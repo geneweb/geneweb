@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.26 2005-01-16 20:07:18 ddr Exp $ *)
+(* $Id: templ.ml,v 4.27 2005-01-20 07:07:48 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -592,7 +592,7 @@ value eval_date_variable od =
       [ Some (Dgreg _ Dgregorian) -> "gregorian"
       | Some (Dgreg _ Djulian) -> "julian"
       | Some (Dgreg _ Dfrench) -> "french"
-      | Some (Dgreg _ Dhebrew) -> "french"
+      | Some (Dgreg _ Dhebrew) -> "hebrew"
       | _ -> "" ]
   | "prec" ->
       match od with
