@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 2.2 1999-04-29 22:02:28 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 2.3 1999-05-06 22:02:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -198,7 +198,7 @@ value print_conflict conf base p =
   return ()
 ;
 
-value check_conflict conf base p key ipl =
+value check_conflict conf base p key new_occ ipl =
   let name = Name.strip_lower key in
   List.iter
     (fun ip ->
@@ -206,7 +206,7 @@ value check_conflict conf base p key ipl =
        if p1.cle_index <> p.cle_index
        && Name.strip_lower (sou base p1.first_name ^ " " ^ sou base p1.surname)
           = name
-       && p1.occ = p.occ then
+       && p1.occ = new_occ then
          do print_conflict conf base p1; return raise Update.ModErr
        else ())
     ipl
@@ -262,7 +262,7 @@ value change_child conf base parent_surname ip =
   || new_occ <> p.occ then
     let key = new_first_name ^ " " ^ new_surname in
     let ipl = person_ht_find_all base key in
-    do check_conflict conf base p key ipl;
+    do check_conflict conf base p key new_occ ipl;
        rename_image_file conf base p (new_first_name, new_surname, new_occ);
        p.first_name := Update.insert_string conf base new_first_name;
        p.surname := Update.insert_string conf base new_surname;

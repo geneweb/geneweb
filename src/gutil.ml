@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.11 1999-04-29 19:55:53 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.12 1999-05-06 22:02:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -275,7 +275,9 @@ value person_ht_find_all base s =
       select ipl where rec select =
         fun
         [ [ip :: ipl] ->
-            if person_is_key base (poi base ip) s then [ip :: select ipl]
+            if person_is_key base (poi base ip) s then
+              let ipl = select ipl in
+              if List.mem ip ipl then ipl else [ip :: ipl]
             else select ipl
         | [] -> [] ] ]
 ;
