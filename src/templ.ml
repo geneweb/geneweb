@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.0 2001-03-16 19:35:03 ddr Exp $ *)
+(* $Id: templ.ml,v 4.1 2001-04-19 17:26:00 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -27,27 +27,34 @@ and ast_expr =
 ;
 
 type token =
-  [ BANGEQUAL | COMMA | DOT | EQUAL | LPAREN | RPAREN
-  | IDENT of string | STRING of string | INT of string
+  [ BANGEQUAL
+  | COMMA
+  | DOT
+  | EQUAL
+  | LPAREN
+  | RPAREN
+  | IDENT of string
+  | STRING of string
+  | INT of string
   | LEXICON of bool and string and char ]
 ;
 
 value rec get_ident len =
   parser
-  [ [: `('a'..'z' | 'A'..'Z' | '0'..'9' | '_' as c); strm :] ->
-      get_ident (Buff.store len c) strm
+  [ [: `('a'..'z' | 'A'..'Z' | '0'..'9' | '_' as c); s :] ->
+      get_ident (Buff.store len c) s
   | [: :] -> Buff.get len ]
 ;
 
 value rec get_string len =
   parser
   [ [: `'"' :] -> Buff.get len
-  | [: `c; strm :] -> get_string (Buff.store len c) strm ]
+  | [: `c; s :] -> get_string (Buff.store len c) s ]
 ;
 
 value rec get_int len =
   parser
-  [ [: `('0'..'9' as c); strm :] -> get_int (Buff.store len c) strm
+  [ [: `('0'..'9' as c); s :] -> get_int (Buff.store len c) s
   | [: :] -> Buff.get len ]
 ;
 
@@ -68,14 +75,14 @@ value lexicon_word =
   let rec text len =
     parser
     [ [: `']' :] -> Buff.get len
-    | [: `c; strm:] -> text (Buff.store len c) strm ]
+    | [: `c; s :] -> text (Buff.store len c) s ]
   in
   parser [: upp = upper; s = text 0; `n :] -> (upp, s, n)
 ;
 
 value rec get_token =
   parser
-  [ [: `(' ' | '\t' | '\n' | '\r'); strm :] -> get_token strm
+  [ [: `' ' | '\t' | '\n' | '\r'; s :] -> get_token s
   | [: `'(' :] -> LPAREN
   | [: `')' :] -> RPAREN
   | [: `',' :] -> COMMA
@@ -91,11 +98,13 @@ value rec get_token =
 value buff = ref (String.create 80);
 
 value buff_store len x =
-  do if len >= String.length buff.val then
-       buff.val := buff.val ^ String.create (String.length buff.val)
-     else ();
-     buff.val.[len] := x;
-  return succ len
+  do {
+    if len >= String.length buff.val then
+      buff.val := buff.val ^ String.create (String.length buff.val)
+    else ();
+    buff.val.[len] := x;
+    succ len
+  }
 ;
 
 value buff_mstore len s =
@@ -106,49 +115,50 @@ value buff_mstore len s =
 
 value buff_get len = String.sub buff.val 0 len;
 
-value rec parse_var =
-  parser
-  [ [: `IDENT id; idl = ident_list :] -> (id, idl) ]
+value rec parse_var = parser [: `IDENT id; idl = ident_list :] -> (id, idl)
 and ident_list =
   parser
   [ [: `DOT;
-       id =
-         parser
-         [ [: `IDENT id :] -> id
-         | [: `_ :] -> "parse_error" ];
-       idl = ident_list :] -> [id :: idl]
+       id = parser [ [: `IDENT id :] -> id | [: `_ :] -> "parse_error" ];
+       idl = ident_list :] ->
+      [id :: idl]
   | [: :] -> [] ]
 ;
 
 value rec parse_expr strm =
   let rec parse_1 =
     parser
-    [ [: e = parse_2;
-         e =
+      [: e = parse_2;
+         a =
            parser
-           [ [: `IDENT "or"; strm :] -> Eor e (parse_1 strm)
-           | [: :] -> e ] :] -> e ]
+           [ [: `IDENT "or"; s :] -> Eor e (parse_1 s)
+           | [: :] -> e ] :] ->
+        a
   and parse_2 =
     parser
-    [ [: e = parse_3;
-         e =
+      [: e = parse_3;
+         a =
            parser
-           [ [: `IDENT "and"; strm :] -> Eand e (parse_2 strm)
-           | [: :] -> e ] :] -> e ]
+           [ [: `IDENT "and"; s :] -> Eand e (parse_2 s)
+           | [: :] -> e ] :] ->
+        a
   and parse_3 =
     parser
-    [ [: e = parse_simple;
-         e =
+      [: e = parse_simple;
+         a =
            parser
            [ [: `EQUAL; e2 = parse_simple :] -> Eop "=" e e2
            | [: `BANGEQUAL; e2 = parse_simple :] -> Eop "!=" e e2
-           | [: :] -> e ] :] -> e ]
+           | [: :] -> e ] :] ->
+        a
   and parse_simple =
     parser
     [ [: `LPAREN; e = parse_1;
-         e = parser
-             [ [: `RPAREN :] -> e
-             | [: `_ :] -> Evar "parse_error" [] ] :] -> e
+         a =
+           parser
+           [ [: `RPAREN :] -> e
+           | [: `_ :] -> Evar "parse_error" [] ] :] ->
+        a
     | [: `IDENT "not"; e = parse_simple :] -> Enot e
     | [: `STRING s :] -> Estr s
     | [: `INT s :] -> Eint s
@@ -157,7 +167,7 @@ value rec parse_expr strm =
   in
   let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
   let r = parse_simple (Stream.from f) in
-  do match strm with parser [ [: `';' :] -> () | [: :] -> () ]; return r
+  do { match strm with parser [ [: `';' :] -> () | [: :] -> () ]; r }
 ;
 
 value parse_real_params strm =
@@ -169,23 +179,22 @@ value parse_real_params strm =
   in
   let rec parse_expr_list =
     parser
-    [ [: x = expr;
+      [: x = expr;
          xl =
            parser
-           [ [: `COMMA; xl = parse_expr_list :] -> xl
-           | [: :] -> [] ] :] -> [x :: xl] ]
+           [ [: `COMMA; a = parse_expr_list :] -> a
+           | [: :] -> [] ] :] ->
+        [x :: xl]
   in
   let parse_tuple =
     parser
-    [ [: `LPAREN;
-         xl =
-           parser
-           [ [: xl = parse_expr_list :] -> xl
-           | [: :] -> [] ];
-         xl =
+      [: `LPAREN;
+         xl = parser [ [: a = parse_expr_list :] -> a | [: :] -> [] ];
+         a =
            parser
            [ [: `RPAREN :] -> xl
-           | [: :] -> [Estr "parse_error"] ] :] -> xl ]
+           | [: :] -> [Estr "parse_error"] ] :] ->
+        a
   in
   let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
   parse_tuple (Stream.from f)
@@ -194,23 +203,19 @@ value parse_real_params strm =
 value parse_formal_params strm =
   let rec parse_ident_list =
     parser
-    [ [: `IDENT x;
+      [: `IDENT x;
          xl =
            parser
-           [ [: `COMMA; xl = parse_ident_list :] -> xl
-           | [: :] -> [] ] :] -> [x :: xl] ]
+           [ [: `COMMA; a = parse_ident_list :] -> a
+           | [: :] -> [] ] :] ->
+        [x :: xl]
   in
   let parse_tuple =
     parser
-    [ [: `LPAREN;
-         xl =
-           parser
-           [ [: xl = parse_ident_list :] -> xl
-           | [: :] -> [] ];
-         xl =
-           parser
-           [ [: `RPAREN :] -> xl
-           | [: :] -> ["parse_error"] ] :] -> xl ]
+      [: `LPAREN;
+         xl = parser [ [: a = parse_ident_list :] -> a | [: :] -> [] ];
+         a = parser [ [: `RPAREN :] -> xl | [: :] -> ["parse_error"] ] :] ->
+        a
   in
   let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
   parse_tuple (Stream.from f)
@@ -220,9 +225,7 @@ value parse_templ conf base strm =
   let rec parse_astl astl bol len end_list strm =
     match strm with parser
     [ [: `'%' :] ->
-        let astl =
-          if len = 0 then astl else [Atext (buff_get len) :: astl]
-        in
+        let astl = if len = 0 then astl else [Atext (buff_get len) :: astl] in
         match get_variable strm with
         [ ("%", []) -> parse_astl [Atext "%" :: astl] False 0 end_list strm
         | (v, []) when List.mem v end_list -> (List.rev astl, v)
@@ -238,13 +241,8 @@ value parse_templ conf base strm =
             in
             parse_astl [ast :: astl] False 0 end_list strm ]
     | [: `'[' :] ->
-        let astl =
-          if len = 0 then astl else [Atext (buff_get len) :: astl]
-        in
-        let a =
-          let (x, y, z) = lexicon_word strm in
-          Atransl x y z
-        in
+        let astl = if len = 0 then astl else [Atext (buff_get len) :: astl] in
+        let a = let (x, y, z) = lexicon_word strm in Atransl x y z in
         parse_astl [a :: astl] False 0 end_list strm
     | [: `c :] ->
         let empty_c = c = ' ' || c = '\t' in
@@ -252,17 +250,14 @@ value parse_templ conf base strm =
         let bol = empty_c && bol || c = '\n' in
         parse_astl astl bol len end_list strm
     | [: :] ->
-        let astl =
-          if len = 0 then astl else [Atext (buff_get len) :: astl]
-        in
+        let astl = if len = 0 then astl else [Atext (buff_get len) :: astl] in
         (List.rev astl, "") ]
   and parse_define astl end_list strm =
     let fxlal =
       try
         let f = get_ident 0 strm in
         let xl = parse_formal_params strm in
-        let (al, _) = parse_astl [] False 0 ["end"] strm in
-        Some (f, xl, al)
+        let (al, _) = parse_astl [] False 0 ["end"] strm in Some (f, xl, al)
       with
       [ Stream.Failure | Stream.Error _ -> None ]
     in
@@ -276,8 +271,7 @@ value parse_templ conf base strm =
   and parse_apply strm =
     try
       let f = get_ident 0 strm in
-      let el = parse_real_params strm in
-      Aapply f el
+      let el = parse_real_params strm in Aapply f el
     with
     [ Stream.Failure | Stream.Error _ -> Atext "apply error" ]
   and parse_if strm =
@@ -290,18 +284,15 @@ value parse_templ conf base strm =
         match tok with
         [ "elseif" ->
             let e2 = parse_expr strm in
-            let (al2, al3) = loop () in
-            (al1, [Aif e2 al2 al3])
+            let (al2, al3) = loop () in (al1, [Aif e2 al2 al3])
         | "else" ->
-            let (al2, _) = parse_astl [] False 0 ["end"] strm in
-            (al1, al2)
+            let (al2, _) = parse_astl [] False 0 ["end"] strm in (al1, al2)
         | _ -> (al1, []) ]
     in
     Aif e al1 al2
   and parse_foreach strm =
     let (v, vl) = get_variable strm in
-    let (astl, _) = parse_astl [] False 0 ["end"] strm in
-    Aforeach v vl astl
+    let (astl, _) = parse_astl [] False 0 ["end"] strm in Aforeach v vl astl
   in
   fst (parse_astl [] True 0 [] strm)
 ;
@@ -313,7 +304,9 @@ value open_templ conf dir name =
   if dir = "" then try Some (open_in std_fname) with [ Sys_error _ -> None ]
   else
     let dir = Filename.basename dir in
-    let fname = Filename.concat (Util.base_path ["etc"] dir) (name ^ ".txt") in
+    let fname =
+      Filename.concat (Util.base_path ["etc"] dir) (name ^ ".txt")
+    in
     try Some (open_in fname) with
     [ Sys_error _ ->
         if dir = conf.bname then
@@ -344,13 +337,12 @@ value input conf base fname =
   let config_templ =
     try
       let s = List.assoc "template" conf.base_env in
-      loop [] 0 0 where rec loop list i len =
-        if i == String.length s then
-          List.rev [Buff.get len :: list]
-        else if s.[i] = ',' then
-          loop [Buff.get len :: list] (i + 1) 0
-        else
-          loop list (i + 1) (Buff.store len s.[i])
+      let rec loop list i len =
+        if i == String.length s then List.rev [Buff.get len :: list]
+        else if s.[i] = ',' then loop [Buff.get len :: list] (i + 1) 0
+        else loop list (i + 1) (Buff.store len s.[i])
+      in
+      loop [] 0 0
     with
     [ Not_found -> [conf.bname; "*"] ]
   in
@@ -368,28 +360,27 @@ value input conf base fname =
   [ Some ic ->
       let astl = parse_templ conf base (Stream.of_channel ic) in
       let astl = strip_newlines_after_variables astl in
-      do close_in ic; return astl
+      do { close_in ic; astl }
   | None ->
       let title _ = Wserver.wprint "Error" in
-      do Util.header conf title;
-         tag "ul" begin
-           html_li conf;
-           Wserver.wprint "Cannot access file \"%s/%s.txt\".\n"
-             dir fname;
-         end;
-         Util.trailer conf;
-      return raise Exit ]
+      do {
+        Util.header conf title;
+        tag "ul" begin
+          html_li conf;
+          Wserver.wprint "Cannot access file \"%s/%s.txt\".\n" dir fname;
+        end;
+        Util.trailer conf;
+        raise Exit
+      } ]
 ;
 
 (* Common evaluation functions *)
 
 value print_body_prop conf base =
   let s =
-    try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
-    [ Not_found -> "" ]
+    try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with [ Not_found -> "" ]
   in
-  let s = s ^ body_prop conf in
-  Wserver.wprint "%s" s
+  let s = s ^ body_prop conf in Wserver.wprint "%s" s
 ;
 
 value print_copyright conf base =
@@ -403,12 +394,13 @@ value print_copyright conf base =
   match open_etc_file "copyr" with
   [ Some ic -> copy_from_etc env conf.indep_command ic
   | None ->
-      do html_p conf;
-         Wserver.wprint "
+      do {
+        html_p conf;
+        Wserver.wprint "
 <hr><font size=-1><em>(c) Copyright 2001 INRIA -
 GeneWeb %s</em></font>" Version.txt;
-         html_br conf;
-      return () ]
+        html_br conf;
+      } ]
 ;
 
 value print_variable conf base =
