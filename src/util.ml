@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.7 1999-04-06 08:11:42 ddr Exp $ *)
+(* $Id: util.ml,v 2.8 1999-04-06 09:35:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -252,19 +252,20 @@ value afficher_prenom_de_personne conf base p =
   Wserver.wprint "%s" (person_text_without_surname conf base p)
 ;
 
-value main_title =
-  fun base p ->
-    let rec loop r =
-      fun
-      [ [] -> r
-      | [x :: l] ->
-          if x.t_name == Tmain then Some x
-          else
-            match r with
-            [ Some t -> loop r l
-            | None -> loop (Some x) l ] ]
-    in
-    loop None p.titles
+value main_title base p =
+  let rec find_main =
+    fun
+    [ [] -> None
+    | [x :: l] ->
+        if x.t_name == Tmain then Some x
+        else find_main l ]
+  in
+  match find_main p.titles with
+  [ None ->
+      match p.titles with
+      [ [x :: _] -> Some x
+      | _ -> None ]
+  | x -> x ]
 ;
 
 value titled_person_text conf base p t =
