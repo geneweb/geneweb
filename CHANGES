@@ -2,6 +2,12 @@ GeneWeb version 3.11
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [10 Jan 00] In relationship computing, changed translation of the
+    phrase "of a cousin". Indeed, in the context, it should display "of a
+    cousin(male) or a cousin(female)". In English there is just one word,
+    "cousin" for male cousins and female cousins, but not in many other
+    languages (German, French, Spanish...). Now, the translation is
+    correct for these languages.
   - [28 Dec 00] (detail) In short dates, for the case "don't know if
     dead", now print just "year" instead of "*year". Changed all FAQ about
     this convention of short dates.
