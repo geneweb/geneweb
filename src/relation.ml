@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.36 2000-01-16 09:15:52 ddr Exp $ *)
+(* $Id: relation.ml,v 3.37 2000-04-11 02:08:51 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -173,6 +173,9 @@ value print_menu conf base p =
              Wserver.wprint "<input type=checkbox name=long value=on><br>\n";
              Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
              Wserver.wprint "<input type=checkbox name=spouse value=on><br>\n";
+             Wserver.wprint "%s\n"
+               (capitale (transl_nth conf "image/images" 1));
+             Wserver.wprint "<input type=checkbox name=image value=on><br>\n";
            end;
            tag "td" "align=right" begin
              Wserver.wprint "%s\n"
@@ -181,10 +184,6 @@ value print_menu conf base p =
              Wserver.wprint "%s\n" (capitale (transl conf "shortest path"));
              Wserver.wprint
                "<input type=checkbox name=shortest value=on><br>\n";
-           end;
-         end;
-         tag "tr" begin
-           tag "td" "colspan=2 align=center" begin
              Wserver.wprint "%s\n"
                (capitale (transl conf "cancel GeneWeb links"));
              Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
@@ -889,6 +888,11 @@ value string_of_big_int conf i =
 ;
 
 value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
+  let image_opt =
+    match p_getenv conf.env "image" with
+    [ Some "on" -> ";image=on"
+    | _ -> "" ]
+  in
   tag "ul" begin
     List.iter
       (fun (a, n) ->
@@ -903,14 +907,15 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                  let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
                  let dp2 = match pp2 with [ Some p -> p | _ -> p2 ] in
                  Wserver.wprint
-                   "<a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s\">"
+                   "<a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s%s\">"
                    (commd conf) (acces conf base a) x1
                    (acces_n conf base "1" dp1) x2 (acces_n conf base "2" dp2)
                    (if pp1 = None then ""
                     else ";" ^ acces_n conf base "3" p1)
                    (if pp2 = None then ""
                     else ";" ^ acces_n conf base "4" p2)
-                   (if propose_dag then ";dag=on" else "");
+                   (if propose_dag then ";dag=on" else "")
+                   image_opt;
                  Wserver.wprint "%s</a>" (transl conf "here");
                  if n > 1 && not propose_dag then
                    Wserver.wprint "%s"
@@ -925,6 +930,11 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
 ;
 
 value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
+  let image_opt =
+    match p_getenv conf.env "image" with
+    [ Some "on" -> ";image=on"
+    | _ -> "" ]
+  in
   do Wserver.wprint "<ul>\n";
      html_li conf;
      Wserver.wprint "%s\n" (capitale (transl conf "indeed,"));
@@ -946,7 +956,7 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                     let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
                     let dp2 = match pp2 with [ Some p -> p | _ -> p2 ] in
                     Wserver.wprint
-                      " <a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s\">"
+                      " <a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s%s\">"
                       (commd conf) (acces conf base a) x1
                       (acces_n conf base "1" dp1) x2
                       (acces_n conf base "2" dp2)
@@ -954,7 +964,8 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                        else ";" ^ acces_n conf base "3" p1)
                       (if pp2 = None then ""
                        else ";" ^ acces_n conf base "4" p2)
-                      (if propose_dag then ";dag=on" else "");
+                      (if propose_dag then ";dag=on" else "")
+                      image_opt;
                     Wserver.wprint "%s</a>" (transl conf "here");
                     if n > 1 && not propose_dag then
                       Wserver.wprint "%s"
