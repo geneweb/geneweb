@@ -130,24 +130,25 @@ pays).</td></tr>
 </table></dl>
 
 <dl><dt><dd><table border=1>
-<tr><td>&nbsp;</td><td>La norme GEDCOM 5.5 pr&eacute;conise
-l'utilisation du codage ANSEL pour les caract&egrave;res
-accentu&eacute;s, qui sont alors repr&eacute;sent&eacute;s par deux
-lettres. Le fichier GEDCOM indique en principe dans son en-t&ecirc;te
-si ce codage est utilis&eacute; ou non.</td></tr>
+<tr><td>&nbsp;</td><td>Le codage des lettres accentu&eacute;es est en
+principe indiqu&eacute; dans l'en-t&ecirc;te du fichier
+GEDCOM.</td></tr>
 
-<tr><td><input type=radio name=ansel value=none checked>&nbsp;&nbsp;&nbsp;</td>
-<td>Suivre les indications de l'en-t&ecirc;te du GEDCOM.</td>
+<tr><td>
+<input type=radio name=charset value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>Suivre les indications de l'en-t&ecirc;te du GEDCOM.</td> </tr>
+
+<tr><td><input type=radio name=charset value=ANSEL>&nbsp;&nbsp;&nbsp;</td>
+<td>Les lettres accentu&eacute;es sont en codage ANSEL.</td>
 </tr>
 
-<tr><td><input type=radio name=ansel value=on>&nbsp;&nbsp;&nbsp;</td>
-<td>Force le d&eacute;codage ANSEL, m&ecirc;me si l'en-t&ecirc;te indique
-le contraire.</td>
+<tr><td><input type=radio name=charset value=ASCII>&nbsp;&nbsp;&nbsp;</td>
+<td>Les lettres accentu&eacute;es sont en codage ASCII.</td>
 </tr>
 
-<tr><td><input type=radio name=ansel value="no_">&nbsp;&nbsp;&nbsp;</td>
-<td>Ne pas faire de d&eacute;codage ANSEL, m&ecirc;me si
-l'en-t&ecirc;te le demande.</td> </tr>
+<tr><td><input type=radio name=charset value=MSDOS>&nbsp;&nbsp;&nbsp;</td>
+<td>Les lettres accentu&eacute;es sont en codage MSDOS.</td>
+</tr>
 </table></dl>
 
 <dl><dt><dd><table border=1>

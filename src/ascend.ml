@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.26 1999-06-16 11:51:42 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.27 1999-06-19 11:04:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -83,10 +83,20 @@ value print_choice conf base p niveau_effectif =
     tag "ul" begin
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=N checked> %s\n"
-        (capitale (transl conf "Sosa numbers"));
-      Wserver.wprint
-        "<ul><li>%s <input type=checkbox name=long value=on></ul>\n"
+        (capitale (transl conf "short display"));
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=G> %s\n"
         (capitale (transl conf "long display"));
+      tag "ul" begin
+        html_li conf;
+        Wserver.wprint
+          "%s <input type=checkbox name=siblings value=on checked>\n"
+          (capitale (transl conf "siblings"));
+        html_li conf;
+        Wserver.wprint
+          "%s <input type=checkbox name=notes value=on checked>\n"
+          (capitale (transl_nth conf "note/notes" 1));
+      end;
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=L> %s%t\n"
         (capitale (transl conf "list"))
@@ -101,26 +111,22 @@ value print_choice conf base p niveau_effectif =
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=S> %s\n"
         (capitale (transl conf "only the generation selected"));
-    end;
-    html_p conf;
-    tag "ul" begin
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=M> %s\n"
         (capitale (transl conf "missing ancestors"));
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=A> %s (%s)\n"
-        (capitale (transl conf "missing ancestors"))
-        (transl conf "alphabetic order");
       tag "ul" begin
+        html_li conf;
+        Wserver.wprint "%s\n" (capitale (transl conf "alphabetic order"));
+        Wserver.wprint "<input type=checkbox name=al value=on>\n";
+        html_li conf;
+        Wserver.wprint "%s\n"
+          (capitale (transl conf "include missing spouses"));
+        Wserver.wprint "<input type=checkbox name=ms value=on>\n";
         html_li conf;
         Wserver.wprint "%s\n" (capitale (transl conf "after"));
         Wserver.wprint "<input name=after size=5 maxlength=5>\n";
         Wserver.wprint "%s\n" (capitale (transl conf "before"));
         Wserver.wprint "<input name=before size=5 maxlength=5>\n";
-        html_li conf;
-        Wserver.wprint "%s\n"
-          (capitale (transl conf "include missing spouses"));
-        Wserver.wprint "<input type=checkbox name=ms value=on>\n";
       end;
     end;
     html_p conf;
@@ -533,8 +539,8 @@ value has_notes conf base =
      | _ -> False ])
 ;
 
-value print_other_marriages conf base all_gp auth ifamo p =
-  if ifamo = None || Array.length p.family >= 2 then
+value print_other_marriages conf base ws all_gp auth ifamo p =
+  if ws && (ifamo = None || Array.length p.family >= 2) then
     do for i = 0 to Array.length p.family - 1 do
          if ifamo = None || ifamo <> Some p.family.(i) then
            let marr_nb = if ifamo = None then None else Some (i + 1) in
@@ -614,13 +620,13 @@ value print_other_families conf base all_gp excl_ifam moth_nb =
   return ()
 ;
 
-value print_generation_person_long conf base all_gp last_generation gp =
+value print_generation_person_long conf base ws wn all_gp last_gen gp =
   match gp with
   [ GP_person n ip ifamo ->
       let p = poi base ip in
       do Wserver.wprint "<p>\n";
          match ifamo with
-         [ Some ifam ->
+         [ Some ifam when ws ->
              if not (Num.even n) then
                let fam = foi base ifam in
                let cpl = coi base ifam in
@@ -642,7 +648,7 @@ value print_generation_person_long conf base all_gp last_generation gp =
                   Wserver.wprint "...\n<p>\n";
                return ()
              else ()
-         | None -> () ];
+         | _ -> () ];
          stag "strong" begin
            stag "a" "name=\"%s\"" (Num.to_string n) begin
              Num.print wpr (transl conf "(thousand separator)") n;
@@ -658,7 +664,7 @@ value print_generation_person_long conf base all_gp last_generation gp =
          [ Some ifam ->
              let cpl = coi base ifam in
              let prec =
-               if last_generation then
+               if last_gen then
                  (get_link all_gp cpl.father, get_link all_gp cpl.mother)
                else
                  let n1 = Num.twice n in
@@ -674,7 +680,7 @@ value print_generation_person_long conf base all_gp last_generation gp =
                  return ()
              | _ -> () ]
          | None -> () ];
-         if age_autorise conf base p && person_has_notes base p then
+         if wn && age_autorise conf base p && person_has_notes base p then
            do Wserver.wprint "[%s "
                 (capitale (transl_nth conf "note/notes" 0));
               stag "strong" begin
@@ -685,16 +691,16 @@ value print_generation_person_long conf base all_gp last_generation gp =
               Wserver.wprint "].\n";
            return ()
          else ();
-         print_other_marriages conf base all_gp (age_autorise conf base p)
+         print_other_marriages conf base ws all_gp (age_autorise conf base p)
            ifamo p;
          match ifamo with
-         [ Some ifam ->
+         [ Some ifam when ws ->
              if not (Num.even n) then
                do print_family_long conf base all_gp ifam None;
                   print_other_families conf base all_gp ifam n;
                return ()
              else ()
-         | None -> () ];
+         | _ -> () ];
       return ()
   | GP_same n1 n2 ip ->
       let p = poi base ip in
@@ -734,7 +740,7 @@ value print_notes conf base =
   | _ -> () ]
 ;
 
-value afficher_ascendants_numerotation_long conf base niveau_max p =
+value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
   let mark = Array.create (base.data.persons.len) Num.zero in
   let rec get_generations niveau gpll gpl =
     let gpll = [gpl :: gpll] in
@@ -753,7 +759,8 @@ value afficher_ascendants_numerotation_long conf base niveau_max p =
                (capitale (transl conf "generation")) niveau;
            end;
            List.iter
-             (print_generation_person_long conf base all_gp (gpll = [])) gpl;
+             (print_generation_person_long conf base ws wn all_gp (gpll = []))
+             gpl;
            Wserver.wprint "<p>";
            html_br conf;
         return
@@ -775,7 +782,7 @@ value afficher_ascendants_numerotation_long conf base niveau_max p =
      let gpll = List.rev gpll in
      let all_gp = List.flatten gpll in
      do generation 1 all_gp gpll;
-        if has_notes conf base all_gp then
+        if wn && has_notes conf base all_gp then
           do Wserver.wprint "<p><hr><p>\n";
              Wserver.wprint "<h3>%s</h3>\n"
                (capitale (transl_nth conf "note/notes" 1));
@@ -1383,25 +1390,33 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> afficher_ascendants_jusqu_a conf base v p
-  | (Some "N", Some v) ->
-      match p_getenv conf.env "long" with
-      [ Some "on" -> afficher_ascendants_numerotation_long conf base v p
-      | _ -> afficher_ascendants_numerotation conf base v p ]
+  | (Some "N", Some v) -> afficher_ascendants_numerotation conf base v p
+  | (Some "G", Some v) ->
+      let ws =
+        match p_getenv conf.env "siblings" with
+        [ Some "on" -> True
+        | _ -> False ]
+      in
+      let wn =
+        match p_getenv conf.env "notes" with
+        [ Some "on" -> True
+        | _ -> False ]
+      in
+      afficher_ascendants_numerotation_long conf base v ws wn p
   | (Some "S", Some v) -> afficher_ascendants_niveau conf base v p
   | (Some "M", Some v) ->
+      let al =
+        match p_getenv conf.env "al" with
+        [ Some "on" -> True
+        | _ -> False ]
+      in
       let si =
         match p_getenv conf.env "ms" with
         [ Some "on" -> True
         | _ -> False ]
       in
-      print_missing_ancestors conf base v si p
-  | (Some "A", Some v) ->
-      let si =
-        match p_getenv conf.env "ms" with
-        [ Some "on" -> True
-        | _ -> False ]
-      in
-      print_missing_ancestors_alphabetically conf base v si p
+      if al then print_missing_ancestors_alphabetically conf base v si p
+      else print_missing_ancestors conf base v si p
   | (Some "D", Some v) ->
       print_ancestors_same_time_descendants conf base p
         (base.data.persons.get v)
