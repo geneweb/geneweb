@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.33 2004-07-21 07:22:21 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.34 2004-09-30 12:15:02 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -175,7 +175,7 @@ function checkCreate(create, redirect)
     <tr>
       <td>
         [*insert::|<input name=ins_paxcnt_n size=1 maxlength=1 value=1> |
-        parents]0
+        parents]
         <input type=checkbox name=ins_paxcnt value=on>
       </td>
     </tr>
@@ -324,7 +324,7 @@ function checkCreate(create, redirect)
     <tr>
       <td>
         [*insert::|<input name=ins_chxcnt_n size=1 maxlength=1 value=1> |
-        child/children]0
+        child/children]
         <input type=checkbox name=ins_chxcnt value=on>
       </td>
     </tr>
