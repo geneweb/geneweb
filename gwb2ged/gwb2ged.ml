@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.8 1999-05-10 15:45:52 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.9 1999-05-11 21:08:31 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -534,7 +534,7 @@ value main () =
      | None ->
          do Printf.printf "Can't open base %s\n" ifile.val;
             flush stdout;
-         return exit 0 ];
+         return exit 2 ];
   return ()
 ;
 
