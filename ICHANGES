@@ -4,6 +4,10 @@ Internal, very small, undocumented, or invisible changes
 GeneWeb Version 4.05
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [11 Jan 02] Fixed bug: the macros in places were not expanded in the
+    places/surnames pages, in descendants and in ascendants pages.
+
 * GeneWeb compiler (gwc) and Gedcom to GeneWeb (ged2gwb)
   - [10 Jan 02] Warranty that the index (istr) number of the empty string
     is 0 and of the string "?" is 1.

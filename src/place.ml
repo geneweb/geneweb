@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.7 2002-01-10 04:13:31 ddr Exp $ *)
+(* $Id: place.ml,v 4.8 2002-01-11 22:15:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -163,11 +163,28 @@ value get_all conf base =
   }
 ;
 
+value print_place conf s =
+  Util.copy_string_with_macros conf [] s
+;
+
 value max_len = ref 2000;
 
 value print_html_places_surnames conf base =
   do {
     Wserver.wprint "<ul>\n";
+    let print_li_place x =
+      do {
+        Wserver.wprint "<li>";
+        print_place conf x;
+        Wserver.wprint "\n";
+      }
+    in
+    let print_ul_li_place x =
+      do {
+        Wserver.wprint "<ul>\n";
+        print_li_place x;
+      }
+    in
     let rec loop prev =
       fun
       [ [(pl, snl) :: list] ->
@@ -175,20 +192,20 @@ value print_html_places_surnames conf base =
             match (prev, pl) with
             [ ([], [x2 :: l2]) ->
                 do {
-                  Wserver.wprint "<li>%s\n" x2;
-                  List.iter (fun p -> Wserver.wprint "<ul>\n<li>%s\n" p) l2
+                  print_li_place x2;
+                  List.iter print_ul_li_place l2;
                 }
             | ([x1], [x2 :: l2]) ->
                 do {
-                  if x1 = x2 then () else Wserver.wprint "<li>%s\n" x2;
-                  List.iter (fun p -> Wserver.wprint "<ul>\n<li>%s\n" p) l2
+                  if x1 = x2 then () else print_li_place x2;
+                  List.iter print_ul_li_place l2
                 }
             | ([x1 :: l1], [x2 :: l2]) ->
                 if x1 = x2 then loop1 l1 l2
                 else do {
                   List.iter (fun _ -> Wserver.wprint "</ul>\n") l1;
-                  Wserver.wprint "<li>%s\n" x2;
-                  List.iter (fun p -> Wserver.wprint "<ul>\n<li>%s\n" p) l2
+                  print_li_place x2;
+                  List.iter print_ul_li_place l2;
                 }
             | _ -> assert False ]
           in
@@ -265,8 +282,12 @@ value print_all_places_surnames_short conf list =
     Wserver.wprint "\n<p>\n";
     List.iter
       (fun (s, len, ip) ->
-         Wserver.wprint "<a href=\"%sm=PS%s;k=%s\">%s</a> (%d),\n"
-           (commd conf) opt (Util.code_varenv s) s len)
+         do {
+           Wserver.wprint "<a href=\"%sm=PS%s;k=%s\">" (commd conf) opt
+             (Util.code_varenv s);
+           print_place conf s;
+           Wserver.wprint "</a> (%d),\n" len;
+         })
       list;
     Util.trailer conf
   }
