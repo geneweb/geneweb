@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.6 2002-01-26 13:31:16 ddr Exp $ *)
+(* $Id: date.ml,v 4.7 2002-01-26 13:38:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -520,13 +520,13 @@ value print_calendar_head conf order =
     Wserver.wprint "\n";
     if order = "ddmmyy" then
       for i = 2 downto 0 do {
-        tag "th" begin
+        tag "th align=center" begin
           Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
         end
       }
     else
       for i = 0 to 2 do {
-        tag "th" begin
+        tag "th align=center" begin
           Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
         end
       };
