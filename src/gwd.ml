@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.2 1999-03-16 18:37:15 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.3 1999-03-22 17:55:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -440,6 +440,19 @@ value chop_extension name =
     else loop (i - 1)
 ;
 
+value match_strings regexp s =
+  loop 0 0 where rec loop i j =
+    if i == String.length regexp && j == String.length s then True
+    else if i == String.length regexp then False
+    else if j == String.length s then False
+    else if regexp.[i] = s.[j] then loop (i + 1) (j + 1)
+    else if regexp.[i] = '*' then
+      if i + 1 == String.length regexp then True
+      else if regexp.[i + 1] = s.[j] then loop (i + 2) (j + 1)
+      else loop i (j + 1)
+    else False
+;
+
 value excluded from =
   let efname = chop_extension Sys.argv.(0) ^ ".xcl" in
   match try Some (open_in efname) with [ Sys_error _ -> None ] with
@@ -447,7 +460,8 @@ value excluded from =
       loop () where rec loop () =
         match try Some (input_line ic) with [ End_of_file -> None ] with
         [ Some line ->
-            if from = line then do close_in ic; return True else loop ()
+            if match_strings line from then do close_in ic; return True
+            else loop ()
         | None -> do close_in ic; return False ]
   | None -> False ]
 ;
