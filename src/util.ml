@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.108 2005-01-04 12:45:39 ddr Exp $ *)
+(* $Id: util.ml,v 4.109 2005-01-15 20:00:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -640,7 +640,7 @@ value gen_person_text (p_first_name, p_surname) conf base p =
     in
     let ali =
       match p.aliases with
-      [ [alias :: _] -> " (" ^ sou base alias ^ ")"
+      [ [alias :: _] -> " <em>(" ^ sou base alias ^ ")</em>"
       | _ -> "" ]
     in
     beg ^ " " ^ p_surname base p ^ ali
@@ -673,7 +673,7 @@ value gen_person_text_without_surname (p_first_name, p_surname) conf base p =
     in
     let ali =
       match p.aliases with
-      [ [alias :: _] -> " (" ^ sou base alias ^ ")"
+      [ [alias :: _] -> " <em>(" ^ sou base alias ^ ")</em>"
       | _ -> "" ]
     in
     s ^ ali
