@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.10 2002-03-11 17:57:00 ddr Exp $ *)
+(* $Id: some.ml,v 4.11 2002-03-11 18:36:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -80,7 +80,7 @@ value print_elem conf base is_surname (p, xl) =
          Wserver.wprint "</a>";
          Wserver.wprint "%s" (Date.short_dates_text conf base x);
          Wserver.wprint " <em>";
-         preciser_homonyme conf base x;
+         specify_homonymous conf base x;
          Wserver.wprint "</em>\n";
        })
     xl
@@ -91,7 +91,7 @@ value first_name_print_list conf base xl liste =
     let l =
       Sort.list
         (fun x1 x2 ->
-           match alphabetique (p_surname base x1) (p_surname base x2) with
+           match alphabetic (p_surname base x1) (p_surname base x2) with
            [ 0 ->
                match
                  (Adef.od_of_codate x1.birth, Adef.od_of_codate x2.birth)
@@ -106,7 +106,7 @@ value first_name_print_list conf base xl liste =
       (fun l x ->
          let px = p_surname base x in
          match l with
-         [ [(p, l1) :: l] when alphabetique px p == 0 -> [(p, [x :: l1]) :: l]
+         [ [(p, l1) :: l] when alphabetic px p == 0 -> [(p, [x :: l1]) :: l]
          | _ -> [(px, [x]) :: l] ])
       [] l
   in
@@ -281,7 +281,7 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
   let ancestors =
     Sort.list
       (fun p1 p2 ->
-         alphabetique (p_first_name base p1) (p_first_name base p2) <= 0)
+         alphabetic (p_first_name base p1) (p_first_name base p2) <= 0)
       pl
   in
   let len = List.length ancestors in
@@ -404,7 +404,7 @@ value print_family_alphabetic x conf base liste =
       Sort.list
         (fun x1 x2 ->
            match
-             alphabetique (p_first_name base x1) (p_first_name base x2)
+             alphabetic (p_first_name base x1) (p_first_name base x2)
            with
            [ 0 -> x1.occ > x2.occ
            | n -> n > 0 ])
@@ -414,7 +414,7 @@ value print_family_alphabetic x conf base liste =
       (fun l x ->
          let px = p_first_name base x in
          match l with
-         [ [(p, l1) :: l] when alphabetique px p == 0 -> [(p, [x :: l1]) :: l]
+         [ [(p, l1) :: l] when alphabetic px p == 0 -> [(p, [x :: l1]) :: l]
          | _ -> [(px, [x]) :: l] ])
       [] l
   in

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 4.4 2002-03-11 17:57:00 ddr Exp $ *)
+(* $Id: title.ml,v 4.5 2002-03-11 18:36:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -135,7 +135,7 @@ value compare_title_order conf base (x1, t1) (x2, t2) =
   else t1.t_nth <= t2.t_nth
 ;
 
-value my_alphabetique n1 n2 =
+value my_alphabetic n1 n2 =
   compare (Name.abbrev (Name.lower n1)) (Name.abbrev (Name.lower n2))
 ;
 
@@ -145,7 +145,7 @@ value string_list_uniq l =
       (fun l e ->
          match l with
          [ [] -> [e]
-         | [x :: _] -> if my_alphabetique e x = 0 then l else [e :: l] ])
+         | [x :: _] -> if my_alphabetic e x = 0 then l else [e :: l] ])
       [] l
   in
   List.rev l
@@ -153,7 +153,7 @@ value string_list_uniq l =
 
 value compare_places p1 p2 = compare (Name.lower p1) (Name.lower p2) <= 0;
 
-value compare_titles t1 t2 = my_alphabetique t1 t2 <= 0;
+value compare_titles t1 t2 = my_alphabetic t1 t2 <= 0;
 
 value strip_abbrev_lower s = Name.strip (Name.abbrev (Name.lower s));
 

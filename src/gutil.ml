@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.6 2002-01-15 16:48:25 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.7 2002-03-11 18:36:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -915,15 +915,15 @@ value strip_spaces str =
 ;
 
 value initiale n =
-  boucle 0 where rec boucle i =
+  loop 0 where rec loop i =
     if i == String.length n then 0
     else
       match n.[i] with
       [ 'A'..'Z' | 'À'..'Ý' -> i
-      | _ -> boucle (succ i) ]
+      | _ -> loop (succ i) ]
 ;
 
-value valeur_alphabetique =
+value alphabetic_value =
   let tab = Array.create 256 0 in
   do {
     for i = 0 to 255 do { tab.(i) := 10 * i };
@@ -945,19 +945,19 @@ value valeur_alphabetique =
   }
 ;
 
-value alphabetique n1 n2 =
-  let rec boucle i1 i2 =
+value alphabetic n1 n2 =
+  let rec loop i1 i2 =
     if i1 == String.length n1 && i2 == String.length n2 then i1 - i2
     else if i1 == String.length n1 then -1
     else if i2 == String.length n2 then 1
     else
       let c1 = n1.[i1] in
       let c2 = n2.[i2] in
-      if valeur_alphabetique c1 < valeur_alphabetique c2 then -1
-      else if valeur_alphabetique c1 > valeur_alphabetique c2 then 1
-      else boucle (succ i1) (succ i2)
+      if alphabetic_value c1 < alphabetic_value c2 then -1
+      else if alphabetic_value c1 > alphabetic_value c2 then 1
+      else loop (succ i1) (succ i2)
   in
-  if n1 = n2 then 0 else boucle (initiale n1) (initiale n2)
+  if n1 = n2 then 0 else loop (initiale n1) (initiale n2)
 ;
 
 value map_title_strings f t =

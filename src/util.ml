@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.43 2002-03-11 17:50:46 ddr Exp $ *)
+(* $Id: util.ml,v 4.44 2002-03-11 18:36:09 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1437,7 +1437,7 @@ value print_parent conf base p fath moth =
        (transl_nth conf "son/daughter/child" is) s)
 ;
 
-value preciser_homonyme conf base p =
+value specify_homonymous conf base p =
   let is = index_of_sex p.sex in
   match (p.public_name, p.qualifiers) with
   [ (n, [nn :: _]) when sou base n <> "" ->
