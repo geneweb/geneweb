@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.29 2001-01-08 12:36:26 ddr Exp $ *)
+(* $Id: dag.ml,v 3.30 2001-01-08 18:54:28 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -222,15 +222,17 @@ value buff_store_int s blen i j =
     if i = j then blen else loop (Buff.store blen s.[i]) (i + 1)
 ;
 
-value displayed_sub s max_len =
-  loop 0 0 0 where rec loop blen dlen i =
+value displayed_sub s ibeg ilen =
+  loop 0 0 0 0 where rec loop blen di dlen i =
     match displayed_next_char s i with
     [ Some (j, k) ->
         let blen = buff_store_int s blen i j in
-        let blen =
-          if dlen < max_len then buff_store_int s blen j k else blen
+        let (blen, dlen) =
+          if di >= ibeg && dlen < ilen then
+            (buff_store_int s blen j k, dlen + 1)
+          else (blen, dlen)
         in
-        loop blen (dlen + 1) k
+        loop blen (di + 1) dlen k
    | None ->
         Buff.get (buff_store_int s blen i (String.length s)) ]
 ;
@@ -242,6 +244,36 @@ value longuest_word_length s =
         if s.[j] = ' ' then loop (max maxlen len) 0 k
         else loop maxlen (len + 1) k
     | None -> max maxlen len ]
+;
+
+value displayed_end_word s di i =
+  loop di i where rec loop di i =
+    match displayed_next_char s i with
+    [ Some (j, k) -> if s.[j] = ' ' then (di, Some j) else loop (di + 1) k
+    | None -> (di, None) ]
+;
+
+value displayed_strip s sz =
+  loop [] 0 0 0 where rec loop strl dibeg di i =
+    let (dj, j) = displayed_end_word s di i in
+    match j with
+    [ Some j ->
+        if dj - dibeg > sz then
+          loop [displayed_sub s dibeg (di - dibeg - 1) :: strl] di (dj + 1)
+            (j + 1)
+        else
+          loop strl dibeg (dj + 1) (j + 1)
+    | None ->
+        let strl =
+          if dj - dibeg > sz then
+            let str2 = displayed_sub s dibeg (di - dibeg - 1) in
+            let str1 = displayed_sub s di (dj - di) in
+            [str1; str2 :: strl]
+          else
+            let str = displayed_sub s dibeg (dj - dibeg) in
+            [str :: strl]
+        in
+        List.rev strl ]
 ;
 
 value gen_compute_columns_sizes length hts ncol =
@@ -336,46 +368,83 @@ do for i = 0 to ncol - 1 do
    Wserver.wprint " = %d(%d) -> %d<br>\n" tcol tmincol dcol;
 return
 *)
-  do Wserver.wprint "<pre>\n";
+  do Wserver.wprint "<center><pre>\n";
      for i = 0 to Array.length hts - 1 do
-       loop 0 0 where rec loop col j =
-         if j = Array.length hts.(i) then Wserver.wprint "\n"
-         else
-           let (colspan, align, td) = hts.(i).(j) in
-           let sz =
-             loop 0 colspan where rec loop sz k =
-               if k = 0 then sz else loop (sz + colsz.(col + k - 1)) (k - 1)
-           in
-           do match td with
-              [ TDstring s ->
-let s = displayed_sub s sz in
-                  let len = displayed_length s in
-                  do for i = 1 to (sz - len) / 2 do
-                       Wserver.wprint " ";
-                     done;
-                     loop 0 where rec loop i =
-                       if i == String.length s || s.[i] = '\n'
-                       || start_with s i "<br>" then ()
-                       else do Wserver.wprint "%c" s.[i]; return loop (i + 1);
-                     for i = (sz + len) / 2 + 1 to sz do
-                       Wserver.wprint " ";
-                     done;
-                  return ()
-              | TDhr LeftA ->
-                  let len = (sz + 1) / 2 in
-                  do for i = 1 to len do Wserver.wprint "-"; done;
-                     for i = len + 1 to sz do Wserver.wprint " "; done;
-                  return ()
-              | TDhr RightA ->
-                  let len = sz / 2 in
-                  do for i = 1 to sz - len - 1 do Wserver.wprint " "; done;
-                     for i = sz - len to sz do Wserver.wprint "-"; done;
-                  return ()
-              | TDhr CenterA ->
-                  for i = 1 to sz do Wserver.wprint "-"; done ];
-           return loop (col + colspan) (j + 1);
+       let (stra, max_row) =
+         let (stral, max_row) =
+           loop [] 1 0 0 where rec loop stral max_row col j =
+             if j = Array.length hts.(i) then (stral, max_row)
+             else
+               let (colspan, _, td) = hts.(i).(j) in
+               let stra =
+                 match td with
+                 [ TDstring s ->
+                     let sz =
+                       loop 0 colspan where rec loop sz k =
+                         if k = 0 then sz else
+                         loop (sz + colsz.(col + k - 1)) (k - 1)
+                     in
+                     Array.of_list (displayed_strip s sz)
+                 | _ -> [| |] ]
+               in
+               loop [stra :: stral] (max max_row (Array.length stra))
+                 (col + colspan) (j + 1)
+         in
+         (Array.of_list (List.rev stral), max_row)
+       in
+       for row = 0 to max_row - 1 do
+         loop 0 0 where rec loop col j =
+           if j = Array.length hts.(i) then Wserver.wprint "\n"
+           else
+             let (colspan, align, td) = hts.(i).(j) in
+             let sz =
+               loop 0 colspan where rec loop sz k =
+                 if k = 0 then sz
+                 else loop (sz + colsz.(col + k - 1)) (k - 1)
+             in
+             do match td with
+                [ TDstring s ->
+                    let s =
+                      let i =
+                        let di = (max_row - Array.length stra.(j)) / 2 in
+                        row - di
+                      in
+                      if i >= 0 && i < Array.length stra.(j) then stra.(j).(i)
+                      else if s <> "&nbsp;" then "|"
+                      else ""
+                    in
+                    let len = displayed_length s in
+                    do for i = 1 to (sz - len) / 2 do
+                         Wserver.wprint " ";
+                       done;
+                       loop 0 where rec loop i =
+                         if i == String.length s || s.[i] = '\n'
+                         || start_with s i "<br>" then ()
+                         else
+                           do Wserver.wprint "%c" s.[i]; return
+                           loop (i + 1);
+                       for i = (sz + len) / 2 + 1 to sz do
+                         Wserver.wprint " ";
+                       done;
+                    return ()
+                | TDhr LeftA ->
+                    let len = (sz + 1) / 2 in
+                    do for i = 1 to len do Wserver.wprint "-"; done;
+                       for i = len + 1 to sz do Wserver.wprint " "; done;
+                    return ()
+                | TDhr RightA ->
+                    let len = sz / 2 in
+                    do for i = 1 to sz - len - 1 do
+                         Wserver.wprint " ";
+                       done;
+                       for i = sz - len to sz do Wserver.wprint "-"; done;
+                    return ()
+                | TDhr CenterA ->
+                    for i = 1 to sz do Wserver.wprint "-"; done ];
+             return loop (col + colspan) (j + 1);
+       done;
      done;
-     Wserver.wprint "</pre>\n";
+     Wserver.wprint "</pre></center>\n";
   return () 
 ;
 
