@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.19 1999-05-23 09:51:58 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.20 1999-06-19 11:04:24 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -20,13 +20,15 @@ type month_number_dates =
   [ MonthDayDates | DayMonthDates | NoMonthNumberDates | MonthNumberHappened ]
 ;
 
+type charset = [ Ansel | Ascii | Msdos ];
+
 value titles_aurejac = ref False;
 value lowercase_first_names = ref False;
 value lowercase_surnames = ref False;
 value extract_first_names = ref True;
 value extract_public_names = ref True;
-value ansel_option = ref None;
-value ansel_characters = ref True;
+value charset_option = ref None;
+value charset = ref Ansel;
 value try_negative_dates = ref False;
 value no_negative_dates = ref False;
 value month_number_dates = ref NoMonthNumberDates;
@@ -82,6 +84,54 @@ value rec line_start num =
   parser [ [: `' '; s :] -> line_start num s | [: `x when x = num :] -> () ]
 ;
 
+value ansel_of_msdos s =
+  let need_copy =
+    loop 0 where rec loop i =
+      if i == String.length s then False
+      else
+        match Char.code s.[i] with
+        [ 0o200 | 0o201 | 0o202 | 0o203 | 0o204 | 0o205 | 0o206 | 0o207
+        | 0o210 | 0o211 | 0o212 | 0o213 | 0o214 | 0o215 | 0o216 | 0o217
+        | 0o220 | 0o221 | 0o222 | 0o223 | 0o224 | 0o225 | 0o226 | 0o227
+        | 0o230 | 0o231 | 0o232 | 0o233 | 0o234 | 0o235 | 0o240 | 0o241
+        | 0o242 | 0o243 | 0o244 | 0o245 | 0o246 | 0o247 | 0o250 | 0o252
+        | 0o253 | 0o254 | 0o255 | 0o256 | 0o257 | 0o346 | 0o361 | 0o366
+        | 0o370 | 0o372 | 0o375 -> True
+        | _ -> loop (i + 1) ]
+  in
+  if need_copy then
+    let s' = String.create (String.length s) in
+    do for i = 0 to String.length s - 1 do
+         let cc =
+           match Char.code s.[i] with
+           [ 0o200 -> 0o307 | 0o201 -> 0o374 | 0o202 -> 0o351 | 0o203 -> 0o342
+           | 0o204 -> 0o344 | 0o205 -> 0o340 | 0o206 -> 0o345 | 0o207 -> 0o347
+           | 0o210 -> 0o352 | 0o211 -> 0o353 | 0o212 -> 0o350 | 0o213 -> 0o357
+           | 0o214 -> 0o356 | 0o215 -> 0o354 | 0o216 -> 0o304 | 0o217 -> 0o305
+           | 0o220 -> 0o311 | 0o221 -> 0o346 | 0o222 -> 0o306 | 0o223 -> 0o364
+           | 0o224 -> 0o366 | 0o225 -> 0o362 | 0o226 -> 0o373 | 0o227 -> 0o371
+           | 0o230 -> 0o377 | 0o231 -> 0o326 | 0o232 -> 0o334 | 0o233 -> 0o242
+           | 0o234 -> 0o243 | 0o235 -> 0o245 | 0o240 -> 0o341 | 0o241 -> 0o355
+           | 0o242 -> 0o363 | 0o243 -> 0o372 | 0o244 -> 0o361 | 0o245 -> 0o321
+           | 0o246 -> 0o252 | 0o247 -> 0o272 | 0o250 -> 0o277 | 0o252 -> 0o254
+           | 0o253 -> 0o275 | 0o254 -> 0o274 | 0o255 -> 0o241 | 0o256 -> 0o253
+           | 0o257 -> 0o273 | 0o346 -> 0o265 | 0o361 -> 0o261 | 0o366 -> 0o367
+           | 0o370 -> 0o260 | 0o372 -> 0o267 | 0o375 -> 0o262
+           | c -> c ]
+         in
+         s'.[i] := Char.chr cc;
+       done;
+    return Ansel.of_iso_8859_1 s'
+  else s
+;
+
+value ansel_of_string s =
+  match charset.val with
+  [ Ansel -> s
+  | Ascii -> Ansel.of_iso_8859_1 s
+  | Msdos -> ansel_of_msdos s ]
+;
+
 value rec get_lev n =
   parser
     [: _ = line_start n; _ = skip_space; r1 = get_ident 0; strm :] ->
@@ -90,9 +140,8 @@ value rec get_lev n =
         else parse_text n r1 strm
       in
       {rlab = rlab;
-       rval = if ansel_characters.val then rval else Ansel.of_iso_8859_1 rval;
-       rcont =
-         if ansel_characters.val then rcont else Ansel.of_iso_8859_1 rcont;
+       rval = ansel_of_string rval;
+       rcont = ansel_of_string rcont;
        rsons = List.rev l; rpos = line_cnt.val}
 and parse_address n r1 =
   parser
@@ -640,12 +689,8 @@ value get_lev0 =
        r3 = get_to_eoln 0 ? "get to eoln";
        l = get_lev_list [] '1' ? "get lev list" :] ->
       let (rlab, rval) = if r2 = "" then (r1, "") else (r2, r1) in
-      let rval =
-        if ansel_characters.val then rval else Ansel.of_iso_8859_1 rval
-      in
-      let rcont =
-        if ansel_characters.val then r3 else Ansel.of_iso_8859_1 r3
-      in
+      let rval = ansel_of_string rval in
+      let rcont = ansel_of_string r3 in
       {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l;
        rpos = line_cnt.val}
 ;
@@ -1143,14 +1188,15 @@ value add_fam gen r =
 ;
 
 value treat_header r =
-  match ansel_option.val with
-  [ Some v -> ansel_characters.val := v
+  match charset_option.val with
+  [ Some v -> charset.val := v
   | None ->
       match find_field "CHAR" r.rsons with
       [ Some r ->
           match r.rval with
-          [ "ANSEL" -> ansel_characters.val := True
-          | _ -> ansel_characters.val := False ]
+          [ "ANSEL" -> charset.val := Ansel
+          | "ASCII" | "IBMPC" -> charset.val := Ascii
+          | _ -> charset.val := Ascii ]
       | None -> () ] ]
 ;
 
@@ -1779,16 +1825,17 @@ value speclist =
     "\n       Interpret months-numbered dates as day/month/year");
    ("-dates_md", Arg.Unit (fun () -> month_number_dates.val := MonthDayDates),
     "\n       Interpret months-numbered dates as month/day/year");
-   ("-ansel", Arg.Unit (fun () -> ansel_option.val := Some True),
-    "  \
-- ANSEL encoding -
-       Force ANSEL encoding, overriding the possible setting in GEDCOM."
-      );
-   ("-no_ansel", Arg.Unit (fun () -> ansel_option.val := Some False),
-    "  \
-- No ANSEL encoding -
-       No ANSEL encoding, overriding the possible setting in GEDCOM."
-      );
+   ("-charset",
+    Arg.String
+      (fun
+       [ "ANSEL" -> charset_option.val := Some Ansel
+       | "ASCII" -> charset_option.val := Some Ascii
+       | "MSDOS" -> charset_option.val := Some Msdos
+       | _ -> raise (Arg.Bad "bad -charset value") ]),
+    "[ANSEL|ASCII|MSDOS] \
+- charset decoding -
+       Force given charset decoding, overriding the possible setting in
+       GEDCOM");
    ("-ta", Arg.Set titles_aurejac,
     "\n       [This option is ad hoc; please do not use it]")]
 ;

@@ -119,22 +119,22 @@ or "February 5, 1912" according to the countries).</td></tr>
 </table></dl>
 
 <dl><dt><dd><table border=1>
-<tr><td>&nbsp;</td><td>The GEDCOM norm 5.5 recommends the usage of the
-ANSEL encoding for accentuated characters, which are then represented by
-two letters. The GEDCOM file normally indicates in its header if this
-encoding is used or not.</td></tr>
+<tr><td>&nbsp;</td><td>The accentuated characters encoding is normally
+specified in the GEDCOM header.</td></tr>
 
-<tr><td><input type=radio name=ansel value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<tr><td>
+<input type=radio name=charset value=none checked>&nbsp;&nbsp;&nbsp;</td>
 <td>Follow the indications of the GEDCOM header.</td>
 </tr>
 
-<tr><td><input type=radio name=ansel value=on>&nbsp;&nbsp;&nbsp;</td>
-<td>Force the ANSEL decoding, overriding the possible header indication.</td>
-</tr>
+<tr><td><input type=radio name=charset value=ANSEL>&nbsp;&nbsp;&nbsp;</td>
+<td>The accentuated characters are in ANSEL encoding.</td></tr>
 
-<tr><td><input type=radio name=ansel value="no_">&nbsp;&nbsp;&nbsp;</td>
-<td>Do not do ANSEL decoding, overriding the possible header indication.</td>
-</tr>
+<tr><td><input type=radio name=charset value=ASCII>&nbsp;&nbsp;&nbsp;</td>
+<td>The accentuated characters are in ASCII encoding.</td></tr>
+
+<tr><td><input type=radio name=charset value=MSDOS>&nbsp;&nbsp;&nbsp;</td>
+<td>The accentuated characters are in MSDOS encoding.</td></tr>
 </table></dl>
 
 <p>

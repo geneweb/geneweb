@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.56 1999-06-11 14:19:16 ddr Exp $
+# $Id: lexicon.txt,v 2.57 1999-06-19 11:04:24 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -327,20 +327,6 @@ he:   ק/ל
 no: J/N
 pt: S/N
 se: J/N
-
-    Sosa numbers
-de: mit Nummern der Generationen
-dk: Sosa-numre (fortl&oslash;bende anenummerering)
-en: Sosa numbers
-eo: nombroj Sosa
-es: numeraci&oacute;n Sosa
-fr: num&eacute;rotation Sosa
-he:   משפרי "Sosa" 
-it: numeri Sosa
-nl: Kwartiernummers
-no: generasjonsnummer
-pt: numera&ccedil;&atilde;o Sosa
-se: generationsnummer
 
     a %s cousin
 de: ein Cousin %s Grades/eine Kusine %s Grades
@@ -3112,6 +3098,13 @@ no: kj&oslash;nn
 pt: sexo
 se: k&ouml;n
 
+    short display
+de: kurze Ansicht
+en: short display
+es: presentaci&oacute;n corta
+fr: affichage court
+pt: short display
+
     should be female
 de: m&uuml;&szlig;te weiblichen Geschlechts sein
 dk: burde v&aelig;re kvinde
@@ -3139,6 +3132,13 @@ nl: moet mannelijk zijn
 no: kj&oslash;nn skulle v&aelig;rt mann
 pt: tendria que ser de sexo masculino
 se: borde vara man
+
+    siblings
+de: Bruder und Schwester
+en: siblings
+eo: gefratoj
+es: hermanos y hermanas
+fr: fr&egrave;res et soeurs
 
     son/daughter/child
 de: Sohn/Tochter/Kind

@@ -121,21 +121,22 @@ significar "2 de mayo de 1912" o "5 de fevrero de 1912" seg&uacute;n los diferen
 </table></dl>
 
 <dl><dt><dd><table border=1>
-<tr><td>&nbsp;</td><td>La norma GEDCOM 5.5 preconiza la utilizaci&oacute;n
-del codaje ANSEL por los car&aacute;cteres acentuados que son entonces representados
-por dos letras. El fichero GEDCOM indica en principio, en su encabezamiento,
-si este codage es o no utilizado.</td></tr>
+<tr><td>&nbsp;</td><td>El codage de los car&aacute;cteres acentuados esta
+indicado en principio en el encabezamiento del fichero GEDCOM.</td></tr>
 
-<tr><td><input type=radio name=ansel value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<tr><td>
+<input type=radio name=charset value=none checked>&nbsp;&nbsp;&nbsp;</td>
 <td>Seguir las indicaciones del encabezamiento del fichero GEDCOM.</td>
 </tr>
 
-<tr><td><input type=radio name=ansel value=on>&nbsp;&nbsp;&nbsp;</td>
-<td>Forzar el decodage ANSEL, aunque el encabezamiento indiqu&eacute; lo contrario.</td>
-</tr>
+<tr><td><input type=radio name=charset value=ANSEL>&nbsp;&nbsp;&nbsp;</td>
+<td>Los car&aacute;cteres acentuados est&aacute;n en codage ANSEL.</td></tr>
 
-<tr><td><input type=radio name=ansel value="no_">&nbsp;&nbsp;&nbsp;</td>
-<td>No utilizar el decodage ANSEL, aunque el encabezamiento lo pida.</td> </tr>
+<tr><td><input type=radio name=charset value=ASCII>&nbsp;&nbsp;&nbsp;</td>
+<td>Los car&aacute;cteres acentuados est&aacute;n en codage ASCII.</td></tr>
+
+<tr><td><input type=radio name=charset value=MSDOS>&nbsp;&nbsp;&nbsp;</td>
+<td>Los car&aacute;cteres acentuados est&aacute;n en codage MSDOS.</td></tr>
 </table></dl>
 
 <dl><dt><dd><table border=1>
