@@ -65,6 +65,14 @@ Propose la recherche par titres de noblesse dans la page d'accueil:
 
 <p>
 
+Cacher les noms privés:
+<input type=radio name=hide_private_names
+ value=yes%chide_private_names=yes;>oui
+<input type=radio name=hide_private_names
+ value=no%chide_private_names=no;>non
+
+<p>
+
 Texte pour le bas des pages:
 <textarea name=trl rows=5 cols=70 maxlength=50 wrap=virtual>%ftrl;</textarea>
 

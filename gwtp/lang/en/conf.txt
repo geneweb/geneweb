@@ -61,6 +61,14 @@ Propose search by nobility titles in welcome page:
 
 <p>
 
+Hide private names:
+<input type=radio name=hide_private_names
+ value=yes%chide_private_names=yes;>yes
+<input type=radio name=hide_private_names
+ value=no%chide_private_names=no;>no
+
+<p>
+
 Trailer text:
 <textarea name=trl rows=5 cols=70 maxlength=50 wrap=virtual>%ftrl;</textarea>
 
