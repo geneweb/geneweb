@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.33 2000-11-04 21:22:53 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.34 2000-11-15 20:20:28 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -25,6 +25,12 @@ value print_date_dmy oc d =
      | YearInt y -> Printf.fprintf oc "..%s" (soy y)
      | _ -> () ];
   return ()
+;
+
+value is_printable =
+  fun
+  [ '\000'..'\031' -> False
+  | _ -> True ]
 ;
 
 value spaces_to_underscore s =
@@ -68,8 +74,8 @@ value starting_char s =
 value gen_correct_string no_colon s =
   loop 0 0 where rec loop i len =
     if i == String.length s then Buff.get len
-    else if i == 0 && not (starting_char s) then
-      loop (i + 1) (Buff.store (Buff.store len '_') s.[0])
+    else if len == 0 && not (starting_char s) then
+      loop i (Buff.store len '_')
     else
       match s.[i] with
       [ ' ' | '\n' | '\t' ->
@@ -79,7 +85,9 @@ value gen_correct_string no_colon s =
       | ':' when no_colon ->
           let len = Buff.store len '\\' in
           loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
-      | c -> loop (i + 1) (Buff.store len c) ]
+      | c ->
+          let c = if is_printable c then c else '_' in
+          loop (i + 1) (Buff.store len c) ]
 ;
 
 value s_correct_string = gen_correct_string False;

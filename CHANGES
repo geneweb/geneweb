@@ -20,6 +20,10 @@ GeneWeb version 3.10
   - [08 Nov 00] Fixed bug: when giving 0 as Sosa number, it did not
     answer (infinite loop in gwd).
 
+* GeneWeb uncompiler (gwu)
+  - [15 Nov 00] Filter the non printable characters if any: now converted
+    into spaces.
+
 * Consanguinity computing (consang)
   - [15 Nov 00] Improved the program: now 30% faster.
 
