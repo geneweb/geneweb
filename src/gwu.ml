@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.8 2001-12-05 19:44:45 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.9 2001-12-05 19:55:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -78,6 +78,7 @@ value starting_char s =
 ;
 
 value gen_correct_string no_colon s =
+  let s = strip_spaces s in
   loop 0 0 where rec loop i len =
     if i == String.length s then Buff.get len
     else if len == 0 && not (starting_char s) then loop i (Buff.store len '_')
