@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.31 2004-07-18 08:53:55 ddr Exp $ *)
+(* $Id: update.ml,v 4.32 2004-09-09 08:40:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -508,43 +508,64 @@ value reconstitute_date_dmy conf var =
       | _ -> (prec, y) ]
     else (prec, y)
   in
-  match int_of_field y with
-  [ Some y ->
-      let prec =
-        match prec with
-        [ Some "about" -> About
-        | Some "maybe" -> Maybe
-        | Some "before" -> Before
-        | Some "after" -> After
-        | Some "oryear" ->
-            match get_number var "oryear" conf.env with
-            [ Some y -> OrYear y
-            | None -> Sure ]
-        | Some "yearint" ->
-            match get_number var "oryear" conf.env with
-            [ Some y -> YearInt y
-            | None -> Sure ]
-        | _ -> Sure ]
-      in
-      match get_number var "mm" conf.env with
-      [ Some m ->
-          match get_number var "dd" conf.env with
-          [ Some d ->
-              let d =
-                {day = d; month = m; year = y; prec = prec; delta = 0}
-              in
-              if d.day >= 1 && d.day <= 31 && d.month >= 1 &&
-                 d.month <= 13 then
-                Some d
-              else bad_date conf d
-          | None ->
-              let d =
-                {day = 0; month = m; year = y; prec = prec; delta = 0}
-              in
-              if d.month >= 1 && d.month <= 13 then Some d
-              else bad_date conf d ]
-      | None -> Some {day = 0; month = 0; year = y; prec = prec; delta = 0} ]
-  | None -> None ]
+  let (force_f_cal, m) =
+    let m = get var "mm" conf.env in
+    match String.uppercase m with
+    [ "VD" -> (True, Some 1)
+    | "BR" -> (True, Some 2)
+    | "FM" -> (True, Some 3)
+    | "NI" -> (True, Some 4)
+    | "PL" -> (True, Some 5)
+    | "VT" -> (True, Some 6)
+    | "GE" -> (True, Some 7)
+    | "FL" -> (True, Some 8)
+    | "PR" -> (True, Some 9)
+    | "ME" -> (True, Some 10)
+    | "TH" -> (True, Some 11)
+    | "FT" -> (True, Some 12)
+    | "JC" -> (True, Some 13)
+    | _ -> (False, int_of_field m) ]
+  in
+  let d =
+    match int_of_field y with
+    [ Some y ->
+        let prec =
+          match prec with
+          [ Some "about" -> About
+          | Some "maybe" -> Maybe
+          | Some "before" -> Before
+          | Some "after" -> After
+          | Some "oryear" ->
+              match get_number var "oryear" conf.env with
+              [ Some y -> OrYear y
+              | None -> Sure ]
+          | Some "yearint" ->
+              match get_number var "oryear" conf.env with
+              [ Some y -> YearInt y
+              | None -> Sure ]
+          | _ -> Sure ]
+        in
+        match m with
+        [ Some m ->
+            match get_number var "dd" conf.env with
+            [ Some d ->
+                let d =
+                  {day = d; month = m; year = y; prec = prec; delta = 0}
+                in
+                if d.day >= 1 && d.day <= 31 && d.month >= 1 &&
+                   d.month <= 13 then
+                  Some d
+                else bad_date conf d
+            | None ->
+                let d =
+                  {day = 0; month = m; year = y; prec = prec; delta = 0}
+                in
+                if d.month >= 1 && d.month <= 13 then Some d
+                else bad_date conf d ]
+        | None -> Some {day = 0; month = 0; year = y; prec = prec; delta = 0} ]
+    | None -> None ]
+  in
+  (d, force_f_cal)
 ;
 
 value check_greg_day conf d =
@@ -553,7 +574,7 @@ value check_greg_day conf d =
 
 value reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
-  [ Some d ->
+  [ (Some d, False) ->
       let (d, cal) =
         match p_getenv conf.env (var ^ "_cal") with
         [ Some "G" | None -> do { check_greg_day conf d; (d, Dgregorian) }
@@ -563,7 +584,8 @@ value reconstitute_date conf var =
         | _ -> (d, Dgregorian) ]
       in
       Some (Dgreg d cal)
-  | None ->
+  | (Some d, True) -> Some (Dgreg (Calendar.gregorian_of_french d) Dfrench)
+  | (None, _) ->
       match p_getenv conf.env (var ^ "_text") with
       [ Some txt ->
           let txt = strip_spaces (get var "text" conf.env) in
