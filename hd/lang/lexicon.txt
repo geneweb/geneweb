@@ -1710,7 +1710,7 @@ pt: apelido "%s.%d %s" j&aacute; utilizado por %testa persona%t
 se: namn "%s.%d %s" anv&auml;nds redan av %tdenna person%t
 
     navigation with %t as Sosa reference
-de: de: Navigation mit %t als Sosareferenz
+de: Navigation mit %t als Sosareferenz
 en: navigation with %t as Sosa reference
 es: navegaci&oacute;n con %t como referencia de Sosa
 fr: navigation avec %t comme r&eacute;f&eacute;rence Sosa
@@ -1718,6 +1718,15 @@ it: percorso con %t come riferimento Sosa
 nl: navigatie met %t als proband
 pt: navega&ccedil;a&atilde;o com o %t como a refer&ecirc;ncia Sosa
 se: navigering med %t som Sosa referens
+
+    next sibling
+de: folgende Geschwister 
+en: next sibling
+eo: posta frat(in)o
+es: siguiente hermano/siguiente hermana/siguiente hermano(a)
+fr: fr&egrave;re suivant/soeur suivante/fr&egrave;re ou soeur suivant
+it: seguente fratello/seguente sorella/seguente fratello o sorella
+pt: seguinte irm&atilde;o/seguinte irm&atilde;/seguinte irm&atilde;(o)
 
     no anniversary
 de: kein Jahrestag
@@ -2115,6 +2124,15 @@ it: luogo
 nl: plaats
 pt: lugar
 se: plats
+
+    previous sibling
+de: vorhergehende Geschwister
+en: previous sibling
+eo: precedento frat(in)o
+es: anterior hermano/anterior hermana/anterior hermano(a)
+fr: fr&egrave;re pr&eacute;c&eacute;dent/soeur pr&eacute;c&eacute;dente/fr&egrave;re ou soeur pr&eacute;c&eacute;dent
+it: precedente fratello/precedente sorella/precedente fratello o sorella
+pt: precedente irm&atilde;o/precedente irm&atilde;/precedente irm&atilde;(o)
 
     private
 de: privat
