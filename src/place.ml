@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.4 2001-07-24 08:33:17 ddr Exp $ *)
+(* $Id: place.ml,v 4.5 2001-07-24 14:59:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -20,13 +20,14 @@ value correct_start_point s =
     if i = iend then s
     else
       let c = s.[i] in
-      if c = ''' || c = Char.uppercase c then
-        if i = 0 then s
-        else
-          let prefix = remove_trailing_space (String.sub s 0 i) in
-          let rest = String.sub s i (iend - i) in
-          rest ^ " (" ^ prefix ^ ")"
-      else loop (i + 1)
+      match c with
+      [ 'A'..'Z' | '\192'..'\214' | '\216'..'\222' ->
+          if i = 0 then s
+          else
+            let prefix = remove_trailing_space (String.sub s 0 i) in
+            let rest = String.sub s i (iend - i) in
+            rest ^ " (" ^ prefix ^ ")"
+      | _ -> loop (i + 1) ]
   in
   loop 0
 ;
