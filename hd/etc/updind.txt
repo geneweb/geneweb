@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.6 2001-02-17 12:45:42 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.7 2001-02-17 18:58:09 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -224,9 +224,9 @@
 </tr>
 </table>
 
-%apply;date;birth;
+%apply;date;"birth";
 
-%apply;source;birth;
+%apply;source;"birth";
 
 <p>
 
@@ -240,9 +240,9 @@
 </tr>
 </table>
 
-%apply;date;bapt;
+%apply;date;"bapt";
 
-%apply;source;bapt;
+%apply;source;"bapt";
 
 <h4>[*death]</h4>
 
@@ -268,7 +268,7 @@
 </tr>
 </table>
 
-%apply;date;death;
+%apply;date;"death";
 
 <table border=1>
 <tr>
@@ -287,7 +287,7 @@
 </tr>
 </table>
 
-%apply;source;death;
+%apply;source;"death";
 
 <h4>[*burial]</h4>
 
@@ -307,9 +307,9 @@
 </tr>
 </table>
 
-%apply;date;burial;
+%apply;date;"burial";
 
-%apply;source;burial;
+%apply;source;"burial";
 
 <h4>[*occupation]</h4>
 
@@ -320,6 +320,99 @@
 </td>
 </tr>
 </table>
+
+<h4>[*relation/relations]1</h4>
+
+%define;insert_relation;xx;
+  <table border=1>
+  <tr>
+  <td>
+  [*insert::relation/relations]0
+  <input type=checkbox name=add_relationxx; value=on>
+  </td>
+  </tr>
+  </table>
+%end;
+%define;relation_type;xx;
+  <table border=1>
+  <tr>
+  <td>
+  <select name=rxx_type>
+  <option value=Undef%if;relation.rt_empty); selected%end;> -
+  <option value=Adoption>%sp;
+    [*adoptive father/adoptive mother/adoptive parents]2
+  <option value=Recognition>%sp;
+    [*recognizing father/recognizing mother/recognizing parents]2
+  <option value=CandidateParent>%sp;
+    [*candidate father/candidate mother/candidate parents]2
+  <option value=GodParent>%sp;
+    [*godfather/godmother/godparents]2
+  <option value=FosterParent>%sp;
+    [*foster father/foster mother/foster parents]2
+  </select>
+  </td>
+  </tr>
+  </table>
+%end;
+%define;simple_person;xx;
+  tag "table" "border=1" begin
+    tag "tr" begin
+      tag "td" begin
+        Wserver.wprint "%s"
+          (capitale (transl_nth conf "first name/first names" 0));
+      end;
+      tag "td" begin
+        Wserver.wprint "<input name=%s_fn size=23 maxlength=200" var;
+        Wserver.wprint " value=\"%s\">"
+          (quote_escaped first_name);
+      end;
+      tag "td" "align=right" begin
+        let s = capitale (transl conf "number") in
+        Wserver.wprint "%s" s;
+      end;
+      tag "td" begin
+        Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
+          (if occ == 0 then "" else " value=" ^ string_of_int occ);
+      end;
+      tag "td" begin
+        tag "select" "name=%s_p" var begin
+          Wserver.wprint "<option value=link%s>%s\n"
+            (if create = Link then " selected" else "")
+            (capitale (transl conf "link"));
+          Wserver.wprint "<option value=create%s>%s\n"
+            (match create with [ Create _ _ -> " selected" | _ -> "" ])
+            (capitale (transl conf "create"));
+        end;
+      end;
+    end;
+    Wserver.wprint "\n";
+    tag "tr" begin
+      tag "td" begin
+        Wserver.wprint "%s"
+          (capitale (transl_nth conf "surname/surnames" 0));
+      end;
+      tag "td" "colspan=4" begin
+        Wserver.wprint
+          "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
+          var surname;
+      end;
+    end;
+  end
+%end;
+
+%apply;insert_relation;"0";
+<p>
+%if;has_relations;
+  %foreach;relation;
+    %apply;relation_type;cnt;
+    <p>
+    %apply;insert_relation;cnt;
+  %end;
+%else;
+  %apply;relation_type;"1";
+  <p>
+  %apply;insert_relation;"1";
+%end;
 
 <p>
 <input type=submit value=Ok>
