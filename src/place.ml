@@ -1,10 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 3.2 2000-03-30 17:47:22 ddr Exp $ *)
+(* $Id: place.ml,v 3.3 2000-03-31 15:13:35 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
 open Gutil;
 open Util;
+open Config;
 
 value fold_place s =
   loop [] 0 0 where rec loop list i ibeg =
@@ -40,19 +41,31 @@ value get_list conf base =
   let _ = base.data.persons.array () in
   let _ = base.data.strings.array () in
 *)
-  let list =
-    loop [] 0 where rec loop list i =
-      if i = base.data.persons.len then list
-      else
-        let p = base.data.persons.get i in
-        let list =
-          let pl = fold_place (sou base p.birth_place) in
-          if pl = [] || not (age_autorise conf base p) then list
-          else [(pl, sou base p.surname, i) :: list]
-        in 
-        loop list (i + 1)
-  in
-  list
+  let add_birth = p_getenv conf.env "bi" = Some "on" in
+  let add_death = p_getenv conf.env "de" = Some "on" in
+  loop [] 0 where rec loop list i =
+    if i = base.data.persons.len then list
+    else
+      let p = base.data.persons.get i in
+      let s = sou base p.surname in
+      let pl_bi =
+        if add_birth then fold_place (sou base p.birth_place) else []
+      in
+      let pl_de =
+        if add_death then fold_place (sou base p.death_place) else []
+      in
+      let list =
+        if (pl_bi = [] && pl_de = []) || not (age_autorise conf base p) then
+          list
+        else
+          let list = if pl_bi = [] then list else [(pl_bi, s, i) :: list] in
+          let list =
+            if pl_de = [] || pl_de = pl_bi then list
+            else [(pl_de, s, i) :: list]
+          in
+          list
+      in 
+      loop list (i + 1)
 ;
 
 value sort_by_place =
@@ -108,11 +121,8 @@ value print_html_places_surnames conf base =
            List.iter
              (fun (sn, n, i) ->
                 do Wserver.wprint "<a href=\"%s" (commd conf);
-                   if n == 1 then
-                     Wserver.wprint "%s"
-                       (acces conf base (base.data.persons.get i))
-                   else
-                     Wserver.wprint "m=N;v=%s" (code_varenv (Name.lower sn));
+                   Wserver.wprint "%s"
+                     (acces conf base (base.data.persons.get i));
                    Wserver.wprint "\">%s</a> (%d),\n" sn n;
                 return ())
              snl;
@@ -131,7 +141,7 @@ value print_all_places_surnames conf base =
   let list = uniq_place list in
   do Util.header conf title;
      print_link_to_welcome conf True;
-     print_html_places_surnames conf base list;
+     if list = [] then () else print_html_places_surnames conf base list;
      Util.trailer conf;
   return ()
 ;

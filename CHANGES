@@ -4,6 +4,10 @@ GeneWeb version 3.04
 * GeneWeb Service/CGI (gwd)
   - [27 Mar 00] Added displaying of places/surnames from welcome page.
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [31 Mar 00] Do not enter any more GIVN as public name if equal to first
+    name nor SURN as surname alias if equal to surname.
+
 GeneWeb version 3.03
 --------------------
 

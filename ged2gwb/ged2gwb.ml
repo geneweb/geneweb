@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.12 2000-03-29 20:20:19 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.13 2000-03-31 15:13:26 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -719,6 +719,7 @@ value particle s i =
 ;
 
 value lowercase_name s =
+  let s = String.copy s in
   loop (particle s 0) 0 where rec loop uncap i =
     if i == String.length s then s
     else
@@ -1069,6 +1070,11 @@ value add_indi gen r =
               [ Not_found -> (f, fal) ]
           | None -> (f, fal) ]
         in
+        let pn = if lowercase_name pn = f then "" else pn in
+        let fal =
+          List.fold_right (fun fa fal -> if fa = pn then fal else [fa :: fal])
+            fal []
+        in
         let s = if lowercase_surnames.val then lowercase_name s else s in
         let r =
           let key = Name.strip_lower (f ^ " " ^ s) in
@@ -1091,8 +1097,12 @@ value add_indi gen r =
     match name_sons with
     [ Some n ->
         match find_field "SURN" n.rsons with
-        [ Some r -> r.rval
-        | None -> "" ]
+        [ Some r ->
+            let x =
+              if lowercase_surnames.val then lowercase_name r.rval else r.rval
+            in
+            if x <> surname then x else ""
+        | _ -> "" ]
     | None -> "" ]
   in
   let aliases =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.11 2000-03-10 09:38:42 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.12 2000-03-31 15:13:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -94,7 +94,7 @@ value print_public_name conf base p =
     tag "td" "colspan=3" begin
       Wserver.wprint "<input name=public_name size=40";
       if p.public_name <> "" then
-        Wserver.wprint " value=\"%s\"" p.public_name
+        Wserver.wprint " value=\"%s\"" (quote_escaped p.public_name)
       else ();
       Wserver.wprint ">";
     end;
