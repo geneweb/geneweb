@@ -5,7 +5,8 @@ GeneWeb version 3.08
   - [21 Sep 00] Fixed bug: in recovery from an old version, if the
     destination data base already existed (created e.g. by a previous
     attempt), it could not overwrite the data base, even it pretended
-    it was going to do it.
+    it was going to do it. Same problem (fixed also) for the creation
+    of a data base from a GeneWeb source file.
 
 * GeneWeb Service/CGI (gwd)
   - [21 Sep 00] When modifying a person, forbid now to let his/her
