@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.24 2002-01-12 12:06:21 ddr Exp $ *)
+(* $Id: perso.ml,v 4.25 2002-01-16 11:51:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -277,8 +277,8 @@ type env =
   | Vbool of bool
   | Vint of int
   | Vstring of string
-  | Vsosa of Lazy.t (option (Num.t * person))
-  | Vimage of Lazy.t (option (string * option (option (int * int))))
+  | Vsosa of option (Num.t * person)
+  | Vimage of option (string * option (option (int * int)))
   | Vtitle of title_item
   | Vnone ]
 and title_item =
@@ -387,6 +387,15 @@ value rec eval_variable conf base env sl =
 
 value eval_base_env_variable conf v =
   try List.assoc v conf.base_env with [ Not_found -> "" ]
+;
+
+value simple_person_text conf base p p_auth =
+  if p_auth then
+    match main_title base p with
+    [ Some t -> titled_person_text conf base p t
+    | None -> person_text conf base p ]
+  else if conf.hide_names then "x x"
+  else person_text conf base p
 ;
 
 value print_age conf base env p p_auth =
@@ -518,7 +527,7 @@ value print_image_size conf base env p p_auth =
   if p_auth then
     match get_env "image" env with
     [ Vimage x ->
-        match Lazy.force x with
+        match x with
         [ Some (_, Some (Some (width, height))) ->
             Wserver.wprint " width=%d height=%d" width height
         | Some (link, None) -> Wserver.wprint " height=%d" max_im_hei
@@ -531,7 +540,7 @@ value print_image_url conf base env p p_auth =
   if p_auth then
     match get_env "image" env with
     [ Vimage x ->
-        match Lazy.force x with
+        match x with
         [ Some (fname, Some (Some _)) ->
             let s = Unix.stat fname in
             let b = acces conf base p in
@@ -715,7 +724,7 @@ value print_relation_type conf base env =
 value print_sosa conf base env a a_auth =
   match get_env "sosa" env with
   [ Vsosa x ->
-      match Lazy.force x with
+      match x with
       [ Some (n, p) ->
           Num.print (fun x -> Wserver.wprint "%s" x)
             (transl conf "(thousand separator)") n
@@ -726,12 +735,20 @@ value print_sosa conf base env a a_auth =
 value print_sosa_link conf base env a a_auth =
   match get_env "sosa" env with
   [ Vsosa x ->
-      match Lazy.force x with
+      match x with
       [ Some (n, p) ->
           Wserver.wprint "m=RL;i1=%d;i2=%d;b1=1;b2=%s"
             (Adef.int_of_iper a.cle_index) (Adef.int_of_iper p.cle_index)
             (Num.to_string n)
       | None -> () ]
+  | _ -> () ]
+;
+
+value print_sosa_ref conf base env a a_auth =
+  match get_env "sosa" env with
+  [ Vsosa (Some (_, p)) ->
+      let p_auth = age_autorise conf base p in
+      Wserver.wprint "%s" (simple_person_text conf base p p_auth)
   | _ -> () ]
 ;
 
@@ -878,6 +895,7 @@ value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
   | "related_type" -> print_related_type conf base env
   | "sosa" -> print_sosa conf base env p p_auth
   | "sosa_link" -> print_sosa_link conf base env p p_auth
+  | "sosa_ref" -> print_sosa_ref conf base env p p_auth
   | "source_type" -> print_source_type conf base env
   | "source" -> print_source conf base env p
   | "surname_alias" -> print_surname_alias conf base env
@@ -885,15 +903,6 @@ value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
   | "title" -> Wserver.wprint "%s" (person_title conf base p)
   | "witness_relation" -> print_witness_relation conf base env efam
   | s -> Wserver.wprint "%s" (try_eval_gen_variable conf base env ep s) ]
-;
-
-value simple_person_text conf base p p_auth =
-  if p_auth then
-    match main_title base p with
-    [ Some t -> titled_person_text conf base p t
-    | None -> person_text conf base p ]
-  else if conf.hide_names then "x x"
-  else person_text conf base p
 ;
 
 value print_simple_person_text conf base (p, _, _, p_auth) =
@@ -1004,7 +1013,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
   | "has_image" ->
       match get_env "image" env with
       [ Vimage x ->
-          match Lazy.force x with
+          match x with
           [ Some (_, Some (Some _)) | Some (_, None) -> True
           | _ -> False ]
       | _ -> False ]
@@ -1031,7 +1040,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
       | None -> False ]
   | "has_sosa" ->
       match get_env "sosa" env with
-      [ Vsosa x -> Lazy.force x <> None
+      [ Vsosa x -> x <> None
       | _ -> False ]
   | "has_sources" ->
       if conf.hide_names && not p_auth then False
@@ -1458,13 +1467,11 @@ value interp_templ conf base p astl =
   let env =
     let env = [] in
     let env =
-      let v = lazy (find_sosa conf base p) in [("sosa", Vsosa v) :: env]
+      let v = find_sosa conf base p in [("sosa", Vsosa v) :: env]
     in
     let env =
       let v =
-        lazy
-          (image_and_size conf base p
-             (limited_image_size max_im_wid max_im_wid))
+        image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
       in
       [("image", Vimage v) :: env]
     in
