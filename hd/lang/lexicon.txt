@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.84 2000-04-06 08:06:19 ddr Exp $
+# $Id: lexicon.txt,v 3.85 2000-04-06 08:24:54 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2738,6 +2738,7 @@ dk: vandret
 en: horizontally
 fi: vaakasuoraan
 fr: horizontalement
+se: horisontellt
 
     husband/wife
 af: man/vrou
