@@ -51,6 +51,9 @@ GeneWeb version 4.01
     in Estonian: the month appeared with all its declinations.
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [07 Apr 01] Added code to loose less information while using option
+    -uin (which puts some of the untreated gedcoms tags in the notes).
+    Code added by Ludovic Ledieu.
   - [23 Mar 01] Added option -udi x-y (Undefined Death Interval): the
     persons whose death part is undefined:
     - if before x years, are considered as alive

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.1 2001-03-23 09:44:46 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.2 2001-04-06 23:13:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1410,11 +1410,23 @@ value add_indi gen r =
   in
   let ext_notes =
     if untreated_in_notes.val then
-      let remain_tags =
-        List.fold_left
-          (fun list r -> if indi_lab r.rlab then list else [r :: list])
-          [] r.rsons
+      let rec build_remain_tags r_list =
+        match r_list with
+        [ [] -> []
+        | [r :: rest] ->
+            let rsons = build_remain_tags r.rsons in
+            let rest = build_remain_tags rest in
+	    if r.rused = True && rsons = [] then rest
+            else
+              [ { rlab = r.rlab;
+                  rval = r.rval;
+                  rcont = r.rcont;
+                  rsons = rsons;
+                  rpos = r.rpos;
+                  rused = r.rused }
+                :: rest ] ]
       in
+      let remain_tags = build_remain_tags r.rsons in
       if remain_tags = [] then ""
       else
         let s = if notes = "" then "" else "\n" in
