@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 2.6 1999-07-26 07:02:00 ddr Exp $ *)
+(* $Id: update.mli,v 2.7 1999-07-28 09:48:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -6,6 +6,7 @@ open Config;
 
 exception ModErr;
 type key = (string * string * int);
+type create = [ Create of sex and option date | Link ];
 
 value find_free_occ : base -> string -> string -> int -> int;
 value infer_death : config -> option date -> death;
@@ -29,6 +30,10 @@ value digest_family : family -> Digest.t;
 value reconstitute_date : config -> string -> option date;
 value print_date :
   config -> base -> string -> string -> option date -> unit;
+
+value print_parent_person :
+  config -> base -> string -> (string * string * int * create) -> unit
+;
 
 value print_src : config -> string -> string -> unit;
 

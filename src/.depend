@@ -165,22 +165,22 @@ updateFam.cmo: adef.cmi config.cmi def.cmi gutil.cmi srcfile.cmi update.cmi \
     util.cmi ../wserver/wserver.cmi updateFam.cmi 
 updateFam.cmx: adef.cmx config.cmi def.cmi gutil.cmx srcfile.cmx update.cmx \
     util.cmx ../wserver/wserver.cmx updateFam.cmi 
-updateFam.cmi: config.cmi def.cmi 
+updateFam.cmi: config.cmi def.cmi update.cmi 
 updateFamOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo \
-    perso.cmi update.cmi updateFam.cmi util.cmi ../wserver/wserver.cmi 
+    update.cmi updateFam.cmi util.cmi ../wserver/wserver.cmi 
 updateFamOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx iobase.cmx lock.cmx \
-    perso.cmx update.cmx updateFam.cmx util.cmx ../wserver/wserver.cmx 
+    update.cmx updateFam.cmx util.cmx ../wserver/wserver.cmx 
 updateInd.cmo: adef.cmi config.cmi def.cmi gutil.cmi srcfile.cmi update.cmi \
     util.cmi ../wserver/wserver.cmi updateInd.cmi 
 updateInd.cmx: adef.cmx config.cmi def.cmi gutil.cmx srcfile.cmx update.cmx \
     util.cmx ../wserver/wserver.cmx updateInd.cmi 
 updateInd.cmi: config.cmi def.cmi update.cmi 
 updateIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo \
-    name.cmi perso.cmi update.cmi updateInd.cmi util.cmi \
-    ../wserver/wserver.cmi updateIndOk.cmi 
+    name.cmi update.cmi updateInd.cmi util.cmi ../wserver/wserver.cmi \
+    updateIndOk.cmi 
 updateIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx iobase.cmx lock.cmx \
-    name.cmx perso.cmx update.cmx updateInd.cmx util.cmx \
-    ../wserver/wserver.cmx updateIndOk.cmi 
+    name.cmx update.cmx updateInd.cmx util.cmx ../wserver/wserver.cmx \
+    updateIndOk.cmi 
 updateIndOk.cmi: config.cmi def.cmi gutil.cmi update.cmi 
 util.cmo: adef.cmi config.cmi consang.cmi def.cmi gutil.cmi iobase.cmi \
     lock.cmo name.cmi num.cmi version.cmo ../wserver/wserver.cmi util.cmi 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.14 1999-07-26 07:02:00 ddr Exp $ *)
+(* $Id: update.ml,v 2.15 1999-07-28 09:48:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -9,6 +9,7 @@ open Util;
 
 exception ModErr;
 type key = (string * string * int);
+type create = [ Create of sex and option date | Link ];
 
 value rec find_free_occ base f s i =
   match
@@ -537,6 +538,52 @@ value print_date conf base lab var d =
        end;
      end;
   return ()
+;
+
+value print_parent_person conf base var (first_name, surname, occ, create) =
+  tag "table" "border=1" begin
+    tag "tr" begin
+      tag "td" begin
+        Wserver.wprint "%s"
+          (capitale (transl_nth conf "first name/first names" 0));
+      end;
+      tag "td" begin
+        Wserver.wprint "<input name=%s_fn size=23 maxlength=200" var;
+        Wserver.wprint " value=\"%s\">"
+          (quote_escaped first_name);
+      end;
+      tag "td" "align=right" begin
+        let s = capitale (transl conf "number") in
+        Wserver.wprint "%s" s;
+      end;
+      tag "td" begin
+        Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
+          (if occ == 0 then "" else " value=" ^ string_of_int occ);
+      end;
+      tag "td" begin
+        tag "select" "name=%s_p" var begin
+          Wserver.wprint "<option value=link%s>%s\n"
+            (if create = Link then " selected" else "")
+            (capitale (transl conf "link"));
+          Wserver.wprint "<option value=create%s>%s\n"
+            (match create with [ Create Neuter _ -> " selected" | _ -> "" ])
+            (capitale (transl conf "create"));
+        end;
+      end;
+    end;
+    Wserver.wprint "\n";
+    tag "tr" begin
+      tag "td" begin
+        Wserver.wprint "%s"
+          (capitale (transl_nth conf "surname/surnames" 0));
+      end;
+      tag "td" "colspan=4" begin
+        Wserver.wprint
+          "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
+          var surname;
+      end;
+    end;
+  end
 ;
 
 value print_someone conf base p =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.13 1999-07-28 09:02:21 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.14 1999-07-28 09:48:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -488,53 +488,23 @@ value print_relation_type conf base r var =
   end
 ;
 
-value print_linked_person conf base r proj var =
-  let (fn, sn, occ) =
+value print_relation_person conf base r proj var =
+  let key =
     match r with
-    [ Some r -> match proj r with [ Some x -> x | None -> ("", "", 0) ]
-    | _ -> ("", "", 0) ]
+    [ Some r ->
+        match proj r with
+        [ Some (fn, sn, oc) -> (fn, sn, oc, Update.Link)
+        | None -> ("", "", 0, Update.Link) ]
+    | None -> ("", "", 0, Update.Link) ]
   in
-  tag "table" "border=1" begin
-    tag "tr" begin
-      tag "td" begin
-        Wserver.wprint "%s"
-          (capitale (transl_nth conf "first name/first names" 0));
-      end;
-      tag "td" begin
-        Wserver.wprint
-          "<input name=\"%s_fn\" size=30 maxlength=200 value=\"%s\">"
-          var (quote_escaped fn);
-      end;
-      tag "td" begin
-        let s = capitale (transl conf "number") in
-        Wserver.wprint "%s" s;
-      end;
-      tag "td" begin
-        Wserver.wprint "<input name=%s_occ size=5 maxlength=8" var;
-        if occ <> 0 then Wserver.wprint " value=%d" occ else ();
-        Wserver.wprint ">";
-      end;
-      Wserver.wprint "\n";
-    end;
-    tag "tr" begin
-      tag "td" begin
-        Wserver.wprint "%s"
-          (capitale (transl_nth conf "surname/surnames" 0));
-      end;
-      tag "td" "colspan=3" begin
-        Wserver.wprint
-          "<input name=\"%s_sn\" size=40 maxlength=200 value=\"%s\">"
-          var (quote_escaped sn);
-      end;
-    end;
-  end
+  Update.print_parent_person conf base var key
 ;
 
 value print_relation conf base r cnt =
   let rcnt = "r" ^ string_of_int cnt in
   do print_relation_type conf base r rcnt;
-     print_linked_person conf base r (fun r -> r.r_fath) (rcnt ^ "_fath");
-     print_linked_person conf base r (fun r -> r.r_moth) (rcnt ^ "_moth");
+     print_relation_person conf base r (fun r -> r.r_fath) (rcnt ^ "_fath");
+     print_relation_person conf base r (fun r -> r.r_moth) (rcnt ^ "_moth");
      html_p conf;
      print_add_relation conf base cnt;
   return ()
