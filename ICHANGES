@@ -5,6 +5,7 @@ GeneWeb Version 3.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Nov 13, 99] Added some checks of access tables out of bounds
   - [Nov 13, 99] Added link to welcome page in case of not found
   - [Nov 9, 99] Chop suffix ".gwb" if the base name has it in URL
   - [Nov 6, 99] The URL for the "up" image now independent from the data base

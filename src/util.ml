@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.9 1999-11-10 10:39:12 ddr Exp $ *)
+(* $Id: util.ml,v 3.10 1999-11-13 08:45:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -870,13 +870,6 @@ value preciser_homonyme conf base p =
           loop 0 ] ]
 ;
 
-value incorrect_request conf =
-  let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "incorrect request"))
-  in
-  do header conf title; trailer conf; return ()
-;
-
 value print_decimal_num conf f =
   let s = string_of_float f in
   loop 0 where rec loop i =
@@ -1021,6 +1014,16 @@ value print_link_to_welcome conf right_aligned =
     return ()
 ;
 
+value incorrect_request conf =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "incorrect request"))
+  in
+  do header conf title;
+     print_link_to_welcome conf False;
+     trailer conf;
+  return ()
+;
+
 value list_find f =
   loop where rec loop =
     fun
@@ -1030,7 +1033,10 @@ value list_find f =
 
 value find_person_in_env conf base suff =
   match p_getint conf.env ("i" ^ suff) with
-  [ Some i -> Some (base.data.persons.get i)
+  [ Some i ->
+      if i >= 0 && i < base.data.persons.len then
+        Some (base.data.persons.get i)
+      else None
   | None ->
       match
         (p_getenv conf.env ("p" ^ suff), p_getenv conf.env ("n" ^ suff))
