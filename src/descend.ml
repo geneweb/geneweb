@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.25 1999-08-19 09:32:29 ddr Exp $ *)
+(* $Id: descend.ml,v 2.26 1999-08-19 12:32:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -194,7 +194,7 @@ value afficher_marie conf base first fam p spouse =
   return ()
 ;
 
-value print_child conf base levt boucle niveau_max niveau compte ix =
+value print_child conf base levt boucle niveau_max niveau compte auth ix =
   let x = poi base ix in
   do html_li conf;
      stag "strong" begin
@@ -202,8 +202,7 @@ value print_child conf base levt boucle niveau_max niveau compte ix =
          afficher_prenom_de_personne_referencee conf base x
        else afficher_personne_referencee conf base x;
      end;
-     if age_autorise conf base x then Perso.print_dates conf base False x
-     else ();
+     if auth then Perso.print_dates conf base False x else ();
      if levt.(Adef.int_of_iper x.cle_index) < niveau then
        Wserver.wprint "<em>, %s</em>"
          (transl conf "see further")
@@ -253,23 +252,27 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
              let fam = foi base ifam in
              let cpl = coi base ifam in
              let conj = spouse p cpl in
-             let enfants = fam.children in
              let conj = poi base conj in
              do if connais base conj || List.length ifaml > 1 then
                   do afficher_marie conf base first fam p conj;
-                     if Array.length enfants <> 0 then
+                     if Array.length fam.children <> 0 then
                        Wserver.wprint ", <em>%s</em>"
                          (transl conf "having as children")
                      else Wserver.wprint ".";
                      html_br conf;
                   return ()
                 else ();
-                if Array.length enfants <> 0 then
+                if Array.length fam.children <> 0 then
+                  let age_auth =
+                    List.for_all
+                      (fun ip -> age_autorise conf base (poi base ip))
+                      (Array.to_list fam.children)
+                  in
                   tag "ul" begin
                     Array.iter
                       (print_child conf base levt boucle niveau_max niveau
-                         compte)
-                      enfants;
+                         compte age_auth)
+                      fam.children;
                   end
                 else ();
              return False)

@@ -59,7 +59,7 @@ de donn&eacute;es.
 Dans ce cas, seules les personnes ayant fourni le bon mot de passe
 "sorcier" auront droit aux modifications. Les autres pourront naviguer
 normalement mais ne verront pas de zone cliquable "mise &agrave; jour"
-zdans les pages personnelles.
+dans les pages personnelles.
 
 <p>
 
@@ -69,8 +69,8 @@ Pour installer un mot de passe "sorcier", proc&eacute;dez comme suit:
 
 <ul>
 
-<li>Si passez habituellement par le programme "setup", lancez "setup",
-allez dans le "menu principal" et s&eacute;lectionnez
+<li>Si vous passez habituellement par le programme "setup", lancez
+"setup", allez dans le "menu principal" et s&eacute;lectionnez
 "param&egrave;tres d'une base de donn&eacute;es".  Indiquez un mot de
 passe "sorcier" et faites "Ok".
 
@@ -244,14 +244,15 @@ acc&egrave;s &agrave; la base de donn&eacute;es.
 
 Si vous voulez que le service gwd de votre site ne soit accessible que
 par certaines personnes, vous pouvez mettre une restriction globale
-d'acc&egrave;s au service.
+d'acc&egrave;s au service. Cela s'applique &agrave; toutes les bases
+de donn&eacute;es qu'il g&egrave;re.
 
 <p>
 
-Dans ce cas, toutes les bases de donn&eacute;es ne seront accessibles
-que par le protocole d'acc&egrave;s. Si, cependant, une certaine base
-a une restriction d'acc&egrave;s globale sp&eacute;cifique (voir
-section pr&eacute;c&eacute;dente), c'est plut&ocirc;t cette restriction
+Les bases de donn&eacute;es ne seront alors accessibles que par le
+protocole d'acc&egrave;s. Si, cependant, une certaine base a une
+restriction d'acc&egrave;s globale sp&eacute;cifique (voir section
+pr&eacute;c&eacute;dente), c'est plut&ocirc;t cette restriction
 sp&eacute;cifique qui sera prise en compte.
 
 <p>
@@ -393,8 +394,9 @@ dans le m&ecirc;me r&eacute;pertoire que la commande "gwd".
 <p>
 
 &Eacute;ditez ce fichier texte et indiquez-y les adresses que vous
-voulez refuser. Vous pouvez y mettre des "*" pour indiquer n'importe
-quelle s&eacute;quence de caract&egrave;res. Exemple:
+voulez refuser (une par ligne). Vous pouvez y mettre des "*" pour
+indiquer n'importe quelle s&eacute;quence de
+caract&egrave;res. Exemple:
 
 <pre>
      grand-mechant@loup.bois
