@@ -3,7 +3,7 @@ GeneWeb version 4.06
 
 * GeneWeb server or CGI (gwd)
   - [04 Mar 02] In CGI mode, in welcome page, the wizard and friend
-    entries are now accessible by links, like in server mode, instead of a
+    entries are now accessible by links, like in server mode, instead of an
     input form. Moreover, if cookies are accepted, when navigating, there
     is no visible "token" in the URL and the connection has no timeout. If
     cookies are not accepted, the behaviour does not change.
