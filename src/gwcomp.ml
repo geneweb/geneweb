@@ -1,9 +1,9 @@
-(* $Id: gwcomp.ml,v 1.6 1998-10-10 15:53:00 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.7 1998-10-23 17:18:29 ddr Exp $ *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo0009";
+value magic_gwo = "GnWo000a";
 
 type key =
   { pk_first_name : string;
@@ -20,8 +20,6 @@ type syntax_o =
   [ Family of couple somebody and Def.family (Def.person string) string
   | Notes of key and string ]
 ;
-
-type gwo = (string * list syntax_o);
 
 value copy_decode s i1 i2 =
   let len =
@@ -690,18 +688,27 @@ value lire_famille ic fname =
 ;
 
 value comp_familles x =
+  let out_file = Filename.chop_suffix x ".gw" ^ ".gwo" in
   do line_cnt.val := 0; return
-  let ic = open_in x in
-  let rec boucle fams ligne =
-    match lire_famille ic x ligne with
-    [ Some (famille, ligne) -> boucle [famille :: fams] ligne
-    | None -> fams ]
-  in
-  let familles = List.rev (boucle [] (lire_ligne ic)) in
-  do close_in ic; return
-  let oc = open_out_bin (Filename.chop_suffix x ".gw" ^ ".gwo") in
-  do output_string oc magic_gwo;
-     output_value oc ((x, familles) : gwo);
+  let oc = open_out_bin out_file in
+  do try
+       let ic = open_in x in
+       do output_string oc magic_gwo;
+          output_value oc (x : string);
+       return
+       let rec loop line =
+         match lire_famille ic x line with
+         [ Some (family, line) ->
+             do output_value oc (family : syntax_o); return loop line
+         | None -> () ]
+       in
+       do loop (lire_ligne ic);
+          close_in ic;
+       return ()
+     with e ->
+       do close_out oc;
+          try Sys.remove out_file with _ -> ();
+       return raise e;
      close_out oc;
   return ()
 ;

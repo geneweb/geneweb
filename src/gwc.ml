@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.5 1998-10-01 10:08:29 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.6 1998-10-23 17:18:29 ddr Exp $ *)
 
 open Def;
 open Check;
@@ -421,8 +421,13 @@ value insere_comp_familles gen (x, shift) =
   do check_magic x ic;
      gen.g_shift := shift;
   return
-  let (src, fams) = (input_value ic : Gwcomp.gwo) in
-  do List.iter (insere_syntax src gen) fams; return close_in ic
+  let src : string = input_value ic in
+  try
+    while True do
+      let fam : syntax_o = input_value ic in
+      insere_syntax src gen fam;
+    done
+  with [ End_of_file -> close_in ic ]
 ;
 
 value just_comp = ref False;
