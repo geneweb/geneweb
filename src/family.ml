@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.1 2001-03-23 11:46:04 ddr Exp $ *)
+(* $Id: family.ml,v 4.2 2001-03-30 12:54:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -546,8 +546,8 @@ value print_no_index conf base =
 ;
 
 value special_vars =
-  ["dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et"; "long"; "spouse";
-   "cgl"; "iz"; "nz"; "pz"; "ocz"; "templ"]
+  ["body_prop"; "dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et";
+   "long"; "spouse"; "cgl"; "iz"; "nz"; "pz"; "ocz"; "templ"]
 ;
 
 value only_special_env = List.for_all (fun (x, _) -> List.mem x special_vars);
@@ -574,6 +574,9 @@ value extract_henv conf base =
      match p_getenv conf.env "templ" with
      [ None -> ()
      | Some s -> conf.henv := conf.henv @ [("templ", code_varenv s)] ];
+     match p_getenv conf.env "body_prop" with
+     [ None -> ()
+     | Some s -> conf.henv := conf.henv @ [("body_prop", code_varenv s)] ];
      match p_getenv conf.env "escache" with
      [ Some _ ->
          let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
