@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.14 2002-01-10 14:53:27 ddr Exp $ *)
+(* $Id: setup.ml,v 4.15 2002-01-10 20:01:08 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1459,7 +1459,8 @@ value set_gwd_default_language_if_absent lang =
 
 value daemon = ref False;
 
-value usage = "Usage: " ^ Sys.argv.(0) ^ " [options] where options are:";
+value usage =
+  "Usage: " ^ Filename.basename Sys.argv.(0) ^ " [options] where options are:";
 value speclist =
   [("-lang", Arg.String (fun x -> lang_param.val := x),
     "<string>: default lang");

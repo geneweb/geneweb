@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.19 2002-01-07 16:00:34 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.20 2002-01-10 20:01:08 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1409,7 +1409,10 @@ value main () =
       Wserver.sock_in.val := "gwd.sin"; Wserver.sock_out.val := "gwd.sou";
     }
     else ();
-    let usage = "Usage: " ^ Sys.argv.(0) ^ " [options] where options are:" in
+    let usage =
+      "Usage: " ^ Filename.basename Sys.argv.(0) ^
+      " [options] where options are:"
+    in
     let speclist =
       [("-hd", Arg.String (fun x -> Util.lang_dir.val := x),
         "<dir>\n       Directory where the directory lang is installed.");
