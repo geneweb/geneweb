@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.85 2000-04-06 08:24:54 ddr Exp $
+# $Id: lexicon.txt,v 3.86 2000-04-17 18:50:44 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -1051,7 +1051,7 @@ se: lever
 af: alle plase
 cs: v¹echna místa
 de: alle Orte
-dk: alle navne
+dk: alle ophav
 en: all the estates
 eo: cxiuj lokoj
 es: todos los lugares
@@ -2190,7 +2190,7 @@ se: fel
 af: landgoed
 cs: místo
 de: Ort
-dk: navn (nob.)
+dk: ophav
 en: estate
 eo: loko
 es: lugar
