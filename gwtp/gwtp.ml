@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.22 2003-12-09 08:32:49 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.23 2004-02-02 11:51:31 ddr Exp $ *)
 (* (c) Copyright 2002 INRIA *)
 
 open Printf;
@@ -274,7 +274,9 @@ value copy_template genv (varenv, filenv) env fname =
                   if c = ']' then Buff.get len
                   else loop (Buff.store len c) (input_char ic)
               in
-              if c = '\n' then Translate.inline lang '%' (macro env) s
+              if c = '\n' then
+                let (s, alt) = Translate.inline lang '%' (macro env) s in
+                if alt then "[" ^ s ^ "]" else s
               else transl lang s
             in
             print_string s

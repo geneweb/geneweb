@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.17 2003-12-11 08:38:05 ddr Exp $ *)
+(* $Id: templ.ml,v 4.18 2004-02-02 11:47:54 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -481,7 +481,10 @@ value eval_transl_lexicon conf upp s c =
 ;
 
 value eval_transl_inline conf s =
-  Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
+  let (s, alt) =
+    Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
+  in
+  if alt then "[" ^ s ^ "]" else s
 ;
 
 value eval_transl conf upp s c =

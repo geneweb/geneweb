@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.82 2004-01-09 21:05:33 ddr Exp $ *)
+(* $Id: util.ml,v 4.83 2004-02-02 11:47:54 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -904,7 +904,8 @@ value rec copy_from_etc env lang imcom ic =
                 if c = ']' then Buff.get len
                 else loop (Buff.store len c) (input_char ic)
             in
-            let s = Translate.inline lang '%' (macro_etc env imcom) s in
+            let (s, alt) = Translate.inline lang '%' (macro_etc env imcom) s in
+            let s = if alt then "[" ^ s ^ "]" else s in
             Wserver.wprint "%s" s
           else
             Wserver.wprint "[%c" c
