@@ -1,10 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updfam.txt,v 4.2 2001-06-14 17:09:32 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.3 2001-06-14 19:55:11 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
-  <title>
-    %if;(evar_m = "ADD_FAM");[*add::family/families]0%end;
+  <title>%nn;
+    %if;(evar_m = "ADD_FAM");[*add::family/families]0
+    %elseif;(evar_m = "ADD_PAR");[*add::family/families]0
+    %elseif;(evar_m = "MOD_FAM");[*modify::family/families]0 # %evar_i;
+    %end;
   </title>
 %base_header;
 </head>
@@ -64,6 +67,7 @@
   </tr>
   </table>
 %end;
+
 %define;source(xx)
   <table border=1>
   <tr>
@@ -138,14 +142,23 @@
 
 <h1 align=center><font color=%highlight;>%nn;
 %if;(evar_m = "ADD_FAM")
-  [*add::family/families]0%end;
+  [*add::family/families]0
+%elseif;(evar_m = "ADD_PAR")
+  [*add::family/families]0
+%elseif;(evar_m = "MOD_FAM")
+  [*modify::family/families]0 # %evar_i;
+%end;
 </font></h1>
 
 <form method=POST action="%action;">
 %hidden;
-<input type=hidden name=digest value="%digest;">
+%if;(evar_i != "");<input type=hidden name=i value="%evar_i;">%nl;%end;
 %if;(evar_ip != "");<input type=hidden name=ip value="%evar_ip;">%nl;%end;
-%if;(evar_m = "ADD_FAM");<input type=hidden name=m value=ADD_FAM_OK>%nl;%end;
+<input type=hidden name=digest value="%digest;">
+%if;(evar_m = "ADD_FAM");<input type=hidden name=m value=ADD_FAM_OK>%nl;
+%elseif;(evar_m = "ADD_PAR");<input type=hidden name=m value=ADD_FAM_OK>%nl;
+%elseif;(evar_m = "MOD_FAM");<input type=hidden name=m value=MOD_FAM_OK>%nl;
+%end;
 
 <h4>[*him/her]0</h4>
 %apply;parent("him", "father")
@@ -255,6 +268,47 @@
 <li>
 %apply;insert_child("0")
 %foreach;child;
+  <li>
+  <table border=1>
+    <tr>
+      <td>[*first name/first names]0</td>
+      <td colspan=2>
+        <input name=ch%cnt;_fn size=23 maxlength=200 value="%child.first_name;">
+      </td>
+      <td align=right>[*number]</td>
+      <td>
+        <input name=ch%cnt;_occ size=5 maxlength=8 value="%child.occ;">
+      </td>
+    </tr>
+    <tr>
+      <td>[*surname/surnames]0</td>
+      <td colspan=4>
+        <input name=ch%cnt;_sn size=40 maxlength=200 value="%child.surname;">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <select name=ch%cnt_p>
+          <option value=link%if;(child.create = "link") selected%end;
+           >[*link]0
+          <option value=create%if;(child.create = "create") selected%end;
+           >[*create]0
+        </select>
+      </td>
+      %apply;birth("ch%cnt;", "child", "false")
+    </tr>
+    <tr>
+      <td>
+        <input type=radio name=ch%cnt;_sex value=N%sp;
+         %if;(child.sex = "neuter"); checked%end;>?
+        <input type=radio name=ch%cnt;_sex value=M%sp;
+         %if;(child.sex = "male"); checked%end;>[M/F]0
+        <input type=radio name=ch%cnt;_sex value=F%sp;
+         %if;(child.sex = "female"); checked%end;>[M/F]1
+      </td>
+      %apply;death("ch%cnt;", "child", "false")
+    </tr>
+  </table>
   <li>
   %apply;insert_child(cnt)
 %end;

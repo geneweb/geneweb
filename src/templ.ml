@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.4 2001-06-14 17:09:33 ddr Exp $ *)
+(* $Id: templ.ml,v 4.5 2001-06-14 19:55:11 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -258,7 +258,14 @@ value parse_templ conf base strm =
       try
         let f = get_ident 0 strm in
         let xl = parse_formal_params strm in
-        let (al, _) = parse_astl [] False 0 ["end"] strm in Some (f, xl, al)
+        let (al, _) = parse_astl [] False 0 ["end"] strm in
+        do {
+          loop () where rec loop () =
+            match strm with parser
+            [ [: `('\n' | '\r') :] -> loop ()
+            | [: :] -> () ];
+          Some (f, xl, al)
+        }
       with
       [ Stream.Failure | Stream.Error _ -> None ]
     in
@@ -285,15 +292,18 @@ value parse_templ conf base strm =
         match tok with
         [ "elseif" ->
             let e2 = parse_expr strm in
-            let (al2, al3) = loop () in (al1, [Aif e2 al2 al3])
+            let (al2, al3) = loop () in
+            (al1, [Aif e2 al2 al3])
         | "else" ->
-            let (al2, _) = parse_astl [] False 0 ["end"] strm in (al1, al2)
+            let (al2, _) = parse_astl [] False 0 ["end"] strm in
+            (al1, al2)
         | _ -> (al1, []) ]
     in
     Aif e al1 al2
   and parse_foreach strm =
     let (v, vl) = get_variable strm in
-    let (astl, _) = parse_astl [] False 0 ["end"] strm in Aforeach v vl astl
+    let (astl, _) = parse_astl [] False 0 ["end"] strm in
+    Aforeach v vl astl
   in
   fst (parse_astl [] True 0 [] strm)
 ;

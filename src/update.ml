@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.8 2001-06-14 17:09:33 ddr Exp $ *)
+(* $Id: update.ml,v 4.9 2001-06-14 19:55:11 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -1000,7 +1000,7 @@ value print conf base p =
               else do {
                 let s = transl conf "parents" in
                 Wserver.wprint "<br>\n";
-                Wserver.wprint "<a href=\"%sm=ADD_PAR;i=%d\">%s</a><br>\n"
+                Wserver.wprint "<a href=\"%sm=ADD_PAR;ip=%d\">%s</a><br>\n"
                   (commd conf) (Adef.int_of_iper p.cle_index)
                   (capitale (transl_decline conf "add" s))
               } ];
