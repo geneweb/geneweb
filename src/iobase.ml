@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.34 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.35 2005-01-08 20:59:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -127,14 +127,42 @@ value output_array_access oc arr pos =
     }
 ;
 
+value intext_magic_number = [| 0x84; 0x95; 0xA6; 0xBE |];
+
 value output_cache_array_no_sharing oc arr =
   do {
-    for i = 1 to output_value_header_size + array_header_size arr do {
-      output_byte oc 0;
-    };
+    let pos = pos_out oc in
+    (* magic number *)
+    for i = 0 to 3 do { output_byte oc intext_magic_number.(i); };
+
+    (* room for block length *)
+    output_binary_int oc 0;
+    (* room for obj counter *)
+    output_binary_int oc 0;
+    (* room for size_32 *)
+    output_binary_int oc 0;
+    (* room for size_64 *)
+    output_binary_int oc 0;
+
+    let pos_start = pos_out oc in
+    Iovalue.size_32.val := 0;
+    Iovalue.size_64.val := 0;
+    Iovalue.output_block_header oc 0 arr.len;
     for i = 0 to arr.len - 1 do {
       Iovalue.output oc (arr.get i);
     };
+    let pos_end = pos_out oc in
+
+    (* block_length *)
+    seek_out oc (pos + 4);
+    output_binary_int oc (pos_end - pos_start);
+    (* obj counter is zero because no_sharing *)
+    output_binary_int oc 0;
+    (* size_32 *)
+    output_binary_int oc Iovalue.size_32.val;
+    (* size_64 *)
+    output_binary_int oc Iovalue.size_64.val;
+    seek_out oc pos_end;
   }
 ;
 
@@ -777,6 +805,17 @@ value array_ext phony fa =
 ;
 
 value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
+  (* history:
+     - in version 4.10, there are special cases for "persons" and "families"
+       because gwc does not create arrays for these cases (to save memory, the
+       contents are written on disk) and the output_value just creates a
+       phony array header (all zeroes); the functions base.data.persons.array
+       and base.data.families.array fail "bug" (see below).
+     - in version 4.11, the array header has been correctly programmed;
+       therefore, there is no reason to keep these special cases (included
+       the test below with [failwith "bug"]; I just don't remove it because
+       I am lazy and I am often afraid of what could happen; well, with
+       some small tests... *)
   let v_ext v =
     if name = "persons" then ext phony_person v
     else if name = "families" then ext phony_family v

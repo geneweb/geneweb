@@ -1,4 +1,4 @@
-(* $Id: iovalue.mli,v 4.2 2004-12-14 09:30:14 ddr Exp $ *)
+(* $Id: iovalue.mli,v 4.3 2005-01-08 20:59:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value input : in_channel -> 'a;
@@ -26,3 +26,7 @@ type out_funs 'a =
 ;
 value gen_output : out_funs 'a -> 'a -> 'b -> unit;
 value out_channel_funs : out_funs out_channel;
+
+value output_block_header : out_channel -> int -> int -> unit;
+value size_32 : ref int;
+value size_64 : ref int;
