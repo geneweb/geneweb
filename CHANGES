@@ -7,7 +7,8 @@ GeneWeb version 3.02
 
 * GeneWeb Service/CGI (gwd)
   - [Dec 15, 99] Added things to be able to translate correctly the
-    possessive case ("x of y") in Finnish, which presently sucks.
+    noun complement ("x of y") in Finnish which sucks in the present
+    version.
   - [Dec 14, 99] In relationship links with option "by marriage" does not
     display the consanguinity (0%) any more if all relations found are by
     marriage.
