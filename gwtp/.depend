@@ -1,6 +1,6 @@
 gwtp.cmo: ../src/buff.cmo ../src/def.cmi httpEnv.cmo ../src/iobase.cmi \
-    iolight.cmo ../src/lock.cmi ../src/translate.cmi 
+    iolight.cmo ../src/lock.cmi ../src/secure.cmi ../src/translate.cmi 
 gwtp.cmx: ../src/buff.cmx ../src/def.cmi httpEnv.cmx ../src/iobase.cmx \
-    iolight.cmx ../src/lock.cmx ../src/translate.cmx 
+    iolight.cmx ../src/lock.cmx ../src/secure.cmx ../src/translate.cmx 
 iolight.cmo: ../src/buff.cmo ../src/def.cmi ../src/iovalue.cmi 
 iolight.cmx: ../src/buff.cmx ../src/def.cmi ../src/iovalue.cmx 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.9 2002-12-31 08:38:07 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.10 2003-10-20 07:11:56 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -272,7 +272,7 @@ value effective_send_ok conf base p file =
     let bfdir = Util.base_path ["images"] conf.bname in
     if Sys.file_exists bfdir then bfdir
     else do {
-      let d = Filename.concat Util.base_dir.val "images" in
+      let d = Filename.concat (Secure.base_dir ()) "images" in
       let d1 = Filename.concat d conf.bname in
       try Unix.mkdir d 0o777 with [ Unix.Unix_error _ _ _ -> () ];
       try Unix.mkdir d1 0o777 with [ Unix.Unix_error _ _ _ -> () ];

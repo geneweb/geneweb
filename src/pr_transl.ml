@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 4.6 2002-12-01 12:28:14 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 4.7 2003-10-20 07:11:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open MLast;
@@ -29,7 +29,7 @@ value rec expr e =
       Printf.printf "%s\n" (Token.eval_string s)
   | <:expr< $lid:x$ >> when List.mem x trace ->
       Stdpp.raise_with_loc (MLast.loc_of_expr e) (Failure "Bad source")
-  | <:expr< let $opt:_$ $list:pel$ in $e$ >> ->
+  | <:expr< let $rec:_$ $list:pel$ in $e$ >> ->
       do { binding_list pel; expr e; () }
   | <:expr< fun [ $list:pel$ ] >> -> List.iter fun_binding pel
   | <:expr< match $e$ with [ $list:pel$ ] >> ->
@@ -78,7 +78,7 @@ and str_item =
   fun
   [ <:str_item< declare $list:sil$ end >> -> List.iter str_item sil
   | <:str_item< open $_$ >> -> ()
-  | <:str_item< value $opt:_$ $list:pel$ >> -> binding_list pel
+  | <:str_item< value $rec:_$ $list:pel$ >> -> binding_list pel
   | <:str_item< type $list:_$ >> -> ()
   | <:str_item< exception $_$ of $list:_$ >> -> ()
   | <:str_item< module $_$ = $me$ >> -> module_expr me

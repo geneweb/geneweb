@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.73 2003-02-14 10:28:51 ddr Exp $ *)
+(* $Id: util.ml,v 4.74 2003-10-20 07:11:56 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -12,11 +12,11 @@ value sharelib =
 
 value add_lang_path = Secure.add_lang_path;
 value add_doc_path = Secure.add_doc_path;
+value set_base_dir = Secure.set_base_dir;
 
 add_lang_path sharelib;
 add_lang_path Filename.current_dir_name;
 
-value base_dir = ref Filename.current_dir_name;
 value cnt_dir = ref "";
 value images_url = ref "";
 
@@ -850,7 +850,7 @@ value input_to_semi ic =
 ;
 
 value base_path pref bname =
-  let pref = [base_dir.val :: pref] in
+  let pref = [Secure.base_dir () :: pref] in
   let bfile = List.fold_right Filename.concat pref bname in
   ifdef WIN95 then bfile
   else if Sys.file_exists bfile then bfile
@@ -1581,13 +1581,15 @@ value source_image_file_name bname str =
     List.fold_right Filename.concat [base_path ["src"] bname; "images"] str
   in
   let fname2 =
-    List.fold_right Filename.concat [base_dir.val; "src"; "images"] str
+    List.fold_right Filename.concat [Secure.base_dir (); "src"; "images"] str
   in
   if Sys.file_exists fname1 then fname1 else fname2
 ;
 
 value image_file_name str =
-  let fname1 = List.fold_right Filename.concat [base_dir.val; "images"] str in
+  let fname1 =
+    List.fold_right Filename.concat [Secure.base_dir (); "images"] str
+  in
   if Sys.file_exists fname1 then fname1
   else search_in_lang_path (Filename.concat "images" str)
 ;

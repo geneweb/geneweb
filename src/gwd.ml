@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.59 2003-06-19 06:11:00 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.60 2003-10-20 07:11:56 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1496,7 +1496,7 @@ value main () =
         "<dir>\n       Directory where the directory lang is installed.");
        ("-dd", Arg.String Util.add_doc_path,
         "<dir>\n       Directory where the documentation is installed.");
-       ("-bd", Arg.String (fun x -> Util.base_dir.val := x),
+       ("-bd", Arg.String Util.set_base_dir,
         "<dir>\n       Directory where the databases are installed.");
        ("-wd", Arg.String make_cnt_dir, "\
 <dir>
@@ -1598,7 +1598,7 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
       List.iter (fun d -> Util.add_doc_path (Filename.concat d "doc"))
         (List.rev (Secure.lang_path ()))
     else ();
-    if Util.cnt_dir.val = "" then Util.cnt_dir.val := Util.base_dir.val
+    if Util.cnt_dir.val = "" then Util.cnt_dir.val := Secure.base_dir ()
     else ();
     let (query, cgi) =
       try (Sys.getenv "QUERY_STRING", True) with

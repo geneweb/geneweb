@@ -1,19 +1,19 @@
-# $Id: Makefile,v 4.16 2003-07-15 11:17:54 ddr Exp $
+# $Id: Makefile,v 4.17 2003-10-20 07:11:55 ddr Exp $
 
 include ../tools/Makefile.inc
 
 PREFIX=/usr
 OCAMLI=-I ../wserver -I ../dag2html
-GWC_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo consangAll.cmo calendar.cmo gwcomp.cmo gwc.cmo
-CONSANG_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
-GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo secure.cmo util.cmo calendar.cmo date.cmo history.cmo update.cmo wiznotes.cmo srcfile.cmo templ.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
+GWC_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo consangAll.cmo calendar.cmo gwcomp.cmo gwc.cmo
+CONSANG_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
+GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo date.cmo history.cmo update.cmo wiznotes.cmo srcfile.cmo templ.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo dag.cmo relationLink.cmo relation.cmo ascend.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthDeath.cmo title.cmo notes.cmo doc.cmo forum.cmo image.cmo family.cmo base64.cmo robot.cmo
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
-GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo iobase.cmo select.cmo calendar.cmo gwu.cmo
+GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo select.cmo calendar.cmo gwu.cmo
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 PROBOT_OBJS=probot.cmo
-MOSTDESC_OBJS=adef.cmo name.cmo buff.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
-FPLA_OBJS=argl.cmo adef.cmo name.cmo buff.cmo gutil.cmo btree.cmo iovalue.cmo iobase.cmo fpla.cmo
+MOSTDESC_OBJS=adef.cmo name.cmo buff.cmo gutil.cmo iovalue.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
+FPLA_OBJS=argl.cmo adef.cmo name.cmo buff.cmo gutil.cmo btree.cmo iovalue.cmo secure.cmo iobase.cmo fpla.cmo
 
 all:: out
 
@@ -94,12 +94,12 @@ i18n_check.out: i18n_check.cmo
 
 i18n: pr_transl.cmo always
 	if test -f i18n; then mv i18n i18n.bak; fi
-	unset LC_ALL; OBJS=`(grep -w -c "transl conf" *.ml; grep -w -c "transl_nth conf" *.ml) | grep -v :0 | sed s/:.*$$// | sort | uniq`; (for i in $$OBJS; do echo $$i 1>&2; camlp4r pa_ifdef.cmo ./pa_lock.cmo ./pa_html.cmo ./pr_transl.cmo pa_extend.cmo $$i; done; grep -h "\[" ../hd/etc/*.txt ../hd/lang/start.txt ../hd/lang/advanced.txt | sed -e "s/^.*\[\*\?//" -e "s/::.*$$//" -e "s/].*$$//") | sort | uniq | grep -v '^$$' > i18n
+	unset LANG LC_ALL; OBJS=`(grep -w -c "transl conf" *.ml; grep -w -c "transl_nth conf" *.ml) | grep -v :0 | sed s/:.*$$// | sort | uniq`; (for i in $$OBJS; do echo $$i 1>&2; camlp4r pa_ifdef.cmo ./pa_lock.cmo ./pa_html.cmo ./pr_transl.cmo pa_extend.cmo $$i; done; grep -h "\[" ../hd/etc/*.txt ../hd/lang/start.txt ../hd/lang/advanced.txt | sed -e "s/^.*\[\*\?//" -e "s/::.*$$//" -e "s/].*$$//") | sort | uniq | grep -v '^$$' > i18n
 
 always:
 
 depend:
-	TOP=.. ../tools/camlp4_depend.sh $(OCAMLI) `ls *.mli *.ml` > .depend.new
+	unset LANG LC_ALL; TOP=.. ../tools/camlp4_depend.sh $(OCAMLI) `ls *.mli *.ml` > .depend.new
 	mv .depend.new .depend
 
 include .depend

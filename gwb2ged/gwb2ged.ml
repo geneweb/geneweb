@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 4.8 2003-02-12 10:12:50 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 4.9 2003-10-20 07:11:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -738,6 +738,7 @@ value anonfun s =
 value main () =
   do {
     Argl.parse speclist anonfun errmsg;
+    Secure.set_base_dir (Filename.dirname ifile.val);
     let anc =
       if anc_1st.val <> "" then
         if anc_2nd.val = "" then do {

@@ -1,4 +1,4 @@
-(* $Id: fpla.ml,v 4.2 2002-01-12 14:20:54 ddr Exp $ *)
+(* $Id: fpla.ml,v 4.3 2003-10-20 07:11:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 (* First Parentless Ancestor *)
 
@@ -72,6 +72,7 @@ value main () =
   let cnt = ref 0 in
   do {
     Argl.parse speclist (fun s -> bname.val := s) usage;
+    Secure.set_base_dir (Filename.dirname bname.val);
     let base = Iobase.input bname.val in
     first_parentless_ancestor base
   }
