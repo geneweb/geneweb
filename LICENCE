@@ -32,8 +32,9 @@ documentation must comprise reference to the ownership of INRIA and
 the present file.
 
 The user undertakes to distribute the software either as unmodified
-source files, identical to those originally made public by INRIA, or as
-executable binaries obtained by compiling the original source files.
+source files or executable binaries, identical to those originally
+made public by INRIA, or as executable binaries obtained by compiling
+the original source file.
 
 Distribution of derivative works obtained by modifying the software or
 integrating it in another software is allowed only if the distribution
