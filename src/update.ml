@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.14 2000-09-12 23:35:13 ddr Exp $ *)
+(* $Id: update.ml,v 3.15 2000-09-14 14:04:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -831,10 +831,20 @@ value print_family_stuff conf base p a u =
   	   return Some fi)
        None (Array.to_list u.family)
      in ();
+     let s = transl_nth conf "family/families" 0 in
      if (p_first_name base p = "?" || p_surname base p = "?")
      && (Array.length u.family <> 0 || a.parents <> None) then ()
+     else if p.sex = Neuter then
+       do Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d;sex=M\">%s (%s)</a><br>\n"
+            (commd conf) (Adef.int_of_iper p.cle_index)
+  	    (capitale (transl_decline conf "add" s))
+            (transl_nth conf "M/F" 0);
+          Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d;sex=F\">%s (%s)</a><br>\n"
+            (commd conf) (Adef.int_of_iper p.cle_index)
+  	    (capitale (transl_decline conf "add" s))
+            (transl_nth conf "M/F" 1);
+       return ()
      else
-       let s = transl_nth conf "family/families" 0 in
        Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d\">%s</a><br>\n"
   	 (commd conf) (Adef.int_of_iper p.cle_index)
   	 (capitale (transl_decline conf "add" s));
