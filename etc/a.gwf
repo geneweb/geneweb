@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.23 2000-12-29 10:02:45 ddr Exp $
+# $Id: a.gwf,v 3.24 2000-12-30 09:52:57 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -161,10 +161,10 @@ places_inverted=no
 #
 # They will be replaced in the displayed "notes", "sources", "comments"
 # and in the data base forum. If the variable name is "var_something",
-# it replaces all occurrences of "%something;" in these texts.
+# it replaces all occurrences of "%vsomething;" in these texts.
 #
 # Example. if you define here:
 #   var_who=Bond, James Bond
-# and if the notes is "My name is %who;.", the displayed text in the notes
+# and if the notes is "My name is %vwho;.", the displayed text in the notes
 # will be:
 #   My name is Bond, James Bond.

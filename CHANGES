@@ -14,6 +14,9 @@ GeneWeb version 3.11
     people are mistaken by thinking it was "add a child in a family".
 
 * Bases configuration files (base.gwf)
+  - [30 Dec 00] In example file a.gwf, fixed comment about customized
+    variables: for variable defined as var_foo, the usage in the text
+    is %vfoo; (not %foo;).
   - [29 Dec 00] Added variable "always_surname" telling to always print
     the children surnames in descendant display, even if same than the
     father's (default = no).
