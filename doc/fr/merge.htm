@@ -59,21 +59,14 @@ avec la commande "gwu". Tapez:
 <p><ul><li> Fabriquez une base commune "tutu". Tapez:
 
 <pre>
-     gwc toto.gw titi.gw -o tutu
+     gwc toto.gw -sep titi.gw -o tutu
 </pre>
 
-Il se peut (et il est m&ecirc;me probable) que gwc mette des erreurs
-parce que des personnes se retrouvent d&eacute;finies deux fois, dans
-"toto.gw" et dans "titi.gw". Pour rem&eacute;dier &agrave; cela, gwc a
-une option "-sh" pour demander de d&eacute;caler les num&eacute;ros
-des personnes et &eacute;viter les conflits. Essayez:
-
-<pre>
-     gwc toto.gw -sh 10 titi.gw -o tutu
-</pre>
-
-Si la valeur 10 ne r&eacute;sout pas le probl&egrave;me, essayez 20,
-30 ou 100...
+L'option "-sep" permet de traiter "titi.gw" s&eacute;par&eacute;ment:
+si une personne de "titi.gw" est d&eacute;j&agrave; d&eacute;finie
+avec la m&ecirc;me cl&eacute; (pr&eacute;nom/patronyme/num&eacute;ro)
+dans "toto.gw", le num&eacute;ro de sa cl&eacute; est automatiquement
+d&eacute;cal&eacute; pour &eacute;viter le conflit.
 
 </ul>
 

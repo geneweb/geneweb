@@ -68,6 +68,11 @@ GeneWeb version 3.08
     spouses' parents are included, except if the option "-nsp" is given.
 
 * Geneweb compiler (gwc)
+  - [25 Sep 00] Replaced option "-shift #" by "-sep": the file following
+    the "-sep" option is treated as separated from the rest, i.e. the numbers
+    in persons keys are automatically shifted if in conflict with the persons
+    of the previous files. No more need to find a "shift" number which avoids
+    the conflicts. Simplifies the data bases merging.
   - [27 Aug 00] Fixed bug: date e.g. "between 1300 and 1350 Julian" where
     printed by gwu as 1300..1350J but gwc expected 1300J..1350 and resulted
     in a syntax error.   
@@ -84,6 +89,9 @@ GeneWeb version 3.08
     make gwtp work correctly.
 
 * Documentation:
+  - [25 Sep 00] Changed in the chapter "merge.htm" the explanation about the
+    separation of the merged data base, using now the new option "-sep"
+    of "gwc" instead of "-shift" (see change in gwc above, same day).
   - [09..25 Sep 00] Updated German version (Falko Trojahn).
   - [24 Sep 00] Added a chapter (gwformat.htm) about the GeneWeb source
     file format (files ending with .gw). Written by Yann Corno. English

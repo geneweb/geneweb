@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.9 2000-06-29 11:38:23 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.10 2000-09-25 15:50:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -151,7 +151,14 @@ value title_unique_string gen t =
    t_date_end = t.t_date_end; t_nth = t.t_nth}
 ;
 
-value find_person_by_name gen first_name surname occ =
+value person_hash first_name surname =
+  let first_name = nominative first_name in
+  let surname = nominative surname in
+  let s = Name.crush_lower (first_name ^ " " ^ surname) in
+  Hashtbl.hash s
+;
+
+value find_person_by_global_name gen first_name surname occ =
   let first_name = nominative first_name in
   let surname = nominative surname in
   let s = Name.crush_lower (first_name ^ " " ^ surname) in
@@ -171,14 +178,50 @@ value find_person_by_name gen first_name surname occ =
         else loop ipl ]
 ;
 
+value find_person_by_local_name gen first_name surname occ =
+  let first_name = nominative first_name in
+  let surname = nominative surname in
+  let s = Name.crush_lower (first_name ^ " " ^ surname) in
+  let key = Hashtbl.hash s in
+  let ipl = Mhashtbl.find_all gen.g_local_names (key, occ) in
+  let first_name = Name.strip_lower first_name in
+  let surname = Name.strip_lower surname in
+  loop ipl where rec loop =
+    fun
+    [ [] -> raise Not_found
+    | [ip :: ipl] ->
+        let p = poi gen.g_base ip in
+        if Name.strip_lower (p_first_name gen.g_base p) = first_name
+        && Name.strip_lower (p_surname gen.g_base p) = surname
+        then ip
+        else loop ipl ]
+;
+
+value find_person_by_name gen first_name surname occ =
+  if gen.g_separate then
+    find_person_by_local_name gen first_name surname occ
+  else
+    find_person_by_global_name gen first_name surname occ
+;
+
 value add_person_by_name gen first_name surname occ iper =
   let s = Name.crush_lower (nominative (first_name ^ " " ^ surname)) in
   let key = Hashtbl.hash s in
   Mhashtbl.add gen.g_names key iper
 ;
 
+value find_first_available_occ gen fn sn occ =
+  loop occ where rec loop occ =
+    match
+      try Some (find_person_by_global_name gen fn sn occ) with
+      [ Not_found -> None ]
+    with
+    [ Some _ -> loop (occ + 1)
+    | None -> occ ]
+;
+
 value insert_undefined gen key =
-  let occ = key.pk_occ + gen.g_shift in
+  let occ = key.pk_occ in
   let x =
     try
       if key.pk_first_name = "?" || key.pk_surname = "?" then raise Not_found
@@ -189,12 +232,18 @@ value insert_undefined gen key =
         poi gen.g_base x
     with
     [ Not_found ->
+        let new_occ =
+          if gen.g_separate && key.pk_first_name <> "?"
+          && key.pk_surname <> "?" then
+            find_first_available_occ gen key.pk_first_name key.pk_surname occ
+          else occ
+        in
         let (x, a, u) =
-          make_person gen key.pk_first_name key.pk_surname occ
+          make_person gen key.pk_first_name key.pk_surname new_occ
             gen.g_pcnt
         in
         do if key.pk_first_name <> "?" && key.pk_surname <> "?" then
-             add_person_by_name gen key.pk_first_name key.pk_surname occ
+             add_person_by_name gen key.pk_first_name key.pk_surname new_occ
                x.cle_index
            else ();
            new_iper gen;
@@ -202,6 +251,8 @@ value insert_undefined gen key =
            (gen.g_base.data.ascends.array ()).(gen.g_pcnt) := a;
            (gen.g_base.data.unions.array ()).(gen.g_pcnt) := u;
            gen.g_pcnt := gen.g_pcnt + 1;
+           let h = person_hash key.pk_first_name key.pk_surname in
+           Mhashtbl.add gen.g_local_names (h, occ) x.cle_index;
         return x ]
   in
   do if not gen.g_errored then
@@ -226,7 +277,7 @@ value insert_undefined gen key =
 ;
 
 value insert_person gen so =
-  let occ = so.occ + gen.g_shift in
+  let occ = so.occ in
   let x =
     try
       if so.first_name = "?" || so.surname = "?" then raise Not_found
@@ -237,11 +288,16 @@ value insert_person gen so =
         poi gen.g_base x
     with
     [ Not_found ->
+        let new_occ =
+          if gen.g_separate && so.first_name <> "?" && so.surname <> "?" then
+            find_first_available_occ gen so.first_name so.surname occ
+          else occ
+        in
         let (x, a, u) =
-          make_person gen so.first_name so.surname occ gen.g_pcnt
+          make_person gen so.first_name so.surname new_occ gen.g_pcnt
         in
         do if so.first_name <> "?" && so.surname <> "?" then
-             add_person_by_name gen so.first_name so.surname occ
+             add_person_by_name gen so.first_name so.surname new_occ
                x.cle_index
            else ();
            new_iper gen;
@@ -249,6 +305,8 @@ value insert_person gen so =
            (gen.g_base.data.ascends.array ()).(gen.g_pcnt) := a;
            (gen.g_base.data.unions.array ()).(gen.g_pcnt) := u;
            gen.g_pcnt := gen.g_pcnt + 1;
+           let h = person_hash so.first_name so.surname in
+           Mhashtbl.add gen.g_local_names (h, occ) x.cle_index;
         return x ]
   in
   do if gen.g_def.(Adef.int_of_iper x.cle_index) then
@@ -420,7 +478,7 @@ value insert_family gen co witl fo deo =
 ;
 
 value insert_notes fname gen key str =
-  let occ = key.pk_occ + gen.g_shift in
+  let occ = key.pk_occ in
   match
     try
       Some (find_person_by_name gen key.pk_first_name key.pk_surname occ)
@@ -499,10 +557,11 @@ value insert_syntax fname gen =
   | Bnotes str -> insert_bnotes fname gen str ]
 ;
 
-value insert_comp_families gen (x, shift) =
+value insert_comp_families gen (x, separate) =
   let ic = open_in_bin x in
   do check_magic x ic;
-     gen.g_shift := shift;
+     gen.g_separate := separate;
+     Mhashtbl.clear gen.g_local_names;
   return
   let src : string = input_value ic in
   try
@@ -629,9 +688,10 @@ value link gwo_list =
   let gen =
     {g_strings = Mhashtbl.create 20011;
      g_names = Mhashtbl.create 20011;
+     g_local_names = Mhashtbl.create 20011;
      g_pcnt = 0; g_fcnt = 0; g_scnt = 0;
      g_base = empty_base;
-     g_def = [| |]; g_shift = 0; g_errored = False}
+     g_def = [| |]; g_separate = False; g_errored = False}
   in
   let _ = unique_string gen "" in
   do List.iter (insert_comp_families gen) gwo_list; return
@@ -662,7 +722,7 @@ value output_command_line bname =
   return ()
 ;
 
-value shift = ref 0;
+value separate = ref False;
 value files = ref [];
 
 value speclist =
@@ -673,17 +733,18 @@ value speclist =
    ("-stats", Arg.Set pr_stats, "Print statistics");
    ("-nc", Arg.Clear do_check, "No consistency check");
    ("-cg", Arg.Set do_consang, "Compute consanguinity");
-   ("-sh", Arg.Int (fun x -> shift.val := x),
-    "<int> Shift all persons numbers");
+   ("-sep", Arg.Set separate, " Separate all persons in next file");
    ("-mem", Arg.Set Iobase.save_mem, " Save memory, but slower");
    ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
 ;
 
 value anonfun x =
+  let sep = separate.val in
   do if Filename.check_suffix x ".gw" then ()
      else if Filename.check_suffix x ".gwo" then ()
      else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\""));
-  return files.val := [(x, shift.val) :: files.val]
+     separate.val := False;
+  return files.val := [(x, sep) :: files.val]
 ;
 
 value errmsg =
@@ -706,15 +767,15 @@ value main () =
   return
   let gwo = ref [] in
   do List.iter
-       (fun (x, shift) ->
+       (fun (x, separate) ->
           if Filename.check_suffix x ".gw" then
             do try Gwcomp.comp_families x with e ->
                  do Printf.printf "File \"%s\", line %d:\n" x line_cnt.val;
                  return raise e;
-               gwo.val := [(x ^ "o", shift) :: gwo.val];
+               gwo.val := [(x ^ "o", separate) :: gwo.val];
             return ()
           else if Filename.check_suffix x ".gwo" then
-            gwo.val := [(x, shift) :: gwo.val]
+            gwo.val := [(x, separate) :: gwo.val]
           else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
        (List.rev files.val);
      if not just_comp.val then
