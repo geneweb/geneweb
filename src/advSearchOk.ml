@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 4.1 2001-04-22 17:50:34 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 4.2 2001-05-21 08:35:02 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -65,7 +65,8 @@ value string_incl x y =
 
 value name_incl x y =
   let x = Name.abbrev (Name.lower x) in
-  let y = Name.abbrev (Name.lower y) in string_incl x y
+  let y = Name.abbrev (Name.lower y) in
+  string_incl x y
 ;
 
 value advanced_search conf base max_answers =
@@ -81,7 +82,10 @@ value advanced_search conf base max_answers =
         in
         do { Hashtbl.add hs x v; v } ]
   in
-  let test x cmp = let y = gets x in if y = "" then True else cmp y in
+  let test x cmp =
+    let y = gets x in
+    if y = "" then True else cmp y
+  in
   let test_auth p x cmp =
     let y = gets x in
     if y = "" then True else if fast_auth_age conf p then cmp y else False
