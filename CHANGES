@@ -8,7 +8,7 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Jul 9, 99] Added link (upper arrow) to welcome page in displays by
+  - [Jul 9, 99] Added link (upper arrow) to welcome page in displayings by
     first names and surnames.
   - [Jul 9, 99] Fixed date check for possible father when interval (i.e. was
     telling "incorrect" when father died between 1250 and 1260 and son born
