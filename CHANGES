@@ -10,6 +10,10 @@ GeneWeb version 3.04
     to display only that one.
   - [27 Mar, 05 Apr 00] Added displaying of places/surnames from welcome page.
 
+* Setup program (gwsetup)
+  - [09 Apr 00] Fixed some bugs in Linux rpm package causing gwsetup to
+    fail and the browser to answer "no output".
+
 * Gedcom to GeneWeb (ged2gwb)
   - [31 Mar 00] Do not enter any more GIVN as public name if equal to first
     name nor SURN as surname alias if equal to surname.

@@ -1,7 +1,7 @@
-# $Id: Makefile,v 3.3 2000-03-22 10:51:17 ddr Exp $
+# $Id: Makefile,v 3.4 2000-04-09 01:17:34 ddr Exp $
 
 VERSION=3.03
-RELEASE=1
+RELEASE=2
 REDHAT=/usr/src/redhat
 
 all:
