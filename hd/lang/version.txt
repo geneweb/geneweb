@@ -1,5 +1,3 @@
-<dl>
-<dd>
 <table border=0>
 <tr>
 <td align=center>
@@ -17,10 +15,6 @@
 <img src="%gm=IM;v=l-es.gif" width=36 height=22 alt=es></a>
 <a href="%glang=fr">
 <img src="%gm=IM;v=l-fr.gif" width=36 height=22 alt=fr></a>
-</td>
-</tr>
-<tr>
-<td align=center>
 <a href="%glang=he">
 <img src="%gm=IM;v=l-he.gif" width=36 height=22 alt=he></a>
 <a href="%glang=it">
@@ -36,4 +30,3 @@
 </td>
 </tr>
 </table>
-</dl>

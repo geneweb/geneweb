@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.3 1999-04-20 20:13:56 ddr Exp $
+# $Id: Makefile,v 2.4 1999-04-22 21:59:27 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -42,7 +42,7 @@ distrib:
 	done
 	mkdir distribution/lang
 	cp hd/lang/*.txt distribution/lang/.
-	for dir in cn de en eo es fr he it nl no pt se; do \
+	for dir in cn de dk en eo es fr he it nl no pt se; do \
 		mkdir distribution/lang/$$dir; \
 		cp hd/lang/$$dir/start.txt distribution/lang/$$dir/.; \
 	done
