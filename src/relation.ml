@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.27 2002-03-11 17:24:56 ddr Exp $ *)
+(* $Id: relation.ml,v 4.28 2002-08-19 18:38:34 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1087,13 +1087,15 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
       html_li conf;
       let s = gen_person_title_text no_reference raw_access conf base p2 in
       let s =
-        if pp2 = None then s
+        if pp2 = None then
+          transl_decline2 conf "%1 of %2" (lab (fun r -> r.Consang.lens2) x2)
+            s
         else
           transl_decline2 conf "%1 of (same or greater generation level) %2"
-            (transl_nth conf "the spouse" (1 - index_of_sex p2.sex)) s
-      in
-      let s =
-        transl_decline2 conf "%1 of %2" (lab (fun r -> r.Consang.lens2) x2) s
+            (transl_decline2 conf "%1 of %2"
+               (lab (fun r -> r.Consang.lens2) x2)
+               (transl_nth conf "the spouse" (1 - index_of_sex p2.sex)))
+            s
       in
       Wserver.wprint "%s\n" (nominative s);
     end;
