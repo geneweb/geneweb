@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.39 2002-03-08 10:02:36 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.40 2002-03-08 10:03:27 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1603,7 +1603,7 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
 <addr>
        Send a message to say that this service has been redirected to <addr>");
        ("-trace_failed_passwd", Arg.Set trace_failed_passwd,
-        "\n       Print the failed passwords in log\n");
+        "\n       Print the failed passwords in log");
        ("-nolock", Arg.Set Lock.no_lock_flag,
         "\n       Do not lock files before writing.") ::
        ifdef UNIX then
