@@ -1,14 +1,14 @@
-# $Id: Makefile,v 2.19 1999-08-21 10:57:27 ddr Exp $
+# $Id: Makefile,v 2.20 1999-09-14 22:33:40 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver
-GWC_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo buff.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo consangAll.cmo gwcomp.cmo gwc.cmo
+GWC_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo buff.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo consangAll.cmo calendar.cmo gwcomp.cmo gwc.cmo
 CONSANG_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo buff.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
-GWD_OBJS1=../wserver/wserver.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo buff.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo util.cmo date.cmo srcfile.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo
+GWD_OBJS1=../wserver/wserver.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo buff.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo util.cmo calendar.cmo date.cmo srcfile.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo relationLink.cmo relation.cmo ascend.cmo descend.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthday.cmo birthDeath.cmo title.cmo tree.cmo notes.cmo doc.cmo family.cmo base64.cmo robot.cmo
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
-GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo buff.cmo iobase.cmo select.cmo gwu.cmo
+GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo buff.cmo iobase.cmo select.cmo calendar.cmo gwu.cmo
 all:: out
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 MOSTDESC_OBJS=adef.cmo name.cmo gutil.cmo iovalue.cmo btree.cmo buff.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo

@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 2.10 1999-08-30 23:55:48 ddr Exp $ *)
+(* $Id: def.mli,v 2.11 1999-09-14 22:33:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = Adef.iper;
@@ -7,14 +7,21 @@ type istr = Adef.istr;
 type cdate = Adef.cdate;
 type codate = Adef.codate;
 
-type precision = Adef.precision ==
-  [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
-;
 type date = Adef.date ==
+  [ Dgreg of dmy and calendar
+  | Dtext of string ]
+and calendar = Adef.calendar ==
+  [ Dgregorian
+  | Djulian
+  | Dfrench
+  | Dhebrew ]
+and dmy = Adef.dmy ==
   { day : int;
     month : int;
     year : int;
     prec : precision }
+and precision = Adef.precision ==
+  [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
 ;
 
 type divorce = [ NotDivorced | Divorced of codate ];
@@ -98,6 +105,7 @@ type gen_family 'person 'string =
   { marriage : mutable codate;
     marriage_place : mutable 'string;
     marriage_src : mutable 'string;
+    witnesses : mutable array 'person;
     not_married : mutable bool;
     divorce : mutable divorce;
     children : mutable array 'person;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.22 1999-07-28 13:08:34 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.23 1999-09-14 22:34:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -114,6 +114,7 @@ value reconstitute_family conf =
     {marriage = Adef.codate_of_od marriage;
      marriage_place = marriage_place;
      marriage_src = strip_spaces (get conf "marr_src");
+     witnesses = [| |];
      not_married = not_married;
      divorce = divorce; children = Array.of_list children; comment = comment;
      origin_file = ""; fsources = fsources;

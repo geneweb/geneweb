@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.16 1999-08-14 09:26:38 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.17 1999-09-14 22:33:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -13,7 +13,7 @@ type mfam =
 
 value soy y = if y == 0 then "-0" else string_of_int y;
 
-value print_date oc d =
+value print_date_dmy oc d =
   do match d.prec with
      [ About -> Printf.fprintf oc "~"
      | Maybe -> Printf.fprintf oc "?"
@@ -31,6 +31,28 @@ value print_date oc d =
      | YearInt y -> Printf.fprintf oc "..%s" (soy y)
      | _ -> () ];
   return ()
+;
+
+value spaces_to_underscore s =
+  do for i = 0 to String.length s - 1 do
+       if s.[i] = ' ' then s.[i] := '_' else ();
+     done;
+  return s
+;
+
+value print_date oc =
+  fun
+  [ Dgreg d Dgregorian -> print_date_dmy oc d
+  | Dgreg d Djulian ->
+      do print_date_dmy oc (Calendar.julian_of_gregorian d);
+         Printf.fprintf oc "J";
+      return ()
+  | Dgreg d Dfrench ->
+      do print_date_dmy oc (Calendar.french_of_gregorian d);
+         Printf.fprintf oc "F";
+      return ()
+  | Dgreg d Dhebrew -> print_date_dmy oc d
+  | Dtext t -> Printf.printf "0(%s)" (spaces_to_underscore t) ]
 ;
 
 value print_date_option oc =

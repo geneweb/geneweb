@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 2.7 1999-07-26 07:01:59 ddr Exp $ *)
+(* $Id: gutil.mli,v 2.8 1999-09-14 22:33:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -24,10 +24,13 @@ value person_misc_names : base -> person -> list string;
 
 value leap_year : int -> bool;
 value nb_jours_dans_mois : int -> int -> int;
-value temps_ecoule : date -> date -> date;
-value annee : date -> int;
+value temps_ecoule : dmy -> dmy -> dmy;
+value annee : dmy -> int;
+value strictement_avant_dmy : dmy -> dmy -> bool;
+value strictement_apres_dmy : dmy -> dmy -> bool;
 value strictement_avant : date -> date -> bool;
 value strictement_apres : date -> date -> bool;
+value date_of_death : death -> option date;
 
 value denomination : base -> person -> string;
 
@@ -61,9 +64,9 @@ type warning 'person =
   | MarriageDateBeforeBirth of 'person
   | MotherDeadAfterChildBirth of 'person and 'person
   | ParentBornAfterChild of 'person and 'person
-  | ParentTooYoung of 'person and date
+  | ParentTooYoung of 'person and dmy
   | TitleDatesError of 'person and title
-  | YoungForMarriage of 'person and date ]
+  | YoungForMarriage of 'person and dmy ]
 ;
 type base_warning = warning person;
 

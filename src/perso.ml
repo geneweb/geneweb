@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.45 1999-08-30 11:33:09 ddr Exp $ *)
+(* $Id: perso.ml,v 2.46 1999-09-14 22:33:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -45,8 +45,8 @@ value has_grand_children base p =
 
 value of_course_died conf p =
   match Adef.od_of_codate p.birth with
-  [ Some d -> conf.today.year - d.year > 120
-  | None -> False ]
+  [ Some (Dgreg d _) -> conf.today.year - d.year > 120
+  | _ -> False ]
 ;
 
 value prev_sibling base p a =
@@ -134,11 +134,13 @@ value
                  [ Some d -> Wserver.wprint "%s" (Date.string_of_date conf d)
                  | None -> () ];
                  match date_end with
-                 [ Some d ->
+                 [ Some (Dgreg d _) ->
                      do if d.month <> 0 then Wserver.wprint " - "
                         else Wserver.wprint "-";
-                        Wserver.wprint "%s" (Date.string_of_date conf d);
                      return ()
+                 | _ -> () ];
+                 match date_end with
+                 [ Some d -> Wserver.wprint "%s" (Date.string_of_date conf d)
                  | None -> () ];
               return False)
            first dates
@@ -209,9 +211,9 @@ value print_dates conf base in_perso p =
           [ (None, "") -> ()
           | _ -> Wserver.wprint "<em>\n" ]
         else ();
-        match Adef.od_of_codate p.birth with
-        [ Some d ->
-            let anniv =
+        let anniv =
+          match Adef.od_of_codate p.birth with
+          [ Some (Dgreg d _) ->
               if d.prec = Sure && p.death = NotDead then
                 d.day = conf.today.day && d.month = conf.today.month &&
                 d.year < conf.today.year
@@ -219,7 +221,10 @@ value print_dates conf base in_perso p =
                 d.month = 2 && conf.today.day = 1 &&
                 conf.today.month = 3
               else False
-            in
+          | _ -> False ]
+       in
+        match Adef.od_of_codate p.birth with
+        [ Some d ->
             do Wserver.wprint "%s " (cap (transl_nth conf "born" is));
                Wserver.wprint "%s" (Date.string_of_ondate conf d);
                if in_perso && anniv then
@@ -318,7 +323,7 @@ value print_dates conf base in_perso p =
      return ();
      if in_perso then
        match (Adef.od_of_codate p.birth, p.death) with
-       [ (Some d, NotDead) ->
+       [ (Some (Dgreg d _), NotDead) ->
            if d.day == 0 && d.month == 0 && d.prec <> Sure then ()
            else
              let a = temps_ecoule d conf.today in
@@ -330,9 +335,8 @@ value print_dates conf base in_perso p =
        | _ -> () ]
      else ();
      let sure d = d.prec = Sure in
-     match (Adef.od_of_codate p.birth, p.death) with
-     [ (Some d1, Death _ d2) ->
-         let d2 = Adef.date_of_cdate d2 in
+     match (Adef.od_of_codate p.birth, date_of_death p.death) with
+     [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
          if sure d1 && sure d2 && d1 <> d2 then
            let a = temps_ecoule d1 d2 in
            do if in_perso then

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.30 1999-08-21 11:45:44 ddr Exp $ *)
+(* $Id: util.mli,v 2.31 1999-09-14 22:34:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -29,7 +29,7 @@ value exit_nobr : unit -> unit;
 value connais : base -> person -> bool;
 value acces_n : config -> base -> string -> person -> string;
 value acces : config -> base -> person -> string;
-value calculer_age : config -> person -> option date;
+value calculer_age : config -> person -> option dmy;
 value wprint_hidden_person : config -> base -> string -> person -> unit;
 
 value geneweb_link : config -> string -> string -> string;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.47 1999-08-30 12:44:49 ddr Exp $ *)
+(* $Id: util.ml,v 2.48 1999-09-14 22:34:03 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -122,20 +122,22 @@ value age_autorise conf base p =
   else if p.access = IfTitles && (p.titles <> [] || parent_has_title base p)
   then True
   else
-    match (Adef.od_of_codate p.birth, p.death) with
-    [ (_, Death _ d) ->
-        let a = annee (temps_ecoule (Adef.date_of_cdate d) conf.today) in
-         a > 100
-    | (Some d, _) ->
-        let a = annee (temps_ecoule d conf.today) in
-        a > 100
+    match (Adef.od_of_codate p.birth, date_of_death p.death) with
+    [ (_, Some (Dgreg d _)) ->
+        let a = temps_ecoule d conf.today in
+        a.year > 100
+    | (Some (Dgreg d _), _) ->
+        let a = temps_ecoule d conf.today in
+        a.year > 100
     | _ ->
         loop 0 where rec loop i =
           if i >= Array.length p.family then False
           else
             let fam = foi base p.family.(i) in
             match Adef.od_of_codate fam.marriage with
-            [ Some d -> let a = annee (temps_ecoule d conf.today) in a > 100
+            [ Some (Dgreg d _) ->
+                let a = temps_ecoule d conf.today in
+                a.year > 100
             | _ -> loop (i + 1) ] ]
 ;
 
@@ -181,8 +183,8 @@ value acces conf base x = acces_n conf base "" x;
 
 value calculer_age conf p =
   match Adef.od_of_codate p.birth with
-  [ None -> None
-  | Some d -> Some (temps_ecoule d conf.today) ]
+  [ Some (Dgreg d _) -> Some (temps_ecoule d conf.today)
+  | _ -> None ]
 ;
 
 type p_access = (base -> person -> string * base -> person -> string);
@@ -437,11 +439,18 @@ value nth_field w n =
   let rec start i n =
     if n == 0 then i
     else if i < String.length w then
-      if w.[i] == '/' then start (i + 1) (n - 1) else start (i + 1) n
+      match w.[i] with
+      [ '<' -> start (i + 2) n
+      | '/' -> start (i + 1) (n - 1)
+      | _ -> start (i + 1) n ]
     else i
   in
   let rec stop i =
-    if i < String.length w then if w.[i] == '/' then i else stop (i + 1)
+    if i < String.length w then
+      match w.[i] with
+      [ '<' -> stop (i + 2)
+      | '/' -> i
+      | _ -> stop (i + 1) ]
     else i
   in
   let i1 = start 0 n in

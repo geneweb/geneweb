@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 2.3 1999-04-20 09:32:30 ddr Exp $ *)
+(* $Id: birthday.ml,v 2.4 1999-09-14 22:33:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -51,7 +51,7 @@ value gen_print conf base mois dead_people =
        let p = base.data.persons.get i in
        if not dead_people then
          match (Adef.od_of_codate p.birth, p.death) with
-         [ (Some d, NotDead | DontKnowIfDead) ->
+         [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
              if d.prec = Sure && d.day <> 0 && d.month <> 0
              && d.month = mois then
                if age_autorise conf base p then
@@ -65,7 +65,7 @@ value gen_print conf base mois dead_people =
          [ NotDead | DontKnowIfDead -> ()
          | _ ->
              do match Adef.od_of_codate p.birth with
-                [ Some dt ->
+                [ Some (Dgreg dt _) ->
                     if dt.prec = Sure && dt.day <> 0 && dt.month <> 0
                     && dt.month = mois then
                       if age_autorise conf base p then
@@ -76,15 +76,18 @@ value gen_print conf base mois dead_people =
                 | _ -> () ];
                 match p.death with
                 [ Death dr d ->
-                    let dt = Adef.date_of_cdate d in
-                    if dt.prec = Sure && dt.day <> 0 && dt.month <> 0
-                    && dt.month = mois then
-                      if age_autorise conf base p then
-                        let j = dt.day in
-                        let a = dt.year in
-                        tab.(pred j) := [(p, a, DeDeath dr) :: tab.(pred j)]
-                      else ()
-                    else ()
+                    match Adef.date_of_cdate d with
+                    [ Dgreg dt _ ->
+                        if dt.prec = Sure && dt.day <> 0 && dt.month <> 0
+                        && dt.month = mois then
+                          if age_autorise conf base p then
+                            let j = dt.day in
+                            let a = dt.year in
+                            tab.(pred j) :=
+                              [(p, a, DeDeath dr) :: tab.(pred j)]
+                          else ()
+                        else ()
+                    | _ -> () ]
                 | _ -> () ];
              return () ];
      done;
@@ -112,7 +115,7 @@ value anniversary_of conf base dead_people jj mm =
        let p = base.data.persons.get i in
        if not dead_people then
          match (Adef.od_of_codate p.birth, p.death) with
-         [ (Some d, NotDead | DontKnowIfDead) ->
+         [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
              if d.prec = Sure && d.day <> 0 && d.month <> 0 then
                if d.day == jj && d.month == mm then
                  if age_autorise conf base p then
@@ -126,7 +129,7 @@ value anniversary_of conf base dead_people jj mm =
          [ NotDead | DontKnowIfDead -> ()
          | _ ->
              do match Adef.od_of_codate p.birth with
-                [ Some d ->
+                [ Some (Dgreg d _) ->
                     if d.prec = Sure && d.day <> 0 && d.month <> 0 then
                       if d.day == jj && d.month == mm then
                         if age_autorise conf base p then
@@ -137,14 +140,16 @@ value anniversary_of conf base dead_people jj mm =
                 | _ -> () ];
                 match p.death with
                 [ Death dr d ->
-                    let dt = Adef.date_of_cdate d in
-                    if dt.prec = Sure && dt.day <> 0 && dt.month <> 0 then
-                      if dt.day == jj && dt.month == mm then
-                        if age_autorise conf base p then
-                          xx.val := [(p, dt.year, DeDeath dr) :: xx.val]
+                    match Adef.date_of_cdate d with
+                    [ Dgreg dt _ ->
+                        if dt.prec = Sure && dt.day <> 0 && dt.month <> 0 then
+                          if dt.day == jj && dt.month == mm then
+                            if age_autorise conf base p then
+                              xx.val := [(p, dt.year, DeDeath dr) :: xx.val]
+                            else ()
+                          else ()
                         else ()
-                      else ()
-                    else ()
+                    | _ -> () ]
                 | _ -> () ];
              return () ];
      done;
@@ -224,7 +229,7 @@ value print_birth_day conf base day_name verb wd d m y list =
       let dt = {day = d; month = m; year = y; prec = Sure} in
       do Wserver.wprint "%s, %s %s%s %s %s:\n"
            (capitale day_name) (transl_nth conf "(week day)" wd)
-           (Date.string_of_date conf dt) verb
+           (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
            (transl conf "the birthday")
            (transl_decline conf "of" "");
          afficher_liste_anniversaires conf base False dt list;
@@ -287,7 +292,7 @@ value print_anniv conf base day_name verb wd d m y list =
       let dt = {day = d; month = m; year = y; prec = Sure} in
       do Wserver.wprint "%s, %s %s%s %s:"
            (capitale day_name) (transl_nth conf "(week day)" wd)
-           (Date.string_of_date conf dt) verb
+           (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
            (transl conf "the anniversary");
          afficher_liste_anniversaires conf base True dt list;
       return () ]
@@ -340,7 +345,7 @@ value print_marriage conf base month =
        if is_deleted_family fam then ()
        else
          match Adef.od_of_codate fam.marriage with
-         [ Some {day = d; month = m; year = y; prec = Sure} when
+         [ Some (Dgreg {day = d; month = m; year = y; prec = Sure} _) when
            d <> 0 && m <> 0 ->
              let cpl = base.data.couples.get i in
              if m == month && age_autorise conf base (poi base cpl.father)
@@ -387,7 +392,7 @@ value anniversary_of_marriage_of_day conf base dd mm =
        if is_deleted_family fam then ()
        else
          match Adef.od_of_codate fam.marriage with
-         [ Some {day = d; month = m; year = y; prec = Sure} when
+         [ Some (Dgreg {day = d; month = m; year = y; prec = Sure} _) when
            d <> 0 && m <> 0 ->
              let cpl = base.data.couples.get i in
              if age_autorise conf base (poi base cpl.father)
@@ -433,7 +438,7 @@ value print_marriage_day conf base day_name verb wd d m y list =
       let dt = {day = d; month = m; year = y; prec = Sure} in
       do Wserver.wprint "%s, %s %s%s %s %s:\n"
            (capitale day_name) (transl_nth conf "(week day)" wd)
-           (Date.string_of_date conf dt) verb
+           (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
            (transl conf "the anniversary of marriage")
            (transl_decline conf "of" "");
          print_anniversaries_of_marriage conf base y list;

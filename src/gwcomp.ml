@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 2.12 1999-08-30 23:55:49 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.13 1999-09-14 22:33:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000f";
+value magic_gwo = "GnWo000g";
 
 type key =
   { pk_first_name : string;
@@ -100,33 +100,63 @@ value date_of_string s i =
             let (year, i) = champ i in
             if year == 0 then
               if i == String.length s then None else error ()
-            else if month < 1 || month > 12 then error ()
+            else if month < 1 || month > 13 then error ()
             else if day < 1 || day > 31 then error ()
             else
-              Some
-                ({day = day; month = month; year = year; prec = precision}, i)
+              let d =
+                {day = day; month = month; year = year; prec = precision}
+              in
+              Some (Dgreg d Dgregorian, i)
         | None ->
             if year == 0 then None
-            else if month < 1 || month > 12 then error ()
+            else if month < 1 || month > 13 then error ()
             else
-              Some
-                ({day = 0; month = month; year = year; prec = precision}, i) ]
+              let d =
+                {day = 0; month = month; year = year; prec = precision}
+              in
+              Some (Dgreg d Dgregorian, i) ]
     | None ->
-        if undefined then None
-        else Some ({day = 0; month = 0; year = year; prec = precision}, i) ]
-  in    
+        if undefined then
+          if i == String.length s then None
+          else if s.[i] == '(' && s.[String.length s - 1] == ')' then
+            let txt = String.sub s (i + 1) (String.length s - i - 2) in
+            Some (Dtext txt, String.length s)
+          else failwith ("date_of_string " ^ s)
+        else
+          let d = {day = 0; month = 0; year = year; prec = precision} in
+          Some (Dgreg d Dgregorian, i) ]
+  in
+  let date =
+    match date with
+    [ Some (Dgreg d _, i) ->
+        if i == String.length s then Some (Dgreg d Dgregorian, i)
+        else
+          match s.[i] with
+          [ 'G' -> Some (Dgreg d Dgregorian, i + 1)
+          | 'J' ->
+              let d = Calendar.gregorian_of_julian d in
+              Some (Dgreg d Djulian, i + 1)
+          | 'F' ->
+              let d = Calendar.gregorian_of_french d in
+              Some (Dgreg d Dfrench, i + 1)
+          | _ -> Some (Dgreg d Dgregorian, i) ]
+    | d -> d ]
+  in
   match date with
-  [ Some (d, i) ->
-      if i == String.length s then Some d
+  [ Some ((Dgreg d cal as dt), i) ->
+      if i == String.length s then Some dt
       else if s.[i] == '|' then
         let (y2, i) = champ (succ i) in
-        if i == String.length s then Some {(d) with prec = OrYear y2}
+        if i == String.length s then
+          Some (Dgreg {(d) with prec = OrYear y2} cal)
         else error ()
       else if i + 1 < String.length s && s.[i] == '.' && s.[i+1] == '.' then
         let (y2, i) = champ (i + 2) in
-        if i == String.length s then Some {(d) with prec = YearInt y2}
+        if i == String.length s then
+          Some (Dgreg {(d) with prec = YearInt y2} cal)
         else  error ()
       else error ()
+  | Some ((Dtext _ as dt), i) -> Some dt
   | None -> None ]
 ;
 
@@ -723,7 +753,8 @@ value read_family ic fname =
           in
           let fo =
             {marriage = marriage; marriage_place = marr_place;
-             marriage_src = marr_src; not_married = not_marr;
+             marriage_src = marr_src; witnesses = [| |];
+             not_married = not_marr;
              divorce = divorce; children = Array.of_list cles_enfants;
              comment = comm; origin_file = fname;
              fsources = fsrc;
@@ -733,7 +764,8 @@ value read_family ic fname =
       | line ->
           let fo =
             {marriage = marriage; marriage_place = marr_place;
-             marriage_src = marr_src; not_married = not_marr;
+             marriage_src = marr_src; witnesses = [| |];
+             not_married = not_marr;
              divorce = divorce; children = [||]; comment = comm;
              origin_file = fname; fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.15 1999-08-17 11:39:23 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.16 1999-09-14 22:33:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -122,8 +122,8 @@ value print_date conf =
   let (wc, rc, d) = count conf in
   match extract_date d with
   [ Some (d, m, y) ->
-      Wserver.wprint "%s"
-        (Date.string_of_date conf {day = d; month = m; year = y; prec = Sure})
+      let d = Dgreg {day = d; month = m; year = y; prec = Sure} Dgregorian in
+      Wserver.wprint "%s" (Date.string_of_date conf d)
   | _ -> Wserver.wprint "%s" d ]
 ;
 

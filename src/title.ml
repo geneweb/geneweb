@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 2.6 1999-07-22 14:34:16 ddr Exp $ *)
+(* $Id: title.ml,v 2.7 1999-09-14 22:33:57 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -17,26 +17,25 @@ value date_interval conf base t x =
   let found = ref False in
   do let rec loop t x =
        let set d =
-         do if d strictement_avant d1.val then d1.val := d else ();
-            if d strictement_apres d2.val then d2.val := d else ();
+         do if strictement_avant_dmy d d1.val then d1.val := d else ();
+            if strictement_apres_dmy d d2.val then d2.val := d else ();
             found.val := True;
          return ()
        in
        do match Adef.od_of_codate x.birth with
-          [ Some d -> set d
+          [ Some (Dgreg d _) -> set d
           | _ -> () ];
-          match x.death with
-          [ Death _ d -> set (Adef.date_of_cdate d)
-          | NotDead -> set conf.today
-          | _ -> () ];
+          match date_of_death x.death with
+          [ Some (Dgreg d _) -> set d
+          | _ -> if x.death = NotDead then set conf.today else () ];
           List.iter
             (fun t ->
                do match Adef.od_of_codate t.t_date_start with
-                  [ Some d -> set d
-                  | None -> () ];
+                  [ Some (Dgreg d _) -> set d
+                  | _ -> () ];
                   match Adef.od_of_codate t.t_date_end with
-                  [ Some d -> set d
-                  | None -> () ];
+                  [ Some (Dgreg d _) -> set d
+                  | _ -> () ];
                return ())
             x.titles;
           match t with
@@ -48,8 +47,8 @@ value date_interval conf base t x =
                    let md = fam.marriage in
                    let conj = spouse x (coi base ifam) in
                    do match Adef.od_of_codate md with
-                      [ Some d -> set d
-                      | None -> () ];
+                      [ Some (Dgreg d _) -> set d
+                      | _ -> () ];
                       loop JustSelf (poi base conj);
                       match t with
                       [ AddChildren ->
@@ -71,8 +70,8 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
      (x2.birth, Adef.od_of_codate t2.t_date_start,
       Adef.od_of_codate t2.t_date_end, x2.death))
   with
-  [ ((_, Some d1, _, _), (_, Some d2, _, _)) ->
-      if d1 strictement_avant d2 then True
+  [ ((_, Some (Dgreg d1 _), _, _), (_, Some (Dgreg d2 _), _, _)) ->
+      if strictement_avant_dmy d1 d2 then True
       else if annee d1 == annee d2 then
         match
           (Adef.od_of_codate t1.t_date_end,
@@ -94,27 +93,27 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
          date_interval conf base JustSelf x2)
       with
       [ (Some (d11, d12), Some (d21, d22)) ->
-          if d21 apres d12 then True
-          else if d11 apres d22 then False
-          else d21 apres d11
+          if not (strictement_avant_dmy d21 d12) then True
+          else if not (strictement_avant_dmy d11 d22) then False
+          else not (strictement_avant_dmy d21 d11)
       | _ ->
           match
             (date_interval conf base AddSpouse x1,
              date_interval conf base AddSpouse x2)
           with
           [ (Some (d11, d12), Some (d21, d22)) ->
-              if not (d21 strictement_avant d12) then True
-              else if not (d11 strictement_avant d22) then False
-              else not (d22 strictement_avant d12)
+              if not (strictement_avant_dmy d21 d12) then True
+              else if not (strictement_avant_dmy d11 d22) then False
+              else not (strictement_avant_dmy d22 d12)
           | _ ->
               match
                 (date_interval conf base AddChildren x1,
                  date_interval conf base AddChildren x2)
               with
               [ (Some (d11, d12), Some (d21, d22)) ->
-                  if not (d21 strictement_avant d12) then True
-                  else if not (d11 strictement_avant d22) then False
-                  else not (d22 strictement_avant d12)
+                  if not (strictement_avant_dmy d21 d12) then True
+                  else if not (strictement_avant_dmy d11 d22) then False
+                  else not (strictement_avant_dmy d22 d12)
               | (Some _, None) -> True
               | (None, Some _) -> False
               | (None, None) -> True ] ] ] ]
@@ -255,16 +254,16 @@ value give_access_someone conf base (x, t) list =
   let t_date_end = Adef.od_of_codate t.t_date_end in
   let has_dates =
     match (t_date_start, t_date_end) with
-    [ (Some _, _) | (_, Some _) -> True
+    [ (Some (Dgreg _ _), _) | (_, Some (Dgreg _ _)) -> True
     | _ -> False ]
   in
   do if has_dates then Wserver.wprint "<em>" else ();
      match t_date_start with
-     [ Some d -> Wserver.wprint "%d" (annee d)
-     | None -> () ];
+     [ Some (Dgreg d _) -> Wserver.wprint "%d" (annee d)
+     | _ -> () ];
      match t_date_end with
-     [ Some d -> Wserver.wprint "-%d" (annee d)
-     | None -> () ];
+     [ Some (Dgreg d _) -> Wserver.wprint "-%d" (annee d)
+     | _ -> () ];
      if has_dates then Wserver.wprint "</em>: " else ();
      if List.memq x list then Wserver.wprint "<em>"
      else Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);

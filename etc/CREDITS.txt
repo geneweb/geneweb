@@ -40,6 +40,10 @@ Algorithm of consanguinity and relationship
 Flags from FOTW Flags Of The World
 		http://fotw.digibel.be/flags/
 
+Algorithm for calendar conversions:
+	        Scott E. Lee
+                http://genealogy.org/~scottlee/
+
 Program written by
 		Daniel de Rauglaudre.
 		daniel.de_rauglaudre@inria.fr
