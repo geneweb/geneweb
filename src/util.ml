@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.72 2003-01-05 17:42:18 ddr Exp $ *)
+(* $Id: util.ml,v 4.73 2003-02-14 10:28:51 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1100,13 +1100,21 @@ value include_hed_trl conf base_opt suff =
 ;
 
 value message_to_wizard conf =
-  if (conf.wizard || conf.just_friend_wizard) && conf.user <> "" then
-    let fname = conf.bname ^ "_" ^ conf.user ^ "_mess.txt" in
-    match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
-    [ Some ic ->
-        try while True do { Wserver.wprint "%c" (input_char ic); } with
-        [ End_of_file -> close_in ic ]
-    | None -> () ]
+  if conf.wizard || conf.just_friend_wizard then
+    let print_file fname =
+      let fname = base_path ["etc"; conf.bname] (fname ^ ".txt") in
+      match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
+      [ Some ic ->
+          try while True do { Wserver.wprint "%c" (input_char ic); } with
+          [ End_of_file -> close_in ic ]
+      | None -> () ]
+    in
+    do {
+      print_file "mess_wizard";
+      if conf.user <> "" then
+        print_file ("mess_wizard_" ^ conf.user)
+      else ();
+    }
   else ()
 ;
 
