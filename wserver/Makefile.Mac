@@ -1,0 +1,10 @@
+# $Id: Makefile.Mac,v 1.1 2000-04-16 09:45:48 ddr Exp $
+
+#include ../tools/Makefile.inc
+
+OBJS = wserver.cmo
+
+all ÄÄ {OBJS}
+
+depend Ä
+    ::tools:camlp4_depend.mpw {OCAMLI} Å.mlÅ > Makefile.Mac.depend

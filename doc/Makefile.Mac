@@ -1,0 +1,11 @@
+all out opt Ä LICENSE.htm
+
+clean Ä
+    delete -y LICENSE.htm
+
+LICENSE.htm Ä ::LICENSE
+   begin
+     echo '<head><title>License</title></head><body><pre>'
+     cat ::LICENSE
+     echo '</pre></body>'
+   end > LICENSE.htm
