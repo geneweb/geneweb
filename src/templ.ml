@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 3.5 2001-02-16 04:39:47 ddr Exp $ *)
+(* $Id: templ.ml,v 3.6 2001-02-16 16:17:26 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -12,7 +12,9 @@ type ast =
   | Atransl of bool and string and char
   | Awid_hei of string
   | Aif of ast_expr and list ast and list ast
-  | Aforeach of string and list string and list ast ]
+  | Aforeach of string and list string and list ast
+  | Adefine of string and string and list ast and list ast
+  | Aapply of string and ast_expr ]
 and ast_expr =
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
@@ -93,7 +95,7 @@ value lexicon_word =
 ;
 
 value parse_templ conf base strm =
-  let parse_bool_expr () =
+  let rec parse_expr () =
     let rec parse_1 =
       parser
       [ [: e = parse_2;
@@ -144,11 +146,13 @@ value parse_templ conf base strm =
         match get_variable strm with
         [ ("%", []) -> parse_astl [Atext "%" :: astl] False 0 end_list strm
         | (v, []) when List.mem v end_list -> (List.rev astl, v)
+        | ("define", []) -> parse_define astl end_list strm
         | x ->
             let ast =
               match x with
               [ ("if", []) -> parse_if strm
               | ("foreach", []) -> parse_foreach strm
+              | ("apply", []) -> parse_apply strm
               | ("wid_hei", []) -> Awid_hei (get_ident 0 strm)
               | (v, vl) -> Avar v vl ]
             in
@@ -169,8 +173,18 @@ value parse_templ conf base strm =
           if len = 0 then astl else [Atext (buff_get len) :: astl]
         in
         (List.rev astl, "") ]
+  and parse_define astl end_list strm =
+    let (f, _) = get_variable strm in
+    let (x, _) = get_variable strm in
+    let (al, _) = parse_astl [] False 0 ["end"] strm in
+    let (alk, v) = parse_astl [] False 0 end_list strm in
+    (List.rev [Adefine f x al alk :: astl], v)
+  and parse_apply strm =
+    let (f, _) = get_variable strm in
+    let x = parse_expr () in
+    Aapply f x
   and parse_if strm =
-    let e = parse_bool_expr () in
+    let e = parse_expr () in
     let (al1, al2) =
       loop () where rec loop () =
         let (al1, tok) =
@@ -178,7 +192,7 @@ value parse_templ conf base strm =
         in
         match tok with
         [ "elseif" ->
-            let e2 = parse_bool_expr () in
+            let e2 = parse_expr () in
             let (al2, al3) = loop () in
             (al1, [Aif e2 al2 al3])
         | "else" ->
@@ -220,7 +234,9 @@ value strip_newlines_after_variables =
         [Atext s :: loop astl]
     | [Aif s alt ale :: astl] -> [Aif s (loop alt) (loop ale) :: loop astl]
     | [Aforeach s sl al :: astl] -> [Aforeach s sl (loop al) :: loop astl]
-    | [(Avar _ _ as ast) :: astl] -> [ast :: loop astl]
+    | [Adefine f x al alk :: astl] ->
+        [Adefine f x (loop al) (loop alk) :: loop astl]
+    | [(Avar _ _ | Aapply _ _ as ast) :: astl] -> [ast :: loop astl]
     | [(Atransl _ _ _ | Awid_hei _ as ast1); ast2 :: astl] ->
         [ast1; ast2 :: loop astl]
     | [ast] -> [ast]
