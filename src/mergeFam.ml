@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 2.2 1999-03-20 10:59:30 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 2.3 1999-07-15 08:52:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -39,10 +39,10 @@ value print_differences conf base branches fam1 fam2 =
            html_li conf;
            Wserver.wprint "<input type=radio name=\"%s\" value=1 checked>\n"
              name;
-           Wserver.wprint "%s\n" (if str_orig then coa conf x1 else x1);
+           Wserver.wprint "%s\n" x1;
            html_li conf;
            Wserver.wprint "<input type=radio name=\"%s\" value=2>\n" name;
-           Wserver.wprint "%s\n" (if str_orig then coa conf x2 else x2);
+           Wserver.wprint "%s\n" x2;
          end;
       return ()
     else ()

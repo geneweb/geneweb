@@ -5,8 +5,8 @@ GeneWeb version 2.05
   - [Jul 15, 99] Changed internal representation of strings in data bases.
     Should not make any differences. However, as it is a major internal
     change in the program, problems may appear (mainly in displaying or in
-    access by name, first name, surname, title): in this case, please
-    report.
+    access by name, first name, surname, title): please report if any
+    problem appears.
 
 * Setup program
   - [Jul 15, 99] Changed GEDCOM export menu to reflect new option "-charset"
@@ -17,7 +17,7 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Jul 14, 99] Added system of grammar declinations (required by German,
+  - [Jul 15, 99] Added system of grammar declinations (required by German,
     Esperanto, Czech).
   - [Jul 9, 99] Added link (upper arrow) to welcome page in displayings by
     first names and surnames.

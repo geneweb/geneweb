@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.8 1999-04-29 19:55:56 ddr Exp $ *)
+(* $Id: update.ml,v 2.9 1999-07-15 08:52:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -8,11 +8,6 @@ open Gutil;
 open Util;
 
 exception ModErr;
-
-value f_coa conf s =
-  if conf.charset = "iso-8859-1" then Ansel.to_iso_8859_1 s
-  else s
-;
 
 value rec find_free_occ base f s i =
   match
@@ -70,8 +65,8 @@ value print_same_name conf base p =
                    stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
                    begin
                      Wserver.wprint "%s.%d %s"
-                       (coa conf (sou base p.first_name)) p.occ
-                       (coa conf (sou base p.surname));
+                       (sou base p.first_name) p.occ
+                       (sou base p.surname);
                    end;
                 return ())
              pl;
@@ -107,24 +102,24 @@ value update_misc_names_of_family base p =
 ;
 
 value print_someone conf base p =
-  Wserver.wprint "%s%s %s" (coa conf (sou base p.first_name))
+  Wserver.wprint "%s%s %s" (sou base p.first_name)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
-    (coa conf (sou base p.surname))
+    (sou base p.surname)
 ;
 
 value print_first_name conf base p =
-  Wserver.wprint "%s%s" (coa conf (sou base p.first_name))
+  Wserver.wprint "%s%s" (sou base p.first_name)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
 ;
 
 value print_someone_strong conf base p =
-  Wserver.wprint "<strong>%s%s %s</strong>" (coa conf (sou base p.first_name))
+  Wserver.wprint "<strong>%s%s %s</strong>" (sou base p.first_name)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
-    (coa conf (sou base p.surname))
+    (sou base p.surname)
 ;
 
 value print_first_name_strong conf base p =
-  Wserver.wprint "<strong>%s%s</strong>" (coa conf (sou base p.first_name))
+  Wserver.wprint "<strong>%s%s</strong>" (sou base p.first_name)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
 ;
 
@@ -139,7 +134,7 @@ value print_src conf name field =
           name
           (match field with
            [ s when s <> "" ->
-               " value=\"" ^ quote_escaped (f_coa conf s) ^ "\""
+               " value=\"" ^ quote_escaped s ^ "\""
            | _ -> "" ]);
       end;
     end;
@@ -152,8 +147,8 @@ value print_error conf base =
       Wserver.wprint
         (fcapitale
            (ftransl conf "name \"%s.%d %s\" already used by %tthis person%t"))
-        (coa conf (sou base p.first_name)) p.occ
-        (coa conf (sou base p.surname))
+        (sou base p.first_name) p.occ
+        (sou base p.surname)
         (fun _ ->
            Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base p))
         (fun _ -> Wserver.wprint "</a>.")
@@ -170,15 +165,15 @@ value print_error conf base =
 value print_someone_ref conf base p =
   Wserver.wprint "<a href=\"%s%s\">\n%s%s %s</a>"
     (commd conf) (acces conf base p)
-    (coa conf (sou base p.first_name))
+    (sou base p.first_name)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
-    (coa conf (sou base p.surname))
+    (sou base p.surname)
 ;
 
 value print_first_name_ref conf base p =
   Wserver.wprint "<a href=\"%s%s\">\n%s%s</a>"
     (commd conf) (acces conf base p)
-    (coa conf (sou base p.first_name))
+    (sou base p.first_name)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
 ;
 
@@ -313,8 +308,8 @@ value print_warning conf base =
            return ())
         (fun _ ->
            Wserver.wprint "<strong>%s %s</strong> <em>%s-%s</em>"
-             (coa conf (sou base t.t_ident))
-             (coa conf (sou base t.t_place))
+             (sou base t.t_ident)
+             (sou base t.t_place)
              (match Adef.od_of_codate t.t_date_start with
               [ Some d -> string_of_int (annee d)
               | _ -> "" ])
@@ -497,9 +492,9 @@ value print_date conf base lab var d =
 ;
 
 value print_someone conf base p =
-  Wserver.wprint "%s%s %s" (coa conf (sou base p.first_name))
+  Wserver.wprint "%s%s %s" (sou base p.first_name)
     (if p.occ == 0 then ""else "." ^ string_of_int p.occ)
-    (coa conf (sou base p.surname))
+    (sou base p.surname)
 ;
 
 value print_family_stuff conf base p a =
@@ -579,7 +574,7 @@ value print conf base p =
            else p.occ
          in
          do Wserver.wprint ": ";
-            Wserver.wprint "%s.%d %s" (coa conf fn) occ (coa conf sn);
+            Wserver.wprint "%s.%d %s" fn occ sn;
          return ();
     return ()
   in

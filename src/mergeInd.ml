@@ -1,16 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 2.4 1999-04-16 21:32:10 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 2.5 1999-07-15 08:52:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;
 open Util;
 open Gutil;
-
-value f_aoc conf s =
-  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
-  else s
-;
 
 value print_differences conf base branches p1 p2 =
   let gen_string_field chk1 chk2 str_orig title name proj =
@@ -22,11 +17,11 @@ value print_differences conf base branches p1 p2 =
            html_li conf;
            Wserver.wprint "<input type=radio name=\"%s\" value=1%s>\n"
              name chk1;
-           Wserver.wprint "%s\n" (if str_orig then coa conf x1 else x1);
+           Wserver.wprint "%s\n" x1;
            html_li conf;
            Wserver.wprint "<input type=radio name=\"%s\" value=2%s>\n"
              name chk2;
-           Wserver.wprint "%s\n" (if str_orig then coa conf x2 else x2);
+           Wserver.wprint "%s\n" x2;
          end;
       return ()
     else ()
@@ -270,7 +265,6 @@ value print conf base =
   let p2 =
     match (p_getenv conf.env "n", p_getint conf.env "i2") with
     [ (Some n, _) ->
-        let n = f_aoc conf n in
         let ipl = Gutil.person_ht_find_all base n in
         match ipl with
         [ [ip2] -> Some (poi base ip2)

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.14 1999-07-09 10:25:40 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.15 1999-07-15 08:52:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -107,11 +107,10 @@ value strictement_apres d1 d2 =
 value denomination base p =
   let prenom = sou base p.first_name in
   let nom = sou base p.surname in
-  Ansel.to_iso_8859_1
-    (prenom ^
-      (if p.occ == 0 || prenom = "?" || nom = "?" then ""
-       else "." ^ string_of_int p.occ) ^
-      " " ^ nom)
+  prenom ^
+   (if p.occ == 0 || prenom = "?" || nom = "?" then ""
+    else "." ^ string_of_int p.occ) ^
+   " " ^ nom
 ;
 
 value saints = ["saint"; "sainte"];

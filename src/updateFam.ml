@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.5 1999-06-07 18:45:20 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.6 1999-07-15 08:52:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -8,11 +8,6 @@ open Util;
 open Config;
 
 value bogus_family_index = Adef.ifam_of_int (-1);
-
-value f_coa conf s =
-  if conf.charset = "iso-8859-1" then Ansel.to_iso_8859_1 s
-  else s
-;
 
 type create = [ Create of sex and option date | Link ];
 type str_indi = (string * string * int * create);
@@ -43,7 +38,7 @@ value print_parent_person conf base var (first_name, surname, occ, create) =
       tag "td" begin
         Wserver.wprint "<input name=%s_first_name size=23 maxlength=200" var;
         Wserver.wprint " value=\"%s\">"
-          (quote_escaped (f_coa conf first_name));
+          (quote_escaped first_name);
       end;
       tag "td" "align=right" begin
         let s = capitale (transl conf "number") in
@@ -73,7 +68,7 @@ value print_parent_person conf base var (first_name, surname, occ, create) =
       tag "td" "colspan=4" begin
         Wserver.wprint
           "<input name=%s_surname size=40 maxlength=200 value=\"%s\">"
-          var (f_coa conf surname);
+          var surname;
       end;
     end;
   end
@@ -89,7 +84,7 @@ value print_child_person conf base var (first_name, surname, occ, create) =
       tag "td" "colspan=3" begin
         Wserver.wprint "<input name=%s_first_name size=23 maxlength=200" var;
         Wserver.wprint " value=\"%s\">"
-          (quote_escaped (f_coa conf first_name));
+          (quote_escaped first_name);
       end;
       tag "td" "align=right" begin
         let s = capitale (transl conf "number") in
@@ -109,7 +104,7 @@ value print_child_person conf base var (first_name, surname, occ, create) =
       tag "td" "colspan=5" begin
         Wserver.wprint
           "<input name=%s_surname size=40 maxlength=200 value=\"%s\">"
-          var (f_coa conf surname);
+          var surname;
       end;
     end;
     Wserver.wprint "\n";
@@ -201,7 +196,7 @@ value print_marriage conf base fam =
            Wserver.wprint
              "<input name=marriage_place size=40 maxlength=200%s>\n"
              (if fam.marriage_place = "" then ""
-             else " value=\"" ^ f_coa conf fam.marriage_place ^ "\"");
+             else " value=\"" ^ fam.marriage_place ^ "\"");
          end;
        end;
      end;
@@ -298,7 +293,7 @@ value print_comment conf base fam =
          tag "td" begin
            Wserver.wprint "<input name=comment size=50 maxlength=200%s>\n"
              (match fam.comment with
-              [ s when s <> "" -> " value=\"" ^ f_coa conf s ^ "\""
+              [ s when s <> "" -> " value=\"" ^ s ^ "\""
               | _ -> "" ]);
          end;
        end;
@@ -317,7 +312,7 @@ value print_source conf base field =
            Wserver.wprint "<input name=src size=50 maxlength=200%s>\n"
              (match field with
               [ s when s <> "" ->
-                  " value=\"" ^ quote_escaped (f_coa conf s) ^ "\""
+                  " value=\"" ^ quote_escaped s ^ "\""
               | _ -> "" ]);
          end;
        end;

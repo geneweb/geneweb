@@ -1,41 +1,46 @@
-(* $Id: name.ml,v 2.3 1999-07-14 11:50:54 ddr Exp $ *)
+(* $Id: name.ml,v 2.4 1999-07-15 08:52:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
-(* Name.lower: applies to ansel encoded strings *)
+(* Name.lower *)
 
 value lower s =
   let rec name_len special i len =
     if i == String.length s then len
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | 'ø' | 'Ø' | '.' ->
+      [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '0'..'9' | '.' ->
           name_len 0 (i + 1) (len + special + 1)
       | _ ->
-          match Char.code s.[i] with
-          [ 225 | 226 | 227 | 228 | 232 | 234 | 240 ->
-              name_len 0 (i + 1) (len + special)
-          | _ ->
-             if len == 0 then name_len 0 (i + 1) 0
-             else name_len 1 (i + 1) len ] ]
+          if len == 0 then name_len 0 (i + 1) 0
+          else name_len 1 (i + 1) len ]
   in
   let s' = String.create (name_len 0 0 0) in
   let rec copy special i i' =
     if i == String.length s then s'
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | 'ø' | 'Ø' | '.' as c ->
+      [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '0'..'9' | '.' as c ->
           let i' =
             if special then do s'.[i'] := ' '; return i' + 1 else i'
           in
-          let c = Char.lowercase s.[i] in
-          let c = if c == 'ø' then 'o' else c in
+          let c =
+            match Char.lowercase c with
+            [ 'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'æ' -> 'a'
+            | 'ç' -> 'c'
+            | 'è' | 'é' | 'ê' | 'ë' -> 'e'
+            | 'ì' | 'í' | 'î' | 'ï' -> 'i'
+            | 'ð' -> 'd'
+            | 'ñ' -> 'n'
+            | 'ò' | 'ó' | 'ô' | 'õ' | 'ö' | 'ø' -> 'o'
+            | 'ù' | 'ú' | 'û' | 'ü' -> 'u'
+            | 'ý' | 'ÿ' -> 'y'
+            | 'þ' -> 'p'
+            | c -> c ]
+          in
           do s'.[i'] := c; return copy False (i + 1) (i' + 1)
-      | _ ->
-          match Char.code s.[i] with
-          [ 225 | 226 | 227 | 228 | 232 | 234 | 240 -> copy special (i + 1) i'
-          | _ ->
-              if i' == 0 then copy False (i + 1) 0
-              else copy True (i + 1) i' ] ]
+      | c ->
+          if i' == 0 then copy False (i + 1) 0
+          else copy True (i + 1) i' ]
   in
   copy False 0 0
 ;

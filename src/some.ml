@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.7 1999-07-09 10:25:40 ddr Exp $ *)
+(* $Id: some.ml,v 2.8 1999-07-15 08:52:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -10,7 +10,7 @@ open Util;
 value first_name_not_found conf x =
   let title _ =
     Wserver.wprint "%s: \"%s\""
-      (capitale (transl conf "first name not found")) (coa conf x)
+      (capitale (transl conf "first name not found")) x
   in
   do header conf title; trailer conf; return ()
 ;
@@ -18,7 +18,7 @@ value first_name_not_found conf x =
 value surname_not_found conf x =
   let title _ =
     Wserver.wprint "%s: \"%s\"" (capitale (transl conf "surname not found"))
-      (coa conf x)
+      x
   in
   do header conf title; trailer conf; return ()
 ;
@@ -74,9 +74,8 @@ value print_elem conf base is_surname (p, xl) =
   [ [x] ->
       do Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
          if is_surname then
-           Wserver.wprint "%s%s" (coa conf (surname_end p))
-             (coa conf (surname_begin p))
-         else Wserver.wprint "%s" (coa conf p);
+           Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
+         else Wserver.wprint "%s" p;
          Wserver.wprint "</a>\n";
          Date.afficher_dates_courtes conf base x;
       return ()
@@ -88,9 +87,9 @@ value print_elem conf base is_surname (p, xl) =
                 Wserver.wprint "<a href=\"%s%s\">" (commd conf)
                   (acces conf base x);
                 if is_surname then
-                  Wserver.wprint "%s%s" (coa conf (surname_end p))
-                    (coa conf (surname_begin p))
-                else Wserver.wprint "%s" (coa conf p);
+                  Wserver.wprint "%s%s" (surname_end p)
+                    (surname_begin p)
+                else Wserver.wprint "%s" p;
                 Wserver.wprint "</a>";
                 Date.afficher_dates_courtes conf base x;
                 Wserver.wprint " <em>";
@@ -127,8 +126,8 @@ value first_name_print_list conf base xl liste =
       [] l
   in
   let title _ =
-    do Wserver.wprint "%s" (coa conf (List.hd xl));
-       List.iter (fun x -> Wserver.wprint ", %s" (coa conf x)) (List.tl xl);
+    do Wserver.wprint "%s" (List.hd xl);
+       List.iter (fun x -> Wserver.wprint ", %s" x) (List.tl xl);
     return ()
   in
   do header conf title;
@@ -153,8 +152,8 @@ value select_first_name conf base n list =
              html_li conf;
              Wserver.wprint "<a href=\"%sm=P;v=%s\">"
                (commd conf) (code_varenv sstr);
-             Wserver.wprint "%s" (coa conf (List.hd strl));
-             List.iter (fun s -> Wserver.wprint ", %s" (coa conf s))
+             Wserver.wprint "%s" (List.hd strl);
+             List.iter (fun s -> Wserver.wprint ", %s" s)
                (List.tl strl);
              Wserver.wprint "</a>\n";
           return ())
@@ -290,10 +289,10 @@ value rec print_by_branch x conf base (ipl, homonymes) =
     in
     let title h =
       let access x =
-        if h || List.length homonymes = 1 then coa conf x
+        if h || List.length homonymes = 1 then x
         else
           geneweb_link conf ("m=N;v=" ^ code_varenv (Name.lower x))
-            (coa conf x)
+            x
       in
       do Wserver.wprint "%s" (access (List.hd homonymes));
          List.iter (fun x -> Wserver.wprint ", %s" (access x))
@@ -354,7 +353,7 @@ value print_family_alphabetic x conf base liste =
   match liste with
   [ [] -> surname_not_found conf x
   | _ ->
-      let title _ = Wserver.wprint "%s" (coa conf x) in
+      let title _ = Wserver.wprint "%s" x in
       do header conf title;
          print_link_to_welcome conf True;
          print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)

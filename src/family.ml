@@ -1,16 +1,11 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.12 1999-06-29 22:24:22 ddr Exp $ *)
+(* $Id: family.ml,v 2.13 1999-07-15 08:52:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 open Config;
 open Util;
-
-value f_aoc conf s =
-  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
-  else s
-;
 
 value person_is_std_key base p k =
   let k = Name.strip_lower k in
@@ -33,7 +28,7 @@ value inconnu_au_bataillon conf =
   [ (Some nom, Some prenom) ->
       let title _ =
         Wserver.wprint "%s: \"%s %s\"" (capitale (transl conf "not found"))
-          (coa conf prenom) (coa conf nom)
+          prenom nom
       in
       do header conf title; trailer conf; return ()
   | _ -> incorrect_request conf ]
@@ -340,7 +335,7 @@ value family_m conf base =
   | Some "NG" ->
       match p_getenv conf.env "n" with
       [ Some n ->
-          let an = f_aoc conf n in
+          let an = n in
           match p_getenv conf.env "t" with
           [ Some "P" -> Some.first_name_print conf base an
           | Some "N" -> Some.surname_print conf base an

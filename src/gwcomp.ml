@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 2.6 1999-05-03 13:41:15 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.7 1999-07-15 08:52:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000c";
+value magic_gwo = "GnWo000d";
 
 type key =
   { pk_first_name : string;
@@ -141,8 +141,7 @@ value input_a_line ic =
       String.sub line 0 (String.length line - 1)
     else line
   in
-  let x = Ansel.of_iso_8859_1 line in
-  do incr line_cnt; return x
+  do incr line_cnt; return line
 ;
 
 value rec input_real_line ic =

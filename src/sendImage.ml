@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 2.2 1999-04-25 23:56:45 ddr Exp $ *)
+(* $Id: sendImage.ml,v 2.3 1999-07-15 08:52:56 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -30,7 +30,7 @@ value print_send_image conf base p =
            else p.occ
          in
          do Wserver.wprint ": ";
-            Wserver.wprint "%s.%d %s" (coa conf fn) occ (coa conf sn);
+            Wserver.wprint "%s.%d %s" fn occ sn;
          return ();
     return ()
   in
@@ -81,7 +81,7 @@ value print_delete_image conf base p =
            else p.occ
          in
          do Wserver.wprint ": ";
-            Wserver.wprint "%s.%d %s" (coa conf fn) occ (coa conf sn);
+            Wserver.wprint "%s.%d %s" fn occ sn;
          return ();
     return ()
   in

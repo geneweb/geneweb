@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.12 1999-07-14 11:50:55 ddr Exp $ *)
+(* $Id: util.mli,v 2.13 1999-07-15 08:53:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -80,12 +80,6 @@ value find_person_in_env : config -> base -> string -> option person;
 
 value quote_escaped : string -> string;
 value rindex : string -> char -> option int;
-
-value charset_of_ansel : config -> string -> string;
-value coa : config -> string -> string;
-
-value ansel_of_charset : config -> string -> string;
-value aoc : config -> string -> string;
 
 value get_server_string : config -> string;
 value get_request_string : config -> string;

@@ -1,27 +1,27 @@
-# $Id: Makefile,v 2.11 1999-07-09 21:41:49 ddr Exp $
+# $Id: Makefile,v 2.12 1999-07-15 08:52:38 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver
-GWC_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo consangAll.cmo gwcomp.cmo gwc.cmo
-CONSANG_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
-GWD_OBJS1=../wserver/wserver.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo util.cmo date.cmo srcfile.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo
+GWC_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo consangAll.cmo gwcomp.cmo gwc.cmo
+CONSANG_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
+GWD_OBJS1=../wserver/wserver.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo util.cmo date.cmo srcfile.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo relation.cmo relationLink.cmo ascend.cmo descend.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthday.cmo birthDeath.cmo title.cmo family.cmo base64.cmo
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
-GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo select.cmo gwu.cmo
+GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo iobase.cmo select.cmo gwu.cmo
 all:: out
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
-MOSTDESC_OBJS=adef.cmo name.cmo ansel.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
-FPLA_OBJS=argl.cmo adef.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iovalue.cmo iobase.cmo fpla.cmo
+MOSTDESC_OBJS=adef.cmo name.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
+FPLA_OBJS=argl.cmo adef.cmo name.cmo gutil.cmo btree.cmo iovalue.cmo iobase.cmo fpla.cmo
 
-out:: def.syn.cmo gwc.out consang.out gwd.out gwu.out phonygwd.out i18n_check.out mostdesc.out
+out:: def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out phonygwd.out i18n_check.out mostdesc.out
 	$(RM) gwc consang gwd gwu
 	cp gwc.out gwc
 	cp consang.out consang
 	cp gwd.out gwd
 	cp gwu.out gwu
 
-opt:: def.syn.cmo gwc.opt consang.opt gwd.opt gwu.opt
+opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt
 	$(RM) gwd consang gwd gwu
 	cp gwc.opt gwc
 	cp consang.opt consang

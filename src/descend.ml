@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.13 1999-06-17 15:05:58 ddr Exp $ *)
+(* $Id: descend.ml,v 2.14 1999-07-15 08:52:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -732,22 +732,21 @@ value print_ref conf base paths p =
          if paths.(Adef.int_of_iper c) <> [] then
            let c = poi base c in
            Wserver.wprint " => %s %s <tt><b>%s</b></tt>"
-             (coa conf (sou base c.first_name))
-             (coa conf (sou base c.surname))
+             (sou base c.first_name)
+             (sou base c.surname)
              (label_of_path paths c)
          else ())
       p.family
 ;
 
 value print_elem conf base paths precision (n, pll) =
-  let n = coa conf n in
   do html_li conf;
      match pll with
      [ [[p]] ->
          do Wserver.wprint "<strong>%s " (surname_end n);
             wprint_geneweb_link conf
               ("i=" ^ string_of_int (Adef.int_of_iper p.cle_index))
-              (coa conf (sou base p.first_name));
+              (sou base p.first_name);
             Wserver.wprint "%s</strong>" (surname_begin n);
             Date.afficher_dates_courtes conf base p;
             print_ref conf base paths p;
@@ -771,7 +770,7 @@ value print_elem conf base paths precision (n, pll) =
                              wprint_geneweb_link conf
                                ("i=" ^
                                 string_of_int (Adef.int_of_iper p.cle_index))
-                               (coa conf (sou base p.first_name));
+                               (sou base p.first_name);
                            end;
                            if several && precision then
                              do Wserver.wprint " <em>";
