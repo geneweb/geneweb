@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.30 1999-04-29 19:55:46 ddr Exp $
+# $Id: lexicon.txt,v 2.31 1999-04-30 08:53:05 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1744,7 +1744,7 @@ es: foto
 fr: image
 he:  תמונה
 it: foto
-nl: foto
+nl: beeld
 no: bilde
 pt: foto
 se: foto
@@ -1758,7 +1758,7 @@ es: foto borrada
 fr: image supprim&eacute;e
 he:  תמונה נמחקה
 it: foto cancellata
-nl: foto verwijderd
+nl: beeld verwijderd
 no: bildet er fjernet
 pt: foto suprimida
 se: foto borttaget

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.7 1999-04-09 13:29:18 ddr Exp $ *)
+(* $Id: descend.ml,v 2.8 1999-04-30 08:53:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -766,21 +766,22 @@ value print_ref conf base paths p =
 ;
 
 value print_elem conf base paths precision (n, pll) =
+  let n = coa conf n in
   do html_li conf;
      match pll with
      [ [[p]] ->
-         do Wserver.wprint "<strong>%s " (coa conf (surname_end n));
+         do Wserver.wprint "<strong>%s " (surname_end n);
             Wserver.wprint "<a href=\"%si=%d\">" (commd conf)
               (Adef.int_of_iper p.cle_index);
             Wserver.wprint "%s</a>" (coa conf (sou base p.first_name));
-            Wserver.wprint "%s</strong>" (coa conf (surname_begin n));
+            Wserver.wprint "%s</strong>" (surname_begin n);
             Date.afficher_dates_courtes conf base p;
             print_ref conf base paths p;
             Wserver.wprint "\n";
          return ()
      | _ ->
          do Wserver.wprint "<strong>%s%s</strong>\n"
-              (coa conf (surname_end n)) (coa conf (surname_begin n));
+              (surname_end n) (surname_begin n);
             tag "ul" begin
               List.iter
                 (fun pl ->
