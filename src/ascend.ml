@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.44 2004-12-28 10:13:26 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.45 2004-12-28 15:12:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -73,11 +73,11 @@ value print_choice conf base p effective_level =
     Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"A\">\n";
     wprint_hidden_person conf base "" p;
     tag "div" begin
-      tag "select" "name=v" begin
+      tag "select" "name=\"v\"" begin
         let rec loop i =
           if i > effective_level + 1 then ()
           else do {
-            Wserver.wprint "  <option value=%d%s> %s\n" i
+            Wserver.wprint "  <option value=\"%d\"%s> %s\n" i
               (if i == 0 then " selected" else "")
               (capitale (text_to conf i));
             loop (succ i)
@@ -135,7 +135,7 @@ value print_choice conf base p effective_level =
             ["FFC0C0"; "FFFFC0"; "C0FFC0"; "C0FFFF"; "C0C0FF"; "FFC0FF"];
           Wserver.wprint "</tr></table>\n";
         end;
-        tag "td" "valign=top" begin
+        tag "td" "valign=\"top\"" begin
           Wserver.wprint "<input type=\"radio\" name=\"t\" value=\"L\"> %s\n"
             (capitale (transl_nth conf "list/list (ancestors)" 1));
           if effective_level < limit_by_list conf then ()
@@ -181,7 +181,7 @@ value print_choice conf base p effective_level =
         end;
       end;
       tag "tr" begin
-        tag "td" "colspan=2 align=\"center\"" begin
+        tag "td" "colspan=\"2\" align=\"center\"" begin
           Wserver.wprint "(*) %s\n"
             (capitale (transl conf "only the generation selected"));
           Wserver.wprint

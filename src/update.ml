@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.36 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: update.ml,v 4.37 2004-12-28 15:13:03 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -56,19 +56,18 @@ value print_same_name conf base p =
 ;
 
 value print_return conf =
-  do {
-    html_p conf;
+  tag "p" begin
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       List.iter
         (fun (x, v) ->
-           Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x
+           xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
              (quote_escaped (decode_varenv v)))
         (conf.henv @ conf.env);
-      Wserver.wprint "<input type=hidden name=return value=on>\n";
-      Wserver.wprint "<input type=submit value=\"%s\">\n"
+      xtag "input" "type=\"hidden\" name=\"return\" value=\"on\"";
+      xtag "input" "type=\"submit\" value=\"%s\""
         (capitale (transl conf "back"));
-    end
-  }
+    end;
+  end
 ;
 
 value print_err_unknown conf base (f, s, o) =
@@ -154,13 +153,13 @@ value print_first_name_strong conf base p =
 ;
 
 value print_src conf name field =
-  tag "table" "border=1" begin
-    tag "tr" "align=left" begin
+  tag "table" "border=\"1\"" begin
+    tag "tr" "align=\"left\"" begin
       tag "td" begin
         Wserver.wprint "%s" (capitale (transl_nth conf "source/sources" 0));
       end;
       tag "td" begin
-        Wserver.wprint "<input name=%s size=40 maxlength=200%s>\n" name
+        xtag "input" "name=\"%s\" size=\"40\" maxlength=\"200\"%s" name
           (match field with
            [ s when s <> "" -> " value=\"" ^ quote_escaped s ^ "\""
            | _ -> "" ]);
@@ -561,8 +560,8 @@ value reconstitute_date conf var =
 
 value print_date conf base lab var d =
   do {
-    tag "table" "border=1" begin
-      tag "tr" "align=left" begin
+    tag "table" "border=\"1\"" begin
+      tag "tr" "align=\"left\"" begin
         stag "td" begin Wserver.wprint "%s" lab; end;
         let d =
           match d with
@@ -574,53 +573,52 @@ value print_date conf base lab var d =
         in
         tag "td" begin
           Wserver.wprint "%s\n" (transl_nth conf "year/month/day" 0);
-          Wserver.wprint "<input name=%s_yyyy size=5 maxlength=5%s>\n" var
+          xtag "input" "name=\"%s_yyyy\" size=\"5\" maxlength=\"5\"%s" var
             (match d with
              [ Some {year = y} -> " value=" ^ string_of_int y
              | _ -> "" ]);
           Wserver.wprint "%s\n" (transl_nth conf "year/month/day" 1);
-          Wserver.wprint "<input name=%s_mm size=2 maxlength=2%s>\n" var
+          xtag "input" "name=\"%s_mm\" size=\"2\" maxlength=\"2\"%s" var
             (match d with
              [ Some {month = m} when m <> 0 -> " value=" ^ string_of_int m
              | _ -> "" ]);
           Wserver.wprint "%s\n" (transl_nth conf "year/month/day" 2);
-          Wserver.wprint "<input name=%s_dd size=2 maxlength=2%s>\n" var
+          xtag "input" "name=\"%s_dd\" size=\"2\" maxlength=\"2\"%s" var
             (match d with
              [ Some {day = d} when d <> 0 -> " value=" ^ string_of_int d
              | _ -> "" ]);
         end;
         tag "td" begin
-          Wserver.wprint "... %s %s\n" (transl conf "or")
-            (transl conf "text");
-          Wserver.wprint "<input name=%s_text size=15 maxlength=30%s>\n" var
+          Wserver.wprint "... %s %s\n" (transl conf "or") (transl conf "text");
+          xtag "input" "name=\"%s_text\" size=\"15\" maxlength=\"30\"%s" var
             (match d with
              [ Some (Dtext t) -> " value=\"" ^ quote_escaped t ^ "\""
              | _ -> "" ]);
         end;
       end;
     end;
-    tag "table" "border=1" begin
-      tag "tr" "align=left" begin
+    tag "table" "border=\"1\"" begin
+      tag "tr" "align=\"left\"" begin
         tag "td" begin
           Wserver.wprint "%s\n"
             (capitale (transl_nth conf "calendar/calendars" 0));
-          tag "select" "name=%s_cal" var begin
-            Wserver.wprint "<option value=G%s>%s\n"
+          tag "select" "name=\"%s_cal\"" var begin
+            Wserver.wprint "<option value=\"G\"%s>%s\n"
               (match d with
                [ Some (Dgreg _ Dgregorian) -> " selected"
                | _ -> "" ])
               (capitale (transl_nth conf "gregorian/julian/french/hebrew" 0));
-            Wserver.wprint "<option value=J%s>%s\n"
+            Wserver.wprint "<option value=\"J\"%s>%s\n"
               (match d with
                [ Some (Dgreg _ Djulian) -> " selected"
                | _ -> "" ])
               (capitale (transl_nth conf "gregorian/julian/french/hebrew" 1));
-            Wserver.wprint "<option value=F%s>%s\n"
+            Wserver.wprint "<option value=\"F\"%s>%s\n"
               (match d with
                [ Some (Dgreg _ Dfrench) -> " selected"
                | _ -> "" ])
               (capitale (transl_nth conf "gregorian/julian/french/hebrew" 2));
-            Wserver.wprint "<option value=H%s>%s\n"
+            Wserver.wprint "<option value=\"H\"%s>%s\n"
               (match d with
                [ Some (Dgreg _ Dhebrew) -> " selected"
                | _ -> "" ])
@@ -629,48 +627,48 @@ value print_date conf base lab var d =
         end;
         tag "td" begin
           Wserver.wprint "%s\n" (capitale (transl conf "precision"));
-          tag "select" "name=%s_prec" var begin
+          tag "select" "name=\"%s_prec\"" var begin
             Wserver.wprint "<option%s>-\n"
               (match d with
                [ None -> " selected"
                | _ -> "" ]);
-            Wserver.wprint "<option value=sure%s>%s\n"
+            Wserver.wprint "<option value=\"sure\"%s>%s\n"
               (match d with
                [ Some (Dgreg {prec = Sure} _) -> " selected"
                | _ -> "" ])
               (capitale (transl conf "exact"));
-            Wserver.wprint "<option value=about%s>%s\n"
+            Wserver.wprint "<option value=\"about\"%s>%s\n"
               (match d with
                [ Some (Dgreg {prec = About} _) -> " selected"
                | _ -> "" ])
               (capitale (transl_decline conf "about (date)" ""));
-            Wserver.wprint "<option value=maybe%s>%s\n"
+            Wserver.wprint "<option value=\"maybe\"%s>%s\n"
               (match d with
                [ Some (Dgreg {prec = Maybe} _) -> " selected"
                | _ -> "" ])
               (capitale (transl_decline conf "possibly (date)" ""));
-            Wserver.wprint "<option value=before%s>%s\n"
+            Wserver.wprint "<option value=\"before\"%s>%s\n"
               (match d with
                [ Some (Dgreg {prec = Before} _) -> " selected"
                | _ -> "" ])
               (capitale (transl_decline conf "before (date)" ""));
-            Wserver.wprint "<option value=after%s>%s\n"
+            Wserver.wprint "<option value=\"after\"%s>%s\n"
               (match d with
                [ Some (Dgreg {prec = After} _) -> " selected"
                | _ -> "" ])
               (capitale (transl_decline conf "after (date)" ""));
-            Wserver.wprint "<option value=oryear%s>&lt;- %s -&gt;\n"
+            Wserver.wprint "<option value=\"oryear\"%s>&lt;- %s -&gt;\n"
               (match d with
                [ Some (Dgreg {prec = OrYear _} _) -> " selected"
                | _ -> "" ])
               (capitale (transl conf "or"));
-            Wserver.wprint "<option value=yearint%s>&lt;- %s -&gt;\n"
+            Wserver.wprint "<option value=\"yearint\"%s>&lt;- %s -&gt;\n"
               (match d with
                [ Some (Dgreg {prec = YearInt _} _) -> " selected"
                | _ -> "" ])
               (capitale (transl conf "between (date)"));
           end;
-          Wserver.wprint "<input name=%s_oryear size=5 maxlength=5%s>\n" var
+          xtag "input" "name=\"%s_oryear\" size=\"5\" maxlength=\"5\"%s" var
             (match d with
              [ Some (Dgreg {prec = OrYear y} _) -> " value=" ^ string_of_int y
              | Some (Dgreg {prec = YearInt y} _) ->
@@ -727,12 +725,11 @@ value print_create_conflict conf base p var =
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       List.iter
         (fun (x, v) ->
-           Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x
+           xtag "input" "type=\"hidden\" name=\"%s\" value=\"%s\"" x
              (quote_escaped (decode_varenv v)))
         (conf.henv @ conf.env);
-      Wserver.wprint "<input type=hidden name=field value=\"%s\">\n" var;
-      Wserver.wprint "<input type=hidden name=free_occ value=\"%d\">\n"
-        free_n;
+      xtag "input" "type=\"hidden\" name=\"field\" value=\"%s\"" var;
+      xtag "input" "type=\"hidden\" name=\"free_occ\" value=\"%d\"" free_n;
       tag "ul" begin
         html_li conf;
         Wserver.wprint "%s: %d. \n"
@@ -751,9 +748,9 @@ value print_create_conflict conf base p var =
         Wserver.wprint " %s %s." (transl_nth conf "and" 0)
           (transl conf "use \"link\" instead of \"create\"");
       end;
-      Wserver.wprint "<input type=submit name=create value=\"%s\">\n"
+      xtag "input" "type=\"submit\" name=\"create\" value=\"%s\""
         (capitale (transl conf "create"));
-      Wserver.wprint "<input type=submit name=return value=\"%s\">\n"
+      xtag "input" "type=\"submit\" name=\"return\" value=\"%s\""
         (capitale (transl conf "back"));
     end;
     print_same_name conf base p;
@@ -874,8 +871,9 @@ value print_family_stuff conf base p a u =
                  Wserver.wprint "<a href=\"%sm=INV_FAM;i=%d;f=%d\">"
                    (commd conf) (Adef.int_of_iper p.cle_index)
                    (Adef.int_of_ifam fi);
-                 Wserver.wprint "%s</a><br>\n"
+                 Wserver.wprint "%s</a>"
                    (capitale (transl_decline conf "invert" ""));
+                 xtag "br";
                  if (father cpl1) = (father cpl2) &&
                     (mother cpl1) = (mother cpl2) then
                     do {
@@ -886,7 +884,7 @@ value print_family_stuff conf base p a u =
                      Wserver.wprint "%s"
                        (capitale (transl_decline conf "merge" ""));
                    end;
-                   Wserver.wprint "<br>\n"
+                   xtag "br";
                  }
                  else ()
                }
@@ -900,37 +898,41 @@ value print_family_stuff conf base p a u =
            Wserver.wprint "\n<em>%s</em>\n"
              (transl_decline conf "with"
                 (gen_someone_txt raw_access conf base (poi base c)));
-           Wserver.wprint "<br>\n";
+           xtag "br";
            Wserver.wprint "<a href=\"%sm=DEL_FAM;i=%d;ip=%d\">" (commd conf)
              (Adef.int_of_ifam fi) (Adef.int_of_iper p.cle_index);
            let s = transl_nth conf "family/families" 0 in
            Wserver.wprint "%s</a>\n"
              (capitale (transl_decline conf "delete" s));
-           Wserver.wprint "\n<em>%s</em><br>\n"
+           Wserver.wprint "\n<em>%s</em>"
              (transl_decline conf "with"
                 (gen_someone_txt raw_access conf base (poi base c)));
+           xtag "br";
            Some fi
          })
       None (Array.to_list u.family)
   in
   do {
-    Wserver.wprint "<br>\n";
+    xtag "br";
     let s = transl_nth conf "marriage/marriages" 0 in
     if (p_first_name base p = "?" || p_surname base p = "?") &&
        (Array.length u.family <> 0 || parents a <> None) then
       ()
     else if p.sex = Neuter then do {
-      Wserver.wprint "<a href=\"%sm=ADD_FAM;ip=%d;sex=M\">%s (%s)</a><br>\n"
+      Wserver.wprint "<a href=\"%sm=ADD_FAM;ip=%d;sex=M\">%s (%s)</a>"
         (commd conf) (Adef.int_of_iper p.cle_index)
         (capitale (transl_decline conf "add" s)) (transl_nth conf "M/F" 0);
+      xtag "br";
       Wserver.wprint "<a href=\"%sm=ADD_FAM;ip=%d;sex=F\">%s (%s)</a><br>\n"
         (commd conf) (Adef.int_of_iper p.cle_index)
         (capitale (transl_decline conf "add" s)) (transl_nth conf "M/F" 1)
     }
-    else
-      Wserver.wprint "<a href=\"%sm=ADD_FAM;ip=%d\">%s</a><br>\n" (commd conf)
+    else do {
+      Wserver.wprint "<a href=\"%sm=ADD_FAM;ip=%d\">%s</a>" (commd conf)
         (Adef.int_of_iper p.cle_index)
-        (capitale (transl_decline conf "add" s))
+        (capitale (transl_decline conf "add" s));
+      xtag "br";
+    }
   }
 ;
 
@@ -945,7 +947,8 @@ value print conf base p =
         let occ =
           if fn = "?" || sn = "?" then Adef.int_of_iper p.cle_index else p.occ
         in
-        Wserver.wprint ":<br>";
+        Wserver.wprint ":";
+        xtag "br";
         Wserver.wprint "%s.%d %s" fn occ sn
       }
     }
@@ -955,90 +958,99 @@ value print conf base p =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    tag "table" "border=%d width=\"90%%\"" conf.border begin
-      tag "tr" "align=left" begin
-        tag "th" "align=left" begin
-          Wserver.wprint "%s<br>&nbsp;\n"
+    tag "table" "border=\"%d\" width=\"90%%\"" conf.border begin
+      tag "tr" "align=\"left\"" begin
+        tag "th" "align=\"left\"" begin
+          Wserver.wprint "%s"
             (std_color conf
                (capitale (nominative (transl_nth conf "person/persons" 0))));
+          xtag "br";
         end;
-        tag "th" "align=left" begin
-          Wserver.wprint "%s<br>&nbsp;\n"
+        tag "th" "align=\"left\"" begin
+          Wserver.wprint "%s"
             (std_color conf
                (capitale (nominative (transl_nth conf "family/families" 1))));
+          xtag "br";
         end;
       end;
-      tag "tr" "align=left" begin
-        tag "td" "valign=top" begin
-          Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a><br>\n"
+      tag "tr" "align=\"left\"" begin
+        tag "td" "valign=\"top\"" begin
+          Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a>"
             (commd conf) (Adef.int_of_iper p.cle_index)
             (capitale (transl_decline conf "modify" ""));
+          xtag "br";
           if conf.can_send_image && sou base p.image = "" && fn <> "?" &&
              sn <> "?" then
              do {
-            Wserver.wprint "<a href=\"%sm=SND_IMAGE;i=%d\">%s</a><br>\n"
+            Wserver.wprint "<a href=\"%sm=SND_IMAGE;i=%d\">%s</a>"
               (commd conf) (Adef.int_of_iper p.cle_index)
               (capitale
                  (transl_decline conf "send"
                     (transl_nth conf "image/images" 0)));
+            xtag "br";
             match auto_image_file conf base p with
             [ Some _ ->
-                Wserver.wprint "<a href=\"%sm=DEL_IMAGE;i=%d\">%s</a><br>\n"
-                  (commd conf) (Adef.int_of_iper p.cle_index)
-                  (capitale
-                     (transl_decline conf "delete"
-                        (transl_nth conf "image/images" 0)))
+                do {
+                  Wserver.wprint "<a href=\"%sm=DEL_IMAGE;i=%d\">%s</a>"
+                    (commd conf) (Adef.int_of_iper p.cle_index)
+                    (capitale
+                       (transl_decline conf "delete"
+                          (transl_nth conf "image/images" 0)));
+                  xtag "br";
+                }
             | None -> () ]
           }
           else ();
-          Wserver.wprint "<br>\n";
-          Wserver.wprint "<a href=\"%sm=DEL_IND;i=%d\">%s</a><br>\n"
+          xtag "br";
+          Wserver.wprint "<a href=\"%sm=DEL_IND;i=%d\">%s</a>"
             (commd conf) (Adef.int_of_iper p.cle_index)
             (capitale (transl_decline conf "delete" ""));
-          Wserver.wprint "<br>\n";
+          xtag "br";
+          xtag "br";
           stag "a" "href=\"%sm=MRG;i=%d\"" (commd conf)
             (Adef.int_of_iper p.cle_index)
           begin
             Wserver.wprint "%s" (capitale (transl_decline conf "merge" ""));
           end;
-          Wserver.wprint "<br>\n";
+          xtag "br";
           match parents a with
           [ Some _ -> ()
           | None ->
               if p_first_name base p = "?" || p_surname base p = "?" then ()
               else do {
                 let s = transl conf "parents" in
-                Wserver.wprint "<br>\n";
-                Wserver.wprint "<a href=\"%sm=ADD_PAR;ip=%d\">%s</a><br>\n"
+                xtag "br";
+                Wserver.wprint "<a href=\"%sm=ADD_PAR;ip=%d\">%s</a>"
                   (commd conf) (Adef.int_of_iper p.cle_index)
-                  (capitale (transl_decline conf "add" s))
+                  (capitale (transl_decline conf "add" s));
+                xtag "br";
               } ];
         end;
-        tag "td" "valign=top" begin
+        tag "td" "valign=\"top\"" begin
           print_family_stuff conf base p a u;
           if has_children base u then do {
-            Wserver.wprint "<br>\n";
+            xtag "br";
             stag "a" "href=\"%sm=CHG_CHN;ip=%d\"" (commd conf)
               (Adef.int_of_iper p.cle_index)
             begin
               Wserver.wprint "%s"
                 (capitale (transl conf "change children's names"));
             end;
-            Wserver.wprint "<br>\n"
+            xtag "br";
           }
           else ();
         end;
       end;
     end;
-    if Array.length u.family > 0 then do {
-      html_p conf;
-      Wserver.wprint
-        (fcapitale (ftransl conf "to add a child to a family, use \"%s\""))
-        (capitale
-           (transl_decline conf "modify"
-              (transl_nth conf "family/families" 0)));
-      Wserver.wprint ".<br>\n"
-    }
+    if Array.length u.family > 0 then
+      tag "p" begin
+        Wserver.wprint
+          (fcapitale (ftransl conf "to add a child to a family, use \"%s\""))
+          (capitale
+             (transl_decline conf "modify"
+                (transl_nth conf "family/families" 0)));
+        xtag "br";
+      end
     else ();
     trailer conf
   }

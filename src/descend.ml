@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.26 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: descend.ml,v 4.27 2004-12-28 15:12:56 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -86,37 +86,37 @@ value print_choice conf base p effective_level =
     Wserver.wprint "<p>\n";
     List.iter
       (fun (k, v) ->
-         Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" k
+         Wserver.wprint "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" k
            (quote_escaped (decode_varenv v)))
       conf.henv;
-    Wserver.wprint "<input type=hidden name=m value=D>\n";
+    Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"D\">\n";
     wprint_hidden_person conf base "" p;
-    tag "select" "name=v" begin
+    tag "select" "name=\"v\"" begin
       let rec loop i =
         if i > effective_level then ()
         else do {
-          Wserver.wprint "  <option value=%d%s> %s\n" i
+          Wserver.wprint "  <option value=\"%d\"%s> %s\n" i
             (if i == 0 then " selected" else "") (capitale (text_to conf i));
           loop (succ i)
         }
       in
       loop 0;
     end;
-    Wserver.wprint "<input type=submit value=\"Ok\">\n";
+    Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     html_p conf;
     tag "table" "border=\"%d\" width=\"100%%\"" conf.border begin
       tag "tr" begin
         tag "td" begin
-          Wserver.wprint "<input type=radio name=t value=L checked> %s<br>\n"
+          Wserver.wprint "<input type=\"radio\" name=\"t\" value=\"L\" checked> %s<br>\n"
             (capitale (transl_nth conf "list/list (ancestors)" 0));
-          Wserver.wprint "<input type=radio name=t value=M> %s\n"
+          Wserver.wprint "<input type=\"radio\" name=\"t\" value=\"M\"> %s\n"
             (capitale (transl_nth conf "male line/female line" 0));
           Wserver.wprint "<br>\n";
-          Wserver.wprint "<input type=radio name=t value=F> %s\n"
+          Wserver.wprint "<input type=\"radio\" name=\"t\" value=\"F\"> %s\n"
             (capitale (transl_nth conf "male line/female line" 1));
           Wserver.wprint "<br>\n";
           Wserver.wprint "<br>\n";
-          Wserver.wprint "<input type=radio name=t value=T> %s\n"
+          Wserver.wprint "<input type=\"radio\" name=\"t\" value=\"T\"> %s\n"
             (capitale (transl conf "tree"));
           if effective_level <= limit_by_tree conf then ()
           else
@@ -125,14 +125,14 @@ value print_choice conf base p effective_level =
               (transl_nth conf "generation/generations" 1);
           Wserver.wprint "<br>\n";
           Wserver.wprint
-            "- %s <input type=checkbox name=image value=on><br>\n"
+            "- %s <input type=\"checkbox\" name=\"image\" value=\"on\"><br>\n"
             (capitale (transl_nth conf "image/images" 1));
           Wserver.wprint
-            "- %s <input name=bd size=1 maxlength=2 value=0><br>\n"
+            "- %s <input name=\"bd\" size=\"1\" maxlength=\"2\" value=\"0\"><br>\n"
             (capitale (transl conf "border"));
           Wserver.wprint "\
 <table><tr><td>-&nbsp;%s</td>
-<td><input type=radio name=color value=\"\" checked></td>\n"
+<td><input type=\"radio\" name=\"color\" value=\"\" checked></td>\n"
               (capitale (transl conf "color"));
           List.iter
             (fun c ->
@@ -143,22 +143,22 @@ value print_choice conf base p effective_level =
           Wserver.wprint "</tr></table>\n";
         end;
         tag "td" begin
-          Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
+          Wserver.wprint "<input type=\"radio\" name=\"t\" value=\"S\"> %s<br>\n"
             (capitale (transl conf "only the generation selected"));
-          Wserver.wprint "<input type=radio name=t value=N> %s<br>\n"
+          Wserver.wprint "<input type=\"radio\" name=\"t\" value=\"N\"> %s<br>\n"
             (capitale (transl conf "families with encoding"));
-          Wserver.wprint "<input type=radio name=t value=G> - %s<br>\n"
+          Wserver.wprint "<input type=\"radio\" name=\"t\" value=\"G\"> - %s<br>\n"
             (capitale (transl conf "index of the descendants"));
-          Wserver.wprint "<input type=radio name=t value=C> - %s<br>\n"
+          Wserver.wprint "<input type=\"radio\" name=\"t\" value=\"C\"> - %s<br>\n"
             (capitale (transl conf "index of the spouses (non descendants)"));
-          Wserver.wprint "<input type=radio name=t value=A> d'Aboville<br>\n";
+          Wserver.wprint "<input type=\"radio\" name=\"t\" value=\"A\"> d'Aboville<br>\n";
         end;
       end;
-      tag "tr" "align=left" begin
-        tag "td" "colspan=2 align=center" begin
+      tag "tr" "align=\"left\"" begin
+        tag "td" "colspan=\"2\" align=\"center\"" begin
           Wserver.wprint "<br>\n%s\n"
             (capitale (transl conf "cancel GeneWeb links"));
-          Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
+          Wserver.wprint "<input type=\"checkbox\" name=\"cgl\" value=\"on\"><br>\n";
         end;
       end;
     end;
@@ -599,7 +599,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                  p.sex == Male || not marks.(Adef.int_of_iper c.cle_index)
                in
                if print_children then
-                 Wserver.wprint "<ol start=%d>\n" (succ cnt)
+                 Wserver.wprint "<ol start=\"%d\">\n" (succ cnt)
                else ();
                let cnt =
                  List.fold_left
@@ -607,7 +607,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                       let e = pget conf base ie in
                       do {
                         if print_children then do {
-                          Wserver.wprint "<li type=A> ";
+                          Wserver.wprint "<li type=\"A\"> ";
                           print_child conf base p c e;
                           Wserver.wprint "\n";
                           incr total;
@@ -674,7 +674,7 @@ value print_family conf base marks paths max_lev lev p =
                Wserver.wprint "\n%s" (referenced_person_text conf base p);
              end;
              display_spouse conf base marks paths fam p c;
-             Wserver.wprint "<ol start=%d>\n" (succ cnt);
+             Wserver.wprint "<ol start=\"%d\">\n" (succ cnt);
              let cnt =
                List.fold_left
                  (fun cnt ie ->
@@ -683,7 +683,7 @@ value print_family conf base marks paths max_lev lev p =
                       if p.sex == Male ||
                          not marks.(Adef.int_of_iper c.cle_index) then
                          do {
-                        Wserver.wprint "<li type=A>";
+                        Wserver.wprint "<li type=\"A\">";
                         print_child conf base p c e;
                         incr total;
                         Wserver.wprint "\n";
@@ -995,9 +995,9 @@ value children_of conf base ip =
 value rec print_table_person conf base max_lev ip =
   do {
     Wserver.wprint "\n";
-    tag "table" "border=1" begin
-      Wserver.wprint "<tr align=left>\n";
-      tag "td" "valign=top" begin
+    tag "table" "border=\"1\"" begin
+      Wserver.wprint "<tr align=\"left\">\n";
+      tag "td" "valign=\"top\"" begin
         print_someone conf base (pget conf base ip);
       end;
       if max_lev > 0 then
@@ -1166,7 +1166,7 @@ value make_tree_hts conf base gv p =
           let txt =
             if bd > 0 || td_prop <> "" then
               Printf.sprintf
-                "<table border=%d><tr><td align=center%s>%s</td></tr></table>"
+                "<table border=\"%d\"><tr><td align=\"center\"%s>%s</td></tr></table>"
                 bd td_prop txt
             else txt
           in
@@ -1210,8 +1210,8 @@ value make_tree_hts conf base gv p =
               let s =
                 if bd > 0 || td_prop <> "" then
                   Printf.sprintf
-                    "<table border=%d><tr>\
-                     <td align=center%s>%s</td></tr></table>" bd td_prop s
+                    "<table border=\"%d\"><tr>\
+                     <td align=\"center\"%s>%s</td></tr></table>" bd td_prop s
                 else s
               in
               (2 * ncol - 1, CenterA, TDstring s)
@@ -1313,7 +1313,7 @@ value print_aboville conf base max_level p =
                 let fam = foi base u.family.(i) in
                 match Adef.od_of_codate fam.marriage with
                 [ Some (Dgreg d _) ->
-                    "<font size=-2><em>" ^ Date.year_text d ^ "</em></font>"
+                    "<font size=\"-2\"><em>" ^ Date.year_text d ^ "</em></font>"
                 | _ -> "" ]
               else ""
             in

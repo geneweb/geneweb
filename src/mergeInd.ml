@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.27 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.28 2004-12-28 15:13:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -15,10 +15,10 @@ value print_differences conf base branches p1 p2 =
       Wserver.wprint "<h4>%s</h4>\n" (capitale title);
       tag "ul" begin
         html_li conf;
-        Wserver.wprint "<input type=radio name=\"%s\" value=1%s>\n" name chk1;
+        Wserver.wprint "<input type=\"radio\" name=\"%s\" value=\"1\"%s>\n" name chk1;
         Wserver.wprint "%s\n" x1;
         html_li conf;
-        Wserver.wprint "<input type=radio name=\"%s\" value=2%s>\n" name chk2;
+        Wserver.wprint "<input type=\"radio\" name=\"%s\" value=\"2\"%s>\n" name chk2;
         Wserver.wprint "%s\n" x2;
       end;
     }
@@ -27,18 +27,18 @@ value print_differences conf base branches p1 p2 =
   let string_field = gen_string_field " checked" "" in
   tag "form" "method=\"post\" action=\"%s\"" conf.command begin
     Util.hidden_env conf;
-    Wserver.wprint "<input type=hidden name=m value=MRG_IND_OK>\n";
-    Wserver.wprint "<input type=hidden name=i1 value=%d>\n"
+    Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"MRG_IND_OK\">\n";
+    Wserver.wprint "<input type=\"hidden\" name=\"i1\" value=\"%d\">\n"
       (Adef.int_of_iper p1.cle_index);
-    Wserver.wprint "<input type=hidden name=i2 value=%d>\n"
+    Wserver.wprint "<input type=\"hidden\" name=\"i2\" value=\"%d\">\n"
       (Adef.int_of_iper p2.cle_index);
     loop branches where rec loop =
       fun
       [ [(ip1, ip2)] ->
           do {
-            Wserver.wprint "<input type=hidden name=ini1 value=%d>\n"
+            Wserver.wprint "<input type=\"hidden\" name=\"ini1\" value=\"%d\">\n"
               (Adef.int_of_iper ip1);
-            Wserver.wprint "<input type=hidden name=ini2 value=%d>\n"
+            Wserver.wprint "<input type=\"hidden\" name=\"ini2\" value=\"%d\">\n"
               (Adef.int_of_iper ip2);
           }
       | [_ :: branches] -> loop branches
@@ -125,7 +125,7 @@ value print_differences conf base branches p1 p2 =
     string_field True (transl conf "burial" ^ " / " ^ transl conf "place")
       "burial_place" (fun p -> sou base p.burial_place);
     html_p conf;
-    Wserver.wprint "<input type=submit value=Ok>\n";
+    Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
   end
 ;
 
@@ -244,7 +244,7 @@ value propose_merge_ind conf base branches p1 p2 =
              let p1 = poi base ip1 in
              let p2 = poi base ip2 in
              do {
-               tag "tr" "align=left" begin
+               tag "tr" "align=\"left\"" begin
                  tag "td" begin
                    Wserver.wprint "\n%s" (referenced_person_text conf base p1);
                    Wserver.wprint "%s" (Date.short_dates_text conf base p1);

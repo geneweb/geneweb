@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.19 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.20 2004-12-28 15:13:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -341,14 +341,14 @@ value print_conflict conf base p =
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       List.iter
         (fun (x, v) ->
-           Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x
+           Wserver.wprint "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n" x
              (quote_escaped (decode_varenv v)))
         (conf.henv @ conf.env);
-      Wserver.wprint "<input type=hidden name=free_occ value=\"%d\">\n"
+      Wserver.wprint "<input type=\"hidden\" name=\"free_occ\" value=\"%d\">\n"
         free_n;
-      Wserver.wprint "<input type=submit name=create value=\"%s\">\n"
+      Wserver.wprint "<input type=\"submit\" name=\"create\" value=\"%s\">\n"
         (capitale (transl conf "create"));
-      Wserver.wprint "<input type=submit name=return value=\"%s\">\n"
+      Wserver.wprint "<input type=\"submit\" name=\"return\" value=\"%s\">\n"
         (capitale (transl conf "back"));
     end;
     Update.print_same_name conf base p;

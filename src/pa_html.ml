@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_html.ml,v 4.3 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: pa_html.ml,v 4.4 2004-12-28 15:13:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Pcaml;
@@ -34,6 +34,29 @@ value tag_encloser loc tag newl enewl a el =
   [e :: el @ [<:expr< Wserver.wprint $str:"</" ^ tag ^ ">" ^ se$ >>]]
 ;
 
+value tag_alone loc tag a =
+  let s = "\n" in
+  let e =
+    let (frm, al) =
+      match a with
+      [ Some e ->
+          let (e, al) = unfold_apply [] e in
+          let frm =
+            match e with
+            [ <:expr< $str:frm$ >> -> frm
+            | _ ->
+                Stdpp.raise_with_loc (MLast.loc_of_expr e)
+                  (Stream.Error "string or 'do' expected") ]
+          in
+          (" " ^ frm, al)
+      | None -> ("", []) ]
+    in
+    List.fold_left (fun f e -> <:expr< $f$ $e$ >>)
+      <:expr< Wserver.wprint $str:"<" ^ tag ^ frm ^ "%s>" ^ s$ >> al
+  in
+  <:expr< $e$ xhs >>
+;
+
 EXTEND
   GLOBAL: expr;
   expr: LEVEL "top"
@@ -48,7 +71,9 @@ EXTEND
       | "stagn"; (tn, al, el) = tag_body ->
           let el = tag_encloser loc tn False True al el in
           ifndef NEWSEQ then MLast.ExSeq loc el (MLast.ExUid loc "()")
-          else MLast.ExSeq loc el ] ]
+          else MLast.ExSeq loc el
+      | "xtag"; tn = STRING; a = OPT expr ->
+          tag_alone loc tn a ] ]
   ;
   tag_body:
     [ [ tn = STRING; a = OPT expr; "begin"; el = LIST0 expr_semi; "end" ->

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.8 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: notes.ml,v 4.9 2004-12-28 15:13:01 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -31,17 +31,18 @@ value print_mod conf base =
   do {
     header conf title;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      html_p conf;
-      Util.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=m value=MOD_NOTES_OK>\n";
-      let digest = Iovalue.digest s in
-      Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
-      stag "textarea" "name=notes rows=30 cols=70" begin
-        if s <> "" then Wserver.wprint "%s" (quote_escaped s) else ();
+      tag "p" begin
+        Util.hidden_env conf;
+        xtag "input" "type=\"hidden\" name=\"m\" value=\"MOD_NOTES_OK\"";
+        let digest = Iovalue.digest s in
+        xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
+        stagn "textarea" "name=\"notes\" rows=\"30\" cols=\"70\"" begin
+          if s <> "" then Wserver.wprint "%s" (quote_escaped s) else ();
+        end;
       end;
-      Wserver.wprint "\n";
-      html_p conf;
-      Wserver.wprint "<input type=submit value=Ok>\n";
+      tag "p" begin
+        xtag "input" "type=\"submit\" value=\"Ok\"";
+      end;
     end;
     trailer conf;
   }

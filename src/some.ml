@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.26 2004-12-26 21:48:28 ddr Exp $ *)
+(* $Id: some.ml,v 4.27 2004-12-28 15:13:02 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -360,7 +360,7 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
       html_p conf;
     }
     else ();
-    Wserver.wprint "<table border=0><tr><td style=\"white-space:nowrap\">\n";
+    Wserver.wprint "<table border=\"0\"><tr><td style=\"white-space:nowrap\">\n";
     if len > 1 && br = None then do {
       Wserver.wprint "%s: %d" (capitale (transl conf "number of branches"))
         len;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.38 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: forum.ml,v 4.39 2004-12-28 15:12:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -93,22 +93,22 @@ value print_one_header conf prec_date ndisp pos h =
               if ndisp > 1 then do {
                 if d.month <> pd.month then
                   Wserver.wprint
-                    "<tr align=left><td colspan=4>&nbsp;</td></tr>\n"
+                    "<tr align=\"left\"><td colspan=\"4\">&nbsp;</td></tr>\n"
                 else ();
                 ndisp - 1
               }
               else do {
                 Wserver.wprint "</table>\n";
                 if d.month <> pd.month then Wserver.wprint "<p>\n" else ();
-                Wserver.wprint "<table border=%d>\n" conf.border;
+                Wserver.wprint "<table border=\"%d\">\n" conf.border;
                 ndisp_items
               }
             else ndisp
         | _ ->
-            do { Wserver.wprint "<table border=%d>\n" conf.border; ndisp } ]
+            do { Wserver.wprint "<table border=\"%d\">\n" conf.border; ndisp } ]
       in
-      tag "tr" "align=left" begin
-        tag "td" "colspan=4 align=left" begin
+      tag "tr" "align=\"left\"" begin
+        tag "td" "colspan=\"4\" align=\"left\"" begin
           Wserver.wprint "%s" (Date.string_of_date conf date);
         end;
       end;
@@ -117,7 +117,7 @@ value print_one_header conf prec_date ndisp pos h =
     else ndisp
   in
   do {
-    tag "tr" "align=left" begin
+    tag "tr" "align=\"left\"" begin
       tag "td" begin
         Wserver.wprint "<tt>&nbsp;%s&nbsp;</tt>"
           (if access = "priv" then "*" else "&nbsp;");
@@ -166,9 +166,9 @@ value print_headers conf =
           [ Some s ->
               if nmess > max_header_mess then do {
                  Wserver.wprint
-                   "<tr align=left><td colspan=4>&nbsp;</td></tr>\n";
-                 tag "tr" "align=left" begin
-                   tag "td" "colspan=4" begin
+                   "<tr align=\"left\"><td colspan=\"4\">&nbsp;</td></tr>\n";
+                 tag "tr" "align=\"left\"" begin
+                   tag "td" "colspan=\"4\"" begin
                      Wserver.wprint
                        "<a href=\"%sm=FORUM;len=%d;from=%d\">%s</a>\n"
                           (commd conf) max_header_mess (ic_len - pos)
@@ -263,8 +263,8 @@ value header_txt conf i = transl_nth conf "ident/email/subject" i;
 value print_add_message conf =
   tag "form" "method=\"get\" action=\"%s\"" conf.command begin
     Util.hidden_env conf;
-    Wserver.wprint "<input type=hidden name=m value=FORUM_ADD>\n";
-    Wserver.wprint "<input type=submit value=\"%s\">\n"
+    Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"FORUM_ADD\">\n";
+    Wserver.wprint "<input type=\"submit\" value=\"%s\">\n"
       (capitale (transl_decline conf "add" (message_txt conf 0)));
   end
 ;
@@ -430,7 +430,7 @@ value print_one_forum_message conf m pos next_pos forum_length =
     if browser_doesnt_have_tables conf then ()
     else
       Wserver.wprint
-        "<table cellspacing=0 cellpadding=0><tr align=left><td>\n";
+        "<table cellspacing=\"0\" cellpadding=\"0\"><tr align=\"left\"><td>\n";
     let mess =
       loop True 0 0 where rec loop last_was_eoln len i =
         if i = String.length m.m_mess then Buff.get len
@@ -451,9 +451,9 @@ value print_one_forum_message conf m pos next_pos forum_length =
         Wserver.wprint "<p>\n";
         tag "form" "method=\"post\" action=\"%s\"" conf.command begin
           Util.hidden_env conf;
-          Wserver.wprint "<input type=hidden name=m value=FORUM_DEL>\n";
-          Wserver.wprint "<input type=hidden name=p value=%d>\n" pos;
-          Wserver.wprint "<input type=submit value=\"%s\">\n"
+          Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"FORUM_DEL\">\n";
+          Wserver.wprint "<input type=\"hidden\" name=\"p\" value=\"%d\">\n" pos;
+          Wserver.wprint "<input type=\"submit\" value=\"%s\">\n"
             (capitale
                (transl_decline conf "delete" (message_txt conf 0)));
         end;
@@ -484,14 +484,14 @@ value print conf base =
 (* Send a message *)
 
 value print_var conf var name opt def_value =
-  tag "tr" "align=left" begin
+  tag "tr" "align=\"left\"" begin
     stag "td" begin
       Wserver.wprint "%s" name;
       if opt then Wserver.wprint " (%s)" (transl conf "optional") else ();
     end;
     Wserver.wprint "\n";
     stag "td" begin
-      Wserver.wprint "<input name=%s size=40 maxlength=200 value=\"%s\">\n"
+      Wserver.wprint "<input name=\"%s\" size=\"40\" maxlength=\"200\" value=\"%s\">\n"
         var def_value;
     end;
     Wserver.wprint "\n";
@@ -508,8 +508,8 @@ value print_add conf base =
     print_link_to_welcome conf True;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       Util.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=m value=FORUM_ADD_OK>\n";
-      tag "table" "border=%d" conf.border begin
+      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"FORUM_ADD_OK\">\n";
+      tag "table" "border=\"%d\"" conf.border begin
         print_var conf "Ident" (capitale (header_txt conf 0)) False
           (if conf.username = "" then conf.user else conf.username);
         print_var conf "Email" (capitale (header_txt conf 1)) True "";
@@ -518,16 +518,16 @@ value print_add conf base =
       html_p conf;
       Wserver.wprint "%s<br>\n"
         (capitale (Gutil.nominative (message_txt conf 0)));
-      stag "textarea" "name=Text rows=15 cols=70 wrap=soft" begin end;
+      stag "textarea" "name=\"Text\" rows=\"15\" cols=\"70\" wrap=\"soft\"" begin end;
       Wserver.wprint "\n<br>\n";
       if conf.wizard || conf.friend then
 	do {
-          Wserver.wprint "<input type=submit name=publ_acc value=\"%s\">\n"
+          Wserver.wprint "<input type=\"submit\" name=\"publ_acc\" value=\"%s\">\n"
 	    (transl conf "public");
-          Wserver.wprint "<input type=submit name=priv_acc value=\"%s\">\n"
+          Wserver.wprint "<input type=\"submit\" name=\"priv_acc\" value=\"%s\">\n"
             (transl conf "private");
         }
-      else Wserver.wprint "<input type=submit value=Ok>\n";
+      else Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     end;
     trailer conf;
   }

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.46 2004-12-26 10:00:14 ddr Exp $ *)
+(* $Id: family.ml,v 4.47 2004-12-28 15:12:57 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -667,7 +667,7 @@ value treat_request_on_possibly_locked_base conf bfile log =
         [ Sys_error _ -> ()
         | _ ->
             Wserver.wprint
-              "<em><font size=-1>Internal message: %s</font></em>\n"
+              "<em><font size=\"-1\">Internal message: %s</font></em>\n"
               (Printexc.to_string e) ];
         Util.trailer conf;
       } ]

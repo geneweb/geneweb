@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.13 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.14 2004-12-28 15:12:54 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -215,14 +215,14 @@ value propose_months conf mode =
           html_p conf;
           Util.hidden_env conf;
           mode ();
-          tag "select" "name=v" begin
+          tag "select" "name=\"v\"" begin
             for i = 1 to 12 do {
-              Wserver.wprint "<option value=%d%s>%s\n" i
+              Wserver.wprint "<option value=\"%d\"%s>%s\n" i
                 (if i = conf.today.month then " selected" else "")
                 (capitale (nominative (transl_nth conf "(month)" (i - 1))))
             };
           end;
-          Wserver.wprint "<input type=submit value=\"Ok\">\n";
+          Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
         end;
       end;
     end;
@@ -443,7 +443,7 @@ value print_menu_birth conf base =
       else raise Not_found
     }
   in
-  let mode () = Wserver.wprint "<input type=hidden name=m value=AN>\n" in
+  let mode () = Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"AN\">\n" in
   gen_print_menu_birth conf base f_scan mode
 ;
 
@@ -525,7 +525,7 @@ value print_menu_dead conf base =
       list_aft.val;
     Wserver.wprint "\n";
     html_p conf;
-    let mode () = Wserver.wprint "<input type=hidden name=m value=AD>\n" in
+    let mode () = Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"AD\">\n" in
     propose_months conf mode;
     Wserver.wprint "\n";
     trailer conf;
@@ -594,7 +594,7 @@ value print_menu_marriage conf base =
       list_aft.val;
     Wserver.wprint "\n";
     html_p conf;
-    let mode () = Wserver.wprint "<input type=hidden name=m value=AM>\n" in
+    let mode () = Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"AM\">\n" in
     propose_months conf mode;
     Wserver.wprint "\n";
     trailer conf;

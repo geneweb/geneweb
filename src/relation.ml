@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.55 2004-12-28 03:59:18 ddr Exp $ *)
+(* $Id: relation.ml,v 4.56 2004-12-28 15:13:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -680,7 +680,7 @@ value print_shortest_path conf base p1 p2 =
         do {
           header_no_page_title conf title;
           if excl_faml = [] then do {
-            Wserver.wprint "<center><h1><font color=%s>" conf.highlight;
+            Wserver.wprint "<center><h1><font color=\"%s\">" conf.highlight;
             title False;
             Wserver.wprint "</font></h1></center>\n";
             Util.print_link_to_welcome conf True;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.12 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.13 2004-12-28 15:12:55 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -12,31 +12,31 @@ value print_child_person conf base p =
   let surname = p_surname base p in
   let occ = p.occ in
   let var = "c" ^ string_of_int (Adef.int_of_iper p.cle_index) in
-  tag "table" "border=1" begin
-    tag "tr" "align=left" begin
+  tag "table" "border=\"1\"" begin
+    tag "tr" "align=\"left\"" begin
       tag "td" begin
         Wserver.wprint "%s"
           (capitale (transl_nth conf "first name/first names" 0));
       end;
-      tag "td" "colspan=3" begin
-        Wserver.wprint "<input name=%s_first_name size=23 maxlength=200" var;
+      tag "td" "colspan=\"3\"" begin
+        Wserver.wprint "<input name=\"%s_first_name\" size=\"23\" maxlength=\"200\"" var;
         Wserver.wprint " value=\"%s\">" (quote_escaped first_name);
       end;
-      tag "td" "align=right" begin
+      tag "td" "align=\"right\"" begin
         let s = capitale (transl conf "number") in Wserver.wprint "%s" s;
       end;
       tag "td" begin
-        Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
+        Wserver.wprint "<input name=\"%s_occ\" size=\"5\" maxlength=\"8\"%s>" var
           (if occ == 0 then "" else " value=" ^ string_of_int occ);
       end;
     end;
-    tag "tr" "align=left" begin
+    tag "tr" "align=\"left\"" begin
       tag "td" begin
         Wserver.wprint "%s" (capitale (transl_nth conf "surname/surnames" 0));
       end;
-      tag "td" "colspan=5" begin
+      tag "td" "colspan=\"5\"" begin
         Wserver.wprint
-          "<input name=%s_surname size=40 maxlength=200 value=\"%s\">" var
+          "<input name=\"%s_surname\" size=\"40\" maxlength=\"200\" value=\"%s\">" var
           surname;
       end;
     end;
@@ -104,14 +104,14 @@ value print_change conf base p u =
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       html_p conf;
       Util.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=ip value=%d>\n"
+      Wserver.wprint "<input type=\"hidden\" name=\"ip\" value=\"%d\">\n"
         (Adef.int_of_iper p.cle_index);
-      Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
-      Wserver.wprint "<input type=hidden name=m value=CHG_CHN_OK>\n";
+      Wserver.wprint "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n" digest;
+      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\">\n";
       print_children conf base children;
       Wserver.wprint "\n";
       html_p conf;
-      Wserver.wprint "<input type=submit value=Ok>\n";
+      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     end;
     Wserver.wprint "\n";
     trailer conf;

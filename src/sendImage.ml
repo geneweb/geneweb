@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.15 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.16 2004-12-28 15:13:01 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -13,7 +13,7 @@ value incorrect_content_type conf base p s =
   do {
     rheader conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<p>\n<font size=-1><em>";
+    Wserver.wprint "<p>\n<font size=\"-1\"><em>";
     Wserver.wprint "Error: incorrect image content type: %s" s;
     Wserver.wprint "</em></font>\n<p>\n";
     Wserver.wprint "<ul><li>%s</ul>\n"
@@ -28,7 +28,7 @@ value error_too_big_image conf base p len max_len =
   do {
     rheader conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<p>\n<font size=-1><em>";
+    Wserver.wprint "<p>\n<font size=\"-1\"><em>";
     Wserver.wprint "Error: this image is too big: %d bytes<br>\n" len;
     Wserver.wprint "Maximum authorized in this database: %d bytes<br>\n"
       max_len;
@@ -69,14 +69,14 @@ value print_send_image conf base p =
     begin
       html_p conf;
       Util.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=m value=SND_IMAGE_OK>\n";
-      Wserver.wprint "<input type=hidden name=i value=%d>\n"
+      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\">\n";
+      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
         (Adef.int_of_iper p.cle_index);
-      Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
+      Wserver.wprint "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n" digest;
       Wserver.wprint "\n";
       Wserver.wprint "%s:\n" (capitale (transl conf "file"));
       Wserver.wprint "\
-<input type=file name=file size=50 maxlength=250 accept=\"image/*\">
+<input type=\"file\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\">
 ";
       match p_getint conf.base_env "max_images_size" with
       [ Some len ->
@@ -86,7 +86,7 @@ value print_send_image conf base p =
           }
       | None -> () ];
       Wserver.wprint "<p>\n";
-      Wserver.wprint "<input type=submit value=Ok>\n";
+      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     end;
     trailer conf
   }
@@ -130,12 +130,12 @@ value print_delete_image conf base p =
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       html_p conf;
       Util.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=m value=DEL_IMAGE_OK>\n";
-      Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
+      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"DEL_IMAGE_OK\">\n";
+      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n\n"
         (Adef.int_of_iper p.cle_index);
       Wserver.wprint "\n";
       html_p conf;
-      Wserver.wprint "<input type=submit value=Ok>\n";
+      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     end;
     Wserver.wprint "\n";
     trailer conf
