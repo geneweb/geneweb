@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.49 2003-12-19 11:44:25 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.50 2004-01-08 12:29:12 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -188,7 +188,7 @@ pl: <a href="%sw=w"><em>"Wizard"</em></a> dostêp<br> (has³o)
 pt: Entrada <a href="%sw=w"><em>feiticeiro</em></a><br> (palavra chave)
 ro: Acces pentru <a href="%sw=w"><em>magician</em></a><br> (parola)
 sl: Urejanje kot <a href="%sw=w"><em>"èarovnik"</em></a> (geslo)
-sv: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
+sv: <a href="%sw=w"><em>Administrat&ouml;r</em></a> tilltr&auml;de<br> (passord)
 ]<br></td>
 
 %INf<td align=center>[
@@ -214,7 +214,7 @@ pl: <a href="%sw=f"><em>"Friend"</em></a> dostêp<br> (has³o)
 pt: Entrada <a href="%sw=f"><em>amigo</em></a><br> (palavra chave)
 ro: Acces pentru <a href="%sw=f"><em>amici</em></a><br> (parola)
 sl: Urejanje kot <a href="%sw=f"><em>prijatelj</em></a><br> (geslo)
-sv: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
+sv: <a href="%sw=f"><em>V&auml;n</em></a> tilltr&auml;de<br> (passord)
 ]</td>
 
 %E</tr></table>%E%I|ca<table border=0>
@@ -244,7 +244,7 @@ no: Passord, for <em>venner</em> eller <em>oppdaterings</em> adgang:
 pl: Has³o dla dostêpu <em>"friend"</em> lub <em>"wizard"</em> :
 pt: Palavra chave para entrada <em>amigo</em> ou <em>feiticeiro</em>:
 ro: Parola, pentru acces de <em>amic</em> sau <em>magician</em>:
-sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
+sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
     tilltr&auml;de:
 ]
 <input name=w type=password size=10 maxlength=200>
