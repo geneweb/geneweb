@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.14 2000-03-11 08:41:24 ddr Exp $ *)
+(* $Id: perso.ml,v 3.15 2000-03-11 18:55:49 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -967,12 +967,17 @@ value print_photo_occupation_dates conf base p =
         end;
       end
   | Some (link, None) ->
-      do Wserver.wprint "<a href=\"%s\">" link;
-         Wserver.wprint "<img src=\"%s\" border=0 alt=\"%s\">" link image_txt;
-         Wserver.wprint "</a>\n";
-         html_p conf;
-         print_occupation_dates conf base False p;
-      return ()
+      tag "table" "border=%d width=\"95%%\"" conf.border begin
+        tag "tr" begin
+          tag "td" begin
+            Wserver.wprint "<a href=\"%s\">" link;
+            Wserver.wprint "<img src=\"%s\" border=0 height=%d alt=\"%s\">"
+              link max_im_hei image_txt;
+            Wserver.wprint "</a>\n";
+          end;
+          print_occupation_dates conf base True p;
+        end;
+      end
   | None ->
       print_occupation_dates conf base False p ]
 ;

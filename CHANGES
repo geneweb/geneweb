@@ -10,6 +10,8 @@ GeneWeb version 3.03
     telling not to delete the window! (English, French, Swedish versions)
 
 * GeneWeb Service/CGI (gwd)
+  - [11 Mar 00] In personal pages, the images defined by external URL (i.e.
+    accomodated in other Web sites) are now reduced as are local images.
   - [11 Mar 00] The information "relationship to" is no more transformed
     into "married to" when "non-friend" browsing (it was supposed to protect
     private life, but seems to have more drawbacks than advantages).
