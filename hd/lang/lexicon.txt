@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.102 2002-07-25 08:48:44 ddr Exp $
+# $Id: lexicon.txt,v 4.103 2002-07-25 09:25:41 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -72,6 +72,7 @@ no: af=afrikaans/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperan
 pl: af=afrikaans/ca=kataloñski/cs=czeski/da=duñski/de=niemiecki/en=angielski/eo=esperanto/es=hiszpañski/et=estoñski/fi=fiñski/fr=francuski/he=hebrajski/is=islandzki/it=w³oski/lv=³otewski/nl=niderlandzki/no=norweski/pl=polski/pt=portugalski/pt-br=portugalski (Brazylia)/ru=rosyjski/sv=szwedzki/zh=chiñski
 pt: af=Afrikaans/ca=Catal&atilde;/cs=Checo/da=Dinamarqu&ecirc;s/de=Alem&atilde;o/en=Ingl&ecirc;s/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finland&ecirc;s/fr=Franc&ecirc;s/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/nl=Holand&ecirc;s/no=Noruegu&ecirc;s/pl=Polon&ecirc;s/pt=Portugu&ecirc;s/pt-br=Portugu&ecirc;s-do-Brasil/ru=Russo/sv=Sueco/zh=Chin&ecirc;s
 pt-br: af=Afrikaner/ca=Catal&atilde;o/cs=Checo/da=Dinamarqu&ecirc;s/de=Alem&atilde;o/en=Ingl&ecirc;s/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finland&ecirc;s/fr=Franc&ecirc;s/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/nl=Holand&ecirc;s/no=Noruegu&ecirc;s/pl=Polon&ecirc;s/pt=Portugu&ecirc;s/pt-br=Portugu&ecirc;s-do-Brasil/ru=Russo/sv=Sueco/zh=Chin&ecirc;s
+ru: af=àôğèêàíñêèé/ca=êàòàëàíñêèé/cs=÷åøñêèé/da=äàòñêèé/de=íåìåöêèé/en=àíãëèéñêèé/eo=ıñïåğàíòî/es=èñïàíñêèé/et=ıñòîíñêèé/fi=ôèíñêèé/fr=ôğàíöóçñêèé/he=èâğèò/is=èñëàíäñêèé/it=èòàëüÿíñêèé/lv=ëàòûøñêèé/nl=ãîëëàíäñêèé/no=íîğâåæñêèé/pl=ïîëüñêèé/pt=ïîğòóãàëüñêèé/pt-br=áğàçèëüñêî-ïîğòóãàëüñêèé/ru=ğóññêèé/sl=ñëàâÿíñêèé/sv=øâåäñêèé/zh=êèòàéñêèé
 sl: af=afrikaan¹èina/ca=katalon¹èina/cs=èe¹èina/da=dan¹èina/de=nem¹èina/en=angle¹èina/eo=esperanto/es=¹pan¹èina/et=eston¹èina/fi=fin¹èina/fr=franco¹èina/he=hebrej¹èina/is=island¹èina/it=italijan¹èina/lv=litvan¹èina/nl=nizozem¹èina/no=norve¹èina/pl=polj¹èina/pt=portugal¹èina/pt-br=brazilska-portugal¹èina/ru=ru¹èina/sl=sloven¹èina/sv=¹ved¹èina/zh=kitaj¹èina
 sv: af=afrikaans/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ru=ryska/sv=svenska/zh=kinesiska
 
@@ -385,6 +386,7 @@ nl: het geslacht van %t klopt niet met zijn/haar relaties
 no: %ts kjønn er uforenlig med forbindelsene hans/hennes
 pl: %t: jego/jej p³eæ nie odpowiada jego/jej zwi±zkom
 pt: o sexo de %t não é coerente com suas rela&ccedil;&otilde;es
+ru: ïîë %t íå ñòûêóåòñÿ ñ åãî/åå âçàèìîîòíîøåíèÿìè
 sl: spol %t ni usklajen z zvezami
 sv: %ts kön stämmer inte överens med sina relationer
 
@@ -2845,6 +2847,7 @@ nl: weergave per snede/sneebreedte/doorsnede/totale breedte
 no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
 pl: wy¶wietl w segmentach/szeroko¶æ segmentu/szeroko¶æ pokrywania siê/szeroko¶æ ca³kowita
 pt: resultados por fracções/largura da fracção/sobreposição/largura total
+ru: îòîáğàæàòü ÷àñòàìè/øèğèíà ÷àñòè/ïåğåêğûòèå/îáùàÿ øèğèíà
 sl: prika¾i s pomoèjo izsekov/¹irina izseka/prekrivanje/skupna ¹irina
 sv: visa genom att dela sidan/sidbredd/överlappning/global bredd
 
@@ -2914,6 +2917,7 @@ nl: voeg de gemeenschappelijke takken niet samen
 no: sammenfallende anelinjer skal ikke slås sammen
 pl: nie grupuj wspólnych linii razem
 pt: não reagrupar os ramos comuns
+ru: íå ãğóïïèğîâàòü îñíîâíûå âåòâè âìåñòå
 sl: ne zbiraj skupnih vej
 sv: gruppera inte ihop de gemensamma anlinjerna
 
@@ -2985,6 +2989,7 @@ nl: verloofd
 no: forlovet
 pl: zarêczyny
 pt: Noivos
+ru: ïîìîëâëåíû
 sl: zaroka
 sv: f&ouml;rlovad
 
@@ -3008,6 +3013,7 @@ nl: verloofd%t met
 no: forlovet%t med
 pl: zarêczony%t z:/zarêczona%t z:
 pt: noivo%t de/noiva%t de
+ru: %t ïîìîëâëåí ñ
 sl: zaroèen z %/zaroèena z
 sv: f&ouml;rlovad%t med
 
@@ -4538,6 +4544,7 @@ nl: kring in de database: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
 pl: pêtla w bazie: %s jest swoim w³asnym przodkiem
 pt: refer&ecirc;ncia circular no banco de dados: %s &eacute; seu pr&oacute;prio ancestral
+ru: ïåòëÿ â áàçå äàííûõ: %s åãî/åå ñîâñòâåííûé ïğåäîê
 sl: krog v bazi podatkov: %s je svoj(a) prednik
 sv: loop i databasen: %s &auml;r sin egen ana
 
@@ -5212,6 +5219,7 @@ nl: geslachten niet verifi&euml;ren
 no: ikke kontroll av kj&oslash;nn
 pl: ta sama p³eæ
 pt: não verificar os sexos
+ru: íå ïğîâåğÿòü ïîë
 sl: ne glede na spol
 sv: ingen kontroll av könen
 
@@ -6325,6 +6333,7 @@ nl: gescheiden
 no: separert
 pl: w separacji
 pt: separados
+ru: ğàçäåëåíû
 sl: ¾ivela narazen
 sv: separerat
 
@@ -6860,6 +6869,7 @@ nl: de %d oudsten, mogelijk nog in leven
 no: de %d eldste som muligens lever
 pl: %d najstarszych osób (prawdopodobnie) ¿yj±cych
 pt: os %d mais velhos talvez ainda vivos
+ru: %d ñàìûõ ñòàğûõ åùå æèâóùèõ
 sl: %d najstarej¹ih, morda ¹e ¾iveèih
 sv: de %d &auml;ldsta som kanske lever
 
@@ -6908,6 +6918,7 @@ nl: de %d langst levende personen
 no: de %d som har levd lengst
 pl: %d osób, które ¿y³y najd³u¿ej
 pt: os %d que mais viveram
+ru: %d ïğîæèâøèõ äîëüøå âñåõ
 sl: %d oseb, ki so ¾ivele najdlje 
 sv: de %d som har levt l&auml;ngst
 
@@ -8029,6 +8040,7 @@ nl: tovenaar/vriend
 no: Oppdaterings/venner
 pl: wizard/friend
 pt: feiticeiro/amigo
+ru: wizard/äğóã
 sl: èarovnik/prijatelj
 sv: uppdaterings/v&auml;nner
 
