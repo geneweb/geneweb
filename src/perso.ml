@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 4.0 2001-03-16 19:34:53 ddr Exp $ *)
+(* $Id: perso.ml,v 4.1 2001-03-17 05:54:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -260,7 +260,7 @@ and ast_expr = Templ.ast_expr ==
 
 type env =
   [ Vind of person and ascend and union
-  | Vfam of family and couple and descend
+  | Vfam of family and (iper * iper) and descend
   | Vrel of relation
   | Vbool of bool
   | Vint of int
@@ -315,6 +315,7 @@ value eval_variable conf base env sl =
         [ Some ifam ->
             let cpl = coi base ifam in
             let ep = make_ep cpl.father in
+            let cpl = (cpl.father, cpl.mother) in
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
         | None -> None ]
@@ -323,14 +324,14 @@ value eval_variable conf base env sl =
         [ Some ifam ->
             let cpl = coi base ifam in
             let ep = make_ep cpl.mother in
+            let cpl = (cpl.mother, cpl.father) in
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
         | None -> None ]
     | ["self" :: sl] -> loop (p, a, u, p_auth) efam sl
     | ["spouse" :: sl] ->
         match efam with
-        [ Vfam fam cpl _ ->
-            let ip = spouse p.cle_index cpl in
+        [ Vfam fam (_, ip) _ ->
             let ep = make_ep ip in
             loop ep efam sl
         | _ -> None ]
@@ -434,12 +435,12 @@ value print_died conf base env p p_auth =
 
 value print_divorce_date conf base env p p_auth =
   fun
-  [ Vfam fam cpl _ ->
+  [ Vfam fam (_, isp) _ ->
       match fam.divorce with
       [ Divorced d ->
           let d = Adef.od_of_codate d in
           let auth =
-            let spouse = poi base (spouse p.cle_index cpl) in
+            let spouse = poi base isp in
             p_auth && age_autorise conf base spouse
           in
           match d with
@@ -498,8 +499,7 @@ value print_image_url conf base env p p_auth =
 
 value print_married_to conf base env p p_auth =
   fun
-  [ Vfam fam cpl des ->
-      let ispouse = spouse p.cle_index cpl in
+  [ Vfam fam (_, ispouse) des ->
       let spouse = poi base ispouse in
       let auth = p_auth && age_autorise conf base spouse in
       let format = relation_txt conf p.sex fam in
@@ -515,15 +515,22 @@ value print_nobility_title conf base env p p_auth =
   | _ -> () ]
 ;
 
-value obsolete var =
-  do Printf.eprintf "\
-*** <W> use of obsolete variable \"%%%s;\" in perso.txt file\n" var;
-     flush stderr;
-  return ()
+value obsolete_list = ref [];
+
+value obsolete var new_var =
+  if List.mem var obsolete_list.val then ()
+  else ifdef UNIX then
+    do Printf.eprintf "\
+*** <W> perso.txt: variable \"%%%s;\" obsolete; use rather \"%%%s;\"\n"
+          var new_var;
+       flush stderr;
+       obsolete_list.val := [var :: obsolete_list.val];
+    return ()
+  else ()
 ;
 
 value print_nobility_titles conf base env p p_auth =
-  do ifdef UNIX then obsolete "nobility_titles" else (); return
+  do obsolete "nobility_titles" "nobility_title"; return
   if p_auth then print_titles conf base True (transl conf "and") p else ()
 ;
 
@@ -732,11 +739,11 @@ value print_surname_key conf base env p p_auth =
 
 value print_witness_relation conf base env =
   fun
-  [ Vfam _ cpl _ ->
+  [ Vfam _ (ip1, ip2) _ ->
       Wserver.wprint
         (fcapitale (ftransl conf "witness at marriage of %s and %s"))
-        (referenced_person_title_text conf base (poi base cpl.father))
-        (referenced_person_title_text conf base (poi base cpl.mother))
+        (referenced_person_title_text conf base (poi base ip1))
+        (referenced_person_title_text conf base (poi base ip2))
   | _ -> () ]
 ;
 
@@ -748,8 +755,28 @@ value eval_int_env var env =
 
 value try_eval_gen_variable conf base env =
   fun
-  [ "count" -> eval_int_env "count" env
-  | "length" -> eval_int_env "length" env
+  [ "child_cnt" -> eval_int_env "child_cnt" env
+  | "family_cnt" -> eval_int_env "family_cnt" env
+  | "nb_children" ->
+      match get_env "fam" env with
+      [ Vfam _ _ des -> string_of_int (Array.length des.children)
+      | _ -> "" ]
+  | "nb_families" ->
+      match get_env "child" env with
+      [ Vind _ _ u -> string_of_int (Array.length u.family)
+      | _ ->
+          match get_env "p" env with
+          [ Vind _ _ u -> string_of_int (Array.length u.family)
+          | _ -> "" ] ]
+(**)
+  | "count" ->
+      do obsolete "count" "child_cnt"; return eval_int_env "child_cnt" env
+  | "length" ->
+      do obsolete "length" "nb_children"; return
+      match get_env "fam" env with
+      [ Vfam _ _ des -> string_of_int (Array.length des.children)
+      | _ -> "" ]
+(**)
   | s ->
       let v = extract_var "evar_" s in
       if v <> "" then
@@ -1210,7 +1237,7 @@ and eval_foreach_child conf base env al =
            let a = aoi base ip in
            let u = uoi base ip in
            let env = [("child", Vind p a u) :: env] in
-           let env = [("count", Vint (i + 1)) :: env] in
+           let env = [("child_cnt", Vint (i + 1)) :: env] in
            let env =
              if i = n - 1 then [("pos", Vstring "prev") :: env]
              else if i = n then [("pos", Vstring "self") :: env]
@@ -1221,13 +1248,14 @@ and eval_foreach_child conf base env al =
         des.children
   | _ -> () ]
 and eval_foreach_family conf base env al (p, _, u, _) =
-  Array.iter
-    (fun ifam ->
+  Array.iteri
+    (fun i ifam ->
        let fam = foi base ifam in
        let cpl = coi base ifam in
        let des = doi base ifam in
+       let cpl = (p.cle_index, spouse p.cle_index cpl) in
        let env = [("fam", Vfam fam cpl des) :: env] in
-       let env = [("length", Vint (Array.length des.children)) :: env] in
+       let env = [("family_cnt", Vint (i + 1)) :: env] in
        List.iter (eval_ast conf base env) al)
     u.family
 and eval_foreach_first_name_alias conf base env al (p, _, _, p_auth) =
@@ -1356,6 +1384,7 @@ and eval_foreach_witness_relation conf base env al (p, _, _, _) =
               if array_memq p.cle_index fam.witnesses then
                 let cpl = coi base ifam in
                 let des = doi base ifam in
+                let cpl = (cpl.father, cpl.mother) in
                 let env = [("fam", Vfam fam cpl des) :: env] in
                 List.iter (eval_ast conf base env) al
               else ())
