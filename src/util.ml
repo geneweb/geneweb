@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.15 1999-04-29 19:56:00 ddr Exp $ *)
+(* $Id: util.ml,v 2.16 1999-05-07 19:26:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -394,6 +394,8 @@ value rec capitale s =
         if String.length s == 1 then s
         else if match_begin s "&iexcl;" then
           "&iexcl;" ^ capitale (String.sub s 7 (String.length s - 7))
+        else if match_begin s "&aelig;" then
+          "&AElig;" ^ String.sub s 7 (String.length s - 7)
         else
           match s.[1] with
           [ 'a'..'z' ->
