@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.117 2002-11-19 00:38:43 ddr Exp $
+# $Id: lexicon.txt,v 4.118 2002-11-25 12:13:33 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -58,7 +58,7 @@ af: af=Afrikaans/ca=Catalan/cs=Czeck/da=Deens/de=Duits/en=Engels/eo=Esperanto/es
 bg: af=áóğñêè/bg=áúëãàğñêè/ca=êàòàëîíñêè/cs=÷åøêè/da=äàòñêè/de=íåìñêè/en=àíãëèéñêè/eo=åñïåğàíòî/es=èñïàíñêè/et=åñòîíñêè/fi=ôèíëàíäñêè/fr=ôğåíñêè/he=èâğèò/is=èñëàíäñêè/it=èòàëèàíñêè/lv=ëàòâèéñêè/nl=õîëàíäñêè/no=íîğâåæêè/pl=ïîëñêè/pt=ïîğòóãàëñêè/pt-br=áğàçèëñêî-ïîğòóãàëñêè/ru=ğóñêè/sl=ñëîâåíñêè/sv=øâåäñêè/zh=êèòàéñêè
 ca: af=africà/ca=català/cs=xec/da=danès/de=alemany/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/pl=polac/pt=portuguès/pt-br=brasiler/ru=rus/sl=eslovè/sv=suec/zh=Xinès
 cs: af=afrikán¹tina/bg=bulhar¹tina/cs=èe¹tina/da=dán¹tina/de=nìmèina/en=angliètina/eo=esperanto/es=¹panìl¹tina/fi=fin¹tina/fr=francouz¹tina/he=hebrej¹tina/is=island¹tina/it=ital¹tina/lv=loty¹¹tina/nl=holand¹tina/no=nor¹tina/pt=portugal¹tina/pt-br=brasil¹tina/ru=ru¹tina/sv=¹véd¹tina/zh=èín¹tina
-da: af=afrikaans/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
+da: af=afrikaans/bg=bulgarsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
 de: af=Afrikaans/bg=Bulgarish/ca=Katalanisch/cs=Tschechisch/da=D&auml;nisch/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/nl=Holl&auml;ndisch/no=Norwegisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ru=Russisch/sl=Slovenisch/sv=Schwedisch/zh=Chinesisch
 en: af=Afrikaans/bg=Bulgarian/ca=Catalan/cs=Czech/da=Danish/de=German/en=English/eo=Esperanto/es=Spanish/et=Estonian/fi=Finnish/fr=French/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/nl=Dutch/no=Norwegian/pl=Polish/pt=Portuguese/pt-br=Brazilian-Portuguese/ru=Russian/sl=Slovenian/sv=Swedish/zh=Chinese
 eo: bg=bulgara/en=anglo/eo=esperanto/fr=franco
