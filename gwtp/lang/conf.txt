@@ -1,6 +1,6 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: conf.txt,v 1.10 2003-12-08 20:46:17 ddr Exp $ -->
+  <!-- $Id: conf.txt,v 1.11 2003-12-08 20:50:31 ddr Exp $ -->
   <title>Gwtp - [
 de: Konfiguration
 en: configuration
@@ -141,7 +141,7 @@ it: Nascondere i nomi privati:
 de: Verwendung des "beschränkten Zugriffssystems":
 en: Use the "restricted access" system (more strict):
 es: Usar el sistema de "área restringida" (más estricta):
-fr: Utiliser le system "accès restreint" (plus strict):
+fr: Utiliser le système "accès restreint" (plus strict):
 it: Utilizzare il sistema "accesso limitato"(più rigoroso):
 ]
 <input type=radio name=use_restrict
