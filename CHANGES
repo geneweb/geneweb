@@ -2,11 +2,11 @@ GeneWeb version 4.05
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [14 Feb 02] Now the header and trailer files (base.hed and base.trl)
-    can be in only only examplary for all languages in the directory lang
-    (of databases directory) with the ability of inline translation
-    like in start.txt. Still searches first in subdirectories of the
-    language identifier, for compatibility.
+  - [14 Feb 02] Now the header and trailer files (base.hed and
+    base.trl) can be in only one examplary for all languages in the
+    directory lang (of databases directory) with the ability of inline
+    translation like in start.txt. Still searches first in subdirectories
+    of the language identifier, for compatibility.
   - [02 Feb 02] Fixed bug: when merging two persons, in case of fast
     merge applied, some fields of the second person were lost (notes,
     baptism).
