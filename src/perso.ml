@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.38 1999-02-26 21:30:23 ddr Exp $ *)
+(* $Id: perso.ml,v 1.39 1999-02-27 20:02:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -136,10 +136,14 @@ value
            (fun first (date_start, date_end) ->
               do if not first then Wserver.wprint ",\n" else ();
                  match date_start with
-                 [ Some d -> Wserver.wprint "%d" (annee d)
+                 [ Some d -> Wserver.wprint "%s" (Date.string_of_date conf d)
                  | None -> () ];
                  match date_end with
-                 [ Some d -> Wserver.wprint "-%d" (annee d)
+                 [ Some d ->
+                     do if d.month <> 0 then Wserver.wprint " - "
+                        else Wserver.wprint "-";
+                        Wserver.wprint "%s" (Date.string_of_date conf d);
+                     return ()
                  | None -> () ];
               return False)
            first dates
@@ -198,7 +202,7 @@ value print_titles conf base and_txt p a =
          return False)
       True titles
   in
-  if titles <> [] then Wserver.wprint "\n" else ()
+  ()
 ;
 
 value print_dates conf base p =
@@ -843,7 +847,7 @@ value print conf base p =
         (p.access <> Private || conf.friend || conf.wizard) then
        do Wserver.wprint "<em>";
           print_titles conf base (transl conf "and") p a;
-          Wserver.wprint ".</em>";
+          Wserver.wprint ".</em>\n";
           html_br conf;
        return ()
      else ();

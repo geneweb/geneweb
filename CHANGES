@@ -6,6 +6,9 @@ License). The previous license still applies up to the version 1.11
 included.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Feb 27, 99] Added case "half-siblings" in relationship links.
+  - [Feb 27, 99] In personal pages, titles dates when complete are
+    displayed completely.
   - [Feb 26, 99] For a birth the present day, does not display "happy
     birthday" any more! And displayed age is "birth" and not "less than
     one year".

@@ -5,6 +5,8 @@ GeneWeb Version 2.00
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Feb 27, 99] No more newline before the ending dot of the titles
+    displaying in personal pages.
   - [Feb 18. 99] Added (undocumented) feature: adding ";opt=spouse" to an
     URL of relationship link (m=RL), the spouses are displayed.
 
