@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.181 2000-11-11 12:50:44 ddr Exp $
+# $Id: lexicon.txt,v 3.182 2000-11-13 13:01:10 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -6031,7 +6031,7 @@ se: f&ouml;r&auml;ldrarna
 
     the spouse
 af: die eggenoot/die eggenote
-de: der Ehemann/die Ehefrau
+de: der:d:dem Ehemann/die:d:der Ehefrau
 dk: &aelig;gtef&aelig;llen
 en: the spouse
 eo: la edzo/la edzino
