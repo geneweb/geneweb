@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.31 1999-08-31 00:54:24 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.32 1999-09-13 10:07:28 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1931,14 +1931,14 @@ value speclist =
    ("-lf", Arg.Set lowercase_first_names,
     "   \
 - Lowercase first names -
-       Force lowercase first names keeping only their initials as uppercase
-       characters."
+       Convert first names to lowercase letters, with initials in
+       uppercase."
       );
    ("-ls", Arg.Set lowercase_surnames,
     "   \
 - Lowercase surnames -
-       Force lowercase surnames keeping only their initials as uppercase
-       characters. Try to keep lowercase particles."
+       Convert surnames to lowercase letters, with initials in
+       uppercase. Try to keep lowercase particles."
       );
    ("-efn", Arg.Set extract_first_names,
     "  \
