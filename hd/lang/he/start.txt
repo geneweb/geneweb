@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//IW"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-8">
+<title>Genealogy - %t</title>
+</head>
+<body%b>
+
+<div dir=rtl lang=iw> 
+<h1>ג'ניולוגיה</h1>
+
+%rversion
+
+<p>
+יש במאגר המידע %n אנשים 
+
+<ul>
+
+<li>
+
+<form method=GET action="%f" >
+%h<input type=hidden name=m value=NG>
+חיפוס: <input name=n size=40 maxlength=200> 
+<input type=submit value="חפס">
+<br>
+זה:
+<ul>
+<li> <input type=radio name=t value=PN checked>
+או  <em> שם פרטי + משפחה </em>
+או <em>שם ציבורי</em>, או <em>שם נוסף</em>.
+<li> <input type=radio name=t value=P> <em>שם פרטי</em>.
+<li> <input type=radio name=t value=N> <em>שם משפחה</em>.
+</ul>
+</form>
+
+<li>
+
+<FORM method=GET action="%f">
+%h<input type=hidden name=m value=TT>
+לפי תואר <INPUT NAME=t size=16 maxlength=200>
+מקום <INPUT NAME=p size=30 maxlength=200> =&gt;
+<INPUT TYPE=submit value="חפס">
+</FORM>
+
+<li>
+
+<FORM method=GET action="%f">
+%h כל
+<SELECT NAME=m>
+   <OPTION VALUE="N" SELECTED>שמות משפחה
+   <OPTION VALUE="P">שמות פרטיים
+</SELECT>
+לפי
+<SELECT NAME=tri>
+   <OPTION VALUE="A" SELECTED>סדר א-ב
+   <OPTION VALUE="F">סדר הופעתם
+</SELECT> =&gt;
+<INPUT TYPE=submit value="בסדר">
+</FORM>
+
+<li> <a href="%sm=H;v=advanced">[*בקשה מתקדמת]</a>.
+
+%w<li> <a href="%sm=ADD_FAM">הוספת משפחה</a>.
+%w
+
+</ul>
+
+<a href="%sm=AN">ימי הולדת</a>%x
+ו- <a href="%sm=B;k=10">לידות לאחרונה</a>%x...
+<br>
+<a href="%sm=AD">ימי השנה למתים</a>.
+<br>
+ו- <a href="%sm=AM">ימי נישואין</a>.
+<p>
+היו %q פנייות, מתוכם %c לעמוד זה, מתאריך %d.
+
+%y<p>
+
+<ul>
+<li> <a href="%sw=w"><em>Wizard</em></a> access (password).
+%y%z<li> <a href="%sw=f"><em>Friend</em></a> access (password).
+%z%y</ul>
+
+%y%i<p>
+<form method=get action="%f">
+%h<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+%i<p>
+
+<font size=-1><a href="%sm=LEX">מלון</a></font>

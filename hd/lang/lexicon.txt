@@ -5,6 +5,7 @@ en: iso-8859-1
 eo: iso-8859-1
 es: iso-8859-1
 fr: iso-8859-1
+he: iso-8859-8
 it: iso-8859-1
 nl: iso-8859-1
 pt: iso-8859-1
@@ -19,6 +20,7 @@ de: , um den ersten zu sehen
 en:  to see the first one
 es:  para ver la primera
 fr:  pour voir la premi&egrave;re
+he:   לראות את הענף הראשון ‏‎
 it:  per vedere il primo
 nl:  om de eerste tak te zien
 pt:  para ver a primeira
@@ -29,6 +31,7 @@ de: , um die erste zu sehen
 en:  to see the first one
 es:  para ver el primero
 fr:  pour voir le premier
+he:  ‎ לראות את קשר המשפחתי הראשון ‏‎
 it:  per vedere il primo
 nl:  om de eerste te zien
 pt:  para ver o primeiro
@@ -39,6 +42,7 @@ de: , um es mit dieser Nummer nochmals zu versuchen, oder dr&uuml;cken Sie "back
 en:  to try again with this number, or do "back" and change it yourself
 es:  para ensayar con este n&uacute;mero, o hace "back" y c&aacute;mbielo Ud. mismo
 fr:  pour r&eacute;essayer avec ce num&eacute;ro, ou bien faites "back" et choisissez-en un autre
+he:  לנסות שוב עם מספר הזה, או "חזרה" ולשנות בעצמך
 nl: , om dit nummer weer te proberen, of druk "terug" en verander het zelf
 pt: para tentar novamente com este n&uacute;mero ou fazer "back" e escolher outro
 se: f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer, eller g&ouml;r "back" och &auml;ndra det sj&auml;lv
@@ -49,6 +53,7 @@ en: %d years ago
 eo: antaux %d jaroj
 es: hace %d a&ntilde;os
 fr: il y a %d ans
+he: ‎ לפני‎ %d ‎שנה‎
 it: ha %d anni
 nl: %d jaren geleden
 pt: h&aacute; %d anos
@@ -60,6 +65,7 @@ en: %s cousins
 eo: %s gekuzoj
 es: primos %s
 fr: cousins au %s degr&eacute;
+he:  ‎ בני דודים לדרגה‏‎%s 
 it: cugini di %s grado
 nl: neven en nichten %s generaties verwijderd
 pt: primos %s
@@ -71,6 +77,7 @@ en: %t already has parents
 eo: %t havas jam gepatroj
 es: los padres de %t ya existen
 fr: %t a d&eacute;j&agrave; des parents
+he:  ‎ ל-‏‎%t‏ יש כבר הורים‎
 it: %t ha gi&agrave; dei genitori
 nl: %t heeft al ouders
 pt: os pais de %t j&aacute; existem
@@ -82,6 +89,7 @@ en: %t died before his/her birth
 eo: %t estis morta antaux lia/sxia naskigxo
 es: %t ha muerto antes de su nacimiento
 fr: %t est mort(e) avant sa naissance
+he:  %t מת לפני הולדתו/הולדתה
 it: %t sarebbe morto prima della sua nascita
 nl: %t zou dood zijn voor zijn/haar geboorte
 pt: %t moreu antes de nascer
@@ -104,6 +112,7 @@ en: %t is born after the death of his/her mother %t
 eo: %t naskigxis post la morto de lia/sxia patrino %t
 es: %t ha nacido despu&eacute;s de la muerte de su madre %t
 fr: %t est n&eacute;(e) apr&egrave;s la mort de sa m&egrave;re %t
+he: %t  נלד(ה) אחרי מוות האם
 it: %t sarebbe nato dopo la morte di sua madre %t
 nl: %t zou geboren zijn na de dood van zijn/haar moeder %t
 pt: $t nasceu depois do ףbito da m&atilde;e
@@ -115,6 +124,7 @@ en: %t is born more than 2 years after the death of his/her father %t
 eo: %t naskigxis plu de 2 jaroj post la morto de lia/sxia patro %t
 es: el padre de %t (%t) ha muerto al menus 2 a&ntilde;os antes de su nacimiento
 fr: %t est n&eacute;(e) plus de 2 ans apr&egrave;s la mort de son p&egrave;re %t
+he: %t  נלד(ה) יותר משנתיים אחרי מוות האב
 it: %t sarebbe nato pi&ugrave; di 2 anni dopo la morte di suo padre %t
 nl: %t is geboren meer dan twee jaar na de dood van zijn/haar vader
 pt: %t nasceu passados 2 anos depois do ףbito do pai
@@ -127,6 +137,7 @@ en: %m 1, %y/%m %d, %y/%m %y/%y
 eo: 1a de %m %y/%da de %m %y/%m %y/%y
 es: 1 %m %y/%d %m %y/%m %y/%y
 fr: 1er %m %y/%d %m %y/%m %y/%y
+he: 1 %m %y/%d %m %y/%m %y/%y 
 it: 1o %m %y/%d %m %y/%m %y/%y
 nl: 1 %m %y/%d %m %y/%m %y/%y
 pt: 1a de %m %y/%da de %m %y/%m %y/%y
@@ -138,6 +149,7 @@ en: .
 eo: .
 es: ,
 fr: ,
+he: .
 it: .
 nl: ,
 pt: ,
@@ -150,6 +162,7 @@ en: January/February/March/April/May/June/July/August/September/October/November
 eo: januaro/februaro/marto/aprilo/majo/junio/julio/auxgusto/septembro/oktobro/novembro/decembro
 es: enero/febrero/marzo/abril/mayo/junio/julio/agosto/septiembre/octubre/noviembre/diciembre
 fr: janvier/f&eacute;vrier/mars/avril/mai/juin/juillet/ao&ucirc;t/septembre/octobre/novembre/d&eacute;cembre
+he: ‎ ינואר/פברואר/מרץ/אפריל/מאי/יוני/יולי/אוגוסט/ספטמבר/אוקטובר/נובמבר/דצמבר‎
 it: gennaio/febbraio/marzo/aprile/maggio/giugno/luglio/agosto/settembre/ottobre/novembre/dicembre
 nl: Januari/Februari/Maart/April/Mei/Juni/Juli/Augustus/September/Oktober/November/December
 pt: Janeiro/Febreiro/Marחo/Abril/Maio/Junho/Julho/Agosto/Setembro/Outubro/Novembro/Dezembro
@@ -162,6 +175,7 @@ en: ,
 eo: ,
 es: .
 fr: .
+he: ,
 it: ,
 nl: .
 pt: .
@@ -173,6 +187,7 @@ en: Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday
 eo: dimancxo/lundo/mardo/merkredo/jauxdo/vendredo/sabato
 es: domingo/lunes/martes/mi&eacute;rcoles/jueves/viernes/s&aacute;bado
 fr: dimanche/lundi/mardi/mercredi/jeudi/vendredi/samedi
+he:  יום א'/יום ב'/יום ג'/יום ד'/יום ה'/יום ו'/שבת 
 it: domenica/luned&igrave;/marted&igrave;/mercoled&igrave;/gioved&igrave;/venerd&igrave;/sabato
 nl: Zondag/Maandag/Dinsdag/Woensdag/Donderdag/Vrijdag/Zaterdag
 pt: domingo/segunda-feira/terחa-feira/quarta-feira/quinta-feira/sexta-feira/s&aacute;bado
@@ -184,6 +199,7 @@ en: nth
 eo: nth
 es: nth/nth (feminine)
 fr: nth (degre)
+he:  ה-n
 it: nth (degre)
 nl: n
 pt: nth
@@ -195,6 +211,7 @@ en: , it is
 eo: , estas
 es: , es
 fr: , c'est
+he:   , זה
 it: , &egrave;
 nl:  is het
 pt: , &eacute;
@@ -206,6 +223,7 @@ en: , it will be
 eo: , estus
 es: , ser&aacute;
 fr: , ce sera
+he:  , יהיה
 it: , sar&agrave;
 nl:  zal het zijn
 pt: , ser&aacute;
@@ -217,6 +235,7 @@ en: 2nd cousins
 eo: 2a gekuzoj
 es: primos 2ndos
 fr: cousins issus de germains
+he:   בני דודים שניים
 it: cugini di 2o grado
 nl: neven en nichten in de 2de graad
 pt: primos 2ndos
@@ -228,6 +247,7 @@ en: 3rd cousins
 eo: 3a gekuzoj
 es: primos 3ros
 fr: cousins issus d'issus de germains
+he:   בני דודים שלישיים
 it: cugini di 3o grado
 nl: neven en nichten in de 3e graad
 pt: primos 3ro
@@ -239,6 +259,7 @@ en: M/F
 eo: M/F
 es: M/F
 fr: H/F
+he:  ז/נ
 it: M/F
 nl: M/F
 pt: M/F
@@ -249,6 +270,7 @@ de: J/N
 en: Y/N
 es: S/N
 fr: O/N
+he:   ק/ל 
 pt: S/N
 se: J/N
 
@@ -258,6 +280,7 @@ en: Sosa numbers
 eo: nombroj Sosa
 es: numeraci&oacute;n Sosa
 fr: num&eacute;rotation Sosa
+he:   משפרי "Sosa" 
 it: numeri Sosa
 nl: Kwartiernummers
 pt: numeraח&atilde;o Sosa
@@ -269,6 +292,7 @@ en: a %s cousin
 eo: %s kuzo/%s kuzino/%s gekuzo
 es: un primo %s/una prima %s/un(a) primo(a) %s
 fr: un cousin au %s degr&eacute;/une cousine au %s degr&eacute;/un(e) cousin(e) au %s degr&eacute;
+he:  בן-דוד לדרגה  %s/בת-דוד לדרגה  %s
 it: un cugino di %s grado/una cugina di %s grado/un(a) cugino(a) di %s grado
 nl: een neef %s generaties verwijderd/een nicht %s generaties verwijderd
 pt: um primo %s/uma prima %s/um(a) primo(a) %s
@@ -280,6 +304,7 @@ en: a 2nd cousin
 eo: 2a kuzo/2a kuzino/2a gekuzo
 es: un primo 2ndo/una prima 2ndo/un(a) primo(a) 2ndo
 fr: un cousin issu de germains/une cousine issue de germains/un(e) cousin(e) issu(e) de germains
+he:  בן-דוד שני/בת-דוד שנית
 it: un cugino di 2o grado/una cugina di 2o grado/un(a) cugino(a) di 2o grado
 nl: een neef 2de generaties verwijderd/een nicht 2de generaties verwijderd
 pt: um primo 2ndo/uma prima 2ndo/um(a) primo(a) 2ndo
@@ -291,6 +316,7 @@ en: a 3rd cousin
 eo: 3a kuzo/3a kuzino/3a gekuzo
 es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
 fr: un cousin issu d'issus de germains/une cousine issue d'issus de germains/un(e) cousin(e) issu(e) d'issus de germains
+he:  בן-דוד שלישי/בת-דוד שלישית
 it: un cugino di 3o grado/una cugina di 3o grado/un(a) cugino(a) di 3o grado
 nl: een neef 3de generaties verwijderd/een nicht 3de generaties verwijderd
 pt: um primo 3ro/uma prima 3ro/um(a) primo(a) 3ro
@@ -302,6 +328,7 @@ en: a brother/a sister/a sibling
 eo: frato/fratino/gefrato
 es: un hermano/una hermana/un(a) hermano(a)
 fr: un fr&egrave;re/une soeur/un fr&egrave;re ou une soeur
+he:   אח/אחות/אח(ות) 
 it: un fratello/una sorella/un fratello o una sorella
 nl: een broer/een zuster/een broer of een zuster
 pt: um irm&atilde;o/uma irm&atilde;/um(a) irm&atilde;o(&atilde;)
@@ -313,6 +340,7 @@ en: a cousin
 eo: kuzo/kuzino
 es: un primo/una prima
 fr: un cousin/une cousine
+he:  בן-דוד/בת-דוד 
 it: un cugino
 nl: een neef/een nicht
 pt: um primo/uma prima
@@ -324,6 +352,7 @@ en: a descendant
 eo: posteulo
 es: un descendiente/una descendianta
 fr: un descendant/une descendante
+he:   צאצא/צאצאה 
 it: un discendente/una discendente
 nl: een nakomeling
 pt: um descendente/uma descendente
@@ -335,6 +364,7 @@ en: a grandfather/a grandmother/a grandparent
 eo: avo/avino/geavo
 es: un abuelo/una abuela/un(a) abuelo(a)
 fr: un grand-p&egrave;re/une grand-m&egrave;re/un grand-parent
+he:   סבא/סבתא/סב(ת)ה
 it: un nonno/una nonna/un(a) nonno(a)
 nl: een grootvader/een grootmoeder/een grootouder
 pt: um avפ/uma avף/um(a) avפ(ף)
@@ -346,6 +376,7 @@ en: a grandson/a granddaughter/a grandchild
 eo: nepo/nepino/genepo
 es: un nieto/una nieta/un(a) nieto(a)
 fr: un petit fils/une petite fille/un petit enfant
+he:  נחד/נחדה /נחד
 it: un nipote/una nipote/un(a) nipote
 nl: een kleinzoon/een kleindochter/een kleinkind
 se: en son(dotter)-son/en son(dotter)-dotter/ett barnbarn
@@ -357,6 +388,7 @@ en: a great-grandfather/a great-grandmother/a great-grandparent
 eo: praevo/praevino/gepraevo
 es: un bisabuelo/una bisabuela/un(a) bisabuelo(a)
 fr: un arri&egrave;re-grand-p&egrave;re/une arri&egrave;re-grand-m&egrave;re/un arri&egrave;re-grand-parent
+he:  רב-סבא/רב-סבתא/רב-סב(ת)א
 it: un bisnonno/una bisnonna/un(a) bisnonno(a)
 nl: een over-grootvader/een over-grootmoeder/een over-grootouder
 pt: um bisavפ/uma bisavף/um(a) bisavפ(ף)
@@ -368,6 +400,7 @@ en: a great-grandson/a great-granddaughter/a great-grandchild
 eo: pranepo/pranepino/gepranepo
 es: un bisnieto/una bisnieta/un(a) bisnieto(a)
 fr: un arri&egrave;re-petit-fils/une arri&egrave;re-petite-fille/un arri&egrave;re-petit-enfant
+he:    נין/נינה
 it: un pronipote/una pronipote/un(a) pronipote
 nl: een achter-kleinzoon/een achter-kleindochter/een achter-kleinkind
 pt: um bisneto/uma bisneta/um(a) bisneto(a)
@@ -379,6 +412,7 @@ en: a great-nephew/a great-niece
 eo: pranevo/pranevino
 es: un bissobrino/una bissobrina
 fr: un petit neveu/une petite ni&egrave;ce
+he:  בן האחיין/בת האחיין
 it: un pronipote/una pronipote
 nl: een achter-neef/een achter-nicht
 pt: um bissobrino/uma bissobrina
@@ -390,6 +424,7 @@ en: a great-uncle/a great-aunt
 eo: praonklo/praonklino
 es: un tio abuelo/una tia abuela
 fr: un grand-oncle/une grand-tante
+he:  דוד-סב/דודה-סבה
 it: un prozio/una prozia
 nl: een oud-oom/een oud-tante
 pt: um tio avפ/uma tia avף
@@ -401,6 +436,7 @@ en: a nephew/a niece
 eo: nevo/nevino
 es: un sobrino/a sobrina
 fr: un neveu/une ni&egrave;ce
+he:   אחיין/אחיינית 
 it: un nipote/una nipote
 nl: een neef/een nicht
 pt: um sobrino/uma sobrina
@@ -412,6 +448,7 @@ en: a son/a daughter/a child
 eo: filo/filino/infano
 es: un hijo/una hija/un(a) hijo(a)
 fr: un fils/une fille/un enfant
+he:   בן/בת/בן 
 it: un figlio/una figlia/un(a) figlio(a)
 nl: een zoon/een dochter/een kind
 pt: um filho/uma filha/um(a) filho(a)
@@ -423,6 +460,7 @@ en: about
 eo: cxirkaux
 es: hacia
 fr: vers
+he:   בערך
 it: intorno
 nl: circa
 pt: cerca
@@ -433,6 +471,7 @@ de: Zugriff
 en: access
 es: accesso
 fr: acc&egrave;s
+he:   כניסה 
 it: accesso
 nl: toegang
 pt: acesso
@@ -444,6 +483,7 @@ en: add
 eo: aldoni +decl
 es: agregar
 fr: ajouter
+he:   הוספה 
 it: aggiungere
 nl: invoeren
 pt: acrescentar
@@ -456,6 +496,7 @@ en: advanced request
 es: avanzada consulta
 eo: progresata rekesto
 fr: requ&ecirc;te &eacute;volu&eacute;e
+he:   בקשה מתקדמת 
 it: avanzata richiesta
 nl: gedetailleerde opzoeking
 pt: investigaח&atilde;o complexa
@@ -467,6 +508,7 @@ en: after
 eo: post
 es: despu&eacute;s
 fr: apr&egrave;s
+he:   אחרי 
 it: dopo
 nl: na
 pt: depois
@@ -478,6 +520,7 @@ en: after
 eo: post
 es: despu&eacute;s de
 fr: apr&egrave;s
+he:   אחרי 
 it: dopo
 nl: na
 pt: depois de
@@ -490,6 +533,7 @@ en: age
 eo: agxo
 es: edad
 fr: &acirc;ge
+he:  ‎ גיל‎
 it: et&agrave;
 nl: leeftijd
 pt: idade
@@ -501,6 +545,7 @@ en: alias
 eo: aliaso
 es: alias
 fr: alias
+he:   שם נוסף 
 it: alias
 nl: alias
 pt: alias
@@ -512,6 +557,7 @@ en: all the places
 eo: cxiuj lokoj
 es: todas las lugares
 fr: tous les lieux
+he:   כל המקומות 
 it: tutti i luogi
 nl: alle plaatsen
 pt: todos os lugares
@@ -523,6 +569,7 @@ en: all the titles
 eo: cxiuj mosxtoj
 es: todos los t&iacute;tulos
 fr: tous les titres
+he:   כל התארים
 it: tutti i titoli
 nl: alle titels
 pt: todos os t&iacute;tulos
@@ -535,6 +582,7 @@ en: allied%t to
 eo: edzagxita%t kun
 es: unido%t con/unida%t con
 fr: alli&eacute;%t &agrave;/alli&eacute;e%t &agrave;
+he:   מזווג ב %t עם/מזווגת ב %t עם
 it: sposato%t con/sposata%t con
 nl: verbonden%t met
 pt: unido%t com/unida%t com
@@ -546,6 +594,7 @@ en: alphabetic order
 eo: alfabetic ordo
 es: orden alfab&eacute;tico
 fr: ordre alphab&eacute;tique
+he:   סדר אלף-בת 
 it: ordine alfabetico
 nl: alfabetische volgorde
 pt: ordem alfab&eacute;tico
@@ -557,6 +606,7 @@ en: also
 eo: ankaux
 es: tambi&eacute;n
 fr: aussi
+he:   גם 
 it: anche
 nl: ook
 pt: tamb&eacute;m
@@ -568,6 +618,7 @@ en: an ancestor
 eo: prapatro/prapatrino
 es: un ancestro/una ancestra
 fr: un anc&ecirc;tre/une anc&ecirc;tre
+he:   אב קדמון 
 it: un antenato/un'antenata
 nl: een voorouder
 pt: um ancestro/uma ancestra
@@ -579,6 +630,7 @@ en: an uncle/an aunt
 eo: onklo/onklino
 es: un tio/una tia
 fr: un oncle/une tante
+he:   דוד/דודה 
 it: uno zio/una zia
 nl: een Oom/een Tante
 pt: um tio/uma tia
@@ -591,6 +643,7 @@ en: ancestors
 eo: antauxeuloj
 es: ascendientes
 fr: ascendants
+he:  ‎ אבות‎
 it: antenati
 nl: voorouders
 pt: ascendentes
@@ -602,6 +655,7 @@ en: ancestors
 eo: geprapatroj
 es: ancestros
 fr: des anc&ecirc;tres
+he:  ‎ אבות‎
 it: antenati
 nl: voorouders
 pt: ancestros
@@ -614,6 +668,7 @@ en: and
 eo: kaj
 es: y
 fr: et
+he:  ‎ ו‎-
 it: e
 nl: en
 pt: e
@@ -625,6 +680,7 @@ en: anniversaries
 eo: datrevenoj
 es: aniversarios
 fr: anniversaires
+he:   ימי שנה 
 it: anniversari
 nl: verjaardag
 pt: aniversarios
@@ -636,6 +692,7 @@ en: anniversaries of dead
 eo: datrevenoj de la mortaj personoj
 es: aniversarios de las personas fallecidas
 fr: anniversaires des personnes d&eacute;c&eacute;d&eacute;es
+he:   ימי שנה למוות 
 it: anniversari delle persone decedute
 nl: verjaardag van overleden mensen
 pt: anivers&aacute;rios das pessoas falecidas
@@ -647,6 +704,7 @@ en: anniversaries of marriage
 eo: datrevenoj de edzigxo
 es: aniversarios de casamiento
 fr: anniversaires de mariage
+he:   ימי נישואין
 it: anniversari di matrimonio
 nl: huwelijks verjaardag
 pt: anivers&aacute;rios de casamento
@@ -658,6 +716,7 @@ en: are
 eo: estas
 es: son
 fr: sont
+he:  הם   
 it: sono
 nl: zijn
 pt: som
@@ -669,6 +728,7 @@ en: at the same time
 eo: samfoje
 es: a la vez
 fr: en m&ecirc;me temps
+he:   גם
 it: nello stesso tempo
 nl: op dezelfde tijd
 pt: ao mesmo tempo
@@ -700,6 +760,7 @@ en: before
 eo: antaux
 es: antes
 fr: avant
+he:   לפני 
 it: prima
 nl: voor
 pt: antes
@@ -711,6 +772,7 @@ en: before
 eo: antaux
 es: antes de
 fr: avant
+he:   לפני 
 it: prima del
 nl: voor
 pt: antes de
@@ -722,6 +784,7 @@ en: begin
 eo: komenko
 es: principio
 fr: d&eacute;but
+he:   התחיל 
 it: inizio
 nl: begin
 pt: comeחo
@@ -733,6 +796,7 @@ en: between
 eo: inter
 es: entre
 fr: entre
+he:  בין 
 it: tra
 nl: tussen
 pt: entre
@@ -744,6 +808,7 @@ en: birth
 eo: naskigxo
 es: nacimiento
 fr: naissance
+he:   לידה 
 it: nascita
 nl: geboorte
 pt: nascimento
@@ -755,6 +820,7 @@ en: birthdays
 eo: naskigxtagoj
 es: cumplea&ntilde;os
 fr: anniversaires
+he:   ימי הולדת 
 it: compleanni
 nl: verjaardagen
 pt: anivers&aacute;rios
@@ -767,6 +833,7 @@ en: born
 eo: naskigxita
 es: nacido/nacida/nacido(a)
 fr: n&eacute;/n&eacute;e/n&eacute;(e)
+he:  נלד/נלדה
 it: nato/nata/nato(a)
 nl: geboren
 pt: nacido/nacida/nacido(a)
@@ -778,6 +845,7 @@ en: branch/branches
 eo: brancxo/brancxoj
 es: rama/ramas
 fr: branche/branches
+he:  ענף/ענפים
 it: ramo/rami
 nl: tak/takken
 pt: rama/ramas
@@ -788,6 +856,7 @@ de: Beisetzung
 en: burial
 es: entierro
 fr: enterrement
+he:  קבורה
 it: sepoltura
 nl: begrafenis
 pt: enterro
@@ -798,6 +867,7 @@ de: beigesetzt
 en: buried
 es: nterrado/nterrada/nterrado(a)
 fr: enterr&eacute;/enterr&eacute;e/enterr&eacute;(e)
+he:  קבור/קבורה
 it: sepolto/sepolta/sepolto(a)
 nl: begraven
 pt: enterrado/enterrada/enterrado(a)
@@ -808,6 +878,7 @@ de: Datenbank nicht erreichbar
 en: cannot access base
 es: no se puede acceder a la base
 fr: impossible d'acc&eacute;der &agrave; la base
+he:  אין כניסה למאגר המידע הזה
 nl: geen toegang tot bestand
 pt: n&atilde;o se pode acceder a base
 se: kan inte n&aring; databasen
@@ -818,6 +889,7 @@ en: cannot change sex of a married person
 eo: ne povas aliigi sekso de edzita persono
 es: no se puede modificar el sexo de una persona casada
 fr: on ne peut pas changer le sexe d'une personne mari&eacute;e
+he:  אין אפשרות לשנות מין של אדם נשוי
 it: non si pu&ograve; cambiare il sesso di una persona sposata
 nl: kan het geslacht van een gehuwd persoon niet veranderen
 pt: n&atilde;o se pode modificar o sexo de uma pessoa casada
@@ -828,6 +900,7 @@ de: Reihenfolge der Kinder gewechselt
 en: changed order of children
 es: cambiado del orden de los hijos
 fr: changement de l'ordre des enfants
+he:  סדר הילדים השתנה
 nl: veranderd de volgorde der kinderen
 pt: cambio da ordem dos filhos
 se: &auml;ndrade ordningen f&ouml;r barnen
@@ -839,6 +912,7 @@ en: child/children
 eo: infano/infanoj
 es: hijo/hijos
 fr: enfant/enfants
+he:    ילד/ילדים‎
 it: figlio/figli
 nl: kind/kinderen
 pt: filho/filhos
@@ -850,6 +924,7 @@ en: click
 eo: clika
 es: cliquear
 fr: cliquez
+he:   לחץ
 it: seleziona
 nl: druk
 pt: clicar
@@ -861,6 +936,7 @@ en: comment
 eo: komento
 es: comentario
 fr: commentaire
+he:   הערה 
 it: commento
 nl: Kommentaar
 pt: commentario
@@ -872,6 +948,7 @@ en: consanguinity
 eo: samsangeco
 es: consanguinidad
 fr: consanguinit&eacute;
+he:   קשר דם  
 it: consanguineit&agrave;
 nl: bloed verwantschap
 pt: consanguinidade
@@ -881,6 +958,7 @@ se: sl&auml;ktskap
 de: Zusammenf&uuml;hrung fortsetzen
 en: continue merging
 es: contin&uacute;e fusi&oacute;n
+he:  להמשיך לאחד
 fr: continuer &agrave; fusionner
 nl: verdergaan met samenvoegen
 pt: continuar fus&atilde;o
@@ -892,6 +970,7 @@ en: cousins
 eo: kuzoj
 es: primos
 fr: cousins
+he:  ‎ בני דודים‎
 it: cugini
 nl: neven en nichten
 pt: primos
@@ -902,6 +981,7 @@ de: erzeugen
 en: create
 es: crear
 fr: cr&eacute;er
+he:  עשה
 it: creare
 nl: maken
 pt: crear
@@ -923,6 +1003,7 @@ en: date (d/m/y)
 eo: dato
 es: fecha
 fr: date
+he:   תאריך 
 it: data
 nl: datum
 pt: data
@@ -934,6 +1015,7 @@ en: days old
 eo: tagoj
 es: dias
 fr: jours
+he:   ימים 
 it: giorni
 nl: dagen oud
 pt: dias
@@ -945,6 +1027,7 @@ en: dead young
 eo: morta juna
 es: muerto joven/muerta joven/muerto(a) joven
 fr: mort jeune/morte jeune/mort(e) jeune
+he:    נפטר בגיל צעיר/נפטרה בגיל צעיר 
 it: morto giovane
 nl: jong gestorven
 pt: morto jovem/morta jovem/morto(a) jovem
@@ -956,6 +1039,7 @@ en: death
 eo: morto
 es: muerte
 fr: d&eacute;c&egrave;s
+he:   מוות 
 it: morto
 nl: overlijden
 pt: morte
@@ -968,6 +1052,7 @@ en: death age:
 eo: agxo de morto:
 es: a la edad de
 fr: &agrave; l'&acirc;ge de
+he:   גיל במותו/גיל במותה
 it: all'et&agrave; di
 nl: leeftijd bij overlijden:
 pt: na idade de
@@ -979,6 +1064,7 @@ en: delete
 eo: malkonstrui +decl
 es: borrar
 fr: supprimer
+he:   מחיקה 
 it: cancellare
 nl: verwijder
 pt: borrar
@@ -991,6 +1077,7 @@ en: descendants
 eo: posteuloj
 es: descendientes
 fr: descendants
+he:   צאצאים
 it: discendenti
 nl: nakomelingen
 pt: descendentes
@@ -1003,6 +1090,7 @@ en: died
 eo: morta
 es: fallecido/fallecida/fallecido(a)
 fr: d&eacute;c&eacute;d&eacute;/d&eacute;c&eacute;d&eacute;e/d&eacute;c&eacute;d&eacute;(e)
+he:     נפטר/נפטרה
 it: deceduto/deceduta/deceduto(a)
 nl: gestorven
 pt: falecido/falecida/falecido(a)
@@ -1014,6 +1102,7 @@ en: disappeared
 eo: malaperita
 es: desaperecido/desaperecida/desaperecido(a)
 fr: disparu/disparue/disparu(e)
+he:  נעלם/נעלמה/נעלם
 it: scomparso/scomparsa/scomparso(a)
 nl: verdwenen
 pt: desaperecido/desaperecida/desaperecido(a)
@@ -1025,6 +1114,7 @@ en: divorce
 eo: eksedzigxo
 es: divorcio
 fr: divorce
+he:   גירושין 
 it: divorzio
 nl: scheiding
 pt: divorcio
@@ -1036,6 +1126,7 @@ en: divorced
 eo: eksedzigxitaj
 es: divorciados
 fr: divorc&eacute;s
+he:   גרושים 
 it: divorziati
 nl: gescheiden
 pt: divorceados
@@ -1047,6 +1138,7 @@ en: don't know
 eo: ne scias
 es: no se
 fr: ne sais pas
+he:   לא יודע 
 it: non si sa
 nl: onbekend
 pt: n&atilde;o sei
@@ -1058,6 +1150,7 @@ en: end
 eo: fino
 es: fin
 fr: fin
+he:   סוף
 it: fine
 nl: Einde
 pt: fim
@@ -1069,6 +1162,7 @@ en: error
 eo: eraro
 es: error
 fr: erreur
+he:  שגיאה
 it: errore
 nl: fout
 pt: error
@@ -1080,6 +1174,7 @@ en: exact
 eo: ekzakta
 es: exacto
 fr: exact
+he:  מדויק
 it: esatto
 nl: precies
 pt: exacto
@@ -1091,6 +1186,7 @@ en: executed
 eo: ekzekutita
 es: ejecutado/ejecutada/ejecutado(a)
 fr: ex&eacute;cut&eacute;/ex&eacute;cut&eacute;e/ex&eacute;cut&eacute;(e)
+he:  נהרג בצו/נהרגה בצו
 it: giustiziato/giustiziato/giustiziato(a)
 nl: ge-exekuteerd
 pt: ejecutado/ejecutada/ejecutado(a)
@@ -1102,6 +1198,7 @@ en: families with encoding
 eo: familioj kun kodagxo
 es: familias con c&oacute;digo
 fr: familles avec codage
+he:  משפחות עם קודים
 it: famiglia con codice
 nl: families met kode
 pt: familias con cףdigo
@@ -1113,6 +1210,7 @@ en: family added
 eo: familio aldonita
 es: familia ingresada
 fr: famille ajout&eacute;e
+he:  משפחה הוספה
 it: famiglia aggiunta
 nl: familie toegevoegd
 pt: fam&iacute;lia adicionada
@@ -1124,6 +1222,7 @@ en: family deleted
 eo: familio malkonstruita
 es: familia borrada
 fr: famille supprim&eacute;e
+he:  משפמה נמחקה
 it: famiglia cancellata
 nl: familie verwijderd
 pt: fam&iacute;lia suprimida
@@ -1135,6 +1234,7 @@ en: family modified
 eo: familio modifita
 es: familia modificada
 fr: famille modifi&eacute;e
+he:  משפחה השתנה
 it: famiglia modificata
 nl: familie veranderd
 pt: fam&iacute;lia modificada
@@ -1146,6 +1246,7 @@ en: family/families
 eo: familio/familioj
 es: familia/familias
 fr: famille/familles
+he:   משפחה/משפחות 
 it: famiglia/famiglia
 nl: familie/families
 pt: fam&iacute;lia/fam&iacute;lias
@@ -1157,6 +1258,7 @@ en: father/mother
 eo: patro/patrino
 es: padre/madre
 fr: p&egrave;re/m&egrave;re
+he:   אב/אם 
 it: padre/madre
 nl: vader/moeder
 pt: pai/m&atilde;e
@@ -1168,6 +1270,7 @@ en: first free number
 eo: una dispona nombro
 es: primer n&uacute;mero libre
 fr: premier num&eacute;ro libre
+he:  המספר חופשי הראשון
 it: primo numero disponibile
 nl: eerste vrij nummer
 pt: primer n&uacute;mero libre
@@ -1179,6 +1282,7 @@ en: first name alias
 eo: personnomo aliaso
 es: nombre alias
 fr: autre(s) pr&eacute;nom(s)
+he:  שם פרטי אחר
 it: alias del nome
 nl: alias voor voornaam
 pt: outro nome
@@ -1190,6 +1294,7 @@ en: first name missing
 eo: personnomo maltrafanta
 es: falta nombre
 fr: pr&eacute;nom manquant
+he:  שם פרטי חסר
 it: manca il nome
 nl: voornaam ontbreekt
 pt: falta o nome
@@ -1201,6 +1306,7 @@ en: first name not found
 eo: personnomo ne trovita
 es: nombre no encontrado
 fr: pr&eacute;nom pas trouv&eacute;
+he:  שם פרטי לא נמצא
 it: nome non trovato
 nl: voornaam niet gevonden
 pt: nome n&atilde;o encontrado
@@ -1213,6 +1319,7 @@ en: first name/first names
 eo: personnomo/personnomoj
 es: nombre/nombres
 fr: pr&eacute;nom/pr&eacute;noms
+he:  שם פרטי/שמות פרטיים
 it: nome/nomi
 nl: voornaam/voornamen
 pt: nome/nomes
@@ -1224,6 +1331,7 @@ en: for the first names by alphabetic order
 eo: por la personnomoj por alfabetic ordo
 es: por los nombres por orden alfab&eacute;tico
 fr: pour les pr&eacute;noms par ordre alphab&eacute;tique
+he:  לשמות הפרטיים בסדר אלף-בת
 it: per il primo nome in ordine alfabetico
 nl: dit geeft de voornamen in alfabetische volgorde
 pt: por os nomes por ordem alfab&eacute;tico
@@ -1235,6 +1343,7 @@ en: generation
 eo: generacio
 es: generaci&oacute;n
 fr: g&eacute;n&eacute;ration
+he:   דור 
 it: generazione
 nl: generatie
 pt: geraח&atilde;o
@@ -1246,6 +1355,7 @@ en: grand-parents
 eo: geavoj
 es: abuelos
 fr: des grands-parents
+he:   סבים
 it: nonni
 nl: grootouders
 pt: avos
@@ -1257,6 +1367,7 @@ en: great-grand-parents
 eo: gepraavoj
 es: bisabuelos
 fr: des arri&egrave;re-grands-parents
+he:   רב-סבים 
 it: bisnonni
 nl: overgrootouders
 pt: bisavos
@@ -1268,6 +1379,7 @@ en: happy birthday to you!
 eo: felicxan datrevenon!
 es: &iexcl;felicidades!
 fr: bon anniversaire!
+he:   יום הולדת סמח
 it: buon compleanno!
 nl: van harte gefeliciteerd!
 pt: feliz anivers&aacute;rio!
@@ -1280,6 +1392,7 @@ en: with
 eo: kun
 es: con
 fr: dont
+he:   עם ילדים‎
 it: con
 nl: hier uit
 pt: com
@@ -1291,6 +1404,7 @@ en: here
 eo: tie
 es: aqui
 fr: ici
+he:   כאן 
 it: qui
 nl: hier
 pt: aqui
@@ -1302,6 +1416,7 @@ en: him/her
 eo: li/sxi
 es: &eacute;l/ella
 fr: lui/elle
+he:   אותו/אותה 
 it: lui/lei
 nl: zijn/haar
 pt: el/ela
@@ -1313,6 +1428,7 @@ en: his wife/her husband
 eo: lia edzino/sxia edzo
 es: su esposa/su esposo
 fr: son &eacute;pouse/son &eacute;poux
+he:   אשתו/בעלה 
 it: sua moglie/suo marito
 nl: zijn vrouw/haar echtgenoot
 pt: sua esposa/seu marido
@@ -1324,6 +1440,7 @@ en: husband/wife
 eo: edzo/edzino
 es: esposo/esposa
 fr: &eacute;poux/&eacute;pouse
+he:   בעל/אשה 
 it: marito/moglie
 nl: echtgenoot/echtgenote
 pt: marido/esposa
@@ -1333,6 +1450,7 @@ se: man/hustru
 de: eingeschr&auml;nkt
 en: if titles
 es: si t&iacute;tulos
+he:  אם בעל(ת) תואר
 fr: si titres
 nl: als titels
 pt: si t&iacute;tulos
@@ -1345,6 +1463,7 @@ en: in
 eo: en
 es: en
 fr: en
+he:   ב-
 it: in
 nl: in
 pt: em
@@ -1357,6 +1476,7 @@ en: in
 eo: en
 es: en
 fr: en
+he: ‎ ב-‎
 it: nel
 nl: in
 pt: em
@@ -1377,6 +1497,7 @@ en: incorrect date
 eo: malkorekta dato
 es: fecha incorrecta
 fr: date incorrecte
+he:  בתאריך שגוי
 it: data incorretta
 nl: verkeerde datum
 pt: data incorecta
@@ -1388,6 +1509,7 @@ en: incorrect request
 eo: malkorekta rekesto
 es: consulta incorrecta
 fr: requ&ecirc;te incorrecte
+he:  בקשה שגויה 
 it: richiesta incorretta
 nl: verkeerd verzoek
 pt: consulta incorecta
@@ -1399,6 +1521,7 @@ en: indeed,
 eo: ja,
 es: en efecto,
 fr: en effet,
+he:   לכן
 it: infatti,
 nl: inderdaad:
 pt: em efecto
@@ -1410,6 +1533,7 @@ en: index of the descendants
 eo: indekso de la posteuloj
 es: index de los descendientes
 fr: index des descendants
+he:  מפתח הצאצאים
 it: indice dei discendenti
 nl: index van de nakomelingen
 pt: index dos descendentes
@@ -1421,6 +1545,7 @@ en: index of the spouses (non descendants)
 eo: indekso de la geedzoj (ne posteuloj)
 es: index de los c&oacute;njuges (no descendientes)
 fr: index des conjoints (non descendants)
+he:  מפתח בני הזוג שאינם צאצאים
 it: indice dei coniugi (non discendenti)
 nl: index van echtgenoten (geen nakomelingen)
 pt: index dos cפnjuges (n&atilde;o descendentes)
@@ -1431,6 +1556,7 @@ de: einf&uuml;gen
 en: insert
 eo: inseri +decl
 es: insertar
+he:  להכניס
 fr: ins&eacute;rer
 nl: invoegen
 pt: inserir
@@ -1453,6 +1579,7 @@ en: is a very young parent
 eo: estas tro juna gepatro
 es: es un padre demasiado joven
 fr: est vraiment un parent tr&egrave;s jeune
+he:  הורה מאוד צעיר
 it: &egrave; veramente un genitore molto giovane
 nl: is een jonge ouder
 pt: &eacute; um pai demais jovem
@@ -1464,6 +1591,7 @@ en: is born after his/her child
 eo: naskigxis post lia/sxia infano
 es: ha nacido(a) despu&eacute;s de su hijo
 fr: est n&eacute;(e) apr&egrave;s son enfant
+he:  נלד אחרי ילדו/נלדה אחרי ילדה
 it: sarebbe nato/a dopo i suoi figli
 nl: zal geboren worden na zijn/haar kind
 pt: ha nacido(a) depois do seu filho
@@ -1475,6 +1603,7 @@ en: it is the same person!
 eo: estas la sama persono!
 es: &iexcl;es la misma persona!
 fr: c'est la m&ecirc;me personne!
+he:  אותו האדם
 it: &egrave; la stessa persona!
 nl: het is dezelfde persoon!
 pt: &eacute; a mesma pessoa !
@@ -1486,6 +1615,7 @@ en: killed
 eo: mortigxita
 es: muerto/muerta/muerto(a)
 fr: tu&eacute;/tu&eacute;e/tu&eacute;(e)
+he:   נפל/נפלה
 it: ucciso/uccisa/ucciso(a)
 nl: gesneuveld
 pt: morto/morta/morto(a)
@@ -1497,6 +1627,7 @@ en: less than one month old
 eo: malpli de un monato
 es: menos de un mes
 fr: moins d'un mois
+he:  פחות מחודש בגיל
 it: meno di un mese
 nl: minder dan een maand oud
 pt: menos de um mךs
@@ -1508,6 +1639,7 @@ en: less than one year old
 eo: malpli de un jaro
 es: menos de un a&ntilde;o
 fr: moins d'un an
+he:  פחות משנה בגיל
 it: meno di un anno
 nl: minder dan een jaar oud
 pt: menos de um ano
@@ -1517,6 +1649,7 @@ se: mindre &auml;n ett &aring;r gammal
 de: verbinden
 en: link
 es: reunir
+he:  קשר
 fr: relier
 nl: konnektie
 pt: reunir
@@ -1528,6 +1661,7 @@ en: link between
 eo: cxenero inter
 es: relaci&oacute;n entre
 fr: lien entre
+he:  קשר בין
 it: legame tra
 nl: konnektie tussen
 pt: relaח&atilde;o entre
@@ -1539,6 +1673,7 @@ en: list
 eo: tabelo
 es: lista
 fr: liste
+he:  רשימה
 it: lista
 nl: lijst
 pt: lista
@@ -1550,6 +1685,7 @@ en: main title
 eo: cxefa mosxto
 es: t&iacute;tulo principal
 fr: titre principal
+he:   תואר ראשית
 it: titolo principale
 nl: voornaamste titel
 pt: t&iacute;tulo principal
@@ -1559,6 +1695,7 @@ se: huvudtitel
 de: Heirat von %t nach seinem/ihrem Tod
 en: marriage of %t after his/her death
 es: casamiento de %t despu&eacute;s de su muerte
+he:  נישואין של %t אחרי מותו/מותה
 fr: mariage de %t apr&egrave;s sa mort
 nl: huwelijk van %t na zijn/haar dood
 pt: casamento de %t depois da sua morte
@@ -1568,6 +1705,7 @@ se: gifterm&aring;l med %t efter hans/hennes d&ouml;d
 de: Heirat von %t vor seiner/ihrer Geburt
 en: marriage of %t before his/her birth
 es: casamiento de %t antes de su nacimiento
+he:  נישואין של %t לפני הולדתו/הולדתה
 fr: mariage de %t avant sa naissance
 nl: huwelijk van %t voor zijn/haar geboorte
 pt: casamento de %t antes do seu nascimento
@@ -1580,6 +1718,7 @@ en: marriage/marriages
 eo: edzigxo/edzigxoj
 es: casamiento/casamientos
 fr: mariage/mariages
+he:   נישואין‎
 it: matrimonio/matrimoni
 nl: huwelijk/huwelijken
 pt: casamento/casamentos
@@ -1589,6 +1728,7 @@ se: gifterm&aring;l/gifterm&aring;l
 de: verheiratet mit %t Jahren
 en: married at age %t
 es: casado a la edad de %t
+he:  התחתן בגיל %t
 fr: mari&eacute;(e) &agrave; l'&agrave;ge de %t
 nl: gehuwd op de leeftijd van %t
 pt: casado com a idade de %t
@@ -1598,6 +1738,7 @@ se: gift vid %t &aring;lder
 de: Maximal %d Generationen
 en: max %d generations
 es: maximum %d generaci&oacute;ns
+he:  מקסימום %d דורות
 fr: max %d g&eacute;n&eacute;rations
 nl: maximaal %d generaties
 pt: maximum %d geraח&otilde;es
@@ -1609,6 +1750,7 @@ en: maybe
 eo: eble
 es: possiblemente
 fr: peut-&ecirc;tre
+he:  אולי
 it: forse
 nl: waarschijnlijk
 pt: possivelmente
@@ -1619,6 +1761,7 @@ de: zusammenf&uuml;hren
 en: merge
 eo: fuzii +decl
 es: fusionar
+he:  איחוד
 fr: fusionner
 nl: samenvoegen
 pt: fus&atilde;o
@@ -1628,6 +1771,7 @@ se: sl&aring;samman
 de: Zusammenf&uuml;hrung abgeschlossen
 en: merge done
 es: fusi&oacute;n hecha
+he:  האיחוד בוצע
 fr: fusion termin&eacute;e
 nl: samenvoeging is gedaan
 pt: fus&atilde;o terminada
@@ -1637,6 +1781,7 @@ se: sammanslagning klar
 de: fehlende Vorfahren
 en: missing ancestors
 es: ascendientes faltandos
+he:  אבות חסרים
 fr: ascendants manquants
 nl: ontbrekende voorouders
 pt: ascendentes faltando
@@ -1648,6 +1793,7 @@ en: modify
 eo: modifi +decl
 es: modificar
 fr: modifier
+he:  לשנות
 it: modificare
 nl: wijzig
 pt: modificar
@@ -1659,6 +1805,7 @@ en: months old
 eo: monato
 es: mes
 fr: mois
+he:  חדשים
 it: mesi
 nl: maanden oud
 pt: meses
@@ -1668,6 +1815,7 @@ se: m&aring;nader gammal
 de: mehr als %d Antworten
 en: more than %d answers
 es: m&aacute;s de %d respuestas
+he:  יותר מ-%d תשובות
 fr: plus de %d r&eacute;ponses
 nl: meer dan %d antwoorden
 pt: m&aacute;s de %d respostas
@@ -1679,6 +1827,7 @@ en: murdered
 eo: murdita
 es: asesinado/asesinada/asesinado(a)
 fr: assassin&eacute;/assassin&eacute;e/assassin&eacute;(e)
+he:   נרצח/נרצחה
 it: assassinato/assassinata/assassinato(a)
 nl: vermoord
 pt: asesinado/asesinada/asesinado(a)
@@ -1693,6 +1842,7 @@ en: name
 eo: nomo
 es: nombre
 fr: nom
+he:  שם
 it: nome
 nl: naam
 pt: apelido
@@ -1704,6 +1854,7 @@ en: name "%s.%d %s" already used by %tthis person%t
 eo: nomo "%s.%d %s" jam uzata por %ttiu cxi persono%t
 es: nombre "%s.%d %s" ya utilizado por %testa persona%t
 fr: nom "%s.%d %s" d&eacute;j&agrave; utilis&eacute; par %tcette personne%t
+he:  השם "%s.%d %s" בשימוש כבר ע"י %tאדם זה%t
 it: nome "%s.%d %s" gi&agrave; utilizzato da %tquesta persona%t
 nl: naam "%s.%d %s" is al gebruikt door %tdit persoon%t
 pt: apelido "%s.%d %s" j&aacute; utilizado por %testa persona%t
@@ -1714,6 +1865,7 @@ de: Navigation mit %t als Sosareferenz
 en: navigation with %t as Sosa reference
 es: navegaci&oacute;n con %t como referencia de Sosa
 fr: navigation avec %t comme r&eacute;f&eacute;rence Sosa
+he:  ניוות עם %t כאזכור Sosa
 it: percorso con %t come riferimento Sosa
 nl: navigatie met %t als proband
 pt: navega&ccedil;a&atilde;o com o %t como a refer&ecirc;ncia Sosa
@@ -1758,6 +1910,7 @@ en: no known relationship link between %t and %t
 eo: ne sciita cxenero de parenceco inter %t kaj %t
 es: no grado de parentesco conocido entre %t y %t
 fr: pas de lien de parent&eacute; connu entre %t et %t
+he:    אין קשר דם בין%t  ו-%t
 it: nessun legame di parentela conosciuto tra %t e %t
 nl: er is geen bekende verwantschap tussen %t en %t
 pt: nenhum grau de parentesco conhecido entre %t y %t
@@ -1778,6 +1931,7 @@ en: not dead
 eo: no morta
 es: no fallecido/no fallecida/no fallecido(a)
 fr: non d&eacute;c&eacute;d&eacute;/non d&eacute;c&eacute;d&eacute;e/non d&eacute;c&eacute;d&eacute;(e)
+he:  לא מת
 it: non deceduto/non deceduta/non deceduto(a)
 nl: niet overleden
 pt: n&atilde;o falecido/n&atilde;o falecida/n&atilde;o falecido(a)
@@ -1789,6 +1943,7 @@ en: not divorced
 eo: ne eksedzigxitaj
 es: no divorciado
 fr: non divorc&eacute;s
+he:  לא גרושים
 it: non divorziati
 nl: niet gescheiden
 pt: n&atilde;o divorceado
@@ -1800,6 +1955,7 @@ en: not found
 eo: ne trovita
 es: no encontrado
 fr: pas trouv&eacute;
+he:  לא נמצא
 it: non trovato
 nl: niet gevonden
 pt: n&atilde;o encontrado
@@ -1812,6 +1968,7 @@ en: note/notes
 eo: noto/notoj
 es: nota/notas
 fr: note/notes
+he:  הערות
 it: nota/note
 nl: aantekening/aantekeningen
 pt: nota/notas
@@ -1823,6 +1980,7 @@ en: nth/1st/2nd/3rd/4th/5th/6th/7th/8th/9th/10th/11th/12th/13th/14th/15th/16th/1
 eo: n-a/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/21a/22a/23a/24a/25a/26a/27a/28a/29a/30a/31a/32a/33a/34a/35a/36a/37a/38a/39a/40a/41a/42a/43a/44a/45a/46a/47a/48a/49a/50a/51a/52a/53a/54a/55a/56a/57a/58a/59a/60a/61a/62a/63a/64a/65a/66a/67a/68a/69a/70a/71a/72a/73a/74a/75a/76a/77a/78a/79a/80a/81a/82a/83a/84a/85a/86a/87a/88a/89a/90a/91a/92a/93a/94a/95a/96a/97a/98a/99a
 es: n-&eacute;simo/1ro/2ndo/3ro/4rto/5to/6to/7mo/8vo/9no/10mo/11mo/12mo/13mo/14mo/15mo/16mo/17mo/18mo/19mo/20mo/21mo/22mo/23mo/24mo/25mo/26mo/27mo/28mo/29mo/30mo/31mo/32mo/33mo/34mo/35mo/36mo/37mo/38mo/39mo/40mo/41mo/42mo/43mo/44mo/45mo/46mo/47mo/48mo/49mo/50mo/51mo/52mo/53mo/54mo/55mo/56mo/57mo/58mo/59mo/60mo/61mo/62mo/63mo/64mo/65mo/66mo/67mo/68mo/69mo/70mo/71mo/72mo/73mo/74mo/75mo/76mo/77mo/78mo/79mo/80mo/81mo/82mo/83mo/84mo/85mo/86mo/87mo/88mo/89mo/90mo/91mo/92mo/93mo/94mo/95mo/96mo/97mo/98mo/99mo
 fr: n-i&egrave;me/1er/2e/3e/4e/5e/6e/7e/8e/9e/10e/11e/12e/13e/14e/15e/16e/17e/18e/19e/20e/21e/22e/23e/24e/25e/26e/27e/28e/29e/30e/31e/32e/33e/34e/35e/36e/37e/38e/39e/40e/41e/42e/43e/44e/45e/46e/47e/48e/49e/50e/51e/52e/53e/54e/55e/56e/57e/58e/59e/60e/61e/62e/63e/64e/65e/66e/67e/68e/69e/70e/71e/72e/73e/74e/75e/76e/77e/78e/79e/80e/81e/82e/83e/84e/85e/86e/87e/88e/89e/90e/91e/92e/93e/94e/95e/96e/97e/98e/99e/100e/101e/102e/103e/104e
+he:  הn/ראשון/שני/שלישי/רביעי/חמשי/שישי/שביעי/שמיני/תשיעי/עשירי/-11/-12/-13/-14/-15/-16
 it: n-esimo/1o/2o/3o/4o/5o/6o/7o/8o/9o/10o/11o/12o/13o/14o/15o/16o/17o/18o/19o/20o/21o/22o/23o/24o/25o/26o/27o/28o/29o/30o/31o/32o/33o/34o/35o/36o/37o/38o/39o/40o/41o/42o/43o/44o/45o/46o/47o/48o/49o/50o/51o/52o/53o/54o/55o/56o/57o/58o/59o/60o/61o/62o/63o/64o/65o/66o/67o/68o/69o/70o/71o/72o/73o/74o/75o/76o/77o/78o/79o/80o/81o/82o/83o/84o/85o/86o/87o/88o/89o/90o/91o/92o/93o/94o/95o/96o/97o/98o/99o
 nl: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
 pt: n-&eacute;simo/1ro/2ndo/3ro/4rto/5to/6to/7mo/8vo/9no/10mo/11mo/12mo/13mo/14mo/15mo/16mo/17mo/18mo/19mo/20mo/21mo/22mo/23mo/24mo/25mo/26mo/27mo/28mo/29mo/30mo/31mo/32mo/33mo/34mo/35mo/36mo/37mo/38mo/39mo/40mo/41mo/42mo/43mo/44mo/45mo/46mo/47mo/48mo/49mo/50mo/51mo/52mo/53mo/54mo/55mo/56mo/57mo/58mo/59mo/60mo/61mo/62mo/63mo/64mo/65mo/66mo/67mo/68mo/69mo/70mo/71mo/72mo/73mo/74mo/75mo/76mo/77mo/78mo/79mo/80mo/81mo/82mo/83mo/84mo/85mo/86mo/87mo/88mo/89mo/90mo/91mo/92mo/93mo/94mo/95mo/96mo/97mo/98mo/99mo
@@ -1831,10 +1989,12 @@ se: nte/1a/2a/3e/4e/5e/6e/7e/8e/9e/10e/11e/12e/13e/14e/15e/16e/17e/18e/19e/20e/2
     nth (degre)
 de: n-ten/1sten/2ten/3ten/4ten/5ten/6ten/7ten/8ten/9ten/10ten/11ten/12ten/13ten/14ten/15ten/16ten/17ten/18ten/19ten/20ten/21ten/22ten/23ten/24ten/25ten/26ten/27ten/28ten/29ten/30ten/31ten/32ten/33ten/34ten/35ten/36ten/37ten/38ten/39ten/40ten/41ten/42ten/43ten/44ten/45ten/46ten/47ten/48ten/49ten/50ten/51ten/52ten/53ten/54ten/55ten/56ten/57ten/58ten/59ten/60ten/61ten/62ten/63ten/64ten/65ten/66ten/67ten/68ten/69ten/70ten/71ten/72ten/73ten/74ten/75ten/76ten/77ten/78ten/79ten/80ten/81ten/82ten/83ten/84ten/85ten/86ten/87ten/88ten/89ten/90ten/91ten/92ten/93ten/94ten/95ten/96ten/97ten/98ten/99ten
 fr: n-i&egrave;me/1er/2e/3e/4e/5e/6e/7e/8e/9e/10e/11e/12e/13e/14e/15e/16e/17e/18e/19e/20e/21e/22e/23e/24e/25e/26e/27e/28e/29e/30e/31e/32e/33e/34e/35e/36e/37e/38e/39e/40e/41e/42e/43e/44e/45e/46e/47e/48e/49e/50e/51e/52e/53e/54e/55e/56e/57e/58e/59e/60e/61e/62e/63e/64e/65e/66e/67e/68e/69e/70e/71e/72e/73e/74e/75e/76e/77e/78e/79e/80e/81e/82e/83e/84e/85e/86e/87e/88e/89e/90e/91e/92e/93e/94e/95e/96e/97e/98e/99e
+he:  הn/ראשון/שני/שלישי/רביעי/חמשי/שישי/שביעי/שמיני/תשיעי/עשירי/-11/-12/-13/-14/-15/-16
 it: n-esimo/1o/2o/3o/4o/5o/6o/7o/8o/9o/10o/11o/12o/13o/14o/15o/16o/17o/18o/19o/20o/21o/22o/23o/24o/25o/26o/27o/28o/29o/30o/31o/32o/33o/34o/35o/36o/37o/38o/39o/40o/41o/42o/43o/44o/45o/46o/47o/48o/49o/50o/51o/52o/53o/54o/55o/56o/57o/58o/59o/60o/61o/62o/63o/64o/65o/66o/67o/68o/69o/70o/71o/72o/73o/74o/75o/76o/77o/78o/79o/80o/81o/82o/83o/84o/85o/86o/87o/88o/89o/90o/91o/92o/93o/94o/95o/96o/97o/98o/99o
 se: nte/1a/2a/3e/4e/5e/6e/7e/8e/9e/10e/11e/12e/13e/14e/15e/16e/17e/18e/19e/20e/21e/22e/23e/24e/25e/26e/27e/28e/29e/30e/31e/32e/33e/34e/35e/36e/37e/38e/39e/40e/41e/42e/43e/44e/45e/46e/47e/48e/49e/50e/51e/52e/53e/54e/55e/56e/57e/58e/59e/60e/61e/62e/63e/64e/65e/66e/67e/68e/69e/70e/71e/72e/73e/74e/75e/76e/77e/78e/79e/80e/81e/82e/83e/84e/85e/86e/87e/88e/89e/90e/91e/92e/93e/94e/95e/96e/97e/98e/99e/100e/103e/104e/105e/106e/107e/108e/109e
 
     nth (feminine)
+he:  הn/ראשונה/שנית/שלישית/רביעית/חמשית/שישית/שביעית/שמינית/תשיעית/עשירית/-11/-12/-13/-14/-15/-16
 pt: n-&eacute;sima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
 es: n-&eacute;sima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
 
@@ -1844,6 +2004,7 @@ en: nth/1st/2nd/3rd/4th/5th/6th/7th/8th/9th/10th/11th/12th/13th/14th/15th/16th/1
 eo: n-a/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/21a/22a/23a/24a/25a/26a/27a/28a/29a/30a/31a/32a/33a/34a/35a/36a/37a/38a/39a/40a/41a/42a/43a/44a/45a/46a/47a/48a/49a/50a/51a/52a/53a/54a/55a/56a/57a/58a/59a/60a/61a/62a/63a/64a/65a/66a/67a/68a/69a/70a/71a/72a/73a/74a/75a/76a/77a/78a/79a/80a/81a/82a/83a/84a/85a/86a/87a/88a/89a/90a/91a/92a/93a/94a/95a/96a/97a/98a/99a
 es: n-&eacute;sima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
 fr: n-i&egrave;me/1&egrave;re/2e/3e/4e/5e/6e/7e/8e/9e/10e/11e/12e/13e/14e/15e/16e/17e/18e/19e/20e/21e/22e/23e/24e/25e/26e/27e/28e/29e/30e/31e/32e/33e/34e/35e/36e/37e/38e/39e/40e/41e/42e/43e/44e/45e/46e/47e/48e/49e/50e/51e/52e/53e/54e/55e/56e/57e/58e/59e/60e/61e/62e/63e/64e/65e/66e/67e/68e/69e/70e/71e/72e/73e/74e/75e/76e/77e/78e/79e/80e/81e/82e/83e/84e/85e/86e/87e/88e/89e/90e/91e/92e/93e/94e/95e/96e/97e/98e/99e/100e/101e/102e/103e/104e/105e/106e/107e/108e/109e/110e/111e/112e/113e/114e/115e/116e/117e/118e/119e/120e/121e/122e/123e/124e/125e
+he:  הn/ראשון/שני/שלישי/רביעי/חמשי/שישי/שביעי/שמיני/תשיעי/עשירי/-11/-12/-13/-14/-15/-16
 it: n-esima/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/21a/22a/23a/24a/25a/26a/27a/28a/29a/30a/31a/32a/33a/34a/35a/36a/37a/38a/39a/40a/41a/42a/43a/44a/45a/46a/47a/48a/49a/50a/51a/52a/53a/54a/55a/56a/57a/58a/59a/60a/61a/62a/63a/64a/65a/66a/67a/68a/69a/70a/71a/72a/73a/74a/75a/76a/77a/78a/79a/80a/81a/82a/83a/84a/85a/86a/87a/88a/89a/90a/91a/92a/93a/94a/95a/96a/97a/98a/99a
 nl: n-te/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
 pt: n-&eacute;sima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
@@ -1855,6 +2016,7 @@ en: number
 eo: nombro
 es: n&uacute;mero
 fr: num&eacute;ro
+he:  מספר
 it: numero
 nl: aantal
 pt: n&uacute;mero
@@ -1866,6 +2028,7 @@ en: number of branches
 eo: nombro de brancxoj
 es: n&uacute;mero de ramas
 fr: nombre de branches
+he:  מספר ענפים
 it: numero di ramo
 nl: aantal takken
 pt: n&uacute;mero de ramas
@@ -1875,6 +2038,7 @@ se: antal grenar
 de: Beruf
 en: occupation
 es: ocupaci&oacute;n
+he:  מקצוע
 fr: occupation
 nl: beroep
 pt: ocupaח&atilde;o
@@ -1886,6 +2050,7 @@ en: of
 eo: de
 es: de
 fr: de/d'
+he:    של
 it: di/d'
 nl: van
 pt: de
@@ -1895,6 +2060,7 @@ se: till
 de: von %ts Seite
 en: of %t's side
 es: por parte de %t
+he:  בצד של %t
 fr: du c&ocirc;t&eacute; de %t
 nl: langs de zijde van %t
 pt: pelo lado de %t
@@ -1906,6 +2072,7 @@ en: of the %s generation
 eo: de la %s generacio
 es: a la %s generaci&oacute;n
 fr: &agrave; la %s g&eacute;n&eacute;ration
+he:   לדור  %s
 it: della %s generazione
 nl: van de %s generatie
 pt: a la %s geraח&atilde;o
@@ -1973,6 +2140,7 @@ en: on
 eo: en la
 es: el
 fr: le
+he:   ב‎-
 it: il
 nl: op
 pt: o
@@ -1984,6 +2152,7 @@ en: one day old
 eo: unu tago
 es: un dia
 fr: un jour
+he:  בן/בת יום
 it: un giorno
 nl: een dag oud
 pt: um dia
@@ -1995,6 +2164,7 @@ en: one month old
 eo: unu monato
 es: un mes
 fr: un mois
+he:  בן/בת חודש
 it: un mese
 nl: een maand oud
 pt: um mes
@@ -2006,6 +2176,7 @@ en: one year old
 eo: unu jaro
 es: un a&ntilde;o
 fr: un an
+he:  בן/בת שנה
 it: un anno
 nl: een jaar oud
 pt: um ano
@@ -2015,6 +2186,7 @@ se: ett &aring;r gammal
 de: nur die ausgew&auml;hlte Generation
 en: only the generation selected
 es: solamente la generaci&oacute;n elegida
+he:  דור הנבכר בלבד
 fr: seulement la g&eacute;n&eacute;ration s&eacute;lectionn&eacute;e
 nl: alleen de geselecteerde generatie
 pt: sף a geraח&atilde;o selecionada
@@ -2026,6 +2198,7 @@ en: or
 eo: aux
 es: o
 fr: ou
+he:  או
 it: o
 nl: of
 pt: o
@@ -2035,6 +2208,7 @@ se: eller
 de: oder benutzen Sie "verbinden" an Stelle von "erzeugen"
 en: or use "link" instead of "create"
 es: o utiliza "reunir" en lugar de "crear"
+he:  או להשתמש ב-"קשר" במקום "עשה"
 fr: ou bien utilisez "relier" au lieu de "cr&eacute;er"
 nl: of gebruik "konnektie" inplaats van "maken"
 pt: o use "reunir" ao lugar de "crear"
@@ -2043,10 +2217,12 @@ se: eller anv&auml;nd "l&auml;nk" ist&auml;llet f&ouml;r "skapa"
     parents
 cn: ¸¸ִ¸
 de: Eltern
+he:   ‎הורים‎ 
 en: parents
 eo: gepatroj
 es: padres
 fr: parents
+he:  הורים
 it: genitori
 nl: ouders
 pt: pais
@@ -2058,6 +2234,7 @@ en: person added
 eo: persono aldonita
 es: persona ingresada
 fr: personne ajout&eacute;e
+he:  אדם הוסף
 it: persona aggiunta
 nl: persoon toegevoegd
 pt: pessoa acrescentada
@@ -2069,6 +2246,7 @@ en: person deleted
 eo: persono malkonstruita
 es: persona borrada
 fr: personne supprim&eacute;e
+he:  אדם נמחק
 it: persona cancellata
 nl: persoon verwijderd
 pt: pessoa suprimida
@@ -2080,6 +2258,7 @@ en: person modified
 eo: persono modifita
 es: persona modificada
 fr: personne modifi&eacute;e
+he:  אדם השתנה
 it: persona modificata
 nl: persoon veranderd
 pt: pessoa modificada
@@ -2091,6 +2270,7 @@ en: person/persons
 eo: persono/personoj
 es: persona/personas
 fr: personne/personnes
+he:  אדם/אנשים
 it: persona/persone
 nl: persoon/personen
 pt: pessoa/pessoas
@@ -2101,6 +2281,7 @@ de: Personen haben denselben Namen
 en: persons having the same name
 eo: personaj kun sama nomo
 es: personas teniendo el mismo nombre
+he:  אנשים עם שם זהה
 fr: personnes ayant le m&ecirc;me nom
 nl: personen met dezelfde naam
 pt: pessoas com o mesmo apelido
@@ -2111,6 +2292,7 @@ de: Foto
 en: photo
 es: foto
 fr: photo
+he:  תמונה
 it: foto
 nl: foto
 pt: foto
@@ -2122,6 +2304,7 @@ en: place
 eo: loko
 es: lugar
 fr: lieu
+he:  ‎ מקום‎
 it: luogo
 nl: plaats
 pt: lugar
@@ -2143,6 +2326,7 @@ de: privat
 en: private
 es: privado
 fr: priv&eacute;
+he:  פרטי
 it: riservato
 nl: priv&eacute;
 pt: privado
@@ -2164,6 +2348,7 @@ en: public
 es: p&uacute;blico
 eo: publika
 fr: public
+he:  ציבורי
 it: pubblico
 nl: publieke
 pt: p&uacute;blico
@@ -2175,6 +2360,7 @@ en: public name
 eo: publika nomo
 es: sobrenombre
 fr: nom public
+he:  שם בציבור
 it: appellativo pubblico
 nl: publieke naam
 pt: apelido
@@ -2186,6 +2372,7 @@ en: qualifier
 eo: kromnomo
 es: apodo
 fr: qualificatif
+he:  כינוי
 it: soprannome
 nl: bijnaam
 pt: alcunha
@@ -2197,6 +2384,7 @@ en: relationship
 eo: parenceco
 es: parentesco
 fr: parent&eacute;
+he:   קשר משפחתי
 it: parentela
 nl: verwantschap
 pt: parentesco
@@ -2209,6 +2397,7 @@ en: relationship computing
 eo: komputo de parenceco
 es: c&aacute;lculo de parentesco
 fr: calcul de parent&eacute;
+he:  ‎ חישוב יחס משפחתי‎
 it: calcolo della parentela
 nl: verwantschap vaststellen
 pt: calc&uacute;lo de parentesco
@@ -2220,6 +2409,7 @@ en: relationship link/relationship links
 eo: cxenero de parenceco/cxeneroj de parenceco
 es: grado de parentesco/grados de parentesco
 fr: lien de parent&eacute;/liens de parent&eacute;
+he:  קשר משפחתי/קשרי משפחה
 it: grado di parentela/gradi di parentela
 nl: verwantschap/verwantschappen
 pt: grau de parentesco/graus de parentesco
@@ -2231,6 +2421,7 @@ en: see above
 eo: vidu supre
 es: ver m&aacute;s arriba
 fr: voir ci-dessus
+he:  הנ"ל
 it: vedi sopra
 nl: zie hierboven
 pt: ver encima
@@ -2242,6 +2433,7 @@ en: see further
 eo: vidu malsupre
 es: ver a continuaci&oacute;n
 fr: voir plus loin
+he:  כדלקמן
 it: vedi di seguito
 nl: zie verder
 pt: ver a continuaח&atilde;o
@@ -2252,6 +2444,7 @@ de: mehrere Antworten
 en: several answers
 es: varias respuestas
 fr: plusieurs r&eacute;ponses
+he:  כמה תשובות
 it: parecchie risposte
 nl: meerdere antwoorden
 pt: varias respostas
@@ -2263,6 +2456,7 @@ en: sex
 eo: sekso
 es: sexo
 fr: sexe
+he:  מין
 it: sesso
 nl: geslacht
 pt: sexo
@@ -2274,6 +2468,7 @@ en: should be female
 eo: devus havi sekso ina
 es: deber&iacute;a ser de sexo feminino
 fr: devrait &ecirc;tre de sexe f&eacute;mining
+he:  צריכה להיות נקבה
 it: dovrebbe essere di sesso femminile
 nl: moet vrouwelijk zijn
 pt: tendria que ser de sexo feminino
@@ -2285,6 +2480,7 @@ en: should be of male
 eo: devus havi sekso maskla
 es: deber&iacute;a ser de sexo masculino
 fr: devrait &ecirc;tre de sexe masculin
+he:  צריך להיות זכר
 it: dovrebbe essere di sesso maschile
 nl: moet mannelijk zijn
 pt: tendria que ser de sexo masculino
@@ -2296,6 +2492,7 @@ en: son/daughter/child
 eo: filo/filino/infano
 es: hijo/hija/hijo(a)
 fr: fils/fille/enfant
+he:  בן/בת/בן
 it: figlio/figlia/figlio(a)
 nl: zoon/dochter/kind
 pt: filho/filha/filho(a)
@@ -2306,6 +2503,7 @@ de: Quelle/Quellen
 en: source/sources
 es: fuente/fuentes
 fr: source/sources
+he:  מקורות
 it: sorgente/sorgenti
 nl: bron/bronnen
 pt: fonte/fontes
@@ -2318,6 +2516,7 @@ en: specify
 eo: specifu
 es: especificar
 fr: pr&eacute;cisez
+he:  פרט
 it: specificare
 nl: selecteer
 pt: especificar
@@ -2329,6 +2528,7 @@ en: spouse
 eo: edzo/edzino
 es: esposo/esposa
 fr: &eacute;poux/&eacute;pouse
+he:  בן-זוג/בת-זוג
 it: coniuge
 nl: echtgenoot/echtgenote
 pt: marido/esposa
@@ -2340,6 +2540,7 @@ en: spouses not included
 eo: geedzoj ne inkluzivitaj
 es: c&oacute;njuges no includos
 fr: conjoints non compris
+he:  בלי בני זוג
 it: coniugi esclusi
 nl: echtgenoten weggelaten
 pt: cפnjuges n&atilde;o inclu&iacute;dos
@@ -2351,6 +2552,7 @@ en: starting with
 eo: ekanta kun
 es: comenzando con
 fr: commen&ccedil;ant par
+he:  להתחיל מ-
 it: partendo da
 nl: begint met
 pt: comeחando com
@@ -2362,6 +2564,7 @@ en: surname alias
 eo: familinomo aliaso
 es: apellido alias
 fr: nom alias
+he:  שם משפחה אחר
 it: alias del cognome
 nl: alias voor familienaam
 pt: alias do apelido
@@ -2373,6 +2576,7 @@ en: surname missing
 eo: familinomo maltrafanta
 es: falta apellido
 fr: nom manquant
+he:  שם משפחה חסר
 it: cognome mancante
 nl: familienaam ontbreekt
 pt: falta apelido
@@ -2384,6 +2588,7 @@ en: surname not found
 eo: familinomo ne trovita
 es: apellido no encontrado
 fr: nom pas trouv&eacute;
+he:  שם משפחה לא נמצא
 it: cognome non trovato
 nl: familienaam niet gevonden
 pt: apelido n&atilde;o foi encontrado
@@ -2396,6 +2601,7 @@ en: surname/surnames
 eo: familinomo/familinomoj
 es: apellido/apellidos
 fr: nom/noms
+he:  שם משפחה/שמות משפחה
 it: cognome/cognomi
 nl: familienaam/familienamen
 pt: apelido/apelidos
@@ -2423,6 +2629,7 @@ se: omflyttning klar
 de: die Reihenfolge der folgenden Familien umkehren
 en: switch the order of the following families
 es: cambiar el orden de las familias siguientes
+he:  לשנות סדר המשפחות הבאות
 fr: intervertir l'ordre des familles suivantes
 nl: verander de volgorde van de volgende families
 pt: inverter a ordem das familias seguintes
@@ -2434,6 +2641,7 @@ en: the %d first names
 eo: la %d personaj nomoj
 es: los %d nombres
 fr: les %d pr&eacute;noms
+he:  שמות פרטיים %d הראשונים
 it: i %d nomi
 nl: de %d voornamen
 pt: os %d nomes
@@ -2445,6 +2653,7 @@ en: the %d surnames
 eo: la %d familinomoj
 es: los %d apellidos
 fr: les %d noms
+he:  %d שמות המשפחה
 it: i %d cognomi
 nl: de %d familienamen
 pt: os %d apelidos
@@ -2456,6 +2665,7 @@ en: the %s generation
 eo: la %s generacio
 es: la %s generaci&oacute;n
 fr: la %s g&eacute;n&eacute;ration
+he:   דור ה%s
 it: la %s generazione
 nl: de %s generatie
 pt: a %s geraח&atilde;o
@@ -2467,6 +2677,7 @@ en: the anniversary
 eo: la datreveno
 es: el aniversario
 fr: l'anniversaire
+he:  יום השנה
 it: l'anniversario
 nl: verjaardag
 pt: o anivers&aacute;rio
@@ -2478,6 +2689,7 @@ en: the anniversary of marriage
 eo: la datreveno de la edzigxo
 es: el aniversario de casamiento
 fr: l'anniversaire de mariage
+he:  יום הנישואין
 it: l'anniversario di matrimonio
 nl: huwelijks verjaardag
 pt: o anivers&aacute;rio de casamento
@@ -2498,6 +2710,7 @@ en: the birthday
 eo: la naskigxtagoj
 es: el cumplea&ntilde;os
 fr: l'anniversaire
+he:  יום הולדת
 it: il compleanno
 nl: de verjaardag
 pt: o anivers&aacute;rio
@@ -2509,6 +2722,7 @@ en: the children
 eo: la infanoj
 es: los hijos
 fr: les enfants
+he:  הילדים
 it: i figli
 nl: de kinderen
 pt: os filhos
@@ -2520,6 +2734,7 @@ en: the day after tomorrow
 eo: postmorgaux
 es: pasado ma&ntilde;ana
 fr: apr&egrave;s-demain
+he: מחרתיים
 it: dopo domani
 nl: overmorgen
 pt: depois de amanh&atilde;
@@ -2532,6 +2747,7 @@ en: the father/the mother/a parent
 eo: la patro/la patrino/gepatro
 es: el padre/la madre/un padre
 fr: le p&egrave;re/la m&egrave;re/un parent
+he:   האב/האם/הורה
 it: il padre/la madre/un genitore
 nl: de vader/de moeder/een ouder
 pt: o pai/a m&atilde;e/um pai
@@ -2553,6 +2769,7 @@ en: the following children of %t and %t are not in order
 eo: la malantauxa infanoj de %t kaj %t ne estas orde
 es: los seguientes hijos de %t y %t no est&aacute;n presentados en orden
 fr: les enfants suivants de %t et de %t ne sont pas dans l'ordre
+he:  הילדים של %t ו-%t לא בסדר נכון
 it: i seguenti figli di %t and %t non sono in ordine d'et&agrave;
 nl: de volgende kinderen van %t en %t staan niet in volgorde
 pt: os seguintes filhos de %t e %t n&atilde;o estan presentados em orden
@@ -2564,6 +2781,7 @@ en: the grandchildren
 eo: la nepoj
 es: los nietos
 fr: les petits enfants
+he:  הנכדים
 it: i nipoti
 nl: de kleinkinderen
 pt: os netos
@@ -2575,6 +2793,7 @@ en: the grandparents
 eo: la geavoj
 es: los abuelos
 fr: les grands-parents
+he: הסבים
 it: i nonni
 nl: de grootouders
 pt: os avos
@@ -2586,6 +2805,7 @@ en: the great-grandchildren
 eo: la gepranepoj
 es: los bisnietos
 fr: les arri&egrave;re-petits-enfants
+he:  הנינים
 it: i pronipoti
 nl: de achterkleinkinderen
 pt: os bisnetos
@@ -2597,6 +2817,7 @@ en: the great-grandparents
 eo: la gepraavoj
 es: los bisabuelos
 fr: les arri&egrave;re-grands-parents
+he:  הורים השלשים
 it: i bisnonni
 nl: de overgrootouders
 pt: os bisavos
@@ -2608,6 +2829,7 @@ en: the latest %d births
 eo: la finaj %d naskigxoj
 es: los %d nacimientos m&aacute;s recientes
 fr: les %d derni&egrave;res naissances
+he:  %d הלידות האחרונות
 it: le ultime %d nascite
 nl: de laatste %d geboorten
 pt: os %d nascimentos m&aacute;s recentes
@@ -2630,6 +2852,7 @@ en: the parents
 eo: la gepatroj
 es: los padres
 fr: les parents
+he:  ההורים
 it: i genitori
 nl: de ouders
 pt: os pais
@@ -2641,6 +2864,7 @@ en: the whole list
 eo: la tuta tabelo
 es: toda la lista
 fr: toute la liste
+he:  כל הרשימה
 it: la lista intera
 nl: de hele lijst
 pt: toda a lista
@@ -2652,6 +2876,7 @@ en: title/titles
 eo: mosxto/mosxtoj
 es: t&iacute;tulo/t&iacute;tulos
 fr: titre/titres
+he:  תואר/ תארים
 it: titolo/titoli
 nl: titel/titels
 pt: t&iacute;tulo/t&iacute;tulos
@@ -2663,6 +2888,7 @@ en: to the %s generation
 eo: gxis la %s generacio
 es: hasta la %s generaci&oacute;n
 fr: jusqu'&agrave; la %s g&eacute;n&eacute;ration
+he:  לדור ה%s
 it: fino alla %s generazione
 nl: tot de %s generatie
 pt: at&eacute; a %s geraח&atilde;o
@@ -2674,6 +2900,7 @@ en: to the children
 eo: gxis la infanoj
 es: hasta los hijos
 fr: jusqu'aux enfants
+he:  עד הילדים
 it: fino ai figli
 nl: tot de kinderen
 pt: at&eacute; os filhos
@@ -2685,6 +2912,7 @@ en: to the grandchildren
 eo: gxis la genepoj
 es: hasta los nietos
 fr: jusqu'aux petits-enfants
+he:  עד הנכדים
 it: fino ai nipoti
 nl: tot de kleinkinderen
 pt: at&eacute; os netos
@@ -2696,6 +2924,7 @@ en: to the grandparents
 eo: gxis la geavoj
 es: hasta los abuelos
 fr: jusqu'aux grands-parents
+he:  עד הסבים
 it: fino ai nonni
 nl: tot de grootouders
 pt: at&eacute; os avos
@@ -2707,6 +2936,7 @@ en: to the great-grandchildren
 eo: gxis la gepranepoj
 es: hasta los bisnietos
 fr: jusqu'aux arri&egrave;re-petits-enfants
+he:  עד הנינים
 it: fino ai bisnonni
 nl: tot de achterkleinkinderen
 pt: at&eacute; os bisnetos
@@ -2718,6 +2948,7 @@ en: to the great-grandparents
 eo: gxis la gepraavoj
 es: hasta los bisabuelos
 fr: jusqu'aux arri&egrave;re-grands-parents
+he:  עד ההורים השלישים
 it: fino ai bisnonni
 nl: tot de overgrootouders
 pt: at&eacute; os bisavos
@@ -2729,6 +2960,7 @@ en: to the parents
 eo: gxis la gepatroj
 es: hasta los padres
 fr: jusqu'aux parents
+he:  עד ההורים
 it: fino ai genitori
 nl: tot de ouders
 pt: at&eacute; os pais
@@ -2740,6 +2972,7 @@ en: today
 eo: hodiaux
 es: hoy
 fr: aujourd'hui
+he:  היום
 it: oggi
 nl: vandaag
 pt: hoje
@@ -2751,6 +2984,7 @@ en: tomorrow
 eo: morgaux
 es: ma&ntilde;ana
 fr: demain
+he:  מחר
 it: domani
 nl: morgen
 pt: amanha
@@ -2762,6 +2996,7 @@ en: total
 eo: totalo
 es: total
 fr: total
+he:  סה'כ 
 it: totale
 nl: totaal
 pt: total
@@ -2772,6 +3007,7 @@ de: unbekannte Person
 en: unknown person
 es: persona no conocida
 fr: personne inconnue
+he:  אדם לא ידוע
 it: sconosciuta persona
 nl: onbekend persoon
 pt: pessoa n&atilde;o conhecida
@@ -2783,6 +3019,7 @@ en: unspecified
 eo: no specifita
 es: no especificado
 fr: non pr&eacute;cis&eacute;
+he:  לא מפורט
 it: non specificato
 nl: onduidelijk
 pt: n&atilde;o especificado
@@ -2794,6 +3031,7 @@ en: up to
 eo: gxis
 es: hasta
 fr: jusqu'&agrave;
+he:  עד
 it: fino
 nl: tot
 pt: at&eacute;
@@ -2806,6 +3044,7 @@ en: update
 eo: gxisdatigo
 es: revisado
 fr: mise &agrave; jour
+he:  עדכן
 it: aggiornamento
 nl: wijzigen
 pt: revisado
@@ -2817,6 +3056,7 @@ en: warnings
 eo: avertoj
 es: advertencias
 fr: remarques
+he:  אזהרות
 it: avvertenze
 nl: waarschuwen
 pt: advertencias
@@ -2828,6 +3068,7 @@ en: with
 eo: kun
 es: con
 fr: avec
+he:  עם
 it: con
 nl: met
 pt: com
@@ -2851,6 +3092,7 @@ en: years old
 eo: jaroj
 es: a&ntilde;os
 fr: ans
+he: ‎ שנים‎ 
 it: anni
 nl: jaren oud
 pt: anos
@@ -2861,6 +3103,7 @@ de: Sie m&uuml;ssen erst zusammenf&uuml;hren
 en: you must first merge
 es: debe primero fusionar
 fr: vous devez d'abord fusionner
+he:  צריך לאחד קודם
 it: dovete in primo luogo fondere
 nl: je moet eerst samenvoegen
 pt: Voc&ecirc; tem que fusionar primeiro
@@ -2871,6 +3114,7 @@ de: Sie m&uuml;ssen erst beide Familien zusammenf&uuml;hren
 en: you must first merge the 2 families
 es: debe primero fusionar las 2 familias
 fr: vous devez d'abord fusionner les 2 familles
+he:  צריך לאחד קודם את 2 המשפחות 
 it: dovete in primo luogo fondere le 2 famiglie
 nl: je moet de twee families eerst samenvoegen
 pt: Voc&ecirc; tem que fusionar primeiro as 2 familias
