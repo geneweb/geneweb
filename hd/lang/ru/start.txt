@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.30 2000-11-06 10:37:07 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.31 2001-03-03 18:50:19 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogy - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -130,10 +130,10 @@ height=108 src="%o/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 - <input type=submit value="Ok">
 </form>
 
-<li>
+<!--<li>
 
 <font color=%i><b>через</b></font>
-<a href="%sm=H;v=advanced"><font color=%i><b>расширенный запрос</b></font></a>.
+<a href="%sm=H;v=advanced"><font color=%i><b>расширенный запрос</b></font></a>.-->
 
 </ul>
 </td></tr></table></center>
