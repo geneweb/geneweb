@@ -23,6 +23,8 @@ GeneWeb Version 4.10
     replaced with empty strings.
 
 * Setup program (gwsetup)
+  - [07 Mar 03] Fixed bug: the -lang parameter of gwsetup did not work
+    when option -daemon was set.
   - [12 Feb 03] Added double quotes around directories for information
     lines.
 
