@@ -12,15 +12,15 @@
 <td><a href="%glang=se"><img src="%gm=IM;v=l-se.gif" alt=se></a></td>
 </tr>
 <tr>
-<td align=center><a href="%glang=cn"><font size=-1>cn</font></a></td>
-<td align=center><a href="%glang=de"><font size=-1>de</font></a></td>
-<td align=center><a href="%glang=en"><font size=-1>en</font></a></td>
-<td align=center><a href="%glang=eo"><font size=-1>eo</font></a></td>
-<td align=center><a href="%glang=es"><font size=-1>es</font></a></td>
-<td align=center><a href="%glang=fr"><font size=-1>fr</font></a></td>
-<td align=center><a href="%glang=it"><font size=-1>it</font></a></td>
-<td align=center><a href="%glang=nl"><font size=-1>nl</font></a></td>
-<td align=center><a href="%glang=pt"><font size=-1>pt</font></a></td>
-<td align=center><a href="%glang=se"><font size=-1>se</font></a></td>
+<td align=center><font size=-1>cn</font></td>
+<td align=center><font size=-1>de</font></td>
+<td align=center><font size=-1>en</font></td>
+<td align=center><font size=-1>eo</font></td>
+<td align=center><font size=-1>es</font></td>
+<td align=center><font size=-1>fr</font></td>
+<td align=center><font size=-1>it</font></td>
+<td align=center><font size=-1>nl</font></td>
+<td align=center><font size=-1>pt</font></td>
+<td align=center><font size=-1>se</font></td>
 </tr>
 </table>
