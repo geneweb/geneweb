@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.9 2001-03-26 21:04:52 ddr Exp $ *)
+(* $Id: relation.ml,v 4.10 2001-03-27 04:43:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -622,11 +622,29 @@ value get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
         | [] -> [] ]
 ;
 
-value parents_label conf =
+value parents_label conf base info =
   fun
   [ 1 -> transl conf "the parents"
-  | 2 -> transl conf "grand-parents"
-  | 3 -> transl conf "great-grand-parents"
+  | 2 ->
+      let txt = transl conf "grand-parents" in
+      let is =
+        if nb_fields txt = 2 then
+          match get_piece_of_branch conf base info (1, 1) with
+          [ [ip1] -> if (poi base ip1).sex = Male then 0 else 1
+          | _ -> (* must be a bug *) 0 ]
+        else 0
+      in
+      nth_field txt is
+  | 3 ->
+      let txt = transl conf "great-grand-parents" in
+      let is =
+        if nb_fields txt = 2 then
+          match get_piece_of_branch conf base info (1, 1) with
+          [ [ip1] -> if (poi base ip1).sex = Male then 0 else 1
+          | _ -> (* must be a bug *) 0 ]
+        else 0
+      in
+      nth_field txt is
   | n ->
       transl conf "ancestors (some)" ^ " " ^
         Printf.sprintf (ftransl conf "of the %s generation")
@@ -653,8 +671,18 @@ value ancestor_label conf base info x sex =
       in
       nth_field txt is
   | 3 ->
-      transl_nth conf
-        "a great-grandfather/a great-grandmother/a great-grandparent" is
+      let txt =
+        transl conf
+          "a great-grandfather/a great-grandmother/a great-grandparent"
+      in
+      let is =
+        if nb_fields txt = 6 then
+          match get_piece_of_branch conf base info (1, 1) with
+          [ [ip1] -> if (poi base ip1).sex = Male then is else is + 3
+          | _ -> (* must be a bug *) is ]
+        else is
+      in
+      nth_field txt is
   | n ->
       transl_nth conf "an ancestor" is ^ " " ^
         Printf.sprintf (ftransl conf "of the %s generation")
@@ -743,7 +771,7 @@ value uncle_label conf base info x p =
       let is =
         if nb_fields txt == 4 then
           let info = (info, fun r -> r.Consang.lens1) in
-          match get_piece_of_branch conf base info (2, 2) with
+          match get_piece_of_branch conf base info (1, 1) with
           [ [ip1] -> if (poi base ip1).sex = Male then is else is + 2
           | _ -> (* must be a bug *) is ]
         else is
@@ -970,11 +998,10 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
      Wserver.wprint "%s %s\n" is_are (transl conf "at the same time");
   return
   let lab proj x =
+    let info = (((reltab, list), x), proj) in
     match list with
-    [ [(a, _)] ->
-        let info = (((reltab, list), x), proj) in
-        ancestor_label conf base info x a.sex
-    | _ -> parents_label conf x ]
+    [ [(a, _)] -> ancestor_label conf base info x a.sex
+    | _ -> parents_label conf base info x ]
   in
   do tag "ul" begin
        html_li conf;
