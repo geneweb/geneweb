@@ -2,6 +2,8 @@ GeneWeb version 2.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [Oct 5, 99] Fixed links problems in some pages from the DOC
+    link (some problems found in the Swedish version).
   - [Oct 5, 99] Added displaying of number of persons in ascends (short
     display).
   - [Oct 4, 99] Fixed displaying bug in update history (spot displayed due
