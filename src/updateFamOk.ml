@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.4 2000-01-10 02:14:42 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.5 2000-01-12 10:24:53 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -280,15 +280,20 @@ value effective_mod conf base sfam scpl sdes =
   let ocpl = coi base fi in
   let odes = doi base fi in
   let created_p = ref [] in
+  let psrc =
+    match p_getenv conf.env "psrc" with
+    [ Some s -> s
+    | None -> "" ]
+  in
   let nfam =
-    map_family_ps (Update.insert_person conf base "" created_p)
+    map_family_ps (Update.insert_person conf base psrc created_p)
       (Update.insert_string conf base) sfam
   in
   let ncpl =
-    map_couple_p (Update.insert_person conf base "" created_p) scpl
+    map_couple_p (Update.insert_person conf base psrc created_p) scpl
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base "" created_p) sdes
+    map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
 (*
   let ofath = poi base ocpl.father in
@@ -379,15 +384,20 @@ value effective_mod conf base sfam scpl sdes =
 value effective_add conf base sfam scpl sdes =
   let fi = Adef.ifam_of_int (base.data.families.len) in
   let created_p = ref [] in
+  let psrc =
+    match p_getenv conf.env "psrc" with
+    [ Some s -> s
+    | None -> "" ]
+  in
   let nfam =
-    map_family_ps (Update.insert_person conf base "" created_p)
+    map_family_ps (Update.insert_person conf base psrc created_p)
       (Update.insert_string conf base) sfam
   in
   let ncpl =
-    map_couple_p (Update.insert_person conf base "" created_p) scpl
+    map_couple_p (Update.insert_person conf base psrc created_p) scpl
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base "" created_p) sdes
+    map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
   let origin_file = infer_origin_file conf base ncpl ndes in
   let nfath_p = poi base ncpl.father in
