@@ -4,6 +4,9 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.11
 --------------------
 
+* Images
+  - [03 Feb 01] Installed a much smaller GeneWeb logo.
+
 * GeneWeb daemon/CGI (gwd)
   - [31 Jan 01] Changed default mac_anc_tree to 7 (instead of 5)
   - [20 Jan 01] Added request "m=KILL_ANC" to kill someone's ancestors.
