@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.14 2002-07-15 08:34:22 ddr Exp $
+# $Id: a.gwf,v 4.15 2002-08-31 08:58:50 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -124,8 +124,11 @@ max_desc_level=12
 # Maximum_level when displaying descendants by tree
 max_desc_tree=4
 
-# Maximum number of cousins displayed
+# Maximum number of displayed cousins
 max_cousins=2000
+
+# Maximum level of displayed cousins
+max_cousins_level=5
 
 # Number of latest events (birth, death) displayed
 latest_event=20
