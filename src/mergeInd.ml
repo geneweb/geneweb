@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 3.12 2000-11-04 10:18:01 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.13 2000-11-24 15:28:21 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -491,16 +491,22 @@ value print conf base =
       else if p1.sex <> p2.sex && p1.sex <> Neuter && p2.sex <> Neuter
       then different_sexes conf
       else
-        let (ok, changes_done) =
-          try_merge conf base [] p1.cle_index p2.cle_index False
-        in
-        do if changes_done then base.func.commit_patches () else ();
-           if ok then
-             let key = (sou base p1.first_name, sou base p1.surname, p1.occ) in
-             do History.record conf base key "fp";
-                print_merged conf base p1;
-             return ()
-           else ();
-        return ()
+        let bfile = Filename.concat Util.base_dir.val conf.bname in
+        lock (Iobase.lock_file bfile) with
+        [ Accept ->
+            let (ok, changes_done) =
+              try_merge conf base [] p1.cle_index p2.cle_index False
+            in
+            do if changes_done then base.func.commit_patches () else ();
+               if ok then
+                 let key =
+                   (sou base p1.first_name, sou base p1.surname, p1.occ)
+                 in
+                 do History.record conf base key "fp";
+                    print_merged conf base p1;
+                 return ()
+               else ();
+            return ()
+        | Refuse -> Update.error_locked conf base ]
   | _ -> not_found_or_incorrect conf ]
 ;
