@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.21 2001-09-19 11:19:31 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.22 2001-09-27 13:29:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -271,10 +271,7 @@ value substring_mem ss s =
 
 value eval_gen_bool_variable conf base env fcd =
   fun
-  [ "msie_5_0" ->
-      let agent = Wserver.extract_param "user-agent: " '\n' conf.request in
-      substring_mem " MSIE 5.0; " agent
-  | s ->
+  [ s ->
       let v = extract_var "evar_" s in
       if v <> "" then
         match p_getenv conf.env v with

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.16 2001-07-01 17:17:52 ddr Exp $ *)
+(* $Id: perso.ml,v 4.17 2001-09-27 13:29:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -844,6 +844,7 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "first_name_alias" -> print_first_name_alias conf base env
   | "first_name_key" -> print_first_name_key conf base env p p_auth
   | "image_size" -> print_image_size conf base env p p_auth
+  | "image_txt" -> Wserver.wprint "%s" (default_image_name base p)
   | "image_url" -> print_image_url conf base env p p_auth
   | "ind_access" -> Wserver.wprint "i=%d" (Adef.int_of_iper p.cle_index)
   | "married_to" -> print_married_to conf base env p p_auth efam

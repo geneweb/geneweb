@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updfam.txt,v 4.14 2001-09-19 13:26:55 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.15 2001-09-27 13:29:41 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -156,7 +156,7 @@
 %end;
 </font></h1>
 
-<form method=%if;msie_5_0;GET%else;POST%end; action="%action;">
+<form method=POST action="%action;">
 %hidden;
 <input type=hidden name=digest value="%digest;">
 %if;(evar_ip != "")<input type=hidden name=ip value="%evar_ip;">%nl;%end;
