@@ -5,6 +5,10 @@ GeneWeb Version 3.06
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [22 Jun 00] Added, in the system of translation in welcome page with [],
+    the ability to put an entry holding %d, with parameter after the []
+    between parentheses. Allows to have one common version of the paragraph
+    "anniversaries" (and co).
   - [17 Jun 00] Suppressed traces of rejected robots failing on password
     accesses.
 

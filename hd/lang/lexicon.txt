@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.117 2000-06-22 00:21:49 ddr Exp $
+# $Id: lexicon.txt,v 3.118 2000-06-22 12:42:56 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5417,6 +5417,7 @@ se: de %d f&ouml;rnamnen
     the %d oldest perhaps still alive
 en: the %d oldest perhaps still alive
 fr: les %d plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
+se: de %d &auml;ldsta som kanske lever
 
     the %d surnames
 af: die %d vanne
