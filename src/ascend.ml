@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.3 1998-11-12 10:59:34 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.4 1998-11-15 22:55:04 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -227,12 +227,14 @@ value next_generation base mark gpl =
   List.rev gpl
 ;
 
+value wpr s = Wserver.wprint "%s" s;
+
 value print_generation_person conf base gp =
   match gp with
   [ GP_person n ip ->
       let p = poi base ip in
       do Wserver.wprint "<li> ";
-         Num.print (transl conf "(thousand separator)") n;
+         Num.print wpr (transl conf "(thousand separator)") n;
          Wserver.wprint " -\n";
          afficher_personne_titre_referencee conf base p;
          Date.afficher_dates_courtes conf base p;
@@ -241,10 +243,10 @@ value print_generation_person conf base gp =
   | GP_same n1 n2 ip ->
       let p = poi base ip in
       do Wserver.wprint "<li> ";
-         Num.print (transl conf "(thousand separator)") n1;
+         Num.print wpr (transl conf "(thousand separator)") n1;
          Wserver.wprint " =&gt; ";
          stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
-           Num.print (transl conf "(thousand separator)") n2;
+           Num.print wpr (transl conf "(thousand separator)") n2;
          end;
          Wserver.wprint "\n\n";
       return ()
@@ -416,7 +418,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
       sou base p.first_name = "?" && sou base p.surname = "?" then
         do print_title ();
            Wserver.wprint "<li> ";
-           Num.print (transl conf "(thousand separator)") n;
+           Num.print wpr (transl conf "(thousand separator)") n;
            Wserver.wprint " -\n";
            if Array.length p.family > 0 then
              let cpl = coi base p.family.(0) in
@@ -449,7 +451,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
         let n2 = Num.inc n1 1 in
         do print_title ();
            Wserver.wprint "<li> ";
-           Num.print (transl conf "(thousand separator)") n1;
+           Num.print wpr (transl conf "(thousand separator)") n1;
            Wserver.wprint "-";
            Wserver.wprint "%d" (Num.modl n2 10);
            Wserver.wprint " -\n";

@@ -1,4 +1,4 @@
-(* $Id: num.ml,v 1.1.1.1 1998-09-01 14:32:05 ddr Exp $ *)
+(* $Id: num.ml,v 1.2 1998-11-15 22:55:05 ddr Exp $ *)
 
 type t = array int;
 
@@ -7,6 +7,16 @@ value base = 0x1000000;
 value zero = [| |];
 value one = [| 1 |];
 value eq x y = x = y;
+value gt x y =
+  if Array.length x > Array.length y then True
+  else if Array.length x < Array.length y then False
+  else
+    loop (Array.length x - 1) where rec loop i =
+      if i < 0 then False
+      else if x.(i) > y.(i) then True
+      else if x.(i) < y.(i) then False
+      else loop (i - 1)
+;
 value twice x =
   let l =
     loop 0 0 where rec loop i r =
@@ -44,6 +54,22 @@ value inc x n =
       else
         let d = x.(i) + r in
         [d mod base :: loop (i + 1) (d / base)]
+  in
+  Array.of_list l
+;
+value add x y =
+  let l =
+    loop 0 0 where rec loop i r =
+      if i >= Array.length x && i >= Array.length y then
+        if r == 0 then [] else [r]
+      else
+        let (d, r) =
+          let xi = if i >= Array.length x then 0 else x.(i) in
+          let yi = if i >= Array.length y then 0 else y.(i) in
+          let s = xi + yi + r in
+          (s mod base, s / base)
+        in
+        [d :: loop (i + 1) r]
   in
   Array.of_list l
 ;
@@ -99,7 +125,13 @@ value modl x n =
   if Array.length r == 0 then 0 else r.(0)
 ;
 
-value print sep x =
+value of_int i =
+  if i < 0 then invalid_arg "Num.of_int"
+  else if i == 0 then zero
+  else if i < base then [| i |]
+  else [| i mod base; i / base |]
+;
+value print f sep x =
   let digits = loop [] x
     where rec loop d x =
       if eq x zero then d
@@ -108,8 +140,8 @@ value print sep x =
   let _ =
     List.fold_left
       (fun n d ->
-         do Wserver.wprint "%d" d;
-            if n > 0 && n mod 3 = 0 then Wserver.wprint "%s" sep else ();
+         do f (string_of_int d);
+            if n > 0 && n mod 3 = 0 then f sep else ();
          return n - 1)
       (List.length digits - 1) digits
   in ()

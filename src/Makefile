@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 1998-10-12 13:26:55 ddr Exp $
+# $Id: Makefile,v 1.7 1998-11-15 22:55:03 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -9,8 +9,9 @@ GWD_OBJS=../wserver/wserver.cmo argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo iobase.cmo select.cmo ansel.cmo gwu.cmo
 all:: out
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
+MOSTDESC_OBJS=adef.cmo name.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo ansel.cmo argl.cmo num.cmo mostdesc.cmo
 
-out:: def.syn.cmo gwc.out consang.out gwd.out gwu.out phonygwd.out i18n_check.out
+out:: def.syn.cmo gwc.out consang.out gwd.out gwu.out phonygwd.out i18n_check.out mostdesc.out
 	$(RM) gwc consang gwd gwu
 	cp gwc.out gwc
 	cp consang.out consang
@@ -53,6 +54,9 @@ gwu.opt: $(GWU_OBJS:.cmo=.cmx)
 
 phonygwd.out: $(PHONYGWD_OBJS)
 	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(PHONYGWD_OBJS) -o phonygwd.out
+
+mostdesc.out: $(MOSTDESC_OBJS)
+	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(MOSTDESC_OBJS) -o mostdesc.out
 
 i18n_check.out: i18n_check.cmo
 	$(OCAMLC) i18n_check.cmo -o i18n_check.out

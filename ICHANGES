@@ -11,10 +11,15 @@ GeneWeb Version 1.09
   - Fixed some displaying and behavior bugs when adding elements in merging
     forms.
   - Fixed some displayed "value=" when the value hold the " character
+  - Some parts of relationship computing use big nums (module Num). Still
+    incomplete.
 
 * ged2gwb:
   - Display message "Strange input" giving the line number instead of character
     number.
+
+* added program "mostdesc" (not distributed in executable versions) computing
+  the "most descendants from someone".
 
 GeneWeb Version 1.08
 --------------------

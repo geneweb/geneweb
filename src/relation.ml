@@ -1,4 +1,4 @@
-(* $Id: relation.ml,v 1.3 1998-11-06 17:57:27 ddr Exp $ *)
+(* $Id: relation.ml,v 1.4 1998-11-15 22:55:06 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -172,6 +172,11 @@ value print_link conf base n p1 p2 x1 x2 =
   return ()
 ;
 
+value wprint_num conf n =
+  Num.print (fun x -> Wserver.wprint "%s" x)
+    (transl conf "(thousand separator)") n
+;
+
 value string_of_big_int conf i =
   let sep = transl conf "(thousand separator)" in
   glop i where rec glop i =
@@ -324,10 +329,11 @@ value print_main_relationship conf base p1 p2 =
              let u = tab.Consang.info.(i) in
              List.fold_left
                (fun n (_, n1) ->
-                  List.fold_left (fun n (_, n2) -> n + n1 * n2) n
-                     u.Consang.lens1)
+                  List.fold_left
+                    (fun n (_, n2) -> Num.add n (Num.of_int (n1 * n2)))
+                    n u.Consang.lens1)
                n u.Consang.lens2)
-          0 ancestors
+          Num.zero ancestors
       in
       let rl =
         List.fold_left
@@ -372,11 +378,11 @@ value print_main_relationship conf base p1 p2 =
          ();
          Wserver.wprint "\n";
          Wserver.wprint "<p>\n";
-         Wserver.wprint "%s: <em>%s</em> %s\n"
-           (capitale (transl conf "total"))
-           (string_of_big_int conf total)
+         Wserver.wprint "%s: <em>" (capitale (transl conf "total"));
+         wprint_num conf total;
+         Wserver.wprint "</em> %s\n"
            (transl_nth conf "relationship link/relationship links"
-              (if total = 1 then 0 else 1));
+              (if Num.eq total Num.one then 0 else 1));
          if
            age_autorise conf base p1 && age_autorise conf base p2 &&
            a1.consang != Adef.fix (-1) && a2.consang != Adef.fix (-1)
