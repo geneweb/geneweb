@@ -5,6 +5,12 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [14 Feb 03] Changed the ability to send messages to wizards (see
+    the change of [24 Dec 01]). Now the message files must be in the
+    databases directory, sub-directory "etc", sub-sub-directory having
+    the name of the database. The file named "mess_wizard_user.txt"
+    is displayed to the wizard named "user" and the file named
+    "mess_wizard.txt" is displayed to all wizards.
   - [06 Feb 03] Fixed bug: in displaying by slices, if the person's name
     contained quotes (for example), the coding/decoding did not work
     correctly and the button "OK" resulted in bad request.
