@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.19 2003-10-20 07:11:55 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.20 2003-12-08 11:38:11 ddr Exp $ *)
 (* (c) Copyright 2002 INRIA *)
 
 open Printf;
@@ -9,6 +9,7 @@ value gwtp_dst = ref (Filename.concat ".." "gwtp_dst");
 value gwtp_log = ref "";
 value gwtp_etc = ref "";
 value gw_site = ref "";
+value no_upload = ref False;
 value token_tmout = ref 900.0;
 
 value filename_basename str =
@@ -1147,17 +1148,21 @@ value gwtp () =
     match HttpEnv.getenv env "m" with
     [ Some "LOGIN" -> gwtp_check_login from str env gwtp_main
     | Some "MAIN" -> gwtp_logged from str env gwtp_main
-    | Some "UPL" -> gwtp_logged from str env gwtp_upload
     | Some "DNL" -> gwtp_logged from str env gwtp_download
-    | Some "UPG" -> gwtp_logged from str env gwtp_upload_gedcom
     | Some "CNF" -> gwtp_logged from str env gwtp_config
-    | Some "SEND" -> gwtp_logged from str env gwtp_send
-    | Some "SEND_GEDCOM" -> gwtp_logged from str env gwtp_send_gedcom
     | Some "RECV" -> gwtp_logged from str env gwtp_receive
     | Some "SCNF" -> gwtp_logged from str env gwtp_setconf
     | Some "LOG" -> gwtp_logged from str env gwtp_print_log
     | Some "ACCW" -> gwtp_logged from str env (gwtp_print_accesses True)
     | Some "ACCF" -> gwtp_logged from str env (gwtp_print_accesses False)
+    | Some "UPL" when not no_upload.val ->
+        gwtp_logged from str env gwtp_upload
+    | Some "UPG" when not no_upload.val ->
+        gwtp_logged from str env gwtp_upload_gedcom
+    | Some "SEND" when not no_upload.val ->
+        gwtp_logged from str env gwtp_send
+    | Some "SEND_GEDCOM" when not no_upload.val ->
+        gwtp_logged from str env gwtp_send_gedcom
     | Some _ -> gwtp_invalid_request str env
     | None -> gwtp_login str env ];
     flush stdout;
@@ -1179,6 +1184,7 @@ value speclist =
     gwtp_tmp.val);
    ("-site", Arg.String (fun x -> gw_site.val := x),
     "<url>: site (if any) where databases are accomodated");
+   ("-noup", Arg.Set no_upload, "no upload");
    ("-tmout", Arg.Float (fun x -> token_tmout.val := x),
     "<sec>: tokens time out; default = " ^
     string_of_float token_tmout.val ^ " sec") ]
