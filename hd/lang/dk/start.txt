@@ -33,8 +33,8 @@ eller <em>officielt navn</em>, eller <em>alias</em>.
 
 <FORM method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-S&oslash;g p&aring; titel: <INPUT NAME=t size=14 maxlength=200>
-og/eller stednavn: <INPUT NAME=p size=25 maxlength=200> =&gt;
+S&oslash;g p&aring; <em>adelstitel</em>: <INPUT NAME=t size=14 maxlength=200>
+og/eller <em>-navn</em>: <INPUT NAME=p size=25 maxlength=200> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
 </FORM>
 

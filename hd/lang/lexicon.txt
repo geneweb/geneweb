@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.42 1999-05-18 17:48:06 ddr Exp $
+# $Id: lexicon.txt,v 2.43 1999-05-20 17:21:20 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -680,7 +680,7 @@ se: alla platser
 
     all the titles
 de: alle Titel
-dk: alle titler
+dk: alle adelstitler
 en: all the titles
 eo: cxiuj mosxtoj
 es: todos los t&iacute;tulos
@@ -1026,6 +1026,7 @@ pt: enterrado/enterrada/enterrado(a)
 se: begravd
 
     cancel GeneWeb links
+dk: uden GeneWeb-links
 en: cancel GeneWeb links
 fr: annuler les liens GeneWeb
 se: utan GeneWeb l&auml;nkar
@@ -1735,7 +1736,7 @@ se: man/hustru
 
     if titles
 de: eingeschr&auml;nkt
-dk: hvis titler
+dk: hvis adelstitler
 en: if titles
 es: si t&iacute;tulos
 he:  אם בעל(ת) תואר
@@ -2507,7 +2508,7 @@ se: antal sl&auml;ktgrenar
 
     occupation
 de: Beruf
-dk: erhverv
+dk: stilling
 en: occupation
 es: ocupaci&oacute;n
 he:  מקצוע
@@ -3237,7 +3238,7 @@ se: omflyttning klar
 
     switch the order of the following families
 de: die Reihenfolge der folgenden Familien umkehren
-dk: ombyt r&aelig;kkef&oslash;lgen for de f&oslash;lgende familier
+dk: omvend r&aelig;kkef&oslash;lgen for de f&oslash;lgende familier
 en: switch the order of the following families
 es: cambiar el orden de las familias siguientes
 he:  לשנות סדר המשפחות הבאות
@@ -3527,7 +3528,7 @@ se: hela listan
 
     title/titles
 de: Titel/Titel
-dk: titel/titler
+dk: titel/adelstitler
 en: title/titles
 eo: mosxto/mosxtoj
 es: t&iacute;tulo/t&iacute;tulos
