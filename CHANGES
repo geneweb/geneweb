@@ -28,6 +28,8 @@ GeneWeb Version 1.09
 --- Restructuration of displaying of surnames and first names by alphabetic
     order and frequency. Fixed bug of bad alphabetic order when first names
     and surnames with accents. Access in indexes faster.
+  - Descendants display limited to 12 generations in all cases (else too much
+    text or too long to answer).
   - Added error message in relationship computing when loop in
     database (someone being his/her own ancestor).
   - In "search", added ability to write "I" instead of "Ier" (french form).
