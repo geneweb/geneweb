@@ -15,7 +15,7 @@
 		Portuguese	Yves Guignard
                 Spanish         Luis Castro Guzman
 		Swedish		Lars Gustavsson
-                                Stig Petersson (few changes)
+                                Stig Petersson
 
 	Documentation
 		Dutch		Joris Esch
