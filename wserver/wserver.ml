@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 1.10 1998-11-03 10:30:14 ddr Exp $ *)
+(* $Id: wserver.ml,v 1.11 1998-11-10 10:26:57 ddr Exp $ *)
 
 open Unix;
 
@@ -396,7 +396,16 @@ value pids = ref [];
 value cleanup_sons () =
   List.iter
     (fun p ->
-       let (pid, _) = Unix.waitpid [WNOHANG] p in
+       let pid =
+         try fst (Unix.waitpid [WNOHANG] p) with _ ->
+           do Printf.eprintf "*** Why error on waitpid %d?\n" p;
+              Printf.eprintf "[";
+              List.iter (fun p -> Printf.eprintf " %d" p) pids.val;
+              Printf.eprintf "]\n";
+              flush Pervasives.stderr;
+           return
+           p
+       in
        if pid = 0 then ()
        else pids.val := list_remove pid pids.val)
      pids.val
