@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.14 1999-11-24 16:29:40 ddr Exp $ *)
+(* $Id: util.ml,v 3.15 1999-11-26 20:50:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1172,11 +1172,12 @@ value create_topological_sort conf base =
       lock (Iobase.lock_file bfile) with
       [ Accept ->
           let tstab_file = Filename.concat (bfile ^ ".gwb") "tstab" in
-          match
-            try Some (open_in_bin tstab_file) with [ Sys_error _ -> None ]
+          try
+            let ic = open_in_bin tstab_file in
+            let tstab = Marshal.from_channel ic in
+            do close_in ic; return tstab
           with
-          [ Some ic -> Marshal.from_channel ic
-          | None ->
+          [ Sys_error _ | End_of_file | Failure _ ->
               let _ = base.data.ascends.array () in
               let _ = base.data.couples.array () in
               let oc = open_out_bin tstab_file in
