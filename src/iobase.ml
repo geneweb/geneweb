@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.35 2005-01-08 20:59:05 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.36 2005-01-09 08:26:44 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -129,7 +129,7 @@ value output_array_access oc arr pos =
 
 value intext_magic_number = [| 0x84; 0x95; 0xA6; 0xBE |];
 
-value output_cache_array_no_sharing oc arr =
+value output_array_no_sharing oc arr =
   do {
     let pos = pos_out oc in
     (* magic number *)
@@ -152,6 +152,8 @@ value output_cache_array_no_sharing oc arr =
       Iovalue.output oc (arr.get i);
     };
     let pos_end = pos_out oc in
+    let size_32 = Iovalue.size_32.val in
+    let size_64 = Iovalue.size_64.val in
 
     (* block_length *)
     seek_out oc (pos + 4);
@@ -159,10 +161,26 @@ value output_cache_array_no_sharing oc arr =
     (* obj counter is zero because no_sharing *)
     output_binary_int oc 0;
     (* size_32 *)
-    output_binary_int oc Iovalue.size_32.val;
+    output_binary_int oc size_32;
     (* size_64 *)
-    output_binary_int oc Iovalue.size_64.val;
+    output_binary_int oc size_64;
     seek_out oc pos_end;
+(*
+Printf.eprintf "check with marshal %d\n" arr.len;
+flush stderr;
+let array = Array.init arr.len arr.get in
+let s = Marshal.to_string array [Marshal.No_sharing] in
+let sign_extend_shift = (Iovalue.sizeof_long - 1) * 8 - 1 in
+let sign_extend x = (x lsl sign_extend_shift) asr sign_extend_shift in
+let glop i =
+  Obj.magic ((sign_extend (Char.code s.[i])) lsl 24 + Char.code s.[i+1] lsl 16 + Char.code s.[i+2] lsl 8 + Char.code s.[i+3])
+in
+Printf.eprintf "block length %d %d\n" (glop 4) (pos_end - pos_start);
+Printf.eprintf "obj counter %d %d\n" (glop 8) 0;
+Printf.eprintf "size_32 %d %d\n" (glop 12) size_32;
+Printf.eprintf "size_64 %d %d\n" (glop 16) size_64;
+flush stderr;
+*)
   }
 ;
 
@@ -805,17 +823,6 @@ value array_ext phony fa =
 ;
 
 value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
-  (* history:
-     - in version 4.10, there are special cases for "persons" and "families"
-       because gwc does not create arrays for these cases (to save memory, the
-       contents are written on disk) and the output_value just creates a
-       phony array header (all zeroes); the functions base.data.persons.array
-       and base.data.families.array fail "bug" (see below).
-     - in version 4.11, the array header has been correctly programmed;
-       therefore, there is no reason to keep these special cases (included
-       the test below with [failwith "bug"]; I just don't remove it because
-       I am lazy and I am often afraid of what could happen; well, with
-       some small tests... *)
   let v_ext v =
     if name = "persons" then ext phony_person v
     else if name = "families" then ext phony_family v
@@ -837,9 +844,6 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
     [ Some x -> x
     | None ->
         do {
-          if name = "persons" then failwith "bug: access to person array"
-          else if name = "families" then failwith "bug: access to family array"
-          else ();
           ifdef UNIX then
             if verbose.val then do {
               Printf.eprintf "*** read %s%s\n" name
@@ -1481,7 +1485,7 @@ value gen_output no_patches bname base =
         flush stderr;
         match try Some (arr.array ()) with [ Failure _ -> None ] with
         [ Some a -> output_value_no_sharing oc a
-        | None -> output_cache_array_no_sharing oc arr ];
+        | None -> output_array_no_sharing oc arr ];
         let epos = output_array_access oc_acc arr bpos in
         if epos <> pos_out oc then count_error epos (pos_out oc) else ()
       }
