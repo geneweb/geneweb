@@ -5,6 +5,8 @@ GeneWeb Version 3.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [25 Jul 00] Restructured Wserver to be cleaner and to save memory
+    when sending big files.
   - [19 Jul 00] Message "Ready" of gwd display now date as yyyy-mm-dd.
   - [12 Jul 00] Refreshes with possible good address when bad character in
     base name (e.g. http://host.com/foo/ instead of http://host.com/foo?)

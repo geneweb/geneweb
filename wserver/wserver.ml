@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.10 2000-07-20 05:01:42 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.11 2000-07-25 15:40:26 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -289,17 +289,25 @@ value treat_connection tmout callback addr ic =
        else ()
      else ();
   return
-  let strm = Stream.of_channel ic in
-  let (request, content) = get_request_and_content strm in
-  let str =
-    match extract_param "GET /" ' ' request with
-    [ "" ->
-        match extract_param "POST /" ' ' request with
-        [ "" -> ""
-        | str -> str ^ "?" ^ content ]
-    | str -> str ]
+  let (request, script_name, contents) =
+    let (request, contents) =
+      let strm = Stream.of_channel ic in
+      get_request_and_content strm
+    in
+    let (script_name, contents) =
+      match extract_param "GET /" ' ' request with
+      [ "" -> (extract_param "POST /" ' ' request, contents)
+      | str ->
+          try
+            let i = String.index str '?' in
+            (String.sub str 0 i,
+             String.sub str (i + 1) (String.length str - i - 1))
+          with
+          [ Not_found -> (str, "") ] ]
+    in
+    (request, script_name, contents)
   in
-  if str = "robots.txt" then
+  if script_name = "robots.txt" then
     do wprint "HTTP/1.0 200 Ok"; nl ();
        wprint "Content-type: text/plain"; nl (); nl ();
        wprint "User-Agent: *"; nl ();
@@ -309,7 +317,7 @@ value treat_connection tmout callback addr ic =
        flush stderr;
     return ()
   else
-    do try callback (addr, request) str with
+    do try callback (addr, request) script_name contents with
        [ Unix.Unix_error Unix.EPIPE "write" _ -> ()
        | exc -> print_err_exc exc ];
        try wflush () with _ -> ();

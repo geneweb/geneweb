@@ -1,4 +1,4 @@
-(* $Id: phonygwd.ml,v 3.2 2000-05-02 02:38:22 ddr Exp $ *)
+(* $Id: phonygwd.ml,v 3.3 2000-07-25 15:40:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 value port_selected = ref 2317;
@@ -36,7 +36,8 @@ value print_text fname =
   return ()
 ;
 
-value connection (addr, request) str =
+value connection (addr, request) script_name contents =
+  let str = script_name ^ "?" ^ contents in
   do log addr request str;
      Wserver.html "";
      print_text fname.val;
