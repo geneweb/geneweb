@@ -34,7 +34,10 @@ GeneWeb version 3.09
     possible, for a site accomodating several data bases, to have a
     personal template file specific to each data base.
 
-* Lexicon (lang/lexicon.txt)
+* Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
+  - [06 Nov 00] Changed "anniversaries of death" (which is incorrect)
+    into "anniversaries of dead people", since it's about their deaths
+    but also their births.
   - [23 Oct 00] Updated Hebrew version (Jonathan B. Marder)
 
 * GeneWeb compiler (gwc)

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.172 2000-11-05 22:32:00 ddr Exp $
+# $Id: lexicon.txt,v 3.173 2000-11-06 10:36:57 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -1390,12 +1390,12 @@ pt: anivers&aacute;rios
 ru: годовщины
 se: &aring;rsdagar
 
-    anniversaries of death
+    anniversaries of dead people
 af: herdenkings van afsterwe
 cs: vэroин ъmrtн
 de: Jahrestage der verstorbenen Personen
 dk: &aring;rsdage for d&oslash;de personer
-en: anniversaries of death
+en: anniversaries of dead people
 eo: mortotagaj datrevenoj 
 es: aniversarios de las personas fallecidas
 fi: vainajien muistop&auml;ivi&auml
