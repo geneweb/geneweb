@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.9 1999-08-04 04:24:56 ddr Exp $ *)
+(* $Id: date.ml,v 2.10 1999-08-19 09:32:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -136,44 +136,6 @@ value print_age conf a =
       else if d == 1 then
         Wserver.wprint "%s" (transl conf "one day old")
       else Wserver.wprint "0" ]
-;
-
-value afficher_dates conf base p =
-  let is = index_of_sex p.sex in
-  if age_autorise conf base p then
-    let something =
-      match (Adef.od_of_codate p.birth, p.death) with
-      [ (Some _, _)
-      | (_, Death _ _ | DeadYoung | DeadDontKnowWhen) -> True
-      | _ -> False ]
-    in
-    do if something then Wserver.wprint "<em>" else ();
-       match Adef.od_of_codate p.birth with
-       [ Some d ->
-           do Wserver.wprint ",\n%s\n" (transl_nth conf "born" is);
-              Wserver.wprint "%s" (string_of_ondate conf d);
-           return ()
-       | None -> () ];
-       match p.death with
-       [ Death dr d ->
-           let d = Adef.date_of_cdate d in
-           let dr_w =
-             match dr with
-             [ Unspecified -> transl_nth conf "died" is
-             | Murdered -> transl_nth conf "murdered" is
-             | Killed -> transl_nth conf "killed (in action)" is
-             | Executed -> transl_nth conf "executed (legally killed)" is
-             | Disappeared -> transl_nth conf "disappeared" is ]
-           in
-           do Wserver.wprint ",\n%s\n" dr_w;
-              Wserver.wprint "%s" (string_of_ondate conf d);
-           return ()
-       | DeadYoung ->
-           Wserver.wprint ",\n%s" (transl_nth conf "dead young" is)
-       | DeadDontKnowWhen | DontKnowIfDead | NotDead -> () ];
-       if something then Wserver.wprint "</em>" else ();
-    return ()
-  else ()
 ;
 
 value year_text d =

@@ -7,6 +7,8 @@ GeneWeb version 2.06
     "warnings.htm".
 
 * GeneWeb Service/CGI (gwd)
+  - [Aug 19, 99] Added more informations (e.g. places) in descendants display
+    by list.
   - [Aug 18, 99] Added a link to the documentation (close to the copyright).
   - [Aug 14, 99] Added ability to put notes for the data base itself (for
     a genera introduction, for example).
