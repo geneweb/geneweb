@@ -9,6 +9,12 @@ GeneWeb version 4.01
   - [14 Mar 01] Added Brazilian Portuguese (Paulo Francisco Sedrez).
 
 * GeneWeb server or CGI (gwd)
+  - [25 Mar 01] Improved the displaying of phrases like "xxx is a
+    grandchild of a nth cousin of yyy" in some languages (Swedish,
+    Danish, French). Indeed in Swedish and Danish, the word "grandchild"
+    is different according to the intermediate person (the child)'s sex.
+    And in French the word "nth cousin" is different if it is a man or a
+    woman.
   - [18 Mar 01] Fixed bug: the data base forum did not work under Windows.
   - [18 Mar 01] Fixed bug: in case of automatic merge, the source field
     of the second person or family was lost.
@@ -40,9 +46,9 @@ GeneWeb version 4.01
     - between x and y, their death value is "don't know if death"
     Default x is 80, y is 120.
 
-* Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
+* Lexicon (lang/lexicon.txt) and Welcome page (lang/start.txt)
   - [26 Mar 01] (technical point) Grouped together all lang/*/start.txt in
-    one only file lang/start.txt.
+    one only file lang/start.txt, easier to manipulate
   - [14 Mar 01] Added the ability to add "derived" languages,
     i.e. languages where most of the phrases are the same than some other
     already existing language, but with some changes here and there. In
