@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Par&aacute;metros de gwd</title></head>
+
+<body>
+
+<h1>Par&aacute;metros de gwd</h1>
+
+<form mode=GET action="gwd_1">
+<input type=hidden name=lang value=$l>
+
+<p>
+
+A continuaci&oacute;n se indican los par&aacute;metros del commando "gwd". Cambie aquellos que
+Ud. juzgue necesario:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-lang</strong>
+<td>Lenguaje por defecto.
+<p>
+Por defecto, las p&aacute;ginas de todas las bases de datos son presentadas en este
+lenguaje. Seleccione su lenguaje preferido.
+<p>
+En una base de datos, uno puede nuevamente cambiar esta preferencia,
+configurando los par&aacute;metros espec&iacute;ficos a esta base.
+Para ello, en la "P&aacute;gina de Recepci&oacute;n" de una base de datos,
+uno puede cliquear en una bandera af&iacute;n de
+seleccionar otro lenguaje. La selecci&oacute;n presente es entonces en
+cierto modo el lenguaje "por defecto por defecto".
+<p>
+<p>
+Si la selecci&oacute;n es "-", el lenguaje por defecto es el espa&ntilde;ol.
+
+<tr>
+<td>&nbsp;
+<td>
+<select name=default_lang>
+<option value=$L{}>-
+<option value=$L{de}>Alem&aacute;n
+<option value=$L{cn}>Chino
+<option value=$L{dk}>Dan&eacute;s
+<option value=$L{es}>Espa&ntilde;ol
+<option value=$L{eo}>Esperanto
+<option value=$L{fr}>Franc&eacute;s
+<option value=$L{he}>Hebreo
+<option value=$L{en}>Ingl&eacute;s
+<option value=$L{it}>Italiano
+<option value=$L{nl}>Neerland&eacute;s
+<option value=$L{no}>Nouego
+<option value=$L{pt}>Portug&eacute;s
+<option value=$L{se}>Sueco
+</select>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-only</strong>
+<td>
+&Uacute;nica direcci&oacute;n autorisada.
+<p>
+Unicamente las demandas provenientes de esta direcci&oacute;n Internet seran aceptadas.
+<p>
+Para saber el valor a utilizar en su ordinador, mire Ud. las
+trazas del comando "gwd", que se presentan en la pantalla cada vez que Ud. explora
+una base de datos. Utilise lo que Ud. ve despu&eacute;s de "From:".
+
+<tr>
+<td>&nbsp;
+<td><input name=only value="$O" size=40>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-log</strong>
+<td>
+Fichero de trazas de conecci&oacute;n.
+<p>
+Por defecto, las trazas de conecci&oacute;n aparecen en la "ventana"
+de "gwd". Cada vez que Ud. explora; o que alguien accede a una de sus bases de
+datos, uno ve que 4 o 5 l&iacute;neas se presentan en dicha "ventana".
+<p>
+Si Ud. desea que las trazas vayan mas bien hacia un fichero; indique
+aqu&iacute; el nombre del fichero que Ud. desea utilizar. Este fichero
+ser&aacute; creado, en caso que el no exista a&uacute;n, en la carpeta
+principal de <em>GeneWeb</em> donde Ud ve los comandos
+"setup" y"gwd". A cada demanda de datos a su base, este fichero sera
+incrementado de las l&iacute;neas de trazas correspondientes.
+
+<tr>
+<td>&nbsp;
+<td><input name=log value="$T" size=40>
+</table></dl>
+
+<dl><dt><dd>El comando "gwd" posee a&uacute;n otros par&aacute;metros suplementarios,
+pero estos no son configurables aqu&iacute;, debido al hecho que ellos pueden perturbar el
+funcionamiento del "setup".</dl>
+
+<dl><td><dd>En efecto la exploraci&oacute;n a partir del "setup" es destinada principalmente
+a hacer que la utilisaci&oacute;n de <em>GeneWeb</em> sea m&aacute;s simple,
+pero no permite de explotar completamente todas las posibilidades
+del comando. Para encontrar los otros par&aacute;metros, as&iacute; como
+su utilisaci&oacute;n, es necesario de ser un poco "ma&ntilde;oso":
+Ud. encontrar&aacute; algunas informaciones buscando bi&eacute;n en la documentaci&oacute;n.</dl>
+
+<p>
+
+A continuaci&oacute;n apoye Ud. en el bot&oacute;n:
+
+<p>
+
+<input type=submit value="Configurar">
+
+</form>

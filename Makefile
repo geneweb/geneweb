@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.11 1999-05-09 09:16:33 ddr Exp $
+# $Id: Makefile,v 2.12 1999-06-07 01:32:23 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -29,7 +29,7 @@ distrib: classical_distrib
 	mkdir distribution/gw/old
 	mkdir distribution/gw/setup
 	cp setup/intro.txt distribution/gw/setup/.
-	for i in fr en; do \
+	for i in fr en es; do \
 	  mkdir distribution/gw/setup/$$i; \
 	  cp setup/$$i/*.html distribution/gw/setup/$$i; \
 	  cp setup/$$i/*.txt distribution/gw/setup/$$i; \

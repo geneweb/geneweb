@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Importaci&oacute;n de un fichero GEDCOM</title></head>
+
+<body>
+
+<h1>Importaci&oacute;n de un fichero GEDCOM</h1>
+
+<form mode=GET action="ged2gwb">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Agregue Ud:
+
+<p>
+
+<ul><li>El nombre completo de su fichero GEDCOM.
+
+<p>
+
+<input name=anon $n{type=file} size=55>
+
+</ul>
+
+<p>
+
+<ul><li>El nombre que Ud. desea dar a su base de datos
+<em>GeneWeb</em>. Si Ud. no mete ning&uacute;n nombre, &eacute;l ser&aacute; deducido del nombre del fichero GEDCOM.
+
+<p>
+
+<input name=o size=30>
+
+</ul>
+
+<p>
+
+Seleccione las opciones que Ud. desee :
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=lf value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Forzar los nombres a estar en min&uacute;sculas. Meter sus iniciales en may&uacute;sculas.</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=ls value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Forzar los apellidos a estar en min&uacute;sculas. Meter sus iniciales en may&uacute;sculas. Trate de mantener las
+part&iacute;culas en min&uacute;sculas.</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Por defecto, al crear una persona, si el campo nombre del fichero
+GEDCOM esta constituido de varios nombres, el primero de ellos ir&aacute; en el campo
+"nombre" y el nombre completo se transforma en un "alias de nombre".</td>
+
+<tr>
+<td><input type=checkbox name=no_efn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Anular esta opci&oacute;n.</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Por defecto, al crear una persona, si el campo nombre en el fichero
+GEDCOM se asemeja a un nombre p&uacute;blico, es decir, si &eacute;l contiene:
+<ul>
+<li>Un n&uacute;mero ordinario o en cifras romanas, normalmente considerado como un n&uacute;mero de un
+t&iacute;tulo de nobleza (por ejemplo: Luis XIV),
+<li>Una de las palabras: "der", "die", "el", "le", "la", "the", normalmente utilizadas como particula inicial de un
+calificativo (por ejemplo: Guillermo el
+Conquistador),
+</ul>
+entonces el nombre en el fichero GEDCOM se transforma en un "nombre p&uacute;blico" y la primera palabra
+del campo nombre va en el campo "nombre".
+<tr>
+<td><input type=checkbox name=no_epn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Anular esta opci&oacute;n.</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><input type=checkbox name=tnd value=on>&nbsp;&nbsp;&nbsp;</td>
+
+<td>En caso de incoherencia existente, tratar de incluir las fechas negativas
+(por ejemplo: nacimiento despues de su muerte).</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><input type=checkbox name=no_nd value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>No aceptar las fechas negativas: no interpretar un a&ntilde;o precedido de un
+signo menos "-" como una fecha negativa.</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Algunos ficheros  GEDCOM utilizan a veces los n&uacute;meros
+ordinarios para referirse a los meses (de 1 a 12). El est&aacute;ndar GEDCOM 5.5 exije que los meses sean
+representados por sus identificadores (por ej: "MAY 1912" y
+no "05/1912"). La notaci&oacute;n "02/05/1912" es ambig&uuml;a; (puede
+significar "2 de mayo de 1912" o "5 de fevrero de 1912" seg&uacute;n los diferentes paises).</td></tr>
+
+<tr>
+<td><input type=radio name=dates value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>Por este tipo de fechas, extraer solamente la parte "a&ntilde;o".</td>
+</tr>
+
+<tr>
+<td><input type=radio name=dates value="_dm">&nbsp;&nbsp;&nbsp;</td>
+<td>Interpretar estas fechas como "d&iacute;a/mes/a&ntilde;o".</td>
+</tr>
+
+<tr>
+<td><input type=radio name=dates value="_md">&nbsp;&nbsp;&nbsp;</td>
+<td>Interpretar estas fechas como "mes/d&iacute;a/a&ntilde;o".</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>La norma GEDCOM 5.5 preconiza la utilizaci&oacute;n
+del codaje ANSEL por los car&aacute;cteres acentuados que son entonces representados
+por dos letras. El fichero GEDCOM indica en principio, en su encabezamiento,
+si este codage es o no utilizado.</td></tr>
+
+<tr><td><input type=radio name=ansel value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>Seguir las indicaciones del encabezamiento del fichero GEDCOM.</td>
+</tr>
+
+<tr><td><input type=radio name=ansel value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Forzar el decodage ANSEL, aunque el encabezamiento indiqu&eacute; lo contrario.</td>
+</tr>
+
+<tr><td><input type=radio name=ansel value="no_">&nbsp;&nbsp;&nbsp;</td>
+<td>No utilizar el decodage ANSEL, aunque el encabezamiento lo pida.</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><input type=checkbox name=ta value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Opci&oacute;n espec&iacute;fica para un amigo (-ta). Asi es, hay algunos "envarados"...
+Normalement, no utilizar esta opci&oacute;n: bajo riesgo de obtener t&iacute;tulos de nobleza
+raros...</td>
+</tr>
+</table></dl>
+
+<p>
+
+Finalmente cliquerar en "Ok".
+
+<p>
+
+<input type=submit value="Ok">
+
+</form>
