@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.4 2000-02-25 15:26:02 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.5 2000-03-07 18:05:21 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -33,7 +33,7 @@ value select conf base get_date =
     [ Some x -> x
     | _ ->
         try int_of_string (List.assoc "latest_event" conf.base_env) with
-        [ Not_found | Failure _ -> 10 ] ]
+        [ Not_found | Failure _ -> 20 ] ]
   in
   let n = min (max 0 n) base.data.persons.len in
   loop Q.empty 0 0 where rec loop q len i =
