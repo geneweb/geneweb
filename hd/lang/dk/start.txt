@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.50 2000-11-06 10:36:59 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.51 2001-02-08 19:28:04 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogi - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -45,15 +45,15 @@ Databasen <font color=%i><b>"%t"</b></font> indeholder for
 <tr>
 
 <td align=center><a href="%sw=w"><em>Opdateringsadgang</em></a><br>
-(adgangsord)<br></td>
+(adgangskode)<br></td>
 
 %INf<td align=center><a href="%sw=f"><em>Betroet adgang</em></a><br>
-(adgangsord)</td>
+(adgangskode)</td>
 
 %E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=POST action="%f">
-%hAdgangsord, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
+%hAdgangskode, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
 <input name=w type=password size=10 maxlength=200>
 <input type=submit value="Ok">
 </form>
