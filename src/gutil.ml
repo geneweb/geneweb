@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.34 2005-02-20 14:34:36 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.35 2005-03-02 12:34:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1219,8 +1219,6 @@ value sort_person_list base pl =
 ;
 
 value find_free_occ base f s i =
-  let first_name = nominative f in
-  let surname = nominative s in
   let ipl = base.func.persons_of_name (f ^ " " ^ s) in
   let first_name = Name.lower f in
   let surname = Name.lower s in
