@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.26 2004-12-28 15:13:02 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.27 2004-12-29 21:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -434,10 +434,10 @@ value rec copy_from_stream conf base strm mode =
               let lang_def = transl conf " !languages" in
               Wserver.wprint "%s" (Translate.language_name lang lang_def)
           | 'V' ->
-	      let txt =
+              let txt =
                 try List.assoc (get_variable strm) conf.base_env with
-		[ Not_found -> "" ]
-	      in
+                [ Not_found -> "" ]
+              in
               copy_from_string conf base txt mode
           | c -> Wserver.wprint "%s" (macro conf base c) ]
       | c -> if echo.val then Wserver.wprint "%c" c else () ]
@@ -452,8 +452,8 @@ and src_translate conf base nomin strm echo mode =
         fun
         [ '[' -> loop (lev + 1) (Lbuff.store len '[') (Stream.next strm)
         | ']' ->
-  	    if lev = 0 then Lbuff.get len
-  	    else loop (lev - 1) (Lbuff.store len ']') (Stream.next strm)
+            if lev = 0 then Lbuff.get len
+            else loop (lev - 1) (Lbuff.store len ']') (Stream.next strm)
         | c -> loop lev (Lbuff.store len c) (Stream.next strm) ]
     in
     let (s, _) = Translate.inline conf.lang '%' (macro conf base) s in

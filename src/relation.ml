@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.56 2004-12-28 15:13:01 ddr Exp $ *)
+(* $Id: relation.ml,v 4.57 2004-12-29 21:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1511,7 +1511,7 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
         [ Some x -> " " ^ x
         | _ ->
             match Util.p_getenv conf.env "color" with
-	    [ None | Some "" -> ""
+            [ None | Some "" -> ""
             | Some x -> " bgcolor=" ^ x ] ]
       in
       let info =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.38 2004-12-14 09:30:18 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.39 2004-12-29 21:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -679,10 +679,10 @@ value need_check_noloop (scpl, sdes, onfs) =
     [ Some ((opar, ochil), (npar, nchil)) ->
         not
           (array_forall2 (is_created_or_already_there opar) npar
-	     (parent_array scpl)) ||
+             (parent_array scpl)) ||
         not
           (array_forall2 (is_created_or_already_there ochil) nchil
-	     sdes.children)
+             sdes.children)
     | None -> True ]
   else False
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.15 2004-12-26 18:11:20 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.16 2004-12-29 21:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -80,7 +80,7 @@ value select_family conf base get_date find_oldest =
       (struct
          type t = (Def.family * Def.dmy * Def.calendar);
          value leq (_, x, _) (_, y, _) =
-	   if find_oldest then before_date x y else before_date y x;
+           if find_oldest then before_date x y else before_date y x;
        end)
   in
   let n =
@@ -352,7 +352,7 @@ value print_marr_or_eng conf base title list len =
                   [ NotMarried -> transl_nth conf "relation/relations" 0
                   | Married | NoSexesCheck -> transl conf "married"
                   | Engaged -> transl conf "engaged"
-		  | NoMention -> "" ])
+                  | NoMention -> "" ])
                  (Date.string_of_ondate conf (Dgreg d cal));
              (month_txt, future)
            })

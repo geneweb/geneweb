@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.17 2004-12-28 10:13:28 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.18 2004-12-29 21:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -371,7 +371,7 @@ value prev_next_1_text conf base info pb nb =
     [ (None, None) -> s
     | _ ->
         s ^ "<span style=\"font-size:80%\">" ^ string_of_int info.c1 ^
-	"</span>" ]
+        "</span>" ]
   in
   match nb with
   [ Some b1 ->
@@ -393,7 +393,7 @@ value prev_next_2_text conf base info pb nb =
     [ (None, None) -> s
     | _ ->
         s ^ "<span style=\"font-size:80%\">" ^ string_of_int info.c2 ^
-	"</span>" ]
+        "</span>" ]
   in
   match nb with
   [ Some b2 ->
@@ -698,7 +698,7 @@ value print_relation_no_dag conf base po ip1 ip2 =
         [ Some x -> " " ^ x
         | _ ->
             match Util.p_getenv conf.env "color" with
-	    [ None | Some "" -> ""
+            [ None | Some "" -> ""
             | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
       in
       let info =

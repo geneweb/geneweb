@@ -1,4 +1,4 @@
-(* $Id: q_codes.ml,v 4.2 2004-12-14 09:30:16 ddr Exp $ *)
+(* $Id: q_codes.ml,v 4.3 2004-12-29 21:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value f _ =
@@ -20,7 +20,7 @@ value f _ =
   | x ->
       Stdpp.raise_with_loc
         (ifdef OCAML_308 then (Token.make_loc (0, String.length x))
-	 else (0, String.length x))
+         else (0, String.length x))
         (Failure ("bad code " ^ x)) ]
 ;
 

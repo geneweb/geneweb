@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.27 2004-12-28 15:13:02 ddr Exp $ *)
+(* $Id: some.ml,v 4.28 2004-12-29 21:03:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -278,12 +278,12 @@ value print_branch conf base psn name =
                  Wserver.wprint "\n";
                  match select with
                  [ Some (_, True) ->
-		     do {
+                     do {
                        tag "dl" begin
                          List.iter
                            (fun e -> loop False (succ lev) (pget conf base e))
                            (Array.to_list des.children);
-		       end;
+                       end;
                        False
                      }
                  | Some (_, False) | None -> False ]
@@ -374,12 +374,12 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
            do {
              if len > 1 && br = None then do {
                Wserver.wprint "\n";
-	       stag "dt" begin
+               stag "dt" begin
                  stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
                      (Util.code_varenv fx) n begin
                    Wserver.wprint "%d." n;
                  end;
-	       end;
+               end;
                Wserver.wprint "\n";
              }
              else ();
@@ -466,7 +466,7 @@ value print_family_alphabetic x conf base liste =
       do {
         header conf title;
         print_link_to_welcome conf True;
-	html_p conf;
+        html_p conf;
         print_alphab_list conf (fun (p, _) -> String.sub p (initial p) 1)
           (print_elem conf base False) liste;
         trailer conf;
