@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.9 2001-12-27 10:46:31 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.10 2001-12-31 20:54:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -293,7 +293,7 @@ value effective_merge_ind conf base p1 p2 =
         let ifam = u2.family.(i) in
         let cpl = coi base ifam in
         if p2.cle_index = cpl.father then cpl.father := p1.cle_index
-        else if p2.cle_index = cpl.mother then cpl.mother := p2.cle_index
+        else if p2.cle_index = cpl.mother then cpl.mother := p1.cle_index
         else assert False;
         base.func.patch_couple ifam cpl;
       };
