@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.208 2004-11-15 10:35:23 ddr Exp $
+# $Id: lexicon.txt,v 4.209 2004-11-18 09:31:03 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7768,8 +7768,11 @@ sv: de %d f&ouml;rnamnen
 
     the %d oldest couples perhaps still alive and engaged
 bg: най-отдавнашните %d двойки от евентуално още живи и сгодени лица
+de: Die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
 en: the %d oldest couples perhaps still alive and engaged
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
+nl: De %d langst paren die mogelijk nog steeds leven en getrouwd zijn
+ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
 
     the %d oldest perhaps still alive
 af: die %d oudstes wat nog leef
