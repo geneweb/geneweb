@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.9 2000-03-19 19:21:37 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.10 2000-06-03 21:08:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -112,7 +112,7 @@ value br_inter_is_empty b1 b2 =
 
 value print_choice conf base p niveau_effectif =
   tag "form" "method=get action=\"%s\"" conf.command begin
-    Srcfile.hidden_env conf;
+    Util.hidden_env conf;
     Wserver.wprint "<input type=hidden name=m value=C>\n";
     wprint_hidden_person conf base "" p;
     tag "select" "name=v1" begin

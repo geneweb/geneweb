@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 3.4 2000-06-01 22:25:55 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 3.5 2000-06-03 21:08:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -98,7 +98,7 @@ value print_merge1 conf base p p2 digest =
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        UpdateInd.merge_call conf;
        Wserver.wprint "<input type=hidden name=i value=%d>\n"
          (Adef.int_of_iper p.cle_index);

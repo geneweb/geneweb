@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 3.1 1999-11-05 15:24:52 ddr Exp $ *)
+(* $Id: notes.ml,v 3.2 2000-06-03 21:08:05 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -31,7 +31,7 @@ value print_mod conf base =
   let s = base.data.bnotes.nread 0 in
   do header conf title;
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=MOD_NOTES_OK>\n";
        stag "textarea" "name=notes rows=30 cols=70 wrap=virtual" begin
          if s <> "" then

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 3.7 2000-06-01 22:25:55 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.8 2000-06-03 21:08:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -28,7 +28,7 @@ value print_differences conf base branches p1 p2 =
   in
   let string_field = gen_string_field " checked" "" in
   tag "form" "method=POST action=\"%s\"" conf.command begin
-    Srcfile.hidden_env conf;
+    Util.hidden_env conf;
     Wserver.wprint "<input type=hidden name=m value=MRG_IND_OK>\n";
     Wserver.wprint "<input type=hidden name=i1 value=%d>\n"
       (Adef.int_of_iper p1.cle_index);

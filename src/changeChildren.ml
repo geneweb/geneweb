@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 3.3 2000-01-10 02:14:37 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 3.4 2000-06-03 21:08:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -108,7 +108,7 @@ value print_change conf base p u =
      Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
      Wserver.wprint "<p>\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=i value=%d>\n"
          (Adef.int_of_iper p.cle_index);
        Wserver.wprint "\n<p>\n";

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.47 2000-05-25 09:01:16 ddr Exp $ *)
+(* $Id: util.ml,v 3.48 2000-06-03 21:08:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -98,6 +98,12 @@ value commd_no_params conf =
        c ^ (if c = "" then "" else ";") ^ k ^
        (if v = "" then "" else "=" ^ v))
     "" conf.henv
+;
+
+value hidden_env conf =
+  List.iter
+    (fun (k, v) -> Wserver.wprint "<input type=hidden name=%s value=%s>\n" k v)
+    (conf.henv @ conf.senv)
 ;
 
 value code_varenv = Wserver.encode;

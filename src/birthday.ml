@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.11 2000-03-05 07:46:04 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.12 2000-06-03 21:08:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -201,7 +201,7 @@ value print_birth_day conf base day_name verb wd dt list =
 value propose_months conf mode =
   tag "center" begin
     tag "form" "method=get action=\"%s\"" conf.command begin
-      Srcfile.hidden_env conf;
+      Util.hidden_env conf;
       mode ();
       tag "select" "name=v" begin
         for i = 1 to 12 do

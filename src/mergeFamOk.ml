@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 3.4 2000-06-01 22:25:55 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 3.5 2000-06-03 21:08:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -63,7 +63,7 @@ value print_merge1 conf base fam des fam2 digest =
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=MRG_MOD_FAM_OK>\n";
        Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
        Wserver.wprint "<input type=hidden name=i value=%d>\n"

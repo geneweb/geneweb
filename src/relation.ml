@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.38 2000-05-14 19:59:37 ddr Exp $ *)
+(* $Id: relation.ml,v 3.39 2000-06-03 21:08:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -84,7 +84,7 @@ value print_menu conf base p =
   let u = uoi base p.cle_index in
   do header conf title;
      tag "form" "method=get action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=em value=R>\n";
        wprint_hidden_person conf base "e" p;
        tag "ul" begin

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.15 2000-04-21 12:03:57 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.16 2000-06-03 21:08:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -731,7 +731,7 @@ value print_mod1 conf base p digest =
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        match p_getenv conf.env "m" with
        [ Some "MRG_MOD_IND_OK" -> merge_call conf
        | _ -> Wserver.wprint "<input type=hidden name=m value=MOD_IND_OK>\n" ];
@@ -757,7 +757,7 @@ value print_add1 conf base p =
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=ADD_IND_OK>\n";
        print_person conf base p;
        Wserver.wprint "\n";
@@ -777,7 +777,7 @@ value print_del1 conf base p =
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
-       Srcfile.hidden_env conf;
+       Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=DEL_IND_OK>\n";
        Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
          (Adef.int_of_iper p.cle_index);

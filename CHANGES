@@ -2,6 +2,8 @@ GeneWeb version 3.05
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [03 Jun 00] In history, added an input field before the ">>" to be able
+    to specify a number of entries to be displayed in the next page.
   - [02 Jun 00] Merge of individuals faster now: can automatically merge
     families and individuals when they are identical in both ancestors trees.
   - [23 May 00] In "divorce" section, added case "separated".

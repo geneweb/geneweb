@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.21 2000-05-16 17:21:16 ddr Exp $ *)
+(* $Id: util.mli,v 3.22 2000-06-03 21:08:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -23,6 +23,7 @@ value unauthorized : config -> string -> unit;
 value commd : config -> string;
 value code_varenv : string -> string;
 value decode_varenv : string -> string;
+value hidden_env : config -> unit;
 
 value age_autorise : config -> base -> person -> bool;
 value fast_auth_age : config -> person -> bool;
