@@ -43,6 +43,12 @@ linke) Person abstammt von einer Person im linken (bzw. rechten) Zweig.
 werden, da&szlig; die Anzeige unlesbar wird. Das sind trotzdem reale Verwandschaftsbeziehungen
 und diese werden bei der Blutverwandschaftsberechnung mitgez&auml;hlt.
 
+<h4>Im CGI-Modus erhalte ich immer nur die Meldung "Internal Server Error"</h4>
+
+Ein h&auml;ufiges Problem entsteht durch die Zugriffsrechte. Der Webserver arbeitet oftmals
+CGIs nur als ein Nutzer mit sehr wenig Rechten ab (typischerweise als Nutzer "nobody" 
+unter Unix). Dieser kann m&ouml;glicherweise "gwd" nicht starten. Kontrolliere die Zugriffsrechte
+von "gwd" und allen <font color=#2f6400><b>GeneWeb</b></font>-Dateien!
 
 <p>
 <hr>
