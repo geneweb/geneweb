@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.155 2000-08-29 07:13:38 ddr Exp $
+# $Id: lexicon.txt,v 3.156 2000-09-01 07:16:59 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -1973,6 +1973,7 @@ eo: komento aldonita
 fi: huomautus lis&auml;tty
 fr: commentaire ajout&eacute;
 he:   äòøä äåëðñä
+it: commento aggiuntivo
 lv: piebilde pievienota
 nl: commentaar toegevoegd
 is: athugasemd bætt við
@@ -2368,6 +2369,7 @@ en: engaged
 eo: gefiancxigintaj
 fi: kihloissa
 fr: fianc&eacute;s
+it: fidanzarsi
 lv: saderin&acirc;ti
 nl: verloofd
 no: forlovet
@@ -2381,6 +2383,7 @@ en: engaged%t to
 eo: fiancxigita%t kun/fiancxinigita%t kun
 fi: kihlattu%t
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
+it: fidanzato%t con/fidanzata%t con
 lv: saderin&acirc;ts%t ar
 nl: verloofd%t met
 no: forlovet%t med
@@ -2982,6 +2985,7 @@ en: horizontally
 eo: horizontale
 fi: vaakasuoraan
 fr: horizontalement
+it: orizzontalmente
 lv: horizont&acirc;li
 nl: horizontaal
 no: horisontal
@@ -3550,6 +3554,7 @@ en: male line/female line
 eo: vira linio /virina linio
 fi: miehen puoleinen linja/naisen puoleinen linja
 fr: lign&eacute;e agnatique/lign&eacute;e cognatique
+it: linea agnatizia/linea cognatizia
 lv: tçva lînija/mâtes lînija
 nl: mannelijke lijn/vrouwelijke lijn
 no: mannlig linje/kvinnelig linje
@@ -4869,6 +4874,7 @@ eo: agnoskinta patro/agnoskinta patrino/agnoskintaj gepatroj
 fi: tunnustanut is&auml;/tunnustanut &auml;iti/tunnustaneet vanhemmat
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
 is: viðurkenndur faðir/viðurkennd móðir/viðurkennd foreldri
+it: padre avente riconosciuto/madre avente riconosciuta/genitori aventi riconusciuti
 lv: atzîts tçvs/mâte/vecâki (?)
 no: bekreftet far/bekreftet mor/bekreftede foreldre
 nl: erkennende vader/erkennende moeder/erkennende ouders
@@ -5082,6 +5088,7 @@ en: separated
 eo: apartigitaj
 fi: asumuserossa
 fr: s&eacute;par&eacute;s
+it: separati
 lv: nedzîvo kop&acirc;
 nl: gescheiden
 no: separert
@@ -5350,6 +5357,7 @@ en: statistics
 eo: statistikoj
 fi: tilastotietoja
 fr: statistiques
+it: statistica
 lv: statistika
 nl: statistieken
 no: statistikk
@@ -5555,6 +5563,7 @@ eo: la %d plej maljunaj eble ankoraù vivantaj
 es: los %s m&aacute;s viejos quiz&aacute;s todov&iacute;a vivo
 fi: %d vanhinta ehk&auml viel&auml el&auml;v&auml;&auml
 fr: les %d les plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
+it: i%d più vecchi possono essere ancora viventi
 lv: %d visvecâkie iespçjams vçl ir dzîvi
 nl: de %d oudsten, mogelijk nog in leven
 no: dei %d eldste som muligens lever
@@ -5587,6 +5596,7 @@ eo: la %d, kiuj vivis plejlonge
 es: los %d que han vivido m&aacute;s mucho tiempo
 fi: %d pisimpään elänyttä
 fr: les %d ayant v&eacute;cu le plus longtemps
+it: %d avendo visuto più a lungo
 lv: %d, kuri dzîvojuði visilgâk
 nl: de %d langst levende personen
 no: dei %d som har levd lengst
@@ -6416,6 +6426,7 @@ fi: %s ja %s avioliiton todistaja
 fr: t&eacute;moin au mariage de %s et de %s
 he:  àãéí áçúåðä ùì %s å-%s
 is: vitni að giftingu %s og %s
+
 lv: liecinieks %s un %s laulîbâs
 nl: getuige bij het huwelijk van %s en %s
 no: forlover ved ekteskap mellom %s og %s
@@ -6434,6 +6445,7 @@ fi: todistaja/todistajat
 fr: t&eacute;moin/t&eacute;moins
 he:  àã/ àãéí
 is: vitni/vitni
+it: testimone/testimone
 lv: liecinieks:a:-u/liecinieki
 nl: getuige/getuigen
 no: forlover/forlovere
