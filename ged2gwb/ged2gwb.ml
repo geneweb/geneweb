@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.13 2001-12-05 19:44:44 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.14 2002-01-08 08:56:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1713,7 +1713,7 @@ value add_fam_norm gen r adop_list =
       [ Some r ->
           match find_field "DATE" r.rsons with
           [ Some d ->
-              Divorced (Adef.codate_of_od (date_of_field r.rpos r.rval))
+              Divorced (Adef.codate_of_od (date_of_field d.rpos d.rval))
           | _ ->
               match find_field "PLAC" r.rsons with
               [ Some _ -> Divorced Adef.codate_None

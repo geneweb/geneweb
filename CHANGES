@@ -1,5 +1,9 @@
 GeneWeb version 4.05
 --------------------
+
+* Gedcom to GeneWeb (ged2gwb)
+  - [8 Jan 02] Fixed bug: the divorce dates were not imported
+
 GeneWeb version 4.04
 --------------------
 
