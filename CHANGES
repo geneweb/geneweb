@@ -47,6 +47,11 @@ GeneWeb version 3.06
     error message in case of several input files are given (these programs can
     treat only one file at a time).
 
+* GeneWeb compiler (gwc) and uncompiler (gwu)
+  - [29 Jun 00] Fixed problem: persons with "relations" (e.g. adoptive
+    children) where not saved (gwu) nor restored (gwc) when isolated
+    (i.e. without parents nor marriages).
+
 * Base configuration files (base.gwf)
   - [17 Jun 00] By default now, the "can_send_image" is "yes", meaning that
     if you specify nothing, the "send image" is proposed in update pages. To

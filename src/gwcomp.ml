@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 3.9 2000-05-23 07:19:02 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.10 2000-06-29 11:38:24 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000h";
+value magic_gwo = "GnWo000l";
 
 type key =
   { pk_first_name : string;
@@ -22,7 +22,7 @@ type syntax_o =
       gen_family (gen_person iper string) string and
       gen_descend (gen_person iper string)
   | Notes of key and string
-  | Relations of key and list (gen_relation somebody string)
+  | Relations of somebody and sex and list (gen_relation somebody string)
   | Bnotes of string ]
 ;
 
@@ -794,8 +794,13 @@ value read_family ic fname =
         | Some (str, _) -> failwith str
         | None -> failwith "end of file" ]
   | Some (str, ["rel" :: l]) ->
-      let (surname, l) = get_name str l in
-      let (first_name, occ, l) = get_fst_name str l in
+      let (sb, _, l) = parse_parent str l in
+      let (sex, l) =
+        match l with
+        [ ["#h" :: l] -> (Male, l)
+        | ["#f" :: l] -> (Female, l)
+        | l -> (Neuter, l) ]
+      in
       if l <> [] then failwith "str"
       else
         match read_line ic with
@@ -810,12 +815,7 @@ value read_family ic fname =
               with
               [ End_of_file -> failwith "missing end rel" ]
             in
-            let key =
-              {pk_first_name = first_name;
-               pk_surname = surname;
-               pk_occ = occ}
-            in
-            Some (Relations key rl, read_line ic)
+            Some (Relations sb sex rl, read_line ic)
         | Some (str, _) -> failwith str
         | None -> failwith "end of file" ]
   | Some (str, _) -> failwith str

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.8 2000-06-05 22:40:16 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.9 2000-06-29 11:38:23 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -476,42 +476,26 @@ value insert_relation gen p r =
    r_sources = unique_string gen r.r_sources}
 ;
 
-value insert_relations fname gen key rl =
-  let occ = key.pk_occ + gen.g_shift in
-  match
-    try
-      Some
-        (find_person_by_name gen key.pk_first_name key.pk_surname occ)
-    with [ Not_found -> None ]
-  with
-  [ Some ip ->
-      let p = poi gen.g_base ip in
-      if p.rparents <> [] then
-        do Printf.printf "\nFile \"%s\"\n" fname;
-           Printf.printf "Relations already defined for \"%s%s %s\"\n"
-             key.pk_first_name
-             (if occ == 0 then "" else "." ^ string_of_int occ)
-             key.pk_surname;
-        return Check.error gen
-      else
-        let rl = List.map (insert_relation gen p) rl in
-        p.rparents := rl
-  | None ->
-      do Printf.printf "File \"%s\"\n" fname;
-         Printf.printf
-           "*** warning: undefined person: \"%s%s %s\"\n"
-           key.pk_first_name
-           (if occ == 0 then "" else "." ^ string_of_int occ)
-           key.pk_surname;
-         flush stdout;
-      return () ]
+value insert_relations fname gen sb sex rl =
+  let p = insert_somebody gen sb in
+  if p.rparents <> [] then
+    do Printf.printf "\nFile \"%s\"\n" fname;
+       Printf.printf "Relations already defined for \"%s%s %s\"\n"
+         (sou gen.g_base p.first_name)
+         (if p.occ == 0 then "" else "." ^ string_of_int p.occ)
+         (sou gen.g_base p.surname);
+    return Check.error gen
+  else
+    do notice_sex gen p sex; return
+    let rl = List.map (insert_relation gen p) rl in
+    p.rparents := rl
 ;
 
 value insert_syntax fname gen =
   fun
   [ Family cpl witl fam des -> insert_family gen cpl witl fam des
   | Notes key str -> insert_notes fname gen key str
-  | Relations key rl -> insert_relations fname gen key rl
+  | Relations sb sex rl -> insert_relations fname gen sb sex rl
   | Bnotes str -> insert_bnotes fname gen str ]
 ;
 

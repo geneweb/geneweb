@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.22 2000-06-26 09:25:38 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.23 2000-06-29 11:38:24 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -578,13 +578,23 @@ value print_relation_for_person oc base mark def_p p r =
      return () ]
 ;
 
-value print_relations_for_person oc base mark def_p p =
+value print_relations_for_person oc base mark def_p is_definition p =
   let surn = correct_string base p.surname in
   let fnam = correct_string base p.first_name in
   if surn <> "?" || fnam <> "?" then
     do Printf.fprintf oc "\n";
-       Printf.fprintf oc "rel %s %s%s\n" surn fnam
+       Printf.fprintf oc "rel %s %s%s" surn fnam
          (if p.occ == 0 then "" else "." ^ string_of_int p.occ);
+       if is_definition then
+         do if has_infos base p then print_infos oc base False "" "" p
+            else Printf.fprintf oc " 0";
+            match p.sex with
+            [ Male -> Printf.fprintf oc " #h"
+            | Female -> Printf.fprintf oc " #f"
+            | Neuter -> () ];
+         return ()
+       else ();
+       Printf.fprintf oc "\n";
        Printf.fprintf oc "beg\n";
        List.iter (print_relation_for_person oc base mark def_p p) p.rparents;
        Printf.fprintf oc "end\n";
@@ -605,11 +615,40 @@ value print_relations oc base mark per_sel ml =
     | [p :: pl] ->
          let def_p = ref [] in
          do if p.rparents <> [] && per_sel p.cle_index then
-              do print_relations_for_person oc base mark def_p p;
+              do print_relations_for_person oc base mark def_p False p;
                  List.iter (print_notes_for_person oc base) def_p.val;
               return ()
             else ();
          return loop (pl @ def_p.val) ]
+;
+
+value is_isolated base p =
+  match (aoi base p.cle_index).parents with
+  [ Some _ -> False
+  | None -> Array.length (uoi base p.cle_index).family = 0 ]
+;
+
+value get_isolated_related base mark m list =
+  let concat_isolated ip list =
+    if mark.(Adef.int_of_iper ip) then list
+    else
+      let p = poi base ip in
+      if List.memq p list then list
+      else if is_isolated base p then [p :: list] else list
+  in
+  let list = List.fold_right concat_isolated m.m_fath.related list in
+  let list = List.fold_right concat_isolated m.m_moth.related list in
+  let list =
+    List.fold_right
+      (fun p list -> List.fold_right concat_isolated p.related list)
+      (Array.to_list m.m_chil) list
+  in
+  list
+;
+
+value print_isolated_related oc base mark per_sel ml =
+  let pl = List.fold_right (get_isolated_related base mark) ml [] in
+  List.iter (print_relations_for_person oc base mark (ref []) True) pl
 ;
 
 value rec merge_families ifaml1f ifaml2f =
@@ -933,6 +972,7 @@ value gwu base out_dir out_oc src_oc_list anc desc =
                      (print_family oc base mark sel fam_done notes_pl_p) ml;
                    print_notes oc base ml per_sel notes_pl_p.val;
                    print_relations oc base mark per_sel ml;
+                   print_isolated_related oc base mark per_sel ml;
                 return ()
               else ()
             else ();
