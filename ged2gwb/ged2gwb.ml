@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.21 1999-06-21 14:16:40 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.22 1999-07-02 14:26:54 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -344,24 +344,31 @@ value find_year =
   in
   Grammar.Entry.of_parser g "find_year" find
 ;
+value date_period d1 d2 =
+  match (d1, d2) with
+  [ (Some d1, Some d2) -> Some (d1, Some d2)
+  | (Some d1, None) ->
+      Some
+        ({day = d1.day; month = d1.month; year = d1.year;
+          prec = After},
+         None)
+  | (None, Some d2) ->
+      Some
+        ({day = d2.day; month = d2.month; year = d2.year;
+          prec = Before},
+         None)
+  | (None, None) -> None ]
+;
+
 EXTEND
   GLOBAL: date;
   date:
-    [ [ ID "BET"; prec; d1 = simple_date; ID "AND"; prec; d2 = simple_date;
-        EOI ->
-          match (d1, d2) with
-          [ (Some d1, Some d2) -> Some (d1, Some d2)
-          | (Some d1, None) ->
-              Some
-                ({day = d1.day; month = d1.month; year = d1.year;
-                  prec = After},
-                 None)
-          | (None, Some d2) ->
-              Some
-                ({day = d2.day; month = d2.month; year = d2.year;
-                  prec = Before},
-                 None)
-          | (None, None) -> None ]
+    [ [ ID "FROM"; prec; d1 = simple_date; ID "TO"; prec; d2 = simple_date;
+        EOI -> date_period d1 d2
+      | ID "FROM"; prec; d1 = simple_date; EOI -> date_period d1 None
+      | ID "TO"; prec; d2 = simple_date; EOI -> date_period None d2
+      | ID "BET"; prec; d1 = simple_date; ID "AND"; prec; d2 = simple_date;
+        EOI -> date_period d1 d2
       | p = prec; d = simple_date; EOI ->
           match d with
           [ Some d ->

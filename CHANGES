@@ -2,10 +2,16 @@ GeneWeb version 2.05
 --------------------
 
 * Setup program
-  - [Jun 2, 99] Fixed bug: importing GeneWeb base from old version passing
+  - [Jul 2, 99] Fixed bug: importing GeneWeb base from old version passing
     by a GEDCOM file did not work if the current directory held spaces.
-  - [Jun 2, 99] Changed names of html files to hold 8 characters maximum
+  - [Jul 2, 99] Changed names of html files to hold 8 characters maximum
     and 3 characters for the extension, to be unzippable by "pkunzip".
+
+* Gedcom to GeneWeb (ged2gwb)
+  - [Jul 2, 99] Recognizes the dates of the form "FROM..TO..".
+
+* GeneWeb to Gedcom (gwb2ged)
+  - [Jul 2, 99] Generates dates of the form "FROM..TO.." for titles.
 
 GeneWeb version 2.04
 --------------------
