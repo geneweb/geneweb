@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.177 2000-11-06 19:50:37 ddr Exp $
+# $Id: lexicon.txt,v 3.178 2000-11-07 10:48:52 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -34,6 +34,7 @@ es: de=Alem&aacute;n/cs=Checo/cn=Chino/dk=Dan&eacute;s/es=Espa&ntilde;ol/eo=Espe
 fi: af=afrikaani/cn=kiina/cs=tsekki/de=saksa/dk=tanska/en=englanti/eo=esperanto/es=espanja/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/se=ruotsi
 fr: af=afrikaans/cn=chinois/cs=tch&egrave;que/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pt=portugais/ru=russe/se=su&eacute;dois
 lv: cn=Íînieðu/cs=Èehu/dk=Dâòu/nl=Holandieðu/en=Angïu/eo=Esperanto/fi=Somu/fr=Franèu/de=Vâcu/he=Ebreju/is=Islandieðû/it=Itâïu/lv=Latvieðu/no=Norvçìu/pt=Portugâïu/es=Spâòu/ru=Krievu/se=Zviedru
+nl: af=Afrikaans/cn=Chinees/cs=Tsjechisch/dk=Deens/nl=Nederlands/en=Engels/eo=Esperanto/fi=Fins/fr=Frans/de=Duits/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/no=Noors/pt=Portugees/es=Spaans/ru=Russisch/se=Zweeds
 pt: af=Afrikaans/cn=Chin&ecirc;/cs=Checo/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;/en=Ingl&ecirc;/eo=Esperanto/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
 se: af=afrikaans/cn=kinesiska/cs=tjeckiska/dk=danska/en=engelska/eo=esperanto/fi=finska/fr=franska/de=tyska/he=hebreiska/is=isl&auml;ndska/it=italienska/lv=litauiska/nl=holl&auml;ndska/no=norska/pt=portugisiska/es=spanska/ru=ryska/se=svenska
 
