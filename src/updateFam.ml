@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.17 2001-06-20 16:34:47 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.18 2001-08-16 08:26:40 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -759,7 +759,7 @@ value rec eval_variable conf base env ((fam, cpl, des) as fcd) =
             let i = i - 1 in
             if i >= 0 && i < Array.length fam.witnesses then
               VVind fam.witnesses.(i) s
-            else if i >= 0 && i < 2 && Array.length fam.witnesses = 0 then
+            else if i >= 0 && i < 2 && Array.length fam.witnesses < 2 then
               VVind ("", "", 0, Update.Create Neuter None, "") s
             else VVnone
         | _ -> VVnone ]
