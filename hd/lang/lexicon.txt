@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.140 1999-10-05 08:12:06 ddr Exp $
+# $Id: lexicon.txt,v 2.141 1999-10-08 07:15:43 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1848,6 +1848,14 @@ nl: dit geeft de voornamen in alfabetische volgorde
 no: alfabetisk p&aring; fornavn
 pt: por os nomes por ordem alfab&eacute;tico
 se: f&ouml;r f&ouml;rnamnen i bokstavsordning
+
+    forum
+en: forum
+fr: forum
+
+    friend
+en: friend
+fr: ami
 
     generation
 cs: generace
@@ -4415,6 +4423,10 @@ en: witness/witnesses
 fr: t&eacute;moin/t&eacute;moins
 nl: getuige/getuigen
 se: vittne/vittnen
+
+    wizard
+en: wizard
+fr: sorcier
 
     would be his/her own ancestor
 cs: byl by svùj vlastní pøedek
