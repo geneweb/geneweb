@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.200 2000-12-19 15:42:08 ddr Exp $
+# $Id: lexicon.txt,v 3.201 2000-12-26 14:58:08 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -34,6 +34,7 @@ eo: en=anglo/eo=esperanto/fr=franco
 es: de=Alem&aacute;n/cs=Checo/cn=Chino/dk=Dan&eacute;s/es=Espa&ntilde;ol/eo=Esperanto/fr=Franc&eacute;s/he=Hebreo/en=Ingl&eacute;s/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/se=Sueco
 fi: af=afrikaani/cn=kiina/cs=tsekki/de=saksa/dk=tanska/en=englanti/eo=esperanto/es=espanja/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/se=ruotsi
 fr: af=afrikaans/cn=chinois/cs=tch&egrave;que/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pt=portugais/ru=russe/se=su&eacute;dois
+he: af=àôøé÷àğñ /cn=ñéğéú /cs=ö'ëéú /de=âøîğéú /dk=ãğéú /en=àğâìéú /eo=àñôøğèå /es=ñôøãéú /fi=ôéğéú /fr=öøôúéú /he=òáøéú /is=àéñìğãéú /it=àéèì÷éú /lv=ìèååéú /no=ğåøáâéú /pt=ôåøèåâæéú /ru=øåñéú /se=ùååãéú
 is: af=afrikanska/cn=kínverska/cs=tékkneska/dk=danska/nl=hollenska/en=enska/eo=esperanto/fi=finnska/fr=franska/de=şıska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/no=norska/pt=portúgalska/es=spænska/ru=rússneska/se=sænska
 it: af=africano/cn=cinese/cs=ceco/de=tedesco/dk=danese/en=inglese/eo=esperanto/es=spagnolo/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pt=portoghese/ru=russo/se=svedese
 lv: cn=Íînieğu/cs=Èehu/dk=Dâòu/nl=Holandieğu/en=Angïu/eo=Esperanto/fi=Somu/fr=Franèu/de=Vâcu/he=Ebreju/is=Islandieğû/it=Itâïu/lv=Latvieğu/no=Norvçìu/pt=Portugâïu/es=Spâòu/ru=Krievu/se=Zviedru
@@ -291,6 +292,7 @@ eo: la sekso de %t ne koheras kun siaj rilatoj
 es: el género de %t es incoherente con sus relaciones
 fi: henkil&ouml;n %t sukupuoli ja h&auml;nen suhteensa eiv&auml;t t&auml;sm&auml;&auml;
 fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
+he:  äîéï ùì %t ìà îúàéí ìéçñéå/ìéçñéä
 is: kyn %t er ekki í samræmi viğ skyldleika
 it: il sesso di %t non e' coerente con le sue relazioni
 nl: het geslacht van %t is niet samenhangend met zijn/haar relaties
@@ -346,6 +348,7 @@ en: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prair
 eo: vendemjero/brumero/frimero/nivozo/pluvjozo/ventozo/germinalo/florealo/prerialo/mesidoro/termindoro/fructidoro/suplemento
 fi: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
+he:  ååğãîéàéàø / áøåîàéàø / ôøéîàéàø / ğéáåæ / ôìåáéåæ / â'øîéğàì / ôìåøéàì / ôøàøéàì / îñéãåø / úøîéãåø / ôøå÷èéãåø / ğåñó
 nl: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 no: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 se: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/komplementär
@@ -3634,6 +3637,7 @@ eo: estas masxo en la datenbazo: %s estas sia propra avo
 es: bucle en la base de datos: %s es su propio ancestro
 fi: silmukka tietokannassa: %s on oma esivanhempansa
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
+he:  îòâì áîàâø äğúåğéí: %s  öàöà(ä) ìàöîå/ìàöîä
 it: loop nel data-base: %s e' antenato di se stesso
 nl: loop in de data base: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
@@ -3869,6 +3873,7 @@ eo: almetita mesagxo
 es: mensaje agregado
 fi: viesti lis&auml;tty
 fr: message ajout&eacute;
+he:  äåñôä äåãòä
 is: skilaboğum bætt viğ
 it: messaggio aggiunto
 nl: bericht toegevoegd
@@ -5484,6 +5489,7 @@ eo: objekto
 es: asunto
 fi: kohde
 fr: sujet
+he:  ğåùà
 is: um
 it: oggetto
 nl: onderwerp
