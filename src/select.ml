@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 1.1.1.1 1998-09-01 14:32:11 ddr Exp $ *)
+(* $Id: select.ml,v 1.2 1998-12-16 17:36:41 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -49,8 +49,8 @@ value functions base anc desc =
   match (anc, desc) with
   [ (None, None) -> (fun _ -> True, fun _ -> True)
   | _ ->
-      let per_tab = Array.create base.persons.len 0 in
-      let fam_tab = Array.create base.families.len 0 in
+      let per_tab = Array.create base.data.persons.len 0 in
+      let fam_tab = Array.create base.data.families.len 0 in
       match (anc, desc) with
       [ (Some iaper, None) ->
           do select_ancestors base per_tab fam_tab 1 iaper; return

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.8 1998-12-16 06:05:01 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.9 1998-12-16 17:36:40 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -105,8 +105,8 @@ value phony_dist_tab = (fun _ -> 0, fun _ -> infinity);
 value make_dist_tab conf base ia maxlev =
   if maxlev <= threshold.val then phony_dist_tab
   else
-    let _ = base.ascends.array () in
-    let _ = base.couples.array () in
+    let _ = base.data.ascends.array () in
+    let _ = base.data.couples.array () in
     let tstab = Util.create_topological_sort conf base in
     let module Pq =
       Pqueue.Make
@@ -116,7 +116,7 @@ value make_dist_tab conf base ia maxlev =
          end)
     in
     let default = {dmin = infinity; dmax = 0; mark = False} in
-    let dist = Array.create base.persons.len default in
+    let dist = Array.create base.data.persons.len default in
     let q = ref Pq.empty in
     let add_children ip =
       let p = poi base ip in
@@ -138,7 +138,7 @@ value make_dist_tab conf base ia maxlev =
        while not (Pq.is_empty q.val) do
          let (k, nq) = Pq.take q.val in
          do q.val := nq; return
-         match (base.ascends.get k).parents with
+         match (base.data.ascends.get k).parents with
          [ Some ifam ->
              let cpl = coi base ifam in
              let dfath = dist.(Adef.int_of_iper cpl.father) in

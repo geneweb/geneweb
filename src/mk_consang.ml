@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 1.3 1998-11-06 17:57:26 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 1.4 1998-12-16 17:36:36 ddr Exp $ *)
 
 value fname = ref "";
 value scratch = ref False;
@@ -21,7 +21,8 @@ value main () =
   let f () =
     let base = Iobase.input fname.val in
     try
-      do if base.Def.has_family_patches then scratch.val := True else ();
+      do if base.Def.data.Def.has_family_patches then scratch.val := True
+         else ();
          Sys.catch_break True;
          try Consang.compute_all_consang base scratch.val with
          [ Sys.Break -> do Printf.eprintf "\n"; flush stderr; return () ];

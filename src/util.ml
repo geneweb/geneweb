@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.17 1998-12-16 06:05:06 ddr Exp $ *)
+(* $Id: util.ml,v 1.18 1998-12-16 17:36:48 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -690,7 +690,7 @@ value list_find f =
 
 value find_person_in_env conf base suff =
   match p_getint conf.env ("i" ^ suff) with
-  [ Some i -> Some (base.persons.get i)
+  [ Some i -> Some (base.data.persons.get i)
   | None ->
       match
         (p_getenv conf.env ("p" ^ suff), p_getenv conf.env ("n" ^ suff))
@@ -786,10 +786,10 @@ value get_request_string conf =
 value create_topological_sort conf base =
   match p_getenv conf.env "opt" with
   [ Some "no_tsfile" ->
-      let _ = base.ascends.array () in
-      let _ = base.couples.array () in
+      let _ = base.data.ascends.array () in
+      let _ = base.data.couples.array () in
       Consang.topological_sort base
-  | Some "no_tstab" -> Array.create base.persons.len 0
+  | Some "no_tstab" -> Array.create base.data.persons.len 0
   | _ ->
       let bfile = Filename.concat base_dir.val conf.bname in
       lock (Iobase.lock_file bfile) with
@@ -800,15 +800,15 @@ value create_topological_sort conf base =
           with
           [ Some ic -> Marshal.from_channel ic
           | None ->
-              let _ = base.ascends.array () in
-              let _ = base.couples.array () in
+              let _ = base.data.ascends.array () in
+              let _ = base.data.couples.array () in
               let oc = open_out_bin tstab_file in
               let tstab = Consang.topological_sort base in
               do Marshal.to_channel oc tstab [Marshal.No_sharing];
                  close_out oc;
               return tstab ]
       | Refuse ->
-          let _ = base.ascends.array () in
-          let _ = base.couples.array () in
+          let _ = base.data.ascends.array () in
+          let _ = base.data.couples.array () in
           Consang.topological_sort base ] ]
 ;

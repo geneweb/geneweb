@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 1.5 1998-12-16 06:04:51 ddr Exp $ *)
+(* $Id: cousins.ml,v 1.6 1998-12-16 17:36:26 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -13,7 +13,7 @@ value max_cnt = 2000;
 
 value niveau_max_ascendance base ip =
   let x = ref 0 in
-  let mark = Array.create base.persons.len False in
+  let mark = Array.create base.data.persons.len False in
   do let rec loop niveau ip =
        if mark.(Adef.int_of_iper ip) then ()
        else

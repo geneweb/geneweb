@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.17 1998-12-16 06:04:59 ddr Exp $ *)
+(* $Id: perso.ml,v 1.18 1998-12-16 17:36:38 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -504,7 +504,7 @@ type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 value find_sosa conf base a p =
   let tstab = Util.create_topological_sort conf base in
-  let mark = Array.create base.persons.len False in
+  let mark = Array.create base.data.persons.len False in
   let rec gene_find =
     fun
     [ [] -> Left []
@@ -536,7 +536,7 @@ value find_sosa conf base a p =
 ;
 (* Masculine version
 value find_sosa conf base a p =
-  let mark = Array.create base.persons.len False in
+  let mark = Array.create base.data.persons.len False in
   let rec find z ip =
     if ip = a.cle_index then Some z
     else if mark.(Adef.int_of_iper ip) then None

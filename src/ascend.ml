@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.9 1998-12-16 06:04:48 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.10 1998-12-16 17:36:21 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -10,7 +10,7 @@ value limit_by_list = 8;
 
 value niveau_max_ascendance base ip =
   let x = ref 0 in
-  let mark = Array.create base.persons.len False in
+  let mark = Array.create base.data.persons.len False in
   do let rec loop niveau ip =
        if mark.(Adef.int_of_iper ip) then ()
        else
@@ -275,7 +275,7 @@ value will_print =
 ;
 
 value afficher_ascendants_numerotation conf base niveau_max p =
-  let mark = Array.create (base.persons.len) Num.zero in
+  let mark = Array.create (base.data.persons.len) Num.zero in
   let rec generation niveau gpl =
     if niveau <= niveau_max then
       do Wserver.wprint "<li>%s %s\n"
@@ -314,7 +314,7 @@ value print_ancestors_same_time_descendants conf base p a =
     | None -> -1 ]
   in
   let predic =
-    let tab = Array.create base.persons.len False in
+    let tab = Array.create base.data.persons.len False in
     let rec mark_descendants len p =
       let i = Adef.int_of_iper p.cle_index in
       if maxlen > 0 && len > maxlen then ()
@@ -337,7 +337,7 @@ value print_ancestors_same_time_descendants conf base p a =
     | GP_same _ _ _ -> False
     | _ -> False ]
   in
-  let mark = Array.create (base.persons.len) Num.zero in
+  let mark = Array.create (base.data.persons.len) Num.zero in
   let rec generation niveau gpl =
     if List.exists will_print gpl then
       do Wserver.wprint "<li>%s %s\n"
@@ -378,9 +378,9 @@ value print_ancestors_same_time_descendants conf base p a =
 ;
 
 value afficher_ascendants_niveau conf base niveau_max p =
-  let mark = Array.create (base.persons.len) Num.zero in
+  let mark = Array.create (base.data.persons.len) Num.zero in
   let rec generation niveau gpl =
-    do for i = 0 to base.persons.len - 1 do
+    do for i = 0 to base.data.persons.len - 1 do
          mark.(i) := Num.zero;
        done;
     return
@@ -512,7 +512,7 @@ value one_year_gp base =
 value print_missing_ancestors conf base v spouses_included p =
   let after = p_getint conf.env "after" in
   let before = p_getint conf.env "before" in
-  let mark = Array.create (base.persons.len) Num.zero in
+  let mark = Array.create (base.data.persons.len) Num.zero in
   let rec generation niveau gpl =
     if niveau > v + 1 then ()
     else if gpl <> [] then
@@ -736,7 +736,7 @@ value print_alphabetic_missing conf base spouses_included (surname, list) =
 ;
 
 value print_missing_ancestors_alphabetically conf base v spouses_included p =
-  let mark = Array.create (base.persons.len) Num.zero in
+  let mark = Array.create (base.data.persons.len) Num.zero in
   let rec generation list niveau gpl =
     if niveau > v then list
     else if gpl <> [] then
@@ -893,15 +893,7 @@ value print conf base p =
       in
       print_missing_ancestors_alphabetically conf base v si p
   | (Some "D", Some v) ->
-      print_ancestors_same_time_descendants conf base p (base.persons.get v)
+      print_ancestors_same_time_descendants conf base p
+        (base.data.persons.get v)
   | _ -> afficher_menu_ascendants conf base p ]
 ;
-
-(*
-value incorrect_request conf =
-  let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "incorrect request"))
-  in
-  do header conf title; trailer conf; return ()
-;
-*)

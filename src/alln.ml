@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 1.9 1998-12-03 13:38:12 ddr Exp $ *)
+(* $Id: alln.ml,v 1.10 1998-12-16 17:36:20 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -94,7 +94,7 @@ value print_title conf base is_surnames ini len =
        Wserver.wprint " %s %s" (transl conf "starting with")
          (String.capitalize ini)
      else
-       Wserver.wprint " (%d %s)" base.persons.len
+       Wserver.wprint " (%d %s)" base.data.persons.len
          (transl_nth conf "person/persons" 1);
   return ()
 ;
@@ -216,7 +216,8 @@ value print_frequency_any conf base is_surnames list len =
 (* version using the index *)
 value select_names conf base is_surnames ini =
   let iii =
-    if is_surnames then base.persons_of_surname else base.persons_of_first_name
+    if is_surnames then base.func.persons_of_surname
+    else base.func.persons_of_first_name
   in
   let list =
     let start_k =
@@ -252,8 +253,8 @@ value select_names conf base is_surnames ini =
 value select_names conf base is_surnames ini =
   let table = Mhashtbl.create 801 in
   let list = ref [] in
-  do for i = 0 to base.persons.len - 1 do
-       let p = base.persons.get i in
+  do for i = 0 to base.data.persons.len - 1 do
+       let p = base.data.persons.get i in
        let s =
          if is_surnames then sou base p.surname
          else sou base p.first_name

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.9 1998-12-16 06:04:55 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.10 1998-12-16 17:36:30 ddr Exp $ *)
 
 open Def;
 open Check;
@@ -26,18 +26,18 @@ value no_string gen = "";
 value unique_string gen x =
   try Mhashtbl.find gen.g_strings x with
   [ Not_found ->
-      do if gen.g_scnt == gen.g_base.strings.len then
-           let arr = gen.g_base.strings.array () in
+      do if gen.g_scnt == gen.g_base.data.strings.len then
+           let arr = gen.g_base.data.strings.array () in
            let new_size = 2 * (Array.length arr) + 1 in
            let new_arr = Array.create new_size (no_string gen) in
            do Array.blit arr 0 new_arr 0 (Array.length arr);
-              gen.g_base.strings.array := fun () -> new_arr;
-              gen.g_base.strings.len := Array.length new_arr;
+              gen.g_base.data.strings.array := fun () -> new_arr;
+              gen.g_base.data.strings.len := Array.length new_arr;
            return ()
          else ();
       return
       let u = Adef.istr_of_int gen.g_scnt in
-      do (gen.g_base.strings.array ()).(gen.g_scnt) := x;
+      do (gen.g_base.data.strings.array ()).(gen.g_scnt) := x;
          gen.g_scnt := gen.g_scnt + 1;
          Mhashtbl.add gen.g_strings x u;
       return u ]
@@ -84,20 +84,20 @@ value faire_personne gen p n occ i =
 value no_person gen = faire_personne gen "" "" 0 0;
 
 value new_iper gen =
-  if gen.g_pcnt == gen.g_base.persons.len then
-    let per_arr = gen.g_base.persons.array () in
-    let asc_arr = gen.g_base.ascends.array () in
+  if gen.g_pcnt == gen.g_base.data.persons.len then
+    let per_arr = gen.g_base.data.persons.array () in
+    let asc_arr = gen.g_base.data.ascends.array () in
     let new_size = 2 * (Array.length per_arr) + 1 in
     let (per_bidon, asc_bidon) = no_person gen in
     let new_per_arr = Array.create new_size per_bidon in
     let new_asc_arr = Array.create new_size asc_bidon in
     let new_def = Array.create new_size False in
     do Array.blit per_arr 0 new_per_arr 0 (Array.length per_arr);
-       gen.g_base.persons.array := fun () -> new_per_arr;
-       gen.g_base.persons.len := Array.length new_per_arr;
+       gen.g_base.data.persons.array := fun () -> new_per_arr;
+       gen.g_base.data.persons.len := Array.length new_per_arr;
        Array.blit asc_arr 0 new_asc_arr 0 (Array.length asc_arr);
-       gen.g_base.ascends.array := fun () -> new_asc_arr;
-       gen.g_base.ascends.len := Array.length new_asc_arr;
+       gen.g_base.data.ascends.array := fun () -> new_asc_arr;
+       gen.g_base.data.ascends.len := Array.length new_asc_arr;
        Array.blit gen.g_def 0 new_def 0 (Array.length gen.g_def);
        gen.g_def := new_def;
     return ()
@@ -105,19 +105,19 @@ value new_iper gen =
 ;
 
 value new_ifam gen =
-  if gen.g_fcnt == gen.g_base.families.len then
-    let fam_arr = gen.g_base.families.array () in
-    let cpl_arr = gen.g_base.couples.array () in
+  if gen.g_fcnt == gen.g_base.data.families.len then
+    let fam_arr = gen.g_base.data.families.array () in
+    let cpl_arr = gen.g_base.data.couples.array () in
     let new_size = 2 * (Array.length fam_arr) + 1 in
     let (phony_fam, phony_cpl) = no_family gen in
     let new_fam_arr = Array.create new_size phony_fam in
     let new_cpl_arr = Array.create new_size phony_cpl in
     do Array.blit fam_arr 0 new_fam_arr 0 (Array.length fam_arr);
-       gen.g_base.families.array := fun () -> new_fam_arr;
-       gen.g_base.families.len := Array.length new_fam_arr;
+       gen.g_base.data.families.array := fun () -> new_fam_arr;
+       gen.g_base.data.families.len := Array.length new_fam_arr;
        Array.blit cpl_arr 0 new_cpl_arr 0 (Array.length cpl_arr);
-       gen.g_base.couples.array := fun () -> new_cpl_arr;
-       gen.g_base.couples.len := Array.length new_cpl_arr;
+       gen.g_base.data.couples.array := fun () -> new_cpl_arr;
+       gen.g_base.data.couples.len := Array.length new_cpl_arr;
     return ()
   else ()
 ;
@@ -181,8 +181,8 @@ value insert_undefined_parent gen key =
                x.cle_index
            else ();
            new_iper gen;
-           (gen.g_base.persons.array ()).(gen.g_pcnt) := x;
-           (gen.g_base.ascends.array ()).(gen.g_pcnt) := a;
+           (gen.g_base.data.persons.array ()).(gen.g_pcnt) := x;
+           (gen.g_base.data.ascends.array ()).(gen.g_pcnt) := a;
            gen.g_pcnt := gen.g_pcnt + 1;
         return x ]
   in
@@ -227,8 +227,8 @@ value insert_person gen so =
                x.cle_index
            else ();
            new_iper gen;
-           (gen.g_base.persons.array ()).(gen.g_pcnt) := x;
-           (gen.g_base.ascends.array ()).(gen.g_pcnt) := a;
+           (gen.g_base.data.persons.array ()).(gen.g_pcnt) := x;
+           (gen.g_base.data.ascends.array ()).(gen.g_pcnt) := a;
            gen.g_pcnt := gen.g_pcnt + 1;
         return x ]
   in
@@ -363,8 +363,8 @@ value insere_famille gen co fo =
   and cpl =
     {father = pere.cle_index; mother = mere.cle_index}
   in
-  do (gen.g_base.families.array ()).(gen.g_fcnt) := fam;
-     (gen.g_base.couples.array ()).(gen.g_fcnt) := cpl;
+  do (gen.g_base.data.families.array ()).(gen.g_fcnt) := fam;
+     (gen.g_base.data.couples.array ()).(gen.g_fcnt) := cpl;
      gen.g_fcnt := gen.g_fcnt + 1;
      pere.family := Array.append pere.family [| fam.fam_index |];
      mere.family := Array.append mere.family [| fam.fam_index |];
@@ -446,67 +446,77 @@ value cache_of tab =
 value no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []};
 
 value empty_base : Def.base =
-  {persons = cache_of [| |];
-   ascends = cache_of [| |];
-   families = cache_of [| |];
-   couples = cache_of [| |];
-   strings = cache_of [| |];
-   has_family_patches = False;
-   persons_of_name = fun [];
-   strings_of_fsname = fun [];
-   index_of_string = fun [];
-   persons_of_surname = no_istr_iper_index;
-   persons_of_first_name = no_istr_iper_index;
-   patch_person = fun [];
-   patch_ascend = fun [];
-   patch_family = fun [];
-   patch_couple = fun [];
-   patch_string = fun [];
-   patch_name = fun [];
-   commit_patches = fun [];
-   cleanup = fun () -> ()}
+  let base_data =
+    {persons = cache_of [| |];
+     ascends = cache_of [| |];
+     families = cache_of [| |];
+     couples = cache_of [| |];
+     strings = cache_of [| |];
+     has_family_patches = False}
+  in
+  let base_func =
+   {persons_of_name = fun [];
+    strings_of_fsname = fun [];
+    index_of_string = fun [];
+    persons_of_surname = no_istr_iper_index;
+    persons_of_first_name = no_istr_iper_index;
+    patch_person = fun [];
+    patch_ascend = fun [];
+    patch_family = fun [];
+    patch_couple = fun [];
+    patch_string = fun [];
+    patch_name = fun [];
+    commit_patches = fun [];
+    cleanup = fun () -> ()}
+  in
+  {data = base_data; func = base_func}
 ;
 
 value linked_base gen : Def.base =
   let persons =
-    let a = Array.sub (gen.g_base.persons.array ()) 0 gen.g_pcnt in
-    do gen.g_base.persons.array := fun _ -> [| |]; return a
+    let a = Array.sub (gen.g_base.data.persons.array ()) 0 gen.g_pcnt in
+    do gen.g_base.data.persons.array := fun _ -> [| |]; return a
   in
   let ascends =
-    let a = Array.sub (gen.g_base.ascends.array ()) 0 gen.g_pcnt in
-    do gen.g_base.ascends.array := fun _ -> [| |]; return a
+    let a = Array.sub (gen.g_base.data.ascends.array ()) 0 gen.g_pcnt in
+    do gen.g_base.data.ascends.array := fun _ -> [| |]; return a
   in
   let families =
-    let a = Array.sub (gen.g_base.families.array ()) 0 gen.g_fcnt in
-    do gen.g_base.families.array := fun _ -> [| |]; return a
+    let a = Array.sub (gen.g_base.data.families.array ()) 0 gen.g_fcnt in
+    do gen.g_base.data.families.array := fun _ -> [| |]; return a
   in
   let couples =
-    let a = Array.sub (gen.g_base.couples.array ()) 0 gen.g_fcnt in
-    do gen.g_base.couples.array := fun _ -> [| |]; return a
+    let a = Array.sub (gen.g_base.data.couples.array ()) 0 gen.g_fcnt in
+    do gen.g_base.data.couples.array := fun _ -> [| |]; return a
   in
   let strings =
-    let a = Array.sub (gen.g_base.strings.array ()) 0 gen.g_scnt in
-    do gen.g_base.strings.array := fun _ -> [| |]; return a
+    let a = Array.sub (gen.g_base.data.strings.array ()) 0 gen.g_scnt in
+    do gen.g_base.data.strings.array := fun _ -> [| |]; return a
   in
-  {persons = cache_of persons;
-   ascends = cache_of ascends;
-   families = cache_of families;
-   couples = cache_of couples;
-   strings = cache_of strings;
-   has_family_patches = False;
-   persons_of_name = fun [];
-   strings_of_fsname = fun [];
-   index_of_string = fun [];
-   persons_of_surname = no_istr_iper_index;
-   persons_of_first_name = no_istr_iper_index;
-   patch_person = fun [];
-   patch_ascend = fun [];
-   patch_family = fun [];
-   patch_couple = fun [];
-   patch_string = fun [];
-   patch_name = fun [];
-   commit_patches = fun [];
-   cleanup = fun () -> ()}
+  let base_data =
+    {persons = cache_of persons;
+     ascends = cache_of ascends;
+     families = cache_of families;
+     couples = cache_of couples;
+     strings = cache_of strings;
+     has_family_patches = False}
+  in
+  let base_func =
+    {persons_of_name = fun [];
+     strings_of_fsname = fun [];
+     index_of_string = fun [];
+     persons_of_surname = no_istr_iper_index;
+     persons_of_first_name = no_istr_iper_index;
+     patch_person = fun [];
+     patch_ascend = fun [];
+     patch_family = fun [];
+     patch_couple = fun [];
+     patch_string = fun [];
+     patch_name = fun [];
+     commit_patches = fun [];
+     cleanup = fun () -> ()}
+  in
+  {data = base_data; func = base_func}
 ;
 
 value link gwo_list =

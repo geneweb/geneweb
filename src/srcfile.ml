@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.8 1998-12-13 11:56:44 ddr Exp $ *)
+(* $Id: srcfile.ml,v 1.9 1998-12-16 17:36:42 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -173,7 +173,7 @@ value rec copy_from_channel conf base ic =
                 return ()
             | 'h' -> hidden_env conf
             | 'l' -> Wserver.wprint "%s" conf.lang
-            | 'n' -> Wserver.wprint "%d" (base.persons.len)
+            | 'n' -> Wserver.wprint "%d" (base.data.persons.len)
             | 'q' ->
                 let (wc, rc, d) = count conf in
                 Num.print (fun x -> Wserver.wprint "%s" x)

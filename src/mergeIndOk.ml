@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 1.5 1998-12-16 06:04:58 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 1.6 1998-12-16 17:36:35 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -100,8 +100,8 @@ value print_merge1 conf base p p2 digest =
 value print_merge conf base =
   match (p_getint conf.env "i1", p_getint conf.env "i2") with
   [ (Some i1, Some i2) ->
-      let p1 = base.persons.get i1 in
-      let p2 = base.persons.get i2 in
+      let p1 = base.data.persons.get i1 in
+      let p2 = base.data.persons.get i2 in
       let p = reconstitute conf base p1 p2 in
       let digest = Update.digest_person p1 in
       print_merge1 conf base p p2 digest
@@ -118,8 +118,8 @@ value print_mod_merge_ok conf base wl p =
      Update.print_warnings conf base wl;
      match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
      [ (Some ini1, Some ini2) ->
-         let p1 = base.persons.get ini1 in
-         let p2 = base.persons.get ini2 in
+         let p1 = base.data.persons.get ini1 in
+         let p2 = base.data.persons.get ini2 in
          do Wserver.wprint "\n<p>\n";
             stag "a" "href=%sm=MRG_IND;i=%d;i2=%d" (commd conf) ini1 ini2
             begin
@@ -139,7 +139,7 @@ value print_mod_merge_ok conf base wl p =
 value effective_mod_merge conf base p =
   match p_getint conf.env "i2" with
   [ Some i2 ->
-      let p2 = base.persons.get i2 in
+      let p2 = base.data.persons.get i2 in
       let a1 = aoi base p.cle_index in
       let a2 = aoi base p2.cle_index in
       do match (a1.parents, a2.parents) with
@@ -150,9 +150,9 @@ value effective_mod_merge conf base p =
                  do fam.children.(i) := p.cle_index;
                     a1.parents := Some ifam;
                     a2.parents := None;
-                    base.patch_ascend p.cle_index a1;
-                    base.patch_ascend p2.cle_index a2;
-                    base.patch_family ifam fam;
+                    base.func.patch_ascend p.cle_index a1;
+                    base.func.patch_ascend p2.cle_index a2;
+                    base.func.patch_family ifam fam;
                  return ()
                else replace (i + 1)
          | _ -> () ];
@@ -162,7 +162,7 @@ value effective_mod_merge conf base p =
       do UpdateIndOk.effective_del conf base p2;
          p2.family := [| |];
          Update.update_misc_names_of_family base p2;
-         base.patch_person p2.cle_index p2;
+         base.func.patch_person p2.cle_index p2;
       return
       let p = UpdateIndOk.effective_mod conf base p in
       do for i = 0 to Array.length p2_family - 1 do
@@ -172,20 +172,20 @@ value effective_mod_merge conf base p =
               [ Masculine -> cpl.father := p.cle_index
               | Feminine -> cpl.mother := p.cle_index
               | Neuter -> assert False ];
-              base.patch_couple ifam cpl;
+              base.func.patch_couple ifam cpl;
            return ();
          done;
          p.family := Array.append p.family p2_family;
-         base.patch_ascend p.cle_index a1;
+         base.func.patch_ascend p.cle_index a1;
          Update.update_misc_names_of_family base p;
-         base.patch_person p.cle_index p;
+         base.func.patch_person p.cle_index p;
          Gutil.check_noloop_for_person_list base (Update.error conf base)
            [p.cle_index];
       return
       let wl =
         UpdateIndOk.all_checks_person conf base p (aoi base p.cle_index)
       in
-      do base.commit_patches ();
+      do base.func.commit_patches ();
          print_mod_merge_ok conf base wl p;
       return ()
   | _ -> incorrect_request conf ]

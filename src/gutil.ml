@@ -1,14 +1,14 @@
-(* $Id: gutil.ml,v 1.8 1998-12-16 06:04:54 ddr Exp $ *)
+(* $Id: gutil.ml,v 1.9 1998-12-16 17:36:29 ddr Exp $ *)
 
 open Def;
 
 value version = "1.10";
 
-value poi base i = base.persons.get (Adef.int_of_iper i);
-value aoi base i = base.ascends.get (Adef.int_of_iper i);
-value foi base i = base.families.get (Adef.int_of_ifam i);
-value coi base i = base.couples.get (Adef.int_of_ifam i);
-value sou base i = base.strings.get (Adef.int_of_istr i);
+value poi base i = base.data.persons.get (Adef.int_of_iper i);
+value aoi base i = base.data.ascends.get (Adef.int_of_iper i);
+value foi base i = base.data.families.get (Adef.int_of_ifam i);
+value coi base i = base.data.couples.get (Adef.int_of_ifam i);
+value sou base i = base.data.strings.get (Adef.int_of_istr i);
 
 value bissextile a =
   if a mod 100 == 0 then a / 100 mod 4 == 0 else a mod 4 == 0
@@ -204,7 +204,7 @@ value person_misc_names base p =
     [] list
 ;
 
-value person_ht_add base s ip = base.patch_name s ip;
+value person_ht_add base s ip = base.func.patch_name s ip;
 
 value person_is_key base p k =
   let k = Name.crush_lower k in
@@ -219,7 +219,7 @@ value person_is_key base p k =
 value person_ht_find_unique base first_name surname occ =
   if first_name = "?" || surname = "?" then raise Not_found
   else
-    let ipl = base.persons_of_name (first_name ^ " " ^ surname) in
+    let ipl = base.func.persons_of_name (first_name ^ " " ^ surname) in
     let first_name = Name.strip_lower first_name in
     let surname = Name.strip_lower surname in
     find ipl where rec find =
@@ -269,7 +269,7 @@ value person_ht_find_all base s =
   match get_unique base s with
   [ Some p -> [p]
   | _ ->
-      let ipl = base.persons_of_name s in
+      let ipl = base.func.persons_of_name s in
       select ipl where rec select =
         fun
         [ [ip :: ipl] ->
@@ -305,11 +305,11 @@ type base_warning = warning base_person;
 type visit = [ NotVisited | BeingVisited | Visited ];
 
 value check_noloop base error =
-  let tab = Array.create (base.persons.len) NotVisited in
+  let tab = Array.create (base.data.persons.len) NotVisited in
   let rec noloop i =
     match tab.(i) with
     [ NotVisited ->
-        do match (base.ascends.get i).parents with
+        do match (base.data.ascends.get i).parents with
            [ Some fam ->
                let fath = (coi base fam).father in
                let moth = (coi base fam).mother in
@@ -320,10 +320,10 @@ value check_noloop base error =
            | None -> () ];
            tab.(i) := Visited;
         return ()
-    | BeingVisited -> error (OwnAncestor (base.persons.get i))
+    | BeingVisited -> error (OwnAncestor (base.data.persons.get i))
     | Visited -> () ]
   in
-  for i = 0 to base.persons.len - 1 do
+  for i = 0 to base.data.persons.len - 1 do
     match tab.(i) with
     [ NotVisited -> noloop i
     | BeingVisited -> failwith "check_noloop algorithm error"
@@ -332,7 +332,7 @@ value check_noloop base error =
 ;
 
 value check_noloop_for_person_list base error ipl =
-  let tab = Array.create (base.persons.len) NotVisited in
+  let tab = Array.create (base.data.persons.len) NotVisited in
   let rec noloop ip =
     let i = Adef.int_of_iper ip in
     match tab.(i) with
@@ -561,12 +561,12 @@ value check_person base error warning p =
 value is_deleted_family fam = fam.fam_index = Adef.ifam_of_int (-1);
 
 value check_base base error warning =
-  do for i = 0 to base.persons.len - 1 do
-       let p = base.persons.get i in
+  do for i = 0 to base.data.persons.len - 1 do
+       let p = base.data.persons.get i in
        check_person base error warning p;
      done;
-     for i = 0 to base.families.len - 1 do
-       let fam = base.families.get i in
+     for i = 0 to base.data.families.len - 1 do
+       let fam = base.data.families.get i in
        if is_deleted_family fam then ()
        else check_family base error warning fam;
      done;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birth.ml,v 1.5 1998-12-16 06:04:49 ddr Exp $ *)
+(* $Id: birth.ml,v 1.6 1998-12-16 17:36:22 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -45,11 +45,11 @@ value print conf base =
     [ Some x -> x
     | _ -> 3 ]
   in
-  let n = min (max 0 n) base.persons.len in
+  let n = min (max 0 n) base.data.persons.len in
   let tab = Array.create n None in
   let len = ref 0 in
-  do for i = 0 to base.persons.len - 1 do
-       let p = base.persons.get i in
+  do for i = 0 to base.data.persons.len - 1 do
+       let p = base.data.persons.get i in
        if age_autorise conf base p then
          match Adef.od_of_codate p.birth with
          [ Some d ->

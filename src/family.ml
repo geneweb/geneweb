@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 1.13 1998-12-16 06:04:53 ddr Exp $ *)
+(* $Id: family.ml,v 1.14 1998-12-16 17:36:28 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -349,8 +349,8 @@ value print_no_index conf base =
   let get_person v =
     match try Some (int_of_string v) with [ Failure _ -> None ] with
     [ Some i ->
-        if i >= 0 && i < base.persons.len then
-          let p = base.persons.get i in
+        if i >= 0 && i < base.data.persons.len then
+          let p = base.data.persons.get i in
           let f = scratch p.first_name in
           let s = scratch p.surname in
           let oc = string_of_int p.occ in

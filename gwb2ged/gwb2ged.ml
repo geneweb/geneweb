@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 1.11 1998-12-16 06:04:47 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.12 1998-12-16 17:36:19 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -335,8 +335,8 @@ value has_personal_infos base per asc =
 ;
 
 value ged_ind_record base sel oc i =
-  let per = base.persons.get i in
-  let asc = base.ascends.get i in
+  let per = base.data.persons.get i in
+  let asc = base.data.ascends.get i in
   if has_personal_infos base per asc then
     do Printf.fprintf oc "0 @I%d@ INDI\n" (i + 1);
        ged_name base oc per;
@@ -353,10 +353,10 @@ value ged_ind_record base sel oc i =
 ;
 
 value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
-  let fam = base.families.get i in
+  let fam = base.data.families.get i in
   if is_deleted_family fam then ()
   else
-    let cpl = base.couples.get i in
+    let cpl = base.data.couples.get i in
     do Printf.fprintf oc "0 @F%d@ FAM\n" (i + 1);
        ged_marriage base oc fam;
        ged_divorce base oc fam;
@@ -397,10 +397,10 @@ value gwb2ged base ifile ofile anc desc mem =
     | None -> None ]
   in
   do if not mem then
-       let _ = base.persons.array () in
-       let _ = base.ascends.array () in
-       let _ = base.couples.array () in
-       let _ = base.families.array () in
+       let _ = base.data.persons.array () in
+       let _ = base.data.ascends.array () in
+       let _ = base.data.couples.array () in
+       let _ = base.data.families.array () in
        ()
      else ();
   return
@@ -408,12 +408,12 @@ value gwb2ged base ifile ofile anc desc mem =
   let ((per_sel, fam_sel) as sel) = Select.functions base anc desc in
   do ged_header base oc ifile ofile;
      flush oc;
-     for i = 0 to base.persons.len - 1 do
+     for i = 0 to base.data.persons.len - 1 do
        if per_sel (Adef.iper_of_int i) then ged_ind_record base sel oc i
        else ();
      done;
      flush oc;
-     for i = 0 to base.families.len - 1 do
+     for i = 0 to base.data.families.len - 1 do
        if fam_sel (Adef.ifam_of_int i) then ged_fam_record base sel oc i
        else ();
      done;
