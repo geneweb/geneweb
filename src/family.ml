@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.15 2002-02-27 16:30:12 ddr Exp $ *)
+(* $Id: family.ml,v 4.16 2002-03-04 14:10:37 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -540,7 +540,7 @@ value print_no_index conf base =
 
 value special_vars =
   ["dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et"; "long"; "spouse";
-   "cgl"; "iz"; "nz"; "pz"; "ocz"; "templ"]
+   "cgl"; "iz"; "nz"; "pz"; "ocz"; "templ"; "log_uid"; "log_pwd"; "log_cnl"]
 ;
 
 value only_special_env = List.for_all (fun (x, _) -> List.mem x special_vars);

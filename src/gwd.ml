@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.32 2002-03-03 09:24:50 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.33 2002-03-04 14:10:38 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -467,7 +467,7 @@ value general_welcome conf =
   | None -> propose_base conf ]
 ;
 
-value unauth conf typ =
+value unauth_not_cgi conf typ =
   do {
     Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
@@ -489,6 +489,45 @@ value unauth conf typ =
     Wserver.wprint "<body><h1>%s %s access failed</h1></body>\n" typ
       conf.bname;
   }
+;
+
+value unauth_cgi conf typ =
+  let title _ =
+    Wserver.wprint "Enter username for %s %s" typ conf.bname
+  in
+  do {
+    Util.header conf title;
+    Wserver.wprint "<div align=center><table border=0><tr><td>\n";
+    tag "form" "method=POST action=\"%s\"" conf.command begin
+      Util.hidden_env conf;
+      tag "table" "border=1" begin
+        tag "tr" "align=left" begin
+          tag "td" "align=right" begin
+            Wserver.wprint "User ID:";
+          end;
+          tag "td" "align=left" begin
+            Wserver.wprint "<input name=\"log_uid\" size=30>\n";
+          end;
+        end;
+        tag "tr" "align=left" begin
+          tag "td" "align=right" begin
+            Wserver.wprint "Password:";
+          end;
+          tag "td" "align=left" begin
+            Wserver.wprint "<input name=\"log_pwd\" type=password size=30>\n";
+          end;
+        end;
+      end;
+      Wserver.wprint "<input type=submit value=Ok>\n";
+      Wserver.wprint "<input type=submit name=log_cnl value=Cancel>\n";
+    end;
+    Wserver.wprint "</td></tr></table></div>\n";
+    Util.trailer conf;
+  }
+;
+
+value unauth conf typ =
+  if conf.cgi then unauth_cgi conf typ else unauth_not_cgi conf typ
 ;
 
 value match_auth_file auth_file uauth =
@@ -833,11 +872,21 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
         [ Not_found -> False ]
     in
     let passwd1 =
-      let auth = Wserver.extract_param "authorization: " '\r' request in
-      if auth = "" then ""
+      if cgi then
+        match (Util.p_getenv env "log_uid", Util.p_getenv env "log_pwd") with
+        [ (Some uid, Some passwd) -> uid ^ ":" ^ passwd
+        | _ -> "" ]
       else
-        let i = String.length "Basic " in
-        Base64.decode (String.sub auth i (String.length auth - i))
+        let auth = Wserver.extract_param "authorization: " '\r' request in
+        if auth = "" then ""
+        else
+          let i = String.length "Basic " in
+          Base64.decode (String.sub auth i (String.length auth - i))
+    in
+    let passwd =
+      match Util.p_getenv env "log_cnl" with
+      [ Some "" | None -> passwd
+      | Some _ -> "" ]
     in
     let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
     let (ok, wizard, friend) =
@@ -846,7 +895,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
       | ATfriend user -> (True, False, True)
       | ATnormal -> (True, False, False)
       | ATnone | ATset ->
-          if not cgi && (passwd = "w" || passwd = "f") then
+          if passwd = "w" || passwd = "f" then
             if passwd = "w" then
               if wizard_passwd = "" && wizard_passwd_file = "" then
                 (True, True, friend_passwd = "")
@@ -883,15 +932,17 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
     in
     let (command, passwd) =
       match access_type with
-      [ ATset ->
-          if wizard then
-            let pwd_id = set_token utm from_addr base_file 'w' user in
-            if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
-          else if friend then
-            let pwd_id = set_token utm from_addr base_file 'f' user in
-            if cgi then (command, pwd_id) else (base_file ^ "_" ^ pwd_id, "")
-          else if cgi then (command, "")
-          else (base_file, "")
+      [ ATnone | ATset ->
+          if cgi then
+            if wizard then
+              let pwd_id = set_token utm from_addr base_file 'w' user in
+              (command, pwd_id)
+            else if friend then
+              let pwd_id = set_token utm from_addr base_file 'f' user in
+              (command, pwd_id)
+            else (command, passwd)
+          else if passwd = "" then (base_file, "")
+          else (base_file ^ "_" ^ passwd, passwd)
       | ATnormal -> if cgi then (command, "") else (base_file, "")
       | _ ->
           if cgi then (command, passwd)
@@ -1099,6 +1150,9 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
           let mode = Util.p_getenv conf.env "m" in
           do {
             if mode <> Some "IM" then
+              let contents =
+                if List.mem_assoc "log_pwd" env then "..." else contents
+              in
               log_and_robot_check conf auth from request script_name contents
             else ();
             match mode with
@@ -1338,10 +1392,16 @@ value geneweb_cgi addr script_name contents =
   do {
     try Unix.mkdir (Filename.concat Util.cnt_dir.val "cnt") 0o755 with
     [ Unix.Unix_error _ _ _ -> () ];
-    let add v x request =
-      try [v ^ ": " ^ Sys.getenv x :: request] with [ Not_found -> request ]
+    let add k x request =
+      try
+        let v = Sys.getenv x in
+        if v = "" then raise Not_found
+        else [k ^ ": " ^ v :: request]
+      with
+      [ Not_found -> request ]
     in
     let request = [] in
+    let request = add "cookie" "HTTP_COOKIE" request in
     let request = add "content-type" "CONTENT_TYPE" request in
     let request = add "accept-language" "HTTP_ACCEPT_LANGUAGE" request in
     let request = add "referer" "HTTP_REFERER" request in
