@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.16 2004-12-28 15:12:55 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.17 2005-01-02 21:27:17 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -112,26 +112,27 @@ value br_inter_is_empty b1 b2 =
 
 value print_choice conf base p niveau_effectif =
   tag "form" "method=\"get\" action=\"%s\"" conf.command begin
-    html_p conf;
-    Util.hidden_env conf;
-    Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"C\">\n";
-    wprint_hidden_person conf base "" p;
-    tag "select" "name=\"v1\"" begin
-      let rec boucle i =
-        if i > niveau_effectif then ()
-        else do {
-          Wserver.wprint "  <option value=\"%d\"%s> %s\n" i
-            (if i == 2 then " selected" else "")
-            (capitale (brother_label conf i));
-          boucle (succ i)
-        }
-      in
-      boucle 1;
+    tag "p" begin
+      Util.hidden_env conf;
+      xtag "input" "type=\"hidden\" name=\"m\" value=\"C\"";
+      wprint_hidden_person conf base "" p;
+      tag "select" "name=\"v1\"" begin
+        let rec boucle i =
+          if i > niveau_effectif then ()
+          else do {
+            Wserver.wprint "  <option value=\"%d\"%s>%s</option>\n" i
+              (if i == 2 then " selected=\"selected\"" else "")
+              (capitale (brother_label conf i));
+            boucle (succ i)
+          }
+        in
+        boucle 1;
+      end;
+      xtag "input" "type=\"submit\" value=\"Ok\"";
+      xtag "br";
+      xtag "input" "type=\"checkbox\" name=\"csp\" value=\"on\"";
+      Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
     end;
-    Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
-    Wserver.wprint "<br>\n";
-    Wserver.wprint "<input type=\"checkbox\" name=\"csp\" value=\"on\"> %s\n"
-      (capitale (transl conf "include spouses"));
   end
 ;
 
@@ -166,8 +167,8 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
       if first then
         Wserver.wprint "%s"
           (gen_person_title_text reference std_access conf base p2)
-      else Wserver.wprint "<br>%s" (person_title_text conf base p2);
-      Wserver.wprint "%s & %s%s" (Date.short_dates_text conf base p2)
+      else Wserver.wprint "<br%s>%s" conf.xhs (person_title_text conf base p2);
+      Wserver.wprint "%s &amp; %s%s" (Date.short_dates_text conf base p2)
         (gen_person_title_text (reference_sp sp) std_access conf base sp)
         (Date.short_dates_text conf base sp)
     }
@@ -209,7 +210,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
          if is_valid_rel && cnt.val < max_cnt && has_desc_lev conf base lev u
          then do {
            if lev <= 2 then do {
-             html_li conf;
+             Wserver.wprint "<li>\n";
              if lev = 1 then do {
                give_access conf base ia_asex ini_p ini_br p br; incr cnt
              }
@@ -221,8 +222,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                in
                Wserver.wprint "%s" (capitale s);
                Wserver.wprint ":"
-             };
-             Wserver.wprint "\n"
+             }
            }
            else ();
            let children =
@@ -231,7 +231,8 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                (children_of base u)
            in
            print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
-             children
+             children;
+	   if lev <= 2 then Wserver.wprint "</li>\n" else ()
          }
          else ())
       children;
@@ -248,7 +249,7 @@ value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
   let sib = siblings conf base a in
   if List.exists (sibling_has_desc_lev conf base lev2) sib then do {
     if lev1 > 1 then do {
-      html_li conf;
+      Wserver.wprint "<li>\n";
       Wserver.wprint "%s:\n"
         (capitale
            (cftransl conf "on %s's side"
@@ -257,6 +258,7 @@ value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
     else ();
     let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
     print_descend_upto conf base max_cnt ini_p ini_br lev2 sib;
+    if lev1 > 1 then Wserver.wprint "</li>\n" else ();
     True
   }
   else False
@@ -285,9 +287,10 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
         else some
     in
     if some then ()
-    else do {
-      html_li conf; Wserver.wprint "%s\n" (capitale (transl conf "no match"))
-    };
+    else
+      stagn "li" begin
+        Wserver.wprint "%s\n" (capitale (transl conf "no match"));
+      end;
     if lev1 > 1 then Wserver.wprint "</ul>\n" else ()
   }
 ;
@@ -327,12 +330,13 @@ value print_cousins conf base p lev1 lev2 =
     header conf title;
     cnt.val := 0;
     print_cousins_lev conf base max_cnt p lev1 lev2;
-    html_p conf;
-    if cnt.val >= max_cnt then Wserver.wprint "etc...\n"
-    else if cnt.val > 1 then
-      Wserver.wprint "%s: %d %s.\n" (capitale (transl conf "total")) cnt.val
-        (nominative (transl_nth_def conf "person/persons" 2 1))
-    else ();
+    tag "p" begin
+      if cnt.val >= max_cnt then Wserver.wprint "etc...\n"
+      else if cnt.val > 1 then
+        Wserver.wprint "%s: %d %s.\n" (capitale (transl conf "total")) cnt.val
+          (nominative (transl_nth_def conf "person/persons" 2 1))
+      else ();
+    end;
     trailer conf
   }
 ;
@@ -350,27 +354,30 @@ value print_menu conf base p effective_level =
   do {
     header conf title;
     tag "ul" begin
-      html_li conf;
-      print_choice conf base p effective_level;
-      html_li conf;
-      Wserver.wprint "<a href=\"%s%s;m=C;v1=2;v2=1\">%s</a>\n" (commd conf)
-        (acces conf base p) (capitale (transl conf "uncles and aunts"));
-      if has_nephews_or_nieces conf base p then do {
-        html_li conf;
-        Wserver.wprint "<a href=\"%s%s;m=C;v1=1;v2=2\">%s</a>\n" (commd conf)
-          (acces conf base p) (capitale (transl conf "nephews and nieces"))
-      }
+      tag "li" begin
+        print_choice conf base p effective_level;
+      end;
+      stagn "li" begin
+        Wserver.wprint "<a href=\"%s%s;m=C;v1=2;v2=1\">%s</a>" (commd conf)
+          (acces conf base p) (capitale (transl conf "uncles and aunts"));
+      end;
+      if has_nephews_or_nieces conf base p then
+        stagn "li" begin
+          Wserver.wprint "<a href=\"%s%s;m=C;v1=1;v2=2\">%s</a>" (commd conf)
+            (acces conf base p) (capitale (transl conf "nephews and nieces"));
+        end
       else ();
     end;
     match p.death with
     [ NotDead | DontKnowIfDead when conf.wizard || conf.friend ->
         do {
-          html_p conf;
+          Wserver.wprint "\n";
           tag "ul" begin
-            html_li conf;
-            Wserver.wprint "<a href=\"%s%s;m=C;t=AN" (commd conf)
-              (acces conf base p);
-            Wserver.wprint "\">%s</a>\n" (capitale (transl conf "birthdays"));
+            stagn "li" begin
+              Wserver.wprint "<a href=\"%s%s;m=C;t=AN" (commd conf)
+                (acces conf base p);
+              Wserver.wprint "\">%s</a>" (capitale (transl conf "birthdays"));
+            end;
           end
         }
     | _ -> () ];
@@ -491,10 +498,10 @@ value print_anniv conf base p level =
   in
   let mode () =
     do {
-      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"C\">\n";
-      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
+      xtag "input" "type=\"hidden\" name=\"m\" value=\"C\"";
+      xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
         (Adef.int_of_iper p.cle_index);
-      Wserver.wprint "<input type=\"hidden\" name=\"t\" value=\"AN\">\n"
+      xtag "input" "type=\"hidden\" name=\"t\" value=\"AN\""
     }
   in
   match p_getint conf.env "v" with
