@@ -17,10 +17,9 @@ vous estimez n&eacute;cessaire:
 
 <p>
 
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
-<td valign=top><strong>-lang</strong></td>
+<td valign=top><strong>-lang</strong>
 <td>Langue par d&eacute;faut.
 <p>
 Par d&eacute;faut, les pages de toutes les bases de donn&eacute;es
@@ -36,11 +35,9 @@ en quelque sorte la langue "par d&eacute;faut par d&eacute;faut".
 <p>
 <p>
 Si c'est "-", c'est le fran&ccedil;ais.
-</td>
-</tr>
 
 <tr>
-<td>&nbsp;</td>
+<td>&nbsp;
 <td>
 <select name=default_lang>
 <option value=$L{}>-
@@ -58,17 +55,11 @@ Si c'est "-", c'est le fran&ccedil;ais.
 <option value=$L{pt}>Portugais
 <option value=$L{se}>Su&eacute;dois
 </select>
-</td>
-</tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
-<td valign=top><strong>-only</strong></td>
+<td valign=top><strong>-only</strong>
 <td>
 Seule adresse autoris&eacute;e.
 <p>
@@ -79,22 +70,15 @@ Pour savoir quelle valeur mettre pour votre ordinateur, regardez les
 traces de la commande "gwd" qui s'affichent chaque fois que vous
 naviguez dans une base de donn&eacute;es. Il faut mettre ce que vous
 voyez derri&egrave;re le "From:".
-</td>
-</tr>
 
 <tr>
-<td>&nbsp;</td>
+<td>&nbsp;
 <td><input name=only value="$O" size=40>
-</tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
-<td valign=top><strong>-log</strong></td>
+<td valign=top><strong>-log</strong>
 <td>
 Fichier de traces de connexion.
 <p>
@@ -108,19 +92,13 @@ fichier sera cr&eacute;&eacute;, s'il n'existe pas, dans le
 r&eacute;pertoire principal de <em>GeneWeb</em> o&ugrave; vous voyez
 les commandes "setup" et "gwd". Il sera rallong&eacute; &agrave; chaque
 requ&ecirc;te.
-<td>
-</tr>
 
 <tr>
-<td>&nbsp;</td>
+<td>&nbsp;
 <td><input name=log value="$T" size=40>
-</tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd> D'autres param&egrave;tres existent pour la commande "gwd",
+<dl><dt><dd> D'autres param&egrave;tres existent pour la commande "gwd",
 mais ils ne sont pas configurables ici, car ils peuvent perturber le
 fonctionnement de "setup".
 <p>
@@ -137,6 +115,6 @@ Puis appuyez sur ce bouton:
 
 <p>
 
-<dl><dd><input type=submit value="Configurer"></dl>
+<input type=submit value="Configurer">
 
 </form>

@@ -19,7 +19,7 @@ Entrez:
 
 <p>
 
-<input name=anon type=file size=55>
+<input name=anon $n{type=file} size=55>
 
 </ul>
 
@@ -41,29 +41,20 @@ S&eacute;lectionnez les options que vous d&eacute;sirez:
 
 <p>
 
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td><input type=checkbox name=lf value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>Forcer les pr&eacute;noms &agrave; &ecirc;tre en
 minuscules. Mettre leurs initiales en majuscules.</td> </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td><input type=checkbox name=ls value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>Forcer les noms de famille &agrave; &ecirc;tre en
 minuscules. Mettre leurs initiales en majuscules. Essaye de garder les
 particules en minuscules.</td> </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td>&nbsp;</td><td>Par d&eacute;faut, au moment de la
 cr&eacute;ation d'une personne, si la partie pr&eacute;nom dans le
 GEDCOM est form&eacute;e de plusieurs noms, le premier de ces noms va
@@ -74,13 +65,9 @@ dans la partie "pr&eacute;nom" et le pr&eacute;nom complet devient un
 <td><input type=checkbox name=no_efn value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>Annuler cette option.</td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td>&nbsp;</td><td>Par d&eacute;faut, au moment de la
 cr&eacute;ation d'une personne, si la partie pr&eacute;nom dans le
 GEDCOM ressemble &agrave; un nom public, c'est-&agrave;-dire contient:
@@ -97,26 +84,18 @@ mot de la partie pr&eacute;nom va dans la partie "pr&eacute;nom".
 <td><input type=checkbox name=no_epn value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>Annuler cette option.</td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
 <td><input type=checkbox name=tnd value=on>&nbsp;&nbsp;&nbsp;</td>
 
 <td>Essayer de mettre des dates n&eacute;gatives s'il y a
 incoh&eacute;rence (exemple: naissance apr&egrave;s la mort).</td>
-
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
+<dl><dt><dd><table border=1>
 <tr>
 <td><input type=checkbox name=no_nd value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>Pas de dates n&eacute;gatives: ne pas interpr&eacute;ter une
@@ -125,10 +104,7 @@ une date n&eacute;gative.</td>
 </tr>
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td>&nbsp;</td><td>Certains fichiers GEDCOM &eacute;crivent
 parfois les dates en mettant les mois avec des nombres (de 1 &agrave;
 12). Le standard GEDCOM 5.5 exige que les mois soient
@@ -151,13 +127,9 @@ pays).</td></tr>
 <td><input type=radio name=dates value="_md">&nbsp;&nbsp;&nbsp;</td>
 <td>Interpr&eacute;ter ces dates comme "mois/jour/ann&eacute;e".</td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td>&nbsp;</td><td>La norme GEDCOM 5.5 pr&eacute;conise
 l'utilisation du codage ANSEL pour les caract&egrave;res
 accentu&eacute;s, qui sont alors repr&eacute;sent&eacute;s par deux
@@ -176,12 +148,9 @@ le contraire.</td>
 <tr><td><input type=radio name=ansel value="no_">&nbsp;&nbsp;&nbsp;</td>
 <td>Ne pas faire de d&eacute;codage ANSEL, m&ecirc;me si
 l'en-t&ecirc;te le demande.</td> </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
+<dl><dt><dd><table border=1>
 <tr>
 <td><input type=checkbox name=ta value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>Option sp&eacute;cifique pour un copain (-ta). Eh oui, y a des
@@ -197,4 +166,5 @@ Puis cliquez sur "Ok".
 <p>
 
 <input type=submit value="Ok">
+
 </form>

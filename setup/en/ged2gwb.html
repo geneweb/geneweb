@@ -18,7 +18,7 @@ Enter:
 
 <p>
 
-<input name=anon type=file size=55>
+<input name=anon $n{type=file} size=55>
 
 </ul>
 
@@ -39,28 +39,19 @@ Select the options you want:
 
 <p>
 
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td><input type=checkbox name=lf value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>Force lowercase first names keeping only their initials as uppercase
 characters.</td> </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td><input type=checkbox name=ls value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>Force lowercase surnames keeping only their initials as uppercase
 characters. Try to keep lowercase particles.</td> </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td>&nbsp;</td><td>By default, when creating a person, if the GEDCOM
 first name part holds several names, the first of this names becomes the
 person "first name" and the complete GEDCOM first name part a "first
@@ -70,13 +61,9 @@ name alias".</td>
 <td><input type=checkbox name=no_efn value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>Cancel this option.</td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td>&nbsp;</td><td>By default, When creating a person, if the GEDCOM
 first name part looks like a public name, i.e. holds:
 <ul>
@@ -91,25 +78,16 @@ and its first word his "first name".
 <td><input type=checkbox name=no_epn value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>Cancel this option.</td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
 <td><input type=checkbox name=tnd value=on>&nbsp;&nbsp;&nbsp;</td>
-
 <td>Set negative dates when inconsistency (e.g. birth after death).</td>
-
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
+<dl><dt><dd><table border=1>
 <tr>
 <td><input type=checkbox name=no_nd value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>No negative dates: do not interpret a year preceded by a minus sign as a
@@ -117,10 +95,7 @@ negative year.</td>
 </tr>
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td>&nbsp;</td><td>Some GEDCOM files sometimes write dates with
 numbered months (from 1 to 12). The GEDCOM standard 5.5 requires that
 the months be represented by identifiers (e.g. "MAY 1912" and not
@@ -141,13 +116,9 @@ or "February 5, 1912" according to the countries).</td></tr>
 <td><input type=radio name=dates value="_md">&nbsp;&nbsp;&nbsp;</td>
 <td>Interpret these dates as "month/day/year".</td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr><td>&nbsp;</td><td>The GEDCOM norm 5.5 recommends the usage of the
 ANSEL encoding for accentuated characters, which are then represented by
 two letters. The GEDCOM file normally indicates in its header if this
@@ -164,7 +135,6 @@ encoding is used or not.</td></tr>
 <tr><td><input type=radio name=ansel value="no_">&nbsp;&nbsp;&nbsp;</td>
 <td>Do not do ANSEL decoding, overriding the possible header indication.</td>
 </tr>
-
 </table></dl>
 
 <p>
@@ -173,5 +143,6 @@ Then click on "Ok".
 
 <p>
 
-<input type=submit value="Ok">
+<dl><dt><dd><input type=submit value="Ok"></dl>
+
 </form>
