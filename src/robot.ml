@@ -1,14 +1,17 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.3 1999-08-06 04:06:13 ddr Exp $ *)
+(* $Id: robot.ml,v 1.4 1999-08-07 11:55:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
+
+value magic_robot = "GWRB0001";
 
 module W = Map.Make (struct type t = string ; value compare = compare; end);
 
 type excl =
   { excl : mutable list (string * ref int);
-    who : mutable W.t (list float * float * int) }
+    who : mutable W.t (list float * float * int);
+    max_conn : mutable int }
 ;
 
 value nl () =
@@ -52,14 +55,25 @@ value fprintf_date oc tm =
     tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec
 ;
 
+value input_excl =
+  let b = String.create (String.length magic_robot) in
+  fun ic ->
+    do really_input ic b 0 (String.length b); return
+    if b <> magic_robot then raise Not_found
+    else (input_value ic : excl)
+;
+
 value check oc tm from max_call sec =
   let fname = Srcfile.adm_file "robot" in
   let xcl =
     match try Some (open_in_bin fname) with _ -> None with
     [ Some ic ->
-        let v = try input_value ic with _ -> {excl = []; who = W.empty} in
+        let v =
+          try input_excl ic with _ ->
+            {excl = []; who = W.empty; max_conn = 0}
+        in
         do close_in ic; return v
-    | None -> {excl = []; who = W.empty} ]
+    | None -> {excl = []; who = W.empty; max_conn = 0} ]
   in
   let refused =
     match try Some (List.assoc from xcl.excl) with [ Not_found -> None ] with
@@ -117,14 +131,21 @@ value check oc tm from max_call sec =
            else ();
            W.iter
              (fun k (_, tm0, nb) ->
-                Printf.fprintf oc
-                  " --- addr %s: %d requests since %.0f seconds\n" k nb
-                  (tm -. tm0))
+                do Printf.fprintf oc
+                     " --- addr %s: %d requests since %.0f seconds\n" k nb
+                     (tm -. tm0);
+                   if nb > xcl.max_conn then xcl.max_conn := nb else ();
+                return ())
               xcl.who;
+           Printf.fprintf oc " --- max %d\n" xcl.max_conn;
         return refused ]
   in
   do match try Some (open_out_bin fname) with [ Sys_error _ -> None ] with
-     [ Some oc -> do output_value oc xcl; close_out oc; return ()
+     [ Some oc ->
+         do output_string oc magic_robot;
+            output_value oc xcl;
+            close_out oc;
+         return ()
      | None -> () ];
   return
   if refused then robot_error from max_call sec else ()
