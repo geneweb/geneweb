@@ -5,7 +5,7 @@ GeneWeb Version 4.02
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [15 Apr 01] In case of overflow in number of relationships, now display
+  - [15 Apr 01] In case of overflow while counting relationships, now display
     *** (instead of the number which overflowed).
   - [08 Apr 01] In forum headers displaying, put one table for each date,
     in order that we don't have to wait the end of the table to see the
