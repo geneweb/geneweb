@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.29 2000-06-18 12:35:46 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.30 2000-06-18 12:49:00 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogie - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -192,7 +192,7 @@ deze verwelkomingspagina.
 
 <p>
 
-{If your browser does not automatically update the modified pages (you
+{If your browser does not automatically update the modified pages (and you
 must each time do "reload current document"), try navigating from <a
 href="%sescache=-%c">this link</a>}.
 
