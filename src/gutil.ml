@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.1 2001-04-03 20:21:48 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.2 2001-04-18 12:36:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -21,14 +21,15 @@ value rindex s c =
 value lindex s c =
   pos 0 where rec pos i =
     if i == String.length s then None
-    else if s.[i] == c then Some i else pos (i + 1)
+    else if s.[i] == c then Some i
+    else pos (i + 1)
 ;
 
 value list_iter_first f al =
-  let _ = List.fold_left
-    (fun first a -> let () = f first a in False)
-    True al
-  in ()
+  let _ =
+    List.fold_left (fun first a -> let () = f first a in False) True al
+  in
+  ()
 ;
 
 value array_memq x a =
@@ -40,44 +41,37 @@ value array_memq x a =
 
 value string_sub s i len =
   let i = min (String.length s) (max 0 i) in
-  let len = min (String.length s - i) (max 0 len) in
-  String.sub s i len
+  let len = min (String.length s - i) (max 0 len) in String.sub s i len
 ;
 
 value decline_word case s ibeg iend =
   let i =
     loop ibeg where rec loop i =
       if i + 3 > iend then ibeg
-      else if s.[i] == ':' && s.[i+1] == case && s.[i+2] == ':' then i + 3
+      else if s.[i] == ':' && s.[i + 1] == case && s.[i + 2] == ':' then i + 3
       else loop (i + 1)
   in
   let j =
     loop i where rec loop i =
       if i + 3 > iend then iend
-      else if s.[i] == ':' && s.[i+2] == ':' then i
+      else if s.[i] == ':' && s.[i + 2] == ':' then i
       else loop (i + 1)
   in
   if i = ibeg then String.sub s ibeg (j - ibeg)
   else if s.[i] == '+' then
     let k =
       loop ibeg where rec loop i =
-        if i == iend then i
-        else if s.[i] == ':' then i
-        else loop (i + 1)
+        if i == iend then i else if s.[i] == ':' then i else loop (i + 1)
     in
-    let i = i + 1 in
-    string_sub s ibeg (k - ibeg) ^ string_sub s i (j - i)
+    let i = i + 1 in string_sub s ibeg (k - ibeg) ^ string_sub s i (j - i)
   else if s.[i] == '-' then
     let k =
       loop ibeg where rec loop i =
-        if i == iend then i
-        else if s.[i] == ':' then i
-        else loop (i + 1)
+        if i == iend then i else if s.[i] == ':' then i else loop (i + 1)
     in
     let (i, cnt) =
       loop (i + 1) 1 where rec loop i cnt =
-        if i < iend && s.[i] == '-' then loop (i + 1) (cnt + 1)
-        else (i, cnt)
+        if i < iend && s.[i] == '-' then loop (i + 1) (cnt + 1) else (i, cnt)
     in
     string_sub s ibeg (k - ibeg - cnt) ^ string_sub s i (j - i)
   else string_sub s i (j - i)
@@ -90,9 +84,9 @@ value decline case s =
     else
       match s.[i] with
       [ ' ' | '<' as sep ->
-          decline_word case s ibeg i ^ String.make 1 sep ^ loop (i + 1) (i + 1)
-      | '>' ->
-          String.sub s ibeg (i + 1 - ibeg) ^ loop (i + 1) (i + 1)
+          decline_word case s ibeg i ^ String.make 1 sep ^
+            loop (i + 1) (i + 1)
+      | '>' -> String.sub s ibeg (i + 1 - ibeg) ^ loop (i + 1) (i + 1)
       | _ -> loop ibeg (i + 1) ]
 ;
 
@@ -118,7 +112,7 @@ value nb_jours_dans_mois =
 ;
 
 value common_prec p1 p2 =
- if p1 = p2 then p1
+  if p1 = p2 then p1
   else
     match (p1, p2) with
     [ (Sure, _) -> p2
@@ -214,8 +208,7 @@ value strictement_apres d1 d2 =
 
 value denomination base p =
   let prenom = p_first_name base p in
-  let nom = p_surname base p in
-  prenom ^ "." ^ string_of_int p.occ ^ " " ^ nom
+  let nom = p_surname base p in prenom ^ "." ^ string_of_int p.occ ^ " " ^ nom
 ;
 
 value spouse ip cpl =
@@ -248,119 +241,122 @@ value surnames_pieces surname =
 value person_misc_names base p =
   let first_name = p_first_name base p in
   let surname = p_surname base p in
-  if first_name = "?" || surname = "?" then [] else
-  let public_names =
-    let titles_names =
-      let tnl = ref [] in
-      do List.iter
-           (fun t ->
-              match t.t_name with
-              [ Tmain | Tnone -> ()
-              | Tname x -> tnl.val := [x :: tnl.val ] ])
-           p.titles;
-      return tnl.val
+  if first_name = "?" || surname = "?" then []
+  else
+    let public_names =
+      let titles_names =
+        let tnl = ref [] in
+        do {
+          List.iter
+            (fun t ->
+               match t.t_name with
+               [ Tmain | Tnone -> ()
+               | Tname x -> tnl.val := [x :: tnl.val] ])
+            p.titles;
+          tnl.val
+        }
+      in
+      if sou base p.public_name = "" then titles_names
+      else [p.public_name :: titles_names]
     in
-    if sou base p.public_name = "" then titles_names
-    else [p.public_name :: titles_names]
-  in
-  let first_names =
-    [first_name ::
-     List.map (sou base) (p.first_names_aliases @ public_names)]
-  in
-  let surnames =
-    [surname ::
-       surnames_pieces surname @
-       List.map (sou base) (p.surnames_aliases @ p.qualifiers)]
-  in
-  let surnames =
-    if p.sex == Female then
-      let u = uoi base p.cle_index in
-      List.fold_left
-        (fun list ifam ->
-           let cpl = coi base ifam in
-           let husband = poi base cpl.father in
-           let husband_surname = p_surname base husband in
-           let husband_surnames_aliases =
-             List.map (sou base) husband.surnames_aliases
-           in
-           if p_surname base husband = "?" then
-             husband_surnames_aliases @ list
-           else
-             [husband_surname ::
-                surnames_pieces husband_surname @ husband_surnames_aliases @
-                list])
-        surnames (Array.to_list u.family)
-    else surnames
-  in
-  let list = [] in
-  let list =
-    List.fold_left (fun list s -> [sou base s :: list]) list public_names
-  in
-  let list =
-    List.fold_left
-       (fun list f ->
-          List.fold_left (fun list s -> [f ^ " " ^ s :: list]) list surnames)
-    list first_names
-  in
-  let list =
     let first_names =
-      [first_name :: List.map (sou base) p.first_names_aliases]
+      [first_name ::
+       List.map (sou base) (p.first_names_aliases @ public_names)]
     in
-    List.fold_left
-      (fun list t ->
-         let s = sou base t.t_place in
-         if s = "" then list
-         else
-           let first_names =
-             match t.t_name with
-             [ Tname f -> [sou base f :: first_names]
-             | _ ->
-                 let f = sou base p.public_name in
-                 if f = "" then first_names
-                 else [f :: first_names] ]
-           in
-           List.fold_left (fun list f -> [f ^ " " ^ s :: list]) list
-             first_names)
-      list p.titles
-  in
-  let list =
-    match (aoi base p.cle_index).parents with
-    [ Some ifam ->
-        let cpl = coi base ifam in
-        let fath = poi base cpl.father in
-        let first_names =
-          [first_name :: List.map (sou base) p.first_names_aliases]
-        in
+    let surnames =
+      [surname ::
+       surnames_pieces surname @
+         List.map (sou base) (p.surnames_aliases @ p.qualifiers)]
+    in
+    let surnames =
+      if p.sex == Female then
+        let u = uoi base p.cle_index in
         List.fold_left
-          (fun list t ->
-             let s = sou base t.t_place in
-             if s = "" then list
+          (fun list ifam ->
+             let cpl = coi base ifam in
+             let husband = poi base cpl.father in
+             let husband_surname = p_surname base husband in
+             let husband_surnames_aliases =
+               List.map (sou base) husband.surnames_aliases
+             in
+             if p_surname base husband = "?" then
+               husband_surnames_aliases @ list
              else
-               List.fold_left (fun list f -> [f ^ " " ^ s :: list]) list
-                 first_names)
-          list fath.titles
-    | _ -> list ]
-  in
-  let list =
-    List.fold_left (fun list s -> [sou base s :: list]) list p.aliases
-  in
-  let fn = Name.lower (first_name ^ " " ^ surname) in
-  List.fold_left
-    (fun list s ->
-       let s = Name.lower s in
-       if s = fn || List.mem s list then list else [s :: list])
-    [] list
+               [husband_surname ::
+                surnames_pieces husband_surname @ husband_surnames_aliases @
+                  list])
+          surnames (Array.to_list u.family)
+      else surnames
+    in
+    let list = [] in
+    let list =
+      List.fold_left (fun list s -> [sou base s :: list]) list public_names
+    in
+    let list =
+      List.fold_left
+        (fun list f ->
+           List.fold_left (fun list s -> [f ^ " " ^ s :: list]) list surnames)
+        list first_names
+    in
+    let list =
+      let first_names =
+        [first_name :: List.map (sou base) p.first_names_aliases]
+      in
+      List.fold_left
+        (fun list t ->
+           let s = sou base t.t_place in
+           if s = "" then list
+           else
+             let first_names =
+               match t.t_name with
+               [ Tname f -> [sou base f :: first_names]
+               | _ ->
+                   let f = sou base p.public_name in
+                   if f = "" then first_names else [f :: first_names] ]
+             in
+             List.fold_left (fun list f -> [f ^ " " ^ s :: list]) list
+               first_names)
+        list p.titles
+    in
+    let list =
+      match (aoi base p.cle_index).parents with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          let fath = poi base cpl.father in
+          let first_names =
+            [first_name :: List.map (sou base) p.first_names_aliases]
+          in
+          List.fold_left
+            (fun list t ->
+               let s = sou base t.t_place in
+               if s = "" then list
+               else
+                 List.fold_left (fun list f -> [f ^ " " ^ s :: list]) list
+                   first_names)
+            list fath.titles
+      | _ -> list ]
+    in
+    let list =
+      List.fold_left (fun list s -> [sou base s :: list]) list p.aliases
+    in
+    let fn = Name.lower (first_name ^ " " ^ surname) in
+    List.fold_left
+      (fun list s ->
+         let s = Name.lower s in
+         if s = fn || List.mem s list then list else [s :: list])
+      [] list
 ;
 
 value person_ht_add base s ip = base.func.patch_name s ip;
 
 value person_is_key base p k =
   let k = Name.crush_lower k in
-  if k = Name.crush_lower (p_first_name base p ^ " " ^ p_surname base p)
-  then True
+  if k = Name.crush_lower (p_first_name base p ^ " " ^ p_surname base p) then
+    True
   else if
-    List.exists (fun x -> k = Name.crush_lower x) (person_misc_names base p)
-  then True
+    List.exists (fun x -> k = Name.crush_lower x)
+      (person_misc_names base p) then
+    True
   else False
 ;
 
@@ -372,16 +368,17 @@ value person_ht_find_unique base first_name surname occ =
     let ipl = base.func.persons_of_name (first_name ^ " " ^ surname) in
     let first_name = Name.lower first_name in
     let surname = Name.lower surname in
-    find ipl where rec find =
+    let rec find =
       fun
       [ [ip :: ipl] ->
           let p = poi base ip in
-          if occ == p.occ
-          && first_name = Name.lower (p_first_name base p)
-          && surname = Name.lower (p_surname base p)
-          then p.cle_index
+          if occ == p.occ && first_name = Name.lower (p_first_name base p) &&
+             surname = Name.lower (p_surname base p) then
+            p.cle_index
           else find ipl
       | _ -> raise Not_found ]
+    in
+    find ipl
 ;
 
 value find_num s i =
@@ -414,14 +411,16 @@ value person_ht_find_all base s =
   [ Some p -> [p]
   | _ ->
       let ipl = base.func.persons_of_name s in
-      select ipl where rec select =
+      let rec select =
         fun
         [ [ip :: ipl] ->
             if person_is_key base (poi base ip) s then
               let ipl = select ipl in
               if List.mem ip ipl then ipl else [ip :: ipl]
             else select ipl
-        | [] -> [] ] ]
+        | [] -> [] ]
+      in
+      select ipl ]
 ;
 
 value find_same_name base p =
@@ -434,8 +433,8 @@ value find_same_name base p =
     List.fold_left
       (fun pl ip ->
          let p = poi base ip in
-         if Name.strip_lower (p_first_name base p) = f
-         && Name.strip_lower (p_surname base p) = s then
+         if Name.strip_lower (p_first_name base p) = f &&
+            Name.strip_lower (p_surname base p) = s then
            [p :: pl]
          else pl)
       [] ipl
@@ -471,48 +470,54 @@ type base_warning = warning person;
 type visit = [ NotVisited | BeingVisited | Visited ];
 
 value check_noloop base error =
-  let tab = Array.create (base.data.persons.len) NotVisited in
+  let tab = Array.create base.data.persons.len NotVisited in
   let rec noloop i =
     match tab.(i) with
     [ NotVisited ->
-        do match (base.data.ascends.get i).parents with
-           [ Some fam ->
-               let fath = (coi base fam).father in
-               let moth = (coi base fam).mother in
-               do tab.(i) := BeingVisited;
-                  noloop (Adef.int_of_iper fath);
-                  noloop (Adef.int_of_iper moth);
-               return ()
-           | None -> () ];
-           tab.(i) := Visited;
-        return ()
+        do {
+          match (base.data.ascends.get i).parents with
+          [ Some fam ->
+              let fath = (coi base fam).father in
+              let moth = (coi base fam).mother in
+              do {
+                tab.(i) := BeingVisited;
+                noloop (Adef.int_of_iper fath);
+                noloop (Adef.int_of_iper moth);
+                ()
+              }
+          | None -> () ];
+          tab.(i) := Visited;
+        }
     | BeingVisited -> error (OwnAncestor (base.data.persons.get i))
     | Visited -> () ]
   in
-  for i = 0 to base.data.persons.len - 1 do
+  for i = 0 to base.data.persons.len - 1 do {
     match tab.(i) with
     [ NotVisited -> noloop i
     | BeingVisited -> failwith "check_noloop algorithm error"
-    | Visited -> () ];
-  done
+    | Visited -> () ]
+  }
 ;
 
 value check_noloop_for_person_list base error ipl =
-  let tab = Array.create (base.data.persons.len) NotVisited in
+  let tab = Array.create base.data.persons.len NotVisited in
   let rec noloop ip =
     let i = Adef.int_of_iper ip in
     match tab.(i) with
     [ NotVisited ->
-        do match (aoi base ip).parents with
-           [ Some ifam ->
-               let cpl = coi base ifam in
-               do tab.(i) := BeingVisited;
-                  noloop cpl.father;
-                  noloop cpl.mother;
-               return ()
-           | None -> () ];
-           tab.(i) := Visited;
-        return ()
+        do {
+          match (aoi base ip).parents with
+          [ Some ifam ->
+              let cpl = coi base ifam in
+              do {
+                tab.(i) := BeingVisited;
+                noloop cpl.father;
+                noloop cpl.mother;
+                ()
+              }
+          | None -> () ];
+          tab.(i) := Visited;
+        }
     | BeingVisited -> error (OwnAncestor (poi base ip))
     | Visited -> () ]
   in
@@ -539,10 +544,8 @@ value roman_of_arabian n =
     | 8 -> five ^ one ^ one ^ one
     | _ -> one ^ ten ]
   in
-  build "M" "M" "M" (n / 1000 mod 10) ^
-  build "C" "D" "M" (n / 100 mod 10) ^
-  build "X" "L" "C" (n / 10 mod 10) ^
-  build "I" "V" "X" (n mod 10)
+  build "M" "M" "M" (n / 1000 mod 10) ^ build "C" "D" "M" (n / 100 mod 10) ^
+    build "X" "L" "C" (n / 10 mod 10) ^ build "I" "V" "X" (n mod 10)
 ;
 
 value child_born_after_his_parent base error warning x iparent =
@@ -552,14 +555,12 @@ value child_born_after_his_parent base error warning x iparent =
      date_of_death x.death)
   with
   [ (Some (Dgreg g1 _ as d1), Some (Dgreg g2 _ as d2), _) ->
-      if strictement_apres d1 d2 then
-        warning (ParentBornAfterChild parent x)
+      if strictement_apres d1 d2 then warning (ParentBornAfterChild parent x)
       else
         let a = temps_ecoule g1 g2 in
         if annee a < 11 then warning (ParentTooYoung parent a) else ()
   | (Some (Dgreg g1 _ as d1), _, Some (Dgreg g2 _ as d2)) ->
-      if strictement_apres d1 d2 then
-        warning (ParentBornAfterChild parent x)
+      if strictement_apres d1 d2 then warning (ParentBornAfterChild parent x)
       else
         let a = temps_ecoule g1 g2 in
         if annee a < 11 then warning (ParentTooYoung parent a) else ()
@@ -595,8 +596,9 @@ value child_born_before_mother_death base warning x imoth =
 value possible_father base warning x ifath =
   let father = poi base ifath in
   match (Adef.od_of_codate x.birth, date_of_death father.death) with
-  [ (Some (Dgreg {prec = Before} _), _)
-  | (_, Some (Dgreg {prec = After} _)) -> ()
+  [ (Some (Dgreg {prec = Before} _), _) |
+    (_, Some (Dgreg {prec = After} _)) ->
+      ()
   | (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
       let a2 =
         match d2 with
@@ -604,8 +606,7 @@ value possible_father base warning x ifath =
         | {prec = OrYear a2} -> a2
         | {year = a} -> a ]
       in
-      if annee d1 > a2 + 1 then
-        warning (DeadTooEarlyToBeFather father x)
+      if annee d1 > a2 + 1 then warning (DeadTooEarlyToBeFather father x)
       else ()
   | _ -> () ]
 ;
@@ -614,36 +615,35 @@ value birth_before_death base warning p =
   match (Adef.od_of_codate p.birth, p.death) with
   [ (Some d1, Death _ d2) ->
       let d2 = Adef.date_of_cdate d2 in
-      if strictement_apres d1 d2 then warning (BirthAfterDeath p)
-      else ()
+      if strictement_apres d1 d2 then warning (BirthAfterDeath p) else ()
   | _ -> () ]
 ;
 
 value titles_after_birth base warning p t =
   let t_date_start = Adef.od_of_codate t.t_date_start in
   let t_date_end = Adef.od_of_codate t.t_date_end in
-  do match (t_date_start, t_date_end) with
-     [ (Some d1, Some d2) ->
-         if strictement_apres d1 d2 then warning (TitleDatesError p t)
-         else ()
-     | _ -> () ];
-     match Adef.od_of_codate p.birth with
-     [ Some d1 ->
-         do match t_date_start with
-            [ Some d ->
-                if strictement_apres d1 d then
-                  warning (TitleDatesError p t)
-                else ()
-            | None -> () ];
-            match t_date_end with
-            [ Some d ->
-                if strictement_apres d1 d then
-                  warning (TitleDatesError p t)
-                else ()
-            | None -> () ];
-         return ()
-     | _ -> () ];
-  return ()
+  do {
+    match (t_date_start, t_date_end) with
+    [ (Some d1, Some d2) ->
+        if strictement_apres d1 d2 then warning (TitleDatesError p t) else ()
+    | _ -> () ];
+    match Adef.od_of_codate p.birth with
+    [ Some d1 ->
+        do {
+          match t_date_start with
+          [ Some d ->
+              if strictement_apres d1 d then warning (TitleDatesError p t)
+              else ()
+          | None -> () ];
+          match t_date_end with
+          [ Some d ->
+              if strictement_apres d1 d then warning (TitleDatesError p t)
+              else ()
+          | None -> () ];
+          ()
+        }
+    | _ -> () ];
+  }
 ;
 
 value related_sex_is_coherent base warning p_ref =
@@ -667,14 +667,11 @@ value related_sex_is_coherent base warning p_ref =
       sex rparents
   in
   let new_sex =
-    List.fold_left
-      (fun g ip ->
-         let p = poi base ip in
-         check_sex g p.rparents )
+    List.fold_left (fun g ip -> let p = poi base ip in check_sex g p.rparents)
       (Some p_ref.sex) p_ref.related
   in
   match new_sex with
-  [ Some g -> if p_ref.sex != g then p_ref.sex := g else () 
+  [ Some g -> if p_ref.sex != g then p_ref.sex := g else ()
   | None -> warning (IncoherentSex p_ref) ]
 ;
 
@@ -682,134 +679,137 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
   let p = poi base ip in
   match Adef.od_of_codate fam.marriage with
   [ Some d2 ->
-      do match Adef.od_of_codate p.birth with
-         [ Some d1 ->
-             if strictement_avant d2 d1 then
-               warning (MarriageDateBeforeBirth p)
-(*
-             else if
-               annee d2 > 1850 && annee (temps_ecoule d1 d2) < 13 then
-               warning (YoungForMarriage p (temps_ecoule d1 d2))
-*)
-             else ()
-         | _ -> () ];
-         match p.death with
-         [ Death _ d3 ->
-             let d3 = Adef.date_of_cdate d3 in
-             if strictement_apres d2 d3 then
-               warning (MarriageDateAfterDeath p)
-             else ()
-         | _ -> () ];
-      return ()
+      do {
+        match Adef.od_of_codate p.birth with
+        [ Some d1 ->
+            if strictement_avant d2 d1 then
+              warning (MarriageDateBeforeBirth p)
+            else ()
+        | _ -> () ];
+        match p.death with
+        [ Death _ d3 ->
+            let d3 = Adef.date_of_cdate d3 in
+            if strictement_apres d2 d3 then warning (MarriageDateAfterDeath p)
+            else ()
+        | _ -> () ];
+      }
   | None -> () ]
 ;
 
 value check_normal_marriage_date base error warning fam =
   let cpl = coi base fam.fam_index in
-  do check_normal_marriage_date_for_someone base error warning fam cpl.father;
-     check_normal_marriage_date_for_someone base error warning fam cpl.mother;
-  return ()
+  do {
+    check_normal_marriage_date_for_someone base error warning fam cpl.father;
+    check_normal_marriage_date_for_someone base error warning fam cpl.mother;
+  }
 ;
 
 value sort_children base warning ifam des =
   let before = ref None in
   let a = des.children in
-  do for i = 1 to Array.length a - 1 do
-       loop (i-1) where rec loop j =
-         if j >= 0 then
-           let p1 = poi base a.(j) in
-           let p2 = poi base a.(j+1) in
-           let d1 =
-             match Adef.od_of_codate p1.birth with
-             [ Some d1 -> Some d1
-             | None -> Adef.od_of_codate p1.baptism ]
-           in
-           let d2 =
-             match Adef.od_of_codate p2.birth with
-             [ Some d2 -> Some d2
-             | None -> Adef.od_of_codate p2.baptism ]
-           in
-           match (d1, d2) with
-           [ (Some d1, Some d2) ->
-               if strictement_avant d2 d1 then
-                 let ip = a.(j+1) in
-                 do match before.val with
-                    [ Some _ -> ()
-                    | None -> before.val := Some (Array.copy a) ];
-                    a.(j+1) := a.(j);
-                    a.(j) := ip;
-                 return loop (j-1)
-               else ()
-           | _ -> () ]
-         else ();
-     done;
-     match before.val with
-     [ None -> ()
-     | Some a -> warning (ChangedOrderOfChildren ifam des a) ];
-  return ()
+  do {
+    for i = 1 to Array.length a - 1 do {
+      let rec loop j =
+        if j >= 0 then
+          let p1 = poi base a.(j) in
+          let p2 = poi base a.(j + 1) in
+          let d1 =
+            match Adef.od_of_codate p1.birth with
+            [ Some d1 -> Some d1
+            | None -> Adef.od_of_codate p1.baptism ]
+          in
+          let d2 =
+            match Adef.od_of_codate p2.birth with
+            [ Some d2 -> Some d2
+            | None -> Adef.od_of_codate p2.baptism ]
+          in
+          match (d1, d2) with
+          [ (Some d1, Some d2) ->
+              if strictement_avant d2 d1 then do {
+                let ip = a.(j + 1) in
+                match before.val with
+                [ Some _ -> ()
+                | None -> before.val := Some (Array.copy a) ];
+                a.(j + 1) := a.(j);
+                a.(j) := ip;
+                loop (j - 1)
+              }
+              else ()
+          | _ -> () ]
+        else ()
+      in
+      loop (i - 1)
+    };
+    match before.val with
+    [ None -> ()
+    | Some a -> warning (ChangedOrderOfChildren ifam des a) ];
+  }
 ;
 
 value check_family base error warning fam cpl des =
   let ifam = fam.fam_index in
   let fath = poi base cpl.father in
   let moth = poi base cpl.mother in
-  do match fath.sex with
-     [ Male -> birth_before_death base warning fath
-     | _ ->
-         if fam.relation = NoSexesCheck then ()
-         else error (BadSexOfMarriedPerson fath) ];
-     match moth.sex with
-     [ Female -> birth_before_death base warning moth
-     | _ ->
-         if fam.relation = NoSexesCheck then ()
-         else error (BadSexOfMarriedPerson moth) ];
-     check_normal_marriage_date base error warning fam;
-     sort_children base warning ifam des;
-     let _ =
-       List.fold_left
-         (fun np child ->
-            let child = poi base child in
-            do birth_before_death base warning child;
-               born_after_his_elder_sibling base error warning child np ifam
-                 des;
-               child_born_after_his_parent base error warning child cpl.father;
-               child_born_after_his_parent base error warning child cpl.mother;
-               child_born_before_mother_death base warning child cpl.mother;
-               possible_father base warning child cpl.father;
-            return
-            match Adef.od_of_codate child.birth with
-            [ Some d -> Some (child, d)
-            | _ -> np ])
-         None (Array.to_list des.children)
-     in
-     ();
-  return ()
+  do {
+    match fath.sex with
+    [ Male -> birth_before_death base warning fath
+    | _ ->
+        if fam.relation = NoSexesCheck then ()
+        else error (BadSexOfMarriedPerson fath) ];
+    match moth.sex with
+    [ Female -> birth_before_death base warning moth
+    | _ ->
+        if fam.relation = NoSexesCheck then ()
+        else error (BadSexOfMarriedPerson moth) ];
+    check_normal_marriage_date base error warning fam;
+    sort_children base warning ifam des;
+    let _ =
+      List.fold_left
+        (fun np child ->
+           let child = poi base child in
+           do {
+             birth_before_death base warning child;
+             born_after_his_elder_sibling base error warning child np ifam
+               des;
+             child_born_after_his_parent base error warning child cpl.father;
+             child_born_after_his_parent base error warning child cpl.mother;
+             child_born_before_mother_death base warning child cpl.mother;
+             possible_father base warning child cpl.father;
+             match Adef.od_of_codate child.birth with
+             [ Some d -> Some (child, d)
+             | _ -> np ]
+           })
+        None (Array.to_list des.children)
+    in
+    ();
+  }
 ;
 
 value check_person base error warning p =
-  do birth_before_death base warning p;
-     List.iter (titles_after_birth base warning p) p.titles;
-     related_sex_is_coherent base warning p;
-  return ()
+  do {
+    birth_before_death base warning p;
+    List.iter (titles_after_birth base warning p) p.titles;
+    related_sex_is_coherent base warning p;
+  }
 ;
 
 value is_deleted_family fam = fam.fam_index = Adef.ifam_of_int (-1);
 
 value check_base base error warning =
-  do for i = 0 to base.data.persons.len - 1 do
-       let p = base.data.persons.get i in
-       check_person base error warning p;
-     done;
-     for i = 0 to base.data.families.len - 1 do
-       let fam = base.data.families.get i in
-       if is_deleted_family fam then ()
-       else
-         let cpl = base.data.couples.get i in
-         let des = base.data.descends.get i in
-         check_family base error warning fam cpl des;
-     done;
-     check_noloop base error;
-  return ()
+  do {
+    for i = 0 to base.data.persons.len - 1 do {
+      let p = base.data.persons.get i in check_person base error warning p
+    };
+    for i = 0 to base.data.families.len - 1 do {
+      let fam = base.data.families.get i in
+      if is_deleted_family fam then ()
+      else
+        let cpl = base.data.couples.get i in
+        let des = base.data.descends.get i in
+        check_family base error warning fam cpl des
+    };
+    check_noloop base error;
+  }
 ;
 
 value strip_controls_m s =
@@ -822,24 +822,25 @@ value strip_controls_m s =
   if len == String.length s then s
   else
     let s' = String.create len in
-    loop 0 0 where rec loop i j =
+    let rec loop i j =
       if j == len then s'
       else if s.[i] == '\r' then loop (i + 1) j
-      else do s'.[j] := s.[i]; return loop (i + 1) (j + 1)
-   
+      else do { s'.[j] := s.[i]; loop (i + 1) (j + 1) }
+    in
+    loop 0 0
 ;
 
 value strip_spaces str =
-  let start = loop 0
-    where rec loop i =
+  let start =
+    loop 0 where rec loop i =
       if i == String.length str then i
       else
         match str.[i] with
         [ ' ' | '\r' | '\n' | '\t' -> loop (i + 1)
         | _ -> i ]
   in
-  let stop = loop (String.length str - 1)
-    where rec loop i =
+  let stop =
+    loop (String.length str - 1) where rec loop i =
       if i == -1 then i + 1
       else
         match str.[i] with
@@ -862,22 +863,24 @@ value initiale n =
 
 value valeur_alphabetique =
   let tab = Array.create 256 0 in
-  do for i = 0 to 255 do tab.(i) := 10 * i; done;
-     tab.(Char.code 'à') := tab.(Char.code 'a') + 1;
-     tab.(Char.code 'á') := tab.(Char.code 'a') + 2;
-     tab.(Char.code 'â') := tab.(Char.code 'a') + 3;
-     tab.(Char.code 'è') := tab.(Char.code 'e') + 1;
-     tab.(Char.code 'é') := tab.(Char.code 'e') + 2;
-     tab.(Char.code 'ê') := tab.(Char.code 'e') + 3;
-     tab.(Char.code 'ë') := tab.(Char.code 'e') + 4;
-     tab.(Char.code 'ô') := tab.(Char.code 'o') + 1;
-     tab.(Char.code 'Á') := tab.(Char.code 'A') + 2;
-     tab.(Char.code 'Æ') := tab.(Char.code 'A') + 5;
-     tab.(Char.code 'È') := tab.(Char.code 'E') + 1;
-     tab.(Char.code 'É') := tab.(Char.code 'E') + 2;
-     tab.(Char.code 'Ö') := tab.(Char.code 'O') + 4;
-     tab.(Char.code '?') := 3000;
-  return fun x -> tab.(Char.code x)
+  do {
+    for i = 0 to 255 do { tab.(i) := 10 * i };
+    tab.(Char.code 'à') := tab.(Char.code 'a') + 1;
+    tab.(Char.code 'á') := tab.(Char.code 'a') + 2;
+    tab.(Char.code 'â') := tab.(Char.code 'a') + 3;
+    tab.(Char.code 'è') := tab.(Char.code 'e') + 1;
+    tab.(Char.code 'é') := tab.(Char.code 'e') + 2;
+    tab.(Char.code 'ê') := tab.(Char.code 'e') + 3;
+    tab.(Char.code 'ë') := tab.(Char.code 'e') + 4;
+    tab.(Char.code 'ô') := tab.(Char.code 'o') + 1;
+    tab.(Char.code 'Á') := tab.(Char.code 'A') + 2;
+    tab.(Char.code 'Æ') := tab.(Char.code 'A') + 5;
+    tab.(Char.code 'È') := tab.(Char.code 'E') + 1;
+    tab.(Char.code 'É') := tab.(Char.code 'E') + 2;
+    tab.(Char.code 'Ö') := tab.(Char.code 'O') + 4;
+    tab.(Char.code '?') := 3000;
+    fun x -> tab.(Char.code x)
+  }
 ;
 
 value alphabetique n1 n2 =
@@ -905,58 +908,52 @@ value map_title_strings f t =
   let t_ident = f t.t_ident in
   let t_place = f t.t_place in
   {t_name = t_name; t_ident = t_ident; t_place = t_place;
-   t_date_start = t.t_date_start; t_date_end = t.t_date_end;
-   t_nth = t.t_nth}
+   t_date_start = t.t_date_start; t_date_end = t.t_date_end; t_nth = t.t_nth}
 ;
 
 value map_relation_ps fp fs r =
   {r_type = r.r_type;
-   r_fath = match r.r_fath with [ Some x -> Some (fp x) | None -> None ];
-   r_moth = match r.r_moth with [ Some x -> Some (fp x) | None -> None ];
-   r_sources = fs r.r_sources }
+   r_fath =
+     match r.r_fath with
+     [ Some x -> Some (fp x)
+     | None -> None ];
+   r_moth =
+     match r.r_moth with
+     [ Some x -> Some (fp x)
+     | None -> None ];
+   r_sources = fs r.r_sources}
 ;
 
 value map_person_ps fp fs p =
   {first_name = fs p.first_name; surname = fs p.surname; occ = p.occ;
-   image = fs p.image; first_names_aliases = List.map fs p.first_names_aliases;
+   image = fs p.image;
+   first_names_aliases = List.map fs p.first_names_aliases;
    surnames_aliases = List.map fs p.surnames_aliases;
-   public_name = fs p.public_name;
-   qualifiers = List.map fs p.qualifiers;
+   public_name = fs p.public_name; qualifiers = List.map fs p.qualifiers;
    titles = List.map (map_title_strings fs) p.titles;
    rparents = List.map (map_relation_ps fp fs) p.rparents;
-   related = p.related;
-   aliases = List.map fs p.aliases;
-   occupation = fs p.occupation;
-   sex = p.sex; access = p.access;
+   related = p.related; aliases = List.map fs p.aliases;
+   occupation = fs p.occupation; sex = p.sex; access = p.access;
    birth = p.birth; birth_place = fs p.birth_place;
-   birth_src = fs p.birth_src;
-   baptism = p.baptism; baptism_place = fs p.baptism_place;
-   baptism_src = fs p.baptism_src;
+   birth_src = fs p.birth_src; baptism = p.baptism;
+   baptism_place = fs p.baptism_place; baptism_src = fs p.baptism_src;
    death = p.death; death_place = fs p.death_place;
-   death_src = fs p.death_src;
-   burial = p.burial; burial_place = fs p.burial_place;
-   burial_src = fs p.burial_src;
-   notes = fs p.notes; psources = fs p.psources;
-   cle_index = p.cle_index}
+   death_src = fs p.death_src; burial = p.burial;
+   burial_place = fs p.burial_place; burial_src = fs p.burial_src;
+   notes = fs p.notes; psources = fs p.psources; cle_index = p.cle_index}
 ;
 
 value map_family_ps fp fs fam =
   {marriage = fam.marriage; marriage_place = fs fam.marriage_place;
    marriage_src = fs fam.marriage_src; witnesses = Array.map fp fam.witnesses;
-   relation = fam.relation; divorce = fam.divorce;
-   comment = fs fam.comment;
-   origin_file = fs fam.origin_file;
-   fsources = fs fam.fsources;
+   relation = fam.relation; divorce = fam.divorce; comment = fs fam.comment;
+   origin_file = fs fam.origin_file; fsources = fs fam.fsources;
    fam_index = fam.fam_index}
 ;
 
-value map_couple_p fp fam =
-  {father = fp fam.father; mother = fp fam.mother}
-;
+value map_couple_p fp fam = {father = fp fam.father; mother = fp fam.mother};
 
-value map_descend_p fp des =
-  {children = Array.map fp des.children}
-;
+value map_descend_p fp des = {children = Array.map fp des.children};
 
 (*
 value string_of_place p =
@@ -992,9 +989,6 @@ value arg_list_of_string line =
       | (None, ' ') ->
           let list = if len == 0 then list else [Buff.get len :: list] in
           loop list (i + 1) 0 quote
-      | (None, ('"' | ''' as c)) ->
-          loop list (i + 1) 0 (Some c)
-      | (None, c) ->
-          loop list (i + 1) (Buff.store len c) None ]
-          
+      | (None, ('"' | ''' as c)) -> loop list (i + 1) 0 (Some c)
+      | (None, c) -> loop list (i + 1) (Buff.store len c) None ]
 ;
