@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.14 2000-04-11 02:08:52 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.15 2000-04-11 12:32:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -198,13 +198,13 @@ value spouse_text conf base end_sp ip ipl =
             Date.short_marriage_date_text conf base fam (poi base c.father)
               (poi base c.mother)
           in
-          (someone_text conf base sp, d)
-      | _ -> ("", "") ]
+          (someone_text conf base sp, d, Some sp)
+      | _ -> ("", "", None) ]
   | ([], _) ->
       match end_sp with
-      [ Some p -> (someone_text conf base p.cle_index, "")
-      | _ -> ("", "") ]
-  | _ -> ("", "") ]
+      [ Some p -> (someone_text conf base p.cle_index, "", None)
+      | _ -> ("", "", None) ]
+  | _ -> ("", "", None) ]
 ;
 
 value print_someone conf base ip =
@@ -214,12 +214,14 @@ value print_someone conf base ip =
 ;
 
 value print_spouse conf base n ip ipl =
-  let (s, d) = spouse_text conf base n ip ipl in
+  let (s, d, spo) = spouse_text conf base n ip ipl in
   if s <> "" then
     do Wserver.wprint "&amp;%s" d;
        html_br conf;
        Wserver.wprint "%s\n" s;
-       Dag.print_image conf base (poi base ip);
+       match spo with
+       [ Some ip -> Dag.print_image conf base (poi base ip)
+       | _ -> () ];
     return ()
   else ()
 ;
@@ -300,7 +302,7 @@ value rec print_both_branches_pre conf base info sz pl1 pl2 =
        match p1 with
        [ Some p1 ->
            do print_pre_left sz (someone_text conf base p1);
-              let (s, d) = spouse_text conf base info.sp1 p1 pl1 in
+              let (s, d, _) = spouse_text conf base info.sp1 p1 pl1 in
               if s <> "" then print_pre_left sz ("&amp;" ^ d ^ " " ^ s)
               else ();
            return ()
@@ -308,7 +310,7 @@ value rec print_both_branches_pre conf base info sz pl1 pl2 =
        match p2 with
        [ Some p2 ->
            do print_pre_right sz (someone_text conf base p2);
-              let (s, d) = spouse_text conf base info.sp2 p2 pl2 in
+              let (s, d, _) = spouse_text conf base info.sp2 p2 pl2 in
               if s <> "" then print_pre_right sz ("&amp;" ^ d ^ " " ^ s)
               else ();
            return ()

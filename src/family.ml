@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.21 2000-03-27 18:21:55 ddr Exp $ *)
+(* $Id: family.ml,v 3.22 2000-04-11 12:32:06 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -263,6 +263,9 @@ value precisez conf base n pl =
 
 value set_senv conf vm vi =
   do conf.senv := [("em", vm); ("ei", vi)];
+     match p_getenv conf.env "image" with
+     [ Some "on" -> conf.senv := conf.senv @ [("image", "on")]
+     | _ -> () ];
      match p_getenv conf.env "long" with
      [ Some "on" -> conf.senv := conf.senv @ [("long", "on")]
      | _ -> () ];
