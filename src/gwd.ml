@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.34 2000-05-10 14:25:45 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.35 2000-05-10 17:56:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -70,10 +70,16 @@ value log oc tm conf from gauth request s =
        else ();
      output_char oc '\n';
      Printf.fprintf oc "  From: %s\n" from;
-     if gauth <> "" then Printf.fprintf oc "  User-g: %s\n" gauth else ();
-     if conf.user <> "" then Printf.fprintf oc "  User: %s\n" conf.user
+     if gauth <> "" then Printf.fprintf oc "  User: %s\n" gauth else ();
+     if conf.wizard && not conf.friend then
+       Printf.fprintf oc "  User: %s%s(wizard)\n" conf.user
+         (if conf.user = "" then "" else " ")
+     else if conf.friend && not conf.wizard then
+       Printf.fprintf oc "  User: %s%s(friend)\n" conf.user
+         (if conf.user = "" then "" else " ")
      else ();
-     Printf.fprintf oc "  Agent: %s\n" user_agent;
+     if user_agent <> "" then Printf.fprintf oc "  Agent: %s\n" user_agent
+     else ();
      if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer else ();
   return ()
 ;
@@ -546,7 +552,7 @@ value make_conf cgi from_addr (addr, request) str env =
         in
         (passwd, env, access_type)
     in
-    let passwd = if cgi then Util.decode_varenv passwd else passwd in
+    let passwd = Util.decode_varenv passwd in
     let command = String.sub str 0 iq in
     (command, base_file, passwd, env, access_type)
   in
@@ -600,7 +606,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
       Base64.decode (String.sub auth i (String.length auth - i))
   in
   let uauth =
-    if passwd = "w" || passwd = "f" then passwd1 else ""
+    if passwd = "w" || passwd = "f" then passwd1 else passwd
   in
   let (ok, wizard, friend, user) =
     match access_type with
@@ -608,7 +614,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     | ATfriend -> (True, False, True, "")
     | ATnormal -> (True, False, False, "")
     | ATnone | ATset ->
-        if not cgi then
+        if not cgi && (passwd = "w" || passwd = "f") then
           if passwd = "w" then
             if wizard_passwd = "" && wizard_passwd_file = "" then
               (True, True, friend_passwd = "", "")
@@ -621,18 +627,17 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
             else if match_auth friend_passwd friend_passwd_file uauth then
               (True, False, True, uauth)
             else (False, False, False, "")
-          else (True, passwd = wizard_passwd, passwd = friend_passwd, "")
+          else assert False
         else
           if wizard_passwd = "" && wizard_passwd_file = "" then
             (True, True, friend_passwd = "", "")
-          else if match_auth wizard_passwd wizard_passwd_file passwd then
-            (True, True, False, "")
+          else if match_auth wizard_passwd wizard_passwd_file uauth then
+            (True, True, False, uauth)
           else if friend_passwd = "" && friend_passwd_file = "" then
             (True, False, True, "")
-          else if match_auth friend_passwd friend_passwd_file passwd then
-            (True, False, True, "")
-          else
-            (True, False, False, "") ]
+          else if match_auth friend_passwd friend_passwd_file uauth then
+            (True, False, True, uauth)
+          else (True, False, False, "") ]
   in
   let (command, passwd) =
     match access_type with
