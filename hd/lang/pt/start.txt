@@ -14,7 +14,7 @@
 height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>{Genealogical<br>data base}</font></h1>
+<h1><font color=#2f6400>Base de Dados<br>Geneol&oacute;gica</font></h1>
 </td>
 </tr>
 </table>
@@ -59,7 +59,7 @@ actualmente %n pessoas%o<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-{To navigate in this data base, you can do your search}:<br><br>
+Para consultar esta base de dados, pode procurar:<br><br>
 
 <ul>
 
@@ -105,7 +105,7 @@ actualmente %n pessoas%o<br>
 <form method=GET action="%f">
 %h
 <table border=0 cellpadding=0 cellspacing=0><tr><td align=center>
-<font color=#2f6400><b>{by the list}</b></font> de todos os<br>
+<font color=#2f6400><b>pela lista</b></font> de todos os<br>
 <select name=m>
 <option value="N" selected>apelidos
 <option value="P">nomes pr&oacute;prios
@@ -113,7 +113,7 @@ actualmente %n pessoas%o<br>
 </td><td>...</td><td align=center>
 por<br>
 <select name=tri>
-<option value="A" selected>ordem alfab&eacute;tico
+<option value="A" selected>ordem alfab&eacute;tica
 <option value="F">frequ&ecirc;ncia
 </select>
 </td><td>
@@ -131,7 +131,7 @@ complexa</b></font></a>.
 
 %w<p>
 
-<center>{You can}<br><br>
+<center>Pode<br><br>
 
 <table border=0>
 <tr>
@@ -151,7 +151,7 @@ complexa</b></font></a>.
 <br>
 %w
 
-<center>{You can also consult}<br><br>
+<center>Tamb&eacute;m pode consultar<br><br>
 
 <table border=0>
 <tr>
@@ -165,9 +165,9 @@ complexa</b></font></a>.
 </td>
 <td valign=up>
 <ul>%x
-<li>os <a href="%sm=LD;k=10">mortes mais recentes</a>%x%j
-<li>os <a href="%sm=HIST;k=10">{history of updates}</a>%j
-<li>os <a href="%sm=CAL">{calendars}</a>
+<li>as <a href="%sm=LD;k=10">mortes mais recentes</a>%x%j
+<li>o <a href="%sm=HIST;k=10">historial das actualiza&ccedil;&aacute;o</a>%j
+<li>os <a href="%sm=CAL">calend&aacute;rios</a>
 <li>o <a href="%sm=FORUM">forum <font color=#2f6400><b>GeneWeb</b></font></a>
 </ul>
 </td>
