@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.21 1999-05-21 08:28:09 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.22 1999-05-28 17:27:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -817,11 +817,9 @@ value print_ancestors_same_time_descendants conf base p a =
   in
   do header conf title;
      conf.senv := [];
-     tag "nobr" begin
-       tag "ul" begin
-         mark.(Adef.int_of_iper p.cle_index) := Num.one;
-         generation 1 [GP_person Num.one p.cle_index None];
-       end;
+     tag "ul" begin
+       mark.(Adef.int_of_iper p.cle_index) := Num.one;
+       generation 1 [GP_person Num.one p.cle_index None];
      end;
      trailer conf;
   return ()
