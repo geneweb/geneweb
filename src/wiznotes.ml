@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.11 2004-03-03 10:29:36 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.12 2004-05-24 15:11:39 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -74,36 +74,57 @@ value print_main conf base wizfile =
   in
   let wizdata = read_wizfile wizfile in
   let wddir = dir conf in
+  let by_alphab_order = p_getenv conf.env "o" = Some "A" in
   do {
     header conf title;
     print_link_to_welcome conf False;
     html_p conf;
+    let list =
+      List.map
+        (fun (wz, wname) ->
+           let wfile = wzfile wddir wz in
+           if Sys.file_exists wfile then
+             try
+               let s = Unix.stat (wzfile wddir wz) in
+               (wz, wname, wfile, s.Unix.st_mtime)
+             with
+             [ Unix.Unix_error _ _ _ -> (wz, wname, "", 0.) ]
+           else (wz, wname, "", 0.))
+      wizdata
+    in
+    let list =
+      if by_alphab_order then list
+      else
+        List.sort (fun (_, _, _, mtm1) (_, _, _, mtm2) -> compare mtm2 mtm1)
+          list
+    in
     Gutil.list_iter_first
-     (fun first (wz, wname) ->
+     (fun first (wz, wname, wfile, stm) ->
         let wname = if wname = "" then wz else wname in
         Wserver.wprint "%s%t" (if first then "" else ",\n")
           (fun _ ->
-             if (conf.wizard && conf.user = wz) ||
-                 Sys.file_exists (wzfile wddir wz)
-             then
+             if conf.wizard && conf.user = wz || wfile <> "" then
                Wserver.wprint "<a href=\"%sm=WIZNOTES;v=%s%t\">%s</a>"
                  (commd conf) (Util.code_varenv wz)
                  (fun _ ->
-                    try
-                      let s = Unix.stat (wzfile wddir wz) in
-                      let tm = Unix.localtime s.Unix.st_mtime in
-                      Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
-                        (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
-                        tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-                        tm.Unix.tm_sec
-                    with
-                    [ Unix.Unix_error _ _ _ -> () ])
+                    let tm = Unix.localtime stm in
+                    Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
+                      (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
+                      tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+                      tm.Unix.tm_sec)
                  wname
              else
                Wserver.wprint "%s" wname))
-     wizdata;
+     list;
     html_p conf;
     Wserver.wprint "%d %s\n" (List.length wizdata) wiztxt;
+    if not by_alphab_order then
+      do {
+        html_br conf;
+        Wserver.wprint "<a href=\"%sm=WIZNOTES;o=A\">%s</a>" (commd conf)
+          (transl conf "alphabetic order");
+      }
+    else ();
     trailer conf;
   }
 ;
