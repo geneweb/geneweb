@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.40 2004-12-30 10:11:27 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.41 2005-02-10 13:32:47 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -289,9 +289,10 @@ value print_error_disconnected conf =
 Sorry, you can add only families connected to the rest.<br>
 This restriction has been added by this database owner.
 <p>
-Désolé, vous ne pouvez ajouter que des familles connectées au reste.<br>
-Cette restriction a été ajoutée par le propriétaire de cette base de
-données.
+D&eacute;sol&eacute;, vous ne pouvez ajouter que des familles
+connect&eacute;es au reste.<br>
+Cette restriction a &eacute;t&eacute; ajout&eacute;e par le
+propri&eacute;taire de cette base de donn&eacute;es.
 ";
     trailer conf;
     raise Update.ModErr
