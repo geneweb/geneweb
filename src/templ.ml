@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.12 2002-02-14 10:19:41 ddr Exp $ *)
+(* $Id: templ.ml,v 4.13 2002-10-31 14:48:37 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -305,7 +305,7 @@ value parse_templ conf strm =
 
 value open_templ conf dir name =
   let std_fname =
-    List.fold_right Filename.concat [lang_dir.val; "etc"] (name ^ ".txt")
+    search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
   in
   if dir = "" then try Some (open_in std_fname) with [ Sys_error _ -> None ]
   else
