@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.3 1999-11-03 21:13:23 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.4 1999-11-05 17:20:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1069,10 +1069,10 @@ value main () =
       "<dir>
        Directory where the directory lang is installed.");
      ("-dd", Arg.String (fun x -> Util.doc_dir.val := x),
-      "dir>
+      "<dir>
        Directory where the documentation is installed.");
      ("-bd", Arg.String (fun x -> Util.base_dir.val := x),
-      "dir>
+      "<dir>
        Directory where the databases are installed.");
      ("-cgi", Arg.Set cgi,
       "

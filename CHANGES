@@ -1,6 +1,9 @@
 GeneWeb version 3.01
 --------------------
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [Nov 5, 99] Accept roman digits in years of French Republican dates.
+
 GeneWeb version 3.00
 --------------------
 
