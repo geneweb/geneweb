@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 4.0 2001-03-16 19:34:23 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 4.1 2001-04-22 17:50:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -23,8 +23,7 @@ value reconstitute_date_dmy conf var =
               if m >= 1 && m <= 12 then
                 Some {day = 0; month = m; year = y; prec = Sure; delta = 0}
               else None ]
-      | None ->
-          Some {day = 0; month = 0; year = y; prec = Sure; delta = 0} ]
+      | None -> Some {day = 0; month = 0; year = y; prec = Sure; delta = 0} ]
   | None -> None ]
 ;
 
@@ -34,9 +33,7 @@ value reconstitute_date conf var =
   | None -> None ]
 ;
 
-value name_eq x y =
-  Name.abbrev (Name.lower x) = Name.abbrev (Name.lower y)
-;
+value name_eq x y = Name.abbrev (Name.lower x) = Name.abbrev (Name.lower y);
 
 value rec skip_spaces x i =
   if i = String.length x then i
@@ -54,21 +51,21 @@ value string_incl x y =
   loop 0 where rec loop j_ini =
     if j_ini == String.length y then False
     else
-      loop1 0 j_ini where rec loop1 i j =
+      let rec loop1 i j =
         if i == String.length x then
-          if j == String.length y then True
-          else String.unsafe_get y j == ' '
+          if j == String.length y then True else String.unsafe_get y j == ' '
         else if
           j < String.length y &&
-          String.unsafe_get x i == String.unsafe_get y j
-        then loop1 (i + 1) (j + 1)
+          String.unsafe_get x i == String.unsafe_get y j then
+          loop1 (i + 1) (j + 1)
         else loop (skip_spaces y (skip_no_spaces y j_ini))
+      in
+      loop1 0 j_ini
 ;
 
 value name_incl x y =
   let x = Name.abbrev (Name.lower x) in
-  let y = Name.abbrev (Name.lower y) in
-  string_incl x y
+  let y = Name.abbrev (Name.lower y) in string_incl x y
 ;
 
 value advanced_search conf base max_answers =
@@ -82,17 +79,12 @@ value advanced_search conf base max_answers =
           [ Some v -> v
           | None -> "" ]
         in
-        do Hashtbl.add hs x v; return v ]
+        do { Hashtbl.add hs x v; v } ]
   in
-  let test x cmp =
-    let y = gets x in
-    if y = "" then True else cmp y
-  in
+  let test x cmp = let y = gets x in if y = "" then True else cmp y in
   let test_auth p x cmp =
     let y = gets x in
-    if y = "" then True
-    else if fast_auth_age conf p then cmp y
-    else False
+    if y = "" then True else if fast_auth_age conf p then cmp y else False
   in
   let test_date p x df =
     let (d1, d2) =
@@ -102,7 +94,7 @@ value advanced_search conf base max_answers =
             (reconstitute_date conf (x ^ "1"),
              reconstitute_date conf (x ^ "2"))
           in
-          do Hashtbl.add hd x v; return v ]
+          do { Hashtbl.add hd x v; v } ]
     in
     match (d1, d2) with
     [ (Some d1, Some d2) ->
@@ -128,92 +120,93 @@ value advanced_search conf base max_answers =
   let len = ref 0 in
   let test_person p u =
     if test "sex"
-         (fun              
+         (fun
           [ "M" -> p.sex = Male
           | "F" -> p.sex = Female
-          | _ -> True ])
-    && test_date p "birth" (fun () -> Adef.od_of_codate p.birth)
-    && test_date p "bapt" (fun () -> Adef.od_of_codate p.baptism)
-    && test_auth p "death"
+          | _ -> True ]) &&
+       test_date p "birth" (fun () -> Adef.od_of_codate p.birth) &&
+       test_date p "bapt" (fun () -> Adef.od_of_codate p.baptism) &&
+       test_auth p "death"
          (fun d ->
             match (d, p.death) with
             [ ("Dead", NotDead | DontKnowIfDead) -> False
             | ("Dead", _) -> True
             | ("NotDead", NotDead) -> True
             | ("NotDead", _) -> False
-            | _ -> True ])
-    && test_date p "death"
+            | _ -> True ]) &&
+       test_date p "death"
          (fun () ->
             match p.death with
             [ Death _ cd -> Some (Adef.date_of_cdate cd)
-            | _ -> None ])
-    && test_date p "burial"
+            | _ -> None ]) &&
+       test_date p "burial"
          (fun () ->
             match p.burial with
             [ Buried cod -> Adef.od_of_codate cod
             | Cremated cod -> Adef.od_of_codate cod
-            | _ -> None ])
-    && test "first_name" (fun x -> name_eq x (p_first_name base p))
-    && test "surname" (fun x -> name_eq x (p_surname base p))
-    && test "married"
-         (fun              
+            | _ -> None ]) &&
+       test "first_name" (fun x -> name_eq x (p_first_name base p)) &&
+       test "surname" (fun x -> name_eq x (p_surname base p)) &&
+       test "married"
+         (fun
           [ "Y" -> u.family <> [| |]
           | "N" -> u.family = [| |]
-          | _ -> True ])
-    && test_auth p "birth_place"
-         (fun x -> name_incl x (sou base p.birth_place))
-    && test_auth p "bapt_place"
-         (fun x -> name_incl x (sou base p.baptism_place))
-    && test_auth p "death_place"
-         (fun x -> name_incl x (sou base p.death_place))
-    && test_auth p "burial_place"
-          (fun x -> name_incl x (sou base p.burial_place))
-    && test_auth p "occu" (fun x -> name_incl x (sou base p.occupation))
-    then
-      do list.val := [p :: list.val];
-         incr len;
-      return ()
+          | _ -> True ]) &&
+       test_auth p "birth_place"
+         (fun x -> name_incl x (sou base p.birth_place)) &&
+       test_auth p "bapt_place"
+         (fun x -> name_incl x (sou base p.baptism_place)) &&
+       test_auth p "death_place"
+         (fun x -> name_incl x (sou base p.death_place)) &&
+       test_auth p "burial_place"
+         (fun x -> name_incl x (sou base p.burial_place)) &&
+       test_auth p "occu" (fun x -> name_incl x (sou base p.occupation)) then
+       do {
+      list.val := [p :: list.val]; incr len;
+    }
     else ()
   in
-  do if gets "first_name" <> "" || gets "surname" <> "" then
-       let (slist, _) =
-         if gets "first_name" <> "" then
-           Some.persons_of_fsname base base.func.persons_of_first_name.find
-             (fun x -> x.first_name) (gets "first_name")
-         else
-           Some.persons_of_fsname base base.func.persons_of_surname.find
-             (fun x -> x.surname) (gets "surname")
-       in
-       let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
-       List.iter (fun ip -> test_person (poi base ip) (uoi base ip)) slist
-     else
-       for i = 0 to base.data.persons.len - 1 do
-         if len.val > max_answers then ()
-         else test_person (base.data.persons.get i) (base.data.unions.get i);
-       done;
-  return (List.rev list.val, len.val)
+  do {
+    if gets "first_name" <> "" || gets "surname" <> "" then
+      let (slist, _) =
+        if gets "first_name" <> "" then
+          Some.persons_of_fsname base base.func.persons_of_first_name.find
+            (fun x -> x.first_name) (gets "first_name")
+        else
+          Some.persons_of_fsname base base.func.persons_of_surname.find
+            (fun x -> x.surname) (gets "surname")
+      in
+      let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
+      List.iter (fun ip -> test_person (poi base ip) (uoi base ip)) slist
+    else
+      for i = 0 to base.data.persons.len - 1 do {
+        if len.val > max_answers then ()
+        else test_person (base.data.persons.get i) (base.data.unions.get i)
+      };
+    (List.rev list.val, len.val)
+  }
 ;
 
 value print_result conf base max_answers (list, len) =
-  if len > max_answers then
-    do Wserver.wprint (fcapitale (ftransl conf "more than %d answers"))
-         max_answers;
-       Wserver.wprint "\n";
-       html_p conf;
-    return ()
+  if len > max_answers then do {
+    Wserver.wprint (fcapitale (ftransl conf "more than %d answers"))
+      max_answers;
+    Wserver.wprint "\n";
+    html_p conf;
+  }
   else if len == 0 then
     Wserver.wprint "%s\n" (capitale (transl conf "no match"))
   else
     tag "ul" begin
       List.iter
         (fun p ->
-           do html_li conf;
-              afficher_personne_referencee conf base p;
-              Date.afficher_dates_courtes conf base p;
-           return ())
+           do {
+             html_li conf;
+             afficher_personne_referencee conf base p;
+             Date.afficher_dates_courtes conf base p;
+           })
         list;
-      if len > max_answers then
-        do html_li conf; Wserver.wprint "...\n"; return ()
+      if len > max_answers then do { html_li conf; Wserver.wprint "...\n"; }
       else ();
     end
 ;
@@ -227,9 +220,10 @@ value print conf base =
     [ Some n -> n
     | None -> 100 ]
   in
-  do header conf title;
-     let list = advanced_search conf base max_answers in
-     print_result conf base max_answers list;
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    let list = advanced_search conf base max_answers in
+    print_result conf base max_answers list;
+    trailer conf;
+  }
 ;
