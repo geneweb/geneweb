@@ -22,6 +22,7 @@
 				Bertil Englund
 
 	Documentation
+		German		Falko Trojahn
 		Dutch		Joris Esch
 		Swedish		Lars Gustavsson
 
