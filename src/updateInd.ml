@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.5 1998-09-30 07:29:27 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.6 1998-11-10 10:24:12 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -609,9 +609,15 @@ value merge_call conf =
 
 value print_mod1 conf base p digest =
   let title _ =
-    Wserver.wprint "%s / %s # %d" (capitale (transl conf "modify"))
-      (capitale (transl_nth conf "person/persons" 0))
-      (Adef.int_of_iper p.cle_index)
+    match p_getenv conf.env "m" with
+    [ Some "MRG_MOD_IND_OK" ->
+        Wserver.wprint "%s / %s # %d" (capitale (transl conf "merge"))
+          (capitale (transl_nth conf "person/persons" 1))
+          (Adef.int_of_iper p.cle_index)
+    | _ ->
+        Wserver.wprint "%s / %s # %d" (capitale (transl conf "modify"))
+          (capitale (transl_nth conf "person/persons" 0))
+          (Adef.int_of_iper p.cle_index) ]
   in
   do header conf title;
      Wserver.wprint "\n";

@@ -1,4 +1,4 @@
-(* $Id: util.ml,v 1.10 1998-11-07 11:12:08 ddr Exp $ *)
+(* $Id: util.ml,v 1.11 1998-11-10 10:24:13 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -595,7 +595,7 @@ value print_parent conf base p a =
   | _ ->
       Wserver.wprint "%s %s%s" (transl_nth conf "son/daughter/child" is)
         (transl_concat conf "of" (coa conf (sou base a.first_name)))
-        (if p.surname <> a.surname then coa conf (sou base a.surname)
+        (if p.surname <> a.surname then " " ^ coa conf (sou base a.surname)
          else "") ]
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 1.4 1998-09-30 14:04:46 ddr Exp $ *)
+(* $Id: updateFam.ml,v 1.5 1998-11-10 10:24:11 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -94,9 +94,8 @@ value print_person conf base var fmem (first_name, surname, occ, create) =
 ;
 
 value print_father conf base fam =
-  do tag "h4" begin
-       Wserver.wprint " %s "
-         (capitale (transl_nth conf "him/her" 0));
+  do stag "h4" begin
+       Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 0));
      end;
      Wserver.wprint "\n";
      print_person conf base "his" Father fam.father;
@@ -105,9 +104,8 @@ value print_father conf base fam =
 ;
 
 value print_mother conf base fam =
-  do tag "h4" begin
-       Wserver.wprint " %s "
-         (capitale (transl_nth conf "him/her" 1));
+  do stag "h4" begin
+       Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 1));
      end;
      Wserver.wprint "\n";
      print_person conf base "her" Mother fam.mother;
@@ -273,17 +271,39 @@ value print_family conf base fam cpl force_children_surnames =
   return ()
 ;
 
+value merge_call conf =
+  do Wserver.wprint "<input type=hidden name=m value=MRG_MOD_FAM_OK>\n";
+     match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
+     [ (Some i1, Some i2) ->
+         do Wserver.wprint "<input type=hidden name=ini1 value=%d>\n" i1;
+            Wserver.wprint "<input type=hidden name=ini2 value=%d>\n" i2;
+         return ()
+     | _ -> () ];
+     match p_getint conf.env "i2" with
+     [ Some i2 -> Wserver.wprint "<input type=hidden name=i2 value=%d>\n" i2
+     | _ -> () ];
+  return ()
+;
+
 value print_mod1 conf base fam cpl digest =
   let title _ =
-    Wserver.wprint "%s / %s # %d" (capitale (transl conf "modify"))
-      (capitale (transl_nth conf "family/families" 0))
-      (Adef.int_of_ifam fam.fam_index)
+    match p_getenv conf.env "m" with
+    [ Some "MRG_MOD_FAM_OK" ->
+        Wserver.wprint "%s / %s # %d" (capitale (transl conf "merge"))
+          (capitale (transl_nth conf "family/families" 1))
+          (Adef.int_of_ifam fam.fam_index)
+    | _ ->
+        Wserver.wprint "%s / %s # %d" (capitale (transl conf "modify"))
+          (capitale (transl_nth conf "family/families" 0))
+          (Adef.int_of_ifam fam.fam_index) ]
   in
   do header conf title;
      Wserver.wprint "\n";
      tag "form" "method=POST action=\"%s\"" conf.command begin
        Srcfile.hidden_env conf;
-       Wserver.wprint "<input type=hidden name=m value=MOD_FAM_OK>\n";
+       match p_getenv conf.env "m" with
+       [ Some "MRG_MOD_FAM_OK" -> merge_call conf
+       | _ -> Wserver.wprint "<input type=hidden name=m value=MOD_FAM_OK>\n" ];
        Wserver.wprint "<input type=hidden name=i value=%d>\n"
          (Adef.int_of_ifam fam.fam_index);
        Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
