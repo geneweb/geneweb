@@ -1,7 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
 <head>
-  <!-- $Id: start.txt,v 4.16 2001-10-16 11:53:37 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.17 2001-11-24 13:17:14 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
