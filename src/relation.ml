@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: relation.ml,v 1.12 1998-12-16 17:36:39 ddr Exp $ *)
+(* $Id: relation.ml,v 1.13 1998-12-26 12:22:24 roglo Exp $ *)
 
 open Def;
 open Gutil;
@@ -58,7 +58,7 @@ value print_menu conf base p =
                  (Adef.int_of_iper p.cle_index)
                  (Adef.int_of_iper c.cle_index);
                afficher_personne_sans_titre conf base c;
-               Wserver.wprint "\n</a>";
+               Wserver.wprint "</a>";
                afficher_titre conf base c;
                Wserver.wprint "\n";
             return ()
