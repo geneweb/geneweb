@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.40 2000-09-03 03:51:59 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.41 2000-09-06 16:11:54 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -125,15 +125,27 @@ value log_open () =
   open_out_gen [Open_wronly; Open_creat; Open_append] 0o666 fname
 ;
 
-value copy_template env fname =
+value get_variable ic =
+  loop 0 where rec loop len =
+    match input_char ic with
+    [ ';' -> Buff.get len
+    | c -> loop (Buff.store len c) ]
+;
+
+value copy_template varenv env fname =
   let ic = open_in (Filename.concat gwtp_tmp.val (fname ^ ".txt")) in
   do try
        while True do
          match input_char ic with
          [ '%' ->
-             let c = input_char ic in
-             try print_string (List.assoc c env) with
-             [ Not_found -> do print_char '%'; print_char c; return () ]
+             match input_char ic with
+             [ 'v' ->
+                 let v = get_variable ic in
+                 try print_string (quote_escaped (List.assoc v varenv)) with
+                 [ Not_found -> () ]
+             | c ->
+                 try print_string (List.assoc c env) with
+                 [ Not_found -> do print_char '%'; print_char c; return () ] ]
          | c -> print_char c ];
        done
      with [ End_of_file -> () ];
@@ -197,10 +209,21 @@ value gwtp_invalid_request str env = gwtp_error "Invalid request";
 
 (* Base configuration *)
 
+value variables = ["wizard_passwd"; "friend_passwd"; "default_lang"];
+
 value get_base_conf b =
   let fname = Filename.concat gwtp_dst.val (b ^ ".gwf" ) in
-  let wizpw = ref "" in
-  let fripw = ref "" in
+  let env = ref [] in
+  let rec record line =
+    fun
+    [ [v :: l] ->
+        if lowercase_start_with line (v ^ "=") then
+          let len = String.length v + 1 in
+          let x = String.sub line len (String.length line - len) in
+          env.val := [(v, x) :: env.val]
+        else record line l
+    | [] -> () ]
+  in
   do match try Some (open_in fname) with [ Sys_error _ -> None ] with
      [ Some ic ->
          try
@@ -212,49 +235,44 @@ value get_base_conf b =
                  String.sub line 0 (String.length line - 1)
                else line
              in
-             if lowercase_start_with line "wizard_passwd=" then
-               let len = String.length "wizard_passwd=" in
-               wizpw.val := String.sub line len (String.length line - len)
-             else if lowercase_start_with line "friend_passwd=" then
-               let len = String.length "friend_passwd=" in
-               fripw.val := String.sub line len (String.length line - len)
-             else ();
+             record line variables;
            done
          with
          [ End_of_file -> close_in ic ]
      | None -> () ];
-  return (wizpw.val, fripw.val)
+  return env.val
 ;
 
-value set_base_conf b (wizpw, fripw) =
+value set_base_conf b varenv =
   let fname = Filename.concat gwtp_dst.val (b ^ ".gwf" ) in
   let fname_out = Filename.concat gwtp_dst.val (b ^ "1.gwf" ) in
   let fname_saved = fname ^ "~" in
-  let wizpw_ok = ref False in
-  let fripw_ok = ref False in
+  let varenv = List.map (fun (k, v) -> (k, v, ref False)) varenv in
+  let rec extract line =
+    fun
+    [ [(v, k, is_set) :: varenv] ->
+        if lowercase_start_with line (v ^ "=") then
+          do is_set.val := True; return
+          v ^ "=" ^ k
+        else extract line varenv
+    | [] -> line ]
+  in
   let oc = open_out fname_out in
   do match try Some (open_in fname) with [ Sys_error _ -> None ] with
      [ Some ic ->
          try
            while True do
              let line = input_line ic in
-             let line_out =
-               if lowercase_start_with line "wizard_passwd=" then
-                 do wizpw_ok.val := True; return
-                 "wizard_passwd=" ^ wizpw
-               else if lowercase_start_with line "friend_passwd=" then
-                 do fripw_ok.val := True; return
-                 "friend_passwd=" ^ fripw
-               else
-                 line
-             in
+             let line_out = extract line varenv in
              fprintf oc "%s\n" line_out;
            done
          with
          [ End_of_file -> close_in ic ]
      | None -> () ];
-     if not wizpw_ok.val then fprintf oc "wizard_passwd=%s\n" wizpw else ();
-     if not fripw_ok.val then fprintf oc "friend_passwd=%s\n" fripw else ();
+     List.iter
+       (fun (v, k, is_set) ->
+          if not is_set.val then fprintf oc "%s=%s\n" v k else ())
+       varenv;
      close_out oc;
      try Sys.remove fname_saved with [ Sys_error _ -> () ];
      let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
@@ -503,19 +521,24 @@ value gwtp_receive str env b tok =
 ;
 
 value gwtp_setconf str env b tok =
-  match (HttpEnv.getenv env "wizpw", HttpEnv.getenv env "fripw") with
-  [ (Some wizpw, Some fripw) ->
-      do printf "content-type: text/html"; crlf (); crlf ();
-       printf "\
+  let varenv =
+    List.fold_right
+      (fun k varenv ->
+         match HttpEnv.getenv env k with
+         [ Some v -> [(k, v) :: varenv]
+         | None -> varenv ])
+      variables []
+  in
+  do printf "content-type: text/html"; crlf (); crlf ();
+     printf "\
 <head><title>Gwtp - configuration %s</title></head>\n<body>
 <h1 align=center>Gwtp - configuration %s</h1>
 " b b;
-         set_base_conf b (wizpw, fripw);
-         printf "Configuration changed\n";
-         printf_link_to_main b tok;
-         printf "</body>\n";
-      return ()
-  | _ -> gwtp_invalid_request str env ]
+     set_base_conf b varenv;
+     printf "Configuration changed\n";
+     printf_link_to_main b tok;
+     printf "</body>\n";
+  return ()
 ;
 
 value gwtp_upload str env b tok =
@@ -524,7 +547,8 @@ value gwtp_upload str env b tok =
     gwtp_error "no configuration file"
   else
     do printf "content-type: text/html"; crlf (); crlf ();
-       copy_template [('s', cgi_script_name ()); ('b', b); ('t', tok)] "send";
+       copy_template [] [('s', cgi_script_name ()); ('b', b); ('t', tok)]
+         "send";
        printf_link_to_main b tok;
        printf "</body>\n";
     return ()
@@ -539,7 +563,7 @@ value gwtp_download str env b tok =
     do printf "content-type: text/html"; crlf (); crlf ();
        if Sys.file_exists bdir then
        let dh = Unix.opendir bdir in
-       do copy_template [('b', b); ('t', tok)] "recv";
+       do copy_template [] [('b', b); ('t', tok)] "recv";
           printf "<ul>\n";
           try
             while True do
@@ -576,11 +600,10 @@ value gwtp_download str env b tok =
 ;
 
 value gwtp_config str env b tok =
-  let (wizpw, fripw) = get_base_conf b in
+  let varenv = get_base_conf b in
   do printf "content-type: text/html"; crlf (); crlf ();
-     copy_template
-       [('s', cgi_script_name ()); ('b', b); ('t', tok);
-        ('w', quote_escaped wizpw); ('f', quote_escaped fripw)]
+     copy_template varenv
+       [('s', cgi_script_name ()); ('b', b); ('t', tok)]
        "conf";
      printf_link_to_main b tok;
      printf "</body>\n";
