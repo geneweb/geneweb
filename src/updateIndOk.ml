@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.11 2002-03-11 17:50:46 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.12 2002-11-14 04:15:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -262,7 +262,7 @@ value reconstitute_person conf =
   in
   let notes =
     if first_name = "?" || surname = "?" then ""
-    else only_printable_or_nl (strip_controls_m (get conf "notes"))
+    else only_printable_or_nl (strip_all_trailing_spaces (get conf "notes"))
   in
   let psources = only_printable (get conf "src") in
   let p =

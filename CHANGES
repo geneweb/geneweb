@@ -18,7 +18,8 @@ GeneWeb version 4.08
     to the surname, not to a person holding this surname associated with
     the place: it is less useful but too many people blamed me that it
     was a bug. Old behaviour if the base configuration variable
-    "place_surname_link_to_ind" is set to "yes".
+    "place_surname_link_to_ind" is set to "yes". Configurable by the
+    gwtp interface.
   - [23 Oct 02] In families forms, added shortcuts for created
     persons' dates: one can write: "?year" to indicate "perhaps",
     ">year" or "year/" to indicate "after", "<year" or "/year" to

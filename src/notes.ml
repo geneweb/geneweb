@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.2 2002-10-26 01:22:42 ddr Exp $ *)
+(* $Id: notes.ml,v 4.3 2002-11-14 04:15:34 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -33,6 +33,8 @@ value print_mod conf base =
     tag "form" "method=POST action=\"%s\"" conf.command begin
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=m value=MOD_NOTES_OK>\n";
+      let digest = Iovalue.digest s in
+      Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
       stag "textarea" "name=notes rows=30 cols=70 wrap=virtual" begin
         if s <> "" then Wserver.wprint "%s" (quote_escaped s) else ();
       end;
@@ -47,8 +49,18 @@ value print_mod conf base =
 value print_mod_ok conf base =
   let s =
     match p_getenv conf.env "notes" with
-    [ Some v -> strip_spaces (strip_controls_m v)
+    [ Some v -> strip_all_trailing_spaces v
     | None -> failwith "notes unbound" ]
   in
-  do { base.func.commit_notes s; print conf base }
+  let digest =
+    match p_getenv conf.env "digest" with
+    [ Some s -> s
+    | None -> "" ]
+  in
+  let old_notes = base.data.bnotes.nread 0 in
+  try
+    if digest <> Iovalue.digest old_notes then Update.error_digest conf base
+    else do { base.func.commit_notes s; print conf base }
+  with
+  [ Update.ModErr -> () ]
 ;

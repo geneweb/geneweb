@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.110 2002-11-13 08:45:23 ddr Exp $
+# $Id: lexicon.txt,v 4.111 2002-11-14 04:15:33 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7298,7 +7298,7 @@ eo: la bazo sxangis; faru "malantauxe", "resxargi", kaj replenigu la formularon
 es: la base ha cambiado: hacer "back", "reload" y completar nuevamente el formulario
 et: andmebaas on mutunud, mine tagasi, uuenda pilti ja tהida vorm uuesti
 fi: tietokanta on muuttunut; peruuta, lataa uudelleen ja t&auml;yt&auml; kaavake
-fr: la base a chang&eacute;: faire "back", "reload", et refaire le formulaire
+fr: la base a chang&eacute;: faire "page pr&eacute;c&eacute;dente" puis "actualiser la page", et refaire le formulaire
 he:  מאגר המידה השתנה: לעשות "back" ו-"reload"  ולמלא מחדש את הטופס
 is: gagnagrunnurinn hefur breyst; gerנu "Back", "Reload", og settu aftur ם formiנ
 it: la base &egrave; cambiata; fate "back", "reload" e rifate la scheda

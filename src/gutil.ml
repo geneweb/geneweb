@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.10 2002-10-06 15:42:54 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.11 2002-11-14 04:15:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -878,22 +878,30 @@ value check_base base error warning =
   }
 ;
 
-value strip_controls_m s =
+value strip_all_trailing_spaces s =
+  let b = Buffer.create (String.length s) in
   let len =
-    loop 0 0 where rec loop i len =
-      if i == String.length s then len
-      else if s.[i] == '\r' then loop (i + 1) len
-      else loop (i + 1) (len + 1)
+    loop (String.length s - 1) where rec loop i =
+      if i < 0 then 0
+      else
+        match s.[i] with
+        [ ' ' | '\t' | '\r' | '\n' -> loop (i - 1)
+        | _ -> i + 1 ]
   in
-  if len == String.length s then s
-  else
-    let s' = String.create len in
-    let rec loop i j =
-      if j == len then s'
-      else if s.[i] == '\r' then loop (i + 1) j
-      else do { s'.[j] := s.[i]; loop (i + 1) (j + 1) }
-    in
-    loop 0 0
+  loop 0 where rec loop i =
+    if i = len then Buffer.contents b
+    else
+      match s.[i] with
+      [ '\r' -> loop (i + 1)
+      | ' ' | '\t' ->
+          loop0 (i + 1) where rec loop0 j =
+            if j = len then Buffer.contents b
+            else
+              match s.[j] with
+              [ ' ' | '\t' | '\r' -> loop0 (j + 1)
+              | '\n' -> loop j
+              | _ -> do { Buffer.add_char b s.[i]; loop (i + 1) } ]
+      | c -> do { Buffer.add_char b c; loop (i + 1) } ]
 ;
 
 value strip_spaces str =
