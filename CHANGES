@@ -43,8 +43,7 @@ GeneWeb version 3.10
     among configurable variables (conf.txt).
 
 * Installation under Linux rpm
-  - [07 Nov 00] Put logs for gwsetup and gwd on /var/log. Several changes
-    in places where files are installed.
+  - [07 Nov 00] Put logs for gwsetup and gwd on /var/log.
 
 GeneWeb version 3.09
 --------------------
