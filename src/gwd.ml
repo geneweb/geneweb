@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.25 1999-01-08 10:22:54 roglo Exp $ *)
+(* $Id: gwd.ml,v 1.26 1999-01-09 13:17:01 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -479,7 +479,9 @@ value print_image cgi bname str t =
 value image_request cgi str env =
   let bname =
     let (x, _) = extract_assoc "b" env in
-    if x <> "" || cgi then x
+    if x <> "" || cgi then
+      let ip = index '_' x in
+      String.sub x 0 ip
     else
       let iq = index '?' str in
       let b = String.sub str 0 iq in
