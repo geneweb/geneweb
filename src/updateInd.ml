@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.3 2001-06-13 08:01:45 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.4 2001-06-13 14:35:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -189,48 +189,7 @@ value try_eval_gen_variable conf base env p =
       else raise Not_found ]
 ;
 
-value eval_date_field =
-  fun
-  [ Some d ->
-      match d with
-      [ Dgreg d Dgregorian -> Some d
-      | Dgreg d Djulian -> Some (Calendar.julian_of_gregorian d)
-      | Dgreg d Dfrench -> Some (Calendar.french_of_gregorian d)
-      | Dgreg d Dhebrew -> Some (Calendar.hebrew_of_gregorian d)
-      | _ -> None ]
-  | None -> None ]
-;
-
-value eval_date_text =
-  fun
-  [ Some (Dtext s) -> s
-  | _ -> "" ]
-;
-
-value eval_date_variable conf base env od =
-  fun
-  [ "day" ->
-      match eval_date_field od with
-      [ Some d -> if d.day = 0 then "" else string_of_int d.day
-      | None -> "" ]
-  | "month" ->
-      match eval_date_field od with
-      [ Some d -> if d.month = 0 then "" else string_of_int d.month
-      | None -> "" ]
-  | "text" -> eval_date_text od
-  | "year" ->
-      match eval_date_field od with
-      [ Some d -> string_of_int d.year
-      | None -> "" ]
-  | "oryear" ->
-      match od with
-      [ Some (Dgreg {prec = OrYear y} _) -> string_of_int y
-      | Some (Dgreg {prec = YearInt y} _) -> string_of_int y
-      | _ -> "" ]
-  | v -> ">%" ^ v ^ "???" ]
-;
-
-value eval_key_variable conf base env (fn, sn, oc, create, var) =
+value eval_key_variable (fn, sn, oc, create, var) =
   fun
   [ "first_name" -> quote_escaped fn
   | "occ" -> if oc = 0 then "" else string_of_int oc
@@ -238,15 +197,15 @@ value eval_key_variable conf base env (fn, sn, oc, create, var) =
   | s -> ">%" ^ s ^ "???" ]
 ;
 
-value eval_relation_variable conf base env p r =
+value eval_relation_variable r =
   fun
   [ ["r_father"; s] ->
       match r with
-      [ Some {r_fath = Some x} -> eval_key_variable conf base env x s
+      [ Some {r_fath = Some x} -> eval_key_variable x s
       | _ -> "" ]
   | ["r_mother"; s] ->
       match r with
-      [ Some {r_moth = Some x} -> eval_key_variable conf base env x s
+      [ Some {r_moth = Some x} -> eval_key_variable x s
       | _ -> "" ]
   | [s :: _] -> ">%" ^ s ^ "???"
   | _ -> ">???" ]
@@ -440,7 +399,7 @@ value eval_bool_value conf base env p =
         try
           match eval_variable conf base env p [s :: sl] with
           [ VVgen s -> try_eval_gen_variable conf base env p s
-          | VVdate od s -> eval_date_variable conf base env od s
+          | VVdate od s -> Templ.eval_date_variable od s
           | VVcvar s -> eval_base_env_variable conf s
           | VVrelation _ _ -> do { Wserver.wprint ">%%%s???" s; "" }
           | VVtitle _ _ -> do { Wserver.wprint ">%%%s???" s; "" }
@@ -459,12 +418,12 @@ value print_variable conf base env p sl =
   [ VVgen s ->
       try Wserver.wprint "%s" (try_eval_gen_variable conf base env p s) with
       [ Not_found -> Templ.print_variable conf base s ]
-  | VVdate od s -> Wserver.wprint "%s" (eval_date_variable conf base env od s)
+  | VVdate od s -> Wserver.wprint "%s" (Templ.eval_date_variable od s)
   | VVcvar s ->
       try Wserver.wprint "%s" (List.assoc s conf.base_env) with
       [ Not_found -> () ]
   | VVrelation r sl ->
-      Wserver.wprint "%s" (eval_relation_variable conf base env p r sl)
+      Wserver.wprint "%s" (eval_relation_variable r sl)
   | VVtitle t sl ->
       Wserver.wprint "%s" (eval_title_variable conf base env p t sl)
   | VVnone ->
@@ -476,47 +435,6 @@ value print_variable conf base env p sl =
         Wserver.wprint "???";
       } ]
 ;
-
-value subst_text x v s =
-  if String.length x = 0 then s
-  else
-    let rec loop len i i_ok =
-      if i = String.length s then
-        if i_ok > 0 then loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
-        else Buff.get len
-      else if s.[i] = x.[i_ok] then
-        if i_ok = String.length x - 1 then loop (Buff.mstore len v) (i + 1) 0
-        else loop len (i + 1) (i_ok + 1)
-      else if i_ok > 0 then
-        loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
-      else loop (Buff.store len s.[i]) (i + 1) 0
-    in
-    loop 0 0 0
-;
-
-value rec subst sf =
-  fun
-  [ Atext s -> Atext (sf s)
-  | Avar s sl -> Avar (sf s) (List.map sf sl)
-  | Atransl b s c -> Atransl b (sf s) c
-  | Awid_hei s -> Awid_hei (sf s)
-  | Aif e alt ale -> Aif (subste sf e) (substl sf alt) (substl sf ale)
-  | Aforeach s sl al -> Aforeach (sf s) (List.map sf sl) (substl sf al)
-  | Adefine f xl al alk ->
-      Adefine (sf f) (List.map sf xl) (substl sf al) (substl sf alk)
-  | Aapply f el -> Aapply (sf f) (substel sf el) ]
-and substl sf al = List.map (subst sf) al
-and subste sf =
-  fun
-  [ Eor e1 e2 -> Eor (subste sf e1) (subste sf e2)
-  | Eand e1 e2 -> Eand (subste sf e1) (subste sf e2)
-  | Eop op e1 e2 -> Eop (sf op) (subste sf e1) (subste sf e2)
-  | Enot e -> Enot (subste sf e)
-  | Estr s -> Estr (sf s)
-  | Eint s -> Eint s
-  | Evar s sl -> Evar (sf s) (List.map sf sl)
-  | Etransl upp s c -> Etransl upp s c ]
-and substel sf el = List.map (subste sf) el;
 
 value rec print_ast conf base env p =
   fun
@@ -541,7 +459,7 @@ and print_apply conf base env p f el =
              loop a xl vl where rec loop a xl vl =
                match (xl, vl) with
                [ ([x :: xl], [v :: vl]) ->
-                   loop (subst (subst_text x v) a) xl vl
+                   loop (Templ.subst (Templ.subst_text x v) a) xl vl
                | ([], []) -> a
                | _ -> Atext "parse_error" ]
            in
