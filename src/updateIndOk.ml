@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.20 2004-12-28 15:13:05 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.21 2005-01-20 12:43:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -746,10 +746,14 @@ value print_mod o_conf base =
   let conf = Update.update_conf o_conf in
   let callback sp =
     let p = effective_mod conf base sp in
+    let op = poi base p.cle_index in
     let u = uoi base p.cle_index in
     do {
       base.func.patch_person p.cle_index p;
-      Update.update_misc_names_of_family base p u;
+      if op.surname <> p.surname || op.surnames_aliases <> p.surnames_aliases
+      || op.titles <> p.titles then
+        Update.update_misc_names_of_family base p u
+      else ();
       let wl = all_checks_person conf base p (aoi base p.cle_index) u in
       let k = (sp.first_name, sp.surname, sp.occ) in
       Util.commit_patches conf base;
