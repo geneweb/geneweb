@@ -2,6 +2,11 @@ GeneWeb version 4.04
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [20 Oct 01] In the updates forms, the order "year/month/day" in
+    the dates now depends on the language. This is indicated in a new
+    entry in the lexicon, "<tt>dates in form</tt>" which is
+    "<tt>ddmmyy</tt>" for French (day/month/year) and "<tt>yymmdd</tt>"
+    for English (year/month/day). Can be changed for the other languages.
   - [11 Oct 01] Improved persons merging (dates and places are merged
     faster).
   - [03 Oct 01] Fixed bug in displaying by places/surnames: the cutting

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.6 2001-06-15 04:34:25 ddr Exp $ *)
+(* $Id: templ.ml,v 4.7 2001-10-20 10:59:00 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -163,6 +163,7 @@ value rec parse_expr strm =
     | [: `IDENT "not"; e = parse_simple :] -> Enot e
     | [: `STRING s :] -> Estr s
     | [: `INT s :] -> Eint s
+    | [: `LEXICON upp s n :] -> Etransl upp s n
     | [: (id, idl) = parse_var :] -> Evar id idl
     | [: `_ :] -> Evar "parse_error" [] ]
   in

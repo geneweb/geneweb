@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.22 2001-09-27 13:29:43 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.23 2001-10-20 10:59:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -91,6 +91,10 @@ value not_impl func x =
 ;
 
 (* string values *)
+
+value eval_base_env_variable conf v =
+  try List.assoc v conf.base_env with [ Not_found -> "" ]
+;
 
 value get_create (fn, sn, oc, create, var) = create;
 
@@ -314,11 +318,12 @@ value eval_bool_value conf base env fcd =
           [ VVgen s -> try_eval_gen_variable conf base env fcd s
           | VVcreate c s -> do { Wserver.wprint ">%%%s???" s; "" }
           | VVdate od s -> Templ.eval_date_variable od s
-          | VVcvar s -> do { Wserver.wprint ">%%%s???" s; "" }
+          | VVcvar s -> eval_base_env_variable conf s
           | VVind pk s -> eval_key_variable pk s
           | VVnone -> do { Wserver.wprint ">%%%s???" s; "" } ]
         with
         [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
+    | Etransl upp s c -> Templ.eval_transl conf base env upp s c
     | x -> do { Wserver.wprint "val???"; "" } ]
   in
   bool_eval
@@ -327,12 +332,15 @@ value eval_bool_value conf base env fcd =
 (* print *)
 
 value print_variable conf base env fcd sl =
-  match eval_variable conf base env fcd sl with
-  [ VVcreate c s -> Wserver.wprint "%s" (eval_create_variable c s)
-  | VVdate od s -> Wserver.wprint "%s" (Templ.eval_date_variable od s)
-  | VVgen s ->
+  match eval_variable conf base env fcd sl with 
+  [ VVgen s ->
       try Wserver.wprint "%s" (try_eval_gen_variable conf base env fcd s) with
       [ Not_found -> Templ.print_variable conf base s ]
+  | VVcreate c s -> Wserver.wprint "%s" (eval_create_variable c s)
+  | VVdate od s -> Wserver.wprint "%s" (Templ.eval_date_variable od s)
+  | VVcvar s ->
+      try Wserver.wprint "%s" (List.assoc s conf.base_env) with
+      [ Not_found -> () ]
   | VVind pk s -> Wserver.wprint "%s" (eval_key_variable pk s)
   | VVnone ->
       do {
@@ -341,8 +349,7 @@ value print_variable conf base env fcd sl =
           (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
           sl;
         Wserver.wprint "???";
-      }
-  | x -> not_impl "print_variable" x ]
+      } ]
 ;
 
 value rec print_ast conf base env fcd =

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.18 2001-09-28 17:22:05 ddr Exp $ *)
+(* $Id: perso.ml,v 4.19 2001-10-20 10:58:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1192,6 +1192,7 @@ value eval_bool_value conf base env =
           | _ -> raise Not_found ]
         with
         [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
+    | Etransl upp s c -> Templ.eval_transl conf base env upp s c
     | x -> do { Wserver.wprint "val???"; "" } ]
   in
   bool_eval
