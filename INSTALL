@@ -3,14 +3,14 @@ INSTALLATIONS INSTRUCTIONS IN UNIX MACHINES
 
 For the compilation, you need
    the Objective Caml compiler version 3.01
-   the preprocessor Camlp4 version 3.01.1
+   the preprocessor Camlp4 version 3.01.4
 installed in your computer.
 
 They are freely distributed at addresses:
      http://caml.inria.fr/ocaml/
      http://caml.inria.fr/camlp4/
 
-It may compile with other (older or newer) versions of OCaml/Camlp4,
+It may compile with other (older or newer) versions of OCaml and Camlp4,
 but no warranty: however, if you manage to compile, it has good chances
 to be correct.
 

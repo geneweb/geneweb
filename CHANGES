@@ -2,6 +2,9 @@ GeneWeb version 4.02
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [29 May 01] Fixed problem with option -log (traces in a log file):
+    if the log file was not writable, all requests failed (instead of
+    ignoring it).
   - [11 May 01] Improved data base access speed in case when many updates
     have been done (and data base not having been cleaned up).
   - [09 May 01] Fixed bug: system images with underscores did not work
