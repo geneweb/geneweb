@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.18 1999-07-20 03:21:25 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.19 1999-07-20 03:54:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -57,7 +57,7 @@ value no_family gen =
   (fam, cpl)
 ;
 
-value faire_personne gen p n occ i =
+value make_person gen p n occ i =
   let empty_string = unique_string gen "" in
   let p =
     {first_name = unique_string gen p; surname = unique_string gen n;
@@ -82,7 +82,7 @@ value faire_personne gen p n occ i =
   (p, a)
 ;
 
-value no_person gen = faire_personne gen "" "" 0 0;
+value no_person gen = make_person gen "" "" 0 0;
 
 value new_iper gen =
   if gen.g_pcnt == gen.g_base.data.persons.len then
@@ -174,7 +174,7 @@ value insert_undefined_parent gen key =
     with
     [ Not_found ->
         let (x, a) =
-          faire_personne gen key.pk_first_name key.pk_surname occ
+          make_person gen key.pk_first_name key.pk_surname occ
             gen.g_pcnt
         in
         do if key.pk_first_name <> "?" && key.pk_surname <> "?" then
@@ -221,7 +221,7 @@ value insert_person gen so =
     with
     [ Not_found ->
         let (x, a) =
-          faire_personne gen so.first_name so.surname occ gen.g_pcnt
+          make_person gen so.first_name so.surname occ gen.g_pcnt
         in
         do if so.first_name <> "?" && so.surname <> "?" then
              add_person_by_name gen so.first_name so.surname occ
@@ -333,7 +333,7 @@ because this persons still exists as child of
   | _ -> () ]
 ;
 
-value noter_sexe gen p s =
+value notice_sex gen p s =
   if p.sex == Neuter then p.sex := s
   else if p.sex == s || s == Neuter then ()
   else
@@ -349,7 +349,7 @@ value insert_family gen co fo =
     Array.map
       (fun cle ->
          let e = insert_person gen cle in
-         do noter_sexe gen e cle.sex; return e.cle_index)
+         do notice_sex gen e cle.sex; return e.cle_index)
       fo.children
   in
   let comment = unique_string gen fo.comment in
@@ -371,8 +371,8 @@ value insert_family gen co fo =
      gen.g_fcnt := gen.g_fcnt + 1;
      pere.family := Array.append pere.family [| fam.fam_index |];
      mere.family := Array.append mere.family [| fam.fam_index |];
-     noter_sexe gen pere Male;
-     noter_sexe gen mere Female;
+     notice_sex gen pere Male;
+     notice_sex gen mere Female;
      Array.iter
        (fun ix ->
           let x = poi gen.g_base ix in

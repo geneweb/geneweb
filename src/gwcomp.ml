@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 2.8 1999-07-20 03:24:55 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.9 1999-07-20 03:54:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -55,7 +55,7 @@ value fields str =
     else [copy_decode str beg i]
 ;
 
-value date_de_string s i =
+value date_of_string s i =
   let champ i =
     let (neg, i) =
       if i < String.length s && s.[i] == '-' then (True, i + 1) else (False, i)
@@ -79,38 +79,38 @@ value date_de_string s i =
     | '<' -> (Before, succ i)
     | _ -> (Sure, i) ]
   in
-  let (undefined, annee, i) =
-    let (annee, j) = champ i in
-    if j = i + 1 && s.[i] == '0' then (True, annee, j)
-    else (False, annee, j)
+  let (undefined, year, i) =
+    let (year, j) = champ i in
+    if j = i + 1 && s.[i] == '0' then (True, year, j)
+    else (False, year, j)
   in
-  let error () = failwith ("date_de_string " ^ s) in
+  let error () = failwith ("date_of_string " ^ s) in
   let date =
     match skip_slash i with
     [ Some i ->
-        let mois = annee in
-        let (annee, i) = champ i in
+        let month = year in
+        let (year, i) = champ i in
         match skip_slash i with
         [ Some i ->
-            let jour = mois in
-            let mois = annee in
-            let (annee, i) = champ i in
-            if annee == 0 then
+            let day = month in
+            let month = year in
+            let (year, i) = champ i in
+            if year == 0 then
               if i == String.length s then None else error ()
-            else if mois < 1 || mois > 12 then error ()
-            else if jour < 1 || jour > 31 then error ()
+            else if month < 1 || month > 12 then error ()
+            else if day < 1 || day > 31 then error ()
             else
               Some
-                ({day = jour; month = mois; year = annee; prec = precision}, i)
+                ({day = day; month = month; year = year; prec = precision}, i)
         | None ->
-            if annee == 0 then None
-            else if mois < 1 || mois > 12 then error ()
+            if year == 0 then None
+            else if month < 1 || month > 12 then error ()
             else
               Some
-                ({day = 0; month = mois; year = annee; prec = precision}, i) ]
+                ({day = 0; month = month; year = year; prec = precision}, i) ]
     | None ->
         if undefined then None
-        else Some ({day = 0; month = 0; year = annee; prec = precision}, i) ]
+        else Some ({day = 0; month = 0; year = year; prec = precision}, i) ]
   in    
   match date with
   [ Some (d, i) ->
@@ -158,7 +158,7 @@ value get_optional_birthdate l =
       else
         match x.[i] with
         [ '~' | '?' | '<' | '>' | '-' | '0'..'9' ->
-            let d = date_de_string x i in
+            let d = date_of_string x i in
             (Some d, l')
         | _ -> (None, l) ]
   | _ -> (None, l) ]
@@ -172,7 +172,7 @@ value get_optional_baptdate l =
         let i = succ i in
         match x.[i] with
         [ '~' | '?' | '<' | '>' | '-' | '0'..'9' ->
-            let d = date_de_string x i in
+            let d = date_of_string x i in
             (Some d, l')
         | _ -> (None, l) ]
       else (None, l)
@@ -197,7 +197,7 @@ value get_optional_deathdate l =
         match x.[i] with
         [ '~' | '?' | '>' | '<' | '-' | '0'..'9' ->
             let d =
-              match date_de_string x i with
+              match date_of_string x i with
               [ None -> DeadDontKnowWhen
               | Some d -> Death dr (Adef.cdate_of_date d) ]
             in
@@ -216,7 +216,7 @@ value get_burial l =
           let (od, l) =
             match x.[i] with
             [ '~' | '?' | '>' | '<' | '-' | '0'..'9' ->
-                (date_de_string x i, l')
+                (date_of_string x i, l')
             | _ -> (None, l) ]
           in
           (Buried (Adef.codate_of_od od), l)
@@ -228,7 +228,7 @@ value get_burial l =
           let (od, l) =
             match x.[i] with
             [ '~' | '?' | '>' | '<' | '-' | '0'..'9' ->
-                (date_de_string x i, l')
+                (date_of_string x i, l')
             | _ -> (None, l) ]
           in
           (Cremated (Adef.codate_of_od od), l)
@@ -411,7 +411,7 @@ value scan_title t =
             | c -> loop (s ^ String.make 1 c) (i + 1) ]
           else (s, i)
       in
-      (if d <> "" then date_de_string d 0 else None, i)
+      (if d <> "" then date_of_string d 0 else None, i)
     else (None, i)
   in
   let (date_end, i) =
@@ -424,7 +424,7 @@ value scan_title t =
             | c -> loop (s ^ String.make 1 c) (i + 1) ]
           else (s, i)
       in
-      (if d <> "" then date_de_string d 0 else None, i)
+      (if d <> "" then date_of_string d 0 else None, i)
     else (None, i)
   in
   let (nth, i) =
@@ -466,7 +466,7 @@ value get_mar_date str =
         match x.[0] with
         [ '+' ->
             (if String.length x > 1 then
-               Adef.codate_of_od (date_de_string x 1)
+               Adef.codate_of_od (date_of_string x 1)
              else Adef.codate_None, l)
         | _ -> failwith str ]
       in
@@ -481,7 +481,7 @@ value get_mar_date str =
         match l with
         [ [x :: l] when x.[0] == '-' ->
             if String.length x > 1 then
-              (Divorced (Adef.codate_of_od (date_de_string x 1)), l)
+              (Divorced (Adef.codate_of_od (date_of_string x 1)), l)
             else (Divorced Adef.codate_None, l)
         | _ -> (NotDivorced, l) ]
       in
@@ -489,7 +489,7 @@ value get_mar_date str =
   | [] -> failwith str ]
 ;
 
-value lire_ligne ic =
+value read_line ic =
   try let str = input_real_line ic in Some (str, fields str) with
   [ End_of_file -> None ]
 ;
@@ -622,7 +622,7 @@ value parse_child str surname csrc l =
   let l = set_infos str u l in (u, l)
 ;
 
-value lire_family ic fname =
+value read_family ic fname =
   fun
   [ Some (str, ["fam" :: l]) ->
       let (cle_pere, surname, l) = parse_parent str l in
@@ -631,32 +631,32 @@ value lire_family ic fname =
       in
       let (cle_mere, _, l) = parse_parent str l in
       do if l <> [] then failwith str else (); return
-      let ligne = lire_ligne ic in
-      let (fsrc, ligne) =
-        match ligne with
-        [ Some (str, ["src"; x]) -> (cut_space x, lire_ligne ic)
+      let line = read_line ic in
+      let (fsrc, line) =
+        match line with
+        [ Some (str, ["src"; x]) -> (cut_space x, read_line ic)
         | Some (str, ["src" :: _]) -> failwith str
-        | _ -> ("", ligne) ]
+        | _ -> ("", line) ]
       in
-      let (csrc, ligne) =
-        match ligne with
-        [ Some (str, ["csrc"; x]) -> (cut_space x, lire_ligne ic)
+      let (csrc, line) =
+        match line with
+        [ Some (str, ["csrc"; x]) -> (cut_space x, read_line ic)
         | Some (str, ["csrc" :: _]) -> failwith str
-        | _ -> ("", ligne) ]
+        | _ -> ("", line) ]
       in
       let co = {father = cle_pere; mother = cle_mere} in
-      let (comm, ligne) =
-        match ligne with
+      let (comm, line) =
+        match line with
         [ Some (str, ["comm" :: _]) ->
             let comm = String.sub str 5 (String.length str - 5) in
-            (comm, lire_ligne ic)
-        | _ -> ("", ligne) ]
+            (comm, read_line ic)
+        | _ -> ("", line) ]
       in
-      match ligne with
+      match line with
       [ Some (_, ["beg"]) ->
           let cles_enfants =
             let rec loop children =
-              match lire_ligne ic with
+              match read_line ic with
               [ Some (str, ["-" :: l]) ->
                   let (sex, l) = get_optional_sexe l in
                   let (child, l) = parse_child str surname csrc l in
@@ -677,8 +677,8 @@ value lire_family ic fname =
              fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}
           in
-          Some (Family co fo, lire_ligne ic)
-      | ligne ->
+          Some (Family co fo, read_line ic)
+      | line ->
           let fo =
             {marriage = marriage; marriage_place = marr_place;
              marriage_src = marr_src; not_married = not_marr;
@@ -686,13 +686,13 @@ value lire_family ic fname =
              origin_file = fname; fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}
           in
-          Some (Family co fo, ligne) ]
+          Some (Family co fo, line) ]
   | Some (str, ["notes" :: l]) ->
       let (surname, l) = get_name str l in
       let (first_name, occ, l) = get_fst_name str l in
       if l <> [] then failwith "str"
       else
-        match lire_ligne ic with
+        match read_line ic with
         [ Some (_, ["beg"]) ->
             let notes =
               try
@@ -709,7 +709,7 @@ value lire_family ic fname =
                pk_occ = occ}
             in
             let str = strip_spaces (strip_controls_m notes) in
-            Some (Notes key str, lire_ligne ic)
+            Some (Notes key str, read_line ic)
         | Some (str, _) -> failwith str
         | None -> failwith "end of file" ]
   | Some (str, _) -> failwith str
@@ -726,12 +726,12 @@ value comp_families x =
           output_value oc (x : string);
        return
        let rec loop line =
-         match lire_family ic x line with
+         match read_family ic x line with
          [ Some (family, line) ->
              do output_value oc (family : syntax_o); return loop line
          | None -> () ]
        in
-       do loop (lire_ligne ic);
+       do loop (read_line ic);
           close_in ic;
        return ()
      with e ->
