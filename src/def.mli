@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 1.4 1998-11-27 23:10:02 ddr Exp $ *)
+(* $Id: def.mli,v 1.5 1998-12-16 06:04:52 ddr Exp $ *)
 
 type iper = Adef.iper;
 type ifam = Adef.ifam;
@@ -43,7 +43,7 @@ type title 'string =
     t_nth : mutable int }
 ;
 
-type sexe = [ Masculin | Feminin | Neutre ];
+type sex = [ Masculine | Feminine | Neuter ];
 
 type person 'string =
   { first_name : mutable 'string;
@@ -57,7 +57,7 @@ type person 'string =
     surnames_aliases : mutable list 'string;
     titles : mutable list (title 'string);
     occupation : mutable 'string;
-    sexe : mutable sexe;
+    sex : mutable sex;
     access : mutable access;
     birth : mutable codate;
     birth_place : mutable 'string;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 1.3 1998-11-27 20:09:39 ddr Exp $ *)
+(* $Id: birthday.ml,v 1.4 1998-12-16 06:04:49 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -12,7 +12,7 @@ value afficher_anniversaires_jour conf base dead_people liste =
   do Wserver.wprint "<ul>\n";
      List.iter
        (fun (p, a, date_event) ->
-          let is = index_of_sex p.sexe in
+          let is = index_of_sex p.sex in
           do Wserver.wprint "<li>\n";
              afficher_personne_titre_referencee conf base p;
              if not dead_people then Wserver.wprint " <em>%d</em>\n" a

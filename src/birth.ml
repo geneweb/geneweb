@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birth.ml,v 1.4 1998-12-09 18:11:40 ddr Exp $ *)
+(* $Id: birth.ml,v 1.5 1998-12-16 06:04:49 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -74,7 +74,7 @@ value print conf base =
              afficher_personne_referencee conf base p;
              Wserver.wprint "</strong>,\n";
              Wserver.wprint "%s <em>%s</em>.\n"
-               (transl_nth conf "born" (index_of_sex p.sexe))
+               (transl_nth conf "born" (index_of_sex p.sex))
                (Date.string_of_ondate conf d);
            end
        | None -> () ];

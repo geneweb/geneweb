@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 1.8 1998-11-21 10:54:12 ddr Exp $ *)
+(* $Id: some.ml,v 1.9 1998-12-16 06:05:01 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -250,11 +250,11 @@ value rec print_branch conf base lev name p =
             Wserver.wprint "\n";
          return
          let down =
-           p.sexe = Masculin &&
+           p.sex = Masculine &&
            (Name.crush_lower (sou base p.surname) = Name.crush_lower name
             || lev == 0) &&
            Array.length el <> 0 ||
-           p.sexe = Feminin && she_has_children_with_her_name base p c el
+           p.sex = Feminine && she_has_children_with_her_name base p c el
          in
          if down then
            do Wserver.wprint "<ul>\n";

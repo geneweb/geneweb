@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 1.2 1998-09-30 14:04:44 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 1.3 1998-12-16 06:04:57 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -61,10 +61,10 @@ value print_differences conf base branches p1 p2 =
       (fun p -> sou base p.occupation);
     string_field False (transl conf "sex") "sex"
       (fun p ->
-         match p.sexe with
-         [ Masculin -> "M"
-         | Feminin -> "F"
-         | Neutre -> "" ]);
+         match p.sex with
+         [ Masculine -> "M"
+         | Feminine -> "F"
+         | Neuter -> "" ]);
     string_field False (transl conf "access") "access"
       (fun p ->
          match p.access with
@@ -273,7 +273,7 @@ value print conf base =
   match (p1, p2) with
   [ (Some p1, Some p2) ->
       if p1.cle_index = p2.cle_index then same_person conf
-      else if p1.sexe <> p2.sexe && p1.sexe <> Neutre && p2.sexe <> Neutre
+      else if p1.sex <> p2.sex && p1.sex <> Neuter && p2.sex <> Neuter
       then different_sexes conf
       else
         let a1 = aoi base p1.cle_index in

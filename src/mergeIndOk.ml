@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 1.4 1998-12-14 12:43:20 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 1.5 1998-12-16 06:04:58 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -49,7 +49,7 @@ value reconstitute conf base p1 p2 =
    surnames_aliases = list (sou base) (fun p -> p.surnames_aliases);
    titles = list (map_title_strings (sou base)) (fun p -> p.titles);
    occupation = field "occupation" (fun p -> sou base p.occupation) (\= "");
-   sexe = field "sex" (fun p -> p.sexe) (\= Neutre);
+   sex = field "sex" (fun p -> p.sex) (\= Neuter);
    access = field "access" (fun p -> p.access) (\= IfTitles);
    birth = field "birth" (fun p -> p.birth) (\= Adef.codate_None);
    birth_place = field "birth_place" (fun p -> sou base p.birth_place) (\= "");
@@ -158,7 +158,7 @@ value effective_mod_merge conf base p =
          | _ -> () ];
       return
       let p2_family = p2.family in
-      let p2_sexe = p2.sexe in
+      let p2_sexe = p2.sex in
       do UpdateIndOk.effective_del conf base p2;
          p2.family := [| |];
          Update.update_misc_names_of_family base p2;
@@ -169,9 +169,9 @@ value effective_mod_merge conf base p =
            let ifam = p2_family.(i) in
            let cpl = coi base ifam in
            do match p2_sexe with
-              [ Masculin -> cpl.father := p.cle_index
-              | Feminin -> cpl.mother := p.cle_index
-              | Neutre -> assert False ];
+              [ Masculine -> cpl.father := p.cle_index
+              | Feminine -> cpl.mother := p.cle_index
+              | Neuter -> assert False ];
               base.patch_couple ifam cpl;
            return ();
          done;

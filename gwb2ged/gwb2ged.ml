@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 1.10 1998-12-08 10:59:49 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.11 1998-12-16 06:04:47 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -82,10 +82,10 @@ value ged_name base oc per =
 ;
 
 value ged_sex base oc per =
-  match per.sexe with
-  [ Masculin -> Printf.fprintf oc "1 SEX M\n"
-  | Feminin -> Printf.fprintf oc "1 SEX F\n"
-  | Neutre -> () ]
+  match per.sex with
+  [ Masculine -> Printf.fprintf oc "1 SEX M\n"
+  | Feminine -> Printf.fprintf oc "1 SEX F\n"
+  | Neuter -> () ]
 ;
 
 value ged_date oc dt =

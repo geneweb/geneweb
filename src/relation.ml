@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: relation.ml,v 1.10 1998-12-11 09:46:00 ddr Exp $ *)
+(* $Id: relation.ml,v 1.11 1998-12-16 06:05:00 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -21,7 +21,7 @@ value print_menu conf base p =
        Wserver.wprint " %s..." (transl conf "and");
     return ()
   in
-  let is = index_of_sex p.sexe in
+  let is = index_of_sex p.sex in
   do header conf title;
      Wserver.wprint "<ul>\n";
      Wserver.wprint "<li>\n<form method=get action=\"%s\">" conf.command;
@@ -95,7 +95,7 @@ value ancestor_label conf x sex =
 ;
 
 value descendant_label conf x p =
-  let is = index_of_sex p.sexe in
+  let is = index_of_sex p.sex in
   match x with
   [ 1 -> transl_nth conf "a son/a daughter/a child" is
   | 2 -> transl_nth conf "a grandson/a granddaughter/a grandchild" is
@@ -121,7 +121,7 @@ value brother_label conf x sex =
 ;
 
 value uncle_label conf x p =
-  let is = index_of_sex p.sexe in
+  let is = index_of_sex p.sex in
   match x with
   [ 1 -> transl_nth conf "an uncle/an aunt" is
   | 2 -> transl_nth conf "a great-uncle/a great-aunt" is
@@ -132,7 +132,7 @@ value uncle_label conf x p =
 ;
 
 value nephew_label conf x p =
-  let is = index_of_sex p.sexe in
+  let is = index_of_sex p.sex in
   match x with
   [ 1 -> transl_nth conf "a nephew/a niece" is
   | 2 -> transl_nth conf "a great-nephew/a great-niece" is
@@ -144,28 +144,28 @@ value nephew_label conf x p =
 
 value print_link conf base n p1 p2 x1 x2 =
   let (p1, x1, p2, x2) =
-    if p1.sexe <> Neutre then (p1, x1, p2, x2) else (p2, x2, p1, x1)
+    if p1.sex <> Neuter then (p1, x1, p2, x2) else (p2, x2, p1, x1)
   in
   do afficher_personne_sans_titre conf base p1;
      afficher_titre conf base p1;
      Wserver.wprint " %s" (transl conf "is");
      if n > 1 then Wserver.wprint " %s" (transl conf "also") else ();
      Wserver.wprint "\n<strong>";
-     if x1 == 0 then Wserver.wprint "%s" (ancestor_label conf x2 p1.sexe)
+     if x1 == 0 then Wserver.wprint "%s" (ancestor_label conf x2 p1.sex)
      else if x2 == 0 then Wserver.wprint "%s" (descendant_label conf x1 p1)
-     else if x1 == x2 then Wserver.wprint "%s" (brother_label conf x2 p1.sexe)
+     else if x1 == x2 then Wserver.wprint "%s" (brother_label conf x2 p1.sex)
      else if x1 == 1 || x2 == 1 then
        if x1 == 1 then Wserver.wprint "%s" (uncle_label conf (x2 - x1) p1)
        else Wserver.wprint "%s" (nephew_label conf (x1 - x2) p1)
      else if x1 < x2 then
-       do Wserver.wprint "%s" (brother_label conf x1 p1.sexe);
+       do Wserver.wprint "%s" (brother_label conf x1 p1.sex);
           Wserver.wprint " %s"
-            (transl_concat conf "of" (ancestor_label conf (x2 - x1) Neutre));
+            (transl_concat conf "of" (ancestor_label conf (x2 - x1) Neuter));
        return ()
      else
        do Wserver.wprint "%s" (descendant_label conf (x1 - x2) p1);
           Wserver.wprint " %s"
-            (transl_concat conf "of" (brother_label conf x2 Masculin));
+            (transl_concat conf "of" (brother_label conf x2 Masculine));
        return ();
      Wserver.wprint "</strong>\n%s " (transl_nth conf "of" 0);
      afficher_personne_sans_titre conf base p2;
@@ -249,7 +249,7 @@ value print_solution_not_ancestor conf base p1 p2 x1 x2 list =
   return
   let lab x =
     match list with
-    [ [(a, _)] -> ancestor_label conf x a.sexe
+    [ [(a, _)] -> ancestor_label conf x a.sex
     | _ -> parents_label conf x ]
   in
   do Wserver.wprint "<ul>\n";

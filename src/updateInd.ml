@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.7 1998-11-13 09:36:37 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.8 1998-12-16 06:05:05 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -76,13 +76,13 @@ value print_surname conf base p =
     tag "td" begin Wserver.wprint "%s" (capitale (transl conf "sex")); end;
     tag "td" begin
       Wserver.wprint "<input type=radio name=sex value=M%s>%s\n"
-        (if p.sexe = Masculin then " checked" else "")
+        (if p.sex = Masculine then " checked" else "")
         (transl_nth conf "M/F" 0);
       Wserver.wprint "<input type=radio name=sex value=F%s>%s\n"
-        (if p.sexe = Feminin then " checked" else "")
+        (if p.sex = Feminine then " checked" else "")
         (transl_nth conf "M/F" 1);
       Wserver.wprint "<input type=radio name=sex value=N%s>?\n"
-        (if p.sexe = Neutre then " checked" else "");
+        (if p.sex = Neuter then " checked" else "");
     end;
   end
 ;
@@ -684,7 +684,7 @@ value print_add conf base =
      first_names_aliases = []; surnames_aliases = [];
      public_name = ""; nick_names = []; aliases = [];
      titles = []; occupation = "";
-     sexe = Neutre; access = IfTitles;
+     sex = Neuter; access = IfTitles;
      birth = Adef.codate_None; birth_place = ""; birth_src = "";
      baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
      death = DontKnowIfDead; death_place = ""; death_src = "";

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 1.7 1998-12-15 22:04:45 ddr Exp $ *)
+(* $Id: util.mli,v 1.8 1998-12-16 06:05:07 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -65,7 +65,7 @@ value ftransl : config -> format 'a 'b 'c -> format 'a 'b 'c;
 value ftransl_nth : config -> format 'a 'b 'c -> int -> format 'a 'b 'c;
 value fcapitale : format 'a 'b 'c -> format 'a 'b 'c;
 
-value index_of_sex : sexe -> int;
+value index_of_sex : sex -> int;
 value conjoint : base_person -> base_couple -> iper;
 
 value incorrect_request : config -> unit;

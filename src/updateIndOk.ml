@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.10 1998-12-11 15:11:47 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.11 1998-12-16 06:05:05 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -169,9 +169,9 @@ value reconstitute_person conf =
   let occupation = only_printable (get conf "occu") in
   let sex =
     match p_getenv conf.env "sex" with
-    [ Some "M" -> Masculin
-    | Some "F" -> Feminin
-    | _ -> Neutre ]
+    [ Some "M" -> Masculine
+    | Some "F" -> Feminine
+    | _ -> Neuter ]
   in
   let public = False in
   let birth = Adef.codate_of_od (Update.reconstitute_date conf "birth") in
@@ -205,7 +205,7 @@ value reconstitute_person conf =
      public_name = public_name;
      nick_names = nicknames; aliases = aliases; titles = titles;
      occupation = occupation;
-     sexe = sex; access = access;
+     sex = sex; access = access;
      birth = birth; birth_place = birth_place;
      birth_src = only_printable (get conf "birth_src");
      baptism = bapt; baptism_place = bapt_place;
@@ -317,7 +317,7 @@ value check_conflict conf base sp ipl =
 ;
 
 value check_sex_married conf base sp op =
-  if sp.sexe <> op.sexe then
+  if sp.sex <> op.sex then
     if Array.length op.family != 0 then
       do print_cannot_change_sex conf base op; return raise Update.ModErr
     else ()

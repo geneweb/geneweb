@@ -1,9 +1,9 @@
-(* $Id: updateFam.mli,v 1.1.1.1 1998-09-01 14:32:07 ddr Exp $ *)
+(* $Id: updateFam.mli,v 1.2 1998-12-16 06:05:03 ddr Exp $ *)
 
 open Def;
 open Config;
 
-type create = [ Create of sexe | Link ];
+type create = [ Create of sex | Link ];
 type str_indi = (string * string * int * create);
 
 value print_add1 :

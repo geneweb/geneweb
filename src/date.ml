@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 1.6 1998-11-27 23:10:02 ddr Exp $ *)
+(* $Id: date.ml,v 1.7 1998-12-16 06:04:51 ddr Exp $ *)
 
 open Def;
 open Util;
@@ -126,7 +126,7 @@ value print_age conf a =
 ;
 
 value afficher_dates conf base p =
-  let is = index_of_sex p.sexe in
+  let is = index_of_sex p.sex in
   if age_autorise conf base p then
     let something =
       match (Adef.od_of_codate p.birth, p.death) with

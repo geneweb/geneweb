@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.27 1998-12-14 12:51:07 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.28 1998-12-16 06:04:45 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -409,7 +409,7 @@ value unknown_per gen i =
      nick_names = []; aliases = []; first_names_aliases = [];
      surnames_aliases = [];
      titles = []; occupation = empty;
-     sexe = Neutre; access = IfTitles;
+     sex = Neuter; access = IfTitles;
      birth = Adef.codate_None; birth_place = empty; birth_src = empty;
      baptism = Adef.codate_None; baptism_place = empty; baptism_src = empty;
      death = DontKnowIfDead; death_place = empty; death_src = empty;
@@ -777,9 +777,9 @@ value add_indi gen r =
   in
   let sex =
     match find_field "SEX" r.rsons with
-    [ Some {rval = "M"} -> Masculin
-    | Some {rval = "F"} -> Feminin
-    | _ -> Neutre ]
+    [ Some {rval = "M"} -> Masculine
+    | Some {rval = "F"} -> Feminine
+    | _ -> Neuter ]
   in
   let photo =
     match find_field "OBJE" r.rsons with
@@ -956,7 +956,7 @@ value add_indi gen r =
      surnames_aliases =
        if surname_alias <> "" then [add_string gen surname_alias] else [];
      titles = titles; occupation = add_string gen occupation;
-     sexe = sex; access = IfTitles;
+     sex = sex; access = IfTitles;
      birth = birth; birth_place = add_string gen birth_place;
      birth_src = add_string gen birth_src;
      baptism = bapt; baptism_place = add_string gen bapt_place;
@@ -996,7 +996,7 @@ value add_fam gen r =
          do if not (List.memq i (Array.to_list p.family)) then
               p.family := Array.append p.family [| i |]
             else ();
-            if p.sexe = Neutre then p.sexe := Masculin else ();
+            if p.sex = Neuter then p.sex := Masculine else ();
          return () ];
      match gen.g_per.arr.(Adef.int_of_iper moth) with
      [ Left _ -> ()
@@ -1004,7 +1004,7 @@ value add_fam gen r =
          do if not (List.memq i (Array.to_list p.family)) then
               p.family := Array.append p.family [| i |]
             else ();
-            if p.sexe = Neutre then p.sexe := Feminin else ();
+            if p.sex = Neuter then p.sex := Feminine else ();
          return () ];
   return
   let children =
@@ -1461,7 +1461,7 @@ value check_parents_sex base =
     let cpl = base.couples.get i in
     let fath = poi base cpl.father in
     let moth = poi base cpl.mother in
-    if fath.sexe <> Masculin || moth.sexe <> Feminin then
+    if fath.sex <> Masculine || moth.sex <> Feminine then
       do Printf.printf "Bad sex for parents\n";
          Printf.printf "- father: %s\n" (denomination base fath);
          Printf.printf "- mother: %s\n" (denomination base moth);

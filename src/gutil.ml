@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 1.7 1998-12-14 12:43:18 ddr Exp $ *)
+(* $Id: gutil.ml,v 1.8 1998-12-16 06:04:54 ddr Exp $ *)
 
 open Def;
 
@@ -131,7 +131,7 @@ value person_misc_names base p =
   let first_names = [p.first_name :: p.first_names_aliases @ public_names] in
   let surnames = [p.surname :: p.surnames_aliases @ p.nick_names] in
   let surnames =
-    if p.sexe == Feminin then
+    if p.sex == Feminine then
       List.fold_left
         (fun list ifam ->
            let cpl = coi base ifam in
@@ -525,11 +525,11 @@ value sort_children base warning fam =
 
 value check_family base error warning fam =
   let cpl = coi base fam.fam_index in
-  do match (poi base cpl.father).sexe with
-     [ Masculin -> ()
+  do match (poi base cpl.father).sex with
+     [ Masculine -> ()
      | _ -> error (BadSexOfMarriedPerson (poi base cpl.father)) ];
-     match (poi base cpl.mother).sexe with
-     [ Feminin -> ()
+     match (poi base cpl.mother).sex with
+     [ Feminine -> ()
      | _ -> error (BadSexOfMarriedPerson (poi base cpl.mother)) ];
      check_normal_marriage_date base error warning fam;
      sort_children base warning fam;
@@ -680,7 +680,7 @@ value map_person_strings f p =
    titles = List.map (map_title_strings f) p.titles;
    aliases = List.map f p.aliases;
    occupation = f p.occupation;
-   sexe = p.sexe; access = p.access;
+   sex = p.sex; access = p.access;
    birth = p.birth; birth_place = f p.birth_place;
    birth_src = f p.birth_src;
    baptism = p.baptism; baptism_place = f p.baptism_place;
