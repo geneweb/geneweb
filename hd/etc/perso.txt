@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.10 2002-01-30 11:49:45 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.11 2002-03-05 12:04:37 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -159,11 +159,11 @@
 %if;has_parents;
   <h3><font color=%highlight;>[*parents]</font></h3>
   <ul>
-  <li type=%if;father.has_parents;disk%else;circle%end;>
+  <li type=%if;father.has_parents;disc%else;circle%end;>
   %if;(cancel_links or father.is_restricted);%father;
   %else;<a href="%prefix;%father.access;">%father;</a>%end;
   %father.title;%father.dates;%nl;
-  <li type=%if;mother.has_parents;disk%else;circle%end;>
+  <li type=%if;mother.has_parents;disc%else;circle%end;>
   %if;(cancel_links or mother.is_restricted);%mother;
   %else;<a href="%prefix;%mother.access;">%mother;</a>%end;
   %mother.title;%mother.dates;%nl;
@@ -175,7 +175,7 @@
   [child/children]1</font></h3>
   <ul>
   %foreach;family;
-    <li type=%if;spouse.has_parents;disk%else;circle%end;>
+    <li type=%if;spouse.has_parents;disc%else;circle%end;>
     %married_to;%sp;
     %if;(cancel_links or spouse.is_restricted);%spouse;
     %else;<a href="%prefix;%spouse.access">%spouse;</a>%end;
@@ -196,7 +196,7 @@
       , [having as children]0
       <ul>
         %foreach;child;
-          <li type=%if;child.has_families;disk%else;circle%end;>
+          <li type=%if;child.has_families;disc%else;circle%end;>
 	  %if;(cancel_links or child.is_restricted);%child.child_name;
 	  %else;
 	    <a href="%prefix;%child.access;">%child.child_name;</a>
@@ -219,7 +219,7 @@
       <li type=circle>
       %child_name;%nl;
     %else;
-      <li type=disk>
+      <li type=disc>
       %if;(cancel_links or child_is_restricted);%child.child_name;
       %else;
         <a href="%prefix;%child.access;">%child.child_name;</a>
@@ -239,11 +239,11 @@
       %if;(has_relation_him and has_relation_her)
         %nl;
         <ul>
-	<li type=%if;relation_him.has_families;disk%else;circle%end;>
+	<li type=%if;relation_him.has_families;disc%else;circle%end;>
         %if;(cancel_links or relation_him.is_restricted);%relation_him;
         %else;<a href="%prefix;%relation_him.access">%relation_him;</a>%end;
         %relation_him.title;%relation_him.dates;%nl;
-	<li type=%if;relation_her.has_families;disk%else;circle%end;>
+	<li type=%if;relation_her.has_families;disc%else;circle%end;>
         %if;(cancel_links or relation_her.is_restricted);%relation_her;
         %else;<a href="%prefix;%relation_her.access">%relation_her;</a>%end;
         %relation_her.title;%relation_her.dates;%nl;
@@ -259,13 +259,13 @@
       %end;
     %end;
     %foreach;related;
-      <li type=%if;related.has_families;disk%else;circle%end;>%related_type;:
+      <li type=%if;related.has_families;disc%else;circle%end;>%related_type;:
       %if;cancel_links;%related;
       %else;<a href="%prefix;%related.access">%related;</a>%end;
       %related.title;%related.dates;%nl;
     %end;
     %foreach;witness_relation;
-      <li type=disk>%witness_relation;%nl;
+      <li type=disc>%witness_relation;%nl;
     %end;
   </ul>
 %end;
