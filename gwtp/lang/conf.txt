@@ -1,6 +1,6 @@
 <head>
-  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: conf.txt,v 1.12 2004-01-29 16:34:16 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA - GeneWeb -->
+  <!-- $Id: conf.txt,v 1.13 2004-12-14 09:53:16 ddr Exp $ -->
   <title>Gwtp - [
 de: Konfiguration
 en: configuration
