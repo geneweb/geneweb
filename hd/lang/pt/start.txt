@@ -11,7 +11,7 @@
 
 <p>
 
-A base contem actualmente %n pessoas%o
+A base de dados cont&eacute;m actualmente %n pessoas%o
 (<a href="%sm=NOTES">[note/notes]1</a>)%o.
 
 <ul>
@@ -50,12 +50,12 @@ lugar <INPUT NAME=p size=25 maxlength=200> =&gt;
 %hTodos os
 <SELECT NAME=m>
    <OPTION VALUE="N" SELECTED> Apelidos
-   <OPTION VALUE="P"> Nomes
+   <OPTION VALUE="P"> Nomes Pr&oacute;prios
 </SELECT>
 por
 <SELECT NAME=tri>
    <OPTION VALUE="A" SELECTED> Ordem alfab&eacute;tico
-   <OPTION VALUE="F"> Frecuencia
+   <OPTION VALUE="F"> Frequ&ecirc;ncia
 </SELECT> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
 </FORM>
@@ -71,15 +71,15 @@ por
 Os <a href="%sm=AN">anivers&aacute;rios</a>.<br>
 Os <a href="%sm=AD">anivers&aacute;rios das pessoas falecidas</a>.<br>
 Os <a href="%sm=AM">anivers&aacute;rios de casamento</a>.<br>%x
-Os <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>.<br>
-Os <a href="%sm=LD;k=10">reci&eacute;n mortes</a>.<br>%x%j
+Os <a href="%sm=LB;k=10">nascimentos mais recentes</a>.<br>
+Os <a href="%sm=LD;k=10">mortes mais recentes</a>.<br>%x%j
 <a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
 <a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
 <a href="%sm=FORUM">[*forum]</a>.
 
 <p>
 
-Houve %q consultas com %c a esta p&aacute;gina desde %d.
+Houve %q consultas, dos quais %c foram a esta p&aacute;gina, desde %d.
 
 %y<p>
 

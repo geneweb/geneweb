@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.31 1999-10-06 08:47:54 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.32 1999-10-26 08:28:39 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -512,6 +512,7 @@ value insert_comp_families gen (x, shift) =
 value just_comp = ref False;
 value do_check = ref True;
 value out_file = ref "a";
+value force = ref False;
 value do_consang = ref False;
 value pr_stats = ref False;
 
@@ -645,6 +646,8 @@ value speclist =
   [("-c", Arg.Set just_comp, "Only compiling");
    ("-o", Arg.String (fun s -> out_file.val := s),
     "<file> Output data base (default: a.gwb)");
+   ("-f", Arg.Set force,
+    "\n       Remove data base if already existing");
    ("-stats", Arg.Set pr_stats, "Print statistics");
    ("-nc", Arg.Clear do_check, "No consistency check");
    ("-cg", Arg.Set do_consang, "Compute consanguinity");
@@ -686,7 +689,18 @@ value main () =
           else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
        (List.rev files.val);
      if not just_comp.val then
-       do lock (Iobase.lock_file out_file.val) with
+       let bdir =
+         if Filename.check_suffix out_file.val ".gwb" then out_file.val
+         else out_file.val ^ ".gwb"
+       in
+       do if not force.val && Sys.file_exists bdir then
+            do Printf.printf "\
+The data base \"%s\" already exists. Use option -f to overwrite it.\n"
+                 out_file.val;
+               flush stdout;
+            return exit 2
+          else ();
+          lock (Iobase.lock_file out_file.val) with
           [ Accept ->
               let base = link (List.rev gwo.val) in
               do Gc.compact ();

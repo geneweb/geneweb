@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.151 1999-10-26 00:05:32 ddr Exp $
+# $Id: lexicon.txt,v 2.152 1999-10-26 08:28:01 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -95,7 +95,7 @@ is: %s frændi(frænka)
 it: cugini di %s grado
 nl: neven en nichten %s generaties verwijderd
 no: %smenninger
-pt: primos %s
+pt: primos em %s grau
 se: %s kusiner
 
     %t already has parents
@@ -175,7 +175,7 @@ is: %t er fædd(ur) meira en 2 árum eftir andlát föður síns %t
 it: %t sarebbe nato pi&ugrave; di 2 anni dopo la morte di suo padre %t
 nl: %t is geboren meer dan twee jaar na de dood van zijn/haar vader
 no: %t er f&oslash;dt mer enn 2 &aring;r etter sin fars d&oslash;d %t
-pt: %t nasceu passados 2 anos depois do &oacute;bito do pai
+pt: %t nasceu 2 anos depois do &oacute;bito do pai
 se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
 
     (date)
@@ -225,7 +225,7 @@ is: Janúar/febrúar/mars/apríl/mai/júní/júlí/ágúst/september/oktober/nóvember/des
 it: gennaio/febbraio/marzo/aprile/maggio/giugno/luglio/agosto/settembre/ottobre/novembre/dicembre
 nl: Januari/Februari/Maart/April/Mei/Juni/Juli/Augustus/September/Oktober/November/December
 no: januar/februar/mars/april/mai/juni/juli/august/september/oktober/november/desember
-pt: Janeiro/Febreiro/Mar&ccedil;o/Abril/Maio/Junho/Julho/Agosto/Setembro/Outubro/Novembro/Dezembro
+pt: Janeiro/Fevereiro/Mar&ccedil;o/Abril/Maio/Junho/Julho/Agosto/Setembro/Outubro/Novembro/Dezembro
 se: januari/februari/mars/april/maj/juni/juli/augusti/september/oktober/november/december
 
     (thousand separator)
@@ -437,7 +437,7 @@ is: mágur/mágkona
 it: un cognato/una cognata
 nl: een schoonbroer/een schoonzus
 no: svoger/svigerinne
-pt: um cunhado /uma cunhada
+pt: um cunhado/uma cunhada
 se: en sv&aring;ger/en sv&auml;gerska
 
     a brother/a sister/a sibling
@@ -565,7 +565,7 @@ is: frændi/frænka
 it: un pronipote/una pronipote
 nl: een achter-neef/een achter-nicht
 no: grandnev&oslash;/grandniese
-pt: um bissobrino/uma bissobrina
+pt: um sobrinho-neto/uma sobrinha-neta
 se: en gammel-nev&ouml;/en gammel-niece
 
     a great-uncle/a great-aunt
@@ -597,7 +597,7 @@ is: hálfbróðir/hálfsystir/hálfsystkin
 it: un fratello/una sorella/un fratello o una sorella
 nl: een broer/een zuster/een broer of een zuster
 no: halvbror/halvs&oslash;ster/halvs&oslash;sken
-pt: um irm&atilde;o/uma irm&atilde;/um(a) irm&atilde;o(&atilde;)
+pt: um meio-irm&atilde;o/uma meia-irm&atilde;/um(a) meio(a) irm&atilde;o(&atilde;)
 se: en halvbror/en halvsyster/ett halvsyskon
 
     a nephew (spouse's nephew)/a niece (spouse's niece)
@@ -610,7 +610,7 @@ is: frændi/frændi
 it: un nipote (dello sposo)/una nipote (dello sposo)
 nl: een neef (van de echtgenoot)/een nicht (van de echtgenoot)
 no: nev&oslash; (ektefelles nev&oslash;)/niese (ektefelles niese)
-pt: um sobrinho/uma sobrinha
+pt: um sobrinho (por afenidade)/uma sobrinha (por afenidade)
 se: en nev&ouml; (makens/makans nev&ouml;)/en niece (makens/makans niece)
 
     a nephew/a niece
@@ -626,7 +626,7 @@ is: bróður(systur)sonur/bróður(systur)dóttir
 it: un nipote/una nipote
 nl: een neef/een nicht
 no: nev&oslash;/niese
-pt: um sobrino/uma sobrina
+pt: um sobrinho/uma sobrinha
 se: en nev&ouml;/en niece
 
     a son-in-law/a daughter-in-law
@@ -671,7 +671,7 @@ is: um
 it: intorno
 nl: circa
 no: ca 
-pt: cerca
+pt: acerca
 se: omkring
 
     access
@@ -745,7 +745,7 @@ is: nánari skoðun
 it: richiesta avanzata
 nl: gedetailleerde opzoeking
 no: avansert s&oslash;k
-pt: investiga&ccedil;&atilde;o complexa
+pt: pesquisa complexa
 se: avancerad s&ouml;kning
 
     after
@@ -858,7 +858,7 @@ is: stafrófsröð
 it: ordine alfabetico
 nl: alfabetische volgorde
 no: alfabetisk
-pt: ordem alfab&eacute;tico
+pt: ordem alfab&eacute;tica
 se: bokstavsordning
 
     also
@@ -890,7 +890,7 @@ is: forfaðir
 it: un antenato/un'antenata
 nl: een voorouder
 no: stamfar
-pt: um ancestro/uma ancestra
+pt: um antepassado/uma antepassada
 se: en ana
 
     an uncle (aunt's husband)/an aunt (uncle's wife)
@@ -903,7 +903,7 @@ is: frændi/frænka
 it: uno zio (marito della zia)/una zia (moglie dello zio)
 nl: een oom/een tante
 no: onkel (tantes mann)/tante (onkels kone)
-pt: um tio/uma tia
+pt: um tio (por afinidade)/uma tia (por afinidade)
 se: en farbror (fasters make)/en faster (farbrors maka)/en morbror (mosters make)/en moster (morbrors maka)
 
     an uncle/an aunt
@@ -936,7 +936,7 @@ is: forfeður
 it: antenati
 nl: voorouders
 no: forfedre
-pt: ascendentes
+pt: antepassado
 se: anor
 
     ancestors (some)
@@ -952,7 +952,7 @@ is: forfeður
 it: antenati
 nl: voorouders
 no: forfedre
-pt: ancestros
+pt: antepassados
 se: anor
 
     and
@@ -985,7 +985,7 @@ is: afmæli
 it: anniversari
 nl: verjaardag
 no: &aring;rsdager
-pt: aniversarios
+pt: anivers&aacute;rios
 se: &aring;rsdagar
 
     anniversaries of dead
@@ -1033,7 +1033,7 @@ is: eru
 it: sono
 nl: zijn
 no: er
-pt: som
+pt: s&atilde;om
 se: &auml;r
 
     at the same time
@@ -1062,7 +1062,7 @@ is: til baka
 it: torna indietro
 nl: terug
 no: tilbake
-pt: back
+pt: voltar
 se: tillbaka
 
     baptism
@@ -1076,7 +1076,7 @@ is: skírn
 it: battesimo
 nl: doop
 no: d&aring;p
-pt: baptism
+pt: baptismo
 se: dop
 
     baptized
@@ -1091,7 +1091,7 @@ is: skírð(ur)
 it: battezzato/battezzata/battezzato(a)
 nl: gedoopt
 no: d&oslash;pt
-pt: batizado/batizada/batizado(a)
+pt: baptizado/baptizada/baptizado(a)
 se: d&ouml;pt
 
     before
@@ -1204,7 +1204,7 @@ is: fædd(ur)
 it: nato/nata/nato(a)
 nl: geboren
 no: f&oslash;dt
-pt: nacido/nacida/nacido(a)
+pt: nascido/nascida/nascido(a)
 se: f&ouml;dd
 
     branch/branches
@@ -1220,7 +1220,7 @@ is: grein/greinar
 it: ramo/rami
 nl: tak/takken
 no: gren/grener
-pt: rama/ramas
+pt: ramo/ramos
 se: gren/grenar
 
     burial
@@ -1261,6 +1261,7 @@ fr: calendrier/calendriers
 is: dagatal/dagatöl
 nl: kalender/kalenders
 no: kalender/kalendere
+pt: calend&aacute;rio/calend&aacute;rios
 se: kalender
 
     cancel GeneWeb links
@@ -1315,7 +1316,7 @@ is: get ekki tengst gagnagrunni
 it: accesso alla base impossibile
 nl: geen toegang tot bestand
 no: kan ikke n&aring; databasen
-pt: n&atilde;o se pode acceder a base
+pt: n&atilde;o se pode acceder &agrave; base
 se: kan inte n&aring; databasen
 
     cannot change sex of a married person
@@ -1345,7 +1346,7 @@ is: breyta nafni barna
 it: cambiare i nomi dei figli
 nl: namen van kinderen wijzigen
 no: endre barnas navn
-pt: alterar os nomes das crianças
+pt: alterar os nomes das crian&ccedil;as
 se: &auml;ndra barnens namn
 
     changed order of children
@@ -1360,7 +1361,7 @@ is: breytti röð barna
 it: ordine dei figli cambiato
 nl: veranderd de volgorde der kinderen
 no: rekkef&oslash;lgen er endret for barna til
-pt: cambio da ordem dos filhos
+pt: mudar a ordem dos filhos
 se: &auml;ndrade ordningen f&ouml;r barnen
 
     child/children
@@ -1391,7 +1392,7 @@ is: nafni barns breytt
 it: nomi dei figli cambiati
 nl: namen van kinderen gewijzigd
 no: barnas navn er endret
-pt: nomes das crianças alterados
+pt: nomes das crian&ccedil;as foram alterados
 se: barnens namn &auml;ndrade
 
     click
@@ -1423,7 +1424,7 @@ is: athugasemd
 it: commento
 nl: Kommentaar
 no: kommentar
-pt: commentario
+pt: comment&aacute;rio
 se: kommentar
 
     comment added
@@ -1460,7 +1461,7 @@ is: halda áfram að sameina
 it: continua la fusione
 nl: verdergaan met samenvoegen
 no: fortsett sammensl&aring;ing
-pt: continuar fus&atilde;o
+pt: continuar a fus&atilde;o
 se: forts&auml;tt sl&aring;samman
 
     cousins
@@ -1507,7 +1508,7 @@ is: búa til
 it: creare
 nl: maken
 no: opprett
-pt: crear
+pt: criar
 se: skapa
 
     cremated
@@ -1521,7 +1522,7 @@ is: brennd(ur)
 it: cremato/cremata/cremato(a)
 nl: gecremeerd
 no: kremert
-pt: incinerado/incinerada/incinerado(a)
+pt: cremado/cremada/cremado(a)
 se: kremerad
 
     date
@@ -1569,7 +1570,7 @@ is: dó ung(ur)
 it: morto giovane
 nl: jong gestorven
 no: d&oslash;d ung
-pt: morto jovem/morta jovem/morto(a) jovem
+pt: morreu jovem
 se: dog ung
 
     death
@@ -1602,7 +1603,7 @@ is: dánaraldur
 it: all'et&agrave; di
 nl: leeftijd bij overlijden:
 no: alder
-pt: na idade de
+pt: com a idade de
 se: &aring;lder:
 
     delete
@@ -1618,7 +1619,7 @@ is: eyða
 it: cancellare
 nl: verwijderen +before
 no: fjern
-pt: borrar
+pt: apagar
 se: ta bort
 
     descendants
@@ -1684,7 +1685,7 @@ is: skilja
 it: divorzio
 nl: scheiding
 no: skilsmisse
-pt: divorcio
+pt: div&oacute;rcio
 se: skilsm&auml;ssa
 
     divorced
@@ -1700,7 +1701,7 @@ is: skildi
 it: divorziati
 nl: gescheiden
 no: skilt
-pt: divorceados
+pt: divorciados
 se: skilda
 
     don't know
@@ -1748,7 +1749,7 @@ is: villa
 it: errore
 nl: fout
 no: feil
-pt: error
+pt: erro
 se: fel
 
     exact
@@ -1780,7 +1781,7 @@ is: líflátin(n)
 it: giustiziato/giustiziato/giustiziato(a)
 nl: ge-exekuteerd
 no: henrettet
-pt: ejecutado/ejecutada/ejecutado(a)
+pt: executado/executada/executado(a)
 se: avr&auml;ttad
 
     families with encoding
@@ -1795,7 +1796,7 @@ is: fjölskyldur með táknum
 it: famiglia con codice
 nl: families met kode
 no: familier med kode
-pt: familias con c&oacute;digo
+pt: fam&iacute;lias com c&oacute;digo
 se: familjer med kod
 
     family added
@@ -2985,7 +2986,7 @@ is: ekki skilin
 it: non divorziati
 nl: niet gescheiden
 no: ikke skilt
-pt: n&atilde;o divorceado
+pt: n&atilde;o divorciado
 se: inte skilda
 
     not found
@@ -4075,7 +4076,7 @@ is: breyta röð eftirfarandi fjölskyldna
 it: scambiare l'ordine delle famiglie seguenti
 nl: verwissel de volgorde van de volgende families
 no: bytt rekkef&oslash;lgen til f&oslash;lgende familier
-pt: inverter a ordem das familias seguintes
+pt: inverter a ordem das fam&iacute;lias seguintes
 se: &auml;ndra ordningen p&aring; de f&ouml;ljande familjerna
 
     text
@@ -4460,7 +4461,7 @@ is: til að bæta barni við fjölskyldu, notaðu "%s"
 it: per aggiungere un figlio ad una famiglia, scegliere "%s"
 nl: gebruik "%s" om een kind aan een familie toe te voegen
 no: for &aring; tilf&oslash;ye et barn til en familie, bruk "%s"
-pt: para acrescentar um filho a uma familia utilizar "%s"
+pt: para acrescentar um filho a uma fam&iacute;lia utilizar "%s"
 se: f&ouml;r att l&auml;gga till ett barn i en familj, anv&auml;nd "%s"
 
     to the %s generation
@@ -4476,7 +4477,7 @@ is: til %s kynslóðar
 it: fino alla %s generazione
 nl: tot de %s generatie
 no: til %s generasjon
-pt: at&eacute; a %s gera&ccedil;&atilde;o
+pt: at&eacute; &agrave; %s gera&ccedil;&atilde;o
 se: till den %s generationen
 
     to the children
@@ -4492,7 +4493,7 @@ is: til barnsins
 it: fino ai figli
 nl: tot de kinderen
 no: til barna
-pt: at&eacute; os filhos
+pt: at&eacute; aos filhos
 se: till barnen
 
     to the grandchildren
@@ -4508,7 +4509,7 @@ is: til barnabarna
 it: fino ai nipoti
 nl: tot de kleinkinderen
 no: til barnebarna
-pt: at&eacute; os netos
+pt: at&eacute; aos netos
 se: till barnbarnen
 
     to the grandparents
@@ -4524,7 +4525,7 @@ is: til afa og ömmu
 it: fino ai nonni
 nl: tot de grootouders
 no: til besteforeldrene
-pt: at&eacute; os avos
+pt: at&eacute; aos av&oacute;s
 se: till far(mor)f&ouml;r&auml;ldrarna
 
     to the great-grandchildren
@@ -4540,7 +4541,7 @@ is: til barnabarnabarna
 it: fino ai bisnonni
 nl: tot de achterkleinkinderen
 no: til oldebarna
-pt: at&eacute; os bisnetos
+pt: at&eacute; aos bisnetos
 se: till barnbarns barnen
 
     to the great-grandparents
@@ -4556,7 +4557,7 @@ is: til langlangafa og ömmu
 it: fino ai bisnonni
 nl: tot de overgrootouders
 no: til oldeforeldrene
-pt: at&eacute; os bisavos
+pt: at&eacute; aos bisav&oacute;s
 se: till gammel-far(mor)f&ouml;r&auml;ldrarna
 
     to the parents
@@ -4572,7 +4573,7 @@ is: til foreldra
 it: fino ai genitori
 nl: tot de ouders
 no: til foreldrene
-pt: at&eacute; os pais
+pt: at&eacute; aos pais
 se: till f&ouml;r&auml;ldrarna
 
     today
@@ -4604,7 +4605,7 @@ is: á morgun
 it: domani
 nl: morgen
 no: i morgen
-pt: amanha
+pt: amanh&atilde;
 se: i morgon
 
     total
@@ -4631,6 +4632,7 @@ fr: arbre
 is: tré
 nl: boom
 no: tre
+pt: &aacute;rvore
 se: tr&auml;d
 
     uncles and aunts
@@ -4659,7 +4661,7 @@ is: óþekktur einstaklingur
 it: sconosciuta persona
 nl: onbekend persoon
 no: ukjent person
-pt: pessoa n&atilde;o conhecida
+pt: pessoa desconhecida
 se: ok&auml;nd person
 
     unspecified
@@ -4708,7 +4710,7 @@ is: uppfæra
 it: aggiornamento
 nl: wijzigen
 no: oppdatere
-pt: revisado
+pt: actualizado
 se: uppdatera
 
     warnings
@@ -4724,7 +4726,7 @@ is: athugið
 it: avvertenze
 nl: waarschuwingen
 no: advarsler
-pt: advertencias
+pt: avisos
 se: varningar
 
     with
@@ -4749,6 +4751,7 @@ fr: t&eacute;moin au mariage de %s et de %s
 is: vitni að giftingu %s og %s
 nl: getuige bij het huwelijk van %s en %s
 no: forlover ved ekteskap mellom %s og %s
+pt: testemunha do casamento de %s e %s
 se: vittne vid &auml;ktenskap mellan %s och %s
 
     witness/witnesses
@@ -4758,6 +4761,7 @@ fr: t&eacute;moin/t&eacute;moins
 is: vitni/vitni
 nl: getuige/getuigen
 no: forlover/forlovere
+pt: testemunha/testemunhas
 se: vittne/vittnen
 
     would be his/her own ancestor
@@ -4773,7 +4777,7 @@ is: myndi verða sinn eigin forfaðir
 it: sarebbe antenato(a) di se stesso(a)
 nl: zou zijn/haar eigen voorouder zijn
 no: ville v&aelig;re sin egen etterkommer 
-pt: seria seu pr&oacute;pio ancestro
+pt: seria seu pr&oacute;pio antepassado
 se: skulle vara sin egen ana
 
     year/month/day
@@ -4785,6 +4789,7 @@ is: ár/mánuður/dagur
 nl: jaar/maand/dag
 no: &aring;r/m&aring;ned/dag
 se: &aring;r/m&aring;nad/dag
+pt: ano/m&ecirc;s/dia
 
     years old
 cn: Ëê
@@ -4815,7 +4820,7 @@ is: þú þarft fyrst að sameina
 it: dovete in primo luogo fondere
 nl: je moet eerst samenvoegen
 no: du m&aring; f&oslash;rst sl&aring; sammen
-pt: Voc&ecirc; tem que fusionar primeiro
+pt: Voc&ecirc; tem que fundir primeiro
 se: du m&aring;ste f&ouml;rst sl&aring;samman
 
     you must first merge the 2 families
@@ -4830,5 +4835,5 @@ is: þú verður fyrst að sameina þessar 2 fjölskyldur
 it: dovete in primo luogo fondere le 2 famiglie
 nl: je moet de twee families eerst samenvoegen
 no: du m&aring; f&oslash;rst sl&aring; sammen de 2 familiene
-pt: Voc&ecirc; tem que fusionar primeiro as 2 familias
+pt: Voc&ecirc; tem que fundir primeiro as 2 fam&iacute;lias
 se: du m&aring;ste f&ouml;rst sl&aring;samman de 2 familjerna
