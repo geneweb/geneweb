@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.54 2001-01-25 13:35:15 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.55 2001-01-30 04:47:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -1875,11 +1875,11 @@ value print_normal_tree conf base v p =
       (person_text_no_html conf base p)
   in
   do header_no_page_title conf title;
-(*
-     if browser_doesnt_have_tables conf then print_tree_with_pre conf base v p
-     else
-*)
-       print_tree_with_table conf base v p;
+     Wserver.wprint "<div align=right><a href=\"%s" (commd conf);
+     List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
+     Wserver.wprint "dag=on;notab=on;pos2=78";
+     Wserver.wprint "\"><tt>//</tt></a></div>\n";
+     print_tree_with_table conf base v p;
      trailer conf;
   return ()
 ;
