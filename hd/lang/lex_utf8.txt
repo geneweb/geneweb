@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.13 2005-03-04 10:16:19 ddr Exp $
+# $Id: lex_utf8.txt,v 1.14 2005-03-04 10:34:34 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -147,7 +147,7 @@ sv:  f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer
 af: %1 van %2
 bg: %1 на :a:%2
 br: %1 eus %2
-ca: %1 d[e']%2
+ca: %1 de %2
 cs: %1 :g:%2
 da: %1 til %2
 de: %1 von :d:%2
@@ -1502,6 +1502,7 @@ sv: efter
 
     age
 af: ouderdom
+ar: عمر
 bg: възраст
 br: oad
 ca: edat
@@ -2266,6 +2267,7 @@ sv: kantlinje
 
     born
 af: gebore
+ar: ولد
 bg: роден/родена/роден(а)
 br: bet ganet
 ca: nascut/nascuda/nascut(uda)
@@ -3105,6 +3107,7 @@ zh:  后代
 
     died
 af: oorlede
+ar: توفي
 bg: починал/починала/починал(а)
 br: marvet
 ca: mort/morta/mort(a)
@@ -6263,6 +6266,7 @@ sv: fr&aring;n %ss sl&auml;ktsida
 
     on (day month year)
 af: op
+ar: يوم
 bg: на
 br: d'an
 ca: el
@@ -9181,6 +9185,7 @@ sv: &aring;r/m&aring;nad/dag
 
     years old
 af: jaar.
+ar: سنة
 bg: години
 br: bloaz
 ca: anys
