@@ -1,5 +1,13 @@
 GeneWeb version 4.06
 --------------------
+
+* GeneWeb server or CGI (gwd)
+  - [02 Mar 02] Fixed bug: when clicking on somebody's link, could sometimes
+    access the wrong person, typically when the two persons had the same
+    combination "firstname surname" cut differently, e.g. François-Victor
+    Hugo (first name "François-Victor", surname "Hugo") and François
+    Victor-Hugo (first name "François", surname "Victor-Hugo").
+
 GeneWeb version 4.05
 --------------------
 
