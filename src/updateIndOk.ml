@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.0 2001-03-16 19:35:09 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.1 2001-03-31 08:26:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -276,7 +276,7 @@ value reconstitute_person conf =
      death_src = only_printable (get conf "death_src");
      burial = burial; burial_place = burial_place;
      burial_src = only_printable (get conf "burial_src");
-     notes = notes; psources = psources;
+     notes = only_printable notes; psources = psources;
      cle_index = Adef.iper_of_int cle_index}
   in
   (p, ext)
