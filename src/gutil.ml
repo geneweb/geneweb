@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.3 2001-05-05 13:27:15 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.4 2002-01-10 19:46:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -96,8 +96,9 @@ value nominative s =
   | _ -> s ]
 ;
 
-value p_first_name base p = nominative (sou base p.first_name);
-value p_surname base p = nominative (sou base p.surname);
+value xx f x = let r = f x in if r = "" then "?" else r;
+value p_first_name base p = xx nominative (sou base p.first_name);
+value p_surname base p = xx nominative (sou base p.surname);
 
 value leap_year a =
   if a mod 100 == 0 then a / 100 mod 4 == 0 else a mod 4 == 0
