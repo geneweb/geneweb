@@ -72,6 +72,9 @@ Thanks to Emmanuelle Visseaux.
     me).
 
 * Base configuration files (base.gwf)
+  - [Oct 30, 99] Deleted variable "enclosing_tag" defined in version 2.05
+    on July 18, 99. Reason: complicated the code, big risks of operation bugs.
+    Sorry for the ones who used it.
   - [Oct 29, 99] Added a variable "propose_titles" (yes by default). When
     set to "no", the search by (nobility) titles is not proposed in the
     welcome page.

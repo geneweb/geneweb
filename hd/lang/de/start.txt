@@ -172,6 +172,7 @@ $INl</ul>
 <p>
 
 Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.
+$Il<p>$E
 
 </td></tr>
 

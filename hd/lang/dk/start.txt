@@ -173,6 +173,7 @@ $INl</ul>
 <p>
 
 Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
+$Il<p>$E
 
 </td></tr>
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.1 1999-10-30 13:25:27 ddr Exp $ *)
+(* $Id: util.ml,v 3.2 1999-10-30 19:50:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -43,28 +43,6 @@ value rec list_assoc_all x =
   [ [] -> []
   | [(a, b) :: l] ->
       if a = x then [b :: list_assoc_all x l] else list_assoc_all x l ]
-;
-
-value enclosing_tags conf =
-  List.rev (list_assoc_all "enclosing_tag" conf.base_env)
-;
-
-value upto_space s =
-  try let i = String.index s ' ' in String.sub s 0 i with
-  [ Not_found -> s ]
-;
-
-value wprint_with_enclosing_tags conf (fmt : format 'a 'b 'c)  =
-  let encl_tag = enclosing_tags conf in
-  let fmt =
-    let fmt = (Obj.magic fmt : string) in
-    if fmt.[1] <> '/' then
-      List.fold_left (fun fmt t -> fmt ^ "<" ^ t ^ ">") fmt encl_tag
-    else
-      List.fold_right (fun t fmt -> "</" ^ upto_space t ^ ">" ^ fmt) encl_tag
-        fmt
-  in
-  Wserver.wprint (Obj.magic fmt : format 'a 'b 'c)
 ;
 
 value commd conf =
@@ -577,7 +555,6 @@ value header_no_page_title conf title =
      in
      let s = s ^ " " ^ body_prop conf in
      Wserver.wprint "<body%s>" s;
-     List.iter (fun t -> Wserver.wprint "<%s>" t) (enclosing_tags conf);
      Wserver.wprint "\n";
   return ()
 ;
@@ -741,8 +718,6 @@ GeneWeb %s</em></font>" Version.txt;
          in
          try copy_from_channel [] (open_in trl_fname) with
          [ Sys_error _ -> () ] ];
-     List.iter (fun t -> Wserver.wprint "</%s>" (upto_space t))
-       (List.rev (enclosing_tags conf));
      Wserver.wprint "</body>\n";
   return ()
 ;
