@@ -267,6 +267,7 @@ specify
 spouse
 spouses not included
 starting with
+statistics
 surname alias
 surname missing
 surname not found
@@ -279,6 +280,7 @@ text
 the %d first names
 the %d oldest perhaps still alive
 the %d surnames
+the %d who lived the longest
 the %s generation
 the anniversary
 the anniversary of marriage
