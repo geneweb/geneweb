@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.234 2001-02-15 14:13:11 ddr Exp $
+# $Id: lexicon.txt,v 3.235 2001-02-15 16:18:40 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -4293,24 +4293,17 @@ no: melding tilf&oslash;yet
 pt: mensagem adicionada
 se: meddelande inlagt
 
-    message/next message
-cs: zpráva/dal¹í zpráva
-ct: missatge/missate següent
-de: Nachricht/n&auml;chste Nachricht
-dk: meddelelse/n&aelig;ste meddelelse
-en: message/next message
-eo: mesagxo/sekvanta mesagxo
-es: mensaje/siguiente mensaje
-et: teade/järgmine teade
-fi: viesti/seuraava viesti
-fr: message/message suivant
-he:  äåãòä / äåãòä äáàä
-is: skilaboğ/næstu skilaboğ
-it: messaggio/prossimo messaggio
-nl: bericht/volgend bericht
-no: melding/neste melding
-pt: mensagem/próxima mensagem
-se: meddelande/n&auml;sta meddelande
+    message/previous message/next message
+ct: missatge/missate anterior/missate següent
+dk: meddelelse/foreg&aring;ende meddelelse/n&aelig;ste meddelelse
+en: message/previous message/next message
+eo: mesagxo:a:+n/antaùa mesagxo/sekvanta mesagxo
+es: mensaje/mansaje anterior/mensaje siguiente
+et: teade/eelmine teade/järgmine teade
+fi: viesti/edellinen viesti/seuraava viesti
+fr: message/message pr&eacute;c&eacute;dent/message suivant
+no: melding/forrige melding/neste melding
+se: meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
 
     missing ancestors
 af: ontbrekende voorsate

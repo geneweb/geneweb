@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.18 2001-01-29 15:33:24 ddr Exp $ *)
+(* $Id: forum.ml,v 3.19 2001-02-15 16:18:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -126,14 +126,16 @@ value print_headers conf =
   | None -> () ]
 ;
 
+value message_txt conf i =
+  transl_nth conf "message/previous message/next message" i
+;
+
 value print_add_message conf =
   tag "form" "method=get action=\"%s\"" conf.command begin
     Util.hidden_env conf;
     Wserver.wprint "<input type=hidden name=m value=FORUM_ADD>\n";
     Wserver.wprint "<input type=submit value=\"%s\">\n"
-      (capitale
-         (transl_decline conf "add"
-            (transl_nth conf "message/next message" 0)));
+      (capitale (transl_decline conf "add" (message_txt conf 0)));
   end
 ;
 
@@ -175,7 +177,8 @@ value get_message conf pos =
               else (Buff.get len, s)
           in
           if ident <> "" then
-            Some (time, ident, email, subject, mess, ic_len - pos_in ic)
+            Some
+              (time, ident, email, subject, mess, ic_len - pos_in ic, ic_len)
           else None
         with [ End_of_file -> None ]
       in
@@ -183,9 +186,37 @@ value get_message conf pos =
   | None -> None ]
 ;
 
+value backward conf pos =
+  let fname = forum_file conf in
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let ic_len = in_channel_length ic in
+      let sync_txt = "\nTime: " in
+      let sync_txt_last = String.length sync_txt - 1 in
+      let new_pos =
+        loop (ic_len - pos - 1) sync_txt_last where rec loop new_pos i =
+          if new_pos = 0 && i = 1 then ic_len
+          else if new_pos > 0 then
+            do seek_in ic new_pos; return
+            let c = input_char ic in
+            if c = sync_txt.[i] then
+              if i = 0 then ic_len - new_pos - 1
+              else loop (new_pos - 1) (i - 1)
+            else loop (new_pos - 1) sync_txt_last
+          else pos
+      in
+      do close_in ic; return new_pos
+  | None -> pos ]
+;
+
 value print_forum_message conf base pos =
+  let pos =
+    match p_getenv conf.env "t" with
+    [ Some "back" -> backward conf pos
+    | _ -> pos ]
+  in
   match get_message conf pos with
-  [ Some (time, ident, email, subject, mess, next_pos) ->
+  [ Some (time, ident, email, subject, mess, next_pos, forum_length) ->
       let title _ =
         let subject =
           if subject = "" || subject = "-" then
@@ -199,11 +230,16 @@ value print_forum_message conf base pos =
          tag "ul" begin
            Wserver.wprint "<li><a href=\"%sm=FORUM\">%s</a>\n"
              (commd conf) (capitale (transl conf "data base forum"));
+           Wserver.wprint "<li>";
+           if pos = forum_length then Wserver.wprint "&nbsp;"
+           else
+             Wserver.wprint "<a href=\"%sm=FORUM;p=%d;t=back\">%s</a>\n"
+               (commd conf) pos (capitale (message_txt conf 2));
+           Wserver.wprint "<li>";
            if next_pos > 0 then
-             Wserver.wprint "<li><a href=\"%sm=FORUM;p=%d\">%s</a>\n"
-               (commd conf) next_pos
-               (capitale (transl_nth conf "message/next message" 1))
-           else ();
+             Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n"
+               (commd conf) next_pos (capitale (message_txt conf 1))
+           else Wserver.wprint "&nbsp;";
          end;
          Wserver.wprint "<p>\n";
          Wserver.wprint "<strong>%s</strong>\n" (secure ident);
@@ -269,9 +305,7 @@ value print_var conf var name opt def_value =
 value print_add conf base =
   let title _ =
     Wserver.wprint "%s"
-      (capitale
-         (transl_decline conf "add"
-            (transl_nth conf "message/next message" 0)))
+      (capitale (transl_decline conf "add" (message_txt conf 0)))
   in
   do header conf title;
      print_link_to_welcome conf True;
@@ -285,8 +319,7 @@ value print_add conf base =
        end;
        html_p conf;
        Wserver.wprint "%s<br>\n"
-         (capitale
-            (Gutil.nominative (transl_nth conf "message/next message" 0)));
+         (capitale (Gutil.nominative (message_txt conf 0)));
        stag "textarea" "name=Text rows=15 cols=70 wrap=virtual" begin end;
        Wserver.wprint "\n";
        Wserver.wprint "<input type=submit value=Ok>\n";
