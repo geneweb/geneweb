@@ -1,6 +1,11 @@
 GeneWeb version 3.07
 --------------------
 
+* New feature
+  - [18 Aug 00] Added a program "gwtp" to upload and download GeneWeb data
+    bases in a site which accomodate some (undocumented program for the
+    moment).
+
 * GeneWeb Service/CGI (gwd)
   - [11 Aug 00] In first names by alphabetic order for a given surname, now
     always specify the parents' names.
