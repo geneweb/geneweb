@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.102 2000-05-23 07:18:59 ddr Exp $
+# $Id: lexicon.txt,v 3.103 2000-05-23 20:02:14 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -4704,6 +4704,7 @@ ru: послать
 se: skicka
 
     separated
+dk: separeret
 en: separated
 fr: s&eacute;par&eacute;s
 
