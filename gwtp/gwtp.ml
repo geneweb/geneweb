@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.52 2000-10-06 20:13:45 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.53 2000-10-06 20:17:39 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -641,7 +641,9 @@ value gwtp_receive str env b tok =
   | _ -> gwtp_invalid_request str env ]
 ;
 
-value acceptable_tags = ["!--"; "a"; "br"; "em"; "font"; "hr"; "img"; "p"];
+value acceptable_tags =
+  ["!--"; "a"; "br"; "em"; "font"; "hr"; "i"; "img"; "p"]
+;
 
 value secure_html s =
   loop 0 0 where rec loop len i =
