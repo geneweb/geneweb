@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 4.8 2002-10-31 12:22:24 ddr Exp $ *)
+(* $Id: wserver.mli,v 4.9 2003-11-04 13:29:38 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -20,9 +20,6 @@ value f :
        If [maxc] is [Some n], maximum [n] clients can be treated at the
        same time; [None] means no limit. See the example below. *)
 
-ifdef OCAML_307 then
-value wprint : format 'a out_channel unit unit -> 'a
-else
 value wprint : format 'a out_channel unit -> 'a;
     (* To be called to print page contents. *)
 

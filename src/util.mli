@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.29 2003-10-20 07:11:56 ddr Exp $ *)
+(* $Id: util.mli,v 4.30 2003-11-04 13:29:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -116,9 +116,6 @@ value surname_end : string -> string;
 
 value specify_homonymous : config -> base -> person -> unit;
 
-ifdef OCAML_307 then
-value valid_format : format 'a 'b 'c 'd -> string -> format 'a 'b 'c 'd
-else
 value valid_format : format 'a 'b 'c -> string -> format 'a 'b 'c;
 
 value transl : config -> string -> string;
@@ -127,20 +124,10 @@ value transl_nth_def : config -> string -> int -> int -> string;
 value transl_decline : config -> string -> string -> string;
 value transl_a_of_b : config -> string -> string -> string;
 value transl_a_of_gr_eq_gen_lev : config -> string -> string -> string;
-ifdef OCAML_307 then
-declare
-value ftransl : config -> format 'a 'b 'c 'd -> format 'a 'b 'c 'd;
-value ftransl_nth : config -> format 'a 'b 'c 'd -> int -> format 'a 'b 'c 'd;
-value fdecline : config -> format 'a 'b 'c 'd -> string -> format 'a 'b 'c 'd;
-value fcapitale : format 'a 'b 'c 'd -> format 'a 'b 'c 'd;
-end
-else
-declare
 value ftransl : config -> format 'a 'b 'c -> format 'a 'b 'c;
 value ftransl_nth : config -> format 'a 'b 'c -> int -> format 'a 'b 'c;
 value fdecline : config -> format 'a 'b 'c -> string -> format 'a 'b 'c;
 value fcapitale : format 'a 'b 'c -> format 'a 'b 'c;
-end;
 value nth_field : string -> int -> string;
 
 value cftransl : config -> string -> list string -> string;
@@ -149,10 +136,6 @@ value std_color : config -> string -> string;
 
 value index_of_sex : sex -> int;
 
-ifdef OCAML_307 then
-value relation_txt :
-  config -> sex -> family -> format (('a -> 'b) -> 'b) 'a 'b 'b
-else
 value relation_txt :
   config -> sex -> family -> format (('a -> 'b) -> 'b) 'a 'b;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.74 2003-10-20 07:11:56 ddr Exp $ *)
+(* $Id: util.ml,v 4.75 2003-11-04 13:29:38 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -78,10 +78,6 @@ value rec capitale s =
     | _ -> s ]
 ;
 
-ifdef OCAML_307 then
-value fcapitale (a : format 'a 'b 'c 'd) : format 'a 'b 'c 'd =
-  Obj.magic capitale a
-else
 value fcapitale (a : format 'a 'b 'c) : format 'a 'b 'c =
   Obj.magic capitale a
 ;
@@ -212,18 +208,10 @@ value transl_a_of_gr_eq_gen_lev conf =
   gen_decline2 (transl_nth conf "%1 of %2" 1)
 ;
 
-ifdef OCAML_307 then
-value failed_format s : format 'a 'b 'c 'd = Obj.magic ("[" ^ s ^ "]")
-else
 value failed_format s : format 'a 'b 'c = Obj.magic ("[" ^ s ^ "]");
 
 value valid_format ini_fmt (r : string) =
-  let s : string =
-    ifdef OCAML_307 then
-      Obj.magic (ini_fmt : format 'a 'b 'c 'd)
-    else
-      Obj.magic (ini_fmt : format 'a 'b 'c)
-  in
+  let s : string = Obj.magic (ini_fmt : format 'a 'b 'c) in
   let rec loop i j =
     if i < String.length s - 1 && j < String.length r - 1 then
       match (s.[i], s.[i + 1], r.[j], r.[j + 1]) with
@@ -237,10 +225,7 @@ value valid_format ini_fmt (r : string) =
     else if j < String.length r - 1 then
       if r.[j] == '%' then failed_format s else loop i (j + 1)
     else
-      ifdef OCAML_307 then
-        (Obj.magic r : format 'a 'b 'c 'd)
-      else
-        (Obj.magic r : format 'a 'b 'c)
+      (Obj.magic r : format 'a 'b 'c)
   in
   loop 0 0
 ;
