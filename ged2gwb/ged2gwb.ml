@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.12 2001-11-27 12:11:11 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.13 2001-12-05 19:44:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1080,7 +1080,7 @@ value source gen r =
   [ Some r ->
       if String.length r.rval > 0 && r.rval.[0] = '@' then
         match find_sources_record gen r.rval with
-        [ Some v -> v.rcont
+        [ Some v -> strip_spaces v.rcont
         | None ->
             do {
               print_location r.rpos;
@@ -1088,7 +1088,7 @@ value source gen r =
               flush log_oc.val;
               ""
             } ]
-      else r.rval
+      else strip_spaces r.rval
   | _ -> "" ]
 ;
 
@@ -1409,7 +1409,9 @@ value add_indi gen r =
   in
   let occupation =
     match find_all_fields "OCCU" r.rsons with
-    [ [r :: rl] -> List.fold_left (fun s r -> s ^ ", " ^ r.rval) r.rval rl
+    [ [r :: rl] ->
+        List.fold_left (fun s r -> s ^ ", " ^ strip_spaces r.rval)
+          (strip_spaces r.rval) rl
     | [] -> "" ]
   in
   let notes =

@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.1 2001-04-19 12:34:56 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.2 2001-12-05 19:44:45 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -275,6 +275,7 @@ value get_burial l =
 value cut_space x =
   let len = String.length x in
   if len = 0 then x
+  else if x = " " then ""
   else
     let start = if x.[0] == ' ' then 1 else 0 in
     let stop = if x.[len - 1] == ' ' then len - 1 else len in
