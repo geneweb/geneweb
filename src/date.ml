@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.25 2001-02-11 17:00:27 ddr Exp $ *)
+(* $Id: date.ml,v 3.26 2001-03-01 08:21:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -37,6 +37,19 @@ value code_date conf encoding d m y =
         | c -> (String.make 1 c, i) ]
       in
       s ^ loop (i + 1)
+;
+
+value code_dmy conf d =
+  let encoding =
+    let n =
+      if d.day = 1 then 0
+      else if d.day != 0 then 1
+      else if d.month != 0 then 2
+      else 3
+    in
+    transl_nth conf "(date)" n
+  in
+  code_date conf encoding d.day d.month d.year
 ;
 
 value default_french_month =
@@ -143,16 +156,7 @@ value string_of_on_prec_dmy conf sy d =
 ;
 
 value string_of_on_dmy conf d =
-  let encoding =
-    let n =
-      if d.day = 1 then 0
-      else if d.day != 0 then 1
-      else if d.month != 0 then 2
-      else 3
-    in
-    transl_nth conf "(date)" n
-  in
-  let sy = code_date conf encoding d.day d.month d.year in
+  let sy = code_dmy conf d in
   string_of_on_prec_dmy conf sy d
 ;
 
@@ -166,17 +170,7 @@ value string_of_on_hebrew_dmy conf d =
   string_of_on_prec_dmy conf sy d
 ;
 
-value string_of_dmy conf d =
-  let encoding =
-    let n =
-      if d.day = 1 then 0
-      else if d.day != 0 then 1
-      else if d.month != 0 then 2
-      else 3
-    in
-    transl_nth conf "(date)" n
-  in
-  let s = code_date conf encoding d.day d.month d.year in
+value string_of_prec_dmy conf s d =
   match d.prec with
   [ Sure -> nominative s
   | About -> transl_decline conf "about (date)" s
@@ -191,6 +185,11 @@ value string_of_dmy conf d =
       transl conf "between (date)" ^ " " ^ s ^ " " ^
       transl conf "and" ^ " " ^
       nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z) ]
+;
+
+value string_of_dmy conf d =
+  let sy = code_dmy conf d in
+  string_of_prec_dmy conf sy d
 ;
 
 value gregorian_precision conf d =

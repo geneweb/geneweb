@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.17 2001-02-11 17:00:27 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.18 2001-03-01 08:21:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -189,8 +189,11 @@ value print_birth_day conf base day_name verb wd dt list =
       do Wserver.wprint "%s,\n" (capitale day_name);
          Wserver.wprint "%s%s\n"
            (std_color conf
-              ("<b>" ^ decline 'e' (transl_nth conf "(week day)" wd) ^ " " ^
-               Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
+              ("<b>" ^
+               transl_decline conf "on (day month year)"
+                 (transl_nth conf "(week day)" wd ^ " " ^
+                  Date.code_dmy conf dt) ^
+               "</b>"))
            verb;
          Wserver.wprint "%s\n"
            (transl_decline2 conf "%1 of %2" (transl conf "the birthday")
@@ -236,8 +239,11 @@ value print_anniv conf base day_name verb wd dt list =
       do Wserver.wprint "%s, %s%s %s:\n"
            (capitale day_name)
            (std_color conf
-              ("<b>" ^ decline 'e' (transl_nth conf "(week day)" wd) ^ " " ^
-               Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
+              ("<b>" ^
+               transl_decline conf "on (day month year)"
+                 (transl_nth conf "(week day)" wd ^ " " ^
+                  Date.code_dmy conf dt) ^
+              "</b>"))
            verb (transl conf "the anniversary");
          afficher_liste_anniversaires conf base True dt list;
       return () ]
@@ -329,8 +335,11 @@ value print_marriage_day conf base day_name verb wd dt list =
       do Wserver.wprint "%s,\n" (capitale day_name);
          Wserver.wprint "%s%s\n"
            (std_color conf
-              ("<b>" ^ decline 'e' (transl_nth conf "(week day)" wd) ^ " " ^
-               Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
+              ("<b>" ^
+               transl_decline conf "on (day month year)"
+                 (transl_nth conf "(week day)" wd ^ " " ^
+                  Date.code_dmy conf dt) ^
+               "</b>"))
            verb;
          Wserver.wprint "%s\n"
            (transl_decline2 conf "%1 of %2"

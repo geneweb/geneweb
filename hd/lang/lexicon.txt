@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.241 2001-02-27 21:27:15 ddr Exp $
+# $Id: lexicon.txt,v 3.242 2001-03-01 08:21:25 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -479,7 +479,7 @@ dk: s&oslash;ndag/mandag/tirsdag/onsdag/torsdag/fredag/l&oslash;rdag
 en: Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday
 eo: dimancxo/lundo/mardo/merkredo/jaùdo/vendredo/sabato
 es: domingo/lunes/martes/mi&eacute;rcoles/jueves/viernes/s&aacute;bado
-et: pühapäev:e:+al/esmaspäev:e:+al/teisipäev:e:+al/kolmapäev:e:+al/neljapäeval:e:+al/reede:e:+l/laupäev:e:+al
+et: pühapäev:i:+al/esmaspäev:i:+al/teisipäev:i:+al/kolmapäev:i:+al/neljapäeval:i:+al/reede:i:+l/laupäev:i:+al
 fi: sunnuntai:e:+na/maanantai:e:+na/tiistai:e:+na/keskiviikko:e:+na/torstai:e:+na/perjantai:e:+na/lauantai:e:+na
 fr: dimanche/lundi/mardi/mercredi/jeudi/vendredi/samedi
 he:  éåí à'/ éåí á'/ éåí â'/ éåí ã'/ éåí ä'/ éåí å'/ ùáú
@@ -5232,7 +5232,7 @@ en: on
 eo: la
 es: el
 et: :i:
-fi:  
+fi: :e:
 fr: le
 he:   á-
 is: &nbsp;
