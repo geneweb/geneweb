@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.39 2000-07-29 14:47:07 ddr Exp $ *)
+(* $Id: perso.ml,v 3.40 2000-08-14 09:23:18 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1062,9 +1062,9 @@ value print_ok conf base p =
      if age_autorise conf base p then
        do print_relations conf base p;
           print_notes conf base p;
-          print_sources conf base True p;
        return ()
      else ();
+     print_sources conf base True p;
      if conf.cancel_links then ()
      else
        do tag "table" "border=%d width=\"90%%\"" conf.border begin
