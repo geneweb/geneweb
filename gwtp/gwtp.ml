@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.48 2000-09-20 09:02:43 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.49 2000-09-20 09:03:20 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -6,7 +6,7 @@ open Printf;
 value gwtp_tmp = ref (Filename.concat ".." "gwtp_tmp");
 value gwtp_dst = ref (Filename.concat ".." "gwtp_dst");
 value gw_site = ref "";
-value token_tmout = ref 900.0.;
+value token_tmout = ref 900.0;
 
 value filename_basename str =
   loop (String.length str - 1) where rec loop i =
