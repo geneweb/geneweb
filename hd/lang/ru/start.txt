@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.27 2000-07-05 12:56:22 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.28 2000-07-07 12:11:14 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogy - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -79,7 +79,7 @@ height=108 src="%o/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 [or] <em>Имя</em>
 [or] <em>Фамилия</em>
 [or] <em>Familiia</em>%Iz
-[or] <em>Sosa номер</em> relative to %a%E
+[or] [<em>Sosa number</em> relative to %t](%a)%E
 <li> <input type=radio name=t value=P> <em>Imia</em>
 <li> <input type=radio name=t value=N> <em>Familiia</em>
 </ul>

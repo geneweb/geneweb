@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.131 2000-07-06 09:46:51 ddr Exp $
+# $Id: lexicon.txt,v 3.132 2000-07-07 12:11:03 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -498,6 +498,7 @@ fi: <em>Sosa-numero</em> henkil&ouml;n&auml %t
 fr: <em>num&eacute;ro Sosa</em> par rapport &agrave; %t
 he: <em> îñôø Sosa </em> áéçñ ì- %t
 is: <em>Sosa númer</em> tengt %t
+lv: <em>SOSA pakâpe</em> attiecîbâ pret %t
 nl: <em>Sosa nummer</em> ten opzichte van %t
 no: <em>Sosa nummer</em> i forhold til %t
 pt: <em>n&uacute;mero Sosa</em> em rela&ccedil;&atilde;o a %t
