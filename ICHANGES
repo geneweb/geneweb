@@ -10,6 +10,7 @@ GeneWeb Version 1.08
     creating families
   - small change in warning message telling that children has been reordered:
     "before" persons are no more clickable
+  - forgot to reset some fields when a person is deleted
 
 GeneWeb Version 1.07
 --------------------
