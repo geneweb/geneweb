@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.116 2002-11-18 12:36:24 ddr Exp $
+# $Id: lexicon.txt,v 4.117 2002-11-19 00:38:43 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7363,7 +7363,7 @@ sv: i &ouml;vermorgon
 
     the father-in-law/the mother-in-law
 af: die skoonpa/die skoonma
-bg: вдругиден
+bg: свекърът:a:--а или тъстът:a:--а/свекървата или тъщата
 ca: el sogre/la sogra
 cs: tchбn/tchэnм
 da: svigerfaderen/svigermoderen
