@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.53 2004-02-23 09:53:50 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.54 2004-05-05 09:39:13 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -806,7 +806,7 @@ he:  ìòãëï àú ääòøåú
 is: breytt athugasemdum
 it: modificare le note
 lv: labot piezîmes
-nl: de nota's wijzigen
+nl: de aantekeningen wijzigen
 no: endre notater
 pl: zmodyfikowaæ uwagi
 pt: modificar as notas
