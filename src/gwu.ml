@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.6 1999-04-06 08:11:41 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.7 1999-04-22 19:23:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -415,7 +415,7 @@ value get_persons_with_notes base m list =
 value print_notes_for_person oc base p =
   let surn = correct_string base p.surname in
   let fnam = correct_string base p.first_name in
-  if surn <> "?" && fnam <> "?" then
+  if surn <> "?" || fnam <> "?" then
     do Printf.fprintf oc "\n";
        Printf.fprintf oc "notes %s %s%s\n" surn fnam
          (if p.occ == 0 then "" else "." ^ string_of_int p.occ);
