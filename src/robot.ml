@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.5 1999-08-07 21:13:08 ddr Exp $ *)
+(* $Id: robot.ml,v 1.6 1999-08-08 02:53:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -29,8 +29,11 @@ value robot_error from cnt sec =
      title False;
      Wserver.wprint "</h1>\n";
      Wserver.wprint "
-You made more than %d requests in less than %d seconds.
-Considering that you are probably a robot, your access has been disconnected.
+This address made more than %d requests in less than %d seconds.
+Considering that you has probably sent a robot, your access
+has been disconnected.
+<p>
+Contact the site administrator to restore it.
 " cnt sec;
      Wserver.wprint "</body>\n";
   return raise Exit
@@ -121,7 +124,7 @@ value check oc tm from max_call sec =
         do if xcl.excl <> [] then
              do List.iter
                   (fun (s, att) ->
-                     do Printf.fprintf oc " --- definitively refused:";
+                     do Printf.fprintf oc " --- excluded:";
                         Printf.fprintf oc " %s (%d refused attempts)\n"
                           s att.val;
                      return ())
