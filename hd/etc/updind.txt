@@ -1,0 +1,297 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- $Id: updind.txt,v 3.1 2001-02-14 19:48:48 ddr Exp $ -->
+  <!-- copyright (c) INRIA -->
+  <meta name="ROBOTS" content="NONE">
+  <title>
+    %if;merging;[*merge::person/persons]1 # %index;
+    %elseif;modifying;[*modify::person/persons]0 # %index;
+    %else;[*add::person/persons]0%end;
+  </title>
+%base_header;
+</head>
+<body%body_prop;>
+
+<h1 align=center><font color=%highlight;>
+%if;merging;[*merge::person/persons]1 # %index;
+%elseif;modifying;[*modify::person/persons]0 # %index;
+%else;[*add::person/persons]0%end;
+</font></h1>
+
+<form method=POST action="%action;">
+%hidden;
+<input type=hidden name=digest value="%digest;">
+<input type=hidden name=i value="%index;">
+%if;merging;
+  %if;evar_i2;<input type=hidden name=i2 value="%evar_i2;">%end;%nl;
+  <input type=hidden name=m value=MRG_MOD_IND_OK>
+%elseif;modifying;
+  <input type=hidden name=m value=MOD_IND_OK>
+%else;
+  <input type=hidden name=m value=ADD_IND_OK>
+%end;
+
+<table border=1>
+<tr>
+<td>[*first name/first names]0</td>
+<td>
+<input name="first_name" size=30 maxlength=200 value="%first_name;"></td>
+<td>[*number]0</td>
+<td>
+<input name=occ size=5 maxlength=8 value="%occ;"></td>
+</tr>
+<tr>
+<td>[*surname/surnames]0</td>
+<td>
+<input name=surname size=40 maxlength=200 value="%surname;"></td>
+<td>[*sex]</td>
+<td>
+<input type=radio name=sex value=M%if;is_male; checked%end;>[M/F]0
+<input type=radio name=sex value=F%if;is_female; checked%end;>[M/F]1
+<input type=radio name=sex value=N%if;not(is_male or is_female); checked%end;>?
+</td>
+</tr>
+<tr>
+<td>[*public name]</td>
+<td colspan=3>
+<input name=public_name size=40 value="%public_name;">
+</td>
+</tr>
+<tr>
+<td>[*image/images]0</td>
+<td colspan=3>
+<input name=image size=50 value="%image;">
+</td>
+</tr>
+</table>
+
+<br>
+
+<table border=1>
+%if;has_qualifiers;
+  %foreach;qualifier;
+    <tr>
+    <td>[*qualifier]0</td>
+    <td>
+    <input name="qualifier%cnt;" size=30 value="%qualifier;">
+    <td>[*insert::qualifier]0</td>
+    <td><input type=checkbox name="add_qualifier%cnt;" value=on></td>
+    </tr>
+  %end;
+%else;
+  %if;not (is_reset propose_qualifier);
+    <tr>
+    <td>[*qualifier]0</td>
+    <td>
+    <input name="qualifier0" size=30 value="">
+    <td>[*insert::qualifier]0</td>
+    <td><input type=checkbox name="add_qualifier0" value=on></td>
+    </tr>
+  %end;
+%end;
+%if;has_aliases;
+  %foreach;alias;
+    <tr>
+    <td>[*alias]0</td>
+    <td>
+    <input name="alias%cnt;" size=30 value="%alias;">
+    <td>[*insert::alias]0</td>
+    <td><input type=checkbox name="add_alias%cnt;" value=on></td>
+    </tr>
+  %end;
+%else;
+  %if;not (is_reset propose_alias);
+    <tr>
+    <td>[*alias]0</td>
+    <td>
+    <input name="alias0" size=30 value="">
+    <td>[*insert::alias]0</td>
+    <td><input type=checkbox name="add_alias0" value=on></td>
+    </tr>
+  %end;
+%end;
+</tr>
+%if;has_first_names_aliases;
+  %foreach;first_name_alias;
+    <tr>
+    <td>[*first name alias]0</td>
+    <td>
+    <input name="first_name_alias%cnt;" size=30 value="%first_name_alias;">
+    <td>[*insert::first name alias]0</td>
+    <td><input type=checkbox name="add_first_name_alias%cnt;" value=on></td>
+    </tr>
+  %end;
+%else;
+  <tr>
+  <td>[*first name alias]0</td>
+  <td>
+  <input name="first_name_alias0" size=30 value="">
+  <td>[*insert::first name alias]0</td>
+  <td><input type=checkbox name="add_first_name_alias0" value=on></td>
+  </tr>
+%end;
+%if;has_surnames_aliases;
+  %foreach;surname_alias;
+    <tr>
+    <td>[*surname alias]0</td>
+    <td>
+    <input name="surname_alias%cnt;" size=30 value="%surname_alias;">
+    <td>[*insert::first name alias]0</td>
+    <td><input type=checkbox name="add_surname_alias%cnt;" value=on></td>
+    </tr>
+  %end;
+%else;
+  <tr>
+  <td>[*surname alias]0</td>
+  <td>
+  <input name="surname_alias0" size=30 value="">
+  <td>[*insert::surname alias]0</td>
+  <td><input type=checkbox name="add_surname_alias0" value=on></td>
+  </tr>
+%end;
+</table>
+
+<h4>[*birth]</h4>
+
+<table border=1>
+<tr>
+<td>[*born]2...</td>
+<td>[*place]</td>
+<td>
+<input name=birth_place size=40 maxlength=200 value="%birth_place;">
+</td>
+</tr>
+</table>
+
+<table border=1>
+<tr>
+<td>[*date]0</td>
+<td>
+[year/month/day]0
+<input name=birth_yyyy size=5 maxlength=5 value="%birth.year;">
+[year/month/day]1
+<input name=birth_mm size=2 maxlength=2 value="%birth.month;">
+[year/month/day]2
+<input name=birth_mm size=2 maxlength=2 value="%birth.day;">
+</td>
+<td>
+...[or]0 [text]0
+<input name=birth_text size=15 maxlength=30 value="%birth.text;">
+</td>
+</table>
+<table border=1>
+<tr>
+<td>[*calendar/calendars]0
+<select name=birth_cal>
+<option value=G%if;birth.cal_gregorian; selected%end;>
+[*gregorian/julian/french/hebrew]0
+<option value=J%if;birth.cal_julian; selected%end;>
+[*gregorian/julian/french/hebrew]1
+<option value=F%if;birth.cal_french; selected%end;>
+[*gregorian/julian/french/hebrew]2
+<option value=H%if;birth.cal_hebrew; selected%end;>
+[*gregorian/julian/french/hebrew]3
+</select>
+</td>
+<td>[*precision]0
+<select name=birth_prec>
+<option%if;birth.prec_no; selected%end;>-
+<option value=sure%if;birth.prec_sure; selected%end;>[*exact]0
+<option value=about%if;birth.prec_about; selected%end;>[*about (date)]0
+<option value=maybe%if;birth.prec_maybe; selected%end;>[*possibly (date)]0
+<option value=before%if;birth.prec_before; selected%end;>[*before (date)]0
+<option value=after%if;birth.prec_after; selected%end;>[*after (date)]0
+<option value=oryear%if;birth.prec_oryear; selected%end;>&lt;- [*or] -&gt;
+<option value=yearint%if;birth.prec_yearint; selected%end;>
+&lt;- [*between (date)] -&gt;
+</select>
+<input name=birth_oryear size=5 maxlength=5 value="%birth.oryear;">
+</td>
+</tr>
+</table>
+<table border=1>
+<tr>
+<td>[*source/sources]0</td>
+<td>
+<input name=birth_src size=40 maxlength=200 value="%birth_src;">
+</td>
+</tr>
+</table>
+
+<p>
+
+<table border=1>
+<tr>
+<td>[*baptized]2...</td>
+<td>[*place]</td>
+<td>
+<input name=bapt_place size=40 maxlength=200 value="%bapt_place;">
+</td>
+</tr>
+</table>
+
+<table border=1>
+<tr>
+<td>[*date]0</td>
+<td>
+[year/month/day]0
+<input name=bapt_yyyy size=5 maxlength=5 value="%bapt.year;">
+[year/month/day]1
+<input name=bapt_mm size=2 maxlength=2 value="%bapt.month;">
+[year/month/day]2
+<input name=bapt_mm size=2 maxlength=2 value="%bapt.day;">
+</td>
+<td>
+...[or]0 [text]0
+<input name=bapt_text size=15 maxlength=30 value="%bapt.text;">
+</td>
+</table>
+<table border=1>
+<tr>
+<td>[*calendar/calendars]0
+<select name=bapt_cal>
+<option value=G%if;bapt.cal_gregorian; selected%end;>
+[*gregorian/julian/french/hebrew]0
+<option value=J%if;bapt.cal_julian; selected%end;>
+[*gregorian/julian/french/hebrew]1
+<option value=F%if;bapt.cal_french; selected%end;>
+[*gregorian/julian/french/hebrew]2
+<option value=H%if;bapt.cal_hebrew; selected%end;>
+[*gregorian/julian/french/hebrew]3
+</select>
+</td>
+<td>[*precision]0
+<select name=bapt_prec>
+<option%if;bapt.prec_no; selected%end;>-
+<option value=sure%if;bapt.prec_sure; selected%end;>[*exact]0
+<option value=about%if;bapt.prec_about; selected%end;>[*about (date)]0
+<option value=maybe%if;bapt.prec_maybe; selected%end;>[*possibly (date)]0
+<option value=before%if;bapt.prec_before; selected%end;>[*before (date)]0
+<option value=after%if;bapt.prec_after; selected%end;>[*after (date)]0
+<option value=oryear%if;bapt.prec_oryear; selected%end;>&lt;- [*or] -&gt;
+<option value=yearint%if;bapt.prec_yearint; selected%end;>
+&lt;- [*between (date)] -&gt;
+</select>
+<input name=bapt_oryear size=5 maxlength=5 value="%bapt.oryear;">
+</td>
+</tr>
+</table>
+<table border=1>
+<tr>
+<td>[*source/sources]0</td>
+<td>
+<input name=bapt_src size=40 maxlength=200 value="%bapt_src;">
+</td>
+</tr>
+</table>
+
+<p>
+<input type=submit value=Ok>
+</form>
+
+<img src="%image_prefix;/gwlogo.gif"
+ alt=... width=64 height=72 align=right>
+<br>
+%copyright;
+%base_trailer;
+</body>

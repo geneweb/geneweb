@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.79 2001-02-14 15:26:41 ddr Exp $ *)
+(* $Id: perso.ml,v 3.80 2001-02-14 19:48:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -520,7 +520,15 @@ value print_nobility_title conf base env p p_auth =
   | _ -> () ]
 ;
 
+value obsolete var =
+  do Printf.eprintf "\
+*** <W> use of obsolete variable \"%%%s;\" in perso.txt file\n" var;
+     flush stderr;
+  return ()
+;
+
 value print_nobility_titles conf base env p p_auth =
+  do ifdef UNIX then obsolete "nobility_titles" else (); return
   if p_auth then print_titles conf base True (transl conf "and") p else ()
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.28 2001-02-14 15:26:42 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.29 2001-02-14 19:48:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -820,6 +820,8 @@ value eval_person_bool_variable conf base env p =
   fun 
   [ "adding" ->
       List.mem (p_getenv conf.env "m") [Some "ADD_IND"; Some "ADD_IND_OK"]
+  | "is_female" -> p.sex = Female
+  | "is_male" -> p.sex = Male
   | "modifying" ->
       List.mem (p_getenv conf.env "m") [Some "MOD_IND"; Some "MOD_IND_OK"]
   | "merging" ->
@@ -848,18 +850,18 @@ value is_precision cond =
 
 value eval_date_bool_variable conf base env od =
   fun
-  [ "gregorian_cal" -> is_calendar Dgregorian od
-  | "julian_cal" -> is_calendar Djulian od
-  | "french_cal" -> is_calendar Dfrench od
-  | "hebrew_cal" -> is_calendar Dhebrew od
-  | "no_prec" -> od = None
-  | "sure_prec" -> is_precision (fun [ Sure -> True | _ -> False ]) od
-  | "about_prec" -> is_precision (fun [ About -> True | _ -> False ]) od
-  | "maybe_prec" -> is_precision (fun [ Maybe -> True | _ -> False ]) od
-  | "before_prec" -> is_precision (fun [ Before -> True | _ -> False ]) od
-  | "after_prec" -> is_precision (fun [ After -> True | _ -> False ]) od
-  | "oryear_prec" -> is_precision (fun [ OrYear _ -> True | _ -> False ]) od
-  | "yearint_prec" -> is_precision (fun [ YearInt _ -> True | _ -> False ]) od
+  [ "cal_gregorian" -> is_calendar Dgregorian od
+  | "cal_julian" -> is_calendar Djulian od
+  | "cal_french" -> is_calendar Dfrench od
+  | "cal_hebrew" -> is_calendar Dhebrew od
+  | "prec_no" -> od = None
+  | "prec_sure" -> is_precision (fun [ Sure -> True | _ -> False ]) od
+  | "prec_about" -> is_precision (fun [ About -> True | _ -> False ]) od
+  | "prec_maybe" -> is_precision (fun [ Maybe -> True | _ -> False ]) od
+  | "prec_before" -> is_precision (fun [ Before -> True | _ -> False ]) od
+  | "prec_after" -> is_precision (fun [ After -> True | _ -> False ]) od
+  | "prec_oryear" -> is_precision (fun [ OrYear _ -> True | _ -> False ]) od
+  | "prec_yearint" -> is_precision (fun [ YearInt _ -> True | _ -> False ]) od
   | s -> do Wserver.wprint "%%%s;" s; return False ]
 ;
 
@@ -885,7 +887,12 @@ value print_person_variable conf base env p =
       match get_env "digest" env with
       [ Estring x -> Wserver.wprint "%s" x
       | _ -> () ]
+  | "first_name" -> Wserver.wprint "%s" (quote_escaped p.first_name)
+  | "image" -> Wserver.wprint "%s" (quote_escaped p.image)
   | "index" -> Wserver.wprint "%d" (Adef.int_of_iper p.cle_index)
+  | "occ" -> if p.occ <> 0 then Wserver.wprint "%d" p.occ else ()
+  | "public_name" -> Wserver.wprint "%s" (quote_escaped p.public_name)
+  | "surname" -> Wserver.wprint "%s" (quote_escaped p.surname)
   | s ->
       if start_with s "evar_" then
         let v = String.sub s 5 (String.length s - 5) in
