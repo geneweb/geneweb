@@ -84,8 +84,6 @@ family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birthDeath.cmx \
     sendImage.cmx some.cmx srcfile.cmx title.cmx update.cmx updateFam.cmx \
     updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx family.cmi 
-fhashtbl.cmo: iovalue.cmi 
-fhashtbl.cmx: iovalue.cmx 
 forum.cmo: config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo srcfile.cmi \
     update.cmi util.cmi ../wserver/wserver.cmi 
 forum.cmx: config.cmi def.cmi gutil.cmx iobase.cmx lock.cmx srcfile.cmx \
@@ -170,10 +168,10 @@ relation.cmo: adef.cmi config.cmi consang.cmi date.cmi def.cmi gutil.cmi \
     num.cmi relationLink.cmo srcfile.cmi util.cmi ../wserver/wserver.cmi 
 relation.cmx: adef.cmx config.cmi consang.cmx date.cmx def.cmi gutil.cmx \
     num.cmx relationLink.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
-relationLink.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi num.cmi \
-    pqueue.cmi util.cmi ../wserver/wserver.cmi 
-relationLink.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
-    pqueue.cmx util.cmx ../wserver/wserver.cmx 
+relationLink.cmo: adef.cmi config.cmi dag2html.cmo date.cmi def.cmi gutil.cmi \
+    num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi 
+relationLink.cmx: adef.cmx config.cmi dag2html.cmx date.cmx def.cmi gutil.cmx \
+    num.cmx pqueue.cmx util.cmx ../wserver/wserver.cmx 
 robot.cmo: srcfile.cmi util.cmi ../wserver/wserver.cmi 
 robot.cmx: srcfile.cmx util.cmx ../wserver/wserver.cmx 
 select.cmo: adef.cmi def.cmi gutil.cmi name.cmi 

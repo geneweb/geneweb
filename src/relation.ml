@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.11 1999-12-02 15:14:09 ddr Exp $ *)
+(* $Id: relation.ml,v 3.12 1999-12-03 03:25:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -779,15 +779,17 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
               do Wserver.wprint ":\n%s " (transl conf "click");
                  let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
                  let dp2 = match pp2 with [ Some p -> p | _ -> p2 ] in
-                 Wserver.wprint "<a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s\">"
+                 Wserver.wprint
+                   "<a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s\">"
                    (commd conf) (acces conf base a) x1
                    (acces_n conf base "1" dp1) x2 (acces_n conf base "2" dp2)
                    (if pp1 = None then ""
                     else ";" ^ acces_n conf base "3" p1)
                    (if pp2 = None then ""
-                    else ";" ^ acces_n conf base "4" p2);
+                    else ";" ^ acces_n conf base "4" p2)
+                   (if n > 1 && n < 10 then ";dag=on" else "");
                  Wserver.wprint "%s</a>" (transl conf "here");
-                 if n > 1 then
+                 if n > 10 then
                    Wserver.wprint "%s"
                      (transl conf " to see the first branch")
                  else ();
@@ -818,16 +820,17 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                     let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
                     let dp2 = match pp2 with [ Some p -> p | _ -> p2 ] in
                     Wserver.wprint
-                      " <a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s\">"
+                      " <a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s\">"
                       (commd conf) (acces conf base a) x1
                       (acces_n conf base "1" dp1) x2
                       (acces_n conf base "2" dp2)
                       (if pp1 = None then ""
                        else ";" ^ acces_n conf base "3" p1)
                       (if pp2 = None then ""
-                       else ";" ^ acces_n conf base "4" p2);
+                       else ";" ^ acces_n conf base "4" p2)
+                      (if n > 1 && n < 10 then ";dag=on" else "");
                     Wserver.wprint "%s</a>" (transl conf "here");
-                    if n > 1 then
+                    if n > 10 then
                       Wserver.wprint "%s"
                         (transl conf " to see the first relationship link")
                     else ();
