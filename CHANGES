@@ -8,6 +8,9 @@ GeneWeb version 3.06
   - [20 Jun 00] Added Latvian version (Janeks Kamerovskis).
 
 * GeneWeb Service/CGI (gwd)
+  - [27 Jun 00] When typing a name holding a number, searches also with
+    its equivalent in Roman digits (e.g. it is possible to type "Louis 15"
+    to find "Louis XV").
   - [26 Jun 00] Fixed bug: the images in ".png" format were not accepted.
   - [23 Jun 00] Added descendants displaying with d'Aboville's encoding.
   - [21 Jun 00] Added displaying of oldest perhaps still alive (from welcome
