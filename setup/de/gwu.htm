@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>GeneWeb-Quelldatei extrahieren</title></head>
+
+<body>
+
+<h1>GeneWeb-Quelldatei extrahieren</h1>
+
+<form mode=GET action="gwu">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+W&auml;hle deine Datenbank:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+
+$b{<tr><td><input type=radio name=anon
+value="$a">&nbsp;&nbsp;&nbsp;</td><td>$a</td></tr>|
+<tr><td>- keine Datenbank vorhanden</tr></td>}
+
+</table></dl>
+
+<p>
+
+Gib den Namen ein, den du deiner <em>GeneWeb</em>-Quelldatei geben
+m&ouml;chtest. Er mu&szlig; mit "<tt>.gw</tt>" enden. Wenn Du nichts eingibst, wird
+der Dateiname aus dem Namen deiner <em>GeneWeb</em>-Datenbank abgeleitet.
+
+<p>
+
+<dl><dt><dd><input name=o size=30></dl>
+
+<p>
+
+W&auml;hle die gew&uuml;nschten Optionen:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=mem value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>W&auml;hrend der Operation sparsam mit dem Speicher umgehen
+(ist aber langsamer).</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td colspan=3>Nur die Vorfahren ausw&auml;hlen von...
+</td></tr>
+<tr><td>Vorname</td><td><input name="a1" size=30
+maxlength=200></td><td>Nr</td> <td><input name="a2" size=5
+maxlength=8></td></tr>
+
+<tr><td>Nachname</td> <td colspan=3><input name="a3" size=40
+maxlength=200></td></tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td colspan=3>Nur die Nachkommen ausw&auml;hlen von...
+</td></tr>
+
+<tr><td>Vorname</td><td><input name="d1" size=30
+maxlength=200></td><td>Nr</td><td><input name="d2" size=5
+maxlength=8></td></tr>
+
+<tr><td>Nachname</td> <td colspan=3><input name="d3" size=40
+maxlength=200></td></tr>
+</table></dl>
+
+<dl><dt><dd>
+Falls du oben beide Optionen gew&auml;hlt hast, wird die Schnittmenge
+extrahiert: Alle Personen die <em>gleichzeitig</em> Vorfahren des
+einen und Nachkommen des anderen sind.
+</dl>
+
+<p>
+
+Dann dr&uuml;cke diesen Knopf:
+
+<p>
+
+<input type=submit value="Extrahieren">
+
+</form>

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>GeneWeb-Quelldatei importieren</title></head>
+
+<body>
+
+<h1>GeneWeb-Quelldatei importieren</h1>
+
+<form mode=GET action="gwc">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Bitte gib folgende Daten ein:
+
+<ul><li>Kompletter Name deiner <em>GeneWeb</em>-Quelldatei (inklusive Endung ".gw");
+falls dein Webbrowser dir diese Option bietet, kannst du den
+"browse"-Button zur Auswahl benutzen.
+
+<p>
+
+<input name=anon $n{type=file} size=55>
+
+</ul>
+
+<p>
+
+<ul><li>Den Namen, den du deiner <em>GeneWeb</em>-Datenbank geben
+m&ouml;chtest. Wenn du nichts eingibst, wird der Name aus deiner
+<em>GeneWeb</em>-Quelldatei abgeleitet.
+
+<p>
+
+<input name=o size=30>
+
+</ul>
+
+<p>
+
+W&auml;hle die gew&uuml;nschten Optionen:
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=stats value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Statistiken nach Abschlu&szlig; der Operation ausgeben
+(sind dann in der Trace-Ausgabe sichtbar).</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=nc value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Datenkonsistenz nicht &uuml;berpr&uuml;fen.</td></tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=cg value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Initialisierung der Blutsverwandtschaften auch durchf&uuml;hren.</td> </tr>
+</table></dl>
+
+<p>
+
+Dann dr&uuml;cke "Ok".
+
+<p>
+
+<input type=submit value="Ok">
+</form>

@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Aufr&auml;umen - Phase 2</title></head>
+
+<body>
+
+<h1>Aufr&auml;umen</h1>
+
+<p>
+
+Wir fahren nun mit dem Aufr&auml;umen der Datenbank "$a" fort.
+
+<p>
+
+Achtung: Diese Operation kann je nach Fall einige Sekunden oder
+Minuten dauern. Bitte habe Geduld.
+
+<p>
+
+Dr&uuml;cke den Knopf, um die Operation zu starten.
+
+<p>
+
+<form mode=GET action="cleanup_1">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+Zu deiner Information: Diese Funktion entspricht der Ausf&uuml;hrung
+der folgenden Kommandos:
+
+<pre>
+     $$ cd $w
+     $$ .$/gwu $a -o tmp.gw
+     $$ mkdir old
+     Unter Unix:
+       $$ rm -rf old/$a.gwb
+       $$ mv $a.gwb old/.
+     Unter MSdos:
+       $$ del old\$a.gwb\*.*
+       $$ rmdir old\$a.gwb
+       $$ move $a.gwb old\.
+     $$ .$/gwc tmp.gw -o $a > comm.log
+</pre>

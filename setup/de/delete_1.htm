@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Datenbanken l&ouml;schen</title></head>
+
+<body>
+
+<h1>Datenbanken l&ouml;schen</h1>
+
+<p>
+
+<form mode=GET action="delete_1">
+<input type=hidden name=lang value=$l>
+$k{<input type=hidden name="$a" value=del>|}
+
+Bist du sicher, da&szlig; du diese Datenbanken l&ouml;schen m&ouml;chtest?
+
+<p>
+
+<ul>
+
+$k{<li><a href="http://localhost:2317/$a">$a</a>|
+<li>[no selection]}
+
+</ul>
+
+<p>
+
+Achtung: Diese Auswahl ist unwiderruflich! Zur Best&auml;tigung bitte
+diesen Kopf dr&uuml;cken:
+
+<p>
+
+<dl><dt><dd><input type=submit value="L&ouml;schen"></dl>
+
+<p>
+
+Zur&uuml;ck zum <a href="gwsetup?lang=$l;v=main.htm">Hauptmen&uuml;</a>.
