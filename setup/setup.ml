@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.26 1999-05-15 11:08:16 ddr Exp $ *)
+(* $Id: setup.ml,v 1.27 1999-05-17 20:13:09 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -489,6 +489,16 @@ value gwc_or_ged2gwb out_name_of_in_name apply conf =
 value gwc = gwc_or_ged2gwb out_name_of_gw "gwc_1.html";
 value ged2gwb_check = gwc_or_ged2gwb out_name_of_ged "base_out.html";
 
+ifdef WIN95 then
+value infer_rc conf rc =
+  if rc > 0 then rc
+  else
+    match p_getenv conf.env "o" with
+    [ Some out_file ->
+        if Sys.file_exists (out_file ^ ".gwb") then 0 else 2
+    | _ -> 0 ]
+;
+
 value gwc_1 conf =
   let rc =
     exec_f (Filename.concat "." "gwc" ^ parameters conf.env)
@@ -558,16 +568,6 @@ value consang_check conf =
   in
   if in_f = "" then print_file conf "err_missing.html"
   else print_file conf "base_in.html"
-;
-
-ifdef WIN95 then
-value infer_rc conf rc =
-  if rc > 0 then rc
-  else
-    match p_getenv conf.env "o" with
-    [ Some out_file ->
-        if Sys.file_exists (out_file ^ ".gwb") then 0 else 2
-    | _ -> 0 ]
 ;
 
 value has_gwu dir =
