@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.45 1999-08-21 11:45:44 ddr Exp $ *)
+(* $Id: util.ml,v 2.46 1999-08-21 19:40:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -689,7 +689,13 @@ value copy_string_with_macros conf s =
 ;
 
 value trailer conf =
-  do try copy_etc_file [('s', conf.command ^ "?")] "copyr" with
+  let env =
+    [('s', conf.command ^ "?");
+     ('d',
+      if conf.cancel_links then ""
+      else " - <a href=\"" ^ conf.command ^ "?m=DOC\">DOC</a>")]
+  in
+  do try copy_etc_file env "copyr" with
      [ Sys_error _ ->
          do html_p conf;
             Wserver.wprint "

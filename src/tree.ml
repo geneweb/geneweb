@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: tree.ml,v 2.3 1999-08-21 18:17:34 ddr Exp $ *)
+(* $Id: tree.ml,v 2.4 1999-08-21 19:40:44 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -63,12 +63,24 @@ value print_tree conf base with_spouses one_branch t =
        Wserver.wprint "\n";
        let p = poi base ip in
        stag "td" "colspan=%d align=center%s" (cs - 2)
-         (if with_spouses && t.sons = [] then " valign=top" else "")
+         (if with_spouses then
+            if t.sons = [] then " valign=top" else " valign=bottom"
+          else "")
        begin
          Wserver.wprint "%s" (referenced_person_title_text conf base p);
          Wserver.wprint "%s" (Date.short_dates_text conf base p);
+       end;
+       Wserver.wprint "\n";
+       stag "td" begin Wserver.wprint "&nbsp;"; end;
+    return ()
+  in
+  let print_spouse cs ip parent t =
+    do stag "td" begin Wserver.wprint "&nbsp;"; end;
+       Wserver.wprint "\n";
+       let p = poi base ip in
+       stag "td" "colspan=%d align=center valign=top" (cs - 2) begin
          match t.sons with
-         [ [{node = (ip, _, _)} :: _] when with_spouses ->
+         [ [{node = (ip, _, _)} :: _] ->
              match (aoi base ip).parents with
              [ Some ifam ->
                  let sp = poi base (spouse p (coi base ifam)) in
@@ -79,8 +91,8 @@ value print_tree conf base with_spouses one_branch t =
                       (referenced_person_title_text conf base sp);
                     Wserver.wprint "%s" (Date.short_dates_text conf base sp);
                  return ()
-             | _ -> () ]
-         | _ -> () ];
+             | _ -> Wserver.wprint "&nbsp;" ]
+         | _ -> Wserver.wprint "&nbsp;" ];
        end;
        Wserver.wprint "\n";
        stag "td" begin Wserver.wprint "&nbsp;"; end;
@@ -153,7 +165,11 @@ value print_tree conf base with_spouses one_branch t =
          else ();
          print_row print_person tl;
          let last = List.for_all (fun (_, t) -> t.sons = []) tl in
-         if not last then print_row print_vertical_bar_if_sons tl else ();
+         if not last then
+           do if with_spouses then print_row print_spouse tl else ();
+              print_row print_vertical_bar_if_sons tl;
+           return ()
+         else ();
       return
       let tl =
         List.fold_right
