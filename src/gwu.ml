@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.32 2000-11-02 18:44:51 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.33 2000-11-04 21:22:53 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -899,7 +899,7 @@ value no_spouses_parents = ref False;
 value no_notes = ref False;
 value censor = ref 0;
 
-value gwu base out_dir out_oc src_oc_list anc desc =
+value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
   let to_separate = separate base in
   let anc =
     match anc with
@@ -911,8 +911,13 @@ value gwu base out_dir out_oc src_oc_list anc desc =
     [ Some (p1, po, p2) -> Some (find_person base p1 po p2)
     | None -> None ]
   in
+  let ancdesc =
+    match ancdesc with
+    [ Some (p1, po, p2) -> Some (find_person base p1 po p2)
+    | None -> None ]
+  in
   let ((per_sel, fam_sel) as sel) =
-    Select.functions base anc desc surnames.val no_spouses_parents.val
+    Select.functions base anc desc surnames.val ancdesc no_spouses_parents.val
       censor.val
   in
   let fam_done = Array.create base.data.families.len False in
@@ -995,9 +1000,18 @@ value anc_2nd = ref "";
 value desc_1st = ref "";
 value desc_occ = ref 0;
 value desc_2nd = ref "";
+value ancdesc_1st = ref "";
+value ancdesc_occ = ref 0;
+value ancdesc_2nd = ref "";
 
 type arg_state =
-  [ ASnone | ASwaitAncOcc | ASwaitAncSurn | ASwaitDescOcc | ASwaitDescSurn ]
+  [ ASnone
+  | ASwaitAncOcc
+  | ASwaitAncSurn
+  | ASwaitDescOcc
+  | ASwaitDescSurn
+  | ASwaitAncdescOcc
+  | ASwaitAncdescSurn ]
 ;
 value arg_state = ref ASnone;
 value mem = ref False;
@@ -1016,6 +1030,12 @@ value speclist =
     Arg.String
       (fun s -> do desc_1st.val := s; return arg_state.val := ASwaitDescOcc),
     "\"<1st_name>\" [num] \"<surname>\" : select descendants of...");
+   ("-ad",
+    Arg.String
+      (fun s -> do ancdesc_1st.val := s; return arg_state.val := ASwaitAncdescOcc),
+    "\"<1st_name>\" [num] \"<surname>\" : select ancestors of...
+    and all their descendants (has no effect if -a and/or -d used,
+    option -nsp is forced).");
    ("-s", Arg.String (fun x -> surnames.val := [x :: surnames.val]),
     "\"<surname>\" : select this surname (option usable several times)");
    ("-nsp", Arg.Set no_spouses_parents,
@@ -1063,7 +1083,16 @@ value anonfun s =
       [ Failure _ ->
           do desc_occ.val := 0; desc_2nd.val := s; return
           arg_state.val := ASnone ]
-  | ASwaitDescSurn -> do desc_2nd.val := s; return arg_state.val := ASnone ]
+  | ASwaitDescSurn -> do desc_2nd.val := s; return arg_state.val := ASnone
+  | ASwaitAncdescOcc ->
+      try
+        do ancdesc_occ.val := int_of_string s; return
+        arg_state.val := ASwaitAncdescSurn
+      with
+      [ Failure _ ->
+          do ancdesc_occ.val := 0; ancdesc_2nd.val := s; return
+          arg_state.val := ASnone ]
+  | ASwaitAncdescSurn -> do ancdesc_2nd.val := s; return arg_state.val := ASnone ]
 ;
 
 value errmsg =
@@ -1111,6 +1140,21 @@ value main () =
       else Some (desc_1st.val, desc_occ.val, desc_2nd.val)
     else None
   in
+  let ancdesc =
+    if ancdesc_1st.val <> "" then
+      if anc_1st.val <> "" || desc_1st.val <> "" then
+	do Printf.printf "Option -ad skipped since -a and/or -d used\n";
+	return None
+      else if ancdesc_2nd.val = "" then
+        do Printf.printf "Misused option -ad\n";
+           Printf.printf "Use option -help for usage\n";
+           flush stdout;
+        return exit 2
+      else
+        do no_spouses_parents.val := True; return
+        Some (ancdesc_1st.val, ancdesc_occ.val, ancdesc_2nd.val)
+    else None
+  in
   let base = Iobase.input in_file.val in
   let src_oc_list = ref [] in
   let _ = base.data.ascends.array () in
@@ -1128,7 +1172,7 @@ value main () =
   let out_oc =
     if out_file.val = "" then stdout else open_out out_file.val
   in
-  do gwu base out_dir.val out_oc src_oc_list anc desc;
+  do gwu base out_dir.val out_oc src_oc_list anc desc ancdesc;
      List.iter
        (fun (src, (oc, _)) -> do flush oc; close_out oc; return ())
        src_oc_list.val;

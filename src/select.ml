@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 3.6 2000-10-28 09:10:01 ddr Exp $ *)
+(* $Id: select.ml,v 3.7 2000-11-04 21:22:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -131,6 +131,15 @@ value select_descendants base per_tab fam_tab no_spouses_parents flag iper =
   loop iper
 ;
 
+value select_descendants_all base per_tab fam_tab no_spouses_parents aflag dflag =
+  for i = 0 to base.data.persons.len - 1 do
+    if per_tab.(i) land aflag <> 0 then
+      select_descendants base per_tab fam_tab no_spouses_parents dflag
+        (Adef.iper_of_int i)
+    else ();
+  done
+;
+
 value select_surname base per_tab fam_tab no_spouses_parents surname =
   let surname = Name.strip_lower surname in
   for i = 0 to base.data.families.len - 1 do
@@ -172,11 +181,11 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
   done
 ;
 
-value functions base anc desc surnames no_spouses_parents censor =
+value functions base anc desc surnames ancdesc no_spouses_parents censor =
   let tm = Unix.localtime (Unix.time ()) in
   let threshold = 1900 + tm.Unix.tm_year - censor in
-  match (anc, desc, surnames) with
-  [ (None, None, []) ->
+  match (anc, desc, surnames, ancdesc) with
+  [ (None, None, [], None) ->
       if censor <> 0 then
         let per_tab = Array.create base.data.persons.len 0 in
         let fam_tab = Array.create base.data.families.len 0 in
@@ -184,7 +193,7 @@ value functions base anc desc surnames no_spouses_parents censor =
         (fun i -> per_tab.(Adef.int_of_iper i) == 0,
          fun i -> fam_tab.(Adef.int_of_ifam i) == 0)
       else (fun _ -> True, fun _ -> True)
-  | (None, None, surnames) ->
+  | (None, None, surnames, None) ->
       let per_tab = Array.create base.data.persons.len False in
       let fam_tab = Array.create base.data.families.len False in
       do List.iter (select_surname base per_tab fam_tab no_spouses_parents)
@@ -192,6 +201,20 @@ value functions base anc desc surnames no_spouses_parents censor =
       return
       (fun i -> per_tab.(Adef.int_of_iper i),
        fun i -> fam_tab.(Adef.int_of_ifam i))
+  | (None, None, _, Some iadper) ->
+      let per_tab = Array.create base.data.persons.len 0 in
+      let fam_tab = Array.create base.data.families.len 0 in
+      let _ =
+        if censor <> 0 then censor_base base per_tab fam_tab 4 threshold
+        else ()
+      in
+      do select_ancestors base per_tab fam_tab 1 iadper;
+         select_descendants_all base per_tab fam_tab no_spouses_parents 1 2;
+      return
+      (fun i -> let fl = per_tab.(Adef.int_of_iper i) in
+                (fl < 4) && (fl > 0),
+       fun i -> let fl = fam_tab.(Adef.int_of_ifam i) in
+                (fl < 4) && (fl > 0))
   | _ ->
       let per_tab = Array.create base.data.persons.len 0 in
       let fam_tab = Array.create base.data.families.len 0 in

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.168 2000-11-04 20:32:38 ddr Exp $
+# $Id: lexicon.txt,v 3.169 2000-11-04 21:22:48 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5388,6 +5388,7 @@ pt: estat&iacute;sticas
 se: statistik
 
     subject
+dk: emne
 en: subject
 fr: sujet
 se: ämne
