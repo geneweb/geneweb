@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.39 2000-07-07 19:43:33 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.40 2000-07-09 10:33:09 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title> Genealogio - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -23,6 +23,13 @@ genealogia</font></h1></table>
 <td align=right valign=top>%w</td>
 </tr>
 </table>
+
+<br>
+
+<font size=-1><em>Vi povas elekti alian lingvon de afisxajxo inter la
+sekvanton:</em></font>
+
+<br>
 
 %rversion
 
