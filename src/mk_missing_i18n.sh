@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: mk_missing_i18n.sh,v 3.5 2000-11-11 13:07:45 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 3.6 2000-12-26 15:12:24 ddr Exp $ *)
 
 open Printf
 
@@ -29,6 +29,7 @@ let check first lang =
   let ic_i18n = open_in "i18n" in
   printf "<h3><a name=%s>%s</h3>\n" lang lang;
   printf "<pre>\n";
+  let has_missing = ref false in
   begin try
     while true do
       let line = input_line ic_i18n in
@@ -48,10 +49,12 @@ let check first lang =
         List.iter (fun (lang, transl) -> printf "%s: %s\n" lang transl)
 	  list;
 	printf "\n";
+	has_missing := true
       end;
    done
   with End_of_file -> ()
   end;
+  if not !has_missing then printf "     - no missing phrases -\n";
   printf "</pre>\n";
   false
 
