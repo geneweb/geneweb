@@ -9,6 +9,9 @@ GeneWeb version 3.04
     fail and the browser to answer "no output".
 
 * GeneWeb Service/CGI (gwd)
+  - [29 Apr 00] Fixed bug in "descendants", "families with encoding": the
+    marriage dates of grandchildren could sometime be erroneously the ones
+    of the children.
   - [16 Apr 00] Fixed problem: the kde browser (Konqueror) seems not to handle
     the password protocol. Went around the problem by treating it as it were
     in CGI mode, where the password has to be given in a form.

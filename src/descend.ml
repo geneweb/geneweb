@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.8 2000-04-11 02:08:51 ddr Exp $ *)
+(* $Id: descend.ml,v 3.9 2000-04-28 22:48:41 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -555,6 +555,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                               let _ =
                                 List.fold_left
                                   (fun first ifam ->
+                                     let fam = foi base ifam in
                                      let des = doi base ifam in
                                      let c1 = spouse ie (coi base ifam) in
                                      let el = des.children in
