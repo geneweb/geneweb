@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.2 1999-12-17 00:19:35 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.3 2000-01-03 21:03:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -107,61 +107,6 @@ value gen_print conf base mois dead_people =
      Wserver.wprint "</ul>\n";
      trailer conf;
   return ()
-;
-
-value anniversary_of conf base dead_people jj mm =
-  let xx = ref [] in
-  do for i = 0 to base.data.persons.len - 1 do
-       let p = base.data.persons.get i in
-       if not dead_people then
-         match (Adef.od_of_codate p.birth, p.death) with
-         [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
-             if d.prec = Sure && d.day <> 0 && d.month <> 0 then
-               if d.day == jj && d.month == mm then
-                 if age_autorise conf base p then
-                   xx.val := [(p, d.year, DeBirth) :: xx.val]
-                 else ()
-               else ()
-             else ()
-         | _ -> () ]
-       else
-         match p.death with
-         [ NotDead | DontKnowIfDead -> ()
-         | _ ->
-             do match Adef.od_of_codate p.birth with
-                [ Some (Dgreg d _) ->
-                    if d.prec = Sure && d.day <> 0 && d.month <> 0 then
-                      if d.day == jj && d.month == mm then
-                        if age_autorise conf base p then
-                          xx.val := [(p, d.year, DeBirth) :: xx.val]
-                        else ()
-                      else ()
-                    else ()
-                | _ -> () ];
-                match p.death with
-                [ Death dr d ->
-                    match Adef.date_of_cdate d with
-                    [ Dgreg dt _ ->
-                        if dt.prec = Sure && dt.day <> 0 && dt.month <> 0 then
-                          if dt.day == jj && dt.month == mm then
-                            if age_autorise conf base p then
-                              xx.val := [(p, dt.year, DeDeath dr) :: xx.val]
-                            else ()
-                          else ()
-                        else ()
-                    | _ -> () ]
-                | _ -> () ];
-             return () ];
-     done;
-     xx.val := Sort.list (fun (p1, a1, _) (p2, a2, _) -> a1 <= a2) xx.val;
-  return xx.val
-;
-
-value anniversaire_du conf base dead_people dt =
-  let list = anniversary_of conf base dead_people dt.day dt.month in
-  if not (leap_year dt.year) && dt.day = 1 && dt.month = 3 then
-    list @ anniversary_of conf base dead_people 29 2
-  else list
 ;
 
 value afficher_liste_anniversaires conf base dead_people dt liste =
@@ -334,27 +279,6 @@ value print_marriage conf base month =
   return ()
 ;
 
-value anniversary_of_marriage_of_day conf base dt =
-  let xx = ref [] in
-  do for i = 0 to base.data.families.len - 1 do
-       let fam = base.data.families.get i in
-       if is_deleted_family fam then ()
-       else
-         match Adef.od_of_codate fam.marriage with
-         [ Some (Dgreg {day = d; month = m; year = y; prec = Sure} _) when
-           d <> 0 && m <> 0 ->
-             let cpl = base.data.couples.get i in
-             if age_autorise conf base (poi base cpl.father)
-             && age_autorise conf base (poi base cpl.mother)
-             && d == dt.day && m == dt.month then
-               xx.val := [(cpl, y) :: xx.val]
-             else ()
-         | _ -> () ];
-     done;
-     xx.val := Sort.list (fun (fam1, y1) (fam2, y2) -> y1 <= y2) xx.val;
-  return xx.val
-;
-
 value print_anniversaries_of_marriage conf base y list =
   do Wserver.wprint "<ul>";
      List.iter
@@ -395,25 +319,55 @@ value print_marriage_day conf base day_name verb wd dt list =
       return () ]
 ;
 
-value print_menu_birth conf base =
+value match_dates conf base p d1 d2 =
+  (* to programmer: dont factorize "age_autorise": it is slow *)
+  if d1.day == d2.day && d1.month == d2.month then
+    age_autorise conf base p
+  else if d1.day == 29 && d1.month == 2 && d2.day == 1 && d2.month = 3 &&
+    not (leap_year d2.year) then age_autorise conf base p
+  else False
+;
+
+value gen_print_menu_birth f_scan conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "birthdays"))
   in
+  let tom = day_after conf.today in
+  let aft = day_after tom in
+  let list_tod = ref [] in
+  let list_tom = ref [] in
+  let list_aft = ref [] in
   do header conf title;
-     let tom = day_after conf.today in
-     let aft = day_after tom in
-     let list_today = anniversaire_du conf base False conf.today in
-     let list_tom = anniversaire_du conf base False tom in
-     let list_aft = anniversaire_du conf base False aft in
-     do print_birth_day conf base (transl conf "today") (transl conf ", it is")
-          conf.today_wd conf.today list_today;
-        print_birth_day conf base (transl conf "tomorrow")
-          (transl conf ", it will be") ((conf.today_wd + 1) mod 7)
-          tom list_tom;
-        print_birth_day conf base (transl conf "the day after tomorrow")
-          (transl conf ", it will be") ((conf.today_wd + 2) mod 7)
-          aft list_aft;
-     return ();
+     try
+       while True do
+         let p = f_scan () in
+         match (Adef.od_of_codate p.birth, p.death) with
+         [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
+             if d.prec = Sure && d.day <> 0 && d.month <> 0 then
+               if match_dates conf base p d conf.today then
+                 list_tod.val := [(p, d.year, DeBirth) :: list_tod.val]
+               else if match_dates conf base p d tom then
+                 list_tom.val := [(p, d.year, DeBirth) :: list_tom.val]
+               else if match_dates conf base p d aft then
+                 list_aft.val := [(p, d.year, DeBirth) :: list_aft.val]
+               else ()
+             else ()
+         | _ -> () ];
+       done
+     with
+     [ Not_found -> () ];
+     List.iter
+       (fun xx ->
+          xx.val := Sort.list (fun (p1, a1, _) (p2, a2, _) -> a1 <= a2) xx.val)
+       [list_tod; list_tom; list_aft];
+     print_birth_day conf base (transl conf "today") (transl conf ", it is")
+       conf.today_wd conf.today list_tod.val;
+     print_birth_day conf base (transl conf "tomorrow")
+       (transl conf ", it will be") ((conf.today_wd + 1) mod 7)
+       tom list_tom.val;
+     print_birth_day conf base (transl conf "the day after tomorrow")
+       (transl conf ", it will be") ((conf.today_wd + 2) mod 7)
+       aft list_aft.val;
      Wserver.wprint "\n";
      html_p conf;
      propose_months conf "AN";
@@ -422,25 +376,77 @@ value print_menu_birth conf base =
   return ()
 ;
 
+value print_menu_birth conf base =
+  let _ = base.data.persons.array () in
+  let i = ref (-1) in
+  let f_scan () =
+    do incr i; return
+    if i.val < base.data.persons.len then base.data.persons.get i.val
+    else raise Not_found
+  in
+  gen_print_menu_birth f_scan conf base
+;
+
 value print_menu_dead conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "anniversaries of dead"))
   in
+  let tom = day_after conf.today in
+  let aft = day_after tom in
+  let list_tod = ref [] in
+  let list_tom = ref [] in
+  let list_aft = ref [] in
+  let _ = base.data.persons.array () in
   do header conf title;
-     let tom = day_after conf.today in
-     let aft = day_after tom in
-     let list_today = anniversaire_du conf base True conf.today in
-     let list_tom = anniversaire_du conf base True tom in
-     let list_aft = anniversaire_du conf base True aft in
-     do print_anniv conf base (transl conf "today") (transl conf ", it is")
-          conf.today_wd conf.today list_today;
-        print_anniv conf base (transl conf "tomorrow")
-          (transl conf ", it will be") ((conf.today_wd + 1) mod 7)
-          tom list_tom;
-        print_anniv conf base (transl conf "the day after tomorrow")
-          (transl conf ", it will be") ((conf.today_wd + 2) mod 7)
-          aft list_aft;
-     return ();
+     for i = 0 to base.data.persons.len - 1 do
+       let p = base.data.persons.get i in
+       match p.death with
+       [ NotDead | DontKnowIfDead -> ()
+       | _ ->
+           do match Adef.od_of_codate p.birth with
+              [ Some (Dgreg d _) ->
+                  if d.prec = Sure && d.day <> 0 && d.month <> 0 then
+                    if match_dates conf base p d conf.today then
+                      list_tod.val := [(p, d.year, DeBirth) :: list_tod.val]
+                    else if match_dates conf base p d tom then
+                      list_tom.val := [(p, d.year, DeBirth) :: list_tom.val]
+                    else if match_dates conf base p d aft then
+                      list_aft.val := [(p, d.year, DeBirth) :: list_aft.val]
+                    else ()
+                  else ()
+              | _ -> () ];
+              match p.death with
+              [ Death dr d ->
+                  match Adef.date_of_cdate d with
+                  [ Dgreg d _ ->
+                      if d.prec = Sure && d.day <> 0 && d.month <> 0 then
+                        if match_dates conf base p d conf.today then
+                          list_tod.val :=
+                            [(p, d.year, DeDeath dr) :: list_tod.val]
+                        else if match_dates conf base p d tom then
+                          list_tom.val :=
+                            [(p, d.year, DeDeath dr) :: list_tom.val]
+                        else if match_dates conf base p d aft then
+                          list_aft.val :=
+                            [(p, d.year, DeDeath dr) :: list_aft.val]
+                        else ()
+                      else ()
+                  | _ -> () ]
+              | _ -> () ];
+           return () ];
+     done;
+     List.iter
+       (fun xx ->
+          xx.val := Sort.list (fun (p1, a1, _) (p2, a2, _) -> a1 <= a2) xx.val)
+       [list_tod; list_tom; list_aft];
+     print_anniv conf base (transl conf "today") (transl conf ", it is")
+       conf.today_wd conf.today list_tod.val;
+     print_anniv conf base (transl conf "tomorrow")
+       (transl conf ", it will be") ((conf.today_wd + 1) mod 7)
+       tom list_tom.val;
+     print_anniv conf base (transl conf "the day after tomorrow")
+       (transl conf ", it will be") ((conf.today_wd + 2) mod 7)
+       aft list_aft.val;
      Wserver.wprint "\n";
      html_p conf;
      propose_months conf "AD";
@@ -449,25 +455,57 @@ value print_menu_dead conf base =
   return ()
 ;
 
+value match_mar_dates conf base cpl d1 d2 =
+  (* to programmer: dont factorize "age_autorise": it is slow *)
+  if d1.day == d2.day && d1.month == d2.month then
+    age_autorise conf base (poi base cpl.father) &&
+    age_autorise conf base (poi base cpl.mother)
+  else if d1.day == 29 && d1.month == 2 && d2.day == 1 && d2.month = 3 &&
+       not (leap_year d2.year)
+    then
+    age_autorise conf base (poi base cpl.father) &&
+    age_autorise conf base (poi base cpl.mother)
+  else False
+;
+
 value print_menu_marriage conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "anniversaries of marriage"))
   in
+  let tom = day_after conf.today in
+  let aft = day_after tom in
+  let list_tod = ref [] in
+  let list_tom = ref [] in
+  let list_aft = ref [] in
+  let _ = base.data.families.array () in
   do header conf title;
-     let tom = day_after conf.today in
-     let aft = day_after tom in
-     let list_today = anniversary_of_marriage_of_day conf base conf.today in
-     let list_tomorrow = anniversary_of_marriage_of_day conf base tom in
-     let list_after = anniversary_of_marriage_of_day conf base aft in
-     do print_marriage_day conf base (transl conf "today")
-          (transl conf ", it is") conf.today_wd conf.today list_today;
-        print_marriage_day conf base (transl conf "tomorrow")
-          (transl conf ", it will be") ((conf.today_wd + 1) mod 7)
-          tom list_tomorrow;
-        print_marriage_day conf base (transl conf "the day after tomorrow")
-          (transl conf ", it will be") ((conf.today_wd + 2) mod 7)
-          aft list_after;
-       return ();
+     for i = 0 to base.data.families.len - 1 do
+       let fam = base.data.families.get i in
+       if is_deleted_family fam then ()
+       else
+         match Adef.od_of_codate fam.marriage with
+         [ Some (Dgreg d _) when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
+             let cpl = base.data.couples.get i in
+             if match_mar_dates conf base cpl d conf.today then
+               list_tod.val := [(cpl, d.year) :: list_tod.val]
+             else if match_mar_dates conf base cpl d tom then
+               list_tom.val := [(cpl, d.year) :: list_tom.val]
+             else if match_mar_dates conf base cpl d aft then
+               list_aft.val := [(cpl, d.year) :: list_aft.val]
+             else ()
+         | _ -> () ];
+     done;
+     List.iter
+       (fun xx -> xx.val := Sort.list (fun (_, y1) (_, y2) -> y1 <= y2) xx.val)
+       [list_tod; list_tom; list_aft];
+     print_marriage_day conf base (transl conf "today")
+      (transl conf ", it is") conf.today_wd conf.today list_tod.val;
+     print_marriage_day conf base (transl conf "tomorrow")
+       (transl conf ", it will be") ((conf.today_wd + 1) mod 7)
+       tom list_tom.val;
+     print_marriage_day conf base (transl conf "the day after tomorrow")
+       (transl conf ", it will be") ((conf.today_wd + 2) mod 7)
+       aft list_aft.val;
      Wserver.wprint "\n";
      html_p conf;
      propose_months conf "AM";
