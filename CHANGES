@@ -1,9 +1,9 @@
-GeneWeb Intermediate Version 2.01-2
------------------------------------
+GeneWeb Version 2.02
+--------------------
 
 * New feature
 
-  - [May 4, 99] Am working on a new program "setup" which will allow to
+  - [May 4, 99] Added a new program "setup" which will allow to
     use a lot of commands without having to type magic incantations in a
     MSdos (Windows) or Xterm (Unix) window. Everything is done in the Web
     navigator: creation of a database, extraction of a GEDCOM file, cleanup,
