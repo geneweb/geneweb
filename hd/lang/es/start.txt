@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.8 1999-10-31 15:48:41 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.9 1999-11-02 10:28:35 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogía - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -56,7 +56,7 @@ personas.%In<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-{To navigate in this data base, you can do your search}:<br><p>
+Para navegar en esta base de datos, puede hacer su búsqueda:<br><p>
 
 <ul>
 
@@ -157,8 +157,8 @@ avanzada</b></font></a>.
 <td valign=up>
 <ul>%I|wf
 <li>las <a href="%sm=LD;k=10">muertes recientes</a>%E%Ih
-<li>los <a href="%sm=HIST;k=10">{history of updates}</a>%E
-<li>los <a href="%sm=CAL">{calendars}</a>
+<li>los <a href="%sm=HIST;k=10">historia de actualizaciones</a>%E
+<li>los <a href="%sm=CAL">calendarios</a>
 <li>el <a href="%sm=FORUM">forum de la base de datos</a>
 </ul>
 </td>

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.3 1999-11-02 10:13:24 ddr Exp $
+# $Id: lexicon.txt,v 3.4 1999-11-02 10:28:33 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1259,8 +1259,10 @@ de: Kalender
 dk: kalender/kalendere
 en: calendar/calendars
 eo: kalendaro/kalendaroj
+es: calendario/calendarios
 fr: calendrier/calendriers
 is: dagatal/dagatöl
+it: calendario/calendarii
 nl: kalender/kalenders
 no: kalender/kalendere
 pt: calend&aacute;rio/calend&aacute;rios
@@ -2002,6 +2004,7 @@ eo: forumo
 es: forum
 fr: forum
 is: umræður
+it: tribuna
 nl: forum
 no: forum
 se: forum
@@ -2084,8 +2087,10 @@ se: gammel-far(mor)f&ouml;r&auml;ldrar
 de: Gregorianisch/Julianisch/Franz&ouml;sisch/Hebr&auml;isch
 dk: gregoriansk/juliansk/fransk rep./j&oslash;disk
 en: Gregorian/Julian/French/Hebrew
+es: gregoriano/julian/franc&eacute;s/hebreo
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
 is: gregorísk/julian/franskt/hebreskt
+it: gregorian/julian/francese/ebraico
 nl: gregoriaans/juliaans/frans/hebreeuws
 no: gregoriansk/juliansk/fransk rep./j&oslash;disk
 se: gregoriansk/juliansk/fransk/hebreisk
@@ -2174,8 +2179,10 @@ de: Chronik der Aktualisierungen
 dk: opdateringers historie
 en: history of updates
 eo: historio de la gxisdatigoj
+es: historia de actualizaciones
 fr: historique des mises-&agrave;-jour
 is: uppfærslusaga
+it: storia degli aggiornamenti
 nl: lijst van wijzigingen
 no: oppdateringshistorie
 pt: historial das actualiza&ccedil;&otilde;es
@@ -4795,8 +4802,10 @@ se: skulle vara sin egen ana
 de: Jahr/Monat/Tag
 dk: &aring;r/m&aring;ned/dag
 en: year/month/day
+es: a&ntilde;o/mes/dia
 fr: ann&eacute;e/mois/jour
 is: ár/mánuður/dagur
+it: anno/mese/giorno
 nl: jaar/maand/dag
 no: &aring;r/m&aring;ned/dag
 se: &aring;r/m&aring;nad/dag
