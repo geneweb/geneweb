@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.29 2001-01-30 16:53:23 ddr Exp $ *)
+(* $Id: descend.ml,v 3.30 2001-01-31 17:43:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -974,11 +974,7 @@ value afficher_descendants_table conf base max_lev a =
   return ()
 ;
 
-value print_tree_aux conf base gv p =
-  let title _ =
-    Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
-      (person_text_no_html conf base p)
-  in
+value make_tree_hts conf base gv p =
   let gv = min (limit_by_tree conf) gv in
   let rec nb_column n v u =
     if v == 0 then n + 1
@@ -1199,16 +1195,22 @@ value print_tree_aux conf base gv p =
     in
     Array.of_list (List.rev tdal)
   in
-  do header_no_page_title conf title;
-     Dag.print_html_table conf hts;
-     trailer conf;
-  return ()
+  hts
 ;
 
 value print_tree conf base gv p =
+  let hts = make_tree_hts conf base gv p in
   if p_getenv conf.env "slices" = Some "on" then
-    Dag.print_slices_menu conf base
-  else print_tree_aux conf base gv p
+    Dag.print_slices_menu conf base (Some hts)
+  else
+    let title _ =
+      Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
+        (person_text_no_html conf base p)
+    in
+    do header_no_page_title conf title;
+       Dag.print_html_table conf hts;
+       trailer conf;
+    return ()
 ;
 
 value print_aboville conf base max_level p =
