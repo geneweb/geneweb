@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.50 2001-01-06 09:55:53 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.51 2001-01-09 09:28:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -103,7 +103,8 @@ value print_choice conf base p niveau_effectif =
           Wserver.wprint "<input type=radio name=t value=T> %s\n"
             (capitale (transl conf "tree"));
           let limit =
-            if browser_doesnt_have_tables conf then 3 else limit_by_tree conf
+            (* if browser_doesnt_have_tables conf then 3 else *)
+            limit_by_tree conf
           in
           if niveau_effectif <= limit then ()
           else
@@ -1563,6 +1564,7 @@ value tree_reference gv conf base p s =
     acces conf base p ^ (if im then ";image=on" else "") ^ "\">" ^ s ^ "</a>"
 ;
 
+(*
 value someone_text conf base reference p =
   reference conf base p (person_title_text conf base p) ^
   Date.short_dates_text conf base p
@@ -1626,6 +1628,7 @@ value print_tree_with_pre conf base v p =
      print_pre_center sz (someone_text conf base reference p);
   end
 ;
+*)
 
 type pos = [ Left | Right | Center | Alone ];
 
@@ -1976,30 +1979,34 @@ value print_normal_tree conf base v p =
       (person_text_no_html conf base p)
   in
   do header_no_page_title conf title;
+(*
      if browser_doesnt_have_tables conf then print_tree_with_pre conf base v p
-     else print_tree_with_table conf base v p;
+     else
+*)
+       print_tree_with_table conf base v p;
      trailer conf;
   return ()
 ;
 
 value print_tree conf base v p =
-  match p_getenv conf.env "dag" with
-  [ Some "on" ->
-      let set =
-        loop Dag.Pset.empty v p.cle_index where rec loop set lev ip =
-          let set = Dag.Pset.add ip set in
-          if lev <= 1 then set
-          else
-            match (aoi base ip).parents with
-            [ Some ifam ->
-                let cpl = coi base ifam in
-                let set = loop set (lev - 1) cpl.mother in
-                loop set (lev - 1) cpl.father
-            | None -> set ]
-      in
-      let d = Dag.make_dag conf base (Dag.Pset.elements set) in
-      Dag.gen_print_dag conf base False True set [] d
-  | _ -> print_normal_tree conf base v p ]
+  if p_getenv conf.env "dag" = Some "on"
+  || browser_doesnt_have_tables conf then
+    let set =
+      loop Dag.Pset.empty v p.cle_index where rec loop set lev ip =
+        let set = Dag.Pset.add ip set in
+        if lev <= 1 then set
+        else
+          match (aoi base ip).parents with
+          [ Some ifam ->
+              let cpl = coi base ifam in
+              let set = loop set (lev - 1) cpl.mother in
+              loop set (lev - 1) cpl.father
+          | None -> set ]
+    in
+    let d = Dag.make_dag conf base (Dag.Pset.elements set) in
+    Dag.gen_print_dag conf base False True set [] d
+  else
+    print_normal_tree conf base v p
 ;
 
 value no_spaces s =
