@@ -1,18 +1,6 @@
-(* $Id: httpEnv.ml,v 1.1 2000-07-24 23:36:11 ddr Exp $ *)
+(* $Id: httpEnv.ml,v 1.2 2000-07-25 13:23:04 ddr Exp $ *)
 
 open Printf;
-
-(* Buffer machinery *)
-
-value buff = ref (String.create 80);
-value store len x =
-  do if len >= String.length buff.val then
-       buff.val := buff.val ^ String.create (String.length buff.val)
-     else ();
-     buff.val.[len] := x;
-  return succ len
-;
-value get_buff len = String.sub buff.val 0 len;
 
 (* Env from a string *)
 
@@ -60,6 +48,19 @@ value extract_boundary content_type =
   List.assoc "boundary" e
 ;
 
+value strip_quotes s =
+  let i0 =
+    if String.length s > 0 && s.[0] == '"' then 1 else 0
+  in
+  let i1 =
+    if String.length s > 0
+    && s.[String.length s - 1] == '"' then
+      String.length s - 1
+    else String.length s
+  in
+  String.sub s i0 (i1 - i0)
+;
+
 value extract_multipart boundary str =
   let rec skip_nl i =
     if i < String.length str && str.[i] == '\r' then skip_nl (i + 1)
@@ -84,6 +85,8 @@ value extract_multipart boundary str =
         let env = create_env s in
         match (getenv env "name", getenv env "filename") with
         [ (Some var, Some filename) ->
+            let var = strip_quotes var in
+            let filename = strip_quotes filename in
             let i = skip_nl i in
             let i1 =
               loop i where rec loop i =
@@ -96,20 +99,9 @@ value extract_multipart boundary str =
                 else i
             in
             let v = String.sub str i (i1 - i) in
-            [("file", v) :: loop i1]
+            [(var ^ "_name", filename); (var, v) :: loop i1]
         | (Some var, None) ->
-            let var =
-              let i0 =
-                if String.length var > 0 && var.[0] == '"' then 1 else 0
-              in
-              let i1 =
-                if String.length var > 0
-                && var.[String.length var - 1] == '"' then
-                  String.length var - 1
-                else String.length var
-              in
-              String.sub var i0 (i1 - i0)
-            in
+            let var = strip_quotes var in
             let (s, i) = next_line i in
             if s = "" then
               let (s, i) = next_line i in

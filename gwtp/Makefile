@@ -1,12 +1,16 @@
-# $Id: Makefile,v 1.1 2000-07-24 23:36:10 ddr Exp $
+# $Id: Makefile,v 1.2 2000-07-25 13:23:03 ddr Exp $
 
 CAMLP4=camlp4r
 OCAMLC=ocamlc
-OCAMLCOPT=
+OCAMLCOPT=-I ../geneweb/src
 RM=/bin/rm -f
 GWTP_OBJS=httpEnv.cmo gwtp.cmo
+GWTP_OTHER=../geneweb/src/buff.cmo
 
 all: gwtp.out
+
+gwtp.out: $(GWTP_OBJS)
+	$(OCAMLC) $(GWTP_OTHER) $(GWTP_OBJS) -o gwtp.out
 
 clean:
 	$(RM) *.cm[oix] *.out
@@ -15,9 +19,6 @@ depend:
 	> .depend.new
 	for i in *.ml; do camlp4r pr_depend.cmo $$i >> .depend.new; done
 	mv .depend.new .depend
-
-gwtp.out: $(GWTP_OBJS)
-	$(OCAMLC) $(GWTP_OBJS) -o gwtp.out
 
 .SUFFIXES: .ml .cmo
 
