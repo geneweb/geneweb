@@ -10,6 +10,7 @@ GeneWeb Version 4.02
     of Camlp4.
 
 * GeneWeb daemon/CGI (gwd)
+  - [03 May 01] Rewrote some parts of name.ml in a cleaner and surer way.
   - [21 Apr 01] Added small test in relation.ml in case of request with
     bad fef parameter to avoid request failure.
   - [21 Apr 01] Changed robot traces (sorted by number of requests).
