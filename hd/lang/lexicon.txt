@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.53 2001-11-21 10:37:08 ddr Exp $
+# $Id: lexicon.txt,v 4.54 2001-11-26 10:39:56 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -416,7 +416,7 @@ et: vandemjäär/brümäär/frimäär/nivoos/plüvioos/vantoos/¸erminaal/floreaal/preria
 fi: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 he:  ååğãîéàéàø / áøåîàéàø / ôøéîàéàø / ğéáåæ / ôìåáéåæ / â'øîéğàì / ôìåøéàì / ôøàøéàì / îñéãåø / úøîéãåø / ôøå÷èéãåø / ğåñó
-it:vendemmiaio/brumaio/frimaio/nevoso/piovioso/ventoso/germinale/fiorile/pratile/ messidoro/termidoro/fruttidoro/complementare
+it: vendemmiaio/brumaio/frimaio/nevoso/piovioso/ventoso/germinale/fiorile/pratile/ messidoro/termidoro/fruttidoro/complementare
 nl: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 no: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 pl: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
