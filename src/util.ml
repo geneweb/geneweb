@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.10 1999-04-09 13:29:21 ddr Exp $ *)
+(* $Id: util.ml,v 2.11 1999-04-11 10:13:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -662,12 +662,13 @@ value print_parent conf base p a =
   [ n when sou base n <> "" ->
       let n = sou base n in
       do Wserver.wprint "%s %s" (transl_nth conf "son/daughter/child" is)
-           (transl_decline conf "of" n);
+           (transl_decline conf "of (same or greater generation level)" n);
          afficher_titre conf base a;
       return ()
   | _ ->
       Wserver.wprint "%s %s%s" (transl_nth conf "son/daughter/child" is)
-        (transl_decline conf "of" (coa conf (sou base a.first_name)))
+        (transl_decline conf "of (same or greater generation level)"
+         (coa conf (sou base a.first_name)))
         (if p.surname <> a.surname then " " ^ coa conf (sou base a.surname)
          else "") ]
 ;

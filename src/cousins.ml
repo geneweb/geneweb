@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 2.5 1999-04-09 20:40:49 ddr Exp $ *)
+(* $Id: cousins.ml,v 2.6 1999-04-11 10:13:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -168,7 +168,8 @@ value rec print_descend_upto conf base ini_p ini_br lev children =
                       else
                         do Wserver.wprint "%s %s "
                              (capitale (transl_nth conf "child/children" 1))
-                             (transl_decline conf "of" "");
+                             (transl_decline conf
+                              "of (same or greater generation level)" "");
                            afficher_personne_titre conf base p;
                            Wserver.wprint ":";
                         return ();
