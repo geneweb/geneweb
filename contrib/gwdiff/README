@@ -1,8 +1,16 @@
 OVERVIEW:
 
 gwdiff will help you to target differences between two GeneWeb databases. So
-far it can only compare the descendants of a person you have found in both
-data bases (Spouses and their parents are compared too).
+far it needs your help to know what to compare. Two modes are available:
+
+ - descendants checks (option -d): it will compare the descendants of the
+    person you have found in both data bases (Spouses and their parents are
+    compared too)
+
+ - descendants of all ascendants (option -ad): it will found ascendants of the 
+    person you have found in both data bases that are available in both data
+    bases. For each top person identified, it will compare its decendants in
+    both data bases.
 
 USAGE:
 
@@ -12,7 +20,11 @@ Now, find a person defined in both data bases (ex.: Jean DUPONT). In base b1,
 it is "Jean.0 DUPONT"; in base b2, it is "Jean.3 DUPONT". Run the following
 command:
 
- gwdiff -d1 Jean 0 DUPONT -d2 Jean 3 DUPONT b1 b2
+ gwdiff -d -1 Jean 0 DUPONT -2 Jean 3 DUPONT b1 b2
+
+If your are interested in the descendants of its ascendants, you can try:
+
+ gwdiff -ad -1 Jean 0 DUPONT -2 Jean 3 DUPONT b1 b2
 
 So far, the checks include:
  - first name: value from b1 has to be found in b2 (first name or first name
