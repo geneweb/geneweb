@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.35 2001-08-23 15:08:14 ddr Exp $
+# $Id: lexicon.txt,v 4.36 2001-08-26 09:08:19 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -1616,7 +1616,7 @@ sv: &aring;rsdagar
 
     anniversaries of dead people
 af: herdenkings van afsterwe
-ca: aniversaris de les persones difuntes
+ca: aniversaris de defunció
 cs: výroèí zemøelých osob
 da: &aring;rsdage for d&oslash;de personer
 de: Jahrestage der verstorbenen Personen
@@ -7373,6 +7373,7 @@ ru: äÿäè è òåòè
 sv: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
 
     undefined sex for %t
+ca: no s'ha definit el sexe de %t
 da: udefineret k&oslash;n for %t
 de: Geschlecht nicht definiert f&uuml;r %t
 en: undefined sex for %t
