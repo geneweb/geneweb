@@ -48,6 +48,5 @@ to be correct.
 
 INSTALLATIONS INSTRUCTIONS IN WINDOWS NT/95/98
 
-Forget it. It it complicated. I managed to compile with OCaml 3.00 and
-a version of Camlp4 3.01.7 patched to ensure the compatibility. Seems not
-to work properly when compiled with OCaml 3.01.
+Version 3.01 of OCaml has a serious bug prevening GeneWeb to be compiled.
+Latest version of GeneWeb have been compiled thanks to some hacks.
