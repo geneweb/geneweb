@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.9 2000-02-16 17:10:26 ddr Exp $ *)
+(* $Id: perso.ml,v 3.10 2000-03-03 12:09:28 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -7,10 +7,9 @@ open Gutil;
 open Util;
 open Config;
 
-exception Ok;
 value has_grand_parents base p =
   let rec loop niveau a =
-    if niveau = 2 then raise Ok
+    if niveau = 2 then raise Exit
     else
       match a.parents with
       [ Some ifam ->
@@ -21,7 +20,7 @@ value has_grand_parents base p =
           return ()
       | _ -> () ]
   in
-  try do loop 0 (aoi base p.cle_index); return False with [ Ok -> True ]
+  try do loop 0 (aoi base p.cle_index); return False with [ Exit -> True ]
 ;
 
 value has_grand_children base u =
@@ -34,13 +33,13 @@ value has_grand_children base u =
                  Array.iter
                    (fun fi ->
                       let eel = (doi base fi).children in
-                      Array.iter (fun _ -> raise Ok) eel)
+                      Array.iter (fun _ -> raise Exit) eel)
                    (uoi base e).family)
               el)
          u.family;
     return False
   with
-  [ Ok -> True ]
+  [ Exit -> True ]
 ;
 
 value prev_sibling base p a =
