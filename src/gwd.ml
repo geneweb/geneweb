@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.61 2000-09-29 08:00:28 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.62 2000-10-05 21:03:27 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -990,11 +990,9 @@ value image_request cgi env =
         if fname.[0] = '/' then String.sub fname 1 (String.length fname - 1)
         else fname
       in
-      do if Filename.is_implicit fname then
-           let fname = Util.image_file_name fname in
-           let _ = Image.print_image_file cgi fname in ()
-         else ();
-      return True
+      let fname = Filename.basename fname in
+      let fname = Util.image_file_name fname in
+      let _ = Image.print_image_file cgi fname in True
   | _ -> False ]
 ;
 
