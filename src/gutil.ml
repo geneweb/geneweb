@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.3 2000-01-20 10:34:38 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.4 2000-03-04 17:42:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -79,13 +79,13 @@ value decline case s =
   loop 0 0 where rec loop ibeg i =
     if i == String.length s then
       if i == ibeg then "" else decline_word case s ibeg i
-    else if s.[i] == ' ' then
-      decline_word case s ibeg i ^ " " ^ loop (i + 1) (i + 1)
-    else if s.[i] == '<' then
-      decline_word case s ibeg i ^ "<" ^ loop (i + 1) (i + 1)
-    else if s.[i] == '>' then
-      String.sub s ibeg (i + 1 - ibeg) ^ loop (i + 1) (i + 1)
-    else loop ibeg (i + 1)
+    else
+      match s.[i] with
+      [ ' ' | '<' as sep ->
+          decline_word case s ibeg i ^ String.make 1 sep ^ loop (i + 1) (i + 1)
+      | '>' ->
+          String.sub s ibeg (i + 1 - ibeg) ^ loop (i + 1) (i + 1)
+      | _ -> loop ibeg (i + 1) ]
 ;
 
 value nominative s =

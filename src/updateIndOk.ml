@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.5 2000-01-10 02:14:42 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.6 2000-03-04 17:42:56 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -40,17 +40,29 @@ value rec reconstitute_string_list conf var ext cnt =
   | _ -> ([], ext) ]
 ;
 
-value reconstitute_add_title conf ext cnt tl =
-  match get_nth conf "add_title" cnt with
-  [ Some "on" ->
-      let t1 =
-        {t_name = Tnone; t_ident = ""; t_place = "";
-         t_date_start = Adef.codate_None;
-         t_date_end = Adef.codate_None;
-         t_nth = 0}
-      in
-      ([t1 :: tl], True)
-  | _ -> (tl, ext) ]
+value reconstitute_insert_title conf ext cnt tl =
+  let var = "ins_title" ^ string_of_int cnt in
+  let n =
+    match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
+    [ (_, Some n) when n > 1 -> n
+    | (Some "on", _) -> 1
+    | _ -> 0 ]
+  in
+  if n > 0 then
+    let tl =
+      loop tl n where rec loop tl n =
+        if n > 0 then 
+          let t1 =
+            {t_name = Tnone; t_ident = ""; t_place = "";
+             t_date_start = Adef.codate_None;
+             t_date_end = Adef.codate_None;
+             t_nth = 0}
+          in
+          loop [t1 :: tl] (n - 1)
+        else tl
+    in
+    (tl, True)
+  else (tl, ext)
 ;
 
 value rec reconstitute_titles conf ext cnt =
@@ -84,7 +96,7 @@ value rec reconstitute_titles conf ext cnt =
          t_nth = t_nth}
       in
       let (tl, ext) = reconstitute_titles conf ext (cnt + 1) in
-      let (tl, ext) = reconstitute_add_title conf ext cnt tl in
+      let (tl, ext) = reconstitute_insert_title conf ext cnt tl in
       ([t :: tl], ext)
   | _ -> ([], ext) ]
 ;
@@ -207,7 +219,7 @@ value reconstitute_person conf =
   let (nicknames, ext) = reconstitute_string_list conf "nickname" ext 0 in
   let (aliases, ext) = reconstitute_string_list conf "alias" ext 0 in
   let (titles, ext) = reconstitute_titles conf ext 1 in
-  let (titles, ext) = reconstitute_add_title conf ext 0 titles in
+  let (titles, ext) = reconstitute_insert_title conf ext 0 titles in
   let (rparents, ext) = reconstitute_relations conf ext 1 in
   let (rparents, ext) = reconstitute_add_relation conf ext 0 rparents in
   let access =

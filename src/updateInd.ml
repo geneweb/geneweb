@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.8 2000-02-14 14:39:54 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.9 2000-03-04 17:42:56 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -332,13 +332,15 @@ value print_burial_date conf base p =
   Update.print_date conf base (capitale (transl conf "date")) "burial" d
 ;
 
-value print_add_title conf base cnt =
+value print_insert_title conf base cnt =
   do tag "table" "border=1" begin
        tag "tr" begin
+         let var = "ins_title" ^ string_of_int cnt in
          tag "td" begin
            let s = transl_nth conf "title/titles" 0 in
-           Wserver.wprint "%s <input type=checkbox name=add_title%d value=on>"
-             (capitale (transl_decline conf "insert" s)) cnt;
+           let sn = "<input name=" ^ var ^ "_n size=1 maxlength=1 value=1> " in
+           Wserver.wprint "%s <input type=checkbox name=%s value=on>"
+             (capitale (transl_decline conf "insert" (sn ^ s))) var;
          end;
        end;
      end;
@@ -415,7 +417,7 @@ value print_title conf base t cnt =
         | _ -> None ]);
      Wserver.wprint "\n";
      html_p conf;
-     print_add_title conf base cnt;
+     print_insert_title conf base cnt;
   return ()
 ;
 
@@ -425,7 +427,7 @@ value print_titles conf base p =
     [ [] -> [None]
     | tl -> List.map (fun t -> Some t) tl ]
   in
-  do print_add_title conf base 0; return
+  do print_insert_title conf base 0; return
   let _ = List.fold_left
     (fun cnt t -> do print_title conf base t cnt; return cnt + 1)
     1 tl

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.5 2000-01-12 10:24:53 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.6 2000-03-04 17:42:56 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -59,6 +59,24 @@ value reconstitute_child conf var default_surname =
   (first_name, surname, occ, create)
 ;
 
+value insert_child conf (children, ext) i =
+  let var = "ins_child" ^ string_of_int i in
+  match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
+  [ (_, Some n) when n > 1 ->
+      let children =
+        loop children n where rec loop children n =
+          if n > 0 then 
+            let new_child = ("", "", 0, Update.Create Neuter None) in
+            loop [new_child :: children] (n - 1)
+          else children
+      in
+      (children, True)
+  | (Some "on", _) ->
+      let new_child = ("", "", 0, Update.Create Neuter None) in
+      ([new_child :: children], True)
+  | _ -> (children, ext) ]
+;
+
 value reconstitute_family conf =
   let ext = False in
   let father = reconstitute_somebody conf "his" in
@@ -111,20 +129,11 @@ value reconstitute_family conf =
       with
       [ Some c ->
           let (children, ext) = loop (i + 1) ext in
-          match p_getenv conf.env ("ins_child" ^ string_of_int i) with
-          [ Some "on" ->
-              let new_child = ("", "", 0, Update.Create Neuter None) in
-              ([c; new_child :: children], True)
-          | _ -> ([c :: children], ext) ]
+          let (children, ext) = insert_child conf (children, ext) i in
+          ([c :: children], ext)
       | None -> ([], ext) ]
   in
-  let (children, ext) =
-    match p_getenv conf.env "ins_child0" with
-    [ Some "on" ->
-        let new_child = ("", "", 0, Update.Create Neuter None) in
-        ([new_child :: children], True)
-    | _ -> (children, ext) ]
-  in
+  let (children, ext) = insert_child conf (children, ext) 0 in
   let comment = strip_spaces (get conf "comment") in
   let fsources = strip_spaces (get conf "src") in
   let fam_index =
