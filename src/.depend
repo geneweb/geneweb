@@ -63,6 +63,8 @@ family.cmx: adef.cmx advSearchOk.cmx alln.cmx ansel.cmx ascend.cmx \
     title.cmx update.cmx updateFam.cmx updateFamOk.cmx updateInd.cmx \
     updateIndOk.cmx util.cmx ../wserver/wserver.cmx family.cmi 
 family.cmi: config.cmi def.cmi 
+fpla.cmo: adef.cmi ansel.cmo argl.cmo def.cmi gutil.cmi iobase.cmi 
+fpla.cmx: adef.cmx ansel.cmx argl.cmx def.cmi gutil.cmx iobase.cmx 
 gutil.cmo: adef.cmi ansel.cmo def.cmi name.cmi gutil.cmi 
 gutil.cmx: adef.cmx ansel.cmx def.cmi name.cmx gutil.cmi 
 gutil.cmi: def.cmi 
