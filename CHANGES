@@ -10,6 +10,10 @@ GeneWeb Version 1.10
 --- [12/12/98..13/12/98] Added displaying of cousins.
   - [11/12/98] Fixed more bugs (accents) due to new ANSEL encoding.
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [14/12/98] Fixed bug in Windows version (displaying "uncaught exception:
+    Stream.Failure").
+
 * Lexicon file (lexicon.txt)
   - [11/12/98] Fixed bug and completed Dutch version (thanks to Joris Esch).
 
