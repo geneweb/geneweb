@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 2.7 1999-06-28 19:11:03 ddr Exp $ *)
+(* $Id: consang.ml,v 2.8 1999-06-30 19:55:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -9,6 +9,15 @@ open Gutil;
 
 type anc_stat = [ MaybeAnc | IsAnc ];
 
+(* relationship:
+   - elim_ancestor
+        to prune displayed relationships
+   - anc_stat1, anc_stat2
+        optimization to answer faster when ancestors list is exhausted
+   - rank
+        to display common ancestors in canonical order
+*)
+
 type relationship =
   { weight1 : mutable float;
     weight2 : mutable float;
@@ -18,6 +27,7 @@ type relationship =
     elim_ancestors : mutable bool;
     anc_stat1 : mutable anc_stat;
     anc_stat2 : mutable anc_stat;
+    rank : int;
     mark : mutable int }
 ;
 
@@ -103,7 +113,7 @@ value make_relationship_table base tstab =
   let phony =
     {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = []; lens2 = [];
      mark = 0; elim_ancestors = False; anc_stat1 = MaybeAnc;
-     anc_stat2 = MaybeAnc}
+     anc_stat2 = MaybeAnc; rank = 0}
   in
   let tab = Array.create base.data.persons.len phony in
   {id = tstab; info = tab}
@@ -128,8 +138,9 @@ value consang_of p =
 (* tsort_leq: a version returning just "tstab.(x) <= tstab.(y)" is ok
    but it seems that our Pqueue algorithm is faster when there are no
    equal values *)
-value tsort_leq tstab x y =
-  if tstab.(x) = tstab.(y) then x >= y else tstab.(x) < tstab.(y)
+value tsort_leq tstab tab x y =
+  if tstab.(x) = tstab.(y) then tab.(x).rank <= tab.(y).rank
+  else tstab.(x) < tstab.(y)
 ;
 
 value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
@@ -137,14 +148,16 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
   let i2 = Adef.int_of_iper ip2 in
   if i1 == i2 then (1.0, [])
   else
+    let rank = ref 0 in
     let reset u mark =
       tab.(u) :=
         {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = [];
          lens2 = []; mark = mark; elim_ancestors = False;
-         anc_stat1 = MaybeAnc; anc_stat2 = MaybeAnc}
+         anc_stat1 = MaybeAnc; anc_stat2 = MaybeAnc;
+         rank = do incr rank; return rank.val}
     in
     let module Pq =
-      Pqueue.Make (struct type t = int; value leq = tsort_leq id; end)
+      Pqueue.Make (struct type t = int; value leq = tsort_leq id tab; end)
     in
     let q = ref Pq.empty in
     let inserted = new_mark () in

@@ -9,6 +9,8 @@ GeneWeb Version 2.04
     distribution just to say that you have to launch the program "setup".
 
 * GeneWeb daemon/CGI (gwd)
+  - [Jun 30, 99] Display common ancestors in relationship links in canonical
+    order.
   - [Jun 30, 99] Added the ability to search by Sosa number.
 
 GeneWeb Version 2.03

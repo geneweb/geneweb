@@ -1,4 +1,4 @@
-(* $Id: consang.mli,v 2.4 1999-06-28 19:04:34 ddr Exp $ *)
+(* $Id: consang.mli,v 2.5 1999-06-30 19:55:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -14,13 +14,13 @@ type relationship =
     elim_ancestors : mutable bool;
     anc_stat1 : mutable anc_stat;
     anc_stat2 : mutable anc_stat;
-   mark : mutable int }
+    rank : int;
+    mark : mutable int }
 and relationship_table = { id : array int; info : array relationship }
 ;
 
 exception TopologicalSortError;
 value topological_sort : base -> array int;
-value tsort_leq : array int -> int -> int -> bool;
 
 value make_relationship_table : base -> array int -> relationship_table;
 
