@@ -5,6 +5,7 @@ GeneWeb Version 3.03
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [09 Feb 00] Added link to welcome in anniversaries pages.
   - [02 Feb 00] Fixed little problem in anniversaries: when other
     calendars than Gregorian (e.g. Julian), could select "anniversary"
     even for persons having only the year in their date (fixed by testing
