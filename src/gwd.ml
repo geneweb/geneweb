@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.12 1999-05-04 14:55:01 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.13 1999-05-12 17:24:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -195,13 +195,13 @@ value rec cut_at_equal i s =
   else cut_at_equal (succ i) s
 ;
 
-value read_base_env bname =
+value read_base_env cgi bname =
   let fname =
     let f = Filename.concat Util.base_dir.val bname ^ ".gwf" in
     if Sys.file_exists f then f
     else
       let f = Filename.concat Util.base_dir.val bname ^ ".cnf" in
-      do if Sys.file_exists f then
+      do if not cgi && Sys.file_exists f then
            do Printf.eprintf "\
 *** Name for config file \"%s.cnf\" is deprecated; \
 rename it as \"%s.gwf\".\n" bname bname;
@@ -378,7 +378,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     let (x, env) = extract_assoc "sleep" env in
     (if x = "" then 0 else int_of_string x, env)
   in
-  let base_env = read_base_env base_file in
+  let base_env = read_base_env cgi base_file in
   let default_lang =
     try
       let x = List.assoc "default_lang" base_env in
@@ -444,11 +444,14 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
        [ Not_found ->
            try
              let r = List.assoc "can_send_photo" base_env = "yes" in
-             do Printf.eprintf "\
+             do if not cgi then
+                  do Printf.eprintf "\
 *** Config file for \"%s\": \"can_send_photo\" is deprecated; \
 use \"can_send_image\".\n"
-                  base_file;
-                flush stderr;
+                       base_file;
+                    flush stderr;
+                  return ()
+                else ();
              return r
            with
            [ Not_found -> False ] ];
@@ -787,7 +790,9 @@ value read_input len =
     do try
          while True do
            let l = input_line stdin in
+(*
            do Printf.eprintf "POST: %s\n" l; flush stderr; return
+*)
            buff.val := buff.val ^ l;
          done
        with
