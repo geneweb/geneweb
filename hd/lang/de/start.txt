@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.40 2000-09-14 02:22:55 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.41 2000-10-11 08:44:57 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -189,9 +189,8 @@ Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.
 
 <p>
 
-{If your browser does not automatically update the modified pages (forcing you
-to do "reload current document"), try navigating from <a
-href="%sescache=0">this link</a>}.
+Wenn die ge&auml;nderten Seiten nicht automatisch aktualisiert werden (man mu&szlig; st&auml;ndig im Browser auf "Neu laden" klicken), 
+bitte <a href="%sescache=0">hier</a> klicken.
 
 </td></tr>
 </table>
