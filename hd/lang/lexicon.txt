@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.60 2000-01-26 09:28:38 ddr Exp $
+# $Id: lexicon.txt,v 3.61 2000-02-01 09:52:20 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -1455,7 +1455,7 @@ nl: tak/takken
 no: gren/grener
 pt: ramo/ramos
 ru: ветвь/ветви
-se: gren/grenar
+se: anlinje/anlinjer
 
     burial
 cs: pohшeb
@@ -1523,7 +1523,7 @@ nl: geen GeneWeb links
 no: uten GeneWeb koblinger
 pt: cancelar os links Geneweb
 ru: без GeneWeb ссылок
-se: utan GeneWeb l&auml;nkar
+se: inga GeneWeb l&auml;nkar
 
     candidate father/candidate mother/candidate parents
 de: m&ouml;glicher Vater/m&ouml;gliche Mutter/m&ouml;gliche Eltern
@@ -2936,7 +2936,7 @@ nl: juliaans dag
 no: juliansk dag
 pt: dia juliano
 ru: юлианский день
-se: juliansk dag
+se: julianskdag
 
     killed (in action)
 cs: zabit/zabita/zabiti
@@ -3041,7 +3041,7 @@ nl: uitgebreide weergave
 no: utvidet rapport
 pt: resultados detalhados
 ru: подробно
-se: utvidgad rapport
+se: ut&ouml;kad rapport
 
     main title
 cs: hlavnн titul
@@ -3634,7 +3634,7 @@ nl: aantal takken
 no: antall slektsgrener
 pt: n&uacute;mero de ramos
 ru: число ветвей
-se: antal sl&auml;ktgrenar
+se: antal grenar
 
     occupation
 cs: zamмstnбnн
@@ -4296,7 +4296,7 @@ nl: verwantschap/verwantschappen
 no: slektslinje/slektslinjer
 pt: grau de parentesco/graus de parentesco
 ru: родственная связь/родственные связи
-se: sl&auml;ktl&auml;nk/sl&auml;ktl&auml;nkar
+se: anlinje/anlinjer
 
     relationship%t to
 cs: %t vztah s
@@ -4452,7 +4452,7 @@ nl: beknopte weergave
 no: kort rapport
 pt: resultados sucintos
 ru: кратко
-se: kort rapport
+se: anlista
 
     shortest path
 de: k&uuml;rzester Pfad
@@ -4462,7 +4462,7 @@ fi: lyhin polku
 fr: chemin le plus court
 no: korteste gren
 ru: кратчайший путь
-se: kortaste grenen
+se: kortaste v&auml;gen
 
     should be female
 cs: mмla by bэt ѕenskйho pohlavн
@@ -4569,7 +4569,7 @@ nl: selecteer
 no: velg
 pt: especificar
 ru: укажите
-se: specificera
+se: v&auml;lj
 
     spouse
 cs: cho»
@@ -5028,7 +5028,7 @@ nl: de grootouders
 no: besteforeldrene
 pt: os av&oacute;s
 ru: прародитель
-se: far(mor)f&ouml;r&auml;ldrarna
+se: den 3:e generationen
 
     the great-grandchildren
 cs: pravnouиata
@@ -5064,7 +5064,7 @@ nl: de overgrootouders
 no: oldeforeldrene
 pt: os bisav&oacute;s
 ru: прапрародитель
-se: gammel-far(mor)f&ouml;r&auml;ldrarna
+se: den 4:e generationen
 
     the latest %d births
 cs: poslednн %d narozenн
@@ -5259,7 +5259,7 @@ nl: tot de grootouders
 no: til besteforeldrene
 pt: at&eacute; aos av&oacute;s
 ru: до прадедов
-se: till far(mor)f&ouml;r&auml;ldrarna
+se: till den 3:e generationen
 
     to the great-grandchildren
 cs: k pravnouиatщm
@@ -5295,7 +5295,7 @@ nl: tot de overgrootouders
 no: til oldeforeldrene
 pt: at&eacute; aos bisav&oacute;s
 ru: до прапрародителей
-se: till gammel-far(mor)f&ouml;r&auml;ldrarna
+se: till den 4:e generationen
 
     to the parents
 cs: k rodiищm
