@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.8 1999-08-08 05:29:32 ddr Exp $ *)
+(* $Id: robot.ml,v 1.9 1999-08-09 15:02:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -31,7 +31,7 @@ value robot_error from cnt sec =
      Wserver.wprint "
 This address made more than %d requests in less than %d seconds.
 Considering that you probably sent a robot, your access has been
-disconnected.
+automatically disconnected.
 <p>
 Contact the site administrator to restore it.
 " cnt sec;
