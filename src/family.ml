@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.27 2002-11-18 12:36:28 ddr Exp $ *)
+(* $Id: family.ml,v 4.28 2002-11-27 20:13:02 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -412,6 +412,7 @@ value family_m conf base =
   | Some "FORUM" -> Forum.print conf base
   | Some "FORUM_ADD" -> Forum.print_add conf base
   | Some "FORUM_ADD_OK" -> Forum.print_add_ok conf base
+  | Some "FORUM_DEL" -> Forum.print_del conf base
   | Some "H" ->
       match p_getenv conf.env "v" with
       [ Some f -> Srcfile.print conf base f
