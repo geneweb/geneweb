@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.11 1999-05-18 22:34:59 ddr Exp $ *)
+(* $Id: descend.ml,v 2.12 1999-05-21 08:28:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -151,28 +151,6 @@ value s_appelle_comme_son_pere base ip =
   | _ -> False ]
 ;
 
-value print_marriage_text conf base fam =
-  let marriage = Adef.od_of_codate fam.marriage in
-  let marriage_place = sou base fam.marriage_place in
-  do match (marriage, marriage_place) with
-     [ (None, "") -> ()
-     | _ -> Wserver.wprint "<em>" ];
-     match marriage with
-     [ Some d ->
-         Wserver.wprint "%s" (Date.string_of_ondate conf d)
-     | _ -> () ];
-     match marriage_place with
-     [ "" -> ()
-     | s ->
-         do if marriage <> None then Wserver.wprint ", " else ();
-            Wserver.wprint "%s," (coa conf s);
-         return () ];
-     match (marriage, marriage_place) with
-     [ (None, "") -> ()
-     | _ -> Wserver.wprint "</em>" ];
-  return ()
-;
-
 value afficher_marie conf base first fam p spouse =
   let is = index_of_sex p.sex in
   let auth = age_autorise conf base p && age_autorise conf base spouse in
@@ -182,11 +160,7 @@ value afficher_marie conf base first fam p spouse =
      in
      Wserver.wprint (fcapitale format)
        (fun _ ->
-          if auth then
-            do Wserver.wprint "\n";
-               print_marriage_text conf base fam;
-            return ()
-          else ());
+          if auth then Perso.print_marriage_text conf base True fam else ());
      stag "strong" begin
        afficher_personne_referencee conf base spouse;
      end;

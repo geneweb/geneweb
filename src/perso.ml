@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.30 1999-05-18 22:35:00 ddr Exp $ *)
+(* $Id: perso.ml,v 2.31 1999-05-21 08:28:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -450,7 +450,7 @@ value print_marriage_text conf base in_perso fam =
        | _ -> Wserver.wprint "<em>" ]
      else ();
      match marriage with
-     [ Some d -> Wserver.wprint "%s" (Date.string_of_ondate conf d)
+     [ Some d -> Wserver.wprint " %s" (Date.string_of_ondate conf d)
      | _ -> () ];
      match marriage_place with
      [ "" -> ()
@@ -478,14 +478,9 @@ value print_family conf base p a ifam =
        else ftransl_nth conf "married%t to" is
      in
      Wserver.wprint (fcapitale format)
-       (fun _ ->
-          if auth then
-            do Wserver.wprint "\n";
-               print_marriage_text conf base True fam;
-            return ()
-          else ());
-     Wserver.wprint "\n";
-     afficher_personne_titre_referencee conf base (poi base ispouse);
+       (fun _ -> if auth then print_marriage_text conf base True fam else ());
+     Wserver.wprint "\n%s"
+       (referenced_person_title_text conf base (poi base ispouse));
      Date.afficher_dates_courtes conf base (poi base ispouse);
      match divorce with
      [ Divorced d ->
