@@ -1,6 +1,6 @@
-# $Id: Makefile,v 4.4 2001-08-28 13:41:42 ddr Exp $
+# $Id: Makefile,v 4.5 2002-01-07 16:00:33 ddr Exp $
 
-VERSION=4.03
+VERSION=4.04
 RELEASE=1
 DESTDIR=/usr/src/RPM
 

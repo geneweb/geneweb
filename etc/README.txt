@@ -1,4 +1,4 @@
-GeneWeb 4.03
+GeneWeb 4.04
 
 If you are under Windows:
    Double-click on the file "index.htm" of the directory "doc",
@@ -19,7 +19,7 @@ the previous versions.
 
      -----------------
 
-GeneWeb is copyright INRIA 2001.
+GeneWeb is copyright INRIA 2002.
 
 Remarks, suggestions, questions, bug reports to:
 	daniel.de_rauglaudre@inria.fr
