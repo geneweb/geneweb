@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 1.14 1999-02-04 17:24:04 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.15 1999-02-16 10:59:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -50,9 +50,10 @@ value store len x =
 
 value get_buff len = String.sub buff.val 0 len;
 
-value starting_char =
-  fun
-  [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '?' | ' ' -> True
+value starting_char s =
+  match s.[0] with
+  [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | ' ' -> True
+  | '?' -> if s = "?" then True else False
   | _ -> False ]
 ;
 
@@ -61,7 +62,7 @@ value correct_string base is =
   loop 0 0 where rec loop i len =
     if i == String.length s then get_buff len
     else
-      if i == 0 && not (starting_char s.[0]) then
+      if i == 0 && not (starting_char s) then
         loop (i + 1) (store (store len '_') s.[0])
       else if s.[i] == ' ' then loop (i + 1) (store len '_')
       else if s.[i] == '_' || s.[i] == '\\' then
