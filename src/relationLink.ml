@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.9 1999-08-02 21:47:02 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.10 1999-08-02 22:28:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -175,11 +175,6 @@ value find_prev_branch base dist ia sa ipl =
 
 (* Printing *)
 
-value has_td_width_percent conf =
-  let user_agent = Wserver.extract_param "user-agent: " '.' conf.request in
-  String.lowercase user_agent <> "mozilla/1"
-;
-
 value has_no_tables conf =
   let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
   String.lowercase user_agent = "lynx"
@@ -299,9 +294,7 @@ value rec print_both_branches conf base info pl1 pl2 =
          Wserver.wprint "\n";
        end;
        tag "tr" begin
-         tag "td" "valign=top align=center%s"
-           (if has_td_width_percent conf then " width=\"50%\"" else "")
-         begin
+         tag "td" "valign=top align=center width=\"50%%\"" begin
            match p1 with
            [ Some p1 ->
                do print_someone conf base p1;
@@ -309,9 +302,7 @@ value rec print_both_branches conf base info pl1 pl2 =
                return ()
            | None -> Wserver.wprint "&nbsp;" ];
          end;
-         tag "td" "valign=top align=center%s"
-           (if has_td_width_percent conf then " width=\"50%\"" else "")
-         begin
+         tag "td" "valign=top align=center width=\"50%%\"" begin
            match p2 with
            [ Some p2 ->
                do print_someone conf base p2;
