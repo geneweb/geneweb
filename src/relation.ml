@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.60 2005-01-18 02:18:50 ddr Exp $ *)
+(* $Id: relation.ml,v 4.61 2005-01-19 02:42:06 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -169,30 +169,41 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
       tag "table" "border=\"%d\" width=\"90%%\"" conf.border begin
         tag "tr" begin
           tag "td" "align=\"right\"" begin
-            Wserver.wprint "%s\n" (capitale (transl conf "long display"));
-            xtag "input" "type=\"checkbox\" name=\"long\" value=\"on\"";
+            tag "label" begin
+              Wserver.wprint "%s\n" (capitale (transl conf "long display"));
+              xtag "input" "type=\"checkbox\" name=\"long\" value=\"on\"";
+            end;
           end;
           tag "td" "align=\"right\"" begin
-            Wserver.wprint "%s\n"
-              (capitale (transl_nth conf "image/images" 1));
-            xtag "input" "type=\"checkbox\" name=\"image\" value=\"on\"";
-          end;
-        end;
-        tag "tr" begin
-          tag "td" "align=\"right\"" begin
-            Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
-            xtag "input" "type=\"checkbox\" name=\"spouse\" value=\"on\"";
-          end;
-          tag "td" "align=\"right\"" begin
-            Wserver.wprint "%s\n"
-              (capitale (transl conf "cancel GeneWeb links"));
-            xtag "input" "type=\"checkbox\" name=\"cgl\" value=\"on\"";
+            tag "label" begin
+              Wserver.wprint "%s\n"
+                (capitale (transl_nth conf "image/images" 1));
+              xtag "input" "type=\"checkbox\" name=\"image\" value=\"on\"";
+            end;
           end;
         end;
         tag "tr" begin
           tag "td" "align=\"right\"" begin
-            Wserver.wprint "%s\n" (capitale (transl conf "border"));
-            xtag "input" "name=\"bd\" size=\"1\" maxlength=\"2\" value=\"0\"";
+            tag "label" begin
+              Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
+              xtag "input" "type=\"checkbox\" name=\"spouse\" value=\"on\"";
+            end;
+          end;
+          tag "td" "align=\"right\"" begin
+            tag "label" begin
+              Wserver.wprint "%s\n"
+                (capitale (transl conf "cancel GeneWeb links"));
+              xtag "input" "type=\"checkbox\" name=\"cgl\" value=\"on\"";
+            end;
+          end;
+        end;
+        tag "tr" begin
+          tag "td" "align=\"right\"" begin
+            tag "label" begin
+              Wserver.wprint "%s\n" (capitale (transl conf "border"));
+              xtag "input"
+                "name=\"bd\" size=\"1\" maxlength=\"2\" value=\"0\"";
+            end;
           end;
           tag "td" "align=\"right\"" begin
             Wserver.wprint "\
@@ -221,16 +232,22 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
         tag "tr" "align=\"left\"" begin
           tag "td" "align=\"center\" colspan=\"2\"" begin
             Wserver.wprint "<table><tr align=\"left\"><td>\n";
-            xtag "input"
-              "type=\"radio\" name=\"et\" value=\"A\" checked=\"checked\"";
-            Wserver.wprint "%s<br%s>\n" (capitale (transl conf "ancestors"))
-              conf.xhs;
-            xtag "input" "type=\"radio\" name=\"et\" value=\"M\"";
-            Wserver.wprint "%s<br%s>\n"
-              (capitale (transl conf "relationships by marriage")) conf.xhs;
-            xtag "input" "type=\"radio\" name=\"et\" value=\"S\"";
-            Wserver.wprint "%s<br%s>\n"
-              (capitale (transl conf "shortest path")) conf.xhs;
+            tag "label" begin
+              xtag "input"
+                "type=\"radio\" name=\"et\" value=\"A\" checked=\"checked\"";
+              Wserver.wprint "%s<br%s>\n" (capitale (transl conf "ancestors"))
+                conf.xhs;
+            end;
+            tag "label" begin
+              xtag "input" "type=\"radio\" name=\"et\" value=\"M\"";
+              Wserver.wprint "%s<br%s>\n"
+                (capitale (transl conf "relationships by marriage")) conf.xhs;
+            end;
+            tag "label" begin
+              xtag "input" "type=\"radio\" name=\"et\" value=\"S\"";
+              Wserver.wprint "%s<br%s>\n"
+                (capitale (transl conf "shortest path")) conf.xhs;
+            end;
             Wserver.wprint "</td></tr></table>\n";
           end;
         end;
