@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.83 2001-01-15 12:54:36 ddr Exp $ *)
+(* $Id: util.ml,v 3.84 2001-01-25 13:35:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -168,8 +168,6 @@ value parent_has_title base p =
   | _ -> False ]
 ;
 
-value nb_year_for_public = 150;
-
 value age_autorise conf base p =
   if p.access = Public || conf.friend || conf.wizard then True
   else if
@@ -179,17 +177,18 @@ value age_autorise conf base p =
   else
     match
       (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism,
-       date_of_death p.death)
+       p.death, date_of_death p.death)
     with
-    [ (_, _, Some (Dgreg d _)) ->
+    [ (_, _, NotDead, _) when conf.private_years > 0 -> False
+    | (_, _, _, Some (Dgreg d _)) ->
         let a = temps_ecoule d conf.today in
-        a.year > nb_year_for_public
-    | (Some (Dgreg d _), _, _) ->
+        a.year > conf.private_years
+    | (Some (Dgreg d _), _, _, _) ->
         let a = temps_ecoule d conf.today in
-        a.year > nb_year_for_public
-    | (_, Some (Dgreg d _), _) ->
+        a.year > conf.private_years
+    | (_, Some (Dgreg d _), _, _) ->
         let a = temps_ecoule d conf.today in
-        a.year > nb_year_for_public
+        a.year > conf.private_years
     | _ ->
         let u = uoi base p.cle_index in
         loop 0 where rec loop i =
@@ -199,7 +198,7 @@ value age_autorise conf base p =
             match Adef.od_of_codate fam.marriage with
             [ Some (Dgreg d _) ->
                 let a = temps_ecoule d conf.today in
-                a.year > nb_year_for_public
+                a.year > conf.private_years
             | _ -> loop (i + 1) ] ]
 ;
 
@@ -210,17 +209,18 @@ value fast_auth_age conf p =
   else
     match
       (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism,
-       date_of_death p.death)
+       p.death, date_of_death p.death)
     with
-    [ (_, _, Some (Dgreg d _)) ->
+    [ (_, _, NotDead, _) when conf.private_years > 0 -> False
+    | (_, _, _, Some (Dgreg d _)) ->
         let a = temps_ecoule d conf.today in
-        a.year > nb_year_for_public
-    | (Some (Dgreg d _), _,  _) ->
+        a.year > conf.private_years
+    | (Some (Dgreg d _), _, _,  _) ->
         let a = temps_ecoule d conf.today in
-        a.year > nb_year_for_public
-    | (_, Some (Dgreg d _), _) ->
+        a.year > conf.private_years
+    | (_, Some (Dgreg d _), _, _) ->
         let a = temps_ecoule d conf.today in
-        a.year > nb_year_for_public
+        a.year > conf.private_years
     | _ -> False ]
 ;
 

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.33 2001-01-07 10:20:18 ddr Exp $ *)
+(* $Id: util.mli,v 3.34 2001-01-25 13:35:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -27,7 +27,6 @@ value hidden_env : config -> unit;
 
 value age_autorise : config -> base -> person -> bool;
 value fast_auth_age : config -> person -> bool;
-value nb_year_for_public : int;
 
 value enter_nobr : unit -> unit;
 value exit_nobr : unit -> unit;

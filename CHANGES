@@ -53,6 +53,9 @@ GeneWeb version 3.11
     with the new form "-sep".
 
 * Bases configuration files (base.gwf)
+  - [25 Jan 01] Added variable "private_years" to specify the number
+    of years for the visibility of personal information in normal access
+    (i.e. neither "friend" nor "wizard"). Default = 150.
   - [30 Dec 00] In example file a.gwf, fixed comment about customized
     variables: for variable defined as var_foo, the usage in the text
     is %vfoo; (not %foo;).
