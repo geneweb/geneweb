@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.196 2004-04-13 14:16:51 ddr Exp $
+# $Id: lexicon.txt,v 4.197 2004-04-20 11:26:16 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -521,7 +521,7 @@ sv: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/a
     (month)
 af: Januarie/Februarie/Maart/April/Mei/Junie/Julie/Augustus/September/Oktober/November/Desember
 bg: януари/февруари/март/април/май/юни/юли/август/септември/октомври/ноември/декември
-br: genver/c'hwevrer/meurzh/ebrel/mezheven/gouere/eost/gwengolo/here/du/kerzu
+br: genver/c'hwevrer/meurzh/ebrel/mae/mezheven/gouere/eost/gwengolo/here/du/kerzu
 ca: gener/febrer/marз/abril/maig/juny/juliol/agost/setembre/octubre/novembre/desembre
 cs: ledna/ъnora/bшezna/dubna/kvмtna/иervna/иervence/srpna/zбшн/шнjna/listopadu/prosince
 da: januar/februar/marts/april/maj/juni/juli/august/september/oktober/november/december
