@@ -57,3 +57,11 @@ Removing an user
 Remove his entry in the passwd file, delete his GeneWeb data base
 (directory ending with ".gwb"), and delete his data base configuration
 file (file ending with ".gwf").
+
+
+Default values
+
+If you want to set default configuration variables values, create a
+file named 'default.gwf' in the directory $tmp holding the default
+variables bindings you want (e.g. can_send_image=no). This file
+will be copied at the beginning of the user configuration file.
