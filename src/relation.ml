@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: relation.ml,v 1.13 1998-12-26 12:22:24 roglo Exp $ *)
+(* $Id: relation.ml,v 1.14 1999-01-08 17:04:13 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -389,7 +389,7 @@ value print_main_relationship conf base p1 p2 =
            a1.consang != Adef.fix (-1) && a2.consang != Adef.fix (-1)
          then
            do Wserver.wprint "<p>\n<em>%s: "
-                (capitale (transl conf "consanguinity"));
+                (capitale (transl conf "relationship"));
               print_decimal_num conf
                 (round_2_dec
                    (Adef.float_of_fix

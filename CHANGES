@@ -2,6 +2,11 @@ GeneWeb Version 1.10
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [08/01/99] Changed term "consanguinity" into "relationship" in
+    relationship computing (because confusion with the usual meaning of
+    the term "consanguinity").
+  - [08/01/99] Changed term "consanguinity" into "relationship" in relationship
+    computing.
   - [06/01/99] Deleted Unix option "-robot_xcl": worked bad, did not detect
     robots, detected robots when there are not, too complicated to fix.
     (The normal HTTP robot exclusion remains.)
