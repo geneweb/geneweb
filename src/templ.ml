@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.31 2005-01-24 04:35:50 ddr Exp $ *)
+(* $Id: templ.ml,v 4.32 2005-02-03 09:59:23 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -692,6 +692,7 @@ value print_variable conf base =
   | "base_header" -> Util.include_hed_trl conf (Some base) ".hed"
   | "base_trailer" -> Util.include_hed_trl conf (Some base) ".trl"
   | "body_prop" -> print_body_prop conf base
+  | "charset" -> Wserver.wprint "%s" conf.charset
   | "copyright" -> Util.print_copyright conf
   | "doctype" -> Wserver.wprint "%s\n" (Util.doctype conf)
   | "hidden" -> Util.hidden_env conf

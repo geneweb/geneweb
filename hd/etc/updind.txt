@@ -1,9 +1,10 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.21 2005-01-20 15:45:36 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.22 2005-02-03 09:59:13 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
       [*merge::person/persons]1 # %index;
