@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.91 2000-05-06 18:54:35 ddr Exp $
+# $Id: lexicon.txt,v 3.92 2000-05-07 05:55:17 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -4947,6 +4947,7 @@ ru: новая:a:--ую фамилия:a:-ю
 se: efternamns alias
 
     surname list
+dk: efternavnsoversigt
 en: surname list
 fr: liste &eacute;clair
 
