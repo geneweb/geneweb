@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.40 1999-05-17 11:36:27 ddr Exp $
+# $Id: lexicon.txt,v 2.41 1999-05-18 06:38:26 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1178,7 +1178,7 @@ se: kusiner
 
     create
 de: erzeugen
-dk: udf&oslash;r
+dk: opret
 en: create
 es: crear
 fr: cr&eacute;er
@@ -2725,7 +2725,7 @@ se: eller
 
     or use "link" instead of "create"
 de: oder benutzen Sie "verbinden" an Stelle von "erzeugen"
-dk: eller anvend "forbind" i stedet for "udf&oslash;r
+dk: eller anvend "forbind" i stedet for "opret"
 en: or use "link" instead of "create"
 es: o utiliza "reunir" en lugar de "crear"
 he:  או להשתמש ב-"קשר" במקום "עשה" 
