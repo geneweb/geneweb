@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- Copyright (c) 1998-2005 INRIA - GeneWeb -->
-  <!-- $Id: cleanup1.htm,v 1.9 2004-12-14 09:53:18 ddr Exp $ -->
+  <!-- $Id: cleanup1.htm,v 1.10 2005-02-13 17:05:31 ddr Exp $ -->
   <title>[
 de: Aufr&auml;umen - Phase 2
 en: Clean up - Phase 2
@@ -121,6 +121,6 @@ it: Sotto MSdos
         $ del old\%a.gwb\*.*
         $ rmdir old\%a.gwb
         $ move %a.gwb old\.
-     $ %x%/gwc tmp.gw -o %a > comm.log
+     $ %x%/gwc tmp.gw -nofail -o %a > comm.log
 </pre>
 
