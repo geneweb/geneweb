@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.12 1999-07-22 14:34:17 ddr Exp $ *)
+(* $Id: update.ml,v 2.13 1999-07-22 22:14:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -99,6 +99,12 @@ value update_misc_names_of_family base p =
              [cpl.mother :: Array.to_list fam.children])
         (Array.to_list p.family)
   | _ -> () ]
+;
+
+value gen_someone_txt (p_first_name, p_surname) conf base p =
+  p_first_name base p
+  ^ (if p.occ = 0 then "" else "." ^ string_of_int p.occ) ^ " "
+  ^ p_surname base p
 ;
 
 value print_someone conf base p =
@@ -550,8 +556,9 @@ value print_family_stuff conf base p a =
             let s = transl_nth conf "family/families" 0 in
             Wserver.wprint "%s</a>\n"
               (capitale (transl_decline conf "modify" s));
-            Wserver.wprint "\n<em>%s</em>\n" (transl conf "with");
-            print_someone conf base (poi base c);
+            Wserver.wprint "\n<em>%s</em>\n"
+              (transl_decline conf "with"
+                 (gen_someone_txt raw_access conf base (poi base c)));
             Wserver.wprint "\n";
             html_li conf;
             Wserver.wprint "<a href=\"%sm=DEL_FAM;i=%d;ip=%d\">" (commd conf)
@@ -559,8 +566,9 @@ value print_family_stuff conf base p a =
             let s = transl_nth conf "family/families" 0 in
             Wserver.wprint "%s</a>\n"
               (capitale (transl_decline conf "delete" s));
-            Wserver.wprint "\n<em>%s</em>\n" (transl conf "with");
-            print_someone conf base (poi base c);
+            Wserver.wprint "\n<em>%s</em>\n"
+              (transl_decline conf "with"
+                 (gen_someone_txt raw_access conf base (poi base c)));
          return Some fi)
       None (Array.to_list p.family)
     in ();
