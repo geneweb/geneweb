@@ -36,6 +36,11 @@ Default language:
 
 <p>
 
+Body tag property:
+<input name=body_prop value="%vbody_prop;" size=50><br>
+
+<p>
+
 Images path:
 <input name=images_path value="%vimages_path;" size=50><br>
 
