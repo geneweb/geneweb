@@ -1,10 +1,13 @@
-(* $Id: gwcomp.ml,v 4.8 2004-07-16 16:17:54 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.9 2004-07-17 08:30:13 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000m";
+ifndef GDAGNET then
+value magic_gwo = "GnWo000m"
+else
+value magic_gwo = "GdNt000m";
 
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int };
 
