@@ -1,4 +1,4 @@
-# $Id: Makefile.inc,v 4.3 2001-12-17 12:55:25 ddr Exp $
+# $Id: Makefile.inc,v 4.4 2002-01-10 08:53:02 ddr Exp $
 
 TOP=..
 CAMLP4_COMM=TOP=$(TOP) $(TOP)/tools/camlp4_comm.sh pa_ifdef.cmo
@@ -13,6 +13,7 @@ STRIP=strip
 RM=/bin/rm -f
 EXE=
 STATIC=-ccopt -static
+STATIC=
 
 all::
 opt::
