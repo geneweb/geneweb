@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.12 1998-12-19 12:36:05 roglo Exp $ *)
+(* $Id: relationLink.ml,v 1.13 1999-01-08 15:20:57 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -164,11 +164,6 @@ value find_prev_branch base dist ia sa ipl =
 value has_td_width_percent conf =
   let user_agent = Wserver.extract_param "user-agent: " '.' conf.request in
   String.lowercase user_agent <> "mozilla/1"
-;
-
-value has_tables conf =
-  let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
-  String.lowercase user_agent <> "lynx"
 ;
 
 value print_someone conf base ip =
@@ -364,32 +359,6 @@ value print_relation_ok conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
             print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 nb1
           else
             print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2 pb2 nb2;
-       return ()
-     else if not (has_tables conf) then
-       do print_someone conf base ip;
-          print_other_parent_if_same conf base ip b1 b2;
-          Wserver.wprint "<p>\n";
-          tag "ol" begin
-            print_both_branches_no_tables conf base b1 b2;
-          end;
-          if pb1 <> None || pb2 <> None || nb1 <> None || nb2 <> None then
-            do Wserver.wprint "<p>\n";
-               tag "ol" begin
-                 Wserver.wprint "<li value=1>\n";
-                 if b1 <> [] then
-                   print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2
-                     pb1 nb1
-                 else Wserver.wprint "&nbsp;\n";
-                 tag "ol" begin
-                   Wserver.wprint "<li value=2>\n";
-                   if b2 <> [] then
-                     print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2
-                       pb2 nb2
-                   else Wserver.wprint "&nbsp;\n";
-                 end;
-               end;
-            return ()
-          else ();
        return ()
      else
        tag "table" "cellspacing=0 cellpadding=0 width=\"100%%\"" begin
