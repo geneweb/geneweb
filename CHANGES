@@ -18,7 +18,8 @@ GeneWeb version 2.05
 
 * GeneWeb Daemon/CGI (gwd)
   - [Jul 15, 99] Added ability to cancel GeneWeb links in relationship
-    computing.
+    computing. Added a long display too, to print in the same page the
+    detail of each relationship link.
   - [Jul 15, 99] Added system of grammar declinations (required by German,
     Esperanto, (future) Czech). Changed the lexicon to use this new system.
   - [Jul 9, 99] Added link (upper arrow) to welcome page in displayings by
