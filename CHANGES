@@ -2,6 +2,11 @@ GeneWeb version 4.05
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [31 Jan 02] Added a system to restrict access more strict than the
+    "hide_private_names" system. It can be set by setting the variable
+    "use_restrict" to "yes" in the configuration file. In this context,
+    the hidden persons are not clickable and the relationship computing
+    cannot go through them. (Implemented by Ludovic Ledieu.)
   - [30 Jan 02] Fixed (hope so!) displaying of relationship by shortest
     path in case of half siblings: sometimes intermediate parents were
     missing, introducing confusion.
