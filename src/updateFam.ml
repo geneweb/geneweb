@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 1.6 1998-11-13 09:36:36 ddr Exp $ *)
+(* $Id: updateFam.ml,v 1.7 1998-12-07 11:20:58 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -94,22 +94,22 @@ value print_person conf base var fmem (first_name, surname, occ, create) =
   end
 ;
 
-value print_father conf base fam =
+value print_father conf base cpl =
   do stag "h4" begin
        Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 0));
      end;
      Wserver.wprint "\n";
-     print_person conf base "his" Father fam.father;
+     print_person conf base "his" Father cpl.father;
      Wserver.wprint "\n";
   return ()
 ;
 
-value print_mother conf base fam =
+value print_mother conf base cpl =
   do stag "h4" begin
        Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 1));
      end;
      Wserver.wprint "\n";
-     print_person conf base "her" Mother fam.mother;
+     print_person conf base "her" Mother cpl.mother;
      Wserver.wprint "\n";
   return ()
 ;
