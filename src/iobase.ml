@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.10 2002-01-12 12:06:21 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.11 2002-01-12 14:09:33 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1051,75 +1051,73 @@ value gen_output no_patches bname base =
         let strings_array_pos = pos_out oc in
         if not no_patches then output_array (base.data.strings.array ())
         else just_copy bname "strings" oc oc_acc;
-        do {
-          seek_out oc array_start_indexes;
-          output_binary_int oc persons_array_pos;
-          output_binary_int oc ascends_array_pos;
-          output_binary_int oc unions_array_pos;
-          output_binary_int oc families_array_pos;
-          output_binary_int oc couples_array_pos;
-          output_binary_int oc descends_array_pos;
-          output_binary_int oc strings_array_pos;
-          base.data.families.clear_array ();
-          base.data.descends.clear_array ();
-          close_out oc;
-          close_out oc_acc;
-          if not no_patches then
-            let oc_inx = open_out_bin tmp_fname_inx in
-            let oc2 = open_out_bin tmp_fname_gw2 in
-            try
-              do {
-                trace "create name index";
-                output_binary_int oc_inx 0;
-                create_name_index oc_inx base;
-                base.data.ascends.clear_array ();
-                base.data.unions.clear_array ();
-                base.data.couples.clear_array ();
-                if save_mem.val then do { trace "compacting"; Gc.compact () }
-                else ();
-                let surname_or_first_name_pos = pos_out oc_inx in
-                trace "create strings of fsname";
-                create_strings_of_fsname oc_inx base;
-                seek_out oc_inx 0;
-                output_binary_int oc_inx surname_or_first_name_pos;
-                close_out oc_inx;
-                if save_mem.val then do { trace "compacting"; Gc.compact () }
-                else ();
-                trace "create string index";
-                output_strings_hash oc2 base;
-                if save_mem.val then do { trace "compacting"; Gc.compact () }
-                else ();
-                let surname_pos = pos_out oc2 in
-                trace "create surname index";
-                output_surname_index oc2 base;
-                if save_mem.val then do {
-                  trace "compacting"; Gc.compact ()
-                }
-                else ();
-                let first_name_pos = pos_out oc2 in
-                trace "create first name index";
-                output_first_name_index oc2 base;
-                seek_out oc2 int_size;
-                output_binary_int oc2 surname_pos;
-                output_binary_int oc2 first_name_pos;
-                let s = base.data.bnotes.nread 0 in
-                if s = "" then ()
-                else do {
-                  let oc_not = open_out tmp_fname_not in
-                  output_string oc_not s;
-                  close_out oc_not;
-                };
-                close_out oc2;
+        seek_out oc array_start_indexes;
+        output_binary_int oc persons_array_pos;
+        output_binary_int oc ascends_array_pos;
+        output_binary_int oc unions_array_pos;
+        output_binary_int oc families_array_pos;
+        output_binary_int oc couples_array_pos;
+        output_binary_int oc descends_array_pos;
+        output_binary_int oc strings_array_pos;
+        base.data.families.clear_array ();
+        base.data.descends.clear_array ();
+        close_out oc;
+        close_out oc_acc;
+        if not no_patches then
+          let oc_inx = open_out_bin tmp_fname_inx in
+          let oc2 = open_out_bin tmp_fname_gw2 in
+          try
+            do {
+              trace "create name index";
+              output_binary_int oc_inx 0;
+              create_name_index oc_inx base;
+              base.data.ascends.clear_array ();
+              base.data.unions.clear_array ();
+              base.data.couples.clear_array ();
+              if save_mem.val then do { trace "compacting"; Gc.compact () }
+              else ();
+              let surname_or_first_name_pos = pos_out oc_inx in
+              trace "create strings of fsname";
+              create_strings_of_fsname oc_inx base;
+              seek_out oc_inx 0;
+              output_binary_int oc_inx surname_or_first_name_pos;
+              close_out oc_inx;
+              if save_mem.val then do { trace "compacting"; Gc.compact () }
+              else ();
+              trace "create string index";
+              output_strings_hash oc2 base;
+              if save_mem.val then do { trace "compacting"; Gc.compact () }
+              else ();
+              let surname_pos = pos_out oc2 in
+              trace "create surname index";
+              output_surname_index oc2 base;
+              if save_mem.val then do {
+                trace "compacting"; Gc.compact ()
               }
-            with e ->
-              do {
-                try close_out oc_inx with _ -> ();
-                try close_out oc2 with _ -> ();
-                raise e
-              }
-          else ();
-          trace "ok";
-        }
+              else ();
+              let first_name_pos = pos_out oc2 in
+              trace "create first name index";
+              output_first_name_index oc2 base;
+              seek_out oc2 int_size;
+              output_binary_int oc2 surname_pos;
+              output_binary_int oc2 first_name_pos;
+              let s = base.data.bnotes.nread 0 in
+              if s = "" then ()
+              else do {
+                let oc_not = open_out tmp_fname_not in
+                output_string oc_not s;
+                close_out oc_not;
+              };
+              close_out oc2;
+            }
+          with e ->
+            do {
+              try close_out oc_inx with _ -> ();
+              try close_out oc2 with _ -> ();
+              raise e
+            }
+        else ();
+        trace "ok";
       }
     with e ->
       do {
