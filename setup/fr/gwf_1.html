@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>Param&egrave;tres "$a"</title></head>
+
+<body>
+
+<h1>Param&egrave;tres "$a"</h1>
+
+<form mode=GET action="gwf_1">
+<input type=hidden name=lang value=$l>
+<input type=hidden name=anon value=$a>
+
+<p>
+
+Configurez les <a
+href="file://$w/doc/$l/start.htm#Cnf">param&egrave;tres</a> de la base
+<a href="http://localhost:2317/$a">$a</a>:
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>body_prop</strong></td>
+<td>Permet de configurer les couleurs de fond, ou d'y mettre un motif
+et de changer la couleur du texte et des liens. Sa syntaxe est la
+syntaxe HTML acceptée dans le tag "&lt;body&gt;" avant le "&gt;". Voyez votre
+documentation HTML. Exemple:
+<p>
+<pre>
+     background=fond.jpg text=#CC0000 vlink=yellow
+</pre>
+<p>
+Quelques variables int&eacute;ressantes...
+<ul>
+<li>background: image de fond
+<li>bgcolor: couleur de fond
+<li>text: couleur du texte
+<li>link: couleur des liens
+<li>vlink: couleur des liens d&eacute;j&agrave; cliqu&eacute;s
+</ul>
+<p>
+Ceci s'applique non seulement à la page d'accueil mais à toutes les pages
+affichées de cette base.
+</td>
+</tr>
+
+<tr>
+<td colspan=2><input name=body_prop value="$B" size=60></td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>default_lang</strong></td>
+<td>Langue par d&eacute;faut.
+<p>
+Si c'est "-", c'est la langue par d&eacute;faut de la commande "gwd"
+qui sera prise.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<select name=default_lang>
+<option value=$L{}>-
+<option value=$L{cn}>Chinois
+<option value=$L{de}>Allemand
+<option value=$L{dk}>Danois
+<option value=$L{en}>Anglais
+<option value=$L{eo}>Esp&eacute;ranto
+<option value=$L{es}>Espagnol
+<option value=$L{fr}>Fran&ccedil;ais
+<option value=$L{he}>H&eacute;breu
+<option value=$L{it}>Italien
+<option value=$L{nl}>N&eacute;erlandais
+<option value=$L{no}>Norv&eacute;gien
+<option value=$L{pt}>Portugais
+<option value=$L{se}>Su&eacute;dois
+</select>
+</td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>friend_passwd</strong></td>
+<td>Mot de passe "ami".
+<p>
+Les "amis" peuvent voir toutes les dates et autres informations des
+personnes n&eacute;es depuis moins d'un si&egrave;cle. Ceux qui n'ont
+pas entr&eacute; le mot de passe ci-dessous ne verront pas ces
+informations.
+<p>
+S'il est vide, tout le monde est "ami".
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=friend_passwd value="$F" size=30></td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>wizard_passwd</strong></td>
+<td>Mot de passe "sorcier".
+<p>
+Les "sorciers" peuvent en outre faire des modifications dans la base de
+donn&eacute;es.
+<p>
+S'il est vide, tout le monde est "sorcier".
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=wizard_passwd value="$W" size=30></td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>can_send_image</strong></td>
+<td>Possibilit&eacute; d'envoyer des images.
+<p>
+Si oui, les "sorciers" ont l'autorisation d'envoyer des images.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<input type=radio name=can_send_image value=$I[yes]>oui
+<input type=radio name=can_send_image value=$I[no]>non
+</td>
+</tr>
+
+</table></dl>
+
+<p>
+
+Puis appuyez sur ce bouton:
+
+<p>
+
+<dl><dd><input type=submit value="Appliquer"></dl>
+
+</form>

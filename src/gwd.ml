@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.10 1999-04-29 21:01:29 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.11 1999-05-04 05:00:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -276,7 +276,7 @@ value start_with_base conf bname =
   [ Left base ->
       let r = Family.family conf base in
       do Wserver.wflush ();
-         log_count r;
+         if conf.cgi && log_file.val = "" then () else log_count r;
       return ()
   | Right e ->
       let transl conf w =
@@ -380,7 +380,10 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
   in
   let base_env = read_base_env base_file in
   let default_lang =
-    try List.assoc "default_lang" base_env with
+    try
+      let x = List.assoc "default_lang" base_env in
+      if x = "" then default_lang.val else x
+    with
     [ Not_found -> default_lang.val ]
   in
   let lexicon = input_lexicon (if lang = "" then default_lang else lang) in

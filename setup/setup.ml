@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.10 1999-05-03 17:35:24 ddr Exp $ *)
+(* $Id: setup.ml,v 1.11 1999-05-04 05:00:44 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -178,6 +178,29 @@ value conf_with_env conf k v =
   {(conf) with env = list_replace k v conf.env}
 ;
 
+value all_db dir =
+  let list = ref [] in
+  let dh = Unix.opendir dir in
+  do try
+       while True do
+         let e = Unix.readdir dh in
+         if Filename.check_suffix e ".gwb" then
+           list.val := [Filename.chop_suffix e ".gwb" :: list.val]
+         else ();
+       done
+     with [ End_of_file -> () ];
+     Unix.closedir dh;
+     list.val := Sort.list \<= list.val;
+  return list.val
+;
+
+value parse_upto lim =
+  loop 0 where rec loop len =
+    parser
+    [ [: `c when c = lim :] -> get_buff len
+    | [: `c; s = loop (store len c) :] -> s ]
+;
+
 value rec copy_from_stream conf print strm =
   try
     while True do
@@ -187,7 +210,7 @@ value rec copy_from_stream conf print strm =
           match c with
           [ '/' -> ifdef UNIX then print "/" else print "\\"
           | 'a' -> print (strip_spaces (s_getenv conf.env "anon"))
-          | 'b' -> for_all_db conf print "." strm
+          | 'b' -> for_all conf print (all_db ".") strm
           | 'c' -> print (Filename.concat "." conf.comm)
           | 'd' -> print conf.comm
           | 'e' ->
@@ -222,6 +245,7 @@ value rec copy_from_stream conf print strm =
                    conf.env;
               return ()
           | 'i' -> print (strip_spaces (s_getenv conf.env "i"))
+          | 'k' -> for_all conf print (fst (List.split conf.env)) strm
           | 'l' -> print conf.lang
           | 'o' -> print (strip_spaces (s_getenv conf.env "o"))
           | 'p' -> print (parameters conf.env)
@@ -231,11 +255,25 @@ value rec copy_from_stream conf print strm =
               let out = strip_spaces (s_getenv conf.env "o") in
               print_if_exists conf print (out ^ ".gwb") strm
           | 'w' -> print (Sys.getcwd ())
-          | 'y' -> for_all_db conf print (s_getenv conf.env "anon") strm
+          | 'y' -> for_all conf print (all_db (s_getenv conf.env "anon")) strm
           | 'z' -> print (string_of_int port)
           | '$' -> print "$"
           | 'A'..'Z' as c ->
-              print (strip_spaces (s_getenv conf.env (String.make 1 c)))
+              match p_getenv conf.env (String.make 1 c) with
+              [ Some v ->
+                  match strm with parser
+                  [ [: `'{' :] ->
+                      let s = parse_upto '}' strm in
+                      do print "\""; print s; print "\"";
+                         if v = s then print " selected" else ();
+                      return ()
+                  | [: `'[' :] ->
+                      let s = parse_upto ']' strm in
+                      do print "\""; print s; print "\"";
+                         if v = s then print " checked" else ();
+                      return ()
+                  | [: :] -> print (strip_spaces v) ]
+              | None -> print "BAD MACRO" ]
           | c -> do print "BAD MACRO "; print (String.make 1 c); return () ]
       | c -> print (String.make 1 c) ];
     done
@@ -244,12 +282,7 @@ value rec copy_from_stream conf print strm =
 and print_log conf print strm =
   match Stream.next strm with
   [ '{' ->
-      let s =
-        loop 0 where rec loop len =
-          match Stream.next strm with
-          [ '}' -> get_buff len
-          | c -> loop (store len c) ]
-      in
+      let s = parse_upto '}' strm in
       let comm_log = "comm.log" in
       if Sys.file_exists comm_log then
         let ic = open_in comm_log in
@@ -263,57 +296,28 @@ and print_log conf print strm =
 and print_if_exists conf print fname strm =
   match Stream.next strm with
   [ '{' ->
-      let s =
-        loop 0 where rec loop len =
-          match Stream.next strm with
-          [ '}' -> get_buff len
-          | c -> loop (store len c) ]
-      in
+      let s = parse_upto '}' strm in
       if Sys.file_exists fname then
         copy_from_stream conf print (Stream.of_string s)
       else ()
   | _ -> () ]
-and for_all_db conf print dir strm =
+and for_all conf print list strm =
   match Stream.next strm with
   [ '{' ->
-      let s_exist =
-        loop 0 where rec loop len =
-          match Stream.next strm with
-          [ '|' -> get_buff len
-          | c -> loop (store len c) ]
-      in
-      let s_empty =
-        loop 0 where rec loop len =
-          match Stream.next strm with
-          [ '}' -> get_buff len
-          | c -> loop (store len c) ]
-      in
-      let list = ref [] in
-      let dh = Unix.opendir dir in
-      do try
-           while True do
-             let e = Unix.readdir dh in
-             if Filename.check_suffix e ".gwb" then
-               list.val := [e :: list.val]
-             else ();
-           done
-         with [ End_of_file -> () ];
-         Unix.closedir dh;
-         list.val := Sort.list \<= list.val;
-         if list.val <> [] then
-           List.iter
-             (fun e ->
-                let db = Filename.chop_suffix e ".gwb" in
-                let conf = conf_with_env conf "anon" db in
-                do copy_from_stream conf print (Stream.of_string s_exist);
-                   print "\n";
-                return ())
-             list.val
-          else
-            do copy_from_stream conf print (Stream.of_string s_empty);
-               print "\n";
-            return ();
-      return ()
+      let s_exist = parse_upto '|' strm in
+      let s_empty = parse_upto '}' strm in
+      if list <> [] then
+        List.iter
+          (fun db ->
+             let conf = conf_with_env conf "anon" db in
+             do copy_from_stream conf print (Stream.of_string s_exist);
+                print "\n";
+             return ())
+          list
+       else
+         do copy_from_stream conf print (Stream.of_string s_empty);
+            print "\n";
+         return ()
   | _ -> () ]
 ;
 
@@ -696,6 +700,153 @@ value cleanup_1 conf =
   return ()
 ;  
 
+value rec check_new_names conf l1 l2 =
+  match (l1, l2) with
+  [ ([(k, v) :: l], [x :: m]) ->
+      if k <> x then do print_file conf "err_outdated.html"; return raise Exit
+      else if not (good_name v) then
+        let conf = {(conf) with env = [("o", v) :: conf.env]} in
+        do print_file conf "err_name.html"; return raise Exit
+      else check_new_names conf l m
+  | ([], []) -> ()
+  | _ -> do print_file conf "err_outdated.html"; return raise Exit ]
+;
+
+value rec check_rename_conflict conf =
+  fun
+  [ [x :: l] ->
+      if List.mem x l then
+        let conf = {(conf) with env = [("o", x) :: conf.env]} in
+        do print_file conf "err_conflict.html"; return raise Exit
+      else check_rename_conflict conf l
+  | [] -> () ]
+;
+
+value rename conf =
+  let rename_list =
+    List.map (fun (k, v) -> (k, strip_spaces (decode_varenv v))) conf.env
+  in
+  try
+    do check_new_names conf rename_list (all_db ".");
+       check_rename_conflict conf (snd (List.split rename_list));
+       List.iter
+         (fun (k, v) ->
+            if k <> v then Sys.rename (k ^ ".gwb") ("_" ^ k ^ ".gwb")
+            else ())
+         rename_list;
+       List.iter
+         (fun (k, v) ->
+            if k <> v then Sys.rename ("_" ^ k ^ ".gwb") (v ^ ".gwb")
+            else ())
+         rename_list;
+       print_file conf "rename_ok.html";
+    return ()
+  with
+  [ Exit -> () ]
+;
+
+value delete conf =
+  print_file conf "delete_1.html"
+;
+
+value delete_1 conf =
+  do List.iter
+       (fun (k, v) -> if v = "del" then rm_base (k ^ ".gwb") else ())
+       conf.env;
+     print_file conf "delete_ok.html";
+  return ()
+;
+
+value rec cut_at_equal s =
+  try
+    let i = String.index s '=' in
+    (String.sub s 0 i, String.sub s (succ i) (String.length s - succ i))
+  with
+  [ Not_found -> (s, "") ]
+;
+
+value read_base_env bname =
+  let fname = bname ^ ".gwf" in
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let env =
+        loop [] where rec loop env =
+          match try Some (input_line ic) with [ End_of_file -> None ] with
+          [ Some s ->
+              if s = "" || s.[0] = '#' then loop env
+              else loop [cut_at_equal s :: env]
+          | None ->
+              env ]
+      in
+      do close_in ic; return env
+  | None -> [] ]
+;
+
+value read_gwd_arg () =
+  let fname = "gwd.arg" in
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let list =
+        loop [] where rec loop list =
+          match try Some (input_line ic) with [ End_of_file -> None ] with
+          [ Some "" -> loop list
+          | Some s -> loop [s :: list]
+          | None -> list ]
+      in
+      do close_in ic; return
+      loop [] (List.rev list) where rec loop env =
+        fun
+        [ [x :: l] ->
+            if x.[0] = '-' then
+              let x = String.sub x 1 (String.length x - 1) in
+              match l with
+              [ [y :: l] when y.[0] <> '-' -> loop [(x, y) :: env] l
+              | _ -> loop [(x, "") :: env] l ]
+            else loop env l
+        | [] -> env ]
+  | None -> [] ]
+;
+
+value gwf conf =
+  let in_base =
+    match p_getenv conf.env "anon" with
+    [ Some f -> strip_spaces f
+    | None -> "" ]
+  in
+  if in_base = "" then print_file conf "err_missing.html"
+  else
+    let benv = read_base_env in_base in
+    let get v = try List.assoc v benv with [ Not_found -> "" ] in
+    let conf =
+      {(conf) with env =
+         [("B", get "body_prop"); ("L", get "default_lang");
+          ("F", get "friend_passwd"); ("W", get "wizard_passwd");
+          ("I", get "can_send_image") :: conf.env]}
+    in
+    print_file conf "gwf_1.html"
+;
+
+value gwf_1 conf =
+  let in_base =
+    match p_getenv conf.env "anon" with
+    [ Some f -> strip_spaces f
+    | None -> "" ]
+  in
+  let oc = open_out (in_base ^ ".gwf") in
+  do Printf.fprintf oc "# File generated by \"setup\"\n\n";
+     Printf.fprintf oc "body_prop=%s\n" (s_getenv conf.env "body_prop");
+     Printf.fprintf oc "default_lang=%s\n" (s_getenv conf.env "default_lang");
+     Printf.fprintf oc "friend_passwd=%s\n"
+       (s_getenv conf.env "friend_passwd");
+     Printf.fprintf oc "wizard_passwd=%s\n"
+       (s_getenv conf.env "wizard_passwd");
+     Printf.fprintf oc "can_send_image=%s\n"
+       (s_getenv conf.env "can_send_image");
+     close_out oc;
+     print_file conf "gwf_ok.html";
+  return ()
+;
+
 value exec_command_out conf =
   let rc =
     exec_f (Filename.concat "." conf.comm ^ parameters conf.env)
@@ -740,6 +891,9 @@ value setup_comm conf =
   | "recover_2" -> recover_2 conf
   | "cleanup" -> cleanup conf
   | "cleanup_1" -> cleanup_1 conf
+  | "rename" -> rename conf
+  | "delete" -> delete conf
+  | "delete_1" -> delete_1 conf
   | "gwc" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> gwc_check conf
@@ -760,6 +914,8 @@ value setup_comm conf =
       match p_getenv conf.env "opt" with
       [ Some "check" -> consang_check conf
       | _ -> exec_command_in conf "consang_ok.html" ]
+  | "gwf" -> gwf conf
+  | "gwf_1" -> gwf_1 conf
   | x -> error ("bad command: \"" ^ x ^ "\"") ]
 ;
 

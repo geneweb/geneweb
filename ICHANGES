@@ -5,6 +5,9 @@ GeneWeb Intermediate Version 2.01-2
 -----------------------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [May 4, 99] If default_lang of some base (file "base.gwf") is empty
+    set it to default_lang of command "gwd" (was set before only when
+    default_lang was not defined). Changed for the "setup" program.
   - [May 2, 99] Fixed small uncomfortable feature: when a new couple was
     added with new (created) persons, then modified to add existing
     children, the field "origin_file" was not updated for the family.

@@ -1,25 +1,22 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>Renommage</title></head>
+<head><title>Param&egrave;tres</title></head>
 
 <body>
 
-<h1>Renommage</h1>
+<h1>Param&egrave;tres</h1>
 
-<form mode=GET action="rename">
+<form mode=GET action="gwf">
 <input type=hidden name=lang value=$l>
 
-Changez le ou les noms que vous d&eacute;sirez:
+S&eacute;lectionnez votre base de donn&eacute;es:
 
 <p>
 
 <dl><dd><table border=1 cellspacing=0 cellpadding=1>
 
-$b{
-<tr>
-<td><a href="http://localhost:2317/$a">$a</a></td>
-<td><input name="$a" value="$a" size=20></td>
-</tr>|
+$b{<tr><td><input type=radio name=anon
+value="$a">&nbsp;&nbsp;&nbsp;</td><td>$a</td></tr>|
 <tr><td>il n'y a aucune base de donn&eacute;es actuellement</tr></td>}
 
 </table></dl>
@@ -30,6 +27,6 @@ Puis appuyez sur ce bouton:
 
 <p>
 
-<dl><dd><input type=submit value="Renommer"></dl>
+<dl><dd><input type=submit value="Configurer"></dl>
 
 </form>
