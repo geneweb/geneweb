@@ -2,6 +2,7 @@
                 -------
 
 	Languages
+		Chinese		Gang Chen
 		Dutch		Joris Esch
 				Wijnand J. Nijs
 		German		Markus Mottl
@@ -14,8 +15,10 @@
 		Dutch		Joris Esch
 		Swedish		Lars Gustavsson
 
-	Program written by Daniel de Rauglaudre.
+        Algorithms of consanguinity and relationship
+                                Didier Rémy
 
+	Program written by Daniel de Rauglaudre.
 
 Warning: this credits file has been started quite late (February 2,
 1999). I don't remember all persons' names having participated to
