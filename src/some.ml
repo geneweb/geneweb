@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.19 2002-10-21 13:53:46 ddr Exp $ *)
+(* $Id: some.ml,v 4.20 2002-11-14 02:43:13 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -503,8 +503,6 @@ value surname_print conf base not_found_fun x =
          (iperl1 @ iperl, [(str, len) :: strl]))
       l ([], [])
   in
-  let strl = Sort.list (fun (_, len1) (_, len2) -> len1 >= len2) strl in
-  let strl = List.map fst strl in
   match p_getenv conf.env "o" with
   [ Some "i" ->
       let pl =
@@ -518,7 +516,9 @@ value surname_print conf base not_found_fun x =
         else pl
       in
       print_family_alphabetic x conf base pl
-  | _ ->
+  | _ -> 
+      let strl = Sort.list (fun (_, len1) (_, len2) -> len1 >= len2) strl in
+      let strl = List.map fst strl in
       let iperl = select_ancestors conf base name_inj iperl in
       let pl = List.map (pget conf base) iperl in
       print_by_branch x conf base not_found_fun (pl, strl) ]
