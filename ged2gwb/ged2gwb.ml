@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.27 2002-02-26 04:32:01 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.28 2002-02-26 04:58:11 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1538,7 +1538,8 @@ value add_indi gen r =
     List.map (fun r -> fam_index gen r) rvl
   in
   let rparents =
-    let godparents = find_all_rela ["godf"; "godm"; "godp"] r.rsons in
+    let rl = find_all_fields "ASSO" r.rsons in
+    let godparents = find_all_rela ["godf"; "godm"; "godp"] rl in
     let godparents =
       if godparents = [] then
         let ro =
@@ -1547,10 +1548,25 @@ value add_indi gen r =
           | x -> x ]
         in
         match ro with
-        [ Some r -> find_all_rela ["godf"; "godm"; "godp"] r.rsons
+        [ Some r -> find_all_rela ["godf"; "godm"; "godp"] rl
         | None -> [] ]
       else godparents
     in
+    let rec find_rela n f =
+      fun
+      [ [] -> None
+      | [r :: rl] ->
+          match find_field "RELA" r.rsons with
+          [ Some r1 ->
+              let len = String.length n in
+              if String.length r1.rval >= len &&
+                 String.lowercase (String.sub r1.rval 0 len) = n
+              then
+                Some (f gen i r.rval)
+              else find_rela n f rl
+          | None -> find_rela n f rl ] ]
+    in
+    let witn = find_rela "witness" forward_witn rl in
     loop godparents where rec loop rl =
       if rl <> [] then
         let (r_fath, rl) =
