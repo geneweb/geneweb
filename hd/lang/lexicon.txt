@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.160 2000-10-03 11:53:36 ddr Exp $
+# $Id: lexicon.txt,v 3.161 2000-10-11 15:18:36 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -34,6 +34,7 @@ es: de=Alem&aacute;n/cs=Checo/cn=Chino/dk=Dan&eacute;s/es=Espa&ntilde;ol/eo=Espe
 fi: af=afrikaani/cn=kiina/cs=tsekki/de=saksa/dk=tanska/en=englanti/eo=esperanto/es=espanja/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/se=ruotsi
 fr: af=afrikaans/cn=chinois/cs=tch&egrave;que/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pt=portugais/ru=russe/se=su&eacute;dois
 lv: cn=Ноnieрu/cs=Иehu/dk=Dвтu/nl=Holandieрu/en=Angпu/eo=Esperanto/fi=Somu/fr=Franиu/de=Vвcu/he=Ebreju/is=Islandieры/it=Itвпu/lv=Latvieрu/no=Norvзмu/pt=Portugвпu/es=Spвтu/ru=Krievu/se=Zviedru
+pt: af=Afrikaans/cn=Chin&ecirc;/cs=Checo/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;/en=Ingl&ecirc;/eo=Esperanto/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
 se: af=afrikaans/cn=kinesiska/cs=tjeckiska/dk=danska/en=engelska/eo=esperanto/fi=finska/fr=franska/de=tyska/he=hebreiska/is=isl&auml;ndska/it=italienska/lv=litauiska/nl=holl&auml;ndska/no=norska/pt=portugisiska/es=spanska/ru=ryska/se=svenska
 
      to see the first branch
@@ -92,7 +93,7 @@ it:  per provare di nuovo con questo numero, oppure fate "back" e scieglietene u
 lv:  mзмiniet vзlreiz ar рo nummuru, vai ejiet atpakaп un nomainiet to
 nl: , om dit nummer weer te proberen, of druk "terug" en verander het zelf
 no:  for е pr&oslash;ve igjen med dette nummeret, eller g&aring; tilbake og endre det selv
-pt: para tentar novamente com este n&uacute;mero ou fazer "back" e escolher outro
+pt: para tentar novamente com este n&uacute;mero ou fa&ccedil; "back" e escolha outro
 ru: для того, чтобы пытаться снова с этим числом, или нажмите "назад" или измените его сами
 se:  f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer eller g&aring; tillbaka och &auml;ndra det sj&auml;lv
 
@@ -272,7 +273,7 @@ it: %t sarebbe nato pi&ugrave; di 2 anni dopo la morte di suo padre %t
 lv: %t ir dzimis vairвk kв 2 gadus pзc sava tзva nвves %t
 nl: %t is geboren meer dan twee jaar na de dood van zijn/haar vader
 no: %t er f&oslash;dt mer enn 2 &aring;r etter sin fars d&oslash;d %t
-pt: %t nasceu 2 anos depois do &oacute;bito do pai
+pt: %t nasceu mais de 2 anos depois do &oacute;bito do pai
 ru: %t родился более, чем через 2 года после смерти его/ее отца %t
 se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
 
@@ -490,7 +491,7 @@ it: cugini di 3o grado
 lv: treрвs pakвpes brвlзns mвsоca
 nl: neven en nichten in de 3e graad
 no: firmenninger
-pt: primos 3ro
+pt: primos 3ros
 ru: троюродные кузены/троюродные кузины
 se: bryllingar
 
@@ -1022,7 +1023,7 @@ it: figlio adottivo/figlia adottiva/figlio addotivo
 lv: padзls/pameita/pabзrns
 nl: geadopteerde zoon/geadopteerde dochter/adoptiekind
 no: adoptivs&oslash;nn/adoptivdatter/adoptivbarn
-pt: filho adoptivo/filha adoptiva/filho adoptivo
+pt: filho adoptivo/filha adoptiva/filho(a) adoptivo(a)
 ru: приемный сын/приемная дочь/приемны ребенок
 se: adoptivson/adoptivdotter/adoptivbarn
 
@@ -2816,7 +2817,7 @@ it: figlioccio/figlioccia/figlioccio
 lv: krustdзls/krustmeita/krustbзrns
 nl: peetzoon/peetdochter/petekind
 no: guds&oslash;nn/guddatter/gudbarn
-pt: afilhado/afilhada/afilhados
+pt: afilhado/afilhada/afilhado(a)
 ru: крестник/крестница/крестник
 se: gudson/guddotter/gudbarn
 
@@ -3187,7 +3188,7 @@ it: sessi incompatibili
 lv: nesavietojami dzimumi
 nl: geslacht komt niet overeen
 no: uforenlig kj&oslash;nn
-pt: sexos incompativeis
+pt: sexos incompat&iacute;veis
 ru: несовместимый пол
 se: of&ouml;renliga k&ouml;n
 
@@ -3247,7 +3248,7 @@ it: infatti,
 lv: patieрвm,
 nl: inderdaad:
 no: felles forfedre,
-pt: por efeito,
+pt: com efeito,
 ru: на самом деле,
 se: faktiskt,
 
@@ -3327,7 +3328,7 @@ it: &egrave;
 lv: ir
 nl: is
 no: er
-pt:  &eacute;
+pt: &eacute;
 ru:  
 se: &auml;r
 
@@ -5362,6 +5363,7 @@ it: statistica
 lv: statistika
 nl: statistieken
 no: statistikk
+pt: estat&iacute;sticas
 se: statistik
 
     surname alias
@@ -5400,7 +5402,7 @@ it: cognome mancante
 lv: trыkst uzvвrds
 nl: familienaam ontbreekt
 no: etternavn mangler
-pt: falta apelido
+pt: falta o apelido
 ru: фамилия утрачена
 se: efternamn saknas
 
@@ -5569,6 +5571,7 @@ it: i%d piщ vecchi possono essere ancora viventi
 lv: %d visvecвkie iespзjams vзl ir dzоvi
 nl: de %d oudsten, mogelijk nog in leven
 no: dei %d eldste som muligens lever
+pt: os %d mais velhos talvez ainda vivos
 se: de %d &auml;ldsta som kanske lever
 
     the %d surnames
@@ -5603,6 +5606,7 @@ it: %d avendo visuto piщ a lungo
 lv: %d, kuri dzоvojuрi visilgвk
 nl: de %d langst levende personen
 no: dei %d som har levd lengst
+pt: os %d que mais viveram 
 se: de %d som har levt l&auml;ngst
 
     the %s generation
@@ -6532,7 +6536,7 @@ it: dovete in primo luogo fondere
 lv: Jums vispirms ir jвapvieno
 nl: je moet eerst samenvoegen
 no: du m&aring; f&oslash;rst sl&aring; sammen
-pt: Voc&ecirc; tem que fundir primeiro
+pt: tem que fundir primeiro
 ru: вы должны сначала объединить
 se: du m&aring;ste f&ouml;rst sl&aring; samman
 
@@ -6552,6 +6556,6 @@ it: dovete in primo luogo fondere le 2 famiglie
 lv: Jums vispirms ir jвpvieno 2 мimenes
 nl: je moet de twee families eerst samenvoegen
 no: du m&aring; f&oslash;rst sl&aring; sammen de 2 familiene
-pt: Voc&ecirc; tem que fundir primeiro as 2 fam&iacute;lias
+pt: primeiro tem que fundir as 2 fam&iacute;lias
 ru: вы должны сначала объединить 2 семьи
 se: du m&aring;ste f&ouml;rst sl&aring; samman de 2 familjerna
