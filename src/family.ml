@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.13 2000-01-10 02:14:38 ddr Exp $ *)
+(* $Id: family.ml,v 3.14 2000-01-22 01:22:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -228,33 +228,30 @@ value precisez conf base n pl =
                       tl;
                  return () ];
              Date.afficher_dates_courtes conf base p;
-             match p.sex with
-             [ Female ->
-                 let husbands =
-                   List.fold_right
-                     (fun ifam husbands ->
-                        let cpl = coi base ifam in
-                        let husband = poi base cpl.father in
-                        if p_surname base husband <> "?" then
-                          [husband :: husbands]
-                        else husbands)
-                     (Array.to_list (uoi base p.cle_index).family) []
-                 in
-                 match husbands with
-                 [ [] -> ()
-                 | [h :: hl] ->
-                     do Wserver.wprint ", <em>%s "
-                          (transl_nth conf "spouse" 1);
-                        afficher_personne_titre conf base h;
-                        List.iter
-                          (fun h ->
-                             do Wserver.wprint ", %s\n" (transl conf "and");
-                                afficher_personne_titre conf base h;
-                             return ())
-                          hl;
-                        Wserver.wprint "</em>\n";
-                     return () ]
-             | _ -> () ];
+             let spouses =
+               List.fold_right
+                 (fun ifam spouses ->
+                    let cpl = coi base ifam in
+                    let spouse = poi base (spouse p.cle_index cpl) in
+                    if p_surname base spouse <> "?" then
+                      [spouse :: spouses]
+                    else spouses)
+                 (Array.to_list (uoi base p.cle_index).family) []
+             in
+             match spouses with
+             [ [] -> ()
+             | [h :: hl] ->
+                 do Wserver.wprint ", <em>%s "
+                      (transl_nth conf "spouse" (index_of_sex p.sex));
+                    afficher_personne_titre conf base h;
+                    List.iter
+                      (fun h ->
+                         do Wserver.wprint ", %s\n" (transl conf "and");
+                            afficher_personne_titre conf base h;
+                         return ())
+                      hl;
+                    Wserver.wprint "</em>\n";
+                 return () ];
           return ())
        ptll;
      Wserver.wprint "</ul>\n";
