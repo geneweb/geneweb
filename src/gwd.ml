@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.46 1999-09-26 19:24:31 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.47 1999-09-30 13:13:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -444,7 +444,7 @@ value make_conf cgi (addr, request) str env =
     | ("", env) -> ("", env)
     | (x, env) -> ("", [("opt", x) :: env]) ]
   in
-let (threshold_test, env) = extract_assoc "th" env in
+let (threshold_test, env) = extract_assoc "threshold" env in
 do if threshold_test <> "" then RelationLink.threshold.val := int_of_string threshold_test else (); return
   let (sleep, env) =
     let (x, env) = extract_assoc "sleep" env in
