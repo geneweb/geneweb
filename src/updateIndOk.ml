@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.13 1999-07-16 13:28:09 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.14 1999-07-17 08:33:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -334,17 +334,19 @@ value effective_mod conf base sp =
   let pi = sp.cle_index in
   let op = poi base pi in
   let key = sp.first_name ^ " " ^ sp.surname in
-  do if Name.strip_lower (sou base op.first_name) =
-          Name.strip_lower sp.first_name
-     && Name.strip_lower (sou base op.surname) =
-          Name.strip_lower sp.surname
+  let ofn = sou base op.first_name in
+  let osn = sou base op.surname in
+  do if Name.strip_lower ofn = Name.strip_lower sp.first_name
+     && Name.strip_lower osn = Name.strip_lower sp.surname
      && op.occ == sp.occ then ()
      else
        let ipl = person_ht_find_all base key in
        do check_conflict conf base sp ipl;
-          person_ht_add base key pi;
           rename_image_file conf base op sp;
        return ();
+     if Name.crush_lower (ofn ^ " " ^ osn) <> Name.crush_lower key then
+       person_ht_add base key pi
+     else ();
      check_sex_married conf base sp op;
   return
   let np = map_person_strings (Update.insert_string conf base) sp in
