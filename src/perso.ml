@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.73 2005-02-07 14:13:32 ddr Exp $ *)
+(* $Id: perso.ml,v 4.74 2005-02-17 04:04:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -545,12 +545,7 @@ and eval_person_var conf base env ((_, a, _, _) as ep) loc =
       in
       loop env
   | ["father" :: sl] ->
-      let famo =
-        match get_env "fam" env with
-        [ Vfam fam _ _ -> Some fam.fam_index
-        | _ -> parents a ]
-      in
-      match famo with
+      match parents a with
       [ Some ifam ->
           let cpl = coi base ifam in
           let ep = make_ep conf base (father cpl) in
@@ -558,12 +553,7 @@ and eval_person_var conf base env ((_, a, _, _) as ep) loc =
       | None ->
           warning_use_has_parents_before_parent loc "father" (str_val "") ]
   | ["mother" :: sl] ->
-      let famo =
-        match get_env "fam" env with
-        [ Vfam fam _ _ -> Some fam.fam_index
-        | _ -> parents a ]
-      in
-      match famo with
+      match parents a with
       [ Some ifam ->
           let cpl = coi base ifam in
           let ep = make_ep conf base (mother cpl) in
@@ -1088,10 +1078,10 @@ and print_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in
   let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
   List.iter (print_ast conf base env ep) al
-and print_foreach conf base env ep loc s sl al =
+and print_foreach conf base env ini_ep loc s sl al =
   let rec loop ((_, a, _, _) as ep) efam =
     fun 
-    [ [s] -> print_simple_foreach conf base env al ep efam s
+    [ [s] -> print_simple_foreach conf base env al ini_ep ep efam s
     | ["child" :: sl] ->
         match get_env "child" env with
         [ Vind p a u ->
@@ -1123,21 +1113,27 @@ and print_foreach conf base env ep loc s sl al =
             loop ep efam sl
         | None ->
             warning_use_has_parents_before_parent loc "mother" () ]
+    | ["spouse" :: sl] ->
+        match efam with
+        [ Vfam _ (_, ip) _ ->
+            let ep = make_ep conf base ip in
+            loop ep efam sl
+        | _ -> raise Not_found ]
     | _ -> raise Not_found ]
   in
   let efam = get_env "fam" env in
-  try loop ep efam [s :: sl] with
+  try loop ini_ep efam [s :: sl] with
   [ Not_found ->
       do {
         Wserver.wprint " %%foreach;%s" s;
         List.iter (fun s -> Wserver.wprint ".%s" s) sl;
         Wserver.wprint "?"
       } ]
-and print_simple_foreach conf base env al ep efam =
+and print_simple_foreach conf base env al ini_ep ep efam =
   fun
   [ "alias" -> print_foreach_alias conf base env al ep
   | "child" -> print_foreach_child conf base env al ep efam
-  | "family" -> print_foreach_family conf base env al ep
+  | "family" -> print_foreach_family conf base env al ini_ep ep
   | "first_name_alias" -> print_foreach_first_name_alias conf base env al ep
   | "nobility_title" -> print_foreach_nobility_title conf base env al ep
   | "parent" -> print_foreach_parent conf base env al ep
@@ -1195,7 +1191,7 @@ and print_foreach_child conf base env al ep =
            List.iter (print_ast conf base env ep) al)
         des.children
   | _ -> () ]
-and print_foreach_family conf base env al ((p, _, u, _) as ep) =
+and print_foreach_family conf base env al ini_ep ((p, _, u, _) as ep) =
   Array.iteri
     (fun i ifam ->
        let fam = foi base ifam in
@@ -1205,7 +1201,7 @@ and print_foreach_family conf base env al ((p, _, u, _) as ep) =
        let env = [("#loop", Vint 0) :: env] in
        let env = [("fam", Vfam fam cpl des) :: env] in
        let env = [("family_cnt", Vint (i + 1)) :: env] in
-       List.iter (print_ast conf base env ep) al)
+       List.iter (print_ast conf base env ini_ep) al)
     u.family
 and print_foreach_first_name_alias conf base env al ((p, _, _, p_auth) as ep) =
   if p_auth then
