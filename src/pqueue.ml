@@ -1,4 +1,4 @@
-(* $Id: pqueue.ml,v 3.1 2000-01-10 02:14:41 ddr Exp $ *)
+(* $Id: pqueue.ml,v 3.2 2000-02-25 12:01:16 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 module type OrderedType = sig type t = 'a; value leq : t -> t -> bool; end;
@@ -42,15 +42,15 @@ module Make (Ord : OrderedType) =
     value empty : t = [];
     value is_empty (q : t) = q = [];
     value add x q = ins {node = x; rank = 0; list = []} q;
+    value rec getMin =
+      fun
+      [ [] -> raise Not_found
+      | [t] -> (t, [])
+      | [t :: ts] ->
+          let (t', ts') = getMin ts in
+          if Ord.leq t.node t'.node then (t, ts) else (t', [t :: ts']) ]
+    ;
     value take ts =
-      let rec getMin =
-        fun
-        [ [] -> raise Not_found
-        | [t] -> (t, [])
-        | [t :: ts] ->
-            let (t', ts') = getMin ts in
-            if Ord.leq t.node t'.node then (t, ts) else (t', [t :: ts']) ]
-      in
       let (t, ts) = getMin ts in (t.node, union (List.rev t.list) ts)
     ;
   end
