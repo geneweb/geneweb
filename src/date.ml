@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 2.17 1999-09-27 14:56:31 ddr Exp $ *)
+(* $Id: date.ml,v 2.18 1999-09-30 01:06:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -32,8 +32,8 @@ value code_date conf encoding d m y =
 
 value french_month =
   let tab =
-    [| "vendemiaire"; "brumaire"; "frimaire"; "niv&ocirc;se";
-       "pluvi&ocirc;se"; "vent&ocirc;se"; "germinal"; "floreal";
+    [| "vend&eacute;miaire"; "brumaire"; "frimaire"; "niv&ocirc;se";
+       "pluvi&ocirc;se"; "vent&ocirc;se"; "germinal"; "flor&eacute;al";
        "prairial"; "messidor"; "thermidor"; "fructidor";
        "compl&eacute;mentaire" |]
   in
