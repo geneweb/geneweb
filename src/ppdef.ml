@@ -1,10 +1,12 @@
 (* camlp4r *)
-(* $Id: ppdef.ml,v 4.6 2005-03-02 12:34:39 ddr Exp $ *)
+(* $Id: ppdef.ml,v 4.7 2005-03-02 13:05:19 ddr Exp $ *)
 
 #load "pa_extend.cmo";
 #load "q_MLast.cmo";
 
 open Pcaml;
+
+Stdpp.loc_name.val := "loc";
 
 type item_or_def 'a =
   [ SdStr of 'a

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.23 2005-03-01 05:50:43 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.24 2005-03-02 13:05:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -11,12 +11,6 @@ open TemplAst;
 value bogus_person_index = Adef.iper_of_int (-1);
 
 value string_person_of base p =
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  let occ =
-    if first_name = "?" || surname = "?" then Adef.int_of_iper p.cle_index
-    else p.occ
-  in
   let fp ip =
     let p = poi base ip in
     (sou base p.first_name, sou base p.surname, p.occ, Update.Link, "")

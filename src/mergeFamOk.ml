@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 4.10 2004-12-14 09:30:14 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 4.11 2005-03-02 13:05:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -19,12 +19,6 @@ value merge_strings base is1 sep is2 =
 
 value sorp base ip =
   let p = poi base ip in
-  let first_name = p_first_name base p in
-  let surname = p_surname base p in
-  let occ =
-    if first_name = "?" || surname = "?" then Adef.int_of_iper p.cle_index
-    else p.occ
-  in
   (sou base p.first_name, sou base p.surname, p.occ, Update.Link, "")
 ;
 

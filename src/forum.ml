@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.45 2005-02-20 06:39:31 ddr Exp $ *)
+(* $Id: forum.ml,v 4.46 2005-03-02 13:05:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -462,7 +462,6 @@ value print_one_forum_message conf m pos next_pos forum_length =
     if m.m_wizard <> "" && conf.wizard && conf.user = m.m_wizard &&
       passwd_in_file conf
     then
-      let s = message_txt conf 0 in
       tag "form" "method=\"post\" action=\"%s\"" conf.command begin
         tag "p" begin
           Util.hidden_env conf;
@@ -671,7 +670,6 @@ value forum_del conf base pos next_pos =
       let oc = Secure.open_out tmp_fname in
       let len = in_channel_length ic in
       let pos = len - pos in
-      let next_pos = len - next_pos in
       do {
         loop 0 where rec loop i =
           if i = len then ()
