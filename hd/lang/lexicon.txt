@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.170 2000-11-05 10:17:18 ddr Exp $
+# $Id: lexicon.txt,v 3.171 2000-11-05 11:06:41 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -6468,7 +6468,6 @@ fi: %s ja %s avioliiton todistaja
 fr: t&eacute;moin au mariage de %s et de %s
 he:  אדים בחתונה של %s ו-%s
 is: vitni aנ giftingu %s og %s
-
 lv: liecinieks %s un %s laulמbגs
 nl: getuige bij het huwelijk van %s en %s
 no: forlover ved ekteskap mellom %s og %s
