@@ -16,6 +16,10 @@ GeneWeb Version 2.06
     Added the executable "setup" in "gw" directory as name "gwsetup".
 
 * GeneWeb daemon/CGI (gwd)
+  - [Aug 17, 99] If option "-auth" used, print the password area like in
+    cgi mode (i.e. an input area instead of hypertexts triggering a window
+    for password), because the auth password and the wizard/friend password
+    are contradictory.
   - [Aug 17, 99] In display by first name or surname, when several spellings
     are found, display them in decreasing frequence order.
   - [Aug 14, 99] In srcfile.ml, for start.txt files, added "o" macro
