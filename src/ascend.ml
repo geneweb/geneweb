@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.22 2000-04-05 07:15:28 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.23 2000-04-06 09:11:28 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -120,7 +120,6 @@ value print_choice conf base p niveau_effectif =
             (capitale (transl_nth conf "image/images" 1));
         end;
         tag "td valign=top" begin
-(*
           Wserver.wprint "<input type=radio name=t value=L> %s\n"
             (capitale (transl conf "list"));
           if niveau_effectif <= limit_by_list conf then ()
@@ -129,7 +128,6 @@ value print_choice conf base p niveau_effectif =
               (limit_by_list conf)
               (transl_nth conf "generation/generations" 1);
           Wserver.wprint "<br>\n";
-*)
           Wserver.wprint "<input type=radio name=t value=H> %s\n"
             (capitale (transl conf "horizontally"));
           if niveau_effectif <= limit_by_list conf then ()
@@ -201,7 +199,6 @@ value afficher_menu_ascendants conf base p =
   return ()
 ;
 
-(*
 value afficher_ancetre conf base p =
   do afficher_personne_referencee conf base p;
      Date.afficher_dates_courtes conf base p;
@@ -252,7 +249,6 @@ value afficher_ascendants_jusqu_a conf base niveau_max p =
      trailer conf;
   return ()
 ;
-*)
 
 (* Print ancestors with numbers.
    The mark table holds the number of the ancestor after it has been
@@ -1737,10 +1733,8 @@ value print_female_line = print_male_female_line False;
 
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
-(*
   [ (Some "L", Some v) -> afficher_ascendants_jusqu_a conf base v p
-*)
-  [ (Some "N", Some v) -> afficher_ascendants_numerotation conf base v p
+  | (Some "N", Some v) -> afficher_ascendants_numerotation conf base v p
   | (Some "G", Some v) ->
       let ws =
         match p_getenv conf.env "siblings" with
