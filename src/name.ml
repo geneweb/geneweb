@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.15 2005-02-05 11:36:30 ddr Exp $ *)
+(* $Id: name.ml,v 4.16 2005-02-08 12:23:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 module Buff =
@@ -79,7 +79,7 @@ value lower s =
             if c2 <> c1 then copy False (i + 2) (Buff.store len c2)
             else copy False (i + 2) (Buff.gstore len s i 2)
         | 0xC3 ->
-            let c1 = Char.chr (Char.code s.[i+1] + 0x40) in
+            let c1 = Char.lowercase (Char.chr (Char.code s.[i+1] + 0x40)) in
             let c2 = unaccent_iso_8859_1 c1 in
             if c2 <> c1 then copy False (i + 2) (Buff.store len c2)
             else copy False (i + 2) (Buff.gstore len s i 2)
