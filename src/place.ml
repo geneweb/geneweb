@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.3 2001-07-15 15:23:20 ddr Exp $ *)
+(* $Id: place.ml,v 4.4 2001-07-24 08:33:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -20,7 +20,7 @@ value correct_start_point s =
     if i = iend then s
     else
       let c = s.[i] in
-      if c = Char.uppercase c then
+      if c = ''' || c = Char.uppercase c then
         if i = 0 then s
         else
           let prefix = remove_trailing_space (String.sub s 0 i) in
