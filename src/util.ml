@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.18 1999-05-15 11:08:16 ddr Exp $ *)
+(* $Id: util.ml,v 2.19 1999-05-17 11:36:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -285,8 +285,16 @@ value one_title_text conf base p t =
   ", <em>" ^ s ^ "</em>"
 ;
 
+value cancel_geneweb_links = ref False;
+
+value geneweb_link conf href s =
+  if cancel_geneweb_links.val then s
+  else "<a href=\"" ^ commd conf ^ href ^ "\">" ^ s ^ "</a>"
+;
+
 value reference conf base p s =
-  "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">" ^ s ^ "</a>"
+  if cancel_geneweb_links.val then s
+  else "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">" ^ s ^ "</a>"
 ;
 
 value referenced_person_title_text conf base p =
@@ -816,18 +824,20 @@ value image_size fname =
 ;
 
 value print_link_to_welcome conf right_aligned =
-  let dir = if conf.is_rtl then "left" else "right" in
-  let wid_hei =
-    match image_size (image_file_name conf.bname "up.gif") with
-    [ Some (wid, hei) ->
-        " width=" ^ string_of_int wid ^ " height=" ^ string_of_int hei
-    | None -> "" ]
-  in
-  do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-     Wserver.wprint "<img src=\"%sm=IM;v=/up.gif\"%s alt=\"^^\"%s>"
-       (commd conf) wid_hei (if right_aligned then " align=" ^ dir else "");
-     Wserver.wprint "</a>\n";
-  return ()
+  if cancel_geneweb_links.val then ()
+  else
+    let dir = if conf.is_rtl then "left" else "right" in
+    let wid_hei =
+      match image_size (image_file_name conf.bname "up.gif") with
+      [ Some (wid, hei) ->
+          " width=" ^ string_of_int wid ^ " height=" ^ string_of_int hei
+      | None -> "" ]
+    in
+    do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
+       Wserver.wprint "<img src=\"%sm=IM;v=/up.gif\"%s alt=\"^^\"%s>"
+         (commd conf) wid_hei (if right_aligned then " align=" ^ dir else "");
+       Wserver.wprint "</a>\n";
+    return ()
 ;
 
 value list_find f =

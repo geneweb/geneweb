@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.26 1999-05-14 11:39:25 ddr Exp $ *)
+(* $Id: perso.ml,v 2.27 1999-05-17 11:36:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -89,14 +89,16 @@ value next_sibling base p a =
 
 value
   print_title conf base cap and_txt p first (nth, name, title, places, dates) =
-  do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">\n" (commd conf)
-       (code_varenv (sou base title))
-       (code_varenv (sou base (List.hd places)));
+  do let href =
+       "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
+       code_varenv (sou base (List.hd places))
+     in
      let tit = coa conf (sou base title) in
-     Wserver.wprint "%s" (if first && cap then capitale tit else tit);
-     Wserver.wprint " ";
-     Wserver.wprint "%s" (coa conf (sou base (List.hd places)));
-     Wserver.wprint "</a>";
+     let s =
+       (if first && cap then capitale tit else tit) ^ " " ^
+       coa conf (sou base (List.hd places))
+     in
+     Wserver.wprint "%s" (geneweb_link conf href s);
      let rec loop places =
        do match places with
           [ [] -> ()
@@ -105,11 +107,12 @@ value
        return
        match places with
        [ [place :: places] ->
-           do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">\n"
-                (commd conf) (code_varenv (sou base title))
-                (code_varenv (sou base place));
-              Wserver.wprint "%s" (coa conf (sou base place));
-              Wserver.wprint "</a>";
+           let href =
+             "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
+             code_varenv (sou base place)
+           in
+           do Wserver.wprint "%s"
+                (geneweb_link conf href (coa conf (sou base place)));
            return loop places
        | _ -> () ]
      in
@@ -770,6 +773,19 @@ value print_ancestors_descends_cousins conf base p a =
   return ()
 ;
 
+value print_linked_first_name_and_surname conf base p =
+  do Wserver.wprint "%s"
+       (geneweb_link conf
+          ("m=P;v=" ^ code_varenv (Name.lower (sou base p.first_name)))
+          (coa conf (sou base p.first_name)));
+     Wserver.wprint " ";
+     Wserver.wprint "%s"
+       (geneweb_link conf
+          ("m=N;v=" ^ code_varenv (Name.lower (sou base p.surname)))
+          (coa conf (sou base p.surname)));
+  return ()
+;
+
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
 value print conf base p =
@@ -797,19 +813,7 @@ value print conf base p =
           Wserver.wprint "%s %s"
             (coa conf (sou base p.first_name))
             (coa conf (sou base p.surname))
-        else
-          do stag "a" "href=\"%sm=P;v=%s\"" (commd conf)
-               (code_varenv (Name.lower (sou base p.first_name)))
-             begin
-               Wserver.wprint "%s" (coa conf (sou base p.first_name));
-             end;
-             Wserver.wprint " ";
-             stag "a" "href=\"%sm=N;v=%s\"" (commd conf)
-               (code_varenv (Name.lower (sou base p.surname)))
-             begin
-               Wserver.wprint "%s" (coa conf (sou base p.surname));
-             end;
-          return () ]
+        else print_linked_first_name_and_surname conf base p ]
   in
   let a = aoi base p.cle_index in
   do header conf title;
@@ -901,16 +905,9 @@ value print conf base p =
      match (sou base p.public_name, p.nick_names) with
      [ ("", []) -> ()
      | _ ->
-         do Wserver.wprint "<em>(<a href=\"%sm=P;v=%s\">" (commd conf)
-              (code_varenv (Name.lower (sou base p.first_name)));
-            Wserver.wprint "%s" (coa conf (sou base p.first_name));
-            Wserver.wprint "</a> ";
-            Wserver.wprint " ";
-            Wserver.wprint "<a href=\"%sm=N;v=%s\">" (commd conf)
-              (code_varenv (Name.lower (sou base p.surname)));
-            Wserver.wprint "%s" (coa conf (sou base p.surname));
-            Wserver.wprint "</a>)</em>\n";
-            html_br conf;
+         do Wserver.wprint "<em>(";
+            print_linked_first_name_and_surname conf base p;
+            Wserver.wprint ")</em>\n";
          return () ];
      List.iter
        (fun n ->
@@ -957,14 +954,18 @@ value print conf base p =
      print_parents conf base a;
      print_families conf base p a;
      print_notes conf base p;
-     Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=R\">\n%s</a>\n</h4>\n"
-       (commd conf) (acces conf base p)
-       (capitale (transl conf "relationship computing"));
-     print_ancestors_descends_cousins conf base p a;
-     if conf.wizard then
-       Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=U\">\n%s</a>\n</h4>\n"
-         (commd conf) (acces conf base p) (capitale (transl conf "update"))
-     else ();
+     if cancel_geneweb_links.val then ()
+     else
+       do Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=R\">\n%s</a>\n</h4>\n"
+            (commd conf) (acces conf base p)
+            (capitale (transl conf "relationship computing"));
+          print_ancestors_descends_cousins conf base p a;
+          if conf.wizard then
+            Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=U\">\n%s</a>\n</h4>\n"
+              (commd conf) (acces conf base p)
+              (capitale (transl conf "update"))
+          else ();
+       return ();
      if age_autorise conf base p then print_sources conf base True p else ();
      match p_getenv conf.env "opt" with
      [ Some "misc" ->
