@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.28 2000-05-02 17:28:04 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.29 2000-05-03 09:50:42 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1093,20 +1093,6 @@ value read_input len =
     return buff.val
 ;
 
-value old_arg_parse_in_file lines =
-  match lines with
-  [ [x :: lines] ->
-       do Util.lang_dir.val := x; return
-       match lines with
-       [ [x :: lines] ->
-           do Util.base_dir.val := x; return
-           match lines with
-           [ [x :: _] -> cgi.val := x = "cgi"
-           | _ -> () ]
-       | _ -> () ]
-  | _ -> () ]
-;
-
 value arg_parse_in_file fname speclist anonfun errmsg =
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -1121,10 +1107,12 @@ value arg_parse_in_file fname speclist anonfun errmsg =
            close_in ic;
         return List.rev list.val
       in
-      match list with
-      [ [x :: l] when String.length x > 0 && x.[0] == '-' ->
-          Argl.parse_list speclist anonfun errmsg list
-      | _ -> old_arg_parse_in_file list ]
+      let list =
+        match list with
+        [ [x] -> arg_list_of_string x
+        | _ -> list ]
+      in
+      Argl.parse_list speclist anonfun errmsg list
   | _ -> () ]
 ;
 

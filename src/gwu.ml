@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.13 2000-04-04 02:58:05 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.14 2000-05-03 09:50:43 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -785,7 +785,7 @@ value speclist =
     ": no (data base) notes")]
 ;
 
-value anon_fun s =
+value anonfun s =
   match arg_state.val with
   [ ASnone -> in_file.val := s
   | ASwaitAncOcc ->
@@ -817,7 +817,14 @@ When option -s is used, the options -a and -d are ignored.
 Options are:";
 
 value main () =
-  do Argl.parse speclist anon_fun errmsg;
+  do ifdef MAC then
+       do Printf.eprintf "args? "; flush stderr;
+          let line = input_line stdin in
+          let list = Gutil.arg_list_of_string line in
+          Argl.parse_list speclist anonfun errmsg list;
+       return ()
+     else ();
+     Argl.parse speclist anonfun errmsg;
      if in_file.val = "" then
        do Printf.printf "Missing base\n";
           Printf.printf "Use option -help for usage\n";

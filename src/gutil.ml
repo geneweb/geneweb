@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.4 2000-03-04 17:42:55 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.5 2000-05-03 09:50:40 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -905,3 +905,22 @@ value place_of_string s =
     else loop list ibeg (i + 1)
 ;
 *)
+
+value arg_list_of_string line =
+  loop [] 0 0 None where rec loop list i len quote =
+    if i == String.length line then
+      if len == 0 then List.rev list else List.rev [Buff.get len :: list]
+    else
+      match (quote, line.[i]) with
+      [ (Some c1, c2) ->
+          if c1 == c2 then loop list (i + 1) len None
+          else loop list (i + 1) (Buff.store len c2) quote
+      | (None, ' ') ->
+          let list = if len == 0 then list else [Buff.get len :: list] in
+          loop list (i + 1) 0 quote
+      | (None, ('"' | ''' as c)) ->
+          loop list (i + 1) 0 (Some c)
+      | (None, c) ->
+          loop list (i + 1) (Buff.store len c) None ]
+          
+;

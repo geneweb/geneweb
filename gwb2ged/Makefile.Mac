@@ -1,4 +1,4 @@
-# $Id: Makefile.Mac,v 1.3 2000-05-03 08:19:49 ddr Exp $
+# $Id: Makefile.Mac,v 1.4 2000-05-03 09:50:38 ddr Exp $
 
 CAMLP4_COMM = ::tools:camlp4_comm.mpw pa_ifdef.cmo pa_ru.cmo
 CAMLP4F = -DMAC
@@ -25,7 +25,7 @@ clean ÄÄ
     {RM} {default}.ppo
 
 OCAMLI = -I ::src
-SRC_OBJS=::src:argl.cmo ::src:adef.cmo ::src:name.cmo ::src:ansel.cmo ::src:gutil.cmo ::src:iovalue.cmo ::src:btree.cmo ::src:buff.cmo ::src:iobase.cmo ::src:select.cmo ::src:version.cmo ::src:calendar.cmo
+SRC_OBJS=::src:argl.cmo ::src:adef.cmo ::src:name.cmo ::src:ansel.cmo ::src:buff.cmo ::src:gutil.cmo ::src:iovalue.cmo ::src:btree.cmo ::src:iobase.cmo ::src:select.cmo ::src:version.cmo ::src:calendar.cmo
 OBJS=$(SRC_OBJS) gwb2ged.cmo
 
 out ÄÄ gwb2ged.out

@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.4 2000-04-04 02:58:05 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.5 2000-05-03 09:50:39 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -583,7 +583,7 @@ type arg_state =
 ;
 value arg_state = ref ASnone;
 
-value usage = "Usage: " ^ Sys.argv.(0) ^ " <base> [options]
+value errmsg = "Usage: " ^ Sys.argv.(0) ^ " <base> [options]
 If both options -a and -d are used, intersection is assumed.
 If several options -s are used, union is assumed.
 When option -s is used, the options -a and -d are ignored.
@@ -623,7 +623,7 @@ value speclist =
     ": no (data base) notes")]
 ;
 
-value anon_fun s =
+value anonfun s =
   match arg_state.val with
   [ ASnone -> ifile.val := s
   | ASwaitAncOcc ->
@@ -649,7 +649,15 @@ value anon_fun s =
 ;
 
 value main () =
-  do Argl.parse speclist anon_fun usage; return
+  do ifdef MAC then
+       do Printf.eprintf "args? "; flush stderr;
+          let line = input_line stdin in
+          let list = Gutil.arg_list_of_string line in
+          Argl.parse_list speclist anonfun errmsg list;
+       return ()
+     else ();
+     Argl.parse speclist anonfun errmsg;
+  return
   let anc =
     if anc_1st.val <> "" then
       if anc_2nd.val = "" then

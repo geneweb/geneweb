@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.5 2000-05-02 17:15:45 doligez Exp $ *)
+(* $Id: gwc.ml,v 3.6 2000-05-03 09:50:42 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -678,6 +678,7 @@ value output_command_line bname =
 ;
 
 value shift = ref 0;
+value files = ref [];
 
 value speclist =
   [("-c", Arg.Set just_comp, "Only compiling");
@@ -693,6 +694,13 @@ value speclist =
    ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
 ;
 
+value anonfun x =
+  do if Filename.check_suffix x ".gw" then ()
+     else if Filename.check_suffix x ".gwo" then ()
+     else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\""));
+  return files.val := [(x, shift.val) :: files.val]
+;
+
 value errmsg =
   "Usage: gwc [options] [files]
 where [files] are a list of files:
@@ -702,14 +710,14 @@ and [options] are:"
 ;
 
 value main () =
-  let files = ref [] in
-  do Argl.parse speclist
-       (fun x ->
-          do if Filename.check_suffix x ".gw" then ()
-             else if Filename.check_suffix x ".gwo" then ()
-             else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\""));
-          return files.val := [(x, shift.val) :: files.val])
-       errmsg;
+  do ifdef MAC then
+       do Printf.eprintf "args? "; flush stderr;
+          let line = input_line stdin in
+          let list = Gutil.arg_list_of_string line in
+          Argl.parse_list speclist anonfun errmsg list;
+       return ()
+     else ();
+     Argl.parse speclist anonfun errmsg;
   return
   let gwo = ref [] in
   do List.iter
