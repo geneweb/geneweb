@@ -37,7 +37,8 @@ GeneWeb version 4.06
     Victor-Hugo (first name "François", surname "Victor-Hugo").
 
 * Gedcom to GeneWeb (ged2gwb)
-  - [08 Mar 02] Fixed bug: added 5 empty lines after each person's notes.
+  - [08 Mar 02] Fixed bug: the import added 5 empty lines after each
+    person's notes.
 
 * Setup program (gwsetup)
   - [06 Mar 02] Added "cancel" buttons close to some "ok" buttons.
