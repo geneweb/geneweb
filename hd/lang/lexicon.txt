@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.214 2001-01-31 17:43:29 ddr Exp $
+# $Id: lexicon.txt,v 3.215 2001-02-01 09:49:15 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -28,7 +28,7 @@ he: rtl
 
      !languages
 cs: af=afrikán¹tina/cn=èín¹tina/cs=èe¹tina/dk=dán¹tina/nl=holand¹tina/en=angliètina/eo=esperanto/fi=fin¹tina/fr=francouz¹tina/de=nìmèina/he=hebrej¹tina/is=island¹tina/it=ital¹tina/lv=loty¹¹tina/no=nor¹tina/pt=portugal¹tina/es=¹panìl¹tina/ru=ru¹tina/se=¹véd¹tina
-de: af=Afrikaans/cn=Chinesisch/dk=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/no=Norwegisch/pt=Portugiesisch/ru=Russisch/es=Spanisch/se=Schwedisch/cs=Tschechisch
+de: af=Afrikaans/cn=Chinesisch/dk=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/no=Norwegisch/pt=Portugiesisch/ru=Russisch/es=Spanisch/se=Schwedisch/cs=Tschechisch
 dk: af=afrikaans/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
 en: af=Afrikaans/cn=Chinese/cs=Czech/dk=Danish/nl=Dutch/en=English/eo=Esperanto/et=Estonian/fi=Finnish/fr=French/de=German/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/no=Norwegian/pt=Portuguese/es=Spanish/ru=Russian/se=Swedish
 eo: en=anglo/eo=esperanto/fr=franco
@@ -2475,6 +2475,7 @@ ru: èñ÷åç/èñ÷åçëà
 se: f&ouml;rsvunnen
 
     display by slices/slice width/overlap/total width
+de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
 en: display by slices/slice width/overlap/total width
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
 
