@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.38 2001-09-04 07:18:35 ddr Exp $
+# $Id: lexicon.txt,v 4.39 2001-09-11 08:03:17 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -7377,6 +7377,7 @@ ca: no s'ha definit el sexe de %t
 da: udefineret k&oslash;n for %t
 de: Geschlecht nicht definiert f&uuml;r %t
 en: undefined sex for %t
+es: sexo indefinido para %t
 et: %t sugu on m‰‰ratlemata
 fi: %t:n sukupuoli tuntematon
 fr: sexe ind&eacute;fini pour %t
