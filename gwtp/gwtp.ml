@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.9 2000-07-29 23:57:15 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.10 2000-07-30 11:12:09 ddr Exp $ *)
 
 open Printf;
 
@@ -240,87 +240,146 @@ value insert_file env bdir name =
   return ()
 ;
 
+value make_temp env b =
+  let bdir = Filename.concat gwtp_tmp.val (b ^ ".gwb") in
+  do if Sys.file_exists bdir then remove_dir_contents bdir
+     else Unix.mkdir bdir 0o777;
+     insert_file env bdir "base";
+     insert_file env bdir "notes";
+     insert_file env bdir "patches";
+     flush stdout;
+   return
+  let base = Iolight.input bdir in
+  do printf "\n";
+     printf "persons: %d\n" base.Def.data.Def.persons.Def.len;
+     printf "families: %d\n\n" base.Def.data.Def.families.Def.len;
+     flush stdout;
+     Iobase.output bdir base;
+     flush stdout;
+  return ()
+;
+
+value copy_temp b =
+  let bdir = Filename.concat gwtp_tmp.val (b ^ ".gwb") in
+  let dir_old = Filename.concat gwtp_dst.val "old" in
+  let dir_old_gwb = Filename.concat dir_old (b ^ ".gwb") in
+  let dir_gwb = Filename.concat gwtp_dst.val (b ^ ".gwb") in
+  do if Sys.file_exists dir_gwb then
+       do if not (Sys.file_exists dir_old) then Unix.mkdir dir_old 0o777
+          else ();
+          if Sys.file_exists dir_old_gwb then
+            do remove_dir_contents dir_old_gwb;
+               Unix.rmdir dir_old_gwb;
+            return ()
+          else ();
+          Sys.rename dir_gwb dir_old_gwb;
+          let old_forum = Filename.concat dir_old_gwb "forum" in
+          if Sys.file_exists old_forum then
+            sys_copy old_forum (Filename.concat bdir "forum")
+          else ();
+       return ()
+     else ();
+     Sys.rename bdir dir_gwb;
+  return ()
+;
+
 value send_file str env b t f fname =
   if Filename.basename fname = "base" then
-    do printf "content-type: text/html\r\n\r\n\
+    do let _ = Unix.umask 0 in ();
+       printf "content-type: text/html\r\n\r\n\
 <head><title>Gwtp...</title></head>\n<body>
 <h1 align=center>Gwtp...</h1>
 <pre>\n";
        Unix.dup2 Unix.stdout Unix.stderr;
        flush stdout;
-    return
-    let bdir = Filename.concat gwtp_tmp.val (b ^ ".gwb") in
-    do if Sys.file_exists bdir then remove_dir_contents bdir
-       else Unix.mkdir bdir 0o777;
-       insert_file env bdir "base";
-       insert_file env bdir "notes";
-       insert_file env bdir "patches";
-       flush stdout;
-    return
-    let base = Iolight.input bdir in
-    do printf "\n";
-       printf "persons: %d\n" base.Def.data.Def.persons.Def.len;
-       printf "families: %d\n\n" base.Def.data.Def.families.Def.len;
-       flush stdout;
-       Iobase.output bdir base;
-       flush stdout;
+       make_temp env b;
        printf "\nTemporary data base created.\n";
        flush stdout;
-    return
-    let dir_old = Filename.concat gwtp_dst.val "old" in
-    let dir_old_gwb = Filename.concat dir_old (b ^ ".gwb") in
-    let dir_gwb = Filename.concat gwtp_dst.val (b ^ ".gwb") in
-    do if Sys.file_exists dir_gwb then
-         do if not (Sys.file_exists dir_old) then Unix.mkdir dir_old 0o777
-            else ();
-            if Sys.file_exists dir_old_gwb then
-              do remove_dir_contents dir_old_gwb;
-                 Unix.rmdir dir_old_gwb;
-              return ()
-            else ();
-            Sys.rename dir_gwb dir_old_gwb;
-         return ()
-       else ();
-       let old_forum = Filename.concat dir_old_gwb "forum" in
-       if Sys.file_exists old_forum then
-         sys_copy old_forum (Filename.concat bdir "forum")
-       else ();
-       Sys.rename bdir dir_gwb;
+       copy_temp b;
        printf "Data base \"%s\" updated.\n" b;
+       flush stdout;
        printf "</pre>\n";
        printf "</body>\n";
     return ()
   else gwtp_error "Bad \"base\" file selection"
 ;
 
-value gwtp_send str env =
-  match
-    (HttpEnv.getenv env "b", HttpEnv.getenv env "t", HttpEnv.getenv env "base",
-     HttpEnv.getenv env "base_name")
-  with
-  [ (Some b, Some t, Some f, Some fname) ->
+value gwtp_send str env b t =
+  match (HttpEnv.getenv env "base", HttpEnv.getenv env "base_name") with
+  [ (Some f, Some fname) -> send_file str env b t f fname
+  | _ -> gwtp_invalid_request str env ]
+;
+
+value gwtp_receive str env b t =
+  match HttpEnv.getenv env "f" with
+  [ Some fname ->
+      let fname = Filename.basename fname in
+      let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
+      do printf "content-type: bin/geneweb\r\n\r\n";
+         let ic = open_in (Filename.concat bdir fname) in
+         do try
+              while True do
+                let c = input_char ic in
+                output_char stdout c;
+              done
+            with [ End_of_file -> () ];
+            close_in ic;
+         return ();
+         flush stdout;
+      return ()
+  | _ -> gwtp_invalid_request str env ]
+;
+
+value gwtp_logged str env gwtp_fun =
+  match (HttpEnv.getenv env "b", HttpEnv.getenv env "t") with
+  [ (Some b, Some t) ->
       let ok =
         let fname = tokens_file_name () in
         let (ok, tokens) = check_token fname b t in
         do write_tokens fname tokens; return ok
       in
-      if ok then send_file str env b t f fname
+      if ok then gwtp_fun str env b t
       else gwtp_error "Login expired"
   | _ -> gwtp_invalid_request str env ]
 ;
 
-value login_ok str env b p tok =
-  do set_token b tok;
-     printf "content-type: text/html\r\n\r\n";
-     copy_template [('b', b); ('t', tok)] "send";
+value gwtp_upload b tok =
+  copy_template [('b', b); ('t', tok)] "send"
+;
+
+value gwtp_download b tok =
+  let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
+  do copy_template [('b', b); ('t', tok)] "recv";
+     if Sys.file_exists bdir then
+       let dh = Unix.opendir bdir in
+       do printf "<ul>\n";
+          try
+            while True do
+              match Unix.readdir dh with
+              [ "." | ".." -> ()
+              | f ->
+                  printf "<li><a href=\"gwtp?m=RECV;b=%s;t=%s;f=/%s\">%s</a>\n"
+                    b tok f f ];
+            done
+          with
+          [ End_of_file -> Unix.closedir dh ];
+          printf "</ul>\n";
+       return ()
+     else ();
+     printf "</body>\n";
+     flush stdout;
   return ()
 ;
 
-value gwtp_login str env =
+value gwtp_check_login str env gwtp_fun =
   match (HttpEnv.getenv env "b", HttpEnv.getenv env "p") with
   [ (Some b, Some p) ->
       match check_login b p with
-      [ Some tok -> login_ok str env b p tok
+      [ Some tok ->
+          do set_token b tok;
+             printf "content-type: text/html\r\n\r\n";
+             gwtp_fun b tok;
+          return ()
       | None -> gwtp_error "Invalid login" ]
   | _ -> gwtp_invalid_request str env ]
 ;
@@ -331,9 +390,10 @@ value gwtp_welcome str env =
 <head><title>Gwtp</title></head>\n<body>
 <h1>Gwtp</h1>
 <form method=POST action=gwtp>
-<input type=hidden name=m value=LOGIN>
 Data base: <input name=b><br>
 Password: <input name=p type=password><br>
+Upload <input type=radio name=m value=UPL checked>
+Download <input type=radio name=m value=DNL><br>
 <input type=submit value=Login>
 </form>
 </body>
@@ -346,8 +406,10 @@ value gwtp () =
   let content = cgi_content () in
   let (str, env) = HttpEnv.make content_type content in
   match HttpEnv.getenv env "m" with
-  [ Some "LOGIN" -> gwtp_login str env
-  | Some "SEND" -> gwtp_send str env
+  [ Some "UPL" -> gwtp_check_login str env gwtp_upload
+  | Some "DNL" -> gwtp_check_login str env gwtp_download
+  | Some "SEND" -> gwtp_logged str env gwtp_send
+  | Some "RECV" -> gwtp_logged str env gwtp_receive
   | Some _ -> gwtp_invalid_request str env
   | None -> gwtp_welcome str env ]
 ;
@@ -360,8 +422,12 @@ value speclist =
 value anonfun _ = do Arg.usage speclist usage_msg; return exit 2;
 
 value main () =
-  do Arg.parse speclist anonfun usage_msg; return
-  gwtp ()
+  do Arg.parse speclist anonfun usage_msg;
+     gwtp ();
+  return ()
 ;
 
+(*
 Printexc.catch (Unix.handle_unix_error main) ();
+*)
+main ();

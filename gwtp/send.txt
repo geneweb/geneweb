@@ -6,7 +6,8 @@
 <input type=hidden name=b value=%b>
 <input type=hidden name=t value=%t>
 
-In your GeneWeb data base directory (foo.gwb for the base <em>foo</em>):<br><p>
+From your GeneWeb data base directory (<em>%b.gwb</em> for the base
+<em>%b</em>):<br><p>
 
 <ul>
 <li>
