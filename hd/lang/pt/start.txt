@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.10 1999-11-04 10:42:03 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.11 1999-11-10 22:38:51 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -142,7 +142,8 @@ complexa</b></font></a>.
 </table>
 </center>
 <br>
-%E
+
+%E<br><p>
 
 <center>Tamb&eacute;m pode consultar<br><p>
 
