@@ -5,6 +5,8 @@ GeneWeb version 4.01
   - [14 Mar 01] Added Brazilian Portuguese (Paulo Francisco Sedrez).
 
 * GeneWeb server or CGI (gwd)
+  - [18 Mar 01] Fixed bug: in case of automatic merge, the source field
+    of the second person or family was lost.
   - [18 Mar 01] Improved displaying of sources in personal pages: the
     identical sources are grouped together in the same line.
   - [17 Mar 01] Fixed problem of displaying of history of updates: it
