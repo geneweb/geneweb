@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.46 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.47 2004-12-30 21:20:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -220,15 +220,15 @@ value display_ancestor_menu conf base p =
   in
   do {
     header conf title;
-    tag "table" "style=\"margin:auto\" border=\"%d\" width=\"90%%\""
-      conf.border
-    begin
+    begin_centered conf;
+    tag "table" "border=\"%d\"" conf.border begin
       tag "tr" begin
         tag "td" "align=\"center\"" begin
           print_choice conf base p effective_level;
           tag "p" begin
             Wserver.wprint
-              (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
+              (fcapitale
+                 (ftransl conf "navigation with %t as Sosa reference"))
               (fun _ ->
                  do {
                    conf.henv := List.remove_assoc "iz" conf.henv;
@@ -237,13 +237,15 @@ value display_ancestor_menu conf base p =
                        (Adef.int_of_iper p.cle_index) s
                    in
                    Wserver.wprint "%s"
-                     (gen_person_title_text reference std_access conf base p)
+                     (gen_person_title_text reference std_access conf
+                        base p)
                  });
             Wserver.wprint ".\n";
           end;
         end;
       end;
     end;
+    end_centered conf;
     trailer conf
   }
 ;

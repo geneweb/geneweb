@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.25 2004-12-28 15:12:56 ddr Exp $ *)
+(* $Id: date.ml,v 4.26 2004-12-30 21:20:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -653,7 +653,8 @@ value print_calendar conf base =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    tag "table" "style=\"margin:auto\"" begin
+    begin_centered conf;
+    tag "table" begin
       stag "tbody" begin
         stag "tr" begin
           tag "td" "align=left" begin
@@ -716,6 +717,7 @@ value print_calendar conf base =
         end;
       end;
     end;
+    end_centered conf;
     trailer conf;
   }
 ;

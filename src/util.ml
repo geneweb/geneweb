@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.103 2004-12-28 03:59:18 ddr Exp $ *)
+(* $Id: util.ml,v 4.104 2004-12-30 21:20:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -295,6 +295,12 @@ value doctype = "\
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" 
  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">";
 *)
+
+value begin_centered conf =
+  Wserver.wprint
+    "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"
+    conf.border;
+value end_centered _ = Wserver.wprint "</td></tr></table>\n";
 
 value html_br conf = do { Wserver.wprint "<br%s>" xhs; Wserver.wprint "\n"; };
 

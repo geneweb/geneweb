@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.14 2004-12-28 15:12:54 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.15 2004-12-30 21:20:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -208,25 +208,29 @@ value print_birth_day conf base day_name verb wd dt list =
 ;
 
 value propose_months conf mode =
-  tag "table" "border=\"%d\" style=\"margin:auto\"" conf.border begin
-    tag "tr" begin
-      tag "td" begin
-        tag "form" "method=\"get\" action=\"%s\"" conf.command begin
-          html_p conf;
-          Util.hidden_env conf;
-          mode ();
-          tag "select" "name=\"v\"" begin
-            for i = 1 to 12 do {
-              Wserver.wprint "<option value=\"%d\"%s>%s\n" i
-                (if i = conf.today.month then " selected" else "")
-                (capitale (nominative (transl_nth conf "(month)" (i - 1))))
-            };
+  do {
+    begin_centered conf;
+    tag "table" "border=\"%d\"" conf.border begin
+      tag "tr" begin
+        tag "td" begin
+          tag "form" "method=\"get\" action=\"%s\"" conf.command begin
+            html_p conf;
+            Util.hidden_env conf;
+            mode ();
+            tag "select" "name=\"v\"" begin
+              for i = 1 to 12 do {
+                Wserver.wprint "<option value=\"%d\"%s>%s\n" i
+                  (if i = conf.today.month then " selected" else "")
+                  (capitale (nominative (transl_nth conf "(month)" (i - 1))))
+              };
+            end;
+            xtag "input" "type=\"submit\" value=\"Ok\"";
           end;
-          Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
         end;
       end;
     end;
-  end
+    end_centered conf;
+  }
 ;
 
 value day_after d =

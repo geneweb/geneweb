@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.216 2004-12-29 09:39:31 ddr Exp $
+# $Id: lexicon.txt,v 4.217 2004-12-30 21:20:05 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !charset
@@ -891,7 +891,7 @@ is: tremenningur
 it: un cugino di 2o grado/una cugina di 2o grado/un(a) cugino(a) di 2o grado
 lv: otrais brâlçns/mâsîca
 nl: een neef in de tweede generatie/een nicht in de tweede generatie
-no: tremenning	
+no: tremenning
 pl: kuzyn/kuzynka drugiego stopnia
 pt: um primo em 2&ordm; grau/uma prima em 2&ordm; grau/um(a) primo(a) em 2&ordm; grau
 ro: un var de gradul doi
@@ -3570,7 +3570,7 @@ de: Familie hinzugef&uuml;gt
 en: family added
 eo: familio aldonita
 es: familia agregada
-et: pere lisatud		
+et: pere lisatud
 fi: perhe lis&auml;tty
 fr: famille ajout&eacute;e
 he:  îùôçä äåñôä

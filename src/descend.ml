@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.28 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: descend.ml,v 4.29 2004-12-30 21:20:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -179,8 +179,8 @@ value display_descendant_menu conf base p =
   let effective_level = min (limit_desc conf) (level_max conf base p) in
   do {
     header conf (descendants_title conf base p);
-    tag "table" "style=\"margin:auto\" border=\"%d\" width=\"90%%\""
-      conf.border
+    begin_centered conf;
+    tag "table" "border=\"%d\" width=\"90%%\"" conf.border
     begin
       tag "tr" begin
         tag "td" "align=\"center\"" begin
@@ -188,6 +188,7 @@ value display_descendant_menu conf base p =
         end;
        end;
     end;
+    end_centered conf;
     trailer conf
   }
 ;

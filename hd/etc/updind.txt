@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.18 2004-12-29 01:16:17 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.19 2004-12-30 21:20:05 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <title>%nn;
@@ -442,9 +442,9 @@ function changeDeath()
       <td>
         <select name="rxcnt_xvar_p">
         <option value="link"%if;relation.xrel.link;%sp;
-	 selected="selected"%end;>[*link]0</option>
+         selected="selected"%end;>[*link]0</option>
         <option value="create"%if;relation.xrel.create;%sp;
-	 selected="selected"%end;>[*create]0</option>
+         selected="selected"%end;>[*create]0</option>
         </select>
       </td>
     </tr>
