@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.13 2000-01-09 17:58:30 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.14 2000-01-25 09:39:52 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -76,7 +76,7 @@ For &aring; navigere i databasen, kan du s&oslash;ke:<br><p>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
 [or] <em>[surname/surnames]</em>%Iz
-[or] <em>Sosa number</em> relative to %a%E
+[or] <em>Sosa nummer</em> i forhold til %a%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
