@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.24 1999-07-15 08:52:33 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.25 1999-07-26 07:01:58 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -483,7 +483,9 @@ type gen =
     g_hper : Hashtbl.t string Adef.iper;
     g_hfam : Hashtbl.t string Adef.ifam;
     g_hstr : Hashtbl.t string Adef.istr;
-    g_hnam : Hashtbl.t string (ref int) }
+    g_hnam : Hashtbl.t string (ref int);
+    g_adop : Hashtbl.t string (Adef.iper * string);
+    g_godp : mutable list (Adef.iper * Adef.iper) }
 ;
 
 value assume_tab name tab none =
@@ -541,12 +543,13 @@ value unknown_per gen i =
   let p =
     {first_name = what; surname = what; occ = i; public_name = empty;
      image = empty; nick_names = []; aliases = []; first_names_aliases = [];
-     surnames_aliases = []; titles = []; occupation = empty; sex = Neuter;
-     access = IfTitles; birth = Adef.codate_None; birth_place = empty;
-     birth_src = empty; baptism = Adef.codate_None; baptism_place = empty;
-     baptism_src = empty; death = DontKnowIfDead; death_place = empty;
-     death_src = empty; burial = UnknownBurial; burial_place = empty;
-     burial_src = empty; family = [| |]; notes = empty; psources = empty;
+     surnames_aliases = []; titles = []; rparents = []; rchildren = [];
+     occupation = empty; sex = Neuter; access = IfTitles;
+     birth = Adef.codate_None; birth_place = empty; birth_src = empty;
+     baptism = Adef.codate_None; baptism_place = empty; baptism_src = empty;
+     death = DontKnowIfDead; death_place = empty; death_src = empty;
+     burial = UnknownBurial; burial_place = empty; burial_src = empty;
+     family = [| |]; notes = empty; psources = empty;
      cle_index = Adef.iper_of_int i}
   and a = {parents = None; consang = Adef.fix (-1)} in
   (p, a)
@@ -858,6 +861,47 @@ value treat_indi_title gen public_name r =
    t_date_end = Adef.codate_of_od date_end; t_nth = nth}
 ;
 
+value forward_adop gen ip lab which_parent =
+  let which_parent =
+    match which_parent with
+    [ Some r -> r.rval
+    | _ -> "" ]
+  in
+  Hashtbl.add gen.g_adop lab (ip, which_parent)
+;
+
+value adop_parent gen ip r =
+  let i = per_index gen r.rval in
+  match gen.g_per.arr.(Adef.int_of_iper i) with
+  [ Left _ -> None
+  | Right p ->
+      do if List.memq ip p.rchildren then ()
+         else p.rchildren := [ip :: p.rchildren];
+      return Some p.cle_index ]
+;
+
+value set_adop_fam gen ip which_parent fath moth =
+  match gen.g_per.arr.(Adef.int_of_iper ip) with
+  [ Left _ -> ()
+  | Right per ->
+      let r_fath =
+        match (which_parent, fath) with
+        [ (("HUSB" | "BOTH"), Some r) -> adop_parent gen ip r
+        | _ -> None ]
+      in
+      let r_moth =
+        match (which_parent, moth) with
+        [ (("WIFE" | "BOTH"), Some r) -> adop_parent gen ip r
+        | _ -> None ]
+      in
+      let r = {r_type = Adoption; r_fath = r_fath; r_moth = r_moth} in
+      per.rparents := [r :: per.rparents] ]
+;
+
+value forward_godp gen ip ipp =
+  gen.g_godp := [(ipp, ip) :: gen.g_godp]
+;
+
 value add_indi gen r =
   let i = per_index gen r.rval in
   let name_sons = find_field "NAME" r.rsons in
@@ -973,6 +1017,30 @@ value add_indi gen r =
         []
     in
     List.map (fun r -> fam_index gen r) rvl
+  in
+  let rparents = [] in
+  let rparents =
+    let rl = find_all_fields "ASSO" r.rsons in
+    let rec find_rela n =
+      fun
+      [ [] -> None
+      | [r :: rl] ->
+          match find_field "RELA" r.rsons with
+          [ Some r1 ->
+              if String.length r1.rval >= 4
+              && String.lowercase (String.sub r1.rval 0 4) = n then
+                let ipp = per_index gen r.rval in
+                do forward_godp gen i ipp; return
+                Some ipp
+              else find_rela n rl
+          | None -> find_rela n rl ] ]
+    in
+    let godf = find_rela "godf" r.rsons in
+    let godm = find_rela "godm" r.rsons in
+    if godf <> None || godm <> None then
+      let r = {r_type = GodParent; r_fath = godf; r_moth = godm} in
+      [r :: rparents]
+    else rparents
   in
   let (birth, birth_place, birth_src) =
     match find_field "BIRT" r.rsons with
@@ -1093,8 +1161,9 @@ value add_indi gen r =
        else [];
      surnames_aliases =
        if surname_alias <> "" then [add_string gen surname_alias] else [];
-     titles = titles; occupation = add_string gen occupation; sex = sex;
-     access = IfTitles; birth = birth;
+     titles = titles; rparents = rparents; rchildren = [];
+     occupation = add_string gen occupation;
+     sex = sex; access = IfTitles; birth = birth;
      birth_place = add_string gen birth_place;
      birth_src = add_string gen birth_src; baptism = bapt;
      baptism_place = add_string gen bapt_place;
@@ -1107,10 +1176,16 @@ value add_indi gen r =
   and ascend = {parents = parents; consang = Adef.fix (-1)} in
   do gen.g_per.arr.(Adef.int_of_iper i) := Right person;
      gen.g_asc.arr.(Adef.int_of_iper i) := Right ascend;
+     match find_field "ADOP" r.rsons with
+     [ Some r ->
+         match find_field "FAMC" r.rsons with
+         [ Some r -> forward_adop gen i r.rval (find_field "ADOP" r.rsons)
+         | _ -> () ]
+     | _ -> () ];
   return ()
 ;
 
-value add_fam gen r =
+value add_fam_norm gen r =
   let i = fam_index gen r.rval in
   let fath =
     match find_field "HUSB" r.rsons with
@@ -1194,6 +1269,15 @@ value add_fam gen r =
   do gen.g_fam.arr.(Adef.int_of_ifam i) := Right fam;
      gen.g_cpl.arr.(Adef.int_of_ifam i) := Right cpl;
   return ()
+;
+
+value add_fam gen r =
+  try
+    let (ip, which_parent) = Hashtbl.find gen.g_adop r.rval in
+    set_adop_fam gen ip which_parent (find_field "HUSB" r.rsons)
+      (find_field "WIFE" r.rsons)
+  with
+  [ Not_found -> add_fam_norm gen r ]
 ;
 
 value treat_header r =
@@ -1374,6 +1458,14 @@ value pass2 gen fname =
            | [: :] -> () ] ]
      in
      loop ();
+     List.iter
+       (fun (ipp, ip) ->
+          match gen.g_per.arr.(Adef.int_of_iper ipp) with
+          [ Right p ->
+              if List.memq ip p.rchildren then ()
+              else p.rchildren := [ip :: p.rchildren]
+          | _ -> () ])
+       gen.g_godp;
      close_in ic;
   return ()
 ;
@@ -1446,7 +1538,8 @@ value make_arrays in_file =
      g_str = {arr = [| |]; tlen = 0}; g_ic = open_in_bin fname;
      g_not = Hashtbl.create 3001; g_src = Hashtbl.create 3001;
      g_hper = Hashtbl.create 3001; g_hfam = Hashtbl.create 3001;
-     g_hstr = Hashtbl.create 3001; g_hnam = Hashtbl.create 3001}
+     g_hstr = Hashtbl.create 3001; g_hnam = Hashtbl.create 3001;
+     g_adop = Hashtbl.create 3001; g_godp = []}
   in
   do string_empty.val := add_string gen "";
      string_x.val := add_string gen "x";

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.11 1999-07-22 14:34:19 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.12 1999-07-26 07:02:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -27,7 +27,11 @@ value string_person_of base p =
     if first_name = "?" || surname = "?" then Adef.int_of_iper p.cle_index
     else p.occ
   in
-  Gutil.map_person_strings (sou base) p
+  let fp ip =
+    let p = poi base ip in
+    (sou base p.first_name, sou base p.surname, p.occ)
+  in
+  Gutil.map_person_ps fp (sou base) p
 ;
 
 value print_first_name conf base p =
@@ -430,6 +434,121 @@ value print_titles conf base p =
   in ()
 ;
 
+value print_add_relation conf base cnt =
+  do tag "table" "border=1" begin
+       tag "tr" begin
+         tag "td" begin
+           let s = transl_nth conf "relation/relations" 0 in
+           Wserver.wprint "%s
+             <input type=checkbox name=add_relation%d value=on>"
+             (capitale (transl_decline conf "insert" s)) cnt;
+         end;
+       end;
+     end;
+     Wserver.wprint "\n";
+     html_p conf;
+  return ()
+;
+
+value print_relation_type conf base r cnt =
+  tag "table" "border=1" begin
+    tag "tr" begin
+      tag "td" begin
+        tag "select" "name=r_type%d" cnt begin
+          Wserver.wprint "<option value=Undef%s> -\n"
+            (match r with
+             [ Some {r_fath = None; r_moth = None} -> " selected"
+             | Some _ -> ""
+             | None -> " selected" ]);
+          Wserver.wprint "<option value=Adoption%s>"
+            (match r with
+             [ Some {r_fath = None; r_moth = None} -> ""
+             | Some {r_type = Adoption} -> " selected"
+             | _ -> "" ]);
+          Wserver.wprint "%s\n" (capitale (relation_type_text conf Adoption 2));
+          Wserver.wprint "<option value=Recognition%s>"
+            (match r with
+             [ Some {r_type = Recognition} -> " selected" | _ -> "" ]);
+          Wserver.wprint "%s\n"
+            (capitale (relation_type_text conf Recognition 2));
+          Wserver.wprint "<option value=CandidateParent%s>"
+            (match r with
+             [ Some {r_type = CandidateParent} -> " selected" | _ -> "" ]);
+          Wserver.wprint "%s\n"
+            (capitale (relation_type_text conf CandidateParent 2));
+          Wserver.wprint "<option value=GodParent%s>"
+            (match r with [ Some {r_type = GodParent} -> " selected" | _ -> "" ]);
+          Wserver.wprint "%s\n" (capitale (relation_type_text conf GodParent 2));
+        end;
+      end;
+    end;
+  end
+;
+
+value print_linked_person conf base r proj var cnt =
+  let (fn, sn, occ) =
+    match r with
+    [ Some r -> match proj r with [ Some x -> x | None -> ("", "", 0) ]
+    | _ -> ("", "", 0) ]
+  in
+  tag "table" "border=1" begin
+    tag "tr" begin
+      tag "td" begin
+        Wserver.wprint "%s"
+          (capitale (transl_nth conf "first name/first names" 0));
+      end;
+      tag "td" begin
+        Wserver.wprint
+          "<input name=\"%s_fn%d\" size=30 maxlength=200 value=\"%s\">"
+          var cnt (quote_escaped fn);
+      end;
+      tag "td" begin
+        let s = capitale (transl conf "number") in
+        Wserver.wprint "%s" s;
+      end;
+      tag "td" begin
+        Wserver.wprint "<input name=%s_occ%d size=5 maxlength=8" var cnt;
+        if occ <> 0 then Wserver.wprint " value=%d" occ else ();
+        Wserver.wprint ">";
+      end;
+      Wserver.wprint "\n";
+    end;
+    tag "tr" begin
+      tag "td" begin
+        Wserver.wprint "%s"
+          (capitale (transl_nth conf "surname/surnames" 0));
+      end;
+      tag "td" "colspan=3" begin
+        Wserver.wprint
+          "<input name=\"%s_sn%d\" size=40 maxlength=200 value=\"%s\">"
+          var cnt (quote_escaped sn);
+      end;
+    end;
+  end
+;
+
+value print_relation conf base r cnt =
+  do print_relation_type conf base r cnt;
+     print_linked_person conf base r (fun r -> r.r_fath) "r_fath" cnt;
+     print_linked_person conf base r (fun r -> r.r_moth) "r_moth" cnt;
+     html_p conf;
+     print_add_relation conf base cnt;
+  return ()
+;
+
+value print_relations conf base p =
+  let rl =
+    match p.rparents with
+    [ [] -> [None]
+    | rl -> List.map (fun r -> Some r) rl ]
+  in
+  do print_add_relation conf base 0; return
+  let _ = List.fold_left
+    (fun cnt r -> do print_relation conf base r cnt; return cnt + 1)
+    1 rl
+  in ()
+;
+
 value print_source conf base field =
   do tag "h4" begin
        Wserver.wprint "%s" (capitale (transl_nth conf "source/sources" 0));
@@ -589,6 +708,12 @@ value print_person conf base p =
      print_occupation conf base p;
      Wserver.wprint "\n";
      tag "h4" begin
+       Wserver.wprint "%s" (capitale (transl_nth conf "relation/relations" 1));
+     end;
+     Wserver.wprint "\n";
+     print_relations conf base p;
+     Wserver.wprint "\n";
+     tag "h4" begin
        Wserver.wprint "%s" (capitale (transl_nth conf "title/titles" 1));
      end;
      Wserver.wprint "\n";
@@ -698,7 +823,7 @@ value print_add conf base =
     {first_name = ""; surname = ""; occ = 0; image = "";
      first_names_aliases = []; surnames_aliases = [];
      public_name = ""; nick_names = []; aliases = [];
-     titles = []; occupation = "";
+     titles = []; rparents = []; rchildren = []; occupation = "";
      sex = Neuter; access = IfTitles;
      birth = Adef.codate_None; birth_place = ""; birth_src = "";
      baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";

@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.13 1999-07-24 10:13:20 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.14 1999-07-26 07:01:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -443,6 +443,114 @@ value print_notes oc base ml per_sel =
     pl
 ;
 
+value get_persons_with_relations base m list =
+  let fath = m.m_fath in
+  let moth = m.m_moth in
+  let list =
+    match (fath.rparents, (aoi base fath.cle_index).parents) with
+    [ ([], _) | (_, Some _) -> list
+    | _ -> [fath :: list] ]
+  in
+  let list =
+    match (moth.rparents, (aoi base moth.cle_index).parents) with
+    [ ([], _) | (_, Some _) -> list
+    | _ -> [moth :: list] ]
+  in
+  List.fold_right
+    (fun p list ->
+       match p.rparents with
+       [ [] -> list
+       | _ -> [p :: list] ])
+    (Array.to_list m.m_chil) list
+;
+
+value print_relation_parent oc base mark p =
+  let a = aoi base p.cle_index in
+  do Printf.fprintf oc "%s %s%s"
+       (correct_string base p.surname)
+       (correct_string base p.first_name)
+       (if p.occ = 0 then "" else "." ^ string_of_int p.occ);
+     if Array.length p.family = 0 && a.parents = None
+     && not mark.(Adef.int_of_iper p.cle_index) then
+       do mark.(Adef.int_of_iper p.cle_index) := True; return
+       if has_infos base p then print_infos oc base False True p
+       else Printf.fprintf oc " 0"
+     else ();
+  return ()
+;
+
+value print_relation_for_person oc base mark p r =
+  let fath =
+    match r.r_fath with
+    [ Some ip ->
+        let p = poi base ip in
+        if sou base p.first_name = "?" || sou base p.surname = "?" then None
+        else Some p
+    | None -> None ]
+  in
+  let moth =
+    match r.r_moth with
+    [ Some ip ->
+        let p = poi base ip in
+        if sou base p.first_name = "?" || sou base p.surname = "?" then None
+        else Some p
+    | None -> None ]
+  in
+  match (fath, moth) with
+  [ (None, None) -> ()
+  | _ ->
+     do Printf.fprintf oc "- ";
+        match r.r_type with
+        [ Adoption -> Printf.fprintf oc "adop"
+        | Recognition -> Printf.fprintf oc "reco"
+        | CandidateParent -> Printf.fprintf oc "cand"
+        | GodParent -> Printf.fprintf oc "godp" ];
+        match (fath, moth) with
+        [ (Some _, None) -> Printf.fprintf oc " fath"
+        | (None, Some _) -> Printf.fprintf oc " moth"
+        | _ -> () ];
+        Printf.fprintf oc ": ";
+        match (fath, moth) with
+        [ (Some fath, None) -> print_relation_parent oc base mark fath
+        | (None, Some moth) -> print_relation_parent oc base mark moth
+        | (Some fath, Some moth) ->
+            do print_relation_parent oc base mark fath;
+               Printf.fprintf oc " + ";
+               print_relation_parent oc base mark moth;
+            return ()
+        | _ -> () ];
+        Printf.fprintf oc "\n";
+     return () ]
+;
+
+value print_relations_for_person oc base mark p =
+  let surn = correct_string base p.surname in
+  let fnam = correct_string base p.first_name in
+  if surn <> "?" || fnam <> "?" then
+    do Printf.fprintf oc "\n";
+       Printf.fprintf oc "rel %s %s%s\n" surn fnam
+         (if p.occ == 0 then "" else "." ^ string_of_int p.occ);
+       Printf.fprintf oc "beg\n";
+       List.iter (print_relation_for_person oc base mark p) p.rparents;
+       Printf.fprintf oc "end\n";
+    return ()
+  else ()
+;
+
+value print_relations oc base mark per_sel ml =
+  let pl = List.fold_right (get_persons_with_relations base) ml [] in
+  let pl =
+    List.fold_right
+      (fun p pl -> if list_memf eq_key p pl then pl else [p :: pl])
+      pl []
+  in
+  List.iter
+    (fun p ->
+       if per_sel p.cle_index then print_relations_for_person oc base mark p
+       else ())
+    pl
+;
+
 value rec merge_families ifaml1f ifaml2f =
   match (ifaml1f, ifaml2f) with
   [ ([ifam1 :: ifaml1], [ifam2 :: ifaml2]) ->
@@ -551,6 +659,7 @@ value gwu base out_dir out_oc src_oc_list anc desc =
                 first.val := False;
                 List.iter (print_family oc base mark sel fam_done) ml;
                 print_notes oc base ml per_sel;
+                print_relations oc base mark per_sel ml;
              return ()
            else ()
          else ();

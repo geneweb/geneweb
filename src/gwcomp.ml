@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 2.9 1999-07-20 03:54:31 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.10 1999-07-26 07:01:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000d";
+value magic_gwo = "GnWo000e";
 
 type key =
   { pk_first_name : string;
@@ -14,12 +14,14 @@ type key =
 
 type somebody =
   [ Undefined of key
-  | Defined of gen_person string ]
+  | Defined of gen_person iper string ]
 ;
 
 type syntax_o =
-  [ Family of gen_couple somebody and gen_family (gen_person string) string
-  | Notes of key and string ]
+  [ Family of gen_couple somebody and
+      gen_family (gen_person iper string) string
+  | Notes of key and string
+  | Relations of key and list (gen_relation somebody string) ]
 ;
 
 value copy_decode s i1 i2 =
@@ -498,7 +500,8 @@ value create_person () =
   {first_name = ""; surname = ""; occ = 0; image = "";
    public_name = ""; nick_names = []; aliases = [];
    first_names_aliases = []; surnames_aliases = [];
-   titles = []; occupation = ""; sex = Neuter; access = IfTitles;
+   titles = []; rparents = []; rchildren = [];
+   occupation = ""; sex = Neuter; access = IfTitles;
    birth = Adef.codate_None; birth_place = ""; birth_src = "";
    baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
    death = DontKnowIfDead; death_place = ""; death_src = "";
@@ -622,6 +625,41 @@ value parse_child str surname csrc l =
   let l = set_infos str u l in (u, l)
 ;
 
+value get_relation str =
+  fun
+  [ ["-"; x :: l] ->
+      let rtyp =
+        match x with
+        [ "adop" | "adop:" -> Adoption
+        | "reco" | "reco:" -> Recognition
+        | "cand" | "cand:" -> CandidateParent
+        | "godp" | "godp:" -> GodParent
+        | _ -> failwith str ]
+      in
+      if String.length x = 5 && x.[4] = ':' then
+        let (fk, _, l) = parse_parent str l in
+        let l =
+          match l with
+          [ ["+" :: l] -> l
+          | _ -> failwith str ]
+        in
+        let (mk, _, l) = parse_parent str l in
+        do if l <> [] then failwith str else (); return
+        {r_type = rtyp; r_fath = Some fk; r_moth = Some mk}
+      else
+        match l with
+        [ ["fath:" :: l] ->
+            let (fk, _, l) = parse_parent str l in
+            do if l <> [] then failwith str else (); return
+            {r_type = rtyp; r_fath = Some fk; r_moth = None}
+        | ["moth:" :: l] ->
+            let (mk, _, l) = parse_parent str l in
+            do if l <> [] then failwith str else (); return
+            {r_type = rtyp; r_fath = None; r_moth = Some mk}
+        | _ -> failwith str ]
+  | _ -> failwith str ]
+;
+
 value read_family ic fname =
   fun
   [ Some (str, ["fam" :: l]) ->
@@ -710,6 +748,31 @@ value read_family ic fname =
             in
             let str = strip_spaces (strip_controls_m notes) in
             Some (Notes key str, read_line ic)
+        | Some (str, _) -> failwith str
+        | None -> failwith "end of file" ]
+  | Some (str, ["rel" :: l]) ->
+      let (surname, l) = get_name str l in
+      let (first_name, occ, l) = get_fst_name str l in
+      if l <> [] then failwith "str"
+      else
+        match read_line ic with
+        [ Some (_, ["beg"]) ->
+            let rl =
+              try
+                loop (input_a_line ic) where rec loop =
+                  fun
+                  [ "end" -> []
+                  | x ->
+                      [get_relation x (fields x) :: loop (input_a_line ic)] ]
+              with
+              [ End_of_file -> failwith "missing end rel" ]
+            in
+            let key =
+              {pk_first_name = first_name;
+               pk_surname = surname;
+               pk_occ = occ}
+            in
+            Some (Relations key rl, read_line ic)
         | Some (str, _) -> failwith str
         | None -> failwith "end of file" ]
   | Some (str, _) -> failwith str

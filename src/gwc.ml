@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.21 1999-07-22 19:47:20 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.22 1999-07-26 07:01:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -64,7 +64,8 @@ value make_person gen p n occ i =
      occ = occ; image = empty_string;
      first_names_aliases = []; surnames_aliases = [];
      public_name = empty_string; nick_names = [];
-     aliases = []; titles = []; occupation = empty_string;
+     aliases = []; titles = []; rparents = []; rchildren = [];
+     occupation = empty_string;
      sex = Neuter; access = IfTitles;
      birth = Adef.codate_None; birth_place = empty_string;
      birth_src = empty_string;
@@ -408,7 +409,59 @@ value insert_notes fname gen key str =
   | None ->
       do Printf.printf "File \"%s\"\n" fname;
          Printf.printf
-           "*** warning: Notes before person definition: \"%s%s %s\"\n"
+           "*** warning: undefined person: \"%s%s %s\"\n"
+           key.pk_first_name
+           (if occ == 0 then "" else "." ^ string_of_int occ)
+           key.pk_surname;
+         flush stdout;
+      return () ]
+;
+
+value map_option f =
+  fun
+  [ Some x -> Some (f x)
+  | None -> None ]
+;
+
+value insert_relation_parent gen p s k =
+  let par = insert_parent gen k in
+  do if not (List.mem p.cle_index par.rchildren) then
+       par.rchildren := [p.cle_index :: par.rchildren]
+     else ();
+     if par.sex = Neuter then par.sex := s else ();
+  return par.cle_index
+;
+
+value insert_relation gen p r =
+  {r_type = r.r_type;
+   r_fath = map_option (insert_relation_parent gen p Male) r.r_fath;
+   r_moth = map_option (insert_relation_parent gen p Female) r.r_moth}
+;
+
+value insert_relations fname gen key rl =
+  let occ = key.pk_occ + gen.g_shift in
+  match
+    try
+      Some
+        (find_person_by_name gen key.pk_first_name key.pk_surname occ)
+    with [ Not_found -> None ]
+  with
+  [ Some ip ->
+      let p = poi gen.g_base ip in
+      if p.rparents <> [] then
+        do Printf.printf "\nFile \"%s\"\n" fname;
+           Printf.printf "Relations already defined for \"%s%s %s\"\n"
+             key.pk_first_name
+             (if occ == 0 then "" else "." ^ string_of_int occ)
+             key.pk_surname;
+        return Check.error gen
+      else
+        let rl = List.map (insert_relation gen p) rl in
+        p.rparents := rl
+  | None ->
+      do Printf.printf "File \"%s\"\n" fname;
+         Printf.printf
+           "*** warning: undefined person: \"%s%s %s\"\n"
            key.pk_first_name
            (if occ == 0 then "" else "." ^ string_of_int occ)
            key.pk_surname;
@@ -419,7 +472,8 @@ value insert_notes fname gen key str =
 value insert_syntax fname gen =
   fun
   [ Family cpl fam -> insert_family gen cpl fam
-  | Notes key str -> insert_notes fname gen key str ]
+  | Notes key str -> insert_notes fname gen key str
+  | Relations key rl -> insert_relations fname gen key rl ]
 ;
 
 value insert_comp_families gen (x, shift) =

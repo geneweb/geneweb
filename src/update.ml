@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.13 1999-07-22 22:14:02 ddr Exp $ *)
+(* $Id: update.ml,v 2.14 1999-07-26 07:02:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -8,6 +8,7 @@ open Gutil;
 open Util;
 
 exception ModErr;
+type key = (string * string * int);
 
 value rec find_free_occ base f s i =
   match
@@ -72,6 +73,46 @@ value print_same_name conf base p =
              pl;
          end;
       return () ]
+;
+
+value print_return conf =
+  do html_p conf; return
+  tag "form" "method=POST action=\"%s\"" conf.command begin
+    List.iter
+      (fun (x, v) ->
+         Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x
+         (decode_varenv v))
+      conf.env;
+    Wserver.wprint "<input type=hidden name=return value=on>\n";
+    Wserver.wprint "<input type=submit value=\"%s\">\n"
+      (capitale (transl conf "back"));
+  end
+;
+
+value print_err_unknown conf base (f, s, o) =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "error"))
+  in
+  do header conf title;
+     Wserver.wprint "%s: <strong>%s.%d %s</strong>\n"
+       (capitale (transl conf "unknown person")) f o s;
+     print_return conf;
+     trailer conf;
+  return raise ModErr
+;
+
+value link_person conf base (f, s, o) =
+  if f = "?" || s = "?" then
+    if o < 0 || o >= base.data.persons.len then
+      print_err_unknown conf base (f, s, o)
+    else
+      let ip = Adef.iper_of_int o in
+      let p = poi base ip in
+      if p_first_name base p = f && p_surname base p = s then ip
+      else print_err_unknown conf base (f, s, o)
+  else
+    try person_ht_find_unique base f s o with
+    [ Not_found -> print_err_unknown conf base (f, s, o) ]
 ;
 
 value insert_string conf base s =
@@ -345,20 +386,6 @@ value print_warnings conf base wl =
            wl;
        end;
     return ()
-;
-
-value print_return conf =
-  do html_p conf; return
-  tag "form" "method=POST action=\"%s\"" conf.command begin
-    List.iter
-      (fun (x, v) ->
-         Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x
-         (decode_varenv v))
-      conf.env;
-    Wserver.wprint "<input type=hidden name=return value=on>\n";
-    Wserver.wprint "<input type=submit value=\"%s\">\n"
-      (capitale (transl conf "back"));
-  end
 ;
 
 value error conf base x =

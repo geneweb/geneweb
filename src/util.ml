@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.35 1999-07-23 12:38:07 ddr Exp $ *)
+(* $Id: util.ml,v 2.36 1999-07-26 07:02:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1078,6 +1078,32 @@ value only_printable s =
          | _ -> ' ' ];
      done;
   return s'
+;
+
+value relation_type_text conf t n =
+  match t with
+  [ Adoption ->
+      transl_nth conf "adoptive father/adoptive mother/adoptive parents" n
+  | Recognition ->
+      transl_nth conf
+        "recognizing father/recognizing mother/recognizing parents" n
+  | CandidateParent ->
+      transl_nth conf "candidate father/candidate mother/candidate parents" n
+  | GodParent ->
+      transl_nth conf "godfather/godmother/godparents" n ]
+;
+
+value rchild_type_text conf t n =
+  match t with
+  [ Adoption ->
+      transl_nth conf "adoptive son/adoptive daughter/adoptive child" n
+  | Recognition ->
+      transl_nth conf
+        "recognized son/recognized daughter/recognized child" n
+  | CandidateParent ->
+      transl_nth conf "candidate son/candidate daughter/candidate child" n
+  | GodParent ->
+      transl_nth conf "godson/goddaughter/godchild" n ]
 ;
 
 (* Deprecated *)

@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 2.6 1999-07-22 14:34:07 ddr Exp $ *)
+(* $Id: gutil.mli,v 2.7 1999-07-26 07:01:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -32,8 +32,12 @@ value strictement_apres : date -> date -> bool;
 value denomination : base -> person -> string;
 
 value map_title_strings : ('a -> 'b) -> gen_title 'a -> gen_title 'b;
-
-value map_person_strings : ('a -> 'b) -> gen_person 'a -> gen_person 'b;
+value map_relation_ps :
+  ('a -> 'c) -> ('b -> 'd) -> gen_relation 'a 'b -> gen_relation 'c 'd
+;
+value map_person_ps :
+  ('a -> 'c) -> ('b -> 'd) -> gen_person 'a 'b -> gen_person 'c 'd
+;
 value map_family_ps :
   ('a -> 'c) -> ('b -> 'd) -> gen_family 'a 'b -> gen_family 'c 'd
 ;

@@ -1,15 +1,17 @@
-(* $Id: update.mli,v 2.5 1999-07-16 13:28:08 ddr Exp $ *)
+(* $Id: update.mli,v 2.6 1999-07-26 07:02:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Config;
 
 exception ModErr;
+type key = (string * string * int);
 
 value find_free_occ : base -> string -> string -> int -> int;
 value infer_death : config -> option date -> death;
 value print_same_name : config -> base -> person -> unit;
 
+value link_person : config -> base -> (string * string * int) -> Adef.iper;
 value insert_string : config -> base -> string -> Adef.istr;
 value update_misc_names_of_family : base -> person -> unit;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.23 1999-07-23 12:38:05 ddr Exp $ *)
+(* $Id: relation.ml,v 2.24 1999-07-26 07:02:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -8,6 +8,43 @@ open Config;
 open Util;
 
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
+
+value print_with_relation text conf base p r is =
+  fun
+  [ Some ic ->
+      let c = poi base ic in
+      do html_li conf;
+         Wserver.wprint "<input type=radio name=select value=%d>\n"
+           (Adef.int_of_iper ic);
+         Wserver.wprint "%s:\n" (text conf r.r_type is);
+         Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n" (commd conf)
+           (Adef.int_of_iper p.cle_index)
+           (Adef.int_of_iper ic);
+         afficher_personne_sans_titre conf base c;
+         Wserver.wprint "</a>";
+         afficher_titre conf base c;
+         Wserver.wprint "\n";
+      return ()
+  | None -> () ]
+;
+
+value print_with_child_relation conf base p ip =
+  let c = poi base ip in
+  List.iter
+    (fun r ->
+       do match r.r_fath with
+          [ Some ip1 when p.cle_index == ip1 ->
+              print_with_relation rchild_type_text conf base p r
+                (index_of_sex c.sex) (Some ip)
+          | _ -> () ];
+          match r.r_moth with
+          [ Some ip1 when p.cle_index == ip1 ->
+              print_with_relation rchild_type_text conf base p r
+                (index_of_sex c.sex) (Some ip)
+          | _ -> () ];
+       return ())
+    c.rparents
+;
 
 value print_menu conf base p =
   let title h =
@@ -63,11 +100,13 @@ value print_menu conf base p =
                 do html_li conf;
                    Wserver.wprint "<input type=radio name=select value=%d>\n"
                      (Adef.int_of_iper c.cle_index);
-                   if fam.not_married && auth && age_autorise conf base c then ()
+                   if fam.not_married && auth && age_autorise conf base c then
+                     ()
                    else
                      Wserver.wprint "%s\n"
                        (transl_nth conf "his wife/her husband" is);
-                   Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n" (commd conf)
+                   Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n"
+                     (commd conf)
                      (Adef.int_of_iper p.cle_index)
                      (Adef.int_of_iper c.cle_index);
                    afficher_personne_sans_titre conf base c;
@@ -77,6 +116,15 @@ value print_menu conf base p =
                 return ()
               else ())
            p.family;
+         List.iter
+           (fun r ->
+              do print_with_relation relation_type_text conf base p r 0
+                   r.r_fath;
+                 print_with_relation relation_type_text conf base p r 1
+                   r.r_moth;
+              return ())
+           p.rparents;
+         List.iter (print_with_child_relation conf base p) p.rchildren;
        end;
        html_p conf;
        Wserver.wprint "%s\n" (capitale (transl conf "long display"));

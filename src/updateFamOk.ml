@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.18 1999-07-22 19:47:21 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.19 1999-07-26 07:02:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -136,18 +136,6 @@ value add_misc_names_for_new_persons base =
   return ()
 ;
 
-value print_err_unknown conf base (f, s, o) =
-  let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "error"))
-  in
-  do header conf title;
-     Wserver.wprint "%s: <strong>%s.%d %s</strong>\n"
-       (capitale (transl conf "unknown person")) f o s;
-     Update.print_return conf;
-     trailer conf;
-  return raise Update.ModErr
-;
-
 value print_create_conflict conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   let n =
@@ -198,6 +186,7 @@ value insert_person conf base src (f, s, o, create) =
              first_names_aliases = []; surnames_aliases = [];
              public_name = empty_string;
              nick_names = []; aliases = []; titles = [];
+             rparents = []; rchildren = [];
              occupation = empty_string;
              sex = sex; access = IfTitles;
              birth = Adef.codate_of_od birth; birth_place = empty_string;
@@ -225,17 +214,7 @@ value insert_person conf base src (f, s, o, create) =
              else ();
           return ip ]
   | UpdateFam.Link ->
-      if f = "?" || s = "?" then
-        if o < 0 || o >= base.data.persons.len then
-          print_err_unknown conf base (f, s, o)
-        else
-          let ip = Adef.iper_of_int o in
-          let p = poi base ip in
-          if p_first_name base p = f && p_surname base p = s then ip
-          else print_err_unknown conf base (f, s, o)
-      else
-        try person_ht_find_unique base f s o with
-        [ Not_found -> print_err_unknown conf base (f, s, o) ] ]
+      Update.link_person conf base (f, s, o) ]
 ;
 
 value strip_children pl =

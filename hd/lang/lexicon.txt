@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.79 1999-07-23 12:51:37 ddr Exp $
+# $Id: lexicon.txt,v 2.80 1999-07-26 07:01:58 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -617,6 +617,14 @@ no: tilf&oslash;y
 pt: acrescentar
 se: l&auml;gg till
 
+    adoptive father/adoptive mother/adoptive parents
+en: adoptive father/adoptive mother/adoptive parents
+fr: p&egrave;re adoptif/m&egrave;re adoptive/parents adoptifs
+
+    adoptive son/adoptive daughter/adoptive child
+en: adoptive son/adoptive daughter/adoptive child
+fr: fils adoptif/fille adoptive/enfant adoptif
+
     advanced request
 cn: ¸ß¼¶·ÃÎÊÇëÇó
 cs: pokroèilý dotaz
@@ -1099,6 +1107,14 @@ nl: geen GeneWeb links
 no: undertrykk GeneWeb koblinger
 pt: cancelar os links Geneweb
 se: utan GeneWeb l&auml;nkar
+
+    candidate father/candidate mother/candidate parents
+en: candidate father/candidate mother/candidate parents
+fr: p&egrave;re possible/m&egrave;re possible/parents possibles
+
+    candidate son/candidate daughter/candidate child
+en: candidate son/candidate daughter/candidate child
+fr: fils possible/fille possible/enfant possible
 
     cannot access base
 cs: databáze je nepøístupná
@@ -1752,6 +1768,14 @@ nl: generatie
 no: generasjon  
 pt: gera&ccedil;&atilde;o
 se: generation
+
+    godfather/godmother/godparents
+en: godfather/godmother/godparents
+fr: parrain/marraine/parrain et marraine
+
+    godson/goddaughter/godchild
+en: godson/goddaughter/godchild
+fr: filleul/filleule/filleul(e)
 
     grand-parents
 cs: prarodièe
@@ -3171,6 +3195,18 @@ nl: bijnaam
 no: tilnavn
 pt: alcunha
 se: smeknamn
+
+    recognizing father/recognizing mother/recognizing parents
+en: recognizing father/recognizing mother/recognizing parents
+fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
+
+    recognized son/recognized daughter/recognized child
+en: recognized son/recognized daughter/recognized child
+fr: fils reconnu/fille reconnue/enfant reconnu
+
+    relation/relations
+en: relation/relations
+fr: relation/relations
 
     relationship
 cs: vztah
