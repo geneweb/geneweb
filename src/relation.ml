@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.8 1999-04-09 13:29:20 ddr Exp $ *)
+(* $Id: relation.ml,v 2.9 1999-04-11 01:12:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -383,11 +383,9 @@ value compute_relationship conf base p1 p2 =
       Some (rl, total, relationship)
 ;
 
-value print_main_relationship conf base p1 p2 =
+value print_main_relationship conf base p1 p2 rel =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
-  let rel = compute_relationship conf base p1 p2 in
-  do conf.senv := [];
-     header conf title;
+  do header conf title;
      match rel with
      [ None ->
          if p1.cle_index == p2.cle_index then
@@ -449,13 +447,13 @@ value print_base_loop conf base =
 ;
 
 value print conf base p =
-  try
-    match p_getint conf.senv "ei" with
-    [ Some i -> print_main_relationship conf base (base.data.persons.get i) p
-    | _ ->
-        match find_person_in_env conf base "1" with
-        [ Some p1 -> print_main_relationship conf base p1 p
-        | _ -> print_menu conf base p ] ]
-  with
-  [ Consang.TopologicalSortError -> print_base_loop conf base ]
+  fun
+  [ Some p1 ->
+      match
+        try Some (compute_relationship conf base p1 p) with
+        [ Consang.TopologicalSortError -> None ]
+      with
+      [ Some rel -> print_main_relationship conf base p1 p rel
+      | None -> print_base_loop conf base ]
+  | None -> print_menu conf base p ]
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.5 1999-04-05 23:42:27 ddr Exp $ *)
+(* $Id: family.ml,v 2.6 1999-04-11 01:12:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -46,9 +46,21 @@ value inconnu conf n =
   do header conf title; trailer conf; return ()
 ;
 
+value relation_print conf base p =
+  let p1 =
+    match p_getint conf.senv "ei" with
+    [ Some i -> do conf.senv := []; return Some (base.data.persons.get i)
+    | None ->
+        match find_person_in_env conf base "1" with
+        [ Some p1 -> do conf.senv := []; return Some p1
+        | None -> None ] ]
+  in
+  Relation.print conf base p p1
+;
+
 value person_selected conf base p =
   match p_getenv conf.senv "em" with
-  [ Some "R" -> Relation.print conf base p
+  [ Some "R" -> relation_print conf base p
   | Some mode -> incorrect_request conf
   | None -> Perso.print conf base p ]
 ;
@@ -328,7 +340,7 @@ value family_m conf base =
       | None -> Alln.print_first_names conf base ]
   | Some "R" ->
       match find_person_in_env conf base "" with
-      [ Some p -> Relation.print conf base p
+      [ Some p -> relation_print conf base p
       | _ -> inconnu_au_bataillon conf ]
   | Some "REQUEST" when conf.wizard ->
       let title _ = () in
