@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.7 2000-01-06 15:21:29 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.8 2000-02-05 16:08:51 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -47,6 +47,7 @@ value print_location pos =
   Printf.fprintf log_oc.val "File \"%s\", line %d:\n" in_file.val pos
 ;
 
+(*
 value buff = ref (String.create 80);
 value store len x =
   do if len >= String.length buff.val then
@@ -56,6 +57,7 @@ value store len x =
   return succ len
 ;
 value get_buff len = String.sub buff.val 0 len;
+*)
 
 value rec skip_eol =
   parser [ [: `'\n' | '\r'; _ = skip_eol :] -> () | [: :] -> () ]
@@ -63,9 +65,9 @@ value rec skip_eol =
 
 value rec get_to_eoln len =
   parser
-  [ [: `'\n' | '\r'; _ = skip_eol :] -> get_buff len
-  | [: `c; s :] -> get_to_eoln (store len c) s
-  | [: :] -> get_buff len ]
+  [ [: `'\n' | '\r'; _ = skip_eol :] -> Buff.get len
+  | [: `c; s :] -> get_to_eoln (Buff.store len c) s
+  | [: :] -> Buff.get len ]
 ;
 
 value rec skip_to_eoln =
@@ -77,10 +79,10 @@ value rec skip_to_eoln =
 
 value rec get_ident len =
   parser
-  [ [: `' ' :] -> get_buff len
+  [ [: `' ' :] -> Buff.get len
   | [: `c when not (List.mem c ['\n'; '\r']); s :] ->
-      get_ident (store len c) s
-  | [: :] -> get_buff len ]
+      get_ident (Buff.store len c) s
+  | [: :] -> Buff.get len ]
 ;
 
 value skip_space = parser [ [: `' ' :] -> () | [: :] -> () ];
@@ -213,9 +215,9 @@ value rec skip_spaces =
 
 value rec ident_slash len =
   parser
-  [ [: `'/' :] -> get_buff len
-  | [: `c; a = ident_slash (store len c) :] -> a
-  | [: :] -> get_buff len ]
+  [ [: `'/' :] -> Buff.get len
+  | [: `c; a = ident_slash (Buff.store len c) :] -> a
+  | [: :] -> Buff.get len ]
 ;
 
 value strip c str =
@@ -298,20 +300,20 @@ value rec find_all_fields lab =
 
 value rec lexing =
   parser
-  [ [: `('0'..'9' as c); n = number (store 0 c) :] -> ("INT", n)
-  | [: `('A'..'Z' as c); i = ident (store 0 c) :] -> ("ID", i)
+  [ [: `('0'..'9' as c); n = number (Buff.store 0 c) :] -> ("INT", n)
+  | [: `('A'..'Z' as c); i = ident (Buff.store 0 c) :] -> ("ID", i)
   | [: `'.' :] -> ("", ".")
   | [: `' ' | '\r'; s :] -> lexing s
   | [: _ = Stream.empty :] -> ("EOI", "")
   | [: `x :] -> ("", String.make 1 x) ]
 and number len =
   parser
-  [ [: `('0'..'9' as c); a = number (store len c) :] -> a
-  | [: :] -> get_buff len ]
+  [ [: `('0'..'9' as c); a = number (Buff.store len c) :] -> a
+  | [: :] -> Buff.get len ]
 and ident len =
   parser
-  [ [: `('A'..'Z' as c); a = ident (store len c) :] -> a
-  | [: :] -> get_buff len ]
+  [ [: `('A'..'Z' as c); a = ident (Buff.store len c) :] -> a
+  | [: :] -> Buff.get len ]
 ;
 
 value make_lexing s = Stream.from (fun _ -> Some (lexing s));
@@ -983,6 +985,44 @@ value forward_godp gen ip ipp =
   gen.g_godp := [(ipp, ip) :: gen.g_godp]
 ;
 
+value glop = ref [];
+
+value indi_lab =
+  fun
+  [ "ASSO" | "BAPM" | "BIRT" | "BURI" | "CHR" | "CREM" | "DEAT" | "FAMC"
+  | "FAMS" | "NAME" | "NOTE" | "OBJE" | "OCCU" | "SEX" | "SOUR"
+  | "TITL" -> True
+  | c -> do if List.mem c glop.val then () else do glop.val := [c :: glop.val]; Printf.eprintf "unused %s\n" c; flush stderr; return (); return
+      False ]
+;
+
+value html_text_of_tags rl =
+  let rec tot len lev r =
+    let len = Buff.mstore len (string_of_int lev) in
+    let len = Buff.store len ' ' in
+    let len = Buff.mstore len r.rlab in
+    let len =
+      if r.rval = "" then len else Buff.mstore (Buff.store len ' ') r.rval
+    in
+    let len =
+      if r.rcont = "" then len else Buff.mstore (Buff.store len ' ') r.rcont
+    in
+    totl len (lev + 1) r.rsons
+  and totl len lev rl =
+    List.fold_left
+      (fun len r ->
+         let len = Buff.store len '\n' in
+         tot len lev r)
+      len rl
+  in
+  let len = 0 in
+  let len = Buff.mstore len "<pre>\n" in
+  let len = Buff.mstore len "-- GEDCOM --" in
+  let len = totl len 1 rl in
+  let len = Buff.mstore len "\n</pre>" in
+  Buff.get len
+;
+
 value add_indi gen r =
   let i = per_index gen r.rval in
   let name_sons = find_field "NAME" r.rsons in
@@ -1095,8 +1135,8 @@ value add_indi gen r =
   in
   let notes =
     match find_all_fields "NOTE" r.rsons with
-    [ [] -> string_empty.val
-    | rl -> add_string gen (treat_notes gen rl) ]
+    [ [] -> ""
+    | rl -> treat_notes gen rl ]
   in
   let titles =
     List.map (treat_indi_title gen public_name)
@@ -1249,6 +1289,17 @@ value add_indi gen r =
     let s = source gen r in
     if s = "" then default_source.val else s
   in
+  let ext_notes =
+    let remain_tags =
+      List.fold_left
+        (fun list r -> if indi_lab r.rlab then list else [r :: list])
+        [] r.rsons
+    in
+    if remain_tags = [] then ""
+    else
+      let s = if notes = "" then "" else "\n" in
+      s ^ html_text_of_tags (List.rev remain_tags)
+  in
   let person =
     {first_name = add_string gen first_name; surname = add_string gen surname;
      occ = occ; public_name = add_string gen public_name;
@@ -1272,7 +1323,8 @@ value add_indi gen r =
      death_src = add_string gen death_src; burial = burial;
      burial_place = add_string gen burial_place;
      burial_src = add_string gen burial_src;
-     notes = notes; psources = add_string gen psources; cle_index = i}
+     notes = add_string gen (notes ^ ext_notes);
+     psources = add_string gen psources; cle_index = i}
   and ascend = {parents = parents; consang = Adef.fix (-1)}
   and union = {family = Array.of_list family} in
   do gen.g_per.arr.(Adef.int_of_iper i) := Right3 person ascend union;

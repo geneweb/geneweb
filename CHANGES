@@ -16,6 +16,9 @@ GeneWeb version 3.03
     asks for a data base name, but in CGI mode when entering a data base,
     it did not work (incorrect URL).
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [05 Feb 00] Added unused Gedcom tags (of indiduals) in notes.
+
 * Base configuration files (base.gwf)
   - [25 Jan 00] Added variable "public_if_titles": if "yes", consider persons
     having nobility titles as public ("public" means that their private data
