@@ -2,6 +2,22 @@ GeneWeb version 3.11
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [29 Jan 01] For GeneWeb sites accomodating many data bases: to
+    avoid the creation of too many files in the same directories, added
+    the ability to put them in sub-sub-directories. A data base file can
+    be installed in a sub-directory of its first character,
+    sub-sub-directory of its second character. For example, a file
+    associated with the data base foo can be in the directory f/o/. This
+    is not required, but optional, and is therefore backward
+    compatible. This applies to:
+      * the database directory: f/o/foo.gwb
+      * the database configuration file: f/o/foo.gwf
+      * the associated images directory: images/f/o/foo
+      * the associated extra images directory: src/images/f/o/foo
+      * the associated source texts directory: src/f/o/foo/*.txt
+      * the header: lang/f/o/foo.hed or lang/xx/f/o/foo.hed
+      * the trailer: lang/f/o/foo.trl or lang/xx/f/o/foo.trl
+      * the personal page template: etc/f/o/foo/perso.txt
   - [26 Jan 01] Under Windows, added option "-noproc" asking not to run a
     new process at each request. This option was added because some users
     under Windows reported that sometimes, the service gwd blocks after some
