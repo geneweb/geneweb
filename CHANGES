@@ -26,8 +26,10 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Aug 6, 99] Changed order of menu in "update page": separated "delete"
+    from "modify".
   - [Aug 6, 99] Restored the system of robot exclusion (had been deleted
-    in version 1.10) with some improvements.
+    in version 1.10) with some improvements. Option "-robot_xcl".
   - [Aug 5, 99] Added descendants displaying by tree (doesn't work with Lynx).
   - [Aug 3, 99] Added ancestors displaying (and navigating) by tree.
   - [Aug 3, 99] In relationship by branches, found a solution to
@@ -93,7 +95,7 @@ GeneWeb version 2.05
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
   - [Aug 5, 99] Updated Portuguese phrases (Yves Guignard)
-  - [Aug 5, 99] Updated Norwegian phrases (Brynjulf Langballe)
+  - [Aug 5..6, 99] Updated Norwegian phrases (Brynjulf Langballe)
   - [Aug 3, 99] Updated Danish phrases (Hans Albeck)
   - [Aug 3..6, 99] Updated Dutch phrases (Joris Esch)
   - [Aug 3, 99] Updated German phrases (Markus Mottl)
