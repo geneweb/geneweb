@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.20 2001-12-20 19:58:12 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.21 2001-12-26 20:41:55 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -776,6 +776,9 @@ zh: 已经有 %q 次访问数据库，其中 %c 次访问本主页， 自从 %d。
 <p>
 
 [
+af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
+    om die dokument te herlaai), probeer die volgende <a
+    href="%sescache=0">link</a>.
 ca: Si el vostre navegador no actualitza autom&agrave;ticament les
     p&agrave;gines modificades (obligant-vos a fer actualitzar manualment
     la p&agrave;gina), proveu de navegar des d'<a href="%sescache=0">aquest
