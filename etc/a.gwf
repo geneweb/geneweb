@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.18 2000-07-28 11:32:48 ddr Exp $
+# $Id: a.gwf,v 3.19 2000-10-17 13:21:09 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -124,3 +124,14 @@ places_inverted=no
 # Uncomment the following definition to specify that the present database has
 # been renamed:
 #renamed=newname
+
+# Template to be used (applies to personal pages):
+# template=*       any template allowed; default = standard one
+# template=foo,*   any template allowed; default = foo
+# template=foo,bar only foo and bar templates allowed
+# template=foo,    only foo and standard template allowed; default = foo
+# template=,foo    only foo and standard template allowed; default = standard
+# template=        only standard template allowed
+# template=foo     only foo template allowed
+# Default is template=*
+# The template can be changed in URL by adding ";templ=foo".

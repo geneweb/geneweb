@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.8 2000-10-16 02:58:08 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.9 2000-10-17 13:21:10 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -29,7 +29,7 @@
   %if;has_qualifiers;%public_name; <em>%qualifier;</em>
   %else;%public_name; %surname;%end;
 %else;
-  %if;has_qualifiers;%first_name; <em>%qualifier;</em>;
+  %if;has_qualifiers;%first_name; <em>%qualifier;</em>
   %else;
     %if;cancel_links;%first_name; %surname;
     %else;
