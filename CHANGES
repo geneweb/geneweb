@@ -40,7 +40,9 @@ GeneWeb version 4.01
     - between x and y, their death value is "don't know if death"
     Default x is 80, y is 120.
 
-* Lexicon (lang/lexicon.txt)
+* Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
+  - [26 Mar 01] (technical point) Grouped together all lang/*/start.txt in
+    one only file lang/start.txt.
   - [14 Mar 01] Added the ability to add "derived" languages,
     i.e. languages where most of the phrases are the same than some other
     already existing language, but with some changes here and there. In
