@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.22 2003-12-11 08:38:04 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.23 2003-12-16 07:45:34 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -175,11 +175,13 @@
     %if;are_married;[*married%t to:::date_place]0
     %elseif;are_not_married;[*relationship%t to:::date_place]0
     %elseif;are_engaged;[*engaged%t to:::date_place]0
+    %elseif;is_a_rap;[*sexual abuse%t with:::date_place]0
     %end;
   %else;
     %if;are_married;[*married%t to:::date_place]1
     %elseif;are_not_married;[*relationship%t to:::date_place]1
     %elseif;are_engaged;[*engaged%t to:::date_place]1
+    %elseif;is_a_rap;[*sexual abuse%t with:::date_place]1
     %end;
   %end;
 %end;

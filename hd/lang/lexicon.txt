@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.166 2003-12-08 20:46:18 ddr Exp $
+# $Id: lexicon.txt,v 4.167 2003-12-16 07:45:34 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -6543,6 +6543,10 @@ ru: прозвище
 sl: oznaka
 sv: smeknamn
 
+    rap
+en: rap
+fr: viol
+
     recognized son/recognized daughter/recognized child
 af: aanvaarde seun/aanvaarde dogter/aanvaarde kind
 bg: припознат син/припозната дъщеря/припознато дете
@@ -6935,6 +6939,10 @@ ro: sex
 ru: пол
 sl: spol
 sv: k&ouml;n
+
+    sexual abuse%t with
+en: having abused%t/victim of sexual abuse%t by
+fr: ayant abus&eacute; sexuellement%t de/victime d'abus sexuel%t de
 
     short display
 af: beknopte weergawe
