@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 4.3 2001-03-30 12:54:23 ddr Exp $ *)
+(* $Id: util.ml,v 4.4 2001-03-31 03:43:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -778,15 +778,12 @@ value default_body_prop conf =
 ;
 
 value body_prop conf =
-  match p_getenv conf.env "body_prop" with
-  [ Some x -> " " ^ x
-  | None ->
-      try
-        match List.assoc "body_prop" conf.base_env with
-        [ "" -> default_body_prop conf
-        | s -> " " ^ s ]
-      with
-      [ Not_found -> default_body_prop conf ] ]
+  try
+    match List.assoc "body_prop" conf.base_env with
+    [ "" -> default_body_prop conf
+    | s -> " " ^ s ]
+  with
+  [ Not_found -> default_body_prop conf ]
 ;
 
 value get_server_string_aux cgi request =
