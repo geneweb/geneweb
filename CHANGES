@@ -9,6 +9,7 @@ GeneWeb version 3.03
     delete the window!
 
 * GeneWeb Service/CGI (gwd)
+  - [02 Fev 00] In personal pages, relations are now displayed before notes.
   - [20 Jan 00] When sorting the children, use now the baptism date
     when there is no birth date.
   - [18 Jan 00] Fixed bug: when selecting no data base, the default page

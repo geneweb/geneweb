@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.8 2000-01-21 12:01:15 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.9 2000-02-02 16:07:17 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -54,7 +54,7 @@ value gen_print conf base mois f_scan dead_people =
            match (Adef.od_of_codate p.birth, p.death) with
            [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
                if d.prec = Sure && d.day <> 0 && d.month <> 0
-               && d.month = mois then
+               && d.month = mois && d.delta = 0 then
                  if age_autorise conf base p then
                    let j = d.day in
                    tab.(pred j) := [(p, d.year, DeBirth) :: tab.(pred j)]
@@ -68,7 +68,7 @@ value gen_print conf base mois f_scan dead_people =
                do match Adef.od_of_codate p.birth with
                   [ Some (Dgreg dt _) ->
                       if dt.prec = Sure && dt.day <> 0 && dt.month <> 0
-                      && dt.month = mois then
+                      && dt.month = mois && dt.delta = 0 then
                         if age_autorise conf base p then
                           let j = dt.day in
                           tab.(pred j) :=
@@ -81,7 +81,7 @@ value gen_print conf base mois f_scan dead_people =
                       match Adef.date_of_cdate d with
                       [ Dgreg dt _ ->
                           if dt.prec = Sure && dt.day <> 0 && dt.month <> 0
-                          && dt.month = mois then
+                          && dt.month = mois && dt.delta = 0 then
                             if age_autorise conf base p then
                               let j = dt.day in
                               let a = dt.year in

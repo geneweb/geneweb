@@ -5,6 +5,10 @@ GeneWeb Version 3.03
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [02 Feb 00] Fixed little problem in anniversaries: when other
+    calendars than Gregorian (e.g. Julian), could select "anniversary"
+    even for persons having only the year in their date (fixed by testing
+    the field "delta" in the date record).
   - [01 Feb 00] Added indentation in forum to make it more readable.
   - [25 Jan 00] Display the number of persons in some more pages. Dont
     display it when number <= 1.
