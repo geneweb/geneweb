@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 3.6 2000-11-22 03:01:03 ddr Exp $ *)
+(* $Id: consang.ml,v 3.7 2000-11-23 18:40:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -28,7 +28,11 @@ type relationship =
     anc_stat2 : mutable anc_stat }
 ;
 
-type relationship_info = { tstab : array int; reltab : array relationship };
+type relationship_info =
+  { tstab : array int;
+    reltab : array relationship;
+    queue : mutable array (list int) }
+;
 
 value no_consang = Adef.fix (-1);
 
@@ -107,14 +111,15 @@ value topological_sort base =
   return tab
 ;
 
+value phony_rel =
+  {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = []; lens2 = [];
+   inserted = 0; elim_ancestors = False; anc_stat1 = MaybeAnc;
+   anc_stat2 = MaybeAnc}
+;
+
 value make_relationship_info base tstab =
-  let phony =
-    {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = []; lens2 = [];
-     inserted = 0; elim_ancestors = False; anc_stat1 = MaybeAnc;
-     anc_stat2 = MaybeAnc}
-  in
-  let tab = Array.create base.data.persons.len phony in
-  {tstab = tstab; reltab = tab}
+  let tab = Array.create base.data.persons.len phony_rel in
+  {tstab = tstab; reltab = tab; queue = [| |]}
 ;
 
 value rec insert_branch_len_rec (len, n) =
@@ -142,22 +147,41 @@ value relationship_and_links base ri b ip1 ip2 =
     let tstab = ri.tstab in
     let yes_inserted = new_mark () in
     let reset u =
-      reltab.(u) :=
-        {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = [];
-         lens2 = []; inserted = yes_inserted; elim_ancestors = False;
-         anc_stat1 = MaybeAnc; anc_stat2 = MaybeAnc}
+      let tu = reltab.(u) in
+      if tu == phony_rel then
+        reltab.(u) :=
+          {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = [];
+           lens2 = []; inserted = yes_inserted; elim_ancestors = False;
+           anc_stat1 = MaybeAnc; anc_stat2 = MaybeAnc}
+      else
+        do tu.weight1 := 0.0; tu.weight2 := 0.0; tu.relationship := 0.0;
+           tu.lens1 := []; tu.lens2 := []; tu.inserted := yes_inserted;
+           tu.elim_ancestors := False;
+           tu.anc_stat1 := MaybeAnc; tu.anc_stat2 := MaybeAnc;
+        return ()
     in
-    let q = ref [| |] in
-    let qi = ref 0 in
-    let qs = min tstab.(i1) tstab.(i2) in
+    let qi = ref (min tstab.(i1) tstab.(i2))  in
+    let qmax = ref (-1) in
     let insert u =
-      let v = tstab.(u) - qs in
+      let v = tstab.(u) in
       do reset u;
-         if v >= Array.length q.val then
-           let len = Array.length q.val in
-           q.val := Array.append q.val (Array.create (v + 1 - len) [])
+         if v >= Array.length ri.queue then
+           let len = Array.length ri.queue in
+           ri.queue := Array.append ri.queue (Array.create (v + 1 - len) [])
          else ();
-         q.val.(v) := [u :: q.val.(v)];
+         if qmax.val < 0 then
+           do for i = qi.val to v - 1 do ri.queue.(i) := []; done;
+              qmax.val := v;
+              ri.queue.(v) := [u];
+           return ()
+         else
+           do if v > qmax.val then
+                do for i = qmax.val + 1 to v do ri.queue.(i) := []; done;
+                   qmax.val := v;
+                return ()
+              else ();
+              ri.queue.(v) := [u :: ri.queue.(v)];
+           return ();
       return ()
     in
     let relationship = ref 0.0 in
@@ -219,10 +243,9 @@ value relationship_and_links base ri b ip1 ip2 =
        reltab.(i1).anc_stat1 := IsAnc;
        reltab.(i2).anc_stat2 := IsAnc;
        while
-         qi.val < Array.length q.val && nb_anc1.val > 0 && nb_anc2.val > 0
+         qi.val <= qmax.val (*&& nb_anc1.val > 0 && nb_anc2.val > 0*)
        do
-         let slice = q.val.(qi.val) in
-         List.iter treat_ancestor slice;
+         List.iter treat_ancestor ri.queue.(qi.val);
          incr qi;
        done;
     return (half relationship.val, tops.val)
