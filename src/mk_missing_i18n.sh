@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml camlp4r.cma $0
 *) ".";
-(* $Id: mk_missing_i18n.sh,v 4.6 2002-07-26 08:49:30 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 4.7 2002-08-21 08:45:15 ddr Exp $ *)
 
 open Printf;
 
@@ -115,8 +115,7 @@ missing entries are displayed together with their English and French
 translations.
 <p>
 If you want to collaborate, you can <a
-href=\"mailto:daniel.de_rauglaudre@inria.fr?subject=Missing translations\">send
-me</a>
+href=\"../email.html\">send me</a>
 the translations in
 the given language if you know it. Thanks.
 <p align=center>
