@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.79 2002-03-06 21:16:24 ddr Exp $
+# $Id: lexicon.txt,v 4.80 2002-03-10 16:09:11 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -734,7 +734,7 @@ af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
 ca: un cosí de %s grau/una cosina de %s grau/un(a) cosí(na) de %s grau
 cs: bratranec z %s kolena/sestøenice z %s kolena
 da: en f&aelig;tter af %s grad/en kusine af %s grad
-de: ein:d:+em Cousin %s Grades/eine Cousine %s Grades
+de: ein:d:+em Cousin %s Grades/eine:d:+r Cousine %s Grades
 en: a %s cousin
 eo: %s grada kuzo/%s grada kuzino/%s grada kuz(in)o
 es: un primo en %s grado/una prima en %s grado/un(a) primo(a) en %s grado
@@ -872,7 +872,7 @@ af: 'n afstammeling
 ca: un descendent/una descendent
 cs: potomek
 da: en efterkommer
-de: ein Nachkomme
+de: ein:d:+em Nachkomme:d:+n
 en: a descendant
 eo: posteulo
 es: un descendiente/una descendiente
@@ -895,7 +895,7 @@ af: 'n oupa/'n ouma/'n grootouer
 ca: un avi/una àvia/un(a) avi(a)
 cs: dìdeèek/babièka/prarodiè
 da: en bedstefader/en bedstemoder/en bedstefor&aelig;lder
-de: ein Gro&szlig;vater/eine Gro&szlig;mutter/ein:d:+em Gro&szlig;elternteil
+de: ein:d:+em Gro&szlig;vater/eine:d:+r Gro&szlig;mutter/ein:d:+em Gro&szlig;elternteil
 en: a grandfather/a grandmother/a grandparent
 eo: avo/avino/av(in)o
 es: un abuelo/una abuela/un(a) abuelo(a)
@@ -918,7 +918,7 @@ af: 'n kleinseun/'n kleindogter/'n kleinkind
 ca: un net/una neta/un(a) net(a)
 cs: vnuk/vnuèka/vnouèe
 da: en s&oslash;nne-s&oslash;n/en s&oslash;nne-datter/et barnebarn/en datter-s&oslash;n/en datter-datter/et barnebarn
-de: ein Enkel/eine Enkelin/ein Enkelkind
+de: ein:d:+em Enkel/eine:d:+r Enkelin/ein:d:+em Enkelkind
 en: a grandson/a granddaughter/a grandchild
 eo: nepo/nepino/nep(in)o
 es: un nieto/una nieta/un(a) nieto(a)
@@ -941,7 +941,7 @@ af: 'n oupagrootjie/'n oumagrootjie/'n grootjie
 ca: un besavi/una besàvia/un(a) besavi(a)
 cs: pradìdeèek/prababièka/praprarodiè
 da: en oldefader/en oldemoder/en oldefor&aelig;lder
-de: ein Urgro&szlig;vater/eine Urgro&szlig;mutter/ein:d:+em Urgro&szlig;elternteil
+de: ein:d:+em Urgro&szlig;vater/eine:d:+r Urgro&szlig;mutter/ein:d:+em Urgro&szlig;elternteil
 en: a great-grandfather/a great-grandmother/a great-grandparent
 eo: praavo/praavino/praav(in)o
 es: un bisabuelo/una bisabuela/un(a) bisabuelo(a)
@@ -964,7 +964,7 @@ af: 'n agterkleinseun/'n agterkleindogter/'n agterkleinkind
 ca: un besnet/una besneta/un(a) besnet(a)
 cs: pravnuk/pravnuèka/pravnouèata
 da: en oldes&oslash;n/en oldedatter/et oldebarn
-de: ein Urenkel/eine Urenkelin/ein Urenkelkind
+de: ein:d:+em Urenkel/eine:d:+r Urenkelin/ein:d:+em Urenkelkind
 en: a great-grandson/a great-granddaughter/a great-grandchild
 eo: pranepo/pranepino/pranep(in)o
 es: un bisnieto/una bisnieta/un(a) bisnieto(a)
@@ -987,7 +987,7 @@ af: 'n agterneef/'n agterniggie
 ca: un besnebot/una besneboda
 cs: prasynovec/praneteø
 da: en grandnev&oslash;/en grandniece
-de: ein Gro&szlig;neffe/eine Gro&szlig;nichte
+de: ein:d:+em Gro&szlig;neffe:d:+n/eine:d:+r Gro&szlig;nichte
 en: a great-nephew/a great-niece
 eo: pranevo/pranevino
 es: un bissobrino/una bissobrina
@@ -1010,7 +1010,7 @@ af: 'n grootoom/'n groottante
 ca: un oncle avi/una tia àvia
 cs: prastrýc/prateta
 da: en grandonkel/en grandtante
-de: ein Gro&szlig;onkel/eine Gro&szlig;tante
+de: ein:d:+em Gro&szlig;onkel/eine:d:+r Gro&szlig;tante
 en: a great-uncle/a great-aunt
 eo: praonklo/praonklino
 es: un tio abuelo/una tia abuela
@@ -1033,7 +1033,7 @@ af: 'n stiefbroer/'n stiefsuster/'n stiefbroer of -suster
 ca: un germanastre/una germanastra/un(a) germanastre(a)
 cs: nevlastní bratr/nevlastní sestra/nevlastní sourozenec
 da: en halvbroder/en halvsøster/en halvsøskende
-de: ein Halbbruder/eine Halbschwester/ein Halbbruder oder eine Halbschwester
+de: ein:d:+em Halbbruder/eine:d:+r Halbschwester/ein:d:+em Halbbruder oder eine:d:+r Halbschwester
 en: a half-brother/a half-sister/a half-sibling
 eo: duonfrato/duonfratino/duonfrat(in)o
 es: un medio hermano/una medio hermana/un(a) medio(a) hermano(a)
@@ -1056,7 +1056,7 @@ af: 'n broerskind/'n susterskind
 ca: un nebot/una neboda
 cs: synovec/neteø
 da: en nev&oslash;/en niece
-de: ein Neffe/eine Nichte
+de: ein:d:+em Neffe:d:+n/eine:d:+r Nichte
 en: a nephew/a niece
 eo: nevo/nevino
 es: un sobrino/a sobrina
@@ -1102,7 +1102,7 @@ af: 'n seun/'n dogter/'n kind
 ca: un fill/una filla/un(a) fill(a)
 cs: syn/dcera/dítì
 da: en s&oslash;n/en datter/et barn
-de: ein Sohn/eine Tochter/ein Kind
+de: ein:d:+em Sohn/eine:d:+r Tochter/ein:d:+em Kind
 en: a son/a daughter/a child
 eo: filo/filino/ido
 es: un hijo/una hija/un(a) hijo(a)
@@ -1522,7 +1522,7 @@ af: 'n oom/'n tante
 ca: un oncle/una tia
 cs: strýc/teta
 da: en onkel/en tante
-de: ein Onkel/eine Tante
+de: ein:d:+em Onkel/eine:d:+r Tante
 en: an uncle/an aunt
 eo: onklo/onklino
 es: un t&iacute;o/una t&iacute;a
@@ -6778,7 +6778,7 @@ af: die skoonpa/die skoonma
 ca: el sogre/la sogra
 cs: tchán/tchýnì
 da: svigerfaderen/svigermoderen
-de: der Schwiegervater/die Schwiegermutter
+de: der:d:dem Schwiegervater/die:d:der Schwiegermutter
 en: the father-in-law/the mother-in-law
 eo: bopatro/bopatrino
 es: el suegro/la suegra
@@ -6801,7 +6801,7 @@ af: die pa/die ma/'n ouer
 ca: el pare/la mare/un pare
 cs: otec/matka/rodièe
 da: faderen/moderen/en for&aelig;lder
-de: der Vater/die Mutter/ein:d:+em Elternteil
+de: der:d:dem Vater/die:d:der Mutter/ein:d:+em Elternteil
 en: the father/the mother/a parent
 eo: la patro/la patrino/unu el la gepatroj
 es: el padre/la madre/un padre
@@ -6871,7 +6871,7 @@ af: die kleinkinders
 ca: els nets
 cs: vnouèata
 da: b&oslash;rneb&oslash;rnene
-de: die Enkel
+de: die Enkelkinder
 en: the grandchildren
 eo: la genepoj
 es: los nietos
