@@ -5,6 +5,8 @@ GeneWeb Version 2.01
   - [Mar 30, 99] Changed term "photo" into "image".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Mar 30, 99] Added the spouses when displaying relationship links with
+    cousins (from the "cousin" link in personal pages).
   - [Mar 25, 99] Added the "unmarried" case for couples.
   - [Mar 23, 99] Added display of number of accesses in traces.
   - [Mar 17, 99] Added an optional automatic choice for the "death state" in
