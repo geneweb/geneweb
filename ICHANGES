@@ -19,6 +19,10 @@ GeneWeb Version 4.04
 * Compilation
   - [07 Sep 01] All executables are now compiled static (no dynamic library)
 
+* Everywhere
+  - [27 Nov 01] Changed all "data base" into "database". I am too bad in
+    English... :-)
+
 GeneWeb Version 4.03
 --------------------
 
