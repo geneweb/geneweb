@@ -23,6 +23,9 @@ GeneWeb Version 2.01
     gedcom files with ascii charset (resulting problems in "a" umlaut, for
     example).
 
+* Consanguinity computing (consang)
+  - [Mar 26, 99] Adde option -q for quiet mode.
+
 * Lexicon (lexicon.txt) and Welcome files (xx/start.txt)
   - [Mar 10, 99] Some changes in Italian version (by Raffaele Sena).
 

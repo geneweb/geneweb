@@ -1,13 +1,14 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 2.1 1999-03-08 11:18:55 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 2.2 1999-03-26 05:48:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value fname = ref "";
 value scratch = ref False;
+value quiet = ref True;
 
 value usage = "usage: " ^ Sys.argv.(0) ^ " [-scratch] <file_name>";
 value speclist =
-  [("-scratch", Arg.Set scratch, ": from scratch")]
+  [("-q", Arg.Set quiet, ": quiet mode"); ("-scratch", Arg.Set scratch, ": from scratch")]
 ;
 
 value main () =
@@ -25,7 +26,7 @@ value main () =
       do if base.Def.data.Def.has_family_patches then scratch.val := True
          else ();
          Sys.catch_break True;
-         try Consang.compute_all_consang base scratch.val with
+         try Consang.compute_all_consang base scratch.val quiet.val with
          [ Sys.Break -> do Printf.eprintf "\n"; flush stderr; return () ];
          Iobase.output fname.val base;
       return ()

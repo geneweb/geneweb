@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.2 1999-03-25 20:25:36 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.3 1999-03-26 05:48:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -535,7 +535,7 @@ value link gwo_list =
        do Check.check_base base gen pr_stats.val; flush stdout; return ()
      else ();
      if not gen.g_errored then
-       if do_consang.val then Consang.compute_all_consang base False
+       if do_consang.val then Consang.compute_all_consang base False False
        else ()
      else exit 1;
   return base
