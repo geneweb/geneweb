@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: cleanup.htm,v 1.2 2002-06-18 08:03:03 ddr Exp $ -->
+  <!-- $Id: cleanup.htm,v 1.3 2002-06-20 08:32:53 ddr Exp $ -->
   <title>[
 de: Aufr&auml;umen
 en: Clean up
@@ -14,7 +14,7 @@ sv: Upprensning
 ]</title>
 </head>
 
-<body background="file://$f/images/gwback.jpg">
+<body background="file://%f/images/gwback.jpg">
 
 <center><h1><font color=#2f6400>[
 de: Eine Datenbank aufr&auml;umen
@@ -63,24 +63,24 @@ sv: Om du har gjort många modifieringar i din databas, eller om du helt
 <li>
 [
 de: Um einfach aufzur&auml;umen, wende die 
-    <a href="gwsetup?lang=$l;v=consang.htm">Initialisierung der
+    <a href="gwsetup?lang=%l;v=consang.htm">Initialisierung der
     Blutsverwandtschaft</a> an.
 en: For a simple cleaning up, apply the <a
-    href="gwsetup?lang=$l;v=consang.htm">initialisation</a> of
+    href="gwsetup?lang=%l;v=consang.htm">initialisation</a> of
     consanguinities.
 es: Para realizar una limpieza simple, aplique el <a
-    href="gwsetup?lang=$l;v=consang.htm">programa de
+    href="gwsetup?lang=%l;v=consang.htm">programa de
     inicialisaci&oacute;n</a> de las consanguinidades.
 fr: Pour un nettoyage simple, appliquez le <a
-    href="gwsetup?lang=$l;v=consang.htm">programme d'initialisation</a> des
+    href="gwsetup?lang=%l;v=consang.htm">programme d'initialisation</a> des
     consanguinités.
 it: Per una pulizia semplice, applicate il <a
-    href="gwsetup?lang=$l;v=consang.htm">programma d'inizializzazione</a> delle
+    href="gwsetup?lang=%l;v=consang.htm">programma d'inizializzazione</a> delle
     consanguineit&agrave;.
 lv: Vienkârðai datu bâzes sakopðanai vieciet asinsradniecîbas <a
-    href="gwsetup?lang=$l;v=consang.htm">pârrçíinâðanu</a>.
+    href="gwsetup?lang=%l;v=consang.htm">pârrçíinâðanu</a>.
 sv: För en enkel upprensning, använd <a
-    href="gwsetup?lang=$l;v=consang.htm">beräkning</a> av
+    href="gwsetup?lang=%l;v=consang.htm">beräkning</a> av
     blodsband.
 ]
 
@@ -88,7 +88,7 @@ sv: För en enkel upprensning, använd <a
 
 <li>
 <form method=GET action="cleanup">
-<input type=hidden name=lang value=$l>
+<input type=hidden name=lang value=%l>
 
 [
 de: Um radikal aufzur&auml;umen, w&auml;hle deine Datenbank aus, indem du 
@@ -110,10 +110,10 @@ sv: För en radikal upprensning, välj din databas genom att klicka på
 <p>
 
 <dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
-$b{
+%b{
 <tr align=left>
-<td><input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
-<td><a href="http://$m:2317/$a">$a</a></td>
+<td><input type=radio name=anon value="%a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://%m:2317/%a">%a</a></td>
 </tr>|
 <tr align=left><td>- [
 de: keine Datenbank vorhanden

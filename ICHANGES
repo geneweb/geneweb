@@ -18,6 +18,9 @@ GeneWeb Version 4.07
     more displayed by families.
 
 * Setup program (gwsetup)
+  - [20 Jun 02] Changed the macro prefix from "$" into "%", because of
+    a small problem: the CVS macro $Id was also interpreted (generated
+    a BAD MACRO text: not a problem since it was in comments, but...).
   - [13 Apr 02] Added a "lexicon.txt" file, in order to be able to
     accept different languages with characters encodings different
     from iso-8859-1 and for future possible use of translations common

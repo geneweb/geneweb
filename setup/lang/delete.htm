@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: delete.htm,v 1.2 2002-06-18 08:03:04 ddr Exp $ -->
+  <!-- $Id: delete.htm,v 1.3 2002-06-20 08:32:54 ddr Exp $ -->
   <title>[
 de: Datenbanken l&ouml;schen
 en: Delete
@@ -14,7 +14,7 @@ sv: Radera
 ]</title>
 </head>
 
-<body background="file://$f/images/gwback.jpg">
+<body background="file://%f/images/gwback.jpg">
 
 <center><h1><font color=#2f6400>[
 de: Datenbanken l&ouml;schen
@@ -27,7 +27,7 @@ sv: Radering av databaser
 ]</font></h1></center>
 
 <form method=GET action="delete">
-<input type=hidden name=lang value=$l>
+<input type=hidden name=lang value=%l>
 
 [
 de: W&auml;hle die Datenbanken, die du l&ouml;schen m&ouml;chtest, mit
@@ -48,10 +48,10 @@ sv: Välj den databas eller de databaser du vill radera, genom att klicka på
 <p>
 
 <dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
-$b{
+%b{
 <tr align=left>
-<td><a href="http://$m:2317/$a">$a</a></td>
-<td><input type=checkbox name="$a" value=on></td>
+<td><a href="http://%m:2317/%a">%a</a></td>
+<td><input type=checkbox name="%a" value=on></td>
 </tr>|
 <tr align=left><td>- [
 de: keine Datenbank vorhanden

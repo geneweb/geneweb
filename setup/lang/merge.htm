@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: merge.htm,v 1.3 2002-06-18 10:49:03 ddr Exp $ -->
+  <!-- $Id: merge.htm,v 1.4 2002-06-20 08:32:59 ddr Exp $ -->
   <title>[
 de: Datenbanken zusammenf&uuml;hren
 en: Merging databases
@@ -12,7 +12,7 @@ sv: Sammanslagning av databaser
 ]</title>
 </head>
 
-<body background="file://$f/images/gwback.jpg">
+<body background="file://%f/images/gwback.jpg">
 
 <center><h1><font color=#2f6400>[
 de: Datenbanken zusammenf&uuml;hren
@@ -23,7 +23,7 @@ sv: Sammanslagning av databaser
 ]</font></h1></center>
 
 <form method=GET action="merge">
-<input type=hidden name=lang value=$l>
+<input type=hidden name=lang value=%l>
 
 [
 de: Alle Datenbanken, die zusammengef&uuml;hrt werden sollen,
@@ -44,26 +44,26 @@ sv: Alla databaser som ska slås samman måste finnas under
 [
 de: Falls das nicht der Fall ist, sondern einige von ihnen z.B. nur
     als GEDCOM-Dateien oder GeneWeb-Quelldateien vorliegen, kehre zum
-    <a href="gwsetup?lang=$l;v=main.htm">Hauptmen&uuml;</a> zur&uuml;ck,
+    <a href="gwsetup?lang=%l;v=main.htm">Hauptmen&uuml;</a> zur&uuml;ck,
     um sie unter <b><font color=#2f6400>GeneWeb</font></b> anzulegen,
     dann kehre hierher zur&uuml;ck.
 en: If it is not the case, if, for example, some of them are just GEDCOM
     files or GeneWeb source files, return to the <a
-    href="gwsetup?lang=$l;v=main.htm">main menu</a> to create them under
+    href="gwsetup?lang=%l;v=main.htm">main menu</a> to create them under
     <b><font color=#2f6400>GeneWeb</font></b>, then go back to this page.
 fr: Si ce n'est pas le cas, si, par exemple, certaines d'entre elles sont
     sous forme GEDCOM ou fichiers source GeneWeb, revenez au <a
-    href="gwsetup?lang=$l;v=main.htm">menu principal</a> pour les
+    href="gwsetup?lang=%l;v=main.htm">menu principal</a> pour les
     cr&eacute;er sous <b><font color=#2f6400>GeneWeb</font></b>, puis
     revenez &agrave; cette page.
 it: Se non &egrave; il caso e certune, ad esempio, sono
     al formato GEDCOM o file sorgente  GeneWeb, tornate al <a
-    href="gwsetup?lang=$l;v=main.htm">menu principale</a> per crearle
+    href="gwsetup?lang=%l;v=main.htm">menu principale</a> per crearle
     sotto <b><font color=#2f6400>GeneWeb</font></b>, poi
     ritornate a questa pagina.
 sv: Om det inte är så, om till exempel, någon av dem bara är GEDCOM
     filer eller GeneWeb källfiler, gå tilbaka till <a
-    href = "gwsetup?lang=$l;v=main.htm">huvudmenyn</a> för att skapa dem
+    href = "gwsetup?lang=%l;v=main.htm">huvudmenyn</a> för att skapa dem
     under <b><font color=#2f6400>GeneWeb</font></b>, gå sedan tillbaka
     till denna sida.
 ]
@@ -86,10 +86,10 @@ sv: När du är klar, välj de databaser du vill slå samman genom att klicka
 <p>
 
 <dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
-$b{
+%b{
 <tr align=left>
-<td><a href="http://$m:2317/$a">$a</a></td>
-<td><input type=checkbox name="$a" value="on_"></td>
+<td><a href="http://%m:2317/%a">%a</a></td>
+<td><input type=checkbox name="%a" value="on_"></td>
 </tr>|
 <tr align=left><td>- [
 de: keine Datenbank vorhanden
@@ -148,24 +148,24 @@ de: Bemerkung: Das Zusammenf&uuml;hren geschieht durch simple
     Zusammenf&uuml;hren musst du deshalb die m&ouml;glicherweise nun
     doppelt vorhandenen Personen oder Familien ausfindig machen und
     sie einzeln zusammenf&uuml;hren.
-    Siehe dazu die <a href="file://$f/doc/$l/update.htm#MrgP">Documentation</a>.
+    Siehe dazu die <a href="file://%f/doc/%l/update.htm#MrgP">Documentation</a>.
 en: Remark: merging consists on simple concatenation of the databases. There
     is no research for identical persons. After merging, you therefore have
     to research the possible doubled persons or families and merge them.
-    See the <a href="file://$f/doc/$l/update.htm#MrgP">documentation</a>.
+    See the <a href="file://%f/doc/%l/update.htm#MrgP">documentation</a>.
 fr: Remarque: la fusion consiste en la simple concat&eacute;nation des
     bases de donn&eacute;es. Il n'y a pas de recherche de personnes
     identiques. Apr&egrave;s la fusion, il faudra donc rechercher les
     &eacute;ventuelles personnes et familles en double et les fusionner.
-    Voir la <a href="file://$f/doc/$l/update.htm#MrgP">documentation</a>.
+    Voir la <a href="file://%f/doc/%l/update.htm#MrgP">documentation</a>.
 it: Nota: la fusione consiste in una semplice concatenazione delle
     basi di dati. Non viene effettuata nessuna ricerca di persone identiche.
     Dopo la fusione, bisogner&agrave; ricercare le eventuali
     persone o famiglie doppie e fonderle.
-    Vedi la <a href="file://$f/doc/$l/update.htm#MrgP">documentazione</a>.
+    Vedi la <a href="file://%f/doc/%l/update.htm#MrgP">documentazione</a>.
 sv: Obs: sammanslagningen lägger helt enkelt ihop databaserna. Det
     är ingen kontroll av identiska personer. Efter sammanslagningen, måste
     du därför undersöka möjligheten att det finns dubbla personer eller
     familjer och slå ihop dem.
-    Se <a href = "file://$f/doc/$l/update.htm#MrgP">dokumentationen</a>.
+    Se <a href = "file://%f/doc/%l/update.htm#MrgP">dokumentationen</a>.
 ]

@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: consang.htm,v 1.2 2002-06-18 08:03:03 ddr Exp $ -->
+  <!-- $Id: consang.htm,v 1.3 2002-06-20 08:32:53 ddr Exp $ -->
   <title>[
 de: Blutsverwandtschaften
 en: Consanguinities
@@ -14,7 +14,7 @@ sv: Blodsband
 ]</title>
 </head>
 
-<body background="file://$f/images/gwback.jpg">
+<body background="file://%f/images/gwback.jpg">
 
 <center><h1><font color=#2f6400>[
 de: Blutsverwandtschaften
@@ -48,7 +48,7 @@ sv: Beräkningen av blodsbanden är nödvändig för att
 
 <form method=GET action="consang">
 <input type=hidden name=opt value=check>
-<input type=hidden name=lang value=$l>
+<input type=hidden name=lang value=%l>
 <input type=hidden name=q value=on>
 
 [
@@ -65,11 +65,11 @@ sv: Välj din databas genom att klicka på motsvarande knapp.
 <p>
 
 <dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
-$b{
+%b{
 <tr align=left>
 <td>
-<input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
-<td><a href="http://$m:2317/$a">$a</a></td>
+<input type=radio name=anon value="%a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://%m:2317/%a">%a</a></td>
 </tr>|
 <tr align=left>
 <td>- [
