@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.16 2003-10-20 07:11:56 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.17 2003-11-14 09:20:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -231,30 +231,38 @@ value persons_of_first_name_or_surname base_data strings params =
   in
   let bt =
     let btr = ref None in
-    fun () ->
+    let completed = ref False in
+    let update_bt gistro bt =
+      do {
+        let bt = ref bt in
+        Hashtbl.iter
+          (fun i p ->
+             let istr = proj p in
+             if gistro <> None && gistro <> Some istr then ()
+             else
+               let ipera =
+                 try IstrTree.find istr bt.val with [ Not_found -> [] ]
+               in
+               if List.memq p.cle_index ipera then ()
+               else
+	         bt.val := IstrTree.add istr [p.cle_index :: ipera] bt.val)
+          person_patches;
+        if gistro = None then completed.val := True else ();
+        bt.val
+      }
+    in
+    fun gistro ->
       match btr.val with
-      [ Some bt -> bt
+      [ Some bt ->
+          if completed.val then bt
+          else
+            let bt = update_bt gistro bt in
+            do { btr.val := Some bt; bt }
       | None ->
           do {
             seek_in ic2 start_pos;
             let bt : IstrTree.t (list iper) = input_value ic2 in
-            let bt =
-              do {
-                let bt = ref bt in
-                Hashtbl.iter
-                  (fun i p ->
-                     let istr = proj p in
-                     let ipera =
-                       try IstrTree.find istr bt.val with [ Not_found -> [] ]
-                     in
-                     if List.memq p.cle_index ipera then ()
-                     else
-                       bt.val := IstrTree.add istr [p.cle_index :: ipera]
-                         bt.val)
-                  person_patches;
-                bt.val
-              }
-            in
+            let bt = update_bt gistro bt in
             btr.val := Some bt;
             bt
           } ]
@@ -275,15 +283,15 @@ value persons_of_first_name_or_surname base_data strings params =
     }
   in
   let find istr =
-    try check_patches istr (IstrTree.find istr (bt ())) with
+    try check_patches istr (IstrTree.find istr (bt (Some istr))) with
     [ Not_found -> [] ]
   in
   let cursor str =
     IstrTree.key_after
       (fun key -> compare_names str (strings.get (Adef.int_of_istr key)))
-      (bt ())
+      (bt None)
   in
-  let next key = IstrTree.next key (bt ()) in
+  let next key = IstrTree.next key (bt None) in
   {find = find; cursor = cursor; next = next}
 ;
 
