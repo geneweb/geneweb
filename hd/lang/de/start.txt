@@ -73,7 +73,7 @@ Die <a href="%sm=LD;k=10">letzten Ableben</a>.%x
 
 <p>
 
-Es hat %q Zugriffe mit %c auf diese Seite gegeben, seit %d.
+Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.
 
 %y<p>
 
