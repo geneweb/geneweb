@@ -1,12 +1,6 @@
 GeneWeb version 4.08
 --------------------
 
-* Installation
-  - [31 Oct 02] When building GeneWeb from source files: added a "make
-    install" which installs the executables in /usr/bin and the system
-    files in /usr/share/geneweb. Added also "make uninstall" which undoes
-    it.
-
 * GeneWeb server or CGI (gwd)
   - [30 Oct 02] In places/surnames pages, now the surname links point
     to the surname, not to a person holding this surname associated with
@@ -54,6 +48,17 @@ GeneWeb version 4.08
   - [22 Oct 02] Fixed bug: when cleaning up a database, if the images
     file names started with numbers (eg. 123abc.jpg), they were restored
     with an underscore at the beginning (eg. _123abc.jpg).
+
+* Installation
+  - [31 Oct 02] When building GeneWeb from source files: added a "make
+    install" which installs the executables in /usr/bin and the system
+    files in /usr/share/geneweb. Added also "make uninstall" which undoes
+    it.
+
+* Documentation
+  - [31 Oct 02] In the "modifications" chapter ("How to make modifications
+    in the database), added a section (5.9) for dates shortcuts in the
+    families forms (French and English versions only).
 
 GeneWeb version 4.07
 --------------------
