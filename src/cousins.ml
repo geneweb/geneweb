@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 2.3 1999-03-31 02:16:48 ddr Exp $ *)
+(* $Id: cousins.ml,v 2.4 1999-04-06 07:22:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -261,7 +261,7 @@ value print_cousins conf base p lev =
 
 value print_menu conf base p effective_level =
   let title h =
-    do Wserver.wprint "%s " (capitale (transl conf "cousins"));
+    do Wserver.wprint "%s " (capitale (transl conf "cousins (general term)"));
        let txt =
          if h then person_text_no_html conf base p
          else person_text conf base p
