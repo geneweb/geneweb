@@ -5,6 +5,8 @@ GeneWeb Version 4.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [26 Mar 02] Does not fail any more if the file cnt/actlog is not
+    writable.
   - [22 Mar 02] Fixed bug in the index of the descendants: they were no
     more displayed by families.
 
