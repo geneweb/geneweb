@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.18 2003-01-07 12:15:42 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.19 2003-07-15 11:17:54 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -103,7 +103,7 @@
 %if;has_image;
   <table border=%border; width="90%%">
   <tr><td>
-   <a href="%image_url;"><img
+   <a href="%image_html_url;"><img
     src="%image_url;"%image_size; border=0
     alt="[image/images]0"></a>
 %end;

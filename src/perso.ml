@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.48 2003-04-01 12:19:10 ddr Exp $ *)
+(* $Id: perso.ml,v 4.49 2003-07-15 11:17:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -492,7 +492,7 @@ value string_of_image_size conf base env p p_auth =
   else ""
 ;
 
-value string_of_image_url conf base env p p_auth =
+value string_of_image_url conf base env p p_auth html =
   if p_auth then
     match get_env "image" env with
     [ Vimage x ->
@@ -501,7 +501,8 @@ value string_of_image_url conf base env p p_auth =
             let s = Unix.stat fname in
             let b = acces conf base p in
             let k = default_image_name base p in
-            Format.sprintf "%sm=IM;d=%d;%s;k=/%s" (commd conf)
+            Format.sprintf "%sm=IM%s;d=%d;%s;k=/%s" (commd conf)
+              (if html then "H" else "")
               (int_of_float
                  (mod_float s.Unix.st_mtime (float_of_int max_int)))
               b k
@@ -809,9 +810,10 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) efam =
   | "first_name_key" ->
       if conf.hide_names && not p_auth then ""
       else code_varenv (Name.lower (p_first_name base p))
+  | "image_html_url" -> string_of_image_url conf base env p p_auth True
   | "image_txt" -> default_image_name base p
   | "image_size" -> string_of_image_size conf base env p p_auth
-  | "image_url" -> string_of_image_url conf base env p p_auth
+  | "image_url" -> string_of_image_url conf base env p p_auth False
   | "ind_access" -> "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
   | "key" ->
       if not p_auth && conf.hide_names then "x"
