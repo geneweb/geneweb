@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.15 2001-06-28 17:05:25 ddr Exp $ *)
+(* $Id: perso.ml,v 4.16 2001-07-01 17:17:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1036,7 +1036,8 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
       [ Vsosa x -> Lazy.force x <> None
       | _ -> False ]
   | "has_sources" ->
-      if sou base p.psources <> "" then True
+      if conf.hide_names && not p_auth then False
+      else if sou base p.psources <> "" then True
       else if
         p_auth &&
         (sou base p.birth_src <> "" || sou base p.baptism_src <> "" ||
@@ -1378,7 +1379,11 @@ and eval_foreach_source conf base env al (p, _, u, p_auth) =
   in
   let insert typ src srcl = insert_loop (nominative typ) src srcl in
   let srcl = [] in
-  let srcl = insert (transl_nth conf "person/persons" 0) p.psources srcl in
+  let srcl =
+    if not conf.hide_names || p_auth then
+      insert (transl_nth conf "person/persons" 0) p.psources srcl
+    else srcl
+  in
   let srcl =
     if p_auth then
       let srcl = insert (transl_nth conf "birth" 0) p.birth_src srcl in
