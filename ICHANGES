@@ -5,6 +5,8 @@ GeneWeb Version 3.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [08 Aug 00] In first names by alphabetic order for a given surname,
+    use now (the translation of) "%1 of %2" instead of "of".
   - [26 Jul 00] Fixed detail in Wserver: closed socket before callback
     in order to allow the callback to fork processes without being blocked    
   - [25 Jul 00] Restructured Wserver to be cleaner and to save memory

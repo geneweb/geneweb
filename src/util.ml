@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.64 2000-07-28 13:07:49 ddr Exp $ *)
+(* $Id: util.ml,v 3.65 2000-08-07 10:46:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1045,16 +1045,18 @@ value print_parent conf base p a =
   match p.public_name with
   [ n when sou base n <> "" ->
       let n = sou base n in
-      do Wserver.wprint "%s %s" (transl_nth conf "son/daughter/child" is)
-           (transl_decline conf "of (same or greater generation level)" n);
+      do Wserver.wprint "%s"
+           (transl_decline2 conf "%1 of (same or greater generation level) %2"
+               (transl_nth conf "son/daughter/child" is) n);
          afficher_titre conf base a;
       return ()
   | _ ->
-      Wserver.wprint "%s %s%s" (transl_nth conf "son/daughter/child" is)
-        (transl_decline conf "of (same or greater generation level)"
-         (p_first_name base a))
-        (if p.surname <> a.surname then " " ^ p_surname base a
-         else "") ]
+      Wserver.wprint "%s"
+        (transl_decline2 conf "%1 of (same or greater generation level) %2"
+           (transl_nth conf "son/daughter/child" is)
+           (p_first_name base a ^
+              (if p.surname <> a.surname then " " ^ p_surname base a
+               else ""))) ]
 ;
 
 value preciser_homonyme conf base p =
@@ -1085,20 +1087,22 @@ value preciser_homonyme conf base p =
               let ct = des.children in
               if Array.length ct > 0 then
                 let enfant = poi base ct.(0) in
-                Wserver.wprint "%s %s%s" (transl_nth conf "father/mother" is)
-                  (transl_decline conf "of" (p_first_name base enfant))
-                  (if p.surname <> enfant.surname then
-                     " " ^ (p_surname base enfant)
-                   else "")
+                Wserver.wprint "%s"
+                  (transl_decline2 conf "%1 of %2"
+                     (transl_nth conf "father/mother" is)
+                     (p_first_name base enfant ^
+                        (if p.surname <> enfant.surname then
+                         " " ^ (p_surname base enfant)
+                         else "")))
               else
                 let conjoint = poi base conjoint in
                 if p_first_name base conjoint <> "?" ||
                    p_surname base conjoint <> "?" then
-                  Wserver.wprint "%s %s %s"
-                    (transl_nth conf "husband/wife" is)
-                    (transl_decline conf "of"
-                       (p_first_name base conjoint))
-                    (p_surname base conjoint)
+                  Wserver.wprint "%s"
+                    (transl_decline2 conf "%1 of %2"
+                       (transl_nth conf "husband/wife" is)
+                       (p_first_name base conjoint ^ " " ^
+                        p_surname base conjoint))
                 else loop (i + 1)
             else Wserver.wprint "..."
           in
