@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.34 2004-12-28 15:13:06 ddr Exp $ *)
+(* $Id: util.mli,v 4.35 2004-12-30 21:20:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -192,6 +192,9 @@ value start_with : string -> int -> string -> bool;
 
 value xhs : string;
 value doctype : string;
+
+value begin_centered : config -> unit;
+value end_centered : config -> unit;
 
 (* Printing for browsers without tables *)
 

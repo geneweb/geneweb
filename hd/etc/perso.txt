@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.34 2004-12-30 20:08:46 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.35 2004-12-30 21:20:05 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -226,9 +226,9 @@
       %sp;([witness/witnesses]w:
       %foreach;witness;
         %if;not is_first;, %end;
-	%if;(cancel_links or witness.is_restricted);%witness;
-	%else;<a href="%prefix;%witness.access">%witness;</a>%end;
-	%witness.title;%witness.dates;
+        %if;(cancel_links or witness.is_restricted);%witness;
+        %else;<a href="%prefix;%witness.access">%witness;</a>%end;
+        %witness.title;%witness.dates;
       %end;
     )%end;
     %if;has_comment; (%comment;)%end;
@@ -239,12 +239,12 @@
       <ul>
         %foreach;child;
           <li style="list-style-type:%if;child.has_families;disc%else;
-	   circle%end;">
-	  %if;(cancel_links or child.is_restricted);%child.child_name;
-	  %else;
-	    <a href="%prefix;%child.access;">%child.child_name;</a>%nn;
+           circle%end;">
+          %if;(cancel_links or child.is_restricted);%child.child_name;
+          %else;
+            <a href="%prefix;%child.access;">%child.child_name;</a>%nn;
           %end;
-	  %child.dates;</li>%nl;
+          %child.dates;</li>%nl;
         %end;
       </ul>
     %end;
@@ -262,13 +262,13 @@
       %if;(has_relation_him and has_relation_her)
         %nl;
         <ul>
-	<li style="list-style-type:%if;relation_him.has_families;disc%else;
+        <li style="list-style-type:%if;relation_him.has_families;disc%else;
          circle%end;">
         %if;(cancel_links or relation_him.is_restricted);%relation_him;
         %else;<a href="%prefix;%relation_him.access">%relation_him;</a>%end;
         %relation_him.title;%relation_him.dates;</li>%nl;
-	<li style="list-style-type:%if;relation_her.has_families;disc%else;
-	 circle%end;">
+        <li style="list-style-type:%if;relation_her.has_families;disc%else;
+         circle%end;">
         %if;(cancel_links or relation_her.is_restricted);%relation_her;
         %else;<a href="%prefix;%relation_her.access">%relation_her;</a>%end;
         %relation_her.title;%relation_her.dates;</li>%nl;
@@ -324,12 +324,12 @@
       %if;has_parents;
         <li>
         <a href="%prefix;m=A;%access;"
-	 class="highlight">[*ancestors]</a></li>
+         class="highlight">[*ancestors]</a></li>
       %end;
       %if;has_children;
         <li>
         <a href="%prefix;m=D;%access;"
-	 class="highlight">[*descendants]</a></li>
+         class="highlight">[*descendants]</a></li>
       %end;
       %if;(father.has_parents or mother.has_parents)
         <li>
@@ -343,16 +343,16 @@
         %end;
       %end;
       %foreach;father.child;
-	%if;is_sibling_before;
-	  <li>
+        %if;is_sibling_before;
+          <li>
           <a href="%prefix;%child.access;"
            class="highlight">[*previous sibling]s</a></li>
-	%end;
-	%if;is_sibling_after;
-	  <li>
+        %end;
+        %if;is_sibling_after;
+          <li>
           <a href="%prefix;%child.access;"
            class="highlight">[*next sibling]s</a></li>
-	%end;
+        %end;
       %end;
     </ul>
   </td>

@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.65 2004-12-28 15:12:53 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.66 2004-12-30 21:20:05 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -301,8 +301,8 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
 
 <table border="0" cellspacing="0" cellpadding="0" style="width: 100%%">
 
-<tr align="left"><td>
-<table style="margin:auto" border="0" cellspacing="0" cellpadding="0"><tr><td>
+<tr align="left"><td align="center">
+<table border="0" cellspacing="0" cellpadding="0"><tr><td>
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
 bg: Можете да използвате тази база от данни за търсене:
@@ -733,8 +733,7 @@ sv: <span class="highlight">genom</span>
 </td></tr></table>
 
 %Iw
-<table border="0" cellspacing="0" cellpadding="0"
- style="margin:auto; text-align: center">
+<table border="0" cellspacing="0" cellpadding="0" style="text-align: center">
 <tr><td>[
 af: Jy kan
 bg: Можете още
@@ -834,7 +833,7 @@ sv: &auml;ndra noteringar
 
 %E
 
-<table border="0" style="margin:auto;text-align:center">
+<table border="0" style="text-align:center">
 <tr><td>
 [
 af: Jy kan ook kyk na
@@ -886,7 +885,7 @@ zh:
 </table>
 </td></tr></table>
 
-<table border="0" style="margin:auto"><tr><td>
+<table border="0"><tr><td>
 [
 af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
 bg: От %d насам е имало %q посещения, от които %c са на настоящата страница.
@@ -926,7 +925,7 @@ zh: ТСѕ­УР %q ґО·ГОККэѕЭївЈ¬ЖдЦР %c ґО·ГОК±ѕЦчТіЈ¬ ЧФґУ %dЎЈ
 
 </td></tr></table>
 
-<table border="0" style="margin:auto"><tr><td>
+<table border="0"><tr><td>
 [
 af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a

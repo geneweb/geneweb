@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.24 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: dag.ml,v 4.25 2004-12-30 21:20:05 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -164,7 +164,8 @@ value image_txt conf base p =
 
 value print_table conf hts =
   do {
-    Wserver.wprint "<table style=\"margin:auto\" border=\"%d\"" conf.border;
+    begin_centered conf;
+    Wserver.wprint "<table border=\"%d\"" conf.border;
     Wserver.wprint " cellspacing=\"0\" cellpadding=\"0\">\n";
     for i = 0 to Array.length hts - 1 do {
       tag "tr" "align=\"left\"" begin
@@ -199,7 +200,8 @@ value print_table conf hts =
         };
       end;
     };
-    Wserver.wprint "</table>\n"
+    Wserver.wprint "</table>\n";
+    end_centered conf;
   }
 ;
 
