@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.43 2002-03-18 12:29:19 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.44 2002-03-20 10:00:48 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -496,56 +496,6 @@ value unauth_server conf passwd =
     Wserver.wprint "Return to <a href=\"%s\">welcome page</a>\n" url;
     Wserver.wprint "</body>\n";
   }
-;
-
-value unauth_cgi conf passwd =
-  let title _ =
-    let i = if passwd = "w" then 0 else 1 in
-    Wserver.wprint "%s / %s"
-      (Util.capitale (Util.transl_nth conf "wizard/friend" i)) conf.bname
-  in
-  let message_txt i = Util.transl_nth conf "user/password/cancel" i in
-  do {
-    Util.header conf title;
-    Wserver.wprint "<div align=center><table border=0><tr><td>\n";
-    tag "form" "method=POST action=\"%s\"" conf.command begin
-      Util.hidden_env conf;
-      List.iter
-        (fun (k, v) ->
-           if List.mem k ["log_pwd"; "log_uid"; "log_cnl"] then ()
-           else
-             Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" k
-               (Util.quote_escaped (Util.decode_varenv v)))
-        conf.env;
-      tag "table" "border=1" begin
-        tag "tr" "align=left" begin
-          tag "td" "align=right" begin
-            Wserver.wprint "%s:" (Util.capitale (message_txt 0));
-          end;
-          tag "td" "align=left" begin
-            Wserver.wprint "<input name=\"log_uid\" size=30>\n";
-          end;
-        end;
-        tag "tr" "align=left" begin
-          tag "td" "align=right" begin
-            Wserver.wprint "%s:" (Util.capitale (message_txt 1));
-          end;
-          tag "td" "align=left" begin
-            Wserver.wprint "<input name=\"log_pwd\" type=password size=30>\n";
-          end;
-        end;
-      end;
-      Wserver.wprint "<input type=submit value=Ok>\n";
-      Wserver.wprint "<input type=submit name=log_cnl value=\"%s\">\n"
-        (Util.capitale (message_txt 2));
-    end;
-    Wserver.wprint "</td></tr></table></div>\n";
-    Util.trailer conf;
-  }
-;
-
-value unauth conf passwd =
-  if conf.cgi then unauth_cgi conf passwd else unauth_server conf passwd
 ;
 
 value match_auth_file auth_file uauth =
@@ -1144,7 +1094,7 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
                   flush_log oc;
                 }
             | Refuse -> () ];
-            unauth conf passwd;
+            unauth_server conf passwd;
           }
       | _ ->
           let mode = Util.p_getenv conf.env "m" in
