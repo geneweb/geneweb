@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.25 2000-06-18 12:00:55 ddr Exp $ *)
+(* $Id: family.ml,v 3.26 2000-06-19 17:42:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -269,14 +269,11 @@ value set_senv conf vm vi =
      match p_getenv conf.env "long" with
      [ Some "on" -> conf.senv := conf.senv @ [("long", "on")]
      | _ -> () ];
-     match p_getenv conf.env "marr" with
-     [ Some "on" -> conf.senv := conf.senv @ [("marr", "on")]
-     | _ -> () ];
      match p_getenv conf.env "spouse" with
      [ Some "on" -> conf.senv := conf.senv @ [("spouse", "on")]
      | _ -> () ];
-     match p_getenv conf.env "shortest" with
-     [ Some "on" -> conf.senv := conf.senv @ [("shortest", "on")]
+     match p_getenv conf.env "et" with
+     [ Some x -> conf.senv := conf.senv @ [("et", x)]
      | _ -> () ];
      match p_getenv conf.env "cgl" with
      [ Some "on" -> conf.senv := conf.senv @ [("cgl", "on")]
@@ -546,8 +543,8 @@ value print_no_index conf base =
 ;
 
 value senv_vars =
-  ["dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "long"; "marr"; "spouse";
-   "shortest"; "cgl"; "iz"; "nz"; "pz"; "ocz"]
+  ["dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et"; "long"; "spouse";
+   "cgl"; "iz"; "nz"; "pz"; "ocz"]
 ;
 
 value only_special_env = List.for_all (fun (x, _) -> List.mem x senv_vars);
