@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.18 2002-01-23 11:52:40 ddr Exp $ *)
+(* $Id: update.ml,v 4.19 2002-01-30 11:49:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -118,7 +118,18 @@ value update_misc_names_of_family base p u =
   | _ -> () ]
 ;
 
+value delete_topological_sort_v conf base =
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
+  do {
+    let tstab_file = Filename.concat bfile "tstab_visitor" in
+    try Sys.remove tstab_file with [ Sys_error _ -> () ];
+    let tstab_file = Filename.concat bfile "restrict" in
+    try Sys.remove tstab_file with [ Sys_error _ -> () ]
+  }
+;
+
 value delete_topological_sort conf base =
+  let _ = delete_topological_sort_v conf base in
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   let tstab_file = Filename.concat bfile "tstab" in
   try Sys.remove tstab_file with [ Sys_error _ -> () ]

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.8 2002-01-12 14:20:54 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.9 2002-01-30 11:49:48 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -612,6 +612,7 @@ value empty_base : Def.base =
   let base_data =
     {persons = cache_of [| |]; ascends = cache_of [| |];
      unions = cache_of [| |]; families = cache_of [| |];
+     visible = { v_write = fun []; v_get = fun [] };
      couples = cache_of [| |]; descends = cache_of [| |];
      strings = cache_of [| |];
      bnotes = {nread = fun _ -> ""; norigin_file = ""}}
@@ -661,6 +662,7 @@ value linked_base gen : Def.base =
   let base_data =
     {persons = cache_of persons; ascends = cache_of ascends;
      unions = cache_of unions; families = cache_of families;
+     visible = { v_write = fun []; v_get = fun [] };
      couples = cache_of couples; descends = cache_of descends;
      strings = cache_of strings; bnotes = bnotes}
   in

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.5 2002-01-23 11:39:55 ddr Exp $ *)
+(* $Id: some.ml,v 4.6 2002-01-30 11:49:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -458,7 +458,7 @@ value select_ancestors conf base name_inj ipl =
            if str_inj fath.surname <> s && str_inj moth.surname <> s &&
               not (List.memq ip ipl) then
              if List.memq cpl.father ipl then ipl
-             else if
+             else if not (is_hidden fath) &&
                has_at_least_2_children_with_surname conf base (doi base ifam)
                  p.surname then
                [cpl.father :: ipl]

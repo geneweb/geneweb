@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.30 2002-01-30 11:46:23 ddr Exp $ *)
+(* $Id: util.ml,v 4.31 2002-01-30 11:49:52 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -419,20 +419,6 @@ value age_autorise conf base p =
         loop 0 ]
 ;
 
-value empty_string = Adef.istr_of_int 0;
-
-value pget (conf : config) base ip =
-  base.data.persons.get (Adef.int_of_iper ip)
-;
-
-value aget (conf : config) base ip =
-  base.data.ascends.get (Adef.int_of_iper ip)
-;
-
-value uget (conf : config) base ip =
-  base.data.unions.get (Adef.int_of_iper ip)
-;
-
 value is_old_person conf p =
   match
     (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism, p.death,
@@ -449,10 +435,75 @@ value is_old_person conf p =
 ;
 
 value fast_auth_age conf p =
-  if p.access = Public || conf.friend || conf.wizard then True
+  if conf.friend || conf.wizard || p.access = Public then True
   else if conf.public_if_titles && p.access = IfTitles && p.titles <> [] then
     True
   else is_old_person conf p
+;
+
+value is_restricted (conf : config) base ip =
+  let quest_string = Adef.istr_of_int 1 in
+  let fct p =
+    p.surname <> quest_string && p.first_name <> quest_string &&
+    not (fast_auth_age conf p)
+  in  
+  if conf.use_restrict then
+    base.data.visible.v_get fct (Adef.int_of_iper ip)
+  else False 
+;
+
+value empty_string = Adef.istr_of_int 0;
+
+value is_hidden p =
+  p.surname = empty_string
+;
+
+value pget (conf : config) base ip =
+  if is_restricted conf base ip then
+    { first_name = empty_string;
+      surname = empty_string;
+      occ = 0;
+      image = empty_string;
+      first_names_aliases = [];
+      surnames_aliases = [];
+      public_name = empty_string;
+      qualifiers = [];
+      titles = [];
+      rparents = [];
+      related = [];
+      aliases = [];
+      occupation = empty_string;
+      sex = Neuter;
+      access = Private;
+      birth = Adef.codate_None;
+      birth_place = empty_string;
+      birth_src = empty_string;
+      baptism = Adef.codate_None;
+      baptism_place = empty_string;
+      baptism_src = empty_string;
+      death = DontKnowIfDead;
+      death_place = empty_string;
+      death_src = empty_string;
+      burial = UnknownBurial;
+      burial_place = empty_string;
+      burial_src = empty_string;
+      notes = empty_string;
+      psources = empty_string;
+      cle_index = ip }
+  else base.data.persons.get (Adef.int_of_iper ip)
+;
+
+value aget (conf : config) base ip =
+  if is_restricted conf base ip then
+    { parents = None;
+      consang = Adef.fix_of_float 0.0 }
+  else base.data.ascends.get (Adef.int_of_iper ip)
+;
+
+value uget (conf : config) base ip =
+  if is_restricted conf base ip then
+    { family = [| |] }
+  else base.data.unions.get (Adef.int_of_iper ip)
 ;
 
 (*
@@ -484,7 +535,8 @@ value is_public conf base p =
 value acces_n conf base n x =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
-  if (conf.wizard && conf.friend || conf.access_by_key)
+  if surname = "" then ""
+  else if (conf.wizard && conf.friend || conf.access_by_key)
   && not (first_name = "?" || surname = "?")
   && (not conf.hide_names || is_public conf base x) then
     "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ ";n" ^ n ^ "=" ^
@@ -507,8 +559,11 @@ value raw_access =
   (fun base p -> sou base p.first_name, fun base p -> sou base p.surname)
 ;
 
+value restricted_txt conf = ".....";
+
 value gen_person_text (p_first_name, p_surname) conf base p =
-  if conf.hide_names && not (fast_auth_age conf p) then "x x"
+  if is_hidden p then restricted_txt conf
+  else if conf.hide_names && not (fast_auth_age conf p) then "x x"
   else
     let beg =
       match (sou base p.public_name, p.qualifiers) with
@@ -522,7 +577,8 @@ value gen_person_text (p_first_name, p_surname) conf base p =
 ;
 
 value gen_person_text_no_html (p_first_name, p_surname) conf base p =
-  if conf.hide_names && not (fast_auth_age conf p) then "x x"
+  if is_hidden p then restricted_txt conf
+  else if conf.hide_names && not (fast_auth_age conf p) then "x x"
   else
     let beg =
       match (sou base p.public_name, p.qualifiers) with
@@ -535,7 +591,8 @@ value gen_person_text_no_html (p_first_name, p_surname) conf base p =
 ;
 
 value gen_person_text_without_surname (p_first_name, p_surname) conf base p =
-  if conf.hide_names && not (fast_auth_age conf p) then "x x"
+  if is_hidden p then restricted_txt conf
+  else if conf.hide_names && not (fast_auth_age conf p) then "x x"
   else
     match (sou base p.public_name, p.qualifiers) with
     [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
@@ -620,7 +677,7 @@ value wprint_geneweb_link conf href s =
 ;
 
 value reference conf base p s =
-  if conf.cancel_links then s
+  if conf.cancel_links || is_hidden p then s
   else "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">" ^ s ^ "</a>"
 ;
 
@@ -840,7 +897,8 @@ value url_no_index conf base =
     [ Some i ->
         if i >= 0 && i < base.data.persons.len then
           let p = pget conf base (Adef.iper_of_int i) in
-          if conf.hide_names && not (fast_auth_age conf p) then None
+          if (conf.hide_names && not (fast_auth_age conf p))
+             || is_hidden p then None
           else
             let f = scratch p.first_name in
             let s = scratch p.surname in
@@ -1566,7 +1624,9 @@ value find_person_in_env conf base suff =
   match p_getint conf.env ("i" ^ suff) with
   [ Some i ->
       if i >= 0 && i < base.data.persons.len then
-        Some (pget conf base (Adef.iper_of_int i))
+        let p = pget conf base (Adef.iper_of_int i) in
+        if is_hidden p then None
+        else Some p
       else None
   | None ->
       match
@@ -1579,7 +1639,13 @@ value find_person_in_env conf base suff =
             | None -> 0 ]
           in
           let k = p ^ " " ^ n in
-          let xl = List.map (pget conf base) (person_ht_find_all base k) in
+          let xl =
+            List.fold_left
+              (fun l ip ->
+                 let p = pget conf base ip in
+                 if is_hidden p then l else [p :: l])
+            [] (person_ht_find_all base k)
+          in
           let k = Name.lower k in
           try
             let r =
@@ -1607,7 +1673,10 @@ value create_topological_sort conf base =
       let bfile = base_path [] (conf.bname ^ ".gwb") in
       lock (Iobase.lock_file bfile) with
       [ Accept ->
-          let tstab_file = Filename.concat bfile "tstab" in
+          let tstab_file =
+            if conf.use_restrict then Filename.concat bfile "tstab_visitor"
+            else Filename.concat bfile "tstab"
+          in
           let r =
             match
               try Some (open_in_bin tstab_file) with [ Sys_error _ -> None ]
@@ -1627,6 +1696,9 @@ value create_topological_sort conf base =
               let _ = base.data.couples.array () in
               let tstab = Consang.topological_sort base (aget conf) in
               do {
+                if conf.use_restrict then
+                  base.data.visible.v_write ()
+                else ();
                 match
                   try Some (open_out_bin tstab_file) with
                   [ Sys_error _ -> None ]

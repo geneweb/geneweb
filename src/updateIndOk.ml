@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.6 2002-01-15 16:48:26 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.7 2002-01-30 11:49:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -766,6 +766,11 @@ value print_mod o_conf base =
       let k = (sp.first_name, sp.surname, sp.occ) in
       base.func.commit_patches ();
       History.record conf base k "mp";
+      let quest_string = Adef.istr_of_int 1 in
+      if p.surname <> quest_string && p.first_name <> quest_string
+         && not (is_old_person conf p) then
+        Update.delete_topological_sort_v conf base
+      else ();
       print_mod_ok conf base wl p;
     }
   in

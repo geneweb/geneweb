@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.12 2002-01-13 01:17:21 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.13 2002-01-30 11:49:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -372,6 +372,74 @@ value lock_file bname =
   bname ^ ".lck"
 ;
 
+(* Restrict file *)
+
+type visible_state = [ VsNone | VsTrue | VsFalse ];
+
+value make_visible_cache bname persons =
+  let visible_ref = ref None in
+  let fname = Filename.concat bname "restrict" in
+  let r = { v_write = fun []; v_get = fun [] } in
+  let read_or_create_visible () =
+    let visible =
+      match try Some (open_in fname) with [ Sys_error _ -> None ] with
+      [ Some ic ->
+          do {
+            ifdef UNIX then
+              if verbose.val then do {
+                Printf.eprintf "*** read restrict file\n";
+                flush stderr;
+              }
+              else ()
+            else ();
+            let visible = input_value ic;
+            close_in ic;
+            visible
+          }
+      | None -> Array.create persons.len VsNone ]
+    in
+    do { visible_ref.val := Some visible; visible }
+  in
+  let v_write () =
+    match visible_ref.val with
+    [ Some visible ->
+        try do {
+          let oc = open_out fname;
+          ifdef UNIX then
+            if verbose.val then do {
+              Printf.eprintf "*** write restrict file\n";
+              flush stderr;
+            }
+            else ()
+          else ();
+          output_value oc visible;
+          close_out oc
+        }
+        with [ Sys_error _ -> () ]
+    | None -> () ]
+  in
+  let v_get fct i =
+    let visible =
+      match visible_ref.val with
+      [ Some visible -> visible
+      | None -> read_or_create_visible () ]
+    in
+    if i < Array.length visible then
+      match visible.(i) with
+      [ VsNone ->
+          let status = fct (persons.get i) in
+          do {
+            visible.(i) := if status then VsTrue else VsFalse;
+            visible_ref.val := Some visible;
+            status
+          }
+      | VsTrue -> True
+      | VsFalse -> False ]
+    else fct (persons.get i)
+  in
+  do { r.v_write := v_write; r.v_get := v_get; r }
+;
+
 (* Input *)
 
 value apply_patches tab patches plen =
@@ -743,6 +811,7 @@ value input bname =
   let bnotes = {nread = read_notes; norigin_file = norigin_file} in
   let base_data =
     {persons = persons; ascends = ascends; unions = unions;
+     visible = make_visible_cache bname persons;
      families = families; couples = couples; descends = descends;
      strings = strings; bnotes = bnotes}
   in
@@ -1147,6 +1216,8 @@ value gen_output no_patches bname base =
       remove_file (Filename.concat bname "patches");
       remove_file (Filename.concat bname "patches~");
       remove_file (Filename.concat bname "tstab");
+      remove_file (Filename.concat bname "tstab_visitor");
+      remove_file (Filename.concat bname "restrict")
     }
     else ();
   }

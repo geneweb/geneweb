@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.3 2001-07-01 21:25:00 ddr Exp $ *)
+(* $Id: alln.ml,v 4.4 2002-01-30 11:49:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -256,7 +256,18 @@ value select_names conf base is_surnames ini =
           if string_start_with ini k then
             let list =
               if s <> "?" then
-                let cnt = List.length (iii.find istr) in
+                let my_list = iii.find istr in
+                let my_list =
+                  if conf.use_restrict then
+                    List.fold_left
+                      (fun l ip ->
+                         if is_restricted conf base ip then l
+                         else [ip :: l])
+                      [] my_list
+                  else my_list
+                in
+                let cnt = List.length my_list in
+                (*let cnt = List.length (iii.find istr) in*)
                 if cnt = 0 then list
                 else
                   match list with

@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 4.3 2002-01-12 12:06:20 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.4 2002-01-30 11:49:45 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -179,6 +179,7 @@ value input bname =
   let bnotes = {nread = read_notes; norigin_file = norigin_file} in
   let base_data =
     {persons = persons; ascends = ascends; unions = unions;
+     visible = { v_write = fun []; v_get = fun [] };
      families = families; couples = couples; descends = descends;
      strings = strings; bnotes = bnotes}
   in

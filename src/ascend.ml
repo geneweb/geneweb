@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.12 2002-01-23 11:39:47 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.13 2002-01-30 11:49:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -1560,7 +1560,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
 ;
 
 value tree_reference gv conf base p s =
-  if conf.cancel_links then s
+  if conf.cancel_links || is_hidden p then s
   else
     let im = p_getenv conf.env "image" = Some "on" in
     "<a href=\"" ^ commd conf ^ "m=A;t=T;v=" ^ string_of_int gv ^ ";" ^
@@ -1842,7 +1842,7 @@ value no_spaces s =
 ;
 
 value htree_reference gv conf base p s =
-  if conf.cancel_links then s
+  if conf.cancel_links || is_hidden p then s
   else
     "<a href=\"" ^ commd conf ^ "m=A;t=H;v=" ^ string_of_int gv ^ ";" ^
       acces conf base p ^ "\">" ^ s ^ "</a>"
@@ -2047,12 +2047,16 @@ value build_surnames_list conf base v p =
             if surn <> fath.surname && surn <> moth.surname then
               add_surname sosa p surn dp
             else ();
-            let sosa = Num.twice sosa in
-            let dp1 = merge_date_place conf base surn dp fath in
-            loop (lev + 1) sosa fath fath.surname dp1;
-            let sosa = Num.inc sosa 1 in
-            let dp2 = merge_date_place conf base surn dp moth in
-            loop (lev + 1) sosa moth moth.surname dp2
+            if not (is_hidden fath) then
+              let sosa = Num.twice sosa in
+              let dp1 = merge_date_place conf base surn dp fath in
+              loop (lev + 1) sosa fath fath.surname dp1
+            else ();
+            if not (is_hidden fath) then
+              let sosa = Num.inc sosa 1 in
+              let dp2 = merge_date_place conf base surn dp moth in
+              loop (lev + 1) sosa moth moth.surname dp2
+            else ();
           }
       | None -> add_surname sosa p surn dp ]
     }

@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 4.2 2002-01-12 12:06:20 ddr Exp $ *)
+(* $Id: def.mli,v 4.3 2002-01-30 11:49:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -168,10 +168,16 @@ type istr_iper_index =
     next : istr -> istr }
 ;
 
+type visible_cache =
+  { v_write : mutable unit -> unit;
+    v_get : mutable (person -> bool) -> int -> bool }
+;
+
 type base_data =
   { persons : cache person;
     ascends : cache ascend;
     unions : cache union;
+    visible : visible_cache;
     families : cache family;
     couples : cache couple;
     descends : cache descend;
