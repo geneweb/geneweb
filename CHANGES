@@ -45,7 +45,9 @@ GeneWeb version 3.08
     IE); changed the same thing for images in gwd.
 
 * Documentation:
-  - Added entries in the FAQ about:
+  - [03 Sep 00] In FAQ, changed the text about the question of missing
+    relationship links.
+  - Added entries in the FAQ about (French and English versions):
     * [01 Sep 00] the fact that information in forms sometimes disappear,
     * [01 Sep 00] adding more information in family forms,
     * [31 Aug 00] short dates displaying conventions,
