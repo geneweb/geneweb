@@ -64,8 +64,7 @@ in ordine
 
 %w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
 <li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w%x<li><a href="%sm=FORUM">[*forum]</a>
-%x
+%w
 
 </ul>
 
@@ -75,7 +74,8 @@ Gli <a href="%sm=AM">anniversari di matrimonio</a>.<br>%x
 Le <a href="%sm=LB;k=10">ultime nascite</a>.<br>
 Le <a href="%sm=LD;k=10">ultime morti</a>.<br>%x%j
 <a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.
+<a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
+<a href="%sm=FORUM">[*forum]</a>.
 <p>
 Dal %d ci sono stati %q accessi, %c dei quali a questa pagina.
 

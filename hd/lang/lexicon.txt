@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.144 1999-10-08 19:12:59 ddr Exp $
+# $Id: lexicon.txt,v 2.145 1999-10-09 10:49:46 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1857,6 +1857,7 @@ se: f&ouml;r f&ouml;rnamnen i bokstavsordning
 dk: forum
 en: forum
 fr: forum
+se: forum
 
     generation
 cs: generace
@@ -3125,6 +3126,7 @@ se: endast den valda generationen
 dk: efter behag
 en: optional
 fr: facultatif
+se: valfritt
 
     or
 cs: nebo
