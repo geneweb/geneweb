@@ -4,6 +4,8 @@ de: Seite angezeigt von
     <a href="http://cristal.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
 en: Page displayed by
     <a href="http://cristal.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
+et: Kasutusel on
+    <a href="http://cristal.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
 fr: Page affichée par
     <a href="http://cristal.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
 ]

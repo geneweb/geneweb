@@ -116,4 +116,7 @@ en: Maintenance! Wizard rights
 fr: Maintenance! les droits des magiciens sont momentanément suspendus...
     attendez quelques minutes pour retrouver la possibilité de faire
     des mises à jour en ligne. Merci.
-]</font></strong></blink>%E
+]</font></strong></blink>
+
+<p>
+%E

@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.26 2002-03-18 12:29:18 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.27 2002-04-04 10:57:15 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -852,6 +852,7 @@ de: Lexikon
 en: lexicon
 eo: leksikono
 es: diccionario
+et: s&otilde;nastik
 fi: Sanasto
 fr: lexique
 he: לקסיקון 
