@@ -8,6 +8,9 @@ GeneWeb version 3.06
   - [20 Jun 00] Added Latvian version (Janeks Kamerovskis).
 
 * GeneWeb Service/CGI (gwd)
+  - [04 Jul 00] Put all statitics in a different page (accessible only
+    to "wizards" and "friends").
+  - [04 Jul 00] Added the computation of the persons who lived the longest.
   - [27 Jun 00] When typing a name holding a number, searches also with
     its equivalent in Roman digits (e.g. it is possible to type "Louis 15"
     to find "Louis XV").
