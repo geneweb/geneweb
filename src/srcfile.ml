@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.13 2000-01-10 02:14:41 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.14 2000-04-16 21:30:48 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -152,6 +152,11 @@ value rec src_translate conf nom ic =
   if upp then capitale r else r
 ;
 
+value browser_cannot_handle_passwords conf =
+  let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
+  String.lowercase user_agent = "konqueror"
+;
+
 value rec copy_from_channel conf base ic =
   let echo = ref True in
   let no_tables = browser_doesnt_have_tables conf in
@@ -168,7 +173,7 @@ value rec copy_from_channel conf base ic =
     fun
     [ 'N' -> not (if_expr (input_char ic))
     | 'a' -> conf.auth_file <> ""
-    | 'c' -> conf.cgi
+    | 'c' -> conf.cgi || browser_cannot_handle_passwords conf
     | 'f' -> conf.friend
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
