@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updfam.txt,v 4.8 2001-06-18 07:06:00 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.9 2001-06-19 08:00:04 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -156,7 +156,7 @@
 %end;
 </font></h1>
 
-<div align=right><em>(new version 2)</em></div>
+<div align=right><em>(new version 3)</em></div>
 
 <form method=POST action="%action;">
 %hidden;
@@ -321,11 +321,11 @@
     </tr>
     <tr>
       <td>
-        <input type=radio name=chxcnt_sex value=N%sp;
+        <input type=radio name=chxcnt_sex value=N%nn;
          %if;(child.sex = "neuter") checked%end;>?
-        <input type=radio name=chxcnt_sex value=M%sp;
+        <input type=radio name=chxcnt_sex value=M%nn;
          %if;(child.sex = "male") checked%end;>[M/F]0
-        <input type=radio name=chxcnt_sex value=F%sp;
+        <input type=radio name=chxcnt_sex value=F%nn;
          %if;(child.sex = "female") checked%end;>[M/F]1
       </td>
       %apply;death("chxcnt", "child", "false")
