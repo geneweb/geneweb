@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.1 2001-04-10 15:50:30 ddr Exp $ *)
+(* $Id: date.ml,v 4.2 2001-04-19 13:20:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -17,26 +17,28 @@ value code_date conf encoding d m y =
     | 'y' -> string_of_int y
     | c -> "%" ^ String.make 1 c ]
   in
-  loop 0 where rec loop i =
+  let rec loop i =
     if i = String.length encoding then ""
     else
       let (s, i) =
         match encoding.[i] with
         [ '%' when i + 1 < String.length encoding ->
-            let s = apply_date_code encoding.[i+1] in
-            (s, i + 1)
+            let s = apply_date_code encoding.[i + 1] in (s, i + 1)
         | '['
-          when i + 5 < String.length encoding
-          && encoding.[i+3] = ']' && encoding.[i+4] = '%' ->
-            let s = apply_date_code encoding.[i+5] in
+          when
+            i + 5 < String.length encoding && encoding.[i + 3] = ']' &&
+            encoding.[i + 4] = '%' ->
+            let s = apply_date_code encoding.[i + 5] in
             let s1 =
-              if start_with_vowel s then String.make 1 encoding.[i+2]
-              else String.make 1 encoding.[i+1] ^ " "
+              if start_with_vowel s then String.make 1 encoding.[i + 2]
+              else String.make 1 encoding.[i + 1] ^ " "
             in
             (s1 ^ s, i + 5)
         | c -> (String.make 1 c, i) ]
       in
       s ^ loop (i + 1)
+  in
+  loop 0
 ;
 
 value code_dmy conf d =
@@ -55,24 +57,23 @@ value code_dmy conf d =
 value default_french_month =
   let tab =
     [| "Vendemiaire"; "Brumaire"; "Frimaire"; "Nivose"; "Pluviose"; "Ventose";
-       "Germinal"; "Floreal"; "Prairial"; "Messidor"; "Thermidor"; "Fructidor";
-       "Extra" |]
+       "Germinal"; "Floreal"; "Prairial"; "Messidor"; "Thermidor";
+       "Fructidor"; "Extra" |]
   in
   fun m -> tab.(m)
 ;
 
 value default_hebrew_month =
   let tab =
-    [| "Tishri"; "Heshvan"; "Kislev"; "Tevet"; "Shevat"; "AdarI";
-       "AdarII"; "Nisan"; "Iyyar"; "Sivan"; "Tammuz"; "Av"; "Elul" |]
+    [| "Tishri"; "Heshvan"; "Kislev"; "Tevet"; "Shevat"; "AdarI"; "AdarII";
+       "Nisan"; "Iyyar"; "Sivan"; "Tammuz"; "Av"; "Elul" |]
   in
   fun m -> tab.(m)
 ;
 
 value french_month conf m =
   let r = transl_nth conf "(french revolution month)" m in
-  if r = "[(french revolution month)]" then
-    "[" ^ default_french_month m ^ "]"
+  if r = "[(french revolution month)]" then "[" ^ default_french_month m ^ "]"
   else r
 ;
 
@@ -90,9 +91,9 @@ value code_french_date conf d m y =
     if m = 0 then ""
     else s ^ (if s = "" then "" else " ") ^ french_month conf (m - 1)
   in
-  s ^ (if s = "" then "" else " ") ^
-  " " ^ transl_nth conf "year/month/day" 0 ^ " " ^
-  (if y >= 1 && y < 4000 then roman_of_arabian y else string_of_int y)
+  s ^ (if s = "" then "" else " ") ^ " " ^
+    transl_nth conf "year/month/day" 0 ^ " " ^
+    (if y >= 1 && y < 4000 then roman_of_arabian y else string_of_int y)
 ;
 
 value code_hebrew_date conf d m y =
@@ -107,8 +108,7 @@ value code_hebrew_date conf d m y =
 value string_of_on_prec_dmy_aux conf sy d =
   match d.prec with
   [ Sure ->
-      if d.day = 0 && d.month = 0 then
-        transl conf "in (year)" ^ " " ^ sy
+      if d.day = 0 && d.month = 0 then transl conf "in (year)" ^ " " ^ sy
       else if d.day = 0 then transl_decline conf "in (month year)" sy
       else transl_decline conf "on (day month year)" sy
   | About | Before | After ->
@@ -129,18 +129,16 @@ value string_of_on_prec_dmy_aux conf sy d =
         else if d.day = 0 then transl_decline conf "in (month year)" sy
         else transl_decline conf "on (day month year)" sy
       in
-      s ^ " " ^
-      transl conf "or" ^ " " ^
-      nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z)
+      s ^ " " ^ transl conf "or" ^ " " ^
+        nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z)
   | YearInt z ->
       let s =
         if d.day = 0 && d.month = 0 then sy
         else if d.day = 0 then sy
         else transl_decline conf "on (day month year)" sy
       in
-      transl conf "between (date)" ^ " " ^ s ^ " " ^
-      transl conf "and" ^ " " ^
-      nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z) ]
+      transl conf "between (date)" ^ " " ^ s ^ " " ^ transl conf "and" ^ " " ^
+        nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z) ]
 ;
 
 value replace_spaces_by_nbsp s =
@@ -151,13 +149,11 @@ value replace_spaces_by_nbsp s =
 ;
 
 value string_of_on_prec_dmy conf sy d =
-  let r = string_of_on_prec_dmy_aux conf sy d in
-  replace_spaces_by_nbsp r
+  let r = string_of_on_prec_dmy_aux conf sy d in replace_spaces_by_nbsp r
 ;
 
 value string_of_on_dmy conf d =
-  let sy = code_dmy conf d in
-  string_of_on_prec_dmy conf sy d
+  let sy = code_dmy conf d in string_of_on_prec_dmy conf sy d
 ;
 
 value string_of_on_french_dmy conf d =
@@ -178,31 +174,25 @@ value string_of_prec_dmy conf s d =
   | After -> transl_decline conf "after (date)" s
   | Maybe -> transl_decline conf "possibly (date)" s
   | OrYear z ->
-      s ^ " " ^
-      transl conf "or" ^ " " ^
-      nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z)
+      s ^ " " ^ transl conf "or" ^ " " ^
+        nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z)
   | YearInt z ->
-      transl conf "between (date)" ^ " " ^ s ^ " " ^
-      transl conf "and" ^ " " ^
-      nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z) ]
+      transl conf "between (date)" ^ " " ^ s ^ " " ^ transl conf "and" ^ " " ^
+        nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z) ]
 ;
 
 value string_of_dmy conf d =
-  let sy = code_dmy conf d in
-  string_of_prec_dmy conf sy d
+  let sy = code_dmy conf d in string_of_prec_dmy conf sy d
 ;
 
 value gregorian_precision conf d =
   if d.delta = 0 then string_of_dmy conf d
   else
     let d2 =
-      Calendar.gregorian_of_sdn d.prec
-        (Calendar.sdn_of_gregorian d + d.delta)
+      Calendar.gregorian_of_sdn d.prec (Calendar.sdn_of_gregorian d + d.delta)
     in
-    transl conf "between (date)" ^ " " ^
-    string_of_on_dmy conf d ^ " " ^
-    transl conf "and" ^ " " ^
-    string_of_on_dmy conf d2
+    transl conf "between (date)" ^ " " ^ string_of_on_dmy conf d ^ " " ^
+      transl conf "and" ^ " " ^ string_of_on_dmy conf d2
 ;
 
 value string_of_ondate conf =
@@ -210,22 +200,19 @@ value string_of_ondate conf =
   [ Dgreg d Dgregorian -> string_of_on_dmy conf d
   | Dgreg d Djulian ->
       let cal_prec =
-        if d.year < 1582 then ""
-        else " (" ^ gregorian_precision conf d ^ ")"
+        if d.year < 1582 then "" else " (" ^ gregorian_precision conf d ^ ")"
       in
       let d1 = Calendar.julian_of_gregorian d in
       string_of_on_dmy conf d1 ^ " " ^
-      transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
+        transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
   | Dgreg d Dfrench ->
       let d1 = Calendar.french_of_gregorian d in
       let s = gregorian_precision conf d in
-      string_of_on_french_dmy conf d1 ^ " "
-      ^ " (" ^ s ^ ")"
+      string_of_on_french_dmy conf d1 ^ " " ^ " (" ^ s ^ ")"
   | Dgreg d Dhebrew ->
       let d1 = Calendar.hebrew_of_gregorian d in
       let s = gregorian_precision conf d in
-      string_of_on_hebrew_dmy conf d1 ^ " "
-      ^ " (" ^ s ^ ")"
+      string_of_on_hebrew_dmy conf d1 ^ " " ^ " (" ^ s ^ ")"
   | Dtext t -> "(" ^ t ^ ")" ]
 ;
 
@@ -250,32 +237,22 @@ value string_of_date conf =
 value print_age conf a =
   match a with
   [ {day = 0; month = 0; year = y} ->
-      if y > 1 then
-        Wserver.wprint "%d %s" y (transl conf "years old")
-      else if y = 1 then
-        Wserver.wprint "%s" (transl conf "one year old")
-      else
-        Wserver.wprint "%s" (transl conf "birth")
+      if y > 1 then Wserver.wprint "%d %s" y (transl conf "years old")
+      else if y = 1 then Wserver.wprint "%s" (transl conf "one year old")
+      else Wserver.wprint "%s" (transl conf "birth")
   | {day = 0; month = m; year = y} ->
-      if y >= 2 then
-        Wserver.wprint "%d %s" y (transl conf "years old")
+      if y >= 2 then Wserver.wprint "%d %s" y (transl conf "years old")
       else if y > 0 || m > 1 then
         Wserver.wprint "%d %s" (y * 12 + m) (transl conf "months old")
-      else if m = 1 then
-        Wserver.wprint "%s" (transl conf "one month old")
-      else
-        Wserver.wprint "%s" (transl conf "less than one month old")
+      else if m = 1 then Wserver.wprint "%s" (transl conf "one month old")
+      else Wserver.wprint "%s" (transl conf "less than one month old")
   | {day = d; month = m; year = y} ->
-      if y >= 2 then
-        Wserver.wprint "%d %s" y (transl conf "years old")
+      if y >= 2 then Wserver.wprint "%d %s" y (transl conf "years old")
       else if y > 0 || m > 1 then
         Wserver.wprint "%d %s" (y * 12 + m) (transl conf "months old")
-      else if m = 1 then
-        Wserver.wprint "%s" (transl conf "one month old")
-      else if d >= 2 then
-        Wserver.wprint "%d %s" d (transl conf "days old")
-      else if d == 1 then
-        Wserver.wprint "%s" (transl conf "one day old")
+      else if m = 1 then Wserver.wprint "%s" (transl conf "one month old")
+      else if d >= 2 then Wserver.wprint "%d %s" d (transl conf "days old")
+      else if d == 1 then Wserver.wprint "%s" (transl conf "one day old")
       else Wserver.wprint "0" ]
 ;
 
@@ -294,9 +271,7 @@ value year_text d =
   | _ -> s ]
 ;
 
-value display_year d =
-  Wserver.wprint "%s" (year_text d)
-;
+value display_year d = Wserver.wprint "%s" (year_text d);
 
 value of_course_died conf p =
   match Adef.od_of_codate p.birth with
@@ -325,13 +300,6 @@ value get_birth_death_date p =
 value short_dates_text conf base p =
   if age_autorise conf base p then
     let (birth_date, death_date, _) = get_birth_death_date p in
-(*
-    let s =
-      match (birth_date, p.death) with
-      [ (Some _, DontKnowIfDead) -> "*"
-      | _ -> "" ]
-    in
-*)
     let s = "" in
     let s =
       match birth_date with
@@ -368,172 +336,173 @@ value short_marriage_date_text conf base fam p1 p2 =
 value print_dates conf base p =
   let cap s = ", " ^ s in
   let is = index_of_sex p.sex in
-  do let birth_place = sou base p.birth_place in
-     do match Adef.od_of_codate p.birth with
-        [ Some d ->
-            do Wserver.wprint "%s " (cap (transl_nth conf "born" is));
-               Wserver.wprint "%s" (string_of_ondate conf d);
-               if birth_place <> "" then Wserver.wprint ",\n" else ();
-            return ()
-        | None ->
-            if birth_place <> "" then
-              Wserver.wprint "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
-            else () ];
-        if birth_place <> "" then Wserver.wprint "%s" birth_place else ();
-     return ();
-     let baptism = Adef.od_of_codate p.baptism in
-     let baptism_place = sou base p.baptism_place in
-     do match baptism with
-        [ Some d ->
-            do Wserver.wprint "%s "
-                 (cap (transl_nth conf "baptized" is));
-               Wserver.wprint "%s" (string_of_ondate conf d);
-               if baptism_place <> "" then Wserver.wprint ",\n" else ();
-            return ()
-        | None ->
-            if baptism_place <> "" then
-              Wserver.wprint "%s\n-&nbsp;"
-                (cap (transl_nth conf "baptized" is))
-            else () ];
+  do {
+    let birth_place = sou base p.birth_place in
+    match Adef.od_of_codate p.birth with
+    [ Some d ->
+        do {
+          Wserver.wprint "%s " (cap (transl_nth conf "born" is));
+          Wserver.wprint "%s" (string_of_ondate conf d);
+          if birth_place <> "" then Wserver.wprint ",\n" else ();
+        }
+    | None ->
+        if birth_place <> "" then
+          Wserver.wprint "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
+        else () ];
+    if birth_place <> "" then Wserver.wprint "%s" birth_place else ();
+    let baptism = Adef.od_of_codate p.baptism in
+    let baptism_place = sou base p.baptism_place in
+    match baptism with
+    [ Some d ->
+        do {
+          Wserver.wprint "%s " (cap (transl_nth conf "baptized" is));
+          Wserver.wprint "%s" (string_of_ondate conf d);
+          if baptism_place <> "" then Wserver.wprint ",\n" else ();
+        }
+    | None ->
         if baptism_place <> "" then
-          Wserver.wprint "%s" baptism_place
-        else ();
-     return ();
-     let death_place = sou base p.death_place in
-     do match p.death with
-        [ Death dr d ->
-            let dr_w =
-              match dr with
-              [ Unspecified -> transl_nth conf "died" is
-              | Murdered -> transl_nth conf "murdered" is
-              | Killed -> transl_nth conf "killed (in action)" is
-              | Executed -> transl_nth conf "executed (legally killed)" is
-              | Disappeared -> transl_nth conf "disappeared" is ]
-            in
-            let d = Adef.date_of_cdate d in
-            do Wserver.wprint "%s " (cap dr_w);
-               Wserver.wprint "%s" (string_of_ondate conf d);
-               if death_place <> "" then Wserver.wprint ",\n" else ();
-            return ()
-        | DeadYoung ->
-            do Wserver.wprint "%s" (cap (transl_nth conf "died young" is));
-               if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
-            return ()
-        | DeadDontKnowWhen ->
-            match (death_place, p.burial) with
-            [ ("", Buried _ | Cremated _) -> ()
-            | _ ->
-                if death_place <> "" || not (of_course_died conf p) then
-                  do Wserver.wprint "%s" (cap (transl_nth conf "died" is));
-                     if death_place <> "" then Wserver.wprint "\n-&nbsp;"
-                     else ();
-                  return ()
-                else () ]
-        | DontKnowIfDead | NotDead -> () ];
-        if death_place <> "" then
-          do Wserver.wprint "%s" death_place;
-          return ()
-        else ();
-     return ();
-     let burial_date_place cod =
-       let place = sou base p.burial_place in
-       do match Adef.od_of_codate cod with
-          [ Some d ->
-              do Wserver.wprint " %s" (string_of_ondate conf d);
-                 if place <> "" then Wserver.wprint ",\n" else ();
-              return ()
-          | None ->
-              if place <> "" then Wserver.wprint " -&nbsp;" else () ];
-          if place <> "" then Wserver.wprint "%s" place else ();
-       return ()
-     in
-     do match p.burial with
-        [ Buried cod ->
-            do Wserver.wprint "%s" (cap (transl_nth conf "buried" is));
-               burial_date_place cod;
-            return ()
-        | Cremated cod ->
-            do Wserver.wprint "%s"
-                 (cap (transl_nth conf "cremated" is));
-               burial_date_place cod;
-            return ()
-        | UnknownBurial -> () ];
-     return ();
-     let (birth_date, death_date, approx) = get_birth_death_date p in
-     match (birth_date, death_date) with
-     [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
-        Some (Dgreg ({prec = Sure | About | Maybe} as d2) _)) when d1 <> d2 ->
-         let a = temps_ecoule d1 d2 in
-         if a.year < 0 || a.year = 0 && a.month = 0 then ()
-         else
-           do Wserver.wprint "\n(";
-              Wserver.wprint "%s " (transl conf "age at death:");
-              if not approx && d1.prec = Sure && d2.prec = Sure then ()
-              else
-                Wserver.wprint "%s "
-                  (transl_decline conf "possibly (date)" "");
-              print_age conf a;
-              Wserver.wprint ")";
-           return ()
-     | _ -> () ];
-  return ()
+          Wserver.wprint "%s\n-&nbsp;"
+            (cap (transl_nth conf "baptized" is))
+        else () ];
+    if baptism_place <> "" then Wserver.wprint "%s" baptism_place else ();
+    let death_place = sou base p.death_place in
+    match p.death with
+    [ Death dr d ->
+        let dr_w =
+          match dr with
+          [ Unspecified -> transl_nth conf "died" is
+          | Murdered -> transl_nth conf "murdered" is
+          | Killed -> transl_nth conf "killed (in action)" is
+          | Executed -> transl_nth conf "executed (legally killed)" is
+          | Disappeared -> transl_nth conf "disappeared" is ]
+        in
+        let d = Adef.date_of_cdate d in
+        do {
+          Wserver.wprint "%s " (cap dr_w);
+          Wserver.wprint "%s" (string_of_ondate conf d);
+          if death_place <> "" then Wserver.wprint ",\n" else ();
+        }
+    | DeadYoung ->
+        do {
+          Wserver.wprint "%s" (cap (transl_nth conf "died young" is));
+          if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
+        }
+    | DeadDontKnowWhen ->
+        match (death_place, p.burial) with
+        [ ("", Buried _ | Cremated _) -> ()
+        | _ ->
+            if death_place <> "" || not (of_course_died conf p) then do {
+              Wserver.wprint "%s" (cap (transl_nth conf "died" is));
+              if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
+            }
+            else () ]
+    | DontKnowIfDead | NotDead -> () ];
+    if death_place <> "" then do { Wserver.wprint "%s" death_place; }
+    else ();
+    let burial_date_place cod =
+      let place = sou base p.burial_place in
+      do {
+         match Adef.od_of_codate cod with
+         [ Some d ->
+             do {
+               Wserver.wprint " %s" (string_of_ondate conf d);
+               if place <> "" then Wserver.wprint ",\n" else ();
+             }
+         | None -> if place <> "" then Wserver.wprint " -&nbsp;" else () ];
+         if place <> "" then Wserver.wprint "%s" place else ();
+      }
+    in
+    match p.burial with
+    [ Buried cod ->
+        do {
+          Wserver.wprint "%s" (cap (transl_nth conf "buried" is));
+          burial_date_place cod;
+        }
+    | Cremated cod ->
+        do {
+          Wserver.wprint "%s" (cap (transl_nth conf "cremated" is));
+          burial_date_place cod;
+        }
+    | UnknownBurial -> () ];
+    let (birth_date, death_date, approx) = get_birth_death_date p in
+    match (birth_date, death_date) with
+    [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
+       Some (Dgreg ({prec = Sure | About | Maybe} as d2) _))
+      when d1 <> d2 ->
+        let a = temps_ecoule d1 d2 in
+        if a.year < 0 || a.year = 0 && a.month = 0 then ()
+        else do {
+          Wserver.wprint "\n(";
+          Wserver.wprint "%s " (transl conf "age at death:");
+          if not approx && d1.prec = Sure && d2.prec = Sure then ()
+          else
+            Wserver.wprint "%s " (transl_decline conf "possibly (date)" "");
+          print_age conf a;
+          Wserver.wprint ")";
+        }
+    | _ -> () ];
+  }
 ;
 
 (* Calendar request *)
 
 value gregorian_month_name conf n =
-  capitale (nominative (transl_nth conf "(month)" n));
+  capitale (nominative (transl_nth conf "(month)" n))
+;
 value julian_month_name = gregorian_month_name;
 value french_month_name conf n = capitale (nominative (french_month conf n));
 value hebrew_month_name conf n = capitale (nominative (hebrew_month conf n));
 
 value print_some_calendar conf date n month_name n_months var =
-  do Wserver.wprint "\n";
-     tag "tr" begin
-       stag "th" begin
-         Wserver.wprint "%s\n"
-           (capitale (transl_nth conf "gregorian/julian/french/hebrew" n));
-       end;
-       Wserver.wprint "\n";
-       tag "td" begin
-         Wserver.wprint "<input type=submit name=y%s1 value=\"&lt;\">" var;
-         Wserver.wprint "<input name=y%s size=5 maxlength=5 value=%d>"
-           var date.year;
-         Wserver.wprint "<input type=submit name=y%s2 value=\"&gt;\">\n" var;
-       end;
-       tag "td" "align=center" begin
-         Wserver.wprint "<input type=submit name=m%s1 value=\"&lt;\">" var;
-         stag "select" "name=m%s" var begin
-           for i = 1 to n_months do
-             Wserver.wprint "<option value=%d%s> %s\n" i
-               (if date.month = i then " selected" else "")
-               (month_name conf (i - 1));
-           done;
-         end;
-         Wserver.wprint "<input type=submit name=m%s2 value=\"&gt;\">" var;
-       end;
-       tag "td" begin
-         Wserver.wprint "<input type=submit name=d%s1 value=\"&lt;\">" var;
-         Wserver.wprint "<input name=d%s size=2 maxlength=2 value=%d>"
-           var date.day;
-         Wserver.wprint "<input type=submit name=d%s2 value=\"&gt;\">\n" var;
-       end;
-       tag "td" begin
-         Wserver.wprint "<input type=submit name=t%s value=\"=\">\n" var;
-       end;
-     end;
-  return ()
+  do {
+    Wserver.wprint "\n";
+    tag "tr" begin
+      stag "th" begin
+        Wserver.wprint "%s\n"
+          (capitale (transl_nth conf "gregorian/julian/french/hebrew" n));
+      end;
+      Wserver.wprint "\n";
+      tag "td" begin
+        Wserver.wprint "<input type=submit name=y%s1 value=\"&lt;\">" var;
+        Wserver.wprint "<input name=y%s size=5 maxlength=5 value=%d>" var
+          date.year;
+        Wserver.wprint "<input type=submit name=y%s2 value=\"&gt;\">\n" var;
+      end;
+      tag "td" "align=center" begin
+        Wserver.wprint "<input type=submit name=m%s1 value=\"&lt;\">" var;
+        stag "select" "name=m%s" var begin
+          for i = 1 to n_months do {
+            Wserver.wprint "<option value=%d%s> %s\n" i
+              (if date.month = i then " selected" else "")
+              (month_name conf (i - 1))
+          };
+        end;
+        Wserver.wprint "<input type=submit name=m%s2 value=\"&gt;\">" var;
+      end;
+      tag "td" begin
+        Wserver.wprint "<input type=submit name=d%s1 value=\"&lt;\">" var;
+        Wserver.wprint "<input name=d%s size=2 maxlength=2 value=%d>" var
+          date.day;
+        Wserver.wprint "<input type=submit name=d%s2 value=\"&gt;\">\n" var;
+      end;
+      tag "td" begin
+        Wserver.wprint "<input type=submit name=t%s value=\"=\">\n" var;
+      end;
+    end;
+  }
 ;
 
 value print_calendar_head conf =
   tag "tr" begin
-    stag "td" begin Wserver.wprint "&nbsp;"; end; Wserver.wprint "\n";
-    for i = 0 to 2 do
+    stag "td" begin Wserver.wprint "&nbsp;"; end;
+    Wserver.wprint "\n";
+    for i = 0 to 2 do {
       tag "th" begin
         Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
-      end;
-    done;
-    stag "td" begin Wserver.wprint "&nbsp;"; end; Wserver.wprint "\n";
+      end
+    };
+    stag "td" begin Wserver.wprint "&nbsp;"; end;
+    Wserver.wprint "\n";
   end
 ;
 
@@ -566,33 +535,36 @@ value print_calendar conf base =
              with
              [ (Some _, _, _, _, _, _) ->
                  let yy = yy - 1 in
-                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+                 conv
+                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
              | (_, Some _, _, _, _, _) ->
                  let yy = yy + 1 in
-                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+                 conv
+                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
              | (_, _, Some _, _, _, _) ->
                  let (yy, mm) =
-                   if mm = 1 then (yy - 1, max_month)
-                   else (yy, mm - 1)
+                   if mm = 1 then (yy - 1, max_month) else (yy, mm - 1)
                  in
-                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+                 conv
+                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
              | (_, _, _, Some _, _, _) ->
                  let (yy, mm) =
-                   if mm = max_month then (yy + 1, 1)
-                   else (yy, mm + 1)
+                   if mm = max_month then (yy + 1, 1) else (yy, mm + 1)
                  in
-                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+                 conv
+                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
              | (_, _, _, _, Some _, _) ->
                  let dd = dd - 1 in
-                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+                 conv
+                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
              | (_, _, _, _, _, Some _) ->
                  let dd = dd + 1 in
-                 conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+                 conv
+                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
              | _ -> d ] ])
       (Calendar.sdn_of_gregorian conf.today)
       [("g", Calendar.sdn_of_gregorian, 12);
-       ("j", Calendar.sdn_of_julian, 12);
-       ("f", Calendar.sdn_of_french, 13);
+       ("j", Calendar.sdn_of_julian, 12); ("f", Calendar.sdn_of_french, 13);
        ("h", Calendar.sdn_of_hebrew, 13)]
   in
   let date = Calendar.gregorian_of_sdn Sure sdn in
@@ -601,38 +573,39 @@ value print_calendar conf base =
     let x = conf.today_wd - sdn_today + sdn in
     if x < 0 then 6 + (x + 1) mod 7 else x mod 7
   in
-  do header conf title;
-     print_link_to_welcome conf True;
-     Wserver.wprint "- %s -\n"
-       (capitale (nominative (transl_nth conf "(week day)" wday)));
-     html_p conf;
-     tag "form" "method=GET action=\"%s\"" conf.command begin
-       List.iter
-         (fun (k, v) ->
-            Wserver.wprint "<input type=hidden name=%s value=%s>\n" k
-              (quote_escaped (decode_varenv v)))
-         conf.henv;
-       Wserver.wprint "<input type=hidden name=m value=CAL>\n\n";
-       tag "table" "border=1" begin
-         print_calendar_head conf;
-         print_some_calendar conf date 0 gregorian_month_name 12 "g";
-         print_some_calendar conf (Calendar.julian_of_gregorian date) 1
-           julian_month_name 12 "j";
-         print_some_calendar conf (Calendar.french_of_gregorian date) 2
-           french_month_name 13 "f";
-         print_some_calendar conf (Calendar.hebrew_of_gregorian date) 3
-           hebrew_month_name 13 "h";
-       end;
-       Wserver.wprint "<br><p>%s: " (capitale (transl conf "julian day"));
-       let jd = Calendar.sdn_of_gregorian date in
-       if jd < 0 then Wserver.wprint "%d" jd
-       else
-         Num.print (fun x -> Wserver.wprint "%s" x)
-           (transl conf "(thousand separator)") (Num.of_int jd);
-       Wserver.wprint "\n";
-     end;
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "- %s -\n"
+      (capitale (nominative (transl_nth conf "(week day)" wday)));
+    html_p conf;
+    tag "form" "method=GET action=\"%s\"" conf.command begin
+      List.iter
+        (fun (k, v) ->
+           Wserver.wprint "<input type=hidden name=%s value=%s>\n" k
+             (quote_escaped (decode_varenv v)))
+        conf.henv;
+      Wserver.wprint "<input type=hidden name=m value=CAL>\n\n";
+      tag "table" "border=1" begin
+        print_calendar_head conf;
+        print_some_calendar conf date 0 gregorian_month_name 12 "g";
+        print_some_calendar conf (Calendar.julian_of_gregorian date) 1
+          julian_month_name 12 "j";
+        print_some_calendar conf (Calendar.french_of_gregorian date) 2
+          french_month_name 13 "f";
+        print_some_calendar conf (Calendar.hebrew_of_gregorian date) 3
+          hebrew_month_name 13 "h";
+      end;
+      Wserver.wprint "<br><p>%s: " (capitale (transl conf "julian day"));
+      let jd = Calendar.sdn_of_gregorian date in
+      if jd < 0 then Wserver.wprint "%d" jd
+      else
+        Num.print (fun x -> Wserver.wprint "%s" x)
+          (transl conf "(thousand separator)") (Num.of_int jd);
+      Wserver.wprint "\n";
+    end;
+    trailer conf;
+  }
 ;
 
 (* Deprecated *)
