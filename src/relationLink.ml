@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.8 2003-11-26 17:08:09 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.9 2003-11-29 03:52:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -23,7 +23,9 @@ type info =
     nb1 : option (list (iper * sex));
     nb2 : option (list (iper * sex));
     sp1 : option person;
-    sp2 : option person }
+    sp2 : option person;
+    bd : int;
+    td_prop : string }
 ;
 
 type dist = { dmin : mutable int; dmax : mutable int; mark : bool };
@@ -206,25 +208,29 @@ value spouse_text conf base end_sp ip ipl =
   | _ -> ("", "", None) ]
 ;
 
-value print_someone conf base ip =
-  do {
-    Wserver.wprint "%s\n" (someone_text conf base ip);
-    Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
-  }
-;
-
-value print_spouse conf base n ip ipl =
+value print_someone_and_spouse conf base info in_tab ip n ipl =
   let (s, d, spo) = spouse_text conf base n ip ipl in
-  if s <> "" then do {
-    Wserver.wprint "&amp;%s" d;
-    html_br conf;
-    Wserver.wprint "%s\n" s;
-    match spo with
-    [ Some ip ->
-        Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
-    | _ -> () ]
+  do {
+    if in_tab && (info.bd > 0 || info.td_prop <> "") then
+      Wserver.wprint "<table border=%d><tr><td align=center%s>" info.bd
+        info.td_prop
+    else ();
+    Wserver.wprint "%s\n" (someone_text conf base ip);
+    Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip));
+    if s <> "" then do {
+      Wserver.wprint "&amp;%s" d;
+      html_br conf;
+      Wserver.wprint "%s\n" s;
+      match spo with
+      [ Some ip ->
+          Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
+      | _ -> () ]
+    }
+    else ();
+    if in_tab && (info.bd > 0 || info.td_prop <> "") then
+      Wserver.wprint "</td></tr></table>"
+    else ();
   }
-  else ()
 ;
 
 value rec print_both_branches conf base info pl1 pl2 =
@@ -258,20 +264,14 @@ value rec print_both_branches conf base info pl1 pl2 =
       tag "td" "valign=top align=center width=\"50%%\"" begin
         match p1 with
         [ Some p1 ->
-            do {
-              print_someone conf base p1;
-              print_spouse conf base info.sp1 p1 pl1
-            }
+            print_someone_and_spouse conf base info True p1 info.sp1 pl1
         | None -> Wserver.wprint "&nbsp;" ];
       end;
       tag "td" begin Wserver.wprint "&nbsp;"; end;
       tag "td" "valign=top align=center width=\"50%%\"" begin
         match p2 with
         [ Some p2 ->
-            do {
-              print_someone conf base p2;
-              print_spouse conf base info.sp2 p2 pl2
-            }
+            print_someone_and_spouse conf base info True p2 info.sp2 pl2
         | None -> Wserver.wprint "&nbsp;" ];
       end;
     end;
@@ -323,29 +323,6 @@ value rec print_both_branches_pre conf base info sz pl1 pl2 =
   }
 ;
 
-value rec print_one_branch conf base ipl1 sp =
-  if ipl1 = [] then ()
-  else do {
-    let (ip1, ipl1) =
-      match ipl1 with
-      [ [(ip1, _) :: ipl1] -> (Some ip1, ipl1)
-      | [] -> (None, []) ]
-    in
-    match ip1 with
-    [ Some ip1 -> do { Wserver.wprint "|"; html_br conf }
-    | None -> () ];
-    match ip1 with
-    [ Some ip1 ->
-        do {
-          print_someone conf base ip1;
-          print_spouse conf base sp ip1 ipl1;
-          html_br conf
-        }
-    | None -> () ];
-    print_one_branch conf base ipl1 sp
-  }
-;
-
 value include_marr conf base n =
   match find_person_in_env conf base n with
   [ Some p -> ";" ^ acces_n conf base n p
@@ -368,6 +345,12 @@ value sign_text conf base sign info b1 b2 c1 c2 =
     (match p_getenv conf.env "bd" with
      [ None | Some ("0" | "") -> ""
      | Some x -> ";bd=" ^ x ]) ^
+    (match p_getenv conf.env "td" with
+     [ None | Some "" -> ""
+     | Some x -> ";td=" ^ x ]) ^
+    (match p_getenv conf.env "color" with
+     [ None | Some "" -> ""
+     | Some x -> ";color=" ^ x ]) ^
     include_marr conf base "3" ^ include_marr conf base "4" ^ "\">" ^ sign ^
     "</a>"
 ;
@@ -445,17 +428,81 @@ value other_parent_text_if_same conf base info =
   | _ -> None ]
 ;
 
-value print_other_parent_if_same conf base info =
-  match other_parent_text_if_same conf base info with
-  [ Some (s, ip) ->
-      do {
-        Wserver.wprint "%s" s;
-        Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
-      }
-  | None -> () ]
+value print_someone_and_other_parent_if_same conf base info =
+  do {
+    if info.bd > 0 || info.td_prop <> "" then
+      Wserver.wprint "<table border=%d><tr><td align=center%s>"
+        info.bd info.td_prop
+    else ();
+    Wserver.wprint "%s\n" (someone_text conf base info.ip);
+    Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base info.ip));
+    match other_parent_text_if_same conf base info with
+    [ Some (s, ip) ->
+        do {
+          Wserver.wprint "%s" s;
+          Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
+        }
+    | None -> () ];
+    if info.bd > 0 || info.td_prop <> "" then
+      Wserver.wprint "</td></tr></table>"
+    else ();
+  }
 ;
 
-value print_with_pre conf base info =
+value rec list_iter_hd_tl f =
+  fun
+  [ [x :: l] -> do { f x l; list_iter_hd_tl f l }
+  | [] -> () ]
+;
+
+value print_one_branch_no_table conf base info =
+  let b = if info.b1 = [] then info.b2 else info.b1 in
+  let sp = if info.b1 = [] then info.sp2 else info.sp1 in
+  tag "center" begin
+    print_someone_and_spouse conf base info False info.ip sp b;
+    html_br conf;
+    list_iter_hd_tl
+      (fun (ip1, _) ipl1 ->
+         do {
+           Wserver.wprint "|";
+           html_br conf;
+           print_someone_and_spouse conf base info False ip1 sp ipl1;
+           html_br conf;
+         })
+      b;
+  end
+;
+
+value print_one_branch_with_table conf base info =
+  let b = if info.b1 = [] then info.b2 else info.b1 in
+  let sp = if info.b1 = [] then info.sp2 else info.sp1 in
+  tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
+    conf.border
+  begin
+    tag "tr" begin
+      tag "td" "align=center" begin
+        print_someone_and_spouse conf base info True info.ip sp b;
+      end;
+      list_iter_hd_tl
+        (fun (ip1, _) ipl1 ->
+           do {
+             tag "tr" begin
+               tag "td" "align=center" begin
+                 Wserver.wprint "|";
+               end;
+             end;
+             tag "tr" begin
+               tag "td" "align=center" begin
+                 print_someone_and_spouse conf base info True ip1 sp ipl1;
+               end;
+             end;
+           })
+        b;
+    end;
+  end
+;
+
+value print_two_branches_with_pre conf base info =
   let sz = 79 in
   tag "pre" begin
     print_pre_center sz (someone_text conf base info.ip);
@@ -482,14 +529,13 @@ value print_with_pre conf base info =
   end
 ;
 
-value print_with_table conf base info =
+value print_two_branches_with_table conf base info =
   tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
     conf.border
   begin
     tag "tr" "align=left" begin
       stag "td" "colspan=3 align=center" begin
-        print_someone conf base info.ip;
-        print_other_parent_if_same conf base info;
+        print_someone_and_other_parent_if_same conf base info;
       end;
     end;
     tag "tr" "align=left" begin
@@ -533,15 +579,16 @@ value print_with_table conf base info =
 ;
 
 value print_relation_path conf base info =
+  let with_table =
+    match p_getenv conf.env "tab" with
+    [ Some "on" -> True
+    | Some "off" -> False
+    | _ -> not (browser_doesnt_have_tables conf) ]
+  in
   if info.b1 = [] || info.b2 = [] then do {
-    let b = if info.b1 = [] then info.b2 else info.b1 in
-    let sp = if info.b1 = [] then info.sp2 else info.sp1 in
-    tag "center" begin
-      print_someone conf base info.ip;
-      print_spouse conf base sp info.ip b;
-      html_br conf;
-      print_one_branch conf base b sp;
-    end;
+    if (info.bd > 0 || info.td_prop <> "") && with_table then
+      print_one_branch_with_table conf base info
+    else print_one_branch_no_table conf base info;
     if not conf.cancel_links &&
        (info.pb1 <> None || info.nb1 <> None || info.pb2 <> None ||
         info.nb2 <> None) then
@@ -556,15 +603,8 @@ value print_relation_path conf base info =
     }
     else ()
   }
-  else
-    let with_table =
-      match p_getenv conf.env "tab" with
-      [ Some "on" -> True
-      | Some "off" -> False
-      | _ -> not (browser_doesnt_have_tables conf) ]
-    in
-    if with_table then print_with_table conf base info
-    else print_with_pre conf base info
+  else if with_table then print_two_branches_with_table conf base info
+  else print_two_branches_with_pre conf base info
 ;
 
 value print_relation_ok conf base info =
@@ -646,10 +686,19 @@ value print_relation_no_dag conf base po ip1 ip2 =
       in
       let sp1 = find_person_in_env conf base "3" in
       let sp2 = find_person_in_env conf base "4" in
+      let bd = match p_getint conf.env "bd" with [ Some x -> x | None -> 0 ] in
+      let td_prop =
+        match Util.p_getenv conf.env "td" with
+        [ Some x -> " " ^ x
+        | _ ->
+            match Util.p_getenv conf.env "color" with
+	    [ None | Some "" -> ""
+            | Some x -> " bgcolor=" ^ x ] ]
+      in
       let info =
         {ip = ip; sp = sp; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2; c1 = c1;
          c2 = c2; pb1 = pb1; pb2 = pb2; nb1 = nb1; nb2 = nb2; sp1 = sp1;
-         sp2 = sp2}
+         sp2 = sp2; bd = bd; td_prop = td_prop}
       in
       print_relation_ok conf base info
   | _ -> incorrect_request conf ]

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.44 2003-11-28 01:38:58 ddr Exp $ *)
+(* $Id: relation.ml,v 4.45 2003-11-29 03:52:22 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1472,10 +1472,19 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
   let b2 = find_first_branch conf base dist ip l2 ip2 Neuter in
   match (b1, b2) with
   [ (Some b1, Some b2) ->
+      let bd = match p_getint conf.env "bd" with [ Some x -> x | None -> 0 ] in
+      let td_prop =
+        match Util.p_getenv conf.env "td" with
+        [ Some x -> " " ^ x
+        | _ ->
+            match Util.p_getenv conf.env "color" with
+	    [ None | Some "" -> ""
+            | Some x -> " bgcolor=" ^ x ] ]
+      in
       let info =
         {ip = ip; sp = a.sex; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2; c1 = 1;
          c2 = 1; pb1 = None; pb2 = None; nb1 = None; nb2 = None; sp1 = sp1;
-         sp2 = sp2}
+         sp2 = sp2; bd = bd; td_prop = td_prop}
       in
       if List.mem (b1, b2) found.val then ()
       else do {

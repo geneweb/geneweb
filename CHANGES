@@ -2,12 +2,12 @@ GeneWeb version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [29 Nov 03] Added optional "border" and "background color" for
+    trees displaying (relationship links, ancestors and descendants).
   - [28 Nov 03] Fixed bug creating sometimes dates with null month
     (and not null day) resulting problems with "gwu-gwc" and "cleaning
     up" the database by gwsetup (happened when a date was entered
     with month=13 which was erroneously not rejected).
-  - [28 Nov 03] Added optional "border" and "background color" for
-    trees displaying.
   - [18 Jan 03] Added a system of black list for the database forum;
     the environment variable "forum_exclude_file" can be set to a
     file name containing a list of excluded IP addresses which cannot
