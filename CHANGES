@@ -2,6 +2,8 @@ GeneWeb version 2.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [Oct 21, 99] Added message "or Sosa number relative to x" when displaying
+    a relationship computing form if navigating with x as Sosa reference.
   - [Oct 21, 99] Limit local images height to some maximum number of pixels
     (currently 240). Not applied to distant (http://) images.
   - [Oct 21, 99] Fixed bug: there was no automatic "wizard" (resp. "friend")

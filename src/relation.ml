@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.32 1999-09-28 20:11:27 ddr Exp $ *)
+(* $Id: relation.ml,v 2.33 1999-10-21 18:18:03 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -96,6 +96,16 @@ value print_menu conf base p =
              (transl conf "or") (transl conf "public name")
              (transl conf "or") (nominative (transl conf "alias"))
              (transl conf "or") (transl_nth conf "surname/surnames" 0);
+           match Util.find_person_in_env conf base "z" with
+           [ Some p ->
+               do Wserver.wprint "%s " (transl conf "or");
+                  Wserver.wprint
+                    (ftransl conf "<em>Sosa number</em> relative to %t")
+                    (fun _ ->
+                       Wserver.wprint "%s"
+                         (referenced_person_title_text conf base p));
+               return ()
+           | None -> () ];
            html_li conf;
            Wserver.wprint "<input type=radio name=t value=P> <em>%s</em>\n"
              (transl_nth conf "first name/first names" 0);
