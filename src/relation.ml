@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.42 2003-11-27 15:34:05 ddr Exp $ *)
+(* $Id: relation.ml,v 4.43 2003-11-27 18:03:35 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -181,7 +181,7 @@ value print_menu conf base p =
               (fun c ->
                  Wserver.wprint "\
 <td bgcolor=%s><input type=radio name=color value=%s></td>\n" c c)
-              ["FFC0C0"; "FFFFCO"; "COFFC0"; "COFFFF"; "C0C0FF"; "FFC0FF"];
+              ["FFC0C0"; "FFFFC0"; "C0FFC0"; "C0FFFF"; "C0C0FF"; "FFC0FF"];
             Wserver.wprint "</tr></table>\n";
           end;
         end;
