@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.1 1999-03-08 11:18:22 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.2 1999-03-12 23:35:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -120,6 +120,13 @@ value print_choice conf base p niveau_effectif =
   end
 ;
 
+value rec list_remove_assoc x =
+  fun
+  [ [] -> []
+  | [((a, b) as pair) :: l] ->
+      if a = x then l else [pair :: list_remove_assoc x l] ]
+;
+
 value afficher_menu_ascendants conf base p =
   let niveau_effectif = niveau_max_ascendance base p.cle_index in
   let title h =
@@ -136,7 +143,7 @@ value afficher_menu_ascendants conf base p =
      Wserver.wprint
        (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
        (fun _ ->
-          do conf.henv := List.remove_assoc "iz" conf.henv;
+          do conf.henv := list_remove_assoc "iz" conf.henv;
              stag "a" "href=\"%siz=%d;i=%d\"" (commd conf)
                (Adef.int_of_iper p.cle_index)
                (Adef.int_of_iper p.cle_index)
