@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 2.2 1999-03-25 20:25:40 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 2.3 1999-07-14 11:50:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -42,8 +42,8 @@ value reconstitute conf base fam1 fam2 =
 value print_merge1 conf base fam fam2 digest =
   let title _ =
     let s = transl_nth conf "family/families" 1 in
-    Wserver.wprint "%s # %d" (capitale (transl_decline conf "merge" s))
-      (Adef.int_of_ifam fam.fam_index)
+    Wserver.wprint "%s # %d"
+      (capitale (transl_decline conf "merge" s)) (Adef.int_of_ifam fam.fam_index)
   in
   let cpl =
     Gutil.map_couple_p (UpdateFam.person_key base) (coi base fam.fam_index)

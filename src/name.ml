@@ -1,42 +1,41 @@
-(* $Id: name.ml,v 2.2 1999-07-03 19:25:24 ddr Exp $ *)
+(* $Id: name.ml,v 2.3 1999-07-14 11:50:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
-(* Name.lower *)
+(* Name.lower: applies to ansel encoded strings *)
 
 value lower s =
   let rec name_len special i len =
     if i == String.length s then len
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' ->
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | 'ø' | 'Ø' | '.' ->
           name_len 0 (i + 1) (len + special + 1)
-      | 'à'..'ý' | 'À'..'Ý' ->
-          name_len 0 (i + 1) (len + special)
       | _ ->
-         if len == 0 then name_len 0 (i + 1) 0
-         else name_len 1 (i + 1) len ]
+          match Char.code s.[i] with
+          [ 225 | 226 | 227 | 228 | 232 | 234 | 240 ->
+              name_len 0 (i + 1) (len + special)
+          | _ ->
+             if len == 0 then name_len 0 (i + 1) 0
+             else name_len 1 (i + 1) len ] ]
   in
   let s' = String.create (name_len 0 0 0) in
   let rec copy special i i' =
     if i == String.length s then s'
     else
       match s.[i] with
-      [ 'a'..'z'  | '0'..'9' | '.' as c ->
-          let i' =
-            if special then do s'.[i'] := ' '; return i' + 1 else i'
-          in
-          let c = s.[i] in
-          do s'.[i'] := c; return copy False (i + 1) (i' + 1)
-      | 'A'..'Z' | '0'..'9' | '.' as c ->
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | 'ø' | 'Ø' | '.' as c ->
           let i' =
             if special then do s'.[i'] := ' '; return i' + 1 else i'
           in
           let c = Char.lowercase s.[i] in
+          let c = if c == 'ø' then 'o' else c in
           do s'.[i'] := c; return copy False (i + 1) (i' + 1)
-      | 'à'..'ý' | 'À'..'Ý' -> copy special (i + 1) i'
-      | c ->
-          if i' == 0 then copy False (i + 1) 0
-          else copy True (i + 1) i' ]
+      | _ ->
+          match Char.code s.[i] with
+          [ 225 | 226 | 227 | 228 | 232 | 234 | 240 -> copy special (i + 1) i'
+          | _ ->
+              if i' == 0 then copy False (i + 1) 0
+              else copy True (i + 1) i' ] ]
   in
   copy False 0 0
 ;

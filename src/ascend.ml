@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.29 1999-06-30 23:04:43 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.30 1999-07-14 11:50:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1170,15 +1170,13 @@ value print_missing_type conf =
   fun
   [ A_person -> ()
   | A_surname_of_husband_of x ->
-      Wserver.wprint "%s %s %s %s"
+      Wserver.wprint "%s %s %s"
         (transl_nth conf "surname/surnames" 0)
-        (transl_decline conf "of" "")
-        (transl_nth conf "his wife/her husband" 1) x
+        (transl_decline conf "of" (transl_nth conf "his wife/her husband" 1)) x
   | A_surname_of_wife_of x ->
-      Wserver.wprint "%s %s %s %s"
+      Wserver.wprint "%s %s %s"
         (transl_nth conf "surname/surnames" 0)
-        (transl_decline conf "of" "")
-        (transl_nth conf "his wife/her husband" 0) x
+        (transl_decline conf "of" (transl_nth conf "his wife/her husband" 0)) x
   | A_husband_of ->
       Wserver.wprint "%s" (transl_nth conf "husband/wife" 0) 
   | A_wife_of ->

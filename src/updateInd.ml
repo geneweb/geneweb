@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.8 1999-06-07 18:45:21 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.9 1999-07-14 11:50:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -156,28 +156,30 @@ value cons_insert conf name = capitale (transl_decline conf "insert" name);
 
 value print_nick_names conf base p =
   gen_print_ext_items conf base
-    {i_name = "nickname"; i_txt_name = transl conf "qualifier";
+    {i_name = "nickname"; i_txt_name = nominative (transl conf "qualifier");
      i_txt_add = cons_insert conf (transl conf "qualifier")}
     p.nick_names
 ;
 
 value print_aliases conf base p =
   gen_print_ext_items conf base
-    {i_name = "alias"; i_txt_name = transl conf "alias";
+    {i_name = "alias"; i_txt_name = nominative (transl conf "alias");
      i_txt_add = cons_insert conf (transl conf "alias")}
     p.aliases
 ;
 
 value print_first_names_aliases conf base p =
   gen_print_ext_items conf base
-    {i_name = "first_name_alias"; i_txt_name = transl conf "first name alias";
+    {i_name = "first_name_alias";
+     i_txt_name = nominative (transl conf "first name alias");
      i_txt_add = cons_insert conf (transl conf "first name alias")}
     p.first_names_aliases
 ;
 
 value print_surnames_aliases conf base p =
   gen_print_ext_items conf base
-    {i_name = "surname_alias"; i_txt_name = transl conf "surname alias";
+    {i_name = "surname_alias";
+     i_txt_name = nominative (transl conf "surname alias");
      i_txt_add = cons_insert conf (transl conf "surname alias")}
     p.surnames_aliases
 ;
@@ -351,7 +353,7 @@ value print_title conf base t cnt =
        tag "tr" begin
          tag "td" begin
            Wserver.wprint "%s\n"
-             (capitale (transl_nth conf "title/titles" 0));
+             (capitale (nominative (transl_nth conf "title/titles" 0)));
          end;
          tag "td" begin
            Wserver.wprint "<input name=t_ident%d size=15%s>" cnt
