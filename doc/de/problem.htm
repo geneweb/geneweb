@@ -1,10 +1,6 @@
-<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
-<html>
-<head>
-   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.61 [en] (X11; I; Linux 2.2.7 i586) [Netscape]">
-   <title>GeneWeb - Problems</title>
-</head>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Probleme</title></head>
 <body background="../images/gwback.jpg">
 <table border=0 width="100%">
 <tr>
@@ -21,80 +17,104 @@ height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <br><br>
 
 Hier einige &ouml;fter auftretende Probleme mit "gwd":
-<p>Du hast den <i>GeneWeb</i> D&auml;mon "gwd" gestartet und er antwortet
-normal wie im Kapitel "Erste Schritte mit GeneWeb" , Abschnitt "Befehl
+<p>Du hast den <font color=#2f6400><b>GeneWeb</b></font>-Daemon "gwd" gestartet und er antwortet
+normal wie im Kapitel "Erste Schritte mit GeneWeb", Abschnitt "Der Befehl
 <a href="start.htm#Gwd">gwd</a>", angegeben.
 <p>Dann ...
+
+<p>
 <hr>
-<h3><font color=#2f6400>Meldung "socket failed"</font></h3>
-Unter Windows wenn diese Meldung im Eingabefenster erscheint und du kannst
-dich mit deinem Webbrowser nicht zur angegebenen Adresse verbinden, k&ouml;nnte
-es sein, dass das Internet Protokoll (TCP/IP) nicht auf deinem Computer
+
+<h3><font color=#2f6400>
+Meldung "socket failed"</font></h3>
+Wenn diese Meldung unter Windows im Eingabefenster erscheint und du 
+dich mit deinem Webbrowser nicht zur angegebenen Adresse verbinden
+kannst, k&ouml;nnte
+es sein, da&szlig; das Internet Protokoll (TCP/IP) nicht auf deinem Computer
 installiert ist.
 <p>In diesem Fall installiere es. Du findest es unter "Systemkonfiguration",
 Icon "Netzwerk".
 <p>Starte "gwd" danach erneut und versuche es noch einmal.
+
+<p>
 <hr>
-<h3><font color=#2f6400>Verbindung mit Netzwerk</font></h3>
+
+<h3><font color=#2f6400>
+Verbindung mit Netzwerk</font></h3>
 
 <ul>
 <li>
 Wenn du in deinem Webbrowser die Adresse eingibst, z. B.:</li>
 
-<pre>&nbsp;&nbsp;&nbsp;&nbsp; http://localhost:2317/smith</pre>
-antwortet der Webbrowser, dass du dich mit dem Netzwerk verbinden sollt
-und dass er nicht off line arbeiten kann.
+<pre>
+     http://localhost:2317/meier</pre>
+antwortet der Webbrowser, da&szlig; du dich mit dem Netzwerk
+verbinden sollst
+und da&szlig; er nicht offline arbeiten kann.
 <p>Dieses Problem tritt mit einigen Versionen des Internet Explorer auf.</ul>
 
 <ul>
 <li>
 M&ouml;glicherweise abh&auml;ngig von der Browserversion erhielten wir
 von
-<i>GeneWeb</i> Nutzern (Danke!) die folgenden L&ouml;sungen:</li>
+<font color=#2f6400><b>GeneWeb</b></font>-Nutzern (Danke!) die folgenden L&ouml;sungen:
 
+<p>
 <ul>
 <li>
 Beim Internet Explorer w&auml;hle das Men&uuml; "Ansicht", "Internet Optionen".
 Dann aktiviere im Men&uuml; "Verbindung"&nbsp; "Proxy nicht f&uuml;r lokale
-Adressen verwenden".</li>
-</ul>
+Adressen verwenden".
 
-<ul>
+<p>
 <li>
 [Version 3.02] Beim Internet Explorer w&auml;hle das Men&uuml; "Ansicht",
 "Optionen", "Verbindung". Dann gehe zu "Proxyserver" und w&auml;hle "Setup",
 f&uuml;ge unter "Ausnahmen" und "Proxyserver nicht f&uuml;r Adressen beginnend
 mit" die Adressen hinzu, die beim Start von gwd.exe ausgegeben werden.
-Zum Beispiel (beachte die Semicolons zwischen den Namen):</li>
+Zum Beispiel (beachte die Semikolons zwischen den Namen):</li>
 
-<pre>&nbsp;&nbsp;&nbsp;&nbsp; 127.0.0.1;localhost;computer</pre>
+<pre>
+     127.0.0.1;localhost;computer</pre>
 </ul>
-Wenn dies nicht besser funktioniert, empfehlen wir dir einen anderen Webbrowser
+Wenn dies nicht besser funktioniert, empfehlen wir dir einen anderen
+Webbrowser
 zu benutzen, z. B.&nbsp; Netscape (welcher frei ist).</ul>
 
+
+<p>
 <hr>
-<h3><font color=#2f6400>Kann auf Datei "start.txt" nicht zugreifen</font></h3>
+
+<h3><font color=#2f6400>
+Cannot access file "start.txt"
+</font></h3>
 
 <ul>
 <li>
-Ein weiteres h&auml;ufiges Problem ist die Meldung: "Kann auf Datei start.txt
-nicht zugreifen".</li>
-</ul>
+Ein weiteres h&auml;ufiges Problem ist die Meldung: "Cannot access
+file "start.txt" (zu deutsch: "Kann auf Datei start.txt nicht zugreifen").
 
-<ul>
+<p>
 <li>
-Wenn du <i>GeneWeb</i> unter Windows benutzt, hast du m&ouml;glicherweise
-das Archiv entpackt mit "pkunzip". Es ist wichtig, dies mit den Optionen
-"-e -d" aufzurufen:</li>
-
-<pre>&nbsp;&nbsp;&nbsp;&nbsp; pkunzip -e -d geneweb.zip</pre>
+Wenn du <font color=#2f6400><b>GeneWeb</b></font> unter Windows benutzt, hast du m&ouml;glicherweise
+das Archiv mit "pkunzip" entpackt. Es ist wichtig, dies mit den Optionen
+"-e -d" aufzurufen:
+<p>
+<pre>
+     pkunzip -e -d geneweb.zip
+</pre>
 Wenn du nicht auf diese Art und Weise dekomprimiert hast, mache es noch
 einmal mit den richtigen Optionen.</ul>
 
-<p><hr><br>
-<center>Zur&uuml;ck zur <a href="diruse.htm">Gebrauchsanweisung</a></center>
 
 <p>
-<hr><i><font size=-1>&copy; Copyright INRIA 1999 - GeneWeb</font></i>
+<hr>
+<br>
+<center>
+Zur&uuml;ck zur <a href="diruse.htm">Gebrauchsanweisung</a>.
+</center>
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
+GeneWeb</em></font><br>
+
 </body>
-</html>
