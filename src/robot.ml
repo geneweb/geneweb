@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.11 1999-08-13 02:44:56 ddr Exp $ *)
+(* $Id: robot.ml,v 1.12 1999-08-14 23:16:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -110,7 +110,7 @@ value check oc tm from max_call sec cgi =
         do xcl.who := W.add from ([tm :: r], tm0, cnt) xcl.who; return
         let refused =
           if cnt > max_call then
-            do Printf.fprintf oc " --- %s is a robot" from;
+            do Printf.fprintf oc "--- %s is a robot" from;
                Printf.fprintf oc
                  " (%d > %d connections in %g <= %d seconds)\n" cnt
                  max_call (tm -. tm0) sec; flush Pervasives.stderr;
@@ -123,24 +123,24 @@ value check oc tm from max_call sec cgi =
         do if xcl.excl <> [] then
              do List.iter
                   (fun (s, att) ->
-                     do Printf.fprintf oc " --- excluded:";
+                     do Printf.fprintf oc "--- excluded:";
                         Printf.fprintf oc " %s (%d refused attempts)\n"
                           s att.val;
                      return ())
                   xcl.excl;
                 Printf.fprintf oc
-                  " --- to restore access, delete file \"%s\"\n" fname;
+                  "--- to restore access, delete file \"%s\"\n" fname;
              return ()
            else ();
            W.iter
              (fun k (_, tm0, nb) ->
                 do Printf.fprintf oc
-                     " --- addr %s: %d requests since %.0f seconds\n" k nb
+                     "--- addr %s: %d requests since %.0f seconds\n" k nb
                      (tm -. tm0);
                    if nb > xcl.max_conn then xcl.max_conn := nb else ();
                 return ())
               xcl.who;
-           Printf.fprintf oc " --- max %d\n" xcl.max_conn;
+           Printf.fprintf oc "--- max %d\n" xcl.max_conn;
         return refused ]
   in
   do match try Some (open_out_bin fname) with [ Sys_error _ -> None ] with
