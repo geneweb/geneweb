@@ -1,4 +1,9 @@
-(* $Id: family.mli,v 4.0 2001-03-16 19:34:38 ddr Exp $ *)
+(* $Id: family.mli,v 4.1 2001-03-23 11:46:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
-value family : Config.config -> Def.base -> option (int * int * string);
+open Config;
+open Def;
+
+value family :
+  config -> base -> (string * unit -> out_channel * out_channel -> unit) ->
+     unit;

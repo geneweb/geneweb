@@ -5,6 +5,8 @@ GeneWeb Version 4.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [23 Mar 01] The log count is now displayed in the traces before the
+    traitment.
   - [20 Mar 01] Added + as possible character in an URL.
   - [15 Mar 01] Added file "alias_lg" in lang directory to specify aliases
     for languages.
