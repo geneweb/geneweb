@@ -2,6 +2,8 @@ GeneWeb version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [06 Nov 02] In family form, one can now set the sex of created
+    witnesses.
   - [30 Oct 02] In places/surnames pages, now the surname links point
     to the surname, not to a person holding this surname associated with
     the place: it is less useful but too many people blamed me that it
