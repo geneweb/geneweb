@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.76 2003-12-10 09:45:03 ddr Exp $ *)
+(* $Id: util.ml,v 4.77 2003-12-15 09:32:38 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1103,7 +1103,7 @@ value message_to_wizard conf =
   else ()
 ;
 
-value header_no_page_title conf title =
+value header_without_page_title conf title =
   do {
     html1 conf;
     Wserver.wprint "\
@@ -1128,7 +1128,7 @@ value header_no_page_title conf title =
 
 value header conf title =
   do {
-    header_no_page_title conf title;
+    header_without_page_title conf title;
     Wserver.wprint "<h1 align=center><font color=%s>" conf.highlight;
     title False;
     Wserver.wprint "</font></h1>\n";
@@ -1137,10 +1137,24 @@ value header conf title =
 
 value rheader conf title =
   do {
-    header_no_page_title conf title;
+    header_without_page_title conf title;
     Wserver.wprint "<center><h1><font color=%s>" red_color;
     title False;
     Wserver.wprint "</font></h1></center>\n";
+  }
+;
+
+value header_no_page_title conf title =
+  do {
+    header_without_page_title conf title;
+    match p_getenv conf.env "title" with
+    [ None | Some "" -> ()
+    | Some x ->
+        do {
+          Wserver.wprint "<h1 align=center><font color=%s>" conf.highlight;
+          Wserver.wprint "%s" x;
+          Wserver.wprint "</font></h1>\n"
+        } ];
   }
 ;
 
