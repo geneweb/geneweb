@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.51 1999-09-29 13:58:36 ddr Exp $ *)
+(* $Id: perso.ml,v 2.52 1999-10-21 16:29:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -896,6 +896,17 @@ value print_linked_first_name_and_surname conf base p =
   return ()
 ;
 
+value max_image_height = 240;
+
+value limited_image_size conf fname =
+  match image_size fname with
+  [ Some (wid, hei) ->
+      if hei > max_image_height then
+        Some (wid * max_image_height / hei, max_image_height)
+      else Some (wid, hei)
+  | None -> None ]
+;
+
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
 value print conf base p =
@@ -936,7 +947,7 @@ value print conf base p =
                let s = Unix.stat f in
                let b = Filename.basename f in
                let wid_hei =
-                 match image_size f with
+                 match limited_image_size conf f with
                  [ Some (wid, hei) ->
                      " width=" ^ string_of_int wid ^ " height=" ^
                      string_of_int hei
@@ -962,7 +973,7 @@ value print conf base p =
              let fname = Util.image_file_name conf.bname s in
              if Sys.file_exists fname then
                let wid_hei =
-                 match image_size fname with
+                 match limited_image_size conf fname with
                  [ Some (wid, hei) ->
                      " width=" ^ string_of_int wid ^ " height=" ^
                      string_of_int hei
