@@ -12,6 +12,10 @@ GeneWeb version 3.01
   - [Nov 10, 99] Added foster parents.
   - [Nov 10, 99] Changed structure of data bases for internal optimizations.
 
+* Base configuration files (base.gwf)
+  - [Nov 13, 99] Fixed bug: when setting the variable "access_by_key" to
+    "yes", links to persons holding "?" in their names were impossible.
+
 * Gedcom to GeneWeb (ged2gwb)
   - [Nov 5, 99] Accept roman digits in years of French Republican dates.
 
