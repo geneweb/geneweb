@@ -5,12 +5,13 @@ GeneWeb version 3.11
   - [26 Jan 01] (a bit technical): for server mode (i.e. not CGI), added
     option "-nofork" asking not to run a new process at each request.
     This option was added because some users under Windows reported that
-    sometimes, the service blocks and need to be stopped and restarted.
-    This option may resolve this problem (not sure). Other advantage: may
-    answer faster. Drawbacks: may stop gwd in case of internal error (not
-    supposed to happen, but...), possible risk of memory leak. Not
-    recommended under Unix since only one request is treated at the
-    same time (in Windows version, it is always the case, anyway).
+    sometimes, the service blocks after some requests and need to be stopped
+    and restarted. This option may resolve this problem (not sure). Other
+    advantage: may answer faster. Drawbacks: may stop gwd in case of
+    internal error (not supposed to happen, but...), possible risk of
+    memory leak. Not recommended under Unix since only one request is
+    treated at the same time (in Windows version, it is always the case,
+    anyway).
   - [25 Jan 01] When searching somebody by a name, if there are several
     possible answers, also display now the first names aliases (if there
     are some).
@@ -76,6 +77,8 @@ GeneWeb version 3.11
     father's (default = no).
 
 * Lexicon (lang/lexicon.txt)
+  - [26 Jan 01] Changed entry name "(french month)" into "(french revolution
+    month)" (which is more exact).
   - [30 Dec 00] Fixed German translations (Frank Komarek + Falko Trojahn)
   - [29 Dec 00] Fixed some Spanish translations (Frank Komarek)
 

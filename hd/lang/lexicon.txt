@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.208 2001-01-21 16:17:48 ddr Exp $
+# $Id: lexicon.txt,v 3.209 2001-01-26 02:46:14 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -341,7 +341,7 @@ pt: ,
 ru: .
 se: ,
 
-    (french month)
+    (french revolution month)
 de: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
 dk: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 en: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
