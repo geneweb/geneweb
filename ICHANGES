@@ -5,6 +5,9 @@ GeneWeb Version 3.12
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [13 Feb 01] If "propose_add_family" is "no" in config file, forbid
+    to add families not connected to the rest (i.e. "ok" on "add family"
+    form when everybody is "create").
   - [12 Feb 01] In list of all persons sharing same title, the "tree" link
     is proposed also for browser without tables.
   - [09 Feb 01] Request "m=N;o=i;v=xxx" now display all possible surnames
