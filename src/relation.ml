@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.34 2002-11-28 13:14:09 ddr Exp $ *)
+(* $Id: relation.ml,v 4.35 2002-11-28 14:10:54 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1078,12 +1078,13 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
     let print pp p alab =
       let s = gen_person_title_text no_reference raw_access conf base p in
       let s =
-        if pp = None then s
+        if pp = None then transl_a_of_b conf alab s
         else
           transl_a_of_gr_eq_gen_lev conf
-            (transl_nth conf "the spouse" (1 - index_of_sex p.sex)) s
+            (transl_a_of_b conf alab
+               (transl_nth conf "the spouse" (1 - index_of_sex p.sex)))
+            s
       in
-      let s = transl_a_of_b conf alab s in
       Wserver.wprint "%s\n" (nominative s)
     in
     tag "ul" begin
