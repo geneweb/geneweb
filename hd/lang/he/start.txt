@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.6 1999-11-23 14:38:20 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.7 1999-11-23 19:17:38 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <META http-equiv="Content-Type" content="text/html; charset=iso-8859-8-i">
   <title>תולדות - %t</title>
@@ -86,11 +86,11 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 <table dir=rtl border=0 cellpadding=0 cellspacing=0><tr><td>
 <font color=#2f6400><b>לפי תאר</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
-(למשל: רב, דיין, נסיך)<br>
+(תאר שמופיע במאגר המידה)<br>
 </td><td>...</td><td>
 <font color=#2f6400><b> לפי מקום</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
-(למשל: של ליטה)
+(מקום שמופיע במאגר המידה)
 </td><td>
 <input type=submit value="חפס">
 </td></tr></table>
@@ -100,15 +100,15 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 
 <form method=GET action="%f" dir=rtl>
 %h
-<font color=#2f6400><b>רשימה</b></font> של כל שמות 
+<font color=#2f6400><b>רשימה</b></font> של כל שמות
 <select name=m>
-<option value="N" selected>  המשפחה 
-<option value="P">  הפרטיים 
+<option value="N" selected>  המשפחה
+<option value="P">  הפרטיים
 </select>
-לפי   
+לפי
 <select name=tri>
-<option value="A" selected> סדר האלף-בית  
-<option value="F"> השכיחות 
+<option value="A" selected> סדר האלף-בית
+<option value="F"> השכיחות
 </select>
 <input type=submit value="אשר">
 </form>
@@ -160,8 +160,8 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 <li> <a href="%sm=LD;k=10"> מקרי מוות האחרונים </a>%E%Ih
 <li> <a href="%sm=HIST;k=10"> דיווח העדכונים </a>%E
 <li> <a href="%sm=CAL"> לוחות שנה </a>
-<li> <a href="%sm=FORUM"><font color=#2f6400><b> הידברות בפורום של
-{data base}</b></font></a>
+<li> <a href="%sm=FORUM"> דייון על מאגר המידה התולדותי
+<font color=#2f6400><b> %t </b></font></a>
 </ul>
 </td>
 </tr>
