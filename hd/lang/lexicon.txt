@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.43 2000-01-02 16:28:38 ddr Exp $
+# $Id: lexicon.txt,v 3.44 2000-01-03 11:26:47 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -703,7 +703,7 @@ it: un nipote (dello sposo)/una nipote (dello sposo)
 nl: een neef (van de echtgenoot)/een nicht (van de echtgenoot)
 no: nev&oslash; (ektefelles nev&oslash;)/niese (ektefelles niese)
 pt: um sobrinho (por afenidade)/uma sobrinha (por afenidade)
-se: en nev&ouml; (makens/makans nev&ouml;)/en niece (makens/makans niece)
+se: en nev&ouml; (gem&aring;lens nev&ouml;)/en niece (gem&aring;lens niece)
 
     a nephew/a niece
 cs: synovec/neteø
