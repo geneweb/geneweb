@@ -2,7 +2,7 @@ GeneWeb Version 2.01
 --------------------
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Mar 25, 99] Added an "unmarried" flag.
+  - [Mar 25, 99] Added the "unmarried" case for couples.
   - [Mar 23, 99] Added display of number of accesses in traces.
   - [Mar 17, 99] Added an optional automatic choice for the "death state" in
     "modify person" forms. Makes the updating simpler to use.
@@ -24,7 +24,8 @@ GeneWeb Version 2.01
     example).
 
 * Consanguinity computing (consang)
-  - [Mar 26, 99] Adde option -q for quiet mode.
+  - [Mar 26, 99] Added option -q for quiet mode, just displaying a progress
+    bar.
 
 * Lexicon (lexicon.txt) and Welcome files (xx/start.txt)
   - [Mar 10, 99] Some changes in Italian version (by Raffaele Sena).
