@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.9 2001-03-26 11:58:52 ddr Exp $
+# $Id: lexicon.txt,v 4.10 2001-03-26 12:55:11 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -960,7 +960,7 @@ no: oldebarn
 pl: prawnuk/prawnuczka/prawnuki
 pt: um bisneto/uma bisneta/um(a) bisneto(a)
 ru: праправнук/праправнучка/праправнук
-se: en sonsonson/en sonsondotter/ett barnbarns barn/en sondotterson/en sondotterdotter/ett barnbarns barn/en dottersonson/en dottersondotter/ett barnbarns barn/en dotterdotterson/en dotterdotterdotter/ett barnbarns barn
+se: en sonsons son/en sonsons dotter/ett barnbarns barn/en sondotters son/en sondotters dotter/ett barnbarns barn/en dottersons son/en dottersons dotter/ett barnbarns barn/en dotterdotters son/en dotterdotters dotter/ett barnbarns barn
 
     a great-nephew/a great-niece
 af: 'n agterneef/'n agterniggie
