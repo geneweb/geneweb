@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.45 1999-09-02 05:19:33 ddr Exp $ *)
+(* $Id: setup.ml,v 1.46 1999-09-02 13:06:00 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -1311,7 +1311,7 @@ value intro () =
                 return ()
               else exit 0;
            return (default_gwd_lang, default_setup_lang)
-         else ()
+         else (default_gwd_lang, default_setup_lang)
        else
          do copy_text "" "intro.txt"; return
          let (gwd_lang, setup_lang) =
