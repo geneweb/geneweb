@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.15 1999-07-22 04:32:29 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.16 1999-07-22 13:56:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -667,7 +667,7 @@ value print_del conf base =
       match p_getint conf.env "i" with
       [ Some i ->
           let fam = foi base (Adef.ifam_of_int i) in
-          do if fam.fam_index <> Adef.ifam_of_int (-1) then
+          do if not (is_deleted_family fam) then
                do effective_del conf base fam;
                   base.func.commit_patches ();
                   delete_topological_sort conf base;
