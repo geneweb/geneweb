@@ -2,6 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- copyright (c) INRIA -->
+  <meta name="ROBOTS" content="NONE">
   <title> Genealogie - %t</title>
 </head>
 <body%b>

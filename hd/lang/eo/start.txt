@@ -3,6 +3,7 @@
 <head>
   <!-- copyright (c) INRIA -->
   <title> Genealogio - %t</title>
+  <meta name="ROBOTS" content="NONE">
 </head>
 <body%b>
 <h1>Genealogio</h1>
