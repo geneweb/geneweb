@@ -42,10 +42,10 @@ date.cmx: adef.cmx config.cmi def.cmi gutil.cmx util.cmx \
     ../wserver/wserver.cmx date.cmi 
 date.cmi: config.cmi def.cmi 
 def.cmi: adef.cmi 
-descend.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi util.cmi \
-    ../wserver/wserver.cmi 
-descend.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx util.cmx \
-    ../wserver/wserver.cmx 
+descend.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi perso.cmi \
+    util.cmi ../wserver/wserver.cmi 
+descend.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx perso.cmx \
+    util.cmx ../wserver/wserver.cmx 
 family.cmo: adef.cmi advSearchOk.cmo alln.cmo ansel.cmo ascend.cmo \
     birthDeath.cmo birthday.cmo changeChildren.cmo config.cmi cousins.cmo \
     date.cmi def.cmi descend.cmo gutil.cmi merge.cmi mergeFam.cmo \
