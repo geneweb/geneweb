@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.8 2002-03-11 19:02:58 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.9 2002-04-09 00:13:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -256,12 +256,16 @@ value person_misc_names base p =
           tnl.val
         }
       in
-      if sou base p.public_name = "" then titles_names
+      if sou base p.public_name = "" || p.titles = [] then titles_names
       else [p.public_name :: titles_names]
     in
     let first_names =
-      [first_name ::
-       List.map (sou base) (p.first_names_aliases @ public_names)]
+      let pn =
+        if sou base p.public_name <> "" && p.titles = [] then
+          [p.public_name :: public_names]
+        else public_names
+      in
+      [first_name :: List.map (sou base) (p.first_names_aliases @ pn)]
     in
     let surnames =
       [surname ::

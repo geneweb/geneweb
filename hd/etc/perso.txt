@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.12 2002-03-06 12:21:15 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.13 2002-04-09 00:13:09 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -338,6 +338,8 @@
   </tr>
   </table>
 %end;
+
+%if;(evar_opt = "misc")%misc_names;<p>%end;
 
 <img src="%image_prefix;/gwlogo.gif"
  alt=... width=64 height=72 align=right>

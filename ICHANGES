@@ -5,6 +5,9 @@ GeneWeb Version 4.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [09 Apr 02] Does not index any more the "public name" when there is
+    no title. Added display of misc names in personal page if opt=misc
+    in the URL.
   - [26 Mar 02] Does not fail any more if the file cnt/actlog is not
     writable.
   - [22 Mar 02] Fixed bug in the index of the descendants: they were no
