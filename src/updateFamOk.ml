@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.12 2001-09-19 13:26:56 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.13 2001-11-16 13:38:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -532,7 +532,7 @@ value effective_add conf base sfam scpl sdes =
   }
 ;
 
-value effective_swi conf base ip u ifam =
+value effective_inv conf base ip u ifam =
   let rec loop =
     fun
     [ [ifam1; ifam2 :: ifaml] ->
@@ -678,8 +678,10 @@ value print_del_ok conf base wl =
   }
 ;
 
-value print_swi_ok conf base p =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "switch done")) in
+value print_inv_ok conf base p =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "inversion done"))
+  in
   do {
     header conf title;
     print_link_to_welcome conf True;
@@ -844,7 +846,7 @@ value print_mod o_conf base =
   print_mod_aux conf base callback
 ;
 
-value print_swi conf base =
+value print_inv conf base =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock Iobase.lock_file bfile with
   [ Accept ->
@@ -855,10 +857,10 @@ value print_swi conf base =
           let k = (sou base p.first_name, sou base p.surname, p.occ) in
           try
             do {
-              effective_swi conf base p.cle_index u (Adef.ifam_of_int ifam);
+              effective_inv conf base p.cle_index u (Adef.ifam_of_int ifam);
               base.func.commit_patches ();
-              History.record conf base k "sf";
-              print_swi_ok conf base p
+              History.record conf base k "if";
+              print_inv_ok conf base p
             }
           with
           [ Update.ModErr -> () ]

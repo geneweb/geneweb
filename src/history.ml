@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.3 2001-06-28 17:05:25 ddr Exp $ *)
+(* $Id: history.ml,v 4.4 2001-11-16 13:38:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -98,7 +98,7 @@ value action_text conf =
   | "af" -> transl_decline conf "add" (transl_nth conf "family/families" 0)
   | "mf" -> transl_decline conf "modify" (transl_nth conf "family/families" 0)
   | "df" -> transl_decline conf "delete" (transl_nth conf "family/families" 0)
-  | "sf" -> transl_decline conf "switch" (transl_nth conf "family/families" 1)
+  | "if" -> transl_decline conf "invert" (transl_nth conf "family/families" 1)
   | "ff" -> transl_decline conf "merge" (transl_nth conf "family/families" 1)
   | "cn" -> transl conf "change children's names"
   | "aa" -> transl_decline conf "add" (transl conf "parents")

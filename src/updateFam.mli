@@ -1,4 +1,4 @@
-(* $Id: updateFam.mli,v 4.2 2001-06-20 16:34:48 ddr Exp $ *)
+(* $Id: updateFam.mli,v 4.3 2001-11-16 13:38:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -14,7 +14,7 @@ value print_update_fam :
 value print_add : config -> base -> unit;
 value print_mod : config -> base -> unit;
 value print_del : config -> base -> unit;
-value print_swi : config -> base -> unit;
+value print_inv : config -> base -> unit;
 value print_add_parents : config -> base -> unit;
 
 value person_key : base -> iper -> Update.key;

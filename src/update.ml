@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.14 2001-09-17 09:36:15 ddr Exp $ *)
+(* $Id: update.ml,v 4.15 2001-11-16 13:38:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -816,11 +816,11 @@ value print_family_stuff conf base p a u =
                let cpl1 = coi base prev_fi in
                let cpl2 = coi base fi in
                do {
-                 Wserver.wprint "<a href=\"%sm=SWI_FAM;i=%d;f=%d\">"
+                 Wserver.wprint "<a href=\"%sm=INV_FAM;i=%d;f=%d\">"
                    (commd conf) (Adef.int_of_iper p.cle_index)
                    (Adef.int_of_ifam fi);
                  Wserver.wprint "%s</a><br>\n"
-                   (capitale (transl_decline conf "switch" ""));
+                   (capitale (transl_decline conf "invert" ""));
                  if cpl1.father = cpl2.father &&
                     cpl1.mother = cpl2.mother then
                     do {
