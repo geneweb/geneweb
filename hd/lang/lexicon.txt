@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.20 2001-04-15 10:26:19 ddr Exp $
+# $Id: lexicon.txt,v 4.21 2001-04-20 11:40:24 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -274,7 +274,7 @@ he:  úàøéëéí ìúàøéí ùì %t àéğí ğëåğéí: %t
 is: %t hefur vitlausa dagsetningu %t
 it: alcune date dei titoli di %t sono incorrette: %t
 lv: %t ir nekorekti datumi: %t
-nl: %t de datum voor titels zijn niet correct
+nl: %t de data voor titels zijn niet correct
 no: %t har feil titeldato %t
 pl: %t ma wpisane nieprawid³owe daty noszenia tytu³u
 pt: as datas de um t&iacute;tulo de %t n&atilde;o est&atilde;o correctas
@@ -2955,7 +2955,7 @@ he:  îùôçåú òí ÷åãéí
 is: fjölskyldur meğ táknum
 it: famiglia con codice
 lv: ğifrçtâs ìimenes
-nl: families met code
+nl: gezinnen met code
 no: familier med kode
 pl: rodziny z kodowaniem
 pt: fam&iacute;lias com c&oacute;digo
@@ -2978,7 +2978,7 @@ he:  îùôçä äåñôä
 is: fjölskyldu bætt viğ
 it: famiglia aggiunta
 lv: ìimene pievienota
-nl: familie toegevoegd
+nl: gezin toegevoegd
 no: ny familie opprettet
 pl: rodzina zosta³a dodana
 pt: fam&iacute;lia adicionada
@@ -3001,7 +3001,7 @@ he:  îùôîä ğîç÷ä
 is: fjölskyldu eytt
 it: famiglia cancellata
 lv: ìimene izdzçsta
-nl: familie verwijderd
+nl: gezin verwijderd
 no: familie fjernet
 pl: rodzina zosta³a usuniêta
 pt: fam&iacute;lia suprimida
@@ -3024,7 +3024,7 @@ he:  îùôçä äòåãëğä
 is: fjölskyldu breytt
 it: famiglia modificata
 lv: ìimene labota
-nl: familie veranderd
+nl: gezin veranderd
 no: familie endret
 pl: rodzina zosta³a zmodyfikowana
 pt: fam&iacute;lia modificada
@@ -3047,7 +3047,7 @@ he:   îùôçä/ îùôçåú
 is: fjölskyldu/fjölskyldum
 it: famiglia/famiglia
 lv: ìimeni/ìimenes
-nl: familie/families
+nl: gezin/gezinnen
 no: familie/familier
 pl: rodzina:a:-ê/rodziny
 pt: fam&iacute;lia/fam&iacute;lias
@@ -3603,7 +3603,7 @@ he: ident/email/ ğåùà
 is: ident/email/um
 it: ident/email/oggetto
 lv: vârds/e-pasts/subjekts
-nl: ident/email/onderwerp
+nl: ident/e-mail/onderwerp
 no: ident/email/emne
 pl: ident/email/temat
 pt: ident/email/assunto
@@ -6551,7 +6551,7 @@ he:  ìùğåú ñãø äîùôçåú äáàåú
 is: breyta röğ eftirfarandi fjölskyldna
 it: scambiare l'ordine delle famiglie seguenti
 lv: pârslçgt sekojoğo ìimeòu secîbu (?)
-nl: verwissel de volgorde van de volgende families
+nl: verwissel de volgorde van de volgende gezinnen
 no: bytt rekkef&oslash;lgen til f&oslash;lgende familier
 pl: czy zmieniæ kolejnoœæ nastepuj¹cych ma³¿eñstw lub zwi¹zków?
 pt: inverter a ordem das fam&iacute;lias seguintes
@@ -7796,7 +7796,7 @@ he:  öøéê ìàçã ÷åãí àú 2 äîùôçåú
 is: şú verğur fyrst ağ sameina şessar 2 fjölskyldur
 it: dovete in primo luogo fondere le 2 famiglie
 lv: Jums vispirms ir jâpvieno 2 ìimenes
-nl: u moet de twee families eerst samenvoegen
+nl: u moet de twee gezinnen eerst samenvoegen
 no: du m&aring; f&oslash;rst sl&aring; sammen de 2 familiene
 pl: musisz najpierw scaliæ 2 rodziny
 pt: primeiro tem que fundir as 2 fam&iacute;lias
