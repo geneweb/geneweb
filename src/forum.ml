@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.6 2001-04-08 12:07:34 ddr Exp $ *)
+(* $Id: forum.ml,v 4.7 2001-04-08 12:47:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -49,8 +49,14 @@ value print_one_header conf prec_date pos h =
          with
          [ Failure _ -> Dtext date ]
        in
-       do if prec_date <> "" then Wserver.wprint "</table>\n" else ();
-          Wserver.wprint "<table border=%d>\n" conf.border;
+       do if prec_date = ""
+          || String.length prec_date > 7 && String.length date > 7
+          && String.sub prec_date 5 2 <> String.sub date 5 2 then
+            do if prec_date <> "" then Wserver.wprint "</table>\n<p>\n"
+               else ();
+               Wserver.wprint "<table border=%d>\n" conf.border;
+            return ()
+          else ();
           tag "tr" begin
             tag "td" "colspan=4 align=left" begin
               Wserver.wprint "%s" (Date.string_of_date conf d);
