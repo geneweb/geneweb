@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.43 1999-08-13 02:44:56 ddr Exp $ *)
+(* $Id: util.ml,v 2.44 1999-08-18 17:55:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -8,6 +8,7 @@ open Gutil;
 
 value lang_dir = ref ".";
 value base_dir = ref ".";
+value doc_dir = ref "";
 
 value html_br conf =
   do Wserver.wprint "<br>";
@@ -604,7 +605,7 @@ value copy_etc_file env fname =
 ;
 
 value trailer conf =
-  do try copy_etc_file [] "copyr" with
+  do try copy_etc_file [('s', conf.command ^ "?")] "copyr" with
      [ Sys_error _ ->
          do html_p conf;
             Wserver.wprint "

@@ -6,7 +6,8 @@ GeneWeb version 2.06
   - [Aug 16, 99] Fixed bug: sometimes tried to display a non-existent file
     "warnings.htm".
 
-* GeneWeb Daemon/CGI (gwd)
+* GeneWeb Service/CGI (gwd)
+  - [Aug 18, 99] Added a link to the documentation (close to the copyright).
   - [Aug 14, 99] Added ability to put notes for the data base itself (for
     a genera introduction, for example).
   - [Aug 14, 99] Fixed bug: send image in cgi mode under Windows did not
