@@ -1,4 +1,4 @@
-(* $Id: calendar.mli,v 4.3 2005-02-27 16:41:53 ddr Exp $ *)
+(* $Id: calendar.mli,v 4.4 2005-02-27 19:23:29 ddr Exp $ *)
 
 open Def;
 
@@ -16,12 +16,12 @@ value french_of_gregorian : dmy -> dmy;
 value gregorian_of_hebrew : dmy -> dmy;
 value hebrew_of_gregorian : dmy -> dmy;
 
-type moon_day =
-  [ OrdinaryMoonDay
+type moon_phase =
+  [ NoPhase
   | NewMoon of int and int
   | FirstQuarter of int and int
   | FullMoon of int and int
   | LastQuarter of int and int ]
 ;
 
-value moon_phase_of_sdn : int -> option (moon_day * int);
+value moon_phase_of_sdn : int -> option (moon_phase * int);
