@@ -7,6 +7,10 @@ GeneWeb Version 3.09
 * General
   - [12 Oct 00] Changed all "nick_name" into "qualifier" in all source files.
 
+* Consanguinity computing (consang)
+  - [28 Oct 00] Put constants in progress bar (option -q) to have a more
+    readable code.
+
 GeneWeb Version 3.08
 --------------------
 
@@ -198,7 +202,6 @@ GeneWeb Version 3.03
   - [19 Jan 00] In traces, display dates in standard, i.e. using -
     instead of / in year-month-day.
 
-* Consanguinity computing (consang)
   - [22 Mar 00] Fixed bug: if interruption (break, control C) between
     the display of "*** ok" and the end, the base is lost without save.
   - [22 Mar 00] In option "-q" display a rotating wheel.
