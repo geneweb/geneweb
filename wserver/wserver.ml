@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 2.2 1999-03-22 17:03:25 ddr Exp $ *)
+(* $Id: wserver.ml,v 2.3 1999-03-24 16:31:13 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value wserver_oc =
@@ -307,7 +307,9 @@ value treat_connection tmout callback addr ic =
     return ()
   else
     let _ = ifdef UNIX then Unix.nice 1 else () in
-    do try callback (addr, request) str with exc -> print_err_exc exc;
+    do try callback (addr, request) str with
+       [ Unix.Unix_error Unix.EPIPE "write" _ -> ()
+       | exc -> print_err_exc exc ];
        try wflush () with _ -> ();
        try flush stderr with _ -> ();
     return ()
@@ -472,7 +474,7 @@ value accept_connection tmout max_clients callback s =
    return ()
 ;
 
-value f port tmout max_clients g =
+value f port tmout max_clients (uid, gid) g =
   match try Some (Sys.getenv "WSERVER") with [ Not_found -> None ] with
   [ Some s ->
       let addr = sockaddr_of_string s in
@@ -486,11 +488,22 @@ value f port tmout max_clients g =
       do Unix.setsockopt s Unix.SO_REUSEADDR True;
          Unix.bind s (Unix.ADDR_INET Unix.inet_addr_any port);
          Unix.listen s 4;
+         ifdef UNIX then
+           do match gid with
+              [ Some gid -> Unix.setgid gid
+              | None -> () ];
+              match uid with
+              [ Some uid -> Unix.setuid uid
+              | None -> () ];
+           return ()
+         else ();
       return
       let tm = Unix.localtime (Unix.time ()) in
-      do Printf.eprintf "Ready %02d/%02d/%4d %02d:%02d port %d...\n"
+      do Printf.eprintf "Ready %02d/%02d/%4d %02d:%02d port"
            tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year)
-           tm.Unix.tm_hour tm.Unix.tm_min port;
+           tm.Unix.tm_hour tm.Unix.tm_min;
+         Printf.eprintf " %d" port;
+         Printf.eprintf "...\n";
          flush stderr;
          while True do
            try accept_connection tmout max_clients g s with

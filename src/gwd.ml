@@ -1,17 +1,19 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.4 1999-03-23 21:15:46 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.5 1999-03-24 16:31:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 
-value port_selected = ref 2317;
+value selected_port = ref 2317;
 value wizard_passwd = ref "";
 value friend_passwd = ref "";
 value only_address = ref "";
 value cgi = ref False;
 value default_lang = ref "fr";
+value uid = ref None;
+value gid = ref None;
 value log_file = ref "";
 value log_flags =
   [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
@@ -687,23 +689,31 @@ value geneweb_server () =
   in
   do if not auto_call then
        do Printf.eprintf "GeneWeb %s - " Gutil.version;
-          Printf.eprintf "Copyright (c) INRIA 1999
-Possible addresses:
+          Printf.eprintf "Copyright (c) INRIA 1999\n";
+          Printf.eprintf "Possible addresses:";
+          Printf.eprintf "
    http://localhost:%d/base
    http://127.0.0.1:%d/base
-   http://%s:%d/base
+   http://%s:%d/base"
+            selected_port.val selected_port.val hostn selected_port.val;
+          Printf.eprintf "
 where \"base\" is the name of the data base
 Type control C to stop the service
-"
-            port_selected.val port_selected.val hostn port_selected.val;
+";
           flush stderr;
-          try Unix.mkdir (Filename.concat Util.base_dir.val "cnt") 0o755 with
-          [ Unix.Unix_error _ _ _ -> () ];
+          try
+            do Unix.mkdir (Filename.concat Util.base_dir.val "cnt") 0o755;
+               if uid.val <> None then
+                 Unix.chmod (Filename.concat Util.base_dir.val "cnt") 0o777
+               else ();
+            return ()
+          with [ Unix.Unix_error _ _ _ -> () ];
        return ()
      else ();
   return
-  Wserver.f port_selected.val tmout
-    (ifdef UNIX then max_clients.val else None) (connection False)
+  Wserver.f selected_port.val tmout
+    (ifdef UNIX then max_clients.val else None) (uid.val, gid.val)
+    (connection False)
 ;
 
 value geneweb_cgi str addr =
@@ -780,9 +790,10 @@ value main () =
      ("-cgi", Arg.Set cgi,
       "
        Force cgi mode.");
-     ("-p", Arg.Int (fun x -> port_selected.val := x),
+     ("-p", Arg.Int (fun x -> selected_port.val := x),
       "<number>
-       Select a port number (default = " ^ string_of_int port_selected.val ^
+       Select a port number (default = " ^
+       string_of_int selected_port.val ^
        "); > 1024 for normal users.");
      ("-wizard", Arg.String (fun x -> wizard_passwd.val := x),
       "<passwd>
@@ -807,14 +818,16 @@ value main () =
       "
        Do not lock files before writing.") ::
      ifdef UNIX then
-       [("-max_clients",
-         Arg.String
-           (fun x ->
-              try max_clients.val := Some (int_of_string x) with _ ->
-                raise (Arg.Bad "number expected after -max_clients")),
+       [("-max_clients", Arg.Int (fun x -> max_clients.val := Some x),
          "<num>
        Max number of clients treated at the same time (default: no limit)
-       (not cgi).")]
+       (not cgi).");
+        ("-setuid", Arg.Int (fun x -> uid.val := Some x),
+         "<num>
+       Set user id, for example to use port < 1024 as simple user.");
+        ("-setgid", Arg.Int (fun x -> gid.val := Some x),
+         "<num>
+       Set group id.")]
      else []]
   in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
@@ -857,13 +870,16 @@ value main () =
 
 ifdef UNIX then
 value test_eacces_bind err fun_name =
-  if err = Unix.EACCES && fun_name = "bind" && port_selected.val <= 1024 then
-    do Printf.eprintf "\n\
+  if err = Unix.EACCES && fun_name = "bind" then
+    try
+      do Printf.eprintf "\n\
 Error: invalid access to the port %d: users port number less than 1024
-are reserved to the system. Solution: become root or choose another port
-number greater than 1024.\n" port_selected.val;
-       flush stderr;
-    return True
+are reserved to the system. Solution: do it as root or choose another port
+number greater than 1024.\n" selected_port.val;
+         flush stderr;
+      return True
+    with
+    [ Not_found -> False ]
   else False
 else
 value test_eacces_bind err fun_name = False;
@@ -871,10 +887,11 @@ value test_eacces_bind err fun_name = False;
 value print_exc exc =
   match exc with
   [ Unix.Unix_error Unix.EADDRINUSE "bind" _ ->
-      do Printf.eprintf "\n\
-Error: the port %d is already used by another GeneWeb daemon
+      do Printf.eprintf "\nError: ";
+         Printf.eprintf "the port %d" selected_port.val;
+         Printf.eprintf " is already used by another GeneWeb daemon
 or by another program. Solution: kill the other program or launch
-GeneWeb with another port number (option -p)\n" port_selected.val;
+GeneWeb with another port number (option -p)\n";
          flush stderr;
       return ()
   | Unix.Unix_error err fun_name arg ->
