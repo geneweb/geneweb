@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 1.31 1999-02-14 19:31:36 ddr Exp $ *)
+(* $Id: util.ml,v 1.32 1999-02-15 13:28:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -9,27 +9,20 @@ open Gutil;
 value lang_dir = ref ".";
 value base_dir = ref ".";
 
-value hack_for_hebrew conf =
-  if conf.is_rtl then Wserver.wprint "<!-- -->" else ()
-;
-
 value html_br conf =
   do Wserver.wprint "<br>";
-     hack_for_hebrew conf;
      Wserver.wprint "\n";
   return ()
 ;
 
 value html_p conf =
   do Wserver.wprint "<p>";
-     hack_for_hebrew conf;
      Wserver.wprint "\n";
   return ()
 ;
 
 value html_li conf =
   do Wserver.wprint "<li>";
-     hack_for_hebrew conf;
      Wserver.wprint "\n";
   return ()
 ;
@@ -287,30 +280,26 @@ value most_prestigious base =
 ;
 
 value afficher_personne_un_titre_referencee conf base p t =
-  do html_ltr conf begin
-       if Name.strip_lower (sou base t.t_place) =
-          Name.strip_lower (sou base p.surname)
-       then
-         match (t.t_name, p.nick_names) with
-         [ (Tname n, []) ->
-             Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
-               (acces conf base p) (coa conf (sou base n))
-         | (Tname n, [nn :: _]) ->
-             Wserver.wprint "<a href=\"%s%s\">%s <em>%s</em></a>" (commd conf)
-               (acces conf base p) (coa conf (sou base n))
-               (coa conf (sou base nn))
-         | _ -> afficher_prenom_de_personne_referencee conf base p ]
-       else
-         match t.t_name with
-         [ Tname s -> afficher_nom_titre_reference conf base p (sou base s)
-         | _ -> afficher_personne_referencee conf base p ];
-     end;
+  do if Name.strip_lower (sou base t.t_place) =
+        Name.strip_lower (sou base p.surname)
+     then
+       match (t.t_name, p.nick_names) with
+       [ (Tname n, []) ->
+           Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
+             (acces conf base p) (coa conf (sou base n))
+       | (Tname n, [nn :: _]) ->
+           Wserver.wprint "<a href=\"%s%s\">%s <em>%s</em></a>" (commd conf)
+             (acces conf base p) (coa conf (sou base n))
+             (coa conf (sou base nn))
+       | _ -> afficher_prenom_de_personne_referencee conf base p ]
+     else
+       match t.t_name with
+       [ Tname s -> afficher_nom_titre_reference conf base p (sou base s)
+       | _ -> afficher_personne_referencee conf base p ];
      Wserver.wprint ", <em>";
-     html_ltr conf begin
-       Wserver.wprint "%s" (coa conf (sou base t.t_title));
-       Wserver.wprint " ";
-       Wserver.wprint "%s" (coa conf (sou base t.t_place));
-     end;
+     Wserver.wprint "%s" (coa conf (sou base t.t_title));
+     Wserver.wprint " ";
+     Wserver.wprint "%s" (coa conf (sou base t.t_place));
      Wserver.wprint "</em>";
   return ()
 ;
