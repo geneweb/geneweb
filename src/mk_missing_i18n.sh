@@ -2,21 +2,30 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: mk_missing_i18n.sh,v 3.8 2001-02-11 17:00:28 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 3.9 2001-02-27 21:27:18 ddr Exp $ *)
 
 open Printf
 
 let languages =
   ["af"; "cn"; "cs"; "ct"; "de"; "dk"; "en"; "eo"; "es"; "et"; "fi"; "fr";
-   "he"; "is"; "it"; "lv"; "nl"; "no"; "pt"; "ru"; "se"]
+   "he"; "is"; "it"; "lv"; "nl"; "no"; "pl"; "pt"; "ru"; "se"]
+
+let linenum = ref 0
+
+let input_line_cnt ic = incr linenum; input_line ic
 
 let rec skip_to_same_line ic line_ref =
-  let line = input_line ic in
+  let line = input_line_cnt ic in
   if line = line_ref then () else skip_to_same_line ic line_ref
 
 let rec get_all_versions ic =
-  let line = input_line ic in
+  let line = input_line_cnt ic in
   if line = "" then []
+  else if String.length line < 4 then begin
+    eprintf "small line %d: \"%s\"\n" !linenum (String.escaped line);
+    flush stderr;
+    []
+  end
   else
     let lang = String.sub line 0 2 in
     let transl = String.sub line 4 (String.length line - 4) in
@@ -25,6 +34,7 @@ let rec get_all_versions ic =
 let compare_assoc (l1, _) (l2, _) = l1 <= l2
 
 let check first lang =
+  linenum := 0;
   let ic_lex = open_in "../hd/lang/lexicon.txt" in
   let ic_i18n = open_in "i18n" in
   printf "<h3><a name=%s>%s</h3>\n" lang lang;

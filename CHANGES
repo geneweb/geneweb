@@ -12,6 +12,12 @@ GeneWeb version 3.12
   - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
 
 * GeneWeb server or CGI (gwd)
+  - [24 Feb 01] Fixed big bug in Windows version: if the GeneWeb
+    directory was installed in a directory which contained one or several
+    spaces (e.g. C:/Program Files), and if the server "gwd" was used
+    in a shortcut or in a batch file, it did not work! (this bug was due
+    to a problem in a library for Windows in my favorite programming
+    language).
   - [16 Feb 01] Fixed problem: when displaying a surname, if there were
     several answers, the link for displaying the first names by alphabetical
     order showed only the first surname.
