@@ -32,10 +32,9 @@ donn&eacute;es </font></h3>
 
 <ul>
 
-<li>
-Si vous avez trois fichiers sources "toto.gw" "dupont.gw" et "titi.gw" que
-vous voulez qu'ils restent s&eacute;par&eacute;s. Lancez une fen&ecirc;tre
-de commandes int&eacute;ractives et tapez:
+<li> Si vous avez trois fichiers source "toto.gw" "dupont.gw" et
+"titi.gw" et que vous voulez qu'ils restent s&eacute;par&eacute;s,
+lancez une fen&ecirc;tre de commandes int&eacute;ractives et tapez:
 
 <pre>
      gwc toto.gw dupont.gw titi.gw -o basefusionnee
@@ -62,15 +61,16 @@ Voir aussi <a href="merge.htm">Fusion de bases de donn&eacute;es</a>.
 <li>
 Maintenant vous pouvez acc&eacute;der et mettre &agrave; jour la base de
 donn&eacute;es "basefusionnee". <font color=#2f6400><b>GeneWeb</b></font>
-se rappellera dans quels fichiers les donn&eacute;es proviennent.
+se rappellera dans quels fichiers se trouvaient les informations.
 
 <p>
 
 <li>
 
 Dans les requ&ecirc;tes de la base de donn&eacute;es, la
-s&eacute;quence <TT>";opt=from"</TT> peut &ecirc;tre ajout&eacute;
+s&eacute;quence <TT>";opt=from"</TT> peut &ecirc;tre ajout&eacute;e
 pour voir le nom du fichier d'o&ugrave; viennent les donn&eacute;es.
+Par exemple:
 
 <pre>
      http://machine:2317/basefusionnee?i=357;opt=from
@@ -82,7 +82,7 @@ Note: Cela ne fonctionne que sur les personnes ayant des familles.
 
 <hr>
 
-<h3><font color=#2f6400>Pour recr&eacute;er les fichiers sources
+<h3><font color=#2f6400>Pour recr&eacute;er les fichiers source
 &agrave; partir de la base fusionn&eacute;e</font></h3>
 
 <ul>
@@ -94,7 +94,7 @@ la commande "mkdir")
 <p>
 
 <li>
-Pour recr&eacute;er les fichiers sources, tapez dans une fen&ecirc;tre
+Pour recr&eacute;er les fichiers source, tapez dans une fen&ecirc;tre
 de commandes int&eacute;ractives:
 
 <pre>
@@ -103,10 +103,10 @@ de commandes int&eacute;ractives:
 
 <li>
 
-Dans le r&eacute;pertoire "outdir", les trois fichiers sources
+Dans le r&eacute;pertoire "outdir", les trois fichiers source
 "toto.gw" "dupont.gw" et "titi.gw" sont recr&eacute;&eacute;s. Si vous
 avez chang&eacute; votre base de donn&eacute;es, ces trois fichiers
-sont aussi mis &agrave; jours (c'est-&agrave;-dire qu'ils ne sont pas
+sont mis &agrave; jour (c'est-&agrave;-dire qu'ils ne sont pas
 les m&ecirc;mes que ceux du d&eacute;part).
 
 <p>
@@ -119,9 +119,9 @@ les m&ecirc;mes que ceux du d&eacute;part).
 
 Alors cela signifie que vous avez ajout&eacute; des personnes que
 <font color=#2f6400><b>GeneWeb</b></font> ne sait pas dans quel
-fichier source elles doivent &ecirc;tre (par exemple si ce sont de
-nouvelles personnes reli&eacute;es &agrave; aucune autre personne des
-fichiers initiaux). <font color=#2f6400><b>GeneWeb</b></font>
+fichier mettre (par exemple si ce sont de nouvelles personnes
+reli&eacute;es &agrave; aucune autre personne des fichiers
+initiaux). Dans ce cas <font color=#2f6400><b>GeneWeb</b></font>
 redirigera ces personnes dans la fen&ecirc;tre de commandes
 int&eacute;ractives.
 
@@ -136,7 +136,7 @@ Pour sauver aussi ces personnes dans le fichier source "nouveau.gw", tapez:
 
 <li>
 Le contenu de "nouveau.gw" peut alors &ecirc;tre transf&eacute;r&eacute; ou
-r&eacute;parti dans les autres fichiers sources avec un &eacute;diteur de
+r&eacute;parti dans les autres fichiers source avec un &eacute;diteur de
 textes.
 
 </ul>
