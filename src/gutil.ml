@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.10 2000-07-12 13:21:46 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.11 2000-08-07 14:32:14 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -47,13 +47,13 @@ value string_sub s i len =
 value decline_word case s ibeg iend =
   let i =
     loop ibeg where rec loop i =
-      if i + 3 >= iend then ibeg
+      if i + 3 > iend then ibeg
       else if s.[i] == ':' && s.[i+1] == case && s.[i+2] == ':' then i + 3
       else loop (i + 1)
   in
   let j =
     loop i where rec loop i =
-      if i + 3 >= iend then iend
+      if i + 3 > iend then iend
       else if s.[i] == ':' && s.[i+2] == ':' then i
       else loop (i + 1)
   in
