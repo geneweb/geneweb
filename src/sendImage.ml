@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.0 2001-03-16 19:35:01 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.1 2001-04-19 21:15:57 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -167,6 +167,59 @@ value move_file_to_old conf typ fname bfname =
     return ()
 ;
 
+value normal_image_type s =
+  if String.length s > 10 && Char.code s.[0] = 0xff
+  && Char.code s.[1] = 0xd8 && String.sub s 6 4 = "JFIF" then
+    ".jpg"
+  else if String.length s > 4 && String.sub s 0 4 = "\137PNG" then
+    ".png"
+  else if String.length s > 4 && String.sub s 0 4 = "GIF8" then
+    ".gif"
+  else ""
+;
+
+value string_search s v =
+  loop 0 0 where rec loop i j =
+    if j = String.length v then Some (i - String.length v)
+    else if i = String.length s then None
+    else if s.[i] = v.[j] then loop (i + 1) (j + 1)
+    else loop (i + 1) 0
+;
+
+(* get the image type, possibly removing spurious header *)
+
+value image_type s =
+  let r = normal_image_type s in
+  if r <> "" then (r, s)
+  else
+    match string_search s "JFIF" with
+    [ Some i when i > 6 ->
+        let s = String.sub s (i - 6) (String.length s - i + 6) in
+        (normal_image_type s, s)
+    | _ ->
+        match string_search s "\137PNG" with
+        [ Some i ->
+            let s = String.sub s i (String.length s - i) in
+            (normal_image_type s, s)
+        | _ ->
+            match string_search s "GIF8" with
+            [ Some i ->
+                let s = String.sub s i (String.length s - i) in
+                (normal_image_type s, s)
+            | None -> ("", s) ] ] ]
+;
+
+value dump_bad_image conf s =
+  match p_getenv conf.base_env "dump_bad_images" with
+  [ Some "yes" ->
+      try
+        let oc = open_out_bin "bad-image" in
+        do output_string oc s; flush oc; return close_out oc
+      with
+      [ Sys_error _ -> () ]
+  | _ -> () ]
+;
+
 value effective_send_ok conf base p file =
   let strm = Stream.of_string file in
   let (request, content) =
@@ -181,13 +234,13 @@ value effective_send_ok conf base p file =
     in
     content ^ s
   in
-  let content_type = Wserver.extract_param "content-type: " '\n' request in
-  let typ =
-    match content_type with
-    [ "image/gif" -> ".gif"
-    | "image/jpeg" | "image/pjpeg" -> ".jpg"
-    | "image/x-png" -> ".png"
-    | s -> incorrect_content_type conf base p s ]
+  let (typ, content) =
+    let (x, c) = image_type content in
+    if x = "" then
+      let ct = Wserver.extract_param "content-type: " '\n' request in
+      do dump_bad_image conf content; return
+      incorrect_content_type conf base p ct
+    else (x, c)
   in
   let bfname = default_image_name base p in
   let bfdir =
