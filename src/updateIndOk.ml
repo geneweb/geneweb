@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.23 1999-07-28 13:08:37 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.24 1999-08-03 10:03:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -278,16 +278,23 @@ value error_person conf base p err =
   return ()
 ;
 
-value strip_list = List.filter (fun s -> s <> "");
+value list_filter p =
+  find [] where rec find accu =
+    fun
+    [ [] -> List.rev accu
+    | [x :: l] -> if p x then find [x :: accu] l else find accu l ]
+;
+
+value strip_list = list_filter (fun s -> s <> "");
 
 value strip_person p =
   do p.first_names_aliases := strip_list p.first_names_aliases;
      p.surnames_aliases := strip_list p.surnames_aliases;
      p.nick_names := strip_list p.nick_names;
      p.aliases := strip_list p.aliases;
-     p.titles := List.filter (fun t -> t.t_ident <> "") p.titles;
+     p.titles := list_filter (fun t -> t.t_ident <> "") p.titles;
      p.rparents :=
-       List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents;
+       list_filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents;
   return ()
 ;
 
@@ -417,7 +424,7 @@ value update_relation_parents base op np =
          else
            let p = poi base ip in
            if List.mem pi p.rchildren then
-             do p.rchildren := List.filter (\<> pi) p.rchildren; return
+             do p.rchildren := list_filter (\<> pi) p.rchildren; return
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
       mod_ippl op_rparents
