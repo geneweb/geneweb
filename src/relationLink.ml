@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.9 2003-11-29 03:52:22 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.10 2004-01-24 07:39:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -43,10 +43,13 @@ value tsort_leq tstab x y =
 value make_dist_tab conf base ia maxlev =
   if maxlev <= threshold.val then phony_dist_tab
   else
-    let _ = base.data.ascends.array () in
-    let _ = base.data.couples.array () in
+    (* optimization to be used 1/ if database not too big or 2/ running
+    on machines with much memory *)
+(*
     let _ = base.data.unions.array () in
     let _ = base.data.descends.array () in
+*)
+    (**)
     let tstab = Util.create_topological_sort conf base in
     let module Pq =
       Pqueue.Make

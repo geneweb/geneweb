@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.45 2003-11-29 03:52:22 ddr Exp $ *)
+(* $Id: relation.ml,v 4.46 2004-01-24 07:39:18 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -608,10 +608,15 @@ value print_shortest_path conf base p1 p2 =
     trailer conf
   }
   else
+    (* optimization to be used 1/ if database not too big or 2/ running
+    on machines with much memory *)
+(*
     let _ = base.data.ascends.array () in
     let _ = base.data.unions.array () in
     let _ = base.data.couples.array () in
     let _ = base.data.descends.array () in
+*)
+    (**)
     let excl_faml =
       loop [] 0 where rec loop list i =
         match p_getint conf.env ("ef" ^ string_of_int i) with
@@ -1396,8 +1401,13 @@ value no_sp p = None;
 value compute_relationship conf base by_marr p1 p2 =
   if p1.cle_index == p2.cle_index then None
   else
+    (* optimization to be used 1/ if database not too big or 2/ running
+    on machines with much memory *)
+(*
     let _ = base.data.ascends.array () in
     let _ = base.data.couples.array () in
+*)
+    (**)
     let tstab = Util.create_topological_sort conf base in
     let sol = compute_simple_relationship conf base tstab p1 p2 in
     let sol_by_marr =

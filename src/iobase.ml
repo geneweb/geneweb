@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.17 2003-11-14 09:20:22 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.18 2004-01-24 07:39:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -50,6 +50,8 @@ value magic_gwb = "GnWb001y";
           - a hash value of the "crushed" (module "Name") first name or
             surname (modulo length)
           - to the array of the corresponding string indexes
+
+    names.acc - direct accesses to arrays inside names.inx
 
     strings.inx - index for strings, surnames, first names
        length of the strings offset array : binary_int
@@ -298,32 +300,48 @@ value persons_of_first_name_or_surname base_data strings params =
 (* Search index for a given name in file names.inx *)
 
 type name_index_data = array (array iper);
+value table_size = 0x3fff;
 
 value persons_of_name bname patches =
   let t = ref None in
   fun s ->
     let s = Name.crush_lower s in
-    let a =
-      match t.val with
-      [ Some a -> a
-      | None ->
-          let ic_inx =
-            Secure.open_in_bin (Filename.concat bname "names.inx")
-          in
-          do {
-            seek_in ic_inx int_size;
-            let a : name_index_data = input_value ic_inx in
-            close_in ic_inx;
-            t.val := Some a;
-            a
-          } ]
-    in
     let i = Hashtbl.hash s in
+    let ai =
+      let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
+      let ai =        
+        let i = i mod table_size in
+        let fname_inx_acc = Filename.concat bname "names.acc" in
+        if Sys.file_exists fname_inx_acc then
+          let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
+          do {
+            seek_in ic_inx_acc (Iovalue.sizeof_long * i);
+            let pos = input_binary_int ic_inx_acc in
+            close_in ic_inx_acc;
+            seek_in ic_inx pos;
+            (Iovalue.input ic_inx : array iper)
+          }
+        else (* compatibility *)
+          let a =
+            match t.val with
+            [ Some a -> a
+            | None ->
+                do {
+                  seek_in ic_inx int_size;
+                  let a : name_index_data = input_value ic_inx in
+                  t.val := Some a;
+                  a
+                } ]
+          in
+          a.(i)
+      in
+      do { close_in ic_inx; ai }          
+    in
     try
       let l = Hashtbl.find patches i in
-      l @ Array.to_list a.(i mod Array.length a)
+      l @ Array.to_list ai
     with
-    [ Not_found -> Array.to_list a.(i mod Array.length a) ]
+    [ Not_found -> Array.to_list ai ]
 ;
 
 type strings_of_fsname = array (array istr);
@@ -332,24 +350,38 @@ value strings_of_fsname bname strings (_, person_patches) =
   let t = ref None in
   fun s ->
     let s = Name.crush_lower s in
-    let a =
-      match t.val with
-      [ Some a -> a
-      | None ->
-          let ic_inx =
-            Secure.open_in_bin (Filename.concat bname "names.inx")
-          in
-          let pos = input_binary_int ic_inx in
-          do {
-            seek_in ic_inx pos;
-            let a : strings_of_fsname = input_value ic_inx in
-            close_in ic_inx;
-            t.val := Some a;
-            a
-          } ]
-    in
     let i = Hashtbl.hash s in
-    let r = a.(i mod Array.length a) in
+    let r =
+      let ic_inx = Secure.open_in_bin (Filename.concat bname "names.inx") in
+      let ai =
+        let i = i mod table_size in
+        let fname_inx_acc = Filename.concat bname "names.acc" in
+        if Sys.file_exists fname_inx_acc then
+          let ic_inx_acc = Secure.open_in_bin fname_inx_acc in
+          do {
+            seek_in ic_inx_acc (Iovalue.sizeof_long * (table_size + i));
+            let pos = input_binary_int ic_inx_acc in
+            close_in ic_inx_acc;
+            seek_in ic_inx pos;
+            (Iovalue.input ic_inx : array istr)
+          }
+        else (* compatibility *)
+          let a =
+            match t.val with
+            [ Some a -> a
+            | None ->
+                let pos = input_binary_int ic_inx in
+                do {
+                  seek_in ic_inx pos;
+                  let a : strings_of_fsname = input_value ic_inx in
+                  t.val := Some a;
+                  a
+                } ]
+          in
+          a.(i)
+        in
+        do { close_in ic_inx; ai }
+    in
     let l = ref (Array.to_list r) in
     do {
       Hashtbl.iter
@@ -374,6 +406,7 @@ value strings_of_fsname bname strings (_, person_patches) =
       l.val
     }
 ;
+(**)
 
 value lock_file bname =
   let bname =
@@ -1003,12 +1036,12 @@ value output_first_name_index oc2 base =
   }
 ;
 
-value table_size = 0x3fff;
 value make_name_index base =
   let t = Array.create table_size [| |] in
   let a = base.data.persons.array () in
   let add_name key valu =
-    let i = Hashtbl.hash (Name.crush (Name.abbrev key)) mod Array.length t in
+    let key = Name.crush (Name.abbrev key) in
+    let i = Hashtbl.hash key mod Array.length t in
     if array_memq valu t.(i) then ()
     else t.(i) := Array.append [| valu |] t.(i)
   in
@@ -1034,14 +1067,30 @@ value make_name_index base =
   }
 ;
 
-value create_name_index oc_inx base =
+value count_error computed found =
+  do {
+    Printf.eprintf "Count error. Computed %d. Found %d.\n" computed found;
+    flush stderr;
+    exit 2
+  }
+;
+
+value create_name_index oc_inx oc_inx_acc base =
   let ni = make_name_index base in
-  output_value_no_sharing oc_inx (ni : name_index_data)
+  let bpos = pos_out oc_inx in
+  do {
+    output_value_no_sharing oc_inx (ni : name_index_data);
+    let epos = output_array_access oc_inx_acc ni bpos in
+    if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
+    else ()
+  }
 ;
 
 value add_name t key valu =
-  let i = Hashtbl.hash (Name.crush_lower key) mod Array.length t in
-  if array_memq valu t.(i) then () else t.(i) := Array.append [| valu |] t.(i)
+  let key = Name.crush_lower key in
+  let i = Hashtbl.hash key mod Array.length t in
+  if array_memq valu t.(i) then ()
+  else t.(i) := Array.append [| valu |] t.(i)
 ;
 
 value make_strings_of_fsname base =
@@ -1065,16 +1114,14 @@ value make_strings_of_fsname base =
   }
 ;
 
-value create_strings_of_fsname oc_inx base =
+value create_strings_of_fsname oc_inx oc_inx_acc base =
   let t = make_strings_of_fsname base in
-  output_value_no_sharing oc_inx (t : strings_of_fsname)
-;
-
-value count_error computed found =
+  let bpos = pos_out oc_inx in
   do {
-    Printf.eprintf "Count error. Computed %d. Found %d.\n" computed found;
-    flush stderr;
-    exit 2
+    output_value_no_sharing oc_inx (t : strings_of_fsname);
+    let epos = output_array_access oc_inx_acc t bpos in
+    if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
+    else ()
   }
 ;
 
@@ -1157,6 +1204,7 @@ value gen_output no_patches bname base =
     let tmp_fname = Filename.concat bname "1base" in
     let tmp_fname_acc = Filename.concat bname "1base.acc" in
     let tmp_fname_inx = Filename.concat bname "1names.inx" in
+    let tmp_fname_inx_acc = Filename.concat bname "1names.acc" in
     let tmp_fname_gw2 = Filename.concat bname "1strings.inx" in
     let tmp_fname_not = Filename.concat bname "1notes" in
     if not no_patches then
@@ -1229,12 +1277,13 @@ value gen_output no_patches bname base =
         close_out oc_acc;
         if not no_patches then
           let oc_inx = Secure.open_out_bin tmp_fname_inx in
+          let oc_inx_acc = Secure.open_out_bin tmp_fname_inx_acc in
           let oc2 = Secure.open_out_bin tmp_fname_gw2 in
           try
             do {
               trace "create name index";
               output_binary_int oc_inx 0;
-              create_name_index oc_inx base;
+              create_name_index oc_inx oc_inx_acc base;
               base.data.ascends.clear_array ();
               base.data.unions.clear_array ();
               base.data.couples.clear_array ();
@@ -1242,7 +1291,7 @@ value gen_output no_patches bname base =
               else ();
               let surname_or_first_name_pos = pos_out oc_inx in
               trace "create strings of fsname";
-              create_strings_of_fsname oc_inx base;
+              create_strings_of_fsname oc_inx oc_inx_acc base;
               seek_out oc_inx 0;
               output_binary_int oc_inx surname_or_first_name_pos;
               close_out oc_inx;
@@ -1290,7 +1339,9 @@ value gen_output no_patches bname base =
         remove_file tmp_fname;
         remove_file tmp_fname_acc;
         if not no_patches then do {
-          remove_file tmp_fname_inx; remove_file tmp_fname_gw2; ()
+          remove_file tmp_fname_inx;
+          remove_file tmp_fname_inx_acc;
+          remove_file tmp_fname_gw2;
         }
         else ();
         raise e
@@ -1302,6 +1353,8 @@ value gen_output no_patches bname base =
     if not no_patches then do {
       remove_file (Filename.concat bname "names.inx");
       Sys.rename tmp_fname_inx (Filename.concat bname "names.inx");
+      remove_file (Filename.concat bname "names.acc");
+      Sys.rename tmp_fname_inx_acc (Filename.concat bname "names.acc");
       remove_file (Filename.concat bname "strings.inx");
       Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
       remove_file (Filename.concat bname "notes");

@@ -5,6 +5,16 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [24 Jan 04] Improved much memory usage on large databases by adding
+    an access file (name.acc) of the names index (name.inx). Built when
+    database created or after consang. Still work if name.acc does not
+    exist yet (in this case, no optimization, of course). Very sensitive
+    when searching somebody by name, first name or surname.
+  - [24 Jan 04] Improved speed on large databases and/or no memory
+    enough by removing some of the codes "let _ = base.data....array ()"
+    which where supposed to improve speed but using much memory (several
+    tenths of MB in my database 600K persons, instead of about 8MB without
+    this code).
   - [05 Jan 04] Now, when database notes are modified, an intermediate
     page is displayed with a link to the "notes" page, instead of the
     "notes" page itself (to be consistent with other updates pages).
