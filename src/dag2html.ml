@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 4.0 2001-03-16 19:34:32 ddr Exp $ *)
+(* $Id: dag2html.ml,v 4.1 2001-04-21 13:50:56 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -22,11 +22,11 @@ external ghost_id_of_int : int -> ghost_id = "%identity";
 external int_of_ghost_id : ghost_id -> int = "%identity";
 
 value new_span_id =
-  let i = ref 0 in fun () -> do incr i; return span_id_of_int i.val
+  let i = ref 0 in fun () -> do { incr i; span_id_of_int i.val }
 ;
 
 value new_ghost_id =
-  let i = ref 0 in fun () -> do incr i; return ghost_id_of_int i.val
+  let i = ref 0 in fun () -> do { incr i; ghost_id_of_int i.val }
 ;
 
 (* creating the html table structure *)
@@ -83,8 +83,7 @@ value html_table_struct indi_txt phony d t =
             in
             [(colspan - 2, CenterA, TDstring s) :: les]
           in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
-          loop les next_j
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in loop les next_j
     in
     Array.of_list (List.rev les)
   in
@@ -112,8 +111,7 @@ value html_table_struct indi_txt phony d t =
             in
             [(colspan - 2, CenterA, TDstring s) :: les]
           in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
-          loop les next_j
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in loop les next_j
     in
     Array.of_list (List.rev les)
   in
@@ -149,8 +147,7 @@ value html_table_struct indi_txt phony d t =
               in
               [(colspan, CenterA, TDstring s) :: les]
           in
-          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
-          loop les next_j
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in loop les next_j
     in
     Array.of_list (List.rev les)
   in
@@ -188,7 +185,7 @@ value html_table_struct indi_txt phony d t =
           in
           let rec loop1 les l =
             if l = next_j then loop les next_j
-            else
+            else do {
               let next_l =
                 let y = t.table.(k).(l) in
                 match y.elem with
@@ -201,12 +198,14 @@ value html_table_struct indi_txt phony d t =
                     loop (l + 1)
                 | _ -> l + 1 ]
               in
-(* happens sometimes: should be debugged *)
-do if next_l > next_j then do Printf.eprintf "assert false i %d k %d l %d next_l %d next_j %d\n" i k l next_l next_j; flush stderr; return () else (); return
-let next_l = min next_l next_j in
-(*
-              do assert (next_l <= next_j); return
-*)
+              if next_l > next_j then do {
+                Printf.eprintf
+                  "assert false i %d k %d l %d next_l %d next_j %d\n" i k l
+                  next_l next_j;
+                flush stderr;
+              }
+              else ();
+              let next_l = min next_l next_j in
               let colspan = 3 * (next_l - l) - 2 in
               let les =
                 match (t.table.(i).(l).elem, t.table.(i + 1).(l).elem) with
@@ -221,26 +220,25 @@ let next_l = min next_l next_j in
                       let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
                       let s = ph (TDstring "|") in
                       let les = [(colspan, CenterA, s) :: les] in
-                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
-                      les
+                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in les
                     else if l = j then
                       let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
                       let s = ph (TDhr RightA) in
                       let les = [(colspan, RightA, s) :: les] in
                       let s = ph (TDhr CenterA) in
-                      let les = [(1, LeftA, s) :: les] in
-                      les
+                      let les = [(1, LeftA, s) :: les] in les
                     else if next_l = next_j then
                       let s = ph (TDhr CenterA) in
                       let les = [(1, LeftA, s) :: les] in
                       let s = ph (TDhr LeftA) in
                       let les = [(colspan, LeftA, s) :: les] in
-                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
-                      les
+                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in les
                     else
                       let s = ph (TDhr CenterA) in
                       [(colspan + 2, LeftA, s) :: les] ]
-              in loop1 les next_l
+              in
+              loop1 les next_l
+            }
           in
           loop1 les j
     in
@@ -261,8 +259,9 @@ let next_l = min next_l next_j in
               else hts
             in
             let hts =
-              if exist_several_branches i (i + 1)
-              && (i < Array.length t.table - 2 || not (all_empty (i + 1))) then
+              if exist_several_branches i (i + 1) &&
+                 (i < Array.length t.table - 2 ||
+                  not (all_empty (i + 1))) then
                 [vbars_txt (i + 1) (i + 1); hbars_txt i (i + 1) :: hts]
               else hts
             in
@@ -270,7 +269,6 @@ let next_l = min next_l next_j in
           else hts
         in
         loop hts (i + 1)
-        
   in
   Array.of_list (List.rev hts)
 ;
@@ -355,22 +353,25 @@ value copy_data d = {elem = d.elem; span = d.span};
 
 value insert_columns t nb j =
   let t1 = Array.create (Array.length t.table) [| |] in
-  do for i = 0 to Array.length t.table - 1 do
-       let line = t.table.(i) in
-       let line1 = Array.create (Array.length line + nb) line.(0) in
-       do t1.(i) := line1; return
-       let rec loop k =
-         if k = Array.length line then ()
-         else
-           do if k < j then line1.(k) := copy_data line.(k)
-              else if k = j then
-                for r = 0 to nb do line1.(k + r) := copy_data line.(k); done
-              else line1.(k + nb) := copy_data line.(k);
-           return loop (k + 1)
-       in
-       loop 0;
-     done;
-  return {table = t1}
+  do {
+    for i = 0 to Array.length t.table - 1 do {
+      let line = t.table.(i) in
+      let line1 = Array.create (Array.length line + nb) line.(0) in
+      t1.(i) := line1;
+      let rec loop k =
+        if k = Array.length line then ()
+        else do {
+          if k < j then line1.(k) := copy_data line.(k)
+          else if k = j then
+            for r = 0 to nb do { line1.(k + r) := copy_data line.(k) }
+          else line1.(k + nb) := copy_data line.(k);
+          loop (k + 1)
+        }
+      in
+      loop 0
+    };
+    {table = t1}
+  }
 ;
 
 value rec gcd a b =
@@ -460,12 +461,13 @@ value treat_new_row d t =
 ;
 
 value down_it t i k y =
-  do t.table.(Array.length t.table - 1).(k) := t.table.(i).(k);
-     for r = i to Array.length t.table - 2 do
-       t.table.(r).(k) :=
-         {elem = Ghost (new_ghost_id ()); span = new_span_id ()};
-     done;
-  return ()
+  do {
+    t.table.(Array.length t.table - 1).(k) := t.table.(i).(k);
+    for r = i to Array.length t.table - 2 do {
+      t.table.(r).(k) :=
+        {elem = Ghost (new_ghost_id ()); span = new_span_id ()}
+    };
+  }
 ;
 
 (* equilibrate:
@@ -492,7 +494,7 @@ value equilibrate t =
                 if k = len then loop1 (i + 1)
                 else
                   match t.table.(i).(k).elem with
-                  [ Elem y when x = y -> do down_it t i k y; return loop 0
+                  [ Elem y when x = y -> do { down_it t i k y; loop 0 }
                   | _ -> loop2 (k + 1) ]
               in
               loop2 0
@@ -508,8 +510,8 @@ value equilibrate t =
                  A A      A A *)
 
 value group_elem t =
-  for i = 0 to Array.length t.table - 2 do
-    for j = 1 to Array.length t.table.(0) - 1 do
+  for i = 0 to Array.length t.table - 2 do {
+    for j = 1 to Array.length t.table.(0) - 1 do {
       let x =
         match t.table.(i + 1).(j - 1).elem with
         [ Elem x -> Some x
@@ -523,9 +525,9 @@ value group_elem t =
       match (x, y) with
       [ (Some x, Some y) when x = y ->
           t.table.(i).(j).span := t.table.(i).(j - 1).span
-      | _ -> () ];
-    done;
-  done
+      | _ -> () ]
+    }
+  }
 ;
 
 (* group_ghost:
@@ -534,8 +536,8 @@ value group_elem t =
                  y  z       y  y           A  A       A  A  *)
 
 value group_ghost t =
-  for i = 0 to Array.length t.table - 2 do
-    for j = 1 to Array.length t.table.(0) - 1 do
+  for i = 0 to Array.length t.table - 2 do {
+    for j = 1 to Array.length t.table.(0) - 1 do {
       match (t.table.(i + 1).(j - 1).elem, t.table.(i + 1).(j).elem) with
       [ (Ghost x, Ghost _) ->
           if t.table.(i).(j - 1).span = t.table.(i).(j).span then
@@ -549,9 +551,9 @@ value group_ghost t =
             t.table.(i).(j) :=
               {elem = Ghost x; span = t.table.(i).(j - 1).span}
           else ()
-      | _ -> () ];
-    done;
-  done
+      | _ -> () ]
+    }
+  }
 ;
 
 (* group_children:
@@ -559,15 +561,15 @@ value group_ghost t =
                  x y      x x *)
 
 value group_children t =
-  for i = 0 to Array.length t.table - 1 do
+  for i = 0 to Array.length t.table - 1 do {
     let line = t.table.(i) in
     let len = Array.length line in
-    for j = 1 to len - 1 do
+    for j = 1 to len - 1 do {
       if line.(j).elem = line.(j - 1).elem && line.(j).elem <> Nothing then
         line.(j).span := line.(j - 1).span
-      else ();
-    done;
-  done
+      else ()
+    }
+  }
 ;
 
 (* group_span_by_common_children:
@@ -589,9 +591,10 @@ value group_span_by_common_children d t =
           let n = d.dag.(int_of_idag id) in
           let curr_cs = List.fold_right S.add n.chil S.empty in
           if S.is_empty (S.inter cs curr_cs) then loop (j + 1) curr_cs
-          else
-            do line.(j).span := line.(j - 1).span; return
+          else do {
+            line.(j).span := line.(j - 1).span;
             loop (j + 1) (S.union cs curr_cs)
+          }
       | _ -> loop (j + 1) S.empty ]
   in
   loop 0 S.empty
@@ -670,27 +673,28 @@ value find_linked_children t i j1 j2 j3 j4 =
 ;
 
 value mirror_block t i1 i2 j1 j2 =
-  for i = i1 to i2 do
+  for i = i1 to i2 do {
     let line = t.(i) in
     let rec loop j1 j2 =
       if j1 >= j2 then ()
-      else
+      else do {
         let v = line.(j1) in
-        do line.(j1) := line.(j2); line.(j2) := v; return
+        line.(j1) := line.(j2);
+        line.(j2) := v;
         loop (j1 + 1) (j2 - 1)
+      }
     in
-    loop j1 j2;
-  done
+    loop j1 j2
+  }
 ;
 
 value exch_blocks t i1 i2 j1 j2 j3 j4 =
-  for i = i1 to i2 do
+  for i = i1 to i2 do {
     let line = t.(i) in
     let saved = Array.copy line in
-    do for j = j1 to j2 do line.(j4 - j2 + j) := saved.(j); done;
-       for j = j3 to j4 do line.(j1 - j3 + j) := saved.(j); done;
-    return ();
-  done
+    for j = j1 to j2 do { line.(j4 - j2 + j) := saved.(j) };
+    for j = j3 to j4 do { line.(j1 - j3 + j) := saved.(j) };
+  }
 ;
 
 value find_block_with_parents t i jj1 jj2 jj3 jj4 =
@@ -743,10 +747,12 @@ value push_to_right d t i j1 j2 =
       let (ii, jj1, jj2, jj3, jj4) =
         find_block_with_parents t i jj1 jj2 jj3 jj4
       in
-      if jj4 < j2 && jj2 < jj3 then
-        do exch_blocks t ii i jj1 jj2 jj3 jj4; return loop (jj4 + 1)
-      else if jj4 < j2 && jj1 = ini_jj1 && jj2 <= jj4 then
-        do mirror_block t ii i jj1 jj4; return loop (jj4 + 1)
+      if jj4 < j2 && jj2 < jj3 then do {
+        exch_blocks t ii i jj1 jj2 jj3 jj4; loop (jj4 + 1)
+      }
+      else if jj4 < j2 && jj1 = ini_jj1 && jj2 <= jj4 then do {
+        mirror_block t ii i jj1 jj4; loop (jj4 + 1)
+      }
       else j - 1
   in
   loop (j1 + 1)
@@ -785,10 +791,12 @@ value push_to_left d t i j1 j2 =
       let (ii, jj1, jj2, jj3, jj4) =
         find_block_with_parents t i jj1 jj2 jj3 jj4
       in
-      if jj1 > j1 && jj2 < jj3 then
-        do exch_blocks t ii i jj1 jj2 jj3 jj4; return loop (jj1 - 1)
-      else if jj1 > j1 && jj4 = ini_jj4 && jj3 >= jj1 then
-        do mirror_block t ii i jj1 jj4; return loop (jj1 - 1)
+      if jj1 > j1 && jj2 < jj3 then do {
+        exch_blocks t ii i jj1 jj2 jj3 jj4; loop (jj1 - 1)
+      }
+      else if jj1 > j1 && jj4 = ini_jj4 && jj3 >= jj1 then do {
+        mirror_block t ii i jj1 jj4; loop (jj1 - 1)
+      }
       else j + 1
   in
   loop (j2 - 1)
@@ -797,33 +805,36 @@ value push_to_left d t i j1 j2 =
 value fill_gap d t i j1 j2 =
   let t1 =
     let t1 = Array.copy t.table in
-    do for i = 0 to Array.length t.table - 1 do
-         t1.(i) := Array.copy t.table.(i);
-         for j = 0 to Array.length t1.(i) - 1 do
-           t1.(i).(j) := copy_data t.table.(i).(j);
-         done;
-       done;
-    return t1
+    do {
+      for i = 0 to Array.length t.table - 1 do {
+        t1.(i) := Array.copy t.table.(i);
+        for j = 0 to Array.length t1.(i) - 1 do {
+          t1.(i).(j) := copy_data t.table.(i).(j)
+        }
+      };
+      t1
+    }
   in
   let j2 = push_to_left d t1 i j1 j2 in
   let j1 = push_to_right d t1 i j1 j2 in
-  if j1 = j2 - 1 then
+  if j1 = j2 - 1 then do {
     let line = t1.(i - 1) in
     let x = line.(j1).span in
     let y = line.(j2).span in
-    do let rec loop y j =
-         if j >= Array.length line then ()
-         else if
-           line.(j).span = y || t1.(i).(j).elem = t1.(i).(j - 1).elem then
-           let y = line.(j).span in
-           do line.(j).span := x;
-              if i > 0 then t1.(i - 1).(j).span := t1.(i - 1).(j - 1).span
-              else ();
-           return loop y (j + 1)
-         else ()
-       in
-       loop y j2;
-    return Some ({table = t1}, True)
+    let rec loop y j =
+      if j >= Array.length line then ()
+      else if line.(j).span = y || t1.(i).(j).elem = t1.(i).(j - 1).elem
+      then do {
+        let y = line.(j).span in
+        line.(j).span := x;
+        if i > 0 then t1.(i - 1).(j).span := t1.(i - 1).(j - 1).span else ();
+        loop y (j + 1)
+      }
+      else ()
+    in
+    loop y j2;
+    Some ({table = t1}, True)
+  }
   else None
 ;
 
@@ -855,25 +866,28 @@ value group_span_last_row t =
   let row = t.table.(Array.length t.table - 1) in
   let rec loop i =
     if i >= Array.length row then ()
-    else
-      do match row.(i).elem with
-         [ Elem _ | Ghost _ as x ->
-             if x = row.(i - 1).elem then row.(i).span := row.(i - 1).span
-             else ()
-         | _ -> () ];
-      return loop (i + 1)
+    else do {
+      match row.(i).elem with
+      [ Elem _ | Ghost _ as x ->
+          if x = row.(i - 1).elem then row.(i).span := row.(i - 1).span
+          else ()
+      | _ -> () ];
+      loop (i + 1)
+    }
   in
   loop 1
 ;
 
 value has_phony_children phony d t =
   let line = t.table.(Array.length t.table - 1) in
-  loop 0 where rec loop j =
+  let rec loop j =
     if j = Array.length line then False
     else
       match line.(j).elem with
       [ Elem x -> if phony d.dag.(int_of_idag x) then True else loop (j + 1)
       | _ -> loop (j + 1) ]
+  in
+  loop 0
 ;
 
 value tablify phony no_optim no_group d =
@@ -902,7 +916,7 @@ value tablify phony no_optim no_group d =
 ;
 
 value fall d t =
-  for i = 1 to Array.length t.table - 1 do
+  for i = 1 to Array.length t.table - 1 do {
     let line = t.table.(i) in
     let rec loop j =
       if j = Array.length line then ()
@@ -933,88 +947,95 @@ value fall d t =
               else if i1 = 0 then i1
               else if t.table.(i1).(j).elem = Nothing then i1
               else i
-            in 
-            do if i1 < i then
-                 do for k = i downto i1 + 1 do
-                      for j = j to j2 do
-                        t.table.(k).(j).elem := t.table.(k - 1).(j).elem;
-                        if k < i then
-                          t.table.(k).(j).span := t.table.(k - 1).(j).span
-                        else ();
-                      done;
-                    done;
-                    for l = j to j2 do
-                      if i1 = 0 || t.table.(i1 - 1).(l).elem = Nothing then
-                        t.table.(i1).(l).elem := Nothing
-                      else
-                        t.table.(i1).(l) :=
-                          if l = j ||
-                             t.table.(i1 - 1).(l - 1).span <>
-                               t.table.(i1 - 1).(l).span then
-                            {elem = Ghost (new_ghost_id ());
-                             span = new_span_id ()}
-                          else copy_data t.table.(i1).(l - 1);
-                    done;
-                 return ()
-               else ();
-            return loop (j2 + 1)
+            in
+            do {
+              if i1 < i then do {
+                for k = i downto i1 + 1 do {
+                  for j = j to j2 do {
+                    t.table.(k).(j).elem := t.table.(k - 1).(j).elem;
+                    if k < i then
+                      t.table.(k).(j).span := t.table.(k - 1).(j).span
+                    else ()
+                  }
+                };
+                for l = j to j2 do {
+                  if i1 = 0 || t.table.(i1 - 1).(l).elem = Nothing then
+                    t.table.(i1).(l).elem := Nothing
+                  else
+                    t.table.(i1).(l) :=
+                      if l = j ||
+                         t.table.(i1 - 1).(l - 1).span <>
+                           t.table.(i1 - 1).(l).span then
+                        {elem = Ghost (new_ghost_id ());
+                         span = new_span_id ()}
+                      else copy_data t.table.(i1).(l - 1)
+                };
+              }
+              else ();
+              loop (j2 + 1)
+            }
         | _ -> loop (j + 1) ]
     in
-    loop 0;
-  done
+    loop 0
+  }
 ;
 
 value fall2_cool_right t i1 i2 i3 j1 j2 =
   let span = t.table.(i2 - 1).(j1).span in
-  do for i = i2 - 1 downto 0 do
-       for j = j1 to j2 - 1 do
-         t.table.(i).(j) :=
-           if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-           else {elem = Nothing; span = new_span_id ()};
-       done;
-     done;
-     for i = Array.length t.table - 1 downto 0 do
-       for j = j2 to Array.length t.table.(i) - 1 do
-         t.table.(i).(j) :=
-           if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-           else {elem = Nothing; span = new_span_id ()};
-       done;
-     done;
-     let old_span = t.table.(i2 - 1).(j1).span in
-(*
-do Printf.eprintf "fall2_coll_right i1 %d i2 %d j %d i3 %d span %d old_span %d\n" i1 i2 j i3 (int_of_span_id span) (int_of_span_id old_span); flush stderr; return
-*)
-     loop j1 where rec loop j =
-       if j = Array.length t.table.(i2 - 1) then ()
-       else if t.table.(i2 - 1).(j).span = old_span then
-         do t.table.(i2 - 1).(j).span := span; return loop (j + 1)
-       else ();
-  return ()  
+  do {
+    for i = i2 - 1 downto 0 do {
+      for j = j1 to j2 - 1 do {
+        t.table.(i).(j) :=
+          if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
+          else {elem = Nothing; span = new_span_id ()}
+      }
+    };
+    for i = Array.length t.table - 1 downto 0 do {
+      for j = j2 to Array.length t.table.(i) - 1 do {
+        t.table.(i).(j) :=
+          if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
+          else {elem = Nothing; span = new_span_id ()}
+      }
+    };
+    let old_span = t.table.(i2 - 1).(j1).span in
+    let rec loop j =
+      if j = Array.length t.table.(i2 - 1) then ()
+      else if t.table.(i2 - 1).(j).span = old_span then do {
+        t.table.(i2 - 1).(j).span := span; loop (j + 1)
+      }
+      else ()
+    in
+    loop j1;
+  }
 ;
 
 value fall2_cool_left t i1 i2 i3 j1 j2 =
   let span = t.table.(i2 - 1).(j2).span in
-  do for i = i2 - 1 downto 0 do
-       for j = j1 + 1 to j2 do
-         t.table.(i).(j) :=
-           if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-           else {elem = Nothing; span = new_span_id ()};
-       done;
-     done;
-     for i = Array.length t.table - 1 downto 0 do
-       for j = j1 downto 0 do
-         t.table.(i).(j) :=
-           if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
-           else {elem = Nothing; span = new_span_id ()};
-       done;
-     done;
-     let old_span = t.table.(i2 - 1).(j2).span in
-     loop j2 where rec loop j =
-       if j < 0 then ()
-       else if t.table.(i2 - 1).(j).span = old_span then
-         do t.table.(i2 - 1).(j).span := span; return loop (j - 1)
-       else ();
-  return ()  
+  do {
+    for i = i2 - 1 downto 0 do {
+      for j = j1 + 1 to j2 do {
+        t.table.(i).(j) :=
+          if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
+          else {elem = Nothing; span = new_span_id ()}
+      }
+    };
+    for i = Array.length t.table - 1 downto 0 do {
+      for j = j1 downto 0 do {
+        t.table.(i).(j) :=
+          if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
+          else {elem = Nothing; span = new_span_id ()}
+      }
+    };
+    let old_span = t.table.(i2 - 1).(j2).span in
+    let rec loop j =
+      if j < 0 then ()
+      else if t.table.(i2 - 1).(j).span = old_span then do {
+        t.table.(i2 - 1).(j).span := span; loop (j - 1)
+      }
+      else ()
+    in
+    loop j2;
+  }
 ;
 
 value do_fall2_right t i1 i2 j1 j2 =
@@ -1022,17 +1043,19 @@ value do_fall2_right t i1 i2 j1 j2 =
     loop_i (Array.length t.table - 1) where rec loop_i i =
       if i < 0 then 0
       else
-        loop_j j2 where rec loop_j j =
+        let rec loop_j j =
           if j = Array.length t.table.(i) then loop_i (i - 1)
           else
             match t.table.(i).(j).elem with
             [ Nothing -> loop_j (j + 1)
             | _ -> i + 1 ]
+        in
+        loop_j j2
   in
   let new_height = i3 + i2 - i1 in
   let t =
     if new_height > Array.length t.table then
-      loop (new_height - Array.length t.table) t where rec loop cnt t =
+      let rec loop cnt t =
         if cnt = 0 then t
         else
           let new_line =
@@ -1041,9 +1064,11 @@ value do_fall2_right t i1 i2 j1 j2 =
           in
           let t = {table = Array.append t.table [| new_line |]} in
           loop (cnt - 1) t
+      in
+      loop (new_height - Array.length t.table) t
     else t
   in
-  do fall2_cool_right t i1 i2 i3 j1 j2; return t
+  do { fall2_cool_right t i1 i2 i3 j1 j2; t }
 ;
 
 value do_fall2_left t i1 i2 j1 j2 =
@@ -1051,17 +1076,19 @@ value do_fall2_left t i1 i2 j1 j2 =
     loop_i (Array.length t.table - 1) where rec loop_i i =
       if i < 0 then 0
       else
-        loop_j j1 where rec loop_j j =
+        let rec loop_j j =
           if j < 0 then loop_i (i - 1)
           else
             match t.table.(i).(j).elem with
             [ Nothing -> loop_j (j - 1)
             | _ -> i + 1 ]
+        in
+        loop_j j1
   in
   let new_height = i3 + i2 - i1 in
   let t =
     if new_height > Array.length t.table then
-      loop (new_height - Array.length t.table) t where rec loop cnt t =
+      let rec loop cnt t =
         if cnt = 0 then t
         else
           let new_line =
@@ -1070,22 +1097,24 @@ value do_fall2_left t i1 i2 j1 j2 =
           in
           let t = {table = Array.append t.table [| new_line |]} in
           loop (cnt - 1) t
+      in
+      loop (new_height - Array.length t.table) t
     else t
   in
-  do fall2_cool_left t i1 i2 i3 j1 j2; return t
+  do { fall2_cool_left t i1 i2 i3 j1 j2; t }
 ;
 
 value do_shorten_too_long t i1 j1 j2 =
-  do for i = i1 to Array.length t.table - 2 do
-       for j = j1 to j2 - 1 do
-         t.table.(i).(j) := t.table.(i + 1).(j);
-       done;
-     done;
-     let i = Array.length t.table - 1 in
-     for j = j1 to j2 - 1 do
-       t.table.(i).(j) := {elem = Nothing; span = new_span_id ()};
-     done;
-  return t
+  do {
+    for i = i1 to Array.length t.table - 2 do {
+      for j = j1 to j2 - 1 do { t.table.(i).(j) := t.table.(i + 1).(j) }
+    };
+    let i = Array.length t.table - 1 in
+    for j = j1 to j2 - 1 do {
+      t.table.(i).(j) := {elem = Nothing; span = new_span_id ()}
+    };
+    t
+  }
 ;
 
 value try_fall2_right t i j =
@@ -1102,18 +1131,21 @@ value try_fall2_right t i j =
       let separated1 =
         loop (i1 - 1) where rec loop i =
           if i < 0 then True
-          else if j > 0
-               && t.table.(i).(j - 1).span = t.table.(i).(j).span then False
+          else if
+            j > 0 && t.table.(i).(j - 1).span = t.table.(i).(j).span then
+            False
           else loop (i - 1)
       in
       let j2 =
         let x = t.table.(i).(j).span in
-        loop (j + 1) where rec loop j2 =
+        let rec loop j2 =
           if j2 = Array.length t.table.(i) then j2
           else
             match t.table.(i).(j2) with
             [ {elem = Ghost _; span = y} when y = x -> loop (j2 + 1)
             | _ -> j2 ]
+        in
+        loop (j + 1)
       in
       let separated2 =
         loop (i + 1) where rec loop i =
@@ -1141,18 +1173,22 @@ value try_fall2_left t i j =
       let separated1 =
         loop (i1 - 1) where rec loop i =
           if i < 0 then True
-          else if j < Array.length t.table.(i) - 1
-               && t.table.(i).(j).span = t.table.(i).(j + 1).span then False
+          else if
+            j < Array.length t.table.(i) - 1 &&
+            t.table.(i).(j).span = t.table.(i).(j + 1).span then
+            False
           else loop (i - 1)
       in
       let j1 =
         let x = t.table.(i).(j).span in
-        loop (j - 1) where rec loop j1 =
+        let rec loop j1 =
           if j1 < 0 then j1
           else
             match t.table.(i).(j1) with
             [ {elem = Ghost _; span = y} when y = x -> loop (j1 - 1)
             | _ -> j1 ]
+        in
+        loop (j - 1)
       in
       let separated2 =
         loop (i + 1) where rec loop i =
@@ -1171,12 +1207,14 @@ value try_shorten_too_long t i j =
   [ Ghost _ ->
       let j2 =
         let x = t.table.(i).(j).span in
-        loop (j + 1) where rec loop j2 =
+        let rec loop j2 =
           if j2 = Array.length t.table.(i) then j2
           else
             match t.table.(i).(j2) with
             [ {elem = Ghost _; span = y} when y = x -> loop (j2 + 1)
             | _ -> j2 ]
+        in
+        loop (j + 1)
       in
       let i1 =
         loop (i + 1) where rec loop i =
@@ -1197,15 +1235,18 @@ value try_shorten_too_long t i j =
       let separated_left =
         loop i where rec loop i =
           if i = i2 then True
-          else if j > 0
-               && t.table.(i).(j).span = t.table.(i).(j - 1).span then False
+          else if
+            j > 0 && t.table.(i).(j).span = t.table.(i).(j - 1).span then
+            False
           else loop (i + 1)
       in
       let separated_right =
         loop i where rec loop i =
           if i = i2 then True
-          else if j2 < Array.length t.table.(i)
-               && t.table.(i).(j2 - 1).span = t.table.(i).(j2).span then False
+          else if
+            j2 < Array.length t.table.(i) &&
+            t.table.(i).(j2 - 1).span = t.table.(i).(j2).span then
+            False
           else loop (i + 1)
       in
       if not separated_left || not separated_right then None
@@ -1218,37 +1259,42 @@ value fall2_right t =
   loop_i (Array.length t.table - 1) t where rec loop_i i t =
     if i <= 0 then t
     else
-      loop_j (Array.length t.table.(i) - 2) t where rec loop_j j t =
+      let rec loop_j j t =
         if j < 0 then loop_i (i - 1) t
         else
           match try_fall2_right t i j with
           [ Some t -> loop_i (Array.length t.table - 1) t
           | None -> loop_j (j - 1) t ]
+      in
+      loop_j (Array.length t.table.(i) - 2) t
 ;
 
 value fall2_left t =
   loop_i (Array.length t.table - 1) t where rec loop_i i t =
     if i <= 0 then t
     else
-      loop_j 1 t where rec loop_j j t =
+      let rec loop_j j t =
         if j >= Array.length t.table.(i) then loop_i (i - 1) t
         else
           match try_fall2_left t i j with
           [ Some t -> loop_i (Array.length t.table - 1) t
           | None -> loop_j (j + 1) t ]
+      in
+      loop_j 1 t
 ;
 
 value shorten_too_long t =
   loop_i (Array.length t.table - 1) t where rec loop_i i t =
     if i <= 0 then t
     else
-      loop_j 1 t where rec loop_j j t =
+      let rec loop_j j t =
         if j >= Array.length t.table.(i) then loop_i (i - 1) t
         else
           match try_shorten_too_long t i j with
           [ Some t -> loop_i (Array.length t.table - 1) t
           | None -> loop_j (j + 1) t ]
-  
+      in
+      loop_j 1 t
 ;
 
 (* top_adjust:
@@ -1267,11 +1313,12 @@ value top_adjust t =
         in
         loop_j 0
   in
-  if di > 0 then
-    do for i = 0 to Array.length t.table - 1 - di do
-         t.table.(i) := t.table.(i + di);
-       done;
-    return {table = Array.sub t.table 0 (Array.length t.table - di)}
+  if di > 0 then do {
+    for i = 0 to Array.length t.table - 1 - di do {
+      t.table.(i) := t.table.(i + di)
+    };
+    {table = Array.sub t.table 0 (Array.length t.table - di)}
+  }
   else t
 ;
 
@@ -1300,31 +1347,35 @@ value bottom_adjust t =
 
 value invert_dag d =
   let d = {dag = Array.copy d.dag} in
-  do for i = 0 to Array.length d.dag - 1 do
-       let n = d.dag.(i) in
-       d.dag.(i) :=
-         {pare = List.map (fun x -> x) n.chil; valu = n.valu;
-          chil = List.map (fun x -> x) n.pare};
-     done;
-  return d
+  do {
+    for i = 0 to Array.length d.dag - 1 do {
+      let n = d.dag.(i) in
+      d.dag.(i) :=
+        {pare = List.map (fun x -> x) n.chil; valu = n.valu;
+         chil = List.map (fun x -> x) n.pare}
+    };
+    d
+  }
 ;
 
 value invert_table t =
   let t' = {table = Array.copy t.table} in
   let len = Array.length t.table in
-  do for i = 0 to len - 1 do
-       t'.table.(i) :=
-         Array.init (Array.length t.table.(0))
-           (fun j ->
-              let d = t.table.(len - 1 - i).(j) in
-              {elem = d.elem; span = d.span});
-       if i < len - 1 then
-         for j = 0 to Array.length t'.table.(i) - 1 do
-           t'.table.(i).(j).span := t.table.(len - 2 - i).(j).span;
-         done
-       else ();
-     done;
-  return t'
+  do {
+    for i = 0 to len - 1 do {
+      t'.table.(i) :=
+        Array.init (Array.length t.table.(0))
+          (fun j ->
+             let d = t.table.(len - 1 - i).(j) in
+             {elem = d.elem; span = d.span});
+      if i < len - 1 then
+        for j = 0 to Array.length t'.table.(i) - 1 do {
+          t'.table.(i).(j).span := t.table.(len - 2 - i).(j).span
+        }
+      else ()
+    };
+    t'
+  }
 ;
 
 (* main *)
@@ -1337,9 +1388,7 @@ value table_of_dag phony no_optim invert no_group d =
   let t = fall2_right t in
   let t = fall2_left t in
   let t = shorten_too_long t in
-  let t = top_adjust t in
-  let t = bottom_adjust t in
-  t
+  let t = top_adjust t in let t = bottom_adjust t in t
 ;
 
 value html_table_of_dag indi_txt phony invert no_group d =
