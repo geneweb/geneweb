@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.172 2003-12-17 14:03:24 ddr Exp $
+# $Id: lexicon.txt,v 4.173 2003-12-17 14:05:05 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -6553,6 +6553,7 @@ sv: smeknamn
 da: voldt&aelig;gt
 en: rape
 fr: viol
+he:  àåðñ
 pl: gwa³t
 pt: violação
 
