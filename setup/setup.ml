@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.6 2001-07-17 00:50:26 ddr Exp $ *)
+(* $Id: setup.ml,v 4.7 2001-07-17 02:49:37 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -249,11 +249,6 @@ value rec list_replace k v =
 
 value conf_with_env conf k v = {(conf) with env = list_replace k v conf.env};
 
-value browser_with_type_file conf =
-  let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
-  String.lowercase user_agent <> "lynx"
-;
-
 value all_db dir =
   let list = ref [] in
   let dh = Unix.opendir dir in
@@ -334,7 +329,6 @@ value rec copy_from_stream conf print strm =
           | 'j' -> print_selector conf print
           | 'k' -> for_all conf print (fst (List.split conf.env)) strm
           | 'l' -> print conf.lang
-          | 'n' -> print_if conf print (browser_with_type_file conf) strm
           | 'o' -> print (strip_spaces (s_getenv conf.env "o"))
           | 'p' -> print (parameters conf.env)
           | 'q' -> print Version.txt
@@ -398,7 +392,9 @@ and print_specific_file conf print fname strm =
 and print_selector conf print =
   let sel =
     try getenv conf.env "sel" with
-    [ Not_found -> ifdef UNIX then "/" else "C:" ]
+    [ Not_found ->
+        try Sys.getenv "HOME" with
+        [ Not_found -> ifdef UNIX then "/" else "C:" ] ]
   in
   let list =
     try
