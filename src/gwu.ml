@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.26 2004-12-14 09:30:12 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.27 2004-12-30 10:11:25 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -425,7 +425,7 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
     in
     match fam.comment with
     [ txt when sou base txt <> "" ->
-        fprintf oc "comm %s\n" (sou base txt)
+        fprintf oc "comm %s\n" (correct_string base txt)
     | _ -> () ];
     match Array.length m.m_chil with
     [ 0 -> ()

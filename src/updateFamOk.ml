@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.39 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.40 2004-12-30 10:11:27 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -186,8 +186,8 @@ value reconstitute_family conf =
           ([c :: parents], ext)
       | None -> ([], ext) ]
   in
-  let comment = strip_spaces (get conf "comment") in
-  let fsources = strip_spaces (get conf "src") in
+  let comment = only_printable (get conf "comment") in
+  let fsources = only_printable (get conf "src") in
   let origin_file =
     match p_getenv conf.env "origin_file" with
     [ Some x -> x
