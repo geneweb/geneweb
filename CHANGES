@@ -30,7 +30,7 @@ GeneWeb version 3.11
     differently (e.g. in a list <ul>..</ul>).
 
 * Setup program (gwsetup)
-  - [22 Jan 01] Added a page to merge data bases (French and English version
+  - [22 Jan 01] Added the merging of data bases (French and English version
     only). Updated the documentation to remove the comments telling that
     this operation cannot be done under gwsetup.
 
