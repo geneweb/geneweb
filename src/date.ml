@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.15 2000-05-19 23:55:36 ddr Exp $ *)
+(* $Id: date.ml,v 3.16 2000-06-21 23:28:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -580,7 +580,8 @@ value print_calendar conf base =
      tag "form" "method=GET action=\"%s\"" conf.command begin
        List.iter
          (fun (k, v) ->
-            Wserver.wprint "<input type=hidden name=%s value=%s>\n" k v)
+            Wserver.wprint "<input type=hidden name=%s value=%s>\n" k
+              (quote_escaped (decode_varenv v)))
          conf.henv;
        Wserver.wprint "<input type=hidden name=m value=CAL>\n\n";
        tag "table" "border=1" begin

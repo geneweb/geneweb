@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.12 2000-06-19 22:23:23 ddr Exp $ *)
+(* $Id: descend.ml,v 3.13 2000-06-21 23:28:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -85,7 +85,8 @@ value print_choice conf base p niveau_effectif =
   tag "form" "method=get action=\"%s\"" conf.command begin
     List.iter
       (fun (k, v) ->
-         Wserver.wprint "\n<input type=hidden name=%s value=%s>" k v)
+         Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" k
+           (quote_escaped (decode_varenv v)))
       conf.henv;
     Wserver.wprint "<input type=hidden name=m value=D>\n";
     wprint_hidden_person conf base "" p;
