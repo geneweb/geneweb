@@ -1,9 +1,6 @@
 GeneWeb Version 1.08
 --------------------
 
-Added doc for merging databases, persons and families.
-Added doc for databases maintenance.
-
 * gwd: fixed several displaying bugs due to ANSEL
 
 * gwc, gwu:
@@ -18,6 +15,11 @@ Added doc for databases maintenance.
 
 * consang:
   - more clear message when consang does not work, because of loop in database
+
+* doc:
+  - added doc for merging databases, persons and families.
+  - added doc for databases maintenance.
+  - small changes in diruse.htm, server.htm, start.htm
 
 GeneWeb Version 1.07
 --------------------
