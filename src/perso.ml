@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.18 2000-05-10 08:14:09 ddr Exp $ *)
+(* $Id: perso.ml,v 3.19 2000-05-12 07:49:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -331,18 +331,6 @@ value print_dates conf base open_area p =
               Wserver.wprint "\n";
           return ()
      | _ -> () ];
-     let sure d = d.prec = Sure in
-     match (Adef.od_of_codate p.birth, date_of_death p.death) with
-     [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
-         if sure d1 && sure d2 && d1 <> d2 then
-           let a = temps_ecoule d1 d2 in
-           do open_area ();
-              Wserver.wprint "%s " (capitale (transl conf "age at death:"));
-              Date.print_age conf a;
-              Wserver.wprint "\n";
-           return ()
-         else ()
-     | _ -> () ];
      let burial_date_place cod =
        let place = sou base p.burial_place in
        do match Adef.od_of_codate cod with
@@ -370,6 +358,17 @@ value print_dates conf base open_area p =
             return ()
         | UnknownBurial -> () ];
      return ();
+     match Date.get_birth_death_date p with
+     [ (Some (Dgreg d1 _), Some (Dgreg d2 _), approx) when d1 <> d2 ->
+         let a = temps_ecoule d1 d2 in
+         do open_area ();
+            Wserver.wprint "%s " (capitale (transl conf "age at death:"));
+            if not approx && d1.prec = Sure && d2.prec = Sure then ()
+            else Wserver.wprint "%s " (transl conf "possibly (date)");
+            Date.print_age conf a;
+            Wserver.wprint "\n";
+         return ()
+     | _ -> () ];
   return ()
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.12 2000-05-04 14:41:06 ddr Exp $ *)
+(* $Id: date.ml,v 3.13 2000-05-12 07:49:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -283,13 +283,27 @@ value of_course_died conf p =
   | _ -> False ]
 ;
 
+value get_birth_death_date p =
+  let (birth_date, approx) =
+    match Adef.od_of_codate p.birth with
+    [ None -> (Adef.od_of_codate p.baptism, True)
+    | x -> (x, False) ]
+  in
+  let (death_date, approx) =
+    match date_of_death p.death with
+    [ Some d -> (Some d, approx)
+    | _ ->
+        match p.burial with
+        [ Buried cd -> (Adef.od_of_codate cd, True)
+        | Cremated cd -> (Adef.od_of_codate cd, True)
+        | _ -> (None, approx) ] ]
+  in
+  (birth_date, death_date, approx)
+;
+
 value short_dates_text conf base p =
   if age_autorise conf base p then
-    let birth_date =
-      match Adef.od_of_codate p.birth with
-      [ None -> Adef.od_of_codate p.baptism
-      | x -> x ]
-    in
+    let (birth_date, death_date, _) = get_birth_death_date p in
     let s =
       match (birth_date, p.death) with
       [ (Some _, DontKnowIfDead) -> "*"
@@ -301,15 +315,16 @@ value short_dates_text conf base p =
       | _ -> s ]
     in
     let s =
-      match (birth_date, p.death) with
-      [ (Some _, Death _ _ | NotDead) -> s ^ "-"
-      | (_, Death _ _) -> if s = "" then "+" else s ^ nbsp ^ "+"
-      | (_, DeadDontKnowWhen | DeadYoung) ->
-          if s = "" then "+" else s ^ nbsp ^ "+"
-      | _ -> s ]
+      match (birth_date, death_date) with
+      [ (Some _, Some _) -> s ^ "-"
+      | _ ->
+          match p.death with
+          [ Death _ _ | DeadDontKnowWhen | DeadYoung ->
+              if s = "" then "+" else s ^ nbsp ^ "+"
+          | _ -> s ] ]
     in
     let s =
-      match date_of_death p.death with
+      match death_date with
       [ Some (Dgreg d _) -> s ^ year_text d
       | _ -> s ]
     in
@@ -395,18 +410,6 @@ value print_dates conf base p =
           return ()
         else ();
      return ();
-     let sure d = d.prec = Sure in
-     match (Adef.od_of_codate p.birth, date_of_death p.death) with
-     [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
-         if sure d1 && sure d2 && d1 <> d2 then
-           let a = temps_ecoule d1 d2 in
-           do Wserver.wprint "\n(";
-              Wserver.wprint "%s " (transl conf "age at death:");
-              print_age conf a;
-              Wserver.wprint ")";
-           return ()
-         else ()
-     | _ -> () ];
      let burial_date_place cod =
        let place = sou base p.burial_place in
        do match Adef.od_of_codate cod with
@@ -431,6 +434,18 @@ value print_dates conf base p =
             return ()
         | UnknownBurial -> () ];
      return ();
+     let (birth_date, death_date, approx) = get_birth_death_date p in
+     match (birth_date, death_date) with
+     [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) when d1 <> d2 ->
+         let a = temps_ecoule d1 d2 in
+         do Wserver.wprint "\n(";
+            Wserver.wprint "%s " (transl conf "age at death:");
+            if not approx && d1.prec = Sure && d2.prec = Sure then ()
+            else Wserver.wprint "%s " (transl conf "possibly (date)");
+            print_age conf a;
+            Wserver.wprint ")";
+         return ()
+     | _ -> () ];
   return ()
 ;
 
