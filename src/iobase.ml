@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 3.3 2000-03-22 04:14:55 ddr Exp $ *)
+(* $Id: iobase.ml,v 3.4 2000-03-22 04:38:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1070,6 +1070,7 @@ do Printf.eprintf "*** create first name index\n"; flush stderr; return
             Sys.rename tmp_fname_not (Filename.concat bname "notes")
           else ();
           remove_file (Filename.concat bname "patches");
+          remove_file (Filename.concat bname "patches~");
           remove_file (Filename.concat bname "tstab");
        return ()
      else ();
