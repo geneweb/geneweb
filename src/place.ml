@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.11 2002-01-27 08:26:24 ddr Exp $ *)
+(* $Id: place.ml,v 4.12 2002-01-29 00:29:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -147,9 +147,6 @@ value get_all conf base =
       (fun (istr_pl, _) (cnt, ip) ->
          let s = fold_place inverted (sou base istr_pl) in
          if s <> [] && (ini = "" || List.hd s = ini) then do {
-(*
-           let s = List.sort compare s in
-*)
            list.val := [(s, cnt.val, ip) :: list.val]; incr len
          }
          else ())
@@ -260,9 +257,24 @@ value print_html_places_surnames conf base =
 value print_all_places_surnames_short conf list =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "place")) in
   let list =
+    List.map
+      (fun (s, len, ip) ->
+         let s = List.hd s in
+         (s, len, ip) )
+      list
+  in
+  let list =
+    Sort.list
+      (fun (s1, _, _) (s2, _, _) ->
+         let s1_l = Name.lower s1 in
+         let s2_l = Name.lower s2 in
+         if s1_l = s2_l then s1 <= s2 
+         else s1_l <= s2_l)
+      list
+  in
+  let list =
     List.fold_left
-      (fun list (pl, len, ip) ->
-         let p = List.hd pl in
+      (fun list (p, len, ip) ->
          match list with
          [ [(p1, len1, ip1) :: list1] when p1 = p ->
              [(p1, len1 + len, ip1) :: list1]
