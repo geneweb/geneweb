@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 1.2 1998-09-29 16:12:16 ddr Exp $ *)
+(* $Id: descend.ml,v 1.3 1998-11-26 12:42:38 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -9,8 +9,6 @@ open Util;
 value limit_by_list = 8;
 
 value infini = 10000;
-
-value coa = Util.charset_of_ansel;
 
 value make_level_table base niveau_max p =
   let mark = Array.create (base.persons.len) False in
@@ -153,7 +151,7 @@ value afficher_marie conf base first fam p conjoint =
          (fun _ ->
             if age_autorise conf base p && age_autorise conf base conjoint then
               let marriage = Adef.od_of_codate fam.marriage in
-              let marriage_place = sou base fam.marriage_place in
+              let marriage_place = coa conf (sou base fam.marriage_place) in
               do match (marriage, marriage_place) with
                  [ (None, "") -> ()
                  | _ -> Wserver.wprint "\n" ];

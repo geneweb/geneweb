@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.19 1998-11-26 11:23:27 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.20 1998-11-26 12:42:36 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -299,13 +299,13 @@ type gen =
    g_fam : tab (choice string base_family);
    g_cpl : tab (choice string base_couple);
    g_str : tab string;
+   g_ic : in_channel;
    g_not : Hashtbl.t string int;
+   g_src : Hashtbl.t string int;
    g_hper : Hashtbl.t string Adef.iper;
    g_hfam : Hashtbl.t string Adef.ifam;
    g_hstr : Hashtbl.t string Adef.istr;
-   g_hnot : Hashtbl.t string record;
-   g_hnam : Hashtbl.t string (ref int);
-   g_fnot : mutable list (iper * list record)}
+   g_hnam : Hashtbl.t string (ref int)}
 ;
 
 value assume_tab name tab none =
@@ -444,14 +444,6 @@ value lowercase_name s =
       do s.[i] := c; return loop uncap (i + 1)
 ;
 
-value source gen r =
-  match find_field "SOUR" r.rsons with
-  [ Some r ->
-      if String.length r.rval > 0 && r.rval.[0] = '@' then ""
-      else r.rval
-  | _ -> "" ]
-;
-
 value look_like_a_number s =
   loop 0 where rec loop i =
     if i == String.length s then True
@@ -507,28 +499,60 @@ value rec is_a_public_name s i =
     else False
 ;
 
-value extract_notes gen rl nf =
+value get_lev0 =
+  parser
+  [ [: `'0'; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
+       r3 = get_to_eoln 0 ? "get to eoln";
+       l = get_lev_list [] '1' ? "get lev list" :] ->
+      let (rlab, rval) = if r2 = "" then (r1, "") else (r2, r1) in
+      let rval =
+        if ansel_characters.val then rval else Ansel.of_iso_8859_1 rval
+      in
+      let rcont =
+        if ansel_characters.val then r3 else Ansel.of_iso_8859_1 r3
+      in
+      {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l} ]
+;
+
+value find_notes_record gen addr =
+  match try Some (Hashtbl.find gen.g_not addr) with [ Not_found -> None ] with
+  [ Some i ->
+      do seek_in gen.g_ic i; return
+      Some (get_lev0 (Stream.of_channel gen.g_ic))
+  | None -> None ]
+;
+
+value find_sources_record gen addr =
+  match try Some (Hashtbl.find gen.g_src addr) with [ Not_found -> None ] with
+  [ Some i ->
+      do seek_in gen.g_ic i; return
+      Some (get_lev0 (Stream.of_channel gen.g_ic))
+  | None -> None ]
+;
+
+value extract_notes gen rl =
   List.fold_right
     (fun r lines ->
        List.fold_right
          (fun r lines ->
             if r.rlab = "NOTE" && r.rval <> "" && r.rval.[0] == '@'
             then
-              let (r, lab) =
-                try (Hashtbl.find gen.g_hnot r.rval, "NOTE") with
-                [ Not_found ->
-                    ({rlab = ""; rval = ""; rcont = nf r.rval; rsons = []},
-                     "") ]
-              in
-              let l = List.map (fun r -> (r.rlab, r.rval)) r.rsons in
-              [(lab, r.rcont) :: l @ lines]
+              match find_notes_record gen r.rval with
+              [ Some r ->
+                  let l = List.map (fun r -> (r.rlab, r.rval)) r.rsons in
+                  [("NOTE", r.rcont) :: l @ lines]
+              | None ->
+                  do print_location ();
+                     Printf.printf "Note %s not found\n" r.rval;
+                     flush stdout;
+                  return lines ]
             else [(r.rlab, r.rval) :: lines])
          [r :: r.rsons] lines)
     rl []
 ;
 
-value treat_indi_notes_titles gen rl nf =
-  let lines = extract_notes gen rl nf in
+value treat_indi_notes_titles gen rl =
+  let lines = extract_notes gen rl in
   let (notes, titles) =
     List.fold_left
       (fun (s, titles) (lab, n) ->
@@ -547,8 +571,8 @@ value treat_indi_notes_titles gen rl nf =
   (add_string gen (strip_newlines notes), titles)
 ;
 
-value treat_indi_notes gen rl nf =
-  let lines = extract_notes gen rl nf in
+value treat_indi_notes gen rl =
+  let lines = extract_notes gen rl in
   let notes =
     List.fold_left
       (fun s (lab, n) ->
@@ -560,6 +584,21 @@ value treat_indi_notes gen rl nf =
       "" lines
   in
   add_string gen (strip_newlines notes)
+;
+
+value source gen r =
+  match find_field "SOUR" r.rsons with
+  [ Some r ->
+      if String.length r.rval > 0 && r.rval.[0] = '@' then
+        match find_sources_record gen r.rval with
+        [ Some v -> v.rcont
+        | None ->
+            do print_location ();
+               Printf.printf "Source %s not found\n" r.rval;
+               flush stdout;
+            return "" ]
+      else r.rval
+  | _ -> "" ]
 ;
 
 value string_empty = ref (Adef.istr_of_int 0);
@@ -727,20 +766,12 @@ value add_indi gen r =
     if titles_aurejac.val then
       match find_all_fields "NOTE" r.rsons with
       [ [] -> (string_empty.val, [])
-      | rl ->
-          try treat_indi_notes_titles gen rl (fun _ -> raise Not_found) with
-          [ Not_found ->
-              do gen.g_fnot := [(i, rl) :: gen.g_fnot]; return
-              (string_empty.val, []) ] ]
+      | rl -> treat_indi_notes_titles gen rl ]
     else
       let notes =
         match find_all_fields "NOTE" r.rsons with
         [ [] -> string_empty.val
-        | rl ->
-            try treat_indi_notes gen rl (fun _ -> raise Not_found) with
-            [ Not_found ->
-                do gen.g_fnot := [(i, rl) :: gen.g_fnot]; return
-                string_empty.val ] ]
+        | rl -> treat_indi_notes gen rl ]
       in
       (notes, [])
   in
@@ -989,14 +1020,6 @@ value add_fam gen r =
   return ()
 ;
 
-value add_note gen r =
-  Hashtbl.add gen.g_hnot r.rval r
-;
-
-value add_source gen r =
-  ()
-;
-
 value treat_header r =
   match ansel_option.val with
   [ Some v -> ansel_characters.val := v
@@ -1021,8 +1044,8 @@ do Printf.printf "%s %s\n" r.rlab r.rval; flush stdout; return
       return ()
   | "INDI" -> add_indi gen r
   | "FAM" -> add_fam gen r
-  | "NOTE" -> add_note gen r
-  | "SOUR" -> add_source gen r
+  | "NOTE" -> ()
+  | "SOUR" -> ()
   | "TRLR" ->
       do Printf.eprintf "*** Trailer ok\n";
          flush stderr;
@@ -1132,6 +1155,7 @@ value pass1 gen fname =
        [ Some (bp, r1, r2) ->
            do match r2 with
               [ "NOTE" -> Hashtbl.add gen.g_not r1 bp
+              | "SOUR" -> Hashtbl.add gen.g_src r1 bp
               | _ -> () ];
            return loop ()
        | None ->
@@ -1140,21 +1164,6 @@ value pass1 gen fname =
            | [: :] -> () ] ];
      close_in ic;
   return ()
-;
-
-value get_lev0 =
-  parser
-  [ [: `'0'; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
-       r3 = get_to_eoln 0 ? "get to eoln";
-       l = get_lev_list [] '1' ? "get lev list" :] ->
-      let (rlab, rval) = if r2 = "" then (r1, "") else (r2, r1) in
-      let rval =
-        if ansel_characters.val then rval else Ansel.of_iso_8859_1 rval
-      in
-      let rcont =
-        if ansel_characters.val then r3 else Ansel.of_iso_8859_1 r3
-      in
-      {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l} ]
 ;
 
 value pass2 gen fname =
@@ -1189,24 +1198,6 @@ value pass2 gen fname =
                return loop ()
            | [: :] -> () ] ];
      close_in ic;
-     let nf n =
-       do Printf.printf "Note not found %s\n" n;
-          flush stdout;
-       return ""
-     in
-     List.iter
-       (fun (i, rl) ->
-          if titles_aurejac.val then
-            let (notes, titles) = treat_indi_notes_titles gen rl nf in
-            match gen.g_per.arr.(Adef.int_of_iper i) with
-            [ Left _ -> ()
-            | Right p -> do p.notes := notes; p.titles := titles; return () ]
-          else
-            let notes = treat_indi_notes gen rl nf in
-            match gen.g_per.arr.(Adef.int_of_iper i) with
-            [ Left _ -> ()
-            | Right p -> p.notes := notes ])
-       gen.g_fnot;
      for i = 0 to gen.g_per.tlen - 1 do
        match gen.g_per.arr.(i) with
        [ Right _ -> ()
@@ -1221,28 +1212,29 @@ value pass2 gen fname =
 ;
 
 value make_arrays in_file =
+  let fname =
+    if Filename.check_suffix in_file ".ged" then in_file
+    else in_file ^ ".ged"
+  in
   let gen =
     {g_per = {arr = [| |]; tlen = 0};
      g_asc = {arr = [| |]; tlen = 0};
      g_fam = {arr = [| |]; tlen = 0};
      g_cpl = {arr = [| |]; tlen = 0};
      g_str = {arr = [| |]; tlen = 0};
+     g_ic = open_in fname;
      g_not = Hashtbl.create 3001;
+     g_src = Hashtbl.create 3001;
      g_hper = Hashtbl.create 3001;
      g_hfam = Hashtbl.create 3001;
      g_hstr = Hashtbl.create 3001;
-     g_hnot = Hashtbl.create 3001;
-     g_hnam = Hashtbl.create 3001;
-     g_fnot = []}
-  in
-  let fname =
-    if Filename.check_suffix in_file ".ged" then in_file
-    else in_file ^ ".ged"
+     g_hnam = Hashtbl.create 3001}
   in
   do Printf.eprintf "*** pass 1\n"; flush stderr;
      pass1 gen fname;
      Printf.eprintf "*** pass 2\n"; flush stderr;
      pass2 gen fname;
+     close_in gen.g_ic;
   return
   (gen.g_per, gen.g_asc, gen.g_fam, gen.g_cpl, gen.g_str)
 ;
