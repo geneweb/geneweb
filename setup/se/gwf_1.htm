@@ -1,0 +1,432 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Parametrar "$a"</title></head>
+
+<body>
+
+<h1>Parametrar "$a"</h1>
+
+<form mode=GET action="gwf_1">
+<input type=hidden name=lang value=$l>
+<input type=hidden name=anon value=$a>
+
+<p>
+
+Här är parametrarna för databasen <a
+href="http://localhost:2317/$a">$a</a>. Ändra vad du anser nödvändigt:
+
+<p>
+
+<dl><dt>
+<dd><table border=1>
+<tr>
+<td><strong>- body_prop -</strong></td>
+</tr>
+
+<tr>
+<td>Gör det möjligt att ändra bakgrunds färgen, att sätta in ett bakgrunds mönster
+eller att ändra färgen för texten eller länkarna. Syntaxen är den samma
+som HTML accepterar i taggen "&lt;body&gt;" före "&gt;". Se din
+HTML dokumentation. Exempel:
+<p>
+<pre>
+     text=#CC0000 vlink=yellow
+</pre>
+<p>
+Några intressanta variabler...
+<ul>
+<li>background: bakgrundsbild (se <a
+href="setup?lang=$l;o=$a;v=backg.htm">noteringen</a>)
+<li>bgcolor: bakgrundsfärg
+<li>text: textfärg
+<li>link: länkfärg
+<li>vlink: färg för de redan besökta länkarna
+</ul>
+<p>
+Du kan också välja en av följande föreslagna färg kombinationer.
+<p>
+Detta gäller inte bara för välkomstsidan utan för alla visade sidor
+för denna databas.
+</td>
+</tr>
+
+<tr><td align=center>
+<table border=0>
+<tr>
+<td colspan=3>
+<input type=radio name=proposed_body_prop value="" checked>
+<input name=body_prop value="$B" size=55><br>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#FFFFFF">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFFFF text=#333333 link=#006699 vlink=#999900">
+<font color="#333333">text</font>
+<font color="#006699">link</font>
+<font color="#999900">vlink</font>
+</td>
+<td bgcolor="#FFFFEE">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFFEE text=#000000 link=#006699 vlink=#990000">
+<font color="#000000">text</font>
+<font color="#006699">link</font>
+<font color="#990000">vlink</font>
+</td>
+<td bgcolor="#CCCCCC">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCCCCC text=#000000 link=#0000CC vlink=#660066">
+<font color="#000000">text</font>
+<font color="#0000CC">link</font>
+<font color="#660066">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#FFFF00">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFF00 text=#FF6600 link=#FF0033 vlink=#336633">
+<font color="#FF6600">text</font>
+<font color="#FF0033">link</font>
+<font color="#336633">vlink</font>
+</td>
+<td bgcolor="#CCCC66">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCCC66 text=#330000 link=#CC0000 vlink=#003300">
+<font color="#330000">text</font>
+<font color="#CC0000">link</font>
+<font color="#003300">vlink</font>
+</td>
+<td bgcolor="#FFFF99">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFF99 text=#330000 link=#CC0000 vlink=#333333">
+<font color="#330000">text</font>
+<font color="#CC0000">link</font>
+<font color="#333333">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#99CCCC">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#99CCCC text=#000066 link=#0000CC vlink=#003366">
+<font color="#000066">text</font>
+<font color="#0000CC">link</font>
+<font color="#003366">vlink</font>
+</td>
+<td bgcolor="#CC99FF">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CC99FF text=#000000 link=#FF0033 vlink=#660066">
+<font color="#000000">text</font>
+<font color="#FF0033">link</font>
+<font color="#660066">vlink</font>
+</td>
+<td bgcolor="#CCFF99">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCFF99 text=#666600 link=#006699 vlink=#003300">
+<font color="#666600">text</font>
+<font color="#006699">link</font>
+<font color="#003300">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#FFCC00">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFCC00 text=#330000 link=#CC0000 vlink=#660066">
+<font color="#330000">text</font>
+<font color="#CC0000">link</font>
+<font color="#660066">vlink</font>
+</td>
+<td bgcolor="#00FF33">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#00FF33 text=#0000CC link=#FF0099 vlink=#660066">
+<font color="#0000CC">text</font>
+<font color="#FF0099">link</font>
+<font color="#660066">vlink</font>
+</td>
+<td bgcolor="#006699">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#006699 text=#CCFFCC link=#FFFF00 vlink=#00FFFF">
+<font color="#CCFFCC">text</font>
+<font color="#FFFF00">link</font>
+<font color="#00FFFF">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#330000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#330000 text=#FF6666 link=#FFCC00 vlink=#CCFF99">
+<font color="#FF6666">text</font>
+<font color="#FFCC00">link</font>
+<font color="#CCFF99">vlink</font>
+</td>
+<td bgcolor="#003300">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#003300 text=#CCCC66 link=#FFFFFF vlink=#FFFF00">
+<font color="#CCCC66">text</font>
+<font color="#FFFFFF">link</font>
+<font color="#FFFF00">vlink</font>
+</td>
+<td bgcolor="#333333">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#333333 text=#CCCCCC link=#FF6666 vlink=#CCCC66">
+<font color="#CCCCCC">text</font>
+<font color="#FF6666">link</font>
+<font color="#CCCC66">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#666600">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#666600 text=#FFFFFF link=#FFFF00 vlink=#99CCFF">
+<font color="#FFFFFF">text</font>
+<font color="#FFFF00">link</font>
+<font color="#99CCFF">vlink</font>
+</td>
+<td bgcolor="#000000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#000000 text=#99CCFF link=#FFFF00 vlink=#CCCC66">
+<font color="#99CCFF">text</font>
+<font color="#FFFF00">link</font>
+<font color="#CCCC66">vlink</font>
+</td>
+<td bgcolor="#333333">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#333333 text=#FFFFFF link=#99CCFF vlink=#CC99FF">
+<font color="#FFFFFF">text</font>
+<font color="#99CCFF">link</font>
+<font color="#CC99FF">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#CC0000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF">
+<font color="#FFFFFF">text</font>
+<font color="#FFFF00">link</font>
+<font color="#00FFFF">vlink</font>
+</td>
+</tr>
+</table>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><strong>- enclosing_tag -</strong></td>
+</tr>
+
+<tr>
+<td>Text formatering
+<p>
+Gör det möjligt att visa texten i fetstil, kursivstil och i liten eller
+stor teckenstil.
+<p>
+Fetstil kan vara användbar, till exempel, när en bakgrundsbild
+har valts, så att texten blir lättare att läsa.
+</td>
+</tr>
+
+<tr>
+<td align=center>
+All text visas med fetstil
+<input type=checkbox name=enclosing_tag_strong value=$1[on]>
+</td>
+</tr>
+
+<tr>
+<td align=center>
+All text visas med kursivstil
+<input type=checkbox name=enclosing_tag_em value=$2[on]>
+</td>
+</tr>
+
+<tr>
+<td align=center>
+Text storlek
+<select name=enclosing_tag_size>
+<option value=$3{s2}>väldigt liten
+<option value=$3{s1}>liten
+<option value=$3{}>normal
+<option value=$3{b1}>stor
+<option value=$3{b2}>väldigt stor
+</select>
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><strong>- default_lang -</strong></td>
+</tr
+
+<tr>
+<td>Förvalt språk.
+<p>
+Om det är "-", kommer det förvalda språket för kommandot "gwd" att gälla.
+</td>
+</tr>
+
+<tr>
+<td align=center>
+<select name=default_lang>
+<option value=$L{}>-
+<option value=$L{cn}>kinesiska
+<option value=$L{cs}>tjeckiska
+<option value=$L{dk}>danska
+<option value=$L{nl}>holländska
+<option value=$L{en}>engelska
+<option value=$L{eo}>esperanto
+<option value=$L{fr}>franska
+<option value=$L{de}>tyska
+<option value=$L{he}>hebreiska
+<option value=$L{it}>italienska
+<option value=$L{no}>norska
+<option value=$L{pt}>portugisiska
+<option value=$L{es}>spanska
+<option value=$L{se}>svenska
+</select>
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><strong>- friend_passwd -</strong></td>
+</tr>
+
+<tr>
+<td>Passord för "friends".
+<p>
+"Friends" kan se alla datum, noteringar coh foton för personer födda
+det senaste århundradet. De som inte anger passordet nedan
+kommer inte att se denna information.
+<p>
+Om den lämnas tom, är alla en "friend".
+</td>
+</tr>
+
+<tr>
+<td align=center><input name=friend_passwd value="$F" size=30></td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><strong>- wizard_passwd -</strong></td>
+</tr>
+
+<tr>
+<td>Passord för "wizards".
+<p>
+"Wizards" kan göra modifieringar i databasen.
+<p>
+Om den lämnas tom, är alla en "wizard".
+</td>
+</tr>
+
+<tr>
+<td align=center><input name=wizard_passwd value="$W" size=30></td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><strong>- can_send_image -</strong></td>
+</tr>
+
+<tr>
+<td>Möjlighet att sända foton.
+<p>
+Om yes, har "wizards" behörighet att sända foton.
+<p>
+Det kan vara användbart lokalt, när man vill sätta in ett foto av någon,
+därför att proceduren installerar fotot automatiskt på rätt plats och med rätt
+filnamn.
+</td>
+</tr>
+
+<tr>
+<td align=center>
+<input type=radio name=can_send_image value=$I[yes]>Yes
+<input type=radio name=can_send_image value=$I[no]>No
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>- wizard_just_friend -</strong></td>
+</tr>
+
+<tr>
+<td>"Wizards" blir enkla "friend".
+<p>
+Om yes, förlorar "wizards" deras behörighet att göra uppdateringar.
+<p>
+Detta kan vara användbart, temporärt, när du gör en upprensning av din databas,
+om den är åtkomstbar över internet, för att undvika att "wizards" gör ändringar
+vilka skulle förloras under operationen (kom ihåg att ta bort denna option efter
+upprensningen).
+</td>
+</tr>
+
+<tr>
+<td align=center>
+<input type=radio name=wizard_just_friend value=$J[yes]>Yes
+<input type=radio name=wizard_just_friend value=$J[no]>No
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><strong>- renamed -</strong></td>
+</tr>
+
+<tr>
+<td>Databasen har blivit omdöpt.
+<p>
+Om du ändrar namnet på din databas, men databasen har funnits
+ett bra tag och du tror att många personer har lagt upp länkar till
+den, behåll denna parameter fil för denna databas och skriv här det nya namnet
+för databasen. Personer som konsulterat databasen med det gamla namnet
+kommer då att se en sida som hänvisar dem till den nya databasen.
+<p>
+Om den är tom, har databasen inte blivit omdöpt.
+</td>
+</tr>
+
+<tr>
+<td align=center><input name=renamed value="$R" size=30></td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td>
+Om du vill att en text ska synas längst ner på varje sida, skriv den här.
+Du kan använda HTML taggar.
+</td>
+</tr>
+<tr>
+<td>
+<textarea name=trailer rows=3 cols=60 wrap=virtual>$T</textarea>
+</td>
+</tr>
+</table></dl>
+
+<p>
+
+Tryck sedan på denna knapp:
+
+<p>
+
+<input type=submit value="Sätt">
+
+</form>

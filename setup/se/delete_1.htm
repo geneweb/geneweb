@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Radering av databaser</title></head>
+
+<body>
+
+<h1>Radering av databaser</h1>
+
+<p>
+
+<form mode=GET action="delete_1">
+<input type=hidden name=lang value=$l>
+$k{<input type=hidden name="$a" value=del>|}
+
+Är du säker att du vill radera dessa databaser?
+
+<p>
+
+<ul>
+
+$k{<li><a href="http://localhost:2317/$a">$a</a>|
+<li>[inga val]}
+
+</ul>
+
+<p>
+
+Varning: detta val är definitivt! För att bekräfta, tryck på denna knapp.
+
+<p>
+
+<dl><dt><dd><input type=submit value="Radera"></dl>
+
+<p>
+
+Eller återvänd till <a href="setup?lang=$l;v=main.htm">huvudmenyn</a>.

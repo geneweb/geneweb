@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Rensa upp - fas 2</title></head>
+
+<body>
+
+<h1>Rensa upp</h1>
+
+<p>
+
+Vi ska gå vidare med att rensa upp databasen "$a".
+
+<p>
+
+Varning: denna operation kan ta några sekunder eller minuter, beroende på
+fallet. Ha tålamod.
+
+<p>
+
+Tryck på knappen nedan för att starta operationen.
+
+<p>
+
+<form mode=GET action="cleanup_1">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+Denna operation motsvarar de följande kommandona:
+
+<pre>
+     $$ cd $w
+     $$ .$/gwu $a -o tmp.gw
+     $$ mkdir old
+     Under Unix:
+       $$ rm -rf old/$a.gwb
+       $$ mv $a.gwb old/.
+     Under MSdos:
+       $$ del old\$a.gwb\*.*
+       $$ rmdir old\$a.gwb
+       $$ move $a.gwb old\.
+     $$ .$/gwc tmp.gw -o $a > comm.log
+</pre>

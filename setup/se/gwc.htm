@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Importera en GeneWeb källfil</title></head>
+
+<body>
+
+<h1>Importera en GeneWeb källfil</h1>
+
+<form mode=GET action="gwc">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Skriv in:
+
+<ul><li>Det kompletta namnet för din <em>GeneWeb</em> källfil (den måste sluta med ".gw");
+du kan använda bläddra knappen för hitta den på din dator, om din webbläsare
+visar någon.
+
+<p>
+
+<input name=anon $n{type=file} size=55>
+
+</ul>
+
+<p>
+
+<ul><li>Namnet du vill kalla din <em>GeneWeb</em> databas. Om du
+inte skriver någonting, kommer den att bli härlätt från <em>GeneWeb</em> källfilen.
+
+<p>
+
+<input name=o size=30>
+
+</ul>
+
+<p>
+
+Välj de optioner du vill ha:
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=stats value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Visa en statistik på slutet (de kommer att synas i utskriften).</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=nc value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Kontrollera inte att databasens data är ok.</td></tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=cg value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Avluta med att beräkna blodsbanden.</td> </tr>
+</table></dl>
+
+<p>
+
+Klicka sedan på "Ok".
+
+<p>
+
+<input type=submit value="Ok">
+</form>

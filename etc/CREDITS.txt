@@ -28,6 +28,7 @@ Documentation
 
 Setup program
 	Spanish		Luis Castro Guzman
+	Swedish		Lars Gustavsson
 
 Initial version of Linux rpm spec file by
 		Dan Kegel
