@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.50 2000-09-20 19:25:14 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.51 2000-09-21 09:36:05 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -387,7 +387,14 @@ value check_login b p =
   let login_ok =
     loop () where rec loop () =
       match try Some (input_line ic) with [ End_of_file -> None ] with
-      [ Some line -> if line = line1 then True else loop ()
+      [ Some line ->
+          let line =
+            if String.length line > 0
+            && line.[String.length line - 1] = '\r' then
+              String.sub line 0 (String.length line - 1)
+            else line
+          in
+          if line = line1 then True else loop ()
       | None -> False ]
   in
   do close_in ic; return
