@@ -16,6 +16,9 @@ Added doc for databases maintenance.
   - fixed bug displaying "Uncaught exception: Stream.Error("get to eoln")" when
     the gedcom file did not end with a newline
 
+* consang:
+  - more clear message when consang does not work, because of loop in database
+
 GeneWeb Version 1.07
 --------------------
 

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 1.6 1998-10-06 12:06:55 ddr Exp $ *)
+(* $Id: some.ml,v 1.7 1998-10-20 09:22:06 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -343,7 +343,7 @@ value print_family_alphabetic x conf base liste =
   match liste with
   [ [] -> surname_not_found conf x
   | _ ->
-      let title _ = Wserver.wprint "%s" x in
+      let title _ = Wserver.wprint "%s" (coa conf x) in
       do header conf title;
          print_alphab_list (fun (p, _) -> String.sub p (initiale p) 1)
            (print_elem conf base False) liste;
