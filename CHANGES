@@ -5,6 +5,11 @@ GeneWeb version 4.01
   - [14 Mar 01] Added Brazilian Portuguese (Paulo Francisco Sedrez).
 
 * GeneWeb server or CGI (gwd)
+  - [15 Mar 01] Fixed bug: when merging two men (the problem did not
+    happen for women), the witnesses of mariage of the second man were
+    incompletely reported to the first one (they are indicated as witness
+    in the first man page, but not in their own personal page in the
+    "relation" section).
   - [15 Mar 01] The displaying of "John Foo of Bar, duke of Bar" ("Foo of
     Bar" being his complete surname) is now displayed "John Foo, duke of Bar"
     (was displayed like that before only for the case "John of Bar, duke of
