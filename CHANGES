@@ -8,11 +8,16 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jul 9, 99] Added link (upper arrow) to welcome page in displays by
+    first names and surnames.
+  - [Jul 9, 99] Fixed date check for possible father when interval (i.e. was
+    telling "incorrect" when father died between 1250 and 1260 and son born
+    in 1255).
   - [Jul 3, 99] Added "af" as possible surnames particles (this is Danish)
     possibly ignored in "search".
 
 * Gedcom to GeneWeb (ged2gwb)
-  - [Jun 5, 99] Fixed bug sometimes stopping the program (exception
+  - [Jul 5, 99] Fixed bug sometimes stopping the program (exception
     "Invalid_argument") after the detection of an error of a family whose
     parents are of bad sex (female father and male mother).
   - [Jul 2, 99] Recognizes the dates of the form "FROM..TO..".

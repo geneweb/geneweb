@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.13 1999-06-26 10:23:18 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.14 1999-07-09 10:25:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -441,7 +441,13 @@ value possible_father base warning x ifath =
       match (d1, Adef.date_of_cdate d2) with
       [ ({prec = Before}, _) | (_, {prec = After}) -> ()
       | (d1, d2) ->
-          if annee d1 > annee d2 + 1 then
+          let a2 =
+            match d2 with
+            [ {prec = YearInt a2} -> a2
+            | {prec = OrYear a2} -> a2
+            | {year = a} -> a ]
+          in
+          if annee d1 > a2 + 1 then
             warning (DeadTooEarlyToBeFather father x)
           else () ]
   | _ -> () ]
