@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.37 2003-11-25 14:39:39 ddr Exp $ *)
+(* $Id: relation.ml,v 4.38 2003-11-26 17:08:09 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -372,8 +372,8 @@ value html_table_of_relation_path_dag conf base elem_txt vbar_txt path =
 value next_relation_link_txt conf ip1 ip2 excl_faml =
   let bd =
     match p_getenv conf.env "bd" with
-    [ Some x -> ";bd=" ^ x
-    | None -> "" ]
+    [ None | Some ("0" | "") -> ""
+    | Some x -> ";bd=" ^ x ]
   in
   let (sl, _) =
     List.fold_left
@@ -1476,7 +1476,7 @@ value print_main_relationship conf base long p1 p2 rel =
     [ Some "on" -> conf.senv := conf.senv @ [("cgl", "on")]
     | _ -> () ];
     match p_getenv conf.env "bd" with
-    [ None | Some "" | Some "0" -> ()
+    [ None | Some ("0" | "") -> ()
     | Some x -> conf.senv := conf.senv @ [("bd", x)] ];
     match rel with
     [ None ->
