@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.10 2002-03-11 17:56:56 ddr Exp $ *)
+(* $Id: date.ml,v 4.11 2002-03-11 19:02:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -265,7 +265,7 @@ value year_text d =
     | About | Maybe -> "ca "
     | _ -> "" ]
   in
-  let s = s ^ string_of_int (annee d) in
+  let s = s ^ string_of_int (year_of d) in
   match d.prec with
   [ After -> s ^ "/"
   | OrYear x -> s ^ "/" ^ string_of_int x
@@ -432,7 +432,7 @@ value print_dates conf base p =
     [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
        Some (Dgreg ({prec = Sure | About | Maybe} as d2) _))
       when d1 <> d2 ->
-        let a = temps_ecoule d1 d2 in
+        let a = time_gone_by d1 d2 in
         if a.year < 0 || a.year = 0 && a.month = 0 then ()
         else do {
           Wserver.wprint "\n(";

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.23 2002-03-11 18:36:07 ddr Exp $ *)
+(* $Id: family.ml,v 4.24 2002-03-11 19:02:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -22,7 +22,7 @@ value select_std_eq base pl k =
     (fun p pl -> if person_is_std_key base p k then [p :: pl] else pl) pl []
 ;
 
-value inconnu_au_bataillon conf =
+value very_unknown conf =
   match (p_getenv conf.env "n", p_getenv conf.env "p") with
   [ (Some nom, Some prenom) ->
       let title _ =
@@ -35,7 +35,7 @@ value inconnu_au_bataillon conf =
   | _ -> incorrect_request conf ]
 ;
 
-value inconnu conf n =
+value unknown conf n =
   let title _ =
     Wserver.wprint "%s: \"%s\"" (capitale (transl conf "not found")) n
   in
@@ -77,13 +77,13 @@ value compact_list conf base xl =
            (Adef.od_of_codate p1.birth, p1.death, Adef.od_of_codate p2.birth,
             p2.death)
          with
-         [ (Some d1, _, Some d2, _) -> d1 strictement_avant d2
+         [ (Some d1, _, Some d2, _) -> d1 strictly_before d2
          | (Some d1, _, _, Death _ d2) ->
-             d1 strictement_avant Adef.date_of_cdate d2
+             d1 strictly_before Adef.date_of_cdate d2
          | (_, Death _ d1, Some d2, _) ->
-             Adef.date_of_cdate d1 strictement_avant d2
+             Adef.date_of_cdate d1 strictly_before d2
          | (_, Death _ d1, _, Death _ d2) ->
-             Adef.date_of_cdate d1 strictement_avant Adef.date_of_cdate d2
+             Adef.date_of_cdate d1 strictly_before Adef.date_of_cdate d2
          | (Some _, _, _, _) -> False
          | (_, Death _ _, _, _) -> False
          | (_, _, Some _, _) -> True
@@ -212,7 +212,7 @@ value find_all conf base an =
       compact_list conf base pl ]
 ;
 
-value precisez conf base n pl =
+value specify conf base n pl =
   let title _ = Wserver.wprint "%s : %s" n (transl conf "specify") in
   let n = Name.crush_lower n in
   let ptll =
@@ -368,7 +368,7 @@ value family_m conf base =
   [ Some "A" ->
       match find_person_in_env conf base "" with
       [ Some p -> Ascend.print conf base p
-      | _ -> inconnu_au_bataillon conf ]
+      | _ -> very_unknown conf ]
   | Some "ADD_FAM" when conf.wizard -> UpdateFam.print_add conf base
   | Some "ADD_FAM_OK" when conf.wizard -> UpdateFamOk.print_add conf base
   | Some "ADD_IND" when conf.wizard -> UpdateInd.print_add conf base
@@ -392,14 +392,14 @@ value family_m conf base =
   | Some "C" ->
       match find_person_in_env conf base "" with
       [ Some p -> Cousins.print conf base p
-      | _ -> inconnu_au_bataillon conf ]
+      | _ -> very_unknown conf ]
   | Some "CAL" -> Date.print_calendar conf base
   | Some "CHG_CHN" when conf.wizard -> ChangeChildren.print conf base
   | Some "CHG_CHN_OK" when conf.wizard -> ChangeChildren.print_ok conf base
   | Some "D" ->
       match find_person_in_env conf base "" with
       [ Some p -> Descend.print conf base p
-      | _ -> inconnu_au_bataillon conf ]
+      | _ -> very_unknown conf ]
   | Some "DAG" -> Dag.print conf base
   | Some "DEL_FAM" when conf.wizard -> UpdateFam.print_del conf base
   | Some "DEL_FAM_OK" when conf.wizard -> UpdateFamOk.print_del conf base
@@ -433,7 +433,7 @@ value family_m conf base =
   | Some "MRG" when conf.wizard ->
       match find_person_in_env conf base "" with
       [ Some p -> Merge.print conf base p
-      | _ -> inconnu_au_bataillon conf ]
+      | _ -> very_unknown conf ]
   | Some "MRG_FAM" when conf.wizard -> MergeFam.print conf base
   | Some "MRG_FAM_OK" when conf.wizard -> MergeFamOk.print_merge conf base
   | Some "MRG_MOD_FAM_OK" when conf.wizard ->
@@ -467,17 +467,17 @@ value family_m conf base =
                 Some.surname_print conf base Some.surname_not_found n
               }
           | _ ->
-              if n = "" then inconnu conf n
+              if n = "" then unknown conf n
               else
                 let pl = find_all conf base n in
                 match pl with
                 [ [] ->
                     do {
                       conf.cancel_links := False;
-                      Some.surname_print conf base inconnu n
+                      Some.surname_print conf base unknown n
                     }
                 | [p] -> person_selected conf base p
-                | pl -> precisez conf base n pl ] ]
+                | pl -> specify conf base n pl ] ]
       | (_, Some i) ->
           relation_print conf base
             (pget conf base (Adef.iper_of_int (int_of_string i)))
@@ -493,7 +493,7 @@ value family_m conf base =
   | Some "R" ->
       match find_person_in_env conf base "" with
       [ Some p -> relation_print conf base p
-      | _ -> inconnu_au_bataillon conf ]
+      | _ -> very_unknown conf ]
   | Some "REQUEST" when conf.wizard ->
       let title _ = () in
       do {
@@ -517,12 +517,12 @@ value family_m conf base =
   | Some "U" when conf.wizard ->
       match find_person_in_env conf base "" with
       [ Some p -> Update.print conf base p
-      | _ -> inconnu_au_bataillon conf ]
+      | _ -> very_unknown conf ]
   | Some mode -> incorrect_request conf
   | None ->
       match find_person_in_env conf base "" with
       [ Some p -> person_selected conf base p
-      | _ -> inconnu_au_bataillon conf ] ]
+      | _ -> very_unknown conf ] ]
 ;
 
 value print_no_index conf base =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.8 2002-01-30 11:49:47 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.9 2002-03-11 19:02:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -12,7 +12,7 @@ value max_cnt = 2000;
 
 (* Utilities *)
 
-value niveau_max_ascendance conf base ip =
+value max_ancestor_level conf base ip =
   let x = ref 0 in
   let mark = Array.create base.data.persons.len False in
   let rec loop niveau ip =
@@ -514,7 +514,7 @@ value print conf base p =
   | (_, Some "AN") when conf.wizard || conf.friend ->
       print_anniv conf base p max_lev
   | _ ->
-      let effective_level = niveau_max_ascendance conf base p.cle_index + 1 in
+      let effective_level = max_ancestor_level conf base p.cle_index + 1 in
       if effective_level == 2 then print_cousins conf base p 2 2
       else print_menu conf base p effective_level ]
 ;

@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 4.3 2002-01-23 14:22:33 ddr Exp $ *)
+(* $Id: consangAll.ml,v 4.4 2002-03-11 19:02:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -131,7 +131,7 @@ value compute base from_scratch quiet =
                     in
                     if better then do {
                       Printf.eprintf "\nMax consanguinity %g for %s... "
-                        consang (denomination base (base.data.persons.get i));
+                        consang (designation base (base.data.persons.get i));
                       flush stderr;
                       most.val := Some a
                     }

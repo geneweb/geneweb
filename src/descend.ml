@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.13 2002-03-11 18:36:06 ddr Exp $ *)
+(* $Id: descend.ml,v 4.14 2002-03-11 19:02:57 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -403,7 +403,7 @@ value display_descendants_level conf base max_level ancestor =
     print_alphab_list conf
       (fun (p, _) ->
          if is_hidden p then "?" else
-         String.sub (p_surname base p) (initiale (p_surname base p)) 1)
+         String.sub (p_surname base p) (initial (p_surname base p)) 1)
       (fun (p, c) ->
          do {
            Wserver.wprint "\n%s" (referenced_person_title_text conf base p);

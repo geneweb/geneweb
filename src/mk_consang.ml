@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 4.3 2001-11-27 12:10:10 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 4.4 2002-03-11 19:03:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value fname = ref "";
@@ -54,7 +54,7 @@ value main () =
           do {
             Printf.printf
               "\nError: loop in database, %s is his/her own ancestor.\n"
-              (Gutil.denomination base p);
+              (Gutil.designation base p);
             flush stdout;
             exit 2
           } ]

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.7 2002-03-11 18:36:07 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.8 2002-03-11 19:02:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -103,7 +103,7 @@ value leap_year a =
   if a mod 100 == 0 then a / 100 mod 4 == 0 else a mod 4 == 0
 ;
 
-value nb_jours_dans_mois =
+value nb_days_in_month =
   let tb = [| 31; 28; 31; 30; 31; 30; 31; 31; 30; 31; 30; 31 |] in
   fun m a ->
     if m == 2 && leap_year a then 29
@@ -120,7 +120,7 @@ value common_prec p1 p2 =
     | _ -> Maybe ]
 ;
 
-value temps_ecoule d1 d2 =
+value time_gone_by d1 d2 =
   let prec = common_prec d1.prec d2.prec in
   match d1 with
   [ {day = 0; month = 0; year = a1} ->
@@ -131,45 +131,45 @@ value temps_ecoule d1 d2 =
           {day = 0; month = 0; year = a2 - a1; prec = prec; delta = 0}
       | {day = 0; month = m2; year = a2} ->
           let r = 0 in
-          let (mois, r) =
+          let (month, r) =
             if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
           in
-          let annee = a2 - a1 - r in
-          {day = 0; month = mois; year = annee; prec = prec; delta = 0}
+          let year = a2 - a1 - r in
+          {day = 0; month = month; year = year; prec = prec; delta = 0}
       | {day = j2; month = m2; year = a2} ->
           let r = 0 in
-          let (mois, r) =
+          let (month, r) =
             if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
           in
-          let annee = a2 - a1 - r in
-          {day = 0; month = mois; year = annee; prec = prec; delta = 0} ]
+          let year = a2 - a1 - r in
+          {day = 0; month = month; year = year; prec = prec; delta = 0} ]
   | {day = j1; month = m1; year = a1} ->
       match d2 with
       [ {day = 0; month = 0; year = a2} ->
           {day = 0; month = 0; year = a2 - a1; prec = prec; delta = 0}
       | {day = 0; month = m2; year = a2} ->
           let r = 0 in
-          let (mois, r) =
+          let (month, r) =
             if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
           in
-          let annee = a2 - a1 - r in
-          {day = 0; month = mois; year = annee; prec = prec; delta = 0}
+          let year = a2 - a1 - r in
+          {day = 0; month = month; year = year; prec = prec; delta = 0}
       | {day = j2; month = m2; year = a2} ->
-          let (jour, r) =
+          let (day, r) =
             if j1 <= j2 then (j2 - j1, 0)
-            else (j2 - j1 + nb_jours_dans_mois m1 a1, 1)
+            else (j2 - j1 + nb_days_in_month m1 a1, 1)
           in
-          let (mois, r) =
+          let (month, r) =
             if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
           in
-          let annee = a2 - a1 - r in
-          {day = jour; month = mois; year = annee; prec = prec; delta = 0} ] ]
+          let year = a2 - a1 - r in
+          {day = day; month = month; year = year; prec = prec; delta = 0} ] ]
 ;
 
-value annee d = d.year;
+value year_of d = d.year;
 
-value strictement_avant_dmy d1 d2 =
-  let {day = d; month = m; year = y; prec = p} = temps_ecoule d2 d1 in
+value strictly_before_dmy d1 d2 =
+  let {day = d; month = m; year = y; prec = p} = time_gone_by d2 d1 in
   if y < 0 then True
   else if y > 0 then False
   else if m < 0 then True
@@ -181,14 +181,14 @@ value strictement_avant_dmy d1 d2 =
   else False
 ;
 
-value strictement_avant d1 d2 =
+value strictly_before d1 d2 =
   match (d1, d2) with
-  [ (Dgreg d1 _, Dgreg d2 _) -> strictement_avant_dmy d1 d2
+  [ (Dgreg d1 _, Dgreg d2 _) -> strictly_before_dmy d1 d2
   | _ -> False ]
 ;
 
-value strictement_apres_dmy d1 d2 =
-  let {day = d; month = m; year = y; prec = p} = temps_ecoule d1 d2 in
+value strictly_after_dmy d1 d2 =
+  let {day = d; month = m; year = y; prec = p} = time_gone_by d1 d2 in
   if y < 0 then True
   else if y > 0 then False
   else if m < 0 then True
@@ -200,13 +200,13 @@ value strictement_apres_dmy d1 d2 =
   else False
 ;
 
-value strictement_apres d1 d2 =
+value strictly_after d1 d2 =
   match (d1, d2) with
-  [ (Dgreg d1 _, Dgreg d2 _) -> strictement_apres_dmy d1 d2
+  [ (Dgreg d1 _, Dgreg d2 _) -> strictly_after_dmy d1 d2
   | _ -> False ]
 ;
 
-value denomination base p =
+value designation base p =
   let prenom = p_first_name base p in
   let nom = p_surname base p in prenom ^ "." ^ string_of_int p.occ ^ " " ^ nom
 ;
@@ -556,15 +556,15 @@ value child_born_after_his_parent base error warning x iparent =
      date_of_death x.death)
   with
   [ (Some (Dgreg g1 _ as d1), Some (Dgreg g2 _ as d2), _) ->
-      if strictement_apres d1 d2 then warning (ParentBornAfterChild parent x)
+      if strictly_after d1 d2 then warning (ParentBornAfterChild parent x)
       else
-        let a = temps_ecoule g1 g2 in
-        if annee a < 11 then warning (ParentTooYoung parent a) else ()
+        let a = time_gone_by g1 g2 in
+        if year_of a < 11 then warning (ParentTooYoung parent a) else ()
   | (Some (Dgreg g1 _ as d1), _, Some (Dgreg g2 _ as d2)) ->
-      if strictement_apres d1 d2 then warning (ParentBornAfterChild parent x)
+      if strictly_after d1 d2 then warning (ParentBornAfterChild parent x)
       else
-        let a = temps_ecoule g1 g2 in
-        if annee a < 11 then warning (ParentTooYoung parent a) else ()
+        let a = time_gone_by g1 g2 in
+        if year_of a < 11 then warning (ParentTooYoung parent a) else ()
   | _ -> () ]
 ;
 
@@ -572,12 +572,12 @@ value born_after_his_elder_sibling base error warning x np ifam des =
   match (np, Adef.od_of_codate x.birth, x.death) with
   [ (None, _, _) -> ()
   | (Some (elder, d1), Some d2, _) ->
-      if strictement_apres d1 d2 then
+      if strictly_after d1 d2 then
         warning (ChildrenNotInOrder ifam des elder x)
       else ()
   | (Some (elder, d1), _, Death _ d2) ->
       let d2 = Adef.date_of_cdate d2 in
-      if strictement_apres d1 d2 then
+      if strictly_after d1 d2 then
         warning (ChildrenNotInOrder ifam des elder x)
       else ()
   | _ -> () ]
@@ -588,7 +588,7 @@ value child_born_before_mother_death base warning x imoth =
   match (Adef.od_of_codate x.birth, mother.death) with
   [ (Some d1, Death _ d2) ->
       let d2 = Adef.date_of_cdate d2 in
-      if strictement_apres d1 d2 then
+      if strictly_after d1 d2 then
         warning (MotherDeadAfterChildBirth mother x)
       else ()
   | _ -> () ]
@@ -612,7 +612,7 @@ value possible_father base warning x ifath =
         | {prec = OrYear a2} -> a2
         | {year = a} -> a ]
       in
-      if annee d1 > a2 + 1 then warning (DeadTooEarlyToBeFather father x)
+      if year_of d1 > a2 + 1 then warning (DeadTooEarlyToBeFather father x)
       else ()
   | _ -> () ]
 ;
@@ -621,7 +621,7 @@ value birth_before_death base warning p =
   match (Adef.od_of_codate p.birth, p.death) with
   [ (Some d1, Death _ d2) ->
       let d2 = Adef.date_of_cdate d2 in
-      if strictement_apres d1 d2 then warning (BirthAfterDeath p) else ()
+      if strictly_after d1 d2 then warning (BirthAfterDeath p) else ()
   | _ -> () ]
 ;
 
@@ -631,19 +631,19 @@ value titles_after_birth base warning p t =
   do {
     match (t_date_start, t_date_end) with
     [ (Some d1, Some d2) ->
-        if strictement_apres d1 d2 then warning (TitleDatesError p t) else ()
+        if strictly_after d1 d2 then warning (TitleDatesError p t) else ()
     | _ -> () ];
     match Adef.od_of_codate p.birth with
     [ Some d1 ->
         do {
           match t_date_start with
           [ Some d ->
-              if strictement_apres d1 d then warning (TitleDatesError p t)
+              if strictly_after d1 d then warning (TitleDatesError p t)
               else ()
           | None -> () ];
           match t_date_end with
           [ Some d ->
-              if strictement_apres d1 d then warning (TitleDatesError p t)
+              if strictly_after d1 d then warning (TitleDatesError p t)
               else ()
           | None -> () ];
           ()
@@ -743,14 +743,14 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
       do {
         match Adef.od_of_codate p.birth with
         [ Some d1 ->
-            if strictement_avant d2 d1 then
+            if strictly_before d2 d1 then
               warning (MarriageDateBeforeBirth p)
             else ()
         | _ -> () ];
         match p.death with
         [ Death _ d3 ->
             let d3 = Adef.date_of_cdate d3 in
-            if strictement_apres d2 d3 then warning (MarriageDateAfterDeath p)
+            if strictly_after d2 d3 then warning (MarriageDateAfterDeath p)
             else ()
         | _ -> () ];
       }
@@ -786,7 +786,7 @@ value sort_children base warning ifam des =
           in
           match (d1, d2) with
           [ (Some d1, Some d2) ->
-              if strictement_avant d2 d1 then do {
+              if strictly_before d2 d1 then do {
                 let ip = a.(j + 1) in
                 match before.val with
                 [ Some _ -> ()
@@ -914,7 +914,7 @@ value strip_spaces str =
   else String.sub str start (stop - start)
 ;
 
-value initiale n =
+value initial n =
   loop 0 where rec loop i =
     if i == String.length n then 0
     else
@@ -957,7 +957,7 @@ value alphabetic n1 n2 =
       else if alphabetic_value c1 > alphabetic_value c2 then 1
       else loop (succ i1) (succ i2)
   in
-  if n1 = n2 then 0 else loop (initiale n1) (initiale n2)
+  if n1 = n2 then 0 else loop (initial n1) (initial n2)
 ;
 
 value map_title_strings f t =

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.31 2002-03-08 10:32:15 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.32 2002-03-11 19:02:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -2021,7 +2021,7 @@ value sort_by_date proj list =
     Sort.list
       (fun e1 e2 ->
          match (proj e1, proj e2) with
-         [ (Some d1, Some d2) -> not (strictement_apres d1 d2)
+         [ (Some d1, Some d2) -> not (strictly_after d1 d2)
          | _ -> False ])
       list
   else list
@@ -2033,24 +2033,24 @@ value print_base_error base =
   fun
   [ AlreadyDefined p ->
       fprintf log_oc.val "%s\nis defined several times\n"
-        (denomination base p)
+        (designation base p)
   | OwnAncestor p ->
       fprintf log_oc.val "%s\nis his/her own ancestor\n"
-        (denomination base p)
+        (designation base p)
   | BadSexOfMarriedPerson p ->
       fprintf log_oc.val "%s\n  bad sex for a married person\n"
-        (denomination base p) ]
+        (designation base p) ]
 ;
 
 value print_base_warning base =
   fun
   [ BirthAfterDeath p ->
       fprintf log_oc.val "%s\n  born after his/her death\n"
-        (denomination base p)
+        (designation base p)
   | IncoherentSex p fixed not_fixed ->
       do {
         fprintf log_oc.val "%s\n  sex not coherent with relations"
-          (denomination base p);
+          (designation base p);
         if fixed > 0 then
           if not_fixed > 0 then
             fprintf log_oc.val " (fixed in %d of the %d cases)"
@@ -2063,56 +2063,56 @@ value print_base_warning base =
   | ChangedOrderOfChildren ifam des _ ->
       let cpl = coi base ifam in
       fprintf log_oc.val "Changed order of children of %s and %s\n"
-        (denomination base (poi base cpl.father))
-        (denomination base (poi base cpl.mother))
+        (designation base (poi base cpl.father))
+        (designation base (poi base cpl.mother))
   | ChildrenNotInOrder ifam des elder x ->
       let cpl = coi base ifam in
       do {
         fprintf log_oc.val
           "The following children of\n  %s\nand\n  %s\nare not in order:\n"
-          (denomination base (poi base cpl.father))
-          (denomination base (poi base cpl.mother));
-        fprintf log_oc.val "- %s\n" (denomination base elder);
-        fprintf log_oc.val "- %s\n" (denomination base x)
+          (designation base (poi base cpl.father))
+          (designation base (poi base cpl.mother));
+        fprintf log_oc.val "- %s\n" (designation base elder);
+        fprintf log_oc.val "- %s\n" (designation base x)
       }
   | DeadTooEarlyToBeFather father child ->
       do {
-        fprintf log_oc.val "%s\n" (denomination base child);
+        fprintf log_oc.val "%s\n" (designation base child);
         fprintf log_oc.val
           "  is born more than 2 years after the death of his/her father\n";
-        fprintf log_oc.val "%s\n" (denomination base father)
+        fprintf log_oc.val "%s\n" (designation base father)
       }
   | MarriageDateAfterDeath p ->
       do {
-        fprintf log_oc.val "%s\n" (denomination base p);
+        fprintf log_oc.val "%s\n" (designation base p);
         fprintf log_oc.val "married after his/her death\n"
       }
   | MarriageDateBeforeBirth p ->
       do {
-        fprintf log_oc.val "%s\n" (denomination base p);
+        fprintf log_oc.val "%s\n" (designation base p);
         fprintf log_oc.val "married before his/her birth\n"
       }
   | MotherDeadAfterChildBirth mother child ->
       fprintf log_oc.val
         "%s\n  is born after the death of his/her mother\n%s\n"
-        (denomination base child) (denomination base mother)
+        (designation base child) (designation base mother)
   | ParentBornAfterChild parent child ->
       fprintf log_oc.val "%s born after his/her child %s\n"
-        (denomination base parent) (denomination base child)
+        (designation base parent) (designation base child)
   | ParentTooYoung p a ->
       fprintf log_oc.val "%s was parent at age of %d\n"
-        (denomination base p) (annee a)
+        (designation base p) (year_of a)
   | TitleDatesError p t ->
       do {
-        fprintf log_oc.val "%s\n" (denomination base p);
+        fprintf log_oc.val "%s\n" (designation base p);
         fprintf log_oc.val "has incorrect title dates as:\n";
         fprintf log_oc.val "  %s %s\n" (sou base t.t_ident)
           (sou base t.t_place)
       }
   | UndefinedSex _ -> ()
   | YoungForMarriage p a ->
-      fprintf log_oc.val "%s married at age %d\n" (denomination base p)
-        (annee a) ]
+      fprintf log_oc.val "%s married at age %d\n" (designation base p)
+        (year_of a) ]
 ;
 
 value find_lev0 =
@@ -2409,11 +2409,11 @@ value check_parents_children base =
               let p = base.data.persons.get i in
               fprintf log_oc.val
                 "%s is not the child of his/her parents\n"
-                (denomination base p);
+                (designation base p);
               fprintf log_oc.val "- %s\n"
-                (denomination base (poi base cpl.father));
+                (designation base (poi base cpl.father));
               fprintf log_oc.val "- %s\n"
-                (denomination base (poi base cpl.mother));
+                (designation base (poi base cpl.mother));
               fprintf log_oc.val "=> no more parents for him/her\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
@@ -2429,11 +2429,11 @@ value check_parents_children base =
         then do {
           fprintf log_oc.val
             "%s is spouse in this family but neither husband nor wife:\n"
-            (denomination base (base.data.persons.get i));
+            (designation base (base.data.persons.get i));
           fprintf log_oc.val "- %s\n"
-            (denomination base (poi base cpl.father));
+            (designation base (poi base cpl.father));
           fprintf log_oc.val "- %s\n"
-            (denomination base (poi base cpl.mother));
+            (designation base (poi base cpl.mother));
           let fath = poi base cpl.father in
           let moth = poi base cpl.mother in
           let ffn = sou base fath.first_name in
@@ -2484,11 +2484,11 @@ value check_parents_children base =
         [ Some ifam ->
             if Adef.int_of_ifam ifam <> i then do {
               fprintf log_oc.val "Other parents for %s\n"
-                (denomination base p);
+                (designation base p);
               fprintf log_oc.val "- %s\n"
-                (denomination base (poi base cpl.father));
+                (designation base (poi base cpl.father));
               fprintf log_oc.val "- %s\n"
-                (denomination base (poi base cpl.mother));
+                (designation base (poi base cpl.mother));
               fprintf log_oc.val "=> deleted in this family\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
@@ -2499,11 +2499,11 @@ value check_parents_children base =
             do {
               fprintf log_oc.val
                 "%s has no parents but is the child of\n"
-                (denomination base p);
+                (designation base p);
               fprintf log_oc.val "- %s\n"
-                (denomination base (poi base cpl.father));
+                (designation base (poi base cpl.father));
               fprintf log_oc.val "- %s\n"
-                (denomination base (poi base cpl.mother));
+                (designation base (poi base cpl.mother));
               fprintf log_oc.val "=> added parents\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
@@ -2568,11 +2568,11 @@ value check_parents_sex base =
     else if fath.sex = Female || moth.sex = Male then do {
       if fath.sex = Female then
         fprintf log_oc.val "Warning - husband with female sex: %s\n"
-          (denomination base fath)
+          (designation base fath)
       else ();
       if moth.sex = Male then
         fprintf log_oc.val "Warning - wife with male sex: %s\n"
-          (denomination base moth)
+          (designation base moth)
       else ();
       flush log_oc.val;
       fam.relation := NoSexesCheck
@@ -2635,7 +2635,7 @@ value negative_dates base =
     let p = base.data.persons.get i in
     match (Adef.od_of_codate p.birth, date_of_death p.death) with
     [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
-        if annee d1 > 0 && annee d2 > 0 && strictement_avant_dmy d2 d1 then
+        if year_of d1 > 0 && year_of d2 > 0 && strictly_before_dmy d2 d1 then
           negative_date_ancestors base (base.data.persons.get i)
         else ()
     | _ -> () ]
