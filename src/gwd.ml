@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.30 2002-02-24 12:43:41 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.31 2002-02-24 14:10:24 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -535,7 +535,11 @@ type access_type =
   [ ATwizard of string | ATfriend of string | ATnormal | ATnone | ATset ]
 ;
 
-value get_actlog utm str =
+value compatible_tokens (addr1, base1_pw1) (addr2, base2_pw2) =
+  (*addr1 = addr2 && *)base1_pw1 = base2_pw2
+;
+
+value get_actlog utm from_addr base_password =
   let fname = Srcfile.adm_file "actlog" in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -545,27 +549,32 @@ value get_actlog utm str =
         [ Some line ->
             let i = index ' ' line in
             let tm = float_of_string (String.sub line 0 i) in
-            let j = index_from ' ' line (i + 1) in
-            let addr_db_pwd = String.sub line (i + 1) (j - i - 1) in
-            let c = line.[j + 1] in
+            let islash = index_from '/' line (i + 1) in
+            let ispace = index_from ' ' line (islash + 1) in
+            let addr = String.sub line (i + 1) (islash - i - 1) in
+            let db_pwd = String.sub line (islash + 1) (ispace - islash - 1) in
+            let c = line.[ispace + 1] in
             let user =
-              let k = j + 3 in
+              let k = ispace + 3 in
               if k >= String.length line then ""
               else String.sub line k (String.length line - k)
             in
             let (list, r, changed) =
               if utm -. tm >= tmout then (list, r, True)
-              else if addr_db_pwd = str then
+              else if
+                compatible_tokens (addr, db_pwd) (from_addr, base_password)
+              then
                 let r = if c = 'w' then ATwizard user else ATfriend user in
-                ([(addr_db_pwd, (utm, c, user)) :: list], r, True)
-              else ([(addr_db_pwd, (tm, c, user)) :: list], r, changed)
+                ([((from_addr, db_pwd), (utm, c, user)) :: list], r, True)
+              else ([((addr, db_pwd), (tm, c, user)) :: list], r, changed)
             in
             loop changed r list
         | None ->
             do {
               close_in ic;
               let list =
-                Sort.list (fun (_, (t1, _, _)) (_, (t2, _, _)) -> t2 <= t1)
+                List.sort
+                  (fun (_, (t1, _, _)) (_, (t2, _, _)) -> compare t2 t1)
                   list
               in
               (list, r, changed)
@@ -580,18 +589,18 @@ value set_actlog list =
   let oc = open_out fname in
   do {
     List.iter
-      (fun (b, (a, c, d)) ->
-         fprintf oc "%.0f %s %c%s\n" a b c
+      (fun ((from, base_pw), (a, c, d)) ->
+         fprintf oc "%.0f %s/%s %c%s\n" a from base_pw c
            (if d = "" then "" else " " ^ d))
       list;
     close_out oc;
   }
 ;
 
-value get_token utm str =
+value get_token utm from_addr base_password =
   lock_wait Srcfile.adm_file "gwd.lck" with
   [ Accept ->
-      let (list, r, changed) = get_actlog utm str in
+      let (list, r, changed) = get_actlog utm from_addr base_password in
       do { if changed then set_actlog list else (); r }
   | Refuse -> ATnormal ]
 ;
@@ -614,23 +623,24 @@ value set_token utm from_addr base_file acc user =
   [ Accept ->
       do {
         random_self_init ();
-        let (list, _, _) = get_actlog utm "" in
+        let (list, _, _) = get_actlog utm "" "" in
         let (x, xx) =
-          let base = from_addr ^ "/" ^ base_file ^ "_" in
+          let base = base_file ^ "_" in
           let rec loop ntimes =
             if ntimes = 0 then failwith "set_token"
             else
               let x = mkpasswd () in
               let xx = base ^ x in
-              match
-                try Some (List.assoc xx list) with [ Not_found -> None ]
-              with
-              [ Some _ -> loop (ntimes - 1)
-              | None -> (x, xx) ]
+              if List.exists
+                   (fun (tok, _) -> compatible_tokens tok (from_addr, xx))
+                   list
+              then
+                loop (ntimes - 1)
+              else (x, xx)
           in
           loop 50
         in
-        let list = [(xx, (utm, acc, user)) :: list] in
+        let list = [((from_addr, xx), (utm, acc, user)) :: list] in
         set_actlog list;
         x
       }
@@ -763,7 +773,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
         let access_type =
           match passwd with
           [ "" | "w" | "f" -> ATnone
-          | _ -> get_token utm (from_addr ^ "/" ^ base_passwd) ]
+          | _ -> get_token utm from_addr base_passwd ]
         in
         (passwd, env, access_type)
     in
