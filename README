@@ -3,7 +3,7 @@ OVERVIEW:
 GeneWeb is a genealogy software with a Web interface. It can be used
 off-line or as a Web service.
 
-This is the version 2.01-1.
+This is the version 2.02.
 
 To compile, you need the Objective Caml compiler, and the preprocessor
 Camlp4.
