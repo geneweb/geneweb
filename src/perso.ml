@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.52 1999-10-21 16:29:16 ddr Exp $ *)
+(* $Id: perso.ml,v 2.53 1999-10-25 22:10:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -114,7 +114,10 @@ value
   do if paren then Wserver.wprint "\n(" else (); return
   let first =
     if nth > 0 then
-      do Wserver.wprint "%s" (transl_nth conf "nth" nth); return False
+      do Wserver.wprint "%s"
+           (if nth >= 100 then string_of_int nth
+            else transl_nth conf "nth" nth);
+      return False
     else True
   in
   let first =

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 2.15 1999-10-24 10:18:09 ddr Exp $ *)
+(* $Id: some.ml,v 2.16 1999-10-25 22:10:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -205,7 +205,7 @@ value afficher_date_mariage conf base fam p c =
 
 value max_lev = 3;
 
-value rec print_branch conf base lev name p =
+value rec print_branch conf base first_lev lev name p =
   do if lev == 0 then html_br conf else html_li conf;
      Wserver.wprint "<strong>";
      if p_surname base p = name then
@@ -245,14 +245,15 @@ value rec print_branch conf base lev name p =
          let down =
            p.sex = Male &&
            (Name.crush_lower (p_surname base p) = Name.crush_lower name
-            || lev == 0) &&
+            || first_lev) &&
            Array.length el <> 0 ||
            p.sex = Female && she_has_children_with_her_name base p c el
          in
          if down then
            do Wserver.wprint "<ul>\n";
               List.iter
-                (fun e -> print_branch conf base (succ lev) name (poi base e))
+                (fun e ->
+                   print_branch conf base False (succ lev) name (poi base e))
                 (Array.to_list el);
               Wserver.wprint "</ul>\n";
            return (False, not down)
@@ -321,10 +322,10 @@ value rec print_by_branch x conf base not_found_fun (ipl, homonymes) =
                       wprint_geneweb_link conf href "&lt;&lt";
                       Wserver.wprint "\n";
                       tag "ul" begin
-                        print_branch conf base 1 x p;
+                        print_branch conf base True 1 x p;
                       end;
                    return ()
-               | None -> print_branch conf base 0 x p ];
+               | None -> print_branch conf base True 0 x p ];
             return n + 1)
          1 ancestors
        in ();
