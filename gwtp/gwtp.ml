@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.21 2000-08-05 12:57:57 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.22 2000-08-05 15:37:08 ddr Exp $ *)
 
 open Printf;
 
@@ -342,6 +342,8 @@ You selected the file <b>%s</b> instead of <b>base</b>
 value gwtp_send str env b t =
   match (HttpEnv.getenv env "base", HttpEnv.getenv env "base_name") with
   [ (Some f, Some fname) -> send_file str env b t f (HttpEnv.decode fname)
+  | (Some f, None) ->
+      gwtp_error "Sorry, your browser seems not be able to send files."
   | _ -> gwtp_invalid_request str env ]
 ;
 
