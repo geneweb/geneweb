@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.6 1999-11-23 18:49:31 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.7 1999-11-23 18:58:57 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title></head>
   <meta name="ROBOTS" content="NONE">
@@ -159,7 +159,7 @@ color=#2f6400><b>erityishaulla</b></font></a>.
 <ul>%I|wf
 <li><a href="%sm=LD;k=10">viime kuolemat</a>%E%Ih
 <li><a href="%sm=HIST;k=10">p&auml;ivityshistorian</a>%E
-<li><a href="%sm=CAL">kalenterit</a>
+<li><a href="%sm=CAL">eri kalenterit</a>
 <li><a href="%sm=FORUM">tietokantafoorumin</a>
 </ul>
 </td>
