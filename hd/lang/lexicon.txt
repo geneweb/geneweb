@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.17 2001-04-13 17:55:59 ddr Exp $
+# $Id: lexicon.txt,v 4.18 2001-04-13 19:12:52 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -1015,7 +1015,7 @@ da: en halvbroder/en halvsøster/en halvsøskende
 de: ein Halbbruder/eine Halbschwester/ein Halbbruder oder eine Halbschwester
 en: a half-brother/a half-sister/a half-sibling
 eo: duonfrato/duonfratino/duonfrat(in)o
-es: un hermano/una hermana/un(a) hermano(a)
+es: un medio hermano/una medio hermana/un(a) medio(a) hermano(a)
 et: poolvend:g:-na/poolõde:g:--e/poolõde:g:--e või poolvend:g:-na
 fi: velipuoli/sisarpuoli/is&auml;(&auml;iti)puolen lapsi
 fr: un demi-fr&egrave;re/une demi-soeur/un demi-fr&egrave;re ou une demi-soeur
@@ -3319,7 +3319,7 @@ da: gudfader/gudmoder/gudfader og gudmoder
 de: Taufzeuge/Taufzeugin/Taufzeuge und Taufzeugin
 en: godfather/godmother/godparents
 eo: baptopatro/baptopatrino/gebaptopatroj
-es: padrino/madrina/padrino y padrina
+es: padrino/madrina/padrinos
 et: ristiisa/ristiema/ristivanemad
 fi: kummiset&auml;/kummit&auml;ti/kummit
 fr: parrain/marraine/parrain et marraine
@@ -3342,7 +3342,7 @@ da: guds&oslash;n/guddatter/gudbarn
 de: Patensohn/Patentochter/Patenkind
 en: godson/goddaughter/godchild
 eo: baptofilo/baptofilino/baptofil(in)o
-es: ahijado/ahijada/ahihado(a)
+es: ahijado/ahijada/ahijado(a)
 et: ristipoeg/ristitütar/ristilaps
 fi: kummipoika/kummitytt&ouml;/kummilapsi
 fr: filleul/filleule/filleul(e)
@@ -4012,7 +4012,7 @@ da: er f&oslash;dt efter hans/hendes barn
 de: ist nach seinem/ihrem Kind geboren
 en: is born after his/her child
 eo: naskigxis post sia infano
-es: ha nacido(a) despu&eacute;s de su hijo
+es: ha nacido despu&eacute;s de su hijo(a)
 et: on sündinud oma lapsest hiljem
 fi: on syntynyt my&ouml;hemmin kuin lapsensa
 fr: est n&eacute;(e) apr&egrave;s son enfant
@@ -4532,7 +4532,7 @@ da: manglende forf&aelig;dre
 de: fehlende Vorfahren
 en: missing ancestors
 eo: mankintaj antaùeuloj
-es: ascendientes faltantes
+es: ascendientes que faltan
 et: puuduvad esivanemad
 fi: puuttuvat esivanhemmat
 fr: ascendants manquants
