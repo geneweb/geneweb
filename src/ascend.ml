@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.22 1999-05-28 17:27:37 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.23 1999-05-31 07:24:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -234,6 +234,7 @@ value afficher_ascendants_jusqu_a conf base niveau_max p =
 type generation_person =
   [ GP_person of Num.t and iper and option ifam
   | GP_same of Num.t and Num.t and iper
+  | GP_interv of option (Num.t * Num.t * option (Num.t * Num.t))
   | GP_missing of Num.t and iper ]
 ;
 
@@ -253,6 +254,15 @@ value next_generation base mark gpl =
                   GP_person n_moth cpl.mother (Some ifam) ::
                   gpl]
              | None -> [GP_missing n ip :: gpl] ]
+         | GP_interv None -> [gp :: gpl]
+         | GP_interv (Some (n1, n2, x)) ->
+             let x =
+               match x with
+               [ Some (m1, m2) -> Some (Num.twice m1, Num.twice m2)
+               | None -> None ]
+             in
+             let gp = GP_interv (Some (Num.twice n1, Num.twice n2, x)) in
+             [gp :: gpl]
          | _ -> gpl ])
       gpl []
   in
@@ -296,6 +306,27 @@ value print_generation_person conf base gp =
            return b.val
          in
          Wserver.wprint "%s" (reference conf base p s);
+         Wserver.wprint "\n\n";
+      return ()
+  | GP_interv None ->
+      do html_li conf;
+         Wserver.wprint "...\n\n";
+      return ()
+  | GP_interv (Some (n1, n2, x)) ->
+      do html_li conf;
+         Num.print wpr (transl conf "(thousand separator)") n1;
+         Wserver.wprint "-";
+         Num.print wpr (transl conf "(thousand separator)")
+           (Num.sub n2 Num.one);
+         Wserver.wprint " = ";
+         match x with
+         [ Some (m1, m2) ->
+             do Num.print wpr (transl conf "(thousand separator)") m1;
+                Wserver.wprint "-";
+                Num.print wpr (transl conf "(thousand separator)")
+                  (Num.sub m2 Num.one);
+             return ()
+         | None -> Wserver.wprint "..." ];
          Wserver.wprint "\n\n";
       return ()
   | _ -> () ]
@@ -833,7 +864,38 @@ value afficher_ascendants_niveau conf base niveau_max p =
        done;
     return
     if niveau < niveau_max then
-      generation (niveau + 1) (next_generation base mark gpl)
+      let gpl =
+        List.map
+          (fun gp ->
+             match gp with
+             [ GP_same n m ip ->
+                 GP_interv (Some (n, Num.inc n 1, Some (m, Num.inc m 1)))
+             | _ -> gp ])
+          gpl
+      in
+      let gpl = next_generation base mark gpl in
+      let gpl =
+        List.fold_right
+          (fun gp gpl ->
+             match (gp, gpl) with
+             [ (GP_interv (Some (n1, n2, x)),
+                [GP_interv (Some (n3, n4, y)) :: gpl1]) ->
+                 if Num.eq n2 n3 then
+                   let z =
+                     match (x, y) with
+                     [ (Some (m1, m2), Some (m3, m4)) ->
+                         if Num.eq m2 m3 then Some (m1, m4)
+                         else None
+                     | _ -> None ]
+                   in
+                   [GP_interv (Some (n1, n4, z)) :: gpl1]
+                 else [GP_interv None :: gpl1]
+             | (GP_interv _, [GP_interv _ :: gpl]) -> [GP_interv None :: gpl]
+             | (GP_missing _ _, gpl) -> gpl
+             | _ -> [gp :: gpl] ])
+          gpl []
+      in
+      generation (niveau + 1) gpl
     else
       do html_li conf;
          Wserver.wprint "%s\n" (capitale (text_level conf niveau_max));
@@ -851,11 +913,9 @@ value afficher_ascendants_niveau conf base niveau_max p =
         (transl_decline conf "of" (person_text conf base p))
   in
   do header conf title;
-     tag "nobr" begin
-       tag "ul" begin
-         mark.(Adef.int_of_iper p.cle_index) := Num.one;
-         generation 1 [GP_person Num.one p.cle_index None];
-       end;
+     tag "ul" begin
+       mark.(Adef.int_of_iper p.cle_index) := Num.one;
+       generation 1 [GP_person Num.one p.cle_index None];
      end;
      trailer conf;
   return ()
@@ -951,6 +1011,7 @@ value one_year_gp base =
   fun
   [ GP_person _ ip _ -> one_year base (poi base ip)
   | GP_same _ _ ip -> one_year base (poi base ip)
+  | GP_interv _ -> None
   | GP_missing _ ip -> one_year base (poi base ip) ]
 ;
 
