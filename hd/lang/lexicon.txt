@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.130 2002-12-02 12:27:11 ddr Exp $
+# $Id: lexicon.txt,v 4.131 2002-12-02 16:09:00 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -1995,7 +1995,7 @@ sv: dop
 
     baptized
 af: gedoop
-bg: кръстен(а)
+bg: кръстен/кръстена/кръстен(а)
 ca: batejat/batejada/batejat(ada)
 cs: pokшtмn/pokшtмna
 da: d&oslash;bt
@@ -5216,6 +5216,7 @@ sl: sporoиilo dodano
 sv: meddelande inlagt
 
     message deleted
+bg: съобщението е изтрито
 de: Nachricht gel&ouml;scht
 en: message deleted
 eo: mesagxo nuligita
