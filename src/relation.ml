@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.17 1999-12-07 14:18:10 ddr Exp $ *)
+(* $Id: relation.ml,v 3.18 1999-12-14 15:22:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -914,17 +914,17 @@ value print_dag_links conf base p1 p2 rl =
   let module M = Map.Make O in
   let anc_map =
     List.fold_left
-      (fun anc_map (_, _, (x1, x2, list)) ->
+      (fun anc_map (pp1, pp2, (x1, x2, list)) ->
          List.fold_left
            (fun anc_map (p, n) ->
-              let (nn, nt, maxlev) =
+              let (pp1, pp2, nn, nt, maxlev) =
                 try M.find p.cle_index anc_map with
-                [ Not_found -> (0, 0, 0) ]
+                [ Not_found -> (pp1, pp2, 0, 0, 0) ]
               in
               if nn >= max_br then anc_map
               else
-                M.add p.cle_index (nn + n, nt + 1, max maxlev (max x1 x2))
-                  anc_map)
+                let v = (pp1, pp2, nn + n, nt + 1, max maxlev (max x1 x2)) in
+                M.add p.cle_index v anc_map)
            anc_map list)
       M.empty rl
   in
@@ -935,7 +935,7 @@ value print_dag_links conf base p1 p2 rl =
   in
   let something =
     M.fold
-      (fun ip (nn, nt, maxlev) something ->
+      (fun ip (_, _, nn, nt, maxlev) something ->
          something || nt > 1 && nn > 1 && nn < max_br)
       anc_map False
   in
@@ -943,7 +943,9 @@ value print_dag_links conf base p1 p2 rl =
     let rest = ref False in
     do if is_anc then Wserver.wprint "(" else Wserver.wprint "<ul>\n";
        M.iter
-         (fun ip (nn, nt, maxlev) ->
+         (fun ip (pp1, pp2, nn, nt, maxlev) ->
+            let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
+            let dp2 = match pp2 with [ Some p -> p | _ -> p2 ] in
             if nt > 1 && nn > 1 && nn < max_br then
               let a = poi base ip in
               do if is_anc then () else html_li conf;
@@ -955,8 +957,12 @@ value print_dag_links conf base p1 p2 rl =
                  else ();
                  Wserver.wprint "<a href=\"%sm=RL" (commd conf);
                  Wserver.wprint ";%s" (acces conf base a);
-                 Wserver.wprint ";%s" (acces_n conf base "1" p1);
-                 Wserver.wprint ";%s" (acces_n conf base "2" p2);
+                 Wserver.wprint ";%s" (acces_n conf base "1" dp1);
+                 Wserver.wprint ";%s" (acces_n conf base "2" dp2);
+                 if pp1 = None then ()
+                 else Wserver.wprint ";%s" (acces_n conf base "2" p1);
+                 if pp2 = None then ()
+                 else Wserver.wprint ";%s" (acces_n conf base "4" p2);
                  let (l1, l2) =
                    List.fold_left
                      (fun (l1, l2) (_, _, (x1, x2, list)) ->

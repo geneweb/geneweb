@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.6 1999-12-13 21:06:48 ddr Exp $ *)
+(* $Id: dag.ml,v 3.7 1999-12-14 15:22:09 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -100,7 +100,7 @@ do List.iter (fun id -> Printf.eprintf "- %s\n" (denomination base (poi base nod
 
 (* main *)
 
-value print_dag conf base set d =
+value print_dag conf base set spl d =
   let title _ =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
   in
@@ -122,8 +122,8 @@ value print_dag conf base set d =
     let p = poi base ip in
     do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
        Wserver.wprint "%s" (Date.short_dates_text conf base p);
-       if spouse_on && n.chil <> [] || n.pare = [] then
-         let spouses =
+       let spouses =
+         if spouse_on && n.chil <> [] || n.pare = [] then
            List.fold_left
              (fun list id ->
                 let cip = d.dag.(int_of_idag id).valu in
@@ -132,26 +132,31 @@ value print_dag conf base set d =
                     let cpl = coi base ifam in
                     let ips = Util.spouse ip cpl in
                     if List.mem_assoc ips list then list
-                    else [(ips, ifam) :: list]
+                    else [(ips, Some ifam) :: list]
                 | None -> list ])
              [] n.chil
-         in
-         List.iter
-           (fun (ips, ifam) ->
-              if Pset.mem ips set then ()
-              else
-                let ps = poi base ips in
-                let d =
-                  Date.short_marriage_date_text conf base (foi base ifam)
-                    p ps
-                in
-                do Wserver.wprint "<br>\n&amp;%s " d;
-                   Wserver.wprint "%s"
-                     (Util.referenced_person_title_text conf base ps);
-                   Wserver.wprint "%s" (Date.short_dates_text conf base ps);
-                return ())
-           spouses
-       else ();
+         else if n.chil = [] then
+           try [List.assq ip spl] with [ Not_found -> [] ]
+         else []
+       in
+       List.iter
+         (fun (ips, ifamo) ->
+            if Pset.mem ips set then ()
+            else
+              let ps = poi base ips in
+              let d =
+                match ifamo with
+                [ Some ifam ->
+                    Date.short_marriage_date_text conf base (foi base ifam)
+                      p ps
+                | None -> "" ]
+              in
+              do Wserver.wprint "<br>\n&amp;%s " d;
+                 Wserver.wprint "%s"
+                   (Util.referenced_person_title_text conf base ps);
+                 Wserver.wprint "%s" (Date.short_dates_text conf base ps);
+              return ())
+         spouses;
     return ()
   in
 (*
@@ -167,5 +172,5 @@ do let d = tag_dag d in print_char_table d (table_of_dag d); flush stderr; retur
 value print conf base =
   let set = get_dag_elems conf base in
   let d = make_dag base (Pset.elements set) in
-  print_dag conf base set d
+  print_dag conf base set [] d
 ;
