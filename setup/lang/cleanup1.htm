@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- (c) Copyright 2001 INRIA - GeneWeb -->
+  <!-- $Id: cleanup1.htm,v 1.1 2002-01-14 13:02:38 ddr Exp $ -->
+  <title>[
+de: Aufr&auml;umen - Phase 2
+en: Clean up - Phase 2
+es: Limpieza
+fr: Nettoyage
+lv: Sakopðana - 2. fâze
+sv: Rensa upp - fas 2
+]</title>
+</head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>[
+de: Aufr&auml;umen
+en: Cleaning up
+es: Limpieza
+fr: Nettoyage
+lv: Sakopðana
+sv: Rensa upp
+]</font></h1></center>
+
+<p>
+
+[
+de: Wir fahren nun mit dem Aufr&auml;umen der Datenbank "$a" fort.
+en: We are going to proceed to the cleaning up of the database "$a".
+es: Vamos a proceder a la limpieza de la base  "$a".
+fr: Nous allons proc&eacute;der au nettoyage de la base "$a".
+lv: Datu bâzes "$a" sakopðanas proces tiks turpinâts.
+sv: Vi ska gå vidare med att rensa upp databasen "$a".
+]
+
+<p>
+
+[
+de: Achtung: Diese Operation kann je nach Fall einige Sekunden oder
+    Minuten dauern. Bitte habe Geduld.
+en: Warning: this operation can take some seconds or minutes, depending on
+    the cases. Be patient.
+es: Atenci&oacute;n: la operaci&oacute;n puede tomar algunos segundos 
+    o algunos minutos, seg&uacute;n el caso. Tenga paciencia.
+fr: Attention: l'op&eacute;ration peut prendre quelques secondes ou
+    quelques minutes, suivant les cas. Soyez patient.
+lv: Brîdinâjums: tas var ilgt no daþâm sekundçm lîdz pat daþâm minûtçm,
+    atkarîbâ no apstâkïiem. Lûdzu pacietîbu.
+sv: Varning: denna operation kan ta några sekunder eller minuter, beroende på
+    fallet. Ha tålamod.
+]
+
+<p>
+
+[
+de: Dr&uuml;cke den Knopf, um die Operation zu starten.
+en: Push the button below to start the operation.
+es: Apoye en el bot&oacute;n siguiente para lanzar la operaci&oacute;n.
+fr: Appuyez sur le bouton ci-dessous pour lancer l'op&eacute;ration.
+lv: Darbîbas uzsâkðanai nospiediet sekojoðo podziòu.
+sv: Tryck på knappen nedan för att starta operationen.
+]
+
+<p>
+
+<form method=POST action="cleanup_1">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+[
+de: Zu deiner Information: Diese Funktion entspricht der Ausf&uuml;hrung
+    der folgenden Kommandos:
+en: For information, this operation corresponds to the following commands:
+es: Por informaci&oacute;n, esta operaci&oacute;n corresponde a la
+    ejecuci&oacuten de los comandos siguientes:
+fr: Pour information, cette op&eacute;ration correspond &agrave; la suite
+    des op&eacute;rations suivantes:
+lv: Inormâcijai: Ðî darbîba atbilst sekojoðâm komandâm:
+sv: Denna operation motsvarar de följande kommandona:
+]
+
+<pre>
+     $$ cd $w
+     $$ $x$/gwu $a -o tmp.gw
+     $$ mkdir old
+     [
+de: Unter Unix:
+en: Under Unix:
+fr: Sous Unix:
+]
+        $$ rm -rf old/$a.gwb
+        $$ mv $a.gwb old/.
+     [
+de: Unter MSdos:
+en: Under MSdos:
+fr: Sous MSdos:
+]
+        $$ del old\$a.gwb\*.*
+        $$ rmdir old\$a.gwb
+        $$ move $a.gwb old\.
+     $$ $x$/gwc tmp.gw -o $a > comm.log
+</pre>
+
