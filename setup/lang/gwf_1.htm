@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: gwf_1.htm,v 1.8 2002-01-21 13:36:17 ddr Exp $ -->
+  <!-- $Id: gwf_1.htm,v 1.9 2002-02-02 06:09:24 ddr Exp $ -->
   <title>[
 de: Parameter "$a"
 en: Parameters "$a"
@@ -1386,6 +1386,143 @@ size=30></td>
 
 <table border=1 width="100%">
 <tr align=left>
+<td valign=top><strong>- wizard_just_friend -</strong></td>
+</tr>
+
+<tr align=left>
+<td>[
+de: "Wizards" werden zu "Freunden".
+en: "Wizards" become simple "friend".
+es: Los "magos" se transforman en simples "amigos".
+fr: Les "magiciens" deviennent de simples "amis".
+lv: "Burvji" kïûst par parastiem "draugiem".
+sv: "Wizards" blir enkla "friend".
+]
+
+<p>
+
+[
+de: Wenn dieser Wert auf "ja" steht, verlieren "Wizards" die Berechtigung,
+    &Auml;nderungen zu machen.
+en: If yes, the "wizards" loose their power to make updates.
+es: Si la opci&oacute;n si es escogida, los "magos" pierden su poder de
+    actualisaci&oacute;n.
+fr: Si oui, les "magiciens" perdent leur pouvoir de mise-&agrave;-jour.
+lv: Ja "jâ", tad "burvji" zaudç savas iespçjas veikt izmaiòas datu bâzç.
+sv: Om "Yes", förlorar "wizards" deras behörighet att göra uppdateringar.
+]
+
+<p>
+
+[
+de: Dies kann sinnvoll sein, um z.&nbsp;B. beim Aufr&auml;umen der Datenbank,
+    wenn sie &uuml;ber das Internet zugreifbar ist, tempor&auml;r zu
+    vermeiden, da&szlig; "Wizards" Daten &auml;ndern, die durch die
+    Operation verloren gehen
+    w&uuml;rden. (Denke in diesem Fall daran, diese Option nach Beendigung des
+    Aufr&auml;umens dann wieder zur&uuml;ckzusetzen.)
+en: This can be useful, temporarilly, when you make a cleanup of your database,
+    if it is accessible to Internet, to avoid that "wizards" make changes which
+    would be lost during the operation (remember to suppress this option after
+    cleanup).
+es: Esto puede ser util, temporalmente, cuando uno realiza una limpieza
+    de la base si esta es accesible por Internet, afin de evitar
+    que los "magos" realizen actualizaciones, que serian perdidas
+    durante esta operaci&oacute;n (piense luego a suprimir esta opci&oacute;n
+    despu&eacute;s de finalizar la limpieza).
+fr: Cela peut-&ecirc;tre utile, temporairement, quand on fait un nettoyage
+    de la base, si elle est accessible sur Internet, pour &eacute;viter
+    que des "magiciens" ne fassent des mises-&agrave;-jour qui seraient
+    perdues pendant l'op&eacute;ration (penser alors &agrave; supprimer cette
+    option apr&egrave;s nettoyage).
+lv: Tas var bût noderîgi islaîcîgi, ja Jûs veicat datu bâzes sakopðanu. Ja
+    tâ ir pieejama no Interneta, tad tas novçrð iespçju, ka "burvji" varçtu
+    veikt izmaiòas, kas tiktu pazaudçtas sakopðanas laikâ (atcerieties pçc
+    datu bâzes sakopðanas atcelt ðo aizliegumu).
+sv: Detta kan vara användbart, temporärt, när du gör en upprensning av din
+    databas, om den är åtkomstbar över internet, för att undvika att
+    "wizards" gör ändringar
+    vilka skulle förloras under operationen (kom ihåg att ta bort denna
+    option efter upprensningen).
+]
+</td>
+</tr>
+
+<tr align=left>
+<td align=center>
+<input type=radio name=wizard_just_friend value=yes$Cwizard_just_friend=yes;>[
+de: Ja
+en: Yes
+es: si
+fr: oui
+lv: Yes
+sv: Yes
+]
+
+<input type=radio name=wizard_just_friend value=no$Cwizard_just_friend=no;>[
+de: Nein
+en: No
+es: no
+fr: non
+lv: Nç
+sv: No 
+]
+
+</td>
+</tr>
+</table>
+
+<p>
+
+<table border=1 width="100%">
+<tr align=left>
+<td><strong>- hide_private_names -</strong></td>
+</tr>
+
+<tr align=left>
+<td>[
+en: Cacher les noms des personnes privées.
+fr: Hide the private person's names.
+]
+
+<p>
+
+[
+en: Hide the names of the private persons, i.e. the still living persons
+    or, more exactly, the persons of less than one century.
+fr: Cache les noms des personnes privées, c'est-à-dire les personnes
+    vivantes, ou plus exactement, celles de moins de 100 ans.
+]</td>
+</tr>
+
+<tr align=left>
+<td align=center>
+<input type=radio name=hide_private_names value=yes$Chide_private_names=yes;>[
+de: Ja
+en: Yes
+es: si
+fr: oui
+lv: Jâ
+sv: Yes
+]
+
+<input type=radio name=hide_private_names value=no$Chide_private_names=no;>[
+de: Nein
+en: No
+es: no
+fr: non
+lv: Nç
+sv: No 
+]
+
+</td>
+</tr>
+</table>
+
+<p>
+
+<table border=1 width="100%">
+<tr align=left>
 <td><strong>- can_send_image -</strong></td>
 </tr>
 
@@ -1451,97 +1588,6 @@ sv: Yes
 ]
 
 <input type=radio name=can_send_image value=no$Ccan_send_image=no;>[
-de: Nein
-en: No
-es: no
-fr: non
-lv: Nç
-sv: No 
-]
-
-</td>
-</tr>
-</table>
-
-<p>
-
-<table border=1 width="100%">
-<tr align=left>
-<td valign=top><strong>- wizard_just_friend -</strong></td>
-</tr>
-
-<tr align=left>
-<td>[
-de: "Wizards" werden zu "Freunden".
-en: "Wizards" become simple "friend".
-es: Los "magos" se transforman en simples "amigos".
-fr: Les "magiciens" deviennent de simples "amis".
-lv: "Burvji" kïûst par parastiem "draugiem".
-sv: "Wizards" blir enkla "friend".
-]
-
-
-<p>
-
-[
-de: Wenn dieser Wert auf "ja" steht, verlieren "Wizards" die Berechtigung,
-    &Auml;nderungen zu machen.
-en: If yes, the "wizards" loose their power to make updates.
-es: Si la opci&oacute;n si es escogida, los "magos" pierden su poder de
-    actualisaci&oacute;n.
-fr: Si oui, les "magiciens" perdent leur pouvoir de mise-&agrave;-jour.
-lv: Ja "jâ", tad "burvji" zaudç savas iespçjas veikt izmaiòas datu bâzç.
-sv: Om "Yes", förlorar "wizards" deras behörighet att göra uppdateringar.
-]
-
-<p>
-
-[
-de: Dies kann sinnvoll sein, um z.&nbsp;B. beim Aufr&auml;umen der Datenbank,
-    wenn sie &uuml;ber das Internet zugreifbar ist, tempor&auml;r zu
-    vermeiden, da&szlig; "Wizards" Daten &auml;ndern, die durch die
-    Operation verloren gehen
-    w&uuml;rden. (Denke in diesem Fall daran, diese Option nach Beendigung des
-    Aufr&auml;umens dann wieder zur&uuml;ckzusetzen.)
-en: This can be useful, temporarilly, when you make a cleanup of your database,
-    if it is accessible to Internet, to avoid that "wizards" make changes which
-    would be lost during the operation (remember to suppress this option after
-    cleanup).
-es: Esto puede ser util, temporalmente, cuando uno realiza una limpieza
-    de la base si esta es accesible por Internet, afin de evitar
-    que los "magos" realizen actualizaciones, que serian perdidas
-    durante esta operaci&oacute;n (piense luego a suprimir esta opci&oacute;n
-    despu&eacute;s de finalizar la limpieza).
-fr: Cela peut-&ecirc;tre utile, temporairement, quand on fait un nettoyage
-    de la base, si elle est accessible sur Internet, pour &eacute;viter
-    que des "magiciens" ne fassent des mises-&agrave;-jour qui seraient
-    perdues pendant l'op&eacute;ration (penser alors &agrave; supprimer cette
-    option apr&egrave;s nettoyage).
-lv: Tas var bût noderîgi islaîcîgi, ja Jûs veicat datu bâzes sakopðanu. Ja
-    tâ ir pieejama no Interneta, tad tas novçrð iespçju, ka "burvji" varçtu
-    veikt izmaiòas, kas tiktu pazaudçtas sakopðanas laikâ (atcerieties pçc
-    datu bâzes sakopðanas atcelt ðo aizliegumu).
-sv: Detta kan vara användbart, temporärt, när du gör en upprensning av din
-    databas, om den är åtkomstbar över internet, för att undvika att
-    "wizards" gör ändringar
-    vilka skulle förloras under operationen (kom ihåg att ta bort denna
-    option efter upprensningen).
-]
-</td>
-</tr>
-
-<tr align=left>
-<td align=center>
-<input type=radio name=wizard_just_friend value=yes$Cwizard_just_friend=yes;>[
-de: Ja
-en: Yes
-es: si
-fr: oui
-lv: Yes
-sv: Yes
-]
-
-<input type=radio name=wizard_just_friend value=no$Cwizard_just_friend=no;>[
 de: Nein
 en: No
 es: no
