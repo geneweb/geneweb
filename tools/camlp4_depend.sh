@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: camlp4_depend.sh,v 2.1 1999-03-08 11:19:39 ddr Exp $
+# $Id: camlp4_depend.sh,v 3.0 1999-10-29 10:31:49 ddr Exp $
 
 FILES=
 DEPARGS=

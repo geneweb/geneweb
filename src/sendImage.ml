@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 2.7 1999-10-19 08:58:43 ddr Exp $ *)
+(* $Id: sendImage.ml,v 3.0 1999-10-29 10:31:35 ddr Exp $ *)
 
 open Gutil;
 open Util;

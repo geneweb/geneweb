@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 2.6 1999-10-11 03:31:40 ddr Exp $ *)
+(* $Id: forum.ml,v 3.0 1999-10-29 10:31:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 2.3 1999-08-21 11:45:44 ddr Exp $ *)
+(* $Id: notes.ml,v 3.0 1999-10-29 10:31:26 ddr Exp $ *)
 
 open Config;
 open Def;

@@ -1,4 +1,4 @@
-(* $Id: argl.ml,v 2.1 1999-03-08 11:18:21 ddr Exp $ *)
+(* $Id: argl.ml,v 3.0 1999-10-29 10:30:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value action_arg s sl =

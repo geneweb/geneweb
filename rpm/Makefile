@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 1999-10-28 04:33:57 ddr Exp $
+# $Id: Makefile,v 3.0 1999-10-29 10:29:39 ddr Exp $
 
 VERSION=3.00
 RELEASE=1

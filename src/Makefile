@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.24 1999-10-08 07:15:47 ddr Exp $
+# $Id: Makefile,v 3.0 1999-10-29 10:30:52 ddr Exp $
 
 include ../tools/Makefile.inc
 

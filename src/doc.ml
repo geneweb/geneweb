@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 2.9 1999-10-27 13:14:13 ddr Exp $ *)
+(* $Id: doc.ml,v 3.0 1999-10-29 10:31:09 ddr Exp $ *)
 
 open Config;
 

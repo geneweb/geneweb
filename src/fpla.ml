@@ -1,4 +1,4 @@
-(* $Id: fpla.ml,v 2.3 1999-07-22 14:34:05 ddr Exp $ *)
+(* $Id: fpla.ml,v 3.0 1999-10-29 10:31:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 (* First Parentless Ancestor *)
 

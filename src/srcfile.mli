@@ -1,4 +1,4 @@
-(* $Id: srcfile.mli,v 2.3 1999-08-06 02:22:34 ddr Exp $ *)
+(* $Id: srcfile.mli,v 3.0 1999-10-29 10:31:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value print : Config.config -> Def.base -> string -> unit;
