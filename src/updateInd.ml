@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.9 1998-12-16 17:36:46 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.10 1998-12-19 13:15:58 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -125,7 +125,8 @@ value gen_print_ext_item conf base item i_cnt i_val =
     tag "td" begin Wserver.wprint "%s" (capitale item.i_txt_name); end;
     tag "td" begin
       Wserver.wprint "<input name=\"%s%d\" size=30" item.i_name i_cnt;
-      if i_val <> "" then Wserver.wprint " value=\"%s\"" (f_coa conf i_val)
+      if i_val <> "" then
+        Wserver.wprint " value=\"%s\"" (quote_escaped (f_coa conf i_val))
       else ();
       Wserver.wprint ">";
     end;
