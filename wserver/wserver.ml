@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 1.7 1998-10-31 09:37:53 ddr Exp $ *)
+(* $Id: wserver.ml,v 1.8 1998-11-03 09:40:29 ddr Exp $ *)
 
 open Unix;
 
@@ -266,16 +266,15 @@ value is_robot robot_excluder addr =
       if List.mem str excluded.val then True
       else
         let tm = Unix.time () in
+(**)
+        let tm = float tm in
+(**)
         let r = try W.find str who.val with [ Not_found -> [] ] in
         let (cnt, r, t) =
           count r where rec count =
             fun
             [ [t :: tl] ->
-(**)
                 if tm -. t < float sec then
-(*
-                if tm - t < sec then
-*)
                   let (cnt, tl, t1) = count tl in
                   (cnt + 1, [t :: tl], if t1 = 0.0 then t else t1)
                 else (0, [], t)
