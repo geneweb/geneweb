@@ -188,7 +188,7 @@
 <input type=radio name=married value=A checked>-
 
 <p>
-Maximum: <input name=max size=5 value=100 maxlength=5>
+Maximum: <input name=max size=5 value=100 maxlength=5> [person/persons]1
 <input type=submit value=Ok>
 
 </form>
