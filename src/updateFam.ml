@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.2 2001-04-20 14:23:29 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.3 2001-05-09 07:59:36 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -436,7 +436,7 @@ value print_comment conf base fam =
         tag "td" begin
           Wserver.wprint "<input name=comment size=50 maxlength=200%s>\n"
             (match fam.comment with
-             [ s when s <> "" -> " value=\"" ^ s ^ "\""
+             [ s when s <> "" -> " value=\"" ^ quote_escaped s ^ "\""
              | _ -> "" ]);
         end;
       end;
