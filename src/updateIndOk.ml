@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.7 2002-01-30 11:49:52 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.8 2002-02-26 09:19:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -248,7 +248,7 @@ value reconstitute_person conf =
   let bapt_place = only_printable (get conf "bapt_place") in
   let burial_place = only_printable (get conf "burial_place") in
   let burial = reconstitute_burial conf burial_place in
-  let death_place = get conf "death_place" in
+  let death_place = only_printable (get conf "death_place") in
   let death = reconstitute_death conf birth death_place burial burial_place in
   let death_place =
     match death with
