@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.4 1999-08-07 11:55:47 ddr Exp $ *)
+(* $Id: robot.ml,v 1.5 1999-08-07 21:13:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -114,6 +114,7 @@ value check oc tm from max_call sec =
                  max_call (tm -. t) sec; flush Pervasives.stderr;
                xcl.excl := [(from, ref 1) :: xcl.excl];
                xcl.who := W.remove from xcl.who;
+               xcl.max_conn := 0;
             return True
           else False
         in
