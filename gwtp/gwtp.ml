@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.33 2000-08-18 13:05:08 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.34 2000-08-18 13:08:50 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -557,9 +557,7 @@ value gwtp_main str env b tok =
 <ul>\n" b b;
      printf "<li><a href=\"gwtp?m=UPL;b=%s;t=%s\">Upload</a>\n" b tok;
      printf "<li><a href=\"gwtp?m=DNL;b=%s;t=%s\">Download</a>\n" b tok;
-(*
      printf "<li><a href=\"gwtp?m=CNF;b=%s;t=%s\">Configuration</a>\n" b tok;
-*)
      printf "</ul>\n";
      if gw_site.val <> "" then
        do printf "<p>\n<ul>\n";
