@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.22 1999-01-04 14:28:34 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.23 1999-01-06 10:47:44 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -373,6 +373,8 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
   let conf =
     {wizard = wizard && not wizard_just_friend;
      friend = friend || wizard_just_friend && wizard;
+     has_wizard_passwd = real_wizard_passwd <> "";
+     has_friend_passwd = real_friend_passwd <> "";
      cgi = cgi;
      command = command;
      lang = if lang = "" then default_lang else lang;

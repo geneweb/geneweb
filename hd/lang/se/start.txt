@@ -70,15 +70,13 @@ Och <a href="%sm=AM">bröllopsdagar</a>.
 <p>
 Det har varit %q åtkomster, %c av dem till den här sidan, sedan %d.
 
-<p>
+%y<p>
 
-<form method=get action="%f">
-%h<font size=-1>Passord, för <em>vänner</em> eller <em>uppdaterings</em>
-tillträde:</font>
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
+<ul>
+<li> <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de (passord).
+%y%z<li> <a href="%sw=f"><em>V&auml;nner</em></a> tilltr&auml;de (passord).
+%z%y</ul>
 
-<p>
+%y<p>
 
 <font size=-1><a href="%sm=LEX">Lexicon</a></font>

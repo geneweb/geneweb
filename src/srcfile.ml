@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.9 1998-12-16 17:36:42 ddr Exp $ *)
+(* $Id: srcfile.ml,v 1.10 1999-01-06 10:47:44 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -151,7 +151,9 @@ value rec copy_from_channel conf base ic =
       | '%' ->
           let c = input_char ic in
           if not echo.val then
-            if c == 'w' || c == 'x' then echo.val := True else ()
+            if c == 'w' || c == 'x' || c == 'y' || c == 'z' then
+              echo.val := True
+            else ()
           else
             match c with
             [ '%' -> Wserver.wprint "%%"
@@ -187,10 +189,16 @@ value rec copy_from_channel conf base ic =
                 return ()
             | 't' -> Wserver.wprint "%s" conf.bname
             | 'v' -> Wserver.wprint "%s" Gutil.version
-            | 'w' -> if not conf.wizard then echo.val := False else ()
+            | 'w' -> if conf.wizard then () else echo.val := False
             | 'x' ->
-                if not (conf.wizard || conf.friend) then echo.val := False
-                else ()
+                if conf.wizard || conf.friend then () else echo.val := False
+            | 'y' ->
+                if not conf.wizard && conf.has_wizard_passwd then ()
+                else echo.val := False
+            | 'z' ->
+                if not conf.wizard && not conf.friend
+                && conf.has_wizard_passwd && conf.has_friend_passwd then ()
+                else echo.val := False
             | c -> Wserver.wprint "%%%c" c ]
       | c -> if echo.val then Wserver.wprint "%c" c else () ];
     done

@@ -1,10 +1,12 @@
-(* $Id: config.mli,v 1.4 1998-11-27 20:09:39 ddr Exp $ *)
+(* $Id: config.mli,v 1.5 1999-01-06 10:47:43 ddr Exp $ *)
 
 open Def;
 
 type config =
   { wizard : bool;
     friend : bool;
+    has_wizard_passwd : bool;
+    has_friend_passwd : bool;
     cgi : bool;
     command : string;
     lang : string;

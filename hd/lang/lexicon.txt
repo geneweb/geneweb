@@ -1875,6 +1875,7 @@ pt: de
 se: till
 
     of %t's side
+de: von %t Seite
 en: of %t's side
 es: por parte de %t
 fr: du c&ocirc;t&eacute; de %t

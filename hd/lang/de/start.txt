@@ -72,14 +72,13 @@ Die <a href="%sm=AM">Hochzeitstage</a>.
 <p>
 Es hat %q Zugriffe mit %c auf diese Seite gegeben, seit %d.
 
-<p>
+%y<p>
 
-<form method=get action="%f">
-%h<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:</font>
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
+<ul>
+<li> <a href="%sw=w"><em>Wizard</em></a> access (password).
+%y%z<li> <a href="%sw=f"><em>Friend</em></a> access (password).
+%z%y</ul>
 
-<p>
+%y<p>
 
 <font size=-1><a href="%sm=LEX">Lexicon</a></font>
