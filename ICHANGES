@@ -5,6 +5,9 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [31 May 03] Fixed little problem which can be dangerous: in case
+    of empty line in wizard (or friend) authorization file, everybody
+    is wizard (or friend).
   - [01 Apr 03] Fixed bug for personal pages template: the macro
     "%prefix_no_templ" had the bad side effect to make the possible
     "templ=" removed in all the %prefix macros following it in the
