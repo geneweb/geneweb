@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.8 2001-05-09 10:46:05 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.9 2001-05-29 17:30:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -31,7 +31,9 @@ value login_timeout = ref 1800;
 value conn_timeout = ref 120;
 
 value log_oc () =
-  if log_file.val <> "" then open_out_gen log_flags 0o644 log_file.val
+  if log_file.val <> "" then
+    try open_out_gen log_flags 0o644 log_file.val with
+    [ Sys_error _ -> do { log_file.val := ""; stderr } ]
   else stderr
 ;
 
