@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.149 1999-10-13 08:31:22 ddr Exp $
+# $Id: lexicon.txt,v 2.150 1999-10-21 18:17:59 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -319,6 +319,14 @@ nl: neven en nichten in de 3e graad
 no: firmenninger
 pt: primos 3ro
 se: bryllingar
+
+    <em>Sosa number</em> relative to %t
+cs: <em>Sosa number</em> vzta¾ené k %t
+dk: <em>Sosa-nummer</em>, refererende til %t
+en: <em>Sosa number</em> relative to %t
+es: <em>n&uacute;mero Sosa</em> respecto a %t
+fr: <em>num&eacute;ro Sosa</em> par rapport &agrave; %t
+se: <em>Sosa nummer</em> relativ till %t
 
     M/F
 cs: M/®
