@@ -2,6 +2,8 @@ GeneWeb version 3.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [28 Nov 00] Fixed bug: it was possible to create a loop by merging
+    somebody with one of his/her ancestor.
   - [25 Nov 00] Small improvements: in update page, added "back" link,
     in "family deleted" page, added link to return to the person.
   - [24 Nov 00] Fixed bug: in automatic merge steps, the data base was
