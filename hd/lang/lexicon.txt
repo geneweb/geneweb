@@ -139,6 +139,7 @@ pt: Janeiro/Febreiro/Março/Abril/Maio/Junho/Julho/Agosto/Setembro/Outubro/Novemb
 se: januari/februari/mars/april/maj/juni/juli/augusti/september/oktober/november/december
 
     (thousand separator)
+cn: .
 de: .
 en: ,
 eo: ,
