@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.23 2000-03-19 17:57:53 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.24 2000-03-19 19:21:37 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -486,10 +486,15 @@ value mkpasswd () =
       loop (Buff.store len (Char.chr v))
 ;
 
+value random_self_init () =
+  let seed = int_of_float (mod_float (Unix.time ()) (float max_int)) in
+  Random.init seed
+;
+
 value set_login utm from_addr base_file acc =
   lock_wait Srcfile.adm_file "gwd.lck" with
   [ Accept ->
-      do Random.self_init (); return
+      do random_self_init (); return
       let (list, _, _) = get_actlog utm "" in
       let (x, xx) =
         let base = from_addr ^ "/" ^ base_file ^ "_" in
