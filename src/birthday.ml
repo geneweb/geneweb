@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.3 2000-01-03 21:03:40 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.4 2000-01-05 12:58:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -377,7 +377,9 @@ value gen_print_menu_birth f_scan conf base =
 ;
 
 value print_menu_birth conf base =
+(*
   let _ = base.data.persons.array () in
+*)
   let i = ref (-1) in
   let f_scan () =
     do incr i; return
@@ -396,7 +398,9 @@ value print_menu_dead conf base =
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
+(*
   let _ = base.data.persons.array () in
+*)
   do header conf title;
      for i = 0 to base.data.persons.len - 1 do
        let p = base.data.persons.get i in
@@ -477,7 +481,9 @@ value print_menu_marriage conf base =
   let list_tod = ref [] in
   let list_tom = ref [] in
   let list_aft = ref [] in
+(*
   let _ = base.data.families.array () in
+*)
   do header conf title;
      for i = 0 to base.data.families.len - 1 do
        let fam = base.data.families.get i in
