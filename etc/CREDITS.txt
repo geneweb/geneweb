@@ -3,6 +3,7 @@
 
 	Languages
 		Chinese		Gang Chen
+		Czech		Hanus Adler
 		Danish		Hans Albeck
 		Dutch		Joris Esch
 				Wijnand J. Nijs
