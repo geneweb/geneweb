@@ -2,6 +2,9 @@ GeneWeb version 3.12
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [11 Feb 01] Fixed a (small) bug: in the ancestors page, if the maximum
+    number of generations was the authorized limit plus one, the message
+    "maximum # generations" did not appear.
   - [10 Feb 01] In family update form, added button "no sexes check"
     allowing 1/ to create gay marriages 2/ to fix parents sex inversion
     without having to delete the marriage.
