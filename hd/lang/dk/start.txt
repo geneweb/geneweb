@@ -91,4 +91,4 @@ Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
 </form>
 %i<p>
 
-<font size=-1><a href="%sm=LEX">Lexicon</a></font>
+<font size=-1><a href="%sm=LEX">Leksikon</a></font>

@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.19 1999-10-04 10:24:00 ddr Exp $
+# $Id: geneweb.spec,v 1.20 1999-10-04 16:31:28 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -67,12 +67,9 @@ nedkopplad eller som en webbtjänst.
 # %prep: before the build.  
 # Blow away temporaries from last aborted build if any.
 # Unpack the .tar.gz (using %setup).
-# Delete any stray CVS dirs that got included (they break 'make install')
 %prep
-rm -f /etc/rc.d/rc?.d/S99gwd /etc/rc.d/rc?.d/K01gwd
-rm -rf /home/geneweb/gw /usr/doc/geneweb-%{version}
+rm -rf $RPM_BUILD_ROOT
 %setup
-find . -name CVS -print | /usr/bin/xargs /bin/rm -rf 
 
 # %build: how to compile
 %build
