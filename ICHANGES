@@ -4,6 +4,9 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 4.04
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [19 Sep 01] Trace: too big texts in referer now cut.
+
 * Compilation
   - [07 Sep 01] All executables are now compiled static (no dynamic library)
 
