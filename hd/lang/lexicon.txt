@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.46 2000-01-03 21:23:05 ddr Exp $
+# $Id: lexicon.txt,v 3.47 2000-01-04 12:06:14 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -225,6 +225,7 @@ se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
 
     (date)
 cn: %yÄê%m1ÈÕ/%yÄê%m%dÈÕ/%yÄê%m/%yÄê
+cr: 1er %m %y/%d %m %y/%m %y/%y
 cs: 1. %m %y/%d. %m %y/%m %y/%y
 de: 1. %m %y/%d. %m %y/%m %y/%y
 dk: 1. %m %y/%d. %m %y/%m %y/%y
@@ -273,6 +274,7 @@ se: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/a
 
     (month)
 cn: 1ÔÂ/2ÔÂ/3ÔÂ/4ÔÂ/5ÔÂ/6ÔÂ/7ÔÂ/8ÔÂ/9ÔÂ/10ÔÂ/11ÔÂ/12ÔÂ
+cr: janvier/f&eacute;vrier/mars/avril/mai/juin/juillet/ao&ucirc;t/septembre/octobre/novembre/d&eacute;cembre
 cs: ledna/února/bøezna/dubna/kvìtna/èervna/èervence/srpna/záøí/øíjna/listopadu/prosince
 de: Januar/Februar/M&auml;rz/April/Mai/Juni/Juli/August/September/Oktober/November/Dezember
 dk: januar/februar/marts/april/maj/juni/juli/august/september/oktober/november/december
