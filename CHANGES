@@ -2,11 +2,11 @@ GeneWeb version 4.03
 --------------------
 
 * Setup program (gwsetup)
-  - [17 Jul 01] Fixed bug: files selections (with "browse" buttons) did not
-    work with all browsers. In particular, it was sometimes not possible
-    to select files in other directories than the one of the data bases.
-    All files selections have therefore been replaced by versions using
-    hyperlinks.
+  - [17 Jul 01] Fixed bug: files selections (with "browse" buttons)
+    did not work with all browsers. In particular, it was sometimes not
+    possible to select files in other directories than the one of the data
+    bases. All these files selections have therefore been replaced by
+    versions using hyperlinks.
 
 * GeneWeb server or CGI (gwd)
   - [15 Jul 01] Improved alphabetical order of places in the display
