@@ -1,16 +1,24 @@
-<HTML>
-<HEAD>
-   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-   <META NAME="GENERATOR" CONTENT="Mozilla/4.03 [de] (WinNT; I) [Netscape]">
-   <TITLE>GeneWeb - Customization of pages</TITLE>
-</HEAD>
-<BODY>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Anpassung von Seiten</title></head>
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>GeneWeb - Anpassung von Seiten</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
 
-<H1>
-GeneWeb - Anpassung von Seiten</H1>
 Dieser Teil erkl&auml;rt, wie die Startseiten anzupassen und verwandte
-Seiten hinzuzuf&uuml;gen sind. Er wurde geschrieben f&uuml;r Leute, die&nbsp;
-<I>GeneWeb</I> bereits verwendet haben und ins Detail gehen wollen.
+Seiten hinzuzuf&uuml;gen sind. Er wurde geschrieben f&uuml;r Leute, die
+<font color=#2f6400><b>GeneWeb</b></font> bereits verwendet haben und ins Detail gehen wollen.
 <UL>
 <LI>
 <A HREF="#Wel">Startseite</A></LI>
@@ -22,31 +30,35 @@ Seiten hinzuzuf&uuml;gen sind. Er wurde geschrieben f&uuml;r Leute, die&nbsp;
 <A HREF="#Ass">Verbundene Seiten</A></LI>
 </UL>
 
-<H4>
-<A NAME="Wel"></A>Startseite</H4>
+
+<p>
+<hr>
+
+<h3><font color=#2f6400>
+<A NAME="Wel"></A>Startseite</font></h3>
 Die Startseite wird aus Textdateien zusammengebaut, den "start.txt"-Dateien,
-die mit der Distribution von <I>GeneWeb </I>geliefert werden. Es ist m&ouml;glich,
+die mit <font color=#2f6400><b>GeneWeb</b></font> geliefert werden. Es ist m&ouml;glich,
 diese Dateien zu modifizieren und/oder eine spezifische Version f&uuml;r
 eine spezielle Datenbank zu erstellen.
 
-<P>Diese Dateien enthalten HTML gemischt mit "Makros" (siehe folgenden
+<P>Diese Dateien enthalten HTML gemischt mit "Makros" (siehe folgender
 Abschnitt). Wenn du solche Dateien anlegen oder &auml;ndern m&ouml;chtest,
 verwende keinen HTML-Editor, sondern einen normalen Texteditor.
 
-<P>F&uuml;r die Startseite der Datenbank "foo" sucht <I>GeneWeb</I> nach
+<P>F&uuml;r die Startseite der Datenbank "bla" sucht <font color=#2f6400><b>GeneWeb</b></font> nach
 den folgenden Dateien in dieser Reihenfolge:
 <UL>
 <LI>
-bdir/lang/lg/foo.txt</LI>
+bdir/lang/lg/bla.txt</LI>
 
 <LI>
-hdir/lang/lg/foo.txt</LI>
+hdir/lang/lg/bla.txt</LI>
 
 <LI>
-bdir/lang/foo.txt</LI>
+bdir/lang/bla.txt</LI>
 
 <LI>
-hdir/lang/foo.txt</LI>
+hdir/lang/bla.txt</LI>
 
 <LI>
 bdir/lang/lg/start.txt</LI>
@@ -72,21 +84,25 @@ wobei:
 "lg" = aktuelle Sprache.</LI>
 </UL>
 Die Dateien "hdir/lang/lg/start.txt" werden mit der Distribution geliefert.
-Der einfachste Weg, um eine angepasste Datei zu erstellen, ist eine Kopie
-der Datei "start.txt", welche du anordnen kannst wie du willst. Wenn die
-Darstellung der Datei "start.txt" nicht gen&uuml;gt, kann diese auch direkt
-ge&auml;ndert werden.
+Der einfachste Weg, um eine angepa&szlig;te Datei zu erstellen, ist eine Kopie
+der Datei "start.txt" zu machen, welche du &auml;ndern kannst wie du
+willst. Wenn die Darstellung der Datei "start.txt" nicht gen&uuml;gt,
+kann diese auch direkt ge&auml;ndert werden.
 
-<P>Trotzdem eine Warnung: von einer Version von <I>GeneWeb</I> zur n&auml;chsten
+<P>Trotzdem eine Warnung: Von einer Version von <font color=#2f6400><b>GeneWeb</b></font> zur n&auml;chsten
 kann es sein, da&szlig; die "start.txt"-Dateien verbessert worden sind.
 Wenn du die neue Version nimmst und die Verbesserungen nutzen willst, schau
 in die "start.txt"-Dateien um zu sehen, wo diese ver&auml;ndert worden
-sind und schliesse die &Auml;nderungen in deine angepassten Dateien ein.
-<H4>
-<A NAME="Mac"></A>Makros</H4>
+sind und erg&auml;nze die &Auml;nderungen in deinen angepa&szlig;ten Dateien.
+
+<p>
+<hr>
+
+<h3><font color=#2f6400>
+<A NAME="Mac"></A>Makros</font></h3>
 Wie oben erw&auml;hnt, sind die Dateien der Startseiten kein pures HTML.
-Sie enthalten "Makros". Das sind Sequenzen beginnend mit dem Zeichen "%"
-gefolgt von einem Buchstaben. Beispiele: "%s", "%x", etc.
+Sie enthalten "Makros". Das sind Sequenzen beginnend mit dem Zeichen
+"%", gefolgt von einem Buchstaben. Beispiele: "%s", "%x", etc.
 
 <P>Diese Makros werden ersetzt durch Werte, die vom Kontext abh&auml;ngen:
 Name der Datenbank, Sprache, Zahl der Personen in der Datenbank etc.
@@ -96,7 +112,7 @@ Name der Datenbank, Sprache, Zahl der Personen in der Datenbank etc.
 in die aktuelle Sprache umgesetzt mit folgenden &Auml;nderungen:
 <UL>
 <LI>
-Wenn nach der &ouml;ffnenden Klammer ein Stern steht, wird der 1. Buchstabe
+Wenn nach der &ouml;ffnenden Klammer ein Stern steht, wird der erste Buchstabe
 der &Uuml;bersetzung gro&szlig; geschrieben.</LI>
 
 <LI>
@@ -119,17 +135,17 @@ in die mitgelieferten "start.txt"-Dateien.
 
 <LI>
 "<TT><FONT SIZE=+1>%f</FONT></TT>": im Servermodus, Name der Datenbank
-gefolgt von einem m&ouml;glichen Passwort (Bsp.: "foo_xyzzy"); im CGI Modus
+gefolgt von einem m&ouml;glichen Kennwort (Bsp.: "bla_xyzzy"); im CGI Modus
 Name des CGI-Aufrufs (Bsp.: "gwd.exe").</LI>
 
 <LI>
 "<TT><FONT SIZE=+1>%g</FONT></TT>": im Servermodus wie "%f"; im CGI-Modus
 Name des CGI-Kommandos gefolgt von "?b=", dem Namen der Datenbank und einem
-Semikolon (Bsp.: "gwd.exe?b=foo;").</LI>
+Semikolon (Bsp.: "gwd.exe?b=bla;").</LI>
 
 <LI>
 "<TT><FONT SIZE=+1>%s</FONT></TT>": Wert von "%f" gefolgt von einem Fragezeichen
-und Kontextvariablen (s. u.) gefolgt von einem Semikolon. Bsp.: "foo?lang=it;iz=8233;".</LI>
+und Kontextvariablen (s.&nbsp;u.) gefolgt von einem Semikolon. Bsp.: "bla?lang=it;iz=8233;".</LI>
 </UL>
 
 <LI>
@@ -151,18 +167,18 @@ und Kontextvariablen (s. u.) gefolgt von einem Semikolon. Bsp.: "foo?lang=it;iz=
 
 <UL>
 <LI>
-"<TT><FONT SIZE=+1>%w... %w</FONT></TT>": anzeigen wenn "Helfer".</LI>
+"<TT><FONT SIZE=+1>%w... %w</FONT></TT>": anzeigen falls "Wizard".</LI>
 
 <LI>
-"<TT><FONT SIZE=+1>%x... %x</FONT></TT>": anzeigen wenn "Helfer" oder "Freund".</LI>
+"<TT><FONT SIZE=+1>%x... %x</FONT></TT>": anzeigen wenn "Wizard" oder "Freund".</LI>
 
 <LI>
 "<TT><FONT SIZE=+1>%y... %y</FONT></TT>": anzeigen wenn "Server"-Modus
-(nicht CGI) und kein "Helfer".</LI>
+(nicht CGI) und kein "Wizard".</LI>
 
 <LI>
 "<TT><FONT SIZE=+1>%z... %z</FONT></TT>": anzeigen wenn "Server"-Modus
-(nicht CGI) und weder "Helfer" noch "Freund".</LI>
+(nicht CGI) und weder "Wizard" noch "Freund".</LI>
 
 <LI>
 "<TT><FONT SIZE=+1>%i... %i</FONT></TT>": anzeigen wenn CGI-Modus.</LI>
@@ -178,11 +194,11 @@ Zeile: Einschlu&szlig; der Datei "name.txt".</LI>
 
 <LI>
 "<TT><FONT SIZE=+1>%b</FONT></TT>": Wert der Variablen "body_prop" der
-Datei "foo.gwf" f&uuml;r die Datenbank "foo".</LI>
+Datei "bla.gwf" f&uuml;r die Datenbank "bla".</LI>
 
 <LI>
 "<TT><FONT SIZE=+1>%h</FONT></TT>": Kontextvariablen (s. u.) in der Form
-"&lt; input type=hidden name=var value=val&gt;".</LI>
+"&lt;input type=hidden name=var value=val&gt;".</LI>
 
 <LI>
 "<TT><FONT SIZE=+1>%l</FONT></TT>": Sprache.</LI>
@@ -191,7 +207,7 @@ Datei "foo.gwf" f&uuml;r die Datenbank "foo".</LI>
 "<TT><FONT SIZE=+1>%n</FONT></TT>": Anzahl von Personen in der Datenbank.</LI>
 
 <LI>
-"<TT><FONT SIZE=+1>%%</FONT></TT>": nur ein "%".</LI>
+"<TT><FONT SIZE=+1>%%</FONT></TT>": einzelnes "%".</LI>
 
 <LI>
 "<TT><FONT SIZE=+1>%[</FONT></TT>": "[".</LI>
@@ -209,18 +225,22 @@ b: im CGI-Modus, Datenbankname.</LI>
 lang: Sprache.</LI>
 
 <LI>
-iz: Nummer der Person, die als Sosa Referenz verwendet wird wenn vorhanden.</LI>
+iz: Nummer der Person, die als Sosa-Referenz verwendet wird, falls vorhanden.</LI>
 </UL>
-Die <B>Bedingungen</B> k&ouml;nnen nicht &uuml;berlappen: man kann kein
+Die <B>Bedingungen</B> k&ouml;nnen nicht &uuml;berlappen: Man kann kein
 "<TT><FONT SIZE=+1>%w... %w</FONT></TT>" innerhalb eines "<TT><FONT SIZE=+1>%i...
 %i</FONT></TT>" verwenden.
-<H4>
-<A NAME="Ass"></A>Verbundene Seiten</H4>
-In die angepassten Startseiten kannst du Links zu verbundenen Dateien einf&uuml;gen,
-die von <I>GeneWeb</I> auf die gleiche Art und Weise behandelt werden:
+
+<p>
+<hr>
+
+<h3><font color=#2f6400>
+<A NAME="Ass"></A>Verbundene Seiten</font></h3>
+In die angepa&szlig;ten Startseiten kannst du Links zu verbundenen Dateien einf&uuml;gen,
+die von <font color=#2f6400><b>GeneWeb</b></font> auf die gleiche Art und Weise behandelt werden:
 Die Makros werden umgewandelt.
 
-<P>Zum Beispiel, wenn du eine spezielle Seite der ber&uuml;hmten Personen
+<P>Wenn du zum Beispiel eine spezielle Seite der ber&uuml;hmten Personen
 deiner Datenbank erstellen willst, erzeuge eine Datei namens "famous.txt"
 im Verzeichnis "bdir/lang/lg" oder im Verzeichnis "bdir/lang" (siehe erster
 Abschnitt).
@@ -247,15 +267,21 @@ Beispielsatz in der Datei "famous.txt":
 &nbsp;&nbsp; Louis XIV&lt;/a> und meine
 &nbsp;&nbsp; &lt;a href="%em=R;ep=john;en=smith;m=NG;n=louis+xiv;t=PN">
 &nbsp;&nbsp; Verwandtschaftsbeziehungen&lt;/a> zu ihm.</PRE>
-Siehe auch: wie man korrekte <A HREF="links.htm">Links</A> zu <I>GeneWeb</I>
+Siehe auch: Wie man korrekte <A HREF="links.htm">Links</A> zu <font color=#2f6400><b>GeneWeb</b></font> 
 Seiten machen kann.
 
-<P>Beachte, dass die "erweiterte Anfrage" wie eine verbundene Datei namens
+<P>Beachte, da&szlig; die "erweiterte Anfrage" wie eine verbundene Datei namens
 "advanced.txt" wirkt.
 
-<P>zur&uuml;ck zur&nbsp; <A HREF="diruse.htm">Gebrauchsanleitung</A>.
 
-<P>
-<HR><I><FONT SIZE=-1>&copy; Copyright INRIA 1999 - GeneWeb</FONT></I>
-</BODY>
-</HTML>
+<p>
+<hr>
+<br>
+<center>
+Zur&uuml;ck zur <a href="diruse.htm">Gebrauchsanweisung</a>.
+</center>
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
+GeneWeb</em></font><br>
+
+</body>

@@ -1,67 +1,89 @@
-<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
-<html>
-<head>
-   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <title>GeneWeb - Datenbankwiederherstellung</title>
-</head>
-<body>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Wiederherstellung einer Datenbank</title></head>
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>GeneWeb - Wiederherstellung einer Datenbank</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
 
-<h1>
-GeneWeb - Wiederherstellung einer Datenbank</h1>
-Bei der Installation einer neuen Version von <i>GeneWeb</i> m&ouml;chtest
+Bei der Installation einer neuen Version von <font color=#2f6400><b>GeneWeb</b></font> m&ouml;chtest
 du wahrscheinlich weiterhin deine vorhandene Datenbank nutzen.
 <p>Wenn du mit einer GEDCOM-Datei begonnen und keine oder nur wenige &Auml;nderungen
-vorgenommen hast, ist es besser, mit der neuen Version von "ged2gwb" zu
-beginnen. Von einer Version zur n&auml;chsten kann dieses Programm verbessert
-worden sein: neu behandelte Felder, neue Optionen.
-<p>Andererseits, wenn du mit einer leeren Datenbank&nbsp; oder mit einer
-GEDCOM-Datei angefangen hast und &Auml;nderungen vorgenommen hast, verwende
-die folgende Prozedur:
+vorgenommen hast, ist es besser, nochmal von vorne mit der neuen Version von "ged2gwb" zu
+beginnen. Von einer Version zur n&auml;chsten k&ouml;nnte dieses Programm verbessert
+worden sein: Neu behandelte Felder, neue Optionen.
+<p>Wenn Du aber  mit einer leeren Datenbank oder mit einer
+GEDCOM-Datei angefangen hast und &Auml;nderungen vorgenommen hast,
+dann gehe wie folgt vor:
 <ul>
 <li>
-Bewege deine Datenbank vom Verzeichnis der alten Version von&nbsp; <i>GeneWeb</i>
-zum neuen. Wenn dein Datenbankname "Meier" ist, musst du also das Verzeichnis
-"Meier.gwb" bewegen.</li>
+Verschiebe deine Datenbank vom Verzeichnis der alten
+<font color=#2f6400><b>GeneWeb</b></font>-Version
+zum neuen. Wenn dein Datenbankname "meier" ist, mu&szlig;t du also das 
+Verzeichnis
+"meier.gwb" verschieben.
 
 <li>
 Start das neue "gwd" und sieh, ob deine Datenbank akzeptiert wird oder
 nicht, indem du versuchst, sie im Webbrowser zu anzusehen.</li>
 
 <li>
-Wenn das nicht geht, musst du sie neu erstellen. F&uuml;hre die ff. Operationen
-durch:</li>
+Wenn das nicht geht, mu&szlig;t du die Datenbank neu erstellen. 
+F&uuml;hre die folgenden Schritte durch:
 
 <ul>
 <li>
-Stelle "Meier.gwb" zur&uuml;ck in das alte Verzeichnis</li>
+Schiebe "meier.gwb" zur&uuml;ck in das alte Verzeichnis
 
 <li>
 Starte ein Eingabefenster. Gehe zum alten Verzeichnis (Befehl "cd") und
-gib ein:</li>
+gib ein:
 
-<pre>&nbsp;&nbsp;&nbsp;&nbsp; gwu meier.gwb > foo.gw</pre>
-Anmerkung: dieser Befehl hie&szlig; "gwb2gw" in fr&uuml;heren Versionen.
-Wenn dieser Befehl existiert, benutze ihn.
+<pre>
+     gwu meier.gwb > bla.gw
+</pre>
+Anmerkung: Dieser Befehl hie&szlig; in fr&uuml;heren Versionen "gwb2gw".
+Wenn dieser Befehl mit dem alten Namen existiert, benutze ihn.
 <li>
-Kopiere die Datei "foo.gw" in das neue Verzeichnis.</li>
-
-<li>
-Im Eingabefenster, gehe zum neuen Verzeichnis (Befehl "cd") und gib ein:</li>
-
-<pre>&nbsp;&nbsp;&nbsp;&nbsp; gwc -nc foo.gw -o meier</pre>
+Kopiere die Datei "bla.gw" in das neue Verzeichnis.</li>
 
 <li>
-starte den neuen D&auml;mon und kontrolliere, dass die Datenbank akzeptiert
+Gehe im Eingabefenster zum neuen Verzeichnis (Befehl "cd") und gib ein:</li>
+
+<pre>
+	gwc -nc bla.gw -o meier
+</pre>
+
+<li>
+Starte den neuen D&auml;mon und kontrolliere, da&szlig; die Datenbank akzeptiert
 wird. Das sollte so sein.</li>
 
 <li>
-Du kannst nun die Dateien "foo.gw" und "foo.gwo" l&ouml;schen, letzteres
-von&nbsp; "gwc" erzeugt, diese werden jetzt nicht mehr ben&ouml;tigt. Du
-kannst aber auch "foo.gw" als eine Sicherung deiner Datenbank aufheben.</li>
+Du kannst nun die Dateien "bla.gw" und "bla.gwo" l&ouml;schen, letzteres
+wurde von "gwc" erzeugt, diese werden jetzt nicht mehr ben&ouml;tigt. Du
+kannst aber auch "bla.gw" als eine Sicherung deiner Datenbank aufheben.</li>
 </ul>
 </ul>
-Zur&uuml;ck zur <a href="diruse.htm">Gebrauchsanweisung</a>.
+
+
 <p>
-<hr><i><font size=-1>&copy; Copyright INRIA 1999 - GeneWeb</font></i>
+<hr>
+<br>
+<center>
+Zur&uuml;ck zur <a href="diruse.htm">Gebrauchsanweisung</a>.
+</center>
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
+GeneWeb</em></font><br>
+
 </body>
-</html>
