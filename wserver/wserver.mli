@@ -1,14 +1,16 @@
-(* $Id: wserver.mli,v 2.4 1999-08-06 02:22:35 ddr Exp $ *)
+(* $Id: wserver.mli,v 2.5 1999-10-20 12:20:11 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 (* module [Wserver]: elementary web service *)
 
 value f :
-  int -> int -> option int -> (option int * option int) ->
+  option string -> int -> int -> option int -> (option int * option int) ->
     ((Unix.sockaddr * list string) -> string -> unit) -> unit
 ;
-   (* [Wserver.f port tmout maxc (uid, gid) g] starts an elementary
-       httpd server at port [port] in the current machine. The port number is
+   (* [Wserver.f addr port tmout maxc (uid, gid) g] starts an elementary
+       httpd server at port [port] in the current machine. The variable
+       [addr] is [Some the-address-to-use] or [None] for any of the
+       available addresses of the present machine. The port number is
        any number greater than 1024 (to create a client < 1024, you must be
        root). At each connection, the function [g] is called:
        [g (addr, request) s] where [addr] is the client
@@ -56,7 +58,7 @@ value get_request_and_content : Stream.t char -> (list string * string);
 (* Example:
 
    - Source program "foo.ml":
-        Wserver.f 2368 60 None (None, None)
+        Wserver.f None 2368 60 None (None, None)
            (fun _ s -> Wserver.html (); Printf.printf "You said: %s...\n" s);;
    - Compilation:
         ocamlc -custom unix.cma -cclib -lunix wserver.cmo foo.ml

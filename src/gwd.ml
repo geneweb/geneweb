@@ -1,11 +1,12 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.50 1999-10-19 08:58:41 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.51 1999-10-20 12:20:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 
+value selected_addr = ref None;
 value selected_port = ref 2317;
 value redirected_addr = ref None;
 value wizard_passwd = ref "";
@@ -913,7 +914,11 @@ else ()
 ;
 
 value geneweb_server () =
-  let hostn = try Unix.gethostname () with _ -> "computer" in
+  let hostn =
+    match selected_addr.val with
+    [ Some addr -> addr
+    | None -> try Unix.gethostname () with _ -> "computer" ]
+  in
   let auto_call =
     try let _ = Sys.getenv "WSERVER" in True with [ Not_found -> False ]
   in
@@ -952,7 +957,7 @@ Type control C to stop the service
        return ()
      else ();
   return
-  Wserver.f selected_port.val tmout
+  Wserver.f selected_addr.val selected_port.val tmout
     (ifdef UNIX then max_clients.val else None) (uid.val, gid.val)
     (connection False)
 ;
@@ -1065,6 +1070,9 @@ value main () =
      ("-cgi", Arg.Set cgi,
       "
        Force cgi mode.");
+     ("-a", Arg.String (fun x -> selected_addr.val := Some x),
+      "<address>
+       Select a specific address (default = any address of this computer)");
      ("-p", Arg.Int (fun x -> selected_port.val := x),
       "<number>
        Select a port number (default = " ^

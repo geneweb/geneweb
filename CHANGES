@@ -2,6 +2,8 @@ GeneWeb version 2.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [Oct 20, 99] Added option -a to give a specific IP address for the
+    service (must be compatible with the computer).
   - [Oct 19, 99] Added treatment of png images files.
   - [Oct 10, 99] In update form, when name conflict, added the birth and
     death date in the list of persons having the same name.
