@@ -51,7 +51,7 @@ pt: h&aacute; %d anos
 se: %d &aring;r sedan
 
     %s cousins
-de: Vettere %s Grades
+de: Cousins %s Grades
 en: %s cousins
 eo: %s gekuzoj
 es: primos %s
@@ -208,7 +208,7 @@ pt: , ser&aacute;
 se: , &auml;r det
 
     2nd cousins
-de: Vettere 2ten Grades
+de: Cousins 2ten Grades
 en: 2nd cousins
 eo: 2a gekuzoj
 es: primos 2ndos
@@ -219,7 +219,7 @@ pt: primos 2ndos
 se: sysslingar
 
     3rd cousins
-de: Vettere 3ten Grades
+de: Cousins 3ten Grades
 en: 3rd cousins
 eo: 3a gekuzoj
 es: primos 3ros
@@ -260,7 +260,7 @@ pt: numeraç&atilde;o Sosa
 se: generationsnummer
 
     a %s cousin
-de: ein Vetter %s Grades/eine Kusine %s Grades
+de: ein Cousin %s Grades/eine Kusine %s Grades
 en: a %s cousin
 eo: %s kuzo/%s kuzino/%s gekuzo
 es: un primo %s/una prima %s/un(a) primo(a) %s
@@ -271,7 +271,7 @@ pt: um primo %s/uma prima %s/um(a) primo(a) %s
 se: en %s kusin
 
     a 2nd cousin
-de: ein Vetter 2ten Grades/eine Kusine 2ten Grades
+de: ein Cousin 2ten Grades/eine Kusine 2ten Grades
 en: a 2nd cousin
 eo: 2a kuzo/2a kuzino/2a gekuzo
 es: un primo 2ndo/una prima 2ndo/un(a) primo(a) 2ndo
@@ -282,7 +282,7 @@ pt: um primo 2ndo/uma prima 2ndo/um(a) primo(a) 2ndo
 se: en syssling
 
     a 3rd cousin
-de: ein Vetter 3ten Grades/eine Kusine 3ten Grades
+de: ein Cousin 3ten Grades/eine Kusine 3ten Grades
 en: a 3rd cousin
 eo: 3a kuzo/3a kuzino/3a gekuzo
 es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
@@ -304,7 +304,7 @@ pt: um irm&atilde;o/uma irm&atilde;/um(a) irm&atilde;o(&atilde;)
 se: en bror/en syster/ett syskon
 
     a cousin
-de: ein Vetter/eine Kusine
+de: ein Cousin/eine Kusine
 en: a cousin
 eo: kuzo/kuzino
 es: un primo/una prima
@@ -883,7 +883,7 @@ pt: continuar fus&atilde;o
 se: forts&auml;tt sl&aring;samman
 
     cousins
-de: Vetter
+de: Cousins
 en: cousins
 eo: kuzoj
 es: primos
@@ -1875,7 +1875,7 @@ pt: de
 se: till
 
     of %t's side
-de: von %t Seite
+de: von %ts Seite
 en: of %t's side
 es: por parte de %t
 fr: du c&ocirc;t&eacute; de %t
