@@ -2,9 +2,12 @@ GeneWeb Version 1.10
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [19/12/98] Fixed bug quotes disappearing in field "first name aliases"
+    in form Update/Person (if the value holds quotes).
   - [18/12/98] No more HTML "table" used in relationship links with
     one branch (=> more compact display and visible in browsers
-    without tables, e.g. "lynx").
+    without tables, e.g. "lynx"). Tried to generate more readable text
+    when 2 branches when browser is "lynx".
   - [13/12/98] The directory cnt is no more searched in the directory where
     the daemon (or the CGI) is launched but in the base directory (option -bd
     of gwd; no difference if option -bd not used).
