@@ -67,7 +67,7 @@ Til að lóðsa þig í gegnum gagnagrunninn getur þú leitað:<br><br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=#2f6400><b>by person</b></font>
+<font color=#2f6400><b>eftir nafni</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -104,7 +104,7 @@ Til að lóðsa þig í gegnum gagnagrunninn getur þú leitað:<br><br>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>með lista</b></font> yfir öll
+<font color=#2f6400><b>eftir lista</b></font> yfir öll
 <select name=m>
 <option value="N" selected>eftirnöfn
 <option value="P">fornöfn
@@ -119,9 +119,9 @@ eftir
 
 <li>
 
-<font color=#2f6400><b>með </b></font>
-<a href="%sm=H;v=advanced"><font color=#2f6400><b>nánari 
-ósk</b></font></a>.
+<font color=#2f6400><b>eftir </b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>frekari
+óskum</b></font></a>.
 
 </ul>
 
