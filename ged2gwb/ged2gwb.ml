@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.4 1999-03-16 18:37:13 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.5 1999-03-16 20:12:42 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -76,9 +76,15 @@ value skip_space =
   | [: :] -> () ]
 ;
 
+value rec line_start num =
+  parser
+  [ [: `' '; s :] -> line_start num s
+  | [: `x when x = num :] -> () ]
+;
+
 value rec get_lev n =
   parser
-  [ [: `c when c == n; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
+  [ [: _ = line_start n; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
        r3 = get_to_eoln 0 ? "get to eoln";
        l = get_lev_list [] (Char.chr (Char.code n + 1)) ? "get lev list" :] ->
       let (rlab, rval, rcont) =
@@ -579,7 +585,7 @@ value rec is_a_public_name s i =
 
 value get_lev0 =
   parser
-  [ [: `'0'; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
+  [ [: _ = line_start '0'; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
        r3 = get_to_eoln 0 ? "get to eoln";
        l = get_lev_list [] '1' ? "get lev list" :] ->
       let (rlab, rval) = if r2 = "" then (r1, "") else (r2, r1) in
@@ -1239,7 +1245,7 @@ value print_base_warning base =
 
 value find_lev0 =
   parser bp
-  [ [: `'0'; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
+  [ [: _ = line_start '0'; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
        _ = skip_to_eoln :] ->
       (bp, r1, r2) ]
 ;
