@@ -64,11 +64,11 @@ sortert
 
 </ul>
 
-<a href="%sm=AN">F&oslash;dselsdager</a>.<br>%x
+<a href="%sm=AN">F&oslash;dselsdager</a>.<br>
+<a href="%sm=AD">&Aring;rsdager for d&oslash;de personer</a>.<br>
+<a href="%sm=AM">Bryllupsdager</a>.<br>%x
 <a href="%sm=LB;k=10">Sist f&oslash;dte</a>.<br>
 <a href="%sm=LD;k=10">Sist d&oslash;de</a>.<br>%x
-<a href="%sm=AD">&Aring;rsdager for d&oslash;de personer</a>.<br>
-<a href="%sm=AM">Bryllupsdager</a>.
 <p>
 Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
 
