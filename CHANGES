@@ -2,11 +2,6 @@ GeneWeb version 4.04
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [21 Nov 01] Fixed a problem which could sometimes generate
-    disconnections, in particular when adding children in families
-    (technical: it happened in server mode (not CGI); it was due to a
-    fact that the header of the http answer had to contain some specific
-    line (precisely: "Connection: close")).
   - [16 Nov 01] Changed the term "switch" into "invert" (English is
     not my native language, I made a miskake when translating it).
   - [14 Nov 01] Suppressed the <nobr> tag used in several displayings,

@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.4 2001-11-22 19:06:20 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.5 2001-11-23 12:24:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -326,7 +326,7 @@ value treat_connection tmout callback addr ic =
       (request, script_name, contents)
     in
     if script_name = "robots.txt" then do {
-      wprint "HTTP/1.0 200 Ok"; nl ();
+      wprint "HTTP/1.0 200 OK"; nl ();
       wprint "Connection: close"; nl ();
       wprint "Content-type: text/plain"; nl (); nl ();
       wprint "User-Agent: *"; nl ();
