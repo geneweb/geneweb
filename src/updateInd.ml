@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.5 1999-04-05 23:42:29 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.6 1999-04-15 01:10:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -355,7 +355,7 @@ value print_title conf base t cnt =
              (capitale (transl_nth conf "title/titles" 0));
          end;
          tag "td" begin
-           Wserver.wprint "<input name=t_title%d size=15%s>" cnt
+           Wserver.wprint "<input name=t_ident%d size=15%s>" cnt
              (match t with
               [ Some {t_ident = n} -> " value=\"" ^ f_coa conf n ^ "\""
               | _ -> "" ]);
