@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.60 2004-12-14 09:30:15 ddr Exp $ *)
+(* $Id: perso.ml,v 4.61 2004-12-28 19:59:42 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1165,7 +1165,7 @@ value print_transl conf base env upp s c =
 
 value print_wid_hei conf base env fname =
   match image_size (image_file_name fname) with
-  [ Some (wid, hei) -> Wserver.wprint " width=%d height=%d" wid hei
+  [ Some (wid, hei) -> Wserver.wprint " width=\"%d\" height=\"%d\"" wid hei
   | None -> () ]
 ;
 
