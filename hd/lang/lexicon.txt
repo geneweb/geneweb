@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.148 2003-01-15 15:19:20 ddr Exp $
+# $Id: lexicon.txt,v 4.149 2003-01-17 09:01:48 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -81,7 +81,7 @@ pt-br: af=Afrikaner/ca=Catal&atilde;o/cs=Checo/da=Dinamarqu&ecirc;s/de=Alem&atil
 ro: af=africaans/ca=catalana/cs=checha/da=daneza/de=germana/en=engleza/eo=esperanto/es=spaniola/fi=finlandeza/fr=franceza/he=evreiasca/is=islandeza/it=italiana/nl=olandeza/no=norvegiana/pl=poloneza/pt=potugeza/pt-br=portugeza-in-brazilia/ro=romaneste/ru=rusa/sv=suedeza/zh=chineza
 ru: af=àôğèêàíñêèé/bg=áîëãàğñêèé/ca=êàòàëàíñêèé/cs=÷åøñêèé/da=äàòñêèé/de=íåìåöêèé/en=àíãëèéñêèé/eo=ıñïåğàíòî/es=èñïàíñêèé/et=ıñòîíñêèé/fi=ôèíñêèé/fr=ôğàíöóçñêèé/he=èâğèò/is=èñëàíäñêèé/it=èòàëüÿíñêèé/lv=ëàòûøñêèé/nl=ãîëëàíäñêèé/no=íîğâåæñêèé/pl=ïîëüñêèé/pt=ïîğòóãàëüñêèé/pt-br=áğàçèëüñêî-ïîğòóãàëüñêèé/ru=ğóññêèé/sl=ñëàâÿíñêèé/sv=øâåäñêèé/zh=êèòàéñêèé
 sl: af=afrikaan¹èina/ca=katalon¹èina/cs=èe¹èina/da=dan¹èina/de=nem¹èina/en=angle¹èina/eo=esperanto/es=¹pan¹èina/et=eston¹èina/fi=fin¹èina/fr=franco¹èina/he=hebrej¹èina/is=island¹èina/it=italijan¹èina/lv=litvan¹èina/nl=nizozem¹èina/no=norve¹èina/pl=polj¹èina/pt=portugal¹èina/pt-br=brazilska-portugal¹èina/ru=ru¹èina/sl=sloven¹èina/sv=¹ved¹èina/zh=kitaj¹èina
-sv: af=afrikaans/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ru=ryska/sv=svenska/zh=kinesiska
+sv: af=afrikaans/bg=bulgariska/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sl=slovenska/sv=svenska/zh=kinesiska
 
      to see the first branch
 af:  om die eerste staak te sien
