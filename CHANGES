@@ -2,6 +2,9 @@ GeneWeb version 3.07
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [30 Jul 00] Added an option "-conn_tmout" (available only under
+    Unix) to specify a connection timeout for one request. If the request
+    has not terminated after this time, it is killed. Default is 120s.
   - [30 Jul 00] Contribution from Ludovic Ledieu: changed displaying
     of ancestors trees: 1/ clicks on persons fall on their personal pages
     (no more for navigation) 2/ vertical bars are clickable to navigate 3/

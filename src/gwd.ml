@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.52 2000-07-26 13:32:31 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.53 2000-07-30 18:59:57 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -25,6 +25,7 @@ value robot_xcl = ref None;
 value auth_file = ref "";
 value daemon = ref False;
 value login_timeout = ref 1800;
+value conn_timeout = ref 120;
 
 value log_oc () =
   if log_file.val <> "" then open_out_gen log_flags 0o644 log_file.val
@@ -1065,8 +1066,6 @@ value connection cgi (addr, request) script_name contents =
       [ Exit -> () ]
 ;
 
-value tmout = 120;
-
 value null_reopen flags fd =
 ifdef UNIX then
   let fd2 = Unix.openfile "/dev/null" flags 0 in
@@ -1115,7 +1114,7 @@ Type %s to stop the service
        return ()
      else ();
   return
-  Wserver.f selected_addr.val selected_port.val tmout
+  Wserver.f selected_addr.val selected_port.val conn_timeout.val
     (ifdef UNIX then max_clients.val else None) (connection False)
 ;
 
@@ -1282,6 +1281,9 @@ value main () =
          "<num>
        Max number of clients treated at the same time (default: no limit)
        (not cgi).");
+       ("-conn_tmout", Arg.Int (fun x -> conn_timeout.val := x),
+      "<sec>
+       Connection timeout (default " ^ string_of_int conn_timeout.val ^ "s)");
         ("-daemon", Arg.Set daemon,
          "
        Unix daemon mode.")]
