@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.13 1999-07-15 08:52:44 ddr Exp $ *)
+(* $Id: family.ml,v 2.14 1999-07-15 17:13:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -212,11 +212,22 @@ value precisez conf base n pl =
      new system: "em=mode;ei=n"
    The old system is kept by compatibility. *)
 
+value set_senv conf vm vi =
+  do conf.senv := [("em", vm); ("ei", vi)];
+     if conf.cancel_links then
+       do conf.senv := conf.senv @ [("cgl", "on")];
+          match p_getenv conf.env "m" with
+          [ Some _ -> conf.cancel_links := False
+          | None -> () ];
+       return ()
+     else ();
+  return ()
+;
+
 value make_senv conf base =
   let get x = Util.p_getenv conf.env x in
   match (get "em", get "ei", get "ep", get "en", get "eoc") with
-  [ (Some vm, Some vi, _, _, _) ->
-      conf.senv := [("em", vm); ("ei", vi)]
+  [ (Some vm, Some vi, _, _, _) -> set_senv conf vm vi
   | (Some vm, None, Some vp, Some vn, voco) ->
       let voc =
         match voco with
@@ -228,7 +239,7 @@ value make_senv conf base =
         [ Not_found -> do incorrect_request conf; return raise Exit ]
       in
       let vi = string_of_int (Adef.int_of_iper ip) in
-      conf.senv := [("em", vm); ("ei", vi)]
+      set_senv conf vm vi
   | _ ->
       let e =
         match get "e" with

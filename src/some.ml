@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.8 1999-07-15 08:52:56 ddr Exp $ *)
+(* $Id: some.ml,v 2.9 1999-07-15 17:13:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -87,8 +87,7 @@ value print_elem conf base is_surname (p, xl) =
                 Wserver.wprint "<a href=\"%s%s\">" (commd conf)
                   (acces conf base x);
                 if is_surname then
-                  Wserver.wprint "%s%s" (surname_end p)
-                    (surname_begin p)
+                  Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
                 else Wserver.wprint "%s" p;
                 Wserver.wprint "</a>";
                 Date.afficher_dates_courtes conf base x;
