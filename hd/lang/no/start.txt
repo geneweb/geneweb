@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.8 1999-11-10 22:38:50 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.9 1999-11-25 11:21:13 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogi - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -87,11 +87,11 @@ For &aring; navigere i databasen, kan du s&oslash;ke:<br><p>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
 <font color=#2f6400><b>etter titel</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
-(ex: roi, duke...)<br>
+(<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
 <font color=#2f6400><b>sted</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
-(ex: de France, of Sax...)
+(<a href="%sm=TT;p=*">[all the places]</a>)
 </td><td>
 <input type=submit value="Ok">
 </td></tr></table>

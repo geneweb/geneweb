@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.7 1999-11-23 19:17:38 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.8 1999-11-25 11:21:11 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <META http-equiv="Content-Type" content="text/html; charset=iso-8859-8-i">
   <title>תולדות - %t</title>
@@ -83,14 +83,14 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-<table dir=rtl border=0 cellpadding=0 cellspacing=0><tr><td>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
 <font color=#2f6400><b>לפי תאר</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
-(תאר שמופיע במאגר המידה)<br>
+(<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
 <font color=#2f6400><b> לפי מקום</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
-(מקום שמופיע במאגר המידה)
+(<a href="%sm=TT;p=*">[all the places]</a>)
 </td><td>
 <input type=submit value="חפס">
 </td></tr></table>
