@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.4 2001-03-30 21:11:08 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.5 2001-03-30 21:11:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -921,9 +921,6 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
                     (capitale (transl_nth conf "generation/generations" 0))
                     niveau;
                 end;
-(*
-                let all_gp = if only then [] else all_gp in
-*)
                 List.iter
                   (print_generation_person_long conf base ws wn all_gp
                      (gpll = []))
