@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 3.6 2000-07-12 13:21:47 ddr Exp $ *)
+(* $Id: iobase.ml,v 3.7 2000-07-31 16:44:47 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -637,7 +637,6 @@ value input bname =
       do output_string oc s;
          close_out oc;
       return ()
-    
   in
   let bnotes = {nread = read_notes; norigin_file = norigin_file} in
   let base_data =
