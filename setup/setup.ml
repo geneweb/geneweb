@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.19 1999-05-07 19:17:47 ddr Exp $ *)
+(* $Id: setup.ml,v 1.20 1999-05-07 20:00:14 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -566,7 +566,7 @@ value has_gwu dir =
 	      [ "gwu" -> raise Exit
 	      | _ -> loop () ]
 	    else
-	      match String.uncapitalize e with
+	      match String.lowercase e with
 	      [ "gwu.exe" -> raise Exit
 	      | _ -> loop () ]
 	 with
@@ -1106,7 +1106,7 @@ value setup (addr, req) str =
   in
   let env = create_env env_str in
   if env = [] && (comm = "" || String.length comm = 2) then
-    let lang = if comm = "" then default_lang else String.uncapitalize comm in
+    let lang = if comm = "" then default_lang else String.lowercase comm in
     let conf = {lang = lang; comm = ""; env = env; request = req} in
     print_file conf "welcome.html"
   else
