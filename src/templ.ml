@@ -1,8 +1,9 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.2 2001-06-13 08:00:45 ddr Exp $ *)
+(* $Id: templ.ml,v 4.3 2001-06-13 14:35:27 ddr Exp $ *)
 
 open Config;
 open Util;
+open Def;
 
 (* Parsing *)
 
@@ -376,6 +377,47 @@ value input conf base fname =
 
 (* Common evaluation functions *)
 
+value subst_text x v s =
+  if String.length x = 0 then s
+  else
+    let rec loop len i i_ok =
+      if i = String.length s then
+        if i_ok > 0 then loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
+        else Buff.get len
+      else if s.[i] = x.[i_ok] then
+        if i_ok = String.length x - 1 then loop (Buff.mstore len v) (i + 1) 0
+        else loop len (i + 1) (i_ok + 1)
+      else if i_ok > 0 then
+        loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
+      else loop (Buff.store len s.[i]) (i + 1) 0
+    in
+    loop 0 0 0
+;
+
+value rec subst sf =
+  fun
+  [ Atext s -> Atext (sf s)
+  | Avar s sl -> Avar (sf s) (List.map sf sl)
+  | Atransl b s c -> Atransl b (sf s) c
+  | Awid_hei s -> Awid_hei (sf s)
+  | Aif e alt ale -> Aif (subste sf e) (substl sf alt) (substl sf ale)
+  | Aforeach s sl al -> Aforeach (sf s) (List.map sf sl) (substl sf al)
+  | Adefine f xl al alk ->
+      Adefine (sf f) (List.map sf xl) (substl sf al) (substl sf alk)
+  | Aapply f el -> Aapply (sf f) (substel sf el) ]
+and substl sf al = List.map (subst sf) al
+and subste sf =
+  fun
+  [ Eor e1 e2 -> Eor (subste sf e1) (subste sf e2)
+  | Eand e1 e2 -> Eand (subste sf e1) (subste sf e2)
+  | Eop op e1 e2 -> Eop (sf op) (subste sf e1) (subste sf e2)
+  | Enot e -> Enot (subste sf e)
+  | Estr s -> Estr (sf s)
+  | Eint s -> Eint s
+  | Evar s sl -> Evar (sf s) (List.map sf sl)
+  | Etransl upp s c -> Etransl upp s c ]
+and substel sf el = List.map (subste sf) el;
+
 value split_at_coloncolon s =
   loop 0 where rec loop i =
     if i >= String.length s - 1 then None
@@ -386,6 +428,64 @@ value split_at_coloncolon s =
           let s2 = String.sub s (i + 2) (String.length s - i - 2) in
           Some (s1, s2)
       | _ -> loop (i + 1) ]
+;
+
+value eval_date_field =
+  fun
+  [ Some d ->
+      match d with
+      [ Dgreg d Dgregorian -> Some d
+      | Dgreg d Djulian -> Some (Calendar.julian_of_gregorian d)
+      | Dgreg d Dfrench -> Some (Calendar.french_of_gregorian d)
+      | Dgreg d Dhebrew -> Some (Calendar.hebrew_of_gregorian d)
+      | _ -> None ]
+  | None -> None ]
+;
+
+value eval_date_text =
+  fun
+  [ Some (Dtext s) -> s
+  | _ -> "" ]
+;
+
+value eval_date_variable od =
+  fun
+  [ "day" ->
+      match eval_date_field od with
+      [ Some d -> if d.day = 0 then "" else string_of_int d.day
+      | None -> "" ]
+  | "month" ->
+      match eval_date_field od with
+      [ Some d -> if d.month = 0 then "" else string_of_int d.month
+      | None -> "" ]
+  | "text" -> eval_date_text od
+  | "year" ->
+      match eval_date_field od with
+      [ Some d -> string_of_int d.year
+      | None -> "" ]
+  | "oryear" ->
+      match od with
+      [ Some (Dgreg {prec = OrYear y} _) -> string_of_int y
+      | Some (Dgreg {prec = YearInt y} _) -> string_of_int y
+      | _ -> "" ]
+  | "calendar" ->
+      match od with
+      [ Some (Dgreg _ Dgregorian) -> "gregorian"
+      | Some (Dgreg _ Djulian) -> "julian"
+      | Some (Dgreg _ Dfrench) -> "french"
+      | Some (Dgreg _ Dhebrew) -> "french"
+      | _ -> "" ]
+  | "prec" ->
+      match od with
+      [ Some (Dgreg {prec = Sure} _) -> "sure"
+      | Some (Dgreg {prec = About} _) -> "about"
+      | Some (Dgreg {prec = Maybe} _) -> "maybe"
+      | Some (Dgreg {prec = Before} _) -> "before"
+      | Some (Dgreg {prec = After} _) -> "after"
+      | Some (Dgreg {prec = OrYear _} _) -> "oryear"
+      | Some (Dgreg {prec = YearInt _} _) -> "yearint"
+      | _ -> "" ]
+  | v -> ">%" ^ v ^ "???" ]
 ;
 
 value eval_transl conf base env upp s c =

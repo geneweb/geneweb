@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- $Id: updfam.txt,v 4.1 2001-06-13 14:35:27 ddr Exp $ -->
+  <!-- copyright 2001 (c) INRIA -->
+  <meta name="ROBOTS" content="NONE">
+  <title>
+    %if;(evar_m = "ADD_FAM");[*add::family/families]0%end;
+  </title>
+%base_header;
+</head>
+<body%body_prop;>
+
+%define;date(xlab,xvar,xdate)
+  <table border=1>
+  <tr>
+  <td>xlab</td>
+  <td>
+  [year/month/day]0
+  <input name=xvar_yyyy size=5 maxlength=5 value="%xdate.year;">
+  [year/month/day]1
+  <input name=xvar_mm size=2 maxlength=2 value="%xdate.month;">
+  [year/month/day]2
+  <input name=xvar_dd size=2 maxlength=2 value="%xdate.day;">
+  </td>
+  <td>
+  ...[or]0 [text]0
+  <input name=xvar_text size=15 maxlength=30 value="%xdate.text;">
+  </td>
+  </table>
+  <table border=1>
+  <tr>
+  <td>[*calendar/calendars]0
+  <select name=xvar_cal>
+  <option value=G%if;(xdate.calendar = "gregorian"); selected%end;
+  >[*gregorian/julian/french/hebrew]0
+  <option value=J%if;(xdate.calendar = "julian"); selected%end;
+  >[*gregorian/julian/french/hebrew]1
+  <option value=F%if;(xdate.calendra = "french"); selected%end;
+  >[*gregorian/julian/french/hebrew]2
+  <option value=H%if;(xdate.calendar = "hebrew"); selected%end;
+  >[*gregorian/julian/french/hebrew]3
+  </select>
+  </td>
+  <td>[*precision]0
+  <select name=xvar_prec>
+  <option%if;(xdate.prec = ""); selected%end;>-
+  <option value=sure%if;(xdate.prec = "sure"); selected%end;
+      >[*exact]0
+  <option value=about%if;(xdate.prec = "about"); selected%end;
+      >[*about (date)]0
+  <option value=maybe%if;(xdate.prec = "maybe"); selected%end;
+      >[*possibly (date)]0
+  <option value=before%if;(xdate.prec = "before"); selected%end;
+      >[*before (date)]0
+  <option value=after%if;(xdate.prec = "after"); selected%end;
+      >[*after (date)]0
+  <option value=oryear%if;(xdate.prec = "oryear"); selected%end;
+      >&lt;- [*or] -&gt;
+  <option value=yearint%if;(xdate.prec = "yearint"); selected%end;
+      >&lt;- [*between (date)] -&gt;
+  </select>
+  <input name=xvar_oryear size=5 maxlength=5 value="%xdate.oryear;">
+  </td>
+  </tr>
+  </table>
+%end;
+%define;source(xx)
+  <table border=1>
+  <tr>
+  <td>[*source/sources]0</td>
+  <td>
+  <input name=xx_src size=40 maxlength=200 value="%xx_src;">
+  </td>
+  </tr>
+  </table>
+%end;
+
+%define;birth(xvar,xx,verbose)
+<td>[*birth]</td>
+<td>
+<input name=xvarb_yyyy size=5 maxlength=5 value="%xx.create.birth_year;">-
+<input name=xvarb_mm size=2 maxlength=2 value="%xx.create.birth_month;">-
+<input name=xvarb_dd size=2 maxlength=2 value="%xx.create.birth_day;">
+</td>
+%if;("verbose" = "true");<td>[*place]</td>%end;
+<td colspan=2>
+<input name=xvarb_pl size=20 maxlength=200 value="%xx.create.birth_place;">
+</td>
+%end;
+
+%define;death(xvar,xx,verbose)
+<td>[*death]</td>
+<td>
+<input name=xvard_yyyy size=5 maxlength=5 value="%xx.create.death_year;">-
+<input name=xvard_mm size=2 maxlength=2 value="%xx.create.death_month;">-
+<input name=xvard_dd size=2 maxlength=2 value="%xx.create.death_day;">
+</td>
+%if;("verbose" = "true");<td>[*place]</td>%end;
+<td colspan=2>
+<input name=xvard_pl size=20 maxlength=200 value="%xx.create.death_place;">
+</td>
+%end;
+
+%define;parent(xvar,xx)
+<table border=1>
+<tr>
+<td>[*first name/first names]0</td>
+<td>
+<input name=xvar_fn size=23 maxlength=200 value="%xx.first_name;">
+</td>
+<td align=right>[*number]</td>
+<td>
+<input name=var_occ size=5 maxlength=8 value="%xx.occ;">
+</td>
+<td>
+<select name=xvar_p>
+<option value=create%if;(xx.create = "create"); selected%end;>[*create]
+<option value=link%if;(xx.create = "link") selected%end;>[*link]
+</select>
+</td>
+</tr>
+<tr>
+<td>[*surname/surnames]0</td>
+<td colspan=4>
+<input name=xvar_sn size=40 maxlength=200 value="%xx.surname">
+</td>
+</tr>
+</table>
+<table border=1>
+<tr>
+%apply;birth("xvar","xx","true")
+</tr>
+<tr>
+%apply;death("xvar","xx","true")
+</tr>
+</table>
+%end;
+
+<h1 align=center><font color=%highlight;>%nn;
+%if;(evar_m = "ADD_FAM")
+  [*add::family/families]0%end;
+</font></h1>
+
+<form method=POST action="%action;">
+%hidden;
+<input type=hidden name=digest value="%digest;">
+%if;(evar_ip != "");<input type=hidden name=ip value="%evar_ip;">%nl;%end;
+%if;(evar_m = "ADD_FAM");<input type=hidden name=m value=ADD_FAM_OK>%nl;%end;
+
+<h4>[*him/her]0</h4>
+%apply;parent("him", "father")
+
+<h4>[*him/her]1</h4>
+%apply;parent("her", "mother")
+
+<h4>[*marriage/marriages]0</h4>
+<input type=radio name=mrel value=marr%if;(mrel = "marr") checked%end;
+>[*married]
+<input type=radio name=mrel value=not_marr%if;(mrel = "not_marr") checked%end;
+>[*not married]
+<input type=radio name=mrel value=engaged%if;(mrel = "engaged") checked%end;
+>[*engaged]
+<input type=radio name=mrel value=nsck%if;(mrel = "nsck") checked%end;
+>[*no sexes check]
+<table border=1>
+<tr>
+<td>[*place]</td>
+<td>
+<input name=marriage_place size=40 maxlength=200 value="%marriage_place;">
+</td>
+</tr>
+</table>
+
+%apply;date([*date]0, "marriage", "marriage")
+%apply;source("marriage")
+
+<p>
+<input type=submit value=Ok>
+</form>
+
+<p>
+<img src="%image_prefix;/gwlogo.gif"
+ alt=... width=64 height=72 align=right>
+<br>
+%copyright;
+%base_trailer;
+</body>
+
+<br><p>

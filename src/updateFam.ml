@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.7 2001-06-13 08:02:00 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.8 2001-06-13 14:35:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -533,14 +533,18 @@ and ast_expr =
     | Etransl of bool and string and char ]
 ;
 
-type env =
+type env = 
   [ Vstring of string
+  | Vfun of list string and list ast
   | Vnone ]
 ;
 
 type variable_value =
   [ VVgen of string
+  | VVcreate of Update.create and string
+  | VVdate of option date and string
   | VVcvar of string
+  | VVind of Update.key and string
   | VVnone ]
 ;
 
@@ -564,12 +568,27 @@ value not_impl func x =
 
 (* string values *)
 
-value rec eval_variable conf base env fcd =
+value get_create (fn, sn, oc, create, var) = create;
+
+value rec eval_variable conf base env ((fam, cpl, des) as fcd) =
   fun
-  [ [] -> VVgen ""
+  [ ["father"; s] -> VVind cpl.father s
+  | ["father"; "create"; s] -> VVcreate (get_create cpl.father) s
+  | ["mother"; s] -> VVind cpl.mother s
+  | ["mother"; "create"; s] -> VVcreate (get_create cpl.mother) s
+  | ["marriage"; s] -> VVdate (Adef.od_of_codate fam.marriage) s
+  | [] -> VVgen ""
   | [s] ->
       let v = extract_var "cvar_" s in if v <> "" then VVcvar v else VVgen s
   | [s :: sl] -> VVnone ]
+;
+
+value eval_relation_kind =
+  fun
+  [ Married -> "marr"
+  | NotMarried -> "not_marr"
+  | Engaged -> "engaged"
+  | NoSexesCheck -> "nsck" ]
 ;
 
 value eval_string_env var env =
@@ -578,9 +597,12 @@ value eval_string_env var env =
   | _ -> "" ]
 ;
 
-value try_eval_gen_variable conf base env fcd =
+value try_eval_gen_variable conf base env ((fam, cpl, des) as fcd) =
   fun
   [ "digest" -> eval_string_env "digest" env
+  | "mrel" -> eval_relation_kind fam.relation
+  | "marriage_place" -> quote_escaped fam.marriage_place
+  | "marriage_src" -> quote_escaped fam.marriage_src
   | s ->
       let v = extract_var "evar_" s in
       if v <> "" then
@@ -588,6 +610,72 @@ value try_eval_gen_variable conf base env fcd =
         [ Some vv -> quote_escaped vv
         | _ -> "" ]
       else raise Not_found ]
+;
+
+value eval_key_variable (fn, sn, oc, create, var) =
+  fun
+  [ "first_name" -> quote_escaped fn
+  | "occ" -> if oc = 0 then "" else string_of_int oc
+  | "surname" -> quote_escaped sn
+  | "create" -> if create <> Update.Link then "create" else "link"
+  | s -> ">%" ^ s ^ "???" ]
+;
+
+value eval_create_variable c =
+  fun
+  [ "birth_year" ->
+      match c with
+      [ Update.Create _ (Some (Some (Dgreg {year = y} _), _, _, _)) ->
+          string_of_int y
+      | _ -> "" ]
+  | "birth_month" ->
+      match c with
+      [ Update.Create _ (Some (Some (Dgreg {month = m} _), _, _, _))
+        when m <> 0 ->
+          string_of_int m
+      | _ -> "" ]
+  | "birth_day" ->
+      match c with
+      [ Update.Create _ (Some (Some (Dgreg {day = d} _), _, _, _))
+        when d <> 0 ->
+          string_of_int d
+      | _ -> "" ]
+  | "birth_place" ->
+      match c with
+      [ Update.Create _ (Some (_, pl, _, _)) -> quote_escaped pl
+      | _ -> "" ]
+  | "death_year" ->
+      match c with
+      [ Update.Create _ (Some (_, _, Some (Dgreg {year = y} _), _)) ->
+          string_of_int y
+      | _ -> "" ]
+  | "death_month" ->
+      match c with
+      [ Update.Create _ (Some (_, _, Some (Dgreg {month = m} _), _))
+        when m <> 0 ->
+          string_of_int m
+      | _ -> "" ]
+  | "death_day" ->
+      match c with
+      [ Update.Create _ (Some (_, _, Some (Dgreg {day = d} _), _))
+        when d <> 0 ->
+          string_of_int d
+      | _ -> "" ]
+  | "death_place" ->
+      match c with
+      [ Update.Create _ (Some (_, _, _, pl)) -> quote_escaped pl
+      | _ -> "" ]
+  | s -> ">%" ^ s ^ "???" ]
+;
+
+value eval_expr conf base env p =
+  fun
+  [ Estr s -> s
+  | Evar s [] ->
+      try try_eval_gen_variable conf base env p s with
+      [ Not_found -> ">" ^ s ^ "???" ]
+  | Etransl upp s c -> Templ.eval_transl conf base env upp s c
+  | _ -> ">parse_error" ]
 ;
 
 (* bool values *)
@@ -606,7 +694,10 @@ value eval_gen_bool_variable conf base env fcd =
 value eval_bool_variable conf base env fcd s sl =
   match eval_variable conf base env fcd [s :: sl] with
   [ VVgen s -> eval_gen_bool_variable conf base env fcd s
+  | VVcreate _ _ -> do { Wserver.wprint ">%%%s???" s; False }
+  | VVdate _ _ -> do { Wserver.wprint ">%%%s???" s; False }
   | VVcvar _ -> do { Wserver.wprint ">%%%s???" s; False }
+  | VVind _ _ -> do { Wserver.wprint ">%%VVind???"; False }
   | VVnone -> do { Wserver.wprint ">%%%s???" s; False } ]
 ;
 
@@ -632,7 +723,10 @@ value eval_bool_value conf base env fcd =
         try
           match eval_variable conf base env fcd [s :: sl] with
           [ VVgen s -> try_eval_gen_variable conf base env fcd s
+          | VVcreate c s -> do { Wserver.wprint ">%%%s???" s; "" }
+          | VVdate od s -> Templ.eval_date_variable od s
           | VVcvar s -> do { Wserver.wprint ">%%%s???" s; "" }
+          | VVind pk s -> eval_key_variable pk s
           | VVnone -> do { Wserver.wprint ">%%%s???" s; "" } ]
         with
         [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
@@ -645,9 +739,20 @@ value eval_bool_value conf base env fcd =
 
 value print_variable conf base env fcd sl =
   match eval_variable conf base env fcd sl with
-  [ VVgen s ->
+  [ VVcreate c s -> Wserver.wprint "%s" (eval_create_variable c s)
+  | VVdate od s -> Wserver.wprint "%s" (Templ.eval_date_variable od s)
+  | VVgen s ->
       try Wserver.wprint "%s" (try_eval_gen_variable conf base env fcd s) with
       [ Not_found -> Templ.print_variable conf base s ]
+  | VVind pk s -> Wserver.wprint "%s" (eval_key_variable pk s)
+  | VVnone ->
+      do {
+        Wserver.wprint ">%%";
+        list_iter_first
+          (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
+          sl;
+        Wserver.wprint "???";
+      }
   | x -> not_impl "print_variable" x ]
 ;
 
@@ -656,9 +761,34 @@ value rec print_ast conf base env fcd =
   [ Atext s -> Wserver.wprint "%s" s
   | Atransl upp s n ->
       Wserver.wprint "%s" (Templ.eval_transl conf base env upp s n)
-  | Avar s sl -> print_variable conf base env fcd [s :: sl]
+  | Avar s sl ->
+(*
+let _ = do { Printf.eprintf "%s\n" s; flush stderr } in
+*)
+      print_variable conf base env fcd [s :: sl]
   | Aif e alt ale -> print_if conf base env fcd e alt ale
+  | Adefine f xl al alk -> print_define conf base env fcd f xl al alk
+  | Aapply f el -> print_apply conf base env fcd f el
   | x -> not_impl "print_ast" x ]
+and print_define conf base env fcd f xl al alk =
+  List.iter (print_ast conf base [(f, Vfun xl al) :: env] fcd) alk
+and print_apply conf base env fcd f el =
+  match get_env f env with
+  [ Vfun xl al ->
+      let vl = List.map (eval_expr conf base env fcd) el in
+      List.iter
+        (fun a ->
+           let a =
+             loop a xl vl where rec loop a xl vl =
+               match (xl, vl) with
+               [ ([x :: xl], [v :: vl]) ->
+                   loop (Templ.subst (Templ.subst_text x v) a) xl vl
+               | ([], []) -> a
+               | _ -> Atext "parse_error" ]
+           in
+           print_ast conf base env fcd a)
+        al
+  | _ -> Wserver.wprint ">%%%s???" f ]
 and print_if conf base env fcd e alt ale =
   let al = if eval_bool_value conf base env fcd e then alt else ale in
   List.iter (print_ast conf base env fcd) al
