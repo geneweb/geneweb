@@ -36,6 +36,11 @@ Default language:
 
 <p>
 
+Images path:
+<input name=images_path value="%vimages_path;" size=50><br>
+
+<p>
+
 Advice:
 
 <ul>
