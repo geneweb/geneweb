@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.70 2000-03-09 09:42:42 ddr Exp $
+# $Id: lexicon.txt,v 3.71 2000-03-09 09:53:39 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5128,6 +5128,7 @@ eo: la lastaj %d edzigxoj
 es: los %d casamientos m&aacute;s recientes
 fr: les %d derniers mariages
 pt: os %d casamentos mais recentes
+se: de senaste %d äktenskapen
 
     the parents
 cs: rodièe
