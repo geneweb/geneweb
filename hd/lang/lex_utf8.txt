@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.23 2005-03-24 10:53:17 ddr Exp $
+# $Id: lex_utf8.txt,v 1.24 2005-03-25 12:10:21 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -907,7 +907,7 @@ sv: en brylling
 
     a brother-in-law/a sister-in-law
 af: 'n swaer/'n skoonsuster
-bg: зет (съпруг на сестра), шурей или баджанак/снаха (съпруга на брат или на шурей) или балдъза/зет (съпруг на сестра или на зълва) или девер/снаха (съпруга на брат), зълва или етърва
+bg: сестрин съпруг, шурей или баджанак/братова съпруга, шуренайка или балдъза/сестрин съпруг, съпруг на зълва или девер/братова съпруга, зълва или етърва
 br: ur breur-kaer/ur c'hoar-gaer
 ca: un cunyat/una cunyada
 cs: švagr/švagrová
@@ -1231,7 +1231,7 @@ sv: en nev&ouml;/en niece
 
     a son-in-law/a daughter-in-law
 af: 'n skoonseun/'n skoondogter
-bg: зет (съпруг на дъщеря)/снаха (съпруга на син)
+bg: съпруг на дъщеря/съпруга на син
 br: mabeg/merc'heg
 ca: un gendre/una jove
 cs: zeť/snacha
@@ -5592,6 +5592,7 @@ sv: m&aring;nader
 
     moon age/new moon/first quarter/full moon/last quarter
 ar: همت عمر/نو موون/فيرست قورتر/فولّ موون/لت قورتر
+bg: лунна фаза/новолуние/първа четвърт/пълнолуние/последна четвърт
 cs: měsíční fáze/nov/první čtvrt'/úplněk/poslední čtvrt'
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
