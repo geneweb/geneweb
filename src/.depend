@@ -98,6 +98,10 @@ gwd.cmo: argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo family.cmi \
 gwd.cmx: argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx family.cmx \
     gutil.cmx image.cmx iobase.cmx lock.cmx relationLink.cmx robot.cmx \
     srcfile.cmx util.cmx version.cmx ../wserver/wserver.cmx 
+gwdiff.cmo: adef.cmi argl.cmo calendar.cmi def.cmi gutil.cmi iobase.cmi \
+    name.cmi 
+gwdiff.cmx: adef.cmx argl.cmx calendar.cmx def.cmi gutil.cmx iobase.cmx \
+    name.cmx 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi iobase.cmi \
     select.cmo 
 gwu.cmx: adef.cmx argl.cmx buff.cmx calendar.cmx def.cmi gutil.cmx iobase.cmx \

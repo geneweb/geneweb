@@ -1,9 +1,10 @@
-# $Id: Makefile,v 1.2 2001-05-13 14:41:41 ddr Exp $
+# $Id: Makefile,v 1.3 2001-05-14 12:38:01 ddr Exp $
 
-OCAMLC=ocamlc.opt
-OCAMLOPT=ocamlopt.opt
-LIBUNIX=-cclib -lunix
-GWDIFF_OBJS=../../src/argl.cmo ../../src/adef.cmo ../../src/name.cmo ../../src/buff.cmo ../../src/gutil.cmo ../../src/btree.cmo ../../src/iovalue.cmo ../../src/iobase.cmo ../../src/calendar.cmo gwdiff.cmo
+include ../../tools/Makefile.inc
+TOP=../..
+
+OCAMLI=-I $(TOP)/src
+GWDIFF_OBJS=$(TOP)/src/argl.cmo $(TOP)/src/adef.cmo $(TOP)/src/name.cmo $(TOP)/src/buff.cmo $(TOP)/src/gutil.cmo $(TOP)/src/btree.cmo $(TOP)/src/iovalue.cmo $(TOP)/src/iobase.cmo $(TOP)/src/calendar.cmo gwdiff.cmo
 
 all:: gwdiff.opt
 
@@ -13,15 +14,8 @@ gwdiff.out: $(GWDIFF_OBJS)
 gwdiff.opt: $(GWDIFF_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) unix.cmxa $(GWDIFF_OBJS:.cmo=.cmx) $(LIBUNIX) -o gwdiff.opt
 
-clean::
-	$(RM) *.cm[oix] *.o *.out *.opt
+depend:
+	TOP=$(TOP) $(TOP)/tools/camlp4_depend.sh $(OCAMLI) `ls *.mli *.ml` > .depend.new
+	mv .depend.new .depend
 
-gwdiff.cmo: gwdiff.ml
-	camlp4r gwdiff.ml -o gwdiff.ppo
-	ocamlc -I ../../src -c -impl gwdiff.ppo
-	/bin/rm -f gwdiff.ppo
-
-gwdiff.cmx: gwdiff.ml
-	camlp4r gwdiff.ml -o gwdiff.ppo
-	ocamlopt -I ../../src -c -impl gwdiff.ppo
-	/bin/rm -f gwdiff.ppo
+include .depend
