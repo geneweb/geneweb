@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.15 1998-12-12 17:26:25 ddr Exp $
+# $Id: Makefile,v 1.16 1999-01-16 06:01:28 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -57,6 +57,9 @@ phonygwd.out: $(PHONYGWD_OBJS)
 
 mostdesc.out: $(MOSTDESC_OBJS)
 	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(MOSTDESC_OBJS) -o mostdesc.out
+
+mostdesc.opt: $(MOSTDESC_OBJS:.cmo=.cmx)
+	$(OCAMLOPT) unix.cmxa $(LIBUNIX) $(MOSTDESC_OBJS:.cmo=.cmx) -o mostdesc.opt
 
 i18n_check.out: i18n_check.cmo
 	$(OCAMLC) i18n_check.cmo -o i18n_check.out

@@ -8,6 +8,10 @@ GeneWeb Version 1.11
       * in Esperanto: "aldoni personon"
           ("personon" instead of the incorrect "persono")
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [16/01/99] Ignore abnormal errors (displaying "uncaught exception:
+    Stream.Failure").
+
 * Lexicon file (lexicon.txt)
   - [11/01/99] Added accusative forms.
   - [11/01/99] Fixed typo in German version (Markus Mottl).

@@ -12,6 +12,9 @@ GeneWeb Version 1.11
 * GeneWeb compiler (gwc)
   - [12/01/99] Failure error now displayed in stdout instead of stderr.
 
+* Most descendants computation (mostdesc)
+  - [16/01/99] Added mostdesc.opt in Makefile.
+
 GeneWeb Version 1.10
 --------------------
 
