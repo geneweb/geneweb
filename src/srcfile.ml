@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.10 1999-07-31 18:37:39 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.11 1999-08-06 02:22:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -12,9 +12,11 @@ value get_date () =
     (succ tm.Unix.tm_mon) (tm.Unix.tm_year + 1900)
 ;
 
-value cnt conf ext =
-  List.fold_right Filename.concat [Util.base_dir.val; "cnt"] (conf.bname ^ ext)
+value adm_file f =
+  List.fold_right Filename.concat [Util.base_dir.val; "cnt"] f
 ;
+
+value cnt conf ext = adm_file (conf.bname ^ ext);
 
 value count conf =
   let fname = cnt conf ".txt" in
