@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.8 2004-12-14 09:30:14 ddr Exp $ *)
+(* $Id: name.ml,v 4.9 2005-02-01 21:15:33 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 module Buff =
@@ -18,37 +18,63 @@ module Buff =
         if i == String.length s then len
         else add_rec (store len s.[i]) (succ i)
     ;
+    value gstore len s si slen =
+      let iend = si + slen in
+      add_rec len si where rec add_rec len i =
+        if i == iend || i == String.length s then len
+        else add_rec (store len s.[i]) (succ i)
+    ;
     value get len = String.sub buff.val 0 len;
   end
 ;
 
+value utf_8 = ref False;
+
 (* Name.lower *)
+
+value unaccent_iso_8859_1 =
+  fun
+  [ 'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'æ' -> 'a'
+  | 'ç' -> 'c'
+  | 'è' | 'é' | 'ê' | 'ë' -> 'e'
+  | 'ì' | 'í' | 'î' | 'ï' -> 'i'
+  | 'ð' -> 'd'
+  | 'ñ' -> 'n'
+  | 'ò' | 'ó' | 'ô' | 'õ' | 'ö' | 'ø' -> 'o'
+  | 'ù' | 'ú' | 'û' | 'ü' -> 'u'
+  | 'ý' | 'ÿ' -> 'y'
+  | 'þ' -> 'p'
+  | c -> c ]
+;
 
 value lower s =
   copy False 0 0 where rec copy special i len =
     if i == String.length s then Buff.get len
-    else
+    else if not utf_8.val || Char.code s.[i] < 0x80 then
       match s.[i] with
       [ 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '.' as c
         ->
           let len = if special then Buff.store len ' ' else len in
-          let c =
-            match Char.lowercase c with
-            [ 'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'æ' -> 'a'
-            | 'ç' -> 'c'
-            | 'è' | 'é' | 'ê' | 'ë' -> 'e'
-            | 'ì' | 'í' | 'î' | 'ï' -> 'i'
-            | 'ð' -> 'd'
-            | 'ñ' -> 'n'
-            | 'ò' | 'ó' | 'ô' | 'õ' | 'ö' | 'ø' -> 'o'
-            | 'ù' | 'ú' | 'û' | 'ü' -> 'u'
-            | 'ý' | 'ÿ' -> 'y'
-            | 'þ' -> 'p'
-            | c -> c ]
-          in
+          let c = unaccent_iso_8859_1 (Char.lowercase c) in
           copy False (i + 1) (Buff.store len c)
       | c ->
           copy (len <> 0) (i + 1) len ]
+    else (* start of utf-8 multi-byte char *)
+      let c = Char.code s.[i] in
+      let nbc =
+        if c < 0b11100000 then 2
+        else if c < 0b11110000 then 3
+        else if c < 0b11111000 then 4
+        else if c < 0b11111100 then 5
+        else if c < 0b11111110 then 6
+        else (* bad utf-8 *) 1
+      in
+      if i + nbc > String.length s then (* bad utf-8 *) Buff.get len
+      else if c = 0xC3 then
+        let c = Char.lowercase (Char.chr (Char.code s.[i+1] + 0x40)) in
+        copy False (i + 2) (Buff.store len (unaccent_iso_8859_1 c))
+      else
+        copy False (i + nbc) (Buff.gstore len s i nbc)
 ;
 
 (* Name.abbrev *)

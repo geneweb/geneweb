@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.225 2005-02-01 10:58:09 ddr Exp $
+# $Id: lexicon.txt,v 4.226 2005-02-01 21:15:33 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !charset
@@ -1467,7 +1467,7 @@ ro: consultatie avansata
 ru: расширенный запрос
 sl: napredno iskanje
 sv: avancerad s&ouml;kning
-zh: ЄяЉґЈ√ќ «л«у
+zh:  ЄяЉґЈ√ќ «л«у
 
     after
 af: na
@@ -1549,7 +1549,7 @@ ro: etate
 ru: возраст
 sl: starost
 sv: &aring;lder
-zh: ƒкЅд
+zh:  ƒкЅд
 
     age at death:
 af: ouderdom by afsterwe:
@@ -1577,7 +1577,7 @@ ro: etate la deces
 ru: в возрасте
 sl: Њivel(a)
 sv: livsl&auml;ngd:
-zh: ѕнƒк
+zh:  ѕнƒк
 
     alias
 af: alias
@@ -1822,7 +1822,7 @@ ro: strabuni
 ru: предки
 sl: predniki
 sv: anor
-zh: „жѕ»
+zh:  „жѕ»
 
     ancestors (some)
 af: voorsate
@@ -1877,7 +1877,7 @@ ro: si
 ru: и
 sl: in
 sv: och
-zh: ЇЌ
+zh:  ЇЌ
 
     anniversaries
 af: herdenkinge
@@ -2312,7 +2312,7 @@ ro: nascut/nascuta/nascut
 ru: родилс€/родилась
 sl: rojen/rojena
 sv: f&ouml;dd
-zh: ≥ц…ъ
+zh:  ≥ц…ъ
 
     branch/branches
 af: tak/takke
@@ -2665,7 +2665,7 @@ ro: copil/copii
 ru: ребенок:g:--ка:a:--ка/дети
 sl: otrok/otroci
 sv: barn/barn
-zh: „”≈Ѓ
+zh:  „”≈Ѓ
 
     children's names changed
 af: kinders se name is verander
@@ -3122,7 +3122,7 @@ ro: descendenti
 ru: потомки
 sl: potomci
 sv: &auml;ttlingar
-zh: Їуіъ
+zh:  Їуіъ
 
     died
 af: oorlede
@@ -3150,7 +3150,7 @@ ro: a decedat
 ru: умер/умерла
 sl: umrl/umrla
 sv: d&ouml;d
-zh: Ћј
+zh:  Ћј
 
     died young
 af: jonk oorlede
@@ -3860,7 +3860,7 @@ ro: prenume
 ru: им€/имена
 sl: osebno ime/osebna imena
 sv: f&ouml;rnamn/f&ouml;rnamn
-zh: √ы
+zh:  √ы
 
     for the first names by alphabetic order
 af: om die voorname in alfabetiese volgorde te kry
@@ -4161,7 +4161,7 @@ ro: cu copii
 ru: имели детей
 sl: otroci:
 sv: barn
-zh: …ъ”–„”≈Ѓ
+zh:  …ъ”–„”≈Ѓ
 
     here
 af: hier
@@ -4460,7 +4460,7 @@ ro: in
 ru: в
 sl: v
 sv: i
-zh: ”Џ
+zh:  ”Џ
 
     in (year)
 af: in
@@ -4488,7 +4488,7 @@ ro: in anul
 ru: в
 sl: v letu
 sv: 
-zh: ”Џ
+zh:  ”Џ
 
     include missing spouses
 af: ontbrekende ouers ingesluit
@@ -5276,7 +5276,7 @@ ro: casatorie/casatorii
 ru: брак/браки
 sl: poroke/poroke
 sv: &auml;ktenskap/&auml;ktenskap
-zh: "й“ц
+zh:  "й“ц
 
     married
 af: getroud
@@ -6059,7 +6059,7 @@ ro: nota/note
 ru: заметка/заметки
 sl: zapisek/zapiski
 sv: notering/noteringar
-zh: ±Є„Ґ
+zh:  ±Є„Ґ
 
     notes modified
 bg: бележките са променени
@@ -6300,7 +6300,7 @@ ro: la
 ru:
 sl:
 sv: den
-zh: ”Џ
+zh:  ”Џ
 
     on (weekday day month year)
 af:
@@ -6518,7 +6518,7 @@ ro: parinti
 ru: родители
 sl: starєi
 sv: f&ouml;r&auml;ldrar
-zh: ЄЄƒЄ
+zh:  ЄЄƒЄ
 
     person added
 af: persoon bygevoeg
@@ -7006,7 +7006,7 @@ ro: calcul de relatii
 ru: кому приходитс€
 sl: pregled sorodstva
 sv: sl&auml;ktskapsber&auml;kning
-zh: ѕаєЎ≤й—ѓ
+zh:  ѕаєЎ≤й—ѓ
 
     relationship link/relationship links
 af: verwantskap/verwantskappe
@@ -7495,7 +7495,7 @@ ro: specifica
 ru: укажите
 sl: doloиi
 sv: v&auml;lj
-zh: і”ѕ¬Ѕ–—°»°
+zh:  і”ѕ¬Ѕ–—°»°
 
     spouses not included
 af: eggenote weggelaat
@@ -7690,7 +7690,7 @@ ro: nume de familie
 ru: фамили€/фамилии
 sl: priimek/priimki
 sv: efternamn/efternamn
-zh: –’
+zh:  –’
 
     surnames list
 af: vanne lys
@@ -8113,7 +8113,7 @@ ro: tatal/mama/parinti
 ru: мать/отец/родители
 sl: oиe/mati/starє
 sv: fadern/modern/en f&ouml;r&auml;lder
-zh: ЄЄ/ƒЄ/a parent
+zh:  ЄЄ/ ƒЄ/a parent
 
     the file is temporarily locked: please try again
 af: die lкer is tydelik gesluit: probeer asseblief later weer
@@ -8952,7 +8952,7 @@ ro: actualizare
 ru: изменить
 sl: spremeni
 sv: uppdatera
-zh: Єь–¬
+zh:  Єь–¬
 
     use "link" instead of "create"
 af: gebruik "koppel" eerder as "skep"
@@ -9216,7 +9216,7 @@ ro: ani
 ru: лет
 sl: let
 sv: &aring;r
-zh: Ћк
+zh:  Ћк
 
     you must first merge
 af: jy moet eers saamvoeg
