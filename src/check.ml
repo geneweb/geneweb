@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 3.5 2001-01-06 09:55:53 ddr Exp $ *)
+(* $Id: check.ml,v 3.6 2001-01-07 23:22:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -14,6 +14,7 @@ type gen =
     g_base : base;
     g_def : mutable array bool;
     g_separate : mutable bool;
+    g_shift : mutable int;
     g_errored : mutable bool }
 ;
 

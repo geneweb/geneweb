@@ -13,6 +13,11 @@ GeneWeb version 3.11
     marriage" because, despite the warning at end of this page, many
     people are mistaken by thinking it was "add a child in a family".
 
+* Geneweb compiler (gwc)
+  - [07 Jan 01] Put back the option "-sh #" (removed in version 3.08):
+    it seems that some users are be still interested in this option, even
+    with the new form "-sep".
+
 * Bases configuration files (base.gwf)
   - [30 Dec 00] In example file a.gwf, fixed comment about customized
     variables: for variable defined as var_foo, the usage in the text
@@ -262,7 +267,7 @@ GeneWeb version 3.08
     spouses' parents are included, except if the option "-nsp" is given.
 
 * Geneweb compiler (gwc)
-  - [25 Sep 00] Replaced option "-shift #" by "-sep": the file following
+  - [25 Sep 00] Replaced option "-sh #" by "-sep": the file following
     the "-sep" option is treated as separated from the rest, i.e. the numbers
     in persons keys are automatically shifted if in conflict with the persons
     of the previous files. No more need to find a "shift" number which avoids
