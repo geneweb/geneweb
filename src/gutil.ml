@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.17 2004-07-17 09:16:53 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.18 2004-07-18 08:53:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -211,38 +211,13 @@ value designation base p =
   let nom = p_surname base p in prenom ^ "." ^ string_of_int p.occ ^ " " ^ nom
 ;
 
-ifndef GDAGNET then
-declare
-  value father cpl = cpl.father;
-  value mother cpl = cpl.mother;
-  value parent father mother = {father = father; mother = mother};
-  value parent_array cpl = [| cpl.father; cpl.mother |];
-
-  value set_father cpl father = cpl.father := father;
-  value set_mother cpl mother = cpl.mother := mother;
-end
-else
-declare
-  value father cpl =
-    if Array.length cpl.parent >= 1 then cpl.parent.(0)
-    else invalid_arg "father"
-  ;
-  value mother cpl =
-    if Array.length cpl.parent >= 2 then cpl.parent.(1)
-    else invalid_arg "mother"
-  ;
-  value parent father mother = {parent = [| father; mother |]};
-  value parent_array cpl = cpl.parent;
-
-  value set_father cpl father =
-    if Array.length cpl.parent >= 1 then cpl.parent.(0) := father
-    else invalid_arg "set_father"
-  ;
-  value set_mother cpl mother =
-    if Array.length cpl.parent >= 2 then cpl.parent.(1) := mother
-    else invalid_arg "set_mother"
-  ;
-end;
+value father = Adef.father;
+value mother = Adef.mother;
+value couple = Adef.couple;
+value parent_array = Adef.parent_array;
+value parent = Adef.parent;
+value set_father = Adef.set_father;
+value set_mother = Adef.set_mother;
 
 value parents asc = asc.parents;
 value consang asc = asc.consang;
@@ -1088,31 +1063,9 @@ value map_family_ps fp fs fam =
    fam_index = fam.fam_index}
 ;
 
-value map_couple_p fp fam = parent (fp (father fam)) (fp (mother fam));
+value map_couple_p fp cpl = parent (Array.map fp (parent_array cpl));
 
 value map_descend_p fp des = {children = Array.map fp des.children};
-
-(*
-value string_of_place p =
-  loop "" 0 where rec loop s i =
-    if i == Array.length p then s
-    else if s = "" then loop p.(i) (i + 1)
-    else s ^ "," ^ loop p.(i) (i + 1)
-;
-
-value place_of_string s =
-  loop [] 0 0 where rec loop list ibeg i =
-    if i == String.length s then
-      let list =
-        if i == ibeg then list else [String.sub s ibeg (i - ibeg) :: list]
-      in
-      Array.of_list (List.rev list)
-    else if s.[i] == ',' then
-      let list = [String.sub s ibeg (i - ibeg) :: list] in
-      loop list (i + 1) (i + 1)
-    else loop list ibeg (i + 1)
-;
-*)
 
 value arg_list_of_string line =
   loop [] 0 0 None where rec loop list i len quote =

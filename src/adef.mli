@@ -1,4 +1,4 @@
-(* $Id: adef.mli,v 4.1 2001-06-07 08:40:19 ddr Exp $ *)
+(* $Id: adef.mli,v 4.2 2004-07-18 08:53:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type iper = 'a;
@@ -7,6 +7,7 @@ type istr = 'a;
 type fix = 'a;
 type cdate = 'a;
 type codate = 'a;
+type gen_couple 'person = 'a;
 
 type date =
   [ Dgreg of dmy and calendar
@@ -46,3 +47,12 @@ external int_of_istr : istr -> int = "%identity";
 external istr_of_int : int -> istr = "%identity";
 
 exception Request_failure of string;
+
+value father : gen_couple 'a -> 'a;
+value mother : gen_couple 'a -> 'a;
+value couple : 'a -> 'a -> gen_couple 'a;
+value parent : array 'a -> gen_couple 'a;
+value parent_array : gen_couple 'a -> array 'a;
+
+value set_father : gen_couple 'a -> 'a -> unit;
+value set_mother : gen_couple 'a -> 'a -> unit;

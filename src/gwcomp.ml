@@ -1,13 +1,10 @@
-(* $Id: gwcomp.ml,v 4.10 2004-07-17 09:16:54 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.11 2004-07-18 08:53:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
 
-ifndef GDAGNET then
-value magic_gwo = "GnWo000m"
-else
-value magic_gwo = "GdNo000m";
+value magic_gwo = "GnWo000m";
 
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int };
 
@@ -754,7 +751,7 @@ value read_family ic fname =
           | Some (str, ["cbp" :: _]) -> failwith str
           | _ -> ("", line) ]
         in
-        let co = parent cle_pere cle_mere in
+        let co = couple cle_pere cle_mere in
         let (comm, line) =
           match line with
           [ Some (str, ["comm" :: _]) ->

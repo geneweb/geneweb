@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.30 2004-07-17 09:16:54 ddr Exp $ *)
+(* $Id: update.ml,v 4.31 2004-07-18 08:53:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -705,8 +705,8 @@ value parse_r_parent = parser [ [: `'f' :] -> 0 | [: `'m' :] -> 1 ];
 
 value text_of_var conf =
   fun
-  [ "him" -> transl_nth conf "him/her" 0
-  | "her" -> transl_nth conf "him/her" 1
+  [ "pa1" -> transl_nth conf "him/her" 0
+  | "pa2" -> transl_nth conf "him/her" 1
   | var ->
       match Stream.of_string var with parser
       [ [: `'r'; pos = parse_int 0; `'_'; pn = parse_r_parent :] ->

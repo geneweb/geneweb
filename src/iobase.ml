@@ -1,13 +1,10 @@
-(* $Id: iobase.ml,v 4.25 2004-07-16 16:17:55 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.26 2004-07-18 08:53:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
 
-ifndef GDAGNET then
-value magic_gwb = "GnWb001y"
-else
-value magic_gwb = "GdNt001y";
+value magic_gwb = "GnWb001y";
 
 (*
  Files in base (directory .gwb)

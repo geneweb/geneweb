@@ -1,4 +1,4 @@
-(* $Id: adef.ml,v 4.1 2001-06-07 08:40:19 ddr Exp $ *)
+(* $Id: adef.ml,v 4.2 2004-07-18 08:53:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type iper = int;
@@ -124,3 +124,41 @@ value od_of_codate od =
 value codate_None = codate_of_od None;
 
 exception Request_failure of string;
+
+value multi_parents = ref False;
+
+type gen_couple 'person =
+  { father : mutable 'person;
+    mother : mutable 'person }
+and gen_parents 'person =
+  { parent : mutable (array 'person) }
+;
+
+value father cpl =
+  if Obj.size (Obj.repr cpl) = 2 then cpl.father
+  else (Obj.magic cpl).parent.(0)
+;
+value mother cpl =
+  if Obj.size (Obj.repr cpl) = 2 then cpl.mother
+  else (Obj.magic cpl).parent.(1)
+;
+value couple father mother =
+  if not multi_parents.val then {father = father; mother = mother}
+  else Obj.magic {parent = [| father; mother |]}
+;
+value parent parent =
+  if not multi_parents.val then {father = parent.(0); mother = parent.(1)}
+  else Obj.magic {parent = parent}
+;
+value parent_array cpl =
+  if Obj.size (Obj.repr cpl) = 2 then [| cpl.father; cpl.mother |]
+  else (Obj.magic cpl).parent
+;
+value set_father cpl father =
+  if Obj.size (Obj.repr cpl) = 2 then cpl.father := father
+  else (Obj.magic cpl).parent.(0) := father
+;
+value set_mother cpl mother =
+  if Obj.size (Obj.repr cpl) = 2 then cpl.mother := mother
+  else (Obj.magic cpl).parent.(1) := mother
+;
