@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.85 2002-03-27 09:37:33 ddr Exp $
+# $Id: lexicon.txt,v 4.86 2002-04-04 10:54:37 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -32,6 +32,7 @@ da: ddmmyy
 de: ddmmyy
 en: yymmdd
 es: ddmmyy
+et: ddmmyy
 fi: ddmmyy
 fr: ddmmyy
 he: ddmmyy
@@ -7561,6 +7562,7 @@ da: bruger/adgangskode/annuller
 de: Benutzer/Passwort/Abbruch
 en: user/password/cancel
 es: usuario/contrase&ntilde;a/cancelar
+et: kasutaja/parool/t&uuml;hista
 fi: kהyttajה/salasana/peruuta
 fr: utilisateur/mot de passe/annuler
 he:  משתמש / סיסמה / ביטול
