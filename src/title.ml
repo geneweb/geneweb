@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 3.12 2001-02-12 03:39:43 ddr Exp $ *)
+(* $Id: title.ml,v 3.13 2001-03-09 13:41:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -123,7 +123,7 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
 ;
 
 value compare_title_order conf base (x1, t1) (x2, t2) =
-  if t1.t_nth == 0 || t2.t_nth == 0 then
+  if t1.t_nth == 0 || t2.t_nth == 0 || t1.t_nth = t2.t_nth then
     compare_title_dates conf base (x1, t1) (x2, t2)
   else t1.t_nth <= t2.t_nth
 ;
