@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.23 1999-01-24 14:17:49 ddr Exp $ *)
+(* $Id: perso.ml,v 1.24 1999-01-24 19:07:30 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -67,9 +67,20 @@ value next_sibling base p a =
   | None -> None ]
 ;
 
+value space_to_unders s =
+  match rindex s ' ' with
+  [ Some _ ->
+      let s' = String.create (String.length s) in
+      do for i = 0 to String.length s - 1 do
+           s'.[i] := if s.[i] = ' ' then '_' else s.[i];
+         done;
+      return s'
+  | None -> s ]
+;
+
 value default_photo_name base p =
-  let f = (Name.lower (sou base p.first_name)) in
-  let s = (Name.lower (sou base p.surname)) in
+  let f = space_to_unders (Name.lower (sou base p.first_name)) in
+  let s = space_to_unders (Name.lower (sou base p.surname)) in
   f ^ "." ^ string_of_int p.occ ^ "." ^ s
 ;
 
