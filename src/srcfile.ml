@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.28 2000-10-28 19:45:10 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.29 2000-10-29 08:27:50 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -124,11 +124,9 @@ value set_wizard_trace conf =
                 if u = conf.user then loop True [(dt, u) :: r] l
                 else loop found [(String.sub x 0 dtlen, u) :: r] l
               else loop found r l
-          | [] ->
-              if found then List.rev r
-              else Sort.list \> [(dt, conf.user) :: r] ]
+          | [] -> if found then r else [(dt, conf.user) :: r] ]
       in
-      write_wizard_trace fname wt
+      write_wizard_trace fname (Sort.list \> wt)
     else ()
   else ()
 ;
