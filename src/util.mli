@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.24 1999-08-05 06:22:02 ddr Exp $ *)
+(* $Id: util.mli,v 2.25 1999-08-05 14:26:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -129,6 +129,7 @@ value browser_doesnt_have_tables : config -> bool;
 
 (* Printing for browsers without tables *)
 
+value pre_text_size : string -> int;
 value print_pre_center : int -> string -> unit;
 value print_pre_left : int -> string -> unit;
 value print_pre_right : int -> string -> unit;
