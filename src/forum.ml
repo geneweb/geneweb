@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.10 2001-06-01 13:03:22 ddr Exp $ *)
+(* $Id: forum.ml,v 4.11 2001-11-08 12:03:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -89,77 +89,104 @@ value print_one_header conf prec_date ndisp pos h =
   }
 ;
 
+value message_txt conf i =
+  transl_nth conf "message/previous message/previous messages/next message" i
+;
+
 value print_headers conf =
   let fname = forum_file conf in
   match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let ic_len = in_channel_length ic in
+      let max_header_mess =
+        match p_getint conf.env "len" with
+        [ Some x -> x
+        | None -> 100 ]
+      in
+      let _ =
+        match p_getint conf.env "from" with
+        [ Some x -> try seek_in ic x with [ Sys_error _ -> () ]
+        | None -> () ]
+      in
       let last_date =
-        loop (Dtext "", ndisp_items) where rec loop (prec_date, ndisp) =
+        loop 0 (Dtext "", ndisp_items)
+        where rec loop nmess (prec_date, ndisp) =
           let pos = ic_len - pos_in ic in
           match try Some (input_line ic) with [ End_of_file -> None ] with
           [ Some s ->
-              let (time, s) = get_var ic "Time:" s in
-              let (ident, s) = get_var ic "Ident:" s in
-              let (_, s) = get_var ic "Email:" s in
-              let (subject, s) = get_var ic "Subject:" s in
-              let (_, s) = get_var ic "Text:" s in
-              let (text, s) =
-                if subject = "" || subject = "-" then
-                  let rec get_mess sl s =
-                    if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
-                      let s = String.sub s 2 (String.length s - 2) in
-                      get_mess [s :: sl] (input_line ic)
-                    else (List.rev sl, s)
-                  in
-                  get_mess [] s
-                else
-                  let rec skip_mess s =
-                    if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
-                      skip_mess (input_line ic)
-                    else ([], s)
-                  in
-                  skip_mess s
-              in
-              let (date, hour) =
-                try
-                  let i = String.index time ' ' in
-                  (String.sub time 0 i,
-                   String.sub time (i + 1) (String.length time - i - 1))
-                with
-                [ Not_found -> ("", time) ]
-              in
-              let beg_mess =
-                match text with
-                [ [x :: _] -> x
-                | _ -> "" ]
-              in
-              let date =
-                try
-                  let y = int_of_string (String.sub date 0 4) in
-                  let m = int_of_string (String.sub date 5 2) in
-                  let d = int_of_string (String.sub date 8 2) in
-                  Dgreg
-                    {year = y; month = m; day = d; prec = Sure; delta = 0}
-                    Dgregorian
-                with
-                [ Failure _ | Invalid_argument _ -> Dtext date ]
-              in
-              let ndisp =
-                if ident <> "" then
-                  let h = (date, hour, ident, subject, beg_mess) in
-                  print_one_header conf prec_date ndisp pos h
-                else ndisp
-              in
-              loop (date, ndisp)
+              if nmess > max_header_mess then do {
+                 Wserver.wprint "<tr><td colspan=4>&nbsp;</td></tr>\n";
+                 tag "tr" begin
+                   tag "td" "colspan=4" begin
+                     Wserver.wprint
+                       "<a href=\"%sm=FORUM;from=%d;len=%d\">%s</a>\n"
+                          (commd conf) (ic_len - pos) max_header_mess
+                          (message_txt conf 2);
+                   end;
+                end;
+                close_in ic;
+                prec_date
+              }
+              else
+                let (time, s) = get_var ic "Time:" s in
+                let (ident, s) = get_var ic "Ident:" s in
+                let (_, s) = get_var ic "Email:" s in
+                let (subject, s) = get_var ic "Subject:" s in
+                let (_, s) = get_var ic "Text:" s in
+                let (text, s) =
+                  if subject = "" || subject = "-" then
+                    let rec get_mess sl s =
+                      if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' '
+                      then
+                        let s = String.sub s 2 (String.length s - 2) in
+                        get_mess [s :: sl] (input_line ic)
+                      else (List.rev sl, s)
+                    in
+                    get_mess [] s
+                  else
+                    let rec skip_mess s =
+                      if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' '
+                      then
+                        skip_mess (input_line ic)
+                      else ([], s)
+                    in
+                    skip_mess s
+                in
+                let (date, hour) =
+                  try
+                    let i = String.index time ' ' in
+                    (String.sub time 0 i,
+                     String.sub time (i + 1) (String.length time - i - 1))
+                  with
+                  [ Not_found -> ("", time) ]
+                in
+                let beg_mess =
+                  match text with
+                  [ [x :: _] -> x
+                  | _ -> "" ]
+                in
+                let date =
+                  try
+                    let y = int_of_string (String.sub date 0 4) in
+                    let m = int_of_string (String.sub date 5 2) in
+                    let d = int_of_string (String.sub date 8 2) in
+                    Dgreg
+                      {year = y; month = m; day = d; prec = Sure; delta = 0}
+                      Dgregorian
+                  with
+                  [ Failure _ | Invalid_argument _ -> Dtext date ]
+                in
+                let ndisp =
+                  if ident <> "" then
+                    let h = (date, hour, ident, subject, beg_mess) in
+                    print_one_header conf prec_date ndisp pos h
+                  else ndisp
+                in
+                loop (nmess + 1) (date, ndisp)
           | None -> do { close_in ic; prec_date } ]
       in
       if last_date = Dtext "" then () else Wserver.wprint "</table>\n"
   | None -> () ]
-;
-
-value message_txt conf i =
-  transl_nth conf "message/previous message/next message" i
 ;
 
 value header_txt conf i = transl_nth conf "ident/email/subject" i;
@@ -275,7 +302,7 @@ value print_forum_message conf base pos =
           if pos = forum_length then Wserver.wprint "&nbsp;"
           else
             Wserver.wprint "<a href=\"%sm=FORUM;p=%d;t=back\">%s</a>\n"
-              (commd conf) pos (capitale (message_txt conf 2));
+              (commd conf) pos (capitale (message_txt conf 3));
           Wserver.wprint "<li>";
           if next_pos > 0 then
             Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n" (commd conf)
