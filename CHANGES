@@ -8,6 +8,8 @@ GeneWeb version 2.04
     whiteyellow, black, bluegreen and brown (thanks to Hans Albeck)
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jun 25, 99] Added short (horizontal) display for surnames by
+    alphabetic order.
   - [Jun 22, 99] Fixed bug: send image in CGI mode did not work.
   - [Jun 19, 99] Added in ancestors long display the ability to select
     and unselect the displaying of siblings and the displaying of notes.
