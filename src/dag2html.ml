@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.2 1999-12-01 19:15:59 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.3 1999-12-02 05:30:45 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -519,12 +519,14 @@ value find_same_parents t i j1 j2 j3 j4 =
       let x4 = t.(i - 1).(j4) in
       let ended =
         if x1.span = x4.span then
+True(*
           loop j1 where rec loop j =
             if j > j4 then True
             else
               match t.(i-1).(j).elem with
               [ Elem _ -> loop (j + 1)
               | _ -> False ]
+*)
         else False
       in
       if ended then (i, j1, j2, j3, j4)
@@ -599,6 +601,16 @@ value exch_blocks t i1 i2 j1 j2 j3 j4 =
           for j = j3 to j4 do line.(j1 - j3 + j) := saved.(j); done;
        return ();
      done;
+     if i1 > 0 then
+       let prev_line = t.(i1-1) in
+       let line = t.(i1) in
+       for j = j1 to j4 do
+         match (prev_line.(j).elem, line.(j).elem) with
+         [ (Ghost x, Elem y) ->
+             prev_line.(j) := {elem = Ghost y; span = prev_line.(j).span}
+         | _ -> () ];
+       done
+     else ();
   return ()
 ;
 
@@ -839,9 +851,9 @@ value print_table print_newline print_elem print_span t =
 value print_char_table d t =
   let print_elem =
     fun
-    [ Elem e -> eprintf " %c" (d.dag.(int_of_idag e).valu)
-    | Ghost e -> eprintf " |" (*d.dag.(int_of_idag e).valu*)
-    | Nothing -> eprintf "  " ]
+    [ Elem e -> eprintf "  %c" (d.dag.(int_of_idag e).valu)
+    | Ghost e -> eprintf "  |" (*d.dag.(int_of_idag e).valu*)
+    | Nothing -> eprintf "   " ]
   in
 (*
   let print_span i j r =
@@ -851,8 +863,8 @@ value print_char_table d t =
   in
 *)
   let print_span i j r =
-    if j > 0 && t.table.(i).(j-1).span = r then eprintf "--"
-    else eprintf " -"
+    if j > 0 && t.table.(i).(j-1).span = r then eprintf "---"
+    else eprintf "  -"
   in
 (**)
   print_table prerr_newline print_elem print_span t
