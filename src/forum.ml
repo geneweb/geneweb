@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.28 2003-07-07 06:30:56 ddr Exp $ *)
+(* $Id: forum.ml,v 4.29 2003-09-22 12:08:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -500,10 +500,10 @@ value print_add conf base =
         if conf.wizard || conf.friend then
           tag "tr" "align=left colspan=2" begin
             stag "td" begin
-              Wserver.wprint
-                "<input type=radio name=Access value=publ checked>%s\n"
+              Wserver.wprint "<input type=radio name=Access value=publ>%s\n"
                 (transl conf "public");
-              Wserver.wprint "<input type=radio name=Access value=priv>%s\n"
+              Wserver.wprint
+                "<input type=radio name=Access value=priv checked>%s\n"
                 (transl conf "private");
             end;
             Wserver.wprint "\n";
