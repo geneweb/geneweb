@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.1.1.1 1998-09-01 14:32:13 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.2 1998-09-04 15:04:52 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -994,6 +994,9 @@ value treat_header r =
 ;
 
 value make_gen gen r =
+(*
+do Printf.printf "%s %s\n" r.rlab r.rval; flush stdout; return
+*)
   match r.rlab with
   [ "HEAD" ->
       do Printf.eprintf "*** Header ok\n";
@@ -1145,16 +1148,26 @@ value make_arrays in_file =
   let strm = Stream.of_channel ic in
   do string_empty.val := add_string gen "";
      string_x.val := add_string gen "x";
-     try
-       while True do
-         let r = get_lev0 strm in
-(*
-         do Hashtbl.add gen.g_all r.rval (); return
-*)
-         make_gen gen r;
-       done
-     with
-     [ Stream.Failure -> () ];
+     loop () where rec loop () =
+       do try
+            while True do
+              let r = get_lev0 strm in
+              make_gen gen r;
+            done
+          with
+          [ Stream.Failure -> () ];
+       return
+       match strm with parser
+       [ [: `'1'..'9' :] ->
+              do let _ : string = get_to_eoln 0 strm in (); return
+              loop ()
+       | [: `_ :] ->
+             do Printf.printf "Strange input found at character %d\n"
+                  (Stream.count strm);
+                flush stdout;
+                let _ : string = get_to_eoln 0 strm in ();
+             return loop ()
+       | [: :] -> () ];
      if ic != stdin then close_in ic else ();
      let nf n =
        do Printf.printf "Note not found %s\n" n;

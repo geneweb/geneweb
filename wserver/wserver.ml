@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 1.1.1.1 1998-09-01 14:32:14 ddr Exp $ *)
+(* $Id: wserver.ml,v 1.2 1998-09-04 15:04:54 ddr Exp $ *)
 
 open Unix;
 
@@ -270,7 +270,11 @@ value is_robot robot_excluder addr =
           count r where rec count =
             fun
             [ [t :: tl] ->
+(**)
                 if tm -. t < float sec then
+(*
+                if tm - t < sec then
+*)
                   let (cnt, tl) = count tl in (cnt + 1, [t :: tl])
                 else (0, [])
             | [] -> (0, []) ]
@@ -316,13 +320,13 @@ value treat_connection tmout callback addr ic =
        if tmout > 0 then
          let spid = fork () in
          if spid > 0 then
-           do let _ : Sys.signal_behavior =
+           do let _ (* : Sys.signal_behavior *) =
                 Sys.signal Sys.sigalrm
                   (Sys.Signal_handle (timeout tmout spid))
               in ();
               let _ = alarm tmout in ();
               let _ = Unix.waitpid [] spid in ();
-              let _ : Sys.signal_behavior =
+              let _ (* : Sys.signal_behavior *) =
                 Sys.signal Sys.sigalrm Sys.Signal_default
               in ();
               exit 0;
