@@ -47,6 +47,11 @@ Propose search by nobility titles in welcome page:
 
 <p>
 
+Trailer text:
+<textarea name=trl rows=5 cols=70 maxlength=50 wrap=virtual>%ftrl;</textarea>
+
+<p>
+
 Advice:
 
 <ul>

@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.51 2000-09-21 09:36:05 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.52 2000-10-06 20:13:45 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -139,7 +139,7 @@ value get_binding ic =
     | c -> loop (Buff.store len c) ]
 ;
 
-value copy_template varenv env fname =
+value copy_template (varenv, filenv) env fname =
   let ic = open_in (Filename.concat gwtp_tmp.val (fname ^ ".txt")) in
   do try
        while True do
@@ -157,6 +157,10 @@ value copy_template varenv env fname =
                  let v = get_variable ic in
                  try print_string (quote_escaped (List.assoc v varenv)) with
                  [ Not_found -> () ]
+             | 'f' ->
+                 let v = get_variable ic in
+                 try print_string (quote_escaped (List.assoc v filenv)) with
+                 [ Not_found -> () ]
              | c ->
                  try print_string (List.assoc c env) with
                  [ Not_found -> do print_char '%'; print_char c; return () ] ]
@@ -169,7 +173,8 @@ value copy_template varenv env fname =
 
 value variables () =
   let ic = open_in (Filename.concat gwtp_tmp.val "conf.txt") in
-  let list = ref [] in
+  let vlist = ref [] in
+  let flist = ref [] in
   do try
        while True do
          match input_char ic with
@@ -177,11 +182,18 @@ value variables () =
              match input_char ic with
              [ 'e' | 'c' ->
                  let (v, _) = get_binding ic in
-                 if not (List.mem v list.val) then list.val := [v :: list.val]
+                 if not (List.mem v vlist.val) then
+                   vlist.val := [v :: vlist.val]
                  else ()
              | 'v' ->
                  let v = get_variable ic in
-                 if not (List.mem v list.val) then list.val := [v :: list.val]
+                 if not (List.mem v vlist.val) then
+                   vlist.val := [v :: vlist.val]
+                 else ()
+             | 'f' ->
+                 let v = get_variable ic in
+                 if not (List.mem v vlist.val) then
+                   flist.val := [v :: flist.val]
                  else ()
              | _ -> () ]
          | _ -> () ];
@@ -189,7 +201,7 @@ value variables () =
      with
      [ End_of_file -> () ];
      close_in ic;
-  return list.val
+  return (vlist.val, flist.val)
 ;
 
 value sys_copy src dst =
@@ -273,34 +285,57 @@ value get_base_conf b =
   let fname = Filename.concat gwtp_dst.val (b ^ ".gwf" ) in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      let variables = variables () in
-      let env = ref [] in
-      let rec record line =
-        fun
-        [ [v :: l] ->
-            if lowercase_start_with line (v ^ "=") then
-              let len = String.length v + 1 in
-              let x = String.sub line len (String.length line - len) in
-              env.val := [(v, x) :: env.val]
-            else record line l
-        | [] -> () ]
+      let (variables, files) = variables () in
+      let varenv =
+        let varenv = ref [] in
+        let rec record line =
+          fun
+          [ [v :: l] ->
+              if lowercase_start_with line (v ^ "=") then
+                let len = String.length v + 1 in
+                let x = String.sub line len (String.length line - len) in
+                varenv.val := [(v, x) :: varenv.val]
+              else record line l
+          | [] -> () ]
+        in
+        do try
+             while True do
+               let line =
+                 let line = input_line ic in
+                 if String.length line > 0
+                 && line.[String.length line - 1] = '\r' then
+                   String.sub line 0 (String.length line - 1)
+                 else line
+               in
+               record line variables;
+             done
+           with
+           [ End_of_file -> close_in ic ];
+        return varenv.val
       in
-      do try
-           while True do
-             let line =
-               let line = input_line ic in
-               if String.length line > 0
-               && line.[String.length line - 1] = '\r' then
-                 String.sub line 0 (String.length line - 1)
-               else line
+      let filenv =
+        List.map
+          (fun fsuff ->
+             let fname =
+               List.fold_right Filename.concat [gwtp_dst.val; "lang"]
+                 (b ^ "." ^ fsuff)
              in
-             record line variables;
-           done
-         with
-         [ End_of_file -> close_in ic ];
-      return env.val
+             match try Some (open_in fname) with [ Sys_error _ -> None ] with
+             [ Some ic ->
+                 let len = ref 0 in
+                 do try
+                      while True do
+                        len.val := Buff.store len.val (input_char ic);
+                      done
+                    with
+                    [ End_of_file -> close_in ic ];
+                 return (fsuff, Buff.get len.val)
+             | None -> (fsuff, "") ])
+          files
+      in
+      (varenv, filenv)
   | None ->
-      [("friend_passwd", mk_passwd 9); ("wizard_passwd", mk_passwd 9)] ]
+      ([("friend_passwd", mk_passwd 9); ("wizard_passwd", mk_passwd 9)], []) ]
 ;
 
 value set_base_conf b varenv =
@@ -349,6 +384,20 @@ value set_base_conf b varenv =
         if b_ex then Sys.rename (bdir ^ "~") bdir else ();
      return ();
   return ()
+;
+
+value set_base_files b filenv =
+  List.iter
+    (fun (k, v) ->
+       let fname =
+         List.fold_right Filename.concat [gwtp_dst.val; "lang"] (b ^ "." ^ k)
+       in
+       if v = "" then
+         try Sys.remove fname with [ Sys_error _ -> () ]
+       else
+         let oc = open_out fname in
+         do output_string oc v; close_out oc; return ())
+    filenv
 ;
 
 (* Login and tokens *)
@@ -592,21 +641,63 @@ value gwtp_receive str env b tok =
   | _ -> gwtp_invalid_request str env ]
 ;
 
+value acceptable_tags = ["!--"; "a"; "br"; "em"; "font"; "hr"; "img"; "p"];
+
+value secure_html s =
+  loop 0 0 where rec loop len i =
+    if i = String.length s then Buff.get len
+    else
+      match s.[i] with
+      [ '<' ->
+          let i = i + 1 in
+          let (slash, i) =
+            if i = String.length s then (False, i)
+            else if s.[i] = '/' then (True, i + 1) else (False, i)
+          in
+          let (tag, i) =
+            loop "" i where rec loop tag i =
+              if i = String.length s then ("", i)
+              else
+                match s.[i] with
+                [ 'a'..'z' | 'A'..'Z' | '!' | '-' ->
+                    loop (tag ^ String.make 1 s.[i]) (i + 1)
+                | _ -> (tag, i) ]
+          in
+          let len =
+            if List.mem (String.lowercase tag) acceptable_tags then
+              Buff.store len '<'
+            else Buff.mstore len "&lt;"
+          in
+          let len = if slash then Buff.store len '/' else len in
+          loop (Buff.mstore len tag) i
+      | c -> loop (Buff.store len c) (i + 1) ]
+;
+
 value gwtp_setconf str env b tok =
+  let (variables, files) = variables () in
   let varenv =
     List.fold_right
       (fun k varenv ->
          match HttpEnv.getenv env k with
          [ Some v -> [(k, v) :: varenv]
          | None -> varenv ])
-      (variables ()) []
+      variables []
   in
+  let filenv =
+    List.fold_right
+      (fun k filenv ->
+         match HttpEnv.getenv env k with
+         [ Some v -> [(k, secure_html v) :: filenv]
+         | None -> filenv ])
+      files []
+  in    
   do printf "content-type: text/html"; crlf (); crlf ();
      printf "\
 <head><title>Gwtp - configuration %s</title></head>\n<body>
 <h1 align=center>Gwtp - configuration %s</h1>
 " b b;
      set_base_conf b varenv;
+     set_base_files b filenv;
      printf "Configuration changed\n";
      printf_link_to_main b tok;
      printf "</body>\n";
@@ -619,7 +710,7 @@ value gwtp_upload str env b tok =
     gwtp_error "no configuration file"
   else
     do printf "content-type: text/html"; crlf (); crlf ();
-       copy_template [] [('s', cgi_script_name ()); ('b', b); ('t', tok)]
+       copy_template ([], []) [('s', cgi_script_name ()); ('b', b); ('t', tok)]
          "send";
        printf_link_to_main b tok;
        printf "</body>\n";
@@ -635,7 +726,7 @@ value gwtp_download str env b tok =
     do printf "content-type: text/html"; crlf (); crlf ();
        if Sys.file_exists bdir then
        let dh = Unix.opendir bdir in
-       do copy_template [] [('b', b); ('t', tok)] "recv";
+       do copy_template ([], []) [('b', b); ('t', tok)] "recv";
           printf "<ul>\n";
           try
             while True do
@@ -672,9 +763,9 @@ value gwtp_download str env b tok =
 ;
 
 value gwtp_config str env b tok =
-  let varenv = get_base_conf b in
+  let (varenv, filenv) = get_base_conf b in
   do printf "content-type: text/html"; crlf (); crlf ();
-     copy_template varenv
+     copy_template (varenv, filenv)
        [('s', cgi_script_name ()); ('b', b); ('t', tok)]
        "conf";
      printf_link_to_main b tok;
