@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.18 1999-11-24 16:29:32 ddr Exp $
+# $Id: lexicon.txt,v 3.19 1999-11-25 10:41:16 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -369,6 +369,7 @@ en: <em>Sosa number</em> relative to %t
 es: <em>n&uacute;mero Sosa</em> respecto a %t
 fi: henkil&ouml;n %t <em>Sosa-numero</em>
 fr: <em>num&eacute;ro Sosa</em> par rapport &agrave; %t
+he: <em> מספר Sosa </em> ביחס ל- %t
 is: <em>Sosa nתmer</em> tengt %t
 se: <em>Sosa nummer</em> relativ till %t
 
@@ -462,6 +463,7 @@ en: a brother-in-law/a sister-in-law
 es: un cu&ntilde;ado/una cu&ntilde;ada
 fi: lanko/k&auml;ly
 fr: un beau-fr&egrave;re/une belle-soeur
+he:  גיס/ גיסה
 is: mבgur/mבgkona
 it: un cognato/una cognata
 nl: een schoonbroer/een schoonzus
@@ -478,7 +480,7 @@ eo: frato/fratino/gefrato
 es: un hermano/una hermana/un(a) hermano(a)
 fi: veli/sisar/sisarus
 fr: un fr&egrave;re/une soeur/un fr&egrave;re ou une soeur
-he:   אח/ אחות 
+he:   אח/ אחות/ אח(ות) 
 is: brףנir/systir/systkyn
 it: un fratello/una sorella/un fratello o una sorella
 nl: een broer/een zuster/een broer of een zuster
@@ -631,7 +633,7 @@ eo: frato/fratino/gefrato
 es: un hermano/una hermana/un(a) hermano(a)
 fi: velipuoli/sisarpuoli/is&auml;(&auml;iti)puolen lapsi
 fr: un demi-fr&egrave;re/une demi-soeur/un demi-fr&egrave;re ou une demi-soeur
-he:   אח/ אחות 
+he:   חצי אח/ חצי אחות/ חצי אח(ות) 
 is: hבlfbrףנir/hבlfsystir/hבlfsystkin
 it: un fratello/una sorella/un fratello o una sorella
 nl: een broer/een zuster/een broer of een zuster
@@ -647,6 +649,7 @@ es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
 fi: veljen tai sisaren poika (puolison veljen tai sisaren poika)/veljen tai sisaren tyt&auml;r (puolison veljen tai sisaren tyt&auml;r)
 fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
 is: frזndi/frזndi
+he:  אחיין (של בן וא בת הזוג)/ אחיינית (של בן וא בת הזוג)) 
 it: un nipote (dello sposo)/una nipote (dello sposo)
 nl: een neef (van de echtgenoot)/een nicht (van de echtgenoot)
 no: nev&oslash; (ektefelles nev&oslash;)/niese (ektefelles niese)
@@ -677,6 +680,7 @@ en: a son-in-law/a daughter-in-law
 es: un yerno/una nuera
 fi: v&auml;vy/mini&auml;
 fr: un beau-fils/une belle-fille
+he:  חתן/ כלה 
 is: tengdasonur/tengdadףttir
 it: un genero/una nuora
 nl: schoonzoon/schoondochter
@@ -693,7 +697,7 @@ eo: filo/filino/infano
 es: un hijo/una hija/un(a) hijo(a)
 fi: poika/tyt&auml;r/lapsi
 fr: un fils/une fille/un enfant
-he:   בן/ בת 
+he:   בן/ בת/ ילד 
 is: sonur/dףttir/barn
 it: un figlio/una figlia/un(a) figlio(a)
 nl: een zoon/een dochter/een kind
@@ -758,6 +762,7 @@ en: adoptive father/adoptive mother/adoptive parents
 es: padre adoptivo/madre adoptiva/padres adoptivos
 fi: ottois&auml;/otto&auml;iti/ottovanhemmat
 fr: p&egrave;re adoptif/m&egrave;re adoptive/parents adoptifs
+he:  אב חורג/ אם חורגת/ הורים חורגים
 is: kjצrfaנir/kjצrmףנir/kjצrforeldrar
 it: padre adottivo/madre adottiva/genitori adottivi
 nl: stiefvader/stiefmoeder/stiefouders
@@ -772,6 +777,7 @@ en: adoptive son/adoptive daughter/adoptive child
 es: hijo adoptivo/hija adoptiva/hijo(a) adoptivo(a)
 fi: ottopoika/ottotyt&auml;r/ottolapsi
 fr: fils adoptif/fille adoptive/enfant adoptif
+he:  בן חורג/ בת חורגת/ ילד חורג 
 is: kjצrsonur/kjצrdףttir/kjצrbarn
 it: figlio adottivo/figlia adottiva/figlio addotivo
 nl: geadopteerde zoon/geadopteerde dochter/adoptiekind
@@ -958,6 +964,7 @@ en: an uncle (aunt's husband)/an aunt (uncle's wife)
 es: un t&iacute;o pol&iacute;tico/una t&iacute;a pol&iacute;tica
 fi: set&auml;/t&auml;ti
 fr: un oncle (&eacute;poux d'une tante)/une tante (&eacute;pouse d'un oncle)
+he:  דוד (בעל הדודה)/ דודה (אשת הדוד) 
 is: frזndi/frזnka
 it: uno zio (marito della zia)/una zia (moglie dello zio)
 nl: een oom/een tante
@@ -992,7 +999,7 @@ eo: antauxeuloj
 es: ascendientes
 fi: esivanhemmat 
 fr: ascendants
-he:   אבות
+he:   האבות
 is: forfeנur
 it: antenati
 nl: voorouders
@@ -1127,6 +1134,7 @@ en: back
 es: regreso
 fi: takaisin
 fr: retour
+he : חזרה 
 is: til baka
 it: torna indietro
 nl: terug
@@ -1142,6 +1150,7 @@ en: baptism
 es: bautismo
 fi: kaste
 fr: bapt&ecirc;me
+he:  תבילה 
 is: skםrn
 it: battesimo
 nl: doop
@@ -1342,6 +1351,7 @@ eo: kalendaro/kalendaroj
 es: calendario/calendarios
 fi: kalenteri/kalenterit
 fr: calendrier/calendriers
+he:  לוח שנה/ לוחות שנה 
 is: dagatal/dagatצl
 it: calendario/calendarii
 nl: kalender/kalenders
@@ -1357,6 +1367,7 @@ es: anular los lazos GeneWeb
 en: cancel GeneWeb links
 fi: ei GeneWeb-linkkej&auml 
 fr: annuler les liens GeneWeb
+he:  בטל קשרי GeneWeb
 is: בn GeneWeb tengla
 it: annullare i links
 nl: geen GeneWeb links
@@ -1371,6 +1382,7 @@ en: candidate father/candidate mother/candidate parents
 es: padre posible/madre posible/padres posibles
 fi: mahdollinen is&auml;/mahdollinen &auml;iti/mahdolliset vanhemmat
 fr: p&egrave;re possible/m&egrave;re possible/parents possibles
+he:  אב אפשרי/ אם אפשרית/ הורים אפשריים 
 is: sennilegur faנir/sennileg mףנir/sennilegir foreldrar
 it: padre presunto/madre presunta/genitori presunti
 nl: kandidaat vader/kandidaat moeder/kandidaat ouders
@@ -1385,6 +1397,7 @@ en: candidate son/candidate daughter/candidate child
 es: hijo posible/hija posible/hijo(a) posible
 fi: mahdollinen poika/mahdollinen tyt&auml;r/mahdollinen lapsi
 fr: fils possible/fille possible/enfant possible
+he:  בן אפשרי/ בת אפשרית/ ילד אפשר  
 is: sennilega sonur/sennilega dףttir/sennilega barn
 it: figlio presunto/figlia presunta/figlio presunto
 nl: kandidaat zoon/kandidaat dochter/kandidaat kind
@@ -1433,6 +1446,7 @@ es: cambiar los nombres de los hijos
 en: change children's names
 fi: muuta lasten nimi&auml;
 fr: changer noms des enfants
+he:  עדכן שמות הילדים 
 is: breyta nafni barna
 it: cambiare i nomi dei figli
 nl: namen van kinderen wijzigen
@@ -1482,6 +1496,7 @@ en: children's names changed
 es: nombres de los hijos cambiados
 fi: lasten nimi&auml on muutettu
 fr: noms des enfants chang&eacute;s
+he:  שמות הילדים הוחלפו 
 is: nafni barns breytt
 it: nomi dei figli cambiati
 nl: namen van kinderen gewijzigd
@@ -1527,6 +1542,7 @@ se: kommentar
 en: comment added
 fi: huomautus lis&auml;tty
 fr: commentaire ajout&eacute;
+he:   הערה הוכנסה  
 nl: commentaar toegevoegd
 is: athugasemd bזtt viנ
 pt: coment&aacute;rio acrescentado
@@ -1964,7 +1980,7 @@ eo: familio modifita
 es: familia modificada
 fi: perhe muutettu 
 fr: famille modifi&eacute;e
-he:  משפחה מעודכנת
+he:  משפחה העודכנה
 is: fjצlskyldu breytt
 it: famiglia modificata
 nl: familie veranderd
@@ -2082,7 +2098,7 @@ eo: personnomo ne trovita
 es: nombre no encontrado
 fi: etunime&auml ei l&ouml;ydy
 fr: pr&eacute;nom pas trouv&eacute;
-he:  שם פרטי לא נמצא
+he:   שם פרטי לא נמצא
 is: fornafn finnst ekki
 it: nome non trovato
 nl: voornaam niet gevonden
@@ -2133,6 +2149,7 @@ eo: forumo
 es: forum
 fi: foorumi
 fr: forum
+he:  קבוצת דייון
 is: umrזנur
 it: tribuna
 nl: forum
@@ -2145,6 +2162,7 @@ dk: plejefader/plejemoder/plejefor&aelig;ldre
 en: foster father/foster mother/foster parents
 fi: kasvatusis&auml;/kasvatus&auml;iti/kasvatusvanhemmat
 fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
+he:   אב חורג/ אם חורגת/ הורים חורגים
 no: fosterfar/fostermor/fosterforeldre
 se: fosterfar/fostermor/fosterf&ouml;r&auml;lder
 
@@ -2153,6 +2171,7 @@ dk: plejes&oslash;n/plejedatter/plejebarn
 en: foster son/foster daughter/foster child
 fi: kasvattipoika/kasvattityt&auml;r/kasvattilapsi
 fr: fils &eacute;lev&eacute;/fille &eacute;lev&eacute;e/enfant &eacute;lev&eacute;
+he:  בן חורג/ בת חורגת/ ילד חורג 
 no: fosters&oslash;nn/fosterdatter/fosterbarn
 se: fosterson/fosterdotter/fosterbarn
 
@@ -2180,6 +2199,7 @@ en: godfather/godmother/godparents
 es: padrino/madrina/padrino y padrina
 fi: kummiset&auml;/kummit&auml;ti/kummit
 fr: parrain/marraine/parrain et marraine
+he:  סנדק/ סנדקית/ סנדקים
 is: guנfaנir/guנmףנir/guנforeldrar
 it: padrino/madrina/padrini
 nl: peter/meter/peetouders
@@ -2194,6 +2214,7 @@ en: godson/goddaughter/godchild
 es: fahijado/fahijada/fahihado(a)
 fi: kummipoika/kummitytt&ouml;/kummilapsi
 fr: filleul/filleule/filleul(e)
+he:  בן סנדקאות/ בת סנדקאות/ ילד סנדקאות
 is: guנsonur/guנdףttir/guנbarn
 it: figlioccio/figlioccia/figlioccio
 nl: peetzoon/peetdochter/petekind
@@ -2242,6 +2263,7 @@ en: Gregorian/Julian/French/Hebrew
 es: gregoriano/julian/franc&eacute;s/hebreo
 fi: gregoriaaninen/juliaaninen/ranskalainen/heprealainen
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
+he:  גרגורי/ יוליאני/ צרפתי/ עברי 
 is: gregorםsk/julian/franskt/hebreskt
 it: gregorian/julian/francese/ebraico
 nl: gregoriaans/juliaans/frans/hebreeuws
@@ -2341,6 +2363,7 @@ eo: historio de la gxisdatigoj
 es: historia de las actualizaciones
 fi: p&auml;ivityshistoria
 fr: historique des mises-&agrave;-jour
+he:  רשימת העדכונים 
 is: uppfזrslusaga
 it: storia degli aggiornamenti
 nl: lijst van wijzigingen
@@ -2473,6 +2496,7 @@ en: include missing spouses
 es: incluir los c&oacute;nyuges faltantes
 fi: lue mukaan puuttuvat puolisot
 fr: inclure les conjoints manquants
+he:  כלל בני זוג החסרים 
 is: meנtaldir makar sem vantar
 it: includere i coniugi mancanti
 nl: ontbrekende echtgenoten tonen
@@ -2487,6 +2511,7 @@ en: include spouses
 es: incluir los c&oacute;nyuges
 fi: mukaanlue puolisot
 fr: inclure les conjoints
+he:  בלל
 is: meנtaldar makar
 it: includere i coniugi
 nl: echtgenoten tonen
@@ -3097,6 +3122,7 @@ eo: nevoj kay nevinoj
 es: sobrinos y sobrinas
 fi: sisarusten lapset
 fr: neveux et ni&egrave;ces
+he:  אחיינים
 is: brזנra og systrabצrn
 it: nipoti
 nl: neven en nichten
@@ -3228,7 +3254,7 @@ eo: ne trovita
 es: no encontrado
 fi: ei l&ouml;ydy
 fr: pas trouv&eacute;
-he:  לא נמצא
+he:  לא נמצא  
 is: fannst ekki
 it: non trovato
 nl: niet gevonden
@@ -3610,6 +3636,7 @@ dk: efter behag
 en: optional
 fi: ei v&auml;ltt&auml;m&auml;t&ouml;n
 fr: facultatif
+he:  על פי בחירה
 is: mב velja
 nl: optioneel
 no: valgfritt
@@ -3659,7 +3686,7 @@ eo: gepatroj:a:+n
 es: padres
 fi: vanhemmat
 fr: parents
-he:  הורים
+he:   הורים
 is: foreldrar
 it: genitori
 nl: ouders
@@ -3775,6 +3802,7 @@ dk: pr&aelig;cisering
 en: precision
 fi: tarkennus
 fr: pr&eacute;cision
+he:  דייוק
 is: nבkvזmni
 nl: precisie
 no: n&oslash;yaktighet
@@ -3886,6 +3914,7 @@ dk: anerkendt s&oslash;n/anerkendt datter/anerkendt barn
 en: recognized son/recognized daughter/recognized child
 fi: tunnustettu poika/tunnustettu tyt&auml;r/tunnustettu lapsi
 fr: fils reconnu/fille reconnue/enfant reconnu
+he:  בן ידוע/ בת ידועה/ ילד ידוע
 is: viנurkendur sonur/viנurkend dףttir/viנurkent barn
 it: figlio riconosciuto/figlia riconosciuta/figlio riconosciuto
 nl: aanvaarde zoon/aanvaarde dochter/aanvaar kind
@@ -3912,6 +3941,7 @@ en: relation/relations
 es: relaci&oacute;n/relaciones
 fi: sukulaisuus/sukulaisuussuhteet
 fr: relation/relations
+he:  יחסים
 is: skyldleiki/skyldleikar
 it: parentela
 nl: relatie/relaties
@@ -3979,6 +4009,7 @@ en: relationship%t to
 es: parentesco%t con
 fi: suhde%t ja 
 fr: relation%t avec
+he:  קירבה
 is: sambתנ%t meנ
 it: legame%t con
 nl: verbonden%t met
@@ -3993,6 +4024,7 @@ en: relationships by marriage
 es: parentesco pol&iacute;tico
 fi: sukulaisuussuhteet avioliiton kautta
 fr: liens de parent&eacute; par alliance
+he:  קשרים דרך נשואין
 is: tengjast meנ giftingu
 it: parentele per matrimonio
 nl: verwant door huwelijk
@@ -4108,6 +4140,7 @@ en: short display
 es: presentaci&oacute;n corta
 fi: lyhyt esitys
 fr: affichage court
+he:  תצוגה מקוצרת 
 is: stutt s‎n
 it: display corto
 nl: beknopte weergave
@@ -4165,6 +4198,7 @@ eo: gefratoj
 es: hermanos y hermanas
 fi: sisarukset
 fr: fr&egrave;res et soeurs
+he:  אחים
 is: systkyni
 it: fratelli
 nl: broers en zussen
@@ -4396,6 +4430,7 @@ dk: tekst
 en: text
 fi: teksti
 fr: texte
+he:  כתוב
 is: texti
 nl: tekst
 no: tekst
@@ -4561,6 +4596,7 @@ en: the father-in-law/the mother-in-law
 es: el suegro/la suegra
 fi: appi/anoppi
 fr: le beau-p&egrave;re/la belle-m&egrave;re
+he:  החם/ החמות
 is: tengdafaנir/tengdamףנir
 it: il suocero/la suocera
 nl: de schoonvader/de schoonmoeder
@@ -4746,6 +4782,7 @@ eo: la edzo/la edzino
 es: el esposo/l'esposa
 fi: puoliso
 fr: l'&eacute;poux/l'&eacute;pouse
+he:  בן הזוג/ בת הזוג
 is: maki
 it: lo sposo/la sposa
 nl: echtgenoot
@@ -4794,6 +4831,7 @@ en: to add a child to a family, use "%s"
 es: para agregar un hijo a una familia, utiliza "%s"
 fi: lis&auml;t&auml;ksesi perheeseen lapsen k&auml;yt&auml; "%s"
 fr: pour ajouter un enfant &agrave; une famille, utiliser "%s"
+he:  להוסיף ילד למשפחה, השתמש ב-"%s" 
 is: til aנ bזta barni viנ fjצlskyldu, notaנu "%s"
 it: per aggiungere un figlio ad una famiglia, scegliere "%s"
 nl: gebruik "%s" om een kind aan een familie toe te voegen
@@ -4977,6 +5015,7 @@ dk: tr&aelig;
 en: tree
 fi: puu
 fr: arbre
+he:  אץ
 is: trי
 nl: boom
 no: tre
@@ -4991,6 +5030,7 @@ eo: onkloj kaj onklinoj
 es: t&iacute;os y t&iacute;as
 fi: sed&auml;t ja t&auml;dit
 fr: oncles et tantes
+he:  דודים
 is: fצנur(mףנur)systur og fצנur(mףנur)brזנur
 it: zii e zie
 nl: ooms en tantes
@@ -5104,6 +5144,7 @@ se: med
 en: witness at marriage of %s and %s
 fi: avioliiton %s ja %s todistaja
 fr: t&eacute;moin au mariage de %s et de %s
+he:  אדים בחתונה של %s ו-%s
 is: vitni aנ giftingu %s og %s
 nl: getuige bij het huwelijk van %s en %s
 no: forlover ved ekteskap mellom %s og %s
@@ -5115,6 +5156,7 @@ dk: vidne/vidner
 en: witness/witnesses
 fi: todistaja/todistajat
 fr: t&eacute;moin/t&eacute;moins
+he:  אד/ אדים 
 is: vitni/vitni
 nl: getuige/getuigen
 no: forlover/forlovere
@@ -5145,6 +5187,7 @@ en: year/month/day
 es: a&ntilde;o/mes/dia
 fi: vuosi/kuukausi/p&auml;iv&auml
 fr: ann&eacute;e/mois/jour
+he:  שנה/ חודש/ יום
 is: בr/mבnuנur/dagur
 it: anno/mese/giorno
 nl: jaar/maand/dag
