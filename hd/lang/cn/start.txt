@@ -12,7 +12,7 @@
 <tr>
 <td>
 <a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
-height=108 src="%gm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
 <h1><font color=#2f6400>ÍøÂç¼ÒÆ×</font></h1>

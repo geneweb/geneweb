@@ -5,6 +5,8 @@ GeneWeb Version 3.00
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Oct 31, 99] Added macro %k for images in order to have the same request
+    for any data base in any language.
   - [Oct 25, 99] Modified the treatment of nth (overflowing after 100)
     to display the number itself (better than just "n-th").
   - [Oct 25, 99] Commented the loading of the whole persons and families
