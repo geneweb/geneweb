@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 3.4 2000-11-16 20:17:12 ddr Exp $ *)
+(* $Id: consang.ml,v 3.5 2000-11-21 15:18:13 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -136,38 +136,6 @@ value consang_of p =
   if p.consang == no_consang then 0.0 else Adef.float_of_fix p.consang
 ;
 
-module type FastPqueueOrd = sig type t = 'a; value f : t -> int; end;
-
-module FastPqueue (Ord : FastPqueueOrd) =
-  struct
-    type t = { a : mutable array (list Ord.t); m : mutable int };
-    value create () =
-      {a = [| |]; m = 0}
-    ;
-    value rec is_empty q =
-      if q.m = Array.length q.a then True
-      else if q.a.(q.m) = [] then do q.m := q.m + 1; return is_empty q
-      else False
-    ;
-    value rec take q =
-      if q.m = Array.length q.a then raise Not_found
-      else
-        match q.a.(q.m) with
-        [ [x :: l] -> do q.a.(q.m) := l; return x
-        | [] -> do q.m := q.m + 1; return take q ]
-    ;
-    value add u q =
-      let v = Ord.f u in
-      do if v >= Array.length q.a then
-           let len = Array.length q.a in
-           q.a := Array.append q.a (Array.create (v + 1 - len) [])
-         else ();
-         q.a.(v) := [u :: q.a.(v)];
-      return ()
-    ;
-  end
-;
-
 value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
   let i1 = Adef.int_of_iper ip1 in
   let i2 = Adef.int_of_iper ip2 in
@@ -179,17 +147,25 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
          lens2 = []; mark = mark; elim_ancestors = False;
          anc_stat1 = MaybeAnc; anc_stat2 = MaybeAnc}
     in
-    let module Pq =
-      FastPqueue (struct type t = int; value f x = id.(x); end)
-    in
-    let q = Pq.create () in
+    let q = ref [| |] in
+    let qi = ref 0 in
+    let qs = min id.(i1) id.(i2) in
     let inserted = new_mark () in
-    let add u = do reset u inserted; Pq.add u q; return () in
+    let add u =
+      let v = id.(u) - qs in
+      do reset u inserted;
+         if v >= Array.length q.val then
+           let len = Array.length q.val in
+           q.val := Array.append q.val (Array.create (v + 1 - len) [])
+         else ();
+         q.val.(v) := [u :: q.val.(v)];
+      return ()
+    in
     let relationship = ref 0.0 in
     let nb_anc1 = ref 1 in
     let nb_anc2 = ref 1 in
     let tops = ref [] in
-    let treat u y =
+    let treat_parent u y =
       do if tab.(y).mark <> inserted then add y else (); return
       let ty = tab.(y) in
       let p1 = half u.weight1 in
@@ -211,6 +187,30 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
          else ();
       return ()
     in
+    let treat_ancestor u =
+      let tu = tab.(u) in
+      let a = base.data.ascends.get u in
+      let contribution =
+        tu.weight1 *. tu.weight2 -.
+        tu.relationship *. (1.0 +. consang_of a)
+      in
+      do if tu.anc_stat1 == IsAnc then decr nb_anc1 else ();
+         if tu.anc_stat2 == IsAnc then decr nb_anc2 else ();
+         relationship.val := relationship.val +. contribution;
+         if b && contribution <> 0.0 && not tu.elim_ancestors then
+           do tops.val := [u :: tops.val];
+              tu.elim_ancestors := True;
+           return ()
+         else ();
+         match a.parents with
+         [ Some ifam ->
+             let cpl = coi base ifam in
+             do treat_parent tu (Adef.int_of_iper cpl.father);
+                treat_parent tu (Adef.int_of_iper cpl.mother);
+             return ()
+         | _ -> () ];
+      return ()
+    in
     do add i1;
        add i2;
        tab.(i1).weight1 := 1.0;
@@ -219,33 +219,12 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
        tab.(i2).lens2 := [(0, 1)];
        tab.(i1).anc_stat1 := IsAnc;
        tab.(i2).anc_stat2 := IsAnc;
-       while not (Pq.is_empty q) && nb_anc1.val > 0 && nb_anc2.val > 0 do
-         let u = Pq.take q in
-(*
-do Printf.eprintf "take %s (%d)\n" (denomination base (base.data.persons.get u)) id.(u); flush stdout; return
-*)
-         let tu = tab.(u) in
-         let a = base.data.ascends.get u in
-         let contribution =
-           tu.weight1 *. tu.weight2 -.
-           tu.relationship *. (1.0 +. consang_of a)
-         in
-         do if tu.anc_stat1 == IsAnc then decr nb_anc1 else ();
-            if tu.anc_stat2 == IsAnc then decr nb_anc2 else ();
-            relationship.val := relationship.val +. contribution;
-            if b && contribution <> 0.0 && not tu.elim_ancestors then
-              do tops.val := [u :: tops.val];
-                 tu.elim_ancestors := True;
-              return ()
-            else ();
-            match a.parents with
-            [ Some ifam ->
-                let cpl = coi base ifam in
-                do treat tu (Adef.int_of_iper cpl.father);
-                   treat tu (Adef.int_of_iper cpl.mother);
-                return ()
-            | _ -> () ];
-         return ();
+       while
+         qi.val < Array.length q.val && nb_anc1.val > 0 && nb_anc2.val > 0
+       do
+         let slice = q.val.(qi.val) in
+         List.iter treat_ancestor slice;
+         incr qi;
        done;
     return (half relationship.val, tops.val)
 ;
