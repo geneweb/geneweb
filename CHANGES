@@ -70,7 +70,10 @@ GeneWeb version 3.10
   - [07 Nov 00] Put logs for gwsetup and gwd on /var/log.
 
 * Documentation
-  - [27 Nov 00] Added a paragraph in the FAQ about the spelling correction
+  - [12 Dec 00] In the FAQ, in the entry "It does not work at all
+    under Windows", added a paragraph to tell to try by replacing
+    "localhost" by "127.0.0.1".
+  - [27 Nov 00] Added an entry in the FAQ about the spelling correction
     and its possible strange results.
 
 GeneWeb version 3.09
