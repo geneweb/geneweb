@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 1.6 1998-10-15 09:45:44 ddr Exp $ *)
+(* $Id: update.ml,v 1.7 1998-10-24 15:24:59 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -382,26 +382,25 @@ value bad_date conf d =
 value reconstitute_date conf var =
   match get_number var "yyyy" conf.env with
   [ Some y ->
-      match get_number var "mm" conf.env with
-      [ Some m ->
-          match get_number var "dd" conf.env with
-          [ Some d ->
-              if d >= 1 && d <= 31 && m >= 1 && m <= 12 then Some (Djma d m y)
-              else bad_date conf (Djma d m y)
-          | None ->
-              if m >= 1 && m <= 12 then Some (Dma m y)
-              else bad_date conf (Dma m y) ]
-      | None ->
-          let prec =
-            match get var "prec" conf.env with
-            [ "about" -> About
-            | "maybe" -> Maybe
-            | "before" -> Before
-            | "after" -> After
-            | "oryear" -> OrYear (int_of_string (get var "oryear" conf.env))
-            | _ -> Sure ]
-          in
-          Some (Da prec y) ]
+      match get var "prec" conf.env with
+      [ "about" -> Some (Da About y)
+      | "maybe" -> Some (Da Maybe y)
+      | "before" -> Some (Da Before y)
+      | "after" -> Some (Da After y)
+      | "oryear" ->
+          Some (Da (OrYear (int_of_string (get var "oryear" conf.env))) y)
+      | _ ->
+          match get_number var "mm" conf.env with
+          [ Some m ->
+              match get_number var "dd" conf.env with
+              [ Some d ->
+                  if d >= 1 && d <= 31 && m >= 1 && m <= 12 then
+                    Some (Djma d m y)
+                  else bad_date conf (Djma d m y)
+              | None ->
+                  if m >= 1 && m <= 12 then Some (Dma m y)
+                  else bad_date conf (Dma m y) ]
+          | None -> Some (Da Sure y) ] ]
   | None -> None ]
 ;
 

@@ -1,7 +1,11 @@
 GeneWeb Version 1.08
 --------------------
 
-* gwd: fixed several displaying bugs due to ANSEL
+* gwd:
+  - fixed several displaying bugs due to ANSEL
+  - in forms, when a precision (about, maybe, before, after, or year) is given
+    for a date, the day and month part are ignored, since its works only for
+    years.
 
 * gwc, gwu:
   - added backslash as escape character for underscores
