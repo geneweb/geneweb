@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.42 2001-01-18 05:24:55 ddr Exp $ *)
+(* $Id: dag.ml,v 3.43 2001-01-26 02:18:44 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -464,6 +464,37 @@ value table_strip_troublemakers hts =
   done
 ;
 
+value print_next_pos conf pos1 pos2 =
+  match pos2 with
+  [ Some pos2 ->
+      let pos1 =
+        match pos1 with
+        [ Some pos1 -> pos1
+        | None -> 0 ]
+      in
+      let dpos =
+        match p_getint conf.env "dpos" with
+        [ Some dpos -> dpos
+        | None -> pos2 - pos1 - 10 ]
+      in
+      let env =
+        List.fold_right
+          (fun (k, v) env ->
+             match k with
+             [ "pos1" | "pos2" -> env
+             | _ -> [(k, v) :: env] ])
+          conf.env []
+      in
+      do Wserver.wprint "<div align=right>\n";
+         Wserver.wprint "<a href=\"%s" (commd conf);
+         List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
+         Wserver.wprint "pos1=%d;pos2=%d" (pos1 + dpos) (pos2 + dpos);
+         Wserver.wprint "\">&gt;&gt;</a>\n";
+         Wserver.wprint "</div>\n";
+      return ()
+  | None -> () ]
+;
+
 (* Main print table algorithm with <pre> *)
 
 value print_table_pre conf hts =
@@ -513,7 +544,8 @@ return
 *)
   let pos1 = p_getint conf.env "pos1" in
   let pos2 = p_getint conf.env "pos2" in
-  do Wserver.wprint "<pre>\n";
+  do print_next_pos conf pos1 pos2;
+     Wserver.wprint "<pre>\n";
      for i = 0 to Array.length hts - 1 do
        let (stra, max_row) =
          let (stral, max_row) =
@@ -599,30 +631,14 @@ return
        done;
      done;
      Wserver.wprint "</pre>\n";
-     let pos1 =
-       match pos1 with
-       [ Some pos1 -> pos1
-       | None -> 0 ]
-     in
-     let env =
-       List.fold_right
-         (fun (k, v) env -> if k = "pos1" then env else [(k, v) :: env])
-         conf.env []
-     in
-     do Wserver.wprint "<p>\n<div align=right>\n";
-        Wserver.wprint "<a href=\"%s" (commd conf);
-        List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
-        Wserver.wprint "pos1=%d" (pos1 + 70);
-        Wserver.wprint "\">&gt;&gt;</a>\n";
-        Wserver.wprint "</div>\n";
-     return ();
-  return () 
+  return ()
 ;
 
 (* main *)
 
 value print_html_table conf hts =
   if Util.p_getenv conf.env "notab" = Some "on"
+  || Util.p_getenv conf.env "pos2" <> None
   || browser_doesnt_have_tables conf then
     print_table_pre conf hts
   else

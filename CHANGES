@@ -2,6 +2,15 @@ GeneWeb version 3.11
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [26 Jan 01] (a bit technical): for server mode (i.e. not CGI), added
+    option "-nofork" asking not to run a new process at each request.
+    This option was added because some users under Windows reported that
+    sometimes, the service blocks and need to be stopped and restarted.
+    This option may resolve this problem (not sure). Other advantage: may
+    answer faster. Drawbacks: may stop gwd in case of internal error (not
+    supposed to happen, but...), possible risk of memory leak. Not
+    recommended under Unix since only one request is treated at the
+    same time (in Windows version, it is always the case, anyway).
   - [25 Jan 01] When searching somebody by a name, if there are several
     possible answers, also display now the first names aliases (if there
     are some).
@@ -21,19 +30,19 @@ GeneWeb version 3.11
   - [28 Dec 00] (detail) In short dates, for the case "don't know if
     dead", now print just "year" instead of "*year". Changed all FAQ about
     this convention of short dates.
-  - [27 Dec 00] In personal pages template file (etc/perso.txt), the value
-    "%witness;" refers now to the witness person himself (instead of being
-    the text with link and dates). This allows to customize now the display
-    of witnesses, e.g. by adding their professions, or their parents, etc.
   - [19 Dec 00] In update page, changed "add family" into "add
     marriage" because, despite the warning at end of this page, many
-    people are mistaken by thinking it was "add a child in a family".
+    users are mistaken by thinking it was "add a child in a family".
 
 * Template (etc/perso.txt)
   - [20 Jan 01] In personal page template file (etc/perso.txt), the macro
     "%nobility_titles;" has been decomposed into "%foreach;nobility_title;"
     and "%nobility_title;", allowing to display the nobility titles
     differently (e.g. in a list <ul>..</ul>).
+  - [27 Dec 00] The value "%witness;" refers now to the witness person
+    himself (instead of being the text with link and dates). This allows to
+    customize now the display of witnesses, e.g. by adding their professions,
+    or their parents, etc.
 
 * Setup program (gwsetup)
   - [22 Jan 01] Added the merging of data bases. Updated the documentation
