@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 4.4 2001-04-21 16:39:24 ddr Exp $ *)
+(* $Id: robot.ml,v 4.5 2001-04-21 17:55:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -155,8 +155,12 @@ value check oc tm from max_call sec cgi suicide =
           let (list, nconn) =
             W.fold
               (fun k (_, tm, nb) (list, nconn) ->
-                 (if nb <= 5 then list else [(k, tm, nb) :: list],
-                  nconn + 1))
+                 do {
+                   if nb > fst xcl.max_conn then xcl.max_conn := (nb, k)
+                   else ();
+                   (if nb <= 5 then list else [(k, tm, nb) :: list],
+                    nconn + 1)
+                 })
               xcl.who ([], 0)
           in
           let list =
@@ -169,12 +173,8 @@ value check oc tm from max_call sec cgi suicide =
           in
           List.iter
             (fun (k, tm0, nb) ->
-               do {
-                 Printf.fprintf oc "--- %3d req - %3.0f sec - %s\n" nb
-                   (tm -. tm0) k;
-                 if nb > fst xcl.max_conn then xcl.max_conn := (nb, k)
-                 else ();
-               })
+               Printf.fprintf oc "--- %3d req - %3.0f sec - %s\n" nb
+                 (tm -. tm0) k)
             list;
           Printf.fprintf oc "--- max %d req by %s / conn %d\n"
             (fst xcl.max_conn) (snd xcl.max_conn) nconn;
