@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.32 2005-02-03 09:59:23 ddr Exp $ *)
+(* $Id: templ.ml,v 4.33 2005-02-05 03:51:58 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -681,7 +681,8 @@ value eval_expr conf eval_var =
 
 value print_body_prop conf base =
   let s =
-    try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with [ Not_found -> "" ]
+    try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
+    [ Not_found -> "" ]
   in
   Wserver.wprint "%s" (s ^ Util.body_prop conf)
 ;

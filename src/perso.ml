@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.69 2005-02-03 16:19:41 ddr Exp $ *)
+(* $Id: perso.ml,v 4.70 2005-02-05 03:51:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -265,7 +265,7 @@ value extract_var sini s =
 value warning_use_has_parents_before_parent var =
   ifdef UNIX then do {
     Printf.eprintf "\
-*** <W> perso.txt: since v4.11, must test \"has_parents\" before using \"%s\"\n"
+*** <W> perso.txt: since v5.00, must test \"has_parents\" before using \"%s\"\n"
       var;
     flush stderr;
   }

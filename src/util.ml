@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.113 2005-02-04 10:33:01 ddr Exp $ *)
+(* $Id: util.ml,v 4.114 2005-02-05 03:51:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1158,7 +1158,7 @@ value header_without_page_title conf title =
     include_hed_trl conf None ".hed";
     Wserver.wprint "</head>\n";
     let s =
-      try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
+      try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
       [ Not_found -> "" ]
     in
     let s = s ^ body_prop conf in Wserver.wprint "<body%s>" s;

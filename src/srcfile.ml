@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.30 2005-02-03 16:19:44 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.31 2005-02-05 03:51:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -216,7 +216,7 @@ value macro conf base =
       | None -> "" ]
   | 'b' ->
       let s =
-        try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
+        try " dir=\"" ^ Hashtbl.find conf.lexicon " !dir" ^ "\"" with
         [ Not_found -> "" ]
       in
       s ^ body_prop conf
