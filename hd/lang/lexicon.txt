@@ -2447,7 +2447,7 @@ es: los %d apellidos
 fr: les %d noms
 it: i %d cognomi
 nl: de %d familienamen
-pt: os apelidos
+pt: os %d apelidos
 se: de %d efternamnen
 
     the %s generation
