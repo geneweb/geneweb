@@ -1,6 +1,9 @@
 GeneWeb version 3.10
 --------------------
 
+* GeneWeb data bases Transfer Program (gwtp)
+  - [07 Nov 00] Added "body_prop" among configurable variables (conf.txt).
+
 * Installation under Linux rpm
   - [07 Nov 00] Put logs for gwsetup and gwd on /var/log.
 
