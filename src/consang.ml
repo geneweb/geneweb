@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 1.3 1998-10-20 09:22:04 ddr Exp $ *)
+(* $Id: consang.ml,v 1.4 1998-11-06 17:57:26 ddr Exp $ *)
 
 (* Algorithm relationship and links from Didier Remy *)
 
@@ -27,6 +27,8 @@ value half x = x *. 0.5;
 
 value mark = ref 0;
 value new_mark () = do incr mark; return mark.val;
+
+exception TopologicalSortError;
 
 value topological_sort base =
   let tab = Array.create base.persons.len 0 in
@@ -69,10 +71,7 @@ value topological_sort base =
               | _ -> () ];           
            return loop todo.val
        | [] -> () ];
-     if cnt.val <> base.persons.len then
-       failwith
-          ("topological sort: cnt " ^ string_of_int cnt.val ^ " len " ^
-           string_of_int base.persons.len)
+     if cnt.val <> base.persons.len then raise TopologicalSortError
      else ();
   return tab
 ;
@@ -177,18 +176,13 @@ value relationship base tab ip1 ip2 =
   fst (relationship_and_links base tab False ip1 ip2)
 ;
 
-exception Error;
-
 value compute_all_consang base from_scratch =
   let _ = base.ascends.array () in
   let _ = base.couples.array () in
   let _ = base.families.array () in
   do Printf.eprintf "Computing consanguinity..."; flush stderr; return
   let running = ref True in
-  let tab =
-    try make_relationship_table base with
-    [ Failure _ -> raise Error ]
-  in
+  let tab = make_relationship_table base in
   let cnt = ref 0 in
   let most = ref None in
   do for i = 0 to base.ascends.len - 1 do

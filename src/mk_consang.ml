@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 1.2 1998-10-20 09:22:06 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 1.3 1998-11-06 17:57:26 ddr Exp $ *)
 
 value fname = ref "";
 value scratch = ref False;
@@ -28,7 +28,7 @@ value main () =
          Iobase.output fname.val base;
       return ()
     with
-    [ Consang.Error ->
+    [ Consang.TopologicalSortError ->
         do Printf.eprintf "
 Error: probable loop in database (persons being their own ancestors).\n";
            flush stderr;

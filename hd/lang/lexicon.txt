@@ -2009,6 +2009,10 @@ fr: priv&eacute;
 pt: privado
 se: privat
 
+    probable loop in base
+en: probable loop in database: someone being his/her own ancestor
+fr: boucle probable dans la base de donn&eacute;es: quelqu'un est son propre anc&ecirc;tre
+
     public
 de: &ouml;ffentlich
 en: public

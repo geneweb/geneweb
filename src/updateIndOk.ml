@@ -1,10 +1,22 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.8 1998-10-30 10:11:21 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.9 1998-11-06 17:57:27 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
+
+value only_printable s =
+  let s = strip_spaces s in
+  let s' = String.create (String.length s) in
+  do for i = 0 to String.length s - 1 do
+       s'.[i] :=
+         match s.[i] with
+         [ ' '..'~' | '\160'..'\255' -> s.[i]
+         | _ -> ' ' ];
+     done;
+  return s'
+;
 
 value f_aoc conf s =
   if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
@@ -124,8 +136,8 @@ value reconstitute_person conf =
     [ Some s -> try int_of_string (strip_spaces s) with [ Failure _ -> -1 ]
     | _ -> -1 ]
   in
-  let first_name = (strip_spaces (get conf "first_name")) in
-  let surname = (strip_spaces (get conf "surname")) in
+  let first_name = only_printable (get conf "first_name") in
+  let surname = only_printable (get conf "surname") in
   let occ =
 (*
     if first_name = "?" || surname = "?" then 0
