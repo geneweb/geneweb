@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 3.5 2000-01-10 02:14:41 ddr Exp $ *)
+(* $Id: some.ml,v 3.6 2000-04-02 19:09:28 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -208,7 +208,7 @@ value afficher_date_mariage conf base fam p c =
 value max_lev = 3;
 
 value rec print_branch conf base first_lev lev name p =
-  do if lev == 0 then html_br conf else html_li conf;
+  do if lev == 0 then () else html_li conf;
      Wserver.wprint "<strong>";
      if p_surname base p = name then
        afficher_prenom_de_personne_referencee conf base p
@@ -266,7 +266,7 @@ value rec print_branch conf base first_lev lev name p =
     in ()
 ;
 
-value rec print_by_branch x conf base not_found_fun (ipl, homonymes) =
+value print_by_branch x conf base not_found_fun (ipl, homonymes) =
   let l = List.map (poi base) ipl in
   let ancestors =
     Sort.list
@@ -277,6 +277,7 @@ value rec print_by_branch x conf base not_found_fun (ipl, homonymes) =
   let len = List.length ancestors in
   if len == 0 then not_found_fun conf x
   else
+    let fx = x in
     let x =
       match homonymes with
       [ [x :: _] -> x
@@ -294,46 +295,64 @@ value rec print_by_branch x conf base not_found_fun (ipl, homonymes) =
            (List.tl homonymes);
       return ()
     in
+    let br = p_getint conf.env "br" in
     do header conf title;
        print_link_to_welcome conf True;
-       Wserver.wprint "<font size=-1><em>\n";
-       Wserver.wprint "%s " (capitale (transl conf "click"));
-       Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
-         (code_varenv x) (transl conf "here");
-       Wserver.wprint "%s"
-         (transl conf "for the first names by alphabetic order");
-       Wserver.wprint ".</em></font>\n";
-       html_p conf;
+       if br = None then
+         do Wserver.wprint "<font size=-1><em>\n";
+            Wserver.wprint "%s " (capitale (transl conf "click"));
+            Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
+              (code_varenv x) (transl conf "here");
+            Wserver.wprint "%s"
+              (transl conf "for the first names by alphabetic order");
+            Wserver.wprint ".</em></font>\n";
+            html_p conf;
+         return ()
+       else ();
        Wserver.wprint "<nobr>\n";
-       if len > 1 then
+       if len > 1 && br = None then
          do Wserver.wprint "%s: %d"
              (capitale (transl conf "number of branches")) len;
             html_p conf;
-            Wserver.wprint "<ol>\n";
+            Wserver.wprint "<dl>\n";
          return ()
        else ();
        let _ = List.fold_left
          (fun n p ->
-            do if len > 1 then html_li conf else ();
-               match (aoi base p.cle_index).parents with
-               [ Some ifam ->
-                   let cpl = coi base ifam in
-                   do Wserver.wprint "<br>\n";
-                      let href = Util.acces conf base (poi base cpl.father) in
-                      wprint_geneweb_link conf href "&lt;&lt";
-                      Wserver.wprint "\n&amp;\n";
-                      let href = Util.acces conf base (poi base cpl.mother) in
-                      wprint_geneweb_link conf href "&lt;&lt";
-                      Wserver.wprint "\n";
-                      tag "ul" begin
-                        print_branch conf base True 1 x p;
-                      end;
-                   return ()
-               | None -> print_branch conf base True 0 x p ];
+            do if len > 1 && br = None then
+                 do Wserver.wprint "<dt>";
+                    stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
+                      (Util.code_varenv fx) n
+                    begin
+                      Wserver.wprint "%d." n;
+                    end;
+                    Wserver.wprint "\n<dd>\n";
+                 return ()
+               else ();
+               if br = None || br = Some n then
+                 match (aoi base p.cle_index).parents with
+                 [ Some ifam ->
+                     let cpl = coi base ifam in
+                     do let href =
+                          Util.acces conf base (poi base cpl.father)
+                        in
+                        wprint_geneweb_link conf href "&lt;&lt";
+                        Wserver.wprint "\n&amp;\n";
+                        let href =
+                          Util.acces conf base (poi base cpl.mother)
+                        in
+                        wprint_geneweb_link conf href "&lt;&lt";
+                        Wserver.wprint "\n";
+                        tag "ul" begin
+                          print_branch conf base True 1 x p;
+                        end;
+                     return ()
+                 | None -> print_branch conf base True 0 x p ]
+               else ();
             return n + 1)
          1 ancestors
        in ();
-       if len > 1 then Wserver.wprint "</ol>\n" else ();
+       if len > 1 && br = None then Wserver.wprint "</dl>\n" else ();
        Wserver.wprint "</nobr>\n";
        trailer conf;
     return ()
