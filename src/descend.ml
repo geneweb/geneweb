@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.31 1999-10-08 10:19:50 ddr Exp $ *)
+(* $Id: descend.ml,v 2.32 1999-10-25 09:07:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -39,8 +39,10 @@ value make_level_table base niveau_max p =
 ;
 
 value level_max base p =
+(*
   let _ = base.data.persons.array () in
   let _ = base.data.families.array () in
+*)
   let levt = make_level_table base infini p in
   let x = ref 0 in
   do for i = 0 to Array.length levt - 1 do
