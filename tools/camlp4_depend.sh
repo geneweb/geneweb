@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: camlp4_depend.sh,v 4.4 2001-05-14 12:38:03 ddr Exp $
+# $Id: camlp4_depend.sh,v 4.5 2001-08-04 16:17:22 ddr Exp $
 
 FILES=
 DEPARGS=
@@ -23,7 +23,6 @@ for FILE in $FILES; do
     fi
     ARGS2="$DEPARGS"
     if test "$COMM" = "camlp4r"; then
-        ARGS="$ARGS $TOP/tools/pa_newseq.cmo"
         ARGS2="$ARGS2 -warn_seq"
     fi
     echo $COMM pr_depend.cmo pa_ifdef.cmo $ARGS -- $ARGS2 $FILE >&2
