@@ -8,7 +8,7 @@
 <center><h1><font color=#2f6400>Base</font></h1></center>
 <ul>
 <li>
-<form method=get action="">
+<form method=get action="%k">
 <input name=b size=40> =&gt;
 <input type=submit value="Ok">
 </ul>

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.14 2000-01-10 02:14:38 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.15 2000-01-18 17:56:35 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -366,7 +366,7 @@ value propose_base conf =
   do Util.header conf title;
      tag "ul" begin
        Util.html_li conf;
-       Wserver.wprint "<form method=get action=\"%s\">\n" conf.command;
+       Wserver.wprint "<form method=get action=\"%s\">\n" conf.indep_command;
        Wserver.wprint "<input name=b size=40> =&gt;\n";
        Wserver.wprint "<input type=submit value=\"Ok\">\n";
      end;
