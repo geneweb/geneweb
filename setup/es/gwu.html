@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Extracci&oacute;n de una fuente GeneWeb</title></head>
+
+<body>
+
+<h1>Extracci&oacute;n de un fichero fuente GeneWeb</h1>
+
+<form mode=GET action="gwu">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Seleccione una base de datos:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+
+$b{<tr><td><input type=radio name=anon
+value="$a">&nbsp;&nbsp;&nbsp;</td><td>$a</td></tr>|
+<tr><td>- actualmente ninguna base de datos existe</tr></td>}
+
+</table></dl>
+
+<p>
+
+Entre Ud. el nombre que Ud. desee dar a su fichero fuente
+<em>GeneWeb</em>. El debe terminar en "<tt>.gw</tt>".  Si Ud. no
+mete nada, este ser&aacute; deducido del nombre de la base.
+
+<p>
+
+<dl><dt><dd><input name=o size=30></dl>
+
+<p>
+
+Seleccione las opciones que Ud. desee:
+
+<p>
+
+<dl><dt><dd><table border=1>
+
+<tr><td><input type=checkbox name=mem value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Economizar el espacio memoria durante la operaci&oacute;n
+(pero esta ser&aacute; mas lenta).</td> </tr>
+
+</table></dl>
+
+<p>
+
+<dl><dt><dd><table border=1>
+
+<tr><td>&nbsp;</td><td colspan=3>No extraer los antepasados
+de...</td></tr>
+
+<tr><td>Nombre</td><td><input name="a1" size=30
+maxlength=200></td><td>N&uacute;m</td> <td><input name="a2" size=5
+maxlength=8></td></tr>
+
+<tr><td>Apellido</td> <td colspan=3><input name="a3" size=40
+maxlength=200></td></tr>
+
+</table></dl>
+
+<p>
+
+<dl><dt><dd><table border=1>
+
+<tr><td>&nbsp;</td><td colspan=3>Extraer solamente los descendientes
+de...</td></tr>
+
+<tr><td>Nombre</td><td><input name="d1" size=30
+maxlength=200></td><td>N&uacute;m</td><td><input name="d2" size=5
+maxlength=8></td></tr>
+
+<tr><td>Apellido</td> <td colspan=3><input name="d3" size=40
+maxlength=200></td></tr>
+
+</table></dl>
+
+<p>
+
+<dl><dt><dd>Si Ud. utiliza las dos opciones anteriores, es
+la intersecci&oacute;n que contar&aacute; <em>al mismo tiempo</em>
+antepasados de uno y descendientes del otro.</dl>
+
+<p>
+
+Apoye luego en este bot&oacute;n:
+
+<p>
+
+<dl><dt><dd><input type=submit value="Extraer"></dl>
+
+</form>

@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Supresi&oacute;n de bases de datos</title></head>
+
+<body>
+
+<h1>Supresi&oacute;n de bases de datos</h1>
+
+<p>
+
+<form mode=GET action="delete_1">
+<input type=hidden name=lang value=$l>
+$k{<input type=hidden name="$a" value=del>|}
+
+Esta Ud seguro de querer suprimir estas bases?
+
+<p>
+
+<ul>
+
+$k{<li><a href="http://localhost:2317/$a">$a</a>|
+<li>[ninguna selecci&oacute;n]}
+
+</ul>
+
+<p>
+
+¡Atenci&oacute;n, esta supresi&oacute;n es definitiva ! Para confirmar,
+apoye Ud en este bot&oacute;n: 
+
+<p>
+
+<dl><dt><dd><input type=submit value="Destruir"></dl>
+
+<p>
+
+O, regrese Ud. al <a href="setup?lang=$l;v=main.html">men&uacute;
+principal</a>.

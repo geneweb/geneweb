@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Recuperar una base - Fase 3</title></head>
+
+<body>
+
+<h1>Recuperar una base</h1>
+
+$v{Atenci&oacute;n: una base que tiene por nombre "$o" ya existe en
+la <a href="setup?lang=$l;v=list.html">carpeta de destinaci&oacute;n
+</a>. Si Ud. apoya en el bot&oacute;n de la parte inferior; el fichero ser&aacute;
+borrado. Si Ud. viene de realizar esta manipulaci&oacute;n,
+debe tratarse probablemente de su resultado, entonces no hay
+ning&uacute;n problema. En caso contrario; regrese a la p&aacute;gina anterior y escoja
+otro nombre para su base.<p>}
+
+Carpeta y base inicial:
+
+<pre>
+  $a
+  $i
+</pre>
+
+Carpeta y base final:
+
+<pre>
+  $w
+  $o
+</pre>
+
+<p>
+
+Atenci&oacute;n: la operaci&oacute;n puede tomar algunos segundos o
+algunos minutos, de acuerdo al caso. Sea paciente
+
+<p>
+
+Apoye en el bot&oacute;n siguiente para lanzar la operaci&oacute;n$v{ y
+destruir la "$o" de la carpeta final}:
+
+<p>
+
+<form mode=GET action="recover_2">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+Por informaci&oacute;n esta operaci&oacute;n corresponde a la ejecuci&oacute;n de los comandos
+siguientes:
+
+<pre>
+     $$ cd $a
+     $$ .$/$U $i $O $w$/$T
+     $$ cd $w
+     $$ .$/$C $T -o $o > comm.log
+</pre>

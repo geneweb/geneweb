@@ -2,6 +2,7 @@ GeneWeb version 2.03
 --------------------
 
 * Setup program
+  - [Jun 7, 99] Added a Spanish version (Luis Castro Guzman).
   - [Jun 1, 99] The location to open is now always "http://localhost:2316/",
     independant from the selected language (no more need to end the location
     with "fr" or "en"): the page is displayed in the selected language.

@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Importaci&oacute;n d'un fichero fuente GeneWeb</title></head>
+
+<body>
+
+<h1>Importaci&oacute;n d'un fichero fuente GeneWeb</h1>
+
+<form mode=GET action="gwc">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Entre Ud:
+
+<ul><li>El nombre completo de su fichero fuente GeneWeb (que termina
+en ".gw"); Ud puede utilizar el bot&oacute;n de exploraci&oacute;n para
+buscar en su ordinador, si su explorador presenta uno.
+
+<p>
+
+<input name=anon $n{type=file} size=55>
+
+</ul>
+
+<p>
+
+<ul><li>El nombre que Ud. desea dar a su base de datos
+<em>GeneWeb</em>. Si Ud. no escribe nada, el nombre se deducir&aacute;
+a partir del nombre del fichero fuente GeneWeb.
+
+<p>
+
+<input name=o size=30>
+
+</ul>
+
+<p>
+
+Seleccione las opciones que Ud. desee:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=stats value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Mostrar algunas estad&iacute;sticas al final (ellas seran visibles
+en las trazas).</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=nc value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>No verificar la coherencia de los datos.</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=cg value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Terminar por el c&aacute;lculo previo de consanguinidad.</td> </tr>
+</table></dl>
+
+<p>
+
+Finalmente cliquear en "Ok".
+
+<p>
+
+<input type=submit value="Ok">
+
+</form>

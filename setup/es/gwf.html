@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Par&aacute;metros</title></head>
+
+<body>
+
+<h1>Par&aacute;metros</h1>
+
+<form mode=GET action="gwf">
+<input type=hidden name=lang value=$l>
+
+Seleccione Ud. su base de datos cliqueando en el bot&oacute;n asociado:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr>
+<td><input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+</tr>|
+<tr><td>- actualmente no existe ninguna base de datos</tr></td>}
+</table></dl>
+
+<p>
+
+Apoye a continuaci&oacute;n en este bot&oacute;n:
+
+<p>
+
+<input type=submit value="Configurar">
+
+</form>

@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Cambio de nombre</title></head>
+
+<body>
+
+<h1>Cambio de nombre</h1>
+
+<form mode=GET action="rename">
+<input type=hidden name=lang value=$l>
+
+Chambie el o los nombres que Ud. desee:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+<td><input name="$a" value="$a" size=20></td>
+</tr>|
+<tr><td>- ninguna base de datos existe actualmente</tr></td>}
+</table></dl>
+
+<p>
+
+Apoye luego en este bot&oacute;n
+
+<p>
+
+<input type=submit value="Cambio de nombre">
+
+</form>

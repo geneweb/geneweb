@@ -1,29 +1,32 @@
 		GeneWeb
-                -------
+		-------
 
 	Languages
 		Chinese		Gang Chen
-                Danish          Hans Albeck
+		Danish		Hans Albeck
 		Dutch		Joris Esch
 				Wijnand J. Nijs
 		German		Markus Mottl
-                                Falko Trojahn
+				Falko Trojahn
 		Hebrew		Jonathan Marder
 				Ruth Marder
-		Italian         Raffaele Sena
-                                Daniel Hirschkoff
-                Norwegian       Brynjulf Langballe
+		Italian		Raffaele Sena
+				Daniel Hirschkoff
+		Norwegian	Brynjulf Langballe
 		Portuguese	Yves Guignard
-                Spanish         Luis Castro Guzman
+		Spanish		Luis Castro Guzman
 		Swedish		Lars Gustavsson
-                                Stig Petersson
+				Stig Petersson
 
 	Documentation
 		Dutch		Joris Esch
 		Swedish		Lars Gustavsson
 
-        Algorithm of consanguinity and relationship
-                                Didier Rémy
+	Setup program
+		Spanish		Luis Castro Guzman
+
+	Algorithm of consanguinity and relationship
+				Didier Rémy
 
 	Program written by Daniel de Rauglaudre.
 
