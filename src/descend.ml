@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.16 2000-07-21 07:28:01 ddr Exp $ *)
+(* $Id: descend.ml,v 3.17 2000-08-09 11:19:48 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -177,8 +177,10 @@ value afficher_marie conf base first fam p spouse =
   do Wserver.wprint (fcapitale (relation_txt conf p.sex fam))
        (fun _ ->
           if auth then Perso.print_marriage_text conf base False fam else ());
+     Wserver.wprint "\n";
      stag "strong" begin
-       afficher_personne_referencee conf base spouse;
+       Wserver.wprint "%s"
+         (reference conf base spouse (person_text conf base spouse));
      end;
      if auth then Date.print_dates conf base spouse else ();
      if auth then
