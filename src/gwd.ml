@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.12 2001-07-13 13:57:34 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.13 2001-09-19 10:52:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -61,6 +61,21 @@ value fprintf_date oc tm =
     tm.Unix.tm_sec
 ;
 
+value print_and_cut_if_too_big oc str =
+  loop 0 where rec loop i =
+    if i < String.length str then do {
+      output_char oc str.[i];
+      let i =
+        if i > 700 && String.length str - i > 750 then do {
+          Printf.fprintf oc " ... "; String.length str - 700
+        }
+        else i + 1
+      in
+      loop i
+    }
+    else ()
+;
+
 value log oc tm conf from gauth request script_name contents =
   let referer = Wserver.extract_param "referer: " '\n' request in
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
@@ -69,20 +84,7 @@ value log oc tm conf from gauth request script_name contents =
     fprintf_date oc tm;
     Printf.fprintf oc " (%d)" (Unix.getpid ());
     Printf.fprintf oc " %s?" script_name;
-    let rec loop i =
-      if i < String.length contents then do {
-        output_char oc contents.[i];
-        let i =
-          if i > 700 && String.length contents - i > 750 then do {
-            Printf.fprintf oc " ... "; String.length contents - 700
-          }
-          else i + 1
-        in
-        loop i
-      }
-      else ()
-    in
-    loop 0;
+    print_and_cut_if_too_big oc contents;
     output_char oc '\n';
     Printf.fprintf oc "  From: %s\n" from;
     if gauth <> "" then Printf.fprintf oc "  User: %s\n" gauth else ();
@@ -95,7 +97,12 @@ value log oc tm conf from gauth request script_name contents =
     else ();
     if user_agent <> "" then Printf.fprintf oc "  Agent: %s\n" user_agent
     else ();
-    if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer else ();
+    if referer <> "" then do {
+      Printf.fprintf oc "  Referer: ";
+      print_and_cut_if_too_big oc referer;
+      Printf.fprintf oc "\n"
+    }
+    else ();
   }
 ;
 
