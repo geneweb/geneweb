@@ -1,10 +1,10 @@
-(* $Id: gwtp.ml,v 1.36 2000-08-18 13:28:53 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.37 2000-08-18 18:40:07 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
 
-value gwtp_tmp = ref "gwtp_tmp";
-value gwtp_dst = ref "gwtp_dst";
+value gwtp_tmp = ref (Filename.concat ".." "gwtp_tmp");
+value gwtp_dst = ref (Filename.concat ".." "gwtp_dst");
 value gw_site = ref "";
 value token_tmout = ref 900.0;
 
@@ -247,8 +247,12 @@ value set_base_conf b (wizpw, fripw) =
      if not fripw_ok.val then fprintf oc "friend_passwd=%s\n" fripw else ();
      close_out oc;
      try Sys.remove fname_saved with [ Sys_error _ -> () ];
-     Sys.rename fname fname_saved;
-     Sys.rename fname_out fname;
+     let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
+     do Sys.rename bdir (bdir ^ "~");
+        Sys.rename fname fname_saved;
+        Sys.rename fname_out fname;
+        Sys.rename (bdir ^ "~") bdir;
+     return ();
   return ()
 ;
 
@@ -282,7 +286,12 @@ value write_tokens fname tokens =
   return ()
 ;
 
-Random.self_init ();
+value random_self_init () =
+  let seed = int_of_float (mod_float (Unix.time ()) (float max_int)) in
+  Random.init seed
+;
+
+random_self_init ();
 
 value mk_passwd () =
   loop 0 where rec loop len =
@@ -651,7 +660,7 @@ value gwtp () =
   let from = cgi_from () in
   let (str, env) = HttpEnv.make content_type content in
   let oc_log = log_open () in
-  do let _ = Unix.umask 0 in ();
+  do ifdef UNIX then let _ = Unix.umask 0 in () else ();
      log oc_log str;
      flush oc_log;
      Unix.dup2 (Unix.descr_of_out_channel oc_log) Unix.stderr;
