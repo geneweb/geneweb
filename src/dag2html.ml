@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.27 2000-01-05 04:48:10 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.28 2000-01-05 12:58:17 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -893,6 +893,19 @@ value treat_gaps d t =
   if Array.length t.table.(i) = 1 then t else loop t 2
 ;
 
+value group_span_last_row t =
+  let row = t.table.(Array.length t.table - 1) in
+  let rec loop i =
+    if i >= Array.length row then ()
+    else
+      do if row.(i).elem = row.(i - 1).elem then
+           row.(i).span := row.(i - 1).span
+         else ();
+      return loop (i + 1)
+  in
+  loop 1
+;
+
 value tablify no_optim d =
   let a = ancestors d in
   let r = group_by_common_children d a in
@@ -908,7 +921,8 @@ value tablify no_optim d =
         let _ = group_ghost t in
         let _ = group_children t in
         let _ = group_span_by_common_children d t in
-        if no_optim then t else treat_gaps d t
+        let t = if no_optim then t else treat_gaps d t in
+        let _ = group_span_last_row t in t
       in
       loop t
   in
