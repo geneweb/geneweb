@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.27 2000-01-10 02:14:42 ddr Exp $ *)
+(* $Id: util.ml,v 3.28 2000-01-14 23:14:30 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -163,10 +163,12 @@ value exit_nobr () =
 
 value start_with_vowel s =
   if String.length s > 0 then
-    match s.[0] with
-    [ 'a' | 'e' | 'i' | 'o' | 'u' | 'y' | 'h' | 'A' | 'E' | 'I' | 'O' | 'U' |
-      'Y' | 'H' | 'Á' | 'È' | 'É' ->
-        True
+    match Char.lowercase s.[0] with
+    [ 'a' | 'e' | 'i' | 'o' | 'u' | 'y' | 'h'
+    | 'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'æ'
+    | 'è' | 'é' | 'ê' | 'ë' | 'ì' | 'í' | 'î' | 'ï'
+    | 'ò' | 'ó' | 'ô' | 'õ' | 'ö'
+    | 'ù' | 'ú' | 'û' | 'ü' | 'ý' | 'ÿ' -> True
     | _ -> False ]
   else False
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.7 2000-01-10 02:14:37 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.8 2000-01-14 23:14:30 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1132,7 +1132,7 @@ value add_missing conf base spouses_included list =
       let p = poi base ip in
       let u = uoi base ip in
       if spouses_included
-      && (p_surname base p = "?" || p_surname base p = "N..." )then
+      && (p_surname base p = "?" || p_surname base p = "N..." ) then
         if p_first_name base p = "?" then list
         else
           if Array.length u.family > 0 then
@@ -1183,11 +1183,11 @@ value print_missing_type conf =
   | A_surname_of_husband_of x ->
       Wserver.wprint "%s %s %s"
         (transl_nth conf "surname/surnames" 0)
-        (transl_decline conf "of" (transl_nth conf "his wife/her husband" 1)) x
+        (transl_decline conf "of" (transl_nth conf "husband/wife" 0)) x
   | A_surname_of_wife_of x ->
       Wserver.wprint "%s %s %s"
         (transl_nth conf "surname/surnames" 0)
-        (transl_decline conf "of" (transl_nth conf "his wife/her husband" 0)) x
+        (transl_decline conf "of" (transl_nth conf "husband/wife" 1)) x
   | A_husband_of ->
       Wserver.wprint "%s" (transl_nth conf "husband/wife" 0) 
   | A_wife_of ->
