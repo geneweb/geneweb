@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.20 2002-10-23 15:20:17 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.21 2002-11-06 12:16:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -29,9 +29,15 @@ value reconstitute_somebody conf var =
   let first_name = only_printable (getn conf var "fn") in
   let surname = only_printable (getn conf var "sn") in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
+  let sex =
+    match p_getenv conf.env (var ^ "_sex") with
+    [ Some "M" -> Male
+    | Some "F" -> Female
+    | _ -> Neuter ]
+  in
   let create =
     match getn conf var "p" with
-    [ "create" -> Update.Create Neuter None
+    [ "create" -> Update.Create sex None
     | _ -> Update.Link ]
   in
   (first_name, surname, occ, create, var)
