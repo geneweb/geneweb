@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.30 2000-06-27 12:05:39 ddr Exp $ *)
+(* $Id: family.ml,v 3.31 2000-07-04 14:22:26 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -423,6 +423,8 @@ value family_m conf base =
       BirthDeath.print_birth conf base
   | Some "LD" when conf.wizard || conf.friend ->
       BirthDeath.print_death conf base
+  | Some "LL" ->
+      BirthDeath.print_longest_lived conf base
   | Some "LM" when conf.wizard || conf.friend ->
       BirthDeath.print_marriage conf base
   | Some "LEX" -> Srcfile.print_lexicon conf base
@@ -507,6 +509,8 @@ value family_m conf base =
       SendImage.print conf base
   | Some "SND_IMAGE_OK" when conf.wizard && conf.can_send_image ->
       SendImage.print_send_ok conf base
+  | Some "STAT" when conf.wizard || conf.friend ->
+      BirthDeath.print_statistics conf base
   | Some "SWI_FAM" when conf.wizard ->
       UpdateFam.print_swi conf base
   | Some "SWI_FAM_OK" when conf.wizard ->

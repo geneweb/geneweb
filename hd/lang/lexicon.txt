@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.121 2000-06-26 20:57:43 ddr Exp $
+# $Id: lexicon.txt,v 3.122 2000-07-04 14:22:13 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5234,6 +5234,10 @@ pt: come&ccedil;ando com
 ru: начинаются с
 se: som b&ouml;rjar med
 
+    statistics
+en: statistics
+fr: statistiques
+
     surname alias
 af: van alias
 cs: alias pшнjmenн
@@ -5465,6 +5469,10 @@ no: %s generasjon
 pt: a %s gera&ccedil;&atilde;o
 ru: %s-е поколение
 se: den %s generationen
+
+    the %d who lived the longest
+en: the %d who lived the longest
+fr: les %d ayant v&eacute;vu le plus longtemps
 
     the anniversary
 af: die herdenking
