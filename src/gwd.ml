@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.44 2002-03-20 10:00:48 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.45 2002-03-26 13:21:16 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -594,15 +594,17 @@ value get_actlog check_from utm from_addr base_password =
 
 value set_actlog list =
   let fname = Srcfile.adm_file "actlog" in
-  let oc = open_out fname in
-  do {
-    List.iter
-      (fun ((from, base_pw), (a, c, d)) ->
-         fprintf oc "%.0f %s/%s %c%s\n" a from base_pw c
-           (if d = "" then "" else " " ^ d))
-      list;
-    close_out oc;
-  }
+  match try Some (open_out fname) with [ Sys_error _ -> None ] with
+  [ Some oc ->
+      do {
+        List.iter
+          (fun ((from, base_pw), (a, c, d)) ->
+             fprintf oc "%.0f %s/%s %c%s\n" a from base_pw c
+               (if d = "" then "" else " " ^ d))
+          list;
+        close_out oc;
+      }
+  | None -> () ]
 ;
 
 value get_token check_from utm from_addr base_password =
