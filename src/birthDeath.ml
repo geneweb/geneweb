@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.7 2000-03-08 17:43:56 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.8 2000-03-30 09:36:18 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -95,12 +95,18 @@ value print_birth conf base =
   do header conf title;
      Wserver.wprint "<ul>\n";
      let _ = List.fold_left
-       (fun last_month_txt (p, d, cal) ->
+       (fun (last_month_txt, was_future) (p, d, cal) ->
           let month_txt =
             let d = {(d) with day = 0} in
             capitale (Date.string_of_date conf (Dgreg d cal))
           in
-          do if month_txt <> last_month_txt then
+          let future = strictement_apres_dmy d conf.today in
+          do if not future && was_future then
+               do Wserver.wprint "</ul>\n</ul>\n<p>\n<ul>\n";
+                  Wserver.wprint "<li>%s\n" month_txt;
+                  Wserver.wprint "<ul>\n";
+               return ()
+             else if month_txt <> last_month_txt then
                do if last_month_txt = "" then ()
                   else Wserver.wprint "</ul>\n";
                   Wserver.wprint "<li>%s\n" month_txt;
@@ -114,8 +120,8 @@ value print_birth conf base =
              Wserver.wprint "%s <em>%s</em>.\n"
                (transl_nth conf "born" (index_of_sex p.sex))
                (Date.string_of_ondate conf (Dgreg d cal));
-          return month_txt)
-       "" list
+          return (month_txt, future))
+       ("", False) list
      in ();
      Wserver.wprint "</ul>\n</ul>\n";
      trailer conf;
