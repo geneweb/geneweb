@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.6 2000-03-04 17:42:56 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.7 2000-04-14 13:20:48 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -472,7 +472,9 @@ value effective_mod conf base sp =
        do check_conflict conf base sp ipl;
           rename_image_file conf base op sp;
        return ();
-     if Name.crush_lower (ofn ^ " " ^ osn) <> Name.crush_lower key then
+     if Name.crush_lower (ofn ^ " " ^ osn) <> Name.crush_lower key
+     || (ofn = "?" || osn = "?") && sp.first_name <> "?" && sp.surname <> "?"
+     then
        person_ht_add base key pi
      else ();
      check_sex_married conf base sp op;

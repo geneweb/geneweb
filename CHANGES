@@ -5,6 +5,15 @@ GeneWeb version 3.04
   - [06 Apr 00] Added Afrikaans (Louis Kruger).
 
 * GeneWeb Service/CGI (gwd)
+  - [14 Apr 00] Fixed bug: could no more access a person by his key after
+    having changed his name, in the case when the initial first name or
+    surname was a question marks *and* the changed name had nevertheless
+    the same signature.
+    Example:
+       before: first name = "John Smith"; surname = "?"
+        after: first name = "John"; surname = "Smith"
+    When doing this fix, there were no more way to access "John Smith" by
+    his key, particularly in forms (which is rather annoying).
   - [13 Apr 00] Added nice display of language code when mouse over the
     flag (Emmanuelle Visseaux's code).
   - [11 Aor 00] Added optional displaying of images in descendants by tree
@@ -426,7 +435,7 @@ GeneWeb version 2.06
   - [Aug 19, 99] Added more informations (places) in descendants display
     by list.
   - [Aug 18, 99] Added a link to the documentation (close to the copyright).
-  - [Aug 14..21, 99] Added ability to put notes for the data base itself (for
+  - [Aug 14..21, 99] Added a ility to put notes for the data base itself (for
     a general introduction).
   - [Aug 14, 99] Fixed bug: send image in cgi mode under Windows did not
     work.
