@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.7 2001-10-20 10:59:00 ddr Exp $ *)
+(* $Id: templ.ml,v 4.8 2001-12-24 11:46:36 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -571,6 +571,7 @@ value print_variable conf base =
   | "hidden" -> Util.hidden_env conf
   | "highlight" -> Wserver.wprint "%s" conf.highlight
   | "image_prefix" -> Wserver.wprint "%s" (image_prefix conf)
+  | "message_to_wizard" -> Util.message_to_wizard conf
   | "nl" -> Wserver.wprint "\n"
   | "nn" -> ()
   | "prefix" -> Wserver.wprint "%s" (commd conf)

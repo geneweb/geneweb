@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.6 2001-11-24 13:17:14 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.7 2001-12-24 11:46:35 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -16,6 +16,7 @@
 %base_header;
 </head>
 <body%body_prop;>
+%message_to_wizard;
 
 %if;is_male;
 <img src="%image_prefix;/male.gif" width=13 height=13
