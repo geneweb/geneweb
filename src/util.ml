@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.36 2002-02-23 20:10:07 ddr Exp $ *)
+(* $Id: util.ml,v 4.37 2002-03-02 11:02:39 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1698,8 +1698,8 @@ value find_person_in_env conf base suff =
             let r =
               List.find
                 (fun x ->
-                   Name.lower (p_first_name base x ^ " " ^ p_surname base x) =
-                     k &&
+                   Name.lower (p_first_name base x) = Name.lower p &&
+                   Name.lower (p_surname base x) = Name.lower n &&
                    x.occ == occ)
                 xl
             in
