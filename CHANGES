@@ -2,6 +2,10 @@ GeneWeb version 3.12
 --------------------
 
 * Installation
+  - [03 Mar 01] Changed Linux rpm package installation; it uses now
+    another directory for data bases (/home/geneweb/bases). Not removed
+    when unstallation, it can be used for the future GeneWeb versions,
+    without requiring it to be moved.
   - [23 Fev 01] Windows version: added an "installer" (therefore
     an installation normally easier). The data bases are put in
     a directory different from the program, therefore not deleted when
@@ -52,6 +56,11 @@ GeneWeb version 3.12
     which is now user-configurable.
   - [10 Feb 01] For the perso.txt template file, added the variables
     %father_age_at_birth; and %mother_age_at_birth;
+
+* Gedcom to GeneWeb (ged2gwb)
+  - [03 Mar 01] In case of program failure, the message is displayed
+    in standard output or in the log file. It is therefore visible
+    in the "traces of the last command" of gwsetup.
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
   - [01 Mar 01] For translators: in "person/persons" phrase, it is now
