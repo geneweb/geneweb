@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 1.7 1998-10-20 09:22:06 ddr Exp $ *)
+(* $Id: some.ml,v 1.8 1998-11-21 10:54:12 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -147,10 +147,8 @@ value select_first_name conf base n list =
      List.iter
        (fun (sstr, (strl, _)) ->
           do Wserver.wprint "\n<li>\n";
-             Wserver.wprint "<a href=\"%s%sm=P;v=%s\">"
-               (commd conf)
-               (if conf.senv = "" then "" else "e=" ^ conf.senv ^ ";")
-               (code_varenv sstr);
+             Wserver.wprint "<a href=\"%sm=P;v=%s\">"
+               (commd conf) (code_varenv sstr);
              Wserver.wprint "%s" (coa conf (List.hd strl));
              List.iter (fun s -> Wserver.wprint ", %s" (coa conf s))
                (List.tl strl);
@@ -295,10 +293,8 @@ value rec print_by_branch x conf base (ipl, homonymes) =
     do header conf title;
        Wserver.wprint "<font size=-1><em>\n";
        Wserver.wprint "%s " (capitale (transl conf "click"));
-       Wserver.wprint "<a href=\"%s%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
-         (if conf.senv = "" then "" else "e=" ^ conf.senv ^ ";")
-         (code_varenv x)
-         (transl conf "here");
+       Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
+         (code_varenv x) (transl conf "here");
        Wserver.wprint "%s"
          (transl conf "for the first names by alphabetic order");
        Wserver.wprint ".</em></font>\n<p>\n";

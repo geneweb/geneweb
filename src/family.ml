@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: family.ml,v 1.4 1998-11-21 09:55:54 ddr Exp $ *)
+(* $Id: family.ml,v 1.5 1998-11-21 10:54:09 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -46,9 +46,9 @@ value inconnu conf n =
   do header conf title; trailer conf; return ()
 ;
 
-value person_selected conf base senv p =
-  match p_getenv senv "m" with
-  [ Some "R" -> Relation.print conf senv base p
+value person_selected conf base p =
+  match p_getenv conf.senv "em" with
+  [ Some "R" -> Relation.print conf base p
   | Some mode -> incorrect_request conf
   | None -> Perso.print conf base p ]
 ;
@@ -179,17 +179,16 @@ value precisez conf base n pl =
   return ()
 ;
 
-(* Get the "special" environement;
+(* Make the "special" environement;
      old system: "e=..." where ... is the coded environment
      new system: "em=mode;ei=n"
    The old system is kept by compatibility. *)
 
-value get_senv conf base =
+value make_senv conf base =
   let get x = try Some (List.assoc x conf.env) with [ Not_found -> None ] in
   match (get "em", get "ei", get "ep", get "en", get "eoc") with
   [ (Some vm, Some vi, _, _, _) ->
-      do conf.senv := code_varenv ("m=" ^ vm ^ ";i=" ^ vi); return
-      [("m", vm); ("i", vi)]
+      conf.senv := [("em", vm); ("ei", vi)]
   | (Some vm, None, Some vp, Some vn, voco) ->
       let voc =
         match voco with
@@ -201,21 +200,18 @@ value get_senv conf base =
         [ Not_found -> do incorrect_request conf; return raise Exit ]
       in
       let vi = string_of_int (Adef.int_of_iper ip) in
-      do conf.senv := code_varenv ("m=" ^ vm ^ ";i=" ^ vi); return
-      [("m", vm); ("i", vi)]
+      conf.senv := [("em", vm); ("ei", vi)]
   | _ ->
-      do conf.senv :=
-           match
-             try Some (List.assoc "e" conf.env) with [ Not_found -> None ]
-           with
-           [ Some s -> s
-           | _ -> "" ];
-      return
-      Util.create_env (decode_varenv conf.senv) ]
+      let e =
+        match get "e" with
+        [ Some s -> Util.create_env (decode_varenv s)
+        | _ -> [] ]
+      in
+      conf.senv := List.map (fun (x, v) -> ("e" ^ x, v)) e ]
 ;
 
 value family_m conf base =
-  let senv = get_senv conf base in
+  do make_senv conf base; return
   match p_getenv conf.env "m" with
   [ Some "A" ->
       match find_person_in_env conf base "" with
@@ -307,7 +303,7 @@ value family_m conf base =
               in
               match pl with
               [ [] -> inconnu conf n
-              | [p] -> person_selected conf base senv p
+              | [p] -> person_selected conf base p
               | pl -> precisez conf base n pl ] ]
       | None -> () ]
   | Some "P" ->
@@ -316,7 +312,7 @@ value family_m conf base =
       | None -> Alln.first_names_print conf base ]
   | Some "R" ->
       match find_person_in_env conf base "" with
-      [ Some p -> Relation.print conf senv base p
+      [ Some p -> Relation.print conf base p
       | _ -> inconnu_au_bataillon conf ]
   | Some "REQUEST" when conf.wizard ->
       let title _ = () in
@@ -339,7 +335,7 @@ value family_m conf base =
   | Some mode -> incorrect_request conf
   | None ->
       match find_person_in_env conf base "" with
-      [ Some p -> person_selected conf base senv p
+      [ Some p -> person_selected conf base p
       | _ -> inconnu_au_bataillon conf ] ]
 ;
 
