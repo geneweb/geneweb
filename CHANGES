@@ -20,7 +20,7 @@ GeneWeb version 2.03
   - [Jun 3, 99] Added ability to use a new predefined term "+before" in the
     lexicon to specify the complement is before a verb (e.g. in German:
     "send" "image" is translated into "senden +before" "Bild", which gives
-    at end: "Bild senden").
+    at end: "Bild senden"; same solution for Dutch).
   - [May 31, 99] In ancestors only selected generation, added displaying
     of Sosa intervals (and "..." is displayed for non-contiguous intervals).
   - [May 18, 99] Added, in ancestors and descendants displaying, the ability
@@ -49,6 +49,8 @@ GeneWeb version 2.03
     was incorrectly capitalized.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (*/start.txt)
+  - [Jun 7, 99] Changed terms in Dutch for sentences with verb at end.
+  - [Jun 7, 99] Added missing terms in Portuguese (Yves Guignard).
   - [Jun 3, 99] Added missing terms in German (Markus Mottl).
   - [Jun 3, 99] Added some missing terms in Italian (Daniel Hirschkoff).
   - [Jun 2, 99] Fixed and completed translations in Swedish (Lars Gustavsson;
