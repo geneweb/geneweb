@@ -32,11 +32,9 @@
 	Algorithm of consanguinity and relationship
 				Didier Rémy
 
-	Program written by Daniel de Rauglaudre.
+	Flags from
+				FOTW Flags Of The World
+				http://fotw.digibel.be/flags/
 
-Warning: this credits file has been started quite late (February 2,
-1999). I don't remember all persons' names having participated to
-GeneWeb. If your name is missing, please help me to complete it by
-writing me a message at:
-
-	daniel.de_rauglaudre@inria.fr
+	Program written by	Daniel de Rauglaudre.
+				daniel.de_rauglaudre@inria.fr
