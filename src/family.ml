@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.27 1999-08-21 10:57:28 ddr Exp $ *)
+(* $Id: family.ml,v 2.28 1999-09-19 13:30:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -93,11 +93,48 @@ value compact_list conf base xl =
     List.fold_right
       (fun p pl ->
          match pl with
-         [ [p1 :: _] when p == p1 -> pl
+         [ [p1 :: _] when p.cle_index == p1.cle_index -> pl
          | _ -> [p :: pl] ])
       pl []
   in
   pl
+;
+
+value cut_words str =
+  loop 0 0 where rec loop beg i =
+    if i < String.length str then
+      match str.[i] with
+      [ ' ' ->
+          if beg == i then loop (succ beg) (succ i)
+          else [String.sub str beg (i - beg) :: loop (succ i) (succ i)]
+      | _ -> loop beg (succ i) ]
+    else if beg == i then []
+    else [String.sub str beg (i - beg)]
+;
+
+value try_find_with_one_first_name conf base n =
+  let n1 = Name.abbrev (Name.lower n) in
+  match lindex n1 ' ' with
+  [ Some i ->
+      let fn = String.sub n1 0 i in
+      let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
+      let (list, _) =
+        Some.persons_of_fsname base base.func.persons_of_surname.find
+          (fun x -> x.surname) sn
+      in
+      let pl =
+        List.fold_left
+          (fun pl (_, _, ipl) ->
+             List.fold_left
+               (fun pl ip ->
+	          let p = poi base ip in
+                  let fn1 = Name.abbrev (Name.lower (sou base p.first_name)) in
+                  if List.mem fn (cut_words fn1) then [p :: pl] else pl)
+               pl ipl)
+          [] list
+      in
+      pl
+  | None -> [] ]
 ;
 
 value find_all conf base an =
@@ -112,7 +149,9 @@ value find_all conf base an =
       let pl = person_ht_find_all base an in
       let pl = compact_list conf base pl in
       let spl = select_std_eq base pl an in
-      if spl = [] then pl else spl ]
+      if spl = [] then
+        if pl = [] then try_find_with_one_first_name conf base an else pl
+      else spl ]
 ;
 
 value precisez conf base n pl =
