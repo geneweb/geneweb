@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.56 2000-10-19 03:47:20 ddr Exp $ *)
+(* $Id: perso.ml,v 3.57 2000-10-19 05:15:30 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -2478,8 +2478,7 @@ value print_ok conf base p =
       let s = List.assoc "template" conf.base_env in
       loop [] 0 0 where rec loop list i len =
         if i == String.length s then
-          if len == 0 then List.rev list
-          else List.rev [Buff.get len :: list]
+          List.rev [Buff.get len :: list]
         else if s.[i] = ',' then
           loop [Buff.get len :: list] (i + 1) 0
         else
