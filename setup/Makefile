@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.6 2002-01-21 05:01:00 ddr Exp $
+# $Id: Makefile,v 4.7 2002-01-21 12:06:44 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -47,8 +47,8 @@ test_dir:
 	cd test/gw; ln -s ../../gwsetup gwsetup
 	cd test/gw; ln -s ../.. setup
 	cd test/gw; ln -s ../../../doc .
-	cd test/gw; cp ../../../src/gwc .
-	cd test/gw; ln -s ../../../src/gwd .
+	cd test/gw; ln -s ../../../src/gwc .
+	cd test/gw; cp ../../../src/gwd .
 	cd test/gw; ln -s ../../../src/gwu .
 	cd test/gw; ln -s ../../../src/consang .
 	cd test/gw; ln -s ../../../hd/lang .
