@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.159 2000-09-14 00:29:32 ddr Exp $
+# $Id: lexicon.txt,v 3.160 2000-10-03 11:53:36 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3665,7 +3665,7 @@ se: gift vid %t &aring;lder
     married%t to
 af: getroud met %t
 cn: %t≈‰≈º «
-cs: %t si vzal :a:/%t si vzala :a:
+cs: %t si vzal/%t si vzala
 de: verheiratet%t mit
 dk: gift%t med
 en: married%t to
