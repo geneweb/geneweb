@@ -1,4 +1,4 @@
-(* $Id: aurejac.ml,v 1.2 1999-02-02 10:23:45 ddr Exp $ *)
+(* $Id: aurejac.ml,v 2.1 1999-03-08 11:17:47 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 (* Find titles had hoc for genealogy Aurejac *)
 

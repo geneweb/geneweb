@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.39 1999-02-27 20:02:53 ddr Exp $ *)
+(* $Id: perso.ml,v 2.1 1999-03-08 11:19:03 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;

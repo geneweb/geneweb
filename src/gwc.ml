@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.14 1999-02-19 16:54:54 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.1 1999-03-08 11:18:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;

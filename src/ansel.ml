@@ -1,4 +1,4 @@
-(* $Id: ansel.ml,v 1.5 1999-02-02 10:23:57 ddr Exp $ *)
+(* $Id: ansel.ml,v 2.1 1999-03-08 11:18:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value no_accent =

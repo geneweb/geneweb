@@ -1,4 +1,4 @@
-(* $Id: pqueue.mli,v 1.2 1999-02-02 10:24:27 ddr Exp $ *)
+(* $Id: pqueue.mli,v 2.1 1999-03-08 11:19:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 (* Module [Pqueue]: priority queues. *)

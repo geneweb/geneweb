@@ -1,4 +1,4 @@
-(* $Id: pqueue.ml,v 1.2 1999-02-02 10:24:27 ddr Exp $ *)
+(* $Id: pqueue.ml,v 2.1 1999-03-08 11:19:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 module type OrderedType = sig type t = 'a; value leq : t -> t -> bool; end;
