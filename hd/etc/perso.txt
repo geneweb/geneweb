@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.16 2001-02-02 09:47:09 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.17 2001-02-05 10:47:34 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -110,43 +110,43 @@
      is_cremated or has_consanguinity)
   %if;has_image;<td>%end;
   <ul>
-    %if;has_occupation;<li>%occupation;%end;
+    %if;has_occupation;<li>%occupation;%nl;%end;
     %if;has_birth_date;
       <li>[*born]s %on_birth_date;
       %if;birthday; ([happy birthday to you!])%end;
-      %if;has_birth_place; - %birth_place;%end;
+      %if;has_birth_place; - %birth_place;%end;%nl;
     %else;
-      %if;has_birth_place;<li>[*born]s -&nbsp;%birth_place;%end;
+      %if;has_birth_place;<li>[*born]s -&nbsp;%birth_place;%nl;%end;
     %end;
     %if;has_baptism_date;
       <li>[*baptized]s %on_baptism_date;
-      %if;has_baptism_place; - %baptism_place;%end;
+      %if;has_baptism_place; - %baptism_place;%end;%nl;
     %else;
-      %if;has_baptism_place;<li>[*baptized]s -&nbsp;%baptism_place;%end;
+      %if;has_baptism_place;<li>[*baptized]s -&nbsp;%baptism_place;%end;%nl;
     %end;
     %if;is_dead;
       <li>%died;
       %if;has_death_date; %on_death_date;%end;
-      %if;has_death_place; -&nbsp;%death_place;%end;
+      %if;has_death_place; -&nbsp;%death_place;%end;%nl;
     %end;
     %if;computable_age;
-      <li>[*age]: %age;
+      <li>[*age]: %age;%nl;
     %end;
     %if;is_buried;
       <li>[*buried]s
       %if;has_burial_date; %on_burial_date;%end;
-      %if;has_burial_place; -&nbsp;%burial_place;%end;
+      %if;has_burial_place; -&nbsp;%burial_place;%end;%nl;
     %end;
     %if;is_cremated;
       <li>[*cremated]s
       %if;has_cremation_date; %on_cremation_date;%end;
-      %if;has_cremation_place; -&nbsp;%cremation_place;%end;
+      %if;has_cremation_place; -&nbsp;%cremation_place;%end;%nl;
     %end;
     %if;computable_death_age;
-      <li>[*age at death:] %death_age;
+      <li>[*age at death:] %death_age;%nl;
     %end;
     %if;has_consanguinity;
-      <li>[*consanguinity]: %consanguinity;
+      <li>[*consanguinity]: %consanguinity;%nl;
     %end;
   </ul>
 %end;
