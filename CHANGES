@@ -1,3 +1,14 @@
+GeneWeb Version 2.02
+--------------------
+
+* GeneWeb compiler (gwc)
+  - [Apr 22, 99] Do not consider the message "notes before definition"
+    any more as an error.
+
+* GeneWeb uncompiler (gwu)
+  - [Apr 22, 99] Do not save notes any more for persons having "?" as
+    first name or surname.
+
 GeneWeb Version 2.01
 --------------------
 

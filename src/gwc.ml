@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.8 1999-04-05 23:42:28 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.9 1999-04-22 19:23:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -404,12 +404,13 @@ value insere_notes fname gen key str =
         p.notes := unique_string gen str
   | None ->
       do Printf.printf "File \"%s\"\n" fname;
-         Printf.printf "Notes before person definition: \"%s%s %s\"\n"
+         Printf.printf
+           "*** warning: Notes before person definition: \"%s%s %s\"\n"
            key.pk_first_name
            (if occ == 0 then "" else "." ^ string_of_int occ)
            key.pk_surname;
          flush stdout;
-      return Check.error gen ]
+      return () ]
 ;
 
 value insere_syntax fname gen =
