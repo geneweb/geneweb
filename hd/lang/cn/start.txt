@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head><title>Genealogy - %t</title></head>
 <body%b>
-<h1>家谱</h1>
+<h1>网络家谱</h1>
 
 %rversion
 
@@ -71,11 +71,11 @@
 <p>
 
 <form method=get action="%f">%h
-<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:</font>
+<font size=-1>授权用户(friend or wizard), 请输入密码：</font>
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
 </form>
 
 <p>
 
-<font size=-1><a href="%sm=LEX">Lexicon</a></font>
+<font size=-1><a href="%sm=LEX">本站使用的术语</a></font>

@@ -368,6 +368,7 @@ nl: invoeren
 se: l&auml;gg till
 
     advanced request
+cn: 高级访问请求
 de: Erweiterte Suche
 en: advanced request
 fr: requ&ecirc;te &eacute;volu&eacute;e
@@ -394,6 +395,7 @@ nl: na
 se: efter
 
     age
+cn: 年龄
 de: Alter
 en: age
 eo: agxo
@@ -434,6 +436,7 @@ nl: alle titels
 se: alla titlar
 
     allied%t (euphemism for married or... not) to
+cn: %t，配偶是
 de: verheiratet%t mit
 en: allied%t to
 eo: edzagxita%t kun
@@ -484,6 +487,7 @@ nl: een Oom/een Tante
 se: en far(mor)bror/en faster(moster)
 
     ancestors
+cn: 祖先
 de: Vorfahren
 en: ancestors
 eo: antauxeuloj
@@ -504,6 +508,7 @@ nl: voorouders
 se: en stamfader
 
     and
+cn: 和
 de: und
 en: and
 eo: kaj
@@ -630,6 +635,7 @@ nl: verjaardagen
 se: f&ouml;delsedagar
 
     born
+cn: 出生
 de: geboren
 en: born
 eo: naskigxita
@@ -689,6 +695,7 @@ nl: veranderd de volgorde der kinderen
 se: &auml;ndrade ordningen f&ouml;r barnen
 
     child/children
+cn: 子女
 de: Kind/Kinder
 en: child/children
 eo: infano/infanoj
@@ -790,6 +797,7 @@ nl: overlijden
 se: d&ouml;d
 
     death age:
+cn: 享年
 de: Alter:
 en: death age:
 eo: agxo de morto:
@@ -810,6 +818,7 @@ nl: verwijder
 se: ta bort
 
     descendants
+cn: 后代
 de: Nachkommen
 en: descendants
 eo: posteuloj
@@ -820,6 +829,7 @@ nl: nakomelingen
 se: &auml;ttlingar
 
     died
+cn: 死
 de: verstorben
 en: died
 eo: morta
@@ -1071,6 +1081,7 @@ nl: van harte gefeliciteerd!
 se: gratulerar p&aring; f&ouml;delsedagen!
 
     having as children
+cn: 生有子女
 de: mit
 en: with
 eo: kun
@@ -1334,6 +1345,7 @@ nl: huwelijk van %t voor zijn/haar geboorte
 se: gifterm&aring;l med %t f&ouml;re hans/hennes f&ouml;delse
 
     marriage/marriages
+cn: 婚姻
 de: Heirat/Heiraten
 en: marriage/marriages
 eo: edzigxo/edzigxoj
@@ -1515,6 +1527,7 @@ nl: niet gevonden
 se: hittar inte
 
     note/notes
+cn: 备注
 de: Notiz/Notizen
 en: note/notes
 eo: noto/notoj
@@ -1652,6 +1665,7 @@ nl: van de moord
 se: av mordet
 
     on (day month year)
+cn: 于
 de: am
 en: on
 eo: en la
@@ -1841,6 +1855,7 @@ nl: verwantschap
 se: sl&auml;ktskap
 
     relationship computing
+cn: 相关查询
 de: Verwandtschaft ermitteln
 en: relationship computing
 eo: komputo de parenceco
@@ -1945,6 +1960,7 @@ nl: bronnen
 se: k&auml;llor
 
     specify
+cn: 从下列选取
 de: pr&auml;zisieren
 en: specify
 eo: specifu
@@ -2375,6 +2391,7 @@ nl: tot
 se: upp till
 
     update
+cn: 更新
 de: Aktualisieren
 en: update
 eo: gxisdatigo
@@ -2435,6 +2452,7 @@ nl: juiste jaar
 se: &aring;rs precision
 
     years old
+cn: 岁
 de: Jahre alt
 en: years old
 eo: jaroj
