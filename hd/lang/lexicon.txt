@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.181 2004-01-08 12:00:54 ddr Exp $
+# $Id: lexicon.txt,v 4.182 2004-01-13 12:27:59 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2183,6 +2183,7 @@ zh:  ³öÉúÓÚ½ñÈÕµÄ¼ÇÂ¼
     border
 bg: ğàìêà
 da: ramme
+de: Rand
 en: border
 fr: bordure
 he:  îñâøú
@@ -2289,7 +2290,7 @@ it: sepolto/sepolta/sepolto(a)
 lv: apbedîts
 nl: begraven
 no: begravet
-pl: pochówek
+pl: pochowany/pochowana/pochówek
 pt: enterrado/enterrada/enterrado(a)
 ro: inmormintat
 ru: ïîõîğîíåí/ïîõîğîíåíà
@@ -2639,6 +2640,7 @@ sv: klicka "%s"
     color
 bg: öâÿò
 da: farve
+de: Farbe
 en: colour
 en-us: color
 fr: couleur
@@ -3033,7 +3035,7 @@ it: morto giovane
 lv: miris jauns
 nl: jong gestorven
 no: d&oslash;d ung
-pl: zm.m³odo
+pl: zmar³ m³odo/zmar³a m³odo/zm.m³odo
 pt: morreu jovem
 ro: a decedat tinar
 ru: óìåğ â äåòñòâå
@@ -3059,7 +3061,7 @@ it: scomparso/scomparsa/scomparso(a)
 lv: pazudis(usi) bez vçsts
 nl: verdwenen
 no: forsvunnet
-pl: zaginiêcie
+pl: zagin±³/zaginê³a/zaginiêcie
 pt: desaparecido/desaparecida/desaparecido(a)
 ro: a disparut
 ru: èñ÷åç/èñ÷åçëà
@@ -5418,7 +5420,7 @@ it: assassinato/assassinata/assassinato(a)
 lv: noslepkavots
 nl: vermoord
 no: myrdet
-pl: morderstwo
+pl: zamordowany/zamordowana/morderstwo
 pt: assassinado/assassinada/assassinado(a)
 ro: ucis
 ru: óáèò/óáèòà
@@ -5667,8 +5669,10 @@ sv: inga tr&auml;ffar
     no mention
 bg: íå ñå ñïîìåíàâà
 da: andet
+de: nicht erv&auml;hnt
 en: no mention
 fr: pas de mention
+pl: bez wzmianki
 sv: inte n&auml;mnd
 
     no sexes check
@@ -5804,8 +5808,10 @@ zh: ±¸×¢
 
     notes modified
 da: noter &aelig;ndret
+de: ge&auml;nderte Notizen
 en: notes modified
 fr: notes modifi&eacute;es
+pl: uwagi zmodyfikowane
 sv: noteringar modifierade
 
     nth
