@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 4.2 2001-03-31 04:46:00 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.3 2001-03-31 07:56:18 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -173,7 +173,7 @@
   [child/children]1</font></h3>
   <ul>
   %foreach;family;
-    <li>
+    <li type=%if;spouse.has_parents;disk%else;circle%end;>
     %married_to;%sp;
     %if;cancel_links;%spouse;
     %else;<a href="%prefix;%spouse.access">%spouse;</a>%end;
