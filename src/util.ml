@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.57 2000-07-12 11:50:47 ddr Exp $ *)
+(* $Id: util.ml,v 3.58 2000-07-12 17:40:57 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -58,7 +58,7 @@ value html conf =
   let charset = if conf.charset = "" then "iso-8859-1" else conf.charset in
   do if not conf.cgi then
        do Wserver.wprint "HTTP/1.0 200 OK"; nl ();
-          Wserver.wprint "Server: GeneWeb %s" Version.txt; nl ();
+          Wserver.wprint "Server: GeneWeb/%s" Version.txt; nl ();
        return ()
      else ();
      Wserver.wprint "Content-type: text/html; charset=%s" charset;
@@ -742,9 +742,9 @@ value body_prop conf =
   [ Not_found -> default_body_prop conf ]
 ;
 
-value get_server_string conf =
-  if not conf.cgi then
-    Wserver.extract_param "host: " '\r' conf.request
+value get_server_string_aux cgi request =
+  if not cgi then
+    Wserver.extract_param "host: " '\r' request
   else
     let server_name =
       try Sys.getenv "SERVER_NAME" with
@@ -757,6 +757,8 @@ value get_server_string conf =
     if server_port = "80" then server_name
     else server_name ^ ":" ^ server_port
 ;
+
+value get_server_string conf = get_server_string_aux conf.cgi conf.request;
 
 value get_request_string conf =
   if not conf.cgi then

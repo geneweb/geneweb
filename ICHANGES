@@ -1,6 +1,15 @@
 Internal, very small, undocumented, or not visible changes
 **********************************************************
 
+GeneWeb Version 3.07
+--------------------
+
+* GeneWeb daemon/CGI (gwd)
+  - [12 Jul 00] Refreshes with possible good address when bad character in
+    base name (e.g. http://host.com/foo/ instead of http://host.com/foo?)
+  - [12 Jul 00] "Server" answer separate "GeneWeb" and version number with
+    a slash.
+
 GeneWeb Version 3.06
 --------------------
 
