@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.37 2002-03-06 22:23:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.38 2002-03-07 09:12:25 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -784,16 +784,6 @@ value http_preferred_language request =
 value make_conf cgi from_addr (addr, request) script_name contents env =
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
-  let _ =
-    let s = script_name in
-    if Util.start_with s 0 "images/" then
-      let i = String.length "images/" in
-      let fname = String.sub s i (String.length s - i) in
-      let fname = Filename.basename fname in
-      let fname = Util.image_file_name fname in
-      let _ = Image.print_image_file cgi fname in raise Exit
-    else ()
-  in
   let (command, base_file, passwd, env, access_type) =
     let (base_passwd, env) =
       let (x, env) = extract_assoc "b" env in
@@ -1243,7 +1233,7 @@ value excluded from =
   | None -> False ]
 ;
 
-value image_request cgi env =
+value image_request cgi script_name env =
   match (Util.p_getenv env "m", Util.p_getenv env "v") with
   [ (Some "IM", Some fname) ->
       let fname =
@@ -1253,7 +1243,16 @@ value image_request cgi env =
       let fname = Filename.basename fname in
       let fname = Util.image_file_name fname in
       let _ = Image.print_image_file cgi fname in True
-  | _ -> False ]
+  | _ ->
+      let s = script_name in
+      if Util.start_with s 0 "images/" then
+        let i = String.length "images/" in
+        let fname = String.sub s i (String.length s - i) in
+        let fname = Filename.basename fname in
+        let fname = Util.image_file_name fname in
+        let _ = Image.print_image_file cgi fname in
+        True
+      else False ]
 ;
 
 value strip_quotes s =
@@ -1353,7 +1352,7 @@ value connection cgi (addr, request) script_name contents =
       else
         try
           let (contents, env) = build_env request contents in
-          if image_request cgi env then ()
+          if image_request cgi script_name env then ()
           else
             conf_and_connection cgi from (addr, request) script_name contents
               env
