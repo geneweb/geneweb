@@ -5,8 +5,8 @@ GeneWeb Version 3.03
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [20 Mar 00] Generates "pz,nz,ocz" instead of "iz" in same conditions
-    than "p,n,z" (wizard && friend || access_by_key).
+  - [20 Mar 00] Generates "pz,nz,ocz" instead of "iz" (Sosa reference) when
+    access_by_key.
   - [16 Mar 00] Added "zur" as particle.
   - [16 Mar 00] Improved the inferring of origin_file field when updating
     a family. Now searches also among other marriages.
