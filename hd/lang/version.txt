@@ -1,42 +1,39 @@
+<dl>
+<dd>
 <table border=0>
 <tr>
-<td><a href="%glang=cn">
-<img src="%gm=IM;v=l-cn.gif" width=36 height=22 alt=cn></a></td>
-<td><a href="%glang=de">
-<img src="%gm=IM;v=l-de.gif" width=36 height=22 alt=de></a></td>
-<td><a href="%glang=en">
-<img src="%gm=IM;v=l-en.gif" width=36 height=22 alt=en></a></td>
-<td><a href="%glang=eo">
-<img src="%gm=IM;v=l-eo.gif" width=36 height=22 alt=eo></a></td>
-<td><a href="%glang=es">
-<img src="%gm=IM;v=l-es.gif" width=36 height=22 alt=es></a></td>
-<td><a href="%glang=fr">
-<img src="%gm=IM;v=l-fr.gif" width=36 height=22 alt=fr></a></td>
-<td><a href="%glang=he">
-<img src="%gm=IM;v=l-he.gif" width=36 height=22 alt=he></a></td>
-<td><a href="%glang=it">
-<img src="%gm=IM;v=l-it.gif" width=36 height=22 alt=it></a></td>
-<td><a href="%glang=nl">
-<img src="%gm=IM;v=l-nl.gif" width=36 height=22 alt=nl></a></td>
-<td><a href="%glang=no">
-<img src="%gm=IM;v=l-no.gif" width=36 height=22 alt=no></a></td>
-<td><a href="%glang=pt">
-<img src="%gm=IM;v=l-pt.gif" width=36 height=22 alt=pt></a></td>
-<td><a href="%glang=se">
-<img src="%gm=IM;v=l-se.gif" width=36 height=22 alt=se></a></td>
+<td align=center>
+<a href="%glang=cn">
+<img src="%gm=IM;v=l-cn.gif" width=36 height=22 alt=cn></a>
+<a href="%glang=de">
+<img src="%gm=IM;v=l-de.gif" width=36 height=22 alt=de></a>
+<a href="%glang=dk">
+<img src="%gm=IM;v=l-dk.gif" width=36 height=22 alt=dk></a>
+<a href="%glang=en">
+<img src="%gm=IM;v=l-en.gif" width=36 height=22 alt=en></a>
+<a href="%glang=eo">
+<img src="%gm=IM;v=l-eo.gif" width=36 height=22 alt=eo></a>
+<a href="%glang=es">
+<img src="%gm=IM;v=l-es.gif" width=36 height=22 alt=es></a>
+<a href="%glang=fr">
+<img src="%gm=IM;v=l-fr.gif" width=36 height=22 alt=fr></a>
+</td>
 </tr>
 <tr>
-<td align=center><font size=-1>cn</font></td>
-<td align=center><font size=-1>de</font></td>
-<td align=center><font size=-1>en</font></td>
-<td align=center><font size=-1>eo</font></td>
-<td align=center><font size=-1>es</font></td>
-<td align=center><font size=-1>fr</font></td>
-<td align=center><font size=-1>he</font></td>
-<td align=center><font size=-1>it</font></td>
-<td align=center><font size=-1>nl</font></td>
-<td align=center><font size=-1>no</font></td>
-<td align=center><font size=-1>pt</font></td>
-<td align=center><font size=-1>se</font></td>
+<td align=center>
+<a href="%glang=he">
+<img src="%gm=IM;v=l-he.gif" width=36 height=22 alt=he></a>
+<a href="%glang=it">
+<img src="%gm=IM;v=l-it.gif" width=36 height=22 alt=it></a>
+<a href="%glang=nl">
+<img src="%gm=IM;v=l-nl.gif" width=36 height=22 alt=nl></a>
+<a href="%glang=no">
+<img src="%gm=IM;v=l-no.gif" width=36 height=22 alt=no></a>
+<a href="%glang=pt">
+<img src="%gm=IM;v=l-pt.gif" width=36 height=22 alt=pt></a>
+<a href="%glang=se">
+<img src="%gm=IM;v=l-se.gif" width=36 height=22 alt=se></a>
+</td>
 </tr>
 </table>
+</dl>
