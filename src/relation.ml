@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.39 2000-06-03 21:08:05 ddr Exp $ *)
+(* $Id: relation.ml,v 3.40 2000-06-16 11:48:39 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -384,7 +384,7 @@ value print_relation_path_table conf base path =
 
 open Dag2html;
 
-value print_relation_path_dag conf base path =
+value print_relation_path_dag conf base path excl_faml =
   let (nl, _) =
     List.fold_left
       (fun (nl, cnt) (ip, fl) ->
@@ -473,10 +473,15 @@ return ();
   in
   do Wserver.wprint "<p>\n";
      Dag.print_only_dag conf base spouse_on invert set [] d;
+     Wserver.wprint "<p>\n";
+     Wserver.wprint "<a href=\"%s" (commd conf);
+     List.iter (fun (v, k) -> Wserver.wprint "%s=%s;" v k) conf.env;
+     Wserver.wprint "ef%d=%d\">&gt;&gt</a>\n"
+       (List.length excl_faml - 1) (List.hd excl_faml);
   return ()
 ;
 
-value print_relation_path conf base path =
+value print_relation_path conf base path excl_faml =
   if path == [] then ()
   else
 (*
@@ -487,27 +492,31 @@ value print_relation_path conf base path =
         return ()
     | _ -> print_relation_path_dag conf base path ]
 *)
-    print_relation_path_dag conf base path
+    print_relation_path_dag conf base path excl_faml
 (**)
 ;
 
 type node = [ NotVisited | Visited of (bool * iper * famlink) ];
 exception FoundLink;
 
-value print_relation_with_alliance conf base ip1 ip2 =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
+value print_relation_with_alliance conf base ip1 ip2 excl_faml =
   let mark_per = Array.create base.data.persons.len NotVisited in
   let mark_fam = Array.create base.data.families.len False in
+  do List.iter
+        (fun i ->
+           if i < Array.length mark_fam then mark_fam.(i) := True else ())
+        excl_faml;
+  return
   let parse_fam ifam =
     if mark_fam.(Adef.int_of_ifam ifam) then []
     else
       let cpl = coi base ifam in
       do mark_fam.(Adef.int_of_ifam ifam) := True; return
-      let result = [(cpl.father, Parent); (cpl.mother, Parent)] in
+      let result = [(cpl.father, Parent, ifam); (cpl.mother, Parent, ifam)] in
       let result =
         result @
           List.fold_right
-            (fun child children -> [(child, Sibling) :: children])
+            (fun child children -> [(child, Sibling, ifam) :: children])
             (Array.to_list (doi base ifam).children) []
       in
       let result =
@@ -517,7 +526,8 @@ value print_relation_with_alliance conf base ip1 ip2 =
                if ifam = fam then children
                else
                  List.fold_right
-                   (fun child children -> [(child, HalfSibling) :: children])
+                   (fun child children ->
+                      [(child, HalfSibling, fam) :: children])
                    (Array.to_list (doi base fam).children) children)
             (Array.to_list (uoi base cpl.father).family) []
       in
@@ -528,7 +538,8 @@ value print_relation_with_alliance conf base ip1 ip2 =
                if ifam = fam then children
                else
                  List.fold_right
-                   (fun child children -> [(child, HalfSibling) :: children])
+                   (fun child children ->
+                      [(child, HalfSibling, fam) :: children])
                    (Array.to_list (doi base fam).children) children)
             (Array.to_list (uoi base cpl.mother).family) []
       in
@@ -543,9 +554,9 @@ value print_relation_with_alliance conf base ip1 ip2 =
              let cpl = coi base ifam in
              do mark_fam.(Adef.int_of_ifam ifam) := True; return
              List.fold_right
-               (fun child children -> [(child, Child) :: children])
+               (fun child children -> [(child, Child, ifam) :: children])
                (Array.to_list (doi base ifam).children)
-               [(cpl.father, Mate); (cpl.mother, Mate)] @
+               [(cpl.father, Mate, ifam); (cpl.mother, Mate, ifam)] @
                nb)
         (Array.to_list (uoi base iper).family) []
     in
@@ -580,7 +591,7 @@ value print_relation_with_alliance conf base ip1 ip2 =
     List.fold_right
       (fun vertex newvertexlist ->
          List.fold_right
-           (fun (iper, fl) result ->
+           (fun (iper, fl, ifam) result ->
               match mark_per.(Adef.int_of_iper iper) with
               [ NotVisited ->
                   do mark_per.(Adef.int_of_iper iper) :=
@@ -594,7 +605,8 @@ value print_relation_with_alliance conf base ip1 ip2 =
                     let path =
                       if source then merge_path p2 p1 else merge_path p1 p2
                     in
-                    do print_relation_path conf base path; return
+                    let excl_faml = [Adef.int_of_ifam ifam :: excl_faml] in
+                    do print_relation_path conf base path excl_faml; return
                     raise FoundLink ])
            (neighbours vertex) newvertexlist)
       queue []
@@ -610,6 +622,7 @@ value print_relation_with_alliance conf base ip1 ip2 =
       let queue1 = one_step_further True queue1 in
       width_search queue1 visited1 queue2 visited2
   in
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
   do header_no_page_title conf title;
      mark_per.(Adef.int_of_iper ip1) := Visited (True, ip1, Self);
      mark_per.(Adef.int_of_iper ip2) := Visited (False, ip2, Self);
@@ -640,7 +653,13 @@ value print_shortest_path conf base p1 p2 =
     let _ = base.data.unions.array () in
     let _ = base.data.couples.array () in
     let _ = base.data.descends.array () in
-    print_relation_with_alliance conf base p1.cle_index p2.cle_index
+    let excl_faml =
+      loop [] 0 where rec loop list i =
+        match p_getint conf.env ("ef" ^ string_of_int i) with
+        [ Some k -> loop [k :: list] (i + 1)
+        | None -> list ]
+    in
+    print_relation_with_alliance conf base p1.cle_index p2.cle_index excl_faml
 ;
 
 value parents_label conf =

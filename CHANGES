@@ -2,6 +2,9 @@ GeneWeb version 3.06
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [16 Jun 00] Added feature: in relationship computing, when option
+    "shortest path" is selected, it is displayed together with a link
+    to see the next shortest path.
   - [13 Jun 00] Deleted this stupid "<meta http-equiv...>" in welcome pages
     and in other pages, because it makes some browsers generate two requests
     and we see the page blinking. Moreover, it has no sense (even if it is
