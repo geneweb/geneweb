@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.51 2005-02-13 23:08:52 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.52 2005-02-27 10:04:16 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -736,8 +736,11 @@ EXTEND
       | ID "ELL" -> 13 ] ]
   ;
   int:
-    [ [ i = INT -> int_of_string i
-      | "-"; i = INT -> - int_of_string i ] ]
+    [ [ i = INT ->
+          try int_of_string i with [ Failure _ -> raise Stream.Failure ]
+      | "-"; i = INT ->
+          try (- int_of_string i) with
+          [ Failure _ -> raise Stream.Failure ] ] ]
   ;
 END;
 
@@ -2813,6 +2816,11 @@ The database \"%s\" already exists. Use option -f to overwrite it.
 ;
 
 try main () with e ->
+  let e =
+    match e with
+    [ Stdpp.Exc_located _ e -> e
+    |  _ -> e ]
+  in
   do {
     fprintf log_oc.val "Uncaught exception: %s\n"
       (Printexc.to_string e);
