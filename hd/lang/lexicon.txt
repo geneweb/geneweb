@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.73 1999-07-17 04:21:07 ddr Exp $
+# $Id: lexicon.txt,v 2.74 1999-07-17 20:30:50 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1836,13 +1836,25 @@ se:
 de: Fehlende Ehegatten einbeziehen
 dk: medtag ukendte &aelig;gtef&aelig;ller
 en: include missing spouses
-es: incluir las esposas faltantes
+es: incluir los c&oacute;nyuges faltantes
 fr: inclure les conjoints manquants
 it: includere i coniugi mancanti
 nl: ontbrekende echtgenoten tonen
 no: inkluder manglende (ekte)feller
 pt: incluir os c&ocirc;njugues que faltam
 se: inkludera makar som saknas
+
+    include spouses
+de: Ehegatten einbeziehen
+dk: medtag &aelig;gtef&aelig;ller
+en: include spouses
+es: incluir los c&oacute;nyuges
+fr: inclure les conjoints
+it: includere i coniugi
+nl: echtgenoten tonen
+no: inkluder (ekte)feller
+pt: incluir os c&ocirc;njugues
+se: inkludera makar
 
     incompatible sexes
 de: unvertr&aml;gliche Geschlechter

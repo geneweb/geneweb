@@ -219,6 +219,49 @@ value="bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF">
 
 <dl><dt><dd><table border=1>
 <tr>
+<td><strong>- enclosing_tag -</strong></td>
+</tr>
+
+<tr>
+<td>Characters displaying
+<p>
+Allows to display character in bold, italic and in small or big font.
+<p>
+The bold displaying can be useful, for example, si a background image
+has been selected, in order to make the text more readable.
+</td>
+</tr>
+
+<tr>
+<td align=center>
+Displaying in bold font
+<input type=checkbox name=enclosing_tag_strong value=$1[on]>
+</td>
+</tr>
+
+<tr>
+<td align=center>
+Displaying in italic
+<input type=checkbox name=enclosing_tag_em value=$2[on]>
+</td>
+</tr>
+
+<tr>
+<td align=center>
+Characters size
+<select name=enclosing_tag_size>
+<option value=$3{s2}>very small
+<option value=$3{s1}>small
+<option value=$3{}>normal
+<option value=$3{b1}>big
+<option value=$3{b2}>very big
+</select>
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
 <td><strong>- default_lang -</strong></td>
 </tr
 
