@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.13 1999-04-17 18:17:42 ddr Exp $ *)
+(* $Id: util.ml,v 2.14 1999-04-18 20:54:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -234,10 +234,6 @@ value afficher_nom_titre_reference conf base p s =
         (acces conf base p) (coa conf s) (coa conf (sou base nn)) ]
 ;
 
-value afficher_prenom_de_personne conf base p =
-  Wserver.wprint "%s" (person_text_without_surname conf base p)
-;
-
 value main_title base p =
   let rec find_main =
     fun
@@ -298,7 +294,7 @@ value afficher_personne_un_titre conf base p t =
   do if t.t_place = p.surname then
        match t.t_name with
        [ Tname n -> Wserver.wprint "%s" (coa conf (sou base n))
-       | _ -> afficher_prenom_de_personne conf base p ]
+       | _ -> Wserver.wprint "%s" (person_text_without_surname conf base p) ]
      else
        match t.t_name with
        [ Tname s -> Wserver.wprint "%s" (coa conf (sou base s))
@@ -320,7 +316,7 @@ value afficher_personne_sans_titre conf base p =
   match main_title base p with
   [ Some t ->
       do if t.t_place == p.surname then
-           afficher_prenom_de_personne conf base p
+           Wserver.wprint "%s" (person_text_without_surname conf base p)
          else
            match (t.t_name, p.nick_names) with
            [ (Tname s, [nn :: _]) ->
@@ -1030,6 +1026,10 @@ value auto_image_file conf base p =
 
 value afficher_personne conf base p =
   Wserver.wprint "%s" (person_text conf base p)
+;
+
+value afficher_prenom_de_personne conf base p =
+  Wserver.wprint "%s" (person_text_without_surname conf base p)
 ;
 
 value afficher_prenom_de_personne_referencee conf base p =

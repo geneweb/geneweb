@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.6 1999-04-17 14:18:05 ddr Exp $ *)
+(* $Id: util.mli,v 2.7 1999-04-18 20:54:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -35,7 +35,6 @@ value one_title_text : config -> base -> person -> title -> string;
 value referenced_person_title_text : config -> base -> person -> string;
 
 value main_title : base -> person -> option title;
-value afficher_prenom_de_personne : config -> base -> person -> unit;
 value afficher_personne_titre : config -> base -> person -> unit;
 value afficher_personne_sans_titre : config -> base -> person -> unit;
 value afficher_titre : config -> base -> person -> unit;
@@ -102,6 +101,7 @@ value auto_image_file : config -> base -> person -> option string;
 
 (* Deprecated *)
 value afficher_personne : config -> base -> person -> unit;
+value afficher_prenom_de_personne : config -> base -> person -> unit;
 value afficher_prenom_de_personne_referencee :
   config -> base -> person -> unit;
 value afficher_personne_referencee : config -> base -> person -> unit;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.7 1999-04-17 14:18:04 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.8 1999-04-18 20:54:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -325,6 +325,14 @@ value afficher_ascendants_numerotation conf base niveau_max p =
   return ()
 ;
 
+value print_link_long conf n =
+  stag "strong" begin
+    stag "a" "href=\"#%s\"" (Num.to_string n) begin
+      Num.print wpr (transl conf "(thousand separator)") n;
+    end;
+  end
+;
+
 value print_person_long_info conf base auth link p =
   do List.iter
        (fun a ->
@@ -346,17 +354,33 @@ value print_person_long_info conf base auth link p =
      else ();
      match link with
      [ Some n ->
-        do Wserver.wprint "\n";
-           stag "strong" begin
-             Wserver.wprint "=&gt; ";
-             stag "a" "href=\"#%s\"" (Num.to_string n) begin
-               Num.print wpr (transl conf "(thousand separator)") n;
-             end;
-           end;
-        return ()
+         do Wserver.wprint ".\n %s " (capitale (transl conf "see"));
+            print_link_long conf n;
+         return ()
      | None -> () ];
-     Wserver.wprint ".\n";
   return ()
+;
+
+value title_reference conf base t =
+  let ident = sou base t.t_ident in
+  let place = sou base t.t_place in
+  let s = if place = "" then ident else ident ^ " " ^ place in
+  "<a href=\"" ^ commd conf ^ "m=TT;sm=S;t=" ^
+  code_varenv ident ^ ";p=" ^ code_varenv place ^ "\"><em>" ^
+  coa conf s ^ "</em></a>"
+;
+
+value strong_referenced_person_title_text conf base p =
+  if p.access <> Private || conf.friend || conf.wizard then
+    match main_title base p with
+    [ Some t ->
+        "<strong>" ^ reference conf base p (titled_person_text conf base p t) ^
+        "</strong>, " ^ title_reference conf base t
+    | None ->
+        "<strong>" ^ reference conf base p (person_text conf base p) ^
+        "</strong>" ]
+  else
+    "<strong>" ^ reference conf base p (person_text conf base p) ^ "</strong>"
 ;
 
 value get_link all_gp ip =
@@ -366,6 +390,38 @@ value get_link all_gp ip =
         if ip = ip0 then Some n else loop gpl
     | [gp :: gpl] -> loop gpl
     | [] -> None ]
+;
+
+value print_persons_parents conf base all_gp p =
+  let a = aoi base p.cle_index in
+  match a.parents with
+  [ Some ifam ->
+      let cpl = coi base ifam in
+      let print ip =
+        let p = poi base ip in        
+        let link = get_link all_gp ip in
+        do Wserver.wprint " %s "
+             (transl_decline conf "of (same or greater generation level)" "");
+           Wserver.wprint "%s"
+              (strong_referenced_person_title_text conf base p);
+           Wserver.wprint "%s" (Date.short_dates_text conf base p);
+           match link with
+           [ Some n ->
+               do Wserver.wprint "\n(";
+                  Wserver.wprint "%s " (transl conf "see");
+                  print_link_long conf n;
+                  Wserver.wprint ")";
+               return ()
+           | None -> () ];
+        return ()
+      in
+      do Wserver.wprint ", %s"
+           (transl_nth conf "son/daughter/child" (index_of_sex p.sex));
+         print cpl.father;
+         Wserver.wprint "\n%s" (transl conf "and");
+         print cpl.mother;
+      return ()
+  | None -> () ]
 ;
 
 value print_marriage_long conf base all_gp auth p ifam =
@@ -388,9 +444,12 @@ value print_marriage_long conf base all_gp auth p ifam =
             else ());
      Wserver.wprint "\n";
      stag "strong" begin
-       afficher_personne_referencee conf base spouse;
+       Wserver.wprint "%s"
+         (reference conf base spouse (person_text conf base spouse));
      end;
      print_person_long_info conf base auth (get_link all_gp ispouse) spouse;
+     print_persons_parents conf base all_gp spouse;
+     Wserver.wprint ".\n";
      match divorce with
      [ Divorced d ->
          let d = Adef.od_of_codate d in
@@ -445,6 +504,22 @@ value print_generation_person_long conf base all_gp gp =
            afficher_personne_referencee conf base p;
          end;
          print_person_long_info conf base (age_autorise conf base p) None p;
+         Wserver.wprint ".\n";
+         match (aoi base ip).parents with
+         [ Some ifam ->
+             let cpl = coi base ifam in
+             match
+              (get_link all_gp cpl.father, get_link all_gp cpl.mother)
+             with
+             [ (Some n1, Some n2) ->
+                 do Wserver.wprint "%s: " (capitale (transl conf "parents"));
+                    print_link_long conf n1;
+                    Wserver.wprint " %s " (transl conf "and");
+                    print_link_long conf n2;
+                    Wserver.wprint ".\n";
+                 return ()
+             | _ -> () ]
+         | None -> () ];
          match ifamo with
          [ Some ifam ->
              if not (Num.even n) then
@@ -475,6 +550,7 @@ value print_generation_person_long conf base all_gp gp =
                           afficher_personne_referencee conf base pc;
                       end;
                       print_person_long_info conf base auth n pc;
+                      Wserver.wprint ".\n";
                       match n with
                       [ Some _ -> ()
                       | None ->
@@ -493,12 +569,10 @@ value print_generation_person_long conf base all_gp gp =
       do Wserver.wprint "<p>\n";
          stag "strong" begin
            Num.print wpr (transl conf "(thousand separator)") n1;
-           Wserver.wprint " =&gt; ";
-           stag "a" "href=\"#%s\"" (Num.to_string n2) begin
-             Num.print wpr (transl conf "(thousand separator)") n2;
-           end;
          end;
-         Wserver.wprint "\n\n";
+         Wserver.wprint ": %s " (transl conf "see");
+         print_link_long conf n2;
+         Wserver.wprint ".\n\n";
       return ()
   | _ -> () ]
 ;
