@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.47 2001-10-24 08:48:53 ddr Exp $
+# $Id: lexicon.txt,v 4.48 2001-11-01 10:20:01 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -26,6 +26,7 @@ sv: iso-8859-1
 zh: gb2312
 
      !dates in forms
+da: ddmmyy
 en: yymmdd
 es: ddmmyy
 fr: ddmmyy
