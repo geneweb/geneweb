@@ -39,7 +39,7 @@ birthday.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx srcfile.cmx \
 calendar.cmo: def.cmi 
 calendar.cmx: def.cmi 
 changeChildren.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi \
-    history.cmi iobase.cmi iovalue.cmi lock.cmo name.cmi srcfile.cmi \
+    history.cmi iobase.cmi iovalue.cmi lock.cmi name.cmi srcfile.cmi \
     update.cmi util.cmi ../wserver/wserver.cmi 
 changeChildren.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx \
     history.cmx iobase.cmx iovalue.cmx lock.cmx name.cmx srcfile.cmx \
@@ -86,7 +86,7 @@ family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birthDeath.cmx \
     relationLink.cmx sendImage.cmx some.cmx srcfile.cmx title.cmx update.cmx \
     updateFam.cmx updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx family.cmi 
-forum.cmo: config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo srcfile.cmi \
+forum.cmo: config.cmi def.cmi gutil.cmi iobase.cmi lock.cmi srcfile.cmi \
     update.cmi util.cmi ../wserver/wserver.cmi 
 forum.cmx: config.cmi def.cmi gutil.cmx iobase.cmx lock.cmx srcfile.cmx \
     update.cmx util.cmx ../wserver/wserver.cmx 
@@ -95,13 +95,13 @@ fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx iobase.cmx
 gutil.cmo: adef.cmi buff.cmo def.cmi name.cmi gutil.cmi 
 gutil.cmx: adef.cmx buff.cmx def.cmi name.cmx gutil.cmi 
 gwc.cmo: adef.cmi argl.cmo check.cmo consangAll.cmo def.cmi gutil.cmi \
-    gwcomp.cmo iobase.cmi lock.cmo mhashtbl.cmo name.cmi 
+    gwcomp.cmo iobase.cmi lock.cmi mhashtbl.cmo name.cmi 
 gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx def.cmi gutil.cmx \
     gwcomp.cmx iobase.cmx lock.cmx mhashtbl.cmx name.cmx 
 gwcomp.cmo: adef.cmi calendar.cmo def.cmi gutil.cmi 
 gwcomp.cmx: adef.cmx calendar.cmx def.cmi gutil.cmx 
 gwd.cmo: argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo family.cmi \
-    gutil.cmi image.cmo iobase.cmi lock.cmo relationLink.cmo robot.cmo \
+    gutil.cmi image.cmo iobase.cmi lock.cmi relationLink.cmo robot.cmo \
     srcfile.cmi util.cmi version.cmo ../wserver/wserver.cmi 
 gwd.cmx: argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx family.cmx \
     gutil.cmx image.cmx iobase.cmx lock.cmx relationLink.cmx robot.cmx \
@@ -122,6 +122,8 @@ iobase.cmx: adef.cmx btree.cmx buff.cmx def.cmi gutil.cmx iovalue.cmx \
     name.cmx iobase.cmi 
 iovalue.cmo: iovalue.cmi 
 iovalue.cmx: iovalue.cmi 
+lock.cmo: lock.cmi 
+lock.cmx: lock.cmi 
 merge.cmo: adef.cmi config.cmi def.cmi gutil.cmi srcfile.cmi util.cmi \
     ../wserver/wserver.cmi merge.cmi 
 merge.cmx: adef.cmx config.cmi def.cmi gutil.cmx srcfile.cmx util.cmx \
@@ -146,7 +148,7 @@ mergeIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi merge.cmi \
 mergeIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx merge.cmx \
     srcfile.cmx update.cmx updateInd.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx 
-mk_consang.cmo: argl.cmo consang.cmi consangAll.cmo iobase.cmi lock.cmo 
+mk_consang.cmo: argl.cmo consang.cmi consangAll.cmo iobase.cmi lock.cmi 
 mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx iobase.cmx lock.cmx 
 mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi iobase.cmi \
     name.cmi num.cmi pqueue.cmi 
@@ -187,7 +189,7 @@ robot.cmx: srcfile.cmx util.cmx ../wserver/wserver.cmx
 select.cmo: adef.cmi def.cmi gutil.cmi name.cmi 
 select.cmx: adef.cmx def.cmi gutil.cmx name.cmx 
 sendImage.cmo: adef.cmi buff.cmo config.cmi def.cmi gutil.cmi history.cmi \
-    iobase.cmi lock.cmo srcfile.cmi update.cmi util.cmi \
+    iobase.cmi lock.cmi srcfile.cmi update.cmi util.cmi \
     ../wserver/wserver.cmi 
 sendImage.cmx: adef.cmx buff.cmx config.cmi def.cmi gutil.cmx history.cmx \
     iobase.cmx lock.cmx srcfile.cmx update.cmx util.cmx \
@@ -197,7 +199,7 @@ some.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
 some.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
     ../wserver/wserver.cmx 
 srcfile.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi history.cmi \
-    lock.cmo num.cmi util.cmi version.cmo ../wserver/wserver.cmi srcfile.cmi 
+    lock.cmi num.cmi util.cmi version.cmo ../wserver/wserver.cmi srcfile.cmi 
 srcfile.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx history.cmx \
     lock.cmx num.cmx util.cmx version.cmx ../wserver/wserver.cmx srcfile.cmi 
 title.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
@@ -213,7 +215,7 @@ updateFam.cmo: adef.cmi config.cmi def.cmi gutil.cmi srcfile.cmi update.cmi \
 updateFam.cmx: adef.cmx config.cmi def.cmi gutil.cmx srcfile.cmx update.cmx \
     util.cmx ../wserver/wserver.cmx updateFam.cmi 
 updateFamOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi iobase.cmi \
-    lock.cmo update.cmi updateFam.cmi util.cmi ../wserver/wserver.cmi 
+    lock.cmi update.cmi updateFam.cmi util.cmi ../wserver/wserver.cmi 
 updateFamOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx iobase.cmx \
     lock.cmx update.cmx updateFam.cmx util.cmx ../wserver/wserver.cmx 
 updateInd.cmo: adef.cmi config.cmi def.cmi gutil.cmi srcfile.cmi update.cmi \
@@ -221,13 +223,13 @@ updateInd.cmo: adef.cmi config.cmi def.cmi gutil.cmi srcfile.cmi update.cmi \
 updateInd.cmx: adef.cmx config.cmi def.cmi gutil.cmx srcfile.cmx update.cmx \
     util.cmx ../wserver/wserver.cmx updateInd.cmi 
 updateIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi iobase.cmi \
-    lock.cmo name.cmi update.cmi updateInd.cmi util.cmi \
+    lock.cmi name.cmi update.cmi updateInd.cmi util.cmi \
     ../wserver/wserver.cmi updateIndOk.cmi 
 updateIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx iobase.cmx \
     lock.cmx name.cmx update.cmx updateInd.cmx util.cmx \
     ../wserver/wserver.cmx updateIndOk.cmi 
 util.cmo: adef.cmi buff.cmo config.cmi consang.cmi def.cmi gutil.cmi \
-    iobase.cmi lock.cmo name.cmi num.cmi version.cmo ../wserver/wserver.cmi \
+    iobase.cmi lock.cmi name.cmi num.cmi version.cmo ../wserver/wserver.cmi \
     util.cmi 
 util.cmx: adef.cmx buff.cmx config.cmi consang.cmx def.cmi gutil.cmx \
     iobase.cmx lock.cmx name.cmx num.cmx version.cmx ../wserver/wserver.cmx \
