@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.132 2000-07-07 12:11:03 ddr Exp $
+# $Id: lexicon.txt,v 3.133 2000-07-07 19:43:33 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -40,6 +40,7 @@ cs:  abyste vidìli první
 de: , um den ersten zu sehen
 dk:  for at se den f&oslash;rste
 en:  to see the first one
+eo:  por vidi la unuan brancxon
 es:  para ver la primera rama
 fi:  n&auml;hd&auml;ksesi ensimm&auml;isen haaran
 fr:  pour voir la premi&egrave;re
@@ -59,6 +60,7 @@ cs:  vidìt první
 de: , um die erste zu sehen
 dk:  for at se det f&oslash;rste
 en:  to see the first one
+eo:  por vidi la unuan cxeneron de parenceco
 es:  para ver el primer v&iacute;nculo de parentesco
 fi:  n&auml;hd&auml;ksesi ensimm&auml;isen sukulaisuuden
 fr:  pour voir le premier
@@ -315,6 +317,7 @@ se: ,
     (french month)
 dk: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 en: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
+eo: vendemjero/brumero/frimero/nivozo/pluvjozo/ventozo/germinalo/florealo/prerialo/mesidoro/termindoro/fructidoro/suplemento
 fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 se: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/komplementär
 
@@ -493,6 +496,7 @@ cs: <em>Sosa number</em> vzta¾ené k %t
 de: <em>Sosa-Nummer</em> relativ zu %t
 dk: <em>Sosa-nummer</em>, refererende til %t
 en: <em>Sosa number</em> relative to %t
+eo: <em>numero Sosa</em> relative al %t
 es: <em>n&uacute;mero Sosa</em> respecto a %t
 fi: <em>Sosa-numero</em> henkil&ouml;n&auml %t
 fr: <em>num&eacute;ro Sosa</em> par rapport &agrave; %t
@@ -923,6 +927,7 @@ cs: pøístup
 de: Zugriff
 dk: adgang
 en: access
+eo: alirejo
 es: acceso
 fi: p&auml;&auml;sy
 fr: acc&egrave;s
@@ -961,6 +966,7 @@ af: aangenome vader/angenome moeder/aangenome ouers
 de: Adoptivvater/Adoptivmutter/Adoptiveltern
 dk: adoptivfader/adoptivmoder/adoptivfor&aelig;ldre
 en: adoptive father/adoptive mother/adoptive parents
+eo: adoptinta patro/adoptinta patrino/adoptintaj gepatroj
 es: padre adoptivo/madre adoptiva/padres adoptivos
 fi: ottois&auml;/otto&auml;iti/ottovanhemmat
 fr: p&egrave;re adoptif/m&egrave;re adoptive/parents adoptifs
@@ -979,6 +985,7 @@ af: aangenome seun/aangenome dogter/aangenome kind
 de: Adoptivsohn/Adoptivtochter/Adoptivkind
 dk: adoptivs&oslash;n/adoptivdatter/adoptivbarn
 en: adoptive son/adoptive daughter/adoptive child
+eo: adoptita filo/adoptita filino/adoptita infano
 es: hijo adoptivo/hija adoptiva/hijo(a) adoptivo(a)
 fi: ottopoika/ottotyt&auml;r/ottolapsi
 fr: fils adoptif/fille adoptive/enfant adoptif
@@ -1120,7 +1127,7 @@ af: in die lewe
 de: nicht verstorben
 dk: levende
 en: alive
-eo: no morta
+eo: vivanta
 es: no fallecido/no fallecida/no fallecido(a)
 fi: el&auml;&auml
 fr: vivant/vivante/vivant(e)
@@ -1140,7 +1147,7 @@ cs: v¹echna místa
 de: alle Orte
 dk: alle ophav
 en: all the estates
-eo: cxiuj lokoj
+eo: cxiuj nobelbienoj
 es: todos los lugares
 fi: kaikki paikat
 fr: tous les domaines
@@ -1657,6 +1664,7 @@ cs: pohøeb
 de: Beisetzung
 dk: begravelse
 en: burial
+eo: emtombigo
 es: entierro
 fi: hautaus
 fr: enterrement
@@ -1713,8 +1721,9 @@ af: stop GeneWeb-skakels
 cs: zru¹it svazky GeneWebu
 de: GeneWeb-Links entfernen
 dk: uden GeneWeb-links
-es: anular los lazos GeneWeb
 en: cancel GeneWeb links
+eo: nuligi legilojn GeneWeb
+es: anular los lazos GeneWeb
 fi: ei GeneWeb-linkkej&auml
 fr: annuler les liens GeneWeb
 he:  áèì ÷ùøé GeneWeb
@@ -1732,6 +1741,7 @@ af: moontlike vader/moontlike moeder/moontlike ouers
 de: m&ouml;glicher Vater/m&ouml;gliche Mutter/m&ouml;gliche Eltern
 dk: mulig fader/mulig moder/mulige for&aelig;ldre
 en: candidate father/candidate mother/candidate parents
+eo: ebla patro/ebla patrino/eblaj gepatroj
 es: padre posible/madre posible/padres posibles
 fi: mahdollinen is&auml;/mahdollinen &auml;iti/mahdolliset vanhemmat
 fr: p&egrave;re possible/m&egrave;re possible/parents possibles
@@ -1805,8 +1815,9 @@ af: verander kinders se name
 cs: zmìnit jména dìtí
 de: Namen der Kinder &auml;ndern
 dk: &aelig;ndre b&oslash;rns navne
-es: cambiar los nombres de los hijos
 en: change children's names
+eo: sxangxi nomojn de la infanon
+es: cambiar los nombres de los hijos
 fi: muuta lasten nimi&auml;
 fr: changer noms des enfants
 he:  òãëï ùîåú äéìãéí
@@ -2019,6 +2030,7 @@ cs: vytvoøit
 de: erzeugen
 dk: opret
 en: create
+eo: krei
 es: crear
 fi: luo
 fr: cr&eacute;er
@@ -2315,6 +2327,7 @@ se: slutar
 de: verlobt
 dk: forlovet
 en: engaged
+eo: fiancxoj
 fi: kihloissa
 fr: fianc&eacute;s
 nl: verloofd
@@ -2357,7 +2370,7 @@ cs: místo
 de: Ort
 dk: ophav
 en: estate
-eo: loko
+eo: nobelbieno
 es: lugar
 fi: paikka
 fr: domaine
@@ -2675,6 +2688,7 @@ af: pleegvader/pleegmoeder/pleegouers
 de: Pflegevater/Pflegemutter/Pflegeeltern
 dk: plejefader/plejemoder/plejefor&aelig;ldre
 en: foster father/foster mother/foster parents
+eo: nutrinto patro/nutrinto patrino/nutrintoj gepatroj
 fi: kasvatusis&auml;/kasvatus&auml;iti/kasvatusvanhemmat
 fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
 he:   àá çåøâ/ àí çåøâú/ äåøéí çåøâéí
@@ -2725,6 +2739,7 @@ af: peetpa/peetma/peetouers
 de: Taufzeuge/Taufzeugin/Taufzeuge und Taufzeugin
 dk: gudfader/gudmoder/gudfader og gudmoder
 en: godfather/godmother/godparents
+eo: baptopatro/baptopatrino/gebaptopatroj
 es: padrino/madrina/padrino y padrina
 fi: kummiset&auml;/kummit&auml;ti/kummit
 fr: parrain/marraine/parrain et marraine
@@ -2743,6 +2758,7 @@ af: peetseun/peetdogter/peetkind
 de: Taufkind
 dk: guds&oslash;n/guddatter/gudbarn
 en: godson/goddaughter/godchild
+eo: baptofilo/baptofilino/baptofil(in)o
 es: fahijado/fahijada/fahihado(a)
 fi: kummipoika/kummitytt&ouml;/kummilapsi
 fr: filleul/filleule/filleul(e)
@@ -2801,6 +2817,7 @@ af: gregoriaans/juliaans/frans/hebreeus
 de: Gregorianisch/Julianisch/Franz&ouml;sisch/Hebr&auml;isch
 dk: gregoriansk/juliansk/fransk rep./j&oslash;disk
 en: Gregorian/Julian/French/Hebrew
+eo: gregoriana/juliana/franco/hebro
 es: gregoriano/julian/franc&eacute;s/hebreo
 fi: gregoriaaninen/juliaaninen/ranskalainen/heprealainen
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
@@ -2917,6 +2934,7 @@ se: uppdateringarnas historia
 de: horizontal
 dk: vandret
 en: horizontally
+eo: horizontale
 fi: vaakasuoraan
 fr: horizontalement
 nl: horizontaal
@@ -2948,6 +2966,7 @@ af: as titels
 de: eingeschr&auml;nkt
 dk: hvis titler
 en: if titles
+eo: se mosxtoj
 es: si t&iacute;tulos
 fi: jos arvonimi&auml
 fr: si titres
@@ -3005,6 +3024,7 @@ cs: obrázek
 de: Bild
 dk: billede/billeder
 en: image/images
+eo: bildo:a:+n/bildoj
 es: imagen
 fi: kuva
 fr: image/images
@@ -3066,6 +3086,7 @@ cs: vèetnì chybìjících man¾elù/man¾elek
 de: Fehlende Ehegatten einbeziehen
 dk: medtag ukendte &aelig;gtef&aelig;ller
 en: include missing spouses
+eo: inklui mankantajn edz(in)ojn
 es: incluir los c&oacute;nyuges faltantes
 fi: lue mukaan puuttuvat puolisot
 fr: inclure les conjoints manquants
@@ -3084,6 +3105,7 @@ af: eggenote ingesluit
 de: Ehegatten einbeziehen
 dk: medtag &aelig;gtef&aelig;ller
 en: include spouses
+eo: inklui edz(in)ojn
 es: incluir los c&oacute;nyuges
 fi: mukaanlue puolisot
 fr: inclure les conjoints
@@ -3377,6 +3399,7 @@ af: koppel
 de: verbinden
 dk: forbind
 en: link
+eo: bindi
 es: reunir
 fi: linkkaa
 fr: relier
@@ -3436,6 +3459,7 @@ cs: dlouhý seznam
 de: Lange Ansicht
 dk: udvidet rapport
 en: long display
+eo: longa afisxajxo
 es: presentaci&oacute;n extensa
 fi: laaja raportti
 fr: affichage long
@@ -3473,6 +3497,7 @@ af: manlike lyn/vroulike lyn
 de: v&auml;terlicherseits/m&uuml;tterlicherseits
 dk: mandlige linie/kvindelige linie
 en: male line/female line
+eo: linio vira/linio virina
 fi: miehen puoleinen linja/naisen puoleinen linja
 fr: ligne agnatique/ligne cognatique
 lv: tçva lînija/mâtes lînija
@@ -3545,6 +3570,7 @@ cs: vdaná
 de: verheiratet
 dk: gift
 en: married
+eo: edzitaj
 es: casados
 fr: mari&eacute;s
 fi: vihitty
@@ -3603,6 +3629,7 @@ af: maksimum
 de: Maximal
 dk: maksimalt
 en: maximum
+eo: maksimumo
 es: m&aacute;ximo
 fi: korkeintaan
 fr: maximum
@@ -3659,6 +3686,7 @@ af: ontbrekende voorsate
 de: fehlende Vorfahren
 dk: manglende forf&aelig;dre
 en: missing ancestors
+eo: mankintaj antauxeuloj
 es: ascendientes faltantes
 fi: puuttuvat esivanhemmat
 fr: ascendants manquants
@@ -3796,6 +3824,7 @@ af: stap met %t as Sosa verwysing
 de: Navigation mit %t als Sosareferenz
 dk: navigering med %t som reference for fortl&oslash;bende anenummerering (Sosa o.a.)
 en: navigation with %t as Sosa reference
+eo: navigado kun %t kiel referenco Sosa
 es: navegaci&oacute;n con %t como referencia de Sosa
 fi: navigointi %t Sosa-viitteen&auml
 fr: navigation avec %t comme r&eacute;f&eacute;rence Sosa
@@ -3971,6 +4000,7 @@ cs: svobodný/svobodná
 de: nicht verheiratet
 dk: ikke gift
 en: not married
+eo: ne edzitaj
 es: no casados
 fi: eiv&auml;t naimisissa
 fr: non mari&eacute;s
@@ -4104,6 +4134,7 @@ cs: zamìstnání
 de: Beruf
 dk: stilling
 en: occupation
+eo: okupo
 es: ocupaci&oacute;n
 fi: ammatti
 fr: occupation
@@ -4383,6 +4414,7 @@ cs: pouze zvolená generace
 de: nur die ausgew&auml;hlte Generation
 dk: kun den valgte generation
 en: only the selected generation
+eo: nur la generacio elekta
 es: solamente la generaci&oacute;n elegida
 he:  ãåø äðáëø áìáã
 is: aðeins valda kynslóðin
@@ -4617,6 +4649,7 @@ af: akkuraatheid
 de: Genauigkeit
 dk: pr&aelig;cisering
 en: precision
+eo: precizo
 fi: tarkennus
 fr: pr&eacute;cision
 he:  ãééå÷
@@ -4655,6 +4688,7 @@ cs: soukromé
 de: privat
 dk: privat
 en: private
+eo: privata
 es: privado
 fi: yksityinen
 fr: priv&eacute;
@@ -4768,6 +4802,7 @@ af: erkennende vader/erkennende moeder/erkennende ouders
 de: anerkennender Vater/anerkennende Mutter/anerkennende Eltern
 dk: sig vedkendende fader/sig vedkendende moder/sig vedkendende for&aelig;ldre
 en: recognizing father/recognizing mother/recognizing parents
+eo: agnoskinta patro/agnoskinta patrino/agnoskintaj gepatroj
 fi: tunnustanut is&auml;/tunnustanut &auml;iti/tunnustaneet vanhemmat
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
 is: viðurkenndur faðir/viðurkennd móðir/viðurkennd foreldri
@@ -4783,6 +4818,7 @@ af: verwant/verwante
 de: Beziehung/Beziehungen
 dk: forbindelse/forbindelser
 en: relation/relations
+eo: konato:a:+n/konatoj
 es: relaci&oacute;n/relaciones
 fi: sukulaisuus/sukulaisuutta
 fr: relation/relations
@@ -4863,6 +4899,7 @@ cs: %t vztah s
 de: in einer Beziehung%t mit
 dk: forbindelse%t med
 en: relationship%t to
+eo: rilato%t kun
 es: parentesco%t con
 fi: suhde%t ja
 fr: relation%t avec
@@ -4881,6 +4918,7 @@ af: aangetroude verwantskappe
 de: Heiratsbeziehungen
 dk: sl&aelig;gtskaber ved gifterm&aring;l
 en: relationships by marriage
+eo: parenceco per edzeco
 es: parentesco pol&iacute;tico
 fi: sukulaisuus avioliiton kautta
 fr: liens de parent&eacute; par alliance
@@ -4960,6 +4998,7 @@ cs: odeslat
 de: senden +before
 dk: inds&aelig;t
 en: send
+eo: sendi :a:
 es: enviar
 fi: l&auml;het&auml
 fr: envoyer
@@ -4977,6 +5016,7 @@ se: skicka
 de: getrennt lebend
 dk: separeret
 en: separated
+eo: apartigaj
 fi: asumuserossa
 fr: s&eacute;par&eacute;s
 nl: gescheiden
@@ -5028,6 +5068,7 @@ cs: krátký výpis
 de: kurze Ansicht
 dk: standardrapport
 en: short display
+eo: mallonga afisxajxo
 es: presentaci&oacute;n corta
 fi: lyhyt raportti
 fr: affichage court
@@ -5046,6 +5087,7 @@ af: kortste pad
 de: k&uuml;rzester Pfad
 dk: korteste vej
 en: shortest path
+eo: pado plej mallonga
 fi: lyhin polku
 fr: chemin le plus court
 it: legame più diretto
@@ -5141,6 +5183,7 @@ cs: zdroj/zdroje
 de: Quelle/Quellen
 dk: kilde/kilder
 en: source/sources
+eo: fonto/fontoj
 es: fuente/fuentes
 fi: l&auml;hde/l&auml;hteet
 fr: source/sources
@@ -5238,6 +5281,7 @@ se: som b&ouml;rjar med
     statistics
 dk: statistikker
 en: statistics
+eo: statistikoj
 fr: statistiques
 nl: statistieken
 se: statistik
@@ -5327,6 +5371,7 @@ se: efternamn/efternamn
 de: Nachnamen-Liste
 dk: efternavnsoversigt
 en: surnames list
+eo: listo de la familinomoj
 fi: sukunimiluettelo
 fr: liste &eacute;clair
 nl: bijnamen lijst
@@ -5395,6 +5440,7 @@ af: teks
 de: Text
 dk: tekst
 en: text
+eo: teksto
 fi: teksti
 fr: texte
 he:  ëúåá
@@ -5430,6 +5476,7 @@ se: de %d f&ouml;rnamnen
     the %d oldest perhaps still alive
 dk: de %d &aelig;ldste af de muligt levende
 en: the %d oldest perhaps still alive
+eo: la %d plej maljunoj eble ankoraux vivantaj
 fi: %d vanhinta ehk&auml viel&auml el&auml;v&auml;&auml
 fr: les %d les plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
 nl: de %d oudsten, mogelijk nog in leven
@@ -5458,6 +5505,7 @@ se: de %d efternamnen
     the %d who lived the longest
 dk: de %d som har levet l&aelig;ngst
 en: the %d who lived the longest
+eo: la %d kiu vivis plejlonge
 fr: les %d ayant v&eacute;cu le plus longtemps
 nl: de %d langst levende personen
 se: de %d som har levt l&auml;ngst
@@ -5646,6 +5694,7 @@ cs: soubor je doèasnì uzamèen: zkuste to znova. Pokud to stále nefunguje, chvíli
 de: die Datei ist z.Z. gesch&uuml;tzt: versuchen Sie es bitte nochmals
 dk: filen er midlertidigt l&aring;st: pr&oslash;v igen. Hvis dette gentagne gange ikke fungerer, da vent lidt inden n&aelig;ste fors&oslash;g
 en: the file is temporarily locked: please try again. If it still does not work, wait a while before trying again
+eo: la sliparo estas provizore riglata: provas ankoraux
 es: la base est&aacute; temporalmente cerrada: ensayar de nuevo. Si no funciona, espere un instante antes de ensayar nuevamente
 fi: tiedosto on lukkiutunut, yrit&auml hetken kuluttua uudelleen
 fr: le fichier est temporairement verrouill&eacute: essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de r&eacute;essayer
@@ -5898,6 +5947,7 @@ af: om 'n kind by te voeg by 'n familie, gebruik "%s"
 de: um ein Kind zu einer Familie zu hinzuzuf&uuml;gen, benutzen Sie "%s"
 dk: brug "%s" for at f&oslash;je et barn til en familie
 en: to add a child to a family, use "%s"
+eo: por aldoni infanon al familion, uzu "%s"
 es: para agregar un hijo a una familia, utiliza "%s"
 fi: lis&auml;t&auml;ksesi perheeseen lapsen k&auml;yt&auml; "%s"
 fr: pour ajouter un enfant &agrave; une famille, utiliser "%s"
@@ -6116,6 +6166,7 @@ af: boom
 de: Baum
 dk: tr&aelig;
 en: tree
+eo: arbo
 es: árbol
 fi: puu
 fr: arbre
@@ -6154,6 +6205,7 @@ cs: neznámá osoba
 de: unbekannte Person
 dk: ukendt person
 en: unknown person
+eo: nekonata persono
 es: persona desconocida
 fi: tuntematon henkil&ouml
 fr: personne inconnue
@@ -6273,6 +6325,7 @@ af: getuie by die troue van %s met %s
 de: Trauzeugen bei der Hochzeit von %s und %s
 dk: vidne ved brylluppet mellem %s og %s
 en: witness at marriage of %s and %s
+eo: atestant(in)o en edzigxo de %s kaj %s
 fi: %s ja %s avioliiton todistaja
 fr: t&eacute;moin au mariage de %s et de %s
 he:  àãéí áçúåðä ùì %s å-%s
@@ -6289,6 +6342,7 @@ af: getuie/getuies
 de: Trauzeuge/Trauzeugen
 dk: vidne/vidner
 en: witness/witnesses
+eo: atestanto:a:+n/atestantoj
 fi: todistaja/todistajat
 fr: t&eacute;moin/t&eacute;moins
 he:  àã/ àãéí
@@ -6325,6 +6379,7 @@ af: jaar/maand/dag
 de: Jahr/Monat/Tag
 dk: &aring;r/m&aring;ned/dag
 en: year/month/day
+eo: jaro/monato/tago
 es: a&ntilde;o/mes/dia
 fi: vuosi/kuukausi/p&auml;iv&auml
 fr: ann&eacute;e/mois/jour
@@ -6365,6 +6420,7 @@ cs: nejdøív musíte spojovat
 de: Sie m&uuml;ssen erst zusammenf&uuml;hren
 dk: du skal f&oslash;rst sammenl&aelig;gge
 en: you must first merge
+eo: vi devas unue fuzii
 es: antes Ud. debe fusionar
 fi: yhdist&auml ensin
 fr: vous devez d'abord fusionner
@@ -6384,6 +6440,7 @@ cs: nejdøív musíte spojit tyto dvì rodiny
 de: Sie m&uuml;ssen erst beide Familien zusammenf&uuml;hren
 dk: du skal f&oslash;rst sammenl&aelig;gge de 2 familier
 en: you must first merge the 2 families
+eo: vi devas unue fuzii la 2 familioj
 es: debe primero fusionar las 2 familias
 fi: yhdist&auml ensin molemmat perheet
 fr: vous devez d'abord fusionner les 2 familles

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.38 2000-07-07 12:11:08 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.39 2000-07-07 19:43:33 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title> Genealogio - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -189,9 +189,9 @@ Estis %q alirejoj kaj %c al cxi pagxo, ekde la %d.
 
 <p>
 
-{If your browser does not automatically update the modified pages (forcing you
-to do "reload current document"), try navigating from <a
-href="%sescache=0">this link</a>}.
+Se via navigisto ne auxtomate gxisdatigas la modificitajn pagxojn (vi
+deviganta fari "resxargi kurantan dokumenton"), eksperimentu ekde <a
+href="%sescache=0">cxi legilo</a>.
 
 </td></tr>
 </table>
