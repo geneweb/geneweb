@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 3.8 2001-01-06 09:55:57 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 3.9 2001-01-13 11:08:02 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -19,6 +19,27 @@ value merge_strings base is1 sep is2 =
   if is1 = is2 then sou base is1 else cat_strings base is1 sep is2
 ;
 
+value sorp base ip =
+  let p = poi base ip in
+  let first_name = p_first_name base p in
+  let surname = p_surname base p in
+  let occ =
+    if first_name = "?" || surname = "?" then Adef.int_of_iper p.cle_index
+    else p.occ
+  in
+  (sou base p.first_name, sou base p.surname, p.occ, Update.Link, "")
+;
+
+value merge_witnesses base wit1 wit2 =
+  let list =
+    List.fold_right
+      (fun wit list -> if List.mem wit list then list else [wit :: list])
+      (List.map (sorp base) (Array.to_list wit1))
+      (List.map (sorp base) (Array.to_list wit2))
+  in
+  Array.of_list list
+;
+
 value reconstitute conf base fam1 des1 fam2 des2 =
   let field name proj null =
     let x1 = proj fam1 in
@@ -34,7 +55,7 @@ value reconstitute conf base fam1 des1 fam2 des2 =
        field "marriage_place" (fun f -> sou base f.marriage_place) (\= "");
      marriage_src =
        merge_strings base fam1.marriage_src ", " fam2.marriage_src;
-     witnesses = [| |];
+     witnesses = merge_witnesses base fam1.witnesses fam2.witnesses;
      relation = field "relation" (fun f -> f.relation) (\= Married);
      divorce = field "divorce" (fun f -> f.divorce) (\= NotDivorced);
      comment = merge_strings base fam1.comment ", " fam2.comment;
