@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.22 2000-11-18 16:54:11 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.23 2000-11-25 18:53:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -621,7 +621,16 @@ value print_del_ok conf base wl =
     Wserver.wprint "%s" (capitale (transl conf "family deleted"))
   in
   do header conf title;
-     print_link_to_welcome conf False;
+     print_link_to_welcome conf True;
+     match p_getint conf.env "ip" with
+     [ Some i ->
+         let p = base.data.persons.get i in
+         tag "ul" begin
+           Wserver.wprint "<li>\n";
+           Wserver.wprint "%s\n"
+             (reference conf base p (person_text conf base p));
+         end
+     | _ -> () ];
      Update.print_warnings conf base wl;
      trailer conf;
   return ()
