@@ -1,5 +1,4 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<!-- saved from url=(0049)http://cristal.inria.fr/~ddr/GeneWeb/se/start.htm -->
 <HTML><HEAD><TITLE>GeneWeb - Komma igång</TITLE>
 <META content="text/html; charset=windows-1252" http-equiv=Content-Type>
 <META content="MSHTML 5.00.2014.210" name=GENERATOR></HEAD>
@@ -10,24 +9,16 @@ kortfattad beskrivning av kommandon och filer som behövs för att starta. </P>
 <UL>
   <LI><A 
   href="#Int">Introduktion</A> 
-  <LI><A href="#Gwc">Kommandot 
-  gwc</A> 
-  <LI><A href="#Ged">Kommandot 
-  ged2gwb</A> 
-  <LI><A href="#Gee">Kommandot 
-  gwb2ged</A> 
-  <LI><A href="#Gwd">Kommandot 
-  gwd</A> 
-  <LI><A href="#Csg">Kommandot 
-  consang</A> 
-  <LI><A href="#Gwu">Kommandot 
-  gwu</A> 
-  <LI><A href="#Cnf">Filen 
-  a.gwf</A> 
-  <LI><A href="#Lex">Katalogen 
-  "lang" - filen "lexicon.txt"</A> 
-  <LI><A href="#Lng">Katalogen 
-  "lang" - underkataloger</A> </LI></UL>
+  <LI><A href="#Gwc">Kommandot gwc</A>
+  <LI><A href="#Ged">Kommandot ged2gwb</A> 
+  <LI><A href="#Gee">Kommandot gwb2ged</A> 
+  <LI><A href="#Gwd">Kommandot gwd</A> 
+  <LI><A href="#Csg">Kommandot consang</A> 
+  <LI><A href="#Gwu">Kommandot gwu</A> 
+  <LI><A href="#Cnf">Filen a.gwf</A> 
+  <LI><A href="#Lex">Katalogen "lang" - filen "lexicon.txt"</A> 
+  <LI><A href="#Lng">Katalogen "lang" - underkataloger</A> </LI></UL>
+
 <H4><A name=Int>Introduktion</A> </H4>
 <P>För att konfigurera och starta <EM>GeneWeb</EM>, måste du använda ett DOS 
 fönster. Under Unix, starta ett xterm. Under Windows 95/98/NT, klicka på 
@@ -44,45 +35,55 @@ installerade <EM>GeneWeb</EM>: </P>
 </PRE>Gå sedan till underkatalogen gw, genoim att skriva: <PRE>     	cd gw
 </PRE>
 <P>Alla <EM>GeneWeb</EM> kommandon kan startas med optionen -help som visar 
-olika möjliga optioner, med en kort förklaring. </P>
-<P>Till exempel, om du skriver: </P><PRE>     gwd -help</PRE>
-<P>ska du se detta: </P>
-<PRE>	Usage: gwd [options] where options are:
-  -hd <dir>
+olika möjliga optioner, med en kort förklaring.
+<P>
+
+Till exempel, om du skriver:<PRE>     gwd -help</PRE>
+<P>ska du se detta: 
+
+<PRE>
+Usage: gwd [options] where options are:
+  -hd [dir]
        Directory where the directory lang is installed.
-  -dd dir>
+  -dd [dir]
        Directory where the documentation is installed.
-  -bd dir>
+  -bd [dir]
        Directory where the databases are installed.
   -cgi
        Force cgi mode.
-  -p <number>
+  -p [number]
        Select a port number (default = 2317); > 1024 for normal users.
-  -wizard <passwd>
+  -wizard [passwd]
        Set a wizard password: access to all dates and updating.
-  -friend <passwd>
+  -friend [passwd]
        Set a friend password: access to all dates.
-  -lang <lang>
+  -lang [lang]
        Set a default language (default: fr).
-  -only <address>
+  -only [address]
        Only inet address accepted.
-  -auth <file>
+  -auth [file]
        Authorization file to restrict access. The file must hold lines
        of the form "user:password".
-  -log <file>
+  -log [file]
        Redirect log trace to this file.
-  -robot_xcl <cnt>,<sec>
+  -robot_xcl [cnt],[sec]
        Exclude connections when more than <cnt> requests in <sec> seconds.
-  -redirect <addr>
+  -redirect [addr]
        Send a message to say that this service has been redirected to <addr>
   -nolock
        Do not lock files before writing.
 </PRE>
-<P>Några kommandon skriver ut text. Du kan dirigera om utmatningen till en fil 
+
+<P>
+
+Några kommandon skriver ut text. Du kan dirigera om utmatningen till en fil 
 genom att avsluta kommandot med "&gt;&nbsp;fil". Exempel: </P><PRE>     gwd -help &gt; foo.txt</PRE><EM>
 <P>GeneWeb</EM> databaser är kataloger med filändelsen ".gwb". </P>
 <H4>K<A name=Gwc>ommandot gwc</A> </H4>
-<P>För att använda <EM>GeneWeb</EM>, måste du skapa en databas. Du kan göra det 
+
+<P>
+
+För att använda <EM>GeneWeb</EM>, måste du skapa en databas. Du kan göra det 
 antingen med kommandot "gwc", eller med "ged2gwb", (se nedan). </P>
 <P>Kommandot "gwc", i dess enklaste utförande, skapar en tom databas i 
 <EM>GeneWeb</EM>, som du kan fylla. </P>
@@ -151,7 +152,7 @@ visar sig: "hela listan". Välj ett efternamn, sedan en person etc. </P></DIR>
 <DIR>
 <P>Det enda möjliga att göra är att skapa personer och familjer. Klicka på "Lägg 
 till familj". Hur du gör det kan du se <A 
-href="#AddF">här</A>. 
+href="update.htm#AddF">här</A>. 
 </P></DIR>
 <P>Under tiden, kan du notera att varje gång du klickar på en knapp eller en 
 länk, visas en textrad i DOS fönstret. När du startar din <EM>GeneWeb </EM><A 
@@ -251,11 +252,11 @@ genom att klicka på flaggorna högst upp på sidan. </P></DIR>
 <UL><B>
   <LI>can_send_image</B> gör det möjligt för "wizards" att skicka foton (och 
   radera). I detta fall i <A 
-  href="#MAJ">uppdaterings</A> 
+  href="update.htm#MAJ">uppdaterings</A> 
   processen, kan de klicka på en länk benämnd <A 
-  href="#SndP">skicka foto</A> 
+  href="update.htm#SndP">skicka foto</A> 
   (ibland även en benämnd <A 
-  href="#DelPh">ta bort 
+  href="update.htm#DelPh">ta bort 
   foto</A>). Det är förvalt "no" (ingen behörighet att skicka foton), för att 
   tillåta det skriv "yes". 
   <P>Varning: fotona lagras på din dator och kan uppta mycket plats på 
