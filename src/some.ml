@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.6 1999-06-26 10:23:18 ddr Exp $ *)
+(* $Id: some.ml,v 2.7 1999-07-09 10:25:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -132,6 +132,7 @@ value first_name_print_list conf base xl liste =
     return ()
   in
   do header conf title;
+     print_link_to_welcome conf True;
      print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)
        (print_elem conf base True) liste;
      trailer conf;
@@ -300,6 +301,7 @@ value rec print_by_branch x conf base (ipl, homonymes) =
       return ()
     in
     do header conf title;
+       print_link_to_welcome conf True;
        Wserver.wprint "<font size=-1><em>\n";
        Wserver.wprint "%s " (capitale (transl conf "click"));
        Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
@@ -354,6 +356,7 @@ value print_family_alphabetic x conf base liste =
   | _ ->
       let title _ = Wserver.wprint "%s" (coa conf x) in
       do header conf title;
+         print_link_to_welcome conf True;
          print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)
            (print_elem conf base False) liste;
          trailer conf;
