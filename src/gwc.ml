@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.13 2001-01-06 09:55:54 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.14 2001-01-07 23:22:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -221,7 +221,7 @@ value find_first_available_occ gen fn sn occ =
 ;
 
 value insert_undefined gen key =
-  let occ = key.pk_occ in
+  let occ = key.pk_occ + gen.g_shift in
   let x =
     try
       if key.pk_first_name = "?" || key.pk_surname = "?" then raise Not_found
@@ -277,7 +277,7 @@ value insert_undefined gen key =
 ;
 
 value insert_person gen so =
-  let occ = so.occ in
+  let occ = so.occ + gen.g_shift in
   let x =
     try
       if so.first_name = "?" || so.surname = "?" then raise Not_found
@@ -478,7 +478,7 @@ value insert_family gen co witl fo deo =
 ;
 
 value insert_notes fname gen key str =
-  let occ = key.pk_occ in
+  let occ = key.pk_occ + gen.g_shift in
   match
     try
       Some (find_person_by_name gen key.pk_first_name key.pk_surname occ)
@@ -557,10 +557,11 @@ value insert_syntax fname gen =
   | Bnotes str -> insert_bnotes fname gen str ]
 ;
 
-value insert_comp_families gen (x, separate) =
+value insert_comp_families gen (x, separate, shift) =
   let ic = open_in_bin x in
   do check_magic x ic;
      gen.g_separate := separate;
+     gen.g_shift := shift;
      Mhashtbl.clear gen.g_local_names;
   return
   let src : string = input_value ic in
@@ -691,7 +692,7 @@ value link gwo_list =
      g_local_names = Mhashtbl.create 20011;
      g_pcnt = 0; g_fcnt = 0; g_scnt = 0;
      g_base = empty_base;
-     g_def = [| |]; g_separate = False; g_errored = False}
+     g_def = [| |]; g_separate = False; g_shift = 0; g_errored = False}
   in
   let _ = unique_string gen "" in
   do List.iter (insert_comp_families gen) gwo_list; return
@@ -723,6 +724,7 @@ value output_command_line bname =
 ;
 
 value separate = ref False;
+value shift = ref 0;
 value files = ref [];
 
 value speclist =
@@ -734,6 +736,8 @@ value speclist =
    ("-nc", Arg.Clear do_check, "No consistency check");
    ("-cg", Arg.Set do_consang, "Compute consanguinity");
    ("-sep", Arg.Set separate, " Separate all persons in next file");
+   ("-sh", Arg.Int (fun x -> shift.val := x),
+    "<int> Shift all persons numbers in next files");
    ("-mem", Arg.Set Iobase.save_mem, " Save memory, but slower");
    ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
 ;
@@ -744,7 +748,7 @@ value anonfun x =
      else if Filename.check_suffix x ".gwo" then ()
      else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\""));
      separate.val := False;
-  return files.val := [(x, sep) :: files.val]
+  return files.val := [(x, sep, shift.val) :: files.val]
 ;
 
 value errmsg =
@@ -767,15 +771,15 @@ value main () =
   return
   let gwo = ref [] in
   do List.iter
-       (fun (x, separate) ->
+       (fun (x, separate, shift) ->
           if Filename.check_suffix x ".gw" then
             do try Gwcomp.comp_families x with e ->
                  do Printf.printf "File \"%s\", line %d:\n" x line_cnt.val;
                  return raise e;
-               gwo.val := [(x ^ "o", separate) :: gwo.val];
+               gwo.val := [(x ^ "o", separate, shift) :: gwo.val];
             return ()
           else if Filename.check_suffix x ".gwo" then
-            gwo.val := [(x, separate) :: gwo.val]
+            gwo.val := [(x, separate, shift) :: gwo.val]
           else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
        (List.rev files.val);
      if not just_comp.val then
