@@ -1,11 +1,11 @@
-(* $Id: alln.ml,v 1.2 1998-09-30 07:29:22 ddr Exp $ *)
+(* $Id: alln.ml,v 1.3 1998-11-21 10:54:08 ddr Exp $ *)
 
 open Def;
 open Config;
 open Util;
 open Gutil;
 
-value print_menu mode conf senv base is_fam liste len par_frequence =
+value print_menu mode conf base is_fam liste len par_frequence =
   let titre _ =
     do if is_fam then
          Wserver.wprint (fcapitale (ftransl conf "the %d surnames")) len
@@ -29,8 +29,8 @@ value print_menu mode conf senv base is_fam liste len par_frequence =
                  let t =
                    if par_frequence then string_of_int c else String.make 1 i
                  in
-                 Wserver.wprint "<a href=\"%sm=%s%s;tri=%s;k=%s\">%s</a>\n"
-                   (commd conf) mode senv (if par_frequence then "F" else "A")
+                 Wserver.wprint "<a href=\"%sm=%s;tri=%s;k=%s\">%s</a>\n"
+                   (commd conf) mode (if par_frequence then "F" else "A")
                    t t
                else ();
             return Some (i, c))
@@ -38,15 +38,15 @@ value print_menu mode conf senv base is_fam liste len par_frequence =
      in
      ();
      if p_getenv conf.env "k" <> Some "" then
-       Wserver.wprint "<p>\n<a href=\"%sm=%s%s;tri=%s;k=\">%s</a>\n"
-         (commd conf) mode senv (if par_frequence then "F" else "A")
+       Wserver.wprint "<p>\n<a href=\"%sm=%s;tri=%s;k=\">%s</a>\n"
+         (commd conf) mode (if par_frequence then "F" else "A")
          (capitale (transl conf "the whole list"))
      else ();
      trailer conf;
   return ()
 ;
 
-value print_all mode conf senv base is_fam liste len par_frequence =
+value print_all mode conf base is_fam liste len par_frequence =
   let title _ =
     do if is_fam then
          Wserver.wprint (fcapitale (ftransl conf "the %d surnames")) len
@@ -64,8 +64,8 @@ value print_all mode conf senv base is_fam liste len par_frequence =
           else String.sub x (initiale x) 1)
        (fun (x, c, istr) ->
           let x = coa conf x in
-          do Wserver.wprint "<a href=\"%sm=%s%s;v=%s\">" (commd conf) mode
-               senv (code_varenv (sou base istr));
+          do Wserver.wprint "<a href=\"%sm=%s;v=%s\">" (commd conf) mode
+               (code_varenv (sou base istr));
              Wserver.wprint "%s</a>%s\n"
                (if is_fam then surname_end x ^ surname_begin x else x)
                (if par_frequence then "" else " (" ^ string_of_int c ^ ")");
@@ -75,8 +75,8 @@ value print_all mode conf senv base is_fam liste len par_frequence =
   return ()
 ;
 
-value print_elem mode conf base senv is_fam par_frequence (x, c, istr) =
-  do Wserver.wprint "<a href=\"%sm=%s%s;" (commd conf) mode senv;
+value print_elem mode conf base is_fam par_frequence (x, c, istr) =
+  do Wserver.wprint "<a href=\"%sm=%s;" (commd conf) mode;
      Wserver.wprint "v=%s" (code_varenv (sou base istr));
      Wserver.wprint "\">";
      if is_fam then
@@ -89,7 +89,7 @@ value print_elem mode conf base senv is_fam par_frequence (x, c, istr) =
   return ()
 ;
 
-value print_frequence mode conf senv base is_fam liste len f =
+value print_frequence mode conf base is_fam liste len f =
   let liste =
     List.fold_right
       (fun (x, c, ip) liste ->
@@ -108,7 +108,7 @@ value print_frequence mode conf senv base is_fam liste len f =
   in
   do header conf title;
      print_alphab_list (fun (x, _, _) -> String.sub x (initiale x) 1)
-       (print_elem mode conf base senv is_fam True) liste;
+       (print_elem mode conf base is_fam True) liste;
      trailer conf;
   return ()
 ;
@@ -119,7 +119,7 @@ value rec same_initial s1 i1 s2 i2 =
   else False
 ;
 
-value print_alphab mode conf senv base is_fam liste len l =
+value print_alphab mode conf base is_fam liste len l =
   let liste =
     List.fold_right
       (fun (x, c, ip) liste ->
@@ -141,7 +141,7 @@ value print_alphab mode conf senv base is_fam liste len l =
        (fun (e, _, _) ->
           let i = initiale e in
           String.sub e i (min crit_len (String.length e - i)))
-       (print_elem mode conf base senv is_fam False) liste;
+       (print_elem mode conf base is_fam False) liste;
      trailer conf;
   return ()
 ;
@@ -184,17 +184,16 @@ value afficher_tous_x proj mode is_fam conf base =
     Sort.list tri liste.val
   in
   let len = List.length liste in
-  let senv = if conf.senv = "" then "" else ";e=" ^ conf.senv in
   if len >= 50 && p_getenv conf.env "k" <> Some "" then
     if par_frequence then
       match p_getint conf.env "k" with
-      [ Some f -> print_frequence mode conf senv base is_fam liste len f
-      | _ -> print_menu mode conf senv base is_fam liste len par_frequence ]
+      [ Some f -> print_frequence mode conf base is_fam liste len f
+      | _ -> print_menu mode conf base is_fam liste len par_frequence ]
     else
       match p_getenv conf.env "k" with
-      [ Some x -> print_alphab mode conf senv base is_fam liste len x
-      | _ -> print_menu mode conf senv base is_fam liste len par_frequence ]
-  else print_all mode conf senv base is_fam liste len par_frequence
+      [ Some x -> print_alphab mode conf base is_fam liste len x
+      | _ -> print_menu mode conf base is_fam liste len par_frequence ]
+  else print_all mode conf base is_fam liste len par_frequence
 ;
 
 value first_alphabetique =

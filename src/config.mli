@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 1.2 1998-09-29 16:12:15 ddr Exp $ *)
+(* $Id: config.mli,v 1.3 1998-11-21 10:54:09 ddr Exp $ *)
 
 open Def;
 
@@ -10,7 +10,7 @@ type config =
     lang : string;
     bname : string;
     env : list (string * string);
-    senv : mutable string;
+    senv : mutable list (string * string);
     henv : mutable list (string * string);
     base_env : list (string * string);
     request : list string;

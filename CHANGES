@@ -13,7 +13,7 @@ GeneWeb Version 1.09
   - Change in request syntax "relation... with..." to allow to specify
     explicit first names and surnames instead of i=.
     Ex:
-     old syntax (still compatible)
+     old syntax (still there for compatibility during some versions)
        base?e=m%3DR%3Bi%3D31440&m=NG&n=somebody&t=PN
      new syntax:
        base?em=R;ei=31440&m=NG&n=somebody&t=PN

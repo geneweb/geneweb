@@ -1,4 +1,4 @@
-(* $Id: util.ml,v 1.11 1998-11-10 10:24:13 ddr Exp $ *)
+(* $Id: util.ml,v 1.12 1998-11-21 10:54:13 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -59,7 +59,7 @@ value commd conf =
   let c = conf.command ^ "?" in
   List.fold_left
     (fun c (k, v) -> c ^ k ^ (if v = "" then "" else "=" ^ v) ^ ";") c
-    conf.henv
+    (conf.henv @ conf.senv)
 ;
 
 value code_varenv = Wserver.encode;
@@ -155,8 +155,7 @@ value acces_pur conf base x =
 ;
 
 value acces conf base x =
-  let r = acces_pur conf base x in
-  if conf.senv = "" then r else "e=" ^ conf.senv ^ ";" ^ r
+  acces_pur conf base x
 ;
 
 value calculer_age conf p =

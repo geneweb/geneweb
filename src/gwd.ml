@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: gwd.ml,v 1.10 1998-11-11 15:33:30 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.11 1998-11-21 10:54:10 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -342,7 +342,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      lang = if lang = "" then default_lang else lang;
      bname = base_file;
      env = env;
-     senv = "";
+     senv = [];
      henv =
        (if not cgi then []
         else if passwd = "" then [("b", base_file)]

@@ -1,4 +1,4 @@
-(* $Id: relation.ml,v 1.5 1998-11-20 19:11:11 ddr Exp $ *)
+(* $Id: relation.ml,v 1.6 1998-11-21 10:54:11 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -300,7 +300,7 @@ value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 value print_main_relationship conf base p1 p2 =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
   if p1.cle_index == p2.cle_index then
-    do header conf title; conf.senv := "";
+    do header conf title; conf.senv := [];
        Wserver.wprint "%s\n" (capitale (transl conf "it is the same person!"));
        trailer conf;
     return ()
@@ -313,7 +313,7 @@ value print_main_relationship conf base p1 p2 =
     in
     if ancestors = [] then
       do header conf title;
-         conf.senv := "";
+         conf.senv := [];
          Wserver.wprint
            (fcapitale
               (ftransl conf
@@ -369,7 +369,7 @@ value print_main_relationship conf base p1 p2 =
       in
       let a1 = aoi base p1.cle_index in
       let a2 = aoi base p2.cle_index in
-      do header conf title; conf.senv := "";
+      do header conf title; conf.senv := [];
          let _ =
            List.fold_left
              (fun i sol ->
@@ -410,9 +410,9 @@ value print_base_loop conf base =
   return ()
 ;
 
-value print conf senv base p =
+value print conf base p =
   try
-    match p_getint senv "i" with
+    match p_getint conf.senv "ei" with
     [ Some i -> print_main_relationship conf base (base.persons.get i) p
     | _ ->
         match find_person_in_env conf base "1" with
