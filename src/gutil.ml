@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.17 1999-07-21 17:36:29 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.18 1999-07-21 17:47:57 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -78,8 +78,6 @@ value nominative s =
   [ Some _ -> decline 'n' s
   | _ -> s ]
 ;
-
-value sou base i = nominative (base.data.strings.get (Adef.int_of_istr i));
 
 value leap_year a =
   if a mod 100 == 0 then a / 100 mod 4 == 0 else a mod 4 == 0
