@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.25 2001-01-06 09:55:54 ddr Exp $ *)
+(* $Id: descend.ml,v 3.26 2001-01-13 04:12:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
+open Dag2html;
 
 value limit_desc conf =
   match p_getint conf.base_env "max_desc_level" with
@@ -1015,162 +1016,172 @@ value print_tree conf base gv p =
       List.fold_left (fun n iper -> nb_column n (v - 1) (uoi base iper)) n
         (Array.to_list des.children)
   in
-  let print_vertical_bar v first po =
-    do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
-       match po with
-       [ Some (_, u, _) ->
-           let ncol = nb_column 0 (v - 1) u in
-           stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
-             Wserver.wprint "|";
-           end
-       | None -> Wserver.wprint "<td>&nbsp;</td>" ];
-       Wserver.wprint "\n";
-    return ()
+  let vertical_bar_txt v tdl po =
+    let tdl =
+      if tdl = [] then []
+      else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+    in
+    let td =
+      match po with
+      [ Some (_, u, _) ->
+          let ncol = nb_column 0 (v - 1) u in
+          (2 * ncol - 1, CenterA, TDstring "|")
+      | None -> (1, LeftA, TDstring "&nbsp;") ]
+    in
+    [td :: tdl]
   in
   let children_vertical_bars v gen =
-    tag "tr" begin list_iter_first (print_vertical_bar v) gen; end
+    let tdl = List.fold_left (vertical_bar_txt v) [] gen in
+    Array.of_list (List.rev tdl)
   in
-  let print_spouses_vertical_bar v first po =
-    do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
-       match po with
-       [ Some (p, u, _) when Array.length u.family > 0 ->
-           list_iter_first
-             (fun first ifam ->
-                do if not first then Wserver.wprint "<td>&nbsp;</td>\n"
-                   else ();
-                   let des = doi base ifam in
-                   if Array.length des.children = 0 then
-                     Wserver.wprint "<td>&nbsp;</td>"
-                   else
-                     let ncol = fam_nb_column 0 (v - 1) des in
-                     stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
-                       Wserver.wprint "|";
-                     end;
-                   Wserver.wprint "\n";
-                return ())
-             (Array.to_list u.family)
-       | _ -> Wserver.wprint "<td>&nbsp;</td>\n" ];
-    return ()
+  let spouses_vertical_bar_txt v tdl po =
+    let tdl =
+      if tdl = [] then []
+      else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+    in
+    match po with
+    [ Some (p, u, _) when Array.length u.family > 0 ->
+        fst (List.fold_left
+          (fun (tdl, first) ifam ->
+             let tdl =
+               if first then tdl
+               else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+             in
+             let des = doi base ifam in
+             let td =
+               if Array.length des.children = 0 then
+                 (1, LeftA, TDstring "&nbsp;")
+               else
+                 let ncol = fam_nb_column 0 (v - 1) des in
+                 (2 * ncol - 1, CenterA, TDstring "|")
+             in
+             ([td :: tdl], False))
+          (tdl, True) (Array.to_list u.family))
+    | _ -> [(1, LeftA, TDstring "&nbsp;") :: tdl] ]
   in
   let spouses_vertical_bar v gen =
-    tag "tr" begin list_iter_first (print_spouses_vertical_bar v) gen; end
+    let tdl = List.fold_left (spouses_vertical_bar_txt v) [] gen in
+    Array.of_list (List.rev tdl)
   in
-  let print_horizontal_bar v first po =
-    do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
-       match po with
-       [ Some (p, u, _) when Array.length u.family > 0 ->
-           list_iter_first
-             (fun first ifam ->
-                do if not first then Wserver.wprint "<td>&nbsp;</td>\n"
-                   else ();
-                   let des = doi base ifam in
-                   if Array.length des.children = 0 then
-                     Wserver.wprint "<td>&nbsp;</td>\n"
-                   else if Array.length des.children = 1 then
-                     let u = uoi base des.children.(0) in
-                     let ncol = nb_column 0 (v - 1) u in
-                     Wserver.wprint "<td colspan=%d align=center>|</td>\n"
-                       (2 * ncol - 1)
+  let horizontal_bar_txt v tdl po =
+    let tdl =
+      if tdl = [] then []
+      else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+    in
+    match po with
+    [ Some (p, u, _) when Array.length u.family > 0 ->
+        fst (List.fold_left
+          (fun (tdl, first) ifam ->
+             let tdl =
+               if first then tdl
+               else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+             in
+             let des = doi base ifam in
+             let tdl =
+               if Array.length des.children = 0 then
+                 [(1, LeftA, TDstring "&nbsp;") :: tdl]
+               else if Array.length des.children = 1 then
+                 let u = uoi base des.children.(0) in
+                 let ncol = nb_column 0 (v - 1) u in
+                 [(2 * ncol - 1, CenterA, TDstring "|") ::
+                  tdl]
+               else
+                 loop tdl 0 where rec loop tdl i =
+                   if i = Array.length des.children then tdl
                    else
-                     Array.iteri
-                       (fun i iper ->
-                          let u = uoi base iper in
-                          do if i > 0 then
-                               Wserver.wprint
-                                 "<td><hr noshade size=1></td>\n"
-                             else ();
-                             let ncol = nb_column 0 (v - 1) u in
-                             let align =
-                               if i == 0 then " align=right"
-                               else if i == Array.length des.children - 1
-                               then " align=left"
-                               else ""
-                             in
-                             stag "td" "colspan=%d%s" (2 * ncol - 1) align
-                             begin
-                               Wserver.wprint "<hr noshade size=1%s%s>"
-                                 (if i = 0
-                                  || i == Array.length des.children - 1 then
-                                    " width=50%"
-                                  else "")
-                                 align;
-                             end;
-                             Wserver.wprint "\n";
-                          return ())
-                       des.children;
-                return ())
-             (Array.to_list u.family)
-       | _ -> Wserver.wprint "<td>&nbsp;</td>\n" ];
-    return ()
+                     let iper = des.children.(i) in
+                     let u = uoi base iper in
+                     let tdl =
+                       if i > 0 then
+                         let align = CenterA in
+                         [(1, align, TDhr align) :: tdl]
+                       else tdl
+                     in
+                     let ncol = nb_column 0 (v - 1) u in
+                     let align =
+                       if i == 0 then RightA
+                       else if i == Array.length des.children - 1
+                         then LeftA
+                       else CenterA
+                     in
+                     let td = (2 * ncol - 1, align, TDhr align) in
+                     loop [td :: tdl] (i + 1)
+             in
+             (tdl, False))
+          (tdl, True) (Array.to_list u.family))
+    | _ -> [(1, LeftA, TDstring "&nbsp;") :: tdl] ]
   in
   let horizontal_bars v gen =
-    tag "tr" begin list_iter_first (print_horizontal_bar v) gen; end
+    let tdl = List.fold_left (horizontal_bar_txt v) [] gen in
+    Array.of_list (List.rev tdl)
   in
-  let print_person v first po =
-    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
-       match po with
-       [ Some (p, u, auth) ->
-           let ncol = nb_column 0 (v - 1) u in
-           let txt =
-             if v = 1 then person_text_without_surname conf base p
-             else person_title_text conf base p
-           in
-           let txt = no_spaces gv txt in
-           let txt = reference conf base p txt in
-           let txt =
-             if auth && v == 1 then txt ^ Date.short_dates_text conf base p
-             else if auth then txt ^ short_dates_text gv conf base p
-             else txt
-           in
-           tag "td" "colspan=%d align=center valign=top" (2 * ncol - 1)
-           begin
-             Wserver.wprint "%s\n" txt;
-             Wserver.wprint "%s" (Dag.image_txt conf base p);
-           end
-       | None -> Wserver.wprint "<td>&nbsp;</td>\n" ];
-    return ()
+  let person_txt v tdl po =
+    let tdl =
+      if tdl = [] then []
+      else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+    in
+    let td =
+      match po with
+      [ Some (p, u, auth) ->
+          let ncol = nb_column 0 (v - 1) u in
+          let txt =
+            if v = 1 then person_text_without_surname conf base p
+            else person_title_text conf base p
+          in
+          let txt = no_spaces gv txt in
+          let txt = reference conf base p txt in
+          let txt =
+            if auth && v == 1 then txt ^ Date.short_dates_text conf base p
+            else if auth then txt ^ short_dates_text gv conf base p
+            else txt
+          in
+          (2 * ncol - 1, CenterA,
+           TDstring (txt ^ Dag.image_txt conf base p))
+       | None -> (1, LeftA, TDstring "&nbsp;") ]
+    in
+    [td :: tdl]
   in
-  let print_spouses v first po =
-    do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
-       match po with
-       [ Some (p, u, auth) when Array.length u.family > 0 ->
-           Array.iteri
-             (fun i ifam ->
-                do if i > 0 then Wserver.wprint "<td valign=top>...</td>\n"
-                   else ();
-                   let fam = foi base ifam in
-                   let des = doi base ifam in
-                   let ncol = fam_nb_column 0 (v - 1) des in
-                   stag "td"
-                     "colspan=%d align=center valign=top" (2 * ncol - 1)
-                   begin
-                     let sp = poi base (spouse p.cle_index (coi base ifam)) in
-                     let txt = person_title_text conf base sp in
-                     let txt = no_spaces gv txt in
-                     let txt = reference conf base sp txt in
-                     let txt =
-                       if auth then txt ^ short_dates_text gv conf base sp
-                       else txt
-                     in
-                     do Wserver.wprint "&amp;%s&nbsp;%s\n"
-                          (if auth then
-                             short_marriage_date_text gv conf base fam p sp
-                           else "")
-                          txt;
-                        Wserver.wprint "%s" (Dag.image_txt conf base sp);
-                     return ();
-                   end;
-                   Wserver.wprint "\n";
-                return ())
-             u.family
-       | _ -> Wserver.wprint "<td>&nbsp;</td>\n" ];
-    return ()
+  let spouses_txt v tdl po =
+    let tdl =
+      if tdl = [] then [] else [(1, LeftA, TDstring "&nbsp;") :: tdl]
+    in
+    match po with
+    [ Some (p, u, auth) when Array.length u.family > 0 ->
+        loop tdl 0 where rec loop tdl i =
+          if i = Array.length u.family then tdl
+          else
+            let ifam = u.family.(i) in
+            let tdl =
+              if i > 0 then [(1, LeftA, TDstring "...") :: tdl] else tdl
+            in
+            let td =
+              let fam = foi base ifam in
+              let des = doi base ifam in
+              let ncol = fam_nb_column 0 (v - 1) des in
+              let s =
+                let sp = poi base (spouse p.cle_index (coi base ifam)) in
+                let txt = person_title_text conf base sp in
+                let txt = no_spaces gv txt in
+                let txt = reference conf base sp txt in
+                let txt =
+                  if auth then txt ^ short_dates_text gv conf base sp
+                  else txt
+                in
+                "&amp;" ^
+                (if auth then short_marriage_date_text gv conf base fam p sp
+                 else "") ^
+                "&nbsp;" ^ txt ^ Dag.image_txt conf base sp
+              in
+              (2 * ncol - 1, CenterA, TDstring s)
+            in
+            loop [td :: tdl] (i + 1)
+    | _ -> [(1, LeftA, TDstring "&nbsp;") :: tdl] ]
   in
   let next_gen gen =
     List.fold_right
       (fun po gen ->
          match po with
-         [ Some (p, u, _) ->
+         [ Some (p, u, auth) ->
              if Array.length u.family = 0 then [None :: gen]
              else
                List.fold_right
@@ -1192,29 +1203,31 @@ value print_tree conf base gv p =
          | None -> [None :: gen] ])
       gen []
   in
+  let hts =
+    let tdal =
+      loop [] [] [Some (p, uoi base p.cle_index, True)] (gv + 1)
+      where rec loop tdal prev_gen gen v =
+        let tdal =
+          if prev_gen <> [] then
+            [children_vertical_bars v gen;
+             horizontal_bars v prev_gen;
+             spouses_vertical_bar (v + 1) prev_gen :: tdal]
+          else tdal
+        in
+        let tdal =
+          let tdl = List.fold_left (person_txt v) [] gen in
+          [Array.of_list (List.rev tdl) :: tdal]
+        in
+        if v > 1 then
+          let tdl = List.fold_left (spouses_txt v) [] gen in
+          let tdal = [Array.of_list (List.rev tdl) :: tdal] in
+          loop tdal gen (next_gen gen) (v - 1)
+        else tdal
+    in
+    Array.of_list (List.rev tdal)
+  in
   do header_no_page_title conf title;
-     tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
-       conf.border
-     begin
-       loop [] [Some (p, uoi base p.cle_index, True)] (gv + 1)
-       where rec loop prev_gen gen v =
-         do if prev_gen <> [] then
-              do spouses_vertical_bar (v + 1) prev_gen;
-                 horizontal_bars v prev_gen;
-                 children_vertical_bars v gen;
-              return ()
-            else ();
-            tag "tr" begin
-              list_iter_first (print_person v) gen;
-            end;
-         return
-         if v > 1 then
-           do tag "tr" begin
-               list_iter_first (print_spouses v) gen;
-              end;
-           return loop gen (next_gen gen) (v - 1)
-         else ();
-     end;
+     Dag.print_html_table conf hts;
      trailer conf;
   return ()
 ;

@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.39 2001-01-11 02:13:30 ddr Exp $ *)
+(* $Id: dag.ml,v 3.40 2001-01-13 04:12:15 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -312,6 +312,10 @@ value displayed_end_word s di i =
 
 value displayed_strip s sz =
   loop [] 0 0 0 where rec loop strl dibeg di i =
+    let i =
+      loop i where rec loop i =
+        if i < String.length s && s.[i] = ' ' then loop (i + 1) else i
+    in
     let (dj, j) = displayed_end_word s di i in
     match j with
     [ Some j ->
@@ -440,8 +444,9 @@ value strip_troublemakers s =
               else loop (j + 1)
           in
           let len =
-            if tag_name = "br" || tag_name = "font" then len
-            else buff_store_int s len i j
+            match tag_name with
+            [ "br" | "font" | "img" | "table" | "td" | "tr" | "center" -> len
+            | _ -> buff_store_int s len i j ]
           in
           loop len j
       | '\n' | '\r' -> loop (Buff.store len ' ') (i + 1)
@@ -490,11 +495,13 @@ do for i = 0 to ncol - 1 do
    Wserver.wprint " = %d(%d) -> %d<br>\n" tcol tmincol dcol;
 return
 *)
-  do for i = 0 to ncol - 1 do
-       colsz.(i) :=
-         colminsz.(i)
-         + (colsz.(i) - colminsz.(i)) * (dcol - tmincol) / (tcol - tmincol);
-     done;
+  do if tcol > tmincol then
+       for i = 0 to ncol - 1 do
+         colsz.(i) :=
+           colminsz.(i)
+           + (colsz.(i) - colminsz.(i)) * (dcol - tmincol) / (tcol - tmincol);
+       done
+     else ();
   return
 (*
 do for i = 0 to ncol - 1 do
