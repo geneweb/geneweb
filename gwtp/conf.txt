@@ -2,7 +2,7 @@
 <body>
 <h1 align=center>Gwtp - configuration %b</h1>
 
-<form method=POST action=gwtp>
+<form method=POST action="%s">
 <input type=hidden name=m value=SCNF>
 <input type=hidden name=b value=%b>
 <input type=hidden name=t value=%t>

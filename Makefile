@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.11 2000-08-18 15:31:05 ddr Exp $
+# $Id: Makefile,v 3.12 2000-08-22 12:09:31 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -75,6 +75,8 @@ classical_distrib:
 	cp ged2gwb/ged2gwb distribution/ged2gwb$(EXE)
 	cp gwb2ged/gwb2ged distribution/gwb2ged$(EXE)
 	cp gwtp/gwtp.opt distribution/gwtp$(EXE)
+	mkdir distribution/gwtp_tmp
+	cp gwtp/*.txt distribution/gwtp_tmp/.
 	cp etc/LISEZMOI.txt distribution/.
 	cp etc/README.txt distribution/.
 	cp etc/INSTALL.htm distribution/.
