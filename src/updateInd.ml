@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.1 1999-03-08 11:19:24 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.2 1999-03-17 14:11:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -225,13 +225,24 @@ value print_bapt_date conf base p =
   Update.print_date conf base (capitale (transl conf "date")) "bapt" d
 ;
 
+value birth_is_empty base p =
+  match Adef.od_of_codate p.birth with
+  [ Some _ -> False
+  | None -> True ]
+;
+
 value print_death_type conf base p =
+  let be = birth_is_empty base p in
   tag "select" "name=death" begin
+    if be && p.death = DontKnowIfDead then
+      Wserver.wprint "<option value=Auto selected> -\n"
+    else ();
     Wserver.wprint "<option value=NotDead%s>"
       (match p.death with [ NotDead -> " selected" | _ -> "" ]);
     Wserver.wprint "%s\n" (capitale (transl_nth conf "not dead" 2));
     Wserver.wprint "<option value=DontKnowIfDead%s>"
-      (match p.death with [ DontKnowIfDead -> " selected" | _ -> "" ]);
+      (if be then ""
+       else match p.death with [ DontKnowIfDead -> " selected" | _ -> "" ]);
     Wserver.wprint "%s\n" (capitale (transl conf "don't know"));
     Wserver.wprint "<option value=Death%s>"
       (match p.death with
