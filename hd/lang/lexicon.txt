@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.167 2003-12-16 07:45:34 ddr Exp $
+# $Id: lexicon.txt,v 4.168 2003-12-16 12:46:18 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2184,6 +2184,8 @@ zh:  出生于今日的记录
 da: ramme
 en: border
 fr: bordure
+pl: granica 
+pt: borda
 
     born
 af: gebore
@@ -2635,6 +2637,8 @@ da: farve
 en: colour
 en-us: color
 fr: couleur
+pl: kolor
+pt: c魊
 
     comment
 af: kommentaar
@@ -6543,9 +6547,10 @@ ru: 镳铉忤
 sl: oznaka
 sv: smeknamn
 
-    rap
-en: rap
+    rape
+en: rape
 fr: viol
+pt: viola玢o
 
     recognized son/recognized daughter/recognized child
 af: aanvaarde seun/aanvaarde dogter/aanvaarde kind
@@ -6943,6 +6948,7 @@ sv: k&ouml;n
     sexual abuse%t with
 en: having abused%t/victim of sexual abuse%t by
 fr: ayant abus&eacute; sexuellement%t de/victime d'abus sexuel%t de
+pt: tendo abusado%t de/v韙ima de abuso sexual%t por
 
     short display
 af: beknopte weergawe

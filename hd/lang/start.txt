@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.46 2003-12-16 11:29:39 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.47 2003-12-16 12:46:18 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -47,7 +47,7 @@ height=108 src="%o/gwlogo.gif" align=%L border=0 alt=GeneWeb></a>
 %E<td align=%R valign=top width=16>%w</td>
 </tr><tr>
 <td align=center colspan=2>
-<table border=0><tr align=left><td align=center><h1><font color=%i>[
+<table border=0><tr align=center><td align=center><h1><font color=%i>[
 af: Genealogiese databasis
 bg: Родословна база от данни
 ca: Base de dades geneal&ograve;gica
