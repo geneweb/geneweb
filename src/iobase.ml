@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.22 2004-05-13 04:11:43 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.23 2004-05-13 09:49:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -290,12 +290,12 @@ value old_persons_of_first_name_or_surname base_data strings params =
       | None ->
           do {
             seek_in ic2 start_pos;
-Printf.eprintf "*** old database created by version <= 4.09\n"; flush stderr;
 let ab1 = Gc.allocated_bytes () in
             let bt : IstrTree.t (list iper) = input_value ic2 in
 let ab2 = Gc.allocated_bytes () in
             let bt = update_bt gistro bt in
             btr.val := Some bt;
+Printf.eprintf "*** old database created by version <= 4.09\n"; flush stderr;
 Printf.eprintf "*** using index allocating here %.0f bytes\n"
   (ab2 -. ab1);
 flush stderr;
@@ -344,12 +344,12 @@ value new_persons_of_first_name_or_surname base_data strings params =
       [ Some bt -> bt
       | None ->
           do {
-Printf.eprintf "*** new database created by version >= 4.10\n";
             let fname_inx = Filename.concat bname names_inx in
             let ic_inx = Secure.open_in_bin fname_inx in
 let ab1 = Gc.allocated_bytes () in
             let bt : IstrTree.t int = input_value ic_inx in
 let ab2 = Gc.allocated_bytes () in
+Printf.eprintf "*** new database created by version >= 4.10\n";
 Printf.eprintf "*** using index '%s' allocating here %.0f bytes\n"
   names_inx (ab2 -. ab1);
 flush stderr;
