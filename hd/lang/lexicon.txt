@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.84 1999-07-28 09:09:30 ddr Exp $
+# $Id: lexicon.txt,v 2.85 1999-07-29 17:02:48 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1168,7 +1168,6 @@ se: &auml;ndra barnens namn
 
     changed order of children
 cs: zmìnit poøadí dìtí
-cs: dítì/dìti
 de: Reihenfolge der Kinder gewechselt
 dk: &aelig;ndret r&aelig;kkef&oslash;lge for b&oslash;rn
 en: changed order of children
@@ -1183,6 +1182,7 @@ se: &auml;ndrade ordningen f&ouml;r barnen
 
     child/children
 cn: ×ÓÅ®
+cs: dítì/dìti
 de: Kind/Kinder
 dk: barn/b&oslash;rn
 en: child/children
