@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.35 2002-04-09 00:13:09 ddr Exp $ *)
+(* $Id: perso.ml,v 4.36 2002-07-15 08:34:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -257,7 +257,7 @@ type env =
   | Vint of int
   | Vstring of string
   | Vsosa of option (Num.t * person)
-  | Vimage of option (string * option (option (int * int)))
+  | Vimage of option (bool * string * option (int * int))
   | Vtitle of title_item
   | Vnone ]
 and title_item =
@@ -507,10 +507,10 @@ value print_image_size conf base env p p_auth =
     match get_env "image" env with
     [ Vimage x ->
         match x with
-        [ Some (_, Some (Some (width, height))) ->
+        [ Some (_, _, Some (width, height)) ->
             Wserver.wprint " width=%d height=%d" width height
-        | Some (link, None) -> Wserver.wprint " height=%d" max_im_hei
-        | None | Some (_, Some None) -> () ]
+        | Some (_, link, None) -> Wserver.wprint " height=%d" max_im_hei
+        | None -> () ]
     | _ -> () ]
   else ()
 ;
@@ -520,7 +520,7 @@ value print_image_url conf base env p p_auth =
     match get_env "image" env with
     [ Vimage x ->
         match x with
-        [ Some (fname, Some (Some _)) ->
+        [ Some (True, fname, _) ->
             let s = Unix.stat fname in
             let b = acces conf base p in
             let k = default_image_name base p in
@@ -528,8 +528,8 @@ value print_image_url conf base env p p_auth =
               (int_of_float
                  (mod_float s.Unix.st_mtime (float_of_int max_int)))
               b k
-        | Some (link, None) -> Wserver.wprint "%s" link
-        | None | Some (_, Some None) -> () ]
+        | Some (False, link, _) -> Wserver.wprint "%s" link
+        | None -> () ]
     | _ -> () ]
   else ()
 ;

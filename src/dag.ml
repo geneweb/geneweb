@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.8 2002-01-23 11:39:49 ddr Exp $ *)
+(* $Id: dag.ml,v 4.9 2002-07-15 08:34:23 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -125,14 +125,25 @@ value image_url_txt conf base url height =
     "</a>\n"
 ;
 
+value image_url_txt_with_size conf base url width height =
+  let image_txt = capitale (transl_nth conf "image/images" 0) in
+  sprintf "<a href=\"%s\">" url ^
+    sprintf "<img src=\"%s\"\nwidth=%d height=%d border=0 alt=\"%s\">" url
+      width height image_txt ^
+    "</a>\n"
+;
+
 value image_txt conf base p =
   match p_getenv conf.env "image" with
   [ Some "on" ->
       match image_and_size conf base p (limited_image_size 100 75) with
-      [ Some (f, Some (Some (wid, hei))) ->
+      [ Some (True, f, Some (wid, hei)) ->
           "<br>\n<center><table border=0><tr align=left><td>\n" ^
             image_normal_txt conf base p f wid hei ^ "</table></center>\n"
-      | Some (url, None) ->
+      | Some (False, url, Some (wid, hei)) ->
+          "<br>\n<center><table border=0><tr align=left><td>\n" ^
+            image_url_txt_with_size conf base url wid hei ^ "</table></center>\n"
+      | Some (False, url, None) ->
           "<br>\n<center><table border=0><tr align=left><td>\n" ^
             image_url_txt conf base url 75 ^ "</table></center>\n"
       | _ -> "" ]
