@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.7 2005-01-03 18:35:30 ddr Exp $ *)
+(* $Id: alln.ml,v 4.8 2005-01-04 00:42:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -205,24 +205,21 @@ value print_frequency_any conf base is_surnames list len =
     tag "ul" begin
       List.iter
         (fun (cnt, l) ->
-           do {
-             html_li conf;
+           tag "li" begin
              Wserver.wprint "%d\n" cnt;
              tag "ul" begin
                List.iter
                  (fun s ->
-                    do {
-                      html_li conf;
+                    stagn "li" begin
                       stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
                           (code_varenv (Name.lower s)) begin
                         Wserver.wprint "%s"
                           (alphab_string conf is_surnames s);
                       end;
-                      Wserver.wprint "\n";
-                    })
+                    end)
                  l;
              end;
-           })
+           end)
         list;
     end;
     trailer conf;

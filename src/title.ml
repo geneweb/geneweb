@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 4.7 2004-12-14 09:30:17 ddr Exp $ *)
+(* $Id: title.ml,v 4.8 2005-01-04 00:42:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -310,13 +310,11 @@ value give_access_someone conf base (x, t) list =
 ;
 
 value give_access_place conf base t p =
-  do {
-    Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s;p=%s\">" (commd conf)
-      (code_varenv t) (code_varenv p);
-    Wserver.wprint "... ";
-    Wserver.wprint "%s" p;
-    Wserver.wprint "</a>\n";
-  }
+  stag "a" "href=\"%sm=TT;sm=S;t=%s;p=%s\"" (commd conf) (code_varenv t)
+    (code_varenv p)
+  begin
+    Wserver.wprint "... %s" p;
+  end
 ;
 
 value give_access_title conf t p =
@@ -329,12 +327,9 @@ value give_access_title conf t p =
 ;
 
 value give_access_all_titles conf t =
-  do {
-    Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s\">" (commd conf)
-      (code_varenv t);
+  stag "a" "href=\"%sm=TT;sm=S;t=%s\"" (commd conf) (code_varenv t) begin
     Wserver.wprint "%s" (capitale t);
-    Wserver.wprint "</a>\n";
-  }
+  end
 ;
 
 value give_access_all_places conf t =
@@ -360,19 +355,20 @@ value print_title_place_list conf base t p list =
   in
   do {
     header conf title;
-    Wserver.wprint "<ul>\n";
-    let _ =
-      List.fold_left
-        (fun list x ->
-           do {
-             html_li conf;
-             give_access_someone conf base x list;
-             Wserver.wprint "\n";
-             [fst x :: list]
-           })
-        [] list
-    in
-    Wserver.wprint "</ul>\n";
+    tag "ul" begin
+      let _ =
+        List.fold_left
+          (fun list x ->
+             do {
+               stagn "li" begin
+                 give_access_someone conf base x list;
+               end;
+               [fst x :: list]
+             })
+          [] list
+      in
+      ();
+    end;
     let (list, _) =
       List.fold_left
         (fun (list, n) (p, _) ->
@@ -384,8 +380,8 @@ value print_title_place_list conf base t p list =
     in
     match List.rev list with
     [ [_; _ :: _] as list ->
-        do {
-          Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
+        tag "p" begin
+          Wserver.wprint "<a href=\"%sm=RLM" (commd conf);
           let _ =
             List.fold_left
               (fun i (p, n) ->
@@ -397,7 +393,7 @@ value print_title_place_list conf base t p list =
               1 list
           in
           Wserver.wprint ";lim=6\">%s</a>\n" (capitale (transl conf "tree"));
-        }
+        end
     | _ -> () ];
     trailer conf;
   }
@@ -441,11 +437,11 @@ value print_places_list conf base t list =
   let title _ = Wserver.wprint "%s" (capitale t) in
   do {
     header conf title;
-    Wserver.wprint "<ul>\n";
-    List.iter
-      (fun p -> do { html_li conf; give_access_place conf base t p; () })
-      list;
-    Wserver.wprint "</ul>\n";
+    tag "ul" begin
+      List.iter
+        (fun p -> stagn "li" begin give_access_place conf base t p; end)
+        list;
+    end;
     trailer conf;
   }
 ;
@@ -464,16 +460,14 @@ value print_titles conf base p =
   let title _ = Wserver.wprint "... %s" p in
   do {
     header conf title;
-    Wserver.wprint "<ul>\n";
-    List.iter (fun t -> do { html_li conf; give_access_title conf t p; () })
-      list;
-    Wserver.wprint "</ul>\n";
-    if List.length list > 1 then do {
-      stag "a" "href=\"%sm=TT;sm=A;p=%s\"" (commd conf) (code_varenv p) begin
+    tag "ul" begin
+      List.iter (fun t -> stagn "li" begin give_access_title conf t p; end)
+        list;
+    end;
+    if List.length list > 1 then
+      stagn "a" "href=\"%sm=TT;sm=A;p=%s\"" (commd conf) (code_varenv p) begin
         Wserver.wprint "%s" (capitale (transl conf "the whole list"));
-      end;
-      Wserver.wprint "\n";
-    }
+      end
     else ();
     trailer conf;
   }
@@ -489,10 +483,10 @@ value print_all_titles conf base =
   in
   do {
     header conf title;
-    Wserver.wprint "<ul>\n";
-    List.iter
-      (fun t -> do { html_li conf; give_access_all_titles conf t; () }) list;
-    Wserver.wprint "</ul>\n";
+    tag "ul" begin
+      List.iter
+        (fun t -> stagn "li" begin give_access_all_titles conf t; end) list;
+    end;
     trailer conf;
   }
 ;
