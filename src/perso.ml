@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.16 2000-03-22 12:47:27 ddr Exp $ *)
+(* $Id: perso.ml,v 3.17 2000-04-26 08:53:20 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -325,7 +325,7 @@ value print_dates conf base open_area p =
          if sure d1 && sure d2 && d1 <> d2 then
            let a = temps_ecoule d1 d2 in
            do open_area ();
-              Wserver.wprint "%s " (capitale (transl conf "death age:"));
+              Wserver.wprint "%s " (capitale (transl conf "age at death:"));
               Date.print_age conf a;
               Wserver.wprint "\n";
            return ()

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.10 2000-02-22 11:25:53 ddr Exp $ *)
+(* $Id: date.ml,v 3.11 2000-04-26 08:53:19 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -98,7 +98,7 @@ value string_of_on_prec_dmy conf sy d =
         else if d.day = 0 then transl conf "in (month year)" ^ " " ^ sy
         else transl_decline conf "on (day month year)" sy
       in
-      transl conf "maybe (date)" ^ " " ^ s
+      transl conf "possibly (date)" ^ " " ^ s
   | OrYear z ->
       let s =
         if d.day = 0 && d.month = 0 then
@@ -160,7 +160,7 @@ value string_of_dmy conf d =
   | About -> transl conf "about (date)" ^ " " ^ s
   | Before -> transl conf "before (date)" ^ " " ^ s
   | After -> transl conf "after (date)" ^ " " ^ s
-  | Maybe -> transl conf "maybe (date)" ^ " " ^ s
+  | Maybe -> transl conf "possibly (date)" ^ " " ^ s
   | OrYear z ->
       s ^ " " ^
       transl conf "or" ^ " " ^
@@ -399,7 +399,7 @@ value print_dates conf base p =
          if sure d1 && sure d2 && d1 <> d2 then
            let a = temps_ecoule d1 d2 in
            do Wserver.wprint "\n(";
-              Wserver.wprint "%s " (transl conf "death age:");
+              Wserver.wprint "%s " (transl conf "age at death:");
               print_age conf a;
               Wserver.wprint ")";
            return ()

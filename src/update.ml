@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.8 2000-03-10 09:38:39 ddr Exp $ *)
+(* $Id: update.ml,v 3.9 2000-04-26 08:53:21 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -583,7 +583,7 @@ value print_date conf base lab var d =
              Wserver.wprint "<option value=maybe%s>%s\n"
                (match d with
                 [ Some (Dgreg {prec = Maybe} _) -> " selected" | _ -> "" ])
-               (capitale (transl conf "maybe (date)"));
+               (capitale (transl conf "possibly (date)"));
              Wserver.wprint "<option value=before%s>%s\n"
                (match d with
                 [ Some (Dgreg {prec = Before} _) -> " selected" | _ -> "" ])
