@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.25 2002-10-26 01:22:43 ddr Exp $ *)
+(* $Id: update.ml,v 4.26 2004-06-22 15:11:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -13,11 +13,36 @@ type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create * string);
 
 value rec find_free_occ base f s i =
+(*
   match
     try Some (person_ht_find_unique base f s i) with [ Not_found -> None ]
   with
   [ Some _ -> find_free_occ base f s (i + 1)
   | None -> i ]
+*)
+  let first_name = nominative f in
+  let surname = nominative s in
+  let ipl = base.func.persons_of_name (f ^ " " ^ s) in
+  let first_name = Name.lower f in
+  let surname = Name.lower s in
+  let list =
+    loop [] ipl where rec loop list =
+      fun
+      [ [ip :: ipl] ->
+          let p = poi base ip in
+          if first_name = Name.lower (p_first_name base p) &&
+             surname = Name.lower (p_surname base p) then
+            loop [p.occ :: list] ipl
+          else loop list ipl
+      | [] -> list ]
+  in
+  let list = List.sort compare list in
+  loop 0 list where rec loop cnt1 =
+    fun
+    [ [cnt2 :: list] ->
+        if cnt1 = cnt2 then loop (cnt1 + 1) list else cnt1
+    | [] -> cnt1 ]
+(**)
 ;
 
 value has_children base u =
