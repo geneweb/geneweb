@@ -1,4 +1,4 @@
-GeneWeb 1.09
+GeneWeb 1.10
 
 To start with GeneWeb, launch your Web browser.
 If you installed GeneWeb, e.g. in the directory:
@@ -20,7 +20,7 @@ the previous versions.
 
      -----------------
 
-GeneWeb is copyright INRIA 1998.
+GeneWeb is copyright INRIA 1998-1999.
 
 Remarks, suggestions, questions, bug reports to:
 	daniel.de_rauglaudre@inria.fr
