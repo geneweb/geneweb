@@ -2,6 +2,9 @@ GeneWeb version 3.09
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [05 Nov 00] In case of loop in data base, which forbids any relationship
+    computation, the error message now displays one person who is his/her
+    own ancestor, allowing the wizard to fix the error.
   - [04 Nov 00] Changed forum displaying. The main page now displays only
     the headers.
   - [04 Nov 00] Fixed bug: when merging two persons, the possible notes

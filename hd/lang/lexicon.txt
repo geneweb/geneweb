@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.169 2000-11-04 21:22:48 ddr Exp $
+# $Id: lexicon.txt,v 3.170 2000-11-05 10:17:18 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3556,6 +3556,10 @@ pt: resultados detalhados
 ru: ïîäğîáíî
 se: ut&ouml;kad rapport
 
+    loop in data base: %s is his/her own ancestor
+en: loop in data base: %s is his/her own ancestor
+fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
+
     main title
 af: hooftitel
 cs: hlavní titul
@@ -4785,26 +4789,6 @@ no: privat
 pt: privado
 ru: ×àñòíûé
 se: privat
-
-    probable loop in base
-af: moontlike lus in die databasis
-cs: pravdìpodobná smyèka v databázi
-de: wahrscheinliche Schleife in der Datenbank: jemand ist sein/ihre eigene(r) Vorfahr(in)
-dk: tilsyneladende loop i databasen: nogen bliver sin egen forfader
-en: probable loop in database: someone being his/her own ancestor
-eo: buklo probabla en datenbazo: iu estanta sia propra prapatro
-es: bucle probable en base de datos: alguien es su propio antepasado
-fi: ilmeisesti silmukka tietokannassa; joku on itsens&auml esi-is&auml
-fr: boucle probable dans la base de donn&eacute;es: quelqu'un est son propre anc&ecirc;tre
-he: "ìåìàä" áîàâøé îéãò  ìôä"ğ
-is: sennilega er loopa í gangagrunni
-it: ciclo probabile nella base di dati: qualcuno &egrave; il suo proprio antenato
-lv: iespçjams, ka datu bâzç ir cilpa
-nl: waarschijnlijk een lus in de databank
-no: mulig loop i databasen: noen er sin egen etterkommer
-pt: la&ccedil;o prov&aacute;vel na base de dados: algu&eacute;m &eacute; his/her pr&oacute;prio antepassado
-ru: âåğîÿòíî öèêë â áàçå
-se: trolig rundg&aring;ng i databasen: n&aring;gon &auml;r sin egen ana
 
     public
 af: openbare

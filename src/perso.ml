@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.65 2000-10-28 21:52:32 ddr Exp $ *)
+(* $Id: perso.ml,v 3.66 2000-11-05 10:17:27 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -167,7 +167,6 @@ value print_titles conf base cap and_txt p =
 ;
 
 (* Version matching the Sosa number of the "ancestor" pages *)
-type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 value find_sosa_aux conf base a p =
   let tstab = Util.create_topological_sort conf base in

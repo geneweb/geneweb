@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.58 2000-11-01 18:15:46 ddr Exp $ *)
+(* $Id: relation.ml,v 3.59 2000-11-05 10:17:29 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -386,7 +386,6 @@ value print_relation_path conf base ip1 ip2 path excl_faml =
 ;
 
 type node = [ NotVisited | Visited of (bool * iper * famlink) ];
-type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 value get_shortest_path_relation base ip1 ip2 excl_faml =
   let mark_per = Array.create base.data.persons.len NotVisited in
@@ -1419,10 +1418,14 @@ value print_multi_relation conf base pl lim assoc_txt =
   return ()
 ;
 
-value print_base_loop conf base =
+value print_base_loop conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do rheader conf title;
-     Wserver.wprint "%s\n" (capitale (transl conf "probable loop in base"));
+     Wserver.wprint
+       (fcapitale
+          (ftransl conf "loop in data base: %s is his/her own ancestor"))
+       (reference conf base p (person_text conf base p));
+     Wserver.wprint ".\n";
      trailer conf;
   return ()
 ;
@@ -1440,11 +1443,11 @@ value print conf base p =
             | _ -> False ]
           in
           match
-            try Some (compute_relationship conf base by_marr p1 p) with
-            [ Consang.TopologicalSortError -> None ]
+            try Left (compute_relationship conf base by_marr p1 p) with
+            [ Consang.TopologicalSortError ip -> Right ip ]
           with
-          [ Some rel -> print_main_relationship conf base long p1 p rel
-          | None -> print_base_loop conf base ] ]
+          [ Left rel -> print_main_relationship conf base long p1 p rel
+          | Right p -> print_base_loop conf base p ] ]
   | None -> print_menu conf base p ]
 ;
 
