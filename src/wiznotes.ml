@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.17 2004-12-14 09:30:18 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.18 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -249,7 +249,7 @@ value print_wizard conf base wizfile wz =
     else ();
     if conf.wizard && conf.user = wz then do {
       html_p conf;
-      tag "form" "method=POST action=\"%s\"" conf.command begin
+      tag "form" "method=\"post\" action=\"%s\"" conf.command begin
         Util.hidden_env conf;
         Wserver.wprint "<input type=hidden name=m value=WIZNOTES>\n";
         Wserver.wprint "<input type=hidden name=v value=\"%s\">\n" wz;

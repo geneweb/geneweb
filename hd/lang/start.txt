@@ -1,7 +1,8 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" 
+ "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.63 2004-12-27 14:29:56 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.64 2004-12-28 02:54:15 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde

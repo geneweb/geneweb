@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.101 2004-12-27 14:29:57 ddr Exp $ *)
+(* $Id: util.ml,v 4.102 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -413,11 +413,21 @@ value quote_escaped s =
   else s
 ;
 
+(**)
+value xhs = "";
+value doctype = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\">";
+(*
+value xhs = " /";
+value doctype = "\
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" 
+ \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">";
+*)
+
 value hidden_env conf =
   List.iter
     (fun (k, v) ->
-       Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" k
-         (quote_escaped (decode_varenv v)))
+       Wserver.wprint "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" k
+         (quote_escaped (decode_varenv v)) xhs)
     (conf.henv @ conf.senv)
 ;
 
@@ -888,6 +898,7 @@ value macro_etc env imcom c =
       | 'o' ->
           if images_url.val <> "" then images_url.val else imcom ^ "m=IM;v="
       | 'v' -> Version.txt
+      | '/' -> ""
       | c -> "%" ^ String.make 1 c ] ]
 ;
 
@@ -1096,10 +1107,7 @@ value include_hed_trl conf base_opt suff =
       in
       copy_from_etc
         [('p', pref); ('s', suff); ('t', fun _ -> commd conf);
-         ('/',
-          fun _ ->
-            try List.assoc "xhtml_slash" conf.base_env with
-            [ Not_found -> "" ])]
+          ('/', fun _ -> xhs)]
         conf.lang conf.indep_command ic
   | None -> () ]
 ;
@@ -1126,13 +1134,13 @@ value message_to_wizard conf =
 value header_without_page_title conf title =
   do {
     html1 conf;
-    Wserver.wprint "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n";
+    Wserver.wprint "%s\n" doctype;
     Wserver.wprint "<html>\n<head>\n";
     Wserver.wprint "  <title>";
     title True;
     Wserver.wprint "</title>\n";
     include_hed_trl conf None ".hed";
-    Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\">\n";
+    Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\"%s>\n" xhs;
     Wserver.wprint "  \
   <style type=\"text/css\"><!--
     .highlight { color: %s; font-weight: bold }
@@ -1174,7 +1182,7 @@ value header_no_page_title conf title =
     [ None | Some "" -> ()
     | Some x ->
         do {
-          Wserver.wprint "<h1 align=center><font color=%s>" conf.highlight;
+          Wserver.wprint "<h1 align=\"center\"><font color=%s>" conf.highlight;
           Wserver.wprint "%s" x;
           Wserver.wprint "</font></h1>\n"
         } ];
@@ -1388,18 +1396,18 @@ value gen_trailer with_logo conf =
         in
         if not conf.setup_link then s
         else s ^ " - " ^ setup_link conf);
-     ('/',
-      fun _ ->
-        try List.assoc "xhtml_slash" conf.base_env with [ Not_found -> "" ])]
+     ('/', fun _ -> xhs)]
   in
   do {
     if not with_logo then ()
     else
       Wserver.wprint "\
-<p>
-<div><a href=\"%s\"><img src=\"%s/gwlogo.png\"
-alt=... width=64 height=72 style=\"border:0;float:right\"></a><br></div>
-" (commd conf) (image_prefix conf);
+<div>
+<a href=\"%s\"><img src=\"%s/gwlogo.png\"
+ alt=\"...\" width=\"64\" height=\"72\" style=\"border:0;float:right\"%s></a>
+<br%s>
+</div>
+" (commd conf) (image_prefix conf) xhs xhs;
     match open_etc_file "copyr" with
     [ Some ic -> copy_from_etc env conf.lang conf.indep_command ic
     | None ->
@@ -2045,8 +2053,8 @@ value rchild_type_text conf t n =
 ;
 
 value wprint_hidden pref name valu =
-  Wserver.wprint "<input type=hidden name=%s%s value=\"%s\">\n" pref name
-    (quote_escaped valu)
+  Wserver.wprint "<input type=\"hidden\" name=\"%s%s\" value=\"%s\"%s>\n"
+    pref name (quote_escaped valu) xhs
 ;
 
 value wprint_hidden_person conf base pref p =
@@ -2265,7 +2273,7 @@ value print_selection_bullet conf =
           "" conf.env
       in
       do {
-        Wserver.wprint "<a name=%s href=\"%s%s%s%s\">" txt (commd conf) req
+        Wserver.wprint "<a name=\"%s\" href=\"%s%s%s%s\">" txt (commd conf) req
           (if sel then ";u=" ^ txt else "")
           (if sel || List.mem_assoc "u" conf.env then "#" ^ txt else "");
         Wserver.wprint "%s"

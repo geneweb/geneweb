@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.10 2004-12-26 18:11:20 ddr Exp $ *)
+(* $Id: history.ml,v 4.11 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -208,7 +208,7 @@ value print_history conf base ic =
   do {
     if n > 0 then Wserver.wprint "</dl>\n" else ();
     if pos > 0 then
-      tag "form" "method=GET action=\"%s\"" conf.command begin
+      tag "form" "method=\"get\" action=\"%s\"" conf.command begin
         html_p conf;
         Util.hidden_env conf;
         Wserver.wprint "<input type=hidden name=m value=HIST>\n";

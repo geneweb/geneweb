@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.19 2004-12-27 06:45:19 ddr Exp $ *)
+(* $Id: dag.ml,v 4.20 2004-12-28 02:54:15 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -812,7 +812,7 @@ value print_slices_menu conf base hts_opt =
   do {
     Util.header conf title;
     Util.print_link_to_welcome conf True;
-    tag "form" "method=get action=\"%s\"" conf.command begin
+    tag "form" "method=\"get\" action=\"%s\"" conf.command begin
       html_p conf;
       hidden_env conf;
       List.iter

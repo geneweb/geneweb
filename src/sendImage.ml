@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.14 2004-12-26 18:11:20 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.15 2004-12-28 02:54:15 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -64,7 +64,7 @@ value print_send_image conf base p =
   let digest = Update.digest_person p in
   do {
     header conf title;
-    tag "form" "method=POST action=\"%s\" enctype=\"multipart/form-data\""
+    tag "form" "method=\"post\" action=\"%s\" enctype=\"multipart/form-data\""
       conf.command
     begin
       html_p conf;
@@ -127,7 +127,7 @@ value print_delete_image conf base p =
   do {
     header conf title;
     Wserver.wprint "\n";
-    tag "form" "method=POST action=\"%s\"" conf.command begin
+    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       html_p conf;
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=m value=DEL_IMAGE_OK>\n";

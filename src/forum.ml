@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.37 2004-12-14 09:30:12 ddr Exp $ *)
+(* $Id: forum.ml,v 4.38 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -261,7 +261,7 @@ value print_headers conf =
 value header_txt conf i = transl_nth conf "ident/email/subject" i;
 
 value print_add_message conf =
-  tag "form" "method=get action=\"%s\"" conf.command begin
+  tag "form" "method=\"get\" action=\"%s\"" conf.command begin
     Util.hidden_env conf;
     Wserver.wprint "<input type=hidden name=m value=FORUM_ADD>\n";
     Wserver.wprint "<input type=submit value=\"%s\">\n"
@@ -449,7 +449,7 @@ value print_one_forum_message conf m pos next_pos forum_length =
       let s = message_txt conf 0 in
       do {
         Wserver.wprint "<p>\n";
-        tag "form" "method=post action=\"%s\"" conf.command begin
+        tag "form" "method=\"post\" action=\"%s\"" conf.command begin
           Util.hidden_env conf;
           Wserver.wprint "<input type=hidden name=m value=FORUM_DEL>\n";
           Wserver.wprint "<input type=hidden name=p value=%d>\n" pos;
@@ -506,7 +506,7 @@ value print_add conf base =
   if can_post conf then do {
     header conf title;
     print_link_to_welcome conf True;
-    tag "form" "method=post action=\"%s\"" conf.command begin
+    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=m value=FORUM_ADD_OK>\n";
       tag "table" "border=%d" conf.border begin
