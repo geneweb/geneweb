@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.40 2003-11-27 14:59:32 ddr Exp $ *)
+(* $Id: relation.ml,v 4.41 2003-11-27 15:18:37 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1236,7 +1236,12 @@ value print_dag_links conf base p1 p2 rl =
              in
              ()
            };
-           Wserver.wprint ";dag=on\">";
+           let image_opt =
+             match p_getenv conf.env "image" with
+             [ Some "on" -> ";image=on"
+             | _ -> "" ]
+           in
+           Wserver.wprint ";dag=on%s\">" image_opt;
            if is_anc then Wserver.wprint "%s" (transl conf "tree")
            else
              Wserver.wprint "%d %s" nn
