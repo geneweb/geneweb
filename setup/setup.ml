@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.38 2002-04-13 09:22:31 ddr Exp $ *)
+(* $Id: setup.ml,v 4.39 2002-06-18 10:50:00 ddr Exp $ *)
 
 open Printf;
 
@@ -1662,7 +1662,7 @@ value null_reopen flags fd =
   else ()
 ;
 
-value setup_available_languages = ["de"; "en"; "es"; "fr"; "lv"; "sv"];
+value setup_available_languages = ["de"; "en"; "es"; "fr"; "it"; "lv"; "sv"];
 
 value intro () =
   let (default_gwd_lang, default_setup_lang) =
