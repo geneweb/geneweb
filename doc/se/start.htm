@@ -1,15 +1,216 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>GeneWeb</title></head>
-<body bgcolor="#d6bfaf">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>GeneWeb - Komma igång</TITLE>
+<META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#d6bfaf">
 
-<h1>Translation not yet available</h1>
+<H1>GeneWeb - Komma ig&aring;ng</H1>
+<P>Detta kapitlet inneh&aring;ller en introduktion till <EM>GeneWeb</EM> med en kortfattad beskrivning av kommandon och filer som beh&ouml;vs f&ouml;r att starta. </P>
 
-In the meantime, try the <a href="../en/start.htm">English</a>
-version.
+<UL>
+<LI><A HREF="#Int">Introduktion</A> </LI>
+<LI><A HREF="#Gwc">Kommandot gwc</A> </LI>
+<LI><A HREF="#Ged">Kommandot ged2gwb</A> </LI>
+<LI><A HREF="#Gee">Kommandot gwb2ged</A> </LI>
+<LI><A HREF="#Gwd">Kommandot gwd</A> </LI>
+<LI><A HREF="#Csg">Kommandot consang</A> </LI>
+<LI><A HREF="#Gwu">Kommandot gwu</A> </LI>
+<LI><A HREF="#Cnf">Filen a.cnf</A> </LI>
+<LI><A HREF="#Lex">Katalogen "lang" - filen "lexicon.txt"</A> </LI>
+<LI><A HREF="#Lng">Katalogen "lang" - underkataloger</A> </LI></UL>
 
-<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
-GeneWeb</em></font><br>
+<H4><A NAME="Int">Introduktion</A> </H4>
+<P>F&ouml;r att konfigurera och starta <EM>GeneWeb</EM>, m&aring;ste du anv&auml;nda ett DOS f&ouml;nster. Under Unix, starta ett xterm. Under Windows 95/98/NT, klicka p&aring; "Start", "Programs" och "Commands MSDOS". </P>
+<P>I detta f&ouml;nster, skriv in kommandot f&ouml;r att g&aring; till den katalog d&auml;r du installerade <EM>GeneWeb</EM>: </P>
 
-</body>
+<UL>
+<LI>Under Unix, om du har installerat det till exempel i "/home/svensson/geneweb": </LI></UL>
 
+<PRE>
+     cd /home/svensson/geneweb</PRE>
+
+<UL>
+<LI>Under Windows 95/98/NT, om du har installerat det i: "C:\program\geneweb": </LI></UL>
+
+<PRE>
+     cd c:\program\geneweb</PRE>
+<P>Alla <EM>GeneWeb</EM> kommandon kan startas med optionen -help som visar olika m&ouml;jliga optioner, med en kort f&ouml;rklaring. </P>
+<P>Till exempel, om du skriver: </P>
+<PRE>
+     gwd -help</PRE>
+<P>ska du se n&aring;got s&aring;dant: </P>
+<PRE>
+     Usage: gwd [args]
+       -hd dir: directory where the directory lang is installed
+       -cgi query addr: called from a cgi-bin
+       -p #: port number; greater than 1024 for normal users
+       -wizard passwd: access to all dates och base updating
+       -friend passwd: access to all dates
+       -only address: only inet address accepted</PRE>
+<P>N&aring;gra kommandon visar viss text. Du kan dirigera om utmatningen till en fil genom att avsluta kommandot med "&gt;&nbsp;fil". Exempel: </P>
+<PRE>     gwd -help &gt; foo.txt</PRE>
+<EM><P>GeneWeb</EM> databaser &auml;r kataloger med fil&auml;ndelsen ".gwb". </P>
+<H4>K<A NAME="Gwc">ommandot gwc</A> </H4>
+<P>F&ouml;r att anv&auml;nda <EM>GeneWeb</EM>, m&aring;ste du skapa en databas. Du kan g&ouml;ra det antingen med kommandot "gwc", eller med "ged2gwb", (se nedan). </P>
+<P>Kommandot "gwc", i dess enklaste anv&auml;ndande, skapar en tom databas: i <EM>GeneWeb</EM>, som du kan fylla. </P>
+<P>Du m&aring;ste ge ett namn till din databas. Anv&auml;nd helst inte mer &auml;n 8 tecken. </P>
+<P>Till exempel, om du vill kalla den "svensson", skriv: </P>
+<PRE>
+     gwc -o svensson</PRE>
+<H4><A NAME="Ged">Kommandot ged2gwb</A> </H4>
+<P>Ett annat s&auml;tt att skapa en <EM>GeneWeb</EM> databas &auml;r att starta fr&aring;n en GEDCOM fil. </P>
+<P>Kommandot "ged2gwb" l&aring;ter dig konvertera en GEDCOM fil till en <EM>GeneWeb</EM> databas. </P>
+<P>Det enklaste s&auml;ttet &auml;r att f&ouml;rst kopiera din GEDCOM fil till katalogen d&auml;r du installerade <EM>GeneWeb</EM>. G&ouml;r det p&aring; vanligt vis, antingen i ett DOS f&ouml;nster eller genom att flytta ikoner. </P>
+<P>Om din GEDCOM fil har namn, till exempel, "foo.ged" och du vill skapa en databas ben&auml;mnd "svensson", skriv: </P>
+<PRE>
+     ged2gwb foo.ged -o svensson</PRE>
+<P>Kommandot visar till viss del vad den g&ouml;r, speciellt om det uppt&auml;cker fel i GEDCOM filen. Ignorera dessa fel i ett f&ouml;rsta steg: din databas kommer att skapas &auml;nd&aring;. Om allt &auml;r Ok, m&aring;ste kommandot avslutas med: </P>
+<PRE>
+     *** Ok</PRE>
+<H4>K<A NAME="Gee">ommandot gwb2ged</A> </H4>
+<P>Innan vi forts&auml;tter, l&aring;t oss notera att det omv&auml;nda kommandot, "gwb2ged", till&aring;ter att &aring;teruppbygga en GEDCOM fil fr&aring;n en <EM>GeneWeb</EM> bas. </P>
+<H4><A NAME="Gwd">Kommandot gwd</A> </H4>
+<P>N&auml;r du har skapat en databas, med en av kommandona "gwc" eller "ged2gwb", kan du konsultera och ut&ouml;ka den. </P>
+<P>Alltid i DOS f&ouml;nstret, skriv: </P>
+<PRE>
+     gwd</PRE>
+<P>Kommandot startar <EM>GeneWeb</EM> "demonen". Kommandot m&aring;ste visa: </P>
+<PRE>
+     GeneWeb 1.0 - Copyright (c) INRIA 1998
+     Possible addresses:
+&#9;http://localhost:2317/base
+&#9;http://127.0.0.1:2317/base
+&#9;http://address:2317/base
+     where "base" is the name of the data base
+     Type control C to stop the service
+     Ready (day) (hour) port 2317...</PRE>
+<P>Notera att du inte se prompt i DOS f&ouml;nstret. Detta program v&auml;ntar f&ouml;r f&ouml;rfr&aring;gningar som du kommer s&auml;nda till den fr&aring;n din webbl&auml;sare. N&auml;r den motar en f&ouml;rfr&aring;gan behandlas den och sedan v&auml;ntar programmet igen. N&auml;r du &auml;r klar med att anv&auml;nda <EM>GeneWeb</EM>, kan du stoppa den genom att trycka "Control-C" i DOS f&ouml;nstret. </P>
+<P>Nu kan du verkligen start. Eftersom du tittar p&aring; denna dokumentation, anv&auml;nder du en webbl&auml;sare. Starta ett nytt f&ouml;nster i denna webbl&auml;sare och &ouml;ppna den f&ouml;ljande adressen. Byt ut "svensson" mot namnet f&ouml;r din databas. Varning: skriv inte in det kompletta namnet (like "c:\program\geneweb\svensson" eller "/home/geneweb/svensson"), just "svensson". </P>
+<PRE>
+     http://localhost:2317/svensson</PRE>
+<P>Du m&aring;ste se <EM>GeneWeb</EM>s v&auml;lkomst sida p&aring; franska. </P>
+<P>[Om det inte fungerar, klicka <A HREF="problem.htm">h&auml;r</A>] </P>
+<P>V&auml;lj ett annat spr&aring;k (t ex engelska), p&aring; flaggorna h&ouml;gst upp p&aring; sidan. (Det finns ett s&auml;tt att v&auml;lja ett default spr&aring;k annat &auml;n franska. Se <A HREF="#Cnf">vidare</A>). </P>
+
+<UL>
+<LI>Om du startade fr&aring;n en GEDCOM fil ("ged2gwb"), m&aring;ste du se att beginning numret av personer av din databas. </LI></UL>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+
+<P>Fr&aring;n d&auml;r, kan du konsultera den som klassisk webbtj&auml;nst, klicka p&aring; l&auml;nkar och knappar, fylla i areas, etc. Tips: i ett f&ouml;rsta steg, klicka p&aring; "Ok" d&auml;r efter "Alla efternamn i alfabetisk ordning", och sedan p&aring; den nya sidan som visar sig: "hela listan". V&auml;lj ett efternamn, sedan en person etc, och navigera. </P></DIR>
+</DIR>
+</DIR>
+</DIR>
+
+
+<UL>
+<LI>Om du startade fr&aring;n en tom databas ("gwc"), visar v&auml;lkomst sidan att databas inneh&aring;ller 0 personer. </LI></UL>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+
+<P>Den endast m&ouml;jliga att g&ouml;ra &auml;r att skapa en person och familjer. Klicka p&aring; "L&auml;gg till familj". Hur du g&ouml;r det kan du se <A HREF="update.htm#AddF">h&auml;r</A>. </P></DIR>
+</DIR>
+</DIR>
+</DIR>
+
+<P>Under tiden, kan du notera att varje g&aring;ng du klickar p&aring; en knapp eller en l&auml;nk, visas en text rad i DOS f&ouml;nstret. N&auml;r du startar din <EM>GeneWeb</EM> server p&aring; Internet (se <A HREF="server.htm">h&auml;r</A>), kan du se f&ouml;rfr&aring;gningarna som s&auml;nds till din databas p&aring; det h&auml;r s&auml;ttet. </P>
+<P>Notera att om du trycker "Control-C" i ditt DOS f&ouml;nster, svarar inte tj&auml;nsten inte l&auml;ngre i din webbl&auml;saren. F&ouml;r att &aring;terstarta den, skriv "gwd" igen. </P>
+<P>Under Windows, kan du enkelt dubbel klicka p&aring; ikonen "gwd" f&ouml;r att starta den. Den &ouml;ppnar ett DOS f&ouml;nster d&auml;r "gwd" visar sina textrader. Om man trycker "Control-C" stoppar "gwd" och f&ouml;nstret st&auml;ngs. Om man skapar en genv&auml;g till "gwd" p&aring; skrivbordet, kan du starta den enkelt. </P>
+<H4>Ko<A NAME="Csg">mmandot consang </A></H4>
+<P>Detta kommando m&aring;ste startas i ett DOS f&ouml;nster, som de andra. Om "gwd" demonen k&ouml;rs, tryck "Control-C" f&ouml;r att stopps den. Ett annat s&auml;tt, om du inte vill stoppa demonen, best&aring;r i att starta en andra DOS f&ouml;nster och f&ouml;lja instruktionerna f&ouml;r introduktionen ovan. </P>
+<P>Kommandot "consang" ber&auml;knar blodsbandet i en databas. Visandet av blodsband g&ouml;rs n&auml;r man konsulterar databasen, i personliga sidan och medan man ber&auml;knar sl&auml;ktskap. </P>
+<P>Men f&ouml;r att ha access till den m&aring;ste du f&ouml;r ber&auml;kna de individuella blodsbanden f&ouml;r personerna i databasen. Detta &auml;r vad "consang" g&ouml;r. Om din databas namn &auml;r "svensson", skriv: </P>
+<PRE>
+     consang svensson</PRE>
+<P>Program kommer att ber&auml;kna n&aring;gra sekunder eller minuter, beroende p&aring; storleken av din databas och visa utan att stoppa numret av &aring;terst&aring;ende persons att behandla. Till slut, har du prompten igen i DOS f&ouml;nstret och de individuella blodsbanden &auml;r lagrade. </P>
+<P>Under denna ber&auml;kning, om du inte stoppade demonen, kan du &aring;terv&auml;nda till webbl&auml;sare och konsulter din databas.</P>
+<P>K&ouml;r "consang" ibland, om du gjorde modifieringar i din databas, speciellt om det &auml;r att l&auml;gga till, modifiera, radera familjer: blodsbandet beror p&aring; familj strukturen. Om den &auml;ndras, den individuella blodsbanden &auml;r inte l&auml;ngre &aring;tkomliga och du m&aring;ste ber&auml;kna om dem. </P>
+<P>Vidare g&ouml;r "consang" en intern "upprensning" av databasen, n&ouml;dv&auml;ndig efter ett antal uppdateringar. </P>
+<H4>K<A NAME="Gwu">ommandot gwu</A> </H4>
+<P>[Detta kommando hette "gwb2gw" i v&auml;ldigt gamla versioner]. </P>
+<P>Detta kommando visar inneh&aring;llet i databasen i text form. Om dirigering av denna display till en fil, kan constitute en saving av din databas. </P>
+<P>Om din databas heter "svensson", och du vill spara den i filen "foo.gw", skriv: </P>
+<PRE>
+     gwu svensson &gt; foo.gw</PRE>
+<P>Sparning i olika filer i olika versioner av din databas, du kan se olikheter, genom att anv&auml;nda ett kommando f&ouml;r att j&auml;mf&ouml;ra text filer. Detta &auml;r speciellt intressant om n&aring;gon har gjort modifieringar i diin databas och du vill veta vem. </P>
+<P>Den finn ocks&aring; en metod f&ouml;r att &aring;terskapa din databas n&auml;r du anv&auml;nder en annan version av <EM>GeneWeb</EM>, i det fallet den inre representationen av databasen har &auml;ndrats. </P>
+<P>F&ouml;r att &aring;terskapa din databas, m&aring;ste du anv&auml;nda kommandot "gwc". Den sparade filen m&aring;ste ha fil&auml;ndelse ".gw". F&ouml;r att skapa en databas ben&auml;mnd "svensson", fr&aring;n filen "foo.gw", skriv: </P>
+<PRE>
+     gwc foo.gw -o svensson</PRE>
+<H4><A NAME="Cnf">Filen a.cnf</A> </H4>
+<P>Denna fil inneh&aring;ller en konfigurations mall f&ouml;r en databas. Om din databas namn &auml;r "svensson", g&ouml;r en kopia av "a.cnf" d&ouml;p om den till "svensson.cnf" och editera filen "svensson.cnf". </P>
+<P>De konfigurerbara v&auml;rdena &auml;r de f&ouml;ljande: </P>
+
+<UL>
+<STRONG><LI>body_prop</STRONG> l&aring;ter att v&auml;lja en bakgrunds f&auml;rg eller bakgrunds m&ouml;nster och &auml;ndra texten och l&auml;nk f&auml;rgen. Dess syntax &auml;r HTML syntax accepterad i taggen "&lt;body&gt;" f&ouml;re "&gt;". Se din HTML dokumentation (eller fr&aring;ga en webbguru). Exempel: </LI></UL>
+
+<PRE>
+     body_prop=background=mybackg.jpg vlink=yellow</PRE><DIR>
+<DIR>
+<DIR>
+<DIR>
+
+<P>Detta g&auml;ller inte bara till v&auml;lkomst sidan men ocks&aring; p&aring; alla visade sidor f&ouml;r denna databas. </P></DIR>
+</DIR>
+</DIR>
+</DIR>
+
+
+<UL>
+<STRONG><LI>friend_passwd</STRONG> l&aring;ter att s&auml;tta en gr&auml;ns f&ouml;r synligheten f&ouml;r data f&ouml;r fortfarande levande personer, faktiskt alla personer f&ouml;dda eller d&ouml;da sedan mindre &auml;n ett sekel. </LI></UL>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+
+<P>Om du s&auml;tter ett v&auml;rde f&ouml;r denna variabel, kommer bara personer som har skrivit in passordet p&aring; v&auml;lkomst sidan att ha tilltr&auml;de till dessa data. </P></DIR>
+</DIR>
+</DIR>
+</DIR>
+
+
+<UL>
+<STRONG><LI>wizard_passwd</STRONG> l&aring;ter att begr&auml;nsa r&auml;ttigheterna f&ouml;r att uppdatera din databas. </LI></UL>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+
+<P>Om du s&auml;tter ett v&auml;rde till denna variabel, kan bara personer som har skrivit in passordet p&aring; v&auml;lkomst sidan att ha tilltr&auml;de till modifikationer. </P></DIR>
+</DIR>
+</DIR>
+</DIR>
+
+
+<UL>
+<STRONG><LI>default_lang</STRONG> l&aring;ter att definiera ett default spr&aring;k p&aring; v&auml;lkomst sidan. Utan specificering &auml;r spr&aring;ket franska. De m&ouml;jliga v&auml;rdena &auml;r: "cn" (kinesiska), "de" (tyska), "en" (engelska), "eo" (esperanto), "es" (spanska), "fr" (franska), "it" (italienska), "nl" (holl&auml;ndska), "pt" (portugisiska), "se" (svenska). </LI></UL>
+<DIR>
+<DIR>
+<DIR>
+<DIR>
+
+<P>Notera att vilken spr&aring;k &auml;n som &auml;r valt default, kan du v&auml;lja ett annat p&aring; v&auml;lkomst sidan genom att klicka p&aring; flaggorna h&ouml;gst upp p&aring; sidan. </P></DIR>
+</DIR>
+</DIR>
+</DIR>
+
+<H4><A NAME="Lex">Katalogen "lang" - filen "lexicon.txt"</A> </H4>
+<P>Filen inneh&aring;ller ett lexikon f&ouml;r alla termer och fraser anv&auml;nt av programmet. F&ouml;r varje finns det en &ouml;vers&auml;ttning till varje spr&aring;k. Om du vill l&auml;gga till ett spr&aring;k, v&auml;lj en kod f&ouml;r detta spr&aring;k och l&auml;gga till en rad f&ouml;r varje &ouml;vers&auml;ttnings grupp som finns i filen. </P>
+<P>Ytterligare, om n&aring;gon av de f&ouml;reslagna &ouml;vers&auml;ttningarna p&aring; n&aring;got av spr&aring;ken inte passar dig , kan du &auml;ndra den. </P>
+<P>N&auml;r du sparar filen "lexicon.txt", kommer detta att appliceras omedelbart p&aring; visningen i din webbl&auml;sare. Du beh&ouml;ver kanske trycka p&aring; "reload". </P>
+<H4><A NAME="Lng">Katalogen "lang" - underkataloger</A></H4>
+<P>Varje underkatalogs namn &auml;r en spr&aring;k kod. Varje inneh&aring;ller en default v&auml;lkomst sida f&ouml;r detta spr&aring;k: filen &auml;r ben&auml;mnd "start.txt". </P>
+<P>Du kan &auml;ndra denna v&auml;lkomst sida f&ouml;r en given databas. F&ouml;r databasen "svensson" i spr&aring;ket "xx", g&ouml;r helt enkelt en kopia av filen "start.txt" i katalogen "xx" d&ouml;pa den till "svensson.txt". Editera filen "svensson.txt" och g&ouml;r de &auml;ndringar du vill. Du kan g&ouml;ra detta f&ouml;r varje spr&aring;k. </P>
+<P>Obs: dessa filer inneh&aring;ller HTML kod med vissa indications: % tecken f&ouml;ljt av en bokstav. Det finns makros som "gwd" kommer att byta ut med v&auml;rden. Till exempel, "%t" &auml;r utbytt mot namnet f&ouml;r databasen, "%b" mot v&auml;rdet f&ouml;r "body_prop" i konfigurationsfilen, etc. </P>
+<P>Den kompletta beskrivningen f&ouml;r dessa makron finns <A HREF="pcustom.htm">h&auml;r</A>.</P>
+<P>Tillbaka till <A HREF="diruse.htm">bruksanvisningen</A>. </P>
+<P><HR></P>
+<FONT SIZE=2><EM><P>&copy; Copyright INRIA 1999 - GeneWeb</P></FONT></EM></BODY>
+</HTML>
