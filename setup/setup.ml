@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.42 1999-08-23 10:44:17 ddr Exp $ *)
+(* $Id: setup.ml,v 1.43 1999-08-23 14:18:05 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -1279,7 +1279,7 @@ value intro () =
   do Argl.parse speclist anonfun usage;
      let lang =
        if daemon.val then
-         do Printf.printf "Open location \"http://localhost:2316/\"\n";
+         do Printf.printf "To start, open location http://localhost:2316/\n";
             flush stdout;
             ifdef UNIX then
               if Unix.fork () = 0 then
