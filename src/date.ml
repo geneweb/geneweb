@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 2.22 1999-10-01 11:36:54 ddr Exp $ *)
+(* $Id: date.ml,v 2.23 1999-10-03 20:38:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -419,7 +419,15 @@ value print_calendar conf base =
        ("h", Calendar.sdn_of_hebrew, 13)]
   in
   let date = Calendar.gregorian_of_sdn Sure sdn in
+  let wday =
+    let sdn_today = Calendar.sdn_of_gregorian conf.today in
+    let x = conf.today_wd - sdn_today + sdn in
+    if x < 0 then 6 + (x + 1) mod 7 else x mod 7
+  in
   do header conf title;
+     Wserver.wprint "- %s -\n"
+       (capitale (transl_nth conf "(week day)" wday));
+     html_p conf;
      tag "form" "method=GET action=\"%s\"" conf.command begin
        List.iter
          (fun (k, v) ->
