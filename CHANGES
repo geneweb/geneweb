@@ -2,6 +2,7 @@ GeneWeb version 4.11
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [02 Jan 05] Each complete date has a link to the calendars page.
   - [20 Dec 04] Fixed bug: in display places/surnames, when vars are used
     in base configuration file (base.gwf), the alphabetical order was done
     before the vars substitutions.
