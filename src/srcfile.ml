@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.11 1999-08-06 02:22:34 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.12 1999-08-07 09:10:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -221,7 +221,8 @@ value rec copy_from_channel conf base ic =
             | 'x' ->
                 if conf.wizard || conf.friend then () else echo.val := False
             | 'y' ->
-                if not conf.wizard && not conf.cgi then ()
+                if not conf.wizard && not conf.just_friend_wizard
+                && not conf.cgi then ()
                 else echo.val := False
             | 'z' ->
                 if not conf.wizard && not conf.friend && not conf.cgi then ()
