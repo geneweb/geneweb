@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.87 2004-06-07 12:15:11 ddr Exp $ *)
+(* $Id: util.ml,v 4.88 2004-07-01 14:00:25 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1385,7 +1385,7 @@ value gen_trailer with_logo conf =
     else
       Wserver.wprint "\
 <p>
-<a href=\"%s\"><img src=\"%s/gwlogo.gif\"
+<a href=\"%s\"><img src=\"%s/gwlogo.png\"
 alt=... width=64 height=72 align=right border=0></a>
 <br>
 " (commd conf) (image_prefix conf);

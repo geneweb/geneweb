@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.28 2004-03-25 14:16:25 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.29 2004-07-01 14:00:24 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -409,7 +409,7 @@ function checkCreate(create, redirect)
 </form>
 
 <p>
-<a href="%prefix;"><img src="%image_prefix;/gwlogo.gif"
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
  alt=... width=64 height=72 align=right border=0></a>
 <br>
 %copyright;

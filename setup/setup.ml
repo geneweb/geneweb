@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.48 2004-02-02 11:50:40 ddr Exp $ *)
+(* $Id: setup.ml,v 4.49 2004-07-01 14:00:25 ddr Exp $ *)
 
 open Printf;
 
@@ -123,7 +123,7 @@ value trailer conf =
     if conf.comm = "" then ()
     else
       Wserver.wprint "
-<img src=\"images/gwlogo.gif\" width=64 height=72 align=right alt=logo>
+<img src=\"images/gwlogo.png\" width=64 height=72 align=right alt=logo>
 <br>
 ";
     Wserver.wprint "
@@ -1507,8 +1507,9 @@ value raw_file conf s =
       (separate_slashed_filename s)
   in
   let typ =
-    if end_with s ".gif" then "image/gif"
+    if end_with s ".png" then "image/png"
     else if end_with s ".jpg" then "image/jpeg"
+    else if end_with s ".gif" then "image/gif"
     else "text/html"
   in
   print_typed_file conf typ fname
