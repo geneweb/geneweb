@@ -1,29 +1,8 @@
-# $Id: Makefile.Mac,v 1.3 2000-05-02 17:10:32 doligez Exp $
+# $Id: Makefile.Mac,v 1.4 2000-05-03 12:33:35 ddr Exp $
 
-CAMLP4_COMM = ::tools:camlp4_comm.mpw pa_ifdef.cmo pa_ru.cmo
-CAMLP4F = -DMAC
-CAMLP4D = "``camlp4 -where``"
-LIBUNIX = -cclib -lunix
-OCAMLC = ocamlc
+#include ::tools:Makefile.Mac
+
 OCAMLI =
-OCAMLD =
-RM = delete -y
-
-# all ÄÄ
-
-clean ÄÄ
-    {RM} Å.out Å.opt Å.cm[oixa] Å.cmxa Å.pp[oi] Å.o Å.a Å.obj Å.lib Å.lck Å.bak Å~ .#Å
-
-.cmi Ä .mli
-    {CAMLP4_COMM} {CAMLP4F} {default}.mli -o {default}.ppi
-    {OCAMLC} {OCAMLI} -I {CAMLP4D} -c -intf {default}.ppi
-    {RM} {default}.ppi
-
-.cmo Ä .ml
-    {CAMLP4_COMM} {CAMLP4F} {default}.ml -o {default}.ppo
-    {OCAMLC} {OCAMLI} {OCAMLD} -I {CAMLP4D} -c -impl {default}.ppo
-    {RM} {default}.ppo
-
 OBJS = wserver.cmo
 
 all ÄÄ {OBJS}
