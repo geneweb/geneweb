@@ -5,6 +5,9 @@ GeneWeb Version 4.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [01 Apr 01] The URL to access GeneWeb images does not contains the "?"
+    character any more (in this case, all browser will put hopefully put
+    them in their cache).
   - [23 Mar 01] The log count is now displayed in the traces before the
     traitment.
   - [20 Mar 01] Added + as possible character in an URL.

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 4.4 2001-03-31 03:43:42 ddr Exp $ *)
+(* $Id: util.ml,v 4.5 2001-04-01 14:33:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -770,7 +770,11 @@ value rec copy_from_etc env imcom ic =
 
 value image_prefix conf =
   if images_url.val <> "" then images_url.val
+(*
   else conf.indep_command ^ "m=IM;v="
+*)
+  else if conf.cgi then conf.command ^ "?m=IM;v="
+  else "images"
 ;
 
 value default_body_prop conf =

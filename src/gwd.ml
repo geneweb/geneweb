@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.3 2001-03-28 12:32:26 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.4 2001-04-01 14:33:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -577,39 +577,42 @@ value set_token utm from_addr base_file acc user =
   | Refuse -> "" ]
 ;
 
-value check_file_name cgi request s =
+value index_not_name s =
   loop 0 where rec loop i =
-    if i == String.length s then ()
+    if i == String.length s then i
     else
       match s.[i] with
       [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '-' -> loop (i + 1)
-      | _ ->
-          let url =
-            let serv =
-              "http://" ^ Util.get_server_string_aux cgi request
-            in
-            let req =
-              let bname = String.sub s 0 i in
-              let str = Util.get_request_string_aux cgi request in
-              if cgi then
-                let cginame = String.sub str 0 (String.index str '?') in
-                cginame ^ "?b=" ^ bname
-              else "/" ^ bname ^ "?"
-            in
-            serv ^ req
-          in
-          do if not cgi then
-               do Wserver.wprint "HTTP/1.0 200 Ok"; Util.nl (); return ()
-             else ();
-             Wserver.wprint "Content-type: text/html"; Util.nl (); Util.nl ();
-             Wserver.wprint "\
+      | _ -> i ]
+;
+
+value refresh_url cgi request s i =
+  let url =
+    let serv =
+      "http://" ^ Util.get_server_string_aux cgi request
+    in
+    let req =
+      let bname = String.sub s 0 i in
+      let str = Util.get_request_string_aux cgi request in
+      if cgi then
+        let cginame = String.sub str 0 (String.index str '?') in
+        cginame ^ "?b=" ^ bname
+      else "/" ^ bname ^ "?"
+    in
+    serv ^ req
+  in
+  do if not cgi then
+       do Wserver.wprint "HTTP/1.0 200 Ok"; Util.nl (); return ()
+     else ();
+     Wserver.wprint "Content-type: text/html"; Util.nl (); Util.nl ();
+     Wserver.wprint "\
 <head>
 <meta http-equiv=\"REFRESH\"
  content=\"1;URL=%s\">
 </head>
 <body>
 <a href=\"%s\">%s</a>\n</body>\n" url url url;
-          return raise Exit ]
+  return raise Exit
 ;
 
 value http_preferred_language request =
@@ -657,7 +660,15 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
           Filename.chop_suffix s ".gwb"
         else s
       in
-      do check_file_name cgi request s; return s
+      let i = index_not_name s in
+      if i = String.length s then s
+      else if String.sub s 0 (i + 1) = "images/" then
+        let fname = String.sub s (i + 1) (String.length s - i - 1) in
+        let fname = Filename.basename fname in
+        let fname = Util.image_file_name fname in
+        let _ = Image.print_image_file cgi fname in
+        raise Exit
+      else refresh_url cgi request s i
     in
     let (passwd, env, access_type) =
       let has_passwd = List.mem_assoc "w" env in
