@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.7 2001-11-27 12:15:46 ddr Exp $
+# $Id: a.gwf,v 4.8 2001-12-10 14:07:32 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -190,3 +190,14 @@ places_inverted=no
 # and if the notes is "My name is %vwho;.", the displayed text in the notes
 # will be:
 #   My name is Bond, James Bond.
+
+expand_env=no
+# If yes, expand the (system) environment variables found in the values of
+# the customized variables. You can write ${xxx} to expand the variable
+# xxx. E.g., if HOME is /home/smith and if you define:
+#    var_foo=my home is ${HOME}, guys!
+# the customized variable %vfoo; is expanded into:
+#    my home is /home/smith, guys!
+# The default is "no" because it may be a security hole to allow accomodated
+# databases in a Web site to show the environment variables of the command
+# gwd. Check that before putting "expand_env" to "yes".
