@@ -1,9 +1,12 @@
-(* $Id: relation.ml,v 1.7 1998-11-28 09:46:44 ddr Exp $ *)
+(* camlp4r ./pa_lock.cmo *)
+(* $Id: relation.ml,v 1.8 1998-12-05 12:01:33 ddr Exp $ *)
 
 open Def;
 open Gutil;
 open Config;
 open Util;
+
+value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
 value print_menu conf base p =
   let title h =
@@ -293,8 +296,6 @@ value print_propose_upto conf base p1 p2 rl =
   | _ -> () ]
 ;
 
-value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
-
 value print_main_relationship conf base p1 p2 =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
   if p1.cle_index == p2.cle_index then
@@ -305,7 +306,8 @@ value print_main_relationship conf base p1 p2 =
   else
     let _ = base.ascends.array () in
     let _ = base.couples.array () in
-    let tab = Consang.make_relationship_table base in
+    let tstab = topological_sort conf base in
+    let tab = Consang.make_relationship_table base tstab in
     let (relationship, ancestors) =
       Consang.relationship_and_links base tab True p1.cle_index p2.cle_index
     in
