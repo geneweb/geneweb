@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.13 2000-06-17 14:51:31 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.14 2000-07-08 03:17:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -399,7 +399,7 @@ value print_children conf base des cpl force_children_surnames =
 
 value print_comment conf base fam =
   do stag "h4" begin
-       Wserver.wprint "%s" (capitale (transl conf "comment"));
+       Wserver.wprint "%s" (capitale (nominative (transl conf "comment")));
      end;
      Wserver.wprint "\n";
      tag "table" "border=1" begin
