@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.8 2000-05-02 17:10:32 doligez Exp $ *)
+(* $Id: wserver.ml,v 3.9 2000-05-17 09:08:13 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -120,7 +120,7 @@ value encode s =
 value nl () =
   do wflush ();
      let _ =
-        Unix.write (Unix.descr_of_out_channel wserver_oc.val) "\015\010" 0 2 in
+        Unix.write (Unix.descr_of_out_channel wserver_oc.val) "\013\010" 0 2 in
      ();
   return ()
 ;
