@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 3.12 2001-02-19 21:43:42 ddr Exp $ *)
+(* $Id: templ.ml,v 3.13 2001-03-02 06:54:47 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -21,13 +21,14 @@ and ast_expr =
   | Eop of string and ast_expr and ast_expr
   | Enot of ast_expr
   | Estr of string
+  | Eint of string
   | Evar of string and list string
   | Etransl of bool and string and char ]
 ;
 
 type token =
   [ BANGEQUAL | COMMA | DOT | EQUAL | LPAREN | RPAREN
-  | IDENT of string | STRING of string
+  | IDENT of string | STRING of string | INT of string
   | LEXICON of bool and string and char ]
 ;
 
@@ -42,6 +43,12 @@ value rec get_string len =
   parser
   [ [: `'"' :] -> Buff.get len
   | [: `c; strm :] -> get_string (Buff.store len c) strm ]
+;
+
+value rec get_int len =
+  parser
+  [ [: `('0'..'9' as c); strm :] -> get_int (Buff.store len c) strm
+  | [: :] -> Buff.get len ]
 ;
 
 value get_variable =
@@ -76,6 +83,7 @@ value rec get_token =
   | [: `'=' :] -> EQUAL
   | [: `'!'; `'=' :] -> BANGEQUAL
   | [: `'"'; s = get_string 0 :] -> STRING s
+  | [: `('0'..'9' as c); s = get_int (Buff.store 0 c) :] -> INT s
   | [: `'['; (upp, s, n) = lexicon_word :] -> LEXICON upp s n
   | [: s = get_ident 0 :] -> IDENT s ]
 ;
@@ -143,6 +151,7 @@ value rec parse_expr strm =
              | [: `_ :] -> Evar "parse_error" [] ] :] -> e
     | [: `IDENT "not"; e = parse_simple :] -> Enot e
     | [: `STRING s :] -> Estr s
+    | [: `INT s :] -> Eint s
     | [: (id, idl) = parse_var :] -> Evar id idl
     | [: `_ :] -> Evar "parse_error" [] ]
   in
