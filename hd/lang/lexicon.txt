@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.248 2001-03-07 20:17:23 ddr Exp $
+# $Id: lexicon.txt,v 3.249 2001-03-08 22:50:11 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -47,7 +47,7 @@ nl: af=Afrikaans/cn=Chinees/cs=Tsjechisch/dk=Deens/nl=Nederlands/en=Engels/eo=Es
 no: af=afrikaans/cn=kinesisk/cs=tjekkisk/ct=katalansk/dk=dansk/en=engelsk/eo=esperanto/et=estisk/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
 pl: af=afrikaans/cn=chiñski/cs=czeski/dk=duñski/nl=niderlandzki/en=angielski/eo=esperanto/fi=fiñski/fr=francuski/de=niemiecki/he=hebrajski/is=islandzki/it=w³oski/lv=³otewski/no=norweski/pl=polski/pt=portugalski/es=hiszpañski/ru=rosyjski/se=szwedzki
 pt: af=Afrikaans/cn=Chin&ecirc;/cs=Checo/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;/en=Ingl&ecirc;/eo=Esperanto/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
-se: af=afrikaans/dk=danska/en=engelska/eo=esperanto/et=estniska/fi=finska/fr=franska/he=hebreiska/nl=holländska/is=isländska/it=italienska/cn=kinesiska/lv=litauiska/no=norska/pt=portugisiska/ru=ryska/es=spanska/se=svenska/cs=tjeckiska/de=tyska
+se: af=afrikaans/cn=kinesiska/cs=tjeckiska/ct=katalanska/de=tyska/dk=danska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/ru=ryska/se=svenska
 
      to see the first branch
 af:  om die eerste staak te sien
