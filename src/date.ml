@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.21 2001-01-06 09:55:53 ddr Exp $ *)
+(* $Id: date.ml,v 3.22 2001-01-26 02:46:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -48,8 +48,10 @@ value default_hebrew_month =
 ;
 
 value french_month conf m =
-  let r = transl_nth conf "(french month)" m in
-  if r = "[(french month)]" then "[" ^ default_french_month m ^ "]" else r
+  let r = transl_nth conf "(french revolution month)" m in
+  if r = "[(french revolution month)]" then
+    "[" ^ default_french_month m ^ "]"
+  else r
 ;
 
 value hebrew_month conf m =
