@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.10 1999-11-25 11:21:10 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.11 1999-11-25 12:32:11 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title></head>
   <meta name="ROBOTS" content="NONE">
@@ -74,7 +74,7 @@ Liikkuaksesi t&auml;ss&auml; tietokannassa voit etsi&auml;:<br><p>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
 [or] <em>[surname/surnames]</em>%Iz
-[or] <em>num&eacute;ro Sosa</em> par rapport &agrave; %a%E
+[or] henkil&ouml;n %a <em>Sosa-numero</em>%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
