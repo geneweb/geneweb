@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.12 2002-02-26 17:50:08 ddr Exp $
+# $Id: a.gwf,v 4.13 2002-04-05 17:51:50 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -158,9 +158,11 @@ places_inverted=no
 # 1/ the "personal page, perso.txt
 # 2/ the update person form, updind.txt
 # 3/ the update family form, updfam.txt
-# The standard template is located in the etc directory. Other templates
-# can be added in sub directories of the etc directory: e.g.
-# etc/foo/perso.txt, etc/bar/perso.txt, and so on.
+# The standard template is located in the etc directory of the GeneWeb
+# distribution.
+#
+# Other templates can be added in the databases directory in a subdirectory
+# also named etc: e.g. etc/foo/perso.txt, etc/bar/perso.txt, # and so on.
 #
 # The "template" variable tells which templates are allowed for this
 # database and gives the default template. It is a list of directories
