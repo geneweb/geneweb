@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.14 2000-05-12 07:55:10 ddr Exp $ *)
+(* $Id: date.ml,v 3.15 2000-05-19 23:55:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -437,7 +437,8 @@ value print_dates conf base p =
      return ();
      let (birth_date, death_date, approx) = get_birth_death_date p in
      match (birth_date, death_date) with
-     [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) when d1 <> d2 ->
+     [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
+        Some (Dgreg ({prec = Sure | About | Maybe} as d2) _)) when d1 <> d2 ->
          let a = temps_ecoule d1 d2 in
          do Wserver.wprint "\n(";
             Wserver.wprint "%s " (transl conf "age at death:");

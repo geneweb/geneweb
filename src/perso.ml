@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.21 2000-05-14 19:59:36 ddr Exp $ *)
+(* $Id: perso.ml,v 3.22 2000-05-19 23:55:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -359,7 +359,9 @@ value print_dates conf base open_area p =
         | UnknownBurial -> () ];
      return ();
      match Date.get_birth_death_date p with
-     [ (Some (Dgreg d1 _), Some (Dgreg d2 _), approx) when d1 <> d2 ->
+     [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
+        Some (Dgreg ({prec = Sure | About | Maybe} as d2) _),
+        approx) when d1 <> d2 ->
          let a = temps_ecoule d1 d2 in
          do open_area ();
             Wserver.wprint "%s " (capitale (transl conf "age at death:"));
