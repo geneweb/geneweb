@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.11 2000-03-23 15:35:56 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.12 2000-04-02 16:35:17 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -712,7 +712,11 @@ value gwu base out_dir out_oc src_oc_list anc desc =
                         m_chil =
                           Array.map (fun ip -> poi base ip) des.children}
                      in
-                     if empty_family base m then ml else [m :: ml])
+                     if empty_family base m then
+                       do fam_done.(Adef.int_of_ifam m.m_fam.fam_index) :=
+                            True;
+                       return ml
+                     else [m :: ml])
                   ifaml []
               in
               if ml <> [] then

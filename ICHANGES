@@ -5,6 +5,10 @@ GeneWeb Version 3.04
 --------------------
 
 * GeneWeb compiler (gwc) and uncompiler (gwu)
+  - [02 Apr 00] Fixed problem in gwu: families could be written several
+    times if phony spouses with several marriages.
+  - [02 Apr 00] Added some missing "quote_escaped" in UpdateInd.ml (bug
+    about quotes)
   - [30 Mar 00] In latest births, skip a line after future births if any.
   - [23 Mar 00] Generates "csrc" if at least two children have the same
     #src value (save file length). Added "cbp", idem for the birth place
