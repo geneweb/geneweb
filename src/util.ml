@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.37 2002-03-02 11:02:39 ddr Exp $ *)
+(* $Id: util.ml,v 4.38 2002-03-04 18:01:34 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -301,6 +301,19 @@ value html conf =
     Wserver.wprint "Date: %s" (string_of_ctime conf); nl ();
     Wserver.wprint "Connection: close"; nl ();
     Wserver.wprint "Content-type: text/html; charset=%s" charset; nl ();
+    match conf.set_cookie with
+    [ Some (k, v) ->
+        let path =
+          if conf.cgi then
+            try Sys.getenv "SCRIPT_URL" with
+            [ Not_found -> "/" ]
+          else "/"
+        in
+        do {
+          Wserver.wprint "Set-cookie: %s=%s; path=%s" k v path;
+          nl ()
+        }
+    | None -> () ];
   }
 ;
 

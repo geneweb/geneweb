@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 4.4 2002-02-23 09:28:19 ddr Exp $ *)
+(* $Id: config.mli,v 4.5 2002-03-04 18:01:33 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -19,6 +19,7 @@ type config =
     public_if_titles : bool;
     cancel_links : mutable bool;
     setup_link : mutable bool;
+    set_cookie : mutable option (string * string);
     access_by_key : bool;
     private_years : int;
     hide_names : bool;
