@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 4.5 2001-04-21 17:55:34 ddr Exp $ *)
+(* $Id: robot.ml,v 4.6 2001-05-05 21:43:35 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -65,6 +65,13 @@ value input_excl =
       really_input ic b 0 (String.length b);
       if b <> magic_robot then raise Not_found else (input_value ic : excl)
     }
+;
+
+value output_excl oc xcl =
+  do {
+    output_string oc magic_robot;
+    output_value oc (xcl : excl);
+  }
 ;
 
 value robot_excl () =
@@ -183,10 +190,7 @@ value check oc tm from max_call sec cgi suicide =
   in
   do {
     match try Some (open_out_bin fname) with [ Sys_error _ -> None ] with
-    [ Some oc ->
-        do {
-          output_string oc magic_robot; output_value oc xcl; close_out oc;
-        }
+    [ Some oc -> do { output_excl oc xcl; close_out oc; }
     | None -> () ];
     if refused then robot_error cgi from max_call sec else ()
   }
