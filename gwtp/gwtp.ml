@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.22 2000-08-05 15:37:08 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.23 2000-08-08 13:23:41 ddr Exp $ *)
 
 open Printf;
 
@@ -45,6 +45,10 @@ value cgi_content () =
   else
     try Sys.getenv "QUERY_STRING" with
     [ Not_found -> "" ]
+;
+
+value cgi_from () =
+  try Sys.getenv "REMOTE_HOST" with [ Not_found -> Sys.getenv "REMOTE_ADDR" ]
 ;
 
 (*
@@ -164,7 +168,7 @@ value read_tokens fname =
 value write_tokens fname tokens =
   let oc = open_out fname in
   do List.iter
-       (fun (tm, b, tok) -> fprintf oc "%.0f %s %s\n" tm b tok)
+       (fun (tm, from_b, tok) -> fprintf oc "%.0f %s %s\n" tm from_b tok)
        tokens;
      close_out oc;
   return ()
@@ -193,30 +197,33 @@ value check_login b p =
   if login_ok then Some (mk_passwd ()) else None
 ;
 
-value check_token fname b tok =
+value check_token fname from b tok =
   let tokens = read_tokens fname in
+  let from_b = from ^ "/" ^ b in
   let tm = Unix.time () in
   loop [] tokens where rec loop tokens_out =
     fun
-    [ [(tm0, b0, tok0) :: tokens] ->
+    [ [(tm0, from_b0, tok0) :: tokens] ->
         if tm < tm0 || tm -. tm0 > token_tmout.val then
           loop tokens_out tokens
-        else if b = b0 && tok = tok0 then
-          (True, List.rev tokens_out @ [(tm, b, tok) :: tokens])
-        else loop [(tm0, b0, tok0) :: tokens_out] tokens
+        else if from_b = from_b0 && tok = tok0 then
+          (True, List.rev tokens_out @ [(tm, from_b, tok) :: tokens])
+        else loop [(tm0, from_b0, tok0) :: tokens_out] tokens
     | [] -> (False, List.rev tokens_out) ]
 ;
 
-value set_token b tok =
+value set_token from b tok =
   let fname = tokens_file_name () in
+  let from_b = from ^ "/" ^ b in
   let tokens =
     let tokens = read_tokens fname in
     let tm = Unix.time () in
     List.fold_right
-      (fun (tm0, b0, tok0) tokens ->
-         if b = b0 || tm < tm0 || tm -. tm0 > token_tmout.val then tokens
-         else [(tm0, b0, tok0) :: tokens])
-      tokens [(tm, b, tok)]
+      (fun (tm0, from_b0, tok0) tokens ->
+         if from_b = from_b0 || tm < tm0 || tm -. tm0 > token_tmout.val then
+           tokens
+         else [(tm0, from_b0, tok0) :: tokens])
+      tokens [(tm, from_b, tok)]
   in
   write_tokens fname tokens
 ;
@@ -453,24 +460,24 @@ value gwtp_redirect_to_main str env b tok =
 ;
 *)
 
-value gwtp_check_login str env gwtp_fun =
+value gwtp_check_login from str env gwtp_fun =
   match (HttpEnv.getenv env "b", HttpEnv.getenv env "p") with
   [ (Some b, Some p) ->
       match check_login b p with
       [ Some tok ->
-          do set_token b tok;
+          do set_token from b tok;
              gwtp_fun str env b tok;
           return ()
       | None -> gwtp_error "Invalid login" ]
   | _ -> gwtp_invalid_request str env ]
 ;
 
-value gwtp_logged str env gwtp_fun =
+value gwtp_logged from str env gwtp_fun =
   match (HttpEnv.getenv env "b", HttpEnv.getenv env "t") with
   [ (Some b, Some t) ->
       let ok =
         let fname = tokens_file_name () in
-        let (ok, tokens) = check_token fname b t in
+        let (ok, tokens) = check_token fname from b t in
         do write_tokens fname tokens; return ok
       in
       if ok then gwtp_fun str env b t
@@ -506,6 +513,7 @@ value log oc_log str =
 value gwtp () =
   let content_type = cgi_content_type () in
   let content = cgi_content () in
+  let from = cgi_from () in
   let (str, env) = HttpEnv.make content_type content in
   let oc_log = log_open () in
   do let _ = Unix.umask 0 in ();
@@ -513,12 +521,12 @@ value gwtp () =
      flush oc_log;
      Unix.dup2 (Unix.descr_of_out_channel oc_log) Unix.stderr;
      match HttpEnv.getenv env "m" with
-     [ Some "LOGIN" -> gwtp_check_login str env gwtp_main
-     | Some "MAIN" -> gwtp_logged str env gwtp_main
-     | Some "UPL" -> gwtp_logged str env gwtp_upload
-     | Some "DNL" -> gwtp_logged str env gwtp_download
-     | Some "SEND" -> gwtp_logged str env gwtp_send
-     | Some "RECV" -> gwtp_logged str env gwtp_receive
+     [ Some "LOGIN" -> gwtp_check_login from str env gwtp_main
+     | Some "MAIN" -> gwtp_logged from str env gwtp_main
+     | Some "UPL" -> gwtp_logged from str env gwtp_upload
+     | Some "DNL" -> gwtp_logged from str env gwtp_download
+     | Some "SEND" -> gwtp_logged from str env gwtp_send
+     | Some "RECV" -> gwtp_logged from str env gwtp_receive
      | Some _ -> gwtp_invalid_request str env
      | None -> gwtp_login str env ];
      flush stdout;
