@@ -5,6 +5,10 @@ GeneWeb Version 3.11
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [20 Jan 01] Added request "m=KILL_ANC" to kill someone's ancestors.
+    Allowed only if variable "can_kill_ancestors" is set to "yes" in the
+    configuration file. Not documented because need interface with buttons,
+    links, intermediate pages to ask for confirmation, things like that.
   - [30 Dec 00] When option redirected used, the traces now display the
     referer.
   - [29 Dec 00] The (undocumented) macro %u which is transformed into the
