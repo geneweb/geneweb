@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 3.11 2001-02-16 11:53:39 ddr Exp $ *)
+(* $Id: some.ml,v 3.12 2001-02-28 21:54:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -204,10 +204,10 @@ value afficher_date_mariage conf base fam p c =
 
 value max_lev = 3;
 
-value rec print_branch conf base first_lev lev name p =
+value rec print_branch conf base first_lev psn lev name p =
   do if lev == 0 then () else html_li conf;
      Wserver.wprint "<strong>";
-     if p_surname base p = name then
+     if not psn && p_surname base p = name then
        afficher_prenom_de_personne_referencee conf base p
      else afficher_personne_referencee conf base p;
      Wserver.wprint "</strong>";
@@ -254,7 +254,8 @@ value rec print_branch conf base first_lev lev name p =
            do Wserver.wprint "<ul>\n";
               List.iter
                 (fun e ->
-                   print_branch conf base False (succ lev) name (poi base e))
+                   print_branch conf base False psn (succ lev) name
+                     (poi base e))
                 (Array.to_list el);
               Wserver.wprint "</ul>\n";
            return (False, not down)
@@ -279,6 +280,11 @@ value print_by_branch x conf base not_found_fun (ipl, homonymes) =
       match homonymes with
       [ [x :: _] -> x
       | _ -> x ]
+    in
+    let psn =
+      match homonymes with
+      [ [_] -> False
+      | _ -> True ]
     in
     let title h =
       let access x =
@@ -341,10 +347,10 @@ value print_by_branch x conf base not_found_fun (ipl, homonymes) =
                         wprint_geneweb_link conf href "&lt;&lt";
                         Wserver.wprint "\n";
                         tag "ul" begin
-                          print_branch conf base True 1 x p;
+                          print_branch conf base True psn 1 x p;
                         end;
                      return ()
-                 | None -> print_branch conf base True 0 x p ]
+                 | None -> print_branch conf base True psn 0 x p ]
                else ();
             return n + 1)
          1 ancestors

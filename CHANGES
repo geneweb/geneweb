@@ -13,6 +13,9 @@ GeneWeb version 3.12
   - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
 
 * GeneWeb server or CGI (gwd)
+  - [28 Feb 01] In surname displaying, if several surnames match,
+    everybody is displayed with his/her surname. Previously, the surname
+    of the people having the first surname of the list was not displayed.
   - [24 Feb 01] Fixed big bug in Windows version: if the GeneWeb
     directory was installed in a directory which contained one or several
     spaces (e.g. C:/Program Files), and if the server "gwd" was used
