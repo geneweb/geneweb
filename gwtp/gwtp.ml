@@ -1,11 +1,13 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.3 2001-06-07 08:40:18 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.4 2001-09-06 09:45:29 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
 
 value gwtp_tmp = ref (Filename.concat ".." "gwtp_tmp");
 value gwtp_dst = ref (Filename.concat ".." "gwtp_dst");
+value gwtp_log = ref "";
+value gwtp_etc = ref "";
 value gw_site = ref "";
 value token_tmout = ref 900.0;
 
@@ -116,7 +118,7 @@ value quote_escaped s =
 ;
 
 value log_open () =
-  let fname = Filename.concat gwtp_tmp.val "gwtp.log" in
+  let fname = Filename.concat gwtp_log.val "gwtp.log" in
   open_out_gen [Open_wronly; Open_creat; Open_append] 0o666 fname
 ;
 
@@ -140,7 +142,7 @@ value template_fname env fname =
     [ Some x -> x
     | _ -> "en" ]
   in
-  List.fold_right Filename.concat [gwtp_tmp.val; "lang"; dir] (fname ^ ".txt")
+  List.fold_right Filename.concat [gwtp_etc.val; "lang"; dir] (fname ^ ".txt")
 ;
 
 value copy_template genv (varenv, filenv) env fname =
@@ -372,7 +374,7 @@ value set_base_conf b varenv =
   let ic_opt =
     try Some (open_in fname) with
     [ Sys_error _ ->
-        let fname = Filename.concat gwtp_tmp.val "default.gwf" in
+        let fname = Filename.concat gwtp_etc.val "default.gwf" in
         try Some (open_in fname) with [ Sys_error _ -> None ] ]
   in
   do {
@@ -449,7 +451,7 @@ value write_tokens fname tokens =
 
 value check_login b p =
   let line1 = b ^ ":" ^ p in
-  let ic = open_in (Filename.concat gwtp_tmp.val "passwd") in
+  let ic = open_in (Filename.concat gwtp_etc.val "passwd") in
   let login_ok =
     loop () where rec loop () =
       match try Some (input_line ic) with [ End_of_file -> None ] with
@@ -962,6 +964,11 @@ value speclist =
     "<dir>: directory for gwtp stuff; default: " ^ gwtp_tmp.val);
    ("-dst", Arg.String (fun x -> gwtp_dst.val := x),
     "<dir>: directory for data bases; default: " ^ gwtp_dst.val);
+   ("-log", Arg.String (fun x -> gwtp_log.val := x),
+    "<log>: directory for log file; default: " ^ gwtp_tmp.val);
+   ("-etc", Arg.String (fun x -> gwtp_etc.val := x),
+    "<etc>: directory for passwd, default.gwf and lang files; default: " ^
+    gwtp_tmp.val);
    ("-site", Arg.String (fun x -> gw_site.val := x),
     "<url>: site (if any) where data bases are accomodated");
    ("-tmout", Arg.Float (fun x -> token_tmout.val := x),
@@ -970,7 +977,14 @@ value speclist =
 ;
 value anonfun _ = do { Arg.usage speclist usage_msg; exit 2 };
 
-value main () = do { Arg.parse speclist anonfun usage_msg; gwtp (); };
+value main () =
+  do {
+    Arg.parse speclist anonfun usage_msg;
+    if gwtp_log.val = "" then gwtp_log.val := gwtp_tmp.val else ();
+    if gwtp_etc.val = "" then gwtp_etc.val := gwtp_tmp.val else ();
+    gwtp ();
+  }
+;
 
 try main () with exc ->
   do {
