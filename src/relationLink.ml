@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.5 1999-12-06 07:31:36 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.6 1999-12-06 15:06:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -553,7 +553,7 @@ value print_relation_ok conf base info =
   return ()
 ;
 
-value print_relation_no_dag conf base po ip1 ip2 l1 l2 =
+value print_relation_no_dag conf base po ip1 ip2 =
   let params =
     match (po, p_getint conf.env "l1", p_getint conf.env "l2") with
     [ (Some p, Some l1, Some l2) ->
@@ -654,24 +654,6 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
   [ Exit -> Util.incorrect_request conf ]
 ;
 
-value print_relation conf base p1 p2 =
-  let l1 = p_getint conf.env "l1" in
-  let l2 = p_getint conf.env "l2" in
-  let po = find_person_in_env conf base "" in
-  match (p_getenv conf.env "dag", po, l1, l2) with
-  [ (Some "on", Some p, Some l1, Some l2) ->
-      print_relation_dag conf base p p1 p2 [l1] [l2]
-  | _ -> print_relation_no_dag conf base po p1.cle_index p2.cle_index l1 l2 ]
-;
-
-value print conf base =
-  match
-    (find_person_in_env conf base "1", find_person_in_env conf base "2")
-  with
-  [ (Some p1, Some p2) -> print_relation conf base p1 p2
-  | _ -> incorrect_request conf ]
-;
-
 value int_list s =
   loop 0 0 where rec loop i n =
     if i = String.length s then [n]
@@ -681,14 +663,21 @@ value int_list s =
       | _ -> [n :: loop (i + 1) 0] ]
 ;
 
-value print_rld conf base =
+value print_relation conf base p1 p2 =
+  let l1 = p_getenv conf.env "l1" in
+  let l2 = p_getenv conf.env "l2" in
+  let po = find_person_in_env conf base "" in
+  match (p_getenv conf.env "dag", po, l1, l2) with
+  [ (Some "on", Some p, Some l1, Some l2) ->
+      print_relation_dag conf base p p1 p2 (int_list l1) (int_list l2)
+  | _ -> print_relation_no_dag conf base po p1.cle_index p2.cle_index ]
+;
+
+value print conf base =
   match
-    (find_person_in_env conf base "",
-     find_person_in_env conf base "1", find_person_in_env conf base "2",
-     p_getenv conf.env "x1", p_getenv conf.env "x2")
+    (find_person_in_env conf base "1", find_person_in_env conf base "2")
   with
-  [ (Some p, Some p1, Some p2, Some x1, Some x2) ->
-      print_relation_dag conf base p p1 p2 (int_list x1) (int_list x2)
+  [ (Some p1, Some p2) -> print_relation conf base p1 p2
   | _ -> incorrect_request conf ]
 ;
 
