@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.48 1999-06-03 10:24:55 ddr Exp $
+# $Id: lexicon.txt,v 2.49 1999-06-03 12:11:00 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -580,7 +580,7 @@ pt: acesso
 se: tilltr&auml;de
 
     add
-de: hinzuf&uuml;gen
+de: hinzuf&uuml;gen +before
 dk: tilf&oslash;j
 en: add
 eo: aldoni +decl
@@ -1028,6 +1028,7 @@ pt: enterrado/enterrada/enterrado(a)
 se: begravd
 
     cancel GeneWeb links
+de: GeneWeb-Links entfernen
 dk: uden GeneWeb-links
 es: anular los lazos GeneWeb
 en: cancel GeneWeb links
@@ -1063,6 +1064,7 @@ pt: n&atilde;o se pode modificar o sexo de uma pessoa casada
 se: kan inte &auml;ndra k&ouml;n p&aring; en gift person
 
     change children's names
+de: Namen der Kinder &auml;ndern
 dk: &aelig;ndre b&oslash;rns navne
 es: cambiar los nombres de los hijos
 en: change children's names
@@ -1099,6 +1101,7 @@ pt: filho/filhos
 se: barn/barnen
 
     children's names changed
+de: Namen der Kinder ge&auml;ndert
 dk: b&oslash;rns navne &aelig;ndret
 en: children's names changed
 es: nombres de los hijos cambiados
@@ -1285,7 +1288,7 @@ pt: na idade de
 se: &aring;lder:
 
     delete
-de: l&ouml;schen
+de: l&ouml;schen +before
 dk: slet
 en: delete
 eo: malkonstrui +decl
@@ -1525,6 +1528,7 @@ pt: pai/m&atilde;e
 se: far/mor
 
     file
+de: Datei
 dk: fil
 en: file
 es: fichero
@@ -1760,7 +1764,7 @@ pt: si t&iacute;tulos
 se: om titlar
 
     image
-de: Foto
+de: Bild
 dk: billede
 en: image
 es: imagen
@@ -1773,7 +1777,7 @@ pt: foto
 se: foto
 
     image deleted
-de: Foto gel&ouml;scht
+de: Bild gel&ouml;scht
 dk: billede slettet
 en: image deleted
 eo: foto malkonstruita
@@ -1787,6 +1791,7 @@ pt: foto suprimida
 se: foto borttaget
 
     image received
+de: Bild erhalten
 dk: billede indsat
 en: image received
 es: imagen recibida
@@ -1827,6 +1832,7 @@ pt: em
 se: 
 
     include missing spouses
+de: Fehlende Ehegatten einbeziehen
 dk: medtag ukendte &aelig;gtef&aelig;ller
 en: include missing spouses
 es: incluir las esposas faltantes
@@ -2057,6 +2063,7 @@ pt: lista
 se: lista
 
     long display
+de: Lange Ansicht
 dk: udvidet rapport
 en: long display
 es: presentaci&oacute;n extensa
@@ -2228,7 +2235,7 @@ pt: ascendentes faltando
 se: anf&auml;der som saknas
 
     modify
-de: &auml;ndern
+de: &auml;ndern +before
 dk: &aelig;ndre
 en: modify
 eo: modifi +decl
@@ -2995,6 +3002,7 @@ pt: grau de parentesco/graus de parentesco
 se: sl&auml;ktl&auml;nk/sl&auml;ktl&auml;nkar
 
     relationship%t to
+de: in einer Beziehung%t mit
 dk: forbindelse%t med
 en: relationship%t to
 es: parentesco%t con
@@ -3045,6 +3053,7 @@ pt: ver a continua&ccedil;&atilde;o
 se: se vidare
 
     send
+de: senden +before
 dk: inds&aelig;t
 en: send
 es: enviar

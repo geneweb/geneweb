@@ -16,6 +16,10 @@ GeneWeb version 2.03
   - [May 7, 99] Fixed bug: "cleanup" under Windows did not work.
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jun 3, 99] Added ability to use a new predefined term "+before" in the
+    lexicon to specify the complement is before a verb (e.g. in German:
+    "send" "image" is translated into "senden +before" "Bild", which gives
+    at end: "Bild senden").
   - [May 31, 99] In ancestors only selected generation, added displaying
     of Sosa intervals (and "..." is displayed for non-contiguous intervals).
   - [May 18, 99] Added, in ancestors and descendants displaying, the ability
@@ -44,6 +48,7 @@ GeneWeb version 2.03
     was incorrectly capitalized.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (*/start.txt)
+  - [Jun 3, 99] Added missing terms in German (Markus Mottl).
   - [Jun 3, 99] Added some missing terms in Italian (Daniel Hirschkoff).
   - [Jun 2, 99] Fixed and completed translations in Swedish (Lars Gustavsson;
     some help also from Stig Petersson).
