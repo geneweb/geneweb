@@ -6,6 +6,7 @@ GeneWeb Version 1.09
   - Fixed still several displaying bugs due to ANSEL
   - Added "wizard_just_friend" in .cnf files (see example etc/a.cnf) to
     suspend the powers of wizards.
+  - [detail] Added text "Parents of" in displaying missing ancestors.
 
 * ged2gwb, gwb2ged:
   - Added save and restore of the GeneWeb fields

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.2 1998-09-07 11:36:18 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.3 1998-11-12 10:59:34 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -549,6 +549,10 @@ value print_missing_ancestors conf base v spouses_included p =
      [ Some a -> Wserver.wprint " %s %d" (transl conf "before") a
      | None -> () ];
      Wserver.wprint ".\n";
+     if not spouses_included then
+       Wserver.wprint "<br>\n%s %s:\n" (capitale (transl conf "parents"))
+         (transl_nth conf "of" 0)
+     else ();  
      mark.(Adef.int_of_iper p.cle_index) := Num.one;
      tag "ul" begin
        generation 1 [GP_person Num.one p.cle_index];
@@ -818,6 +822,10 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
         [ Some a -> Wserver.wprint " %s %d" (transl conf "before") a
         | None -> () ];
         Wserver.wprint ".\n";
+        if not spouses_included then
+          Wserver.wprint "<br>\n%s %s:\n" (capitale (transl conf "parents"))
+            (transl_nth conf "of" 0)
+        else ();  
         tag "ul" begin
           let _ = List.fold_left
             (fun prev_i ((n, _) as e) ->
