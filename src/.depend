@@ -36,7 +36,7 @@ descend.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx util.cmx \
 family.cmo: adef.cmi advSearchOk.cmo alln.cmo ascend.cmo birth.cmo \
     birthday.cmo config.cmi date.cmi def.cmi descend.cmo gutil.cmi merge.cmi \
     mergeFam.cmo mergeFamOk.cmo mergeInd.cmo mergeIndOk.cmo name.cmi \
-    perso.cmo relation.cmo relationLink.cmo some.cmo srcfile.cmi title.cmo \
+    perso.cmi relation.cmo relationLink.cmo some.cmo srcfile.cmi title.cmo \
     update.cmi updateFam.cmi updateFamOk.cmo updateInd.cmi updateIndOk.cmi \
     util.cmi ../wserver/wserver.cmi family.cmi 
 family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birth.cmx \
@@ -100,9 +100,10 @@ pa_html.cmx: ../wserver/wserver.cmx
 pa_lock.cmo: lock.cmo 
 pa_lock.cmx: lock.cmx 
 perso.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
-    ../wserver/wserver.cmi 
+    ../wserver/wserver.cmi perso.cmi 
 perso.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
-    ../wserver/wserver.cmx 
+    ../wserver/wserver.cmx perso.cmi 
+perso.cmi: config.cmi def.cmi 
 phonygwd.cmo: argl.cmo ../wserver/wserver.cmi 
 phonygwd.cmx: argl.cmx ../wserver/wserver.cmx 
 pqueue.cmo: pqueue.cmi 
