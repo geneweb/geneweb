@@ -69,7 +69,8 @@ family.cmo: adef.cmi advSearchOk.cmo alln.cmo ascend.cmo birthDeath.cmo \
     mergeInd.cmo mergeIndOk.cmo name.cmi notes.cmo num.cmi perso.cmi \
     relation.cmo relationLink.cmo sendImage.cmo some.cmo srcfile.cmi \
     title.cmo tree.cmo update.cmi updateFam.cmi updateFamOk.cmo updateInd.cmi \
-    updateIndOk.cmi util.cmi ../wserver/wserver.cmi family.cmi 
+    updateIndOk.cmi util.cmi ../wserver/wserver.cmi family.cmi \
+    history.cmo
 family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birthDeath.cmx \
     birthday.cmx changeChildren.cmx config.cmi cousins.cmx date.cmx def.cmi \
     descend.cmx doc.cmx gutil.cmx merge.cmx mergeFam.cmx mergeFamOk.cmx \
@@ -97,8 +98,8 @@ gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmo def.cmi gutil.cmi iobase.cmi \
     select.cmo 
 gwu.cmx: adef.cmx argl.cmx buff.cmx calendar.cmx def.cmi gutil.cmx iobase.cmx \
     select.cmx 
-history.cmo: config.cmi def.cmi util.cmi 
-history.cmx: config.cmi def.cmi util.cmx 
+history.cmo: history.cmi config.cmi def.cmi util.cmi 
+history.cmx: history.cmi config.cmi def.cmi util.cmx 
 iobase.cmo: adef.cmi btree.cmo buff.cmo def.cmi gutil.cmi iovalue.cmi \
     name.cmi iobase.cmi 
 iobase.cmx: adef.cmx btree.cmx buff.cmx def.cmi gutil.cmx iovalue.cmx \
@@ -187,7 +188,7 @@ updateFam.cmo: adef.cmi config.cmi def.cmi gutil.cmi srcfile.cmi update.cmi \
     util.cmi ../wserver/wserver.cmi updateFam.cmi 
 updateFam.cmx: adef.cmx config.cmi def.cmi gutil.cmx srcfile.cmx update.cmx \
     util.cmx ../wserver/wserver.cmx updateFam.cmi 
-updateFamOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmo iobase.cmi \
+updateFamOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi iobase.cmi \
     lock.cmo update.cmi updateFam.cmi util.cmi ../wserver/wserver.cmi 
 updateFamOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx iobase.cmx \
     lock.cmx update.cmx updateFam.cmx util.cmx ../wserver/wserver.cmx 
@@ -195,7 +196,7 @@ updateInd.cmo: adef.cmi config.cmi def.cmi gutil.cmi srcfile.cmi update.cmi \
     util.cmi ../wserver/wserver.cmi updateInd.cmi 
 updateInd.cmx: adef.cmx config.cmi def.cmi gutil.cmx srcfile.cmx update.cmx \
     util.cmx ../wserver/wserver.cmx updateInd.cmi 
-updateIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmo iobase.cmi \
+updateIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi iobase.cmi \
     lock.cmo name.cmi update.cmi updateInd.cmi util.cmi \
     ../wserver/wserver.cmi updateIndOk.cmi 
 updateIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx iobase.cmx \
