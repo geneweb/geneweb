@@ -5,6 +5,15 @@ GeneWeb Version 3.03
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [5 Mar 00] Changed images request, because it was possible to display
+    the images even for private persons ("friend" security hole).
+    Consequently, there are now two forms of the "m=IM" requests: one for
+    persons (images accessed in directory "bd/images/base"), one for
+    other images (images accessed in directory "bd/images" or "hd/images").
+    Other consequence: background images must *not* be put in bd/images/base
+    directory.
+  - [5 Mar 00] In m=RL, added ability to add ";tab=on" or ";tab=off" to
+    force printing with or without tables.
   - [23 Feb 00] Fixed bug: in notes, when "<a" and "href" were separated
     by a newline instead of space, it was not considered to be in the
     tag "a href" and if followed by "http://" could erroneously generate a

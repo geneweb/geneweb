@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.12 2000-01-15 00:48:15 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.13 2000-03-05 17:15:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -535,10 +535,15 @@ value print_relation_path conf base info =
          return ()
        else ();
     return ()
-  else if browser_doesnt_have_tables conf then
-    print_with_pre conf base info
   else
-    print_with_table conf base info
+    let with_table =
+      match p_getenv conf.env "tab" with
+      [ Some "on" -> True
+      | Some "off" -> False
+      | _ -> not (browser_doesnt_have_tables conf) ]
+    in
+    if with_table then print_with_table conf base info
+    else print_with_pre conf base info
 ;
 
 value print_relation_ok conf base info =
@@ -693,4 +698,3 @@ value print conf base =
   [ (Some p1, Some p2) -> print_relation conf base p1 p2
   | _ -> incorrect_request conf ]
 ;
-

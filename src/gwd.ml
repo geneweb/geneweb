@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.17 2000-01-25 03:18:02 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.18 2000-03-05 17:15:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -762,49 +762,7 @@ value excluded from =
   | None -> False ]
 ;
 
-value content_image cgi t len =
-  do if not cgi then
-       do Wserver.wprint "HTTP/1.0 200 OK"; nl (); return ()
-     else ();
-     Wserver.wprint "Content-type: image/%s" t; nl ();
-     Wserver.wprint "Content-length: %d" len; nl ();
-     nl ();
-     Wserver.wflush ();
-  return ()
-;
-
-value print_image cgi bname str t =
-  let fname = Util.image_file_name bname str in
-  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
-  [ Some ic ->
-      do try
-           do content_image cgi t (in_channel_length ic);
-              try
-                let b = " " in
-                while True do
-                  b.[0] := input_char ic;
-                  Wserver.wprint "%c" b.[0];
-                done
-              with [ End_of_file -> () ];
-           return ()
-         with e -> do close_in ic; return raise e;
-         close_in ic;
-      return ()
- | None -> () ]
-;
-
 value image_request cgi str env =
-  let bname =
-    let (x, _) = extract_assoc "b" env in
-    if x <> "" || cgi then
-      let ip = index '_' x in
-      String.sub x 0 ip
-    else
-      let iq = index '?' str in
-      let b = String.sub str 0 iq in
-      let ip = index '_' b in
-      String.sub str 0 (min ip iq)
-  in
   match (Util.p_getenv env "m", Util.p_getenv env "v") with
   [ (Some "IM", Some fname) ->
       let fname =
@@ -812,16 +770,8 @@ value image_request cgi str env =
         else fname
       in
       do if Filename.is_implicit fname then
-           let _ =
-             List.exists
-               (fun (suff, itype) ->
-                  if Filename.check_suffix fname suff
-                  || Filename.check_suffix fname (String.uppercase suff) then
-                    do print_image cgi bname fname itype; return True
-                  else False)
-               [(".png", "png"); (".jpg", "jpeg"); (".jpeg", "jpeg");
-                (".gif", "gif")]
-           in ()
+           let fname = Util.image_file_name fname in
+           let _ = Image.print_image_file cgi fname in ()
          else ();
       return True
   | _ -> False ]

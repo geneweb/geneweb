@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.9 2000-01-25 09:58:21 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.10 2000-03-05 17:15:06 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1472,6 +1472,21 @@ value print_tree_with_pre conf base v p =
   end
 ;
 
+value print_image conf base p fname width height =
+  let image_txt = capitale (transl conf "image") in
+  let s = Unix.stat fname in
+  let b = acces conf base p in
+  let k = default_image_name base p in
+  do Wserver.wprint "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k;
+     Wserver.wprint "\
+<img src=\"%sm=IM;d=%d;%s;k=/%s\" width=%d height=%d border=0 alt=\"%s\">"
+        (commd conf)
+        (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+        b k width height image_txt;
+     Wserver.wprint "</a>\n";
+  return ()
+;
+
 value print_tree_with_table conf base gv p =
   let gv = min (limit_by_tree conf) gv in
   let next_gen pol =
@@ -1502,11 +1517,6 @@ value print_tree_with_table conf base gv p =
   in
   let down_reference p s =
     if conf.cancel_links then s
-(*
-    else if Array.length p.family > 0 then
-      "<a href=\"" ^ commd conf ^ "m=D;t=T;v=1;k=" ^ string_of_int v ^ ";" ^
-      acces conf base p ^ "\">" ^ s ^ "</a>"
-*)
     else reference conf base p s
   in
   let colspan = fun [ 1 -> "" | n -> " colspan=" ^ string_of_int n ] in
@@ -1526,6 +1536,17 @@ value print_tree_with_table conf base gv p =
            | _ -> "&nbsp;" ]
          in
          Wserver.wprint "%s" txt;
+         match (po, p_getenv conf.env "image") with
+         [ (Some p, Some "on") ->
+             match image_and_size conf base p (limited_image_size 100 100) with
+             [ Some (f, Some (wid, hei)) ->
+                 do Wserver.wprint "<br>\n";
+                    Wserver.wprint "<center><table border=0><tr><td>\n";
+                    print_image conf base p f wid hei;
+                    Wserver.wprint "</table></center>\n";
+                 return ()
+             | _ -> () ]
+         | _ -> () ];
        end;
        Wserver.wprint "\n";
     return ()

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.14 2000-01-22 01:22:03 ddr Exp $ *)
+(* $Id: family.ml,v 3.15 2000-03-05 17:15:06 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -370,6 +370,8 @@ value family_m conf base =
       | None -> Util.incorrect_request conf ]
   | Some "HIST" ->
       History.print conf base
+  | Some "IM" ->
+      Image.print conf base
   | Some "LB" when conf.wizard || conf.friend ->
       BirthDeath.print_birth conf base
   | Some "LD" when conf.wizard || conf.friend ->
