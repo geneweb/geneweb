@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.48 2000-06-26 17:08:45 ddr Exp $ *)
+(* $Id: relation.ml,v 3.49 2000-06-27 11:14:18 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -474,7 +474,7 @@ value print_shortest_path conf base p1 p2 =
             match find_person_in_env conf base ("ef" ^ string_of_int i) with
             [ Some p ->
                 let n =
-                  match p_getint conf.env ("eff" ^ string_of_int i) with
+                  match p_getint conf.env ("fef" ^ string_of_int i) with
                   [ Some n -> n
                   | None -> 0 ]
                 in
