@@ -1,3 +1,4 @@
+<a href="%gsuicide=x"> </a>
 </table>
 <table border=0>
 <tr>
@@ -37,3 +38,7 @@
 </td>
 </tr>
 </table>
+
+%Ij<p><blink><strong><font color=red>Maintenance! Wizard power
+temporarily suspended... wait some minutes to recover the ability to
+make inline updates. Thank you.</font></strong></blink>%E
