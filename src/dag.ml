@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.15 2000-01-06 22:33:45 ddr Exp $ *)
+(* $Id: dag.ml,v 3.16 2000-01-08 14:58:12 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -165,14 +165,19 @@ value print_only_dag conf base spouse_on invert set spl d =
     [ Some x -> x
     | _ -> 0 ]
   in
+  let td =
+    match Util.p_getenv conf.env "td" with
+    [ Some x -> " " ^ x
+    | _ -> "" ]
+  in
   let print_indi n =
-    let sq =
+    let (sq, td) =
       match n.valu with
-      [ Left ip -> square
-      | _ -> 0 ]
+      [ Left ip -> (square, td)
+      | _ -> (0, "") ]
     in
-    if sq > 0 then
-      do Wserver.wprint "<table border=%d><tr><td align=center>" sq;
+    if sq > 0 || td <> "" then
+      do Wserver.wprint "<table border=%d><tr><td align=center%s>" sq td;
          print_indi n;
          Wserver.wprint "</table>";
       return ()
