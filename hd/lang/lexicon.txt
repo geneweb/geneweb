@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.13 1999-04-07 11:31:52 ddr Exp $
+# $Id: lexicon.txt,v 2.14 1999-04-07 11:33:42 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2323,6 +2323,19 @@ no: fra %ts slektside
 pt: pelo lado de %t
 se: fr&aring;n %ts sl&auml;ktsida
 
+    of (person of lower generation level)
+de: von +decl
+en: of
+eo: de
+es: de
+fr: de/d'
+he:    ωμ
+it: di/d'
+nl: van
+no: til
+pt: de
+se: till
+
     of the %s generation
 de: der %s Generation
 en: of the %s generation
@@ -2400,19 +2413,6 @@ nl: van de moord
 no: av mordet
 pt: do assesinado
 se: av mordet
-
-    of (person of lower generation level)
-de: von +decl
-en: of
-eo: de
-es: de
-fr: de/d'
-he:    ωμ
-it: di/d'
-nl: van
-no: til
-pt: de
-se: till
 
     on (day month year)
 cn: ΣΪ
