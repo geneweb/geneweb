@@ -6,6 +6,7 @@ in the navigation.
 
    Under Windows, double-click on "gwsetup".
    Under Unix, launch "gwsetup" in an xterm.
+   Under MacOS X, launch "gwsetup" in a Terminal.
 
 But if you prefer to know the basic commands of GeneWeb, and are used
 to the interactive commands (MSdos, Xterm...), go to the directory "gw"
