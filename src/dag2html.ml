@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.18 1999-12-21 15:35:10 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.19 1999-12-21 20:01:52 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -171,8 +171,13 @@ value print_html_table print print_indi phony border d t =
              do print "<td colspan=";
                 print (string_of_int colspan);
                 print " align=center>";
-                print
-                  (if phony t.table.(i + 1).(j).elem then "&nbsp;" else "|");
+                let all_ph =
+                  loop j where rec loop j =
+                    if j = next_j then True
+                    else if phony t.table.(i + 1).(j).elem then loop (j + 1)
+                    else False
+                in
+                print (if all_ph then "&nbsp;" else "|");
                 print "</td>\n";
              return ();
            print "<td>&nbsp;</td>\n";
