@@ -1,27 +1,35 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>D&eacute;marrage</title></head>
+<head><title>M&eacute;thode simple</title></head>
 
 <body>
 
-<h1>D&eacute;marrage</h1>
+<h1>M&eacute;thode simple</h1>
 
-Pour d&eacute;marrer, vous avez besoin d'une base de donn&eacute;es
-<em>GeneWeb</em>.
+<form mode=GET action="start">
+<input type=hidden name=lang value=$l>
 
-<p>
-
-<ul><li>Si vous partez de rien, vous devez cr&eacute;er une base de
-donn&eacute;es vide. <a href="$sm=H;v=gwc_empty.html">Cliquez
-ici</a>.</ul>
+Si vous disposez d'un fichier GEDCOM, indiquez-le ici. Si vous n'en
+n'avez pas, laissez cette zone vide:
 
 <p>
 
-<ul><li>Si vous disposez d'un fichier GEDCOM, vous devez le convertir
-en base de donn&eacute;es <em>GeneWeb</em>. <a
-href="$sm=H;v=ged2gwb_simple.html">Cliquez ici</a>.</ul>
+<input name=anon type=file size=55>
 
 <p>
 
-Pour revenir &agrave; l'&eacute;cran pr&eacute;c&eacute;dent, utilisez
-la touche "retour en arri&egrave;re" de votre navigateur.
+Indiquez le nom que vous voulez donner &agrave; votre base de
+donn&eacute;es:
+
+<p>
+
+<input name=o size=30 value="base">
+
+<p>
+
+Puis appuyez sur ce bouton:
+
+<p>
+
+<input type=submit value="Cr&eacute;er">
+</form>

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 1999-04-30 11:45:47 ddr Exp $
+# $Id: Makefile,v 1.2 1999-05-01 09:35:05 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -23,6 +23,7 @@ gw:
 	cd gw; ln -s .. setup
 	cd gw; ln -s ../../src/gwc .
 	cd gw; ln -s ../../src/gwd .
+	cd gw; ln -s ../../src/consang .
 	cd gw; ln -s ../../hd/lang .
 	cd gw; ln -s ../../hd/images .
 	cd gw; ln -s ../../ged2gwb/ged2gwb .
@@ -35,5 +36,7 @@ setup.opt: $(OBJS:.cmo=.cmx)
 
 depend:
 	../tools/camlp4_depend.sh $(OCAMLI) *.ml* > .depend
+
+always:
 
 include .depend

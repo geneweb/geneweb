@@ -2,7 +2,7 @@
 Bienvenue dans GeneWeb
 
 Allez dans votre navigateur et ouvrez l'adresse:
-       http://localhost:2318/fr
+       http://localhost:$z/fr
 
 Si cela ne fonctionne pas, il se peut que vous ayez a configurer dans
 votre navigateur des options du genre "travailler hors connexion" ou
