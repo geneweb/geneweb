@@ -11,6 +11,10 @@ GeneWeb version 3.08
      <img src=...>? did not work because the program changed it into
      <img src=<a href=http://...>>
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [26 Aug 00] If -epn (which is default) and -lf, tries now to lowercase
+    the public names.
+
 * GeneWeb data bases Transfer Program (gwtp)
   - [22 Aug 00] Fixed bug: worked only if the CGI name was gwtp (could not
     be gwtp.cgi, for example). Fixed also the distribution: template files
