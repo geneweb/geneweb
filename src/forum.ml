@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.8 2001-04-22 10:35:20 ddr Exp $ *)
+(* $Id: forum.ml,v 4.9 2001-06-01 09:06:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -35,35 +35,37 @@ value sp2nbsp lim s =
       loop (i + 1) len
 ;
 
-value print_one_header conf prec_date pos h =
+value print_one_header conf prec_date nmon pos h =
   let (date, hour, ident, subject, beg_mess) = h in
-  do {
+  let nmon =
     if date <> prec_date then do {
-      let d =
-        try
-          let y = int_of_string (String.sub date 0 4) in
-          let m = int_of_string (String.sub date 5 2) in
-          let d = int_of_string (String.sub date 8 2) in
-          Dgreg {year = y; month = m; day = d; prec = Sure; delta = 0}
-            Dgregorian
-        with
-        [ Failure _ -> Dtext date ]
+      let nmon =
+        match (prec_date, date) with
+        [ (Dgreg pd _, Dgreg d _) ->
+            if d.month <> pd.month then
+              if nmon < 1 then do {
+                Wserver.wprint "<tr><td colspan=4>&nbsp;</td></tr>\n";
+                nmon + 1
+              }
+              else do {
+                Wserver.wprint "</table>\n<p>\n";
+                Wserver.wprint "<table border=%d>\n" conf.border;
+                0
+              }
+            else nmon
+        | _ ->
+            do { Wserver.wprint "<table border=%d>\n" conf.border; nmon } ]
       in
-      if prec_date = "" ||
-         String.length prec_date > 7 && String.length date > 7 &&
-         String.sub prec_date 5 2 <> String.sub date 5 2 then
-         do {
-        if prec_date <> "" then Wserver.wprint "</table>\n<p>\n" else ();
-        Wserver.wprint "<table border=%d>\n" conf.border;
-      }
-      else ();
       tag "tr" begin
         tag "td" "colspan=4 align=left" begin
-          Wserver.wprint "%s" (Date.string_of_date conf d);
+          Wserver.wprint "%s" (Date.string_of_date conf date);
         end;
       end;
+      nmon
     }
-    else ();
+    else nmon
+  in
+  do {
     tag "tr" begin
       tag "td" begin Wserver.wprint "<tt>&nbsp;&nbsp;&nbsp;</tt>"; end;
       tag "td" begin Wserver.wprint "<tt>%s</tt>" hour; end;
@@ -77,6 +79,7 @@ value print_one_header conf prec_date pos h =
         else Wserver.wprint "%s" (secure (sp2nbsp 30 subject));
       end;
     end;
+    nmon
   }
 ;
 
@@ -86,7 +89,7 @@ value print_headers conf =
   [ Some ic ->
       let ic_len = in_channel_length ic in
       let last_date =
-        loop "" where rec loop prec_date =
+        loop (Dtext "", 0) where rec loop (prec_date, nmon) =
           let pos = ic_len - pos_in ic in
           match try Some (input_line ic) with [ End_of_file -> None ] with
           [ Some s ->
@@ -125,16 +128,27 @@ value print_headers conf =
                 [ [x :: _] -> x
                 | _ -> "" ]
               in
-              do {
+              let date =
+                try
+                  let y = int_of_string (String.sub date 0 4) in
+                  let m = int_of_string (String.sub date 5 2) in
+                  let d = int_of_string (String.sub date 8 2) in
+                  Dgreg
+                    {year = y; month = m; day = d; prec = Sure; delta = 0}
+                    Dgregorian
+                with
+                [ Failure _ | Invalid_argument _ -> Dtext date ]
+              in
+              let nmon =
                 if ident <> "" then
                   let h = (date, hour, ident, subject, beg_mess) in
-                  print_one_header conf prec_date pos h
-                else ();
-                loop date
-              }
+                  print_one_header conf prec_date nmon pos h
+                else nmon
+              in
+              loop (date, nmon)
           | None -> do { close_in ic; prec_date } ]
       in
-      if last_date = "" then () else Wserver.wprint "</table>\n"
+      if last_date = Dtext "" then () else Wserver.wprint "</table>\n"
   | None -> () ]
 ;
 

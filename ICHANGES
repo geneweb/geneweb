@@ -13,6 +13,9 @@ GeneWeb Version 4.02
     of Camlp4.
 
 * GeneWeb daemon/CGI (gwd)
+  - [01 Jun 01] Changed displaying in forum: the header are displayed by
+    groups of two months, in order that the changes of the tables sizes
+    in a new month be invisible.
   - [12 May 01] In request names by alphabetic order (short display), added
     ability to add ";atleast=xx" where xx is a number, to display only names
     having at least xx individuals.
