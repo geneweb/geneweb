@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.6 2000-03-04 17:42:56 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.7 2000-03-09 20:06:49 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -44,7 +44,13 @@ value reconstitute_child conf var default_surname =
     if surname = "" then default_surname else surname
   in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
-  let birth = Update.reconstitute_date conf var in
+  let create_info =
+    let b = Update.reconstitute_date conf (var ^ "b") in
+    let bpl = getn conf (var ^ "b") "pl" in
+    let d = Update.reconstitute_date conf (var ^ "d") in
+    let dpl = getn conf (var ^ "d") "pl" in
+    (b, bpl, d, dpl)
+  in
   let sex =
     match p_getenv conf.env (var ^ "_sex") with
     [ Some "M" -> Male
@@ -53,14 +59,14 @@ value reconstitute_child conf var default_surname =
   in
   let create =
     match getn conf var "p" with
-    [ "create" -> Update.Create sex birth
+    [ "create" -> Update.Create sex (Some create_info)
     | _ -> Update.Link ]
   in
   (first_name, surname, occ, create)
 ;
 
 value insert_child conf (children, ext) i =
-  let var = "ins_child" ^ string_of_int i in
+  let var = "ins_ch" ^ string_of_int i in
   match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
   [ (_, Some n) when n > 1 ->
       let children =
@@ -123,7 +129,7 @@ value reconstitute_family conf =
     loop 1 ext where rec loop i ext =
       match
         try
-          Some (reconstitute_child conf ("child" ^ string_of_int i) surname)
+          Some (reconstitute_child conf ("ch" ^ string_of_int i) surname)
         with
         [ Failure _ -> None ]
       with
