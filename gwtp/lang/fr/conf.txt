@@ -22,6 +22,7 @@ Langue par défaut:
 <select name="default_lang">
 <option value=""%edefault_lang=;><tt>-</tt>
 <option value="af"%edefault_lang=af;>Afrikaans
+<option value="ct"%edefault_lang=ct;>Catalan
 <option value="cn"%edefault_lang=cn;>Chinese
 <option value="cs"%edefault_lang=cs;>Czech
 <option value="dk"%edefault_lang=dk;>Danish

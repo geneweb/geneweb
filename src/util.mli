@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.35 2001-01-29 15:33:27 ddr Exp $ *)
+(* $Id: util.mli,v 3.36 2001-02-11 17:00:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -32,6 +32,7 @@ value fast_auth_age : config -> person -> bool;
 value enter_nobr : unit -> unit;
 value exit_nobr : unit -> unit;
 
+value start_with_vowel : string -> bool;
 value connais : base -> person -> bool;
 value acces_n : config -> base -> string -> person -> string;
 value acces : config -> base -> person -> string;
