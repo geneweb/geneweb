@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.19 2001-11-27 12:10:10 ddr Exp $ *)
+(* $Id: relation.ml,v 4.20 2001-12-20 19:58:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -141,7 +141,7 @@ value print_menu conf base p =
       end;
       html_p conf;
       tag "table" "border=%d width=\"90%%\"" conf.border begin
-        tag "tr" begin
+        tag "tr" "align=left" begin
           tag "td" "align=right" begin
             Wserver.wprint "%s\n" (capitale (transl conf "long display"));
             Wserver.wprint "<input type=checkbox name=long value=on><br>\n";
@@ -157,9 +157,9 @@ value print_menu conf base p =
             Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
           end;
         end;
-        tag "tr" begin
+        tag "tr" "align=left" begin
           tag "td" "align=center colspan=2" begin
-            Wserver.wprint "<table><tr><td>\n";
+            Wserver.wprint "<table><tr align=left><td>\n";
             Wserver.wprint "<input type=radio name=et value=A checked>\n";
             Wserver.wprint "%s<br>\n" (capitale (transl conf "ancestors"));
             Wserver.wprint "<input type=radio name=et value=M>\n";
@@ -171,7 +171,7 @@ value print_menu conf base p =
             Wserver.wprint "</td></tr></table>\n";
           end;
         end;
-        tag "tr" begin
+        tag "tr" "align=left" begin
           tag "td" "align=center colspan=2" begin
             Wserver.wprint "<input type=submit value=\"Ok\">\n";
           end;
@@ -1413,7 +1413,7 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
       else do {
         tag "center" begin
           tag "table" "border=1" begin
-            tag "tr" begin
+            tag "tr" "align=left" begin
               tag "td" begin
                 RelationLink.print_relation_path conf base info;
               end;

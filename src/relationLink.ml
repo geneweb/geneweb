@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.2 2001-05-15 15:32:22 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.3 2001-12-20 19:58:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -238,7 +238,7 @@ value rec print_both_branches conf base info pl1 pl2 =
       [ [(p2, _) :: pl2] -> (Some p2, pl2)
       | [] -> (None, []) ]
     in
-    tag "tr" begin
+    tag "tr" "align=left" begin
       stag "td" "align=center" begin
         match p1 with
         [ Some p1 -> Wserver.wprint "|"
@@ -252,7 +252,7 @@ value rec print_both_branches conf base info pl1 pl2 =
       end;
       Wserver.wprint "\n";
     end;
-    tag "tr" begin
+    tag "tr" "align=left" begin
       tag "td" "valign=top align=center width=\"50%%\"" begin
         match p1 with
         [ Some p1 ->
@@ -481,16 +481,16 @@ value print_with_table conf base info =
   tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
     conf.border
   begin
-    tag "tr" begin
+    tag "tr" "align=left" begin
       stag "td" "colspan=3 align=center" begin
         print_someone conf base info.ip;
         print_other_parent_if_same conf base info;
       end;
     end;
-    tag "tr" begin
+    tag "tr" "align=left" begin
       stag "td" "colspan=3 align=center" begin Wserver.wprint "|"; end;
     end;
-    tag "tr" begin
+    tag "tr" "align=left" begin
       stag "td" "align=right" begin
         Wserver.wprint "<hr size=1 noshade width=\"50%%\" align=right>";
       end;
@@ -506,7 +506,7 @@ value print_with_table conf base info =
     if not conf.cancel_links &&
        (info.pb1 <> None || info.nb1 <> None || info.pb2 <> None ||
         info.nb2 <> None) then
-      tag "tr" begin
+      tag "tr" "align=left" begin
         tag "td" begin
           if info.pb1 <> None || info.nb1 <> None then do {
             html_br conf; print_prev_next_1 conf base info info.pb1 info.nb1

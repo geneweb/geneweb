@@ -16,7 +16,7 @@
 <h4>[*first name/first names]0</h4>
 
 <table border=1>
-<tr>
+<tr align=left>
 <td>
 <input name=first_name size=40 maxlength=200">
 </td>
@@ -26,7 +26,7 @@
 <h4>[*surname/surnames]0</h4>
 
 <table border=1>
-<tr>
+<tr align=left>
 <td>
 <input name=surname size=40 maxlength=200">
 </td>
@@ -35,7 +35,7 @@
 
 <h4>[*birth]</h4>
 <table border=1>
-<tr>
+<tr align=left>
 <td>
 [*place]
 </td>
@@ -46,7 +46,7 @@
 </table>
 
 <table border=1>
-<tr>
+<tr align=left>
 <td>[*after]</td>
 <td>
 [year/month/day]0<input name=birth1_yyyy size=5 maxlength=5>
@@ -54,7 +54,7 @@
 [year/month/day]2<input name=birth1_dd size=2 maxlength=2>
 </td>
 </tr>
-<tr>
+<tr align=left>
 <td>[*before]</td>
 <td>
 [year/month/day]0<input name=birth2_yyyy size=5 maxlength=5>
@@ -66,7 +66,7 @@
 
 <h4>[*baptism]</h4>
 <table border=1>
-<tr>
+<tr align=left>
 <td>[*place]</td>
 <td>
 <input name=bapt_place size=40 maxlength=200>
@@ -75,7 +75,7 @@
 </table>
 
 <table border=1>
-<tr>
+<tr align=left>
 <td>[*after]</td>
 <td>
 [year/month/day]0<input name=bapt1_yyyy size=5 maxlength=5>
@@ -83,7 +83,7 @@
 [year/month/day]2<input name=bapt1_dd size=2 maxlength=2>
 </td>
 </tr>
-<tr>
+<tr align=left>
 <td>[*before]</td>
 <td>
 [year/month/day]0<input name=bapt2_yyyy size=5 maxlength=5>
@@ -96,7 +96,7 @@
 <h4>[*death]</h4>
 
 <table border=1>
-<tr>
+<tr align=left>
 <td>
 <select name=death>
 <option value=Dead>[*died]
@@ -108,7 +108,7 @@
 </table>
 
 <table border=1>
-<tr>
+<tr align=left>
 <td>[*place]</td>
 <td>
 <input name=death_place size=40 maxlength=200>
@@ -117,7 +117,7 @@
 </table>
 
 <table border=1>
-<tr>
+<tr align=left>
 <td>[*after]</td>
 <td>
 [year/month/day]0<input name=death1_yyyy size=5 maxlength=5>
@@ -125,7 +125,7 @@
 [year/month/day]2<input name=death1_dd size=2 maxlength=2>
 </td>
 </tr>
-<tr>
+<tr align=left>
 <td>[*before]</td>
 <td>
 [year/month/day]0<input name=death2_yyyy size=5 maxlength=5>
@@ -138,7 +138,7 @@
 <h4>[*burial]</h4>
 
 <table border=1>
-<tr>
+<tr align=left>
 <td>
 [*place]
 </td>
@@ -149,7 +149,7 @@
 </table>
 
 <table border=1>
-<tr>
+<tr align=left>
 <td>[*after]</td>
 <td>
 [year/month/day]0<input name=burial1_yyyy size=5 maxlength=5>
@@ -157,7 +157,7 @@
 [year/month/day]2<input name=burial1_dd size=2 maxlength=2>
 </td>
 </tr>
-<tr>
+<tr align=left>
 <td>[*before]</td>
 <td>
 [year/month/day]0<input name=burial2_yyyy size=5 maxlength=5>
@@ -171,7 +171,7 @@
 [*occupation]</h4>
 
 <table border=1>
-<tr>
+<tr align=left>
 <td>
 <input name=occu size=50 maxlength=200>
 </td>

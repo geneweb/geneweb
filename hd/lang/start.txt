@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.19 2001-12-18 15:58:17 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.20 2001-12-20 19:58:12 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -34,13 +34,13 @@ sv: Genealogi
 
 <center>
 <table border=0 width="100%">
-<tr>
+<tr align=left>
 <td>
 <a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
 height=108 src="%o/gwlogo.gif" align=%L border=0 alt=GeneWeb></a>
 </td>
 <td align=%L>
-<table><tr><td align=center><h1><font color=%i>[
+<table><tr align=left><td align=center><h1><font color=%i>[
 af: Genealogiese<br>databasis
 ca: Base de dades<br>geneal&ograve;gica
 cs: Genealogická databáze
@@ -142,7 +142,7 @@ zh: ÏÖÓĞ %n ÈËÔÚÊı¾İ¿âÖĞ¡£
 %I&NwNj<br><p>
 
 %I&NcNa<table border=0 width="70%">
-<tr>
+<tr align=left>
 
 <td align=center>[
 af: <a href="%sw=w"><em>Medewerkers</em></a> toegang<br> (password)
@@ -191,7 +191,7 @@ sv: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
 ]</td>
 
 %E</tr></table>%E%I|ca<table border=0>
-<tr><td align=center>
+<tr align=left><td align=center>
 <form method=POST action="%f">
 %h[
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
@@ -227,8 +227,8 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
 
 <table border=0 cellspacing=0 cellpadding=0>
 
-<tr><td>
-<center><table border=0 cellspacing=0 cellpadding=0><tr><td>
+<tr align=left><td>
+<center><table border=0 cellspacing=0 cellpadding=0><tr align=left><td>
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
 ca: Per navegar en aquesta base, podeu fer la vostra recerca:
@@ -303,7 +303,7 @@ zh: ËÑË÷£º
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<table border=0 cellpadding=0 cellspacing=0><tr align=left><td>
 <font color=%i><b>[
 af: by title
 ca: per títol
@@ -630,7 +630,7 @@ zh:
 ]<br><p>
 
 <table border=0>
-<tr>
+<tr align=left>
 <td align=right>
 <ul>
 %Ispropose_add_family;<li><a href="%sm=ADD_FAM">[
@@ -718,7 +718,7 @@ zh:
 ]<br><p>
 
 <table border=0>
-<tr>
+<tr align=left>
 <td valign=up>
 <ul>
 <li><a href="%sm=AN">[birthdays]</a>

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.7 2001-10-15 13:22:51 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.8 2001-12-20 19:58:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -244,7 +244,7 @@ value propose_merge_ind conf base branches p1 p2 =
              let p1 = poi base ip1 in
              let p2 = poi base ip2 in
              do {
-               tag "tr" begin
+               tag "tr" "align=left" begin
                  tag "td" begin
                    afficher_personne_referencee conf base p1;
                    Date.afficher_dates_courtes conf base p1;

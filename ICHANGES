@@ -5,6 +5,8 @@ GeneWeb Version 4.04
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [20 Dec 01] Added "align=left" to all "<tr>" tags because some
+    browsers display them centered by default.
   - [10 Dec 01] In configuration file (base.gwf), if the variable
     "expand_env" is set to "yes" ("no" by default), the system
     environment variables are expanded in the values of the customized

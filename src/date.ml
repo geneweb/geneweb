@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.2 2001-04-19 13:20:28 ddr Exp $ *)
+(* $Id: date.ml,v 4.3 2001-12-20 19:58:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -456,7 +456,7 @@ value hebrew_month_name conf n = capitale (nominative (hebrew_month conf n));
 value print_some_calendar conf date n month_name n_months var =
   do {
     Wserver.wprint "\n";
-    tag "tr" begin
+    tag "tr" "align=left" begin
       stag "th" begin
         Wserver.wprint "%s\n"
           (capitale (transl_nth conf "gregorian/julian/french/hebrew" n));
@@ -493,7 +493,7 @@ value print_some_calendar conf date n month_name n_months var =
 ;
 
 value print_calendar_head conf =
-  tag "tr" begin
+  tag "tr" "align=left" begin
     stag "td" begin Wserver.wprint "&nbsp;"; end;
     Wserver.wprint "\n";
     for i = 0 to 2 do {

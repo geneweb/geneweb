@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.9 2001-11-14 10:02:28 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.10 2001-12-20 19:58:13 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -86,7 +86,7 @@ value print_choice conf base p niveau_effectif =
     end;
     html_br conf;
     tag "table" "border=%d width=\"90%%\"" conf.border begin
-      tag "tr" begin
+      tag "tr" "align=left" begin
         tag "td" "valign=top" begin
           Wserver.wprint
             "<input type=radio name=t value=N checked> %s (*)<br>\n"
@@ -150,14 +150,14 @@ value print_choice conf base p niveau_effectif =
           Wserver.wprint "<input name=before size=5 maxlength=5><br>\n";
         end;
       end;
-      tag "tr" begin
+      tag "tr" "align=left" begin
         tag "td" "colspan=2 align=center" begin
           Wserver.wprint "%s\n"
             (capitale (transl conf "cancel GeneWeb links"));
           Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
         end;
       end;
-      tag "tr" begin
+      tag "tr" "align=left" begin
         tag "td" "colspan=2 align=center" begin
           Wserver.wprint "(*) %s\n"
             (capitale (transl conf "only the generation selected"));
@@ -1765,12 +1765,12 @@ value print_tree_with_table conf base gv p =
       (fun firstline gen ->
          do {
            if not firstline then
-             tag "tr" begin
+             tag "tr" "align=left" begin
                list_iter_first
                  (fun first po -> print_vertical_bars gen first po) gen;
              end
            else ();
-           tag "tr" begin
+           tag "tr" "align=left" begin
              list_iter_first (fun first po -> print_ancestor gen first po)
                gen;
            end;
@@ -1778,11 +1778,11 @@ value print_tree_with_table conf base gv p =
            [ [Cell _ Center _ _ :: _] -> ()
            | _ ->
                do {
-                 tag "tr" begin
+                 tag "tr" "align=left" begin
                    list_iter_first
                      (fun first po -> print_ancestor_link gen first po) gen;
                  end;
-                 tag "tr" begin
+                 tag "tr" "align=left" begin
                    list_iter_first
                      (fun first po -> print_horizontal_line gen first po) gen;
                  end

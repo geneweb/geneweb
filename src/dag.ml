@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.5 2001-08-24 04:54:10 ddr Exp $ *)
+(* $Id: dag.ml,v 4.6 2001-12-20 19:58:13 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -128,10 +128,10 @@ value image_txt conf base p =
   [ Some "on" ->
       match image_and_size conf base p (limited_image_size 100 75) with
       [ Some (f, Some (Some (wid, hei))) ->
-          "<br>\n<center><table border=0><tr><td>\n" ^
+          "<br>\n<center><table border=0><tr align=left><td>\n" ^
             image_normal_txt conf base p f wid hei ^ "</table></center>\n"
       | Some (url, None) ->
-          "<br>\n<center><table border=0><tr><td>\n" ^
+          "<br>\n<center><table border=0><tr align=left><td>\n" ^
             image_url_txt conf base url 75 ^ "</table></center>\n"
       | _ -> "" ]
   | _ -> "" ]
@@ -144,7 +144,7 @@ value print_table conf hts =
     Wserver.wprint "<center><table border=%d" conf.border;
     Wserver.wprint " cellspacing=0 cellpadding=0>\n";
     for i = 0 to Array.length hts - 1 do {
-      Wserver.wprint "<tr>\n";
+      Wserver.wprint "<tr align=left>\n";
       for j = 0 to Array.length hts.(i) - 1 do {
         let (colspan, align, td) = hts.(i).(j) in
         Wserver.wprint "<td";
@@ -759,7 +759,8 @@ value make_tree_hts
       | _ -> (0, "") ]
     in
     if bd > 0 || td <> "" then
-      sprintf "<table border=%d><tr><td align=center%s>%s</table>" bd td
+      sprintf
+        "<table border=%d><tr align-left><td align=center%s>%s</table>" bd td
         (indi_txt n)
     else indi_txt n
   in
@@ -795,7 +796,7 @@ value print_slices_menu conf base hts_opt =
                (code_varenv k) (code_varenv v))
         conf.env;
       tag "table" begin
-        tag "tr" begin
+        tag "tr" "align=left" begin
           tag "td" "align=right" begin
             Wserver.wprint "%s\n"
               (Util.capitale
@@ -803,19 +804,19 @@ value print_slices_menu conf base hts_opt =
             Wserver.wprint "<input type=checkbox name=nogroup value=on>\n";
           end;
         end;
-        tag "tr" begin
+        tag "tr" "align=left" begin
           tag "td" "align=right" begin
             Wserver.wprint "%s\n" (txt 1);
             Wserver.wprint "<input name=dpos size=5 value=78>\n";
           end;
         end;
-        tag "tr" begin
+        tag "tr" "align=left" begin
           tag "td" "align=right" begin
             Wserver.wprint "%s\n" (txt 2);
             Wserver.wprint "<input name=overlap size=5 value=10>\n";
           end;
         end;
-        tag "tr" begin
+        tag "tr" "align=left" begin
           tag "td" "align=right" begin
             Wserver.wprint "%s\n" (txt 3);
             let wid =

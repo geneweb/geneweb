@@ -1,4 +1,4 @@
-(* $Id: main.ml,v 1.4 2001-08-24 04:54:09 ddr Exp $ *)
+(* $Id: main.ml,v 1.5 2001-12-20 19:58:12 ddr Exp $ *)
 
 open Dag2html;
 open Printf;
@@ -177,7 +177,7 @@ value print_table border hts =
     printf "<center><table border=%d" border;
     printf " cellspacing=0 cellpadding=0>\n";
     for i = 0 to Array.length hts - 1 do {
-      printf "<tr>\n";
+      printf "<tr align=left>\n";
       for j = 0 to Array.length hts.(i) - 1 do {
         let (colspan, align, td) = hts.(i).(j) in
         printf "<td";
