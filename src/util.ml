@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.28 2000-01-14 23:14:30 ddr Exp $ *)
+(* $Id: util.ml,v 3.29 2000-01-25 03:18:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -124,18 +124,22 @@ value parent_has_title base p =
   | _ -> False ]
 ;
 
+value nb_year_for_public = 150;
+
 value age_autorise conf base p =
   if p.access = Public || conf.friend || conf.wizard then True
-  else if p.access = IfTitles && (p.titles <> [] || parent_has_title base p)
+  else if
+    conf.public_if_titles && p.access = IfTitles &&
+    (p.titles <> [] || parent_has_title base p)
   then True
   else
     match (Adef.od_of_codate p.birth, date_of_death p.death) with
     [ (_, Some (Dgreg d _)) ->
         let a = temps_ecoule d conf.today in
-        a.year > 100
+        a.year > nb_year_for_public
     | (Some (Dgreg d _), _) ->
         let a = temps_ecoule d conf.today in
-        a.year > 100
+        a.year > nb_year_for_public
     | _ ->
         let u = uoi base p.cle_index in
         loop 0 where rec loop i =
@@ -145,7 +149,7 @@ value age_autorise conf base p =
             match Adef.od_of_codate fam.marriage with
             [ Some (Dgreg d _) ->
                 let a = temps_ecoule d conf.today in
-                a.year > 100
+                a.year > nb_year_for_public
             | _ -> loop (i + 1) ] ]
 ;
 
@@ -307,7 +311,7 @@ value reference conf base p s =
 ;
 
 value gen_referenced_person_title_text p_access conf base p =
-  if p.access <> Private || conf.friend || conf.wizard then
+  if age_autorise conf base p then
     match main_title base p with
     [ Some t ->
         reference conf base p (titled_person_text conf base p t) ^
@@ -317,7 +321,7 @@ value gen_referenced_person_title_text p_access conf base p =
 ;
 
 value gen_person_title_text p_access conf base p =
-  if p.access <> Private || conf.friend || conf.wizard then
+  if age_autorise conf base p then
     match main_title base p with
     [ Some t -> titled_person_text conf base p t ^ one_title_text conf base p t
     | None -> gen_person_text p_access conf base p ]
@@ -362,7 +366,7 @@ value gen_person_text_without_title p_access conf base p =
 value person_text_without_title = gen_person_text_without_title std_access;
 
 value afficher_titre conf base p =
-  if p.access <> Private || conf.friend || conf.wizard then
+  if age_autorise conf base p then
     match main_title base p with
     [ Some t -> Wserver.wprint "%s" (one_title_text conf base p t)
     | None -> () ]

@@ -11,6 +11,14 @@ GeneWeb version 3.03
     asks for a data base name, but in CGI mode when entering a data base,
     it did not work (incorrect URL).
 
+* Base configuration files (base.gwf)
+  - [25 Jan 00] Added variable "public_if_titles": if yes, consider persons
+    having titles as public ("public" means that their private data is
+    displayed even if their dates is less than 150 years). Warning: the
+    default of this variable is no: it is a behavior change in GeneWeb,
+    relatively to previous versions (but don't worry: with this change, 
+    private data is better protected).
+
 * Lexicon (lang/lexicon.txt)
   - [21 Jan 00] Changed the English displaying of dates into "day month
     year", the displaying "month day year" being specific to the United

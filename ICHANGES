@@ -5,6 +5,9 @@ GeneWeb Version 3.03
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [25 Jan 00] Changed the limit for public persons to 150 years instead
+    of 100 years: persons must have been born and dead before 150 years
+    to be public.
   - [21 Jan 00] When searching for somebody, if several persons have
     this name, display name of spouses for men also.
   - [20 Jan 00] Fixed omission in 'advanced.txt': I forgot to change

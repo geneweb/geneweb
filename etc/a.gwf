@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.8 2000-01-18 17:56:31 ddr Exp $
+# $Id: a.gwf,v 3.9 2000-01-25 03:18:02 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -98,6 +98,10 @@ max_cousins=2000
 # the old information if you want (oldest = begin of file) or you can remove
 # it when it is too large, if you prefer.
 history=no
+
+# Consider persons having titles as public, i.e. even not friends can see
+# their dates; "yes" = consider; "no" = don't consider
+public_if_titles=no
 
 # Uncomment the following definition to specify that the present database has
 # been renamed:
