@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.8 2001-06-13 14:35:28 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.9 2001-06-14 17:09:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -536,6 +536,7 @@ and ast_expr =
 type env = 
   [ Vstring of string
   | Vfun of list string and list ast
+  | Vint of int
   | Vnone ]
 ;
 
@@ -577,6 +578,23 @@ value rec eval_variable conf base env ((fam, cpl, des) as fcd) =
   | ["mother"; s] -> VVind cpl.mother s
   | ["mother"; "create"; s] -> VVcreate (get_create cpl.mother) s
   | ["marriage"; s] -> VVdate (Adef.od_of_codate fam.marriage) s
+  | ["divorce"; s] ->
+      let d =
+        match fam.divorce with
+        [ Divorced d -> Adef.od_of_codate d
+        | _ -> None ]
+      in
+      VVdate d s
+  | ["witness"; s] ->
+        match get_env "cnt" env with
+        [ Vint i ->
+            let i = i - 1 in
+            if i >= 0 && i < Array.length fam.witnesses then
+              VVind fam.witnesses.(i) s
+            else if i >= 0 && i < 2 && Array.length fam.witnesses = 0 then
+              VVind ("", "", 0, Update.Create Neuter None, "") s
+            else VVnone
+        | _ -> VVnone ]
   | [] -> VVgen ""
   | [s] ->
       let v = extract_var "cvar_" s in if v <> "" then VVcvar v else VVgen s
@@ -591,15 +609,31 @@ value eval_relation_kind =
   | NoSexesCheck -> "nsck" ]
 ;
 
+value eval_divorce =
+  fun
+  [ Divorced _ -> "divorced"
+  | NotDivorced -> "not_divorced"
+  | Separated -> "separated" ]
+;
+
 value eval_string_env var env =
   match get_env var env with
   [ Vstring x -> quote_escaped x
   | _ -> "" ]
 ;
 
+value eval_int_env var env =
+  match get_env var env with
+  [ Vint x -> string_of_int x
+  | _ -> "" ]
+;
+
 value try_eval_gen_variable conf base env ((fam, cpl, des) as fcd) =
   fun
-  [ "digest" -> eval_string_env "digest" env
+  [ "cnt" -> eval_int_env "cnt" env
+  | "comment" -> quote_escaped fam.comment
+  | "digest" -> eval_string_env "digest" env
+  | "divorce" -> eval_divorce fam.divorce
   | "mrel" -> eval_relation_kind fam.relation
   | "marriage_place" -> quote_escaped fam.marriage_place
   | "marriage_src" -> quote_escaped fam.marriage_src
@@ -761,12 +795,9 @@ value rec print_ast conf base env fcd =
   [ Atext s -> Wserver.wprint "%s" s
   | Atransl upp s n ->
       Wserver.wprint "%s" (Templ.eval_transl conf base env upp s n)
-  | Avar s sl ->
-(*
-let _ = do { Printf.eprintf "%s\n" s; flush stderr } in
-*)
-      print_variable conf base env fcd [s :: sl]
+  | Avar s sl -> print_variable conf base env fcd [s :: sl]
   | Aif e alt ale -> print_if conf base env fcd e alt ale
+  | Aforeach s sl al -> print_foreach conf base env fcd s sl al
   | Adefine f xl al alk -> print_define conf base env fcd f xl al alk
   | Aapply f el -> print_apply conf base env fcd f el
   | x -> not_impl "print_ast" x ]
@@ -792,6 +823,34 @@ and print_apply conf base env fcd f el =
 and print_if conf base env fcd e alt ale =
   let al = if eval_bool_value conf base env fcd e then alt else ale in
   List.iter (print_ast conf base env fcd) al
+and print_foreach conf base env fcd s sl al =
+  let (sl, s) =
+    let sl = List.rev [s :: sl] in (List.rev (List.tl sl), List.hd sl)
+  in
+  match eval_variable conf base env fcd sl with
+  [ VVgen "" -> print_simple_foreach conf base env fcd al s
+  | VVgen _ ->
+      do {
+        Wserver.wprint "foreach ";
+        List.iter (fun s -> Wserver.wprint "%s." s) sl;
+        Wserver.wprint "%s???" s;
+      }
+  | VVcvar _ | VVdate _ _ | VVind _ _ | VVcreate _ _ | VVnone -> () ]
+and print_simple_foreach conf base env ((fam, cpl, des) as fcd) al s =
+  match s with
+  [ "child" -> print_foreach_child conf base env fcd al des.children s
+  | "witness" -> print_foreach_witness conf base env fcd al fam.witnesses s
+  | _ -> Wserver.wprint "foreach %s???" s ]
+and print_foreach_child conf base env fcd al arr lab =
+  for i = 0 to max 1 (Array.length arr) - 1 do {
+    let env = [("cnt", Vint (i + 1)) :: env] in
+    List.iter (print_ast conf base env fcd) al
+  }
+and print_foreach_witness conf base env fcd al arr lab =
+  for i = 0 to max 2 (Array.length arr) - 1 do {
+    let env = [("cnt", Vint (i + 1)) :: env] in
+    List.iter (print_ast conf base env fcd) al
+  }
 ;
 
 value interp_templ conf base fcd digest astl =
