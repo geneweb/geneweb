@@ -53,19 +53,13 @@ called "bar", extract these two bases as source files with the command
 <p><ul><li> Create a common base "base".  Type:
 
 <pre>
-     gwc foo.gw bar.gw -o base
+     gwc foo.gw -sep bar.gw -o base
 </pre>
 
-It may happens (and probably it will) that gwc displays errors because
-persons are defined twice in "foo.gw" and "bar.gw". To fix that, gwc
-has an option "-sh" to shift the numbers of the persons and to avoid
-conflicts. Try:
-
-<pre>
-     gwc foo.gw -sh 10 bar.gw -o base
-</pre>
-
-If the value 10 does not solve the problem, try 20, 30 or 100...
+The option "-sep" allows to treat "bar.gw" separately: if a person in
+"bar.gw" is already defined with the same key (first name/surname/number)
+in "foo.gw", the number of his key is automatically shifted to avoid the
+conflict.
 
 </ul>
 
