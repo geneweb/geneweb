@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.10 1999-11-13 08:45:45 ddr Exp $ *)
+(* $Id: util.ml,v 3.11 1999-11-13 11:00:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -140,8 +140,8 @@ value connais base p =
 value acces_n conf base n x =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
-  if conf.wizard && conf.friend && not (first_name = "?" || surname = "?")
-  || conf.access_by_key then
+  if (conf.wizard && conf.friend || conf.access_by_key)
+  && not (first_name = "?" || surname = "?") then
     "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^
     ";n" ^ n ^ "=" ^ code_varenv (Name.lower surname) ^
       (if x.occ > 0 then ";oc" ^ n ^ "=" ^ string_of_int x.occ else "")
@@ -1271,8 +1271,8 @@ value wprint_hidden pref name valu =
 value wprint_hidden_person conf base pref p =
   let first_name = p_first_name base p in
   let surname = p_surname base p in
-  if conf.wizard && conf.friend && not (first_name = "?" || surname = "?")
-  || conf.access_by_key then
+  if (conf.wizard && conf.friend || conf.access_by_key)
+  && not (first_name = "?" || surname = "?") then
     do wprint_hidden pref "p" (Name.lower first_name);
        wprint_hidden pref "n" (Name.lower surname);
        if p.occ > 0 then wprint_hidden pref "oc" (string_of_int p.occ)
