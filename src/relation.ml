@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.67 2001-01-21 16:17:49 ddr Exp $ *)
+(* $Id: relation.ml,v 3.68 2001-01-27 21:40:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -155,6 +155,14 @@ value print_menu conf base p =
              Wserver.wprint "%s\n"
                (capitale (transl conf "cancel GeneWeb links"));
              Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
+           end;
+         end;
+         tag "tr" begin
+           tag "td" "colspan=2 align=right" begin
+             Wserver.wprint
+               (fcapitale (ftransl conf "display by slices of %t characters"))
+               (fun _ -> Wserver.wprint "\n<input name=dpos size=3 value=79>");
+             Wserver.wprint "<input type=checkbox name=notab value=on>\n";
            end;
          end;
          tag "tr" begin

@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.43 2001-01-26 02:18:44 ddr Exp $ *)
+(* $Id: dag.ml,v 3.44 2001-01-27 21:40:09 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -465,34 +465,39 @@ value table_strip_troublemakers hts =
 ;
 
 value print_next_pos conf pos1 pos2 =
-  match pos2 with
-  [ Some pos2 ->
-      let pos1 =
-        match pos1 with
-        [ Some pos1 -> pos1
-        | None -> 0 ]
-      in
-      let dpos =
-        match p_getint conf.env "dpos" with
-        [ Some dpos -> dpos
-        | None -> pos2 - pos1 - 10 ]
-      in
-      let env =
-        List.fold_right
-          (fun (k, v) env ->
-             match k with
-             [ "pos1" | "pos2" -> env
-             | _ -> [(k, v) :: env] ])
-          conf.env []
-      in
-      do Wserver.wprint "<div align=right>\n";
-         Wserver.wprint "<a href=\"%s" (commd conf);
-         List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
-         Wserver.wprint "pos1=%d;pos2=%d" (pos1 + dpos) (pos2 + dpos);
-         Wserver.wprint "\">&gt;&gt;</a>\n";
-         Wserver.wprint "</div>\n";
-      return ()
-  | None -> () ]
+  let doit = p_getenv conf.env "notab" = Some "on" in
+  if doit then
+    let dpos =
+      match p_getint conf.env "dpos" with
+      [ Some dpos -> dpos
+      | None -> 80 ]
+    in
+    let pos1 =
+      match pos1 with
+      [ Some pos1 -> pos1
+      | None -> 0 ]
+    in
+    let pos2 =
+      match pos2 with
+      [ Some pos2 -> pos2
+      | None -> dpos ]
+    in
+    let env =
+      List.fold_right
+        (fun (k, v) env ->
+           match k with
+           [ "pos1" | "pos2" -> env
+           | _ -> [(k, v) :: env] ])
+        conf.env []
+    in
+    do Wserver.wprint "<div align=right>\n";
+       Wserver.wprint "<a href=\"%s" (commd conf);
+       List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
+       Wserver.wprint "pos1=%d;pos2=%d" (pos2 - 10) (pos2 + dpos);
+       Wserver.wprint "\">&gt;&gt;</a>\n";
+       Wserver.wprint "</div>\n";
+    return ()
+  else ()
 ;
 
 (* Main print table algorithm with <pre> *)
@@ -513,7 +518,7 @@ value print_table_pre conf hts =
   let tmincol = Array.fold_left \+ 0 colminsz in
   let dcol =
     let dcol =
-      match p_getint conf.env "col" with
+      match p_getint conf.env "dcol" with
       [ Some i -> i
       | None -> 79 ]
     in
