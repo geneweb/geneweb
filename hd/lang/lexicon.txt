@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.62 2000-02-02 10:24:55 ddr Exp $
+# $Id: lexicon.txt,v 3.63 2000-02-04 11:58:48 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -411,7 +411,7 @@ it: cugini di 2o grado
 nl: neven en nichten in de 2de graad
 no: tremenninger
 pt: primos 2ndos
-ru: троюродные брать€/3-юродные сестры
+ru: троюродные брать€/троюродные сестры
 se: sysslingar
 
     3rd cousins
@@ -547,7 +547,7 @@ it: un cognato/una cognata
 nl: een schoonbroer/een schoonzus
 no: svoger/svigerinne
 pt: um cunhado/uma cunhada
-ru: сво€к-шурин/сво€ченица-заловка
+ru: деверь-шурин/заловка-сво€ченица
 se: en sv&aring;ger/en sv&auml;gerska
 
     a brother/a sister/a sibling
@@ -1095,7 +1095,7 @@ it: uno zio (marito della zia)/una zia (moglie dello zio)
 nl: een oom/een tante
 no: onkel (tantes mann)/tante (onkels kone)
 pt: um tio (por afinidade)/uma tia (por afinidade)
-ru: муж тети/жен€ д€ди
+ru: муж тети/жена д€ди
 se: en farbror (fasters make)/en faster (farbrors maka)/en morbror (mosters make)/en moster (morbrors maka)
 
     an uncle/an aunt
@@ -1269,7 +1269,7 @@ en: back
 es: regreso
 fi: takaisin
 fr: retour
-he : зжшд
+he: зжшд
 is: til baka
 it: torna indietro
 nl: terug
@@ -2617,7 +2617,7 @@ it: immagine
 nl: beeld
 no: bilde
 pt: imagem
-ru: картинка
+ru: картинку
 se: foto
 
     image deleted
@@ -3830,7 +3830,7 @@ it: il
 nl: op
 no: den
 pt: a
-ru: :g:
+ru: 
 se: den
 
     one day old
@@ -4312,7 +4312,7 @@ it: legame%t con
 nl: verbonden%t met
 no: forbindelse%t med
 pt: relacionado%t com
-ru: приходитс€
+ru: приходитс€%t
 se: f&ouml;rh&aring;llande%t med
 
     relationships by marriage
@@ -4622,7 +4622,7 @@ it: partendo da
 nl: beginnend met
 no: som starter med
 pt: come&ccedil;ando com
-ru: начать с
+ru: начинаютс€ с
 se: som b&ouml;rjar med
 
     surname alias
@@ -5009,7 +5009,7 @@ it: i nipoti
 nl: de kleinkinderen
 no: barnebarna
 pt: os netos
-ru: правнук
+ru: правнуки
 se: barnbarnen
 
     the grandparents
@@ -5081,7 +5081,7 @@ it: le ultime %d nascite
 nl: de laatste %d geboorten
 no: de siste %d f&oslash;dte
 pt: os %d nascimentos mais recentes
-ru: самые последние %d рождени€
+ru: %d последних рождений
 se: de senaste %d f&ouml;dslarna
 
     the latest %d deaths
@@ -5099,7 +5099,7 @@ it: le ultime %d morto
 nl: de %d meest recente overlijdens
 no: de siste %d d&oslash;de
 pt: os %d &oacute;bitos mais recentes
-ru: самые последние %d смерти
+ru: %d последних смертей
 se: de senaste %d d&ouml;dsfallen
 
     the parents
