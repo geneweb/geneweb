@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.230 2001-02-12 10:27:53 ddr Exp $
+# $Id: lexicon.txt,v 3.231 2001-02-13 12:10:40 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -4629,6 +4629,7 @@ ct: no verificar els sexes
 en: no sexes check
 fr: pas de v&eacute;rification des sexes
 nl: Geslachten niet verifi&euml;ren
+se: ingen kontroll av könen
 
     not divorced
 af: nie geskei nie
