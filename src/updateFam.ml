@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.5 2001-06-02 13:52:59 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.6 2001-06-07 18:45:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -499,7 +499,13 @@ value print_family conf base fam cpl des force_children_surnames =
     Wserver.wprint "\n";
     print_children conf base des cpl force_children_surnames;
     Wserver.wprint "\n";
-    print_source conf base fam.fsources
+    print_source conf base fam.fsources;
+    match p_getenv conf.env "origin_file" with
+    [ Some "on" ->
+        Wserver.wprint "<input name=origin_file size=50 maxlength=200%s>\n"
+          (if fam.origin_file = "" then ""
+           else " value=" ^ quote_escaped fam.origin_file)
+    | _ -> () ]
   }
 ;
 

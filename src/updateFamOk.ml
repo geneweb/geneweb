@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.3 2001-05-15 19:41:05 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.4 2001-06-07 18:45:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -146,6 +146,11 @@ value reconstitute_family conf =
   let (children, ext) = insert_child conf (children, ext) 0 in
   let comment = strip_spaces (get conf "comment") in
   let fsources = strip_spaces (get conf "src") in
+  let origin_file =
+    match p_getenv conf.env "origin_file" with
+    [ Some x -> x
+    | None -> "" ]
+  in
   let fam_index =
     match p_getint conf.env "i" with
     [ Some i -> i
@@ -155,7 +160,7 @@ value reconstitute_family conf =
     {marriage = Adef.codate_of_od marriage; marriage_place = marriage_place;
      marriage_src = strip_spaces (get conf "marr_src");
      witnesses = Array.of_list witnesses; relation = relation;
-     divorce = divorce; comment = comment; origin_file = "";
+     divorce = divorce; comment = comment; origin_file = origin_file;
      fsources = fsources; fam_index = Adef.ifam_of_int fam_index}
   and cpl = {father = father; mother = mother}
   and des = {children = Array.of_list children} in
@@ -370,9 +375,11 @@ value effective_mod conf base sfam scpl sdes =
     }
     else if ncpl.father == ncpl.mother then print_err conf base
     else ();
-    nfam.origin_file :=
-      if sou base ofam.origin_file <> "" then ofam.origin_file
-      else infer_origin_file conf base fi ncpl ndes;
+    if sfam.origin_file = "" then 
+      nfam.origin_file :=
+        if sou base ofam.origin_file <> "" then ofam.origin_file
+        else infer_origin_file conf base fi ncpl ndes
+    else ();
     nfam.fam_index := fi;
     base.func.patch_family fi nfam;
     base.func.patch_couple fi ncpl;
