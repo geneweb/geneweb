@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.150 2003-01-21 11:03:13 ddr Exp $
+# $Id: lexicon.txt,v 4.151 2003-01-21 11:08:02 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -4098,7 +4098,7 @@ af: ident/e-pos/onderwerp
 bg: идентификатор/e-mail/тема
 ca: ident/email/tema
 cs: ident/email/pшedmмt (osoba?)
-da: ident/email/emne
+da: navn/e-post/emne
 de: Name/E-Mail/Betreff
 en: ident/e-mail/subject
 eo: ident/email/objekto
