@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 2.4 1999-06-25 09:48:35 ddr Exp $ *)
+(* $Id: alln.ml,v 2.5 1999-06-25 12:48:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -359,7 +359,7 @@ value print_alphabetic_short conf base is_surnames ini list len =
                  (fun first (s, cnt) ->
                     let href =
                       if not conf.cancel_links then
-                        " href=" ^ commd conf ^ "\"m=" ^ mode ^ ";v=" ^
+                        " href=\"" ^ commd conf ^ "m=" ^ mode ^ ";v=" ^
                          code_varenv (Name.lower s) ^ "\""
                       else ""
                     in
