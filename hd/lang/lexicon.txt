@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.67 1999-06-30 23:04:42 ddr Exp $
+# $Id: lexicon.txt,v 2.68 1999-07-01 08:06:40 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -905,7 +905,7 @@ se: f&ouml;re
 
     begin
 de: Anfang
-dk: begyndelse
+dk: p&aring;begyndelse
 en: begin
 eo: komenko
 es: principio
@@ -1386,7 +1386,7 @@ se: vet ej
 
     end
 de: Ende
-dk: slutning
+dk: oph&oslash;r
 en: end
 eo: fino
 es: fin
@@ -2873,7 +2873,7 @@ se: personer som har samma namn
 
     place
 de: Ort
-dk: sted
+dk: sted/Adelsnavn
 en: place
 eo: loko
 es: lugar
