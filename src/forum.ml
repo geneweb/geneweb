@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 2.5 1999-10-09 21:02:55 ddr Exp $ *)
+(* $Id: forum.ml,v 2.6 1999-10-11 03:31:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -186,4 +186,3 @@ value print_add_ok conf base =
     with
     [ Update.ModErr -> () ]
 ;
-
