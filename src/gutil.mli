@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.1 2001-04-03 20:21:48 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.2 2001-05-05 13:27:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -75,6 +75,7 @@ type warning 'person =
   | ParentBornAfterChild of 'person and 'person
   | ParentTooYoung of 'person and dmy
   | TitleDatesError of 'person and title
+  | UndefinedSex of 'person
   | YoungForMarriage of 'person and dmy ]
 ;
 type base_warning = warning person;

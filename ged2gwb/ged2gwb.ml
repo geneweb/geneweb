@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.4 2001-04-23 03:02:37 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.5 2001-05-05 13:27:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1752,6 +1752,8 @@ value print_base_warning base =
         Printf.fprintf log_oc.val "  %s %s\n" (sou base t.t_ident)
           (sou base t.t_place);
       }
+  | UndefinedSex _ ->
+      ()
   | YoungForMarriage p a ->
       Printf.fprintf log_oc.val "%s married at age %d\n" (denomination base p)
         (annee a) ]
