@@ -4,5 +4,5 @@ clean:
 	$(RM) LICENSE.htm
 
 LICENSE.htm: ../LICENSE
-	(echo "<head><title>Licence</title></head><body><pre>"; \
+	(echo "<head><title>License</title></head><body><pre>"; \
 	 cat ../LICENSE; echo "</pre></body>") > LICENSE.htm
