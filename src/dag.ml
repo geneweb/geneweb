@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.26 2001-01-06 18:47:32 ddr Exp $ *)
+(* $Id: dag.ml,v 3.27 2001-01-07 10:20:18 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -146,6 +146,8 @@ value image_txt conf base p =
   | _ -> "" ]
 ;
 
+(* Print with HTML table tags: <table> <tr> <td> *)
+
 value print_table conf hts =
   do Wserver.wprint "<center><table border=%d" conf.border;
      Wserver.wprint " cellspacing=0 cellpadding=0>\n";
@@ -184,6 +186,8 @@ else Wserver.wprint " colspan=%d" colspan;
   return () 
 ;
 
+(* Print without HTML table tags: using <pre> *)
+
 value displayed_length s =
   loop 0 0 where rec loop len i =
     if i = String.length s then len
@@ -207,15 +211,68 @@ value displayed_length s =
       | _ -> loop (len + 1) (i + 1) ]
 ;
 
-value print_table_pre conf hts =
-  let ncol =
-    let hts0 = hts.(0) in
-    loop 0 0 where rec loop ncol j =
-      if j = Array.length hts0 then ncol
-      else
-        let (colspan, _, _) = hts0.(j) in
-        loop (ncol + colspan) (j + 1)
-  in
+value displayed_sub s max_len =
+  loop 0 0 0 where rec loop len dlen i =
+    if i = String.length s then Buff.get len
+    else
+      match s.[i] with
+      [ '<' ->
+          let is_a =
+            if i < String.length s - 1 then
+              match (s.[i + 1], s.[i + 2]) with
+              [ ('a' | 'A', ' ' | '\n' | '\r') | ('/', 'a' | 'A') -> True
+              | _ -> False ]
+            else False
+          in
+          let astore len c = if is_a then Buff.store len c else len in
+          loop1 (astore len '<') (i + 1)
+          where rec loop1 len i =
+            if i = String.length s then Buff.get len
+            else if s.[i] = '>' then loop (astore len '>') dlen (i + 1)
+            else loop1 (astore len s.[i]) (i + 1)
+      | '&' ->
+          if dlen < max_len then
+            let dlen = dlen + 1 in
+            loop1 (Buff.store len '&') (i + 1)
+            where rec loop1 len i =
+              if i = String.length s then Buff.get len
+              else
+                match s.[i] with
+                [ 'a'..'z' | 'A'..'Z' -> loop1 (Buff.store len s.[i]) (i + 1)
+                | ';' -> loop (Buff.store len ';') dlen (i + 1)
+                | _ -> loop len dlen i ]
+          else loop len dlen (i + 1)
+      | '\n' | '\r' -> loop len max_len (i + 1)
+      | c ->
+          if dlen < max_len then loop (Buff.store len c) (dlen + 1) (i + 1)
+          else loop len dlen (i + 1) ]
+;
+
+value longuest_word_length s =
+  loop 0 0 0 where rec loop maxlen len i =
+    if i = String.length s then max maxlen len
+    else
+      match s.[i] with
+      [ '<' ->
+          loop1 (i + 1) where rec loop1 i =
+            if i = String.length s then max maxlen len
+            else if s.[i] = '>' then loop maxlen len (i + 1)
+            else loop1 (i + 1)
+      | '&' ->
+          let len = len + 1 in
+          loop1 (i + 1) where rec loop1 i =
+            if i = String.length s then max maxlen len
+            else
+              match s.[i] with
+              [ 'a'..'z' | 'A'..'Z' -> loop1 (i + 1)
+              | ';' -> loop maxlen len (i + 1)
+              | _ -> loop maxlen len i ]
+      | '\n' | '\r' -> max maxlen len
+      | ' ' -> loop (max maxlen len) 0 (i + 1)
+      | _ -> loop maxlen (len + 1) (i + 1) ]
+;
+
+value gen_compute_columns_sizes length hts ncol =
   let colsz = Array.make ncol 0 in
   do loop 1 where rec loop curr_colspan =
        let next_colspan = ref (ncol + 1) in
@@ -229,7 +286,7 @@ value print_table_pre conf hts =
                   do match td with
                      [ TDstring s ->
                          if colspan = curr_colspan then
-                           let len = displayed_length s in
+                           let len = length s in
                            let currsz =
                              loop 0 col colspan
                              where rec loop currsz col cnt =
@@ -257,7 +314,56 @@ value print_table_pre conf hts =
           done;
        return
        if next_colspan.val > ncol then () else loop next_colspan.val;
+  return colsz
+;
+
+value compute_columns_sizes =
+  gen_compute_columns_sizes displayed_length;
+value compute_columns_minimum_sizes =
+  gen_compute_columns_sizes longuest_word_length;
+
+value print_table_pre conf hts =
+  let ncol =
+    let hts0 = hts.(0) in
+    loop 0 0 where rec loop ncol j =
+      if j = Array.length hts0 then ncol
+      else
+        let (colspan, _, _) = hts0.(j) in
+        loop (ncol + colspan) (j + 1)
+  in
+  let colsz = compute_columns_sizes hts ncol in
+  let colminsz = compute_columns_minimum_sizes hts ncol in
+  let tcol = Array.fold_left \+ 0 colsz in
+  let tmincol = Array.fold_left \+ 0 colminsz in
+  let dcol =
+    let dcol =
+      match p_getint conf.env "col" with
+      [ Some i -> i
+      | None -> 80 ]
+    in
+    max tmincol (min dcol tcol)
+  in
+(**)
+do for i = 0 to ncol - 1 do
+     Wserver.wprint " %d(%d)" colsz.(i) colminsz.(i);
+   done;
+   Wserver.wprint " = %d(%d) -> %d<br>\n" tcol tmincol dcol;
+return
+(**)
+  do for i = 0 to ncol - 1 do
+       colsz.(i) :=
+         colminsz.(i)
+         + (colsz.(i) - colminsz.(i)) * (dcol - tmincol) / (tcol - tmincol);
+     done;
   return
+(**)
+do for i = 0 to ncol - 1 do
+     Wserver.wprint " %d(%d)" colsz.(i) colminsz.(i);
+   done;
+   let tcol = Array.fold_left \+ 0 colsz in
+   Wserver.wprint " = %d(%d) -> %d<br>\n" tcol tmincol dcol;
+return
+(**)
   do Wserver.wprint "<pre>\n";
      for i = 0 to Array.length hts - 1 do
        loop 0 0 where rec loop col j =
@@ -270,11 +376,15 @@ value print_table_pre conf hts =
            in
            do match td with
               [ TDstring s ->
+let s = displayed_sub s sz in
                   let len = displayed_length s in
                   do for i = 1 to (sz - len) / 2 do
                        Wserver.wprint " ";
                      done;
-                     Wserver.wprint "%s" s;
+                     loop 0 where rec loop i =
+                       if i == String.length s || s.[i] = '\n'
+                       || start_with s i "<br>" then ()
+                       else do Wserver.wprint "%c" s.[i]; return loop (i + 1);
                      for i = (sz + len) / 2 + 1 to sz do
                        Wserver.wprint " ";
                      done;
