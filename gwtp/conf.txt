@@ -7,8 +7,9 @@
 <input type=hidden name=b value=%b>
 <input type=hidden name=t value=%t>
 
-Friend password: <input name=fripw value="%f"><br>
-Wizard password: <input name=wizpw value="%w"><br>
+Friend password: <input name=friend_passwd value="%vfriend_passwd;"><br>
+Wizard password: <input name=wizard_passwd value="%vwizard_passwd;"><br>
+Default language: <input name=default_lang value="%vdefault_lang;" size=2><br>
 
 <p>
 
