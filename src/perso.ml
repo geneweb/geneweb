@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.52 2000-10-17 04:15:19 ddr Exp $ *)
+(* $Id: perso.ml,v 3.53 2000-10-17 13:21:11 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -2425,12 +2425,6 @@ value copy_from_templ conf base ic p =
 (* Main *)
 
 value print_ok conf base p =
-  let templ =
-    match p_getenv conf.env "templ" with
-    [ Some "off" -> None
-    | Some x -> Some x
-    | None -> Some "" ]
-  in
   let config_templ =
     try
       let s = List.assoc "template" conf.base_env in
@@ -2446,15 +2440,14 @@ value print_ok conf base p =
     [ Not_found -> ["*"] ]
   in
   let templ =
-    match templ with
-    [ Some x ->
-        if List.mem "*" config_templ then templ
-        else if List.mem x config_templ then templ
-        else
-          match config_templ with
-          [ [] -> Some ""
-          | [x :: _] -> Some x ]
-    | None -> None ]
+    match p_getenv conf.env "templ" with
+    [ Some "off" -> None
+    | Some x when List.mem "*" config_templ -> Some x
+    | Some x when List.mem x config_templ -> Some x
+    | Some _ | None ->
+        match config_templ with
+        [ [] | ["*"] -> Some ""
+        | [x :: _] -> Some x ] ]
   in
   match templ with
   [ None -> Classic.print_ok conf base p

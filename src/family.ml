@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.34 2000-10-12 12:45:41 ddr Exp $ *)
+(* $Id: family.ml,v 3.35 2000-10-17 13:21:10 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -661,7 +661,7 @@ value extract_henv conf base =
      [ Some "" | None -> ()
      | Some s -> conf.henv := conf.henv @ [("dsrc", code_varenv s)] ];
      match p_getenv conf.env "templ" with
-     [ Some "" | None -> ()
+     [ None -> ()
      | Some s -> conf.henv := conf.henv @ [("templ", code_varenv s)] ];
      match p_getenv conf.env "escache" with
      [ Some _ ->
