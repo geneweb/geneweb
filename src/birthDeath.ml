@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.11 2000-05-14 19:59:33 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.12 2000-05-23 06:48:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -221,8 +221,8 @@ value print_marriage conf base =
              Wserver.wprint "%s <em>%s</em>.\n"
                (match fam.relation with
                 [ NotMarried -> transl_nth conf "relation/relations" 0
-                | Married -> transl_nth conf "married" 1
-                | Engaged -> transl_nth conf "engaged" 1 ])
+                | Married -> transl conf "married"
+                | Engaged -> transl conf "engaged" ])
                (Date.string_of_ondate conf (Dgreg d cal));
           return (month_txt, future))
        ("", False) list

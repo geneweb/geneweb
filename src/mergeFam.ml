@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 3.1 2000-01-10 02:14:39 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 3.2 2000-05-23 06:48:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -14,6 +14,12 @@ value need_differences_selection conf base fam1 fam2 =
     x1 <> "" && x2 <> "" && x1 <> x2
   in
   need_selection
+    (fun fam ->
+       match fam.relation with
+       [ Married -> "married"
+       | NotMarried -> "not married"
+       | Engaged -> "engaged" ])
+  || need_selection
     (fun fam ->
        match Adef.od_of_codate fam.marriage with
        [ None -> ""
@@ -30,7 +36,7 @@ value need_differences_selection conf base fam1 fam2 =
 ;
 
 value print_differences conf base branches fam1 fam2 =
-  let string_field str_orig title name proj =
+  let string_field title name proj =
     let x1 = proj fam1 in
     let x2 = proj fam2 in
     if x1 <> "" && x2 <> "" && x1 <> x2 then
@@ -68,15 +74,21 @@ value print_differences conf base branches fam1 fam2 =
       | [_ :: branches] -> loop branches
       | _ -> () ];
     html_p conf;
-    string_field False (transl_nth conf "marriage/marriages" 0) "marriage"
+    string_field (transl_nth conf "relation/relations" 0) "relation"
+      (fun fam ->
+         match fam.relation with
+         [ Married -> transl conf "married"
+         | NotMarried -> transl conf "not married"
+         | Engaged -> transl conf "engaged" ]);
+    string_field (transl_nth conf "marriage/marriages" 0) "marriage"
       (fun fam ->
          match Adef.od_of_codate fam.marriage with
          [ None -> ""
          | Some d -> Date.string_of_ondate conf d ]);
-    string_field True
+    string_field
       (transl_nth conf "marriage/marriages" 0 ^ " / " ^ transl conf "place")
       "marriage_place" (fun fam -> sou base fam.marriage_place);
-    string_field False (transl conf "divorce") "divorce"
+    string_field (transl conf "divorce") "divorce"
       (fun fam ->
          match fam.divorce with
          [ NotDivorced -> ""

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.100 2000-05-17 04:31:11 ddr Exp $
+# $Id: lexicon.txt,v 3.101 2000-05-23 06:48:52 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2171,7 +2171,7 @@ se: slutar
     engaged
 dk: forlovet
 en: engaged
-fr: fianc&eacute;/fianc&eacute;s
+fr: fianc&eacute;s
 se: f&ouml;rlovad
 
     engaged%t to
@@ -3339,19 +3339,19 @@ se: &auml;ktenskap/&auml;ktenskap
 
     married
 af: getroud
-cs: ¾enatı/vdaná
+cs: vdaná
 de: verheiratet
 dk: gift
 en: married
-es: casado/casados
-fr: mari&eacute;/mari&eacute;s
+es: casados
+fr: mari&eacute;s
 fi: vihitty
 he:  ğùåàéí
 is: gift
 it: sposati
 nl: gehuwd
 no: gift
-pt: casado/casados
+pt: casados
 ru: â áğàêå
 se: gift
 
