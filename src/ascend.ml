@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.27 1999-06-19 11:04:25 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.28 1999-06-28 20:25:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -551,7 +551,7 @@ value print_other_marriages conf base ws all_gp auth ifamo p =
   else ()
 ;
 
-value print_family_long conf base all_gp ifam nth =
+value print_family_long conf base ws all_gp ifam nth =
   let fam = foi base ifam in
   let cpl = coi base ifam in
   let auth =
@@ -576,29 +576,31 @@ value print_family_long conf base all_gp ifam nth =
      tag "ol" "type=a" begin
        for i = 0 to Array.length fam.children - 1 do
          let ipc = fam.children.(i) in
-         let pc = poi base ipc in
-         let n = get_link all_gp ipc in
-         do Wserver.wprint "<li>\n";
-            stag "strong" begin
-              if pc.surname = (poi base cpl.father).surname then
-                afficher_prenom_de_personne_referencee conf base
-                  pc
-              else
-                afficher_personne_referencee conf base pc;
-            end;
-            print_person_long_info conf base auth n pc;
-            Wserver.wprint ".\n";
-            match n with
-            [ Some _ -> ()
-            | None ->
-                for i = 0 to Array.length pc.family - 1 do
-                  print_marriage_long conf base all_gp auth None
-                    pc (pc.family.(i));
-                done ];
-            if i <> Array.length fam.children - 1 then
-              Wserver.wprint "<br>&nbsp;\n"
-            else ();
-         return ();
+         if ws || get_link all_gp ipc <> None then
+           let pc = poi base ipc in
+           let n = get_link all_gp ipc in
+           do Wserver.wprint "<li>\n";
+              stag "strong" begin
+                if pc.surname = (poi base cpl.father).surname then
+                  afficher_prenom_de_personne_referencee conf base
+                    pc
+                else
+                  afficher_personne_referencee conf base pc;
+              end;
+              print_person_long_info conf base auth n pc;
+              Wserver.wprint ".\n";
+              match n with
+              [ Some _ -> ()
+              | None ->
+                  for i = 0 to Array.length pc.family - 1 do
+                    print_marriage_long conf base all_gp auth None
+                      pc (pc.family.(i));
+                  done ];
+              if i <> Array.length fam.children - 1 then
+                Wserver.wprint "<br>&nbsp;\n"
+              else ();
+           return ()
+         else ();
        done;
      end;
   return ()
@@ -610,7 +612,7 @@ value print_other_families conf base all_gp excl_ifam moth_nb =
     for i = 0 to Array.length p.family - 1 do
       let ifam = p.family.(i) in
       if ifam <> excl_ifam && Array.length (foi base ifam).children <> 0 then
-        print_family_long conf base all_gp ifam (Some (n, i + 1))
+        print_family_long conf base True all_gp ifam (Some (n, i + 1))
       else ();
     done
   in
@@ -626,7 +628,7 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
       let p = poi base ip in
       do Wserver.wprint "<p>\n";
          match ifamo with
-         [ Some ifam when ws ->
+         [ Some ifam ->
              if not (Num.even n) then
                let fam = foi base ifam in
                let cpl = coi base ifam in
@@ -694,10 +696,11 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
          print_other_marriages conf base ws all_gp (age_autorise conf base p)
            ifamo p;
          match ifamo with
-         [ Some ifam when ws ->
+         [ Some ifam ->
              if not (Num.even n) then
-               do print_family_long conf base all_gp ifam None;
-                  print_other_families conf base all_gp ifam n;
+               do print_family_long conf base ws all_gp ifam None;
+                  if ws then print_other_families conf base all_gp ifam n
+                  else ();
                return ()
              else ()
          | _ -> () ];
