@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.18 2000-02-14 14:39:51 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.19 2000-02-16 17:10:25 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -18,7 +18,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
 <table><tr><td align=center><h1><font color=%i>Base de Dados<br>
-Geneol&oacute;gica</font></h1></table>
+Geneal&oacute;gica</font></h1></table>
 </td>
 </tr>
 </table>

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.8 2000-02-02 16:07:17 ddr Exp $ *)
+(* $Id: perso.ml,v 3.9 2000-02-16 17:10:26 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1162,5 +1162,3 @@ value print conf base p =
   [ Some (src, passwd) when passwd <> conf.passwd -> Util.unauthorized conf src
   | _ -> print_ok conf base p ]
 ;
-
-
