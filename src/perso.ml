@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.32 2000-07-11 09:46:41 ddr Exp $ *)
+(* $Id: perso.ml,v 3.33 2000-07-17 11:54:28 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -79,17 +79,16 @@ value next_sibling base p a =
   | None -> None ]
 ;
 
-value
-  print_title conf base cap and_txt p first (nth, name, title, places, dates) =
+value print_title conf base and_txt p (nth, name, title, places, dates) =
   do let href =
        "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
        code_varenv (sou base (List.hd places))
      in
-     let tit = sou base title in
-     let s =
-       ((*if first && cap then capitale tit else*) tit) ^ " " ^
-       sou base (List.hd places)
+     let (tit, est) =
+       Lextitle.translate conf Util.base_dir.val
+         (sou base title, sou base (List.hd places))
      in
+     let s = tit ^ " " ^ est in
      wprint_geneweb_link conf href s;
      let rec loop places =
        do match places with
@@ -103,7 +102,10 @@ value
              "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
              code_varenv (sou base place)
            in
-           do wprint_geneweb_link conf href (sou base place);
+           let (_, est) =
+             Lextitle.translate conf Util.base_dir.val ("", sou base place)
+           in
+           do wprint_geneweb_link conf href est;
            return loop places
        | _ -> () ]
      in
@@ -203,7 +205,7 @@ value print_titles conf base cap and_txt p =
       (fun first t ->
          do if not first then Wserver.wprint "," else ();
             Wserver.wprint "\n";
-            print_title conf base cap and_txt p first t;
+            print_title conf base and_txt p t;
          return False)
       True titles
   in

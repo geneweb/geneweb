@@ -122,6 +122,8 @@ iobase.cmx: adef.cmx btree.cmx buff.cmx def.cmi gutil.cmx iovalue.cmx \
     name.cmx iobase.cmi 
 iovalue.cmo: iovalue.cmi 
 iovalue.cmx: iovalue.cmi 
+lextitle.cmo: config.cmi 
+lextitle.cmx: config.cmi 
 lock.cmo: lock.cmi 
 lock.cmx: lock.cmi 
 merge.cmo: adef.cmi config.cmi def.cmi gutil.cmi util.cmi \
@@ -160,10 +162,10 @@ notes.cmo: config.cmi def.cmi gutil.cmi util.cmi ../wserver/wserver.cmi
 notes.cmx: config.cmi def.cmi gutil.cmx util.cmx ../wserver/wserver.cmx 
 num.cmo: num.cmi 
 num.cmx: num.cmi 
-perso.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi num.cmi \
-    util.cmi ../wserver/wserver.cmi perso.cmi 
-perso.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx num.cmx \
-    util.cmx ../wserver/wserver.cmx perso.cmi 
+perso.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi lextitle.cmo \
+    name.cmi num.cmi util.cmi ../wserver/wserver.cmi perso.cmi 
+perso.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx lextitle.cmx \
+    name.cmx num.cmx util.cmx ../wserver/wserver.cmx perso.cmi 
 phonygwd.cmo: argl.cmo ../wserver/wserver.cmi 
 phonygwd.cmx: argl.cmx ../wserver/wserver.cmx 
 place.cmo: adef.cmi config.cmi def.cmi gutil.cmi iobase.cmi util.cmi \
@@ -223,11 +225,11 @@ updateIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx iobase.cmx \
     lock.cmx name.cmx update.cmx updateInd.cmx util.cmx \
     ../wserver/wserver.cmx updateIndOk.cmi 
 util.cmo: adef.cmi buff.cmo config.cmi consang.cmi def.cmi gutil.cmi \
-    iobase.cmi lock.cmi name.cmi num.cmi version.cmo ../wserver/wserver.cmi \
-    util.cmi 
+    iobase.cmi lextitle.cmo lock.cmi name.cmi num.cmi version.cmo \
+    ../wserver/wserver.cmi util.cmi 
 util.cmx: adef.cmx buff.cmx config.cmi consang.cmx def.cmi gutil.cmx \
-    iobase.cmx lock.cmx name.cmx num.cmx version.cmx ../wserver/wserver.cmx \
-    util.cmi 
+    iobase.cmx lextitle.cmx lock.cmx name.cmx num.cmx version.cmx \
+    ../wserver/wserver.cmx util.cmi 
 advSearchOk.cmo advSearchOk.cmx: pa_html.cmo def.syn.cmo
 alln.cmo alln.cmx: pa_html.cmo
 ascend.cmo ascend.cmx: def.syn.cmo pa_html.cmo

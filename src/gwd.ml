@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.48 2000-07-17 09:35:32 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.49 2000-07-17 11:54:26 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -647,36 +647,36 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
   let uauth =
     if passwd = "w" || passwd = "f" then passwd1 else passwd
   in
-  let (ok, wizard, friend, user) =
+  let (ok, wizard, friend) =
     match access_type with
-    [ ATwizard -> (True, True, False, "")
-    | ATfriend -> (True, False, True, "")
-    | ATnormal -> (True, False, False, "")
+    [ ATwizard -> (True, True, False)
+    | ATfriend -> (True, False, True)
+    | ATnormal -> (True, False, False)
     | ATnone | ATset ->
         if not cgi && (passwd = "w" || passwd = "f") then
           if passwd = "w" then
             if wizard_passwd = "" && wizard_passwd_file = "" then
-              (True, True, friend_passwd = "", "")
+              (True, True, friend_passwd = "")
             else if match_auth wizard_passwd wizard_passwd_file uauth then
-              (True, True, False, uauth)
-            else (False, False, False, "")
+              (True, True, False)
+            else (False, False, False)
           else if passwd = "f" then
             if friend_passwd = "" && friend_passwd_file = "" then
-              (True, False, True, "")
+              (True, False, True)
             else if match_auth friend_passwd friend_passwd_file uauth then
-              (True, False, True, uauth)
-            else (False, False, False, "")
+              (True, False, True)
+            else (False, False, False)
           else assert False
         else
           if wizard_passwd = "" && wizard_passwd_file = "" then
-            (True, True, friend_passwd = "", "")
+            (True, True, friend_passwd = "")
           else if match_auth wizard_passwd wizard_passwd_file uauth then
-            (True, True, False, uauth)
+            (True, True, False)
           else if friend_passwd = "" && friend_passwd_file = "" then
-            (True, False, True, "")
+            (True, False, True)
           else if match_auth friend_passwd friend_passwd_file uauth then
-            (True, False, True, uauth)
-          else (True, False, False, "") ]
+            (True, False, True)
+          else (True, False, False) ]
   in
   let (command, passwd) =
     match access_type with
@@ -698,9 +698,9 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
         else (base_file ^ "_" ^ passwd, passwd) ]
   in
   let user =
-    match lindex user ':' with
+    match lindex uauth ':' with
     [ Some i ->
-        let s = String.sub user 0 i in
+        let s = String.sub uauth 0 i in
         if s = wizard_passwd || s = friend_passwd then "" else s
     | None -> "" ]
   in
