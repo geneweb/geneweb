@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 4.5 2003-12-16 12:46:21 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 4.6 2003-12-16 12:49:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -19,7 +19,7 @@ value need_differences_selection conf base fam1 fam2 =
        | NotMarried -> "not married"
        | Engaged -> "engaged"
        | NoSexesCheck -> "no sexes check"
-       | Rap -> "rape" ]) ||
+       | Rape -> "rape" ]) ||
   need_selection
     (fun fam ->
        match Adef.od_of_codate fam.marriage with
