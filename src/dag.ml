@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.27 2001-01-07 10:20:18 ddr Exp $ *)
+(* $Id: dag.ml,v 3.28 2001-01-07 21:01:55 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -339,7 +339,7 @@ value print_table_pre conf hts =
     let dcol =
       match p_getint conf.env "col" with
       [ Some i -> i
-      | None -> 80 ]
+      | None -> 79 ]
     in
     max tmincol (min dcol tcol)
   in
