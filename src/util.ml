@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.19 1998-12-19 12:36:10 roglo Exp $ *)
+(* $Id: util.ml,v 1.20 1998-12-28 15:40:26 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -153,7 +153,8 @@ value acces_pur conf base x =
   let first_name = sou base x.first_name in
   let surname = sou base x.surname in
   if conf.wizard && conf.friend && not (first_name = "?" || surname = "?") then
-    "n=" ^ code_varenv surname ^ ";p=" ^ code_varenv first_name ^
+    "n=" ^ (code_varenv (Name.lower surname)) ^ ";p=" ^
+    (code_varenv (Name.lower first_name)) ^
       (if x.occ > 0 then ";oc=" ^ string_of_int x.occ else "")
   else
   "i=" ^ string_of_int (Adef.int_of_iper x.cle_index)
