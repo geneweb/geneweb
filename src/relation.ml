@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.0 1999-10-29 10:31:33 ddr Exp $ *)
+(* $Id: relation.ml,v 3.1 1999-11-01 23:19:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -832,7 +832,7 @@ value print_main_relationship conf base long p1 p2 rel =
 
 value print_base_loop conf base =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do header conf title;
+  do rheader conf title;
      Wserver.wprint "%s\n" (capitale (transl conf "probable loop in base"));
      trailer conf;
   return ()

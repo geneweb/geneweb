@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.0 1999-10-29 10:31:42 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.1 1999-11-01 23:19:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -166,7 +166,7 @@ value print_err_parents conf base p =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "error"))
   in
-  do header conf title;
+  do rheader conf title;
      Wserver.wprint "\n";
      Wserver.wprint (fcapitale (ftransl conf "%t already has parents"))
        (fun _ -> afficher_personne_referencee conf base p);
@@ -188,7 +188,7 @@ value print_err_father_sex conf base p =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "error"))
   in
-  do header conf title;
+  do rheader conf title;
      afficher_personne_referencee conf base p;
      Wserver.wprint "\n%s\n" (transl conf "should be male");
      Update.print_return conf;
@@ -200,7 +200,7 @@ value print_err_mother_sex conf base p =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "error"))
   in
-  do header conf title;
+  do rheader conf title;
      afficher_personne_referencee conf base p;
      Wserver.wprint "\n%s\n" (transl conf "should be female");
      Update.print_return conf;

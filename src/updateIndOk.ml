@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.0 1999-10-29 10:31:45 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.1 1999-11-01 23:19:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -277,7 +277,7 @@ value check_person conf base p =
 
 value error_person conf base p err =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do header conf title;
+  do rheader conf title;
      Wserver.wprint "%s\n" (capitale err);
      trailer conf;
   return ()
@@ -325,7 +325,7 @@ to try again with this number, or do \"back\" and change it yourself");
 
 value print_conflict conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do header conf title;
+  do rheader conf title;
      Update.print_error conf base (AlreadyDefined p);
      html_p conf;
   return
@@ -346,7 +346,7 @@ value print_conflict conf base p =
 
 value print_cannot_change_sex conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do header conf title;
+  do rheader conf title;
      Update.print_error conf base (BadSexOfMarriedPerson p);
      tag "ul" begin
        html_li conf;
