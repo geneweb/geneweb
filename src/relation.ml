@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.31 2002-11-18 12:36:28 ddr Exp $ *)
+(* $Id: relation.ml,v 4.32 2002-11-25 13:10:09 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -698,9 +698,11 @@ value parents_label conf base info =
           (transl_nth conf "nth (generation)" n) ]
 ;
 
-value parent_in_law_label conf sex =
-  let is = index_of_sex sex in
-  transl_nth conf "the father-in-law/the mother-in-law" is
+value parent_in_law_label conf sex_child sex_parent =
+  let txt = transl conf "the father-in-law/the mother-in-law" in
+  let is = index_of_sex sex_parent in
+  if nb_fields txt = 2 then nth_field txt is
+  else nth_field txt (2 * index_of_sex sex_child + is)
 ;
 
 value ancestor_label conf base info x sex =
@@ -736,9 +738,11 @@ value ancestor_label conf base info x sex =
           (transl_nth conf "nth (generation)" n) ]
 ;
 
-value child_in_law_label conf sex =
-  let is = index_of_sex sex in
-  transl_nth conf "a son-in-law/a daughter-in-law" is
+value child_in_law_label conf sex_child sex_parent =
+  let txt = transl conf "a son-in-law/a daughter-in-law" in
+  let is = index_of_sex sex_child in
+  if nb_fields txt = 2 then nth_field txt is
+  else nth_field txt (2 * index_of_sex sex_parent + is)
 ;
 
 value descendant_label conf base info x p =
@@ -875,13 +879,13 @@ value print_link_name conf base n p1 p2 sol =
       let sp2 = pp2 <> None in
       if x2 == 0 then
         if sp1 && x1 == 1 then
-          (parent_in_law_label conf p2.sex, False, sp2)
+          (parent_in_law_label conf ini_p1.sex ini_p2.sex, False, sp2)
         else
           let info = ((info, x1), fun r -> r.Consang.lens1) in
           (ancestor_label conf base info x1 p2.sex, sp1, sp2)
       else if x1 == 0 then
         if sp2 && x2 == 1 then
-          (child_in_law_label conf ini_p2.sex, sp1, False)
+          (child_in_law_label conf ini_p2.sex ini_p1.sex, sp1, False)
         else (descendant_label conf base (info, x2) x2 p2, sp1, sp2)
       else if x2 == x1 then
         if x2 == 1 && not (same_parents conf base p2 p1) then
