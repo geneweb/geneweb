@@ -47,7 +47,7 @@ GeneWeb version 2.05
     in branches displayings. Added ability to cancel GeneWeb links in branches
     displaying.
   - [Jul 15, 99] Added system of grammar declinations (required by German,
-    Esperanto, (future) Czech). Changed the lexicon to use this new system.
+    Esperanto, Czech). Changed the lexicon to use this new system.
   - [Jul 9, 99] Added link (upper arrow) to welcome page in displayings by
     first names and surnames.
   - [Jul 9, 99] Fixed date check for possible father when interval (i.e. was
