@@ -90,7 +90,7 @@ vous allez nommer "geneweb" et contenant les lignes suivantes:
 
 <pre>
      #!/bin/sh
-     DIR=/home/dupont/geneweb
+     DIR=/home/dupont/geneweb/gw
      cd $DIR
      $DIR/gwd -cgi
 </pre>
@@ -124,7 +124,7 @@ que le serveur Web n'ait pas le droit d'acc&egrave;s &agrave; la base ni
 aux autres r&eacute;pertoires. Effectuez les op&eacute;rations suivantes:
 
 <pre>
-     cd /home/dupont/geneweb
+     cd /home/dupont/geneweb/gw
      chmod 777 . lang images base.gwb
 </pre>
 
@@ -154,9 +154,9 @@ les lignes suivantes:
 
 <pre>
      -hd
-     c:\home\dupont\geneweb
+     c:\home\dupont\geneweb\gw
      -bd
-     c:\home\dupont\geneweb
+     c:\home\dupont\geneweb\gw
      -cgi
 </pre>
 
@@ -199,10 +199,10 @@ nom de votre base. Vous pouvez aussi ajouter directement "?b=durand"
 
 Remarque: si cette derni&egrave;re commande ne fonctionne pas, il est
 possible que le serveur Web n'ait pas le droit d'acc&egrave;s &agrave;
-la base ni aux autres r&eacute;pertoires. Il faut donner les droits
-de lecture et d'&eacute;criture au r&eacute;pertoire "geneweb" et aux
-sous-r&eacute;pertoires "lang", "durand.gwb", "images" (et "cnt" si
-ce r&eacute;pertoire existe).
+la base ni aux autres r&eacute;pertoires. Il faut donner les droits de
+lecture et d'&eacute;criture au r&eacute;pertoire "geneweb", &agrave;
+son sous-r&eacute;pertoire "gw" et aux sous-r&eacute;pertoires "lang",
+"durand.gwb", "images" (et "cnt" si ce r&eacute;pertoire existe).
 
 </ul>
 

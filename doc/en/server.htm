@@ -79,7 +79,7 @@ following lines:
 
 <pre>
      #!/bin/sh
-     DIR=/home/smith/geneweb
+     DIR=/home/smith/geneweb/gw
      cd $DIR
      $DIR/gwd -cgi
 </pre>
@@ -109,7 +109,7 @@ server have no access rights to the base and the other directories.
 Do the following operations:
 
 <pre>
-     cd /home/smith/geneweb
+     cd /home/smith/geneweb/gw
      chmod 777 . lang images base.gwb
 </pre>
 
@@ -136,9 +136,9 @@ the following lines:
 
 <pre>
      -hd
-     c:\home\smith\geneweb
+     c:\home\smith\geneweb\gw
      -bd
-     c:\home\smith\geneweb
+     c:\home\smith\geneweb\gw
      -cgi
 </pre>
 
@@ -179,8 +179,8 @@ add "?b=jones" to this URL, if "jones" is your database's name.
 Remark: if this latest command does not work, it is possible that the
 Web server have no access rights to the base and the other
 directories.  You have to give the read and write access rights to the
-directory "geneweb" and the subdirectories "lang", "jones.gwb",
-"images" (and "cnt" if this directory exists).
+directory "geneweb", its subdirectory "gw" and the subdirectories
+"lang", "jones.gwb", "images" (and "cnt" if this directory exists).
 
 </ul>
 
