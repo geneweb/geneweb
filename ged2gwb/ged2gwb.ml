@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.13 1999-04-05 23:42:27 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.14 1999-04-29 09:06:43 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1731,13 +1731,13 @@ value speclist =
       );
    ("-efn", Arg.Set extract_first_names,
     "  \
-- Extract first names
+- Extract first names - [default]
        When creating a person, if the GEDCOM first name part holds several
        names, the first of this names becomes the person \"first name\" and
        the complete GEDCOM first name part a \"first name alias\"."
       );
    ("-no_efn", Arg.Clear extract_first_names,
-    " - [default] -\n       Cancels the previous option.");
+    "\n       Cancels the previous option.");
    ("-epn", Arg.Set extract_public_names,
     "  \
 - Extract public names - [default]
