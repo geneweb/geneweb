@@ -5,9 +5,9 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [03 Mar 04] Added new field in wizard password file. With an
-    extra colon, gives user name, which is displayed by default
-    as ident in "forum add" and in wizard notes.
+  - [03 Mar 04] Added new optional field in wizard and friend password
+    files. With an extra colon, gives user name, which is displayed by
+    default as ident in "forum add" and in wizard notes.
   - [23 Feb 04] Submit in forum when wizard or friend is now in two
     buttons, instead of "Ok".
   - [16 Feb 04] Fixed bug: in ascend pages, the image link remained
