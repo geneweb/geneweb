@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 2.6 1999-10-01 16:05:45 ddr Exp $ *)
+(* $Id: doc.ml,v 2.7 1999-10-05 20:59:24 ddr Exp $ *)
 
 open Config;
 
@@ -7,32 +7,31 @@ value start_with s i p =
   && String.lowercase (String.sub s i (String.length p)) = p
 ;
 
-value href = "<a href=";
-value href1 = "<a\nhref=";
 value http = "http://";
 
 value copy pref s =
+  let last8 = String.make 8 ' ' in
+  let insert c =
+    let c = Char.lowercase c in
+    let c = if c = '\n' || c = '\r' then ' ' else c in
+    if c = ' ' && last8.[7] = ' ' then ()
+    else do String.blit last8 1 last8 0 7; last8.[7] := c; return ()
+  in
   loop 0 where rec loop i =
     if i == String.length s then ()
     else
-      let sw =
-        if start_with s i href then Some href
-        else if start_with s i href1 then Some href1
-        else None
-      in
-      match sw with
-      [ Some href ->
-          do Wserver.wprint "%s" href; return
-          let i = i + String.length href in
-          let i =
-            if s.[i] = '"' then do Wserver.wprint "\""; return i + 1 else i
-          in
-          do if s.[i] = '#' || start_with s i http || start_with s i "mailto:"
-             then ()
-             else Wserver.wprint "%s" pref;
-          return
-          loop i
-      | _ -> do Wserver.wprint "%c" s.[i]; return loop (i + 1) ]
+      do insert s.[i]; return
+      if last8 = "<a href=" then
+        let i = do Wserver.wprint "%c" s.[i]; return i + 1 in
+        let i =
+          if s.[i] = '"' then do Wserver.wprint "\""; return i + 1 else i
+        in
+        do if s.[i] = '#' || start_with s i http || start_with s i "mailto:"
+           then ()
+           else Wserver.wprint "%s" pref;
+        return
+        loop i
+      else do Wserver.wprint "%c" s.[i]; return loop (i + 1)
 ;
 
 value has_dotslash s =
