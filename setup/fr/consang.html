@@ -1,24 +1,35 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>Calcul de consanguinit&eacute;</title></head>
+<head><title>Consanguinit&eacute;s</title></head>
 
 <body>
 
-<h1>Calcul de consanguinit&eacute;</h1>
+<h1>Consanguinit&eacute;s</h1>
+
+L'initialisation des consanguinit&eacute;s est n&eacute;cessaire pour
+que les consanguinit&eacute;s s'affichent quand on navigue dans la
+base.
+
+<p>
 
 <form mode=GET action="consang">
 <input type=hidden name=opt value=check>
 <input type=hidden name=lang value=$l>
 <input type=hidden name=q value=on>
 
-S&eacute;lectionnez votre base de donn&eacute;es:
+S&eacute;lectionnez votre base de donn&eacute;es en cliquant sur le
+bouton associ&eacute;.
 
 <p>
 
 <dl><dd><table border=1 cellspacing=0 cellpadding=1>
 
-$b{<tr><td><input type=radio name=anon
-value="$a">&nbsp;&nbsp;&nbsp;</td><td>$a</td></tr>|
+$b{
+<tr>
+<td>
+<input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+</tr>|
 <tr><td>il n'y a aucune base de donn&eacute;es actuellement</tr></td>}
 
 </table></dl>
