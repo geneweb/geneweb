@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.30 2003-12-04 20:30:56 ddr Exp $ *)
+(* $Id: forum.ml,v 4.31 2003-12-05 05:48:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -536,9 +536,9 @@ value forum_add conf base ident comm =
     [ Some v -> v
     | None -> "publ" ]
   in
-  let bfile = base_path [] (conf.bname ^ ".gwb") in
   if ident <> "" && comm <> "" then
 (*
+  let bfile = base_path [] (conf.bname ^ ".gwb") in
     lock (Iobase.lock_file bfile) with
     [ Accept ->
 *)
