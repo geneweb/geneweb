@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.11 2000-08-27 15:43:51 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.12 2000-09-08 11:58:20 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -193,8 +193,7 @@ value rec input_real_line ic =
 
 value get_optional_birthdate l =
   match l with
-  [ ["</h4>" :: _] -> (None, l)
-  | [x :: l'] ->
+  [ [x :: l'] ->
       let i = 0 in
       if x.[i] == '!' then (None, l)
       else

@@ -61,8 +61,10 @@ GeneWeb version 3.08
   - [03 Sep 00] In FAQ, changed the text about the question of missing
     relationship links (French and English versions only).
   - Added entries in the FAQ (French and English versions) about:
+    * [08 Sep 00] the research by place/surname, where only one person
+      by surname is displayed,
     * [03 Sep 00] the fact that sometimes, under Windows, it does not
-      work at all.
+      work at all,
     * [01 Sep 00] the fact that information in forms sometimes disappear,
     * [01 Sep 00] adding more information in family forms,
     * [31 Aug 00] short dates displaying conventions,
