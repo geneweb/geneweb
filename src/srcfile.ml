@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.30 2000-11-08 21:36:52 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.31 2000-11-09 12:40:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -187,12 +187,12 @@ value source_file_name conf fname =
   let bname = conf.bname in
   let lang = conf.lang in
   let fname1 =
-    List.fold_right Filename.concat [Util.base_dir.val; "sources"; bname; lang]
+    List.fold_right Filename.concat [Util.base_dir.val; "src"; bname; lang]
       (Filename.basename fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
   else
-    List.fold_right Filename.concat [Util.base_dir.val; "sources"; bname]
+    List.fold_right Filename.concat [Util.base_dir.val; "src"; bname]
       (Filename.basename fname ^ ".txt")
 ;
 
