@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.30 1999-09-29 13:58:37 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.31 1999-09-29 15:40:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -237,6 +237,42 @@ value infer_origin_file conf base ncpl nfam =
           else loop (i + 1) ]
 ;
 
+value list_filter p =
+  find [] where rec find accu =
+    fun
+    [ [] -> List.rev accu
+    | [x :: l] -> if p x then find [x :: accu] l else find accu l ]
+;
+
+value update_related_witnesses base ofam_witn nfam_witn ncpl =
+  let mod_ippl = [] in
+  let mod_ippl =
+    List.fold_left
+      (fun ippl ip ->
+         if List.memq ip ofam_witn then ippl
+         else
+           let p = poi base ip in
+           if not (List.mem ncpl.father p.related) then
+             do p.related := [ncpl.father :: p.related]; return
+             if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
+           else ippl)
+      mod_ippl nfam_witn
+  in
+  let mod_ippl =
+    List.fold_left
+      (fun ippl ip ->
+         if List.memq ip nfam_witn then ippl
+         else
+           let p = poi base ip in
+           if List.mem ncpl.father p.related then
+             do p.related := list_filter (\<> ncpl.father) p.related; return
+             if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
+           else ippl)
+      mod_ippl ofam_witn
+  in
+  List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
+;
+
 value effective_mod conf base sfam scpl =
   let fi = sfam.fam_index in
   let ofam = foi base fi in
@@ -324,43 +360,9 @@ value effective_mod conf base sfam scpl =
        nfam.children;
      Update.add_misc_names_for_new_persons base created_p.val;
      Update.update_misc_names_of_family base nfath;
+     update_related_witnesses base (Array.to_list ofam.witnesses)
+        (Array.to_list nfam.witnesses) ncpl;
   return (nfam, ncpl)
-;
-
-value list_filter p =
-  find [] where rec find accu =
-    fun
-    [ [] -> List.rev accu
-    | [x :: l] -> if p x then find [x :: accu] l else find accu l ]
-;
-
-value update_related_witnesses base ofam_witn nfam_witn ncpl =
-  let mod_ippl = [] in
-  let mod_ippl =
-    List.fold_left
-      (fun ippl ip ->
-         if List.memq ip ofam_witn then ippl
-         else
-           let p = poi base ip in
-           if not (List.mem ncpl.father p.related) then
-             do p.related := [ncpl.father :: p.related]; return
-             if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
-           else ippl)
-      mod_ippl nfam_witn
-  in
-  let mod_ippl =
-    List.fold_left
-      (fun ippl ip ->
-         if List.memq ip nfam_witn then ippl
-         else
-           let p = poi base ip in
-           if List.mem ncpl.father p.related then
-             do p.related := list_filter (\<> ncpl.father) p.related; return
-             if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
-           else ippl)
-      mod_ippl ofam_witn
-  in
-  List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
 ;
 
 value effective_add conf base sfam scpl =
