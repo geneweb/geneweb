@@ -8,7 +8,7 @@
 
 <p>
 
-Databasen indeholder for øjeblikket %n personer.
+Databasen indeholder for &oslash;jeblikket %n personer.
 
 <ul>
 
@@ -16,10 +16,10 @@ Databasen indeholder for øjeblikket %n personer.
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-Søg: <input name=n size=40 maxlength=200>
+S&oslash;g: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
-Sådan:
+S&aring;dan:
 <ul>
 <li> <input type=radio name=t value=PN checked>
 Enten <em>fornavn</em> og <em>efternavn</em>,
@@ -43,8 +43,8 @@ sted <INPUT NAME=p size=25 maxlength=200> =&gt;
 <FORM method=GET action="%f">
 %hAlle
 <SELECT NAME=m>
-   <OPTION VALUE="N" SELECTED> Efternavn
-   <OPTION VALUE="P"> Fornavn
+   <OPTION VALUE="N" SELECTED> Efternavne
+   <OPTION VALUE="P"> Fornavne
 </SELECT>
 efter
 <SELECT NAME=tri>
@@ -56,18 +56,18 @@ efter
 
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
 
-%w<li> <a href="%sm=ADD_FAM">Tilføj en familie</a>.
+%w<li> <a href="%sm=ADD_FAM">Tilf&oslash;j en familie</a>.
 %w
 
 </ul>
 
-<a href="%sm=AN">Fødselsdage</a>.<br>
-<a href="%sm=AD">Døde personers årsdage</a>.<br>
+<a href="%sm=AN">F&oslash;dselsdage</a>.<br>
+<a href="%sm=AD">D&oslash;de personers &aring;rsdage</a>.<br>
 <a href="%sm=AM">Bryllupsdage</a>.<br>%x
 De <a href="%sm=LB;k=10">seneste f&oslash;dsler</a>.<br>
 De <a href="%sm=LD;k=10">seneste d&oslash;dsfald</a>.<br>%x
 <p>
-Der har været %q opslag, %c af dem på denne side, siden %d.
+Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
 
 %y<p>
 
