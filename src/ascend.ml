@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.50 2005-02-05 06:34:39 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.51 2005-02-05 14:29:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -45,7 +45,8 @@ value max_ancestor_level conf base ip =
 value text_to conf =
   fun
   [ 1 ->
-      transl conf "specify" ^ " " ^ transl_nth conf "generation/generations" 0
+      transl_decline conf "specify"
+        (transl_nth conf "generation/generations" 0)
   | 2 -> transl conf "to the parents"
   | 3 -> transl conf "to the grandparents"
   | 4 -> transl conf "to the great-grandparents"
@@ -57,7 +58,8 @@ value text_to conf =
 value text_level conf =
   fun
   [ 1 ->
-      transl conf "specify" ^ " " ^ transl_nth conf "generation/generations" 0
+      transl_decline conf "specify"
+        (transl_nth conf "generation/generations" 0)
   | 2 -> transl conf "the parents"
   | 3 -> transl conf "the grandparents"
   | 4 -> transl conf "the great-grandparents"
@@ -94,44 +96,62 @@ value print_choice conf base p effective_level =
     tag "table" "border=\"%d\" width=\"100%%\"" conf.border begin
       tag "tr" begin
         tag "td" "align=\"%s\"" conf.left begin
-          xtag "input"
-            "type=\"radio\" name=\"t\" value=\"N\" checked=\"checked\"";
-          Wserver.wprint " %s (*)" (capitale (transl conf "short display"));
+          tag "label" begin
+            xtag "input"
+              "type=\"radio\" name=\"t\" value=\"N\" checked=\"checked\"";
+            Wserver.wprint " %s (*)" (capitale (transl conf "short display"));
+          end;
           xtag "br";
-          xtag "input" "type=\"radio\" name=\"t\" value=\"G\"";
-          Wserver.wprint " %s (*)" (capitale (transl conf "long display"));
+          tag "label" begin
+            xtag "input" "type=\"radio\" name=\"t\" value=\"G\"";
+            Wserver.wprint " %s (*)" (capitale (transl conf "long display"));
+          end;
           xtag "br";
-          Wserver.wprint "- %s\n" (capitale (transl conf "siblings"));
-          xtag "input" "\
+          tag "label" begin
+            Wserver.wprint "- %s\n" (capitale (transl conf "siblings"));
+            xtag "input" "\
 type=\"checkbox\" name=\"siblings\" value=\"on\" checked=\"checked\"";
+          end;
           xtag "br";
-          Wserver.wprint "- %s\n"
-            (capitale (nominative (transl_nth conf "note/notes" 1)));
-          xtag "input" "\
+          tag "label" begin
+            Wserver.wprint "- %s\n"
+              (capitale (nominative (transl_nth conf "note/notes" 1)));
+            xtag "input" "\
 type=\"checkbox\" name=\"notes\" value=\"on\" checked=\"checked\"";
+          end;
           xtag "br";
-          xtag "input" "type=\"radio\" name=\"t\" value=\"T\"";
-          Wserver.wprint "%s" (capitale (transl conf "tree"));
-          let limit = limit_by_tree conf in
-          if effective_level < limit then ()
-          else
-            Wserver.wprint "(%s %d %s)\n" (transl conf "maximum") limit
-              (transl_nth conf "generation/generations" 1);
+          tag "label" begin
+            xtag "input" "type=\"radio\" name=\"t\" value=\"T\"";
+            Wserver.wprint "%s" (capitale (transl conf "tree"));
+            let limit = limit_by_tree conf in
+            if effective_level < limit then ()
+            else
+              Wserver.wprint " (%s %d %s)\n" (transl conf "maximum") limit
+                (transl_nth conf "generation/generations" 1);
+          end;
           xtag "br";
-          xtag "input" "type=\"radio\" name=\"t\" value=\"A\"";
-          Wserver.wprint "%s\n"
-            (capitale (transl_nth conf "male line/female line" 0));
+          tag "label" begin
+            xtag "input" "type=\"radio\" name=\"t\" value=\"A\"";
+            Wserver.wprint "%s\n"
+              (capitale (transl_nth conf "male line/female line" 0));
+          end;
           xtag "br";
-          xtag "input" "type=\"radio\" name=\"t\" value=\"C\"";
-          Wserver.wprint "%s\n"
-            (capitale (transl_nth conf "male line/female line" 1));
+          tag "label" begin
+            xtag "input" "type=\"radio\" name=\"t\" value=\"C\"";
+            Wserver.wprint "%s\n"
+              (capitale (transl_nth conf "male line/female line" 1));
+          end;
           xtag "br";
-          Wserver.wprint "- %s\n"
-            (capitale (transl_nth conf "image/images" 1));
-          xtag "input" "type=\"checkbox\" name=\"image\" value=\"on\"";
+          tag "label" begin
+            Wserver.wprint "- %s\n"
+              (capitale (transl_nth conf "image/images" 1));
+            xtag "input" "type=\"checkbox\" name=\"image\" value=\"on\"";
+          end;
           xtag "br";
-          Wserver.wprint "- %s\n" (capitale (transl conf "border"));
-          xtag "input" "name=\"bd\" size=\"1\" maxlength=\"2\" value=\"0\"";
+          tag "label" begin
+            Wserver.wprint "- %s\n" (capitale (transl conf "border"));
+            xtag "input" "name=\"bd\" size=\"1\" maxlength=\"2\" value=\"0\"";
+          end;
           xtag "br";
           tag "table" "cellspacing=\"0\" cellpadding=\"0\" border=\"%d\""
             conf.border
@@ -155,55 +175,76 @@ type=\"radio\" name=\"color\" value=\"\" checked=\"checked\"";
           end;
         end;
         tag "td" "align=\"%s\" valign=\"top\"" conf.left begin
-          xtag "input" "type=\"radio\" name=\"t\" value=\"L\"";
-          Wserver.wprint "%s"
-            (capitale (transl_nth conf "list/list (ancestors)" 1));
-          if effective_level < limit_by_list conf then ()
-          else
-            Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
-              (limit_by_list conf)
-              (transl_nth conf "generation/generations" 1);
+          tag "label" begin
+            xtag "input" "type=\"radio\" name=\"t\" value=\"L\"";
+            Wserver.wprint "%s"
+              (capitale (transl_nth conf "list/list (ancestors)" 1));
+            if effective_level < limit_by_list conf then ()
+            else
+              Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
+                (limit_by_list conf)
+                (transl_nth conf "generation/generations" 1);
+          end;
           xtag "br";
-          xtag "input" "type=\"radio\" name=\"t\" value=\"H\"";
-          Wserver.wprint "%s\n" (capitale (transl conf "horizontally"));
-          if effective_level < limit_by_list conf then ()
-          else
-            Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
-              (limit_by_list conf)
-              (transl_nth conf "generation/generations" 1);
+          tag "label" begin
+            xtag "input" "type=\"radio\" name=\"t\" value=\"H\"";
+            Wserver.wprint "%s\n" (capitale (transl conf "horizontally"));
+            if effective_level < limit_by_list conf then ()
+            else
+              Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
+                (limit_by_list conf)
+                (transl_nth conf "generation/generations" 1);
+          end;
           xtag "br";
-          xtag "input" "type=\"radio\" name=\"t\" value=\"F\"";
-          Wserver.wprint "%s\n" (capitale (transl conf "surnames list"));
+          tag "label" begin
+            xtag "input" "type=\"radio\" name=\"t\" value=\"F\"";
+            Wserver.wprint "%s\n" (capitale (transl conf "surnames list"));
+          end;
           xtag "br";
-          xtag "input" "type=\"radio\" name=\"t\" value=\"M\"";
-          Wserver.wprint "%s\n" (capitale (transl conf "missing ancestors"));
+          tag "label" begin
+            xtag "input" "type=\"radio\" name=\"t\" value=\"M\"";
+            Wserver.wprint "%s\n" (capitale (transl conf "missing ancestors"));
+          end;
           xtag "br";
-          Wserver.wprint "- %s\n" (capitale (transl conf "alphabetic order"));
-          xtag "input" "type=\"checkbox\" name=\"al\" value=\"on\"";
+          tag "label" begin
+            Wserver.wprint "- %s\n"
+              (capitale (transl conf "alphabetic order"));
+            xtag "input" "type=\"checkbox\" name=\"al\" value=\"on\"";
+          end;
           xtag "br";
-          Wserver.wprint "- %s\n"
-            (capitale (transl conf "include missing spouses"));
-          xtag "input" "type=\"checkbox\" name=\"ms\" value=\"on\"";
+          tag "label" begin
+            Wserver.wprint "- %s\n"
+              (capitale (transl conf "include missing spouses"));
+            xtag "input" "type=\"checkbox\" name=\"ms\" value=\"on\"";
+          end;
           xtag "br";
-          Wserver.wprint "- %s\n" (capitale (transl conf "after"));
-          xtag "input" "name=\"after\" size=\"5\" maxlength=\"5\"";
-          Wserver.wprint "%s\n" (capitale (transl conf "before"));
-          xtag "input" "name=\"before\" size=\"5\" maxlength=\"5\"";
+          tag "label" begin
+            Wserver.wprint "- %s\n" (capitale (transl conf "after"));
+            xtag "input" "name=\"after\" size=\"5\" maxlength=\"5\"";
+          end;
+          tag "label" begin
+            Wserver.wprint "%s\n" (capitale (transl conf "before"));
+            xtag "input" "name=\"before\" size=\"5\" maxlength=\"5\"";
+          end;
           xtag "br";
         end;
       end;
       tag "tr" begin
         tag "td" "colspan=\"2\" align=\"center\"" begin
-          Wserver.wprint "%s\n"
-            (capitale (transl conf "cancel GeneWeb links"));
-          xtag "input" "type=\"checkbox\" name=\"cgl\" value=\"on\"";
+          tag "label" begin
+            Wserver.wprint "%s\n"
+              (capitale (transl conf "cancel GeneWeb links"));
+            xtag "input" "type=\"checkbox\" name=\"cgl\" value=\"on\"";
+          end;
         end;
       end;
       tag "tr" begin
         tag "td" "colspan=\"2\" align=\"center\"" begin
-          Wserver.wprint "(*) %s\n"
-            (capitale (transl conf "only the generation selected"));
-          xtag "input" "type=\"checkbox\" name=\"only\" value=\"on\"";
+          tag "label" begin
+            Wserver.wprint "(*) %s\n"
+              (capitale (transl conf "only the generation selected"));
+            xtag "input" "type=\"checkbox\" name=\"only\" value=\"on\"";
+          end;
         end;
       end;
     end;
@@ -431,7 +472,8 @@ value display_ancestors_with_numbers conf base max_level p =
     if level <= max_level then do {
       html_li conf;
       Wserver.wprint "%s %d\n"
-        (capitale (transl_nth conf "generation/generations" 0)) level;
+        (capitale (nominative (transl_nth conf "generation/generations" 0)))
+        level;
       tag "ul" begin
         List.iter (print_generation_person conf base cnt) gpl;
       end;
@@ -959,7 +1001,8 @@ value display_ancestors_with_numbers_long conf base max_level ws wn p =
           if not only || level = max_level then do {
             tag "h3" begin
               Wserver.wprint "<em>%s %d</em>\n"
-                (capitale (transl_nth conf "generation/generations" 0))
+                (capitale
+                   (nominative (transl_nth conf "generation/generations" 0)))
                 level;
             end;
             List.iter
@@ -1040,7 +1083,8 @@ value print_ancestors_same_time_descendants conf base p a =
     if List.exists will_print gpl then do {
       html_li conf;
       Wserver.wprint "%s %d\n"
-        (capitale (transl_nth conf "generation/generations" 0)) level;
+        (capitale (nominative (transl_nth conf "generation/generations" 0)))
+        level;
       tag "ul" begin
         List.iter
           (fun gp ->
@@ -1128,7 +1172,8 @@ value display_ancestors_level conf base max_level p =
   let title h =
     if h then
       Wserver.wprint "%s %d\n"
-        (capitale (transl_nth conf "generation/generations" 0)) max_level
+        (capitale (nominative (transl_nth conf "generation/generations" 0)))
+        max_level
     else
       Wserver.wprint "%s"
         (capitale
@@ -1158,7 +1203,9 @@ value print_generation_missing_persons conf base title sp_incl gp =
         do {
           html_li conf;
           Wserver.wprint "%s %d\n"
-            (capitale (transl_nth conf "generation/generations" 0)) level;
+            (capitale
+	       (nominative (transl_nth conf "generation/generations" 0)))
+            level;
           Wserver.wprint "<ul>\n";
           title.val := None
         }
@@ -1743,8 +1790,8 @@ value print_tree_with_table conf base gv p =
   let align =
     fun
     [ Cell _ Center _ _ | Cell _ Alone _ _ -> "align=\"center\""
-    | Cell _ Left _ _ -> "align=\"right\""
-    | Cell _ Right _ _ -> "align=\"left\""
+    | Cell _ Left _ _ -> "align=\"" ^ conf.right ^ "\""
+    | Cell _ Right _ _ -> "align=\"" ^ conf.left ^ "\""
     | _ -> "" ]
   in
   let print_ancestor_link gen first po =
@@ -1819,7 +1866,7 @@ value print_tree_with_table conf base gv p =
         let txt =
           match po with
           [ Empty -> "&nbsp;"
-          | Cell _ (Left | Right) _ _ -> "<hr style=\"width:50%\">"
+          | Cell _ (Left | Right) _ _ -> "<hr style=\"width:50%\" dir=\"ltr\">"
           | Cell _ Alone _ _ -> "|"
           | Cell _ Center _ _ -> "<hr noshade size=\"1\">" ]
         in

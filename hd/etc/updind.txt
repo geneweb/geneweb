@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.23 2005-02-05 06:34:39 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.24 2005-02-05 14:29:20 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -351,9 +351,9 @@ function changeDeath()
 </select>
 </td>
 <td>
-[*place]0
+<label>[*place]0
 <input name="death_place" size="40" maxlength="200" value="%death_place;"%sp;
- onfocus="setDead()"%/>
+ onfocus="setDead()"%/></label>
 </td>
 </tr>
 </table>
@@ -363,16 +363,22 @@ function changeDeath()
 <table border="1">
 <tr>
 <td>
+<label>
 <input type="radio" name="death_reason" value="Killed"%if;dr_killed;
 %sp;checked="checked"%end; onclick='setDead()'%/>[*killed (in action)]2
+</label><label>
 <input type="radio" name="death_reason" value="Murdered"%if;dr_murdered;
 %sp;checked="checked"%end; onclick='setDead()'%/>[*murdered]2
+</label><label>
 <input type="radio" name="death_reason" value="Executed"%if;dr_executed;
 %sp;checked="checked"%end; onclick='setDead()'%/>[*executed (legally killed)]2
+</label><label>
 <input type="radio" name="death_reason" value="Disappeared"%if;dr_disappeared;
 %sp;checked="checked"%end; onclick='setDead()'%/>[*disappeared]2
+</label><label>
 <input type="radio" name="death_reason" value="Unspecified"%if;dr_unspecified;
 %sp;checked="checked"%end; onclick='setDead()'%/>[*unspecified]2
+</label>
 </td>
 </tr>
 </table>
@@ -394,8 +400,9 @@ function changeDeath()
 </select>
 </td>
 <td>
-[*place]0
+<label>[*place]0
 <input name="burial_place" size="40" maxlength="200" value="%burial_place;"%/>
+</label>
 </td>
 </tr>
 </table>
@@ -404,12 +411,12 @@ function changeDeath()
 
 %apply;source("burial")
 
-<h4>[*occupation]</h4>
+<h4><label for="occu">[*occupation]</label></h4>
 
 <table border="1">
 <tr>
 <td>
-<input name="occu" size="50" maxlength="200" value="%occupation;"%/>
+<input name="occu" size="50" maxlength="200" value="%occupation;" id="occu"%/>
 </td>
 </tr>
 </table>
@@ -420,8 +427,8 @@ function changeDeath()
   <table border="1">
   <tr>
   <td>
-  [*insert::relation/relations]0
-  <input type="checkbox" name="add_relationxx" value="on"%/>
+  <label>[*insert::relation/relations]0
+  <input type="checkbox" name="add_relationxx" value="on"%/></label>
   </td>
   </tr>
   </table>
@@ -455,15 +462,15 @@ function changeDeath()
 %define;one_relation(xcnt,xvar,xrel,xsex)
  <table border="1">
     <tr>
-      <td>[*first name/first names]0</td>
+      <td><label for="rxcnt_xvar_fn">[*first name/first names]0</label></td>
       <td>
         <input name="rxcnt_xvar_fn" size="23" maxlength="200"%sp;
-         value="%relation.xrel.first_name;"%/>
+         value="%relation.xrel.first_name;" id="rxcnt_xvar_fn"%/>
       </td>
-      <td align="right">[*number]</td>
+      <td align="right"><label for="rxcnt_xvar_occ">[*number]</label></td>
       <td>
         <input name="rxcnt_xvar_occ" size="5" maxlength="8"%sp;
-         value="%relation.xrel.occ;"%/>
+         value="%relation.xrel.occ;" id="rxcnt_xvar_occ"%/>
       </td>
       <td>
         <select name="rxcnt_xvar_p">
@@ -475,10 +482,10 @@ function changeDeath()
       </td>
     </tr>
     <tr>
-      <td>[*surname/surnames]0</td>
+      <td><label for="rxcnt_xvar_sn">[*surname/surnames]0</label></td>
       <td colspan="4">
         <input name="rxcnt_xvar_sn" size="40" maxlength="200"%sp;
-         value="%relation.xrel.surname;"%/>
+         value="%relation.xrel.surname;" id="rxcnt_xvar_sn"%/>
          ([sex]0 = xsex)
       </td>
     </tr>
@@ -513,9 +520,9 @@ function changeDeath()
   <table border="1">
   <tr>
   <td>
-  [*insert::|<input name="ins_titlexx_n" size="1" maxlength="1"%sp;
-   value="1"%/> | title/titles]
-  <input type="checkbox" name="ins_titlexx" value="on"%/>
+  <label>[*insert::|<input name="ins_titlexx_n" size="1" maxlength="1"%sp;
+   value="1"%/></label><label> | title/titles]
+  <input type="checkbox" name="ins_titlexx" value="on"%/></label>
   </td>
   </tr>
   </table>
@@ -523,28 +530,32 @@ function changeDeath()
 %define;one_title(xcnt)
   <table border="1">
     <tr>
-      <td>[*title/titles]0</td>
+      <td><label for="t_identxcnt">[*title/titles]0</label></td>
       <td>
-        <input name="t_identxcnt" size="15" value="%title.t_ident;"%/>
+        <input name="t_identxcnt" size="15" value="%title.t_ident;"%sp;
+	 id="t_identxcnt"%/>
       </td>
-      <td>[*estate]0</td>
+      <td><label for="t_placexcnt">[*estate]0</label></td>
       <td colspan="2">
-        <input name="t_placexcnt" size="30" value="%title.t_estate;"%/>
+        <input name="t_placexcnt" size="30" value="%title.t_estate;"%sp;
+	 id="t_placexcnt"%/>
       </td>
     </tr>
     <tr>
-      <td>[*name]0</td>
+      <td><label for="t_namexcnt">[*name]0</label></td>
       <td>
-        <input name="t_namexcnt" size="20" value="%title.t_name;"%/>
+        <input name="t_namexcnt" size="20" value="%title.t_name;"%sp;
+	 id="t_namexcnt"%/>
       </td>
-      <td>[*nth]0</td>
+      <td><label for="t_nthxcnt">[*nth]0</label></td>
       <td>
-        <input name="t_nthxcnt" size="3" value="%title.t_nth;"%/>
+        <input name="t_nthxcnt" size="3" value="%title.t_nth;"%sp;
+	 id="t_nthxcnt"%/>
       </td>
       <td>
-        [*main title]0
+        <label>[*main title]0
         <input type="checkbox" name="t_main_titlexcnt" value="on"%sp;
-         %if;title.t_main; checked="checked"%end;%/>
+         %if;title.t_main; checked="checked"%end;%/></label>
       </td>
     </tr>
   </table>
@@ -572,31 +583,32 @@ function changeDeath()
   <tr>
     <td>[*access]0</td>
     <td>
-      <input type="radio" name="access"%sp;
+      <label><input type="radio" name="access"%sp;
        value="IfTitles"%if;acc_if_titles; checked="checked"%end;%/>
-      [*if titles]0
-      <input type="radio" name="access"%sp;
+      [*if titles]0</label>
+      <label><input type="radio" name="access"%sp;
        value="Public"%if;acc_public; checked="checked"%end;%/>
-      [*public]0
-      <input type="radio" name="access"%sp;
+      [*public]0</label>
+      <label><input type="radio" name="access"%sp;
        value="Private"%if;acc_private; checked="checked"%end;%/>
-      [*private]0
+      [*private]0</label>
     </td>
   </tr>
 </table>
 
-<h4>[*note/notes]1</h4>
+<h4><label for="notes">[*note/notes]1</label></h4>
 
 <p>
-<textarea name="notes" rows="6" cols="70">%notes;</textarea>
+<textarea name="notes" rows="6" cols="70" id="notes">%notes;</textarea>
 </p>
 
-<h4>[*source/sources]0</h4>
+<h4><label for="src">[*source/sources]0</label></h4>
 
 <table border="1">
   <tr>
     <td>
-      <input name="src" size="50" maxlength="200"%sp; value="%sources;"%/>
+      <input name="src" size="50" maxlength="200"%sp; value="%sources;"%sp;
+       id="src"%/>
     </td>
   </tr>
 </table>
