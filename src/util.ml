@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.35 2000-03-05 17:15:07 ddr Exp $ *)
+(* $Id: util.ml,v 3.36 2000-03-08 14:35:35 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1390,7 +1390,7 @@ value auto_image_file conf base p =
 
 value image_and_size conf base p image_size =
   if age_autorise conf base p then
-    let image_txt = capitale (transl conf "image") in
+    let image_txt = capitale (transl_nth conf "image/images" 0) in
     match sou base p.image with
     [ "" ->
         match auto_image_file conf base p with

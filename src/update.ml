@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.5 2000-01-10 11:14:20 ddr Exp $ *)
+(* $Id: update.ml,v 3.6 2000-03-08 14:35:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -866,14 +866,16 @@ value print conf base p =
              do Wserver.wprint "<a href=\"%sm=SND_IMAGE;i=%d\">%s</a><br>\n"
                   (commd conf) (Adef.int_of_iper p.cle_index)
                   (capitale
-                     (transl_decline conf "send" (transl conf "image")));
+                     (transl_decline conf "send"
+                        (transl_nth conf "image/images" 0)));
                 match auto_image_file conf base p with
                 [ Some _ ->
                     Wserver.wprint
                       "<a href=\"%sm=DEL_IMAGE;i=%d\">%s</a><br>\n"
                        (commd conf) (Adef.int_of_iper p.cle_index)
                        (capitale
-                          (transl_decline conf "delete" (transl conf "image")))
+                          (transl_decline conf "delete"
+                             (transl_nth conf "image/images" 0)))
                 | None -> () ];
              return ()
            else ();

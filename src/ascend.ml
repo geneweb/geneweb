@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.12 2000-03-07 18:05:19 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.13 2000-03-08 14:35:29 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -110,6 +110,10 @@ value print_choice conf base p niveau_effectif =
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum") limit
               (transl_nth conf "generation/generations" 1);
           Wserver.wprint "<br>\n";
+          Wserver.wprint "- %s <input type=checkbox name=image value=on><br>\n"
+            (capitale (transl_nth conf "image/images" 1));
+        end;
+        tag "td valign=top" begin
           Wserver.wprint "<input type=radio name=t value=L> %s\n"
             (capitale (transl conf "list"));
           if niveau_effectif <= limit_by_list conf then ()
@@ -118,8 +122,6 @@ value print_choice conf base p niveau_effectif =
               (limit_by_list conf)
               (transl_nth conf "generation/generations" 1);
           Wserver.wprint "<br>\n";
-        end;
-        tag "td valign=top" begin
           Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
             (capitale (transl conf "only the generation selected"));
           Wserver.wprint "<input type=radio name=t value=M> %s<br>\n"
@@ -1474,7 +1476,7 @@ value print_tree_with_pre conf base v p =
 ;
 
 value print_image conf base p fname width height =
-  let image_txt = capitale (transl conf "image") in
+  let image_txt = capitale (transl_nth conf "image/images" 0) in
   let s = Unix.stat fname in
   let b = acces conf base p in
   let k = default_image_name base p in

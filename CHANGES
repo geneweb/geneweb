@@ -10,6 +10,8 @@ GeneWeb version 3.03
     telling not to delete the window! (English, French, Swedish versions)
 
 * GeneWeb Service/CGI (gwd)
+  - [08 Mar 00] Added optional displaying of images in ancestors displaying
+    by tree.
   - [05 Mar 00] In birthday anniversaries for close parents (accessible
     in "cousin" page for "friends" and "wizards"), the links give now the
     relationship trees, instead of the persons.

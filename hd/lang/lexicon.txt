@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.66 2000-02-16 17:10:22 ddr Exp $
+# $Id: lexicon.txt,v 3.67 2000-03-08 14:35:27 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2621,23 +2621,6 @@ pt: sem t&iacute;tulos
 ru: если титул
 se: om titlar
 
-    image
-cs: obrбzek
-de: Bild
-dk: billede
-en: image
-es: imagen
-fi: kuva
-fr: image
-he:  ъоерд
-is: mynd
-it: immagine
-nl: beeld
-no: bilde
-pt: imagem
-ru: картинку
-se: foto
-
     image deleted
 cs: obrбzek smazбn
 de: Bild gel&ouml;scht
@@ -2672,6 +2655,23 @@ no: bildet er mottatt
 pt: imagem recebida
 ru: картинка получена
 se: foto mottaget
+
+    image/images
+cs: obrбzek
+de: Bild
+dk: billede
+en: image/images
+es: imagen
+fi: kuva
+fr: image/images
+he:  ъоерд
+is: mynd
+it: immagine
+nl: beeld
+no: bilde
+pt: imagem
+ru: картинку
+se: foto
 
     in (month year)
 cn: УЪ

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.11 2000-03-05 17:15:07 ddr Exp $ *)
+(* $Id: perso.ml,v 3.12 2000-03-08 14:35:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -944,7 +944,7 @@ value print_occupation_dates conf base in_table p =
 ;
 
 value print_photo_occupation_dates conf base p =
-  let image_txt = capitale (transl conf "image") in
+  let image_txt = capitale (transl_nth conf "image/images" 0) in
   match
     image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
   with
