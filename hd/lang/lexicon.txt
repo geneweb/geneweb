@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.223 2001-02-10 11:33:03 ddr Exp $
+# $Id: lexicon.txt,v 3.224 2001-02-10 17:05:25 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -3015,6 +3015,7 @@ se: fosterson/fosterdotter/fosterbarn
     gay
 en: gay
 fr: homosexuel
+nl: homosexueel
 
     generation/generations
 af: geslag/geslagte
