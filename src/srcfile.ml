@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.25 2000-07-28 13:07:49 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.26 2000-09-14 02:22:56 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -272,6 +272,13 @@ value browser_cannot_handle_passwords conf =
   String.lowercase user_agent = "konqueror"
 ;
 
+value get_variable ic =
+  loop 0 where rec loop len =
+    match input_char ic with
+    [ ';' -> Buff.get len
+    | c -> loop (Buff.store len c) ]
+;
+
 value rec copy_from_channel conf base ic =
   let echo = ref True in
   let no_tables = browser_doesnt_have_tables conf in
@@ -289,13 +296,18 @@ value rec copy_from_channel conf base ic =
     [ 'N' -> not (if_expr (input_char ic))
     | 'a' -> conf.auth_file <> ""
     | 'c' -> conf.cgi || browser_cannot_handle_passwords conf
+(*
     | 'd' -> p_getenv conf.base_env "propose_add_family" <> Some "no"
+*)
     | 'f' -> conf.friend
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
     | 'l' -> no_tables
     | 'n' -> base.data.bnotes.nread 1 <> ""
+    | 's' -> p_getenv conf.base_env (get_variable ic) <> Some "no"
+(*
     | 't' -> p_getenv conf.base_env "propose_titles" <> Some "no"
+*)
     | 'w' -> conf.wizard
     | 'z' -> Util.find_person_in_env conf base "z" <> None
     | '|' ->
