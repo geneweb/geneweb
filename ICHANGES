@@ -5,6 +5,10 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [01 Apr 03] Fixed bug for personal pages template: the macro
+    "%prefix_no_templ" had the bad side effect to make the possible
+    "templ=" removed in all the %prefix macros following it in the
+    template file (perso.txt).
   - [06 Mar 03] Fixed bug: in the template perso.txt, the boolean value
     child.has_children did not work correctly.
   - [14 Feb 03] Changed the ability to send messages to wizards (see
