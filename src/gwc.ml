@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.7 1998-11-20 19:11:10 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.8 1998-11-30 12:35:58 ddr Exp $ *)
 
 open Def;
 open Check;
@@ -443,59 +443,83 @@ value cache_of tab =
   do c.get := fun i -> (c.array ()).(i); return c
 ;
 
+value no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []};
+
+value empty_base : Def.base =
+  {persons = cache_of [| |];
+   ascends = cache_of [| |];
+   families = cache_of [| |];
+   couples = cache_of [| |];
+   strings = cache_of [| |];
+   has_family_patches = False;
+   persons_of_name = fun [];
+   strings_of_fsname = fun [];
+   index_of_string = fun [];
+   persons_of_surname = no_istr_iper_index;
+   persons_of_first_name = no_istr_iper_index;
+   patch_person = fun [];
+   patch_ascend = fun [];
+   patch_family = fun [];
+   patch_couple = fun [];
+   patch_string = fun [];
+   patch_name = fun [];
+   commit_patches = fun [];
+   cleanup = fun () -> ()}
+;
+
+value linked_base gen : Def.base =
+  let persons =
+    let a = Array.sub (gen.g_base.persons.array ()) 0 gen.g_pcnt in
+    do gen.g_base.persons.array := fun _ -> [| |]; return a
+  in
+  let ascends =
+    let a = Array.sub (gen.g_base.ascends.array ()) 0 gen.g_pcnt in
+    do gen.g_base.ascends.array := fun _ -> [| |]; return a
+  in
+  let families =
+    let a = Array.sub (gen.g_base.families.array ()) 0 gen.g_fcnt in
+    do gen.g_base.families.array := fun _ -> [| |]; return a
+  in
+  let couples =
+    let a = Array.sub (gen.g_base.couples.array ()) 0 gen.g_fcnt in
+    do gen.g_base.couples.array := fun _ -> [| |]; return a
+  in
+  let strings =
+    let a = Array.sub (gen.g_base.strings.array ()) 0 gen.g_scnt in
+    do gen.g_base.strings.array := fun _ -> [| |]; return a
+  in
+  {persons = cache_of persons;
+   ascends = cache_of ascends;
+   families = cache_of families;
+   couples = cache_of couples;
+   strings = cache_of strings;
+   has_family_patches = False;
+   persons_of_name = fun [];
+   strings_of_fsname = fun [];
+   index_of_string = fun [];
+   persons_of_surname = no_istr_iper_index;
+   persons_of_first_name = no_istr_iper_index;
+   patch_person = fun [];
+   patch_ascend = fun [];
+   patch_family = fun [];
+   patch_couple = fun [];
+   patch_string = fun [];
+   patch_name = fun [];
+   commit_patches = fun [];
+   cleanup = fun () -> ()}
+;
+
 value link gwo_list =
-  let no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []} in
   let gen =
     {g_strings = Mhashtbl.create 20011;
      g_names = Mhashtbl.create 20011;
      g_pcnt = 0; g_fcnt = 0; g_scnt = 0;
-     g_base =
-       {persons = cache_of [| |];
-        ascends = cache_of [| |];
-        families = cache_of [| |];
-        couples = cache_of [| |];
-        strings = cache_of [| |];
-        has_family_patches = False;
-        persons_of_name = fun [];
-        strings_of_fsname = fun [];
-        index_of_string = fun [];
-        persons_of_surname = no_istr_iper_index;
-        persons_of_first_name = no_istr_iper_index;
-        patch_person = fun []; patch_ascend = fun [];
-        patch_family = fun []; patch_couple = fun [];
-        patch_string = fun [];
-        patch_name = fun []; commit_patches = fun []; cleanup = fun () -> ()};
+     g_base = empty_base;
      g_def = [| |]; g_shift = 0; g_errored = False}
   in
   do List.iter (insere_comp_familles gen) gwo_list; return
-  let persons = Array.sub (gen.g_base.persons.array ()) 0 gen.g_pcnt in
-  do gen.g_base.persons.array := fun _ -> [| |]; return
-  let ascends = Array.sub (gen.g_base.ascends.array ()) 0 gen.g_pcnt in
-  do gen.g_base.ascends.array := fun _ -> [| |]; return
-  let families = Array.sub (gen.g_base.families.array ()) 0 gen.g_fcnt in
-  do gen.g_base.families.array := fun _ -> [| |]; return
-  let couples = Array.sub (gen.g_base.couples.array ()) 0 gen.g_fcnt in
-  do gen.g_base.couples.array := fun _ -> [| |]; return
-  let strings = Array.sub (gen.g_base.strings.array ()) 0 gen.g_scnt in
-  do gen.g_base.strings.array := fun _ -> [| |]; return
-  let base =
-    {persons = cache_of persons;
-     ascends = cache_of ascends;
-     families = cache_of families;
-     couples = cache_of couples;
-     strings = cache_of strings;
-     has_family_patches = False;
-     persons_of_name = fun [];
-     strings_of_fsname = fun [];
-     index_of_string = fun [];
-     persons_of_surname = no_istr_iper_index;
-     persons_of_first_name = no_istr_iper_index;
-     patch_person = fun []; patch_ascend = fun [];
-     patch_family = fun []; patch_couple = fun [];
-     patch_string = fun []; patch_name = fun []; commit_patches = fun [];
-     cleanup = fun () -> ()}
-  in
-  do if do_check.val && Array.length persons > 0 then
+  let base = linked_base gen in
+  do if do_check.val && gen.g_pcnt > 0 then
        do Check.check_base base gen pr_stats.val; flush stdout; return ()
      else ();
      if not gen.g_errored then

@@ -1,66 +1,7 @@
-(* $Id: mostdesc.ml,v 1.1 1998-11-15 22:55:04 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 1.2 1998-11-30 12:36:00 ddr Exp $ *)
 
 open Gutil;
 open Def;
-
-(*
-value qsort len leq exch =
-  loop 0 len where rec loop imin imax =
-    if imin + 1 <= imax then
-      let i =
-        loop (imin + 1) imax where rec loop i j =
-          if i == j then i
-          else if leq i imin then loop (i + 1) j
-          else
-            do if i < j - 1 then exch i (j - 1) else (); return loop i (j - 1)
-      in
-      let i = if i < imax && leq i imin then i else i - 1 in
-      do if imin < i then exch imin i else ();
-         if imin < i then loop imin i else ();
-         if i + 1 < imax then loop (i + 1) imax else ();
-      return ()
-    else ()
-;
-
-value sort_tab tab =
-  let ind = Array.create (Array.length tab) 0 in
-  do for i = 0 to Array.length ind - 1 do ind.(i) := i; done;
-     qsort (Array.length tab) (fun i j -> Num.gt tab.(i) tab.(j))
-       (fun i j ->
-          let a = tab.(i) and b = ind.(i) in
-          do tab.(i) := tab.(j); tab.(j) := a;
-             ind.(i) := ind.(j); ind.(j) := b;
-          return ());
-  return ind
-;
-
-value print_result base tab =
-  let ind = sort_tab tab in
-do Printf.eprintf "*** sort ok\n"; flush stderr; return
-  loop 0 where rec loop i =
-    if i < Array.length tab && not (Num.eq tab.(i) Num.zero) then
-      let m_val = tab.(i) in
-      let (m_list, i) =
-        loop (i + 1) [ind.(i)] where rec loop i list =
-          if i < Array.length tab && Num.eq tab.(i) m_val then
-            loop (i + 1) [ind.(i) :: list]
-          else (list, i)
-      in
-      do Num.print print_string "." m_val;
-         print_newline ();
-         List.iter
-           (fun i ->
-              let p = base.persons.get i in
-              do Printf.printf "- %s.%d %s\n"
-                   (Ansel.to_iso_8859_1 (sou base p.first_name)) p.occ
-                   (Ansel.to_iso_8859_1 (sou base p.surname));
-                 flush stdout;
-              return ())
-           m_list;
-      return loop i
-    else ()
-;
-*)
 
 value print_result base tab =
   let m_val = ref Num.zero in
