@@ -1,75 +1,79 @@
-(* $Id: calendar.ml,v 4.0 2001-03-16 19:34:28 ddr Exp $ *)
+(* $Id: calendar.ml,v 4.1 2001-04-10 23:10:28 ddr Exp $ *)
 
 (* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/;
    converted his C program into this OCaml program.
    SDN 1 is November 25, 4714 BC Gregorian calendar *)
+(* Changed gregorian and julian to work always with negative years
+   (Scott's version worked only for years > -4800 *)
 
 open Def;
 
+value mydiv x y = if x >= 0 then x / y else (x - y + 1) / y;
+value mymod x y = if x >= 0 then x mod y else (x + 1) mod y + y - 1;
+
 (* gregorian *)
 
-value sdn_offset = 32045;
+value sdn_offset = 1721119;
 value days_per_5_months = 153;
 value days_per_4_years = 1461;
 value days_per_400_years = 146097;
 
 value sdn_of_gregorian d =
-  let year = if d.year < 0 then d.year + 4801 else d.year + 4800 in
+  let year = if d.year < 0 then d.year + 1 else d.year in
   let (month, year) =
     if d.month > 2 then (d.month - 3, year) else (d.month + 9, year - 1)
   in
-  year / 100 * days_per_400_years / 4 + year mod 100 * days_per_4_years / 4 +
-    (month * days_per_5_months + 2) / 5 + d.day - sdn_offset
+  mydiv (mydiv year 100 * days_per_400_years) 4 +
+  mydiv (mymod year 100 * days_per_4_years) 4 +
+    (month * days_per_5_months + 2) / 5 + d.day + sdn_offset
 ;
 
 value gregorian_of_sdn prec sdn =
-  let temp = (sdn + sdn_offset) * 4 - 1 in
-  let century = temp / days_per_400_years in
-  let temp = ((temp mod days_per_400_years) / 4) * 4 + 3 in
-  let year = (century * 100) + (temp / days_per_4_years) in
-  let dayOfYear = (temp mod days_per_4_years) / 4 + 1 in
+  let temp = (sdn - sdn_offset) * 4 - 1 in
+  let century = mydiv temp days_per_400_years in
+  let temp = (mydiv (mymod temp days_per_400_years) 4) * 4 + 3 in
+  let year = (century * 100) + (mydiv temp days_per_4_years) in
+  let dayOfYear = mydiv (mymod temp days_per_4_years) 4 + 1 in
   let temp = dayOfYear * 5 - 3 in
-  let month = temp / days_per_5_months in
-  let day = (temp mod days_per_5_months) / 5 + 1 in
+  let month = mydiv temp days_per_5_months in
+  let day = mydiv (mymod temp days_per_5_months) 5 + 1 in
   let (month, year) =
     if month < 10 then (month + 3, year) else (month - 9, year + 1)
   in
-  let year = year - 4800 in
   let year = if year <= 0 then year - 1 else year in
   {day = day; month = month; year = year; prec = prec; delta = 0}
 ;
 
 (* julian *)
 
-value sdn_offset = 32083;
+value sdn_offset = 1721117;
 value days_per_5_months = 153;
 value days_per_4_years = 1461;
 
 value sdn_of_julian d =
-  let year = if d.year < 0 then d.year + 4801 else d.year + 4800 in
+  let year = if d.year < 0 then d.year + 1 else d.year in
   let (month, year) =
     if d.month > 2 then (d.month - 3, year) else (d.month + 9, year - 1)
   in
-  (year * days_per_4_years) / 4 + (month * days_per_5_months + 2) / 5 +
-     d.day - sdn_offset
+  mydiv (year * days_per_4_years) 4 + (month * days_per_5_months + 2) / 5 +
+    d.day + sdn_offset
 ;
 
 value julian_of_sdn prec sdn =
-  let temp = (sdn + sdn_offset) * 4 - 1 in
-  let year = temp / days_per_4_years in
-  let dayOfYear = (temp mod days_per_4_years) / 4 + 1 in
+  let temp = (sdn - sdn_offset) * 4 - 1 in
+  let year = mydiv temp days_per_4_years in
+  let dayOfYear = mydiv (mymod temp days_per_4_years) 4 + 1 in
   let temp = dayOfYear * 5 - 3 in
-  let month = temp / days_per_5_months in
-  let day = (temp mod days_per_5_months) / 5 + 1 in
+  let month = mydiv temp days_per_5_months in
+  let day = mydiv (mymod temp days_per_5_months) 5 + 1 in
   let (month, year) =
     if month < 10 then (month + 3, year) else (month - 9, year + 1)
   in
-  let year = year - 4800 in
   let year = if year <= 0 then year - 1 else year in
   {day = day; month = month; year = year; prec = prec; delta = 0}
 ;
 
-(* french *)
+(* french revolution *)
 (* this code comes from Remy Pialat; thanks to him *)
 
 value modulo pAngle pVal =
