@@ -35,15 +35,34 @@ tell me.
 
 <h4>When displaying relationship links, some are missing.</h4>
 
-<font color=#2f6400><b>GeneWeb</b></font> does not display the links
-such that the right (resp. left) person is descended from a person of
-the left (resp. right) branch.
+To avoid that the listing of relationship links be too long, <font
+color=#2f6400><b>GeneWeb</b></font> deletes some of them when
+displaying the result. For this, it uses the following method: when a
+relationship link is found with a common ancestor, all the ancestors
+of this ancestor are eliminated from the research.
 
 <p>
 
-Because those relationship links become often so numerous that the
-displaying is unreadable. They are real relationship links, however,
-and are counted in the consanguinity computing.
+A consequence of this pruning is that if one asks for the computation
+of a relationship link with an ancestor, he will be displayed only as
+an ancestor, even if he can sometimes also be a cousin.
+
+<p>
+
+For example, if my father and my mother are cousins, and if I am looking
+for my relationships with my mother, it only indicates that I am her son,
+not that I am her cousin's son, even if this link really exists.
+
+<p>
+
+Pruning is necessary: without it, for families a little bit "intermixed",
+the displaying rapidly becomes invaded by a lot a relationship links and
+eventually ununderstandable (I tested it).
+
+<p>
+
+The non displayed relationship links are however real relationship
+links, and are counted in the consanguinity computing.
 
 <p>
 
