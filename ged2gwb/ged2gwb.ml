@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.27 1999-08-19 17:38:56 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.28 1999-08-22 16:00:47 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -26,7 +26,7 @@ type charset = [ Ansel | Ascii | Msdos ];
 value titles_aurejac = ref False;
 value lowercase_first_names = ref False;
 value lowercase_surnames = ref False;
-value extract_first_names = ref True;
+value extract_first_names = ref False;
 value extract_public_names = ref True;
 value charset_option = ref None;
 value charset = ref Ascii;
@@ -1919,13 +1919,15 @@ value speclist =
       );
    ("-efn", Arg.Set extract_first_names,
     "  \
-- Extract first names - [default]
+- Extract first names -
        When creating a person, if the GEDCOM first name part holds several
        names, the first of this names becomes the person \"first name\" and
        the complete GEDCOM first name part a \"first name alias\"."
       );
    ("-no_efn", Arg.Clear extract_first_names,
-    "\n       Cancels the previous option.");
+    "  \
+- Dont extract first names - [default]
+       Cancels the previous option.");
    ("-epn", Arg.Set extract_public_names,
     "  \
 - Extract public names - [default]
