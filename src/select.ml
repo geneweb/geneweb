@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 2.1 1999-03-08 11:19:11 ddr Exp $ *)
+(* $Id: select.ml,v 2.2 1999-10-24 10:18:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -46,9 +46,53 @@ value select_descendants base per_tab fam_tab flag =
         (poi base iper).family
 ;
 
-value functions base anc desc =
-  match (anc, desc) with
-  [ (None, None) -> (fun _ -> True, fun _ -> True)
+value select_surname base per_tab fam_tab no_spouses_parents surname =
+  let surname = Name.strip_lower surname in
+  for i = 0 to base.data.families.len - 1 do
+    let fam = base.data.families.get i in
+    let cpl = base.data.couples.get i in
+    if is_deleted_family fam then ()
+    else
+      let fath = poi base cpl.father in
+      let moth = poi base cpl.mother in
+      if Name.strip_lower (sou base fath.surname) = surname
+      || Name.strip_lower (sou base moth.surname) = surname
+      then
+        do fam_tab.(i) := True;
+           per_tab.(Adef.int_of_iper cpl.father) := True;
+           per_tab.(Adef.int_of_iper cpl.mother) := True;
+           Array.iter
+             (fun ic -> per_tab.(Adef.int_of_iper ic) := True)
+             fam.children;
+           if no_spouses_parents then ()
+           else
+             List.iter
+               (fun x ->
+                  match (aoi base x).parents with
+                  [ Some ifam when not fam_tab.(Adef.int_of_ifam ifam) ->
+                      let cpl = coi base ifam in
+        	      do fam_tab.(Adef.int_of_ifam ifam) := True;
+        		 per_tab.(Adef.int_of_iper cpl.father) := True;
+        		 per_tab.(Adef.int_of_iper cpl.mother) := True;
+                      return ()
+                  | _ -> () ])
+               [cpl.father; cpl.mother];
+        return ()
+    else ();
+  done
+;
+
+value functions base anc desc surnames no_spouses_parents =
+  match (anc, desc, surnames) with
+  [ (None, None, []) -> (fun _ -> True, fun _ -> True)
+  | (None, None, surnames) ->
+      let per_tab = Array.create base.data.persons.len False in
+      let fam_tab = Array.create base.data.families.len False in
+      do List.iter (select_surname base per_tab fam_tab no_spouses_parents)
+           surnames;
+      return
+      (fun i -> per_tab.(Adef.int_of_iper i),
+       fun i -> fam_tab.(Adef.int_of_ifam i))
   | _ ->
       let per_tab = Array.create base.data.persons.len 0 in
       let fam_tab = Array.create base.data.families.len 0 in

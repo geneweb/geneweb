@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.23 1999-10-19 19:29:03 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.24 1999-10-24 10:18:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -667,6 +667,9 @@ value find_person base p1 po p2 =
       return exit 2 ]
 ;
 
+value surnames = ref [];
+value no_spouses_parents = ref False;
+
 value gwu base out_dir out_oc src_oc_list anc desc =
   let anc =
     match anc with
@@ -678,7 +681,9 @@ value gwu base out_dir out_oc src_oc_list anc desc =
     [ Some (p1, po, p2) -> Some (find_person base p1 po p2)
     | None -> None ]
   in
-  let ((per_sel, fam_sel) as sel) = Select.functions base anc desc in
+  let ((per_sel, fam_sel) as sel) =
+    Select.functions base anc desc surnames.val no_spouses_parents.val
+  in
   let fam_done = Array.create (base.data.families.len) False in
   let mark = Array.create base.data.persons.len False in
   let out_oc_first = ref True in
@@ -768,11 +773,15 @@ value speclist =
    ("-a",
     Arg.String
       (fun s -> do anc_1st.val := s; return arg_state.val := ASwaitAncOcc),
-    "\"<1st_name>\" [num] \"<surname>\": select ancestors of...");
+    "\"<1st_name>\" [num] \"<surname>\" : select ancestors of...");
    ("-d",
     Arg.String
       (fun s -> do desc_1st.val := s; return arg_state.val := ASwaitDescOcc),
-    "\"<1st_name>\" [num] \"<surname>\": select descendants of...")]
+    "\"<1st_name>\" [num] \"<surname>\" : select descendants of...");
+   ("-s", Arg.String (fun x -> surnames.val := [x :: surnames.val]),
+    "\"<surname>\" : select this surname (option usable several times)");
+   ("-nsp", Arg.Set no_spouses_parents,
+    ": no spouses' parents (for option -s)")]
 ;
 
 value anon_fun s =
@@ -801,6 +810,9 @@ value anon_fun s =
 ;
 
 value errmsg = "Usage: " ^ Sys.argv.(0) ^ " [options] <base_file>
+If both options -a and -d are used, intersection is assumed.
+If several options -s are used, union is assumed.
+When option -s is used, the options -a and -d are ignored.
 Options are:";
 
 value main () =
