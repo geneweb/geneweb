@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.0 1999-10-29 10:29:40 ddr Exp $
+# $Id: geneweb.spec,v 3.1 1999-11-03 15:36:30 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -176,13 +176,13 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %defattr(-,geneweb,geneweb)
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwd
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwsetup
-%attr(744, root, root) /etc/rc.d/init.d/gwd
-%attr(744, root, root) /etc/rc.d/rc0.d/K01gwd
-%attr(744, root, root) /etc/rc.d/rc1.d/K01gwd
-%attr(744, root, root) /etc/rc.d/rc2.d/S99gwd
-%attr(744, root, root) /etc/rc.d/rc3.d/S99gwd
-%attr(744, root, root) /etc/rc.d/rc5.d/S99gwd
-%attr(744, root, root) /etc/rc.d/rc6.d/K01gwd
+%attr(755, root, root) /etc/rc.d/init.d/gwd
+%attr(755, root, root) /etc/rc.d/rc0.d/K01gwd
+%attr(755, root, root) /etc/rc.d/rc1.d/K01gwd
+%attr(755, root, root) /etc/rc.d/rc2.d/S99gwd
+%attr(755, root, root) /etc/rc.d/rc3.d/S99gwd
+%attr(755, root, root) /etc/rc.d/rc5.d/S99gwd
+%attr(755, root, root) /etc/rc.d/rc6.d/K01gwd
 /home/geneweb/gw/LISEZMOI.txt
 /home/geneweb/gw/README.txt
 /home/geneweb/gw/gw/CHANGES
