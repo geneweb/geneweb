@@ -65,10 +65,10 @@ date.cmo: adef.cmi calendar.cmo config.cmi def.cmi gutil.cmi num.cmi util.cmi \
     ../wserver/wserver.cmi date.cmi 
 date.cmx: adef.cmx calendar.cmx config.cmi def.cmi gutil.cmx num.cmx util.cmx \
     ../wserver/wserver.cmx date.cmi 
-descend.cmo: adef.cmi config.cmi dag.cmi date.cmi def.cmi gutil.cmi perso.cmi \
-    util.cmi ../wserver/wserver.cmi 
-descend.cmx: adef.cmx config.cmi dag.cmx date.cmx def.cmi gutil.cmx perso.cmx \
-    util.cmx ../wserver/wserver.cmx 
+descend.cmo: adef.cmi config.cmi dag.cmi dag2html.cmi date.cmi def.cmi \
+    gutil.cmi perso.cmi util.cmi ../wserver/wserver.cmi 
+descend.cmx: adef.cmx config.cmi dag.cmx dag2html.cmx date.cmx def.cmi \
+    gutil.cmx perso.cmx util.cmx ../wserver/wserver.cmx 
 doc.cmo: buff.cmo config.cmi util.cmi ../wserver/wserver.cmi 
 doc.cmx: buff.cmx config.cmi util.cmx ../wserver/wserver.cmx 
 eval.cmo: parse.cmo util.cmi ../wserver/wserver.cmi 
