@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.49 1999-06-03 12:11:00 ddr Exp $
+# $Id: lexicon.txt,v 2.50 1999-06-03 12:49:19 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -554,7 +554,7 @@ se: en son/en dotter/ett barn
 
     about (date)
 de: ca.
-dk: ca.
+dk: omkring
 en: about
 eo: cxirkaux
 es: alrededor de
@@ -1246,7 +1246,7 @@ se: dagar gammal
 
     dead young
 de: jung gestorben
-dk: d&oslash;d ung
+dk: d&oslash;d som ung
 en: dead young
 eo: morta juna
 es: muerto joven/muerta joven/muerto(a) joven
@@ -1924,7 +1924,7 @@ pt: index dos c&ocirc;njuges (n&atilde;o descendentes)
 se: f&ouml;rteckning &ouml;ver gem&aring;lerna (icke &auml;ttlingar)
 
     insert
-de: einf&uuml;gen
+de: einf&uuml;gen +before
 dk: inds&aelig;t
 en: insert
 eo: inseri +decl
@@ -3370,7 +3370,7 @@ se: br&ouml;llopsdagen
 
     the base has changed; do "back", "reload", and refill the form
 de: die Datei wurde ver&auml;ndert; dr&uuml;cken Sie bitte "back", "reload" und f&uuml;llen Sie das Formular neu aus
-dk: databasen er &aelig;ndret; klik "back", "reload", og udfyld formularen igen
+dk: databasen er &aelig;ndret; g&aring; tilbage, klik for opdatering og udfyld formularen igen
 en: the base has changed; do "back", "reload", and refill the form
 es: la base ha cambiado: hacer "back", "reload" y completar nuevamente el formulario
 fr: la base a chang&eacute;: faire "back", "reload", et refaire le formulaire
