@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.13 1999-12-10 02:35:51 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.14 1999-12-20 14:33:29 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -65,7 +65,7 @@ value print_char_table d t =
   print_table prerr_newline print_elem print_span t
 ;
 
-value print_html_table print print_indi border d t =
+value print_html_table print print_indi phony border d t =
   let jlast = Array.length t.table.(0) - 1 in
   let print_elem =
     fun
@@ -77,6 +77,14 @@ value print_html_table print print_indi border d t =
     fun
     [ Elem _ | Ghost _ -> print "|"
     | Nothing -> print "&nbsp;" ]
+  in
+  let all_empty i =
+    loop 0 where rec loop j =
+      if j = Array.length t.table.(i) then True
+      else
+        match t.table.(i).(j).elem with
+        [ Nothing -> loop (j + 1)
+        | e -> if phony e then loop (j + 1) else False ]
   in
   let print_line_elem i =
     do print "<tr>\n"; return
@@ -123,6 +131,7 @@ value print_html_table print print_indi border d t =
            if k > 0 && t.table.(k - 1).(j).elem = Nothing ||
               t.table.(k).(j).elem = Nothing then
              print "&nbsp;"
+           else if phony t.table.(i).(j).elem then print "&nbsp;"
            else print_bar x;
            print "</td>\n";
            print "<td>&nbsp;</td>\n";
@@ -155,7 +164,10 @@ value print_html_table print print_indi border d t =
            else
              do print "<td colspan=";
                 print (string_of_int colspan);
-                print " align=center>|</td>\n";
+                print " align=center>";
+                print
+                  (if phony t.table.(i + 1).(j).elem then "&nbsp;" else "|");
+                print "</td>\n";
              return ();
            print "<td>&nbsp;</td>\n";
         return loop next_j
@@ -165,6 +177,7 @@ value print_html_table print print_indi border d t =
   let exist_several_branches i k =
     loop 0 where rec loop j =
       if j = Array.length t.table.(i) then False
+      else if phony t.table.(k).(j).elem then loop (j + 1)
       else
         let x = t.table.(i).(j).span in
         let e = t.table.(k).(j).elem in
@@ -215,6 +228,9 @@ value print_html_table print print_indi border d t =
                       print ">&nbsp;</td>\n";
                    return ()
                | _ ->
+                   let ph s =
+                     if phony t.table.(k).(l).elem then "&nbsp;" else s
+                   in
                    if l = j && next_l = next_j then
                      do print "<td>&nbsp</td>\n";
                         print "<td colspan=";
@@ -228,16 +244,22 @@ value print_html_table print print_indi border d t =
                         print (string_of_int colspan);
                         print " align=right>";
                         print
-                          "<hr noshade size=1 width=\"50%%\" align=right>";
+                          (ph
+                             "<hr noshade size=1 width=\"50%%\" align=right>");
                         print "</td>\n";
-                        print "<td><hr noshade size=1></td>\n";
+                        print "<td>";
+                        print (ph "<hr noshade size=1>");
+                        print "</td>\n";
                      return ()
                    else if next_l = next_j then
-                     do print "<td><hr noshade size=1></td>\n";
+                     do print "<td>";
+                        print (ph "<hr noshade size=1>");
+                        print "</td>\n";
                         print "<td colspan=";
                         print (string_of_int colspan);
                         print " align=left>";
-                        print "<hr noshade size=1 width=\"50%%\" align=left>";
+                        print
+                          (ph "<hr noshade size=1 width=\"50%%\" align=left>");
                         print "</td>\n";
                         print "<td>&nbsp;</td>\n";
                      return ()
@@ -245,7 +267,8 @@ value print_html_table print print_indi border d t =
                      do print "<td colspan=";
                         print (string_of_int (colspan + 2));
                         print ">";
-                        print "<hr noshade size=1></td>\n";
+                        print (ph "<hr noshade size=1>");
+                        print "</td>\n";
                      return () ];
             return loop1 next_l
         in
@@ -257,13 +280,15 @@ value print_html_table print print_indi border d t =
      print (string_of_int border);
      print " cellspacing=0 cellpadding=0>\n";
      for i = 0 to Array.length t.table - 1 do
-       print_line_elem i;
+       if i = Array.length t.table - 1 && all_empty i then ()
+       else print_line_elem i;
        if i < Array.length t.table - 1 then
          do print_vbars (i + 1) i;
             if exist_several_branches i i then
               do print_hbars i i; print_alone_bar i; return ()
             else ();
-            if exist_several_branches i (i + 1) then
+            if exist_several_branches i (i + 1)
+            && (i < Array.length t.table - 2 || all_empty (i + 1)) then
               do print_hbars i (i + 1); print_vbars (i + 1) (i + 1); return ()
             else ();
          return ()
