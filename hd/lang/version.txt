@@ -17,6 +17,8 @@
 <img src="%km=IM;v=/l-eo.jpg" width=36 height=22 alt=eo></a>
 <a href="%glang=es">
 <img src="%km=IM;v=/l-es.jpg" width=36 height=22 alt=es></a>
+<a href="%glang=fi">
+<img src="%km=IM;v=/l-fi.jpg" width=36 height=22 alt=fi></a>
 <a href="%glang=fr">
 <img src="%km=IM;v=/l-fr.jpg" width=36 height=22 alt=fr></a>
 <a href="%glang=he">

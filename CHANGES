@@ -1,6 +1,9 @@
 GeneWeb version 3.01
 --------------------
 
+* Languages
+  - [Nov 22, 99] Added Finnish (Antti Alfthan)
+
 * Setup program (gwsetup)
   - [Nov 7, 99] Fixed problem in Windows version under Netscape: images did
     not appear...

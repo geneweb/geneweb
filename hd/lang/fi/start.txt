@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- $Id: start.txt,v 1.1 1999-11-22 09:28:19 ddr Exp $ -->
+  <!-- copyright (c) INRIA -->
+  <title>Genealogia - %t</title></head>
+  <meta name="ROBOTS" content="NONE">
+</head>
+<body%b>
+<h1>Genealogia</h1>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>{Genealogical<br>data base}</font></h1>
+</td>
+</tr>
+</table>
+
+<br>
+
+%rversion
+
+<p>
+
+Tietokannassa <font color=#2f6400><b>"%t"</b></font> on nyt %n
+henkil&ouml;&auml.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
+
+%I&NwNj<br><p>
+
+%I&NcNa<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w"><em>"Wizard"</em></a> kirjautuminen<br>
+(salasana)<br></td>
+
+%INf<td align=center><a href="%sw=f"><em>"Friend"</em></a> kirjautuminen<br>
+(salasana)</td>
+
+%E</tr></table>%E%I|ca<table border=0>
+<tr><td align=center>
+<form method=get action="%f">
+%hSalasana <em>"Friend"</em> tai <em>"Wizard"</em> kirjautumiseen:
+<input name=w size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+
+%E%E<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+{To navigate in this data base, you can do your search}:<br><p>
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
+<font color=#2f6400><b>{by person}</b></font>
+<input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+<ul>
+<li> <input type=radio name=t value=PN checked>
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em>num&eacute;ro Sosa</em> par rapport &agrave; %a%E
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
+</ul>
+</form>
+
+%It<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=TT>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<font color=#2f6400><b>{by title}</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
+(ex: roi, duke...)<br>
+</td><td>...</td><td>
+<font color=#2f6400><b>paikka</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
+(ex: de France, of Sax...)
+</td><td>
+<input type=submit value="Ok">
+</td></tr></table>
+</form>
+
+%E<li>
+
+<form method=GET action="%f">
+%h
+<font color=#2f6400><b>{by the list}</b></font> {of all}
+<select name=m>
+<option value="N" selected>sukunimet
+<option value="P">etunimet
+</select>
+lajiteltuina
+<select name=tri>
+<option value="A" selected>aakkosj&auml;rjestykseen
+<option value="F">m&auml;&auml;r&auml;j&auml;rjestykseen
+</select>
+<input type=submit value="Ok">
+</form>
+
+<li>
+
+<font color=#2f6400><b>by the</b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>erityishaku</b></font></a>.
+
+</ul>
+
+%Iw<p>
+
+<center>{You can}<br><p>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM">lis&auml;&auml perhe</a>
+%INl</ul>
+</td>
+<td align=left>
+<ul>%E
+<li><a href="%sm=MOD_NOTES">{modify the notes}</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+%E<br><p>
+
+<center>{You can also consult}<br><p>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li>{the} <a href="%sm=AN">syntym&auml;p&auml;iv&auml;t</a>
+<li>{the} <a href="%sm=AD">vainajien vuosip&auml;iv&auml;t</a>
+<li>{the} <a href="%sm=AM">h&auml;&auml;p&auml;iv&auml;t</a>%I|wf
+<li>{the} <a href="%sm=LB;k=10">viime syntym&auml;t</a>%E
+</ul>
+</td>
+<td valign=up>
+<ul>%I|wf
+<li>{the} <a href="%sm=LD;k=10">Viime kuolemat</a>%E%Ih
+<li>{the} <a href="%sm=HIST;k=10">{history of updates}</a>%E
+<li>{the} <a href="%sm=CAL">{calendars}</a>
+<li>{the} <a href="%sm=FORUM">{data base forum}</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+<p>
+
+T&auml;h&auml;n menness&auml %q tapahtumaa, joista %c t&auml;lle
+sivulle %d j&auml;lkeen.
+%Il<p>%E
+
+</td></tr>
+
+<tr>
+<td align=right><br><font size=-1><em><a
+href="%sm=LEX">Sanasto</a></em></font></td>
+</tr>
+
+</table>
+</center>
