@@ -1,6 +1,6 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: conf.txt,v 1.4 2002-06-27 09:46:46 ddr Exp $ -->
+  <!-- $Id: conf.txt,v 1.5 2002-07-15 09:47:04 ddr Exp $ -->
   <title>Gwtp - [
 en: configuration
 fr: configuration
@@ -264,6 +264,27 @@ en: no
 fr: non
 it: no
 ]
+
+<p>
+
+<dl><dt>
+[
+en: Accesses to distant images for "normal" visitors:
+fr: Accès aux images distantes pour les visiteurs "normaux":
+]
+<dd>
+<input type=radio name=no_image_for_visitor
+ value=yes%cno_image_for_visitor=yes;> [
+en: don't generate them
+fr: ne pas les générer
+]
+<dd>
+<input type=radio name=no_image_for_visitor
+ value=no%cno_image_for_visitor=no;> [
+en: generate them
+fr: les générer
+]
+</dl>
 
 <p>
 
