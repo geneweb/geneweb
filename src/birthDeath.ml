@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.1 2001-04-22 14:37:59 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.2 2001-06-12 15:50:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -83,7 +83,8 @@ value select_family conf base get_date =
     else
       let p = base.data.families.get i in
       let (q, len) =
-        if p.relation == Married then
+        if Gutil.is_deleted_family p then (q, len)
+        else if p.relation == Married then
           match get_date p with
           [ Some (Dgreg d cal) ->
               let e = (p, d, cal) in
