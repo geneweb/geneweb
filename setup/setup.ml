@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.7 2001-07-17 02:49:37 ddr Exp $ *)
+(* $Id: setup.ml,v 4.8 2001-07-17 09:50:20 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -280,7 +280,7 @@ value parse_upto lim =
     | [: `c; a = loop (store len c) :] -> a ]
 ;
 
-value is_directory x = Sys.file_exists (Filename.concat x ".");
+value is_directory x = (Unix.stat x).Unix.st_kind = Unix.S_DIR;
 
 value rec copy_from_stream conf print strm =
   try
@@ -394,7 +394,7 @@ and print_selector conf print =
     try getenv conf.env "sel" with
     [ Not_found ->
         try Sys.getenv "HOME" with
-        [ Not_found -> ifdef UNIX then "/" else "C:" ] ]
+        [ Not_found -> ifdef UNIX then "/" else "" ] ]
   in
   let list =
     try
@@ -435,7 +435,9 @@ and print_selector conf print =
              conf.env;
            print "sel=";
            let d =
-             if x = ".." then Filename.dirname sel else Filename.concat sel x
+             if x = ".." then Filename.dirname sel
+             else ifdef UNIX then Filename.concat sel x
+             else sel ^ "\\" ^ x
            in
            print (code_varenv d);
            print "\">";
