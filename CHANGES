@@ -25,6 +25,11 @@ GeneWeb version 4.04
     -etc (for passwd, default.gwf and lang directories) and -tmp (the
     rest). Code written by Christian Perrier.
 
+* Documentation
+
+  - [31 Oct 01] Added a paragraph in the FAQ about why the sources in
+    gedcom are sometimes not taken into account.
+
 GeneWeb version 4.03
 --------------------
 
