@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.28 2000-06-21 21:13:05 ddr Exp $ *)
+(* $Id: family.ml,v 3.29 2000-06-27 08:01:12 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -149,6 +149,46 @@ value try_find_with_one_first_name conf base n =
   | None -> [] ]
 ;
 
+value roman_of_arabian n =
+  let build one five ten =
+    fun
+    [ 0 -> ""
+    | 1 -> one
+    | 2 -> one ^ one
+    | 3 -> one ^ one ^ one
+    | 4 -> one ^ five
+    | 5 -> five
+    | 6 -> five ^ one
+    | 7 -> five ^ one ^ one
+    | 8 -> five ^ one ^ one ^ one
+    | _ -> one ^ ten ]
+  in
+  build "M" "M" "M" (n / 1000 mod 10) ^
+  build "C" "D" "M" (n / 100 mod 10) ^
+  build "X" "L" "C" (n / 10 mod 10) ^
+  build "I" "V" "X" (n mod 10)
+;
+
+value name_with_roman_number str =
+  loop False 0 0 where rec loop found len i =
+    if i == String.length str then
+      if found then Some (Buff.get len) else None
+    else
+      match str.[i] with
+      [ '0'..'9' as c ->
+          let (n, i) =
+            loop (Char.code c - Char.code '0') (i + 1) where rec loop n i =
+              if i == String.length str then (n, i)
+              else
+                match str.[i] with
+                [ '0'..'9' as c ->
+                    loop (10 * n + Char.code c - Char.code '0') (i + 1)
+                | _ -> (n, i) ]
+          in
+          loop True (Buff.mstore len (roman_of_arabian n)) i
+      | c -> loop found (Buff.store len c) (i + 1) ]
+;
+
 value find_all conf base an =
   let sosa_ref = Util.find_person_in_env conf base "z" in
   let sosa_nb = try Some (Num.of_string an) with [ Failure _ -> None ] in
@@ -159,6 +199,15 @@ value find_all conf base an =
       | _ -> [] ]
   | _ ->
       let ipl = person_ht_find_all base an in
+      let (an, ipl) =
+        if ipl = [] then
+          match name_with_roman_number an with
+          [ Some an1 ->
+              let ipl = person_ht_find_all base an1 in
+              if ipl = [] then (an, []) else (an1, ipl)
+          | None -> (an, ipl) ]
+        else (an, ipl)
+      in
       let pl = List.map (poi base) ipl in
       let spl = select_std_eq base pl an in
       let pl =
