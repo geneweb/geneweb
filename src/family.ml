@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.50 2005-02-04 20:18:59 ddr Exp $ *)
+(* $Id: family.ml,v 4.51 2005-02-05 22:13:16 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -232,8 +232,7 @@ value specify conf base n pl =
     Wserver.wprint "<ul>\n";
     List.iter
       (fun (p, tl) ->
-         do {
-           html_li conf;
+         tag "li" begin
            match tl with
            [ [] ->
                Wserver.wprint "\n%s" (referenced_person_title_text conf base p)
@@ -282,8 +281,8 @@ value specify conf base n pl =
                    (fun s h -> s ^ ",\n" ^ person_title_text conf base h)
                    (person_title_text conf base h) hl
                in
-               Wserver.wprint ", <em>&amp; %s</em>\n" s ]
-         })
+               Wserver.wprint ", <em>&amp; %s</em>\n" s ];
+         end)
       ptll;
     Wserver.wprint "</ul>\n";
     trailer conf;
