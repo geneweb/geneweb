@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.26 2001-02-23 10:07:58 ddr Exp $ *)
+(* $Id: setup.ml,v 3.27 2001-02-23 18:26:52 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1438,6 +1438,13 @@ value intro () =
      flush stdout;
   return ()
 ;
+
+(* hack done under vi under Windows... wrap_setup should me moved here *)
+value wrap_setup x =
+  do ifdef WIN95 then Argl.parse speclist anonfun usage else (); return
+  wrap_setup x
+;
+(* end hack *)
 
 value main () =
   do ifdef UNIX then intro ()
