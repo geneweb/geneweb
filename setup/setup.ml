@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.5 2001-05-17 17:39:15 ddr Exp $ *)
+(* $Id: setup.ml,v 4.6 2001-07-17 00:50:26 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -285,6 +285,8 @@ value parse_upto lim =
     | [: `c; a = loop (store len c) :] -> a ]
 ;
 
+value is_directory x = Sys.file_exists (Filename.concat x ".");
+
 value rec copy_from_stream conf print strm =
   try
     while True do {
@@ -329,6 +331,7 @@ value rec copy_from_stream conf print strm =
                   conf.env
               }
           | 'i' -> print (strip_spaces (s_getenv conf.env "i"))
+          | 'j' -> print_selector conf print
           | 'k' -> for_all conf print (fst (List.split conf.env)) strm
           | 'l' -> print conf.lang
           | 'n' -> print_if conf print (browser_with_type_file conf) strm
@@ -392,6 +395,61 @@ and print_specific_file conf print fname strm =
       }
       else copy_from_stream conf print (Stream.of_string s)
   | _ -> () ]
+and print_selector conf print =
+  let sel =
+    try getenv conf.env "sel" with
+    [ Not_found -> ifdef UNIX then "/" else "C:" ]
+  in
+  let list =
+    try
+      let dh = Unix.opendir sel in
+      loop [] where rec loop list =
+        match try Some (Unix.readdir dh) with [ End_of_file -> None ] with
+        [ Some x ->
+            let list =
+              if x = ".." then [x :: list]
+              else if String.length x > 0 && x.[0] = '.' then list
+              else [x :: list]
+            in
+            loop list
+        | None -> List.sort compare list ]
+    with
+    [ Unix.Unix_error _ _ _ -> [".."] ]
+  in
+  do {
+    print "<input type=hidden name=anon value=\"";
+    print sel;
+    print "\">\n";
+    print "<pre>\n";
+    print "     ";
+    print sel;
+    print "</a>\n";
+    List.iter
+      (fun x ->
+         do {
+           print "          <a href=\"";
+           print conf.comm;
+           print "?lang=";
+           print conf.lang;
+           print ";";
+           List.iter
+             (fun (k, v) ->
+                if k = "sel" then ()
+                else do { print k; print "="; print v; print ";" })
+             conf.env;
+           print "sel=";
+           let d =
+             if x = ".." then Filename.dirname sel else Filename.concat sel x
+           in
+           print (code_varenv d);
+           print "\">";
+           let x = if is_directory d then Filename.concat x "" else x in
+           print x;
+           print "</a>\n";
+         })
+      list;
+    print "</pre>\n";
+  }
 and print_if conf print cond strm =
   match Stream.next strm with
   [ '{' ->
@@ -500,6 +558,10 @@ value simple conf =
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
+  let ged =
+    if Filename.check_suffix (String.lowercase ged) ".ged" then ged
+    else ""
+  in
   let out_file =
     match p_getenv conf.env "o" with
     [ Some f -> strip_spaces f
@@ -511,6 +573,7 @@ value simple conf =
     else out_file
   in
   let env = [("f", "on") :: conf.env] in
+  let env = list_replace "anon" ged env in
   let conf =
     {comm = if ged = "" then "gwc" else "ged2gwb";
      env = list_replace "o" out_file env; lang = conf.lang;
