@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: recover1.htm,v 1.1 2002-01-14 19:26:13 ddr Exp $ -->
+  <title>[
+de: Eine bestehende Datenbank &uuml;bernehmen - Phase 2
+en: Recover a database - Phase 2
+es: Recuperar una base - Fase 2
+fr: R&eacute;cup&eacute;rer une base - Phase 2
+lv: Datu bâzes atjauninâðana - 2. fâze
+sv: Återskapa en databas - fas 2
+]</title>
+</head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>[
+de: Eine bestehende Datenbank &uuml;bernehmen
+en: Recover a database
+es: Recuperar una base
+fr: R&eacute;cup&eacute;rer une base
+lv: Datu bâzes atjauninâðana - 2. fâze
+sv: Återskapa en databas
+]</font></h1></center>
+
+<br><p>
+
+[
+de: Verzeichnis
+en: Directory
+es: Carpeta:
+fr: R&eacute;pertoire:
+lv: Katalogs
+sv: Katalog
+]
+
+<pre>
+  $a
+</pre>
+
+[
+de: W&auml;hle die Datenbank, die du &uuml;bernehmen m&ouml;chtest:
+en: Select the database you want to recover:
+es: Seleccione Ud. la base que desea recuperar:
+fr: S&eacute;lectionnez la base que vous voulez r&eacute;cup&eacute;rer:
+lv: Izvçlieties datu bâzi, kuru jûs vçlaties atjauninât:
+sv: Välj den databas du vill återskapa:
+]
+
+<p>
+
+<form method=GET action="recover_1">
+<input type=hidden name=lang value=$l>
+<input type=hidden name=anon value="$a">
+
+<dl><dt><dd><table border=1>
+
+$y{<tr><td><input type=radio name=i value="$a"></td><td> $a </td></tr>|
+<tr><td>- [
+de: keine Datenbanken in diesem Verzeichnis gefunden
+en: there is no databases in this directory
+es: ninguna base de datos existe en esta carpeta
+fr: il n'y a aucune base de donn&eacute;es dans ce
+    r&eacute;pertoire
+lv: ðinî katalogâ nav nevienas datu bâzes
+sv: det finns inga databaser i denna katalog
+]</tr></td>}
+
+</table></dl>
+
+<p>
+
+[
+de: Gib den Namen an, den du deiner Datenbank geben m&ouml;chtest. 
+    Wenn du nichts angibst, bekommt sie den gleichen Namen wie die
+    alte Datenbank.
+en: Write the name you want to give to your database. By default, it will
+    be the same in the new directory.
+es: Indique Ud. el nombre que Ud. desea dar a su base de datos.
+    Por defecto; ser&aacute; el mismo en la nueva carpeta.
+fr: Indiquez le nom que vous voulez donner &agrave; votre base de
+    donn&eacute;es. Par d&eacute;faut, ce sera le m&ecirc;me dans le
+    nouveau r&eacute;pertoire.
+lv: Ierakstiet datu bâzes nosaukumu, kâdâ vçlaties to nosaukt. Pçc noklusçjuma tas bûs tâds pats, kâ jaunais katalogs.
+sv: Skriv in namnet du vill kalla din databas. Skriver du ingenting kommer
+    den att heta samma i den nya katalogen.
+]
+
+<p>
+
+<dl><dt><dd><input name=o size=30></dl>
+
+<p>
+
+[
+de: Wenn gew&uuml;nscht, w&auml;hle die folgende Option:
+en: You can select an option:
+es: Ud. puede seleccionar una opci&oacute;n:
+fr: Vous pouvez s&eacute;lectionner une option:
+lv: Jûs variet izvçlçties arî iespçju:
+sv: Du kan välja en option:
+]
+
+<p>
+
+<dl><dt><dd><table border=1>
+
+<tr><td><input type=checkbox name=ged value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>[
+de: Mittels GEDCOM-Datei &uuml;bernehmen. A priori wird dies nicht
+    empfohlen, jedoch solltest du diese Variante versuchen, wenn
+    die normale &Uuml;bernahme nicht funktioniert.
+en: Pass by a GEDCOM file. A priori, it is not recommended, but if it
+    does not work with the normal procedure, try this option.</td>
+es: Pasar por un fichero GEDCOM. A priori, no es aconsejable, pero si esto
+    no funciona con el procedimiento normal, ensaye con esta
+    opci&oacute;n.
+fr: Passer par un fichier GEDCOM. A priori, c'est d&eacute;conseill&eacute;,
+    mais si &ccedil;a ne fonctionne pas avec la proc&eacute;dure normale, 
+    essayez cette option.
+lv: Atjaunot caur GEDCOM datni. Vispâr tas nav ieteicams, bet ja parastajâ
+    variantâ atjauninâðana neizdodas, tad izmçìiniet ðo iespçju.
+sv: Gå genom en GEDCOM-fil. Det är inte rekommenderat, men om det
+    inte fungerar med den normala proceduren, försök med detta.
+]</td>
+</tr>
+
+</table></dl>
+
+<p>
+
+[
+de: Dann dr&uuml;cke diesen Knopf:
+en: Then push this button:
+es: Apoye luego en este bot&oacute;n:
+fr: Puis appuyez sur ce bouton:
+lv: Beigâs nospiediet ðo podziòu:
+sv: Tryck sedan på denna knapp:
+]
+
+<p>
+
+<input type=submit value="[
+de: &Uuml;bernehmen
+en: Recover
+es: Recuperar
+fr: R&eacute;cup&eacute;rer
+lv: Atjauninât
+sv: Återskapa
+]">
+</form>
