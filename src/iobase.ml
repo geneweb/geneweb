@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.3 2001-05-11 14:01:23 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.4 2001-05-12 02:51:40 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -240,19 +240,19 @@ value persons_of_first_name_or_surname base_data strings params =
             let bt : IstrTree.t (list iper) = input_value ic2 in
             let bt =
               do {
-                let r = ref bt in
+                let bt = ref bt in
                 Hashtbl.iter
                   (fun i p ->
                      let istr = proj p in
                      let ipera =
-                       try IstrTree.find istr bt with [ Not_found -> [] ]
+                       try IstrTree.find istr bt.val with [ Not_found -> [] ]
                      in
                      if List.memq p.cle_index ipera then ()
                      else
-                       r.val := IstrTree.add istr [p.cle_index :: ipera]
-                         r.val)
+                       bt.val := IstrTree.add istr [p.cle_index :: ipera]
+                         bt.val)
                   person_patches;
-                r.val
+                bt.val
               }
             in
             btr.val := Some bt;
