@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.204 2000-12-30 08:48:47 ddr Exp $
+# $Id: lexicon.txt,v 3.205 2001-01-02 17:43:55 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -351,6 +351,7 @@ fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;
 he:  ååğãîéàéàø / áøåîàéàø / ôøéîàéàø / ğéáåæ / ôìåáéåæ / â'øîéğàì / ôìåøéàì / ôøàøéàì / îñéãåø / úøîéãåø / ôøå÷èéãåø / ğåñó
 nl: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 no: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
+pt: vindemiário/brumário/frimário/nivoso/pluviose/ventoso/germinal/floreal/prairial/messidor/termidor/frutidor/complementar
 se: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/komplementär
 
     (hebrew month)
@@ -363,6 +364,7 @@ fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz
 he: úùøé/ çùåï/ ëñìå/ èáú/ ùáè/ àãø à'/ àãø á'/ ğéñï/ àééø/ ñéåï/ úîåæ/ àá/ àìåì
 nl: Tishri/Marcheswan/Kislew/Tebeth/Shebat/Adar/Adar2/Niesan/Ijjar/Siwan/Tammuz/Ab/Elul
 no: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
+pt: Tishrei/Cheshvan/Kislev/Adar/Tevet/Shevat/Adar I/Adar II/Nissan/Iyar/Sivan/Tamuz/Av/Elul
 se: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 
     (month)

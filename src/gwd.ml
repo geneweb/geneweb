@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.68 2000-12-30 15:57:06 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.69 2001-01-02 17:43:58 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -291,14 +291,14 @@ value print_renamed conf new_n =
       return () ]
 ;
 
-value log_redirect conf from request =
+value log_redirect conf from request req =
   let referer = Wserver.extract_param "referer: " '\n' request in
   lock_wait Srcfile.adm_file "gwd.lck" with
   [ Accept ->
       let oc = log_oc () in
       do let tm = Unix.localtime (Unix.time ()) in
          fprintf_date oc tm;
-         Printf.fprintf oc "\n";
+         Printf.fprintf oc " %s\n" req;
          Printf.fprintf oc "  From: %s\n" from;
          Printf.fprintf oc "  Referer: %s\n" referer;
          flush_log oc;
@@ -307,12 +307,10 @@ value log_redirect conf from request =
 ;
 
 value print_redirected conf from request new_addr =
-  let link =
-    let req = Util.get_request_string conf in
-    "http://" ^ new_addr ^ req
-  in
+  let req = Util.get_request_string conf in
+  let link = "http://" ^ new_addr ^ req in
   let env = [('l', fun _ -> link)] in
-  do log_redirect conf from request; return
+  do log_redirect conf from request req; return
   match Util.open_etc_file "redirect" with
   [ Some ic ->
       do Util.html conf;
