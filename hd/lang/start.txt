@@ -1,0 +1,389 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- $Id: start.txt,v 4.1 2001-03-26 11:51:38 ddr Exp $ -->
+  <!-- copyright (c) INRIA -->
+  <title>[
+af: Genealogie/Familiekunde
+cs: Genealogy
+en: Genealogy
+fr: G&eacute;n&eacute;alogie
+se: Genealogi
+] - %t</title>
+  <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
+  <meta name="ROBOTS" content="NONE">
+%j</head>
+<body%b>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%o/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<table><tr><td align=center><h1><font color=%i>[
+af: Genealogiese<br>databasis
+cn: ÍøÂç¼ÒÆ×
+cs: Genealogická databáze
+en: Genealogical<br>data base
+fr: Base de donn&eacute;es<br>g&eacute;n&eacute;alogique
+se: Genealogisk<br>databas
+]</font></h1></table>
+</td>
+<td align=right valign=top>%w</td>
+</tr>
+</table>
+
+<br>
+
+<font size=-1><em>[
+af: Taalvoorkeur/Language preference:
+cs: Zvolte jazyk pro prohlí¾ení databáze:
+en: You can select another displaying language among the following ones:
+fr: Vous pouvez sélectionner une autre langue d'affichage
+    parmi les suivantes:
+se: Du kan välja ett annat språk bland de följande:
+]</em></font>
+
+<br>
+
+%rversion
+
+<p>
+
+[
+af: Die databasis <font color=%i><b>"%t"</b></font> bevat tans %n persone.
+cn: ÏÖÓĞ %n ÈËÔÚÊı¾İ¿âÖĞ¡£
+cs: Databáze <font color=%i><b>"%t"</b></font> obsahuje %n osob.
+en: The data base <font color=%i><b>"%t"</b></font> now holds %n persons.
+fr: La base de donn&eacute;es <font color=%i><b>"%t"</b></font> contient
+    actuellement %n personnes.
+se: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
+    %n personer.
+]%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
+
+%I&NwNj<br><p>
+
+%I&NcNa<table border=0 width="70%">
+<tr>
+
+<td align=center>[
+af: <a href="%sw=w"><em>Medewerkers</em></a> toegang<br> (password)
+cs: <a href="%sw=w">{<em>"Wizard"</em></a> pøístup<br> (heslo)
+en: <a href="%sw=w"><em>Wizard</em></a> access<br> (password)
+fr: acc&egrave;s <a href="%sw=w"><em>sorcier</em></a><br> (mot de passe).
+se: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
+]<br></td>
+
+%INf<td align=center>[
+af: <a href="%sw=f"><em>Vriend</em></a> toegang<br> (password)
+cs: <a href="%sw=f">{<em>"Friend"</em></a> pøístup<br> (heslo)
+en: <a href="%sw=f"><em>Friend</em></a> access<br> (password)
+fr: acc&egrave;s <a href="%sw=f"><em>ami</em></a><br> (mot de passe).
+se: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
+]</td>
+
+%E</tr></table>%E%I|ca<table border=0>
+<tr><td align=center>
+<form method=POST action="%f">
+%h[
+af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
+cs: Heslo pro<em>"friend"</em> nebo <em>"wizard"</em> pøístup:</em>:
+en: Password, for <em>friend</em> or <em>wizard</em> access:
+fr: Mot de passe, pour acc&egrave;s <em>ami</em> ou <em>sorcier</em>:
+se: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
+    tilltr&auml;de:
+]
+<input name=w type=password size=10 maxlength=200>
+<input type=submit value="Ok">
+</form>
+</td></tr>
+</table>
+
+%E%E<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+<center><table border=0 cellspacing=0 cellpadding=0><tr><td>
+[
+af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
+cn: 
+cs: Databázi lze prohledávat:
+en: To navigate in this data base, you can do your search:
+fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez effectuer
+       votre recherche:
+se: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
+]<br><p>
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
+<font color=%i><b>[
+af: per persoon
+cn: ËÑË÷£º
+cs: Podle osob
+en: by person
+fr: par personne
+se: efter person
+]</b></font>
+<input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+<ul>
+<li> <input type=radio name=t value=PN checked>
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>%Iz
+[or] [<em>Sosa number</em> relative to %t](%a)%E
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
+</ul>
+</form>
+
+%Ispropose_titles;<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=TT>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<font color=%i><b>[
+af: by title
+cn: ¸ù¾İÃûÏÎ
+cs: podle titulu
+en: by title
+fr: par titre
+se: efter titel
+]</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
+(<a href="%sm=TT;t=">[all the titles]</a>)<br>
+</td><td>...</td><td>
+<font color=%i><b>[estate]</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
+(<a href="%sm=TT;p=*">[all the estates]</a>)
+</td><td>
+<input type=submit value="Ok">
+</td></tr></table>
+</form>
+
+%E<li>
+
+<form method=GET action="%f">
+%h
+[
+af: <font color=%i><b>in die lys </b></font>van alle
+cn: ÏÔÊ¾ËùµÄ
+cs: <font color=%i><b>ze seznamu</b></font> v¹ech
+en: <font color=%i><b>by the list</b></font> of all
+fr: <font color=%i><b>par la liste</b></font> de tous les
+se: <font color=%i><b>efter listan</b></font> av alla
+]
+<select name=m>
+<option value="N" selected>[
+af: vanne
+cn: ĞÕ
+cs: pøíjmení
+en: surnames
+fr: patronymes
+se: efternamn
+]
+<option value="P">[
+af: voorname
+cn: Ãû 
+cs: køestní jméno
+en: first names
+fr: pr&eacute;noms
+se: f&ouml;rnamn
+]
+</select>
+[
+af: volgens
+cn: ¸ù¾İ
+cs: seøazená podle
+en: by
+fr: par
+se: sorterade i
+]
+<select name=tri>
+<option value="A" selected>[
+af: alfabeties volgorde
+cn: ×ÖÄ¸Ğò
+cs: abecedy
+en: alphabetic order
+fr: ordre alphab&eacute;tique
+se: bokstavsordning
+]
+<option value="F">[
+af: frekwensie
+cn: ·ÃÎÊ´ÎÊı
+cs: èetnosti
+en: frequency
+fr: fr&eacute;quence
+se: frekvensordning
+]
+</select>
+<input type=submit value="Ok">
+</form>
+
+<li>
+
+<form method=GET action="%s">
+%h<input type=hidden name=m value=PS>
+<font color=%i><b>[
+af: by
+cs: podle
+en: by
+fr: par
+se: efter
+] [place] / [surname/surnames]0</b></font>
+- [birth] <input type=checkbox name=bi value=on checked>
+- [death] <input type=checkbox name=de value=on>
+- [marriage/marriages]0 <input type=checkbox name=ma value=on>
+- <input type=submit value="Ok">
+</form>
+
+%INshide_advanced_request;<li>
+
+[
+af: <font color=%i><b>deur 'n</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>detail
+       navraag</b></font></a>.
+cs: <font color=%i><b>lze také zadat</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>roz¹íøenı
+       dotaz</b></font></a>.
+en: <font color=%i><b>by the</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>advanced
+       request</b></font></a>.
+fr: <font color=%i><b> par la</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>requ&ecirc;te
+        &eacute;volu&eacute;e</b></font></a>.
+se: <font color=%i><b>genom</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>avancerad
+       s&ouml;kning</b></font></a>.
+]%E
+
+</ul>
+</td></tr></table></center>
+
+%Iw<p>
+<center>[
+af: Jy kan
+cn: 
+cs: Zde mù¾ete
+en: You can
+fr: Vous pouvez
+se: Du kan
+]<br><p>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+%Ispropose_add_family;<li><a href="%sm=ADD_FAM">[
+af: 'n familie byvoeg
+cn: Ôö¼Ó¼ÒÍ¥¼ÇÂ¼
+cs: pøidat novou rodinu
+en: add a family
+fr: ajouter une famille
+se: l&auml;gga till en familj
+]</a>
+%INl</ul>
+</td>
+<td align=left>
+<ul>%E
+%E<li><a href="%sm=MOD_NOTES">[
+af: die notas wysig
+cs: upravit poznámky
+en: modify the notes
+fr: modifier les notes
+se: &auml;ndra noteringar
+]</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+%E<br><p>
+
+<center>[
+af: Jy kan ook kyk na
+cn: 
+cs: Lze také zobrazit
+en: You can also consult
+fr: Vous pouvez également consulter
+se: Du kan ocks&aring; konsultera
+]<br><p>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li><a href="%sm=AN">[birthdays]</a>
+<li><a href="%sm=AD">[anniversaries of dead people]</a>
+<li><a href="%sm=AM">[anniversaries of marriage]</a>
+<li><a href="%sm=STAT">[statistics]</a>
+</ul>
+</td>
+<td valign=up>
+<ul>%Ih
+<li><a href="%sm=HIST;k=10">[history of updates]</a>%E
+<li><a href="%sm=CAL">[calendar/calendars]1</a>
+<li><a href="%sm=FORUM">[data base forum]</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+<p>
+
+[
+af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
+cn: ÒÑ¾­ÓĞ %q ´Î·ÃÎÊÊı¾İ¿â£¬ÆäÖĞ %c ´Î·ÃÎÊ±¾Ö÷Ò³£¬ ×Ô´Ó %d¡£
+cs: %q pøístupù, z toho %c na tuto stránku, od %d.
+en: There have been %q accesses, %c of them to this page, since %d.
+fr: Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
+se: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
+    sedan %d.
+]
+%Il<p>%E
+
+<p>
+
+[
+cs: Pokud Vá¹ prohlí¾eè neprovádí automaticky obnovu upravenıch stránek
+    (musíte pou¾ívat tlaèítko "obnovit"), zkuste prohlí¾ení pøes <a
+    href="%sescache=0">tento odkaz</a>.
+en: If your browser does not automatically update the modified pages (forcing
+    you to do "reload current document"), try navigating from <a
+    href="%sescache=0">this link</a>.
+fr: Si votre navigateur ne met pas &agrave; jour automatiquement les pages
+    modifi&eacute;es (vous obligeant &agrave; faire "actualiser la page"),
+    essayez la navigation &agrave; partir de <a href="%sescache=0">ce
+    lien</a>.
+se: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
+    (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
+    navigera <a href="%sescache=0">härifrån</a>.
+]
+
+</td></tr>
+</table>
+
+<br>
+
+<p align=right><font size=-1><em><a href="%sm=LEX">[
+af: lexicon
+cn: ±¾Õ¾Ê¹ÓÃµÄÊõÓï
+cs: lexikon
+en: lexicon
+fr: lexique
+se: lexikon
+]</a></em></font></p>
+
+</center>
