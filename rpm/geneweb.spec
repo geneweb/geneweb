@@ -1,21 +1,4 @@
-# $Id: geneweb.spec,v 4.1 2001-04-05 13:59:03 ddr Exp $
-#
-# geneweb .spec file -- 15 August 1999 -- Dan Kegel
-#
-# This .spec file is commented to help maintainers who are not
-# yet intimately familliar with the process of creating RPM's.
-# Like me :-)
-#
-# First rule: buy a copy of Maximum RPM and read it.
-# 
-# .spec header lines that describe the rpm are gathered at the top:
-#
-# Note: the resulting .rpm is named $name-$version.$release.rpm
-# e.g. if 'Version' is 2.06, and 'Release' is 1, it'll be geneweb-2.06-1.rpm
-# The resulting source .srpm is named $name-$version.$release.srpm
-# 'Release' refers only to the .rpm, not to the source .tar.gz;
-# it starts at 1 for the first .rpm released for a given source version,
-# and should be incremented each time a new .rpm is released.
+# $Id: geneweb.spec,v 4.2 2001-04-08 03:54:25 ddr Exp $
 
 Summary: Genealogy software with a Web interface
 Name: geneweb
@@ -57,29 +40,14 @@ het Internet.
 GeneWeb är ett genealogi program med ett webbinterface. Det kan användas 
 nedkopplad eller som en webbtjänst.
 
-# *********** BUILDING .RPM *************
-# Now come the header lines that describe how to build the application
-# from source and turn it into an .rpm
-# rpm -b runs the %prep and %build scripts.
-# This stuff only happens on the developer's machine.
-
-# %prep: before the build.  
-# Blow away temporaries from last aborted build if any.
-# Unpack the .tar.gz (using %setup).
 %prep
 rm -rf $RPM_BUILD_ROOT
 %setup
 
-# %build: how to compile
 %build
 make opt
 make distrib
 
-# %install: after compiling.  put the geneweb distrib folder
-# into the geneweb user's gw subdir, then set up the /etc/rc.d entries.
-# (Note: this isn't the same kind of install that the end-user does.
-#  This sets up the same files 'by hand'; rpm will then archive them.
-#  The end user installs the copies from the .rpm archive.)
 %install
 mkdir -p $RPM_BUILD_ROOT/home/geneweb
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
@@ -88,49 +56,28 @@ cp -r distribution $RPM_BUILD_ROOT/home/geneweb/gw
 cp rpm/geneweb-initrc.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/gwd
 cp rpm/geneweb-logrotate $RPM_BUILD_ROOT/etc/logrotate.d/gwd
 
-# %clean: after installing, how to clean up.  (The files are all
-# in the .rpm archive by now.  Need to remove them before we
-# can test the whole thing with 'rpm -i foo.rpm'.)
 %clean
 make clean
 rm -rf $RPM_BUILD_ROOT
 
-# *********** INSTALLING .RPM *************
-# This stuff only happens on the user's machine.
-# rpm -i runs the %pre script, in which I create the geneweb user,
-# then it automatically unpacks all the files and symlinks from the archive.
-# Finally it runs the %post script, in which I start the service.
 %pre
 /usr/sbin/groupadd geneweb || :
 /usr/sbin/useradd -d /home/geneweb -g geneweb -c "GeneWeb database" geneweb || :
 chmod a+rx /home/geneweb
 
 %post
-# Sure, all the files are already owned by geneweb, but the directories ain't.
 chown -R geneweb.geneweb /home/geneweb/gw
 chkconfig --add gwd
 /etc/rc.d/init.d/gwd start
 
-# *********** UNINSTALLING .RPM *************
-# rpm -e automatically erases all the files listed in %files.
-# Beforehand, it runs the %preun script; afterwards, it runs the %postun
-# script.  I use them to stop the service & remove the pseudouser.
 %preun
 /etc/rc.d/init.d/gwd stop
 chkconfig --del gwd
 
 %postun
-cd /home/geneweb/gw/gw
+# cd /home/geneweb/gw/gw
 # rm -rf doc etc images lang setup gwtp_tmp
 
-# *********** THE FILES OWNED BY THIS .RPM *************
-# These are the files belonging to this package.  We have to list
-# them so RPM can install and uninstall them.
-# (If a line starts with %doc, it means that file goes into 
-# /usr/doc/$packagename instead of ~geneweb.)
-# This package is not relocatable, which kinda sucks.
-# Note that gwd and gwsetup (the main daemon and the gwsetup daemon) are
-# installed setuid, owned by geneweb, and can only be run by root.
 %files
 %defattr(-,geneweb,geneweb)
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwd
