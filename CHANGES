@@ -2,11 +2,11 @@ GeneWeb version 3.09
 --------------------
 
 * GeneWeb compiler (gwc)
-  - [11 Oct 00] Important change: added a system of template files for
-    the personal pages. It is therefore possible to change the displaying
-    of the personal pages, by editing it. It is also possible, for a site
-    accomodating several data bases, to have a personal template file
-    specific to each data base.
+  - [11 Oct 00] Important improvement: added a system of template
+    files for the personal pages. It is therefore possible to change the
+    displaying of the personal pages, by editing the template. It is also
+    possible, for a site accomodating several data bases, to have a
+    personal template file specific to each data base.
   - [03 Oct 00] Fixed bug: there were an inconsistency between "gwc"
     and the inline updating, for persons "keys": the inline updating
     considered spaces in names as significant but not "gwc". Result:
