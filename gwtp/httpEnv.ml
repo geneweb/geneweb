@@ -1,4 +1,4 @@
-(* $Id: httpEnv.ml,v 1.5 2000-08-16 08:15:59 ddr Exp $ *)
+(* $Id: httpEnv.ml,v 1.6 2001-01-18 05:24:54 ddr Exp $ *)
 
 open Printf;
 
@@ -147,7 +147,7 @@ value is_multipart_form =
     loop 0 where rec loop i =
       if i >= String.length content_type then False
       else if i >= String.length s then True
-      else if content_type.[i] == s.[i] then loop (i + 1)
+      else if content_type.[i] == Char.lowercase s.[i] then loop (i + 1)
       else False
 ;
 

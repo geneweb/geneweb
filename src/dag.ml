@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.41 2001-01-13 22:13:52 ddr Exp $ *)
+(* $Id: dag.ml,v 3.42 2001-01-18 05:24:55 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -599,6 +599,23 @@ return
        done;
      done;
      Wserver.wprint "</pre>\n";
+     let pos1 =
+       match pos1 with
+       [ Some pos1 -> pos1
+       | None -> 0 ]
+     in
+     let env =
+       List.fold_right
+         (fun (k, v) env -> if k = "pos1" then env else [(k, v) :: env])
+         conf.env []
+     in
+     do Wserver.wprint "<p>\n<div align=right>\n";
+        Wserver.wprint "<a href=\"%s" (commd conf);
+        List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
+        Wserver.wprint "pos1=%d" (pos1 + 70);
+        Wserver.wprint "\">&gt;&gt;</a>\n";
+        Wserver.wprint "</div>\n";
+     return ();
   return () 
 ;
 
