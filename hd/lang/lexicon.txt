@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.32 1999-05-04 14:54:52 ddr Exp $
+# $Id: lexicon.txt,v 2.33 1999-05-05 09:13:32 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -129,7 +129,7 @@ it: alcune date dei titoli di %t sono incorrette: %t
 nl: %t de datum voor titels zijn inkorrekt
 no: %t har feil titeldato %t
 pt: as datas de um t&iacute;tulo de %t n&atilde;o est&atilde;o correctas
-se: %t har inkorrekta titel datum: %t
+se: %t har inkorrekta titeldatum: %t
 
     %t is born after the death of his/her mother %t
 de: %t ist nach dem Tod der Mutter %t geboren
@@ -1054,6 +1054,7 @@ se: kan inte &auml;ndra k&ouml;n p&aring; en gift person
     change children's names
 en: change children's names
 fr: changer noms des enfants
+se: &auml;ndra barnens namn
 
     changed order of children
 de: Reihenfolge der Kinder gewechselt
@@ -1066,10 +1067,6 @@ nl: veranderd de volgorde der kinderen
 no: barnas rekkef&oslash;lge er endret 
 pt: cambio da ordem dos filhos
 se: &auml;ndrade ordningen f&ouml;r barnen
-
-    children's names changed
-en: children's names changed
-fr: noms des enfants chang&eacute;s
 
     child/children
 cn: ×ÓÅ®
@@ -1085,6 +1082,11 @@ nl: kind/kinderen
 no: barn/barn
 pt: filho/filhos
 se: barn/barnen
+
+    children's names changed
+en: children's names changed
+fr: noms des enfants chang&eacute;s
+se: barnens namn &auml;ndrade
 
     click
 de: klicken Sie
@@ -2031,7 +2033,7 @@ fr: affichage long
 he:  תצוגה ארוכה
 nl: kwartierstaat
 no: utvidet rapport
-se: l&aring;ng listning
+se: utvidgad rapport
 
     main title
 de: Haupttitel
