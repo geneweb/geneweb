@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.37 2000-03-22 12:47:29 ddr Exp $ *)
+(* $Id: util.ml,v 3.38 2000-04-02 12:50:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -152,6 +152,21 @@ value age_autorise conf base p =
                 let a = temps_ecoule d conf.today in
                 a.year > nb_year_for_public
             | _ -> loop (i + 1) ] ]
+;
+
+value fast_auth_age conf p =
+  if p.access = Public || conf.friend || conf.wizard then True
+  else if conf.public_if_titles && p.access = IfTitles && p.titles <> []
+  then True
+  else
+    match (Adef.od_of_codate p.birth, date_of_death p.death) with
+    [ (_, Some (Dgreg d _)) ->
+        let a = temps_ecoule d conf.today in
+        a.year > nb_year_for_public
+    | (Some (Dgreg d _), _) ->
+        let a = temps_ecoule d conf.today in
+        a.year > nb_year_for_public
+    | _ -> False ]
 ;
 
 value nobr_level = ref 0;
