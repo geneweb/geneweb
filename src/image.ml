@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 4.4 2001-11-23 13:13:12 ddr Exp $ *)
+(* $Id: image.ml,v 4.5 2002-07-15 08:34:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -54,8 +54,8 @@ value print_image_file cgi fname =
 ;
 
 value print_personal_image conf base p =
-  match image_and_size conf base p (fun x -> Some (1, 1)) with
-  [ Some (f, Some _) ->
+  match image_and_size conf base p (fun x y -> Some (1, 1)) with
+  [ Some (True, f, _) ->
       if print_image_file conf.cgi f then () else incorrect_request conf
   | _ -> incorrect_request conf ]
 ;

@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.13 2002-04-05 17:51:50 ddr Exp $
+# $Id: a.gwf,v 4.14 2002-07-15 08:34:22 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -82,6 +82,11 @@ can_kill_ancestors=no
 # directory. This value, when set, could typically start with http://...
 # or file://...
 images_path=
+
+# Don't search images if normal visitor (i.e. neither "wizard" nor "friend").
+# Useful if the images are hosted in a site protected by a password that
+# only wizards and friend know.
+no_image_for_visitor=no
 
 # Global authorization file for this database (overriding the value
 # of the option "-auth" of "gwd"). This file must hold lines of the

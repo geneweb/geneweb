@@ -7,6 +7,9 @@ GeneWeb version 4.07
   - [11 Apr 02] Added Slovenian (Mitja Iskric).
 
 * GeneWeb server or CGI (gwd)
+  - [15 Jul 02] Added ability to specify a size of images, for the ones
+    which are hosted in another site. The syntax is the name of the image
+    followed by "(widthxheight)". Code by Ludovic Ledieu.
   - [20 Jun 02] For option -wd (directory for socket communication and
     access count), build now all upper directories of the path (e.g.
     under Windows, if using -wd C:\TEMP\GENEWEB, build C:\TEMP if it does
@@ -27,6 +30,12 @@ GeneWeb version 4.07
 
 * Gedcom to GeneWeb (ged2gwb)
   - [16 May 02] Added option -us: uppercase surnames.
+
+* Base configuration files (base.gwf)
+  - [15 Jul 02] Added variable "no_image_for_visitor" to specify not
+    to search images when "normal" visitor (i.e. neither "wizard", nor
+    "friend"). Useful if the images are hosted in a site protected by
+    a password (htaccess). Code by Ludovic Ledieu.
 
 GeneWeb version 4.06
 --------------------

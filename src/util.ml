@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.47 2002-04-13 08:51:20 ddr Exp $ *)
+(* $Id: util.ml,v 4.48 2002-07-15 08:34:26 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1597,8 +1597,11 @@ value image_size fname =
   | None -> None ]
 ;
 
-value limited_image_size max_wid max_hei fname =
-  match image_size fname with
+value limited_image_size max_wid max_hei fname size =
+  match
+    if fname = "" then size
+    else image_size fname
+  with
   [ Some (wid, hei) ->
       let (wid, hei) =
         if hei > max_hei then
@@ -1828,35 +1831,49 @@ value auto_image_file conf base p =
 ;
 
 value image_and_size conf base p image_size =
-  if authorized_age conf base p then
+  if not conf.no_image && authorized_age conf base p then
     let image_txt = capitale (transl_nth conf "image/images" 0) in
     match sou base p.image with
     [ "" ->
         match auto_image_file conf base p with
-        [ Some f -> Some (f, Some (image_size f))
+        [ Some f -> Some (True, f, image_size f None)
         | None -> None ]
     | s ->
+        let (s, size) =
+          let l = String.length s - 1 in
+          if s.[l] = ')' then
+            try
+              let pos1 = String.index s '(' in
+              let pos2 = String.index_from s pos1 'x' in
+              let wid = String.sub s (pos1+1) (pos2-pos1-1) in
+              let hei = String.sub s (pos2+1) (l-pos2-1) in
+              let size = Some (int_of_string wid, int_of_string hei) in
+              (String.sub s 0 pos1, image_size "" size)
+            with
+            [ Not_found | Failure _ -> (s, None) ]
+          else (s, None)
+        in
         let http = "http://" in
         if String.length s > String.length http &&
            String.sub s 0 (String.length http) = http then
-          Some (s, None)
+          Some (False, s, size)
         else if Filename.is_implicit s then
           match
             try Some (List.assoc "images_path" conf.base_env) with
             [ Not_found -> None ]
           with
-          [ Some p when p <> "" -> Some (p ^ s, None)
+          [ Some p when p <> "" -> Some (False, p ^ s, size)
           | _ ->
               let fname = personal_image_file_name conf.bname s in
               if Sys.file_exists fname then
-                Some (fname, Some (image_size fname))
+                Some (True, fname, image_size fname None)
               else None ]
         else None ]
   else None
 ;
 
 value has_image conf base p =
-  if authorized_age conf base p then
+  if not conf.no_image && authorized_age conf base p then
     p.image <> Adef.istr_of_int 0 || auto_image_file conf base p <> None
   else False
 ;
