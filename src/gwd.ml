@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.7 1999-04-20 20:13:57 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.8 1999-04-28 16:52:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -71,6 +71,20 @@ value nl () =
   Wserver.wprint "\r\n"
 ;
 
+value copy_file fname =
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      do try
+           while True do
+             let c = input_char ic in
+             Wserver.wprint "%c" c;
+           done
+         with _ -> ();
+         close_in ic;
+      return ()
+  | None -> () ]
+;
+
 value refuse_log from cgi =
   let oc = open_out_gen log_flags 0o644 "refuse_log" in
   do let tm = Unix.localtime (Unix.time ()) in
@@ -84,6 +98,7 @@ value refuse_log from cgi =
      else ();
      Wserver.wprint "Content-type: text/html"; nl (); nl ();
      Wserver.wprint "Your access has been disconnected by administrator.\n";
+     copy_file "refuse.txt";
   return ()
 ;
 
@@ -151,8 +166,9 @@ value input_lexicon lang =
            while True do
              let k =
                find_key (input_line ic) where rec find_key line =
-                 if String.length line = 0 then find_key (input_line ic)
-                 else if line.[0] = '#' then find_key (input_line ic)
+                 if String.length line < 4 then find_key (input_line ic)
+                 else if String.sub line 0 4 <> "    " then
+                   find_key (input_line ic)
                  else line
              in
              loop (input_line ic) where rec loop line =
