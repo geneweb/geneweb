@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.47 2000-11-13 20:48:25 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.48 2000-12-19 15:42:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -718,7 +718,8 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
              in
              match prec with
              [ (Some n1, Some n2) ->
-                 do Wserver.wprint "%s: " (capitale (transl conf "parents"));
+                 do Wserver.wprint "%s: "
+                      (capitale (nominative (transl conf "parents")));
                     print_link_long conf n1;
                     Wserver.wprint " %s " (transl conf "and");
                     print_link_long conf n2;
@@ -800,7 +801,7 @@ value print_sources conf base new_parag p =
        do if auth then
             print_not_empty_src conf base new_parag first
               (fun () ->
-                 transl_nth conf "marriage/marriages" 0 ^
+                 (nominative (transl_nth conf "marriage/marriages" 0)) ^
                  (if Array.length u.family == 1 then ""
                   else " " ^ string_of_int (i + 1)))
                fam.marriage_src
@@ -1151,7 +1152,8 @@ value print_generation_missing_persons conf base title sp_incl gp =
            in
            Wserver.wprint "%s\n"
              (if sp_incl then
-                transl_decline2 conf "%1 of %2" (transl conf "parents") s
+                transl_decline2 conf "%1 of %2"
+                  (nominative (transl conf "parents")) s
               else s);
         return ()
   | _ -> () ]
@@ -1246,7 +1248,8 @@ value print_missing_ancestors conf base v spouses_included p =
        do html_br conf; html_br conf; return
        Wserver.wprint "%s\n"
          (capitale
-            (transl_decline2 conf "%1 of %2" (transl conf "parents") "..."))
+            (transl_decline2 conf "%1 of %2"
+               (nominative (transl conf "parents")) "..."))
      else ();  
      mark.(Adef.int_of_iper p.cle_index) := Num.one;
      tag "ul" begin
@@ -1349,7 +1352,7 @@ value print_missing_type conf =
   | A_wife_of ->
       Wserver.wprint "%s" (transl_nth conf "husband/wife" 1)
   | A_parents_of ->
-      Wserver.wprint "%s" (transl conf "parents") ]
+      Wserver.wprint "%s" (nominative (transl conf "parents")) ]
 ;
 
 value print_spouses conf base p u =
@@ -1516,7 +1519,8 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
           do html_br conf; html_br conf; return
           Wserver.wprint "%s\n"
             (capitale
-               (transl_decline2 conf "%1 of %2" (transl conf "parents") "..."))
+               (transl_decline2 conf "%1 of %2"
+                   (nominative (transl conf "parents")) "..."))
         else ();  
         tag "ul" begin
           let _ = List.fold_left

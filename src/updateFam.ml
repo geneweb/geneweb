@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.17 2000-11-25 18:53:34 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.18 2000-12-19 15:42:11 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -289,7 +289,7 @@ value print_witnesses conf base fam =
 value print_marriage conf base fam =
   do tag "h4" begin
        Wserver.wprint "%s"
-         (capitale (transl_nth conf "marriage/marriages" 0));
+         (capitale (nominative (transl_nth conf "marriage/marriages" 0)));
      end;
      Wserver.wprint "\n";
      Wserver.wprint "<input type=radio name=mrel value=marr%s>"

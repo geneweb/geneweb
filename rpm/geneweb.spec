@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.19 2000-12-14 14:37:07 ddr Exp $
+# $Id: geneweb.spec,v 3.20 2000-12-19 15:42:09 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -101,7 +101,8 @@ rm -rf $RPM_BUILD_ROOT
 # then it automatically unpacks all the files and symlinks from the archive.
 # Finally it runs the %post script, in which I start the service.
 %pre
-/usr/sbin/useradd -d /home/geneweb -c "GeneWeb database" geneweb || :
+/usr/sbin/groupadd geneweb || :
+/usr/sbin/useradd -d /home/geneweb -g geneweb -c "GeneWeb database" geneweb || :
 chmod a+rx /home/geneweb
 
 %post

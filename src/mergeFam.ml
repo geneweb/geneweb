@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 3.4 2000-06-03 21:08:03 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 3.5 2000-12-19 15:42:10 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -81,13 +81,15 @@ value print_differences conf base branches fam1 fam2 =
          [ Married -> transl conf "married"
          | NotMarried -> transl conf "not married"
          | Engaged -> transl conf "engaged" ]);
-    string_field (transl_nth conf "marriage/marriages" 0) "marriage"
+    string_field (nominative (transl_nth conf "marriage/marriages" 0))
+      "marriage"
       (fun fam ->
          match Adef.od_of_codate fam.marriage with
          [ None -> ""
          | Some d -> Date.string_of_ondate conf d ]);
     string_field
-      (transl_nth conf "marriage/marriages" 0 ^ " / " ^ transl conf "place")
+      (nominative (transl_nth conf "marriage/marriages" 0) ^ " / " ^
+       transl conf "place")
       "marriage_place" (fun fam -> sou base fam.marriage_place);
     string_field (transl conf "divorce") "divorce"
       (fun fam ->

@@ -1,6 +1,11 @@
 GeneWeb version 3.11
 --------------------
 
+* GeneWeb server or CGI (gwd)
+  - [19 Dec 00] In update page, changed "add family" into "add marriage"
+    because of the frequent error that people think it is "add child in
+    a family".
+
 GeneWeb version 3.10
 --------------------
 
@@ -9,7 +14,7 @@ GeneWeb version 3.10
     "notes". You can define customized variables in the configuration
     file (base.gwf): their values will be replaced in the "sources" and
     in the "notes". The syntax in configuration file is "var_ident=value"
-    and in the sources and notes: "%ident;".
+    and in the sources and notes: "%vident;".
   - [03 Dec 00] Fixed bug in Hebrew calendar computation (example: Hebrew
     day was good for Gregorian date 2001-11-30 but incorrect for the following
     day 2001-12-01).
