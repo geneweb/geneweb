@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 1.5 1998-12-05 11:59:08 ddr Exp $ *)
+(* $Id: consang.ml,v 1.6 1998-12-06 10:28:32 ddr Exp $ *)
 
 (* Algorithm relationship and links from Didier Remy *)
 
@@ -30,11 +30,12 @@ value new_mark () = do incr mark; return mark.val;
 
 exception TopologicalSortError;
 
-(* Return tab such as: tab.(i) > tab.(j) => j is not an ancestor of i *)
+(* Return tab such as: i is an ancestor of j => tab.(i) > tab.(j) *)
 
 value topological_sort base =
   let tab = Array.create base.persons.len 0 in
   let todo = ref [] in
+  let tval = ref 0 in
   let cnt = ref 0 in
   do for i = 0 to base.persons.len - 1 do
        let a = base.ascends.get i in
@@ -51,28 +52,43 @@ value topological_sort base =
      for i = 0 to base.persons.len - 1 do
        if tab.(i) == 0 then todo.val := [i :: todo.val] else ();
      done;
-     loop todo.val where rec loop =
-       fun
-       [ [i :: il] ->
-           let a = base.ascends.get i in
-           do todo.val := il;
-              tab.(i) := cnt.val;
-              incr cnt;
-              match a.parents with
-              [ Some ifam ->
-                  let cpl = coi base ifam in
-                  let ifath = Adef.int_of_iper cpl.father in
-                  let imoth = Adef.int_of_iper cpl.mother in
-                  do tab.(ifath) := tab.(ifath) - 1;
-                     tab.(imoth) := tab.(imoth) - 1;
-                     if tab.(ifath) == 0 then todo.val := [ifath :: todo.val]
-                     else ();
-                     if tab.(imoth) == 0 then todo.val := [imoth :: todo.val]
-                     else ();
-                  return ()
-              | _ -> () ];           
-           return loop todo.val
-       | [] -> () ];
+     loop todo.val where rec loop list =
+       if list = [] then ()
+       else
+         let new_list =
+           List.fold_left
+             (fun new_list i ->
+                let a = base.ascends.get i in
+                do tab.(i) := tval.val;
+                   incr cnt;
+(*
+                   incr tval;
+*)
+                return
+                match a.parents with
+                [ Some ifam ->
+                    let cpl = coi base ifam in
+                    let ifath = Adef.int_of_iper cpl.father in
+                    let imoth = Adef.int_of_iper cpl.mother in
+                    do tab.(ifath) := tab.(ifath) - 1;
+                       tab.(imoth) := tab.(imoth) - 1;
+                    return
+                    let new_list =
+                      if tab.(ifath) == 0 then [ifath :: new_list]
+                      else new_list
+                    in
+                    let new_list =
+                      if tab.(imoth) == 0 then [imoth :: new_list]
+                      else new_list
+                    in
+                    new_list
+                | _ -> new_list ])
+             [] list
+         in
+(**)
+         do incr tval; return
+(**)
+         loop new_list;
      if cnt.val <> base.persons.len then raise TopologicalSortError
      else ();
   return tab
@@ -103,9 +119,11 @@ value consang_of p =
   if p.consang == no_consang then 0.0 else Adef.float_of_fix p.consang
 ;
 
-value leq = ref (fun []);
-module Pq =
-  Pqueue.Make (struct type t = int; value leq x y = leq.val x y; end)
+(* tsort_leq: a version returning just "tstab.(x) <= tstab.(y)" is ok
+   but it seems that our Pqueue algorithm is faster when there are no
+   equal values *)
+value tsort_leq tstab x y =
+  if tstab.(x) = tstab.(y) then x >= y else tstab.(x) < tstab.(y)
 ;
 
 value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
@@ -118,7 +136,9 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
         {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = [];
          lens2 = []; mark = mark; elim_ancestors = False}
     in
-    do leq.val := fun x y -> id.(x) < id.(y); return
+    let module Pq =
+      Pqueue.Make (struct type t = int; value leq = tsort_leq id; end)
+    in
     let q = ref Pq.empty in
     let inserted = new_mark () in
     let add u = do reset u inserted; q.val := Pq.add u q.val; return () in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.4 1998-12-05 13:29:50 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.5 1998-12-06 10:28:33 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -100,11 +100,6 @@ value infinity = 1000;
 
 value threshold = ref 15;
 
-value leq = ref (fun []);
-module Pq =
-  Pqueue.Make (struct type t = int; value leq x y = leq.val x y; end)
-;
-
 value phony_dist_tab = (fun _ -> 0, fun _ -> infinity);
 
 value make_dist_tab conf base ia maxlev =
@@ -113,10 +108,16 @@ value make_dist_tab conf base ia maxlev =
   else
     let _ = base.ascends.array () in
     let _ = base.couples.array () in
-    let id = Util.create_topological_sort conf base in
+    let tstab = Util.create_topological_sort conf base in
+    let module Pq =
+      Pqueue.Make
+        (struct
+           type t = int;
+           value leq x y = not (Consang.tsort_leq tstab x y);
+         end)
+    in
     let default = {dmin = infinity; dmax = 0; mark = False} in
     let dist = Array.create base.persons.len default in
-    do leq.val := fun x y -> id.(x) > id.(y); return
     let q = ref Pq.empty in
     let add_children ip =
       let p = poi base ip in
