@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.31 2000-06-21 23:28:55 ddr Exp $ *)
+(* $Id: perso.ml,v 3.32 2000-07-11 09:46:41 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -87,7 +87,7 @@ value
      in
      let tit = sou base title in
      let s =
-       (if first && cap then capitale tit else tit) ^ " " ^
+       ((*if first && cap then capitale tit else*) tit) ^ " " ^
        sou base (List.hd places)
      in
      wprint_geneweb_link conf href s;
