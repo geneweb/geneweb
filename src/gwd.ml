@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.23 1999-08-08 10:27:37 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.24 1999-08-08 11:25:26 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -23,6 +23,7 @@ ifdef UNIX then
 value max_clients = ref None;
 value robot_xcl = ref None;
 value auth_file = ref "";
+value daemon = ref False;
 
 value log_oc () =
   if log_file.val <> "" then open_out_gen log_flags 0o644 log_file.val
@@ -247,7 +248,7 @@ value print_renamed conf new_n =
        conf.bname new_n;
      Wserver.wprint "Please use now:\n";
      Util.html_br conf;
-     Wserver.wprint "The base de données \"%s\" est renommée \"%s\".\n"
+     Wserver.wprint "La base de données \"%s\" est renommée \"%s\".\n"
        conf.bname new_n;
      Wserver.wprint "Utiliser maintenant:\n";
      Util.html_p conf;
@@ -791,6 +792,15 @@ value connection cgi (addr, request) str =
 
 value tmout = 120;
 
+value null_reopen flags fd =
+ifdef UNIX then
+  let fd2 = Unix.openfile "/dev/null" flags 0 in
+  do Unix.dup2 fd2 fd;
+     Unix.close fd2;
+  return ()
+else ()
+;
+
 value geneweb_server () =
   let hostn = try Unix.gethostname () with _ -> "computer" in
   let auto_call =
@@ -799,17 +809,27 @@ value geneweb_server () =
   do if not auto_call then
        do Printf.eprintf "GeneWeb %s - " Version.txt;
           Printf.eprintf "Copyright (c) INRIA 1999\n";
-          Printf.eprintf "Possible addresses:";
-          Printf.eprintf "
+          if not daemon.val then
+            do Printf.eprintf "Possible addresses:";
+               Printf.eprintf "
    http://localhost:%d/base
    http://127.0.0.1:%d/base
    http://%s:%d/base"
             selected_port.val selected_port.val hostn selected_port.val;
-          Printf.eprintf "
+               Printf.eprintf "
 where \"base\" is the name of the data base
 Type control C to stop the service
 ";
+            return ()
+          else ();
           flush stderr;
+          if daemon.val then
+            if Unix.fork () = 0 then ()
+            else exit 0
+          else ();
+          Unix.close Unix.stdin;
+          null_reopen [Unix.O_WRONLY] Unix.stdout;
+          null_reopen [Unix.O_WRONLY] Unix.stderr;
           try
             do Unix.mkdir (Filename.concat Util.base_dir.val "cnt") 0o755;
                if uid.val <> None then
@@ -968,7 +988,10 @@ value main () =
        Set user id, for example to use port < 1024 as simple user.");
         ("-setgid", Arg.Int (fun x -> gid.val := Some x),
          "<num>
-       Set group id.")]
+       Set group id.");
+        ("-daemon", Arg.Set daemon,
+         "
+       Unix daemon mode.")]
      else []]
   in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
