@@ -9,6 +9,7 @@ GeneWeb Version 2.01
     names, cleanuped some code.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Apr 6, 99] Big cleanup about titles (hopefully not introducing bugs).
   - [Apr 3, 99] Dont print "died" in personal page if this is the only
     information (no date, no place) and if it is older than 120 years.
   - [Mar 22, 99] Ability to put "*" (to match any characters) in lines in
