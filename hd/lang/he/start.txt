@@ -52,7 +52,7 @@
 </SELECT>
 לפי
 <SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED>סדר א-ב
+   <OPTION VALUE="A" SELECTED>סדר אלף-בת
    <OPTION VALUE="F">סדר הופעתם
 </SELECT> =&gt;
 <INPUT TYPE=submit value="בסדר">
