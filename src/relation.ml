@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.49 2000-06-27 11:14:18 ddr Exp $ *)
+(* $Id: relation.ml,v 3.50 2000-08-07 14:32:15 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -662,7 +662,7 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
            (half_brother_label conf p1.sex, sp1, sp2)
          else if x1 == 1 && (sp1 || sp2) && p1.sex <> Neuter then
            (brother_in_law_label conf ini_p1.sex, False, False)
-         else (nominative (brother_label conf x2 p1.sex), sp1, sp2)
+         else (brother_label conf x2 p1.sex, sp1, sp2)
        else if x1 == 1 then
          let side =
            if x2 <= 3 then uncle_relation_side base p1 p2 x2 else Neuter
