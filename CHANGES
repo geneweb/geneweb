@@ -22,6 +22,10 @@ GeneWeb version 3.08
     printed by gwu as 1300..1350J but gwc expected 1300J..1350 and resulted
     in a syntax error.   
 
+* GeneWeb to Gedcom (gwb2ged) and GeneWeb uncompiler (gwu)
+  - [29 Aug 00] Now, when option "-d" (descendants of) is applied, the
+    spouses' parents are included, except if the option "-nsp" is given.
+
 * GeneWeb data bases Transfer Program (gwtp)
   - [22 Aug 00] Fixed bug: worked only if the CGI name was gwtp (could not
     be gwtp.cgi, for example). Fixed also the distribution: template files
