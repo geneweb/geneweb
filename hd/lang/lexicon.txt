@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.133 2000-07-07 19:43:33 ddr Exp $
+# $Id: lexicon.txt,v 3.134 2000-07-08 03:17:08 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -324,6 +324,7 @@ se: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prair
     (hebrew month)
 dk: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 en: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
+eo: tisxrio/hesxvano/kislevo/teveto/sxevato/adaro 1/adaro 2/nisano/ijaro/sivano/tamuzo/avo/elulo
 fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 he: úùøé/ çùåï/ ëñìå/ èáú/ ùáè/ àãø à'/ àãø á'/ ğéñï/ àééø/ ñéåï/ úîåæ/ àá/ àìåì
 se: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
@@ -535,6 +536,7 @@ cs: A/N
 de: J/N
 dk: J/N
 en: Y/N
+eo: Y/N
 es: S/N
 fi: K/E
 fr: O/N
@@ -612,6 +614,7 @@ af: 'n swaer/'n skoonsuster
 de: ein Schwager/eine Schw&agrave;gerin
 dk: en svoger/en svigerinde
 en: a brother-in-law/a sister-in-law
+eo: bofrato/bofratino
 es: un cu&ntilde;ado/una cu&ntilde;ada
 fi: lanko/k&auml;ly
 fr: un beau-fr&egrave;re/une belle-soeur
@@ -830,6 +833,7 @@ af: 'n neef van die eggenoot/'n niggie van die eggenoot
 de: ein Neffe (des Ehegatten)/eine Nichte (des Ehegatten)
 dk: en nev&oslash; (&aelig;gtef&aelig;lles nev&oslash;)/en niece (&aelig;gtef&aelig;lles niece)
 en: a nephew (spouse's nephew)/a niece (spouse's niece)
+eo: nevo (nevo de edz(in)o)/nevino (nevino de edz(in)o)
 es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
 fi: veljen tai sisaren poika (puolison veljen tai sisaren poika)/veljen tai sisaren tyt&auml;r (puolison veljen tai sisaren tyt&auml;r)
 fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
@@ -868,6 +872,7 @@ af: 'n skoonseun/'n skoondogter
 de: ein Schwiegersohn/eine Schwiegertochter
 dk: en svigers&oslash;n/en svigerdatter
 en: a son-in-law/a daughter-in-law
+eo: bofilo/bofilino
 es: un yerno/una nuera
 fi: v&auml;vy/mini&auml;
 fr: un beau-fils/une belle-fille
@@ -1246,6 +1251,7 @@ af: 'n oom (tante se man)/'n tante (oom se vrou)
 de: ein Onkel (Ehemann der Tante)/eine Tante (Ehefrau des Onkels)
 dk: en onkel (tantes mand)/en tante (onkels hustru)
 en: an uncle (aunt's husband)/an aunt (uncle's wife)
+eo: onklo (edzo de onklino)/onklino (edzino de onklo)
 es: un t&iacute;o pol&iacute;tico/una t&iacute;a pol&iacute;tica
 fi: set&auml;:g:--d&auml;n/t&auml;ti:g:--din
 fr: un oncle (&eacute;poux d'une tante)/une tante (&eacute;pouse d'un oncle)
@@ -1446,6 +1452,7 @@ af: terug
 de: zur&uuml;ck
 dk: tilbage
 en: back
+eo: returniro
 es: regreso
 fi: takaisin
 fr: retour
@@ -1465,6 +1472,7 @@ cs: køest
 de: Taufe
 dk: d&aring;b
 en: baptism
+eo: bapto
 es: bautismo
 fi: kaste
 fr: bapt&ecirc;me
@@ -1664,7 +1672,7 @@ cs: pohøeb
 de: Beisetzung
 dk: begravelse
 en: burial
-eo: emtombigo
+eo: entombigo
 es: entierro
 fi: hautaus
 fr: enterrement
@@ -1684,6 +1692,7 @@ cs: pohøben/pohøbena
 de: beigesetzt
 dk: begravet
 en: buried
+eo: entombigita
 es: enterrado/enterrada/enterrado(a)
 fi: haudattu
 fr: enterr&eacute;/enterr&eacute;e/enterr&eacute;(e)
@@ -1777,6 +1786,7 @@ cs: databáze je nepøístupná
 de: Datenbank nicht erreichbar
 dk: kan ikke n&aring; databasen
 en: cannot access base
+eo: ne povas alireji bazo
 es: acceso a la base imposible
 fi: tietokantaan ei p&auml;&auml;se
 fr: impossible d'acc&eacute;der &agrave; la base
@@ -1816,7 +1826,7 @@ cs: zmìnit jména dìtí
 de: Namen der Kinder &auml;ndern
 dk: &aelig;ndre b&oslash;rns navne
 en: change children's names
-eo: sxangxi nomojn de la infanon
+eo: sxangxi nomojn de la infanoj
 es: cambiar los nombres de los hijos
 fi: muuta lasten nimi&auml;
 fr: changer noms des enfants
@@ -1836,6 +1846,7 @@ cs: zmìnit poøadí dìtí
 de: Reihenfolge der Kinder gewechselt
 dk: &aelig;ndret r&aelig;kkef&oslash;lge for b&oslash;rn
 en: changed order of children
+eo: sxangxo de la nomojn de la infanon
 es: cambio del orden de los hijos
 fi: lasten j&auml;rjestyst&auml on muutettu
 fr: changement de l'ordre des enfants
@@ -1876,6 +1887,7 @@ cs: jména dìtí zmìnìna
 de: Namen der Kinder ge&auml;ndert
 dk: b&oslash;rns navne &aelig;ndret
 en: children's names changed
+eo: nomoj de la infanoj sxangxita
 es: nombres de los hijos cambiados
 fi: lasten nimi&auml on muutettu
 fr: noms des enfants chang&eacute;s
@@ -1915,7 +1927,7 @@ cs: komentáø
 de: Kommentar
 dk: kommentar
 en: comment
-eo: komento
+eo: komento:a:+n
 es: comentario
 fi: huomautus
 fr: commentaire
@@ -1934,6 +1946,7 @@ af: kommentaar bygevoeg
 de: Kommentar hinzugef&uuml;gt
 dk: kommentar tilf&oslash;jet
 en: comment added
+eo: komento aldonita
 fi: huomautus lis&auml;tty
 fr: commentaire ajout&eacute;
 he:   äòøä äåëğñä
@@ -2050,6 +2063,7 @@ cs: spálen/spálena
 de: einge&auml;schert
 dk: kremeret
 en: cremated
+eo: incinerata
 es: incinerado/incinerada/incinerado(a)
 fi: polttohaudattu
 fr: incin&eacute;r&eacute;/incin&eacute;r&eacute;e/incin&eacute;r&eacute;(e)
@@ -2327,7 +2341,7 @@ se: slutar
 de: verlobt
 dk: forlovet
 en: engaged
-eo: fiancxoj
+eo: fiancxaj
 fi: kihloissa
 fr: fianc&eacute;s
 nl: verloofd
@@ -2338,6 +2352,7 @@ se: f&ouml;rlovad
 de: verlobt%t mit
 dk: forlovet%t med
 en: engaged%t to
+eo: fiancxa%t kun
 fi: kihlattu%t
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
 nl: verloofd%t met
@@ -3125,6 +3140,7 @@ cs: nekompatibilní pohlaví
 de: unvertr&auml;gliche Geschlechter
 dk: k&oslash;n inkompatible
 en: incompatible sexes
+eo: seksoj neakordigeblaj
 es: sexos incompatibles
 fi: sukupuolet eivät t&auml;sm&auml;&auml
 fr: sexes incompatibles
@@ -3343,6 +3359,7 @@ af: juliaanse dag
 de: Julianisch
 dk: juliansk dag
 en: Julian day
+eo: tago juliana
 es: dia julian
 fi: juliaaninen p&auml;iv&auml;
 fr: jour julien
@@ -3744,6 +3761,7 @@ af: meer as %d antwoorde
 de: mehr als %d Antworten
 dk: mere end %d svar
 en: more than %d answers
+eo: pli ke %d respondoj
 es: m&aacute;s de %d respuestas
 he:  éåúø î-%d úùåáåú
 fi: yli %d vastausta
@@ -3941,6 +3959,7 @@ af: geen passing
 de: keine passenden Eintr&auml;ge
 dk: intet resultat af s&oslash;gningen
 en: no match
+eo: nenia respondo
 es: ninguna respuesta
 fi: ei l&ouml;ytynyt
 fr: aucune r&eacute;ponse
@@ -4314,6 +4333,7 @@ cs: ze strany :g:%s
 de: von %ss Seite
 dk: fra %s's side
 en: on %s's side
+eo: de la flanko de %s
 es: por parte de %s
 fi: henkil&ouml;n %s puolelta
 fr: du c&ocirc;t&eacute; de %s
@@ -4433,6 +4453,7 @@ af: opsioneel
 de: optional
 dk: efter behag
 en: optional
+eo: nedeviga
 fi: valittavissa
 fr: facultatif
 he:  òì ôé áçéøä
@@ -4471,6 +4492,7 @@ cs: nebo pou¾ij "svázat" namísto "vytvoøit"
 de: oder benutzen Sie "verbinden" an Stelle von "erzeugen"
 dk: eller anvend "forbind" i stedet for "opret"
 en: or use "link" instead of "create"
+eo: aux uzu "bindi" anstataux "krei"
 es: o utilise "reunir" en lugar de "crear"
 he:  àå ìäùúîù á-"÷ùø" áî÷åí "òùä"
 is: eğa notağu "tengja" í stağ "búa til"
@@ -5029,6 +5051,7 @@ cs: více odpovìdí
 de: mehrere Antworten
 dk: flere svar
 en: several answers
+eo: pluraj respondoj
 es: varias respuestas
 fi: useita vastauksia
 fr: plusieurs r&eacute;ponses
@@ -5384,6 +5407,7 @@ cs: prohodit
 de: umkehren
 dk: omvend r&aelig;kkef&oslash;lge
 en: switch
+eo: intersxangxi
 es: invertir
 fi: vaihda
 fr: intervertir
@@ -5403,6 +5427,7 @@ cs: prohození dokonèeno
 de: umgekehrt
 dk: r&aelig;kkef&oslash;lge omvendt
 en: switch done
+eo: intersxangxo farita
 es: inversi&oacute;n realizada
 he:  ääçìôä áåöòä
 is: breyting gerğ
@@ -5422,6 +5447,7 @@ cs: prohodit poøadí následujících rodin
 de: die Reihenfolge der folgenden Familien umkehren
 dk: omvend r&aelig;kkef&oslash;lgen for de f&oslash;lgende familier
 en: switch the order of the following families
+eo: intersxangxi la ordon de la familiaj sekvantaj
 es: invertir el orden de las familias siguientes
 fi: vaihda seuraavien perheiden j&auml;rjestyst&auml
 fr: intervertir l'ordre des familles suivantes
@@ -5654,6 +5680,7 @@ af: die skoonpa/die skoonma
 de: der Schwiegervater/die Schwiegermutter
 dk: svigerfaderen/svigermoderen
 en: the father-in-law/the mother-in-law
+eo: bopatro/bopatrino
 es: el suegro/la suegra
 fi: appi/anoppi
 fr: le beau-p&egrave;re/la belle-m&egrave;re

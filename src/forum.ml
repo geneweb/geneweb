@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.6 2000-06-21 21:13:05 ddr Exp $ *)
+(* $Id: forum.ml,v 3.7 2000-07-08 03:17:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -113,7 +113,8 @@ value print_add conf base =
          print_var conf "Email" True "";
        end;
        html_p conf;
-       Wserver.wprint "%s<br>\n" (capitale (transl conf "comment"));
+       Wserver.wprint "%s<br>\n"
+         (capitale (Gutil.nominative (transl conf "comment")));
        stag "textarea" "name=Text rows=15 cols=70 wrap=virtual" begin end;
        Wserver.wprint "\n";
        Wserver.wprint "<input type=submit value=Ok>\n";
