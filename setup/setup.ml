@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.4 2001-04-22 17:50:33 ddr Exp $ *)
+(* $Id: setup.ml,v 4.5 2001-05-17 17:39:15 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -104,7 +104,7 @@ value header_no_page_title title =
     title True;
     Wserver.wprint "</title>\n";
     Wserver.wprint "</head>\n";
-    Wserver.wprint "<body>\n";
+    Wserver.wprint "<body>\n"
   }
 ;
 
@@ -122,7 +122,7 @@ value trailer conf =
 <hr><font size=-1><em>(c) Copyright 2001 INRIA -
 GeneWeb %s</em></font>" Version.txt;
     Wserver.wprint "<br>";
-    Wserver.wprint "</body>\n";
+    Wserver.wprint "</body>\n"
   }
 ;
 
@@ -131,7 +131,7 @@ value header title =
     header_no_page_title title;
     Wserver.wprint "<h1>";
     title False;
-    Wserver.wprint "</h1>\n";
+    Wserver.wprint "</h1>\n"
   }
 ;
 
@@ -305,7 +305,7 @@ value rec copy_from_stream conf print strm =
                   (fun (k, s) ->
                      if k = "opt" then ()
                      else do { print ";"; print k; print "="; print s; () })
-                  conf.env;
+                  conf.env
               }
           | 'f' ->
               print (slashify (Filename.concat (Sys.getcwd ()) setup_dir.val))
@@ -326,7 +326,7 @@ value rec copy_from_stream conf print strm =
                        print "\">\n";
                        ()
                      })
-                  conf.env;
+                  conf.env
               }
           | 'i' -> print (strip_spaces (s_getenv conf.env "i"))
           | 'k' -> for_all conf print (fst (List.split conf.env)) strm
@@ -362,7 +362,7 @@ value rec copy_from_stream conf print strm =
                         print "\"";
                         print s;
                         print "\"";
-                        if v = s then print " selected" else ();
+                        if v = s then print " selected" else ()
                       }
                   | [: `'[' :] ->
                       let s = parse_upto ']' strm in
@@ -370,11 +370,11 @@ value rec copy_from_stream conf print strm =
                         print "\"";
                         print s;
                         print "\"";
-                        if v = s then print " checked" else ();
+                        if v = s then print " checked" else ()
                       }
                   | [: :] -> print (strip_spaces v) ]
               | None -> print "BAD MACRO" ]
-          | c -> do { print "BAD MACRO "; print (String.make 1 c); } ]
+          | c -> do { print "BAD MACRO "; print (String.make 1 c) } ]
       | c -> print (String.make 1 c) ]
     }
   with
@@ -388,7 +388,7 @@ and print_specific_file conf print fname strm =
         if in_channel_length ic = 0 then
           copy_from_stream conf print (Stream.of_string s)
         else copy_from_stream conf print (Stream.of_channel ic);
-        close_in ic;
+        close_in ic
       }
       else copy_from_stream conf print (Stream.of_string s)
   | _ -> () ]
@@ -412,12 +412,12 @@ and for_all conf print list strm =
              let conf = conf_with_env conf "anon" db in
              do {
                copy_from_stream conf print (Stream.of_string s_exist);
-               if eol then print "\n" else ();
+               if eol then print "\n" else ()
              })
           list
       else do {
         copy_from_stream conf print (Stream.of_string s_empty);
-        if eol then print "\n" else ();
+        if eol then print "\n" else ()
       }
   | _ -> () ]
 ;
@@ -432,7 +432,7 @@ value print_file conf fname =
         copy_from_stream conf (fun x -> Wserver.wprint "%s" x)
           (Stream.of_channel ic);
         close_in ic;
-        trailer conf;
+        trailer conf
       }
   | _ ->
       let title _ = Wserver.wprint "Error" in
@@ -450,7 +450,7 @@ value error conf str =
   do {
     header (fun _ -> Wserver.wprint "Incorrect request");
     Wserver.wprint "<em>%s</em>\n" (String.capitalize str);
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -554,7 +554,7 @@ value ged2gwb_check conf =
   gwc_or_ged2gwb out_name_of_ged conf
 ;
 
-ifdef WIN95 then
+(*ifdef WIN95 then*)
 value infer_rc conf rc =
   if rc > 0 then rc
   else
@@ -796,7 +796,7 @@ value recover_2 conf =
   in
   do {
     if rc > 1 then do { Sys.chdir dir; print_file conf "err_reco.htm" }
-    else print_file conf "bso_ok.htm";
+    else print_file conf "bso_ok.htm"
   }
 ;
 
@@ -818,7 +818,7 @@ value rm_base dir =
         Unix.closedir dh;
         List.iter (fun file -> Unix.unlink (Filename.concat dir file))
           list.val;
-        try Unix.rmdir dir with [ Unix.Unix_error _ _ _ -> () ];
+        try Unix.rmdir dir with [ Unix.Unix_error _ _ _ -> () ]
       }
   | _ -> () ]
 ;
@@ -854,7 +854,7 @@ value cleanup_1 conf =
     ifdef UNIX then Printf.eprintf "$ rm -rf old/%s\n" in_base_dir
     else do {
       Printf.eprintf "$ del old\\%s\\*.*\n" in_base_dir;
-      Printf.eprintf "$ rmdir old\\%s\n" in_base_dir;
+      Printf.eprintf "$ rmdir old\\%s\n" in_base_dir
     };
     flush stderr;
     rm_base (Filename.concat "old" in_base_dir);
@@ -875,7 +875,7 @@ value cleanup_1 conf =
     if rc > 1 then
       let conf = {(conf) with comm = "gwc"} in
       print_file conf "bsi_err.htm"
-    else print_file conf "clean_ok.htm";
+    else print_file conf "clean_ok.htm"
   }
 ;  
 
@@ -921,7 +921,7 @@ value rename conf =
         (fun (k, v) ->
            if k <> v then Sys.rename ("_" ^ k ^ ".gwb") (v ^ ".gwb") else ())
         rename_list;
-      print_file conf "ren_ok.htm";
+      print_file conf "ren_ok.htm"
     }
   with
   [ Exit -> () ]
@@ -933,7 +933,7 @@ value delete_1 conf =
   do {
     List.iter (fun (k, v) -> if v = "del" then rm_base (k ^ ".gwb") else ())
       conf.env;
-    print_file conf "del_ok.htm";
+    print_file conf "del_ok.htm"
   }
 ;
 
@@ -1137,11 +1137,11 @@ value gwf_1 conf =
         let oc = open_out trl_file in
         output_string oc trl;
         output_string oc "\n";
-        close_out oc;
+        close_out oc
       }
     with
     [ Sys_error _ -> () ];
-    print_file conf "gwf_ok.htm";
+    print_file conf "gwf_ok.htm"
   }
 ;
 
@@ -1191,11 +1191,11 @@ value gwd_1 conf =
     ifdef UNIX then do {
       print_param "max_clients";
       print_param "setuid";
-      print_param "setgid";
+      print_param "setgid"
     }
     else ();
     close_out oc;
-    print_file conf "gwd_ok.htm";
+    print_file conf "gwd_ok.htm"
   }
 ;
 
@@ -1328,7 +1328,7 @@ value wrap_setup a b c =
          and we cannot parse the arg list again, because of possible spaces
          in arguments which may appear as separators *)
       try default_lang.val := Sys.getenv "GWLANG" with [ Not_found -> () ];
-      try setup_dir.val := Sys.getenv "GWGD" with [ Not_found -> () ];
+      try setup_dir.val := Sys.getenv "GWGD" with [ Not_found -> () ]
     }
     else ();
     try setup a b c with [ Exit -> () ]
@@ -1344,7 +1344,7 @@ value copy_text lang fname =
       do {
         copy_from_stream conf print_string (Stream.of_channel ic);
         flush stdout;
-        close_in ic;
+        close_in ic
       }
   | _ ->
       do {
@@ -1352,7 +1352,7 @@ value copy_text lang fname =
         Printf.printf "Type \"Enter\" to exit\n? ";
         flush stdout;
         let _ = input_line stdin in ();
-        exit 2;
+        exit 2
       } ]
 ;
 
@@ -1374,7 +1374,7 @@ value set_gwd_default_language_if_absent lang =
           env;
         if not lang_found.val then Printf.fprintf oc "-lang\n%s\n" lang
         else ();
-        close_out oc;
+        close_out oc
       }
   | None -> () ]
 ;
@@ -1401,7 +1401,7 @@ value null_reopen flags fd =
   ifdef UNIX then do {
     let fd2 = Unix.openfile "/dev/null" flags 0 in
     Unix.dup2 fd2 fd;
-    Unix.close fd2;
+    Unix.close fd2
   }
   else ()
 ;
@@ -1435,7 +1435,7 @@ value intro () =
           flush stdout;
           if Unix.fork () = 0 then do {
             Unix.close Unix.stdin;
-            null_reopen [Unix.O_WRONLY] Unix.stdout;
+            null_reopen [Unix.O_WRONLY] Unix.stdout
           }
           else exit 0;
           (default_gwd_lang, default_setup_lang)
@@ -1459,11 +1459,11 @@ value intro () =
     set_gwd_default_language_if_absent gwd_lang;
     default_lang.val := setup_lang;
     ifdef WIN95 then do {
-      Unix.putenv "GWLANG" setup_lang; Unix.putenv "GWGD" setup_dir.val;
+      Unix.putenv "GWLANG" setup_lang; Unix.putenv "GWGD" setup_dir.val
     }
     else ();
     Printf.printf "\n";
-    flush stdout;
+    flush stdout
   }
 ;
 
@@ -1475,7 +1475,7 @@ value main () =
       if len > 2 && Sys.argv.(len - 2) = "-wserver" then () else intro ()
     else
       try let _ = Sys.getenv "WSERVER" in () with [ Not_found -> intro () ];
-    Wserver.f None port.val 0 None wrap_setup;
+    Wserver.f None port.val 0 None wrap_setup
   }
 ;
 
