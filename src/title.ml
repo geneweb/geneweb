@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: title.ml,v 1.2 1998-09-30 07:29:25 ddr Exp $ *)
+(* $Id: title.ml,v 1.3 1998-11-11 13:50:14 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -185,10 +185,10 @@ value select_place base place =
   return (list.val, clean_name.val)
 ;
 
-value select_all_titles base =
+value select_all_titles conf base =
   let list = ref [] in
   let add_title t =
-    let tn = capitale (sou base t.t_title) in
+    let tn = capitale (coa conf (sou base t.t_title)) in
     if not (List.mem tn list.val) then list.val := [tn :: list.val] else ()
   in
   do for i = 0 to base.persons.len - 1 do
@@ -197,11 +197,12 @@ value select_all_titles base =
   return list.val
 ;
 
-value select_all_places base =
+value select_all_places conf base =
   let list = ref [] in
   let add_place t =
-    if not (List.mem (sou base t.t_place) list.val) then
-      list.val := [sou base t.t_place :: list.val]
+    let pl = coa conf (sou base t.t_place) in
+    if not (List.mem pl list.val) then
+      list.val := [pl :: list.val]
     else ()
   in
   do for i = 0 to base.persons.len - 1 do
@@ -273,7 +274,7 @@ value give_access_title conf t p =
 value give_access_all_titles conf t =
   do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s\">" (commd conf)
        (code_varenv t);
-     Wserver.wprint "%s" (capitale (coa conf t));
+     Wserver.wprint "%s" (capitale t);
      Wserver.wprint "</a>\n";
   return ()
 ;
@@ -281,7 +282,7 @@ value give_access_all_titles conf t =
 value give_access_all_places conf t =
   do Wserver.wprint "<a href=\"%sm=TT;sm=S;p=%s\">" (commd conf)
        (code_varenv t);
-     Wserver.wprint "... %s" (coa conf t);
+     Wserver.wprint "... %s" t;
      Wserver.wprint "</a>\n";
   return ()
 ;
@@ -359,7 +360,9 @@ value print_all_titles conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "all the titles"))
   in
-  let list = let l = select_all_titles base in Sort.list compare_titles l in
+  let list =
+    let l = select_all_titles conf base in Sort.list compare_titles l
+  in
   do header conf title;
      Wserver.wprint "<ul>\n";
      List.iter
@@ -375,7 +378,9 @@ value print_all_places conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "all the places"))
   in
-  let list = let l = select_all_places base in Sort.list compare_places l in
+  let list =
+    let l = select_all_places conf base in Sort.list compare_places l
+  in
   do header conf title;
      Wserver.wprint "<ul>\n";
      List.iter
