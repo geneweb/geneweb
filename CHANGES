@@ -31,7 +31,8 @@ GeneWeb version 3.05
     containing several (at least two) indications between parentheses.
 
 * Gedcom to GeneWeb (ged2gwb) and GeneWeb to Gedcom (gwb2ged)
-  - [25 May 00] Now save and restore the marriage witnesses.
+  - [25 May 00] Now save and restore the marriage witnesses (that was
+    missing).
 
 * Base configuration files (base.gwf)
   - [25 May 00] Added variable "images_path" to specify a path to access
