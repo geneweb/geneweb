@@ -59,7 +59,7 @@ personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-Om deze databank te consulteren, kan u een opzoeking doen:<br><br>
+Om deze databank te consulteren, kan u een opzoeking doen:<br><p>
 
 <ul>
 
@@ -89,12 +89,12 @@ Om deze databank te consulteren, kan u een opzoeking doen:<br><br>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>op titel</b></font><br>
-<input name=t size=14 maxlength=200><br>
-(vb: koning, hertog...)
+<font color=#2f6400><b>op titel</b></font>$INl<br>$E
+<input name=t size=14 maxlength=200>$INl<br>$E
+(vb: koning, hertog...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>plaats</b></font><br>
-<input name=p size=25 maxlength=200><br>
+<font color=#2f6400><b>plaats</b></font>$INl<br>$E
+<input name=p size=25 maxlength=200>$INl<br>$E
 (vb: van Frankrijk, van Brabant...)
 </td><td>
 <input type=submit value="Ok">
@@ -128,27 +128,26 @@ opzoeking</b></font></a>.
 
 %w<p>
 
-<center>U kan:<br><br>
+<center>U kan:<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">een familie toevoegen</a>
-</ul>
+$INl</ul>
 </td>
 <td align=left>
-<ul>
+<ul>$E
 <li><a href="%sm=MOD_NOTES">de nota's wijzigen</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-<br>
 %w
 
-<center>U kan de volgende zaken bekijken:<br><br>
+<center>U kan de volgende zaken bekijken:<br><p>
 
 <table border=0>
 <tr>

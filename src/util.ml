@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.0 1999-10-29 10:31:47 ddr Exp $ *)
+(* $Id: util.ml,v 3.1 1999-10-30 13:25:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -717,7 +717,8 @@ value gen_trailer with_logo conf =
   do if not with_logo then ()
      else
         Wserver.wprint "<p>
-<img width=64 height=72 src=\"%s?m=IM;v=/gwlogo.gif\" align=right>\n<br>\n"
+<img src=\"%s?m=IM;v=/gwlogo.gif\"
+alt=GeneWeb width=64 height=72 align=right>\n<br>\n"
           conf.command;
      try copy_etc_file env "copyr" with
      [ Sys_error _ ->
