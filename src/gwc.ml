@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.24 2004-08-09 11:35:00 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.25 2004-08-09 11:39:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -760,7 +760,7 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
 (**)
   let _ =
     do {
-      Printf.eprintf "\npcnt %d persons %d\n" gen.g_pcnt
+      Printf.eprintf "pcnt %d persons %d\n" gen.g_pcnt
         (Array.length gen.g_base.c_persons);
       flush stderr;
     }
@@ -855,6 +855,7 @@ value link gwo_list =
     ifdef UNIX then Sys.remove "gwc_fam_index" else ();
     ifdef UNIX then Sys.remove "gwc_fam" else ();
     List.iter (insert_comp_families gen) gwo_list;
+    Printf.eprintf "\n"; flush stderr;
     close_out gen.g_per_index;
     close_out gen.g_per;
     close_out gen.g_fam_index;
