@@ -6,6 +6,8 @@ License). The previous license still applies up to the version 1.11
 included.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Mar 7, 99] Added ability to enter directly birth dates for children
+    in families forms.
   - [Feb 27, 99] Added case "half-siblings" in relationship links.
   - [Feb 27, 99] In personal pages, titles dates when complete are
     displayed completely (not just date).

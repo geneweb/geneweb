@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 1.16 1999-02-18 15:52:54 ddr Exp $ *)
+(* $Id: update.ml,v 1.17 1999-03-07 11:25:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -389,16 +389,16 @@ value reconstitute_date conf var =
   match get_number var "yyyy" conf.env with
   [ Some y ->
       let prec =
-        match get var "prec" conf.env with
-        [ "about" -> About
-        | "maybe" -> Maybe
-        | "before" -> Before
-        | "after" -> After
-        | "oryear" ->
+        match p_getenv conf.env (var ^ "_prec") with
+        [ Some "about" -> About
+        | Some "maybe" -> Maybe
+        | Some "before" -> Before
+        | Some "after" -> After
+        | Some "oryear" ->
             match get_number var "oryear" conf.env with
             [ Some y -> OrYear y
             | None -> Sure ]
-        | "yearint" ->
+        | Some "yearint" ->
             match get_number var "oryear" conf.env with
             [ Some y -> YearInt y
             | None -> Sure ]
