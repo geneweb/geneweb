@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.41 2003-12-05 05:48:58 ddr Exp $ *)
+(* $Id: family.ml,v 4.42 2004-01-26 18:20:03 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -279,14 +279,10 @@ value specify conf base n pl =
            | [h :: hl] ->
                let s =
                  List.fold_left
-                   (fun s h ->
-                      s ^ ", " ^ transl_nth conf "and" 0 ^ "\n" ^
-                        person_title_text conf base h)
+                   (fun s h -> s ^ ",\n" ^ person_title_text conf base h)
                    (person_title_text conf base h) hl
                in
-               Wserver.wprint ", <em>%s</em>\n"
-                 (transl_a_of_gr_eq_gen_lev conf
-                    (transl_nth conf "spouse" (index_of_sex p.sex)) s) ];
+               Wserver.wprint ", <em>&amp; %s</em>\n" s ]
          })
       ptll;
     Wserver.wprint "</ul>\n";
