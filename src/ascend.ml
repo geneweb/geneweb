@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.51 2005-02-05 14:29:20 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.52 2005-02-08 18:05:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1204,7 +1204,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
           html_li conf;
           Wserver.wprint "%s %d\n"
             (capitale
-	       (nominative (transl_nth conf "generation/generations" 0)))
+               (nominative (transl_nth conf "generation/generations" 0)))
             level;
           Wserver.wprint "<ul>\n";
           title.val := None
