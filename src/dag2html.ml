@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 4.3 2001-06-03 14:16:54 ddr Exp $ *)
+(* $Id: dag2html.ml,v 4.4 2001-06-03 14:21:54 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -1416,10 +1416,4 @@ value table_of_dag phony no_optim invert no_group d =
   let t = top_adjust t in
   let t = bottom_adjust t in
   t
-;
-
-value html_table_of_dag indi_txt phony invert no_group d =
-  let t = table_of_dag phony False invert no_group d in
-  if Array.length t.table = 0 then [| |]
-  else html_table_struct indi_txt phony d t
 ;
