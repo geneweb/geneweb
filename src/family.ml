@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.0 2001-03-16 19:34:37 ddr Exp $ *)
+(* $Id: family.ml,v 4.1 2001-03-23 11:46:04 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -601,24 +601,40 @@ value set_owner conf =
   else ()
 ;
 
-value family conf base =
-  let r =
-    match (p_getenv conf.env "opt", p_getenv conf.env "m") with
-    [ (Some "no_index", _) ->
-        do print_no_index conf base; return None
-    | (_, Some "IM") ->
-        do Image.print conf base; return None
-    | _ ->
-        do set_owner conf;
-           extract_henv conf base;
-           make_senv conf base;
-        return
-        if only_special_env conf.env then
-          let r = Srcfile.incr_welcome_counter conf in
-          do Srcfile.print_start conf base; return r
-        else
-          let r = Srcfile.incr_request_counter conf in
-          do family_m conf base; return r ]
-  in
-  do Wserver.wflush (); return r
+value log_count conf (log_file, log_oc, flush_log) r =
+  if conf.cgi && log_file = "" then ()
+  else
+    match r with
+    [ Some (welcome_cnt, request_cnt, start_date) ->
+        let oc = log_oc () in
+        do Printf.fprintf oc "  #accesses %d (#welcome %d) since %s\n"
+             (welcome_cnt + request_cnt) welcome_cnt start_date;
+           flush_log oc;
+        return ()
+    | None -> () ]
+;
+
+value family conf base log =
+  do match (p_getenv conf.env "opt", p_getenv conf.env "m") with
+     [ (Some "no_index", _) ->
+         print_no_index conf base
+     | (_, Some "IM") ->
+         Image.print conf base
+     | _ ->
+         do set_owner conf;
+            extract_henv conf base;
+            make_senv conf base;
+            if only_special_env conf.env then
+              let r = Srcfile.incr_welcome_counter conf in
+              do log_count conf log r;
+                 Srcfile.print_start conf base;
+              return ()  
+            else
+              let r = Srcfile.incr_request_counter conf in
+              do log_count conf log r;
+                 family_m conf base;
+              return ();
+         return () ];
+     Wserver.wflush ();
+  return ()
 ;

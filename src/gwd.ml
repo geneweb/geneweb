@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.0 2001-03-16 19:34:42 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.1 2001-03-23 11:46:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -370,25 +370,13 @@ value print_redirected conf from request new_addr =
       return () ]
 ;
 
-value log_count =
-  fun
-  [ Some (welcome_cnt, request_cnt, start_date) ->
-      let oc = log_oc () in
-      do Printf.fprintf oc "  #accesses %d (#welcome %d) since %s\n"
-           (welcome_cnt + request_cnt) welcome_cnt start_date;
-         flush_log oc;
-      return ()
-  | None -> () ]
-;
-
 value start_with_base conf bname =
   let bfile = Util.base_path [] (bname ^ ".gwb") in
   match try Left (Iobase.input bfile) with e -> Right e with
   [ Left base ->
       do try
-           let r = Family.family conf base in
-           do Wserver.wflush ();
-              if conf.cgi && log_file.val = "" then () else log_count r;
+           do Family.family conf base (log_file.val, log_oc, flush_log);
+              Wserver.wflush ();
            return ()
          with exc -> do base.func.cleanup (); return raise exc;
          base.func.cleanup ();
