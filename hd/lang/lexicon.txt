@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.196 2000-12-04 12:20:19 ddr Exp $
+# $Id: lexicon.txt,v 3.197 2000-12-11 10:37:00 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2172,7 +2172,7 @@ dk: database-forum
 en: data base forum
 eo: datenbankforumo
 es: foro de la base de datos
-fi: tietokantafoorumin
+fi: tietokantafoorumi
 fr: forum de la base de donn&eacute;es
 he:  דייון על מאגר המידה התולדותי
 is: umrזנur
@@ -4732,7 +4732,7 @@ dk: person/personer
 en: person/persons
 eo: persono:a:+n/personoj
 es: persona/personas
-fi: henkil&ouml;/henkil&ouml;it&auml
+fi: henkil&ouml;/henkil&ouml;&auml
 fr: personne/personnes
 he:  אדם/ אנשים
 is: einstaklingur/einstaklingar
