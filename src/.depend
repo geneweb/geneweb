@@ -22,6 +22,7 @@ birthday.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx util.cmx \
     ../wserver/wserver.cmx 
 calendar.cmo: def.cmi calendar.cmi 
 calendar.cmx: def.cmi calendar.cmi 
+calendar.cmi: def.cmi 
 changeChildren.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi \
     history.cmi iobase.cmi iovalue.cmi lock.cmi name.cmi update.cmi util.cmi \
     ../wserver/wserver.cmi 
@@ -260,7 +261,6 @@ mergeInd.cmo mergeInd.cmx: pa_html.cmo pa_lock.cmo
 mergeIndOk.cmo mergeIndOk.cmx: pa_lock.cmo pa_html.cmo
 mk_consang.cmo mk_consang.cmx: pa_lock.cmo
 notes.cmo notes.cmx: pa_html.cmo
-perso.cmo perso.cmx: pa_html.cmo
 place.cmo place.cmx: pa_html.cmo
 relation.cmo relation.cmx: pa_lock.cmo pa_html.cmo
 relationLink.cmo relationLink.cmx: pa_html.cmo
@@ -274,4 +274,4 @@ updateFam.cmo updateFam.cmx: pa_html.cmo
 updateFamOk.cmo updateFamOk.cmx: pa_lock.cmo pa_html.cmo
 updateInd.cmo updateInd.cmx: pa_html.cmo
 updateIndOk.cmo updateIndOk.cmx: pa_lock.cmo pa_html.cmo
-util.cmo util.cmx: pa_lock.cmo pa_html.cmo
+util.cmo util.cmx: pa_lock.cmo
