@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.38 2001-01-10 20:30:50 ddr Exp $ *)
+(* $Id: dag.ml,v 3.39 2001-01-11 02:13:30 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -597,8 +597,15 @@ return
 
 (* main *)
 
+value print_html_table conf hts =
+  if Util.p_getenv conf.env "version" = Some "notab"
+  || browser_doesnt_have_tables conf then
+    print_table_pre conf hts
+  else
+    print_table conf hts
+;
+
 value print_only_dag conf base elem_txt spouse_on invert set spl d =
-  let t = table_of_dag False invert d in
   let indi_txt n =
     match n.valu with
     [ Left ip ->
@@ -675,12 +682,8 @@ value print_only_dag conf base elem_txt spouse_on invert set spl d =
     [ Left _ -> False
     | Right _ -> True ]
   in
-  let hts = html_table_struct indi_txt phony d t in
-  if Util.p_getenv conf.env "version" = Some "notab"
-  || browser_doesnt_have_tables conf then
-    print_table_pre conf hts
-  else
-    print_table conf hts
+  let hts = html_table_of_dag indi_txt phony invert d in
+  print_html_table conf hts
 ;
 
 value gen_print_dag conf base spouse_on invert set spl d =

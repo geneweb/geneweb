@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.35 2001-01-09 09:13:10 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.36 2001-01-11 02:13:30 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -90,6 +90,7 @@ value print_char_table d t =
 
 type align = [ LeftA | CenterA | RightA ];
 type table_data = [ TDstring of string | TDhr of align ];
+type html_table = array (array (int * align * table_data));
 
 value html_table_struct indi_txt phony d t =
   let phony =
@@ -1247,7 +1248,8 @@ value invert_table t =
 
 (* main *)
 
-value table_of_dag no_optim invert d =
+value html_table_of_dag indi_txt phony invert d =
+  let no_optim = False in
   let d = if invert then invert_dag d else d in
   let t = tablify no_optim d in
   let t = if invert then invert_table t else t in
@@ -1255,8 +1257,5 @@ value table_of_dag no_optim invert d =
   let t = fall2_right t in
   let t = fall2_left t in
   let t = top_adjust t in
-(*
-do print_char_table (tag_dag d) t; flush stderr; return
-*)
-  t
+  html_table_struct indi_txt phony d t
 ;
