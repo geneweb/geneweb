@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.0 2001-03-16 19:34:44 ddr Exp $ *)
+(* $Id: history.ml,v 4.1 2001-03-17 21:14:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -110,7 +110,7 @@ value action_text conf =
 
 value line_tpl = "0000-00-00 00:00:00 xx .";
 
-value line_fields conf base line =
+value line_fields line =
   if String.length line > String.length line_tpl then
     let time = String.sub line 0 19 in
     let (user, i) =
@@ -120,24 +120,19 @@ value line_fields conf base line =
           (user, i + 2)
       | _ -> ("", 20) ]
     in
-    let action = action_text conf (String.sub line i 2) in
+    let action = String.sub line i 2 in
     let key = String.sub line (i + 3) (String.length line - i - 3) in
-    let p =
-      match person_ht_find_all base key with
-      [ [ip] -> Right (poi base ip)
-      | _ -> Left key ]
-    in
-    Some (time, user, action, p)
+    Some (time, user, action, key)
   else None
 ;
 
 value print_history_line conf base line wiz k i =
-  match line_fields conf base line with
-  [ Some (time, user, action, p) ->
+  match line_fields line with
+  [ Some (time, user, action, key) ->
       if wiz = "" || user = wiz then
         do if i = 0 then Wserver.wprint "<dl>\n" else ();
            Wserver.wprint "<dt><tt><b>*</b> %s</tt>\n" time;
-           Wserver.wprint "(%s)\n" action;
+           Wserver.wprint "(%s)\n" (action_text conf action);
            if user <> "" then
              do Wserver.wprint "<em>";
                 if wiz = "" then
@@ -150,13 +145,14 @@ value print_history_line conf base line wiz k i =
              return ()
            else ();
            Wserver.wprint " :\n<dd>";
-           match p with
-           [ Left key -> Wserver.wprint "%s" key
-           | Right p ->
+           match person_ht_find_all base key with
+           [ [ip] ->
+               let p = poi base ip in
                do Wserver.wprint "%s"
                     (referenced_person_title_text conf base p);
                   Wserver.wprint "%s" (Date.short_dates_text conf base p);
-               return () ];
+               return ()
+           | _ -> Wserver.wprint "%s" key ];
            Wserver.wprint "\n";
         return i + 1
       else i

@@ -5,6 +5,8 @@ GeneWeb version 4.01
   - [14 Mar 01] Added Brazilian Portuguese (Paulo Francisco Sedrez).
 
 * GeneWeb server or CGI (gwd)
+  - [17 Mar 01] Fixed problem of displaying of history of updates: it
+    was sometimes very very slow.
   - [15 Mar 01] Fixed bug: when merging two men (the problem did not
     happen for women), the witnesses of mariage of the second man were
     incompletely reported to the first one (they are indicated as witness
@@ -39,8 +41,8 @@ GeneWeb version 4.01
 
 * Templates files (etc/*.txt)
   For programmers...
-  - [17 Mar 01] File perso.txt: added variables %nb_families, %family_cnt,
-    %nb_children, %child_cnt; the variables %count and %length are removed.
+  - [17 Mar 01] File perso.txt: remplaced variables %length and %count
+    by %nb_families, %family_cnt, %nb_children, %child_cnt.
 
 GeneWeb version 4.00
 --------------------
