@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.12 1999-09-06 12:42:33 ddr Exp $
+# $Id: geneweb.spec,v 1.13 1999-09-18 11:20:35 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -68,7 +68,7 @@ nedkopplad eller som en webbtjänst.
 # Unpack the .tar.gz (using %setup).
 # Delete any stray CVS dirs that got included (they break 'make install')
 %prep
-rm -f /etc/rc.d/rc?.d/[KS]99gwd
+rm -f /etc/rc.d/rc?.d/S99gwd /etc/rc.d/rc?.d/K01gwd
 rm -rf /home/geneweb/gw /usr/doc/geneweb-%{version}
 %setup
 find . -name CVS -print | /usr/bin/xargs /bin/rm -rf 
@@ -87,12 +87,12 @@ make distrib
 mkdir -p /home/geneweb
 cp -r distribution /home/geneweb/gw
 cp $RPM_SOURCE_DIR/geneweb-initrc-%{version}.sh /etc/rc.d/init.d/gwd
-ln -s ../init.d/gwd /etc/rc.d/rc0.d/K99gwd
-ln -s ../init.d/gwd /etc/rc.d/rc1.d/K99gwd
+ln -s ../init.d/gwd /etc/rc.d/rc0.d/K01gwd
+ln -s ../init.d/gwd /etc/rc.d/rc1.d/K01gwd
 ln -s ../init.d/gwd /etc/rc.d/rc2.d/S99gwd
 ln -s ../init.d/gwd /etc/rc.d/rc3.d/S99gwd
 ln -s ../init.d/gwd /etc/rc.d/rc5.d/S99gwd
-ln -s ../init.d/gwd /etc/rc.d/rc6.d/K99gwd
+ln -s ../init.d/gwd /etc/rc.d/rc6.d/K01gwd
 
 # %clean: after installing, how to clean up.  (The files are all
 # in the .rpm archive by now.  Need to remove them before we
@@ -170,12 +170,12 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %attr(4700, geneweb, geneweb) /home/geneweb/gw/gw/gwd
 %attr(4700, geneweb, geneweb) /home/geneweb/gw/gw/gwsetup
 %attr(744, root, root) /etc/rc.d/init.d/gwd
-%attr(744, root, root) /etc/rc.d/rc0.d/K99gwd
-%attr(744, root, root) /etc/rc.d/rc1.d/K99gwd
+%attr(744, root, root) /etc/rc.d/rc0.d/K01gwd
+%attr(744, root, root) /etc/rc.d/rc1.d/K01gwd
 %attr(744, root, root) /etc/rc.d/rc2.d/S99gwd
 %attr(744, root, root) /etc/rc.d/rc3.d/S99gwd
 %attr(744, root, root) /etc/rc.d/rc5.d/S99gwd
-%attr(744, root, root) /etc/rc.d/rc6.d/K99gwd
+%attr(744, root, root) /etc/rc.d/rc6.d/K01gwd
 /home/geneweb/gw/gw/CHANGES
 /home/geneweb/gw/gw/LICENSE
 /home/geneweb/gw/gw/gwc
