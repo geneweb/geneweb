@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.21 2004-02-12 20:53:51 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.22 2004-05-13 04:11:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -64,14 +64,38 @@ value magic_gwb = "GnWb001y";
          strings list array (length = string array length)
            - associating a string index
            - to the index of the next index holding the same hash value
+       -- the following table has been obsolete since version 4.10
+       -- it has been replaced by snames.inx/sname.dat which use
+       -- much less memory
        surnames index                     : value
          binary tree
           - associating the string index of a surname
           - to the corresponding list of persons holding this surname
+       -- the following table has been obsolete since version 4.10
+       -- it has been replaced by fnames.inx/fname.dat which use
+       -- much less memory
        first_names index                  : value
          binary tree
           - associating the string index of a first name
           - to the corresponding list of persons holding this first name
+
+    snames.inx - index for surnames
+       binary tree
+        - associating the string index of a surname
+        - to a pointer (int) to snames.dat
+
+    snames.dat - data associated with snames.inx
+      table of list of persons holding a surname
+
+    fnames.inx - index for first names
+       binary tree
+        - associating the string index of a first name
+        - to a pointer (int) to fnames.dat
+
+    fnames.dat - data associated with fnames.inx
+      table of list of persons holding a first name
+
+the corresponding list of persons holding this surname
 
     patches - patches
        When updated, none of the previous files are modified. Only this one
@@ -225,8 +249,11 @@ value rec list_remove_elemq x =
   | [] -> [] ]
 ;
 
-value persons_of_first_name_or_surname base_data strings params =
-  let (ic2, start_pos, proj, person_patches, tree_name) = params in
+(* compatibility with databases created with versions <= 4.09 *)
+(* should be removed after some time (when all databases will have
+   been rebuilt with version >= 4.10 *)
+value old_persons_of_first_name_or_surname base_data strings params =
+  let (ic2, start_pos, proj, person_patches, _, _, _) = params in
   let module IstrTree =
     Btree.Make
       (struct type t = istr; value compare = compare_istr_fun base_data; end)
@@ -263,9 +290,15 @@ value persons_of_first_name_or_surname base_data strings params =
       | None ->
           do {
             seek_in ic2 start_pos;
+Printf.eprintf "*** old database created by version <= 4.09\n"; flush stderr;
+let ab1 = Gc.allocated_bytes () in
             let bt : IstrTree.t (list iper) = input_value ic2 in
+let ab2 = Gc.allocated_bytes () in
             let bt = update_bt gistro bt in
             btr.val := Some bt;
+Printf.eprintf "*** using index allocating here %.0f bytes\n"
+  (ab2 -. ab1);
+flush stderr;
             bt
           } ]
   in
@@ -295,6 +328,105 @@ value persons_of_first_name_or_surname base_data strings params =
   in
   let next key = IstrTree.next key (bt None) in
   {find = find; cursor = cursor; next = next}
+;
+
+value new_persons_of_first_name_or_surname base_data strings params =
+  let (_, _, proj, person_patches, names_inx, names_dat, bname) = params in
+  let module IstrTree =
+    Btree.Make
+      (struct type t = istr; value compare = compare_istr_fun base_data; end)
+  in
+  let fname_dat = Filename.concat bname names_dat in
+  let bt =
+    let btr = ref None in
+    fun () ->
+      match btr.val with
+      [ Some bt -> bt
+      | None ->
+          do {
+Printf.eprintf "*** new database created by version >= 4.10\n";
+            let fname_inx = Filename.concat bname names_inx in
+            let ic_inx = Secure.open_in_bin fname_inx in
+let ab1 = Gc.allocated_bytes () in
+            let bt : IstrTree.t int = input_value ic_inx in
+let ab2 = Gc.allocated_bytes () in
+Printf.eprintf "*** using index '%s' allocating here %.0f bytes\n"
+  names_inx (ab2 -. ab1);
+flush stderr;
+            close_in ic_inx;
+            btr.val := Some bt;
+            bt
+          } ]
+  in
+  let find istr =
+    let ipera =
+      try
+        let pos = IstrTree.find istr (bt ()) in
+        let ic_dat = Secure.open_in_bin fname_dat in
+        do {
+          seek_in ic_dat pos;
+          let len = input_binary_int ic_dat in
+          let rec read_loop ipera len =
+            if len = 0 then ipera
+            else
+              let iper = Adef.iper_of_int (input_binary_int ic_dat) in
+              read_loop [iper :: ipera] (len - 1)
+          in
+          let ipera = read_loop [] len in
+          close_in ic_dat;
+          ipera
+        }
+      with
+      [ Not_found -> [] ]
+    in
+    let ipera = ref ipera in
+    do {
+      Hashtbl.iter
+        (fun i p ->
+           let istr1 = proj p in
+           if istr1 <> istr then ()
+           else if List.memq p.cle_index ipera.val then ()
+           else ipera.val := [p.cle_index :: ipera.val])
+        person_patches;
+      ipera.val
+    }
+  in
+  let bt_patched =
+    let btr = ref None in
+    fun () ->
+      match btr.val with
+      [ Some bt -> bt
+      | None ->
+          let bt = ref (bt ()) in
+          do {
+            Hashtbl.iter
+              (fun i p ->
+                 let istr1 = proj p in
+                 try
+                   let _ = IstrTree.find istr1 bt.val in
+                   ()
+                 with
+                 [ Not_found -> bt.val := IstrTree.add istr1 0 bt.val ])
+              person_patches;
+            btr.val := Some bt.val;
+	    bt.val
+          } ]
+  in
+  let cursor str =
+    IstrTree.key_after
+      (fun key -> compare_names str (strings.get (Adef.int_of_istr key)))
+      (bt_patched ())
+  in
+  let next key = IstrTree.next key (bt_patched ()) in
+  {find = find; cursor = cursor; next = next}
+;
+
+value persons_of_first_name_or_surname base_data strings params =
+  let (_, _, _, _, names_inx, _, bname) = params in
+  if Sys.file_exists (Filename.concat bname names_inx) then
+    new_persons_of_first_name_or_surname base_data strings params
+  else
+    old_persons_of_first_name_or_surname base_data strings params
 ;
 
 (* Search index for a given name in file names.inx *)
@@ -954,11 +1086,11 @@ value input bname =
      persons_of_surname =
        persons_of_first_name_or_surname base_data strings
          (ic2, ic2_surname_start_pos, fun p -> p.surname, snd patches.h_person,
-          "surname");
+          "snames.inx", "snames.dat", bname);
      persons_of_first_name =
        persons_of_first_name_or_surname base_data strings
          (ic2, ic2_first_name_start_pos, fun p -> p.first_name,
-          snd patches.h_person, "first_name");
+          snd patches.h_person, "fnames.inx", "fnames.dat", bname);
      patch_person = patch_person; patch_ascend = patch_ascend;
      patch_union = patch_union; patch_family = patch_family;
      patch_couple = patch_couple; patch_descend = patch_descend;
@@ -1004,7 +1136,7 @@ value output_strings_hash oc2 base =
   }
 ;
 
-value output_surname_index oc2 base =
+value output_surname_index oc2 base tmp_snames_inx tmp_snames_dat =
   let module IstrTree =
     Btree.Make
       (struct type t = istr; value compare = compare_istr_fun base.data; end)
@@ -1016,11 +1148,33 @@ value output_surname_index oc2 base =
       let a = try IstrTree.find p.surname bt.val with [ Not_found -> [] ] in
       bt.val := IstrTree.add p.surname [p.cle_index :: a] bt.val
     };
+    (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
+       i.e. the created database can be still read by these versions but this
+       table will not be used in versions >= 4.10 *)
     output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
+    (* new table created from version >= 4.10 *)
+    let oc_sn_dat = Secure.open_out_bin tmp_snames_dat in
+    let bt2 =
+      IstrTree.map
+        (fun ipl ->
+           let i = pos_out oc_sn_dat in
+           do {
+             output_binary_int oc_sn_dat (List.length ipl);
+             List.iter
+               (fun ip -> output_binary_int oc_sn_dat (Adef.int_of_iper ip))
+               ipl;
+             i
+           })
+        bt.val
+    in
+    close_out oc_sn_dat;
+    let oc_sn_inx = Secure.open_out_bin tmp_snames_inx in
+    output_value_no_sharing oc_sn_inx (bt2 : IstrTree.t int);
+    close_out oc_sn_inx;
   }
 ;
 
-value output_first_name_index oc2 base =
+value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
   let module IstrTree =
     Btree.Make
       (struct type t = istr; value compare = compare_istr_fun base.data; end)
@@ -1029,12 +1183,32 @@ value output_first_name_index oc2 base =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let p = base.data.persons.get i in
-      let a =
-        try IstrTree.find p.first_name bt.val with [ Not_found -> [] ]
-      in
+      let a = try IstrTree.find p.first_name bt.val with [ Not_found -> [] ] in
       bt.val := IstrTree.add p.first_name [p.cle_index :: a] bt.val
     };
+    (* obsolete table: saved by compatibility with GeneWeb versions <= 4.09,
+       i.e. the created database can be still read by these versions but this
+       table will not be used in versions >= 4.10 *)
     output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
+    (* new table created from version >= 4.10 *)
+    let oc_fn_dat = Secure.open_out_bin tmp_fnames_dat in
+    let bt2 =
+      IstrTree.map
+        (fun ipl ->
+           let i = pos_out oc_fn_dat in
+           do {
+             output_binary_int oc_fn_dat (List.length ipl);
+             List.iter
+               (fun ip -> output_binary_int oc_fn_dat (Adef.int_of_iper ip))
+               ipl;
+             i
+           })
+        bt.val
+    in
+    close_out oc_fn_dat;
+    let oc_fn_inx = Secure.open_out_bin tmp_fnames_inx in
+    output_value_no_sharing oc_fn_inx (bt2 : IstrTree.t int);
+    close_out oc_fn_inx;
   }
 ;
 
@@ -1203,12 +1377,16 @@ value gen_output no_patches bname base =
   in
   do {
     try Unix.mkdir bname 0o755 with _ -> ();
-    let tmp_fname = Filename.concat bname "1base" in
-    let tmp_fname_acc = Filename.concat bname "1base.acc" in
-    let tmp_fname_inx = Filename.concat bname "1names.inx" in
-    let tmp_fname_inx_acc = Filename.concat bname "1names.acc" in
-    let tmp_fname_gw2 = Filename.concat bname "1strings.inx" in
-    let tmp_fname_not = Filename.concat bname "1notes" in
+    let tmp_base = Filename.concat bname "1base" in
+    let tmp_base_acc = Filename.concat bname "1base.acc" in
+    let tmp_names_inx = Filename.concat bname "1names.inx" in
+    let tmp_names_acc = Filename.concat bname "1names.acc" in
+    let tmp_snames_inx = Filename.concat bname "1snames.inx" in
+    let tmp_snames_dat = Filename.concat bname "1snames.dat" in
+    let tmp_fnames_inx = Filename.concat bname "1fnames.inx" in
+    let tmp_fnames_dat = Filename.concat bname "1fnames.dat" in
+    let tmp_strings_inx = Filename.concat bname "1strings.inx" in
+    let tmp_notes = Filename.concat bname "1notes" in
     if not no_patches then
       let _ = base.data.persons.array () in
       let _ = base.data.ascends.array () in
@@ -1219,8 +1397,8 @@ value gen_output no_patches bname base =
       let _ = base.data.strings.array () in ()
     else ();
     base.func.cleanup ();
-    let oc = Secure.open_out_bin tmp_fname in
-    let oc_acc = Secure.open_out_bin tmp_fname_acc in
+    let oc = Secure.open_out_bin tmp_base in
+    let oc_acc = Secure.open_out_bin tmp_base_acc in
     let output_array arr =
       let bpos = pos_out oc in
       do {
@@ -1278,9 +1456,9 @@ value gen_output no_patches bname base =
         close_out oc;
         close_out oc_acc;
         if not no_patches then
-          let oc_inx = Secure.open_out_bin tmp_fname_inx in
-          let oc_inx_acc = Secure.open_out_bin tmp_fname_inx_acc in
-          let oc2 = Secure.open_out_bin tmp_fname_gw2 in
+          let oc_inx = Secure.open_out_bin tmp_names_inx in
+          let oc_inx_acc = Secure.open_out_bin tmp_names_acc in
+          let oc2 = Secure.open_out_bin tmp_strings_inx in
           try
             do {
               trace "create name index";
@@ -1306,21 +1484,21 @@ value gen_output no_patches bname base =
               else ();
               let surname_pos = pos_out oc2 in
               trace "create surname index";
-              output_surname_index oc2 base;
+              output_surname_index oc2 base tmp_snames_inx tmp_snames_dat;
               if save_mem.val then do {
                 trace "compacting"; Gc.compact ()
               }
               else ();
               let first_name_pos = pos_out oc2 in
               trace "create first name index";
-              output_first_name_index oc2 base;
+	      output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat;
               seek_out oc2 int_size;
               output_binary_int oc2 surname_pos;
               output_binary_int oc2 first_name_pos;
               let s = base.data.bnotes.nread 0 in
               if s = "" then ()
               else do {
-                let oc_not = Secure.open_out tmp_fname_not in
+                let oc_not = Secure.open_out tmp_notes in
                 output_string oc_not s;
                 close_out oc_not;
               };
@@ -1340,30 +1518,38 @@ value gen_output no_patches bname base =
       do {
         try close_out oc with _ -> ();
         try close_out oc_acc with _ -> ();
-        remove_file tmp_fname;
-        remove_file tmp_fname_acc;
+        remove_file tmp_base;
+        remove_file tmp_base_acc;
         if not no_patches then do {
-          remove_file tmp_fname_inx;
-          remove_file tmp_fname_inx_acc;
-          remove_file tmp_fname_gw2;
+          remove_file tmp_names_inx;
+          remove_file tmp_names_acc;
+          remove_file tmp_strings_inx;
         }
         else ();
         raise e
       };
     remove_file (Filename.concat bname "base");
-    Sys.rename tmp_fname (Filename.concat bname "base");
+    Sys.rename tmp_base (Filename.concat bname "base");
     remove_file (Filename.concat bname "base.acc");
-    Sys.rename tmp_fname_acc (Filename.concat bname "base.acc");
+    Sys.rename tmp_base_acc (Filename.concat bname "base.acc");
     if not no_patches then do {
       remove_file (Filename.concat bname "names.inx");
-      Sys.rename tmp_fname_inx (Filename.concat bname "names.inx");
+      Sys.rename tmp_names_inx (Filename.concat bname "names.inx");
       remove_file (Filename.concat bname "names.acc");
-      Sys.rename tmp_fname_inx_acc (Filename.concat bname "names.acc");
+      Sys.rename tmp_names_acc (Filename.concat bname "names.acc");
+      remove_file (Filename.concat bname "snames.dat");
+      Sys.rename tmp_snames_dat (Filename.concat bname "snames.dat");
+      remove_file (Filename.concat bname "snames.inx");
+      Sys.rename tmp_snames_inx (Filename.concat bname "snames.inx");
+      remove_file (Filename.concat bname "fnames.dat");
+      Sys.rename tmp_fnames_dat (Filename.concat bname "fnames.dat");
+      remove_file (Filename.concat bname "fnames.inx");
+      Sys.rename tmp_fnames_inx (Filename.concat bname "fnames.inx");
       remove_file (Filename.concat bname "strings.inx");
-      Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
+      Sys.rename tmp_strings_inx (Filename.concat bname "strings.inx");
       remove_file (Filename.concat bname "notes");
-      if Sys.file_exists tmp_fname_not then
-        Sys.rename tmp_fname_not (Filename.concat bname "notes")
+      if Sys.file_exists tmp_notes then
+        Sys.rename tmp_notes (Filename.concat bname "notes")
       else ();
       remove_file (Filename.concat bname "patches");
       remove_file (Filename.concat bname "patches~");

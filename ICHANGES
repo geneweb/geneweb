@@ -5,6 +5,9 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [13 May 04] Added index files snames.inx, snames.dat, fnames.inx
+    and fnames.dat to improve memory use in requests dispaying a surname
+    or a first name.
   - [05 May 04] In URLs referencing somebody with his internal number
     (i=...), added ";oc=n", n being his occurrence number (only if
     wizard and n different from 0): useful for updates.
