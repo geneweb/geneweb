@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 4.0 2001-03-16 19:33:03 ddr Exp $
+# $Id: geneweb.spec,v 4.1 2001-04-05 13:59:03 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -121,7 +121,7 @@ chkconfig --del gwd
 
 %postun
 cd /home/geneweb/gw/gw
-rm -rf doc etc images lang setup gwtp_tmp
+# rm -rf doc etc images lang setup gwtp_tmp
 
 # *********** THE FILES OWNED BY THIS .RPM *************
 # These are the files belonging to this package.  We have to list

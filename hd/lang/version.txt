@@ -16,95 +16,95 @@ function WorkOnBrowser() {
 <a href="%glang=af"
  onmouseover="if (WorkOnBrowser()) iaf.src='%o/t-af.gif'"
  onmouseout="iaf.src='%o/l-af.jpg'">
-<img src="%o/l-af.jpg" width=36 height=22 alt=%uaf name=iaf border=0></a>
-<a href="%glang=br"
- onmouseover="if (WorkOnBrowser()) ibr.src='%o/t-br.gif'"
- onmouseout="ibr.src='%o/l-br.jpg'">
-<img src="%o/l-br.jpg" width=36 height=22 alt=%ubr name=ibr border=0></a>
-<a href="%glang=cn"
- onmouseover="if (WorkOnBrowser()) icn.src='%o/t-cn.gif'"
- onmouseout="icn.src='%o/l-cn.jpg'">
-<img src="%o/l-cn.jpg" width=36 height=22 alt=%ucn name=icn border=0></a>
+<img src="%o/l-af.jpg" width=36 height=22 alt=%uaf; name=iaf border=0></a>
+<a href="%glang=ca"
+ onmouseover="if (WorkOnBrowser()) ict.src='%o/l-ct.jpg'"
+ onmouseout="ict.src='%o/l-ct.jpg'">
+<img src="%o/l-ct.jpg" width=36 height=22 alt=%uca; name=ict border=0></a>
 <a href="%glang=cs"
  onmouseover="if (WorkOnBrowser()) ics.src='%o/t-cs.gif'"
  onmouseout="ics.src='%o/l-cs.jpg'">
-<img src="%o/l-cs.jpg" width=36 height=22 alt=%ucs name=ics border=0></a>
-<a href="%glang=ct"
- onmouseover="if (WorkOnBrowser()) ict.src='%o/t-ct.gif'"
- onmouseout="ict.src='%o/l-ct.jpg'">
-<img src="%o/l-ct.jpg" width=36 height=22 alt=%uct name=ict border=0></a>
+<img src="%o/l-cs.jpg" width=36 height=22 alt=%ucs; name=ics border=0></a>
+<a href="%glang=da"
+ onmouseover="if (WorkOnBrowser()) idk.src='%o/l-dk.jpg'"
+ onmouseout="idk.src='%o/l-dk.jpg'">
+<img src="%o/l-dk.jpg" width=36 height=22 alt=%uda; name=idk border=0></a>
 <a href="%glang=de"
  onmouseover="if (WorkOnBrowser()) ide.src='%o/t-de.gif'"
  onmouseout="ide.src='%o/l-de.jpg'">
-<img src="%o/l-de.jpg" width=36 height=22 alt=%ude name=ide border=0></a>
-<a href="%glang=dk"
- onmouseover="if (WorkOnBrowser()) idk.src='%o/t-dk.gif'"
- onmouseout="idk.src='%o/l-dk.jpg'">
-<img src="%o/l-dk.jpg" width=36 height=22 alt=%udk name=idk border=0></a>
+<img src="%o/l-de.jpg" width=36 height=22 alt=%ude; name=ide border=0></a>
 <a href="%glang=en"
  onmouseover="if (WorkOnBrowser()) ien.src='%o/t-en.gif'"
  onmouseout="ien.src='%o/l-en.jpg'">
-<img src="%o/l-en.jpg" width=36 height=22 alt=%uen name=ien border=0></a>
+<img src="%o/l-en.jpg" width=36 height=22 alt=%uen; name=ien border=0></a>
 <a href="%glang=eo"
  onmouseover="if (WorkOnBrowser()) ieo.src='%o/t-eo.gif'"
  onmouseout="ieo.src='%o/l-eo.jpg'">
-<img src="%o/l-eo.jpg" width=36 height=22 alt=%ueo name=ieo border=0></a>
+<img src="%o/l-eo.jpg" width=36 height=22 alt=%ueo; name=ieo border=0></a>
 <a href="%glang=es"
  onmouseover="if (WorkOnBrowser()) ies.src='%o/t-es.gif'"
  onmouseout="ies.src='%o/l-es.jpg'">
-<img src="%o/l-es.jpg" width=36 height=22 alt=%ues name=ies border=0></a>
+<img src="%o/l-es.jpg" width=36 height=22 alt=%ues; name=ies border=0></a>
 <a href="%glang=et"
  onmouseover="if (WorkOnBrowser()) iet.src='%o/t-et.gif'"
  onmouseout="iet.src='%o/l-et.jpg'">
-<img src="%o/l-et.jpg" width=36 height=22 alt=%uet name=iet border=0></a>
+<img src="%o/l-et.jpg" width=36 height=22 alt=%uet; name=iet border=0></a>
 <a href="%glang=fi"
  onmouseover="if (WorkOnBrowser()) ifi.src='%o/t-fi.gif'"
  onmouseout="ifi.src='%o/l-fi.jpg'">
-<img src="%o/l-fi.jpg" width=36 height=22 alt=%ufi name=ifi border=0></a>
+<img src="%o/l-fi.jpg" width=36 height=22 alt=%ufi; name=ifi border=0></a>
 <a href="%glang=fr"
  onmouseover="if (WorkOnBrowser()) ifr.src='%o/t-fr.gif'"
  onmouseout="ifr.src='%o/l-fr.jpg'">
-<img src="%o/l-fr.jpg" width=36 height=22 alt=%ufr name=ifr border=0></a>
+<img src="%o/l-fr.jpg" width=36 height=22 alt=%ufr; name=ifr border=0></a>
 <a href="%glang=he"
  onmouseover="if (WorkOnBrowser()) ihe.src='%o/t-he.gif'"
  onmouseout="ihe.src='%o/l-he.jpg'">
-<img src="%o/l-he.jpg" width=36 height=22 alt=%uhe name=ihe border=0></a>
+<img src="%o/l-he.jpg" width=36 height=22 alt=%uhe; name=ihe border=0></a>
 <a href="%glang=is"
  onmouseover="if (WorkOnBrowser()) iis.src='%o/t-is.gif'"
  onmouseout="iis.src='%o/l-is.jpg'">
-<img src="%o/l-is.jpg" width=36 height=22 alt=%uis name=iis border=0></a>
+<img src="%o/l-is.jpg" width=36 height=22 alt=%uis; name=iis border=0></a>
 <a href="%glang=it"
  onmouseover="if (WorkOnBrowser()) iit.src='%o/t-it.gif'"
  onmouseout="iit.src='%o/l-it.jpg'">
-<img src="%o/l-it.jpg" width=36 height=22 alt=%uit name=iit border=0></a>
+<img src="%o/l-it.jpg" width=36 height=22 alt=%uit; name=iit border=0></a>
 <a href="%glang=lv"
  onmouseover="if (WorkOnBrowser()) ilv.src='%o/t-lv.gif'"
  onmouseout="ilv.src='%o/l-lv.jpg'">
-<img src="%o/l-lv.jpg" width=36 height=22 alt=%ulv name=ilv border=0></a>
+<img src="%o/l-lv.jpg" width=36 height=22 alt=%ulv; name=ilv border=0></a>
 <a href="%glang=nl"
  onmouseover="if (WorkOnBrowser()) inl.src='%o/t-nl.gif'"
  onmouseout="inl.src='%o/l-nl.jpg'">
-<img src="%o/l-nl.jpg" width=36 height=22 alt=%unl name=inl border=0></a>
+<img src="%o/l-nl.jpg" width=36 height=22 alt=%unl; name=inl border=0></a>
 <a href="%glang=no"
  onmouseover="if (WorkOnBrowser()) ino.src='%o/t-no.gif'"
  onmouseout="ino.src='%o/l-no.jpg'">
-<img src="%o/l-no.jpg" width=36 height=22 alt=%uno name=ino border=0></a>
+<img src="%o/l-no.jpg" width=36 height=22 alt=%uno; name=ino border=0></a>
 <a href="%glang=pl"
  onmouseover="if (WorkOnBrowser()) ipl.src='%o/t-pl.gif'"
  onmouseout="ipl.src='%o/l-pl.jpg'">
-<img src="%o/l-pl.jpg" width=36 height=22 alt=%upl name=ipl border=0></a>
+<img src="%o/l-pl.jpg" width=36 height=22 alt=%upl; name=ipl border=0></a>
 <a href="%glang=pt"
  onmouseover="if (WorkOnBrowser()) ipt.src='%o/t-pt.gif'"
  onmouseout="ipt.src='%o/l-pt.jpg'">
-<img src="%o/l-pt.jpg" width=36 height=22 alt=%upt name=ipt border=0></a>
+<img src="%o/l-pt.jpg" width=36 height=22 alt=%upt; name=ipt border=0></a>
+<a href="%glang=pt-br"
+ onmouseover="if (WorkOnBrowser()) ibr.src='%o/t-br.gif'"
+ onmouseout="ibr.src='%o/l-br.jpg'">
+<img src="%o/l-br.jpg" width=36 height=22 alt=%upt-br; name=ibr border=0></a>
 <a href="%glang=ru"
  onmouseover="if (WorkOnBrowser()) iru.src='%o/t-ru.gif'"
  onmouseout="iru.src='%o/l-ru.jpg'">
-<img src="%o/l-ru.jpg" width=36 height=22 alt=%uru name=iru border=0></a>
-<a href="%glang=se"
- onmouseover="if (WorkOnBrowser()) ise.src='%o/t-se.gif'"
+<img src="%o/l-ru.jpg" width=36 height=22 alt=%uru; name=iru border=0></a>
+<a href="%glang=sv"
+ onmouseover="if (WorkOnBrowser()) ise.src='%o/l-se.jpg'"
  onmouseout="ise.src='%o/l-se.jpg'">
-<img src="%o/l-se.jpg" width=36 height=22 alt=%use name=ise border=0></a>
+<img src="%o/l-se.jpg" width=36 height=22 alt=%usv; name=ise border=0></a>
+<a href="%glang=zh"
+ onmouseover="if (WorkOnBrowser()) icn.src='%o/l-cn.jpg'"
+ onmouseout="icn.src='%o/l-cn.jpg'">
+<img src="%o/l-cn.jpg" width=36 height=22 alt=%uzh; name=icn border=0></a>
 </td>
 </tr>
 </table>%Ij

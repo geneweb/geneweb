@@ -18,11 +18,11 @@ Default language:
 <select name="default_lang">
 <option value=""%edefault_lang=;><tt>-</tt>
 <option value="af"%edefault_lang=af;>Afrikaans
-<option value="br"%edefault_lang=br;>Brazilian
-<option value="ct"%edefault_lang=ct;>Catalan
-<option value="cn"%edefault_lang=cn;>Chinese
+<option value="pt-br"%edefault_lang=pt-br;>Brazilian
+<option value="ca"%edefault_lang=ca;>Catalan
+<option value="zh"%edefault_lang=zh;>Chinese
 <option value="cs"%edefault_lang=cs;>Czech
-<option value="dk"%edefault_lang=dk;>Danish
+<option value="da"%edefault_lang=da;>Danish
 <option value="nl"%edefault_lang=nl;>Dutch
 <option value="en"%edefault_lang=en;>English
 <option value="eo"%edefault_lang=eo;>Esperanto
@@ -39,7 +39,7 @@ Default language:
 <option value="pt"%edefault_lang=pt;>Portuguese
 <option value="es"%edefault_lang=es;>Spanish
 <option value="ru"%edefault_lang=ru;>Russian
-<option value="se"%edefault_lang=se;>Swedish
+<option value="sv"%edefault_lang=sv;>Swedish
 </select>
 <br>
 

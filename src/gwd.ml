@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.4 2001-04-01 14:33:19 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.5 2001-04-05 13:59:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -192,39 +192,38 @@ value input_lexicon lang =
         (List.fold_right Filename.concat [Util.lang_dir.val; "lang"]
            "lexicon.txt")
     in
-    let pref = lang ^ ":" in
-    let derived_pref = ref "" in
+    let derived_lang =
+      match Gutil.lindex lang '-' with
+      [ Some i -> String.sub lang 0 i
+      | _ -> "" ]
+    in
     try
       do try
            while True do
              let k =
                find_key (input_line ic) where rec find_key line =
-                 if String.length line = 5 && line.[2] = '=' then
-                   let derived_lang = String.sub line 0 2 in
-                   do if derived_lang = lang then
-                        derived_pref.val := String.sub line 3 2 ^ ":"
-                      else ();
-                   return find_key (input_line ic)
-                 else if String.length line < 4 then find_key (input_line ic)
+                 if String.length line < 4 then find_key (input_line ic)
                  else if String.sub line 0 4 <> "    " then
                    find_key (input_line ic)
                  else line
              in
              let k = String.sub k 4 (String.length k - 4) in
              loop (input_line ic) where rec loop line =
-               if String.length line < 3 then ()
-               else
-                 let line_pref = String.sub line 0 3 in
-                 do if line_pref = pref
-                    || line_pref = derived_pref.val && not (Hashtbl.mem t k)
-                    then
-                      let v =
-                        if String.length line = 3 then ""
-                        else String.sub line 4 (String.length line - 4)
-                      in
-                      Hashtbl.add t k v
-                    else ();
-                 return loop (input_line ic);
+               match Gutil.lindex line ':' with
+               [ Some i ->
+                   let line_lang = String.sub line 0 i in
+                   do if line_lang = lang
+                      || line_lang = derived_lang && not (Hashtbl.mem t k) then
+                        let v =
+                          if i + 1 = String.length line then ""
+                          else
+                            String.sub line (i + 2)
+                              (String.length line - i - 2)
+                        in
+                        Hashtbl.add t k v
+                      else ();
+                   return loop (input_line ic)
+               | None -> () ];
            done
          with [ End_of_file -> () ];
          close_in ic;
@@ -248,8 +247,8 @@ value alias_lang lang =
             loop (input_line ic) where rec loop line =
               match Gutil.lindex line '=' with
               [ Some i ->
-                  if i + 3 = String.length line && lang = String.sub line 0 i
-                  then String.sub line (i + 1) 2
+                  if lang = String.sub line 0 i then
+                    String.sub line (i + 1) (String.length line - i - 1)
                   else loop (input_line ic)
               | None -> loop (input_line ic) ]
           with
@@ -633,7 +632,6 @@ value http_preferred_language request =
     loop list where rec loop =
       fun
       [ [lang :: list] ->
-          let lang = alias_lang lang in
           if List.mem lang Version.available_languages then lang
           else if String.length lang = 5 then
             let blang = String.sub lang 0 2 in

@@ -6,6 +6,14 @@ GeneWeb version 4.01
     gwd did not work; it worked only by using 'stop' and 'start'.
 
 * Languages
+  - [05 Apr 01] Renamed some languages codes to be in conformance with
+    the standard (cf http://www.oasis-open.org/cover/iso639a.html):
+      * Catalan: ct replaced by ca
+      * Chinese: cn replaced by zh
+      * Danish: dk replaced by da
+      * Swedish: se replaced by sv
+    But old codes are still working, thanks to an alias language file.
+    The code of the new language, Brazilian Portuguese, is pt-br.
   - [14 Mar 01] Added Brazilian Portuguese (Paulo Francisco Sedrez).
 
 * GeneWeb server or CGI (gwd)
@@ -56,6 +64,7 @@ GeneWeb version 4.01
     were descendant.
 
 * Lexicon (lang/lexicon.txt) and Welcome page (lang/start.txt)
+  - [05 Apr 01] Fixed several phrases in lexicon for Dutch (Herman Theys)
   - [26 Mar 01] (technical point) Grouped together all lang/*/start.txt in
     one only file lang/start.txt, easier to manipulate (at least for me!)
   - [14 Mar 01] Added the ability to add "derived" languages,

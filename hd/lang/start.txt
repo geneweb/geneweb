@@ -1,15 +1,14 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 4.7 2001-03-28 12:32:26 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.8 2001-04-05 13:59:03 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
-br: Genealogia
 cs: Genealogy
-ct: Genealogia
+ca: Genealogia
 de: Genealogie
-dk: Genealogi
+da: Genealogi
 en: Genealogy
 eo: Genealogio
 es: Genealogía
@@ -24,8 +23,9 @@ nl: Genealogie
 no: Genealogi
 pl: Genealogia
 pt: Genealogia
+pt-br: Genealogia
 ru: Genealogy
-se: Genealogi
+sv: Genealogi
 ] - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
   <meta name="ROBOTS" content="NONE">
@@ -42,12 +42,12 @@ height=108 src="%o/gwlogo.gif" align=%L border=0 alt=GeneWeb></a>
 <td align=%L>
 <table><tr><td align=center><h1><font color=%i>[
 af: Genealogiese<br>databasis
-br: Base de Dados<br>Geneal&oacute;gica
-cn: ÍøÂç¼ÒÆ×
+pt-br: Base de Dados<br>Geneal&oacute;gica
+zh: ÍøÂç¼ÒÆ×
 cs: Genealogická databáze
-ct: Base de dades<br>geneal&ograve;gica
+ca: Base de dades<br>geneal&ograve;gica
 de: Genealogische<br>Datenbank
-dk: Genealogisk<br>database
+da: Genealogisk<br>database
 en: Genealogical<br>data base
 eo: Datenbazo<br>genealogia
 es: Base de datos<br>geneal&oacute;gica
@@ -63,7 +63,7 @@ no: Genealogisk<br>database
 pl: Genealogiczna<br>baza danych
 pt: Base de Dados<br>Geneal&oacute;gica
 ru: Ãåíåaëîãè÷åñêàÿ<br>áàçà äàííûõ
-se: Genealogisk<br>databas
+sv: Genealogisk<br>databas
 ]</font></h1></table>
 </td>
 <td align=%R valign=top>%w</td>
@@ -75,9 +75,9 @@ se: Genealogisk<br>databas
 <font size=-1><em>[
 af: Taalvoorkeur/Language preference:
 cs: Zvolte jazyk pro prohlí¾ení databáze:
-ct: Podeu seleccionar una altre llengua, hi ha disponibles les seg&uuml;ents:
+ca: Podeu seleccionar una altre llengua, hi ha disponibles les seg&uuml;ents:
 de: Du kannst eine der folgenden Sprachen f&uuml;r die Anzeige ausw&auml;hlen:
-dk: Du kan v&aelig;lge fremstilling p&aring; et andet sprog blandt de
+da: Du kan v&aelig;lge fremstilling p&aring; et andet sprog blandt de
     f&oslash;lgende:
 en: You can select another displaying language among the following ones:
 eo: Vi povas elekti alian lingvon inter la sekvantajn:
@@ -86,7 +86,7 @@ fr: Vous pouvez sélectionner une autre langue d'affichage
     parmi les suivantes:
 lv: Jûs variet apskatît datu bâzi arî citâs sekojoğâs valodâs:
 pl: Mo¿esz wybraæ inny jêzyk spoœród nastêpuj¹cych:
-se: Du kan välja ett annat språk bland de följande:
+sv: Du kan välja ett annat språk bland de följande:
 ]</em></font>
 
 <br>
@@ -97,15 +97,15 @@ se: Du kan välja ett annat språk bland de följande:
 
 [
 af: Die databasis <font color=%i><b>"%t"</b></font> bevat tans %n persone.
-br: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
+pt-br: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
     atualmente %n pessoas.
-cn: ÏÖÓĞ %n ÈËÔÚÊı¾İ¿âÖĞ¡£
+zh: ÏÖÓĞ %n ÈËÔÚÊı¾İ¿âÖĞ¡£
 cs: Databáze <font color=%i><b>"%t"</b></font> obsahuje %n osob.
-ct: La base de dades <font color=%i><b>"%t"</b></font> cont&eacute;
+ca: La base de dades <font color=%i><b>"%t"</b></font> cont&eacute;
     actualment %n persones.
 de: Die Datenbank <font color=%i><b>"%t"</b></font> enth&auml;lt z. Zt.
     %n Personen.
-dk: Databasen <font color=%i><b>"%t"</b></font> indeholder for
+da: Databasen <font color=%i><b>"%t"</b></font> indeholder for
     &oslash;jeblikket %n personer.
 en: The data base <font color=%i><b>"%t"</b></font> now holds %n persons.
 eo: La datenbazo <font color=%i><b>"%t"</b></font> enhavas nun %n
@@ -131,7 +131,7 @@ pl: Baza danych <font color=%i><b>"%t"</b></font> zawiera obecnie osób:%n.
 pt: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
     actualmente %n pessoas.
 ru: Áàçà äàííûõ <font color=%i><b>"%t"</b></font> ñåé÷àñ ñîäåğæèò %n ÷åëîâåê.
-se: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
+sv: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
     %n personer.
 ]%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
@@ -143,11 +143,11 @@ se: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
 
 <td align=center>[
 af: <a href="%sw=w"><em>Medewerkers</em></a> toegang<br> (password)
-br: Entrada <a href="%sw=w"><em>feiticeiro</em></a><br> (palavra chave)
+pt-br: Entrada <a href="%sw=w"><em>feiticeiro</em></a><br> (palavra chave)
 cs: <a href="%sw=w">{<em>"Wizard"</em></a> pøístup<br> (heslo)
-ct: acc&eacute;s <a href="%sw=w"><em>administrador</em></a><br> (clau)
+ca: acc&eacute;s <a href="%sw=w"><em>administrador</em></a><br> (clau)
 de: <a href="%sw=w"><em>Wizard</em></a>-Zugang<br> (Passwort)
-dk: <a href="%sw=w"><em>Opdateringsadgang</em></a><br> (adgangskode)
+da: <a href="%sw=w"><em>Opdateringsadgang</em></a><br> (adgangskode)
 en: <a href="%sw=w"><em>Wizard</em></a> access<br> (password)
 eo: <a href="%sw=w">Aliro <em>sorcxisto</em></a><br> (pasvorto)
 es: <a href="%sw=w">Entrada <em>brujo</em></a><br> (contrase&ntilde;a)
@@ -162,16 +162,16 @@ nl: Toegang als <a href="%sw=w"><em>tovenaar</em></a><br> (wachtwoord)
 no: <a href="%sw=w"><em>Oppdaterings</em></a> adgang<br> (passord)
 pl: <a href="%sw=w"><em>"Wizard"</em></a> dostêp<br> (has³o)
 pt: Entrada <a href="%sw=w"><em>feiticeiro</em></a><br> (palavra chave)
-se: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
+sv: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
 ]<br></td>
 
 %INf<td align=center>[
 af: <a href="%sw=f"><em>Vriend</em></a> toegang<br> (password)
-br: Entrada <a href="%sw=f"><em>amigo</em></a><br> (palavra chave)
+pt-br: Entrada <a href="%sw=f"><em>amigo</em></a><br> (palavra chave)
 cs: <a href="%sw=f">{<em>"Friend"</em></a> pøístup<br> (heslo)
-ct: acc&eacute;s <a href="%sw=f"><em>amic</em></a><br> (clau)
+ca: acc&eacute;s <a href="%sw=f"><em>amic</em></a><br> (clau)
 de: <a href="%sw=f"><em>Freund</em></a>-Zugang<br> (Passwort)
-dk: <a href="%sw=f"><em>Betroet adgang</em></a><br> (adgangskode)
+da: <a href="%sw=f"><em>Betroet adgang</em></a><br> (adgangskode)
 en: <a href="%sw=f"><em>Friend</em></a> access<br> (password)
 eo: <a href="%sw=f">Aliro <em>amiko</em></a><br> (pasvorto)
 es: <a href="%sw=f">Entrada <em>amigo</em></a><br> (contrase&ntilde;a)
@@ -186,7 +186,7 @@ nl: Toegang als <a href="%sw=f"><em>vriend</em></a><br> (wachtwoord)
 no: <a href="%sw=f"><em>Venners</em></a> adgang<br> (passord)
 pl: <a href="%sw=f"><em>"Friend"</em></a> dostêp<br> (has³o)
 pt: Entrada <a href="%sw=f"><em>amigo</em></a><br> (palavra chave)
-se: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
+sv: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
 ]</td>
 
 %E</tr></table>%E%I|ca<table border=0>
@@ -194,11 +194,11 @@ se: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
 <form method=POST action="%f">
 %h[
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
-br: Palavra chave para entrada <em>amigo</em> ou <em>feiticeiro</em>:
+pt-br: Palavra chave para entrada <em>amigo</em> ou <em>feiticeiro</em>:
 cs: Heslo pro<em>"friend"</em> nebo <em>"wizard"</em> pøístup:</em>:
-ct: Clau, per acc&eacute;s <em>amic</em> o <em>administrador</em>:
+ca: Clau, per acc&eacute;s <em>amic</em> o <em>administrador</em>:
 de: Passwort für <em>Freund</em>- oder <em>Wizard</em>-Zugang</em>:
-dk: Adgangskode, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
+da: Adgangskode, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
 en: Password, for <em>friend</em> or <em>wizard</em> access:
 eo: Pasvorto, por aliro <em>amiko</em> a&ugrave; <em>sorcxisto</em>:
 es: Contrase&ntilde;a, para entrada <em>amigo</em> o <em>brujo</em>:
@@ -214,7 +214,7 @@ nl: <font size=-1>Wachtwoord, voor toegang als <em>vriend</em> of
 no: Passord, for <em>venner</em> eller <em>oppdaterings</em> adgang:
 pl: Has³o dla dostêpu <em>"friend"</em> lub <em>"wizard"</em> :
 pt: Palavra chave para entrada <em>amigo</em> ou <em>feiticeiro</em>:
-se: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
+sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
     tilltr&auml;de:
 ]
 <input name=w type=password size=10 maxlength=200>
@@ -231,12 +231,12 @@ se: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
 <center><table border=0 cellspacing=0 cellpadding=0><tr><td>
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
-br: Para consultar esta base de dados, pode procurar:
-cn:
+pt-br: Para consultar esta base de dados, pode procurar:
+zh:
 cs: Databázi lze prohledávat:
-ct: Per navegar en aquesta base, podeu fer la vostra recerca:
+ca: Per navegar en aquesta base, podeu fer la vostra recerca:
 de: Zum Benutzen dieser Datenbank kannst du hier suchen:
-dk: For at navigere i denne database kan du søge:
+da: For at navigere i denne database kan du søge:
 en: To navigate in this data base, you can do your search:
 eo: Por navigi en cxi tiu datenbazo, vi povas fari vian sercxon:
 es: Para navegar en esta base de datos, puede hacer su búsqueda:
@@ -253,7 +253,7 @@ no: For &aring; navigere i databasen, kan du s&oslash;ke:
 pl: Aby poruszaæ siê po bazie, mo¿esz:
 pt: Para consultar esta base de dados, pode procurar:
 ru: ×òîáû íàéòè â ıòîé áàçå äàííûõ, Âû ìîæåòå èñêàòü:
-se: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
+sv: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
 ]<br><p>
 
 <ul>
@@ -264,12 +264,12 @@ se: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
 %h<input type=hidden name=m value=NG>
 <font color=%i><b>[
 af: per persoon
-br: por pessoa
-cn: ËÑË÷£º
+pt-br: por pessoa
+zh: ËÑË÷£º
 cs: Podle osob
-ct: per persona
+ca: per persona
 de: nach einer Person
-dk: personnavn
+da: personnavn
 en: by person
 eo: laù la persono
 es: por persona
@@ -285,7 +285,7 @@ no: etter person
 pl: znaleŸæ osobê
 pt: por pessoa
 ru: ïî ÷åëîâåêó
-se: efter person
+sv: efter person
 ]</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
@@ -308,12 +308,12 @@ se: efter person
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
 <font color=%i><b>[
 af: by title
-br: por t&iacute;tulo
-cn: ¸ù¾İÃûÏÎ
+pt-br: por t&iacute;tulo
+zh: ¸ù¾İÃûÏÎ
 cs: podle titulu
-ct: per títol
+ca: per títol
 de: nach einem Titel
-dk: titel (nob.)
+da: titel (nob.)
 en: by title
 eo: laù la mosxto
 es: por t&iacute;tulo
@@ -329,7 +329,7 @@ no: etter titel
 pl: znaleŸæ:
 pt: por t&iacute;tulo
 ru: ïî òèòóëó
-se: efter titel
+sv: efter titel
 ]</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
@@ -348,12 +348,12 @@ se: efter titel
 %h
 [
 af: <font color=%i><b>in die lys </b></font>van alle
-br: <font color=%i><b>pela lista</b></font> de todos os
-cn: ÏÔÊ¾ËùµÄ
+pt-br: <font color=%i><b>pela lista</b></font> de todos os
+zh: ÏÔÊ¾ËùµÄ
 cs: <font color=%i><b>ze seznamu</b></font> v¹ech
-ct: <font color=%i><b>pel llistat</b></font> de tots els
+ca: <font color=%i><b>pel llistat</b></font> de tots els
 de: <font color=%i><b>in der Liste</b></font> aller
-dk: <font color=%i><b>i liste</b></font> over alle
+da: <font color=%i><b>i liste</b></font> over alle
 en: <font color=%i><b>by the list</b></font> of all
 eo: <font color=%i><b>per la listo</b></font> de cxiuj
 es: <font color=%i><b>por la lista</b></font> de todos los
@@ -369,17 +369,17 @@ no: <font color=%i><b>med liste</b></font> over alle
 pl: <font color=%i><b>przejrzeæ listê</b></font> wszystkich
 pt: <font color=%i><b>pela lista</b></font> de todos os
 ru: <font color=%i><b>ïî ñïèñêó</b></font>  âñåõ
-se: <font color=%i><b>efter listan</b></font> av alla
+sv: <font color=%i><b>efter listan</b></font> av alla
 ]
 <select name=m>
 <option value="N" selected>[
 af: vanne
-br: sobrenomes
-cn: ĞÕ
+pt-br: sobrenomes
+zh: ĞÕ
 cs: pøíjmení
-ct: cognoms
+ca: cognoms
 de: Nachnamen
-dk: efternavne
+da: efternavne
 en: surnames
 eo: familiaj nomoj
 es: apellidos
@@ -395,16 +395,16 @@ no: etternavn
 pl: nazwisk
 pt: apelidos
 ru: ôàìèëèé
-se: efternamn
+sv: efternamn
 ]
 <option value="P">[
 af: voorname
-br: prenomes
-cn: Ãû
+pt-br: prenomes
+zh: Ãû
 cs: køestní jméno
-ct: noms
+ca: noms
 de: Vornamen
-dk: fornavne
+da: fornavne
 en: first names
 eo: propraj nomoj
 es: nombres
@@ -420,17 +420,17 @@ no: fornavn
 pl: imion
 pt: nomes pr&oacute;prios
 ru: èì¸í
-se: f&ouml;rnamn
+sv: f&ouml;rnamn
 ]
 </select>
 [
 af: volgens
-br: por
-cn: ¸ù¾İ
+pt-br: por
+zh: ¸ù¾İ
 cs: seøazená podle
-ct: per
+ca: per
 de:
-dk: sorteret efter
+da: sorteret efter
 en: by
 eo: laù
 es: por
@@ -446,17 +446,17 @@ no: sortert
 pl: u³o¿onych
 pt: por
 ru: óïîğÿäî÷åííûõ
-se: sorterade i
+sv: sorterade i
 ]
 <select name=tri>
 <option value="A" selected>[
 af: alfabeties volgorde
-br: ordem alfab&eacute;tica
-cn: ×ÖÄ¸Ğò
+pt-br: ordem alfab&eacute;tica
+zh: ×ÖÄ¸Ğò
 cs: abecedy
-ct: ordre alfab&egrave;tic
+ca: ordre alfab&egrave;tic
 de: alphabetisch sortiert
-dk: alfabetisk orden
+da: alfabetisk orden
 en: alphabetic order
 eo: alfabeta ordo
 es: orden alfab&eacute;tico
@@ -472,16 +472,16 @@ no: alfabetisk
 pl: w porz¹dku alfabetycznym
 pt: ordem alfab&eacute;tica
 ru: ïî àëôàâèòó
-se: bokstavsordning
+sv: bokstavsordning
 ]
 <option value="F">[
 af: frekwensie
-br: frequ&ecirc;ncia
-cn: ·ÃÎÊ´ÎÊı
+pt-br: frequ&ecirc;ncia
+zh: ·ÃÎÊ´ÎÊı
 cs: èetnosti
-ct: freq&uuml&egrave;ncia
+ca: freq&uuml&egrave;ncia
 de: nach H&auml;ufigkeit
-dk: hyppighed
+da: hyppighed
 en: frequency
 eo: ofteco
 es: frecuencia
@@ -497,7 +497,7 @@ no: etter frekvens
 pl: wed³ug czêstoœci wystêpowania
 pt: frequ&ecirc;ncia
 ru: ïî ÷àñòîòå
-se: frekvensordning
+sv: frekvensordning
 ]
 </select>
 [
@@ -513,11 +513,11 @@ et: järgi
 %h<input type=hidden name=m value=PS>
 <font color=%i><b>[
 af: by
-br: por
+pt-br: por
 cs: podle
-ct: per
+ca: per
 de: mit
-dk: ved
+da: ved
 en: by
 eo: per
 es: por
@@ -531,7 +531,7 @@ nl: via
 no: etter
 pl: przejrzeæ listê:
 pt: por
-se: efter
+sv: efter
 ] [place] / [surname/surnames]0</b></font>
 - [birth] <input type=checkbox name=bi value=on checked>
 - [death] <input type=checkbox name=de value=on>
@@ -545,19 +545,19 @@ se: efter
 af: <font color=%i><b>deur 'n</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>detail
        navraag</b></font></a>.
-br: <font color=%i><b>por</b></font>
+pt-br: <font color=%i><b>por</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>pesquisa
        complexa</b></font></a>.
 cs: <font color=%i><b>lze také zadat</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>roz¹íøenı
        dotaz</b></font></a>.
-ct: <font color=%i><b>per la</b></font>
+ca: <font color=%i><b>per la</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>consulta
        avançada</b></font></a>.
 de: <font color=%i><b>mit der</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>erweiterten
        Suche</b></font></a>.
-dk: <font color=%i><b>ved</b></font>
+da: <font color=%i><b>ved</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>avanceret
        søgning</b></font></a>.
 en: <font color=%i><b>by the</b></font>
@@ -603,7 +603,7 @@ pt: <font color=%i><b>por</b></font>
 ru: <font color=%i><b>÷åğåç</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>ğàñøèğåííûé
        çàïğîñ</b></font></a>.
-se: <font color=%i><b>genom</b></font>
+sv: <font color=%i><b>genom</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>avancerad
        s&ouml;kning</b></font></a>.
 ]%E
@@ -614,12 +614,12 @@ se: <font color=%i><b>genom</b></font>
 %Iw<p>
 <center>[
 af: Jy kan
-br: Pode
-cn:
+pt-br: Pode
+zh:
 cs: Zde mù¾ete
-ct: Podeu
+ca: Podeu
 de: Du kannst
-dk: Du kan:
+da: Du kan:
 en: You can
 eo: Vi povas
 es: Puede
@@ -635,7 +635,7 @@ no: Du kan
 pl: Mo¿esz
 pt: Pode
 ru: Âû ìîæåòå
-se: Du kan
+sv: Du kan
 ]<br><p>
 
 <table border=0>
@@ -644,12 +644,12 @@ se: Du kan
 <ul>
 %Ispropose_add_family;<li><a href="%sm=ADD_FAM">[
 af: 'n familie byvoeg
-br: acrescentar uma família
-cn: Ôö¼Ó¼ÒÍ¥¼ÇÂ¼
+pt-br: acrescentar uma família
+zh: Ôö¼Ó¼ÒÍ¥¼ÇÂ¼
 cs: pøidat novou rodinu
-ct: afegir una fam&iacute;lia
+ca: afegir una fam&iacute;lia
 de: eine Familie hinzuf&uuml;gen
-dk: tilføje en familie
+da: tilføje en familie
 en: add a family
 eo: aldoni familion
 es: agregar una familia
@@ -665,7 +665,7 @@ no: legge til en familie
 pl: dodaæ rodzinê (parê)
 pt: acrescentar uma família
 ru: äîáàâèòü ñåìüş
-se: l&auml;gga till en familj
+sv: l&auml;gga till en familj
 ]</a>
 %INl</ul>
 </td>
@@ -673,11 +673,11 @@ se: l&auml;gga till en familj
 <ul>%E
 %E<li><a href="%sm=MOD_NOTES">[
 af: die notas wysig
-br: modificar as notas
+pt-br: modificar as notas
 cs: upravit poznámky
-ct: modificar les notes
+ca: modificar les notes
 de: die Notizen &auml;ndern
-dk: ændre noterne
+da: ændre noterne
 en: modify the notes
 eo: modifi la notojn
 es: modificar las notas
@@ -693,7 +693,7 @@ no: endre notater
 pl: zmodyfikowaæ uwagi
 pt: modificar as notas
 ru: èçìåíèòü çàìåòêó
-se: &auml;ndra noteringar
+sv: &auml;ndra noteringar
 ]</a>
 </ul>
 </td>
@@ -705,12 +705,12 @@ se: &auml;ndra noteringar
 
 <center>[
 af: Jy kan ook kyk na
-br: Tamb&eacute;m pode consultar
-cn:
+pt-br: Tamb&eacute;m pode consultar
+zh:
 cs: Lze také zobrazit
-ct: Tamb&eacute; podeu consultar
+ca: Tamb&eacute; podeu consultar
 de: Du kannst zugreifen auf
-dk: Du kan også fremkalde:
+da: Du kan også fremkalde:
 en: You can also consult
 eo: Vi povas anka&ugrave; konsulti
 es: Puede consultar
@@ -726,7 +726,7 @@ no: Du kan ogs&aring; sl&aring; opp
 pl: Mo¿esz tak¿e obejrzeæ
 pt: Tamb&eacute;m pode consultar
 ru: Âû ìîæåòå òàêæå îáğàòèòüñÿ ê
-se: Du kan ocks&aring; konsultera
+sv: Du kan ocks&aring; konsultera
 ]<br><p>
 
 <table border=0>
@@ -754,13 +754,13 @@ se: Du kan ocks&aring; konsultera
 
 [
 af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
-br: Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
-cn: ÒÑ¾­ÓĞ %q ´Î·ÃÎÊÊı¾İ¿â£¬ÆäÖĞ %c ´Î·ÃÎÊ±¾Ö÷Ò³£¬ ×Ô´Ó %d¡£
+pt-br: Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
+zh: ÒÑ¾­ÓĞ %q ´Î·ÃÎÊÊı¾İ¿â£¬ÆäÖĞ %c ´Î·ÃÎÊ±¾Ö÷Ò³£¬ ×Ô´Ó %d¡£
 cs: %q pøístupù, z toho %c na tuto stránku, od %d.
-ct: Hi ha hagut %q consultes, de les quals %c en aquesta p&agrave;gina, des
+ca: Hi ha hagut %q consultes, de les quals %c en aquesta p&agrave;gina, des
     del %d.
 de: Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.
-dk: Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
+da: Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
 en: There have been %q accesses, %c of them to this page, since %d.
 eo: Estis %q alirejoj, el kiuj %c al cxi tiu pagxo, ekde la %d.
 es: Ha habido %q consultas, de las cuales %c corresponden a esta
@@ -781,7 +781,7 @@ no: Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
 pl: Baza zosta³a od %d odwiedzona %q razy (w tym %c razy strona tytu³owa).
 pt: Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
 ru: Âñåãî áûëî %q îáğàùåíèé, èç íèõ %c ê ıòîé ñòğàíèöå, íà÷èíàÿ ñ %d.
-se: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
+sv: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
     sedan %d.
 ]
 %Il<p>%E
@@ -789,21 +789,21 @@ se: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
 <p>
 
 [
-br: Se o seu <i>browser</i> n&atilde;o atualiza automaticamente as
+pt-br: Se o seu <i>browser</i> n&atilde;o atualiza automaticamente as
     p&aacute;ginas modificadas (for&ccedil;ando a fazer
     "reload current document"), tente navegar desde <a
     href="%sescache=0">este link</a>.
 cs: Pokud Vá¹ prohlí¾eè neprovádí automaticky obnovu upravenıch stránek
     (musíte pou¾ívat tlaèítko "obnovit"), zkuste prohlí¾ení pøes <a
     href="%sescache=0">tento odkaz</a>.
-ct: Si el vostre navegador no actualitza autom&agrave;ticament les
+ca: Si el vostre navegador no actualitza autom&agrave;ticament les
     p&agrave;gines modificades (obligant-vos a fer actualitzar manualment
     la p&agrave;gina), proveu de navegar des d'<a href="%sescache=0">aquest
     altre lloc</a>.
 de: Wenn die ge&auml;nderten Seiten nicht automatisch aktualisiert werden
     (man mu&szlig; st&auml;ndig im Browser auf "Neu laden" klicken),
     bitte <a href="%sescache=0">hier</a> klicken.
-dk: Hvis din browser ikke automatisk opdaterer &aelig;ndrede sider
+da: Hvis din browser ikke automatisk opdaterer &aelig;ndrede sider
     (n&oslash;dvendigg&oslash;r genindl&aelig;sning af det aktuelle
     dokument), pr&oslash;v da at navigere <a href="%sescache=0">herfra</a>.
 en: If your browser does not automatically update the modified pages (forcing
@@ -836,7 +836,7 @@ pt: Se o seu <i>browser</i> n&atilde;o actualiza automaticamente as
     p&aacute;ginas modificadas (for&ccedil;ando a fazer
     "reload current document"), tente navegar desde <a
     href="%sescache=0">este link</a>.
-se: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
+sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
     navigera <a href="%sescache=0">härifrån</a>.
 ]
@@ -847,11 +847,11 @@ se: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
 <br>
 
 <p align=right><font size=-1><em><a href="%sm=LEX">[
-cn: ±¾Õ¾Ê¹ÓÃµÄÊõÓï
+zh: ±¾Õ¾Ê¹ÓÃµÄÊõÓï
 cs: lexikon
-ct: L&egrave;xic
+ca: L&egrave;xic
 de: Lexikon
-dk: leksikon
+da: leksikon
 en: lexicon
 eo: leksikono
 fi: Sanasto
@@ -859,7 +859,7 @@ fr: lexique
 he: ì÷ñé÷åï 
 no: leksikon
 pl: leksykon
-se: lexikon
+sv: lexikon
 ]</a></em></font></p>
 
 </center>

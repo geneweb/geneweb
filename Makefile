@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.1 2001-03-26 17:03:54 ddr Exp $
+# $Id: Makefile,v 4.2 2001-04-05 13:58:34 ddr Exp $
 
 DESTDIR=distribution
 
@@ -51,7 +51,7 @@ new_distrib: classical_distrib
 	mkdir $(DESTDIR)/gw/old
 	mkdir $(DESTDIR)/gw/setup
 	cp setup/intro.txt $(DESTDIR)/gw/setup/.
-	for i in de en es fr lv se; do \
+	for i in de en es fr lv sv; do \
 	  mkdir $(DESTDIR)/gw/setup/$$i; \
 	  cp setup/$$i/*.htm $(DESTDIR)/gw/setup/$$i; \
 	  if test "$(CAMLP4F)" = "-DWIN95"; then \
@@ -93,7 +93,7 @@ classical_distrib:
 	cp etc/a.gwf $(DESTDIR)/.
 	mkdir $(DESTDIR)/doc
 	cp doc/*.htm $(DESTDIR)/doc/.
-	for i in de fr en nl se; do \
+	for i in de fr en nl sv; do \
 	  mkdir $(DESTDIR)/doc/$$i; \
 	  cp doc/$$i/*.htm $(DESTDIR)/doc/$$i/.; \
 	done

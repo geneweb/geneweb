@@ -2,31 +2,25 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: mk_missing_i18n.sh,v 4.1 2001-03-26 03:39:16 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 4.2 2001-04-05 13:59:42 ddr Exp $ *)
 
 open Printf
 
 let languages =
-  ["af"; "br"; "cn"; "cs"; "ct"; "de"; "dk"; "en"; "eo"; "es"; "et"; "fi";
-   "fr"; "he"; "is"; "it"; "lv"; "nl"; "no"; "pl"; "pt"; "ru"; "se"]
+  ["af"; "ca"; "cs"; "da"; "de"; "en"; "es"; "eo"; "et"; "fi";
+   "fr"; "he"; "is"; "it"; "lv"; "nl"; "no"; "pl"; "pt"; "pt-br";
+   "ru"; "sv"; "zh"]
 
 let linenum = ref 0
 let input_line_cnt ic = incr linenum; input_line ic
 
-let derived = ref []
-let derive lang = try List.assoc lang !derived with Not_found -> ""
-
 let rec skip_to_same_line ic line_ref =
   let line = input_line_cnt ic in
   if line = line_ref then ()
-  else if String.length line = 5 && line.[2] = '=' then begin
-    derived := (String.sub line 0 2, String.sub line 3 2) :: !derived;
-    skip_to_same_line ic line_ref
-  end
   else skip_to_same_line ic line_ref
 
 let rec get_all_versions ic =
-  let line = input_line_cnt ic in
+  let line = try input_line_cnt ic with End_of_file -> "" in
   if line = "" then []
   else if String.length line < 3 then begin
     eprintf "small line %d: \"%s\"\n" !linenum (String.escaped line);
@@ -34,18 +28,21 @@ let rec get_all_versions ic =
     []
   end
   else
-    let lang = String.sub line 0 2 in
-    let transl =
-      if String.length line = 3 then ""
-      else String.sub line 4 (String.length line - 4)
-    in
-    (lang, transl) :: get_all_versions ic
+    try
+      let i = String.index line ':' in
+      let lang = String.sub line 0 i in
+      let transl = String.sub line (i + 1) (String.length line - i - 1) in
+      (lang, transl) :: get_all_versions ic
+    with Not_found ->
+      []
 
 let compare_assoc (l1, _) (l2, _) = l1 <= l2
 
 let check first lang =
+  let derived_lang =
+    try String.sub lang 0 (String.index lang '-') with Not_found -> ""
+  in
   linenum := 0;
-  derived := [];
   let ic_lex = open_in "../hd/lang/lexicon.txt" in
   let ic_i18n = open_in "i18n" in
   printf "<h3><a name=%s>%s</h3>\n" lang lang;
@@ -60,7 +57,7 @@ let check first lang =
 	eprintf "Misordered for:\n   \"%s\"\n" line;
 	flush stderr;
       end;
-      if not (List.mem_assoc lang list || List.mem_assoc (derive lang) list)
+      if not (List.mem_assoc lang list || List.mem_assoc derived_lang list)
       then begin
         let list =
 	  Sort.list compare_assoc
@@ -68,7 +65,7 @@ let check first lang =
 	     ("fr", List.assoc "fr" list)]
 	in
         printf "    %s\n" line;
-        List.iter (fun (lang, transl) -> printf "%s: %s\n" lang transl)
+        List.iter (fun (lang, transl) -> printf "%s:%s\n" lang (if transl = "" then " " else transl))
 	  list;
 	printf "\n";
 	has_missing := true
