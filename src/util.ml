@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.65 2002-12-01 05:46:36 ddr Exp $ *)
+(* $Id: util.ml,v 4.66 2002-12-18 14:08:35 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -2099,6 +2099,59 @@ value escache_value conf =
   string_of_int v
 ;
 
+value adm_file f =
+  List.fold_right Filename.concat [cnt_dir.val; "cnt"] f
+;
+
+value std_date () =
+  let tm = Unix.localtime (Unix.time ()) in
+  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" (tm.Unix.tm_year + 1900)
+    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+    tm.Unix.tm_sec
+;
+
+value read_wf_trace fname =
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let r = ref [] in
+      do {
+        try while True do { r.val := [input_line ic :: r.val] } with
+        [ End_of_file -> close_in ic ];
+        List.rev r.val
+      }
+  | None -> [] ]
+;
+
+value write_wf_trace fname wt =
+  let oc = open_out fname in
+  do {
+    List.iter (fun (dt, u) -> Printf.fprintf oc "%s %s\n" dt u) wt;
+    close_out oc;
+  }
+;
+
+value update_wf_trace conf fname =
+  let dt = std_date () in
+  let wt =
+    let r = read_wf_trace fname in
+    let dtlen = String.length dt in
+    let rec loop found r =
+      fun
+      [ [x :: l] ->
+          if String.length x > dtlen + 2 then
+            let u =
+              String.sub x (dtlen + 1) (String.length x - dtlen - 1)
+            in
+            if u = conf.user then loop True [(dt, u) :: r] l
+            else loop found [(String.sub x 0 dtlen, u) :: r] l
+          else loop found r l
+      | [] -> if found then r else [(dt, conf.user) :: r] ]
+    in
+    loop False [] r
+  in
+  write_wf_trace fname (Sort.list \> wt)
+;
+
 value commit_patches conf base =
   do {
     base.func.commit_patches ();
@@ -2108,6 +2161,16 @@ value commit_patches conf base =
            if k = "escache" then (k, escache_value conf) else (k, v))
         conf.henv
     ;
+    if conf.user <> "" then
+      let wpf =
+        try List.assoc "wizard_passwd_file" conf.base_env with
+        [ Not_found -> "" ]
+      in
+      if wpf <> "" then
+        let fname = adm_file (conf.bname ^ "_u.txt") in
+        update_wf_trace conf fname
+      else ()
+    else ();
   }
 ;
 

@@ -4,6 +4,10 @@ Internal, very small, undocumented, or invisible changes
 GeneWeb Version 4.09
 --------------------
 
+* GeneWeb server or CGI (gwd)
+  - [18 Dec 02] Save now a file named base_u.txt in the cnt directory,
+    recording the latest wizards updates.
+
 GeneWeb Version 4.08
 --------------------
 
