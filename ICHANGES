@@ -9,6 +9,10 @@ GeneWeb Version 1.11
     instead of line = "": better test to avoid failures when bad lexicon
     files.
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [16/01/99] Ignore abnormal errors (displaying "uncaught exception:
+    Stream.Failure").
+
 * GeneWeb compiler (gwc)
   - [12/01/99] Failure error now displayed in stdout instead of stderr.
 
