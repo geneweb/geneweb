@@ -73,14 +73,13 @@
 <p>
 已经有 %q 次访问数据库，其中 %c 次访问本主页， 自从 %d。
 
-<p>
+%y<p>
 
-<form method=get action="%f">
-%h<font size=-1>授权用户(friend or wizard), 请输入密码：</font>
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
+<ul>
+<li> <a href="%sw=w"><em>Wizard</em></a> access (password).
+%y%z<li> <a href="%sw=f"><em>Friend</em></a> access (password).
+%z%y</ul>
 
-<p>
+%y<p>
 
 <font size=-1><a href="%sm=LEX">本站使用的术语</a></font>

@@ -72,15 +72,13 @@ En de <a href="%sm=AM">verjaardagen van huwelijken</a>.
 Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
 deze verwelkomingspagina.
 
-<p>
+%y<p>
 
-<form method=get action="%f">
-%h<font size=-1>Wachtwoord, voor <em>vriend</em> of <em>wijzigen</em> toegang:
-</font>
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
+<ul>
+<li> <a href="%sw=w"><em>Wijzigen</em></a> toegang (wachtwoord).
+%y%z<li> <a href="%sw=f"><em>Vriend</em></a> toegang (wachtwoord).
+%z%y</ul>
 
-<p>
+%y<p>
 
 <font size=-1><a href="%sm=LEX">Lexicon</a></font>
