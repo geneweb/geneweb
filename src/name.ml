@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.14 2005-02-05 11:18:20 ddr Exp $ *)
+(* $Id: name.ml,v 4.15 2005-02-05 11:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 module Buff =
@@ -72,8 +72,8 @@ value lower s =
       if i + nbc > String.length s then (* bad utf-8 *) Buff.get len
       else
         let len = if special then Buff.store len ' ' else len in
-	match c with
-	[ 0xC2 ->
+        match c with
+        [ 0xC2 ->
             let c1 = Char.chr (Char.code s.[i+1]) in
             let c2 = unaccent_iso_8859_1 c1 in
             if c2 <> c1 then copy False (i + 2) (Buff.store len c2)
@@ -83,7 +83,7 @@ value lower s =
             let c2 = unaccent_iso_8859_1 c1 in
             if c2 <> c1 then copy False (i + 2) (Buff.store len c2)
             else copy False (i + 2) (Buff.gstore len s i 2)
-	| c ->
+        | c ->
             copy False (i + nbc) (Buff.gstore len s i nbc) ]
 ;
 
@@ -175,7 +175,7 @@ value crush s =
               in
               copy (i + 1) len first_vowel
           | 's' | 'z' when
-	    utf_8_db.val && (i == String.length s - 1 || s.[i + 1] == ' ') ->
+            utf_8_db.val && (i == String.length s - 1 || s.[i + 1] == ' ') ->
               let len =
                 loop (i - 1) (len - 1) where rec loop i len =
                   if i > 0 && len > 0 && s.[i] = Buff.buff.val.[len] &&
