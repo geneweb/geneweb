@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.85 2001-02-17 03:51:14 ddr Exp $ *)
+(* $Id: perso.ml,v 3.86 2001-02-17 12:45:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -246,8 +246,7 @@ type ast = Templ.ast ==
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
   | Adefine of string and string and list ast and list ast
-  | Aapply of string and ast_expr
-  | Aeval of ast_expr ]
+  | Aapply of string and string ]
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
@@ -1143,8 +1142,7 @@ value rec eval_ast conf base env =
   | Aif e alt ale -> eval_if conf base env e alt ale
   | Aforeach s sl al -> eval_foreach conf base env s sl al
   | Adefine f x al alk -> ()
-  | Aapply f v -> ()
-  | Aeval a -> () ]
+  | Aapply f v -> () ]
 and eval_if conf base env e alt ale =
   let al = if eval_bool_value conf base env e then alt else ale in
   List.iter (eval_ast conf base env) al
