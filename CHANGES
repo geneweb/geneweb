@@ -14,7 +14,7 @@ GeneWeb version 3.01
 
 * Base configuration files (base.gwf)
   - [Nov 13, 99] Fixed bug: when setting the variable "access_by_key" to
-    "yes", links to persons holding "?" in their names were impossible.
+    "yes", links to persons holding "?" in their names did not work.
 
 * Gedcom to GeneWeb (ged2gwb)
   - [Nov 5, 99] Accept roman digits in years of French Republican dates.
