@@ -28,7 +28,8 @@
 <LI><A HREF="#ModF">5.2.</A> Modifiera en Familj. </LI>
 <LI><A HREF="#DelF">5.3.</A> Ta bort en Familj. </LI>
 <LI><A HREF="#ModP">5.4.</A> Modifiera en Person. </LI>
-<LI><A HREF="#DelP">5.5.</A> Ta bort en Person. </LI></UL>
+<LI><A HREF="#DelP">5.5.</A> Ta bort en Person. </LI>
+<LI><A HREF="#SndP">5.6.</A> Skicka ett foto. </LI></UL>
 
 <LI><A HREF="#MrgP">6.</A> Hur man sl&aring;rsamman tv&aring; personer. </LI>
 <LI><A HREF="#MrgF">7.</A> Hur man sl&aring;rsamman tv&aring; familjer. </LI>
@@ -76,7 +77,7 @@
 
 <P>P&aring; v&auml;lkomst sidan, genom att klicka p&aring; "L&auml;gg till en familj" allows dig att starta fylla i en tom databas. </P>
 <P>Du ser sedan en formul&auml;r f&ouml;r att l&auml;gga till en familj. Report till sektionen <A HREF="#AddF">L&auml;gg till en Familj</A>. </P>
-<P>P&aring; en personlig sida, genom att klicka p&aring; "Uppdatera" allows dig att se en sida d&auml;r n&aring;gra f&ouml;rslag finns. Dessa val beror av familje situationen f&ouml;r personen: </P>
+<P>P&aring; en personlig sida, genom att klicka p&aring; "Uppdatera" g&ouml;r det m&ouml;jligt f&ouml;r dig att se en sida d&auml;r n&aring;gra f&ouml;rslag finns. Dessa val beror av familje situationen f&ouml;r personen: </P>
 <OL>
 
 <LI>I alla fall, har du valet "Modifiera" och "Ta bort": det &auml;r modifiering eller att ta bort personen. Report till sektionen: </LI></OL>
@@ -88,10 +89,24 @@
 <LI><A HREF="#ModP">Modifiera en Person</A> </LI>
 <LI><A HREF="#DelP">Ta bort en Person</A> </LI></UL>
 </UL>
+<DIR>
+<DIR>
+<DIR>
+
+<P>Om databas &auml;garen gav beh&ouml;righet (se <A HREF="start.htm#Cnf">Konfigurations filen</A>), f&aring;r du valet "Skicka foto". Rapportera till sektionen: </P></DIR>
+</DIR>
+</DIR>
+
+
+<UL>
+
+<UL>
+<LI><A HREF="#Sndp">Skicka ett foto</A></LI></UL>
+</UL>
 
 <OL START=2>
 
-<LI>Om personen &auml;r gift, har du, f&ouml;r varje gifterm&aring;l valet "Modifiera/Familj" och "Ta bort/Familj". Report to the sections: </LI></OL>
+<LI>Om personen &auml;r gift, har du, f&ouml;r varje gifterm&aring;l valet "Modifiera/Familj" och "Ta bort/Familj". Report till sektionen: </LI></OL>
 
 
 <UL>
@@ -103,7 +118,7 @@
 
 <OL START=3>
 
-<LI>Om det &auml;r flera gifterm&aring;l, finns det ett val "Byt" mellan varje gifterm&aring;l, allowing dig att byta plats p&aring; familjerna. </LI></OL>
+<LI>Om det &auml;r flera gifterm&aring;l, finns det ett val "Byt" mellan varje gifterm&aring;l, g&ouml;r det m&ouml;jligt f&ouml;r dig att byta plats p&aring; familjerna. </LI></OL>
 
 <OL START=4>
 
@@ -125,8 +140,15 @@
 
 <UL>
 <LI><A HREF="#AddF">L&auml;gg till en Familj</A> </LI></UL>
+</UL>
+<DIR>
+<DIR>
 
-<LI>Obs: </LI>
+<P>Obs: </P></DIR>
+</DIR>
+
+
+<UL>
 <LI>Alla dessa val leder antingen till ett formul&auml;r att fylla i, eller till en fr&aring;ga: du g&ouml;r ingenting definitivt genom att klicka p&aring; denna sida: it is always possible to go back. </LI></UL>
 <DIR>
 <DIR>
@@ -140,7 +162,7 @@
 
 
 <UL>
-<LI>I formul&auml;rul&auml;r, kand det h&auml;nda att en del f&auml;lt &auml;r f&ouml;r i fyllda. Dett betyder inte att du inte kan &auml;ndra inneh&aring;llet. </LI></UL>
+<LI>I formul&auml;r, kan det h&auml;nda att en del f&auml;lt &auml;r f&ouml;r i fyllda. Detta betyder inte att du inte kan &auml;ndra inneh&aring;llet. </LI></UL>
 <DIR>
 <DIR>
 <DIR>
@@ -545,6 +567,11 @@
 <P>If you do "Ok", a new sida appears with the the title "Person deleted". </P>
 <P>The person is not exactly deleted. His personal data is erased (included his f&ouml;rnamn och efternamn) as well as his connection with his f&ouml;r&auml;ldrar. </P>
 <P>But an "entity person" is subsisting, linked to his possible spouse och barnren. </P>
+<H4><A NAME="SndP">5.6.</A> Skicka ett foto </H4>
+<P>Du ser this formul&auml;r, ben&auml;mnd "Skicka foto" from a personal record, after having clicked on "Update", then "Skicka foto", but only if the databas &auml;garen ger <A HREF="start.htm#Cnf">beh&ouml;righet</A> till det. </P>
+<P>Du kan skicka (upload) en "gif" eller "jpeg" fil which will be associated to the person. This file is recorded in the site. If this person already had a photo, yours replaces it. </P>
+<P>Viktigt: f&auml;ltet "Foto" f&ouml;r personen m&aring;ste vara tomt, otherwise this field is taken for the photo, not the photo you sent. Om detta f&auml;lt &auml;r fyllt g&ouml;r "Uppdatera" och "Modifiera person" f&ouml;r att radera det.</P>
+<P>&nbsp;</P>
 <H4><A NAME="MrgP">6.</A> Hur man sl&aring;r ihop tv&aring; personer </H4>
 <P>Denn del beskriver hur man sl&aring;r ihop tv&aring; <STRONG>personer</STRONG> i en databas, om du har lagrat samma person tv&aring; g&aring;nger. </P>
 <P>Notera: vi pratar inte h&auml;r om hur man sl&aring;r ihop tv&aring; <STRONG>databaser</STRONG>: this is treated <A HREF="merge.htm">elsewhere</A>: it is not possible to do it on line (this chapter relates only to on line updates). </P>
