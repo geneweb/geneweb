@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.56 1999-10-26 00:05:34 ddr Exp $ *)
+(* $Id: setup.ml,v 1.57 1999-10-26 08:28:38 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -463,7 +463,7 @@ value simple conf =
     else if out_file = "" then out_name_of_ged ged
     else out_file
   in
-  let env = if ged = "" then conf.env else [("f", "on") :: conf.env] in
+  let env = [("f", "on") :: conf.env] in
   let conf =
     {comm = if ged = "" then "gwc" else "ged2gwb";
      env = list_replace "o" out_file env;
