@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.52 2001-01-11 20:51:29 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.53 2001-01-21 16:17:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -997,16 +997,16 @@ value print_ancestors_same_time_descendants conf base p a =
   in
   let title h =
     if h then
-      Wserver.wprint "%s... %s..."
+      Wserver.wprint "%s... %s"
         (capitale (transl conf "ancestors"))
-        (transl conf "up to")
+        (transl_decline conf "up to" "...")
     else
       do Wserver.wprint "%s\n"
            (capitale
               (transl_decline2 conf "%1 of %2" (transl conf "ancestors")
                  (gen_person_text raw_access conf base p)));
-         Wserver.wprint "%s %s" (transl conf "up to")
-           (person_text conf base a);
+         Wserver.wprint "%s"
+           (transl_decline conf "up to" (person_text conf base a));
       return ()
   in
   do header conf title;

@@ -19,6 +19,11 @@ GeneWeb Version 3.11
   - [19 Dec 00] Fixed several problems of declinations appearing in esperanto
     version (e.g. texts "parents", "notes").
 
+* Lexicon (lang/lexicon.txt)
+  - [21 Jan 01] Changed phrase "up to" to accept ask for declination. Changed
+    the translation in Czech (Hanus Adler) to indicate the good declination
+    after it.
+
 * Setup program (gwsetup)
   - [30 Dec 00] Fixed information file about how to put a background image,
     the URL to use and the directory were wrong (obsolete).
