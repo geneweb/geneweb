@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.30 2001-02-15 06:22:17 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.31 2001-02-15 14:24:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -786,7 +786,7 @@ type ast = Templ.ast ==
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
-  | Eequal of ast_expr and ast_expr
+  | Eop of string and ast_expr and ast_expr
   | Enot of ast_expr
   | Estr of string
   | Evar of string and list string ]
@@ -798,21 +798,13 @@ type env =
 ;
 
 type variable_value =
-  [ VVind of string
+  [ VVgen of string
   | VVdate of option date and string
+  | VVcvar of string
   | VVnone ]
 ;
 
 value get_env v env = try List.assoc v env with [ Not_found -> Enone ];
-
-value eval_variable conf base env p =
-  fun
-  [ ["bapt"; s] -> VVdate (Adef.od_of_codate p.baptism) s
-  | ["birth"; s] -> VVdate (Adef.od_of_codate p.birth) s
-  | [s] -> VVind s
-  | [] -> VVind ""
-  | _ -> VVnone ]
-;
 
 value extract_var sini s =
   let len = String.length sini in
@@ -821,11 +813,110 @@ value extract_var sini s =
   else ""
 ;
 
-value eval_person_bool_variable conf base env p =
+value eval_variable conf base env p =
+  fun
+  [ ["bapt"; s] -> VVdate (Adef.od_of_codate p.baptism) s
+  | ["birth"; s] -> VVdate (Adef.od_of_codate p.birth) s
+  | ["death"; s] ->
+      let d =
+        match p.death with
+        [ Death _ cd -> Some (Adef.date_of_cdate cd)
+        | _ -> None ]
+      in
+      VVdate d s
+  | [] -> VVgen ""
+  | [s] ->
+      let v = extract_var "cvar_" s in
+      if v <> "" then VVcvar v else VVgen s
+  | _ -> VVnone ]
+;
+
+(* string values *)
+
+value eval_base_env_variable conf v =
+  try List.assoc v conf.base_env with [ Not_found -> "" ]
+;
+
+value eval_string_env var env =
+   match get_env var env with
+   [ Estring x -> x
+   | _ -> "" ]
+;
+
+value eval_gen_variable conf base env p =
+  fun
+  [ "bapt_place" -> quote_escaped p.baptism_place
+  | "bapt_src" -> quote_escaped p.baptism_src
+  | "birth_place" -> quote_escaped p.birth_place
+  | "birth_src" -> quote_escaped p.birth_src
+  | "death_place" -> quote_escaped p.death_place
+  | "death_src" -> quote_escaped p.death_src
+  | "cnt" -> eval_string_env "cnt" env
+  | "digest" -> eval_string_env "digest" env
+  | "first_name" -> quote_escaped p.first_name
+  | "image" -> quote_escaped p.image
+  | "index" -> string_of_int (Adef.int_of_iper p.cle_index)
+  | "item" -> eval_string_env "item" env
+  | "occ" -> if p.occ <> 0 then string_of_int p.occ else ""
+  | "public_name" -> quote_escaped p.public_name
+  | "surname" -> quote_escaped p.surname
+  | s ->
+      let v = extract_var "evar_" s in
+      if v <> "" then
+        match p_getenv conf.env v with
+        [ Some vv -> quote_escaped vv
+        | _ -> "" ]
+     else raise Not_found ]
+;
+
+value eval_date_field proj =
+  fun
+  [ Some d  ->
+      let d =
+        match d with
+        [ Dgreg d Dgregorian -> Some d
+        | Dgreg d Djulian -> Some (Calendar.julian_of_gregorian d)
+        | Dgreg d Dfrench -> Some (Calendar.french_of_gregorian d)
+        | Dgreg d Dhebrew -> Some (Calendar.hebrew_of_gregorian d)
+        | _ -> None ]
+      in
+      match d with
+      [ Some d -> string_of_int (proj d)
+      | None -> "" ]
+  | None -> "" ]
+;
+
+value eval_date_text =
+  fun
+  [ Some (Dtext s) -> s
+  | _ -> "" ]
+;
+
+value eval_date_variable conf base env od =
+  fun
+  [ "day" -> eval_date_field (fun d -> d.day) od
+  | "month" -> eval_date_field (fun d -> d.month) od
+  | "text" -> eval_date_text od
+  | "year" -> eval_date_field (fun d -> d.year) od
+  | "oryear" ->
+      match od with
+      [ Some (Dgreg {prec = OrYear y} _) -> string_of_int y
+      | Some (Dgreg {prec = YearInt y} _) -> string_of_int y
+      | _ -> "" ]
+  | v -> "%" ^ v ^ ";" ]
+;
+
+(* bool values *)
+
+value eval_gen_bool_variable conf base env p =
   fun 
   [ "adding" ->
       List.mem (p_getenv conf.env "m") [Some "ADD_IND"; Some "ADD_IND_OK"]
+  | "dead_dont_know_when" -> p.death = DeadDontKnowWhen
+  | "died_young" -> p.death = DeadYoung
+  | "dont_know_if_dead" -> p.death = DontKnowIfDead
   | "has_aliases" -> p.aliases <> []
+  | "has_birth_date" -> Adef.od_of_codate p.birth <> None
   | "has_first_names_aliases" -> p.first_names_aliases <> []
   | "has_qualifiers" -> p.qualifiers <> []
   | "has_surnames_aliases" -> p.surnames_aliases <> []
@@ -836,13 +927,14 @@ value eval_person_bool_variable conf base env p =
   | "merging" ->
       List.mem (p_getenv conf.env "m")
         [Some "MRG_IND_OK"; Some "MRG_MOD_IND_OK"]
+  | "not_dead" -> p.death = NotDead
   | s ->
       let v = extract_var "evar_" s in
       if v <> "" then
         match p_getenv conf.env v with
         [ Some "" | None -> False
         | _ -> True ]
-      else do Wserver.wprint "%%%s;" s; return True ]
+      else do Wserver.wprint "%%%s???" s; return False ]
 ;
 
 value is_calendar cal =
@@ -871,14 +963,15 @@ value eval_date_bool_variable conf base env od =
   | "prec_after" -> is_precision (fun [ After -> True | _ -> False ]) od
   | "prec_oryear" -> is_precision (fun [ OrYear _ -> True | _ -> False ]) od
   | "prec_yearint" -> is_precision (fun [ YearInt _ -> True | _ -> False ]) od
-  | s -> do Wserver.wprint "%%%s;" s; return False ]
+  | s -> do Wserver.wprint "%%%s???" s; return False ]
 ;
 
-value eval_bool_variable conf base env p sl =
-  match eval_variable conf base env p sl with
-  [ VVind s -> eval_person_bool_variable conf base env p s
+value eval_bool_variable conf base env p s sl =
+  match eval_variable conf base env p [s :: sl] with
+  [ VVgen s -> eval_gen_bool_variable conf base env p s
   | VVdate od s -> eval_date_bool_variable conf base env od s
-  | VVnone -> False ]
+  | VVcvar s -> do Wserver.wprint "%%%s???" s; return False
+  | VVnone -> do Wserver.wprint "%%%s???" s; return False ]
 ;
 
 value eval_bool_value conf base env p =
@@ -886,94 +979,42 @@ value eval_bool_value conf base env p =
     fun
     [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
     | Eand e1 e2 -> bool_eval e1 && bool_eval e2
-    | Eequal e1 e2 -> string_eval e1 = string_eval e2
+    | Eop op e1 e2 ->
+        match op with
+        [ "=" -> string_eval e1 = string_eval e2
+        | "!=" -> string_eval e1 <> string_eval e2
+        | _ -> do Wserver.wprint "op %s???" op; return False ]
     | Enot e -> not (bool_eval e)
     | Estr s -> do Wserver.wprint "\"%s\"???" s; return False
-    | Evar s sl -> eval_bool_variable conf base env p [s :: sl] ]
+    | Evar s sl -> eval_bool_variable conf base env p s sl ]
   and string_eval =
     fun
     [ Estr s -> s
-    | Evar s [] ->
-        let v = extract_var "cvar_" s in
-        if v <> "" then try List.assoc v conf.base_env with [ Not_found -> "" ]
-        else do Wserver.wprint "%s???" s; return ""
-    | Evar s _ -> do Wserver.wprint "%s???" s; return ""
+    | Evar s sl ->
+        try
+          match eval_variable conf base env p [s :: sl] with
+          [ VVgen s -> eval_gen_variable conf base env p s
+          | VVdate od s -> eval_date_variable conf base env od s
+          | VVcvar s -> eval_base_env_variable conf s
+          | VVnone -> do Wserver.wprint "%%%s???" s; return "" ]
+        with
+        [ Not_found -> do Wserver.wprint "%%%s???" s; return "" ]
     | _ -> do Wserver.wprint "val???"; return "" ]
   in
   bool_eval
 ;
 
-value print_string_env var env =
-   match get_env var env with
-   [ Estring x -> Wserver.wprint "%s" x
-   | _ -> () ]
-;
-
-value print_person_variable conf base env p =
-  fun
-  [ "bapt_place" -> Wserver.wprint "%s" (quote_escaped p.baptism_place)
-  | "bapt_src" -> Wserver.wprint "%s" (quote_escaped p.baptism_src)
-  | "birth_place" -> Wserver.wprint "%s" (quote_escaped p.birth_place)
-  | "birth_src" -> Wserver.wprint "%s" (quote_escaped p.birth_src)
-  | "cnt" -> print_string_env "cnt" env
-  | "digest" -> print_string_env "digest" env
-  | "first_name" -> Wserver.wprint "%s" (quote_escaped p.first_name)
-  | "image" -> Wserver.wprint "%s" (quote_escaped p.image)
-  | "index" -> Wserver.wprint "%d" (Adef.int_of_iper p.cle_index)
-  | "item" -> print_string_env "item" env
-  | "occ" -> if p.occ <> 0 then Wserver.wprint "%d" p.occ else ()
-  | "public_name" -> Wserver.wprint "%s" (quote_escaped p.public_name)
-  | "surname" -> Wserver.wprint "%s" (quote_escaped p.surname)
-  | s ->
-      let v = extract_var "evar_" s in
-      if v <> "" then
-        match p_getenv conf.env v with
-        [ Some vv -> Wserver.wprint "%s" (quote_escaped vv)
-        | _ -> () ]
-     else Templ.print_variable conf base s ]
-;
-
-value print_date_field proj =
-  fun
-  [ Some d  ->
-      let d =
-        match d with
-        [ Dgreg d Dgregorian -> Some d
-        | Dgreg d Djulian -> Some (Calendar.julian_of_gregorian d)
-        | Dgreg d Dfrench -> Some (Calendar.french_of_gregorian d)
-        | Dgreg d Dhebrew -> Some (Calendar.hebrew_of_gregorian d)
-        | _ -> None ]
-      in
-      match d with
-      [ Some d -> Wserver.wprint "%d" (proj d)
-      | None -> () ]
-  | None -> () ]
-;
-
-value print_date_text =
-  fun
-  [ Some (Dtext s) -> Wserver.wprint "%s" s
-  | _ -> () ]
-;
-
-value print_date_variable conf base env od =
-  fun
-  [ "day" -> print_date_field (fun d -> d.day) od
-  | "month" -> print_date_field (fun d -> d.month) od
-  | "text" -> print_date_text od
-  | "year" -> print_date_field (fun d -> d.year) od
-  | "oryear" ->
-      match od with
-      [ Some (Dgreg {prec = OrYear y} _) -> Wserver.wprint "%d" y
-      | Some (Dgreg {prec = YearInt y} _) -> Wserver.wprint "%d" y
-      | _ -> () ]
-  | v -> Wserver.wprint "%%%s;" v ]
-;
+(* print *)
 
 value print_variable conf base env p sl =
   match eval_variable conf base env p sl with
-  [ VVind s -> print_person_variable conf base env p s
-  | VVdate od s -> print_date_variable conf base env od s
+  [ VVgen s ->
+      try Wserver.wprint "%s" (eval_gen_variable conf base env p s) with
+      [ Not_found -> Templ.print_variable conf base s ]
+  | VVdate od s -> Wserver.wprint "%s" (eval_date_variable conf base env od s)
+  | VVcvar s ->
+      try Wserver.wprint "%s" (List.assoc s conf.base_env) with
+      [ Not_found -> () ]
   | VVnone ->
       do list_iter_first
            (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
@@ -1025,13 +1066,13 @@ and eval_foreach conf base env p s sl al =
     (List.rev (List.tl sl), List.hd sl)
   in
   match eval_variable conf base env p sl with
-  [ VVind "" -> eval_simple_foreach conf base env p al s
-  | VVind _ ->
+  [ VVgen "" -> eval_simple_foreach conf base env p al s
+  | VVgen _ ->
       do Wserver.wprint "foreach ";
          List.iter (fun s -> Wserver.wprint "%s." s) sl;
          Wserver.wprint "%s???" s;
       return ()
-  | VVdate _ _ | VVnone -> () ]
+  | VVcvar _ | VVdate _ _ | VVnone -> () ]
 and eval_simple_foreach conf base env p al s =
   let list =
     match s with

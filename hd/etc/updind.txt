@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.2 2001-02-15 06:22:17 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.3 2001-02-15 14:24:49 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -281,6 +281,85 @@
 <td>[*source/sources]0</td>
 <td>
 <input name=bapt_src size=40 maxlength=200 value="%bapt_src;">
+</td>
+</tr>
+</table>
+
+<h4>[*death]</h4>
+
+<table border=1>
+<tr>
+<td>
+<select name=death>
+  %if;(not has_birth_date and dont_know_if_dead);
+  <option value=Auto selected> -
+  %end;
+  <option value=NotDead%if;not_dead; selected%end;>[*alive]2
+  <option value=DontKnowIfDead%if;(dont_know_if_dead and has_birth_date);%sp;
+   selected%end;>[*don't know]0%nl;
+  <option value=Death%if;(death.year != "" or dead_dont_know_when);%sp;
+   selected%end;>[*died]2...
+  <option value=DeadYoung%if;died_young; selected%end;>[*died young]2
+</select>
+</td>
+<td>
+[*place]0
+<input name=death_place size=40 maxlength=200 value="%death_place;">
+</td>
+</tr>
+</table>
+
+<table border=1>
+<tr>
+<td>[*date]0</td>
+<td>
+[year/month/day]0
+<input name=death_yyyy size=5 maxlength=5 value="%death.year;">
+[year/month/day]1
+<input name=death_mm size=2 maxlength=2 value="%death.month;">
+[year/month/day]2
+<input name=death_mm size=2 maxlength=2 value="%death.day;">
+</td>
+<td>
+...[or]0 [text]0
+<input name=death_text size=15 maxlength=30 value="%death.text;">
+</td>
+</table>
+<table border=1>
+<tr>
+<td>[*calendar/calendars]0
+<select name=death_cal>
+<option value=G%if;death.cal_gregorian; selected%end;>
+[*gregorian/julian/french/hebrew]0
+<option value=J%if;death.cal_julian; selected%end;>
+[*gregorian/julian/french/hebrew]1
+<option value=F%if;death.cal_french; selected%end;>
+[*gregorian/julian/french/hebrew]2
+<option value=H%if;death.cal_hebrew; selected%end;>
+[*gregorian/julian/french/hebrew]3
+</select>
+</td>
+<td>[*precision]0
+<select name=death_prec>
+<option%if;death.prec_no; selected%end;>-
+<option value=sure%if;death.prec_sure; selected%end;>[*exact]0
+<option value=about%if;death.prec_about; selected%end;>[*about (date)]0
+<option value=maybe%if;death.prec_maybe; selected%end;>[*possibly (date)]0
+<option value=before%if;death.prec_before; selected%end;>[*before (date)]0
+<option value=after%if;death.prec_after; selected%end;>[*after (date)]0
+<option value=oryear%if;death.prec_oryear; selected%end;>&lt;- [*or] -&gt;
+<option value=yearint%if;death.prec_yearint; selected%end;>
+&lt;- [*between (date)] -&gt;
+</select>
+<input name=death_oryear size=5 maxlength=5 value="%death.oryear;">
+</td>
+</tr>
+</table>
+<table border=1>
+<tr>
+<td>[*source/sources]0</td>
+<td>
+<input name=death_src size=40 maxlength=200 value="%death_src;">
 </td>
 </tr>
 </table>
