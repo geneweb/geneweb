@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.14 1999-08-06 03:56:14 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.15 1999-09-23 08:32:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -453,7 +453,13 @@ value print_with_pre conf base info =
 ;
 
 value print_with_table conf base info =
-  tag "table" "border=0 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
+  let border =
+    match p_getint conf.env "border" with
+    [ Some i -> i
+    | None -> 0 ]
+  in
+  tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\"" border
+  begin
     tag "tr" begin
       stag "td" "colspan=2 align=center" begin
         print_someone conf base info.ip;

@@ -41,12 +41,12 @@ GeneWeb version 2.07
   - [Sep 8, 99] In "DOC" links, in the bottom of the pages, the links
     with Email addresses did not work correctly. Fixed.
 
-* Lexicon (lang/lexicon.txt)
-  - [Sep 22, 99] Fixed some German phrases (Gerriet Backer).
-
 * Consanguinity computing (consang)
   - [Sep 17..19, 99] Run faster when no modifications have been done (e.g. just
     after the creation of the data base).
+
+* Lexicon (lang/lexicon.txt)
+  - [Sep 22, 99] Fixed some German phrases (Gerriet Backer).
 
 * Documentation
   - [Sep 10, 99] Updated Swedish files (Lars Gustavsson).
