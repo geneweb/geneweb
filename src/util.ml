@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.8 2001-07-01 21:25:01 ddr Exp $ *)
+(* $Id: util.ml,v 4.9 2001-07-02 19:03:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -813,9 +813,12 @@ value url_no_index conf base =
     [ Some i ->
         if i >= 0 && i < base.data.persons.len then
           let p = base.data.persons.get i in
-          let f = scratch p.first_name in
-          let s = scratch p.surname in
-          let oc = string_of_int p.occ in Some (f, s, oc)
+          if conf.hide_names && not (fast_auth_age conf p) then None
+          else
+            let f = scratch p.first_name in
+            let s = scratch p.surname in
+            let oc = string_of_int p.occ in
+            Some (f, s, oc)
         else None
     | None -> None ]
   in
