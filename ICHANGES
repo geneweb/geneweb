@@ -4,9 +4,9 @@ Internal Changes
 GeneWeb Version 1.06
 --------------------
 
-* Some changes for compilation with version 2.00 of Ocaml and Camlp4.
+* Restructuration (perestroika) for distribution of sources.
 
-* Some changes for sources distribution
+* Some changes for compilation with version 2.00 of Ocaml and Camlp4.
 
 * gwd:
   - added cannot change sex of married person while updating person,
