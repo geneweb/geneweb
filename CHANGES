@@ -50,13 +50,6 @@ GeneWeb version 3.08
 * GeneWeb data bases Transfer Program (gwtp)
   - [08 Sep 00] Added small documentation (a README file) for GeneWeb
     Web site administrators.
-  - [06 Sep 00] Added ability to change the default language.
-  - [22 Aug 00] Fixed bug: worked only if the CGI name was gwtp (could not
-    be gwtp.cgi, for example). Fixed also the distribution: template files
-    used by gwtp (3 files ending with .txt) were not installed. Fixed also
-    a problem: when downloading a file, the proposed name for the file was
-    not the good one (a trick was used but worked only with Netscape, not
-    IE); changed the same thing for images in gwd.
 
 * Documentation:
   - [07 Sep 00] In the directions for use, the entry "How to start with
