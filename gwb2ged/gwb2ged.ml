@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 4.2 2001-04-23 03:02:38 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 4.3 2001-11-09 10:55:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -124,15 +124,25 @@ value ged_header base oc ifile ofile =
   }
 ;
 
+value sub_string_index s t =
+  loop 0 0 where rec loop i j =
+    if j = String.length t then Some (i - j)
+    else if i = String.length s then None
+    else if s.[i] = t.[j] then loop (i + 1) (j + 1)
+    else loop (i + 1) 0
+;
+
 value ged_1st_name base p =
   let fn = sou base p.first_name in
   match p.first_names_aliases with
   [ [n :: _] ->
       let fna = sou base n in
-      if String.length fna > String.length fn &&
-         fn = String.sub fna 0 (String.length fn) then
-        fna
-      else fn
+      match sub_string_index fna fn with
+      [ Some i ->
+          let j = i + String.length fn in
+          String.sub fna 0 i ^ "\"" ^ fn ^ "\"" ^
+          String.sub fna j (String.length fna - j)
+      | None -> fn ]
   | [] -> fn ]
 ;
 
