@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.21 1999-04-20 18:04:36 ddr Exp $ *)
+(* $Id: perso.ml,v 2.22 1999-04-25 22:10:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -513,7 +513,7 @@ value print_family conf base p a ifam =
          List.for_all (fun ip -> age_autorise conf base (poi base ip))
            (Array.to_list children)
        in
-       do if fam.not_married && auth then Wserver.wprint ":"
+       do if fam.not_married && auth then ()
           else Wserver.wprint ", %s" (transl conf "having as children");
           Wserver.wprint "\n";
           tag "ul" begin
