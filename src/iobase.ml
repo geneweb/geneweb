@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.4 1999-05-03 17:35:27 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.5 1999-05-22 21:47:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -513,6 +513,13 @@ value input bname =
        close_out oc9;
     return ()
   in
+  let patched_families () =
+    List.fold_right
+      (fun (_, fam) ifaml ->
+         if is_deleted_family fam then ifaml
+         else [fam.fam_index :: ifaml])
+      patches.p_family.val []
+  in
   let patch_person i p =
     let i = Adef.int_of_iper i in
     do persons.len := max persons.len (i + 1);
@@ -592,6 +599,7 @@ value input bname =
      patch_couple = patch_couple;
      patch_string = patch_string;
      patch_name = patch_name;
+     patched_families = patched_families;
      commit_patches = commit_patches; cleanup = cleanup}
   in
   {data = base_data; func = base_func}

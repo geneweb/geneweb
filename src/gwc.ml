@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.12 1999-05-03 13:41:14 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.13 1999-05-22 21:47:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -471,6 +471,7 @@ value empty_base : Def.base =
     patch_string = fun [];
     patch_name = fun [];
     commit_patches = fun [];
+    patched_families = fun [];
     cleanup = fun () -> ()}
   in
   {data = base_data; func = base_func}
@@ -518,6 +519,7 @@ value linked_base gen : Def.base =
      patch_string = fun [];
      patch_name = fun [];
      commit_patches = fun [];
+     patched_families = fun [];
      cleanup = fun () -> ()}
   in
   {data = base_data; func = base_func}
@@ -537,7 +539,7 @@ value link gwo_list =
        do Check.check_base base gen pr_stats.val; flush stdout; return ()
      else ();
      if not gen.g_errored then
-       if do_consang.val then Consang.compute_all_consang base False False
+       if do_consang.val then Consang.compute_all_consang base True False
        else ()
      else exit 2;
   return base
