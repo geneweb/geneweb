@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.19 1999-07-22 14:34:06 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.20 1999-07-22 19:47:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -79,8 +79,8 @@ value nominative s =
   | _ -> s ]
 ;
 
-value p_first_name base p = sou base p.first_name;
-value p_surname base p = sou base p.surname;
+value p_first_name base p = nominative (sou base p.first_name);
+value p_surname base p = nominative (sou base p.surname);
 
 value leap_year a =
   if a mod 100 == 0 then a / 100 mod 4 == 0 else a mod 4 == 0
@@ -208,7 +208,9 @@ value surnames_pieces surname =
 ;
 
 value person_misc_names base p =
-  if p_first_name base p = "?" || p_surname base p = "?" then [] else
+  let first_name = p_first_name base p in
+  let surname = p_surname base p in
+  if first_name = "?" || surname = "?" then [] else
   let public_names =
     let titles_names =
       let tnl = ref [] in
@@ -223,9 +225,11 @@ value person_misc_names base p =
     if sou base p.public_name = "" then titles_names
     else [p.public_name :: titles_names]
   in
-  let first_names = [p.first_name :: p.first_names_aliases @ public_names] in
+  let first_names =
+    [first_name ::
+     List.map (sou base) (p.first_names_aliases @ public_names)]
+  in
   let surnames =
-    let surname = p_surname base p in
     [surname ::
        surnames_pieces surname @
        List.map (sou base) (p.surnames_aliases @ p.nick_names)]
@@ -256,13 +260,12 @@ value person_misc_names base p =
   let list =
     List.fold_left
        (fun list f ->
-          let f = sou base f in
           List.fold_left (fun list s -> [f ^ " " ^ s :: list]) list surnames)
     list first_names
   in
   let list =
     let first_names =
-      [p_first_name base p :: List.map (sou base) p.first_names_aliases]
+      [first_name :: List.map (sou base) p.first_names_aliases]
     in
     List.fold_left
       (fun list t ->
@@ -287,7 +290,7 @@ value person_misc_names base p =
         let cpl = coi base ifam in
         let fath = poi base cpl.father in
         let first_names =
-          [p_first_name base p :: List.map (sou base) p.first_names_aliases]
+          [first_name :: List.map (sou base) p.first_names_aliases]
         in
         List.fold_left
           (fun list t ->
@@ -302,7 +305,7 @@ value person_misc_names base p =
   let list =
     List.fold_left (fun list s -> [sou base s :: list]) list p.aliases
   in
-  let fn = Name.lower (p_first_name base p ^ " " ^ p_surname base p) in
+  let fn = Name.lower (first_name ^ " " ^ surname) in
   List.fold_left
     (fun list s ->
        let s = Name.lower s in
@@ -325,6 +328,8 @@ value person_is_key base p k =
 value person_ht_find_unique base first_name surname occ =
   if first_name = "?" || surname = "?" then raise Not_found
   else
+    let first_name = nominative first_name in
+    let surname = nominative surname in
     let ipl = base.func.persons_of_name (first_name ^ " " ^ surname) in
     let first_name = Name.strip_lower first_name in
     let surname = Name.strip_lower surname in

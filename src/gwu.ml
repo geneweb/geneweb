@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.11 1999-07-22 14:34:09 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.12 1999-07-22 19:47:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -266,12 +266,6 @@ value print_infos oc base is_child print_sources p =
 
 value print_parent oc base ml fam_sel fam p =
   let a = aoi base p.cle_index in
-  do Printf.fprintf oc "%s %s%s" (s_correct_string (p_surname base p))
-       (s_correct_string (p_first_name base p))
-       (if p.occ == 0 || p_first_name base p = "?"
-        || p_surname base p = "?" then ""
-        else "." ^ string_of_int p.occ);
-  return
   let has_printed_parents =
     match a.parents with
     [ Some ifam -> fam_sel ifam
@@ -289,12 +283,20 @@ value print_parent oc base ml fam_sel fam p =
       | [] -> assert False ]
   in
   let pr = not has_printed_parents && first_parent_definition in
-  if pr (* && p_first_name base p <> "?" *) then
-    if has_infos base p then print_infos oc base False True p
-    else if p_first_name base p <> "?" && p_surname base p <> "?" then
-      Printf.fprintf oc " 0"
-    else ()
-  else ()
+  let has_infos = if pr then has_infos base p else False in
+  let first_name = sou base p.first_name in
+  let surname = sou base p.surname in
+  do Printf.fprintf oc "%s %s%s"
+       (s_correct_string surname) (s_correct_string first_name)
+       (if p.occ == 0 || first_name = "?" || surname = "?" then ""
+        else "." ^ string_of_int p.occ);
+     if pr then
+       if has_infos then print_infos oc base False True p
+       else if first_name <> "?" && surname <> "?" then
+         Printf.fprintf oc " 0"
+       else ()
+     else ();
+  return ()
 ;
 
 value print_child oc base fam_surname print_sources p =
@@ -303,12 +305,12 @@ value print_child oc base fam_surname print_sources p =
      [ Male -> Printf.fprintf oc " h"
      | Female -> Printf.fprintf oc " f"
      | _ -> () ];
-     Printf.fprintf oc " %s" (s_correct_string (p_first_name base p));
+     Printf.fprintf oc " %s" (s_correct_string (sou base p.first_name));
      if p.occ == 0 || p_first_name base p = "?" || p_surname base p = "?"
      then ()
      else Printf.fprintf oc ".%d" p.occ;
      if p.surname <> fam_surname then
-       Printf.fprintf oc " %s" (s_correct_string (p_surname base p))
+       Printf.fprintf oc " %s" (s_correct_string (sou base p.surname))
      else ();
      print_infos oc base True print_sources p;
      Printf.fprintf oc "\n";

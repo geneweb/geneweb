@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.17 1999-07-22 14:34:20 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.18 1999-07-22 19:47:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -363,7 +363,7 @@ value effective_mod conf base sp =
 
 value effective_add conf base sp =
   let pi = Adef.iper_of_int (base.data.persons.len) in
-  let key = sp.first_name ^ " " ^ sp.surname in
+  let key = nominative (sp.first_name ^ " " ^ sp.surname) in
   let ipl = person_ht_find_all base key in
   do check_conflict conf base sp ipl;
      person_ht_add base key pi;

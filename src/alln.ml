@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 2.7 1999-07-22 14:34:00 ddr Exp $ *)
+(* $Id: alln.ml,v 2.8 1999-07-22 19:47:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -243,7 +243,7 @@ value select_names conf base is_surnames ini =
       else ini
     in
     loop (iii.cursor (String.capitalize start_k)) [] where rec loop istr list =
-      let s = sou base istr in
+      let s = nominative (sou base istr) in
       let k = Iobase.name_key s in
       if string_start_with ini k then
         let list =

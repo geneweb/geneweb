@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.30 1999-07-22 14:34:21 ddr Exp $ *)
+(* $Id: util.ml,v 2.31 1999-07-22 19:47:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -185,7 +185,9 @@ value calculer_age conf p =
   | Some d -> Some (temps_ecoule d conf.today) ]
 ;
 
-value person_text conf base p =
+type gen_access = (base -> person -> string * base -> person -> string);
+
+value gen_person_text (p_first_name, p_surname) conf base p =
   let beg =
     match (sou base p.public_name, p.nick_names) with
     [ ("", [nn :: _]) ->
@@ -196,6 +198,8 @@ value person_text conf base p =
   in
   beg ^ " " ^ p_surname base p
 ;
+
+value person_text = gen_person_text (p_first_name, p_surname);
 
 value person_text_no_html conf base p =
   let beg =
@@ -455,8 +459,9 @@ value transl_decline conf w s =
   let wt = transl conf w in
   let len = String.length wt in
   if wt.[len - 1] = ''' then
-    if String.length s > 0 && start_with_vowel s then nth_field wt 1 ^ s
-    else nth_field wt 0 ^ s1
+    if String.length s > 0 && start_with_vowel s then
+      nth_field wt 1 ^ decline 'n' s
+    else nth_field wt 0 ^ decline 'n' s1
   else if len >= 3 && wt.[len-3] == ':' && wt.[len-1] == ':' then
     let start = String.sub wt 0 (len - 3) in
     start ^ decline wt.[len-2] s
@@ -464,7 +469,7 @@ value transl_decline conf w s =
     match plus_decl wt with
     [ Some (start, " +before") ->
         if s = "" then start else s ^ " " ^ start
-    | _ -> wt ^ s1 ]
+    | _ -> wt ^ decline 'n' s1 ]
 ;
 
 value ftransl conf (s : format 'a 'b 'c) : format 'a 'b 'c =
