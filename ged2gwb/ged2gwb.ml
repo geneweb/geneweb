@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.32 2000-10-12 07:42:03 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.33 2000-10-17 14:01:28 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1162,7 +1162,7 @@ value add_indi gen r =
         in
         let s = if lowercase_surnames.val then lowercase_name s else s in
         let r =
-          let key = Name.strip_lower (f ^ " " ^ s) in
+          let key = Name.strip_lower (nominative f ^ " " ^ nominative s) in
           try Hashtbl.find gen.g_hnam key with
           [ Not_found ->
               let r = ref (-1) in do Hashtbl.add gen.g_hnam key r; return r ]
