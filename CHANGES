@@ -4,6 +4,9 @@ GeneWeb version 2.08
 * GeneWeb Service/CGI (gwd)
   - [Oct 3, 99] Added week day in "calendars" page.
 
+* Lexicon (lang/lexicon.txt)
+  - [Oct 4, 99] Fixed some German phrases (Falko Trojahn).
+
 GeneWeb version 2.07
 --------------------
 
