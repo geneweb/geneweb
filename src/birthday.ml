@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.0 1999-10-29 10:30:59 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.1 1999-11-25 12:17:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -229,7 +229,7 @@ value print_birth_day conf base day_name verb wd dt list =
       do Wserver.wprint "%s, %s%s %s %s:\n"
            (capitale day_name)
            (std_color
-              ("<b>" ^ transl_nth conf "(week day)" wd ^ " " ^
+              ("<b>" ^ decline 'e' (transl_nth conf "(week day)" wd) ^ " " ^
                Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
            verb (transl conf "the birthday")
            (transl_decline conf "of" "");
@@ -274,7 +274,7 @@ value print_anniv conf base day_name verb wd dt list =
       do Wserver.wprint "%s, %s%s %s:\n"
            (capitale day_name)
            (std_color
-              ("<b>" ^ transl_nth conf "(week day)" wd ^ " " ^
+              ("<b>" ^ decline 'e' (transl_nth conf "(week day)" wd) ^ " " ^
                Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
            verb (transl conf "the anniversary");
          afficher_liste_anniversaires conf base True dt list;
@@ -387,7 +387,7 @@ value print_marriage_day conf base day_name verb wd dt list =
       do Wserver.wprint "%s, %s%s %s %s:\n"
            (capitale day_name)
            (std_color
-              ("<b>" ^ transl_nth conf "(week day)" wd ^ " " ^
+              ("<b>" ^ decline 'e' (transl_nth conf "(week day)" wd) ^ " " ^
                Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
            verb (transl conf "the anniversary of marriage")
            (transl_decline conf "of" "");
