@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.1 2001-03-18 16:57:26 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.2 2001-03-18 18:07:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -34,10 +34,6 @@ value print_differences conf base branches p1 p2 =
       (Adef.int_of_iper p1.cle_index);
     Wserver.wprint "<input type=hidden name=i2 value=%d>\n"
       (Adef.int_of_iper p2.cle_index);
-match p_getenv conf.env "opt" with
-[ Some ("new" | "old" as x) ->
-    Wserver.wprint "<input type=hidden name=opt value=x>\n"
-| _ -> () ];
     loop branches where rec loop =
       fun
       [ [(ip1, ip2)] ->
@@ -74,9 +70,9 @@ match p_getenv conf.env "opt" with
     string_field False (transl conf "access") "access"
       (fun p ->
          match p.access with
-         [ IfTitles -> "IfTitles"
-         | Private -> "Private"
-         | Public -> "Public" ]);
+         [ IfTitles -> transl conf "if titles"
+         | Private -> "private"
+         | Public -> "public" ]);
     string_field False (transl conf "birth") "birth"
       (fun p ->
          match Adef.od_of_codate p.birth with

@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.0 2001-03-16 19:32:04 ddr Exp $
+# $Id: a.gwf,v 4.1 2001-03-18 18:11:20 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -62,6 +62,9 @@ default_lang=fr
 
 # Authorization for wizards to send images (no: cannot; yes: can)
 can_send_image=yes
+
+# Allow the usage of the request m=KILL_ANC
+can_kill_ancestors=no
 
 # Optional path for images defined by the "image" field (i.e. *not* added
 # by "send image"). Applies only for images not found in the image/base

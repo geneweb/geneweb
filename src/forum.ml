@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.0 2001-03-16 19:34:38 ddr Exp $ *)
+(* $Id: forum.ml,v 4.1 2001-03-18 18:07:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -77,7 +77,7 @@ value print_one_header conf prec_date pos h =
 
 value print_headers conf =
   let fname = forum_file conf in
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let ic_len = in_channel_length ic in
       tag "table" "border=%d" conf.border begin
@@ -156,7 +156,7 @@ value print_forum_headers conf base =
 
 value get_message conf pos =
   let fname = forum_file conf in
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let ic_len = in_channel_length ic in
       let r =
@@ -188,7 +188,7 @@ value get_message conf pos =
 
 value backward conf pos =
   let fname = forum_file conf in
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let ic_len = in_channel_length ic in
       let sync_txt = "\nTime: " in
@@ -361,7 +361,7 @@ value forum_add conf base ident comm =
                     else ();
                  return loop (i + 1) (comm.[i] = '\n');
              Printf.fprintf oc "\n\n";
-             match try Some (open_in fname) with [ Sys_error _ -> None ] with
+             match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
              [ Some ic ->
                  do try
                       while True do output_char oc (input_char ic); done
