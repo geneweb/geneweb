@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.148 2000-08-06 13:44:06 ddr Exp $
+# $Id: lexicon.txt,v 3.149 2000-08-07 08:38:16 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2983,6 +2983,7 @@ fi: vaakasuoraan
 fr: horizontalement
 lv: horizont&acirc;li
 nl: horizontaal
+no: horisontal
 pt: horizontalmente
 se: horisontellt
 
@@ -3550,6 +3551,7 @@ fi: miehen puoleinen linja/naisen puoleinen linja
 fr: ligne agnatique/ligne cognatique
 lv: tçva lînija/mâtes lînija
 nl: mannelijke lijn/vrouwelijke lijn
+no: mannlig linje/kvinnelig linje
 pt: linha masculina (agnat&iacute;cia)/linha feminina (cogn&aacute;tica)
 se: manliga linjen/kvinnliga linjen
 
@@ -5081,6 +5083,7 @@ fi: asumuserossa
 fr: s&eacute;par&eacute;s
 lv: nedzîvo kop&acirc;
 nl: gescheiden
+no: separert
 pt: separados
 se: separerat
 
@@ -5440,6 +5443,7 @@ fi: sukunimiluettelo
 fr: liste &eacute;clair
 lv: uzv&acirc;rdu saraksts
 nl: bijnamen lijst
+no: liste over etternavn
 pt: lista de apelidos
 se: efternamns lista
 
@@ -5551,6 +5555,7 @@ fi: %d vanhinta ehk&auml viel&auml el&auml;v&auml;&auml
 fr: les %d les plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
 lv: %d visvecâkie iespçjams vçl ir dzîvi
 nl: de %d oudsten, mogelijk nog in leven
+no: dei %d eldste som muligens lever
 se: de %d &auml;ldsta som kanske lever
 
     the %d surnames
@@ -5581,6 +5586,7 @@ es: los %d que han vivido m&aacute;s mucho tiempo
 fr: les %d ayant v&eacute;cu le plus longtemps
 lv: %d, kuri dzîvojuði visilgâk
 nl: de %d langst levende personen
+no: dei %d som har levd lengst
 se: de %d som har levt l&auml;ngst
 
     the %s generation
@@ -5935,6 +5941,7 @@ fr: les %d derniers mariages
 it: gli ultimi %d matrimoni
 lv: pçdçjâs %d laulîbas
 nl: de %d laatste huwelijken
+no: dei %d siste gifte 
 pt: os %d casamentos mais recentes
 se: de senaste %d äktenskapen
 
