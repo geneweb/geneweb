@@ -8,6 +8,7 @@ GeneWeb Version 3.05
   - [07 May 00] The files CHANGES and LICENSE now end with .txt.
 
 * GeneWeb daemon/CGI (gwd) and uncompiler (gwu)
+  - [10 May 00] Changed traces when wizards, friends, global accesses.
   - [10 May 00] Reply now "no access" for attempt of access to data base
     in CGI mode when base auth file defined (because that works only in
     server mode).
