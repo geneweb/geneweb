@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.16 1998-11-28 18:54:02 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.17 1998-12-03 13:38:13 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -577,8 +577,7 @@ Type control C to stop the service
           flush Pervasives.stderr;
        return ()
      else ();
-     try Unix.mkdir "cnt" 0o755 with
-       _ -> ();
+     try Unix.mkdir "cnt" 0o755 with _ -> ();
   return
   Wserver.f port_selected.val tmout
     (ifdef UNIX then max_clients.val else None) robot_xcl.val
