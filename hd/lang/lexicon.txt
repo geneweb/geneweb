@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.67 2002-02-02 05:17:27 ddr Exp $
+# $Id: lexicon.txt,v 4.68 2002-02-02 05:40:49 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -7643,6 +7643,28 @@ pt: testemunha/testemunhas
 ru: свидетель:g:-я:a:-я/свидетели
 sv: vittne/vittnen
 
+    wizard/friend
+af: Medewerkers/vriend
+ca: administrador/amic
+cs: wizard/friend
+da: opdateringsadgang/betroet
+de: Wizard/Freund
+en: wizard/friend
+eo: sorcxisto/amiko
+es: brujo/amigo
+et: teadmamehena/sхbrana
+fi: velho/valittu
+fr: magicien/ami
+he:  лваеп / ойезсъ 
+is: wizard/vin
+it: wizard/amico
+lv: wizard/friend
+nl: tovenaar/vriend
+no: Oppdaterings/venner
+pl: wizard/friend
+pt: feiticeiro/amigo
+sv: uppdaterings/v&auml;nner
+
     would be his/her own ancestor
 af: sal sy/haar eie voorganger wees
 ca: seria el seu propi avantpassat
@@ -7758,25 +7780,3 @@ pl: musisz najpierw scaliж 2 rodziny
 pt: primeiro tem que fundir as 2 fam&iacute;lias
 ru: вы должны сначала объединить 2 семьи
 sv: du m&aring;ste f&ouml;rst sl&aring; samman de 2 familjerna
-
-    wizard/friend
-af: Medewerkers/vriend
-ca: administrador/amic
-cs: wizard/friend
-da: opdateringsadgang/betroet
-de: Wizard/Freund
-en: wizard/friend
-eo: sorcxisto/amiko
-es: brujo/amigo
-et: teadmamehena/sхbrana
-fi: velho/valittu
-fr: magicien/ami
-he:  лваеп / ойезсъ 
-is: wizard/vin
-it: wizard/amico
-lv: wizard/friend
-nl: tovenaar/vriend
-no: Oppdaterings/venner
-pl: wizard/friend
-pt: feiticeiro/amigo
-sv: uppdaterings/v&auml;nner
