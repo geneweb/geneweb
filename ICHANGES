@@ -16,6 +16,8 @@ GeneWeb Version 2.06
     Added the executable "setup" in "gw" directory as name "gwsetup".
 
 * GeneWeb daemon/CGI (gwd)
+  - [Aug 17, 99] In display by first name or surname, when several spellings
+    are found, display them in decreasing frequence order.
   - [Aug 14, 99] In srcfile.ml, for start.txt files, added "o" macro
     (print if notes) and ability to decline verb + noun ([verb][noun]
     without space between 1st ] and snd [).

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.13 1999-08-04 04:24:56 ddr Exp $ *)
+(* $Id: some.ml,v 2.14 1999-08-17 09:48:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -396,9 +396,12 @@ value surname_print conf base not_found_fun x =
   let (iperl, strl) =
     List.fold_right
       (fun (str, istr, iperl1) (iperl, strl)  ->
-         (iperl1 @ iperl, [str :: strl]))
+         let len = List.length iperl1 in
+         (iperl1 @ iperl, [(str, len) :: strl]))
       l ([], [])
   in
+  let strl = Sort.list (fun (_, len1) (_, len2) -> len1 >= len2) strl in
+  let strl = List.map fst strl in
   match p_getenv conf.env "o" with
   [ Some "i" ->
       let liste =
