@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.24 2002-01-30 11:49:49 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.25 2002-02-02 05:17:28 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -476,7 +476,7 @@ value unauth conf typ =
     Wserver.wprint "\
 <head>
 <title>%s %s access failed</title>
-<meta http-equiv=\"REFRESH\" content=\"1;URL=%s\">
+<meta http-equiv=\"REFRESH\" content=\"2;URL=%s\">
 </head>
 " typ conf.bname url;
     Wserver.wprint "<body><h1>%s %s access failed</h1></body>\n" typ
@@ -1073,7 +1073,6 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
                   log_passwd_failed passwd uauth oc tm from request
                     conf.bname;
                   flush_log oc;
-                  ()
                 }
             | Refuse -> () ];
             unauth conf (if passwd = "w" then "Wizard" else "Friend");
