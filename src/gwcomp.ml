@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.7 1998-10-23 17:18:29 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.8 1998-10-28 09:59:59 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -118,7 +118,13 @@ value rindex s c =
 value line_cnt = ref 0;
 
 value input_a_line ic =
-  let x = Ansel.of_iso_8859_1 (input_line ic) in
+  let line = input_line ic in
+  let line =
+    if String.length line > 0 && line.[String.length line - 1] == '\r' then
+      String.sub line 0 (String.length line - 1)
+    else line
+  in
+  let x = Ansel.of_iso_8859_1 line in
   do incr line_cnt; return x
 ;
 

@@ -1,4 +1,4 @@
-(* $Id: perso.ml,v 1.6 1998-09-30 07:29:24 ddr Exp $ *)
+(* $Id: perso.ml,v 1.7 1998-10-28 10:00:02 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -563,10 +563,14 @@ value print conf base p =
               String.sub s 0 (String.length http) = http then
              Wserver.wprint "<img src=\"%s\" alt=\"%s\"><p>\n" s s
            else if Filename.is_implicit s then
-             let fname =
+             let fname1 =
+               List.fold_right Filename.concat
+                 [Util.base_dir.val; "images"; conf.bname] s
+             in
+             let fname2 =
                List.fold_right Filename.concat [Util.base_dir.val; "images"] s
              in
-             if Sys.file_exists fname then
+             if Sys.file_exists fname1 || Sys.file_exists fname2 then
                Wserver.wprint "<img src=\"%sm=IM;v=%s\" alt=\"%s\"><p>\n"
                  (commd conf) s s
              else ()
