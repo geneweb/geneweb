@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 1.4 2001-03-07 03:13:14 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.0 2001-03-16 19:32:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;

@@ -1,4 +1,4 @@
-# $Id: Makefile.inc,v 3.2 2000-06-08 19:52:10 ddr Exp $
+# $Id: Makefile.inc,v 4.0 2001-03-16 19:35:13 ddr Exp $
 
 CAMLP4_COMM=../tools/camlp4_comm.sh pa_ifdef.cmo pa_ru.cmo
 CAMLP4F=-DUNIX

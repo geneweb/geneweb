@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 3.4 2001-01-06 09:55:57 ddr Exp $ *)
+(* $Id: name.ml,v 4.0 2001-03-16 19:34:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* Name.lower *)

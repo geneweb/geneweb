@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: mk_missing_i18n.sh,v 3.12 2001-03-14 18:01:12 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 4.0 2001-03-16 19:34:51 ddr Exp $ *)
 
 open Printf
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 3.8 2001-03-04 14:13:09 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.0 2001-03-16 19:34:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.261 2001-03-16 16:23:27 ddr Exp $
+# $Id: lexicon.txt,v 4.0 2001-03-16 19:32:44 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
