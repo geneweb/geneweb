@@ -6,7 +6,7 @@ en: Page displayed by
     <a href="http://www.geneweb.org/">GeneWeb %v</a>
 et: Kasutusel on
     <a href="http://www.geneweb.org/">GeneWeb %v</a>
-fr: Page affichée par
+fr: Page affich&eacute;e par
     <a href="http://www.geneweb.org/">GeneWeb %v</a>
 it: Pagina visualizzata da
     <a href="http://www.geneweb.org/">GeneWeb %v</a>
