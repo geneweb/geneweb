@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.27 2004-06-27 02:02:39 ddr Exp $ *)
+(* $Id: update.ml,v 4.28 2004-07-16 15:19:33 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -500,6 +500,7 @@ value reconstitute_date_dmy conf var =
     if len > 1 then
       match (y.[0], y.[len-1]) with
       [ ('?', _) -> (Some "maybe", String.sub y 1 (len - 1))
+      | ('~', _) -> (Some "about", String.sub y 1 (len - 1))
       | ('/', '/') -> (Some "about", String.sub y 1 (len - 2))
       | ('<', _) | ('/', _) -> (Some "before", String.sub y 1 (len - 1))
       | ('>', _) -> (Some "after", String.sub y 1 (len - 1))
@@ -802,10 +803,13 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
           let o = if f = "?" || s = "?" then 0 else o in
           let ip = Adef.iper_of_int base.data.persons.len in
           let empty_string = insert_string base "" in
-          let (birth, birth_place) =
+          let (birth, birth_place, baptism, baptism_place) =
             match info with
-            [ Some (b, bpl, _, _, _) -> (b, bpl)
-            | None -> (None, "") ]
+            [ Some (b, bpl, _, _, _) ->
+                if String.length bpl >= 2 && String.sub bpl 0 2 = "b/" then
+                  (None, "", b, String.sub bpl 2 (String.length bpl - 2))
+                else (b, bpl, None, "")
+            | None -> (None, "", None, "") ]
           in
           let (death, death_place) =
             match info with
@@ -826,8 +830,9 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
              occupation = empty_string; sex = sex; access = IfTitles;
              birth = Adef.codate_of_od birth;
              birth_place = insert_string base birth_place;
-             birth_src = empty_string; baptism = Adef.codate_None;
-             baptism_place = empty_string; baptism_src = empty_string;
+             birth_src = empty_string; baptism = Adef.codate_of_od baptism;
+             baptism_place = insert_string base baptism_place;
+             baptism_src = empty_string;
              death = death; death_place = insert_string base death_place;
              death_src = empty_string; burial = UnknownBurial;
              burial_place = empty_string; burial_src = empty_string;
