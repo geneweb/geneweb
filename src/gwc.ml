@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.4 1998-09-30 15:00:45 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.5 1998-10-01 10:08:29 ddr Exp $ *)
 
 open Def;
 open Check;
@@ -553,18 +553,19 @@ and [options] are:";
           else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
        (List.rev files.val);
      if not just_comp.val then
-       lock (Iobase.lock_file out_file.val) with
-       [ Accept ->
-           let base = link (List.rev gwo.val) in
-           do Gc.compact ();
-              Iobase.output out_file.val base;
-           return ()
-       | Refuse ->
-           do Printf.eprintf "Base is locked: cannot write it\n";
-              flush stderr;
-           return exit 2 ]
+       do lock (Iobase.lock_file out_file.val) with
+          [ Accept ->
+              let base = link (List.rev gwo.val) in
+              do Gc.compact ();
+                 Iobase.output out_file.val base;
+              return ()
+          | Refuse ->
+              do Printf.eprintf "Base is locked: cannot write it\n";
+                 flush stderr;
+              return exit 2 ];
+          output_command_line out_file.val;
+       return ()
      else ();
-     output_command_line out_file.val;
   return ()
 ;
 
