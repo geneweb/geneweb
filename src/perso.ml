@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.29 1999-05-18 21:57:52 ddr Exp $ *)
+(* $Id: perso.ml,v 2.30 1999-05-18 22:35:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -98,7 +98,7 @@ value
        (if first && cap then capitale tit else tit) ^ " " ^
        coa conf (sou base (List.hd places))
      in
-     Wserver.wprint "%s" (geneweb_link conf href s);
+     wprint_geneweb_link conf href s;
      let rec loop places =
        do match places with
           [ [] -> ()
@@ -111,8 +111,7 @@ value
              "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
              code_varenv (sou base place)
            in
-           do Wserver.wprint "%s"
-                (geneweb_link conf href (coa conf (sou base place)));
+           do wprint_geneweb_link conf href (coa conf (sou base place));
            return loop places
        | _ -> () ]
      in
@@ -774,15 +773,13 @@ value print_ancestors_descends_cousins conf base p a =
 ;
 
 value print_linked_first_name_and_surname conf base p =
-  do Wserver.wprint "%s"
-       (geneweb_link conf
-          ("m=P;v=" ^ code_varenv (Name.lower (sou base p.first_name)))
-          (coa conf (sou base p.first_name)));
+  do wprint_geneweb_link conf
+       ("m=P;v=" ^ code_varenv (Name.lower (sou base p.first_name)))
+       (coa conf (sou base p.first_name));
      Wserver.wprint " ";
-     Wserver.wprint "%s"
-       (geneweb_link conf
-          ("m=N;v=" ^ code_varenv (Name.lower (sou base p.surname)))
-          (coa conf (sou base p.surname)));
+     wprint_geneweb_link conf
+       ("m=N;v=" ^ code_varenv (Name.lower (sou base p.surname)))
+       (coa conf (sou base p.surname));
   return ()
 ;
 

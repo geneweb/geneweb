@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.20 1999-05-17 16:40:13 ddr Exp $ *)
+(* $Id: util.ml,v 2.21 1999-05-18 22:35:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -288,6 +288,10 @@ value one_title_text conf base p t =
 value geneweb_link conf href s =
   if conf.cancel_links then s
   else "<a href=\"" ^ commd conf ^ href ^ "\">" ^ s ^ "</a>"
+;
+
+value wprint_geneweb_link conf href s =
+  Wserver.wprint "%s" (geneweb_link conf href s)
 ;
 
 value reference conf base p s =

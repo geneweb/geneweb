@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.10 1999-05-18 21:57:50 ddr Exp $ *)
+(* $Id: descend.ml,v 2.11 1999-05-18 22:34:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -131,7 +131,7 @@ value afficher_menu_descendants conf base p =
     if h then
       Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
         (transl_decline conf "of (same or greater generation level)"
-         (person_text_no_html conf base p))
+        (person_text_no_html conf base p))
     else
       Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
         (transl_decline conf "of (same or greater generation level)"
@@ -711,13 +711,12 @@ value afficher_descendants_numerotation conf base niveau_max ancetre =
         (transl_decline conf "of (same or greater generation level)"
         (person_text_no_html conf base ancetre))
     else
-      stag "a" "href=\"%sm=D;i=%d;v=%d;t=G\"" (commd conf)
-        (Adef.int_of_iper ancetre.cle_index) niveau_max
-      begin
-        Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
-          (transl_decline conf "of (same or greater generation level)"
-          (person_text conf base ancetre));
-      end
+      wprint_geneweb_link conf
+        ("m=D;i=" ^ string_of_int (Adef.int_of_iper ancetre.cle_index) ^
+         ";v=" ^ string_of_int niveau_max ^ ";t=G")
+        (capitale (transl conf "descendants") ^ " " ^
+         transl_decline conf "of (same or greater generation level)"
+           (person_text conf base ancetre))
   in
   let marks = Array.create (base.data.persons.len) False in
   let paths = Array.create (base.data.persons.len) [] in
@@ -772,9 +771,9 @@ value print_elem conf base paths precision (n, pll) =
      match pll with
      [ [[p]] ->
          do Wserver.wprint "<strong>%s " (surname_end n);
-            Wserver.wprint "<a href=\"%si=%d\">" (commd conf)
-              (Adef.int_of_iper p.cle_index);
-            Wserver.wprint "%s</a>" (coa conf (sou base p.first_name));
+            wprint_geneweb_link conf
+              ("i=" ^ string_of_int (Adef.int_of_iper p.cle_index))
+              (coa conf (sou base p.first_name));
             Wserver.wprint "%s</strong>" (surname_begin n);
             Date.afficher_dates_courtes conf base p;
             print_ref conf base paths p;
@@ -795,13 +794,10 @@ value print_elem conf base paths precision (n, pll) =
                      (fun p ->
                         do html_li conf;
                            stag "strong" begin
-                             stag "a" "href=\"%si=%d\""
-                               (commd conf)
-                               (Adef.int_of_iper p.cle_index)
-                             begin
-                               Wserver.wprint "%s"
-                                 (coa conf (sou base p.first_name));
-                             end;
+                             wprint_geneweb_link conf
+                               ("i=" ^
+                                string_of_int (Adef.int_of_iper p.cle_index))
+                               (coa conf (sou base p.first_name));
                            end;
                            if several && precision then
                              do Wserver.wprint " <em>";
@@ -869,13 +865,13 @@ value trier_et_afficher conf base paths precision liste =
 value afficher_index_descendants conf base niveau_max ancetre =
   let niveau_max = min limit_desc niveau_max in
   let title h =
-    do if not h then
-         Wserver.wprint "<a href=\"%sm=D;i=%d;v=%d;t=C\">" (commd conf)
-           (Adef.int_of_iper ancetre.cle_index) niveau_max
-       else ();
-       Wserver.wprint "%s" (capitale (transl conf "index of the descendants"));
-       if not h then Wserver.wprint "</a>" else ();
-    return ()
+    let txt = capitale (transl conf "index of the descendants") in
+    if not h then
+      wprint_geneweb_link conf
+        ("m=D;i=" ^ string_of_int (Adef.int_of_iper ancetre.cle_index) ^
+         ";v=" ^ string_of_int niveau_max ^ ";t=C")
+        txt
+    else Wserver.wprint "%s" txt
   in
   do header conf title; return
   let marks = Array.create (base.data.persons.len) False in
