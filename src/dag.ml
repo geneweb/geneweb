@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.0 2001-03-16 19:34:31 ddr Exp $ *)
+(* $Id: dag.ml,v 4.1 2001-04-21 14:06:52 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -24,11 +24,13 @@ value tag_dag d =
   map_dag
     (fun v ->
        let v = c.val in
-       do c.val :=
-            if c.val = 'Z' then 'a'
-            else if c.val = 'z' then '1'
-            else Char.chr (Char.code c.val + 1);
-       return v)
+       do {
+         c.val :=
+           if c.val = 'Z' then 'a'
+           else if c.val = 'z' then '1'
+           else Char.chr (Char.code c.val + 1);
+         v
+       })
     d
 ;
 
@@ -38,7 +40,11 @@ value get_dag_elems conf base =
   loop None Pset.empty 1 where rec loop prev_po set i =
     let s = string_of_int i in
     let po = Util.find_person_in_env conf base s in
-    let po = match po with [ None -> prev_po | x -> x ] in
+    let po =
+      match po with
+      [ None -> prev_po
+      | x -> x ]
+    in
     let so = Util.p_getenv conf.env ("s" ^ s) in
     match (po, so) with
     [ (Some p, Some s) ->
@@ -66,12 +72,6 @@ value make_dag conf base list =
   let nodes =
     Array.map
       (fun ip ->
-(*
-do Printf.eprintf "\no %s\n" (denomination base (poi base ip)); flush stderr; return
-*)
-(*
-do let p = poi base ip in Printf.eprintf "\no %s%s\n" (Util.person_title_text conf base p) (Date.short_dates_text conf base p); flush stderr; return
-*)
          let pare =
            match (aoi base ip).parents with
            [ Some ifam ->
@@ -80,10 +80,6 @@ do let p = poi base ip in Printf.eprintf "\no %s%s\n" (Util.person_title_text co
                try [M.find c.father map :: l] with [ Not_found -> l ]
            | None -> [] ]
          in
-(*
-do Printf.eprintf "parents\n"; flush stderr; return
-do List.iter (fun id -> Printf.eprintf "- %s\n" (denomination base (poi base nodes.(int_of_idag id)))) pare; flush stderr; return
-*)
          let chil =
            let u = uoi base ip in
            Array.fold_left
@@ -96,13 +92,6 @@ do List.iter (fun id -> Printf.eprintf "- %s\n" (denomination base (poi base nod
              [] u.family
          in
          let chil = List.rev chil in
-(*
-do Printf.eprintf "children\n"; flush stderr; return
-do List.iter (fun id -> Printf.eprintf "- %s\n" (denomination base (poi base nodes.(int_of_idag id)))) chil; flush stderr; return
-*)
-(*
-do List.iter (fun id -> let p = poi base nodes.(int_of_idag id) in Printf.eprintf "- %s%s\n" (Util.person_title_text conf base p) (Date.short_dates_text conf base p)) chil; flush stderr; return
-*)
          {pare = pare; valu = Left ip; chil = chil})
       nodes
   in
@@ -115,20 +104,20 @@ value image_normal_txt conf base p fname width height =
   let b = acces conf base p in
   let k = default_image_name base p in
   sprintf "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k ^
-  sprintf "\
+    sprintf "\
 <img src=\"%sm=IM;d=%d;%s;k=/%s\" width=%d height=%d border=0 alt=\"%s\">"
-        (commd conf)
-        (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
-        b k width height image_txt ^
-  "</a>"
+      (commd conf)
+      (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
+      width height image_txt ^
+    "</a>"
 ;
 
 value image_url_txt conf base url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
-  sprintf "<img src=\"%s\"\nheight=%d border=0 alt=\"%s\">" url
-    height image_txt ^
-  "</a>\n"
+    sprintf "<img src=\"%s\"\nheight=%d border=0 alt=\"%s\">" url height
+      image_txt ^
+    "</a>\n"
 ;
 
 value image_txt conf base p =
@@ -137,12 +126,10 @@ value image_txt conf base p =
       match image_and_size conf base p (limited_image_size 100 75) with
       [ Some (f, Some (Some (wid, hei))) ->
           "<br>\n<center><table border=0><tr><td>\n" ^
-          image_normal_txt conf base p f wid hei ^
-          "</table></center>\n"
+            image_normal_txt conf base p f wid hei ^ "</table></center>\n"
       | Some (url, None) ->
           "<br>\n<center><table border=0><tr><td>\n" ^
-          image_url_txt conf base url 75 ^
-          "</table></center>\n"
+            image_url_txt conf base url 75 ^ "</table></center>\n"
       | _ -> "" ]
   | _ -> "" ]
 ;
@@ -150,41 +137,39 @@ value image_txt conf base p =
 (* Print with HTML table tags: <table> <tr> <td> *)
 
 value print_table conf hts =
-  do Wserver.wprint "<center><table border=%d" conf.border;
-     Wserver.wprint " cellspacing=0 cellpadding=0>\n";
-     for i = 0 to Array.length hts - 1 do
-       Wserver.wprint "<tr>\n";
-       for j = 0 to Array.length hts.(i) - 1 do
-         let (colspan, align, td) = hts.(i).(j) in
-         do Wserver.wprint "<td";
-(*
-            if colspan > 1 then Wserver.wprint " colspan=%d" colspan else ();
-*)
-if colspan=1 && (td=TDstring "&nbsp;" || td=TDhr CenterA) then ()
-else Wserver.wprint " colspan=%d" colspan;
-(**)
-            match (align, td) with
-            [ (LeftA, TDhr LeftA) -> Wserver.wprint " align=left"
-            | (LeftA, _) -> ()
-            | (CenterA, _) -> Wserver.wprint " align=center"
-            | (RightA, _) -> Wserver.wprint " align=right" ];
-            Wserver.wprint ">";
-            match td with
-            [ TDstring s -> Wserver.wprint "%s" s
-            | TDhr align ->
-                do Wserver.wprint "<hr noshade size=1";
-                   match align with
-                   [ LeftA -> Wserver.wprint " width=\"50%%\" align=left"
-                   | RightA -> Wserver.wprint " width=\"50%%\" align=right"
-                   | _ -> () ];
-                   Wserver.wprint ">";
-                return () ];
-            Wserver.wprint "</td>\n";
-         return ();
-       done;
-     done;
-     Wserver.wprint "</table></center>\n";
-  return () 
+  do {
+    Wserver.wprint "<center><table border=%d" conf.border;
+    Wserver.wprint " cellspacing=0 cellpadding=0>\n";
+    for i = 0 to Array.length hts - 1 do {
+      Wserver.wprint "<tr>\n";
+      for j = 0 to Array.length hts.(i) - 1 do {
+        let (colspan, align, td) = hts.(i).(j) in
+        Wserver.wprint "<td";
+        if colspan = 1 && (td = TDstring "&nbsp;" || td = TDhr CenterA) then
+          ()
+        else Wserver.wprint " colspan=%d" colspan;
+        match (align, td) with
+        [ (LeftA, TDhr LeftA) -> Wserver.wprint " align=left"
+        | (LeftA, _) -> ()
+        | (CenterA, _) -> Wserver.wprint " align=center"
+        | (RightA, _) -> Wserver.wprint " align=right" ];
+        Wserver.wprint ">";
+        match td with
+        [ TDstring s -> Wserver.wprint "%s" s
+        | TDhr align ->
+            do {
+              Wserver.wprint "<hr noshade size=1";
+              match align with
+              [ LeftA -> Wserver.wprint " width=\"50%%\" align=left"
+              | RightA -> Wserver.wprint " width=\"50%%\" align=right"
+              | _ -> () ];
+              Wserver.wprint ">";
+            } ];
+        Wserver.wprint "</td>\n";
+      }
+    };
+    Wserver.wprint "</table></center>\n";
+  }
 ;
 
 (*
@@ -204,18 +189,22 @@ value displayed_next_char s i =
     else
       match s.[i] with
       [ '<' ->
-          loop1 (i + 1) where rec loop1 i =
+          let rec loop1 i =
             if i = String.length s then None
             else if s.[i] = '>' then loop (i + 1)
             else loop1 (i + 1)
+          in
+          loop1 (i + 1)
       | '&' ->
-          loop1 (i + 1) where rec loop1 j =
+          let rec loop1 j =
             if j = String.length s then Some (i, j)
             else
               match s.[j] with
               [ 'a'..'z' | 'A'..'Z' -> loop1 (j + 1)
               | ';' -> Some (i, j + 1)
               | _ -> Some (i, j) ]
+          in
+          loop1 (i + 1)
       | _ -> Some (i, i + 1) ]
 ;
 
@@ -246,21 +235,17 @@ value strip_empty_tags s =
           in
           let j =
             loop j where rec loop j =
-              if s.[j] = '>' then j + 1
-              else loop (j + 1)
+              if s.[j] = '>' then j + 1 else loop (j + 1)
           in
           match opened_tag with
           [ Some (opened_tag_name, k) ->
               if tag_close then
                 if tag_name = opened_tag_name then loop blen None j
                 else loop (buff_store_int s blen k j) None j
-              else
-                loop (buff_store_int s blen k i) (Some (tag_name, i)) j
+              else loop (buff_store_int s blen k i) (Some (tag_name, i)) j
           | None ->
-              if tag_close then
-                loop (buff_store_int s blen i j) None j
-              else
-                loop blen (Some (tag_name, i)) j ]
+              if tag_close then loop (buff_store_int s blen i j) None j
+              else loop blen (Some (tag_name, i)) j ]
       | c ->
           let blen =
             match opened_tag with
@@ -288,7 +273,7 @@ value displayed_sub s ibeg ilen =
           else (blen, dlen)
         in
         loop blen (di + 1) dlen k
-   | None ->
+    | None ->
         let s = Buff.get (buff_store_int s blen i (String.length s)) in
         strip_empty_tags s ]
 ;
@@ -323,17 +308,13 @@ value displayed_strip s sz =
         if dj - dibeg > sz then
           loop [displayed_sub s dibeg (di - dibeg - 1) :: strl] di (dj + 1)
             (j + 1)
-        else
-          loop strl dibeg (dj + 1) (j + 1)
+        else loop strl dibeg (dj + 1) (j + 1)
     | None ->
         let strl =
           if dj - dibeg > sz then
             let str2 = displayed_sub s dibeg (di - dibeg - 1) in
-            let str1 = displayed_sub s di (dj - di) in
-            [str1; str2 :: strl]
-          else
-            let str = displayed_sub s dibeg (dj - dibeg) in
-            [str :: strl]
+            let str1 = displayed_sub s di (dj - di) in [str1; str2 :: strl]
+          else let str = displayed_sub s dibeg (dj - dibeg) in [str :: strl]
         in
         List.rev strl ]
 ;
@@ -342,53 +323,63 @@ value displayed_strip s sz =
 
 value gen_compute_columns_sizes size_fun hts ncol =
   let colsz = Array.make ncol 0 in
-  do loop 1 where rec loop curr_colspan =
-       let next_colspan = ref (ncol + 1) in
-       do for i = 0 to Array.length hts - 1 do
-            if i = Array.length hts then ()
-            else
-              loop 0 0 where rec loop col j =
-                if j = Array.length hts.(i) then ()
-                else
-                  let (colspan, _, td) = hts.(i).(j) in
-                  do match td with
-                     [ TDstring s ->
-                         if colspan = curr_colspan then
-                           let len = size_fun s in
-                           let currsz =
-                             loop 0 col colspan
-                             where rec loop currsz col cnt =
-                               if cnt = 0 then currsz
-                               else
-                                 let currsz = currsz + colsz.(col) in
-                                 loop currsz (col + 1) (cnt - 1)
-                           in
-                           if currsz >= len then ()
-                           else
-                             loop 1 col colspan where rec loop n col cnt =
-                               if cnt = 0 then ()
-                               else
-                                 let inc_sz =
-                                   n * (len - currsz) / colspan -
-                                   (n - 1) * (len - currsz) / colspan
-                                 in
-                                 do colsz.(col) := colsz.(col) + inc_sz;
-                                 return loop (n + 1) (col + 1) (cnt - 1)
-                         else if colspan > curr_colspan then
-                           next_colspan.val := min colspan next_colspan.val
-                         else ()
-                     | TDhr _ -> () ];
-                  return loop (col + colspan) (j + 1);
-          done;
-       return
-       if next_colspan.val > ncol then () else loop next_colspan.val;
-  return colsz
+  do {
+    let rec loop curr_colspan =
+      let next_colspan = ref (ncol + 1) in
+      do {
+        for i = 0 to Array.length hts - 1 do {
+          if i = Array.length hts then ()
+          else
+            let rec loop col j =
+              if j = Array.length hts.(i) then ()
+              else do {
+                let (colspan, _, td) = hts.(i).(j) in
+                match td with
+                [ TDstring s ->
+                    if colspan = curr_colspan then
+                      let len = size_fun s in
+                      let currsz =
+                        loop 0 col colspan where rec loop currsz col cnt =
+                          if cnt = 0 then currsz
+                          else
+                            let currsz = currsz + colsz.(col) in
+                            loop currsz (col + 1) (cnt - 1)
+                      in
+                      if currsz >= len then ()
+                      else
+                        let rec loop n col cnt =
+                          if cnt = 0 then ()
+                          else do {
+                            let inc_sz =
+                              n * (len - currsz) / colspan -
+                                (n - 1) * (len - currsz) / colspan
+                            in
+                            colsz.(col) := colsz.(col) + inc_sz;
+                            loop (n + 1) (col + 1) (cnt - 1)
+                          }
+                        in
+                        loop 1 col colspan
+                    else if colspan > curr_colspan then
+                      next_colspan.val := min colspan next_colspan.val
+                    else ()
+                | TDhr _ -> () ];
+                loop (col + colspan) (j + 1)
+              }
+            in
+            loop 0 0
+        };
+        if next_colspan.val > ncol then () else loop next_colspan.val
+      }
+    in
+    loop 1;
+    colsz
+  }
 ;
 
-value compute_columns_sizes =
-  gen_compute_columns_sizes displayed_length;
+value compute_columns_sizes = gen_compute_columns_sizes displayed_length;
 value compute_columns_minimum_sizes =
-  gen_compute_columns_sizes longuest_word_length;
+  gen_compute_columns_sizes longuest_word_length
+;
 
 (* Gadget to add a | to fill upper/lower part of a table data when
    preceded/followed by a |; not obligatory but nicer *)
@@ -397,27 +388,31 @@ value try_add_vbar stra_row stra_row_max hts i col =
   if stra_row < 0 then
     if i = 0 then ""
     else
-      loop 0 0 where rec loop pcol pj =
-        if pj >= Array.length hts.(i-1) then ""
+      let rec loop pcol pj =
+        if pj >= Array.length hts.(i - 1) then ""
         else
-          let (colspan, _, td) = hts.(i-1).(pj) in
+          let (colspan, _, td) = hts.(i - 1).(pj) in
           if pcol = col then
             match td with
             [ TDstring "|" -> "|"
             | _ -> "" ]
           else loop (pcol + colspan) (pj + 1)
+      in
+      loop 0 0
   else if stra_row >= stra_row_max then
     if i = Array.length hts - 1 then ""
     else
-      loop 0 0 where rec loop ncol nj =
-        if nj >= Array.length hts.(i+1) then ""
+      let rec loop ncol nj =
+        if nj >= Array.length hts.(i + 1) then ""
         else
-          let (colspan, _, td) = hts.(i+1).(nj) in
+          let (colspan, _, td) = hts.(i + 1).(nj) in
           if ncol = col then
             match td with
             [ TDstring "|" -> "|"
             | _ -> "" ]
           else loop (ncol + colspan) (nj + 1)
+      in
+      loop 0 0
   else ""
 ;
 
@@ -441,8 +436,7 @@ value strip_troublemakers s =
           in
           let j =
             loop j where rec loop j =
-              if s.[j] = '>' then j + 1
-              else loop (j + 1)
+              if s.[j] = '>' then j + 1 else loop (j + 1)
           in
           let len =
             match tag_name with
@@ -457,19 +451,19 @@ value strip_troublemakers s =
 ;
 
 value table_strip_troublemakers hts =
-  for i = 0 to Array.length hts - 1 do
-    for j = 0 to Array.length hts.(i) - 1 do
+  for i = 0 to Array.length hts - 1 do {
+    for j = 0 to Array.length hts.(i) - 1 do {
       match hts.(i).(j) with
       [ (colspan, align, TDstring s) ->
           hts.(i).(j) := (colspan, align, TDstring (strip_troublemakers s))
-      | _ -> () ];
-    done;
-  done
+      | _ -> () ]
+    }
+  }
 ;
 
 value print_next_pos conf pos1 pos2 tcol =
   let doit = p_getenv conf.env "notab" = Some "on" in
-  if doit then
+  if doit then do {
     let dpos =
       match p_getint conf.env "dpos" with
       [ Some dpos -> dpos
@@ -501,45 +495,47 @@ value print_next_pos conf pos1 pos2 tcol =
            | _ -> [(k, v) :: env] ])
         conf.env []
     in
-    do Wserver.wprint "<div align=right>\n";
-       if pos1 = 0 then Wserver.wprint "&nbsp;"
-       else
-         do Wserver.wprint "<a href=\"%s" (commd conf);
-            List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
-            Wserver.wprint "pos1=%d;pos2=%d" (pos1 + overlap - dpos)
-              (pos1 + overlap);
-            Wserver.wprint "\">&lt;&lt;</a>\n";
-         return ();
-       if pos2 >= tcol then Wserver.wprint "&nbsp;"
-       else
-         do Wserver.wprint "<a href=\"%s" (commd conf);
-            List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
-            Wserver.wprint "pos1=%d;pos2=%d" (pos2 - overlap)
-              (pos2 - overlap + dpos);
-            Wserver.wprint "\">&gt;&gt;</a>\n";
-         return ();
-       Wserver.wprint "</div>\n";
-    return ()
+    Wserver.wprint "<div align=right>\n";
+    if pos1 = 0 then Wserver.wprint "&nbsp;"
+    else do {
+      Wserver.wprint "<a href=\"%s" (commd conf);
+      List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
+      Wserver.wprint "pos1=%d;pos2=%d" (pos1 + overlap - dpos)
+        (pos1 + overlap);
+      Wserver.wprint "\">&lt;&lt;</a>\n";
+    };
+    if pos2 >= tcol then Wserver.wprint "&nbsp;"
+    else do {
+      Wserver.wprint "<a href=\"%s" (commd conf);
+      List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
+      Wserver.wprint "pos1=%d;pos2=%d" (pos2 - overlap)
+        (pos2 - overlap + dpos);
+      Wserver.wprint "\">&gt;&gt;</a>\n";
+    };
+    Wserver.wprint "</div>\n";
+  }
   else ()
 ;
 
 (* Main print table algorithm with <pre> *)
 
 value table_pre_dim conf hts =
-  do table_strip_troublemakers hts; return
-  let ncol =
-    let hts0 = hts.(0) in
-    loop 0 0 where rec loop ncol j =
-      if j = Array.length hts0 then ncol
-      else
-        let (colspan, _, _) = hts0.(j) in
-        loop (ncol + colspan) (j + 1)
-  in
-  let min_widths_tab = compute_columns_minimum_sizes hts ncol in
-  let max_widths_tab = compute_columns_sizes hts ncol in
-  let min_wid = Array.fold_left \+ 0 min_widths_tab in
-  let max_wid = Array.fold_left \+ 0 max_widths_tab in
-  (min_wid, max_wid, min_widths_tab, max_widths_tab, ncol)
+  do {
+    table_strip_troublemakers hts;
+    let ncol =
+      let hts0 = hts.(0) in
+      let rec loop ncol j =
+        if j = Array.length hts0 then ncol
+        else let (colspan, _, _) = hts0.(j) in loop (ncol + colspan) (j + 1)
+      in
+      loop 0 0
+    in
+    let min_widths_tab = compute_columns_minimum_sizes hts ncol in
+    let max_widths_tab = compute_columns_sizes hts ncol in
+    let min_wid = Array.fold_left  \+ 0 min_widths_tab in
+    let max_wid = Array.fold_left  \+ 0 max_widths_tab in
+    (min_wid, max_wid, min_widths_tab, max_widths_tab, ncol)
+  }
 ;
 
 value print_table_pre conf hts =
@@ -552,142 +548,126 @@ value print_table_pre conf hts =
     in
     max tmincol (min dcol tcol)
   in
-(*
-do for i = 0 to ncol - 1 do
-     Wserver.wprint " %d(%d)" colsz.(i) colminsz.(i);
-   done;
-   Wserver.wprint " = %d(%d) -> %d<br>\n" tcol tmincol dcol;
-return
-*)
-  do if tcol > tmincol then
-       for i = 0 to ncol - 1 do
-         colsz.(i) :=
-           colminsz.(i)
-           + (colsz.(i) - colminsz.(i)) * (dcol - tmincol) / (tcol - tmincol);
-       done
-     else ();
-  return
-(*
-do for i = 0 to ncol - 1 do
-     Wserver.wprint " %d(%d)" colsz.(i) colminsz.(i);
-   done;
-   let tcol = Array.fold_left \+ 0 colsz in
-   Wserver.wprint " = %d(%d) -> %d<br>\n" tcol tmincol dcol;
-return
-*)
-  let pos1 = p_getint conf.env "pos1" in
-  let pos2 =
-    match p_getint conf.env "pos2" with
-    [ None -> p_getint conf.env "dpos"
-    | x -> x ]
-  in
-  do print_next_pos conf pos1 pos2 (Array.fold_left \+ 0 colsz);
-     Wserver.wprint "<pre>\n";
-     for i = 0 to Array.length hts - 1 do
-       let (stra, max_row) =
-         let (stral, max_row) =
-           loop [] 1 0 0 where rec loop stral max_row col j =
-             if j = Array.length hts.(i) then (stral, max_row)
-             else
-               let (colspan, _, td) = hts.(i).(j) in
-               let stra =
-                 match td with
-                 [ TDstring s ->
-                     let sz =
-                       loop 0 colspan where rec loop sz k =
-                         if k = 0 then sz else
-                         loop (sz + colsz.(col + k - 1)) (k - 1)
-                     in
-                     Array.of_list (displayed_strip s sz)
-                 | _ -> [| |] ]
-               in
-               loop [stra :: stral] (max max_row (Array.length stra))
-                 (col + colspan) (j + 1)
-         in
-         (Array.of_list (List.rev stral), max_row)
-       in
-       for row = 0 to max_row - 1 do
-         loop 0 0 0 where rec loop pos col j =
-           if j = Array.length hts.(i) then Wserver.wprint "\n"
-           else
-             let (colspan, align, td) = hts.(i).(j) in
-             let sz =
-               loop 0 colspan where rec loop sz k =
-                 if k = 0 then sz
-                 else loop (sz + colsz.(col + k - 1)) (k - 1)
-             in
-             let outs =
-               match td with
-               [ TDstring s ->
-                   let s =
-                     let k =
-                       let dk = (max_row - Array.length stra.(j)) / 2 in
-                       row - dk
-                     in
-                     if k >= 0 && k < Array.length stra.(j) then stra.(j).(k)
-                     else if s = "|" then s
-                     else try_add_vbar k (Array.length stra.(j)) hts i col
-                   in
-                   let s = if s = "&nbsp;" then " " else s in
-                   let len = displayed_length s in
-                   String.make ((sz - len) / 2) ' ' ^ s ^
-                   String.make (sz - (sz + len) / 2) ' '
-               | TDhr LeftA ->
-                   let len = (sz + 1) / 2 in
-                   String.make len '-' ^ String.make (sz - len) ' '
-               | TDhr RightA ->
-                   let len = sz / 2 in
-                   String.make (sz - len - 1) ' ' ^ String.make (len + 1) '-'
-               | TDhr CenterA ->
-                   String.make sz '-' ]
-             in
-             let clipped_outs =
-               if pos1 = None && pos2 = None then outs
-               else
-                 let pos1 =
-                   match pos1 with
-                   [ Some pos1 -> pos1
-                   | None -> pos ]
-                 in
-                 let pos2 =
-                   match pos2 with
-                   [ Some pos2 -> pos2
-                   | None -> pos + sz ]
-                 in
-                 if pos + sz <= pos1 then ""
-                 else if pos > pos2 then ""
-                 else if pos2 >= pos + sz then
-                   displayed_sub outs (pos1 - pos) (pos + sz - pos1)
-                 else if pos1 < pos then
-                   displayed_sub outs 0 (pos2 - pos)
-                 else
-                   displayed_sub outs (pos1 - pos) (pos2 - pos1)
-             in
-             do Wserver.wprint "%s" clipped_outs; return
-             loop (pos + sz) (col + colspan) (j + 1);
-       done;
-     done;
-     Wserver.wprint "</pre>\n";
-  return ()
+  do {
+    if tcol > tmincol then
+      for i = 0 to ncol - 1 do {
+        colsz.(i) :=
+          colminsz.(i) +
+            (colsz.(i) - colminsz.(i)) * (dcol - tmincol) / (tcol - tmincol)
+      }
+    else ();
+    let pos1 = p_getint conf.env "pos1" in
+    let pos2 =
+      match p_getint conf.env "pos2" with
+      [ None -> p_getint conf.env "dpos"
+      | x -> x ]
+    in
+    print_next_pos conf pos1 pos2 (Array.fold_left  \+ 0 colsz);
+    Wserver.wprint "<pre>\n";
+    for i = 0 to Array.length hts - 1 do {
+      let (stra, max_row) =
+        let (stral, max_row) =
+          loop [] 1 0 0 where rec loop stral max_row col j =
+            if j = Array.length hts.(i) then (stral, max_row)
+            else
+              let (colspan, _, td) = hts.(i).(j) in
+              let stra =
+                match td with
+                [ TDstring s ->
+                    let sz =
+                      loop 0 colspan where rec loop sz k =
+                        if k = 0 then sz
+                        else loop (sz + colsz.(col + k - 1)) (k - 1)
+                    in
+                    Array.of_list (displayed_strip s sz)
+                | _ -> [| |] ]
+              in
+              loop [stra :: stral] (max max_row (Array.length stra))
+                (col + colspan) (j + 1)
+        in
+        (Array.of_list (List.rev stral), max_row)
+      in
+      for row = 0 to max_row - 1 do {
+        let rec loop pos col j =
+          if j = Array.length hts.(i) then Wserver.wprint "\n"
+          else do {
+            let (colspan, align, td) = hts.(i).(j) in
+            let sz =
+              loop 0 colspan where rec loop sz k =
+                if k = 0 then sz else loop (sz + colsz.(col + k - 1)) (k - 1)
+            in
+            let outs =
+              match td with
+              [ TDstring s ->
+                  let s =
+                    let k =
+                      let dk = (max_row - Array.length stra.(j)) / 2 in
+                      row - dk
+                    in
+                    if k >= 0 && k < Array.length stra.(j) then stra.(j).(k)
+                    else if s = "|" then s
+                    else try_add_vbar k (Array.length stra.(j)) hts i col
+                  in
+                  let s = if s = "&nbsp;" then " " else s in
+                  let len = displayed_length s in
+                  String.make ((sz - len) / 2) ' ' ^ s ^
+                    String.make (sz - (sz + len) / 2) ' '
+              | TDhr LeftA ->
+                  let len = (sz + 1) / 2 in
+                  String.make len '-' ^ String.make (sz - len) ' '
+              | TDhr RightA ->
+                  let len = sz / 2 in
+                  String.make (sz - len - 1) ' ' ^ String.make (len + 1) '-'
+              | TDhr CenterA -> String.make sz '-' ]
+            in
+            let clipped_outs =
+              if pos1 = None && pos2 = None then outs
+              else
+                let pos1 =
+                  match pos1 with
+                  [ Some pos1 -> pos1
+                  | None -> pos ]
+                in
+                let pos2 =
+                  match pos2 with
+                  [ Some pos2 -> pos2
+                  | None -> pos + sz ]
+                in
+                if pos + sz <= pos1 then ""
+                else if pos > pos2 then ""
+                else if pos2 >= pos + sz then
+                  displayed_sub outs (pos1 - pos) (pos + sz - pos1)
+                else if pos1 < pos then displayed_sub outs 0 (pos2 - pos)
+                else displayed_sub outs (pos1 - pos) (pos2 - pos1)
+            in
+            Wserver.wprint "%s" clipped_outs;
+            loop (pos + sz) (col + colspan) (j + 1)
+          }
+        in
+        loop 0 0 0
+      }
+    };
+    Wserver.wprint "</pre>\n";
+  }
 ;
 
 (* main *)
 
 value print_html_table conf hts =
-  do if Util.p_getenv conf.env "notab" <> Some "on" then
-       do Wserver.wprint "<div align=right><a href=\"%s" (commd conf);
-          List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
-          Wserver.wprint "notab=on;slices=on";
-          Wserver.wprint "\"><tt>//</tt></a></div>\n";
-       return ()
-     else ();
-  return
-  if Util.p_getenv conf.env "notab" = Some "on"
-  || Util.p_getenv conf.env "pos2" <> None
-  || browser_doesnt_have_tables conf then
-    print_table_pre conf hts
-  else
-    print_table conf hts
+  do {
+    if Util.p_getenv conf.env "notab" <> Some "on" then do {
+      Wserver.wprint "<div align=right><a href=\"%s" (commd conf);
+      List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
+      Wserver.wprint "notab=on;slices=on";
+      Wserver.wprint "\"><tt>//</tt></a></div>\n";
+    }
+    else ();
+    if Util.p_getenv conf.env "notab" = Some "on" ||
+       Util.p_getenv conf.env "pos2" <> None ||
+       browser_doesnt_have_tables conf then
+      print_table_pre conf hts
+    else print_table conf hts
+  }
 ;
 
 value make_tree_hts conf base elem_txt spouse_on invert no_group set spl d =
@@ -733,12 +713,11 @@ value make_tree_hts conf base elem_txt spouse_on invert no_group set spl d =
                    | None -> "" ]
                  in
                  txt ^ "<br>\n&amp;" ^ d ^ " " ^
-                 Util.referenced_person_title_text conf base ps ^
-                 Date.short_dates_text conf base ps)
+                   Util.referenced_person_title_text conf base ps ^
+                   Date.short_dates_text conf base ps)
             txt spouses
         in
-        let txt = txt ^ image_txt conf base p in
-        txt
+        let txt = txt ^ image_txt conf base p in txt
     | Right _ -> "&nbsp;" ]
   in
   let bd =
@@ -767,76 +746,76 @@ value make_tree_hts conf base elem_txt spouse_on invert no_group set spl d =
     [ Left _ -> False
     | Right _ -> True ]
   in
-  let hts = Dag2html.html_table_of_dag indi_txt phony invert no_group d in
-  hts
+  let hts = Dag2html.html_table_of_dag indi_txt phony invert no_group d in hts
 ;
 
 value print_slices_menu conf base hts_opt =
   let txt n =
     Util.capitale
-       (transl_nth conf
-          "display by slices/slice width/overlap/total width" n)
+      (transl_nth conf "display by slices/slice width/overlap/total width" n)
   in
   let title _ = Wserver.wprint "%s" (txt 0) in
-  do Util.header conf title;
-     Util.print_link_to_welcome conf True;
-     tag "form" "method=get action=\"%s\"" conf.command begin
-       hidden_env conf;
-       List.iter
-         (fun (k, v) ->
-            if k = "slices" then ()
-            else
-              Wserver.wprint "<input type=hidden name=%s value=%s>\n"
-                (code_varenv k) (code_varenv v))
-         conf.env;
-       tag "table" begin
-         tag "tr" begin
-           tag "td" "align=right" begin
-             Wserver.wprint "%s\n"
-               (Util.capitale
-                  (transl conf
-                   "don't group the common branches together"));
-             Wserver.wprint "<input type=checkbox name=nogroup value=on>\n";
-           end;
-         end;
-         tag "tr" begin
-           tag "td" "align=right" begin
-             Wserver.wprint "%s\n" (txt 1);
-             Wserver.wprint "<input name=dpos size=5 value=78>\n";
-           end;
-         end;
-         tag "tr" begin
-           tag "td" "align=right" begin
-             Wserver.wprint "%s\n" (txt 2);
-             Wserver.wprint "<input name=overlap size=5 value=10>\n";
-           end;
-         end;
-         tag "tr" begin
-           tag "td" "align=right" begin
-             Wserver.wprint "%s\n" (txt 3);
-             let wid =
-               let wid = 78 in
-               match hts_opt with
-               [ Some hts ->
-                   let (min_wid, max_wid, _, _, _) = table_pre_dim conf hts in
-                   do Wserver.wprint "(%d-%d)\n" min_wid max_wid; return
-                   max min_wid (min max_wid wid)
-               | None -> wid ]
-             in
-             Wserver.wprint "<input name=width size=5 value=%d>\n" wid;
-           end;
-         end;
-       end;
-       Wserver.wprint "<input type=submit value=\"Ok\">\n";
-     end;
-     Util.trailer conf;
-  return ()
+  do {
+    Util.header conf title;
+    Util.print_link_to_welcome conf True;
+    tag "form" "method=get action=\"%s\"" conf.command begin
+      hidden_env conf;
+      List.iter
+        (fun (k, v) ->
+           if k = "slices" then ()
+           else
+             Wserver.wprint "<input type=hidden name=%s value=%s>\n"
+               (code_varenv k) (code_varenv v))
+        conf.env;
+      tag "table" begin
+        tag "tr" begin
+          tag "td" "align=right" begin
+            Wserver.wprint "%s\n"
+              (Util.capitale
+                 (transl conf "don't group the common branches together"));
+            Wserver.wprint "<input type=checkbox name=nogroup value=on>\n";
+          end;
+        end;
+        tag "tr" begin
+          tag "td" "align=right" begin
+            Wserver.wprint "%s\n" (txt 1);
+            Wserver.wprint "<input name=dpos size=5 value=78>\n";
+          end;
+        end;
+        tag "tr" begin
+          tag "td" "align=right" begin
+            Wserver.wprint "%s\n" (txt 2);
+            Wserver.wprint "<input name=overlap size=5 value=10>\n";
+          end;
+        end;
+        tag "tr" begin
+          tag "td" "align=right" begin
+            Wserver.wprint "%s\n" (txt 3);
+            let wid =
+              let wid = 78 in
+              match hts_opt with
+              [ Some hts ->
+                  let (min_wid, max_wid, _, _, _) = table_pre_dim conf hts in
+                  do {
+                    Wserver.wprint "(%d-%d)\n" min_wid max_wid;
+                    max min_wid (min max_wid wid)
+                  }
+              | None -> wid ]
+            in
+            Wserver.wprint "<input name=width size=5 value=%d>\n" wid;
+          end;
+        end;
+      end;
+      Wserver.wprint "<input type=submit value=\"Ok\">\n";
+    end;
+    Util.trailer conf;
+  }
 ;
 
 value gen_print_dag conf base spouse_on invert set spl d =
   let dag_elem_txt conf base p =
     Util.referenced_person_title_text conf base p ^
-    Date.short_dates_text conf base p
+      Date.short_dates_text conf base p
   in
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let hts =
@@ -844,14 +823,14 @@ value gen_print_dag conf base spouse_on invert set spl d =
   in
   if p_getenv conf.env "slices" = Some "on" then
     print_slices_menu conf base (Some hts)
-  else
+  else do {
     let title _ =
       Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
     in
-    do Util.header_no_page_title conf title;
-       print_html_table conf hts;
-       Util.trailer conf;
-    return ()
+    Util.header_no_page_title conf title;
+    print_html_table conf hts;
+    Util.trailer conf;
+  }
 ;
 
 value print_dag conf base set spl d =
