@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.45 2001-01-30 04:47:39 ddr Exp $ *)
+(* $Id: dag.ml,v 3.46 2001-01-30 13:05:16 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -421,7 +421,7 @@ value try_add_vbar stra_row stra_row_max hts i col =
 ;
 
 value strip_troublemakers s =
-  loop 0 0 where rec loop len i =
+  loop False 0 0 where rec loop last_space len i =
     if i = String.length s then Buff.get len
     else
       match s.[i] with
@@ -448,9 +448,11 @@ value strip_troublemakers s =
             [ "br" | "font" | "img" | "table" | "td" | "tr" | "center" -> len
             | _ -> buff_store_int s len i j ]
           in
-          loop len j
-      | '\n' | '\r' -> loop (Buff.store len ' ') (i + 1)
-      | c -> loop (Buff.store len c) (i + 1) ]
+          loop last_space len j
+      | '\n' | '\r' | ' ' ->
+          let len = if last_space then len else Buff.store len ' ' in
+          loop True len (i + 1)
+      | c -> loop False (Buff.store len c) (i + 1) ]
 ;
 
 value table_strip_troublemakers hts =
@@ -521,7 +523,7 @@ value print_table_pre conf hts =
   let tmincol = Array.fold_left \+ 0 colminsz in
   let dcol =
     let dcol =
-      match p_getint conf.env "dcol" with
+      match p_getint conf.env "width" with
       [ Some i -> i
       | None -> 79 ]
     in
