@@ -5,6 +5,8 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [16 Feb 04] Fixed bug: in ascend pages, the image link remained
+    even if cgl on.
   - [12 Feb 04] Changed method output of "patches" file: instead of
     1/ renaming "patches" into "patches~" 2/ writing "patches", which
     can be dangerous (writing of "patches" file can fail in the middle
