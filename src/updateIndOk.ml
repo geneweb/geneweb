@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.4 2001-05-09 12:14:27 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.5 2001-12-01 11:59:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -328,18 +328,8 @@ value print_conflict conf base p =
       html_li conf;
       Wserver.wprint "%s: %d.\n" (capitale (transl conf "first free number"))
         free_n;
-      Wserver.wprint "%s " (capitale (transl conf "click"));
-      Wserver.wprint "<a href=\n\"%s" (commd conf);
-      list_iter_first
-        (fun first (v, x) ->
-           do {
-             Wserver.wprint "%s" (if first then "" else ";");
-             Wserver.wprint "%s=" v;
-             if v = "occ" then Wserver.wprint "%d" free_n
-             else Wserver.wprint "%s" x;
-           })
-        conf.env;
-      Wserver.wprint "\">%s</a>" (transl conf "here");
+      Wserver.wprint (fcapitale (ftransl conf "click on \"%s\""))
+        (transl conf "create");
       Wserver.wprint "%s.\n" (transl conf " to try again with this number");
       html_li conf;
       Wserver.wprint "%s " (capitale (transl conf "or"));
@@ -347,7 +337,20 @@ value print_conflict conf base p =
       Wserver.wprint " %s %s." (transl conf "and")
         (transl conf "change it (the number) yourself");
     end;
-    Update.print_return conf;
+    html_p conf;
+    tag "form" "method=POST action=\"%s\"" conf.command begin
+      List.iter
+        (fun (x, v) ->
+           Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x
+             (quote_escaped (decode_varenv v)))
+        (conf.henv @ conf.env);
+      Wserver.wprint "<input type=hidden name=free_occ value=\"%d\">\n"
+        free_n;
+      Wserver.wprint "<input type=submit name=create value=\"%s\">\n"
+        (capitale (transl conf "create"));
+      Wserver.wprint "<input type=submit name=return value=\"%s\">\n"
+        (capitale (transl conf "back"));
+    end;
     Update.print_same_name conf base p;
     trailer conf;
     raise Update.ModErr
