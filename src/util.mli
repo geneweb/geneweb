@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.15 2002-07-15 08:34:27 ddr Exp $ *)
+(* $Id: util.mli,v 4.16 2002-09-19 15:13:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -111,6 +111,8 @@ value surname_begin : string -> string;
 value surname_end : string -> string;
 
 value specify_homonymous : config -> base -> person -> unit;
+
+value valid_format : format 'a 'b 'c -> string -> format 'a 'b 'c;
 
 value transl : config -> string -> string;
 value transl_nth : config -> string -> int -> string;

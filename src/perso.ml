@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.36 2002-07-15 08:34:24 ddr Exp $ *)
+(* $Id: perso.ml,v 4.37 2002-09-19 15:13:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -18,15 +18,10 @@ value has_children base u =
     (Array.to_list u.family)
 ;
 
-value print_marriage_text conf base in_perso fam =
+value print_marriage_text conf base fam =
   let marriage = Adef.od_of_codate fam.marriage in
   let marriage_place = sou base fam.marriage_place in
   do {
-    if in_perso then
-      match (marriage, marriage_place) with
-      [ (None, "") -> ()
-      | _ -> Wserver.wprint "<em>" ]
-    else ();
     match marriage with
     [ Some d -> Wserver.wprint " %s" (Date.string_of_ondate conf d)
     | _ -> () ];
@@ -38,11 +33,6 @@ value print_marriage_text conf base in_perso fam =
           copy_string_with_macros conf [] s;
           Wserver.wprint ","
         } ];
-    if in_perso then
-      match (marriage, marriage_place) with
-      [ (None, "") -> ()
-      | _ -> Wserver.wprint "</em>" ]
-    else ()
   }
 ;
 
@@ -259,6 +249,7 @@ type env =
   | Vsosa of option (Num.t * person)
   | Vimage of option (bool * string * option (int * int))
   | Vtitle of title_item
+  | Vfun of list string and list ast
   | Vnone ]
 and title_item =
   (int * gen_title_name istr * istr * list istr *
@@ -534,6 +525,7 @@ value print_image_url conf base env p p_auth =
   else ()
 ;
 
+(*
 value print_married_to conf base env p p_auth =
   fun
   [ Vfam fam (_, ispouse) des ->
@@ -541,9 +533,10 @@ value print_married_to conf base env p p_auth =
       let auth = p_auth && authorized_age conf base spouse in
       let format = relation_txt conf p.sex fam in
       Wserver.wprint (fcapitale format)
-        (fun _ -> if auth then print_marriage_text conf base True fam else ())
+        (fun _ -> if auth then print_marriage_text conf base fam else ())
   | _ -> () ]
 ;
+*)
 
 value print_misc_names conf base env p p_auth =
   if p_auth then
@@ -819,6 +812,21 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) =
         [ Vfam _ _ des -> string_of_int (Array.length des.children)
         | _ -> "" ]
       }
+  | "marriage_place" ->
+      if p_auth then
+        match get_env "fam" env with
+        [ Vfam fam _ _ -> sou base fam.marriage_place
+        | _ -> "" ]
+      else ""
+  | "on_marriage_date" ->
+      if p_auth then
+        match get_env "fam" env with
+        [ Vfam fam _ _ ->
+            match Adef.od_of_codate fam.marriage with
+            [ Some s -> Date.string_of_ondate conf s
+            | None -> "" ] 
+        | _ -> "" ]
+      else ""
   | "surname" ->
       if not p_auth && conf.hide_names then "x" else p_surname base p
   | s ->
@@ -875,7 +883,9 @@ value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
   | "image_txt" -> Wserver.wprint "%s" (default_image_name base p)
   | "image_url" -> print_image_url conf base env p p_auth
   | "ind_access" -> Wserver.wprint "i=%d" (Adef.int_of_iper p.cle_index)
+(*
   | "married_to" -> print_married_to conf base env p p_auth efam
+*)
   | "misc_names" -> print_misc_names conf base env p p_auth
   | "mother_age_at_birth" ->
       print_parent_age conf base p a p_auth (fun cpl -> cpl.mother)
@@ -935,6 +945,27 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
       [ Vfam fam cpl _ ->
           match fam.divorce with
           [ Divorced d -> True
+          | _ -> False ]
+      | _ -> False ]
+  | "are_engaged" ->
+      match efam with
+      [ Vfam fam _ _ ->
+          match fam.relation with
+          [ Engaged -> True
+          | _ -> False ]
+      | _ -> False ]
+  | "are_married" ->
+      match efam with
+      [ Vfam fam _ _ ->
+          match fam.relation with
+          [ Married | NoSexesCheck -> True
+          | _ -> False ]
+      | _ -> False ]
+  | "are_not_married" ->
+      match efam with
+      [ Vfam fam _ _ ->
+          match fam.relation with
+          [ NotMarried -> True
           | _ -> False ]
       | _ -> False ]
   | "are_separated" ->
@@ -1157,7 +1188,12 @@ value print_transl conf base env upp s c =
             match split_at_coloncolon s with
             [ None -> nominative (Util.transl_nth conf s n)
             | Some (s1, s2) ->
-                Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
+                if String.length s2 > 0 && s2.[0] = ':' then
+                  let s2 = String.sub s2 1 (String.length s2 - 1) in
+                  Printf.sprintf
+                    (Util.ftransl_nth conf (Util.valid_format "%t" s1) n)
+                       (fun _ -> s2)
+                else Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
         | None -> nominative (Util.transl conf s) ^ c ] ]
   in
   Wserver.wprint "%s" (if upp then capitale r else r)
@@ -1204,6 +1240,16 @@ value eval_bool_value conf base env =
   bool_eval
 ;
 
+value eval_expr conf base env p =
+  fun
+  [ Estr s -> s
+  | Evar s [] ->
+      try try_eval_gen_variable conf base env p s with
+      [ Not_found -> ">" ^ s ^ "???" ]
+  | Etransl upp s c -> Templ.eval_transl conf upp s c
+  | _ -> ">parse_error" ]
+;
+
 value rec eval_ast conf base env =
   fun
   [ Atext s -> Wserver.wprint "%s" s
@@ -1212,8 +1258,32 @@ value rec eval_ast conf base env =
   | Awid_hei s -> print_wid_hei conf base env s
   | Aif e alt ale -> eval_if conf base env e alt ale
   | Aforeach s sl al -> eval_foreach conf base env s sl al
-  | Adefine f x al alk -> ()
-  | Aapply f v -> () ]
+  | Adefine f xl al alk -> print_define conf base env f xl al alk
+  | Aapply f el -> print_apply conf base env f el ]
+and print_define conf base env f xl al alk =
+  List.iter (eval_ast conf base [(f, Vfun xl al) :: env]) alk
+and print_apply conf base env f el =
+  match get_env f env with
+  [ Vfun xl al ->
+      let ep =
+        match (get_env "p" env, get_env "p_auth" env) with
+        [ (Vind p a u, Vbool p_auth) -> (p, a, u, p_auth)
+        | _ -> assert False ]
+      in
+      let vl = List.map (eval_expr conf base env ep) el in
+      List.iter
+        (fun a ->
+           let a =
+             loop a xl vl where rec loop a xl vl =
+               match (xl, vl) with
+               [ ([x :: xl], [v :: vl]) ->
+                   loop (Templ.subst (Templ.subst_text x v) a) xl vl
+               | ([], []) -> a
+               | _ -> Atext "parse_error" ]
+           in
+           eval_ast conf base env a)
+        al
+  | _ -> Wserver.wprint ">%%%s???" f ]
 and eval_if conf base env e alt ale =
   let al = if eval_bool_value conf base env e then alt else ale in
   List.iter (eval_ast conf base env) al
@@ -1283,9 +1353,11 @@ and eval_foreach_child conf base env al =
            let env = [("child", Vind p a u) :: env] in
            let env = [("child_cnt", Vint (i + 1)) :: env] in
            let env =
-             if i = n - 1 && not (is_hidden p) then [("pos", Vstring "prev") :: env]
+             if i = n - 1 && not (is_hidden p) then
+               [("pos", Vstring "prev") :: env]
              else if i = n then [("pos", Vstring "self") :: env]
-             else if i = n + 1 && not (is_hidden p) then [("pos", Vstring "next") :: env]
+             else if i = n + 1 && not (is_hidden p) then
+               [("pos", Vstring "next") :: env]
              else env
            in
            List.iter (eval_ast conf base env) al)

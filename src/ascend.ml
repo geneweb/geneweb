@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.23 2002-05-17 10:06:45 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.24 2002-09-19 15:13:48 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -523,7 +523,7 @@ value print_marriage_long conf base all_gp auth marr_nb p ifam =
            match marr_nb with
            [ Some n -> Wserver.wprint " (%d)" n
            | None -> () ];
-           if auth then Perso.print_marriage_text conf base False fam else ()
+           if auth then Perso.print_marriage_text conf base fam else ()
          });
     Wserver.wprint "\n";
     stag "strong" begin
@@ -692,7 +692,7 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
               Wserver.wprint "... ";
               Wserver.wprint (relation_txt conf Male fam)
                 (fun _ ->
-                   if auth then Perso.print_marriage_text conf base False fam
+                   if auth then Perso.print_marriage_text conf base fam
                    else ());
               Wserver.wprint "...\n<p>\n"
             }

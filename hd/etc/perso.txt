@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.13 2002-04-09 00:13:09 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.14 2002-09-19 15:13:48 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -170,13 +170,48 @@
   </ul>
 %end;
 
+%define;married_to(date_place)
+  %if;is_male;
+    %if;are_married;[*married%t to:::date_place]0
+    %elseif;are_not_married;[*relationship%t to:::date_place]0
+    %elseif;are_engaged;[*engaged%d to:::date_place]0
+    %end;
+  %else;
+    %if;are_married;[*married%t to:::date_place]1
+    %elseif;are_not_married;[*relationship%t to:::date_place]1
+    %elseif;are_engaged;[*engaged%d to:::date_place]1
+    %end;
+  %end;
+%end;
+
+%define;married_to_with_place(place)
+  %apply;married_to("<em>, place, </em>")
+%end;
+
+%define;married_to_with_date(ondate)
+  %apply;married_to(" <em>ondate</em>")
+%end;
+
+%define;married_to_with_date_and_place(ondate,place)
+  %apply;married_to(" <em>ondate, place, </em>")
+%end;
+
 %if;has_families;
   <h3><font color=%highlight;>[*marriage/marriages]1
   [and::child/children]1</font></h3>
   <ul>
   %foreach;family;
     <li type=%if;spouse.has_parents;disc%else;circle%end;>
-    %married_to;%sp;
+    %if;(marriage_place = "")
+      %if;(on_marriage_date = "")%apply;married_to("")
+      %else;%apply;married_to_with_date(on_marriage_date)
+      %end;
+    %else;
+      %if;(on_marriage_date = "")%apply;married_to_with_place("")
+      %else;
+        %apply;married_to_with_date_and_place(on_marriage_date,marriage_place)
+      %end;
+    %end;
     %if;(cancel_links or spouse.is_restricted);%spouse;
     %else;<a href="%prefix;%spouse.access">%spouse;</a>%end;
     %spouse.title;%spouse.dates;
