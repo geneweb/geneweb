@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.136 1999-09-29 13:58:28 ddr Exp $
+# $Id: lexicon.txt,v 2.137 1999-10-03 21:54:27 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -365,7 +365,7 @@ se: en %s kusin
 
     a 2nd cousin
 cs: bratranec z druhého kolena/sestøenice z druhého kolena
-de: ein:d:+em Cousin 2ten Grades/eine Kusine 2ten Grades
+de: ein:d:+em Cousin 2ten Grades/eine:d:+r Kusine 2ten Grades
 dk: en f&aelig;tter af 2. grad/en kusine af 2. grad
 en: a 2nd cousin
 eo: 2a kuzo/2a kuzino/2a gekuzo
@@ -380,7 +380,7 @@ se: en syssling
 
     a 3rd cousin
 cs: bratranec z tøetího kolena/sestøenice z tøetího kolena
-de: ein:d:+em Cousin 3ten Grades/eine Kusine 3ten Grades
+de: ein:d:+em Cousin 3ten Grades/eine:d:+r Kusine 3ten Grades
 dk: en f&aelig;tter af 3. grad/en kusine af 3. grad
 en: a 3rd cousin
 eo: 3a kuzo/3a kuzino/3a gekuzo
@@ -422,7 +422,7 @@ se: en bror/en syster/ett syskon
 
     a cousin
 cs: bratranec/sestøenice
-de: ein:d:+em Cousin/eine Kusine
+de: ein:d:+em Cousin/eine:d:+r Kusine
 dk: en f&aelig;tter/en kusine
 en: a cousin
 eo: kuzo/kuzino
@@ -583,7 +583,7 @@ pt: um sobrino/uma sobrina
 se: en nev&ouml;/en niece
 
     a son-in-law/a daughter-in-law
-de: ein Schwiegersohn/eine Schweigertochter
+de: ein Schwiegersohn/eine Schwiegertochter
 dk: en svigers&oslash;n/en svigerdatter
 en: a son-in-law/a daughter-in-law
 es: un yerno/una nuera
@@ -816,7 +816,7 @@ se: ocks&aring;
 
     an ancestor
 cs: pøedek
-de: ein:d:+em Vorfahre/eine Vorfahrin
+de: ein:d:+em Vorfahre/eine:d:+r Vorfahrin
 dk: en forfader
 en: an ancestor
 eo: prapatro/prapatrino
@@ -1226,7 +1226,7 @@ se: kan inte n&aring; databasen
 
     cannot change sex of a married person
 cs: nemohu zmìnit pohlaví ¾enatého mu¾e/nemohu zmìnit pohlaví vdané ¾eny
-de: kann das Geschlecht einer verheiraten Person nicht &auml;ndern
+de: kann das Geschlecht einer verheirateten Person nicht &auml;ndern
 dk: kan ikke &aelig;ndre k&oslash;n for en gift person
 en: cannot change sex of a married person
 eo: ne povas aliigi sekso de edzita persono
