@@ -13,6 +13,9 @@ GeneWeb Version 4.05
     page.
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [26 Feb 02] Some changes in witnesses (did not work any more), added
+    the ability to be witness several times, fixed problems of dates
+    written as text in titles.
   - [26 Feb 02] Fixed bug: did not import date FROM BET 1487 AND 1488.
     I am not sure it is correct gedcom but it can happen in title date
     range.

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.29 2002-02-26 08:42:47 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.30 2002-02-26 08:54:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -446,7 +446,7 @@ value rec lexing_date =
   parser
   [ [: `('0'..'9' as c); n = number (Buff.store 0 c) :] -> ("INT", n)
   | [: `('A'..'Z' as c); i = ident (Buff.store 0 c) :] -> ("ID", i)
-  | [: `'('; t = text 0 :] -> ("TEXT", t)
+  | [: `'('; len = text 0 :] -> ("TEXT", Buff.get len)
   | [: `'.' :] -> ("", ".")
   | [: `' ' | '\t' | '\013'; s :] -> lexing_date s
   | [: _ = Stream.empty :] -> ("EOI", "")
@@ -461,8 +461,11 @@ and ident len =
   | [: :] -> Buff.get len ]
 and text len =
   parser
-  [ [: `')' :] -> Buff.get len
-  | [: `c; s :] -> text (Buff.store len c) s ]
+  [ [: `')' :] -> len
+  | [: `'('; len = text (Buff.store len '('); s :] ->
+      text (Buff.store len ')') s
+  | [: `c; s :] -> text (Buff.store len c) s
+  | [: :] -> len ]
 ;
 
 value make_date_lexing s = Stream.from (fun _ -> Some (lexing_date s));
