@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.58 2000-09-12 08:49:46 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.59 2000-09-22 14:37:31 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -165,10 +165,12 @@ value refuse_auth conf from auth auth_type =
   return ()
 ;
 
-value index c s =
-  loop 0 where rec loop i =
+value index_from c s =
+  loop where rec loop i =
     if i == String.length s then i else if s.[i] == c then i else loop (i + 1)
 ;
+
+value index c s = index_from c s 0;
 
 value rec extract_assoc key =
   fun
@@ -438,7 +440,9 @@ value match_auth passwd auth_file uauth =
   else match_auth_file auth_file uauth
 ;
 
-type access_type = [ ATwizard | ATfriend | ATnormal | ATnone | ATset ];
+type access_type =
+  [ ATwizard of string | ATfriend of string | ATnormal | ATnone | ATset ]
+;
 
 value get_actlog utm str =
   let fname = Srcfile.adm_file "actlog" in
@@ -451,24 +455,28 @@ value get_actlog utm str =
         with
         [ Some line ->
             let i = index ' ' line in
-            let a = float_of_string (String.sub line 0 i) in
-            let b =
-              String.sub line (i + 1) (String.length line - i - 3)
+            let tm = float_of_string (String.sub line 0 i) in
+            let j = index_from ' ' line (i + 1) in
+            let addr_db_pwd = String.sub line (i + 1) (j - i - 1) in
+            let c = line.[j + 1] in
+            let user =
+              let k = j + 3 in
+              if k >= String.length line then ""
+              else String.sub line k (String.length line - k)
             in
-            let c = line.[String.length line - 1] in
             let (list, r, changed) =
-              if utm -. a >= tmout then (list, r, True)
-              else if b = str then
-                let r = if c = 'w' then ATwizard else ATfriend in
-                ([(b, (utm, c)) :: list], r, True)
+              if utm -. tm >= tmout then (list, r, True)
+              else if addr_db_pwd = str then
+                let r = if c = 'w' then ATwizard user else ATfriend user in
+                ([(addr_db_pwd, (utm, c, user)) :: list], r, True)
               else
-                ([(b, (a, c)) :: list], r, changed)
+                ([(addr_db_pwd, (tm, c, user)) :: list], r, changed)
             in
             loop changed r list
         | None ->
             do close_in ic; return
             let list =
-              Sort.list (fun (_, (t1, _)) (_, (t2, _)) -> t2 <= t1) list
+              Sort.list (fun (_, (t1, _, _)) (_, (t2, _, _)) -> t2 <= t1) list
             in
             (list, r, changed) ]
   | None -> ([], ATnormal, False) ]
@@ -477,7 +485,10 @@ value get_actlog utm str =
 value set_actlog list =
   let fname = Srcfile.adm_file "actlog" in
   let oc = open_out fname in
-  do List.iter (fun (b, (a, c)) -> Printf.fprintf oc "%.0f %s %c\n" a b c)
+  do List.iter
+       (fun (b, (a, c, d)) ->
+          Printf.fprintf oc "%.0f %s %c%s\n" a b c
+            (if d = "" then "" else " " ^ d))
        list;
      close_out oc;
   return ()
@@ -504,7 +515,7 @@ value random_self_init () =
   Random.init seed
 ;
 
-value set_token utm from_addr base_file acc =
+value set_token utm from_addr base_file acc user =
   lock_wait Srcfile.adm_file "gwd.lck" with
   [ Accept ->
       do random_self_init (); return
@@ -520,7 +531,7 @@ value set_token utm from_addr base_file acc =
             [ Some _ -> loop (ntimes - 1)
             | None -> (x, xx) ]
       in
-      let list = [(xx, (utm, acc)) :: list] in
+      let list = [(xx, (utm, acc, user)) :: list] in
       do set_actlog list; return x
   | Refuse -> "" ]
 ;
@@ -658,8 +669,8 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
   in
   let (ok, wizard, friend) =
     match access_type with
-    [ ATwizard -> (True, True, False)
-    | ATfriend -> (True, False, True)
+    [ ATwizard user -> (True, True, False)
+    | ATfriend user -> (True, False, True)
     | ATnormal -> (True, False, False)
     | ATnone | ATset ->
         if not cgi && (passwd = "w" || passwd = "f") then
@@ -687,15 +698,26 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
             (True, False, True)
           else (True, False, False) ]
   in
+  let user =
+    match lindex uauth ':' with
+    [ Some i ->
+        let s = String.sub uauth 0 i in
+        if s = wizard_passwd || s = friend_passwd then "" else s
+    | None ->
+        match access_type with
+        [ ATwizard user -> user
+        | ATfriend user -> user
+        | _ -> "" ] ]
+  in
   let (command, passwd) =
     match access_type with
     [ ATset ->
         if wizard then
-          let pwd_id = set_token utm from_addr base_file 'w' in
+          let pwd_id = set_token utm from_addr base_file 'w' user in
           if cgi then (command, pwd_id)
           else (base_file ^ "_" ^ pwd_id, "")
         else if friend then
-          let pwd_id = set_token utm from_addr base_file 'f' in
+          let pwd_id = set_token utm from_addr base_file 'f' user in
           if cgi then (command, pwd_id)
           else (base_file ^ "_" ^ pwd_id, "")
         else if cgi then (command, "")
@@ -705,13 +727,6 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
         if cgi then (command, passwd)
         else if passwd = "" then (base_file, "")
         else (base_file ^ "_" ^ passwd, passwd) ]
-  in
-  let user =
-    match lindex uauth ':' with
-    [ Some i ->
-        let s = String.sub uauth 0 i in
-        if s = wizard_passwd || s = friend_passwd then "" else s
-    | None -> "" ]
   in
   let passwd1 =
     match lindex passwd1 ':' with
