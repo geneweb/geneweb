@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.41 2002-11-03 20:16:09 ddr Exp $ *)
+(* $Id: setup.ml,v 4.42 2002-11-14 16:54:29 ddr Exp $ *)
 
 open Printf;
 
@@ -384,6 +384,29 @@ value variables bname =
   }
 ;
 
+value nth_field s n =
+  loop 0 0 where rec loop nth i =
+    let j =
+      try String.index_from s i '/' with [ Not_found -> String.length s ]
+    in
+    if nth = n then String.sub s i (j - i)
+    else if j = String.length s then s
+    else loop (nth + 1) (j + 1)
+;
+
+value translate_phrase lang lexicon s n =
+  let n =
+    match n with
+    [ Some n -> n
+    | None -> 0 ]
+  in
+  try
+    let s = Hashtbl.find lexicon s in
+    nth_field s n
+  with
+  [ Not_found -> "[" ^ nth_field s n ^ "]" ]
+;
+
 value rec copy_from_stream conf print strm =
   try
     while True do {
@@ -394,7 +417,19 @@ value rec copy_from_stream conf print strm =
               let s = parse_upto ']' strm in
               print (Translate.inline conf.lang '%' (macro conf) s)
           | _ ->
-              print "[" ]
+              let s =
+                loop 0 where rec loop len =
+                  match strm with parser
+                  [ [: `']' :] -> Buff.get len
+                  | [: `c :] -> loop (Buff.store len c)
+                  | [: :] -> Buff.get len ]
+              in
+              let n =
+                match strm with parser
+                [ [: `('0'..'9' as c) :] -> Some (Char.code c - Char.code '0')
+                | [: :] -> None ]
+              in
+              print (translate_phrase conf.lang conf.lexicon s n) ]
       | '%' ->
           let c = Stream.next strm in
           match c with

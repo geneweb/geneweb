@@ -45,6 +45,8 @@ GeneWeb Version 4.08
     following character was converted into uppercase.
 
 * Setup program (gwsetup)
+  - [14 Nov 02] Added ability to more use the lexicon; added some
+    phrases; simplified some template files thanks to that.
   - [03 Nov 02] Added macro "%Lxx;" replaced by the language whose id
     is "xx" by its translation in the current language. Use it in template
     files "gwd.htm" and "gwf_1.htm". Added in the gwsetup lexicon the
