@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.12 1999-09-16 12:17:24 ddr Exp $ *)
+(* $Id: date.ml,v 2.13 1999-09-16 15:01:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -38,6 +38,14 @@ value french_month =
   fun m -> tab.(m)
 ;
 
+value hebrew_month =
+  let tab =
+    [| "Tishri"; "Heshvan"; "Kislev"; "Tevet"; "Shevat"; "AdarI";
+       "AdarII"; "Nisan"; "Iyyar"; "Sivan"; "Tammuz"; "Av"; "Elul" |]
+  in
+  fun m -> tab.(m)
+;
+
 value code_french_date conf d m y =
   let s =
     if d = 0 then ""
@@ -49,6 +57,15 @@ value code_french_date conf d m y =
   in
   s ^ (if s = "" then "" else " ") ^
   " an " ^ string_of_int y
+;
+
+value code_hebrew_date conf d m y =
+  let s = if d = 0 then "" else string_of_int d in
+  let s =
+    if m = 0 then ""
+    else s ^ (if s = "" then "" else " ") ^ hebrew_month (m - 1)
+  in
+  s ^ (if s = "" then "" else " ") ^ " " ^ string_of_int y
 ;
 
 value string_of_on_prec_dmy conf sy d =
@@ -111,6 +128,11 @@ value string_of_on_french_dmy conf d =
   string_of_on_prec_dmy conf sy d
 ;
 
+value string_of_on_hebrew_dmy conf d =
+  let sy = code_hebrew_date conf d.day d.month d.year in
+  string_of_on_prec_dmy conf sy d
+;
+
 value string_of_dmy conf d =
   let encoding =
     let n =
@@ -154,7 +176,6 @@ value gregorian_precision conf d =
 value string_of_ondate conf =
   fun
   [ Dgreg d Dgregorian -> string_of_on_dmy conf d
-  | Dgreg ({day = 0} as d) Djulian -> string_of_on_dmy conf d
   | Dgreg d Djulian ->
       let cal_prec =
         if d.year < 1582 then ""
@@ -168,7 +189,11 @@ value string_of_ondate conf =
       let s = gregorian_precision conf d in
       string_of_on_french_dmy conf d1 ^ " "
       ^ " (" ^ s ^ ")"
-  | Dgreg d Dhebrew -> string_of_on_dmy conf d
+  | Dgreg d Dhebrew ->
+      let d1 = Calendar.hebrew_of_gregorian d in
+      let s = gregorian_precision conf d in
+      string_of_on_hebrew_dmy conf d1 ^ " "
+      ^ " (" ^ s ^ ")"
   | Dtext t -> "(" ^ t ^ ")" ]
 ;
 

@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.17 1999-09-14 22:33:34 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.18 1999-09-16 15:01:05 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -17,13 +17,21 @@ value french_txt =
      "COMP" |]
 ;
 
+value hebrew_txt =
+  [| "TSH"; "CSH"; "KSL"; "TVT"; "SHV"; "ADR";
+     "ADS"; "NSN"; "IYR"; "SVN"; "TMZ"; "AAV"; "ELL" |]
+;
+
 value ged_month cal m =
   match cal with
-  [ Dgregorian | Djulian | Dhebrew ->
+  [ Dgregorian | Djulian ->
       if m >= 1 && m <= Array.length month_txt then month_txt.(m-1)
       else failwith "ged_month"
   | Dfrench ->
       if m >= 1 && m <= Array.length french_txt then french_txt.(m-1)
+      else failwith "ged_month"
+  | Dhebrew ->
+      if m >= 1 && m <= Array.length hebrew_txt then hebrew_txt.(m-1)
       else failwith "ged_month" ]
 ;
 
@@ -184,7 +192,7 @@ value ged_date oc =
   [ Dgreg d Dgregorian -> ged_date_dmy oc d Dgregorian
   | Dgreg d Djulian -> ged_date_dmy oc (Calendar.julian_of_gregorian d) Djulian
   | Dgreg d Dfrench -> ged_date_dmy oc (Calendar.french_of_gregorian d) Dfrench
-  | Dgreg d Dhebrew -> ged_date_dmy oc d Dhebrew
+  | Dgreg d Dhebrew -> ged_date_dmy oc (Calendar.hebrew_of_gregorian d) Dhebrew
   | Dtext t -> Printf.fprintf oc "(%s)" t ]
 ;
 

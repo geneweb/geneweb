@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.14 1999-09-14 22:33:59 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.15 1999-09-16 15:01:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -89,20 +89,20 @@ value print_child_person conf base var (first_name, surname, occ, create) =
         Wserver.wprint "%s" (capitale (transl conf "birth"));
       end;
       tag "td" "colspan=2" begin
-        Wserver.wprint "<input name=%s_dd size=2 maxlength=2%s>\n" var
+        Wserver.wprint "<input name=%s_yyyy size=5 maxlength=5%s>\n" var
           (match create with
-           [ Update.Create _ (Some (Dgreg {day = d} _)) when d <> 0 ->
-               " value=" ^ string_of_int d
+           [ Update.Create _ (Some (Dgreg {year = y} _)) ->
+               " value=" ^ string_of_int y
            | _ -> "" ]);
         Wserver.wprint "<input name=%s_mm size=2 maxlength=2%s>\n" var
           (match create with
            [ Update.Create _ (Some (Dgreg {month = m} _)) when m <> 0 ->
                " value=" ^ string_of_int m
            | _ -> "" ]);
-        Wserver.wprint "<input name=%s_yyyy size=5 maxlength=5%s>\n" var
+        Wserver.wprint "<input name=%s_dd size=2 maxlength=2%s>\n" var
           (match create with
-           [ Update.Create _ (Some (Dgreg {year = y} _)) ->
-               " value=" ^ string_of_int y
+           [ Update.Create _ (Some (Dgreg {day = d} _)) when d <> 0 ->
+               " value=" ^ string_of_int d
            | _ -> "" ]);
       end;
     end;
