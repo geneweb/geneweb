@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.8 2000-01-21 12:01:16 ddr Exp $ *)
+(* $Id: date.ml,v 3.9 2000-01-23 16:11:40 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -85,7 +85,7 @@ value string_of_on_prec_dmy conf sy d =
       if d.day = 0 && d.month = 0 then
         transl conf "in (year)" ^ " " ^ sy
       else if d.day = 0 then transl conf "in (month year)" ^ " " ^ sy
-      else transl conf "on (day month year)" ^ " " ^ sy
+      else transl_decline conf "on (day month year)" sy
   | About | Before | After ->
       let s = sy in
       if d.prec = About then transl conf "about (date)" ^ " " ^ s
@@ -96,7 +96,7 @@ value string_of_on_prec_dmy conf sy d =
         if d.day = 0 && d.month = 0 then
           transl conf "in (year)" ^ " " ^ sy
         else if d.day = 0 then transl conf "in (month year)" ^ " " ^ sy
-        else transl conf "on (day month year)" ^ " " ^ sy
+        else transl_decline conf "on (day month year)" sy
       in
       transl conf "maybe (date)" ^ " " ^ s
   | OrYear z ->
@@ -104,7 +104,7 @@ value string_of_on_prec_dmy conf sy d =
         if d.day = 0 && d.month = 0 then
           transl conf "in (year)" ^ " " ^ sy
         else if d.day = 0 then transl conf "in (month year)" ^ " " ^ sy
-        else transl conf "on (day month year)" ^ " " ^ sy
+        else transl_decline conf "on (day month year)" sy
       in
       s ^ " " ^
       transl conf "or" ^ " " ^
@@ -113,7 +113,7 @@ value string_of_on_prec_dmy conf sy d =
       let s =
         if d.day = 0 && d.month = 0 then sy
         else if d.day = 0 then sy
-        else transl conf "on (day month year)" ^ " " ^ sy
+        else transl_decline conf "on (day month year)" sy
       in
       transl conf "between (date)" ^ " " ^ s ^ " " ^
       transl conf "and" ^ " " ^
