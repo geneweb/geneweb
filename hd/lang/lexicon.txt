@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.103 2000-05-23 20:02:14 ddr Exp $
+# $Id: lexicon.txt,v 3.104 2000-05-29 08:40:39 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2169,12 +2169,14 @@ ru: кончая
 se: slutar
 
     engaged
+de: verlobt
 dk: forlovet
 en: engaged
 fr: fianc&eacute;s
 se: f&ouml;rlovad
 
     engaged%t to
+de: verlobt%t mit
 dk: forlovet%t med
 en: engaged%t to
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
@@ -2747,6 +2749,7 @@ ru: история обновлений
 se: uppdateringarnas historia
 
     horizontally
+de: horizontal
 dk: vandret
 en: horizontally
 fi: vaakasuoraan
@@ -3275,6 +3278,7 @@ se: huvudtitel
 
     male line/female line
 af: manlike lyn/vroulike lyn
+de: v&auml;terlicherseits/m&uuml;tterlicherseits
 dk: mandlige linie/kvindelige linie
 en: male line/female line
 fi: miespuoleinen linja/naispuoleinen linja
@@ -4704,6 +4708,7 @@ ru: послать
 se: skicka
 
     separated
+de: getrennt lebend
 dk: separeret
 en: separated
 fr: s&eacute;par&eacute;s
