@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.25 2003-12-23 11:56:04 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.26 2004-01-05 10:14:25 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -147,7 +147,7 @@
     %if;computable_death_age;
       <li>[*age at death:] %death_age;%nl;
     %end;
-    %if;has_consanguinity;
+    %if;(has_consanguinity and cvar_show_consang != "no");
       <li>[*consanguinity]: %consanguinity;%nl;
     %end;
   </ul>
