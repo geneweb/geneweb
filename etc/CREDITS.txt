@@ -17,6 +17,7 @@
 		Spanish		Luis Castro Guzman
 		Swedish		Lars Gustavsson
 				Stig Petersson
+				Bertil Englund
 
 	Documentation
 		Dutch		Joris Esch
