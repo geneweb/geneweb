@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.18 2001-02-12 12:53:09 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.19 2001-02-14 10:53:33 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -463,7 +463,8 @@ value rec get_titles str l =
       if x.[0] == '[' && x.[String.length x - 1] == ']' then
         let t = String.sub x 1 (String.length x - 2) in
         let t = scan_title t in
-        let (al, l') = get_titles str l' in ([t :: al], l')
+        let (al, l') = get_titles str l' in
+        (if t.t_ident = "" then al else [t :: al], l')
       else ([], l)
   | _ -> ([], l) ]
 ;
