@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.26 1999-04-23 16:15:52 ddr Exp $
+# $Id: lexicon.txt,v 2.27 1999-04-23 16:47:51 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1730,6 +1730,7 @@ se: om titlar
 
     image
 de: Foto
+dk: billede
 en: image
 es: foto
 fr: image
@@ -1742,6 +1743,7 @@ se: foto
 
     image deleted
 de: Foto gel&ouml;scht
+dk: billede slettet
 en: image deleted
 eo: foto malkonstruita
 es: foto borrada
@@ -1754,6 +1756,7 @@ pt: foto suprimida
 se: foto borttaget
 
     image received
+dk: billede gemt
 en: image received
 fr: image re&ccedil;ue
 he:  התמונה התקבלה
@@ -2010,6 +2013,7 @@ pt: lista
 se: lista
 
     long display
+dk: langt display
 en: long display
 fr: affichage long
 he:  תצוגה ארוכה
@@ -2071,6 +2075,7 @@ se: &auml;ktenskap/&auml;ktenskap
 
     married
 de: verheiratet
+dk: gift
 en: married
 es: casados
 fr: mari&eacute;s
@@ -2380,6 +2385,7 @@ se: hittar inte
 
     not married
 de: nicht verheiratet
+dk: ikke gift
 en: not married
 es: no casados
 fr: non mari&eacute;s
