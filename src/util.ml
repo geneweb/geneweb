@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.62 2002-11-16 23:33:49 ddr Exp $ *)
+(* $Id: util.ml,v 4.63 2002-11-18 10:02:51 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -2125,13 +2125,13 @@ value print_selection_bullet conf =
           "" conf.env
       in
       do {
-        Wserver.wprint "<a name=%s><tt>" txt;
-        Wserver.wprint "<a href=\"%s%s%s%s\"" (commd conf) req
+        Wserver.wprint "<a name=%s>" txt;
+        Wserver.wprint "<a href=\"%s%s%s%s\">" (commd conf) req
           (if sel then ";u=" ^ txt else "")
           (if sel || List.mem_assoc "u" conf.env then "#" ^ txt else "");
         Wserver.wprint "%s"
           (if sel then bullet_sel_txt else bullet_unsel_txt);
-        Wserver.wprint "</a></tt></a>\n";
+        Wserver.wprint "</a></a>\n";
       }
   | None -> Wserver.wprint "%s\n" bullet_nosel_txt ]
 ;
