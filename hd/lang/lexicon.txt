@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.16 1999-04-09 20:44:05 ddr Exp $
+# $Id: lexicon.txt,v 2.17 1999-04-13 07:57:04 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -55,7 +55,7 @@ he:  לנסות שוב עם המספר הזה, או "חזרה" ולשנות בעצמך
 nl: , om dit nummer weer te proberen, of druk "terug" en verander het zelf
 no:  for ו pr&oslash;ve igjen med dette nummeret, eller g&aring; tilbake og endre det selv
 pt: para tentar novamente com este n&uacute;mero ou fazer "back" e escolher outro
-se:  f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer, eller g&ouml;r "back" och &auml;ndra det sj&auml;lv
+se:  f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer eller g&aring; tillbaka och &auml;ndra det sj&auml;lv
 
     %d years ago
 de: vor %d Jahren
@@ -107,7 +107,7 @@ it: %t sarebbe morto prima della sua nascita
 nl: %t zou dood zijn voor zijn/haar geboorte
 no: %t d&oslash;de f&oslash;r sin f&oslash;dsel
 pt: %t moreu antes de nascer
-se: %t dog f&ouml;re hans/hennes f&ouml;delse
+se: %t dog f&ouml;re sin egen f&ouml;delse
 
     %t has incorrect title dates: %t
 de: die Datumsangaben eines Titels von %t sind falsch: %t
@@ -133,7 +133,7 @@ it: %t sarebbe nato dopo la morte di sua madre %t
 nl: %t zou geboren zijn na de dood van zijn/haar moeder %t
 no: %t er f&oslash;dt etter sin mors d&oslash;d %t
 pt: $t nasceu depois do &oacute;bito da m&atilde;e
-se: %t &auml;r f&ouml;dd efter att hans/hennes mor dog %t
+se: %t &auml;r f&ouml;dd efter att sin egen mor dog %t
 
     %t is born more than 2 years after the death of his/her father %t
 de: %t ist mehr als 2 Jahre nach dem Tod des Vaters %t geboren
@@ -146,7 +146,7 @@ it: %t sarebbe nato pi&ugrave; di 2 anni dopo la morte di suo padre %t
 nl: %t is geboren meer dan twee jaar na de dood van zijn/haar vader
 no: %t er f&oslash;dt mer enn 2 &aring;r etter sin fars d&oslash;d %t
 pt: %t nasceu passados 2 anos depois do &oacute;bito do pai
-se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att hans/hennes far dog %t
+se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
 
     (date)
 cn: %yִך%m1ָױ/%yִך%m%dָױ/%yִך%m/%yִך
@@ -458,7 +458,7 @@ it: un pronipote/una pronipote
 nl: een achter-neef/een achter-nicht
 no: grandnev&oslash;/grandniese
 pt: um bissobrino/uma bissobrina
-se: en gammel-syskonson/en gammel-syskondotter
+se: en gammel-nev&ouml;/en gammel-niece
 
     a great-uncle/a great-aunt
 de: ein Gro&szlig;onkel/eine Gro&szlig;tante
@@ -497,7 +497,7 @@ it: un nipote/una nipote
 nl: een neef/een nicht
 no: nev&oslash;/niese
 pt: um sobrino/uma sobrina
-se: en syskonson/en syskondotter
+se: en nev&ouml;/en niece
 
     a son/a daughter/a child
 de: ein Sohn/eine Tochter/ein Kind
@@ -523,7 +523,7 @@ it: intorno
 nl: circa
 no: ca 
 pt: cerca
-se: ca
+se: omkring
 
     access
 de: Zugriff
@@ -680,7 +680,7 @@ it: un antenato/un'antenata
 nl: een voorouder
 no: stamfar
 pt: um ancestro/uma ancestra
-se: en stamfader
+se: en anfader
 
     an uncle/an aunt
 de: ein Onkel/eine Tante
@@ -707,7 +707,7 @@ it: antenati
 nl: voorouders
 no: forfedre
 pt: ascendentes
-se: stamf&auml;der
+se: anf&auml;der
 
     ancestors (some)
 de: Vorfahren
@@ -720,7 +720,7 @@ it: antenati
 nl: voorouders
 no: forfedre
 pt: ancestros
-se: en stamfader
+se: en anfader
 
     and
 cn: ÷ֽ
@@ -1335,7 +1335,7 @@ it: famiglia aggiunta
 nl: familie toegevoegd
 no: ny familie opprettet
 pt: fam&iacute;lia adicionada
-se: familj tillagd
+se: ny familj tillagd
 
     family deleted
 de: Familie gel&ouml;scht
@@ -1785,7 +1785,7 @@ it: sarebbe nato/a dopo i suoi figli
 nl: zal geboren worden na zijn/haar kind
 no: er f&oslash;dt etter sitt barn
 pt: ha nacido(a) depois do seu filho
-se: &auml;r f&ouml;dd efter hans/hennes barn
+se: &auml;r f&ouml;dd efter sitt barn
 
     it is the same person!
 de: es ist dieselbe Person!
@@ -1885,7 +1885,7 @@ fr: mariage de %t apr&egrave;s sa mort
 nl: huwelijk van %t na zijn/haar dood
 no: ekteskap med %t etter ektefellens d&oslash;d
 pt: casamento de %t depois da sua morte
-se: gifterm&aring;l med %t efter hans/hennes d&ouml;d
+se: &auml;ktenskap med %t f&ouml;re gem&aring;lens f&ouml;delse
 
     marriage of %t before his/her birth
 de: Heirat von %t vor seiner/ihrer Geburt
@@ -1910,7 +1910,7 @@ it: matrimonio/matrimoni
 nl: huwelijk/huwelijken
 no: ekteskap/ekteskap
 pt: casamento/casamentos
-se: gifterm&aring;l/gifterm&aring;l
+se: &auml;ktenskap/&auml;ktenskap
 
     married
 de: verheiratet
@@ -2003,7 +2003,7 @@ fr: ascendants manquants
 nl: ontbrekende voorouders
 no: manglende forfedre
 pt: ascendentes faltando
-se: stamf&auml;der som fattas
+se: anf&auml;der som fattas
 
     modify
 de: &auml;ndern
@@ -2107,7 +2107,7 @@ it: seguente fratello/seguente sorella/seguente fratello o sorella
 nl: volgende broer/volgende zus/volgende broer of zus
 no: Neste bror/neste s&oslash;ster/neste s&oslash;sken
 pt: seguinte irm&atilde;o/seguinte irm&atilde;/seguinte irm&atilde;(o)
-se: n&auml;sta syskon
+se: n&auml;sta bror/n&auml;sta syster/n&auml;sta syskon 
 
     no anniversary
 de: kein Jahrestag
@@ -2206,7 +2206,7 @@ fr: non mari&eacute;s
 nl: niet gehuwd
 pt: n&atilde;o casados
 no: ugift
-se: inte gift
+se: ogift
 
     note/notes
 cn: ±¸׳¢
@@ -2273,7 +2273,7 @@ it: numero
 nl: aantal
 no: nummer
 pt: n&uacute;mero
-se: antal
+se: nummer
 
     number of branches
 de: Anzahl der &Auml;ste
@@ -2286,7 +2286,7 @@ it: numero di ramo
 nl: aantal takken
 no: antall slektsgrener
 pt: n&uacute;mero de ramas
-se: antal grenar
+se: antal sl&auml;ktgrenar
 
     occupation
 de: Beruf
@@ -2604,7 +2604,7 @@ it: precedente fratello/precedente sorella/precedente fratello o sorella
 nl: vorige broer/vorige zus/vorige broer of zus
 no: forrige bror/forrige s&oslash;ster/forrige s&oslash;sken 
 pt: precedente irm&atilde;o/precedente irm&atilde;/precedente irm&atilde;(o)
-se: f&ouml;reg&aring;ende syskon
+se: f&ouml;reg&aring;ende bror/f&ouml;reg&aring;ende syster/f&ouml;reg&aring;ende syskon
 
     private
 de: privat
@@ -2628,8 +2628,7 @@ it: ciclo probabile nella base di dati: qualcuno &egrave; il suo proprio antenat
 nl: waarschijnlijk een lus in de databank
 no: mulig loop i databasen: noen er sin egen etterkommer
 pt: la&ccedil;o prov&aacute;vel na base de dados: algu&eacute;m &eacute; his/her pr&oacute;prio antepassado
-se: trolig rundg&aring;ng i databasen: n&aring;gon &auml;r hans/hennes
-egen stamfader
+se: trolig rundg&aring;ng i databasen: n&aring;gon &auml;r sin egen anfader
 
     public
 de: &ouml;ffentlich
@@ -2695,7 +2694,7 @@ it: calcolo della parentela
 nl: verwantschap vaststellen
 no: slektskapsberegning
 pt: calc&uacute;lo de parentesco
-se: sl&auml;ktskaps ber&auml;kning
+se: sl&auml;ktskapsber&auml;kning
 
     relationship link/relationship links
 de: Verwandtschaft/Verwandtschaften
@@ -2708,7 +2707,7 @@ it: grado di parentela/gradi di parentela
 nl: verwantschap/verwantschappen
 no: slektslinje/slektslinjer
 pt: grau de parentesco/graus de parentesco
-se: sl&auml;kt l&auml;nk/sl&auml;kt l&auml;nkar
+se: sl&auml;ktl&auml;nk/sl&auml;ktl&auml;nkar
 
     see above
 de: siehe oben
@@ -3031,7 +3030,7 @@ he:  מאגר המידה השתנה: לעשות "back" ו-"reload"  ולמלא מחדש את הטופס
 nl: de informatie is veranderd; druk "back", "reload" en vul in de details
 no: databasen er endret; klikk tilbake og oppfrisk, og fyll ut formularet p&aring; nytt
 pt: a base mudou : fazer "back", "reload" e preencher novamente o formul&aacute;rio
-se: databasen har &auml;ndrats; g&ouml;r "back", "reload", och fyll i formul&auml;ret igen
+se: databasen har &auml;ndrats; g&aring; tillbaka, klicka uppdatera och fyll i formul&auml;ret igen
 
     the birthday
 de: der Geburtstag
@@ -3447,7 +3446,7 @@ it: sarebbe antenato(a) di se stesso(a)
 nl: zou zijn/haar eigen voorouder zijn
 no: ville v&aelig;re sin egen etterkommer 
 pt: seria seu pr&oacute;pio ancestro
-se: skulle vara hans/hennes egen stamfader
+se: skulle vara sin egen anfader
 
     years old
 cn: ֻך
