@@ -9,6 +9,8 @@ GeneWeb version 2.05
     problem.
 
 * Setup program
+  - [Jul 15, 99] Added ability to cancel GeneWeb links in relationship
+    computing.
   - [Jul 15, 99] Changed GEDCOM export menu to reflect new option "-charset"
     of "gwb2ged" (see below in section "GeneWeb to Gedcom").
   - [Jul 2, 99] Fixed bug: importing GeneWeb base from old version passing
