@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.18 1999-07-02 13:59:41 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.19 1999-08-05 12:38:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -20,6 +20,7 @@ value log_flags =
 ;
 ifdef UNIX then
 value max_clients = ref None;
+value robot_xcl = ref None;
 value auth_file = ref "";
 
 value log_oc () =
@@ -775,7 +776,7 @@ Type control C to stop the service
   return
   Wserver.f selected_port.val tmout
     (ifdef UNIX then max_clients.val else None) (uid.val, gid.val)
-    (connection False)
+    robot_xcl.val (connection False)
 ;
 
 value geneweb_cgi str addr =
@@ -846,6 +847,26 @@ value arg_parse_in_file fname speclist anonfun errmsg =
   | _ -> () ]
 ;
 
+module G = Grammar.Make (struct value lexer = Plexer.make (); end);
+value robot_xcl_arg = G.Entry.create "robot_xcl arg";
+GEXTEND G
+  robot_xcl_arg:
+    [ [ cnt = INT; ","; sec = INT; EOI ->
+          (int_of_string cnt, int_of_string sec) ] ];
+END;
+
+value robot_exclude s =
+  try
+    robot_xcl.val :=
+      Some (G.Entry.parse robot_xcl_arg (G.parsable (Stream.of_string s)))
+  with
+  [ Stdpp.Exc_located _ (Stream.Error _ | Token.Error _) ->
+      do Printf.eprintf "Bad use of option -robot_xcl\n";
+         Printf.eprintf "Use option -help for usage.\n";
+         flush Pervasives.stderr;
+      return exit 2 ]
+;
+
 value main () =
   let usage = "Usage: " ^ Sys.argv.(0) ^ " [options] where options are:" in
   let speclist =
@@ -890,6 +911,9 @@ value main () =
          "<num>
        Max number of clients treated at the same time (default: no limit)
        (not cgi).");
+        ("-robot_xcl", Arg.String robot_exclude,
+         "<cnt>,<sec>
+       Exclude connections when more than <cnt> requests in <sec> seconds.");
         ("-setuid", Arg.Int (fun x -> uid.val := Some x),
          "<num>
        Set user id, for example to use port < 1024 as simple user.");

@@ -1,15 +1,16 @@
-(* $Id: wserver.mli,v 2.2 1999-03-24 16:31:13 ddr Exp $ *)
+(* $Id: wserver.mli,v 2.3 1999-08-05 12:38:32 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 (* module [Wserver]: elementary web service *)
 
 value f :
   int -> int -> option int -> (option int * option int) ->
+    option (int * int) ->
     ((Unix.sockaddr * list string) -> string -> unit) -> unit
 ;
-   (* [Wserver.f port tmout maxc (uid, gid) g] starts an elementary httpd
-       server at port [port] in the current machine. The port number is any
-       number greater than 1024 (to create a client < 1024, you must be
+   (* [Wserver.f port tmout maxc (uid, gid) robot_exl g] starts an elementary
+       httpd server at port [port] in the current machine. The port number is
+       any number greater than 1024 (to create a client < 1024, you must be
        root). At each connection, the function [g] is called:
        [g (addr, request) s] where [addr] is the client
        identification socket, [request] the browser request, and [s]
