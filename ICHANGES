@@ -5,6 +5,8 @@ GeneWeb Version 4.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [17 May 02] In ancestor horizontally displaying, added a table with
+    nowrap.
   - [13 Apr 02] Fixed problem of displaying "ancestors of xx", "descendants
     of xx" and "cousins of xx" when "xx" is a name with declinations.
   - [09 Apr 02] Does not index any more the "public name" when there is

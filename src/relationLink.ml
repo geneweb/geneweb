@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.5 2002-01-23 11:39:55 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.6 2002-05-17 10:06:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -220,7 +220,8 @@ value print_spouse conf base n ip ipl =
     html_br conf;
     Wserver.wprint "%s\n" s;
     match spo with
-    [ Some ip -> Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
+    [ Some ip ->
+        Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
     | _ -> () ]
   }
   else ()
