@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.30 2000-05-03 14:40:26 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.31 2000-05-03 14:44:14 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1039,7 +1039,7 @@ value geneweb_server () =
                Printf.eprintf "
 where \"base\" is the name of the data base
 Type %s to stop the service
-" (ifdef MAC then "cmd Q" else "control C");
+" (ifdef MAC then "cmd-Q" else "control C");
             return ()
           else ();
           flush stderr;
