@@ -1,31 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.9 2001-12-31 15:12:36 ddr Exp $ *)
+(* $Id: templ.ml,v 4.10 2002-01-16 12:07:21 ddr Exp $ *)
 
 open Config;
 open Util;
 open Def;
+open TemplAst;
 
 (* Parsing *)
-
-type ast =
-  [ Atext of string
-  | Avar of string and list string
-  | Atransl of bool and string and string
-  | Awid_hei of string
-  | Aif of ast_expr and list ast and list ast
-  | Aforeach of string and list string and list ast
-  | Adefine of string and list string and list ast and list ast
-  | Aapply of string and list ast_expr ]
-and ast_expr =
-  [ Eor of ast_expr and ast_expr
-  | Eand of ast_expr and ast_expr
-  | Eop of string and ast_expr and ast_expr
-  | Enot of ast_expr
-  | Estr of string
-  | Eint of string
-  | Evar of string and list string
-  | Etransl of bool and string and string ]
-;
 
 type token =
   [ BANGEQUAL
@@ -236,7 +217,7 @@ value parse_formal_params strm =
   parse_tuple (Stream.from f)
 ;
 
-value parse_templ conf base strm =
+value parse_templ conf strm =
   let rec parse_astl astl bol len end_list strm =
     match strm with parser
     [ [: `'%' :] ->
@@ -358,7 +339,7 @@ value strip_newlines_after_variables =
     | [] -> [] ]
 ;
 
-value input conf base fname =
+value input conf fname =
   let config_templ =
     try
       let s = List.assoc "template" conf.base_env in
@@ -383,7 +364,7 @@ value input conf base fname =
   let dir = Filename.basename dir in
   match open_templ conf dir fname with
   [ Some ic ->
-      let astl = parse_templ conf base (Stream.of_channel ic) in
+      let astl = parse_templ conf (Stream.of_channel ic) in
       let astl = strip_newlines_after_variables astl in
       do { close_in ic; astl }
   | None ->
@@ -462,7 +443,7 @@ value rec skip_spaces_and_newlines s i =
     | _ -> i ]
 ;
 
-value eval_transl conf base env upp s c =
+value eval_transl conf upp s c =
   let r =
     match try Some (int_of_string c) with [ Failure _ -> None ] with
     [ Some n ->

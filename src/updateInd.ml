@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.6 2001-12-31 15:12:37 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.7 2002-01-16 12:07:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
 open Def;
 open Util;
 open Gutil;
+open TemplAst;
 
 value bogus_person_index = Adef.iper_of_int (-1);
 
@@ -24,28 +25,6 @@ value string_person_of base p =
 ;
 
 (* Interpretation of template file 'updind.txt' *)
-
-type ast =
-  Templ.ast ==
-    [ Atext of string
-    | Avar of string and list string
-    | Atransl of bool and string and string
-    | Awid_hei of string
-    | Aif of ast_expr and list ast and list ast
-    | Aforeach of string and list string and list ast
-    | Adefine of string and list string and list ast and list ast
-    | Aapply of string and list ast_expr ]
-and ast_expr =
-  Templ.ast_expr ==
-    [ Eor of ast_expr and ast_expr
-    | Eand of ast_expr and ast_expr
-    | Eop of string and ast_expr and ast_expr
-    | Enot of ast_expr
-    | Estr of string
-    | Eint of string
-    | Evar of string and list string
-    | Etransl of bool and string and string ]
-;
 
 type env =
   [ Vstring of string
@@ -239,7 +218,7 @@ value eval_expr conf base env p =
   | Evar s [] ->
       try try_eval_gen_variable conf base env p s with
       [ Not_found -> ">" ^ s ^ "???" ]
-  | Etransl upp s c -> Templ.eval_transl conf base env upp s c
+  | Etransl upp s c -> Templ.eval_transl conf upp s c
   | _ -> ">parse_error" ]
 ;
 
@@ -406,7 +385,7 @@ value eval_bool_value conf base env p =
           | VVnone -> do { Wserver.wprint ">%%%s???" s; "" } ]
         with
         [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
-    | Etransl upp s c -> Templ.eval_transl conf base env upp s c
+    | Etransl upp s c -> Templ.eval_transl conf upp s c
     | x -> do { Wserver.wprint "val???"; "" } ]
   in
   bool_eval
@@ -440,8 +419,7 @@ value print_variable conf base env p sl =
 value rec print_ast conf base env p =
   fun
   [ Atext s -> Wserver.wprint "%s" s
-  | Atransl upp s n ->
-      Wserver.wprint "%s" (Templ.eval_transl conf base env upp s n)
+  | Atransl upp s n -> Wserver.wprint "%s" (Templ.eval_transl conf upp s n)
   | Avar s sl -> print_variable conf base env p [s :: sl]
   | Awid_hei s -> Wserver.wprint "Awid_hei"
   | Aif e alt ale -> print_if conf base env p e alt ale
@@ -533,7 +511,7 @@ value print_update_ind conf base p digest =
   match p_getenv conf.env "m" with
   [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK") | Some ("MOD_IND" | "MOD_IND_OK") |
     Some ("ADD_IND" | "ADD_IND_OK") ->
-      let astl = Templ.input conf base "updind" in
+      let astl = Templ.input conf "updind" in
       do { html conf; interp_templ conf base p digest astl }
   | _ -> incorrect_request conf ]
 ;
