@@ -1,14 +1,8 @@
-GeneWeb version 3.12
+GeneWeb version 4.00
 --------------------
 
-* Platforms
-  - [4 Mar 01] Experimental version for MacOS X.
-
-* Languages
-  - [27 Feb 01] Added Polish (Sebastian Tuszynski)
-  - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
-
 * Installation
+  - [04 Mar 01] Added version for MacOS X.
   - [03 Mar 01] Changed Linux rpm package installation; it uses now
     another directory for data bases (/home/geneweb/bases). Not removed
     when unstallation, it can be used for the future GeneWeb versions,
@@ -18,6 +12,10 @@ GeneWeb version 3.12
     a directory different from the program, therefore not deleted when
     the program is uninstalled, and can be directly usable if another
     version is installed.
+
+* Languages
+  - [27 Feb 01] Added Polish (Sebastian Tuszynski)
+  - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
 
 * GeneWeb server or CGI (gwd)
   - [03 Feb 01] Removed the "advanced request". I received too much
