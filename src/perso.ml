@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.19 2000-05-12 07:49:05 ddr Exp $ *)
+(* $Id: perso.ml,v 3.20 2000-05-14 16:43:52 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -775,7 +775,7 @@ value find_sosa conf base a =
   [ Some p ->
       if a.cle_index = p.cle_index then Some (Num.one, p)
       else
-        let u = uoi base p.cle_index in
+        let u = uoi base a.cle_index in
 	if has_children base u then find_sosa_aux conf base a p
 	else None
   | None -> None ]
