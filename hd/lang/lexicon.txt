@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.164 2000-10-24 15:35:02 ddr Exp $
+# $Id: lexicon.txt,v 3.165 2000-11-02 10:31:22 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5396,6 +5396,10 @@ nl: statistieken
 no: statistikk
 pt: estat&iacute;sticas
 se: statistik
+
+    subject
+en: subject
+fr: sujet
 
     surname alias
 af: van alias

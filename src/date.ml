@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.18 2000-09-13 09:05:38 ddr Exp $ *)
+(* $Id: date.ml,v 3.19 2000-11-02 10:31:26 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -67,7 +67,8 @@ value code_french_date conf d m y =
     else s ^ (if s = "" then "" else " ") ^ french_month conf (m - 1)
   in
   s ^ (if s = "" then "" else " ") ^
-  " " ^ transl_nth conf "year/month/day" 0 ^ " " ^ string_of_int y
+  " " ^ transl_nth conf "year/month/day" 0 ^ " " ^
+  (if y >= 1 && y < 4000 then roman_of_arabian y else string_of_int y)
 ;
 
 value code_hebrew_date conf d m y =

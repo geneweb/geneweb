@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.8 2000-10-26 09:05:43 ddr Exp $ *)
+(* $Id: forum.ml,v 3.9 2000-11-02 10:31:28 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -30,6 +30,7 @@ value print_forum conf base =
           let (time, s) = get_var ic "Time:" s in
           let (ident, s) = get_var ic "Ident:" s in
           let (email, s) = get_var ic "Email:" s in
+          let (subject, s) = get_var ic "Subject:" s in
           let (_, s) = get_var ic "Text:" s in
           let (mess, s) =
             get_mess [] s where rec get_mess sl s =
@@ -47,6 +48,10 @@ value print_forum conf base =
                       email email
                   else ();
                   Wserver.wprint "<br>\n";
+                  if subject <> "" then
+                    Wserver.wprint "<b>%s: %s</b>\n<br>\n"
+                      (capitale (transl conf "subject")) subject
+                  else ();
                   Wserver.wprint "<em>%s</em>\n" time;
                   Wserver.wprint "<dl><dt><dd>\n";
                   if browser_doesnt_have_tables conf then ()
@@ -89,7 +94,7 @@ value print conf base =
   return ()
 ;
 
-value print_var conf name opt def_value =
+value print_var conf var name opt def_value =
   tag "tr" begin
     stag "td" begin
       Wserver.wprint "%s" name;
@@ -98,7 +103,7 @@ value print_var conf name opt def_value =
     Wserver.wprint "\n";
     stag "td" begin
       Wserver.wprint "<input name=%s size=40 maxlength=200 value=\"%s\">\n"
-        name def_value;
+        var def_value;
     end;
     Wserver.wprint "\n";
   end
@@ -115,8 +120,9 @@ value print_add conf base =
        Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=FORUM_ADD_OK>\n";
        tag "table" "border=%d" conf.border begin
-         print_var conf "Ident" False conf.user;
-         print_var conf "Email" True "";
+         print_var conf "Ident" "Ident" False conf.user;
+         print_var conf "Email" "Email" True "";
+         print_var conf "Subject" (capitale (transl conf "subject")) False "";
        end;
        html_p conf;
        Wserver.wprint "%s<br>\n"
@@ -137,6 +143,7 @@ value get conf key =
 
 value forum_add conf base ident comm =
   let email = String.lowercase (Gutil.strip_spaces (get conf "Email")) in
+  let subject = String.lowercase (Gutil.strip_spaces (get conf "Subject")) in
   let bfile = Filename.concat Util.base_dir.val conf.bname in
   if ident <> "" && comm <> "" then
     lock (Iobase.lock_file bfile) with
@@ -150,6 +157,8 @@ value forum_add conf base ident comm =
 	       conf.today.year conf.today.month conf.today.day hh mm ss;
              Printf.fprintf oc "Ident: %s\n" ident;
              if email <> "" then Printf.fprintf oc "Email: %s\n" email else ();
+             let subject = if subject = "" then "?" else subject in
+             Printf.fprintf oc "Subject: %s\n" subject;
              Printf.fprintf oc "Text:\n";
              loop 0 True where rec loop i bol =
                if i == String.length comm then ()
