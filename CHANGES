@@ -3,17 +3,17 @@ GeneWeb version 2.04
 
 * Setup program
   - [Jun 19, 99] Changed GEDCOM import menu to reflect new option "-charset"
-    of "ged2gwb" (see below).
+    of "ged2gwb" (see below in section "Gedcom to GeneWeb").
   - [Jun 18, 99] Added a color combination in the provided palette
     whiteyellow, black, bluegreen and brown (thanks to Hans Albeck)
 
 * GeneWeb Daemon/CGI (gwd)
   - [Jun 19, 99] Added in ancestors long display the ability to select
-    the displaying of siblings and the displaying of notes.
+    and unselect the displaying of siblings and the displaying of notes.
   - [Jun 19, 99] Changed presentation of ancestors displaying main menu.
 
 * Gedcom to GeneWeb (ged2gwb)
-  - [Jun 19, 99] Can now translate from MSDOS characters encoding. Added
+  - [Jun 19, 99] Can now read MSDOS accentuated characters encoding. Added
     option "-charset" which can be followed by "ANSEL", "ASCII" or "MSDOS".
     Removed options "-ansel" and "-no_ansel".
     Warning: in GEDCOM files, the charset "IBMPC" (which is not standard
