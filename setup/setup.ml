@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.18 2000-11-04 09:46:01 ddr Exp $ *)
+(* $Id: setup.ml,v 3.19 2000-11-07 05:25:24 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1323,7 +1323,9 @@ value intro () =
               if Unix.fork () = 0 then
                 do Unix.close Unix.stdin;
                    null_reopen [Unix.O_WRONLY] Unix.stdout;
+(*
                    null_reopen [Unix.O_WRONLY] Unix.stderr;
+*)
                 return ()
               else exit 0;
            return (default_gwd_lang, default_setup_lang)

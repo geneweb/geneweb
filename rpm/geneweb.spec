@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.14 2000-11-06 13:50:33 ddr Exp $
+# $Id: geneweb.spec,v 3.15 2000-11-07 05:25:24 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -25,10 +25,9 @@ Copyright: GPL
 Vendor: INRIA
 Group: Applications
 Source: ftp://ftp.inria.fr/INRIA/Projects/cristal/geneweb/Src/geneweb-%{version}.tar.gz
-Source1: geneweb-initrc-%{version}.sh
 URL: http://cristal.inria.fr/~ddr/GeneWeb/
 Packager: Daniel de Rauglaudre <daniel.de_rauglaudre@inria.fr>
-# Requires: ld-linux.so.2 libc.so.6 libm.so.6 libncurses.so.4 libm.so.6(GLIBC_2.1) libm.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1) libc.so.6(GLIBC_2.0)
+# Requires: ld-linux.so.2 libc.so.6 libm.so.6 libm.so.6(GLIBC_2.1) libm.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1) libc.so.6(GLIBC_2.0)
 BuildRoot: /tmp/%{name}-%{version}
 
 Prefix: /usr
@@ -91,8 +90,10 @@ mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc3.d
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc4.d
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc5.d
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc6.d
+mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 cp -r distribution $RPM_BUILD_ROOT/home/geneweb/gw
-cp $RPM_SOURCE_DIR/geneweb-initrc-%{version}.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/gwd
+cp rpm/geneweb-initrc.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/gwd
+cp rpm/geneweb-logrotate $RPM_BUILD_ROOT/etc/logrotate.d/gwd
 ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc0.d/K01gwd
 ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc1.d/K01gwd
 ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc2.d/S99gwd
@@ -189,6 +190,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %attr(755, root, root) /etc/rc.d/rc3.d/S99gwd
 %attr(755, root, root) /etc/rc.d/rc5.d/S99gwd
 %attr(755, root, root) /etc/rc.d/rc6.d/K01gwd
+%attr(644, root, root) /etc/logrotate.d/gwd
 /home/geneweb/gw/LICENSE.txt
 /home/geneweb/gw/LISEZMOI.htm
 /home/geneweb/gw/README.htm
@@ -669,6 +671,13 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %doc doc/*
 
 %changelog
+* Tue Nov  7 2000 Daniel de Rauglaudre
+Version 3.10
+- No more installation of geneweb-initrc.sh in SOURCES: it is directly
+  copied from BUILD/geneweb-xx/rpm. In that file, added -log for gwd and
+  gwsetup.
+- Added /etc/logrotate.d/gwd
+
 * Sun Apr  9 2000 Daniel de Rauglaudre
 Version 3.03-2
 - added set user id bit also for gwc gwu ged2gwb gwb2ged consang because

@@ -1,0 +1,11 @@
+/var/log/gwd.log {
+  postrotate
+    /etc/rc.d/init.d/gwd restart
+  endscript
+}
+
+/var/log/gwsetup.log {
+  postrotate
+    /etc/rc.d/init.d/gwd restart
+  endscript
+}
