@@ -10,6 +10,8 @@ GeneWeb Version 4.02
     first messages
 
 * Setup program (gwsetup)
+  - [09 Apr 01] Changed word "configurate" (which does not exist!) into
+    "configure".
   - [08 Apr 01] fr/gw2gd.htm: fixed errored message
 
 GeneWeb Version 4.01
