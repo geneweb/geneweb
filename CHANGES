@@ -2,6 +2,8 @@ GeneWeb version 4.02
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [12 Jun 01] In case of deleted families, the list of the latest
+    marriages worked bad.
   - [07 Jun 01] (technical point) fixed problem: in case when the data
     base is not writable, an error message is now displayed, instead of
     just an empty answer.
