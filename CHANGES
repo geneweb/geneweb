@@ -2,6 +2,9 @@ GeneWeb version 3.11
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [25 Jan 01] When searching somebody by a name, if there are several
+    possible answers, also display now the first names aliases (if there
+    are some).
   - [23 Jan 01] Fixed bug: when changing somebody's name, in some cases
     there were no check that the key already existed, resulting of a
     double defined persons when cleaning the data base.
