@@ -1,11 +1,11 @@
-(* $Id: gwtp.ml,v 1.6 2000-07-27 03:32:40 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.7 2000-07-28 07:00:51 ddr Exp $ *)
 
 open Printf;
 
 value gwtp_dir = ref "gwtp_dir";
 value comm_ged2gwb = ref "../../geneweb/ged2gwb/ged2gwb";
 value comm_consang = ref "../../geneweb/src/consang";
-value token_tmout = ref 180.0;
+value token_tmout = ref 600.0;
 
 (* Get CGI contents *)
 
@@ -171,6 +171,33 @@ value lowercase_start_with s s_ini =
   String.length s >= len && String.lowercase (String.sub s 0 len) = s_ini
 ;
 
+value insert_file env bdir name =
+  let fname = List.assoc (name ^ "_name") env in
+  do if fname = "" then ()
+     else if fname <> name then
+       printf "You selected \"%s\" instead of \"%s\" -&gt; ignored.\n"
+         fname name
+     else
+       let contents = List.assoc name env in
+       let i =
+         if lowercase_start_with contents "content-type: " then
+           String.index contents '\n'
+         else 0
+       in
+       let j = String.index_from contents (i + 1) '\n' in
+       let len = String.length contents - j - 3 in
+       if len > 0 then
+         let oc = open_out (Filename.concat bdir name) in
+         do output oc contents (j + 1) len;
+            flush oc;
+            printf "File \"%s\" transfered.\n" name;
+            close_out oc;
+         return ()
+       else ();
+     flush stdout;
+  return ()
+;
+
 value send_file str env b t f fname =
   if Filename.basename fname = "base" then
     do printf "content-type: text/html\r\n\r\n\
@@ -178,43 +205,43 @@ value send_file str env b t f fname =
 <h1>Gwtp...</h1>
 <pre>\n";
        Unix.dup2 Unix.stdout Unix.stderr;
+       flush stdout;
     return
     let bdir = Filename.concat "tmp" (b ^ ".gwb") in
     do try Unix.mkdir bdir 0o777 with
-       [ Unix.Unix_error Unix.EEXIST _ _ -> () ];
-    return
-    let oc = open_out (Filename.concat bdir "base") in
-    do try
-         let contents = List.assoc "f" env in
-         let i =
-           if lowercase_start_with contents "content-type: " then
-             String.index contents '\n'
-           else 0
-         in
-         let j = String.index_from contents (i + 1) '\n' in
-         output oc contents (j + 1) (String.length contents - j - 3)
-       with
-       [ Not_found -> () ];
-       close_out oc;
-       printf "</pre>\n";
-       printf "File \"%s\" transfered.<br>\n" fname;
-       printf "<pre>\n";
+       [ Unix.Unix_error Unix.EEXIST _ _ ->
+           let dh = Unix.opendir bdir in
+           try
+             while True do
+               match Unix.readdir dh with
+               [ "." | ".." -> ()
+               | f -> Unix.unlink (Filename.concat bdir f) ];
+             done
+           with
+           [ End_of_file -> () ] ];
+       insert_file env bdir "base";
+       insert_file env bdir "notes";
+       insert_file env bdir "patches";
        flush stdout;
     return
     let base = Iolight.input bdir in
-    do Iobase.output bdir base;
+    do printf "\n";
+       printf "persons: %d\n" base.Def.data.Def.persons.Def.len;
+       printf "families: %d\n\n" base.Def.data.Def.families.Def.len;
+       flush stdout;
+       Iobase.output bdir base;
        flush stdout;
        printf "</pre>\n";
        printf "Data base \"%s\" created.\n" b;
        printf "</body>\n";
     return ()
-  else gwtp_error "only \"base\" file implemented"
+  else gwtp_error "Bad \"base\" file selection"
 ;
 
 value gwtp_send str env =
   match
-    (HttpEnv.getenv env "b", HttpEnv.getenv env "t", HttpEnv.getenv env "f",
-     HttpEnv.getenv env "f_name")
+    (HttpEnv.getenv env "b", HttpEnv.getenv env "t", HttpEnv.getenv env "base",
+     HttpEnv.getenv env "base_name")
   with
   [ (Some b, Some t, Some f, Some fname) ->
       let ok =
@@ -238,7 +265,11 @@ value login_ok str env b p tok =
 <input type=hidden name=b value=%s>
 <input type=hidden name=t value=%s>
 Select the file named \"base\" in your GeneWeb data base directory:<br><p>
-<input type=file name=f size=50><br><p>
+<input type=file name=base size=60><br><p>
+Select the file named \"notes\" (if any) in the same directory:<br><p>
+<input type=file name=notes size=60><br><p>
+Select the file named \"patches\" (if any) in the same directory:<br><p>
+<input type=file name=patches size=60><br><p>
 <input type=submit value=Send>
 </form>
 </body>
