@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.2 1999-11-10 08:44:25 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.3 1999-11-10 09:53:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -719,8 +719,9 @@ value gwu base out_dir out_oc src_oc_list anc desc =
               let ml =
                 List.fold_right
                   (fun ifam ml ->
-                     let des = doi base ifam in
+                     let fam = foi base ifam in
                      let cpl = coi base ifam in
+                     let des = doi base ifam in
                      let m =
                        {m_fam = fam;
                         m_fath = poi base cpl.father;
