@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.193 2000-11-28 09:07:52 ddr Exp $
+# $Id: lexicon.txt,v 3.194 2000-12-02 09:28:37 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -286,6 +286,7 @@ dk: %t's k&oslash;n er ikke koh&aelig;rent med hans/hendes forbindelser
 en: %t's sex is not coherent with his/her relations
 eo: la sekso de %t ne koheras kun siaj rilatoj
 es: el género de %t es incoherente con sus relaciones
+fi: henkil&ouml;n %t sukupuoli ja h&auml;nen suhteensa eiv&auml;t t&auml;sm&auml;&auml;
 fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
 it: il sesso di %t non e' coerente con le sue relazioni
 no: %ts kjønn er uforenlig med forbindelsene hans/hennes
@@ -338,6 +339,7 @@ de: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prair
 dk: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 en: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
 eo: vendemjero/brumero/frimero/nivozo/pluvjozo/ventozo/germinalo/florealo/prerialo/mesidoro/termindoro/fructidoro/suplemento
+fi: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 no: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 se: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/komplementär
@@ -347,6 +349,7 @@ de: Tischri/Marcheschwan/Kislev/Tebet/Schebat/Adar/WeAdar/Nisan/Ijar/Siwan/Tammu
 dk: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 en: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 eo: tisxrio/hesxvano/kislevo/teveto/sxevato/adaro 1/adaro 2/nisano/ijaro/sivano/tamuzo/avo/elulo
+fi: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 he: úùøé/ çùåï/ ëñìå/ èáú/ ùáè/ àãø à'/ àãø á'/ ğéñï/ àééø/ ñéåï/ úîåæ/ àá/ àìåì
 no: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
@@ -3614,6 +3617,7 @@ dk: loop i databasen: %s er sin egen ane
 en: loop in data base: %s is his/her own ancestor
 eo: estas masxo en la datenbazo: %s estas sia propra avo
 es: bucle en la base de datos: %s es su propio ancestro
+fi: silmukka tietokannassa: %s on oma esivanhempansa
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 it: loop nel data-base: %s e' antenato di se stesso
 nl: loop in de data base: %s is zijn/haar eigen voorouder
@@ -3847,6 +3851,7 @@ dk: meddelelse tilf&oslash;jet
 en: message added
 eo: almetita mesagxo
 es: mensaje agregado
+fi: viesti lis&auml;tty
 fr: message ajout&eacute;
 it: messaggio aggiunto
 nl: bericht toegevoegd
@@ -3860,6 +3865,7 @@ dk: meddelelse/n&aelig;ste meddelelse
 en: message/next message
 eo: mesagxo/sekvanta mesagxo
 es: mensaje/siguiente mensaje
+fi: viesti/seuraava viesti
 fr: message/message suivant
 it: messaggio/prossimo messaggio
 nl: bericht/volgend bericht
@@ -5454,6 +5460,7 @@ dk: emne
 en: subject
 eo: objekto
 es: asunto
+fi: kohde
 fr: sujet
 it: oggetto
 nl: onderwerp
