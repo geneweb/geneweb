@@ -19,6 +19,12 @@ GeneWeb Version 4.02
     in order that we don't have to wait the end of the table to see the
     first messages
 
+* Lexicon (lang/lexicon.txt)
+  - [25 Apr 01] Deleted some not so important phrases used only in
+    anniversaries of dead people: "of the birth" (using "birth") and
+    "of the death", "of the murder", "of the execution", "of the
+    disappearance" (using "death").
+
 * Setup program (gwsetup)
   - [09 Apr 01] Changed word "configurate" (which does not exist!) into
     "configure".
