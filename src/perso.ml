@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.44 2000-10-11 14:40:57 ddr Exp $ *)
+(* $Id: perso.ml,v 3.45 2000-10-12 07:36:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1579,13 +1579,6 @@ value print_mother conf base env =
   | _ -> () ]
 ;
 
-value print_nick_name conf base env p =
-  match (get_env "nick" env, p.nick_names) with
-  [ (Estring nn, _) -> Wserver.wprint "%s" nn
-  | (_, [nn :: _]) -> Wserver.wprint "%s" (sou base nn)
-  | _ -> () ]
-;
-
 value print_nobility_titles conf base env p =
   if age_autorise conf base p then
     print_titles conf base True (transl conf "and") p
@@ -1665,6 +1658,13 @@ value print_origin_file conf base env =
 
 value print_public_name conf base env p =
   Wserver.wprint "%s" (sou base p.public_name)
+;
+
+value print_qualifier conf base env p =
+  match (get_env "qualifier" env, p.nick_names) with
+  [ (Estring nn, _) -> Wserver.wprint "%s" nn
+  | (_, [nn :: _]) -> Wserver.wprint "%s" (sou base nn)
+  | _ -> () ]
 ;
 
 value print_referer conf base env =
@@ -1846,7 +1846,6 @@ value print_variable conf base env =
   | "image_url" -> do_person "p" print_image_url conf base env
   | "married_to" -> do_person "p" print_married_to conf base env
   | "mother" -> print_mother conf base env
-  | "nick_name" -> do_person "p" print_nick_name conf base env
   | "nl" -> Wserver.wprint "\n"
   | "nobility_titles" -> do_person "p" print_nobility_titles conf base env
   | "notes" -> do_person "p" print_notes conf base env
@@ -1859,6 +1858,7 @@ value print_variable conf base env =
   | "origin_file" -> print_origin_file conf base env
   | "public_name" -> do_person "p" print_public_name conf base env
   | "prefix" -> Wserver.wprint "%s" (commd conf)
+  | "qualifier" -> do_person "p" print_qualifier conf base env
   | "referer" -> print_referer conf base env
   | "related" -> do_person "c" print_related conf base env
   | "relation_her" -> print_relation_her conf base env
@@ -1988,7 +1988,6 @@ value eval_bool_variable conf base env p =
           | _ -> False ]
       | _ -> False ]
   | "has_nephews_or_nieces" -> has_nephews_or_nieces base p
-  | "has_nick_names" -> p.nick_names <> []
   | "has_grand_parents" -> has_grand_parents base p
   | "has_nobility_titles" -> age_autorise conf base p && p.titles <> []
   | "has_notes" -> age_autorise conf base p && sou base p.notes <> ""
@@ -1998,6 +1997,7 @@ value eval_bool_variable conf base env p =
       [ Eind _ a _ -> a.parents <> None
       | _ -> False ]
   | "has_public_name" -> sou base p.public_name <> ""
+  | "has_qualifiers" -> p.nick_names <> []
   | "has_referer" -> Wserver.extract_param "referer: " '\n' conf.request <> ""
   | "has_relation_her" ->
       match get_env "rel" env with
@@ -2128,7 +2128,7 @@ value rec eval_ast conf base env =
   | Aforeach "family" al -> eval_foreach_family conf base env al
   | Aforeach "first_name_alias" al ->
       eval_foreach_first_name_alias conf base env al
-  | Aforeach "nick_name" al -> eval_foreach_nick_name conf base env al
+  | Aforeach "qualifier" al -> eval_foreach_qualifier conf base env al
   | Aforeach "related" al -> eval_foreach_related conf base env al
   | Aforeach "relation" al -> eval_foreach_relation conf base env al
   | Aforeach "sibling" al -> eval_foreach_sibling conf base env al
@@ -2189,12 +2189,12 @@ and eval_foreach_first_name_alias conf base env al =
            List.iter (eval_ast conf base env) al)
         p.first_names_aliases
   | _ -> () ]
-and eval_foreach_nick_name conf base env al =
+and eval_foreach_qualifier conf base env al =
   match get_env "p" env with
   [ Eind p _ _ ->
       iter_first
         (fun first nn ->
-           let env = [("nick", Estring (sou base nn)) :: env] in
+           let env = [("qualifier", Estring (sou base nn)) :: env] in
            let env = [("first", Ebool first) :: env] in
            List.iter (eval_ast conf base env) al)
         p.nick_names

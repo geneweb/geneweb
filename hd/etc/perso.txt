@@ -1,14 +1,14 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.2 2000-10-11 16:16:19 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.3 2000-10-12 07:36:02 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
     %if;has_public_name;
-      %if;has_nick_names;%public_name; %nick_name;
+      %if;has_qualifiers;%public_name; %qualifier;
       %else;%public_name; %surname;%end;
     %else;
-      %if;has_nick_names;%first_name; %nick_name;
+      %if;has_qualifiers;%first_name; %qualifier;
       %else;%first_name; %surname;%end;
     %end;
   </title>
@@ -26,10 +26,10 @@
 
 <h1 align=center><font color=%highlight;>
 %if;has_public_name
-  %if;has_nick_names;%public_name; <em>%nick_name;</em>
+  %if;has_qualifiers;%public_name; <em>%qualifier;</em>
   %else;%public_name; %surname;%end;
 %else;
-  %if;has_nick_names;%first_name; <em>%nick_name;</em>;
+  %if;has_qualifiers;%first_name; <em>%qualifier;</em>;
   %else;
     %if;cancel_links;%first_name; %surname;
     %else;
@@ -40,7 +40,7 @@
 %end;
 </font></h1>
 
-%if;(has_sosa or has_nick_names or has_aliases or has_nobility_titles or
+%if;(has_sosa or has_qualifiers or has_aliases or has_nobility_titles or
      has_public_name or has_surnames_aliases or has_first_names_aliases)
   <center>
   <table border=%border; cellspacing=0 cellpadding=0>
@@ -51,10 +51,10 @@
     %else;<a href="%prefix;%sosa_link;">%sosa;</a>%end;
     </em><br>
   %end;
-  %foreach;nick_name;
+  %foreach;qualifier;
     %if;not is_first;
-      %if;has_public_name;%public_name; %nick_name;
-      %else;%first_name; %nick_name;%end;<br>
+      %if;has_public_name;%public_name; %qualifier;
+      %else;%first_name; %qualifier;%end;<br>
     %end;
   %end;
   %foreach;alias;
@@ -64,7 +64,7 @@
     <em>%nobility_titles;</em><br>
   %end;
   %if;has_public_name;
-    %if;has_nick_names;
+    %if;has_qualifiers;
       <em>(%if;cancel_links;%first_name; %surname;
            %else;
              <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
@@ -191,7 +191,7 @@
   %foreach;sibling;
     %if;is_self;
       <li type=circle>
-      -
+      %sibling;%nl;
     %else;
       <li type=disk>
       %if;cancel_links;%sibling;
