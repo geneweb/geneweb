@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.14 2005-02-13 10:45:51 ddr Exp $ *)
+(* $Id: alln.ml,v 4.15 2005-02-13 21:07:38 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -465,25 +465,27 @@ value print_alphabetic_short conf base is_surnames ini list len =
       tag "p" begin
         List.iter
           (fun (ini_k, _) ->
-             stagn "a" "href=\"#%s\"" ini_k begin
-               Wserver.wprint "%s" (String.capitalize ini_k);
+             let ini = capitalize_if_not_utf8 ini_k in
+             stagn "a" "href=\"#%s\"" ini begin
+               Wserver.wprint "%s" (Gutil.tr '_' ' ' ini);
              end)
         list;
       end
     else ();
     List.iter
       (fun (ini_k, l) ->
+         let ini = capitalize_if_not_utf8 ini_k in
          tag "p" begin
            list_iter_first
              (fun first (s, cnt) ->
                 let href =
                   if not conf.cancel_links then
                     " href=\"" ^ commd conf ^ "m=" ^ mode ^ ";v=" ^
-                      code_varenv (Name.lower s) ^ "\""
+                      code_varenv (lower_if_not_utf8 s) ^ ";t=A\""
                   else ""
                 in
                 let name =
-                  if first && need_ref then " name=" ^ ini_k else ""
+                  if first && need_ref then " id=\"" ^ ini ^ "\"" else ""
                 in
                 do {
                   if not first then Wserver.wprint ",\n" else ();
