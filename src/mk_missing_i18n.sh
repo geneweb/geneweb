@@ -2,12 +2,12 @@
 #cd (*
 exec ocaml camlp4r.cma $0
 *) ".";
-(* $Id: mk_missing_i18n.sh,v 4.9 2002-11-26 08:39:40 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 4.10 2003-03-03 09:50:52 ddr Exp $ *)
 
 open Printf;
 
 value languages =
-  ["af"; "bg"; "ca"; "cs"; "da"; "de"; "en"; "es"; "eo"; "et"; "fi"; "fr";
+  ["af"; "bg"; "ca"; "cs"; "da"; "de"; "en"; "eo"; "es"; "et"; "fi"; "fr";
    "he"; "is"; "it"; "lv"; "nl"; "no"; "pl"; "pt"; "pt-br"; "ro"; "ru"; "sl";
    "sv"; "zh"]
 ;

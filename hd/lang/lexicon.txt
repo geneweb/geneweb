@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.153 2003-02-24 09:31:01 ddr Exp $
+# $Id: lexicon.txt,v 4.154 2003-03-03 09:50:49 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -67,7 +67,7 @@ de: af=Afrikaans/bg=Bulgarish/ca=Katalanisch/cs=Tschechisch/da=D&auml;nisch/de=D
 en: af=Afrikaans/bg=Bulgarian/ca=Catalan/cs=Czech/da=Danish/de=German/en=English/eo=Esperanto/es=Spanish/et=Estonian/fi=Finnish/fr=French/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/nl=Dutch/no=Norwegian/pl=Polish/pt=Portuguese/pt-br=Brazilian-Portuguese/ro=Romanian/ru=Russian/sl=Slovenian/sv=Swedish/zh=Chinese
 eo: bg=bulgara/en=anglo/eo=esperanto/fr=franco
 es: af=Afrikaans/ca=Catalבn/cs=Checo/da=Dan&eacute;s/de=Alem&aacute;n/en=Ingl&eacute;s/eo=Esperanto/es=Espa&ntilde;ol/et=Estonio/fi=Fin&eacute;s/fr=Franc&eacute;s/he=Hebreo/is=Island&eacute;s/it=Italiano/lv=Lituano/nl=Neerland&eacute;s/no=Noruego/pl=Polaco/pt=Portug&eacute;s/pt-br=Portug&eacute;s de Brasil/ru=Ruso/sl=Esloveno/sv=Sueco/zh=Chino
-et: af=afrikaani/ca=katalaani/cs=t¨ehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=lהti/nl=hollandi/no=norra/pl=poola/pt=portugali/ru=vene/sv=rootsi/zh=hiina
+et: af=afrikaani/bg=bulgaaria/ca=katalaani/cs=t&scaron;ehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=l&aumlaut;ti/nl=hollandi/no=norra/pl=poola/pt=portugali/pt-br=brasiilia-portugali/ro=rumeenia/ru=vene/sl=sloveenia/sv=rootsi/zh=hiina
 fi: af=afrikaans/ca=katalaani/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=esperanto/es=espanja/et=eesti/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pl=puola/pt=portugali/pt-br=brasilianportugali/ru=ven&auml;j&auml;/sv=ruotsi/zh=kiina
 fr: af=afrikaans/bg=bulgare/ca=catalan/cs=tch&egrave;que/da=danois/de=allemand/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finnois/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pl=polonais/pt=portugais/pt-br=portugais-du-Br&eacute;sil/ro=roumain/ru=russe/sl=slov&egrave;ne/sv=su&eacute;dois/zh=chinois
 he: af=אפריקאנס /cs=צ'כית /da=דנית /de=גרמנית /en=אנגלית /eo=אספרנטו /es=ספרדית /fi=פינית /fr=צרפתית /he=עברית /is=איסלנדית /it=איטלקית /lv=לטווית /no=נורבגית /pt=פורטוגזית /ru=רוסית /sv=שוודית/zh=סינית 
@@ -5231,6 +5231,7 @@ de: Nachricht gel&ouml;scht
 en: message deleted
 eo: mesagxo nuligita
 es: mensaje borrado
+et: teade kustutatud
 fi: viesti poistettu
 fr: message supprim&eacute;
 he:  הודעה נמחקה
