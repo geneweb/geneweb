@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.48 1999-09-14 22:34:03 ddr Exp $ *)
+(* $Id: util.ml,v 2.49 1999-09-20 17:16:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -970,13 +970,13 @@ value print_link_to_welcome conf right_aligned =
   else
     let dir = if conf.is_rtl then "left" else "right" in
     let wid_hei =
-      match image_size (image_file_name conf.bname "up.gif") with
+      match image_size (image_file_name conf.bname "up.jpg") with
       [ Some (wid, hei) ->
           " width=" ^ string_of_int wid ^ " height=" ^ string_of_int hei
       | None -> "" ]
     in
     do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-       Wserver.wprint "<img src=\"%sm=IM;v=/up.gif\"%s alt=\"^^\"%s>"
+       Wserver.wprint "<img src=\"%sm=IM;v=/up.jpg\"%s alt=\"^^\"%s>"
          (commd conf) wid_hei (if right_aligned then " align=" ^ dir else "");
        Wserver.wprint "</a>\n";
     return ()
