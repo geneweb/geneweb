@@ -1,6 +1,13 @@
 Internal, very small, undocumented, or not visible changes
 **********************************************************
 
+GeneWeb Version 2.07
+--------------------
+
+* Consang:
+  - [Sep 17, 99] Simplified (=> faster and less memory consummation) output
+    when no patches.
+
 GeneWeb Version 2.06
 --------------------
 

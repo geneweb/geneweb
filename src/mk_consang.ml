@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 2.7 1999-08-31 10:49:27 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 2.8 1999-09-17 06:29:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value fname = ref "";
@@ -28,7 +28,7 @@ value main () =
       do Sys.catch_break True;
          try ConsangAll.compute base scratch.val quiet.val with
          [ Sys.Break -> do Printf.eprintf "\n"; flush stderr; return () ];
-         Iobase.output fname.val base;
+         Iobase.simple_output fname.val base;
       return ()
     with
     [ Consang.TopologicalSortError ->
