@@ -22,6 +22,7 @@ M/F
 a %s cousin
 a 2nd cousin
 a 3rd cousin
+a brother-in-law/a sister-in-law
 a brother/a sister/a sibling
 a cousin
 a descendant
@@ -32,7 +33,9 @@ a great-grandson/a great-granddaughter/a great-grandchild
 a great-nephew/a great-niece
 a great-uncle/a great-aunt
 a half-brother/a half-sister/a half-sibling
+a nephew (spouse's nephew)/a niece (spouse's niece)
 a nephew/a niece
+a son-in-law/a daughter-in-law
 a son/a daughter/a child
 about (date)
 access
@@ -49,6 +52,7 @@ all the titles
 alphabetic order
 also
 an ancestor
+an uncle (aunt's husband)/an aunt (uncle's wife)
 an uncle/an aunt
 ancestors
 ancestors (some)
@@ -224,6 +228,7 @@ relationship
 relationship computing
 relationship link/relationship links
 relationship%t to
+relationships by marriage
 see
 see above
 see further
@@ -256,6 +261,7 @@ the base has changed; do "back", "reload", and refill the form
 the birthday
 the children
 the day after tomorrow
+the father-in-law/the mother-in-law
 the father/the mother/a parent
 the file is temporarily locked: please try again
 the following children of %t and %t are not in order
@@ -266,6 +272,7 @@ the great-grandparents
 the latest %d births
 the latest %d deaths
 the parents
+the spouse
 the whole list
 title/titles
 to add a child to a family, use "%s"

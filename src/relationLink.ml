@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.6 1999-07-22 13:44:51 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.7 1999-08-01 08:50:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -14,7 +14,8 @@ type info =
     b1 : list (iper * sex); b2 : list (iper * sex);
     c1 : int; c2 : int;
     pb1 : option (list (iper * sex)); pb2 : option (list (iper * sex));
-    nb1 : option (list (iper * sex)); nb2 : option (list (iper * sex)) }
+    nb1 : option (list (iper * sex)); nb2 : option (list (iper * sex));
+    sp1 : option person; sp2 : option person }
 ;
 
 type dist =
@@ -235,23 +236,24 @@ value someone_text conf base ip =
   Date.short_dates_text conf base p
 ;
 
-value spouse_text conf base ip ipl =
-  match (ipl, p_getenv conf.env "opt") with
-  [ ([(ips, _) :: _], Some "spouse") ->
+value spouse_text conf base end_sp ip ipl =
+  match (ipl, (p_getenv conf.env "spouse", p_getenv conf.env "opt")) with
+  [ ([(ips, _) :: _], ((Some "on", _) | (_, Some "spouse"))) ->
       let a = aoi base ips in
       match a.parents with
       [ Some ifam ->
           let c = coi base ifam in
-          let sp =
-            if ip = c.father then c.mother
-            else c.father
-          in
+          let sp = if ip = c.father then c.mother else c.father in
           let d =
             match Adef.od_of_codate (foi base ifam).marriage with
             [ Some d -> "<font size=-2>" ^ Date.year_text d ^ "</font>"
             | None -> "" ]
           in
           (someone_text conf base sp, d)
+      | _ -> ("", "") ]
+  | ([], _) ->
+      match end_sp with
+      [ Some p -> (someone_text conf base p.cle_index, "")
       | _ -> ("", "") ]
   | _ -> ("", "") ]
 ;
@@ -260,8 +262,8 @@ value print_someone conf base ip =
   Wserver.wprint "%s\n" (someone_text conf base ip)
 ;
 
-value print_spouse conf base ip ipl =
-  let (s, d) = spouse_text conf base ip ipl in
+value print_spouse conf base n ip ipl =
+  let (s, d) = spouse_text conf base n ip ipl in
   if s <> "" then
     do Wserver.wprint "&amp;%s" d;
        html_br conf;
@@ -270,7 +272,7 @@ value print_spouse conf base ip ipl =
   else ()
 ;
 
-value rec print_both_branches conf base pl1 pl2 =
+value rec print_both_branches conf base info pl1 pl2 =
   if pl1 = [] && pl2 = [] then ()
   else
     let (p1, pl1) =
@@ -303,7 +305,7 @@ value rec print_both_branches conf base pl1 pl2 =
            match p1 with
            [ Some p1 ->
                do print_someone conf base p1;
-                  print_spouse conf base p1 pl1;
+                  print_spouse conf base info.sp1 p1 pl1;
                return ()
            | None -> Wserver.wprint "&nbsp;" ];
          end;
@@ -313,15 +315,15 @@ value rec print_both_branches conf base pl1 pl2 =
            match p2 with
            [ Some p2 ->
                do print_someone conf base p2;
-                  print_spouse conf base p2 pl2;
+                  print_spouse conf base info.sp2 p2 pl2;
                return ()
            | None -> Wserver.wprint "&nbsp;" ];
          end;
        end;
-    return print_both_branches conf base pl1 pl2
+    return print_both_branches conf base info pl1 pl2
 ;
 
-value rec print_both_branches_pre conf base sz pl1 pl2 =
+value rec print_both_branches_pre conf base info sz pl1 pl2 =
   if pl1 = [] && pl2 = [] then ()
   else
     let (p1, pl1) =
@@ -348,7 +350,7 @@ value rec print_both_branches_pre conf base sz pl1 pl2 =
        match p1 with
        [ Some p1 ->
            do print_pre_left sz (someone_text conf base p1);
-              let (s, d) = spouse_text conf base p1 pl1 in
+              let (s, d) = spouse_text conf base info.sp1 p1 pl1 in
               if s <> "" then print_pre_left sz ("&amp;" ^ d ^ " " ^ s)
               else ();
            return ()
@@ -356,15 +358,15 @@ value rec print_both_branches_pre conf base sz pl1 pl2 =
        match p2 with
        [ Some p2 ->
            do print_pre_right sz (someone_text conf base p2);
-              let (s, d) = spouse_text conf base p2 pl2 in
+              let (s, d) = spouse_text conf base info.sp2 p2 pl2 in
               if s <> "" then print_pre_right sz ("&amp;" ^ d ^ " " ^ s)
               else ();
            return ()
        | None -> () ];
-    return print_both_branches_pre conf base sz pl1 pl2
+    return print_both_branches_pre conf base info sz pl1 pl2
 ;
 
-value rec print_one_branch conf base ipl1 =
+value rec print_one_branch conf base ipl1 sp =
   if ipl1 = [] then ()
   else
     let (ip1, ipl1) =
@@ -378,20 +380,29 @@ value rec print_one_branch conf base ipl1 =
        match ip1 with
        [ Some ip1 ->
            do print_someone conf base ip1;
-              print_spouse conf base ip1 ipl1;
+              print_spouse conf base sp ip1 ipl1;
               html_br conf;
            return ()
        | None -> () ];
-    return print_one_branch conf base ipl1
+    return print_one_branch conf base ipl1 sp
 ;
 
-value sign_text conf sign info b1 b2 c1 c2 =
+value include_marr conf base n =
+  match find_person_in_env conf base n with
+  [ Some p -> ";i" ^ n ^ "=" ^ string_of_int (Adef.int_of_iper p.cle_index)
+  | None -> "" ]
+;
+
+value sign_text conf base sign info b1 b2 c1 c2 =
   "<a href=\"" ^ commd conf ^ "m=RL"
   ^ ";i1=" ^ string_of_int (Adef.int_of_iper info.ip1)
   ^ ";i2=" ^ string_of_int (Adef.int_of_iper info.ip2)
   ^ ";b1=" ^ Num.to_string (sosa_of_branch [(info.ip, info.sp) :: b1])
   ^ ";b2=" ^ Num.to_string (sosa_of_branch [(info.ip, info.sp) :: b2])
   ^ ";c1=" ^ string_of_int c1 ^ ";c2=" ^ string_of_int c2
+  ^ (match p_getenv conf.env "spouse" with
+     [ Some "on" -> ";spouse=on" | _ -> "" ])
+  ^ include_marr conf base "3" ^ include_marr conf base "4"
   ^ "\">" ^ sign ^ "</a>"
 ;
 
@@ -400,7 +411,7 @@ value prev_next_1_text conf base info pb nb =
     match pb with
     [ Some b1 ->
        let sign = "&lt;&lt;" in
-       sign_text conf sign info b1 info.b2 (info.c1 - 1) info.c2 ^ " "
+       sign_text conf base sign info b1 info.b2 (info.c1 - 1) info.c2 ^ " "
     | _ -> "" ]
   in
   let s =
@@ -411,7 +422,7 @@ value prev_next_1_text conf base info pb nb =
   match nb with
   [ Some b1 ->
       let sign = "&gt;&gt;" in
-      s ^ " " ^ sign_text conf sign info b1 info.b2 (info.c1 + 1) info.c2
+      s ^ " " ^ sign_text conf base sign info b1 info.b2 (info.c1 + 1) info.c2
   | _ -> s ]
 ;
 
@@ -420,7 +431,7 @@ value prev_next_2_text conf base info pb nb =
     match pb with
     [ Some b2 ->
        let sign = "&lt;&lt;" in
-       sign_text conf sign info info.b1 b2 info.c1 (info.c2 - 1) ^ " "
+       sign_text conf base sign info info.b1 b2 info.c1 (info.c2 - 1) ^ " "
     | _ -> "" ]
   in
   let s =
@@ -431,7 +442,7 @@ value prev_next_2_text conf base info pb nb =
   match nb with
   [ Some b2 ->
      let sign = "&gt;&gt;" in
-     s ^ " " ^ sign_text conf sign info info.b1 b2 info.c1 (info.c2 + 1)
+     s ^ " " ^ sign_text conf base sign info info.b1 b2 info.c1 (info.c2 + 1)
   | _ -> s ]
 ;
 
@@ -483,7 +494,7 @@ value print_with_pre conf base info =
     if s <> "" then print_pre_center sz s else ();
     print_pre_center sz "|";
     print_pre_center sz (String.make (sz / 2) '_');
-    print_both_branches_pre conf base sz info.b1 info.b2;
+    print_both_branches_pre conf base info sz info.b1 info.b2;
     if info.pb1 <> None || info.nb1 <> None
     || info.pb2 <> None || info.nb2 <> None
     then
@@ -521,9 +532,10 @@ value print_with_table conf base info =
            else "");
       end;
     end;
-    print_both_branches conf base info.b1 info.b2;
-    if info.pb1 <> None || info.nb1 <> None
-    || info.pb2 <> None || info.nb2 <> None
+    print_both_branches conf base info info.b1 info.b2;
+    if not conf.cancel_links &&
+    (info.pb1 <> None || info.nb1 <> None
+     || info.pb2 <> None || info.nb2 <> None)
     then
       tag "tr" begin
         tag "td" begin
@@ -546,14 +558,16 @@ value print_with_table conf base info =
 value print_relation_path conf base info =
   if info.b1 = [] || info.b2 = [] then
     let b = if info.b1 = [] then info.b2 else info.b1 in
+    let sp = if info.b1 = [] then info.sp2 else info.sp1 in
     do tag "center" begin
          print_someone conf base info.ip;
-         print_spouse conf base info.ip b;
+         print_spouse conf base sp info.ip b;
          html_br conf;
-         print_one_branch conf base b;
+         print_one_branch conf base b sp;
        end;
-       if info.pb1 <> None || info.nb1 <> None
-       || info.pb2 <> None || info.nb2 <> None
+       if not conf.cancel_links &&
+       (info.pb1 <> None || info.nb1 <> None
+        || info.pb2 <> None || info.nb2 <> None)
        then
          do html_br conf;
             if info.pb1 <> None || info.nb1 <> None then
@@ -643,9 +657,12 @@ value print_relation conf base ip1 ip2 =
       let nb2 =
         if c2 == 0 then None else find_next_branch base dist ip sp b2
       in
+      let sp1 = find_person_in_env conf base "3" in
+      let sp2 = find_person_in_env conf base "4" in
       let info =
         {ip = ip; sp = sp; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2;
-         c1 = c1; c2 = c2; pb1 = pb1; pb2 = pb2; nb1 = nb1; nb2 = nb2}
+         c1 = c1; c2 = c2; pb1 = pb1; pb2 = pb2; nb1 = nb1; nb2 = nb2;
+         sp1 = sp1; sp2 = sp2}
       in
       print_relation_ok conf base info
   | _ ->
