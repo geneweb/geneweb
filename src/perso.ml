@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.39 1999-07-26 17:24:00 ddr Exp $ *)
+(* $Id: perso.ml,v 2.40 1999-07-28 07:48:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -52,29 +52,6 @@ value has_grand_children base p =
               el)
          p.family;
     return False
-  with
-  [ Ok -> True ]
-;
-
-value has_nephews_or_nieces base p =
-  try
-    let a = aoi base p.cle_index in
-    match a.parents with
-    [ Some ifam ->
-        let fam = foi base ifam in
-        do Array.iter
-             (fun ip ->
-                if ip == p.cle_index then ()
-                else
-                  Array.iter
-                    (fun ifam ->
-                       if Array.length (foi base ifam).children > 0 then
-                         raise Ok
-                       else ())
-                    (poi base ip).family)
-             fam.children;
-        return False
-    | _ -> False ]
   with
   [ Ok -> True ]
 ;
@@ -832,6 +809,19 @@ value print_ancestors_descends_cousins conf base p a =
             (capitale (transl conf "descendants"));
        return ()
      else ();
+     if has_grand_parents then
+       do head ();
+          Wserver.wprint "<a href=\"%s%s;m=C\">%s</a>"
+            (commd conf) (acces conf base p)
+            (capitale (transl conf "cousins (general term)"));
+       return ()
+     else if has_nephews_or_nieces base p then
+       do head ();
+          Wserver.wprint "<a href=\"%s%s;m=C;v1=1;v2=2\">%s</a>"
+            (commd conf) (acces conf base p)
+            (capitale (transl conf "nephews and nieces"));
+       return ()
+     else ();
      match prev_sibling base p a with
      [ Some p ->
          do head ();
@@ -852,33 +842,6 @@ value print_ancestors_descends_cousins conf base p a =
             end;
          return ()
      | None -> () ];
-(*
-     if st.val != 0 then Wserver.wprint "</h4>" else ();
-     st.val := 0;
-*)
-     if st.val != 0 then
-       do Wserver.wprint "<br>"; st.val := 2; return ()
-     else ();
-(**)
-     Wserver.wprint "\n";
-     if has_grand_parents then
-       do head ();
-          Wserver.wprint "<a href=\"%s%s;m=C\">%s</a>"
-            (commd conf) (acces conf base p)
-            (capitale (transl conf "cousins (general term)"));
-          Wserver.wprint " /\n";
-          Wserver.wprint "<a href=\"%s%s;m=C;v1=2;v2=1\">%s</a>"
-            (commd conf) (acces conf base p)
-            (capitale (transl conf "uncles and aunts"));
-       return ()
-     else ();
-     if has_nephews_or_nieces base p then
-       do head ();
-          Wserver.wprint "<a href=\"%s%s;m=C;v1=1;v2=2\">%s</a>"
-            (commd conf) (acces conf base p)
-            (capitale (transl conf "nephews and nieces"));
-       return ()
-     else ();
      if st.val != 0 then Wserver.wprint "</h4>" else ();
      Wserver.wprint "\n";
   return ()
