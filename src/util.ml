@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.54 2000-06-21 23:28:57 ddr Exp $ *)
+(* $Id: util.ml,v 3.55 2000-06-22 22:04:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -739,6 +739,37 @@ value body_prop conf =
   [ Not_found -> default_body_prop conf ]
 ;
 
+value get_server_string conf =
+  if not conf.cgi then
+    Wserver.extract_param "host: " '\r' conf.request
+  else
+    let server_name =
+      try Sys.getenv "SERVER_NAME" with
+      [ Not_found -> "" ]
+    in
+    let server_port =
+      try Sys.getenv "SERVER_PORT" with
+      [ Not_found | Failure _ -> "80" ]
+    in
+    if server_port = "80" then server_name
+    else server_name ^ ":" ^ server_port
+;
+
+value get_request_string conf =
+  if not conf.cgi then
+    Wserver.extract_param "GET " ' ' conf.request
+  else
+    let script_name =
+      try Sys.getenv "SCRIPT_NAME" with
+      [ Not_found -> "" ]
+    in
+    let query_string =
+      try Sys.getenv "QUERY_STRING" with
+      [ Not_found -> "" ]
+    in
+    script_name ^ "?" ^ query_string
+;
+
 value include_hed_trl conf suff =
   let hed_fname =
     let fname =
@@ -751,7 +782,9 @@ value include_hed_trl conf suff =
         (conf.bname ^ suff)
   in
   match try Some (open_in hed_fname) with [ Sys_error _ -> None ] with
-  [ Some ic -> copy_from_etc [] conf.indep_command ic
+  [ Some ic ->
+      let url = get_server_string conf ^ get_request_string conf in
+      copy_from_etc [('u', code_varenv url)] conf.indep_command ic
   | None -> () ]
 ;
 
@@ -1302,37 +1335,6 @@ value find_person_in_env conf base suff =
           with
           [ Not_found -> None ]
       | _ -> None ] ]
-;
-
-value get_server_string conf =
-  if not conf.cgi then
-    Wserver.extract_param "host: " '\r' conf.request
-  else
-    let server_name =
-      try Sys.getenv "SERVER_NAME" with
-      [ Not_found -> "" ]
-    in
-    let server_port =
-      try Sys.getenv "SERVER_PORT" with
-      [ Not_found | Failure _ -> "80" ]
-    in
-    if server_port = "80" then server_name
-    else server_name ^ ":" ^ server_port
-;
-
-value get_request_string conf =
-  if not conf.cgi then
-    Wserver.extract_param "GET " ' ' conf.request
-  else
-    let script_name =
-      try Sys.getenv "SCRIPT_NAME" with
-      [ Not_found -> "" ]
-    in
-    let query_string =
-      try Sys.getenv "QUERY_STRING" with
-      [ Not_found -> "" ]
-    in
-    script_name ^ "?" ^ query_string
 ;
 
 value create_topological_sort conf base =
