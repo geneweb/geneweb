@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.38 2000-05-17 21:12:08 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.39 2000-05-17 21:36:43 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -516,10 +516,15 @@ value set_token utm from_addr base_file acc =
   | Refuse -> "" ]
 ;
 
-value incorrect base_file =
-  do Wserver.html "";
-     Wserver.wprint "<body>Incorrect base name: %s</body>\n" base_file;
-  return ()
+value check_file_name s =
+  for i = 0 to String.length s - 1 do
+    match s.[i] with
+    [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '-' -> ()
+    | _ ->
+        do Wserver.html "";
+           Wserver.wprint "<body>Incorrect data base name</body>\n";
+        return raise Exit ];
+  done
 ;
 
 value make_conf cgi from_addr (addr, request) str env =
@@ -533,16 +538,14 @@ value make_conf cgi from_addr (addr, request) str env =
       else (String.sub str 0 iq, env)
     in
     let ip = index '_' base_passwd in
-    let base_file = String.sub base_passwd 0 ip in
     let base_file =
-      if Filename.check_suffix base_file ".gwb" then
-        Filename.chop_suffix base_file ".gwb"
-      else base_file
-    in
-    let base_file =
-      let s = Filename.basename base_file in
-      if base_file <> s then do incorrect base_file; return raise Exit
-      else s
+      let s = String.sub base_passwd 0 ip in
+      let s =
+        if Filename.check_suffix s ".gwb" then
+          Filename.chop_suffix s ".gwb"
+        else s
+      in
+      do check_file_name s; return s
     in
     let (passwd, env, access_type) =
       let has_passwd = List.mem_assoc "w" env in
