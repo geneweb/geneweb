@@ -1,6 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>GeneWeb - Att ha data separerat inuti en databas</title></head>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>GeneWeb - Att ha data separerat inuti en databas</title>
+</head>
 <body background="../images/gwback.jpg">
 <table border=0 width="100%">
 <tr>
@@ -16,58 +19,58 @@ height=108 src="../images/gwlogo.png" align=left border=0 alt=GeneWeb></a>
 </font>
 <br><br>
 
-Om du har fått GEDCOM-filer eller information från andra forskare eller du vill kunna
+Om du har fÃ¥tt GEDCOM-filer eller information frÃ¥n andra forskare eller du vill kunna
 ha din databas separerad i flera olika filer, men du vill endast arbeta med en databas, kan
-<font color=#2f6400><b>GeneWeb</b></font> göra det åt dig.
+<font color=#2f6400><b>GeneWeb</b></font> gÃ¶ra det Ã¥t dig.
 
 <p>
 
 <hr>
-<h3><font color=#2f6400>Slå samman filerna till en databas </font></h3>
+<h3><font color=#2f6400>SlÃ¥ samman filerna till en databas </font></h3>
 
 <ul>
 
 <li>
-Om du har tre källfiler "bar.gw", "svensson.gw" och "foo.gw" som du vill ha separerade.
-Starta ett DOS fönster och skriv:
+Om du har tre kÃ¤llfiler "bar.gw", "svensson.gw" och "foo.gw" som du vill ha separerade.
+Starta ett DOS fÃ¶nster och skriv:
 
 <pre>
      gwc bar.gw svensson.gw foo.gw -o mbas
 </pre>
 
 
-Det kan hända att gwc visar fel meddelanden därför att personer är definierade både
-i "bar.gw", "svensson.gw" och "foo.gw". För att rätta till det, har
-gwc en option "-sep" för att automatiskt flytta numren för personerna för att
-undvika konflikter. Försök med:
+Det kan hÃ¤nda att gwc visar fel meddelanden dÃ¤rfÃ¶r att personer Ã¤r definierade bÃ¥de
+i "bar.gw", "svensson.gw" och "foo.gw". FÃ¶r att rÃ¤tta till det, har
+gwc en option "-sep" fÃ¶r att automatiskt flytta numren fÃ¶r personerna fÃ¶r att
+undvika konflikter. FÃ¶rsÃ¶k med:
 
 <pre>
      gwc bar.gw -sep svensson.gw foo.gw -o mbas
 </pre>
 
-Se också <a href="merge.htm">slå ihop databaser</a>.
+Se ocksÃ¥ <a href="merge.htm">slÃ¥ ihop databaser</a>.
 
 <p>
 
 <li>
-Nu kan du titta på och uppdatera databasen "mbas". <font color=#2f6400><b>GeneWeb</b></font>
-kommer att minnas från vilka källfiler informationen kommer.
+Nu kan du titta pÃ¥ och uppdatera databasen "mbas". <font color=#2f6400><b>GeneWeb</b></font>
+kommer att minnas frÃ¥n vilka kÃ¤llfiler informationen kommer.
 
 <p>
 
 <li>
-I databasen kan sekvensen <TT>";opt=from"</TT> läggas till adressen för att se från
-vilken källfil informationen kommer (och till vilken den hör). Till exempel:
+I databasen kan sekvensen <TT>";opt=from"</TT> lÃ¤ggas till adressen fÃ¶r att se frÃ¥n
+vilken kÃ¤llfil informationen kommer (och till vilken den hÃ¶r). Till exempel:
 
 <pre>
      http://machine:2317/mbas?i=357;opt=from
 </pre>
 
-Obs: Det fungerar endast för personer med familjer.
+Obs: Det fungerar endast fÃ¶r personer med familjer.
 </ul>
 
 <hr>
-<h3><font color=#2f6400>Att återskapa källfilerna från den sammanslagna databasen </font></h3>
+<h3><font color=#2f6400>Att Ã¥terskapa kÃ¤llfilerna frÃ¥n den sammanslagna databasen </font></h3>
 
 <ul>
 
@@ -77,16 +80,16 @@ Om katalogen "utkata" inte finns, skapa den (med kommandot "mkdir").
 <p>
 
 <li>
-För att återskapa källfilerna skriv i DOS fönstret:
+FÃ¶r att Ã¥terskapa kÃ¤llfilerna skriv i DOS fÃ¶nstret:
 
 <pre>
      gwu mbas -odir utkata
 </pre>
 
 <li>
-De tre källfilerna "bar.gw", "svensson.gw" och "foo.gw" kommer nu att skapas i katalogen
-"utkata". Om du har uppdaterat databasen är dessa källfiler också uppdaterade
-(de kommer alltså inte att vara lika som de filerna du startade med).
+De tre kÃ¤llfilerna "bar.gw", "svensson.gw" och "foo.gw" kommer nu att skapas i katalogen
+"utkata". Om du har uppdaterat databasen Ã¤r dessa kÃ¤llfiler ocksÃ¥ uppdaterade
+(de kommer alltsÃ¥ inte att vara lika som de filerna du startade med).
 
 <p>
 
@@ -95,22 +98,22 @@ De tre källfilerna "bar.gw", "svensson.gw" och "foo.gw" kommer nu att skapas i k
 <p>
 
 <li>
-Då har du lagt till personer som <font color=#2f6400><b>GeneWeb</b></font> inte kan avgöra
-i vilken källfil de skall placeras (nya personer som inte är släkt med de personer i de
-ursprungliga källfilerna), då kommer <font color=#2f6400><b>GeneWeb</b></font> att dirigera
-dessa personer till DOS fönstret.
+DÃ¥ har du lagt till personer som <font color=#2f6400><b>GeneWeb</b></font> inte kan avgÃ¶ra
+i vilken kÃ¤llfil de skall placeras (nya personer som inte Ã¤r slÃ¤kt med de personer i de
+ursprungliga kÃ¤llfilerna), dÃ¥ kommer <font color=#2f6400><b>GeneWeb</b></font> att dirigera
+dessa personer till DOS fÃ¶nstret.
 
 <p>
 
 <li>
-För att spara också dessa nya personer i källfilen "nytt.gw", skriv:
+FÃ¶r att spara ocksÃ¥ dessa nya personer i kÃ¤llfilen "nytt.gw", skriv:
 
 <pre>
      gwu mdbas -odir utkata > nytt.gw
 </pre>
 
 <li>
-Innehållet i "nytt.gw" kan sedan efter behag flyttas till någon av de andra källfilerna
+InnehÃ¥llet i "nytt.gw" kan sedan efter behag flyttas till nÃ¥gon av de andra kÃ¤llfilerna
 med en texteditor.
 </ul>
 

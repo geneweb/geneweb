@@ -1,6 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>GeneWeb - Åtkomst restriktioner</title></head>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>GeneWeb - Ã…tkomst restriktioner</title>
+</head>
 <body background="../images/gwback.jpg">
 <table border=0 width="100%">
 <tr>
@@ -9,15 +12,15 @@
 height=108 src="../images/gwlogo.png" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>GeneWeb - Åtkomst restriktioner</font></h1>
+<h1><font color=#2f6400>GeneWeb - Ã…tkomst restriktioner</font></h1>
 </td>
 </tr>
 </table>
 </font>
 <br><br>
 
-Om din databas finns på webben, kanske du vill kunna hindra åtkomster
-till informationen den innehåller.
+Om din databas finns pÃ¥ webben, kanske du vill kunna hindra Ã¥tkomster
+till informationen den innehÃ¥ller.
 
 <p>
 
@@ -25,114 +28,114 @@ Med <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>, kan du:
 
 <ul>
 
-<li>Begränsa inline uppdateringar: <a href="#Wiz">wizard</a> behörighet.
+<li>BegrÃ¤nsa inline uppdateringar: <a href="#Wiz">wizard</a> behÃ¶righet.
 
-<li>Skydda den privata informationen: <a href="#Fri">friend</a> behörighet.
+<li>Skydda den privata informationen: <a href="#Fri">friend</a> behÃ¶righet.
 
-<li>Skydda den globala åtkomsten till en <a href="#DBA">databas</a>.
+<li>Skydda den globala Ã¥tkomsten till en <a href="#DBA">databas</a>.
 
-<li>Skydda den globala åtkomsten till <a href="#GWA">gwd service</a>.
+<li>Skydda den globala Ã¥tkomsten till <a href="#GWA">gwd service</a>.
 
 </ul>
 
 <p>
 
-Om din databas ligger på en internet sajt, behöver du bara bry dig om
-de första tre punkterna.
+Om din databas ligger pÃ¥ en internet sajt, behÃ¶ver du bara bry dig om
+de fÃ¶rsta tre punkterna.
 
 <p>
 
-De första två punkterna (global åtkomst) fungerar endast i server mod. I
-CGI mod, måste du använda de möjligheter som din HTTP server ger.
+De fÃ¶rsta tvÃ¥ punkterna (global Ã¥tkomst) fungerar endast i server mod. I
+CGI mod, mÃ¥ste du anvÃ¤nda de mÃ¶jligheter som din HTTP server ger.
 
 <p>
 
-Eftersom ämnet handlar om åtkomst restriktioner, behandlar nästa
-kapitel <a href="#Rob">robotar</a> och sätt att
-hindra dem från att förstöra. Den sista delen ger ett ännu tuffare
-sätt att begränsa behörigheten: den <a href="#Bla">svartalistan</a>.
+Eftersom Ã¤mnet handlar om Ã¥tkomst restriktioner, behandlar nÃ¤sta
+kapitel <a href="#Rob">robotar</a> och sÃ¤tt att
+hindra dem frÃ¥n att fÃ¶rstÃ¶ra. Den sista delen ger ett Ã¤nnu tuffare
+sÃ¤tt att begrÃ¤nsa behÃ¶righeten: den <a href="#Bla">svartalistan</a>.
 
 <HR>
-<H3><font color=#2f6400><a name="Wiz">Begränsning av modifieringar: "wizard" behörighet</a></font></H3>
+<H3><font color=#2f6400><a name="Wiz">BegrÃ¤nsning av modifieringar: "wizard" behÃ¶righet</a></font></H3>
 
-Om du inte vill att någon ska kunna göra inline modifieringar,
-måste du sätta ett "wizard" passord till din databas.
-
-<p>
-
-I detta fall, har endast personerna som har angett det rätta "wizard" passordet
-rätten att göra uppdateringar. De andra kan normalt navigera
-men ser inte den klickbara texten "uppdatera" på de personliga sidorna.
+Om du inte vill att nÃ¥gon ska kunna gÃ¶ra inline modifieringar,
+mÃ¥ste du sÃ¤tta ett "wizard" passord till din databas.
 
 <p>
 
-För att installera ett "wizard" passord, gör så här:
+I detta fall, har endast personerna som har angett det rÃ¤tta "wizard" passordet
+rÃ¤tten att gÃ¶ra uppdateringar. De andra kan normalt navigera
+men ser inte den klickbara texten "uppdatera" pÃ¥ de personliga sidorna.
+
+<p>
+
+FÃ¶r att installera ett "wizard" passord, gÃ¶r sÃ¥ hÃ¤r:
 <p>
 
 <ul>
 
-<li>Om du normalt brukar använda "gwsetup" programmet, starta det, gå till
-huvudmenyn och välj "databas parametrar". Skriv "wizard"
-passordet och gör "OK".
+<li>Om du normalt brukar anvÃ¤nda "gwsetup" programmet, starta det, gÃ¥ till
+huvudmenyn och vÃ¤lj "databas parametrar". Skriv "wizard"
+passordet och gÃ¶r "OK".
 
-<li>Om du inte använder "gwsetup", editera din fil "foo.gwf" (för en databas
-benämnd "foo"). Om denna fil inte existerar, skapa den genom att
+<li>Om du inte anvÃ¤nder "gwsetup", editera din fil "foo.gwf" (fÃ¶r en databas
+benÃ¤mnd "foo"). Om denna fil inte existerar, skapa den genom att
 kopiera mallfilen "a.gwf" inkluderad i distributionen.
-Skriv in ditt passord som värde för variabeln "wizard_password". Exempel:
+Skriv in ditt passord som vÃ¤rde fÃ¶r variabeln "wizard_password". Exempel:
 
 <pre>
      wizard_passwd=xyzzy
 </pre>
 
-<li>Om din databas finns på en sajt, be
-administratören att skriva in ett "wizard" passord. Gå alltid genom
-honom sedan för att ändra passordet.
+<li>Om din databas finns pÃ¥ en sajt, be
+administratÃ¶ren att skriva in ett "wizard" passord. GÃ¥ alltid genom
+honom sedan fÃ¶r att Ã¤ndra passordet.
 
 </ul>
 
 <p>
 
-När ett "wizard" passord är installerat, ger välkomstsidan (den med
-flaggorna) dig en rad för passorden.
+NÃ¤r ett "wizard" passord Ã¤r installerat, ger vÃ¤lkomstsidan (den med
+flaggorna) dig en rad fÃ¶r passorden.
 
 <p>
 
 <ul>
 
-<li>I server mod, visar sidan "Uppdaterings tillträde" på vilken du kan
-klicka: din webbläsare öppnar då ett fönster där du kan skriva passordet
-på rätt rad ("användare" raden ignoreras; du kan skriva vad som
-helst där).
+<li>I server mod, visar sidan "Uppdaterings tilltrÃ¤de" pÃ¥ vilken du kan
+klicka: din webblÃ¤sare Ã¶ppnar dÃ¥ ett fÃ¶nster dÃ¤r du kan skriva passordet
+pÃ¥ rÃ¤tt rad ("anvÃ¤ndare" raden ignoreras; du kan skriva vad som
+helst dÃ¤r).
 
-<li>I CGI mod eller om det finns en global åtkomstbehörighet (se nedan),
+<li>I CGI mod eller om det finns en global Ã¥tkomstbehÃ¶righet (se nedan),
 visas en inmatningsrad. Ange ditt passord och klicka "OK" (i detta
-fall är passordet synligt och kommer att vara synligt i URLen under hela
+fall Ã¤r passordet synligt och kommer att vara synligt i URLen under hela
 navigationen).
 
 </ul>
 
 <p>
 
-Efter att ha skrivit in passordet, måste välkomstsidan visas igen.
-Du kan se att du är i "wizard" mod därför att texterna
+Efter att ha skrivit in passordet, mÃ¥ste vÃ¤lkomstsidan visas igen.
+Du kan se att du Ã¤r i "wizard" mod dÃ¤rfÃ¶r att texterna
 "modifiera familj" och "modifiera noteringar" ska visas.
 
 <p>
 
-I navigation, på de personliga sidorna, har du rätt att "uppdatera".
+I navigation, pÃ¥ de personliga sidorna, har du rÃ¤tt att "uppdatera".
 
 <h4><a name="Fri">Skydd av privat information: "friend"
-behörighet</a></h4>
+behÃ¶righet</a></h4>
 
-Om du vill skydda den privata informationen för din databas, måste du
-ange ett "friend" passord. Den privata informationen berör endast personer
-födda de senaste 100 åren och de är:
+Om du vill skydda den privata informationen fÃ¶r din databas, mÃ¥ste du
+ange ett "friend" passord. Den privata informationen berÃ¶r endast personer
+fÃ¶dda de senaste 100 Ã¥ren och de Ã¤r:
 
 <p>
 
 <ul>
 
-<li>Födslar, dödsfall, äktenskap, etc. datum och platser.
+<li>FÃ¶dslar, dÃ¶dsfall, Ã¤ktenskap, etc. datum och platser.
 
 <li>Yrke.
 
@@ -140,13 +143,13 @@ födda de senaste 100 åren och de är:
 
 <li>Bild.
 
-<li>"Andra relationer" (gudföräldrar, adoptivföräldrar, etc).
+<li>"Andra relationer" (gudfÃ¶rÃ¤ldrar, adoptivfÃ¶rÃ¤ldrar, etc).
 
 </ul>
 
 <p>
 
-Den andra genealogiska informationen (föräldrar, barn) visas ändå.
+Den andra genealogiska informationen (fÃ¶rÃ¤ldrar, barn) visas Ã¤ndÃ¥.
 
 <p>
 
@@ -155,26 +158,26 @@ passord (eller "wizard" passordet) se den privata informationen.
 
 <p>
 
-För att installera ett "friend" passord, gör som med "wizard"
-passordet ovan. Om du skapar filen "foo.gwf" själv, är variabel namnet
+FÃ¶r att installera ett "friend" passord, gÃ¶r som med "wizard"
+passordet ovan. Om du skapar filen "foo.gwf" sjÃ¤lv, Ã¤r variabel namnet
 "friend_passwd".
 
 <HR>
-<H3><font color=#2f6400><a name="DBA">Globala åtkomst restriktioner till en databas</a></font></H3>
+<H3><font color=#2f6400><a name="DBA">Globala Ã¥tkomst restriktioner till en databas</a></font></H3>
 
-Om du vill att bara vissa personer ska kunna komma åt din databas, kan
-du ange en global åtkomst restriktion.
-
-<p>
-
-Varning: detta fungerar endast i server mod. Om du är i CGI mod, måste du
-använda de möjligheter som din HTTP server ger (den nuvarande dokumentationen
-förklarar inte hur, därför att det beror på server).
+Om du vill att bara vissa personer ska kunna komma Ã¥t din databas, kan
+du ange en global Ã¥tkomst restriktion.
 
 <p>
 
-Du måste först skapa en behörighetsfil. Denna textfil innehåller
-rader som "användare:passord". Till exempel:
+Varning: detta fungerar endast i server mod. Om du Ã¤r i CGI mod, mÃ¥ste du
+anvÃ¤nda de mÃ¶jligheter som din HTTP server ger (den nuvarande dokumentationen
+fÃ¶rklarar inte hur, dÃ¤rfÃ¶r att det beror pÃ¥ server).
+
+<p>
+
+Du mÃ¥ste fÃ¶rst skapa en behÃ¶righetsfil. Denna textfil innehÃ¥ller
+rader som "anvÃ¤ndare:passord". Till exempel:
 
 <p>
 
@@ -185,147 +188,147 @@ rader som "användare:passord". Till exempel:
 
 <p>
 
-För att installera denna behörighetsfil, gör så här:
+FÃ¶r att installera denna behÃ¶righetsfil, gÃ¶r sÃ¥ hÃ¤r:
 
 <p>
 
 <ul>
 
 <li>Kopiera din fil i databas katalogen. I standard
-installationen, är det katalogen "gw". Editera din fil "foo.gwf"
-(om din databas namn är "foo"; om denna fil inte finns, gör en
+installationen, Ã¤r det katalogen "gw". Editera din fil "foo.gwf"
+(om din databas namn Ã¤r "foo"; om denna fil inte finns, gÃ¶r en
 kopia av mallfilen "a.gwf" som finns med i distributionen).
-Skriv in din behörighetsfils namn du just skrev, som värde för
-variabeln "auth_file". Till exempel (om du kallade din behörighetsfil
+Skriv in din behÃ¶righetsfils namn du just skrev, som vÃ¤rde fÃ¶r
+variabeln "auth_file". Till exempel (om du kallade din behÃ¶righetsfil
 "foo.auth"):
 
 <pre>
      auth_file=foo.auth
 </pre>
 
-<li>Om din databas finns på en sajt, be administratören genom
-att skicka honom behörighets filen.
+<li>Om din databas finns pÃ¥ en sajt, be administratÃ¶ren genom
+att skicka honom behÃ¶righets filen.
 
 </ul>
 
 <p>
 
-När man gör åtkomster i denna databas, kommer webbläsaren att öppna ett fönster
-där du ska ange det rätta användarnamnet och passordet.
+NÃ¤r man gÃ¶r Ã¥tkomster i denna databas, kommer webblÃ¤saren att Ã¶ppna ett fÃ¶nster
+dÃ¤r du ska ange det rÃ¤tta anvÃ¤ndarnamnet och passordet.
 
 <p>
 
-I exemplet ovan, har du skrivit "svensson" som "användare" och
-"ex23zuu" som "passord" eller "martin" som "användare" och
+I exemplet ovan, har du skrivit "svensson" som "anvÃ¤ndare" och
+"ex23zuu" som "passord" eller "martin" som "anvÃ¤ndare" och
 "2wxuz4" som "passord".
 
 <p>
 
-Om ditt passord inte stämde, har du ingen behörighet alls till databasen.
+Om ditt passord inte stÃ¤mde, har du ingen behÃ¶righet alls till databasen.
 
 <HR>
-<H3><font color=#2f6400><a name="GWA">Globala åtkomst restriktioner till gwd servicen</a></font></H3>
+<H3><font color=#2f6400><a name="GWA">Globala Ã¥tkomst restriktioner till gwd servicen</a></font></H3>
 
-Om du vill att bara vissa personer ska komma åt gwd servicen, kan
-du sätta en global åtkomst restriktion för gwd servicen. Detta gäller
-för alla databaser den betjänar.
-
-<p>
-
-Databaserna är sedan åtkomstbara endast genom åtkomstprotokoll.
-Men om några databaser har en specifik global åtkomst restriktion (se
-föregående kapitel), gäller denna.
+Om du vill att bara vissa personer ska komma Ã¥t gwd servicen, kan
+du sÃ¤tta en global Ã¥tkomst restriktion fÃ¶r gwd servicen. Detta gÃ¤ller
+fÃ¶r alla databaser den betjÃ¤nar.
 
 <p>
 
-Varning: som för föregående kapitel, detta fungerar endast i server mod,
+Databaserna Ã¤r sedan Ã¥tkomstbara endast genom Ã¥tkomstprotokoll.
+Men om nÃ¥gra databaser har en specifik global Ã¥tkomst restriktion (se
+fÃ¶regÃ¥ende kapitel), gÃ¤ller denna.
+
+<p>
+
+Varning: som fÃ¶r fÃ¶regÃ¥ende kapitel, detta fungerar endast i server mod,
 inte i CGI mod.
 
 <p>
 
-Du måste skapa en behörighetsfil. Det kan bara göras
-av administratören: om din databas ligger någon annanstans,
-behöver du inte bekymra dig om detta.
+Du mÃ¥ste skapa en behÃ¶righetsfil. Det kan bara gÃ¶ras
+av administratÃ¶ren: om din databas ligger nÃ¥gon annanstans,
+behÃ¶ver du inte bekymra dig om detta.
 
 <p>
 
-Den globala åtkomstbehörigheten görs med parametrar för "gwd"
-kommandot. Optionen är "-auth" och måste följas av namnet
-för behörighetsfilen.
+Den globala Ã¥tkomstbehÃ¶righeten gÃ¶rs med parametrar fÃ¶r "gwd"
+kommandot. Optionen Ã¤r "-auth" och mÃ¥ste fÃ¶ljas av namnet
+fÃ¶r behÃ¶righetsfilen.
 
 <HR>
 <H3><font color=#2f6400><a name="Rob">Robotar</a></font></H3>
 
-En del personer kan sända en "robot" till din sajt. Dessa robotar är
-program som går igenom hela din sajt metodiskt, till exempel genom att
-starta från någon specifik sida och "klicka" på allt klickbart på
-sidan och fortsätta med de resulterande sidorna.
+En del personer kan sÃ¤nda en "robot" till din sajt. Dessa robotar Ã¤r
+program som gÃ¥r igenom hela din sajt metodiskt, till exempel genom att
+starta frÃ¥n nÃ¥gon specifik sida och "klicka" pÃ¥ allt klickbart pÃ¥
+sidan och fortsÃ¤tta med de resulterande sidorna.
 
 <p>
 
-De flesta av dessa robotar är dåliga id&eacute;er, därför att antalet möjliga
-sidor är nästan oändligt. Till exempel, om roboten startar från
-en personligsida, "klickar" på "släktskapsberäkning", sedan på
-maka, beräknas alla anlinjer emellan personen och hans
-hustru, sedan kan roboten klicka på alla detaljer för dessa länkar
-och på alla mellanliggande personer och så vidare.
+De flesta av dessa robotar Ã¤r dÃ¥liga id&eacute;er, dÃ¤rfÃ¶r att antalet mÃ¶jliga
+sidor Ã¤r nÃ¤stan oÃ¤ndligt. Till exempel, om roboten startar frÃ¥n
+en personligsida, "klickar" pÃ¥ "slÃ¤ktskapsberÃ¤kning", sedan pÃ¥
+maka, berÃ¤knas alla anlinjer emellan personen och hans
+hustru, sedan kan roboten klicka pÃ¥ alla detaljer fÃ¶r dessa lÃ¤nkar
+och pÃ¥ alla mellanliggande personer och sÃ¥ vidare.
 
 <p>
 
-Id&eacute;n för dessa personer som startar en robot är ofta: istället
-för att sitta i timmar och klicka på den här intressanta sajten,
-laddar jag ner alla dess sidor nu och läser dem i lugn och ro senare,
+Id&eacute;n fÃ¶r dessa personer som startar en robot Ã¤r ofta: istÃ¤llet
+fÃ¶r att sitta i timmar och klicka pÃ¥ den hÃ¤r intressanta sajten,
+laddar jag ner alla dess sidor nu och lÃ¤ser dem i lugn och ro senare,
 samt fria telefonlinjen.
 
 <p>
 
-Oturligt nog, eftersom <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> servicen är en labyrint utan utgång,
-gör detta bara en sak: överlastar personens hårddisk med HTML sidor.
+Oturligt nog, eftersom <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> servicen Ã¤r en labyrint utan utgÃ¥ng,
+gÃ¶r detta bara en sak: Ã¶verlastar personens hÃ¥rddisk med HTML sidor.
 
 <p>
 
-Från sajt innehavarens synpunkt, är han generellt inte glad åt att
-få så många åtkomster på så kort tid, ibland mer än 10 per sekund.
-Därför:
+FrÃ¥n sajt innehavarens synpunkt, Ã¤r han generellt inte glad Ã¥t att
+fÃ¥ sÃ¥ mÃ¥nga Ã¥tkomster pÃ¥ sÃ¥ kort tid, ibland mer Ã¤n 10 per sekund.
+DÃ¤rfÃ¶r:
 
 <p>
 
 <ul>
 
-<li>Det slöar ner hans dator,
+<li>Det slÃ¶ar ner hans dator,
 
-<li>Det slöar ner de andra användarna som konsulterar sajten normalt,
+<li>Det slÃ¶ar ner de andra anvÃ¤ndarna som konsulterar sajten normalt,
 
-<li>Det förstör statistiken för åtkomsterna,
+<li>Det fÃ¶rstÃ¶r statistiken fÃ¶r Ã¥tkomsterna,
 
-<li>Det ger känslan av att vara övervakad.
+<li>Det ger kÃ¤nslan av att vara Ã¶vervakad.
 
 </ul>
 
 <p>
 
 Men sidorna som <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> skapar indikerar klart
-till roboten (i protokollet) att inte fortsätta utforska från sidan.
+till roboten (i protokollet) att inte fortsÃ¤tta utforska frÃ¥n sidan.
 
 <p>
 
 "Goda" robotar, de som indexerar webbsidor eller hela internet,
-respekterar detta protokoll. Men när man startar en robot,
-är det möjligt att säga åt den att ignorera det.
+respekterar detta protokoll. Men nÃ¤r man startar en robot,
+Ã¤r det mÃ¶jligt att sÃ¤ga Ã¥t den att ignorera det.
 
 <p>
 
-Mot dessa oartiga robotar, finns optionen "-robot_xcl" för gwd.
-Den är baserad på observationen av hur snabbt åtkomsterna kommer
-från en och samma plats.
+Mot dessa oartiga robotar, finns optionen "-robot_xcl" fÃ¶r gwd.
+Den Ã¤r baserad pÃ¥ observationen av hur snabbt Ã¥tkomsterna kommer
+frÃ¥n en och samma plats.
 
 <p>
 
-Parametrarna är två nummer, separerade av ett komma. Det första är
-ett nummer "x" för åtkomster och det andra är ett nummer "y" för sekunder.
-Om någon adress gör fler "x" åtkomster på "y" sekunder, registreras adressen
-automatiskt i en svartlista och alla framtida åtkomster är refuserade
-med ett lämpligt meddelande.
+Parametrarna Ã¤r tvÃ¥ nummer, separerade av ett komma. Det fÃ¶rsta Ã¤r
+ett nummer "x" fÃ¶r Ã¥tkomster och det andra Ã¤r ett nummer "y" fÃ¶r sekunder.
+Om nÃ¥gon adress gÃ¶r fler "x" Ã¥tkomster pÃ¥ "y" sekunder, registreras adressen
+automatiskt i en svartlista och alla framtida Ã¥tkomster Ã¤r refuserade
+med ett lÃ¤mpligt meddelande.
 
 <p>
 
@@ -339,31 +342,31 @@ Exempel:
 
 <p>
 
-Om fler än 100 åtkomster på 150 sekunder upptäcks från en och samma
-plats, har den adressen ingen mer åtkomstbehörighet tills sajt innehavaren
-bestämmer sig att "fria" den.
+Om fler Ã¤n 100 Ã¥tkomster pÃ¥ 150 sekunder upptÃ¤cks frÃ¥n en och samma
+plats, har den adressen ingen mer Ã¥tkomstbehÃ¶righet tills sajt innehavaren
+bestÃ¤mmer sig att "fria" den.
 
 <p>
 
-För att fria de förbjudna adresserna, behöver bara sajt innehavaren radera
-filen benämnd "robot" som ligger i katalogen "cnt".
+FÃ¶r att fria de fÃ¶rbjudna adresserna, behÃ¶ver bara sajt innehavaren radera
+filen benÃ¤mnd "robot" som ligger i katalogen "cnt".
 
 <HR>
 <H3><font color=#2f6400><a name="Bla">Den svartalistan</a></font></H3>
 
-Den svartalistan gör det möjligt att förbjuda åtkomster till en
+Den svartalistan gÃ¶r det mÃ¶jligt att fÃ¶rbjuda Ã¥tkomster till en
 <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> sajt
-för internet adresser eller grupper av internet adresser.
+fÃ¶r internet adresser eller grupper av internet adresser.
 
 <p>
 
-Skapa ett fil namn "gwd.xcl" och lägg den i samma katalog som
+Skapa ett fil namn "gwd.xcl" och lÃ¤gg den i samma katalog som
 kommandot "gwd".
 
 <p>
 
 Editera denna textfil och skriv adresserna (en per rad) som du vill
-hindra. Du kan skriva "*" för att indikera vilka tecken som helst.
+hindra. Du kan skriva "*" fÃ¶r att indikera vilka tecken som helst.
 Exempel:
 
 <pre>
@@ -373,8 +376,8 @@ Exempel:
 
 <p>
 
-Detta hindrar åtkomster från adresser som "stora-stygga@vargen.skogen",
-"fantomen-22@djungeln.bengalen", "fantomen-xx@djungeln.bengalen" och så vidare. Om du
+Detta hindrar Ã¥tkomster frÃ¥n adresser som "stora-stygga@vargen.skogen",
+"fantomen-22@djungeln.bengalen", "fantomen-xx@djungeln.bengalen" och sÃ¥ vidare. Om du
 bara skriver en rad med "*", blir alla adresser hindrade
 (inklusive din egen).
 
