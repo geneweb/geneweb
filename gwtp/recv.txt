@@ -1,0 +1,8 @@
+<head><title>Directory %b.gwb</title></head>
+<body>
+<h1>Directory %b.gwb</h1>
+
+Create a new directory named <em>%b.gwb</em>, or any other name ending
+with <em>.gwb</em>, on your disk and download these files into.
+
+
