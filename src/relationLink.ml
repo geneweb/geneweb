@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.5 1998-12-06 10:28:33 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.6 1998-12-13 10:16:55 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -103,8 +103,7 @@ value threshold = ref 15;
 value phony_dist_tab = (fun _ -> 0, fun _ -> infinity);
 
 value make_dist_tab conf base ia maxlev =
-  if maxlev <= threshold.val then
-    (fun _ -> 0, fun _ -> infinity)
+  if maxlev <= threshold.val then phony_dist_tab
   else
     let _ = base.ascends.array () in
     let _ = base.couples.array () in
@@ -172,26 +171,27 @@ value find_first_branch base (dmin, dmax) ia =
         | None -> None ]
 ;
 
-value branch_of_num base ip n =
+value branch_of_sosa base ip n =
   let rec expand bl n =
     if Num.eq n Num.one then bl else expand [Num.even n :: bl] (Num.half n)
   in
   let rec loop ipl ip sp =
     fun
-    [ [] -> [(ip, sp) :: ipl]
+    [ [] -> Some [(ip, sp) :: ipl]
     | [goto_fath :: nl] ->
         match (aoi base ip).parents with
         [ Some ifam ->
             let cpl = coi base ifam in
             if goto_fath then loop [(ip, sp) :: ipl] cpl.father Masculin nl
             else loop [(ip, sp) :: ipl] cpl.mother Feminin nl
-        | _ -> [(ip, sp) :: ipl] ] ]
+        | _ -> None ] ]
   in
   loop [] ip (poi base ip).sexe (expand [] n)
 ;
 
-value num_of_branch ia sa ipl =
-  let ipl = List.tl (List.rev [(ia, sa) :: ipl]) in
+value sosa_of_branch ipl =
+  do if ipl = [] then failwith "sosa_of_branch" else (); return
+  let ipl = List.tl (List.rev ipl) in
   List.fold_left
     (fun b (ip, sp) ->
        let b = Num.twice b in
@@ -230,12 +230,14 @@ value rec next_branch_same_len base dist backward missing ia sa ipl =
     | None -> next_branch_same_len base dist True missing ia sa ipl ]
 ;
 
+(*
 value text_of_sex =
   fun
   [ Masculin -> "Masculin"
   | Feminin -> "Feminin"
   | Neutre -> "Neutre" ]
 ;
+*)
 
 value find_next_branch base dist ia sa ipl =
   loop ia sa ipl where rec loop ia1 sa1 ipl =
@@ -282,8 +284,8 @@ value find_prev_branch base dist ia sa ipl =
 value print_sign conf sign ip sp i1 i2 b1 b2 c1 c2 =
   do Wserver.wprint "<a href=%sm=RL;i1=%d;i2=%d" (commd conf)
        (Adef.int_of_iper i1) (Adef.int_of_iper i2);
-     Wserver.wprint ";b1=%s" (Num.to_string (num_of_branch ip sp b1));
-     Wserver.wprint ";b2=%s" (Num.to_string (num_of_branch ip sp b2));
+     Wserver.wprint ";b1=%s" (Num.to_string (sosa_of_branch [(ip, sp) :: b1]));
+     Wserver.wprint ";b2=%s" (Num.to_string (sosa_of_branch [(ip, sp) :: b2]));
      Wserver.wprint ";c1=%d;c2=%d" c1 c2;
      Wserver.wprint ">%s</a>" sign;
      Wserver.wprint "\n";
@@ -331,6 +333,31 @@ value print_prev_next conf base ip sp i1 i2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
   end
 ;
 
+value print_other_parent_if_same conf base ip b1 b2 =
+  match (b1, b2) with
+  [ ([(sib1, _) :: _], [(sib2, _) :: _]) ->
+      match ((aoi base sib1).parents, (aoi base sib2).parents) with
+      [ (Some ifam1, Some ifam2) ->
+          let cpl1 = coi base ifam1 in
+          let cpl2 = coi base ifam2 in
+          let other_parent =
+            if cpl1.father = ip then
+              if cpl1.mother = cpl2.mother then Some cpl1.mother
+              else None
+            else
+              if cpl1.father = cpl2.father then Some cpl1.father
+              else None
+          in
+          match other_parent with
+          [ Some ip ->
+              do Wserver.wprint "&amp;\n";
+                 print_someone conf base ip;
+              return ()
+          | _ -> () ]
+      | _ -> () ]
+  | _ -> () ]
+;
+
 value print_relation conf base ip1 ip2 =
   let params =
     let po = find_person_in_env conf base "" in
@@ -346,8 +373,8 @@ value print_relation conf base ip1 ip2 =
         [ (Some b1str, Some b2str) ->
             let n1 = Num.of_string b1str in
             let n2 = Num.of_string b2str in
-            match (branch_of_num base ip1 n1, branch_of_num base ip2 n2) with
-            [ ([(ia1, sa1) :: b1], [(ia2, sa2) :: b2]) ->
+            match (branch_of_sosa base ip1 n1, branch_of_sosa base ip2 n2) with
+            [ (Some [(ia1, sa1) :: b1], Some [(ia2, sa2) :: b2]) ->
                 if ia1 == ia2 then
                   let c1 =
                     match p_getint conf.env "c1" with
@@ -422,6 +449,7 @@ value print_relation conf base ip1 ip2 =
              do tag "tr" begin
                   stag "td" "colspan=2 align=center" begin
                     print_someone conf base ip;
+                    print_other_parent_if_same conf base ip b1 b2;
                   end;
                 end;
                 tag "tr" begin

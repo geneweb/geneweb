@@ -2,8 +2,10 @@ GeneWeb Version 1.10
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [13/12/98] In relationship links, display the ancestor couple (if both
+    are ancestors).
+--- [12/12/98..13/12/98] Added displaying of cousins.
   - [11/12/98] Fixed more bugs (accents) due to new ANSEL encoding.
---- [12/12/98] Added displaying of cousins.
 
 * Lexicon file (lexicon.txt)
   - [11/12/98] Fixed bug and completed Dutch version (thanks to Joris Esch).

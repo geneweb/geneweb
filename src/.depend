@@ -27,9 +27,9 @@ consang.cmo: adef.cmi check.cmo def.cmi gutil.cmi pqueue.cmi consang.cmi
 consang.cmx: adef.cmx check.cmx def.cmi gutil.cmx pqueue.cmx consang.cmi 
 consang.cmi: def.cmi 
 cousins.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi num.cmi \
-    srcfile.cmi util.cmi ../wserver/wserver.cmi 
+    relationLink.cmo srcfile.cmi util.cmi ../wserver/wserver.cmi 
 cousins.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
-    srcfile.cmx util.cmx ../wserver/wserver.cmx 
+    relationLink.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
 date.cmo: adef.cmi def.cmi gutil.cmi util.cmi ../wserver/wserver.cmi date.cmi 
 date.cmx: adef.cmx def.cmi gutil.cmx util.cmx ../wserver/wserver.cmx date.cmi 
 date.cmi: config.cmi def.cmi 

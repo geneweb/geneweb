@@ -207,7 +207,7 @@ se: , &auml;r det
 
     2nd cousins
 de: Vettere 2ten Grades
-en: 2nd cousin
+en: 2nd cousins
 eo: 2a gekuzoj
 es: primos 2ndos
 fr: cousins issus de germains
@@ -218,7 +218,7 @@ se: syssling
 
     3rd cousins
 de: Vettere 3ten Grades
-en: 3rd cousin
+en: 3rd cousins
 eo: 3a gekuzoj
 es: primos 3ros
 fr: cousins issus d'issus de germains

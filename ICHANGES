@@ -14,7 +14,7 @@ GeneWeb Version 1.10
 
 * Input base
   - [12/12/98] Fixed horrible programming of base patches applying, which
-    resulted in much memory allocation and time loosing for bases with many
+    resulted in much memory allocation and time loosing for bases having many
     added "things" (persons, families, strings). Now the code is cleaner.
     Consequence: saved speed and memory allocation in such bases in gwd,
     gwu, gwb2ged.
