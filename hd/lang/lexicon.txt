@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.28 1999-04-26 09:10:04 ddr Exp $
+# $Id: lexicon.txt,v 2.29 1999-04-28 09:10:50 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2017,6 +2017,7 @@ dk: langt display
 en: long display
 fr: affichage long
 he:  תצוגה ארוכה
+nl: kwartierstaat
 no: utvidet rapport
 se: l&aring;ng listning
 
