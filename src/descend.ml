@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.19 2003-07-17 08:38:06 ddr Exp $ *)
+(* $Id: descend.ml,v 4.20 2003-11-27 11:40:51 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -126,6 +126,9 @@ value print_choice conf base p effective_level =
           Wserver.wprint
             "- %s <input type=checkbox name=image value=on><br>\n"
             (capitale (transl_nth conf "image/images" 1));
+          Wserver.wprint
+            "- %s <input name=bd size=1 maxlength=2 value=0><br>\n"
+            (capitale (transl conf "border"));
         end;
         tag "td" begin
           Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
@@ -1003,6 +1006,7 @@ value display_descendant_with_table conf base max_lev a =
 
 value make_tree_hts conf base gv p =
   let gv = min (limit_by_tree conf) gv in
+  let bd = match p_getint conf.env "bd" with [ Some x -> x | None -> 0 ] in
   let rec nb_column n v u =
     if v == 0 then n + 1
     else if Array.length u.family = 0 then n + 1
@@ -1131,7 +1135,14 @@ value make_tree_hts conf base gv p =
           let txt =
             if auth then txt ^ Date.short_dates_text conf base p else txt
           in
-          (2 * ncol - 1, CenterA, TDstring (txt ^ Dag.image_txt conf base p))
+          let txt =
+            if bd > 0 then
+              Printf.sprintf
+                "<table border=%d><tr><td>%s</td></tr></table>" bd txt
+            else txt
+          in
+          let txt = txt ^ Dag.image_txt conf base p in
+          (2 * ncol - 1, CenterA, TDstring txt)
       | None -> (1, LeftA, TDstring "&nbsp;") ]
     in
     [td :: tdl]
@@ -1166,6 +1177,12 @@ value make_tree_hts conf base gv p =
                      Date.short_marriage_date_text conf base fam p sp
                    else "") ^
                   "&nbsp;" ^ txt ^ Dag.image_txt conf base sp
+              in
+              let s =
+                if bd > 0 then
+                  Printf.sprintf
+                    "<table border=%d><tr><td>%s</td></tr></table>" bd s
+                else s
               in
               (2 * ncol - 1, CenterA, TDstring s)
             in
