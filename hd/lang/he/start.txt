@@ -63,8 +63,8 @@
 %w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
 <li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
 <li><a href="%sm=FORUM;t=w">[*forum] - <em>[wizard]</em></a>
-%w%e<li><a href="%sm=FORUM;t=f">[*forum] - <em>[friend]</em></a>
-%e
+%w%x<li><a href="%sm=FORUM;t=f">[*forum] - <em>[friend]</em></a>
+%x
 
 </ul>
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.19 1999-10-08 07:15:48 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.20 1999-10-08 14:52:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -165,8 +165,7 @@ value rec copy_from_channel conf base ic =
           let c = input_char ic in
           if not echo.val then
             match c with
-            [ 'w' | 'x' | 'y' | 'z' | 'e' | 'i' | 'j' | 'u' | 'o' ->
-                echo.val := True
+            [ 'w' | 'x' | 'y' | 'z' | 'i' | 'j' | 'u' | 'o' -> echo.val := True
             | _ -> () ]
           else
             match c with
@@ -197,7 +196,6 @@ value rec copy_from_channel conf base ic =
                   (transl conf "(thousand separator)")
                   (Num.of_int wc)
             | 'd' -> print_date conf
-            | 'e' -> if conf.friend then () else echo.val := False
             | 'f' -> Wserver.wprint "%s" conf.command
             | 'g' ->
                 do Wserver.wprint "%s?" conf.command;
