@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 1.6 1998-11-27 20:09:44 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.7 1998-11-30 10:26:50 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -317,10 +317,6 @@ value print_family oc base ifaml (per_sel, fam_sel) fam_done ifam =
      match sou base fam.fsources with
      [ "" -> ()
      | s -> Printf.fprintf oc "src %s\n" (correct_string base fam.fsources) ];
-     match fam.comment with
-     [ txt when sou base txt <> "" ->
-         Printf.fprintf oc "comm %s\n" (Ansel.to_iso_8859_1 (sou base txt))
-     | _ -> () ];
      let print_sources =
        match common_children_sources base fam.children with
        [ Some s ->
@@ -328,6 +324,11 @@ value print_family oc base ifaml (per_sel, fam_sel) fam_done ifam =
           False
        | _ -> True ]
      in
+     do match fam.comment with
+        [ txt when sou base txt <> "" ->
+            Printf.fprintf oc "comm %s\n" (Ansel.to_iso_8859_1 (sou base txt))
+        | _ -> () ];
+     return
      match Array.length fam.children with
      [ 0 -> ()
      | _ ->
