@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.36 1999-08-02 21:47:02 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.37 1999-08-02 22:28:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1374,21 +1374,29 @@ value print_tree conf base v p =
       (person_text_no_html conf base p)
   in
   let v = min 4 v in
-  let next_gen ipol =
+  let next_gen pol =
     List.fold_right
-      (fun ipo list ->
-         match ipo with
-         [ Some ip ->
-             match (aoi base ip).parents with
+      (fun po list ->
+         match po with
+         [ Some p ->
+             match (aoi base p.cle_index).parents with
              [ Some ifam ->
                  let cpl = coi base ifam in
-                 [Some cpl.father; Some cpl.mother :: list]
+                 let fath =
+                   let p = poi base cpl.father in
+                   if connais base p then Some p else None
+                 in
+                 let moth =
+                   let p = poi base cpl.mother in
+                   if connais base p then Some p else None
+                 in
+                 [fath; moth :: list]
              | _ -> [None; None :: list] ]
          | None -> [None; None :: list] ])
-      ipol []
+      pol []
   in
   let gen =
-    loop (v - 1) [Some p.cle_index] [] where rec loop i gen list =
+    loop (v - 1) [Some p] [] where rec loop i gen list =
       if i == 0 then [gen :: list]
       else loop (i - 1) (next_gen gen) [gen :: list]
   in
@@ -1398,12 +1406,12 @@ value print_tree conf base v p =
       "<a href=\"" ^ commd conf ^ "m=A;t=T;v=" ^ string_of_int v ^ ";" ^
       acces conf base p ^ "\">" ^ s ^ "</a>"
   in
-  let print_ancestor gen n ipo =
-    do stag "td" "align=center colspan=%d" n begin
+  let colspan = fun [ 1 -> "" | n -> " colspan=" ^ string_of_int n ] in
+  let print_ancestor gen n po =
+    do stag "td" "align=center%s" (colspan n) begin
          let txt =
-           match ipo with
-           [ Some ip ->
-               let p = poi base ip in
+           match po with
+           [ Some p ->
                let txt = person_title_text conf base p in
                let txt =
                  if List.length gen = 1 then reference conf base p txt
@@ -1419,17 +1427,17 @@ value print_tree conf base v p =
   in
   let print_vertical_bars n cs =
     for i = 1 to n do
-      stag "td" "align=center colspan=%d" cs begin Wserver.wprint "|"; end;
+      stag "td" "align=center%s" (colspan cs) begin Wserver.wprint "|"; end;
       Wserver.wprint "\n";
     done
   in
   let print_horizontal_line n cs =
     for i = 1 to n do
-      stag "td" "colspan=%d" (cs / 2) begin
+      stag "td" "%s" (colspan (cs / 2)) begin
         Wserver.wprint "<hr noshade size=1 width=\"50%%\" align=right>";
       end;
       Wserver.wprint "\n";
-      stag "td" "colspan=%d" (cs / 2) begin
+      stag "td" "%s" (colspan (cs / 2)) begin
         Wserver.wprint "<hr noshade size=1 width=\"50%%\" align=left>";
       end;
       Wserver.wprint "\n";
