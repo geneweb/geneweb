@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.13 2002-09-30 11:11:00 ddr Exp $ *)
+(* $Id: some.ml,v 4.14 2002-10-02 11:55:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -200,7 +200,77 @@ value max_lev = 3;
 
 value rec print_branch conf base first_lev psn lev name p =
   do {
-    if lev == 0 then () else html_li conf;
+    let image_sel_txt = "<tt>o</tt>" in
+    let image_unsel_txt = "<tt>+</tt>" in
+    let image_nosel_txt = "<tt>o</tt>" in
+    let print_image_select conf =
+      fun
+      [ Some (ifam, sel) ->
+          let ifam_txt = string_of_int (Adef.int_of_ifam ifam) in
+          let req =
+            List.fold_left
+              (fun req (k, v) ->
+                 if not sel && k = "u" && v = ifam_txt then req
+                 else
+                   let s = k ^ "=" ^ v in
+                   if req = "" then s else req ^ ";" ^ s)
+              "" conf.env
+          in
+          do {
+            stag "a" "name=%s" ifam_txt begin
+              stag "a"
+                "href=\"%s%s%s%s\"" (commd conf) req
+                  (if sel then ";u=" ^ ifam_txt else "")
+                  (if sel || List.mem_assoc "u" conf.env then "#" ^ ifam_txt
+                   else "")
+              begin
+                Wserver.wprint "%s"
+                  (if sel then image_sel_txt else image_unsel_txt);
+              end;
+            end;
+            Wserver.wprint "\n";
+          }
+      | None -> Wserver.wprint "%s\n" image_nosel_txt ]
+    in
+    let unsel_list =
+      List.fold_left
+        (fun sl (k, v) ->
+           try
+             if k = "u" then [int_of_string v :: sl]
+             else sl
+           with
+           [ Failure _ -> sl ])
+        [] conf.env
+    in
+    let u = uget conf base p.cle_index in
+    let family_list =
+      List.map
+        (fun ifam ->
+           let fam = foi base ifam in
+           let des = doi base ifam in
+           let c = spouse p.cle_index (coi base ifam) in
+           let el = des.children in
+           let c = pget conf base c in
+           let down =
+             p.sex = Male &&
+             (Name.crush_lower (p_surname base p) =
+                Name.crush_lower name ||
+              first_lev) &&
+             Array.length des.children <> 0 ||
+             p.sex = Female &&
+             she_has_children_with_her_name conf base p c el
+           in
+           let sel = not (List.memq (Adef.int_of_ifam ifam) unsel_list) in
+           (fam, des, c, if down then Some (ifam, sel) else None))
+        (Array.to_list u.family)
+    in
+    let select =
+      match family_list with
+      [ [(_, _, _, select) :: _] -> select
+      | _ -> None ]
+    in
+    if lev == 0 then () else Wserver.wprint "<dd>\n";
+    print_image_select conf select;
     Wserver.wprint "<strong>";
     Wserver.wprint "%s"
       (Util.reference conf base p
@@ -211,20 +281,15 @@ value rec print_branch conf base first_lev psn lev name p =
     Wserver.wprint "</strong>";
     Wserver.wprint "%s" (Date.short_dates_text conf base p);
     Wserver.wprint "\n";
-    let u = uget conf base p.cle_index in
     if Array.length u.family == 0 then ()
     else
       let _ =
         List.fold_left
-          (fun (first, need_br) ifam ->
-             let fam = foi base ifam in
-             let des = doi base ifam in
-             let c = spouse p.cle_index (coi base ifam) in
-             let el = des.children in
-             let c = pget conf base c in
+          (fun first (fam, des, c, select) ->
              do {
-               if need_br then html_br conf else ();
                if not first then do {
+                 Wserver.wprint "</dd>\n<dd>\n";
+                 print_image_select conf select;
                  Wserver.wprint "<em>";
                  Wserver.wprint "%s"
                    (if conf.hide_names && not (fast_auth_age conf p) then "x"
@@ -247,30 +312,24 @@ value rec print_branch conf base first_lev psn lev name p =
                Wserver.wprint "</strong>";
                Wserver.wprint "%s" (Date.short_dates_text conf base c);
                Wserver.wprint "\n";
-               let down =
-                 p.sex = Male &&
-                 (Name.crush_lower (p_surname base p) =
-                    Name.crush_lower name ||
-                  first_lev) &&
-                 Array.length el <> 0 ||
-                 p.sex = Female &&
-                 she_has_children_with_her_name conf base p c el
-               in
-               if down then do {
-                 Wserver.wprint "<ul>\n";
-                 List.iter
-                   (fun e ->
-                      print_branch conf base False psn (succ lev) name
-                        (pget conf base e))
-                   (Array.to_list el);
-                 Wserver.wprint "</ul>\n";
-                 (False, not down)
-               }
-               else (False, not down)
+               match select with
+               [ Some (_, True) ->
+                   do {
+                     Wserver.wprint "<dl><dt>\n";
+                     List.iter
+                       (fun e ->
+                          print_branch conf base False psn (succ lev) name
+                            (pget conf base e))
+                       (Array.to_list des.children);
+                     Wserver.wprint "</dt></dl>\n";
+                     False
+                   }
+               | Some (_, False) | None -> False ]
              })
-          (True, False) (Array.to_list u.family)
+          True family_list
       in
-      ()
+      ();
+    if lev == 0 then () else Wserver.wprint "</dd>\n";
   }
 ;
 
@@ -362,8 +421,10 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
                        let href = Util.acces conf base pp in
                        wprint_geneweb_link conf href "&lt;&lt;";
                      Wserver.wprint "\n";
-                     tag "ul" begin
-                       print_branch conf base True psn 1 x p;
+                     tag "dl" begin
+                       tag "dt" begin
+                         print_branch conf base True psn 1 x p;
+                       end;
                      end;
                    }
                | None -> print_branch conf base True psn 0 x p ]
@@ -372,7 +433,7 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
            })
         1 ancestors
     in
-    if len > 1 && br = None then Wserver.wprint "</dl>\n" else ();
+    if len > 1 && br = None then Wserver.wprint "</dt></dl>\n" else ();
     Wserver.wprint "</td></tr></table>\n";
     trailer conf;
   }
