@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.37 2001-09-02 19:09:05 ddr Exp $
+# $Id: lexicon.txt,v 4.38 2001-09-04 07:18:35 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -7381,8 +7381,10 @@ et: %t sugu on määratlemata
 fi: %t:n sukupuoli tuntematon
 fr: sexe ind&eacute;fini pour %t
 he:  äîéï ùì %t ìà îåâãø
+it: sesso indefinito per %t
 nl: onbepaald geslacht voor %t
 no: udefinert kjønn for %t
+pt: sexo indefinido para %t
 sv: odefinierat kön för %t
 
     unknown person
