@@ -1,11 +1,14 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 4.1 2001-03-26 11:51:38 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.2 2001-03-26 13:02:54 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
 cs: Genealogy
+ct: Genealogia
+de: Genealogie
+dk: Genealogi
 en: Genealogy
 fr: G&eacute;n&eacute;alogie
 se: Genealogi
@@ -27,6 +30,9 @@ height=108 src="%o/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 af: Genealogiese<br>databasis
 cn: ÍøÂç¼ÒÆ×
 cs: Genealogická databáze
+ct: Base de dades<br>geneal&ograve;gica
+de: Genealogische<br>Datenbank
+dk: Genealogisk<br>database
 en: Genealogical<br>data base
 fr: Base de donn&eacute;es<br>g&eacute;n&eacute;alogique
 se: Genealogisk<br>databas
@@ -41,6 +47,10 @@ se: Genealogisk<br>databas
 <font size=-1><em>[
 af: Taalvoorkeur/Language preference:
 cs: Zvolte jazyk pro prohlí¾ení databáze:
+ct: Podeu seleccionar una altre llengua, hi ha disponibles les seg&uuml;ents:
+de: Du kannst eine der folgenden Sprachen f&uuml;r die Anzeige ausw&auml;hlen:
+dk: Du kan v&aelig;lge fremstilling p&aring; et andet sprog blandt de
+    f&oslash;lgende:
 en: You can select another displaying language among the following ones:
 fr: Vous pouvez sélectionner une autre langue d'affichage
     parmi les suivantes:
@@ -57,6 +67,12 @@ se: Du kan välja ett annat språk bland de följande:
 af: Die databasis <font color=%i><b>"%t"</b></font> bevat tans %n persone.
 cn: ÏÖÓĞ %n ÈËÔÚÊı¾İ¿âÖĞ¡£
 cs: Databáze <font color=%i><b>"%t"</b></font> obsahuje %n osob.
+ct: La base de dades <font color=%i><b>"%t"</b></font> cont&eacute;
+    actualment %n persones.
+de: Die Datenbank <font color=%i><b>"%t"</b></font> enth&auml;lt z. Zt.
+    %n Personen.
+dk: Databasen <font color=%i><b>"%t"</b></font> indeholder for
+    &oslash;jeblikket %n personer.
 en: The data base <font color=%i><b>"%t"</b></font> now holds %n persons.
 fr: La base de donn&eacute;es <font color=%i><b>"%t"</b></font> contient
     actuellement %n personnes.
@@ -73,6 +89,9 @@ se: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
 <td align=center>[
 af: <a href="%sw=w"><em>Medewerkers</em></a> toegang<br> (password)
 cs: <a href="%sw=w">{<em>"Wizard"</em></a> pøístup<br> (heslo)
+ct: acc&eacute;s <a href="%sw=w"><em>administrador</em></a><br> (clau)
+de: <a href="%sw=w"><em>Wizard</em></a>-Zugang<br> (Passwort)
+dk: <a href="%sw=w"><em>Opdateringsadgang</em></a><br> (adgangskode)
 en: <a href="%sw=w"><em>Wizard</em></a> access<br> (password)
 fr: acc&egrave;s <a href="%sw=w"><em>sorcier</em></a><br> (mot de passe).
 se: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
@@ -81,6 +100,9 @@ se: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
 %INf<td align=center>[
 af: <a href="%sw=f"><em>Vriend</em></a> toegang<br> (password)
 cs: <a href="%sw=f">{<em>"Friend"</em></a> pøístup<br> (heslo)
+ct: acc&eacute;s <a href="%sw=f"><em>amic</em></a><br> (clau)
+de: <a href="%sw=f"><em>Freund</em></a>-Zugang<br> (Passwort)
+dk: <a href="%sw=f"><em>Betroet adgang</em></a><br> (adgangskode)
 en: <a href="%sw=f"><em>Friend</em></a> access<br> (password)
 fr: acc&egrave;s <a href="%sw=f"><em>ami</em></a><br> (mot de passe).
 se: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
@@ -92,6 +114,9 @@ se: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
 %h[
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
 cs: Heslo pro<em>"friend"</em> nebo <em>"wizard"</em> pøístup:</em>:
+ct: Clau, per acc&eacute;s <em>amic</em> o <em>administrador</em>:
+de: Passwort für <em>Freund</em>- oder <em>Wizard</em>-Zugang</em>:
+dk: Adgangskode, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
 en: Password, for <em>friend</em> or <em>wizard</em> access:
 fr: Mot de passe, pour acc&egrave;s <em>ami</em> ou <em>sorcier</em>:
 se: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
@@ -113,6 +138,9 @@ se: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
 cn: 
 cs: Databázi lze prohledávat:
+ct: Per navegar en aquesta base, podeu fer la vostra recerca:
+de: Zum Benutzen dieser Datenbank kannst du hier suchen:
+dk: For at navigere i denne database kan du søge:
 en: To navigate in this data base, you can do your search:
 fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez effectuer
        votre recherche:
@@ -129,6 +157,9 @@ se: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
 af: per persoon
 cn: ËÑË÷£º
 cs: Podle osob
+ct: per persona
+de: nach einer Person
+dk: personnavn
 en: by person
 fr: par personne
 se: efter person
@@ -156,6 +187,9 @@ se: efter person
 af: by title
 cn: ¸ù¾İÃûÏÎ
 cs: podle titulu
+ct: per títol
+de: nach einem Titel
+dk: titel (nob.)
 en: by title
 fr: par titre
 se: efter titel
@@ -179,6 +213,9 @@ se: efter titel
 af: <font color=%i><b>in die lys </b></font>van alle
 cn: ÏÔÊ¾ËùµÄ
 cs: <font color=%i><b>ze seznamu</b></font> v¹ech
+ct: <font color=%i><b>pel llistat</b></font> de tots els
+de: <font color=%i><b>in der Liste</b></font> aller
+dk: <font color=%i><b>i liste</b></font> over alle
 en: <font color=%i><b>by the list</b></font> of all
 fr: <font color=%i><b>par la liste</b></font> de tous les
 se: <font color=%i><b>efter listan</b></font> av alla
@@ -188,6 +225,9 @@ se: <font color=%i><b>efter listan</b></font> av alla
 af: vanne
 cn: ĞÕ
 cs: pøíjmení
+ct: cognoms
+de: Nachnamen
+dk: efternavne
 en: surnames
 fr: patronymes
 se: efternamn
@@ -196,6 +236,9 @@ se: efternamn
 af: voorname
 cn: Ãû 
 cs: køestní jméno
+ct: noms
+de: Vornamen
+dk: fornavne
 en: first names
 fr: pr&eacute;noms
 se: f&ouml;rnamn
@@ -205,6 +248,9 @@ se: f&ouml;rnamn
 af: volgens
 cn: ¸ù¾İ
 cs: seøazená podle
+ct: per
+de: 
+dk: sorteret efter
 en: by
 fr: par
 se: sorterade i
@@ -214,6 +260,9 @@ se: sorterade i
 af: alfabeties volgorde
 cn: ×ÖÄ¸Ğò
 cs: abecedy
+ct: ordre alfab&egrave;tic
+de: alphabetisch sortiert
+dk: alfabetisk orden
 en: alphabetic order
 fr: ordre alphab&eacute;tique
 se: bokstavsordning
@@ -222,6 +271,9 @@ se: bokstavsordning
 af: frekwensie
 cn: ·ÃÎÊ´ÎÊı
 cs: èetnosti
+ct: freq&uuml&egrave;ncia
+de: nach H&auml;ufigkeit
+dk: hyppighed
 en: frequency
 fr: fr&eacute;quence
 se: frekvensordning
@@ -237,6 +289,9 @@ se: frekvensordning
 <font color=%i><b>[
 af: by
 cs: podle
+ct: per
+de: mit
+dk: ved
 en: by
 fr: par
 se: efter
@@ -256,6 +311,15 @@ af: <font color=%i><b>deur 'n</b></font>
 cs: <font color=%i><b>lze také zadat</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>roz¹íøenı
        dotaz</b></font></a>.
+ct: <font color=%i><b>per la</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>consulta
+       avançada</b></font></a>.
+de: <font color=%i><b>mit der</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>erweiterten
+       Suche</b></font></a>.
+dk: <font color=%i><b>ved</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>avanceret
+       søgning</b></font></a>.
 en: <font color=%i><b>by the</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>advanced
        request</b></font></a>.
@@ -275,6 +339,9 @@ se: <font color=%i><b>genom</b></font>
 af: Jy kan
 cn: 
 cs: Zde mù¾ete
+ct: Podeu
+de: Du kannst
+dk: Du kan:
 en: You can
 fr: Vous pouvez
 se: Du kan
@@ -288,6 +355,9 @@ se: Du kan
 af: 'n familie byvoeg
 cn: Ôö¼Ó¼ÒÍ¥¼ÇÂ¼
 cs: pøidat novou rodinu
+ct: afegir una fam&iacute;lia
+de: eine Familie hinzuf&uuml;gen
+dk: tilføje en familie
 en: add a family
 fr: ajouter une famille
 se: l&auml;gga till en familj
@@ -299,6 +369,9 @@ se: l&auml;gga till en familj
 %E<li><a href="%sm=MOD_NOTES">[
 af: die notas wysig
 cs: upravit poznámky
+ct: modificar les notes
+de: die Notizen &auml;ndern
+dk: ændre noterne
 en: modify the notes
 fr: modifier les notes
 se: &auml;ndra noteringar
@@ -315,6 +388,9 @@ se: &auml;ndra noteringar
 af: Jy kan ook kyk na
 cn: 
 cs: Lze také zobrazit
+ct: Tamb&eacute; podeu consultar
+de: Du kannst zugreifen auf
+dk: Du kan også fremkalde:
 en: You can also consult
 fr: Vous pouvez également consulter
 se: Du kan ocks&aring; konsultera
@@ -347,6 +423,10 @@ se: Du kan ocks&aring; konsultera
 af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
 cn: ÒÑ¾­ÓĞ %q ´Î·ÃÎÊÊı¾İ¿â£¬ÆäÖĞ %c ´Î·ÃÎÊ±¾Ö÷Ò³£¬ ×Ô´Ó %d¡£
 cs: %q pøístupù, z toho %c na tuto stránku, od %d.
+ct: Hi ha hagut %q consultes, de les quals %c en aquesta p&agrave;gina, des
+    del %d.
+de: Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.
+dk: Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
 en: There have been %q accesses, %c of them to this page, since %d.
 fr: Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 se: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
@@ -360,6 +440,16 @@ se: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
 cs: Pokud Vá¹ prohlí¾eè neprovádí automaticky obnovu upravenıch stránek
     (musíte pou¾ívat tlaèítko "obnovit"), zkuste prohlí¾ení pøes <a
     href="%sescache=0">tento odkaz</a>.
+ct: Si el vostre navegador no actualitza autom&agrave;ticament les
+    p&agrave;gines modificades (obligant-vos a fer actualitzar manualment
+    la p&agrave;gina), proveu de navegar des d'<a href="%sescache=0">aquest
+    altre lloc</a>.
+de: Wenn die ge&auml;nderten Seiten nicht automatisch aktualisiert werden
+    (man mu&szlig; st&auml;ndig im Browser auf "Neu laden" klicken), 
+    bitte <a href="%sescache=0">hier</a> klicken.
+dk: Hvis din browser ikke automatisk opdaterer &aelig;ndrede sider
+    (n&oslash;dvendigg&oslash;r genindl&aelig;sning af det aktuelle
+    dokument), pr&oslash;v da at navigere <a href="%sescache=0">herfra</a>.
 en: If your browser does not automatically update the modified pages (forcing
     you to do "reload current document"), try navigating from <a
     href="%sescache=0">this link</a>.
@@ -381,6 +471,9 @@ se: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
 af: lexicon
 cn: ±¾Õ¾Ê¹ÓÃµÄÊõÓï
 cs: lexikon
+ct: L&egrave;xic
+de: Lexikon
+dk: leksikon
 en: lexicon
 fr: lexique
 se: lexikon
