@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.27 2001-05-08 02:23:30 ddr Exp $
+# $Id: lexicon.txt,v 4.28 2001-07-14 09:05:20 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -7371,6 +7371,10 @@ pl: stryjowie lub wujowie oraz ciotki
 pt: tios e tias
 ru: дяди и тети
 sv: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
+
+    undefined sex for %t
+en: undefined sex for %t
+fr: sexe ind&eacute;fini pour %t
 
     unknown person
 af: onbekende persoon
