@@ -1,15 +1,15 @@
-# $Id: Makefile.Mac,v 1.2 2000-04-16 15:43:49 ddr Exp $
+# $Id: Makefile.Mac,v 1.3 2000-05-03 08:19:48 ddr Exp $
 
 CAMLP4_COMM = ::tools:camlp4_comm.mpw pa_ifdef.cmo pa_ru.cmo
 CAMLP4F = -DMAC
-CAMLP4D = `camlp4 -where`
-LIBUNIX = -cclib -lunix
+CAMLP4D = "``camlp4 -where``"
+LIBUNIX =
 OCAMLC = ocamlc
 OCAMLI =
 OCAMLD =
 RM = delete -y
 
-all ÄÄ
+all Ä out
 
 clean ÄÄ
     {RM} Å.out Å.opt Å.cm[oixa] Å.cmxa Å.pp[oi] Å.o Å.a Å.obj Å.lib Å.lck Å.bak Å~ .#Å
@@ -27,17 +27,15 @@ clean ÄÄ
 OCAMLI = -I ::src
 OBJS = ::src:argl.cmo ::src:adef.cmo ::src:iovalue.cmo ::src:name.cmo ::src:ansel.cmo ::src:gutil.cmo ::src:btree.cmo ::src:buff.cmo ::src:iobase.cmo ::src:calendar.cmo ged2gwb.cmo
 
-all ÄÄ out
-
 out ÄÄ ged2gwb.out
-    delete -y ged2gwb
-    rename ged2gwb.out ged2gwb
+    delete -i ged2gwb
+    duplicate -y ged2gwb.out ged2gwb
 
 clean ÄÄ
     delete -y ged2gwb
 
 ged2gwb.out Ä {OBJS}
-    {OCAMLC} -custom {OCAMLD} unix.cma {LIBUNIX} {CAMLP4D}:gramlib.cma {OBJS} -o ged2gwb.out
+    ocamlmkappli {OCAMLD} unix.cma {CAMLP4D}gramlib.cma {OBJS} -name ged2gwb.out
 
 depend Ä
     ::tools:camlp4_depend.mpw {OCAMLI} Å.mlÅ > Makefile.Mac.depend
