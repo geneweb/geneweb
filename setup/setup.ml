@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.34 1999-07-17 20:30:50 ddr Exp $ *)
+(* $Id: setup.ml,v 1.35 1999-07-18 22:56:45 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -743,7 +743,7 @@ value recover_2 conf =
      else rc
   in
   do if rc = 1 then print_file conf "warnings.htm"
-     else if rc > 1 then print_file conf "err_reco.htm"
+     else if rc > 1 then do Sys.chdir dir; return print_file conf "err_reco.htm"
      else print_file conf "bso_ok.htm";
   return ()
 ;
