@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.68 2000-12-27 10:50:40 ddr Exp $ *)
+(* $Id: perso.ml,v 3.69 2000-12-27 16:03:13 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1034,7 +1034,8 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
            Some (Dgreg ({prec = Sure | About | Maybe} as d2) _),
            approx) when d1 <> d2 ->
             let a = temps_ecoule d1 d2 in
-            not (a.year < 0 || a.year = 0 && a.month = 0)
+            a.year > 0 ||
+            a.year = 0 && (a.month > 0 || a.month = 0 && (a.day > 0))
         | _ -> False ]
       else False
   | "has_aliases" -> p.aliases <> []
