@@ -2,6 +2,9 @@ GeneWeb version 3.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [16 Nov 00] Fixed bug: in languages with declinations (e.g. German)
+    some declinations structures sometimes incorrectly remained in the
+    displayed text (e.g. "xx ist ein:d:+em Cousin")
   - [11 Nov 00] When updating, display now a warning in case when the
     person has a sex inconsistent with his/her "relation" (e.g. woman
     being godfather or man being godmother). Can now change a wrong or
