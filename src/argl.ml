@@ -1,4 +1,4 @@
-(* $Id: argl.ml,v 4.4 2002-11-30 06:18:47 ddr Exp $ *)
+(* $Id: argl.ml,v 4.5 2002-11-30 06:20:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Printf;
@@ -24,16 +24,16 @@ value action_arg s sl =
       else
         try do { f (int_of_string s); Some sl } with
         [ Failure "int_of_string" -> None ]
+  | Arg.Float f ->
+      if s = "" then
+        match sl with
+        [ [s :: sl] -> do { f (float_of_string s); Some sl }
+        | [] -> None ]
+      else do { f (float_of_string s); Some sl }
   | x ->
       ifdef OCAML_307 then
         match x with
         [ Arg.Unit f -> if s = "" then do { f (); Some sl } else None
-        | Arg.Float f ->
-            if s = "" then
-              match sl with
-              [ [s :: sl] -> do { f (float_of_string s); Some sl }
-              | [] -> None ]
-            else do { f (float_of_string s); Some sl }
         | Arg.Set_string r ->
             if s = "" then
               match sl with
