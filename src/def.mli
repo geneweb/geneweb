@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 4.3 2002-01-30 11:49:47 ddr Exp $ *)
+(* $Id: def.mli,v 4.4 2002-09-23 15:49:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -68,6 +68,17 @@ type gen_relation 'person 'string =
 ;
 
 type sex = [ Male | Female | Neuter ];
+
+(* The types "gen_person" and "gen_family" can be extended preserving
+   backward compatibility if:
+      1/ the extensions take place at the end of the record type
+      2/ the types of the new fields are implemented by "int" (e.g. "int",
+         "bool", "istr"), or by a sum type having at least a constructor
+         without parameter (e.g. the type "option" which has "None", the
+         type "list" has "[]"); does not work with arrays and strings!
+   If these conditions are respected, old databases can be read with
+   new version of this "def.mli"; the values of the missing fields have
+   the value implemented as "0" (0, False, None, [], and so on). *)
 
 (* person *)
 
