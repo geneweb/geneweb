@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 1.6 1998-11-03 13:30:54 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.7 1998-11-04 13:52:31 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -234,6 +234,15 @@ value ged_psource base oc per =
   | s -> Printf.fprintf oc "1 SOUR %s\n" s ]
 ;
 
+value ged_multimedia_link base oc per =
+  match sou base per.photo with
+  [ "" -> ()
+  | s ->
+      do Printf.fprintf oc "1 OBJE\n";
+         Printf.fprintf oc "2 FILE %s\n" s;
+      return () ]
+;
+
 value br = "<br>";
 
 value rec display_note oc s i =
@@ -328,6 +337,7 @@ value ged_ind_record base sel oc i =
        ged_famc base sel oc asc;
        Array.iter (ged_fams base sel oc) per.family;
        ged_psource base oc per;
+       ged_multimedia_link base oc per;
        ged_note base oc per;
     return ()
   else ()

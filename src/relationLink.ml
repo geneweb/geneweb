@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.1.1.1 1998-09-01 14:32:11 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.2 1998-11-04 13:52:33 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -293,13 +293,17 @@ value print_prev_next conf base ip sp i1 i2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
       tag "td" begin
         Wserver.wprint "<br>\n";
         match pb1 with
-        [ Some b1 -> print_sign conf "&lt;&lt;" ip sp i1 i2 b1 b2 (c1 - 1) c2
+        [ Some b1 ->
+            let sign = "&lt;&lt;" in
+            print_sign conf sign ip sp i1 i2 b1 b2 (c1 - 1) c2
         | _ -> () ];
         match (pb1, nb1) with
         [ (None, None) -> ()
         | _ -> Wserver.wprint "<font size=-1>%d</font>\n" c1 ];
         match nb1 with
-        [ Some b1 -> print_sign conf "&gt;&gt;" ip sp i1 i2 b1 b2 (c1 + 1) c2
+        [ Some b1 ->
+            let sign = "&gt;&gt;" in
+            print_sign conf sign ip sp i1 i2 b1 b2 (c1 + 1) c2
         | _ -> () ];
       end
     else ();
@@ -307,13 +311,17 @@ value print_prev_next conf base ip sp i1 i2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
       tag "td" begin
         Wserver.wprint "<br>\n";
         match pb2 with
-        [ Some b2 -> print_sign conf "&lt;&lt;" ip sp i1 i2 b1 b2 c1 (c2 - 1)
+        [ Some b2 ->
+            let sign = "&lt;&lt;" in
+            print_sign conf sign ip sp i1 i2 b1 b2 c1 (c2 - 1)
         | _ -> () ];
         match (pb2, nb2) with
         [ (None, None) -> ()
         | _ -> Wserver.wprint "<font size=-1>%d</font>\n" c2 ];
         match nb2 with
-        [ Some b2 -> print_sign conf "&gt;&gt;" ip sp i1 i2 b1 b2 c1 (c2 + 1)
+        [ Some b2 ->
+            let sign = "&gt;&gt;" in
+            print_sign conf sign ip sp i1 i2 b1 b2 c1 (c2 + 1)
         | _ -> () ];
       end
     else ();

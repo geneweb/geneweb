@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.10 1998-11-03 13:30:53 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.11 1998-11-04 13:52:30 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -698,6 +698,14 @@ value add_indi gen r =
     | Some {rval = "F"} -> Feminin
     | _ -> Neutre ]
   in
+  let photo =
+    match find_field "OBJE" r.rsons with
+    [ Some r ->
+        match find_field "FILE" r.rsons with
+        [ Some r -> r.rval
+        | None -> "" ]
+    | None -> "" ]
+  in
   let parents =
     match find_field "FAMC" r.rsons with
     [ Some r -> Some (fam_index gen r.rval)
@@ -865,7 +873,7 @@ value add_indi gen r =
      surname = add_string gen surname;
      occ = occ;
      public_name = add_string gen public_name;
-     photo = empty;
+     photo = add_string gen photo;
      nick_names = if nick_name <> "" then [add_string gen nick_name] else [];
      aliases = [];
      first_names_aliases =

@@ -2,8 +2,15 @@ GeneWeb Version 1.09
 --------------------
 
 * ged2gwb, gwb2ged:
-  - Write and read the fields "public name" and "surname alias" into "2 GIVN"
-    and "2 SURN", respectively.
+  - Added save and restore of the GeneWeb fields
+       public name
+       surname alias
+       photo
+    into the Gedcom fields, resp.
+       2 GIVN ...
+       2 SURN ...
+       1 OBJE
+         2 FILE ...
 
 GeneWeb Version 1.08
 --------------------

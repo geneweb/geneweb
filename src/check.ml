@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 1.1.1.1 1998-09-01 14:32:04 ddr Exp $ *)
+(* $Id: check.ml,v 1.2 1998-11-04 13:52:32 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -35,73 +35,73 @@ value glop x =
 value print_base_error base =
   fun
   [ AlreadyDefined p ->
-      Printf.eprintf "%s\nis defined several times\n" (denomination base p)
+      Printf.printf "%s\nis defined several times\n" (denomination base p)
   | OwnAncestor p ->
-      Printf.eprintf "%s\nis his/her own ancestor\n" (denomination base p)
+      Printf.printf "%s\nis his/her own ancestor\n" (denomination base p)
   | BadSexOfMarriedPerson p ->
-      Printf.eprintf "%s\n  bad sex (this error should not have occurred)\n"
+      Printf.printf "%s\n  bad sex (this error should not have occurred)\n"
         (denomination base p) ]
 ;
 
 value print_base_warning base =
   fun
   [ BirthAfterDeath p ->
-      Printf.eprintf "%s\n  born after his/her death\n" (denomination base p)
+      Printf.printf "%s\n  born after his/her death\n" (denomination base p)
   | ChangedOrderOfChildren fam _ ->
       let cpl = coi base fam.fam_index in
-      Printf.eprintf "changed order of children of %s and %s\n"
+      Printf.printf "changed order of children of %s and %s\n"
         (denomination base (poi base cpl.father))
         (denomination base (poi base cpl.mother))
   | ChildrenNotInOrder fam elder x ->
       let cpl = coi base fam.fam_index in
-      do Printf.eprintf
+      do Printf.printf
            "the following children of\n  %s\nand\n  %s\nare not in order:\n"
            (denomination base (poi base cpl.father))
            (denomination base (poi base cpl.mother));
-         Printf.eprintf "- %s\n" (denomination base elder);
-         Printf.eprintf "- %s\n" (denomination base x);
+         Printf.printf "- %s\n" (denomination base elder);
+         Printf.printf "- %s\n" (denomination base x);
       return ()
   | DeadTooEarlyToBeFather father child ->
-      do Printf.eprintf "%s\n" (denomination base child);
-         Printf.eprintf
+      do Printf.printf "%s\n" (denomination base child);
+         Printf.printf
            "  is born more than 2 years after the death of his/her father\n";
-         Printf.eprintf "%s\n" (denomination base father);
+         Printf.printf "%s\n" (denomination base father);
       return ()
   | MarriageDateAfterDeath p ->
-      do Printf.eprintf "%s\n" (denomination base p);
-         Printf.eprintf "married after his/her death\n";
+      do Printf.printf "%s\n" (denomination base p);
+         Printf.printf "married after his/her death\n";
       return ()
   | MarriageDateBeforeBirth p ->
-      do Printf.eprintf "%s\n" (denomination base p);
-         Printf.eprintf "married before his/her birth\n";
+      do Printf.printf "%s\n" (denomination base p);
+         Printf.printf "married before his/her birth\n";
       return ()
   | MotherDeadAfterChildBirth mother child ->
-      Printf.eprintf "%s\n  is born after the death of his/her mother\n%s\n"
+      Printf.printf "%s\n  is born after the death of his/her mother\n%s\n"
         (denomination base child) (denomination base mother)
   | ParentBornAfterChild parent child ->
-      Printf.eprintf "%s born after his/her child %s\n"
+      Printf.printf "%s born after his/her child %s\n"
         (denomination base parent) (denomination base child)
   | ParentTooYoung p a ->
-      Printf.eprintf "%s was parent at age of %d\n" (denomination base p)
+      Printf.printf "%s was parent at age of %d\n" (denomination base p)
         (annee a)
   | TitleDatesError p t ->
-      do Printf.eprintf "%s\n" (denomination base p);
-         Printf.eprintf "has incorrect title dates as:\n";
-         Printf.eprintf "  %s %s\n" (sou base t.t_title) (sou base t.t_place);
+      do Printf.printf "%s\n" (denomination base p);
+         Printf.printf "has incorrect title dates as:\n";
+         Printf.printf "  %s %s\n" (sou base t.t_title) (sou base t.t_place);
       return ()
   | YoungForMarriage p a ->
-      Printf.eprintf "%s married at age %d\n" (denomination base p) (annee a) ]
+      Printf.printf "%s married at age %d\n" (denomination base p) (annee a) ]
 ;      
 
 value set_error base gen x =
-  do Printf.eprintf "\nError: ";
+  do Printf.printf "\nError: ";
      print_base_error base x;
      error gen;
   return ()
 ;
 
 value set_warning base x =
-  do Printf.eprintf "\nWarning: ";
+  do Printf.printf "\nWarning: ";
      print_base_warning base x;
   return ()
 ;
@@ -207,14 +207,14 @@ value check_base base gen pr_stats =
      for i = 0 to base.persons.len - 1 do
        let p = base.persons.get i in
        do if not gen.g_def.(i) then
-            Printf.eprintf "Undefined: %s%s %s\n"
+            Printf.printf "Undefined: %s%s %s\n"
               (sou base p.first_name)
               (if p.occ == 0 then "" else "." ^ string_of_int p.occ)
               (glop (sou base p.surname))
           else ();
           if pr_stats then update_stats base current_year s p else ();
        return ();
-       flush stderr;
+       flush stdout;
      done;
      if pr_stats then
        do Printf.printf "\n";
