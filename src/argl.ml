@@ -1,4 +1,4 @@
-(* $Id: argl.ml,v 1.5 1999-02-02 10:23:58 ddr Exp $ *)
+(* $Id: argl.ml,v 1.6 1999-02-19 16:54:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value action_arg s sl =
@@ -6,9 +6,7 @@ value action_arg s sl =
   [ Arg.Unit f -> if s = "" then do f (); return Some sl else None
   | Arg.Set r -> if s = "" then do r.val := True; return Some sl else None
   | Arg.Clear r -> if s = "" then do r.val := False; return Some sl else None
-(**)
   | Arg.Rest f -> do List.iter f [s :: sl]; return Some []
-(**)
   | Arg.String f ->
       if s = "" then
         match sl with
@@ -59,10 +57,13 @@ value rec parse_aux spec_list anon_fun =
         match parse_arg s sl spec_list with
         [ Some sl -> parse_aux spec_list anon_fun sl
         | None -> [s :: parse_aux spec_list anon_fun sl] ]
-      else do anon_fun s; return parse_aux spec_list anon_fun sl ]
+      else do (anon_fun s : unit); return parse_aux spec_list anon_fun sl ]
 ;
 
 value parse_arg_list spec_list anon_fun remaining_args =
+  let spec_list =
+    Sort.list (fun (k1, _, _) (k2, _, _) -> k1 >= k2) spec_list
+  in
   try parse_aux spec_list anon_fun remaining_args with
   [ Arg.Bad s ->
       do Printf.eprintf "Error: %s\n" s;

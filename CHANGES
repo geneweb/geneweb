@@ -22,7 +22,7 @@ included.
     standard Gedcom 5.5. Interpreted as day/month/year.
 
 * GeneWeb compiler (gwc)
-  - [Feb 8, 99] The option "-cg" did not work. Fixed.
+  - [Feb 19, 99] The option "-cg" did not work. Fixed.
 
 * GeneWeb uncompiler (gwu)
   - [Feb 16, 99] Fixed bug: names holding "?" were sometimes not saved
