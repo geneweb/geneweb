@@ -12,8 +12,6 @@ GeneWeb Version 4.06
     version 4.04 (two versions before) is then just the reading of the
     browser answer: this was because it was not read that the browser
     was unhappy.
-  - [05 Mar 02] Fixed bug in perso.txt: <li> item of type "disc" were
-    wrongly written "disk".
 
 GeneWeb Version 4.05
 --------------------

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.73 2002-03-05 16:16:23 ddr Exp $
+# $Id: lexicon.txt,v 4.74 2002-03-06 08:39:51 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7553,6 +7553,7 @@ ru: используйте "связать" вместо "создать"
 sv: anv&auml;nd "l&auml;nk" ist&auml;llet f&ouml;r "skapa"
 
     user/password/cancel
+da: bruger/adgangskode/annuller
 en: user/password/cancel
 fr: utilisateur/mot de passe/annuler
 pl: uїytkownik/hasіo/anuluj
