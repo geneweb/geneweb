@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.1 1999-12-01 05:53:16 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.2 1999-12-01 19:15:59 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -54,7 +54,7 @@ value get_dag conf base =
     Array.map
       (fun ip ->
 (*
-do Printf.eprintf "\n*** %s\n" (denomination base (poi base ip)); flush stderr; return
+do Printf.eprintf "\no %s\n" (denomination base (poi base ip)); flush stderr; return
 *)
          let pare =
            match (aoi base ip).parents with
@@ -489,10 +489,8 @@ value group_children t =
 ;
 
 value group_span_by_common_children d t =
-  let module O = struct type t = idag; value compare = compare; end
-  in
-  let module S = Set.Make O
-  in
+  let module O = struct type t = idag; value compare = compare; end in
+  let module S = Set.Make O in
   let i = Array.length t.table - 1 in
   let line = t.table.(i) in
   let rec loop j cs =
@@ -519,7 +517,17 @@ value find_same_parents t i j1 j2 j3 j4 =
       let x2 = t.(i - 1).(j2) in
       let x3 = t.(i - 1).(j3) in
       let x4 = t.(i - 1).(j4) in
-      if x1 = x4 then (i, j1, j2, j3, j4)
+      let ended =
+        if x1.span = x4.span then
+          loop j1 where rec loop j =
+            if j > j4 then True
+            else
+              match t.(i-1).(j).elem with
+              [ Elem _ -> loop (j + 1)
+              | _ -> False ]
+        else False
+      in
+      if ended then (i, j1, j2, j3, j4)
       else
         let j1 =
           loop (j1 - 1) where rec loop j =
@@ -550,7 +558,7 @@ value find_same_parents t i j1 j2 j3 j4 =
 
 value find_linked_children t i j1 j2 j3 j4 =
   loop i j1 j2 j3 j4 where rec loop i j1 j2 j3 j4 =
-    if i = Array.length t then (j1, j2, j3, j4)
+    if i = Array.length t - 1 then (j1, j2, j3, j4)
     else
       let x1 = t.(i).(j1) in
       let x2 = t.(i).(j2) in
@@ -577,7 +585,7 @@ value find_linked_children t i j1 j2 j3 j4 =
       let j4 =
         loop (j4 + 1) where rec loop j =
           if j >= Array.length t.(i) then j - 1
-          else if t.(i).(j).span = x2.span then loop (j + 1)
+          else if t.(i).(j).span = x4.span then loop (j + 1)
           else j - 1
       in
       loop (i + 1) j1 j2 j3 j4
@@ -592,6 +600,23 @@ value exch_blocks t i1 i2 j1 j2 j3 j4 =
        return ();
      done;
   return ()
+;
+
+value find_block_with_parents t i jj1 jj2 jj3 jj4 =
+  loop i jj1 jj2 jj3 jj4 where rec loop ii jj1 jj2 jj3 jj4 =
+    let (nii, njj1, njj2, njj3, njj4) =
+      find_same_parents t i jj1 jj2 jj3 jj4
+    in
+    if nii <> ii || njj1 <> jj1 || njj2 <> jj2 || njj3 <> jj3 || njj4 <> jj4
+    then
+      let nii = min ii nii in
+      let (jj1, jj2, jj3, jj4) =
+        find_linked_children t nii njj1 njj2 njj3 njj4
+      in
+      if njj1 <> jj1 || njj2 <> jj2 || njj3 <> jj3 || njj4 <> jj4 then
+        loop nii jj1 jj2 jj3 jj4
+      else (nii, jj1, jj2, jj3, jj4)
+    else (ii, jj1, jj2, jj3, jj4)
 ;
 
 value push_to_right d t i j1 j2 =
@@ -619,8 +644,9 @@ value push_to_right d t i j1 j2 =
         in
         same_value (j + 1)
       in
-      let (ii, jj1, jj2, jj3, jj4) = find_same_parents t i jj1 jj2 jj3 jj4 in
-      let (jj1, jj2, jj3, jj4) = find_linked_children t ii jj1 jj2 jj3 jj4 in
+      let (ii, jj1, jj2, jj3, jj4) =
+        find_block_with_parents t i jj1 jj2 jj3 jj4
+      in
       if jj4 < j2 && jj2 < jj3 then
         do exch_blocks t ii i jj1 jj2 jj3 jj4; return loop (jj4 + 1)
       else j1
@@ -653,8 +679,9 @@ value push_to_left d t i j1 j2 =
         in
         same_value (j + 2)
       in
-      let (ii, jj1, jj2, jj3, jj4) = find_same_parents t i jj1 jj2 jj3 jj4 in
-      let (jj1, jj2, jj3, jj4) = find_linked_children t ii jj1 jj2 jj3 jj4 in
+      let (ii, jj1, jj2, jj3, jj4) =
+        find_block_with_parents t i jj1 jj2 jj3 jj4
+      in
       if jj1 > j1 && jj2 < jj3 then
         do exch_blocks t ii i jj1 jj2 jj3 jj4; return loop (jj1 - 1)
       else j2
@@ -663,7 +690,6 @@ value push_to_left d t i j1 j2 =
 ;
 
 value fill_gap d t i j1 j2 =
-  let line = t.table.(i) in
   let t1 =
     let t1 = Array.copy t.table in
     do for i = 0 to Array.length t.table - 1 do
@@ -678,7 +704,7 @@ value fill_gap d t i j1 j2 =
   let j1 = push_to_right d t1 i j1 j2 in
   let j2 = push_to_left d t1 i j1 j2 in
   if j1 = j2 - 1 then
-    let line = t1.(i) in
+    let line = t1.(i-1) in
     let x = line.(j1).span in
     let y = line.(j2).span in
     do let rec loop j =
@@ -716,7 +742,7 @@ value treat_gaps d t =
             loop1 t (j - 2)
       | _ -> loop t (j + 1) ]
   in
-  loop t 2
+  if Array.length t.table.(i) = 1 then t else loop t 2
 ;
 
 value table_of_dag d =
@@ -814,7 +840,7 @@ value print_char_table d t =
   let print_elem =
     fun
     [ Elem e -> eprintf " %c" (d.dag.(int_of_idag e).valu)
-    | Ghost _ -> eprintf " |"
+    | Ghost e -> eprintf " |" (*d.dag.(int_of_idag e).valu*)
     | Nothing -> eprintf "  " ]
   in
 (*
@@ -846,7 +872,9 @@ value print conf base =
        Wserver.wprint "%s" (Date.short_dates_text conf base p);
     return ()
   in
+(*
 do let d = tag_dag d in print_char_table d (table_of_dag d); flush stderr; return
+*)
   do Util.header_no_page_title conf title;
      print_html_table conf base print_indi False d t;
      Util.trailer conf;

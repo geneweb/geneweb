@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.8 1999-11-28 03:06:42 ddr Exp $ *)
+(* $Id: relation.ml,v 3.9 1999-12-01 19:16:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -896,7 +896,32 @@ value print_solution conf base long n p1 p2 (pp1, pp2, (x1, x2, list)) =
   return ()
 ;
 
-value print_propose_upto conf base p1 p2 rl =
+open RelationLink;
+
+value print_list_for_dag conf base maxlen a p rl =
+  let dist = make_dist_tab conf base a.cle_index maxlen in
+  let _ = List.fold_left
+    (fun cnt (_, _, (x1, x2, _)) ->
+       let x = max x1 x2 in
+       let b = find_first_branch base dist a.cle_index x p.cle_index Neuter in
+       let cnt =
+         loop cnt b
+         where rec loop cnt =
+           fun
+           [ Some b ->
+               let s = Util.sosa_of_branch [(a.cle_index, a.sex) :: b] in
+               do Wserver.wprint ";i%d=%d;s%d=%s" cnt
+                    (Adef.int_of_iper p.cle_index) cnt (Num.to_string s);
+               return
+               let b = find_next_branch base dist a.cle_index a.sex b in
+               loop (cnt + 1) b
+           | None ->  cnt ]
+       in cnt)
+    1 rl
+  in ()
+;
+
+value print_propose_upto conf base total p1 p2 rl =
   match rl with
   [ [(None, None, (x1, x2, _)) :: _] when x1 == 0 || x2 == 0 ->
       let maxlen =
@@ -913,8 +938,16 @@ value print_propose_upto conf base p1 p2 rl =
          Wserver.wprint ":\n<em>%s\n" (transl conf "click");
          Wserver.wprint "<a href=\"%sm=A;t=D;%s;%s;l=%d\">" (commd conf)
            (acces conf base p) (acces_n conf base "1" a) maxlen;
-         Wserver.wprint "%s</a>." (transl conf "here");
-         Wserver.wprint "</em></font>\n";
+         Wserver.wprint "%s</a>" (transl conf "here");
+         if Num.gt total Num.one && Num.gt (Num.of_int 33) total then
+           do Wserver.wprint " %s\n" (transl conf "or");
+              Wserver.wprint "<a href=\"%sm=DAG" (commd conf);
+              print_list_for_dag conf base maxlen a p rl;
+              Wserver.wprint "\">%s</a> (%s)" (transl conf "here")
+                (transl conf "tree");
+           return ()
+         else ();
+         Wserver.wprint ".</em></font>\n";
       return ()
   | _ -> () ]
 ;
@@ -1062,8 +1095,6 @@ value compute_relationship conf base by_marr p1 p2 =
     if sl = [] then None else Some (sl, total, rel)
 ;
 
-open RelationLink;
-
 value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
   let ip = a.cle_index in
   let sp1 = match pp1 with [ Some _ -> Some p1 | _ -> None ] in
@@ -1160,7 +1191,7 @@ value print_main_relationship conf base long p1 p2 rel =
                  html_p conf;
               return ()
             else ();
-            print_propose_upto conf base p1 p2 rl;
+            print_propose_upto conf base total p1 p2 rl;
          return () ];
      trailer conf;
   return ()
