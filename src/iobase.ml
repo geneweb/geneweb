@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 3.2 2000-01-10 02:14:39 ddr Exp $ *)
+(* $Id: iobase.ml,v 3.3 2000-03-22 04:14:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -925,153 +925,155 @@ value gen_output no_patches bname base =
     let epos = output_array_access oc_acc arr bpos in
     if epos <> pos_out oc then count_error epos (pos_out oc) else ()
   in
-  try
-    do output_string oc magic_gwb;
-       output_binary_int oc base.data.persons.len;
-       output_binary_int oc base.data.families.len;
-       output_binary_int oc base.data.strings.len;
-    return
-    let array_start_indexes = pos_out oc in
-    do output_binary_int oc 0;
-       output_binary_int oc 0;
-       output_binary_int oc 0;
-       output_binary_int oc 0;
-       output_binary_int oc 0;
-       output_binary_int oc 0;
-       output_binary_int oc 0;
-       output_value_no_sharing oc base.data.bnotes.norigin_file;
-    return
-    let persons_array_pos = pos_out oc in
-    do if not no_patches then output_array (base.data.persons.array ())
-       else just_copy bname "persons" oc oc_acc;
-    return
-    let ascends_array_pos = pos_out oc in
-    do if not no_patches then ()
-       else do Printf.eprintf "*** saving ascends\n"; flush stderr; return ();
-       output_array (base.data.ascends.array ());
-    return
-    let unions_array_pos = pos_out oc in
-    do if not no_patches then output_array (base.data.unions.array ())
-       else just_copy bname "unions" oc oc_acc;
-    return
-    let families_array_pos = pos_out oc in
-    do if not no_patches then output_array (base.data.families.array ())
-       else just_copy bname "families" oc oc_acc;
-    return
-    let couples_array_pos = pos_out oc in
-    do if not no_patches then output_array (base.data.couples.array ())
-       else just_copy bname "couples" oc oc_acc;
-    return
-    let descends_array_pos = pos_out oc in
-    do if not no_patches then output_array (base.data.descends.array ())
-       else just_copy bname "descends" oc oc_acc;
-    return
-    let strings_array_pos = pos_out oc in
-    do if not no_patches then output_array (base.data.strings.array ())
-       else just_copy bname "strings" oc oc_acc;
-    return
-    do seek_out oc array_start_indexes;
-       output_binary_int oc persons_array_pos;
-       output_binary_int oc ascends_array_pos;
-       output_binary_int oc unions_array_pos;
-       output_binary_int oc families_array_pos;
-       output_binary_int oc couples_array_pos;
-       output_binary_int oc descends_array_pos;
-       output_binary_int oc strings_array_pos;
-       base.data.families.clear_array ();
-       base.data.descends.clear_array ();
-       close_out oc;
-       close_out oc_acc;
-       if not no_patches then
-         let oc_inx = open_out_bin tmp_fname_inx in
-         let oc2 = open_out_bin tmp_fname_gw2 in
-         try
+  do try
+       do output_string oc magic_gwb;
+          output_binary_int oc base.data.persons.len;
+          output_binary_int oc base.data.families.len;
+          output_binary_int oc base.data.strings.len;
+       return
+       let array_start_indexes = pos_out oc in
+       do output_binary_int oc 0;
+          output_binary_int oc 0;
+          output_binary_int oc 0;
+          output_binary_int oc 0;
+          output_binary_int oc 0;
+          output_binary_int oc 0;
+          output_binary_int oc 0;
+          output_value_no_sharing oc base.data.bnotes.norigin_file;
+       return
+       let persons_array_pos = pos_out oc in
+       do if not no_patches then output_array (base.data.persons.array ())
+          else just_copy bname "persons" oc oc_acc;
+       return
+       let ascends_array_pos = pos_out oc in
+       do if not no_patches then ()
+          else
+            do Printf.eprintf "*** saving ascends\n"; flush stderr; return ();
+          output_array (base.data.ascends.array ());
+       return
+       let unions_array_pos = pos_out oc in
+       do if not no_patches then output_array (base.data.unions.array ())
+          else just_copy bname "unions" oc oc_acc;
+       return
+       let families_array_pos = pos_out oc in
+       do if not no_patches then output_array (base.data.families.array ())
+          else just_copy bname "families" oc oc_acc;
+       return
+       let couples_array_pos = pos_out oc in
+       do if not no_patches then output_array (base.data.couples.array ())
+          else just_copy bname "couples" oc oc_acc;
+       return
+       let descends_array_pos = pos_out oc in
+       do if not no_patches then output_array (base.data.descends.array ())
+          else just_copy bname "descends" oc oc_acc;
+       return
+       let strings_array_pos = pos_out oc in
+       do if not no_patches then output_array (base.data.strings.array ())
+          else just_copy bname "strings" oc oc_acc;
+       return
+       do seek_out oc array_start_indexes;
+          output_binary_int oc persons_array_pos;
+          output_binary_int oc ascends_array_pos;
+          output_binary_int oc unions_array_pos;
+          output_binary_int oc families_array_pos;
+          output_binary_int oc couples_array_pos;
+          output_binary_int oc descends_array_pos;
+          output_binary_int oc strings_array_pos;
+          base.data.families.clear_array ();
+          base.data.descends.clear_array ();
+          close_out oc;
+          close_out oc_acc;
+          if not no_patches then
+            let oc_inx = open_out_bin tmp_fname_inx in
+            let oc2 = open_out_bin tmp_fname_gw2 in
+            try
 do Printf.eprintf "*** create name index\n"; flush stderr; return
-           do output_binary_int oc_inx 0;
-	      create_name_index oc_inx base;
-              base.data.ascends.clear_array ();
-              base.data.unions.clear_array ();
-              base.data.couples.clear_array ();
-              if save_mem.val then
-do Printf.eprintf "*** compacting\n"; flush stderr; return
-                Gc.compact ()
-              else ();
-	      let surname_or_first_name_pos = pos_out oc_inx in
-do Printf.eprintf "*** create strings of fsname\n"; flush stderr; return
-	      do create_strings_of_fsname oc_inx base;
-	         seek_out oc_inx 0;
-		 output_binary_int oc_inx surname_or_first_name_pos;
-		 close_out oc_inx;
-              return ();
-              if save_mem.val then
-do Printf.eprintf "*** compacting\n"; flush stderr; return
-                Gc.compact ()
-              else ();
-do Printf.eprintf "*** create string index\n"; flush stderr; return
-              output_strings_hash oc2 base;
-              if save_mem.val then
-do Printf.eprintf "*** compacting\n"; flush stderr; return
-                Gc.compact ()
-              else ();
-              let surname_pos = pos_out oc2 in
-do Printf.eprintf "*** create surname index\n"; flush stderr; return
-              do output_surname_index oc2 base;
+              do output_binary_int oc_inx 0;
+                 create_name_index oc_inx base;
+                 base.data.ascends.clear_array ();
+                 base.data.unions.clear_array ();
+                 base.data.couples.clear_array ();
                  if save_mem.val then
 do Printf.eprintf "*** compacting\n"; flush stderr; return
                    Gc.compact ()
                  else ();
-              return
-              let first_name_pos = pos_out oc2 in
+                 let surname_or_first_name_pos = pos_out oc_inx in
+do Printf.eprintf "*** create strings of fsname\n"; flush stderr; return
+                 do create_strings_of_fsname oc_inx base;
+                    seek_out oc_inx 0;
+                    output_binary_int oc_inx surname_or_first_name_pos;
+                    close_out oc_inx;
+                 return ();
+                 if save_mem.val then
+do Printf.eprintf "*** compacting\n"; flush stderr; return
+                   Gc.compact ()
+                 else ();
+do Printf.eprintf "*** create string index\n"; flush stderr; return
+                 output_strings_hash oc2 base;
+                 if save_mem.val then
+do Printf.eprintf "*** compacting\n"; flush stderr; return
+                   Gc.compact ()
+                 else ();
+                 let surname_pos = pos_out oc2 in
+do Printf.eprintf "*** create surname index\n"; flush stderr; return
+                 do output_surname_index oc2 base;
+                    if save_mem.val then
+do Printf.eprintf "*** compacting\n"; flush stderr; return
+                      Gc.compact ()
+                    else ();
+                 return
+                 let first_name_pos = pos_out oc2 in
 do Printf.eprintf "*** create first name index\n"; flush stderr; return
-              do output_first_name_index oc2 base;
-                 seek_out oc2 int_size;
-                 output_binary_int oc2 surname_pos;
-                 output_binary_int oc2 first_name_pos;
-              return ();
-              let s = base.data.bnotes.nread 0 in
-              if s = "" then ()
-              else
-                let oc_not = open_out tmp_fname_not in
-                do output_string oc_not s;
-                   close_out oc_not;
-                return ();
-              close_out oc2;
-           return ()
-         with e ->
-           do try close_out oc_inx with _ -> ();
-              try close_out oc2 with _ -> ();
-           return raise e
-       else ();
-do Printf.eprintf "*** ok\n"; flush stderr; return
-       remove_file (Filename.concat bname "base");
-       Sys.rename tmp_fname (Filename.concat bname "base");
-       remove_file (Filename.concat bname "base.acc");
-       Sys.rename tmp_fname_acc (Filename.concat bname "base.acc");
-       if not no_patches then
-         do remove_file (Filename.concat bname "names.inx");
-            Sys.rename tmp_fname_inx (Filename.concat bname "names.inx");
-            remove_file (Filename.concat bname "strings.inx");
-            Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
-            remove_file (Filename.concat bname "notes");
-            if Sys.file_exists tmp_fname_not then
-              Sys.rename tmp_fname_not (Filename.concat bname "notes")
-            else ();
-            remove_file (Filename.concat bname "patches");
-            remove_file (Filename.concat bname "tstab");
-         return ()
-       else ();
-    return ()
-  with e ->
-    do try close_out oc with _ -> ();
-       try close_out oc_acc with _ -> ();
-       remove_file tmp_fname;
-       remove_file tmp_fname_acc;
-       if not no_patches then
-         do remove_file tmp_fname_inx;
-            remove_file tmp_fname_gw2;
-         return ()
-       else ();
-    return raise e
+                 do output_first_name_index oc2 base;
+                    seek_out oc2 int_size;
+                    output_binary_int oc2 surname_pos;
+                    output_binary_int oc2 first_name_pos;
+                 return ();
+                 let s = base.data.bnotes.nread 0 in
+                 if s = "" then ()
+                 else
+                   let oc_not = open_out tmp_fname_not in
+                   do output_string oc_not s;
+                      close_out oc_not;
+                   return ();
+                 close_out oc2;
+              return ()
+            with e ->
+              do try close_out oc_inx with _ -> ();
+                 try close_out oc2 with _ -> ();
+              return raise e
+          else ();
+          Printf.eprintf "*** ok\n"; flush stderr;
+       return ()
+     with e ->
+       do try close_out oc with _ -> ();
+          try close_out oc_acc with _ -> ();
+          remove_file tmp_fname;
+          remove_file tmp_fname_acc;
+          if not no_patches then
+            do remove_file tmp_fname_inx;
+               remove_file tmp_fname_gw2;
+            return ()
+          else ();
+       return raise e;
+     remove_file (Filename.concat bname "base");
+     Sys.rename tmp_fname (Filename.concat bname "base");
+     remove_file (Filename.concat bname "base.acc");
+     Sys.rename tmp_fname_acc (Filename.concat bname "base.acc");
+     if not no_patches then
+       do remove_file (Filename.concat bname "names.inx");
+          Sys.rename tmp_fname_inx (Filename.concat bname "names.inx");
+          remove_file (Filename.concat bname "strings.inx");
+          Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
+          remove_file (Filename.concat bname "notes");
+          if Sys.file_exists tmp_fname_not then
+            Sys.rename tmp_fname_not (Filename.concat bname "notes")
+          else ();
+          remove_file (Filename.concat bname "patches");
+          remove_file (Filename.concat bname "tstab");
+       return ()
+     else ();
+  return ()
 ;
 
 value output = gen_output False;

@@ -43,6 +43,11 @@ GeneWeb Version 3.03
   - [19 Jan 00] In traces, display dates in standard, i.e. using -
     instead of / in year-month-day.
 
+* Consanguinity computing (consang)
+  - [22 Mar 00] Fixed bug: if interruption (break, control C) between
+    the display of "*** ok" and the end, the base is lost without save.
+  - [22 Mar 00] In option "-q" display a rotating wheel.
+
 * GeneWeb uncompiler (gwu)
   - [19 Mar 00] Convert newlines into spaces for fields supposed not to
     contain newlines (e.g. sources).
@@ -51,6 +56,9 @@ GeneWeb Version 3.03
 
 * Gedcom to GeneWeb (ged2gwb)
   - [19 Feb 00] The option "-ds" applies now to families too.
+
+* GeneWeb to Gedcom (ged2gwb)
+  - [22 Mar 00] Now faster, by preloading "unions" and "descends".
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
   - [21 Jan 00] Changed "anniversaries of dead" into "annivesaries of death"

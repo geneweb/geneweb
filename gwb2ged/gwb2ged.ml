@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.2 1999-11-18 17:42:22 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.3 2000-03-22 04:14:55 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -533,8 +533,10 @@ value gwb2ged base ifile ofile anc desc mem =
   do if not mem then
        let _ = base.data.persons.array () in
        let _ = base.data.ascends.array () in
+       let _ = base.data.unions.array () in
        let _ = base.data.couples.array () in
        let _ = base.data.families.array () in
+       let _ = base.data.descends.array () in
        ()
      else ();
   return
