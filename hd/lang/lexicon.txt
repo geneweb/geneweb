@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.101 2002-07-08 13:57:53 ddr Exp $
+# $Id: lexicon.txt,v 4.102 2002-07-25 08:48:44 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -3765,7 +3765,7 @@ nl: horizontaal
 no: horisontal
 pl: w poziomie
 pt: horizontalmente
-ru: ÇÏÒÉÚÏÎÔÁÌØÎÏ
+ru: ãîğèçîíòàëüíî
 sl: vodoravno
 sv: horisontellt
 
@@ -3813,7 +3813,7 @@ nl: ident/e-mail/onderwerp
 no: ident/email/emne
 pl: ident/email/temat
 pt: ident/email/assunto
-ru: ÉÄÅÎÔÉÆÉËÁÔÏÒ/email/ÔÅÍÁ
+ru: èäåíòèôèêàòîğ/email/òåìà
 sl: ime/e-po¹ta/vsebina
 sv: ident/email/ämne
 
@@ -4585,7 +4585,7 @@ nl: mannelijke lijn/vrouwelijke lijn
 no: mannlig linje/kvinnelig linje
 pl: linia mêska/linia ¿eñska
 pt: linha masculina (agnat&iacute;cia)/linha feminina (cogn&aacute;tica)
-ru: ÍÕÖÓËÁÑ ÌÉÎÉÑ/ÖÅÎÓËÁÑ ÌÉÎÉÑ
+ru: ìóæñêàÿ ëèíèÿ/æåíñêàÿ ëèíèÿ
 sl: mo¹ka linija/¾enska linija
 sv: manliga linjen/kvinnliga linjen
 
@@ -4827,7 +4827,7 @@ nl: bericht toegevoegd
 no: melding tilf&oslash;yet
 pl: wiadomo¶æ zosta³a dodana
 pt: mensagem adicionada
-ru: äğ÷âşíåïğ õğğ÷üåïêå
+ru: ñîîáùåíèå äîáàâëåíî
 sl: sporoèilo dodano
 sv: meddelande inlagt
 
@@ -4849,7 +4849,7 @@ nl: bericht/vorig bericht/vorig bericht/volgend bericht
 no: melding/forrige melding/forrige melding/neste melding
 pl: wiadomo¶æ/poprzednia wiadomo¶æ/poprzednia wiadomo¶æ/nastêpna wiadomo¶æ
 pt: mensagem/mensagem anterior/mensagem anterior/mensagem seguinte
-ru: õğğ÷üåïêå/òôåäıäèüåå õğğ÷üåïêå/òôåäıäèüåå õğğ÷üåïêå/õíåäèáüåå õğğ÷üåïêå
+ru: ñîîáùåíèå/ïğåäûäóùåå ñîîáùåíèå/ïğåäûäóùèå ñîîáùåíèÿ/ñëåäóşùåå ñîîáùåíèå
 sl: sporoèilo/prej¹nje sporoèilo/prej¹nja sporoèila/naslednje sporoèilo
 sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
 
@@ -6661,7 +6661,7 @@ nl: statistieken
 no: statistikk
 pl: zestawienia
 pt: estat&iacute;sticas
-ru: õæâæêõæêìâ
+ru: ñòàòèñòèêà
 sl: statistike
 sv: statistik
 
@@ -6787,7 +6787,7 @@ no: liste over etternavn
 pl: lista nazwisk
 pt: lista de apelidos
 pt-br: lista de sobrenomes
-ru: ÓĞÉÓÏË ÆÁÍÉÌÉÊ
+ru: ñïèñîê ôàìèëèé
 sl: seznam priimkov
 sv: efternamns lista
 
@@ -7340,7 +7340,7 @@ nl: de %d jongste huwelijken
 no: de %d sist gifte
 pl: %d ostatnich ¶lubów
 pt: os %d casamentos mais recentes
-ru: ĞÏÓÌÅÄÎÉÅ %d ÂÒÁËÏ×
+ru: ïîñëåäíèå %d áğàêîâ
 sl: zadnjih %d porok
 sv: de senaste %d äktenskapen
 
@@ -7770,7 +7770,7 @@ nl: onbepaald geslacht voor %t
 no: udefinert kjønn for %t
 pl: %t ma nieokre¶lon± p³eæ
 pt: sexo indefinido para %t
-ru: ÎÅÉÚ×ÅÓÔÎÙÊ ĞÏÌ Õ %t
+ru: íåèçâåñòíûé ïîë ó %t
 sl: %t nima doloèenega spola
 sv: odefinierat kön för %t
 
