@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.20 1999-07-28 08:02:47 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.21 1999-07-28 08:18:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -96,6 +96,7 @@ value rec reconstitute_relations conf ext cnt =
     (get_nth conf "r_fath_fn" cnt, get_nth conf "r_fath_sn" cnt,
      get_nth conf "r_moth_fn" cnt, get_nth conf "r_moth_sn" cnt)
   with
+(*
   [ (Some ("" | "?"), _, Some ("" | "?"), _)
   | (Some ("" | "?"), _, _, Some ("" | "?"))
   | (_, Some ("" | "?"), Some ("" | "?"), _)
@@ -103,7 +104,8 @@ value rec reconstitute_relations conf ext cnt =
       let (rl, ext) = reconstitute_relations conf ext (cnt + 1) in
       let (rl, ext) = reconstitute_add_relation conf ext cnt rl in
       (rl, ext)
-  | (Some r_fath_fn, Some r_fath_sn, Some r_moth_fn, Some r_moth_sn) ->
+*)
+  [ (Some r_fath_fn, Some r_fath_sn, Some r_moth_fn, Some r_moth_sn) ->
       let r_fath_occ =
         match get_nth conf "r_fath_occ" cnt with
         [ Some x -> try int_of_string x with [ Failure _ -> 0 ]
@@ -276,20 +278,16 @@ value error_person conf base p err =
   return ()
 ;
 
-value strip_list l =
-  List.fold_right (fun s l -> if s = "" then l else [s :: l]) l []
-;
-
-value strip_titles tl =
-  List.fold_right (fun t tl -> if t.t_ident = "" then tl else [t :: tl]) tl []
-;
+value strip_list = List.filter (fun s -> s <> "");
 
 value strip_person p =
   do p.first_names_aliases := strip_list p.first_names_aliases;
      p.surnames_aliases := strip_list p.surnames_aliases;
      p.nick_names := strip_list p.nick_names;
      p.aliases := strip_list p.aliases;
-     p.titles := strip_titles p.titles;
+     p.titles := List.filter (fun t -> t.t_ident <> "") p.titles;
+     p.rparents :=
+       List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents;
   return ()
 ;
 
