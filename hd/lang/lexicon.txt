@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.93 2000-05-07 14:02:27 ddr Exp $
+# $Id: lexicon.txt,v 3.94 2000-05-08 08:58:16 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -4947,11 +4947,6 @@ pt: alias do apelido
 ru: новая:a:--ую фамилия:a:-ю
 se: efternamns alias
 
-    surname list
-dk: efternavnsoversigt
-en: surname list
-fr: liste &eacute;clair
-
     surname missing
 af: van ontbreek
 cs: pшнjmenн schбzн
@@ -5009,6 +5004,11 @@ no: etternavn/etternavn
 pt: apelido/apelidos
 ru: фамилия/фамилии
 se: efternamn/efternamn
+
+    surnames list
+dk: efternavnsoversigt
+en: surnames list
+fr: liste &eacute;clair
 
     switch
 af: omruil
