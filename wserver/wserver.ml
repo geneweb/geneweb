@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.10 2002-02-17 09:48:54 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.11 2002-02-17 12:47:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -362,6 +362,7 @@ value treat_connection tmout callback addr ic =
       flush stderr;
     }
     else do {
+      Buffer.clear buffer;
       try callback (addr, request) script_name contents with
       [ Unix.Unix_error Unix.EPIPE "write" _ -> ()
       | exc -> print_err_exc exc ];
