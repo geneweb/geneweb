@@ -20,6 +20,10 @@ GeneWeb Version 1.11
   - [Jan 18, 99] Fixed two bugs in dates parsing: 1. "x..y" (between x and
     y) was interpreted as "x|y" (x or y) 2. did not accept "d/m/y..y".
 
+* GeneWeb to Gedcom (gwb2ged)
+  - [Jan 19, 99] Fixed bug: the tag "<br>" was converted into a new line
+    only in lowercase form; "<BR>" did not work.
+
 * Gedcom to GeneWeb and GeneWeb to Gedcom (ged2gwb, gwb2ged)
   - [Jan 18, 99] When there several names (several records "1 NAME") for
     someone in Gedcom, the other become "aliases" (and vice versa for
