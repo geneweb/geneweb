@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.129 1999-09-23 14:25:57 ddr Exp $
+# $Id: lexicon.txt,v 2.130 1999-09-24 05:59:28 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -4359,6 +4359,10 @@ nl: wijzigen
 no: oppdatere
 pt: revisado
 se: uppdatera
+
+    updates history
+en: updates history
+fr: historique des mises-&agrave;-jour
 
     warnings
 cs: varování

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.26 1999-09-23 22:19:12 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.27 1999-09-24 05:59:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -634,7 +634,11 @@ value print_mod conf base =
   let callback sfam scpl =
     let (fam, cpl) = effective_mod conf base sfam scpl in
     let wl = all_checks_family conf base fam cpl in
-    let (fn, sn, occ, _) = scpl.father in
+    let (fn, sn, occ, _) =
+      match p_getint conf.env "ip" with
+      [ Some i when Adef.int_of_iper cpl.mother = i -> scpl.mother
+      | _ -> scpl.father ]
+    in
     do base.func.commit_patches ();
        History.record conf base (fn, sn, occ) "mf";
        delete_topological_sort conf base;

@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 1.7 1999-09-11 10:49:52 ddr Exp $
+# $Id: a.gwf,v 1.8 1999-09-24 05:59:26 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -82,6 +82,10 @@ max_anc_level=8
 
 # Maximum_level when displaying descendants
 max_desc_level=12
+
+# History: set it to yes to save update traces in data base (in file named
+# "history"):
+history=no
 
 # Uncomment the following definition to specify that the present database has
 # been renamed:
