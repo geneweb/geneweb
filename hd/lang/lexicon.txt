@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.250 2001-03-09 11:35:02 ddr Exp $
+# $Id: lexicon.txt,v 3.251 2001-03-09 13:41:52 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -136,7 +136,7 @@ it: %1 d[i']%2
 lv: %1 -&gt; %2
 nl: %1 van %2
 no: %1 til %2
-pl: %1 :g: %2
+pl: %1 :g:%2
 pt: %1 de %2
 ru: %1 :g:%2
 se: %1 till %2
@@ -159,7 +159,7 @@ it: %1 d[i']%2
 lv: %1 -&gt; %2
 nl: %1 van %2
 no: %1 av %2
-pl: %1 :g: %2
+pl: %1 :g:%2
 pt: %1 de %2
 ru: %1 :g:%2
 se: %1 till %2
