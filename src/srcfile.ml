@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.10 2002-02-17 09:48:52 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.11 2002-02-26 17:49:04 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -495,6 +495,10 @@ value rec copy_from_channel conf base ic mode =
                   if c = ';' then Buff.get len else loop (Buff.store len c)
               in
               Wserver.wprint "%s" (language_name conf lang)
+          | 'V' ->
+              match p_getenv conf.base_env (get_variable ic) with
+              [ Some txt -> Wserver.wprint "%s" txt
+              | None -> () ]
           | c -> Wserver.wprint "%s" (macro conf base c) ]
       | c -> if echo.val then Wserver.wprint "%c" c else () ]
     }

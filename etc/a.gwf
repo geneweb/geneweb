@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.11 2002-01-30 12:05:20 ddr Exp $
+# $Id: a.gwf,v 4.12 2002-02-26 17:50:08 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -205,3 +205,7 @@ expand_env=no
 # The default is "no" because it may be a security hole to allow accomodated
 # databases in a Web site to show the environment variables of the command
 # gwd. Check that before putting "expand_env" to "yes".
+
+# Message of the day. If set, display this message in the welcome page.
+# Can contain html tags.
+#motd=

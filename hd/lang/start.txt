@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.23 2002-02-02 05:17:28 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.24 2002-02-26 17:49:04 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -98,7 +98,7 @@ sv: Du kan välja ett annat språk bland de följande:
 
 %rversion
 
-<p>
+%Vmotd;<p>
 
 [
 af: Die databasis <font color=%i><b>"%t"</b></font> bevat tans %n persone.
