@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.41 2001-02-18 15:44:51 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.42 2001-02-20 04:09:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -9,6 +9,7 @@ open Gutil;
 
 value bogus_person_index = Adef.iper_of_int (-1);
 
+(*
 value string_title_of base t =
   {t_name =
      match t.t_name with
@@ -19,6 +20,7 @@ value string_title_of base t =
    t_date_start = t.t_date_start; t_date_end = t.t_date_end;
    t_nth = t.t_nth}
 ;
+*)
 
 value string_person_of base p =
   let first_name = p_first_name base p in
@@ -34,10 +36,10 @@ value string_person_of base p =
   Gutil.map_person_ps fp (sou base) p
 ;
 
+(*
 value print_first_name conf base p =
   let occ =
-    if p.first_name = "?" || p.surname = "?" then
-      (* Adef.int_of_iper p.cle_index *) 0
+    if p.first_name = "?" || p.surname = "?" then 0
     else p.occ
   in
   tag "tr" begin
@@ -773,6 +775,7 @@ value print_update_ind_aux conf base p digest =
      trailer conf;
   return ()
 ;
+*)
 
 (* Interpretation of template file 'updind.txt' *)
 
@@ -1385,9 +1388,11 @@ value print_update_ind conf base p digest =
   [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK")
   | Some ("MOD_IND" | "MOD_IND_OK")
   | Some ("ADD_IND" | "ADD_IND_OK") ->
+(*
       if p_getenv conf.env "opt" = Some "old" then
         print_update_ind_aux conf base p digest
       else
+*)
         let astl = Templ.input conf base "updind" in
         do html conf; interp_templ conf base p digest astl; return ()
   | _ -> incorrect_request conf ]
