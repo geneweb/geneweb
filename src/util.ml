@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.9 2001-07-02 19:03:44 ddr Exp $ *)
+(* $Id: util.ml,v 4.10 2001-08-04 09:28:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1800,7 +1800,7 @@ value of_course_died conf p =
 value relation_txt conf sex fam =
   let is = index_of_sex sex in
   match fam.relation with
-  [ NotMarried -> ftransl conf "relationship%t to"
+  [ NotMarried -> ftransl_nth conf "relationship%t to" is
   | Married | NoSexesCheck -> ftransl_nth conf "married%t to" is
   | Engaged -> ftransl_nth conf "engaged%t to" is ]
 ;
