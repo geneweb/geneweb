@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.24 2000-07-07 12:11:15 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.25 2000-07-28 13:07:49 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -175,7 +175,7 @@ value macro conf base =
         try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
         [ Not_found -> "" ]
       in
-      s ^ " " ^ body_prop conf
+      s ^ body_prop conf
   | 'c' ->
       let r = count conf in
       string_of_num (transl conf "(thousand separator)")
