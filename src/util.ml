@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.120 2005-02-21 12:42:09 ddr Exp $ *)
+(* $Id: util.ml,v 4.121 2005-02-23 02:15:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -131,14 +131,16 @@ value nth_field w n =
   String.sub w i1 (i2 - i1)
 ;
 
+value tnf s = "[" ^ s ^ "]";
+
 value transl conf w =
   try Hashtbl.find conf.lexicon w with
-  [ Not_found -> "[" ^ w ^ "]" ]
+  [ Not_found -> tnf w ]
 ;
 
 value transl_nth conf w n =
   try nth_field (Hashtbl.find conf.lexicon w) n with
-  [ Not_found -> "[" ^ nth_field w n ^ "]" ]
+  [ Not_found -> tnf (nth_field w n) ]
 ;
 
 value transl_nth_def conf w n def_n =
@@ -147,7 +149,7 @@ value transl_nth_def conf w n def_n =
     let (i1, i2) = nth_field_abs w n in
     if i2 == i1 then nth_field w def_n else String.sub w i1 (i2 - i1)
   with
-  [ Not_found -> "[" ^ nth_field w def_n ^ "]" ]
+  [ Not_found -> tnf (nth_field w def_n) ]
 ;
 
 value plus_decl s =
@@ -232,8 +234,7 @@ value transl_a_of_gr_eq_gen_lev conf =
   gen_decline2 (transl_nth conf "%1 of %2" 1)
 ;
 
-value failed_format s : format 'a 'b 'c =
-  Obj.magic ("[" ^ s ^ "]");
+value failed_format s : format 'a 'b 'c = Obj.magic (tnf s);
 
 value valid_format ini_fmt (r : string) =
   let s : string = Obj.magic (ini_fmt : format 'a 'b 'c) in
@@ -951,7 +952,7 @@ value rec copy_from_etc env lang imcom ic =
                 else loop (Buff.store len c) (input_char ic)
             in
             let (s, alt) = Translate.inline lang '%' (macro_etc env imcom) s in
-            let s = if alt then "[" ^ s ^ "]" else s in
+            let s = if alt then tnf s else s in
             Wserver.wprint "%s" s
           else
             Wserver.wprint "[%c" c
