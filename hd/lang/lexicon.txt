@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.64 1999-06-29 13:36:26 ddr Exp $
+# $Id: lexicon.txt,v 2.65 1999-06-30 10:42:53 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -323,7 +323,8 @@ dk: J/N
 en: Y/N
 es: S/N
 fr: O/N
-he:   ק/ל 
+he:   ק/ל
+it: S/N
 no: J/N
 pt: S/N
 se: J/N
@@ -1151,8 +1152,9 @@ de: Zusammenf&uuml;hrung fortsetzen
 dk: forts&aelig;t sammenf&oslash;jning
 en: continue merging
 es: continuar la fusi&oacute;n
-he:  להמשיך לאחד
 fr: continuer &agrave; fusionner
+he:  להמשיך לאחד
+it: continua la fusione
 nl: verdergaan met samenvoegen
 no: fortsett sammensl&aring;ing
 pt: continuar fus&atilde;o
@@ -2071,6 +2073,7 @@ en: long display
 es: presentaci&oacute;n extensa
 fr: affichage long
 he:  תצוגה ארוכה
+it: display esteso
 nl: kwartierstaat
 no: utvidet rapport
 pt: long display
@@ -2205,8 +2208,9 @@ dk: sammenl&aelig;g
 en: merge
 eo: fuzii +decl
 es: fusionar
-he:  איחוד
 fr: fusionner
+he:  איחוד
+it: fondere
 nl: samenvoegen
 no: sl&aring; sammen
 pt: fus&atilde;o
@@ -2217,8 +2221,9 @@ de: Zusammenf&uuml;hrung abgeschlossen
 dk: sammenl&aelig;gning udf&oslash;rt
 en: merge done
 es: fusi&oacute;n terminada
-he:  האיחוד בוצע
 fr: fusion termin&eacute;e
+he:  האיחוד בוצע
+it: fusione terminata
 nl: samenvoeging is gedaan
 no: er sl&aring;tt sammen
 pt: fus&atilde;o terminada
@@ -2229,9 +2234,9 @@ de: fehlende Vorfahren
 dk: manglende forf&aelig;dre
 en: missing ancestors
 es: ascendientes faltantes
+fr: ascendants manquants
 he:  אבות חסרים
 it: antenati mancanti
-fr: ascendants manquants
 nl: ontbrekende voorouders
 no: manglende forfedre
 pt: ascendentes faltando
@@ -2551,8 +2556,9 @@ de: Beruf
 dk: stilling
 en: occupation
 es: ocupaci&oacute;n
-he:  מקצוע
 fr: occupation
+he:  מקצוע
+it: professione
 nl: beroep
 no: yrke
 pt: ocupa&ccedil;&atilde;o
@@ -3104,6 +3110,7 @@ dk: standardrapport
 en: short display
 es: presentaci&oacute;n corta
 fr: affichage court
+it: display corto
 pt: short display
 se: kort rapport
 
@@ -3142,6 +3149,7 @@ en: siblings
 eo: gefratoj
 es: hermanos y hermanas
 fr: fr&egrave;res et soeurs
+it: fratelli
 pt: irm&atilde;os e irm&atilde;s
 se: syskon
 
