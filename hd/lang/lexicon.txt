@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.61 2000-02-01 09:52:20 ddr Exp $
+# $Id: lexicon.txt,v 3.62 2000-02-02 10:24:55 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -444,7 +444,7 @@ he: <em> осфш Sosa </em> бйзс м- %t
 is: <em>Sosa nъmer</em> tengt %t
 no: <em>Sosa nummer</em> i forhold til %t
 ru: <em>Sosa номер</em> относительно %t
-se: <em>Sosa nummer</em> relativ till %t
+se: <em>annummer</em> relativ till %t
 
     M/F
 cs: M/®
@@ -3370,7 +3370,7 @@ nl: navigatie met %t als proband
 no: navigering med %t som Sosa referanse
 pt: navega&ccedil;a&atilde;o com %t como a refer&ecirc;ncia Sosa
 ru: навигация с %t как ссылка Sosa
-se: navigering med %t som Sosa referens
+se: navigering med %t som annummer referens
 
     nephews and nieces
 de: Neffen und Nichten
