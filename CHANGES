@@ -3,7 +3,7 @@ GeneWeb Version 1.12
 
 * GeneWeb daemon/CGI (gwd)
   - [Feb 8, 99] Fixed bug in CGI mode under Windows: images (flags e.g.) 
-    were sometimes truncated.
+    were often truncated.
 
 * Gedcom to GeneWeb (ged2gwb)
   - [Feb 6, 99] Accept dates with "/" (20/11/1993) although it is not
