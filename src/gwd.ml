@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.64 2000-11-04 09:46:02 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.65 2000-11-05 10:17:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -254,8 +254,6 @@ value read_base_env cgi bname =
       do close_in ic; return env
   | None -> [] ]
 ;
-
-type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 value print_renamed conf new_n =
   let link =

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.33 2000-10-17 14:01:28 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.34 2000-11-05 10:17:16 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -16,7 +16,6 @@ type record =
     rused : mutable bool }
 ;
 
-type choice 'a 'b = [ Left of 'a | Right of 'b ];
 type choice3 'a 'b 'c 'd = [ Left3 of 'a | Right3 of 'b and 'c and 'd ];
 type month_number_dates =
   [ MonthDayDates | DayMonthDates | NoMonthNumberDates

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 3.5 2000-06-26 09:25:38 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 3.6 2000-11-05 10:17:27 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 value fname = ref "";
@@ -57,9 +57,10 @@ value main () =
          simple_output fname.val base;
       return ()
     with
-    [ Consang.TopologicalSortError ->
+    [ Consang.TopologicalSortError p ->
         do Printf.printf "
-Error: probable loop in database (persons being their own ancestors).\n";
+Error: loop in database, %s is his/her own ancestor.\n"
+             (Gutil.denomination base p);
            flush stdout;
         return exit 2 ]
   in

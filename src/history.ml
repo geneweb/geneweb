@@ -1,13 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 3.11 2000-09-09 07:06:55 ddr Exp $ *)
+(* $Id: history.ml,v 3.12 2000-11-05 10:17:26 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
 open Def;
 open Util;
 open Gutil;
-
-type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 value file_name conf =
   let bname =

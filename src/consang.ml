@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 3.1 2000-01-10 02:14:37 ddr Exp $ *)
+(* $Id: consang.ml,v 3.2 2000-11-05 10:17:23 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -43,14 +43,13 @@ value half x = x *. 0.5;
 value mark = ref 0;
 value new_mark () = do incr mark; return mark.val;
 
-exception TopologicalSortError;
+exception TopologicalSortError of person;
 
 (* Return tab such as: i is an ancestor of j => tab.(i) > tab.(j) *)
 
 value topological_sort base =
   let tab = Array.create base.data.persons.len 0 in
   let todo = ref [] in
-  let tval = ref 0 in
   let cnt = ref 0 in
   do for i = 0 to base.data.persons.len - 1 do
        let a = base.data.ascends.get i in
@@ -67,18 +66,15 @@ value topological_sort base =
      for i = 0 to base.data.persons.len - 1 do
        if tab.(i) == 0 then todo.val := [i :: todo.val] else ();
      done;
-     loop todo.val where rec loop list =
+     loop 0 todo.val where rec loop tval list =
        if list = [] then ()
        else
          let new_list =
            List.fold_left
              (fun new_list i ->
                 let a = base.data.ascends.get i in
-                do tab.(i) := tval.val;
+                do tab.(i) := tval;
                    incr cnt;
-(*
-                   incr tval;
-*)
                 return
                 match a.parents with
                 [ Some ifam ->
@@ -100,11 +96,12 @@ value topological_sort base =
                 | _ -> new_list ])
              [] list
          in
-(**)
-         do incr tval; return
-(**)
-         loop new_list;
-     if cnt.val <> base.data.persons.len then raise TopologicalSortError
+         loop (tval + 1) new_list;
+     if cnt.val <> base.data.persons.len then
+       Gutil.check_noloop base
+         (fun
+          [ OwnAncestor p -> raise (TopologicalSortError p)
+          | _ -> assert False ])
      else ();
   return tab
 ;

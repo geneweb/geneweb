@@ -1,7 +1,9 @@
-(* $Id: gutil.mli,v 3.7 2000-11-02 10:31:29 ddr Exp $ *)
+(* $Id: gutil.mli,v 3.8 2000-11-05 10:17:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
+
+type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 value poi : base -> iper -> person;
 value aoi : base -> iper -> ascend;
@@ -86,6 +88,7 @@ value check_family :
     couple -> descend -> unit
 ;
 
+value check_noloop : base -> (base_error -> unit) -> unit;
 value check_noloop_for_person_list :
   base -> (base_error -> unit) -> list iper -> unit
 ;

@@ -1,7 +1,9 @@
-(* $Id: gutil.ml,v 3.16 2000-11-02 10:31:29 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.17 2000-11-05 10:17:24 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
+
+type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 value poi base i = base.data.persons.get (Adef.int_of_iper i);
 value aoi base i = base.data.ascends.get (Adef.int_of_iper i);

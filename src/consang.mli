@@ -1,4 +1,4 @@
-(* $Id: consang.mli,v 3.1 2000-01-10 02:14:37 ddr Exp $ *)
+(* $Id: consang.mli,v 3.2 2000-11-05 10:17:23 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -19,7 +19,7 @@ type relationship =
 and relationship_table = { id : array int; info : array relationship }
 ;
 
-exception TopologicalSortError;
+exception TopologicalSortError of person;
 value topological_sort : base -> array int;
 
 value make_relationship_table : base -> array int -> relationship_table;
