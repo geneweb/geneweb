@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.16 1999-02-18 15:52:52 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.17 1999-02-22 04:40:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -188,8 +188,7 @@ value print_spouse conf base ip ipl =
           in
           do Wserver.wprint "&amp;";
              html_br conf;
-             afficher_personne_titre_referencee conf base (poi base sp);
-             Wserver.wprint "\n";
+             print_someone conf base sp;
           return ()
       | _ -> () ]
   | _ -> () ]
