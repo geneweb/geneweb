@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.118 2005-02-13 23:08:52 ddr Exp $ *)
+(* $Id: util.ml,v 4.119 2005-02-20 17:10:06 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -52,7 +52,24 @@ value match_begin s t =
     else False
 ;
 
-value rec capitale s =
+value amp_capitalize capitale s =
+  if String.length s <= 1 then s
+  else if match_begin s "&iexcl;" then
+    "&iexcl;" ^ capitale (String.sub s 7 (String.length s - 7))
+  else if match_begin s "&aelig;" then
+    "&AElig;" ^ String.sub s 7 (String.length s - 7)
+  else
+    match s.[1] with
+    [ 'a'..'z' ->
+        "&" ^
+          String.make 1
+            (Char.chr
+               (Char.code s.[1] - Char.code 'a' + Char.code 'A')) ^
+          String.sub s 2 (String.length s - 2)
+    | _ -> s ]
+;
+
+value rec capitale_iso_8859_1 s =
   if String.length s == 0 then ""
   else
     match s.[0] with
@@ -60,22 +77,27 @@ value rec capitale s =
         String.make 1
           (Char.chr (Char.code s.[0] - Char.code 'a' + Char.code 'A')) ^
           String.sub s 1 (String.length s - 1)
-    | '&' ->
-        if String.length s == 1 then s
-        else if match_begin s "&iexcl;" then
-          "&iexcl;" ^ capitale (String.sub s 7 (String.length s - 7))
-        else if match_begin s "&aelig;" then
-          "&AElig;" ^ String.sub s 7 (String.length s - 7)
-        else
-          match s.[1] with
-          [ 'a'..'z' ->
-              "&" ^
-                String.make 1
-                  (Char.chr
-                     (Char.code s.[1] - Char.code 'a' + Char.code 'A')) ^
-                String.sub s 2 (String.length s - 2)
-          | _ -> s ]
+    | '&' -> amp_capitalize capitale_iso_8859_1 s
     | _ -> s ]
+;
+
+value rec capitale_utf_8 s =
+  if String.length s == 0 then ""
+  else
+    let c = s.[0] in
+    if c = '&' then amp_capitalize capitale_utf_8 s
+    else if Char.code c < 0b10000000 then String.capitalize s
+    else if String.length s == 1 then s
+    else if Char.code c == 0xC3 then
+      let c1 = Char.uppercase (Char.chr (Char.code s.[1] + 0x40)) in
+      String.make 1 c ^ String.make 1 (Char.chr (Char.code c1 - 0x40)) ^
+        String.sub s 2 (String.length s - 2)
+    else s
+;
+
+value capitale s =
+  if Gutil.utf_8_db.val then capitale_utf_8 s
+  else capitale_iso_8859_1 s
 ;
 
 value fcapitale (a : format 'a 'b 'c) : format 'a 'b 'c =
