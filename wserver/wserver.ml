@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.13 2000-07-29 14:22:39 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.14 2000-11-03 16:53:36 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -476,15 +476,16 @@ value accept_connection tmout max_clients callback s =
           cleanup ();
        return ();
     return
-    let pid =
-      let env =
-        Array.append (Unix.environment ())
-          [| "WSERVER=" ^ string_of_sockaddr addr |]
+    let comm =
+      let stringify_if_spaces s =
+        try let _ = String.index s ' ' in "\"" ^ s ^ "\"" with
+        [ Not_found -> s ]
       in
-      Unix.create_process_env Sys.argv.(0) Sys.argv env Unix.stdin Unix.stdout
-        Unix.stderr
+      List.fold_left (fun s a -> s ^ stringify_if_spaces a ^ " ") ""
+        (Array.to_list Sys.argv) ^
+      "-wserver " ^ string_of_sockaddr addr
     in
-    let _ = Unix.waitpid [] pid in
+    let _ = Sys.command comm in
     let cleanup () =
       do try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
          try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
@@ -519,7 +520,10 @@ value f addr_opt port tmout max_clients g =
   match
     ifdef MAC then None
     else ifdef WIN95 then
-      try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
+      let len = Array.length Sys.argv in
+      if len > 2 && Sys.argv.(len - 2) = "-wserver" then
+        Some Sys.argv.(len - 1)
+      else None
     else None
   with
   [ Some s ->
