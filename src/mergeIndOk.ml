@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 3.6 2000-10-12 07:42:08 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 3.7 2000-11-10 12:02:23 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -176,11 +176,14 @@ value effective_mod_merge conf base sp =
       do List.iter
            (fun ipc ->
               let pc = poi base ipc in
+              let uc = uoi base ipc in
+              let mod_p = ref False in
               do List.iter
                    (fun r ->
                       do match r.r_fath with
                          [ Some ip when ip = p2.cle_index ->
                              do r.r_fath := Some p.cle_index;
+                                mod_p.val := True;
                                 if List.memq ipc p.related then ()
                                 else p.related := [ipc :: p.related];
                              return ()
@@ -188,13 +191,29 @@ value effective_mod_merge conf base sp =
                          match r.r_moth with
                          [ Some ip when ip = p2.cle_index ->
                              do r.r_moth := Some p.cle_index;
+                                mod_p.val := True;
                                 if List.memq ipc p.related then ()
                                 else p.related := [ipc :: p.related];
                              return ()
                          | _ -> () ];
                       return ())
                    pc.rparents;
-                 base.func.patch_person ipc pc;
+                 for i = 0 to Array.length uc.family - 1 do
+                   let fam = foi base uc.family.(i) in
+                   if array_memq p2.cle_index fam.witnesses then
+                     do for j = 0 to Array.length fam.witnesses - 1 do
+                          if fam.witnesses.(j) == p2.cle_index then
+                            do fam.witnesses.(j) := p.cle_index;
+                               if List.memq ipc p.related then ()
+                               else p.related := [ipc :: p.related];
+                            return ()
+                          else ();
+                        done;
+                        base.func.patch_family fam.fam_index fam;
+                     return ()
+                   else ();
+                 done;
+                 if mod_p.val then base.func.patch_person ipc pc else ();
               return ())
            rel_chil;
          for i = 0 to Array.length p2_family - 1 do

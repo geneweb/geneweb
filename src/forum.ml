@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.14 2000-11-05 06:32:19 ddr Exp $ *)
+(* $Id: forum.ml,v 3.15 2000-11-10 12:02:22 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -300,7 +300,7 @@ value get conf key =
 
 value forum_add conf base ident comm =
   let email = String.lowercase (Gutil.strip_spaces (get conf "Email")) in
-  let subject = String.lowercase (Gutil.strip_spaces (get conf "Subject")) in
+  let subject = Gutil.strip_spaces (get conf "Subject") in
   let bfile = Filename.concat Util.base_dir.val conf.bname in
   if ident <> "" && comm <> "" then
     lock (Iobase.lock_file bfile) with
