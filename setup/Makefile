@@ -1,9 +1,9 @@
-# $Id: Makefile,v 1.9 1999-08-16 08:03:01 ddr Exp $
+# $Id: Makefile,v 1.10 1999-08-23 10:24:50 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver -I ../src
-OBJS=../wserver/wserver.cmo ../src/version.cmo setup.cmo
+OBJS=../wserver/wserver.cmo ../src/version.cmo ../src/argl.cmo setup.cmo
 
 all:: setup.out
 	$(RM) gwsetup

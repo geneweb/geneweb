@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.40 1999-08-16 15:59:09 ddr Exp $ *)
+(* $Id: setup.ml,v 1.41 1999-08-23 10:24:50 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -1258,15 +1258,45 @@ value set_gwd_default_language_if_absent lang =
   | None -> () ]
 ;
 
+value daemon = ref False;
+
+value usage = "Usage: " ^ Sys.argv.(0) ^ " [options] where options are:";
+value speclist =
+  [("-daemon", Arg.Set daemon, "Unix daemon mode.")]
+;
+value anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) ;
+
+value null_reopen flags fd =
+ifdef UNIX then
+  let fd2 = Unix.openfile "/dev/null" flags 0 in
+  do Unix.dup2 fd2 fd;
+     Unix.close fd2;
+  return ()
+else ()
+;
+
 value intro () =
-  do (* Sys.chdir "gw"; *)
-     copy_text "" "intro.txt";
+  do Argl.parse speclist anonfun usage;
      let lang =
-       let x = input_line stdin in
-       if x = "" then default_lang.val else x
+       if daemon.val then
+         do ifdef UNIX then
+              if Unix.fork () = 0 then
+                do Unix.close Unix.stdin;
+                   null_reopen [Unix.O_WRONLY] Unix.stdout;
+                   null_reopen [Unix.O_WRONLY] Unix.stderr;
+                return ()
+              else exit 0
+            else ();
+         return default_lang.val
+       else
+         do copy_text "" "intro.txt"; return
+         let lang =
+           let x = input_line stdin in
+           if x = "" then default_lang.val else x
+         in
+         do copy_text lang (Filename.concat lang "intro.txt"); return lang
      in
-     do copy_text lang (Filename.concat lang "intro.txt");
-        set_gwd_default_language_if_absent lang;
+     do set_gwd_default_language_if_absent lang;
         default_lang.val := lang;
         ifdef WIN95 then Unix.putenv "GWLANG" lang else ();
      return ();
