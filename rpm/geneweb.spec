@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.13 1999-09-18 11:20:35 ddr Exp $
+# $Id: geneweb.spec,v 1.14 1999-09-21 05:42:19 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -19,8 +19,8 @@
 
 Summary: Genealogy software with a Web interface
 Name: geneweb
-Version: 2.06
-Release: 5
+Version: VERSION
+Release: RELEASE
 Copyright: GPL
 Vendor: INRIA
 Group: Applications
@@ -107,7 +107,8 @@ rm -rf /home/geneweb/gw /usr/doc/geneweb-%{version} /etc/rc.d/*/*gwd
 # then it automatically unpacks all the files and symlinks from the archive.
 # Finally it runs the %post script, in which I start the service.
 %pre
-/usr/sbin/useradd -d /home/geneweb -c "GeneWeb database" -g root geneweb
+/usr/sbin/groupadd geneweb
+/usr/sbin/useradd -d /home/geneweb -c "GeneWeb database" geneweb
 
 %post
 # Sure, all the files are already owned by geneweb, but the directories ain't.
@@ -156,6 +157,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 (rmdir /home/geneweb/gw/gw/setup/* >/dev/null 2>&1; exit 0)
 (rmdir /home/geneweb/gw/gw/setup >/dev/null 2>&1; exit 0)
 /usr/sbin/userdel geneweb
+/usr/sbin/groupdel geneweb
 
 # *********** THE FILES OWNED BY THIS .RPM *************
 # These are the files belonging to this package.  We have to list
@@ -167,8 +169,8 @@ chown -R geneweb.geneweb /home/geneweb/gw
 # installed setuid, owned by geneweb, and can only be run by root.
 %files
 %defattr(-,geneweb,geneweb)
-%attr(4700, geneweb, geneweb) /home/geneweb/gw/gw/gwd
-%attr(4700, geneweb, geneweb) /home/geneweb/gw/gw/gwsetup
+%attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwd
+%attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwsetup
 %attr(744, root, root) /etc/rc.d/init.d/gwd
 %attr(744, root, root) /etc/rc.d/rc0.d/K01gwd
 %attr(744, root, root) /etc/rc.d/rc1.d/K01gwd
@@ -176,19 +178,16 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %attr(744, root, root) /etc/rc.d/rc3.d/S99gwd
 %attr(744, root, root) /etc/rc.d/rc5.d/S99gwd
 %attr(744, root, root) /etc/rc.d/rc6.d/K01gwd
+/home/geneweb/gw/LISEZMOI.txt
+/home/geneweb/gw/README.txt
 /home/geneweb/gw/gw/CHANGES
+/home/geneweb/gw/gw/CREDITS.txt
+/home/geneweb/gw/gw/INSTALL.htm
 /home/geneweb/gw/gw/LICENSE
-/home/geneweb/gw/gw/gwc
-/home/geneweb/gw/gw/consang
-/home/geneweb/gw/gw/gwu
-/home/geneweb/gw/gw/ged2gwb
-/home/geneweb/gw/gw/gwb2ged
 /home/geneweb/gw/gw/LISEZMOI.txt
 /home/geneweb/gw/gw/README.txt
-/home/geneweb/gw/gw/INSTALL.htm
 /home/geneweb/gw/gw/a.gwf
-/home/geneweb/gw/gw/CREDITS.txt
-/home/geneweb/gw/gw/doc/index.htm
+/home/geneweb/gw/gw/consang
 /home/geneweb/gw/gw/doc/LICENSE.htm
 /home/geneweb/gw/gw/doc/de/consang.htm
 /home/geneweb/gw/gw/doc/de/diruse.htm
@@ -203,20 +202,6 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/de/server.htm
 /home/geneweb/gw/gw/doc/de/start.htm
 /home/geneweb/gw/gw/doc/de/update.htm
-/home/geneweb/gw/gw/doc/fr/access.htm
-/home/geneweb/gw/gw/doc/fr/consang.htm
-/home/geneweb/gw/gw/doc/fr/diruse.htm
-/home/geneweb/gw/gw/doc/fr/faq.htm
-/home/geneweb/gw/gw/doc/fr/links.htm
-/home/geneweb/gw/gw/doc/fr/maint.htm
-/home/geneweb/gw/gw/doc/fr/merge.htm
-/home/geneweb/gw/gw/doc/fr/pcustom.htm
-/home/geneweb/gw/gw/doc/fr/problem.htm
-/home/geneweb/gw/gw/doc/fr/recover.htm
-/home/geneweb/gw/gw/doc/fr/report.htm
-/home/geneweb/gw/gw/doc/fr/server.htm
-/home/geneweb/gw/gw/doc/fr/start.htm
-/home/geneweb/gw/gw/doc/fr/update.htm
 /home/geneweb/gw/gw/doc/en/access.htm
 /home/geneweb/gw/gw/doc/en/consang.htm
 /home/geneweb/gw/gw/doc/en/diruse.htm
@@ -231,6 +216,21 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/en/server.htm
 /home/geneweb/gw/gw/doc/en/start.htm
 /home/geneweb/gw/gw/doc/en/update.htm
+/home/geneweb/gw/gw/doc/fr/access.htm
+/home/geneweb/gw/gw/doc/fr/consang.htm
+/home/geneweb/gw/gw/doc/fr/diruse.htm
+/home/geneweb/gw/gw/doc/fr/faq.htm
+/home/geneweb/gw/gw/doc/fr/links.htm
+/home/geneweb/gw/gw/doc/fr/maint.htm
+/home/geneweb/gw/gw/doc/fr/merge.htm
+/home/geneweb/gw/gw/doc/fr/pcustom.htm
+/home/geneweb/gw/gw/doc/fr/problem.htm
+/home/geneweb/gw/gw/doc/fr/recover.htm
+/home/geneweb/gw/gw/doc/fr/report.htm
+/home/geneweb/gw/gw/doc/fr/server.htm
+/home/geneweb/gw/gw/doc/fr/start.htm
+/home/geneweb/gw/gw/doc/fr/update.htm
+/home/geneweb/gw/gw/doc/index.htm
 /home/geneweb/gw/gw/doc/nl/consang.htm
 /home/geneweb/gw/gw/doc/nl/diruse.htm
 /home/geneweb/gw/gw/doc/nl/faq.htm
@@ -244,6 +244,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/nl/server.htm
 /home/geneweb/gw/gw/doc/nl/start.htm
 /home/geneweb/gw/gw/doc/nl/update.htm
+/home/geneweb/gw/gw/doc/se/access.htm
 /home/geneweb/gw/gw/doc/se/consang.htm
 /home/geneweb/gw/gw/doc/se/diruse.htm
 /home/geneweb/gw/gw/doc/se/faq.htm
@@ -257,9 +258,30 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/se/server.htm
 /home/geneweb/gw/gw/doc/se/start.htm
 /home/geneweb/gw/gw/doc/se/update.htm
+/home/geneweb/gw/gw/etc/copyr.txt
+/home/geneweb/gw/gw/etc/redirect.txt
+/home/geneweb/gw/gw/etc/renamed.txt
+/home/geneweb/gw/gw/etc/robot.txt
+/home/geneweb/gw/gw/ged2gwb
+/home/geneweb/gw/gw/gwb2ged
+/home/geneweb/gw/gw/gwc
+/home/geneweb/gw/gw/gwu
+/home/geneweb/gw/gw/images/l-cn.jpg
+/home/geneweb/gw/gw/images/l-cs.jpg
+/home/geneweb/gw/gw/images/l-de.jpg
+/home/geneweb/gw/gw/images/l-dk.jpg
+/home/geneweb/gw/gw/images/l-en.jpg
+/home/geneweb/gw/gw/images/l-eo.jpg
+/home/geneweb/gw/gw/images/l-es.jpg
+/home/geneweb/gw/gw/images/l-fr.jpg
+/home/geneweb/gw/gw/images/l-he.jpg
+/home/geneweb/gw/gw/images/l-it.jpg
+/home/geneweb/gw/gw/images/l-nl.jpg
+/home/geneweb/gw/gw/images/l-no.jpg
+/home/geneweb/gw/gw/images/l-pt.jpg
+/home/geneweb/gw/gw/images/l-se.jpg
+/home/geneweb/gw/gw/images/up.jpg
 /home/geneweb/gw/gw/lang/advanced.txt
-/home/geneweb/gw/gw/lang/lexicon.txt
-/home/geneweb/gw/gw/lang/version.txt
 /home/geneweb/gw/gw/lang/cn/start.txt
 /home/geneweb/gw/gw/lang/cs/start.txt
 /home/geneweb/gw/gw/lang/de/start.txt
@@ -270,79 +292,62 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/lang/fr/start.txt
 /home/geneweb/gw/gw/lang/he/start.txt
 /home/geneweb/gw/gw/lang/it/start.txt
+/home/geneweb/gw/gw/lang/lexicon.txt
 /home/geneweb/gw/gw/lang/nl/start.txt
 /home/geneweb/gw/gw/lang/no/start.txt
 /home/geneweb/gw/gw/lang/pt/start.txt
 /home/geneweb/gw/gw/lang/se/start.txt
-/home/geneweb/gw/gw/images/l-cn.gif
-/home/geneweb/gw/gw/images/l-cs.gif
-/home/geneweb/gw/gw/images/l-de.gif
-/home/geneweb/gw/gw/images/l-dk.gif
-/home/geneweb/gw/gw/images/l-en.gif
-/home/geneweb/gw/gw/images/l-eo.gif
-/home/geneweb/gw/gw/images/l-es.gif
-/home/geneweb/gw/gw/images/l-fr.gif
-/home/geneweb/gw/gw/images/l-he.gif
-/home/geneweb/gw/gw/images/l-it.gif
-/home/geneweb/gw/gw/images/l-nl.gif
-/home/geneweb/gw/gw/images/l-no.gif
-/home/geneweb/gw/gw/images/l-pt.gif
-/home/geneweb/gw/gw/images/l-se.gif
-/home/geneweb/gw/gw/images/up.gif
-/home/geneweb/gw/gw/etc/copyr.txt
-/home/geneweb/gw/gw/etc/redirect.txt
-/home/geneweb/gw/gw/etc/renamed.txt
-/home/geneweb/gw/gw/etc/robot.txt
-/home/geneweb/gw/gw/setup/intro.txt
-/home/geneweb/gw/gw/setup/fr/backg.htm
-/home/geneweb/gw/gw/setup/fr/bsi.htm
-/home/geneweb/gw/gw/setup/fr/bsi_err.htm
-/home/geneweb/gw/gw/setup/fr/bso.htm
-/home/geneweb/gw/gw/setup/fr/bso_err.htm
-/home/geneweb/gw/gw/setup/fr/bso_ok.htm
-/home/geneweb/gw/gw/setup/fr/clean_ok.htm
-/home/geneweb/gw/gw/setup/fr/cleanup.htm
-/home/geneweb/gw/gw/setup/fr/cleanup1.htm
-/home/geneweb/gw/gw/setup/fr/consang.htm
-/home/geneweb/gw/gw/setup/fr/consg_ok.htm
-/home/geneweb/gw/gw/setup/fr/del_ok.htm
-/home/geneweb/gw/gw/setup/fr/delete.htm
-/home/geneweb/gw/gw/setup/fr/delete_1.htm
-/home/geneweb/gw/gw/setup/fr/err_acc.htm
-/home/geneweb/gw/gw/setup/fr/err_cnfl.htm
-/home/geneweb/gw/gw/setup/fr/err_miss.htm
-/home/geneweb/gw/gw/setup/fr/err_name.htm
-/home/geneweb/gw/gw/setup/fr/err_ndir.htm
-/home/geneweb/gw/gw/setup/fr/err_ngw.htm
-/home/geneweb/gw/gw/setup/fr/err_outd.htm
-/home/geneweb/gw/gw/setup/fr/err_reco.htm
-/home/geneweb/gw/gw/setup/fr/err_smdr.htm
-/home/geneweb/gw/gw/setup/fr/err_unkn.htm
-/home/geneweb/gw/gw/setup/fr/ged2gwb.htm
-/home/geneweb/gw/gw/setup/fr/gw2gd_ok.htm
-/home/geneweb/gw/gw/setup/fr/gwb2ged.htm
-/home/geneweb/gw/gw/setup/fr/gwc.htm
-/home/geneweb/gw/gw/setup/fr/gwd.htm
-/home/geneweb/gw/gw/setup/fr/gwd_info.htm
-/home/geneweb/gw/gw/setup/fr/gwd_ok.htm
-/home/geneweb/gw/gw/setup/fr/gwf.htm
-/home/geneweb/gw/gw/setup/fr/gwf_1.htm
-/home/geneweb/gw/gw/setup/fr/gwf_ok.htm
-/home/geneweb/gw/gw/setup/fr/gwu.htm
-/home/geneweb/gw/gw/setup/fr/gwu_ok.htm
-/home/geneweb/gw/gw/setup/fr/list.htm
-/home/geneweb/gw/gw/setup/fr/main.htm
-/home/geneweb/gw/gw/setup/fr/note.htm
-/home/geneweb/gw/gw/setup/fr/recover.htm
-/home/geneweb/gw/gw/setup/fr/recover1.htm
-/home/geneweb/gw/gw/setup/fr/recover2.htm
-/home/geneweb/gw/gw/setup/fr/ren_ok.htm
-/home/geneweb/gw/gw/setup/fr/rename.htm
-/home/geneweb/gw/gw/setup/fr/save.htm
-/home/geneweb/gw/gw/setup/fr/simple.htm
-/home/geneweb/gw/gw/setup/fr/traces.htm
-/home/geneweb/gw/gw/setup/fr/welcome.htm
-/home/geneweb/gw/gw/setup/fr/intro.txt
+/home/geneweb/gw/gw/lang/version.txt
+/home/geneweb/gw/gw/only.txt
+/home/geneweb/gw/gw/setup/de/backg.htm
+/home/geneweb/gw/gw/setup/de/bsi.htm
+/home/geneweb/gw/gw/setup/de/bsi_err.htm
+/home/geneweb/gw/gw/setup/de/bso.htm
+/home/geneweb/gw/gw/setup/de/bso_err.htm
+/home/geneweb/gw/gw/setup/de/bso_ok.htm
+/home/geneweb/gw/gw/setup/de/clean_ok.htm
+/home/geneweb/gw/gw/setup/de/cleanup.htm
+/home/geneweb/gw/gw/setup/de/cleanup1.htm
+/home/geneweb/gw/gw/setup/de/consang.htm
+/home/geneweb/gw/gw/setup/de/consg_ok.htm
+/home/geneweb/gw/gw/setup/de/del_ok.htm
+/home/geneweb/gw/gw/setup/de/delete.htm
+/home/geneweb/gw/gw/setup/de/delete_1.htm
+/home/geneweb/gw/gw/setup/de/err_acc.htm
+/home/geneweb/gw/gw/setup/de/err_cnfl.htm
+/home/geneweb/gw/gw/setup/de/err_miss.htm
+/home/geneweb/gw/gw/setup/de/err_name.htm
+/home/geneweb/gw/gw/setup/de/err_ndir.htm
+/home/geneweb/gw/gw/setup/de/err_ngw.htm
+/home/geneweb/gw/gw/setup/de/err_outd.htm
+/home/geneweb/gw/gw/setup/de/err_reco.htm
+/home/geneweb/gw/gw/setup/de/err_smdr.htm
+/home/geneweb/gw/gw/setup/de/err_unkn.htm
+/home/geneweb/gw/gw/setup/de/ged2gwb.htm
+/home/geneweb/gw/gw/setup/de/gw2gd_ok.htm
+/home/geneweb/gw/gw/setup/de/gwb2ged.htm
+/home/geneweb/gw/gw/setup/de/gwc.htm
+/home/geneweb/gw/gw/setup/de/gwd.htm
+/home/geneweb/gw/gw/setup/de/gwd_info.htm
+/home/geneweb/gw/gw/setup/de/gwd_ok.htm
+/home/geneweb/gw/gw/setup/de/gwf.htm
+/home/geneweb/gw/gw/setup/de/gwf_1.htm
+/home/geneweb/gw/gw/setup/de/gwf_ok.htm
+/home/geneweb/gw/gw/setup/de/gwu.htm
+/home/geneweb/gw/gw/setup/de/gwu_ok.htm
+/home/geneweb/gw/gw/setup/de/intro.txt
+/home/geneweb/gw/gw/setup/de/list.htm
+/home/geneweb/gw/gw/setup/de/main.htm
+/home/geneweb/gw/gw/setup/de/note.htm
+/home/geneweb/gw/gw/setup/de/recover.htm
+/home/geneweb/gw/gw/setup/de/recover1.htm
+/home/geneweb/gw/gw/setup/de/recover2.htm
+/home/geneweb/gw/gw/setup/de/ren_ok.htm
+/home/geneweb/gw/gw/setup/de/rename.htm
+/home/geneweb/gw/gw/setup/de/save.htm
+/home/geneweb/gw/gw/setup/de/simple.htm
+/home/geneweb/gw/gw/setup/de/traces.htm
+/home/geneweb/gw/gw/setup/de/welcome.htm
 /home/geneweb/gw/gw/setup/en/backg.htm
 /home/geneweb/gw/gw/setup/en/bsi.htm
 /home/geneweb/gw/gw/setup/en/bsi_err.htm
@@ -379,6 +384,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/setup/en/gwf_ok.htm
 /home/geneweb/gw/gw/setup/en/gwu.htm
 /home/geneweb/gw/gw/setup/en/gwu_ok.htm
+/home/geneweb/gw/gw/setup/en/intro.txt
 /home/geneweb/gw/gw/setup/en/list.htm
 /home/geneweb/gw/gw/setup/en/main.htm
 /home/geneweb/gw/gw/setup/en/note.htm
@@ -391,7 +397,6 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/setup/en/simple.htm
 /home/geneweb/gw/gw/setup/en/traces.htm
 /home/geneweb/gw/gw/setup/en/welcome.htm
-/home/geneweb/gw/gw/setup/en/intro.txt
 /home/geneweb/gw/gw/setup/es/backg.htm
 /home/geneweb/gw/gw/setup/es/bsi.htm
 /home/geneweb/gw/gw/setup/es/bsi_err.htm
@@ -428,6 +433,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/setup/es/gwf_ok.htm
 /home/geneweb/gw/gw/setup/es/gwu.htm
 /home/geneweb/gw/gw/setup/es/gwu_ok.htm
+/home/geneweb/gw/gw/setup/es/intro.txt
 /home/geneweb/gw/gw/setup/es/list.htm
 /home/geneweb/gw/gw/setup/es/main.htm
 /home/geneweb/gw/gw/setup/es/note.htm
@@ -440,10 +446,105 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/setup/es/simple.htm
 /home/geneweb/gw/gw/setup/es/traces.htm
 /home/geneweb/gw/gw/setup/es/welcome.htm
-/home/geneweb/gw/gw/setup/es/intro.txt
-/home/geneweb/gw/gw/only.txt
-/home/geneweb/gw/README.txt
-/home/geneweb/gw/LISEZMOI.txt
+/home/geneweb/gw/gw/setup/fr/backg.htm
+/home/geneweb/gw/gw/setup/fr/bsi.htm
+/home/geneweb/gw/gw/setup/fr/bsi_err.htm
+/home/geneweb/gw/gw/setup/fr/bso.htm
+/home/geneweb/gw/gw/setup/fr/bso_err.htm
+/home/geneweb/gw/gw/setup/fr/bso_ok.htm
+/home/geneweb/gw/gw/setup/fr/clean_ok.htm
+/home/geneweb/gw/gw/setup/fr/cleanup.htm
+/home/geneweb/gw/gw/setup/fr/cleanup1.htm
+/home/geneweb/gw/gw/setup/fr/consang.htm
+/home/geneweb/gw/gw/setup/fr/consg_ok.htm
+/home/geneweb/gw/gw/setup/fr/del_ok.htm
+/home/geneweb/gw/gw/setup/fr/delete.htm
+/home/geneweb/gw/gw/setup/fr/delete_1.htm
+/home/geneweb/gw/gw/setup/fr/err_acc.htm
+/home/geneweb/gw/gw/setup/fr/err_cnfl.htm
+/home/geneweb/gw/gw/setup/fr/err_miss.htm
+/home/geneweb/gw/gw/setup/fr/err_name.htm
+/home/geneweb/gw/gw/setup/fr/err_ndir.htm
+/home/geneweb/gw/gw/setup/fr/err_ngw.htm
+/home/geneweb/gw/gw/setup/fr/err_outd.htm
+/home/geneweb/gw/gw/setup/fr/err_reco.htm
+/home/geneweb/gw/gw/setup/fr/err_smdr.htm
+/home/geneweb/gw/gw/setup/fr/err_unkn.htm
+/home/geneweb/gw/gw/setup/fr/ged2gwb.htm
+/home/geneweb/gw/gw/setup/fr/gw2gd_ok.htm
+/home/geneweb/gw/gw/setup/fr/gwb2ged.htm
+/home/geneweb/gw/gw/setup/fr/gwc.htm
+/home/geneweb/gw/gw/setup/fr/gwd.htm
+/home/geneweb/gw/gw/setup/fr/gwd_info.htm
+/home/geneweb/gw/gw/setup/fr/gwd_ok.htm
+/home/geneweb/gw/gw/setup/fr/gwf.htm
+/home/geneweb/gw/gw/setup/fr/gwf_1.htm
+/home/geneweb/gw/gw/setup/fr/gwf_ok.htm
+/home/geneweb/gw/gw/setup/fr/gwu.htm
+/home/geneweb/gw/gw/setup/fr/gwu_ok.htm
+/home/geneweb/gw/gw/setup/fr/intro.txt
+/home/geneweb/gw/gw/setup/fr/list.htm
+/home/geneweb/gw/gw/setup/fr/main.htm
+/home/geneweb/gw/gw/setup/fr/note.htm
+/home/geneweb/gw/gw/setup/fr/recover.htm
+/home/geneweb/gw/gw/setup/fr/recover1.htm
+/home/geneweb/gw/gw/setup/fr/recover2.htm
+/home/geneweb/gw/gw/setup/fr/ren_ok.htm
+/home/geneweb/gw/gw/setup/fr/rename.htm
+/home/geneweb/gw/gw/setup/fr/save.htm
+/home/geneweb/gw/gw/setup/fr/simple.htm
+/home/geneweb/gw/gw/setup/fr/traces.htm
+/home/geneweb/gw/gw/setup/fr/welcome.htm
+/home/geneweb/gw/gw/setup/intro.txt
+/home/geneweb/gw/gw/setup/se/backg.htm
+/home/geneweb/gw/gw/setup/se/bsi.htm
+/home/geneweb/gw/gw/setup/se/bsi_err.htm
+/home/geneweb/gw/gw/setup/se/bso.htm
+/home/geneweb/gw/gw/setup/se/bso_err.htm
+/home/geneweb/gw/gw/setup/se/bso_ok.htm
+/home/geneweb/gw/gw/setup/se/clean_ok.htm
+/home/geneweb/gw/gw/setup/se/cleanup.htm
+/home/geneweb/gw/gw/setup/se/cleanup1.htm
+/home/geneweb/gw/gw/setup/se/consang.htm
+/home/geneweb/gw/gw/setup/se/consg_ok.htm
+/home/geneweb/gw/gw/setup/se/del_ok.htm
+/home/geneweb/gw/gw/setup/se/delete.htm
+/home/geneweb/gw/gw/setup/se/delete_1.htm
+/home/geneweb/gw/gw/setup/se/err_acc.htm
+/home/geneweb/gw/gw/setup/se/err_cnfl.htm
+/home/geneweb/gw/gw/setup/se/err_miss.htm
+/home/geneweb/gw/gw/setup/se/err_name.htm
+/home/geneweb/gw/gw/setup/se/err_ndir.htm
+/home/geneweb/gw/gw/setup/se/err_ngw.htm
+/home/geneweb/gw/gw/setup/se/err_outd.htm
+/home/geneweb/gw/gw/setup/se/err_reco.htm
+/home/geneweb/gw/gw/setup/se/err_smdr.htm
+/home/geneweb/gw/gw/setup/se/err_unkn.htm
+/home/geneweb/gw/gw/setup/se/ged2gwb.htm
+/home/geneweb/gw/gw/setup/se/gw2gd_ok.htm
+/home/geneweb/gw/gw/setup/se/gwb2ged.htm
+/home/geneweb/gw/gw/setup/se/gwc.htm
+/home/geneweb/gw/gw/setup/se/gwd.htm
+/home/geneweb/gw/gw/setup/se/gwd_info.htm
+/home/geneweb/gw/gw/setup/se/gwd_ok.htm
+/home/geneweb/gw/gw/setup/se/gwf.htm
+/home/geneweb/gw/gw/setup/se/gwf_1.htm
+/home/geneweb/gw/gw/setup/se/gwf_ok.htm
+/home/geneweb/gw/gw/setup/se/gwu.htm
+/home/geneweb/gw/gw/setup/se/gwu_ok.htm
+/home/geneweb/gw/gw/setup/se/intro.txt
+/home/geneweb/gw/gw/setup/se/list.htm
+/home/geneweb/gw/gw/setup/se/main.htm
+/home/geneweb/gw/gw/setup/se/note.htm
+/home/geneweb/gw/gw/setup/se/recover.htm
+/home/geneweb/gw/gw/setup/se/recover1.htm
+/home/geneweb/gw/gw/setup/se/recover2.htm
+/home/geneweb/gw/gw/setup/se/ren_ok.htm
+/home/geneweb/gw/gw/setup/se/rename.htm
+/home/geneweb/gw/gw/setup/se/save.htm
+/home/geneweb/gw/gw/setup/se/simple.htm
+/home/geneweb/gw/gw/setup/se/traces.htm
+/home/geneweb/gw/gw/setup/se/welcome.htm
 /home/geneweb/gw/gwd
 /home/geneweb/gw/gwsetup
 %defattr(-,root,root)
@@ -452,7 +553,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %changelog
 * Sun Sep 6 1999 Daniel de Rauglaudre
 Version 2.06-5
-- Set root as default group for user geneweb
+- updated file list
 
 * Sun Sep 5 1999 Daniel de Rauglaudre
 Version 2.06-4
