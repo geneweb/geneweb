@@ -14,6 +14,10 @@ GeneWeb Version 4.10
   - [12 Feb 03] Fixed problem with places containing only spaces: now
     replaced with empty strings.
 
+* Setup program (gwsetup)
+  - [12 Feb 03] Added double quotes around directories for information
+    lines.
+
 GeneWeb Version 4.09
 --------------------
 

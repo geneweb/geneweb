@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.42 2002-11-14 16:54:29 ddr Exp $ *)
+(* $Id: setup.ml,v 4.43 2003-02-12 12:04:28 ddr Exp $ *)
 
 open Printf;
 
@@ -695,7 +695,7 @@ value error conf str =
 value exec_f comm =
   let s = comm ^ " > " ^ "comm.log" in
   do {
-    eprintf "$ cd %s\n" (Sys.getcwd ());
+    eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
     flush stderr;
     eprintf "$ %s\n" s;
     flush stderr;
@@ -1015,7 +1015,7 @@ value recover_2 conf =
   let rc =
     try
       do {
-        eprintf "$ cd %s\n" init_dir;
+        eprintf "$ cd \"%s\"\n" init_dir;
         flush stderr;
         Sys.chdir init_dir;
         let c =
@@ -1031,7 +1031,7 @@ value recover_2 conf =
   in
   let rc =
     if rc = 0 then do {
-      eprintf "$ cd %s\n" dir;
+      eprintf "$ cd \"%s\"\n" dir;
       flush stderr;
       Sys.chdir dir;
       let c =
@@ -1095,7 +1095,7 @@ value cleanup_1 conf =
   in
   let in_base_dir = in_base ^ ".gwb" in
   do {
-    eprintf "$ cd %s\n" (Sys.getcwd ());
+    eprintf "$ cd \"%s\"\n" (Sys.getcwd ());
     flush stderr;
     let c =
       Filename.concat setup_dir.val "gwu" ^ " " ^ in_base ^ " -o tmp.gw"
@@ -1213,7 +1213,7 @@ value merge_1 conf =
   let bases = selected conf.env in
   let dir = Sys.getcwd () in
   do {
-    eprintf "$ cd %s\n" dir;
+    eprintf "$ cd \"%s\"\n" dir;
     flush stderr;
     Sys.chdir dir;
     let rc =
