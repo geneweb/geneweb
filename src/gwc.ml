@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.20 2004-08-05 12:37:14 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.21 2004-08-05 14:01:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -627,23 +627,29 @@ value cache_of tab =
 
 value no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []};
 
-value person_of_m_person per_index_ic per_ic mp =
-  do {
-    seek_in per_index_ic
-      (Iovalue.sizeof_long * Adef.int_of_iper mp.m_cle_index);
-    let pos = input_binary_int per_index_ic in
-    seek_in per_ic pos;
-    let p : person = input_value per_ic in
-    p.first_name := mp.m_first_name;
-    p.surname := mp.m_surname;
-    p.occ := mp.m_occ;
-    p.rparents := mp.m_rparents;
-    p.related := mp.m_related;
-    p.sex := mp.m_sex;
-    p.notes := mp.m_notes;
-    p.cle_index := mp.m_cle_index;
-    p
-  }
+value persons_cache per_index_ic per_ic persons =
+  let get_fun i =
+    let mp = persons.(i) in
+    do {
+      seek_in per_index_ic
+        (Iovalue.sizeof_long * Adef.int_of_iper mp.m_cle_index);
+      let pos = input_binary_int per_index_ic in
+      seek_in per_ic pos;
+      let p : person = input_value per_ic in
+      p.first_name := mp.m_first_name;
+      p.surname := mp.m_surname;
+      p.occ := mp.m_occ;
+      p.rparents := mp.m_rparents;
+      p.related := mp.m_related;
+      p.sex := mp.m_sex;
+      p.notes := mp.m_notes;
+      p.cle_index := mp.m_cle_index;
+      p
+    }
+  in
+  {array = fun _ -> failwith "bug: accessing persons array";
+   get = get_fun; len = Array.length persons;
+   clear_array = fun _ -> ()}
 ;
 
 value empty_base : Check.cbase =
@@ -685,8 +691,7 @@ value linked_base gen per_index_ic per_ic : Def.base =
   in
   let bnotes = gen.g_base.c_bnotes in
   let base_data =
-    {persons =
-       cache_of (Array.map (person_of_m_person per_index_ic per_ic) persons);
+    {persons = persons_cache per_index_ic per_ic persons;
      ascends = cache_of ascends;
      unions = cache_of unions; families = cache_of families;
      visible = { v_write = fun []; v_get = fun [] };
@@ -727,8 +732,6 @@ value link gwo_list =
     close_out gen.g_per_index;
     close_out gen.g_per;
     let base = linked_base gen per_index_ic per_ic in
-    close_in per_index_ic;
-    close_in per_ic;
     if do_check.val && gen.g_pcnt > 0 then do {
       Check.check_base base gen pr_stats.val; flush stdout;
     }

@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.27 2004-08-04 09:43:57 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.28 2004-08-05 14:01:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -116,15 +116,26 @@ value output_value_no_sharing oc v =
   Marshal.to_channel oc v [Marshal.No_sharing]
 ;
 
-value array_header_size arr = if Array.length arr < 8 then 1 else 5;
+value array_header_size arr = if arr.len < 8 then 1 else 5;
 
 value output_array_access oc arr pos =
   loop (pos + output_value_header_size + array_header_size arr) 0 where rec
-    loop pos i =
-    if i == Array.length arr then pos
+  loop pos i =
+    if i == arr.len then pos
     else do {
-      output_binary_int oc pos; loop (pos + Iovalue.size arr.(i)) (i + 1)
+      output_binary_int oc pos; loop (pos + Iovalue.size (arr.get i)) (i + 1)
     }
+;
+
+value output_cache_array_no_sharing oc arr =
+  do {
+    for i = 1 to output_value_header_size + array_header_size arr do {
+      output_byte oc 0;
+    };
+    for i = 0 to arr.len - 1 do {
+      Iovalue.output oc (arr.get i);
+    };
+  }
 ;
 
 (* Search index of a given string in file strings.inx *)
@@ -777,6 +788,8 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
     [ Some x -> x
     | None ->
         do {
+          if name = "persons" then failwith "bug: access to person array"
+	  else ();
           ifdef UNIX then
             if verbose.val then do {
               Printf.eprintf "*** read %s%s\n" name
@@ -1217,7 +1230,6 @@ value output_first_name_index oc2 base tmp_fnames_inx tmp_fnames_dat =
 
 value make_name_index base =
   let t = Array.create table_size [| |] in
-  let a = base.data.persons.array () in
   let add_name key valu =
     let key = Name.crush (Name.abbrev key) in
     let i = Hashtbl.hash key mod Array.length t in
@@ -1230,7 +1242,7 @@ value make_name_index base =
     | [n :: nl] -> do { add_name n ip; add_names ip nl } ]
   in
   do {
-    for i = 0 to Array.length a - 1 do {
+    for i = 0 to base.data.persons.len - 1 do {
       let p = base.data.persons.get i in
       let first_name = p_first_name base p in
       let surname = p_surname base p in
@@ -1254,12 +1266,20 @@ value count_error computed found =
   }
 ;
 
+value cache_of tab =
+  let c =
+    {array = fun _ -> tab; get = fun []; len = Array.length tab;
+     clear_array = fun _ -> ()}
+  in
+  do { c.get := fun i -> (c.array ()).(i); c }
+;
+
 value create_name_index oc_inx oc_inx_acc base =
   let ni = make_name_index base in
   let bpos = pos_out oc_inx in
   do {
     output_value_no_sharing oc_inx (ni : name_index_data);
-    let epos = output_array_access oc_inx_acc ni bpos in
+    let epos = output_array_access oc_inx_acc (cache_of ni) bpos in
     if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
     else ()
   }
@@ -1274,9 +1294,8 @@ value add_name t key valu =
 
 value make_strings_of_fsname base =
   let t = Array.create table_size [| |] in
-  let a = base.data.persons.array () in
   do {
-    for i = 0 to Array.length a - 1 do {
+    for i = 0 to base.data.persons.len - 1 do {
       let p = base.data.persons.get i in
       let first_name = p_first_name base p in
       let surname = p_surname base p in
@@ -1298,7 +1317,7 @@ value create_strings_of_fsname oc_inx oc_inx_acc base =
   let bpos = pos_out oc_inx in
   do {
     output_value_no_sharing oc_inx (t : strings_of_fsname);
-    let epos = output_array_access oc_inx_acc t bpos in
+    let epos = output_array_access oc_inx_acc (cache_of t) bpos in
     if epos <> pos_out oc_inx then count_error epos (pos_out oc_inx)
     else ()
   }
@@ -1391,7 +1410,9 @@ value gen_output no_patches bname base =
     let tmp_strings_inx = Filename.concat bname "1strings.inx" in
     let tmp_notes = Filename.concat bname "1notes" in
     if not no_patches then
+(*
       let _ = base.data.persons.array () in
+*)
       let _ = base.data.ascends.array () in
       let _ = base.data.unions.array () in
       let _ = base.data.families.array () in
@@ -1405,7 +1426,9 @@ value gen_output no_patches bname base =
     let output_array arr =
       let bpos = pos_out oc in
       do {
-        output_value_no_sharing oc arr;
+        match try Some (arr.array ()) with [ Failure _ -> None ] with
+        [ Some a -> output_value_no_sharing oc a
+	| None -> output_cache_array_no_sharing oc arr ];
         let epos = output_array_access oc_acc arr bpos in
         if epos <> pos_out oc then count_error epos (pos_out oc) else ()
       }
@@ -1426,25 +1449,25 @@ value gen_output no_patches bname base =
         output_binary_int oc 0;
         output_value_no_sharing oc base.data.bnotes.norigin_file;
         let persons_array_pos = pos_out oc in
-        if not no_patches then output_array (base.data.persons.array ())
+        if not no_patches then output_array base.data.persons
         else just_copy bname "persons" oc oc_acc;
         let ascends_array_pos = pos_out oc in
         if not no_patches then () else trace "saving ascends";
-        output_array (base.data.ascends.array ());
+        output_array base.data.ascends;
         let unions_array_pos = pos_out oc in
-        if not no_patches then output_array (base.data.unions.array ())
+        if not no_patches then output_array base.data.unions
         else just_copy bname "unions" oc oc_acc;
         let families_array_pos = pos_out oc in
-        if not no_patches then output_array (base.data.families.array ())
+        if not no_patches then output_array base.data.families
         else just_copy bname "families" oc oc_acc;
         let couples_array_pos = pos_out oc in
-        if not no_patches then output_array (base.data.couples.array ())
+        if not no_patches then output_array base.data.couples
         else just_copy bname "couples" oc oc_acc;
         let descends_array_pos = pos_out oc in
-        if not no_patches then output_array (base.data.descends.array ())
+        if not no_patches then output_array base.data.descends
         else just_copy bname "descends" oc oc_acc;
         let strings_array_pos = pos_out oc in
-        if not no_patches then output_array (base.data.strings.array ())
+        if not no_patches then output_array base.data.strings
         else just_copy bname "strings" oc oc_acc;
         seek_out oc array_start_indexes;
         output_binary_int oc persons_array_pos;
