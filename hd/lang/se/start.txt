@@ -25,7 +25,8 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-Databasen <font color=#2f6400><b>"%t"</b></font> inneh&aring;ller nu %n personer.%o<br>
+Databasen <font color=#2f6400><b>"%t"</b></font> inneh&aring;ller nu
+%n personer.%o<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%o
 
 %y<br><p>
@@ -59,7 +60,7 @@ tilltr&auml;de<br> (passord)</td>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-F&ouml;r att navigera i denna databas, kan du s&ouml;ka:<br><br>
+F&ouml;r att navigera i denna databas, kan du s&ouml;ka:<br><p>
 
 <ul>
 
@@ -83,24 +84,24 @@ F&ouml;r att navigera i denna databas, kan du s&ouml;ka:<br><br>
 </ul>
 </form>
 
-%T<li>
+$It<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>efter titel</b></font><br>
-<input name=t size=14 maxlength=200><br>
-(ex: roi, duke...)
+<font color=#2f6400><b>efter titel</b></font>$INl<br>$E
+<input name=t size=14 maxlength=200>$INl<br>$E
+(ex: roi, duke...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>plats</b></font><br>
-<input name=p size=25 maxlength=200><br>
+<font color=#2f6400><b>plats</b></font>$INl<br>$E
+<input name=p size=25 maxlength=200>$INl<br>$E
 (ex: de France, of Sax...)
-</td><td>...</td><td>
+</td><td>
 <input type=submit value="Ok">
 </td></tr></table>
 </form>
 
-%T<li>
+$E<li>
 
 <form method=GET action="%f">
 %h
@@ -127,27 +128,26 @@ s&ouml;kning</b></font></a>.
 
 %w<p>
 
-<center>Du kan<br><br>
+<center>Du kan<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">l&auml;gga till en familj</a>
-</ul>
+$INl</ul>
 </td>
 <td align=left>
-<ul>
+<ul>$E
 <li><a href="%sm=MOD_NOTES">&auml;ndra noteringar</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-<br>
 %w
 
-<center>Du kan ocks&aring; konsultera<br><br>
+<center>Du kan ocks&aring; konsultera<br><p>
 
 <table border=0>
 <tr>

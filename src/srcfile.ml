@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.1 1999-10-29 18:04:15 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.2 1999-10-30 13:25:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -154,18 +154,76 @@ value rec src_translate conf nom ic =
 
 value rec copy_from_channel conf base ic =
   let echo = ref True in
+  let no_tables = browser_doesnt_have_tables conf in
+  let (push_echo, pop_echo) =
+    let stack = ref [] in
+    (fun x ->
+       do stack.val := [echo.val :: stack.val]; echo.val := x; return (),
+     fun () ->
+       match stack.val with
+       [ [x :: l] -> do stack.val := l; echo.val := x; return ()
+       | [] -> echo.val := True ])
+  in
+  let rec if_expr =
+    fun
+    [ 'N' -> not (if_expr (input_char ic))
+    | 'a' -> conf.auth_file <> ""
+    | 'c' -> conf.cgi
+    | 'f' -> conf.friend
+    | 'h' -> Sys.file_exists (History.file_name conf)
+    | 'j' -> conf.just_friend_wizard
+    | 'l' -> no_tables
+    | 'n' -> base.data.bnotes.nread 1 <> ""
+    | 'w' -> conf.wizard
+    | 't' -> p_getenv conf.base_env "propose_titles" <> Some "no"
+    | 'z' -> Util.find_person_in_env conf base "z" <> None
+    | '|' ->
+        let a = if_expr (input_char ic) in
+        let b = if_expr (input_char ic) in
+        a || b
+    | '&' ->
+        let a = if_expr (input_char ic) in
+        let b = if_expr (input_char ic) in
+        a && b
+    | c -> do Wserver.wprint "!!!!!%c!!!!!" c; return True ]
+  in
   try
+    let compatibility = ref True in
     while True do
       match input_char ic with
       [ '[' ->
           let s = src_translate conf True ic in
-          if not echo.val then ()
-          else Wserver.wprint "%s" s
+          if not echo.val then () else Wserver.wprint "%s" s
+      | '<' when no_tables && echo.val ->
+          let c = input_char ic in
+          let (slash, c) =
+            if c = '/' then ("/", input_char ic) else ("", c)
+          in
+          let (atag, c) =
+            loop 0 c where rec loop len =
+              fun
+              [ '>' | ' ' as c -> (Buff.get len, c)
+              | c -> loop (Buff.store len c) (input_char ic) ]
+          in
+          match atag with
+          [ "table" | "tr" | "td" ->
+              loop c where rec loop =
+                fun
+                [ '>' -> ()
+                | _ -> loop (input_char ic) ]
+          | _ -> Wserver.wprint "<%s%s%c" slash atag c ]
+      | '$' ->
+          match input_char ic with
+          [ 'E' -> pop_echo ()
+          | 'I' -> push_echo (echo.val && if_expr (input_char ic))
+          | 'D' -> compatibility.val := False
+          | c -> Wserver.wprint "$%c" c ]
       | '%' ->
           let c = input_char ic in
           if not echo.val then
             match c with
-            [ 'w' | 'x' | 'y' | 'z' | 'i' | 'j' | 'u' | 'o' | 'T' ->
+            [ 'w' | 'x' | 'y' | 'z' | 'i' | 'j' | 'u' | 'o' | 'T'
+              when compatibility.val ->
                 echo.val := True
             | _ -> () ]
           else
@@ -200,10 +258,10 @@ value rec copy_from_channel conf base ic =
                    if conf.cgi then Wserver.wprint "b=%s;" conf.bname else ();
                 return ()
             | 'h' -> hidden_env conf
-            | 'i' ->
+            | 'i' when compatibility.val ->
                 if conf.cgi || conf.auth_file <> "" then ()
                 else echo.val := False
-            | 'j' ->
+            | 'j' when compatibility.val ->
                 if Sys.file_exists (History.file_name conf) then ()
                 else echo.val := False
             | 'l' -> Wserver.wprint "%s" conf.lang
@@ -211,9 +269,8 @@ value rec copy_from_channel conf base ic =
                 Num.print (fun x -> Wserver.wprint "%s" x)
                   (transl conf "(thousand separator)")
                   (Num.of_int base.data.persons.len)
-            | 'o' ->
-                if (* conf.lang <> conf.default_lang
-                || *) base.data.bnotes.nread 1 = "" then echo.val := False
+            | 'o' when compatibility.val ->
+                if base.data.bnotes.nread 1 = "" then echo.val := False
                 else ()
             | 'q' ->
                 let (wc, rc, d) = count conf in
@@ -223,23 +280,24 @@ value rec copy_from_channel conf base ic =
             | 'r' -> copy_from_file conf base (input_line ic)
             | 's' -> Wserver.wprint "%s" (commd conf)
             | 't' -> Wserver.wprint "%s" conf.bname
-            | 'T' ->
+            | 'T' when compatibility.val ->
                  match p_getenv conf.base_env "propose_titles" with
                  [ Some "no" -> echo.val := False
                  | _ -> () ]
-            | 'u' ->
+            | 'u' when compatibility.val ->
                 match Util.find_person_in_env conf base "z" with
                 [ Some _ -> ()
                 | None -> echo.val := False ]
             | 'v' -> Wserver.wprint "%s" Version.txt
-            | 'w' -> if conf.wizard then () else echo.val := False
-            | 'x' ->
+            | 'w' when compatibility.val ->
+                if conf.wizard then () else echo.val := False
+            | 'x' when compatibility.val ->
                 if conf.wizard || conf.friend then () else echo.val := False
-            | 'y' ->
+            | 'y' when compatibility.val ->
                 if not conf.wizard && not conf.just_friend_wizard
                 && not conf.cgi && conf.auth_file = "" then ()
                 else echo.val := False
-            | 'z' ->
+            | 'z' when compatibility.val ->
                 if not conf.wizard && not conf.friend && not conf.cgi
                 && conf.auth_file = "" then ()
                 else echo.val := False
