@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.13 1999-05-22 21:47:41 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.14 1999-05-23 09:51:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -455,8 +455,7 @@ value empty_base : Def.base =
      ascends = cache_of [| |];
      families = cache_of [| |];
      couples = cache_of [| |];
-     strings = cache_of [| |];
-     has_family_patches = False}
+     strings = cache_of [| |]}
   in
   let base_func =
    {persons_of_name = fun [];
@@ -471,7 +470,7 @@ value empty_base : Def.base =
     patch_string = fun [];
     patch_name = fun [];
     commit_patches = fun [];
-    patched_families = fun [];
+    patched_ascends = fun [];
     cleanup = fun () -> ()}
   in
   {data = base_data; func = base_func}
@@ -503,8 +502,7 @@ value linked_base gen : Def.base =
      ascends = cache_of ascends;
      families = cache_of families;
      couples = cache_of couples;
-     strings = cache_of strings;
-     has_family_patches = False}
+     strings = cache_of strings}
   in
   let base_func =
     {persons_of_name = fun [];
@@ -519,7 +517,7 @@ value linked_base gen : Def.base =
      patch_string = fun [];
      patch_name = fun [];
      commit_patches = fun [];
-     patched_families = fun [];
+     patched_ascends = fun [];
      cleanup = fun () -> ()}
   in
   {data = base_data; func = base_func}
@@ -539,7 +537,7 @@ value link gwo_list =
        do Check.check_base base gen pr_stats.val; flush stdout; return ()
      else ();
      if not gen.g_errored then
-       if do_consang.val then Consang.compute_all_consang base True False
+       if do_consang.val then ConsangAll.compute base True False
        else ()
      else exit 2;
   return base

@@ -10,10 +10,15 @@ GeneWeb Intermediate Version 2.02-1
     one returns an error code.
 
 * GeneWeb daemon/CGI (gwd)
+  - [May 23, 99] Deleted supposed unuseful code, particularly in MergeIndOk,
+    to make code cleaner, hopefully not introducing bugs.
+  - [May 23, 99] Added renitialization of field "consang" when modifying
+    families to prepare new version of program "consang" (minimalist).
   - [May 18, 99] Added thousand separator for displaying of number of persons
     in the welcome page.
 
 * Compilation
+  - [May 23, 99] Separed consang computation in another file "consangAll.ml".
   - [May 12,99] Fixed YAAP (yet another accent problem...)
   - [May 8, 99] Added "make opt" case in "setup" to build optimized versions.
 

@@ -32,6 +32,8 @@ config.cmi: def.cmi
 consang.cmo: adef.cmi check.cmo def.cmi gutil.cmi pqueue.cmi consang.cmi 
 consang.cmx: adef.cmx check.cmx def.cmi gutil.cmx pqueue.cmx consang.cmi 
 consang.cmi: def.cmi 
+consangAll.cmo: adef.cmi consang.cmi def.cmi gutil.cmi 
+consangAll.cmx: adef.cmx consang.cmx def.cmi gutil.cmx 
 cousins.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi num.cmi \
     srcfile.cmi util.cmi ../wserver/wserver.cmi 
 cousins.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
@@ -64,10 +66,10 @@ family.cmi: config.cmi def.cmi
 gutil.cmo: adef.cmi ansel.cmo def.cmi name.cmi gutil.cmi 
 gutil.cmx: adef.cmx ansel.cmx def.cmi name.cmx gutil.cmi 
 gutil.cmi: def.cmi 
-gwc.cmo: adef.cmi ansel.cmo argl.cmo check.cmo consang.cmi def.cmi gutil.cmi \
-    gwcomp.cmo iobase.cmi lock.cmo mhashtbl.cmo name.cmi 
-gwc.cmx: adef.cmx ansel.cmx argl.cmx check.cmx consang.cmx def.cmi gutil.cmx \
-    gwcomp.cmx iobase.cmx lock.cmx mhashtbl.cmx name.cmx 
+gwc.cmo: adef.cmi ansel.cmo argl.cmo check.cmo consangAll.cmo def.cmi \
+    gutil.cmi gwcomp.cmo iobase.cmi lock.cmo mhashtbl.cmo name.cmi 
+gwc.cmx: adef.cmx ansel.cmx argl.cmx check.cmx consangAll.cmx def.cmi \
+    gutil.cmx gwcomp.cmx iobase.cmx lock.cmx mhashtbl.cmx name.cmx 
 gwcomp.cmo: adef.cmi ansel.cmo def.cmi gutil.cmi 
 gwcomp.cmx: adef.cmx ansel.cmx def.cmi gutil.cmx 
 gwd.cmo: argl.cmo base64.cmo config.cmi def.cmi family.cmi gutil.cmi \
@@ -106,8 +108,8 @@ mergeIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi merge.cmi srcfile.cmi \
     update.cmi updateInd.cmi updateIndOk.cmi util.cmi ../wserver/wserver.cmi 
 mergeIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx merge.cmx srcfile.cmx \
     update.cmx updateInd.cmx updateIndOk.cmx util.cmx ../wserver/wserver.cmx 
-mk_consang.cmo: argl.cmo consang.cmi def.cmi iobase.cmi lock.cmo 
-mk_consang.cmx: argl.cmx consang.cmx def.cmi iobase.cmx lock.cmx 
+mk_consang.cmo: argl.cmo consang.cmi consangAll.cmo iobase.cmi lock.cmo 
+mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx iobase.cmx lock.cmx 
 mostdesc.cmo: adef.cmi ansel.cmo argl.cmo consang.cmi def.cmi gutil.cmi \
     iobase.cmi name.cmi num.cmi pqueue.cmi 
 mostdesc.cmx: adef.cmx ansel.cmx argl.cmx consang.cmx def.cmi gutil.cmx \

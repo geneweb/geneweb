@@ -1,4 +1,4 @@
-(* $Id: consang.mli,v 2.2 1999-03-26 05:48:02 ddr Exp $ *)
+(* $Id: consang.mli,v 2.3 1999-05-23 09:51:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -22,5 +22,3 @@ value make_relationship_table : base -> array int -> relationship_table;
 
 value relationship_and_links :
   base -> relationship_table -> bool -> iper -> iper -> (float * list int);
-
-value compute_all_consang : base -> bool -> bool -> unit;

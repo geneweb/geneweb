@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.18 1999-05-22 21:47:41 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.19 1999-05-23 09:51:58 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1459,7 +1459,7 @@ value make_base (persons, ascends, families, couples, strings) =
   let base_data =
     {persons = cache_of persons; ascends = cache_of ascends;
      families = cache_of families; couples = cache_of couples;
-     strings = cache_of strings; has_family_patches = False}
+     strings = cache_of strings}
   in
   let base_func =
     {persons_of_name = fun []; strings_of_fsname = fun [];
@@ -1468,8 +1468,7 @@ value make_base (persons, ascends, families, couples, strings) =
      persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
      patch_person = fun []; patch_ascend = fun []; patch_family = fun [];
      patch_couple = fun []; patch_string = fun []; patch_name = fun [];
-     commit_patches = fun []; patched_families = fun [];
-     cleanup = fun () -> ()}
+     commit_patches = fun []; patched_ascends = fun []; cleanup = fun () -> ()}
   in
   {data = base_data; func = base_func}
 ;

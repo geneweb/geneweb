@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.10 1999-05-06 19:26:48 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.11 1999-05-23 09:52:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -430,7 +430,6 @@ value effective_del conf base p =
      p.burial_src := empty;
      p.notes := empty;
      p.psources := empty;
-     base.func.patch_person p.cle_index p;
   return ()
 ;
 
@@ -519,6 +518,7 @@ value print_del conf base =
       [ Some i ->
           let p = base.data.persons.get i in
           do effective_del conf base p;
+             base.func.patch_person p.cle_index p;
              base.func.commit_patches ();
              print_del_ok conf base [];
           return ()

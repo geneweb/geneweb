@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.8 1999-05-10 15:46:02 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.9 1999-05-23 09:51:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -389,11 +389,15 @@ value effective_mod conf base sfam scpl =
           let a = aoi base ip in
           do Hashtbl.add cache ip a; return a ]
   in
+  let same_parents =
+    nfath.cle_index = ofath.cle_index &&
+    nmoth.cle_index = omoth.cle_index
+  in
   do Array.iter
        (fun ip ->
           let a = find_asc ip in
           do a.parents := None; return
-          if not (array_memq ip nfam.children) then base.func.patch_ascend ip a
+          if not (array_memq ip nfam.children) then a.consang := Adef.fix (-1)
           else ())
        ofam.children;
      Array.iter
@@ -405,9 +409,21 @@ value effective_mod conf base sfam scpl =
               raise Update.ModErr
           | None ->
               do a.parents := Some fi; return
-              if not (array_memq ip ofam.children) then
-                base.func.patch_ascend ip a
+              if not (array_memq ip ofam.children) || not same_parents then
+                a.consang := Adef.fix (-1)
               else () ])
+       nfam.children;
+     Array.iter
+       (fun ip ->
+          if not (array_memq ip nfam.children) then
+            base.func.patch_ascend ip (find_asc ip)
+          else ())
+       ofam.children;
+     Array.iter
+       (fun ip ->
+          if not (array_memq ip ofam.children) || not same_parents then
+            base.func.patch_ascend ip (find_asc ip)
+          else ())
        nfam.children;
      add_misc_names_for_new_persons base;
      Update.update_misc_names_of_family base nfath;
@@ -448,8 +464,9 @@ value effective_add conf base sfam scpl =
           [ Some _ ->
               do print_err_parents conf base p; return raise Update.ModErr
           | None ->
-              do base.func.patch_ascend p.cle_index a;
-                 a.parents := Some fi;
+              do a.parents := Some fi;
+                 a.consang := Adef.fix (-1);
+                 base.func.patch_ascend p.cle_index a;
               return () ])
        nfam.children;
      add_misc_names_for_new_persons base;
@@ -486,6 +503,7 @@ value kill_family base fam ip =
 value kill_parents base ip =
   let a = aoi base ip in
   do a.parents := None;
+     a.consang := Adef.fix (-1);
      base.func.patch_ascend ip a;
   return ()
 ;
