@@ -8,6 +8,9 @@ GeneWeb version 3.05
     options -setuid and -setgid now unuseful.
   - [30 Apr 00] Fixed little problem with displaying by places for the ones
     containing several (at least two) indications between parentheses.
+  
+* Documentation
+  - [04 May 00] Added one item in faq about a possible problem in CGI mode.
 
 GeneWeb version 3.04
 --------------------
