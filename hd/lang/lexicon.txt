@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.228 2001-02-11 18:58:53 ddr Exp $
+# $Id: lexicon.txt,v 3.229 2001-02-11 19:28:54 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -29,12 +29,12 @@ he: rtl
 
      !languages
 cs: af=afrikán¹tina/cn=èín¹tina/cs=èe¹tina/dk=dán¹tina/nl=holand¹tina/en=angliètina/eo=esperanto/fi=fin¹tina/fr=francouz¹tina/de=nìmèina/he=hebrej¹tina/is=island¹tina/it=ital¹tina/lv=loty¹¹tina/no=nor¹tina/pt=portugal¹tina/es=¹panìl¹tina/ru=ru¹tina/se=¹véd¹tina
-ct: af=africà/cn=Xinès/cs=xec/de=alemany/dk=danès/en=anglès/eo=esperanto/es=castellà/fi=finlandès/fr=francès/he=hebre/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/pt=portuguès/ru=rus/se=suec
+ct: af=africà/cn=Xinès/cs=xec/ct=català/de=alemany/dk=danès/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/pt=portuguès/ru=rus/se=suec
 de: af=Afrikaans/cn=Chinesisch/dk=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/no=Norwegisch/pt=Portugiesisch/ru=Russisch/es=Spanisch/se=Schwedisch/cs=Tschechisch
 dk: af=afrikaans/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
 en: af=Afrikaans/cn=Chinese/cs=Czech/ct=Catalan/dk=Danish/nl=Dutch/en=English/eo=Esperanto/et=Estonian/fi=Finnish/fr=French/de=German/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/no=Norwegian/pt=Portuguese/es=Spanish/ru=Russian/se=Swedish
 eo: en=anglo/eo=esperanto/fr=franco
-es: de=Alem&aacute;n/cs=Checo/cn=Chino/dk=Dan&eacute;s/es=Espa&ntilde;ol/eo=Esperanto/fr=Franc&eacute;s/he=Hebreo/en=Ingl&eacute;s/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/se=Sueco
+es: cs=Checo/cn=Chino/ct=Catalán/de=Alem&aacute;n/dk=Dan&eacute;s/es=Espa&ntilde;ol/eo=Esperanto/fr=Franc&eacute;s/he=Hebreo/en=Ingl&eacute;s/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/se=Sueco
 et: af=afrikaani/cn=hiina/cs=t¨ehhi/de=saksa/dk=taani/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/pt=portugali/ru=vene/se=rootsi
 fi: af=afrikaani/cn=kiina/cs=tsekki/de=saksa/dk=tanska/en=englanti/eo=esperanto/es=espanja/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/se=ruotsi
 fr: af=afrikaans/cn=chinois/cs=tch&egrave;que/ct=catalan/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pt=portugais/ru=russe/se=su&eacute;dois
