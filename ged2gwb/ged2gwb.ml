@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.22 1999-07-02 14:26:54 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.23 1999-07-05 09:39:22 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1542,22 +1542,24 @@ value check_parents_children base =
        match a.parents with
        [ Some ifam ->
            let fam = foi base ifam in
-           let cpl = coi base ifam in
-           if array_memq (Adef.iper_of_int i) fam.children then ()
+           if fam.fam_index == Adef.ifam_of_int (-1) then a.parents := None
            else
-             let p = base.data.persons.get i in
-             do Printf.fprintf log_oc.val
-                  "%s is not the child of his/her parents\n"
-                  (denomination base p);
-                Printf.fprintf log_oc.val "- %s\n"
-                  (denomination base (poi base cpl.father));
-                Printf.fprintf log_oc.val "- %s\n"
-                  (denomination base (poi base cpl.mother));
-                Printf.fprintf log_oc.val "=> no more parents for him/her\n";
-                Printf.fprintf log_oc.val "\n";
-                flush log_oc.val;
-                a.parents := None;
-             return ()
+             let cpl = coi base ifam in
+             if array_memq (Adef.iper_of_int i) fam.children then ()
+             else
+               let p = base.data.persons.get i in
+               do Printf.fprintf log_oc.val
+                    "%s is not the child of his/her parents\n"
+                    (denomination base p);
+                  Printf.fprintf log_oc.val "- %s\n"
+                    (denomination base (poi base cpl.father));
+                  Printf.fprintf log_oc.val "- %s\n"
+                    (denomination base (poi base cpl.mother));
+                  Printf.fprintf log_oc.val "=> no more parents for him/her\n";
+                  Printf.fprintf log_oc.val "\n";
+                  flush log_oc.val;
+                  a.parents := None;
+               return ()
        | None -> () ];
      done;
      for i = 0 to base.data.families.len - 1 do

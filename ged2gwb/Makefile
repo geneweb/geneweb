@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.2 1999-04-29 08:08:37 ddr Exp $
+# $Id: Makefile,v 2.3 1999-07-05 09:39:21 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -17,7 +17,7 @@ clean::
 	$(RM) ged2gwb
 
 ged2gwb.out: $(OBJS)
-	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(CAMLP4D)/gramlib.cma $(OBJS) -o ged2gwb.out
+	$(OCAMLC) -custom $(OCAMLD) unix.cma $(LIBUNIX) $(CAMLP4D)/gramlib.cma $(OBJS) -o ged2gwb.out
 
 ged2gwb.opt: $(OBJS:.cmo=.cmx)
 	$(OCAMLOPT) unix.cmxa $(LIBUNIX) $(CAMLP4D)/gramlib.cmxa $(OBJS:.cmo=.cmx) -o ged2gwb.opt

@@ -1,4 +1,4 @@
-# $Id: Makefile.inc,v 2.2 1999-05-03 07:10:48 ddr Exp $
+# $Id: Makefile.inc,v 2.3 1999-07-05 09:39:25 ddr Exp $
 
 CAMLP4_COMM=../tools/camlp4_comm.sh pa_ifdef.cmo pa_ru.cmo
 CAMLP4F=-DUNIX
@@ -7,6 +7,7 @@ LIBUNIX=-cclib -lunix
 OCAMLC=ocamlc.opt
 OCAMLOPT=ocamlopt.opt
 OCAMLI=
+OCAMLD=-g
 RM=/bin/rm -f
 EXE=
 
@@ -27,7 +28,7 @@ clean::
 .ml.cmo:
 	@if test `basename $<` != $<; then echo "Bad directory for $<"; exit 1; fi
 	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppo
-	$(OCAMLC) $(OCAMLI) -I $(CAMLP4D) -c -impl $*.ppo
+	$(OCAMLC) $(OCAMLI) $(OCAMLD) -I $(CAMLP4D) -c -impl $*.ppo
 	$(RM) $*.ppo
 
 .ml.cmx:

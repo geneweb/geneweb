@@ -10,6 +10,9 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [Jun 5, 99] Fixed bug sometimes raising exception "Invalid_argument"
+    after a detection of an error of parents with inverted sex (female
+    father and male mother).
   - [Jul 2, 99] Recognizes the dates of the form "FROM..TO..".
 
 * GeneWeb to Gedcom (gwb2ged)
