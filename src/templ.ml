@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.25 2004-12-31 03:59:53 ddr Exp $ *)
+(* $Id: templ.ml,v 4.26 2005-01-16 20:07:18 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -614,38 +614,13 @@ value print_body_prop conf base =
   let s = s ^ body_prop conf in Wserver.wprint "%s" s
 ;
 
-value print_copyright conf base =
-  let env =
-    [('s', fun _ -> commd conf);
-     ('d',
-      fun _ ->
-        let s =
-          if conf.cancel_links then ""
-          else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>"
-        in
-        if not conf.setup_link then s
-        else s ^ " - " ^ Util.setup_link conf);
-     ('/', fun _ -> conf.xhs)]
-  in
-  match open_etc_file "copyr" with
-  [ Some ic -> copy_from_etc env conf.lang conf.indep_command ic
-  | None ->
-      do {
-        html_p conf;
-        Wserver.wprint "
-<hr><font size=\"-1\"><em>Copyright (c) 1998-2005 INRIA -
-GeneWeb %s</em></font>" Version.txt;
-        html_br conf;
-      } ]
-;
-
 value print_variable conf base =
   fun
   [ "action" -> Wserver.wprint "%s" conf.command
   | "base_header" -> include_hed_trl conf (Some base) ".hed"
   | "base_trailer" -> include_hed_trl conf (Some base) ".trl"
   | "body_prop" -> print_body_prop conf base
-  | "copyright" -> print_copyright conf base
+  | "copyright" -> Util.print_copyright conf
   | "doctype" -> Wserver.wprint "%s\n" (Util.doctype conf)
   | "hidden" -> Util.hidden_env conf
   | "highlight" -> Wserver.wprint "%s" conf.highlight
