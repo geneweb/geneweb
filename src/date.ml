@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.23 2004-12-26 18:11:20 ddr Exp $ *)
+(* $Id: date.ml,v 4.24 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -673,7 +673,7 @@ value print_calendar conf base =
         end;
         stag "tr" begin
           tag "td" "align=center" begin
-            tag "form" "method=GET action=\"%s\"" conf.command begin
+            tag "form" "method=\"get\" action=\"%s\"" conf.command begin
               html_p conf;
               List.iter
                 (fun (k, v) ->

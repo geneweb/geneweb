@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.14 2004-12-26 18:11:20 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.15 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -111,7 +111,7 @@ value br_inter_is_empty b1 b2 =
 (* Algorithms *)
 
 value print_choice conf base p niveau_effectif =
-  tag "form" "method=get action=\"%s\"" conf.command begin
+  tag "form" "method=\"get\" action=\"%s\"" conf.command begin
     html_p conf;
     Util.hidden_env conf;
     Wserver.wprint "<input type=hidden name=m value=C>\n";

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.35 2004-12-26 18:11:20 ddr Exp $ *)
+(* $Id: update.ml,v 4.36 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -58,7 +58,7 @@ value print_same_name conf base p =
 value print_return conf =
   do {
     html_p conf;
-    tag "form" "method=POST action=\"%s\"" conf.command begin
+    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       List.iter
         (fun (x, v) ->
            Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x
@@ -724,7 +724,7 @@ value print_create_conflict conf base p var =
       find_free_occ base (p_first_name base p) (p_surname base p) 0
     in
     html_p conf;
-    tag "form" "method=POST action=\"%s\"" conf.command begin
+    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       List.iter
         (fun (x, v) ->
            Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_html.ml,v 4.2 2004-12-14 09:30:14 ddr Exp $ *)
+(* $Id: pa_html.ml,v 4.3 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Pcaml;
@@ -10,8 +10,9 @@ value rec unfold_apply list =
   | e -> (e, list) ]
 ;
 
-value tag_encloser loc tag newl a el =
+value tag_encloser loc tag newl enewl a el =
   let s = if newl then "\n" else "" in
+  let se = if newl || enewl then "\n" else "" in
   let e =
     let (frm, al) =
       match a with
@@ -30,18 +31,22 @@ value tag_encloser loc tag newl a el =
     List.fold_left (fun f e -> <:expr< $f$ $e$ >>)
       <:expr< Wserver.wprint $str:"<" ^ tag ^ frm ^ ">" ^ s$ >> al
   in
-  [e :: el @ [<:expr< Wserver.wprint $str:"</" ^ tag ^ ">" ^ s$ >>]]
+  [e :: el @ [<:expr< Wserver.wprint $str:"</" ^ tag ^ ">" ^ se$ >>]]
 ;
 
 EXTEND
   GLOBAL: expr;
   expr: LEVEL "top"
     [ [ "tag"; (tn, al, el) = tag_body ->
-          let el = tag_encloser loc tn True al el in
+          let el = tag_encloser loc tn True True al el in
           ifndef NEWSEQ then MLast.ExSeq loc el (MLast.ExUid loc "()")
           else MLast.ExSeq loc el
       | "stag"; (tn, al, el) = tag_body ->
-          let el = tag_encloser loc tn False al el in
+          let el = tag_encloser loc tn False False al el in
+          ifndef NEWSEQ then MLast.ExSeq loc el (MLast.ExUid loc "()")
+          else MLast.ExSeq loc el
+      | "stagn"; (tn, al, el) = tag_body ->
+          let el = tag_encloser loc tn False True al el in
           ifndef NEWSEQ then MLast.ExSeq loc el (MLast.ExUid loc "()")
           else MLast.ExSeq loc el ] ]
   ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.12 2004-12-26 18:11:20 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.13 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -211,7 +211,7 @@ value propose_months conf mode =
   tag "table" "border=\"%d\" style=\"margin:auto\"" conf.border begin
     tag "tr" begin
       tag "td" begin
-        tag "form" "method=get action=\"%s\"" conf.command begin
+        tag "form" "method=\"get\" action=\"%s\"" conf.command begin
           html_p conf;
           Util.hidden_env conf;
           mode ();

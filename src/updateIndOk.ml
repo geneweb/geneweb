@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.18 2004-12-14 09:30:18 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.19 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -338,7 +338,7 @@ value print_conflict conf base p =
         (transl conf "change it (the number) yourself");
     end;
     html_p conf;
-    tag "form" "method=POST action=\"%s\"" conf.command begin
+    tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       List.iter
         (fun (x, v) ->
            Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.32 2004-12-14 09:30:18 ddr Exp $ *)
+(* $Id: util.mli,v 4.33 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -189,6 +189,8 @@ value has_nephews_or_nieces : config -> base -> person -> bool;
 value browser_doesnt_have_tables : config -> bool;
 
 value start_with : string -> int -> string -> bool;
+
+value xhs : string;
 
 (* Printing for browsers without tables *)
 

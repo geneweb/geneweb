@@ -1,11 +1,13 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.53 2004-12-26 21:48:28 ddr Exp $ *)
+(* $Id: relation.ml,v 4.54 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;
 open Config;
 open Util;
+
+value xhs = Util.xhs;
 
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
@@ -14,13 +16,14 @@ value print_with_relation text conf base p r is =
   [ Some ic ->
       let c = pget conf base ic in
       if is_hidden c then ()
-      else do {
-        html_li conf;
-        Wserver.wprint "<input type=radio name=select value=%d>\n"
-          (Adef.int_of_iper ic);
-        Wserver.wprint "(%s)\n" (text conf r.r_type is);
-        Wserver.wprint "%s\n" (person_title_text conf base c)
-      }
+      else
+        tag "li" begin        
+          Wserver.wprint
+            "<input type=\"radio\" name=\"select\" value=\"%d\"%s>\n"
+            (Adef.int_of_iper ic) xhs;
+          Wserver.wprint "(%s)\n" (text conf r.r_type is);
+          Wserver.wprint "%s\n" (person_title_text conf base c);
+        end
   | None -> () ]
 ;
 
@@ -49,8 +52,8 @@ value print_with_witness conf base p fam ip =
   if is_hidden w then ()
   else do {
     html_li conf;
-    Wserver.wprint "<input type=radio name=select value=%d>\n"
-      (Adef.int_of_iper ip);
+    Wserver.wprint "<input type=\"radio\" name=\"select\" value=\"%d\"%s>\n"
+      (Adef.int_of_iper ip) xhs;
     Wserver.wprint "(%s)\n"
       (nominative (transl_nth conf "witness/witnesses" 0));
     Wserver.wprint "%s\n" (person_title_text conf base w)
@@ -76,42 +79,51 @@ value print_menu conf base p =
   let u = uget conf base p.cle_index in
   do {
     header conf title;
-    tag "form" "method=get action=\"%s\"" conf.command begin
-      Wserver.wprint "<p>\n";
-      Util.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=em value=R>\n";
-      wprint_hidden_person conf base "e" p;
+    tag "form" "method=\"get\" action=\"%s\"" conf.command begin
+      tag "p" begin
+        Util.hidden_env conf;
+        Wserver.wprint
+          "<input type=\"hidden\" name=\"em\" value=\"R\"%s>\n" xhs;
+        wprint_hidden_person conf base "e" p;
+      end;
       tag "ul" begin
-        html_li conf;
-        Wserver.wprint "<input type=hidden name=m value=NG>\n";
-        Wserver.wprint "<input type=radio name=select value=input checked>\n";
-        Wserver.wprint "<input name=n size=40 maxlength=200>\n";
-        html_p conf;
-        tag "ul" begin
-          html_li conf;
-          Wserver.wprint "<input type=radio name=t value=PN checked>\n";
-          Wserver.wprint "<em>%s %s</em> %s <em>%s</em> %s <em>%s</em>\n"
-            (transl_nth conf "first name/first names" 0)
-            (transl_nth conf "surname/surnames" 0) (transl conf "or")
-            (transl conf "public name") (transl conf "or")
-            (nominative (transl conf "alias"));
-          match Util.find_sosa_ref conf base with
-          [ Some p ->
-              do {
-                Wserver.wprint "%s " (transl conf "or");
-                Wserver.wprint
-                  (ftransl conf "<em>Sosa number</em> relative to %t")
-                  (fun _ ->
-                     Wserver.wprint "%s"
-                       (referenced_person_title_text conf base p))
-              }
-          | None -> () ];
-          html_li conf;
-          Wserver.wprint "<input type=radio name=t value=P> <em>%s</em>\n"
-            (transl_nth conf "first name/first names" 0);
-          html_li conf;
-          Wserver.wprint "<input type=radio name=t value=N> <em>%s</em>\n"
-            (transl_nth conf "surname/surnames" 0);
+        tag "li" begin
+          Wserver.wprint "\
+<input type=\"hidden\" name=\"m\" value=\"NG\"%s>
+<input type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"%s>
+<input name=\"n\" size=\"40\" maxlength=\"200\"%s>\n" xhs xhs xhs;
+          tag "ul" begin
+            tag "li" begin
+              Wserver.wprint "\
+<input type=\"radio\" name=\"t\" value=\"PN\" checked=\"checked\"%s>\n" xhs;
+              Wserver.wprint "<em>%s %s</em> %s <em>%s</em> %s <em>%s</em>\n"
+                (transl_nth conf "first name/first names" 0)
+                (transl_nth conf "surname/surnames" 0) (transl conf "or")
+                (transl conf "public name") (transl conf "or")
+                (nominative (transl conf "alias"));
+              match Util.find_sosa_ref conf base with
+              [ Some p ->
+                  do {
+                    Wserver.wprint "%s " (transl conf "or");
+                    Wserver.wprint
+                      (ftransl conf "<em>Sosa number</em> relative to %t")
+                      (fun _ ->
+                         Wserver.wprint "%s"
+                           (referenced_person_title_text conf base p))
+                  }
+              | None -> () ];
+            end;
+            stagn "li" begin
+              Wserver.wprint
+                "<input type=\"radio\" name=\"t\" value=\"P\"%s> <em>%s</em>"
+                xhs (transl_nth conf "first name/first names" 0);
+            end;
+            stagn "li" begin
+              Wserver.wprint
+                "<input type=\"radio\" name=\"t\" value=\"N\"%s> <em>%s</em>"
+                xhs (transl_nth conf "surname/surnames" 0);
+            end;
+          end;
         end;
         Array.iter
           (fun ifam ->
@@ -121,19 +133,19 @@ value print_menu conf base p =
              let c = pget conf base c in
              if (p_first_name base c <> "?" || p_surname base c <> "?")
                 && not (is_hidden c)
-             then do {
-               html_li conf;
-               Wserver.wprint "<input type=radio name=select value=%d>\n"
-                 (Adef.int_of_iper c.cle_index);
-               Wserver.wprint "%s\n" (person_title_text conf base c)
-             }
+             then
+               tag "li" begin
+                 Wserver.wprint
+                   "<input type=\"radio\" name=\"select\" value=\"%d\"%s>\n"
+                   (Adef.int_of_iper c.cle_index) xhs;
+                 Wserver.wprint "%s\n" (person_title_text conf base c);
+               end
              else ())
           u.family;
         List.iter
           (fun r ->
              do {
-               print_with_relation relation_type_text conf base p r 0
-                 r.r_fath;
+               print_with_relation relation_type_text conf base p r 0 r.r_fath;
                print_with_relation relation_type_text conf base p r 1 r.r_moth
              })
           p.rparents;
@@ -144,74 +156,85 @@ value print_menu conf base p =
              Array.iter (print_with_witness conf base p ifam) fam.witnesses)
           u.family;
       end;
-      html_p conf;
-      tag "table" "border=%d width=\"90%%\"" conf.border begin
+      tag "table" "border=\"%d\" width=\"90%%\"" conf.border begin
         tag "tr" begin
-          tag "td" "align=right" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n" (capitale (transl conf "long display"));
-            Wserver.wprint "<input type=checkbox name=long value=on>\n";
+            Wserver.wprint
+              "<input type=\"checkbox\" name=\"long\" value=\"on\"%s>\n" xhs;
           end;
-          tag "td" "align=right" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n"
               (capitale (transl_nth conf "image/images" 1));
-            Wserver.wprint "<input type=checkbox name=image value=on>\n";
+            Wserver.wprint
+              "<input type=\"checkbox\" name=\"image\" value=\"on\"%s>\n" xhs;
           end;
         end;
         tag "tr" begin
-          tag "td" "align=right" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
-            Wserver.wprint "<input type=checkbox name=spouse value=on>\n";
+            Wserver.wprint
+              "<input type=\"checkbox\" name=\"spouse\" value=\"on\"%s>\n" xhs;
           end;
-          tag "td" "align=right" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n"
               (capitale (transl conf "cancel GeneWeb links"));
-            Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
+            Wserver.wprint
+              "<input type=\"checkbox\" name=\"cgl\" value=\"on\"%s>\n" xhs;
           end;
         end;
         tag "tr" begin
-          tag "td" "align=right" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n" (capitale (transl conf "border"));
-            Wserver.wprint "<input name=bd size=1 maxlength=2 value=0>\n";
+            Wserver.wprint
+              "<input name=\"bd\" size=\"1\" maxlength=\"2\" value=\"0\"%s>\n"
+              xhs;
           end;
-          tag "td" "align=right" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "\
 <table><tr><td>%s</td>
-<td><input type=radio name=color value=\"\" checked></td>\n"
-              (capitale (transl conf "color"));
+<td>
+<input type=\"radio\" name=\"color\" value=\"\" checked=\"checked\"%s>
+</td>\n"
+              (capitale (transl conf "color")) xhs;
             List.iter
               (fun c ->
                  Wserver.wprint "\
 <td style=\"background:#%s\">
-<input type=\"radio\" name=\"color\" value=\"#%s\"></td>\n" c c)
+<input type=\"radio\" name=\"color\" value=\"#%s\"%s></td>\n" c c xhs)
               ["FFC0C0"; "FFFFC0"; "C0FFC0"; "C0FFFF"; "C0C0FF"; "FFC0FF"];
             Wserver.wprint "</tr></table>\n";
           end;
         end;
         tag "tr" begin
-          tag "td" "align=right" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "&nbsp;";
           end;
-          tag "td" "align=right" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "&nbsp;";
           end;
         end;
-        tag "tr" "align=left" begin
-          tag "td" "align=center colspan=2" begin
-            Wserver.wprint "<table><tr align=left><td>\n";
-            Wserver.wprint "<input type=radio name=et value=A checked>\n";
-            Wserver.wprint "%s<br>\n" (capitale (transl conf "ancestors"));
-            Wserver.wprint "<input type=radio name=et value=M>\n";
-            Wserver.wprint "%s<br>\n"
-              (capitale (transl conf "relationships by marriage"));
-            Wserver.wprint "<input type=radio name=et value=S>\n";
-            Wserver.wprint "%s<br>\n"
-              (capitale (transl conf "shortest path"));
+        tag "tr" "align=\"left\"" begin
+          tag "td" "align=\"center\" colspan=\"2\"" begin
+            Wserver.wprint "<table><tr align=\"left\"><td>\n";
+            Wserver.wprint "\
+<input type=\"radio\" name=\"et\" value=\"A\" checked=\"checked\"%s>\n" xhs;
+            Wserver.wprint "%s<br%s>\n" (capitale (transl conf "ancestors"))
+              xhs;
+            Wserver.wprint
+              "<input type=\"radio\" name=\"et\" value=\"M\"%s>\n" xhs;
+            Wserver.wprint "%s<br%s>\n"
+              (capitale (transl conf "relationships by marriage")) xhs;
+            Wserver.wprint
+              "<input type=\"radio\" name=\"et\" value=\"S\"%s>\n" xhs;
+            Wserver.wprint "%s<br%s>\n"
+              (capitale (transl conf "shortest path")) xhs;
             Wserver.wprint "</td></tr></table>\n";
           end;
         end;
-        tag "tr" "align=left" begin
-          tag "td" "align=center colspan=2" begin
-            Wserver.wprint "<input type=submit value=\"Ok\">\n";
+        tag "tr" "align=\"left\"" begin
+          tag "td" "align=\"center\" colspan=\"2\"" begin
+            Wserver.wprint "<input type=\"submit\" value=\"Ok\"%s>\n" xhs;
           end;
         end;
       end;
@@ -1502,8 +1525,8 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
       if List.mem (b1, b2) found.val then ()
       else do {
         tag "center" begin
-          tag "table" "border=1" begin
-            tag "tr" "align=left" begin
+          tag "table" "border=\"1\"" begin
+            tag "tr" "align=\"left\"" begin
               tag "td" begin
                 RelationLink.print_relation_path conf base info;
               end;

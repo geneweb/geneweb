@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.25 2004-12-26 10:00:14 ddr Exp $ *)
+(* $Id: descend.ml,v 4.26 2004-12-28 02:54:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -82,7 +82,7 @@ value text_level conf =
 ;
 
 value print_choice conf base p effective_level =
-  tag "form" "method=get action=\"%s\"" conf.command begin
+  tag "form" "method=\"get\" action=\"%s\"" conf.command begin
     Wserver.wprint "<p>\n";
     List.iter
       (fun (k, v) ->
