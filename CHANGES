@@ -1,10 +1,21 @@
 GeneWeb Intermediate Version 2.01-2
 -----------------------------------
 
+* New feature
+
+  - [May 4, 99] Am working on a new program "setup" which will allow to
+    use a lot of commands without having to type magic incantations in a
+    MSdos (Windows) or Xterm (Unix) window. Everything is done in the Web
+    navigator: creation of a database, extraction of a GEDCOM file, cleanup,
+    etc etc.
+    Should be convenient for non computer scientists beginners (and even for
+    old timers computer scientists who already know GeneWeb).
+
 * General
   - [Apr 22, 99] Added Danish language (by Hans Albeck).
 
 * GeneWeb Daemon/CGI (gwd)
+  - [May 4, 99] Added button "include missing spouses" for missing ancestors.
   - [May 4, 99] Suppressed trace log count in CGI mode in not redirected
     in a file (option "-log"). Seemed to be incorrectly displayed in the
     HTML page in Windows.

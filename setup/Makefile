@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 1999-05-03 17:35:24 ddr Exp $
+# $Id: Makefile,v 1.5 1999-05-04 14:54:53 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -32,7 +32,7 @@ test:
 	cd test/gw; ln -s ../../../hd/images .
 	cd test/gw; ln -s ../../../ged2gwb/ged2gwb .
 	cd test/gw; ln -s ../../../gwb2ged/gwb2ged .
-
+	cd test/gw; ln -s ../../../etc/INSTALL.htm .
 setup.out: $(OBJS)
 	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(OBJS) -o setup.out
 
