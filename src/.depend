@@ -213,9 +213,9 @@ update.cmx: adef.cmx calendar.cmx config.cmi date.cmx def.cmi gutil.cmx \
     iovalue.cmx util.cmx ../wserver/wserver.cmx update.cmi 
 update.cmi: adef.cmi config.cmi def.cmi gutil.cmi 
 updateFam.cmo: adef.cmi config.cmi def.cmi gutil.cmi templ.cmo templAst.cmi \
-    update.cmi util.cmi version.cmo ../wserver/wserver.cmi updateFam.cmi 
+    update.cmi util.cmi ../wserver/wserver.cmi updateFam.cmi 
 updateFam.cmx: adef.cmx config.cmi def.cmi gutil.cmx templ.cmx templAst.cmi \
-    update.cmx util.cmx version.cmx ../wserver/wserver.cmx updateFam.cmi 
+    update.cmx util.cmx ../wserver/wserver.cmx updateFam.cmi 
 updateFam.cmi: config.cmi def.cmi update.cmi 
 updateFamOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi iobase.cmi \
     lock.cmi update.cmi updateFam.cmi util.cmi ../wserver/wserver.cmi 
