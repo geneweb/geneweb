@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.64 2000-02-14 14:39:44 ddr Exp $
+# $Id: lexicon.txt,v 3.65 2000-02-15 15:49:09 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -4083,7 +4083,7 @@ se: personer som har samma namn
     place
 cs: místo
 de: Ort
-dk: sted/Navn (nob.)
+dk: sted
 en: place
 eo: loko
 es: lugar
