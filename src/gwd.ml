@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.43 1999-09-17 12:26:11 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.44 1999-09-17 12:42:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -503,7 +503,10 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
           (True, False, True, uauth)
         else (False, False, False, "")
       else (True, passwd = wizard_passwd, passwd = friend_passwd, "")
-    else (True, passwd = wizard_passwd, passwd = friend_passwd, "")
+    else
+      (True,
+       match_auth wizard_passwd wizard_passwd_file passwd,
+       match_auth friend_passwd friend_passwd_file passwd, "")
   in
   let user =
     match lindex user ':' with
