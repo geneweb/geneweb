@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.15 2002-11-13 12:29:28 ddr Exp $ *)
+(* $Id: place.ml,v 4.16 2002-12-26 14:26:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -165,7 +165,7 @@ value get_all conf base =
 ;
 
 value print_place conf s =
-  Wserver.wprint "%s" (Util.string_with_macros conf [] s)
+  Wserver.wprint "%s" (Util.string_with_macros conf False [] s)
 ;
 
 value max_len = ref 2000;
