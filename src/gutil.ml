@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.2 1999-03-11 12:56:54 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.3 1999-03-20 19:12:57 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -17,7 +17,10 @@ value leap_year a =
 
 value nb_jours_dans_mois =
   let tb = [| 31; 28; 31; 30; 31; 30; 31; 31; 30; 31; 30; 31 |] in
-  fun m a -> if m == 2 && leap_year a then 29 else tb.(m - 1)
+  fun m a ->
+    if m == 2 && leap_year a then 29
+    else if m >= 1 && m <= 12 then tb.(m - 1)
+    else 31
 ;
 
 value common_prec p1 p2 =
