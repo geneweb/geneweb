@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 2.6 1999-09-24 19:37:39 ddr Exp $ *)
+(* $Id: history.ml,v 2.7 1999-09-24 20:31:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -148,6 +148,7 @@ value print conf base =
     Wserver.wprint "%s" (capitale (transl conf "history of updates"))
   in
   do header conf title;
+     print_link_to_welcome conf True;
      let fname = file_name conf in
      match try Some (open_in fname) with [ Sys_error _ -> None ] with
      [ Some ic ->
