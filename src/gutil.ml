@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.13 2000-10-12 07:42:06 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.14 2000-10-20 18:00:33 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -678,19 +678,22 @@ value sort_children base warning ifam des =
 
 value check_family base error warning fam cpl des =
   let ifam = fam.fam_index in
-  do match (poi base cpl.father).sex with
-     [ Male -> ()
-     | _ -> error (BadSexOfMarriedPerson (poi base cpl.father)) ];
-     match (poi base cpl.mother).sex with
-     [ Female -> ()
-     | _ -> error (BadSexOfMarriedPerson (poi base cpl.mother)) ];
+  let fath = poi base cpl.father in
+  let moth = poi base cpl.mother in
+  do match fath.sex with
+     [ Male -> birth_before_death base warning fath
+     | _ -> error (BadSexOfMarriedPerson fath) ];
+     match moth.sex with
+     [ Female -> birth_before_death base warning moth
+     | _ -> error (BadSexOfMarriedPerson moth) ];
      check_normal_marriage_date base error warning fam;
      sort_children base warning ifam des;
      let _ =
        List.fold_left
          (fun np child ->
             let child = poi base child in
-            do born_after_his_elder_sibling base error warning child np ifam
+            do birth_before_death base warning child;
+               born_after_his_elder_sibling base error warning child np ifam
                  des;
                child_born_after_his_parent base error warning child cpl.father;
                child_born_after_his_parent base error warning child cpl.mother;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.17 2000-09-12 23:35:13 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.18 2000-10-20 18:00:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -339,10 +339,6 @@ value effective_mod conf base sfam scpl sdes =
   let ndes =
     map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
-(*
-  let ofath = poi base ocpl.father in
-  let omoth = poi base ocpl.mother in
-*)
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
   let nfath_u = uoi base ncpl.father in
@@ -773,7 +769,7 @@ value print_mod_aux conf base callback =
           else
             do strip_family sfam sdes; return
             callback sfam scpl sdes
-          else Update.error_digest conf base
+        else Update.error_digest conf base
       with
       [ Update.ModErr -> () ]
   | Refuse -> Update.error_locked conf base ]
