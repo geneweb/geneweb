@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.103 1999-08-05 10:30:50 ddr Exp $
+# $Id: lexicon.txt,v 2.104 1999-08-05 11:04:48 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1188,6 +1188,7 @@ fr: p&egrave;re possible/m&egrave;re possible/parents possibles
 it: padre presunto/madre presunta/genitori presunti
 nl: kandidaat vader/kandidaat moeder/kandidaat ouders
 no: kandidatfar/kandidatmor/kandidatforeldre
+pt: suposto pai/suposta m&atilde;e/supostos pais
 se: m&ouml;jlig far/m&ouml;jlig mor/m&ouml;jliga f&ouml;r&auml;ldrar
 
     candidate son/candidate daughter/candidate child
@@ -1199,6 +1200,7 @@ fr: fils possible/fille possible/enfant possible
 it: figlio presunto/figlia presunta/figlio presunto
 nl: kandidaat zoon/kandidaat dochter/kandidaat kind
 no: kandidats&oslash;nn/kandidatdatter/kandidatbarn
+pt: suposto filho/suposta filha/supostos filhos
 se: m&ouml;jlig son/m&ouml;jlig dotter/m&ouml;jliga barn
 
     cannot access base
@@ -3325,6 +3327,7 @@ dk: sig vedkendende fader/sig vedkendende moder/sig vedkendende for&aelig;ldre
 en: recognizing father/recognizing mother/recognizing parents
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
 no: bekreftet far/bekreftet mor/bekreftede foreldre
+pt: pai que o reconhoceu/m&atilde;e que o reconhoceu/pais que o reconheceram
 se: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
 
     relation/relations
