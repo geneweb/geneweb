@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.1 2001-03-17 09:35:09 ddr Exp $ *)
+(* $Id: relation.ml,v 4.2 2001-03-23 20:17:11 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -619,11 +619,61 @@ value child_in_law_label conf sex =
   transl_nth conf "a son-in-law/a daughter-in-law" is
 ;
 
-value descendant_label conf x p =
+value ancestors_n base =
+  loop [] where rec loop list n ip =
+    if n == 0 then [(aoi base ip).parents :: list]
+    else
+      match (aoi base ip).parents with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          let list = loop list (n - 1) cpl.father in
+          let list = loop list (n - 1) cpl.mother in
+          list
+      | None -> list ]
+;
+
+value nb_fields s =
+  loop 1 0 where rec loop cnt i =
+    if i == String.length s then cnt
+    else if s.[i] == '/' then loop (cnt + 1) (i + 1)
+    else loop cnt (i + 1)
+;
+
+value descendant_label conf base x anc p =
   let is = index_of_sex p.sex in
   match x with
   [ 1 -> transl_nth conf "a son/a daughter/a child" is
-  | 2 -> transl_nth conf "a grandson/a granddaughter/a grandchild" is
+  | 2 ->
+      let txt = transl conf "a grandson/a granddaughter/a grandchild" in
+      if nb_fields txt = 6 then
+        match anc with
+        [ Some anc ->
+            let n =
+              match (aoi base p.cle_index).parents with
+              [ Some ifam ->
+                  let glop list =
+                    List.fold_left
+                      (fun list ->
+                         fun
+                         [ Some ifam ->
+                             let cpl = coi base ifam in
+                             [cpl.father; cpl.mother :: list]
+                         | None -> list ])
+                      [] list
+                  in
+                  let cpl = coi base ifam in
+                  let fath_side = glop (ancestors_n base 0 cpl.father) in
+                  let moth_side = glop (ancestors_n base 0 cpl.mother) in
+                  if List.mem anc.cle_index fath_side then 0
+                  else if List.mem anc.cle_index moth_side then 3
+                  else 0
+              | None -> 0 ]
+            in
+            nth_field txt (is + n)
+        | None ->
+            nth_field txt is ^ " " ^ transl conf "or" ^ " " ^
+            nth_field txt (is + 3) ]
+      else nth_field txt is
   | 3 ->
       transl_nth conf
         "a great-grandson/a great-granddaughter/a great-grandchild" is
@@ -653,13 +703,6 @@ value half_brother_label conf sex =
 value brother_in_law_label conf sex =
   let is = index_of_sex sex in
   transl_nth conf "a brother-in-law/a sister-in-law" is
-;
-
-value nb_fields s =
-  loop 1 0 where rec loop cnt i =
-    if i == String.length s then cnt
-    else if s.[i] == '/' then loop (cnt + 1) (i + 1)
-    else loop cnt (i + 1)
 ;
 
 value uncle_label conf x p side =
@@ -706,19 +749,6 @@ value same_parents base p1 p2 =
   (aoi base p1.cle_index).parents = (aoi base p2.cle_index).parents
 ;
 
-value ancestors_n base =
-  loop [] where rec loop list n ip =
-    if n == 0 then [(aoi base ip).parents :: list]
-    else
-      match (aoi base ip).parents with
-      [ Some ifam ->
-          let cpl = coi base ifam in
-          let list = loop list (n - 1) cpl.father in
-          let list = loop list (n - 1) cpl.mother in
-          list
-      | None -> list ]
-;
-
 value uncle_relation_side base p1 p2 x2 =
   let a_fam = (aoi base p1.cle_index).parents in
   match (aoi base p2.cle_index).parents with
@@ -754,7 +784,7 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
        else if x2 == 0 then
          if sp1 && x1 == 1 then
            (child_in_law_label conf ini_p1.sex, False, sp2)
-         else (descendant_label conf x1 p1, sp1, sp2)
+         else (descendant_label conf base x1 (Some p2) p1, sp1, sp2)
        else if x1 == x2 then
          if x1 == 1 && not (same_parents base p1 p2) then
            (half_brother_label conf p1.sex, sp1, sp2)
@@ -783,7 +813,7 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
          let s =
            let sm = brother_label conf x2 Male in
            let sf = brother_label conf x2 Female in
-           let d = descendant_label conf (x1 - x2) p1 in
+           let d = descendant_label conf base (x1 - x2) None p1 in
            if sm = sf then
              transl_decline2 conf
                "%1 of (same or greater generation level) %2" d sm
