@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.20 2001-09-17 04:27:38 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.21 2001-09-19 11:19:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -261,9 +261,20 @@ value eval_expr conf base env p =
 
 (* bool values *)
 
+value substring_mem ss s =
+  loop 0 0 0 where rec loop j_ini i j =
+    if i = String.length ss then True
+    else if j = String.length s then False
+    else if ss.[i] = s.[j] then loop j_ini (i + 1) (j + 1)
+    else loop (j_ini + 1) 0 (j_ini + 1)
+;
+
 value eval_gen_bool_variable conf base env fcd =
   fun
-  [ s ->
+  [ "msie_5_0" ->
+      let agent = Wserver.extract_param "user-agent: " '\n' conf.request in
+      substring_mem " MSIE 5.0; " agent
+  | s ->
       let v = extract_var "evar_" s in
       if v <> "" then
         match p_getenv conf.env v with
