@@ -5,6 +5,10 @@ GeneWeb version 2.06
   - [Aug 14, 99] Added notes for the data base (changes in gwd, ged2gwb,
     gwb2ged, gwc, gwu).
 
+* Setup program
+  - [Aug 16, 99] Fixed bug: sometimes tried to display a non-existent file
+    "warnings.htm".
+
 * GeneWeb Daemon/CGI (gwd)
   - [Aug 14, 99] Fixed bug: send image in cgi mode under Windows did not
     work.

@@ -4,6 +4,17 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 2.06
 --------------------
 
+* General
+  - [Aug 16, 99] Now "make" does "make opt". To run the older "make"
+    do "make out". The installation tells to run "make" (i.e. "make opt").
+    The previous installation version told to run "make" and "make opt"
+    but it is unuseful to run both.
+
+* Setup program and GeneWeb daemon
+  - [Aug 16, 99] In distribution (make distrib), creates "setup" and "gwd"
+    as shell script wrappers under Unix and .bat files wrappers under Windows.
+    Added the executable "setup" in "gw" directory as name "gwsetup".
+
 * GeneWeb daemon/CGI (gwd)
   - [Aug 14, 99] In srcfile.ml, for start.txt files, added "o" macro
     (print if notes) and ability to decline verb + noun ([verb][noun]

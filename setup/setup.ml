@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.37 1999-08-06 02:39:43 ddr Exp $ *)
+(* $Id: setup.ml,v 1.38 1999-08-16 00:43:16 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -521,8 +521,7 @@ value gwc conf =
      Printf.eprintf "\n";
      flush stderr;
   return
-  if rc = 1 then print_file conf "warnings.htm"
-  else if rc > 1 then print_file conf "bso_err.htm"
+  if rc > 1 then print_file conf "bso_err.htm"
   else print_file conf "bso_ok.htm"
 ;
 
@@ -560,8 +559,7 @@ value gwb2ged_or_gwu_1 ok_file conf =
   do Printf.eprintf "\n";
      flush stderr;
   return
-  if rc = 1 then print_file conf "warnings.htm"
-  else if rc > 1 then print_file conf "bsi_err.htm"
+  if rc > 1 then print_file conf "bsi_err.htm"
   else
     let conf =
       conf_with_env conf "o" (Filename.basename (s_getenv conf.env "o"))
@@ -742,8 +740,8 @@ value recover_2 conf =
       return rc
      else rc
   in
-  do if rc = 1 then print_file conf "warnings.htm"
-     else if rc > 1 then do Sys.chdir dir; return print_file conf "err_reco.htm"
+  do if rc > 1 then
+       do Sys.chdir dir; return print_file conf "err_reco.htm"
      else print_file conf "bso_ok.htm";
   return ()
 ;
@@ -811,8 +809,7 @@ value cleanup_1 conf =
      do Printf.eprintf "\n";
         flush stderr;
      return
-     if rc = 1 then print_file conf "warnings.htm"
-     else if rc > 1 then print_file conf "cleanup_err.htm"
+     if rc > 1 then print_file conf "cleanup_err.htm"
      else print_file conf "clean_ok.htm";
   return ()
 ;  
@@ -1094,8 +1091,7 @@ value exec_command_out conf =
   do Printf.eprintf "\n";
      flush stderr;
   return
-  if rc = 1 then print_file conf "warnings.htm"
-  else if rc > 1 then print_file conf "bso_err.htm"
+  if rc > 1 then print_file conf "bso_err.htm"
   else print_file conf "bso_ok.htm"
 ;
 
@@ -1106,8 +1102,7 @@ value exec_command_in conf ok_file =
   do Printf.eprintf "\n";
      flush stderr;
   return
-  if rc = 1 then print_file conf "warnings.htm"
-  else if rc > 1 then print_file conf "bsi_err.htm"
+  if rc > 1 then print_file conf "bsi_err.htm"
   else print_file conf ok_file
 ;
 

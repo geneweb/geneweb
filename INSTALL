@@ -18,17 +18,12 @@ They are freely distributed at addresses:
        OCAMLC=ocamlc
        OCAMLOPT=ocamlopt
 
-2- From the top directory, do:
+2- If your platform has the command ocamlopt, do:
       make
-   This creates executables for the Objective Caml interpretor.
+   Otherwise do (warning: slower executables):
+      make out
 
-3- If your platform is supported by the native-code Ocaml compiler, you
-   can build the native-code programs (this is highly recommended,
-   executables are much faster).
-   Do:
-      make opt
-
-4- Do:
+3- Do:
       make distrib
 
    This creates a directory "distribution" where all executables programs
@@ -37,7 +32,7 @@ They are freely distributed at addresses:
    This can constitute a "distribution" directory if you want to distribute
    executables.
 
-5- To use GeneWeb, move the directory "distribution" to another place, or
+4- To use GeneWeb, move the directory "distribution" to another place, or
    rename it.
 
    Go to this directory and launch the command "setup".
