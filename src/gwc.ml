@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.4 1999-03-26 08:14:10 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.5 1999-03-27 02:19:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -234,7 +234,7 @@ value insert_person gen so =
         return x ]
   in
   do if gen.g_def.(Adef.int_of_iper x.cle_index) then
-       do Printf.printf "\nPersonne déja définie: \"%s%s %s\"\n"
+       do Printf.printf "\nPerson already defined: \"%s%s %s\"\n"
             (Ansel.to_iso_8859_1 so.first_name)
             (match x.occ with
              [ 0 -> ""
