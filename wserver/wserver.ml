@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.2 2000-01-16 10:34:51 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.3 2000-02-15 14:13:57 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -394,7 +394,7 @@ do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.U
            if pids.val <> [] && not stop_verbose.val then
              do stop_verbose.val := True; return
              let tm = Unix.localtime (Unix.time ()) in
-do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after cleanup\n" tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec (List.length pids.val); flush stderr; return ()
+do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after cleanup (%d)\n" tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec (List.length pids.val) (List.hd pids.val); flush stderr; return ()
            else ();
          done;
      return ()
