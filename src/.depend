@@ -117,9 +117,9 @@ iovalue.cmo: iovalue.cmi
 iovalue.cmx: iovalue.cmi 
 lock.cmo: lock.cmi 
 lock.cmx: lock.cmi 
-merge.cmo: adef.cmi config.cmi def.cmi gutil.cmi util.cmi \
+merge.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi util.cmi \
     ../wserver/wserver.cmi merge.cmi 
-merge.cmx: adef.cmx config.cmi def.cmi gutil.cmx util.cmx \
+merge.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx util.cmx \
     ../wserver/wserver.cmx merge.cmi 
 merge.cmi: config.cmi def.cmi 
 mergeFam.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi mergeFamOk.cmo \
@@ -205,9 +205,9 @@ title.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
 title.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
     ../wserver/wserver.cmx 
 update.cmo: adef.cmi calendar.cmo config.cmi date.cmi def.cmi gutil.cmi \
-    iovalue.cmi name.cmi util.cmi ../wserver/wserver.cmi update.cmi 
+    iovalue.cmi util.cmi ../wserver/wserver.cmi update.cmi 
 update.cmx: adef.cmx calendar.cmx config.cmi date.cmx def.cmi gutil.cmx \
-    iovalue.cmx name.cmx util.cmx ../wserver/wserver.cmx update.cmi 
+    iovalue.cmx util.cmx ../wserver/wserver.cmx update.cmi 
 update.cmi: adef.cmi config.cmi def.cmi gutil.cmi 
 updateFam.cmo: adef.cmi config.cmi def.cmi gutil.cmi update.cmi util.cmi \
     ../wserver/wserver.cmi updateFam.cmi 
