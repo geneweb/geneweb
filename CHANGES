@@ -1,6 +1,10 @@
 GeneWeb version 4.03
 --------------------
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [06 Jul 01] Fixed bug: sometimes failed when converting ansel text
+    to ascii.
+
 * Base configuration files (base.gwf)
   - [28 Jun 01] Added variable "hide_private_names". If set (i.e. if
     the value is "yes"), the names of the private persons (less than 150

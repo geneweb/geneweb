@@ -1,4 +1,4 @@
-(* $Id: ansel.ml,v 4.1 2001-04-18 09:33:39 ddr Exp $ *)
+(* $Id: ansel.ml,v 4.2 2001-07-06 08:08:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value no_accent =
@@ -180,7 +180,7 @@ value to_iso_8859_1 s =
       else if i == String.length s - 1 then len + 1
       else
         match Char.code s.[i] with
-        [ 225 | 226 | 227 | 228 | 232 | 234 | 240 -> loop (i + 1) len
+        [ 225 | 226 | 227 | 228 | 232 | 234 | 240 -> loop (i + 2) (len + 1)
         | _ -> loop (i + 1) (len + 1) ]
   in
   if len == String.length s then s
