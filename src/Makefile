@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.5 1999-12-15 19:58:02 ddr Exp $
+# $Id: Makefile,v 3.6 1999-12-19 09:14:15 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -13,6 +13,8 @@ all:: out
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 MOSTDESC_OBJS=adef.cmo name.cmo gutil.cmo iovalue.cmo btree.cmo buff.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
 FPLA_OBJS=argl.cmo adef.cmo name.cmo gutil.cmo btree.cmo buff.cmo iovalue.cmo iobase.cmo fpla.cmo
+
+all:: out
 
 out:: def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out phonygwd.out i18n_check.out mostdesc.out
 	$(RM) gwc consang gwd gwu

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.24 1999-12-17 00:19:45 ddr Exp $ *)
+(* $Id: util.ml,v 3.25 1999-12-19 09:14:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -9,6 +9,7 @@ open Gutil;
 value lang_dir = ref ".";
 value base_dir = ref ".";
 value doc_dir = ref "";
+value cnt_dir = ref "";
 
 value secure s =
   let rec need_code i =

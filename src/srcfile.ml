@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.10 1999-12-17 00:19:42 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.11 1999-12-19 09:14:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -13,7 +13,7 @@ value get_date () =
 ;
 
 value adm_file f =
-  List.fold_right Filename.concat [Util.base_dir.val; "cnt"] f
+  List.fold_right Filename.concat [Util.cnt_dir.val; "cnt"] f
 ;
 
 value cnt conf ext = adm_file (conf.bname ^ ext);

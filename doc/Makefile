@@ -1,4 +1,4 @@
-all opt: LICENSE.htm
+all out opt: LICENSE.htm
 
 clean:
 	$(RM) LICENSE.htm

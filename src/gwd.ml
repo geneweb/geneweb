@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.12 1999-12-17 00:19:36 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.13 1999-12-19 09:14:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -983,9 +983,9 @@ Type control C to stop the service
             else exit 0
           else ();
           try
-            do Unix.mkdir (Filename.concat Util.base_dir.val "cnt") 0o755;
+            do Unix.mkdir (Filename.concat Util.cnt_dir.val "cnt") 0o755;
                if uid.val <> None then
-                 Unix.chmod (Filename.concat Util.base_dir.val "cnt") 0o777
+                 Unix.chmod (Filename.concat Util.cnt_dir.val "cnt") 0o777
                else ();
             return ()
           with [ Unix.Unix_error _ _ _ -> () ];
@@ -998,7 +998,7 @@ Type control C to stop the service
 ;
 
 value geneweb_cgi str addr =
-  do try Unix.mkdir (Filename.concat Util.base_dir.val "cnt") 0o755 with
+  do try Unix.mkdir (Filename.concat Util.cnt_dir.val "cnt") 0o755 with
      [ Unix.Unix_error _ _ _ -> () ];
   return
   let add v x request =
@@ -1091,6 +1091,12 @@ value available_languages =
 ;
 
 value main () =
+  do ifdef WIN95 then
+       do Wserver.sock_in.val := "gwd.sin";
+          Wserver.sock_out.val := "gwd.sou";
+       return ()
+     else ();
+  return
   let usage = "Usage: " ^ Sys.argv.(0) ^ " [options] where options are:" in
   let speclist =
     [("-hd", Arg.String (fun x -> Util.lang_dir.val := x),
@@ -1102,6 +1108,19 @@ value main () =
      ("-bd", Arg.String (fun x -> Util.base_dir.val := x),
       "<dir>
        Directory where the databases are installed.");
+     ("-wd",
+      Arg.String
+        (fun x ->
+           do try Unix.mkdir x 0o755 with [ Unix.Unix_error _ _ _ -> () ];
+              ifdef WIN95 then
+                do Wserver.sock_in.val := Filename.concat x "gwd.sin";
+                   Wserver.sock_out.val := Filename.concat x "gwd.sou";
+                return ()
+              else ();
+              Util.cnt_dir.val := x;
+           return ()),
+      "<dir>
+       Directory for socket communication (Windows) and access count.");
      ("-cgi", Arg.Set cgi,
       "
        Force cgi mode.");
@@ -1174,6 +1193,9 @@ value main () =
      Argl.parse speclist anonfun usage;
      if Util.doc_dir.val = "" then
        Util.doc_dir.val := Filename.concat Util.lang_dir.val "doc"
+     else ();
+     if Util.cnt_dir.val = "" then
+       Util.cnt_dir.val := Util.base_dir.val
      else ();
   return
   let (query, cgi) =
