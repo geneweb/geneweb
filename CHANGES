@@ -8,6 +8,10 @@ GeneWeb version 2.04
     whiteyellow, black, bluegreen and brown (thanks to Hans Albeck)
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jun 26, 99] Added something I should have implemented since a long
+    time: the ability to access persons having composed surnames by
+    subparts of their surname: e.g. "Josephine Tascher de La Pagerie" can
+    be found by typing "Josephine Tascher" or "Josephine de La Pagerie".
   - [Jun 25, 99] Added short (horizontal) display for surnames by
     alphabetic order + ability to cancel GeneWeb links (for creation of
     static HTML pages).

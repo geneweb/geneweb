@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.12 1999-05-06 22:02:59 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.13 1999-06-26 10:23:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -114,6 +114,27 @@ value denomination base p =
       " " ^ nom)
 ;
 
+value saints = ["saint"; "sainte"];
+
+value surnames_pieces surname =
+  let surname = Name.lower surname in
+  let flush i0 i1 =
+    if i1 > i0 then [String.sub surname i0 (i1 - i0)] else []
+  in
+  let rec loop i0 iw i =
+    if i == String.length surname then
+      if i0 == 0 then [] else flush i0 i
+    else if surname.[i] == ' ' then
+      if i > iw + 3 then
+        let w = String.sub surname iw (i - iw) in
+        if List.mem w saints then loop i0 (i + 1) (i + 1)
+        else flush i0 i @ loop (i + 1) (i + 1) (i + 1)
+      else loop i0 (i + 1) (i + 1)
+    else loop i0 iw (i + 1)
+  in
+  loop 0 0 0
+;
+
 value person_misc_names base p =
   if sou base p.first_name = "?" || sou base p.surname = "?" then [] else
   let public_names =
@@ -131,16 +152,28 @@ value person_misc_names base p =
     else [p.public_name :: titles_names]
   in
   let first_names = [p.first_name :: p.first_names_aliases @ public_names] in
-  let surnames = [p.surname :: p.surnames_aliases @ p.nick_names] in
+  let surnames =
+    let surname = sou base p.surname in
+    [surname ::
+       surnames_pieces surname @
+       List.map (sou base) (p.surnames_aliases @ p.nick_names)]
+  in
   let surnames =
     if p.sex == Female then
       List.fold_left
         (fun list ifam ->
            let cpl = coi base ifam in
            let husband = poi base cpl.father in
+           let husband_surname = sou base husband.surname in
+           let husband_surnames_aliases =
+             List.map (sou base) husband.surnames_aliases
+           in
            if sou base husband.surname = "?" then
-             husband.surnames_aliases @ list
-           else [husband.surname :: husband.surnames_aliases @ list])
+             husband_surnames_aliases @ list
+           else
+             [husband_surname ::
+                surnames_pieces husband_surname @ husband_surnames_aliases @
+                list])
         surnames (Array.to_list p.family)
     else surnames
   in
@@ -152,8 +185,7 @@ value person_misc_names base p =
     List.fold_left
        (fun list f ->
           let f = sou base f in
-          List.fold_left (fun list s -> [f ^ " " ^ sou base s :: list]) list
-            surnames)
+          List.fold_left (fun list s -> [f ^ " " ^ s :: list]) list surnames)
     list first_names
   in
   let list =

@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 2.3 1999-04-29 19:55:53 ddr Exp $ *)
+(* $Id: gutil.mli,v 2.4 1999-06-26 10:23:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -80,3 +80,5 @@ value alphabetique : string -> string -> int;
 value initiale : string -> int;
 
 value lindex : string -> char -> option int;
+
+value surnames_pieces : string -> list string;
