@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 3.7 2000-09-10 14:30:42 ddr Exp $ *)
+(* $Id: def.mli,v 3.8 2000-10-12 07:42:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 type iper = Adef.iper;
@@ -75,7 +75,7 @@ type gen_person 'person 'string =
     occ : mutable int;
     image : mutable 'string;
     public_name : mutable 'string;
-    nick_names : mutable list 'string;
+    qualifiers : mutable list 'string;
     aliases : mutable list 'string;
     first_names_aliases : mutable list 'string;
     surnames_aliases : mutable list 'string;

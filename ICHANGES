@@ -4,6 +4,9 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.09
 --------------------
 
+* General
+  - [12 Oct 00] Changed all "nick_name" into "qualifier" in all source files.
+
 GeneWeb Version 3.08
 --------------------
 

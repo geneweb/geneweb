@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.12 2000-08-30 08:58:34 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.13 2000-10-12 07:42:06 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -269,7 +269,7 @@ value person_misc_names base p =
   let surnames =
     [surname ::
        surnames_pieces surname @
-       List.map (sou base) (p.surnames_aliases @ p.nick_names)]
+       List.map (sou base) (p.surnames_aliases @ p.qualifiers)]
   in
   let surnames =
     if p.sex == Female then
@@ -840,7 +840,7 @@ value map_person_ps fp fs p =
    image = fs p.image; first_names_aliases = List.map fs p.first_names_aliases;
    surnames_aliases = List.map fs p.surnames_aliases;
    public_name = fs p.public_name;
-   nick_names = List.map fs p.nick_names;
+   qualifiers = List.map fs p.qualifiers;
    titles = List.map (map_title_strings fs) p.titles;
    rparents = List.map (map_relation_ps fp fs) p.rparents;
    related = p.related;

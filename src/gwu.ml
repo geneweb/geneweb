@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.27 2000-10-02 10:27:42 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.28 2000-10-12 07:42:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -96,7 +96,7 @@ value correct_string_no_colon base is = gen_correct_string True (sou base is);
 
 value has_infos_not_dates base p =
   p.first_names_aliases <> [] || p.surnames_aliases <> [] ||
-  sou base p.public_name <> "" || p.nick_names <> [] || p.aliases <> [] ||
+  sou base p.public_name <> "" || p.qualifiers <> [] || p.aliases <> [] ||
   p.titles <> [] || sou base p.occupation <> "" ||
   sou base p.birth_place <> "" || sou base p.baptism_place <> "" ||
   sou base p.death_place <> "" || sou base p.psources <> ""
@@ -122,7 +122,7 @@ value print_surname_alias oc base is =
   Printf.fprintf oc " #salias %s" (correct_string base is)
 ;
 
-value print_nick_name oc base is =
+value print_qualifier oc base is =
   Printf.fprintf oc " #nick %s" (correct_string base is)
 ;
 
@@ -190,7 +190,7 @@ value print_infos oc base is_child csrc cbp p =
          Printf.fprintf oc " (%s)" (correct_string base s)
      | _ -> () ];
      print_if_no_empty oc base "#image" p.image;
-     List.iter (print_nick_name oc base) p.nick_names;
+     List.iter (print_qualifier oc base) p.qualifiers;
      List.iter (print_alias oc base) p.aliases;
      List.iter (print_title oc base) p.titles;
      match p.access with

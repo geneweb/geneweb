@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 3.4 2000-02-14 14:39:54 ddr Exp $ *)
+(* $Id: title.ml,v 3.5 2000-10-12 07:42:10 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -262,7 +262,7 @@ value give_access_someone conf base (x, t) list =
      if has_dates then Wserver.wprint "</em>: " else ();
      if List.memq x list then Wserver.wprint "<em>"
      else Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
-     match (t.t_name, x.public_name, x.nick_names) with
+     match (t.t_name, x.public_name, x.qualifiers) with
      [ (Tmain, pn, [nn :: _]) when sou base pn <> "" ->
          Wserver.wprint "%s <em>%s</em> %s" (sou base pn)
            (sou base nn)

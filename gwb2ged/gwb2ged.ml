@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.15 2000-10-02 10:27:41 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.16 2000-10-12 07:42:04 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -146,7 +146,7 @@ value ged_name base oc per =
        (encode (sou base per.surname));
      let n = sou base per.public_name in
      if n <> "" then Printf.fprintf oc "2 GIVN %s\n" (encode n) else ();
-     match per.nick_names with
+     match per.qualifiers with
      [ [nn :: _] -> Printf.fprintf oc "2 NICK %s\n" (encode (sou base nn))
      | [] -> () ];
      match per.surnames_aliases with

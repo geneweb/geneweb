@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.16 2000-09-18 12:07:08 ddr Exp $ *)
+(* $Id: update.ml,v 3.17 2000-10-12 07:42:10 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -730,7 +730,7 @@ value insert_person conf base src new_persons (f, s, o, create) =
              occ = o; image = empty_string;
              first_names_aliases = []; surnames_aliases = [];
              public_name = empty_string;
-             nick_names = []; aliases = []; titles = [];
+             qualifiers = []; aliases = []; titles = [];
              rparents = []; related = [];
              occupation = empty_string;
              sex = sex; access = IfTitles;

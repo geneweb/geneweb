@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.31 2000-10-02 10:27:38 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.32 2000-10-12 07:42:03 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -662,7 +662,7 @@ value unknown_per gen i =
   let what = add_string gen "?" in
   let p =
     {first_name = what; surname = what; occ = i; public_name = empty;
-     image = empty; nick_names = []; aliases = []; first_names_aliases = [];
+     image = empty; qualifiers = []; aliases = []; first_names_aliases = [];
      surnames_aliases = []; titles = []; rparents = []; related = [];
      occupation = empty; sex = Neuter; access = IfTitles;
      birth = Adef.codate_None; birth_place = empty; birth_src = empty;
@@ -1170,7 +1170,7 @@ value add_indi gen r =
         do incr r; return (f, s, r.val, pn, fal)
     | None -> ("?", "?", Adef.int_of_iper i, givn, []) ]
   in
-  let nick_name =
+  let qualifier =
     match name_sons with
     [ Some n ->
         match find_field "NICK" n.rsons with
@@ -1396,7 +1396,7 @@ value add_indi gen r =
     {first_name = add_string gen first_name; surname = add_string gen surname;
      occ = occ; public_name = add_string gen public_name;
      image = add_string gen image;
-     nick_names = if nick_name <> "" then [add_string gen nick_name] else [];
+     qualifiers = if qualifier <> "" then [add_string gen qualifier] else [];
      aliases = List.map (add_string gen) aliases;
      first_names_aliases = List.map (add_string gen) first_names_aliases;
      surnames_aliases = List.map (add_string gen) surname_aliases;
