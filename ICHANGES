@@ -10,6 +10,9 @@ GeneWeb Version 4.02
     of Camlp4.
 
 * GeneWeb daemon/CGI (gwd)
+  - [12 May 01] In request names by alphabetic order (short display), added
+    ability to add ";atleast=xx" where xx is a number, to display only names
+    having at least xx individuals.
   - [03 May 01] Rewrote some parts of name.ml in a cleaner and surer way.
   - [21 Apr 01] Added small test in relation.ml in case of request with
     bad fef parameter to avoid request failure.
