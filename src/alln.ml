@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.17 2005-02-14 18:19:23 ddr Exp $ *)
+(* $Id: alln.ml,v 4.18 2005-02-20 10:52:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -323,15 +323,7 @@ value select_names conf base is_surnames ini =
     else base.func.persons_of_first_name
   in
   let list =
-    let start_k =
-(*
-      if String.length ini > 0 && ini.[String.length ini - 1] == '_' then
-        String.sub ini 0 (String.length ini - 1)
-      else ini
-*)
-      Gutil.tr '_' ' ' ini
-(**)
-    in
+    let start_k = Gutil.tr '_' ' ' ini in
     match
       try Some (iii.cursor (capitalize_if_not_utf8 start_k)) with
       [ Not_found -> None ]
@@ -392,7 +384,7 @@ value select_names conf base is_surnames ini =
          if cnt >= lim then [(k, s, cnt) :: list] else list)
       [] list
   in
-  (list, False)
+  (list, if Gutil.utf_8_db.val then False else True)
 ;
 
 value print_frequency conf base is_surnames =
@@ -411,6 +403,10 @@ value print_frequency conf base is_surnames =
   let len = List.length list in
   let list = combine_by_count list in
   print_frequency_any conf base is_surnames list len
+;
+
+value compare2 s1 s2 =
+  if Gutil.utf_8_db.val then Gutil.alphabetic_utf_8 s1 s2 else compare s1 s2
 ;
 
 value print_alphabetic conf base is_surnames =
@@ -443,7 +439,7 @@ value print_alphabetic conf base is_surnames =
     else
       let (list, sorted) = select_names conf base is_surnames ini in
       if sorted then list
-      else List.sort (fun (k1, _, _) (k2, _, _) -> compare k1 k2) list
+      else List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list
   in
   let len = List.length list in
   if fast then
@@ -526,7 +522,7 @@ value print_short conf base is_surnames =
   let list =
     let (list, sorted) = select_names conf base is_surnames ini in
     if sorted then list
-    else List.sort (fun (k1, _, _) (k2, _, _) -> compare k1 k2) list
+    else List.sort (fun (k1, _, _) (k2, _, _) -> compare2 k1 k2) list
   in
   let len = List.length list in
   let list = combine_by_ini ini list in
