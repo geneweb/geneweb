@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.71 2001-01-31 17:43:30 ddr Exp $ *)
+(* $Id: relation.ml,v 3.72 2001-02-02 01:09:02 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -309,7 +309,7 @@ value dag_of_ind_dag_list indl =
     indl
 ;
 
-value print_relation_path_dag conf base elem_txt path =
+value html_table_of_relation_path_dag conf base elem_txt path =
   let indl = dag_ind_list_of_path path in
   let indl = add_missing_parents_of_siblings base indl in
   let faml = dag_fam_list_of_ind_list indl in
@@ -356,7 +356,8 @@ value print_relation_path_dag conf base elem_txt path =
     [ Some "on" -> True
     | _ -> False ]
   in
-  Dag.print_only_dag conf base elem_txt spouse_on invert set [] d
+  let no_group = p_getenv conf.env "nogroup" = Some "on" in
+  Dag.make_tree_hts conf base elem_txt spouse_on invert no_group set [] d
 ;
 
 value print_relation_path conf base ip1 ip2 path excl_faml =
@@ -367,7 +368,8 @@ value print_relation_path conf base ip1 ip2 path excl_faml =
       Date.short_dates_text conf base p
     in
     do Wserver.wprint "<p>\n";
-       print_relation_path_dag conf base elem_txt path;
+       let hts = html_table_of_relation_path_dag conf base elem_txt path in
+       Dag.print_html_table conf hts;
        Wserver.wprint "<p>\n";
        Wserver.wprint "<a href=\"%s" (commd conf);
        Wserver.wprint "em=R;ei=%d;i=%d%s;et=S" (Adef.int_of_iper ip1)
@@ -1367,6 +1369,32 @@ value print_main_relationship conf base long p1 p2 rel =
   return ()
 ;
 
+value print_multi_relation_html_table conf hts pl2 lim assoc_txt =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
+  do header_no_page_title conf title;
+     Dag.print_html_table conf hts;
+     match pl2 with
+     [ [] -> ()
+     | _ ->
+         do Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
+            let _ = List.fold_left
+              (fun n p ->
+                 do Wserver.wprint ";i%d=%d" n (Adef.int_of_iper p.cle_index);
+                    try
+                      let t = Hashtbl.find assoc_txt p.cle_index in
+                      Wserver.wprint ";t%d=%s" n t
+                    with
+                    [ Not_found -> () ];
+                 return n + 1)
+              1 pl2
+            in ();
+            if lim > 0 then Wserver.wprint ";lim=%d" lim else ();
+            Wserver.wprint "\">&gt;&gt;</a>\n";
+         return () ];
+     trailer conf;
+  return ()
+;
+
 value print_multi_relation conf base pl lim assoc_txt =
   let (pl1, pl2) =
     if lim <= 0 then (pl, [])
@@ -1400,7 +1428,6 @@ value print_multi_relation conf base pl lim assoc_txt =
           | None -> path ]
       | [_] | [] -> path ]
   in
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
   let elem_txt conf base p =
     let txt =
       Util.referenced_person_title_text conf base p ^
@@ -1412,28 +1439,11 @@ value print_multi_relation conf base pl lim assoc_txt =
      with
      [ Not_found -> txt ]
   in
-  do header_no_page_title conf title;
-     print_relation_path_dag conf base elem_txt path;
-     match pl2 with
-     [ [] -> ()
-     | _ ->
-         do Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
-            let _ = List.fold_left
-              (fun n p ->
-                 do Wserver.wprint ";i%d=%d" n (Adef.int_of_iper p.cle_index);
-                    try
-                      let t = Hashtbl.find assoc_txt p.cle_index in
-                      Wserver.wprint ";t%d=%s" n t
-                    with
-                    [ Not_found -> () ];
-                 return n + 1)
-              1 pl2
-            in ();
-            if lim > 0 then Wserver.wprint ";lim=%d" lim else ();
-            Wserver.wprint "\">&gt;&gt;</a>\n";
-         return () ];
-     trailer conf;
-  return ()
+  let hts = html_table_of_relation_path_dag conf base elem_txt path in
+  if p_getenv conf.env "slices" = Some "on" then
+    Dag.print_slices_menu conf base (Some hts)
+  else
+    print_multi_relation_html_table conf hts pl2 lim assoc_txt
 ;
 
 value print_base_loop conf base p =

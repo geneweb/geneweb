@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 3.51 2001-01-31 18:03:21 ddr Exp $ *)
+(* $Id: dag.ml,v 3.52 2001-02-02 01:09:02 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -769,14 +769,6 @@ value make_tree_hts conf base elem_txt spouse_on invert no_group set spl d =
   in
   let hts = Dag2html.html_table_of_dag indi_txt phony invert no_group d in
   hts
-;
-
-value print_only_dag conf base elem_txt spouse_on invert set spl d =
-  let no_group = p_getenv conf.env "nogroup" = Some "on" in
-  let hts =
-    make_tree_hts conf base elem_txt spouse_on invert no_group set spl d
-  in
-  print_html_table conf hts
 ;
 
 value print_slices_menu conf base hts_opt =
