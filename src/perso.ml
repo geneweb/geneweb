@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.22 1999-04-25 22:10:46 ddr Exp $ *)
+(* $Id: perso.ml,v 2.23 1999-04-28 16:53:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -711,7 +711,7 @@ value print_sosa_if_any conf base a =
 
 value print_ancestors_descends_cousins conf base p a =
   let head things =
-    if not things then Wserver.wprint "\n<h4>" else Wserver.wprint " / "
+    if not things then Wserver.wprint "\n<h4>" else Wserver.wprint " /\n"
   in
   let things = False in
   let has_grand_parents = has_grand_parents base p in
