@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.48 2005-01-21 10:12:59 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.49 2005-01-22 20:11:41 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -236,8 +236,8 @@ and eval_key (fn, sn, oc, create, var) =
   | x ->
       match x with
       [ ["sex"] ->
-	  obsolete "4.11" "sex" "create.sex"
-	    (str_val (eval_create create "sex"))
+          obsolete "4.11" "sex" "create.sex"
+            (str_val (eval_create create "sex"))
       | _ -> raise Not_found ] ]
 and eval_create c =
   fun
@@ -335,7 +335,7 @@ and eval_relation_kind =
 and eval_int_env var env =
   match get_env var env with
   [ Vint x -> str_val (string_of_int x)
-  | _ -> str_val "" ]
+  | _ -> raise Not_found ]
 and eval_string_env var env =
   match get_env var env with
   [ Vstring x -> str_val (quote_escaped x)
