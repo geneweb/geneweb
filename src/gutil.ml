@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.2 2000-01-10 02:14:38 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.3 2000-01-20 10:34:38 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -653,7 +653,17 @@ value sort_children base warning ifam des =
          if j >= 0 then
            let p1 = poi base a.(j) in
            let p2 = poi base a.(j+1) in
-           match (Adef.od_of_codate p1.birth, Adef.od_of_codate p2.birth) with
+           let d1 =
+             match Adef.od_of_codate p1.birth with
+             [ Some d1 -> Some d1
+             | None -> Adef.od_of_codate p1.baptism ]
+           in
+           let d2 =
+             match Adef.od_of_codate p2.birth with
+             [ Some d2 -> Some d2
+             | None -> Adef.od_of_codate p2.baptism ]
+           in
+           match (d1, d2) with
            [ (Some d1, Some d2) ->
                if strictement_avant d2 d1 then
                  let ip = a.(j+1) in

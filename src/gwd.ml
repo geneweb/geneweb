@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.15 2000-01-18 17:56:35 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.16 2000-01-20 10:34:39 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -52,7 +52,7 @@ value extract_boundary content_type =
 ;
 
 value fprintf_date oc tm =
-  Printf.fprintf oc "%4d/%02d/%02d %02d:%02d:%02d"
+  Printf.fprintf oc "%4d-%02d-%02d %02d:%02d:%02d"
     (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
     tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec
 ;

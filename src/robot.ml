@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 3.3 2000-01-10 02:14:41 ddr Exp $ *)
+(* $Id: robot.ml,v 3.4 2000-01-20 10:34:40 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -51,7 +51,7 @@ value purge_who tm xcl sec =
 ;
 
 value fprintf_date oc tm =
-  Printf.fprintf oc "%4d/%02d/%02d %02d:%02d:%02d"
+  Printf.fprintf oc "%4d-%02d-%02d %02d:%02d:%02d"
     (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
     tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec
 ;

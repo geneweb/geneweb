@@ -99,7 +99,7 @@
 <td>
 <select name=death>
 <option value=Dead>[*died]
-<option value=NotDead>[*not dead]
+<option value=NotDead>[*alive]
 <option value="" selected>-
 </select>
 </td>

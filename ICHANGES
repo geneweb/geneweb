@@ -4,6 +4,12 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.03
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [Jan 20, 00] Fixed omission in 'advanced.txt': I forgot to change
+    the [not dead] into [alive].
+  - [Jan 19, 00] In traces, display dates in standard, i.e. using -
+    instead of / in year-month-day.
+
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
   - [Jan 13, 00] Changed "living" into "alive"
   - [Jan 17, 00] Added a message in welcome pages when the flag
