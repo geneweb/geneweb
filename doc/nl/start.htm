@@ -1,0 +1,453 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Getting Started</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Getting Started</h1>
+
+Dit hoofdstuk bevat een inleiding tot het gebruik van <em>GeneWeb</em> met
+een uitleg over de bevelen en gebruikte bestanden. Na het lezen weet je
+(hopelijk) genoeg om GeneWeb te kunnen gebruiken.
+
+<ul>
+
+<li> <a href="#Int">Inleiding</a>
+
+<li> <a href="#Gwc">Bevel gwc</a>
+
+<li> <a href="#Ged">Bevel ged2gwb</a>
+
+<li> <a href="#Gee">Bevel gwb2ged</a>
+
+<li> <a href="#Gwd">Bevel gwd</a>
+
+<li> <a href="#Csg">Bevel consang</a>
+
+<li> <a href="#Gwu">Bevel gwu</a>
+
+<li> <a href="#Cnf">Bestand a.cnf</a>
+
+<li> <a href="#Lex">Directory "lang" - bestand "lexicon.txt"</a>
+
+<li> <a href="#Lng">Directory "lang" - subdirectories</a>
+
+</ul>
+
+<p>
+
+<h4> <a name="Int">Inleiding</a> </h4>
+
+Om <em>GeneWeb</em> te installeren en in te stellen, moet je interactieve
+bevelen gebruiken. Onder Unix, start een xterm. Onder Window 95/NT, klik op
+"Start", "Programmas" en  "MSDOS bevel".
+
+<p>
+
+In dit venster, typ het bevel om naar de directory te gaan waarin je
+<em>GeneWeb</em> geïnstalleerd hebt:
+
+<ul>
+
+<li> Onder Unix, als je <em>GeneWeb</em> geïnstalleerd hebt in vb.
+"/home/smith/geneweb": <pre>      cd /home/smith/geneweb
+</pre>
+
+<li> Onder Window 95/NT, als je <em>GeneWeb</em> geïnstalleerd hebt in vb. 
+"C:\soft\geneweb": <pre>
+     cd c:\soft\geneweb
+</pre>
+
+</ul>
+
+Alle <em>GeneWeb</em> bevelen kunnen gebruikt worden met de optie
+-help. Dit toont alle mogelijke opties met een korte uitleg.
+
+<p>
+
+Als je bijvoorbeeld typt:
+<pre>
+     gwd -help
+</pre>
+
+moet je iets dergelijks zien:
+<pre>
+     Usage: gwd [args]
+       -hd dir: directory where the directory lang is installed
+       -cgi query addr: called from a cgi-bin
+       -p #: port number; greater than 1024 for normal users
+       -wizard passwd: access to all dates and base updating
+       -friend passwd: access to all dates
+       -only address: only inet address accepted
+</pre>
+
+<p>
+
+<em>GeneWeb</em> databanken zijn directories met de extensie ".gwb".
+
+<h4> <a name="Gwc">Bevel gwc</a> </h4>
+
+Om  <em>GeneWeb</em> te kunnen gebruiken, moet je eerst een databank
+aanmaken. Je kan dit doen met het bevel "gwc", of met "ged2gwb", dat later
+wordt uitgelegd.
+
+<p>
+
+Het bevel "gwc", in zijn eenvoudigste gebruik, maakt een lege databank aan: 
+met <em>GeneWeb</em> zal je er gegevens aan kunnen toevoegen.
+
+<p>
+
+Je moet een naam geven aan de databank. Zowat elke naam is goed, maar gebruik
+best niet meer dan 8 letters.
+
+<p>
+
+Bijvoorbeeld, als je de databank "smith" wil noemen, typ dan:
+
+<pre>
+     gwc -o smith
+</pre>
+
+<h4> <a name="Ged">Bevel ged2gwb</a> </h4>
+
+Een andere manier om een <em>GeneWeb</em> databank aan te maken is te
+vertrekken met een GEDCOM bestand.
+
+<p>
+
+Het bevel "ged2gwb" laat toe een conversie uit te voeren van een GEDCOM
+bestand naar een <em>GeneWeb</em> databank.
+
+<p>
+De eenvoudigste manier is eerst je GEDCOM bestand kopiëren naar de directory
+waar je  <em>GeneWeb</em> geïnstalleerd hebt. Ja kan dit doen zoals je wil:
+lijngericht of met het verslepen van grafische icoontjes.
+
+<p>
+
+Als je GEDCOM bestand  bijvoorbeeld "foo.ged" heet en je wil een databank
+aanmaken met de naam "smith", typ dan:
+
+<pre>
+     ged2gwb foo.ged -o smith
+</pre>
+
+<p>
+
+Dit bevel zal rapporteren wat er gebeurt, vooral als er fouten ontdekt worden
+in het GEDCOM bestand. Trek je daarvan voorlopig niet te veel aan: de
+databank zal toch worden aangemaakt. Als de conversie correct is verlopen
+, eindigt het bevel als volgt:
+
+<pre>
+     *** Ok
+</pre>
+
+
+<h4> <a name="Gee">Bevel gwb2ged</a> </h4>
+Alvorens verder te gaan, wijzen we even op het tegengestelde bevel "gwb2ged",
+dat toelaat om een GEDCOM bestand aan te maken op basis van een 
+<em>GeneWeb</em> databank.
+
+<h4> <a name="Gwd">Bevel gwd</a> </h4>
+
+Van zodra een databank gecreeërd is met het bevel "gwc" of "ged2gwb", kan je
+dit bevel gebruiken.
+
+<p>
+
+Nog steeds in een interactief venster, typ:
+
+<pre>
+     gwd
+</pre>
+
+<p>
+
+Dit bevel start een <em>GeneWeb</em> "daemon" op. Een "daemon" is een
+"background proces", een niet interactief programma dat in de achtergrond
+wordt uitgevoerd. Bij uitvoeren van "gwd" zie je normaal het volgende:
+
+<pre>
+     GeneWeb 1.0 - Copyright (c) INRIA 1998
+     Possible addresses:
+	http://localhost:2317/base
+	http://127.0.0.1:2317/base
+	http://address:2317/base
+     where "base" is the name of the data base
+     Type control C to stop the service
+     Ready (day) (hour) port 2317...
+</pre>
+
+<p>
+
+Merk op dat je geen "prompt" ziet. Dit programma wacht op vragen die jij er
+aan zal stellen via je Web browser. Als "gwd" een vraag gesteld wordt,
+beantwoordt hij die en wacht daarna opniew. Als je stopt met het gebruik van 
+<em>GeneWeb</em> kan je "gwd" stoppen door control-c te typen.
+
+<p>
+
+Nu ben je echt klaar om te beginnen. Aangezien je deze documentatie leest,
+gebruik je een Web browser. Maak een nieuw venster aan met je browser en
+surf naar de volgende locatie. Vervang "smith" door de naam van je eigen
+databank. Gebruik niet de volledige naam (c:\geneweb\smith of
+/home/geneweb/smith) maar enkel "smith".
+
+<pre>
+     http://localhost:2317/smith
+</pre>
+
+<p>
+
+Je zal de <em>GeneWeb</em> verwelkomingspagina zien in het Frans.
+
+<p>
+
+[Als dit niet werkt, klik <a href="problem.htm">hier</a>]
+
+<p>
+
+Kies een andere taal (bv. nederlands) door op de vlag te klikken. (Er
+bestaat een manier om een andere taal te kiezen dan Frans om te
+beginnen. Zie <a href="#Cnf">later</a>).
+
+<p>
+
+<ul>
+<li>
+Als je gestart bent vanaf een GEDCOM bestand ("ged2gwb"), zal je bovenaan het
+aantal personen in de databank zien.
+
+<p>
+
+Vanaf de welkompagina, kan je je bestand aanpassen alsof je op het web
+rondsurft. Je kan klikken op "hyperlinks", knoppen... er zijn
+invoervelden.... Hint: probeer eerst eens  "Alle voornamen volgens
+alfabet" (klik op "OK"). In de nieuwe pagina die verschijnt kan je een
+achternaam kiezen, een persoon... kortom: eindeloos rondsurfen.
+
+</ul>
+
+<p>
+
+<ul>
+
+<li> Als je begonnen bent met een lege databank ("gwc"), zegt de
+verwelkomingspagina dat de databank 0 personen bevat.
+
+<p>
+
+Het enige dat je kan doen is personen en families invoeren. Klik op
+"Invoeren van een familie". Je zal waarschijnlijk zelf je weg kunnen vinden, zo niet is de 
+volledige documentatie <A HREF="update.htm">hier</A> te vinden.
+
+</ul>
+
+<p>
+
+Intussen merk je op dat telkens je een link aanklikt, "gwd" dit
+toont. Je kan zo zien wie je databank gebruikt als je <em>GeneWeb</em> op een
+netwerk gebruikt. Volledige documentatie voor het gebruik van <em>GeneWeb</em>
+in een netwerk vindt je <a href="server.htm">hier</a>.
+
+<p>
+
+Merk ook op dat als je "gwd" afsluit met control-c je niet meer kan werken
+met GeneWeb. Je moet dan gewoon opnieuw "gwd" intikken.
+
+<p>
+
+Onder Windows kan je eenvoudig op het icoontje van "gwd" klikken om "gwd" op
+te starten. Dit opent een interactief venster waarin "gwd" zijn output toont.
+Control-c typen stopt "gwd" en sluit dit venster.  Je kan op het bureaublad een snelkoppeling plaatsen naar "gwd" om het
+allemaal nog wat eenvoudiger te maken.
+
+<h4> <a name="Csg"> Bevel consang </a> </h4>
+
+Dit bevel moet uitgevoerd worden in een interactief venster, net als ander
+bevelen.
+
+<p>
+
+Het bevel "consang" berekent de verwantschappen in een databank. Het tonen van
+verwantschappen gebeurt als je de databank raadpleegt voor informatie over
+personen en bij het tonen van verwantschappen.
+
+<p>
+
+Maar om dan correcte informatie te kunnen zien moet je vooraf de
+verwantschappen tussen de personen in de databank berekenen. Dit gebeurt
+met behulp van "consang". Als je databank "smith" heet, typ dan:
+
+<p>
+
+<pre>
+     consang smith
+</pre>
+
+<p>
+
+Dit programma zal enkele ogenblikken of minuten rekenen, afhankelijk van de
+grootte van je bestand. Het toont het aantal personen waarvan nog
+verwantschappen berekend moeten worden en op het einde krijg je je "prompt"
+terug. De verwantschappen zijn dan berekend.
+
+<p>
+
+Als de berekeningen lang duren mag je ondertussen gewoon verder gaan met het
+gebruik van GeneWeb.
+
+<p>
+
+Voer "consang" nu en dan eens uit, als je wijzigingen hebt aangebracht .
+Vooral als je families hebt toegevoegd, verwijderd of gewijzigd:
+verwantschap hangt af van de structuur van de families. Individuele
+verwantschappen zijn dan niet onmiddelijk beschikbaar, maar pas na uitvoering 
+van  "consang".
+
+<p>
+
+Bovendien zorgt  "consang" voor een interne "opruiming" van de databank, wat
+noodzakelijk is na een zeker aantal wijzigingen.
+
+<h4> <a name="Gwu">Bevel gwu</a> </h4>
+
+[Het bevel heette vroeger "gwb2gw"].
+
+<p>
+
+Dit bevel toont de inhoud van een databank als tekst. Je kan deze tekst opslaan in een bestand, vb. met behulp van een unix "shell redirection".
+
+<p>
+
+Als je databank "smith" heet, en je wil het bestand opslaan in het bestand "foo.gw", typ dan:
+type:
+
+<p>
+<pre>
+     gwu smith > foo.gw
+</pre>
+
+<p>
+
+Nu en dan eens een dergelijk *.gw bestand opslaan laat toe na te gaan welke wijzigingen er gebeurd zijn als iemand anders gegevens heeft ingebracht.
+
+<p>
+
+Dit bevel laat ook toe om een databank te converteren naar een nieuwe versie van <em>GeneWeb</em>. Dit is natuurlijk enkel nodig als de interne voorstelling van <em>GeneWeb</em> gewijzigd werd. Dit wordt steeds vermeld bij het uitbrengen ban een nieuwe versie van <em>GeneWeb</em>.
+
+<p>
+
+Om op basis van een "*.gw" bestand een databank aan te maken gebruik je het bevel "gwc". Om op basis van een bestand "peeters.gw" een databank met de naam "peeters" aan te maken, typ je:
+
+<p>
+<pre>
+     gwc foo.gw -o jones
+</pre>
+
+<h4> <a name="Cnf">Bestand a.cnf</a> </h4>
+
+
+Dit bestand bevat de algemene instellingen voor een databank. Als jouw
+databank "jansen" heet, kopieer dan het bestand "a.cnf" naar "jansen.cnf".
+In het bestand "jansen.cnf" mag je dan naar hartelust wijzigingen aanbrengen.
+
+<p>
+
+De instelbare waarden zijn de volgende:
+
+<ul><li> <strong>body_prop</strong> laat toe om de achtergrond van de web
+pagina's te wijzigen in een andere kleur of zelfs een foto in te stellen als
+achtergrond. De syntax is volledig volgens de HTML regels. Kijk eens naar wat
+HTML documentatie, bezoek een specialist in HTML, of bekijk gewoon de volgende 
+voorbeelden:
+
+<pre>
+     body_prop=background=mybackg.jpg vlink=yellow
+</pre>
+
+<p>
+
+Deze achtergrond wordt gebruikt in ALLE pagina's die je opvraagt, niet
+enkel de verwelkomingspagina.
+
+</ul>
+
+<p>
+
+<ul><li> <strong>friend_passwd</strong> laat toe je gegevens te
+beschermen. Wie het paswoord niet kent, krijgt niet alle gegevens te zien van
+nog levende personen. 
+
+
+</ul>
+
+<p>
+
+<ul><li> <strong>wizard_passwd</strong> laat toe de mogelijkheid tot het
+wijzigen van de gegevens te beveiligen. Enkel de personen die het paswoord
+kennen mogen wijzigingen aanbrengen in de databank.
+
+
+</ul>
+
+<p>
+
+<ul><li> <strong>default_lang</strong> laat toe een standaard taal in te
+stellen. Zonder instelling is deze taal het Frans. <em>GeneWeb</em>
+ondersteunt momenteel de volgende talen. 
+
+"cn" (chinese),
+"de" (german),
+"en" (english),
+"eo" (esperanto),
+"es" (spanish),
+"fr" (french),
+"it" (italian),
+"nl" (dutch),
+"pt" (portuguese),
+"se" (swedish).
+
+<p>
+
+Je kan nog steeds met de vlaggen een andere taal kiezen, welk ook de
+standaardtaal is die je ingeseteld hebt.
+
+</ul>
+
+<h4> <a name="Lex">Directory "lang" - bestand "lexicon.txt"</a> </h4>
+
+Dit bestand bevat een lexicon van alle termen en zinnnen die gebruikt worden in
+het programma, samen met  verschillende vertalingen. 
+
+<p>
+
+Als een van de vertalingen je niet bevalt kan je dit gerust wijzigen.
+
+<p>
+
+Weet ook dat de wijzigingen die je aanbrengt in "lexicon.txt" onmiddellijk zichtbaar zijn. Je moet enkel de "reload" functie van je Web browser gebruiken.
+
+<h4> <a name="Lng">Directory "lang" - subdirectories</a> </h4>
+
+Elke subdirectory van de directory "lang" is genoemd naar een taal (vb. "nl" voor het Nederlands). Je vindt er de standaard verwelkomingspagina voor die taal in het bestand "start.txt".
+
+<p>
+Je kan de verwelkomingspagina voor elke databank anders instellen als je wil. Voor de databank "jansen" in de taal "xx", kopieer je gewoon het bestand "start.txt" naar "jansen.txt" in de directory "xx". Je kan het bestand "jansen.txt" aanpassen zoveel je wil.
+
+<p>
+
+Opmerking: Deze bestanden ("start.txt" en "jansen.txt) bevatten specifieke HTML codes: %-tekens gevolgd door een letter. Dit zijn "macros" die door "gwd" worden vervangen door cijfers, namen, ... Vb.: "%t" wordt vervangen door de naam van de databank.
+
+<p>
+
+De complete documentatie voor deze macros is nog niet geschreven.
+
+<p>
+
+Terugkeren naar de  <a href="diruse.htm">gebruiksaanwijzing</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>
