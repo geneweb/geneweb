@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.3 1999-12-02 05:30:45 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.4 1999-12-02 14:31:28 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -15,12 +15,22 @@ external idag_of_int : int -> idag = "%identity";
 
 type table 'a = { table : mutable array (array (data 'a)) }
 and data 'a = { elem : elem 'a; span : mutable span_id }
-and elem 'a = [ Elem of 'a | Ghost of 'a | Nothing ]
+and elem 'a = [ Elem of 'a | Ghost of ghost_id | Nothing ]
 and span_id = 'x
-;
+and ghost_id = 'x;
 
 external span_id_of_int : int -> span_id = "%identity";
 external int_of_span_id : span_id -> int = "%identity";
+external ghost_id_of_int : int -> ghost_id = "%identity";
+external int_of_ghost_id : ghost_id -> int = "%identity";
+
+value new_span_id =
+  let i = ref 0 in fun () -> do incr i; return span_id_of_int i.val
+;
+
+value new_ghost_id =
+  let i = ref 0 in fun () -> do incr i; return ghost_id_of_int i.val
+;
 
 (* input dag *)
 
@@ -239,10 +249,6 @@ else (); return
 
 (* transforming dag into table *)
 
-value new_span_id =
-  let i = ref 0 in fun () -> do incr i; return span_id_of_int i.val
-;
-
 value ancestors d =
   loop 0 where rec loop i =
     if i = Array.length d.dag then []
@@ -421,7 +427,8 @@ value treat_new_row d t =
 value down_it t i k y =
   do t.table.(Array.length t.table - 1).(k) := t.table.(i).(k);
      for r = i to Array.length t.table - 2 do
-       t.table.(r).(k) := {elem = Ghost y; span = new_span_id ()};
+       t.table.(r).(k) :=
+         {elem = Ghost (new_ghost_id ()); span = new_span_id ()};
      done;
   return ()
 ;
@@ -453,24 +460,36 @@ value equilibrate t =
   loop 0
 ;
 
-value group_ghost_with_elem t =
+value group_elem t =
   for i = 0 to Array.length t.table - 2 do
     for j = 1 to Array.length t.table.(0) - 1 do
       let x =
-        match t.table.(i + 1).(j - 1).elem with
+        match t.table.(i+1).(j-1).elem with
         [ Elem x -> Some x
-        | Ghost x -> Some x
         | _ -> None ]
       in
       let y =
-        match t.table.(i + 1).(j).elem with
+        match t.table.(i+1).(j).elem with
         [ Elem x -> Some x
-        | Ghost x -> Some x
         | _ -> None ]
       in
       match (x, y) with
       [ (Some x, Some y) when x = y ->
-          t.table.(i).(j).span := t.table.(i).(j - 1).span
+          t.table.(i).(j).span := t.table.(i).(j-1).span
+      | _ -> () ];
+    done;
+  done
+;
+
+value group_ghost t =
+  for i = 0 to Array.length t.table - 2 do
+    for j = 1 to Array.length t.table.(0) - 1 do
+      match (t.table.(i+1).(j-1).elem, t.table.(i+1).(j).elem) with
+      [ (Ghost x, Ghost _) ->
+          if t.table.(i).(j-1).elem = t.table.(i).(j).elem then
+            t.table.(i+1).(j) :=
+              {elem = Ghost x; span = t.table.(i+1).(j-1).span}
+          else ()
       | _ -> () ];
     done;
   done
@@ -517,19 +536,7 @@ value find_same_parents t i j1 j2 j3 j4 =
       let x2 = t.(i - 1).(j2) in
       let x3 = t.(i - 1).(j3) in
       let x4 = t.(i - 1).(j4) in
-      let ended =
-        if x1.span = x4.span then
-True(*
-          loop j1 where rec loop j =
-            if j > j4 then True
-            else
-              match t.(i-1).(j).elem with
-              [ Elem _ -> loop (j + 1)
-              | _ -> False ]
-*)
-        else False
-      in
-      if ended then (i, j1, j2, j3, j4)
+      if x1.span = x4.span then (i, j1, j2, j3, j4)
       else
         let j1 =
           loop (j1 - 1) where rec loop j =
@@ -601,16 +608,6 @@ value exch_blocks t i1 i2 j1 j2 j3 j4 =
           for j = j3 to j4 do line.(j1 - j3 + j) := saved.(j); done;
        return ();
      done;
-     if i1 > 0 then
-       let prev_line = t.(i1-1) in
-       let line = t.(i1) in
-       for j = j1 to j4 do
-         match (prev_line.(j).elem, line.(j).elem) with
-         [ (Ghost x, Elem y) ->
-             prev_line.(j) := {elem = Ghost y; span = prev_line.(j).span}
-         | _ -> () ];
-       done
-     else ();
   return ()
 ;
 
@@ -766,11 +763,11 @@ value table_of_dag d =
     if List.for_all (fun x -> x.elem = Nothing) new_row then t
     else
       let t = {table = Array.append t.table [| Array.of_list new_row |]} in
-      do equilibrate t;
-         group_ghost_with_elem t;
-         group_children t;
-         group_span_by_common_children d t;
-      return
+      let _ = equilibrate t in
+      let _ = group_elem t in
+      let _ = group_ghost t in
+      let _ = group_children t in
+      let _ = group_span_by_common_children d t in
       let t = treat_gaps d t in
       loop t
   in
@@ -852,7 +849,7 @@ value print_char_table d t =
   let print_elem =
     fun
     [ Elem e -> eprintf "  %c" (d.dag.(int_of_idag e).valu)
-    | Ghost e -> eprintf "  |" (*d.dag.(int_of_idag e).valu*)
+    | Ghost x -> eprintf "  |" (*int_of_ghost_id x*)
     | Nothing -> eprintf "   " ]
   in
 (*
