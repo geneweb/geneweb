@@ -1,10 +1,16 @@
 INSTALLATIONS INSTRUCTIONS IN UNIX MACHINES
 
-1- For the compilation, you need the Objective Caml compiler version
-   2.00 and the preprocessor Camlp4 version 2.00 installed in your machine.
-   They are freely distributed at addresses:
-      http://caml.inria.fr/ocaml/
-      http://caml.inria.fr/camlp4/
+For the compilation, you need the Objective Caml compiler version
+2.00 and the preprocessor Camlp4 version 2.00 installed in your machine.
+They are freely distributed at addresses:
+     http://caml.inria.fr/ocaml/
+     http://caml.inria.fr/camlp4/
+
+1- If your platform has no native-code Ocaml compiler (the command ocaml.opt
+   is not installed), edit the file "tools/Makefile.inc" and change
+     OCAMLC=ocamlc.opt
+   into
+     OCAMLC=ocamlc
 
 2- From the top directory, do:
       make
@@ -47,4 +53,5 @@ move the file Makefile.inc.win as Makefile.inc. Edit it and possibly
 change "CAMLP4D" and "LIBUNIX" to point file where the corresponding
 Ocaml and Camlp4 files or directories are installed.
 
-Then follow the same instructions above than for the Unix installation.
+Then follow the same instructions above than for the Unix installation,
+starting at point 2.

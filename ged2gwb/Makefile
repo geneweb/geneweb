@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1.1.1 1998-09-01 14:32:12 ddr Exp $
+# $Id: Makefile,v 1.2 1998-09-02 11:58:56 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -6,7 +6,15 @@ OCAMLI=-I ../src
 OBJS=../src/argl.cmo ../src/adef.cmo ../src/iovalue.cmo ../src/name.cmo ../src/gutil.cmo ../src/btree.cmo ../src/iobase.cmo aurejac.cmo ansel.cmo ged2gwb.cmo
 
 all:: ged2gwb.out
+	$(RM) lged2gwb
+	cp ged2gwb.out lged2gwb
+
 opt:: ged2gwb.opt
+	$(RM) lged2gwb
+	cp ged2gwb.opt lged2gwb
+
+clean::
+	$(RM) lged2gwb
 
 ged2gwb.out: $(OBJS)
 	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(CAMLP4D)/gramlib.cma $(OBJS) -o ged2gwb.out
