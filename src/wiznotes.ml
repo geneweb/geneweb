@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.9 2003-07-07 06:30:56 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.10 2004-02-23 09:59:01 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -57,7 +57,9 @@ value write_wizard_notes fname nn =
 ;
 
 value print_main conf base wizfile =
-  let wiztxt = Gutil.nominative (transl_nth conf "wizard/wizards/friend" 1) in
+  let wiztxt =
+    Gutil.nominative (transl_nth conf "wizard/wizards/friend/friends" 1)
+  in
   let title _ =
     Wserver.wprint "%s - %s" (capitale wiztxt)
       (Gutil.nominative (transl_nth conf "note/notes" 1))
