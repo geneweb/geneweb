@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.13 2000-04-01 02:45:21 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.14 2000-04-02 15:58:47 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -359,7 +359,7 @@ value print_title conf base t cnt =
          tag "td" begin
            Wserver.wprint "<input name=t_ident%d size=15%s>" cnt
              (match t with
-              [ Some {t_ident = n} -> " value=\"" ^ n ^ "\""
+              [ Some {t_ident = n} -> " value=\"" ^ quote_escaped n ^ "\""
               | _ -> "" ]);
          end;
          tag "td" begin
@@ -368,7 +368,7 @@ value print_title conf base t cnt =
          tag "td" "colspan=2" begin
            Wserver.wprint "<input name=t_place%d size=30%s>" cnt
              (match t with
-              [ Some {t_place = n} -> " value=\"" ^ n ^ "\""
+              [ Some {t_place = n} -> " value=\"" ^ quote_escaped n ^ "\""
             | _ -> "" ]);
          end;
        end;
@@ -380,7 +380,7 @@ value print_title conf base t cnt =
          tag "td" begin
            Wserver.wprint "<input name=t_name%d size=20%s>" cnt
              (match t with
-              [ Some {t_name = Tname n} -> " value=\"" ^ n ^ "\""
+              [ Some {t_name = Tname n} -> " value=\"" ^ quote_escaped n ^ "\""
               | _ -> "" ]);
          end;
          tag "td" begin
