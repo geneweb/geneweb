@@ -2,6 +2,8 @@ GeneWeb version 4.03
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [15 Jul 01] Improved alphabetical order of places in the display
+    by places/surnames (code by Ludovic Ledieu).
   - [13 Jul 01] Fixed bug: in update person form, when clicking on
     "insert surname alias", the display became "insert first name alias".
 
