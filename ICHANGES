@@ -8,6 +8,10 @@ GeneWeb Version 4.05
   - [20 Jan 02] Use of dates order (according to the language) in calendars
     page.
 
+* GeneWeb to Gedcom (gwb2ged) and Gedcom to GeneWeb (ged2gwb)
+  - [20 Jan 02] Fixed bug when converting from and to ansel encoding:
+    the German character es-tsett needed to be converted.
+
 * GeneWeb compiler (gwc) and Gedcom to GeneWeb (ged2gwb)
   - [10 Jan 02] Warranty that the index (istr) number of the empty string
     is 0 and of the string "?" is 1.
