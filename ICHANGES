@@ -5,6 +5,8 @@ GeneWeb Version 3.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [12 Aug 00] Added also check baptism date to determine public and
+    private.
   - [09 Aug 00] Fixed a problem of missing space after "married to" in
     descendants page (did not happen with all browsers).
   - [08 Aug 00] In first names by alphabetic order for a given surname,
