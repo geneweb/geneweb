@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.37 2000-06-21 23:42:34 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.38 2000-06-22 07:35:12 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogy - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -175,7 +175,7 @@ request</b></font></a>.
 <li><a href="%sm=AD">[anniversaries of death]</a>
 <li><a href="%sm=AM">[anniversaries of marriage]</a>%I|wf
 <li><a href="%sm=LB;k=%m">[the latest %d births](%m)</a>
-<li><a href="%sm=OA;k=%m">[the %d oldest perhaps still alive](%m)</a>%E
+<li><a href="%sm=OA;k=%m;lim=0">[the %d oldest perhaps still alive](%m)</a>%E
 </ul>
 </td>
 <td valign=up>

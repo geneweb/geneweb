@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.16 2000-06-21 23:42:41 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.17 2000-06-22 07:35:19 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -193,9 +193,18 @@ value print_death conf base =
 ;
 
 value print_oldest_alive conf base =
+  let limit =
+    match p_getint conf.env "lim" with
+    [ Some x -> x
+    | _ -> 0 ]
+  in
   let get_oldest_alive p =
     match p.death with
     [ NotDead -> Adef.od_of_codate p.birth
+    | DontKnowIfDead when limit > 0 ->
+        match Adef.od_of_codate p.birth with
+        [ Some (Dgreg d _) as x when conf.today.year - d.year <= limit -> x
+        | _ -> None ]
     | _ -> None ]
   in
   let (list, len) = select conf base get_oldest_alive True in
@@ -214,7 +223,7 @@ value print_oldest_alive conf base =
              Wserver.wprint "%s <em>%s</em>"
                (transl_nth conf "born" (index_of_sex p.sex))
                (Date.string_of_ondate conf (Dgreg d cal));
-             if d.prec = Sure then
+             if p.death = NotDead && d.prec = Sure then
                let a = temps_ecoule d conf.today in
                do Wserver.wprint " <em>(";
                   Date.print_age conf a;
