@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.64 2001-01-06 09:55:58 ddr Exp $ *)
+(* $Id: relation.ml,v 3.65 2001-01-09 09:13:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -842,7 +842,7 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
               (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
             if not long then
               let propose_dag =
-                n > 1 && n <= 10 && not (browser_doesnt_have_tables conf)
+                n > 1 && n <= 10 (* && not (browser_doesnt_have_tables conf) *)
               in
               do Wserver.wprint ":\n%s " (transl conf "click");
                  let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
@@ -891,7 +891,8 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                     (if n = 1 then 0 else 1));
                if not long then
                  let propose_dag =
-                   n > 1 && n <= 10 && not (browser_doesnt_have_tables conf)
+                   n > 1 && n <= 10
+                   (* && not (browser_doesnt_have_tables conf) *)
                  in
                  do Wserver.wprint ":\n%s" (transl conf "click");
                     let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
@@ -1329,7 +1330,7 @@ value print_main_relationship conf base long p1 p2 rel =
             Wserver.wprint "</em> %s\n"
               (transl_nth conf "relationship link/relationship links"
                  (if Num.eq total Num.one then 0 else 1));
-            if long || browser_doesnt_have_tables conf then ()
+            if long (* || browser_doesnt_have_tables conf *) then ()
             else print_dag_links conf base p1 p2 rl;
             if not all_by_marr &&
                age_autorise conf base p1 && age_autorise conf base p2 &&
