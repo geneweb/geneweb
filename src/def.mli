@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 4.6 2003-12-16 12:46:21 ddr Exp $ *)
+(* $Id: def.mli,v 4.7 2003-12-23 11:56:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -27,7 +27,9 @@ and precision = Adef.precision ==
   [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
 ;
 
-type relation_kind = [ Married | NotMarried | Engaged | NoSexesCheck | Rape ];
+type relation_kind =
+  [ Married | NotMarried | Engaged | NoSexesCheck | NoMention ]
+;
 
 type divorce = [ NotDivorced | Divorced of codate | Separated ];
 

@@ -214,6 +214,7 @@ no anniversary
 no birthday
 no known relationship link between %s and %s
 no match
+no mention
 no sexes check
 not divorced
 not found
@@ -248,7 +249,6 @@ private
 public
 public name
 qualifier
-rape
 recognized son/recognized daughter/recognized child
 recognizing father/recognizing mother/recognizing parents
 relation/relations
@@ -264,7 +264,6 @@ send
 separated
 several answers
 sex
-sexual abuse%t with
 short display
 shortest path
 should be female

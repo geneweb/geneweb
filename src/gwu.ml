@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.19 2003-12-16 12:46:21 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.20 2003-12-23 11:56:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -383,7 +383,7 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
           | Neuter -> '?' ]
         in
         fprintf oc " #nsck %c%c" (c m.m_fath) (c m.m_moth)
-    | Rape -> fprintf oc "#rape" ];
+    | NoMention -> fprintf oc "#noment" ];
     print_if_no_empty oc base "#mp" fam.marriage_place;
     print_if_no_empty oc base "#ms" fam.marriage_src;
     match fam.divorce with
