@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.28 2002-01-21 05:01:00 ddr Exp $ *)
+(* $Id: setup.ml,v 4.29 2002-01-21 13:25:33 ddr Exp $ *)
 
 open Printf;
 
@@ -576,38 +576,63 @@ and print_selector conf print =
     [ Unix.Unix_error _ _ _ -> [".."] ]
   in
   do {
-    print "<input type=hidden name=anon value=\"";
-    print sel;
-    print "\">\n";
     print "<pre>\n";
     print "     ";
+    print "<input type=hidden name=anon value=\"";
+    print sel;
+    print "\">";
     print sel;
     print "</a>\n";
-    List.iter
-      (fun x ->
-         do {
-           print "          <a href=\"";
-           print conf.comm;
-           print "?lang=";
-           print conf.lang;
-           print ";";
-           List.iter
-             (fun (k, v) ->
-                if k = "sel" then ()
-                else do { print k; print "="; print v; print ";" })
-             conf.env;
-           print "sel=";
+    let list =
+      List.map
+        (fun x ->
            let d =
              if x = ".." then Filename.dirname sel
              else Filename.concat sel x
            in
-           print (code_varenv d);
-           print "\">";
            let x = if is_directory d then Filename.concat x "" else x in
-           print x;
-           print "</a>\n";
-         })
-      list;
+           (d, x))
+        list
+    in
+    let max_len =
+      List.fold_left (fun max_len (_, x) -> max max_len (String.length x))
+        0 list
+    in
+    let min_interv = 2 in
+    let line_len = 72 in
+    let n_by_line = max 1 ((line_len + min_interv) / (max_len + min_interv)) in
+    let newline () = print "\n          " in
+    newline ();
+    loop 1 list where rec loop i =
+      fun
+      [ [(d, x) :: list] ->
+          do {
+            print "<a href=\"";
+            print conf.comm;
+            print "?lang=";
+            print conf.lang;
+            print ";";
+            List.iter
+              (fun (k, v) ->
+                 if k = "sel" then ()
+                 else do { print k; print "="; print v; print ";" })
+              conf.env;
+            print "sel=";
+            print (code_varenv d);
+            print "\">";
+            print x;
+            print "</a>";
+            if i = n_by_line then do {
+              newline ();
+              loop 1 list;
+            }
+            else if list = [] then newline ()
+            else do {
+              print (String.make (max_len + 2 - String.length x) ' ');
+              loop (i + 1) list
+            }
+          }
+      | [] -> print "\n" ];
     print "</pre>\n";
   }
 and print_if conf print cond strm =
