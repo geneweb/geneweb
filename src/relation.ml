@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.28 1999-08-02 10:16:02 ddr Exp $ *)
+(* $Id: relation.ml,v 2.29 1999-08-02 16:08:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -216,20 +216,35 @@ value brother_in_law_label conf sex =
   transl_nth conf "a brother-in-law/a sister-in-law" is
 ;
 
-value uncle_label conf x p =
+value nb_fields s =
+  loop 1 0 where rec loop cnt i =
+    if i == String.length s then cnt
+    else if s.[i] == '/' then loop (cnt + 1) (i + 1)
+    else loop cnt (i + 1)
+;
+
+value uncle_label conf x p side =
   let is = index_of_sex p.sex in
   match x with
-  [ 1 -> transl_nth conf "an uncle/an aunt" is
-  | 2 -> transl_nth conf "a great-uncle/a great-aunt" is
+  [ 1 ->
+      let txt = transl conf "an uncle/an aunt" in
+      let is = if nb_fields txt == 4 && side == Female then is + 2 else is in
+      nth_field txt is
+  | 2 ->
+      let txt = transl conf "a great-uncle/a great-aunt" in
+      let is = if nb_fields txt == 4 && side == Female then is + 2 else is in
+      nth_field txt is
   | n ->
       transl_nth conf "an uncle/an aunt" is ^ " " ^
         Printf.sprintf (ftransl conf "of the %s generation")
           (transl_nth conf "nth (generation)" n) ]
 ;
 
-value uncle_in_law_label conf sex =
+value uncle_in_law_label conf sex side =
   let is = index_of_sex sex in
-  transl_nth conf "an uncle (aunt's husband)/an aunt (uncle's wife)" is
+  let txt = transl conf "an uncle (aunt's husband)/an aunt (uncle's wife)" in
+  let is = if nb_fields txt == 4 && side == Female then is + 2 else is in
+  nth_field txt is
 ;
 
 value nephew_label conf x p =
@@ -250,6 +265,32 @@ value nephew_in_law_label conf sex =
 
 value same_parents base p1 p2 =
   (aoi base p1.cle_index).parents = (aoi base p2.cle_index).parents
+;
+
+value ancestors_n base =
+  loop [] where rec loop list n ip =
+    if n == 0 then [(aoi base ip).parents :: list]
+    else
+      match (aoi base ip).parents with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          let list = loop list (n - 1) cpl.father in
+          let list = loop list (n - 1) cpl.mother in
+          list
+      | None -> list ]
+;
+
+value uncle_relation_side base p1 p2 x2 =
+  let a_fam = (aoi base p1.cle_index).parents in
+  match (aoi base p2.cle_index).parents with
+  [ Some ifam ->
+      let cpl = coi base ifam in
+      let fath_side = ancestors_n base (x2 - 2) cpl.father in
+      let moth_side = ancestors_n base (x2 - 2) cpl.mother in
+      if List.mem a_fam fath_side then Male
+      else if List.mem a_fam moth_side then Female
+      else Neuter
+  | None -> Neuter ]
 ;
 
 value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
@@ -283,9 +324,12 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
            (brother_in_law_label conf ini_p1.sex, False, False)
          else (nominative (brother_label conf x2 p1.sex), sp1, sp2)
        else if x1 == 1 then
+         let side =
+           if x2 <= 3 then uncle_relation_side base p1 p2 x2 else Neuter
+         in
          if x2 == 2 && sp1 then
-           (uncle_in_law_label conf ini_p1.sex, False, sp2)
-         else (uncle_label conf (x2 - x1) p1, sp1, sp2)
+           (uncle_in_law_label conf ini_p1.sex side, False, sp2)
+         else (uncle_label conf (x2 - x1) p1 side, sp1, sp2)
        else if x2 == 1 then
          if x1 == 2 && x2 == 1 && sp2 then
            (nephew_in_law_label conf p1.sex, sp1, False)
