@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.16 2002-01-12 14:20:53 ddr Exp $ *)
+(* $Id: setup.ml,v 4.17 2002-01-13 03:05:37 ddr Exp $ *)
 
 open Printf;
 
@@ -291,6 +291,15 @@ value is_directory x =
   [ Unix.Unix_error _ _ _ -> False ]
 ;
 
+value server_string conf =
+  let s = Wserver.extract_param "host: " '\r' conf.request in
+  try
+    let i = String.rindex s ':' in
+    String.sub s 0 i
+  with
+  [ Not_found -> "127.0.0.1" ]
+;
+
 value rec copy_from_stream conf print strm =
   try
     while True do {
@@ -338,6 +347,7 @@ value rec copy_from_stream conf print strm =
           | 'j' -> print_selector conf print
           | 'k' -> for_all conf print (fst (List.split conf.env)) strm
           | 'l' -> print conf.lang
+          | 'm' -> print (server_string conf)
           | 'o' -> print (strip_spaces (s_getenv conf.env "o"))
           | 'p' -> print (parameters conf.env)
           | 'q' -> print Version.txt

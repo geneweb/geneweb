@@ -7,6 +7,10 @@ GeneWeb version 4.05
   - [11 Jan 02] Fixed bug: the macros in places were not expanded in the
     places/surnames pages, in descendants and in ancestors pages.
 
+* Setup program (gwsetup)
+  - [13 Jan 02] Proposes now both addresses localhost and 127.0.0.1.
+    (sometimes just one of them work and not the other).
+
 * Gedcom to GeneWeb (ged2gwb)
   - [08 Jan 02] Fixed bug: the divorce dates were not imported
 

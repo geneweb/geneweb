@@ -5,13 +5,14 @@ To start, open the file "start.htm" of your GeneWeb installation.
 
 If you don't find it, go to your Web browser and open the address:
        http://127.0.0.1:$z/
+       http://localhost:$z/
 
 Warning: for this program to work, you must not delete this window!
 But you can iconify it.
 
-If it does not work, you may have to configure, in your browser,
-options like "work off-line" or "do not use the proxy for local
-addresses" or "do not connect to Internet for the address
+If none of these addresses work, you may have to configure, in your
+browser, options like "work off-line" or "do not use the proxy for
+local addresses" or "do not connect to Internet for the address
 'localhost'".
 
 If despite your efforts, it still does not answer, try the classical
@@ -19,3 +20,5 @@ procedure by looking at the documentation. For that, stop this program
 by typing "control-c" in this window, go to the directory "gw" and
 open the file:
    INSTALL.htm
+
+But you risk to meet the same problem a little bit further...
