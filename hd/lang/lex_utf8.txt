@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.14 2005-03-04 10:34:34 ddr Exp $
+# $Id: lex_utf8.txt,v 1.15 2005-03-04 10:58:38 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -553,6 +553,7 @@ zh: .
 
     (week day)
 af: Sondag/Maandag/Dinsdag/Woensdag/Donderdag/Vrydag/Saterdag
+ar: يوم الإثنين/يوم الثلاثاء/يوم الأربعاء/يوم الخميس/يوم الجمعة/يوم السّبت/يوم ا
 bg: неделя/понеделник/вторник/сряда/четвъртък/петък/събота
 br: sul/lun/meurzh/merc'her/yaou/gwener/sadorn
 ca: diumenge/dilluns/dimarts/dimecres/dijous/divendres/dissabte
@@ -1831,6 +1832,7 @@ sv: anor
 
     and
 af: en
+ar: و
 bg: и
 br: ha
 ca: i
@@ -2377,6 +2379,7 @@ sv: begravd
 
     calendar/calendars
 af: kalender/kalenders
+ar: تقويم/تقاويم
 bg: календар/календари
 br: deiziadur
 ca: calendari/calendaris
@@ -2621,6 +2624,7 @@ sv: &auml;ndrade ordningen f&ouml;r barnen
 
     child/children
 af: kind/kinders
+ar: طفلة/أطفال
 bg: дете/деца
 br: bugel/bugale
 ca: fill/fills
@@ -5235,6 +5239,7 @@ sv: &auml;ktenskap med %t f&ouml;re makens/makans f&ouml;delse
 
     marriage/marriages
 af: huwelik/huwelike
+ar: زواج/زواجات
 bg: брак/бракове
 br: eured/euredoù
 ca: casament/casaments
@@ -5585,6 +5590,7 @@ sl: mesecev star/mesecev stara
 sv: m&aring;nader
 
     moon age/new moon/first quarter/full moon/last quarter
+ar: همت عمر/نو موون/فيرست قورتر/فولّ موون/لت قورتر
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
 fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
@@ -6024,6 +6030,7 @@ sv: ogifta
 
     note/notes
 af: nota/notas
+ar: بطاقة/بطاقات
 bg: бележка/бележки
 br: notenn/notennoù
 ca: nota/notes
@@ -6458,6 +6465,7 @@ sv: valfritt
 
     or
 af: of
+ar: أو
 bg: или
 br: pe
 ca: o
@@ -6485,6 +6493,7 @@ sv: eller
 
     parents
 af: ouers
+ar: والد
 bg: родители
 br: kerent
 ca: pares
@@ -9158,6 +9167,7 @@ sv: skulle vara sin egen ana
 
     year/month/day
 af: jaar/maand/dag
+ar: سنة/شهر/يوم
 bg: година/месец/ден
 br: bloaz/miz/deiz
 ca: any/mes/dia
