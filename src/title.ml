@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 2.1 1999-03-08 11:19:16 ddr Exp $ *)
+(* $Id: title.ml,v 2.2 1999-04-05 23:42:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -149,9 +149,9 @@ value select_title_place conf base title place =
   let title = strip_abbrev_lower title in
   let place = strip_abbrev_lower place in
   let select x t =
-    if strip_abbrev_lower (sou base t.t_title) = title &&
+    if strip_abbrev_lower (sou base t.t_ident) = title &&
        strip_abbrev_lower (sou base t.t_place) = place then
-      do clean_title.val := sou base t.t_title;
+      do clean_title.val := sou base t.t_ident;
          clean_place.val := sou base t.t_place;
       return list.val := [(x, t) :: list.val]
     else ()
@@ -183,7 +183,7 @@ value select_title base title =
   let clean_name = ref title in
   let title = strip_abbrev_lower title in
   let add_place t =
-    let tn = sou base t.t_title in
+    let tn = sou base t.t_ident in
     if strip_abbrev_lower tn = title then
       let pn = sou base t.t_place in
       if not (List.mem pn list.val) then
@@ -205,7 +205,7 @@ value select_place base place =
   let add_title t =
     let pn = sou base t.t_place in
     if strip_abbrev_lower pn = place then
-      let tn = sou base t.t_title in
+      let tn = sou base t.t_ident in
       if not (List.mem tn list.val) then
         do clean_name.val := pn; return
         list.val := [tn :: list.val]
@@ -221,7 +221,7 @@ value select_place base place =
 value select_all_titles conf base =
   let list = ref [] in
   let add_title t =
-    let tn = sou base t.t_title in
+    let tn = sou base t.t_ident in
     if not (List.mem tn list.val) then list.val := [tn :: list.val] else ()
   in
   do for i = 0 to base.data.persons.len - 1 do
@@ -355,7 +355,7 @@ value print_all_with_place_list conf base p list =
        (fun list ((p, t) as x) ->
           do html_li conf;
              give_access_someone conf base x [];
-             Wserver.wprint ", %s\n" (coa conf (sou base t.t_title));
+             Wserver.wprint ", %s\n" (coa conf (sou base t.t_ident));
              Wserver.wprint "\n";
           return [fst x :: list])
        [] list

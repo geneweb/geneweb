@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.2 1999-03-25 20:25:39 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.3 1999-04-05 23:42:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -355,10 +355,10 @@ value rec patch_len len =
 ;
 
 type patches =
-  { p_person : ref (list (int * base_person));
-    p_ascend : ref (list (int * base_ascend));
-    p_family : ref (list (int * base_family));
-    p_couple : ref (list (int * base_couple));
+  { p_person : ref (list (int * person));
+    p_ascend : ref (list (int * ascend));
+    p_family : ref (list (int * family));
+    p_couple : ref (list (int * couple));
     p_string : ref (list (int * string));
     p_name : ref (list (int * list iper)) }
 ;

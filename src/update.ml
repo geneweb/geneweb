@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.5 1999-04-02 09:14:20 ddr Exp $ *)
+(* $Id: update.ml,v 2.6 1999-04-05 23:42:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -305,7 +305,7 @@ value print_warning conf base =
            return ())
         (fun _ ->
            Wserver.wprint "<strong>%s %s</strong> <em>%s-%s</em>"
-             (coa conf (sou base t.t_title))
+             (coa conf (sou base t.t_ident))
              (coa conf (sou base t.t_place))
              (match Adef.od_of_codate t.t_date_start with
               [ Some d -> string_of_int (annee d)
@@ -372,8 +372,8 @@ the base has changed; do \"back\", \"reload\", and refill the form"));
   return raise ModErr
 ;
 
-value digest_person (p : base_person) = Iovalue.digest p;
-value digest_family (fam : base_family) = Iovalue.digest fam;
+value digest_person (p : person) = Iovalue.digest p;
+value digest_family (fam : family) = Iovalue.digest fam;
 
 value get var key env =
   match p_getenv env (var ^ "_" ^ key) with

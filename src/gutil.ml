@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.6 1999-03-31 02:16:49 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.7 1999-04-05 23:42:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -289,22 +289,22 @@ type error 'person =
   | OwnAncestor of 'person
   | BadSexOfMarriedPerson of 'person ]
 ;
-type base_error = error base_person;
+type base_error = error person;
 
 type warning 'person =
   [ BirthAfterDeath of 'person
-  | ChangedOrderOfChildren of base_family and array iper
-  | ChildrenNotInOrder of base_family and 'person and 'person
+  | ChangedOrderOfChildren of family and array iper
+  | ChildrenNotInOrder of family and 'person and 'person
   | DeadTooEarlyToBeFather of 'person and 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
   | MotherDeadAfterChildBirth of 'person and 'person
   | ParentBornAfterChild of 'person and 'person
   | ParentTooYoung of 'person and Def.date
-  | TitleDatesError of 'person and title istr
+  | TitleDatesError of 'person and title
   | YoungForMarriage of 'person and Def.date ]
 ;
-type base_warning = warning base_person;
+type base_warning = warning person;
 
 type visit = [ NotVisited | BeingVisited | Visited ];
 
@@ -668,9 +668,9 @@ value map_title_strings f t =
     | Tname s -> Tname (f s)
     | Tnone -> Tnone ]
   in
-  let t_title = f t.t_title in
+  let t_ident = f t.t_ident in
   let t_place = f t.t_place in
-  {t_name = t_name; t_title = t_title; t_place = t_place;
+  {t_name = t_name; t_ident = t_ident; t_place = t_place;
    t_date_start = t.t_date_start; t_date_end = t.t_date_end;
    t_nth = t.t_nth}
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.11 1999-04-05 15:25:42 ddr Exp $ *)
+(* $Id: perso.ml,v 2.12 1999-04-05 23:42:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -175,28 +175,28 @@ value print_titles conf base and_txt p a =
          [ [(nth, name, title, place, dates) :: rl]
            when
              not conf.is_rtl &&
-             nth = t.t_nth && name_equiv name t.t_name && title = t.t_title &&
+             nth = t.t_nth && name_equiv name t.t_name && title = t.t_ident &&
              place = t.t_place ->
              [(nth, name, title, place,
                [(t_date_start, t_date_end) :: dates]) ::
               rl]
          | _ ->
-             [(t.t_nth, t.t_name, t.t_title, t.t_place,
+             [(t.t_nth, t.t_name, t.t_ident, t.t_place,
                [(t_date_start, t_date_end)]) ::
               l] ])
       titles []
   in
   let titles =
     List.fold_right
-      (fun (t_nth, t_name, t_title, t_place, t_dates) l ->
+      (fun (t_nth, t_name, t_ident, t_place, t_dates) l ->
          match l with
          [ [(nth, name, title, places, dates) :: rl]
            when
              not conf.is_rtl &&
-             nth = t_nth && name_equiv name t_name && title = t_title &&
+             nth = t_nth && name_equiv name t_name && title = t_ident &&
              dates = t_dates ->
              [(nth, name, title, [t_place :: places], dates) :: rl]
-         | _ -> [(t_nth, t_name, t_title, [t_place], t_dates) :: l] ])
+         | _ -> [(t_nth, t_name, t_ident, [t_place], t_dates) :: l] ])
       titles []
   in
   let _ =

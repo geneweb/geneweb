@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.5 1999-04-02 09:14:22 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.6 1999-04-05 23:42:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -57,7 +57,7 @@ value reconstitute_add_title conf ext cnt tl =
   match get_nth conf "add_title" cnt with
   [ Some "on" ->
       let t1 =
-        {t_name = Tnone; t_title = ""; t_place = "";
+        {t_name = Tnone; t_ident = ""; t_place = "";
          t_date_start = Adef.codate_None;
          t_date_end = Adef.codate_None;
          t_nth = 0}
@@ -68,10 +68,10 @@ value reconstitute_add_title conf ext cnt tl =
 
 value rec reconstitute_titles conf ext cnt =
   match
-    (get_nth conf "t_title" cnt, get_nth conf "t_place" cnt,
+    (get_nth conf "t_ident" cnt, get_nth conf "t_place" cnt,
      get_nth conf "t_name" cnt)
   with
-  [ (Some t_title, Some t_place, Some t_name) ->
+  [ (Some t_ident, Some t_place, Some t_name) ->
       let t_name =
         match (get_nth conf "t_main_title" cnt, t_name) with
         [ (Some "on", _) -> Tmain
@@ -90,7 +90,7 @@ value rec reconstitute_titles conf ext cnt =
         | _ -> 0 ]
       in
       let t =
-        {t_name = t_name; t_title = only_printable t_title;
+        {t_name = t_name; t_ident = only_printable t_ident;
          t_place = only_printable t_place;
          t_date_start = Adef.codate_of_od t_date_start;
          t_date_end = Adef.codate_of_od t_date_end;
@@ -245,7 +245,7 @@ value strip_list l =
 ;
 
 value strip_titles tl =
-  List.fold_right (fun t tl -> if t.t_title = "" then tl else [t :: tl]) tl []
+  List.fold_right (fun t tl -> if t.t_ident = "" then tl else [t :: tl]) tl []
 ;
 
 value strip_person p =

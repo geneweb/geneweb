@@ -1,22 +1,22 @@
-(* $Id: gutil.mli,v 2.1 1999-03-08 11:18:39 ddr Exp $ *)
+(* $Id: gutil.mli,v 2.2 1999-04-05 23:42:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 
 value version : string;
 
-value poi : base -> iper -> base_person;
-value aoi : base -> iper -> base_ascend;
-value foi : base -> ifam -> base_family;
-value coi : base -> ifam -> base_couple;
+value poi : base -> iper -> person;
+value aoi : base -> iper -> ascend;
+value foi : base -> ifam -> family;
+value coi : base -> ifam -> couple;
 value sou : base -> istr -> string;
 
-value is_deleted_family : base_family -> bool;
+value is_deleted_family : family -> bool;
 
 value person_ht_add : base -> string -> iper -> unit;
 value person_ht_find_all : base -> string -> list iper;
 value person_ht_find_unique : base -> string -> string -> int -> iper;
-value person_misc_names : base -> base_person -> list string;
+value person_misc_names : base -> person -> list string;
 
 value leap_year : int -> bool;
 value nb_jours_dans_mois : int -> int -> int;
@@ -25,15 +25,15 @@ value annee : date -> int;
 value strictement_avant : date -> date -> bool;
 value strictement_apres : date -> date -> bool;
 
-value denomination : base -> base_person -> string;
+value denomination : base -> person -> string;
 
-value map_title_strings : ('a -> 'b) -> Def.title 'a -> Def.title 'b;
+value map_title_strings : ('a -> 'b) -> gen_title 'a -> gen_title 'b;
 
-value map_person_strings : ('a -> 'b) -> Def.person 'a -> Def.person 'b;
+value map_person_strings : ('a -> 'b) -> gen_person 'a -> gen_person 'b;
 value map_family_ps :
-  ('a -> 'c) -> ('b -> 'd) -> Def.family 'a 'b -> Def.family 'c 'd
+  ('a -> 'c) -> ('b -> 'd) -> gen_family 'a 'b -> gen_family 'c 'd
 ;
-value map_couple_p : ('a -> 'b) -> Def.couple 'a -> Def.couple 'b;
+value map_couple_p : ('a -> 'b) -> gen_couple 'a -> gen_couple 'b;
 
 (* check base *)
 
@@ -42,29 +42,29 @@ type error 'person =
   | OwnAncestor of 'person
   | BadSexOfMarriedPerson of 'person ]
 ;
-type base_error = error base_person;
+type base_error = error person;
 
 type warning 'person =
   [ BirthAfterDeath of 'person
-  | ChangedOrderOfChildren of base_family and array iper
-  | ChildrenNotInOrder of base_family and 'person and 'person
+  | ChangedOrderOfChildren of family and array iper
+  | ChildrenNotInOrder of family and 'person and 'person
   | DeadTooEarlyToBeFather of 'person and 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
   | MotherDeadAfterChildBirth of 'person and 'person
   | ParentBornAfterChild of 'person and 'person
-  | ParentTooYoung of 'person and Def.date
-  | TitleDatesError of 'person and title istr
-  | YoungForMarriage of 'person and Def.date ]
+  | ParentTooYoung of 'person and date
+  | TitleDatesError of 'person and title
+  | YoungForMarriage of 'person and date ]
 ;
-type base_warning = warning base_person;
+type base_warning = warning person;
 
 value check_person :
-  base -> (base_error -> unit) -> (base_warning -> unit) -> base_person -> unit
+  base -> (base_error -> unit) -> (base_warning -> unit) -> person -> unit
 ;
 
 value check_family :
-  base -> (base_error -> unit) -> (base_warning -> unit) -> base_family ->
+  base -> (base_error -> unit) -> (base_warning -> unit) -> family ->
     unit
 ;
 

@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 2.4 1999-03-31 02:16:49 ddr Exp $ *)
+(* $Id: def.mli,v 2.5 1999-04-05 23:42:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = Adef.iper;
@@ -34,10 +34,10 @@ type burial = [ UnknownBurial | Buried of codate | Cremated of codate ];
 
 type access = [ IfTitles | Public | Private ];
 
-type title_name 'string = [ Tmain | Tname of 'string | Tnone ];
-type title 'string =
-  { t_name : mutable title_name 'string;
-    t_title : mutable 'string;
+type gen_title_name 'string = [ Tmain | Tname of 'string | Tnone ];
+type gen_title 'string =
+  { t_name : mutable gen_title_name 'string;
+    t_ident : mutable 'string;
     t_place : mutable 'string;
     t_date_start : mutable codate;
     t_date_end : mutable codate;
@@ -46,7 +46,7 @@ type title 'string =
 
 type sex = [ Male | Female | Neuter ];
 
-type person 'string =
+type gen_person 'string =
   { first_name : mutable 'string;
     surname : mutable 'string;
     occ : mutable int;
@@ -56,7 +56,7 @@ type person 'string =
     aliases : mutable list 'string;
     first_names_aliases : mutable list 'string;
     surnames_aliases : mutable list 'string;
-    titles : mutable list (title 'string);
+    titles : mutable list (gen_title 'string);
     occupation : mutable 'string;
     sex : mutable sex;
     access : mutable access;
@@ -78,12 +78,12 @@ type person 'string =
     cle_index : mutable iper }
 ;
 
-type ascend =
+type gen_ascend =
   { parents : mutable option ifam;
     consang : mutable Adef.fix }
 ;
 
-type family 'person 'string =
+type gen_family 'person 'string =
   { marriage : mutable codate;
     marriage_place : mutable 'string;
     marriage_src : mutable 'string;
@@ -96,15 +96,16 @@ type family 'person 'string =
     fam_index : mutable ifam }
 ;
 
-type couple 'person =
+type gen_couple 'person =
   { father : mutable 'person;
     mother : mutable 'person }
 ;
 
-type base_person = person istr;
-type base_ascend = ascend;
-type base_family = family iper istr;
-type base_couple = couple iper;
+type person = gen_person istr;
+type ascend = gen_ascend;
+type family = gen_family iper istr;
+type couple = gen_couple iper;
+type title = gen_title istr;
 
 type cache 'a =
   { array : mutable unit -> array 'a;
@@ -119,10 +120,10 @@ type istr_iper_index =
 ;
 
 type base_data =
-  { persons : cache base_person;
-    ascends : cache base_ascend;
-    families : cache base_family;
-    couples : cache base_couple;
+  { persons : cache person;
+    ascends : cache ascend;
+    families : cache family;
+    couples : cache couple;
     strings : cache string;
     has_family_patches : bool }
 ;
@@ -133,10 +134,10 @@ type base_func =
     index_of_string : string -> istr;
     persons_of_surname : istr_iper_index;
     persons_of_first_name : istr_iper_index;
-    patch_person : iper -> base_person -> unit;
-    patch_ascend : iper -> base_ascend -> unit;
-    patch_family : ifam -> base_family -> unit;
-    patch_couple : ifam -> base_couple -> unit;
+    patch_person : iper -> person -> unit;
+    patch_ascend : iper -> ascend -> unit;
+    patch_family : ifam -> family -> unit;
+    patch_couple : ifam -> couple -> unit;
     patch_string : istr -> string -> unit;
     patch_name : string -> iper -> unit;
     commit_patches : unit -> unit;
