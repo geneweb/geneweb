@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.13 2004-05-24 15:42:07 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.14 2004-05-28 11:27:32 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -44,11 +44,23 @@ value read_wizfile fname =
 value read_wizard_notes fname =
   match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      loop 0 where rec loop len =
+      let (date, len) =
+        try
+          let line = input_line ic in
+          if line = "WIZNOTES" then
+            let line = input_line ic in
+            (float_of_string line, 0)
+          else
+            let s = Unix.stat fname in
+            (s.Unix.st_mtime, Buff.store (Buff.mstore 0 line) '\n')
+        with
+        [ End_of_file | Failure _ -> (0., 0) ]
+      in
+      loop len where rec loop len =
         match try Some (input_char ic) with [ End_of_file -> None ] with
         [ Some c -> loop (Buff.store len c)
-        | None -> do { close_in ic; Buff.get (max 0 (len - 1)) } ]
-  | None -> "" ]
+        | None -> do { close_in ic; (Buff.get (max 0 (len - 1)), date) } ]
+  | None -> ("", 0.) ]
 ;
 
 value write_wizard_notes fname nn =
@@ -58,11 +70,32 @@ value write_wizard_notes fname nn =
     match try Some (Secure.open_out fname) with [ Sys_error _ -> None ] with
     [ Some oc ->
         do {
+          Printf.fprintf oc "WIZNOTES\n%.0f\n" (Unix.time ());
           output_string oc nn;
           output_string oc "\n";
           close_out oc;
         }
     | None -> () ]
+;
+
+value wiznote_date wfile =
+  match try Some (Secure.open_in wfile) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let date =
+        try
+          let line = input_line ic in
+          if line = "WIZNOTES" then float_of_string (input_line ic)
+          else raise Exit
+        with
+        [ End_of_file | Failure _ | Exit ->
+            let s = Unix.stat wfile in
+            s.Unix.st_mtime ]
+      in
+      do {
+        close_in ic;
+        (wfile, date)
+      }
+  | None -> ("", 0.) ]
 ;
 
 value print_main conf base wizfile =
@@ -83,14 +116,8 @@ value print_main conf base wizfile =
     let list =
       List.map
         (fun (wz, wname) ->
-           let wfile = wzfile wddir wz in
-           if Sys.file_exists wfile then
-             try
-               let s = Unix.stat (wzfile wddir wz) in
-               (wz, wname, wfile, s.Unix.st_mtime)
-             with
-             [ Unix.Unix_error _ _ _ -> (wz, wname, "", 0.) ]
-           else (wz, wname, "", 0.))
+	   let (wfile, wnote) = wiznote_date (wzfile wddir wz) in
+	   (wz, wname, wfile, wnote))
       wizdata
     in
     let list =
@@ -133,7 +160,7 @@ value print_main conf base wizfile =
 value print_wizard conf base wz =
   let title _ = Wserver.wprint "%s" wz in
   let wfile = wzfile (dir conf) wz in
-  let s = read_wizard_notes wfile in
+  let (s, date) = read_wizard_notes wfile in
   do {
     header conf title;
     print_link_to_welcome conf False;
@@ -148,10 +175,7 @@ value print_wizard conf base wz =
     if Sys.file_exists wfile then
       do {
         html_p conf;
-        let tm =
-          let s = Unix.stat wfile in
-          Unix.localtime s.Unix.st_mtime
-        in
+        let tm = Unix.localtime date in
         let dmy =
           {day = tm.Unix.tm_mday; month = tm.Unix.tm_mon + 1;
            year = 1900 + tm.Unix.tm_year; prec = Sure; delta = 0}
@@ -186,7 +210,7 @@ value print_wizard conf base wz =
 value print_wizard_mod conf base wizfile wz nn =
   let wddir = dir conf in
   let fname = wzfile wddir wz in
-  let on = read_wizard_notes fname in
+  let (on, _) = read_wizard_notes fname in
   let nn = Gutil.strip_all_trailing_spaces nn in
   let digest =
     match p_getenv conf.env "digest" with
