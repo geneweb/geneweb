@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.105 2002-09-26 13:54:24 ddr Exp $
+# $Id: lexicon.txt,v 4.106 2002-09-26 19:12:33 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -502,7 +502,7 @@ nl: januari/februari/maart/april/mei/juni/juli/augustus/september/oktober/novemb
 no: januar/februar/mars/april/mai/juni/juli/august/september/oktober/november/desember
 pl: I/II/III/IV/V/VI/VII/VIII/IX/X/XI/XII
 pt: Janeiro/Fevereiro/Mar&ccedil;o/Abril/Maio/Junho/Julho/Agosto/Setembro/Outubro/Novembro/Dezembro
-ru: января/февраля/марта/апреля/мая/июня/июля/августа/сентября/октября/ноября/декабря
+ru: Января/февраля/марта/апреля/мая/июня/июля/августа/сентября/октября/ноября/декабря
 sl: januarja/februarja/marca/aprila/maja/junija/julija/avgusta/septembra/oktobra/novembra/decembra
 sv: januari/februari/mars/april/maj/juni/juli/augusti/september/oktober/november/december
 zh: 1ФВ/2ФВ/3ФВ/4ФВ/5ФВ/6ФВ/7ФВ/8ФВ/9ФВ/10ФВ/11ФВ/12ФВ
