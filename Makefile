@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.20 2001-02-27 21:41:44 ddr Exp $
+# $Id: Makefile,v 3.21 2001-03-07 21:33:04 ddr Exp $
 
 DESTDIR=distribution
 
@@ -33,10 +33,14 @@ wrappers:
 	  echo 'cd gw' > $(DESTDIR)/gwsetup.bat; \
 	  echo 'gwsetup' >> $(DESTDIR)/gwsetup.bat; \
 	else \
-	  echo '#!/bin/sh' > $(DESTDIR)/gwd; \
-	  echo 'cd gw; exec ./gwd' >> $(DESTDIR)/gwd; \
-	  echo '#!/bin/sh' > $(DESTDIR)/gwsetup; \
-	  echo 'cd gw; exec ./gwsetup' >> $(DESTDIR)/gwsetup; \
+	  (echo '#!/bin/sh'; \
+	   echo 'mkdir -p bases'; \
+	   echo 'cd bases'; \
+	   echo 'exec ../gw/gwd -hd ../gw') > $(DESTDIR)/gwd; \
+	  (echo '#!/bin/sh'; \
+	   echo 'mkdir -p bases'; \
+	   echo 'cd bases'; \
+	   echo 'exec ../gw/gwsetup -gd ../gw') > $(DESTDIR)/gwsetup; \
 	  chmod +x $(DESTDIR)/gwd $(DESTDIR)/gwsetup; \
 	fi
 
