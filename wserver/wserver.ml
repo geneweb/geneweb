@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.4 2000-04-12 15:22:10 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.5 2000-04-16 15:40:19 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -269,7 +269,7 @@ value string_of_sockaddr =
 value sockaddr_of_string s = Unix.ADDR_UNIX s;
 
 value treat_connection tmout callback addr ic =
-  do ifdef NO_PROCESS then ()
+  do ifdef MAC then ()
      else ifdef UNIX then
        if tmout > 0 then
          let spid = Unix.fork () in
@@ -346,11 +346,11 @@ value rec list_remove x =
   | [y :: l] -> if x = y then l else [y :: list_remove x l] ]
 ;
 
-ifndef NO_PROCESS then
+ifndef MAC then
 value pids = ref [];
-ifndef NO_PROCESS then
+ifndef MAC then
 value cleanup_verbose = ref True;
-ifndef NO_PROCESS then
+ifndef MAC then
 value cleanup_sons () =
   List.iter
     (fun p ->
@@ -375,7 +375,7 @@ value cleanup_sons () =
      pids.val
 ;
 
-ifndef NO_PROCESS then
+ifndef MAC then
 value wait_available max_clients s =
   match max_clients with
   [ Some m ->
@@ -405,7 +405,7 @@ do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining aft
   | None -> () ]
 ;
 
-ifdef NO_PROCESS then
+ifdef MAC then
 value wait_and_compact s =
   if Unix.select [s] [] [] 15.0 = ([], [], []) then
     do Printf.eprintf "Compacting... "; flush stderr;
@@ -416,12 +416,12 @@ value wait_and_compact s =
 ;
 
 value accept_connection tmout max_clients callback s =
-  do ifdef NO_PROCESS then wait_and_compact s
+  do ifdef MAC then wait_and_compact s
      else wait_available max_clients s;
   return
   let (t, addr) = Unix.accept s in
   do Unix.setsockopt t Unix.SO_KEEPALIVE True; return
-  ifdef NO_PROCESS then
+  ifdef MAC then
     let cleanup () =
       do try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
          try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
@@ -506,13 +506,13 @@ value accept_connection tmout max_clients callback s =
 
 value f addr_opt port tmout max_clients (uid, gid) g =
   match
-    ifdef NO_PROCESS then None
+    ifdef MAC then None
     else ifdef WIN95 then
       try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
     else None
   with
   [ Some s ->
-      ifdef NO_PROCESS then ()
+      ifdef MAC then ()
       else ifdef WIN95 then
         let addr = sockaddr_of_string s in
         let ic = open_in_bin sock_in.val in
@@ -543,7 +543,7 @@ value f addr_opt port tmout max_clients (uid, gid) g =
               | None -> () ];
            return ()
          else ();
-         ifdef NO_PROCESS then Sys.set_signal Sys.sigpipe Sys.Signal_ignore
+         ifdef MAC then Sys.set_signal Sys.sigpipe Sys.Signal_ignore
          else ();
       return
       let tm = Unix.localtime (Unix.time ()) in

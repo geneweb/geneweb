@@ -1,0 +1,30 @@
+# $Id: camlp4_comm.mpw,v 3.1 2000-04-16 15:40:18 ddr Exp $
+
+set echo 0
+
+exit if {#} < 1
+
+set args1 ""
+set args2 ""
+set file ""
+loop
+   break if {#} == 1
+   if "{1}" =~ /(Å)¨0.ml/
+      set file {1}
+   else
+      set args "{args} `quote "{1}"`"
+   end
+   shift
+end
+
+set firstline "`streamedit -e '1 exit' "{file}"`" ³ dev:null || set status 0
+
+if "{firstline}" =~ /¶(¶* camlp4r(Å)¨0¶*¶)/
+  set comm "camlp4r"
+  set args2 "{"0}"
+else
+  set comm "camlp4r"
+  set args2 ""
+end
+
+{comm} {args2} {args1} {file}
