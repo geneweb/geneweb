@@ -7,7 +7,7 @@
 %t has incorrect title dates: %t
 %t is born after the death of his/her mother %t
 %t is born more than 2 years after the death of his/her father %t
-(day)
+(date)
 (decimal separator)
 (month)
 (thousand separator)
