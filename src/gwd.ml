@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.47 2002-07-15 08:34:23 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.48 2002-09-16 13:44:30 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -345,7 +345,7 @@ value print_renamed conf new_n =
     "http://" ^ Util.get_server_string conf ^ new_req
   in
   let env =
-    [('o', fun _ -> conf.bname); ('n', fun _ -> new_n); ('l', link)]
+    [('o', fun _ -> conf.bname); ('e', fun _ -> new_n); ('l', link)]
   in
   match Util.open_etc_file "renamed" with
   [ Some ic ->

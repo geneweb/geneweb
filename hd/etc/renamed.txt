@@ -2,18 +2,18 @@
 <head>
   <meta name="ROBOTS" content="NONE">
   <!--meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"-->
-  <title>%o -&gt; %n</title>
+  <title>%o -&gt; %e</title>
 </head>
 <body background="%km=IM;v=/gwback.jpg">
-<h1>%o -&gt; %n</h1>
+<h1>%o -&gt; %e</h1>
 
-The database "%o" has been renamed "%n".
+The database "%o" has been renamed "%e".
 Please use now:
 <br>
-La base de données "%o" est renommée "%n".
+La base de données "%o" est renommée "%e".
 Utilizzate:
 <br>
-La base di dati "%o" ha cambiato nome "%n".
+La base di dati "%o" ha cambiato nome "%e".
 Utiliser maintenant:<p>
 <ul>
 <li>
