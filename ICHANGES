@@ -4,22 +4,11 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.07
 --------------------
 
-* Distribution
-  - [18 Aug 00] Create files named README.htm and LISEZMOI.htm instead
-    of README.txt and LISEZMOI.txt.
-
 * GeneWeb daemon/CGI (gwd)
-  - [16 Aug 00] In personal pages, does not display the age at death
-    if less than one year and undefined (it displayed "age at death:
-    birth"!)
-  - [14 Aug 00] In personal pages, sources are now printed, even for
-    non friends, non wizards.
   - [12 Aug 00] For relationlinks by shortest path, if "cancel GeneWeb
     links" is selected, now it is applied to all pages browsed by ">>".
   - [12 Aug 00] Added also check baptism date to determine public and
     private.
-  - [09 Aug 00] Fixed a problem of missing space after "married to" in
-    descendants page (did not happen with all browsers).
   - [08 Aug 00] In first names by alphabetic order for a given surname,
     use now (the translation of) "%1 of %2" instead of "of".
   - [26 Jul 00] Fixed detail in Wserver: closed socket before callback
