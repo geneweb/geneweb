@@ -1,7 +1,7 @@
-# $Id: lexicon.txt,v 4.228 2005-02-05 11:36:30 ddr Exp $
+# $Id: lexicon.txt,v 4.229 2005-03-20 08:17:45 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 # This file is kept by compatibility to allow displaying databases
-# created before version 5.00. It does not change any more.
+# created before version 5.00.
 
      !charset
 af: iso-8859-1
@@ -88,6 +88,7 @@ ro: af=africaans/ca=catalana/cs=checha/da=daneza/de=germana/en=engleza/eo=espera
 ru: af=àôğèêàíñêèé/bg=áîëãàğñêèé/ca=êàòàëàíñêèé/cs=÷åøñêèé/da=äàòñêèé/de=íåìåöêèé/en=àíãëèéñêèé/eo=ıñïåğàíòî/es=èñïàíñêèé/et=ıñòîíñêèé/fi=ôèíñêèé/fr=ôğàíöóçñêèé/he=èâğèò/is=èñëàíäñêèé/it=èòàëüÿíñêèé/lv=ëàòûøñêèé/nl=ãîëëàíäñêèé/no=íîğâåæñêèé/pl=ïîëüñêèé/pt=ïîğòóãàëüñêèé/pt-br=áğàçèëüñêî-ïîğòóãàëüñêèé/ru=ğóññêèé/sl=ñëàâÿíñêèé/sv=øâåäñêèé/zh=êèòàéñêèé
 sl: af=afrikaan¹èina/ca=katalon¹èina/cs=èe¹èina/da=dan¹èina/de=nem¹èina/en=angle¹èina/eo=esperanto/es=¹pan¹èina/et=eston¹èina/fi=fin¹èina/fr=franco¹èina/he=hebrej¹èina/is=island¹èina/it=italijan¹èina/lv=litvan¹èina/nl=nizozem¹èina/no=norve¹èina/pl=polj¹èina/pt=portugal¹èina/pt-br=brazilska-portugal¹èina/ru=ru¹èina/sl=sloven¹èina/sv=¹ved¹èina/zh=kitaj¹èina
 sv: af=afrikaans/bg=bulgariska/br=bretonska/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ro=rumänska/ru=ryska/sl=slovenska/sv=svenska/zh=kinesiska
+zh: fr=·¨Óï/zh=ÖĞÎÄ
 
      to see the first branch
 af:  om die eerste staak te sien
@@ -175,7 +176,7 @@ sv:  f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer
 af: %1 van %2
 bg: %1 íà :a:%2
 br: %1 eus %2
-ca: %1 d[e']%2
+ca: %1 de %2
 cs: %1 :g:%2
 da: %1 til %2
 de: %1 von :d:%2
@@ -251,6 +252,60 @@ ro: veri de gradul %s
 ru: %s êóçåíû
 sl: %s bratranci/sestriène
 sv: %sm&auml;nningar
+
+    %s, it is %s of
+af: %s, dit is %s van
+bg: %s, å %s íà
+br: %s, bez ez eo %s eus
+ca: %s, és %s de
+cs: %s, je %s
+da: %s, er det %s til
+de: %s ist %s von
+en: %s, it is %s of
+eo: %s, estas %s de
+es: %s, es %s de
+et: %s, on %s
+fi: %s, on %s
+fr: %s, c'est %s de
+he: %s, æä %s ùì
+is: %s, er %s
+it: %s, &egrave; %s di
+lv: %s, tas ir %s
+nl: %s is het %s van
+no: %s, er det %s til
+pl: %s, jest %s
+pt: %s, &eacute; %s de
+ro: %s, este %s pentru
+ru: %s, ıòî %s
+sl: %s, je %s od
+sv: %s, &auml;r det %s till
+
+    %s, it will be %s of
+af: %s, dit sal wees %s van
+bg: %s, ùå áúäå %s íà
+br: %s, bez e vo %s eus
+ca: %s, serà %s de
+cs: %s, bude %s
+da: %s, er det %s til
+de: %s ist %s von
+en: %s, it will be %s of
+eo: %s, estos %s de
+es: %s, ser&aacute; %s de
+et: %s, on %s
+fi: %s, on %s
+fr: %s, ce sera %s de
+he: %s , éäéä %s ùì
+is: %s, verğa %s
+it: %s, sar&agrave; %s di
+lv: %s, tas bûs %s
+nl: %s zal het %s zijn van
+no: %s, vil det bli %s til
+pl: %s, bêdzie %s
+pt: %s, ser&aacute; %s de
+ro: %s, va fi %s pentru
+ru: %s, ıòî áóäåò %s
+sl: %s, bo %s od
+sv: %s, &auml;r det %s till
 
     %t already has parents
 af: %t het reeds ouers
@@ -561,7 +616,7 @@ eo: .
 es: .
 et: &nbsp;
 fi: .
-fr: &nbsp;
+fr: <span style="font-size:50%"> </span>
 he: ,
 is: .
 it: .
@@ -630,60 +685,6 @@ ro: n-elea/primar/de gradul 2/de gradul 3/de gradul 4/de gardul 5/de gradul 6/de
 ru: ıííûé/1-é/2-é/3-é/4-é/5-é/6-é/-7é/8-é/9-é/10-é/11-é/11-é/12-é/13-é/14-é/15-é/16-é/17-é/18-é/19-é/20-é
 sl: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n/tv&aring;/tre/fyra/fem/sex/sju/&aring;tta/nio/tio/elva/tolv/tretton/fjorton/femton/sexton/sjutton/arton/nitton/tjugo/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99/100/101/102/103/104/105/106/107/108/109/110/111/112/113/114/115/116/117/118/119/120/121/122/123/124/125/126/127/128/129/130
-
-    , it is
-af: , dit is
-bg: , å
-br: , bez ez eo
-ca: , és
-cs: , je
-da: , er det
-de:  ist
-en: , it is
-eo: , estas
-es: , es
-et: , on
-fi: , on
-fr: , c'est
-he:   , æä
-is: , er
-it: , &egrave;
-lv: , tas ir
-nl:  is het
-no: , er det
-pl: , jest
-pt: , &eacute;
-ro: , este
-ru: , ıòî
-sl: , je
-sv: , &auml;r det
-
-    , it will be
-af: , dit sal wees
-bg: , ùå áúäå
-br: , bez e vo
-ca: , serà
-cs: , bude
-da: , er det
-de:  ist
-en: , it will be
-eo: , estos
-es: , ser&aacute;
-et: , on
-fi: , on
-fr: , ce sera
-he:  , éäéä
-is: , verğa
-it: , sar&agrave;
-lv: , tas bûs
-nl:  zal het zijn
-no: , vil det bli
-pl: , bêdzie
-pt: , ser&aacute;
-ro: , va fi
-ru: , ıòî áóäåò
-sl: , bo
-sv: , &auml;r det
 
     2nd cousins
 af: kleinneef/kleinniggie
@@ -2275,6 +2276,7 @@ de: Rand
 en: border
 eo: limo
 es: borde
+et: ääris
 fi: raja
 fr: bordure
 he:  îñâøú
@@ -2571,7 +2573,7 @@ de: Namen der Kinder &auml;ndern
 en: change children's names
 eo: sxangxi nomojn de la idoj
 es: cambiar los nombres de los hijos
-et: muuda laste nimed
+et: muuda laste nimesid
 fi: muuta lasten nimi&auml;
 fr: changer noms des enfants
 he:  òãëï ùîåú äéìãéí
@@ -2761,6 +2763,7 @@ en: colour
 en-us: color
 eo: koloro
 es: color 
+et: värv
 fi: v&auml;ri
 fr: couleur
 he:  öáò
@@ -3957,7 +3960,7 @@ cs: generace
 da: generation/generationer
 de: Generation/Generationen
 en: generation/generations
-eo: generacio/generacioj
+eo: generacio:a:+n/generacioj
 es: generaci&oacute;n/generaciones
 et: sugupõlv/sugupõlve
 fi: sukupolvi/sukupolvea
@@ -5278,7 +5281,7 @@ ro: casatorie/casatorii
 ru: áğàê/áğàêè
 sl: poroke/poroke
 sv: &auml;ktenskap/&auml;ktenskap
-zh:  "éÒö
+zh:  "éÒ
 
     married
 af: getroud
@@ -5560,7 +5563,7 @@ de: &auml;ndern +before
 en: modify
 eo: modifi :a:
 es: modificar
-et: muuda
+et: muuda :g:
 fi: muokkaa
 fr: modifier
 he:  ìùğåú
@@ -5602,6 +5605,14 @@ ro: luni
 ru: ìåñÿöû
 sl: mesecev star/mesecev stara
 sv: m&aring;nader
+
+    moon age/new moon/first quarter/full moon/last quarter
+cs: mìsíèní fáze/nov/první ètvrt'/úplnìk/poslední ètvrt'
+de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
+en: moon age/new moon/first quarter/full moon/last quarter
+fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
+pl: faza ksiê¿yca/nów/pierwsza kwadra/pe³nia/trzecia kwadra
+pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
 
     more than %d answers
 af: meer as %d antwoorde
@@ -5915,6 +5926,7 @@ de: nicht erv&auml;hnt
 en: no mention
 eo: neniu mencio
 es: sin informaci&oacute;n
+et: pole mainitud
 fi: ei mainintaa
 fr: pas de mention
 it: senza menzione
@@ -6073,6 +6085,7 @@ de: ge&auml;nderte Notizen
 en: notes modified
 eo: notoj modifitaj
 es: notas modificadas
+et: märkused muudetud
 fi: muistiinpanoja muokattu
 fr: notes modifi&eacute;es
 it: note modificate
@@ -7783,11 +7796,13 @@ cs: %d nejstar¹ích párù pravdìpodobnì ¾ijících a zadanıch
 da: og de %d &aelig;ldste par muligvis stadig i live og forlovede
 de: Die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
 en: the %d oldest couples perhaps still alive and engaged
+et: %d vanimat paari kes on võib-olla veel elus ja kihlatud
 fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
 nl: De %d langst paren die mogelijk nog steeds leven en getrouwd zijn
 pl: %d najstarsza para prawdopodobnie jeszcze zyje i pozostaje zareczona
 pt: o %d mais velho casal talvez ainda vivo e noivado
+pt-br: os %d mais velhos casais talvez ainda vivos
 ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
 sv: de %d &auml;ldsta nu levande paren som kanske fortfarande &auml;r f&ouml;rlovade
 
