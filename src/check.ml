@@ -1,12 +1,24 @@
-(* $Id: check.ml,v 4.10 2004-08-05 11:19:09 ddr Exp $ *)
+(* $Id: check.ml,v 4.11 2004-08-05 12:37:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
 open Printf;
 
+type gen_min_person 'person 'string =
+  { m_first_name : mutable 'string;
+    m_surname : mutable 'string;
+    m_occ : mutable int;
+    m_rparents : mutable list (gen_relation 'person 'string);
+    m_related : mutable list iper;
+    m_sex : mutable sex;
+    m_notes : mutable 'string;
+    m_cle_index : mutable iper }
+;
+type min_person = gen_min_person iper istr;
+
 type cbase =
-  { c_persons : mutable array person;
+  { c_persons : mutable array min_person;
     c_ascends : mutable array ascend;
     c_unions : mutable array union;
     c_families : mutable array family;
@@ -27,7 +39,9 @@ type gen =
     g_def : mutable array bool;
     g_separate : mutable bool;
     g_shift : mutable int;
-    g_errored : mutable bool }
+    g_errored : mutable bool;
+    g_per_index : out_channel;
+    g_per : out_channel }
 ;
 
 value error gen = gen.g_errored := True;
