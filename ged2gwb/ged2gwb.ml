@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.26 1998-12-05 11:58:32 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.27 1998-12-14 12:51:07 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -1193,7 +1193,7 @@ value find_lev0 =
 ;
 
 value pass1 gen fname =
-  let ic = open_in fname in
+  let ic = open_in_bin fname in
   let strm = Stream.of_channel ic in
   do loop () where rec loop () =
        match try Some (find_lev0 strm) with [ Stream.Failure -> None ] with
@@ -1212,7 +1212,7 @@ value pass1 gen fname =
 ;
 
 value pass2 gen fname =
-  let ic = open_in fname in
+  let ic = open_in_bin fname in
   do line_cnt.val := 0; return
   let strm =
     Stream.from
@@ -1267,7 +1267,7 @@ value make_arrays in_file =
      g_fam = {arr = [| |]; tlen = 0};
      g_cpl = {arr = [| |]; tlen = 0};
      g_str = {arr = [| |]; tlen = 0};
-     g_ic = open_in fname;
+     g_ic = open_in_bin fname;
      g_not = Hashtbl.create 3001;
      g_src = Hashtbl.create 3001;
      g_hper = Hashtbl.create 3001;
