@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.12 2000-10-02 12:10:56 ddr Exp $
+# $Id: geneweb.spec,v 3.13 2000-10-02 13:21:36 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -181,7 +181,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwc
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwu
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/consang
-%attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwtp
+%attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwtp_tmp/gwtp
 %attr(755, root, root) /etc/rc.d/init.d/gwd
 %attr(755, root, root) /etc/rc.d/rc0.d/K01gwd
 %attr(755, root, root) /etc/rc.d/rc1.d/K01gwd
@@ -295,7 +295,6 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/etc/robot.txt
 /home/geneweb/gw/gw/gwtp_tmp/README
 /home/geneweb/gw/gw/gwtp_tmp/conf.txt
-/home/geneweb/gw/gw/gwtp_tmp/gwtp
 /home/geneweb/gw/gw/gwtp_tmp/recv.txt
 /home/geneweb/gw/gw/gwtp_tmp/send.txt
 /home/geneweb/gw/gw/images/female.gif
