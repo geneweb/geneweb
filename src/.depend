@@ -151,8 +151,8 @@ mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi iobase.cmi \
     name.cmi num.cmi pqueue.cmi 
 mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx iobase.cmx \
     name.cmx num.cmx pqueue.cmx 
-name.cmo: name.cmi 
-name.cmx: name.cmi 
+name.cmo: buff.cmo name.cmi 
+name.cmx: buff.cmx name.cmi 
 notes.cmo: config.cmi def.cmi gutil.cmi util.cmi ../wserver/wserver.cmi 
 notes.cmx: config.cmi def.cmi gutil.cmx util.cmx ../wserver/wserver.cmx 
 num.cmo: num.cmi 
