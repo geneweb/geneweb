@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 2.21 1999-10-01 06:51:11 ddr Exp $ *)
+(* $Id: date.ml,v 2.22 1999-10-01 11:36:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -437,18 +437,6 @@ value print_calendar conf base =
            hebrew_month_name 13 "h";
        end;
      end;
-(*
-     if date.year < 1792 || date.year > 1806 then
-       Wserver.wprint "\
-<p>
-Warning: the French (Republican) date out of the year range 1-14 (1792-1806)
-can be erroneous in the present implementation...
-<p>
-Attention: le calendrier r&eacute;publicain en dehors de l'intervalle des
-ann&eacute;es 1 &agrave; 14 (1792-1806) peut donner des r&eacute;sultats
-faux dans l'impl&eacute;mentation actuelle...\n"
-     else ();
-*)
      trailer conf;
   return ()
 ;
