@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.44 1999-05-24 16:39:06 ddr Exp $
+# $Id: lexicon.txt,v 2.45 1999-05-28 07:44:07 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -53,7 +53,7 @@ se:  f&ouml;r att se den f&ouml;rsta
 de: , um es mit dieser Nummer nochmals zu versuchen, oder dr&uuml;cken Sie "back" und &auml;ndern Sie es selbst
 dk:  for at fors&oslash;ge igen med dette nummer, eller v&aelig;lg "back" og v&aelig;lg et andet
 en:  to try again with this number, or do "back" and change it yourself
-es:  para ensayar con este n&uacute;mero, o hace "back" y c&aacute;mbielo Ud. mismo
+es:  para ensayar nuevamente con este n&uacute;mero, o bien utilizar la tecla "back" y c&aacute;mbielo Ud. mismo
 fr:  pour r&eacute;essayer avec ce num&eacute;ro, ou bien faites "back" et choisissez-en un autre
 he:  לנסות שוב עם המספר הזה, או "חזרה" ולשנות בעצמך
 nl: , om dit nummer weer te proberen, of druk "terug" en verander het zelf
@@ -597,7 +597,7 @@ cn: ¸ß¼¶·ֳ־Êַכַף
 de: Erweiterte Suche
 dk: avanceret s&oslash;gning
 en: advanced request
-es: avanzada consulta
+es: consulta avanzada
 eo: progresata rekesto
 fr: requ&ecirc;te &eacute;volu&eacute;e
 he:   בקשה מתקדמת 
@@ -1027,6 +1027,7 @@ se: begravd
 
     cancel GeneWeb links
 dk: uden GeneWeb-links
+es: anular los lazos GeneWeb
 en: cancel GeneWeb links
 fr: annuler les liens GeneWeb
 se: utan GeneWeb l&auml;nkar
@@ -1059,6 +1060,7 @@ se: kan inte &auml;ndra k&ouml;n p&aring; en gift person
 
     change children's names
 dk: &aelig;ndre b&oslash;rns navne
+es: cambiar los nombres de los hijos
 en: change children's names
 fr: changer noms des enfants
 se: &auml;ndra barnens namn
@@ -1093,6 +1095,7 @@ se: barn/barnen
     children's names changed
 dk: b&oslash;rns navne &aelig;ndret
 en: children's names changed
+es: nombres de los hijos cambiados
 fr: noms des enfants chang&eacute;s
 se: barnens namn &auml;ndrade
 
@@ -1517,6 +1520,7 @@ se: far/mor
     file
 dk: fil
 en: file
+es: fichero
 fr: fichier
 he:  קובץ 
 no: fil
@@ -1750,7 +1754,7 @@ se: om titlar
 de: Foto
 dk: billede
 en: image
-es: foto
+es: imagen
 fr: image
 he:  תמונה
 it: foto
@@ -1764,7 +1768,7 @@ de: Foto gel&ouml;scht
 dk: billede slettet
 en: image deleted
 eo: foto malkonstruita
-es: foto borrada
+es: imagen borrada
 fr: image supprim&eacute;e
 he:  תמונה נמחקה
 it: foto cancellata
@@ -1776,6 +1780,7 @@ se: foto borttaget
     image received
 dk: billede indsat
 en: image received
+es: imagen recibida
 fr: image re&ccedil;ue
 he:  התמונה התקבלה
 no: bildet er mottatt
@@ -1813,6 +1818,7 @@ se: i
 
     include missing spouses
 dk: medtag ukendte &aelig;gtef&aelig;ller
+es: incluir las esposas faltantes
 en: include missing spouses
 fr: inclure les conjoints manquants
 se: inkludera gem&aring;ler som saknas
@@ -2039,6 +2045,7 @@ se: lista
     long display
 dk: udvidet rapport
 en: long display
+es: presentaci&oacute;n extensa
 fr: affichage long
 he:  תצוגה ארוכה
 nl: kwartierstaat
@@ -2963,6 +2970,7 @@ se: sl&auml;ktl&auml;nk/sl&auml;ktl&auml;nkar
     relationship%t to
 dk: forbindelse%t med
 en: relationship%t to
+es: parentesco%t con
 fr: relation%t avec
 se: f&ouml;rh&aring;llande%t med
 
@@ -3011,6 +3019,7 @@ se: se vidare
     send
 dk: inds&aelig;t
 en: send
+es: enviar
 fr: envoyer
 he:  שלח
 no: send
