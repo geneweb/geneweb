@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 4.9 2004-07-16 16:17:57 ddr Exp $ *)
+(* $Id: select.ml,v 4.10 2004-11-09 12:40:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -79,6 +79,33 @@ value censor_base base per_tab fam_tab flag threshold =
     };
     for i = 0 to base.data.persons.len - 1 do {
       censor_person base per_tab fam_tab flag threshold i False
+    }
+  }
+;
+
+value restrict_base base per_tab fam_tab flag =
+  do {
+    for i = 0 to base.data.persons.len - 1 do {
+      let fct p = False in
+      if base.data.visible.v_get fct i then
+        let _ = per_tab.(i) := per_tab.(i) lor flag in ()
+      else ()
+    };
+    for i = 0 to base.data.families.len - 1 do {
+      let des = base.data.descends.get i in
+      let cpl = base.data.couples.get i in
+      let des_visible =
+        Array.fold_left
+          (fun check iper -> check || per_tab.(Adef.int_of_iper iper) = 0)
+          False des.children
+      in
+      let cpl_not_visible =
+        per_tab.(Adef.int_of_iper (father cpl)) <> 0 ||
+        per_tab.(Adef.int_of_iper (mother cpl)) <> 0
+      in
+      if not des_visible && cpl_not_visible then
+        let _ = fam_tab.(i) := fam_tab.(i) lor flag in ()
+      else ();
     }
   }
 ;
@@ -337,10 +364,13 @@ value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
   let threshold = 1900 + tm.Unix.tm_year - censor in
   match (anc, desc, ancdesc) with
   [ (None, None, None) ->
-      if censor <> 0 then
+      if censor <> 0 || censor == -1 then
         let per_tab = Array.create base.data.persons.len 0 in
         let fam_tab = Array.create base.data.families.len 0 in
-        let _ = censor_base base per_tab fam_tab 1 threshold in
+        let _ =
+          if censor == -1 then restrict_base base per_tab fam_tab 1      
+          else censor_base base per_tab fam_tab 1 threshold
+        in
         (fun i -> per_tab.(Adef.int_of_iper i) == 0,
          fun i -> fam_tab.(Adef.int_of_ifam i) == 0)
       else (fun _ -> True, fun _ -> True)
@@ -348,7 +378,8 @@ value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
       let per_tab = Array.create base.data.persons.len 0 in
       let fam_tab = Array.create base.data.families.len 0 in
       let _ =
-        if censor <> 0 then censor_base base per_tab fam_tab 4 threshold
+        if censor == -1 then restrict_base base per_tab fam_tab 4
+        else if censor <> 0 then censor_base base per_tab fam_tab 4 threshold
         else ()
       in
       do {
@@ -365,7 +396,8 @@ value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
       let per_tab = Array.create base.data.persons.len 0 in
       let fam_tab = Array.create base.data.families.len 0 in
       let _ =
-        if censor <> 0 then censor_base base per_tab fam_tab 4 threshold
+        if censor == -1 then restrict_base base per_tab fam_tab 4
+        else if censor <> 0 then censor_base base per_tab fam_tab 4 threshold
         else ()
       in
       match (anc, desc) with
