@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.28 2002-04-11 07:48:59 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.29 2002-04-22 16:06:17 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -120,7 +120,7 @@ es: La base <font color=%i><b>"%t"</b></font> contiene actualmente %n
 et: Andmebaas <font color=%i><b>"%t"</b></font> sisaldab andmeid %n
     isiku kohta.
 fi: Tietokannassa <font color=%i><b>"%t"</b></font> on nyt %n
-    henkil&ouml;&auml.
+    henkil&ouml;&auml;.
 fr: La base de donn&eacute;es <font color=%i><b>"%t"</b></font> contient
     actuellement %n personnes.
 he: áîàâø äîéãò <font color=%i><b>"%t"</b></font> éù %n àğùéí.
@@ -777,7 +777,7 @@ es: Ha habido %q consultas, de las cuales %c corresponden a esta
     p&aacute;gina, desde el %d.
 et: Alates andmebaasi loomise päevast (%d) on selle poole pöördutud %q korda, 
     neist %c korda sellele lehele.
-fi: T&auml;h&auml;n menness&auml %q tapahtumaa, joista %c t&auml;lle
+fi: T&auml;h&auml;n menness&auml; %q tapahtumaa, joista %c t&auml;lle
     sivulle %d j&auml;lkeen.
 fr: Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 he: äéå %q ëğéñåú, ëåìì %c ëğéñåú ìòîåã æä, îàæ %d.
@@ -830,9 +830,9 @@ es: Si las p&aacute;ginas modificadas no ser&aacute;n actualizadas automaticamen
 et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt 
     (pead andma käsu "lae käesolev dokument uuesti"), siis  proovi alustada
     navigeerimist <a href="%sescache=0">sellest viitest</a>.
-fi: Mik&auml;li selaimesi ei automaattisesti p&auml;ivit&auml muutettuja sivuja
+fi: Mik&auml;li selaimesi ei automaattisesti p&auml;ivit&auml; muutettuja sivuja
     (jolloin sinun t&auml;ytyy "ladata uudelleen nykyinen dokumentti") kokeile
-    <a href="%sescache=0">t&auml;t&auml linkki&auml;</a>.
+    <a href="%sescache=0">t&auml;t&auml; linkki&auml;</a>.
 fr: Si votre navigateur ne met pas &agrave; jour automatiquement les pages
     modifi&eacute;es (vous obligeant &agrave; faire "actualiser la page"),
     essayez la navigation &agrave; partir de <a href="%sescache=0">ce

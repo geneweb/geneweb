@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.93 2002-04-15 09:53:37 ddr Exp $
+# $Id: lexicon.txt,v 4.94 2002-04-22 16:05:00 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -131,7 +131,7 @@ en:  to try again with this number
 eo:  por reprovi kun cxi tiu numero
 es:  para ensayar de nuevo con este n&uacute;mero
 et: , proovimaks uuesti selle numbriga
-fi:  yritt&auml;&auml;ksesi uudelleen t&auml;ll&auml numerolla
+fi:  yritt&auml;&auml;ksesi uudelleen t&auml;ll&auml; numerolla
 fr:  pour r&eacute;essayer avec ce num&eacute;ro
 he:  ìğñåú ùåá òí äîñôø äæä
 is:  til ağ reyna şetta aftur meğ şessu númeri
@@ -252,7 +252,7 @@ en: %t already has parents
 eo: %t havas jam gepatrojn
 es: los padres de %t ya existen
 et: isikul %t on juba vanemad
-fi: henkil&ouml;ll&auml %t on jo vanhemmat
+fi: henkil&ouml;ll&auml; %t on jo vanhemmat
 fr: %t a d&eacute;j&agrave; des parents
 he:   ì- %t éù ëáø äåøéí
 is: %t er şegar meğ foreldra
@@ -276,7 +276,7 @@ en: %t died before his/her birth
 eo: %t mortis antaù sia naskigxo
 es: %t ha muerto antes de su nacimiento
 et: %t suri enne sündi
-fi: %t on kuollut ennen syntym&auml;&auml;ns&auml
+fi: %t on kuollut ennen syntym&auml;&auml;ns&auml;
 fr: %t est mort(e) avant sa naissance
 he:  %t îú ìôğé äåìãúå/äåìãúä
 is: %t lést áğur en hann/hún fæddist
@@ -300,7 +300,7 @@ en: %t has incorrect title dates: %t
 eo: la nobeltitolaj datoj de %t estas malkorektaj: %t
 es: las fechas de un t&iacute;tulo de %t son incorrectas: %t
 et: isiku %t tiitli kuupäev %t on vigane
-fi: henkil&ouml;n %t arvonimen p&auml;iv&auml;m&auml;&auml;r&auml;ss&auml %t on virhe
+fi: henkil&ouml;n %t arvonimen p&auml;iv&auml;m&auml;&auml;r&auml;ss&auml; %t on virhe
 fr: %t a des dates de titre incorrectes: %t
 he:  úàøéëéí ìúàøéí ùì %t àéğí ğëåğéí: %t
 is: %t hefur vitlausa dagsetningu %t
@@ -325,7 +325,7 @@ en: %t is born after the death of his/her mother %t
 eo: %t naskigxis post la morto de sia patrino %t
 es: %t ha nacido despu&eacute;s de la muerte de su madre %t
 et: %t on sündinud pärast oma ema %t surma
-fi: %t on syntynyt &auml;itins&auml kuoleman j&auml;lkeen
+fi: %t on syntynyt &auml;itins&auml; kuoleman j&auml;lkeen
 fr: %t est n&eacute;(e) apr&egrave;s la mort de sa m&egrave;re %t
 he: %t  ğìã(ä) àçøé îååú äàí
 is: %t er fædd(ur) eftir andlát móğur sinnar %t
@@ -349,7 +349,7 @@ en: %t is born more than 2 years after the death of his/her father %t
 eo: %t naskigxis pli ol 2 jaroj post la morto de sia patro %t
 es: %t ha nacido m&aacute;s de 2 a&ntilde;os despu&eacuet;s de la muerte de su padre %
 et: %t on sündinud rohkem kui 2 aastat pärast oma isa %t surma
-fi: %t on syntynyt yli 2 vuotta is&auml;ns&auml kuoleman j&auml;lkeen
+fi: %t on syntynyt yli 2 vuotta is&auml;ns&auml; kuoleman j&auml;lkeen
 fr: %t est n&eacute;(e) plus de 2 ans apr&egrave;s la mort de son p&egrave;re %t
 he: %t  ğìã(ä) éåúø îùğúééí àçøé îååú äàá
 is: %t er fædd(ur) meira en 2 árum eftir andlát föğur síns %t
@@ -1063,7 +1063,7 @@ en: a great-uncle/a great-aunt
 eo: praonklo/praonklino
 es: un tio abuelo/una tia abuela
 et: vanaonu/vanatädi
-fi: isoset&auml/isot&auml;ti
+fi: isoset&auml;/isot&auml;ti
 fr: un grand-oncle/une grand-tante
 he:   ãåã-ñá/ ãåãä-ñáä
 is: afa(ömmu)bróğir/afa(ömmu)systir
@@ -1231,7 +1231,7 @@ en: add
 eo: aldoni :a:
 es: agregar
 et: lisa
-fi: lis&auml;&auml
+fi: lis&auml;&auml;
 fr: ajouter
 he:   äåñôä
 is: bæta viğ
@@ -1378,7 +1378,7 @@ en: age
 eo: agxo
 es: edad
 et: vanus
-fi: ik&auml
+fi: ik&auml;
 fr: &acirc;ge
 he:   âéì
 is: aldur
@@ -1403,7 +1403,7 @@ en: age at death:
 eo: mortagxo
 es: a la edad de
 et: vanus surres
-fi: ik&auml kuollessa
+fi: ik&auml; kuollessa
 fr: &agrave; l'&acirc;ge de
 he:   âéì áîåúå/îåúä
 is: dánaraldur
@@ -1453,7 +1453,7 @@ en: alive
 eo: vivanta
 es: no fallecido/no fallecida/no fallecido(a)
 et: elus
-fi: el&auml;&auml
+fi: el&auml;&auml;
 fr: vivant/vivante/vivant(e)
 he:  áçééí
 is: ekki látin(n)
@@ -1695,7 +1695,7 @@ en: anniversaries
 eo: datrevenoj
 es: aniversarios
 et: aastapäevad
-fi: merkkip&auml;ivi&auml
+fi: merkkip&auml;ivi&auml;
 fr: anniversaires
 he:   éîé ùğä
 is: merkisdagar
@@ -1719,7 +1719,7 @@ en: anniversaries of dead people
 eo: mortotagaj datrevenoj
 es: aniversarios de las personas fallecidas
 et: surnud inimeste mälestuspäevad
-fi: vainajien muistop&auml;ivi&auml
+fi: vainajien muistop&auml;ivi&auml;
 fr: anniversaires des personnes d&eacute;c&eacute;d&eacute;es
 he:   éîé ùğä ìîååú
 is: ártíğir
@@ -1744,7 +1744,7 @@ en: anniversaries of marriage
 eo: datrevenoj de edzigxo
 es: aniversarios de casamiento
 et: pulma-aastapäevad
-fi: h&auml;&auml;p&auml;ivi&auml
+fi: h&auml;&auml;p&auml;ivi&auml;
 fr: anniversaires de mariage
 he:   éîé ğéùåàéï
 is: brúğkaupsafmæli
@@ -1963,7 +1963,7 @@ en: between
 eo: inter
 es: entre
 et: vahemikus
-fi: v&auml;lill&auml
+fi: v&auml;lill&auml;
 fr: entre
 he:  áéï
 is: milli
@@ -1987,7 +1987,7 @@ en: birth
 eo: naskigxo
 es: nacimiento
 et: sünd
-fi: syntym&auml
+fi: syntym&auml;
 fr: naissance
 he:   ìéãä
 is: fæğing
@@ -2011,7 +2011,7 @@ en: birthdays
 eo: datrevenoj de naskigxo
 es: cumplea&ntilde;os
 et: sünnipäevad
-fi: syntym&auml;p&auml;ivi&auml
+fi: syntym&auml;p&auml;ivi&auml;
 fr: anniversaires
 he:   éîé äåìãú
 is: afmælisdagar
@@ -2158,7 +2158,7 @@ en: cancel GeneWeb links
 eo: nuligi GeneWeb-ajn ligilojn
 es: anular los lazos GeneWeb
 et: tühista GeneWebi viited
-fi: ei GeneWeb-linkkej&auml
+fi: ei GeneWeb-linkkej&auml;
 fr: annuler les liens GeneWeb
 he:  áèì ÷ùøé GeneWeb
 is: án GeneWeb tengla
@@ -2327,7 +2327,7 @@ en: changed order of children
 eo: sxangxo de la ordo de la idoj
 es: cambio del orden de los hijos
 et: laste järjekord muudetud
-fi: lasten j&auml;rjestyst&auml on muutettu
+fi: lasten j&auml;rjestyst&auml; on muutettu
 fr: changement de l'ordre des enfants
 he:  ñãø äéìãéí äùúğä
 is: breytti röğ barna
@@ -2376,7 +2376,7 @@ en: children's names changed
 eo: nomoj de la idoj sxangxitaj
 es: nombres de los hijos cambiados
 et: lapse nimed muudetud
-fi: lasten nimi&auml on muutettu
+fi: lasten nimi&auml; on muutettu
 fr: noms des enfants chang&eacute;s
 he:  ùîåú äéìãéí äåçìôå
 is: nafni barns breytt
@@ -2496,7 +2496,7 @@ en: continue merging
 eo: daùrigu la kunigxon
 es: continuar la fusi&oacute;n
 et: jätka ühendamist
-fi: jatka yhdist&auml;mist&auml
+fi: jatka yhdist&auml;mist&auml;
 fr: continuer &agrave; fusionner
 he:  ìäîùéê ìàçã
 is: halda áfram ağ sameina
@@ -2664,7 +2664,7 @@ en: days old
 eo: tagoj
 es: d&iacute;as
 et: päeva
-fi: p&auml;iv&auml;&auml vanha
+fi: p&auml;iv&auml;&auml; vanha
 fr: jours
 he:   éîéí
 is: daga gamall
@@ -2736,7 +2736,7 @@ en: descendants
 eo: posteuloj
 es: descendientes
 et: järeltulijad
-fi: j&auml;lkel&auml;isi&auml
+fi: j&auml;lkel&auml;isi&auml;
 fr: descendants
 he:   öàöàéí
 is: afkomendur
@@ -2832,7 +2832,7 @@ de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
 en: display by slices/slice width/overlap/total width
 es: mostrar en segmentos/ancho de segmento/superpuesto/ancho total
 et: kuva osadena/osa laius/ülekate/kogulaius
-fi: n&auml;yt&auml jaettuna kaistoihin/kaistan leveys/ylitys/koko leveys
+fi: n&auml;yt&auml; jaettuna kaistoihin/kaistan leveys/ylitys/koko leveys
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
 he:  äöâ øöåòåú  / øåçá øöåòåú  / çôéôä / ñ"ä øåçá
 it: visualizzare per segmenti/larghezza del segmento/superposizione/larghezza totale
@@ -2900,7 +2900,7 @@ de: gemeinsame Zweige nicht zusammenfassen
 en: don't group the common branches together
 es: no agrupar las ramas comunes
 et: ära grupeeri ühiseid harusid
-fi: ei yhteisten sukuhaarojen ryhmittely&auml
+fi: ei yhteisten sukuhaarojen ryhmittely&auml;
 fr: ne pas regrouper les branches communes
 he:  ìà ìùìá òğôé îùôçä îùåúôéí
 it: non ragruppare i rami comuni
@@ -3187,7 +3187,7 @@ en: family modified
 eo: familio modifita
 es: familia modificada
 et: pere muudetud
-fi: perhett&auml muutettu
+fi: perhett&auml; muutettu
 fr: famille modifi&eacute;e
 he:  îùôçä äòåãëğä
 is: fjölskyldu breytt
@@ -3235,7 +3235,7 @@ en: father/mother
 eo: patro/patrino
 es: padre/madre
 et: isa/ema
-fi: is&auml/&auml;iti
+fi: is&auml;/&auml;iti
 fr: p&egrave;re/m&egrave;re
 he:  àá/ àí
 is: fağir/móğir
@@ -3358,7 +3358,7 @@ en: first name not found
 eo: propra nomo ne trovita
 es: nombre no encontrado
 et: eesnime ei leitud
-fi: etunime&auml ei l&ouml;ydy
+fi: etunime&auml; ei l&ouml;ydy
 fr: pr&eacute;nom pas trouv&eacute;
 he:   ùí ôøèé ìà ğîöà
 is: fornafn finnst ekki
@@ -3409,7 +3409,7 @@ en: for the first names by alphabetic order
 eo: por la propraj nomoj laù la alfabeta ordo
 es: por los nombres en orden alfab&eacute;tico
 et: eesnimed tähestikulises järjekorras
-fi: etunimien mukaan aakkosj&auml;rjestyksess&auml
+fi: etunimien mukaan aakkosj&auml;rjestyksess&auml;
 fr: pour les pr&eacute;noms par ordre alphab&eacute;tique
 he:  ìùîåú äôøèééí áñãø àìó-áú
 is: fornöfn í stafrófsröğ
@@ -3628,7 +3628,7 @@ en: happy birthday to you!
 eo: felicxan datrevenon!
 es: &iexcl;Feliz cumplea&ntilde;os!
 et: palju õnne sünnipäevaks!
-fi: hyv&auml;&auml syntym&auml;p&auml;iv&auml;&auml;!
+fi: hyv&auml;&auml; syntym&auml;p&auml;iv&auml;&auml;!
 fr: bon anniversaire!
 he:   éåí äåìãú ùîç
 is: til hamingju meğ afmæliğ !
@@ -3677,7 +3677,7 @@ en: here
 eo: tie
 es: aqu&iacute;
 et: siia
-fi: t&auml;ss&auml
+fi: t&auml;ss&auml;
 fr: ici
 he:   ëàï
 is: hér
@@ -3820,7 +3820,7 @@ en: if titles
 eo: se nobeltitoloj
 es: si t&iacute;tulos
 et: kui on tiitlid
-fi: jos arvonimi&auml
+fi: jos arvonimi&auml;
 fr: si titres
 he:  àí áòì(ú) úåàø
 is: ef titlar
@@ -4014,7 +4014,7 @@ en: incompatible sexes
 eo: seksoj neakordigeblaj
 es: sexos incompatibles
 et: sobimatud sood
-fi: sukupuolet eivät t&auml;sm&auml;&auml
+fi: sukupuolet eivät t&auml;sm&auml;&auml;
 fr: sexes incompatibles
 he:  àé äúàîä áîéğéí
 is: kyn passa ekki
@@ -4038,7 +4038,7 @@ en: incorrect date
 eo: nekorekta dato
 es: fecha incorrecta
 et: vigane kuupäev
-fi: virheellinen p&auml;iv&auml;m&auml;&auml;r&auml
+fi: virheellinen p&auml;iv&auml;m&auml;&auml;r&auml;
 fr: date incorrecte
 he:  áúàøéê ùâåé
 is: vitlaus dagsetning
@@ -4112,7 +4112,7 @@ en: index of the descendants
 eo: indekso de la posteuloj
 es: &iacute;ndice de los descendientes
 et: järglaste loetelu
-fi: luettelo j&auml;lkel&auml;isist&auml
+fi: luettelo j&auml;lkel&auml;isist&auml;
 fr: index des descendants
 he:  îôúç äöàöàéí
 is: skrá afkomenda
@@ -4136,7 +4136,7 @@ en: index of the spouses (non descendants)
 eo: indekso de la geedzoj (ne posteuloj)
 es: &iacute;ndice de los c&oacute;nyuges (no descendientes)
 et: abikaasade loetelu (pole järglasi)
-fi: luettelo puolisoista (ei j&auml;lkel&auml;isi&auml)
+fi: luettelo puolisoista (ei j&auml;lkel&auml;isi&auml;)
 fr: index des conjoints (non descendants)
 he:  îôúç áğé äæåâ ùàéğí öàöàéí
 is: skrá make (ekki afkomenda)
@@ -4160,7 +4160,7 @@ en: insert
 eo: enmeti :a:
 es: insertar
 et: lisa
-fi: lis&auml;&auml v&auml;liin
+fi: lis&auml;&auml; v&auml;liin
 fr: ins&eacute;rer
 he:  ìäëğéñ
 is: setja inn
@@ -4233,7 +4233,7 @@ en: invert the order of the following families
 eo: intersxangxi la ordon de la familioj sekvantaj
 es: invertir el orden de las familias siguientes
 et: vaheta järgmiste perede järjekord
-fi: vaihda seuraavien perheiden j&auml;rjestyst&auml
+fi: vaihda seuraavien perheiden j&auml;rjestyst&auml;
 fr: intervertir l'ordre des familles suivantes
 he:  ìùğåú ñãø äîùôçåú äáàåú
 is: breyta röğ eftirfarandi fjölskyldna
@@ -4281,7 +4281,7 @@ en: is a very young parent
 eo: estas treege juna patr(in)o
 es: es un padre demasiado joven
 et: on väga noor isa või ema
-fi: on kovin nuori is&auml tai &auml;iti
+fi: on kovin nuori is&auml; tai &auml;iti
 fr: est vraiment un parent tr&egrave;s jeune
 he:  äåøä îàåã öòéø
 is: er mjög ungt foreldri
@@ -4615,7 +4615,7 @@ en: marriage of %t before his/her birth
 eo: edz(in)igxo de %t antaù sia naskigxo
 es: casamiento de %t antes de su nacimiento
 et: %t abiellus enne oma sündi
-fi: %t olisi naitu ennen syntym&auml;&auml
+fi: %t olisi naitu ennen syntym&auml;&auml;
 fr: mariage de %t avant sa naissance
 he:  ğéùåàéï ùì %t ìôğé äåìãúå/äåìãúä
 is: gistist %t fyrir fæğingu hans/hennar
@@ -4688,7 +4688,7 @@ en: married at age %t
 eo: edzigxinta je la agxo de %t jaroj
 es: casado a la edad de %t
 et: abiellunud %t aastasena
-fi: vihitty %t ik&auml;isen&auml
+fi: vihitty %t ik&auml;isen&auml;
 fr: mari&eacute;(e) &agrave; l'&agrave;ge de %t
 he:  äúçúï áâéì %t
 is: giftist %t ára
@@ -5003,7 +5003,7 @@ en: name %s already used by %tthis person%t
 eo: nomo %s jam uzita de %ttiu persono%t
 es: nombre %s ya utilizado por %testa persona%t
 et: nimi %s on juba kasutuses %tselle inimese poolt%t
-fi: nimi %s on jo k&auml;yt&ouml;ss&auml %tt&auml;ll&auml; henkil&ouml;ll&auml;%t
+fi: nimi %s on jo k&auml;yt&ouml;ss&auml; %tt&auml;ll&auml; henkil&ouml;ll&auml;%t
 fr: nom %s d&eacute;j&agrave; utilis&eacute; par %tcette personne%t
 he:  äùí %s áùéîåù ëáø ò"é %tàãí æä%t
 is: nafniğ %s er şegar í %tnotkun af%t
@@ -5028,7 +5028,7 @@ en: navigation with %t as Sosa reference
 eo: navigado kun %t kiel Sosa referenco
 es: navegaci&oacute;n con %t como referencia de Sosa
 et: navigeerimine kasutades %t Sosa viidet
-fi: navigointi %t Sosa-viitteen&auml
+fi: navigointi %t Sosa-viitteen&auml;
 fr: navigation avec %t comme r&eacute;f&eacute;rence Sosa
 he:  ğéååú òí %t ëàæëåø Sosa
 is: leiğsögn meğ %t sem Sosa tilvísun
@@ -5100,7 +5100,7 @@ en: no anniversary
 eo: neniu datreveno
 es: ning&uacute;n aniversario
 et: pole ühtegi aastapäeva
-fi: ei vuosip&auml;iv&auml;&auml
+fi: ei vuosip&auml;iv&auml;&auml;
 fr: pas d'anniversaire
 he:  àéï úàøéê éåí äùğä
 is: engir merkisdagar
@@ -5124,7 +5124,7 @@ en: no birthday
 eo: neniu naskigxtago
 es: ning&uacute;n cumplea&ntilde;os
 et: pole ühtegi sünnipäeva
-fi: ei syntym&auml;p&auml;iv&auml;&auml
+fi: ei syntym&auml;p&auml;iv&auml;&auml;
 fr: pas d'anniversaire
 he:   àéï éåí äåìãú
 is: engir afmælisdagar
@@ -5148,7 +5148,7 @@ en: no known relationship link between %s and %s
 eo: neniu sciita ligo de parenceco inter %s kaj %s
 es: ning&uacute;n grado de parentesco conocido entre %s y %s
 et: %s ja %s vahel pole teadaolevat sugulussuhet
-fi: ei todettua sukulaisuutta %s ja %s v&auml;lill&auml
+fi: ei todettua sukulaisuutta %s ja %s v&auml;lill&auml;
 fr: pas de lien de parent&eacute; connu entre %s et %s
 he:  àéï ÷ùø ãí áéï %s  å-%s
 is: engin şekkt tengsl milli %s og %s
@@ -5387,7 +5387,7 @@ en: number of branches
 eo: nombro da brancxoj
 es: n&uacute;mero de ramas
 et: harude arv
-fi: sukuhaarojen m&auml;&auml;r&auml
+fi: sukuhaarojen m&auml;&auml;r&auml;
 fr: nombre de branches
 he:  îñôø òğôéí
 is: fjöldi greina
@@ -5533,7 +5533,7 @@ en: one day old
 eo: unu tago
 es: un d&iacute;a
 et: üks päev
-fi: p&auml;iv&auml;n ik&auml;isen&auml
+fi: p&auml;iv&auml;n ik&auml;isen&auml;
 fr: un jour
 he:  áï/áú éåí
 is: dagsgamalt
@@ -5557,7 +5557,7 @@ en: one month old
 eo: unu monato
 es: un mes
 et: üks kuu
-fi: kuukauden ik&auml;isen&auml
+fi: kuukauden ik&auml;isen&auml;
 fr: un mois
 he:  áï/áú çåãù
 is: mánağar gamalt
@@ -5581,7 +5581,7 @@ en: one year old
 eo: unu jaro
 es: un a&ntilde;o
 et: üks aasta
-fi: vuoden ik&auml;isen&auml
+fi: vuoden ik&auml;isen&auml;
 fr: un an
 he:  áï/áú ùğä
 is: ársgamalt
@@ -5750,7 +5750,7 @@ en: person modified
 eo: persono modifita
 es: persona modificada
 et: isik muudetud
-fi: henkil&ouml;&auml muokattu
+fi: henkil&ouml;&auml; muokattu
 fr: personne modifi&eacute;e
 he:  àãí îòåãëï
 is: einstaklingi breytt
@@ -5774,7 +5774,7 @@ en: person/persons
 eo: persono:a:+n/personoj:a:+n
 es: persona/personas
 et: isik/isikud/isikut
-fi: henkil&ouml;/henkil&ouml;&auml
+fi: henkil&ouml;/henkil&ouml;&auml;
 fr: personne/personnes
 he:  àãí/ àğùéí
 is: einstaklingur/einstaklingar
@@ -5798,7 +5798,7 @@ en: persons having the same name
 eo: personoj samnomaj
 es: personas con el mismo nombre
 et: samanimelised isikud
-fi: samannimisi&auml henkil&ouml;it&auml;
+fi: samannimisi&auml; henkil&ouml;it&auml;
 fr: personnes ayant le m&ecirc;me nom
 he:  àğùéí òí àåúå äùí
 is: fólk meğ sama nafn
@@ -6136,7 +6136,7 @@ en: relationship link/relationship links
 eo: ligo de parenceco/ligoj de parenceco
 es: grado de parentesco/grados de parentesco
 et: sugulussuhe/sugulussuhet
-fi: sukulaisuuskytkent&auml;/sukulaisuuskytkent&auml;&auml
+fi: sukulaisuuskytkent&auml;/sukulaisuuskytkent&auml;&auml;
 fr: lien de parent&eacute;/liens de parent&eacute;
 he:  ÷ùø îùôçúé/ ÷ùøé îùôçä
 is: skyldleika tengsl/skyldleika tengsli
@@ -6233,7 +6233,7 @@ en: see above
 eo: vidu cxi-supre
 es: ver m&aacute;s arriba
 et: vaata ülal
-fi: katso yll&auml
+fi: katso yll&auml;
 fr: voir ci-dessus
 he:  äğ"ì
 is: sjá ağ ofan
@@ -6282,7 +6282,7 @@ en: send
 eo: sendi :a:
 es: enviar
 et: saada
-fi: l&auml;het&auml
+fi: l&auml;het&auml;
 fr: envoyer
 he:  ùìç
 is: senda
@@ -6618,7 +6618,7 @@ en: starting with
 eo: komencante kun
 es: comenzando con
 et: alates
-fi: ensimm&auml;isen&auml
+fi: ensimm&auml;isen&auml;
 fr: commen&ccedil;ant par
 he:  ìäúçéì î-
 is: sem byrjar á
@@ -6716,7 +6716,7 @@ en: surname not found
 eo: familia nomo ne trovita
 es: apellido no encontrado
 et: perekonnanime ei leitud
-fi: sukunime&auml ei l&ouml;ydy
+fi: sukunime&auml; ei l&ouml;ydy
 fr: patronyme pas trouv&eacute;
 he:  ùí îùôçä ìà ğîöà
 is: finn ekki eftirnafn
@@ -6815,7 +6815,7 @@ en: the %d first names
 eo: la %d unuaj nomoj
 es: los %d nombres
 et: %d eesnime
-fi: %d etunime&auml
+fi: %d etunime&auml;
 fr: les %d pr&eacute;noms
 he:  %d ùîåú äôøèééí
 is: %d fyrstu fornöfnin
@@ -6840,7 +6840,7 @@ en: the %d oldest perhaps still alive
 eo: la %d plej maljunaj eble ankoraù vivantaj
 es: los %s m&aacute;s viejos quiz&aacute;s todov&iacute;a vivo
 et: %d vanimat kes on võib-olla veel elus
-fi: %d vanhinta ehk&auml viel&auml el&auml;v&auml;&auml
+fi: %d vanhinta ehk&auml; viel&auml; el&auml;v&auml;&auml;
 fr: les %d les plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
 he:  äæ÷ï ä %d  ùàåìé òåã áçééí
 is: %d elsti sem kann ağ vera á lífi
@@ -6863,7 +6863,7 @@ en: the %d surnames
 eo: la %d familiaj nomoj
 es: los %d apellidos
 et: %d perekonnanime
-fi: %d sukunime&auml
+fi: %d sukunime&auml;
 fr: les %d patronymes
 he:  %d ùîåú äîùôçä
 is: %d fyrstu eftirnöfnin
@@ -6935,7 +6935,7 @@ en: the anniversary
 eo: la datreveno
 es: el aniversario
 et: aastapäev
-fi: merkkip&auml;iv&auml
+fi: merkkip&auml;iv&auml;
 fr: l'anniversaire
 he:  éåí äùğä
 is: afmælisdagar
@@ -6959,7 +6959,7 @@ en: the anniversary of marriage
 eo: la datreveno de edzigxo
 es: el aniversario de casamiento
 et: pulma-aastapäev
-fi: h&auml;&auml;p&auml;iv&auml
+fi: h&auml;&auml;p&auml;iv&auml;
 fr: l'anniversaire de mariage
 he:  éåí äğéùåàéï
 is: brúğkaupsafmæli
@@ -6983,7 +6983,7 @@ en: the base has changed; do "back", "reload", and refill the form
 eo: la bazo sxangis; faru "malantauxe", "resxargi", kaj replenigu la formularon
 es: la base ha cambiado: hacer "back", "reload" y completar nuevamente el formulario
 et: andmebaas on mutunud, mine tagasi, uuenda pilti ja täida vorm uuesti
-fi: tietokanta on muuttunut; peruuta, lataa uudelleen ja t&auml;yt&auml kaavake
+fi: tietokanta on muuttunut; peruuta, lataa uudelleen ja t&auml;yt&auml; kaavake
 fr: la base a chang&eacute;: faire "back", "reload", et refaire le formulaire
 he:  îàâø äîéãä äùúğä: ìòùåú "back" å-"reload"  åìîìà îçãù àú äèåôñ
 is: gagnagrunnurinn hefur breyst; gerğu "Back", "Reload", og settu aftur í formiğ
@@ -7007,7 +7007,7 @@ en: the birthday
 eo: la naskigxdatreveno
 es: el cumplea&ntilde;os
 et: sünnipäev
-fi: syntym&auml;p&auml;iv&auml
+fi: syntym&auml;p&auml;iv&auml;
 fr: l'anniversaire
 he:  éåí ääåìãú
 is: afmælisdagur
@@ -7128,7 +7128,7 @@ en: the file is temporarily locked: please try again. If it still does not work,
 eo: la sliparo estas provizore riglata: provu denove. Se tio ne funkcios, atendu iomete kaj provu ankoraù unufoje
 es: la base est&aacute; temporalmente cerrada: ensayar de nuevo. Si no funciona, espere un instante antes de ensayar nuevamente
 et: fail on ajutiselt lukustatud: proovi uuesti
-fi: tiedosto on lukkiutunut, yrit&auml hetken kuluttua uudelleen
+fi: tiedosto on lukkiutunut, yrit&auml; hetken kuluttua uudelleen
 fr: le fichier est temporairement verrouill&eacute;: essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de r&eacute;essayer
 he:  ä÷åáõ ğòåì æîğéú: ìç÷åú åìğñåú ùåá
 is: skjaliğ er læst í augnablikinu, reyndu aftur
@@ -7152,7 +7152,7 @@ en: the following children of %t and %t are not in chronological order
 eo: la sekvantaj infanoj de %t kaj %t ne estas orde
 es: los hijos siguientes de %t y %t no est&aacute;n presentados en orden
 et: lapsed %t ja %t ei ole vanuse järjekorras
-fi: %t ja %t lapsista seuraavat eiv&auml;t ole ik&auml;j&auml;rjestyksess&auml
+fi: %t ja %t lapsista seuraavat eiv&auml;t ole ik&auml;j&auml;rjestyksess&auml;
 fr: les enfants suivants de %t et de %t ne sont pas dans l'ordre
 he:  äéìãéí ùì %t å-%t ìà áñãø ğëåï
 is: şessi börn %t og %t eru ekki í röğ
@@ -7272,7 +7272,7 @@ en: the latest %d births
 eo: la lastaj %d naskigxoj
 es: los %d nacimientos m&aacute;s recientes
 et: viimased %d sündi
-fi: viimeiset %d syntym&auml;&auml
+fi: viimeiset %d syntym&auml;&auml;
 fr: les %d derni&egrave;res naissances
 he:  %d äìéãåú äàçøåğåú
 is: síğustu %d fæğingar
@@ -7679,7 +7679,7 @@ en: total
 eo: tuto
 es: total
 et: kokku
-fi: yhteens&auml
+fi: yhteens&auml;
 fr: total
 he:  ñä'ë
 is: alls
@@ -7843,7 +7843,7 @@ en: update
 eo: gxisdatigo
 es: revisi&oacute;n
 et: täienda
-fi: p&auml;ivit&auml
+fi: p&auml;ivit&auml;
 fr: mise &agrave; jour
 he:  òãëï
 is: uppfæra
@@ -7869,7 +7869,7 @@ en: use "link" instead of "create"
 eo: uzu "bindi" anstataù ol "krei"
 es: utilise "reunir" en lugar de "crear"
 et: vali "loo" asemel "viita"
-fi: käytä "luo" toiminnon "liit&auml" sijaan
+fi: käytä "luo" toiminnon "liit&auml;" sijaan
 fr: utilisez "relier" au lieu de "cr&eacute;er"
 he:  ìäùúîù á-"÷ùø" áî÷åí "òùä"
 is: notağu "tengja" í stağ "búa til"
@@ -7934,7 +7934,7 @@ en: with
 eo: kun
 es: con
 et: koos
-fi: sek&auml
+fi: sek&auml;
 fr: avec
 he:  òí
 is: meğ
@@ -8053,7 +8053,7 @@ en: year/month/day
 eo: jaro/monato/tago
 es: a&ntilde;o/mes/d&iacute;a
 et: aasta/kuu/päev
-fi: vuosi/kuukausi/p&auml;iv&auml
+fi: vuosi/kuukausi/p&auml;iv&auml;
 fr: ann&eacute;e/mois/jour
 he:  ùğä/ çåãù/ éåí
 is: ár/mánuğur/dagur
@@ -8102,7 +8102,7 @@ en: you must first merge
 eo: vi devas unue kunigi
 es: antes Ud. debe fusionar
 et: kõigepealt pead ühendama
-fi: yhdist&auml ensin
+fi: yhdist&auml; ensin
 fr: vous devez d'abord fusionner
 he:  öøéê ìàçã ÷åãí
 is: şú şarft fyrst ağ sameina
@@ -8126,7 +8126,7 @@ en: you must first merge the 2 families
 eo: vi devas unue kunigi la 2 familiojn
 es: debe primero fusionar las 2 familias
 et: kõigepealt peab ühendama mõlemad pered
-fi: yhdist&auml ensin molemmat perheet
+fi: yhdist&auml; ensin molemmat perheet
 fr: vous devez d'abord fusionner les 2 familles
 he:  öøéê ìàçã ÷åãí àú 2 äîùôçåú
 is: şú verğur fyrst ağ sameina şessar 2 fjölskyldur
