@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.4 2001-06-13 14:35:28 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.5 2001-10-20 10:59:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -406,6 +406,7 @@ value eval_bool_value conf base env p =
           | VVnone -> do { Wserver.wprint ">%%%s???" s; "" } ]
         with
         [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
+    | Etransl upp s c -> Templ.eval_transl conf base env upp s c
     | x -> do { Wserver.wprint "val???"; "" } ]
   in
   bool_eval

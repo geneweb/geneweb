@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.4 2001-10-19 09:16:44 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.5 2001-10-20 10:58:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -828,6 +828,7 @@ value mark_someone base mark s =
 ;
 
 value sep_limit = ref 21;
+value only_file = ref "";
 value separate_list = ref [];
 
 value scan_connex_component base test_action len ifam =
@@ -889,9 +890,11 @@ value mark_one_connex_component base mark ifam =
       scan_connex_component base test_action () ifam
     }
   in
-  if len <= sep_limit.val then set_mark ToSeparate
+  if len <= sep_limit.val
+  && (only_file.val = "" || only_file.val = origin_file) then
+    set_mark ToSeparate
   else do {
-    Printf.eprintf "group of size %d not included\n" len;
+    Printf.eprintf "group of size %d not included (%s)\n" len origin_file;
     let cpl = coi base ifam in
     Printf.eprintf "    %s + %s\n" (denomination base (poi base cpl.father))
       (denomination base (poi base cpl.mother));
@@ -1106,6 +1109,9 @@ value speclist =
      all his ancestors and descendants sharing the same surname. All the
      concerned families are displayed on standard output instead of their
      associated files. This option can be used several times.");
+   ("-sep_only_file", Arg.String (fun s -> only_file.val := s), "\
+<file> :
+     With option \"-sep\", tells to separate only groups of that file.");
    ("-sep_limit", Arg.Int (fun i -> sep_limit.val := i), "\
 <num> :
      When using the option \"-sep\", groups of families can become isolated
