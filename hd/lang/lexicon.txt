@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.34 2001-08-21 09:09:22 ddr Exp $
+# $Id: lexicon.txt,v 4.35 2001-08-23 15:08:14 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -7373,6 +7373,7 @@ ru: äÿäè è òåòè
 sv: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
 
     undefined sex for %t
+da: udefineret k&oslash;n for %t
 de: Geschlecht nicht definiert f&uuml;r %t
 en: undefined sex for %t
 et: %t sugu on määratlemata

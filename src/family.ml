@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.5 2001-06-28 17:05:23 ddr Exp $ *)
+(* $Id: family.ml,v 4.6 2001-08-23 15:08:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -583,6 +583,8 @@ value set_owner conf =
   else ()
 ;
 
+value thousand oc x = Num.print (output_string oc) "," (Num.of_int x);
+
 value log_count conf (log_file, log_oc, flush_log) r =
   if conf.cgi && log_file = "" then ()
   else
@@ -590,8 +592,9 @@ value log_count conf (log_file, log_oc, flush_log) r =
     [ Some (welcome_cnt, request_cnt, start_date) ->
         let oc = log_oc () in
         do {
-          Printf.fprintf oc "  #accesses %d (#welcome %d) since %s\n"
-            (welcome_cnt + request_cnt) welcome_cnt start_date;
+          Printf.fprintf oc "  #accesses %a (#welcome %a) since %s\n"
+            thousand (welcome_cnt + request_cnt) thousand welcome_cnt
+            start_date;
           flush_log oc;
         }
     | None -> () ]
