@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.19 2003-07-15 11:17:54 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.20 2003-11-14 11:39:20 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -311,6 +311,7 @@
 %end;
 
 %if;has_sources;
+  <p>
   <font size=-1><em>[*source/sources]1:
   %foreach;source;
     <br>- %source_type;: %source;
