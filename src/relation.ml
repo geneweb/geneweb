@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.24 1999-07-26 07:02:00 ddr Exp $ *)
+(* $Id: relation.ml,v 2.25 1999-07-29 16:02:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -130,16 +130,11 @@ value print_menu conf base p =
        Wserver.wprint "%s\n" (capitale (transl conf "long display"));
        Wserver.wprint "<input type=checkbox name=long value=on>\n";
        html_br conf;
-       Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
-       Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
-       html_br conf;
-       Wserver.wprint "%s:\n" (capitale (transl_nth conf "branch/branches" 1));
-       Wserver.wprint "%s\n" (transl conf "include spouses");
+       Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
        Wserver.wprint "<input type=checkbox name=opt value=spouse>\n";
        html_br conf;
-       Wserver.wprint "%s:\n" (capitale (transl_nth conf "branch/branches" 1));
-       Wserver.wprint "%s\n" (transl conf "cancel GeneWeb links");
-       Wserver.wprint "<input type=checkbox name=cglb value=on>\n";
+       Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
+       Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
        html_p conf;
        Wserver.wprint "<input type=submit value=\"Ok\">\n";
      end;
@@ -295,8 +290,7 @@ value print_solution_ancestor conf long p1 p2 x1 x2 list =
           do html_li conf;
              Wserver.wprint "<em>%s %s" (string_of_big_int conf n)
                (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
-             if conf.cancel_links || long then ()
-             else
+             if not long then
                do Wserver.wprint ":\n%s " (transl conf "click");
                   Wserver.wprint
                     "<a href=\"%sm=RL;i=%d;l1=%d;i1=%d;l2=%d;i2=%d\">%s</a>"
@@ -308,7 +302,8 @@ value print_solution_ancestor conf long p1 p2 x1 x2 list =
                     Wserver.wprint "%s"
                       (transl conf " to see the first branch")
                   else ();
-               return ();
+               return ()
+             else ();
              Wserver.wprint ".</em>\n";
           return ())
        list;
@@ -330,8 +325,7 @@ value print_solution_not_ancestor conf base long p1 p2 x1 x2 list =
                Wserver.wprint "%d %s" n
                  (transl_nth conf "relationship link/relationship links"
                     (if n = 1 then 0 else 1));
-               if conf.cancel_links || long then ()
-               else
+               if not long then
                  do Wserver.wprint ":\n%s" (transl conf "click");
                     Wserver.wprint
                       " <a href=\"%sm=RL;i=%d;l1=%d;i1=%d;l2=%d;i2=%d\">"
@@ -343,7 +337,8 @@ value print_solution_not_ancestor conf base long p1 p2 x1 x2 list =
                       Wserver.wprint "%s"
                         (transl conf " to see the first relationship link")
                     else ();
-                 return ();
+                 return ()
+               else ();
                Wserver.wprint "</em>).\n";
             return ())
          list;
@@ -362,13 +357,13 @@ value print_solution_not_ancestor conf base long p1 p2 x1 x2 list =
   in
   do tag "ul" begin
        html_li conf;
-       Wserver.wprint "%s %s\n" (lab x1)
+       Wserver.wprint "%s %s" (lab x1)
          (transl_decline conf "of"
             (gen_person_text_without_title raw_access conf base p1));
        afficher_titre conf base p1;
        Wserver.wprint "\n";
        html_li conf;
-       Wserver.wprint "%s %s\n" (lab x2)
+       Wserver.wprint "%s %s" (lab x2)
          (transl_decline conf "of"
             (gen_person_text_without_title raw_access conf base p2));
        afficher_titre conf base p2;
@@ -379,9 +374,12 @@ value print_solution_not_ancestor conf base long p1 p2 x1 x2 list =
 ;
 
 value print_solution conf base long n p1 p2 (x1, x2, list) =
-  do print_link conf base n p2 p1 x2 x1; return
-  if x1 == 0 || x2 == 0 then print_solution_ancestor conf long p1 p2 x1 x2 list
-  else print_solution_not_ancestor conf base long p1 p2 x1 x2 list
+  do print_link conf base n p2 p1 x2 x1;
+     if x1 == 0 || x2 == 0 then
+       print_solution_ancestor conf long p1 p2 x1 x2 list
+     else print_solution_not_ancestor conf base long p1 p2 x1 x2 list;
+     Wserver.wprint "\n";
+  return ()
 ;
 
 value print_propose_upto conf base p1 p2 rl =
@@ -501,7 +499,10 @@ value print_one_path conf base found a p1 p2 l1 l2 =
 
 value print_path conf base i p1 p2 (l1, l2, list) =
   let found = ref [] in
-  List.iter (fun (a, n) -> print_one_path conf base found a p1 p2 l1 l2) list
+  do List.iter (fun (a, n) -> print_one_path conf base found a p1 p2 l1 l2)
+       list;
+     Wserver.wprint "\n";
+  return ()
 ;
 
 value print_main_relationship conf base long p1 p2 rel =
@@ -510,7 +511,7 @@ value print_main_relationship conf base long p1 p2 rel =
      match p_getenv conf.env "opt" with
      [ Some "spouse" -> conf.senv := conf.senv @ [("opt", "spouse")]
      | _ -> () ];
-     match p_getenv conf.env "cglb" with
+     match p_getenv conf.env "cgl" with
      [ Some "on" -> conf.senv := conf.senv @ [("cgl", "on")]
      | _ -> () ];
      match rel with
@@ -558,21 +559,7 @@ value print_main_relationship conf base long p1 p2 rel =
                  html_p conf;
               return ()
             else ();
-(*
-            if long then ()
-            else
-              let href =
-                List.fold_right
-                  (fun (x, v) s ->
-                     let sep = if s = "" then "" else ";" in
-                     x ^ "=" ^ code_varenv v ^ sep ^ s)
-                  (conf.env @ [("long", "on")]) ""
-              in
-              Wserver.wprint "<a href=\"%s%s\">%s</a>\n" (commd conf)
-                href (capitale (transl conf "long display"));
-*)
-            if conf.cancel_links then ()
-            else print_propose_upto conf base p1 p2 rl;
+            print_propose_upto conf base p1 p2 rl;
          return () ];
      trailer conf;
   return ()
