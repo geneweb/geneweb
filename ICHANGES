@@ -4,6 +4,10 @@ Internal, very small, undocumented, or invisible changes
 GeneWeb Version 4.10
 --------------------
 
+* General
+  - [11 Aug 04] Some changes to make GeneWeb compilable by the new
+    ocaml, version 3.08.
+
 * GeneWeb server or CGI (gwd)
   - [10 Aug 04] Automatic reordering of marriages from the weddings date
     in personal pages of witnesses.
