@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.34 2002-02-23 14:05:06 ddr Exp $ *)
+(* $Id: util.ml,v 4.35 2002-02-23 15:39:21 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -298,14 +298,18 @@ value html conf =
       nl ();
     }
     else ();
-    let date = string_of_ctime conf;
-    Wserver.wprint "Date: %s" date; nl ();
+    Wserver.wprint "Date: %s" (string_of_ctime conf); nl ();
+    Wserver.wprint "Connection: close"; nl ();
     Wserver.wprint "Content-type: text/html; charset=%s" charset; nl ();
   }
 ;
 
 value html1 conf =
-  if Wserver.extract_param "POST /" ' ' conf.request = "" then do {
+  if conf.cgi || Wserver.extract_param "POST /" ' ' conf.request = "" ||
+    String.lowercase
+      (Wserver.extract_param "connection: " '\n' conf.request) <>
+      "keep-alive"
+  then do {
     html conf;
     nl ();
   }
