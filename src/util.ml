@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.97 2004-12-26 05:44:15 ddr Exp $ *)
+(* $Id: util.ml,v 4.98 2004-12-26 10:00:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -832,7 +832,7 @@ value create_env s =
 
 value red_color = "red";
 value std_color conf s =
-  "<font color=" ^ conf.highlight ^ ">" ^ s ^ "</font>"
+  "<span style=\"color:" ^ conf.highlight ^ "\">" ^ s ^ "</span>"
 ;
 
 value index_of_sex =
@@ -1121,15 +1121,17 @@ value message_to_wizard conf =
 value header_without_page_title conf title =
   do {
     html1 conf;
-    Wserver.wprint "\
-<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
-";
+    Wserver.wprint "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\n";
     Wserver.wprint "<html>\n<head>\n";
-    Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\">\n";
     Wserver.wprint "  <title>";
     title True;
     Wserver.wprint "</title>\n";
     include_hed_trl conf None ".hed";
+    Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\">\n";
+    Wserver.wprint "  \
+  <style type=\"text/css\"><!--
+    .highlight { color: %s; font-weight: bold }
+  --></style>\n" conf.highlight;
     Wserver.wprint "</head>\n";
     let s =
       try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
@@ -1144,9 +1146,9 @@ value header_without_page_title conf title =
 value header conf title =
   do {
     header_without_page_title conf title;
-    Wserver.wprint "<h1 align=center><font color=%s>" conf.highlight;
+    Wserver.wprint "<h1 style=\"text-align:center\" class=\"highlight\">";
     title False;
-    Wserver.wprint "</font></h1>\n";
+    Wserver.wprint "</h1>\n";
   }
 ;
 
@@ -1386,9 +1388,8 @@ value gen_trailer with_logo conf =
     else
       Wserver.wprint "\
 <p>
-<a href=\"%s\"><img src=\"%s/gwlogo.png\"
-alt=... width=64 height=72 align=right border=0></a>
-<br>
+<div><a href=\"%s\"><img src=\"%s/gwlogo.png\"
+alt=... width=64 height=72 style=\"border:0;float:right\"></a><br></div>
 " (commd conf) (image_prefix conf);
     match open_etc_file "copyr" with
     [ Some ic -> copy_from_etc env conf.lang conf.indep_command ic
@@ -1741,7 +1742,7 @@ value print_link_to_welcome conf right_aligned =
       | None -> "" ]
     in
     if right_aligned then
-      Wserver.wprint "<table align=%s><tr align=left><td>\n" dir
+      Wserver.wprint "<table style=\"float:%s\"><tr><td>\n" dir
     else ();
     let str = link_to_referer conf in
     if str = "" then () else Wserver.wprint "%s" str;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.12 2004-12-14 09:30:17 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.13 2004-12-26 10:00:14 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -353,7 +353,7 @@ value sign_text conf base sign info b1 b2 c1 c2 =
      | Some x -> ";td=" ^ x ]) ^
     (match p_getenv conf.env "color" with
      [ None | Some "" -> ""
-     | Some x -> ";color=" ^ x ]) ^
+     | Some x -> ";color=" ^ code_varenv x ]) ^
     include_marr conf base "3" ^ include_marr conf base "4" ^ "\">" ^ sign ^
     "</a>"
 ;
