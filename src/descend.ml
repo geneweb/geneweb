@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.1 2001-04-22 14:37:59 ddr Exp $ *)
+(* $Id: descend.ml,v 4.2 2001-05-15 15:57:12 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -165,7 +165,7 @@ value afficher_menu_descendants conf base p =
   do {
     header conf (descendants_title conf base p);
     tag "center" begin print_choice conf base p niveau_effectif; end;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -203,13 +203,14 @@ value afficher_marie conf base first fam p spouse =
               match Adef.od_of_codate cod with
               [ Some d -> Wserver.wprint " %s" (Date.string_of_ondate conf d)
               | None -> () ];
-            end;
+            end
           } ]
-    else ();
+    else ()
   }
 ;
 
-value print_child conf base levt boucle niveau_max niveau compte auth
+value
+  print_child conf base levt boucle niveau_max niveau compte auth
     always_surname x =
   let ix = x.cle_index in
   let ux = uoi base ix in
@@ -239,14 +240,12 @@ value print_child conf base levt boucle niveau_max niveau compte auth
              let fam = foi base ifam in
              let c = spouse x.cle_index (coi base ifam) in
              let c = poi base c in
-             do {
-               if connais base c then do {
-                 afficher_marie conf base first fam x c;
-                 Wserver.wprint ".";
-                 html_br conf;
-               }
-               else ();
-             })
+             if connais base c then do {
+               afficher_marie conf base first fam x c;
+               Wserver.wprint ".";
+               html_br conf
+             }
+             else ())
           (Array.to_list ux.family)
       else ();
       boucle (succ niveau) x ux
@@ -291,7 +290,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
                  Wserver.wprint ", <em>%s</em>"
                    (transl conf "having as children")
                else Wserver.wprint ".";
-               html_br conf;
+               html_br conf
              }
              else ();
              if children <> [] then do {
@@ -305,7 +304,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
                    children;
                end
              }
-             else ();
+             else ()
            })
         ifaml
     else ()
@@ -337,11 +336,11 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
       if niveau_max > 1 then
         Wserver.wprint " (%s)" (transl conf "spouses not included")
       else ();
-      Wserver.wprint ".\n";
+      Wserver.wprint ".\n"
     }
     else ();
     if niveau_max > 6 then exit_nobr () else ();
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -407,10 +406,10 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
            afficher_personne_titre_referencee conf base p;
            Date.afficher_dates_courtes conf base p;
            if c > 1 then Wserver.wprint " <em>(%d)</em>" c else ();
-           Wserver.wprint "\n";
+           Wserver.wprint "\n"
          })
       liste;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -446,7 +445,7 @@ value label_descendants base marks paths max_lev =
                        do {
                       let path = [Char.chr (Char.code 'A' + cnt) :: path] in
                       paths.(Adef.int_of_iper e) := path;
-                      loop path (succ lev) (poi base e);
+                      loop path (succ lev) (poi base e)
                     }
                     else ();
                     succ cnt
@@ -517,7 +516,7 @@ value print_child conf base p1 p2 e =
         afficher_prenom_de_personne_referencee conf base e
       else afficher_personne_referencee conf base e;
     end;
-    Date.afficher_dates_courtes conf base e;
+    Date.afficher_dates_courtes conf base e
   }
 ;
 
@@ -542,7 +541,7 @@ value afficher_spouse conf base marks paths fam p c =
     stag "strong" begin afficher_personne_referencee conf base c; end;
     if marks.(Adef.int_of_iper c.cle_index) then
       Wserver.wprint " (<tt><b>%s</b></tt>)" (label_of_path paths c)
-    else Date.afficher_dates_courtes conf base c;
+    else Date.afficher_dates_courtes conf base c
   }
 ;
 
@@ -591,7 +590,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                  do {
                                    if not first then do {
                                      html_br conf;
-                                     print_repeat_child conf base p c e;
+                                     print_repeat_child conf base p c e
                                    }
                                    else ();
                                    afficher_spouse conf base marks paths fam e
@@ -599,10 +598,10 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                    if Array.length el <> 0 then
                                      Wserver.wprint "....."
                                    else ();
-                                   Wserver.wprint "\n";
+                                   Wserver.wprint "\n"
                                  })
                               (Array.to_list (uoi base ie).family)
-                          else loop (succ lev) e;
+                          else loop (succ lev) e
                         }
                         else ();
                         succ cnt
@@ -624,7 +623,7 @@ value print_family conf base marks paths max_lev lev p =
   do {
     if lev <> 0 then do {
       Wserver.wprint "<tt><b>%s</b></tt>." (label_of_path paths p);
-      html_br conf;
+      html_br conf
     }
     else ();
     let lab = label_of_path paths p in
@@ -673,12 +672,12 @@ value print_family conf base marks paths max_lev lev p =
                                  if Array.length el <> 0 then
                                    Wserver.wprint "....."
                                  else ();
-                                 Wserver.wprint "\n";
+                                 Wserver.wprint "\n"
                                })
                             (uoi base ie).family
                         else
                           print_family_locally conf base marks paths max_lev
-                            (succ lev) p c e;
+                            (succ lev) p c e
                       }
                       else ();
                       succ cnt
@@ -753,10 +752,10 @@ value afficher_descendants_numerotation conf base niveau_max ancetre =
       if niveau_max > 1 then
         Wserver.wprint " (%s)" (transl conf "spouses not included")
       else ();
-      Wserver.wprint ".\n";
+      Wserver.wprint ".\n"
     }
     else ();
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -788,7 +787,7 @@ value print_elem conf base paths precision (n, pll) =
           Wserver.wprint "%s</strong>" (surname_begin n);
           Date.afficher_dates_courtes conf base p;
           print_ref conf base paths p;
-          Wserver.wprint "\n";
+          Wserver.wprint "\n"
         }
     | _ ->
         do {
@@ -815,17 +814,17 @@ value print_elem conf base paths precision (n, pll) =
                         if several && precision then do {
                           Wserver.wprint " <em>";
                           preciser_homonyme conf base p;
-                          Wserver.wprint "</em>";
+                          Wserver.wprint "</em>"
                         }
                         else ();
                         Date.afficher_dates_courtes conf base p;
                         print_ref conf base paths p;
-                        Wserver.wprint "\n";
+                        Wserver.wprint "\n"
                       })
                    pl)
               pll;
-          end;
-        } ];
+          end
+        } ]
   }
 ;
 
@@ -869,9 +868,7 @@ value trier_et_afficher conf base paths precision liste =
       liste
   in
   if liste <> [] then
-    tag "ul" begin
-      List.iter (print_elem conf base paths precision) liste;
-    end
+    tag "ul" begin List.iter (print_elem conf base paths precision) liste; end
   else ()
 ;
 
@@ -903,7 +900,7 @@ value afficher_index_descendants conf base niveau_max ancetre =
       else ()
     };
     trier_et_afficher conf base paths True liste.val;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -942,7 +939,7 @@ value afficher_index_spouses conf base niveau_max ancetre =
       else ()
     };
     trier_et_afficher conf base paths False liste.val;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -950,7 +947,7 @@ value print_someone conf base p =
   do {
     afficher_personne_titre_referencee conf base p;
     Date.afficher_dates_courtes conf base p;
-    Wserver.wprint "\n";
+    Wserver.wprint "\n"
   }
 ;
 
@@ -965,9 +962,7 @@ value rec print_table_person conf base max_lev ip =
     Wserver.wprint "\n";
     tag "table" "border=1" begin
       Wserver.wprint "<tr>\n";
-      tag "td" "valign=top" begin
-        print_someone conf base (poi base ip);
-      end;
+      tag "td" "valign=top" begin print_someone conf base (poi base ip); end;
       if max_lev > 0 then
         match children_of base ip with
         [ [] -> ()
@@ -975,10 +970,10 @@ value rec print_table_person conf base max_lev ip =
             do {
               Wserver.wprint "\n<td>";
               List.iter (print_table_person conf base (max_lev - 1)) ipl;
-              Wserver.wprint "</td>\n";
+              Wserver.wprint "</td>\n"
             } ]
       else ();
-    end;
+    end
   }
 ;
 
@@ -988,7 +983,7 @@ value afficher_descendants_table conf base max_lev a =
   do {
     header conf title;
     print_table_person conf base max_lev a.cle_index;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -1226,7 +1221,7 @@ value print_tree conf base gv p =
     in
     header_no_page_title conf title;
     Dag.print_html_table conf hts;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -1283,7 +1278,7 @@ value print_aboville conf base max_level p =
       }
     in
     loop_ind 0 "" p;
-    Util.trailer conf;
+    Util.trailer conf
   }
 ;
 
