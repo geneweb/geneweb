@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.17 2005-01-02 21:27:17 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.18 2005-01-03 18:35:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -232,7 +232,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
            in
            print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
              children;
-	   if lev <= 2 then Wserver.wprint "</li>\n" else ()
+           if lev <= 2 then Wserver.wprint "</li>\n" else ()
          }
          else ())
       children;
