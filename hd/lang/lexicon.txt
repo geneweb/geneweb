@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.65 1999-06-30 10:42:53 ddr Exp $
+# $Id: lexicon.txt,v 2.66 1999-06-30 11:44:51 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2074,7 +2074,7 @@ es: presentaci&oacute;n extensa
 fr: affichage long
 he:  תצוגה ארוכה
 it: display esteso
-nl: kwartierstaat
+nl: uitgebreide weergave
 no: utvidet rapport
 pt: long display
 se: utvidgad rapport
@@ -3111,6 +3111,8 @@ en: short display
 es: presentaci&oacute;n corta
 fr: affichage court
 it: display corto
+nl: beknopte weergave
+no: kort rapport
 pt: short display
 se: kort rapport
 
@@ -3150,6 +3152,8 @@ eo: gefratoj
 es: hermanos y hermanas
 fr: fr&egrave;res et soeurs
 it: fratelli
+nl: broers en zussen
+no: s&oslash;sken
 pt: irm&atilde;os e irm&atilde;s
 se: syskon
 

@@ -39,6 +39,7 @@ GeneWeb version 2.04
   - [Jun 28, 99] Optimized code: it is twice faster (on average) now.
 
 * Lexicon (lang/lexicon.txt)
+  - [Jun 30, 99] Translations added in Italian (Daniel Hirshkoff).
   - [Jun 18..28, 99] Translations improvements in Danish (Hans Albeck).
 
 GeneWeb version 2.03
