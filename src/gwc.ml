@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.23 1999-08-14 09:26:38 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.24 1999-08-30 23:55:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -441,7 +441,8 @@ value insert_relation_parent gen p s k =
 value insert_relation gen p r =
   {r_type = r.r_type;
    r_fath = map_option (insert_relation_parent gen p Male) r.r_fath;
-   r_moth = map_option (insert_relation_parent gen p Female) r.r_moth}
+   r_moth = map_option (insert_relation_parent gen p Female) r.r_moth;
+   r_sources = unique_string gen r.r_sources}
 ;
 
 value insert_relations fname gen key rl =

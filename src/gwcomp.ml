@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 2.11 1999-08-14 09:26:38 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.12 1999-08-30 23:55:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000e";
+value magic_gwo = "GnWo000f";
 
 type key =
   { pk_first_name : string;
@@ -646,17 +646,17 @@ value get_relation str =
         in
         let (mk, _, l) = parse_parent str l in
         do if l <> [] then failwith str else (); return
-        {r_type = rtyp; r_fath = Some fk; r_moth = Some mk}
+        {r_type = rtyp; r_fath = Some fk; r_moth = Some mk; r_sources = ""}
       else
         match l with
         [ ["fath:" :: l] ->
             let (fk, _, l) = parse_parent str l in
             do if l <> [] then failwith str else (); return
-            {r_type = rtyp; r_fath = Some fk; r_moth = None}
+            {r_type = rtyp; r_fath = Some fk; r_moth = None; r_sources = ""}
         | ["moth:" :: l] ->
             let (mk, _, l) = parse_parent str l in
             do if l <> [] then failwith str else (); return
-            {r_type = rtyp; r_fath = None; r_moth = Some mk}
+            {r_type = rtyp; r_fath = None; r_moth = Some mk; r_sources = ""}
         | _ -> failwith str ]
   | _ -> failwith str ]
 ;

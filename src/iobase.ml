@@ -1,10 +1,10 @@
-(* $Id: iobase.ml,v 2.14 1999-08-14 09:26:38 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.15 1999-08-30 23:55:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwb = "GnWb001u";
+value magic_gwb = "GnWb001v";
 
 (*
  Files in base (directory .gwb)
@@ -21,6 +21,7 @@ value magic_gwb = "GnWb001u";
        families array offset in file            : binary_int
        couples array offset in file             : binary_int
        strings array offset in file             : binary_int
+       notes origin file                        : value
        persons array                            : value
        ascends array                            : value
        families array                           : value
@@ -487,6 +488,7 @@ value input bname =
   let families_array_pos = input_binary_int ic in
   let couples_array_pos = input_binary_int ic in
   let strings_array_pos = input_binary_int ic in
+  let norigin_file = input_value ic in
   let ic2_string_start_pos = 3 * int_size in
   let ic2_string_hash_len = input_binary_int ic2 in
   let ic2_surname_start_pos = input_binary_int ic2 in
@@ -613,7 +615,6 @@ value input bname =
       return ()
     
   in
-  let norigin_file = "" in
   let bnotes = {nread = read_notes; norigin_file = norigin_file} in
   let base_data =
     {persons = persons;
@@ -837,6 +838,7 @@ value output bname base =
        output_binary_int oc 0;
        output_binary_int oc 0;
        output_binary_int oc 0;
+       output_value_no_sharing oc base.data.bnotes.norigin_file;
     return
     let persons_array_pos = pos_out oc in
     do output_array (base.data.persons.array ()); return
