@@ -1,9 +1,13 @@
-(* $Id: wserver.ml,v 1.15 1999-02-02 10:24:42 ddr Exp $ *)
+(* $Id: wserver.ml,v 1.16 1999-02-08 18:27:04 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Unix;
 
-value wserver_oc = ref Pervasives.stdout;
+value wserver_oc =
+  do set_binary_mode_out Pervasives.stdout True; return
+  ref Pervasives.stdout
+;
+
 value wprint fmt = Printf.fprintf wserver_oc.val fmt;
 value wflush () = flush wserver_oc.val;
 
