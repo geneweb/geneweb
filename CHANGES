@@ -4,6 +4,8 @@ GeneWeb version 2.04
 * Setup program
   - [Jun 19, 99] Changed GEDCOM import menu to reflect new option "-charset"
     of "ged2gwb" (see below).
+  - [Jun 18, 99] Added a color combination in the provided palette
+    whiteyellow, black, bluegreen and brown (thanks to Hans Albeck)
 
 * GeneWeb Daemon/CGI (gwd)
   - [Jun 19, 99] Added in ancestors long display the ability to select
@@ -17,6 +19,9 @@ GeneWeb version 2.04
     Warning: in GEDCOM files, the charset "IBMPC" (which is not standard
     GEDCOM 5.5) is by default interpreted as "ASCII", *not* "MSDOS"; to
     override this default, the option "-charset MSDOS" will have to be used.
+
+* Lexicon (lang/lexicon.txt)
+  - [Jun 18, 99] Translations improvements in Danish (Hans Albeck).
 
 GeneWeb version 2.03
 --------------------
