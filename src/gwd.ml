@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.49 2000-07-17 11:54:26 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.50 2000-07-25 15:40:24 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -56,17 +56,17 @@ value fprintf_date oc tm =
     tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec
 ;
 
-value log oc tm conf from gauth request s =
+value log oc tm conf from gauth request script_name contents =
   let referer = Wserver.extract_param "referer: " '\n' request in
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
   do let tm = Unix.localtime tm in
      fprintf_date oc tm;
      Printf.fprintf oc " (%d)" (Unix.getpid ());
-     output_char oc ' ';
+     Printf.fprintf oc " %s?" script_name;
      loop 0 where rec loop i =
-       if i < String.length s then
+       if i < String.length contents then
          if i > 1000 then Printf.fprintf oc "..."
-         else do output_char oc s.[i]; return loop (i + 1)
+         else do output_char oc contents.[i]; return loop (i + 1)
        else ();
      output_char oc '\n';
      Printf.fprintf oc "  From: %s\n" from;
@@ -552,15 +552,14 @@ value check_file_name cgi request s =
           return raise Exit ]
 ;
 
-value make_conf cgi from_addr (addr, request) str env =
+value make_conf cgi from_addr (addr, request) script_name contents env =
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
-  let iq = index '?' str in
   let (command, base_file, passwd, env, access_type) =
     let (base_passwd, env) =
       let (x, env) = extract_assoc "b" env in
       if x <> "" || cgi then (x, env)
-      else (String.sub str 0 iq, env)
+      else (script_name, env)
     in
     let ip = index '_' base_passwd in
     let base_file =
@@ -592,7 +591,7 @@ value make_conf cgi from_addr (addr, request) str env =
         (passwd, env, access_type)
     in
     let passwd = Util.decode_varenv passwd in
-    let command = String.sub str 0 iq in
+    let command = script_name in
     (command, base_file, passwd, env, access_type)
   in
   let (lang, env) = extract_assoc "lang" env in
@@ -777,7 +776,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
   (conf, sleep, if not ok then Some (passwd, uauth, base_file) else None)
 ;
 
-value log_and_robot_check conf auth from request str =
+value log_and_robot_check conf auth from request script_name contents =
   if conf.cgi && log_file.val = "" && robot_xcl.val = None then ()
   else
     let tm = Unix.time () in
@@ -792,7 +791,7 @@ value log_and_robot_check conf auth from request str =
                     Robot.check oc tm from cnt sec conf.cgi suicide
                 | _ -> () ];
                 if conf.cgi && log_file.val = "" then ()
-                else log oc tm conf from auth request str;
+                else log oc tm conf from auth request script_name contents;
              return ()
            with e -> do flush_log oc; return raise e;
            flush_log oc;
@@ -846,8 +845,10 @@ value no_access conf =
   return ()
 ;
 
-value conf_and_connection cgi from (addr, request) str env =
-  let (conf, sleep, passwd_err) = make_conf cgi from (addr, request) str env in
+value conf_and_connection cgi from (addr, request) script_name contents env =
+  let (conf, sleep, passwd_err) =
+    make_conf cgi from (addr, request) script_name contents env
+  in
   let (auth_err, auth) =
     if conf.auth_file = "" then (False, "")
     else if cgi then (True, "")
@@ -885,7 +886,7 @@ value conf_and_connection cgi from (addr, request) str env =
   | _ ->
       let mode = Util.p_getenv conf.env "m" in
       do if mode <> Some "IM" then
-           log_and_robot_check conf auth from request str
+           log_and_robot_check conf auth from request script_name contents
          else ();
          match mode with
          [ Some "DOC" -> Doc.print conf
@@ -942,7 +943,7 @@ value excluded from =
   | None -> False ]
 ;
 
-value image_request cgi str env =
+value image_request cgi env =
   match (Util.p_getenv env "m", Util.p_getenv env "v") with
   [ (Some "IM", Some fname) ->
       let fname =
@@ -1016,38 +1017,27 @@ value extract_multipart boundary str =
       else if s = boundary ^ "--" then []
       else loop i
   in
-  let i =
-    start 0 where rec start i =
-      if i == String.length str then i
-      else if str.[i] == '?' then (i + 1)
-      else start (i + 1)
-  in
-  let env = loop i in
+  let env = loop 0 in
   let (str, _) =
     List.fold_left
       (fun (str, sep) (v, x) ->
          if v = "file" then (str, sep) else (str ^ sep ^ v ^ "=" ^ x, ";"))
-      (String.sub str 0 i, "") env
+      ("", "") env
   in
   (str, env)
 ;
 
-value build_env request str =
+value build_env request contents =
   let content_type = Wserver.extract_param "content-type: " '\n' request in
   if is_multipart_form content_type then
     let boundary = extract_boundary content_type in
-    let (str, env) = extract_multipart boundary str in
+    let (str, env) = extract_multipart boundary contents in
     (str, env)
   else
-    let iq = index '?' str in
-    let query_string =
-      if iq == String.length str then ""
-      else String.sub str (iq + 1) (String.length str - iq - 1)
-    in
-    (str, Util.create_env query_string)
+    (contents, Util.create_env contents)
 ;
 
-value connection cgi (addr, request) str =
+value connection cgi (addr, request) script_name contents =
   let from =
     match addr with
     [ Unix.ADDR_UNIX x -> x
@@ -1063,9 +1053,10 @@ value connection cgi (addr, request) str =
     if not accept then only_log from cgi
     else
       try
-        let (str, env) = build_env request str in
-        if image_request cgi str env then ()
-        else conf_and_connection cgi from (addr, request) str env
+        let (contents, env) = build_env request contents in
+        if image_request cgi env then ()
+        else
+          conf_and_connection cgi from (addr, request) script_name contents env
       with
       [ Exit -> () ]
 ;
@@ -1124,7 +1115,7 @@ Type %s to stop the service
     (ifdef UNIX then max_clients.val else None) (connection False)
 ;
 
-value geneweb_cgi str addr =
+value geneweb_cgi addr script_name contents =
   do try Unix.mkdir (Filename.concat Util.cnt_dir.val "cnt") 0o755 with
      [ Unix.Unix_error _ _ _ -> () ];
   return
@@ -1135,7 +1126,7 @@ value geneweb_cgi str addr =
   let request = add "user-agent" "HTTP_USER_AGENT" request in
   let request = add "referer" "HTTP_REFERER" request in
   let request = add "content-type" "CONTENT_TYPE" request in
-  connection True (Unix.ADDR_UNIX addr, request) str
+  connection True (Unix.ADDR_UNIX addr, request) script_name contents
 ;
 
 value read_input len =
@@ -1343,8 +1334,7 @@ value main () =
       try Sys.getenv "SCRIPT_NAME" with
       [ Not_found -> Sys.argv.(0) ]
     in
-    let query = Filename.basename script ^ "?" ^ query in
-    geneweb_cgi query addr
+    geneweb_cgi addr (Filename.basename script) query
   else geneweb_server ()
 ;
 

@@ -1,11 +1,11 @@
-(* $Id: wserver.mli,v 3.4 2000-05-31 09:15:24 ddr Exp $ *)
+(* $Id: wserver.mli,v 3.5 2000-07-25 15:40:26 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 (* module [Wserver]: elementary web service *)
 
 value f :
   option string -> int -> int -> option int ->
-    ((Unix.sockaddr * list string) -> string -> unit) -> unit
+    ((Unix.sockaddr * list string) -> string -> string -> unit) -> unit
 ;
    (* [Wserver.f addr port tmout maxc g] starts an elementary
        httpd server at port [port] in the current machine. The variable
@@ -13,9 +13,9 @@ value f :
        available addresses of the present machine. The port number is
        any number greater than 1024 (to create a client < 1024, you must be
        root). At each connection, the function [g] is called:
-       [g (addr, request) s] where [addr] is the client
-       identification socket, [request] the browser request, and [s]
-       the string request itself (extracted from [request]). The function
+       [g (addr, request) scr cont] where [addr] is the client identification
+       socket, [request] the browser request, [scr] the script name (extracted
+       from [request]) and [cont] the stdin contents . The function
        [g] has [tmout] seconds to answer some text on standard output.
        If [maxc] is [Some n], maximum [n] clients can be treated at the
        same time; [None] means no limit. See the example below. *)

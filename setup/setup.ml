@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.12 2000-06-28 20:03:14 ddr Exp $ *)
+(* $Id: setup.ml,v 3.13 2000-07-25 15:40:24 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1184,15 +1184,7 @@ value only_addr () =
   | None -> None ]
 ;
 
-value setup (addr, req) str =
-  let (comm, env_str) =
-    try
-      let i = String.index str '?' in
-      (String.sub str 0 i,
-       String.sub str (i + 1) (String.length str - i - 1))
-    with
-    [ Not_found -> (str, "") ]
-  in
+value setup (addr, req) comm env_str =
   let conf =
     let env = create_env env_str in
     if env = [] && (comm = "" || String.length comm = 2) then
@@ -1222,12 +1214,12 @@ value setup (addr, req) str =
       else setup_comm conf comm ]
 ;
 
-value wrap_setup a b =
+value wrap_setup a b c =
   do ifdef WIN95 then
        try default_lang.val := Sys.getenv "GWLANG" with [ Not_found -> () ]
      else ();
   return
-  try setup a b with
+  try setup a b c with
   [ Exit -> () ]
 ;
 
