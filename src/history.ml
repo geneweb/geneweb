@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 3.10 2000-08-25 13:51:12 ddr Exp $ *)
+(* $Id: history.ml,v 3.11 2000-09-09 07:06:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -178,7 +178,10 @@ value print_history conf base ic =
   in
   let wiz =
     match p_getenv conf.env "wiz" with
-    [ Some x -> x
+    [ Some x ->
+        match p_getenv conf.env "n" with
+        [ Some "" | None -> x
+        | _ -> "" ]
     | _ -> "" ]
   in
   let (pos, n) =
@@ -207,6 +210,9 @@ value print_history conf base ic =
            return ()
          else ();
          Wserver.wprint "<input type=submit value=\"&gt;&gt;\">\n";
+         if wiz <> "" then
+           Wserver.wprint "<input type=submit name=n value=\"&gt;&gt;\">\n"
+         else ();
        end
      else ();
   return ()

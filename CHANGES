@@ -52,6 +52,7 @@ GeneWeb version 3.08
     Web site administrators.
 
 * Documentation:
+  - [09 Sep 00] Updated German version, particularly the FAQ (Falko Trojahn).
   - [07 Sep 00] In the directions for use, the entry "How to start with
     GeneWeb" now points to a page which explains that you can start with
     the program gwsetup instead of typing interactive commands, which seemed
