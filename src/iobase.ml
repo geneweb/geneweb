@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.8 2001-11-27 12:10:09 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.9 2002-01-10 20:34:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -607,8 +607,6 @@ value input bname =
     let ic = open_in_bin (Filename.concat bname "base") in
     do { check_magic ic; ic }
   in
-  let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
-  let ic2 = open_in_bin (Filename.concat bname "strings.inx") in
   let persons_len = input_binary_int ic in
   let families_len = input_binary_int ic in
   let strings_len = input_binary_int ic in
@@ -620,6 +618,8 @@ value input bname =
   let descends_array_pos = input_binary_int ic in
   let strings_array_pos = input_binary_int ic in
   let norigin_file = input_value ic in
+  let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
+  let ic2 = open_in_bin (Filename.concat bname "strings.inx") in
   let ic2_string_start_pos = 3 * int_size in
   let ic2_string_hash_len = input_binary_int ic2 in
   let ic2_surname_start_pos = input_binary_int ic2 in

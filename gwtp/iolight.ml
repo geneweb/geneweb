@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 4.1 2001-04-22 18:55:22 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.2 2002-01-10 20:34:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -77,10 +77,7 @@ value make_cache ic shift array_pos patches len name =
   do { r.array := array; r.get := gen_get; r }
 ;
 
-value input bname =
-  let bname =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
+value input_patches bname =
   let patches =
     match
       try Some (open_in_bin (Filename.concat bname "patches")) with _ -> None
@@ -91,6 +88,14 @@ value input bname =
          p_family = ref []; p_couple = ref []; p_descend = ref [];
          p_string = ref []; p_name = ref []} ]
   in
+  patches
+;
+
+value input bname =
+  let bname =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  let patches = input_patches bname in
   let ic =
     let ic = open_in_bin (Filename.concat bname "base") in
     do { check_magic ic; ic }
