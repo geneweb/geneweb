@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.20 2004-11-06 16:58:44 ddr Exp $ *)
+(* $Id: templ.ml,v 4.21 2004-11-08 10:29:56 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -55,6 +55,8 @@ value get_variable =
   in
   parser
   [ [: `'%' :] -> ("%", [])
+  | [: `'[' :] -> ("[", [])
+  | [: `']' :] -> ("]", [])
   | [: v = get_ident 0; vl = var_kont :] -> (v, vl) ]
 ;
 
@@ -229,7 +231,8 @@ value parse_templ conf strm =
     [ [: `'%' :] ->
         let astl = if len = 0 then astl else [Atext (buff_get len) :: astl] in
         match get_variable strm with
-        [ ("%", []) -> parse_astl [Atext "%" :: astl] False 0 end_list strm
+        [ (("%" | "[" | "]" as c), []) ->
+            parse_astl [Atext c :: astl] False 0 end_list strm
         | (v, []) when List.mem v end_list -> (List.rev astl, v)
         | ("define", []) -> parse_define astl end_list strm
         | x ->

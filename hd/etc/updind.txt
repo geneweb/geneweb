@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.13 2004-09-30 12:15:03 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.14 2004-11-08 10:29:55 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -27,22 +27,22 @@ function sourceIfData(src, place, year, text)
 }
 function setDead()
 {
-  document.forms[0].death.value = "Death";
+  document.forms%[0].death.value = "Death";
   changeDeath();
 }
 function changeDeath()
 {
   var color = "black";
-  if (document.forms[0].death.value != "Death") color = "#b0b0b0";
-  document.forms[0].death_place.style.color = color;
-  document.forms[0].death_dd.style.color = color;
-  document.forms[0].death_mm.style.color = color;
-  document.forms[0].death_yyyy.style.color = color;
-  document.forms[0].death_text.style.color = color;
-  document.forms[0].death_cal.style.color = color;
-  document.forms[0].death_prec.style.color = color;
-  document.forms[0].death_oryear.style.color = color;
-  document.forms[0].death_src.style.color = color;
+  if (document.forms%[0].death.value != "Death") color = "#b0b0b0";
+  document.forms%[0].death_place.style.color = color;
+  document.forms%[0].death_dd.style.color = color;
+  document.forms%[0].death_mm.style.color = color;
+  document.forms%[0].death_yyyy.style.color = color;
+  document.forms%[0].death_text.style.color = color;
+  document.forms%[0].death_cal.style.color = color;
+  document.forms%[0].death_prec.style.color = color;
+  document.forms%[0].death_oryear.style.color = color;
+  document.forms%[0].death_src.style.color = color;
 }
 -->
 </script>
@@ -113,8 +113,8 @@ function changeDeath()
   <input name=xx_src size=40 maxlength=200 value="%xx_src;"
    onFocus='
      sourceIfData
-       (document.forms[0].xx_src, document.forms[0].xx_place,
-        document.forms[0].xx_yyyy, document.forms[0].xx_text)'>
+       (document.forms%[0].xx_src, document.forms%[0].xx_place,
+        document.forms%[0].xx_yyyy, document.forms%[0].xx_text)'>
   </td>
   </tr>
   </table>

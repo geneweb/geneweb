@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.204 2004-11-08 09:45:55 ddr Exp $
+# $Id: lexicon.txt,v 4.205 2004-11-08 10:29:55 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7762,6 +7762,10 @@ ru: %d имён
 sl: %d lastnih imen
 sv: de %d f&ouml;rnamnen
 
+    the %d oldest couples perhaps still alive and engaged
+en: the %d oldest couples perhaps still alive and engaged
+fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
+
     the %d oldest perhaps still alive
 af: die %d oudstes wat nog leef
 bg: най-старите %d евентуално живи лица
@@ -7788,10 +7792,6 @@ ro: %d cei mai batrini posibil mai in viata
 ru: %d самых старых еще живущих
 sl: %d najstarej№ih, morda №e ѕiveиih
 sv: de %d &auml;ldsta som kanske lever
-
-    the %d oldest couples perhaps still alive and engaged
-en: the %d oldest couples perhaps still alive and engaged
-fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
 
     the %d surnames
 af: die %d vanne
