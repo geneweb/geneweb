@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.4 2001-09-06 09:45:29 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.5 2001-09-15 07:12:08 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -119,7 +119,7 @@ value quote_escaped s =
 
 value log_open () =
   let fname = Filename.concat gwtp_log.val "gwtp.log" in
-  open_out_gen [Open_wronly; Open_creat; Open_append] 0o666 fname
+  open_out_gen [Open_wronly; Open_creat; Open_append] 0o644 fname
 ;
 
 value get_variable ic =
