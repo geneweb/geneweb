@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.220 2001-02-07 09:01:05 ddr Exp $
+# $Id: lexicon.txt,v 3.221 2001-02-08 19:28:03 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -2476,6 +2476,7 @@ se: f&ouml;rsvunnen
 
     display by slices/slice width/overlap/total width
 de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
+dk: vis ved delte sider/sidebredde/overlapning/total bredde
 en: display by slices/slice width/overlap/total width
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
 nl: weergave per snede/sneebreedte/doorsnede/totale breedte
@@ -2526,6 +2527,7 @@ se: skilda
 
     don't group the common branches together
 de: gemeinsame Zweige nicht zusammenfassen
+dk: sl&aring; ikke f&aelig;lles anelinier sammen
 en: don't group the common branches together
 fr: ne pas regrouper les branches communes
 nl: voeg de gemeenschappelijke takken niet samen
