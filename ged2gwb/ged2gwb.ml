@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.28 2000-08-31 17:57:58 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.29 2000-09-23 12:01:08 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1083,7 +1083,7 @@ value html_text_of_tags rl =
 value add_indi gen r =
   let i = per_index gen r.rval in
   let name_sons = find_field "NAME" r.rsons in
-  let public_name =
+  let givn =
     match name_sons with
     [ Some n ->
         match find_field "GIVN" n.rsons with
@@ -1095,6 +1095,7 @@ value add_indi gen r =
     match name_sons with
     [ Some n ->
         let (f, s) = parse_name (Stream.of_string n.rval) in
+        let pn = if givn = f then "" else givn in
         let fal = [] in
         let (f, fal) =
           match first_names_brackets.val with
@@ -1121,15 +1122,15 @@ value add_indi gen r =
           if extract_public_names.val || extract_first_names.val then
             let i = next_word_pos f 0 in
             let j = next_sep_pos f i in
-            if j == String.length f then (f, public_name, fal)
+            if j == String.length f then (f, pn, fal)
             else
               let fn = String.sub f i (j - i) in
-              if public_name = "" && extract_public_names.val then
+              if pn = "" && extract_public_names.val then
                 if is_a_public_name f j then (fn, f, fal)
                 else if extract_first_names.val then (fn, "", [f :: fal])
                 else (f, "", fal)
-              else (fn, public_name, [f :: fal])
-          else (f, public_name, fal)
+              else (fn, pn, [f :: fal])
+          else (f, pn, fal)
         in
         let f = if lowercase_first_names.val then lowercase_name f else f in
         let fal =
@@ -1153,7 +1154,7 @@ value add_indi gen r =
               let r = ref (-1) in do Hashtbl.add gen.g_hnam key r; return r ]
         in
         do incr r; return (f, s, r.val, pn, fal)
-    | None -> ("?", "?", Adef.int_of_iper i, public_name, []) ]
+    | None -> ("?", "?", Adef.int_of_iper i, givn, []) ]
   in
   let nick_name =
     match name_sons with

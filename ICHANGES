@@ -23,6 +23,10 @@ GeneWeb Version 3.08
   - [22 Aug 00] Added test: no more display "age at death" if negative
     (because of erroneous dates).
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [23 Sep 00] Fixed bug: if GIVN = first name, should have ignored it,
+    but did not.
+
 * GeneWeb data bases Transfer Program (gwtp)
   - [06 Sep 00] Added ability to change the default language.
   - [22 Aug 00] Fixed bug: worked only if the CGI name was gwtp (could not
