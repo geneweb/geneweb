@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 2.3 1999-05-06 22:02:59 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 2.4 1999-06-07 18:45:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -35,7 +35,6 @@ value print_child_person conf base p =
       end;
       tag "td" "align=right" begin
         let s = capitale (transl conf "number") in
-        let s = if String.length s > 3 then String.sub s 0 3 else s in
         Wserver.wprint "%s" s;
       end;
       tag "td" begin

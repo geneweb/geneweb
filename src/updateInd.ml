@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.7 1999-04-19 06:48:58 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.8 1999-06-07 18:45:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -53,7 +53,6 @@ value print_first_name conf base p =
     end;
     tag "td" begin
       let s = capitale (transl conf "number") in
-      let s = if String.length s > 3 then String.sub s 0 3 else s in
       Wserver.wprint "%s" s;
     end;
     tag "td" begin

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.4 1999-04-19 06:48:58 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.5 1999-06-07 18:45:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -47,7 +47,6 @@ value print_parent_person conf base var (first_name, surname, occ, create) =
       end;
       tag "td" "align=right" begin
         let s = capitale (transl conf "number") in
-        let s = if String.length s > 3 then String.sub s 0 3 else s in
         Wserver.wprint "%s" s;
       end;
       tag "td" begin
@@ -94,7 +93,6 @@ value print_child_person conf base var (first_name, surname, occ, create) =
       end;
       tag "td" "align=right" begin
         let s = capitale (transl conf "number") in
-        let s = if String.length s > 3 then String.sub s 0 3 else s in
         Wserver.wprint "%s" s;
       end;
       tag "td" begin
