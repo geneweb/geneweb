@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.127 2002-12-02 10:24:53 ddr Exp $
+# $Id: lexicon.txt,v 4.128 2002-12-02 10:26:31 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -5217,6 +5217,8 @@ sv: meddelande inlagt
 
     message deleted
 en: message deleted
+eo: mesagxo nuligita
+es: mensaje borrado
 fr: message supprim&eacute;
 he:  הודעה נמחקה
 
