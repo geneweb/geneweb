@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.1 2001-04-03 20:21:48 ddr Exp $ *)
+(* $Id: update.ml,v 4.2 2001-04-09 18:14:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -88,7 +88,7 @@ value print_err_unknown conf base (f, s, o) =
   return raise ModErr
 ;
 
-value insert_string conf base s =
+value insert_string base s =
   try base.func.index_of_string s with
   [ Not_found ->
       let i = Adef.istr_of_int base.data.strings.len in
@@ -769,7 +769,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in
           let ip = Adef.iper_of_int (base.data.persons.len) in
-          let empty_string = insert_string conf base "" in
+          let empty_string = insert_string base "" in
           let (birth, birth_place) =
             match info with
             [ Some (b, bpl, _, _) -> (b, bpl)
@@ -784,8 +784,8 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
             | _ -> (infer_death conf birth, "") ]
           in
           let p =
-            {first_name = insert_string conf base f;
-             surname = insert_string conf base s;
+            {first_name = insert_string base f;
+             surname = insert_string base s;
              occ = o; image = empty_string;
              first_names_aliases = []; surnames_aliases = [];
              public_name = empty_string;
@@ -794,19 +794,19 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
              occupation = empty_string;
              sex = sex; access = IfTitles;
              birth = Adef.codate_of_od birth;
-             birth_place = insert_string conf base birth_place;
+             birth_place = insert_string base birth_place;
              birth_src = empty_string;
              baptism = Adef.codate_None; baptism_place = empty_string;
              baptism_src = empty_string;
              death = death;
-             death_place = insert_string conf base death_place;
+             death_place = insert_string base death_place;
              death_src = empty_string;
              burial = UnknownBurial; burial_place = empty_string;
              burial_src = empty_string;
              notes = empty_string;
              psources =
                if f = "?" || s = "?" then empty_string
-               else insert_string conf base src;
+               else insert_string base src;
              cle_index = ip}
           and a =
             {parents = None;
