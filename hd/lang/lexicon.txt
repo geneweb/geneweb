@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 1.56 1999-02-13 21:55:01 ddr Exp $
+# $Id: lexicon.txt,v 1.57 1999-02-18 11:38:53 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -51,7 +51,7 @@ fr:  pour r&eacute;essayer avec ce num&eacute;ro, ou bien faites "back" et chois
 he:  לנסות שוב עם המספר הזה, או "חזרה" ולשנות בעצמך
 nl: , om dit nummer weer te proberen, of druk "terug" en verander het zelf
 pt: para tentar novamente com este n&uacute;mero ou fazer "back" e escolher outro
-se: f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer, eller g&ouml;r "back" och &auml;ndra det sj&auml;lv
+se:  f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer, eller g&ouml;r "back" och &auml;ndra det sj&auml;lv
 
     %d years ago
 de: vor %d Jahren
@@ -807,7 +807,7 @@ he:  בין
 it: tra
 nl: tussen
 pt: entre
-se: emellan
+se: mellan
 
     birth
 de: Geburt
@@ -1014,7 +1014,7 @@ he:   תאריך
 it: data
 nl: datum
 pt: data
-se: datum
+se: datum (d/m/&aring;)
 
     days old
 de: Tage alt
@@ -1274,6 +1274,7 @@ se: far/mor
     file
 en: file
 fr: fichier
+se: fil
 
     first free number
 de: erste freie Nummer
@@ -2321,6 +2322,7 @@ se: foto
     photo received
 en: photo received
 fr: photo re&ccedil;ue
+se: foto mottaget
 
     place
 de: Ort
@@ -2469,6 +2471,7 @@ se: se vidare
     send
 en: send
 fr: envoyer
+se: skicka
 
     several answers
 de: mehrere Antworten
@@ -2493,7 +2496,7 @@ nl: geslacht
 pt: sexo
 se: k&ouml;n
 
-    should be of sex feminine
+    should be female
 de: m&uuml;&szlig;te weiblichen Geschlechts sein
 en: should be female
 eo: devus havi sekso ina
@@ -2505,9 +2508,9 @@ nl: moet vrouwelijk zijn
 pt: tendria que ser de sexo feminino
 se: borde vara kvinna
 
-    should be of sex masculine
+    should be male
 de: m&uuml;&szlig;te m&auml;nnlichen Geschlechts sein
-en: should be of male
+en: should be male
 eo: devus havi sekso maskla
 es: deber&iacute;a ser de sexo masculino
 fr: devrait &ecirc;tre de sexe masculin

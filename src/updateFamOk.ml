@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 1.14 1999-02-12 12:37:14 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.15 1999-02-18 11:38:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -274,7 +274,7 @@ value print_err_father_sex conf base p =
   in
   do header conf title;
      afficher_personne_referencee conf base p;
-     Wserver.wprint "\n%s\n" (transl conf "should be of sex masculine");
+     Wserver.wprint "\n%s\n" (transl conf "should be male");
      trailer conf;
   return ()
 ;
@@ -285,7 +285,7 @@ value print_err_mother_sex conf base p =
   in
   do header conf title;
      afficher_personne_referencee conf base p;
-     Wserver.wprint "\n%s\n" (transl conf "should be of sex feminine");
+     Wserver.wprint "\n%s\n" (transl conf "should be female");
      trailer conf;
   return ()
 ;

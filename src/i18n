@@ -91,7 +91,7 @@ died
 disappeared
 divorce
 divorced
-dont know
+don't know
 end
 error
 exact
@@ -102,6 +102,7 @@ family deleted
 family modified
 family/families
 father/mother
+file
 first free number
 first name alias
 first name missing
@@ -190,6 +191,7 @@ person modified
 person/persons
 persons having the same name
 photo
+photo received
 place
 previous sibling
 private
@@ -202,10 +204,11 @@ relationship computing
 relationship link/relationship links
 see above
 see further
+send
 several answers
 sex
-should be of sex feminine
-should be of sex masculine
+should be female
+should be male
 son/daughter/child
 source/sources
 specify
