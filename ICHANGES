@@ -9,6 +9,9 @@ GeneWeb Version 2.07
     in the form, but present in the file.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Sep 30, 99] When modifying a person, does not keep the notes when
+    his first name or surname hold a "?" since it cannot not saved in
+    GeneWeb source files.
   - [Sep 29, 99] Errorred when clicking on surnames by alphabetic order
     on empty data bases. Fixed.
   - [Sep 28, 99] Forgot sharp (#) as possible character in URLs. Fixed.
