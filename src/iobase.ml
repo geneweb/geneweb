@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.19 1999-09-19 09:25:23 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.20 1999-09-29 13:58:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -99,13 +99,6 @@ value rec list_remove_assoc x =
   [ [(x1, y1) :: l] ->
       if x = x1 then l else [(x1, y1) :: list_remove_assoc x l]
   | [] -> [] ]
-;
-
-value array_memq x a =
-  loop 0 where rec loop i =
-    if i == Array.length a then False
-    else if x == a.(i) then True
-    else loop (i + 1)
 ;
 
 (* Search index of a given string in file strings.inx *)

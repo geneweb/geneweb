@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 2.17 1999-09-28 20:11:22 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.18 1999-09-29 13:58:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -721,12 +721,6 @@ value read_family ic fname =
       let (cle_mere, _, l) = parse_parent str l in
       do if l <> [] then failwith str else (); return
       let line = read_line ic in
-      let (fsrc, line) =
-        match line with
-        [ Some (str, ["src"; x]) -> (cut_space x, read_line ic)
-        | Some (str, ["src" :: _]) -> failwith str
-        | _ -> ("", line) ]
-      in
       let (witn, line) =
         loop line where rec loop =
           fun
@@ -742,6 +736,12 @@ value read_family ic fname =
               let (witn, line) = loop (read_line ic) in
               ([(wk, sex) :: witn], line)
           | line -> ([], line) ]
+      in
+      let (fsrc, line) =
+        match line with
+        [ Some (str, ["src"; x]) -> (cut_space x, read_line ic)
+        | Some (str, ["src" :: _]) -> failwith str
+        | _ -> ("", line) ]
       in
       let (csrc, line) =
         match line with
