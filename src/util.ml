@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.76 2000-11-08 15:59:13 ddr Exp $ *)
+(* $Id: util.ml,v 3.77 2000-11-08 16:07:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1483,7 +1483,6 @@ value image_and_size conf base p image_size =
           with
           [ Some p when p <> "" -> Some (p ^ s, None)
           | _ ->
-              let s = Filename.basename s in
               let fname = personal_image_file_name conf.bname s in
               if Sys.file_exists fname then
                 Some (fname, Some (image_size fname))
