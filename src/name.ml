@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.5 2001-05-03 11:58:44 ddr Exp $ *)
+(* $Id: name.ml,v 4.6 2001-11-27 12:10:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 module Buff =
@@ -145,7 +145,7 @@ value crush s =
 
   - [date] Changed index: names ending with s, z, sz, ss are now
     treated like if only ended by one s (therefore could be ignored in
-    search). The index being different, data bases must be rebuild (radical
+    search). The index being different, databases must be rebuild (radical
     cleanup or consang program, option -i), otherwise the requests concerning
     people whose names end with z, sz or ss may not return the good result.
 

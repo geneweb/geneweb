@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 4.3 2001-11-09 10:55:46 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 4.4 2001-11-27 12:11:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -675,7 +675,7 @@ value speclist =
     "\
 [ASCII|ANSEL]:
      Set charset. Default is ASCII. Warning: value ANSEL works correctly only
-     on iso-8859-1 encoded data bases.");
+     on iso-8859-1 encoded databases.");
    ("-o",
     Arg.String (fun x -> do { ofile.val := x; arg_state.val := ASnone }),
     "<ged>: output file name (default: a.ged)");
@@ -703,7 +703,7 @@ value speclist =
     "\"<surname>\" : select this surname (option usable several times)");
    ("-nsp", Arg.Set no_spouses_parents,
     ": no spouses' parents (for options -s and -d)");
-   ("-nn", Arg.Set no_notes, ": no (data base) notes");
+   ("-nn", Arg.Set no_notes, ": no (database) notes");
    ("-c", Arg.Int (fun i -> censor.val := i), "\
 <num> :
      When a person is born less than <num> years ago, it is not exported unless
@@ -714,7 +714,7 @@ value anonfun s =
   match arg_state.val with
   [ ASnone ->
       if ifile.val = "" then ifile.val := s
-      else raise (Arg.Bad "Cannot treat several data bases")
+      else raise (Arg.Bad "Cannot treat several databases")
   | ASwaitAncOcc ->
       try
         do { anc_occ.val := int_of_string s; arg_state.val := ASwaitAncSurn }

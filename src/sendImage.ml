@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.6 2001-09-16 14:41:35 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.7 2001-11-27 12:10:11 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -30,7 +30,7 @@ value error_too_big_image conf base p len max_len =
     print_link_to_welcome conf True;
     Wserver.wprint "<p>\n<font size=-1><em>";
     Wserver.wprint "Error: this image is too big: %d bytes<br>\n" len;
-    Wserver.wprint "Maximum authorized in this data base: %d bytes<br>\n"
+    Wserver.wprint "Maximum authorized in this database: %d bytes<br>\n"
       max_len;
     Wserver.wprint "</em></font>\n<p>\n";
     Wserver.wprint "<ul><li>%s</ul>\n"

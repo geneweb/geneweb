@@ -7,7 +7,7 @@ GeneWeb version 4.04
   - [14 Nov 01] Suppressed the <nobr> tag used in several displayings,
     because it is not html standard. Its effect was to ask not to cut
     too large lines.
-  - [08 Nov 01] In data base forum, display 100 headers and a link to
+  - [08 Nov 01] In database forum, display 100 headers and a link to
     the previous messages, instead of all headers.
   - [20 Oct 01] In the updates forms, the order "year/month/day" in
     the dates now depends on the language. This is indicated in a new
@@ -35,10 +35,10 @@ GeneWeb version 4.04
     in the first name field, with the real first name part enclosed with
     double quotes.
 
-* GeneWeb data bases Transfer Program (gwtp)
+* GeneWeb databases Transfer Program (gwtp)
   - [27 Oct 01] In the executable "ged2gwb" is installed in the
     directory corresponding to the option -etc of gwtp, the users can
-    upload gedcom files to update their data bases.
+    upload gedcom files to update their databases.
   - [06 Sep 01] Separated the option -tmp into -log (for the log),
     -etc (for passwd, default.gwf and lang directories) and -tmp (the
     rest). Code written by Christian Perrier.
@@ -81,7 +81,7 @@ GeneWeb version 4.03
     recovered, but not always) 2/ when a father has female sex or a mother
     has male sex (the family gets the flag "no sexes check"). Moreover,
     now ged2gwb automatically put parents to isolated persons, so that the
-    future cleanups of the data base do not suppress them.
+    future cleanups of the database do not suppress them.
   - [17 Jul 01] Now, selecting surnames and ancestors/descendants is
     no more exclusive. It is therefore possible to select e.g. a surname
     *and* the ancestors of somebody.
@@ -96,7 +96,7 @@ GeneWeb version 4.03
 
 * Documentation
   - [15 Aug 01] Added documentation (English and French) about how to
-    create a CDrom with your data base. Swedish version added by Lars
+    create a CDrom with your database. Swedish version added by Lars
     Gustavsson.
 
 GeneWeb version 4.02
@@ -116,8 +116,8 @@ GeneWeb version 4.02
   - [29 May 01] Fixed problem with option -log (traces in a log file):
     if the log file was not writable, all requests failed (instead of
     ignoring it).
-  - [11 May 01] Improved data base access speed in case when many updates
-    have been done (and data base not having been cleaned up).
+  - [11 May 01] Improved database access speed in case when many updates
+    have been done (and database not having been cleaned up).
   - [09 May 01] Fixed bug: system images with underscores did not work
     (may happen in cases of customization of the welcome page)
   - [09 May 01] Fixed bug: in family update form, if the comment
@@ -146,7 +146,7 @@ GeneWeb version 4.02
     modified: now, if this file is not accessible, only requests from
     127.0.0.1 (local machine) are accepted.
 
-* GeneWeb data bases Transfer Program (gwtp)
+* GeneWeb databases Transfer Program (gwtp)
   - [28 Apr 01] Added option -tmout to specify the time after which
     unused logins expire (default is 900s = 15mn).
 
@@ -179,7 +179,7 @@ GeneWeb version 4.01
     is different according to the intermediate person (the child)'s sex.
     And in French the word "nth cousin" is different if it is a man or a
     woman.
-  - [18 Mar 01] Fixed bug: the data base forum did not work under Windows.
+  - [18 Mar 01] Fixed bug: the database forum did not work under Windows.
   - [18 Mar 01] Fixed bug: in case of automatic merge, the source field
     of the second person or family was lost.
   - [18 Mar 01] Improved displaying of sources in personal pages: the
@@ -198,7 +198,7 @@ GeneWeb version 4.01
   - [14 Mar 01] Added option "-blang": if no language is specified in
     the request (i.e. explicitely selected by a flag, for example), choose
     preferably the user preferred language (the one of his browser) rather
-    than the default data base language.
+    than the default database language.
   - [13 Mar 01] Fixed problem in displaying "anniversaries month"
     in Estonian: the month appeared with all its declinations.
 
@@ -246,11 +246,11 @@ The new version number (4.00) is in honour of:
 * Installation
   - [04 Mar 01] Added version for MacOS X.
   - [03 Mar 01] Changed Linux rpm package installation; it uses now
-    another directory for data bases (/home/geneweb/bases). Not removed
+    another directory for databases (/home/geneweb/bases). Not removed
     when unstallation, it can be used for the future GeneWeb versions,
     without requiring it to be moved.
   - [23 Fev 01] Windows version: added an "installer" (therefore
-    an installation normally easier). The data bases are put in
+    an installation normally easier). The databases are put in
     a directory different from the program, therefore not deleted when
     the program is uninstalled, and can be directly usable if another
     version is installed.
@@ -328,14 +328,14 @@ The new version number (4.00) is in honour of:
     displaying surnames by branch (no more only to descendants pages).
 
 * Setup program (gwsetup)
-  - [24 Feb 01] Fixed big bug: when creating a data base, a page
-    displays that the data base has been created. Ok. But if this page is
+  - [24 Feb 01] Fixed big bug: when creating a database, a page
+    displays that the database has been created. Ok. But if this page is
     requested again later by the browser and if it is no more in the
     browser cache, the action is made again overwriting the possible user
     changes.
   - [23 Feb 01] Added option -gd (gwsetup directory) to set a different
     directory for the gwsetup files. It allows to launch gwsetup in another
-    directory, therefore to separate the data bases from the GeneWeb files.
+    directory, therefore to separate the databases from the GeneWeb files.
   - [20 Feb 01] Added option -lang: if provided in parameter, the lang
     name is not asked the user. Changed all "http://localhost:" into
     "http://127.0.0.1:" which always work on Windows and in all OSes.
@@ -355,12 +355,12 @@ GeneWeb version 3.11
     wide for printers. In tree displaying, a link is proposed in the upper
     right corner of the page. When clicking on it, a page is proposed for
     a parametrizable display of the tree by slices.
-  - [29 Jan 01] For GeneWeb sites accomodating many data bases: to
+  - [29 Jan 01] For GeneWeb sites accomodating many databases: to
     avoid the creation of too many files in the same directories, added
-    the ability to put them in sub-sub-directories. A data base file can
+    the ability to put them in sub-sub-directories. A database file can
     be installed in a sub-directory of its first character,
     sub-sub-directory of its second character. For example, a file
-    associated with the data base foo can be in the directory f/o/. This
+    associated with the database foo can be in the directory f/o/. This
     is not required, but optional, and is therefore backward
     compatible. This applies to:
       * the database directory: f/o/foo.gwb
@@ -381,7 +381,7 @@ GeneWeb version 3.11
     are some).
   - [23 Jan 01] Fixed bug: when changing somebody's name, in some cases
     there were no check that the key already existed, resulting of a
-    double defined persons when cleaning the data base.
+    double defined persons when cleaning the database.
   - [14 Jan 01] Complicated trees (ancestors, descendants, relationships) now
     work with browsers without tables (like Lynx).
   - [13 Jan 01] Fixed bug: when merging families, the marriage witnesses
@@ -411,14 +411,14 @@ GeneWeb version 3.11
     or their parents, etc.
 
 * Setup program (gwsetup)
-  - [22 Jan 01] Added the merging of data bases. Updated the documentation
+  - [22 Jan 01] Added the merging of databases. Updated the documentation
     to remove the comments telling that this operation cannot be done under
     gwsetup.
 
 * Gedcom to GeneWeb (ged2gwb)
   - [23 Jan 01] Added a hack to turn around a bug in the GEDCOMs
     coming from Genealogos (fields inverted in certain lines) which
-    created empty data bases.
+    created empty databases.
 
 * GeneWeb to Gedcom (gwb2ged)
   - [04 Feb 00] Added option "-aws" (Ancestors With Siblings), the same
@@ -478,8 +478,8 @@ GeneWeb version 3.10
     somebody with one of his/her ancestor.
   - [25 Nov 00] Small improvements: in update page, added "back" link,
     in "family deleted" page, added link to return to the person.
-  - [24 Nov 00] Fixed bug: in automatic merge steps, the data base was
-    not locked, risking to corrupt the data base if two persons were making
+  - [24 Nov 00] Fixed bug: in automatic merge steps, the database was
+    not locked, risking to corrupt the database if two persons were making
     changes exactly at the same time.
   - [18 Nov 00] Fixed bug: while updating a person or a family, in
     case of keys (first name/surname/number) conflicts, if there where
@@ -530,7 +530,7 @@ GeneWeb version 3.10
   - [13 Nov 00] Deleted entry "of": using only "%1 of %2" now. Some
     consequences in displaying (depending on language).
 
-* GeneWeb data bases Transfer Program (gwtp)
+* GeneWeb databases Transfer Program (gwtp)
   - [14 Dec 00] Added a system to display pages on other languages than
     English. Added French version.
   - [07 Nov 00] Added "body_prop" (text added inside the tag "body" in
@@ -551,7 +551,7 @@ GeneWeb version 3.09
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [05 Nov 00] In case of loop in data base, which stops all relationship
+  - [05 Nov 00] In case of loop in database, which stops all relationship
     computations, the error message now displays one person who is his/her
     own ancestor, allowing the wizard to fix the error.
   - [04 Nov 00] Changed forum displaying. The main page now displays only
@@ -580,8 +580,8 @@ GeneWeb version 3.09
   - [11 Oct 00] Important improvement: added a system of template
     files for the personal pages. It is therefore possible to change the
     displaying of the personal pages, by editing the template. It is also
-    possible, for a site accomodating several data bases, to have a
-    personal template file specific to each data base.
+    possible, for a site accomodating several databases, to have a
+    personal template file specific to each database.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
   - [06 Nov 00] Changed "anniversaries of death" into "anniversaries
@@ -592,7 +592,7 @@ GeneWeb version 3.09
   - [03 Oct 00] Fixed bug: there were an inconsistency between "gwc"
     and the inline updating, for persons "keys": the inline updating
     considered spaces in names as significant but not "gwc". Result:
-    when cleaning up a data base (gwu + gwc) or when importing a data
+    when cleaning up a database (gwu + gwc) or when importing a data
     base from an old version of GeneWeb, it could cause names conflict
     errors (for example if both "Anne.0 Le Blanc" and "Anne.0 Leblanc"
     were defined).
@@ -611,10 +611,10 @@ GeneWeb version 3.09
     less than <num> years nor their descendants (code written by Ludovic
     Ledieu).
 
-* GeneWeb data bases Transfer Program (gwtp)
-  - [29 Oct 00] Fixed bug: if one tried to send a data base several
+* GeneWeb databases Transfer Program (gwtp)
+  - [29 Oct 00] Fixed bug: if one tried to send a database several
     times at the same time (by several requests), it could create a
-    corrupted data base or it could make the program fail.
+    corrupted database or it could make the program fail.
   - [06 Oct 00] Added ability to put a trailer text.
 
 * Setup program (gwsetup)
@@ -628,10 +628,10 @@ GeneWeb version 3.08
 
 * Setup program (gwsetup)
   - [21 Sep 00] Fixed bug: in recovery from an old version, if the
-    destination data base already existed (created e.g. by a previous
-    attempt), it could not overwrite the data base, even it pretended
+    destination database already existed (created e.g. by a previous
+    attempt), it could not overwrite the database, even it pretended
     it was going to do it. Same problem (fixed also) for the creation
-    of a data base from a GeneWeb source file.
+    of a database from a GeneWeb source file.
 
 * GeneWeb Service/CGI (gwd)
   - [25 Sep 00] When wizard or friend access failure, now display the
@@ -639,7 +639,7 @@ GeneWeb version 3.08
     failure").
   - [21 Sep 00] When modifying a person, forbid now to let his/her
     first name or surname as just "?", because it can cause problems
-    of linking these persons after a data base cleanup.
+    of linking these persons after a database cleanup.
   - [18 Sep 00] In family updating, when creating an unknown person
     (i.e. having "?" as firstname or surname), does not set the "source"
     field any more for this person.
@@ -665,7 +665,7 @@ GeneWeb version 3.08
     Degaulle", when changing the second person' s surname into "de Gaulle",
     did not display a name conflict error.
   - [28 Aug 00] Added option "-wjf" (= wizard just friend) to permanently
-    prevent all wizards in all data bases to make changes.
+    prevent all wizards in all databases to make changes.
   - [26 Aug 00] In descendants page, added male line and female line.
   - [25 Aug 00] In history, added the ability to see the changes only
     by a given wizard.
@@ -688,7 +688,7 @@ GeneWeb version 3.08
 
 * GeneWeb to Gedcom (gwb2ged)
   - [06 Sep 00] Fixed bug: newlines in notes were incorrectly saved,
-    resulting that when restoring the data base (ged2gwb), the lines
+    resulting that when restoring the database (ged2gwb), the lines
     were catenated without any spaces.
 
 * GeneWeb to Gedcom (gwb2ged) and GeneWeb uncompiler (gwu)
@@ -703,12 +703,12 @@ GeneWeb version 3.08
     the "-sep" option is treated as separated from the rest, i.e. the numbers
     in persons keys are automatically shifted if in conflict with the persons
     of the previous files. No more need to find a "shift" number which avoids
-    the conflicts. Simplifies the data bases merging.
+    the conflicts. Simplifies the databases merging.
   - [27 Aug 00] Fixed bug: date e.g. "between 1300 and 1350 Julian" where
     printed by gwu as 1300..1350J but gwc expected 1300J..1350 and resulted
     in a syntax error.   
 
-* GeneWeb data bases Transfer Program (gwtp)
+* GeneWeb databases Transfer Program (gwtp)
   - [08 Sep 00] Added small documentation (a README file) for GeneWeb
     Web site administrators.
 
@@ -743,7 +743,7 @@ GeneWeb version 3.08
   - [03 Sep 00] In FAQ, changed the text about the question of missing
     relationship links.
   - Added entries in the FAQ about:
-    * [27 Sep 00] the message "probable loop in the data base",
+    * [27 Sep 00] the message "probable loop in the database",
     * [08 Sep 00] the research by place/surname, where only one person
       by surname is displayed,
     * [03 Sep 00] the fact that sometimes, under Windows, it does not
@@ -761,7 +761,7 @@ GeneWeb version 3.07
 
 * New feature
   - [18 Aug 00] Added a program "gwtp" (CGI) to upload and download GeneWeb
-    data bases in a site which accomodate some (undocumented program for the
+    databases in a site which accomodate some (undocumented program for the
     moment).
 
 * Distribution
@@ -808,16 +808,16 @@ GeneWeb version 3.07
   - [09 Aug 00] Added a consistency check: in some gedcoms (from bad
     genealogy softwares), it happens that a person can be noticed as
     "spouse" (FAMS) of a family without being however neither husband
-    (HUSB) nor wife (WIFE) in that family. In the GeneWeb data base, the
+    (HUSB) nor wife (WIFE) in that family. In the GeneWeb database, the
     symptom was that the pages concerning this "spouse" (particularly
     his/her personal page) stopped in the middle. Now the converter
     displays an error message and fixes this inconsistency in the created
-    data base.
+    database.
   - [28 Jul 00] Fixed bug: when a person was married several times,
     the order of families were sometimes incorrect. Actually, the order
     wrongly followed the order where the families appeared in the
     gedcom, not the order indicated in the individual record.
-  - [26 Jul 00] Added a lock to the data base before writing it (to avoid
+  - [26 Jul 00] Added a lock to the database before writing it (to avoid
     multiple accesses which risk to damage it).
 
 * Base configuration files (base.gwf)
@@ -941,7 +941,7 @@ GeneWeb version 3.05
     are proposed from 2 generations (instead of 3, before).
   - [06..11 May 00] Added surname list from "ancestors" page.
   - [02 May 00] [technical] In Unix version now, each request gets the
-    user id and the group id of the owner of the data base directory
+    user id and the group id of the owner of the database directory
     (base.gwb). No error if cannot change to these ids. Deleted the gwd
     options -setuid and -setgid now unuseful.
   - [30 Apr 00] Fixed little problem with displaying by places for the ones
@@ -1027,7 +1027,7 @@ GeneWeb version 3.04
     name nor SURN as surname alias if equal to surname.
 
 * GeneWeb uncompiler (gwu) and GeneWeb to gedcom (gwb2ged)
-  - [04 Apr 00] Added option "-nn" not to save data base notes.
+  - [04 Apr 00] Added option "-nn" not to save database notes.
 
 * Base configuration files (base.gwf)
   - [31 Mar 00] Added variable "places_inverted" (default no) to specify that
@@ -1089,8 +1089,8 @@ GeneWeb version 3.03
   - [02 Feb 00] In personal pages, relations are now displayed before notes.
   - [20 Jan 00] When sorting the children, use now the baptism date
     when there is no birth date.
-  - [18 Jan 00] Fixed bug: when selecting no data base, the default page
-    asks for a data base name, but in CGI mode when entering a data base,
+  - [18 Jan 00] Fixed bug: when selecting no database, the default page
+    asks for a database name, but in CGI mode when entering a database,
     it did not work (incorrect URL).
 
 * Gedcom to GeneWeb (ged2gwb)
@@ -1142,7 +1142,7 @@ GeneWeb version 3.02
   - [Jan 12, 00] In adding or modifying family, added a specific field
     to indicate the source for (possibly) created persons.
   - [Jan 3, 00] Speeded up the displaying of anniversaries (noticeable on
-    large data bases).
+    large databases).
   - [Jan 10, 00] Forbid "send image" when the person's first name or
     surname is "?" ("dead end" person).
   - [Jan 9, 00] Added birthday anniversaries for close parents (accessible
@@ -1152,8 +1152,8 @@ GeneWeb version 3.02
     pages (useful e.g. to add style sheets).
   - [Dec 21, 99] Changed display of relationship by shortest path.
   - [Dec 19, 99] Added option -wd to specify a (writable) directory for
-    socket communication (required for Windows) and data bases access
-    count. Useful to use GeneWeb and data bases in a CDrom.
+    socket communication (required for Windows) and databases access
+    count. Useful to use GeneWeb and databases in a CDrom.
   - [Dec 17, 99] Added <meta http-equiv...> in headers of all generated
     pages to be compatible with all browsers.
   - [Dec 16, 99] Fixed bug: the ";opt=no_index" did not work correctly
@@ -1228,14 +1228,14 @@ GeneWeb version 3.01
   - [Nov 26, 99] Fixed a problem of sometimes displaying of a message
     "document contains no data" from the browser when computing relationship.
   - [Nov 19, 99] Added ability of customization of the page displayed when
-    no data base is given (must make a file etc/index.txt).
+    no database is given (must make a file etc/index.txt).
   - [Nov 16, 99] Fixed bug: some old dates failed the calendars page
   - [Nov 13, 99] In calendars, display the number of days since ...
   - [Nov 10, 99] Images are now clickable to see them in their true size
   - [Nov 10, 99] Added relationship computing by shortest path (Louis
     Granboulan).
   - [Nov 10, 99] Added foster parents.
-  - [Nov 10, 99] Changed structure of data bases for internal optimizations.
+  - [Nov 10, 99] Changed structure of databases for internal optimizations.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
   - [Nov 30, 99] Added French Revolution and Hebrew months in lexicon
@@ -1298,7 +1298,7 @@ Thanks to Emmanuelle Visseaux.
 * GeneWeb compiler (gwc)
   - [Oct 26, 99] Added option -f, like in ged2gwb: by default now, if the data
     base already exists, the program exits in error. If option -f is used
-    the old data base is overwritten.
+    the old database is overwritten.
 
 * GeneWeb uncompiler (gwu)
   - [Oct 24, 99] Added option -s to select all persons having a given surname
@@ -1403,13 +1403,13 @@ GeneWeb version 2.07
     with Email addresses did not work correctly. Fixed.
 
 * Gedcom to GeneWeb (ged2gwb)
-  - [Sep 28, 99] By default now, if a data base with the same name already
+  - [Sep 28, 99] By default now, if a database with the same name already
     exists, does not erase it and exits in error. Added option -f to
     overwrite the old version.
 
 * Consanguinity computing (consang)
   - [Sep 17..19, 99] Run faster when no modifications have been done (e.g. just
-    after the creation of the data base).
+    after the creation of the database).
 
 * Lexicon (lang/lexicon.txt)
   - [Sep 22, 99] Fixed some German phrases (Gerriet Backer).
@@ -1440,14 +1440,14 @@ GeneWeb version 2.06
   - [Aug 19, 99] Added more informations (places) in descendants display
     by list.
   - [Aug 18, 99] Added a link to the documentation (close to the copyright).
-  - [Aug 14..21, 99] Added a ility to put notes for the data base itself (for
+  - [Aug 14..21, 99] Added a ility to put notes for the database itself (for
     a general introduction).
   - [Aug 14, 99] Fixed bug: send image in cgi mode under Windows did not
     work.
   - [Aug 13..21, 99] In notes, URLs and Email addresses are now clickable.
   - [Aug 13, 99] Added the ability to change the text of some pages:
     1/ for site address redirection (gwd new option "-redirect", see below),
-    2/ for data base name change (gwf file field "renamed") and
+    2/ for database name change (gwf file field "renamed") and
     3/ detected robot exclusion (when option -robot_xcl has been set).
   - [Aug 13, 99] Fixed bug: when merging persons, the "other relations" where
     not included.
@@ -1466,9 +1466,9 @@ GeneWeb version 2.06
   - [Aug 20, 99] Added new variables "max_anc_level" and "max_desc_level"
     to specify the maximum level of generations that can be displayed in
     ancestors and descendants displaying (default resp. 8 and 12 generations).
-  - [Aug 18, 99] Added a new variable "auth_file" in data bases configuration
+  - [Aug 18, 99] Added a new variable "auth_file" in databases configuration
     files (files ending with ".gwf") overriding the possible authorization
-    file set by option "-auth" of gwd. Therefore now, each data base can have
+    file set by option "-auth" of gwd. Therefore now, each database can have
     its specific global restricted access. See the template file "a.gwf".
     Works only in server (not cgi) mode.
 
@@ -1477,7 +1477,7 @@ GeneWeb version 2.06
 
 * Documentation
   - [Sep 1, 99] Added German version (Falko Trojahn)
-  - [Aug 19, 99] Added new chapter "the access restrictions to data bases"
+  - [Aug 19, 99] Added new chapter "the access restrictions to databases"
     about wizards, friends, global access restrictions, robots, black list.
 
 GeneWeb version 2.05
@@ -1487,14 +1487,14 @@ GeneWeb version 2.05
   - [Aug 4, 99] In the distribution main directory, files README.txt (English)
     and LISEZMOI.txt (French), added a few lines of explanations for starting
     with GeneWeb.
-  - [Jul 15, 99] Changed internal representation of strings in data bases.
+  - [Jul 15, 99] Changed internal representation of strings in databases.
     Should not make any differences while browsing. However, as it is a major
     internal change in the program, problems may appear (mainly in displaying
     or in access by name, first name, surname, title...): please report if any
     problem.
 
 * Setup program
-  - [Jul 18, 99] Added in the menu "data base parameters" the ability to
+  - [Jul 18, 99] Added in the menu "database parameters" the ability to
     display the characters in the pages 1/ in bold, 2/ in italic, 3/ in
     smaller or bigger size (using the new key 'enclosing_tag': see below
     section "base configuration files"). Bold is useful, for example, if
@@ -1657,10 +1657,10 @@ GeneWeb version 2.03
     independant from the selected language (no more need to end the location
     with "fr" or "en"): the page is displayed in the selected language.
   - [May 15, 99] Added deletion of ".gwo" file after then "gwc" operation.
-  - [May 9, 99] Added predefined palette combination in "data base parameters";
+  - [May 9, 99] Added predefined palette combination in "database parameters";
     changed presentation of all page.
   - [May 9, 99] Added system to forbid non local accesses.
-  - [May 7, 99] Fixed bug: recovering data base from old version of GeneWeb
+  - [May 7, 99] Fixed bug: recovering database from old version of GeneWeb
     did not work when the old directory held spaces.
   - [May 7, 99] Fixed bad behavior under Windows: "GWU.EXE" (in uppercase)
     was not regognized when searching for old GeneWeb versions.
@@ -1680,7 +1680,7 @@ GeneWeb version 2.03
     GeneWeb server.
   - [May 16, 99] Fixed bug: in ascendants long displaying, did not display
     the last possible generation.
-  - [May 15, 99] Added a "?" at end of empty requests (with just the data base
+  - [May 15, 99] Added a "?" at end of empty requests (with just the database
     name) because of too smart browsers which automatically add a "/" at end
     of the address in this case (transforming e.g. "http://host/base" into
     "http://host/base/"), what makes the request not working.
@@ -2317,7 +2317,7 @@ Other changes:
   - fixed bug: when deleting a person, some fields were not erased.
   - added option -lang: default language
   - changed: displaying shortcuts when accessing by titles: for example,
-    if there is only one king in the data base, and it is "king of France",
+    if there is only one king in the database, and it is "king of France",
     selecting "king" directy displays "kings of France".
 
 * gwb2gw has been renamed gwu.

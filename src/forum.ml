@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.12 2001-11-08 12:10:00 ddr Exp $ *)
+(* $Id: forum.ml,v 4.13 2001-11-27 12:10:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -202,7 +202,7 @@ value print_add_message conf =
 
 value print_forum_headers conf base =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "data base forum"))
+    Wserver.wprint "%s" (capitale (transl conf "database forum"))
   in
   do {
     header conf title;
@@ -287,7 +287,7 @@ value print_forum_message conf base pos =
       let title _ =
         let subject =
           if subject = "" || subject = "-" then
-            capitale (transl conf "data base forum")
+            capitale (transl conf "database forum")
           else secure subject
         in
         Wserver.wprint "%s" subject
@@ -297,7 +297,7 @@ value print_forum_message conf base pos =
         print_link_to_welcome conf True;
         tag "ul" begin
           Wserver.wprint "<li><a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
-            (capitale (transl conf "data base forum"));
+            (capitale (transl conf "database forum"));
           Wserver.wprint "<li>";
           if pos = forum_length then Wserver.wprint "&nbsp;"
           else
@@ -467,7 +467,7 @@ value print_add_ok conf base =
         header conf title;
         print_link_to_welcome conf True;
         Wserver.wprint "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
-          (capitale (transl conf "data base forum"));
+          (capitale (transl conf "database forum"));
         trailer conf;
       }
     with

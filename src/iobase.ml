@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.7 2001-07-17 01:38:00 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.8 2001-11-27 12:10:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -671,7 +671,7 @@ value input bname =
       let oc9 =
         try open_out_bin fname with
         [ Sys_error _ ->
-            raise (Adef.Request_failure "the data base is not writable") ]
+            raise (Adef.Request_failure "the database is not writable") ]
       in
       let patches = patches_of_patches_ht patches in
       output_value_no_sharing oc9 (patches : Old.patches);

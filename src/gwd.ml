@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.17 2001-11-24 17:58:44 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.18 2001-11-27 12:10:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -1022,7 +1022,7 @@ value no_access conf =
   let title _ = Wserver.wprint "Error" in
   do {
     Util.rheader conf title;
-    Wserver.wprint "No access to this data base in CGI mode\n";
+    Wserver.wprint "No access to this database in CGI mode\n";
     Util.trailer conf;
   }
 ;
@@ -1051,7 +1051,7 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
                 try List.assoc "auth_file" conf.base_env with
                 [ Not_found -> "" ]
               in
-              if x = "" then "GeneWeb service" else "data base " ^ conf.bname
+              if x = "" then "GeneWeb service" else "database " ^ conf.bname
             in
             refuse_auth conf from auth auth_type
       | (_, _, Some (passwd, uauth)) ->
@@ -1283,7 +1283,7 @@ value geneweb_server () =
    http://%s:%d/base" selected_port.val selected_port.val hostn
           selected_port.val;
         Printf.eprintf "
-where \"base\" is the name of the data base
+where \"base\" is the name of the database
 Type %s to stop the service
 " "control C";
       }

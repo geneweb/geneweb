@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.12 2001-11-08 12:03:43 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.13 2001-11-27 12:11:38 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -656,7 +656,7 @@ value send_gedcom_file str env b tok f fname =
     printf "\nGedcom file transfered.\n";
     flush stdout;
     ged2gwb b;
-    printf "New data base created.\n";
+    printf "New database created.\n";
     flush stdout;
     copy_temp b;
     printf "Data base \"%s\" updated.\n" b;
@@ -741,7 +741,7 @@ value send_file str env b tok f fname =
     [ Accept ->
         do {
           make_temp env b;
-          printf "\nTemporary data base created.\n";
+          printf "\nTemporary database created.\n";
           flush stdout;
           copy_temp b;
           printf "Data base \"%s\" updated.\n" b;
@@ -931,7 +931,7 @@ value gwtp_download str env b tok =
 <head><title>Gwtp - download %s</title></head>
 <body>
 <h1 align=center>Gwtp - download %s</h1>
-<p>Your data base does not exist or is empty.
+<p>Your database does not exist or is empty.
 " b b;
     printf_link_to_main b tok;
     printf "</body>\n";
@@ -969,7 +969,7 @@ value gwtp_main str env b tok =
     if config_exists then do {
       if Sys.file_exists (Filename.concat gwtp_etc.val "ged2gwb") then do {
         printf "<li>Upload from\n<ul>\n";
-        printf "<li><a href=\"%s?m=UPL;b=%s;t=%s\">data base files</a>\n"
+        printf "<li><a href=\"%s?m=UPL;b=%s;t=%s\">database files</a>\n"
           gwtp_comm b tok;
         printf "<li><a href=\"%s?m=UPG;b=%s;t=%s\">gedcom</a>\n"
           gwtp_comm b tok;
@@ -1098,14 +1098,14 @@ value speclist =
   [("-tmp", Arg.String (fun x -> gwtp_tmp.val := x),
     "<dir>: directory for gwtp stuff; default: " ^ gwtp_tmp.val);
    ("-dst", Arg.String (fun x -> gwtp_dst.val := x),
-    "<dir>: directory for data bases; default: " ^ gwtp_dst.val);
+    "<dir>: directory for databases; default: " ^ gwtp_dst.val);
    ("-log", Arg.String (fun x -> gwtp_log.val := x),
     "<log>: directory for log file; default: " ^ gwtp_tmp.val);
    ("-etc", Arg.String (fun x -> gwtp_etc.val := x),
     "<etc>: directory for passwd, default.gwf and lang files; default: " ^
     gwtp_tmp.val);
    ("-site", Arg.String (fun x -> gw_site.val := x),
-    "<url>: site (if any) where data bases are accomodated");
+    "<url>: site (if any) where databases are accomodated");
    ("-tmout", Arg.Float (fun x -> token_tmout.val := x),
     "<sec>: tokens time out; default = " ^
     string_of_float token_tmout.val ^ " sec") ]

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.4 2001-10-15 13:22:50 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.5 2001-11-27 12:10:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -720,8 +720,8 @@ value files = ref [];
 value speclist =
   [("-c", Arg.Set just_comp, "Only compiling");
    ("-o", Arg.String (fun s -> out_file.val := s),
-    "<file> Output data base (default: a.gwb)");
-   ("-f", Arg.Set force, " Remove data base if already existing");
+    "<file> Output database (default: a.gwb)");
+   ("-f", Arg.Set force, " Remove database if already existing");
    ("-stats", Arg.Set pr_stats, "Print statistics");
    ("-nc", Arg.Clear do_check, "No consistency check");
    ("-cg", Arg.Set do_consang, "Compute consanguinity");
@@ -731,7 +731,7 @@ value speclist =
    ("-ds", Arg.String (fun s -> default_source.val := s), "\
      set the source field for persons and families without source data");
    ("-mem", Arg.Set Iobase.save_mem, " Save memory, but slower");
-   ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock data base.")]
+   ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.")]
 ;
 
 value anonfun x =
@@ -778,7 +778,7 @@ value main () =
       in
       if not force.val && Sys.file_exists bdir then do {
         Printf.printf "\
-The data base \"%s\" already exists. Use option -f to overwrite it.
+The database \"%s\" already exists. Use option -f to overwrite it.
 " out_file.val;
         flush stdout;
         exit 2

@@ -16,15 +16,15 @@ height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </font>
 <br><br>
 
-You can create a CD-ROM of your data base with <font
+You can create a CD-ROM of your database with <font
 color=#2f6400><b>GeneWeb</b></font> included inside: it allows you
-to distribute your data base directly usable.
+to distribute your database directly usable.
 
 <p>
 
 This chapter explains the minimum steps to manage to do it. This
 installation has the advantage that the user has nothing to install
-in his hard disk, neither the software, nor the data base.
+in his hard disk, neither the software, nor the database.
 
 <p>
 
@@ -34,18 +34,18 @@ Here are the operations to do:
 
 <ol>
 
-<li> Do a deep cleanup of your data base. If you have gwsetup, use it:
+<li> Do a deep cleanup of your database. If you have gwsetup, use it:
 look at its "main menu". You can also do that with the commands gwu
-and gwc (gwu extracts the data base as source text and gwc recreates
+and gwc (gwu extracts the database as source text and gwc recreates
 it).
 
 <p>
 
 <font size=-1>Remark: this step is not absolutely mandatory but allows
-to distribute a data base which is optimized in memory space and in
-access speed. However, if your data base comes from a GEDCOM file or
+to distribute a database which is optimized in memory space and in
+access speed. However, if your database comes from a GEDCOM file or
 from a <font color=#2f6400><b>GeneWeb</b></font> source file and if
-you made no changes in your data base, it is un-useful.</font>
+you made no changes in your database, it is un-useful.</font>
 
 <p>
 
@@ -62,14 +62,14 @@ displayed.</font>
 
 <p>
 
-<li> Enter in your data base and do any relationship computing, for
+<li> Enter in your database and do any relationship computing, for
 example between a father and his son.
 
 <p>
 
 <font size=-1>Remark: this is also an optional step to optimize the
-access to the data base. Indeed, the first relationship computing
-builds a file (named fstab) in the data base which allows the future
+access to the database. Indeed, the first relationship computing
+builds a file (named fstab) in the database which allows the future
 relationship computings to go faster. If this file was not created, it
 will not be possible in the CD-ROM and the relationship computings will
 be slower.</font>
@@ -82,19 +82,19 @@ explanation.
 
 <p>
 
-<li> Transfer your data base in the destination directory: your data
-base is a directory ending with ".gwb". For example, if your data base
+<li> Transfer your database in the destination directory: your data
+base is a directory ending with ".gwb". For example, if your database
 is named "xyz", the directory is "xyz.gwb". This directory is located
-in the data bases directory (depending on your installation: Windows,
+in the databases directory (depending on your installation: Windows,
 MacOS X, Unix, Linux rpm, Linux Debian...)
 
 <p>
 
 <li> Add a configuration file in the destination directory. If you
 have some which fits you, use it, otherwise create it. The
-configuration file is a text file ending by ".gwf": if your data base
+configuration file is a text file ending by ".gwf": if your database
 is "xyz", the file is "xyz.gwf". If this file already exists, it is
-also in the data base directory.
+also in the database directory.
 
 <p>
 
@@ -184,15 +184,15 @@ but just "gwd.arg") and write inside:
 
 <p>
 
-<li>If your data base has images, put them in the directory images,
-sub directory holding the name of your data base ("images/xyz" if
-your data base is named "xyz").
+<li>If your database has images, put them in the directory images,
+sub directory holding the name of your database ("images/xyz" if
+your database is named "xyz").
 
 <p>
 
 <li> After all these steps, you have a minimum installation, obliging
 the user to launch gwd himself and open the URL address to access the
-data base. You can improve that by providing HTML files and/or scripts
+database. You can improve that by providing HTML files and/or scripts
 (shell, batch) which launch all that. You can also put several data
 bases, other HTML files and so on.
 
@@ -206,13 +206,13 @@ but I don't know.
 
 <p>
 
-Remark: if you want that your data base be readable under other
+Remark: if you want that your database be readable under other
 Operating Systems than the one you use, you can create a directory for
 each OS and put the version of gwd inside. Of course, you must have
 downloaded the versions of <font color=#2f6400><b>GeneWeb</b></font>
 for all these systems. You have also to look at the files "gwd.arg"
 (one by gwd file) and in particular ask them to indicate the
-access path to the data base (options -hd and -bd of gwd).
+access path to the database (options -hd and -bd of gwd).
 
 </font>
 
@@ -222,7 +222,7 @@ access path to the data base (options -hd and -bd of gwd).
 rights of the destination directory and all its files and directory:
 make them no-writable. Then launch the command gwd (by double-click or
 by an interactive command). Open in your Web navigator the address
-http://127.0.0.1:2317/xyz (if your data base is named xyz) and check
+http://127.0.0.1:2317/xyz (if your database is named xyz) and check
 if it works.
 
 <p>
