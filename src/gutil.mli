@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.15 2004-08-06 01:04:40 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.16 2004-08-09 11:35:00 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -98,10 +98,6 @@ value check_noloop_for_person_list :
   base -> (base_error -> unit) -> list iper -> unit
 ;
 
-value check_base :
-  base -> (base_error -> unit) -> (base_warning -> unit) -> unit
-;
-
 value strip_spaces : string -> string;
 value alphabetic : string -> string -> int;
 value initial : string -> int;
@@ -132,7 +128,3 @@ value consang : gen_ascend 'a -> Adef.fix;
 value no_ascend : unit -> gen_ascend 'a;
 value set_parents : gen_ascend 'a -> option 'a -> unit;
 value set_consang : gen_ascend 'a -> Adef.fix -> unit;
-
-value start_progr_bar : unit -> unit;
-value run_progr_bar : int -> int -> unit;
-value finish_progr_bar : unit -> unit;

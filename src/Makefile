@@ -1,10 +1,10 @@
-# $Id: Makefile,v 4.19 2004-07-19 01:27:13 ddr Exp $
+# $Id: Makefile,v 4.20 2004-08-09 11:34:59 ddr Exp $
 
 include ../tools/Makefile.inc
 
 PREFIX=/usr
 OCAMLI=-I ../wserver -I ../dag2html
-GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo consangAll.cmo calendar.cmo gwcomp.cmo gwc.cmo
+GWC_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo check.cmo calendar.cmo gwcomp.cmo gwc.cmo
 CONSANG_OBJS=argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
 GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo secure.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo date.cmo history.cmo update.cmo wiznotes.cmo srcfile.cmo templ.cmo perso.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo dag.cmo relationLink.cmo relation.cmo ascend.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthDeath.cmo title.cmo notes.cmo doc.cmo forum.cmo image.cmo family.cmo base64.cmo robot.cmo

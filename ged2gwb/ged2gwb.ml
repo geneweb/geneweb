@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.43 2004-07-18 14:26:37 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.44 2004-08-09 11:34:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -2040,94 +2040,6 @@ value sort_by_date proj list =
   else list
 ;
 
-(* Printing check errors *)
-
-value print_base_error base =
-  fun
-  [ AlreadyDefined p ->
-      fprintf log_oc.val "%s\nis defined several times\n"
-        (designation base p)
-  | OwnAncestor p ->
-      fprintf log_oc.val "%s\nis his/her own ancestor\n"
-        (designation base p)
-  | BadSexOfMarriedPerson p ->
-      fprintf log_oc.val "%s\n  bad sex for a married person\n"
-        (designation base p) ]
-;
-
-value print_base_warning base =
-  fun
-  [ BirthAfterDeath p ->
-      fprintf log_oc.val "%s\n  born after his/her death\n"
-        (designation base p)
-  | IncoherentSex p fixed not_fixed ->
-      do {
-        fprintf log_oc.val "%s\n  sex not coherent with relations"
-          (designation base p);
-        if fixed > 0 then
-          if not_fixed > 0 then
-            fprintf log_oc.val " (fixed in %d of the %d cases)"
-              fixed (fixed + not_fixed)
-          else
-            fprintf log_oc.val " (fixed)"
-        else ();
-        fprintf log_oc.val "\n";
-      }
-  | ChangedOrderOfChildren ifam des _ ->
-      let cpl = coi base ifam in
-      fprintf log_oc.val "Changed order of children of %s and %s\n"
-        (designation base (poi base (father cpl)))
-        (designation base (poi base (mother cpl)))
-  | ChildrenNotInOrder ifam des elder x ->
-      let cpl = coi base ifam in
-      do {
-        fprintf log_oc.val
-          "The following children of\n  %s\nand\n  %s\nare not in order:\n"
-          (designation base (poi base (father cpl)))
-          (designation base (poi base (mother cpl)));
-        fprintf log_oc.val "- %s\n" (designation base elder);
-        fprintf log_oc.val "- %s\n" (designation base x)
-      }
-  | DeadTooEarlyToBeFather father child ->
-      do {
-        fprintf log_oc.val "%s\n" (designation base child);
-        fprintf log_oc.val
-          "  is born more than 2 years after the death of his/her father\n";
-        fprintf log_oc.val "%s\n" (designation base father)
-      }
-  | MarriageDateAfterDeath p ->
-      do {
-        fprintf log_oc.val "%s\n" (designation base p);
-        fprintf log_oc.val "married after his/her death\n"
-      }
-  | MarriageDateBeforeBirth p ->
-      do {
-        fprintf log_oc.val "%s\n" (designation base p);
-        fprintf log_oc.val "married before his/her birth\n"
-      }
-  | MotherDeadAfterChildBirth mother child ->
-      fprintf log_oc.val
-        "%s\n  is born after the death of his/her mother\n%s\n"
-        (designation base child) (designation base mother)
-  | ParentBornAfterChild parent child ->
-      fprintf log_oc.val "%s born after his/her child %s\n"
-        (designation base parent) (designation base child)
-  | ParentTooYoung p a ->
-      fprintf log_oc.val "%s was parent at age of %d\n"
-        (designation base p) (year_of a)
-  | TitleDatesError p t ->
-      do {
-        fprintf log_oc.val "%s\n" (designation base p);
-        fprintf log_oc.val "has incorrect title dates as:\n";
-        fprintf log_oc.val "  %s %s\n" (sou base t.t_ident)
-          (sou base t.t_place)
-      }
-  | UndefinedSex _ -> ()
-  | YoungForMarriage p a ->
-      fprintf log_oc.val "%s married at age %d\n" (designation base p)
-        (year_of a) ]
-;
-
 value find_lev0 =
   parser bp
     [: _ = line_start '0'; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
@@ -2703,15 +2615,20 @@ value finish_base base =
     check_parents_sex base;
     check_parents_children base;
     if try_negative_dates.val then negative_dates base else ();
-    check_base base
+    Check.check_base base
       (fun x ->
-         do { print_base_error base x; fprintf log_oc.val "\n" })
+         do {
+           Check.print_base_error log_oc.val base x;
+           fprintf log_oc.val "\n"
+         })
       (fun
        [ UndefinedSex _ -> ()
        | x ->
            do {
-             print_base_warning base x; fprintf log_oc.val "\n"
-           } ]);
+             Check.print_base_warning log_oc.val base x;
+             fprintf log_oc.val "\n"
+           } ])
+      (fun _ -> True) False;
     flush log_oc.val
   }
 ;

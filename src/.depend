@@ -29,11 +29,11 @@ changeChildren.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi \
 changeChildren.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx \
     history.cmx iovalue.cmx name.cmx update.cmx util.cmx \
     ../wserver/wserver.cmx 
-check.cmo: adef.cmi def.cmi gutil.cmi 
-check.cmx: adef.cmx def.cmi gutil.cmx 
+check.cmo: adef.cmi consangAll.cmo def.cmi gutil.cmi 
+check.cmx: adef.cmx consangAll.cmx def.cmi gutil.cmx 
 config.cmi: def.cmi 
-consang.cmo: adef.cmi check.cmo def.cmi gutil.cmi consang.cmi 
-consang.cmx: adef.cmx check.cmx def.cmi gutil.cmx consang.cmi 
+consang.cmo: adef.cmi def.cmi gutil.cmi consang.cmi 
+consang.cmx: adef.cmx def.cmi gutil.cmx consang.cmi 
 consang.cmi: def.cmi 
 consangAll.cmo: adef.cmi consang.cmi def.cmi gutil.cmi 
 consangAll.cmx: adef.cmx consang.cmx def.cmi gutil.cmx 
@@ -87,9 +87,9 @@ gutil.cmo: adef.cmi buff.cmo def.cmi name.cmi gutil.cmi
 gutil.cmx: adef.cmx buff.cmx def.cmi name.cmx gutil.cmi 
 gutil.cmi: adef.cmi def.cmi 
 gwc.cmo: adef.cmi argl.cmo check.cmo consangAll.cmo def.cmi gutil.cmi \
-    gwcomp.cmo iobase.cmi lock.cmi name.cmi secure.cmi 
+    gwcomp.cmo iobase.cmi iovalue.cmi lock.cmi name.cmi secure.cmi 
 gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx def.cmi gutil.cmx \
-    gwcomp.cmx iobase.cmx lock.cmx name.cmx secure.cmx 
+    gwcomp.cmx iobase.cmx iovalue.cmx lock.cmx name.cmx secure.cmx 
 gwcomp.cmo: adef.cmi calendar.cmi def.cmi gutil.cmi 
 gwcomp.cmx: adef.cmx calendar.cmx def.cmi gutil.cmx 
 gwd.cmo: adef.cmi argl.cmo base64.cmo buff.cmo config.cmi def.cmi doc.cmo \
