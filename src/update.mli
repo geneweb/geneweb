@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 1.2 1998-09-29 12:22:43 ddr Exp $ *)
+(* $Id: update.mli,v 1.3 1998-09-30 07:29:26 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -27,6 +27,6 @@ value print_date :
 
 value print_src : config -> string -> string -> unit;
 
-value print_someone : base -> base_person -> unit;
+value print_someone : config -> base -> base_person -> unit;
 
 value print : config -> base -> base_person -> unit;

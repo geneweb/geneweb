@@ -38,18 +38,23 @@
 <li>
 
 <FORM method=GET action="%f">%h
-显示所的
-<ul>
-<li><input type=radio name=m value=N checked>姓
-<li><input type=radio name=m value=P>名
-</ul>
-根据
-<ul>
-<li><input type=radio name=tri value=A checked>字母序
-<li><input type=radio name=tri value=F>访问次数
-</ul>
+<table border=0>
+<tr>
+<td valign=center>显示所的
+<td>
+<input type=radio name=m value=N checked>姓
+<br>
+<input type=radio name=m value=P>名
+<td valign=center>根据
+<td>
+<input type=radio name=tri value=A checked>字母序
+<br>
+<input type=radio name=tri value=F>访问次数
+<td valign=center>
 =&gt;
 <INPUT TYPE=submit VALUE="Ok">
+</tr>
+</table>
 </FORM>
 
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.

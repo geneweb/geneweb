@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.5 1998-09-29 16:12:25 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.6 1998-09-30 07:29:28 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -22,6 +22,7 @@ value get_nth env key cnt = p_getenv env (key ^ string_of_int cnt);
 value rec reconstitute_string_list conf var ext cnt =
   match get_nth conf.env var cnt with
   [ Some s ->
+      let s = f_aoc conf s in
       let (sl, ext) = reconstitute_string_list conf var ext (cnt + 1) in
       match get_nth conf.env ("add_" ^ var) cnt with
       [ Some "on" -> ([s; "" :: sl], True)
@@ -52,7 +53,7 @@ value rec reconstitute_titles conf ext cnt =
         match (get_nth conf.env "t_main_title" cnt, t_name) with
         [ (Some "on", _) -> Tmain
         | (_, "") -> Tnone
-        | (_, _) -> Tname t_name ]
+        | (_, _) -> Tname (f_aoc conf t_name) ]
       in
       let t_date_start =
         Update.reconstitute_date conf ("t_date_start" ^ string_of_int cnt)
@@ -66,7 +67,8 @@ value rec reconstitute_titles conf ext cnt =
         | _ -> 0 ]
       in
       let t =
-        {t_name = t_name; t_title = t_title; t_place = t_place;
+        {t_name = t_name; t_title = f_aoc conf t_title;
+         t_place = f_aoc conf t_place;
          t_date_start = Adef.codate_of_od t_date_start;
          t_date_end = Adef.codate_of_od t_date_end;
          t_nth = t_nth}
@@ -115,7 +117,7 @@ value reconstitute_person conf =
     | _ -> -1 ]
   in
   let first_name = f_aoc conf (strip_spaces (get conf.env "first_name")) in
-  let surname = strip_spaces (get conf.env "surname") in
+  let surname = f_aoc conf (strip_spaces (get conf.env "surname")) in
   let occ =
 (*
     if first_name = "?" || surname = "?" then 0
@@ -126,7 +128,7 @@ value reconstitute_person conf =
   in
   let photo =
     match p_getenv conf.env "photo" with
-    [ Some s -> strip_spaces s
+    [ Some s -> f_aoc conf (strip_spaces s)
     | _ -> "" ]
   in
   let (first_names_aliases, ext) =
@@ -137,7 +139,7 @@ value reconstitute_person conf =
   in
   let public_name =
     match p_getenv conf.env "public_name" with
-    [ Some s -> s
+    [ Some s -> f_aoc conf s
     | None -> "" ]
   in
   let (nicknames, ext) = reconstitute_string_list conf "nickname" ext 0 in
@@ -152,7 +154,7 @@ value reconstitute_person conf =
   in
   let occupation =
     match p_getenv conf.env "occu" with
-    [ Some s -> s
+    [ Some s -> f_aoc conf s
     | None -> "" ]
   in
   let sex =
@@ -163,19 +165,20 @@ value reconstitute_person conf =
   in
   let public = False in
   let birth = Adef.codate_of_od (Update.reconstitute_date conf "birth") in
-  let birth_place = get conf.env "birth_place" in
+  let birth_place = f_aoc conf (get conf.env "birth_place") in
   let bapt = Adef.codate_of_od (Update.reconstitute_date conf "bapt") in
-  let bapt_place = get conf.env "bapt_place" in
+  let bapt_place = f_aoc conf (get conf.env "bapt_place") in
   let death = reconstitute_death conf in
   let death_place =
     match death with
-    [ Death _ _ | DeadYoung | DeadDontKnowWhen -> get conf.env "death_place"
+    [ Death _ _ | DeadYoung | DeadDontKnowWhen ->
+        f_aoc conf (get conf.env "death_place")
     | _ -> "" ]
   in
   let burial = reconstitute_burial conf in
   let burial_place =
     match burial with
-    [ Buried _ | Cremated _ -> get conf.env "burial_place"
+    [ Buried _ | Cremated _ -> f_aoc conf (get conf.env "burial_place")
     | _ -> "" ]
   in
   let death =
@@ -185,12 +188,12 @@ value reconstitute_person conf =
   in
   let notes =
     match p_getenv conf.env "notes" with
-    [ Some s -> strip_spaces (strip_controls_m s)
+    [ Some s -> f_aoc conf (strip_spaces (strip_controls_m s))
     | _ -> "" ]
   in
   let psources =
     match p_getenv conf.env "src" with
-    [ Some s -> strip_spaces s
+    [ Some s -> f_aoc conf (strip_spaces s)
     | _ -> "" ]
   in
   let p =
@@ -203,13 +206,13 @@ value reconstitute_person conf =
      occupation = occupation;
      sexe = sex; access = access;
      birth = birth; birth_place = birth_place;
-     birth_src = get conf.env "birth_src";
+     birth_src = f_aoc conf (get conf.env "birth_src");
      baptism = bapt; baptism_place = bapt_place;
-     baptism_src = get conf.env "bapt_src";
+     baptism_src = f_aoc conf (get conf.env "bapt_src");
      death = death; death_place = death_place;
-     death_src = get conf.env "death_src";
+     death_src = f_aoc conf (get conf.env "death_src");
      burial = burial; burial_place = burial_place;
-     burial_src = get conf.env "burial_src";
+     burial_src = f_aoc conf (get conf.env "burial_src");
      family = [| |]; notes = notes; psources = psources;
      cle_index = Adef.iper_of_int cle_index}
   in
