@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.28 2001-02-13 14:13:39 ddr Exp $
+# $Id: a.gwf,v 3.29 2001-03-01 13:03:30 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -108,8 +108,9 @@ max_cousins=2000
 # Number of latest events (birth, death) displayed
 latest_event=20
 
-# Always display the children surnames in descendant displaying even if
-# same than father; "yes" = do it; "no" = don't
+# Always display the children surnames even if same than father.
+# Applies in descendants page and in surname displaying page.
+# "yes" = do it; "no" = don't
 always_surname=no
 
 # History: set it to yes to save update traces in data base (in file named
