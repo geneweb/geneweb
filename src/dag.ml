@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.7 1999-12-14 15:22:09 ddr Exp $ *)
+(* $Id: dag.ml,v 3.8 1999-12-17 20:49:21 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -100,19 +100,9 @@ do List.iter (fun id -> Printf.eprintf "- %s\n" (denomination base (poi base nod
 
 (* main *)
 
-value print_dag conf base set spl d =
+value gen_print_dag conf base spouse_on invert set spl d =
   let title _ =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
-  in
-  let invert =
-    match Util.p_getenv conf.env "invert" with
-    [ Some "on" -> True
-    | _ -> False ]
-  in
-  let spouse_on =
-    match Util.p_getenv conf.env "spouse" with
-    [ Some "on" -> True
-    | _ -> False ]
   in
   let d = if invert then invert_dag d else d in
   let t = table_of_dag False d in
@@ -123,7 +113,7 @@ value print_dag conf base set spl d =
     do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
        Wserver.wprint "%s" (Date.short_dates_text conf base p);
        let spouses =
-         if spouse_on && n.chil <> [] || n.pare = [] then
+         if spouse_on && n.chil <> [] || n.pare = [] && not invert then
            List.fold_left
              (fun list id ->
                 let cip = d.dag.(int_of_idag id).valu in
@@ -167,6 +157,20 @@ do let d = tag_dag d in print_char_table d (table_of_dag d); flush stderr; retur
        d t;
      Util.trailer conf;
   return ()
+;
+
+value print_dag conf base set spl d =
+  let spouse_on =
+    match Util.p_getenv conf.env "spouse" with
+    [ Some "on" -> True
+    | _ -> False ]
+  in
+  let invert =
+    match Util.p_getenv conf.env "invert" with
+    [ Some "on" -> True
+    | _ -> False ]
+  in
+  gen_print_dag conf base spouse_on invert set spl d
 ;
 
 value print conf base =
