@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.24 1999-01-06 12:14:57 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.25 1999-01-08 10:22:54 roglo Exp $ *)
 
 open Config;
 open Def;
@@ -268,7 +268,11 @@ value match_auth sauth uauth =
   else
     match lindex sauth ':' with
     [ Some _ -> sauth = uauth
-    | None -> ":" ^ sauth = uauth ]
+    | None ->
+        match lindex uauth ':' with
+        [ Some i ->
+            sauth = String.sub uauth (i + 1) (String.length uauth - i - 1)
+        | None -> sauth = uauth ] ]
 ;
 
 value connection_accepted cgi (addr, request) str env =
@@ -372,8 +376,6 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
   let conf =
     {wizard = wizard && not wizard_just_friend;
      friend = friend || wizard_just_friend && wizard;
-     has_wizard_passwd = real_wizard_passwd <> "";
-     has_friend_passwd = real_friend_passwd <> "";
      cgi = cgi;
      command = command;
      lang = if lang = "" then default_lang else lang;

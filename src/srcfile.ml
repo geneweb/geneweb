@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.10 1999-01-06 10:47:44 ddr Exp $ *)
+(* $Id: srcfile.ml,v 1.11 1999-01-08 10:22:56 roglo Exp $ *)
 
 open Config;
 open Def;
@@ -193,11 +193,9 @@ value rec copy_from_channel conf base ic =
             | 'x' ->
                 if conf.wizard || conf.friend then () else echo.val := False
             | 'y' ->
-                if not conf.wizard && conf.has_wizard_passwd then ()
-                else echo.val := False
+                if not conf.wizard then () else echo.val := False
             | 'z' ->
-                if not conf.wizard && not conf.friend
-                && conf.has_wizard_passwd && conf.has_friend_passwd then ()
+                if not conf.wizard && not conf.friend then ()
                 else echo.val := False
             | c -> Wserver.wprint "%%%c" c ]
       | c -> if echo.val then Wserver.wprint "%c" c else () ];
