@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 4.9 2003-08-07 09:25:50 ddr Exp $ *)
+(* $Id: image.ml,v 4.10 2003-08-07 11:43:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -95,6 +95,6 @@ value print_html conf base =
 	 let v = if k = "m" then "IM" else v in
 	 Wserver.wprint "%s%s=%s" (if first then "" else ";") k v)
       conf.env;
-    Wserver.wprint ">\n</body>\n</html>";
+    Wserver.wprint "\">\n</body>\n</html>";
   }
 ;
