@@ -13,6 +13,8 @@ GeneWeb Version 4.02
     of Camlp4.
 
 * GeneWeb daemon/CGI (gwd)
+  - [03 Jun 01] Fixed inverted alphabetic order of first name for index
+    of descendants and spouses.
   - [01 Jun 01] Changed displaying in forum: the header are displayed by
     groups of two months, in order that the changes of the tables sizes
     in a new month be invisible.
