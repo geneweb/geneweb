@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.36 2001-01-09 09:13:10 ddr Exp $ *)
+(* $Id: dag.ml,v 3.37 2001-01-10 15:24:50 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -432,7 +432,7 @@ value strip_troublemakers s =
             loop j where rec loop k =
               match s.[k] with
               [ 'a'..'z' | 'A'..'Z' -> loop (k + 1)
-              | _ -> (String.sub s j (k - j), k) ]
+              | _ -> (String.lowercase (String.sub s j (k - j)), k) ]
           in
           let j =
             loop j where rec loop j =
