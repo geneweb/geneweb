@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.174 2000-11-06 15:58:58 ddr Exp $
+# $Id: lexicon.txt,v 3.175 2000-11-06 19:01:32 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3557,6 +3557,7 @@ ru: подробно
 se: ut&ouml;kad rapport
 
     loop in data base: %s is his/her own ancestor
+dk: loop i databasen: %s er sin egen ane
 en: loop in data base: %s is his/her own ancestor
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 se: loop i databasen: %s &auml;r sin egen ana
