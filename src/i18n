@@ -178,6 +178,7 @@ link
 link between
 list/list (ancestors)
 long display
+loop in data base: %s is his/her own ancestor
 main title
 male line/female line
 marriage of %t after his/her death
@@ -241,7 +242,6 @@ possibly (date)
 precision
 previous sibling
 private
-probable loop in base
 public
 public name
 qualifier
