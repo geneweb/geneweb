@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.59 1999-06-21 14:16:44 ddr Exp $
+# $Id: lexicon.txt,v 2.60 1999-06-22 16:47:26 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2201,7 +2201,7 @@ se: kanske
 
     merge
 de: zusammenf&uuml;hren
-dk: sammenf&oslash;j
+dk: sammenl&aelig;g
 en: merge
 eo: fuzii +decl
 es: fusionar
@@ -2214,7 +2214,7 @@ se: sl&aring;samman
 
     merge done
 de: Zusammenf&uuml;hrung abgeschlossen
-dk: sammenf&oslash;jning udf&oslash;rt
+dk: sammenl&aelig;gning udf&oslash;rt
 en: merge done
 es: fusi&oacute;n terminada
 he:  האיחוד בוצע
@@ -3870,7 +3870,7 @@ se: &aring;r gammal
 
     you must first merge
 de: Sie m&uuml;ssen erst zusammenf&uuml;hren
-dk: du skal f&oslash;rst sammenf&oslash;je
+dk: du skal f&oslash;rst sammenl&aelig;gge
 en: you must first merge
 es: antes Ud. debe fusionar
 fr: vous devez d'abord fusionner
@@ -3883,7 +3883,7 @@ se: du m&aring;ste f&ouml;rst sl&aring;samman
 
     you must first merge the 2 families
 de: Sie m&uuml;ssen erst beide Familien zusammenf&uuml;hren
-dk: du skal f&oslash;rst sammenf&oslash;je de 2 familier
+dk: du skal f&oslash;rst sammenl&aelig;gge de 2 familier
 en: you must first merge the 2 families
 es: debe primero fusionar las 2 familias
 fr: vous devez d'abord fusionner les 2 familles
