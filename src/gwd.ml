@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.21 1999-08-07 09:10:37 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.22 1999-08-08 06:37:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -7,6 +7,7 @@ open Def;
 open Gutil;
 
 value selected_port = ref 2317;
+value redirected_addr = ref None;
 value wizard_passwd = ref "";
 value friend_passwd = ref "";
 value only_address = ref "";
@@ -256,6 +257,25 @@ value print_renamed conf new_n =
   return ()
 ;
 
+value print_redirected conf new_addr =
+  let  title _ = Wserver.wprint "Address changed" in
+  let link =
+    let req = Util.get_request_string conf in
+    "http://" ^ new_addr ^ req
+  in
+  do Util.header conf title;
+     Wserver.wprint "The address of this service has changed.\n";
+     Wserver.wprint "Please use now:\n";
+     Util.html_p conf;
+     tag "ul" begin
+       Util.html_li conf;
+       stag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
+       Wserver.wprint "\n";
+     end;
+     Util.trailer conf;
+  return ()
+;
+
 value log_count =
   fun
   [ Some (welcome_cnt, request_cnt, start_date) ->
@@ -488,14 +508,17 @@ use \"can_send_image\".\n"
   in
   if conf.bname = "" then propose_base conf
   else
-    match
-      try Some (List.assoc "renamed" base_env) with [ Not_found -> None ]
-    with
-    [ Some n when n <> "" -> print_renamed conf n
-    | _ ->
-        do start_with_base conf conf.bname;
-           if sleep > 0 then Unix.sleep sleep else ();
-        return () ]
+    match redirected_addr.val with
+    [ Some addr -> print_redirected conf addr
+    | None ->
+        match
+          try Some (List.assoc "renamed" base_env) with [ Not_found -> None ]
+        with
+        [ Some n when n <> "" -> print_renamed conf n
+        | _ ->
+            do start_with_base conf conf.bname;
+               if sleep > 0 then Unix.sleep sleep else ();
+            return () ] ]
 ;
 
 value chop_extension name =
@@ -922,6 +945,9 @@ value main () =
      ("-robot_xcl", Arg.String robot_exclude_arg,
       "<cnt>,<sec>
        Exclude connections when more than <cnt> requests in <sec> seconds.");
+     ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x),
+      "<addr>
+       Send a message to say that this service has been redirected to <addr>");
      ("-nolock", Arg.Set Lock.no_lock_flag,
       "
        Do not lock files before writing.") ::
