@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.29 2000-06-20 18:51:23 ddr Exp $ *)
+(* $Id: perso.ml,v 3.30 2000-06-20 21:54:11 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -455,10 +455,9 @@ value print_family conf base p a ifam =
      if Array.length fam.witnesses > 0 then
        do Wserver.wprint "\n(";
           Wserver.wprint "%s"
-            (capitale
-               (nominative
-                 (transl_nth conf "witness/witnesses"
-                    (if Array.length fam.witnesses = 1 then 0 else 1))));
+            (nominative
+              (transl_nth conf "witness/witnesses"
+                 (if Array.length fam.witnesses = 1 then 0 else 1)));
           for i = 0 to Array.length fam.witnesses - 1 do
             let p = poi base fam.witnesses.(i) in
             do Wserver.wprint "%c " (if i = 0 then ':' else ',');
