@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 1.17 1999-02-12 12:37:02 ddr Exp $ *)
+(* $Id: family.ml,v 1.18 1999-02-13 21:55:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -332,6 +332,10 @@ value family_m conf base =
          trailer conf;
       return ()
   | Some "RL" -> RelationLink.print conf base
+  | Some "SND_PHOTO" when conf.wizard && conf.can_send_photo ->
+      SendPhoto.print conf base
+  | Some "SND_PHOTO_OK" when conf.wizard && conf.can_send_photo ->
+      SendPhoto.print_send_ok conf base
   | Some "SWI_FAM" when conf.wizard ->
       UpdateFam.print_swi conf base
   | Some "SWI_FAM_OK" when conf.wizard ->

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.29 1999-02-12 14:55:02 ddr Exp $ *)
+(* $Id: util.ml,v 1.30 1999-02-13 21:55:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -404,12 +404,18 @@ value surname_end n =
   if i == 0 then n else String.sub n i (String.length n - i)
 ;
 
+value rec skip_spaces s i =
+  if i < String.length s && s.[i] == ' ' then skip_spaces s (i + 1)
+  else i
+;
+
 value create_env s =
   let rec get_assoc beg i =
     if i == String.length s then
       if i == beg then [] else [String.sub s beg (i - beg)]
     else if s.[i] == ';' || s.[i] == '&' then
-      [String.sub s beg (i - beg) :: get_assoc (succ i) (succ i)]
+      let next_i = skip_spaces s (succ i) in
+      [String.sub s beg (i - beg) :: get_assoc next_i next_i]
     else get_assoc beg (succ i)
   in
   let rec separate i s =
@@ -955,4 +961,21 @@ value sosa_of_branch ipl =
        | Feminine -> Num.inc b 1
        | Neuter -> assert False ])
     Num.one ipl
+;
+
+value space_to_unders s =
+  match rindex s ' ' with
+  [ Some _ ->
+      let s' = String.create (String.length s) in
+      do for i = 0 to String.length s - 1 do
+           s'.[i] := if s.[i] = ' ' then '_' else s.[i];
+         done;
+      return s'
+  | None -> s ]
+;
+
+value default_photo_name base p =
+  let f = space_to_unders (Name.lower (sou base p.first_name)) in
+  let s = space_to_unders (Name.lower (sou base p.surname)) in
+  f ^ "." ^ string_of_int p.occ ^ "." ^ s
 ;

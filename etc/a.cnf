@@ -1,3 +1,4 @@
+# $Id: a.cnf,v 1.6 1999-02-13 21:55:00 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -40,6 +41,9 @@ wizard_just_friend=no
 
 # Default language
 default_lang=fr
+
+# Authorization for wizards to send photos (no: cannot; yes: can)
+can_send_photo=no
 
 # Uncomment the following definition to specify that the present database has
 # been renamed:

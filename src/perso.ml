@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.29 1999-02-12 14:55:01 ddr Exp $ *)
+(* $Id: perso.ml,v 1.30 1999-02-13 21:55:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -66,23 +66,6 @@ value next_sibling base p a =
           else Some (poi base fam.children.(i+1))
         else loop (i + 1)
   | None -> None ]
-;
-
-value space_to_unders s =
-  match rindex s ' ' with
-  [ Some _ ->
-      let s' = String.create (String.length s) in
-      do for i = 0 to String.length s - 1 do
-           s'.[i] := if s.[i] = ' ' then '_' else s.[i];
-         done;
-      return s'
-  | None -> s ]
-;
-
-value default_photo_name base p =
-  let f = space_to_unders (Name.lower (sou base p.first_name)) in
-  let s = space_to_unders (Name.lower (sou base p.surname)) in
-  f ^ "." ^ string_of_int p.occ ^ "." ^ s
 ;
 
 value

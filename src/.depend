@@ -41,15 +41,17 @@ descend.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx util.cmx \
 family.cmo: adef.cmi advSearchOk.cmo alln.cmo ansel.cmo ascend.cmo \
     birthDeath.cmo birthday.cmo config.cmi cousins.cmo date.cmi def.cmi \
     descend.cmo gutil.cmi merge.cmi mergeFam.cmo mergeFamOk.cmo mergeInd.cmo \
-    mergeIndOk.cmo name.cmi perso.cmi relation.cmo relationLink.cmo some.cmo \
-    srcfile.cmi title.cmo update.cmi updateFam.cmi updateFamOk.cmo \
-    updateInd.cmi updateIndOk.cmi util.cmi ../wserver/wserver.cmi family.cmi 
+    mergeIndOk.cmo name.cmi perso.cmi relation.cmo relationLink.cmo \
+    sendPhoto.cmo some.cmo srcfile.cmi title.cmo update.cmi updateFam.cmi \
+    updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi \
+    ../wserver/wserver.cmi family.cmi 
 family.cmx: adef.cmx advSearchOk.cmx alln.cmx ansel.cmx ascend.cmx \
     birthDeath.cmx birthday.cmx config.cmi cousins.cmx date.cmx def.cmi \
     descend.cmx gutil.cmx merge.cmx mergeFam.cmx mergeFamOk.cmx mergeInd.cmx \
-    mergeIndOk.cmx name.cmx perso.cmx relation.cmx relationLink.cmx some.cmx \
-    srcfile.cmx title.cmx update.cmx updateFam.cmx updateFamOk.cmx \
-    updateInd.cmx updateIndOk.cmx util.cmx ../wserver/wserver.cmx family.cmi 
+    mergeIndOk.cmx name.cmx perso.cmx relation.cmx relationLink.cmx \
+    sendPhoto.cmx some.cmx srcfile.cmx title.cmx update.cmx updateFam.cmx \
+    updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
+    ../wserver/wserver.cmx family.cmi 
 family.cmi: config.cmi def.cmi 
 gutil.cmo: adef.cmi ansel.cmo def.cmi name.cmi gutil.cmi 
 gutil.cmx: adef.cmx ansel.cmx def.cmi name.cmx gutil.cmi 
@@ -127,6 +129,10 @@ relationLink.cmx: adef.cmx config.cmi consang.cmx date.cmx def.cmi gutil.cmx \
     num.cmx pqueue.cmx util.cmx ../wserver/wserver.cmx 
 select.cmo: adef.cmi def.cmi gutil.cmi 
 select.cmx: adef.cmx def.cmi gutil.cmx 
+sendPhoto.cmo: adef.cmi config.cmi def.cmi gutil.cmi iobase.cmi srcfile.cmi \
+    update.cmi util.cmi ../wserver/wserver.cmi 
+sendPhoto.cmx: adef.cmx config.cmi def.cmi gutil.cmx iobase.cmx srcfile.cmx \
+    update.cmx util.cmx ../wserver/wserver.cmx 
 some.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
 some.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
@@ -191,6 +197,7 @@ mk_consang.cmo mk_consang.cmx: pa_lock.cmo
 perso.cmo perso.cmx: pa_html.cmo
 relation.cmo relation.cmx: pa_lock.cmo pa_html.cmo
 relationLink.cmo relationLink.cmx: pa_html.cmo
+sendPhoto.cmo sendPhoto.cmx: pa_lock.cmo pa_html.cmo
 some.cmo some.cmx: def.syn.cmo
 srcfile.cmo srcfile.cmx: pa_lock.cmo pa_html.cmo
 title.cmo title.cmx: def.syn.cmo pa_html.cmo

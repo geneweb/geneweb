@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 1.14 1999-02-12 14:55:03 ddr Exp $ *)
+(* $Id: util.mli,v 1.15 1999-02-13 21:55:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -98,3 +98,5 @@ value branch_of_sosa : base -> iper -> Num.t -> option (list (iper * sex));
 value sosa_of_branch : list (iper * sex) -> Num.t;
 
 value print_link_to_welcome : config -> bool -> unit;
+
+value default_photo_name : base -> base_person -> string;
