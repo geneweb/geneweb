@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.237 2001-02-17 09:46:40 ddr Exp $
+# $Id: lexicon.txt,v 3.238 2001-02-19 18:51:24 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -460,7 +460,7 @@ dk: s&oslash;ndag/mandag/tirsdag/onsdag/torsdag/fredag/l&oslash;rdag
 en: Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday
 eo: dimancxo/lundo/mardo/merkredo/jaùdo/vendredo/sabato
 es: domingo/lunes/martes/mi&eacute;rcoles/jueves/viernes/s&aacute;bado
-et: pühapäev:e:+al/esmaspäev:e:+al/teisipäev:e:+al/kolmapäev:e:+al/neljapäeval:e:+al/reede:e:+al/laupäev:e:+al
+et: pühapäev:e:+al/esmaspäev:e:+al/teisipäev:e:+al/kolmapäev:e:+al/neljapäeval:e:+al/reede:e:+l/laupäev:e:+al
 fi: sunnuntai:e:+na/maanantai:e:+na/tiistai:e:+na/keskiviikko:e:+na/torstai:e:+na/perjantai:e:+na/lauantai:e:+na
 fr: dimanche/lundi/mardi/mercredi/jeudi/vendredi/samedi
 he:  éåí à'/ éåí á'/ éåí â'/ éåí ã'/ éåí ä'/ éåí å'/ ùáú
@@ -526,7 +526,7 @@ dk: , er det
 en: , it will be
 eo: , estos
 es: , ser&aacute;
-et: ,
+et: , on 
 fi: ,
 fr: , ce sera
 he:  , éäéä
@@ -680,7 +680,7 @@ dk: en f&aelig;tter af %s grad/en kusine af %s grad
 en: a %s cousin
 eo: %s grada kuzo/%s grada kuzino/%s grada kuz(in)o
 es: un primo en %s grado/una prima en %s grado/un(a) primo(a) en %s grado
-et: %s nõbu
+et: %s astme nõbu:g:--o
 fi: %s serkku:g:--un
 fr: un cousin au %s degr&eacute;/une cousine au %s degr&eacute;/un(e) cousin(e) au %s degr&eacute;
 he:  áï-ãåã ìãøâä  %s/ áú-ãåã ìãøâä  %s
@@ -702,7 +702,7 @@ dk: en f&aelig;tter af 2. grad/en kusine af 2. grad
 en: a 2nd cousin
 eo: rekta prakuzo/rekta prakuzino/rekta kuz(in)o
 es: un primo nacido de primos hermanos/una prima nacida de primos hermanos/un(a) primo(a) nacido(a) de primos hermanos
-et: teise astme nõbu
+et: teise astme nõbu:g:--o
 fi: pikkuserkku
 fr: un cousin issu de germains/une cousine issue de germains/un(e) cousin(e) issu(e) de germains
 he:  áï-ãåã ùğé/ áú-ãåã ùğéä
@@ -724,7 +724,7 @@ dk: en f&aelig;tter af 3. grad/en kusine af 3. grad
 en: a 3rd cousin
 eo: 3a grada kuzo/3a grada kuzino/3a grada kuz(in)o
 es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
-et: kolmanda astme nõbu
+et: kolmanda astme nõbu:g:--o
 fi: kolmas serkku
 fr: un cousin issu d'issus de germains/une cousine issue d'issus de germains/un(e) cousin(e) issu(e) d'issus de germains
 he:  áï-ãåã ùìéùé/ áú-ãåã ùìéùéú
@@ -746,7 +746,7 @@ dk: en svoger/en svigerinde
 en: a brother-in-law/a sister-in-law
 eo: bofrato/bofratino
 es: un cu&ntilde;ado/una cu&ntilde;ada
-et: küdi või nääl või õemees/nadu või käli või vennanaine
+et: küdi või nääl:g:+u või õemees:g:--he/nadu või käli või vennanaine:g:--se
 fi: lanko/k&auml;ly
 fr: un beau-fr&egrave;re/une belle-soeur
 he:  âéñ/ âéñä
@@ -768,7 +768,7 @@ dk: en broder/en s&oslash;ster/en broder eller en s&oslash;ster
 en: a brother/a sister/a sibling
 eo: frato/fratino/frat(in)o
 es: un hermano/una hermana/un(a) hermano(a)
-et: vend/õde/õde või vend
+et: vend:g:-na/õde:g:--e/õde:g:--e või vend:g:-na
 fi: veli/sisar/sisarus
 fr: un fr&egrave;re/une soeur/un fr&egrave;re ou une soeur
 he:   àç/ àçåú/ àç(åú)
@@ -790,7 +790,7 @@ dk: en f&aelig;tter/en kusine
 en: a cousin
 eo: kuzo/kuzino
 es: un primo/una prima
-et: nõbu
+et: nõbu:g:--o
 fi: serkku:g:--un
 fr: un cousin/une cousine
 he:  áï-ãåã/ áú-ãåã
@@ -812,7 +812,7 @@ dk: en efterkommer
 en: a descendant
 eo: posteulo
 es: un descendiente/una descendiente
-et: järglane
+et: järglane:g:--se
 fi: j&auml;lkel&auml;inen
 fr: un descendant/une descendante
 he:   öàöà/ öàöàä
@@ -834,7 +834,7 @@ dk: en bedstefader/en bedstemoder/en bedstefor&aelig;lder
 en: a grandfather/a grandmother/a grandparent
 eo: avo/avino/av(in)o
 es: un abuelo/una abuela/un(a) abuelo(a)
-et: vanaisa/vanaema/vanavanem
+et: vanaisa/vanaema/vanavanem:g:+a
 fi: isois&auml;:g:+n/iso&auml;iti:g:--din/isovanhempi:g:--man
 fr: un grand-p&egrave;re/une grand-m&egrave;re/un grand-parent
 he:    ñáà/ ñáúà
@@ -856,7 +856,7 @@ dk: en s&oslash;nne(datter)-s&oslash;n/en s&oslash;nne(datter)-datter/et barneba
 en: a grandson/a granddaughter/a grandchild
 eo: nepo/nepino/nep(in)o
 es: un nieto/una nieta/un(a) nieto(a)
-et: poja- või tütrepoeg/ poja- või tütretütar/lapselaps
+et: poja- või tütrepoeg:g:--ja/poja- või tütretütar:g:--re/lapselaps:g:+e
 fi: pojan tai tytt&auml;ren poika/pojan tai tytt&auml;ren tyt&auml;r/lapsenlapsi
 fr: un petit fils/une petite fille/un petit enfant
 he:  ğëã/ ğëãä
@@ -878,7 +878,7 @@ dk: en oldefader/en oldemoder/en oldefor&aelig;lder
 en: a great-grandfather/a great-grandmother/a great-grandparent
 eo: praavo/praavino/praav(in)o
 es: un bisabuelo/una bisabuela/un(a) bisabuelo(a)
-et: vanavanaisa/vanavanaema/vanavanavanem
+et: vana-vanaisa/vana-vanaema/vana-vanavanem:g:+a
 fi: iso-isois&auml;:g:+n/iso-iso&auml;iti:g:--din/iso-isovanhempi:g:--man
 fr: un arri&egrave;re-grand-p&egrave;re/une arri&egrave;re-grand-m&egrave;re/un arri&egrave;re-grand-parent
 he:   øá-ñáà/ øá-ñáúà
@@ -900,7 +900,7 @@ dk: en oldes&oslash;n/en oldedatter/et oldebarn
 en: a great-grandson/a great-granddaughter/a great-grandchild
 eo: pranepo/pranepino/pranep(in)o
 es: un bisnieto/una bisnieta/un(a) bisnieto(a)
-et: lapselapse poeg/lapselapse tütar:g:tütre/lapselapselaps
+et: lapselapse poeg:g:--ja/lapselapse tütar:g:--re/lapselapselaps:g:+e
 fi: isois&auml;n(-&auml;idin) poika/isois&auml;n(-&auml;idin) tyt&auml;r/lapsen-lapsenlapsi
 fr: un arri&egrave;re-petit-fils/une arri&egrave;re-petite-fille/un arri&egrave;re-petit-enfant
 he:   ğéï/ ğéğä
@@ -922,7 +922,7 @@ dk: en grandnev&oslash;/en grandniece
 en: a great-nephew/a great-niece
 eo: pranevo/pranevino
 es: un bissobrino/una bissobrina
-et: venna- või õelapse poeg/venna- või õelapse tütar
+et: venna- või õelapse poeg:g:--ja/venna- või õelapse tütar:g:--re
 fi: 2. polven veljen(sisaren)poika/2. polven veljen(sisaren)tyt&auml;r
 fr: un petit neveu/une petite ni&egrave;ce
 he:   áï äàçééï/ áú äàçééï
@@ -966,7 +966,7 @@ dk: en halvbroder/en halvsøster/en halvsøskende
 en: a half-brother/a half-sister/a half-sibling
 eo: duonfrato/duonfratino/duonfrat(in)o
 es: un hermano/una hermana/un(a) hermano(a)
-et: poolvend/poolõde/poolõde või poolvend
+et: poolvend:g:-na/poolõde:g:--e/poolõde:g:--e või poolvend:g:-na
 fi: velipuoli/sisarpuoli/is&auml;(&auml;iti)puolen lapsi
 fr: un demi-fr&egrave;re/une demi-soeur/un demi-fr&egrave;re ou une demi-soeur
 he:   çöé àç/ çöé àçåú/ çöé àç(åú)
@@ -1010,7 +1010,7 @@ dk: en nev&oslash;/en niece
 en: a nephew/a niece
 eo: nevo/nevino
 es: un sobrino/a sobrina
-et: venna- või õepoeg/venna- või õetütar
+et: venna- või õepoeg:g:--ja/venna- või õetütar:g:--re
 fi: veljen(sisaren)poika/veljen(sisaren)tyt&auml;r
 fr: un neveu/une ni&egrave;ce
 he:   àçééï/ àçééğéú
@@ -1032,7 +1032,7 @@ dk: en svigers&oslash;n/en svigerdatter
 en: a son-in-law/a daughter-in-law
 eo: bofilo/bofilino
 es: un yerno/una nuera
-et: väimees/minia
+et: väimees:g:--he/minia
 fi: v&auml;vy/mini&auml;
 fr: un beau-fils/une belle-fille
 he:  çúï/ ëìä
@@ -1054,7 +1054,7 @@ dk: en s&oslash;n/en datter/et barn
 en: a son/a daughter/a child
 eo: filo/filino/ido
 es: un hijo/una hija/un(a) hijo(a)
-et: poeg/tütar/laps
+et: poeg:g:--ja/tütar:g:--re/laps:g:+e
 fi: poika/tyt&auml;r/lapsi
 fr: un fils/une fille/un enfant
 he:   áï/ áú/ éìã
@@ -1299,7 +1299,7 @@ dk: alias
 en: alias
 eo: aliasa
 es: alias
-et: teise nimega
+et: hüüdnimi
 fi: alias
 fr: alias
 he:   ùí ğåñó
@@ -1587,7 +1587,7 @@ dk: &aring;rsdage for d&oslash;de personer
 en: anniversaries of dead people
 eo: mortotagaj datrevenoj 
 es: aniversarios de las personas fallecidas
-et: surma-aastapäevad
+et: surnud inimeste mälestuspäevad
 fi: vainajien muistop&auml;ivi&auml
 fr: anniversaires des personnes d&eacute;c&eacute;d&eacute;es
 he:   éîé ùğä ìîååú
@@ -2401,7 +2401,7 @@ dk: database-forum
 en: data base forum
 eo: datenbankforumo
 es: foro de la base de datos
-et: andmabaasi foorum
+et: andmebaasi foorum
 fi: tietokantafoorumi
 fr: forum de la base de donn&eacute;es
 he:  ãééåï òì îàâø äîéãä äúåìãåúé
@@ -2535,7 +2535,7 @@ dk: d&oslash;d
 en: died
 eo: mortinta
 es: fallecido/fallecida/fallecido(a)
-et: suri
+et: surnud 
 fi: kuollut
 fr: d&eacute;c&eacute;d&eacute;/d&eacute;c&eacute;d&eacute;e/d&eacute;c&eacute;d&eacute;(e)
 he:   ğôèø/ ğôèøä
@@ -2597,6 +2597,7 @@ ct: visualitzar per seccions/llargada de la secció/encavalcament/llargada total
 de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
 dk: vis ved delte sider/sidebredde/overlapning/total bredde
 en: display by slices/slice width/overlap/total width
+et: kuva osadena/osa laius/ülekate/kogulaius
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
 nl: weergave per snede/sneebreedte/doorsnede/totale breedte
 no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
@@ -2652,6 +2653,7 @@ ct: no reagrupar les branques comunes
 de: gemeinsame Zweige nicht zusammenfassen
 dk: sl&aring; ikke f&aelig;lles anelinier sammen
 en: don't group the common branches together
+et: ära grupeeri ühiseid harusid
 fr: ne pas regrouper les branches communes
 nl: voeg de gemeenschappelijke takken niet samen
 no: sammenfallende anelinjer skal ikke slås sammen
@@ -4858,7 +4860,7 @@ dk: af den %s generation
 en: of the %s generation
 eo: el la %s generacio
 es: de la %s generaci&oacute;n
-et: %s sugupõlve
+et: (%s sugupõlv)
 fi: %s sukupolvea
 fr: &agrave; la %s g&eacute;n&eacute;ration
 he:   ìãåø  %s
@@ -4902,7 +4904,7 @@ dk: for d&oslash;den
 en: of the death
 eo: de la morto
 es: de la muerte
-et: surma
+et: surm
 fi: kuoleman
 fr: du d&eacute;c&egrave;s
 he:  ùì äîååú
@@ -5123,7 +5125,7 @@ dk: efter behag
 en: optional
 eo: nedeviga
 es: opcional
-et: mittekohustuslik
+et: vabatahtlik
 fi: valittavissa
 fr: facultatif
 he:  òì ôé áçéøä
@@ -5520,6 +5522,7 @@ dk: forbindelse/forbindelser
 en: relation/relations
 eo: konato:a:+n/konatoj
 es: relaci&oacute;n/relaciones
+et: suhe/suhted
 fi: sukulaisuus/sukulaisuutta
 fr: relation/relations
 he:  éçñéí
@@ -5608,7 +5611,7 @@ dk: forbindelse%t med
 en: relationship%t to
 eo: rilato%t kun
 es: parentesco%t con
-et: suhe%t ja
+et: suhe%t
 fi: suhde%t ja
 fr: relation%t avec
 he:  ÷éøáä
@@ -6544,7 +6547,7 @@ dk: faderen/moderen/en for&aelig;lder
 en: the father/the mother/a parent
 eo: la patro/la patrino/unu el la gepatroj
 es: el padre/la madre/un padre
-et: isa/ema/vanem:g:--a
+et: isa/ema/vanem:g:+a
 fi: is&auml;:g:+n/&auml;iti:g:--din/vanhempi:g:--man
 fr: le p&egrave;re/la m&egrave;re/un parent
 he:   äàá/ äàí/ äåøä
@@ -6676,7 +6679,7 @@ dk: oldefor&aelig;ldrene
 en: the great-grandparents
 eo: la gepraavoj
 es: los bisabuelos
-et: vanavanavanemad
+et: vana-vanavanemad
 fi: iso-isovanhemmat
 fr: les arri&egrave;re-grands-parents
 he:  äåøéí äùéìùéí
@@ -6785,7 +6788,7 @@ dk: &aelig;gtef&aelig;llen
 en: the spouse
 eo: la edzo/la edzino
 es: el esposo/l'esposa
-et: abikaasa
+et: :g: abikaasa
 fi: puoliso
 fr: l'&eacute;poux/l'&eacute;pouse
 he:  áï äæåâ/ áú äæåâ
@@ -6983,7 +6986,7 @@ dk: til oldefor&aelig;ldrene
 en: to the great-grandparents
 eo: gxis la gepraavoj
 es: hasta los bisabuelos
-et: vanavanavanemateni
+et: vana-vanavanemateni
 fi: iso-isovanhempiin
 fr: jusqu'aux arri&egrave;re-grands-parents
 he:  òã ääåøéí äùéìùéí
