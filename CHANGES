@@ -1,3 +1,10 @@
+GeneWeb version 3.05
+--------------------
+
+* GeneWeb Service/CGI (gwd)
+  - [30 Apr 00] Fixed little problem with displaying by places for the ones
+    containing several (at least two) indications between parentheses.
+
 GeneWeb version 3.04
 --------------------
 
