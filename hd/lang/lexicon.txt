@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.162 2000-10-12 13:57:07 ddr Exp $
+# $Id: lexicon.txt,v 3.163 2000-10-23 17:47:01 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -1519,6 +1519,7 @@ eo: baptita
 es: bautizado/bautizada/bautizado(a)
 fi: kastettu
 fr: baptis&eacute;/baptis&eacute;e/baptis&eacute;(e)
+he:  ìğöøåú / ğèáìä ìğöøåú   ğèáì  
 is: skírğ(ur)
 it: battezzato/battezzata/battezzato(a)
 lv: baptized
@@ -2093,6 +2094,7 @@ eo: cindrigita
 es: incinerado/incinerada/incinerado(a)
 fi: polttohaudattu
 fr: incin&eacute;r&eacute;/incin&eacute;r&eacute;e/incin&eacute;r&eacute;(e)
+he:   ğùøôä âååééä
 is: brennd(ur)
 it: cremato/cremata/cremato(a)
 lv: kremçts(a)
@@ -2370,6 +2372,7 @@ en: engaged
 eo: gefiancxigintaj
 fi: kihloissa
 fr: fianc&eacute;s
+he:  îàåøñéí
 it: fidanzarsi
 lv: saderin&acirc;ti
 nl: verloofd
@@ -2384,6 +2387,7 @@ en: engaged%t to
 eo: fiancxigita%t kun/fiancxinigita%t kun
 fi: kihlattu%t
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
+he:   äúàøñ  %t òí/ äúàøñä  %t òí
 it: fidanzato%t con/fidanzata%t con
 lv: saderin&acirc;ts%t ar
 nl: verloofd%t met
@@ -2986,6 +2990,7 @@ en: horizontally
 eo: horizontale
 fi: vaakasuoraan
 fr: horizontalement
+he:  àåô÷é
 it: orizzontalmente
 lv: horizont&acirc;li
 nl: horizontaal
@@ -3401,6 +3406,7 @@ eo: tago juliana
 es: dia julian
 fi: juliaaninen p&auml;iv&auml;
 fr: jour julien
+he:  éåí éåìéàğé
 is: julian dagur
 it: giorno julian
 nl: juliaans dag
@@ -3555,6 +3561,7 @@ en: male line/female line
 eo: vira linio /virina linio
 fi: miehen puoleinen linja/naisen puoleinen linja
 fr: lign&eacute;e agnatique/lign&eacute;e cognatique
+he:  ÷å æëøé / ÷å ğ÷áé
 it: linea agnatizia/linea cognatizia
 lv: tçva lînija/mâtes lînija
 nl: mannelijke lijn/vrouwelijke lijn
@@ -4874,6 +4881,7 @@ en: recognizing father/recognizing mother/recognizing parents
 eo: agnoskinta patro/agnoskinta patrino/agnoskintaj gepatroj
 fi: tunnustanut is&auml;/tunnustanut &auml;iti/tunnustaneet vanhemmat
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
+he:   àá îëéø / àí îëéøä / äåøéí îëéøéí
 is: viğurkenndur fağir/viğurkennd móğir/viğurkennd foreldri
 it: padre avente riconosciuto/madre avente riconosciuta/genitori aventi riconusciuti
 lv: atzîts tçvs/mâte/vecâki (?)
@@ -5089,6 +5097,7 @@ en: separated
 eo: apartigitaj
 fi: asumuserossa
 fr: s&eacute;par&eacute;s
+he:  ğôøãå
 it: separati
 lv: nedzîvo kop&acirc;
 nl: gescheiden
@@ -5164,6 +5173,7 @@ en: shortest path
 eo: vojo plej mallonga
 fi: lyhin polku
 fr: chemin le plus court
+he:   ÷ùø äëé ÷øåá  
 it: legame più diretto
 lv: îsâkais ceïğ
 nl: kortste weg
@@ -5359,6 +5369,7 @@ en: statistics
 eo: statistikoj
 fi: tilastotietoja
 fr: statistiques
+he:  ğúåğéí ñèèéñèéí
 it: statistica
 lv: statistika
 nl: statistieken
@@ -5454,6 +5465,7 @@ en: surnames list
 eo: listo de la familiaj nomoj
 fi: sukunimiluettelo
 fr: liste &eacute;clair
+he:  øùéîú ùîåú îùôçä
 lv: uzv&acirc;rdu saraksts
 nl: bijnamen lijst
 no: liste over etternavn
@@ -5567,6 +5579,7 @@ eo: la %d plej maljunaj eble ankoraù vivantaj
 es: los %s m&aacute;s viejos quiz&aacute;s todov&iacute;a vivo
 fi: %d vanhinta ehk&auml viel&auml el&auml;v&auml;&auml
 fr: les %d les plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
+he:  äæ÷ï ä %d  ùàåìé òåã áçééí 
 it: i%d più vecchi possono essere ancora viventi
 lv: %d visvecâkie iespçjams vçl ir dzîvi
 nl: de %d oudsten, mogelijk nog in leven
@@ -5602,6 +5615,7 @@ eo: la %d, kiuj vivis plejlonge
 es: los %d que han vivido m&aacute;s mucho tiempo
 fi: %d pisimpään elänyttä
 fr: les %d ayant v&eacute;cu le plus longtemps
+he:  ä %d áàøéëåú éîéí 
 it: %d avendo visuto più a lungo
 lv: %d, kuri dzîvojuği visilgâk
 nl: de %d langst levende personen
@@ -5958,6 +5972,7 @@ eo: la lastaj %d edzigxoj
 es: los %d casamientos m&aacute;s recientes
 fi: viime %d naimisiinmenoa
 fr: les %d derniers mariages
+he:  %d äğéùåàéí äàçøåğéí
 it: gli ultimi %d matrimoni
 lv: pçdçjâs %d laulîbas
 nl: de %d laatste huwelijken
