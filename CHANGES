@@ -5,7 +5,7 @@ GeneWeb version 3.04
   - [06 Apr 00] Added Afrikaans (Louis Kruger).
 
 * GeneWeb Service/CGI (gwd)
-  - [11 Mar 00] Added optional displaying of images in descendants by tree
+  - [11 Aor 00] Added optional displaying of images in descendants by tree
     and in relationship trees.
   - [03 Apr 00] In ancestor page, added horizontal displaying.
   - [02 Apr 00] In surname page, added ability to click on a branch number
@@ -17,6 +17,11 @@ GeneWeb version 3.04
     fail and the browser to answer "no output".
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [11 Apr 00] Fixed bug+problem of adoptive children when they are also
+    recorded as normal children of their adoptive parents in the GEDCOM
+    (extracted from a genealogical software having a different logic than
+    GeneWeb about this subject). The "bug" made the adoptive links not
+    appear, the "problem" made the parents family not appear.
   - [31 Mar 00] Do not enter any more GIVN as public name if equal to first
     name nor SURN as surname alias if equal to surname.
 

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.14 2000-04-10 17:08:09 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.15 2000-04-11 21:45:03 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -939,6 +939,7 @@ value forward_adop gen ip lab which_parent =
     [ Some r -> r.rval
     | _ -> "" ]
   in
+  let which_parent = if which_parent = "" then "BOTH" else which_parent in
   Hashtbl.add gen.g_adop lab (ip, which_parent)
 ;
 
@@ -1341,7 +1342,7 @@ value add_indi gen r =
   return ()
 ;
 
-value add_fam_norm gen r =
+value add_fam_norm gen r adop_list =
   let i = fam_index gen r.rval in
   let fath =
     match find_field "HUSB" r.rsons with
@@ -1372,7 +1373,17 @@ value add_fam_norm gen r =
   return
   let children =
     let rl = find_all_fields "CHIL" r.rsons in
-    List.map (fun r -> per_index gen r.rval) rl
+    List.fold_right
+      (fun r ipl ->
+         let ip = per_index gen r.rval in
+         if List.mem_assoc ip adop_list then
+           match gen.g_per.arr.(Adef.int_of_iper ip) with
+           [ Right3 _ ({parents = Some ifam} as a) _ ->
+               if ifam = i then do a.parents := None; return ipl
+               else [ip :: ipl]
+           | _ -> [ip :: ipl] ]
+         else [ip :: ipl])
+      rl []
   in
   let (not_married, marr, marr_place, marr_src) =
     match find_field "MARR" r.rsons with
@@ -1432,12 +1443,20 @@ value add_fam_norm gen r =
 ;
 
 value add_fam gen r =
-  try
-    let (ip, which_parent) = Hashtbl.find gen.g_adop r.rval in
-    set_adop_fam gen ip which_parent (find_field "HUSB" r.rsons)
-      (find_field "WIFE" r.rsons)
-  with
-  [ Not_found -> add_fam_norm gen r ]
+  let list = Hashtbl.find_all gen.g_adop r.rval in
+  match list with
+  [ [] -> add_fam_norm gen r []
+  | list ->
+      let husb = find_field "HUSB" r.rsons in
+      let wife = find_field "WIFE" r.rsons in
+      do List.iter
+           (fun (ip, which_parent) ->
+              set_adop_fam gen ip which_parent husb wife)
+           list;
+         match find_field "CHIL" r.rsons with
+         [ Some _ -> add_fam_norm gen r list
+         | _ -> () ];
+      return () ]
 ;
 
 value treat_header2 gen r =
