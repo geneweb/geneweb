@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.2 2001-06-17 11:05:39 ddr Exp $ *)
+(* $Id: place.ml,v 4.3 2001-07-15 15:23:20 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -7,13 +7,37 @@ open Gutil;
 open Util;
 open Config;
 
+value remove_trailing_space s =
+  loop (String.length s) where rec loop i =
+    if i = 0 then ""
+    else if ' ' = s.[i - 1] then loop (i - 1)
+    else String.sub s 0 i
+;
+
+value correct_start_point s =
+  let iend = String.length s in
+  let rec loop i =
+    if i = iend then s
+    else
+      let c = s.[i] in
+      if c = Char.uppercase c then
+        if i = 0 then s
+        else
+          let prefix = remove_trailing_space (String.sub s 0 i) in
+          let rest = String.sub s i (iend - i) in
+          rest ^ " (" ^ prefix ^ ")"
+      else loop (i + 1)
+  in
+  loop 0
+;
+
 value fold_place inverted s =
   let rec loop iend list i ibeg =
     if i == iend then
       if i > ibeg then [String.sub s ibeg (i - ibeg) :: list] else list
     else
       let (list, ibeg) =
-        match String.unsafe_get s i with
+        match s.[i] with
         [ ',' ->
             let list =
               if i > ibeg then [String.sub s ibeg (i - ibeg) :: list]
@@ -38,6 +62,7 @@ value fold_place inverted s =
     else (String.length s, [])
   in
   let list = rest @ loop iend [] 0 0 in
+  let list = List.map correct_start_point list in
   if inverted then List.rev list else list
 ;
 
@@ -79,13 +104,14 @@ value get_all conf base =
           let pl_bu = if add_death then p.burial_place else empty in
           if pl_bi == empty && pl_bp == empty && pl_de == empty &&
              pl_bu == empty ||
-             not (fast_auth_age conf p) then
+             not (fast_auth_age conf p)
+          then
             ()
           else do {
             if pl_bi != empty then ht_add pl_bi p else ();
             if pl_bp != empty then ht_add pl_bp p else ();
             if pl_de != empty then ht_add pl_de p else ();
-            if pl_bu != empty then ht_add pl_bu p else ();
+            if pl_bu != empty then ht_add pl_bu p else ()
           };
           loop (i + 1)
         }
@@ -105,7 +131,7 @@ value get_all conf base =
               let fath = poi base cpl.father in
               let moth = poi base cpl.mother in
               if fast_auth_age conf fath && fast_auth_age conf moth then do {
-                ht_add pl_ma fath; ht_add pl_ma moth;
+                ht_add pl_ma fath; ht_add pl_ma moth
               }
               else ()
             else ();
@@ -120,11 +146,18 @@ value get_all conf base =
       (fun (istr_pl, _) (cnt, ip) ->
          let s = fold_place inverted (sou base istr_pl) in
          if s <> [] && (ini = "" || List.hd s = ini) then do {
-           list.val := [(s, cnt.val, ip) :: list.val]; incr len;
+           list.val := [(s, cnt.val, ip) :: list.val]; incr len
          }
          else ())
       ht;
-    let list = Sort.list (fun (s1, _, _) (s2, _, _) -> s1 <= s2) list.val in
+    let list =
+      Sort.list
+        (fun (s1, _, _) (s2, _, _) ->
+           let s1 = List.map Name.lower s1 in
+           let s2 = List.map Name.lower s2 in
+           s1 <= s2)
+        list.val
+    in
     (list, len.val)
   }
 ;
@@ -137,38 +170,36 @@ value print_html_places_surnames conf base =
     let rec loop prev =
       fun
       [ [(pl, snl) :: list] ->
+          let rec loop1 prev pl =
+            match (prev, pl) with
+            [ ([], [x2 :: l2]) ->
+                do {
+                  Wserver.wprint "<li>%s\n" x2;
+                  List.iter (fun p -> Wserver.wprint "<ul>\n<li>%s\n" p) l2
+                }
+            | ([x1], [x2 :: l2]) ->
+                do {
+                  if x1 = x2 then () else Wserver.wprint "<li>%s\n" x2;
+                  List.iter (fun p -> Wserver.wprint "<ul>\n<li>%s\n" p) l2
+                }
+            | ([x1 :: l1], [x2 :: l2]) ->
+                if x1 = x2 then loop1 l1 l2
+                else do {
+                  List.iter (fun _ -> Wserver.wprint "</ul>\n") l1;
+                  Wserver.wprint "<li>%s\n" x2;
+                  List.iter (fun p -> Wserver.wprint "<ul>\n<li>%s\n" p) l2
+                }
+            | _ -> assert False ]
+          in
           do {
-            let rec loop1 prev pl =
-              match (prev, pl) with
-              [ ([], [x2 :: l2]) ->
-                  do {
-                    Wserver.wprint "<li>%s\n" x2;
-                    List.iter (fun p -> Wserver.wprint "<ul>\n<li>%s\n" p)
-                      l2;
-                  }
-              | ([x1], [x2 :: l2]) ->
-                  do {
-                    if x1 = x2 then () else Wserver.wprint "<li>%s\n" x2;
-                    List.iter (fun p -> Wserver.wprint "<ul>\n<li>%s\n" p)
-                      l2;
-                  }
-              | ([x1 :: l1], [x2 :: l2]) ->
-                  if x1 = x2 then loop1 l1 l2
-                  else do {
-                    List.iter (fun _ -> Wserver.wprint "</ul>\n") l1;
-                    Wserver.wprint "<li>%s\n" x2;
-                    List.iter (fun p -> Wserver.wprint "<ul>\n<li>%s\n" p)
-                      l2;
-                  }
-              | _ -> assert False ]
-            in
             loop1 prev pl;
             Wserver.wprint "<ul>\n<li>\n";
             let snl =
               List.map
                 (fun (len, ip) ->
                    let p = poi base ip in
-                   let sn = p_surname base p in (len, p, sn))
+                   let sn = p_surname base p in
+                   (len, p, sn))
                 snl
             in
             let snl =
@@ -192,7 +223,7 @@ value print_html_places_surnames conf base =
                  do {
                    Wserver.wprint "<a href=\"%s" (commd conf);
                    Wserver.wprint "%s" (acces conf base p);
-                   Wserver.wprint "\">%s</a> (%d),\n" sn len;
+                   Wserver.wprint "\">%s</a> (%d),\n" sn len
                  })
               snl;
             Wserver.wprint "</ul>\n";
@@ -236,7 +267,7 @@ value print_all_places_surnames_short conf list =
          Wserver.wprint "<a href=\"%sm=PS%s;k=%s\">%s</a> (%d),\n"
            (commd conf) opt (Util.code_varenv s) s len)
       list;
-    Util.trailer conf;
+    Util.trailer conf
   }
 ;
 
@@ -250,7 +281,14 @@ value print_all_places_surnames_long conf base list =
          | _ -> [(pl, [(len, ip)]) :: list] ])
       [] list
   in
-  let list = Sort.list (fun (pl1, _) (pl2, _) -> pl1 <= pl2) list in
+  let list =
+    Sort.list
+      (fun (pl1, _) (pl2, _) ->
+         let pl1 = List.map Name.lower pl1 in
+         let pl2 = List.map Name.lower pl2 in
+         pl1 <= pl2)
+      list
+  in
   let title _ =
     Wserver.wprint "%s / %s" (capitale (transl conf "place"))
       (capitale (transl_nth conf "surname/surnames" 0))
@@ -259,7 +297,7 @@ value print_all_places_surnames_long conf base list =
     Util.header conf title;
     print_link_to_welcome conf True;
     if list = [] then () else print_html_places_surnames conf base list;
-    Util.trailer conf;
+    Util.trailer conf
   }
 ;
 
