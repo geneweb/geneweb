@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: gwf_1.htm,v 1.9 2002-02-02 06:09:24 ddr Exp $ -->
+  <!-- $Id: gwf_1.htm,v 1.10 2002-03-05 09:07:56 ddr Exp $ -->
   <title>[
 de: Parameter "$a"
 en: Parameters "$a"
@@ -831,6 +831,7 @@ fr: afrikaans
 sv: afrikaans
 ]
 <option value="ca"$Edefault_lang=ca;>[
+de: Katalanisch
 en: Catalan
 es: Catalán
 fr: catalan
@@ -1007,6 +1008,7 @@ sv: kinesiska
 <tr align=left><td><strong>- max_anc_level -</strong></td></tr>
 <tr align=left>
 <td>[
+de: Maximale Stufe bei der Anzeige von Vorfahren.
 en: Maximum level when displaying ancestors.
 fr: Niveau maximum dans l'affichage des ascendants.
 ]
@@ -1014,6 +1016,9 @@ fr: Niveau maximum dans l'affichage des ascendants.
 <p>
 
 [
+de: Wenn Vorfahren angezeigt werden, soll die Anzahl der angezeigten
+    Generationen limitiert werden. Per Default ist die Anzahl acht
+    Generationen, aber du kannst hier eine andere Anzahl einstellen.
 en: When ancestors are displayed, limit the number of displayed
     generations. By default, it is 8 generations, but you can
     indicate a different value here.
@@ -1037,6 +1042,7 @@ size=5></td>
 <tr align=left><td><strong>- max_desc_level -</strong></td></tr>
 <tr align=left>
 <td>[
+de: Maximale Stufe bei der Anzeige von Nachfahren.
 en: Maximum level when displaying descendants.
 fr: Niveau maximum dans l'affichage des descendants.
 ]
@@ -1044,6 +1050,9 @@ fr: Niveau maximum dans l'affichage des descendants.
 <p>
 
 [
+de: Wenn Nachfahren angezeigt werden, soll die Anzahl der angezeigten
+    Generationen limitiert werden. Per Default ist die Anzahl zwölf
+    Generationen, aber du kannst hier eine andere Anzahl einstellen.
 en: When descendants are displayed, limit the number of displayed
     generations. By default, it is 12 generations, but you can
     indicate a different value here.
@@ -1067,6 +1076,7 @@ size=5></td>
 <tr align=left><td><strong>- max_anc_tree -</strong></td></tr>
 <tr align=left>
 <td>[
+de: Maximale Stufe bei der Anzeige von Vorfahren als Baum.
 en: Maximum level when displaying ancestors by tree.
 fr: Niveau maximum dans l'affichage des ascendants par arbre.
 ]
@@ -1074,6 +1084,9 @@ fr: Niveau maximum dans l'affichage des ascendants par arbre.
 <p>
 
 [
+de: Wenn Vorfahren in Baumstruktur angezeigt werden, soll die Anzahl der 
+    angezeigten Generationen limitiert werden. Per Default ist die Anzahl 
+    sieben Generationen, aber du kannst hier eine andere Anzahl einstellen.
 en: When ancestors are displayed by tree, limit the number of displayed
     generations. By default, it is 7 generations, but you can
     indicate a different value here.
@@ -1097,6 +1110,7 @@ size=5></td>
 <tr align=left><td><strong>- max_desc_tree -</strong></td></tr>
 <tr align=left>
 <td>[
+de: Maximale Stufe bei der Anzeige von Nachkommen als Baum.
 en: Maximum level when displaying descendants by tree.
 fr: Niveau maximum dans l'affichage des descendants par arbre.
 ]
@@ -1104,6 +1118,9 @@ fr: Niveau maximum dans l'affichage des descendants par arbre.
 <p>
 
 [
+de: Wenn Nachkommen in Baumstruktur angezeigt werden, soll die Anzahl der 
+    angezeigten Generationen limitiert werden. Per Default ist die Anzahl 
+    vier Generationen, aber du kannst hier eine andere Anzahl einstellen.
 en: When descendants are displayed by tree, limit the number of displayed
     generations. By default, it is 4 generations, but you can
     indicate a different value here.
@@ -1127,6 +1144,7 @@ size=5></td>
 <tr align=left><td><strong>- history -</strong></td></tr>
 <tr align=left>
 <td>[
+de: &Auml;nderungshistorie
 en: History of updates
 fr: Historique des mises &agrave; jour
 ]
@@ -1134,6 +1152,14 @@ fr: Historique des mises &agrave; jour
 <p>
 
 [
+de: Auf der Startseite auf &Auml;nderungen mit einem Link
+    "&Auml;nderungshistorie" hinweisen.
+    <p>
+    Technische Bemerkung: Die Update-Protokolle werden in einer Datei
+    "history" im Datenbankverzeichnis ($a.gwb) gespeichert. Diese
+    Datei w&auml;chst endlos. Du kannst sie editieren um alte
+    Informationen zu l&ouml;schen. Oder sie auch einfach l&ouml;schen,
+    wenn Du mit einer leeren Version neu beginnen willst.
 en: Ask to indicate the updates in the welcome pages as a link
     "history of updates".
     <p>
@@ -1180,6 +1206,7 @@ sv: No
 <tr align=left><td><strong>- images_path -</strong></td></tr>
 <tr align=left>
 <td>[
+de: Bildpfad
 en: Images path
 fr: Chemin d'acc&egrave;s aux images
 ]
@@ -1187,7 +1214,19 @@ fr: Chemin d'acc&egrave;s aux images
 <p>
 
 [
-en: If you want that your images are installed in the standard place
+de: Wenn Du NICHT m&ouml;chtest, dass deine Bilder am Standardort 
+    (Datenbankverzeichnis, Unterverzeichnis "images",
+    Unter-Unterverzeichnis "$a") abgelegt werden, gib hier den Pfad zu
+    dem Verzeichnis an, dass Du benutzen möchtest. Dieser Pfad ist ein
+    URL: Wenn es sich um eine Webadresse handelt, muss sie mit
+    <tt>http://</tt> beginnen, falls es ein lokales Verzeichnis ist,
+    mit <tt>file://</tt>.
+    <p>
+    Dies betrifft die Bilder, die im Personenformular im Feld "Bild"
+    eingegeben wurden, nicht aber Bilder, die über den Link "Bild
+    senden" hochgeladen wurden. Letztere werden mit Standardnamen im
+    Standardverzeichnis installiert.
+en: If do NOT want that your images are installed in the standard place
     (databases directory, sub-directory "images", sub-sub-directory "$a"),
     indicate here the path to the directory you want to use. This path is
     an URL: if it is a Web site, it must start with <tt>http://</tt>, if
@@ -1225,6 +1264,7 @@ size=50></td>
 <tr align=left><td><strong>- hide_advanced_request -</strong></td></tr>
 <tr align=left>
 <td>[
+de: Erweiterte Suche verbergen.
 en: Hide advanced request.
 fr: Cacher la requête évoluée.
 ]
@@ -1232,6 +1272,10 @@ fr: Cacher la requête évoluée.
 <p>
 
 [
+de: Die erweiterte Suche erlaubt es, Recherchen gem&auml;&szlig;
+    bestimmter Kriterien auf der Datenbank durchzuf&uuml;hren.
+    Da sie sehr unvollst&auml;ndig implementiert it, ist sie per
+    Default verborgen. W&auml;hle "Nein", um sie zu aktivieren.
 en: The advanced request allows to make researches in the data base.
     As it is very incomplete, it is hidden by default. Select "no"
     below to set it.
@@ -1481,13 +1525,17 @@ sv: No
 
 <tr align=left>
 <td>[
-en: Cacher les noms des personnes privées.
-fr: Hide the private person's names.
+de: Namen der zeitgen&ouml;ssischen Personen verbergen.
+en: Hide the private person's names.
+fr: Cacher les noms des personnes privées.
 ]
 
 <p>
 
 [
+de: Verberge die Namen zeitgen&ouml;ssischer Personen, d.h. die Namen
+    der Personen, die noch leben, oder genauer, die Personen, die
+    j&uuml;ger als ein Jahrhundert sind.
 en: Hide the names of the private persons, i.e. the still living persons
     or, more exactly, the persons of less than one century.
 fr: Cache les noms des personnes privées, c'est-à-dire les personnes
