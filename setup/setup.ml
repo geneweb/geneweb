@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.26 2002-01-14 20:50:29 ddr Exp $ *)
+(* $Id: setup.ml,v 4.27 2002-01-17 06:15:53 ddr Exp $ *)
 
 open Printf;
 
@@ -127,6 +127,13 @@ value header title =
     title False;
     Wserver.wprint "</h1>\n"
   }
+;
+
+value strip_control_m s =
+  loop 0 0 where rec loop i len =
+    if i = String.length s then Buff.get len
+    else if s.[i] = '\r' then loop (i + 1) len
+    else loop (i + 1) (Buff.store len s.[i])
 ;
 
 value strip_spaces str =
@@ -378,6 +385,55 @@ value inline_translate conf s =
   loop None True 0
 ;
 
+value get_variable strm =
+  loop 0 where rec loop len =
+    match strm with parser
+    [ [: `';' :] -> Buff.get len
+    | [: `c :] -> loop (Buff.store len c) ]
+;
+
+value get_binding strm =
+  loop 0 where rec loop len =
+    match strm with parser
+    [ [: `'=' :] -> let k = Buff.get len in (k, get_variable strm)
+    | [: `c :] -> loop (Buff.store len c) ]
+;
+
+value variables bname =
+  let dir = Filename.concat setup_dir.val "setup" in
+  let fname = Filename.concat (Filename.concat dir "lang") bname in
+  let ic = open_in fname in
+  let strm = Stream.of_channel ic in
+  let (vlist, flist) =
+    loop ([], []) where rec loop (vlist, flist) =
+      match strm with parser
+      [ [: `'$' :] ->
+          let (vlist, flist) =
+            match strm with parser
+            [ [: `('E' | 'C') :] ->
+                  let (v, _) = get_binding strm in
+                  if not (List.mem v vlist) then ([v :: vlist], flist)
+                  else (vlist, flist)
+            | [: `'V' :] ->
+                let v = get_variable strm in
+                if not (List.mem v vlist) then ([v :: vlist], flist)
+                else (vlist, flist)
+            | [: `'F' :] ->
+                let v = get_variable strm in
+                if not (List.mem v flist) then (vlist, [v :: flist])
+                else (vlist, flist)
+            | [: :] -> (vlist, flist) ]
+          in
+          loop (vlist, flist)
+      | [: `_ :] -> loop (vlist, flist)
+      | [: :] -> (vlist, flist) ]
+  in
+  do {
+    close_in ic;
+    (List.rev vlist, flist)
+  }
+;
+
 value rec copy_from_stream conf print strm =
   try
     while True do {
@@ -435,27 +491,42 @@ value rec copy_from_stream conf print strm =
           | 'y' -> for_all conf print (all_db (s_getenv conf.env "anon")) strm
           | 'z' -> print (string_of_int port.val)
           | 'A'..'Z' | '0'..'9' as c ->
-              match p_getenv conf.env (String.make 1 c) with
-              [ Some v ->
-                  match strm with parser
-                  [ [: `'{' :] ->
-                      let s = parse_upto '}' strm in
-                      do {
-                        print "\"";
-                        print s;
-                        print "\"";
-                        if v = s then print " selected" else ()
-                      }
-                  | [: `'[' :] ->
-                      let s = parse_upto ']' strm in
-                      do {
-                        print "\"";
-                        print s;
-                        print "\"";
-                        if v = s then print " checked" else ()
-                      }
-                  | [: :] -> print (strip_spaces v) ]
-              | None -> print "BAD MACRO" ]
+              match c with
+              [ 'C' | 'E' ->
+                  let (k, v) = get_binding strm in
+                  match p_getenv conf.env k with
+                  [ Some x ->
+                      if x = v then
+                        print (if c = 'C' then " checked" else " selected")
+                      else ()
+                  | None -> () ]
+              | 'V' | 'F' ->
+                  let k = get_variable strm in
+                  match p_getenv conf.env k with
+                  [ Some v -> print v
+                  | None -> () ]
+              | _ ->
+                  match p_getenv conf.env (String.make 1 c) with
+                  [ Some v ->
+                      match strm with parser
+                      [ [: `'{' :] ->
+                          let s = parse_upto '}' strm in
+                          do {
+                            print "\"";
+                            print s;
+                            print "\"";
+                            if v = s then print " selected" else ()
+                          }
+                      | [: `'[' :] ->
+                          let s = parse_upto ']' strm in
+                          do {
+                            print "\"";
+                            print s;
+                            print "\"";
+                            if v = s then print " checked" else ()
+                          }
+                      | [: :] -> print (strip_spaces v) ]
+                  | None -> print "BAD MACRO" ] ]
           | c -> print (macro conf c) ]
       | c -> print (String.make 1 c) ]
     }
@@ -882,8 +953,8 @@ value recover_1 conf =
     let conf =
       {(conf) with
         env =
-          [("U", old_to_src); ("O", o_opt); ("T", tmp); ("C", src_to_new) ::
-           conf.env]}
+          [("U", old_to_src); ("O", o_opt); ("T", tmp);
+           ("src2new", src_to_new) :: conf.env]}
     in
     print_file conf "recover2.htm"
 ;
@@ -1211,12 +1282,14 @@ value read_gwd_arg () =
 ;
 
 value file_contents fname =
-  let len = ref 0 in
-  try
-    let ic = open_in fname in
-    do { while True do { len.val := Buff.store len.val (input_char ic) }; "" }
-  with
-  [ Sys_error _ | End_of_file -> Buff.get len.val ]
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      loop 0 where rec loop len =
+        match try Some (input_char ic) with [ End_of_file -> None ] with
+        [ Some '\r' -> loop len
+        | Some c -> loop (Buff.store len c)
+        | None -> do { close_in ic; Buff.get len } ]
+  | None -> "" ]
 ;
 
 value gwf conf =
@@ -1228,10 +1301,6 @@ value gwf conf =
   if in_base = "" then print_file conf "err_miss.htm"
   else
     let benv = read_base_env in_base in
-    let get v =
-      try quote_escaped (List.assoc v benv) with [ Not_found -> "" ]
-    in
-    let get_all v = List.map quote_escaped (list_assoc_all v benv) in
     let trailer =
       quote_escaped
         (file_contents (Filename.concat "lang" (in_base ^ ".trl")))
@@ -1239,17 +1308,10 @@ value gwf conf =
     let conf =
       {(conf) with
         env =
-          [("B", get "body_prop"); ("L", get "default_lang");
-           ("F", get "friend_passwd"); ("W", get "wizard_passwd");
-           ("I", get "can_send_image"); ("J", get "wizard_just_friend");
-           ("R", get "renamed"); ("T", trailer) :: conf.env]}
+          List.map (fun (k, v) -> (k, quote_escaped v)) benv @
+          [("trailer", trailer) :: conf.env]}
     in
     print_file conf "gwf_1.htm"
-;
-
-value gwf_keys =
-  ["body_prop"; "default_lang"; "friend_passwd"; "wizard_passwd";
-   "can_send_image"; "wizard_just_friend"; "renamed"]
 ;
 
 value gwf_1 conf =
@@ -1259,6 +1321,7 @@ value gwf_1 conf =
     | None -> "" ]
   in
   let benv = read_base_env in_base in
+  let (vars, files) = variables "gwf_1.htm" in
   do {
     let oc = open_out (in_base ^ ".gwf") in
     let body_prop =
@@ -1267,26 +1330,22 @@ value gwf_1 conf =
       | Some x -> x ]
     in
     fprintf oc "# File generated by \"setup\"\n\n";
-    if body_prop = "" then ()
-    else fprintf oc "body_prop=%s\n" body_prop;
-    fprintf oc "default_lang=%s\n"
-      (s_getenv conf.env "default_lang");
-    fprintf oc "friend_passwd=%s\n"
-      (s_getenv conf.env "friend_passwd");
-    fprintf oc "wizard_passwd=%s\n"
-      (s_getenv conf.env "wizard_passwd");
-    fprintf oc "can_send_image=%s\n"
-      (s_getenv conf.env "can_send_image");
-    fprintf oc "wizard_just_friend=%s\n"
-      (s_getenv conf.env "wizard_just_friend");
-    fprintf oc "renamed=%s\n" (s_getenv conf.env "renamed");
+    List.iter
+      (fun k ->
+         match k with
+         [ "body_prop" ->
+             if body_prop = "" then ()
+             else fprintf oc "body_prop=%s\n" body_prop
+         | _ -> fprintf oc "%s=%s\n" k (s_getenv conf.env k) ])
+      vars;
     List.iter
       (fun (k, v) ->
-         if List.mem k gwf_keys then ()
+         if List.mem k vars then ()
          else fprintf oc "%s=%s\n" k v)
       benv;
+
     close_out oc;
-    let trl = s_getenv conf.env "trailer" in
+    let trl = strip_spaces (strip_control_m (s_getenv conf.env "trailer")) in
     let trl_file = Filename.concat "lang" (in_base ^ ".trl") in
     try Unix.mkdir "lang" 0o755 with [ Unix.Unix_error _ _ _ -> () ];
     try
@@ -1313,7 +1372,7 @@ value gwd conf =
     {(conf) with
       env =
         [("H", get "hd"); ("B", get "bd"); ("P", get "p");
-         ("W", get "wizard"); ("F", get "friend"); ("L", get "lang");
+         ("W", get "wizard"); ("L", get "lang");
          ("O", get "only"); ("A", get "auth");
          ("T", Filename.basename (get "log")); ("N", nolock);
          ("M", get "max_clients"); ("U", get "setuid"); ("G", get "setgid") ::
