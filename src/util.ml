@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.82 2001-01-06 09:55:59 ddr Exp $ *)
+(* $Id: util.ml,v 3.83 2001-01-15 12:54:36 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1044,6 +1044,8 @@ value copy_string_with_macros conf s =
               [ Not_found -> ("%", i + 1) ]
             in
             do Wserver.wprint "%s" v; return loop tt i
+        | '%' ->
+            do Wserver.wprint "%%"; return loop tt (i + 2)
         | _ -> do Wserver.wprint "%%"; return loop tt (i + 1) ]
       else if s.[i] = '<' && dangerous_tag s (i + 1) then
         do Wserver.wprint "..."; return loop tt (i + 1)
