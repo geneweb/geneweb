@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.174 2003-12-23 11:56:04 ddr Exp $
+# $Id: lexicon.txt,v 4.175 2003-12-23 15:46:59 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2185,6 +2185,7 @@ da: ramme
 en: border
 fr: bordure
 he:  מסגרת
+no: ramme         
 pl: granica 
 pt: borda
 
@@ -2639,6 +2640,7 @@ en: colour
 en-us: color
 fr: couleur
 he:  צבע
+no: farge         
 pl: kolor
 pt: cפr
 
