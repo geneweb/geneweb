@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.3 2000-01-10 02:14:37 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.4 2000-01-10 11:55:22 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -146,7 +146,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
   return ()
 ;
 
-value rec print_descend_upto conf base ini_p ini_br lev children =
+value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
   if lev > 0 && cnt.val < max_cnt then
     do if lev <= 2 then Wserver.wprint "<ul>\n" else ();
        List.iter
@@ -180,7 +180,8 @@ value rec print_descend_upto conf base ini_p ini_br lev children =
                         (ip, ia_asex, [(p.cle_index, p.sex) :: rev_br]))
                    (children_of base u)
                  in
-                 print_descend_upto conf base ini_p ini_br (lev - 1) children;
+                 print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
+                   children;
               return ()
             else ())
         children;
@@ -193,7 +194,7 @@ value sibling_has_desc_lev base lev (ip, _) =
   has_desc_lev base lev (uoi base ip)
 ;
 
-value print_cousins_side_of conf base a ini_p ini_br lev1 lev2 =
+value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
   let sib = siblings base a in
   if List.exists (sibling_has_desc_lev base lev2) sib then
     do if lev1 > 1 then
@@ -205,12 +206,12 @@ value print_cousins_side_of conf base a ini_p ini_br lev1 lev2 =
          return ()
        else ();
        let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
-       print_descend_upto conf base ini_p ini_br lev2 sib;
+       print_descend_upto conf base max_cnt ini_p ini_br lev2 sib;
     return True
   else False
 ;
 
-value print_cousins_lev conf base p lev1 lev2 =
+value print_cousins_lev conf base max_cnt p lev1 lev2 =
   let first_sosa =
     loop Num.one lev1 where rec loop sosa lev =
       if lev <= 1 then sosa
@@ -224,7 +225,8 @@ value print_cousins_lev conf base p lev1 lev2 =
            let some =
              match Util.branch_of_sosa base p.cle_index sosa with
              [ Some ([(ia, _) :: _] as br) ->
-                 print_cousins_side_of conf base (poi base ia) p br lev1 lev2
+                 print_cousins_side_of conf base max_cnt (poi base ia) p br
+                   lev1 lev2
                  || some
              | _ -> some ]
            in
@@ -260,9 +262,13 @@ value print_cousins conf base p lev1 lev2 =
         (capitale (transl conf "ancestors")) lev1
         (capitale (transl conf "descendants")) lev2
   in
+  let max_cnt =
+    try int_of_string (List.assoc "max_cousin" conf.base_env) with
+    [ Not_found | Failure _ -> max_cnt ]
+  in
   do header conf title;
      cnt.val := 0;
-     print_cousins_lev conf base p lev1 lev2;
+     print_cousins_lev conf base max_cnt p lev1 lev2;
      if cnt.val >= max_cnt then Wserver.wprint "etc...\n"
      else if cnt.val > 1 then
        Wserver.wprint "%s: %d %s.\n" (capitale (transl conf "total"))
