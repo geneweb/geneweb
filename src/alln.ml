@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 1.8 1998-12-03 09:09:20 ddr Exp $ *)
+(* $Id: alln.ml,v 1.9 1998-12-03 13:38:12 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -11,7 +11,8 @@ open Gutil;
 value string_start_with ini s =
   loop 0 0 where rec loop i1 i2 =
     if i1 == String.length ini then True
-    else if i2 == String.length s then False
+    else if i2 == String.length s then
+      if ini.[i1] == '_' then loop (i1 + 1) i2 else False
     else if s.[i2] == ini.[i1] || s.[i2] == ' ' && ini.[i1] == '_' then
       loop (i1 + 1) (i2 + 1)
     else False
@@ -218,7 +219,12 @@ value select_names conf base is_surnames ini =
     if is_surnames then base.persons_of_surname else base.persons_of_first_name
   in
   let list =
-    loop (iii.cursor (String.capitalize ini)) [] where rec loop istr list =
+    let start_k =
+      if String.length ini > 0 && ini.[String.length ini - 1] == '_' then
+        String.sub ini 0 (String.length ini - 1)
+      else ini
+    in
+    loop (iii.cursor (String.capitalize start_k)) [] where rec loop istr list =
       let s = sou base istr in
       let k = Iobase.name_key s in
       if string_start_with ini k then
