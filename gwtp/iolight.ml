@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 1.1 2000-07-27 02:26:21 ddr Exp $ *)
+(* $Id: iolight.ml,v 1.2 2000-07-28 07:00:51 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -17,10 +17,40 @@ value check_magic =
     else ()
 ;
 
-value make_cache ic shift array_pos len name =
+type patches =
+  { p_person : ref (list (int * person));
+    p_ascend : ref (list (int * ascend));
+    p_union : ref (list (int * union));
+    p_family : ref (list (int * family));
+    p_couple : ref (list (int * couple));
+    p_descend : ref (list (int * descend));
+    p_string : ref (list (int * string));
+    p_name : ref (list (int * list iper)) }
+;
+
+value rec patch_len len =
+  fun
+  [ [] -> len
+  | [(i, _) :: l] -> patch_len (max len (i + 1)) l ]
+;
+
+value apply_patches tab plist plen =
+  if plist = [] then tab
+  else
+    let new_tab =
+      if plen > Array.length tab then
+        let new_tab = Array.create plen (Obj.magic 0) in
+        do Array.blit tab 0 new_tab 0 (Array.length tab); return
+        new_tab
+      else tab
+    in
+    do List.iter (fun (i, v) -> new_tab.(i) := v) plist; return new_tab
+;
+
+value make_cache ic shift array_pos patches len name =
   let tab = ref None in
   let r =
-    {array = fun []; get = fun []; len = len;
+    {array = fun []; get = fun []; len = patch_len len patches.val;
      clear_array = fun _ -> tab.val := None}
   in
   let array () =
@@ -29,7 +59,7 @@ value make_cache ic shift array_pos len name =
     | None ->
 do Printf.eprintf "*** read %s\n" name; flush stderr; return
         do seek_in ic array_pos; return
-        let t = input_value ic in
+        let t = apply_patches (input_value ic) patches.val r.len in
         do tab.val := Some t; return t ]
   in
   let gen_get i = (r.array ()).(i) in
@@ -40,6 +70,18 @@ value input bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname
     else bname ^ ".gwb"
+  in
+  let patches =
+    match
+      try Some (open_in_bin (Filename.concat bname "patches")) with _ -> None
+    with
+    [ Some ic ->
+        let p = input_value ic in
+        do close_in ic; return p
+    | None ->
+        {p_person = ref []; p_ascend = ref []; p_union = ref [];
+         p_family = ref []; p_couple = ref []; p_descend = ref [];
+         p_string = ref []; p_name = ref []} ]
   in
   let ic =
     let ic = open_in_bin (Filename.concat bname "base") in
@@ -57,23 +99,40 @@ value input bname =
   let strings_array_pos = input_binary_int ic in
   let norigin_file = input_value ic in
   let shift = 0 in
-  let persons = make_cache ic shift persons_array_pos persons_len "persons" in
+  let persons =
+    make_cache ic shift persons_array_pos patches.p_person persons_len
+      "persons"
+  in
   let shift = shift + persons_len * Iovalue.sizeof_long in
-  let ascends = make_cache ic shift ascends_array_pos persons_len "ascends" in
+  let ascends =
+    make_cache ic shift ascends_array_pos patches.p_ascend persons_len
+      "ascends"
+  in
   let shift = shift + persons_len * Iovalue.sizeof_long in
-  let unions = make_cache ic shift unions_array_pos persons_len "unions" in
+  let unions =
+    make_cache ic shift unions_array_pos patches.p_union persons_len
+      "unions"
+  in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let families =
-    make_cache ic shift families_array_pos families_len "families"
+    make_cache ic shift families_array_pos patches.p_family
+      families_len "families"
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
-  let couples = make_cache ic shift couples_array_pos families_len "couples" in
+  let couples =
+    make_cache ic shift couples_array_pos patches.p_couple families_len
+      "couples"
+  in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let descends =
-    make_cache ic shift descends_array_pos families_len "descends"
+    make_cache ic shift descends_array_pos patches.p_descend
+      families_len "descends"
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
-  let strings = make_cache ic shift strings_array_pos strings_len "strings" in
+  let strings =
+    make_cache ic shift strings_array_pos patches.p_string strings_len
+      "strings"
+  in
   let cleanup () = close_in ic in
   let read_notes mlen =
     match
