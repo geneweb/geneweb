@@ -13,6 +13,17 @@ GeneWeb Version 1.09
   - Fixed some displayed "value=" when the value hold the " character
   - Some parts of relationship computing use big nums (module Num). Still
     incomplete.
+  - Change in request syntax "relation... with..." to allow
+    explicit first names and surnames instead of i=.
+    Ex:
+     old syntax (still there for compatibility during some versions)
+       base?e=m%3DR%3Bi%3D31440&m=NG&n=somebody&t=PN
+     new syntax:
+       base?em=R;ei=31440&m=NG&n=somebody&t=PN
+     and ability to write in a direct link:
+       base?em=R;ep=jack;en=nicholson;eoc=3&m=NG&n=somebody&t=PN
+     to be somewhat independant from the index of "jack nicholson" in
+     the base.
 
 * ged2gwb:
   - Display message "Strange input" giving the line number instead of character

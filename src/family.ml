@@ -1,5 +1,5 @@
-(* camlp4r ./def.syn.cmo *)
-(* $Id: family.ml,v 1.5 1998-11-21 10:54:09 ddr Exp $ *)
+(* camlp4r ./def.syn.cmo ./pa_html.cmo *)
+(* $Id: family.ml,v 1.6 1998-11-24 00:39:43 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -185,7 +185,7 @@ value precisez conf base n pl =
    The old system is kept by compatibility. *)
 
 value make_senv conf base =
-  let get x = try Some (List.assoc x conf.env) with [ Not_found -> None ] in
+  let get x = Util.p_getenv conf.env x in
   match (get "em", get "ei", get "ep", get "en", get "eoc") with
   [ (Some vm, Some vi, _, _, _) ->
       conf.senv := [("em", vm); ("ei", vi)]
@@ -339,12 +339,81 @@ value family_m conf base =
       | _ -> inconnu_au_bataillon conf ] ]
 ;
 
+value print_no_index conf base =
+  let scratch s =
+    code_varenv (Name.lower (sou base s))
+  in
+  let get_person v =
+    match try Some (int_of_string v) with [ Failure _ -> None ] with
+    [ Some i ->
+        if i >= 0 && i < base.persons.len then
+          let p = base.persons.get i in
+          let f = scratch p.first_name in
+          let s = scratch p.surname in
+          let oc = string_of_int p.occ in
+          Some (f, s, oc)
+        else None
+    | None -> None ]
+  in
+  let env =
+    let rec loop =
+      fun
+      [ [] -> []
+      | [("opt", "no_index") :: l] -> loop l
+      | [("i", v) :: l] -> new_env "i" v (fun x -> x) l
+      | [("i1", v) :: l] -> new_env "i1" v (fun x -> x ^ "1") l
+      | [("i2", v) :: l] -> new_env "i1" v (fun x -> x ^ "2") l
+      | [("ei", v) :: l] -> new_env "ei" v (fun x -> "e" ^ x) l
+      | [xv :: l] -> [xv :: loop l] ]
+    and new_env x v c l =
+      match get_person v with
+      [ Some (f, s, oc) ->
+          if oc = "0" then [(c "p", f); (c "n", s) :: loop l]
+          else [(c "p", f); (c "n", s); (c "oc", oc) :: loop l]
+      | None -> [(x, v) :: loop l] ]
+    in          
+    loop conf.env
+  in
+  let link =
+    let pref =
+      let s = Wserver.extract_param "GET " ' ' conf.request in
+      match rindex s '?' with
+      [ Some i -> String.sub s 0 i
+      | None -> s ]
+    in
+    let suff =
+      List.fold_right
+        (fun (x, v) s ->
+           let sep = if s = "" then "" else ";" in
+           x ^ "=" ^ code_varenv v ^ sep ^ s)
+        env ""
+    in
+    "http://" ^
+    Wserver.extract_param "host: " '\r' conf.request ^
+    pref ^ "?" ^ suff
+  in
+  let title _ = Wserver.wprint "Link to use" in
+  do header conf title;
+     tag "ul" begin
+       Wserver.wprint "<li>\n";
+       tag "a" "href=\"%s\"" link begin
+         Wserver.wprint "%s" link;
+       end;
+     end;
+     trailer conf;
+  return ()
+;
+
 value family conf base =
-  do if conf.env = [] then
-       do Srcfile.incr_welcome_counter conf; return
-       Srcfile.print_start conf base
-     else
-       do Srcfile.incr_request_counter conf; return
-       family_m conf base;
+  do match p_getenv conf.env "opt" with
+     [ Some "no_index" ->
+         print_no_index conf base
+     | _ ->
+         if conf.env = [] then
+           do Srcfile.incr_welcome_counter conf; return
+           Srcfile.print_start conf base
+         else
+           do Srcfile.incr_request_counter conf; return
+           family_m conf base ];
   return Wserver.wflush ()
 ;
