@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.73 2001-01-29 15:33:25 ddr Exp $ *)
+(* $Id: perso.ml,v 3.74 2001-01-29 16:57:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -245,7 +245,7 @@ value open_templ conf dir name =
   if dir = "" then try Some (open_in std_fname) with [ Sys_error _ -> None ]
   else
     let dir = Filename.basename dir in
-    let fname = Util.base_path ["etc"; dir] (name ^ ".txt") in
+    let fname = Filename.concat (Util.base_path ["etc"] dir) (name ^ ".txt") in
     try Some (open_in fname) with
     [ Sys_error _ ->
         if dir = conf.bname then
