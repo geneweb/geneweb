@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.52 2004-01-29 16:11:37 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.53 2004-02-23 09:53:50 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -43,8 +43,10 @@ sv: Genealogi
 <a href="http://pauillac.inria.fr/~ddr/GeneWeb/"><img width=96
 height=108 src="%o/gwlogo.gif" align=%L border=0 alt=GeneWeb></a>
 </td>
-%I&wNf<td align=%R valign=top><em>([wizard/wizards/friend]0%U)</em></td>
-%E%I&fNw<td align=%R valign=top><em>([wizard/wizards/friend]2)</em></td>
+%I&wNf<td align=%R
+valign=top><em>([wizard/wizards/friend/friends]0%U)</em></td>
+%E%I&fNw<td align=%R
+valign=top><em>([wizard/wizards/friend/friends]2)</em></td>
 %E<td align=%R valign=top width=16>%w</td>
 </tr><tr>
 <td align=center colspan=%I|&wNf&fNw2%E%I&|Nwf|Nfw1%E>
@@ -161,7 +163,7 @@ zh: ÏÖÓÐ %n ÈËÔÚÊý¾Ý¿âÖÐ¡£
 ]%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 %I&|pwizard_passwd_file;pwizard_descr_file;|wo<br>
-(<a href="%sm=WIZNOTES">[wizard/wizards/friend]1/[note/notes]1</a>)%E
+(<a href="%sm=WIZNOTES">[wizard/wizards/friend/friends]1/[note/notes]1</a>)%E
 %E
 
 %I&NwNj<br><p>
@@ -170,47 +172,58 @@ zh: ÏÖÓÐ %n ÈËÔÚÊý¾Ý¿âÖÐ¡£
 <tr align=left>
 
 <td align=center>[
-af: <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a> toegang<br>
+af: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> toegang<br>
     (password)
-bg: Äîñòúï êàòî <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a><br>
+bg: Äîñòúï êàòî
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
     (ïàðîëà)
-br: mont e-barzh evel <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a><br>
+br: mont e-barzh evel
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
     (ger-tremen)
-ca: acc&eacute;s <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a><br>
+ca: acc&eacute;s
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
     (clau)
-cs: <a href="%sw=w">{<em>"[wizard/wizards/friend]0"</em></a> pøístup<br>
-    (heslo)
+cs: <a href="%sw=w">{<em>"[wizard/wizards/friend/friends]0"</em></a>
+    pøístup<br> (heslo)
 da: <a href="%sw=w"><em>Opdateringsadgang</em></a><br> (adgangskode)
-de: <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a>-Zugang<br> (Passwort)
-en: <a href="%sw=w"><em>[*wizard/wizards/friend]0</em></a> access<br>
+de: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a>-Zugang<br>
+    (Passwort)
+en: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br>
     (password)
-eo: <a href="%sw=w">Aliro <em>[wizard/wizards/friend]0</em></a><br> (pasvorto)
-es: <a href="%sw=w">Entrada <em>[wizard/wizards/friend]0</em></a><br>
+eo: <a href="%sw=w">Aliro <em>[wizard/wizards/friend/friends]0</em></a><br>
+    (pasvorto)
+es: <a href="%sw=w">Entrada <em>[wizard/wizards/friend/friends]0</em></a><br>
     (contrase&ntilde;a)
-et: Ligipääs <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a><br> (parool)
-fi: <a href="%sw=w"><em>[*wizard/wizards/friend]0</em></a> kirjautuminen<br>
-    (salasana)
-fr: acc&egrave;s <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a><br>
+et: Ligipääs
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br> (parool)
+fi: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a>
+    kirjautuminen<br> (salasana)
+fr: acc&egrave;s
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
     (mot de passe).
-he: ëðéñä  <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a>
+he: ëðéñä  <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a>
 is: <a href="%sw=w"><em>Uppfærslu</em></a> aðgangur<br> (aðgangsorð)
-it: <a href="%sw=w"><em>[*wizard/wizards/friend]0</em></a> access<br>
+it: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br>
     (password)
-lv: <a href="%sw=w"><em>[*wizard/wizards/friend]0</em></a> access<br>
+lv: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a> access<br>
     (password)
-nl: Toegang als <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a><br>
+nl: Toegang als
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
     (wachtwoord)
-no: <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a> adgang<br>
+no: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> adgang<br>
     (passord)
-pl: <a href="%sw=w"><em>"[wizard/wizards/friend]0"</em></a> dostêp<br> (has³o)
-pt: Entrada <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a><br>
+pl: <a href="%sw=w"><em>"[wizard/wizards/friend/friends]0"</em></a> dostêp<br>
+    (has³o)
+pt: Entrada <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
     (palavra chave)
-ro: Acces pentru <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a><br>
+ro: Acces pentru
+    <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br>
     (parola)
-sl: Urejanje kot <a href="%sw=w"><em>"[wizard/wizards/friend]0"</em></a>
+sl: Urejanje kot
+    <a href="%sw=w"><em>"[wizard/wizards/friend/friends]0"</em></a>
     (geslo)
-sv: <a href="%sw=w"><em>[*wizard/wizards/friend]0</em></a> tilltr&auml;de<br>
-    (passord)
+sv: <a href="%sw=w"><em>[*wizard/wizards/friend/friends]0</em></a>
+    tilltr&auml;de<br> (passord)
 ]<br></td>
 
 %INf<td align=center>[
