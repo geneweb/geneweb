@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.24 2000-05-06 11:51:36 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.25 2000-05-06 14:50:06 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1845,7 +1845,7 @@ value print_flash_list conf base v p =
   let title h =
      do if not h then Wserver.wprint "%s<br>" (person_text conf base p)
         else ();
-        Wserver.wprint "%s" (capitale (transl conf "flash list"));
+        Wserver.wprint "- %s -" (capitale (transl conf "flash list"));
      return ()
   in
   let list = build_flash_list conf base v p in
