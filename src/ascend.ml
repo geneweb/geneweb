@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.50 1999-08-21 11:45:44 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.51 1999-09-14 22:33:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -990,23 +990,23 @@ value print_generation_missing_persons conf base title sp_incl gp =
 
 value one_year base p =
   match Adef.od_of_codate p.birth with
-  [ Some d -> Some (annee d)
-  | None ->
+  [ Some (Dgreg d _) -> Some d.year
+  | _ ->
       match Adef.od_of_codate p.baptism with
-      [ Some d -> Some (annee d)
-      | None ->
-          match p.death with
-          [ Death _ cd -> Some (annee (Adef.date_of_cdate cd))
+      [ Some (Dgreg d _) -> Some (annee d)
+      | _ ->
+          match date_of_death p.death with
+          [ Some (Dgreg d _) -> Some (annee d)
           | _ ->
               match p.burial with
               [ Buried cod ->
                   match Adef.od_of_codate cod with
-                  [ Some d -> Some (annee d)
-                  | None -> None ]
+                  [ Some (Dgreg d _) -> Some (annee d)
+                  | _ -> None ]
               | Cremated cod ->
                   match Adef.od_of_codate cod with
-                  [ Some d -> Some (annee d)
-                  | None -> None ]
+                  [ Some (Dgreg d _) -> Some (annee d)
+                  | _ -> None ]
               | UnknownBurial -> None ] ] ] ]
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.21 1999-08-19 17:39:00 ddr Exp $ *)
+(* $Id: update.ml,v 2.22 1999-09-14 22:33:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -29,12 +29,12 @@ value has_children base p =
 
 value infer_death conf birth =
   match birth with
-  [ Some d ->
+  [ Some (Dgreg d _) ->
       let a = Gutil.annee (Gutil.temps_ecoule d conf.today) in
       if a > 120 then DeadDontKnowWhen
       else if a <= 80 then NotDead
       else DontKnowIfDead
-  | None -> DontKnowIfDead ]
+  | _ -> DontKnowIfDead ]
 ;
 
 value print_same_name conf base p =
@@ -345,10 +345,10 @@ value print_warning conf base =
              (sou base t.t_ident)
              (sou base t.t_place)
              (match Adef.od_of_codate t.t_date_start with
-              [ Some d -> string_of_int (annee d)
+              [ Some d -> Date.string_of_date conf d
               | _ -> "" ])
              (match Adef.od_of_codate t.t_date_end with
-              [ Some d -> string_of_int (annee d)
+              [ Some d -> Date.string_of_date conf d
               | _ -> "" ]))
   | YoungForMarriage p a ->
       do print_someone_strong conf base p;
@@ -433,7 +433,7 @@ value bad_date conf d =
   return raise ModErr
 ;
 
-value reconstitute_date conf var =
+value reconstitute_date_dmy conf var =
   match get_number var "yyyy" conf.env with
   [ Some y ->
       let prec =
@@ -458,69 +458,143 @@ value reconstitute_date conf var =
           [ Some d ->
               let d = {day = d; month = m; year = y; prec = prec} in
               if d.day >= 1 && d.day <= 31 && d.month >= 1
-              && d.month <= 12 then
+              && d.month <= 13 then
                 Some d
               else bad_date conf d
           | None ->
               let d = {day = 0; month = m; year = y; prec = prec} in
-              if d.month >= 1 && d.month <= 12 then Some d
+              if d.month >= 1 && d.month <= 13 then Some d
               else bad_date conf d ]
       | None -> Some {day = 0; month = 0; year = y; prec = prec} ]
   | None -> None ]
 ;
 
+value reconstitute_date conf var =
+  match reconstitute_date_dmy conf var with
+  [ Some d ->
+      let (d, cal) =
+        match p_getenv conf.env (var ^ "_cal") with
+        [ Some "G" -> (d, Dgregorian)
+        | Some "J" -> (Calendar.gregorian_of_julian d, Djulian)
+        | Some "F" -> (Calendar.gregorian_of_french d, Dfrench)
+        | _ -> (d, Dgregorian) ]
+      in
+      Some (Dgreg d cal)
+  | None ->
+      match p_getenv conf.env (var ^ "_text") with
+      [ Some txt ->
+          let txt = strip_spaces (get var "text" conf.env) in
+          if txt = "" then None else Some (Dtext txt)
+      | _ -> None ] ]
+;
+
 value print_date conf base lab var d =
-  do tag "tr" begin
-       stag "td" begin Wserver.wprint "%s" lab; end;
-       tag "td" begin
-         Wserver.wprint "<input name=%s_dd size=2 maxlength=2%s>\n" var
-           (match d with
-            [ Some {day = d} when d <> 0 -> " value=" ^ string_of_int d
-            | _ -> "" ]);
-         Wserver.wprint "<input name=%s_mm size=2 maxlength=2%s>\n" var
-           (match d with
-            [ Some {month = m} when m <> 0 -> " value=" ^ string_of_int m
-            | _ -> "" ]);
-         Wserver.wprint "<input name=%s_yyyy size=5 maxlength=5%s>\n" var
-           (match d with
-            [ Some {year = y} -> " value=" ^ string_of_int y
-            | _ -> "" ]);
-       end;
-       tag "td" begin
-         tag "select" "name=%s_prec" var begin
-           Wserver.wprint "<option%s>-\n"
+  do tag "table" "border=1" begin
+       tag "tr" begin
+         stag "td" begin Wserver.wprint "%s" lab; end;
+         let d =
+           match d with
+           [ Some (Dgreg d Dgregorian) -> Some d
+           | Some (Dgreg d Djulian) -> Some (Calendar.julian_of_gregorian d)
+           | Some (Dgreg d Dfrench) -> Some (Calendar.french_of_gregorian d)
+           | _ -> None ]
+         in
+         tag "td" begin
+           Wserver.wprint "%s\n" (transl_nth conf "day/month/year" 0);
+           Wserver.wprint "<input name=%s_dd size=2 maxlength=2%s>\n" var
              (match d with
-              [ None -> " selected"
+              [ Some {day = d} when d <> 0 ->
+                  " value=" ^ string_of_int d
               | _ -> "" ]);
-           Wserver.wprint "<option value=sure%s>&lt;- %s\n"
-             (match d with [ Some {prec = Sure} -> " selected" | _ -> "" ])
-             (capitale (transl conf "exact"));
-           Wserver.wprint "<option value=about%s>&lt;- %s\n"
-             (match d with [ Some {prec = About} -> " selected" | _ -> "" ])
-             (capitale (transl conf "about (date)"));
-           Wserver.wprint "<option value=maybe%s>&lt;- %s\n"
-             (match d with [ Some {prec = Maybe} -> " selected" | _ -> "" ])
-             (capitale (transl conf "maybe (date)"));
-           Wserver.wprint "<option value=before%s>&lt;- %s\n"
-             (match d with [ Some {prec = Before} -> " selected" | _ -> "" ])
-             (capitale (transl conf "before (date)"));
-           Wserver.wprint "<option value=after%s>&lt;- %s\n"
-             (match d with [ Some {prec = After} -> " selected" | _ -> "" ])
-             (capitale (transl conf "after (date)"));
-           Wserver.wprint "<option value=oryear%s>&lt;- %s -&gt;\n"
-             (match d with [ Some {prec = OrYear _} -> " selected" | _ -> "" ])
-             (capitale (transl conf "or"));
-           Wserver.wprint "<option value=yearint%s>&lt;- %s -&gt;\n"
+           Wserver.wprint "%s\n" (transl_nth conf "day/month/year" 1);
+           Wserver.wprint "<input name=%s_mm size=2 maxlength=2%s>\n" var
              (match d with
-              [ Some {prec = YearInt _} -> " selected"
-              | _ -> "" ])
-             (capitale (transl conf "between (date)"));
+              [ Some {month = m} when m <> 0 ->
+                  " value=" ^ string_of_int m
+              | _ -> "" ]);
+           Wserver.wprint "%s\n" (transl_nth conf "day/month/year" 2);
+           Wserver.wprint "<input name=%s_yyyy size=5 maxlength=5%s>\n" var
+             (match d with
+              [ Some {year = y} -> " value=" ^ string_of_int y
+              | _ -> "" ]);
          end;
-         Wserver.wprint "<input name=%s_oryear size=5 maxlength=5%s>\n" var
-           (match d with
-            [ Some {prec = OrYear y} -> " value=" ^ string_of_int y
-            | Some {prec = YearInt y} -> " value=" ^ string_of_int y
-            | _ -> "" ]);
+         tag "td" begin
+           Wserver.wprint "... %s %s\n" (transl conf "or")
+             (transl conf "text");
+           Wserver.wprint "<input name=%s_text size=15 maxlength=30%s>\n" var
+             (match d with
+              [ Some (Dtext t) -> " value=\"" ^ quote_escaped t ^ "\""
+              | _ -> "" ]);
+         end;
+       end;
+     end;
+     tag "table" "border=1" begin
+       tag "tr" begin
+         tag "td" begin
+           Wserver.wprint "%s\n" (capitale (transl conf "calendar"));
+           tag "select" "name=%s_cal" var begin
+             Wserver.wprint "<option value=G%s>%s\n"
+               (match d with
+                [ Some (Dgreg _ Dgregorian) -> " selected"
+                | _ -> "" ])
+               (capitale (transl_nth conf "gregorian/julian/french/hebrew" 0));
+             Wserver.wprint "<option value=J%s>%s\n"
+               (match d with
+                [ Some (Dgreg _ Djulian) -> " selected"
+                | _ -> "" ])
+               (capitale (transl_nth conf "gregorian/julian/french/hebrew" 1));
+             Wserver.wprint "<option value=F%s>%s\n"
+               (match d with
+                [ Some (Dgreg _ Dfrench) -> " selected"
+                | _ -> "" ])
+               (capitale (transl_nth conf "gregorian/julian/french/hebrew" 2));
+           end;
+         end;
+         tag "td" begin
+           Wserver.wprint "%s\n" (capitale (transl conf "precision"));
+           tag "select" "name=%s_prec" var begin
+             Wserver.wprint "<option%s>-\n"
+               (match d with
+                [ None -> " selected"
+                | _ -> "" ]);
+             Wserver.wprint "<option value=sure%s>%s\n"
+               (match d with
+                [ Some (Dgreg {prec = Sure} _) -> " selected" | _ -> "" ])
+               (capitale (transl conf "exact"));
+             Wserver.wprint "<option value=about%s>%s\n"
+               (match d with
+                [ Some (Dgreg {prec = About} _) -> " selected" | _ -> "" ])
+               (capitale (transl conf "about (date)"));
+             Wserver.wprint "<option value=maybe%s>%s\n"
+               (match d with
+                [ Some (Dgreg {prec = Maybe} _) -> " selected" | _ -> "" ])
+               (capitale (transl conf "maybe (date)"));
+             Wserver.wprint "<option value=before%s>%s\n"
+               (match d with
+                [ Some (Dgreg {prec = Before} _) -> " selected" | _ -> "" ])
+               (capitale (transl conf "before (date)"));
+             Wserver.wprint "<option value=after%s>%s\n"
+               (match d with
+                [ Some (Dgreg {prec = After} _) -> " selected" | _ -> "" ])
+               (capitale (transl conf "after (date)"));
+             Wserver.wprint "<option value=oryear%s>&lt;- %s -&gt;\n"
+               (match d with
+                [ Some (Dgreg {prec = OrYear _} _) -> " selected" | _ -> "" ])
+               (capitale (transl conf "or"));
+             Wserver.wprint "<option value=yearint%s>&lt;- %s -&gt;\n"
+               (match d with
+                [ Some (Dgreg {prec = YearInt _} _) -> " selected"
+                | _ -> "" ])
+               (capitale (transl conf "between (date)"));
+           end;
+           Wserver.wprint "<input name=%s_oryear size=5 maxlength=5%s>\n" var
+             (match d with
+              [ Some (Dgreg {prec = OrYear y} _) ->
+                  " value=" ^ string_of_int y
+              | Some (Dgreg {prec = YearInt y} _) ->
+                  " value=" ^ string_of_int y
+              | _ -> "" ]);
+         end;
        end;
      end;
   return ()

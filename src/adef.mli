@@ -1,4 +1,4 @@
-(* $Id: adef.mli,v 2.1 1999-03-08 11:18:18 ddr Exp $ *)
+(* $Id: adef.mli,v 2.2 1999-09-14 22:33:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = 'a;
@@ -8,14 +8,21 @@ type fix = 'a;
 type cdate = 'a;
 type codate = 'a;
 
-type precision =
-  [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
-;
 type date =
+  [ Dgreg of dmy and calendar
+  | Dtext of string ]
+and calendar =
+  [ Dgregorian
+  | Djulian
+  | Dfrench
+  | Dhebrew ]
+and dmy =
   { day : int;
     month : int;
     year : int;
     prec : precision }
+and precision =
+  [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
 ;
 
 value float_of_fix : fix -> float;

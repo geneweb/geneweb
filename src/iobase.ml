@@ -1,10 +1,10 @@
-(* $Id: iobase.ml,v 2.15 1999-08-30 23:55:49 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.16 1999-09-14 22:33:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwb = "GnWb001v";
+value magic_gwb = "GnWb001w";
 
 (*
  Files in base (directory .gwb)

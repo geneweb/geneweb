@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.16 1999-08-14 09:26:39 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.17 1999-09-14 22:34:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -402,19 +402,17 @@ value print_title conf base t cnt =
        end;
      end;
      Wserver.wprint "\n";
-     tag "table" "border=1" begin
-       Update.print_date conf base (capitale (transl conf "begin"))
-         ("t_date_start" ^ string_of_int cnt)
-         (match t with
-          [ Some t -> Adef.od_of_codate t.t_date_start
-          | _ -> None ]);
-       Wserver.wprint "\n";
-       Update.print_date conf base (capitale (transl conf "end"))
-         ("t_date_end" ^ string_of_int cnt)
-         (match t with
-          [ Some t -> Adef.od_of_codate t.t_date_end
-          | _ -> None ]);
-     end;
+     Update.print_date conf base (capitale (transl conf "begin"))
+       ("t_date_start" ^ string_of_int cnt)
+       (match t with
+        [ Some t -> Adef.od_of_codate t.t_date_start
+        | _ -> None ]);
+     Wserver.wprint "\n";
+     Update.print_date conf base (capitale (transl conf "end"))
+       ("t_date_end" ^ string_of_int cnt)
+       (match t with
+        [ Some t -> Adef.od_of_codate t.t_date_end
+        | _ -> None ]);
      Wserver.wprint "\n";
      html_p conf;
      print_add_title conf base cnt;
@@ -621,9 +619,7 @@ value print_person conf base p =
        print_birth_place conf base p;
      end;
      Wserver.wprint "\n";
-     tag "table" "border=1" begin
-       print_birth_date conf base p;
-     end;
+     print_birth_date conf base p;
      Wserver.wprint "\n";
      Update.print_src conf "birth_src" p.birth_src;
      Wserver.wprint "\n";
@@ -632,9 +628,7 @@ value print_person conf base p =
        print_bapt_place conf base p;
      end;
      Wserver.wprint "\n";
-     tag "table" "border=1" begin
-       print_bapt_date conf base p;
-     end;
+     print_bapt_date conf base p;
      Wserver.wprint "\n";
      Update.print_src conf "bapt_src" p.baptism_src;
      Wserver.wprint "\n";
@@ -648,9 +642,7 @@ value print_person conf base p =
        end;
      end;
      Wserver.wprint "\n";
-     tag "table" "border=1" begin
-       print_death_date conf base p;
-     end;
+     print_death_date conf base p;
      Wserver.wprint "\n";
      tag "table" "border=1" begin
        tag "tr" begin
@@ -673,9 +665,7 @@ value print_person conf base p =
        end;
      end;
      Wserver.wprint "\n";
-     tag "table" "border=1" begin
-       print_burial_date conf base p;
-     end;
+     print_burial_date conf base p;
      Wserver.wprint "\n";
      Update.print_src conf "burial_src" p.burial_src;
      Wserver.wprint "\n";

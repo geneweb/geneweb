@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.32 1999-09-13 10:07:28 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.33 1999-09-14 22:33:32 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -335,110 +335,110 @@ value lexer =
    Token.tparse = tparse; Token.text = fun _ -> "<tok>"}
 ;
 
+type range 'a =
+  [ Begin of 'a
+  | End of 'a
+  | BeginEnd of 'a and 'a ]
+; 
+
 value g = Grammar.create lexer;
-value date = Grammar.Entry.create g "date";
-value find_year =
-  let rec find strm =
-    match strm with parser
-    [ [: `("INT", n) :] ->
-        let n = int_of_string n in
-        if n >= 32 && n <= 2500 then n else find strm
-    | [: `("EOI", "") :] -> raise Not_found
-    | [: `_ :] -> find strm ]
-  in
-  Grammar.Entry.of_parser g "find_year" find
-;
-value date_period d1 d2 =
-  match (d1, d2) with
-  [ (Some d1, Some d2) -> Some (d1, Some d2)
-  | (Some d1, None) ->
-      Some
-        ({day = d1.day; month = d1.month; year = d1.year;
-          prec = After},
-         None)
-  | (None, Some d2) ->
-      Some
-        ({day = d2.day; month = d2.month; year = d2.year;
-          prec = Before},
-         None)
-  | (None, None) -> None ]
-;
+value date_value = Grammar.Entry.create g "date value";
+value date_range = Grammar.Entry.create g "date range";
 
 value date_str = ref "";
 
+value make_date n1 n2 n3 =
+  let n3 =
+    if no_negative_dates.val then
+      match n3 with
+      [ Some n3 -> Some (abs n3)
+      | None -> None ]
+    else n3
+  in
+  match (n1, n2, n3) with
+  [ (Some d, Some m, Some y) ->
+      let (d, m) =
+        match m with
+        [ Right m -> (d, m)
+        | Left m ->
+            match month_number_dates.val with
+            [ DayMonthDates -> do check_month m; return (d, m)
+            | MonthDayDates -> do check_month d; return (m, d)
+            | _ ->
+                if d >= 1 && m >= 1 && d <= 31 && m <= 31 then
+                  if d > 13 && m <= 13 then (d, m)
+                  else if m > 13 && d <= 13 then (m, d)
+                  else if d > 13 && m > 13 then (0, 0)
+                  else
+                    do month_number_dates.val :=
+                         MonthNumberHappened date_str.val;
+                    return (0, 0)
+                else (0, 0) ] ]
+      in
+      let (d, m) = if m < 1 || m > 13 then (0, 0) else (d, m) in
+      {day = d; month = m; year = y; prec = Sure}
+  | (None, Some m, Some y) ->
+      let m =
+        match m with
+        [ Right m -> m
+        | Left m -> m ]
+      in
+      {day = 0; month = m; year = y; prec = Sure}
+  | (None, None, Some y) ->
+      {day = 0; month = 0; year = y; prec = Sure}
+  | (Some y, None, None) ->
+      {day = 0; month = 0; year = y; prec = Sure}
+  | _ -> raise (Stream.Error "bad date") ]
+;
+
 EXTEND
-  GLOBAL: date;
-  date:
-    [ [ ID "FROM"; prec; d1 = simple_date; ID "TO"; prec; d2 = simple_date;
-        EOI -> date_period d1 d2
-      | ID "FROM"; prec; d1 = simple_date; EOI -> date_period d1 None
-      | ID "TO"; prec; d2 = simple_date; EOI -> date_period None d2
-      | ID "BET"; prec; d1 = simple_date; ID "AND"; prec; d2 = simple_date;
-        EOI -> date_period d1 d2
-      | p = prec; d = simple_date; EOI ->
-          match d with
-          [ Some d ->
-              Some
-                ({day = d.day; month = d.month; year = d.year; prec = p},
-                 None)
-          | None -> None ] ] ]
+  GLOBAL: date_value date_range;
+  date_value:
+    [ [ (d, cal) = date; EOI -> Dgreg d cal
+      | dr = date_range ->
+          match dr with
+          [ Begin (d, cal) -> Dgreg {(d) with prec = After} cal
+          | End (d, cal) -> Dgreg {(d) with prec = Before} cal
+          | BeginEnd (d1, cal) (d2, _) ->
+              Dgreg {(d1) with prec = YearInt d2.year} cal ]
+      | d = date_approximated; EOI -> d ] ]
   ;
-  simple_date:
+  date_range:
+    [ [ ID "BEF"; dt = date; EOI -> End dt
+      | ID "AFT"; dt = date; EOI -> Begin dt
+      | ID "BET"; dt = date; ID "AND"; dt1 = date; EOI -> BeginEnd dt dt1
+      | ID "TO"; dt = date; EOI -> End dt
+      | ID "FROM"; dt = date; EOI -> Begin dt
+      | ID "FROM"; dt = date; ID "TO"; dt1 = date; EOI -> BeginEnd dt dt1 ] ]
+  ;
+  date_approximated:
+    [ [ ID "ABT" ; (d, cal) = date -> Dgreg {(d) with prec = About} cal
+      | ID "ENV"; (d, cal) = date -> Dgreg {(d) with prec = About} cal
+      | ID "EST"; (d, cal) = date -> Dgreg {(d) with prec = Maybe} cal ] ]
+  ;
+  date:
+    [ [ "@"; "#"; ID "DGREGORIAN"; "@"; d = date_greg -> (d, Dgregorian)
+      | "@"; "#"; ID "DJULIAN"; "@"; d = date_greg ->
+          (Calendar.gregorian_of_julian d, Djulian)
+      | "@"; "#"; ID "DFRENCH"; ID "R"; "@"; d = date_fren ->
+          (Calendar.gregorian_of_french d, Dfrench)
+      | d = date_greg -> (d, Dgregorian) ] ]
+  ;
+  date_greg:
     [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." -> () | "/" -> () ];
         n2 = OPT gen_month; LIST0 [ "." -> () | "/" -> () ]; n3 = OPT int;
         LIST0 "." ->
-          let n3 =
-            if no_negative_dates.val then
-              match n3 with
-              [ Some n3 -> Some (abs n3)
-              | None -> None ]
-            else n3
-          in
-          match (n1, n2, n3) with
-          [ (Some d, Some m, Some y) ->
-              let (d, m) =
-                match m with
-                [ Right m -> (d, m)
-                | Left m ->
-                    match month_number_dates.val with
-                    [ DayMonthDates -> do check_month m; return (d, m)
-                    | MonthDayDates -> do check_month d; return (m, d)
-                    | _ ->
-                        if d >= 1 && m >= 1 && d <= 31 && m <= 31 then
-                          if d > 12 && m <= 12 then (d, m)
-                          else if m > 12 && d <= 12 then (m, d)
-                          else if d > 12 && m > 12 then (0, 0)
-                          else
-                            do month_number_dates.val :=
-                                 MonthNumberHappened date_str.val;
-                            return (0, 0)
-                        else (0, 0) ] ]
-              in
-              let (d, m) = if m < 1 || m > 12 then (0, 0) else (d, m) in
-              Some {day = d; month = m; year = y; prec = Sure}
-          | (None, Some m, Some y) ->
-              let m =
-                match m with
-                [ Right m -> m
-                | Left m -> m ]
-              in
-              Some {day = 0; month = m; year = y; prec = Sure}
-          | (None, None, Some y) ->
-              Some {day = 0; month = 0; year = y; prec = Sure}
-          | (Some y, None, None) ->
-              Some {day = 0; month = 0; year = y; prec = Sure}
-          | _ -> None ] ] ]
+          make_date n1 n2 n3 ] ]
   ;
-  prec:
-    [ [ ID "ABT" -> About
-      | ID "ENV" -> About
-      | ID "BEF" -> Before
-      | ID "AFT" -> After
-      | ID "EST" -> Maybe
-      | -> Sure ] ]
+  date_fren:
+    [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." -> () | "/" -> () ];
+        n2 = OPT gen_french; LIST0 [ "." -> () | "/" -> () ]; n3 = OPT int;
+        LIST0 "." ->
+          make_date n1 n2 n3 ] ]
   ;
   gen_month:
-    [ [ i = int -> Left (abs i) | m = month -> Right m ] ]
+    [ [ i = int -> Left (abs i)
+      | m = month -> Right m ] ]
   ;
   month:
     [ [ ID "JAN" -> 1
@@ -454,6 +454,24 @@ EXTEND
       | ID "NOV" -> 11
       | ID "DEC" -> 12 ] ]
   ;
+  gen_french:
+    [ [ m = french -> Right m ] ]
+  ;
+  french:
+    [ [ ID "VEND" -> 1
+      | ID "BRUM" -> 2
+      | ID "FRIM" -> 3
+      | ID "NIVO" -> 4
+      | ID "PLUV" -> 5
+      | ID "VENT" -> 6
+      | ID "GERM" -> 7
+      | ID "FLOR" -> 8
+      | ID "PRAI" -> 9
+      | ID "MESS" -> 10
+      | ID "THER" -> 11
+      | ID "FRUC" -> 12
+      | ID "COMP" -> 13 ] ]
+  ;
   int:
     [ [ i = INT -> int_of_string i | "-"; i = INT -> - int_of_string i ] ]
   ;
@@ -463,22 +481,15 @@ value date_of_field pos d =
   if d = "" then None
   else
     let s = Stream.of_string (String.uppercase d) in
-    let r =
-      do date_str.val := d; return
-      try Grammar.Entry.parse date s with [ Stdpp.Exc_located loc e -> None ]
-    in
-    match r with
-    [ Some (d1, Some d2) ->
-        Some
-          {day = d1.day; month = d1.month; year = d1.year;
-           prec = YearInt d2.year}
-    | Some (d, None) -> Some d
-    | None ->
-        try
-          let y = Grammar.Entry.parse find_year (Stream.of_string d) in
-          Some {day = 0; month = 0; year = y; prec = Maybe}
-        with
-        [ Stdpp.Exc_located loc e -> do print_bad_date pos d; return None ] ]
+    do date_str.val := d; return
+    try Some (Grammar.Entry.parse date_value s) with
+    [ Stdpp.Exc_located loc (Stream.Error _) -> 
+        let d =
+          if d.[0] = '(' && d.[String.length d - 1] = ')' then
+            String.sub d 1 (String.length d - 2)
+          else d
+        in
+        Some (Dtext d) ]
 ;
 
 (* Creating base *)
@@ -601,7 +612,8 @@ value unknown_fam gen i =
   let mother = phony_per gen Female in
   let f =
     {marriage = Adef.codate_None; marriage_place = empty;
-     marriage_src = empty; not_married = False; divorce = NotDivorced;
+     marriage_src = empty; witnesses = [| |]; not_married = False;
+     divorce = NotDivorced;
      children = [| |]; comment = empty; origin_file = empty; fsources = empty;
      fam_index = Adef.ifam_of_int i}
   and c = {father = father; mother = mother} in
@@ -615,12 +627,12 @@ value this_year =
 
 value infer_death birth =
   match birth with
-  [ Some d ->
+  [ Some (Dgreg d _) ->
       let a = this_year - d.year in
       if a > 120 then DeadDontKnowWhen
       else if a <= 80 then NotDead
       else DontKnowIfDead
-  | None -> DontKnowIfDead ]
+  | _ -> DontKnowIfDead ]
 ;
 
 value make_title gen (title, place) =
@@ -860,14 +872,11 @@ value decode_title s =
 value decode_date_interval pos s =
   let strm = Stream.of_string s in
   try
-    match Grammar.Entry.parse date strm with
-    [ Some (d1, Some d2) -> (Some d1, Some d2)
-    | Some (d1, None) ->
-        match d1.prec with
-        [ After -> (Some {(d1) with prec = Sure}, None)
-        | Before -> (None, Some {(d1) with prec = Sure})
-        | _ -> (Some d1, None) ]
-    | _ -> do print_bad_date pos s; return (None, None) ]
+    match Grammar.Entry.parse date_range strm with
+    [ BeginEnd (d1, cal1) (d2, cal2) ->
+        (Some (Dgreg d1 cal1), Some (Dgreg d2 cal2))
+    | Begin (d, cal) -> (Some (Dgreg d cal), None)
+    | End (d, cal) -> (None, Some (Dgreg d cal)) ]
   with
   [ Stdpp.Exc_located _ _ | Not_found ->
       do print_bad_date pos s; return (None, None) ]
@@ -1302,7 +1311,9 @@ value add_fam_norm gen r =
   let fam =
     {marriage = Adef.codate_of_od marr;
      marriage_place = add_string gen marr_place;
-     marriage_src = add_string gen marr_src; not_married = not_married;
+     marriage_src = add_string gen marr_src;
+     witnesses = [| |];
+     not_married = not_married;
      divorce = div; children = Array.of_list children;
      comment = add_string gen comment; origin_file = empty;
      fsources = add_string gen fsources; fam_index = i}
@@ -1804,7 +1815,7 @@ value check_parents_sex base =
   done
 ;
 
-value neg_year =
+value neg_year_dmy =
   fun
   [ {day = d; month = m; year = y; prec = OrYear y2} ->
       {day = d; month = m; year = - abs y; prec = OrYear (- abs y2)}
@@ -1812,6 +1823,12 @@ value neg_year =
       {day = d; month = m; year = - abs y; prec = YearInt (- abs y2)}
   | {day = d; month = m; year = y; prec = p} ->
       {day = d; month = m; year = - abs y; prec = p} ]
+;
+
+value neg_year =
+  fun
+  [ Dgreg d cal -> Dgreg (neg_year_dmy d) cal
+  | x -> x ]
 ;
 
 value neg_year_cdate cd =
@@ -1845,10 +1862,9 @@ value rec negative_date_ancestors base p =
 value negative_dates base =
   for i = 0 to base.data.persons.len - 1 do
     let p = base.data.persons.get i in
-    match (Adef.od_of_codate p.birth, p.death) with
-    [ (Some d1, Death dr cd2) ->
-        let d2 = Adef.date_of_cdate cd2 in
-        if annee d1 > 0 && annee d2 > 0 && strictement_avant d2 d1 then
+    match (Adef.od_of_codate p.birth, date_of_death p.death) with
+    [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
+        if annee d1 > 0 && annee d2 > 0 && strictement_avant_dmy d2 d1 then
           negative_date_ancestors base (base.data.persons.get i)
         else ()
     | _ -> () ];

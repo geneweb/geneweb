@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.16 1999-08-31 00:54:24 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.17 1999-09-14 22:33:34 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -6,21 +6,25 @@ open Gutil;
 
 value ascii = ref True;
 
-value ged_month =
-  fun
-  [ 1 -> "JAN"
-  | 2 -> "FEB"
-  | 3 -> "MAR"
-  | 4 -> "APR"
-  | 5 -> "MAY"
-  | 6 -> "JUN"
-  | 7 -> "JUL"
-  | 8 -> "AUG"
-  | 9 -> "SEP"
-  | 10 -> "OCT"
-  | 11 -> "NOV"
-  | 12 -> "DEC"
-  | _ -> failwith "ged_month" ]
+value month_txt =
+  [| "JAN"; "FEB"; "MAR"; "APR"; "MAY"; "JUN";
+     "JUL"; "AUG"; "SEP"; "OCT"; "NOV"; "DEC" |]
+;
+
+value french_txt =
+  [| "VEND"; "BRUM"; "FRIM"; "NIVO"; "PLUV"; "VENT";
+     "GERM"; "FLOR"; "PRAI"; "MESS"; "THER"; "FRUC";
+     "COMP" |]
+;
+
+value ged_month cal m =
+  match cal with
+  [ Dgregorian | Djulian | Dhebrew ->
+      if m >= 1 && m <= Array.length month_txt then month_txt.(m-1)
+      else failwith "ged_month"
+  | Dfrench ->
+      if m >= 1 && m <= Array.length french_txt then french_txt.(m-1)
+      else failwith "ged_month" ]
 ;
 
 value encode s =
@@ -84,7 +88,7 @@ value ged_header base oc ifile ofile =
         if Filename.check_suffix fname ".gwb" then fname else fname ^ ".gwb");
      try
        let tm = Unix.localtime (Unix.time ()) in
-       let mon = ged_month (tm.Unix.tm_mon + 1) in
+       let mon = ged_month Dgregorian (tm.Unix.tm_mon + 1) in
        do Printf.fprintf oc "1 DATE %02d %s %d\n" tm.Unix.tm_mday mon
             (1900 + tm.Unix.tm_year);
           Printf.fprintf oc "2 TIME %02d:%02d:%02d\n" tm.Unix.tm_hour
@@ -140,7 +144,15 @@ value ged_sex base oc per =
   | Neuter -> () ]
 ;
 
-value ged_date oc dt =
+value ged_calendar oc =
+  fun
+  [ Dgregorian -> ()
+  | Djulian -> Printf.fprintf oc "@#DJULIAN@ "
+  | Dfrench -> Printf.fprintf oc "@#DFRENCH R@ "
+  | Dhebrew -> Printf.fprintf oc "@#DHEBREW@ " ]
+;
+
+value ged_date_dmy oc dt cal =
   do match dt.prec with
      [ Sure -> ()
      | About -> Printf.fprintf oc "ABT "
@@ -149,15 +161,31 @@ value ged_date oc dt =
      | After -> Printf.fprintf oc "AFT "
      | OrYear i -> Printf.fprintf oc "BET "
      | YearInt i -> Printf.fprintf oc "BET " ];
+     ged_calendar oc cal;
      if dt.day <> 0 then Printf.fprintf oc "%02d " dt.day else ();
-     if dt.month <> 0 then Printf.fprintf oc "%s " (ged_month dt.month)
+     if dt.month <> 0 then Printf.fprintf oc "%s " (ged_month cal dt.month)
      else ();
      Printf.fprintf oc "%d" dt.year;
      match dt.prec with
-     [ OrYear i -> Printf.fprintf oc " AND %d" i
-     | YearInt i -> Printf.fprintf oc " AND %d" i
+     [ OrYear i ->
+         do ged_calendar oc cal;
+            Printf.fprintf oc " AND %d" i;
+         return ()
+     | YearInt i ->
+         do ged_calendar oc cal;
+            Printf.fprintf oc " AND %d" i;
+         return ()
      | _ -> () ];
   return ()
+;
+
+value ged_date oc =
+  fun
+  [ Dgreg d Dgregorian -> ged_date_dmy oc d Dgregorian
+  | Dgreg d Djulian -> ged_date_dmy oc (Calendar.julian_of_gregorian d) Djulian
+  | Dgreg d Dfrench -> ged_date_dmy oc (Calendar.french_of_gregorian d) Dfrench
+  | Dgreg d Dhebrew -> ged_date_dmy oc d Dhebrew
+  | Dtext t -> Printf.fprintf oc "(%s)" t ]
 ;
 
 value ged_ev_detail oc n d pl src =

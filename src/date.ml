@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.10 1999-08-19 09:32:27 ddr Exp $ *)
+(* $Id: date.ml,v 2.11 1999-09-14 22:33:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -28,17 +28,30 @@ value code_date conf encoding d m y =
       s ^ loop (i + 1)
 ;
 
-value string_of_ondate conf d =
-  let encoding =
-    let n =
-      if d.day = 1 then 0
-      else if d.day != 0 then 1
-      else if d.month != 0 then 2
-      else 3
-    in
-    transl_nth conf "(date)" n
+value french_month =
+  let tab =
+    [| "vendemiaire"; "brumaire"; "frimaire"; "niv&ocirc;se";
+       "pluvi&ocirc;se"; "vent&ocirc;se"; "germinal"; "floreal";
+       "prairial"; "messidor"; "thermidor"; "fructidor";
+       "jours compl&eacute;mentaires" |]
   in
-  let sy = code_date conf encoding d.day d.month d.year in
+  fun m -> tab.(m)
+;
+
+value code_french_date conf d m y =
+  let s =
+    if d = 0 then ""
+    else string_of_int d ^ (if d = 1 then "<sup>er</sup>" else "")
+  in
+  let s =
+    if m = 0 then ""
+    else s ^ (if s = "" then "" else " ") ^ french_month (m - 1)
+  in
+  s ^ (if s = "" then "" else " ") ^
+  " an " ^ string_of_int y
+;
+
+value string_of_on_prec_dmy conf sy d =
   match d.prec with
   [ Sure ->
       if d.day = 0 && d.month = 0 then
@@ -79,7 +92,26 @@ value string_of_ondate conf d =
       code_date conf (transl_nth conf "(date)" 3) 0 0 z ]
 ;
 
-value string_of_date conf d =
+value string_of_on_dmy conf d =
+  let encoding =
+    let n =
+      if d.day = 1 then 0
+      else if d.day != 0 then 1
+      else if d.month != 0 then 2
+      else 3
+    in
+    transl_nth conf "(date)" n
+  in
+  let sy = code_date conf encoding d.day d.month d.year in
+  string_of_on_prec_dmy conf sy d
+;
+
+value string_of_on_french_dmy conf d =
+  let sy = code_french_date conf d.day d.month d.year in
+  string_of_on_prec_dmy conf sy d
+;
+
+value string_of_dmy conf d =
   let encoding =
     let n =
       if d.day = 1 then 0
@@ -104,6 +136,31 @@ value string_of_date conf d =
       transl conf "between (date)" ^ " " ^ s ^ " " ^
       transl conf "and" ^ " " ^
       code_date conf (transl_nth conf "(date)" 3) 0 0 z ]
+;
+
+value string_of_ondate conf =
+  fun
+  [ Dgreg d Dgregorian -> string_of_on_dmy conf d
+  | Dgreg ({day = 0} as d) Djulian -> string_of_on_dmy conf d
+  | Dgreg d Djulian ->
+      let cal_prec =
+        if d.year < 1582 then ""
+        else " (" ^ string_of_dmy conf d ^ ")"
+      in
+      let d1 = Calendar.julian_of_gregorian d in
+      string_of_on_dmy conf d1 ^ " " ^
+      transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
+  | Dgreg d french ->
+      let d1 = Calendar.french_of_gregorian d in
+      string_of_on_french_dmy conf d1 ^ " "
+      ^ " (" ^ string_of_dmy conf d ^ ")"
+  | Dtext t -> "(" ^ t ^ ")" ]
+;
+
+value string_of_date conf =
+  fun
+  [ Dgreg d _ -> string_of_dmy conf d
+  | Dtext t -> "(" ^ t ^ ")" ]
 ;
 
 value print_age conf a =
@@ -157,8 +214,8 @@ value display_year d =
 
 value of_course_died conf p =
   match Adef.od_of_codate p.birth with
-  [ Some d -> conf.Config.today.year - d.year > 120
-  | None -> False ]
+  [ Some (Dgreg d _) -> conf.Config.today.year - d.year > 120
+  | _ -> False ]
 ;
 
 value short_dates_text conf base p =
@@ -175,7 +232,7 @@ value short_dates_text conf base p =
     in
     let s =
       match birth_date with
-      [ Some d -> s ^ year_text d
+      [ Some (Dgreg d _) -> s ^ year_text d
       | _ -> s ]
     in
     let s =
@@ -188,8 +245,8 @@ value short_dates_text conf base p =
       | _ -> s ]
     in
     let s =
-      match p.death with
-      [ Death _ d -> s ^ year_text (Adef.date_of_cdate d)
+      match date_of_death p.death with
+      [ Some (Dgreg d _) -> s ^ year_text d
       | _ -> s ]
     in
     if s <> "" then " <em>" ^ s ^ "</em>" else s
@@ -199,8 +256,8 @@ value short_dates_text conf base p =
 value short_marriage_date_text conf base fam p1 p2 =
   if age_autorise conf base p1 && age_autorise conf base p2 then
     match Adef.od_of_codate fam.marriage with
-    [ Some d -> "<font size=-2>" ^ year_text d ^ "</font>"
-    | None -> "" ]
+    [ Some (Dgreg d _) -> "<font size=-2>" ^ year_text d ^ "</font>"
+    | _ -> "" ]
   else ""
 ;
 

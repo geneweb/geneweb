@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.13 1999-07-28 13:08:32 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.14 1999-09-14 22:33:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -91,17 +91,18 @@ value print_child_person conf base var (first_name, surname, occ, create) =
       tag "td" "colspan=2" begin
         Wserver.wprint "<input name=%s_dd size=2 maxlength=2%s>\n" var
           (match create with
-           [ Update.Create _ (Some {day = d}) when d <> 0 ->
+           [ Update.Create _ (Some (Dgreg {day = d} _)) when d <> 0 ->
                " value=" ^ string_of_int d
            | _ -> "" ]);
         Wserver.wprint "<input name=%s_mm size=2 maxlength=2%s>\n" var
           (match create with
-           [ Update.Create _ (Some {month = m}) when m <> 0 ->
+           [ Update.Create _ (Some (Dgreg {month = m} _)) when m <> 0 ->
                " value=" ^ string_of_int m
            | _ -> "" ]);
         Wserver.wprint "<input name=%s_yyyy size=5 maxlength=5%s>\n" var
           (match create with
-           [ Update.Create _ (Some {year = y}) -> " value=" ^ string_of_int y
+           [ Update.Create _ (Some (Dgreg {year = y} _)) ->
+               " value=" ^ string_of_int y
            | _ -> "" ]);
       end;
     end;
@@ -153,10 +154,8 @@ value print_marriage conf base fam =
          end;
        end;
      end;
-     tag "table" "border=1" begin
-       Update.print_date conf base (capitale (transl conf "date")) "marriage"
-         (Adef.od_of_codate fam.marriage);
-     end;
+     Update.print_date conf base (capitale (transl conf "date")) "marriage"
+       (Adef.od_of_codate fam.marriage);
      Update.print_src conf "marr_src" fam.marriage_src;
   return ()
 ;
@@ -173,12 +172,10 @@ value print_divorce conf base fam =
      Wserver.wprint "<input type=radio name=divorce value=divorced%s>"
        (match fam.divorce with [ Divorced _ -> " checked" | _ -> "" ]);
      Wserver.wprint "%s\n" (capitale (transl conf "divorced"));
-     tag "table" "border=1" begin
-       Update.print_date conf base (capitale (transl conf "date")) "divorce"
-         (match fam.divorce with
-          [ Divorced d -> Adef.od_of_codate d
-          | _ -> None ]);
-     end;
+     Update.print_date conf base (capitale (transl conf "date")) "divorce"
+       (match fam.divorce with
+        [ Divorced d -> Adef.od_of_codate d
+        | _ -> None ]);
   return ()
 ;
 
@@ -444,7 +441,7 @@ value print_add conf base =
   in
   let fam =
     {marriage = Adef.codate_None; marriage_place = "";
-     marriage_src = ""; not_married = False;
+     marriage_src = ""; witnesses = [| |]; not_married = False;
      divorce = NotDivorced; children = [| |];
      comment = ""; origin_file = ""; fsources = "";
      fam_index = bogus_family_index}
@@ -460,7 +457,7 @@ value print_add_parents conf base =
       let p = base.data.persons.get i in
       let fam =
         {marriage = Adef.codate_None; marriage_place = "";
-         marriage_src = ""; not_married = False;
+         marriage_src = ""; witnesses = [| |]; not_married = False;
          divorce = NotDivorced;
          children =
            [| (sou base p.first_name, sou base p.surname, p.occ,

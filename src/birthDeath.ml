@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 2.2 1999-04-19 15:49:09 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 2.3 1999-09-14 22:33:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -7,15 +7,15 @@ open Gutil;
 open Util;
 open Config;
 
-value insert_at tab len i p d =
+value insert_at tab len i p d cal =
   let len = min len (Array.length tab - 1) in
   do Array.blit tab i tab (i + 1) (len - i); return
-  tab.(i) := Some (p, d)
+  tab.(i) := Some (p, d, cal)
 ;
 
 value before d =
   fun
-  [ Some (_, d1) ->
+  [ Some (_, d1, _) ->
       if d1.year < d.year then True
       else if d1.year > d.year then False
       else if d1.month < d.month then True
@@ -28,19 +28,20 @@ value before d =
 
 value after d x = not (before d x);
 
-value insert conf tab len p d =
+value insert conf tab len p d cal =
   do assert (len <= Array.length tab); return
-  if len == 0 then if Array.length tab > 0 then tab.(0) := Some (p, d) else ()
-  else if before d tab.(0) then insert_at tab len 0 p d
+  if len == 0 then
+    if Array.length tab > 0 then tab.(0) := Some (p, d, cal) else ()
+  else if before d tab.(0) then insert_at tab len 0 p d cal
   else if after d tab.(len - 1) then
-    if len == Array.length tab then () else tab.(len) := Some (p, d)
+    if len == Array.length tab then () else tab.(len) := Some (p, d, cal)
   else
     loop 0 (len - 1) where rec loop imin imax =
       do assert (imin < imax);
          assert (after d tab.(imin));
          assert (before d tab.(imax));
       return
-      if imin == imax - 1 then insert_at tab len imax p d
+      if imin == imax - 1 then insert_at tab len imax p d cal
       else
         let imid = (imin + imax) / 2 in
         if before d tab.(imid) then loop imin imid
@@ -60,8 +61,8 @@ value select conf base get_date =
        let p = base.data.persons.get i in
        if age_autorise conf base p then
          match get_date p with
-         [ Some d ->
-             do insert conf tab len.val p d;
+         [ Some (Dgreg d cal) ->
+             do insert conf tab len.val p d cal;
                 if len.val == Array.length tab then () else incr len;
              return ()
          | _ -> () ]
@@ -78,7 +79,7 @@ value print_birth conf base =
   do header conf title;
      for i = 0 to Array.length tab - 1 do
        match tab.(i) with
-       [ Some (p, d) ->
+       [ Some (p, d, cal) ->
            tag "ul" begin
              html_li conf;
              Wserver.wprint "<strong>\n";
@@ -86,7 +87,7 @@ value print_birth conf base =
              Wserver.wprint "</strong>,\n";
              Wserver.wprint "%s <em>%s</em>.\n"
                (transl_nth conf "born" (index_of_sex p.sex))
-               (Date.string_of_ondate conf d);
+               (Date.string_of_ondate conf (Dgreg d cal));
            end
        | None -> () ];
      done;
@@ -108,7 +109,7 @@ value print_death conf base =
   do header conf title;
      for i = 0 to Array.length tab - 1 do
        match tab.(i) with
-       [ Some (p, d) ->
+       [ Some (p, d, cal) ->
            tag "ul" begin
              html_li conf;
              Wserver.wprint "<strong>\n";
@@ -116,10 +117,10 @@ value print_death conf base =
              Wserver.wprint "</strong>,\n";
              Wserver.wprint "%s <em>%s</em>"
                (transl_nth conf "died" (index_of_sex p.sex))
-               (Date.string_of_ondate conf d);
+               (Date.string_of_ondate conf (Dgreg d cal));
              let sure d = d.prec = Sure in
              match Adef.od_of_codate p.birth with
-             [ Some d1 ->
+             [ Some (Dgreg d1 _) ->
                  if sure d1 && sure d && d1 <> d then
                    let a = temps_ecoule d1 d in
                    do Wserver.wprint " <em>(";

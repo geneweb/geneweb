@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.23 1999-08-30 23:55:48 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.24 1999-09-14 22:33:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -155,7 +155,7 @@ value temps_ecoule d1 d2 =
 
 value annee d = d.year;
 
-value strictement_avant d1 d2 =
+value strictement_avant_dmy d1 d2 =
   let {day = d; month = m; year = y; prec = p} = temps_ecoule d2 d1 in
   if y < 0 then True
   else if y > 0 then False
@@ -168,7 +168,13 @@ value strictement_avant d1 d2 =
   else False
 ;
 
-value strictement_apres d1 d2 =
+value strictement_avant d1 d2 =
+  match (d1, d2) with
+  [ (Dgreg d1 _, Dgreg d2 _) -> strictement_avant_dmy d1 d2
+  | _ -> False ]
+;
+
+value strictement_apres_dmy d1 d2 =
   let {day = d; month = m; year = y; prec = p} = temps_ecoule d1 d2 in
   if y < 0 then True
   else if y > 0 then False
@@ -179,6 +185,12 @@ value strictement_apres d1 d2 =
   else if d2.prec = d1.prec then False
   else if d2.prec = Before && d1.prec = After then True
   else False
+;
+
+value strictement_apres d1 d2 =
+  match (d1, d2) with
+  [ (Dgreg d1 _, Dgreg d2 _) -> strictement_apres_dmy d1 d2
+  | _ -> False ]
 ;
 
 value denomination base p =
@@ -407,9 +419,9 @@ type warning 'person =
   | MarriageDateBeforeBirth of 'person
   | MotherDeadAfterChildBirth of 'person and 'person
   | ParentBornAfterChild of 'person and 'person
-  | ParentTooYoung of 'person and Def.date
+  | ParentTooYoung of 'person and Def.dmy
   | TitleDatesError of 'person and title
-  | YoungForMarriage of 'person and Def.date ]
+  | YoungForMarriage of 'person and Def.dmy ]
 ;
 type base_warning = warning person;
 
@@ -464,24 +476,30 @@ value check_noloop_for_person_list base error ipl =
   List.iter noloop ipl
 ;
 
+value date_of_death =
+  fun
+  [ Death _ cd -> Some (Adef.date_of_cdate cd)
+  | _ -> None ]
+;
+
 value child_born_after_his_parent base error warning x iparent =
   let parent = poi base iparent in
   match
-    (Adef.od_of_codate parent.birth, Adef.od_of_codate x.birth, x.death)
+    (Adef.od_of_codate parent.birth, Adef.od_of_codate x.birth,
+     date_of_death x.death)
   with
-  [ (Some d1, Some d2, _) ->
+  [ (Some (Dgreg g1 _ as d1), Some (Dgreg g2 _ as d2), _) ->
       if strictement_apres d1 d2 then
         warning (ParentBornAfterChild parent x)
       else
-        let a = temps_ecoule d1 d2 in
-        if annee a < 12 then warning (ParentTooYoung parent a) else ()
-  | (Some d1, _, Death _ d2) ->
-      let d2 = Adef.date_of_cdate d2 in
+        let a = temps_ecoule g1 g2 in
+        if annee a < 11 then warning (ParentTooYoung parent a) else ()
+  | (Some (Dgreg g1 _ as d1), _, Some (Dgreg g2 _ as d2)) ->
       if strictement_apres d1 d2 then
         warning (ParentBornAfterChild parent x)
       else
-        let a = temps_ecoule d1 d2 in
-        if annee a < 12 then warning (ParentTooYoung parent a) else ()
+        let a = temps_ecoule g1 g2 in
+        if annee a < 11 then warning (ParentTooYoung parent a) else ()
   | _ -> () ]
 ;
 
@@ -511,20 +529,19 @@ value child_born_before_mother_death base warning x imoth =
 
 value possible_father base warning x ifath =
   let father = poi base ifath in
-  match (Adef.od_of_codate x.birth, father.death) with
-  [ (Some d1, Death _ d2) ->
-      match (d1, Adef.date_of_cdate d2) with
-      [ ({prec = Before}, _) | (_, {prec = After}) -> ()
-      | (d1, d2) ->
-          let a2 =
-            match d2 with
-            [ {prec = YearInt a2} -> a2
-            | {prec = OrYear a2} -> a2
-            | {year = a} -> a ]
-          in
-          if annee d1 > a2 + 1 then
-            warning (DeadTooEarlyToBeFather father x)
-          else () ]
+  match (Adef.od_of_codate x.birth, date_of_death father.death) with
+  [ (Some (Dgreg {prec = Before} _), _)
+  | (_, Some (Dgreg {prec = After} _)) -> ()
+  | (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
+      let a2 =
+        match d2 with
+        [ {prec = YearInt a2} -> a2
+        | {prec = OrYear a2} -> a2
+        | {year = a} -> a ]
+      in
+      if annee d1 > a2 + 1 then
+        warning (DeadTooEarlyToBeFather father x)
+      else ()
   | _ -> () ]
 ;
 
@@ -589,9 +606,11 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
          [ Some d1 ->
              if strictement_avant d2 d1 then
                warning (MarriageDateBeforeBirth p)
+(*
              else if
                annee d2 > 1850 && annee (temps_ecoule d1 d2) < 13 then
                warning (YoungForMarriage p (temps_ecoule d1 d2))
+*)
              else ()
          | _ -> () ];
          match p.death with
@@ -821,8 +840,8 @@ value map_person_ps fp fs p =
 
 value map_family_ps fp fs fam =
   {marriage = fam.marriage; marriage_place = fs fam.marriage_place;
-   marriage_src = fs fam.marriage_src; not_married = fam.not_married;
-   divorce = fam.divorce;
+   marriage_src = fs fam.marriage_src; witnesses = Array.map fp fam.witnesses;
+   not_married = fam.not_married; divorce = fam.divorce;
    children = Array.map fp fam.children;
    comment = fs fam.comment;
    origin_file = fs fam.origin_file;

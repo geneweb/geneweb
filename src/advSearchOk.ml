@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 2.6 1999-07-27 14:18:54 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 2.7 1999-09-14 22:33:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -9,7 +9,7 @@ open Util;
 
 value get_number var key env = p_getint env (var ^ "_" ^ key);
 
-value reconstitute_date conf var =
+value reconstitute_date_dmy conf var =
   match get_number var "yyyy" conf.env with
   [ Some y ->
       match get_number var "mm" conf.env with
@@ -25,6 +25,12 @@ value reconstitute_date conf var =
               else None ]
       | None ->
           Some {day = 0; month = 0; year = y; prec = Sure} ]
+  | None -> None ]
+;
+
+value reconstitute_date conf var =
+  match reconstitute_date_dmy conf var with
+  [ Some d -> Some (Dgreg d Dgregorian)
   | None -> None ]
 ;
 

@@ -3,7 +3,6 @@ GeneWeb version 2.07
 
 * Setup program (gwsetup)
   - [Sep 13, 99] Added German version (Thomas Omerzu).
-  - [Sep 13, 99] Changed all remaining "setup" into "gwsetup" in HTML files.
   - [Sep 9, 99] Added Swedish version (Lars Gustavsson).
   - [Sep 8, 99] Fixed lot of typos and errors in English version
     (thanks to Lars Gustavsson).
