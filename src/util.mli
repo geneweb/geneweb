@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.5 2002-01-21 05:01:01 ddr Exp $ *)
+(* $Id: util.mli,v 4.6 2002-01-23 11:39:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -45,6 +45,8 @@ value geneweb_link : config -> string -> string -> string;
 value wprint_geneweb_link : config -> string -> string -> unit;
 
 value pget : config -> base -> iper -> person;
+value aget : config -> base -> iper -> ascend;
+value uget : config -> base -> iper -> union;
 
 type p_access = (base -> person -> string * base -> person -> string);
 value std_access : p_access;
@@ -165,7 +167,7 @@ value only_printable : string -> string;
 value relation_type_text : config -> relation_type -> int -> string;
 value rchild_type_text : config -> relation_type -> int -> string;
 
-value has_nephews_or_nieces : base -> person -> bool;
+value has_nephews_or_nieces : config -> base -> person -> bool;
 
 value browser_doesnt_have_tables : config -> bool;
 

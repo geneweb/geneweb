@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.8 2002-01-10 04:13:30 ddr Exp $ *)
+(* $Id: family.ml,v 4.9 2002-01-23 11:39:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -292,7 +292,7 @@ value precisez conf base n pl =
                   let spouse = pget conf base (spouse p.cle_index cpl) in
                   if p_surname base spouse <> "?" then [spouse :: spouses]
                   else spouses)
-               (Array.to_list (uoi base p.cle_index).family) []
+               (Array.to_list (uget conf base p.cle_index).family) []
            in
            match spouses with
            [ [] -> ()

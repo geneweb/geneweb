@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 4.3 2002-01-10 04:13:30 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 4.4 2002-01-23 11:39:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -181,13 +181,14 @@ value advanced_search conf base max_answers =
             (fun x -> x.surname) (gets "surname")
       in
       let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
-      List.iter (fun ip -> test_person (pget conf base ip) (uoi base ip)) slist
+      List.iter
+        (fun ip -> test_person (pget conf base ip) (uget conf base ip)) slist
     else
       for i = 0 to base.data.persons.len - 1 do {
         if len.val > max_answers then ()
         else
           test_person (pget conf base (Adef.iper_of_int i))
-            (base.data.unions.get i)
+            (uget conf base (Adef.iper_of_int i))
       };
     (List.rev list.val, len.val)
   }
