@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.70 2001-01-06 09:55:54 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.71 2001-01-18 05:24:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -43,7 +43,7 @@ value is_multipart_form =
     loop 0 where rec loop i =
       if i >= String.length content_type then False
       else if i >= String.length s then True
-      else if content_type.[i] == s.[i] then loop (i + 1)
+      else if content_type.[i] == Char.lowercase s.[i] then loop (i + 1)
       else False
 ;
 
