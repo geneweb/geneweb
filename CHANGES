@@ -1,6 +1,13 @@
 GeneWeb version 4.07
 --------------------
 
+* GeneWeb server or CGI (gwd)
+  - [18 Mar 02] Had to remove the cookie system added in previous version
+    because it introduced a bug: the system of global authorization file
+    (variable "auth_file" of the configuration file) did not work any
+    more (it is complicated to make both systems work: the code is too
+    badly written).
+
 GeneWeb version 4.06
 --------------------
 
