@@ -1,9 +1,15 @@
-(* $Id: iobase.ml,v 1.2 1998-09-15 11:16:55 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.3 1998-09-15 12:30:05 ddr Exp $ *)
+
+open Def;
+open Gutil;
+
+value magic_gwb = "GnWb001p";
+
 (*
  Files in base (directory .gwb)
 
     gwb - the base itself
-       magic number (magic_gwb)                 : string of len 8
+       magic number (magic_gwb)                 : string of length 8
        number of persons                        : binary_int
        number of ascends (= number of persons)  : binary_int
        number of families                       : binary_int
@@ -25,17 +31,18 @@
        ascends offsets   : array of binary_ints
        families offsets  : array of binary_ints
        couples offsets   : array of binary_ints
+       strings offsets   : array of binary_ints
 
-    inx - index for names + index for strings of first names and surnames
+    inx - index for names, strings of first names and surnames
        2nd index offset : binary_int
        1st index (names) : value
-         array, len = "table_size", associating:
-          - a hash value of a "crushed" (see module "Name") name (modulo len)
+         array, length = "table_size", associating:
+          - a hash value of a "crushed" (module "Name") name (modulo length)
           - to the array of indexes of the corresponding persons
        2nd index (first names and surnames strings) : value
-         array, len = "table_size", associating:
-          - a hash value of the "crushed" (see module "Name") first name or
-            surname (modulo len)
+         array, length = "table_size", associating:
+          - a hash value of the "crushed" (module "Name") first name or
+            surname (modulo length)
           - to the array of the corresponding string indexes
 
     gw2 - index for strings, surnames, first names
@@ -43,10 +50,10 @@
        offset of surnames index           : binary_int
        offset of first names index        : binary_int
        strings hash table index           : 2 arrays of binary_ints
-         strings offset array (len = prime after 10 * strings array length)
-           - associating a hash value of the string modulo len
+         strings offset array (length = prime after 10 * strings array length)
+           - associating a hash value of the string modulo length
            - to his index in the string array
-         strings list array (len = string array length)
+         strings list array (length = string array length)
            - associating a string index
            - to the index of the next index holding the same hash value
        surnames index                     : value
@@ -63,11 +70,6 @@
        is written and rewritten. It holds a record of type "patches", composed
        of association lists "index" - "new value".
 *)
-
-open Def;
-open Gutil;
-
-value magic_gwb = "GnWb001p";
 
 value output_value_header_size = 20;
 value output_value_no_sharing oc v =
