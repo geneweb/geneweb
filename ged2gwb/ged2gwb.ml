@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.9 1998-10-16 13:11:59 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.10 1998-11-03 13:30:53 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -636,23 +636,32 @@ value treat_indi_title gen public_name r =
 
 value add_indi gen r =
   let i = per_index gen r.rval in
-  let (first_name, surname, occ, public_name, nick_name, first_name_alias) =
-    match find_field "NAME" r.rsons with
+  let name_sons = find_field "NAME" r.rsons in
+  let public_name =
+    match name_sons with
+    [ Some n ->
+        match find_field "GIVN" n.rsons with
+        [ Some r -> r.rval
+        | None -> "" ]
+    | None -> "" ]
+  in
+  let (first_name, surname, occ, public_name, first_name_alias) =
+    match name_sons with
     [ Some n ->
         let (f, s) = parse_name (Stream.of_string n.rval) in
         let (f, pn, fa) =
           if extract_public_names.val || extract_first_names.val then
             let i = next_word_pos f 0 in
             let j = next_sep_pos f i in
-            if j == String.length f then (f, "", "")
+            if j == String.length f then (f, public_name, "")
             else
               let fn = String.sub f i (j - i) in
-              if extract_public_names.val then
+              if public_name = "" && extract_public_names.val then
                 if is_a_public_name f j then (fn, f, "")
                 else if extract_first_names.val then (fn, "", f)
                 else (f, "", "")
-              else (fn, "", f)
-          else (f, "", "")
+              else (fn, public_name, f)
+          else (f, public_name, "")
         in
         let f = if lowercase_first_names.val then lowercase_name f else f in
         let fa = if lowercase_first_names.val then lowercase_name fa else fa in
@@ -664,13 +673,24 @@ value add_indi gen r =
               let r = ref (-1) in
               do Hashtbl.add gen.g_hnam key r; return r ]
         in
-        let nn =
-          match find_field "NICK" n.rsons with
-          [ Some r -> r.rval
-          | None -> "" ]
-        in
-        do incr r; return (f, s, r.val, pn, nn, fa)
-    | None -> ("?", "?", Adef.int_of_iper i, "", "", "") ]
+        do incr r; return (f, s, r.val, pn, fa)
+    | None -> ("?", "?", Adef.int_of_iper i, public_name, "") ]
+  in
+  let nick_name =
+    match name_sons with
+    [ Some n ->
+        match find_field "NICK" n.rsons with
+        [ Some r -> r.rval
+        | None -> "" ]
+    | None -> "" ]
+  in
+  let surname_alias =
+    match name_sons with
+    [ Some n ->
+        match find_field "SURN" n.rsons with
+        [ Some r -> r.rval
+        | None -> "" ]
+    | None -> "" ]
   in
   let sex =
     match find_field "SEX" r.rsons with
@@ -851,7 +871,8 @@ value add_indi gen r =
      first_names_aliases =
        if first_name_alias <> "" then [add_string gen first_name_alias]
        else [];
-     surnames_aliases = [];
+     surnames_aliases =
+       if surname_alias <> "" then [add_string gen surname_alias] else [];
      titles = titles; occupation = add_string gen occupation;
      sexe = sex; access = IfTitles;
      birth = birth; birth_place = add_string gen birth_place;

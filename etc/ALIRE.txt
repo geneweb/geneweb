@@ -1,4 +1,4 @@
-GeneWeb 1.08
+GeneWeb 1.09
 
 Pour demarrer avec GeneWeb, lancez votre navigateur Web.
 
