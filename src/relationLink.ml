@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.7 1999-12-10 02:35:51 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.8 1999-12-14 15:22:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -645,9 +645,17 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
              set l2)
         (Dag.Pset.add ia Dag.Pset.empty) l1
     in
+    let spl =
+      List.fold_right
+        (fun (ip, s) spl ->
+           match find_person_in_env conf base s with
+           [ Some sp -> [(ip, (sp.cle_index, None)) :: spl]
+           | None -> spl ])
+        [(p1.cle_index, "3"); (p2.cle_index, "4")] []
+    in
     let list = Dag.Pset.elements set in
     let d = Dag.make_dag base list in
-    Dag.print_dag conf base set d
+    Dag.print_dag conf base set spl d
   with
   [ Exit -> Util.incorrect_request conf ]
 ;

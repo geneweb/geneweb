@@ -6,6 +6,8 @@ GeneWeb version 3.02
     another browser (see version 3.01).
 
 * GeneWeb Service/CGI (gwd)
+  - [Dec 14, 99] In relationship links, with option "relationship by
+    marriage", when several branches, sometimes did not display the person.
   - [Dec 13, 99] In tree displays with several branches, add the spouse(s)
     of the top person(s).
   - [Dec 13, 99] Fixed bug: when merging two persons, the godchildren,
