@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.10 2001-12-31 20:54:19 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.11 2002-01-10 04:13:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -241,8 +241,8 @@ value propose_merge_ind conf base branches p1 p2 =
       tag "table" begin
         List.iter
           (fun (ip1, ip2) ->
-             let p1 = poi base ip1 in
-             let p2 = poi base ip2 in
+             let p1 = pget conf base ip1 in
+             let p2 = pget conf base ip2 in
              do {
                tag "tr" "align=left" begin
                  tag "td" begin
@@ -324,8 +324,8 @@ value effective_merge_ind conf base p1 p2 =
 ;
 
 value merge_ind conf base branches ip1 ip2 changes_done =
-  let p1 = poi base ip1 in
-  let p2 = poi base ip2 in
+  let p1 = pget conf base ip1 in
+  let p2 = pget conf base ip2 in
   if compatible_ind base p1 p2 then do {
     effective_merge_ind conf base p1 p2; (True, True)
   }
@@ -379,8 +379,8 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
 ;
 
 value merge_fam conf base branches ifam1 ifam2 ip1 ip2 changes_done =
-  let p1 = poi base ip1 in
-  let p2 = poi base ip2 in
+  let p1 = pget conf base ip1 in
+  let p2 = pget conf base ip2 in
   let fam1 = foi base ifam1 in
   let fam2 = foi base ifam2 in
   if compatible_fam base fam1 fam2 then do {
@@ -515,7 +515,7 @@ value print conf base =
         [ (Some "input" | None, Some n) ->
             let ipl = Gutil.person_ht_find_all base n in
             match ipl with
-            [ [ip2] -> Some (poi base ip2)
+            [ [ip2] -> Some (pget conf base ip2)
             | _ -> None ]
         | (Some x, Some "" | None) ->
             Some (base.data.persons.get (int_of_string x))

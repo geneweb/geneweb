@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.6 2001-12-20 19:58:14 ddr Exp $ *)
+(* $Id: descend.ml,v 4.7 2002-01-10 04:13:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -169,11 +169,11 @@ value afficher_menu_descendants conf base p =
   }
 ;
 
-value s_appelle_comme_son_pere base ip =
+value s_appelle_comme_son_pere conf base ip =
   let a = aoi base ip in
   match a.parents with
   [ Some ifam ->
-      (poi base ip).surname = (poi base (coi base ifam).father).surname
+      (pget conf base ip).surname = (pget conf base (coi base ifam).father).surname
   | _ -> False ]
 ;
 
@@ -217,7 +217,7 @@ value
   do {
     html_li conf;
     stag "strong" begin
-      if not always_surname && s_appelle_comme_son_pere base ix then
+      if not always_surname && s_appelle_comme_son_pere conf base ix then
         afficher_prenom_de_personne_referencee conf base x
       else afficher_personne_referencee conf base x;
     end;
@@ -239,7 +239,7 @@ value
           (fun first ifam ->
              let fam = foi base ifam in
              let c = spouse x.cle_index (coi base ifam) in
-             let c = poi base c in
+             let c = pget conf base c in
              if connais base c then do {
                afficher_marie conf base first fam x c;
                Wserver.wprint ".";
@@ -271,12 +271,12 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
            let cpl = coi base ifam in
            let des = doi base ifam in
            let conj = spouse p.cle_index cpl in
-           let conj = poi base conj in
+           let conj = pget conf base conj in
            let children =
              let list = Array.to_list des.children in
              List.fold_right
                (fun ip pl ->
-                  let p = poi base ip in
+                  let p = pget conf base ip in
                   if line = Neuter || line = Male && p.sex <> Female ||
                      line = Female && p.sex <> Male then
                     [p :: pl]
@@ -358,7 +358,7 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
          let enfants = des.children in
          List.fold_left
            (fun list ix ->
-              let x = poi base ix in
+              let x = pget conf base ix in
               if niveau == niveau_max then
                 if p_first_name base x = "x" ||
                    levt.(Adef.int_of_iper x.cle_index) != niveau then
@@ -432,7 +432,7 @@ value mark_descendants base marks max_lev p =
     else ()
 ;
 
-value label_descendants base marks paths max_lev =
+value label_descendants conf base marks paths max_lev =
   loop [] 0 where rec loop path lev p =
     if lev < max_lev then
       let u = uoi base p.cle_index in
@@ -449,7 +449,7 @@ value label_descendants base marks paths max_lev =
                        do {
                       let path = [Char.chr (Char.code 'A' + cnt) :: path] in
                       paths.(Adef.int_of_iper e) := path;
-                      loop path (succ lev) (poi base e)
+                      loop path (succ lev) (pget conf base e)
                     }
                     else ();
                     succ cnt
@@ -463,7 +463,7 @@ value label_descendants base marks paths max_lev =
 
 value close_lev = 2;
 
-value close_to_end base marks max_lev lev p =
+value close_to_end conf base marks max_lev lev p =
   if lev + close_lev >= max_lev then True
   else
     let rec short dlev p =
@@ -476,7 +476,7 @@ value close_to_end base marks max_lev lev p =
            if p.sex == Male || not marks.(Adef.int_of_iper c) then
              if dlev == close_lev then Array.length el = 0
              else
-               List.for_all (fun e -> short (succ dlev) (poi base e))
+               List.for_all (fun e -> short (succ dlev) (pget conf base e))
                  (Array.to_list el)
            else True)
         (Array.to_list u.family)
@@ -484,7 +484,7 @@ value close_to_end base marks max_lev lev p =
     short 1 p
 ;
 
-value labelled base marks max_lev lev ip =
+value labelled conf base marks max_lev lev ip =
   let a = aoi base ip in
   let u = uoi base ip in
   Array.length u.family <> 0 &&
@@ -496,10 +496,10 @@ value labelled base marks max_lev lev ip =
             let el = (doi base ifam).children in
             List.exists
               (fun ie ->
-                 let e = poi base ie in
+                 let e = pget conf base ie in
                  let u = uoi base ie in
                  Array.length u.family <> 0 &&
-                 not (close_to_end base marks max_lev lev e))
+                 not (close_to_end conf base marks max_lev lev e))
               (Array.to_list el))
          (Array.to_list (uoi base cpl.father).family)
    | _ -> False ])
@@ -561,7 +561,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
              let des = doi base ifam in
              let c = spouse p.cle_index (coi base ifam) in
              let el = des.children in
-             let c = poi base c in
+             let c = pget conf base c in
              do {
                if need_br then html_br conf else ();
                if not first then print_repeat_child conf base p1 c1 p else ();
@@ -576,7 +576,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                let cnt =
                  List.fold_left
                    (fun cnt ie ->
-                      let e = poi base ie in
+                      let e = pget conf base ie in
                       do {
                         if print_children then do {
                           Wserver.wprint "<li type=A> ";
@@ -590,7 +590,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                  let des = doi base ifam in
                                  let c1 = spouse ie (coi base ifam) in
                                  let el = des.children in
-                                 let c1 = poi base c1 in
+                                 let c1 = pget conf base c1 in
                                  do {
                                    if not first then do {
                                      html_br conf;
@@ -640,7 +640,7 @@ value print_family conf base marks paths max_lev lev p =
            let des = doi base ifam in
            let c = spouse p.cle_index (coi base ifam) in
            let el = des.children in
-           let c = poi base c in
+           let c = pget conf base c in
            do {
              stag "strong" begin
                afficher_personne_referencee conf base p;
@@ -650,7 +650,7 @@ value print_family conf base marks paths max_lev lev p =
              let cnt =
                List.fold_left
                  (fun cnt ie ->
-                    let e = poi base ie in
+                    let e = pget conf base ie in
                     do {
                       if p.sex == Male ||
                          not marks.(Adef.int_of_iper c.cle_index) then
@@ -659,7 +659,7 @@ value print_family conf base marks paths max_lev lev p =
                         print_child conf base p c e;
                         incr total;
                         Wserver.wprint "\n";
-                        if labelled base marks max_lev lev ie then
+                        if labelled conf base marks max_lev lev ie then
                           Wserver.wprint " => <tt><b>%s</b></tt>\n"
                             (label_of_path paths e)
                         else if succ lev == max_lev then
@@ -669,7 +669,7 @@ value print_family conf base marks paths max_lev lev p =
                                let des = doi base ifam in
                                let c = spouse ie (coi base ifam) in
                                let el = des.children in
-                               let c = poi base c in
+                               let c = pget conf base c in
                                do {
                                  afficher_spouse conf base marks paths fam e
                                    c;
@@ -706,12 +706,13 @@ value print_families conf base marks paths max_lev =
            let des = doi base ifam in
            let c = spouse p.cle_index (coi base ifam) in
            let el = des.children in
-           let c = poi base c in
+           let c = pget conf base c in
            if p.sex == Male || not marks.(Adef.int_of_iper c.cle_index) then
              Array.iter
                (fun ie ->
-                  let e = poi base ie in
-                  if labelled base marks max_lev lev ie then loop (succ lev) e
+                  let e = pget conf base ie in
+                  if labelled conf base marks max_lev lev ie then
+                    loop (succ lev) e
                   else ())
                el
            else ())
@@ -747,7 +748,7 @@ value afficher_descendants_numerotation conf base niveau_max ancetre =
     Wserver.wprint "%s." (capitale (text_to conf niveau_max));
     html_p conf;
     mark_descendants base marks niveau_max ancetre;
-    label_descendants base marks paths niveau_max ancetre;
+    label_descendants conf base marks paths niveau_max ancetre;
     print_families conf base marks paths niveau_max ancetre;
     if total.val > 1 then do {
       html_p conf;
@@ -771,7 +772,7 @@ value print_ref conf base paths p =
       (fun ifam ->
          let c = spouse p.cle_index (coi base ifam) in
          if paths.(Adef.int_of_iper c) <> [] then
-           let c = poi base c in
+           let c = pget conf base c in
            Wserver.wprint " => %s %s <tt><b>%s</b></tt>" (p_first_name base c)
              (p_surname base c) (label_of_path paths c)
          else ())
@@ -833,7 +834,7 @@ value print_elem conf base paths precision (n, pll) =
 ;
 
 value trier_et_afficher conf base paths precision liste =
-  let liste = List.map (poi base) liste in
+  let liste = List.map (pget conf base) liste in
   let liste =
     Sort.list
       (fun p1 p2 ->
@@ -892,11 +893,11 @@ value afficher_index_descendants conf base niveau_max ancetre =
     let marks = Array.create base.data.persons.len False in
     let paths = Array.create base.data.persons.len [] in
     mark_descendants base marks niveau_max ancetre;
-    label_descendants base marks paths niveau_max ancetre;
+    label_descendants conf base marks paths niveau_max ancetre;
     let liste = ref [] in
     for i = 0 to base.data.persons.len - 1 do {
       if paths.(i) <> [] then
-        let p = base.data.persons.get i in
+        let p = pget conf base (Adef.iper_of_int i) in
         if p_first_name base p <> "?" && p_surname base p <> "?" &&
            p_first_name base p <> "x"
         && (not conf.hide_names || fast_auth_age conf p) then
@@ -920,11 +921,11 @@ value afficher_index_spouses conf base niveau_max ancetre =
     let marks = Array.create base.data.persons.len False in
     let paths = Array.create base.data.persons.len [] in
     mark_descendants base marks niveau_max ancetre;
-    label_descendants base marks paths niveau_max ancetre;
+    label_descendants conf base marks paths niveau_max ancetre;
     let liste = ref [] in
     for i = 0 to base.data.persons.len - 1 do {
       if paths.(i) <> [] then
-        let p = base.data.persons.get i in
+        let p = pget conf base (Adef.iper_of_int i) in
         let u = base.data.unions.get i in
         if p_first_name base p <> "?" && p_surname base p <> "?" &&
            p_first_name base p <> "x" then
@@ -932,7 +933,7 @@ value afficher_index_spouses conf base niveau_max ancetre =
             (fun ifam ->
                let c = spouse p.cle_index (coi base ifam) in
                if paths.(Adef.int_of_iper c) = [] then
-                 let c = poi base c in
+                 let c = pget conf base c in
                  if p_first_name base c <> "?" && p_surname base c <> "?" &&
                     p_first_name base p <> "x" &&
                     (not conf.hide_names || fast_auth_age conf c) &&
@@ -969,7 +970,7 @@ value rec print_table_person conf base max_lev ip =
     Wserver.wprint "\n";
     tag "table" "border=1" begin
       Wserver.wprint "<tr align=left>\n";
-      tag "td" "valign=top" begin print_someone conf base (poi base ip); end;
+      tag "td" "valign=top" begin print_someone conf base (pget conf base ip); end;
       if max_lev > 0 then
         match children_of base ip with
         [ [] -> ()
@@ -1146,7 +1147,7 @@ value make_tree_hts conf base gv p =
               let des = doi base ifam in
               let ncol = fam_nb_column 0 (v - 1) des in
               let s =
-                let sp = poi base (spouse p.cle_index (coi base ifam)) in
+                let sp = pget conf base (spouse p.cle_index (coi base ifam)) in
                 let txt = person_title_text conf base sp in
                 let txt = reference conf base sp txt in
                 let txt =
@@ -1180,12 +1181,12 @@ value make_tree_hts conf base gv p =
                     else
                       let age_auth =
                         List.for_all
-                          (fun ip -> age_autorise conf base (poi base ip))
+                          (fun ip -> age_autorise conf base (pget conf base ip))
                           (Array.to_list des.children)
                       in
                       List.fold_right
                         (fun iper gen ->
-                           let g = (poi base iper, uoi base iper, age_auth) in
+                           let g = (pget conf base iper, uoi base iper, age_auth) in
                            [Some g :: gen])
                         (Array.to_list des.children) gen)
                  (Array.to_list u.family) gen
@@ -1247,7 +1248,7 @@ value print_aboville conf base max_level p =
         if lev < max_level then
           for i = 0 to Array.length u.family - 1 do {
             let cpl = coi base u.family.(i) in
-            let spouse = poi base (Gutil.spouse p.cle_index cpl) in
+            let spouse = pget conf base (Gutil.spouse p.cle_index cpl) in
             let mdate =
               if age_autorise conf base p &&
                  age_autorise conf base spouse then
@@ -1274,7 +1275,7 @@ value print_aboville conf base max_level p =
                   loop_fam cnt_chil (i + 1)
                 else do {
                   loop_ind (lev + 1) (lab ^ string_of_int cnt_chil ^ ".")
-                    (poi base des.children.(j));
+                    (pget conf base des.children.(j));
                   loop_chil (cnt_chil + 1) (j + 1)
                 }
               in

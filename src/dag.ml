@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.6 2001-12-20 19:58:13 ddr Exp $ *)
+(* $Id: dag.ml,v 4.7 2002-01-10 04:13:30 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -49,7 +49,9 @@ value get_dag_elems conf base =
     match (po, so) with
     [ (Some p, Some s) ->
         let set =
-          match Util.branch_of_sosa base p.cle_index (Num.of_string s) with
+          match
+            Util.branch_of_sosa conf base p.cle_index (Num.of_string s)
+          with
           [ Some ipsl ->
               List.fold_left (fun set (ip, _) -> Pset.add ip set) set ipsl
           | None -> set ]
@@ -696,7 +698,7 @@ value make_tree_hts
   let indi_txt n =
     match n.valu with
     [ Left ip ->
-        let p = poi base ip in
+        let p = pget conf base ip in
         let txt = elem_txt p in
         let txt =
           let spouses =
@@ -726,7 +728,7 @@ value make_tree_hts
             (fun txt (ips, ifamo) ->
                if Pset.mem ips set then txt
                else
-                 let ps = poi base ips in
+                 let ps = pget conf base ips in
                  let d =
                    match ifamo with
                    [ Some ifam ->

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.7 2001-11-16 13:38:52 ddr Exp $ *)
+(* $Id: family.ml,v 4.8 2002-01-10 04:13:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -51,7 +51,7 @@ value relation_print conf base p =
         do {
           conf.senv := [];
           if i >= 0 && i < base.data.persons.len then
-            Some (base.data.persons.get i)
+            Some (pget conf base (Adef.iper_of_int i))
           else None
         }
     | None ->
@@ -128,7 +128,7 @@ value try_find_with_one_first_name conf base n =
       let fn = String.sub n1 0 i in
       let sn = String.sub n1 (i + 1) (String.length n1 - i - 1) in
       let (list, _) =
-        Some.persons_of_fsname base base.func.persons_of_surname.find
+        Some.persons_of_fsname conf base base.func.persons_of_surname.find
           (fun x -> x.surname) sn
       in
       let pl =
@@ -136,7 +136,7 @@ value try_find_with_one_first_name conf base n =
           (fun pl (_, _, ipl) ->
              List.fold_left
                (fun pl ip ->
-                  let p = poi base ip in
+                  let p = pget conf base ip in
                   let fn1 =
                     Name.abbrev (Name.lower (sou base p.first_name))
                   in
@@ -173,8 +173,8 @@ value find_all conf base an =
   match (sosa_ref, sosa_nb) with
   [ (Some p, Some n) ->
       if n <> Num.zero then
-        match Util.branch_of_sosa base p.cle_index n with
-        [ Some [(ip, _) :: _] -> [poi base ip]
+        match Util.branch_of_sosa conf base p.cle_index n with
+        [ Some [(ip, _) :: _] -> [pget conf base ip]
         | _ -> [] ]
       else []
   | _ ->
@@ -188,7 +188,7 @@ value find_all conf base an =
           | None -> (an, ipl) ]
         else (an, ipl)
       in
-      let pl = List.map (poi base) ipl in
+      let pl = List.map (pget conf base) ipl in
       let spl = select_std_eq base pl an in
       let pl =
         if spl = [] then
@@ -289,7 +289,7 @@ value precisez conf base n pl =
              List.fold_right
                (fun ifam spouses ->
                   let cpl = coi base ifam in
-                  let spouse = poi base (spouse p.cle_index cpl) in
+                  let spouse = pget conf base (spouse p.cle_index cpl) in
                   if p_surname base spouse <> "?" then [spouse :: spouses]
                   else spouses)
                (Array.to_list (uoi base p.cle_index).family) []
@@ -472,7 +472,8 @@ value family_m conf base =
                 | [p] -> person_selected conf base p
                 | pl -> precisez conf base n pl ] ]
       | (_, Some i) ->
-          relation_print conf base (base.data.persons.get (int_of_string i))
+          relation_print conf base
+            (pget conf base (Adef.iper_of_int (int_of_string i)))
       | _ -> () ]
   | Some "NOTES" -> Notes.print conf base
   | Some "OA" when conf.wizard || conf.friend ->
