@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.183 2000-11-13 20:48:24 ddr Exp $
+# $Id: lexicon.txt,v 3.184 2000-11-14 09:25:36 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -282,6 +282,7 @@ se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
     %t's sex is not coherent with his/her relations
 en: %t's sex is not coherent with his/her relations
 fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
+pt: o sexo de %t não é coerente com suas relações
 
     (date)
 af: 1 %m %y/%d %m %y/%m %y/%y 
@@ -3574,6 +3575,7 @@ en: loop in data base: %s is his/her own ancestor
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 nl: loop in de data base: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
+pt: referência circular no banco de dados: %s é seu próprio ancestral
 se: loop i databasen: %s &auml;r sin egen ana
 
     main title
@@ -3798,6 +3800,7 @@ en: message added
 fr: message ajout&eacute;
 nl: bericht toegevoegd
 no: melding tilf&oslash;yet
+pt: mensagem adicionada
 se: meddelande inlagt
 
     message/next message
@@ -3807,6 +3810,7 @@ en: message/next message
 fr: message/message suivant
 nl: bericht/volgend bericht
 no: melding/neste melding
+pt: mensagem/próxima mensagem
 se: meddelande/n&auml;sta meddelande
 
     missing ancestors
@@ -5364,6 +5368,7 @@ en: subject
 fr: sujet
 nl: onderwerp
 no: emne
+pt: assunto
 se: ämne
 
     surname alias
