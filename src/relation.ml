@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.44 2000-06-20 07:06:40 ddr Exp $ *)
+(* $Id: relation.ml,v 3.45 2000-06-20 21:19:58 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -487,7 +487,7 @@ return ();
      Wserver.wprint "<a href=\"%s" (commd conf);
      List.iter (fun (v, k) -> Wserver.wprint "%s=%s;" v k) conf.env;
      Wserver.wprint "ef%d=%d\">&gt;&gt</a>\n"
-       (List.length excl_faml - 1) (List.hd excl_faml);
+       (List.length excl_faml - 1) (Adef.int_of_ifam (List.hd excl_faml));
   return ()
 ;
 
@@ -514,6 +514,7 @@ value print_relation_with_alliance conf base ip1 ip2 excl_faml =
   let mark_fam = Array.create base.data.families.len False in
   do List.iter
         (fun i ->
+           let i = Adef.int_of_ifam i in
            if i < Array.length mark_fam then mark_fam.(i) := True else ())
         excl_faml;
   return
@@ -617,7 +618,7 @@ value print_relation_with_alliance conf base ip1 ip2 excl_faml =
                     let path =
                       if source then merge_path p2 p1 else merge_path p1 p2
                     in
-                    let excl_faml = [Adef.int_of_ifam ifam :: excl_faml] in
+                    let excl_faml = [ifam :: excl_faml] in
                     do print_relation_path conf base path excl_faml; return
                     raise FoundLink ])
            (neighbours vertex) newvertexlist)
@@ -668,8 +669,18 @@ value print_shortest_path conf base p1 p2 =
     let excl_faml =
       loop [] 0 where rec loop list i =
         match p_getint conf.env ("ef" ^ string_of_int i) with
-        [ Some k -> loop [k :: list] (i + 1)
-        | None -> list ]
+        [ Some k -> loop [Adef.ifam_of_int k :: list] (i + 1)
+        | None ->
+            match find_person_in_env conf base ("ef" ^ string_of_int i) with
+            [ Some p ->
+                let n =
+                  match p_getint conf.env ("eff" ^ string_of_int i) with
+                  [ Some n -> n
+                  | None -> 0 ]
+                in
+                let u = uoi base p.cle_index in
+                loop [u.family.(n) :: list] (i + 1)
+            | None -> list ] ]
     in
     print_relation_with_alliance conf base p1.cle_index p2.cle_index excl_faml
 ;
