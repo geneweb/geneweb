@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.14 2005-01-20 12:43:28 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.15 2005-01-20 15:45:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -40,6 +40,19 @@ value extract_var sini s =
   if String.length s > len && String.sub s 0 (String.length sini) = sini then
     String.sub s len (String.length s - len)
   else ""
+;
+
+value obsolete_list = ref [];
+
+value obsolete var new_var =
+  if List.mem var obsolete_list.val then ()
+  else ifdef UNIX then do {
+    Printf.eprintf "*** <W> updind.txt: \"%s\" obsolete since v4.11%s\n" var
+      (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
+    flush stderr;
+    obsolete_list.val := [var :: obsolete_list.val]
+  }
+  else ()
 ;
 
 type var_value = [ VVbool of bool | VVstring of string ];
@@ -163,17 +176,13 @@ value rec eval_var conf base env p =
         | None -> str_val "" ]
       else
         let v = extract_var "cvar_" s in
-	if v <> "" then
-	  str_val (try List.assoc v conf.base_env with [ Not_found -> "" ])
+        if v <> "" then
+          str_val (try List.assoc v conf.base_env with [ Not_found -> "" ])
         else raise Not_found
   | _ -> raise Not_found ]
 and eval_date_var conf base env od =
   fun
-  [ "cal_french" -> eval_is_cal Dfrench od
-  | "cal_gregorian" -> eval_is_cal Dgregorian od
-  | "cal_hebrew" -> eval_is_cal Dhebrew od
-  | "cal_julian" -> eval_is_cal Djulian od
-  | "calendar" ->
+  [ "calendar" ->
       match od with
       [ Some (Dgreg _ Dgregorian) -> str_val "gregorian"
       | Some (Dgreg _ Djulian) -> str_val "julian"
@@ -214,14 +223,6 @@ and eval_date_var conf base env od =
       | Some (Dgreg {prec = OrYear _} _) -> str_val "oryear"
       | Some (Dgreg {prec = YearInt _} _) -> str_val "yearint"
       | _ -> str_val "" ]
-  | "prec_no" -> bool_val (od = None)
-  | "prec_sure" -> eval_is_prec (fun [ Sure -> True | _ -> False ]) od
-  | "prec_about" -> eval_is_prec (fun [ About -> True | _ -> False ]) od
-  | "prec_maybe" -> eval_is_prec (fun [ Maybe -> True | _ -> False ]) od
-  | "prec_before" -> eval_is_prec (fun [ Before -> True | _ -> False ]) od
-  | "prec_after" -> eval_is_prec (fun [ After -> True | _ -> False ]) od
-  | "prec_oryear" -> eval_is_prec (fun [ OrYear _ -> True | _ -> False ]) od
-  | "prec_yearint" -> eval_is_prec (fun [ YearInt _ -> True | _ -> False ]) od
   | "text" ->
       match od with
       [ Some (Dtext s) -> str_val s
@@ -230,7 +231,29 @@ and eval_date_var conf base env od =
       match eval_date_field od with
       [ Some d -> str_val (string_of_int d.year)
       | None -> str_val "" ]
-  | _ -> raise Not_found ]
+  | x ->
+      let r =
+        match x with
+        [ "cal_french" -> eval_is_cal Dfrench od
+        | "cal_gregorian" -> eval_is_cal Dgregorian od
+        | "cal_hebrew" -> eval_is_cal Dhebrew od
+        | "cal_julian" -> eval_is_cal Djulian od
+        | "prec_no" -> bool_val (od = None)
+        | "prec_sure" -> eval_is_prec (fun [ Sure -> True | _ -> False ]) od
+        | "prec_about" -> eval_is_prec (fun [ About -> True | _ -> False ]) od
+        | "prec_maybe" -> eval_is_prec (fun [ Maybe -> True | _ -> False ]) od
+        | "prec_before" ->
+            eval_is_prec (fun [ Before -> True | _ -> False ]) od
+        | "prec_after" ->
+            eval_is_prec (fun [ After -> True | _ -> False ]) od
+        | "prec_oryear" ->
+            eval_is_prec (fun [ OrYear _ -> True | _ -> False ]) od
+        | "prec_yearint" ->
+            eval_is_prec (fun [ YearInt _ -> True | _ -> False ]) od
+        | _ -> raise Not_found ]
+      in
+      let () = obsolete x (if x.[0] = 'c' then "calendar" else "prec") in
+      r ]
 and eval_date_field =
   fun
   [ Some d ->
