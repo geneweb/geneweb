@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.25 1998-12-02 11:29:35 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.26 1998-12-05 11:58:32 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -211,7 +211,7 @@ value rec find_all_fields lab =
 value rec lexing =
   parser
   [ [: `('0'..'9' as c); n = number (store 0 c) :] -> ("INT", n)
-  | [: `('A'..'Z' as c); i = ident (store 0 c) :] -> ("LIDENT", i)
+  | [: `('A'..'Z' as c); i = ident (store 0 c) :] -> ("ID", i)
   | [: `'.' :] -> ("", ".")
   | [: `' ' | '\r'; s :] -> lexing s
   | [: _ = Stream.empty :] -> ("EOI", "")
@@ -233,10 +233,18 @@ value tparse (p_con, p_prm) =
   else parser [: `(con, prm) when con = p_con && prm = p_prm :] -> prm
 ;
 
+value using_token (p_con, p_prm) =
+  match p_con with
+  [ "" | "INT" | "ID" | "EOI" -> ()
+  | _ ->
+      raise (Token.Error ("\
+the constructor \"" ^ p_con ^ "\" is not recognized by the lexer")) ]
+;
+
 value lexer =
   {Token.func = fun s -> (make_lexing s, fun _ -> (0, 0));
-   Token.add_keyword = fun _ -> ();
-   Token.remove_keyword = fun _ -> ();
+   Token.using = using_token;
+   Token.removing = fun _ -> ();
    Token.tparse = tparse;
    Token.text = fun _ -> "<tok>"}
 ;
@@ -274,20 +282,20 @@ EXTEND
          in
          (n1, n2, n3) ]];
   title_date:
-    [[ LIDENT "BET"; _ = prec; d1 = simple_date;
-       LIDENT "AND"; _ = prec; d2 = simple_date ->
+    [[ ID "BET"; _ = prec; d1 = simple_date;
+       ID "AND"; _ = prec; d2 = simple_date ->
          TDinterv d1 d2
-     | LIDENT "BEF"; d = simple_date -> TDend d
+     | ID "BEF"; d = simple_date -> TDend d
      | _ = prec; d = simple_date -> TDstart d ]];
   prec:
-    [[ LIDENT "ABT" -> About | LIDENT "ENV" -> About
-     | LIDENT "BEF" -> Before | LIDENT "AFT" -> After
-     | LIDENT "EST" -> Maybe | -> Sure ]];
+    [[ ID "ABT" -> About | ID "ENV" -> About
+     | ID "BEF" -> Before | ID "AFT" -> After
+     | ID "EST" -> Maybe | -> Sure ]];
   month:
-    [[ LIDENT "JAN" -> 1 | LIDENT "FEB" -> 2 | LIDENT "MAR" -> 3
-     | LIDENT "APR" -> 4 | LIDENT "MAY" -> 5 | LIDENT "JUN" -> 6
-     | LIDENT "JUL" -> 7 | LIDENT "AUG" -> 8 | LIDENT "SEP" -> 9
-     | LIDENT "OCT" -> 10 | LIDENT "NOV" -> 11 | LIDENT "DEC" -> 12 ]];
+    [[ ID "JAN" -> 1 | ID "FEB" -> 2 | ID "MAR" -> 3
+     | ID "APR" -> 4 | ID "MAY" -> 5 | ID "JUN" -> 6
+     | ID "JUL" -> 7 | ID "AUG" -> 8 | ID "SEP" -> 9
+     | ID "OCT" -> 10 | ID "NOV" -> 11 | ID "DEC" -> 12 ]];
   int:
     [[ i = INT -> int_of_string i
      | "-"; i = INT -> - int_of_string i ]];

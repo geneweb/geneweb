@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 1.4 1998-11-06 17:57:26 ddr Exp $ *)
+(* $Id: consang.ml,v 1.5 1998-12-05 11:59:08 ddr Exp $ *)
 
 (* Algorithm relationship and links from Didier Remy *)
 
@@ -29,6 +29,8 @@ value mark = ref 0;
 value new_mark () = do incr mark; return mark.val;
 
 exception TopologicalSortError;
+
+(* Return tab such as: tab.(i) > tab.(j) => j is not an ancestor of i *)
 
 value topological_sort base =
   let tab = Array.create base.persons.len 0 in
@@ -76,14 +78,13 @@ value topological_sort base =
   return tab
 ;
 
-value make_relationship_table base =
-  let id = topological_sort base in
+value make_relationship_table base tstab =
   let phony =
     {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = []; lens2 = [];
      mark = 0; elim_ancestors = False}
   in
   let tab = Array.create base.persons.len phony in
-  {id = id; info = tab}
+  {id = tstab; info = tab}
 ;
 
 value rec insert_branch_len_rec (len, n) =
@@ -182,7 +183,7 @@ value compute_all_consang base from_scratch =
   let _ = base.families.array () in
   do Printf.eprintf "Computing consanguinity..."; flush stderr; return
   let running = ref True in
-  let tab = make_relationship_table base in
+  let tab = make_relationship_table base (topological_sort base) in
   let cnt = ref 0 in
   let most = ref None in
   do for i = 0 to base.ascends.len - 1 do
