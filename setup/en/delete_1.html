@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Deletion of databases</title></head>
+
+<body>
+
+<h1>Deletion of databases</h1>
+
+<p>
+
+<form mode=GET action="delete_1">
+<input type=hidden name=lang value=$l>
+$k{<input type=hidden name="$a" value=del>|}
+
+Are you sure you want to delete these databases?
+
+<p>
+
+<ul>
+
+$k{<li><a href="http://localhost:2317/$a">$a</a>|
+<li>[no selection]}
+
+</ul>
+
+<p>
+
+Warning: this suppression is definitive! To confirm, push this button.
+
+<p>
+
+<dl><dt><dd><input type=submit value="Delete"></dl>
+
+<p>
+
+Or return to the <a href="setup?lang=$l;v=main.html">main menu</a>.

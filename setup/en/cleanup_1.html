@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Clean up - Phase 2</title></head>
+
+<body>
+
+<h1>Cleaning up</h1>
+
+<p>
+
+We are going to proceed to the cleaning up of the database "$a".
+
+<p>
+
+Warning: this operation can take some seconds or minutes, depending on
+the cases. Be patient.
+
+<p>
+
+Push the button below to start the operation.
+
+<p>
+
+<form mode=GET action="cleanup_1">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+For information, this operation corresponds to the following commands:
+
+<pre>
+     $$ cd $w
+     $$ .$/gwu $a -o tmp.gw
+     $$ mkdir old
+     Sous Unix:
+       $$ rm -rf old/$a.gwb
+       $$ mv $a.gwb old/.
+     Sous MSdos:
+       $$ del old\$a.gwb\*.*
+       $$ rmdir old\$a.gwb
+       $$ move $a.gwb old\.
+     $$ .$/gwc tmp.gw -o $a > comm.log
+</pre>
