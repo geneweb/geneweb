@@ -128,7 +128,7 @@
 <P>Den enda m&ouml;jliga att g&ouml;ra &auml;r att skapa personer och familjer. Klicka p&aring; "L&auml;gg till familj". Hur du g&ouml;r det kan du se <A HREF="update.htm#AddF">h&auml;r</A>. </P></DIR>
 </DIR>
 
-<P>Under tiden, kan du notera att varje g&aring;ng du klickar p&aring; en knapp eller en l&auml;nk, visas en text rad i DOS f&ouml;nstret. N&auml;r du startar din <EM>GeneWeb</EM> server p&aring; Internet (se <A HREF="server.htm">h&auml;r</A>), kan du se f&ouml;rfr&aring;gningarna som s&auml;nds till din databas p&aring; det h&auml;r s&auml;ttet. </P>
+<P>Under tiden, kan du notera att varje g&aring;ng du klickar p&aring; en knapp eller en l&auml;nk, visas en text rad i DOS f&ouml;nstret. N&auml;r du startar din <EM>GeneWeb </EM><A HREF="server.htm">server</A> p&aring; Internet, kan du se f&ouml;rfr&aring;gningarna som s&auml;nds till din databas p&aring; det h&auml;r s&auml;ttet. </P>
 <P>Notera att om du trycker "Control-C" i ditt DOS f&ouml;nster, svarar inte tj&auml;nsten inte l&auml;ngre i din webbl&auml;saren. F&ouml;r att &aring;terstarta den, skriv "gwd" igen. </P>
 <P>Under Windows, kan du enkelt dubbel klicka p&aring; ikonen "gwd" f&ouml;r att starta den. Den &ouml;ppnar ett DOS f&ouml;nster d&auml;r "gwd" visar sina textrader. Om man trycker "Control-C" stoppar "gwd" och f&ouml;nstret st&auml;ngs. Om man skapar en genv&auml;g till "gwd" p&aring; skrivbordet, kan du starta den enkelt. </P>
 <H4>Ko<A NAME="Csg">mmandot consang </A></H4>
@@ -186,12 +186,22 @@
 
 
 <UL>
+<B><LI>wizard_just_friend</B> g&ouml;r det m&ouml;jligt att f&ouml;rbjuda uppdatering av databasen. Skriv "yes" f&ouml;r att g&ouml;ra det, "no" f&ouml;r att ge beh&ouml;righet igen. Det kan vara praktiskt att skriva "yes" tempor&auml;rt, n&auml;r du <A HREF="maint.htm">rensar upp</A> din databas.</LI>
+<p>
+
 <STRONG><LI>default_lang</STRONG> g&ouml;r det m&ouml;jligt att definiera ett spr&aring;k f&ouml;r v&auml;lkomst sidan. Utan specificering &auml;r spr&aring;ket franska. De m&ouml;jliga v&auml;rdena &auml;r: "cn" (kinesiska), "de" (tyska), "en" (engelska), "eo" (esperanto), "es" (spanska), "fr" (franska), "he" (hebreiska), "it" (italienska), "nl" (holl&auml;ndska), "pt" (portugisiska) och "se" (svenska). </LI></UL>
 <DIR>
 <DIR>
 
 <P>Notera att vilket spr&aring;k som &auml;n &auml;r f&ouml;r valt, kan du v&auml;lja ett annat p&aring; v&auml;lkomst sidan genom att klicka p&aring; flaggorna h&ouml;gst upp p&aring; sidan. </P></DIR>
 </DIR>
+
+
+<UL>
+<B><LI>can_send_photo</B> g&ouml;r det m&ouml;jligt f&ouml;r "wizards" att skicka foton. I detta fall i <A HREF="update.htm#MAJ">uppdaterings</A> processen, kan de klicka p&aring; en l&auml;nk ben&auml;mnd <A HREF="update.htm#SndP">skicka foto</A>. Det &auml;r f&ouml;r valt "no" (ingen beh&ouml;righet att skicka foton), f&ouml;r att till&aring;ta det skriv "yes". </LI>
+<p>
+
+<B><LI>renamed</B> g&ouml;r det m&ouml;jligt att indikera att namnet f&ouml;r en databas har &auml;ndrats. Om din sajt har konsulterats mycket och m&aring;nga har lagrat din databas som bokm&auml;rke &auml;r det ett s&auml;tt att dirigera om dem till den nya databasen med det nya namnet. Om man f&ouml;rs&ouml;ker att komma &aring;t databasen med det gamla namnet ses en sida med en l&auml;nk till det nya namnet.</LI></UL>
 
 <H4><A NAME="Lex">Katalogen "lang" - filen "lexicon.txt"</A> </H4>
 <P>Denna fil inneh&aring;ller ett lexikon &ouml;ver alla termer och fraser anv&auml;nda i programmet. F&ouml;r varje finns det en &ouml;vers&auml;ttning till varje spr&aring;k. Om du vill l&auml;gga till ett spr&aring;k, v&auml;lj en kod f&ouml;r detta spr&aring;k och l&auml;gga till en rad f&ouml;r varje &ouml;vers&auml;ttnings grupp som finns i filen. </P>
