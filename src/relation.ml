@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.35 2002-11-28 14:10:54 ddr Exp $ *)
+(* $Id: relation.ml,v 4.36 2003-11-22 05:03:18 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -368,19 +368,21 @@ value html_table_of_relation_path_dag conf base elem_txt vbar_txt path =
 ;
 
 value next_relation_link_txt conf ip1 ip2 excl_faml =
-  "href=\"" ^ commd conf ^ "em=R;ei=" ^
-    string_of_int (Adef.int_of_iper ip1) ^ ";i=" ^
-    string_of_int (Adef.int_of_iper ip2) ^
-    (if p_getenv conf.env "spouse" = Some "on" then ";spouse=on" else "") ^
-    (if conf.cancel_links then ";cgl=on" else "") ^ ";et=S" ^
-    fst
-      (List.fold_left
-         (fun (txt, i) ifam ->
-            (txt ^ ";ef" ^ string_of_int i ^ "=" ^
-               string_of_int (Adef.int_of_ifam ifam),
-             i + 1))
-         ("", 0) (List.rev excl_faml)) ^
-    "\""
+  let (sl, _) =
+    List.fold_left
+      (fun (sl, i) ifam ->
+         ([";ef"; string_of_int i; "=";
+           string_of_int (Adef.int_of_ifam ifam) :: sl], i - 1))
+      (["\""], List.length excl_faml - 1) excl_faml
+  in
+  let sl =
+    ["href=\""; commd conf; "em=R;ei=";
+     string_of_int (Adef.int_of_iper ip1); ";i=";
+     string_of_int (Adef.int_of_iper ip2);
+     if p_getenv conf.env "spouse" = Some "on" then ";spouse=on" else "";
+     if conf.cancel_links then ";cgl=on" else ""; ";et=S" :: sl]
+  in
+  String.concat "" sl
 ;
 
 value print_relation_path conf base ip1 ip2 path ifam excl_faml =
