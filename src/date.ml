@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 2.25 1999-10-27 13:14:09 ddr Exp $ *)
+(* $Id: date.ml,v 2.26 1999-10-28 16:43:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -198,6 +198,18 @@ value string_of_ondate conf =
       ^ " (" ^ s ^ ")"
   | Dtext t -> "(" ^ t ^ ")" ]
 ;
+
+(*
+value string_of_ondate conf d =
+  match d with
+  [ Dgreg {day = day; month = month; year = year} _
+    when day <> 0 && month <> 0 && not conf.cancel_links ->
+      "<a href=\"" ^ commd conf ^ "m=CAL;yg=" ^ string_of_int year ^ ";mg=" ^
+      string_of_int month ^ ";dg=" ^ string_of_int day ^ ";tg=ok\">" ^
+      string_of_ondate conf d ^ "</a>"
+  | _ -> string_of_ondate conf d ]
+;
+*)
 
 value string_of_date conf =
   fun
@@ -451,7 +463,7 @@ value print_some_calendar conf date n month_name n_months var =
          Wserver.wprint "<input type=submit name=d%s2 value=\"&gt;\">\n" var;
        end;
        tag "td" begin
-         Wserver.wprint "<input type=submit name=t%s value=Ok>\n" var;
+         Wserver.wprint "<input type=submit name=t%s value=\"=\">\n" var;
        end;
      end;
   return ()
