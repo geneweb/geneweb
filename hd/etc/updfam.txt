@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.23 2002-11-06 12:16:38 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.24 2002-11-18 10:02:50 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -384,7 +384,7 @@
   </tr>
 </table>
 
-%if;(evar_origin_file = "on")
+%if;(cvar_origin_file = "on")
   <input name=origin_file size=50 maxlength=200 value="%origin_file;">
 %end;
 
