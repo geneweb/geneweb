@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.33 2000-05-14 19:59:32 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.34 2000-05-19 11:10:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1647,7 +1647,7 @@ value print_horizontally conf base max_level p =
   in
   let max_level = min (limit_by_list conf) max_level in
   let suff1 = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" in
-  let suff2 = "&nbsp;&nbsp;--&nbsp;" in
+  let suff2 = "&nbsp;+--&nbsp;" in
   let suff3 = "&nbsp;|&nbsp;&nbsp;&nbsp;" in
   let rec loop level s1 s2 s3 ip =
     if level >= max_level then ()
