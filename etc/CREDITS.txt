@@ -1,0 +1,25 @@
+		GeneWeb
+                -------
+
+	Languages
+		Dutch		Joris Esch
+				Wijnand J. Nijs
+		German		Markus Mottl
+		Hebrew		Jonathan Marder
+				Ruth Marder
+		Portuguese	Yves Guignard
+		Swedish		Lars Gustavsson
+
+	Documentation
+		Dutch		Joris Esch
+		Swedish		Lars Gustavsson
+
+	Program written by Daniel de Rauglaudre.
+
+
+Warning: this credits file has been started quite late (February 2,
+1999). I don't remember all persons' names having participated to
+GeneWeb. If your name is missing, please help me to complete it by
+writing me a message at:
+
+	daniel.de_rauglaudre@inria.fr
