@@ -1,5 +1,5 @@
-(* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.14 1999-08-17 09:48:20 ddr Exp $ *)
+(* camlp4r ./def.syn.cmo ./pa_html.cmo *)
+(* $Id: some.ml,v 2.15 1999-10-24 10:18:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -310,7 +310,21 @@ value rec print_by_branch x conf base not_found_fun (ipl, homonymes) =
        let _ = List.fold_left
          (fun n p ->
             do if len > 1 then html_li conf else ();
-               print_branch conf base 0 x p;
+               match (aoi base p.cle_index).parents with
+               [ Some ifam ->
+                   let cpl = coi base ifam in
+                   do Wserver.wprint "<br>\n";
+                      let href = Util.acces conf base (poi base cpl.father) in
+                      wprint_geneweb_link conf href "&lt;&lt";
+                      Wserver.wprint "\n&amp;\n";
+                      let href = Util.acces conf base (poi base cpl.mother) in
+                      wprint_geneweb_link conf href "&lt;&lt";
+                      Wserver.wprint "\n";
+                      tag "ul" begin
+                        print_branch conf base 1 x p;
+                      end;
+                   return ()
+               | None -> print_branch conf base 0 x p ];
             return n + 1)
          1 ancestors
        in ();

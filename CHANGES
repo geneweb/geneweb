@@ -2,6 +2,9 @@ GeneWeb version 2.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [Oct 24, 99] In display by surname, added a specific indication to show
+    the branches whose ancestor has parents with a different name, in order
+    to differentiate them with the branches whose ancestor has no parents.
   - [Oct 21, 99] Added message "or Sosa number relative to x" when displaying
     a relationship computing form if navigating with x as Sosa reference.
   - [Oct 21, 99] Limit local images height to some maximum number of pixels
@@ -23,6 +26,9 @@ GeneWeb version 2.08
   - [Oct 3, 99] Added week day in "calendars" page.
 
 * GeneWeb uncompiler (gwu)
+  - [Oct 24, 99] Added option -s to select a surname (option usable several
+    times). Added associated option -nsp, not to select the spouses' parents.
+    These options has been added in command gwb2ged too.
   - [Oct 19, 99] Fixed bug: notes sometimes disappeared for godparents and co.
   - [Oct 10, 99] Fixed bug: dates represented as text where not extracted
     in the output file but on standard output.
@@ -37,6 +43,9 @@ GeneWeb version 2.08
     use -fne '()', and so on.
 
 * GeneWeb to Gedcom (gwb2ged)
+  - [Oct 24, 99] Added option -s to select a surname (option usable several
+    times). Added associated option -nsp, not to select the spouses' parents.
+    These options has been added in command gwu too.
   - [Oct 5, 99] Changed the way the lines of notes are cut (by tag CONC).
     The standard GEDCOM 5.5 tells that too long lines must be cut *inside*
     words and not *between* words, to avoid starting or trailing spaces in

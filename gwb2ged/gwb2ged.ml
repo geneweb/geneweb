@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.20 1999-10-05 17:04:24 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.21 1999-10-24 10:18:05 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -514,6 +514,9 @@ value find_person base p1 po p2 =
       return exit 2 ]
 ;
 
+value surnames = ref [];
+value no_spouses_parents = ref False;
+
 value gwb2ged base ifile ofile anc desc mem =
   let anc =
     match anc with
@@ -534,7 +537,9 @@ value gwb2ged base ifile ofile anc desc mem =
      else ();
   return
   let oc = if ofile = "" then stdout else open_out ofile in
-  let ((per_sel, fam_sel) as sel) = Select.functions base anc desc in
+  let ((per_sel, fam_sel) as sel) =
+    Select.functions base anc desc surnames.val no_spouses_parents.val
+  in
   do ged_header base oc ifile ofile;
      flush oc;
      for i = 0 to base.data.persons.len - 1 do
@@ -573,6 +578,8 @@ value arg_state = ref ASnone;
 
 value usage = "Usage: " ^ Sys.argv.(0) ^ " <base> [options]
 If both options -a and -d are used, intersection is assumed.
+If several options -s are used, union is assumed.
+When option -s is used, the options -a and -d are ignored.
 Options are:";
 
 value speclist =
@@ -590,6 +597,9 @@ value speclist =
    ("-o",
     Arg.String (fun x -> do  ofile.val := x; return arg_state.val := ASnone),
     "<ged>: output file name (default: a.ged)");
+   ("-mem",
+    Arg.Unit (fun () -> do mem.val := True; return arg_state.val := ASnone),
+    ": save memory space, but slower");
    ("-a",
     Arg.String
       (fun s -> do anc_1st.val := s; return arg_state.val := ASwaitAncOcc),
@@ -598,9 +608,10 @@ value speclist =
     Arg.String
       (fun s -> do desc_1st.val := s; return arg_state.val := ASwaitDescOcc),
     "\"<1st_name>\" [num] \"<surname>\": select descendants of");
-   ("-mem",
-    Arg.Unit (fun () -> do mem.val := True; return arg_state.val := ASnone),
-    ": save memory space, but slower")]
+   ("-s", Arg.String (fun x -> surnames.val := [x :: surnames.val]),
+    "\"<surname>\" : select this surname (option usable several times)");
+   ("-nsp", Arg.Set no_spouses_parents,
+    ": no spouses' parents (for option -s)")]
 ;
 
 value anon_fun s =
