@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.25 2001-04-30 08:48:17 ddr Exp $
+# $Id: lexicon.txt,v 4.26 2001-04-30 08:54:41 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -31,7 +31,7 @@ he: rtl
      !languages
 ca: af=africà/zh=Xinès/cs=xec/ca=català/de=alemany/da=danès/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/pt=portuguès/ru=rus/sv=suec
 cs: af=afrikán¹tina/pt-br=brasil¹tina/zh=èín¹tina/cs=èe¹tina/da=dán¹tina/nl=holand¹tina/en=angliètina/eo=esperanto/fi=fin¹tina/fr=francouz¹tina/de=nìmèina/he=hebrej¹tina/is=island¹tina/it=ital¹tina/lv=loty¹¹tina/no=nor¹tina/pt=portugal¹tina/es=¹panìl¹tina/ru=ru¹tina/sv=¹véd¹tina
-da: af=afrikaans/pt-br=Brasil-portugisisk/zh=kinesisk/cs=tjekkisk/da=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/sv=svensk
+da: af=afrikaans/ca=katalansk/cs=tjekkisk/da=dansk/en=engelsk/eo=esperanto/et=estisk/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/es=spansk/ru=russisk/sv=svensk/zh=kinesisk
 de: af=Afrikaans/pt-br=Brasil-Portugiesisch/zh=Chinesisch/da=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/no=Norwegisch/pl=Polnisch/pt=Portugiesisch/ru=Russisch/es=Spanisch/sv=Schwedisch/cs=Tschechisch
 en: af=Afrikaans/pt-br=Brazilian-Portuguese/zh=Chinese/cs=Czech/ca=Catalan/da=Danish/nl=Dutch/en=English/eo=Esperanto/et=Estonian/fi=Finnish/fr=French/de=German/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/no=Norwegian/pl=Polish/pt=Portuguese/es=Spanish/ru=Russian/sv=Swedish
 eo: en=anglo/eo=esperanto/fr=franco
