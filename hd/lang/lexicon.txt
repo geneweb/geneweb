@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.143 2002-12-23 10:52:17 ddr Exp $
+# $Id: lexicon.txt,v 4.144 2003-01-03 09:53:48 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -41,6 +41,7 @@ et: ddmmyy
 fi: ddmmyy
 fr: ddmmyy
 he: ddmmyy
+is: ddmmyy
 it: ddmmyy
 lv: ddmmyy
 nl: ddmmyy
@@ -3129,6 +3130,7 @@ et: ära grupeeri ühiseid harusid
 fi: ei yhteisten sukuhaarojen ryhmittely&auml;
 fr: ne pas regrouper les branches communes
 he:  ìà ìùìá òğôé îùôçä îùåúôéí
+is: ekki slá saman sameiginlegum ættingjum
 it: non ragruppare i rami comuni
 lv: negrupçt kopçjos zarus kopâ
 nl: voeg de gemeenschappelijke takken niet samen
@@ -4890,6 +4892,7 @@ et: silmus andmebaasis: %s on iseenda esivanem
 fi: silmukka tietokannassa: %s on oma esivanhempansa
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 he:  îòâì áîàâø äğúåğéí: %s  öàöà(ä) ìàöîå/ìàöîä
+is: villa í gagnagrunni: %s er sinn eigin forfağir/afkomandi
 it: loop nel data-base: %s e' antenato di se stesso
 lv: cilpa datu bâzç: %s ir viòa/viòas pağas secis
 nl: kring in de database: %s is zijn/haar eigen voorouder
@@ -5226,6 +5229,7 @@ es: mensaje borrado
 fi: viesti poistettu
 fr: message supprim&eacute;
 he:  äåãòä ğîç÷ä
+is: skilaboğum eytt
 it: messaggio cancellato
 nl: boodschap verwijderd
 no: melding fjernet
@@ -5246,6 +5250,7 @@ et: teade/eelmine teade/eelmine teade/järgmine teade
 fi: viesti/edellinen viesti/edellinen viesti/seuraava viesti
 fr: message/message pr&eacute;c&eacute;dent/messages pr&eacute;c&eacute;dents/message suivant
 he:  äåãòä / äåãòä ÷åãîú / äåãòä ÷åãîú / äåãòä äáàä
+is: skilaboğ/fyrri skilaboğ/fyrri skilaboğ/næstu skilaboğ
 it: messaggio/messaggio precedente/messaggio precedente/messaggio seguente
 lv: ziòa/iepriekğçjâ ziòa/iepriekğçjâ ziòa/nâkoğâ ziòa
 nl: bericht/vorig bericht/vorig bericht/volgend bericht
@@ -5639,6 +5644,7 @@ et: ära kontrolli sugude sobivust
 fi: ei sukupuolitarkistusta
 fr: pas de v&eacute;rification des sexes
 he:  áìé ìååãà îéï
+is: ekki athuga kyn
 it: senza verifica del sesso
 lv: nepâbaudît dzimumus
 nl: geslachten niet verifi&euml;ren
@@ -8413,6 +8419,7 @@ et: %t sugu on määratlemata
 fi: %t:n sukupuoli tuntematon
 fr: sexe ind&eacute;fini pour %t
 he:  äîéï ùì %t ìà îåâãø
+is: kyn ekki skilgreint fyrir %t
 it: sesso indefinito per %t
 lv: nenoskaidrots dzimums personai %t
 nl: onbepaald geslacht voor %t
@@ -8693,7 +8700,7 @@ et: teadmamehena/teadmamehena/sõbrana
 fi: velho/velho/valittu
 fr: magicien/magiciens/ami
 he:  ëâàåï / ëâàåï / îéåçñú 
-is: wizard/wizard/vin
+is: uppfæra/uppfæra/vinur
 it: wizard/wizard/amico
 lv: wizard/wizard/friend
 nl: tovenaar/tovenaar/vriend
