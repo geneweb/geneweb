@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.138 2000-07-11 16:37:53 ddr Exp $
+# $Id: lexicon.txt,v 3.139 2000-07-18 07:50:31 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2348,6 +2348,7 @@ en: engaged
 eo: fiancxaj
 fi: kihloissa
 fr: fianc&eacute;s
+lv: saderin&acirc;ti
 nl: verloofd
 pt: Noivos
 se: f&ouml;rlovad
@@ -2359,6 +2360,7 @@ en: engaged%t to
 eo: fiancxa%t kun
 fi: kihlattu%t
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
+lv: saderin&acirc;ts%t ar
 nl: verloofd%t met
 pt: noivo%t de/noiva%t de
 se: f&ouml;rlovad%t med
@@ -2958,6 +2960,7 @@ en: horizontally
 eo: horizontale
 fi: vaakasuoraan
 fr: horizontalement
+lv: horizont&acirc;li
 nl: horizontaal
 pt: horizontalmente
 se: horisontellt
@@ -5054,6 +5057,7 @@ en: separated
 eo: apartigaj
 fi: asumuserossa
 fr: s&eacute;par&eacute;s
+lv: nedzîvo kop&acirc;
 nl: gescheiden
 pt: separados
 se: separerat
@@ -5319,6 +5323,7 @@ dk: statistikker
 en: statistics
 eo: statistikoj
 fr: statistiques
+lv: statistika
 nl: statistieken
 se: statistik
 
@@ -5410,6 +5415,7 @@ en: surnames list
 eo: listo de la familinomoj
 fi: sukunimiluettelo
 fr: liste &eacute;clair
+lv: uzv&acirc;rdu saraksts
 nl: bijnamen lijst
 pt: lista de apelidos
 se: efternamns lista
