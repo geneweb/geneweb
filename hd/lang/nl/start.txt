@@ -47,10 +47,10 @@ plaats <INPUT NAME=p size=25 maxlength=200> =&gt;
    <OPTION VALUE="N" SELECTED> Familienamen
    <OPTION VALUE="P"> Voornamen
 </SELECT>
-in
+volgens
 <SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED> Alfabetische volgorde
-   <OPTION VALUE="F"> [Frequency]
+   <OPTION VALUE="A" SELECTED> Alfabet
+   <OPTION VALUE="F"> Aantal
 </SELECT> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
 </FORM>

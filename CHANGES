@@ -2,13 +2,16 @@ GeneWeb Version 1.10
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - Fixed more bugs (accents) due to new ANSEL encoding.
+  - [11/12/98] Fixed more bugs (accents) due to new ANSEL encoding.
 
 * Lexicon file (lexicon.txt)
-  - Fixed bug in the Dutch version.
+  - [11/12/98] Fixed bug and completed Dutch version (thanks to Joris Esch).
+
+* Dutch welcome file (nl/start.txt)
+  - [11/12/98] Fixed and completed (thanks to Joris Esch).
 
 * GeneWeb uncompiler (gwu)
-  - Save memory consummation.
+  - [11/12/98] Save memory consummation.
 
 GeneWeb Version 1.09
 --------------------
