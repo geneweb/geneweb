@@ -49,10 +49,6 @@ GeneWeb version 2.05
   - [Jul 3, 99] Added "af" as possible surnames particles (this is Danish)
     possibly ignored in "search".
 
-* GeneWeb compiler (gwc)
-  - [Jul 18, 99] If the data base already exists, do not erase it. Added option
-    '-f' (force) to remove an existing data base.
-
 * Gedcom to GeneWeb (ged2gwb)
   - [Jul 5, 99] Fixed bug sometimes stopping the program (exception
     "Invalid_argument") after the detection of an error of a family whose
