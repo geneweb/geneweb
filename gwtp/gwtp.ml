@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.11 2000-07-30 14:55:02 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.12 2000-07-31 01:10:59 ddr Exp $ *)
 
 open Printf;
 
@@ -411,7 +411,7 @@ value log str =
         try Sys.getenv "REMOTE_ADDR" with
         [ Not_found -> "" ] ]
   in
-  let oc = open_out_gen [Open_wronly; Open_creat; Open_append] 0o777 fname in
+  let oc = open_out_gen [Open_wronly; Open_creat; Open_append] 0o666 fname in
   do fprintf oc "%4d-%02d-%02d %02d:%02d:%02d"
        (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
         tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec;
