@@ -1,30 +1,39 @@
-# $Id: Makefile,v 1.2 2000-07-25 13:23:03 ddr Exp $
+# $Id: Makefile,v 1.3 2000-07-25 16:35:42 ddr Exp $
 
 CAMLP4=camlp4r
-OCAMLC=ocamlc
-OCAMLCOPT=-I ../geneweb/src
+OCAMLC=ocamlc.opt
+OCAMLOPT=ocamlopt.opt
+OCOPT=-I ../geneweb/src
 RM=/bin/rm -f
 GWTP_OBJS=httpEnv.cmo gwtp.cmo
 GWTP_OTHER=../geneweb/src/buff.cmo
 
-all: gwtp.out
+all: gwtp.opt
+
+gwtp.opt: $(GWTP_OBJS:.cmo=.cmx)
+	$(OCAMLOPT) $(GWTP_OTHER:.cmo=.cmx) $(GWTP_OBJS:.cmo=.cmx) -o gwtp.opt
 
 gwtp.out: $(GWTP_OBJS)
 	$(OCAMLC) $(GWTP_OTHER) $(GWTP_OBJS) -o gwtp.out
 
 clean:
-	$(RM) *.cm[oix] *.out
+	$(RM) *.cm[oix] *.out *.opt
 
 depend:
 	> .depend.new
 	for i in *.ml; do camlp4r pr_depend.cmo $$i >> .depend.new; done
 	mv .depend.new .depend
 
-.SUFFIXES: .ml .cmo
+.SUFFIXES: .ml .cmo .cmx
 
 .ml.cmo:
 	$(CAMLP4) $< -o $*.ppo
-	$(OCAMLC) $(OCAMLCOPT) -c -impl $*.ppo
+	$(OCAMLC) $(OCOPT) -c -impl $*.ppo
+	$(RM) $*.ppo
+
+.ml.cmx:
+	$(CAMLP4) $< -o $*.ppo
+	$(OCAMLOPT) $(OCOPT) -c -impl $*.ppo
 	$(RM) $*.ppo
 
 include .depend
