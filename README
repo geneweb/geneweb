@@ -19,7 +19,7 @@ CONTENTS:
 	CHANGES		changes (for genealogists non programmers)
 	ICHANGES	changes (for programmers)
 	LICENSE		license notice
-	Makefile	main Mak efile
+	Makefile	main Makefile
 	README		this file
 	INSTALL		installation file
 	contrib		users contributions
