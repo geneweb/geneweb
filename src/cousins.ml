@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 2.8 1999-07-22 21:18:59 ddr Exp $ *)
+(* $Id: cousins.ml,v 2.9 1999-07-23 12:38:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -200,9 +200,10 @@ value print_cousins_side_of conf base a ini_p ini_br lev1 lev2 =
   if List.exists (sibling_has_desc_lev base lev2) sib then
     do if lev1 > 1 then
          do html_li conf;
-            Wserver.wprint (fcapitale (ftransl conf "of %t's side"))
-              (fun _ -> afficher_personne_titre conf base a);
-            Wserver.wprint ":\n";
+            Wserver.wprint "%s:\n"
+              (capitale
+                 (cftransl conf "of %s's side"
+                    [gen_person_title_text raw_access conf base a]));
          return ()
        else ();
        let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.20 1999-07-22 19:47:20 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.21 1999-07-23 12:38:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -70,6 +70,10 @@ value decline case s =
       if i == ibeg then "" else decline_word case s ibeg i
     else if s.[i] == ' ' then
       decline_word case s ibeg i ^ " " ^ loop (i + 1) (i + 1)
+    else if s.[i] == '<' then
+      decline_word case s ibeg i ^ "<" ^ loop (i + 1) (i + 1)
+    else if s.[i] == '>' then
+      String.sub s ibeg (i + 1 - ibeg) ^ loop (i + 1) (i + 1)
     else loop ibeg (i + 1)
 ;
 

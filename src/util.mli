@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.18 1999-07-22 22:14:04 ddr Exp $ *)
+(* $Id: util.mli,v 2.19 1999-07-23 12:38:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -41,6 +41,7 @@ value gen_person_text_no_html : p_access -> config -> base -> person -> string;
 value gen_person_text_without_title :
   p_access -> config -> base -> person -> string
 ;
+value gen_person_title_text : p_access -> config -> base -> person -> string;
 value gen_referenced_person_title_text :
   p_access -> config -> base -> person -> string
 ;
@@ -52,10 +53,10 @@ value person_text_without_surname : config -> base -> person -> string;
 value person_text_without_title : config -> base -> person -> string;
 value titled_person_text : config -> base -> person -> title -> string;
 value one_title_text : config -> base -> person -> title -> string;
+value person_title_text : config -> base -> person -> string;
 value referenced_person_title_text : config -> base -> person -> string;
 
 value main_title : base -> person -> option title;
-value afficher_personne_titre : config -> base -> person -> unit;
 value afficher_titre : config -> base -> person -> unit;
 value p_getenv : list (string * string) -> string -> option string;
 value p_getint : list (string * string) -> string -> option int;
@@ -84,6 +85,8 @@ value ftransl : config -> format 'a 'b 'c -> format 'a 'b 'c;
 value ftransl_nth : config -> format 'a 'b 'c -> int -> format 'a 'b 'c;
 value fdecline : config -> format 'a 'b 'c -> string -> format 'a 'b 'c;
 value fcapitale : format 'a 'b 'c -> format 'a 'b 'c;
+
+value cftransl : config -> string -> list string -> string;
 
 value index_of_sex : sex -> int;
 value spouse : person -> couple -> iper;
@@ -120,6 +123,7 @@ value afficher_prenom_de_personne : config -> base -> person -> unit;
 value afficher_prenom_de_personne_referencee :
   config -> base -> person -> unit;
 value afficher_personne_referencee : config -> base -> person -> unit;
+value afficher_personne_titre : config -> base -> person -> unit;
 value afficher_personne_titre_referencee : config -> base -> person -> unit;
 value afficher_personne_sans_titre : config -> base -> person -> unit;
 (**)
