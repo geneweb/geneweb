@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.7 1999-11-23 18:58:57 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.8 1999-11-24 10:45:42 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title></head>
   <meta name="ROBOTS" content="NONE">
@@ -36,16 +36,16 @@ henkil&ouml;&auml.%In<br>
 %I&NcNa<table border=0 width="70%">
 <tr>
 
-<td align=center><a href="%sw=w"><em>"Wizard"</em></a> kirjautuminen<br>
+<td align=center><a href="%sw=w"><em>Velho</em></a> kirjautuminen<br>
 (salasana)<br></td>
 
-%INf<td align=center><a href="%sw=f"><em>"Friend"</em></a> kirjautuminen<br>
+%INf<td align=center><a href="%sw=f"><em>Toveri</em></a> kirjautuminen<br>
 (salasana)</td>
 
 %E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=get action="%f">
-%hSalasana <em>"Friend"</em> tai <em>"Wizard"</em> kirjautumiseen:
+%hSalasana <em>Toveri</em> tai <em>Velho</em> kirjautumiseen:
 <input name=w size=10 maxlength=200>
 </form>
 </td></tr>
@@ -134,7 +134,7 @@ color=#2f6400><b>erityishaulla</b></font></a>.
 </td>
 <td align=left>
 <ul>%E
-<li><a href="%sm=MOD_NOTES">muokkaa huomautuksia</a>
+<li><a href="%sm=MOD_NOTES">muokkaa viitteit&auml;</a>
 </ul>
 </td>
 </tr>
