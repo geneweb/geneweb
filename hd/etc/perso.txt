@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.20 2003-11-14 11:39:20 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.21 2003-11-21 11:44:39 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -75,7 +75,7 @@
     <em>(%if;cancel_links;%first_name; %surname;
          %else;
            <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
-           <a href="%prefix;m=N;v=%surname_key;">%surname;</a>
+           <a href="%prefix;m=N;v=%surname_key;">%surname;</a>%nn;
          %end;)</em><br>
   %end;
   %foreach;surname_alias;
