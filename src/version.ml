@@ -1,7 +1,7 @@
-(* $Id: version.ml,v 4.19 2002-11-26 08:39:41 ddr Exp $ *)
+(* $Id: version.ml,v 4.20 2002-12-12 08:37:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
-value txt = "4.08-exp";
+value txt = "4.08";
 
 value available_languages =
   ["af"; "bg"; "ca"; "cs"; "da"; "de"; "en"; "es"; "eo"; "et"; "fi";
