@@ -2,6 +2,8 @@ GeneWeb version 4.02
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [09 May 01] Fixed bug: system images with underscores did not work
+    (may happen in cases of customization of the welcome page)
   - [09 May 01] Fixed bug: in family update form, if the comment
     contained quotes, the text was truncated.
   - [05 May 01] When creating or modifying a family, warn for children
