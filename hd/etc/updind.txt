@@ -1,7 +1,7 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.15 2004-12-14 10:04:38 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.16 2004-12-26 18:11:20 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -11,12 +11,15 @@
       [*modify::person/persons]0 # %index;
     %else;[*add::person/persons]0%end;
   </title>
+  <style type="text/css"><!--
+    .highlight { color: %highlight;; font-weight: bold }
+  --></style>
 %base_header;
 </head>
 <body%body_prop;>
 %message_to_wizard;
 
-<script>
+<script type="text/javascript">
 <!--
 function sourceIfData(src, place, year, text)
 {
@@ -120,16 +123,17 @@ function changeDeath()
   </table>
 %end;
 
-<h1 align=center><font color=%highlight;>%nn;
+<h1 style="text-align:center" class="highlight">%nn;
 %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
   [*merge::person/persons]1 # %index;
 %elseif;(evar_m = "MOD_IND" or evar_m = "MOD_IND_OK");
   [*modify::person/persons]0 # %index;
 %else;
   [*add::person/persons]0%end;
-</font></h1>
+</h1>
 
 <form method=POST action="%action;">
+<p>
 %hidden;
 <input type=hidden name=digest value="%digest;">
 <input type=hidden name=i value="%index;">
@@ -180,7 +184,7 @@ function changeDeath()
 </tr>
 </table>
 
-<br>
+<p>
 
 <table border=1>
 %if;has_qualifiers;
@@ -221,7 +225,6 @@ function changeDeath()
   <td><input type=checkbox name="add_alias0" value=on></td>
   </tr>
 %end;
-</tr>
 %if;has_first_names_aliases;
   %foreach;first_name_alias;
     <tr>
@@ -321,7 +324,7 @@ function changeDeath()
 </tr>
 </table>
 
-%apply;date([*date]0, "death", "death", " onFocus=setDead()")
+%apply;date([*date]0, "death", "death", " onFocus='setDead()'")
 
 <table border=1>
 <tr>
@@ -541,7 +544,8 @@ function changeDeath()
 
 <h4>[*note/notes]1</h4>
 
-<textarea name=notes rows=6 cols=70 wrap=soft>%notes;</textarea>
+<p>
+<textarea name=notes rows=6 cols=70>%notes;</textarea>
 
 <h4>[*source/sources]0</h4>
 
@@ -557,9 +561,8 @@ function changeDeath()
 <input type=submit value=Ok>
 </form>
 
-<a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
- alt=... width=64 height=72 align=right border=0></a>
-<br>
+<div><a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
+ alt=... width=64 height=72 style="border:0;float:right"></a><br></div>
 %copyright;
 %base_trailer;
 </body>

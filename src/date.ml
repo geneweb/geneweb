@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.22 2004-12-26 13:29:23 ddr Exp $ *)
+(* $Id: date.ml,v 4.23 2004-12-26 18:11:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -477,24 +477,28 @@ value hebrew_month_name conf n = capitale (nominative (hebrew_month conf n));
 
 value print_year date var =
   do {
-    tag "td" begin
+    stag "td" begin
       Wserver.wprint "<input type=submit name=y%s1 value=\" &lt; \">" var;
     end;
-    tag "td" begin
+    Wserver.wprint "\n";
+    stag "td" begin
       Wserver.wprint "<input name=y%s size=5 maxlength=5 value=%d>" var
         date.year;
     end;
-    tag "td" begin
-      Wserver.wprint "<input type=submit name=y%s2 value=\" &gt; \">\n" var;
-    end
+    Wserver.wprint "\n";
+    stag "td" begin
+      Wserver.wprint "<input type=submit name=y%s2 value=\" &gt; \">" var;
+    end;
+    Wserver.wprint "\n";
   }
 ;
 
 value print_month conf date month_name n_months var =
   do {
-    tag "td" begin
+    stag "td" begin
       Wserver.wprint "<input type=submit name=m%s1 value=\" &lt; \">" var;
     end;
+    Wserver.wprint "\n";
     tag "td" "align=center" begin
       tag "select" "name=m%s" var begin
         for i = 1 to n_months do {
@@ -504,24 +508,28 @@ value print_month conf date month_name n_months var =
         };
       end;
     end;
-    tag "td" begin
+    stag "td" begin
       Wserver.wprint "<input type=submit name=m%s2 value=\" &gt; \">" var;
-    end
+    end;
+    Wserver.wprint "\n";
   }
 ;
 
 value print_day date var =
   do {
-    tag "td" begin
+    stag "td" begin
       Wserver.wprint "<input type=submit name=d%s1 value=\" &lt; \">" var;
     end;
-    tag "td" begin
+    Wserver.wprint "\n";
+    stag "td" begin
       Wserver.wprint "<input name=d%s size=2 maxlength=2 value=%d>" var
         date.day;
     end;
-    tag "td" begin
-      Wserver.wprint "<input type=submit name=d%s2 value=\" &gt; \">\n" var;
-    end
+    Wserver.wprint "\n";
+    stag "td" begin
+      Wserver.wprint "<input type=submit name=d%s2 value=\" &gt; \">" var;
+    end;
+    Wserver.wprint "\n";
   }
 ;
 
@@ -530,7 +538,7 @@ value print_some_calendar conf order date n month_name n_months var =
     Wserver.wprint "\n";
     tag "tr" "align=left" begin
       stag "th" begin
-        Wserver.wprint "%s\n"
+        Wserver.wprint "%s"
           (capitale (transl_nth conf "gregorian/julian/french/hebrew" n));
       end;
       Wserver.wprint "\n";
@@ -544,9 +552,10 @@ value print_some_calendar conf order date n month_name n_months var =
         print_month conf date month_name n_months var;
         print_day date var;
       };
-      tag "td" begin
-        Wserver.wprint "<input type=submit name=t%s value=\" = \">\n" var;
+      stag "td" begin
+        Wserver.wprint "<input type=submit name=t%s value=\" = \">" var;
       end;
+      Wserver.wprint "\n";
     end;
   }
 ;
@@ -557,15 +566,17 @@ value print_calendar_head conf order =
     Wserver.wprint "\n";
     if order = "ddmmyy" then
       for i = 2 downto 0 do {
-        tag "th" "align=center colspan=3" begin
+        stag "th" "align=center colspan=3" begin
           Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
-        end
+        end;
+        Wserver.wprint "\n";
       }
     else
       for i = 0 to 2 do {
-        tag "th" "align=center" begin
+        stag "th" "align=center" begin
           Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
-        end
+        end;
+        Wserver.wprint "\n";
       };
     stag "td" begin Wserver.wprint "&nbsp;"; end;
     Wserver.wprint "\n";
@@ -642,7 +653,7 @@ value print_calendar conf base =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    tag "table" "align=center" begin
+    tag "table" "style=\"margin:auto\"" begin
       stag "tbody" begin
         stag "tr" begin
           tag "td" "align=left" begin
@@ -663,6 +674,7 @@ value print_calendar conf base =
         stag "tr" begin
           tag "td" "align=center" begin
             tag "form" "method=GET action=\"%s\"" conf.command begin
+              html_p conf;
               List.iter
                 (fun (k, v) ->
                    Wserver.wprint "<input type=hidden name=%s value=%s>\n" k

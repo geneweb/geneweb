@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.9 2004-12-14 09:30:18 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.10 2004-12-26 18:11:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -525,6 +525,7 @@ value print_del1 conf base p =
     header conf title;
     Wserver.wprint "\n";
     tag "form" "method=POST action=\"%s\"" conf.command begin
+      html_p conf;
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=m value=DEL_IND_OK>\n";
       Wserver.wprint "<input type=hidden name=i value=%d>\n\n"

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.34 2004-12-14 09:30:17 ddr Exp $ *)
+(* $Id: update.ml,v 4.35 2004-12-26 18:11:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1040,7 +1040,6 @@ value print conf base p =
       Wserver.wprint ".<br>\n"
     }
     else ();
-    Wserver.wprint "<br>\n";
     trailer conf
   }
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.6 2004-01-05 14:38:08 ddr Exp $ *)
+(* $Id: notes.ml,v 4.7 2004-12-26 18:11:20 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -31,11 +31,12 @@ value print_mod conf base =
   do {
     header conf title;
     tag "form" "method=POST action=\"%s\"" conf.command begin
+      html_p conf;
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=m value=MOD_NOTES_OK>\n";
       let digest = Iovalue.digest s in
       Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
-      stag "textarea" "name=notes rows=30 cols=70 wrap=soft" begin
+      stag "textarea" "name=notes rows=30 cols=70" begin
         if s <> "" then Wserver.wprint "%s" (quote_escaped s) else ();
       end;
       Wserver.wprint "\n";
