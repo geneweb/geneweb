@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.25 2001-02-13 00:23:45 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.26 2001-02-28 19:07:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -339,7 +339,7 @@ value print_conflict conf base p =
        html_li conf;
        Wserver.wprint "%s " (capitale (transl conf "or"));
        Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-       Wserver.wprint "%s %s." (transl conf "and")
+       Wserver.wprint " %s %s." (transl conf "and")
          (transl conf "change it (the number) yourself");
      end;
      Update.print_return conf;

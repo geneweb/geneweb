@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.27 2001-02-14 03:19:04 ddr Exp $ *)
+(* $Id: update.ml,v 3.28 2001-02-28 19:07:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -739,12 +739,12 @@ value print_create_conflict conf base p var =
          html_li conf;
          Wserver.wprint "%s " (capitale (transl conf "or"));
          Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-         Wserver.wprint "%s %s." (transl conf "and")
+         Wserver.wprint " %s %s." (transl conf "and")
            (transl conf "change it (the number) yourself");
          html_li conf;
          Wserver.wprint "%s " (capitale (transl conf "or"));
          Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-         Wserver.wprint "%s %s." (transl conf "and")
+         Wserver.wprint " %s %s." (transl conf "and")
            (transl conf "use \"link\" instead of \"create\"");
        end;
        Wserver.wprint "<input type=submit name=create value=\"%s\">\n"
