@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.21 2000-11-18 09:52:01 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.22 2000-11-18 16:54:11 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -249,37 +249,32 @@ value infer_origin_file_from_other_marriages conf base ifam ip =
 ;
 
 value infer_origin_file conf base ifam ncpl ndes =
-  let afath = aoi base ncpl.father in
-  let amoth = aoi base ncpl.mother in
-  match (afath.parents, amoth.parents) with
-  [ (Some if1, _) when sou base (foi base if1).origin_file <> "" ->
-      (foi base if1).origin_file
-  | (_, Some if2) when sou base (foi base if2).origin_file <> "" ->
-      (foi base if2).origin_file
-  | _ ->
-      let r =
-        loop 0 where rec loop i =
-          if i == Array.length ndes.children then None
-          else
-            let cifams = (uoi base ndes.children.(i)).family in
-            if Array.length cifams == 0 then loop (i + 1)
-            else if sou base (foi base cifams.(0)).origin_file <> "" then
-              Some (foi base cifams.(0)).origin_file
-            else loop (i + 1)
-      in
-      let r =
-        if r = None then
-          infer_origin_file_from_other_marriages conf base ifam ncpl.father
-        else r
-      in
-      let r =
-        if r = None then
-          infer_origin_file_from_other_marriages conf base ifam ncpl.mother
-        else r
-      in
-      match r with
-      [ None -> Update.insert_string conf base ""
-      | Some r -> r ] ]
+  let r = infer_origin_file_from_other_marriages conf base ifam ncpl.father in
+  let r =
+    if r = None then
+      infer_origin_file_from_other_marriages conf base ifam ncpl.mother
+    else r
+  in
+  match r with
+  [ Some r -> r
+  | None ->
+      let afath = aoi base ncpl.father in
+      let amoth = aoi base ncpl.mother in
+      match (afath.parents, amoth.parents) with
+      [ (Some if1, _) when sou base (foi base if1).origin_file <> "" ->
+          (foi base if1).origin_file
+      | (_, Some if2) when sou base (foi base if2).origin_file <> "" ->
+          (foi base if2).origin_file
+      | _ ->
+          loop 0 where rec loop i =
+            if i == Array.length ndes.children then
+              Update.insert_string conf base ""
+            else
+              let cifams = (uoi base ndes.children.(i)).family in
+              if Array.length cifams == 0 then loop (i + 1)
+              else if sou base (foi base cifams.(0)).origin_file <> "" then
+                (foi base cifams.(0)).origin_file
+              else loop (i + 1) ] ]
 ;
 
 value update_related_witnesses base ofam_witn nfam_witn ncpl =

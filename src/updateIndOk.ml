@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.18 2000-11-18 09:52:02 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.19 2000-11-18 16:54:11 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -411,9 +411,6 @@ value rparents_of p =
 ;
 
 value is_witness_at_marriage base ip p =
-(*
-do Printf.eprintf "cherche si %s est temoin au mariage de %s\n" (denomination base (poi base ip)) (denomination base p); flush stderr; return
-*)
   let u = uoi base ip in
   List.exists
     (fun ifam ->
