@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.17 2005-01-02 01:09:13 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.18 2005-01-02 10:37:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -183,45 +183,48 @@ value print_death conf base =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<ul>\n";
-    let _ =
-      List.fold_left
-        (fun last_month_txt (p, d, cal) ->
-           let month_txt =
-             let d = {(d) with day = 0} in
-             capitale (Date.string_of_date conf (Dgreg d cal))
-           in
-           do {
-             if month_txt <> last_month_txt then do {
-               if last_month_txt = "" then ()
-	       else Wserver.wprint "</ul>\n</li>\n";
-               Wserver.wprint "<li>%s\n" month_txt;
-               Wserver.wprint "<ul>\n";
-             }
-             else ();
-             stagn "li" begin
-               Wserver.wprint "<b>";
-               Wserver.wprint "%s" (referenced_person_text conf base p);
-               Wserver.wprint "</b>,";
-               Wserver.wprint "%s <em>%s</em>"
-                 (transl_nth conf "died" (index_of_sex p.sex))
-                 (Date.string_of_ondate conf (Dgreg d cal));
-               let sure d = d.prec = Sure in
-               match Adef.od_of_codate p.birth with
-               [ Some (Dgreg d1 _) ->
-                   if sure d1 && sure d && d1 <> d then do {
-                     let a = time_gone_by d1 d in
-                     Wserver.wprint " <em>(%s)</em>"
-                       (Date.string_of_age conf a);
-                   }
-                   else ()
-               | _ -> () ];
-             end;
-             month_txt
-           })
-        "" list
-    in
-    Wserver.wprint "</ul>\n</li>\n</ul>\n";
+    if list <> [] then do {
+      Wserver.wprint "<ul>\n";
+      let _ =
+        List.fold_left
+          (fun last_month_txt (p, d, cal) ->
+             let month_txt =
+               let d = {(d) with day = 0} in
+               capitale (Date.string_of_date conf (Dgreg d cal))
+             in
+             do {
+               if month_txt <> last_month_txt then do {
+                 if last_month_txt = "" then ()
+                 else Wserver.wprint "</ul>\n</li>\n";
+                 Wserver.wprint "<li>%s\n" month_txt;
+                 Wserver.wprint "<ul>\n";
+               }
+               else ();
+               stagn "li" begin
+                 Wserver.wprint "<b>";
+                 Wserver.wprint "%s" (referenced_person_text conf base p);
+                 Wserver.wprint "</b>,";
+                 Wserver.wprint "%s <em>%s</em>"
+                   (transl_nth conf "died" (index_of_sex p.sex))
+                   (Date.string_of_ondate conf (Dgreg d cal));
+                 let sure d = d.prec = Sure in
+                 match Adef.od_of_codate p.birth with
+                 [ Some (Dgreg d1 _) ->
+                     if sure d1 && sure d && d1 <> d then do {
+                       let a = time_gone_by d1 d in
+                       Wserver.wprint " <em>(%s)</em>"
+                         (Date.string_of_age conf a);
+                     }
+                     else ()
+                 | _ -> () ];
+               end;
+               month_txt
+             })
+          "" list
+      in
+      Wserver.wprint "</ul>\n</li>\n</ul>\n";
+    }
+    else ();
     trailer conf;
   }
 ;
