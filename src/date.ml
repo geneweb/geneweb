@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.7 1999-04-29 19:55:51 ddr Exp $ *)
+(* $Id: date.ml,v 2.8 1999-06-02 19:23:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -42,28 +42,28 @@ value string_of_ondate conf d =
   match d.prec with
   [ Sure ->
       if d.day = 0 && d.month = 0 then
-        transl conf "in (year)" ^ nbsp ^ sy
-      else if d.day = 0 then transl conf "in (month year)" ^ nbsp ^ sy
-      else transl conf "on (day month year)" ^ nbsp ^ sy
+        transl conf "in (year)" ^ " " ^ sy
+      else if d.day = 0 then transl conf "in (month year)" ^ " " ^ sy
+      else transl conf "on (day month year)" ^ " " ^ sy
   | About | Before | After ->
       let s = sy in
-      if d.prec = About then transl conf "about (date)" ^ nbsp ^ s
-      else if d.prec = Before then transl conf "before (date)" ^ nbsp ^ s
-      else transl conf "after (date)" ^ nbsp ^ s
+      if d.prec = About then transl conf "about (date)" ^ " " ^ s
+      else if d.prec = Before then transl conf "before (date)" ^ " " ^ s
+      else transl conf "after (date)" ^ " " ^ s
   | Maybe ->
       let s =
         if d.day = 0 && d.month = 0 then
-          transl conf "in (year)" ^ nbsp ^ sy
-        else if d.day = 0 then transl conf "in (month year)" ^ nbsp ^ sy
-        else transl conf "on (day month year)" ^ nbsp ^ sy
+          transl conf "in (year)" ^ " " ^ sy
+        else if d.day = 0 then transl conf "in (month year)" ^ " " ^ sy
+        else transl conf "on (day month year)" ^ " " ^ sy
       in
-      transl conf "maybe (date)" ^ nbsp ^ s
+      transl conf "maybe (date)" ^ " " ^ s
   | OrYear z ->
       let s =
         if d.day = 0 && d.month = 0 then
-          transl conf "in (year)" ^ nbsp ^ sy
-        else if d.day = 0 then transl conf "in (month year)" ^ nbsp ^ sy
-        else transl conf "on (day month year)" ^ nbsp ^ sy
+          transl conf "in (year)" ^ " " ^ sy
+        else if d.day = 0 then transl conf "in (month year)" ^ " " ^ sy
+        else transl conf "on (day month year)" ^ " " ^ sy
       in
       s ^ " " ^
       transl conf "or" ^ " " ^
@@ -72,9 +72,9 @@ value string_of_ondate conf d =
       let s =
         if d.day = 0 && d.month = 0 then sy
         else if d.day = 0 then sy
-        else transl conf "on (day month year)" ^ nbsp ^ sy
+        else transl conf "on (day month year)" ^ " " ^ sy
       in
-      transl conf "between (date)" ^ nbsp ^ s ^ " " ^
+      transl conf "between (date)" ^ " " ^ s ^ " " ^
       transl conf "and" ^ " " ^
       code_date conf (transl_nth conf "(date)" 3) 0 0 z ]
 ;
@@ -92,16 +92,16 @@ value string_of_date conf d =
   let s = code_date conf encoding d.day d.month d.year in
   match d.prec with
   [ Sure -> s
-  | About -> transl conf "about (date)" ^ nbsp ^ s
-  | Before -> transl conf "before (date)" ^ nbsp ^ s
-  | After -> transl conf "after (date)" ^ nbsp ^ s
-  | Maybe -> transl conf "maybe (date)" ^ nbsp ^ s
+  | About -> transl conf "about (date)" ^ " " ^ s
+  | Before -> transl conf "before (date)" ^ " " ^ s
+  | After -> transl conf "after (date)" ^ " " ^ s
+  | Maybe -> transl conf "maybe (date)" ^ " " ^ s
   | OrYear z ->
       s ^ " " ^
       transl conf "or" ^ " " ^
       code_date conf (transl_nth conf "(date)" 3) 0 0 z
   | YearInt z ->
-      transl conf "between (date)" ^ nbsp ^ s ^ " " ^
+      transl conf "between (date)" ^ " " ^ s ^ " " ^
       transl conf "and" ^ " " ^
       code_date conf (transl_nth conf "(date)" 3) 0 0 z ]
 ;
@@ -180,7 +180,7 @@ value year_text d =
   let s =
     match d.prec with
     [ Before -> "/"
-    | About | Maybe | OrYear _ | YearInt _ -> "ca&nbsp;"
+    | About | Maybe | OrYear _ | YearInt _ -> "ca "
     | _ -> "" ]
   in
   let s = s ^ string_of_int (annee d) in
@@ -219,10 +219,10 @@ value short_dates_text conf base p =
     let s =
       match (birth_date, p.death) with
       [ (Some _, Death _ _ | NotDead) -> s ^ "-"
-      | (_, Death _ _) -> if s = "" then "+" else s ^ "&nbsp;+"
+      | (_, Death _ _) -> if s = "" then "+" else s ^ nbsp ^ "+"
       | (_, DeadDontKnowWhen | DeadYoung) ->
           if of_course_died conf p then s
-          else if s = "" then "+" else s ^ "&nbsp;+"
+          else if s = "" then "+" else s ^ nbsp ^ "+"
       | _ -> s ]
     in
     let s =
