@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.5 2000-04-16 15:40:19 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.6 2000-04-28 22:48:42 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -346,11 +346,11 @@ value rec list_remove x =
   | [y :: l] -> if x = y then l else [y :: list_remove x l] ]
 ;
 
-ifndef MAC then
+ifdef MAC then declare end else
 value pids = ref [];
-ifndef MAC then
+ifdef MAC then declare end else
 value cleanup_verbose = ref True;
-ifndef MAC then
+ifdef MAC then declare end else
 value cleanup_sons () =
   List.iter
     (fun p ->
@@ -375,7 +375,7 @@ value cleanup_sons () =
      pids.val
 ;
 
-ifndef MAC then
+ifdef MAC then declare end else
 value wait_available max_clients s =
   match max_clients with
   [ Some m ->
