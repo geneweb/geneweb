@@ -21,6 +21,11 @@ GeneWeb Version 3.12
     (shorten_too_long and bottom_adjust) to shorten too long branches
     which may appear in the algorithm.
 
+* Lexicon (lang/lexicon.txt)
+  - [01 Mar 01] The existing trailing spaces at end of lines are deleted.
+    Now gwd and the other utilities accept the line "xx:" without trailing
+    space as an empty translation.
+
 * GeneWeb compiler (gwc)
   - [14 Feb 01] Delete empty titles (titles with empty identifier)
 

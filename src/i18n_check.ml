@@ -1,4 +1,4 @@
-(* $Id: i18n_check.ml,v 3.2 2001-01-06 09:55:57 ddr Exp $ *)
+(* $Id: i18n_check.ml,v 3.3 2001-03-01 12:52:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value usage () =
@@ -20,7 +20,7 @@ value main () =
         loop (input_line ic) where rec loop line =
           if line = "" then ()
           else
-            do if String.sub line 0 4 = lang ^ ": " then
+            do if String.sub line 0 3 = lang ^ ":" then
                  Printf.printf "%s\n"
                    (String.sub line_ref 4 (String.length line_ref - 4))
                else ();

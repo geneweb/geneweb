@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: mk_missing_i18n.sh,v 3.9 2001-02-27 21:27:18 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 3.10 2001-03-01 12:52:06 ddr Exp $ *)
 
 open Printf
 
@@ -21,14 +21,17 @@ let rec skip_to_same_line ic line_ref =
 let rec get_all_versions ic =
   let line = input_line_cnt ic in
   if line = "" then []
-  else if String.length line < 4 then begin
+  else if String.length line < 3 then begin
     eprintf "small line %d: \"%s\"\n" !linenum (String.escaped line);
     flush stderr;
     []
   end
   else
     let lang = String.sub line 0 2 in
-    let transl = String.sub line 4 (String.length line - 4) in
+    let transl =
+      if String.length line = 3 then ""
+      else String.sub line 4 (String.length line - 4)
+    in
     (lang, transl) :: get_all_versions ic
 
 let compare_assoc (l1, _) (l2, _) = l1 <= l2
