@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.21 2002-12-26 14:26:21 ddr Exp $ *)
+(* $Id: forum.ml,v 4.22 2002-12-31 08:38:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -97,7 +97,9 @@ value message_txt conf i =
 
 value print_headers conf =
   let fname = forum_file conf in
-  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
+  match
+    try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
+  with
   [ Some ic ->
       let ic_len = in_channel_length ic in
       let max_header_mess =
@@ -222,7 +224,9 @@ value print_forum_headers conf base =
 
 value get_message conf pos =
   let fname = forum_file conf in
-  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
+  match
+    try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
+  with
   [ Some ic ->
       let ic_len = in_channel_length ic in
       let r =
@@ -259,7 +263,9 @@ value get_message conf pos =
 
 value backward_pos conf pos =
   let fname = forum_file conf in
-  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
+  match
+    try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
+  with
   [ Some ic ->
       let ic_len = in_channel_length ic in
       let sync_txt = "\nTime: " in
@@ -432,7 +438,7 @@ value forum_add conf base ident comm =
     [ Accept ->
         let fname = forum_file conf in
         let tmp_fname = fname ^ "~" in
-        let oc = open_out tmp_fname in
+        let oc = Secure.open_out tmp_fname in
         try
           let (hh, mm, ss) = conf.time in
           do {
@@ -458,7 +464,9 @@ value forum_add conf base ident comm =
             loop 0 True;
             fprintf oc "\n\n";
             match
-              try Some (open_in_bin fname) with [ Sys_error _ -> None ]
+              try
+                Some (Secure.open_in_bin fname) with
+                [ Sys_error _ -> None ]
             with
             [ Some ic ->
                 do {
@@ -517,9 +525,11 @@ value internal_error conf base =
 value forum_del conf base pos next_pos =
   let fname = forum_file conf in
   let tmp_fname = fname ^ "~" in
-  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
+  match
+     try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ]
+  with
   [ Some ic ->
-      let oc = open_out tmp_fname in
+      let oc = Secure.open_out tmp_fname in
       let len = in_channel_length ic in
       let pos = len - pos in
       let next_pos = len - next_pos in

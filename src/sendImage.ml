@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.8 2002-03-11 17:50:45 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.9 2002-12-31 08:38:07 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -170,7 +170,7 @@ value print_sent conf base p =
 ;
 
 value write_file fname content =
-  let oc = open_out_bin fname in
+  let oc = Secure.open_out_bin fname in
   do { output_string oc content; flush oc; close_out oc }
 ;
 
@@ -235,7 +235,7 @@ value dump_bad_image conf s =
   match p_getenv conf.base_env "dump_bad_images" with
   [ Some "yes" ->
       try
-        let oc = open_out_bin "bad-image" in
+        let oc = Secure.open_out_bin "bad-image" in
         do { output_string oc s; flush oc; close_out oc }
       with
       [ Sys_error _ -> () ]

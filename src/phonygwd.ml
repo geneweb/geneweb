@@ -1,4 +1,4 @@
-(* $Id: phonygwd.ml,v 4.2 2001-04-23 02:59:45 ddr Exp $ *)
+(* $Id: phonygwd.ml,v 4.3 2002-12-31 08:38:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value port_selected = ref 2317;
@@ -25,7 +25,7 @@ value log addr request s =
 ;
 
 value print_text fname =
-  let ic = open_in fname in
+  let ic = Secure.open_in fname in
   do {
     try while True do { print_char (input_char ic) } with
     [ End_of_file -> () ];
@@ -58,7 +58,7 @@ value main () =
       exit 1
     }
     else ();
-    close_in (open_in fname.val);
+    close_in (Secure.open_in fname.val);
     Wserver.f None port_selected.val 0 (Some 4) connection;
   }
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.7 2002-12-30 13:51:45 ddr Exp $ *)
+(* $Id: history.ml,v 4.8 2002-12-31 08:38:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -30,7 +30,7 @@ value record conf base (fn, sn, occ) action =
   if do_it then
     let fname = file_name conf in
     match
-      try Some (open_out_gen ext_flags 0o644 fname) with
+      try Some (Secure.open_out_gen ext_flags 0o644 fname) with
       [ Sys_error _ -> None ]
     with
     [ Some oc ->
@@ -235,7 +235,7 @@ value print conf base =
     header conf title;
     print_link_to_welcome conf True;
     let fname = file_name conf in
-    match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
+    match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
     [ Some ic -> do { print_history conf base ic; close_in ic; }
     | _ -> () ];
     trailer conf;

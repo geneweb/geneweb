@@ -1,27 +1,20 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.70 2002-12-30 18:40:05 ddr Exp $ *)
+(* $Id: util.ml,v 4.71 2002-12-31 08:38:07 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
 open Config;
 open Gutil;
 
-value open_in fname =
-  if String.contains fname '\000' then raise (Sys_error "")
-  else Pervasives.open_in fname
-;
-
-value open_in_bin fname =
-  if String.contains fname '\000' then raise (Sys_error "")
-  else Pervasives.open_in_bin fname
-;
-
 value sharelib =
   List.fold_right Filename.concat [Gwlib.prefix; "share"] "geneweb"
 ;
 
-value lang_path = ref [Filename.current_dir_name; sharelib];
-value doc_path = ref [];
+value lang_path = Secure.lang_path;
+value doc_path = Secure.doc_path;
+
+lang_path.val := [Filename.current_dir_name; sharelib];
+
 value base_dir = ref Filename.current_dir_name;
 value cnt_dir = ref "";
 value images_url = ref "";
@@ -881,8 +874,9 @@ value open_etc_file fname =
     search_in_lang_path
       (Filename.concat "etc" (Filename.basename fname ^ ".txt"))
   in
-  try Some (open_in fname1) with
-  [ Sys_error _ -> try Some (open_in fname2) with [ Sys_error _ -> None ] ]
+  try Some (Secure.open_in fname1) with
+  [ Sys_error _ ->
+      try Some (Secure.open_in fname2) with [ Sys_error _ -> None ] ]
 ;
 
 value macro_etc env imcom c =
@@ -1080,7 +1074,7 @@ value include_hed_trl conf base_opt suff =
     if Sys.file_exists fname then fname
     else base_path ["lang"] (conf.bname ^ suff)
   in
-  match try Some (open_in hed_fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in hed_fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let url () =
         match base_opt with
@@ -1107,7 +1101,7 @@ value include_hed_trl conf base_opt suff =
 value message_to_wizard conf =
   if (conf.wizard || conf.just_friend_wizard) && conf.user <> "" then
     let fname = conf.bname ^ "_" ^ conf.user ^ "_mess.txt" in
-    match try Some (open_in fname) with [ Sys_error _ -> None ] with
+    match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
         try while True do { Wserver.wprint "%c" (input_char ic); } with
         [ End_of_file -> close_in ic ]
@@ -1650,7 +1644,7 @@ value jpeg_image_size ic =
 ;
 
 value image_size fname =
-  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let r =
         try
@@ -1793,7 +1787,9 @@ value create_topological_sort conf base =
           in
           let r =
             match
-              try Some (open_in_bin tstab_file) with [ Sys_error _ -> None ]
+              try
+                Some (Secure.open_in_bin tstab_file) with
+                [ Sys_error _ -> None ]
             with
             [ Some ic ->
                 let r =
@@ -1814,7 +1810,7 @@ value create_topological_sort conf base =
                   base.data.visible.v_write ()
                 else ();
                 match
-                  try Some (open_out_bin tstab_file) with
+                  try Some (Secure.open_out_bin tstab_file) with
                   [ Sys_error _ -> None ]
                 with
                 [ Some oc ->
@@ -2125,7 +2121,7 @@ value std_date conf =
 ;
 
 value read_wf_trace fname =
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let r = ref [] in
       do {
@@ -2137,7 +2133,7 @@ value read_wf_trace fname =
 ;
 
 value write_wf_trace fname wt =
-  let oc = open_out fname in
+  let oc = Secure.open_out fname in
   do {
     List.iter (fun (dt, u) -> Printf.fprintf oc "%s %s\n" dt u) wt;
     close_out oc;

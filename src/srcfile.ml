@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.16 2002-12-19 22:54:31 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.17 2002-12-31 08:38:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -33,7 +33,7 @@ value input_int ic =
 value count conf =
   let fname = cnt conf ".txt" in
   try
-    let ic = open_in fname in
+    let ic = Secure.open_in fname in
     let rd =
       try
         let wc = int_of_string (input_line ic) in
@@ -57,7 +57,7 @@ value count conf =
 value write_counter conf r =
   let fname = cnt conf ".txt" in
   try
-    let oc = open_out_bin fname in
+    let oc = Secure.open_out_bin fname in
     do {
       output_string oc (string_of_int r.welcome_cnt);
       output_string oc "\n";
@@ -450,7 +450,7 @@ and copy_from_file conf base name mode =
     [ Lang -> any_lang_file_name name
     | Source -> source_file_name conf name ]
   in
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic -> copy_from_channel conf base ic mode
   | None ->
       do {
@@ -463,12 +463,12 @@ value gen_print with_logo mode conf base fname =
   let channel =
     match mode with
     [ Lang ->
-        try Some (open_in (lang_file_name conf fname)) with
+        try Some (Secure.open_in (lang_file_name conf fname)) with
         [ Sys_error _ ->
-            try Some (open_in (any_lang_file_name fname)) with
+            try Some (Secure.open_in (any_lang_file_name fname)) with
             [ Sys_error _ -> None ] ]
     | Source ->
-        try Some (open_in (source_file_name conf fname)) with
+        try Some (Secure.open_in (source_file_name conf fname)) with
         [ Sys_error _ -> None ] ]
   in
   match channel with
@@ -510,7 +510,7 @@ value print_lexicon conf base =
   let fname = search_in_lang_path (Filename.concat "lang" "lexicon.txt") in
   do {
     Util.header conf title;
-    match try Some (open_in fname) with [ Sys_error _ -> None ] with
+    match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
         do {
           Wserver.wprint "<pre>\n";
