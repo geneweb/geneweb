@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.141 2002-12-20 10:01:21 ddr Exp $
+# $Id: lexicon.txt,v 4.142 2002-12-23 10:29:06 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -66,7 +66,7 @@ en: af=Afrikaans/bg=Bulgarian/ca=Catalan/cs=Czech/da=Danish/de=German/en=English
 eo: bg=bulgara/en=anglo/eo=esperanto/fr=franco
 es: af=Afrikaans/ca=Catalán/cs=Checo/da=Dan&eacute;s/de=Alem&aacute;n/en=Ingl&eacute;s/eo=Esperanto/es=Espa&ntilde;ol/et=Estonio/fi=Fin&eacute;s/fr=Franc&eacute;s/he=Hebreo/is=Island&eacute;s/it=Italiano/lv=Lituano/nl=Neerland&eacute;s/no=Noruego/pl=Polaco/pt=Portug&eacute;s/pt-br=Portug&eacute;s de Brasil/ru=Ruso/sl=Esloveno/sv=Sueco/zh=Chino
 et: af=afrikaani/ca=katalaani/cs=t¨ehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/pl=poola/pt=portugali/ru=vene/sv=rootsi/zh=hiina
-fi: af=afrikaans/ca=katalaani/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=esperanto/es=espanja/et=eesti/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/pt-br=Brasilian-portugali/ru=ven&auml;j&auml;/sv=ruotsi/zh=kiina
+fi: af=afrikaans/ca=katalaani/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=esperanto/es=espanja/et=eesti/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pl=puola/pt=portugali/pt-br=brasilianportugali/ru=ven&auml;j&auml;/sv=ruotsi/zh=kiina
 fr: af=afrikaans/bg=bulgare/ca=catalan/cs=tch&egrave;que/da=danois/de=allemand/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finnois/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pl=polonais/pt=portugais/pt-br=portugais-du-Br&eacute;sil/ro=roumain/ru=russe/sl=slov&egrave;ne/sv=su&eacute;dois/zh=chinois
 he: af=àôøé÷àğñ /cs=ö'ëéú /da=ãğéú /de=âøîğéú /en=àğâìéú /eo=àñôøğèå /es=ñôøãéú /fi=ôéğéú /fr=öøôúéú /he=òáøéú /is=àéñìğãéú /it=àéèì÷éú /lv=ìèååéú /no=ğåøáâéú /pt=ôåøèåâæéú /ru=øåñéú /sv=ùååãéú/zh=ñéğéú 
 is: af=afrikanska/cs=tékkneska/da=danska/de=şıska/en=enska/eo=esperanto/es=spænska/fi=finnska/fr=franska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/nl=hollenska/no=norska/pt=portúgalska/pt-br=Brasil-portúgalska/ru=rússneska/sv=sænska/zh=kínverska
@@ -849,7 +849,7 @@ en: a 2nd cousin
 eo: rekta prakuzo/rekta prakuzino/rekta kuz(in)o
 es: un primo nacido de primos hermanos/una prima nacida de primos hermanos/un(a) primo(a) nacido(a) de primos hermanos
 et: teise astme nõbu:g:--o
-fi: pikkuserkku
+fi: pikkuserkku:g:--un
 fr: un cousin issu de germains/une cousine issue de germains/un(e) cousin(e) issu(e) de germains
 he:  áï-ãåã ùğé/ áú-ãåã ùğéä
 is: tremenningur
@@ -875,7 +875,7 @@ en: a 3rd cousin
 eo: 3a grada kuzo/3a grada kuzino/3a grada kuz(in)o
 es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
 et: kolmanda astme nõbu:g:--o
-fi: kolmas serkku
+fi: kolmas serkku:g:nnen&nbsp;serkun
 fr: un cousin issu d'issus de germains/une cousine issue d'issus de germains/un(e) cousin(e) issu(e) d'issus de germains
 he:  áï-ãåã ùìéùé/ áú-ãåã ùìéùéú
 is: fjórmenningur
@@ -927,7 +927,7 @@ en: a brother/a sister/a sibling
 eo: frato/fratino/frat(in)o
 es: un hermano/una hermana/un(a) hermano(a)
 et: vend:g:-na/õde:g:--e/õde:g:--e või vend:g:-na
-fi: veli/sisar/sisarus
+fi: veli:g:-jen/sisar:g:+en/sisarus:g:-ksen
 fr: un fr&egrave;re/une soeur/un fr&egrave;re ou une soeur
 he:   àç/ àçåú/ àç(åú)
 is: bróğir/systir/systkyn
@@ -979,7 +979,7 @@ en: a descendant
 eo: posteulo
 es: un descendiente/una descendiente
 et: järglane:g:--se
-fi: j&auml;lkel&auml;inen
+fi: j&auml;lkel&auml;inen:g:---sen
 fr: un descendant/une descendante
 he:   öàöà/ öàöàä
 is: afkomandi
@@ -1031,7 +1031,7 @@ en: a grandson/a granddaughter/a grandchild
 eo: nepo/nepino/nep(in)o
 es: un nieto/una nieta/un(a) nieto(a)
 et: poja- või tütrepoeg:g:--ja/poja- või tütretütar:g:--re/lapselaps:g:+e
-fi: pojan tai tytt&auml;ren poika/pojan tai tytt&auml;ren tyt&auml;r/lapsenlapsi
+fi: pojan tai tytt&auml;ren poika:g:---jan/pojan tai tytt&auml;ren tyt&auml;r:g:--t&auml;ren/lapsenlapsi:g:-en
 fr: un petit fils/une petite fille/un petit enfant
 he:  ğëã/ ğëãä
 is: barnabarn/barnabarn/barnabarn
@@ -1083,7 +1083,7 @@ en: a great-grandson/a great-granddaughter/a great-grandchild
 eo: pranepo/pranepino/pranep(in)o
 es: un bisnieto/una bisnieta/un(a) bisnieto(a)
 et: lapselapse poeg:g:--ja/lapselapse tütar:g:--re/lapselapselaps:g:+e
-fi: isois&auml;n(-&auml;idin) poika/isois&auml;n(-&auml;idin) tyt&auml;r/lapsen-lapsenlapsi
+fi: lapsenlapsen poika:g:---jan/lapsenlapsen tyt&auml;r:g:--t&auml;ren/lapsenlapsen lapsi:g:-en
 fr: un arri&egrave;re-petit-fils/une arri&egrave;re-petite-fille/un arri&egrave;re-petit-enfant
 he:   ğéï/ ğéğä
 is: barnabarnabarn/barnabarnabarn/barnabarnabarn
@@ -1109,7 +1109,7 @@ en: a great-nephew/a great-niece
 eo: pranevo/pranevino
 es: un bissobrino/una bissobrina
 et: venna- või õelapse poeg:g:--ja/venna- või õelapse tütar:g:--re
-fi: 2. polven veljen(sisaren)poika/2. polven veljen(sisaren)tyt&auml;r
+fi: veljen- tai sisarenlapsen poika:g:---jan/veljen- tai sisarenlapsen tyt&auml;r:g:--t&auml;ren
 fr: un petit neveu/une petite ni&egrave;ce
 he:   áï äàçééï/ áú äàçééï
 is: frændi/frænka
@@ -1135,7 +1135,7 @@ en: a great-uncle/a great-aunt
 eo: praonklo/praonklino
 es: un tio abuelo/una tia abuela
 et: vanaonu/vanatädi
-fi: isoset&auml;/isot&auml;ti
+fi: isoset&auml;:g:--d&auml;n/isot&auml;ti:g:--din
 fr: un grand-oncle/une grand-tante
 he:   ãåã-ñá/ ãåãä-ñáä
 is: afa(ömmu)bróğir/afa(ömmu)systir
@@ -1161,7 +1161,7 @@ en: a half-brother/a half-sister/a half-sibling
 eo: duonfrato/duonfratino/duonfrat(in)o
 es: un medio hermano/una medio hermana/un(a) medio(a) hermano(a)
 et: poolvend:g:-na/poolõde:g:--e/poolõde:g:--e või poolvend:g:-na
-fi: velipuoli/sisarpuoli/is&auml;(&auml;iti)puolen lapsi
+fi: velipuoli:g:-en/sisarpuoli:g:-en/is&auml;- tai &auml;itipuolen lapsi:g:-en
 fr: un demi-fr&egrave;re/une demi-soeur/un demi-fr&egrave;re ou une demi-soeur
 he:   çöé àç/ çöé àçåú/ çöé àç(åú)
 is: hálfbróğir/hálfsystir/hálfsystkin
@@ -1187,7 +1187,7 @@ en: a nephew/a niece
 eo: nevo/nevino
 es: un sobrino/a sobrina
 et: venna- või õepoeg:g:--ja/venna- või õetütar:g:--re
-fi: veljen(sisaren)poika/veljen(sisaren)tyt&auml;r
+fi: veljen- tai sisarenpoika:g:---jan/veljen- tai sisarentyt&auml;r:g:--t&auml;ren
 fr: un neveu/une ni&egrave;ce
 he:   àçééï/ àçééğéú
 is: bróğur(systur)sonur/bróğur(systur)dóttir
@@ -5223,6 +5223,7 @@ de: Nachricht gel&ouml;scht
 en: message deleted
 eo: mesagxo nuligita
 es: mensaje borrado
+fi: viesti poistettu
 fr: message supprim&eacute;
 he:  äåãòä ğîç÷ä
 it: messaggio cancellato
