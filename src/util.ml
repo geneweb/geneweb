@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.19 2001-12-24 11:46:36 ddr Exp $ *)
+(* $Id: util.ml,v 4.20 2001-12-24 16:05:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -927,7 +927,7 @@ value include_hed_trl conf base_opt suff =
 ;
 
 value message_to_wizard conf =
-  if conf.wizard && conf.user <> "" then
+  if (conf.wizard || conf.just_friend_wizard) && conf.user <> "" then
     let fname = conf.bname ^ "_" ^ conf.user ^ "_mess.txt" in
     match try Some (open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
