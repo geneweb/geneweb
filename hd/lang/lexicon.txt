@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.106 2000-05-31 13:25:45 ddr Exp $
+# $Id: lexicon.txt,v 3.107 2000-06-05 10:09:47 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3391,7 +3391,7 @@ fr: mari&eacute;%t avec/mari&eacute;e%t avec
 he:   התחתן  %t עם/ התחתנה  %t עם
 is: giftist%t
 it: sposato%t con/sposata%t con
-nl: verbonden%t met
+nl: gehuwd%t met
 no: gift%t med
 pt: casado%t com/casada%t com
 ru: ג בנאךו ס%t
