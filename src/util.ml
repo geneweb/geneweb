@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.55 2000-06-22 22:04:34 ddr Exp $ *)
+(* $Id: util.ml,v 3.56 2000-06-26 09:17:10 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1436,6 +1436,7 @@ value auto_image_file conf base p =
   in
   if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
   else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
+  else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
   else None
 ;
 
