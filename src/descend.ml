@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.3 2001-06-03 15:43:01 ddr Exp $ *)
+(* $Id: descend.ml,v 4.4 2001-06-28 17:05:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -894,7 +894,8 @@ value afficher_index_descendants conf base niveau_max ancetre =
       if paths.(i) <> [] then
         let p = base.data.persons.get i in
         if p_first_name base p <> "?" && p_surname base p <> "?" &&
-           p_first_name base p <> "x" then
+           p_first_name base p <> "x"
+        && (not conf.hide_names || fast_auth_age conf p) then
           liste.val := [p.cle_index :: liste.val]
         else ()
       else ()
@@ -930,7 +931,9 @@ value afficher_index_spouses conf base niveau_max ancetre =
                  let c = poi base c in
                  if p_first_name base c <> "?" && p_surname base c <> "?" &&
                     p_first_name base p <> "x" &&
-                    not (List.memq c.cle_index liste.val) then
+                    (not conf.hide_names || fast_auth_age conf c) &&
+                    not (List.memq c.cle_index liste.val)
+                 then
                    liste.val := [c.cle_index :: liste.val]
                  else ()
                else ())

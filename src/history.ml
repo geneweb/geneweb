@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.2 2001-04-19 17:25:59 ddr Exp $ *)
+(* $Id: history.ml,v 4.3 2001-06-28 17:05:25 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -126,31 +126,43 @@ value print_history_line conf base line wiz k i =
   match line_fields line with
   [ Some (time, user, action, key) ->
       if wiz = "" || user = wiz then do {
-        if i = 0 then Wserver.wprint "<dl>\n" else ();
-        Wserver.wprint "<dt><tt><b>*</b> %s</tt>\n" time;
-        Wserver.wprint "(%s)\n" (action_text conf action);
-        if user <> "" then do {
-          Wserver.wprint "<em>";
-          if wiz = "" then
-            Wserver.wprint "<a href=\"%sm=HIST;k=%d;wiz=%s\">" (commd conf) k
-              (Util.code_varenv user)
+        let po =
+          match person_ht_find_all base key with
+          [ [ip] -> Some (poi base ip)
+          | _ -> None ]
+        in
+        let not_displayed =
+          match po with
+          [ Some p -> conf.hide_names && not (fast_auth_age conf p)
+          | None -> False ]
+        in
+        if not_displayed then i
+        else do {
+          if i = 0 then Wserver.wprint "<dl>\n" else ();
+          Wserver.wprint "<dt><tt><b>*</b> %s</tt>\n" time;
+          Wserver.wprint "(%s)\n" (action_text conf action);
+          if user <> "" then do {
+            Wserver.wprint "<em>";
+            if wiz = "" then
+              Wserver.wprint "<a href=\"%sm=HIST;k=%d;wiz=%s\">" (commd conf) k
+                (Util.code_varenv user)
+            else ();
+            Wserver.wprint "%s" user;
+            if wiz = "" then Wserver.wprint "</a>" else ();
+            Wserver.wprint "</em>";
+          }
           else ();
-          Wserver.wprint "%s" user;
-          if wiz = "" then Wserver.wprint "</a>" else ();
-          Wserver.wprint "</em>";
+          Wserver.wprint " :\n<dd>";
+          match po with
+          [ Some p ->
+              do {
+                Wserver.wprint "%s" (referenced_person_title_text conf base p);
+                Wserver.wprint "%s" (Date.short_dates_text conf base p);
+              }
+          | None -> Wserver.wprint "%s" key ];
+          Wserver.wprint "\n";
+          i + 1
         }
-        else ();
-        Wserver.wprint " :\n<dd>";
-        match person_ht_find_all base key with
-        [ [ip] ->
-            let p = poi base ip in
-            do {
-              Wserver.wprint "%s" (referenced_person_title_text conf base p);
-              Wserver.wprint "%s" (Date.short_dates_text conf base p);
-            }
-        | _ -> Wserver.wprint "%s" key ];
-        Wserver.wprint "\n";
-        i + 1
       }
       else i
   | None -> i ]
@@ -184,7 +196,8 @@ value print_history conf base ic =
           try Some (rev_input_line ic pos vv) with [ Begin_of_file -> None ]
         with
         [ Some (line, pos) ->
-            let i = print_history_line conf base line wiz k i in loop pos i
+            let i = print_history_line conf base line wiz k i in
+            loop pos i
         | _ -> (pos, i) ]
     in
     loop pos 0

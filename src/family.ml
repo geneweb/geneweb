@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.4 2001-04-22 14:37:59 ddr Exp $ *)
+(* $Id: family.ml,v 4.5 2001-06-28 17:05:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -194,6 +194,14 @@ value find_all conf base an =
         if spl = [] then
           if pl = [] then try_find_with_one_first_name conf base an else pl
         else spl
+      in
+      let pl =
+        if not conf.wizard && not conf.friend && conf.hide_names then
+          List.fold_right
+            (fun p pl ->
+               if Util.fast_auth_age conf p then [p :: pl] else pl)
+            pl []
+        else pl
       in
       compact_list conf base pl ]
 ;
