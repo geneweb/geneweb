@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.247 2001-03-01 19:42:44 ddr Exp $
+# $Id: lexicon.txt,v 3.248 2001-03-07 20:17:23 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -397,6 +397,7 @@ de: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prair
 dk: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 en: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
 eo: vendemjero/brumero/frimero/nivozo/pluvjozo/ventozo/germinalo/florealo/prerialo/mesidoro/termindoro/fructidoro/suplemento
+es: vendimiario/brumario/frimario/nivoso/ventoso/pluvioso/germinal/floreal/pradial/mesidor/termidor/fructidor/complementario
 et: vandemjäär/brümäär/frimäär/nivoos/plüvioos/vantoos/¸erminaal/floreaal/preriaal/messidoor/termidoor/früktidoor/komplementäär
 fi: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
@@ -413,6 +414,7 @@ de: Tischri/Marcheschwan/Kislev/Tebet/Schebat/Adar/WeAdar/Nisan/Ijar/Siwan/Tammu
 dk: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 en: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 eo: tisxrio/hesxvano/kislevo/teveto/sxevato/adaro 1/adaro 2/nisano/ijaro/sivano/tamuzo/avo/elulo
+es: tishri/marjeshvan o jeshvan/kislev/tevet/shevat/adar /( + adar sheni, adar bet o ve-adar)/nisan/iyar/sivan/tamuz/av/elul
 et: tishrei/chesvan/kislev/tevet/shvat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 fi: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
