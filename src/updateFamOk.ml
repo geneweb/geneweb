@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.17 2002-03-11 17:50:45 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.18 2002-03-20 10:50:12 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -26,8 +26,8 @@ value getn conf var key =
 ;
 
 value reconstitute_somebody conf var =
-  let first_name = strip_spaces (getn conf var "fn") in
-  let surname = strip_spaces (getn conf var "sn") in
+  let first_name = only_printable (getn conf var "fn") in
+  let surname = only_printable (getn conf var "sn") in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
   let create =
     match getn conf var "p" with
@@ -38,9 +38,9 @@ value reconstitute_somebody conf var =
 ;
 
 value reconstitute_parent_or_child conf var default_surname =
-  let first_name = getn conf var "fn" in
+  let first_name = only_printable (getn conf var "fn") in
   let surname =
-    let surname = getn conf var "sn" in
+    let surname = only_printable (getn conf var "sn") in
     if surname = "" then default_surname else surname
   in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
