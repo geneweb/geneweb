@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.7 2001-07-11 13:37:56 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.8 2001-07-16 09:54:37 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -137,7 +137,7 @@ value set_wizard_and_friend_traces conf =
       let fname = adm_file (conf.bname ^ "_w.txt") in
       update_wf_trace conf fname
     else ()
-  else if conf.friend && conf.user <> "" then
+  else if conf.friend && not conf.just_friend_wizard && conf.user <> "" then
     let fpf =
       try List.assoc "friend_passwd_file" conf.base_env with
       [ Not_found -> "" ]
