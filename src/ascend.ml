@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.14 2000-03-11 08:41:21 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.15 2000-03-11 18:55:48 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1489,6 +1489,15 @@ value print_image conf base p fname width height =
   return ()
 ;
 
+value print_image_url conf base url height =
+  let image_txt = capitale (transl_nth conf "image/images" 0) in
+  do Wserver.wprint "<a href=\"%s\">" url;
+     Wserver.wprint "<img src=\"%s\"\nheight=%d border=0 alt=\"%s\">" url
+        height image_txt;
+     Wserver.wprint "</a>\n";
+  return ()
+;
+
 value print_tree_with_table conf base gv p =
   let gv = min (limit_by_tree conf) gv in
   let next_gen pol =
@@ -1545,6 +1554,12 @@ value print_tree_with_table conf base gv p =
                  do Wserver.wprint "<br>\n";
                     Wserver.wprint "<center><table border=0><tr><td>\n";
                     print_image conf base p f wid hei;
+                    Wserver.wprint "</table></center>\n";
+                 return ()
+             | Some (url, None) ->
+                 do Wserver.wprint "<br>\n";
+                    Wserver.wprint "<center><table border=0><tr><td>\n";
+                    print_image_url conf base url 75;
                     Wserver.wprint "</table></center>\n";
                  return ()
              | _ -> () ]
