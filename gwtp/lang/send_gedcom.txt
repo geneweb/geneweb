@@ -1,6 +1,6 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: send_gedcom.txt,v 1.1 2002-01-30 13:59:19 ddr Exp $ -->
+  <!-- $Id: send_gedcom.txt,v 1.2 2002-06-18 07:13:05 ddr Exp $ -->
   <title>Gwtp - upload %b</title>
 </head>
 <body>
@@ -12,12 +12,14 @@
 
 <div align=right>
 <a href="%s?m=UPG;b=%b;t=%t;lang=en">English</a> /
-<a href="%s?m=UPG;b=%b;t=%t;lang=fr">Français</a>
+<a href="%s?m=UPG;b=%b;t=%t;lang=fr">Français</a> /
+<a href="%s?m=UPG;b=%b;t=%t;lang=it">Italiano</a>
 </div><p>
 
 [
 en: Select your GEDCOM file:
 fr: Sélectionnez votre fichier GEDCOM:
+it: Selezionate il vostro file GEDCOM:
 ]<br><p>
 
 <input type=file name=gedcom size=60><br><p>
@@ -28,5 +30,6 @@ fr: Sélectionnez votre fichier GEDCOM:
 [
 en: Send
 fr: Envoyer
+it: Inviare
 ]">
 </form>

@@ -2,6 +2,8 @@ GeneWeb version 4.07
 --------------------
 
 * Languages
+  - [18 Jul 02] Completed Italian for lexicon. Added it for gwtp and
+    gwsetup (Latino Imparato)
   - [11 Apr 02] Added Slovenian (Mitja Iskric).
 
 * GeneWeb server or CGI (gwd)

@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.31 2002-05-27 09:27:18 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.32 2002-06-18 07:13:08 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -165,7 +165,7 @@ fi: <a href="%sw=w"><em>Velho</em></a> kirjautuminen<br> (salasana)
 fr: acc&egrave;s <a href="%sw=w"><em>magicien</em></a><br> (mot de passe).
 he: ëðéñä  <a href="%sw=w"><em> ëâàåï </em></a>
 is: <a href="%sw=w"><em>Wizard</em></a> aðgangur<br> (aðgangsorð)
-it: <a href="%sw=w"><em>Wizard</em></a> access<br> (parola d'accesso)
+it: <a href="%sw=w"><em>Wizard</em></a> access<br> (password)
 lv: <a href="%sw=w"><em>Wizard</em></a> access<br> (password)
 nl: Toegang als <a href="%sw=w"><em>tovenaar</em></a><br> (wachtwoord)
 no: <a href="%sw=w"><em>Oppdaterings</em></a> adgang<br> (passord)
@@ -189,7 +189,7 @@ fi: <a href="%sw=f"><em>Valittu</em></a> kirjautuminen<br> (salasana)
 fr: acc&egrave;s <a href="%sw=f"><em>ami</em></a><br> (mot de passe).
 he: ëðéñä<a href="%sw=f"><em> îéåçñú </em></a>
 is: <a href="%sw=f"><em>Vina</em></a> aðgangur<br> (aðgangsorð)
-it: <a href="%sw=f"><em>amiko</em></a> access<br> (parola d'accesso)
+it: <a href="%sw=f"><em>amico</em></a> access<br> (password)
 lv: <a href="%sw=f"><em>Friend</em></a> access<br> (password)
 nl: Toegang als <a href="%sw=f"><em>vriend</em></a><br> (wachtwoord)
 no: <a href="%sw=f"><em>Venners</em></a> adgang<br> (passord)
@@ -886,7 +886,8 @@ es: diccionario
 et: s&otilde;nastik
 fi: Sanasto
 fr: lexique
-he: ì÷ñé÷åï 
+he: ì÷ñé÷åï
+it: lessico 
 no: leksikon
 pl: leksykon
 sl: leksikon

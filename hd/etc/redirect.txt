@@ -12,7 +12,9 @@ Please use now:
 <br>
 L'adresse du service a changé.
 Utiliser maintenant:
-<p>
+<br>
+L'indirizzo di questo service è cambiato.
+Utilizzate:<p>
 <ul>
 <li>
 <a href="%l">%l</a>
