@@ -4,6 +4,9 @@ V„lkommen till GeneWeb $q
 Starta din webbl„sare och ”ppna adressen:
        http://localhost:$z/
 
+Varning: f”r att det h„r programmet ska fungera, f†r du inte st„nga
+detta f”nster!
+
 Om det inte fungerar, kanske du m†ste st„lla in din webbl„sare
 med optioner som "arbeta off-line" eller "anv„nd inte en proxyserver
 f”r lokala adresser" eller "anslut inte till Internet f”r adressen

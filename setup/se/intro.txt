@@ -4,6 +4,9 @@ Välkommen till GeneWeb $q
 Starta din webbläsare och öppna adressen:
        http://localhost:$z/
 
+Varning: för att det här programmet ska fungera, får du inte stänga
+detta fönster!
+
 Om det inte fungerar, kanske du måste ställa in din webbläsare
 med optioner som "arbeta off-line" eller "använd inte en proxyserver
 för lokala adresser" eller "anslut inte till Internet för adressen
