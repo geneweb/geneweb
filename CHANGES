@@ -21,6 +21,8 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jul 18, 99] Fixed small bug for the access by subparts of surnames
+    (it accepted too small subparts).
   - [Jul 17, 99] In welcome page, now search by surname when search by
     full name fails (no need to select "surname"). Idem in relationship
     computing.
