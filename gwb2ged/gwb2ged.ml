@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.6 2000-05-14 19:59:31 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.7 2000-05-14 21:03:13 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -418,7 +418,8 @@ value ged_marriage base oc fam =
   match (Adef.od_of_codate fam.marriage, sou base fam.marriage_place) with
   [ (None, "") -> ()
   | (d, pl) ->
-      do Printf.fprintf oc "1 MARR";
+      do Printf.fprintf oc "1 %s"
+           (if fam.relation = Engaged then "ENGA" else "MARR");
          ged_ev_detail oc 2 d pl (sou base fam.marriage_src);
          if fam.relation = NotMarried then
            Printf.fprintf oc "2 PLAC unmarried\n"
