@@ -8,7 +8,7 @@ Web. Tout vous sera explique dans la navigation.
    Sous Windows, double-cliquez sur "gwsetup".
    Sous Unix, lancez "gwsetup" dans un xterm.
 
-Mais si vous preferez connaître les commandes de base de GeneWeb, et
+Mais si vous preferez connaitre les commandes de base de GeneWeb, et
 que vous etes un habitue des commandes interactives (MSdos, Xterm),
 allez dans le repertoire "gw" et lisez le fichier LISEZMOI.txt. C'est
-une autre façon de demarrer.
+une autre facon de demarrer.
