@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 2.1 1999-04-29 19:55:49 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 2.2 1999-04-29 22:02:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -220,6 +220,21 @@ value error_person conf base p err =
   return raise Update.ModErr
 ;
 
+value rename_image_file conf base p (nfn, nsn, noc) =
+  match auto_image_file conf base p with
+  [ Some old_f ->
+      let s = default_image_name_of_key nfn nsn noc in
+      let f =
+        List.fold_right Filename.concat [base_dir.val; "images"; conf.bname] s
+      in
+      let new_f =
+        if Filename.check_suffix old_f ".gif" then f ^ ".gif"
+        else f ^ ".jpg"
+      in
+      try Sys.rename old_f new_f with [ Sys_error _ -> () ]
+  | _ -> () ]
+;
+
 value change_child conf base parent_surname ip =
   let p = poi base ip in
   let var = "c" ^ string_of_int (Adef.int_of_iper p.cle_index) in
@@ -240,24 +255,24 @@ value change_child conf base parent_surname ip =
     [ Some x -> x
     | _ -> 0 ]
   in
-  if new_first_name <> sou base p.first_name
+  if new_first_name = "" then
+    error_person conf base p (transl conf "first name missing")
+  else if new_first_name <> sou base p.first_name
   || new_surname <> sou base p.surname
   || new_occ <> p.occ then
-    if new_first_name = "" then
-      error_person conf base p (transl conf "first name missing")
-    else
-      let key = new_first_name ^ " " ^ new_surname in
-      let ipl = person_ht_find_all base key in
-      do check_conflict conf base p key ipl;
-         p.first_name := Update.insert_string conf base new_first_name;
-         p.surname := Update.insert_string conf base new_surname;
-         p.occ := new_occ;
-         base.func.patch_person p.cle_index p;
-         person_ht_add base key p.cle_index;
-         let np_misc_names = person_misc_names base p in
-         List.iter (fun key -> person_ht_add base key p.cle_index)
-           np_misc_names;
-      return ()
+    let key = new_first_name ^ " " ^ new_surname in
+    let ipl = person_ht_find_all base key in
+    do check_conflict conf base p key ipl;
+       rename_image_file conf base p (new_first_name, new_surname, new_occ);
+       p.first_name := Update.insert_string conf base new_first_name;
+       p.surname := Update.insert_string conf base new_surname;
+       p.occ := new_occ;
+       base.func.patch_person p.cle_index p;
+       person_ht_add base key p.cle_index;
+       let np_misc_names = person_misc_names base p in
+       List.iter (fun key -> person_ht_add base key p.cle_index)
+         np_misc_names;
+    return ()
   else ()
 ;
 
