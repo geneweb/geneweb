@@ -9,6 +9,7 @@ GeneWeb Intermediate Version 2.02-1
     one returns an error code.
 
 * Compilation
+  - [May 12,99] Fixed YAAP (yet another accent problem...)
   - [May 8, 99] Added "make opt" case in "setup" to build optimized versions.
 
 GeneWeb Version 2.02
