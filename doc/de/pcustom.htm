@@ -28,6 +28,9 @@ Seiten hinzuzuf&uuml;gen sind. Er wurde geschrieben f&uuml;r Leute, die
 
 <LI>
 <A HREF="#Ass">Verbundene Seiten</A></LI>
+
+<LI>
+<A HREF="#All">Alle Seiten</A> anpassen</LI>
 </UL>
 
 
@@ -273,6 +276,32 @@ Seiten machen kann.
 <P>Beachte, da&szlig; die "erweiterte Anfrage" wie eine verbundene Datei namens
 "advanced.txt" wirkt.
 
+<p>
+<hr>
+
+<h3><font color=#2f6400>
+<A NAME="All"></A>Alle Seiten anpassen</font></h3>
+
+Alle Seiten, die Startseite eingeschlossen, k&ouml;nnen an drei Stellen angepasst werden:
+
+<ul>
+
+<li>Du kannst eine Datei namens <b>base.hed</b> (wobei "base" der Name
+deiner Datenbank ist) erstellen, welche in allen Seiten als Kopf eingef&uuml;gt wird
+(zwischen &lt;head&gt; und &lt;/head&gt;). Damit k&ouml;nnen z. B. style sheets
+eingebunden werden. Speichere die Datei im Verzeichnis "lang" und/oder f&uuml;r einzelne
+Sprachen "xy" im Verzeichnis "lang/xy".
+
+<li>Auf die gleiche Art kannst du eine Datei namens <b>base.trl</b> anlegen, welche
+nach dem <font color=#2f6400><b>GeneWeb</b></font> copyright auf jeder Seite erscheint.
+
+<li>Schlie&szlig;lich kannst du noch die Variable <tt>body_prop</tt> in der Datei
+<b>base.gwf</b> setzen, welche in das tag "&lt;body&gt;" aller Seiten
+eingesetzt wird. Das ist n&uuml;tzlich, um Hintergrundfarbe oder -image anzugeben oder die
+Farben der angezeigten Texte zu &auml;ndern. Siehe diesen <a href="start.htm#Cnf">Abschnitt
+</a> des Kapitels "Erste Schritte mit <font color=#2f6400><b>GeneWeb</b></font>".
+
+</ul>                                                                         
 
 <p>
 <hr>
