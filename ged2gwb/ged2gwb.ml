@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.37 2001-01-06 09:55:32 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.38 2001-01-23 10:38:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1598,7 +1598,14 @@ value treat_header3 gen r =
    | rl -> gen.g_bnot := treat_notes gen rl ]
 ;
 
+value turn_around_genealogos_bug r =
+  if String.length r.rlab > 0 && r.rlab.[0] = '@' then
+    {(r) with rlab = r.rval; rval = r.rlab}
+  else r
+;
+
 value make_gen2 gen r =
+  let r = turn_around_genealogos_bug r in
   match r.rlab with
   [ "HEAD" -> treat_header2 gen r
   | "INDI" -> add_indi gen r
@@ -1606,6 +1613,7 @@ value make_gen2 gen r =
 ;
 
 value make_gen3 gen r =
+  let r = turn_around_genealogos_bug r in
   match r.rlab with
   [ "HEAD" -> treat_header3 gen r
   | "SUBM" -> ()

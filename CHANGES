@@ -30,9 +30,14 @@ GeneWeb version 3.11
     differently (e.g. in a list <ul>..</ul>).
 
 * Setup program (gwsetup)
-  - [22 Jan 01] Added the merging of data bases (French and English version
-    only). Updated the documentation to remove the comments telling that
-    this operation cannot be done under gwsetup.
+  - [22 Jan 01] Added the merging of data bases. Updated the documentation
+    to remove the comments telling that this operation cannot be done under
+    gwsetup.
+
+* Gedcom to GeneWeb (ged2gwb)
+  - [23 Jan 01] Added a hack to turn around a bug in the GEDCOMs
+    coming from Genealogos (fields inverted in certain lines) which
+    created empty data bases.
 
 * GeneWeb to Gedcom (gwb2ged)
   - [18 Jan 01] Fixed problem for names with declinations: they were
