@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.30 2005-02-05 06:34:39 ddr Exp $ *)
+(* $Id: date.ml,v 4.31 2005-02-27 04:29:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -579,7 +579,7 @@ value print_calendar_head conf order =
       }
     else
       for i = 0 to 2 do {
-        stag "th" "align=\"center\"" begin
+        stag "th" "align=\"center\" colspan=\"3\"" begin
           Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
         end;
         Wserver.wprint "\n";
@@ -660,7 +660,8 @@ value print_calendar conf base =
     header conf title;
     print_link_to_welcome conf True;
     begin_centered conf;
-    tag "table" begin
+    let jd = Calendar.sdn_of_gregorian date in
+    tag "table" "border=\"%d\"" conf.border begin
       stag "tbody" begin
         stag "tr" begin
           tag "td" "align=\"%s\"" conf.left begin
@@ -707,15 +708,26 @@ value print_calendar conf base =
             end;
           end;
         end;
+        let moon_txt = "new moon/first quarter/full moon/last quarter" in
         stag "tr" begin
-          stag "td" "align=\"%s\"" conf.left begin
-            Wserver.wprint "&nbsp;";
-          end;
-        end;
-        stag "tr" begin
-          tag "td" "align=\"center\"" begin
+          stag "td" "align=\"center\"" begin
+            match Calendar.moon_phase_of_sdn jd with
+            [ (Calendar.OrdinaryMoonDay, _) -> Wserver.wprint "&nbsp;"
+            | (Calendar.NewMoon hh mm, _) ->
+                Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                  (capitale (transl_nth conf moon_txt 0)) hh mm
+            | (Calendar.FirstQuarter hh mm, _) ->
+                Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                  (capitale (transl_nth conf moon_txt 1)) hh mm
+            | (Calendar.FullMoon hh mm, _) ->
+                Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                  (capitale (transl_nth conf moon_txt 2)) hh mm
+            | (Calendar.LastQuarter hh mm, _) ->
+                Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                  (capitale (transl_nth conf moon_txt 3)) hh mm ];
+            xtag "br";
+            xtag "br";
             Wserver.wprint "%s: " (capitale (transl conf "julian day"));
-            let jd = Calendar.sdn_of_gregorian date in
             if jd < 0 then Wserver.wprint "%d" jd
             else
               Num.print (fun x -> Wserver.wprint "%s" x)
