@@ -1,6 +1,13 @@
 GeneWeb version 3.08
 --------------------
 
+* GeneWeb Service/CGI (gwd)
+   - [24 Aug 00] Fixed bug: when entering Web addresses (http://...)
+     in notes, it generates enclosing HTML code to make links, but
+     sometimes it did it incorrectly. For example the image insertion
+     <img src=...>? did not work because the program changed it into
+     <img src=<a href=http://...>>
+
 * GeneWeb data bases Transfer Program (gwtp)
   - [22 Aug 00] Fixed bug: worked only if the CGI name was gwtp (could not
     be gwtp.cgi, for example). Fixed also the distribution: template files
