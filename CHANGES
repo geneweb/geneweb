@@ -15,6 +15,10 @@ GeneWeb version 3.09
     errors (for example if both "Anne.0 Le Blanc" and "Anne.0 Leblanc"
     were defined).
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [17 Oct 00] Fixed bug: problem of accessing persons with the same
+    names when they contained declinations (Czech names, for example).
+
 * GeneWeb data bases Transfer Program (gwtp)
   - [06 Oct 00] Added ability to put a trailer text.
 

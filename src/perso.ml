@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.53 2000-10-17 13:21:11 ddr Exp $ *)
+(* $Id: perso.ml,v 3.54 2000-10-17 21:18:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1884,7 +1884,7 @@ value print_variable conf base env s sl =
     | [] -> Wserver.wprint "%s" (simple_person_text conf base p p_auth) ]
 ;
 
-value eval_bool_variable conf base env p =
+value eval_simple_bool_variable conf base env p =
   fun
   [ "are_divorced" ->
       match get_env "fam" env with
@@ -2072,6 +2072,35 @@ value eval_bool_variable conf base env p =
   | v -> do Wserver.wprint "%%%s;" v; return True ]
 ;
 
+value eval_bool_variable conf base env s sl =
+  let ep =
+    match (get_env "p" env, get_env "p_auth" env) with
+    [ (Eind p a u, Ebool p_auth) -> (p, a, u, p_auth)
+    | _ -> assert False ]
+  in
+  let efam = get_env "fam" env in
+  let make_ep ip =
+    let p = poi base ip in
+    let a = aoi base ip in
+    let u = uoi base ip in
+    let p_auth = age_autorise conf base p in
+    (p, a, u, p_auth)
+  in
+  loop ep efam [s :: sl] where rec loop (p, a, u, p_auth) efam =
+    fun
+    [ ["spouse" :: sl] ->
+        match efam with
+        [ Efam fam cpl _ ->
+            let ip = spouse p.cle_index cpl in
+            let ep = make_ep ip in
+            loop ep efam sl
+        | _ -> False ]
+    | [s] -> eval_simple_bool_variable conf base env p s
+    | [s :: sl] ->
+        do Wserver.wprint "%s." s; return loop (p, a, u, p_auth) efam sl
+    | [] -> False ]
+;
+
 value print_transl conf base env upp s c =
   let r =
     match c with
@@ -2117,10 +2146,7 @@ value eval_bool_value conf base env =
     [ Eor e1 e2 -> eval e1 || eval e2
     | Eand e1 e2 -> eval e1 && eval e2
     | Enot e -> not (eval e)
-    | Evar v _ ->
-        match get_env "p" env with
-        [ Eind p _ _ -> eval_bool_variable conf base env p v
-        | _ -> False ] ]
+    | Evar s sl -> eval_bool_variable conf base env s sl ]
 ;
 
 value iter_first f al =
