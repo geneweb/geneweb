@@ -4,7 +4,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <title>Base</title>
 </head>
-<body background="%km=IM;v=/gwback.jpg">
+<body background="%o/gwback.jpg">
 <center><h1><font color=#2f6400>Base</font></h1></center>
 <ul>
 <li>
