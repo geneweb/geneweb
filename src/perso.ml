@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.87 2001-02-17 18:58:09 ddr Exp $ *)
+(* $Id: perso.ml,v 3.88 2001-02-18 09:30:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -245,15 +245,16 @@ type ast = Templ.ast ==
   | Awid_hei of string
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
-  | Adefine of string and string and list ast and list ast
-  | Aapply of string and ast_expr ]
+  | Adefine of string and list string and list ast and list ast
+  | Aapply of string and list ast_expr ]
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
   | Eop of string and ast_expr and ast_expr
   | Enot of ast_expr
   | Estr of string
-  | Evar of string and list string ]
+  | Evar of string and list string
+  | Etransl of bool and string and char ]
 ;
 
 type env =
@@ -1092,8 +1093,9 @@ value eval_bool_value conf base env =
         | "!=" -> string_eval e1 <> string_eval e2
         | _ -> do Wserver.wprint "op %s???" op; return False ]
     | Enot e -> not (bool_eval e)
+    | Evar s sl -> eval_bool_variable conf base env [s :: sl]
     | Estr s -> do Wserver.wprint "\"%s\"???" s; return False
-    | Evar s sl -> eval_bool_variable conf base env [s :: sl] ]
+    | Etransl _ s _ -> do Wserver.wprint "[%s]???" s; return False ]
   and string_eval =
     fun
     [ Estr s -> s

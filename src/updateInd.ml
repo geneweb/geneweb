@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.38 2001-02-17 22:44:12 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.39 2001-02-18 09:30:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -783,20 +783,21 @@ type ast = Templ.ast ==
   | Awid_hei of string
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
-  | Adefine of string and string and list ast and list ast
-  | Aapply of string and ast_expr ]
+  | Adefine of string and list string and list ast and list ast
+  | Aapply of string and list ast_expr ]
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
   | Eop of string and ast_expr and ast_expr
   | Enot of ast_expr
   | Estr of string
-  | Evar of string and list string ]
+  | Evar of string and list string
+  | Etransl of bool and string and char ]
 ;
 
 type env =
   [ Vstring of string
-  | Vfun of string and list ast
+  | Vfun of list string and list ast
   | Vint of int
   | Vnone ]
 ;
@@ -805,6 +806,7 @@ type variable_value =
   [ VVgen of string
   | VVdate of option date and string
   | VVrelation of option (gen_relation Update.key string) and list string
+  | VVtitle of option (gen_title string) and list string
   | VVcvar of string
   | VVnone ]
 ;
@@ -845,6 +847,38 @@ value rec eval_variable conf base env p =
         | _ -> None ]
       in
       VVrelation r sl
+  | ["title" :: sl] ->
+      let t =
+        match get_env "cnt" env with
+        [ Vint i ->
+            try Some (List.nth p.titles (i - 1)) with [ Failure _ -> None ]
+        | _ -> None ]
+      in
+      VVtitle t sl
+  | ["title_date_start"; s] ->
+      let d =
+        match get_env "cnt" env with
+        [ Vint i ->
+            try
+              let t = List.nth p.titles (i - 1) in
+              Adef.od_of_codate t.t_date_start
+            with
+            [ Failure _ -> None ]
+        | _ -> None ]
+      in
+      VVdate d s
+  | ["title_date_end"; s] ->
+      let d =
+        match get_env "cnt" env with
+        [ Vint i ->
+            try
+              let t = List.nth p.titles (i - 1) in
+              Adef.od_of_codate t.t_date_end
+            with
+            [ Failure _ -> None ]
+        | _ -> None ]
+      in
+      VVdate d s
   | [] -> VVgen ""
   | [s] ->
       let v = extract_var "cvar_" s in
@@ -962,6 +996,64 @@ value eval_relation_variable conf base env p r =
   | _ -> ">???" ]
 ;
 
+value eval_title_variable conf base env p t =
+  fun
+  [ ["t_ident"] ->
+      match t with
+      [ Some {t_ident = x} -> quote_escaped x
+      | _ -> "" ]
+  | ["t_estate"] ->
+      match t with
+      [ Some {t_place = x} -> quote_escaped x
+      | _ -> "" ]
+  | ["t_name"] ->
+      match t with
+      [ Some {t_name = Tname x} -> quote_escaped x
+      | _ -> "" ]
+  | ["t_nth"] ->
+      match t with
+      [ Some {t_nth = x} -> if x = 0 then "" else string_of_int x
+      | _ -> "" ]
+  | [s :: _] -> ">%" ^ s ^ "???"
+  | _ -> ">???" ]
+;
+
+value split_at_coloncolon s =
+  loop 0 where rec loop i =
+    if i >= String.length s - 1 then None
+    else
+      match (s.[i], s.[i+1]) with
+      [ (':', ':') ->
+          let s1 = String.sub s 0 i in
+          let s2 = String.sub s (i + 2) (String.length s - i - 2) in
+          Some (s1, s2)
+      | _ -> loop (i + 1) ]
+;
+
+value eval_transl conf base env upp s c =
+  let r =
+    match c with
+    [ '0'..'9' ->
+        let n = Char.code c - Char.code '0' in
+        match split_at_coloncolon s with
+        [ None -> nominative (Util.transl_nth conf s n)
+        | Some (s1, s2) ->
+            Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
+    | _ -> nominative (Util.transl conf s) ^ String.make 1 c ]
+  in
+  if upp then capitale r else r
+;
+
+value eval_expr conf base env p =
+  fun
+  [ Estr s -> s
+  | Evar s [] ->
+      try try_eval_gen_variable conf base env p s with
+      [ Not_found -> ">" ^ s ^ "???" ]
+  | Etransl upp s c -> eval_transl conf base env upp s c
+  | _ -> ">parse_error" ]
+;
+
 (* bool values *)
 
 value is_death_reason dr =
@@ -989,6 +1081,7 @@ value eval_gen_bool_variable conf base env p =
   | "has_qualifiers" -> p.qualifiers <> []
   | "has_relations" -> p.rparents <> []
   | "has_surnames_aliases" -> p.surnames_aliases <> []
+  | "has_titles" -> p.titles <> []
   | "is_female" -> p.sex = Female
   | "is_male" -> p.sex = Male
   | "not_dead" -> p.death = NotDead
@@ -1071,11 +1164,21 @@ value eval_relation_bool_variable conf base env r =
   | _ -> do Wserver.wprint ">???"; return False ]
 ;
 
+value eval_title_bool_variable conf base env t =
+  fun
+  [ ["t_main"] ->
+      match t with
+      [ Some {t_name = Tmain} -> True
+      | _ -> False ]
+  | _ -> do Wserver.wprint ">???"; return False ]
+;
+
 value eval_bool_variable conf base env p s sl =
   match eval_variable conf base env p [s :: sl] with
   [ VVgen s -> eval_gen_bool_variable conf base env p s
   | VVdate od s -> eval_date_bool_variable conf base env od s
   | VVrelation r sl -> eval_relation_bool_variable conf base env r sl
+  | VVtitle t sl -> eval_title_bool_variable conf base env t sl
   | VVcvar _ -> do Wserver.wprint ">%%%s???" s; return False
   | VVnone -> do Wserver.wprint ">%%%s???" s; return False ]
 ;
@@ -1091,8 +1194,9 @@ value eval_bool_value conf base env p =
         | "!=" -> string_eval e1 <> string_eval e2
         | _ -> do Wserver.wprint "op %s???" op; return False ]
     | Enot e -> not (bool_eval e)
+    | Evar s sl -> eval_bool_variable conf base env p s sl
     | Estr s -> do Wserver.wprint "\"%s\"???" s; return False
-    | Evar s sl -> eval_bool_variable conf base env p s sl ]
+    | Etransl _ s _ -> do Wserver.wprint "[%s]???" s; return False ]
   and string_eval =
     fun
     [ Estr s -> s
@@ -1103,6 +1207,7 @@ value eval_bool_value conf base env p =
           | VVdate od s -> eval_date_variable conf base env od s
           | VVcvar s -> eval_base_env_variable conf s
           | VVrelation _ _ -> do Wserver.wprint ">%%%s???" s; return ""
+          | VVtitle _ _ -> do Wserver.wprint ">%%%s???" s; return ""
           | VVnone -> do Wserver.wprint ">%%%s???" s; return "" ]
         with
         [ Not_found -> do Wserver.wprint ">%%%s???" s; return "" ]
@@ -1124,6 +1229,8 @@ value print_variable conf base env p sl =
       [ Not_found -> () ]
   | VVrelation r sl ->
       Wserver.wprint "%s" (eval_relation_variable conf base env p r sl)
+  | VVtitle t sl ->
+      Wserver.wprint "%s" (eval_title_variable conf base env p t sl)
   | VVnone ->
       do Wserver.wprint ">%%";
          list_iter_first
@@ -1131,32 +1238,6 @@ value print_variable conf base env p sl =
            sl;
          Wserver.wprint "???";
       return () ]
-;
-
-value split_at_coloncolon s =
-  loop 0 where rec loop i =
-    if i >= String.length s - 1 then None
-    else
-      match (s.[i], s.[i+1]) with
-      [ (':', ':') ->
-          let s1 = String.sub s 0 i in
-          let s2 = String.sub s (i + 2) (String.length s - i - 2) in
-          Some (s1, s2)
-      | _ -> loop (i + 1) ]
-;
-
-value print_transl conf base env upp s c =
-  let r =
-    match c with
-    [ '0'..'9' ->
-        let n = Char.code c - Char.code '0' in
-        match split_at_coloncolon s with
-        [ None -> nominative (Util.transl_nth conf s n)
-        | Some (s1, s2) ->
-            Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
-    | _ -> nominative (Util.transl conf s) ^ String.make 1 c ]
-  in
-  Wserver.wprint "%s" (if upp then capitale r else r)
 ;
 
 value subst_text x v s =
@@ -1183,8 +1264,9 @@ value rec subst sf =
   | Awid_hei s -> Awid_hei (sf s)
   | Aif e alt ale -> Aif (subste sf e) (substl sf alt) (substl sf ale)
   | Aforeach s sl al -> Aforeach (sf s) (List.map sf sl) (substl sf al)
-  | Adefine f x al alk -> Adefine (sf f) (sf x) (substl sf al) (substl sf alk)
-  | Aapply f x -> Aapply (sf f) (subste sf x) ]
+  | Adefine f xl al alk ->
+      Adefine (sf f) (List.map sf xl) (substl sf al) (substl sf alk)
+  | Aapply f el -> Aapply (sf f) (substel sf el) ]
 and substl sf al =
   List.map (subst sf) al
 and subste sf =
@@ -1194,34 +1276,40 @@ and subste sf =
   | Eop op e1 e2 -> Eop (sf op) (subste sf e1) (subste sf e2)
   | Enot e -> Enot (subste sf e)
   | Estr s -> Estr (sf s)
-  | Evar s sl -> Evar (sf s) (List.map sf sl) ]
+  | Evar s sl -> Evar (sf s) (List.map sf sl)
+  | Etransl upp s c -> Etransl upp s c ]
+and substel sf el =
+  List.map (subste sf) el
 ;
 
 value rec print_ast conf base env p =
   fun
   [ Atext s -> Wserver.wprint "%s" s
-  | Atransl upp s n -> print_transl conf base env upp s n
+  | Atransl upp s n -> Wserver.wprint "%s" (eval_transl conf base env upp s n)
   | Avar s sl -> print_variable conf base env p [s :: sl]
   | Awid_hei s -> Wserver.wprint "Awid_hei"
   | Aif e alt ale -> print_if conf base env p e alt ale
   | Aforeach s sl al -> print_foreach conf base env p s sl al
-  | Adefine f x al alk -> print_define conf base env p f x al alk
-  | Aapply f e -> print_apply conf base env p f e ]
-and print_define conf base env p f x al alk =
-  List.iter (print_ast conf base [(f, Vfun x al) :: env] p) alk
-and print_apply conf base env p f e =
+  | Adefine f xl al alk -> print_define conf base env p f xl al alk
+  | Aapply f el -> print_apply conf base env p f el ]
+and print_define conf base env p f xl al alk =
+  List.iter (print_ast conf base [(f, Vfun xl al) :: env] p) alk
+and print_apply conf base env p f el =
   match get_env f env with
-  [ Vfun x al ->
-      let v =
-        match e with
-        [ Estr s -> s
-        | Evar s [] ->
-            try try_eval_gen_variable conf base env p s with
-            [ Not_found -> ">" ^ s ^ "???" ]
-        | _ -> "parse_error" ]
-      in
-      let sf = subst_text x v in
-      List.iter (fun a -> print_ast conf base env p (subst sf a)) al
+  [ Vfun xl al ->
+      let vl = List.map (eval_expr conf base env p) el in
+      List.iter
+        (fun a ->
+           let a =
+             loop a xl vl where rec loop a xl vl =
+               match (xl, vl) with
+               [ ([x :: xl], [v :: vl]) ->
+                   loop (subst (subst_text x v) a) xl vl
+               | ([], []) -> a
+               | _ -> Atext "parse_error" ]
+           in
+           print_ast conf base env p a)
+        al
   | _ -> Wserver.wprint ">%%%s???" f ]
 and print_if conf base env p e alt ale =
   let al = if eval_bool_value conf base env p e then alt else ale in
@@ -1238,7 +1326,7 @@ and print_foreach conf base env p s sl al =
          List.iter (fun s -> Wserver.wprint "%s." s) sl;
          Wserver.wprint "%s???" s;
       return ()
-  | VVcvar _ | VVdate _ _ | VVrelation _ _ | VVnone -> () ]
+  | VVcvar _ | VVdate _ _ | VVrelation _ _ | VVtitle _ _ | VVnone -> () ]
 and print_simple_foreach conf base env p al s =
   let list =
     match s with
@@ -1253,6 +1341,7 @@ and print_simple_foreach conf base env p al s =
   | None ->
       match s with
       [ "relation" -> print_foreach_relation conf base env p al p.rparents
+      | "title" -> print_foreach_title conf base env p al p.titles
       | _ -> Wserver.wprint "foreach %s???" s ] ]
 and print_foreach_string conf base env p al list =
   let _ = List.fold_left
@@ -1263,6 +1352,13 @@ and print_foreach_string conf base env p al list =
     0 list
   in ()
 and print_foreach_relation conf base env p al list =
+  let _ = List.fold_left
+    (fun cnt nn ->
+       let env = [("cnt", Vint cnt) :: env] in
+       do List.iter (print_ast conf base env p) al; return cnt + 1)
+    1 list
+  in ()
+and print_foreach_title conf base env p al list =
   let _ = List.fold_left
     (fun cnt nn ->
        let env = [("cnt", Vint cnt) :: env] in
