@@ -36,8 +36,7 @@ Initial version of Linux rpm spec file by
 Algorithm of consanguinity and relationship
 		Didier Rémy
 
-Flags from
-		FOTW Flags Of The World
+Flags from FOTW Flags Of The World
 		http://fotw.digibel.be/flags/
 
 Program written by
