@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.161 2000-10-11 15:18:36 ddr Exp $
+# $Id: lexicon.txt,v 3.162 2000-10-12 13:57:07 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3208,7 +3208,7 @@ it: data incorretta
 lv: nepareizs datums
 nl: verkeerde datum
 no: ugyldig dato
-pt: data incorecta
+pt: data incorrecta
 ru: неправильная дата
 se: fel datum
 
@@ -3228,7 +3228,7 @@ it: richiesta incorretta
 lv: kпыdains pieprasоjums
 nl: verkeerd verzoek
 no: ugyldig foresp&oslash;rsel
-pt: consulta incorecta
+pt: consulta incorrecta
 ru: некорректный запрос
 se: fel f&ouml;rfr&aring;gan
 
