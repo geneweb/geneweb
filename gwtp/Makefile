@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.11 2000-08-18 10:54:56 ddr Exp $
+# $Id: Makefile,v 1.12 2000-08-18 15:15:25 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -27,8 +27,7 @@ gwtp.opt: $(GWTP_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) unix.cmxa $(GWTP_OTHER:.cmo=.cmx) $(GWTP_OBJS:.cmo=.cmx) -o gwtp.opt
 
 depend:
-	> .depend.new
-	for i in *.ml; do camlp4r pr_depend.cmo $$i >> .depend.new; done
+	../tools/camlp4_depend.sh $(OCAMLI) *.ml >> .depend.new
 	mv .depend.new .depend
 
 include .depend

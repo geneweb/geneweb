@@ -1,2 +1,6 @@
-gwtp.cmo: httpEnv.cmo iolight.cmo 
-gwtp.cmx: httpEnv.cmx iolight.cmx 
+gwtp.cmo: ../src/buff.cmo ../src/def.cmi httpEnv.cmo ../src/iobase.cmi \
+    iolight.cmo 
+gwtp.cmx: ../src/buff.cmx ../src/def.cmi httpEnv.cmx ../src/iobase.cmx \
+    iolight.cmx 
+iolight.cmo: ../src/buff.cmo ../src/def.cmi ../src/iovalue.cmi 
+iolight.cmx: ../src/buff.cmx ../src/def.cmi ../src/iovalue.cmx 
