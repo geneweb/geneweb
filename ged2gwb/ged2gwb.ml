@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.2 1998-09-04 15:04:52 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.3 1998-09-21 11:06:30 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -52,13 +52,19 @@ value rec get_ident len =
   | [: :] -> get_buff len ]
 ;
 
+value skip_space =
+  parser
+  [ [: `' ' :] -> ()
+  | [: :] -> () ]
+;
+
 value rec get_lev n =
   parser
-  [ [: `c when c == n; `' ' ? "space"; r1 = get_ident 0; r2 = get_ident 0;
+  [ [: `c when c == n; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
        r3 = get_to_eoln 0 ? "get to eoln";
        l = get_lev_list [] (Char.chr (Char.code n + 1)) ? "get lev list" :] ->
       let (rlab, rval, rcont) =
-        if r1.[0] = '@' then (r2, r1, r3)
+        if String.length r1 > 0 && r1.[0] = '@' then (r2, r1, r3)
         else
           let rval = if r3 = "" then r2 else r2 ^ " " ^ r3 in
           (r1, rval, "")
@@ -1103,7 +1109,7 @@ value print_base_warning base =
 
 value get_lev0 =
   parser
-  [ [: `'0'; `' ' ? "space"; r1 = get_ident 0; r2 = get_ident 0;
+  [ [: `'0'; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
        r3 = get_to_eoln 0 ? "get to eoln";
        l = get_lev_list [] '1' ? "get lev list" :] ->
       let (rlab, rval) = if r2 = "" then (r1, "") else (r2, r1) in
