@@ -1,6 +1,10 @@
 GeneWeb version 4.03
 --------------------
 
+* GeneWeb server or CGI (gwd)
+  - [13 Jul 01] Fixed bug: in update person form, when clicking on
+    "insert surname alias", the display became "insert first name alias".
+
 * Gedcom to GeneWeb (ged2gwb)
   - [06 Jul 01] Fixed bug: sometimes failed when converting ansel text
     to ascii.

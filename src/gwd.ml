@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.11 2001-06-28 17:05:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.12 2001-07-13 13:57:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -483,6 +483,14 @@ value match_auth_file auth_file uauth =
         try
           let rec loop () =
             let sauth = input_line ic in
+            let sauth =
+              try
+                let i = String.index sauth ':' in
+                let i = String.index_from sauth (i + 1) ':' in
+                String.sub sauth 0 i
+              with
+              [ Not_found -> sauth ]
+            in
             if uauth = sauth then do { close_in ic; True } else loop ()
           in
           loop ()

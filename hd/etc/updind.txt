@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 4.0 2001-03-16 19:32:27 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.1 2001-07-13 13:57:34 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -201,7 +201,7 @@
     <td>[*surname alias]0</td>
     <td>
     <input name="surname_alias%cnt;" size=30 value="%surname_alias;">
-    <td>[*insert::first name alias]0</td>
+    <td>[*insert::surname alias]0</td>
     <td><input type=checkbox name="add_surname_alias%cnt;" value=on></td>
     </tr>
   %end;
