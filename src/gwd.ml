@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.78 2001-03-01 12:52:05 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.79 2001-03-05 14:05:36 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -392,26 +392,8 @@ value start_with_base conf bname =
          Wserver.wprint "%s"
            (Util.capitale (transl conf "cannot access base"));
          Wserver.wprint " \"%s\".</ul>\n" conf.bname;
-         match e with
-         [ Failure s ->
-(*
-do Wserver.wprint "
-<p>
-<table border=2><tr><td>
-The service is not available for this data base for some minutes. I'm
-installing a new version; I am trying to recover the access as soon as
-possible... Thank you for your patience.
-<p>
-Le service n'est pas disponible sur cette base de donn&eacute;es pendant
-quelques minutes. J'installe une nouvelle version; je m'efforce de remettre
-l'acc&egrave;s le plus t&ocirc;t possible... Merci de votre patience.
-</td></tr></table>
-<p>\n";
-return
-*)
-             Wserver.wprint
-               "<em><font size=-1>Internal message: %s</font></em>\n" s
-         | _ -> () ];
+         Wserver.wprint "<em><font size=-1>Internal message: %s</font></em>\n"
+           (Printexc.to_string e);
          Wserver.wprint "</body>\n";
       return () ]
 ;
