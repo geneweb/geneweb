@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.13 2002-10-26 01:22:43 ddr Exp $ *)
+(* $Id: place.ml,v 4.14 2002-10-30 13:47:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -241,7 +241,7 @@ value print_html_places_surnames conf base =
               (fun (len, p, sn) ->
                  do {
                    Wserver.wprint "<a href=\"%s" (commd conf);
-                   Wserver.wprint "%s" (acces conf base p);
+                   Wserver.wprint "m=N;v=%s" (code_varenv sn);
                    Wserver.wprint "\">%s</a> (%d),\n" sn len
                  })
               snl;
