@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.80 1999-07-26 07:01:58 ddr Exp $
+# $Id: lexicon.txt,v 2.81 1999-07-26 14:07:16 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2532,6 +2532,13 @@ no: navigering med %t som generasjonsnummerreferanse
 pt: navega&ccedil;a&atilde;o com o %t como a refer&ecirc;ncia Sosa
 se: navigering med %t som generationsnummer referens
 
+    nephews and nieces
+en: nephews and nieces
+eo: nevoj kay nevinoj
+es: sobrinos y sobrinas
+fr: neveux et ni&egrave;ces
+pt: sobrinos e sobrinas
+
     next sibling
 cs: následující sourozenec
 de: folgende Geschwister
@@ -4067,6 +4074,13 @@ nl: totaal
 no: totalt
 pt: total
 se: totalt
+
+    uncles and aunts
+en: uncles and aunts
+eo: onkloj kaj onklinoj
+es: t&iacute;os y t&iacute;as
+fr: oncles et tantes
+pt: tios e tias
 
     unknown person
 cs: neznámá osoba
