@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.19 2004-07-18 14:26:38 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.20 2004-07-18 18:51:36 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -231,8 +231,10 @@ value set_consang asc v = asc.consang := v;
 
 value spouse ip cpl =
   if ip == father cpl then mother cpl
+(*
   else if ip == mother cpl then father cpl
-  else invalid_arg "spouse"
+*)
+  else father cpl
 ;
 
 value saints = ["saint"; "sainte"];
