@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.39 1999-08-03 08:54:53 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.40 1999-08-03 13:10:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1404,8 +1404,10 @@ value print_tree conf base v p =
       acces conf base p ^ "\">" ^ s ^ "</a>"
   in
   let colspan = fun [ 1 -> "" | n -> " colspan=" ^ string_of_int n ] in
-  let print_ancestor gen n po =
-    do stag "td" "align=center%s" (colspan n) begin
+  let print_ancestor gen n first po =
+    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n"
+       else ();
+       stag "td" "align=center%s" (colspan n) begin
          let txt =
            match po with
            [ Some p ->
@@ -1415,9 +1417,9 @@ value print_tree conf base v p =
                  else tree_reference p txt
                in
                txt ^ Date.short_dates_text conf base p
-           | _ -> "" ]
+           | _ -> "&nbsp;" ]
          in
-         Wserver.wprint "&nbsp;%s&nbsp;" txt;
+         Wserver.wprint "%s" txt;
        end;
        Wserver.wprint "\n";
     return ()
@@ -1426,18 +1428,21 @@ value print_tree conf base v p =
     for i = 1 to n do
       stag "td" "align=center%s" (colspan cs) begin Wserver.wprint "|"; end;
       Wserver.wprint "\n";
+      if i < n then Wserver.wprint "<td>&nbsp;</td>\n" else ();
     done
   in
   let print_horizontal_line n cs =
     for i = 1 to n do
-      stag "td" "align=right%s" (colspan (cs / 2)) begin
+      stag "td" "align=right%s" (colspan cs) begin
         Wserver.wprint "<hr noshade size=1 width=\"50%%\" align=right>";
       end;
       Wserver.wprint "\n";
-      stag "td" "align=left%s" (colspan (cs / 2)) begin
+      Wserver.wprint "<td><hr noshade size=1></td>\n";
+      stag "td" "align=left%s" (colspan cs) begin
         Wserver.wprint "<hr noshade size=1 width=\"50%%\" align=left>";
       end;
       Wserver.wprint "\n";
+      if i < n then Wserver.wprint "<td>&nbsp;</td>\n" else ();
     done
   in
   do header_no_page_title conf title;
@@ -1447,13 +1452,19 @@ value print_tree conf base v p =
            (fun cs gen ->
               do if cs > 1 then
                    let n = List.length gen in
-                   do tag "tr" begin print_vertical_bars (2 * n) (cs / 2); end;
-                      tag "tr" begin print_horizontal_line n cs; end;
-                      tag "tr" begin print_vertical_bars n cs; end;
+                   do tag "tr" begin print_vertical_bars (2 * n) (cs - 1); end;
+                      tag "tr" begin print_horizontal_line n (cs - 1); end;
+                      tag "tr" begin print_vertical_bars n (2 * cs - 1); end;
                    return ()
                  else ();
                  tag "tr" begin
-                   List.iter (print_ancestor gen cs) gen;
+                   let _ =
+                     List.fold_left
+                       (fun first po ->
+                          do print_ancestor gen (2 * cs - 1) first po;
+                          return False)
+                       True gen
+                   in ();
                  end;
               return 2 * cs)
            1 gen
