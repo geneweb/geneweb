@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.16 1999-07-17 21:27:02 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.17 1999-07-21 17:36:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -8,6 +8,78 @@ value aoi base i = base.data.ascends.get (Adef.int_of_iper i);
 value foi base i = base.data.families.get (Adef.int_of_ifam i);
 value coi base i = base.data.couples.get (Adef.int_of_ifam i);
 value sou base i = base.data.strings.get (Adef.int_of_istr i);
+
+value rindex s c =
+  pos (String.length s - 1) where rec pos i =
+    if i < 0 then None else if s.[i] = c then Some i else pos (i - 1)
+;
+
+value lindex s c =
+  pos 0 where rec pos i =
+    if i == String.length s then None
+    else if s.[i] == c then Some i else pos (i + 1)
+;
+
+value string_sub s i len =
+  let i = min (String.length s) (max 0 i) in
+  let len = min (String.length s - i) (max 0 len) in
+  String.sub s i len
+;
+
+value decline_word case s ibeg iend =
+  let i =
+    loop ibeg where rec loop i =
+      if i + 3 >= iend then ibeg
+      else if s.[i] == ':' && s.[i+1] == case && s.[i+2] == ':' then i + 3
+      else loop (i + 1)
+  in
+  let j =
+    loop i where rec loop i =
+      if i == iend then i
+      else if s.[i] == ':' then i
+      else loop (i + 1)
+  in
+  if s.[i] == '+' then
+    let k =
+      loop ibeg where rec loop i =
+        if i == iend then i
+        else if s.[i] == ':' then i
+        else loop (i + 1)
+    in
+    let i = i + 1 in
+    string_sub s ibeg (k - ibeg) ^ string_sub s i (j - i)
+  else if s.[i] == '-' then
+    let k =
+      loop ibeg where rec loop i =
+        if i == iend then i
+        else if s.[i] == ':' then i
+        else loop (i + 1)
+    in
+    let (i, cnt) =
+      loop (i + 1) 1 where rec loop i cnt =
+        if i < iend && s.[i] == '-' then loop (i + 1) (cnt + 1)
+        else (i, cnt)
+    in
+    string_sub s ibeg (k - ibeg - cnt) ^ string_sub s i (j - i)
+  else string_sub s i (j - i)
+;
+
+value decline case s =
+  loop 0 0 where rec loop ibeg i =
+    if i == String.length s then
+      if i == ibeg then "" else decline_word case s ibeg i
+    else if s.[i] == ' ' then
+      decline_word case s ibeg i ^ " " ^ loop (i + 1) (i + 1)
+    else loop ibeg (i + 1)
+;
+
+value nominative s =
+  match rindex s ':' with
+  [ Some _ -> decline 'n' s
+  | _ -> s ]
+;
+
+value sou base i = nominative (base.data.strings.get (Adef.int_of_istr i));
 
 value leap_year a =
   if a mod 100 == 0 then a / 100 mod 4 == 0 else a mod 4 == 0
@@ -265,12 +337,6 @@ value person_ht_find_unique base first_name surname occ =
           then p.cle_index
           else find ipl
       | _ -> raise Not_found ]
-;
-
-value lindex s c =
-  pos 0 where rec pos i =
-    if i == String.length s then None
-    else if s.[i] == c then Some i else pos (i + 1)
 ;
 
 value find_num s i =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.8 1999-07-17 20:30:51 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.9 1999-07-21 17:36:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -137,7 +137,7 @@ value src_translate conf ic =
   let r =
     match input_char ic with
     [ '0'..'9' as c -> Util.transl_nth conf s (Char.code c - Char.code '0')
-    | c -> Util.nominative (Util.transl_nth conf s 0) ^ String.make 1 c ]
+    | c -> Gutil.nominative (Util.transl_nth conf s 0) ^ String.make 1 c ]
   in
   if upp then capitale r else r
 ;
