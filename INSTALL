@@ -2,8 +2,9 @@ INSTALLATIONS INSTRUCTIONS IN UNIX MACHINES
 [For Windows machines, look at the end of this file]
 
 For the compilation, you need
-   the Objective Caml compiler version 2.01 or 2.02
-   the preprocessor Camlp4 version 2.01 or 2.02
+   the Objective Caml compiler version 2.01, 2.02 or 2.03
+   the preprocessor Camlp4 with same version number
+
 installed in your computer.
 
 They are freely distributed at addresses:
