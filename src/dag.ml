@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.11 1999-12-30 21:45:26 ddr Exp $ *)
+(* $Id: dag.ml,v 3.12 2000-01-01 07:55:40 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -103,9 +103,7 @@ do List.iter (fun id -> Printf.eprintf "- %s\n" (denomination base (poi base nod
 (* main *)
 
 value print_only_dag conf base spouse_on invert set spl d =
-  let d = if invert then invert_dag d else d in
-  let t = table_of_dag False d in
-  let t = if invert then invert_table t else t in
+  let t = table_of_dag False invert d in
   let print_indi n =
     match n.valu with
     [ Left ip ->

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.14 1999-12-26 13:30:02 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.15 2000-01-01 07:54:44 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>G&eacute;n&eacute;alogie - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -181,7 +181,7 @@ Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 
 <tr>
 <td align=right><br><font size=-1><em><a
-href="%sm=LEX">lexicon</a></em></font></td>
+href="%sm=LEX">lexique</a></em></font></td>
 </tr>
 
 </table>
