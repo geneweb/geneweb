@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Keeping data divided inside a database</title></head>
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>GeneWeb - Keeping data divided inside a database</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
+
+If you have received GEDCOM files from other researchers, or you want to keep your database divided in several
+different files, but you only want to access one database, <font color=#2f6400><b>GeneWeb</b></font> can do that for you.
+
+<p>
+
+<hr>
+<h3><font color=#2f6400>Merging the files into a database </font></h3>
+
+
+
+<ul>
+
+<li>
+If you have three source files "bar.gw" "smith.gw" and "foo.gw" you want to keep divided.
+Launch a window of interactive commands and type:
+
+<pre>
+     gwc bar.gw smith.gw foo.gw -o mergedbase
+</pre>
+
+
+It may happen that gwc displays errors, because persons are defined twice in "bar.gw" "smith.gw" and "foo.gw". To
+fix that, gwc has an option "-sh" to shift the numbers of the persons to avoid conflicts. Try:
+
+<pre>
+     gwc bar.gw -sh 10 smith.gw -sh 10 foo.gw -o mergedbase
+</pre>
+
+If the value 10 does not solve the problem, try 20, 30 or 100...
+
+<br>
+
+See also <a href="merge.htm">Merging databases</a>.
+
+<p>
+
+<li>
+Now you can access and update the database "mergedbase". <font color=#2f6400><b>GeneWeb</b></font> will
+remember which files the data orginates from.
+
+<p>
+
+<li>
+Inside the database the sequence <TT>";opt=from"</TT> can be added to the address to see from which file
+the data orginates. For example:
+
+
+<pre>
+     http://machine:2317/mergedbase?i=357;opt=from
+</pre>
+
+Note: It work only for persons with families.
+</ul>
+
+<hr>
+<h3><font color=#2f6400>To recreate the source files from the merged database </font></h3>
+
+<ul>
+
+<li>
+If the directory "outdir" doesn't exist, create it.
+
+<p>
+
+<li>
+To recreate the source files, in the window of interactive commands, type:
+
+<pre>
+     gwu mergedbase -odir outdir
+</pre>
+
+<li>
+In the directory "outdir", the three source files "bar.gw", "smith.gw" and "foo.gw"
+should now have been created. If you have updated the database these source files
+have also been updated (i.e. they are not the same as those you started with).
+
+<p>
+
+<font color=#ff0000>If the command gwu is printing out source information</font>
+
+<p>
+
+<li>
+Then you have added persons that <font color=#2f6400><b>GeneWeb</b></font> can't decide
+in which source file they would be in (new persons that isn't related to the ones from the
+source files), then <font color=#2f6400><b>GeneWeb</b></font> will direct these persons to
+the window of interactive commands.
+
+<p>
+
+<li>
+To save also these new persons in the source file "new.gw", type:
+
+<pre>
+     gwu mergedbase -odir outdir > new.gw
+</pre>
+
+</ul>
+
+<p>
+<hr>
+<br>
+<center>Return to <a href="diruse.htm">Directions for Use</a></center>
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 2000 -
+GeneWeb</em></font><br>
+
+</body>

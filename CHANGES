@@ -43,6 +43,9 @@ GeneWeb version 3.03
     want an American display.    
 
 * Documentation
+  - [17 Feb 00] Added a new chapter "Keeping data divided inside a
+    database" (written by Lars Gustavsson: thanks, Lars!). Only
+    English version for the moment.
   - [11 Feb 00] Changed some Swedish files (Lars Gustavsson).
   - [03 Feb 00] In chapter "modifications" (update.htm), section 1,
     added a footnote to explain that it is better to use western Europe
