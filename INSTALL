@@ -11,8 +11,8 @@ They are freely distributed at addresses:
      http://caml.inria.fr/camlp4/
 
 It may compile with other (older or newer) versions of OCaml/Camlp4,
-but no warranty: but if you manage to compile, it is ok, OCaml being a
-very sure language.
+but no warranty: however, if you manage to compile, it has good chances
+to be correct.
 
 1- If the command ocamlc.opt is not installed, edit the file
    "tools/Makefile.inc" and change:
