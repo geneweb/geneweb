@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.67 2005-03-14 22:54:39 ddr Exp $ *)
+(* $Id: relation.ml,v 4.68 2005-03-19 15:58:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -689,6 +689,16 @@ value print_shortest_path conf base p1 p2 =
         if p_getenv conf.env "slices" = Some "on" then
           Dag.print_slices_menu conf base None
         else do {
+          let conf =
+            (* changing doctype to transitional because use of
+               <hr width=... align=...> *)
+            let doctype =
+              match p_getenv conf.base_env "doctype" with
+              [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
+              | _ -> "xhtml-1.0-trans" ]
+            in
+            {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
+          in
           header_no_page_title conf title;
           print_relation_path conf base ip1 ip2 path ifam excl_faml;
           trailer conf

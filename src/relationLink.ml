@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.24 2005-03-17 10:36:18 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.25 2005-03-19 15:58:08 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -627,6 +627,16 @@ value print_relation_ok conf base info =
     }
   in
   do {
+    let conf =
+      (* changing doctype to transitional because use of
+         <hr width=... align=...> *)
+      let doctype =
+        match p_getenv conf.base_env "doctype" with
+        [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
+        | _ -> "xhtml-1.0-trans" ]
+      in
+      {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
+    in
     header_no_page_title conf title;
     print_relation_path conf base info;
     trailer conf
