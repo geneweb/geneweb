@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.26 1999-09-22 09:11:45 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.27 1999-09-28 20:11:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -822,7 +822,7 @@ value map_person_ps fp fs p =
    nick_names = List.map fs p.nick_names;
    titles = List.map (map_title_strings fs) p.titles;
    rparents = List.map (map_relation_ps fp fs) p.rparents;
-   rchildren = p.rchildren;
+   related = p.related;
    aliases = List.map fs p.aliases;
    occupation = fs p.occupation;
    sex = p.sex; access = p.access;

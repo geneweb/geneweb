@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.31 1999-09-18 03:44:00 ddr Exp $ *)
+(* $Id: relation.ml,v 2.32 1999-09-28 20:11:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -28,7 +28,7 @@ value print_with_relation text conf base p r is =
   | None -> () ]
 ;
 
-value print_with_child_relation conf base p ip =
+value print_with_related conf base p ip =
   let c = poi base ip in
   List.iter
     (fun r ->
@@ -138,7 +138,7 @@ value print_menu conf base p =
                    r.r_moth;
               return ())
            p.rparents;
-         List.iter (print_with_child_relation conf base p) p.rchildren;
+         List.iter (print_with_related conf base p) p.related;
          Array.iter
            (fun ifam ->
               let fam = foi base ifam in
