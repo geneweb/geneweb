@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.11 2003-02-06 11:20:33 ddr Exp $ *)
+(* $Id: dag.ml,v 4.12 2003-11-06 18:47:55 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -774,7 +774,7 @@ value make_tree_hts
     in
     if bd > 0 || td <> "" then
       sprintf
-        "<table border=%d><tr align-left><td align=center%s>%s</table>" bd td
+        "<table border=%d><tr align=left><td align=center%s>%s</table>" bd td
         (indi_txt n)
     else indi_txt n
   in
