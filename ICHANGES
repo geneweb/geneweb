@@ -16,6 +16,8 @@ GeneWeb Version 2.06
     Added the executable "setup" in "gw" directory as name "gwsetup".
 
 * GeneWeb daemon/CGI (gwd)
+  - [Aug 21, 99] Added request mode "TREE" to display general tree; no
+    interface for it for the moment...
   - [Aug 17, 99] If option "-auth" used, print the password area like in
     cgi mode (i.e. an input area instead of hypertexts triggering a window
     for password), because the auth password and the wizard/friend password
