@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.12 2002-03-11 17:56:57 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: descend.ml,v 4.13 2002-03-11 18:36:06 ddr Exp $ *)
+(* Copyright (c) 2002 INRIA *)
 
 open Config;
 open Def;
@@ -20,16 +20,16 @@ value limit_by_tree conf =
   | None -> 4 ]
 ;
 
-value infini = 10000;
+value infinite = 10000;
 
-value make_level_table conf base niveau_max p =
+value make_level_table conf base max_level p =
   let mark = Array.create base.data.persons.len False in
-  let levt = Array.create base.data.persons.len infini in
+  let levt = Array.create base.data.persons.len infinite in
   let rec fill ip u lev =
-    if niveau_max == infini && mark.(Adef.int_of_iper ip) then ()
+    if max_level == infinite && mark.(Adef.int_of_iper ip) then ()
     else do {
       mark.(Adef.int_of_iper ip) := True;
-      if lev <= niveau_max then do {
+      if lev <= max_level then do {
         if lev < levt.(Adef.int_of_iper ip) then
           levt.(Adef.int_of_iper ip) := lev
         else ();
@@ -46,12 +46,12 @@ value make_level_table conf base niveau_max p =
 ;
 
 value level_max conf base p =
-  let levt = make_level_table conf base infini p in
+  let levt = make_level_table conf base infinite p in
   let x = ref 0 in
   do {
     for i = 0 to Array.length levt - 1 do {
       let lev = levt.(i) in
-      if lev != infini && x.val < lev then x.val := lev else ()
+      if lev != infinite && x.val < lev then x.val := lev else ()
     };
     x.val
   }
@@ -81,7 +81,7 @@ value text_level conf =
         (transl_nth conf "nth (generation)" i) ]
 ;
 
-value print_choice conf base p niveau_effectif =
+value print_choice conf base p effective_level =
   tag "form" "method=get action=\"%s\"" conf.command begin
     List.iter
       (fun (k, v) ->
@@ -91,15 +91,15 @@ value print_choice conf base p niveau_effectif =
     Wserver.wprint "<input type=hidden name=m value=D>\n";
     wprint_hidden_person conf base "" p;
     tag "select" "name=v" begin
-      let rec boucle i =
-        if i > niveau_effectif then ()
+      let rec loop i =
+        if i > effective_level then ()
         else do {
           Wserver.wprint "  <option value=%d%s> %s\n" i
             (if i == 0 then " selected" else "") (capitale (text_to conf i));
-          boucle (succ i)
+          loop (succ i)
         }
       in
-      boucle 0;
+      loop 0;
     end;
     Wserver.wprint "<input type=submit value=\"Ok\">\n";
     html_p conf;
@@ -117,7 +117,7 @@ value print_choice conf base p niveau_effectif =
           Wserver.wprint "<br>\n";
           Wserver.wprint "<input type=radio name=t value=T> %s\n"
             (capitale (transl conf "tree"));
-          if niveau_effectif <= limit_by_tree conf then ()
+          if effective_level <= limit_by_tree conf then ()
           else
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
               (limit_by_tree conf)
@@ -160,24 +160,25 @@ value descendants_title conf base p h =
   Wserver.wprint "%s" (capitale s)
 ;
 
-value afficher_menu_descendants conf base p =
-  let niveau_effectif = min (limit_desc conf) (level_max conf base p) in
+value display_descendant_menu conf base p =
+  let effective_level = min (limit_desc conf) (level_max conf base p) in
   do {
     header conf (descendants_title conf base p);
-    tag "center" begin print_choice conf base p niveau_effectif; end;
+    tag "center" begin print_choice conf base p effective_level; end;
     trailer conf
   }
 ;
 
-value s_appelle_comme_son_pere conf base ip =
+value named_like_father conf base ip =
   let a = aget conf base ip in
   match a.parents with
   [ Some ifam ->
-      (pget conf base ip).surname = (pget conf base (coi base ifam).father).surname
+      (pget conf base ip).surname =
+         (pget conf base (coi base ifam).father).surname
   | _ -> False ]
 ;
 
-value afficher_marie conf base first fam p spouse =
+value display_married conf base first fam p spouse =
   let auth = authorized_age conf base p && authorized_age conf base spouse in
   do {
     Wserver.wprint (fcapitale (relation_txt conf p.sex fam))
@@ -210,14 +211,14 @@ value afficher_marie conf base first fam p spouse =
 ;
 
 value
-  print_child conf base levt boucle niveau_max niveau compte auth
+  print_child conf base levt loop max_level level count auth
     always_surname x =
   let ix = x.cle_index in
   let ux = uget conf base ix in
   do {
     html_li conf;
     stag "strong" begin
-      if not always_surname && s_appelle_comme_son_pere conf base ix then
+      if not always_surname && named_like_father conf base ix then
         Wserver.wprint "%s"
           (referenced_person_text_without_surname conf base x)
       else Wserver.wprint "\n%s" (referenced_person_text conf base x);
@@ -225,46 +226,46 @@ value
     if auth then Date.print_dates conf base x else ();
     let occu = sou base x.occupation in
     if auth && occu <> "" then Wserver.wprint ", %s" occu else ();
-    if levt.(Adef.int_of_iper x.cle_index) < niveau then
+    if levt.(Adef.int_of_iper x.cle_index) < level then
       Wserver.wprint "<em>, %s</em>" (transl conf "see further")
-    else if levt.(Adef.int_of_iper x.cle_index) > niveau then
+    else if levt.(Adef.int_of_iper x.cle_index) > level then
       Wserver.wprint "<em>, %s</em>" (transl conf "see above")
-    else incr compte;
+    else incr count;
     Wserver.wprint ".";
-    if levt.(Adef.int_of_iper x.cle_index) == niveau then do {
-      levt.(Adef.int_of_iper x.cle_index) := infini;
+    if levt.(Adef.int_of_iper x.cle_index) == level then do {
+      levt.(Adef.int_of_iper x.cle_index) := infinite;
       if Array.length ux.family <> 0 then html_br conf
       else Wserver.wprint "\n";
-      if niveau == niveau_max then
+      if level == max_level then
         list_iter_first
           (fun first ifam ->
              let fam = foi base ifam in
              let c = spouse x.cle_index (coi base ifam) in
              let c = pget conf base c in
              if know base c then do {
-               afficher_marie conf base first fam x c;
+               display_married conf base first fam x c;
                Wserver.wprint ".";
                html_br conf
              }
              else ())
           (Array.to_list ux.family)
       else ();
-      boucle (succ niveau) x ux
+      loop (succ level) x ux
     }
     else Wserver.wprint "\n"
   }
 ;
 
-value afficher_descendants_jusqu_a conf base niveau_max p line =
-  let niveau_max = min (limit_desc conf) niveau_max in
-  let levt = make_level_table conf base niveau_max p in
-  let compte = ref 0 in
+value display_descendants_upto conf base max_level p line =
+  let max_level = min (limit_desc conf) max_level in
+  let levt = make_level_table conf base max_level p in
+  let count = ref 0 in
   let always_surname =
     try List.assoc "always_surname" conf.base_env = "yes" with
     [ Not_found -> False ]
   in
-  let rec boucle niveau p u =
-    if niveau <= niveau_max then
+  let rec loop level p u =
+    if level <= max_level then
       let ifaml = Array.to_list u.family in
       list_iter_first
         (fun first ifam ->
@@ -286,7 +287,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
            in
            do {
              if know base conj || List.length ifaml > 1 then do {
-               afficher_marie conf base first fam p conj;
+               display_married conf base first fam p conj;
                if children <> [] then
                  Wserver.wprint ", <em>%s</em>"
                    (transl conf "having as children")
@@ -300,7 +301,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
                in
                tag "ul" begin
                  List.iter
-                   (print_child conf base levt boucle niveau_max niveau compte
+                   (print_child conf base levt loop max_level level count
                       age_auth always_surname)
                    children;
                end
@@ -313,10 +314,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
   do {
     header conf (descendants_title conf base p);
     print_link_to_welcome conf True;
-(*
-    if niveau_max > 6 then enter_nobr () else ();
-*)
-    Wserver.wprint "%s.<br>\n" (capitale (text_to conf niveau_max));
+    Wserver.wprint "%s.<br>\n" (capitale (text_to conf max_level));
     if line = Neuter then ()
     else
       Wserver.wprint "%s.<br>\n"
@@ -333,28 +331,25 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
     else ();
     Wserver.wprint ".";
     html_br conf;
-    boucle 1 p (uget conf base p.cle_index);
-    if compte.val > 1 then do {
+    loop 1 p (uget conf base p.cle_index);
+    if count.val > 1 then do {
       html_p conf;
-      Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) compte.val
+      Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) count.val
         (nominative (transl_nth_def conf "person/persons" 2 1));
-      if niveau_max > 1 then
+      if max_level > 1 then
         Wserver.wprint " (%s)" (transl conf "spouses not included")
       else ();
       Wserver.wprint ".\n"
     }
     else ();
-(*
-    if niveau_max > 6 then exit_nobr () else ();
-*)
     trailer conf
   }
 ;
 
-value afficher_descendants_niveau conf base niveau_max ancetre =
-  let niveau_max = min (limit_desc conf) niveau_max in
-  let levt = make_level_table conf base niveau_max ancetre in
-  let rec get_level niveau u list =
+value display_descendants_level conf base max_level ancestor =
+  let max_level = min (limit_desc conf) max_level in
+  let levt = make_level_table conf base max_level ancestor in
+  let rec get_level level u list =
     List.fold_left
       (fun list ifam ->
          let des = doi base ifam in
@@ -362,43 +357,43 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
          List.fold_left
            (fun list ix ->
               let x = pget conf base ix in
-              if niveau == niveau_max then
+              if level == max_level then
                 if p_first_name base x = "x" ||
-                   levt.(Adef.int_of_iper x.cle_index) != niveau then
+                   levt.(Adef.int_of_iper x.cle_index) != level then
                   list
                 else [x :: list]
-              else if niveau < niveau_max then
-                get_level (succ niveau) (uget conf base ix) list
+              else if level < max_level then
+                get_level (succ level) (uget conf base ix) list
               else list)
            list (Array.to_list enfants))
       list (Array.to_list u.family)
   in
   let len = ref 0 in
-  let liste = get_level 1 (uget conf base ancetre.cle_index) [] in
-  let liste =
+  let list = get_level 1 (uget conf base ancestor.cle_index) [] in
+  let list =
     Sort.list
       (fun p1 p2 ->
-         let c = alphabetique (p_surname base p1) (p_surname base p2) in
+         let c = alphabetic (p_surname base p1) (p_surname base p2) in
          if c == 0 then
            let c =
-             alphabetique (p_first_name base p1) (p_first_name base p2)
+             alphabetic (p_first_name base p1) (p_first_name base p2)
            in
            if c == 0 then p1.occ > p2.occ else c > 0
          else c > 0)
-      liste
+      list
   in
-  let liste =
+  let list =
     List.fold_left
       (fun pl p ->
          match pl with
          [ [(p1, n) :: pl] when p.cle_index == p1.cle_index ->
              [(p1, succ n) :: pl]
          | _ -> do { incr len; [(p, 1) :: pl] } ])
-      [] liste
+      [] list
   in
   do {
-    header conf (descendants_title conf base ancetre);
-    Wserver.wprint "%s" (capitale (text_level conf niveau_max));
+    header conf (descendants_title conf base ancestor);
+    Wserver.wprint "%s" (capitale (text_level conf max_level));
     if len.val > 1 then
       Wserver.wprint " (%d %s)" len.val
         (nominative (transl_nth_def conf "person/persons" 2 1))
@@ -418,12 +413,12 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
            else ();
            Wserver.wprint "\n"
          })
-      liste;
+      list;
     trailer conf
   }
 ;
 
-(* Avec numerotation *)
+(* With number *)
 
 value mark_descendants conf base marks max_lev p =
   loop 0 p.cle_index (uget conf base p.cle_index) where rec loop lev ip u =
@@ -540,14 +535,10 @@ value print_repeat_child conf base p1 p2 e =
   end
 ;
 
-value afficher_date_mariage conf base fam p c =
-  Wserver.wprint "%s" (Date.short_marriage_date_text conf base fam p c)
-;
-
-value afficher_spouse conf base marks paths fam p c =
+value display_spouse conf base marks paths fam p c =
   do {
     Wserver.wprint "\n&amp;";
-    afficher_date_mariage conf base fam p c;
+    Wserver.wprint "%s" (Date.short_marriage_date_text conf base fam p c);
     Wserver.wprint " ";
     stag "strong" begin
       Wserver.wprint "\n%s" (referenced_person_text conf base c);
@@ -574,7 +565,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
              do {
                if need_br then html_br conf else ();
                if not first then print_repeat_child conf base p1 c1 p else ();
-               afficher_spouse conf base marks paths fam p c;
+               display_spouse conf base marks paths fam p c;
                Wserver.wprint "\n";
                let print_children =
                  p.sex == Male || not marks.(Adef.int_of_iper c.cle_index)
@@ -606,7 +597,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                      print_repeat_child conf base p c e
                                    }
                                    else ();
-                                   afficher_spouse conf base marks paths fam e
+                                   display_spouse conf base marks paths fam e
                                      c1;
                                    if Array.length el <> 0 then
                                      Wserver.wprint "....."
@@ -654,7 +645,7 @@ value print_family conf base marks paths max_lev lev p =
              stag "strong" begin
                Wserver.wprint "\n%s" (referenced_person_text conf base p);
              end;
-             afficher_spouse conf base marks paths fam p c;
+             display_spouse conf base marks paths fam p c;
              Wserver.wprint "<ol start=%d>\n" (succ cnt);
              let cnt =
                List.fold_left
@@ -680,7 +671,7 @@ value print_family conf base marks paths max_lev lev p =
                                let el = des.children in
                                let c = pget conf base c in
                                do {
-                                 afficher_spouse conf base marks paths fam e
+                                 display_spouse conf base marks paths fam e
                                    c;
                                  if Array.length el <> 0 then
                                    Wserver.wprint "....."
@@ -730,40 +721,40 @@ value print_families conf base marks paths max_lev =
     else ()
 ;
 
-value afficher_descendants_numerotation conf base niveau_max ancetre =
-  let niveau_max = min (limit_desc conf) niveau_max in
+value display_descendants_with_numbers conf base max_level ancestor =
+  let max_level = min (limit_desc conf) max_level in
   let title h =
-    if h then descendants_title conf base ancetre h
+    if h then descendants_title conf base ancestor h
     else
       wprint_geneweb_link conf
-        ("m=D;i=" ^ string_of_int (Adef.int_of_iper ancetre.cle_index) ^
-           ";v=" ^ string_of_int niveau_max ^ ";t=G")
+        ("m=D;i=" ^ string_of_int (Adef.int_of_iper ancestor.cle_index) ^
+           ";v=" ^ string_of_int max_level ^ ";t=G")
         (capitale
            (transl_decline2 conf "%1 of (same or greater generation level) %2"
-              (transl conf "descendants") (person_text conf base ancetre)))
+              (transl conf "descendants") (person_text conf base ancestor)))
   in
   let marks = Array.create base.data.persons.len False in
   let paths = Array.create base.data.persons.len [] in
   do {
     header conf title;
     total.val := 0;
-    Wserver.wprint "%s" (Date.short_dates_text conf base ancetre);
-    let p = ancetre in
+    Wserver.wprint "%s" (Date.short_dates_text conf base ancestor);
+    let p = ancestor in
     if authorized_age conf base p then
       match (Adef.od_of_codate p.birth, p.death) with
       [ (Some _, _) | (_, Death _ _) -> html_br conf
       | _ -> () ]
     else ();
-    Wserver.wprint "%s." (capitale (text_to conf niveau_max));
+    Wserver.wprint "%s." (capitale (text_to conf max_level));
     html_p conf;
-    mark_descendants conf base marks niveau_max ancetre;
-    label_descendants conf base marks paths niveau_max ancetre;
-    print_families conf base marks paths niveau_max ancetre;
+    mark_descendants conf base marks max_level ancestor;
+    label_descendants conf base marks paths max_level ancestor;
+    print_families conf base marks paths max_level ancestor;
     if total.val > 1 then do {
       html_p conf;
       Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) total.val
         (nominative (transl_nth_def conf "person/persons" 2 1));
-      if niveau_max > 1 then
+      if max_level > 1 then
         Wserver.wprint " (%s)" (transl conf "spouses not included")
       else ();
       Wserver.wprint ".\n"
@@ -825,7 +816,7 @@ value print_elem conf base paths precision (n, pll) =
                         end;
                         if several && precision then do {
                           Wserver.wprint " <em>";
-                          preciser_homonyme conf base p;
+                          specify_homonymous conf base p;
                           Wserver.wprint "</em>"
                         }
                         else ();
@@ -841,30 +832,30 @@ value print_elem conf base paths precision (n, pll) =
   }
 ;
 
-value trier_et_afficher conf base paths precision liste =
-  let liste = List.map (pget conf base) liste in
-  let liste =
+value sort_and_display conf base paths precision list =
+  let list = List.map (pget conf base) list in
+  let list =
     Sort.list
       (fun p1 p2 ->
-         let c = alphabetique (p_surname base p1) (p_surname base p2) in
+         let c = alphabetic (p_surname base p1) (p_surname base p2) in
          if c == 0 then
            let c =
-             alphabetique (p_first_name base p1) (p_first_name base p2)
+             alphabetic (p_first_name base p1) (p_first_name base p2)
            in
            c > 0
          else c > 0)
-      liste
+      list
   in
-  let liste =
+  let list =
     List.fold_left
       (fun npll p ->
          match npll with
          [ [(n, pl) :: npll] when n == p_surname base p ->
              [(n, [p :: pl]) :: npll]
          | _ -> [(p_surname base p, [p]) :: npll] ])
-      [] liste
+      [] list
   in
-  let liste =
+  let list =
     List.map
       (fun (n, pl) ->
          let pll =
@@ -878,21 +869,21 @@ value trier_et_afficher conf base paths precision liste =
              [] pl
          in
          (n, pll))
-      liste
+      list
   in
-  if liste <> [] then
-    tag "ul" begin List.iter (print_elem conf base paths precision) liste; end
+  if list <> [] then
+    tag "ul" begin List.iter (print_elem conf base paths precision) list; end
   else ()
 ;
 
-value afficher_index_descendants conf base niveau_max ancetre =
-  let niveau_max = min (limit_desc conf) niveau_max in
+value display_descendant_index conf base max_level ancestor =
+  let max_level = min (limit_desc conf) max_level in
   let title h =
     let txt = capitale (transl conf "index of the descendants") in
     if not h then
       wprint_geneweb_link conf
-        ("m=D;i=" ^ string_of_int (Adef.int_of_iper ancetre.cle_index) ^
-           ";v=" ^ string_of_int niveau_max ^ ";t=C")
+        ("m=D;i=" ^ string_of_int (Adef.int_of_iper ancestor.cle_index) ^
+           ";v=" ^ string_of_int max_level ^ ";t=C")
         txt
     else Wserver.wprint "%s" txt
   in
@@ -900,26 +891,26 @@ value afficher_index_descendants conf base niveau_max ancetre =
     header conf title;
     let marks = Array.create base.data.persons.len False in
     let paths = Array.create base.data.persons.len [] in
-    mark_descendants conf base marks niveau_max ancetre;
-    label_descendants conf base marks paths niveau_max ancetre;
-    let liste = ref [] in
+    mark_descendants conf base marks max_level ancestor;
+    label_descendants conf base marks paths max_level ancestor;
+    let list = ref [] in
     for i = 0 to base.data.persons.len - 1 do {
       if paths.(i) <> [] then
         let p = pget conf base (Adef.iper_of_int i) in
         if p_first_name base p <> "?" && p_surname base p <> "?" &&
            p_first_name base p <> "x"
         && (not conf.hide_names || fast_auth_age conf p) then
-          liste.val := [p.cle_index :: liste.val]
+          list.val := [p.cle_index :: list.val]
         else ()
       else ()
     };
-    trier_et_afficher conf base paths True liste.val;
+    sort_and_display conf base paths True list.val;
     trailer conf
   }
 ;
 
-value afficher_index_spouses conf base niveau_max ancetre =
-  let niveau_max = min (limit_desc conf) niveau_max in
+value display_spouse_index conf base max_level ancestor =
+  let max_level = min (limit_desc conf) max_level in
   let title _ =
     Wserver.wprint "%s"
       (capitale (transl conf "index of the spouses (non descendants)"))
@@ -928,9 +919,9 @@ value afficher_index_spouses conf base niveau_max ancetre =
     header conf title;
     let marks = Array.create base.data.persons.len False in
     let paths = Array.create base.data.persons.len [] in
-    mark_descendants conf base marks niveau_max ancetre;
-    label_descendants conf base marks paths niveau_max ancetre;
-    let liste = ref [] in
+    mark_descendants conf base marks max_level ancestor;
+    label_descendants conf base marks paths max_level ancestor;
+    let list = ref [] in
     for i = 0 to base.data.persons.len - 1 do {
       if paths.(i) <> [] then
         let p = pget conf base (Adef.iper_of_int i) in
@@ -945,16 +936,16 @@ value afficher_index_spouses conf base niveau_max ancetre =
                  if p_first_name base c <> "?" && p_surname base c <> "?" &&
                     p_first_name base p <> "x" &&
                     (not conf.hide_names || fast_auth_age conf c) &&
-                    not (List.memq c.cle_index liste.val)
+                    not (List.memq c.cle_index list.val)
                  then
-                   liste.val := [c.cle_index :: liste.val]
+                   list.val := [c.cle_index :: list.val]
                  else ()
                else ())
             u.family
         else ()
       else ()
     };
-    trier_et_afficher conf base paths False liste.val;
+    sort_and_display conf base paths False list.val;
     trailer conf
   }
 ;
@@ -995,7 +986,7 @@ value rec print_table_person conf base max_lev ip =
   }
 ;
 
-value afficher_descendants_table conf base max_lev a =
+value display_descendant_with_table conf base max_lev a =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "descendants")) in
   let max_lev = min (limit_desc conf) max_lev in
   do {
@@ -1016,7 +1007,8 @@ value make_tree_hts conf base gv p =
   and fam_nb_column n v des =
     if Array.length des.children = 0 then n + 1
     else
-      List.fold_left (fun n iper -> nb_column n (v - 1) (uget conf base iper)) n
+      List.fold_left
+        (fun n iper -> nb_column n (v - 1) (uget conf base iper)) n
         (Array.to_list des.children)
   in
   let vertical_bar_txt v tdl po =
@@ -1191,12 +1183,16 @@ value make_tree_hts conf base gv p =
                     else
                       let age_auth =
                         List.for_all
-                          (fun ip -> authorized_age conf base (pget conf base ip))
+                          (fun ip ->
+                             authorized_age conf base (pget conf base ip))
                           (Array.to_list des.children)
                       in
                       List.fold_right
                         (fun iper gen ->
-                           let g = (pget conf base iper, uget conf base iper, age_auth) in
+                           let g =
+                             (pget conf base iper, uget conf base iper,
+                              age_auth)
+                           in
                            [Some g :: gen])
                         (Array.to_list des.children) gen)
                  (Array.to_list u.family) gen
@@ -1205,8 +1201,8 @@ value make_tree_hts conf base gv p =
   in
   let hts =
     let tdal =
-      loop [] [] [Some (p, uget conf base p.cle_index, True)] (gv + 1) where rec
-        loop tdal prev_gen gen v =
+      loop [] [] [Some (p, uget conf base p.cle_index, True)] (gv + 1)
+      where rec loop tdal prev_gen gen v =
         let tdal =
           if prev_gen <> [] then
             [children_vertical_bars v gen; horizontal_bars v prev_gen;
@@ -1303,14 +1299,14 @@ value print_aboville conf base max_level p =
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "A", Some v) -> print_aboville conf base v p
-  | (Some "L", Some v) -> afficher_descendants_jusqu_a conf base v p Neuter
-  | (Some "M", Some v) -> afficher_descendants_jusqu_a conf base v p Male
-  | (Some "F", Some v) -> afficher_descendants_jusqu_a conf base v p Female
-  | (Some "S", Some v) -> afficher_descendants_niveau conf base v p
-  | (Some "H", Some v) -> afficher_descendants_table conf base v p
-  | (Some "N", Some v) -> afficher_descendants_numerotation conf base v p
-  | (Some "G", Some v) -> afficher_index_descendants conf base v p
-  | (Some "C", Some v) -> afficher_index_spouses conf base v p
+  | (Some "L", Some v) -> display_descendants_upto conf base v p Neuter
+  | (Some "M", Some v) -> display_descendants_upto conf base v p Male
+  | (Some "F", Some v) -> display_descendants_upto conf base v p Female
+  | (Some "S", Some v) -> display_descendants_level conf base v p
+  | (Some "H", Some v) -> display_descendant_with_table conf base v p
+  | (Some "N", Some v) -> display_descendants_with_numbers conf base v p
+  | (Some "G", Some v) -> display_descendant_index conf base v p
+  | (Some "C", Some v) -> display_spouse_index conf base v p
   | (Some "T", Some v) -> print_tree conf base v p
-  | _ -> afficher_menu_descendants conf base p ]
+  | _ -> display_descendant_menu conf base p ]
 ;

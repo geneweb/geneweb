@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.20 2002-03-11 18:12:18 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.21 2002-03-11 18:36:05 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1322,9 +1322,9 @@ value val_of_mt =
 ;
 
 value compare base (mt1, p1) (mt2, p2) =
-  let c = alphabetique (p_surname base p1) (p_surname base p2) in
+  let c = alphabetic (p_surname base p1) (p_surname base p2) in
   if c == 0 then
-    let c = alphabetique (p_first_name base p1) (p_first_name base p2) in
+    let c = alphabetic (p_first_name base p1) (p_first_name base p2) in
     if c == 0 then
       if p1 == p2 then val_of_mt mt1 < val_of_mt mt2
       else
@@ -2060,7 +2060,7 @@ value build_surnames_list conf base v p =
          let surn = sou base i in
          if surn <> "?" then list.val := [(surn, dp.val) :: list.val] else ())
       ht;
-    Sort.list (fun (s1, _) (s2, _) -> Gutil.alphabetique s1 s2 <= 0) list.val
+    Sort.list (fun (s1, _) (s2, _) -> Gutil.alphabetic s1 s2 <= 0) list.val
   }
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.22 2002-03-11 17:56:57 ddr Exp $ *)
+(* $Id: family.ml,v 4.23 2002-03-11 18:36:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -89,10 +89,10 @@ value compact_list conf base xl =
          | (_, _, Some _, _) -> True
          | (_, _, _, Death _ _) -> True
          | _ ->
-             let c = alphabetique (p_surname base p1) (p_surname base p2) in
+             let c = alphabetic (p_surname base p1) (p_surname base p2) in
              if c == 0 then
                let c =
-                 alphabetique (p_first_name base p1) (p_first_name base p2)
+                 alphabetic (p_first_name base p1) (p_first_name base p2)
                in
                if c == 0 then p1.occ > p2.occ else c > 0
              else c > 0 ])
