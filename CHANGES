@@ -2,8 +2,8 @@ GeneWeb version 4.05
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [21 Jan 02] Added a link to gwsetup in bottom of pages. Set by
-    a new gwd option "-setup_link" which is installed by default.
+  - [21 Jan 02] Added a link to the "gwsetup" service in bottom of pages.
+    (The command "gwd" has a new option "-setup_link" to add that).
   - [12 Jan 02] Fixed bug: when merging two persons, in case of fast
     merge applied, the notes of the second person were lost.
   - [11 Jan 02] Fixed bug: the macros in places were not expanded in the
@@ -18,7 +18,7 @@ GeneWeb version 4.05
     distribution! This has other advantages: 1/ easier to maintain 2/
     easier to add new languages 3/ easier to extend 4/ exactly same look
     for all languages 5/ easier to see which sentences are missing in a
-    language .
+    language.
   - [13 Jan 02] Proposes now both addresses localhost and 127.0.0.1.
     (sometimes just one of them work and not the other).
 
