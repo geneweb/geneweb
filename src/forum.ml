@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.3 2000-01-10 02:14:38 ddr Exp $ *)
+(* $Id: forum.ml,v 3.4 2000-02-01 18:58:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -47,7 +47,8 @@ value print_forum conf base =
                       email email
                   else ();
                   Wserver.wprint "<br>\n";
-                  Wserver.wprint "<em>%s</em><br>\n" time;
+                  Wserver.wprint "<em>%s</em>\n" time;
+                  Wserver.wprint "<dl><dt><dd>\n";
                   List.iter
                     (fun s ->
                        do if s = "" then Wserver.wprint "<p>"
@@ -55,6 +56,7 @@ value print_forum conf base =
                           Wserver.wprint "\n";
                        return ())
                     mess;
+                  Wserver.wprint "</dl>\n";
                return ()
              else ();
           return loop (input_line ic)
