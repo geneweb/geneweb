@@ -109,7 +109,6 @@ chown -R geneweb.geneweb /home/geneweb/gw
 
 %postun
 /usr/sbin/userdel geneweb
-rm -rf /home/geneweb
 
 # *********** THE FILES OWNED BY THIS .RPM *************
 # These are the files belonging to this package.  We have to list

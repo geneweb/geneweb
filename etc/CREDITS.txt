@@ -1,40 +1,41 @@
 		GeneWeb
 		-------
 
-	Languages
-		Chinese		Gang Chen
-		Czech		Hanus Adler
-		Danish		Hans Albeck
-		Dutch		Joris Esch
-				Wijnand J. Nijs
-		German		Markus Mottl
-				Falko Trojahn
-				Thomas Omerzu
-		Hebrew		Jonathan Marder
-				Ruth Marder
-		Italian		Raffaele Sena
-				Daniel Hirschkoff
-		Norwegian	Brynjulf Langballe
-		Portuguese	Yves Guignard
-		Spanish		Luis Castro Guzman
-		Swedish		Lars Gustavsson
-				Stig Petersson
-				Bertil Englund
+Languages
+	Chinese		Gang Chen
+	Czech		Hanus Adler
+	Danish		Hans Albeck
+	Dutch		Joris Esch
+			Wijnand J. Nijs
+	German		Markus Mottl
+			Falko Trojahn
+			Thomas Omerzu
+	Hebrew		Jonathan Marder
+			Ruth Marder
+	Italian		Raffaele Sena
+			Daniel Hirschkoff
+	Norwegian	Brynjulf Langballe
+	Portuguese	Yves Guignard
+	Spanish		Luis Castro Guzman
+	Swedish		Lars Gustavsson
+			Stig Petersson
+			Bertil Englund
 
-	Documentation
-		German		Falko Trojahn
-		Dutch		Joris Esch
-		Swedish		Lars Gustavsson
+Documentation
+	German		Falko Trojahn
+	Dutch		Joris Esch
+	Swedish		Lars Gustavsson
 
-	Setup program
-		Spanish		Luis Castro Guzman
+Setup program
+	Spanish		Luis Castro Guzman
 
-	Algorithm of consanguinity and relationship
-				Didier Rémy
+Algorithm of consanguinity and relationship
+		Didier Rémy
 
-	Flags from
-				FOTW Flags Of The World
-				http://fotw.digibel.be/flags/
+Flags from
+		FOTW Flags Of The World
+		http://fotw.digibel.be/flags/
 
-	Program written by	Daniel de Rauglaudre.
-				daniel.de_rauglaudre@inria.fr
+Program written by
+		Daniel de Rauglaudre.
+		daniel.de_rauglaudre@inria.fr
