@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.1 2001-03-17 11:02:05 ddr Exp $
+# $Id: lexicon.txt,v 4.2 2001-03-19 14:44:39 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -3625,6 +3625,26 @@ pt: marido/esposa
 ru: ìóæ/æåíà
 se: make/maka
 
+    ident/email/subject
+cs: ident/email/pøedmìt (osoba?)
+ct: ident/email/tema
+de: ident/email/Betreff
+dk: ident/email/emne
+en: ident/email/subject
+eo: ident/email/objekto
+es: ident/email/asunto
+et: ident/email/teema
+fi: ident/email/kohde
+fr: nom/courriel/sujet
+he: ident/email/ ğåùà
+is: ident/email/um
+it: ident/email/oggetto
+nl: ident/email/onderwerp
+no: ident/email/emne
+pl: ident/email/temat
+pt: ident/email/assunto
+se: ident/email/ämne
+
     if titles
 af: as titels
 cs: jsou-li tituly
@@ -6376,26 +6396,6 @@ no: statistikk
 pl: zestawienia
 pt: estat&iacute;sticas
 se: statistik
-
-    subject
-cs: pøedmìt (osoba?)
-ct: tema
-de: Betreff
-dk: emne
-en: subject
-eo: objekto
-es: asunto
-et: teema
-fi: kohde
-fr: sujet
-he:  ğåùà
-is: um
-it: oggetto
-nl: onderwerp
-no: emne
-pl: temat
-pt: assunto
-se: ämne
 
     surname alias
 af: van alias

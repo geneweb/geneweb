@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.1 2001-03-18 18:07:22 ddr Exp $ *)
+(* $Id: forum.ml,v 4.2 2001-03-19 14:44:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -130,6 +130,10 @@ value message_txt conf i =
   transl_nth conf "message/previous message/next message" i
 ;
 
+value header_txt conf i =
+  transl_nth conf "ident/email/subject" i
+;
+
 value print_add_message conf =
   tag "form" "method=get action=\"%s\"" conf.command begin
     Util.hidden_env conf;
@@ -251,7 +255,7 @@ value print_forum_message conf base pos =
          Wserver.wprint "<br>\n";
          if subject <> "" then
            Wserver.wprint "<b>%s: %s</b>\n<br>\n"
-             (capitale (transl conf "subject")) (secure subject)
+             (capitale (header_txt conf 2)) (secure subject)
          else ();
          Wserver.wprint "<em>%s</em>\n" time;
          Wserver.wprint "<dl><dt><dd>\n";
@@ -313,9 +317,9 @@ value print_add conf base =
        Util.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=FORUM_ADD_OK>\n";
        tag "table" "border=%d" conf.border begin
-         print_var conf "Ident" "Ident" False conf.user;
-         print_var conf "Email" "Email" True "";
-         print_var conf "Subject" (capitale (transl conf "subject")) False "";
+         print_var conf "Ident" (capitale (header_txt conf 0)) False conf.user;
+         print_var conf "Email" (capitale (header_txt conf 1)) True "";
+         print_var conf "Subject" (capitale (header_txt conf 2)) False "";
        end;
        html_p conf;
        Wserver.wprint "%s<br>\n"
