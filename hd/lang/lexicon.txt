@@ -438,7 +438,7 @@ nl: alle titels
 se: alla titlar
 
     allied%t (euphemism for married or... not) to
-cn: %t，配偶是
+cn: %t配偶是
 de: verheiratet%t mit
 en: allied%t to
 eo: edzagxita%t kun
@@ -1141,6 +1141,7 @@ nl: als titels
 se: om titlar
 
     in (month year)
+cn: 于
 de: im
 en: in
 eo: en
@@ -1151,6 +1152,7 @@ nl: in
 se: i
 
     in (year)
+cn: 于
 de: im Jahre
 en: in
 eo: en
