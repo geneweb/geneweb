@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.71 2000-03-09 09:53:39 ddr Exp $
+# $Id: lexicon.txt,v 3.72 2000-03-09 18:05:32 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5538,7 +5538,7 @@ se: med
 
     witness at marriage of %s and %s
 de: Trauzeugen bei der Hochzeit von %s und %s
-dk: vidne ved bryllup mellem %s and %s
+dk: vidne ved brylluppet mellem %s og %s
 en: witness at marriage of %s and %s
 fi: avioliiton %s ja %s todistaja
 fr: t&eacute;moin au mariage de %s et de %s
