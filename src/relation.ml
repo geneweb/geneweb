@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.61 2000-11-22 03:01:03 ddr Exp $ *)
+(* $Id: relation.ml,v 3.62 2000-11-28 09:44:37 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -941,7 +941,7 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
              (transl_nth conf "the spouse" (1 - index_of_sex p1.sex)) s
        in
        let s = transl_decline2 conf "%1 of %2" (lab x1) s in
-       Wserver.wprint "%s\n" s;
+       Wserver.wprint "%s\n" (nominative s);
        html_li conf;
        let s = gen_person_title_text raw_access conf base p2 in
        let s =
@@ -951,7 +951,7 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
              (transl_nth conf "the spouse" (1 - index_of_sex p2.sex)) s
        in
        let s = transl_decline2 conf "%1 of %2" (lab x2) s in
-       Wserver.wprint "%s\n" s;
+       Wserver.wprint "%s\n" (nominative s);
      end;
      Wserver.wprint "</ul>\n";
   return ()
