@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.41 2000-06-17 19:50:54 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.42 2000-06-17 21:04:43 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -775,6 +775,15 @@ value log_and_robot_check conf auth from request str =
     | Refuse -> () ]
 ;
 
+value is_robot from =
+  lock_wait Srcfile.adm_file "gwd.lck" with
+  [ Accept ->
+      let (robxcl, _) = Robot.robot_excl () in
+      try let _ = List.assoc from robxcl.Robot.excl in True with
+      [ Not_found -> False ]
+  | Refuse -> False ]
+;
+
 value auth_err request auth_file =
   if auth_file = "" then (False, "")
   else
@@ -820,8 +829,9 @@ value conf_and_connection cgi from (addr, request) str env =
     else auth_err request conf.auth_file
   in
   match (cgi, auth_err, passwd_err) with
-  [ (True, True, _) -> no_access conf
+  [ (True, True, _) -> if is_robot from then () else no_access conf
   | (_, True, _) ->
+      if is_robot from then () else
       let auth_type =
         let x =
           try List.assoc "auth_file" conf.base_env with
@@ -831,6 +841,7 @@ value conf_and_connection cgi from (addr, request) str env =
       in
       refuse_auth conf from auth auth_type
   | (_, _, Some (passwd, uauth, base_file)) ->
+      if is_robot from then () else
       let tm = Unix.time () in
       do lock_wait Srcfile.adm_file "gwd.lck" with
          [ Accept ->
