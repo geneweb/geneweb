@@ -9,6 +9,9 @@ GeneWeb Version 3.10
     several times in the title list, the title tree showed his last order
     number instead of his (more logicial) first order number. 
 
+* Installation by Linux rpm
+  - [07..09 Nov 00] Many improvements. See geneweb.spec changelog
+
 GeneWeb Version 3.09
 --------------------
 
