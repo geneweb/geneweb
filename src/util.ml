@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.27 2002-01-23 11:39:56 ddr Exp $ *)
+(* $Id: util.ml,v 4.28 2002-01-23 14:22:33 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1596,7 +1596,7 @@ value create_topological_sort conf base =
   match p_getenv conf.env "opt" with
   [ Some "no_tsfile" ->
       let _ = base.data.ascends.array () in
-      let _ = base.data.couples.array () in Consang.topological_sort base
+      let _ = base.data.couples.array () in Consang.topological_sort base aoi
   | Some "no_tstab" -> Array.create base.data.persons.len 0
   | _ ->
       let bfile = base_path [] (conf.bname ^ ".gwb") in
@@ -1620,7 +1620,7 @@ value create_topological_sort conf base =
           | None ->
               let _ = base.data.ascends.array () in
               let _ = base.data.couples.array () in
-              let tstab = Consang.topological_sort base in
+              let tstab = Consang.topological_sort base aoi in
               do {
                 match
                   try Some (open_out_bin tstab_file) with
@@ -1637,7 +1637,7 @@ value create_topological_sort conf base =
       | Refuse ->
           let _ = base.data.ascends.array () in
           let _ = base.data.couples.array () in
-          Consang.topological_sort base ] ]
+          Consang.topological_sort base aoi ] ]
 ;
 
 value branch_of_sosa conf base ip n =

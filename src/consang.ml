@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 4.4 2001-06-08 14:33:27 ddr Exp $ *)
+(* $Id: consang.ml,v 4.5 2002-01-23 14:22:32 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -57,13 +57,13 @@ exception TopologicalSortError of person;
      list of one of the person is exhausted).
 *)
 
-value topological_sort base =
+value topological_sort base aoi =
   let tab = Array.create base.data.persons.len 0 in
   let todo = ref [] in
   let cnt = ref 0 in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let a = base.data.ascends.get i in
+      let a = aoi base (Adef.iper_of_int i) in
       match a.parents with
       [ Some ifam ->
           let cpl = coi base ifam in
@@ -83,7 +83,7 @@ value topological_sort base =
         let new_list =
           List.fold_left
             (fun new_list i ->
-               let a = base.data.ascends.get i in
+               let a = aoi base (Adef.iper_of_int i) in
                do {
                  tab.(i) := tval;
                  incr cnt;
