@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 3.0 1999-10-29 10:30:54 ddr Exp $ *)
+(* $Id: alln.ml,v 3.1 2000-01-04 11:22:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -377,9 +377,9 @@ value print_alphabetic_short conf base is_surnames ini list len =
                          Wserver.wprint "<a%s%s>" href name
                        else ();
                        Wserver.wprint "%s" (alphab_string conf is_surnames s);
-                       Wserver.wprint "(%d)" cnt;
                        if href <> "" || name <> "" then Wserver.wprint "</a>"
                        else ();
+                       Wserver.wprint "(%d)" cnt;
                     return False)
                  True l
              in ();
