@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: title.ml,v 1.6 1998-11-27 20:09:48 ddr Exp $ *)
+(* $Id: title.ml,v 1.7 1998-11-29 13:40:45 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -119,9 +119,25 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
               | (None, None) -> True ] ] ] ]
 ;
 
-value compare_places p1 p2 = alphabetique p1 p2 <= 0;
+value my_alphabetique n1 n2 =
+  compare (Name.abbrev (Name.lower n1)) (Name.abbrev (Name.lower n2))
+;
 
-value compare_titles t1 t2 = t1 <= t2;
+value string_list_uniq l =
+  let l =
+    List.fold_left
+      (fun l e ->
+         match l with
+         [ [] -> [e]
+         | [x :: _] -> if my_alphabetique e x = 0 then l else [e :: l] ])
+      [] l
+  in
+  List.rev l
+;
+
+value compare_places p1 p2 = compare (Name.lower p1) (Name.lower p2) <= 0;
+
+value compare_titles t1 t2 = my_alphabetique t1 t2 <= 0;
 
 value strip_abbrev_lower s = Name.strip (Name.abbrev (Name.lower s));
 
@@ -172,7 +188,7 @@ value select_place base place =
   let add_title t =
     let pn = sou base t.t_place in
     if strip_abbrev_lower pn = place then
-      let tn = capitale (sou base t.t_title) in
+      let tn = sou base t.t_title in
       if not (List.mem tn list.val) then
         do clean_name.val := pn; return
         list.val := [tn :: list.val]
@@ -188,7 +204,7 @@ value select_place base place =
 value select_all_titles conf base =
   let list = ref [] in
   let add_title t =
-    let tn = capitale (coa conf (sou base t.t_title)) in
+    let tn = sou base t.t_title in
     if not (List.mem tn list.val) then list.val := [tn :: list.val] else ()
   in
   do for i = 0 to base.persons.len - 1 do
@@ -200,7 +216,7 @@ value select_all_titles conf base =
 value select_all_places conf base =
   let list = ref [] in
   let add_place t =
-    let pl = coa conf (sou base t.t_place) in
+    let pl = sou base t.t_place in
     if not (List.mem pl list.val) then
       list.val := [pl :: list.val]
     else ()
@@ -274,7 +290,7 @@ value give_access_title conf t p =
 value give_access_all_titles conf t =
   do Wserver.wprint "<a href=\"%sm=TT;sm=S;t=%s\">" (commd conf)
        (code_varenv t);
-     Wserver.wprint "%s" (capitale t);
+     Wserver.wprint "%s" (capitale (coa conf t));
      Wserver.wprint "</a>\n";
   return ()
 ;
@@ -282,7 +298,7 @@ value give_access_all_titles conf t =
 value give_access_all_places conf t =
   do Wserver.wprint "<a href=\"%sm=TT;sm=S;p=%s\">" (commd conf)
        (code_varenv t);
-     Wserver.wprint "... %s" t;
+     Wserver.wprint "... %s" (coa conf t);
      Wserver.wprint "</a>\n";
   return ()
 ;
@@ -335,7 +351,7 @@ value print_places_list conf base t list =
 
 value print_places conf base t =
   let (l, t) = select_title base t in
-  let list = Sort.list compare_places l in
+  let list = string_list_uniq (Sort.list compare_places l) in
   match list with
   [ [p] -> print_title_place conf base t p
   | _ -> print_places_list conf base t list ]
@@ -343,7 +359,7 @@ value print_places conf base t =
 
 value print_titles conf base p =
   let (l, p) = select_place base p in
-  let list = Sort.list compare_titles l in
+  let list = string_list_uniq (Sort.list compare_titles l) in
   let title _ = Wserver.wprint "... %s" (coa conf p) in
   do header conf title;
      Wserver.wprint "<ul>\n";
@@ -361,7 +377,8 @@ value print_all_titles conf base =
     Wserver.wprint "%s" (capitale (transl conf "all the titles"))
   in
   let list =
-    let l = select_all_titles conf base in Sort.list compare_titles l
+    let l = select_all_titles conf base in
+    string_list_uniq (Sort.list compare_titles l)
   in
   do header conf title;
      Wserver.wprint "<ul>\n";
@@ -379,7 +396,8 @@ value print_all_places conf base =
     Wserver.wprint "%s" (capitale (transl conf "all the places"))
   in
   let list =
-    let l = select_all_places conf base in Sort.list compare_places l
+    let l = select_all_places conf base in
+    string_list_uniq (Sort.list compare_places l)
   in
   do header conf title;
      Wserver.wprint "<ul>\n";
