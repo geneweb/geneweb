@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.5 2000-03-07 18:05:21 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.6 2000-03-08 16:02:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -12,10 +12,10 @@ value before_date (_, d, _) (_, d1, _) =
   else if d1.year > d.year then False
   else if d1.month < d.month then True
   else if d1.month > d.month then False
+  else if d1.prec > d.prec then True
+  else if d1.prec < d.prec then False
   else if d1.day < d.day then True
   else if d1.day > d.day then False
-  else if d1.prec < d.prec then True
-  else if d1.prec > d.prec then False
   else True
 ;
 
@@ -23,6 +23,14 @@ module Q =
   Pqueue.Make
     (struct
        type t = (Def.person * Def.dmy * Def.calendar);
+       value leq x y = before_date y x;
+     end)
+;
+
+module QF =
+  Pqueue.Make
+    (struct
+       type t = (Def.family * Def.dmy * Def.calendar);
        value leq x y = before_date y x;
      end)
 ;
@@ -50,6 +58,32 @@ value select conf base get_date =
           let e = (p, d, cal) in
           if len < n then loop (Q.add e q) (len + 1) (i + 1)
           else loop (snd (Q.take (Q.add e q))) len (i + 1)
+      | _ -> loop q len (i + 1) ]
+;
+
+value select_family conf base get_date =
+  let n =
+    match p_getint conf.env "k" with
+    [ Some x -> x
+    | _ ->
+        try int_of_string (List.assoc "latest_event" conf.base_env) with
+        [ Not_found | Failure _ -> 20 ] ]
+  in
+  let n = min (max 0 n) base.data.families.len in
+  loop QF.empty 0 0 where rec loop q len i =
+    if i = base.data.families.len then
+      loop [] q where rec loop list q =
+        if QF.is_empty q then (list, len)
+        else
+          let (e, q) = QF.take q in
+          loop [e :: list] q
+    else
+      let p = base.data.families.get i in
+      match get_date p with
+      [ Some (Dgreg d cal) ->
+          let e = (p, d, cal) in
+          if len < n then loop (QF.add e q) (len + 1) (i + 1)
+          else loop (snd (QF.take (QF.add e q))) len (i + 1)
       | _ -> loop q len (i + 1) ]
 ;
 
@@ -133,6 +167,48 @@ value print_death conf base =
                  else ()
              | _ -> () ];
              Wserver.wprint "\n";
+          return month_txt)
+       "" list
+     in ();
+     Wserver.wprint "</ul>\n</ul>\n";
+     trailer conf;
+  return ()
+;
+
+value print_marriage conf base =
+  let (list, len) =
+    select_family conf base (fun fam -> Adef.od_of_codate fam.marriage)
+  in
+  let title _ =
+    Wserver.wprint (fcapitale (ftransl conf "the latest %d marriages")) len
+  in
+  do header conf title;
+     Wserver.wprint "<ul>\n";
+     let _ = List.fold_left
+       (fun last_month_txt (fam, d, cal) ->
+          let month_txt =
+            let d = {(d) with day = 0} in
+            capitale (Date.string_of_date conf (Dgreg d cal))
+          in
+          let cpl = coi base fam.fam_index in
+          do if month_txt <> last_month_txt then
+               do if last_month_txt = "" then ()
+                  else Wserver.wprint "</ul>\n";
+                  Wserver.wprint "<li>%s\n" month_txt;
+                  Wserver.wprint "<ul>\n";
+               return ()
+             else ();
+             Wserver.wprint "<li>\n";
+             Wserver.wprint "<strong>\n";
+             afficher_personne_referencee conf base (poi base cpl.father);
+             Wserver.wprint "</strong>,\n";
+             Wserver.wprint "%s" (transl conf "and");
+             Wserver.wprint "<strong>\n";
+             afficher_personne_referencee conf base (poi base cpl.mother);
+             Wserver.wprint "</strong>,\n";
+             Wserver.wprint "%s <em>%s</em>.\n"
+               (transl_nth conf "married" 1)
+               (Date.string_of_ondate conf (Dgreg d cal));
           return month_txt)
        "" list
      in ();

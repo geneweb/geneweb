@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.16 2000-03-05 17:47:37 ddr Exp $ *)
+(* $Id: family.ml,v 3.17 2000-03-08 16:02:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -374,6 +374,8 @@ value family_m conf base =
       BirthDeath.print_birth conf base
   | Some "LD" when conf.wizard || conf.friend ->
       BirthDeath.print_death conf base
+  | Some "LM" when conf.wizard || conf.friend ->
+      BirthDeath.print_marriage conf base
   | Some "LEX" -> Srcfile.print_lexicon conf base
   | Some "MRG" when conf.wizard ->
       match find_person_in_env conf base "" with

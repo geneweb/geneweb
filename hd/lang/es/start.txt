@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.21 2000-02-24 20:43:17 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.22 2000-03-08 16:02:04 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogía - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -160,7 +160,8 @@ avanzada</b></font></a>.
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>las <a href="%sm=LD">muertes recientes</a>%E%Ih
+<li>las <a href="%sm=LD">muertes recientes</a>
+<li>los <a href="%sm=LM">casamientos más recientes</a>%E%Ih
 <li>la <a href="%sm=HIST;k=10">historia de las actualizaciones</a>%E
 <li>los <a href="%sm=CAL">calendarios</a>
 <li>el <a href="%sm=FORUM">foro de la base de datos</a>
