@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.14 1999-07-17 08:33:58 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.15 1999-07-18 06:42:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -431,7 +431,7 @@ value effective_del conf base p =
   return ()
 ;
 
-value print_mod_ok conf base wl p =
+value print_mod_ok_aux conf base wl p =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "person modified"))
   in
@@ -442,6 +442,11 @@ value print_mod_ok conf base wl p =
      Update.print_warnings conf base wl;
      trailer conf;
   return ()
+;
+
+value print_mod_ok conf base wl p =
+  if wl = [] then Perso.print conf base p
+  else print_mod_ok_aux conf base wl p
 ;
 
 value all_checks_person conf base p a =
@@ -464,7 +469,7 @@ value all_checks_person conf base p a =
   return List.rev wl.val
 ;
 
-value print_add_ok conf base wl p =
+value print_add_ok_aux conf base wl p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "person added")) in
   do header conf title;
      print_link_to_welcome conf True;
@@ -473,6 +478,11 @@ value print_add_ok conf base wl p =
      Update.print_warnings conf base wl;
      trailer conf;
   return ()
+;
+
+value print_add_ok conf base wl p =
+  if wl = [] then Perso.print conf base p
+  else print_add_ok_aux conf base wl p
 ;
 
 value print_del_ok conf base wl =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.12 1999-07-16 13:28:08 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.13 1999-07-18 06:42:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -169,7 +169,7 @@ value print_create_conflict conf base p =
   return raise Update.ModErr
 ;
 
-value insert_person conf base (f, s, o, create) =
+value insert_person conf base src (f, s, o, create) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in
   match create with
@@ -210,7 +210,7 @@ value insert_person conf base (f, s, o, create) =
              burial_src = empty_string;
              family = [| |];
              notes = empty_string;
-             psources = empty_string;
+             psources = Update.insert_string conf base src;
              cle_index = ip}
           and a =
             {parents = None;
@@ -338,10 +338,10 @@ value effective_mod conf base sfam scpl =
   let ofam = foi base fi in
   let ocpl = coi base fi in
   let nfam =
-    map_family_ps (insert_person conf base) (Update.insert_string conf base)
-      sfam
+    map_family_ps (insert_person conf base sfam.fsources)
+      (Update.insert_string conf base) sfam
   in
-  let ncpl = map_couple_p (insert_person conf base) scpl in
+  let ncpl = map_couple_p (insert_person conf base sfam.fsources) scpl in
   let ofath = poi base ocpl.father in
   let omoth = poi base ocpl.mother in
   let nfath = poi base ncpl.father in
@@ -423,10 +423,10 @@ value effective_mod conf base sfam scpl =
 value effective_add conf base sfam scpl =
   let fi = Adef.ifam_of_int (base.data.families.len) in
   let nfam =
-    map_family_ps (insert_person conf base) (Update.insert_string conf base)
-      sfam
+    map_family_ps (insert_person conf base sfam.fsources)
+      (Update.insert_string conf base) sfam
   in
-  let ncpl = map_couple_p (insert_person conf base) scpl in
+  let ncpl = map_couple_p (insert_person conf base sfam.fsources) scpl in
   let origin_file = infer_origin_file conf base ncpl nfam in
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
@@ -545,7 +545,7 @@ value print_family conf base wl fam cpl =
   return ()
 ;
 
-value print_mod_ok conf base wl fam cpl =
+value print_mod_ok_aux conf base wl fam cpl =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "family modified"))
   in
@@ -556,7 +556,15 @@ value print_mod_ok conf base wl fam cpl =
   return ()
 ;
 
-value print_add_ok conf base wl fam cpl =
+value print_mod_ok conf base wl fam cpl =
+  if wl = [] then
+    match p_getenv conf.env "ip" with
+    [ Some ip -> Perso.print conf base (base.data.persons.get (int_of_string ip))
+    | None -> print_mod_ok_aux conf base wl fam cpl ]
+  else print_mod_ok_aux conf base wl fam cpl
+;
+
+value print_add_ok_aux conf base wl fam cpl =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "family added"))
   in
@@ -567,7 +575,15 @@ value print_add_ok conf base wl fam cpl =
   return ()
 ;
 
-value print_del_ok conf base wl =
+value print_add_ok conf base wl fam cpl =
+  if wl = [] then
+    match p_getenv conf.env "i" with
+    [ Some ip -> Perso.print conf base (base.data.persons.get (int_of_string ip))
+    | None -> print_add_ok_aux conf base wl fam cpl ]
+  else print_add_ok_aux conf base wl fam cpl
+;
+
+value print_del_ok_aux conf base wl =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "family deleted"))
   in
@@ -578,7 +594,16 @@ value print_del_ok conf base wl =
   return ()
 ;
 
-value print_swi_ok conf base p =
+value print_del_ok conf base wl =
+  if wl = [] then
+    match p_getenv conf.env "ip" with
+    [ Some ip -> Perso.print conf base (base.data.persons.get (int_of_string ip))
+    | None -> print_del_ok_aux conf base wl ]
+  else print_del_ok_aux conf base wl
+;
+
+(*
+value print_swi_ok_aux conf base p =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "switch done"))
   in
@@ -588,6 +613,11 @@ value print_swi_ok conf base p =
      Wserver.wprint "\n";
      trailer conf;
   return ()
+;
+*)
+
+value print_swi_ok conf base p =
+  Perso.print conf base p
 ;
 
 value delete_topological_sort conf base =

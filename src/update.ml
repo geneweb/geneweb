@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.10 1999-07-16 13:28:07 ddr Exp $ *)
+(* $Id: update.ml,v 2.11 1999-07-18 06:42:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -545,8 +545,8 @@ value print_family_stuff conf base p a =
          let c = spouse p (coi base fi) in
          do Wserver.wprint "\n";
             html_li conf;
-            Wserver.wprint "<a href=\"%sm=MOD_FAM;i=%d\">" (commd conf)
-              (Adef.int_of_ifam fi);
+            Wserver.wprint "<a href=\"%sm=MOD_FAM;i=%d;ip=%d\">" (commd conf)
+              (Adef.int_of_ifam fi) (Adef.int_of_iper p.cle_index);
             let s = transl_nth conf "family/families" 0 in
             Wserver.wprint "%s</a>\n"
               (capitale (transl_decline conf "modify" s));
@@ -554,8 +554,8 @@ value print_family_stuff conf base p a =
             print_someone conf base (poi base c);
             Wserver.wprint "\n";
             html_li conf;
-            Wserver.wprint "<a href=\"%sm=DEL_FAM;i=%d\">" (commd conf)
-              (Adef.int_of_ifam fi);
+            Wserver.wprint "<a href=\"%sm=DEL_FAM;i=%d;ip=%d\">" (commd conf)
+              (Adef.int_of_ifam fi) (Adef.int_of_iper p.cle_index);
             let s = transl_nth conf "family/families" 0 in
             Wserver.wprint "%s</a>\n"
               (capitale (transl_decline conf "delete" s));
