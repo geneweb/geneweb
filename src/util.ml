@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.22 1999-01-11 14:36:02 ddr Exp $ *)
+(* $Id: util.ml,v 1.23 1999-01-11 15:05:32 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -437,9 +437,12 @@ value transl_nth conf w n =
   [ Not_found -> "[" ^ nth_field w n ^ "]" ]
 ;
 
-value accusative conf s =
+value decl = " +decl";
+value decl_len = String.length decl;
+
+value decline conf s =
   try
-    let a = Hashtbl.find conf.lexicon " +acc" in
+    let a = Hashtbl.find conf.lexicon decl in
     let (start, dest) =
       let i = String.index a '=' in
       (String.sub a 0 i, String.sub a (i + 1) (String.length a - i - 1))
@@ -458,15 +461,15 @@ value accusative conf s =
   with [ Not_found -> s ]
 ;
 
-value transl_concat conf w s =
+value transl_decline conf w s =
   let wt = transl conf w in
   if wt.[String.length wt - 1] = ''' then
     if String.length s > 0 && start_with_vowel s then nth_field wt 1 ^ s
     else nth_field wt 0 ^ " " ^ s
-  else if String.length wt > 6
-  && String.sub wt (String.length wt - 5) 5 = " +acc" then
-    String.sub wt 0 (String.length wt - 5) ^
-      (if s = "" then "" else " " ^ accusative conf s)
+  else if String.length wt > decl_len
+  && String.sub wt (String.length wt - decl_len) decl_len = decl then
+    String.sub wt 0 (String.length wt - decl_len) ^
+      (if s = "" then "" else " " ^ decline conf s)
   else wt ^ " " ^ s
 ;
 
@@ -624,12 +627,12 @@ value print_parent conf base p a =
   [ n when sou base n <> "" ->
       let n = sou base n in
       do Wserver.wprint "%s %s" (transl_nth conf "son/daughter/child" is)
-           (transl_concat conf "of" n);
+           (transl_decline conf "of" n);
          afficher_titre conf base a;
       return ()
   | _ ->
       Wserver.wprint "%s %s%s" (transl_nth conf "son/daughter/child" is)
-        (transl_concat conf "of" (coa conf (sou base a.first_name)))
+        (transl_decline conf "of" (coa conf (sou base a.first_name)))
         (if p.surname <> a.surname then " " ^ coa conf (sou base a.surname)
          else "") ]
 ;
@@ -669,7 +672,7 @@ value preciser_homonyme conf base p =
               if Array.length ct > 0 then
                 let enfant = poi base ct.(0) in
                 Wserver.wprint "%s %s%s" (transl_nth conf "father/mother" is)
-                  (transl_concat conf "of"
+                  (transl_decline conf "of"
                      (coa conf (sou base enfant.first_name)))
                   (if p.surname <> enfant.surname then
                      " " ^ coa conf (sou base enfant.surname)
@@ -680,7 +683,7 @@ value preciser_homonyme conf base p =
                    sou base conjoint.surname <> "?" then
                   Wserver.wprint "%s %s %s"
                     (transl_nth conf "husband/wife" is)
-                    (transl_concat conf "of"
+                    (transl_decline conf "of"
                        (coa conf (sou base conjoint.first_name)))
                     (coa conf (sou base conjoint.surname))
                 else loop (i + 1)

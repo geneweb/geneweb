@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 1.8 1999-01-11 14:35:55 ddr Exp $ *)
+(* $Id: cousins.ml,v 1.9 1999-01-11 15:05:25 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -166,7 +166,7 @@ value rec print_descend_upto conf base ini_p ini_br lev children =
                       else
                         do Wserver.wprint "%s %s "
                              (capitale (transl_nth conf "child/children" 1))
-                             (transl_concat conf "of" "");
+                             (transl_decline conf "of" "");
                            afficher_personne_titre conf base p;
                            Wserver.wprint ":";
                         return ();
@@ -240,7 +240,7 @@ value print_cousins conf base p lev =
          if h then person_text_no_html conf base p
          else person_text conf base p
        in
-       Wserver.wprint "%s" (transl_concat conf "of" txt);
+       Wserver.wprint "%s" (transl_decline conf "of" txt);
     return ()
   in
   do header conf title;
@@ -262,7 +262,7 @@ value print_menu conf base p effective_level =
          if h then person_text_no_html conf base p
          else person_text conf base p
        in
-       Wserver.wprint "%s" (transl_concat conf "of" txt);
+       Wserver.wprint "%s" (transl_decline conf "of" txt);
     return ()
   in
   do header conf title;
