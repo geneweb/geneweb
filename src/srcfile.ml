@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.22 1999-10-27 13:14:24 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.23 1999-10-27 15:06:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -182,7 +182,8 @@ value rec copy_from_channel conf base ic =
                   try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
                   [ Not_found -> "" ]
                 in
-                do Wserver.wprint " %s" (body_prop conf);
+                let s = s ^ " " ^ body_prop conf in
+                do Wserver.wprint "%s" s;
                    List.iter (fun t -> Wserver.wprint "><%s" t)
                      (Util.enclosing_tags conf);
                 return ()
