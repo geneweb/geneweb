@@ -1,4 +1,4 @@
-(* $Id: adef.mli,v 2.2 1999-09-14 22:33:41 ddr Exp $ *)
+(* $Id: adef.mli,v 2.3 1999-09-16 09:31:39 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = 'a;
@@ -20,7 +20,8 @@ and dmy =
   { day : int;
     month : int;
     year : int;
-    prec : precision }
+    prec : precision;
+    delta : int }
 and precision =
   [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
 ;

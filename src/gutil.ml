@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.24 1999-09-14 22:33:48 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.25 1999-09-16 09:31:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -111,36 +111,36 @@ value temps_ecoule d1 d2 =
   let prec = common_prec d1.prec d2.prec in
   match d1 with
   [ {day = 0; month = 0; year = a1} ->
-      {day = 0; month = 0; year = d2.year - a1; prec = prec}
+      {day = 0; month = 0; year = d2.year - a1; prec = prec; delta = 0}
   | {day = 0; month = m1; year = a1} ->
       match d2 with
       [ {day = 0; month = 0; year = a2} ->
-          {day = 0; month = 0; year = a2 - a1; prec = prec}
+          {day = 0; month = 0; year = a2 - a1; prec = prec; delta = 0}
       | {day = 0; month = m2; year = a2} ->
           let r = 0 in
           let (mois, r) =
             if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
           in
           let annee = a2 - a1 - r in
-          {day = 0; month = mois; year = annee; prec = prec}
+          {day = 0; month = mois; year = annee; prec = prec; delta = 0}
       | {day = j2; month = m2; year = a2} ->
           let r = 0 in
           let (mois, r) =
             if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
           in
           let annee = a2 - a1 - r in
-          {day = 0; month = mois; year = annee; prec = prec} ]
+          {day = 0; month = mois; year = annee; prec = prec; delta = 0} ]
   | {day = j1; month = m1; year = a1} ->
       match d2 with
       [ {day = 0; month = 0; year = a2} ->
-          {day = 0; month = 0; year = a2 - a1; prec = prec}
+          {day = 0; month = 0; year = a2 - a1; prec = prec; delta = 0}
       | {day = 0; month = m2; year = a2} ->
           let r = 0 in
           let (mois, r) =
             if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
           in
           let annee = a2 - a1 - r in
-          {day = 0; month = mois; year = annee; prec = prec}
+          {day = 0; month = mois; year = annee; prec = prec; delta = 0}
       | {day = j2; month = m2; year = a2} ->
           let (jour, r) =
             if j1 <= j2 then (j2 - j1, 0)
@@ -150,7 +150,7 @@ value temps_ecoule d1 d2 =
             if m1 + r <= m2 then (m2 - m1 - r, 0) else (m2 - m1 - r + 12, 1)
           in
           let annee = a2 - a1 - r in
-          {day = jour; month = mois; year = annee; prec = prec} ] ]
+          {day = jour; month = mois; year = annee; prec = prec; delta = 0} ] ]
 ;
 
 value annee d = d.year;
@@ -852,3 +852,25 @@ value map_family_ps fp fs fam =
 value map_couple_p fp fam =
   {father = fp fam.father; mother = fp fam.mother}
 ;
+
+(*
+value string_of_place p =
+  loop "" 0 where rec loop s i =
+    if i == Array.length p then s
+    else if s = "" then loop p.(i) (i + 1)
+    else s ^ "," ^ loop p.(i) (i + 1)
+;
+
+value place_of_string s =
+  loop [] 0 0 where rec loop list ibeg i =
+    if i == String.length s then
+      let list =
+        if i == ibeg then list else [String.sub s ibeg (i - ibeg) :: list]
+      in
+      Array.of_list (List.rev list)
+    else if s.[i] == ',' then
+      let list = [String.sub s ibeg (i - ibeg) :: list] in
+      loop list (i + 1) (i + 1)
+    else loop list ibeg (i + 1)
+;
+*)

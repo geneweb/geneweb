@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 2.7 1999-09-14 22:33:57 ddr Exp $ *)
+(* $Id: title.ml,v 2.8 1999-09-16 09:31:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -12,8 +12,8 @@ type date_search = [ JustSelf | AddSpouse | AddChildren ];
 value infinity = 10000;
 
 value date_interval conf base t x =
-  let d1 = ref {day = 0; month = 0; year = infinity; prec = Sure} in
-  let d2 = ref {day = 0; month = 0; year = 0; prec = Sure} in
+  let d1 = ref {day = 0; month = 0; year = infinity; prec = Sure; delta = 0} in
+  let d2 = ref {day = 0; month = 0; year = 0; prec = Sure; delta = 0} in
   let found = ref False in
   do let rec loop t x =
        let set d =

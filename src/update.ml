@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.22 1999-09-14 22:33:58 ddr Exp $ *)
+(* $Id: update.ml,v 2.23 1999-09-16 09:31:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -456,16 +456,16 @@ value reconstitute_date_dmy conf var =
       [ Some m ->
           match get_number var "dd" conf.env with
           [ Some d ->
-              let d = {day = d; month = m; year = y; prec = prec} in
+              let d = {day = d; month = m; year = y; prec = prec; delta = 0} in
               if d.day >= 1 && d.day <= 31 && d.month >= 1
               && d.month <= 13 then
                 Some d
               else bad_date conf d
           | None ->
-              let d = {day = 0; month = m; year = y; prec = prec} in
+              let d = {day = 0; month = m; year = y; prec = prec; delta = 0} in
               if d.month >= 1 && d.month <= 13 then Some d
               else bad_date conf d ]
-      | None -> Some {day = 0; month = 0; year = y; prec = prec} ]
+      | None -> Some {day = 0; month = 0; year = y; prec = prec; delta = 0} ]
   | None -> None ]
 ;
 
