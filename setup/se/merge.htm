@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright 2001 INRIA - GeneWeb -->
+<head><title>Sammanslagning av databaser</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>
+Sammanslagning av databaser
+</font></h1></center>
+
+<form mode=GET action = "merge">
+<input type=hidden name=lang value=$l>
+
+Alla databaser som ska slås samman måste finnas under
+<b><font color=#2f6400>GeneWeb</font></b>.
+
+<p>
+
+Om det inte är så, om till exempel, någon av dem bara är GEDCOM
+filer eller GeneWeb källfiler, gå tilbaka till <a
+href = "gwsetup?lang=$l;v=main.htm">huvudmenyn</a> för att skapa dem
+under <b><font color=#2f6400>GeneWeb</font></b>, gå sedan tillbaka
+till denna sida.
+
+<p>
+
+När du är klar, välj de databaser du vill slå samman genom att klicka
+i deras knappar:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr>
+<td><a href = "http://localhost:2317/$a">$a</a></td>
+<td><input type=checkbox name="$a" value="on_"></td>
+</tr>|
+<tr><td>- det finns ingen databas för närvarande</tr></td>}
+</table></dl>
+
+<p>
+
+Skriv namnet du vill ge din databas:
+
+<p>
+
+<input name=o size=30>
+
+<p>
+
+Tryck sedan denna knapp:
+
+<p>
+
+<input type=submit value="Slåsamman">
+
+</form>
+
+<p>
+
+Obs: sammanslagningen lägger helt enkelt ihop databaserna. Det
+är ingen kontroll av identiska personer. Efter sammanslagningen, måste du därför
+undersöka möjligheten att det finns dubbla personer eller familjer och slå ihop dem.
+Se <a href = "file://$w/doc/$l/update.htm#MrgP">dokumentationen</a>.
+

@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright 2001 INRIA - GeneWeb -->
+<head><title>Sammanslagning av databaser</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>
+Sammanslagning av databaser
+</font></h1></center>
+
+<p><p>
+
+<form mode=GET action = "merge_1">
+<input type=hidden name=lang value=$l>
+</form>
+
+<p>
+
+$v{<b>Varning</b>: det finns redan en databas med namnet "$o" i din
+<a href = "gwsetup?lang=$l;v=list.htm">katalog</a>. Om du trycker knappen
+"OK" nedan, kommer den att raderas.<p>
+
+Om du just gjorde detta, är den nu nog raderad och därför är det
+inte viktigt. Annars, återvänd till föregående sida och välj ett annat
+namn för din databas.<p>}
+
+<p>
+
+Vi ska skapa en databas med namn "$o" från de följande databaser:
+
+<ul>
+$s{<li>$a</b>|}
+</ul>
+
+<p>
+
+Obs: denna operation kan gå blixtsnabbt eller ta tiotalet
+sekunder eller flera minuter, beroende på fallet. Ha tålamod.
+
+
+<p>
+
+Klicka knappen nedan för att skapa din databas$v{ och skriva över den
+tidigare databasen "$o" i mål katalogen}:
+
+<p>
+
+<form mode=GET action = "merge_1">
+$h
+<dl><dt><dd><input type=submit value="OK"></dl>
+</form>
+
+<p>
+
+Denna operation motsvarar de följande kommandona:
+
+<pre>
+     $$ cd $w
+$s{     $$ .$/gwu $a -o $a.gw|}     $$ .$/gwc $s{-sep $a.gw |}\-f -o $o
+</pre>
