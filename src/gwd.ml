@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.33 2000-05-10 14:04:00 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.34 2000-05-10 14:25:45 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -70,7 +70,7 @@ value log oc tm conf from gauth request s =
        else ();
      output_char oc '\n';
      Printf.fprintf oc "  From: %s\n" from;
-     if gauth <> "" then Printf.fprintf oc "  User: %s\n" gauth else ();
+     if gauth <> "" then Printf.fprintf oc "  User-g: %s\n" gauth else ();
      if conf.user <> "" then Printf.fprintf oc "  User: %s\n" conf.user
      else ();
      Printf.fprintf oc "  Agent: %s\n" user_agent;
@@ -782,7 +782,15 @@ value auth_err request auth_file =
           in
           try
             loop () where rec loop () =
-              if auth = input_line ic then do close_in ic; return (False, auth)
+              if auth = input_line ic then do close_in ic; return
+                let s =
+                  try
+                    let i = String.rindex auth ':' in
+                    String.sub auth 0 i
+                  with
+                  [ Not_found -> "..." ]
+                in
+                (False, s)
               else loop ()
           with
           [ End_of_file -> do close_in ic; return (True, auth) ]
