@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.201 2000-12-26 14:58:08 ddr Exp $
+# $Id: lexicon.txt,v 3.202 2000-12-26 16:19:23 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3890,6 +3890,7 @@ eo: mesagxo/sekvanta mesagxo
 es: mensaje/siguiente mensaje
 fi: viesti/seuraava viesti
 fr: message/message suivant
+he:  äåãòä / äåãòä äáàä
 is: skilaboğ/næstu skilaboğ
 it: messaggio/prossimo messaggio
 nl: bericht/volgend bericht
