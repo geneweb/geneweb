@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.20 2000-12-19 16:25:07 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.21 2000-12-19 16:44:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -599,6 +599,23 @@ value print_notes conf base p =
   return ()
 ;
 
+value if_propose conf base var f p proj =
+  let propose_var =
+    try List.assoc ("propose_" ^ var) conf.base_env <> "no" with
+    [ Not_found -> True ]
+  in
+  if propose_var then do f conf base p; Wserver.wprint "\n"; return ()
+  else
+    let _ = List.fold_left
+      (fun i_cnt a ->
+         do Wserver.wprint "<input type=hidden name=%s%d value=\"%s\">\n"
+              var i_cnt (quote_escaped a);
+        return i_cnt + 1)
+      0 proj
+    in
+    ()
+;
+
 value print_person conf base p =
   do tag "table" "border=1" begin
        print_first_name conf base p;
@@ -613,26 +630,8 @@ value print_person conf base p =
      html_br conf;
      Wserver.wprint "\n";
      tag "table" "border=1" begin
-       print_qualifiers conf base p;
-       Wserver.wprint "\n";
-       let propose_alias =
-         try List.assoc "propose_alias" conf.base_env <> "no" with
-         [ Not_found -> True ]
-       in
-       if propose_alias then
-         do print_aliases conf base p;
-            Wserver.wprint "\n";
-         return ()
-       else
-         let _ = List.fold_left
-           (fun i_cnt a ->
-              do Wserver.wprint
-                   "<input type=hidden name=alias%d value=\"%s\">\n"
-                   i_cnt (quote_escaped a);
-              return i_cnt + 1)
-           0 p.aliases
-         in
-         ();
+       if_propose conf base "qualifier" print_qualifiers p p.qualifiers;
+       if_propose conf base "alias" print_aliases p p.aliases;
        print_first_names_aliases conf base p;
        Wserver.wprint "\n";
        print_surnames_aliases conf base p;
