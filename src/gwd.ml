@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.43 2000-06-20 14:30:30 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.44 2000-07-12 17:40:56 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -517,15 +517,26 @@ value set_token utm from_addr base_file acc =
   | Refuse -> "" ]
 ;
 
-value check_file_name s =
-  for i = 0 to String.length s - 1 do
-    match s.[i] with
-    [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '-' -> ()
-    | _ ->
-        do Wserver.html "";
-           Wserver.wprint "<body>Incorrect data base name</body>\n";
-        return raise Exit ];
-  done
+value check_file_name cgi request s =
+  loop 0 where rec loop i =
+    if i == String.length s then ()
+    else
+      match s.[i] with
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '-' -> loop (i + 1)
+      | _ ->
+          let s = String.sub s 0 i in
+          let req =
+            "http://" ^ Util.get_server_string_aux cgi request ^ "/" ^ s ^ "?"
+          in
+          do Wserver.html "";
+             Wserver.wprint "\
+<head>
+<meta http-equiv=\"REFRESH\"
+ content=\"1;URL=%s\">
+</head>
+<body>
+<a href=\"%s\">%s</a>\n</body>\n" req req req;
+          return raise Exit ]
 ;
 
 value make_conf cgi from_addr (addr, request) str env =
@@ -546,7 +557,7 @@ value make_conf cgi from_addr (addr, request) str env =
           Filename.chop_suffix s ".gwb"
         else s
       in
-      do check_file_name s; return s
+      do check_file_name cgi request s; return s
     in
     let (passwd, env, access_type) =
       let has_passwd = List.mem_assoc "w" env in
