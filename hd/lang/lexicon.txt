@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.30 1999-12-02 10:58:18 ddr Exp $
+# $Id: lexicon.txt,v 3.31 1999-12-10 12:45:48 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2178,7 +2178,7 @@ fi: kasvatusis&auml;/kasvatus&auml;iti/kasvatusvanhemmat
 fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
 he:   אב חורג/ אם חורגת/ הורים חורגים
 no: fosterfar/fostermor/fosterforeldre
-se: fosterfar/fostermor/fosterf&ouml;r&auml;lder
+se: fosterfar/fostermor/fosterf&ouml;r&auml;ldrar
 
     foster son/foster daughter/foster child
 dk: plejes&oslash;n/plejedatter/plejebarn
