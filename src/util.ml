@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.53 2000-06-20 13:47:26 ddr Exp $ *)
+(* $Id: util.ml,v 3.54 2000-06-21 23:28:57 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -100,14 +100,54 @@ value commd_no_params conf =
     "" conf.henv
 ;
 
-value hidden_env conf =
-  List.iter
-    (fun (k, v) -> Wserver.wprint "<input type=hidden name=%s value=%s>\n" k v)
-    (conf.henv @ conf.senv)
-;
-
 value code_varenv = Wserver.encode;
 value decode_varenv = Wserver.decode;
+
+value quote_escaped s =
+  let rec need_code i =
+    if i < String.length s then
+      match s.[i] with
+      [ '"' | '&' | '<' | '>' -> True
+      | x -> need_code (succ i) ]
+    else False
+  in
+  let rec compute_len i i1 =
+    if i < String.length s then
+      let i1 =
+        match s.[i] with
+        [ '"' -> i1 + 6
+        | '&' -> i1 + 5
+        | '<' | '>' -> i1 + 4
+        | _ -> succ i1 ]
+      in
+      compute_len (succ i) i1
+    else i1
+  in
+  let rec copy_code_in s1 i i1 =
+    if i < String.length s then
+      let i1 =
+        match s.[i] with
+        [ '"' -> do String.blit "&#034;" 0 s1 i1 6; return i1 + 6
+        | '&' -> do String.blit "&amp;" 0 s1 i1 5; return i1 + 5
+        | '<' -> do String.blit "&lt;" 0 s1 i1 4; return i1 + 4
+        | '>' -> do String.blit "&gt;" 0 s1 i1 4; return i1 + 4
+        | c -> do s1.[i1] := c; return succ i1 ]
+      in
+      copy_code_in s1 (succ i) i1
+    else s1
+  in
+  if need_code 0 then
+    let len = compute_len 0 0 in copy_code_in (String.create len) 0 0
+  else s
+;
+
+value hidden_env conf =
+  List.iter
+    (fun (k, v) ->
+       Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" k
+         (quote_escaped (decode_varenv v)))
+    (conf.henv @ conf.senv)
+;
 
 value p_getenv env label =
   try Some (decode_varenv (List.assoc (decode_varenv label) env)) with
@@ -1262,44 +1302,6 @@ value find_person_in_env conf base suff =
           with
           [ Not_found -> None ]
       | _ -> None ] ]
-;
-
-value quote_escaped s =
-  let rec need_code i =
-    if i < String.length s then
-      match s.[i] with
-      [ '"' | '&' | '<' | '>' -> True
-      | x -> need_code (succ i) ]
-    else False
-  in
-  let rec compute_len i i1 =
-    if i < String.length s then
-      let i1 =
-        match s.[i] with
-        [ '"' -> i1 + 6
-        | '&' -> i1 + 5
-        | '<' | '>' -> i1 + 4
-        | _ -> succ i1 ]
-      in
-      compute_len (succ i) i1
-    else i1
-  in
-  let rec copy_code_in s1 i i1 =
-    if i < String.length s then
-      let i1 =
-        match s.[i] with
-        [ '"' -> do String.blit "&#034;" 0 s1 i1 6; return i1 + 6
-        | '&' -> do String.blit "&amp;" 0 s1 i1 5; return i1 + 5
-        | '<' -> do String.blit "&lt;" 0 s1 i1 4; return i1 + 4
-        | '>' -> do String.blit "&gt;" 0 s1 i1 4; return i1 + 4
-        | c -> do s1.[i1] := c; return succ i1 ]
-      in
-      copy_code_in s1 (succ i) i1
-    else s1
-  in
-  if need_code 0 then
-    let len = compute_len 0 0 in copy_code_in (String.create len) 0 0
-  else s
 ;
 
 value get_server_string conf =

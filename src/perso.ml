@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.30 2000-06-20 21:54:11 ddr Exp $ *)
+(* $Id: perso.ml,v 3.31 2000-06-21 23:28:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -446,11 +446,12 @@ value print_family conf base p a ifam =
   do Wserver.wprint "\n";
      html_li conf;
      let format = relation_txt conf p.sex fam in
+     Wserver.wprint (fcapitale format)
+       (fun _ -> if auth then print_marriage_text conf base True fam else ());
      let txt =
        gen_referenced_person_title_text raw_access conf base (poi base ispouse)
      in
-     Wserver.wprint (fcapitale (fdecline conf format txt))
-       (fun _ -> if auth then print_marriage_text conf base True fam else ());
+     Wserver.wprint " %s" txt;
      Date.afficher_dates_courtes conf base (poi base ispouse);
      if Array.length fam.witnesses > 0 then
        do Wserver.wprint "\n(";
