@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.17 1999-05-06 21:25:14 ddr Exp $ *)
+(* $Id: setup.ml,v 1.18 1999-05-07 07:52:34 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -296,6 +296,7 @@ value rec copy_from_stream conf print strm =
           | 'p' -> print (parameters conf.env)
           | 'q' -> print Version.txt
           | 'r' -> print_specific_file conf print "gwd.arg" strm
+          | 't' -> print_if conf print (ifdef UNIX then False else True) strm
           | 'u' -> print (Filename.dirname (Sys.getcwd ()))
           | 'v' ->
               let out = strip_spaces (s_getenv conf.env "o") in
