@@ -8,6 +8,8 @@ GeneWeb Version 3.05
   - [07 May 00] The files CHANGES and LICENSE now end with .txt.
 
 * GeneWeb daemon/CGI (gwd)
+  - [17 May 00] Fixed problem of the request "robots.txt": the end lines
+    were not "ctrl-m ctrl-j" (\r\n) but "ctrl-o ctrl-j".
   - [14 May 00] Does not fail any more ("document contains no data") when
     the "cnt" directory has no access permissions.
   - [10 May 00] Changed traces when wizards, friends, global accesses.
