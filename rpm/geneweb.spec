@@ -1,3 +1,4 @@
+# $Id: geneweb.spec,v 1.4 1999-09-01 19:50:51 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -41,7 +42,7 @@ It uses very efficient techniques of relationship and consanguinity computing.
 GeneWeb est un logiciel de généalogie doté d'une interface Web,
 utilisable aussi bien sur un ordinateur non connecté au réseau qu'en
 service Web. Il utilise des techniques de calcul de parenté et de
-consanguinité extrêmement efficaces.
+consanguinité très efficaces.
 
 # *********** BUILDING .RPM *************
 # Now come the header lines that describe how to build the application
@@ -61,7 +62,7 @@ find . -name CVS -print | /usr/bin/xargs /bin/rm -rf
 
 # %build: how to compile
 %build
-make out
+make opt
 make distrib
 
 # %install: after compiling.  put the geneweb distrib folder
