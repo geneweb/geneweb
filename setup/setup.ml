@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.1 1999-10-30 19:50:22 ddr Exp $ *)
+(* $Id: setup.ml,v 3.2 1999-11-07 17:44:38 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -15,6 +15,17 @@ value store len x =
   return succ len
 ;
 value get_buff len = String.sub buff.val 0 len;
+
+value slashify s =
+  let s1 = String.copy s in
+  do for i = 0 to String.length s - 1 do
+       s1.[i] :=
+         match s.[i] with
+         [ '\\' -> '/'
+         | x -> x ];
+     done;
+  return s1
+;
 
 value quote_escaped s =
   let rec need_code i =
@@ -97,7 +108,7 @@ value trailer conf =
        Wserver.wprint "
 <img src=\"file://%s/images/gwlogo.gif\"
  width=64 height=72 align=right>\n<br>\n"
-         (Sys.getcwd ());
+         (slashify (Sys.getcwd ()));
      Wserver.wprint "
 <hr><font size=-1><em>(c) Copyright INRIA 1999 -
 GeneWeb %s</em></font>" Version.txt;
@@ -320,7 +331,7 @@ value rec copy_from_stream conf print strm =
           | 'v' ->
               let out = strip_spaces (s_getenv conf.env "o") in
               print_if conf print (Sys.file_exists (out ^ ".gwb")) strm
-          | 'w' -> print (Sys.getcwd ())
+          | 'w' -> print (slashify (Sys.getcwd ()))
           | 'y' -> for_all conf print (all_db (s_getenv conf.env "anon")) strm
           | 'z' -> print (string_of_int port.val)
           | '$' -> print "$"
