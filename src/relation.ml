@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.32 2000-01-02 03:36:43 ddr Exp $ *)
+(* $Id: relation.ml,v 3.33 2000-01-02 08:04:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -194,6 +194,7 @@ value print_menu conf base p =
  *)
 type famlink = [ Self | Parent | Sibling | HalfSibling | Mate | Child ];
 
+(*
 value print_relation_path_list conf base path =
   do Wserver.wprint "<p>%s :\n" (capitale (transl conf "shortest path"));
      tag "ol" begin
@@ -367,6 +368,7 @@ value print_relation_path_table conf base path =
      end;
   return ()
 ;
+*)
 
 open Dag2html;
 
@@ -465,12 +467,16 @@ return ();
 value print_relation_path conf base path =
   if path == [] then ()
   else
+(*
     match p_getenv conf.env "dag" with
     [ Some "off" ->
         do print_relation_path_list conf base path;
            print_relation_path_table conf base path;
         return ()
     | _ -> print_relation_path_dag conf base path ]
+*)
+    print_relation_path_dag conf base path
+(**)
 ;
 
 type node = [ NotVisited | Visited of (bool * iper * famlink) ];
@@ -596,7 +602,13 @@ value print_relation_with_alliance conf base ip1 ip2 =
      mark_per.(Adef.int_of_iper ip1) := Visited (True, ip1, Self);
      mark_per.(Adef.int_of_iper ip2) := Visited (False, ip2, Self);
      if try width_search [ip1] 0 [ip2] 0 with [ FoundLink -> False ] then
-       Wserver.wprint "XXX"
+       let p1 = poi base ip1 in
+       let p2 = poi base ip2 in
+       Wserver.wprint "%s\n"
+         (capitale
+            (cftransl conf "no known relationship link between %s and %s"
+               [gen_referenced_person_title_text raw_access conf base p1;
+                gen_referenced_person_title_text raw_access conf base p2]))
      else ();
      trailer conf;
   return ()
