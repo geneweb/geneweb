@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.4 1998-09-29 12:22:37 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.5 1998-09-29 16:12:17 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -116,13 +116,12 @@ value rindex s c =
 value line_cnt = ref 0;
 
 value input_a_line ic =
-  let x = input_line ic in
+  let x = Ansel.of_iso_8859_1 (input_line ic) in
   do incr line_cnt; return x
 ;
 
 value rec input_real_line ic =
-  let x = input_line ic in
-  do incr line_cnt; return
+  let x = input_a_line ic in
   if x = "" || x.[0] == '#' then input_real_line ic else x
 ;
 

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 1.1.1.1 1998-09-01 14:32:06 ddr Exp $ *)
+(* $Id: util.mli,v 1.2 1998-09-29 16:12:27 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -77,3 +77,6 @@ value find_person_in_env : config -> base -> string -> option base_person;
 
 value quote_escaped : string -> string;
 value rindex : string -> char -> option int;
+
+value charset_of_ansel : config -> string -> string;
+value coa : config -> string -> string;

@@ -1,4 +1,4 @@
-(* $Id: ansel.ml,v 1.2 1998-09-29 13:10:41 ddr Exp $ *)
+(* $Id: ansel.ml,v 1.1 1998-09-29 16:12:14 ddr Exp $ *)
 
 value no_accent =
   fun
@@ -21,14 +21,15 @@ value no_accent =
   | c -> c ]
 ;
 
-value encode s =
+value of_iso_8859_1 s =
   let len =
     loop 0 0 where rec loop i len =
       if i == String.length s then len
       else
         match s.[i] with
         [ 'À'..'Å' | 'Ç'.. 'Ï' | 'Ñ'..'Ö' | 'Ù'..'İ'
-        | 'à'..'å' | 'ç'.. 'ï' | 'ñ'..'ö' | 'ù'..'ı' -> loop (i + 1) (len + 2)
+        | 'à'..'å' | 'ç'.. 'ï' | 'ñ'..'ö' | 'ù'..'ı' | 'ÿ' ->
+            loop (i + 1) (len + 2)
         | _ -> loop (i + 1) (len + 1) ]
   in
   if len == String.length s then s
@@ -57,6 +58,9 @@ value encode s =
           | 'Ä' | 'Ë' | 'Ï' | 'Ö' | 'Ü'
           | 'ä' | 'ë' | 'ï' | 'ö' | 'ü' | 'ÿ' ->
               do s'.[i'] := Char.chr 232; s'.[i'+1] := no_accent s.[i];
+              return i' + 1
+          | 'Å' | 'å' ->
+              do s'.[i'] := Char.chr 234; s'.[i'+1] := no_accent s.[i];
               return i' + 1
           | 'Ç' | 'ç' ->
               do s'.[i'] := Char.chr 240; s'.[i'+1] := no_accent s.[i];
@@ -98,7 +102,7 @@ value acute =
   | x -> x ]
 ;
 
-value circ =
+value circum =
   fun
   [ 'a' -> 'â'
   | 'e' -> 'ê'
@@ -128,6 +132,13 @@ value uml =
   | x -> x ]
 ;
 
+value circle =
+  fun
+  [ 'a' -> 'å'
+  | 'A' -> 'Å'
+  | x -> x ]
+;
+
 value tilde =
   fun
   [ 'a' -> 'ã'
@@ -146,7 +157,7 @@ value cedil =
   | x -> x ]
 ;
 
-value decode s =
+value to_iso_8859_1 s =
   let len =
     loop 0 0 where rec loop i len =
       if i == String.length s then len
@@ -168,9 +179,10 @@ value decode s =
           match Char.code s.[i] with
           [ 225 -> do s'.[i'] := grave s.[i+1]; return i + 1
           | 226 -> do s'.[i'] := acute s.[i+1]; return i + 1
-          | 227 -> do s'.[i'] := circ s.[i+1]; return i + 1
+          | 227 -> do s'.[i'] := circum s.[i+1]; return i + 1
           | 228 -> do s'.[i'] := tilde s.[i+1]; return i + 1
           | 232 -> do s'.[i'] := uml s.[i+1]; return i + 1
+          | 234 -> do s'.[i'] := circle s.[i+1]; return i + 1
           | 240 -> do s'.[i'] := cedil s.[i+1]; return i + 1
           | _ -> do s'.[i'] := s.[i]; return i ]
         in

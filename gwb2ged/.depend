@@ -1,6 +1,4 @@
-gwb2ged.cmo: ../src/adef.cmi ../ged2gwb/ansel.cmo ../src/argl.cmo \
-    ../src/def.cmi ../src/gutil.cmi ../src/iobase.cmi ../src/select.cmo \
-    ../src/util.cmi 
-gwb2ged.cmx: ../src/adef.cmx ../ged2gwb/ansel.cmx ../src/argl.cmx \
-    ../src/def.cmi ../src/gutil.cmx ../src/iobase.cmx ../src/select.cmx \
-    ../src/util.cmx 
+gwb2ged.cmo: ../src/adef.cmi ../src/argl.cmo ../src/def.cmi ../src/gutil.cmi \
+    ../src/iobase.cmi ../src/select.cmo ../src/util.cmi 
+gwb2ged.cmx: ../src/adef.cmx ../src/argl.cmx ../src/def.cmi ../src/gutil.cmx \
+    ../src/iobase.cmx ../src/select.cmx ../src/util.cmx 

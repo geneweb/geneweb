@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.3 1998-09-29 12:22:46 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.4 1998-09-29 16:12:23 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -7,6 +7,11 @@ open Util;
 open Gutil;
 
 value bogus_person_index = Adef.iper_of_int (-1);
+
+value f_coa conf s =
+  if conf.charset = "iso-8859-1" then Ansel.to_iso_8859_1 s
+  else s
+;
 
 value string_title_of base t =
   {t_name =
@@ -43,7 +48,7 @@ value print_first_name conf base p =
     tag "td" begin
       Wserver.wprint
         "<input name=\"first_name\" size=30 maxlength=200 value=\"%s\">"
-        p.first_name;
+        (f_coa conf p.first_name);
     end;
     tag "td" begin
       let s = capitale (transl conf "number") in
