@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.40 2000-06-16 11:48:39 ddr Exp $ *)
+(* $Id: relation.ml,v 3.41 2000-06-17 14:51:30 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -524,6 +524,7 @@ value print_relation_with_alliance conf base ip1 ip2 excl_faml =
           List.fold_right
             (fun fam children ->
                if ifam = fam then children
+               else if mark_fam.(Adef.int_of_ifam fam) then children
                else
                  List.fold_right
                    (fun child children ->
@@ -536,6 +537,7 @@ value print_relation_with_alliance conf base ip1 ip2 excl_faml =
           List.fold_right
             (fun fam children ->
                if ifam = fam then children
+               else if mark_fam.(Adef.int_of_ifam fam) then children
                else
                  List.fold_right
                    (fun child children ->

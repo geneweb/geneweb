@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.13 2000-05-23 07:19:04 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.14 2000-06-17 14:51:31 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -552,7 +552,19 @@ value all_checks_family conf base fam cpl des =
 ;
 
 value print_family conf base wl cpl des =
-  do Wserver.wprint "<ul>\n";
+  let rdsrc =
+     match p_getenv conf.env "rdsrc" with
+    [ Some "on" -> p_getenv conf.env "src"
+    | _ -> p_getenv conf.env "dsrc" ]
+  in
+  do match rdsrc with
+     [ Some x ->
+         do conf.henv := List.remove_assoc "dsrc" conf.henv;
+            if x <> "" then conf.henv := [("dsrc", code_varenv x) :: conf.henv]
+            else ();
+         return ()
+     | None -> () ];
+     Wserver.wprint "<ul>\n";
      html_li conf;
      afficher_personne_referencee conf base (poi base cpl.father);
      Wserver.wprint "\n";
