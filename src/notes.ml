@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 2.1 1999-08-14 09:26:39 ddr Exp $ *)
+(* $Id: notes.ml,v 2.2 1999-08-14 12:17:01 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -8,8 +8,9 @@ open Util;
 
 value print conf base =
   let title _ =
-    Wserver.wprint "%s"
+    Wserver.wprint "%s - %s"
       (capitale (nominative (transl_nth conf "note/notes" 1)))
+      conf.bname
   in
   let s = base.data.bnotes.nread 0 in
   do header_no_page_title conf title;
@@ -24,7 +25,8 @@ value print conf base =
 value print_mod conf base =
   let title _ =
     let s = transl_nth conf "note/notes" 1 in
-    Wserver.wprint "%s" (capitale (transl_decline conf "modify" s))
+    Wserver.wprint "%s - %s" (capitale (transl_decline conf "modify" s))
+      conf.bname
   in
   let s = base.data.bnotes.nread 0 in
   do header conf title;
@@ -51,5 +53,5 @@ value print_mod_ok conf base =
     | None -> failwith "notes unbound" ]
   in
   do base.func.commit_notes s; return
-  Srcfile.print_start conf base
+  print conf base
 ;

@@ -6,6 +6,8 @@ GeneWeb version 2.06
     gwb2ged, gwc, gwu).
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Aug 14, 99] Fixed bug: send image in cgi mode under windows did not
+    work.
   - [Aug 13, 99] In personal pages notes, URLs are now clickable.
   - [Aug 13, 99] Added the ability to change the text of some pages:
     1/ for site address redirection (gwd new option "-redirect", see below),
