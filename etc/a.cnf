@@ -38,3 +38,7 @@ wizard_just_friend=no
 
 # Default language
 default_lang=fr
+
+# Uncomment the following definition to specify that the present database has
+# been renamed:
+#renamed=newname

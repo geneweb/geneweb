@@ -1,4 +1,4 @@
-(* $Id: relation.ml,v 1.6 1998-11-21 10:54:11 ddr Exp $ *)
+(* $Id: relation.ml,v 1.7 1998-11-28 09:46:44 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -51,10 +51,8 @@ value print_menu conf base p =
           if sou base c.first_name <> "?" || sou base c.surname <> "?" then
             do Wserver.wprint "<li>\n%s\n"
                  (capitale (transl_nth conf "his wife/her husband" is));
-               Wserver.wprint "<a href=\"%se=%s;i=%d\">\n" (commd conf)
-                 (code_varenv
-                    ("m=R;i=" ^
-                       string_of_int (Adef.int_of_iper p.cle_index)))
+               Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n" (commd conf)
+                 (Adef.int_of_iper p.cle_index)
                  (Adef.int_of_iper c.cle_index);
                afficher_personne_sans_titre conf base c;
                Wserver.wprint "\n</a>";

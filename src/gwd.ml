@@ -1,5 +1,5 @@
-(* camlp4r pa_extend.cmo *)
-(* $Id: gwd.ml,v 1.12 1998-11-27 20:09:44 ddr Exp $ *)
+(* camlp4r pa_extend.cmo ./pa_html.cmo *)
+(* $Id: gwd.ml,v 1.13 1998-11-28 09:46:43 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -184,6 +184,39 @@ value read_base_env bname =
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
+value print_renamed conf new_n =
+  let  title _ =
+    Wserver.wprint "%s -&gt; %s" conf.bname new_n
+  in
+  let link =
+    let req =
+      let s = Wserver.extract_param "GET " ' ' conf.request in
+      let len = String.length conf.bname in
+      loop 0 where rec loop i =
+        if i > String.length s then ""
+        else if i >= len && String.sub s (i - len) len = conf.bname then
+          String.sub s 0 (i - len) ^ new_n ^
+          String.sub s i (String.length s - i)
+        else loop (i + 1)
+    in
+    "http://" ^
+    Wserver.extract_param "host: " '\r' conf.request ^
+    req
+  in
+  do Util.header conf title;
+     Wserver.wprint "The database \"%s\" has been renamed \"%s\".\n"
+       conf.bname new_n;
+     Wserver.wprint "Please use now:\n<p>\n";
+     tag "ul" begin
+       Wserver.wprint "<li>\n";
+       tag "a" "href=\"%s\"" link begin
+         Wserver.wprint "%s" link;
+       end;
+     end;
+     Util.trailer conf;
+  return ()
+;
+
 value start_with_base conf bname =
   let bfile = Filename.concat Util.base_dir.val bname in
   match try Left (Iobase.input bfile) with e -> Right e with
@@ -362,9 +395,14 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
   in
   if conf.bname = "" then propose_base conf
   else
-    do start_with_base conf conf.bname;
-       if sleep > 0 then Unix.sleep sleep else ();
-    return ()
+    match
+      try Some (List.assoc "renamed" base_env) with [ Not_found -> None ]
+    with
+    [ Some n -> print_renamed conf n
+    | None ->
+        do start_with_base conf conf.bname;
+           if sleep > 0 then Unix.sleep sleep else ();
+        return () ]
 ;
 
 value chop_extension name =

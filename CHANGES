@@ -16,8 +16,10 @@ GeneWeb Version 1.09
   - Added ability to add ";opt=no_index" at end of requests to get an
     equivalent link independant from the persons' index number.
 
-* a.cnf:
-  - Added "wizard_just_friend" in .cnf files to suspend the powers of wizards.
+* base.cnf:
+  - Added "wizard_just_friend" to suspend the powers of wizards.
+  - Added ability to define "renamed" to specify that a database has been
+    renamed.
 
 * gwc, consang:
   - Fixed accents displaying in traces and error messages.
