@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.13 1998-11-09 09:31:24 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.14 1998-11-13 14:31:34 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -1153,7 +1153,17 @@ value make_arrays in_file =
         in
         open_in f ]
   in
-  let strm = Stream.of_channel ic in
+  let line_cnt = ref 0 in
+  let strm =
+    Stream.from
+      (fun i ->
+         try
+           let c = input_char ic in
+           do if c == '\n' then incr line_cnt else (); return
+           Some c
+         with
+         [ End_of_file -> None ])
+  in
   do string_empty.val := add_string gen "";
      string_x.val := add_string gen "x";
      loop () where rec loop () =
@@ -1170,8 +1180,9 @@ value make_arrays in_file =
               do let _ : string = get_to_eoln 0 strm in (); return
               loop ()
        | [: `_ :] ->
-             do Printf.printf "Strange input found at character %d\n"
-                  (Stream.count strm);
+             do Printf.printf "File \"%s\", line %d:\n" in_file
+                  (line_cnt.val + 1);
+                Printf.printf "Strange input\n";
                 flush stdout;
                 let _ : string = get_to_eoln 0 strm in ();
              return loop ()
