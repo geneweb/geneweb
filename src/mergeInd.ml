@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.29 2004-12-29 03:03:26 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.30 2004-12-30 11:05:07 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -19,7 +19,7 @@ value print_differences conf base branches p1 p2 =
           Wserver.wprint "%s\n" x1;
         end;
         tag "li" begin
-          xtag "input" "type=\"radio\" name=\"%s\" value=\"2\"%s>\n" name chk2;
+          xtag "input" "type=\"radio\" name=\"%s\" value=\"2\"%s" name chk2;
           Wserver.wprint "%s\n" x2;
         end;
       end;
