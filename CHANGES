@@ -7,6 +7,11 @@ GeneWeb version 4.08
   - [11 Sep 02] Added documentation in Italian (Latino Imparato).
 
 * GeneWeb server or CGI (gwd)
+  - [09 Dec 02] Added link "wizard/notes" in welcome page to allow
+    each wizard to set and modify his personal notes for the database,
+    which are visible by everybody. Works only if the wizards are defined
+    in a file defined by the variable "wizard_passwd_file" of the
+    database configuration file.
   - [01 Dec 02] Added ability for named wizards (wizards defined in a
     wizard password file) to remove the messages they posted.
     messages in the database forum.

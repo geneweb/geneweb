@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.13 2002-11-03 20:16:09 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.14 2002-12-09 22:42:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -424,6 +424,11 @@ value rec copy_from_channel conf base ic mode =
     | 'j' -> conf.just_friend_wizard
     | 'l' -> no_tables
     | 'n' -> base.data.bnotes.nread 1 <> ""
+    | 'o' -> Sys.file_exists (Wiznotes.dir conf)
+    | 'p' ->
+        match p_getenv conf.base_env (get_variable ic) with
+        [ Some "" | None -> False
+        | Some _ -> True ]
     | 's' -> p_getenv conf.base_env (get_variable ic) <> Some "no"
     | 'w' -> conf.wizard
     | 'z' -> Util.find_person_in_env conf base "z" <> None
