@@ -1,4 +1,4 @@
-(* $Id: httpEnv.ml,v 1.2 2000-07-25 13:23:04 ddr Exp $ *)
+(* $Id: httpEnv.ml,v 1.3 2000-07-26 01:39:33 ddr Exp $ *)
 
 open Printf;
 
@@ -75,8 +75,8 @@ value extract_multipart boundary str =
       else loop (s ^ String.make 1 str.[i]) (i + 1)
   in
   let boundary = "--" ^ boundary in
-  let rec loop i =
-    if i == String.length str then []
+  let rec loop list i =
+    if i == String.length str then list
     else
       let (s, i) = next_line i in
       if s = boundary then
@@ -99,24 +99,31 @@ value extract_multipart boundary str =
                 else i
             in
             let v = String.sub str i (i1 - i) in
-            [(var ^ "_name", filename); (var, v) :: loop i1]
+            let list =
+              [(var, v, False); (var ^ "_name", filename, True) :: list]
+            in
+            loop list i1
         | (Some var, None) ->
             let var = strip_quotes var in
             let (s, i) = next_line i in
             if s = "" then
               let (s, i) = next_line i in
-              [(var, s) :: loop i]
-            else loop i
-        | _ -> loop i ]
-      else if s = boundary ^ "--" then []
-      else loop i
+              loop [(var, s, True) :: list] i
+            else loop list i
+        | _ -> loop list i ]
+      else if s = boundary ^ "--" then list
+      else loop list i
   in
-  let env = loop 0 in
-  let (str, _) =
+  let env = loop [] 0 in
+  let (str, env, _) =
     List.fold_left
-      (fun (str, sep) (v, x) ->
-         if v = "file" then (str, sep) else (str ^ sep ^ v ^ "=" ^ x, ";"))
-      ("", "") env
+      (fun (str, env, sep) (v, x, b) ->
+         let (str, sep) =
+           if b then (str ^ sep ^ v ^ "=" ^ x, ";")
+           else (str, sep)
+         in
+         (str, [(v, x) :: env], sep))
+      ("", [], "") env
   in
   (str, env)
 ;

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2000-07-25 17:31:12 ddr Exp $
+# $Id: Makefile,v 1.5 2000-07-26 01:39:33 ddr Exp $
 
 CAMLP4=camlp4r
 OCAMLC=ocamlc.opt
@@ -11,7 +11,7 @@ GWTP_OTHER=../geneweb/src/buff.cmo
 all: gwtp.opt
 
 gwtp.opt: $(GWTP_OBJS:.cmo=.cmx)
-	$(OCAMLOPT) $(GWTP_OTHER:.cmo=.cmx) $(GWTP_OBJS:.cmo=.cmx) -o gwtp.opt
+	$(OCAMLOPT) unix.cmxa $(GWTP_OTHER:.cmo=.cmx) $(GWTP_OBJS:.cmo=.cmx) -o gwtp.opt
 
 gwtp.out: $(GWTP_OBJS)
 	$(OCAMLC) $(GWTP_OTHER) $(GWTP_OBJS) -o gwtp.out
