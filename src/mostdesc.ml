@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 4.2 2002-01-10 04:13:30 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 4.3 2002-03-09 16:48:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Gutil;
@@ -55,14 +55,13 @@ value print_result base tab =
 value most_desc base p =
   let _ = base.data.ascends.array () in
   let _ = base.data.couples.array () in
-  let id = Consang.topological_sort base in
+  let id = Consang.topological_sort base aoi in
   let module Pq =
     Pqueue.Make
       (struct
          type t = iper;
          value leq x y = id.(Adef.int_of_iper x) > id.(Adef.int_of_iper y);
-       end
-       )
+       end)
   in
   let _ = base.data.persons.array () in
   let _ = base.data.descends.array () in
@@ -130,7 +129,7 @@ value main () =
     let ip =
       Gutil.person_ht_find_unique base p_fname.val p_sname.val p_num.val
     in
-    most_desc base (pget conf base ip)
+    most_desc base (poi base ip)
   }
 ;
 
