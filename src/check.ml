@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 2.5 1999-09-14 22:33:46 ddr Exp $ *)
+(* $Id: check.ml,v 2.6 1999-09-20 17:16:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -169,7 +169,7 @@ value update_stats base current_year s p =
                 do if age > fst s.oldest_mother then
                      s.oldest_mother := (age, poi base cpl.mother)
                    else ();
-                   if age < fst s.youngest_father then
+                   if age < fst s.youngest_mother then
                      s.youngest_mother := (age, poi base cpl.mother)
                    else ();
                 return ()

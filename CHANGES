@@ -16,10 +16,11 @@ GeneWeb version 2.07
     in the lexicon.
 
 * GeneWeb Service/CGI (gwd)
-  - [Sep 19, 99] For "search", can find someone if only one of his first
+  - [Sep 20, 99] Changed gif files (flags and up arrow) into jpeg files.
+  - [Sep 19, 99] In "search", can find someone if only one of his first
     names is given: e.g. can find "Marie Liesse de Rohan Chabot" if searching
     "Marie de Rohan Chabot" or "Liesse de Rohan Chabot". Works partially,
-    e.g. only if the classic search failed.
+    i.e. only if the classic search failed.
   - [Sep 17, 99] Can use now special characters for wizard/friend passwords
     in CGI mode (before, it worked only in service mode).
   - [Sep 16, 99] Advanced search with baptism date and place did not work:
