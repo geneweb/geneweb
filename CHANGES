@@ -23,7 +23,9 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Jul 26, 99] Added relations: godparents, adoptive parents,
+  - [Jul 26, 99] In personal pages, added link to uncles and aunts, nephews
+    and nieces.
+  - [Jul 26, 99] Added other relations: godparents, adoptive parents,
     recognizing parents, candidate parents.
   - [Jul 22, 99] In relationship branches displaying, when the spouses are
     displayed, display also the marriage date.
