@@ -1,6 +1,14 @@
 Internal, very small, undocumented, or not visible changes
 **********************************************************
 
+GeneWeb Version 3.12
+--------------------
+
+* GeneWeb daemon/CGI (gwd)
+  - [07 Feb 01] Fixed problem in dag2html. Had to add functions
+    (shorten_too_long and bottom_adjust) to shorten too long branches
+    which may appear in the algorithm.
+
 GeneWeb Version 3.11
 --------------------
 
