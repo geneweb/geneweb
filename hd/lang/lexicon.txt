@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.150 2000-08-07 10:46:32 ddr Exp $
+# $Id: lexicon.txt,v 3.151 2000-08-07 11:01:47 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -100,7 +100,7 @@ af: %1 van %2
 cs: %1 :g:%2
 de: %1 von :d:%2
 dk: %1 til %2
-en: %2's %1
+en: %1 of %2
 eo: %1 de %2
 es: %1 de %2
 fi: :g:%2 %1
@@ -120,7 +120,7 @@ af: %1 van %2
 cs: %1 :g:%2
 de: %1 von :d:%2
 dk: %1 til %2
-en: %2's %1
+en: %1 of %2
 eo: %1 de %2
 es: %1 de %2
 fi: :g:%2 %1
