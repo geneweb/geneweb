@@ -2,15 +2,16 @@ GeneWeb version 4.02
 --------------------
 
 * Setup program (gwsetup)
-  - [11 Apr 01] Fixed security hole: if the file only.txt was not accessible
-    or corrupted for some reason (it should not but...), the gwsetup service
-    was potentially accessible from any outside address (if people can guess
-    its address). It is changed: now, if this file is not accessible, only
-    requests from 127.0.0.1 (local machine) are accepted. 
+  - [11 Apr 01] Fixed security hole: if the file only.txt was not
+    accessible or corrupted for some reason (it should not but...), the
+    gwsetup service became potentially accessible from any outside address
+    (but only if people could guess the gwsetup service address). It is
+    modified: now, if this file is not accessible, only requests from
+    127.0.0.1 (local machine) are accepted.
 
 * GeneWeb server or CGI (gwd)
   - [11 Apr 01] The Gregorian and Julian calendars did not work for years
-    less than 1800 BC. Fixed.
+    less than 4800 BC. Fixed.
 
 GeneWeb version 4.01
 --------------------
