@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.134 2002-12-09 11:26:04 ddr Exp $
+# $Id: lexicon.txt,v 4.135 2002-12-10 08:40:33 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -8673,31 +8673,31 @@ ru: свидетель:g:-я:a:-я/свидетели
 sl: priиa/priиe
 sv: vittne/vittnen
 
-    wizard/friend
-af: Medewerkers/vriend
-bg: администратор/приятел
-ca: administrador/amic
-cs: wizard/friend
-da: opdateringsadgang/betroet
-de: Wizard/Freund
-en: wizard/friend
-eo: sorcxisto/amiko
-es: brujo/amigo
-et: teadmamehena/sхbrana
-fi: velho/valittu
-fr: magicien/ami
-he:  лваеп / ойезсъ 
-is: wizard/vin
-it: wizard/amico
-lv: wizard/friend
-nl: tovenaar/vriend
-no: Oppdaterings/venner
-pl: wizard/friend
-pt: feiticeiro/amigo
-ro: magician/amic
-ru: wizard/друг
-sl: иarovnik/prijatelj
-sv: uppdaterings/v&auml;nner
+    wizard/wizards/friend
+af: Medewerkers/Medewerkers/vriend
+bg: администратор/администратор/приятел
+ca: administrador/administrador/amic
+cs: wizard/wizards/friend
+da: opdateringsadgang/opdateringsadgang/betroet
+de: Wizard/Wizard/Freund
+en: wizard/wizards/friend
+eo: sorcxisto/sorcxistoj/amiko
+es: brujo/brujos/amigo
+et: teadmamehena/teadmamehena/sхbrana
+fi: velho/velho/valittu
+fr: magicien/magiciens/ami
+he:  лваеп / лваеп / ойезсъ 
+is: wizard/wizard/vin
+it: wizard/wizard/amico
+lv: wizard/wizard/friend
+nl: tovenaar/tovenaar/vriend
+no: Oppdaterings/Oppdaterings/venner
+pl: wizard/wizard/friend
+pt: feiticeiro/feiticeiros/amigo
+ro: magician/magician/amic
+ru: wizard/wizard/друг
+sl: иarovnik/иarovnik/prijatelj
+sv: uppdaterings/uppdaterings/v&auml;nner
 
     would be his/her own ancestor
 af: sal sy/haar eie voorganger wees
