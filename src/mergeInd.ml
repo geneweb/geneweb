@@ -1,13 +1,18 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 1.1.1.1 1998-09-01 14:32:11 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 1.2 1998-09-30 14:04:44 ddr Exp $ *)
 
 open Config;
 open Def;
 open Util;
 open Gutil;
 
+value f_aoc conf s =
+  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
+  else s
+;
+
 value print_differences conf base branches p1 p2 =
-  let string_field title name proj =
+  let string_field str_orig title name proj =
     let x1 = proj p1 in
     let x2 = proj p2 in
     if x1 <> "" && x1 <> "?" && x2 <> "" && x2 <> "?" && x1 <> x2 then
@@ -16,10 +21,10 @@ value print_differences conf base branches p1 p2 =
            Wserver.wprint "<li>\n";
            Wserver.wprint "<input type=radio name=\"%s\" value=1 checked>\n"
              name;
-           Wserver.wprint "%s\n" x1;
+           Wserver.wprint "%s\n" (if str_orig then coa conf x1 else x1);
            Wserver.wprint "<li>\n";
            Wserver.wprint "<input type=radio name=\"%s\" value=2>\n" name;
-           Wserver.wprint "%s\n" x2;
+           Wserver.wprint "%s\n" (if str_orig then coa conf x2 else x2);
          end;
       return ()
     else ()
@@ -42,44 +47,45 @@ value print_differences conf base branches p1 p2 =
       | [_ :: branches] -> loop branches
       | _ -> () ];
     Wserver.wprint "<p>\n";
-    string_field (transl_nth conf "first name/first names" 0) "first_name"
+    string_field True (transl_nth conf "first name/first names" 0) "first_name"
       (fun p -> sou base p.first_name);
-    string_field (transl_nth conf "surname/surnames" 0) "surname"
+    string_field True (transl_nth conf "surname/surnames" 0) "surname"
       (fun p -> sou base p.surname);
-    string_field (transl conf "number") "number"
+    string_field False (transl conf "number") "number"
       (fun p -> string_of_int p.occ);
-    string_field (transl conf "photo") "photo" (fun p -> sou base p.photo);
-    string_field (transl conf "public name") "public_name"
+    string_field True (transl conf "photo") "photo"
+      (fun p -> sou base p.photo);
+    string_field True (transl conf "public name") "public_name"
       (fun p -> sou base p.public_name);
-    string_field (transl conf "occupation") "occupation"
+    string_field True (transl conf "occupation") "occupation"
       (fun p -> sou base p.occupation);
-    string_field (transl conf "sex") "sex"
+    string_field False (transl conf "sex") "sex"
       (fun p ->
          match p.sexe with
          [ Masculin -> "M"
          | Feminin -> "F"
          | Neutre -> "" ]);
-    string_field (transl conf "access") "access"
+    string_field False (transl conf "access") "access"
       (fun p ->
          match p.access with
          [ IfTitles -> "IfTitles"
          | Private -> "Private"
          | Public -> "Public" ]);
-    string_field (transl conf "birth") "birth"
+    string_field False (transl conf "birth") "birth"
       (fun p ->
          match Adef.od_of_codate p.birth with
          [ None -> ""
          | Some d -> Date.string_of_ondate conf d ]);
-    string_field (transl conf "birth" ^ " / " ^ transl conf "place")
+    string_field True (transl conf "birth" ^ " / " ^ transl conf "place")
       "birth_place" (fun p -> sou base p.birth_place);
-    string_field (transl conf "baptism") "baptism"
+    string_field False (transl conf "baptism") "baptism"
       (fun p ->
          match Adef.od_of_codate p.baptism with
          [ None -> ""
          | Some d -> Date.string_of_ondate conf d ]);
-    string_field (transl conf "baptism" ^ " / " ^ transl conf "place")
+    string_field True (transl conf "baptism" ^ " / " ^ transl conf "place")
       "baptism_place" (fun p -> sou base p.baptism_place);
-    string_field (transl conf "death") "death"
+    string_field False (transl conf "death") "death"
       (fun p ->
          let is = 2 in
          match p.death with
@@ -97,9 +103,9 @@ value print_differences conf base branches p1 p2 =
          | DeadYoung -> transl_nth conf "dead young" is
          | DeadDontKnowWhen -> transl_nth conf "died" is
          | DontKnowIfDead -> "" ]);
-    string_field (transl conf "death" ^ " / " ^ transl conf "place")
+    string_field True (transl conf "death" ^ " / " ^ transl conf "place")
       "death_place" (fun p -> sou base p.death_place);
-    string_field (transl conf "burial") "burial"
+    string_field False (transl conf "burial") "burial"
       (fun p ->
          let is = 2 in
          match p.burial with
@@ -114,7 +120,7 @@ value print_differences conf base branches p1 p2 =
              (match Adef.od_of_codate cod with
               [ None -> ""
               | Some d -> " " ^ Date.string_of_ondate conf d ]) ]);
-    string_field (transl conf "burial" ^ " / " ^ transl conf "place")
+    string_field True (transl conf "burial" ^ " / " ^ transl conf "place")
       "burial_place" (fun p -> sou base p.burial_place);
     Wserver.wprint "<p>\n";
     Wserver.wprint "<input type=submit value=Ok>\n";
@@ -133,11 +139,11 @@ value merge_ind conf base branches p1 p2 =
           tag "ul" begin
             Wserver.wprint "<li>\n";
             stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p1) begin
-              Merge.print_someone base p1;
+              Merge.print_someone conf base p1;
             end;
             Wserver.wprint "\n%s\n" (transl conf "and");
             stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p2) begin
-              Merge.print_someone base p2;
+              Merge.print_someone conf base p2;
             end;
             Wserver.wprint "\n";
           end;
@@ -185,11 +191,11 @@ value merge_fam_first conf base branches fam1 fam2 p1 p2 =
      tag "ul" begin
        Wserver.wprint "<li>\n";
        stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p1) begin
-         Merge.print_someone base p1;
+         Merge.print_someone conf base p1;
        end;
        Wserver.wprint "\n%s\n" (transl conf "with");
        stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p2) begin
-         Merge.print_someone base p2;
+         Merge.print_someone conf base p2;
        end;
        Wserver.wprint "\n";
      end;
@@ -256,6 +262,7 @@ value print conf base =
   let p2 =
     match (p_getenv conf.env "n", p_getint conf.env "i2") with
     [ (Some n, _) ->
+        let n = f_aoc conf n in
         let ipl = Gutil.person_ht_find_all base n in
         match ipl with
         [ [ip2] -> Some (poi base ip2)

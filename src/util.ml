@@ -1,4 +1,4 @@
-(* $Id: util.ml,v 1.6 1998-09-30 07:29:28 ddr Exp $ *)
+(* $Id: util.ml,v 1.7 1998-09-30 14:04:49 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -631,9 +631,10 @@ value preciser_homonyme conf base p =
               if Array.length ct > 0 then
                 let enfant = poi base ct.(0) in
                 Wserver.wprint "%s %s%s" (transl_nth conf "father/mother" is)
-                  (transl_concat conf "of" (sou base enfant.first_name))
+                  (transl_concat conf "of"
+                     (coa conf (sou base enfant.first_name)))
                   (if p.surname <> enfant.surname then
-                     " " ^ sou base enfant.surname
+                     " " ^ coa conf (sou base enfant.surname)
                    else "")
               else
                 let conjoint = poi base conjoint in
@@ -641,8 +642,9 @@ value preciser_homonyme conf base p =
                    sou base conjoint.surname <> "?" then
                   Wserver.wprint "%s %s %s"
                     (transl_nth conf "husband/wife" is)
-                    (transl_concat conf "of" (sou base conjoint.first_name))
-                    (sou base conjoint.surname)
+                    (transl_concat conf "of"
+                       (coa conf (sou base conjoint.first_name)))
+                    (coa conf (sou base conjoint.surname))
                 else loop (i + 1)
             else Wserver.wprint "..."
           in

@@ -1,24 +1,23 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 1.4 1998-09-29 16:12:21 ddr Exp $ *)
+(* $Id: some.ml,v 1.5 1998-09-30 14:04:45 ddr Exp $ *)
 
 open Def;
 open Gutil;
 open Config;
 open Util;
 
-value coa = Util.charset_of_ansel;
-
 value first_name_not_found conf x =
   let title _ =
     Wserver.wprint "%s: \"%s\""
-      (capitale (transl conf "first name not found")) x
+      (capitale (transl conf "first name not found")) (coa conf x)
   in
   do header conf title; trailer conf; return ()
 ;
 
 value surname_not_found conf x =
   let title _ =
-    Wserver.wprint "%s: \"%s\"" (capitale (transl conf "surname not found")) x
+    Wserver.wprint "%s: \"%s\"" (capitale (transl conf "surname not found"))
+      (coa conf x)
   in
   do header conf title; trailer conf; return ()
 ;
@@ -75,7 +74,7 @@ value print_elem conf base is_surname (p, xl) =
          if is_surname then
            Wserver.wprint "%s%s" (coa conf (surname_end p))
              (coa conf (surname_begin p))
-         else Wserver.wprint "%s" p;
+         else Wserver.wprint "%s" (coa conf p);
          Wserver.wprint "</a>\n";
          Date.afficher_dates_courtes conf base x;
       return ()
@@ -89,7 +88,7 @@ value print_elem conf base is_surname (p, xl) =
                 if is_surname then
                   Wserver.wprint "%s%s" (coa conf (surname_end p))
                     (coa conf (surname_begin p))
-                else Wserver.wprint "%s" p;
+                else Wserver.wprint "%s" (coa conf p);
                 Wserver.wprint "</a>";
                 Date.afficher_dates_courtes conf base x;
                 Wserver.wprint " <em>";

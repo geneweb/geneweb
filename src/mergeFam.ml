@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 1.1.1.1 1998-09-01 14:32:11 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 1.2 1998-09-30 14:04:43 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -7,7 +7,7 @@ open Util;
 open Gutil;
 
 value print_differences conf base branches fam1 fam2 =
-  let string_field title name proj =
+  let string_field str_orig title name proj =
     let x1 = proj fam1 in
     let x2 = proj fam2 in
     if x1 <> "" && x2 <> "" && x1 <> x2 then
@@ -16,10 +16,10 @@ value print_differences conf base branches fam1 fam2 =
            Wserver.wprint "<li>\n";
            Wserver.wprint "<input type=radio name=\"%s\" value=1 checked>\n"
              name;
-           Wserver.wprint "%s\n" x1;
+           Wserver.wprint "%s\n" (if str_orig then coa conf x1 else x1);
            Wserver.wprint "<li>\n";
            Wserver.wprint "<input type=radio name=\"%s\" value=2>\n" name;
-           Wserver.wprint "%s\n" x2;
+           Wserver.wprint "%s\n" (if str_orig then coa conf x2 else x2);
          end;
       return ()
     else ()
@@ -42,15 +42,15 @@ value print_differences conf base branches fam1 fam2 =
       | [_ :: branches] -> loop branches
       | _ -> () ];
     Wserver.wprint "<p>\n";
-    string_field (transl_nth conf "marriage/marriages" 0) "marriage"
+    string_field False (transl_nth conf "marriage/marriages" 0) "marriage"
       (fun fam ->
          match Adef.od_of_codate fam.marriage with
          [ None -> ""
          | Some d -> Date.string_of_ondate conf d ]);
-    string_field
+    string_field True
       (transl_nth conf "marriage/marriages" 0 ^ " / " ^ transl conf "place")
       "marriage_place" (fun fam -> sou base fam.marriage_place);
-    string_field (transl conf "divorce") "divorce"
+    string_field False (transl conf "divorce") "divorce"
       (fun fam ->
          match fam.divorce with
          [ NotDivorced -> ""
@@ -90,4 +90,3 @@ value print conf base =
       merge_fam conf base fam1 fam2
   | _ -> incorrect_request conf ]
 ;
-

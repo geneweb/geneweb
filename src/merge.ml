@@ -1,59 +1,22 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 1.1.1.1 1998-09-01 14:32:10 ddr Exp $ *)
+(* $Id: merge.ml,v 1.2 1998-09-30 14:04:42 ddr Exp $ *)
 
 open Def;
 open Config;
 open Gutil;
 open Util;
 
-value print_someone base p =
-  Wserver.wprint "%s%s %s" (sou base p.first_name)
+value print_someone conf base p =
+  Wserver.wprint "%s%s %s" (coa conf (sou base p.first_name))
     (if p.occ == 0 then ""else "." ^ string_of_int p.occ)
-    (sou base p.surname)
+    (coa conf (sou base p.surname))
 ;
-
-(*
-value print_person conf base (first_name, surname, occ) =
-  tag "table" "border=1" begin
-    tag "tr" begin
-      tag "td" begin
-        Wserver.wprint "%s"
-          (capitale (transl_nth conf "first name/first names" 0));
-      end;
-      tag "td" begin
-        Wserver.wprint "<input name=p2 size=23 maxlength=200";
-        Wserver.wprint " value=\"%s\">" first_name;
-      end;
-      tag "td" "align=right" begin
-        let s = capitale (transl conf "number") in
-        let s = if String.length s > 3 then String.sub s 0 3 else s in
-        Wserver.wprint "%s" s;
-      end;
-      tag "td" begin
-        Wserver.wprint "<input name=oc2 size=5 maxlength=8%s>\n"
-          (if occ == 0 then "" else " value=" ^ string_of_int occ);
-      end;
-    end;
-    tag "tr" begin
-      tag "td" begin
-        Wserver.wprint "%s"
-          (capitale (transl_nth conf "surname/surnames" 0));
-      end;
-      tag "td" "colspan=3" begin
-        Wserver.wprint
-          "<input name=n2 size=40 maxlength=200 value=\"%s\">\n"
-          surname;
-      end;
-    end;
-  end
-;
-*)
 
 value print conf base p =
   let title h =
     do Wserver.wprint "%s" (capitale (transl conf "merge"));
        if h then ()
-       else do Wserver.wprint ": "; print_someone base p; return ();
+       else do Wserver.wprint ": "; print_someone conf base p; return ();
     return ()
   in
   do header conf title;

@@ -1,29 +1,40 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.2 1998-09-29 12:22:45 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.3 1998-09-30 14:04:47 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
 
-value get env key =
-  match p_getenv env key with
+value f_aoc conf s =
+  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
+  else s
+;
+
+value raw_get conf key =
+  match p_getenv conf.env key with
   [ Some v -> v
   | None -> failwith (key ^ " unbound") ]
 ;
 
-value getn var key env =
-  match p_getenv env (var ^ "_" ^ key) with
-  [ Some v -> v
+value get conf key =
+  match p_getenv conf.env key with
+  [ Some v -> f_aoc conf v
+  | None -> failwith (key ^ " unbound") ]
+;
+
+value getn conf var key =
+  match p_getenv conf.env (var ^ "_" ^ key) with
+  [ Some v -> f_aoc conf v
   | None -> failwith (var ^ "_" ^ key ^ " unbound") ]
 ;
 
-value reconstitute_person env var =
-  let first_name = getn var "first_name" env in
-  let surname = getn var "surname" env in
-  let occ = try int_of_string (getn var "occ" env) with [ Failure _ -> 0 ] in
+value reconstitute_person conf var =
+  let first_name = getn conf var "first_name" in
+  let surname = getn conf var "surname" in
+  let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
   let create =
-    match getn var "p" env with
+    match getn conf var "p" with
     [ "create" -> UpdateFam.Create Neutre
     | "create_M" -> UpdateFam.Create Masculin
     | "create_F" -> UpdateFam.Create Feminin
@@ -32,15 +43,15 @@ value reconstitute_person env var =
   (first_name, surname, occ, create)
 ;
 
-value reconstitute_child env var default_surname =
-  let first_name = getn var "first_name" env in
+value reconstitute_child conf var default_surname =
+  let first_name = getn conf var "first_name" in
   let surname =
-    let surname = getn var "surname" env in
+    let surname = getn conf var "surname" in
     if surname = "" then default_surname else surname
   in
-  let occ = try int_of_string (getn var "occ" env) with [ Failure _ -> 0 ] in
+  let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
   let create =
-    match getn var "p" env with
+    match getn conf var "p" with
     [ "create" -> UpdateFam.Create Neutre
     | "create_M" -> UpdateFam.Create Masculin
     | "create_F" -> UpdateFam.Create Feminin
@@ -51,14 +62,10 @@ value reconstitute_child env var default_surname =
 
 value reconstitute_family conf =
   let ext = False in
-  let father = reconstitute_person conf.env "his" in
-  let mother = reconstitute_person conf.env "her" in
+  let father = reconstitute_person conf "his" in
+  let mother = reconstitute_person conf "her" in
   let marriage = Update.reconstitute_date conf "marriage" in
-  let marriage_place =
-    match p_getenv conf.env "marriage_place" with
-    [ Some s -> s
-    | None -> "" ]
-  in
+  let marriage_place = get conf "marriage_place" in
   let divorce =
     match p_getenv conf.env "divorce" with
     [ Some "not_divorced" -> NotDivorced
@@ -67,13 +74,12 @@ value reconstitute_family conf =
           (Adef.codate_of_od
              (Update.reconstitute_date conf "divorce")) ]
   in
-  let surname = getn "his" "surname" conf.env in
+  let surname = getn conf "his" "surname" in
   let (children, ext) =
     loop 1 False where rec loop i ext =
       match
         try
-          Some
-            (reconstitute_child conf.env ("child" ^ string_of_int i) surname)
+          Some (reconstitute_child conf ("child" ^ string_of_int i) surname)
         with
         [ Failure _ -> None ]
       with
@@ -90,16 +96,8 @@ value reconstitute_family conf =
     [ Some "on" -> ([("", "", 0, UpdateFam.Create Neutre) :: children], True)
     | _ -> (children, ext) ]
   in
-  let comment =
-    match p_getenv conf.env "comment" with
-    [ Some s -> s
-    | None -> "" ]
-  in
-  let fsources =
-    match p_getenv conf.env "src" with
-    [ Some s -> s
-    | None -> "" ]
-  in
+  let comment = get conf "comment" in
+  let fsources = get conf "src" in
   let fam_index =
     match p_getint conf.env "i" with
     [ Some i -> i
@@ -108,7 +106,7 @@ value reconstitute_family conf =
   let fam =
     {marriage = Adef.codate_of_od marriage;
      marriage_place = marriage_place;
-     marriage_src = get conf.env "marr_src";
+     marriage_src = get conf "marr_src";
      divorce = divorce; children = Array.of_list children; comment = comment;
      origin_file = ""; fsources = fsources;
      fam_index = Adef.ifam_of_int fam_index}
@@ -605,7 +603,7 @@ value print_mod_aux conf base callback =
       try
         let (sfam, scpl, ext) = reconstitute_family conf in
         let digest = Update.digest_family (foi base sfam.fam_index) in
-        if digest = get conf.env "digest" then
+        if digest = raw_get conf "digest" then
           if ext then UpdateFam.print_mod1 conf base sfam scpl digest
           else
             do strip_family sfam; return

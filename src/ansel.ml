@@ -1,4 +1,4 @@
-(* $Id: ansel.ml,v 1.2 1998-09-30 07:29:22 ddr Exp $ *)
+(* $Id: ansel.ml,v 1.3 1998-09-30 14:04:40 ddr Exp $ *)
 
 value no_accent =
   fun
@@ -44,7 +44,7 @@ value of_iso_8859_1 s =
           | 'à' | 'è' | 'ì' | 'ò' | 'ù' ->
               do s'.[i'] := Char.chr 225; s'.[i'+1] := no_accent s.[i];
               return i' + 1
-          | 'Á' | 'É' | 'Í' | 'ó' | 'Ú' | 'Ý'
+          | 'Á' | 'É' | 'Í' | 'Ó' | 'Ú' | 'Ý'
           | 'á' | 'é' | 'í' | 'ó' | 'ú' | 'ý' ->
               do s'.[i'] := Char.chr 226; s'.[i'+1] := no_accent s.[i];
               return i' + 1
