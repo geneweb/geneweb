@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.17 2000-10-28 09:08:15 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.18 2000-10-28 09:12:25 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -548,6 +548,7 @@ value find_person base p1 po p2 =
 
 value surnames = ref [];
 value no_spouses_parents = ref False;
+value censor = ref 0;
 
 value gwb2ged base ifile ofile anc desc mem =
   let anc =
@@ -572,6 +573,7 @@ value gwb2ged base ifile ofile anc desc mem =
   let oc = if ofile = "" then stdout else open_out ofile in
   let ((per_sel, fam_sel) as sel) =
     Select.functions base anc desc surnames.val no_spouses_parents.val
+      censor.val
   in
   do ged_header base oc ifile ofile;
      flush oc;
@@ -650,7 +652,11 @@ value speclist =
     "\"<surname>\" : select this surname (option usable several times)");
    ("-nsp", Arg.Set no_spouses_parents,
     ": no spouses' parents (for options -s and -d)");
-   ("-nn", Arg.Set no_notes, ": no (data base) notes")]
+   ("-nn", Arg.Set no_notes, ": no (data base) notes");
+   ("-c", Arg.Int (fun i -> censor.val := i), "\
+<num> :
+     When a person is born less than <num> years ago, it is not exported unless
+     it is Public. All the spouses and descendants are also censored.")]
 ;
 
 value anonfun s =

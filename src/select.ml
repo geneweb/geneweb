@@ -1,8 +1,85 @@
-(* $Id: select.ml,v 3.5 2000-10-28 09:04:37 ddr Exp $ *)
+(* $Id: select.ml,v 3.6 2000-10-28 09:10:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
 open Gutil;
+
+value is_censored_person threshold p =
+  match Adef.od_of_codate p.birth with
+  [ Some date ->
+      match date with
+      [ Dgreg dmy _ -> dmy.year >= threshold && p.access != Public
+      | _ -> False ]
+  | None -> False ]
+;
+
+value is_censored_couple base threshold cpl =
+  let fath = poi base cpl.father in
+  let moth = poi base cpl.mother in
+  is_censored_person threshold fath || is_censored_person threshold moth
+;
+
+value censor_person base per_tab fam_tab flag threshold p no_check =
+  let ps = base.data.persons.get p in
+  if no_check || is_censored_person threshold ps then
+    per_tab.(p) := per_tab.(p) lor flag
+  else ()
+;
+
+value rec censor_family base per_tab fam_tab flag threshold i no_check =
+  let censor_unions p =
+    let uni = base.data.unions.get p in
+    Array.iter
+      (fun ifam ->
+         let f = Adef.int_of_ifam ifam in
+         do censor_family base per_tab fam_tab flag threshold f True;
+            censor_person base per_tab fam_tab flag threshold p True;
+         return ())
+      uni.family
+  in
+  let censor_descendants f =
+    let des = base.data.descends.get f in
+    Array.iter
+      (fun iper ->
+         let ip = Adef.int_of_iper iper in
+         if per_tab.(ip) <> 0 then () else censor_unions ip)
+      des.children
+  in
+  let all_families_censored p =
+    let uni = base.data.unions.get p in
+    Array.fold_left
+      (fun check ifam -> fam_tab.(Adef.int_of_ifam ifam) = 0 && check) True
+      uni.family
+  in
+  let censor_spouse iper =
+    let p = Adef.int_of_iper iper in
+    if all_families_censored p then per_tab.(p) := per_tab.(p) lor flag
+    else ()
+  in
+  if fam_tab.(i) <> 0 then ()
+  else
+    let fam = base.data.families.get i in
+    if is_deleted_family fam then ()
+    else
+      let cpl = base.data.couples.get i in
+      if no_check || is_censored_couple base threshold cpl then
+        do fam_tab.(i) := fam_tab.(i) lor flag;
+           censor_spouse cpl.father;
+           censor_spouse cpl.mother;
+           censor_descendants i;
+        return ()
+      else ()
+;
+
+value censor_base base per_tab fam_tab flag threshold =
+  do for i = 0 to base.data.families.len - 1 do
+       censor_family base per_tab fam_tab flag threshold i False;
+     done;
+     for i = 0 to base.data.persons.len - 1 do
+       censor_person base per_tab fam_tab flag threshold i False;
+     done;
+  return ()
+;
 
 value select_ancestors base per_tab fam_tab flag =
   loop where rec loop iper =
@@ -95,9 +172,18 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
   done
 ;
 
-value functions base anc desc surnames no_spouses_parents =
+value functions base anc desc surnames no_spouses_parents censor =
+  let tm = Unix.localtime (Unix.time ()) in
+  let threshold = 1900 + tm.Unix.tm_year - censor in
   match (anc, desc, surnames) with
-  [ (None, None, []) -> (fun _ -> True, fun _ -> True)
+  [ (None, None, []) ->
+      if censor <> 0 then
+        let per_tab = Array.create base.data.persons.len 0 in
+        let fam_tab = Array.create base.data.families.len 0 in
+        let _ = censor_base base per_tab fam_tab 1 threshold in
+        (fun i -> per_tab.(Adef.int_of_iper i) == 0,
+         fun i -> fam_tab.(Adef.int_of_ifam i) == 0)
+      else (fun _ -> True, fun _ -> True)
   | (None, None, surnames) ->
       let per_tab = Array.create base.data.persons.len False in
       let fam_tab = Array.create base.data.families.len False in
@@ -109,6 +195,10 @@ value functions base anc desc surnames no_spouses_parents =
   | _ ->
       let per_tab = Array.create base.data.persons.len 0 in
       let fam_tab = Array.create base.data.families.len 0 in
+      let _ =
+        if censor <> 0 then censor_base base per_tab fam_tab 4 threshold
+        else ()
+      in
       match (anc, desc) with
       [ (Some iaper, None) ->
           do select_ancestors base per_tab fam_tab 1 iaper; return
