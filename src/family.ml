@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.16 1999-07-16 21:01:05 ddr Exp $ *)
+(* $Id: family.ml,v 2.17 1999-07-17 05:30:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -345,23 +345,26 @@ value family_m conf base =
       [ Some v -> Some.surname_print conf base Some.surname_not_found v
       | _ -> Alln.print_surnames conf base ]
   | Some "NG" ->
-      match p_getenv conf.env "n" with
-      [ Some n ->
-          let an = n in
+      match (p_getenv conf.env "n", p_getenv conf.env "select") with
+      [ (Some n, Some "input" | None) ->
           match p_getenv conf.env "t" with
           [ Some "P" ->
               do conf.cancel_links := False; return
-              Some.first_name_print conf base an
+              Some.first_name_print conf base n
           | Some "N" ->
               do conf.cancel_links := False; return
-              Some.surname_print conf base Some.surname_not_found an
+              Some.surname_print conf base Some.surname_not_found n
           | _ ->
-              let pl = find_all conf base an in
+              let pl = find_all conf base n in
               match pl with
-              [ [] -> Some.surname_print conf base inconnu an
+              [ [] ->
+                  do conf.cancel_links := False; return
+                  Some.surname_print conf base inconnu n
               | [p] -> person_selected conf base p
               | pl -> precisez conf base n pl ] ]
-      | None -> () ]
+      | (_, Some i) ->
+          relation_print conf base (base.data.persons.get (int_of_string i))
+      | _ -> () ]
   | Some "P" ->
       match p_getenv conf.env "v" with
       [ Some v -> Some.first_name_print conf base v

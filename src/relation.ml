@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.16 1999-07-17 04:21:09 ddr Exp $ *)
+(* $Id: relation.ml,v 2.17 1999-07-17 05:30:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -24,61 +24,62 @@ value print_menu conf base p =
   in
   let is = index_of_sex p.sex in
   do header conf title;
-     Wserver.wprint "<ul>\n";
-     html_li conf;
      tag "form" "method=get action=\"%s\"" conf.command begin
        Srcfile.hidden_env conf;
        Wserver.wprint "<input type=hidden name=em value=R>\n";
        Wserver.wprint "<input type=hidden name=ei value=%d>\n"
          (Adef.int_of_iper p.cle_index);
-       Wserver.wprint "<input type=hidden name=m value=NG>\n";
-       Wserver.wprint "<input name=n size=40 maxlength=200> =&gt;\n";
-       Wserver.wprint "<input type=submit value=\"Ok\">\n";
        tag "ul" begin
          html_li conf;
-         Wserver.wprint "<input type=radio name=t value=PN checked>\n";
-         Wserver.wprint
-           "<em>%s %s</em> %s <em>%s</em> %s <em>%s</em> %s <em>%s</em>\n"
-           (transl_nth conf "first name/first names" 0)
-           (transl_nth conf "surname/surnames" 0)
-           (transl conf "or") (transl conf "public name")
-           (transl conf "or") (nominative (transl conf "alias"))
-           (transl conf "or") (transl_nth conf "surname/surnames" 0);
-         html_li conf;
-         Wserver.wprint "<input type=radio name=t value=P> <em>%s</em>\n"
-           (transl_nth conf "first name/first names" 0);
-         html_li conf;
-         Wserver.wprint "<input type=radio name=t value=N> <em>%s</em>\n"
-           (transl_nth conf "surname/surnames" 0);
+         Wserver.wprint "<input type=hidden name=m value=NG>\n";
+         Wserver.wprint "<input type=radio name=select value=input checked>\n";
+         Wserver.wprint "<input name=n size=40 maxlength=200>\n";
+         html_p conf;
+         tag "ul" begin
+           html_li conf;
+           Wserver.wprint "<input type=radio name=t value=PN checked>\n";
+           Wserver.wprint
+             "<em>%s %s</em> %s <em>%s</em> %s <em>%s</em> %s <em>%s</em>\n"
+             (transl_nth conf "first name/first names" 0)
+             (transl_nth conf "surname/surnames" 0)
+             (transl conf "or") (transl conf "public name")
+             (transl conf "or") (nominative (transl conf "alias"))
+             (transl conf "or") (transl_nth conf "surname/surnames" 0);
+           html_li conf;
+           Wserver.wprint "<input type=radio name=t value=P> <em>%s</em>\n"
+             (transl_nth conf "first name/first names" 0);
+           html_li conf;
+           Wserver.wprint "<input type=radio name=t value=N> <em>%s</em>\n"
+             (transl_nth conf "surname/surnames" 0);
+         end;
+         Array.iter
+           (fun ifam ->
+              let cpl = coi base ifam in
+              let c = spouse p cpl in
+              let c = poi base c in
+              if sou base c.first_name <> "?" || sou base c.surname <> "?" then
+                do html_li conf;
+                   Wserver.wprint "<input type=radio name=select value=%d>\n"
+                     (Adef.int_of_iper c.cle_index);
+                   Wserver.wprint "%s\n"
+                     (transl_nth conf "his wife/her husband" is);
+                   afficher_personne_sans_titre conf base c;
+                   Wserver.wprint "</a>";
+                   afficher_titre conf base c;
+                   Wserver.wprint "\n";
+                return ()
+              else ())
+           p.family;
        end;
+       html_p conf;
        Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
        Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
-(**)
        html_br conf;
        Wserver.wprint "%s\n" (capitale (transl conf "long display"));
        Wserver.wprint "<input type=checkbox name=long value=on>\n";
-(**)
+       html_p conf;
+       Wserver.wprint "<input type=submit value=\"Ok\">\n";
      end;
-     Array.iter
-       (fun ifam ->
-          let cpl = coi base ifam in
-          let c = spouse p cpl in
-          let c = poi base c in
-          if sou base c.first_name <> "?" || sou base c.surname <> "?" then
-            do html_li conf;
-               Wserver.wprint "%s\n"
-                 (capitale (transl_nth conf "his wife/her husband" is));
-               Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n" (commd conf)
-                 (Adef.int_of_iper p.cle_index)
-                 (Adef.int_of_iper c.cle_index);
-               afficher_personne_sans_titre conf base c;
-               Wserver.wprint "</a>";
-               afficher_titre conf base c;
-               Wserver.wprint "\n";
-            return ()
-          else ())
-       p.family;
-     Wserver.wprint "</ul>\n";
      trailer conf;
   return ()
 ;
