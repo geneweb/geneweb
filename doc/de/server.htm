@@ -1,0 +1,168 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.03 [de] (WinNT; I) [Netscape]">
+   <TITLE>GeneWeb - Server</TITLE>
+</HEAD>
+<BODY>
+
+<H1>
+GeneWeb - Server</H1>
+Wenn gestartet, funktioniert "gwd" als ein Server. Normalerweise wird die
+Adresse: "http://computer:2317/base" f&uuml;r den Zugriff durch externe
+Leute genutzt.
+
+<P>Allerdings gilt das nur f&uuml;r Rechner, die von au&szlig;en sichtbar
+sind, d. h. nur f&uuml;r die, die direkt an's Internet angeschlossen sind.
+
+<P>Wenn du &uuml;ber einen Provider gehst, ist dein Computer nicht sichtbar.
+In diesem Fall gibt es keine L&ouml;sung. Es liegt in der Verantwortung
+des Providers, <I>GeneWeb </I>zu installieren. Zum Zeitpunkt wo ich diese
+Zeilen schreibe (Oct 98) hat es, denke ich, kein Provider installiert.
+
+<P>Daher betrifft das folgende nur diejenigen, die eine direkte Verbindung
+zum Internet besitzen.
+
+<P>Unter Unix oder Windows NT (also nicht Windows 95) erlangt man Zugang
+zum Computer als Nutzer, indem man den Loginnamen und das Password benutzt.
+M&ouml;glicherweise m&ouml;chtest du dich wieder abmelden, ohne dass <I>GeneWeb</I>
+angehalten wird.
+
+<P>Dann hast du zwei L&ouml;sungen f&uuml;r dieses Problem: Installation
+als "Dienst" und Installation als "cgi"-Programm.
+<H4>
+Installation als "Service"</H4>
+In diesem Funktionsmodus mu&szlig; kein Webserver auf deinem Computer installiert
+sein. Gwd <I>ist</I> selbst ein Webserver. Der einzige Unterschied zu anderen
+Servern besteht darin, dass er nur der Genealogie dient.
+<UL>
+<LI>
+Unter Unix gib - anstelle nur "gwd" zu schreiben - ein:</LI>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; nohup gwd 2>&amp;1 &amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (unter "sh", "ksh", "bash")
+&nbsp;&nbsp;&nbsp;&nbsp; nohup gwd >&amp; nohup.out &amp;&nbsp;&nbsp;&nbsp;&nbsp; (unter "csh", "tcsh")</PRE>
+Dann kannst du dich abmelden. Gwd wird weiterlaufen und seinen Mitschnitt
+in die Datei "nohup.out" schreiben, die du sp&auml;ter auswerten kannst.
+Zum Anhalten schau dir die Prozessnummer von "gwd" mit dem Befehl "ps"
+an und stoppe es mit dem Befehl "kill".</UL>
+
+<UL>
+<LI>
+Unter Windows NT mu&szlig;t du "gwd" als "Dienst" installieren. Frage deinen
+Systemadministrator.</LI>
+</UL>
+
+<H4>
+Installation als "cgi"-Programm</H4>
+In diesem Funktionsmodus mu&szlig; ein Webserver auf deinem Computer laufen.
+"Cgi"s sind Programme, die der Webserver starten kann. Nur der Systemadministrator
+ist autorisiert, "cgi"s hinzuzuf&uuml;gen. Du mu&szlig;t sie/ihn zuvor
+fragen.
+<UL>
+<LI>
+Unter Unix, wenn du <I>GeneWeb</I> z. B. im Verzeichnis "/home/smith/geneweb"
+installiert hast, erzeuge eine Datei mit dem Namen "geneweb" mit folgenden
+Zeilen:</LI>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; #!/bin/sh
+&nbsp;&nbsp;&nbsp;&nbsp; DIR=/home/smith/geneweb/gw
+&nbsp;&nbsp;&nbsp;&nbsp; cd $DIR
+&nbsp;&nbsp;&nbsp;&nbsp; $DIR/gwd -cgi</PRE>
+Setze diese Datei auf ausf&uuml;hrbar (chmod +x geneweb) und frage deinen
+Systemadministrator, ob er die Datei im "cgi" Verzeichnis installiert.
+Frage sie/ihn, welche Adresse zu benutzen ist. Das wird vermutlich soetwas
+sein wie:
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; http://blabla.xx.edu/cgi-bin/geneweb</PRE>
+Wenn du die o. g. URL-Adresse in deinem Webbrowser eingibst, wirst du eine
+Seite sehen, die lediglich nach "Base:" fragt. Gib den Namen deiner Datenbank
+ein. Du kannst auch "?b=jones" zu dieser URL hinzuf&uuml;gen, wenn "jones"
+dein Datenbankname ist.
+
+<P>Anmerkungen:
+<UL>
+<LI>
+Wenn letzteres Kommando nicht funktioniert, kann es sein, dass der Webserver
+keine Zugriffsrechte zu der Datenbank und den anderen Verzeichnissen hat.
+F&uuml;hre die folgenden Operationen aus:</LI>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; cd /home/smith/geneweb/gw
+&nbsp;&nbsp;&nbsp;&nbsp; chmod 777 . lang images base.gwb</PRE>
+
+<LI>
+Wenn er antwortet, aber sehr langsam ist, kann es sein, dass das durch
+den Zugriff auf die Datenbank &uuml;ber NFS kommt (wenn du nicht wei&szlig;t
+was das hei&szlig;t, frage deinen Systemadministrator). Es w&auml;re besser,
+wenn das nicht so bleibt: wenn m&ouml;glich, kopiere das Verzeichnis geneweb
+auf eine lokale Festplatte auf dem Webserver. Wenn das nicht m&ouml;glich
+ist, f&uuml;ge die Option "-nolock" zum Aufruf des Befehls&nbsp; "gwd"
+in der o.g. Datei "geneweb" hinzu:</LI>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; $DIR/gwd -cgi -nolock</PRE>
+</UL>
+</UL>
+
+<UL>
+<LI>
+Unter Windows NT, wenn du <I>GeneWeb</I> z. B. im Verzeichnis "c:\home\smith\geneweb"
+installiert hast, erzeuge eine Datei namens "gwd.arg" mit folgenden Zeilen:</LI>
+
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; -hd
+&nbsp;&nbsp;&nbsp;&nbsp; c:\home\smith\geneweb\gw
+&nbsp;&nbsp;&nbsp;&nbsp; -bd
+&nbsp;&nbsp;&nbsp;&nbsp; c:\home\smith\geneweb\gw
+&nbsp;&nbsp;&nbsp;&nbsp; -cgi</PRE>
+Das sind die Optionen, die zum Befehl "gwd" hinzugef&uuml;gt werden k&ouml;nnen.
+F&uuml;hre "gwd -help" aus, um alle m&ouml;glichen Optionen zu sehen.
+
+<P>Bitte dann deinen Systemadministrator:
+<UL>
+<LI>
+die Datei "gwd.arg" in das "cgi"-Verzeichnis zu installieren.</LI>
+
+<LI>
+die Datei "gwd.exe" aus dem "geneweb"-Verzeichnis in dieses "cgi"-Verzeichnis
+zu kopieren.</LI>
+</UL>
+Frage sie/ihn, welche Adresse zu benutzen ist. Das wird vermutlich soetwas
+sein wie:
+<PRE>&nbsp;&nbsp;&nbsp;&nbsp; http://blabla.xx.edu/cgi-bin/gwd.exe</PRE>
+Wenn du die o. g. URL-Adresse in deinem Webbrowser &ouml;ffnest, wirst
+du eine Seite sehen, die lediglich nach "Base:" fragt. Gib den Namen deiner
+Datenbank ein. Du kannst ausserdem "?b=jones" zu dieser URL hinzuf&uuml;gen,
+wenn "jones" dein Datenbankname ist.
+
+<P>Anmerkung: Wenn dieses letzte Kommando nicht funktioniert, kann es sein,
+da&szlig; der Webserver keine Zugriffsrechte auf die Datenbank und die
+anderen Verzeichnisse hat. Du mu&szlig;t Lese- und Schreibzugriffsrechte
+f&uuml;r das Verzeichnis "geneweb", dessen Unterverzeichnis "gw" und die
+Unterverzeichnisse "lang", "jones.gwb", "images" (und "cnt", wenn es existiert)
+vergeben.</UL>
+
+<H4>
+Installation als "Dienst" oder als "cgi"-Programm?</H4>
+Wenn du die Wahl hast zwischen Installation als "Dienst" oder als "cgi"-Programm,
+beachte bitte die folgenden Punkte:
+<UL>
+<LI>
+Im "cgi"-Modus sind die Anfragen indirekt, weil sie durch den Webserver
+gehen, was die Abarbeitung verlangsamen kann.</LI>
+
+<LI>
+Unter Unix ist die Installation als "Dienst" einfacher, weil es weder die
+Erlaubnis noch den Eingriff des Systemadministrators ben&ouml;tigt.</LI>
+
+<LI>
+Unter Windows NT mu&szlig;t du immer den Systemadministrator fragen, der
+vermutlich den "cgi"-Modus bevorzugen wird, weil er einfacher zu installieren
+und zu kontrollieren ist.</LI>
+
+<LI>
+Wenn nat&uuml;rlich kein Webserver auf deinem Computer l&auml;uft, ist
+nur die Installation als "Dienst" m&ouml;glich.</LI>
+</UL>
+Zur&uuml;ck zur <A HREF="diruse.htm">Gebrauchsanleitung</A>.
+
+<P>
+<HR><I><FONT SIZE=-1>&copy; Copyright INRIA 1999 - GeneWeb</FONT></I>
+</BODY>
+</HTML>
