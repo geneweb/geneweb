@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.230 2005-03-23 12:03:21 ddr Exp $
+# $Id: lexicon.txt,v 4.231 2005-03-24 10:53:17 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 # This file is kept by compatibility to allow displaying databases
 # created before version 5.00.
@@ -5610,6 +5610,7 @@ sv: m&aring;nader
 cs: mìsíèní fáze/nov/první ètvrt'/úplnìk/poslední ètvrt'
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
+eo: ago de la luno/novluno/unua lunkvarono/plenluno/lasta lunkvarono
 fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
 no: månefaser/nymåne/første kvarter/fullmåne/siste kvarter
 pl: faza ksiê¿yca/nów/pierwsza kwadra/pe³nia/trzecia kwadra
@@ -7797,6 +7798,7 @@ cs: %d nejstar¹ích párù pravdìpodobnì ¾ijících a zadaných
 da: og de %d &aelig;ldste par muligvis stadig i live og forlovede
 de: Die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
 en: the %d oldest couples perhaps still alive and engaged
+eo: versajne la %d plej altaj paroj ankorau vivas kaj estas fiancigitaj
 et: %d vanimat paari kes on võib-olla veel elus ja kihlatud
 fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
