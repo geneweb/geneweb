@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.28 1999-05-17 16:40:10 ddr Exp $ *)
+(* $Id: perso.ml,v 2.29 1999-05-18 21:57:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -908,6 +908,7 @@ value print conf base p =
          do Wserver.wprint "<em>(";
             print_linked_first_name_and_surname conf base p;
             Wserver.wprint ")</em>\n";
+            html_br conf;
          return () ];
      List.iter
        (fun n ->

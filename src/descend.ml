@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.9 1999-05-10 15:45:59 ddr Exp $ *)
+(* $Id: descend.ml,v 2.10 1999-05-18 21:57:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -113,6 +113,13 @@ value print_choice conf base p niveau_effectif =
       Wserver.wprint "<input type=radio name=t value=S> %s\n"
         (capitale (transl conf "only the generation selected"));
     end;
+    html_p conf;
+    tag "ul" begin
+      html_li conf;
+      Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
+      Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
+    end;
+    html_p conf;      
     Wserver.wprint "<input type=submit value=\"Ok\">";
     html_br conf;
   end
