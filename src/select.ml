@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 3.4 2000-08-29 15:34:05 ddr Exp $ *)
+(* $Id: select.ml,v 3.5 2000-10-28 09:04:37 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -17,43 +17,41 @@ value select_ancestors base per_tab fam_tab flag =
           else
             do fam_tab.(i) := fam_tab.(i) lor flag; return
             let cpl = coi base ifam in
-            do loop cpl.father;
-               loop cpl.mother;
-            return ()
+            do loop cpl.father; loop cpl.mother; return ()
       | None -> () ]
 ;
 
 value select_descendants base per_tab fam_tab no_spouses_parents flag iper =
   let select_family ifam cpl =
-    do let i = Adef.int_of_ifam ifam in
-       fam_tab.(i) := fam_tab.(i) lor flag;
+    do let i = Adef.int_of_ifam ifam in fam_tab.(i) := fam_tab.(i) lor flag;
        let i = Adef.int_of_iper cpl.father in
        per_tab.(i) := per_tab.(i) lor flag;
        let i = Adef.int_of_iper cpl.mother in
        per_tab.(i) := per_tab.(i) lor flag;
     return ()
   in
-  loop iper where rec loop iper =
+  let rec loop iper =
     let i = Adef.int_of_iper iper in
     if per_tab.(i) land flag <> 0 then ()
     else
       do per_tab.(i) := per_tab.(i) lor flag; return
       Array.iter
         (fun ifam ->
-          let i = Adef.int_of_ifam ifam in
-          if fam_tab.(i) land flag <> 0 then ()
-          else
-            let cpl = coi base ifam in
-            do select_family ifam cpl;
-               if not no_spouses_parents then
-                 let sp = spouse iper cpl in
-                 match (aoi base sp).parents with
-                 [ Some ifam -> select_family ifam (coi base ifam)
-                 | None -> () ]
-               else ();
-            return
-            Array.iter loop (doi base ifam).children)
+           let i = Adef.int_of_ifam ifam in
+           if fam_tab.(i) land flag <> 0 then ()
+           else
+             let cpl = coi base ifam in
+             do select_family ifam cpl;
+                if not no_spouses_parents then
+                  let sp = spouse iper cpl in
+                  match (aoi base sp).parents with
+                  [ Some ifam -> select_family ifam (coi base ifam)
+                  | None -> () ]
+                else ();
+             return Array.iter loop (doi base ifam).children)
         (uoi base iper).family
+  in
+  loop iper
 ;
 
 value select_surname base per_tab fam_tab no_spouses_parents surname =
@@ -66,9 +64,8 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
       let des = base.data.descends.get i in
       let fath = poi base cpl.father in
       let moth = poi base cpl.mother in
-      if Name.strip_lower (sou base fath.surname) = surname
-      || Name.strip_lower (sou base moth.surname) = surname
-      then
+      if Name.strip_lower (sou base fath.surname) = surname ||
+         Name.strip_lower (sou base moth.surname) = surname then
         do fam_tab.(i) := True;
            per_tab.(Adef.int_of_iper cpl.father) := True;
            per_tab.(Adef.int_of_iper cpl.mother) := True;
@@ -76,8 +73,7 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
              (fun ic ->
                 let p = poi base ic in
                 if not per_tab.(Adef.int_of_iper ic) &&
-                  Name.strip_lower (sou base p.surname) = surname
-                then
+                   Name.strip_lower (sou base p.surname) = surname then
                   per_tab.(Adef.int_of_iper ic) := True
                 else ())
              des.children;
@@ -88,14 +84,14 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
                   match (aoi base x).parents with
                   [ Some ifam when not fam_tab.(Adef.int_of_ifam ifam) ->
                       let cpl = coi base ifam in
-        	      do fam_tab.(Adef.int_of_ifam ifam) := True;
-        		 per_tab.(Adef.int_of_iper cpl.father) := True;
-        		 per_tab.(Adef.int_of_iper cpl.mother) := True;
+                      do fam_tab.(Adef.int_of_ifam ifam) := True;
+                         per_tab.(Adef.int_of_iper cpl.father) := True;
+                         per_tab.(Adef.int_of_iper cpl.mother) := True;
                       return ()
                   | _ -> () ])
                [cpl.father; cpl.mother];
         return ()
-    else ();
+      else ();
   done
 ;
 
@@ -132,5 +128,4 @@ value functions base anc desc surnames no_spouses_parents =
           (fun i -> per_tab.(Adef.int_of_iper i) == 3,
            fun i -> fam_tab.(Adef.int_of_ifam i) == 3)
       | _ -> assert False ] ]
-
 ;
