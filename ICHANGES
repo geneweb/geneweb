@@ -4,6 +4,11 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.04
 --------------------
 
+* GeneWeb compiler (gwc) and uncompiler (gwu)
+  - [23 Mar 00] Generates "csrc" if at least two children have the same
+    #src value (save file length). Added "cbp", idem for the birth place
+    (#bp value).
+
 GeneWeb Version 3.03
 --------------------
 

@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.10 2000-03-23 13:34:52 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.11 2000-03-23 15:35:56 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -105,10 +105,12 @@ value has_infos base p =
   p.baptism <> Adef.codate_None ||  p.death <> NotDead
 ;
 
-value print_if_no_empty oc base lab is =
-  if sou base is = "" then ()
+value print_if_not_equal_to x oc base lab is =
+  if sou base is = x then ()
   else Printf.fprintf oc " %s %s" lab (correct_string base is)
 ;
+
+value print_if_no_empty = print_if_not_equal_to "";
 
 value print_first_name_alias oc base is =
   Printf.fprintf oc " {%s}" (correct_string base is)
@@ -178,7 +180,7 @@ value print_title oc base t =
   return ()
 ;
 
-value print_infos oc base is_child print_sources p =
+value print_infos oc base is_child csrc cbp p =
   do List.iter (print_first_name_alias oc base) p.first_names_aliases;
      List.iter (print_surname_alias oc base) p.surnames_aliases;
      match p.public_name with
@@ -194,9 +196,7 @@ value print_infos oc base is_child print_sources p =
      | Public -> Printf.fprintf oc " #apubl"
      | Private -> Printf.fprintf oc " #apriv" ];
      print_if_no_empty oc base "#occu" p.occupation;
-     if sou base p.psources <> print_sources then
-       print_if_no_empty oc base "#src" p.psources
-     else ();
+     print_if_not_equal_to csrc oc base "#src" p.psources;
      match Adef.od_of_codate p.birth with
      [ Some d ->
          do Printf.fprintf oc " ";
@@ -212,7 +212,7 @@ value print_infos oc base is_child print_sources p =
              p_first_name base p <> "?" && p_surname base p <> "?" ->
                Printf.fprintf oc " 0"
            | _ -> () ] ];
-     print_if_no_empty oc base "#bp" p.birth_place;
+     print_if_not_equal_to cbp oc base "#bp" p.birth_place;
      print_if_no_empty oc base "#bs" p.birth_src;
      match Adef.od_of_codate p.baptism with
      [ Some d ->
@@ -268,7 +268,7 @@ value print_parent oc base mark fam_sel fam p =
        (if p.occ == 0 || first_name = "?" || surname = "?" then ""
         else "." ^ string_of_int p.occ);
      if pr then
-       if has_infos then print_infos oc base False "" p
+       if has_infos then print_infos oc base False "" "" p
        else if first_name <> "?" && surname <> "?" then
          Printf.fprintf oc " 0"
        else ()
@@ -276,7 +276,7 @@ value print_parent oc base mark fam_sel fam p =
   return ()
 ;
 
-value print_child oc base fam_surname print_sources p =
+value print_child oc base fam_surname csrc cbp p =
   do Printf.fprintf oc "-";
      match p.sex with
      [ Male -> Printf.fprintf oc " h"
@@ -289,7 +289,7 @@ value print_child oc base fam_surname print_sources p =
      if p.surname <> fam_surname then
        Printf.fprintf oc " %s" (s_correct_string (sou base p.surname))
      else ();
-     print_infos oc base True print_sources p;
+     print_infos oc base True csrc cbp p;
      Printf.fprintf oc "\n";
   return ()
 ;
@@ -298,11 +298,11 @@ value bogus_person base p =
   p_first_name base p = "?" && p_surname base p = "?"
 ;
 
-value common_children_sources base children =
+value common_children proj base children =
   if Array.length children <= 1 then None
   else
     let list =
-      List.map (fun p -> sou base p.psources) (Array.to_list children)
+      List.map (fun p -> sou base (proj p)) (Array.to_list children)
     in
     if List.mem "" list then None
     else
@@ -319,6 +319,9 @@ value common_children_sources base children =
       in
       if n_max > 1 then Some src_max else None
 ;
+
+value common_children_sources = common_children (fun p -> p.psources);
+value common_children_birth_place = common_children (fun p -> p.birth_place);
 
 value array_forall f a =
   loop 0 where rec loop i =
@@ -342,7 +345,7 @@ value print_witness oc base mark p notes_pl_p =
      if Array.length u.family = 0 && a.parents = None
      && not mark.(Adef.int_of_iper p.cle_index) then
        do mark.(Adef.int_of_iper p.cle_index) := True;
-          if has_infos base p then print_infos oc base False "" p
+          if has_infos base p then print_infos oc base False "" "" p
           else Printf.fprintf oc " 0";
           match sou base p.notes with
           [ "" -> ()
@@ -385,10 +388,16 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
      match sou base fam.fsources with
      [ "" -> ()
      | s -> Printf.fprintf oc "src %s\n" (correct_string base fam.fsources) ];
-     let print_sources =
+     let csrc =
        match common_children_sources base m.m_chil with
        [ Some s ->
           do Printf.fprintf oc "csrc %s\n" (s_correct_string s); return s
+       | _ -> "" ]
+     in
+     let cbp =
+       match common_children_birth_place base m.m_chil with
+       [ Some s ->
+          do Printf.fprintf oc "cbp %s\n" (s_correct_string s); return s
        | _ -> "" ]
      in
      do match fam.comment with
@@ -404,7 +413,7 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
             Array.iter
               (fun p ->
                  if per_sel p.cle_index then
-                   print_child oc base fam_surname print_sources p
+                   print_child oc base fam_surname csrc cbp p
                  else ())
               m.m_chil;
             Printf.fprintf oc "end\n";
@@ -510,7 +519,7 @@ value print_relation_parent oc base mark defined_p p =
      if Array.length u.family = 0 && a.parents = None
      && not mark.(Adef.int_of_iper p.cle_index) then
        do mark.(Adef.int_of_iper p.cle_index) := True;
-          if has_infos base p then print_infos oc base False "" p
+          if has_infos base p then print_infos oc base False "" "" p
           else Printf.fprintf oc " 0";
           defined_p.val := [p :: defined_p.val];
        return ()
