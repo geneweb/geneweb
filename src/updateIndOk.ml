@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.3 1999-11-10 10:39:09 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.4 1999-12-14 05:16:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -282,13 +282,6 @@ value error_person conf base p err =
      Wserver.wprint "%s\n" (capitale err);
      trailer conf;
   return ()
-;
-
-value list_filter p =
-  find [] where rec find accu =
-    fun
-    [ [] -> List.rev accu
-    | [x :: l] -> if p x then find [x :: accu] l else find accu l ]
 ;
 
 value strip_list = list_filter (fun s -> s <> "");
