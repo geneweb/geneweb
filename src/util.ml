@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.90 2001-02-10 22:05:37 ddr Exp $ *)
+(* $Id: util.ml,v 3.91 2001-03-01 19:42:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -504,7 +504,7 @@ value fcapitale (a : format 'a 'b 'c) =
   (Obj.magic capitale a : format 'a 'b 'c)
 ;
 
-value nth_field w n =
+value nth_field_abs w n =
   let rec start i n =
     if n == 0 then i
     else if i < String.length w then
@@ -524,7 +524,12 @@ value nth_field w n =
   in
   let i1 = start 0 n in
   let i2 = stop i1 in
-  let (i1, i2) = if i2 == i1 then (0, stop 0) else (i1, i2) in
+  (i1, i2)
+;
+
+value nth_field w n =
+  let (i1, i2) = nth_field_abs w n in
+  let (i1, i2) = if i2 == i1 then nth_field_abs w 0 else (i1, i2) in
   String.sub w i1 (i2 - i1)
 ;
 
@@ -535,6 +540,16 @@ value transl conf w =
 value transl_nth conf w n =
   try nth_field (Hashtbl.find conf.lexicon w) n with
   [ Not_found -> "[" ^ nth_field w n ^ "]" ]
+;
+
+value transl_nth_def conf w n def_n =
+  try
+    let w = Hashtbl.find conf.lexicon w in
+    let (i1, i2) = nth_field_abs w n in
+    if i2 == i1 then nth_field w def_n
+    else String.sub w i1 (i2 - i1)
+  with
+  [ Not_found -> "[" ^ nth_field w def_n ^ "]" ]
 ;
 
 value plus_decl s =

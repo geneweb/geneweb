@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.13 2001-02-14 02:47:09 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.14 2001-03-01 19:42:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -281,7 +281,7 @@ value print_cousins conf base p lev1 lev2 =
      if cnt.val >= max_cnt then Wserver.wprint "etc...\n"
      else if cnt.val > 1 then
        Wserver.wprint "%s: %d %s.\n" (capitale (transl conf "total"))
-         cnt.val (nominative (transl_nth conf "person/persons" 1))
+         cnt.val (nominative (transl_nth_def conf "person/persons" 2 1))
      else ();
      trailer conf;
   return ()

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.246 2001-03-01 19:03:16 ddr Exp $
+# $Id: lexicon.txt,v 3.247 2001-03-01 19:42:44 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -3305,7 +3305,7 @@ dk: generation/generationer
 en: generation/generations
 eo: generacio/generacioj
 es: generaci&oacute;n/generaci&oacute;nes
-et: sugupõlv/sugupõlved
+et: sugupõlv/sugupõlve
 fi: sukupolvi/sukupolvea
 fr: g&eacute;n&eacute;ration/g&eacute;n&eacute;rations
 he:   ãåø / ãåøåú
@@ -5510,7 +5510,7 @@ dk: person/personer
 en: person/persons
 eo: persono:a:+n/personoj:a:+n
 es: persona/personas
-et: isik/isikud
+et: isik/isikud/isikut
 fi: henkil&ouml;/henkil&ouml;&auml
 fr: personne/personnes
 he:  àãí/ àğùéí
@@ -5856,7 +5856,7 @@ dk: sl&aelig;gtskabsforbindelse/sl&aelig;gtskabsforbindelser
 en: relationship link/relationship links
 eo: ligo de parenceco/ligoj de parenceco
 es: grado de parentesco/grados de parentesco
-et: sugulussuhe/sugulussuhted
+et: sugulussuhe/sugulussuhet
 fi: sukulaisuuskytkent&auml;/sukulaisuuskytkent&auml;&auml
 fr: lien de parent&eacute;/liens de parent&eacute;
 he:  ÷ùø îùôçúé/ ÷ùøé îùôçä
