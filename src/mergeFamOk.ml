@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 4.8 2004-07-16 16:17:56 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 4.9 2004-07-18 14:26:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -81,7 +81,7 @@ value print_merge conf base =
         Update.digest_family fam1 (base.data.couples.get f1) des1
       in
       let scpl =
-        Gutil.map_couple_p (UpdateFam.person_key base)
+        Gutil.map_couple_p conf.multi_parents (UpdateFam.person_key base)
           (coi base sfam.fam_index)
       in
       UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest

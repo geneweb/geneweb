@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.65 2004-04-05 09:30:35 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.66 2004-07-18 14:26:38 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -911,6 +911,9 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
          [ Not_found -> green_color ];
        lang = if lang = "" then default_lang else lang;
        default_lang = default_lang;
+       multi_parents =
+         try List.assoc "multi_parents" base_env = "yes" with
+         [ Not_found -> False ];
        can_send_image =
          try List.assoc "can_send_image" base_env <> "no" with
          [ Not_found -> True ];

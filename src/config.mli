@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 4.10 2004-03-03 10:29:36 ddr Exp $ *)
+(* $Id: config.mli,v 4.11 2004-07-18 14:26:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -17,6 +17,7 @@ type config =
     highlight : string;
     lang : string;
     default_lang : string;
+    multi_parents : bool;
     can_send_image : bool;
     public_if_titles : bool;
     public_if_no_date : bool;

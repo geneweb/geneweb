@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.31 2004-07-18 08:53:55 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.32 2004-07-18 14:26:40 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -206,7 +206,7 @@ value reconstitute_family conf =
      witnesses = Array.of_list witnesses; relation = relation;
      divorce = divorce; comment = comment; origin_file = origin_file;
      fsources = fsources; fam_index = Adef.ifam_of_int fam_index}
-  and cpl = parent (Array.of_list parents)
+  and cpl = parent conf.multi_parents (Array.of_list parents)
   and des = {children = Array.of_list children} in
   (fam, cpl, des, ext)
 ;
@@ -403,7 +403,8 @@ value effective_mod conf base sfam scpl sdes =
     | None -> "" ]
   in
   let ncpl =
-    map_couple_p (Update.insert_person conf base psrc created_p) scpl
+    map_couple_p conf.multi_parents
+      (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)
@@ -515,7 +516,8 @@ value effective_add conf base sfam scpl sdes =
     | None -> "" ]
   in
   let ncpl =
-    map_couple_p (Update.insert_person conf base psrc created_p) scpl
+    map_couple_p conf.multi_parents
+      (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.55 2004-07-17 09:16:54 ddr Exp $ *)
+(* $Id: perso.ml,v 4.56 2004-07-18 14:26:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -188,7 +188,7 @@ value find_sosa_aux conf base a p =
                 let z = Num.twice z in
                 match gene_find zil with
                 [ Left zil ->
-                    Left [(z, (father cpl)); (Num.inc z 1, (mother cpl)) :: zil]
+                    Left [(z, father cpl); (Num.inc z 1, (mother cpl)) :: zil]
                 | Right z -> Right z ]
             | None -> gene_find zil ]
         } ]
@@ -293,6 +293,11 @@ value rec eval_variable conf base env sl =
               | _ -> False ]
             in
             let ep = (p, a, u, auth) in loop ep Vnone sl
+        | _ -> VVnone ]
+    | ["parent" :: sl] ->
+        match get_env "parent" env with
+        [ Vind p a u ->
+            let ep = (p, a, u, authorized_age conf base p ) in loop ep efam sl
         | _ -> VVnone ]
     | ["father" :: sl] ->
         match parents a with
@@ -1267,6 +1272,7 @@ and print_simple_foreach conf base env al ep efam =
   | "family" -> print_foreach_family conf base env al ep
   | "first_name_alias" -> print_foreach_first_name_alias conf base env al ep
   | "nobility_title" -> print_foreach_nobility_title conf base env al ep
+  | "parent" -> print_foreach_parent conf base env al ep
   | "qualifier" -> print_foreach_qualifier conf base env al ep
   | "related" -> print_foreach_related conf base env al ep
   | "relation" -> print_foreach_relation conf base env al ep
@@ -1351,6 +1357,19 @@ and print_foreach_nobility_title conf base env al (p, _, _, p_auth) =
          List.iter (print_ast conf base env) al)
       titles
   else ()
+and print_foreach_parent conf base env al (_, a, _, _) =
+  match parents a with
+  [ Some ifam ->
+      let cpl = coi base ifam in
+      Array.iter
+        (fun iper ->
+	   let p = pget conf base iper in
+	   let a = aget conf base iper in
+	   let u = uget conf base iper in
+	   let env = [("parent", Vind p a u) :: env] in
+           List.iter (print_ast conf base env) al)
+        (parent_array cpl)
+  | None -> () ]
 and print_foreach_qualifier conf base env al (p, _, _, _) =
   list_iter_first
     (fun first nn ->
