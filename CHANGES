@@ -4,6 +4,8 @@ GeneWeb version 4.04
 * GeneWeb server or CGI (gwd)
   - [11 Oct 01] Improved persons merging (dates and places are merged
     faster).
+  - [03 Oct 01] Fixed bug in displaying by places/surnames: the cutting
+    of the places by "levels" worked bad.
   - [16 Sep 01] Added variable "max_images_size" in base configuration
     files (base.gwf) to limit the size of the images which can be sent
     by the "send image" link.
