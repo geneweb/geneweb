@@ -5,6 +5,8 @@ GeneWeb Version 3.10
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [28 Nov 00] Fixed problem in relationship displaying in German; sometimes
+    displayed "ein:d:+em" in the text.
   - [26 Nov 00] In merging persons the default selected number is now 1/ the
     lowest if the first names are the same or 2/ the first one if the first
     names are different.
