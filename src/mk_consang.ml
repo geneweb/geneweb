@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 3.3 2000-01-30 15:14:57 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 3.4 2000-05-03 09:50:44 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 value fname = ref "";
@@ -7,7 +7,7 @@ value indexes = ref False;
 value scratch = ref False;
 value quiet = ref False;
 
-value usage = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>";
+value errmsg = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>";
 value speclist =
   [("-q", Arg.Set quiet, ": quiet mode");
    ("-i", Arg.Set indexes, ": build the indexes again");
@@ -16,6 +16,7 @@ value speclist =
     ": Save memory, but slower when rewritting data base");
    ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
 ;
+value anonfun s = fname.val := s;
 
 value simple_output bname base =
   let no_patches =
@@ -29,7 +30,14 @@ value simple_output bname base =
 ;
 
 value main () =
-  do Argl.parse speclist (fun s -> fname.val := s) usage;
+  do ifdef MAC then
+       do Printf.eprintf "args? "; flush stderr;
+          let line = input_line stdin in
+          let list = Gutil.arg_list_of_string line in
+          Argl.parse_list speclist anonfun errmsg list;
+       return ()
+     else ();
+     Argl.parse speclist anonfun errmsg;
      if fname.val = "" then
        do Printf.eprintf "Missing file name\n";
           Printf.eprintf "Use option -help for usage\n";

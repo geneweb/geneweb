@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 3.2 2000-01-10 02:14:38 ddr Exp $ *)
+(* $Id: gutil.mli,v 3.3 2000-05-03 09:50:41 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -102,3 +102,5 @@ value lindex : string -> char -> option int;
 value array_memq : 'a -> array 'a -> bool;
 
 value surnames_pieces : string -> list string;
+
+value arg_list_of_string : string -> list string;

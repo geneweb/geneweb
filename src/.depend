@@ -92,8 +92,8 @@ forum.cmx: config.cmi def.cmi gutil.cmx iobase.cmx lock.cmx srcfile.cmx \
     update.cmx util.cmx ../wserver/wserver.cmx 
 fpla.cmo: adef.cmi argl.cmo def.cmi gutil.cmi iobase.cmi 
 fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx iobase.cmx 
-gutil.cmo: adef.cmi def.cmi name.cmi gutil.cmi 
-gutil.cmx: adef.cmx def.cmi name.cmx gutil.cmi 
+gutil.cmo: adef.cmi buff.cmo def.cmi name.cmi gutil.cmi 
+gutil.cmx: adef.cmx buff.cmx def.cmi name.cmx gutil.cmi 
 gwc.cmo: adef.cmi argl.cmo check.cmo consangAll.cmo def.cmi gutil.cmi \
     gwcomp.cmo iobase.cmi lock.cmo mhashtbl.cmo name.cmi 
 gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx def.cmi gutil.cmx \
