@@ -26,6 +26,11 @@ GeneWeb version 2.06
   - [Aug 8, 99] Added option "-redirect" to say to the users that the
     GeneWeb service has been redirected to some other address.
 
+
+* Gedcom to GeneWeb (ged2gwb)
+  - [Aug 22, 99] The option "-no_efn" is now the default. Made the change
+    in "setup" files too.
+
 * Base configuration files (base.gwf)
   - [Aug 20, 99] Added new variables "max_anc_level" and "max_desc_level"
     to specify the maximum level of generations that can be displayed in
