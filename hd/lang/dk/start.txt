@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.17 2000-01-14 14:25:40 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.18 2000-01-15 19:07:51 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogi - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -41,7 +41,7 @@ Databasen <font color=%i><b>"%t"</b></font> indeholder for
 <td align=center><a href="%sw=w"><em>Opdateringsadgang</em></a><br>
 (adgangsord)<br></td>
 
-%INf<td align=center><a href="%sw=f"><em>Betroet</em></a> adgang<br>
+%INf<td align=center><a href="%sw=f"><em>Betroet adgang</em></a><br>
 (adgangsord)</td>
 
 %E</tr></table>%E%I|ca<table border=0>
