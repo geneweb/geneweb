@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.21 2000-07-28 08:53:41 ddr Exp $ *)
+(* $Id: dag.ml,v 3.22 2000-11-01 04:11:16 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -154,14 +154,13 @@ value print_image conf base p =
 
 (* main *)
 
-value print_only_dag conf base spouse_on invert set spl d =
+value print_only_dag conf base print_elem spouse_on invert set spl d =
   let t = table_of_dag False invert d in
   let print_indi n =
     match n.valu with
     [ Left ip ->
         let p = poi base ip in
-        do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
-           Wserver.wprint "%s" (Date.short_dates_text conf base p);
+        do print_elem conf base p;
            let spouses =
              if (spouse_on && n.chil <> [] || n.pare = []) && not invert then
                List.fold_left
@@ -243,11 +242,13 @@ value gen_print_dag conf base spouse_on invert set spl d =
   let title _ =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
   in
-(*
-do let d = tag_dag d in print_char_table d (table_of_dag d); flush stderr; return
-*)
+  let print_elem conf base p =
+    do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
+       Wserver.wprint "%s" (Date.short_dates_text conf base p);
+    return ()
+  in
   do Util.header_no_page_title conf title;
-     print_only_dag conf base spouse_on invert set spl d;
+     print_only_dag conf base print_elem spouse_on invert set spl d;
      Util.trailer conf;
   return ()
 ;

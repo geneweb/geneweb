@@ -13,9 +13,7 @@ GeneWeb Version 3.09
 * GeneWeb daemon/CGI (gwd)
   - [31 Oct 00] Created the request "m=RLM" followed by the list of persons
     to link two by two to create arbitrary dags (i1=...;i2=...;i3=... and so
-    on). Tested with persons having the same nobility title but... generally
-    the resulting dag is too complicated, resulting to a ugly display.
-    However, the new code for initializing dags seems to be less bugged,
+    on). Besides, the new code for initializing dags seems to be less bugged,
     giving better results for example in relationships by shortest path.
   - [30 Oct 00] In relation.ml changed the part computing the relationship
     by shortest path to get a function returning the result instead of
