@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.33 2000-06-13 10:06:50 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.34 2000-06-18 12:00:53 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogi - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -192,6 +192,12 @@ søgning</b></font></a>.
 
 Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
 %Il<p>%E
+
+<p>
+
+{If your browser does not automatically update the modified pages (you
+must each time do "reload current document"), try navigating from <a
+href="%sescache=-%c">this link</a>}.
 
 </td></tr>
 
