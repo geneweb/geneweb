@@ -26,6 +26,7 @@ GeneWeb Version 2.01
   - [Mar 10, 99] Some changes in Italian version (by Raffaele Sena).
 
 * Documentation
+  - [Mar 24, 99] Deleted all background colors.
   - [Mar 18, 99] Swedish version updated (Lars Gustavsson).
   - [Mar 17, 99] Changed documentation for the new feature "automatic choice"
     for the "death state" (see above), file "update.htm", section 5.4 "modify
