@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.81 2000-04-04 18:53:12 ddr Exp $
+# $Id: lexicon.txt,v 3.82 2000-04-04 18:59:20 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -1197,7 +1197,7 @@ dk: &aring;rsdage for d&oslash;de personer
 en: anniversaries of death
 eo: datrevenoj de la mortaj personoj
 es: aniversarios de las personas fallecidas
-fi: vainajien muistop&auml;ivi&auml
+fi: vainajien muistop&auml;iv&auml;t
 fr: anniversaires des personnes d&eacute;c&eacute;d&eacute;es
 he:   ימי שנה למוות
 is: בrtםנir
@@ -5141,6 +5141,7 @@ dk: de seneste %d bryllupper
 en: the latest %d marriages
 eo: la lastaj %d edzigxoj
 es: los %d casamientos m&aacute;s recientes
+fi: viime %d naimisiinmenot
 fr: les %d derniers mariages
 it: gli ultimi %d matrimoni
 pt: os %d casamentos mais recentes
