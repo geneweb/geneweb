@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.48 2002-09-16 13:44:30 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.49 2002-10-22 13:18:24 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -927,6 +927,9 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
          [ Not_found -> True ];
        public_if_titles =
          try List.assoc "public_if_titles" base_env = "yes" with
+         [ Not_found -> False ];
+       public_if_no_date =
+         try List.assoc "public_if_no_date" base_env = "yes" with
          [ Not_found -> False ];
        cancel_links = cancel_links;
        setup_link = setup_link.val;

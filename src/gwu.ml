@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.12 2002-03-11 19:02:59 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.13 2002-10-22 13:18:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -73,7 +73,7 @@ value print_date_option oc =
 
 value starting_char s =
   match s.[0] with
-  [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' -> True
+  [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '0'..'9' -> True
   | '?' -> if s = "?" then True else False
   | _ -> False ]
 ;

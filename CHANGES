@@ -2,7 +2,7 @@ GeneWeb version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - <li>[21 Oct 02] In families forms, added shortcuts for created
+  - [21 Oct 02] In families forms, added shortcuts for created
     persons' dates: one can write "?", ">", "<" before the year to specify
     "perhaps", "after" and "before". And in the "death" field, one can
      write "+" and "=" to specify "died don't know when" and "alive".
@@ -26,11 +26,19 @@ GeneWeb version 4.08
   - [11 Sep 02] Added documentation in Italian (Latino Imparato).
 
 * Base configuration files (base.gwf)
+  - [22 Oct 02] Added configuration variable public_if_no_date: all
+    persons having no date are considered as public, except if their
+    "access" field has been explicitely set to "Private" (default: no).
   - [22 Oct 02] Added configuration variable propose_place_surnames to
     propose or not the displaying by place / surnames in the welcome
     page (defaut: yes).
   - [31 Aug 02] Added configuration variable max_cousins_level to specify
     the maximum level of displayed cousins (default: 5)
+
+* GeneWeb compiler (gwc) and GeneWeb uncompiler (gwu)
+  - [22 Oct 02] Fixed bug: when cleaning up a database, if the images
+    file names started with numbers (eg. 123abc.jpg), they were restored
+    with an underscore at the beginning (eg. _123abc.jpg).
 
 GeneWeb version 4.07
 --------------------
