@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.73 2001-01-26 02:18:44 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.74 2001-01-26 19:39:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -1335,10 +1335,7 @@ value main () =
        Send a message to say that this service has been redirected to <addr>");
      ("-nolock", Arg.Set Lock.no_lock_flag,
       "
-       Do not lock files before writing.");
-     ("-nofork", Arg.Set Wserver.nofork,
-      "
-       Do not fork a process at each request.") ::
+       Do not lock files before writing.") ::
      ifdef UNIX then
        [("-max_clients", Arg.Int (fun x -> max_clients.val := Some x),
          "<num>
@@ -1352,11 +1349,14 @@ value main () =
          "
        Unix daemon mode.")]
      else
+       [("-noproc", Arg.Set Wserver.noproc,
+         "
+       Do not launch a process at each request.") ::
        ifdef SYS_COMMAND then
          [("-wserver", Arg.String (fun _ -> wserver_auto_call.val := True),
         "
        (internal feature)")]
-       else []]
+       else []]]
   in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
   do ifdef UNIX then
