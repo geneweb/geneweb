@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.54 1999-10-27 13:14:27 ddr Exp $ *)
+(* $Id: util.ml,v 2.55 1999-10-27 15:06:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -548,7 +548,7 @@ value index_of_sex =
 ;
 
 value default_body_prop conf =
- "background=\"" ^ conf.command ^ "?m=IM;v=/gwback.jpg\""
+  "background=\"" ^ conf.command ^ "?m=IM;v=/gwback.jpg\""
 ;
 
 value body_prop conf =
@@ -575,10 +575,7 @@ value header_no_page_title conf title =
        try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
        [ Not_found -> "" ]
      in
-     let s =
-       try s ^ " " ^ List.assoc "body_prop" conf.base_env with
-       [ Not_found -> s ^ default_body_prop conf ]
-     in
+     let s = s ^ " " ^ body_prop conf in
      Wserver.wprint "<body%s>" s;
      List.iter (fun t -> Wserver.wprint "<%s>" t) (enclosing_tags conf);
      Wserver.wprint "\n";
