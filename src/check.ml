@@ -1,8 +1,9 @@
-(* $Id: check.ml,v 4.3 2001-05-05 15:28:07 ddr Exp $ *)
+(* $Id: check.ml,v 4.4 2002-01-12 14:20:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
+open Printf;
 
 type gen =
   { g_strings : mutable Mhashtbl.t string istr;
@@ -30,81 +31,81 @@ value feminin =
 value print_base_error base =
   fun
   [ AlreadyDefined p ->
-      Printf.printf "%s\nis defined several times\n" (denomination base p)
+      printf "%s\nis defined several times\n" (denomination base p)
   | OwnAncestor p ->
-      Printf.printf "%s\nis his/her own ancestor\n" (denomination base p)
+      printf "%s\nis his/her own ancestor\n" (denomination base p)
   | BadSexOfMarriedPerson p ->
-      Printf.printf "%s\n  bad sex\n" (denomination base p) ]
+      printf "%s\n  bad sex\n" (denomination base p) ]
 ;
 
 value print_base_warning base =
   fun
   [ BirthAfterDeath p ->
-      Printf.printf "%s\n  born after his/her death\n" (denomination base p)
+      printf "%s\n  born after his/her death\n" (denomination base p)
   | IncoherentSex p ->
-      Printf.printf "%s\n  sex not coherent with relations\n"
+      printf "%s\n  sex not coherent with relations\n"
         (denomination base p)
   | ChangedOrderOfChildren ifam des _ ->
       let cpl = coi base ifam in
-      Printf.printf "changed order of children of %s and %s\n"
+      printf "changed order of children of %s and %s\n"
         (denomination base (poi base cpl.father))
         (denomination base (poi base cpl.mother))
   | ChildrenNotInOrder ifam des elder x ->
       let cpl = coi base ifam in
       do {
-        Printf.printf
+        printf
           "the following children of\n  %s\nand\n  %s\nare not in order:\n"
           (denomination base (poi base cpl.father))
           (denomination base (poi base cpl.mother));
-        Printf.printf "- %s\n" (denomination base elder);
-        Printf.printf "- %s\n" (denomination base x);
+        printf "- %s\n" (denomination base elder);
+        printf "- %s\n" (denomination base x);
       }
   | DeadTooEarlyToBeFather father child ->
       do {
-        Printf.printf "%s\n" (denomination base child);
-        Printf.printf
+        printf "%s\n" (denomination base child);
+        printf
           "  is born more than 2 years after the death of his/her father\n";
-        Printf.printf "%s\n" (denomination base father);
+        printf "%s\n" (denomination base father);
       }
   | MarriageDateAfterDeath p ->
       do {
-        Printf.printf "%s\n" (denomination base p);
-        Printf.printf "married after his/her death\n";
+        printf "%s\n" (denomination base p);
+        printf "married after his/her death\n";
       }
   | MarriageDateBeforeBirth p ->
       do {
-        Printf.printf "%s\n" (denomination base p);
-        Printf.printf "married before his/her birth\n";
+        printf "%s\n" (denomination base p);
+        printf "married before his/her birth\n";
       }
   | MotherDeadAfterChildBirth mother child ->
-      Printf.printf "%s\n  is born after the death of his/her mother\n%s\n"
+      printf "%s\n  is born after the death of his/her mother\n%s\n"
         (denomination base child) (denomination base mother)
   | ParentBornAfterChild parent child ->
-      Printf.printf "%s born after his/her child %s\n"
+      printf "%s born after his/her child %s\n"
         (denomination base parent) (denomination base child)
   | ParentTooYoung p a ->
-      Printf.printf "%s was parent at age of %d\n" (denomination base p)
+      printf "%s was parent at age of %d\n" (denomination base p)
         (annee a)
   | TitleDatesError p t ->
       do {
-        Printf.printf "%s\n" (denomination base p);
-        Printf.printf "has incorrect title dates as:\n";
-        Printf.printf "  %s %s\n" (sou base t.t_ident) (sou base t.t_place);
+        printf "%s\n" (denomination base p);
+        printf "has incorrect title dates as:\n";
+        printf "  %s %s\n" (sou base t.t_ident) (sou base t.t_place);
       }
   | UndefinedSex p ->
       ()
   | YoungForMarriage p a ->
-      Printf.printf "%s married at age %d\n" (denomination base p) (annee a) ]
+      printf "%s married at age %d\n" (denomination base p) (annee a) ]
 ;      
 
 value set_error base gen x =
-  do { Printf.printf "\nError: "; print_base_error base x; error gen; }
+  do { printf "\nError: "; print_base_error base x; error gen; }
 ;
 
 value set_warning base =
   fun
   [ UndefinedSex _ -> ()
-  | x -> do { Printf.printf "\nWarning: "; print_base_warning base x; } ]
+  | x -> do { printf "\nWarning: "; print_base_warning base x; } ]
 ;
 
 type stats =
@@ -211,31 +212,31 @@ value check_base base gen pr_stats =
     for i = 0 to base.data.persons.len - 1 do {
       let p = base.data.persons.get i in
       if not gen.g_def.(i) then
-        Printf.printf "Undefined: %s\n" (denomination base p)
+        printf "Undefined: %s\n" (denomination base p)
       else ();
       if pr_stats then update_stats base current_year s p else ();
       flush stdout;
     };
     if pr_stats then do {
-      Printf.printf "\n";
-      Printf.printf "%d men\n" s.men;
-      Printf.printf "%d women\n" s.women;
-      Printf.printf "%d unknown sex\n" s.neutre;
-      Printf.printf "%d unnamed\n" s.noname;
-      Printf.printf "Oldest: %s, %d\n" (denomination base (snd s.oldest_dead))
+      printf "\n";
+      printf "%d men\n" s.men;
+      printf "%d women\n" s.women;
+      printf "%d unknown sex\n" s.neutre;
+      printf "%d unnamed\n" s.noname;
+      printf "Oldest: %s, %d\n" (denomination base (snd s.oldest_dead))
         (fst s.oldest_dead);
-      Printf.printf "Oldest still alive: %s, %d\n"
+      printf "Oldest still alive: %s, %d\n"
         (denomination base (snd s.oldest_still_alive))
         (fst s.oldest_still_alive);
-      Printf.printf "Youngest father: %s, %d\n"
+      printf "Youngest father: %s, %d\n"
         (denomination base (snd s.youngest_father)) (fst s.youngest_father);
-      Printf.printf "Youngest mother: %s, %d\n"
+      printf "Youngest mother: %s, %d\n"
         (denomination base (snd s.youngest_mother)) (fst s.youngest_mother);
-      Printf.printf "Oldest father: %s, %d\n"
+      printf "Oldest father: %s, %d\n"
         (denomination base (snd s.oldest_father)) (fst s.oldest_father);
-      Printf.printf "Oldest mother: %s, %d\n"
+      printf "Oldest mother: %s, %d\n"
         (denomination base (snd s.oldest_mother)) (fst s.oldest_mother);
-      Printf.printf "\n";
+      printf "\n";
       flush stdout;
     }
     else ();

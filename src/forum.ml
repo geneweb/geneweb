@@ -1,10 +1,11 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.14 2001-12-20 19:58:15 ddr Exp $ *)
+(* $Id: forum.ml,v 4.15 2002-01-12 14:20:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
 open Config;
 open Def;
+open Printf;
 
 value forum_file conf =
   Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum"
@@ -416,23 +417,23 @@ value forum_add conf base ident comm =
         try
           let (hh, mm, ss) = conf.time in
           do {
-            Printf.fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
+            fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
               conf.today.year conf.today.month conf.today.day hh mm ss;
-            Printf.fprintf oc "Ident: %s\n" ident;
-            if email <> "" then Printf.fprintf oc "Email: %s\n" email else ();
+            fprintf oc "Ident: %s\n" ident;
+            if email <> "" then fprintf oc "Email: %s\n" email else ();
             let subject = if subject = "" then "-" else subject in
-            Printf.fprintf oc "Subject: %s\n" subject;
-            Printf.fprintf oc "Text:\n";
+            fprintf oc "Subject: %s\n" subject;
+            fprintf oc "Text:\n";
             let rec loop i bol =
               if i == String.length comm then ()
               else do {
-                if bol then Printf.fprintf oc "  " else ();
+                if bol then fprintf oc "  " else ();
                 if comm.[i] <> '\r' then output_char oc comm.[i] else ();
                 loop (i + 1) (comm.[i] = '\n')
               }
             in
             loop 0 True;
-            Printf.fprintf oc "\n\n";
+            fprintf oc "\n\n";
             match
               try Some (open_in_bin fname) with [ Sys_error _ -> None ]
             with

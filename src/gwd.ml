@@ -1,10 +1,11 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.20 2002-01-10 20:01:08 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.21 2002-01-12 14:20:55 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
+open Printf;
 
 value green_color = "#2f6400";
 value selected_addr = ref None;
@@ -56,7 +57,7 @@ value extract_boundary content_type =
 ;
 
 value fprintf_date oc tm =
-  Printf.fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
+  fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
     (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
     tm.Unix.tm_sec
 ;
@@ -67,7 +68,7 @@ value print_and_cut_if_too_big oc str =
       output_char oc str.[i];
       let i =
         if i > 700 && String.length str - i > 750 then do {
-          Printf.fprintf oc " ... "; String.length str - 700
+          fprintf oc " ... "; String.length str - 700
         }
         else i + 1
       in
@@ -82,25 +83,25 @@ value log oc tm conf from gauth request script_name contents =
   do {
     let tm = Unix.localtime tm in
     fprintf_date oc tm;
-    Printf.fprintf oc " (%d)" (Unix.getpid ());
-    Printf.fprintf oc " %s?" script_name;
+    fprintf oc " (%d)" (Unix.getpid ());
+    fprintf oc " %s?" script_name;
     print_and_cut_if_too_big oc contents;
     output_char oc '\n';
-    Printf.fprintf oc "  From: %s\n" from;
-    if gauth <> "" then Printf.fprintf oc "  User: %s\n" gauth else ();
+    fprintf oc "  From: %s\n" from;
+    if gauth <> "" then fprintf oc "  User: %s\n" gauth else ();
     if conf.wizard && not conf.friend then
-      Printf.fprintf oc "  User: %s%s(wizard)\n" conf.user
+      fprintf oc "  User: %s%s(wizard)\n" conf.user
         (if conf.user = "" then "" else " ")
     else if conf.friend && not conf.wizard then
-      Printf.fprintf oc "  User: %s%s(friend)\n" conf.user
+      fprintf oc "  User: %s%s(friend)\n" conf.user
         (if conf.user = "" then "" else " ")
     else ();
-    if user_agent <> "" then Printf.fprintf oc "  Agent: %s\n" user_agent
+    if user_agent <> "" then fprintf oc "  Agent: %s\n" user_agent
     else ();
     if referer <> "" then do {
-      Printf.fprintf oc "  Referer: ";
+      fprintf oc "  Referer: ";
       print_and_cut_if_too_big oc referer;
-      Printf.fprintf oc "\n"
+      fprintf oc "\n"
     }
     else ();
   }
@@ -111,12 +112,12 @@ value log_passwd_failed passwd uauth oc tm from request base_file =
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
   do {
     let tm = Unix.localtime tm in fprintf_date oc tm;
-    Printf.fprintf oc " (%d)" (Unix.getpid ());
-    Printf.fprintf oc " %s_%s" base_file passwd;
-    Printf.fprintf oc " => failed\n";
-    Printf.fprintf oc "  From: %s\n" from;
-    Printf.fprintf oc "  Agent: %s\n" user_agent;
-    if referer <> "" then Printf.fprintf oc "  Referer: %s\n" referer else ();
+    fprintf oc " (%d)" (Unix.getpid ());
+    fprintf oc " %s_%s" base_file passwd;
+    fprintf oc " => failed\n";
+    fprintf oc "  From: %s\n" from;
+    fprintf oc "  Agent: %s\n" user_agent;
+    if referer <> "" then fprintf oc "  Referer: %s\n" referer else ();
   }
 ;
 
@@ -145,7 +146,7 @@ value refuse_log from cgi =
   do {
     let tm = Unix.localtime (Unix.time ()) in
     fprintf_date oc tm;
-    Printf.fprintf oc " excluded: %s\n" from;
+    fprintf oc " excluded: %s\n" from;
     close_out oc;
     if not cgi then http "403 Forbidden" else ();
     Wserver.wprint "Content-type: text/html";
@@ -161,7 +162,7 @@ value only_log from cgi =
   do {
     let tm = Unix.localtime (Unix.time ()) in
     fprintf_date oc tm;
-    Printf.fprintf oc " Connection refused from %s (only %s)\n" from
+    fprintf oc " Connection refused from %s (only %s)\n" from
       only_address.val;
     flush_log oc;
     if not cgi then http "" else ();
@@ -178,10 +179,10 @@ value refuse_auth conf from auth auth_type =
   do {
     let tm = Unix.localtime (Unix.time ()) in
     fprintf_date oc tm;
-    Printf.fprintf oc " Access failed\n";
-    Printf.fprintf oc "  From: %s\n" from;
-    Printf.fprintf oc "  Basic realm: %s\n" auth_type;
-    Printf.fprintf oc "  Response: %s\n" auth;
+    fprintf oc " Access failed\n";
+    fprintf oc "  From: %s\n" from;
+    fprintf oc "  Basic realm: %s\n" auth_type;
+    fprintf oc "  Response: %s\n" auth;
     flush_log oc;
     Util.unauthorized conf auth_type;
   }
@@ -364,9 +365,9 @@ value log_redirect conf from request req =
       do {
         let tm = Unix.localtime (Unix.time ()) in
         fprintf_date oc tm;
-        Printf.fprintf oc " %s\n" req;
-        Printf.fprintf oc "  From: %s\n" from;
-        Printf.fprintf oc "  Referer: %s\n" referer;
+        fprintf oc " %s\n" req;
+        fprintf oc "  From: %s\n" from;
+        fprintf oc "  Referer: %s\n" referer;
         flush_log oc;
       }
   | Refuse -> () ]
@@ -572,7 +573,7 @@ value set_actlog list =
   do {
     List.iter
       (fun (b, (a, c, d)) ->
-         Printf.fprintf oc "%.0f %s %c%s\n" a b c
+         fprintf oc "%.0f %s %c%s\n" a b c
            (if d = "" then "" else " " ^ d))
       list;
     close_out oc;
@@ -1273,16 +1274,16 @@ value geneweb_server () =
         [ Some addr -> addr
         | None -> try Unix.gethostname () with _ -> "computer" ]
       in
-      Printf.eprintf "GeneWeb %s - " Version.txt;
-      Printf.eprintf "Copyright (c) 2002 INRIA\n";
+      eprintf "GeneWeb %s - " Version.txt;
+      eprintf "Copyright (c) 2002 INRIA\n";
       if not daemon.val then do {
-        Printf.eprintf "Possible addresses:";
-        Printf.eprintf "
+        eprintf "Possible addresses:";
+        eprintf "
    http://localhost:%d/base
    http://127.0.0.1:%d/base
    http://%s:%d/base" selected_port.val selected_port.val hostn
           selected_port.val;
-        Printf.eprintf "
+        eprintf "
 where \"base\" is the name of the database
 Type %s to stop the service
 " "control C";
@@ -1378,8 +1379,8 @@ value robot_exclude_arg s =
   with
   [ Stdpp.Exc_located _ (Stream.Error _ | Token.Error _) ->
       do {
-        Printf.eprintf "Bad use of option -robot_xcl\n";
-        Printf.eprintf "Use option -help for usage.\n";
+        eprintf "Bad use of option -robot_xcl\n";
+        eprintf "Use option -help for usage.\n";
         flush Pervasives.stderr;
         exit 2
       } ]
@@ -1563,7 +1564,7 @@ value test_eacces_bind err fun_name =
     if err = Unix.EACCES && fun_name = "bind" then
       try
         do {
-          Printf.eprintf "
+          eprintf "
 Error: invalid access to the port %d: users port number less than 1024
 are reserved to the system. Solution: do it as root or choose another port
 number greater than 1024.
@@ -1581,9 +1582,9 @@ value print_exc exc =
   match exc with
   [ Unix.Unix_error Unix.EADDRINUSE "bind" _ ->
       do {
-        Printf.eprintf "\nError: ";
-        Printf.eprintf "the port %d" selected_port.val;
-        Printf.eprintf " \
+        eprintf "\nError: ";
+        eprintf "the port %d" selected_port.val;
+        eprintf " \
 is already used by another GeneWeb daemon
 or by another program. Solution: kill the other program or launch
 GeneWeb with another port number (option -p)

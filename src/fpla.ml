@@ -1,9 +1,10 @@
-(* $Id: fpla.ml,v 4.1 2001-04-23 02:59:45 ddr Exp $ *)
+(* $Id: fpla.ml,v 4.2 2002-01-12 14:20:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 (* First Parentless Ancestor *)
 
 open Gutil;
 open Def;
+open Printf;
 
 value make_table base =
   let _ = base.data.ascends.array () in
@@ -50,12 +51,12 @@ value first_parentless_ancestor base =
   let tab = make_table base in
   do {
     Array.sort (fun (_, s1) (_, s2) -> compare s2 s1) tab;
-    Printf.printf "First parentless ancestor\n\n";
+    printf "First parentless ancestor\n\n";
     Array.iter
       (fun (i, s) ->
          let p = poi base (Adef.iper_of_int i) in
          do {
-           Printf.printf "Sosa %d  \t%s.%d %s\n" s (p_first_name base p) p.occ
+           printf "Sosa %d  \t%s.%d %s\n" s (p_first_name base p) p.occ
              (p_surname base p);
            flush stdout;
          })

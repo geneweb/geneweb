@@ -1,8 +1,9 @@
-(* $Id: gwu.ml,v 4.10 2001-12-07 16:39:36 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.11 2002-01-12 14:20:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
+open Printf;
 
 type mfam =
   { m_fam : family; m_fath : person; m_moth : person; m_chil : array person }
@@ -13,17 +14,17 @@ value soy y = if y == 0 then "-0" else string_of_int y;
 value print_date_dmy oc d =
   do {
     match d.prec with
-    [ About -> Printf.fprintf oc "~"
-    | Maybe -> Printf.fprintf oc "?"
-    | Before -> Printf.fprintf oc "<"
-    | After -> Printf.fprintf oc ">"
+    [ About -> fprintf oc "~"
+    | Maybe -> fprintf oc "?"
+    | Before -> fprintf oc "<"
+    | After -> fprintf oc ">"
     | _ -> () ];
-    if d.day == 0 && d.month == 0 then Printf.fprintf oc "%s" (soy d.year)
-    else if d.day == 0 then Printf.fprintf oc "%d/%s" d.month (soy d.year)
-    else Printf.fprintf oc "%d/%d/%s" d.day d.month (soy d.year);
+    if d.day == 0 && d.month == 0 then fprintf oc "%s" (soy d.year)
+    else if d.day == 0 then fprintf oc "%d/%s" d.month (soy d.year)
+    else fprintf oc "%d/%d/%s" d.day d.month (soy d.year);
     match d.prec with
-    [ OrYear y -> Printf.fprintf oc "|%s" (soy y)
-    | YearInt y -> Printf.fprintf oc "..%s" (soy y)
+    [ OrYear y -> fprintf oc "|%s" (soy y)
+    | YearInt y -> fprintf oc "..%s" (soy y)
     | _ -> () ]
   }
 ;
@@ -49,19 +50,19 @@ value print_date oc =
   | Dgreg d Djulian ->
       do {
         print_date_dmy oc (Calendar.julian_of_gregorian d);
-        Printf.fprintf oc "J"
+        fprintf oc "J"
       }
   | Dgreg d Dfrench ->
       do {
         print_date_dmy oc (Calendar.french_of_gregorian d);
-        Printf.fprintf oc "F"
+        fprintf oc "F"
       }
   | Dgreg d Dhebrew ->
       do {
         print_date_dmy oc (Calendar.hebrew_of_gregorian d);
-        Printf.fprintf oc "H"
+        fprintf oc "H"
       }
-  | Dtext t -> Printf.fprintf oc "0(%s)" (spaces_to_underscore t) ]
+  | Dtext t -> fprintf oc "0(%s)" (spaces_to_underscore t) ]
 ;
 
 value print_date_option oc =
@@ -115,41 +116,41 @@ value has_infos base p =
 
 value print_if_not_equal_to x oc base lab is =
   if sou base is = x then ()
-  else Printf.fprintf oc " %s %s" lab (correct_string base is)
+  else fprintf oc " %s %s" lab (correct_string base is)
 ;
 
 value print_if_no_empty = print_if_not_equal_to "";
 
 value print_first_name_alias oc base is =
-  Printf.fprintf oc " {%s}" (correct_string base is)
+  fprintf oc " {%s}" (correct_string base is)
 ;
 
 value print_surname_alias oc base is =
-  Printf.fprintf oc " #salias %s" (correct_string base is)
+  fprintf oc " #salias %s" (correct_string base is)
 ;
 
 value print_qualifier oc base is =
-  Printf.fprintf oc " #nick %s" (correct_string base is)
+  fprintf oc " #nick %s" (correct_string base is)
 ;
 
 value print_alias oc base is =
-  Printf.fprintf oc " #alias %s" (correct_string base is)
+  fprintf oc " #alias %s" (correct_string base is)
 ;
 
 value print_burial oc base b =
   match b with
   [ Buried cod ->
       do {
-        Printf.fprintf oc " #buri";
+        fprintf oc " #buri";
         match Adef.od_of_codate cod with
-        [ Some d -> do { Printf.fprintf oc " "; print_date oc d; () }
+        [ Some d -> do { fprintf oc " "; print_date oc d; () }
         | _ -> () ]
       }
   | Cremated cod ->
       do {
-        Printf.fprintf oc " #crem";
+        fprintf oc " #crem";
         match Adef.od_of_codate cod with
-        [ Some d -> do { Printf.fprintf oc " "; print_date oc d; () }
+        [ Some d -> do { fprintf oc " "; print_date oc d; () }
         | _ -> () ]
       }
   | UnknownBurial -> () ]
@@ -159,29 +160,29 @@ value print_title oc base t =
   let t_date_start = Adef.od_of_codate t.t_date_start in
   let t_date_end = Adef.od_of_codate t.t_date_end in
   do {
-    Printf.fprintf oc " [";
+    fprintf oc " [";
     match t.t_name with
-    [ Tmain -> Printf.fprintf oc "*"
-    | Tname s -> Printf.fprintf oc "%s" (correct_string base s)
+    [ Tmain -> fprintf oc "*"
+    | Tname s -> fprintf oc "%s" (correct_string base s)
     | Tnone -> () ];
-    Printf.fprintf oc ":";
-    Printf.fprintf oc "%s" (correct_string_no_colon base t.t_ident);
-    Printf.fprintf oc ":";
-    Printf.fprintf oc "%s" (correct_string_no_colon base t.t_place);
-    if t.t_nth <> 0 then Printf.fprintf oc ":"
+    fprintf oc ":";
+    fprintf oc "%s" (correct_string_no_colon base t.t_ident);
+    fprintf oc ":";
+    fprintf oc "%s" (correct_string_no_colon base t.t_place);
+    if t.t_nth <> 0 then fprintf oc ":"
     else
       match (t_date_start, t_date_end) with
-      [ (Some _, _) | (_, Some _) -> Printf.fprintf oc ":"
+      [ (Some _, _) | (_, Some _) -> fprintf oc ":"
       | _ -> () ];
     print_date_option oc t_date_start;
-    if t.t_nth <> 0 then Printf.fprintf oc ":"
+    if t.t_nth <> 0 then fprintf oc ":"
     else
       match t_date_end with
-      [ Some _ -> Printf.fprintf oc ":"
+      [ Some _ -> fprintf oc ":"
       | _ -> () ];
     print_date_option oc t_date_end;
-    if t.t_nth <> 0 then Printf.fprintf oc ":%d" t.t_nth else ();
-    Printf.fprintf oc "]"
+    if t.t_nth <> 0 then fprintf oc ":%d" t.t_nth else ();
+    fprintf oc "]"
   }
 ;
 
@@ -191,7 +192,7 @@ value print_infos oc base is_child csrc cbp p =
     List.iter (print_surname_alias oc base) p.surnames_aliases;
     match p.public_name with
     [ s when sou base s <> "" ->
-        Printf.fprintf oc " (%s)" (correct_string base s)
+        fprintf oc " (%s)" (correct_string base s)
     | _ -> () ];
     print_if_no_empty oc base "#image" p.image;
     List.iter (print_qualifier oc base) p.qualifiers;
@@ -199,47 +200,47 @@ value print_infos oc base is_child csrc cbp p =
     List.iter (print_title oc base) p.titles;
     match p.access with
     [ IfTitles -> ()
-    | Public -> Printf.fprintf oc " #apubl"
-    | Private -> Printf.fprintf oc " #apriv" ];
+    | Public -> fprintf oc " #apubl"
+    | Private -> fprintf oc " #apriv" ];
     print_if_no_empty oc base "#occu" p.occupation;
     print_if_not_equal_to csrc oc base "#src" p.psources;
     match Adef.od_of_codate p.birth with
-    [ Some d -> do { Printf.fprintf oc " "; print_date oc d }
+    [ Some d -> do { fprintf oc " "; print_date oc d }
     | _ ->
         if p.baptism <> Adef.codate_None then ()
         else
           match p.death with
-          [ Death _ _ | DeadYoung | DeadDontKnowWhen -> Printf.fprintf oc " 0"
+          [ Death _ _ | DeadYoung | DeadDontKnowWhen -> fprintf oc " 0"
           | DontKnowIfDead
             when
               not is_child && not (has_infos_not_dates base p) &&
               p_first_name base p <> "?" && p_surname base p <> "?" ->
-              Printf.fprintf oc " 0"
+              fprintf oc " 0"
           | _ -> () ] ];
     print_if_not_equal_to cbp oc base "#bp" p.birth_place;
     print_if_no_empty oc base "#bs" p.birth_src;
     match Adef.od_of_codate p.baptism with
-    [ Some d -> do { Printf.fprintf oc " !"; print_date oc d }
+    [ Some d -> do { fprintf oc " !"; print_date oc d }
     | _ -> () ];
     print_if_no_empty oc base "#pp" p.baptism_place;
     print_if_no_empty oc base "#ps" p.baptism_src;
     match p.death with
     [ Death dr d ->
         do {
-          Printf.fprintf oc " ";
+          fprintf oc " ";
           match dr with
-          [ Killed -> Printf.fprintf oc "k"
-          | Murdered -> Printf.fprintf oc "m"
-          | Executed -> Printf.fprintf oc "e"
-          | Disappeared -> Printf.fprintf oc "s"
+          [ Killed -> fprintf oc "k"
+          | Murdered -> fprintf oc "m"
+          | Executed -> fprintf oc "e"
+          | Disappeared -> fprintf oc "s"
           | _ -> () ];
           print_date oc (Adef.date_of_cdate d)
         }
-    | DeadYoung -> Printf.fprintf oc " mj"
-    | DeadDontKnowWhen -> Printf.fprintf oc " 0"
+    | DeadYoung -> fprintf oc " mj"
+    | DeadDontKnowWhen -> fprintf oc " 0"
     | DontKnowIfDead ->
         match (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism) with
-        [ (Some _, _) | (_, Some _) -> Printf.fprintf oc " ?"
+        [ (Some _, _) | (_, Some _) -> fprintf oc " ?"
         | _ -> () ]
     | NotDead -> () ];
     print_if_no_empty oc base "#dp" p.death_place;
@@ -266,13 +267,13 @@ value print_parent oc base mark fam_sel fam p =
   let first_name = sou base p.first_name in
   let surname = sou base p.surname in
   do {
-    Printf.fprintf oc "%s %s%s" (s_correct_string surname)
+    fprintf oc "%s %s%s" (s_correct_string surname)
       (s_correct_string first_name)
       (if p.occ == 0 || first_name = "?" || surname = "?" then ""
        else "." ^ string_of_int p.occ);
     if pr then
       if has_infos then print_infos oc base False "" "" p
-      else if first_name <> "?" && surname <> "?" then Printf.fprintf oc " 0"
+      else if first_name <> "?" && surname <> "?" then fprintf oc " 0"
       else ()
     else ()
   }
@@ -280,20 +281,20 @@ value print_parent oc base mark fam_sel fam p =
 
 value print_child oc base fam_surname csrc cbp p =
   do {
-    Printf.fprintf oc "-";
+    fprintf oc "-";
     match p.sex with
-    [ Male -> Printf.fprintf oc " h"
-    | Female -> Printf.fprintf oc " f"
+    [ Male -> fprintf oc " h"
+    | Female -> fprintf oc " f"
     | _ -> () ];
-    Printf.fprintf oc " %s" (s_correct_string (sou base p.first_name));
+    fprintf oc " %s" (s_correct_string (sou base p.first_name));
     if p.occ == 0 || p_first_name base p = "?" || p_surname base p = "?" then
       ()
-    else Printf.fprintf oc ".%d" p.occ;
+    else fprintf oc ".%d" p.occ;
     if p.surname <> fam_surname then
-      Printf.fprintf oc " %s" (s_correct_string (sou base p.surname))
+      fprintf oc " %s" (s_correct_string (sou base p.surname))
     else ();
     print_infos oc base True csrc cbp p;
-    Printf.fprintf oc "\n"
+    fprintf oc "\n"
   }
 ;
 
@@ -342,7 +343,7 @@ value print_witness oc base mark p notes_pl_p =
   let a = aoi base p.cle_index in
   let u = uoi base p.cle_index in
   do {
-    Printf.fprintf oc "%s %s%s" (correct_string base p.surname)
+    fprintf oc "%s %s%s" (correct_string base p.surname)
       (correct_string base p.first_name)
       (if p.occ = 0 then "" else "." ^ string_of_int p.occ);
     if Array.length u.family = 0 && a.parents = None &&
@@ -350,7 +351,7 @@ value print_witness oc base mark p notes_pl_p =
     then do {
       mark.(Adef.int_of_iper p.cle_index) := True;
       if has_infos base p then print_infos oc base False "" "" p
-      else Printf.fprintf oc " 0";
+      else fprintf oc " 0";
       match sou base p.notes with
       [ "" -> ()
       | _ -> notes_pl_p.val := [p :: notes_pl_p.val] ]
@@ -362,14 +363,14 @@ value print_witness oc base mark p notes_pl_p =
 value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
   let fam = m.m_fam in
   do {
-    Printf.fprintf oc "fam ";
+    fprintf oc "fam ";
     print_parent oc base mark fam_sel fam m.m_fath;
-    Printf.fprintf oc " +";
+    fprintf oc " +";
     print_date_option oc (Adef.od_of_codate fam.marriage);
     match fam.relation with
-    [ NotMarried -> Printf.fprintf oc " #nm"
+    [ NotMarried -> fprintf oc " #nm"
     | Married -> ()
-    | Engaged -> Printf.fprintf oc " #eng"
+    | Engaged -> fprintf oc " #eng"
     | NoSexesCheck ->
         let c x =
           match x.sex with
@@ -377,63 +378,63 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
           | Female -> 'f'
           | Neuter -> '?' ]
         in
-        Printf.fprintf oc " #nsck %c%c" (c m.m_fath) (c m.m_moth) ];
+        fprintf oc " #nsck %c%c" (c m.m_fath) (c m.m_moth) ];
     print_if_no_empty oc base "#mp" fam.marriage_place;
     print_if_no_empty oc base "#ms" fam.marriage_src;
     match fam.divorce with
     [ NotDivorced -> ()
-    | Separated -> Printf.fprintf oc " #sep"
+    | Separated -> fprintf oc " #sep"
     | Divorced d ->
         let d = Adef.od_of_codate d in
-        do { Printf.fprintf oc " -"; print_date_option oc d } ];
-    Printf.fprintf oc " ";
+        do { fprintf oc " -"; print_date_option oc d } ];
+    fprintf oc " ";
     print_parent oc base mark fam_sel fam m.m_moth;
-    Printf.fprintf oc "\n";
+    fprintf oc "\n";
     Array.iter
       (fun ip ->
          if per_sel ip then do {
            let p = poi base ip in
-           Printf.fprintf oc "wit";
+           fprintf oc "wit";
            match p.sex with
-           [ Male -> Printf.fprintf oc " m"
-           | Female -> Printf.fprintf oc " f"
+           [ Male -> fprintf oc " m"
+           | Female -> fprintf oc " f"
            | _ -> () ];
-           Printf.fprintf oc ": ";
+           fprintf oc ": ";
            print_witness oc base mark p notes_pl_p;
-           Printf.fprintf oc "\n"
+           fprintf oc "\n"
          }
          else ())
       fam.witnesses;
     match sou base fam.fsources with
     [ "" -> ()
-    | s -> Printf.fprintf oc "src %s\n" (correct_string base fam.fsources) ];
+    | s -> fprintf oc "src %s\n" (correct_string base fam.fsources) ];
     let csrc =
       match common_children_sources base m.m_chil with
-      [ Some s -> do { Printf.fprintf oc "csrc %s\n" (s_correct_string s); s }
+      [ Some s -> do { fprintf oc "csrc %s\n" (s_correct_string s); s }
       | _ -> "" ]
     in
     let cbp =
       match common_children_birth_place base m.m_chil with
-      [ Some s -> do { Printf.fprintf oc "cbp %s\n" (s_correct_string s); s }
+      [ Some s -> do { fprintf oc "cbp %s\n" (s_correct_string s); s }
       | _ -> "" ]
     in
     match fam.comment with
     [ txt when sou base txt <> "" ->
-        Printf.fprintf oc "comm %s\n" (sou base txt)
+        fprintf oc "comm %s\n" (sou base txt)
     | _ -> () ];
     match Array.length m.m_chil with
     [ 0 -> ()
     | _ ->
         let fam_surname = m.m_fath.surname in
         do {
-          Printf.fprintf oc "beg\n";
+          fprintf oc "beg\n";
           Array.iter
             (fun p ->
                if per_sel p.cle_index then
                  print_child oc base fam_surname csrc cbp p
                else ())
             m.m_chil;
-          Printf.fprintf oc "end\n"
+          fprintf oc "end\n"
         } ];
     fam_done.(Adef.int_of_ifam fam.fam_index) := True
   }
@@ -465,12 +466,12 @@ value print_notes_for_person oc base p =
   let surn = s_correct_string (p_surname base p) in
   let fnam = s_correct_string (p_first_name base p) in
   if notes <> "" && surn <> "?" && fnam <> "?" then do {
-    Printf.fprintf oc "\n";
-    Printf.fprintf oc "notes %s %s%s\n" surn fnam
+    fprintf oc "\n";
+    fprintf oc "notes %s %s%s\n" surn fnam
       (if p.occ == 0 then "" else "." ^ string_of_int p.occ);
-    Printf.fprintf oc "beg\n";
-    Printf.fprintf oc "%s\n" notes;
-    Printf.fprintf oc "end notes\n"
+    fprintf oc "beg\n";
+    fprintf oc "%s\n" notes;
+    fprintf oc "end notes\n"
   }
   else ()
 ;
@@ -575,7 +576,7 @@ value print_relation_parent oc base mark defined_p p =
   let a = aoi base p.cle_index in
   let u = uoi base p.cle_index in
   do {
-    Printf.fprintf oc "%s %s%s" (correct_string base p.surname)
+    fprintf oc "%s %s%s" (correct_string base p.surname)
       (correct_string base p.first_name)
       (if p.occ = 0 then "" else "." ^ string_of_int p.occ);
     if Array.length u.family = 0 && a.parents = None &&
@@ -583,7 +584,7 @@ value print_relation_parent oc base mark defined_p p =
     then do {
       mark.(Adef.int_of_iper p.cle_index) := True;
       if has_infos base p then print_infos oc base False "" "" p
-      else Printf.fprintf oc " 0";
+      else fprintf oc " 0";
       defined_p.val := [p :: defined_p.val]
     }
     else ()
@@ -615,29 +616,29 @@ value print_relation_for_person oc base mark per_sel def_p p r =
   [ (None, None) -> ()
   | _ ->
       do {
-        Printf.fprintf oc "- ";
+        fprintf oc "- ";
         match r.r_type with
-        [ Adoption -> Printf.fprintf oc "adop"
-        | Recognition -> Printf.fprintf oc "reco"
-        | CandidateParent -> Printf.fprintf oc "cand"
-        | GodParent -> Printf.fprintf oc "godp"
-        | FosterParent -> Printf.fprintf oc "fost" ];
+        [ Adoption -> fprintf oc "adop"
+        | Recognition -> fprintf oc "reco"
+        | CandidateParent -> fprintf oc "cand"
+        | GodParent -> fprintf oc "godp"
+        | FosterParent -> fprintf oc "fost" ];
         match (fath, moth) with
-        [ (Some _, None) -> Printf.fprintf oc " fath"
-        | (None, Some _) -> Printf.fprintf oc " moth"
+        [ (Some _, None) -> fprintf oc " fath"
+        | (None, Some _) -> fprintf oc " moth"
         | _ -> () ];
-        Printf.fprintf oc ": ";
+        fprintf oc ": ";
         match (fath, moth) with
         [ (Some fath, None) -> print_relation_parent oc base mark def_p fath
         | (None, Some moth) -> print_relation_parent oc base mark def_p moth
         | (Some fath, Some moth) ->
             do {
               print_relation_parent oc base mark def_p fath;
-              Printf.fprintf oc " + ";
+              fprintf oc " + ";
               print_relation_parent oc base mark def_p moth
             }
         | _ -> () ];
-        Printf.fprintf oc "\n"
+        fprintf oc "\n"
       } ]
 ;
 
@@ -655,23 +656,23 @@ value print_relations_for_person oc base mark per_sel def_p is_definition p =
       p.rparents
   in
   if surn <> "?" && fnam <> "?" && exist_relation then do {
-    Printf.fprintf oc "\n";
-    Printf.fprintf oc "rel %s %s%s" surn fnam
+    fprintf oc "\n";
+    fprintf oc "rel %s %s%s" surn fnam
       (if p.occ == 0 then "" else "." ^ string_of_int p.occ);
     if is_definition then do {
       if has_infos base p then print_infos oc base False "" "" p
-      else Printf.fprintf oc " 0";
+      else fprintf oc " 0";
       match p.sex with
-      [ Male -> Printf.fprintf oc " #h"
-      | Female -> Printf.fprintf oc " #f"
+      [ Male -> fprintf oc " #h"
+      | Female -> fprintf oc " #f"
       | Neuter -> () ]
     }
     else ();
-    Printf.fprintf oc "\n";
-    Printf.fprintf oc "beg\n";
+    fprintf oc "\n";
+    fprintf oc "beg\n";
     List.iter (print_relation_for_person oc base mark per_sel def_p p)
       p.rparents;
-    Printf.fprintf oc "end\n"
+    fprintf oc "end\n"
   }
   else ()
 ;
@@ -745,7 +746,7 @@ value find_person base p1 po p2 =
   try Gutil.person_ht_find_unique base p1 p2 po with
   [ Not_found ->
       do {
-        Printf.printf "Not found: %s%s %s\n" p1
+        printf "Not found: %s%s %s\n" p1
           (if po == 0 then "" else " " ^ string_of_int po) p2;
         flush stdout;
         exit 2
@@ -818,11 +819,11 @@ value mark_someone base mark s =
       List.iter (mark_branch base mark p.surname) plist
   | [] ->
       do {
-        Printf.eprintf "Error: \"%s\" is not found\n" s; flush stderr; exit 2
+        eprintf "Error: \"%s\" is not found\n" s; flush stderr; exit 2
       }
   | _ ->
       do {
-        Printf.eprintf "Error: several answers for \"%s\"\n" s;
+        eprintf "Error: several answers for \"%s\"\n" s;
         flush stderr;
         exit 2
       } ]
@@ -895,9 +896,9 @@ value mark_one_connex_component base mark ifam =
   && (only_file.val = "" || only_file.val = origin_file) then
     set_mark ToSeparate
   else do {
-    Printf.eprintf "%s: group of size %d not included\n" origin_file len;
+    eprintf "%s: group of size %d not included\n" origin_file len;
     let cpl = coi base ifam in
-    Printf.eprintf "    %s + %s\n" (denomination base (poi base cpl.father))
+    eprintf "    %s + %s\n" (denomination base (poi base cpl.father))
       (denomination base (poi base cpl.mother));
     flush stderr;
     set_mark Scanned
@@ -936,7 +937,7 @@ value separate base =
             else if mark.(i) = ToSeparate then loop (len + 1) (i + 1)
             else loop len (i + 1)
         in
-        Printf.eprintf "*** extracted %d families\n" len;
+        eprintf "*** extracted %d families\n" len;
         flush stderr;
         fun ifam -> mark.(Adef.int_of_ifam ifam) == ToSeparate
       } ]
@@ -1015,7 +1016,7 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
         in
         if ml <> [] then do {
           let notes_pl_p = ref [] in
-          if not first.val then Printf.fprintf oc "\n" else ();
+          if not first.val then fprintf oc "\n" else ();
           first.val := False;
           List.iter (print_family oc base mark sel fam_done notes_pl_p) ml;
           print_notes oc base ml per_sel notes_pl_p.val;
@@ -1028,10 +1029,10 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
     if s = "" then ()
     else if not no_notes.val then do {
       let (oc, first) = origin_file base.data.bnotes.norigin_file in
-      if not first.val then Printf.fprintf oc "\n" else ();
-      Printf.fprintf oc "notes\n";
-      Printf.fprintf oc "%s\n" s;
-      Printf.fprintf oc "end notes\n"
+      if not first.val then fprintf oc "\n" else ();
+      fprintf oc "notes\n";
+      fprintf oc "%s\n" s;
+      fprintf oc "end notes\n"
     }
     else ()
   }
@@ -1174,8 +1175,8 @@ value main () =
   do {
     Argl.parse speclist anonfun errmsg;
     if in_file.val = "" then do {
-      Printf.printf "Missing base\n";
-      Printf.printf "Use option -help for usage\n";
+      printf "Missing base\n";
+      printf "Use option -help for usage\n";
       flush stdout;
       exit 2
     }
@@ -1183,8 +1184,8 @@ value main () =
     let anc =
       if anc_1st.val <> "" then
         if anc_2nd.val = "" then do {
-          Printf.printf "Misused option -a\n";
-          Printf.printf "Use option -help for usage\n";
+          printf "Misused option -a\n";
+          printf "Use option -help for usage\n";
           flush stdout;
           exit 2
         }
@@ -1194,8 +1195,8 @@ value main () =
     let desc =
       if desc_1st.val <> "" then
         if desc_2nd.val = "" then do {
-          Printf.printf "Misused option -d\n";
-          Printf.printf "Use option -help for usage\n";
+          printf "Misused option -d\n";
+          printf "Use option -help for usage\n";
           flush stdout;
           exit 2
         }
@@ -1205,11 +1206,11 @@ value main () =
     let ancdesc =
       if ancdesc_1st.val <> "" then
         if anc_1st.val <> "" || desc_1st.val <> "" then do {
-          Printf.printf "Option -ad skipped since -a and/or -d used\n"; None
+          printf "Option -ad skipped since -a and/or -d used\n"; None
         }
         else if ancdesc_2nd.val = "" then do {
-          Printf.printf "Misused option -ad\n";
-          Printf.printf "Use option -help for usage\n";
+          printf "Misused option -ad\n";
+          printf "Use option -help for usage\n";
           flush stdout;
           exit 2
         }
