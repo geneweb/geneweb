@@ -8,7 +8,8 @@
 
 <p>
 
-Databasen innehåller nu %n personer.
+Databasen innehåller nu %n personer%o
+(<a href="%sm=NOTES">[note/notes]1</a>)%o.
 
 <ul>
 
@@ -58,7 +59,8 @@ sorterade i
 
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
 
-%w<li> <a href="%sm=ADD_FAM">Lägg till en familj</a>.
+%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
+<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
 %w
 
 </ul>

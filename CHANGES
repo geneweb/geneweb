@@ -1,6 +1,10 @@
 GeneWeb version 2.06
 --------------------
 
+* General
+  - [Aug 14, 99] Added notes for the data base (changes in gwd, ged2gwb,
+    gwb2ged, gwc, gwu).
+
 * GeneWeb Daemon/CGI (gwd)
   - [Aug 13, 99] In personal pages notes, URLs are now clickable.
   - [Aug 13, 99] Added the ability to change the text of some pages:

@@ -11,7 +11,8 @@
 
 <p>
 
-La datenbazo enhavas nune %n personojn.
+La datenbazo enhavas nune %n personojn%o
+(<a href="%sm=NOTES">[note/notes]1</a>)%o.
 
 <ul>
 
@@ -61,10 +62,15 @@ por
 
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
 
-%w<li> <a href="%sm=ADD_FAM">Aldoni familion</a>.
+%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
+<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
 %w
 
 </ul>
+
+<a href="%sm=NOTES">[*note/notes]1</a>.
+
+<p>
 
 La <a href="%sm=AN">naskigxtagoj</a>.<br>
 La <a href="%sm=AD">datrevenoj de la mortaj personoj</a>.<br>

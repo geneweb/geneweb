@@ -11,7 +11,8 @@
 %rversion
 
 <p>
-יש במאגר המידע %n אנשים 
+יש במאגר המידע %n אנשים %o
+(<a href="%sm=NOTES">[note/notes]1</a>)%o
 
 <ul>
 
@@ -59,7 +60,8 @@
 
 <li> <a href="%sm=H;v=advanced">בקשה מתקדמת</a>.
 
-%w<li> <a href="%sm=ADD_FAM">הוספת משפחה</a>.
+%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
+<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
 %w
 
 </ul>

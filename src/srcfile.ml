@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.12 1999-08-07 09:10:38 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.13 1999-08-14 09:26:39 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -127,7 +127,7 @@ value print_date conf =
   | _ -> Wserver.wprint "%s" d ]
 ;
 
-value src_translate conf ic =
+value rec src_translate conf nom ic =
   let (upp, s) =
     loop "" (input_char ic) where rec loop s c =
       if c = ']' then
@@ -136,10 +136,16 @@ value src_translate conf ic =
         else (False, s)
       else loop (s ^ String.make 1 c) (input_char ic)
   in
-  let r =
+  let (n, c) =
     match input_char ic with
-    [ '0'..'9' as c -> Util.transl_nth conf s (Char.code c - Char.code '0')
-    | c -> Gutil.nominative (Util.transl_nth conf s 0) ^ String.make 1 c ]
+    [ '0'..'9' as c -> (Char.code c - Char.code '0', "")
+    | c -> (0, String.make 1 c) ]
+  in
+  let r =
+    if c = "[" then Util.transl_decline conf s (src_translate conf False ic)
+    else
+      let r = Util.transl_nth conf s n in
+      (if nom then Gutil.nominative r else r) ^ c
   in
   if upp then capitale r else r
 ;
@@ -150,14 +156,14 @@ value rec copy_from_channel conf base ic =
     while True do
       match input_char ic with
       [ '[' ->
-          let s = src_translate conf ic in
+          let s = src_translate conf True ic in
           if not echo.val then ()
           else Wserver.wprint "%s" s
       | '%' ->
           let c = input_char ic in
           if not echo.val then
             match c with
-            [ 'w' | 'x' | 'y' | 'z' | 'i' | 'u' -> echo.val := True
+            [ 'w' | 'x' | 'y' | 'z' | 'i' | 'u' | 'o' -> echo.val := True
             | _ -> () ]
           else
             match c with
@@ -200,6 +206,10 @@ value rec copy_from_channel conf base ic =
                 Num.print (fun x -> Wserver.wprint "%s" x)
                   (transl conf "(thousand separator)")
                   (Num.of_int base.data.persons.len)
+            | 'o' ->
+                if conf.lang <> conf.default_lang
+                || base.data.bnotes.nread 1 = "" then echo.val := False
+                else ()
             | 'q' ->
                 let (wc, rc, d) = count conf in
                 Num.print (fun x -> Wserver.wprint "%s" x)

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 2.4 1999-07-22 14:34:15 ddr Exp $ *)
+(* $Id: sendImage.ml,v 2.5 1999-08-14 09:26:39 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -153,16 +153,6 @@ value move_file_to_old conf typ fname bfname =
     return ()
 ;
 
-value buff = ref (String.create 80);
-value store len x =
-  do if len >= String.length buff.val then
-       buff.val := buff.val ^ String.create (String.length buff.val)
-     else ();
-     buff.val.[len] := x;
-  return succ len
-;
-value get_buff len = String.sub buff.val 0 len;
-
 value effective_send_ok conf base p file =
   let strm = Stream.of_string file in
   let (request, content) =
@@ -172,8 +162,8 @@ value effective_send_ok conf base p file =
     let s =
       loop 0 strm where rec loop len =
         parser
-        [ [: `x :] -> loop (store len x) strm
-        | [: :] -> get_buff len ]
+        [ [: `x :] -> loop (Buff.store len x) strm
+        | [: :] -> Buff.get len ]
     in
     content ^ s
   in

@@ -8,7 +8,8 @@
 
 <p>
 
-A base contem actualmente %n pessoas.
+A base contem actualmente %n pessoas%o
+(<a href="%sm=NOTES">[note/notes]1</a>)%o.
 
 <ul>
 
@@ -58,7 +59,8 @@ por
 
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
 
-%w<li> <a href="%sm=ADD_FAM">Adicionar uma fam&iacute;lia</a>.
+%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
+<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
 %w
 
 </ul>

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.15 1999-07-28 13:08:35 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.16 1999-08-14 09:26:39 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -696,7 +696,8 @@ value print_person conf base p =
      print_access conf base p;
      Wserver.wprint "\n";
      tag "h4" begin
-       Wserver.wprint "%s" (capitale (transl_nth conf "note/notes" 1));
+       Wserver.wprint "%s"
+         (capitale (nominative (transl_nth conf "note/notes" 1)));
      end;
      print_notes conf base p;
      Wserver.wprint "\n";

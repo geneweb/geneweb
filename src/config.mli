@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 2.6 1999-08-07 09:10:36 ddr Exp $ *)
+(* $Id: config.mli,v 2.7 1999-08-14 09:26:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -10,6 +10,7 @@ type config =
     cgi : bool;
     command : string;
     lang : string;
+    default_lang : string;
     can_send_image : bool;
     cancel_links : mutable bool;
     access_by_key : bool;

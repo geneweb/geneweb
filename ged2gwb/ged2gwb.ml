@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.25 1999-07-26 07:01:58 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.26 1999-08-14 09:26:35 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -32,6 +32,7 @@ value charset = ref Ascii;
 value try_negative_dates = ref False;
 value no_negative_dates = ref False;
 value month_number_dates = ref NoMonthNumberDates;
+value conc_spc = ref False;
 
 (* Reading input *)
 
@@ -477,6 +478,7 @@ type gen =
     g_fam : tab (choice string family);
     g_cpl : tab (choice string couple);
     g_str : tab string;
+    g_bnot : mutable string;
     g_ic : in_channel;
     g_not : Hashtbl.t string int;
     g_src : Hashtbl.t string int;
@@ -743,6 +745,25 @@ value extract_notes gen rl =
     rl []
 ;
 
+value treat_notes gen rl =
+  let lines = extract_notes gen rl in
+  let notes =
+    List.fold_left
+      (fun s (lab, n) ->
+         let spc = String.length n > 0 && n.[0] == ' ' || conc_spc.val in
+         let end_spc = String.length n > 1 && n.[String.length n - 1] == ' ' in
+         let n = strip_spaces n in
+         if s = "" then n ^ (if end_spc then " " else "")
+         else if lab = "CONT" || lab = "NOTE" then
+           s ^ "<br>\n" ^ n ^ (if end_spc then " " else "")
+         else if n = "" then s
+         else
+           s ^ (if spc then "\n" else "") ^ n ^ (if end_spc then " " else ""))
+      "" lines
+  in
+  strip_newlines notes
+;
+
 value treat_indi_notes_titles gen rl =
   let lines = extract_notes gen rl in
   let (notes, titles) =
@@ -764,22 +785,7 @@ value treat_indi_notes_titles gen rl =
 ;
 
 value treat_indi_notes gen rl =
-  let lines = extract_notes gen rl in
-  let notes =
-    List.fold_left
-      (fun s (lab, n) ->
-         let spc = String.length n > 0 && n.[0] == ' ' in
-         let end_spc = String.length n > 1 && n.[String.length n - 1] == ' ' in
-         let n = strip_spaces n in
-         if s = "" then n ^ (if end_spc then " " else "")
-         else if lab = "CONT" || lab = "NOTE" then
-           s ^ "<br>\n" ^ n ^ (if end_spc then " " else "")
-         else if n = "" then s
-         else
-           s ^ (if spc then "\n" else "") ^ n ^ (if end_spc then " " else ""))
-      "" lines
-  in
-  add_string gen (strip_newlines notes)
+  add_string gen (treat_notes gen rl)
 ;
 
 value source gen r =
@@ -1280,23 +1286,27 @@ value add_fam gen r =
   [ Not_found -> add_fam_norm gen r ]
 ;
 
-value treat_header r =
-  match charset_option.val with
-  [ Some v -> charset.val := v
-  | None ->
-      match find_field "CHAR" r.rsons with
-      [ Some r ->
-          match r.rval with
-          [ "ANSEL" -> charset.val := Ansel
-          | "ASCII" | "IBMPC" -> charset.val := Ascii
-          | _ -> charset.val := Ascii ]
-      | None -> () ] ]
+value treat_header gen r =
+  do match charset_option.val with
+     [ Some v -> charset.val := v
+     | None ->
+         match find_field "CHAR" r.rsons with
+         [ Some r ->
+             match r.rval with
+             [ "ANSEL" -> charset.val := Ansel
+             | "ASCII" | "IBMPC" -> charset.val := Ascii
+             | _ -> charset.val := Ascii ]
+         | None -> () ] ];
+     match find_all_fields "NOTE" r.rsons with
+     [ [] -> ()
+     | rl -> gen.g_bnot := treat_notes gen rl ];
+  return ()
 ;
 
 value make_gen2 gen r =
   match r.rlab with
   [ "HEAD" ->
-      do Printf.eprintf "*** Header ok\n"; flush stderr; treat_header r;
+      do Printf.eprintf "*** Header ok\n"; flush stderr; treat_header gen r;
       return ()
   | "INDI" -> add_indi gen r
   | _ -> () ]
@@ -1535,7 +1545,8 @@ value make_arrays in_file =
   let gen =
     {g_per = {arr = [| |]; tlen = 0}; g_asc = {arr = [| |]; tlen = 0};
      g_fam = {arr = [| |]; tlen = 0}; g_cpl = {arr = [| |]; tlen = 0};
-     g_str = {arr = [| |]; tlen = 0}; g_ic = open_in_bin fname;
+     g_str = {arr = [| |]; tlen = 0}; g_bnot = "";
+     g_ic = open_in_bin fname;
      g_not = Hashtbl.create 3001; g_src = Hashtbl.create 3001;
      g_hper = Hashtbl.create 3001; g_hfam = Hashtbl.create 3001;
      g_hstr = Hashtbl.create 3001; g_hnam = Hashtbl.create 3001;
@@ -1554,10 +1565,10 @@ value make_arrays in_file =
      pass3 gen fname;
      close_in gen.g_ic;
      check_undefined gen;
-  return (gen.g_per, gen.g_asc, gen.g_fam, gen.g_cpl, gen.g_str)
+  return (gen.g_per, gen.g_asc, gen.g_fam, gen.g_cpl, gen.g_str, gen.g_bnot)
 ;
 
-value make_subarrays (g_per, g_asc, g_fam, g_cpl, g_str) =
+value make_subarrays (g_per, g_asc, g_fam, g_cpl, g_str, g_bnot) =
   let persons =
     let a = Array.create g_per.tlen (Obj.magic 0) in
     do for i = 0 to g_per.tlen - 1 do
@@ -1595,7 +1606,7 @@ value make_subarrays (g_per, g_asc, g_fam, g_cpl, g_str) =
     return a
   in
   let strings = Array.sub g_str.arr 0 g_str.tlen in
-  (persons, ascends, families, couples, strings)
+  (persons, ascends, families, couples, strings, g_bnot)
 ;
 
 value cache_of tab =
@@ -1603,11 +1614,12 @@ value cache_of tab =
   do c.get := fun i -> (c.array ()).(i); return c
 ;
 
-value make_base (persons, ascends, families, couples, strings) =
+value make_base (persons, ascends, families, couples, strings, bnotes) =
+  let bnotes = {nread = fun _ -> bnotes; norigin_file = ""} in
   let base_data =
     {persons = cache_of persons; ascends = cache_of ascends;
      families = cache_of families; couples = cache_of couples;
-     strings = cache_of strings}
+     strings = cache_of strings; bnotes = bnotes}
   in
   let base_func =
     {persons_of_name = fun []; strings_of_fsname = fun [];
@@ -1616,7 +1628,8 @@ value make_base (persons, ascends, families, couples, strings) =
      persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
      patch_person = fun []; patch_ascend = fun []; patch_family = fun [];
      patch_couple = fun []; patch_string = fun []; patch_name = fun [];
-     commit_patches = fun []; patched_ascends = fun []; cleanup = fun () -> ()}
+     commit_patches = fun []; commit_notes = fun [];
+     patched_ascends = fun []; cleanup = fun () -> ()}
   in
   {data = base_data; func = base_func}
 ;
@@ -1947,7 +1960,9 @@ value speclist =
 value errmsg = "Usage: ged2gwb [<ged>] [options] where options are:";
 
 value main () =
-  do Argl.parse speclist (fun s -> in_file.val := s) errmsg; return
+  do Argl.parse speclist (fun s -> in_file.val := s) errmsg;
+     conc_spc.val := titles_aurejac.val; (* kludge *)
+  return
   let arrays = make_arrays in_file.val in
   do Gc.compact (); return
   let arrays = make_subarrays arrays in
