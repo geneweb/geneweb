@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.81 2004-01-08 11:56:07 ddr Exp $ *)
+(* $Id: util.ml,v 4.82 2004-01-09 21:05:33 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1079,8 +1079,8 @@ value include_hed_trl conf base_opt suff =
         [ Some i -> String.sub s (i + 1) (String.length s - i - 1)
         | None -> "" ]
       in
-      copy_from_etc [('p', pref); ('s', suff)] conf.lang conf.indep_command
-        ic
+      copy_from_etc [('p', pref); ('s', suff); ('t', fun _ -> commd conf)]
+        conf.lang conf.indep_command ic
   | None -> () ]
 ;
 
