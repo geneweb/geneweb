@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.96 2000-05-12 12:54:02 ddr Exp $
+# $Id: lexicon.txt,v 3.97 2000-05-14 19:35:24 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2167,6 +2167,14 @@ no: slutt
 pt: fim
 ru: кончая
 se: slutar
+
+    engaged
+en: engaged
+fr: fianc&eacute;/fianc&eacute;s
+
+    engaged%t with
+en: engaged%t with
+fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
 
     error
 af: fout
