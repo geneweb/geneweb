@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.3 2001-09-16 13:53:11 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.4 2001-09-16 14:15:19 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -15,6 +15,23 @@ value incorrect_content_type conf base p s =
     print_link_to_welcome conf True;
     Wserver.wprint "<p>\n<font size=-1><em>";
     Wserver.wprint "Error: incorrect image content type: %s" s;
+    Wserver.wprint "</em></font>\n<p>\n";
+    Wserver.wprint "<ul><li>%s</ul>\n"
+      (referenced_person_title_text conf base p);
+    trailer conf;
+    raise Update.ModErr
+  }
+;
+
+value error_too_big_image conf base p len max_len =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  do {
+    rheader conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<p>\n<font size=-1><em>";
+    Wserver.wprint "Error: this image is too big: %d bytes<br>\n" len;
+    Wserver.wprint "Maximum authorized in this data base: %d bytes<br>\n"
+      max_len;
     Wserver.wprint "</em></font>\n<p>\n";
     Wserver.wprint "<ul><li>%s</ul>\n"
       (referenced_person_title_text conf base p);
@@ -237,7 +254,11 @@ value effective_send_ok conf base p file =
       dump_bad_image conf content;
       incorrect_content_type conf base p ct
     }
-    else (x, c)
+    else
+      match p_getint conf.base_env "max_image_size" with
+      [ Some len when String.length content > len ->
+          error_too_big_image conf base p (String.length content) len
+      | _ -> (x, c) ]
   in
   let bfname = default_image_name base p in
   let bfdir =
@@ -280,6 +301,7 @@ value print_send_ok conf base =
         let digest = Update.digest_person p in
         if digest = raw_get conf "digest" then
           let file = raw_get conf "file" in
+let _ = do { Printf.eprintf "file size %d\n" (String.length file); flush stderr; } in
           effective_send_ok conf base p file
         else Update.error_digest conf base
       with
