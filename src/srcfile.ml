@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.6 2001-04-19 17:25:59 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.7 2001-07-11 13:37:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -85,7 +85,7 @@ value std_date () =
     tm.Unix.tm_sec
 ;
 
-value read_wizard_trace fname =
+value read_wf_trace fname =
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let r = ref [] in
@@ -97,7 +97,7 @@ value read_wizard_trace fname =
   | None -> [] ]
 ;
 
-value write_wizard_trace fname wt =
+value write_wf_trace fname wt =
   let oc = open_out fname in
   do {
     List.iter (fun (dt, u) -> Printf.fprintf oc "%s %s\n" dt u) wt;
@@ -105,7 +105,29 @@ value write_wizard_trace fname wt =
   }
 ;
 
-value set_wizard_trace conf =
+value update_wf_trace conf fname =
+  let dt = std_date () in
+  let wt =
+    let r = read_wf_trace fname in
+    let dtlen = String.length dt in
+    let rec loop found r =
+      fun
+      [ [x :: l] ->
+          if String.length x > dtlen + 2 then
+            let u =
+              String.sub x (dtlen + 1) (String.length x - dtlen - 1)
+            in
+            if u = conf.user then loop True [(dt, u) :: r] l
+            else loop found [(String.sub x 0 dtlen, u) :: r] l
+          else loop found r l
+      | [] -> if found then r else [(dt, conf.user) :: r] ]
+    in
+    loop False [] r
+  in
+  write_wf_trace fname (Sort.list \> wt)
+;
+
+value set_wizard_and_friend_traces conf =
   if conf.wizard && conf.user <> "" then
     let wpf =
       try List.assoc "wizard_passwd_file" conf.base_env with
@@ -113,25 +135,20 @@ value set_wizard_trace conf =
     in
     if wpf <> "" then
       let fname = adm_file (conf.bname ^ "_w.txt") in
-      let dt = std_date () in
-      let wt =
-        let r = read_wizard_trace fname in
-        let dtlen = String.length dt in
-        let rec loop found r =
-          fun
-          [ [x :: l] ->
-              if String.length x > dtlen + 2 then
-                let u =
-                  String.sub x (dtlen + 1) (String.length x - dtlen - 1)
-                in
-                if u = conf.user then loop True [(dt, u) :: r] l
-                else loop found [(String.sub x 0 dtlen, u) :: r] l
-              else loop found r l
-          | [] -> if found then r else [(dt, conf.user) :: r] ]
-        in
-        loop False [] r
-      in
-      write_wizard_trace fname (Sort.list  \> wt)
+      update_wf_trace conf fname
+    else ()
+  else if conf.friend && conf.user <> "" then
+    let fpf =
+      try List.assoc "friend_passwd_file" conf.base_env with
+      [ Not_found -> "" ]
+    in
+    let fp =
+      try List.assoc "friend_passwd" conf.base_env with
+      [ Not_found -> "" ]
+    in
+    if fpf <> "" && conf.passwd <> fp then
+      let fname = adm_file (conf.bname ^ "_f.txt") in
+      update_wf_trace conf fname
     else ()
   else ()
 ;
@@ -147,7 +164,7 @@ value incr_welcome_counter conf =
         else if conf.friend then r.friend_cnt := r.friend_cnt + 1
         else r.normal_cnt := r.normal_cnt + 1;
         write_counter conf r;
-        set_wizard_trace conf;
+        set_wizard_and_friend_traces conf;
         Some (r.welcome_cnt, r.request_cnt, r.start_date)
       }
   | Refuse -> None ]
@@ -164,7 +181,7 @@ value incr_request_counter conf =
         else if conf.friend then r.friend_cnt := r.friend_cnt + 1
         else r.normal_cnt := r.normal_cnt + 1;
         write_counter conf r;
-        set_wizard_trace conf;
+        set_wizard_and_friend_traces conf;
         Some (r.welcome_cnt, r.request_cnt, r.start_date)
       }
   | Refuse -> None ]
