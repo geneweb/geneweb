@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.15 2002-01-30 21:52:33 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.16 2002-03-06 12:21:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -442,7 +442,7 @@ value print_person_long_info conf base auth link p =
        (p.access <> Private || conf.friend || conf.wizard) then
        do {
       Wserver.wprint ", <em>";
-      Perso.print_titles conf base False (transl conf "and") p;
+      Perso.print_titles conf base False (transl_nth conf "and" 0) p;
       Wserver.wprint "</em>"
     }
     else ();
@@ -511,7 +511,7 @@ value print_persons_parents conf base all_gp p =
       Wserver.wprint ", %s\n"
         (transl_decline2 conf "%1 of (same or greater generation level) %2"
            (transl_nth conf "son/daughter/child" (index_of_sex p.sex))
-           (string cpl.father ^ "\n" ^ transl conf "and" ^ "\n" ^
+           (string cpl.father ^ "\n" ^ transl_nth conf "and" 0 ^ "\n" ^
               string cpl.mother))
   | None -> () ]
 ;
@@ -728,7 +728,7 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
                   Wserver.wprint "%s: "
                     (capitale (nominative (transl conf "parents")));
                   print_link_long conf n1;
-                  Wserver.wprint " %s " (transl conf "and");
+                  Wserver.wprint " %s " (transl_nth conf "and" 0);
                   print_link_long conf n2;
                   Wserver.wprint ".\n"
                 }

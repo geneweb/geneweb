@@ -6,6 +6,11 @@ GeneWeb version 4.06
     specify the database directory.
 
 * GeneWeb server or CGI (gwd)
+  - [06 Mar 02] Fixed problem of the text "marriages and children" in
+    Spanish, "casamientos e hijos", which were incorrectly displayed
+    "casamientos y hijos". Technical: the solution uses a system of
+    "elision" (already needed by Catalan) which had to be a little bit
+    modified.
   - [05 Mar 02] Fixed bug, in personal page: the circle before
     children was supposed to be empty for the non married ones and full
     for the married ones, but it did not work in all browser. Technical:

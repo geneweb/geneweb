@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.4 2002-02-15 10:44:33 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.5 2002-03-06 12:21:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -303,7 +303,7 @@ value print_marriage conf base month =
                    html_li conf;
                    afficher_personne_titre_referencee conf base
                      (pget conf base fam.father);
-                   Wserver.wprint "\n%s\n" (transl conf "and");
+                   Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
                    afficher_personne_titre_referencee conf base
                      (pget conf base fam.mother);
                    Wserver.wprint ", <em>%s %d</em>\n"
@@ -326,9 +326,11 @@ value print_anniversaries_of_marriage conf base y list =
          do {
            Wserver.wprint "\n";
            html_li conf;
-           afficher_personne_titre_referencee conf base (pget conf base fam.father);
-           Wserver.wprint "\n%s\n" (transl conf "and");
-           afficher_personne_titre_referencee conf base (pget conf base fam.mother);
+           afficher_personne_titre_referencee conf base
+             (pget conf base fam.father);
+           Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
+           afficher_personne_titre_referencee conf base
+             (pget conf base fam.mother);
            Wserver.wprint ", <em>%s %d\n(" (transl conf "in (year)") year;
            Wserver.wprint (ftransl conf "%d years ago")
              (conf.today.year - year);

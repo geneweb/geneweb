@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.7 2002-01-26 13:38:39 ddr Exp $ *)
+(* $Id: date.ml,v 4.8 2002-03-06 12:21:20 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -137,7 +137,8 @@ value string_of_on_prec_dmy_aux conf sy d =
         else if d.day = 0 then sy
         else transl_decline conf "on (day month year)" sy
       in
-      transl conf "between (date)" ^ " " ^ s ^ " " ^ transl conf "and" ^ " " ^
+      transl conf "between (date)" ^ " " ^ s ^ " " ^
+        transl_nth conf "and" 0 ^ " " ^
         nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z) ]
 ;
 
@@ -177,7 +178,8 @@ value string_of_prec_dmy conf s d =
       s ^ " " ^ transl conf "or" ^ " " ^
         nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z)
   | YearInt z ->
-      transl conf "between (date)" ^ " " ^ s ^ " " ^ transl conf "and" ^ " " ^
+      transl conf "between (date)" ^ " " ^ s ^ " " ^
+        transl_nth conf "and" 0 ^ " " ^
         nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z) ]
 ;
 
@@ -192,7 +194,7 @@ value gregorian_precision conf d =
       Calendar.gregorian_of_sdn d.prec (Calendar.sdn_of_gregorian d + d.delta)
     in
     transl conf "between (date)" ^ " " ^ string_of_on_dmy conf d ^ " " ^
-      transl conf "and" ^ " " ^ string_of_on_dmy conf d2
+      transl_nth conf "and" 0 ^ " " ^ string_of_on_dmy conf d2
 ;
 
 value string_of_ondate conf =

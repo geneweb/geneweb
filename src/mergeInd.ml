@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.15 2002-03-05 16:29:56 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.16 2002-03-06 12:21:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -222,7 +222,7 @@ value propose_merge_ind conf base branches p1 p2 =
         stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p1) begin
           Merge.print_someone conf base p1;
         end;
-        Wserver.wprint "\n%s\n" (transl conf "and");
+        Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
         stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p2) begin
           Merge.print_someone conf base p2;
         end;

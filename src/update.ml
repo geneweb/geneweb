@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.19 2002-01-30 11:49:51 ddr Exp $ *)
+(* $Id: update.ml,v 4.20 2002-03-06 12:21:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -238,7 +238,7 @@ value print_warning conf base =
           (capitale (transl conf "changed order of children"));
         Wserver.wprint "-&gt;\n";
         Wserver.wprint "%s"
-          (someone_ref_text conf base fath ^ "\n" ^ transl conf "and" ^
+          (someone_ref_text conf base fath ^ "\n" ^ transl_nth conf "and" 0 ^
              someone_ref_text conf base moth ^ "\n");
         Wserver.wprint "\n<ul>\n";
         html_li conf;
@@ -712,12 +712,12 @@ value print_create_conflict conf base p var =
         html_li conf;
         Wserver.wprint "%s " (capitale (transl conf "or"));
         Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-        Wserver.wprint " %s %s." (transl conf "and")
+        Wserver.wprint " %s %s." (transl_nth conf "and" 0)
           (transl conf "change it (the number) yourself");
         html_li conf;
         Wserver.wprint "%s " (capitale (transl conf "or"));
         Wserver.wprint (ftransl conf "click on \"%s\"") (transl conf "back");
-        Wserver.wprint " %s %s." (transl conf "and")
+        Wserver.wprint " %s %s." (transl_nth conf "and" 0)
           (transl conf "use \"link\" instead of \"create\"");
       end;
       Wserver.wprint "<input type=submit name=create value=\"%s\">\n"

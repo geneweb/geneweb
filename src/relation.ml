@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.24 2002-02-03 19:05:16 ddr Exp $ *)
+(* $Id: relation.ml,v 4.25 2002-03-06 12:21:23 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -69,7 +69,7 @@ value print_menu conf base p =
            [ "" -> p_first_name base p ^ " " ^ p_surname base p
            | n -> n ]
          else person_text conf base p);
-      Wserver.wprint " %s..." (transl conf "and")
+      Wserver.wprint " %s..." (transl_nth conf "and" 0)
     }
   in
   let is = index_of_sex p.sex in

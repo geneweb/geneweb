@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.18 2002-03-05 16:29:56 ddr Exp $ *)
+(* $Id: family.ml,v 4.19 2002-03-06 12:21:20 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -306,7 +306,7 @@ value precisez conf base n pl =
                let s =
                  List.fold_left
                    (fun s h ->
-                      s ^ ", " ^ transl conf "and" ^ "\n" ^
+                      s ^ ", " ^ transl_nth conf "and" 0 ^ "\n" ^
                         person_title_text conf base h)
                    (person_title_text conf base h) hl
                in
