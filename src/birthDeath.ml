@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.17 2000-06-22 07:35:19 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.18 2000-07-04 14:22:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -100,6 +100,7 @@ value print_birth conf base =
     Wserver.wprint (fcapitale (ftransl conf "the latest %d births")) len
   in
   do header conf title;
+     print_link_to_welcome conf True;
      Wserver.wprint "<ul>\n";
      let _ = List.fold_left
        (fun (last_month_txt, was_future) (p, d, cal) ->
@@ -151,6 +152,7 @@ value print_death conf base =
     Wserver.wprint (fcapitale (ftransl conf "the latest %d deaths")) len
   in
   do header conf title;
+     print_link_to_welcome conf True;
      Wserver.wprint "<ul>\n";
      let _ = List.fold_left
        (fun last_month_txt (p, d, cal) ->
@@ -213,6 +215,7 @@ value print_oldest_alive conf base =
       (fcapitale (ftransl conf "the %d oldest perhaps still alive")) len
   in
   do header conf title;
+     print_link_to_welcome conf True;
      Wserver.wprint "<ul>\n";
      List.iter
        (fun (p, d, cal) ->
@@ -238,6 +241,40 @@ value print_oldest_alive conf base =
   return ()
 ;
 
+value print_longest_lived conf base =
+  let get_longest p =
+    if Util.fast_auth_age conf p then
+      match (Adef.od_of_codate p.birth, p.death) with
+      [ (Some (Dgreg bd _), Death _ cd) ->
+          match Adef.date_of_cdate cd with
+          [ Dgreg dd _ -> Some (Dgreg (temps_ecoule bd dd) Dgregorian)
+          | _ -> None ]
+      | _ -> None ]
+    else None
+  in
+  let (list, len) = select conf base get_longest False in
+  let title _ =
+    Wserver.wprint (fcapitale (ftransl conf "the %d who lived the longest"))
+      len
+  in
+  do header conf title;
+     print_link_to_welcome conf True;
+     Wserver.wprint "<ul>\n";
+     List.iter
+       (fun (p, d, cal) ->
+          do Wserver.wprint "<li>\n";
+             Wserver.wprint "<strong>\n";
+             afficher_personne_referencee conf base p;
+             Wserver.wprint "</strong>%s" (Date.short_dates_text conf base p);
+             Wserver.wprint "\n(%d %s)" d.year (transl conf "years old");
+             Wserver.wprint ".\n";
+          return ())
+       list;
+     Wserver.wprint "</ul>\n\n";
+     trailer conf;
+  return ()
+;
+
 value print_marriage conf base =
   let (list, len) =
     select_family conf base (fun fam -> Adef.od_of_codate fam.marriage)
@@ -246,6 +283,7 @@ value print_marriage conf base =
     Wserver.wprint (fcapitale (ftransl conf "the latest %d marriages")) len
   in
   do header conf title;
+     print_link_to_welcome conf True;
      Wserver.wprint "<ul>\n";
      let _ = List.fold_left
        (fun (last_month_txt, was_future) (fam, d, cal) ->
@@ -289,6 +327,37 @@ value print_marriage conf base =
        ("", False) list
      in ();
      Wserver.wprint "</ul>\n</ul>\n";
+     trailer conf;
+  return ()
+;
+
+value print_statistics conf base =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "statistics"))
+  in
+  let n =
+    try int_of_string (List.assoc "latest_event" conf.base_env) with
+    [ Not_found | Failure _ -> 20 ]
+  in
+  do header conf title;
+     print_link_to_welcome conf True;
+     tag "ul" begin
+       Wserver.wprint "<li><a href=\"%sm=LB;k=%d\">" (commd conf) n;
+       Wserver.wprint (ftransl conf "the latest %d births") n;
+       Wserver.wprint "</a>\n";
+       Wserver.wprint "<li><a href=\"%sm=LD;k=%d\">" (commd conf) n;
+       Wserver.wprint (ftransl conf "the latest %d deaths") n;
+       Wserver.wprint "</a>\n";
+       Wserver.wprint "<li><a href=\"%sm=LM;k=%d\">" (commd conf) n;
+       Wserver.wprint (ftransl conf "the latest %d marriages") n;
+       Wserver.wprint "</a>\n";
+       Wserver.wprint "<li><a href=\"%sm=OA;k=%d;lim=0\">" (commd conf) n;
+       Wserver.wprint (ftransl conf "the %d oldest perhaps still alive") n;
+       Wserver.wprint "</a>\n";
+       Wserver.wprint "<li><a href=\"%sm=LL;k=%d\">" (commd conf) n;
+       Wserver.wprint (ftransl conf "the %d who lived the longest") n;
+       Wserver.wprint "</a>\n";
+     end;
      trailer conf;
   return ()
 ;

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.44 2000-06-22 07:35:11 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.45 2000-07-04 14:22:18 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogi - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -173,15 +173,12 @@ søgning</b></font></a>.
 <ul>
 <li><a href="%sm=AN">[birthdays]</a>
 <li><a href="%sm=AD">[anniversaries of death]</a>
-<li><a href="%sm=AM">[anniversaries of marriage]</a>%I|wf
-<li><a href="%sm=LB;k=%m">[the latest %d births](%m)</a>
-<li><a href="%sm=OA;k=%m;lim=0">[the %d oldest perhaps still alive](%m)</a>%E
+<li><a href="%sm=AM">[anniversaries of marriage]</a>
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li><a href="%sm=LD;k=%m">[the latest %d deaths](%m)</a>
-<li><a href="%sm=LM;k=%m">[the latest %d marriages](%m)</a>%E%Ih
+<li><a href="%sm=STAT">[statistics]</a>%E%Ih
 <li><a href="%sm=HIST;k=10">[history of updates]</a>%E
 <li><a href="%sm=CAL">[calendar/calendars]1</a>
 <li><a href="%sm=FORUM">[data base forum]</a>
