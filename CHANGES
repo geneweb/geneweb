@@ -3,6 +3,9 @@ GeneWeb Version 1.08
 
 * gwd: fixed several displaying bugs due to ANSEL
 
+* gwc, gwu:
+  - added backslash as escape character for underscores
+
 GeneWeb Version 1.07
 --------------------
 

@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.5 1998-09-29 16:12:17 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.6 1998-10-10 15:53:00 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -24,20 +24,24 @@ type syntax_o =
 type gwo = (string * list syntax_o);
 
 value copy_decode s i1 i2 =
+  let len =
+    loop 0 i1 where rec loop len i =
+      if i == i2 then len
+      else if s.[i] == '\\' then loop len (i + 1)
+      else loop (len + 1) (i + 1)
+  in
   let rec loop_copy t i j =
     if i < i2 then
-      let c =
+      let (c, i) =
         match s.[i] with
-        [ '_' -> ' '
-        | x -> x ]
+        [ '_' -> (' ', i)
+        | '\\' -> (s.[i + 1], i + 1)
+        | x -> (x, i) ]
       in
       do t.[j] := c; return loop_copy t (succ i) (succ j)
     else t
   in
-(*
-  let i1 = if i1 < i2 && s.[i1] == '_' then i1 + 1 else i1 in
-*)
-  loop_copy (String.create (i2 - i1)) i1 0
+  loop_copy (String.create len) i1 0
 ;
 
 value fields str =

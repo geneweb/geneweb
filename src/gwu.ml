@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 1.3 1998-09-30 07:29:23 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.4 1998-10-10 15:53:00 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -54,6 +54,8 @@ value correct_string base is =
       if i == 0 && not (starting_char s.[0]) then
         loop (i + 1) (store (store len '_') s.[0])
       else if s.[i] == ' ' then loop (i + 1) (store len '_')
+      else if s.[i] == '_' || s.[i] == '\\' then
+        loop (i + 1) (store (store len '\\') s.[i])
       else loop (i + 1) (store len s.[i])
 ;
 
