@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 4.0 2001-03-16 19:34:57 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 4.1 2001-04-17 21:56:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open MLast;
@@ -24,11 +24,7 @@ value rec expr e =
       Printf.printf "%s\n" s
   | <:expr< $lid:f$ $_$ ($lid:g$ $_$ $str:s$ $_$) >> when
     List.mem f trace && List.mem g trace ->
-(*
-      Printf.printf "INDIRECT %s\n" s
-*)
       Printf.printf "%s\n" s
-(**)
   | <:expr< $lid:x$ >> when List.mem x trace ->
       Stdpp.raise_with_loc (MLast.loc_of_expr e) (Failure "Bad source")
   | <:expr< let $rec:_$ $list:pel$ in $e$ >> ->
@@ -38,13 +34,12 @@ value rec expr e =
       do expr e; List.iter fun_binding pel; return ()
   | <:expr< try $e$ with [ $list:pel$ ] >> ->
       do expr e; List.iter fun_binding pel; return ()
-  | <:expr< do $list:el$ return $e$ >> ->
-      do List.iter expr el; expr e; return ()
+  | <:expr< do { $list:el$ } >> -> List.iter expr el
   | <:expr< if $e1$ then $e2$ else $e3$ >> ->
       do expr e1; expr e2; expr e3; return ()
-  | <:expr< for $_$ = $_$ $to:_$ $_$ do $list:el$ done >> ->
+  | <:expr< for $_$ = $_$ $to:_$ $_$ do { $list:el$ } >> ->
       List.iter expr el
-  | <:expr< while $_$ do $list:el$ done >> -> List.iter expr el
+  | <:expr< while $_$ do { $list:el$ } >> -> List.iter expr el
   | <:expr< let module $m$ = $me$ in $e$ >> -> expr e
   | <:expr< ($list:el$) >> -> List.iter expr el
   | <:expr< ($e$:$_$) >> -> expr e
