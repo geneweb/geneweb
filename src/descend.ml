@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.32 2001-02-14 02:47:09 ddr Exp $ *)
+(* $Id: descend.ml,v 3.33 2001-03-01 19:42:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -337,7 +337,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
      if compte.val > 1 then
        do html_p conf;
           Wserver.wprint "%s: %d %s" (capitale (transl conf "total"))
-            compte.val (nominative (transl_nth conf "person/persons" 1));
+            compte.val (nominative (transl_nth_def conf "person/persons" 2 1));
           if niveau_max > 1 then
             Wserver.wprint " (%s)" (transl conf "spouses not included")
           else ();
@@ -400,7 +400,7 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
      Wserver.wprint "%s" (capitale (text_level conf niveau_max));
      if len.val > 1 then
        Wserver.wprint " (%d %s)" len.val
-         (nominative (transl_nth conf "person/persons" 1))
+         (nominative (transl_nth_def conf "person/persons" 2 1))
      else ();
      Wserver.wprint ".\n";
      html_p conf;
@@ -744,7 +744,7 @@ value afficher_descendants_numerotation conf base niveau_max ancetre =
      if total.val > 1 then
        do html_p conf;
           Wserver.wprint "%s: %d %s" (capitale (transl conf "total"))
-            total.val (nominative (transl_nth conf "person/persons" 1));
+            total.val (nominative (transl_nth_def conf "person/persons" 2 1));
           if niveau_max > 1 then
             Wserver.wprint " (%s)" (transl conf "spouses not included")
           else ();
