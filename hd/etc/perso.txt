@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
 <head>
-  <!-- $Id: perso.txt,v 4.5 2001-07-07 19:17:03 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.6 2001-11-24 13:17:14 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -343,3 +344,4 @@
 %copyright;
 %base_trailer;
 </body>
+</html>

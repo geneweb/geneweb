@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
 <head>
-  <!-- $Id: updfam.txt,v 4.16 2001-10-20 10:58:56 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.17 2001-11-24 13:17:14 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -389,3 +390,4 @@
 %copyright;
 %base_trailer;
 </body>
+</html>

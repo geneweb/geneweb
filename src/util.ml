@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.14 2001-11-23 13:13:12 ddr Exp $ *)
+(* $Id: util.ml,v 4.15 2001-11-24 13:17:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -932,7 +932,7 @@ value header_no_page_title conf title =
     Wserver.wprint "\
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
 ";
-    Wserver.wprint "<head>\n";
+    Wserver.wprint "<html>\n<head>\n";
     Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\">\n";
     Wserver.wprint "  <title>";
     title True;
@@ -1139,7 +1139,7 @@ GeneWeb %s</em></font>" Version.txt;
           ()
         } ];
     include_hed_trl conf None ".trl";
-    Wserver.wprint "</body>\n";
+    Wserver.wprint "</body>\n</html>\n";
   }
 ;
 
