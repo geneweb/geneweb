@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.6 2001-11-27 12:10:10 ddr Exp $ *)
+(* $Id: name.ml,v 4.7 2002-09-30 11:11:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 module Buff =
@@ -143,7 +143,7 @@ value crush s =
   following comment in the CHANGES file. Not done now (3 May 2001) because
   it is a minor change, but with a probleming incompatibility.
 
-  - [date] Changed index: names ending with s, z, sz, ss are now
+  - [date] Changed index: names ending with s, z, sz, ss (s-tsett?) are now
     treated like if only ended by one s (therefore could be ignored in
     search). The index being different, databases must be rebuild (radical
     cleanup or consang program, option -i), otherwise the requests concerning
