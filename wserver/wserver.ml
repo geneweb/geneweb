@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.11 2002-02-17 12:47:50 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.12 2002-02-23 15:39:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -9,6 +9,8 @@ value bufferize = ref False;
 value wserver_oc =
   do { set_binary_mode_out stdout True; ref stdout }
 ;
+
+value wserver_ic = ref stdin;
 
 value buffer = Buffer.create 211;
 
@@ -230,6 +232,8 @@ value case_unsensitive_eq s1 s2 =
   String.lowercase s1 = String.lowercase s2
 ;
 
+value end_lines = ['\n'; '\r'];
+
 value rec extract_param name stop_char =
   fun
   [ [x :: l] ->
@@ -239,6 +243,9 @@ value rec extract_param name stop_char =
           loop (String.length name) where rec loop i =
             if i = String.length x then i
             else if x.[i] = stop_char then i
+            else if
+              List.mem stop_char end_lines && List.mem x.[i] end_lines
+            then i
             else loop (i + 1)
         in
         String.sub x (String.length name) (i - String.length name)
@@ -491,6 +498,7 @@ value accept_connection tmout max_clients callback s =
       in
       let ic = Unix.in_channel_of_descr t in
       do {
+        wserver_ic.val := Unix.in_channel_of_descr t;
         wserver_oc.val := Unix.out_channel_of_descr t;
         treat_connection tmout callback addr ic;
         cleanup ();
@@ -548,6 +556,7 @@ value accept_connection tmout max_clients callback s =
       else if noproc.val then do {
         let ic = open_in_bin sock_in.val in
         let oc = open_out_bin sock_out.val in
+        wserver_ic.val := ic;
         wserver_oc.val := oc;
         treat_connection tmout callback addr ic;
         flush oc;
@@ -618,6 +627,7 @@ value f addr_opt port tmout max_clients g =
         let addr = sockaddr_of_string s in
         let ic = open_in_bin sock_in.val in
         let oc = open_out_bin sock_out.val in
+        wserver_ic.val := ic;
         wserver_oc.val := oc;
         treat_connection tmout g addr ic;
         exit 0
