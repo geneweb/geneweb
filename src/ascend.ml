@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.39 2000-07-21 07:27:59 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.40 2000-07-30 13:10:38 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1476,7 +1476,260 @@ value print_tree_with_pre conf base v p =
   end
 ;
 
+type pos = [ Left | Right | Center | Alone ];
+
+type cell = [ Cell of person and
+                      pos and  (* Position for horizontal bar *)
+                      bool and (* Top vertical bar needed ? *)
+                      int      (* Colspan *)
+	    | Empty ];
+
+(* Ascendant tree:
+
+  8 ? ? ? ? ? ? ?
+   4   5   ?   7
+     2       3 
+         1
+
+1) Build list of levels (t1 = True for parents flag, size 1)
+   => [ [8At1 E E] [4Lt1 5Rt1 7At1] [2Lt1 3Rt1] [1At1] ] 
+
+2) Enrich list of levels (parents flag, sizing)
+   => [ [8At1 E E] [4Lt1 5Rf1 7Af1] [2Lt3 3Rt1] [1At5] ]
+
+3) Display it
+    For each cell:
+      Top vertical bar if parents flag (not on top line)
+      Person
+      Person tree link (vertical bar) ) not on bottom line
+      Horizontal line                 )
+
+*)
+
+value rec enrich lst1 lst2 =
+  match (lst1, lst2) with
+  [ (_, []) -> []
+  | ([], lst) -> lst
+  | (_, _) ->
+      match (List.hd lst1, List.hd lst2) with
+      [ (Cell _ Right _ s1, Cell p d u s2) ->
+          [(Cell p d u (s1+s2+1)) :: (enrich (List.tl lst1) (List.tl lst2))]
+      | (Cell _ Left _ s, Cell p d u _) ->
+          enrich (List.tl lst1) [Cell p d u s :: List.tl lst2]
+      | (Cell _ _ _ s, Cell p d u _) ->
+          [Cell p d u s :: enrich (List.tl lst1) (List.tl lst2)]
+      | (Empty, Cell p d _ s) ->
+          [ Cell p d False s :: enrich (List.tl lst1) (List.tl lst2)]
+      | (_, Empty) ->
+          [ Empty :: enrich (List.tl lst1) (List.tl lst2)] ]
+  ]
+;
+    
+value rec enrich_tree lst =
+  match lst with
+  [ [] -> []
+  | [head :: tail] ->
+      match tail with
+      [ [] -> [head]
+      | [thead :: ttail] ->
+          [head :: enrich_tree [(enrich head thead) :: ttail]]
+      ]
+  ]
+;
+
+(* print_tree_with_table:
+    conf: configuration parameters
+    base: base name
+    gv: number of generations
+    p: person *)
 value print_tree_with_table conf base gv p =
+  let gv = min (limit_by_tree conf) gv in
+  let next_gen pol =
+    List.fold_right
+      (fun po list ->
+         match po with
+         [ Empty -> [Empty :: list]
+         | Cell p _ _ _ ->
+             match (aoi base p.cle_index).parents with
+             [ Some ifam ->
+                 let cpl = coi base ifam in
+                 let fath =
+                   let p = poi base cpl.father in
+                   if connais base p then Some p else None
+                 in
+                 let moth =
+                   let p = poi base cpl.mother in
+                   if connais base p then Some p else None
+                 in
+		 match (fath, moth) with
+		 [ (Some f, Some m) ->
+                     [Cell f Left True 1; Cell m Right True 1 :: list]
+		 | (Some f, None)   -> [Cell f Alone True 1 :: list]
+                 | (None, Some m)   -> [Cell m Alone True 1 :: list]
+		 | (None, None)     -> [Empty :: list] ]
+             | _ -> [Empty :: list] ] ])
+      pol []
+  in
+  (* build tree: go up (initialisation) *)
+  let gen =
+    loop (gv - 1) [Cell p Alone True 1] [] where rec loop i gen list =
+      if i == 0 then [gen :: list]
+      else loop (i - 1) (next_gen gen) [gen :: list]
+  in
+  (* build tree: go down (enrichment) *)
+  let gen = enrich_tree gen in
+  let down_reference p s =
+    if conf.cancel_links then s
+    else reference conf base p s
+  in
+  let colspan = 
+    fun [ Empty 
+        | Cell _ _ _ 1 -> ""
+        | Cell _ _ _ s -> " colspan=" ^ string_of_int s ] in
+  let align =
+    fun [ Cell _ Center _ _
+        | Cell _ Alone _ _  -> "align=center"
+        | Cell _ Left _ _   -> "align=right"
+        | _                 -> "" ]
+  in
+  let print_ancestor_link gen first po =
+    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n"
+       else ();
+       stag "td" "align=center%s" (colspan po) begin
+         let txt =
+           match po with
+           [ Empty -> "&nbsp;"
+           | Cell p _ _ _ ->
+               tree_reference gv conf base p "|" ]
+         in
+         Wserver.wprint "%s" txt;
+       end;
+       Wserver.wprint "\n";
+    return ()
+  in
+  let print_ancestor gen first po =
+    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n"
+       else ();
+       stag "td" "align=center%s" (colspan po) begin
+         let txt =
+           match po with
+           [ Empty -> "&nbsp;"
+           | Cell p _ _ _ ->
+               let txt = person_title_text conf base p in
+               let txt = down_reference p txt in
+                   txt ^ Date.short_dates_text conf base p ]
+         in
+         Wserver.wprint "%s" txt;
+         match po with
+         [ Empty -> ()
+         | Cell p _ _ _ -> Dag.print_image conf base p ];
+       end;
+       Wserver.wprint "\n";
+    return ()
+  in
+  let print_vertical_bars gen first po =
+    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n"
+       else ();
+       stag "td" "align=center%s" (colspan po) begin
+         let txt =
+           match po with
+           [ Empty 
+           | Cell _ _ False _ -> "&nbsp;"
+           | _ -> "|" ]
+         in
+         Wserver.wprint "%s" txt;
+       end;
+       Wserver.wprint "\n";
+    return ()
+  in
+  let print_horizontal_line gen first po =
+    do if not first then
+         do stag "td" "%s" (align po) begin
+              let txt = 
+                match po with
+                [ Cell _ Right _ _
+                | Cell _ Center _ _ -> "<hr noshade size=1>"
+                | _ -> "&nbsp;" ]
+              in
+              Wserver.wprint "%s" txt;
+            end;
+            Wserver.wprint "\n";
+          return ()
+       else ();
+       stag "td" "%s%s" (align po) (colspan po) begin
+         let txt =
+           match po with
+           [ Empty -> "&nbsp;"
+           | Cell _ Left _ _ ->
+              "<hr noshade size=1 width=\"50%%\" align=right>"
+           | Cell _ Right _ _ ->
+              "<hr noshade size=1 width=\"50%%\" align=left>"
+           | Cell _ Alone _ _ ->
+              "|"
+           | Cell _ Center _ _ ->
+              "<hr noshade size=1>" ]
+         in
+         Wserver.wprint "%s" txt;
+       end;
+       Wserver.wprint "\n";
+    return ()
+  in
+  tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
+    conf.border
+  begin
+    let _ =
+      List.fold_left
+        (fun firstline gen ->
+           do if not firstline then
+                tag "tr" begin
+                  let _ =
+                    List.fold_left 
+                      (fun first po ->
+                         do print_vertical_bars gen first po;
+                         return False)
+                      True gen
+                  in ();
+                end
+              else ();
+              tag "tr" begin
+                let _ =
+                  List.fold_left 
+                    (fun first po ->
+                       do print_ancestor gen first po;
+                       return False)
+                    True gen
+                in ();
+              end;
+              if List.length gen > 1 then
+                do tag "tr" begin
+                    let _ =
+                      List.fold_left 
+                        (fun first po ->
+                           do print_ancestor_link gen first po;
+                           return False)
+                        True gen
+                    in ();
+                  end;
+                  tag "tr" begin
+                    let _ =
+                      List.fold_left 
+                        (fun first po ->
+                           do print_horizontal_line gen first po;
+                           return False)
+                        True gen
+                    in ();
+                  end;
+                return ()
+              else ();
+           return False)
+        True gen
+    in
+    ();
+  end
+;
+
+(*
+value print_tree_with_table_old conf base gv p =
   let gv = min (limit_by_tree conf) gv in
   let next_gen pol =
     List.fold_right
@@ -1581,6 +1834,7 @@ value print_tree_with_table conf base gv p =
     ();
   end
 ;
+*)
 
 value print_normal_tree conf base v p =
   let title _ =
