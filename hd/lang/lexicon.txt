@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.82 2000-04-04 18:59:20 ddr Exp $
+# $Id: lexicon.txt,v 3.83 2000-04-05 06:26:41 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2590,6 +2590,7 @@ se: uppdateringarnas historia
     horizontally
 dk: vandret
 en: horizontally
+fi: vaakasuoraan
 fr: horizontalement
 
     husband/wife
@@ -3087,6 +3088,7 @@ se: huvudtitel
     male line/female line
 dk: mandlige linie/kvindelige linie
 en: male line/female line
+fi: miespuoleinen linja/naispuoleinen linja
 fr: ligne agnatique/ligne cognatique
 se: manliga linjen/kvinnliga linjen
 
@@ -5141,7 +5143,7 @@ dk: de seneste %d bryllupper
 en: the latest %d marriages
 eo: la lastaj %d edzigxoj
 es: los %d casamientos m&aacute;s recientes
-fi: viime %d naimisiinmenot
+fi: viime %d naimisiinmenoa
 fr: les %d derniers mariages
 it: gli ultimi %d matrimoni
 pt: os %d casamentos mais recentes
