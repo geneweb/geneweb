@@ -676,6 +676,7 @@ en: baptism
 es: bautismo
 fr: bapt&ecirc;me
 nl: doop
+pt: baptism
 se: dop
 
     baptized
@@ -1875,9 +1876,10 @@ se: till
 
     of %t's side
 en: of %t's side
-es: de la cara de %t
+es: por parte de %t
 fr: du c&ocirc;t&eacute; de %t
 nl: langs de zijde van %t
+pt: pelo lado de %t
 se: fr&aring;n %t sl&auml;ktsida
 
     of the %s generation
@@ -2821,6 +2823,7 @@ es: debe primero fusionar
 fr: vous devez d'abord fusionner
 it: dovete in primo luogo fondere
 nl: je moet eerst samenvoegen
+pt: Voc&ecirc; tem que fusionar primeiro
 se: du m&aring;ste f&ouml;rst sl&aring;samman
 
     you must first merge the 2 families
@@ -2830,5 +2833,5 @@ es: debe primero fusionar las 2 familias
 fr: vous devez d'abord fusionner les 2 familles
 it: dovete in primo luogo fondere le 2 famiglie
 nl: je moet de twee families eerst samenvoegen
-pt: Você tem que fusionar primeiro as 2 familias
+pt: Voc&ecirc; tem que fusionar primeiro as 2 familias
 se: du m&aring;ste f&ouml;rst sl&aring;samman de 2 familjerna
