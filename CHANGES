@@ -16,6 +16,8 @@ GeneWeb version 2.07
     in the lexicon.
 
 * GeneWeb Service/CGI (gwd)
+  - [Sep 21, 99] Fixed bug: the "DOC" link did not work in CGI mode.
+  - [Sep 21, 99] Added "CREDITS" in doc, accessible from the "DOC" link too.
   - [Sep 20, 99] Changed gif files (flags and up arrow) into jpeg files.
   - [Sep 19, 99] In "search", can find someone if only one of his first
     names is given: e.g. can find "Marie Liesse de Rohan Chabot" if searching

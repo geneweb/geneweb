@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.121 1999-09-17 18:14:22 ddr Exp $
+# $Id: lexicon.txt,v 2.122 1999-09-21 10:28:24 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -3238,8 +3238,9 @@ pt: lugar
 se: plats
 
     precision
+de: Genauigkeit
 en: precision
-fr: precision
+fr: pr&eacute;cision
 se: precision
 
     previous sibling

@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 2.4 1999-09-08 10:46:41 ddr Exp $ *)
+(* $Id: doc.ml,v 2.5 1999-09-21 10:28:26 ddr Exp $ *)
 
 open Config;
 
@@ -42,6 +42,14 @@ value has_dotslash s =
     else loop (i + 1)
 ;
 
+value nl () = Wserver.wprint "\r\n";
+
+value head_cgi conf =
+  do Wserver.wprint "Content-type: text/html; charset=%s" conf.charset;
+     nl (); nl ();
+  return ()
+;
+
 value print conf =
   let v =
     match Util.p_getenv conf.env "v" with
@@ -57,6 +65,7 @@ value print conf =
     let fname = Filename.concat Util.doc_dir.val v in
     match try Some (open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
+        do if conf.cgi then head_cgi conf else (); return
         let s =
           let len = ref 0 in
           do try
