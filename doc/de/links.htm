@@ -1,68 +1,94 @@
-<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
-<html>
-<head>
-   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.51 [en] (X11; I; Linux 2.2.6 i586) [Netscape]">
-   <title>GeneWeb - Links to a database</title>
-</head>
-<body>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Links zu einer Datenbank</title></head>
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>GeneWeb - Links zu einer Datenbank</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
 
-<h1>
-GeneWeb - Links zu einer Datenbank</h1>
-Diese Seite beschreibt, wie man Links auf <i>GeneWeb</i> Seiten setzt.
-Sie wurde sowohl f&uuml;r die Benutzer von <i>GeneWeb</i> geschrieben als
-auch f&uuml;r jene, welche ohne <i>GeneWeb</i> zu kennen direkte Links
-auf <i>GeneWeb</i> Seiten im Web machen m&ouml;chten.
+Diese Seite beschreibt, wie man Links auf <font color=#2f6400><b>GeneWeb</b></font>-Seiten setzt.
+Sie wurde sowohl f&uuml;r die Benutzer von <font color=#2f6400><b>GeneWeb</b></font> geschrieben als
+auch f&uuml;r jene, welche ohne <font color=#2f6400><b>GeneWeb</b></font> zu kennen direkte Links
+auf <font color=#2f6400><b>GeneWeb</b></font>-Seiten im Web machen m&ouml;chten.
 <p>Lies dies aufmerksam, denn es gibt hier einen kleinen zu umgehenden
 Fallstrick sowie die L&ouml;sung daf&uuml;r.
-<h4>
-Links mit Nummern</h4>
-Es ist auf jeden Fall m&ouml;glich, Links auf <i>GeneWeb</i> Seiten in
+
+<p>
+<hr>
+
+<h3><font color=#2f6400>
+Links mit Nummern</font></h3>
+Es ist auf jeden Fall m&ouml;glich, Links auf <font color=#2f6400><b>GeneWeb</b></font>-Seiten in
 deine Lesezeichen oder auf deine HTML&nbsp; Seiten zu setzen.
 <p>Zum Beispiel zeigst du die pers&ouml;nliche Seite von&nbsp; "Max Meier"
-der betreffenden Datenbank an. Du bemerkst, dass diese zu folgender URL
+der betreffenden Datenbank an. Du bemerkst, da&szlig; diese zu folgender URL
 geh&ouml;rt:
-<pre>&nbsp;&nbsp; http://machine:2317/foo?i=357</pre>
-Die "357" die du in dem Aufruf siehst geh&ouml;rt zu einer Zahl, die durch
-die Befehle von <i>GeneWeb</i> (ged2gwb, gwc or gwd) zu "Max Meier" zugewiesen
+<pre>&nbsp;&nbsp; http://machine:2317/bla?i=357</pre>
+Die "357", die du in dem Aufruf siehst, geh&ouml;rt zu einer Zahl, die durch
+die Befehle von <font color=#2f6400><b>GeneWeb</b></font> (ged2gwb, gwc oder gwd) "Max Meier" zugewiesen
 wurde.
 <p>Wenn derjenige, der f&uuml;r die Datenbank verantwortlich ist (du oder
-jemand anderes) sich entschliesst, die Datenbankversion zu erneuern, k&ouml;nnen
-sich die Nummern &auml;ndern, und der Link den du gespeichert hast wird
+jemand anderes), sich entschlie&szlig;t, die Datenbank zu aktualisieren, k&ouml;nnen
+sich die Nummern &auml;ndern, und der Link den du gespeichert hast, wird
 nicht mehr funktionieren.
-<p>Damit die Verantwortlichen von <i>GeneWeb</i> Datenbanken wissen wann
+<p>Damit die Verantwortlichen von <font color=#2f6400><b>GeneWeb</b></font>-Datenbanken wissen, wann
 das passiert:
 <ul>
 <li>
-durch den Befehl "ged2gwb" beim Start von einer neuen GEDCOM Datei.</li>
+durch den Befehl "ged2gwb" beim Start von einer neuen GEDCOM-Datei.</li>
 
 <li>
-durch den Befehl "gwc" beim s&auml;ubern der Datenbank.</li>
+durch den Befehl "gwc" beim S&auml;ubern der Datenbank.</li>
 </ul>
 
-<h4>
-L&ouml;sung</h4>
+
+<p>
+<hr>
+
+<h3><font color=#2f6400>
+L&ouml;sung</font></h3>
 Um das zu vermeiden, f&uuml;ge an die Adresse die folgende Sequenz an:
 "<tt>;opt=no_index</tt>", d.h. f&uuml;r das obige Beispiel:
-<pre>&nbsp;&nbsp; http://machine:2317/foo?i=357;opt=no_index</pre>
-Gib diese Adresse ein. <i>GeneWeb</i> wird antworten mit der Seite:
-<pre>Link to use
+<pre>
+     http://machine:2317/bla?i=357;opt=no_index</pre>
+Gib diese Adresse ein. <font color=#2f6400><b>GeneWeb</b></font> antwortet mit der Seite:
+<pre>
+Link to use
 
-&nbsp;* http://machine:2317/foo?....</pre>
-Dieser Link kann verwendet werden (klicke darauf), du musst dieselbe Seite
-erhalten (hier die pers&ouml;nliche Seite von Max Meier), aber mit einer
+ * http://machine:2317/bla?....
+</pre>
+Dieser Link kann verwendet werden (klicke darauf), du mu&szlig;t dieselbe Seite
+erhalten (hier die Personenseite f&uuml;r Max Meier), aber mit einer
 Adresse, die nicht irgendeine Nummer enth&auml;lt, sondern explizite Referenzen
 auf seinen Vor- und Nachnamen.
 <p>Benutze diese Adresse in deinen Links.
-<p>Das trifft zu auf alle Anfragen an <i>GeneWeb</i>, insbesondere auf
+<p>Das trifft zu auf alle Anfragen an <font color=#2f6400><b>GeneWeb</b></font> , insbesondere auf
 die, die die Verwandtschaftsbeziehungen anzeigen, bei denen man h&auml;ufig
-2 oder 3 Personen in der Datenbank findet, die durch ihre Nummer kodiert
+zwei oder drei Personen in der Datenbank findet, die durch ihre Nummer kodiert
 sind.
-<p>F&uuml;r die Administratoren von <i>GeneWeb</i> Datenbanken: benutze
-auch diese Vorgehensweise in dazugeh&ouml;rigen Dateien; siehe die <a href="pcustom.htm">Anpassung</a>
+<p>F&uuml;r die Administratoren von <font color=#2f6400><b>GeneWeb</b></font>-Datenbanken: Benutze
+diese Vorgehensweise auch in den dazugeh&ouml;rigen Dateien; siehe die <a href="pcustom.htm">Anpassung</a>
 von Seiten.
-<p>Zur&uuml;ck zur <a href="diruse.htm">Gebrauchsanweisung</a>.
+
+
 <p>
-<hr><i><font size=-1>&copy;Copyright INRIA 1999 - GeneWeb</font></i>
+<hr>
+<br>
+<center>
+Zur&uuml;ck zur <a href="diruse.htm">Gebrauchsanweisung</a>.
+</center>
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
+GeneWeb</em></font><br>
+
 </body>
-</html>

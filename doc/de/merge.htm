@@ -1,17 +1,26 @@
-<HTML>
-<HEAD>
-   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-   <META NAME="GENERATOR" CONTENT="Mozilla/4.03 [de] (WinNT; I) [Netscape]">
-   <TITLE>GeneWeb - Merging databases</TITLE>
-</HEAD>
-<BODY>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Zusammenführen von Datenbanken</title></head>
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>GeneWeb - Zusammenf&uuml;hren von Datenbanken</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
 
-<H1>
-GeneWeb - Mischen von Datenbanken</H1>
-Dieser Teil zeigt die Prozedur zum Mischen von Datenbanken. Diese ist zwar
+
+Dieser Teil zeigt die Prozedur zum Zusammenf&uuml;hren von Datenbanken. Diese ist zwar
 noch manuell, aber sie wird m&ouml;glicherweise in Zukunft verbessert.
 
-<P>Das Mischen von Datenbanken erfolgt in zwei Schritten:
+<P>Das Zusammenf&uuml;hren von Datenbanken erfolgt in zwei Schritten:
 <UL>
 <LI>
 Erstens: Zusammenf&uuml;gen der zwei Datenbanken zu einer.</LI>
@@ -19,65 +28,92 @@ Erstens: Zusammenf&uuml;gen der zwei Datenbanken zu einer.</LI>
 
 <UL>
 <LI>
-Zweitens: Mischen der Personen.</LI>
+Zweitens: Zusammenf&uuml;hren der Personen.</LI>
 </UL>
 
-<H4>
-Erster Schritt: Verkettung der Datenbanken</H4>
-Das kann nur im Eingabefenster erfolgen (siehe "Wie mit GeneWeb <A HREF="start.htm">starten</A>").
+<p>
+<hr>
+
+<h3><font color=#2f6400>
+Erster Schritt: Verkettung der Datenbanken</font></h3>
+Das kann nur im Eingabefenster erfolgen (siehe "<A
+HREF="start.htm">Erste Schritte</a> mit mit GeneWeb").
 <UL>
 <LI>
-Wenn du eine Datenbank namens "foo" hast und eine weitere namens "bar",
+Wenn du eine Datenbank namens "bla" hast und eine weitere namens "blub",
 extrahiere diese beiden Datenbanken als Quelldateien mit dem Befehl "gwu".
 Gib ein:</LI>
 
-<PRE>&nbsp;&nbsp;&nbsp;&nbsp; gwu foo > foo.gw
-&nbsp;&nbsp;&nbsp;&nbsp; gwu bar > bar.gw</PRE>
+<PRE>
+     gwu bla  > bla.gw
+     gwu blub > blub.gw
+</PRE>
 </UL>
 
 <UL>
 <LI>
 Erzeuge eine gemeinsame Datenbank "base". Gib ein:</LI>
 
-<PRE>&nbsp;&nbsp;&nbsp;&nbsp; gwc foo.gw bar.gw -o base</PRE>
-Es kann passieren (und wird vermutlich auch), dass gwc Fehler anzeigt,
-weil Personen zweimal in "foo.gw" und "bar.gw" definiert sind. Um das zu
+<PRE>
+     gwc bla.gw blub.gw -o base
+</PRE>
+Es kann passieren (und das ist auch sehr wahrscheinlich),
+da&szlig; gwc Fehler anzeigt,
+weil Personen zweimal in "bla.gw" und "blub.gw" definiert sind. Um das zu
 korrigieren, hat gwc eine Option "-sh" um die Nummern der Personen zu verschieben
 und so Konflikte zu vermeiden. Versuche:
-<PRE>&nbsp;&nbsp;&nbsp;&nbsp; gwc foo.gw -sh 10 bar.gw -o base</PRE>
+<PRE>
+     gwc bla.gw -sh 10 blub.gw -o base
+</PRE>
 Wenn der Wert 10 das Problem nicht behebt, versuche es mit 20, 30 oder
 100...</UL>
 
-<H4>
-Zweiter Schritt: Mischen von Personen</H4>
-Du hast nun eine Datenbank "base", die "foo" und "bar" enth&auml;lt, mit
+<p>
+<hr>
+
+<h3><font color=#2f6400>
+Zweiter Schritt: Zusammenf&uuml;hren von Personen</font></h3>
+Du hast nun eine Datenbank "base", die "bla" und "blub" enth&auml;lt, mit
 einigen doppelt vorhandenen Personen.
 
 <P>Du kannst diese Personen mit dem Webbrowser zusammenf&uuml;hren. Wenn
 "gwd" nicht l&auml;uft, starte es jetzt.
 
-<P>Dann wende <A HREF="update.htm#MrgP">Personen zusammenf&uuml;hren</A>
-an, welches sich im Teil "Wie mache ich &Auml;nderungen an der Datenbank"
-befindet (vergi&szlig; die Bemerkung dar&uuml;ber, dass es nicht um das
-"Zusammenf&uuml;hren von Datenbanken" handelt).
-<H4>
-Abschliessendes Aufr&auml;umen</H4>
-Am Ende des Mischens ist es klug, ein abschliessendes S&auml;ubern der
+<P>Dann wende die 
+im Kapitel "Wie nimmt man &Auml;nderungen an der
+Datenbank vor" beschriebene Prozedur
+<A HREF="update.htm#MrgP">"Zusammenführen zweier Personen"</A> an
+(hierbei ist die dort angegebenen Bemerkung, da&szlig; es sich nicht um das
+"Zusammenf&uuml;hren von Datenbanken" handelt, zu ignorieren).
+<p>
+<hr>
+
+<h3><font color=#2f6400>
+Abschlie&szlig;endes Aufr&auml;umen</font></h3>
+Am Ende des Zusammenf&uuml;hrens ist es klug, ein abschlie&szlig;endes S&auml;ubern der
 Datenbank durchzuf&uuml;hren. In der Tat wird der Platz von gel&ouml;schten
-Personen oder Familien nicht wieder freigegeben (was ja beim Mischen passiert).
+Personen oder Familien nicht wieder freigegeben (was ja beim
+Zusammenf&uuml;hren passiert).
 Speziell die Startseite zeigt immer die gleiche Zahl von Personen an.
 
 <P>Um das S&auml;ubern der Datenbank "base" durchzuf&uuml;hren (du kannst
 das zu jeder Zeit und auch mehrmals machen), benutze wieder ein Eingabefenster.
 Gib ein:
-<PRE>&nbsp;&nbsp;&nbsp;&nbsp; gwu base > base.gw
-&nbsp;&nbsp;&nbsp;&nbsp; gwc base.gw -o base</PRE>
-Beachte, dass du zum &Uuml;berschreiben der alten Datenbank "foo" einfach
-"-o foo" in diesem zweiten Befehl schreiben kannst:
-<PRE>&nbsp;&nbsp;&nbsp;&nbsp; gwc base.gw -o foo</PRE>
-Zur&uuml;ck zur <A HREF="diruse.htm">Gebrauchsanleitung</A>.
+<PRE>     gwu base > base.gw
+     gwc base.gw -o base</PRE>
+Beachte, da&szlig; du zum &Uuml;berschreiben der alten Datenbank "bla" einfach
+"-o bla" in diesem zweiten Befehl schreiben kannst:
+<PRE>     gwc base.gw -o bla</PRE>
 
-<P>
-<HR><I><FONT SIZE=-1>&copy; Copyright INRIA 1999 - GeneWeb</FONT></I>
-</BODY>
-</HTML>
+
+<p>
+<hr>
+<br>
+<center>
+Zur&uuml;ck zur <a href="diruse.htm">Gebrauchsanweisung</a>.
+</center>
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
+GeneWeb</em></font><br>
+
+</body>
