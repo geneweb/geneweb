@@ -1,17 +1,17 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.12 1999-08-14 23:16:55 ddr Exp $ *)
+(* $Id: robot.ml,v 1.13 1999-10-01 12:42:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
 
-value magic_robot = "GWRB0001";
+value magic_robot = "GWRB0002";
 
 module W = Map.Make (struct type t = string ; value compare = compare; end);
 
 type excl =
   { excl : mutable list (string * ref int);
     who : mutable W.t (list float * float * int);
-    max_conn : mutable int }
+    max_conn : mutable (int * string) }
 ;
 
 value nl () =
@@ -70,10 +70,10 @@ value check oc tm from max_call sec cgi =
     [ Some ic ->
         let v =
           try input_excl ic with _ ->
-            {excl = []; who = W.empty; max_conn = 0}
+            {excl = []; who = W.empty; max_conn = (0, "")}
         in
         do close_in ic; return v
-    | None -> {excl = []; who = W.empty; max_conn = 0} ]
+    | None -> {excl = []; who = W.empty; max_conn = (0, "")} ]
   in
   let refused =
     match try Some (List.assoc from xcl.excl) with [ Not_found -> None ] with
@@ -116,7 +116,7 @@ value check oc tm from max_call sec cgi =
                  max_call (tm -. tm0) sec; flush Pervasives.stderr;
                xcl.excl := [(from, ref 1) :: xcl.excl];
                xcl.who := W.remove from xcl.who;
-               xcl.max_conn := 0;
+               xcl.max_conn := (0, "");
             return True
           else False
         in
@@ -137,10 +137,12 @@ value check oc tm from max_call sec cgi =
                 do Printf.fprintf oc
                      "--- addr %s: %d requests since %.0f seconds\n" k nb
                      (tm -. tm0);
-                   if nb > xcl.max_conn then xcl.max_conn := nb else ();
+                   if nb > fst xcl.max_conn then xcl.max_conn := (nb, k)
+                   else ();
                 return ())
               xcl.who;
-           Printf.fprintf oc "--- max %d\n" xcl.max_conn;
+           Printf.fprintf oc "--- max %d by %s\n" (fst xcl.max_conn)
+             (snd xcl.max_conn);
         return refused ]
   in
   do match try Some (open_out_bin fname) with [ Sys_error _ -> None ] with
