@@ -7,7 +7,7 @@ GeneWeb version 4.01
 
 * Languages
   - [05 Apr 01] Renamed some languages codes to be in conformance with
-    the standard (cf http://www.oasis-open.org/cover/iso639a.html):
+    the standard (http://www.oasis-open.org/cover/iso639a.html):
       * Catalan: ct replaced by ca
       * Chinese: cn replaced by zh
       * Danish: dk replaced by da
@@ -64,7 +64,7 @@ GeneWeb version 4.01
     were descendant.
 
 * Lexicon (lang/lexicon.txt) and Welcome page (lang/start.txt)
-  - [05 Apr 01] Fixed several phrases in lexicon for Dutch (Herman Theys)
+  - [05 Apr 01] Fixed several Dutch phrases in lexicon (Herman Theys)
   - [26 Mar 01] (technical point) Grouped together all lang/*/start.txt in
     one only file lang/start.txt, easier to manipulate (at least for me!)
   - [14 Mar 01] Added the ability to add "derived" languages,

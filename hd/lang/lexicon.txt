@@ -1,13 +1,12 @@
-# $Id: lexicon.txt,v 4.15 2001-04-05 13:58:59 ddr Exp $
+# $Id: lexicon.txt,v 4.16 2001-04-05 15:49:43 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
 af: iso-8859-1
-zh: gb2312
-cs: iso-8859-2
 ca: iso-8859-1
-de: iso-8859-1
+cs: iso-8859-2
 da: iso-8859-1
+de: iso-8859-1
 en: iso-8859-1
 eo: iso-8859-1
 es: iso-8859-1
@@ -24,6 +23,7 @@ pl: iso-8859-2
 pt: iso-8859-1
 ru: windows-1251
 sv: iso-8859-1
+zh: gb2312
 
      !dir
 he: rtl
