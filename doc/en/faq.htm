@@ -323,6 +323,29 @@ You can access the list of all the persons of this surname by clicking
 on the surname in the person's displayed page.
 
 <p>
+
+<h4>When I browse my data base, I get sometimes the message "probable
+loop in the data base; somebody is his own ancestor"</h4>
+
+Your data base probably comes from a GEDCOM (it cannot happen with a
+data base created under <font color=#2f6400><b>GeneWeb</b></font>).
+At import time, this error has been detected but the data base has
+been build. However, some functionalities cannot work, like the
+relationship computing or the ancestors display.
+
+<p>
+
+To fix this problem, you must know which person or persons are
+involved. Create your data base again from the GEDCOM (if you made
+changes in your data base, you can create it with another name to
+avoid overwriting it). If you use interactive commands, look at the
+result of "ged2gwb". If you use <a href="gwsetup.htm">gwsetup</a>,
+after the import, go to the main menu and click on "traces of the
+latest command". The persons who are their own ancestors are displayed
+with the message (in English): "<em>So-and-so</em> is his/her own
+ancestor".
+
+<p>
 <hr>
 <br>
 <center>Return to <a href="diruse.htm">Directions for Use</a></center>

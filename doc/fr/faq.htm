@@ -374,6 +374,36 @@ patronyme en cliquant sur le patronyme dans la page de la personne
 affich&eacute;e.
 
 <p>
+
+<h4>Quand je navigue dans ma base de donn&eacute;es, il m'arrive
+d'avoir le message "boucle probable dans la base de données: quelqu'un
+est son propre ancêtre"</h4>
+
+Votre base de donn&eacute;es vient probablement d'un GEDCOM (&ccedil;a
+ne peut pas arriver avec une base de donn&eacute;es
+cr&eacute;&eacute;e sous <font
+color=#2f6400><b>GeneWeb</b></font>). Au moment de l'import GEDCOM,
+cette erreur a &eacute;t&eacute; d&eacute;tect&eacute;e mais la base a
+quand m&ecirc;me &eacute;t&eacute; construite. N&eacute;anmoins,
+certaines fonctionnalit&eacute;s ne peuvent pas fonctionner, comme le
+calcul de parent&eacute; ou, simplement l'affichage d'anc&ecirc;tres.
+
+<p>
+
+Pour r&eacute;parer ce probl&egrave;me, il faut savoir de quelle
+personne ou de quelles personnes il s'agit. Recr&eacute;ez votre base
+&agrave; partir du GEDCOM (si vous avez fait des changements dans
+votre base, pour &eacute;viter de l'&eacute;craser, vous pouvez
+cr&eacute;er une autre base en choisissant un nom
+diff&eacute;rent). Si vous utilisez des commandes int&eacute;ractives,
+regardez ce qui est affich&eacute; par "ged2gwb". Si vous utilisez <a
+href="gwsetup.htm">gwsetup</a>, apr&egrave;s l'import, allez dans le
+menu principal et cliquez sur "traces de la derni&egrave;re commande".
+Les personnes qui sont leur propre anc&ecirc;tre y sont
+indiqu&eacute;es sous le message (en anglais): "<em>Untel</em> is
+his/her own ancestor".
+
+<p>
 <hr>
 <br>
 <center>Retour vers <a href="diruse.htm">Mode d'Emploi</a></center>
