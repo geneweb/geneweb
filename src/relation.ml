@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.4 1999-11-16 00:02:23 ddr Exp $ *)
+(* $Id: relation.ml,v 3.5 1999-11-19 08:24:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -277,7 +277,7 @@ value print_relation_path_table_seprow conf base path i width =
         in
         if prev_is_sibling then
           if j == width then ()
-          else Wserver.wprint "<td align=center>&nbsp;</td>\n"
+          else Wserver.wprint "<td>&nbsp;</td>\n"
         else
           do tag "td" "align=center" begin
                let child =
@@ -304,7 +304,7 @@ value print_relation_path_table_seprow conf base path i width =
                else Wserver.wprint "&nbsp;";
              end;
              if j == width then ()
-             else Wserver.wprint "<td align=center>&nbsp;</td>\n";
+             else Wserver.wprint "<td>&nbsp;</td>\n";
           return ();
     done;
   end
@@ -341,7 +341,7 @@ value print_relation_path_table_mainrow conf base path i width =
 ;
 
 value print_relation_path_table conf base path =
-  do Wserver.wprint "<p>%s :\n" (capitale (transl conf "shortest path"));
+  do Wserver.wprint "<p>\n";
      let (width, hmin, hmax, _, path) =
        List.fold_left
          (fun (x, a, b, y, p) (ip, fl) ->
