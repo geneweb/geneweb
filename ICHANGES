@@ -4,6 +4,10 @@ Internal, very small, undocumented, or invisible changes
 GeneWeb Version 4.08
 --------------------
 
+* Compilation
+  - [29 Nov 02] Added option -warn-error for compilation with ocamlc and
+    ocamlopt.
+
 * GeneWeb server or CGI (gwd)
   - [28 Nov 02] Fixed bug in displaying relationship by marriage: in
     the text "are at the same time case1 case2" the "case2" where
