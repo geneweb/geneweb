@@ -21,6 +21,10 @@ function WorkOnBrowser() {
  onmouseover="if (WorkOnBrowser()) ibg.src='%o/t-bg.gif'"
  onmouseout="ibg.src='%o/l-bg.jpg'">
 <img src="%o/l-bg.jpg" width=36 height=22 alt=%ubg; name=ibg border=0></a>
+<a href="%glang=br"
+ onmouseover="if (WorkOnBrowser()) ibr.src='%o/t-br.gif'"
+ onmouseout="ibr.src='%o/l-br.jpg'">
+<img src="%o/l-br.jpg" width=36 height=22 alt=%ubr; name=ibr border=0></a>
 <a href="%glang=ca"
  onmouseover="if (WorkOnBrowser()) ica.src='%o/t-ca.gif'"
  onmouseout="ica.src='%o/l-ca.jpg'">
@@ -94,9 +98,10 @@ function WorkOnBrowser() {
  onmouseout="ipt.src='%o/l-pt.jpg'">
 <img src="%o/l-pt.jpg" width=36 height=22 alt=%upt; name=ipt border=0></a>
 <a href="%glang=pt-br"
- onmouseover="if (WorkOnBrowser()) ibr.src='%o/t-br.gif'"
- onmouseout="ibr.src='%o/l-br.jpg'">
-<img src="%o/l-br.jpg" width=36 height=22 alt=%upt-br; name=ibr border=0></a>
+ onmouseover="if (WorkOnBrowser()) ipt_br.src='%o/t-pt.gif'"
+ onmouseout="ipt_br.src='%o/l-pt-br.jpg'">
+<img src="%o/l-pt-br.jpg" width=36 height=22 alt=%upt-br; name=ipt_br
+  border=0></a>
 <a href="%glang=ro"
  onmouseover="if (WorkOnBrowser()) iro.src='%o/t-ro.gif'"
  onmouseout="iro.src='%o/l-ro.jpg'">
