@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.11 2000-02-19 13:21:35 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.12 2000-03-29 20:20:19 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -308,8 +308,10 @@ and ident len =
 value make_lexing s = Stream.from (fun _ -> Some (lexing s));
 
 value tparse (p_con, p_prm) =
-  if p_prm = "" then parser [: `(con, prm) when con = p_con :] -> prm
-  else parser [: `(con, prm) when con = p_con && prm = p_prm :] -> prm
+  ifdef CAMLP4_300 then None
+  else
+    if p_prm = "" then parser [: `(con, prm) when con = p_con :] -> prm
+    else parser [: `(con, prm) when con = p_con && prm = p_prm :] -> prm
 ;
 
 value using_token (p_con, p_prm) =
