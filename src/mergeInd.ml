@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 3.19 2001-01-29 15:33:25 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.20 2001-02-13 16:15:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -52,7 +52,7 @@ value print_differences conf base branches p1 p2 =
     let select_smallest_num = p_first_name base p1 = p_first_name base p2 in
     gen_string_field
       (if p1.occ < p2.occ || not select_smallest_num then " checked" else "")
-      (if p1.occ > p2.occ || not select_smallest_num then " checked" else "")
+      (if p1.occ > p2.occ && select_smallest_num then " checked" else "")
       False (transl conf "number") "number"
       (fun p -> string_of_int p.occ);
     string_field True (transl_nth conf "image/images" 0) "image"
