@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.39 2000-11-08 12:28:15 ddr Exp $ *)
+(* $Id: family.ml,v 3.40 2000-11-08 21:36:52 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -492,6 +492,10 @@ value family_m conf base =
       SendImage.print conf base
   | Some "SND_IMAGE_OK" when conf.wizard && conf.can_send_image ->
       SendImage.print_send_ok conf base
+  | Some "SRC" -> 
+      match p_getenv conf.env "v" with
+      [ Some f -> Srcfile.print_source conf base f
+      | _ -> Util.incorrect_request conf ]
   | Some "STAT" ->
       BirthDeath.print_statistics conf base
   | Some "SWI_FAM" when conf.wizard ->

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 3.5 2000-08-22 15:14:09 ddr Exp $ *)
+(* $Id: image.ml,v 3.6 2000-11-08 21:36:52 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -54,8 +54,22 @@ value print_personal_image conf base p =
   | _ -> incorrect_request conf ]
 ;
 
+value print_source_image conf f =
+  let fname =
+    if f.[0] = '/' then String.sub f 1 (String.length f - 1)
+    else f
+  in
+  if fname = Filename.basename fname then
+    let fname = source_image_file_name conf.bname fname in
+    if print_image_file conf.cgi fname then () else incorrect_request conf
+  else incorrect_request conf
+;
+
 value print conf base =
-  match find_person_in_env conf base "" with
-  [ Some p -> print_personal_image conf base p
-  | _ -> incorrect_request conf ]
+  match p_getenv conf.env "s" with
+  [ Some f -> print_source_image conf f
+  | None ->
+      match find_person_in_env conf base "" with
+      [ Some p -> print_personal_image conf base p
+      | _ -> incorrect_request conf ] ]
 ;
