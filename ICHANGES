@@ -11,6 +11,9 @@ GeneWeb Version 3.07
   - [12 Jul 00] "Server" answer separate "GeneWeb" and version number with
     a slash.
 
+* Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
+  - [20 Jul 00] Added term "Sosa" in lexicon.
+
 GeneWeb Version 3.06
 --------------------
 
