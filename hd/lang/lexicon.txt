@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.151 2003-01-21 11:08:02 ddr Exp $
+# $Id: lexicon.txt,v 4.152 2003-02-03 07:47:43 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2912,7 +2912,7 @@ sv: d&ouml;d
 
     delete
 af: verwyder
-bg: да се премахнат
+bg: да няма
 ca: esborrar
 cs: smazat
 da: slet
@@ -3460,7 +3460,7 @@ sv: familj &auml;ndrad
 
     family/families
 af: familie/families
-bg: данните за семейството
+bg: данни за семейството
 ca: famнlia/famнlies
 cs: rodina:a:-u/rodiny
 da: familie/familier
@@ -4411,7 +4411,7 @@ sv: fel f&ouml;rfr&aring;gan
 
     indeed,
 af: inderdaad,
-bg: това е така, защото
+bg: фактически
 ca: en efecte
 cs: ve skuteиnosti
 da: faktisk,
@@ -6267,7 +6267,7 @@ sv: person &auml;ndrad
 
     person/persons
 af: persoon/persone
-bg: данните за лицето/сведения за лица
+bg: данни за лицето/сведения за лица
 ca: persona/persones
 cs: osoba/osob
 da: person/personer
