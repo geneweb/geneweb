@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.10 2001-03-26 12:55:11 ddr Exp $
+# $Id: lexicon.txt,v 4.11 2001-03-26 21:04:52 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -891,7 +891,7 @@ no: bestefar/bestemor/en av besteforeldrene
 pl: dziadek/babka/dziadkowie
 pt: um av&ocirc;/uma av&oacute;/um(a) av&ocirc;(&oacute;)
 ru: дедушка/бабушка/прародитель
-se: en farf&ouml;r&auml;lder/en morf&ouml;r&auml;lder/en far(mor)f&ouml;r&auml;lder
+se: farfar/farmor/en farf&ouml;r&auml;lder/morfar/mormor/en morf&ouml;r&auml;lder
 
     a grandson/a granddaughter/a grandchild
 af: 'n kleinseun/'n kleindogter/'n kleinkind
