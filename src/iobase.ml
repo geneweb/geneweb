@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 1.5 1998-11-27 20:09:45 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.6 1998-11-30 12:35:59 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -140,13 +140,11 @@ value index_of_string strings ic start_pos hash_len string_patches s =
 
 value compare_names = Gutil.alphabetique;
 value compare_istr = ref (fun []);
-value set_compare_istr base =
-  compare_istr.val :=
-    fun is1 is2 ->
-      if is1 == is2 then 0
-      else
-        compare_names (base.strings.get (Adef.int_of_istr is1))
-          (base.strings.get (Adef.int_of_istr is2))
+value compare_istr_fun base is1 is2 =
+  if is1 == is2 then 0
+  else
+    compare_names (base.strings.get (Adef.int_of_istr is1))
+      (base.strings.get (Adef.int_of_istr is2))
 ;
 module IstrTree =
   Btree.Make
@@ -155,32 +153,31 @@ module IstrTree =
 
 type first_name_or_surname_index = IstrTree.t (list iper);
 
-value fsname_btree (ic2, start_pos, proj, person_patches, tree_name) =
-  let btr = ref None in
-  fun () ->
-    match btr.val with
-    [ Some bt -> bt
-    | None ->
-        do seek_in ic2 start_pos; return
-        let bt : first_name_or_surname_index = input_value ic2 in
-        let bt =
-          List.fold_left
-            (fun bt (i, p) ->
-               let istr = proj p in
-               let ipera =
-                 try IstrTree.find istr bt with
-                 [ Not_found -> [] ]
-               in
-               if List.memq p.cle_index ipera then bt
-               else
-                 IstrTree.add istr [ p.cle_index :: ipera] bt)
-            bt person_patches.val
-        in
-        do btr.val := Some bt; return bt ]
-;
-
 value persons_of_first_name_or_surname strings params =
-  let bt = fsname_btree params in
+  let bt =
+    let (ic2, start_pos, proj, person_patches, tree_name) = params in
+    let btr = ref None in
+    fun () ->
+      match btr.val with
+      [ Some bt -> bt
+      | None ->
+          do seek_in ic2 start_pos; return
+          let bt : IstrTree.t (list iper) = input_value ic2 in
+          let bt =
+            List.fold_left
+              (fun bt (i, p) ->
+                 let istr = proj p in
+                 let ipera =
+                   try IstrTree.find istr bt with
+                   [ Not_found -> [] ]
+                 in
+                 if List.memq p.cle_index ipera then bt
+                 else
+                   IstrTree.add istr [p.cle_index :: ipera] bt)
+              bt person_patches.val
+          in
+          do btr.val := Some bt; return bt ]
+  in
   let find istr = try IstrTree.find istr (bt ()) with [ Not_found -> [] ] in
   let cursor str =
     IstrTree.key_after
@@ -391,8 +388,10 @@ value input bname =
         {p_person = ref []; p_ascend = ref []; p_family = ref [];
          p_couple = ref []; p_string = ref []; p_name = ref []} ]
   in
-  let ic = open_in_bin (Filename.concat bname "base") in
-  do check_magic ic; return
+  let ic =
+    let ic = open_in_bin (Filename.concat bname "base") in
+    do check_magic ic; return ic
+  in
   let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
   let ic2 = open_in_bin (Filename.concat bname "strings.inx") in
   let persons_len = input_binary_int ic in
@@ -527,7 +526,7 @@ value input bname =
      patch_name = patch_name;
      commit_patches = commit_patches; cleanup = cleanup}
   in
-  do set_compare_istr base; return base
+  do compare_istr.val := compare_istr_fun base; return base
 ;
 
 (* Output *)
@@ -570,7 +569,7 @@ value output_strings_hash oc2 base =
 
 value create_first_name_or_surname_index base proj =
   let bt = ref IstrTree.empty in
-  do set_compare_istr base;
+  do compare_istr.val := compare_istr_fun base;
      for i = 0 to base.persons.len - 1 do
        let p = base.persons.get i in
        let a =
