@@ -82,6 +82,13 @@ Houve %q consultas com %c a esta p&aacute;gina desde %d.
 %y%z<li> Entrada <a href="%sw=f"><em>amigo</em></a> (palavra de paso).
 %z%y</ul>
 
-%y<p>
+%y%i<p>
+<form method=get action="%f">
+%h<font size=-1>Palavra de paso para entrada <em>amigo</em> o
+<em>bruxo</em>:</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+%i<p>
 
 <font size=-1><a href="%sm=LEX">Lexicon</a></font>

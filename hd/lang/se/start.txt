@@ -77,6 +77,13 @@ Det har varit %q åtkomster, %c av dem till den här sidan, sedan %d.
 %y%z<li> <a href="%sw=f"><em>V&auml;nner</em></a> tilltr&auml;de (passord).
 %z%y</ul>
 
-%y<p>
+%y%i<p>
+<form method=get action="%f">
+%h<font size=-1>Passord, f&ouml;r <em>v&auml;nner</em> eller
+<em>uppdaterings</em> tilltr&auml;de:</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+%i<p>
 
 <font size=-1><a href="%sm=LEX">Lexicon</a></font>

@@ -77,6 +77,13 @@ Estis %q alirejoj kaj %c al cxi pagxo, ekde la %d.
 %y%z<li> Aliro <a href="%sw=f"><em>amiko</em></a> (pasvorto).
 %z%y</ul>
 
-%y<p>
+%y%i<p>
+<form method=get action="%f">
+%h<font size=-1>Pasvorto, por aliro <em>amiko</em> a&ugrave;
+<em>sorcxisto</em>:
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+%i<p>
 
 <font size=-1><a href="%sm=LEX">Lexicon</a></font>

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 1999-01-09 10:37:58 ddr Exp $
+# $Id: Makefile,v 1.8 1999-01-09 12:07:18 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -9,12 +9,14 @@ out::
 	cd src; $(MAKE) all
 	cd ged2gwb; $(MAKE) all
 	cd gwb2ged; $(MAKE) all
+	cd doc; $(MAKE) all
 
 opt::
 	cd wserver; $(MAKE) opt
 	cd src; $(MAKE) opt
 	cd ged2gwb; $(MAKE) opt
 	cd gwb2ged; $(MAKE) opt
+	cd doc; $(MAKE) opt
 
 distrib:
 	$(RM) -rf distribution
@@ -30,6 +32,7 @@ distrib:
 	cp etc/README.txt distribution/.
 	mkdir distribution/doc
 	cp doc/index.htm distribution/doc/.
+	cp doc/LICENCE.htm distribution/doc/.
 	for i in fr en nl; do \
 	  mkdir distribution/doc/$$i; \
 	  cp doc/$$i/*.htm distribution/doc/$$i/.; \
@@ -49,6 +52,7 @@ clean::
 	cd src; $(MAKE) clean
 	cd ged2gwb; $(MAKE) clean
 	cd gwb2ged; $(MAKE) clean
+	cd doc; $(MAKE) clean
 	$(RM) -rf distribution
 	$(RM) -f *~ .#*
 

@@ -1,17 +1,16 @@
 GeneWeb 1.10
 
-To start with GeneWeb, launch your Web browser.
-If you installed GeneWeb, e.g. in the directory:
-- /home/smith/geneweb           under Unix
-- C:\home\smith\geneweb         under Windows 95/NT
-open the location:
-     file:/home/smith/geneweb/doc/index.htm
+If you are under Windows NT/95/98:
+   Double-click on the file "index.htm" of the directory "doc" of the
+   distribution of GeneWeb, and follow the instructions.
 
-A simpler solution, under Windows 95/98/NT, without having to launch
-the Web browser before, is to double-click on the file "index.htm" of
-the directory "doc".
-
-Follow the instructions.
+If you are under Unix:
+   Launch your Web navigator.
+   If you installed GeneWeb, for example in
+        /home/smith/geneweb
+   open the location:
+        file:/home/smith/geneweb/doc/index.htm
+   and follow the instructions.
 
      -----------------
 
@@ -26,5 +25,5 @@ Remarks, suggestions, questions, bug reports to:
 	daniel.de_rauglaudre@inria.fr
 	http://cristal.inria.fr/~ddr/
 
-Please specify the version number above and the system you use (Linux,
+Please specify the version number above and the system you use (Unix,
 Windows NT, Windows 95/98).

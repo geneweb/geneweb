@@ -79,6 +79,13 @@ deze verwelkomingspagina.
 %y%z<li> <a href="%sw=f"><em>Vriend</em></a> toegang (wachtwoord).
 %z%y</ul>
 
-%y<p>
+%y%i<p>
+<form method=get action="%f">
+%h<font size=-1>Wachtwoord, voor <em>vriend</em> of <em>wijzigen</em> toegang:
+</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+%i<p>
 
 <font size=-1><a href="%sm=LEX">Lexicon</a></font>
