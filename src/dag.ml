@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.20 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: dag.ml,v 4.21 2004-12-28 03:59:18 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -110,7 +110,7 @@ value image_normal_txt conf base p fname width height =
   let k = default_image_name base p in
   let r =
     sprintf "\
-<img src=\"%sm=IM;d=%d;%s;k=/%s\" width=%d%s border=0 alt=\"%s\">"
+<img src=\"%sm=IM;d=%d;%s;k=/%s\" width=\"%d\"%s border=\"0\" alt=\"%s\">"
       (commd conf)
       (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))) b k
       width (if height = 0 then "" else " height=" ^ string_of_int height) image_txt
@@ -122,7 +122,7 @@ value image_normal_txt conf base p fname width height =
 value image_url_txt conf base url height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
-    sprintf "<img src=\"%s\"\nheight=%d border=0 alt=\"%s\">" url height
+    sprintf "<img src=\"%s\"\nheight=%d border=\"0\" alt=\"%s\">" url height
       image_txt ^
     "</a>\n"
 ;
@@ -130,7 +130,7 @@ value image_url_txt conf base url height =
 value image_url_txt_with_size conf base url width height =
   let image_txt = capitale (transl_nth conf "image/images" 0) in
   sprintf "<a href=\"%s\">" url ^
-    sprintf "<img src=\"%s\"\nwidth=%d height=%d border=0 alt=\"%s\">" url
+    sprintf "<img src=\"%s\"\nwidth=%d height=\"%d\" border=\"0\" alt=\"%s\">" url
       width height image_txt ^
     "</a>\n"
 ;
@@ -140,17 +140,21 @@ value image_txt conf base p =
   [ Some "on" ->
       match image_and_size conf base p (limited_image_size 100 75) with
       [ Some (True, f, Some (wid, hei)) ->
-          "<br>\n<center><table border=0><tr align=left><td>\n" ^
+          "<br" ^ xhs ^
+           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_normal_txt conf base p f wid hei ^ "</table></center>\n"
       | Some (True, f, None) ->
-          "<br>\n<center><table border=0><tr align=left><td>\n" ^
+          "<br" ^ xhs ^
+          ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_normal_txt conf base p f 100 0 ^ "</table></center>\n"
       | Some (False, url, Some (wid, hei)) ->
-          "<br>\n<center><table border=0><tr align=left><td>\n" ^
+          "<br" ^ xhs ^
+          ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_url_txt_with_size conf base url wid hei ^
             "</table></center>\n"
       | Some (False, url, None) ->
-          "<br>\n<center><table border=0><tr align=left><td>\n" ^
+          "<br" ^ xhs ^
+          ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_url_txt conf base url 75 ^ "</table></center>\n"
       | _ -> "" ]
   | _ -> "" ]
@@ -160,40 +164,41 @@ value image_txt conf base p =
 
 value print_table conf hts =
   do {
-    Wserver.wprint "<table style=\"margin:auto\" border=%d" conf.border;
-    Wserver.wprint " cellspacing=0 cellpadding=0>\n";
+    Wserver.wprint "<table style=\"margin:auto\" border=\"%d\"" conf.border;
+    Wserver.wprint " cellspacing=\"0\" cellpadding=\"0\">\n";
     for i = 0 to Array.length hts - 1 do {
-      Wserver.wprint "<tr align=left>\n";
-      for j = 0 to Array.length hts.(i) - 1 do {
-        let (colspan, align, td) = hts.(i).(j) in
-        Wserver.wprint "<td";
-        if colspan = 1 && (td = TDstring "&nbsp;" || td = TDhr CenterA) then
-          ()
-        else Wserver.wprint " colspan=%d" colspan;
-        match (align, td) with
-        [ (LeftA, TDhr LeftA) -> Wserver.wprint " align=left"
-        | (LeftA, _) -> ()
-        | (CenterA, _) -> Wserver.wprint " align=center"
-        | (RightA, _) -> Wserver.wprint " align=right" ];
-        Wserver.wprint ">";
-        match td with
-        [ TDstring s -> Wserver.wprint "%s" s
-        | TDbar s ->
-            if s = "" then Wserver.wprint "|"
-            else
-              Wserver.wprint
-                "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
-        | TDhr align ->
-            do {
-              Wserver.wprint "<hr style=\"";
-              match align with
-              [ LeftA -> Wserver.wprint "margin-right:50%%"
-              | RightA -> Wserver.wprint "margin-left:50%%"
-              | _ -> () ];
-              Wserver.wprint "\">"
-            } ];
-        Wserver.wprint "</td>\n"
-      }
+      tag "tr" "align=\"left\"" begin
+        for j = 0 to Array.length hts.(i) - 1 do {
+          let (colspan, align, td) = hts.(i).(j) in
+          Wserver.wprint "<td";
+          if colspan = 1 && (td = TDstring "&nbsp;" || td = TDhr CenterA) then
+            ()
+          else Wserver.wprint " colspan=\"%d\"" colspan;
+          match (align, td) with
+          [ (LeftA, TDhr LeftA) -> Wserver.wprint " align=\"left\""
+          | (LeftA, _) -> ()
+          | (CenterA, _) -> Wserver.wprint " align=\"center\""
+          | (RightA, _) -> Wserver.wprint " align=\"right\"" ];
+          Wserver.wprint ">";
+          match td with
+          [ TDstring s -> Wserver.wprint "%s" s
+          | TDbar s ->
+              if s = "" then Wserver.wprint "|"
+              else
+                Wserver.wprint
+                  "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
+          | TDhr align ->
+              do {
+                Wserver.wprint "<hr style=\"";
+                match align with
+                [ LeftA -> Wserver.wprint "margin-right:50%%"
+                | RightA -> Wserver.wprint "margin-left:50%%"
+                | _ -> () ];
+                Wserver.wprint "\"%s>" xhs;
+              } ];
+          Wserver.wprint "</td>\n"
+        };
+      end;
     };
     Wserver.wprint "</table>\n"
   }
@@ -692,12 +697,13 @@ value print_table_pre conf hts =
 
 value print_html_table conf hts =
   do {
-    if Util.p_getenv conf.env "notab" <> Some "on" then do {
-      Wserver.wprint "<a style=\"float:right\" href=\"%s" (commd conf);
-      List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
-      Wserver.wprint "notab=on;slices=on";
-      Wserver.wprint "\"><tt>//</tt></a>\n"
-    }
+    if Util.p_getenv conf.env "notab" <> Some "on" then
+      tag "p" begin
+        Wserver.wprint "<a style=\"float:right\" href=\"%s" (commd conf);
+        List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
+        Wserver.wprint "notab=on;slices=on";
+        Wserver.wprint "\"><tt>//</tt></a>\n";
+      end
     else ();
     if Util.p_getenv conf.env "notab" = Some "on" ||
        Util.p_getenv conf.env "pos2" <> None ||
@@ -757,7 +763,7 @@ value make_tree_hts
                          p ps
                    | None -> "" ]
                  in
-                 txt ^ "<br>\n&amp;" ^ d ^ " " ^
+                 txt ^ "<br" ^ xhs ^ ">\n&amp;" ^ d ^ " " ^
                    Util.referenced_person_title_text conf base ps ^
                    Date.short_dates_text conf base ps)
             txt spouses
@@ -785,9 +791,9 @@ value make_tree_hts
       | _ -> (0, "") ]
     in
     if bd > 0 || td <> "" then
-      sprintf
-        "<table border=%d><tr align=left><td align=center%s>%s</table>" bd td
-        (indi_txt n)
+      sprintf "\
+<table border=\"%d\"><tr align=\"left\"><td align=\"center\"%s>%s</table>"
+        bd td (indi_txt n)
     else indi_txt n
   in
   let vbar_txt n =
@@ -819,7 +825,8 @@ value print_slices_menu conf base hts_opt =
         (fun (k, v) ->
            if k = "slices" then ()
            else
-             Wserver.wprint "<input type=hidden name=\"%s\" value=\"%s\">\n"
+             Wserver.wprint
+               "<input type=\"hidden\" name=\"%s\" value=\"%s\">\n"
                (decode_varenv k) (decode_varenv v))
         conf.env;
       tag "table" begin
@@ -828,19 +835,21 @@ value print_slices_menu conf base hts_opt =
             Wserver.wprint "%s\n"
               (Util.capitale
                  (transl conf "don't group the common branches together"));
-            Wserver.wprint "<input type=checkbox name=nogroup value=on>\n";
+            Wserver.wprint
+              "<input type=\"checkbox\" name=\"nogroup\" value=\"on\">\n";
           end;
         end;
         tag "tr" "align=left" begin
           tag "td" "align=right" begin
             Wserver.wprint "%s\n" (txt 1);
-            Wserver.wprint "<input name=dpos size=5 value=78>\n";
+            Wserver.wprint "<input name=\"dpos\" size=\"5\" value=\"78\">\n";
           end;
         end;
         tag "tr" "align=left" begin
           tag "td" "align=right" begin
             Wserver.wprint "%s\n" (txt 2);
-            Wserver.wprint "<input name=overlap size=5 value=10>\n";
+            Wserver.wprint
+              "<input name=\"overlap\" size=\"5\" value=\"10\">\n";
           end;
         end;
         tag "tr" "align=left" begin
@@ -857,12 +866,13 @@ value print_slices_menu conf base hts_opt =
                   }
               | None -> wid ]
             in
-            Wserver.wprint "<input name=width size=5 value=%d>\n" wid;
+            Wserver.wprint "<input name=\"width\" size=\"5\" value=\"%d\">\n"
+	      wid;
           end;
         end;
       end;
       html_p conf;
-      Wserver.wprint "<input type=submit value=\"Ok\">\n";
+      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     end;
     Util.trailer conf
   }
@@ -886,7 +896,6 @@ value gen_print_dag conf base spouse_on invert set spl d =
       Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
     in
     Util.header_no_page_title conf title;
-    html_p conf;
     print_html_table conf hts;
     Util.trailer conf
   }

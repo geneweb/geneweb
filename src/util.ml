@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.102 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: util.ml,v 4.103 2004-12-28 03:59:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -286,7 +286,17 @@ value secure s =
   else s
 ;
 
-value html_br conf = do { Wserver.wprint "<br>"; Wserver.wprint "\n"; };
+(**)
+value xhs = "";
+value doctype = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\">";
+(*
+value xhs = " /";
+value doctype = "\
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" 
+ \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">";
+*)
+
+value html_br conf = do { Wserver.wprint "<br%s>" xhs; Wserver.wprint "\n"; };
 
 value html_p conf = do { Wserver.wprint "<p>"; Wserver.wprint "\n"; };
 
@@ -412,16 +422,6 @@ value quote_escaped s =
     let len = compute_len 0 0 in copy_code_in (String.create len) 0 0
   else s
 ;
-
-(**)
-value xhs = "";
-value doctype = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\">";
-(*
-value xhs = " /";
-value doctype = "\
-<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" 
- \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">";
-*)
 
 value hidden_env conf =
   List.iter
@@ -1417,7 +1417,6 @@ value gen_trailer with_logo conf =
 <hr><font size=-1><em>Copyright (c) 1998-2005 INRIA -
 GeneWeb %s</em></font>" Version.txt;
           html_br conf;
-          ()
         } ];
     include_hed_trl conf None ".trl";
     Wserver.wprint "</body>\n</html>\n";
@@ -1755,7 +1754,8 @@ value print_link_to_welcome conf right_aligned =
     let wid_hei =
       match image_size (image_file_name fname) with
       [ Some (wid, hei) ->
-          " width=" ^ string_of_int wid ^ " height=" ^ string_of_int hei
+          " width=\"" ^ string_of_int wid ^ "\" height=\"" ^
+          string_of_int hei ^ "\""
       | None -> "" ]
     in
     if right_aligned then
@@ -1764,8 +1764,8 @@ value print_link_to_welcome conf right_aligned =
     let str = link_to_referer conf in
     if str = "" then () else Wserver.wprint "%s" str;
     Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-    Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\">" (image_prefix conf)
-      fname wid_hei;
+    Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\"%s>" (image_prefix conf)
+      fname wid_hei xhs;
     Wserver.wprint "</a>\n";
     if right_aligned then Wserver.wprint "</td></tr></table>\n" else ();
   }

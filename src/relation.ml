@@ -1,13 +1,11 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.54 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: relation.ml,v 4.55 2004-12-28 03:59:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;
 open Config;
 open Util;
-
-value xhs = Util.xhs;
 
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
@@ -1092,90 +1090,89 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
     [ Some "on" -> ";image=on"
     | _ -> "" ]
   in
-  do {
-    Wserver.wprint "<ul>\n";
-    html_li conf;
-    Wserver.wprint "%s\n" (capitale (transl conf "indeed,"));
-    tag "ul" begin
-      List.iter
-        (fun (a, n) ->
-           do {
-             html_li conf;
-             Wserver.wprint "%s" (person_title_text conf base a);
-             Wserver.wprint "\n<em>(";
-             Wserver.wprint "%d %s" n
-               (transl_nth conf "relationship link/relationship links"
-                  (if n = 1 then 0 else 1));
-             if not long then do {
-               let propose_dag = n > 1 && n <= 10 in
-               Wserver.wprint ":\n%s" (transl conf "click");
-               let dp1 =
-                 match pp1 with
-                 [ Some p -> p
-                 | _ -> p1 ]
-               in
-               let dp2 =
-                 match pp2 with
-                 [ Some p -> p
-                 | _ -> p2 ]
-               in
-               Wserver.wprint
-                 " <a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s%s\">"
-                 (commd conf) (acces conf base a) x1
-                 (acces_n conf base "1" dp1) x2 (acces_n conf base "2" dp2)
-                 (if pp1 = None then "" else ";" ^ acces_n conf base "3" p1)
-                 (if pp2 = None then "" else ";" ^ acces_n conf base "4" p2)
-                 (if propose_dag then ";dag=on" else "") image_opt;
-               Wserver.wprint "%s</a>" (transl conf "here");
-               if n > 1 && not propose_dag then
-                 Wserver.wprint "%s"
-                   (transl conf " to see the first relationship link")
-               else ()
-             }
-             else ();
-             Wserver.wprint "</em>).\n"
-           })
-        list;
-    end;
-    let is_are =
-      match list with
-      [ [_] -> transl conf "is"
-      | _ -> transl conf "are" ]
-    in
-    Wserver.wprint "%s %s\n" is_are (transl conf "at the same time");
-    let lab proj x =
-      let info = (((reltab, list), x), proj) in
-      match list with
-      [ [(a, _)] -> ancestor_label conf base info x a.sex
-      | _ -> parents_label conf base info x ]
-    in
-    let print pp p alab =
-      let s = gen_person_title_text no_reference raw_access conf base p in
-      let s =
-        if pp = None then transl_a_of_b conf alab s
-        else
-          transl_a_of_gr_eq_gen_lev conf
-            (transl_a_of_b conf alab
-               (transl_nth conf "the spouse" (1 - index_of_sex p.sex)))
-            s
+  tag "ul" begin
+    tag "li" begin
+      Wserver.wprint "%s\n" (capitale (transl conf "indeed,"));
+      tag "ul" begin
+        List.iter
+          (fun (a, n) ->
+             tag "li" begin
+               Wserver.wprint "%s" (person_title_text conf base a);
+               Wserver.wprint "\n<em>(";
+               Wserver.wprint "%d %s" n
+                 (transl_nth conf "relationship link/relationship links"
+                    (if n = 1 then 0 else 1));
+               if not long then do {
+                 let propose_dag = n > 1 && n <= 10 in
+                 Wserver.wprint ":\n%s" (transl conf "click");
+                 let dp1 =
+                   match pp1 with
+                   [ Some p -> p
+                   | _ -> p1 ]
+                 in
+                 let dp2 =
+                   match pp2 with
+                   [ Some p -> p
+                   | _ -> p2 ]
+                 in
+                 Wserver.wprint
+                   " <a href=\"%sm=RL;%s;l1=%d;%s;l2=%d;%s%s%s%s%s\">"
+                   (commd conf) (acces conf base a) x1
+                   (acces_n conf base "1" dp1) x2 (acces_n conf base "2" dp2)
+                   (if pp1 = None then "" else ";" ^ acces_n conf base "3" p1)
+                   (if pp2 = None then "" else ";" ^ acces_n conf base "4" p2)
+                   (if propose_dag then ";dag=on" else "") image_opt;
+                 Wserver.wprint "%s</a>" (transl conf "here");
+                 if n > 1 && not propose_dag then
+                   Wserver.wprint "%s"
+                     (transl conf " to see the first relationship link")
+                 else ()
+               }
+               else ();
+               Wserver.wprint "</em>).\n";
+             end)
+          list;
+      end;
+      let is_are =
+        match list with
+        [ [_] -> transl conf "is"
+        | _ -> transl conf "are" ]
       in
-      Wserver.wprint "%s\n" (nominative s)
-    in
-    tag "ul" begin
-      html_li conf;
-      print pp1 p1 (lab (fun r -> r.Consang.lens1) x1);
-      html_li conf;
-      print pp2 p2 (lab (fun r -> r.Consang.lens2) x2);
+      Wserver.wprint "%s %s\n" is_are (transl conf "at the same time");
+      let lab proj x =
+        let info = (((reltab, list), x), proj) in
+        match list with
+        [ [(a, _)] -> ancestor_label conf base info x a.sex
+        | _ -> parents_label conf base info x ]
+      in
+      let print pp p alab =
+        let s = gen_person_title_text no_reference raw_access conf base p in
+        let s =
+          if pp = None then transl_a_of_b conf alab s
+          else
+            transl_a_of_gr_eq_gen_lev conf
+              (transl_a_of_b conf alab
+                 (transl_nth conf "the spouse" (1 - index_of_sex p.sex)))
+              s
+        in
+        Wserver.wprint "%s\n" (nominative s)
+      in
+      tag "ul" begin
+        tag "li" begin
+          print pp1 p1 (lab (fun r -> r.Consang.lens1) x1);
+        end;
+        tag "li" begin
+          print pp2 p2 (lab (fun r -> r.Consang.lens2) x2);
+        end;
+      end;
     end;
-    Wserver.wprint "</ul>\n"
-  }
+  end
 ;
 
 value print_solution conf base long n p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), reltab) = sol in
   do {
-    html_p conf;
-    print_link_name conf base n p1 p2 sol;
+    tag "p" begin print_link_name conf base n p1 p2 sol; end;
     if x1 == 0 || x2 == 0 then
       print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
     else print_solution_not_ancestor conf base long p1 p2 sol;
@@ -1234,7 +1231,7 @@ value print_dag_links conf base p1 p2 rl =
          in
          if nt > 1 && nn > 1 && nn < max_br then do {
            let a = pget conf base ip in
-           if is_anc then () else html_li conf;
+           if is_anc then () else Wserver.wprint "<li>\n";
            if not is_anc then
              Wserver.wprint "%s:\n" (person_title_text conf base a)
            else ();
@@ -1283,11 +1280,11 @@ value print_dag_links conf base p1 p2 rl =
              Wserver.wprint "%d %s" nn
                (transl_nth conf "relationship link/relationship links" 1);
            Wserver.wprint "</a>";
-           if is_anc then () else Wserver.wprint "\n"
+           if is_anc then () else Wserver.wprint "\n</li>\n"
          }
          else rest.val := True)
       anc_map;
-    if rest.val then do { html_li conf; Wserver.wprint "...\n" } else ();
+    if rest.val then stagn "li" begin Wserver.wprint "..."; end else ();
     if is_anc then Wserver.wprint ")\n" else Wserver.wprint "</ul>\n"
   }
   else ()
@@ -1599,28 +1596,27 @@ value print_main_relationship conf base long p1 p2 rel =
         in
         do {
           Wserver.wprint "\n";
-          html_p conf;
-          Wserver.wprint "%s: <em>" (capitale (transl conf "total"));
-          if Num.eq total Num.zero then Wserver.wprint "***"
-          else wprint_num conf total;
-          Wserver.wprint "</em> %s\n"
-            (transl_nth conf "relationship link/relationship links"
-               (if Num.eq total Num.one then 0 else 1));
+          tag "p" begin
+            Wserver.wprint "%s: <em>" (capitale (transl conf "total"));
+            if Num.eq total Num.zero then Wserver.wprint "***"
+              else wprint_num conf total;
+            Wserver.wprint "</em> %s\n"
+              (transl_nth conf "relationship link/relationship links"
+                 (if Num.eq total Num.one then 0 else 1));
+          end;
           if long then () else print_dag_links conf base p1 p2 rl;
           if not all_by_marr && authorized_age conf base p1 &&
              authorized_age conf base p2 && (consang a1) != Adef.fix (-1) &&
              consang a2 != Adef.fix (-1)
-          then do {
-            html_p conf;
-            Wserver.wprint "<em>%s: " (capitale (transl conf "relationship"));
-            Wserver.wprint "%s"
-              (string_of_decimal_num conf
-                 (round_2_dec
-                    (Adef.float_of_fix (Adef.fix_of_float relationship) *.
-                       100.0)));
-            Wserver.wprint "%%</em>";
-            html_p conf
-          }
+          then
+            tag "p" begin
+              Wserver.wprint "<em>%s: %s%%</em>"
+                (capitale (transl conf "relationship"))
+                (string_of_decimal_num conf
+                   (round_2_dec
+                      (Adef.float_of_fix (Adef.fix_of_float relationship) *.
+                         100.0)));
+            end
           else ();
           print_propose_upto conf base p1 p2 rl
         } ];
