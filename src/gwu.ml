@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.16 2003-10-20 07:11:56 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.17 2003-11-28 10:17:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -19,7 +19,7 @@ value print_date_dmy oc d =
     | Before -> fprintf oc "<"
     | After -> fprintf oc ">"
     | _ -> () ];
-    if d.day == 0 && d.month == 0 then fprintf oc "%s" (soy d.year)
+    if (*d.day == 0 &&*) d.month == 0 then fprintf oc "%s" (soy d.year)
     else if d.day == 0 then fprintf oc "%d/%s" d.month (soy d.year)
     else fprintf oc "%d/%d/%s" d.day d.month (soy d.year);
     match d.prec with
