@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.7 1999-11-19 10:02:29 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.8 1999-12-14 05:16:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -74,7 +74,7 @@ value incr_request_counter conf =
 value hidden_env conf =
   List.iter
     (fun (k, v) -> Wserver.wprint "<input type=hidden name=%s value=%s>\n" k v)
-    conf.henv
+    (conf.henv @ conf.senv)
 ;
 
 value lang_file_name conf fname =

@@ -4,6 +4,12 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.02
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [Dec 14, 99] No more compatibility with old relationship request form e=...
+  - [Dec 14, 99] Changed things so that adding ";em=R;ep=fn;en=sn" in
+    the URL generates relationship computing with "fn sn" in welcome page
+    and in notes (already worked for many other page kinds).
+
 GeneWeb Version 3.01
 --------------------
 

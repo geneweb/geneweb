@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.18 1999-12-07 14:25:17 ddr Exp $ *)
+(* $Id: util.ml,v 3.19 1999-12-14 05:16:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -711,10 +711,7 @@ value copy_string_with_macros conf s =
   loop False False 0 where rec loop in_tag in_atag i =
     if i < String.length s then
       if i + 1 < String.length s && s.[i] = '%' && s.[i+1] = 's' then
-        do Wserver.wprint "%s?" conf.command;
-           List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v)
-             conf.henv;
-        return loop in_tag in_atag (i + 2)
+        do Wserver.wprint "%s" (commd conf); return loop in_tag in_atag (i + 2)
       else if in_atag then
         let in_atag = not (start_with s i "</a>") in
         do Wserver.wprint "%c" s.[i]; return loop in_tag in_atag (i + 1)
@@ -1075,6 +1072,13 @@ value list_find f =
     fun
     [ [] -> raise Not_found
     | [x :: l] -> if f x then x else loop l ]
+;
+
+value list_filter p =
+  find [] where rec find accu =
+    fun
+    [ [] -> List.rev accu
+    | [x :: l] -> if p x then find [x :: accu] l else find accu l ]
 ;
 
 value find_person_in_env conf base suff =

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.10 1999-12-06 15:06:38 ddr Exp $ *)
+(* $Id: family.ml,v 3.11 1999-12-14 05:16:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -262,10 +262,7 @@ value precisez conf base n pl =
   return ()
 ;
 
-(* Make the "special" environement;
-     old system: "e=..." where ... is the coded environment
-     new system: "em=mode;ei=n"
-   The old system is kept by compatibility. *)
+(* Make the "special" environement; "em=mode;ei=n" *)
 
 value set_senv conf vm vi =
   do conf.senv := [("em", vm); ("ei", vi)];
@@ -303,17 +300,10 @@ value make_senv conf base =
       in
       let vi = string_of_int (Adef.int_of_iper ip) in
       set_senv conf vm vi
-  | _ ->
-      let e =
-        match get "e" with
-        [ Some s -> Util.create_env (decode_varenv s)
-        | _ -> [] ]
-      in
-      conf.senv := List.map (fun (x, v) -> ("e" ^ x, v)) e ]
+  | _ -> () ]
 ;
 
 value family_m conf base =
-  do make_senv conf base; return
   match p_getenv conf.env "m" with
   [ Some "A" ->
       match find_person_in_env conf base "" with
@@ -551,12 +541,12 @@ value print_no_index conf base =
   return ()
 ;
 
-value rec except_sosa_env =
-  fun
-  [ [("iz" | "nz" | "pz" | "ocz", _) :: env] -> except_sosa_env env
-  | [x :: env] -> [env :: except_sosa_env env]
-  | [] -> [] ]
+value senv_vars =
+  ["em"; "ei"; "ep"; "en"; "eoc"; "long"; "marr"; "spouse"; "shortest"; "cgl";
+   "iz"; "nz"; "pz"; "ocz"]
 ;
+
+value only_special_env = List.for_all (fun (x, _) -> List.mem x senv_vars);
 
 value extract_sosa_henv conf base =
   match find_person_in_env conf base "z" with
@@ -567,13 +557,15 @@ value extract_sosa_henv conf base =
 ;
 
 value family conf base =
-  do extract_sosa_henv conf base; return
   let r =
     match p_getenv conf.env "opt" with
     [ Some "no_index" ->
         do print_no_index conf base; return None
     | _ ->
-        if except_sosa_env conf.env = [] then
+        do extract_sosa_henv conf base;
+           make_senv conf base;
+        return
+        if only_special_env conf.env then
           let r = Srcfile.incr_welcome_counter conf in
           do Srcfile.print_start conf base; return r
         else
