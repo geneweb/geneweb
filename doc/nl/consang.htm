@@ -1,97 +1,87 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>GeneWeb - Verwantschap;</title></head>
-<body bgcolor="#d6bfaf">
-<h1>GeneWeb - Verwantschap</h1>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE>GeneWeb - Verwantschap;</TITLE>
+   <META NAME="GENERATOR" CONTENT="Mozilla/3.0Gold (X11; I; Linux 2.0.34 i586) [Netscape]">
+</HEAD>
+<BODY BGCOLOR="#D6BFAF">
 
-In dit deel wordt het begrip verwantschap uitgelegd en hoe de verwantschap door
-<em>GeneWeb</em> wordt berekend en uitgedrukt wordt in een getal.
+<H1>GeneWeb - Verwantschap</H1>
 
+<P>In dit deel wordt het begrip verwantschap uitgelegd en hoe de verwantschap
+door <I>GeneWeb</I> wordt berekend en uitgedrukt wordt in een getal. </P>
 
-<h4>Verwantschap</h4>
+<H4>Verwantschap</H4>
 
-Het genoom van een individu is opgebouwd uit een groot aantal genen die steeds
-identiek blijven reproduceren, mutaties buiten beschouwing gelaten.
+<P>Het genoom van een individu is opgebouwd uit een groot aantal genen
+die steeds identiek blijven reproduceren, mutaties buiten beschouwing gelaten.
 De genen kunnen dienen als een maat voor de verwantschap van een persoon.
+</P>
 
-<p>
+<P>Genen bevinden steeds op de &quot;locus&quot;. Op iedere locus is er
+plaats voor twee genen. Een daarvan komt van iemands vader, de andere van
+zijn moeder. Elk van de genen op de locus is een exacte kopie van een van
+de genen van zijn ouders op die locus. </P>
 
-Genen bevinden steeds op de "locus". Op iedere locus is er plaats voor twee
-genen. Een daarvan komt van iemands vader, de andere van zijn moeder. Elk van
-de genen op de locus is een exacte kopie van een van de genen van zijn ouders
-op die locus.
+<P>De <I>verwantschap</I> van een individu <I>x</I> is de waarschijnlijkheid
+<I>cg(x)</I> om een locus met net dezelfde genen te vinden. </P>
 
+<P>De <I>verwantschap</I> tussen twee personen <I>x</I> en <I>y</I> is
+de waarschijnlijkheid <I>pr(x,y)</I> om een locus met dezelfde genen te
+vinden. </P>
 
-<p>
+<H4>Berekeningen</H4>
 
-De <em>verwantschap</em> van een individu <em>x</em> is de
-waarschijnlijkheid <em>cg(x)</em> om een locus met net dezelfde genen te
-vinden.
+<P>Waarschijnlijkheidsbereking toont dat: </P>
 
+<UL>
+<LI>De verwantschap <I>cg(x)</I> gelijk is aan de verwantschap <I>pr(px,mx)</I>
+met <I>px</I> en <I>mx</I> de ouders van <I>x</I>. </LI>
+</UL>
 
-<p>
+<UL>
+<LI>Als <I>x..a..y</I> een lijn van minimale verwantschap is tussen <I>x</I>
+en <I>y</I> (dat wil zeggen dat de takken <I>x..a</I> en <I>a..y</I> enkel
+<I>a</I> als gemeenschappelijk persoon hebben), dat dan deze gemeenschappelijke
+voorouder als volgt bijdraagt tot de verwanstschap: </LI>
 
-De <em>verwantschap</em> tussen twee personen <em>x</em> en
-<em>y</em> is de waarschijnlijkheid <em>pr(x,y)</em>
-om een locus met dezelfde genen te vinden.
+<PRE>     1 / 2**(n+1) * (1 + cg(a))
+</PRE>
 
+<P>waarin <I>n</I> de lengte (afstand <I>x..a</I> + afstand <I>a..y</I>)
+van het verband <I>x..a..y</I> is. </P>
 
-<h4>Berekeningen</h4>
+<P>De verwantschap tussen <I>x</I> en <I>y</I> is de som van de bijdragen
+van alle minimale verbanden. </P>
+</UL>
 
-Waarschijnlijkheidsbereking toont dat:
+<H4>GeneWeb</H4>
 
+<P><I>GeneWeb</I> toont u de verwantschappen tussen personen en de verwantschap
+van een persoon onder de vorm van een percentage. </P>
 
-<ul><li>De verwantschap <em>cg(x)</em> gelijk is aan de verwantschap
-<em>pr(px,mx)</em> met <em>px</em> en <em>mx</em> de ouders van <em>x</em>.
-</ul>
+<P>Statistich gezien komt de verwantschap van een persoon benaderend overeen
+met het percentage loci dat identieke genen draagt. </P>
 
-<p>
+<P>De algoritmes bij deze berekeningen werden geschreven door Didier R&eacute;my,
+mijn onderzoeksdirecteur aan het INRIA, waarvoor bedankt. </P>
 
-<ul><li>Als <em>x..a..y</em> een lijn van minimale verwantschap is tussen
-<em>x</em> en <em>y</em> (dat wil zeggen dat de takken <em>x..a</em> en
-<em>a..y</em> enkel <em>a</em> als gemeenschappelijk persoon hebben), dat
-dan deze gemeenschappelijke voorouder als volgt bijdraagt tot de verwanstschap:
+<H4>Referenties</H4>
 
+<UL>
+<LI>Albert Jacquard. <I>Structures G&eacute;n&eacute;tiques des Populations.</I>
+Masson &amp; Cie, 1970.</LI>
+</UL>
 
-<pre>
-     1 / 2**(n+1) * (1 + cg(a))
-</pre>
+<P>Constructieve voorstellen over een betere vertaling van deze sectie
+zijn welkom. <A HREF="mailto: joris.esch@student.kuleuven.ac.be">Joris
+Esch</A> , vertaler van dienst.</P>
 
-waarin <em>n</em> de lengte (afstand <em>x..a</em> +
-afstand <em>a..y</em>) van het verband <em>x..a..y</em> is. 
+<P>Terugkeren naar de <A HREF="diruse.htm">gebruiksaanwijzing</A>. </P>
 
-<p>
+<P>
+<HR><I><FONT SIZE=-1>&copy; Copyright INRIA 1999 - GeneWeb</FONT></I><BR>
+</P>
 
-De verwantschap tussen <em>x</em> en <em>y</em> is de som van de bijdragen van alle minimale verbanden.
-
-</ul>
-
-<h4>GeneWeb</h4>
-
-<em>GeneWeb</em> toont u de verwantschappen tussen personen en de verwantschap van een persoon onder de vorm van een percentage.
-
-<p>
-
-Statistich gezien komt de verwantschap van een persoon benaderend overeen met
-het percentage loci dat identieke genen draagt.
-
-
-<p>
-
-De algoritmes bij deze berekeningen werden geschreven door Didier R&eacute;my,
-mijn onderzoeksdirecteur aan het INRIA, waarvoor bedankt.
-
-
-<h4>Referenties</h4>
-
-<ul><li>Albert Jacquard. <em> Structures G&eacute;n&eacute;tiques des
-Populations.</em> Masson & Cie, 1970.</ul>
-
-<p>
-
-Terugkeren naar de <a href="diruse.htm">gebruiksaanwijzing</a>.
-
-<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
-GeneWeb</em></font><br>
-
-</body>
+</BODY>
+</HTML>
