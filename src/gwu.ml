@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.21 2004-01-28 10:04:29 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.22 2004-05-04 17:14:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -521,10 +521,10 @@ value get_isolated_related base m list =
     else if is_isolated base p then
       match p.rparents with
       [ [{r_fath = Some x} :: _] when x = p_relation.cle_index ->
-          [(p, True) :: list]
+          list @ [(p, True)]
       | [{r_fath = None; r_moth = Some x} :: _]
         when x = p_relation.cle_index ->
-          [(p, True) :: list]
+          list @ [(p, True)]
       | _ -> list ]
     else list
   in
