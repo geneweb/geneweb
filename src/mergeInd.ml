@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.13 2002-01-12 14:57:13 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.14 2002-02-02 15:27:32 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -308,6 +308,10 @@ value effective_merge_ind conf base p1 p2 =
     if p1.birth = Adef.codate_None then p1.birth := p2.birth else ();
     if p1.birth_place = Adef.istr_of_int 0 then
       p1.birth_place := p2.birth_place
+    else ();
+    if p1.baptism = Adef.codate_None then p1.baptism := p2.baptism else ();
+    if p1.baptism_place = Adef.istr_of_int 0 then
+      p1.baptism_place := p2.baptism_place
     else ();
     if p1.death = DontKnowIfDead then p1.death := p2.death else ();
     if p1.death_place = Adef.istr_of_int 0 then

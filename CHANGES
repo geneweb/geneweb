@@ -2,6 +2,9 @@ GeneWeb version 4.05
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [02 Feb 02] Fixed bug: when merging two persons, in case of fast
+    merge applied, some fields of the second person were lost (notes,
+    baptism).
   - [02 Feb 02] Added an indication "wizard" or "friend" in upper
     right corner of the welcome page.
   - [31 Jan 02] Added a system to restrict access more strict than the
@@ -14,8 +17,6 @@ GeneWeb version 4.05
     missing, introducing confusion.
   - [21 Jan 02] Added a link to the "gwsetup" service in bottom of pages.
     (The command "gwd" has a new option "-setup_link" to add that).
-  - [12 Jan 02] Fixed bug: when merging two persons, in case of fast
-    merge applied, the notes of the second person were lost.
   - [11 Jan 02] Fixed bug: the macros in places were not expanded in the
     places/surnames pages, in descendants and in ancestors pages.
 
