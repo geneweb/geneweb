@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 4.4 2001-03-26 16:03:19 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.5 2001-03-26 16:35:54 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -19,6 +19,10 @@ he: úåìãåú
 is: Ættfræği
 it: Genealogia
 lv: Genealogy
+nl: Genealogie
+no: Genealogi
+pl: Genealogia
+pt: Genealogia
 se: Genealogi
 ] - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -51,6 +55,10 @@ he: îàâø îéãò <br> úåìãåúé
 is: Ættfræği<br>gagnagrunnur
 it: Base di dati<br>genealogica
 lv: Ciltsrakstu<br>datu bâze
+nl: Genealogische<br>databank
+no: Genealogisk<br>database
+pl: Genealogiczna<br>baza danych
+pt: Base de Dados<br>Geneal&oacute;gica
 se: Genealogisk<br>databas
 ]</font></h1></table>
 </td>
@@ -73,6 +81,7 @@ et: Võid valida ka mõne muu keele järgnevatest:
 fr: Vous pouvez sélectionner une autre langue d'affichage
     parmi les suivantes:
 lv: Jûs variet apskatît datu bâzi arî citâs sekojoğâs valodâs:
+pl: Mo¿esz wybraæ inny jêzyk spoœród nastêpuj¹cych:
 se: Du kan välja ett annat språk bland de följande:
 ]</em></font>
 
@@ -109,6 +118,12 @@ is: Gagnagrunnurinn <font color=%i><b>"%t"</b></font> er nú meğ %n
 it: La base di dati <font color=%i><b>"%t"</b></font> contiene
     attualmente %n persone.
 lv: Datu bâze <font color=%i><b>"%t"</b></font> patreiz satur %n personas.
+nl: Deze databank <font color=%i><b>"%t"</b></font> bevat nu %n personen.
+no: Databasen <font color=%i><b>"%t"</b></font> inneholder n&aring; %n
+    personer.
+pl: Baza danych <font color=%i><b>"%t"</b></font> zawiera obecnie osób:%n.
+pt: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
+    actualmente %n pessoas.
 se: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
     %n personer.
 ]%In<br>
@@ -135,6 +150,10 @@ he: ëğéñä  <a href="%sw=w"><em> ëâàåï </em></a>
 is: <a href="%sw=w"><em>Wizard</em></a> ağgangur<br> (ağgangsorğ)
 it: <a href="%sw=w"><em>Wizard</em></a> access<br> (parola d'accesso)
 lv: <a href="%sw=w"><em>Wizard</em></a> access<br> (password)
+nl: Toegang als <a href="%sw=w"><em>tovenaar</em></a><br> (wachtwoord)
+no: <a href="%sw=w"><em>Oppdaterings</em></a> adgang<br> (passord)
+pl: <a href="%sw=w"><em>"Wizard"</em></a> dostêp<br> (has³o)
+pt: Entrada <a href="%sw=w"><em>feiticeiro</em></a><br> (palavra chave)
 se: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
 ]<br></td>
 
@@ -154,6 +173,10 @@ he: ëğéñä<a href="%sw=f"><em> îéåçñú </em></a>
 is: <a href="%sw=f"><em>Vina</em></a> ağgangur<br> (ağgangsorğ)
 it: <a href="%sw=f"><em>amiko</em></a> access<br> (parola d'accesso)
 lv: <a href="%sw=f"><em>Friend</em></a> access<br> (password)
+nl: Toegang als <a href="%sw=f"><em>vriend</em></a><br> (wachtwoord)
+no: <a href="%sw=f"><em>Venners</em></a> adgang<br> (passord)
+pl: <a href="%sw=f"><em>"Friend"</em></a> dostêp<br> (has³o)
+pt: Entrada <a href="%sw=f"><em>amigo</em></a><br> (palavra chave)
 se: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
 ]</td>
 
@@ -176,6 +199,11 @@ he: ñéñîä ìëğéñä <em> îéåçñú  </em> àå <em>ëâàåï</em>
 is: Ağgangsorğ, fyrir <em>vin</em> eğa <em>wizard</em> ağgang:
 it: Parola d'accesso, per accesso dell' <em>amico</em> o del <em>wizard</em>:
 lv: Password, for <em>friend</em> or <em>wizard</em> access:
+nl: <font size=-1>Wachtwoord, voor toegang als <em>vriend</em> of
+    <em>tovenaar</em>:
+no: Passord, for <em>venner</em> eller <em>oppdaterings</em> adgang:
+pl: Has³o dla dostêpu <em>"friend"</em> lub <em>"wizard"</em> :
+pt: Palavra chave para entrada <em>amigo</em> ou <em>feiticeiro</em>:
 se: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
     tilltr&auml;de:
 ]
@@ -209,6 +237,10 @@ he: ğååè áîàâø îéãä òì-éãé çéôåñ:
 is: Í şessum gagnagrunni getur şú leitağ:
 it: Per spostarsi in questa base di dati, si pu&ograve; fare una ricerca:
 lv: Jûs variet meklçt ğinî datu bâzç:
+nl: Om deze databank te consulteren, kan u een opzoeking doen:
+no: For &aring; navigere i databasen, kan du s&oslash;ke:
+pl: Aby poruszaæ siê po bazie, mo¿esz:
+pt: Para consultar esta base de dados, pode procurar:
 se: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
 ]<br><p>
 
@@ -235,6 +267,10 @@ he: ìôé ùí àå æäåú
 is: eftir nafni
 it: per persona
 lv: personas
+nl: op naam
+no: etter person
+pl: znaleŸæ osobê
+pt: por pessoa
 se: efter person
 ]</b></font>
 <input name=n size=40 maxlength=200>
@@ -273,6 +309,10 @@ he: ìôé úàø
 is: eftir titli
 it: per titolo
 lv: tituls
+nl: op titel
+no: etter titel
+pl: znaleŸæ:
+pt: por t&iacute;tulo
 se: efter titel
 ]</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
@@ -307,6 +347,10 @@ he: <font color=%i><b>øùéîä</b></font> ùì ëì ùîåú
 is: <font color=%i><b>eftir lista</b></font> yfir öll
 it: <font color=%i><b>per la lista</b></font> di tutti i
 lv: <font color=%i><b>visus</b></font>
+nl: <font color=%i><b>via de lijst</b></font> van alle
+no: <font color=%i><b>med liste</b></font> over alle
+pl: <font color=%i><b>przejrzeæ listê</b></font> wszystkich
+pt: <font color=%i><b>pela lista</b></font> de todos os
 se: <font color=%i><b>efter listan</b></font> av alla
 ]
 <select name=m>
@@ -327,6 +371,10 @@ he:   äîùôçä
 is: eftirnöfn
 it: cognomi
 lv: uzvârdus
+nl: familienamen
+no: etternavn
+pl: nazwisk
+pt: apelidos
 se: efternamn
 ]
 <option value="P">[
@@ -346,6 +394,10 @@ he:   äôøèééí
 is: fornöfn
 it: nomi
 lv: vârdus
+nl: voornamen
+no: fornavn
+pl: imion
+pt: nomes pr&oacute;prios
 se: f&ouml;rnamn
 ]
 </select>
@@ -366,6 +418,10 @@ he: ìôé
 is: eftir
 it: in ordine
 lv:
+nl: volgens
+no: sortert
+pl: u³o¿onych
+pt: por
 se: sorterade i
 ]
 <select name=tri>
@@ -386,6 +442,10 @@ he:  ñãø äàìó-áéú
 is: stafrófsröğ
 it: alfabetico
 lv: alfabçtiskâ kârtîbâ
+nl: alfabet
+no: alfabetisk
+pl: w porz¹dku alfabetycznym
+pt: ordem alfab&eacute;tica
 se: bokstavsordning
 ]
 <option value="F">[
@@ -405,6 +465,10 @@ he:  äùëéçåú
 is: tíğni
 it: di frequenza
 lv: pçc sastopamîbas
+nl: aantal
+no: etter frekvens
+pl: wed³ug czêstoœci wystêpowania
+pt: frequ&ecirc;ncia
 se: frekvensordning
 ]
 </select>
@@ -434,6 +498,10 @@ fr: par
 is: eftir
 it: per
 lv:
+nl: via
+no: etter
+pl: przejrzeæ listê:
+pt: por
 se: efter
 ] [place] / [surname/surnames]0</b></font>
 - [birth] <input type=checkbox name=bi value=on checked>
@@ -488,6 +556,18 @@ it: <font color=%i><b>per la</b></font>
 lv: <font color=%i><b>meklçt pçc</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>citiem
        parametriem</b></font></a>.
+nl: <font color=%i><b>via een</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>gedetailleerde
+       opzoeking</b></font></a>.
+no: <font color=%i><b>gjennom</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>avansert
+       s&oslash;king</b></font></a>.
+pl: <font color=%i><b>skorzystaæ z</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>wyszukiwania
+       zaawansowanego</b></font></a>.
+pt: <font color=%i><b>por</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>pesquisa
+       complexa</b></font></a>.
 se: <font color=%i><b>genom</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>avancerad
        s&ouml;kning</b></font></a>.
@@ -514,6 +594,10 @@ he:  éù àôùøåú
 is: Şú getur
 it: Si pu&ograve;
 lv: Izmaiòu veikğana:
+nl: U kan:
+no: Du kan
+pl: Mo¿esz
+pt: Pode
 se: Du kan
 ]<br><p>
 
@@ -538,6 +622,10 @@ he:  ìäåñéó îùôçä
 is: bætt viğ fjölskyldu
 it: aggiungere una famiglia
 lv: pievienot ìimeni
+nl: een familie toevoegen
+no: legge til en familie
+pl: dodaæ rodzinê (parê)
+pt: acrescentar uma família
 se: l&auml;gga till en familj
 ]</a>
 %INl</ul>
@@ -560,6 +648,10 @@ he:  ìòãëï àú ääòøåú
 is: breytt athugasemdum
 it: modificare le note
 lv: labot piezîmes
+nl: de nota's wijzigen
+no: endre notater
+pl: zmodyfikowaæ uwagi
+pt: modificar as notas
 se: &auml;ndra noteringar
 ]</a>
 </ul>
@@ -587,6 +679,10 @@ he: àôùø âí ìäøàåú
 is: Şú getur einnig athugağ
 it: Si pu&ograve; anche consultare
 lv: Informâcija par:
+nl: U kan de volgende zaken bekijken:
+no: Du kan ogs&aring; sl&aring; opp
+pl: Mo¿esz tak¿e obejrzeæ
+pt: Tamb&eacute;m pode consultar
 se: Du kan ocks&aring; konsultera
 ]<br><p>
 
@@ -635,6 +731,11 @@ is: Şağ hafa veriğ %q heimsóknir, %c af şeim á şessa síğu, síğan %d.
 it: Dal %d ci sono stati %q accessi, %c dei quali a questa pagina.
 lv: Kopğ %D datu bâze ir apmeklçta %q reizes, %c no tiem ir bijuği ğinî
     lappusç. 
+nl: Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
+    deze verwelkomingspagina.
+no: Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
+pl: Baza zosta³a od %d odwiedzona %q razy (w tym %c razy strona tytu³owa).
+pt: Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
 se: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
     sedan %d.
 ]
@@ -676,6 +777,16 @@ lv: Ja Jûsu Interneta caurlûkprogramma automâtiski nepârlâdç lappuses pçc
     veiktajâm izmaiòâm (tâdçjâdi radot Jums nepiecieğamîbu "pârlâdçt
     tekoğo dokumentu"), tad pamçìiniet uzklikğíinât <a
     href="%sescache=0">ğeit</a>.
+no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever 
+    oppfrisking av den aktuelle siden), prøv da å navigere <a
+    href="%sescache=0">herfra</a>.
+pl: Je¿eli twoja przegl¹darka nie odœwie¿a automatycznie zmienionych stron 
+    (zmuszaj¹c ciê do ich rêcznego odœwie¿ania), kliknij <a
+    href="%sescache=0">tutaj</a>.
+pt: Se o seu <i>browser</i> n&atilde;o actualiza automaticamente as
+    p&aacute;ginas modificadas (for&ccedil;ando a fazer
+    "reload current document"), tente navegar desde <a
+    href="%sescache=0">este link</a>.
 se: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
     navigera <a href="%sescache=0">härifrån</a>.
@@ -697,6 +808,8 @@ eo: leksikono
 fi: Sanasto
 fr: lexique
 he: ì÷ñé÷åï 
+no: leksikon
+pl: leksykon
 se: lexikon
 ]</a></em></font></p>
 
