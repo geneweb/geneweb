@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 4.7 2004-12-14 09:30:14 ddr Exp $ *)
+(* $Id: merge.ml,v 4.8 2004-12-26 18:11:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -30,6 +30,7 @@ value print conf base p =
     header conf title;
     Wserver.wprint "\n";
     tag "form" "method=GET action=\"%s\"" conf.command begin
+      html_p conf;
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=m value=MRG_IND>\n";
       Wserver.wprint "<input type=hidden name=i value=%d>\n"

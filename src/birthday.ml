@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.11 2004-12-14 09:30:10 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.12 2004-12-26 18:11:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -142,7 +142,7 @@ value print_anniversary_list conf base dead_people dt liste =
              Wserver.wprint ")</em>";
            }
            else do {
-             Wserver.wprint "\n%s" (txt_of conf base p);
+             Wserver.wprint "%s" (txt_of conf base p);
              match p.death with
              [ NotDead ->
                  do {
@@ -208,18 +208,23 @@ value print_birth_day conf base day_name verb wd dt list =
 ;
 
 value propose_months conf mode =
-  tag "center" begin
-    tag "form" "method=get action=\"%s\"" conf.command begin
-      Util.hidden_env conf;
-      mode ();
-      tag "select" "name=v" begin
-        for i = 1 to 12 do {
-          Wserver.wprint "<option value=%d%s>%s\n" i
-            (if i = conf.today.month then " selected" else "")
-            (capitale (nominative (transl_nth conf "(month)" (i - 1))))
-        };
+  tag "table" "border=\"%d\" style=\"margin:auto\"" conf.border begin
+    tag "tr" begin
+      tag "td" begin
+        tag "form" "method=get action=\"%s\"" conf.command begin
+          html_p conf;
+          Util.hidden_env conf;
+          mode ();
+          tag "select" "name=v" begin
+            for i = 1 to 12 do {
+              Wserver.wprint "<option value=%d%s>%s\n" i
+                (if i = conf.today.month then " selected" else "")
+                (capitale (nominative (transl_nth conf "(month)" (i - 1))))
+            };
+          end;
+          Wserver.wprint "<input type=submit value=\"Ok\">\n";
+        end;
       end;
-      Wserver.wprint "<input type=submit value=\"Ok\">\n";
     end;
   end
 ;
@@ -298,13 +303,12 @@ value print_marriage conf base month =
             List.iter
               (fun (fam, year) ->
                  do {
-                   Wserver.wprint "\n";
                    html_li conf;
                    Wserver.wprint "%s"
                      (referenced_person_title_text conf base
                         (pget conf base (father fam)));
                    Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
-                   Wserver.wprint "\n%s"
+                   Wserver.wprint "%s"
                      (referenced_person_title_text conf base
                         (pget conf base (mother fam)));
                    Wserver.wprint ", <em>%s %d</em>\n"
@@ -321,17 +325,16 @@ value print_marriage conf base month =
 
 value print_anniversaries_of_marriage conf base y list =
   do {
-    Wserver.wprint "<ul>";
+    Wserver.wprint "<ul>\n";
     List.iter
       (fun (fam, year) ->
          do {
-           Wserver.wprint "\n";
            html_li conf;
-           Wserver.wprint "\n%s"
+           Wserver.wprint "%s\n"
              (referenced_person_title_text conf base
                 (pget conf base (father fam)));
-           Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
-           Wserver.wprint "\n%s"
+           Wserver.wprint "%s\n" (transl_nth conf "and" 0);
+           Wserver.wprint "%s"
              (referenced_person_title_text conf base
                 (pget conf base (mother fam)));
            Wserver.wprint ", <em>%s %d\n(" (transl conf "in (year)") year;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.13 2004-12-14 09:30:11 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.14 2004-12-26 18:11:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -112,6 +112,7 @@ value br_inter_is_empty b1 b2 =
 
 value print_choice conf base p niveau_effectif =
   tag "form" "method=get action=\"%s\"" conf.command begin
+    html_p conf;
     Util.hidden_env conf;
     Wserver.wprint "<input type=hidden name=m value=C>\n";
     wprint_hidden_person conf base "" p;
@@ -326,6 +327,7 @@ value print_cousins conf base p lev1 lev2 =
     header conf title;
     cnt.val := 0;
     print_cousins_lev conf base max_cnt p lev1 lev2;
+    html_p conf;
     if cnt.val >= max_cnt then Wserver.wprint "etc...\n"
     else if cnt.val > 1 then
       Wserver.wprint "%s: %d %s.\n" (capitale (transl conf "total")) cnt.val

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.14 2004-12-14 09:30:10 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.15 2004-12-26 18:11:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -148,7 +148,7 @@ value print_birth conf base =
              else ();
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
-             Wserver.wprint "\n%s" (referenced_person_text conf base p);
+             Wserver.wprint "%s" (referenced_person_text conf base p);
              Wserver.wprint "</strong>,\n";
              if future then
                Wserver.wprint "<em>%s</em>.\n"
@@ -197,7 +197,7 @@ value print_death conf base =
              else ();
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
-             Wserver.wprint "\n%s" (referenced_person_text conf base p);
+             Wserver.wprint "%s" (referenced_person_text conf base p);
              Wserver.wprint "</strong>,\n";
              Wserver.wprint "%s <em>%s</em>"
                (transl_nth conf "died" (index_of_sex p.sex))
@@ -251,7 +251,7 @@ value print_oldest_alive conf base =
          do {
            Wserver.wprint "<li>\n";
            Wserver.wprint "<strong>\n";
-           Wserver.wprint "\n%s" (referenced_person_text conf base p);
+           Wserver.wprint "%s" (referenced_person_text conf base p);
            Wserver.wprint "</strong>,\n";
            Wserver.wprint "%s <em>%s</em>"
              (transl_nth conf "born" (index_of_sex p.sex))
@@ -294,7 +294,7 @@ value print_longest_lived conf base =
          do {
            Wserver.wprint "<li>\n";
            Wserver.wprint "<strong>\n";
-           Wserver.wprint "\n%s" (referenced_person_text conf base p);
+           Wserver.wprint "%s" (referenced_person_text conf base p);
            Wserver.wprint "</strong>%s" (Date.short_dates_text conf base p);
            Wserver.wprint "\n(%d %s)" d.year (transl conf "years old");
            Wserver.wprint ".\n";
@@ -333,13 +333,13 @@ value print_marr_or_eng conf base title list len =
              else ();
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
-             Wserver.wprint "\n%s"
+             Wserver.wprint "%s"
                (referenced_person_text conf base
                   (pget conf base (father cpl)));
              Wserver.wprint "</strong>\n";
-             Wserver.wprint "%s" (transl_nth conf "and" 0);
+             Wserver.wprint "%s\n" (transl_nth conf "and" 0);
              Wserver.wprint "<strong>\n";
-             Wserver.wprint "\n%s"
+             Wserver.wprint "%s"
                (referenced_person_text conf base
                   (pget conf base (mother cpl)));
              Wserver.wprint "</strong>,\n";

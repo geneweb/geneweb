@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.10 2004-12-14 09:30:11 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.11 2004-12-26 18:11:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -30,7 +30,6 @@ value print_child_person conf base p =
           (if occ == 0 then "" else " value=" ^ string_of_int occ);
       end;
     end;
-    Wserver.wprint "\n";
     tag "tr" "align=left" begin
       tag "td" begin
         Wserver.wprint "%s" (capitale (transl_nth conf "surname/surnames" 0));
@@ -41,7 +40,6 @@ value print_child_person conf base p =
           surname;
       end;
     end;
-    Wserver.wprint "\n";
   end
 ;
 
@@ -81,7 +79,7 @@ value print_children conf base ipl =
            let p = poi base ip in
            do {
              html_li conf;
-             Wserver.wprint "\n%s"
+             Wserver.wprint "%s"
                (reference conf base p (person_text conf base p));
              Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
              print_child_person conf base p;
@@ -100,16 +98,15 @@ value print_change conf base p u =
   let digest = digest_children base children in
   do {
     header conf title;
+    html_p conf;
     Wserver.wprint "%s" (reference conf base p (person_text conf base p));
     Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
-    Wserver.wprint "<p>\n";
     tag "form" "method=POST action=\"%s\"" conf.command begin
+      html_p conf;
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=ip value=%d>\n"
         (Adef.int_of_iper p.cle_index);
-      Wserver.wprint "\n<p>\n";
       Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
-      Wserver.wprint "\n";
       Wserver.wprint "<input type=hidden name=m value=CHG_CHN_OK>\n";
       print_children conf base children;
       Wserver.wprint "\n";

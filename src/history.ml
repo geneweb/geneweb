@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.9 2004-12-14 09:30:12 ddr Exp $ *)
+(* $Id: history.ml,v 4.10 2004-12-26 18:11:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -141,9 +141,9 @@ value print_history_line conf base line wiz k i =
         else do {
           if i = 0 then Wserver.wprint "<dl>\n" else ();
           Wserver.wprint "<dt><tt><b>*</b> %s</tt>\n" time;
-          Wserver.wprint "(%s)\n" (action_text conf action);
+          Wserver.wprint "(%s)" (action_text conf action);
           if user <> "" then do {
-            Wserver.wprint "<em>";
+            Wserver.wprint "\n<em>";
             if wiz = "" then
               Wserver.wprint "<a href=\"%sm=HIST;k=%d;wiz=%s\">" (commd conf) k
                 (Util.code_varenv user)
@@ -209,6 +209,7 @@ value print_history conf base ic =
     if n > 0 then Wserver.wprint "</dl>\n" else ();
     if pos > 0 then
       tag "form" "method=GET action=\"%s\"" conf.command begin
+        html_p conf;
         Util.hidden_env conf;
         Wserver.wprint "<input type=hidden name=m value=HIST>\n";
         Wserver.wprint "<input name=k size=3 value=%d>\n" k;

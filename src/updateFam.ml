@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.43 2004-12-14 09:30:18 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.44 2004-12-26 18:11:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -515,6 +515,7 @@ value print_del1 conf base fam =
     print_link_to_welcome conf True;
     Wserver.wprint "\n";
     tag "form" "method=POST action=\"%s\"" conf.command begin
+      html_p conf;
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
         (Adef.int_of_ifam fam.fam_index);
@@ -553,6 +554,7 @@ value print_inv1 conf base p fam1 fam2 =
     end;
     Wserver.wprint "\n";
     tag "form" "method=POST action=\"%s\"" conf.command begin
+      html_p conf;
       Util.hidden_env conf;
       Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
         (Adef.int_of_iper p.cle_index);
