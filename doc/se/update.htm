@@ -1,662 +1,1293 @@
-<HTML>
-<HEAD>
-<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
-<TITLE>GeneWeb - Ändringar</TITLE>
-</HEAD>
-<BODY LINK="#0000ff" VLINK="#800080">
 
-<H1>GeneWeb - &Auml;ndringar</H1>
-<P>Denna del behandlar hur du kan g&ouml;ra modifieringar i en databas med hj&auml;lp av din webbl&auml;sare. Om databas &auml;garen har installerat ett passord, m&aring;ste du ange den p&aring; v&auml;lkomst sidan f&ouml;r att ha r&auml;ttigheter att kunna g&ouml;ra olika uppdateringar. </P>
-<P>F&ouml;re start, &auml;r det viktigt att f&ouml;rst&aring; basic notationer: f&ouml;r det f&ouml;rsta, notationen f&ouml;r "f&ouml;rnamn", "efternamn", "nummer", och f&ouml;r det andra, notationen f&ouml;r "personer" och "familjer". Det g&ouml;r att du f&ouml;rst&aring;r n&auml;sta kapitel about uppdatering. </P>
-
-<UL>
-<LI><A HREF="#FSO">1.</A> F&ouml;rnamn, efternamn, nummer. </LI>
-<LI><A HREF="#PF">2.</A> Personer och Familjer. </LI>
-<LI><A HREF="#MAJ">3.</A> R&auml;ttigheter f&ouml;r uppdatering. </LI>
-<LI><A HREF="#Part">4.</A> Olika punkter: </LI>
-
-<UL>
-<LI><A HREF="#ModC">4.1.</A> Hur man modifierar f&ouml;rnamnet eller efternamnet f&ouml;r ett barn. </LI>
-<LI><A HREF="#AddC">4.2.</A> Hur man l&auml;gger till ett barn i en familj. </LI></UL>
-
-<LI><A HREF="#Form">5.</A> Formul&auml;r. </LI>
-
-<UL>
-<LI><A HREF="#AddF">5.1.</A> L&auml;gga till en Familj. </LI>
-<LI><A HREF="#ModF">5.2.</A> Modifiera en Familj. </LI>
-<LI><A HREF="#DelF">5.3.</A> Ta bort en Familj. </LI>
-<LI><A HREF="#ModP">5.4.</A> Modifiera en Person. </LI>
-<LI><A HREF="#DelP">5.5.</A> Ta bort en Person. </LI>
-<LI><A HREF="#SndP">5.6.</A> Skicka ett foto. </LI>
-<LI><A HREF="#DelPh">5.7.</A> Ta bort ett foto. </LI></UL>
-
-<LI><A HREF="#MrgP">6.</A> Hur man sl&aring;rsamman tv&aring; personer. </LI>
-<LI><A HREF="#MrgF">7.</A> Hur man sl&aring;rsamman tv&aring; familjer. </LI>
-<H4><LI><A NAME="FSO">1.</A> F&ouml;rnamn, efternamn, nummer </LI></H4>
-<LI>Varje person i databasen lokaliseras genom f&ouml;rnamnet, efternamnet och numret, denna sista information g&ouml;r det m&ouml;jligt att skilja p&aring; tv&aring; personer som har samma f&ouml;r- och efter namn. Denna set &auml; kallas personens "nyckel". </LI></UL>
-
-<P>Om det finns tv&aring; "Bertil Svensson" i databasen, kan du skilja dem &aring;t med numret. Vilket nummer som helst g&aring;r bra och du &auml;r inte tvingad att b&ouml;rja fr&aring;n 0 eller 1, inte heller l&auml;gga till en f&ouml;r varje g&aring;ng. Till exempel, din f&ouml;rsta "Bertil Svensson" kan ha nummer 7 och den andra, nummer 4. Den ena kommer att vara representerad av "Bertil", "Svensson", "7" och den andra av "Bertil", "Svensson", "4". </P>
-<EM><P>Du</EM> v&auml;ljer detta nummer, f&ouml;rutom om du startade fr&aring;n en GEDCOM fil: i det fallet, har "ged2gwb" valt numret &aring;t dig, f&ouml;r alla personer i databasen. </P>
-<P>Detta nummer syns bara p&aring; uppdaterings sidor: de syns inte p&aring; de normala sidorna. S&aring; om dy skriver in namnet "Bertil Svensson" p&aring; v&auml;lkomst sidan, <EM>GeneWeb</EM> ber dig att v&auml;lja mellan "Bertil Svensson 7" och "Bertil Svensson 4", men utan att visa numren. </P>
-<P>However, eftersom du &auml;r "guru" since du g&ouml;r uppdateringar, know that you can put en "punkt" och numret mellan f&ouml;rnamn och efternamn. Till exempel, p&aring; v&auml;lkomst sidan, kan du s&ouml;ka "Bertil .4 Svensson" och du kommer att finna den som har nummer 4 direkt. </P>
-<P>Notera ocks&aring; att: </P>
-
-<UL>
-<LI>Accents och versala bokst&auml;ver &auml;r not taken into account in this differenciation. S&aring; "bertil", "svensson", "5" ger access till samma person som "BERTIL", "svensson", "5" och "Bertil", "Svensson", "5". </LI>
-<LI>N&auml;r den inte &auml;r n&aring;got nummer, v&auml;rdet &auml;r faktiskt 0. Att inte s&auml;tta eller s&auml;tta det till 0 &auml;r samma sak. </LI></UL>
-
-<P>Det &auml;r viktigt att f&ouml;rst&aring; denna notation korrekt, d&auml;rf&ouml;r att n&aring;gra av felmeddelandena du f&aring;r ber&ouml;r detta. Till exempel, meddelanden som: </P>
-
-<UL>
-<LI>"Person existerar redan": detta betyder att du f&ouml;rs&ouml;ker skapa en person vars kombination "f&ouml;rnamn", "name", "nummer" finns redan reserverat, vilket h&auml;nder: </LI>
-
-<UL>
-<LI>Antingen i ett sammanhang d&auml;r du vill skapa en ny person. </LI>
-<LI>Eller i ett sammanhang d&auml;r du ville &auml;ndra f&ouml;rnamn, efternamn eller numret p&aring; en person. </LI></UL>
-
-<LI>"Ok&auml;nd person": det betyder att ingen i databasen corresponds till denna kombination "f&ouml;rnamn", "namn", "nummer", vilket h&auml;nder n&auml;r du vill l&auml;nka en given person i en familj som far, mor eller barn. </LI>
-<LI>Notera ocks&aring; att detta nummer inte ha n&aring;gonting att g&ouml;ra med numret f&ouml;r f&ouml;rnamn av adliga personer: "Edward III" har inte n&ouml;dv&auml;ndigtvis numret "3". However, och detta &auml;r inte en mots&auml;gelse, it is good usage, men inte obligatorisk, att v&auml;lja samma nummer n&auml;r det &auml;r m&ouml;jligt: du kommer att uppt&auml;cka att &auml;r mer praktiskt. </LI></UL>
-
-<P>Men mesta tiden, finns det ingen need att specificera ett nummer. Skriv inte n&aring;gonting: det kommer att vara 0 by default och det &auml;r Ok. </P>
-<H4><A NAME="PF">2.</A> Personer och Familjer </H4>
-<EM><P>GeneWeb</EM> databasen internt, hold two main notationer: personer och familjer: </P>
-
-<UL>
-<LI>Personer hold individual data such as f&ouml;rnamn, efternamn, nummer, dates och places of birth, baptism, death, the possible nobility titles, etc, etc. </LI>
-<LI>Familjer hold simple familjer: far, mor, barn, datum och place of possible marriage och skild. Notera att om en person &auml;r gift flera g&aring;nger, kommer det att vara s&aring; m&aring;nga "familjer" som det &auml;r gifterm&aring;l. </LI></UL>
-
-<P>Uppdateringarna av databasen &auml;r simply och exclusively uppdateringar av "personer" och "familjer": l&auml;gga till, modifiera eller ta bort. </P>
-
-<H4><A NAME="MAJ">3.</A> R&auml;ttigheter att uppdatera </H4>
-<P>Om du f&ouml;rst&aring;r de tidigare kapitlen kan du forts&auml;tta. </P>
-<P>F&ouml;r att komma &aring;t uppdateringarna, kan du: </P>
-
-<UL>
-<LI>Antingen klicka p&aring; "L&auml;gg till en familj" p&aring; v&auml;lkomst sidan. </LI>
-<LI>Eller klicka p&aring; "Uppdatera" p&aring; en personlig sida. </LI></UL>
-
-<P>P&aring; v&auml;lkomst sidan, genom att klicka p&aring; "L&auml;gg till en familj" allows dig att starta fylla i en tom databas. </P>
-<P>Du ser sedan en formul&auml;r f&ouml;r att l&auml;gga till en familj. Report till sektionen <A HREF="#AddF">L&auml;gg till en Familj</A>. </P>
-<P>P&aring; en personlig sida, genom att klicka p&aring; "Uppdatera" g&ouml;r det m&ouml;jligt f&ouml;r dig att se en sida d&auml;r n&aring;gra f&ouml;rslag finns. Dessa val beror av familje situationen f&ouml;r personen: </P>
-<OL>
-
-<LI>I alla fall, har du valet "Modifiera" och "Ta bort": det &auml;r modifiering eller att ta bort personen. Report till sektionen: </LI></OL>
-
-
-<UL>
-
-<UL>
-<LI><A HREF="#ModP">Modifiera en Person</A> </LI>
-<LI><A HREF="#DelP">Ta bort en Person</A> </LI></UL>
-</UL>
-<DIR>
-<DIR>
-<DIR>
-
-<P>Om databas &auml;garen gav beh&ouml;righet (se <A HREF="start.htm#Cnf">Konfigurations filen</A>), f&aring;r du valet "Skicka foto". Rapportera till sektionen: </P></DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-
-<UL>
-<LI><A HREF="#SndP">Skicka ett foto</A></LI>
-<LI><A HREF="#DelPh">Ta bort ett foto</A></LI></UL>
-</UL>
-
-<OL START=2>
-
-<LI>Om personen &auml;r gift, har du, f&ouml;r varje gifterm&aring;l valet "Modifiera/Familj" och "Ta bort/Familj". Report till sektionen: </LI></OL>
-
-
-<UL>
-
-<UL>
-<LI><A HREF="#ModF">Modifiera en Familj</A> </LI>
-<LI><A HREF="#DelF">Ta bort en Familj</A> </LI></UL>
-</UL>
-
-<OL START=3>
-
-<LI>Om det &auml;r flera gifterm&aring;l, finns det ett val "Byt" mellan varje gifterm&aring;l, g&ouml;r det m&ouml;jligt f&ouml;r dig att byta plats p&aring; familjerna. </LI></OL>
-
-<OL START=4>
-
-<LI>I andra fall, denna familj lista slutar med "L&auml;gg till/Familj". Du ser samma formul&auml;r som "L&auml;gg till en familj" p&aring; v&auml;lkomst sida, f&ouml;rutom att personen &auml;r f&ouml;r i fylld i formul&auml;ret p&aring; en av f&ouml;r&auml;ldrarna (beroende p&aring; k&ouml;n). Report till sektionen: </LI></OL>
-
-
-<UL>
-
-<UL>
-<LI><A HREF="#AddF">L&auml;gg till en Familj</A> </LI></UL>
-</UL>
-
-<OL START=5>
-
-<LI>Vid slutet, om personen inte har f&ouml;r&auml;ldrar, valet "L&auml;gg till/F&ouml;r&auml;ldrar" &auml;r f&ouml;resl&aring;s. This also gives the formul&auml;r "L&auml;gg till/Familj" with personen prefilled som ett barn och hans efternamn i "namn" f&auml;lt f&ouml;r fadern. Report till sektionen: </LI></OL>
-
-
-<UL>
-
-<UL>
-<LI><A HREF="#AddF">L&auml;gg till en Familj</A> </LI></UL>
-</UL>
-<DIR>
-<DIR>
-
-<P>Obs: </P></DIR>
-</DIR>
-
-
-<UL>
-<LI>Alla dessa val leder antingen till ett formul&auml;r att fylla i, eller till en fr&aring;ga: du g&ouml;r ingenting definitivt genom att klicka p&aring; denna sida: it is always possible to go back. </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>S&aring; "Ta bort" (val nummer 1) kommer att ta bort personen bara om du klickar p&aring; "Ok" p&aring; n&auml;sta sida. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-<LI>I formul&auml;r, kan det h&auml;nda att en del f&auml;lt &auml;r f&ouml;r i fyllda. Detta betyder inte att du inte kan &auml;ndra inneh&aring;llet. </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>S&aring; i "L&auml;gg till/F&ouml;r&auml;ldrar" (val nummer 5), efternamnet av fadern &auml;r f&ouml;r i fyllt. Men detta &auml;r bara commodity due to the fact att f&auml;der och barn har oftast samma efternamn: men om fadern har ett annat kan du &auml;ndra det. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-<H4><A NAME="Part">4.</A> N&aring;gra speciella punkter </H4>
-<P>Dessa punkter &auml;r i fetstil d&auml;rf&ouml;r att de &auml;r m&ouml;jliga fallgropar: f&ouml;lj indicated procedure. </P>
-<H4><A NAME="ModC">4.1.</A> Hur man modifierar f&ouml;rnamnet eller efternamnet f&ouml;r ett barn </H4>
-<P>Exempel: i familjen f&ouml;r "Bertil Svensson" och "Ulla Karlsson", har ett av barnen d&ouml;pts till "Robert", fast hans f&ouml;rnamn egentligen var "Filip": </P>
-<P>Vad du skall g&ouml;ra: </P>
-
-<UL>
-<LI>G&aring; till den personliga sidan f&ouml;r "Robert Svensson", klicka p&aring; "Uppdatera", sedan "&Auml;ndra" och forts&auml;tt som det st&aring;r i avdelningen "Modifiera en Person" (v&auml;lj nummer 1 i avdelning 3). </LI></UL>
-
-<P>Vad du <I>inte</I> skall g&ouml;ra: </P>
-
-<UL>
-<LI>Anv&auml;nd inte "Modifiera/Familj" (v&auml;lj nummer 2 i avdelning 3). </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>Om du g&ouml;r det och &auml;ndrar "Robert" till "Filip" i formul&auml;r: </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-
-<UL>
-<LI>Detta kommer att klippa av kopplingen mellan "Robert" och hans f&ouml;r&auml;ldrar, och "Robert" forts&auml;tter att heta "Robert Svensson", men utan f&ouml;r&auml;ldrar. </LI>
-<LI>Detta kommer att g&ouml;ra att "Filip Svensson", om han existerar och inte redan har f&ouml;r&auml;ldrar, som ett barn till paret. </LI>
-<LI>Men om "Filip Svensson" inte finns i databasen eller han finns men har f&ouml;r&auml;ldrar redan, ett felmeddelande kommer att visas och ingenting kommer att &auml;ndras (som tur &auml;r). </LI></UL>
-
-</UL>
-
-<H4><A NAME="AddC">4.2.</A> Hur man l&auml;gger till ett barn i en familj</H4>
-
-<P>Till exempel, i familjen av "Bertil Svensson" och "Ulla Karlsson", vill du l&auml;gga till "Herbert" som ett barn: </P>
-<P>Vad du m&aring;ste g&ouml;ra: </P>
-
-<UL>
-<LI>G&aring; till den personliga sidan f&ouml;r en av f&ouml;r&auml;ldrarna, klicka p&aring; "Uppdatera", och sedan "Modifiera/Familj" (v&auml;lj nummer 2 i avdelning 3), och l&auml;gg till barnet som det st&aring;r i avdelningen "Modifiera en Familj". </LI></UL>
-
-<P>Vad du <I>inte</I> ska g&ouml;ra: </P>
-
-<UL>
-<LI>Anv&auml;nd inte "L&auml;gg till/Familj" (nummer 4 i avdelning 3) vilket inte betyder "l&auml;gg till ett barn i en familj" utan "l&auml;gg till ett gifterm&aring;l" och skapar en ny enhet "familj" med en ny gem&aring;l. </LI>
-<LI>Moreover, om barnet redan fanns i databasen och du vill l&auml;gga till den i listan av barn f&ouml;r ett par som redan finns, anv&auml;nd inte "L&auml;gg till/F&ouml;r&auml;ldrar" (val nummer 4 i avdelningen 3) heller. </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>Valet "L&auml;gg till/F&ouml;r&auml;ldrar" &auml;r rather anv&auml;nt att l&auml;gga till f&ouml;r&auml;ldrar till en av dina stamf&auml;der f&ouml;r att up a little mer. Detta val skapar ocks&aring; en ny familj. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-<H4><A NAME="Form">5.</A> Formul&auml;r </H4>
-<H4><A NAME="AddF">5.1.</A> L&auml;gg till en Familj </H4>
-<P>Du ser detta formul&auml;r med &ouml;verskrift "L&auml;gg till/Familj": </P>
-
-<UL>
-<LI>Antingen fr&aring;n v&auml;lkomst sidan, when klicking p&aring; "L&auml;gg till en familj"; i detta fallet, no area of the formul&auml;r is prefilled, </LI>
-<LI>Eller fr&aring;n ett personlig sida, after having clicked on "Update", then "L&auml;gg till/Familj"; in this case, the areas "f&ouml;rnamn", "efternamn" och "nummer" are prefilled, for the father eller the mother according to the sex of personen, </LI>
-<LI>Eller, i samma sammanhang, efter att ha klickat p&aring; "L&auml;gg till/F&ouml;r&auml;ldrar", om detta val var f&ouml;reslagit; i detta fallet kommer "efternamn" f&auml;ltet av fadern att vara f&ouml;r i fyllt, s&aring; f&auml;lten "f&ouml;rnamn", "efternamn" och "nummer" av deras f&ouml;rsta (och enda) barn. Observera att du kan &auml;ndra efternamnet p&aring; fadern, om det &auml;r annorlunda. </LI></UL>
-
-<P>This formul&auml;r behaves exactly like "Modifiera a Familj", except that it creates a new familj. As many times you use it, as many times a familj is created. </P>
-<P>This means that if you notice that you made mistakes after having validated the formul&auml;r, do not do "L&auml;gg till/Familj" again, but "Modifiera/Familj"! </P>
-<P>Report to the following paragraph to see how to fill the formul&auml;r. </P>
-<H4><A NAME="ModF">5.2.</A> Modifiera en Familj </H4>
-<P>You see this formul&auml;r from a personal record, after having clicked on "Update", then "Modifiera/Familj". This formul&auml;r is prefilled by the "f&ouml;rnamn", "efternamn" och "nummer" för fadern, modern och barnen, as well as all the possible data relative to this familj. </P>
-<P>This formul&auml;r behaves like "L&auml;gg till/Familj" of the previous section (except that there is no creation of a new familj). What follows is therefore valid for the formul&auml;r "L&auml;gg till/Familj". </P>
-<STRONG><P>Filling</P>
-</STRONG><P>Alla f&auml;lt (f&ouml;r i fyllda eller inte) kan fyllas i, raderas eller modifieras. N&auml;r du &auml;r f&auml;rdig filling, erasing och modifying all you judge necessary, go to the end of the formul&auml;r och commit the formul&auml;r by clicking on "Ok". </P>
-<P>In front of the area where there are persons, remark the selection "L&auml;nk" och "Skapa". According to the case, it will be preselected to "L&auml;nk" eller "Skapa". You can change this selection according to what you want to do. </P>
-
-<UL>
-<LI>"Link" means that personen already exists in the databas. When committing, the system checks that this persons exists och, for a parent, that he is of the good sex. </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>Note that as it is a research by "nyckel" (se f&ouml;rsta avdelningen), it is not necessary to respect accents, lowercase och uppercase. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-<LI>"Create" means that personen does not exists in the databas och that you ask the system, when committing, to create him with the indicated f&ouml;rnamn, efternamn och nummer. </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>Here, what is different from "Link", you must write the accents, uppercases och lowecases correctly: personen will be created with the spelling you write there. 
-<P>
-You can enter the child's sex and his day of birth. For his other personal data, you will have to do "update" later from his personal page.</P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-<P>When committing, the cases "child" whose area "f&ouml;rnamn" is empty are ignored, whatever the contents of the other areas. It is like they do not exist. </P>
-<P>For barnren, f&auml;ltet "name" is facultative: if it is absent, the name of the father is taken. </P>
-<STRONG><P>N&aring;gra modifieringar</P>
-</STRONG><P>Here are some modifications you can do: </P>
-
-<UL>
-<STRONG><LI>F&ouml;r l&auml;gga till ett barn</STRONG>, if there is no free area for him, click first on the button "Infoga/Barn" according to the place where you want to add him in the familj. Then click on "Ok" at end of the formul&auml;r. </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>Remark: this will not commit the formul&auml;r immediately. The system will just propose you another formul&auml;r with a reserved place for barnet eller barnren you want to add. </P>
-<P>Therefore warning: as long as you click on "Infoga/Barn", when you click in "Ok", there is no committing: just another bigger formul&auml;r. You must not interpret this button as "add me this barn I just wrote": the system sees it, don't worry. </P>
-<P>The barn you type in the area you allocated for him may be an existing person in the databas. In this case, select "Link" instead of "Create". </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-<STRONG><LI>F&ouml;r att ta bort ett barn</STRONG>, simply erase his f&ouml;rnamn. As said above, cases whose f&ouml;rnamn area is empty are ignored when committing. Remark that it will not delete personen: he will simply be removed formul&auml;r the list of barnetren och will be himself without f&ouml;r&auml;ldrar. </LI>
-<STRONG><LI>F&ouml;r att &auml;ndra ett barns position</STRONG>, the simplest way is to click on "Infoga/Barn" at the position you want to set him, och do "Ok". In the new proposed formul&auml;r, type barnet's data in the new case, select "Link" instead of "Create" och erase his f&ouml;rnamn in the old area. </LI>
-<STRONG><LI>F&ouml;r att byta positionen av tv&aring; barn</STRONG>, you can proceed with the same way, passing through a new case in ellerder to simply cut ant paste. Do not forget to select "Link". </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>You can also do it directly, without adding a new room: the problem is you have to remember one of the two names, when you erase it to type the other one at his location. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-<STRONG><P>Committing</P>
-</STRONG><P>The committing takes place when you click on "Ok". As you as you do not do it, no change is done in the databas. </P>
-<P>Remark also that, as it is said above, that if you selected one eller several "Infoga/Barn", just a new formul&auml;r is proposed: this is <EM>not</EM> the proper committing. </P>
-<P>When the committing is really done, you must see a new sida whose title is: </P>
-
-<UL>
-<LI>Antingen: Familj<STRONG> tilllagd eller modifierad</STRONG> </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>You see them the f&ouml;r&auml;ldrar' names on which you can click. </P>
-<P>Maybe you see also warnings. They concern dates eller barnren ellerder inconsistencies. The update is done anyway, but it is preferable to fix them, if necessary. </P>
-<P>Clicking on one of the f&ouml;r&auml;ldrar, you see his personal record. But your update may not be visible. Webbl&auml;sare use to keep already displayed sidas in memory, och probably display the old version. Do "reload the sida" in your webbl&auml;sare to really see your modifications. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-<LI>Eller: <STRONG>Fel</STRONG> </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>The sida indicates the encountered ett fel. Go back och fix. You can also give up... doing nothing och go on navigating in the databas. </P>
-<P>Om felet indicates you that some person already exists, it means you wanted to create a person whose combination "f&ouml;rnamn", "efternamn", "number" is already present in the databas. </P>
-<P>L&ouml;sning: </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-
-<UL>
-<LI>If you really wanted to create a new person, go back och change his nummer. Remark that the error sida give you the first free, therefore available, nummer: choose it eller another one. If there are several persons with the same name, their list is displayed. </LI>
-<LI>If it was the good person person you wanted to speak about, go back och change "Create" into "Link". </LI>
-
-<UL>
-<LI>Then do "Ok" again. </LI></UL>
-</UL>
-</UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>Om felet indicated you that some person does not exist, this means that you selected "Link" in front of an non existing person. Maybe you mischoosed his nummer? Eller did you want actually to create a new person? </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-<H4><A NAME="DelF">5.3.</A> Ta bort en Familj </H4>
-<P>You see this formul&auml;r, titled "Delete/Familj" from a personal record, after having clicked on "Update", the "Delete/Familj". </P>
-<P>The formul&auml;r only holds the button "Ok" to allow you to do it really. You can still give up. </P>
-<P>Om du klickar i "Ok", kommer en ny sida upp med rubriken "Familj bort tagen". </P>
-<P>The familj is removed from the databas: the father, the mother och barnetren scatter. However none of them is deleted: just the father och the mother are no more married, they have no more these barnren (they may have other ones from other marriages, which are persisting), barnetren have no more f&ouml;r&auml;ldrar. </P>
-
-<H4><A NAME="ModP">5.4.</A> Modifiera en Person </H4>
-<P>Du ser detta formul&auml;r med rubrik "Modifiera/Person" fr&aring;n en personlig sida, efter att ha klickat p&aring; "Uppdatera", och sedan "Modifiera". Formul&auml;ret &auml;r f&ouml;r i fyllt med alla data om personen. </P>
-<STRONG><P>I fyllnad</P>
-</STRONG><P>All areas (prefilled eller not) can be filled, erased eller modified. When you filled, erased, modified all you judge necessary, go to the end of the formul&auml;r och commit the formul&auml;r by clicking on "Ok". </P>
-<P>Some buttons hold "Infoga ...": "Infoga smeknamn", "Infoga alias", etc. </P>
-<P>Warning: this is not to add the corresponding smeknamn eller alias, etc to personen, but to ask for a new formul&auml;r with a reserved place for anothersmeknamn, another alias, etc. </P>
-<P>So, if you do "Ok" after having selected one eller several of these buttons, a new bigger formul&auml;r is proposed to you, och no updating is done yet. </P>
-<P>Therefore, if, efter ett "Ok", kan du se ett nytt modifierings formul&auml;r, this means that your committing has not been recorded (not yet), even if you filled a lot of areas. </P>
-<STRONG><P>Olika f&auml;lt</P>
-</STRONG><P>Remark the meaning of the different f&auml;lts, specially the use of "publikt namn", "smeknamn", "alias", etc which all have a very specific meaning. </P>
-
-<UL>
-<STRONG><LI>F&ouml;rnamn</STRONG> och <STRONG>efternamn</STRONG> har den vanliga meningen. Med <STRONG>Num</STRONG> (nummer), har personen en unik "access nyckel" as indicated in the beginning of this chapter. </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>We suggest to put the common f&ouml;rnamn in the f&ouml;rnamn area. The other f&ouml;rnamns (complete f&ouml;rnamns, other possible f&ouml;rnamns, other spelling of f&ouml;rnamns, etc) must rather go to the area "f&ouml;rnamn alias" (below). The names with nummer as for noble och royal persons must rather go to the area "public name". </P>
-<P>This is because the f&ouml;rnamn is recorded in the list of f&ouml;rnamns. It is possible to know what is the most frequent f&ouml;rnamn, see which other persons have the same f&ouml;rnamn, etc. The other kinds of f&ouml;rnamns would risk to be in one only exemplary. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-<STRONG><LI>Publikt namn</STRONG> &auml;r det namn personen &auml;r k&auml;nd med. Exempel: "Edward VII" (hans f&ouml;rnamn &auml;r "Edward" och hans efternamn "Windsor"). </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>The persons having a public name are accessible in the navigation by this name. </P>
-<P>If there is a public name, it is displayed as a title in his personal record, instead of his "f&ouml;rnamn efternamn" which are relegated below och in smaller characters. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-<STRONG><LI>Foto</STRONG> &auml;r en ".gif" eller ".jpg" fil associerad till personen och with will be displayed in his personal record. This can be an URL address (starting with "http://...") eller just a name the system will search in the directory "images", subdirectory "base" (where "base" is the name of the databas) while displaying. </LI></UL>
-
-<P>If you don't specify a file name, there is a default name. </P>
-<P>This name is constitued of: the f&ouml;rnamn, a dot, numret, another dot, the efternamn, all in lowercases, without accents och all the non letter characters are converted into spaces. </P>
-<P>Exempel, personen named "Anne-C&eacute;cile Dupont de Nemours" has as default photo name: </P>
-<PRE>   anne cecile.0.dupont de nemours</PRE>
-<EM><P>GeneWeb</EM> search a file with this name followed by ".gif" eller ".jpg" in the above directory of the images of the databas. </P>
-
-<UL>
-<STRONG><LI>Smeknamn</STRONG> is the part of the name attached to the public name for famous persons. So is "den Fete" f&ouml;r "Ludvig VI den Fete". </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>Persons are accessible with this smeknamn at the place of their efternamn. So "Ludvig VI den Fete" is accessible by "Ludvig VI" (publikt namn), "Ludvig VI den Fete", "Ludvig den Fete", "Ludvig Capet", etc. Let us note that "den Fete" is nevertheless not considered alone as a efternamn. </P>
-<P>There may be several smeknamn: so "William Er&ouml;rvraren" is known also as "William Bastarden". Therefore you need an area for the smeknamnen "Er&ouml;vraren" och another one for "Bastarden". This is why the "Infoga/Smeknamn" is useful. </P>
-<P>If there is a smeknamn, det publika namnet (eller f&ouml;rnamnet om det inte finns n&aring;got publikt namn), followed by the smeknamn are displayed as title in personenal record, instead of the normal "f&ouml;rnamn efternamn", which is relagated below, in smaller characters. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-<STRONG><LI>Alias</STRONG> is a name personen is known by, without being an alternative for a f&ouml;rnamn (like the "public name" is, for example). </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>S&aring;ledes, "Norma Jean Mortenson" &auml;r k&auml;nd som "Marilyn Monroe". Notera att alias &auml;r i en del: no question to accept combinations like "Norma Jean Monroe" eller "Marilyn Mortenson". </P>
-<P>If there are one eller several aliases, they are displayed in bold small characters below the title. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-<STRONG><LI>F&ouml;rnamns alias</STRONG> kan ha flera usages: </LI>
-
-<UL>
-<LI>Det kan vara den kompletta lista av f&ouml;rnamn. </LI>
-<LI>Dett kan vara ett little namn anv&auml;ndt f&ouml;r close relations: "Pelle" for "Per". </LI>
-<LI>This can be another f&ouml;rnamn, eller the same one but with a different spelling, in case of persons of old times, whom f&ouml;rnamn is not sure, eller written differently in different sources. </LI>
-
-<UL>
-<LI>Det kan finnas flera f&ouml;rnamns aliases. </LI></UL>
-</UL>
-</UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
-
-<P>First name aliases can be used in place of the f&ouml;rnamn in requests, but they are not considered as real f&ouml;rnamns, i.e. they are not recorded in the lists by f&ouml;rnamns, etc. </P>
-<P>Om det finns f&ouml;rnamns aliaser, visas dem p&aring; den personliga sidan, i gemena bokt&auml;ver under titeln. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
-
-
-<UL>
-<STRONG><LI>Efternamns alias</STRONG> kan anv&auml;ndas som ett alternativt efternamn, om du vill ha en annan version av namnet, t. ex. Med en annan stavning. Dess anv&auml;ndning &auml;r inte frekvent. </LI>
-<STRONG><LI>F&ouml;dd</STRONG> tilll&aring;ter indicate datum och platser f&ouml;r f&ouml;delse och dop. Inga speciella problem. </LI>
-<STRONG><LI>D&ouml;d</STRONG> allows att indicate information f&ouml;r d&ouml;den.
-No particular problem except the notion of "automatic choice" which we
-explain here.
-
-<p>
-
-The "automatic choice" is present when the selection of the first menu
-of the "death" area displays a "-". It indicates that one does not know
-if the person is dead or not.
-
-<p>
-
-In this case, if you do not indicate any death date nor place, the
-system chooses for you the fact that the person is dead or not,
-according to his birth date: if he is less than 80 years old, it
-decides "not dead", between 81 and 120 years old, it decides "don't
-know", and more than 120 years old, it decides "dead".
-
-<p>
-
-If this automatic choice does not fit, you can select yourself the good
-choice in this first menu, instead of the displayed "-".
-
-<p>
-
-Notice that the age of the persons whose death is "don't know" is not
-displayed in their personal page nor in the anniversaries. Therefore, if
-a person is between 81 and 120 years old and is not dead, select "not dead".
-
+<head><title>GeneWeb - Ändringar</title>
+</head>
+
+<body>
+
+<h1>GeneWeb - Ändringar</h1>
+
+<p>Denna del behandlar hur du kan göra modifieringar i en
+databas med hjälp av din webbläsare. Om databas ägaren har
+installerat ett passord, måste du ange det på välkomst sidan
+för att ha rättigheter att uppdatera. </p>
+
+<p>Före start, är det viktigt att förstå de grundläggande
+notationerna: för det första, notationen för
+&quot;förnamn&quot;, &quot;efternamn&quot;, &quot;nummer&quot;
+och för det andra, notationen för &quot;personer&quot; och
+&quot;familjer&quot;. Det gör att du förstår nästa kapitel
+som handlar om uppdateringar. </p>
+
+<ul>
+    <li><a href="#FSO">1.</a> Förnamn, efternamn, nummer. </li>
+    <li><a href="#PF">2.</a> Personer och Familjer. </li>
+    <li><a href="#MAJ">3.</a> Rättigheter för uppdatering. </li>
+    <li><a href="#Part">4.</a> Olika punkter: </li>
+    <ul>
+            <li><a href="#ModC">4.1.</a> Hur man modifierar
+                förnamnet eller efternamnet för ett barn. </li>
+            <li><a href="#AddC">4.2.</a> Hur man lägger till ett
+                barn i en familj. </li>
+        </ul>
+    </li>
+    <li><a href="#Form">5.</a> Formulär. </li>
+    <ul>
+            <li><a href="#AddF">5.1.</a> Lägga till en Familj. </li>
+            <li><a href="#ModF">5.2.</a> Modifiera en Familj. </li>
+            <li><a href="#DelF">5.3.</a> Ta bort en Familj. </li>
+            <li><a href="#ModP">5.4.</a> Modifiera en Person. </li>
+            <li><a href="#DelP">5.5.</a> Ta bort en Person. </li>
+            <li><a href="#SndP">5.6.</a> Skicka ett foto. </li>
+            <li><a href="#DelPh">5.7.</a> Ta bort ett foto. </li>
+            <li><a href="#ChgC">5.8.</a> Ändra barnens namn. </li>
+        </ul>
+    </li>
+    <li><a href="#MrgP">6.</a> Hur man slårsamman två personer.
+    </li>
+    <li><a href="#MrgF">7.</a> Hur man slårsamman två familjer.
+    </li>
 </ul>
+
+<p><a name="FSO"><strong>1.</strong></a><strong> Förnamn,
+efternamn, nummer</strong></p>
+
+Varje person i databasen lokaliseras genom förnamnet,
+efternamnet och numret, denna sista information gör det
+möjligt att skilja på två personer som har samma för-
+och efternamn. Denna uppsättning kallas personens
+&quot;nyckel&quot;.
+
+<p>Om det finns två &quot;Bertil Svensson&quot; i databasen, kan
+du skilja dem åt med numret. Vilket nummer som helst går bra
+och du är inte tvingad att börja från 0 eller 1 och inte
+heller lägga till ett för varje gång. Till exempel, din
+första &quot;Bertil Svensson&quot; kan ha nummer 7 och den andra
+nummer 4. Den ena kommer att vara representerad av
+&quot;Bertil&quot;, &quot;Svensson&quot;, &quot;7&quot; och den
+andra av &quot;Bertil&quot;, &quot;Svensson&quot;, &quot;4&quot;.
+</p>
+
+<p><em>Du</em> väljer detta nummer, förutom om du startade
+från en GEDCOM fil: i det fallet, har &quot;ged2gwb&quot; valt
+numret åt dig för alla personer i databasen. </p>
+
+<p>Detta nummer syns bara på uppdaterings sidor: de syns inte
+på de normala sidorna. Så om du skriver in namnet &quot;Bertil
+Svensson&quot; på välkomst sidan ber <em>GeneWeb</em> dig att
+välja mellan &quot;Bertil Svensson 7&quot; och &quot;Bertil
+Svensson 4&quot;, men utan att visa numren. </p>
+
+<p>Men eftersom du är en &quot;dataguru&quot; (eftersom du gör
+uppdateringar), kom i håg att du kan skriva en &quot;punkt&quot;
+och numret mellan förnamn och efternamn. Till exempel, på
+välkomst sidan, kan du söka &quot;Bertil .4 Svensson&quot; och
+du kommer att finna den som har nummer 4 direkt. </p>
+
+<p>Notera också att: </p>
+
+<ul>
+    <li>Accenter och versala bokstäver är inte med tagna i
+        denna differentiering. Så &quot;bertil&quot;,
+        &quot;svensson&quot;, &quot;5&quot; ger åtkomst till
+        samma person som &quot;BERTIL&quot;,
+        &quot;svensson&quot;, &quot;5&quot; och
+        &quot;Bertil&quot;, &quot;Svensson&quot;, &quot;5&quot;. </li>
+    <li>När det inte står något nummer är värdet faktiskt 0.
+        Att inte sätta eller sätta det till 0 är samma sak. </li>
+</ul>
+
+<p>Det är viktigt att förstå denna notation korrekt, därför
+att några av felmeddelandena du får berör detta. Till exempel,
+meddelanden som: </p>
+
+<ul>
+    <li>&quot;Personen existerar redan&quot;: detta betyder att
+        du försöker skapa en person vars kombination
+        &quot;förnamn&quot;, &quot;efternamn&quot;,
+        &quot;nummer&quot; redan finns reserverat, vilket
+        händer: </li>
+    <ul>
+<p>
+            <li>Antingen i ett sammanhang där du vill skapa en
+                ny person. </li>
+            <li>Eller i ett sammanhang där du ville ändra
+                förnamn, efternamn eller numret på en person. </li>
+        </ul>
+    </li>
+<p>
+    <li>&quot;Okänd person&quot;: det betyder att ingen i
+        databasen stämmer överens med denna kombination
+        &quot;förnamn&quot;, &quot;efternamn&quot;,
+        &quot;nummer&quot;, vilket händer när du vill länka en
+        given person i en familj som far, mor eller barn. </li>
+</ul>
+Notera också att detta nummer inte har någonting att
+göra med numret för förnamn av adliga och kungliga
+personer: &quot;Edward III&quot; har inte nödvändigtvis
+numret &quot;3&quot;. Men (och detta är inte en
+motsägelse) är det god sed, men inte obligatorisk, att
+välja samma nummer när det är möjligt: du kommer att
+upptäcka att det är mer praktiskt.
+
+
+<p>Men för det mesta, finns det inget behov att specificera ett
+nummer. Om du inte skriver någonting blir numret 0 och det är
+Ok. </p>
+
+<h4><a name="PF">2.</a> Personer och Familjer </h4>
+
+<p><em>GeneWeb</em> databasen består av två delar internt:
+personer och familjer: </p>
+
+<ul>
+    <li>Personer innehåller individuella data som förnamn,
+        efternamn, nummer, datum och födelseplats, dop,
+        dödsfall, adelstitlar, etc. </li>
+    <li>Familjer består helt enkelt av familjer: far, mor, barn,
+        datum och platsen för möjligt giftermål och slutligen
+        möjlig skilsmässa. Notera att om en person är gift
+        flera gånger, kommer det att vara så många
+        &quot;familjer&quot; som det är giftermål. </li>
+</ul>
+
+<p>Uppdateringarna av databasen är endast uppdateringar av
+&quot;personer&quot; och &quot;familjer&quot;: tillägg,
+modifieringar eller raderingar. </p>
+
+<h4><a name="MAJ">3.</a> Rättigheter att uppdatera </h4>
+
+<p>Om du förstår de tidigare kapitlen kan du nu fortsätta. </p>
+
+<p>För att komma åt uppdateringarna, kan du: </p>
+
+<ul>
+    <li>Antingen klicka på &quot;Lägga till en familj&quot; på
+        välkomst sidan. </li>
+    <li>Eller klicka på &quot;Uppdatera&quot; på en personlig
+        sida. </li>
+</ul>
+
+<p>På välkomst sidan, genom att klicka på &quot;Lägg till en
+familj&quot; tillåter dig att starta och fylla i en tom databas.
+</p>
+
+<p>Du ser sedan ett formulär för att lägga till en familj. Se
+vidare <a href="#AddF">Lägga till en Familj</a>. </p>
+
+<p>På en personlig sida, genom att klicka på
+&quot;Uppdatera&quot; gör det möjligt för dig att se en sida
+där några förslag finns. Dessa val beror av familjens
+situation för personen: </p>
+
+<ol>
+    <li>I alla fall, har du valet &quot;Modifiera&quot; och
+        &quot;Ta bort&quot;: det är modifiering eller att ta
+        bort personen. Se vidare: </li>
+</ol>
+
+<ul>
+    <ul>
+            <li><a href="#ModP">Modifiera en Person</a> </li>
+            <li><a href="#DelP">Ta bort en Person</a> </li>
+        </ul>
+    </li>
+</ul>
+
+<dir>
+    <dir>
+            <li>Om databas ägaren gav behörighet (se <a
+                href="start.htm#Cnf">Konfigurations filen</a>),
+                får du valet &quot;Skicka foto&quot;. Se vidare:
+            </li>
+        </dir>
+    </li>
+</dir>
+
+<ul>
+    <ul>
+            <li><a href="#SndP">Skicka ett foto</a></li>
+            <li><a href="#DelPh">Ta bort ett foto</a></li>
+        </ul>
+    </li>
+</ul>
+
+<ol start="2">
+    <li>Om personen är gift, har du för varje giftermål valet
+        &quot;Modifiera/Familj&quot; och &quot;Ta
+        bort/Familj&quot;. Se vidare:</li>
+</ol>
+
+<ul>
+    <ul>
+            <li><a href="#ModF">Modifiera en Familj</a> </li>
+            <li><a href="#DelF">Ta bort en Familj</a> </li>
+        </ul>
+    </li>
+</ul>
+
+<ol start="3">
+    <li>Om det är flera giftermål, finns det ett val &quot;Byt
+        ordning&quot; mellan varje giftermål, det gör det
+        möjligt för dig att byta plats på familjerna. </li>
+</ol>
+
+<ol start="4">
+    <li>I andra fall, denna familj lista slutar med &quot;Lägg
+        till/Familj&quot;. Du ser samma formulär som &quot;Lägg
+        till en familj&quot; på välkomst sida, förutom att
+        personen är förifylld i formuläret på en av
+        föräldrarna (beroende på kön). Se vidare:</li>
+</ol>
+
+<ul>
+    <ul>
+            <li><a href="#AddF">Lägga till en Familj</a> </li>
+        </ul>
+    </li>
+</ul>
+
+<ol><li value=5> Ett val föreslås att ändra barnens namn. Detta medger att ändra förnamnet och efternamnet för alla
+barnen för en person i ett formulär. Se vidare:
+
+<p>
 
 <ul>
 
-<STRONG><LI>Yrke</STRONG> holds the profession. If you want to put a nobility title, use rather f&auml;ltets "title" below. </LI>
-<STRONG><LI>Titel</STRONG> holds a nobility title. There may be several of them. To have a formul&auml;r with other places for the titles, click on one eller several "Infoga/Titel", go to end of formul&auml;r och do "Ok". </LI><DIR>
-<DIR>
+<li> <a href="#ChgC">Ändra barnens namn</a>
+
+</ul>
+
+</ol>
+
+<ol start="6">
+    <li>Vid slutet, om personen inte har föräldrar, föreslås
+        valet &quot;Lägg till/Föräldrar&quot;. Det ger också
+        formuläret &quot;Lägg till/Familj&quot; med personen
+        förifylld som ett barn och personens efternamn i
+        &quot;namn&quot; fältet för fadern. Se vidare: </li>
+</ol>
+
+<ul>
+    <ul>
+            <li><a href="#AddF">Lägga till en Familj</a> </li>
+        </ul>
+    </li>
+</ul>
+
+Obs:
+
+<ul>
+    <li>Alla dessa val leder antingen till ett formulär att
+        fylla i, eller till en fråga: du gör ingenting
+        definitivt genom att klicka på denna sida: det är
+        alltid möjligt att gå tillbaka.
+<p>
+        Så &quot;Ta bort&quot; (val
+        nummer 1) kommer att ta bort
+        personen bara om du klickar på
+        &quot;Ok&quot; på nästa sida.
+</ul>        
+
+<ul>
+    <li>I formulär, kan det hända att en del fält är
+        förifyllda. Detta betyder inte att du inte kan ändra
+        innehållet. </li>
+<p>
+        Så i &quot;Lägg
+        till/Föräldrar&quot; (val
+        nummer 5), är efternamnet för
+        fadern förifylld. Men detta är
+        bara en bekvämlighet på grund
+        av att fäder och barn oftast har
+        samma efternamn: men om fadern
+        har ett annat kan du ändra det.
+
+</ul>
 
 
-<UL>
-<LI>Titles are composed on two parts: the title itself och the place. The title itself holds the designation: "earl", "duke", "king", etc. The place holds the complement: "of Warwick", "of Saxony", "of England", etc. </LI></UL>
-</DIR>
-</DIR>
-</UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
+<h4><a name="Part">4.</a> Några speciella punkter </h4>
 
-<P>Note the particle: when displayed, you see the combination of the disignation och the place: "earl of Warwick", "duke of Saxony", "king of England", which are clickable areas, allowing to see all persons having this title. </P>
-<P>But the separation of these notions allows to select, for example, all the "earl", all the "duke", all the "king" (plural must not be used), och conversely all titles ending with "of Warwick", "of Saxony", "of England", etc. </P>
-<P>The f&auml;lt "name" represents a public name associated with the title. Till exempel, "Charles Quint" is named "Charles I" as "king of Spain", "Charles IV" as "king of Sicilia", etc. </P>
-<P>F&auml;ltet "Nte" anv&auml;nds f&ouml;r titlar med ett nummer. Exempel: f&ouml;r den "5e hertigen av Hamilton", skriv v&auml;rdet "5". Blanda inte ihop det med "Edward VII" vars nummer s&auml;ger att han &auml;r den 7e "Edward" lineage, inte den 7e "konungen av Storbritannien". </P>
-<P>The button "Main title" allows to indicate, when this person is displayed with a simple way (in the sida of his spouse, for example, eller in those of his barnren), which title to use. This has importance only if there are several titles. </P>
-<P>The next two f&auml;lts give dates of begin och end of reign. </P>
-<P>To delete a title, just erase the contents of the first f&auml;lt "Title". </P></DIR>
-</DIR>
-</DIR>
-</DIR>
+<p>Dessa punkter är i fetstil därför att de är möjliga
+fallgropar: följ den indikerade proceduren. </p>
+
+<h4><a name="ModC">4.1.</a> Hur man modifierar förnamnet eller
+efternamnet för ett barn </h4>
+
+<p>Exempel: i familjen för &quot;Bertil Svensson&quot; och
+&quot;Ulla Karlsson&quot;, har ett av barnen döpts till
+&quot;Robert&quot;, fast hans förnamn egentligen var
+&quot;Filip&quot;: </p>
+
+<p>Vad du skall göra: </p>
+
+<ul>
+    <li>Gå till den personliga sidan för &quot;Robert
+        Svensson&quot;, klicka på &quot;Uppdatera&quot;, sedan
+        &quot;Ändra&quot; och fortsätt som det står i
+        avdelningen &quot;Modifiera en Person&quot; (välj nummer
+        1 i avdelning 3). </li>
+</ul>
+
+<p>Vad du <i>inte</i> skall göra: </p>
+
+<ul>
+    <li>Använd inte &quot;Modifiera/Familj&quot; (val nummer 2 i
+        avdelning 3). </li>
+<p>
+
+                            Om du gör det och ändrar
+                            &quot;Robert&quot; till
+                            &quot;Filip&quot; i formuläret: </ul>
+
+<ul>
+    <ul>
+            <li>Kommer detta att klippa av kopplingen mellan
+                &quot;Robert&quot; och hans föräldrar och
+                &quot;Robert&quot; fortsätter att heta
+                &quot;Robert Svensson&quot;, men utan
+                föräldrar. </li>
+            <li>Kommer detta att göra att &quot;Filip
+                Svensson&quot;, om han existerar och inte redan
+                har föräldrar, blir ett barn till paret. </li>
+            <li>Men om &quot;Filip Svensson&quot; inte finns i
+                databasen eller han finns men redan har
+                föräldrar, kommer ett felmeddelande att visas
+                och ingenting kommer att ändras (som tur är). </li>
+        </ul>
+    </li>
+</ul>
+
+<h4><a name="AddC">4.2.</a> Hur man lägger till ett barn i en
+familj</h4>
+
+<p>Till exempel, i familjen för &quot;Bertil Svensson&quot; och
+&quot;Ulla Karlsson&quot;, vill du lägga till
+&quot;Herbert&quot; som ett barn: </p>
+
+<p>Vad du måste göra: </p>
+
+<ul>
+    <li>Gå till den personliga sidan för en av föräldrarna,
+        klicka på &quot;Uppdatera&quot; och sedan
+        &quot;Modifiera/Familj&quot; (välj nummer 2 i avdelning
+        3) och lägg till barnet som det står i avdelningen
+        &quot;Modifiera en Familj&quot;. </li>
+</ul>
+
+<p>Vad du <i>inte</i> ska göra: </p>
+
+<ul>
+    <li>Använd inte &quot;Lägg till/Familj&quot; (val nummer 4
+        i avdelning 3) vilket inte betyder &quot;lägg till ett
+        barn i en familj&quot; utan &quot;lägg till ett
+        giftermål&quot; och skapar en ny enhet
+        &quot;familj&quot; med en ny gemål.
+
+ <p>
+    <li>Vidare, om barnet redan fanns i databasen och du vill
+        lägga till den i listan av barn för ett par som redan
+        finns, använd inte &quot;Lägg till/Föräldrar&quot;
+        (val nummer 4 i avdelningen 3) heller. </li>
+<p>
+
+                            Valet &quot;Lägg
+                            till/Föräldrar&quot; är
+                            istället använt att lägga till
+                            föräldrar till en av dina
+                            anfäder för att gå ett steg
+                            länge tillbaka. Detta val skapar
+                            också en ny familj. </li>
+
+</ul>
 
 
-<UL>
-<STRONG><LI>Access</STRONG> allows to specify the access to personal informations. This is applied to personens of "nowadays", i.e. whose dates (birth, death, etc.) &auml;r less &auml;n 100 &aring;r: </LI>
+<h4><a name="Form">5.</a> Formulär </h4>
 
-<UL>
-<LI>By default, personens having nobility titles eller one of the f&ouml;r&auml;ldrar of them has nobility titles are considered as "public" persons och their personal informations are always displayed. </LI>
-<LI>When selecting "public", personenal informations are always displayed, even if personen has no nobility titles. </LI>
-<LI>When selecting "private", personenal informations are not displayed, even if personen has nobility titles. </LI>
+<h4><a name="AddF">5.1.</a> Lägga till en Familj </h4>
 
-<UL>
-<LI>In "wizard" eller "friend" entries (by passwords), personenal informations are always displayed. </LI></UL>
-</UL>
+<p>Du ser detta formulär benämnt &quot;Lägg till/Familj&quot;:
+</p>
 
-<STRONG><LI>Noteringar</STRONG> holds the notes about personen. In personenal record sida, the text will be displayed without breaks, even if you put breaks in your text. To add a real break, write "&lt;br&gt;" where you want breaks to take place. </LI>
-<STRONG><LI>K&auml;llor</STRONG> allows to note short informations about the ellerigins of the informations: a name, an abbreviation, a book title, a code. So you know where you got your informations from. </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
+<ul>
+    <li>Antingen från välkomst sidan, när du klickar på
+        &quot;Lägg till en familj&quot;; i detta fallet är inga
+        fält av formuläret förifyllda, </li>
+    <li>Eller från en personlig sida, efter att ha klickat på
+        &quot;Uppdatera&quot; och sedan &quot;Lägg
+        till/Familj&quot;; i detta fall är fälten
+        &quot;förnamn&quot;, &quot;efternamn&quot; och
+        &quot;nummer&quot; förifyllda, för fadern eller modern
+        beroende på kön för personerna, </li>
+    <li>Eller i samma sammanhang, efter att ha klickat på
+        &quot;Lägg till/Föräldrar&quot;, om detta val var
+        föreslagit; i detta fallet kommer &quot;efternamn&quot;
+        fältet av fadern att vara förifylld, så fälten
+        &quot;förnamn&quot;, &quot;efternamn&quot; och
+        &quot;nummer&quot; av deras första (och enda) barn.
+        Observera att du kan ändra efternamnet på fadern, om
+        det inte stämmer. </li>
+</ul>
 
-<P>It is not designed to long informations, like "the copy of the document found in the town hall": use f&auml;ltet "Notes" above for that. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
+<p>Detta formulär uppträder exakt som &quot;Modifiera en
+Familj&quot;, förutom att det skapar en ny familj. Varje gång
+du använder det kommer det att skapas en familj </p>
 
-<STRONG><P>Committing</P>
-</STRONG><P>The committing takes place when you click on "Ok". As you as you do not do it, no change is done in the databas. </P>
-<P>Remark also that, as it is said above, that if you selected one eller several "Infoga/...", just a new formul&auml;r is proposed: this is <EM>not</EM> the proper committing. </P>
-<P>When the committing is really done, you must see a new sida whose title is: </P>
+<p>Detta betyder att om du upptäcker att du gjorde ett fel efter
+att ha kontrollerat sidan, gör inte &quot;Lägg
+till/Familj&quot; igen, utan istället
+&quot;Modifiera/Familj&quot;! </p>
 
-<UL>
-<LI>Antingen: <STRONG>Person modifierad</STRONG> </LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
+<p>Se det följande kapitlet för att se hur du fyller i
+formuläret. </p>
 
-<P>You see the name of personen och you can click on it. </P>
-<P>Maybe you see also warnings. They concern dates inconsistencies. The update is done anyway, but it is preferable to fix them. </P>
-<P>Clicking on personen, you see his personal record. But your update may not be visible. Webbl&auml;saren use to keep already displayed sidas in memory, och probably display the old version. Do "reload the sida" in your webbl&auml;sare to really see your modifications. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
+<h4><a name="ModF">5.2.</a> Modifiera en Familj </h4>
+
+<p>Du ser detta formulär från en persons sida, efter att ha
+klickat på &quot;Uppdatera&quot; och sedan
+&quot;Modifiera/Familj&quot;. Detta formulär är förifylld med
+&quot;förnamn&quot;, &quot;efternamn&quot; och
+&quot;nummer&quot; för fadern, modern och barnen och även
+möjliga andra data relevant för denna familj. </p>
+
+<p>Dettas formulär uppträder som &quot;Lägg till/Familj&quot;
+från det tidigare kapitlet (förutom att det inte skapas någon
+ny familj). Vad som följer gäller därför för formuläret
+&quot;Lägg till/Familj&quot;. </p>
+
+<p><strong>Ifyllnad</strong></p>
+
+<p>Alla fält (förifyllda eller ej) kan fyllas i, raderas eller
+modifieras. När du har fyllt i, raderat och modifiera allt du
+anser nödvändigt, gå till slutet av formuläret och bekräfta
+formuläret genom att klicka på &quot;Ok&quot;. </p>
+
+<p>Framför fältet där det är personer, observera valet
+&quot;Länk&quot; och &quot;Skapa&quot;. Beroende på
+situationen, kommer den att förvälja &quot;Länk&quot; eller
+&quot;Skapa&quot;. Du kan ändra detta val beroende på vad du
+vill göra. </p>
+
+<ul>
+    <li>&quot;Länk&quot; betyder att personen redan finns i
+        databasen. När du bekräftar, kontrollerar systemet att
+        dessa personer existerar och för en förälder, att det
+        är rätt kön. </li>
+<p>
+
+                                Notera att eftersom det är en
+                                sökningen med &quot;nyckel&quot;
+                                (se första avdelningen), är det
+                                inte nödvändigt att respektera
+                                accenter, versaler och gemena. </li>
+
+</ul>
+<ul>
+    <li>&quot;Skapa&quot; betyder att personen inte existerar i
+        databasen och att du ber systemet, när du bekräftar,
+        att skapa personen med de inskrivna förnamn, efternamn
+        och nummer. </li>
+<p>
+
+                                Här, vad som skiljer från
+                                &quot;Länk&quot;, är att du
+                                måste skriva accenter, versaler
+                                och gemena korrekt: personen
+                                kommer att skapas med den
+                                stavning du skriver där. <p>Du
+                                kan skriva in barnets kön och
+                                datum för födelsen. För de
+                                andra personliga data måste du
+                                göra &quot;uppdatera&quot;
+                                senare från den personliga
+                                sidan.</p>
+</ul>
+
+<p>När du bekräftar, fallen med &quot;barn&quot; vilkas fält
+&quot;förnamn&quot; är tomma kommer att ignoreras, oberoende av
+vad de andra fälten innehåller. Det är som de inte existerar. </p>
+
+<p>För barnen, om fältet &quot;efternamn&quot; fattas tas
+efternamnet från fadern.</p>
+
+<p><strong>Några modifieringar</strong></p>
+
+<p>Här är några modifieringar du kan göra: </p>
+
+<ul>
+    <li><strong>För att lägga till ett barn</strong>, om det
+        finns något tomt fält för personen, klicka först på
+        knappen &quot;Infoga/Barn&quot; beroende på var du vill
+        lägga till personen i familjen. Klicka sedan
+        &quot;Ok&quot; längst ner på formuläret. </li>
+<p>
+
+                                Obs: detta kommer inte att
+                                bekräfta formuläret omedelbart.
+                                Systemet kommer endast att
+                                föreslå ett annat dig ett annat
+                                formulär med en reserverad plats
+                                för barnet eller barnen du vill
+                                lägga till. <p>Därför en
+                                varning: så länge du klickar
+                                på &quot;Infoga/Barn&quot;, när
+                                du klickar på &quot;Ok&quot;
+                                blir det ingen bekräftning av
+                                formuläret: bara ett nytt
+                                större formulär. Du får inte
+                                tyda denna knapp som &quot;lägg
+                                till detta barn jag just
+                                skrev&quot;: systemet ser det. </p>
+                                <p>Barnet du skriver in i fältet
+                                du allokerade för personen kan
+                                vara en person som existerar i
+                                databasen. I detta fall, välj
+                                &quot;Länk&quot; istället för
+                                &quot;Skapa&quot;. </p>
+</ul>
+
+<ul>
+    <li><strong>För att ta bort ett barn</strong>, ta helt
+        enkelt bort personens förnamn. Som sades ovan, fall där
+        förnamns fältet är tomt är ignorerade när du
+        bekräfta. Observera att det inte kommer att ta bort
+        personen: den blir bara borttagen från listan av barnen
+        och kommer att vara utan föräldrar. </li>
+    <li><strong>För att ändra ett barns position</strong>, det
+        enklaste sättet är att klicka på
+        &quot;Infoga/Barn&quot; vid den position du vill sätta
+        in personen vid och gör &quot;Ok&quot;. I det nya
+        föreslagna formuläret, skriv in barnets data i det nya
+        fallet, välj &quot;Länk&quot; istället för
+        &quot;Skapa&quot; och ta bort personens förnamn i det
+        gamla fältet. </li>
+    <li><strong>För att byta positionen för två barn</strong>,
+        kan du göra på samma sätt, skapa en ny position och
+        sedan helt enkelt klippa och klistra. Glöm inte att
+        välja &quot;Länk&quot;. </li>
+<p>
+                            Du kan också göra det direkt,
+                                utan att lägga till ny plats:
+                                problemet är att du måste komma
+                                ihåg en av de följande två
+                                namnen, när du tar bort den för
+                                att skriva den andra vid detta
+                                ställe. </li>
+</ul>
+
+<p><strong>Bekräftan</strong></p>
+
+<p>Bekräftningen äger rum när du klickar på &quot;Ok&quot;.
+Så länge du inte gör det, görs ingen ändring i databasen. </p>
+
+<p>Observera också att, som sades ovan, att om du valde en eller
+flera &quot;Infoga/Barn&quot;, skapa bara ett nytt formulär:
+detta är <em>inte</em> den korrekta bekräftan. </p>
+
+<p>När bekräftan är klar, ska du se en ny sida benämnd: </p>
+
+<ul>
+    <li>Antingen: Familj<strong> tillagd eller modifierad</strong>
+    </li>
+<p>
+
+                            Du ser föräldrarnas namn, på
+                                vilka du kan klicka. <p>Kanske du
+                                också ser varningar. Det beror
+                                antingen på datum konflikter
+                                eller ordningen för barnen.
+                                Uppdateringen görs ändå, men
+                                det är rekommenderat att fixa
+                                dem, om nödvändigt. </p>
+                                <p>Om du klickar på en av
+                                föräldrarna, ser du dennas
+                                personliga sida. Men din
+                                uppdatering kanske inte syns.
+                                Webbläsare brukar spara redan
+                                visade sidor i minnet och
+                                troligen visas den äldre
+                                versionen. Gör
+                                &quot;uppdatera&quot; i din
+                                webbläsare för att se dina
+                                modifieringar. </p>
+</ul>
+
+<ul>
+    <li>Eller: <strong>Fel</strong> </li>
+<p>
+
+                            Sidan indikerar att programmet
+                                upptäckte ett fel. Gå tillbaka
+                                och rätta till det. Du kan
+                                också ge upp... inte göra
+                                någonting och fortsätta att
+                                navigera i databasen. <p>Om felet
+                                indikerar att vissa personer
+                                redan finns, betyder det att du
+                                försökte skapa en person
+                                vilkens kombination
+                                &quot;förnamn&quot;,
+                                &quot;efternamn&quot;,
+                                &quot;nummer&quot; redan finns i
+                                databasen. </p>
+<p>Lösning: </p>
+</ul>
+
+<ul>
+    <ul>
+            <li>Om du verkligen ville skapa en ny person, gå
+                tillbaka och ändra personens nummer. Observera
+                att fel sidan ger dig det första lediga numret:
+                välj det eller tag ett annat. Om det är flera
+                personer med samma namn, visas deras namn i en
+                lista. </li>
+            <li>Om det var den personen du ville ha, gå tillbaka
+                och ändra &quot;Skapa&quot; till
+                &quot;Länk&quot;. </li></ul>
+<p>
+                    Klicka sedan på &quot;Ok&quot; igen. </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+<p>
+<ul>
+                            Om felet indikerade att någon
+                                person inte finns, detta betyder
+                                att du valde &quot;Länk&quot;
+                                framför en icke existerande
+                                person. Kanske du skrev in fel
+                                nummer? Eller ville du skapa en
+                                ny person? </li>
+</ul>
 
 
-<UL>
-<LI>Eller: <STRONG>Fel</LI></UL>
-<DIR>
-<DIR>
-<DIR>
-<DIR>
+<h4><a name="DelF">5.3.</a> Ta bort en Familj </h4>
 
-</STRONG><P>Sidan indicates the encountered fel. Go back och fix. You can also give up... doing nothing och go on navigating in the databas. </P>
-<P>Om felet indicates you that some person already exists, it means that you modified the f&ouml;rnamn, the efternamn eller numret (you have absolutely the right to do it), but you new choice enters in conflict with another person of the databas. </P>
-<P>Solution: go back och change numret. Remark that the error sida proposed you a free therefore available nummer. Take this one eller another. If there are several persons with the same name, their list is displayed. </P></DIR>
-</DIR>
-</DIR>
-</DIR>
+<p>Du ser detta formulär, benämnt &quot;Ta bort/Familj&quot;
+från en personlig sida, efter att ha klickat på
+&quot;Uppdatera&quot; och sedan &quot;Ta bort/Familj&quot;. </p>
 
-<H4><A NAME="DelP">5.5.</A> Ta bort en Person </H4>
-<P>Du ser detta formul&auml;r, benamnt "Delete/Person" fran en personlig sida, efter att ha klickat pa "Uppdatera" och sedan "Ta bort/Person". </P>
-<P>The formul&auml;r only holds the button "Ok" to allow you to do it really. You can still give up. </P>
-<P>If you do "Ok", a new sida appears with the the title "Person deleted". </P>
-<P>The person is not exactly deleted. His personal data is erased (included his f&ouml;rnamn och efternamn) as well as his connection with his f&ouml;r&auml;ldrar. </P>
-<P>But an "entity person" is subsisting, linked to his possible spouse och barnren. </P>
+<p>Formuläret innehåller endast knappen &quot;Ok&quot; för att
+verkligen göra det. Du kan fortfarande låta bli.</p>
 
-<H4><A NAME="SndP">5.6.</A> Skicka ett foto </H4>
-<P>Du ser this formul&auml;r, ben&auml;mnd "Skicka foto" from a personal record, after having clicked on "Update", then "Skicka foto", but only if the databas &auml;garen ger <A HREF="start.htm#Cnf">beh&ouml;righet</A> till det. </P>
-<P>Du kan skicka (upload) en "gif" eller "jpeg" fil which will be associated to the person. This file is recorded in the site. If this person already had a photo, yours replaces it. </P>
-<P>Viktigt: f&auml;ltet "Foto" f&ouml;r personen m&aring;ste vara tomt, otherwise this field is taken for the photo, not the photo you sent. Om detta f&auml;lt &auml;r fyllt g&ouml;r "Uppdatera" och "Modifiera person" f&ouml;r att radera det.</P>
+<p>Om du klickar i &quot;Ok&quot;, kommer en ny sida upp med
+rubriken &quot;Familj borttagen&quot;. </p>
 
-<H4><A NAME="DelPh">5.7.</A> Ta bort ett foto </H4>
-You see this form, titled "Delete photo" from a personal record, after having clicked on "Update", then "Delete photo", but only if the data base owner gave the <A HREF="start.htm#Cnf">beh&ouml;righet</A> for that. 
+<p>Familjen tas bort från databasen: fadern, modern och barnen
+sprids för vinden. Men ingen av dem tas bort: fadern och modern
+är bara inte gifta längre, de har inga fler barn (de kan ha
+andra från andra giftermål, vilket är kvar), barnen har inga
+föräldrar längre. </p>
 
-If you click on "Ok", the photo associated with the person is deleted.
+<h4><a name="ModP">5.4.</a> Modifiera en Person </h4>
 
-<H4><A NAME="MrgP">6.</A> Hur man sl&aring;r ihop tv&aring; personer </H4>
-<P>Denn del beskriver hur man sl&aring;r ihop tv&aring; <STRONG>personer</STRONG> i en databas, om du har lagrat samma person tv&aring; g&aring;nger. </P>
-<P>Notera: vi pratar inte h&auml;r om hur man sl&aring;r ihop tv&aring; <STRONG>databaser</STRONG>: this is treated <A HREF="merge.htm">elsewhere</A>: it is not possible to do it on line (this chapter relates only to on line updates). </P>
-<P>Samman slagning av tv&aring; personer &auml;r ganska manuell, but constantly, you keep a coherent databas. </P>
-<P>Principen &auml;r f&ouml;ljande: </P>
+<p>Du ser detta formulär med rubrik &quot;Modifiera/Person&quot;
+från en personlig sida, efter att ha klickat på
+&quot;Uppdatera&quot; och sedan &quot;Modifiera&quot;.
+Formuläret är förifyllt med alla data om personen. </p>
 
-<UL>
-<LI>You select the two persons to be merged. But there, the difficulty of their f&ouml;r&auml;ldrar arises. If both have f&ouml;r&auml;ldrar, their f&ouml;r&auml;ldrar must be first merged. och it is necessary to start again by looking at the f&ouml;r&auml;ldrar of the f&ouml;r&auml;ldrar, etc. </LI></UL>
+<p><strong>Ifyllnad</strong></p>
 
-<P>It is therefore necessary to scan the ancestors until we find "mergeable" ones. <EM>GeneWeb</EM> does this work for you: it indicates you the possible ancestors to be merged. </P>
-<P>Here is how to proceed. Follow the instructions below while doing your merge: </P>
+<p>Alla fält (förifyllda eller ej) kan fyllas i, raderas eller
+modifieras. När du har fyllt i, raderat och modifierat allt du
+anser nödvändigt, gå till slutet av formuläret och bekräfta
+formuläret genom att klicka på &quot;Ok&quot;. </p>
 
-<UL>
-<LI>Starta tv&aring; f&ouml;nster av din webbl&auml;sare. </LI>
-<LI>I det v&auml;nstra f&ouml;nstret, s&ouml;k den f&ouml;rsta personen att merge. </LI>
-<LI>I det andra f&ouml;nstret , det h&ouml;gra, s&ouml;k efter den andra. </LI>
-<LI>I b&aring;da f&ouml;nstren, g&ouml;r "Uppdatera". </LI>
-<LI>I det v&auml;nstra f&ouml;nstret, g&ouml;r "Merge". </LI>
-<LI>I formul&auml;r, put the f&ouml;rnamn, a dot, numret och the name of the second person. You find that in the title of the right window. Use "cut-and-paste", if you can. </LI>
-<LI>Tryck sedan "Ok". From there, the right window is no more useful. Du kan st&auml;nga det. </LI>
-<LI>Om de tv&aring; personerna &auml;r directly "mergeable" (at least one of them does not have f&ouml;r&auml;ldrar), <EM>GeneWeb</EM> proposes to you to merge them. Otherwise, it says that you must initially merge some ancestors eller some families. </LI>
-<LI>Om <STRONG>personer</STRONG> ska sl&aring;ssamman (personerna sj&auml;lva eller deras ancestors): </LI>
+<p>Några knappar innehåller &quot;Infoga ...&quot;:
+&quot;Infoga smeknamn&quot;, &quot;Infoga alias&quot;, etc. </p>
 
-<UL>
-<LI>In the case of ancestors, the bottom of the formul&auml;r indicates the two branches to be merged. With your assistance, it will merge the top, then the intermediaries, och will end up merging the bottom, those you requested initially. </LI>
-<LI>The formul&auml;r contains the values in conflict, if any, between the two persons to be merged. Choose och do "Ok". </LI>
-<LI>You then see a formul&auml;r " Merge/Person" which is presented like the formul&auml;r "Update/Person". Control the various f&auml;lts, add, modify, remove what you want och do "Ok". </LI>
-<LI>Now, the two persons are merged. If they were ancestors of your initial persons, the sida proposes to you to continue merging. Click on "continue merging". Advance until you have merged the two initial persons. </LI></UL>
+<p>Varning: detta är inte för att lägga till smeknamn eller
+alias, etc för personen, utan för att be om ett nytt formulär
+med en reserverad plats för ett andra smeknamn, ett andra alias,
+etc. </p>
 
-<LI>Om <STRONG>familjer</STRONG> ska sl&aring;s ihop: </LI>
+<p>Så, om du gör &quot;Ok&quot; efter att ha valt en eller
+flera av dessa knappar, skapas ett nytt större formulär och
+ingen uppdatering är gjord ännu. </p>
 
-<UL>
-<LI>This happens when a couple of ancestors was merged. In this case, two families are remaining. It is as if this couple had married twice. It is thus necessary to gather the two families. </LI>
-<LI>First, as in the case above of persons being merged, select the the possible conflicting values och do "Ok". </LI>
-<LI>You then see a formul&auml;r "Merge/Families" which looks like "L&auml;gg till/Familj" eller "Modifiera/Familj". Do the changes you want. Notice that some barnren can be displayed twice. Leave them: they will be merged later. </LI>
-<LI>Tryck "Ok": familjerna &auml;r sammanslagna. G&aring; vidare genom att klicka p&aring; "forts&auml;tta sammanslagningen". </LI></UL>
+<p>Därför, efter ett &quot;Ok&quot;, kan du se ett nytt
+modifierings formulär, betyder detta att din bekräftan inte har
+blivit sparad (inte ännu), även om du fyllde i flera fält. </p>
 
-<LI>Notera att i formul&auml;ru&auml;ren for merging persons eller families, the displayed persons are clickable. You can click on them if you wish to check that this merge is correct (go back with your webbl&auml;sare afterwards). </LI>
-<LI>Also note that you can stop at any time: your databas remains coherent och the merges you already did are recorded. You can ask again later for the merge of your two initial persons, och the merge restarts where you stopped it. </LI>
-</UL>
+<p><strong>Olika fält</strong></p>
 
-<H4><A NAME="MrgF">7.</A> Hur man sl&aring;rsamman tv&aring; familjer</H4>
+<p>Observera meningen för de olika fälten, använd speciellt
+&quot;publikt namn&quot;, &quot;smeknamn&quot;,
+&quot;alias&quot;, etc vilka alla har en specifik mening. </p>
 
-F&ouml;r att sl&aring;samman tv&aring; familjer, sl&aring; f&ouml;rst ihop faderns (om de &auml;r olika) och moderns (om de &auml;r olika) following the directives of the previous section.
+<ul>
+    <li><strong>Förnamn</strong> och <strong>efternamn</strong>
+        har den vanliga meningen. Med <strong>Num</strong>
+        (nummer), har personen en unik &quot;nyckel&quot; som
+        sades i början av detta kapitel. </li>
+<p>
+                            Vi föreslår att man skriver in
+                                tilltalsnamn i förnamns fältet.
+                                De andra förnamnen (kompletta
+                                förnamn, andra möjliga
+                                förnamn, andra stavningar av
+                                förnamn, etc) ska helst skrivas
+                                in i fältet &quot;förnamns
+                                alias&quot; (nedan). Namn med
+                                nummer som för adliga och
+                                kungliga personer ska skrivas in
+                                på &quot;publikt namn&quot;. <p>Detta
+                                är därför att förnamnet är
+                                sparat i listan över förnamn.
+                                Det är möjligt att se vilka
+                                namn som är de mest frekventa
+                                förnamnen, att se vilka andra
+                                personer som har samma förnamn,
+                                etc. De andra typerna av förnamn
+                                skulle riskera att bara finnas i
+                                ett exemplar. </p>
+</ul>
 
-<P>Sedan, fr&aring;n faderns- eller moderns sida, g&ouml;r "Uppdatera". Om de tv&aring; familjerna &auml;r bredvid varandra, kan du se "Sl&aring;samman" mellan dem. Klicka p&aring; den. Om de inte ligger efter varandra , anv&auml;nd "Byt" s&aring; m&aring;nga g&aring;nger som det beh&ouml;vs. </P>
-<P>Tillbaka till <A HREF="diruse.htm">bruksanvisningen</A>. </P>
-<P><HR></P>
-<FONT SIZE=2><EM><P>&copy; Copyright INRIA 1999 - GeneWeb</P></FONT></EM></BODY>
-</HTML>
+<ul>
+    <li><strong>Publikt namn</strong> är det namn personen är
+        känd som. Till exempel: &quot;Edward VII&quot; (hans
+        förnamn är &quot;Edward&quot; och hans efternamn
+        &quot;Windsor&quot;). </li>
+<p>
+
+                            Personer som har ett publikt namn
+                                är åtkomstbara i navigering
+                                genom detta namn. <p>Om det finns
+                                ett publikt namn, visas det som
+                                en titel på personens sida,
+                                istället för &quot;förnamn
+                                efternamn&quot; vilket är
+                                reglerat nedan och i mindre
+                                bokstäver. </p>
+</ul>
+
+<ul>
+    <li><strong>Foto</strong> är en &quot;.gif&quot; eller
+        &quot;.jpg&quot; fil associerad till personen och som att
+        visas på personens personliga sida. Detta kan vara en
+        URL adress (som startar med &quot;http://...&quot;) eller
+        bara ett namn, systemet kommer att söka i katalogen
+        &quot;images&quot;, underkatalogen &quot;bas&quot; (där
+        &quot;bas&quot; är namnet för din databasen). </li>
+<p>
+
+<p>Om du inte specificerar ett fil namn, kommer programmet att
+välja ett namn. </p>
+
+<p>Detta namn består av förnamn, en punkt, numret, en till
+punkt, efternamnet, allt i gemena bokstäver, utan accenter och
+alla icke bokstäver är konverterade till mellanslag. </p>
+
+<p>Exempel: personen med namnet &quot;Anne-Cécile Dupont de
+Nemours&quot; kommer att få foto namnet: </p>
+
+<pre>   anne_cecile.0.dupont_de_nemours</pre>
+
+<p><em>GeneWeb</em> söker en fil med detta namn följt av
+&quot;.gif&quot; eller &quot;.jpg&quot; i det ovan nämnda
+katalogen för fotona i databasen. </p>
+</ul>
+<ul>
+    <li><strong>Smeknamn</strong> är delen av namnet tillagd
+        till publika namnet för kända personer. Således är
+        &quot;den Fete&quot; för &quot;Ludvig VI den Fete&quot;.
+    </li>
+<p>
+
+                            Personer är åtkomstbara med
+                                detta smeknamn i platsen för
+                                deras efternamn. Så &quot;Ludvig
+                                VI den Fete&quot; är åtkomstbar
+                                genom &quot;Ludvig VI&quot;
+                                (publikt namn), &quot;Ludvig VI
+                                den Fete&quot;, &quot;Ludvig den
+                                Fete&quot;, &quot;Ludvig
+                                Capet&quot;, etc. Notera att
+                                &quot;den Fete&quot; är
+                                hursomhelst inte betraktat ensamt
+                                som ett efternamn. <p>Det kan
+                                finnas flera smeknamn:
+                                &quot;William Erövraren&quot;
+                                är också känd som
+                                &quot;William Bastarden&quot;.
+                                Därför behöver du ett fält
+                                för smeknamnet
+                                &quot;Erövraren&quot; och ett
+                                annat för &quot;Bastarden&quot;.
+                                Detta är varför
+                                &quot;Infoga/Smeknamn&quot; är
+                                användbart. </p>
+                                <p>Om det finns ett smeknamn, det
+                                publika namnet (eller förnamnet
+                                om det inte finns något publikt
+                                namn), följt av smeknamnet visas
+                                som titel på personens sida,
+                                istället för det normala
+                                &quot;förnamn efternamn&quot;,
+                                vilket är reglerat nedan, i
+                                mindre stil. </p>
+</ul>
+
+<ul>
+    <li><strong>Alias</strong> är ett namn personen är känd
+        som, utan att vara ett alternativ för ett förnamn (som
+        &quot;publikt namn&quot; är, till exempel). </li>
+<p>
+
+                            Således, &quot;Norma Jean
+                                Mortenson&quot; är känd som
+                                &quot;Marilyn Monroe&quot;.
+                                Notera att alias är i en del:
+                                inga frågor för att acceptera
+                                kombinationer som &quot;Norma
+                                Jean Monroe&quot; eller
+                                &quot;Marilyn Mortenson&quot;. <p>Om
+                                det är en eller flera aliaser,
+                                visas de fet stil under titeln. </p>
+</ul>
+
+<ul>
+    <li><strong>Förnamns alias</strong> kan användas på flera
+        sätt: </li>
+    <ul><p>
+            <li>Det kan vara den kompletta lista av förnamn. </li>
+            <li>Det kan vara ett kort namn använt av nära
+                släkt: &quot;Pelle&quot; for &quot;Per&quot;. </li>
+            <li>Detta kan vara ett annat förnamn eller samma men
+                med en annan stavning, i fallet med äldre
+                personer, vilkas förnamn inte är säkra eller
+                skrivna olika i olika källor. </li>
+            </ul>
+                    <p>Det kan finnas flera förnamns aliaser. </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+<ul>
+              Förnamns alias kan användas på
+                                platsen för förnamnet i
+                                förfrågningar, men de är inte
+                                betraktade som riktiga förnamn,
+                                dvs de är inte lagrade i
+                                förnamns listan, etc. <p>Om det
+                                finns förnamns aliaser, visas
+                                dem på den personliga sidan, i
+                                gemena bokstäver under titeln. </p>
+</ul>
+
+<ul>
+    <li><strong>Efternamns alias</strong> kan användas som ett
+        alternativt efternamn, om du vill ha en annan version av
+        namnet, t. ex. Med en annan stavning. Dess användning
+        är inte frekvent. </li>
+<p>    <li><strong>Född</strong> tillåter att indikera datum och
+        plats för födelse och dop. Inga speciella problem. </li>
+<p>    <li><strong>Död</strong> tillåter att indikera information
+        för döden. Inga speciella problem förutom notationen
+        för &quot;automatisk val&quot; vilket förklaras här. <p>&quot;Automatiskt
+        val&quot; gäller när valet från den första menyn av
+        &quot;död&quot; fältet visar ett &quot;-&quot;. Det
+        indikerar att man inte vet om personen är död eller
+        inte. </p>
+        <p>I detta fallet, om du inte indikerar något döds
+        datum eller plats, kommer systemet att välja åt dig om
+        personen är död eller inte, beroende på personens
+        födelsedatum: om personen är yngre än 80 år gammal,
+        väljer det &quot;ej död&quot;, mellan 81 och 120 år
+        gammal, väljer det &quot;vet ej&quot; och mer än 120
+        år gammal, väljer det &quot;död&quot;. </p>
+        <p>Om det &quot;automatiska valet&quot; inte passar, kan
+        du själv välja ett bättre val i denna första meny,
+        istället för det visade &quot;-&quot;. </p>
+        <p>Notera att åldern för personerna vilkas död är
+        &quot;vet ej&quot; inte visas på deras personliga sidor,
+        inte heller vid födelsedagar. Därför, om en person är
+        mellan 81 och 120 år gammal och inte död, välj
+        &quot;inte död&quot;. </p>
+    </li>
+</ul>
+
+<ul>
+    <li><strong>Yrke</strong> innehåller arbetet. Om du vill
+        skriva in en adelstitel, använd istället fältets
+        &quot;titel&quot; nedan. </li>
+<p>    <li><strong>Titel</strong> adelstitel. Det kan vara flera.
+        För att få fram ett formulär med andra platser för
+        titlarna, klicka på en eller flera av
+        &quot;Infoga/Titel&quot; och gå sedan till slutet av
+        formuläret och gör &quot;Ok&quot;. </li>
+
+<p>
+                            Titlar består av två delar:
+                                titeln självt och platsen. Titel
+                                självt innehåller typen:
+                                &quot;greve&quot;,
+                                &quot;hertig&quot;,
+                                &quot;konung&quot;, etc. Platsen
+                                innehåller komplementet:
+                                &quot;av Warwick&quot;, &quot;av
+                                Sachsen&quot;, &quot;av
+                                England&quot;, etc. </li>
+<p>
+
+                            Notera partikeln: när de visas,
+                                ser du kombinationen av typ och
+                                platsen: &quot;greve av
+                                Warwick&quot;, &quot;hertig av
+                                Sachsen&quot;, &quot;konung av
+                                England&quot;, som är klickbara
+                                fält, vilket tillåter att se
+                                alla personer som har denna
+                                titel. <p>Men separationen av
+                                dessa notationer tillåter att
+                                välja, till exempel, alla
+                                &quot;greve&quot;, alla
+                                &quot;hertig&quot;, alla
+                                &quot;konung&quot; (plural ska
+                                inte användas) och motsvarande
+                                alla titlar som slutar med
+                                &quot;av Warwick&quot;, &quot;av
+                                Sachsen&quot;, &quot;av
+                                England&quot;, etc. </p>
+                                <p>Fält &quot;namn&quot;
+                                representerar ett publikt namn
+                                associerad med titeln. Till
+                                exempel, &quot;Karl Quint&quot;
+                                har namnet &quot;Karl I&quot; som
+                                &quot;konung av Spanien&quot;,
+                                &quot;Karl IV&quot; som
+                                &quot;konung av Sicilien&quot;,
+                                etc. </p>
+                                <p>Fältet &quot;Nte&quot;
+                                används för titlar med ett
+                                nummer. Exempel: för den
+                                &quot;5e hertigen av
+                                Hamilton&quot;, skriv värdet
+                                &quot;5&quot;. Blanda inte ihop
+                                det med &quot;Edward VII&quot;
+                                vars nummer säger att han är
+                                den 7e &quot;Edward&quot; i
+                                linjen, inte den 7e
+                                &quot;konungen av
+                                Storbritannien&quot;. </p>
+                                <p>Knappen &quot;Huvud
+                                titel&quot; tillåter att
+                                indikera, när denna person
+                                visas, på ett enkelt sätt (för
+                                gemålens sida, till exempel,
+                                eller på barnens sidor), vilken
+                                titel som ska användas. Detta
+                                har bara betydelse om det finns
+                                flera titlar. </p>
+                                <p>De nästa två fälten ger
+                                datum för start och slut av
+                                regenttid. </p>
+                                <p>För att ta bort en titel,
+                                radera endast innehållet i det
+                                första fältet
+                                &quot;Titel&quot;. </p>
+</ul>
+
+<ul>
+    <li><strong>Tillträde</strong> tillåter specificering av
+        åtkomst till personlig information. Detta är använt
+        för &quot;nutida&quot; personer , dvs vilkas datum
+        (födelse, dödsfall, etc.) är mindre än 100 år: </li>
+    <ul>
+            <p><li>Förinställt är att personer som har
+                adelstitlar eller någon av föräldrarna för
+                dem har adelstitlar behandlas som
+                &quot;publika&quot; personer och deras personliga
+                information är alltid visad. </li>
+            <li>När man väljer &quot;publikt&quot;, visas
+                alltid personlig information, även om personen
+                inte har några adelstitlar. </li>
+            <li>När man väljer &quot;privat&quot;, visas inte
+                personlig information, även om personen har
+                adelstitlar. </li>
+            </ul><p>
+                    I &quot;wizard&quot; eller
+                        &quot;friend&quot; åtkomster (genom
+                        passord), visas alltid personlig
+                        information. </li>
+                </ul>
+            </li>
+<ul>
+    <li><strong>Noteringar</strong> innehåller noteringar om
+        personen. På persons sida, kommer texten att visas utan
+        radbrytningar, även om du sätter sådana i din text.
+        För att lägga till en riktig radbrytningen, skriv
+        &quot;&lt;br&gt;&quot; där du vill ha radbrytningar. </li>
+<p>    <li><strong>Källor</strong> gör det möjligt att notera
+        kort information över var ifrån informationen om: ett
+        namn, ett förkortning, en bok titel, en kod. Så du vet
+        var du fick din information från. </li>
+<p>
+
+                            Det är inte skapat för lång
+                                information, som &quot;kopian av
+                                dokumentet hittat i
+                                stadsarkivet&quot;: använd
+                                fältet &quot;Noteringar&quot;
+                                för det. </li>
+</ul>
+
+
+<p><strong>Bekräftan</strong></p>
+
+<p>Bekräftan äger rum när du klickar på &quot;Ok&quot;. Så
+länge du inte gör det, görs ingen ändring i databasen.</p>
+
+<p>Observera också att, som sades ovan, att om du valde en eller
+flera &quot;Infoga/...&quot;, skapas ett nytt formulär: detta
+är <em>inte</em> den korrekta bekräftan. </p>
+
+<p>När bekräftingen är klar, ska du se en ny sida benämnd:</p>
+
+<ul>
+    <li>Antingen: <strong>Person modifierad</strong> </li>
+<p>
+
+                            Du ser personens namn, på vilken
+                                du kan klicka. <p>Kanske du
+                                också ser varningar. De beror
+                                på datum konflikter.
+                                Uppdateringen görs ändå, men
+                                det är rekommenderat att fixa
+                                dem, om nödvändigt.</p>
+                                <p>Om du klickar på personen,
+                                ser du dennas personliga sida.
+                                Men din uppdatering kanske inte
+                                syns. Webbläsare brukar spara
+                                visade sidor i minnet och
+                                troligen visas den äldre
+                                versionen. Gör
+                                &quot;uppdatera&quot; i din
+                                webbläsare för att se din
+                                modifiering. </p>
+</ul>
+
+<ul>
+    <li>Eller: <strong>Fel</strong></li>
+<p>
+
+                            Sidan indikerar att programmet
+                                upptäckte ett fel. Gå tillbaka
+                                och rätta till det. Du kan
+                                också ge upp... inte göra
+                                någonting och fortsätta att
+                                navigera i databasen. <p>Om felet
+                                indikerar att vissa personer
+                                redan finns, betyder det att du
+                                har modifierat förnamn,
+                                efternamn eller numret (du har
+                                rätt att göra det), men de nya
+                                valen är i konflikt med en annan
+                                person i databasen. </p>
+                                <p>Lösning: gå tillbaka och
+                                ändra numret. Observera att fel
+                                sidan föreslår ett ledigt
+                                nummer. Ta detta nummer eller ett
+                                annat. Om det är flera personer
+                                med samma namn, visas deras namn
+                                i en lista. </p>
+</ul>
+
+
+
+
+<h4><a name="DelP">5.5.</a> Ta bort en Person </h4>
+
+<p>Du ser detta formulär, benämnt &quot;Ta bort/Person&quot;
+från en personlig sida, efter att ha klickat på
+&quot;Uppdatera&quot; och sedan &quot;Ta bort/Person&quot;. </p>
+
+<p>Formuläret innehåller endast knappen &quot;Ok&quot; för att
+verkligen göra det. Du kan fortfarande låta bli. </p>
+
+<p>Om du gör &quot;Ok&quot;, dyker en ny sida upp med titeln
+&quot;Person raderad&quot;. </p>
+
+<p>Personen är inte riktigt raderad. Personens personliga data
+är raderat (inkluderat förnamn och efternamn) och även
+kopplingen till föräldrarna. </p>
+
+<p>Men en &quot;enhet person&quot; är kvar, länkad till
+personens möjliga gemål och barnen. </p>
+
+<h4><a name="SndP">5.6.</a> Skicka ett foto </h4>
+
+<p>Du ser detta formulär, benämnt &quot;Skicka foto&quot; från
+en persons sida, efter att ha klickat på &quot;Uppdatera&quot;
+och sedan &quot;Skicka foto&quot;, men endast om databas ägaren
+ger <a href="start.htm#Cnf">behörighet</a> till det. </p>
+
+<p>Du kan skicka (upload) en &quot;gif&quot; eller
+&quot;jpeg&quot; fil vilken kommer att bli associerad till
+personen. Denna fil lagras på sajten. Om denna person redan hade
+ett foto, kommer ditt att ersätta det. </p>
+
+<p>Viktigt: fältet &quot;Foto&quot; för personen måste vara
+tomt, annars tas fotot från detta fält, inte fotot du skickade.
+Om detta fält är ifyllt gör &quot;Uppdatera&quot; och
+&quot;Modifiera person&quot; för att radera det.</p>
+
+<h4><a name="DelPh">5.7.</a> Ta bort ett foto </h4>
+
+<p>Du ser detta formulär, benämnd &quot;Ta bort foto&quot;
+från en persons sida, efter att ha klickat på
+&quot;Uppdatera&quot; och sedan &quot;Ta bort foto&quot;, men
+endast om databas ägaren ger <a href="start.htm#Cnf">behörighet</a>
+till det. Om du klickar på &quot;Ok&quot;, tas fotot associerat
+med personen bort. </p>
+
+<h4><a name="ChgC">5.8.</a> Ändra barnens namn</h4>
+
+<p>Du set denna formulär från en persons sida efter att ha
+klickat på &quot;Uppdatera&quot; och sedan &quot;Ändra barnens
+namn&quot;. </p>
+
+<p>Alla personens barn visas. Det är möjligt att modifiera
+förnamnen, efternamnen och numret för varje barn. </p>
+
+<p>En intressant möjlighet: när ett barns efternamn är
+raderat, tas förälderns efternamn automatiskt. </p>
+
+<p>Detta kan vara praktiskt att ändra efternamnen för en hel
+gren: man ändrar med &quot;Modifiera person&quot; efternamnet
+för en anfader. Sedan applicerar man &quot;Ändra barnens
+namn&quot; på den anfadern och raderar helt enkelt in detta
+formulär barnens efternamn, vilket går snabbt. Sedan
+fortsätter man med barnen. </p>
+
+<p>Den kan också användas för att rätta till förnamnet för
+ett barn. Men om det endast är för ett barn, kan det också
+göras med &quot;Modifiera person&quot;. </p>
+
+<h4><a name="MrgP">6.</a> Hur man slår ihop två personer </h4>
+
+<p>Denna del beskriver hur man slår ihop två <strong>personer</strong>
+i en databas, om du har lagrat samma person två gånger. </p>
+
+<p>Notera: vi pratar inte här om hur man slår ihop två <strong>databaser</strong>:
+det behandlas <a href="merge.htm">på annan plats</a>: det är
+inte möjligt att göra det uppkopplad (detta kapitel behandlar
+bara uppkopplad uppdatering). </p>
+
+<p>Sammanslagningen av två personer är ganska manuell, men du
+kommer hela tiden att ha en sammanhängande databas. </p>
+
+<p>Principen är följande: </p>
+
+<ul>
+    <li>Du väljer de två personerna som ska slåsamman. Men då
+        uppstår ett problem med deras föräldrar. Om båda har
+        föräldrar måste deras föräldrar slåsamman först
+        och det blir nödvändigt att börja titta på
+        föräldrarnas föräldrar osv. </li>
+</ul>
+
+<p>Det är därför nödvändigt att söka efter anfäder ända
+tills vi finner de som är &quot;klara för sammanslagning&quot;.
+<em>GeneWeb</em> gör detta åt dig: den visar dig de möjliga
+anfäder att slåsamman. </p>
+
+<p>Så här går du vidare. Följ instruktionerna nedan under
+tiden du gör din sammanslagning: </p>
+
+<ul>
+    <li>Starta två fönster av din webbläsare. </li>
+<p>    <li>I det vänstra fönstret, sök den första personen att
+        slåihop med. </li>
+<p>    <li>I det andra fönstret , det högra, sök efter den andra
+        personen. </li>
+<p>    <li>I båda fönstren, gör &quot;Uppdatera&quot;. </li>
+<p>    <li>I det vänstra fönstret, gör &quot;Slåsamman&quot;. </li>
+<p>    <li>I formuläret, skriv in förnamnet, en punkt, numret och
+        namnet för den andra personen. Du finner det i titeln
+        för det högra fönstret. Använd
+        &quot;klipp-och-klistra&quot;, om du vet hur man gör. </li>
+<p>    <li>Tryck sedan &quot;Ok&quot;. Därifrån, är det högra
+        fönstret inte användbar något mer. Du kan stänga det.
+    </li>
+<p>    <li>Om de två personerna kan slåsihop direkt (i vart fall
+        någon av dem har inte några föräldrar), föreslår<em>
+        GeneWeb</em> att du slårihop dem. Annars, säger den att
+        du måste initialt slåsamman några anfäder eller
+        några familjer. </li>
+<p>    <li>Om <strong>personer</strong> ska slåsamman (personerna
+        själva eller deras anfäder): </li>
+    <ul>
+<p>            <li>I fallet med anfäder, längst på formuläret
+                visas de två grenarna som ska slåsamman. Med
+                din assistans, kommer programmet att slå ihop
+                toppen, sedan de mellanliggande personerna och
+                slutligen botten, de som du begärde initialt. </li>
+            <li>Formuläret innehåller konflikt värden, om
+                några, mellan de två personerna som ska
+                slåsamman. Välj och gör &quot;Ok&quot;. </li>
+            <li>Du ser sedan ett formulär &quot;
+                Slåsamman/Person&quot; vilket presenteras som
+                formuläret &quot;Uppdatera/Person&quot;.
+                Kontrollera de olika fälten, lägg till,
+                modifiera, ta bort vad du vill och gör
+                &quot;Ok&quot;. </li>
+            <li>Nu är de två personerna sammanslagna. Om de var
+                anfäder till din initiala person, föreslår
+                sidan att du fortsätter slårsamman. Klicka på
+                &quot;Fortsätt slåsamman&quot;. Fortsätt ända
+                tills du har slagit ihop de två initiala
+                personerna. </li>
+        </ul>
+    </li>
+<p>    <li>Om <strong>familjer</strong> ska slås ihop: </li>
+    <p><ul>
+            <li>Detta händer när några anfäder är
+                sammanslagna. I detta fall är två familjer
+                kvar. Det är som om paret hade gift sig två
+                gånger. Det därför nödvändigt att slå ihop
+                de två familjerna. </li>
+            <li>Först, som fallet ovan med att slåsamman
+                personer, välj de olika värdena som är i
+                konflikt och gör &quot;Ok&quot;. </li>
+            <li>Du ser sedan ett formulär &quot;Slåsamman/Familjer&quot;
+                vilket ser ut som &quot;Lägg till/Familj&quot;
+                eller &quot;Modifiera/Familj&quot;. Gör de
+                ändringar du vill. Notera att än del barn kan
+                visas dubbelt. Låt de vara: de kommer att
+                slåsamman senare. </li>
+            <li>Tryck &quot;Ok&quot;: familjerna är
+                sammanslagna. Gå vidare genom att klicka på
+                &quot;Fortsätt  slåsamman&quot;. </li>
+        </ul>
+    </li>
+<p>    <li>Notera att i formulären för att slåsamman personer
+        eller familjer, är de visade personerna klickbara. Du
+        kan klicka på dem om du vill kontrollera att denna
+        sammanslagning blev korrekt (gå tillbaka med din
+        webbläsare efteråt). </li>
+<p>    <li>Notera också att du kan stoppa den när som helst: din
+        databas är sammanhängande och sammanslagningarna du
+        redan gjort är lagrade. Du kan börja sammanslagningen
+        igen senare för dina två initial personer och
+        sammanslagningen återstartar där du stoppade den. </li>
+</ul>
+
+<h4><a name="MrgF">7.</a> Hur man slårsamman två familjer</h4>
+
+<p>För att slåsamman två familjer, slå först ihop faderns
+(om de är olika) och moderns (om de är olika), följ
+instruktionerna från föregående sektion. </p>
+
+<p>Sedan, från faderns- eller moderns sida, gör
+&quot;Uppdatera&quot;. Om de två familjerna är bredvid
+varandra, kan du se &quot;Slåsamman&quot; mellan dem. Klicka på
+den. Om de inte ligger efter varandra , använd &quot;Byt&quot;
+så många gånger som det behövs. </p>
+
+<p>Tillbaka till <a href="diruse.htm">bruksanvisningen</a>. </p>
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
+GeneWeb</em></font><br>
+
+</body>
