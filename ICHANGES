@@ -4,6 +4,10 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.11
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [19 Dec 00] Fixed several problems of declinations appearing in esperanto
+    version (e.g. texts "parents", "notes").
+
 GeneWeb Version 3.10
 --------------------
 

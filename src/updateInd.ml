@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.19 2000-11-18 09:52:02 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.20 2000-12-19 16:25:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -615,8 +615,24 @@ value print_person conf base p =
      tag "table" "border=1" begin
        print_qualifiers conf base p;
        Wserver.wprint "\n";
-       print_aliases conf base p;
-       Wserver.wprint "\n";
+       let propose_alias =
+         try List.assoc "propose_alias" conf.base_env <> "no" with
+         [ Not_found -> True ]
+       in
+       if propose_alias then
+         do print_aliases conf base p;
+            Wserver.wprint "\n";
+         return ()
+       else
+         let _ = List.fold_left
+           (fun i_cnt a ->
+              do Wserver.wprint
+                   "<input type=hidden name=alias%d value=\"%s\">\n"
+                   i_cnt (quote_escaped a);
+              return i_cnt + 1)
+           0 p.aliases
+         in
+         ();
        print_first_names_aliases conf base p;
        Wserver.wprint "\n";
        print_surnames_aliases conf base p;
