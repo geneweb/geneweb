@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 3.50 2001-01-31 17:43:30 ddr Exp $ *)
+(* $Id: dag.ml,v 3.51 2001-01-31 18:03:21 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -690,7 +690,7 @@ value print_html_table conf hts =
     print_table conf hts
 ;
 
-value make_tree_hts conf base elem_txt spouse_on invert set spl d =
+value make_tree_hts conf base elem_txt spouse_on invert no_group set spl d =
   let indi_txt n =
     match n.valu with
     [ Left ip ->
@@ -767,13 +767,15 @@ value make_tree_hts conf base elem_txt spouse_on invert set spl d =
     [ Left _ -> False
     | Right _ -> True ]
   in
-  let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let hts = Dag2html.html_table_of_dag indi_txt phony invert no_group d in
   hts
 ;
 
 value print_only_dag conf base elem_txt spouse_on invert set spl d =
-  let hts = make_tree_hts conf base elem_txt spouse_on invert set spl d in
+  let no_group = p_getenv conf.env "nogroup" = Some "on" in
+  let hts =
+    make_tree_hts conf base elem_txt spouse_on invert no_group set spl d
+  in
   print_html_table conf hts
 ;
 
@@ -843,7 +845,10 @@ value gen_print_dag conf base spouse_on invert set spl d =
     Util.referenced_person_title_text conf base p ^
     Date.short_dates_text conf base p
   in
-  let hts = make_tree_hts conf base dag_elem_txt spouse_on invert set spl d in
+  let no_group = p_getenv conf.env "nogroup" = Some "on" in
+  let hts =
+    make_tree_hts conf base dag_elem_txt spouse_on invert no_group set spl d
+  in
   if p_getenv conf.env "slices" = Some "on" then
     print_slices_menu conf base (Some hts)
   else
