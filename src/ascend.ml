@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.51 1999-09-14 22:33:43 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.52 1999-09-21 16:55:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1522,7 +1522,13 @@ value print_tree_with_table conf base gv p =
       if i < n then Wserver.wprint "<td>&nbsp;</td>\n" else ();
     done
   in
-  tag "table" "border=0 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
+  let border =
+    match p_getint conf.env "border" with
+    [ Some x -> x
+    | None -> 0 ]
+  in
+  tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\"" border
+  begin
     let _ =
       List.fold_left
         (fun cs gen ->

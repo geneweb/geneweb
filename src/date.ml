@@ -1,9 +1,11 @@
-(* $Id: date.ml,v 2.13 1999-09-16 15:01:11 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: date.ml,v 2.14 1999-09-21 16:55:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Util;
 open Gutil;
+open Config;
 
 value nbsp = "&nbsp;";
 
@@ -299,6 +301,104 @@ value short_marriage_date_text conf base fam p1 p2 =
     [ Some (Dgreg d _) -> "<font size=-2>" ^ year_text d ^ "</font>"
     | _ -> "" ]
   else ""
+;
+
+(* Calendar request *)
+
+value gregorian_month_name conf n = capitale (transl_nth conf "(month)" n);
+value julian_month_name = gregorian_month_name;
+value french_month_name conf n = capitale (french_month n);
+value hebrew_month_name conf n = capitale (hebrew_month n);
+
+value print_some_calendar conf date n month_name n_months var =
+  do Wserver.wprint "\n";
+     tag "tr" begin
+       stag "th" begin
+         Wserver.wprint "%s\n"
+           (capitale (transl_nth conf "gregorian/julian/french/hebrew" n));
+       end;
+       Wserver.wprint "\n";
+       tag "td" begin
+         Wserver.wprint "<input name=yyyy_%s size=5 maxlength=5 value=%d>\n"
+           var date.year;
+       end;
+       tag "td" "align=center" begin
+         tag "select" "name=mm_%s" var begin
+           for i = 1 to n_months do
+             Wserver.wprint "<option value=%d%s> %s\n" i
+               (if date.month = i then " selected" else "")
+               (month_name conf (i - 1));
+           done;
+         end;
+       end;
+       tag "td" begin
+         Wserver.wprint "<input name=dd_%s size=2 maxlength=2 value=%d>\n"
+           var date.day;
+       end;
+       tag "td" begin
+         Wserver.wprint "<input type=submit name=t_%s value=Ok>\n" var;
+       end;
+     end;
+  return ()
+;
+
+value print_calendar_head conf =
+  tag "tr" begin
+    stag "td" begin Wserver.wprint "&nbsp;"; end; Wserver.wprint "\n";
+    for i = 0 to 2 do
+      tag "th" begin
+        Wserver.wprint "%s" (capitale (transl_nth conf "year/month/day" i));
+      end;
+    done;
+    stag "td" begin Wserver.wprint "&nbsp;"; end; Wserver.wprint "\n";
+  end
+;
+
+value print_calendar conf base =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl_nth conf "calendar/calendars" 1))
+  in
+  let date =
+    List.fold_left
+      (fun d (var, conv) ->
+         match p_getenv conf.env ("t_" ^ var) with
+         [ Some _ ->
+             match
+               (p_getint conf.env ("yyyy_" ^ var),
+                p_getint conf.env ("mm_" ^ var),
+                p_getint conf.env ("dd_" ^ var))
+             with
+             [ (Some yyyy, Some mm, Some dd) ->
+                 conv
+                   {day = dd; month = mm; year = yyyy; prec = Sure; delta = 0}
+             | _ -> d ]
+         | None -> d ])
+      conf.today
+      [("g", fun x -> x);
+       ("j", Calendar.gregorian_of_julian);
+       ("f", Calendar.gregorian_of_french);
+       ("h", Calendar.gregorian_of_hebrew)]
+  in
+  do header conf title;
+     tag "form" "method=GET action=\"%s\"" conf.command begin
+       List.iter
+         (fun (k, v) ->
+            Wserver.wprint "<input type=hidden name=%s value=%s>\n" k v)
+         conf.henv;
+       Wserver.wprint "<input type=hidden name=m value=CAL>\n\n";
+       tag "table" "border=1" begin
+         print_calendar_head conf;
+         print_some_calendar conf date 0 gregorian_month_name 12 "g";
+         print_some_calendar conf (Calendar.julian_of_gregorian date) 1
+           julian_month_name 12 "j";
+         print_some_calendar conf (Calendar.french_of_gregorian date) 2
+           french_month_name 13 "f";
+         print_some_calendar conf (Calendar.hebrew_of_gregorian date) 3
+           hebrew_month_name 13 "h";
+       end;
+     end;
+     trailer conf;
+  return ()
 ;
 
 (* Deprecated *)

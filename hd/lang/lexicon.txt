@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.122 1999-09-21 10:28:24 ddr Exp $
+# $Id: lexicon.txt,v 2.123 1999-09-21 16:55:38 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1166,10 +1166,10 @@ no: begravet
 pt: enterrado/enterrada/enterrado(a)
 se: begravd
 
-    calendar
+    calendar/calendars
 de: Kalender
-en: calendar
-fr: calendrier
+en: calendar/calendars
+fr: calendrier/calendriers
 se: kalender
 
     cancel GeneWeb links

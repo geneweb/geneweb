@@ -1,4 +1,4 @@
-(* $Id: calendar.ml,v 2.5 1999-09-16 15:01:11 ddr Exp $ *)
+(* $Id: calendar.ml,v 2.6 1999-09-21 16:55:48 ddr Exp $ *)
 
 (* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/;
    converted his C program into this Ocaml program.
@@ -76,16 +76,23 @@ value days_per_4_years = 1461;
 value days_per_month = 30;
 
 value sdn_of_french d =
-  (d.year * days_per_4_years) / 4
-  + (d.month - 1) * days_per_month
-  + d.day + sdn_offset
+  let temp =
+    if d.year < 0 then - (- (d.year * days_per_4_years + 1) / 4) - 1
+    else (d.year * days_per_4_years) / 4
+  in
+  temp + (d.month - 1) * days_per_month + d.day + sdn_offset
 ;
 
 value french_of_sdn prec sdn =
   let temp = (sdn - sdn_offset) * 4 - 1 in
   let year = temp / days_per_4_years in
-  let temp = temp mod days_per_4_years in
-  let temp = if temp < 0 then temp + days_per_4_years else temp in
+  let (year, temp) =
+    if temp < 0 then
+      (year - 1,
+       days_per_4_years - 1 -
+         (- temp + days_per_4_years - 1) mod days_per_4_years)
+     else (year, temp mod days_per_4_years)
+  in
   let dayOfYear = temp / 4 in
   let month = dayOfYear / days_per_month + 1 in
   let day = dayOfYear mod days_per_month + 1 in

@@ -210,6 +210,7 @@ birthDeath.cmo birthDeath.cmx: def.syn.cmo pa_html.cmo
 birthday.cmo birthday.cmx: pa_html.cmo
 changeChildren.cmo changeChildren.cmx: pa_lock.cmo pa_html.cmo
 cousins.cmo cousins.cmx: pa_html.cmo
+date.cmo date.cmx: pa_html.cmo
 descend.cmo descend.cmx: pa_html.cmo
 family.cmo family.cmx: def.syn.cmo pa_html.cmo
 gwc.cmo gwc.cmx: pa_lock.cmo
