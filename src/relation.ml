@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.53 2000-10-30 10:51:15 ddr Exp $ *)
+(* $Id: relation.ml,v 3.54 2000-10-30 16:21:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1261,6 +1261,64 @@ value print_main_relationship conf base long p1 p2 rel =
   return ()
 ;
 
+value print_multi_relation conf base pl =
+  let path =
+    loop [] (List.rev pl) where rec loop path =
+      fun
+      [ [p1 :: ([p2 :: _] as pl)] ->
+          let ip1 = p1.cle_index in
+          let ip2 = p2.cle_index in
+          match get_shortest_path_relation base ip1 ip2 [] with
+          [ Some (path1, _) ->
+(*
+let string_of_famlink =
+  fun
+  [ Self -> "self"
+  | Parent -> "parent"
+  | Sibling -> "sibling"
+  | HalfSibling -> "halfsibling"
+  | Mate -> "mate"
+  | Child -> "child" ]
+in
+do Printf.eprintf "ip1 %d ip2 %d\n" (Adef.int_of_iper ip1) (Adef.int_of_iper ip2);
+   List.iter
+     (fun (ip, fl) -> Printf.eprintf "ip=%d; %s\n" (Adef.int_of_iper ip)
+        (string_of_famlink fl))
+     path1;
+   Printf.eprintf "\n";
+   flush stderr;
+return
+*)
+              let path =
+                match path with
+                [ [] -> path1
+                | _ ->
+                    match List.rev path1 with
+                    [ [_ :: path1] -> List.rev path1 @ path
+                    | [] -> path ] ]
+              in
+(*
+do Printf.eprintf "result\n";
+   List.iter
+     (fun (ip, fl) -> Printf.eprintf "ip=%d; %s\n" (Adef.int_of_iper ip)
+        (string_of_famlink fl))
+     path;
+   Printf.eprintf "\n";
+   flush stderr;
+return
+*)
+              loop path pl
+          | None -> path ]
+      | [_] | [] -> path ]
+  in
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
+  do header_no_page_title conf title;
+     print_relation_path_dag conf base (Adef.iper_of_int 0)
+       (Adef.iper_of_int 0) path [];
+     trailer conf;
+  return ()
+;
+
 value print_base_loop conf base =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do rheader conf title;
@@ -1288,4 +1346,14 @@ value print conf base p =
           [ Some rel -> print_main_relationship conf base long p1 p rel
           | None -> print_base_loop conf base ] ]
   | None -> print_menu conf base p ]
+;
+
+value print_multi conf base =
+  let pl =
+    loop [] 1 where rec loop pl i =
+      match find_person_in_env conf base (string_of_int i) with
+      [ Some p -> loop [p :: pl] (i + 1)
+      | None -> pl ]
+  in
+  print_multi_relation conf base pl
 ;
