@@ -5,6 +5,9 @@ GeneWeb Version 3.09
 --------------------
 
 * General
+  - [30 Oct 00] In relation.ml changed the part computing the relationship
+    by shortest path to get a function returning the result instead of
+    displaying it and raising a "Found" exception.
   - [29 Oct 00] Added useful function list_iter_first. Deleted functions
     applied to list to accept old versions of OCaml: now, it is necessary
     to compile with at least version 3.00.
