@@ -40,8 +40,8 @@ case "$1" in
   restart)
 	echo -n "Restarting GeneWeb Services: "
 	cd /home/geneweb/gw/gw
-        killproc gwd
-        killproc gwsetup
+        killproc ./gwd
+        killproc ./gwsetup
 	echo
         touch /var/log/gwd.log /var/log/gwsetup.log
         chown geneweb /var/log/gwd.log /var/log/gwsetup.log
