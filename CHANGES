@@ -57,6 +57,11 @@ GeneWeb version 3.08
     IE); changed the same thing for images in gwd.
 
 * Documentation:
+  - [07 Sep 00] In directions for use, the entry "How to start with GeneWeb"
+    now points to a page which explains that you can start with the program
+    gwsetup instead of typing interactive commands, which seemed not to
+    be clear. Changed diruse.htm (link), added initial.htm, added small
+    paragraph in start.htm.    
   - [03 Sep 00] In FAQ, changed the text about the question of missing
     relationship links (French and English versions only).
   - Added entries in the FAQ (French and English versions) about:
