@@ -37,6 +37,9 @@ GeneWeb Version 1.11
     gwb2ged).
 
 * Lexicon file (lexicon.txt)
+  - [Jan 28, 99] Added section "!dir" for languages written right to left.
+  - [Jan 28, 99] [minor] Portuguese translation now in pure ascii using
+    HTML "&" macros instead of accents (no changes in Portuguese displaying)
   - [Jan 16, 99] For update forms, changed text "Date" into "Date (d/m/y)"
     in english version to be sure there is no ambiguity.
   - [Jan 16, 99] Added declined forms.

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.24 1999-01-24 19:07:30 ddr Exp $ *)
+(* $Id: perso.ml,v 1.25 1999-01-28 14:53:08 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -759,8 +759,14 @@ value print conf base p =
   do header conf title;
      print_sosa_if_any conf base p;
      Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-     Wserver.wprint "<img src=\"%sm=IM;v=up.gif\" alt=\"^^\" align=right>"
-       (commd conf);
+     let dir =
+       try
+         if Hashtbl.find conf.lexicon " !dir" = "rtl" then "left"
+         else "right" with
+       [ Not_found -> "right" ]
+     in
+     Wserver.wprint "<img src=\"%sm=IM;v=up.gif\" alt=\"^^\" align=%s>"
+       (commd conf) dir;
      Wserver.wprint "</a>\n";
      if age_autorise conf base p then
        let photo_txt = capitale (transl conf "photo") in

@@ -11,6 +11,9 @@ nl: iso-8859-1
 pt: iso-8859-1
 se: iso-8859-1
 
+     !dir
+he: rtl
+
      +decl
 eo: =+n
 de: ein=einem
@@ -2515,7 +2518,7 @@ de: Quelle/Quellen
 en: source/sources
 es: fuente/fuentes
 fr: source/sources
-he: מקור/ מקורות
+he:  מקור/ מקורות
 it: sorgente/sorgenti
 nl: bron/bronnen
 pt: fonte/fontes

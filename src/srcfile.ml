@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.12 1999-01-09 12:07:59 ddr Exp $ *)
+(* $Id: srcfile.ml,v 1.13 1999-01-28 14:53:10 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -159,9 +159,15 @@ value rec copy_from_channel conf base ic =
             [ '%' -> Wserver.wprint "%%"
             | '[' | ']' -> Wserver.wprint "%c" c
             | 'b' ->
-                try
-                  Wserver.wprint " %s" (List.assoc "body_prop" conf.base_env)
-                with [ Not_found -> () ]
+                let s =
+                  try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
+                  [ Not_found -> "" ]
+                in
+                let s =
+                  try s ^ " " ^ List.assoc "body_prop" conf.base_env with
+                  [ Not_found -> s ]
+                in
+                if s <> "" then Wserver.wprint "%s" s else ()
             | 'c' ->
                 let (wc, rc, d) = count conf in
                 Num.print (fun x -> Wserver.wprint "%s" x)
