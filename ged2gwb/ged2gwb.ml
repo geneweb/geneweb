@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.22 1998-11-27 20:09:33 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.23 1998-11-28 13:28:41 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -1024,6 +1024,13 @@ value add_fam gen r =
             | _ -> Divorced Adef.codate_None ] ]
     | None -> NotDivorced ]
   in
+  let comment =
+    match find_field "NOTE" r.rsons with
+    [ Some r ->
+        if r.rval <> "" && r.rval.[0] == '@' then ""
+        else r.rval
+    | None -> "" ]
+  in
   let empty = add_string gen "" in
   let fsources = source gen r in
   let fam =
@@ -1032,7 +1039,8 @@ value add_fam gen r =
      marriage_src = add_string gen marr_src;
      divorce = div;
      children = Array.of_list children;
-     comment = empty; origin_file = empty; fsources = add_string gen fsources;
+     comment = add_string gen comment; origin_file = empty;
+     fsources = add_string gen fsources;
      fam_index = i}
   and cpl =
     {father = fath;

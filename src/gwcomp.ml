@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.9 1998-11-27 20:09:42 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.10 1998-11-28 13:28:46 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -622,6 +622,13 @@ value lire_famille ic fname =
         | _ -> ("", ligne) ]
       in
       let co = {father = cle_pere; mother = cle_mere} in
+      let (comm, ligne) =
+        match ligne with
+        [ Some (str, ["comm" :: _]) ->
+            let comm = String.sub str 5 (String.length str - 5) in
+            (comm, lire_ligne ic)
+        | _ -> ("", ligne) ]
+      in
       match ligne with
       [ Some (_, ["beg"]) ->
           let cles_enfants =
@@ -643,18 +650,8 @@ value lire_famille ic fname =
             {marriage = marriage; marriage_place = marr_place;
              marriage_src = marr_src;
              divorce = divorce; children = Array.of_list cles_enfants;
-             comment = ""; origin_file = fname;
+             comment = comm; origin_file = fname;
              fsources = fsrc;
-             fam_index = Adef.ifam_of_int (-1)}
-          in
-          Some (Family co fo, lire_ligne ic)
-      | Some (str, ["comm" :: _]) ->
-          let comm = String.sub str 5 (String.length str - 5) in
-          let fo =
-            {marriage = marriage; marriage_place = marr_place;
-             marriage_src = marr_src;
-             divorce = divorce; children = [||]; comment = comm;
-             origin_file = fname; fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}
           in
           Some (Family co fo, lire_ligne ic)
@@ -662,7 +659,7 @@ value lire_famille ic fname =
           let fo =
             {marriage = marriage; marriage_place = marr_place;
              marriage_src = marr_src;
-             divorce = divorce; children = [||]; comment = "";
+             divorce = divorce; children = [||]; comment = comm;
              origin_file = fname; fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}
           in

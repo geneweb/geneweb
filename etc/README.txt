@@ -24,7 +24,7 @@ GeneWeb is copyright INRIA 1998.
 
 Remarks, suggestions, questions, bug reports to:
 	daniel.de_rauglaudre@inria.fr
-	http://pauillac.inria.fr/~ddr/
+	http://cristal.inria.fr/~ddr/
 
 Please specify the version number above and the system you use (Linux,
 Windows NT, Windows 95).
