@@ -1,0 +1,278 @@
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: conf.txt,v 1.1 2002-01-30 13:59:18 ddr Exp $ -->
+  <title>Gwtp - [
+en: configuration
+fr: configuration
+] %b</title>
+</head>
+<body>
+<h1 align=center>Gwtp - [
+en: configuration
+fr: configuration
+] %b</h1>
+
+<div align=right>
+<a href="%s?m=CNF;b=%b;t=%t;lang=en">English</a> /
+<a href="%s?m=CNF;b=%b;t=%t;lang=fr">Français</a>
+</div>
+
+<form method=POST action="%s">
+<input type=hidden name=m value=SCNF>
+<input type=hidden name=b value=%b>
+<input type=hidden name=t value=%t>
+
+<table>
+<tr><td>[
+en: Friend password:
+fr: Mot de passe ami:
+]
+<td><input name=friend_passwd value="%vfriend_passwd;"><br>
+<tr><td>[
+en: Wizard password:
+fr: Mot de passe magicien:
+]
+<td><input name=wizard_passwd value="%vwizard_passwd;"><br>
+</table>
+[
+en: Default language:
+fr: Langue par défaut:
+]
+<select name="default_lang">
+<option value=""%edefault_lang=;><tt>-</tt>
+<option value="af"%edefault_lang=af;>[
+en: Afrikaans
+fr: Afrikaans
+]
+<option value="ca"%edefault_lang=ca;>[
+en: Catalan
+fr: Catalan
+]
+<option value="cs"%edefault_lang=cs;>[
+en: Czech
+fr: Tchèque
+]
+<option value="de"%edefault_lang=de;>[
+en: German
+fr: Allemand
+]
+<option value="da"%edefault_lang=da;>[
+en: Danish
+fr: Danois
+]
+<option value="nl"%edefault_lang=nl;>[
+en: Dutch
+fr: Néerlandais
+]
+<option value="en"%edefault_lang=en;>[
+en: English
+fr: Anglais
+]
+<option value="eo"%edefault_lang=eo;>[
+en: Esperanto
+fr: Espéranto
+]
+<option value="et"%edefault_lang=et;>[
+en: Estonian
+fr: Estonien
+]
+<option value="fi"%edefault_lang=fi;>[
+en: Finnish
+fr: Finnois
+]
+<option value="fr"%edefault_lang=fr;>[
+en: French
+fr: Français
+]
+<option value="he"%edefault_lang=he;>[
+en: Hebrew
+fr: Hébreu
+]
+<option value="is"%edefault_lang=is;>[
+en: Icelandic
+fr: Islandais
+]
+<option value="it"%edefault_lang=it;>[
+en: Italian
+fr: Italien
+]
+<option value="lv"%edefault_lang=lv;>[
+en: Latvian
+fr: Letton
+]
+<option value="no"%edefault_lang=no;>[
+fr: Norwegian
+en: Norvégien
+]
+<option value="pl"%edefault_lang=pl;>[
+en: Polish
+fr: Polonais
+]
+<option value="pt"%edefault_lang=pt;>[
+en: Portuguese
+fr: Portugais
+]
+<option value="pt-br"%edefault_lang=pt-br;>[
+en: Brazilian
+fr: Brésilien
+]
+<option value="es"%edefault_lang=es;>[
+en: Spanish
+fr: Espagnol
+]
+<option value="ru"%edefault_lang=ru;>[
+en: Russian
+fr: Russe
+]
+<option value="sv"%edefault_lang=sv;>[
+en: Swedish
+fr: Suédois
+]
+<option value="zh"%edefault_lang=zh;>[
+en: Chinese
+fr: Chinois
+]
+</select>
+<br>
+
+<p>
+
+[
+en: Body tag property:
+fr: Propriété "body tag":
+]
+<input name=body_prop value="%vbody_prop;" size=50><br>
+
+<p>
+
+[
+en: Images URL:
+fr: URL pour les images:
+]
+<input name=images_path value="%vimages_path;" size=50><br>
+
+<p>
+
+[
+en: Propose search by nobility titles in welcome page:
+fr: Propose la recherche par titres de noblesse dans la page d'accueil:
+]
+<input type=radio name=propose_titles value=yes%cpropose_titles=yes;>[
+en: yes
+fr: oui
+]
+<input type=radio name=propose_titles value=no%cpropose_titles=no;>[
+en: no
+fr: non
+]
+
+<p>
+
+[
+en: Hide private names:
+fr: Cacher les noms privés:
+]
+<input type=radio name=hide_private_names
+ value=yes%chide_private_names=yes;>[
+en: yes
+fr: oui
+]
+<input type=radio name=hide_private_names
+ value=no%chide_private_names=no;>[
+en: no
+fr: non
+]
+
+<p>
+
+[
+en: Use the "restricted access" system (more strict):
+fr: Utiliser le system "accès restreint" (plus strict):
+]
+<input type=radio name=use_restrict
+ value=yes%cuse_restrict=yes;>[
+en: yes
+fr: oui
+]
+<input type=radio name=use_restrict
+ value=no%cuse_restrict=no;>[
+en: no
+fr: non
+]
+
+<p>
+
+[
+en: Wizard just friend (for temporary update)
+fr: Magiciens seulement amis (pour mises à jour temporaires):
+]
+<input type=radio name=wizard_just_friend
+ value=yes%cwizard_just_friend=yes;>[
+en: yes
+fr: oui
+]
+<input type=radio name=wizard_just_friend
+ value=no%cwizard_just_friend=no;>[
+en: no
+fr: non
+]
+
+<p>
+
+[
+en: Trailer text:
+fr: Texte pour le bas des pages:
+]
+<textarea name=trl rows=5 cols=70 maxlength=50 wrap=virtual>%ftrl;</textarea>
+
+<p>
+
+[
+en: Advice:
+fr: Remarques:
+]
+
+<ul>
+
+<li>[
+en: If you want that everybody be "friend", clear your friend password
+fr: Si vous voulez que tout le monde soit "ami", effacez le mot de
+    passe ami.
+]
+
+<li>[
+en: Keep an non-empty and not too simple wizard password.
+fr: Choisissez un mot de passe "magicien" non vide et pas trop simple.
+]
+
+<li>[
+en: This is not checked: you take your responsabilities.
+fr: Cela n'est pas vérifié: vous prenez vos responsabilités.
+]
+
+<li>[
+en: If you don't know, keep the proposed passwords.
+fr: Si vous ne savez pas, gardez les mots de passe proposés.
+]
+
+</ul>
+
+<p>
+
+[
+en: Other configuration parameters exist, but they may have an influence
+    on the performances of the server computer. Ask the GeneWeb site
+    administrator if you want to change them. Be aware of the fact that
+    your resquest may not be accepted.
+fr: D'autres paramètres de configuration existent, mais ils peuvent avoir
+    une influence sur les performances de l'ordinateur serveur. Demandez
+    à l'administrateur du site GeneWeb si vous voulez les changer. Soyez
+    conscient du fait que votre requête peut ne pas être acceptée.
+]
+
+<p>
+<input type=submit value="[
+en: Update
+fr: Modifier
+]">
+</form>

@@ -1,4 +1,8 @@
-<head><title>Gwtp - upload %b</title></head>
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: send_gedcom.txt,v 1.1 2002-01-30 13:59:19 ddr Exp $ -->
+  <title>Gwtp - upload %b</title>
+</head>
 <body>
 <h1 align=center>Gwtp - upload %b</h1>
 <form method=POST action="%s" enctype="multipart/form-data">
@@ -11,11 +15,18 @@
 <a href="%s?m=UPG;b=%b;t=%t;lang=fr">Français</a>
 </div><p>
 
-Sélectionnez votre fichier GEDCOM:<br><p>
+[
+en: Select your GEDCOM file:
+fr: Sélectionnez votre fichier GEDCOM:
+]<br><p>
 
 <input type=file name=gedcom size=60><br><p>
 
 <p>
 
-<input type=submit value=Envoyer>
+<input type=submit value="
+[
+en: Send
+fr: Envoyer
+]">
 </form>

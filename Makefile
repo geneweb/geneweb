@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.11 2002-01-21 05:00:59 ddr Exp $
+# $Id: Makefile,v 4.12 2002-01-30 13:59:17 ddr Exp $
 
 DESTDIR=distribution
 
@@ -84,10 +84,7 @@ classical_distrib:
 	mkdir $(DESTDIR)/gwtp_tmp/lang
 	cp gwtp/gwtp $(DESTDIR)/gwtp_tmp/gwtp$(EXE)
 	cp gwtp/README $(DESTDIR)/gwtp_tmp/.
-	for i in en fr; do \
-		mkdir $(DESTDIR)/gwtp_tmp/lang/$$i; \
-		cp gwtp/lang/$$i/*.txt $(DESTDIR)/gwtp_tmp/lang/$$i/.; \
-	done
+	cp gwtp/lang/*.txt $(DESTDIR)/gwtp_tmp/lang/.
 	cp etc/LISEZMOI.txt $(DESTDIR)/.
 	cp etc/README.txt $(DESTDIR)/.
 	cp etc/INSTALL.htm $(DESTDIR)/.
