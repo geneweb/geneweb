@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 2.10 1999-09-26 16:18:11 ddr Exp $ *)
+(* $Id: history.ml,v 2.11 1999-09-26 18:32:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -33,9 +33,9 @@ value record conf base (fn, sn, occ) action =
     let fname = file_name conf in
     let oc = open_out_gen ext_flags 0o644 fname in
     let (hh, mm, ss) = conf.time in
-    do Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d %s %s.%d %s\n"
-	 conf.today.year conf.today.month conf.today.day hh mm ss action fn occ
-	   sn;
+    do Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d [%s] %s %s.%d %s\n"
+	 conf.today.year conf.today.month conf.today.day hh mm ss conf.user
+         action fn occ sn;
        close_out oc;
     return ()
   else ()
@@ -86,24 +86,33 @@ value line_tpl = "0000-00-00 00:00:00 xx .";
 value line_fields conf base line =
   if String.length line > String.length line_tpl then
     let time = String.sub line 0 19 in
-    let action = action_text conf (String.sub line 20 2) in
-    let key = String.sub line 23 (String.length line - 23) in
+    let (user, i) =
+      match (line.[20], Gutil.lindex line ']') with
+      [ ('[', Some i) ->
+          let user = String.sub line 21 (i - 21) in
+          (user, i + 2)
+      | _ -> ("", 20) ]
+    in
+    let action = action_text conf (String.sub line i 2) in
+    let key = String.sub line (i + 3) (String.length line - i - 3) in
     let p =
       match person_ht_find_all base key with
       [ [ip] -> Right (poi base ip)
       | _ -> Left key ]
     in
-    Some (time, action, p)
+    Some (time, user, action, p)
   else None
 ;
 
 value print_history_line conf base line i =
   match line_fields conf base line with
-  [ Some (time, action, p) ->
+  [ Some (time, user, action, p) ->
       do if i = 0 then Wserver.wprint "<dl>\n" else ();
          html_li conf;
          Wserver.wprint "<dt><tt>%s</tt>\n" time;
-         Wserver.wprint "(%s)\n<dd>" action;
+         Wserver.wprint "(%s)\n" action;
+         if user <> "" then Wserver.wprint "<em>%s</em>\n" user else ();
+         Wserver.wprint "<dd>";
          match p with
          [ Left key -> Wserver.wprint "%s" key
          | Right p ->
