@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.11 2000-09-12 23:35:14 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.12 2000-09-21 11:11:16 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -283,8 +283,10 @@ value reconstitute_person conf =
 ;
 
 value check_person conf base p =
-  if p.first_name = "" then Some (transl conf "first name missing")
-  else if p.surname = "" then Some (transl conf "surname missing")
+  if p.first_name = "" || p.first_name = "?" then
+    Some (transl conf "first name missing")
+  else if p.surname = "" || p.surname = "?" then
+    Some (transl conf "surname missing")
   else None
 ;
 

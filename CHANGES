@@ -8,6 +8,9 @@ GeneWeb version 3.08
     it was going to do it.
 
 * GeneWeb Service/CGI (gwd)
+  - [21 Sep 00] When modifying a person, forbid now to let his/her
+    first name or surname as just "?", because it can cause problems
+    of linking these persons after a data base cleanup.
   - [18 Sep 00] In family updating, when creating an unknown person
     (i.e. having "?" as firstname or surname), does not set the "source"
     field any more for this person.
