@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.6 1999-05-23 09:51:59 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.7 1999-06-26 10:23:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -649,7 +649,7 @@ value output_surname_index oc2 base =
          try IstrTree.find p.surname bt.val with
          [ Not_found -> [] ]
        in
-       bt.val := IstrTree.add p.surname [ p.cle_index :: a] bt.val;
+       bt.val := IstrTree.add p.surname [p.cle_index :: a] bt.val;
      done;
      output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
   return ()
@@ -667,7 +667,7 @@ value output_first_name_index oc2 base =
          try IstrTree.find p.first_name bt.val with
          [ Not_found -> [] ]
        in
-       bt.val := IstrTree.add p.first_name [ p.cle_index :: a] bt.val;
+       bt.val := IstrTree.add p.first_name [p.cle_index :: a] bt.val;
      done;
      output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
   return ()
@@ -722,7 +722,11 @@ value make_strings_of_fsname base =
        let surname = sou base p.surname in
        do if first_name <> "?" then add_name t first_name p.first_name
           else ();
-          if surname <> "?" then add_name t surname p.surname
+          if surname <> "?" then
+            do add_name t surname p.surname;
+               List.iter (fun sp -> add_name t sp p.surname)
+                 (surnames_pieces surname);
+            return ()
           else ();
        return ();
      done;

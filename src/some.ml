@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.5 1999-05-12 16:25:12 ddr Exp $ *)
+(* $Id: some.ml,v 2.6 1999-06-26 10:23:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -30,7 +30,8 @@ value persons_of_fsname base find proj x =
     List.fold_right
       (fun istr l ->
          let str = sou base istr in
-         if Name.crush_lower str = x then
+         if Name.crush_lower str = x
+         || List.mem x (List.map Name.crush_lower (surnames_pieces str)) then
            let iperl = find istr in
            let iperl =
              List.fold_left
@@ -287,8 +288,14 @@ value rec print_by_branch x conf base (ipl, homonymes) =
       | _ -> x ]
     in
     let title h =
-      do Wserver.wprint "%s" (coa conf (List.hd homonymes));
-         List.iter (fun x -> Wserver.wprint ", %s" (coa conf x))
+      let access x =
+        if h || List.length homonymes = 1 then coa conf x
+        else
+          geneweb_link conf ("m=N;v=" ^ code_varenv (Name.lower x))
+            (coa conf x)
+      in
+      do Wserver.wprint "%s" (access (List.hd homonymes));
+         List.iter (fun x -> Wserver.wprint ", %s" (access x))
            (List.tl homonymes);
       return ()
     in
