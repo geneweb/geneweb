@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.28 2000-05-06 18:54:38 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.29 2000-05-07 12:33:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1901,7 +1901,7 @@ value print_surname_list conf base v p =
                    sosa_list ("", 1)
                in
                wprint_geneweb_link conf
-                 ("m=DAG;" ^ acces conf base p ^ str)
+                 ("m=DAG;" ^ acces_n conf base "1" p ^ str)
                  (surname_end surn ^ surname_begin surn);
              if conf.cancel_links then ()
              else
