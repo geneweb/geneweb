@@ -116,7 +116,7 @@ fr: %t est n&eacute;(e) apr&egrave;s la mort de sa m&egrave;re %t
 he: %t  נלד(ה) אחרי מוות האם
 it: %t sarebbe nato dopo la morte di sua madre %t
 nl: %t zou geboren zijn na de dood van zijn/haar moeder %t
-pt: $t nasceu depois do ףbito da m&atilde;e
+pt: $t nasceu depois do &oacute;bito da m&atilde;e
 se: %t &auml;r f&ouml;dd efter att hans/hennes mor dog %t
 
     %t is born more than 2 years after the death of his/her father %t
@@ -128,7 +128,7 @@ fr: %t est n&eacute;(e) plus de 2 ans apr&egrave;s la mort de son p&egrave;re %t
 he: %t  נלד(ה) יותר משנתיים אחרי מוות האב
 it: %t sarebbe nato pi&ugrave; di 2 anni dopo la morte di suo padre %t
 nl: %t is geboren meer dan twee jaar na de dood van zijn/haar vader
-pt: %t nasceu passados 2 anos depois do ףbito do pai
+pt: %t nasceu passados 2 anos depois do &oacute;bito do pai
 se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att hans/hennes far dog %t
 
     (date)
@@ -166,7 +166,7 @@ fr: janvier/f&eacute;vrier/mars/avril/mai/juin/juillet/ao&ucirc;t/septembre/octo
 he:  ינואר/פברואר/מרץ/אפריל/מאי/יוני/יולי/אוגוסט/ספטמבר/אוקטובר/נובמבר/דצמבר
 it: gennaio/febbraio/marzo/aprile/maggio/giugno/luglio/agosto/settembre/ottobre/novembre/dicembre
 nl: Januari/Februari/Maart/April/Mei/Juni/Juli/Augustus/September/Oktober/November/December
-pt: Janeiro/Febreiro/Marחo/Abril/Maio/Junho/Julho/Agosto/Setembro/Outubro/Novembro/Dezembro
+pt: Janeiro/Febreiro/Mar&ccedil;o/Abril/Maio/Junho/Julho/Agosto/Setembro/Outubro/Novembro/Dezembro
 se: januari/februari/mars/april/maj/juni/juli/augusti/september/oktober/november/december
 
     (thousand separator)
@@ -191,7 +191,7 @@ fr: dimanche/lundi/mardi/mercredi/jeudi/vendredi/samedi
 he:  יום א'/יום ב'/יום ג'/יום ד'/יום ה'/יום ו'/שבת 
 it: domenica/luned&igrave;/marted&igrave;/mercoled&igrave;/gioved&igrave;/venerd&igrave;/sabato
 nl: Zondag/Maandag/Dinsdag/Woensdag/Donderdag/Vrijdag/Zaterdag
-pt: domingo/segunda-feira/terחa-feira/quarta-feira/quinta-feira/sexta-feira/s&aacute;bado
+pt: domingo/segunda-feira/ter&ccedil;a-feira/quarta-feira/quinta-feira/sexta-feira/s&aacute;bado
 se: s&ouml;ndag/m&aring;ndag/tisdag/onsdag/torsdag/fredag/l&ouml;rdag
 
     *nth (cousin)*
@@ -284,7 +284,7 @@ fr: num&eacute;rotation Sosa
 he:   משפרי "Sosa" 
 it: numeri Sosa
 nl: Kwartiernummers
-pt: numeraח&atilde;o Sosa
+pt: numera&ccedil;&atilde;o Sosa
 se: generationsnummer
 
     a %s cousin
@@ -368,7 +368,7 @@ fr: un grand-p&egrave;re/une grand-m&egrave;re/un grand-parent
 he:    סבא/ סבתא
 it: un nonno/una nonna/un(a) nonno(a)
 nl: een grootvader/een grootmoeder/een grootouder
-pt: um avפ/uma avף/um(a) avפ(ף)
+pt: um av&ocirc;/uma av&oacute;/um(a) av&ocirc;(&oacute;)
 se: en farf&ouml;r&auml;lder/en morf&ouml;r&auml;lder/en far(mor)f&ouml;r&auml;lder
 
     a grandson/a granddaughter/a grandchild
@@ -392,7 +392,7 @@ fr: un arri&egrave;re-grand-p&egrave;re/une arri&egrave;re-grand-m&egrave;re/un 
 he:   רב-סבא/ רב-סבתא
 it: un bisnonno/una bisnonna/un(a) bisnonno(a)
 nl: een over-grootvader/een over-grootmoeder/een over-grootouder
-pt: um bisavפ/uma bisavף/um(a) bisavפ(ף)
+pt: um bisav&ocirc;/uma bisav&oacute;/um(a) bisav&ocirc;(&oacute;)
 se: en gammel-farf&ouml;r&auml;lder/en gammel-morf&ouml;r&auml;lder/en gammel-far(mor)f&ouml;r&auml;lder
 
     a great-grandson/a great-granddaughter/a great-grandchild
@@ -428,7 +428,7 @@ fr: un grand-oncle/une grand-tante
 he:   דוד-סב/ דודה-סבה
 it: un prozio/una prozia
 nl: een oud-oom/een oud-tante
-pt: um tio avפ/uma tia avף
+pt: um tio av&ocirc;/uma tia av&oacute;
 se: en gammel-far(mor)bror/en gammel-faster(moster)
 
     a nephew/a niece
@@ -500,7 +500,7 @@ fr: requ&ecirc;te &eacute;volu&eacute;e
 he:   בקשה מתקדמת 
 it: avanzata richiesta
 nl: gedetailleerde opzoeking
-pt: investigaח&atilde;o complexa
+pt: investiga&ccedil;&atilde;o complexa
 se: avancerad s&ouml;kning
 
     after
@@ -788,7 +788,7 @@ fr: d&eacute;but
 he:   התחיל 
 it: inizio
 nl: begin
-pt: comeחo
+pt: come&ccedil;o
 se: b&ouml;rjar
 
     between (date)
@@ -1202,7 +1202,7 @@ fr: familles avec codage
 he:  משפחות עם קודים
 it: famiglia con codice
 nl: families met kode
-pt: familias con cףdigo
+pt: familias con c&oacute;digo
 se: familjer med kod
 
     family added
@@ -1347,7 +1347,7 @@ fr: g&eacute;n&eacute;ration
 he:   דור 
 it: generazione
 nl: generatie
-pt: geraח&atilde;o
+pt: gera&ccedil;&atilde;o
 se: generationen
 
     grand-parents
@@ -1549,7 +1549,7 @@ fr: index des conjoints (non descendants)
 he:  מפתח בני הזוג שאינם צאצאים
 it: indice dei coniugi (non discendenti)
 nl: index van echtgenoten (geen nakomelingen)
-pt: index dos cפnjuges (n&atilde;o descendentes)
+pt: index dos c&ocirc;njuges (n&atilde;o descendentes)
 se: f&ouml;rteckning &ouml;ver gem&aring;lerna (icke &auml;ttlingar)
 
     insert
@@ -1632,7 +1632,7 @@ fr: moins d'un mois
 he:  פחות מחודש בגיל
 it: meno di un mese
 nl: minder dan een maand oud
-pt: menos de um mךs
+pt: menos de um m&ecirc;s
 se: mindre &auml;n en m&aring;nad gammal
 
     less than one year old
@@ -1666,7 +1666,7 @@ fr: lien entre
 he:  קשר בין
 it: legame tra
 nl: konnektie tussen
-pt: relaח&atilde;o entre
+pt: rela&ccedil;&atilde;o entre
 se: sl&auml;ktskap emellan
 
     list
@@ -1743,7 +1743,7 @@ es: maximum %d generaci&oacute;ns
 he:  מקסימום %d דורות
 fr: max %d g&eacute;n&eacute;rations
 nl: maximaal %d generaties
-pt: maximum %d geraח&otilde;es
+pt: maximum %d gera&ccedil;&otilde;es
 se: maximalt %d generationer
 
     maybe (date)
@@ -2047,7 +2047,7 @@ es: ocupaci&oacute;n
 he:  מקצוע
 fr: occupation
 nl: beroep
-pt: ocupaח&atilde;o
+pt: ocupa&ccedil;&atilde;o
 se: yrke
 
     of
@@ -2081,7 +2081,7 @@ fr: &agrave; la %s g&eacute;n&eacute;ration
 he:   לדור  %s
 it: della %s generazione
 nl: van de %s generatie
-pt: a la %s geraח&atilde;o
+pt: a la %s gera&ccedil;&atilde;o
 se: av den %s generationen
 
     of the birth
@@ -2117,7 +2117,7 @@ fr: de la disparition
 he:   של העלמות
 it: della scomparsa
 nl: van het verdwijnen
-pt: da dispariח&atilde;o
+pt: da dispari&ccedil;&atilde;o
 se: av f&ouml;rsvinnandet
 
     of the execution
@@ -2129,7 +2129,7 @@ fr: de l'ex&eacute;cution
 he:   של ההוצאה להורג
 it: di esecuzione
 nl: van de executie
-pt: da execuח&atilde;o
+pt: da execu&ccedil;&atilde;o
 se: av avr&auml;ttningen
 
     of the murder
@@ -2200,7 +2200,7 @@ es: solamente la generaci&oacute;n elegida
 he:  דור הנבכר בלבד
 fr: seulement la g&eacute;n&eacute;ration s&eacute;lectionn&eacute;e
 nl: alleen de geselecteerde generatie
-pt: sף a geraח&atilde;o selecionada
+pt: s&oacute; a gera&ccedil;&atilde;o selecionada
 se: endast den valda generationen
 
     or
@@ -2448,7 +2448,7 @@ fr: voir plus loin
 he:  כדלקמן
 it: vedi di seguito
 nl: zie verder
-pt: ver a continuaח&atilde;o
+pt: ver a continua&ccedil;&atilde;o
 se: se vidare
 
     several answers
@@ -2555,7 +2555,7 @@ fr: conjoints non compris
 he:  לא כולל בני זוג
 it: coniugi esclusi
 nl: echtgenoten weggelaten
-pt: cפnjuges n&atilde;o inclu&iacute;dos
+pt: c&ocirc;njuges n&atilde;o inclu&iacute;dos
 se: makar inte inkluderade
 
     starting with
@@ -2567,7 +2567,7 @@ fr: commen&ccedil;ant par
 he:  להתחיל מ-
 it: partendo da
 nl: begint met
-pt: comeחando com
+pt: come&ccedil;ando com
 se: som startar med
 
     surname alias
@@ -2682,7 +2682,7 @@ fr: la %s g&eacute;n&eacute;ration
 he:   דור ה%s
 it: la %s generazione
 nl: de %s generatie
-pt: a %s geraח&atilde;o
+pt: a %s gera&ccedil;&atilde;o
 se: den %s generationen
 
     the anniversary
@@ -2908,7 +2908,7 @@ fr: jusqu'&agrave; la %s g&eacute;n&eacute;ration
 he:  לדור ה%s
 it: fino alla %s generazione
 nl: tot de %s generatie
-pt: at&eacute; a %s geraח&atilde;o
+pt: at&eacute; a %s gera&ccedil;&atilde;o
 se: till den %s generationen
 
     to the children
@@ -3100,7 +3100,7 @@ fr: serait son propre anc&ecirc;tre
 he:  היה אב-קדמון לעצמו/לעצמה 
 it: sarebbe antenato(a) di se stesso(a)
 nl: zou zijn/haar eigen voorouder zijn
-pt: seria seu prףpio ancestro
+pt: seria seu pr&oacute;pio ancestro
 se: skulle vara hans/hennes egen stamfader
 
     years old
