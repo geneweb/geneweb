@@ -18,7 +18,8 @@ GeneWeb version 3.03
     it did not work (incorrect URL).
 
 * Gedcom to GeneWeb (ged2gwb)
-  - [05 Feb 00] Added unused Gedcom tags (of indiduals) in notes.
+  - [19 Feb 00] Added option "-uin" (untreated in notes) to put unused
+    Gedcom tags (of indiduals) in notes.
 
 * Base configuration files (base.gwf)
   - [25 Jan 00] Added variable "public_if_titles": if "yes", consider persons

@@ -23,6 +23,9 @@ GeneWeb Version 3.03
   - [19 Jan 00] In traces, display dates in standard, i.e. using -
     instead of / in year-month-day.
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [19 Feb 00] The option "-ds" applies now to families too.
+
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
   - [21 Jan 00] Changed "anniversaries of dead" into "annivesaries of death"
   - [13 Jan 00] Changed "living" into "alive"
