@@ -1,7 +1,5 @@
-(* $Id: phonygwd.ml,v 1.4 1999-02-02 10:24:26 ddr Exp $ *)
+(* $Id: phonygwd.ml,v 1.5 1999-03-04 12:36:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
-
-open Unix;
 
 value port_selected = ref 2317;
 value fname = ref "";
@@ -14,14 +12,14 @@ value log addr request s =
        (succ tm.Unix.tm_mon) tm.Unix.tm_year tm.Unix.tm_hour tm.Unix.tm_min;
      Printf.eprintf " %s\n" s;
      match addr with
-     [ ADDR_UNIX x -> ()
-     | ADDR_INET iaddr port ->
+     [ Unix.ADDR_UNIX x -> ()
+     | Unix.ADDR_INET iaddr port ->
          Printf.eprintf "  From: %s\n"
-           (try (gethostbyaddr iaddr).h_name with _ ->
-              string_of_inet_addr iaddr) ];
+           (try (Unix.gethostbyaddr iaddr).Unix.h_name with _ ->
+              Unix.string_of_inet_addr iaddr) ];
      Printf.eprintf "  Agent: %s\n" user_agent;
      if referer <> "" then Printf.eprintf "  Referer: %s\n" referer else ();
-     flush Pervasives.stderr;
+     flush stderr;
   return ()
 ;
 
@@ -55,7 +53,7 @@ value main () =
      if fname.val = "" then
        do Printf.eprintf "Missing file\n";
           Printf.eprintf "Use option -help for usage\n";
-          flush Pervasives.stderr;
+          flush stderr;
        return exit 1
      else ();
      close_in (open_in fname.val);
@@ -66,9 +64,9 @@ value main () =
 try
   main ()
 with
-[ Unix_error err fun_name arg ->
-    do Printf.eprintf "Error: \"%s\", %s\n" fun_name (error_message err);
-       flush Pervasives.stderr;
+[ Unix.Unix_error err fun_name arg ->
+    do Printf.eprintf "Error: \"%s\", %s\n" fun_name (Unix.error_message err);
+       flush stderr;
     return exit 1
 | exc -> Printexc.catch raise exc ]
 ;

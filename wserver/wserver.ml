@@ -1,11 +1,8 @@
-(* $Id: wserver.ml,v 1.16 1999-02-08 18:27:04 ddr Exp $ *)
+(* $Id: wserver.ml,v 1.17 1999-03-04 12:36:54 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
-open Unix;
-
 value wserver_oc =
-  do set_binary_mode_out Pervasives.stdout True; return
-  ref Pervasives.stdout
+  do set_binary_mode_out stdout True; return ref stdout
 ;
 
 value wprint fmt = Printf.fprintf wserver_oc.val fmt;
@@ -112,7 +109,9 @@ value encode s =
 
 value nl () =
   do wflush ();
-     let _ = write (Unix.descr_of_out_channel wserver_oc.val) "\r\n" 0 2 in ();
+     let _ =
+        Unix.write (Unix.descr_of_out_channel wserver_oc.val) "\r\n" 0 2 in
+     ();
   return ()
 ;
 
@@ -125,7 +124,7 @@ value html charset =
 
 value print_exc exc =
   match exc with
-  [ Unix_error err fun_name arg ->
+  [ Unix.Unix_error err fun_name arg ->
       do prerr_string "\"";
          prerr_string fun_name;
          prerr_string "\" failed";
@@ -134,7 +133,7 @@ value print_exc exc =
            return ()
          else ();
          prerr_string ": ";
-         prerr_endline (error_message err);
+         prerr_endline (Unix.error_message err);
       return ()
   | Out_of_memory -> prerr_string "Out of memory\n"
   | Match_failure (file, first_char, last_char) ->
@@ -176,7 +175,7 @@ value print_exc exc =
 value print_err_exc exc =
   do print_exc exc;
      Printf.eprintf "Please report.\n";
-     flush Pervasives.stderr;
+     flush stderr;
   return ()
 ;
 
@@ -255,21 +254,21 @@ value get_request_and_content strm =
 
 value string_of_sockaddr =
   fun
-  [ ADDR_UNIX s -> s
-  | ADDR_INET a _ -> string_of_inet_addr a ]
+  [ Unix.ADDR_UNIX s -> s
+  | Unix.ADDR_INET a _ -> Unix.string_of_inet_addr a ]
 ;
-value sockaddr_of_string s = ADDR_UNIX s;
+value sockaddr_of_string s = Unix.ADDR_UNIX s;
 
 value treat_connection tmout callback addr ic =
   do ifdef UNIX then
        if tmout > 0 then
-         let spid = fork () in
+         let spid = Unix.fork () in
          if spid > 0 then
            do let _ (* : Sys.signal_behavior *) =
                 Sys.signal Sys.sigalrm
                   (Sys.Signal_handle (timeout tmout spid))
               in ();
-              let _ = alarm tmout in ();
+              let _ = Unix.alarm tmout in ();
               let _ = Unix.waitpid [] spid in ();
               let _ (* : Sys.signal_behavior *) =
                 Sys.signal Sys.sigalrm Sys.Signal_default
@@ -297,13 +296,13 @@ value treat_connection tmout callback addr ic =
        wprint "Disallow: /"; nl ();
        wflush ();
        Printf.eprintf "Robot request\n";
-       flush Pervasives.stderr;
+       flush stderr;
     return ()
   else
-    let _ = ifdef UNIX then nice 1 else () in
+    let _ = ifdef UNIX then Unix.nice 1 else () in
     do try callback (addr, request) str with exc -> print_err_exc exc;
        try wflush () with _ -> ();
-       try flush Pervasives.stderr with _ -> ();
+       try flush stderr with _ -> ();
     return ()
 ;
 
@@ -317,7 +316,7 @@ value copy_what_necessary t oc =
     Stream.from
       (fun _ ->
 	 do if i.val >= len.val then
-              do len.val := read t buff 0 (String.length buff);
+              do len.val := Unix.read t buff 0 (String.length buff);
 	         i.val := 0;
 		 if len.val > 0 then output oc buff 0 len.val else ();
 	      return ()
@@ -342,16 +341,16 @@ value cleanup_sons () =
   List.iter
     (fun p ->
        let pid =
-         try fst (Unix.waitpid [WNOHANG] p) with
-         [ Unix_error _ _ _ as exc ->
+         try fst (Unix.waitpid [Unix.WNOHANG] p) with
+         [ Unix.Unix_error _ _ _ as exc ->
              do if cleanup_verbose.val then
                   do Printf.eprintf "*** Why error on waitpid %d?\n" p;
-                     flush Pervasives.stderr;
+                     flush stderr;
                      print_exc exc;
                      Printf.eprintf "[";
                      List.iter (fun p -> Printf.eprintf " %d" p) pids.val;
                      Printf.eprintf "]\n";
-                     flush Pervasives.stderr;
+                     flush stderr;
                      cleanup_verbose.val := False;
                   return ()
                 else ();
@@ -368,23 +367,23 @@ value wait_available max_clients s =
       do if List.length pids.val >= m then
 (*
 let tm = Unix.localtime (Unix.time ()) in
-do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "%d clients running; waiting...\n" m; flush Pervasives.stderr; return
+do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "%d clients running; waiting...\n" m; flush stderr; return
 *)
            let (pid, _) = Unix.wait () in
 (*
 let tm = Unix.localtime (Unix.time ()) in
-do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "ok: place for another client\n"; flush Pervasives.stderr; return
+do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d " tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec; Printf.eprintf "ok: place for another client\n"; flush stderr; return
 *)
            pids.val := list_remove pid pids.val
          else ();
          if pids.val <> [] then cleanup_sons () else ();
          let stop_verbose = ref False in
-         while pids.val <> [] && select [s] [] [] 15.0 = ([], [], []) do
+         while pids.val <> [] && Unix.select [s] [] [] 15.0 = ([], [], []) do
            cleanup_sons ();
            if pids.val <> [] && not stop_verbose.val then
              do stop_verbose.val := True; return
              let tm = Unix.localtime (Unix.time ()) in
-do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after cleanup\n" tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec (List.length pids.val); flush Pervasives.stderr; return ()
+do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after cleanup\n" tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec (List.length pids.val); flush stderr; return ()
            else ();
          done;
      return ()
@@ -393,36 +392,36 @@ do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining aft
 
 value accept_connection tmout max_clients callback s =
   do wait_available max_clients s; return
-  let (t, addr) = accept s in
-  do setsockopt t SO_KEEPALIVE True; return
+  let (t, addr) = Unix.accept s in
+  do Unix.setsockopt t Unix.SO_KEEPALIVE True; return
   ifdef UNIX then
-    match try Some (fork ()) with _ -> None with
+    match try Some (Unix.fork ()) with _ -> None with
     [ Some 0 ->
         do try
-             do if max_clients = None && fork () <> 0 then exit 0 else ();
-                close s;
-                dup2 t stdout;
-                dup2 t stdin;
-                treat_connection tmout callback addr Pervasives.stdin;
-                try close t with _ -> ();
+             do if max_clients = None && Unix.fork () <> 0 then exit 0 else ();
+                Unix.close s;
+                Unix.dup2 t Unix.stdout;
+                Unix.dup2 t Unix.stdin;
+                treat_connection tmout callback addr stdin;
+                try Unix.close t with _ -> ();
              return ()
            with exc ->
-             try do print_err_exc exc; flush Pervasives.stderr; return ()
+             try do print_err_exc exc; flush stderr; return ()
              with _ -> ();
         return exit 0
     | Some id ->
-        do close t;
-           if max_clients = None then let _ = waitpid [] id in ()
+        do Unix.close t;
+           if max_clients = None then let _ = Unix.waitpid [] id in ()
            else pids.val := [id :: pids.val];
         return ()
     | None ->
-        do close t; Printf.eprintf "Fork failed\n"; flush Pervasives.stderr;
+        do Unix.close t; Printf.eprintf "Fork failed\n"; flush stderr;
         return () ]
   else
     do let oc = open_out_bin "gwd.sin" in
        let cleanup () = try close_out oc with _ -> () in
        do try copy_what_necessary t oc with
-          [ Unix_error _ _ _ -> ()
+          [ Unix.Unix_error _ _ _ -> ()
           | exc -> do cleanup (); return raise exc ];
           cleanup ();
        return ();
@@ -432,13 +431,14 @@ value accept_connection tmout max_clients callback s =
         Array.append (Unix.environment ())
           [| "WSERVER=" ^ string_of_sockaddr addr |]
       in
-      Unix.create_process_env Sys.argv.(0) Sys.argv env stdin stdout stderr
+      Unix.create_process_env Sys.argv.(0) Sys.argv env Unix.stdin Unix.stdout
+        Unix.stderr
     in
     let _ = Unix.waitpid [] pid in
     let cleanup () =
-      do try shutdown t SHUTDOWN_SEND with _ -> ();
-         try shutdown t SHUTDOWN_RECEIVE with _ -> ();
-	 try close t with _ -> ();
+      do try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
+         try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
+	 try Unix.close t with _ -> ();
       return ()
     in
     do try
@@ -450,7 +450,7 @@ value accept_connection tmout max_clients callback s =
                 if len == 0 then ()
    		else
    		  do loop_write 0 where rec loop_write i =
-   		       let olen = write t buff i (len - i) in
+   		       let olen = Unix.write t buff i (len - i) in
                        if i + olen < len then loop_write (i + olen) else ();
    		  return loop ()
             with
@@ -475,23 +475,23 @@ value f port tmout max_clients g =
          treat_connection tmout g addr ic;
       return exit 0
   | None ->
-      let s = socket PF_INET SOCK_STREAM 0 in
-      do setsockopt s SO_REUSEADDR True;
-         bind s (ADDR_INET inet_addr_any port);
-         listen s 4;
+      let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
+      do Unix.setsockopt s Unix.SO_REUSEADDR True;
+         Unix.bind s (Unix.ADDR_INET Unix.inet_addr_any port);
+         Unix.listen s 4;
       return
-      let tm = localtime (time ()) in
+      let tm = Unix.localtime (Unix.time ()) in
       do Printf.eprintf "Ready %02d/%02d/%4d %02d:%02d port %d...\n"
-           tm.tm_mday (succ tm.tm_mon) (1900 + tm.tm_year) tm.tm_hour
-           tm.tm_min port;
-         flush Pervasives.stderr;
+           tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year)
+           tm.Unix.tm_hour tm.Unix.tm_min port;
+         flush stderr;
          while True do
            try accept_connection tmout max_clients g s with
            [ Unix.Unix_error _ "accept" _ -> ()
            | exc -> print_err_exc exc ];
            wflush ();
-           flush Pervasives.stdout;
-           flush Pervasives.stderr;
+           flush stdout;
+           flush stderr;
          done;
       return () ]
 ;

@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 1.14 1999-02-02 10:24:15 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.15 1999-03-04 12:36:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -382,7 +382,7 @@ value make_cache ic ic_acc shift array_pos patches len name =
     match tab.val with
     [ Some x -> x
     | None ->
-do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush Pervasives.stderr; return () else (); return
+do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush stderr; return () else (); return
         do seek_in ic array_pos; return
         let t = apply_patches (input_value ic) patches.val plen in
         do tab.val := Some t; return t ]
@@ -411,7 +411,7 @@ value make_cached ic ic_acc shift array_pos patches len cache_htab name =
     match tab.val with
     [ Some x -> x
     | None ->
-do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush Pervasives.stderr; return () else (); return
+do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush stderr; return () else (); return
         do seek_in ic array_pos; return
         let t = apply_patches (input_value ic) patches.val plen in
         do tab.val := Some t; return t ]

@@ -1,11 +1,10 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.32 1999-02-14 19:31:33 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.33 1999-03-04 12:36:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
-open Unix;
 
 value port_selected = ref 2317;
 value wizard_passwd = ref "";
@@ -23,7 +22,7 @@ value auth_file = ref "";
 
 value log_oc () =
   if log_file.val <> "" then open_out_gen log_flags 0o644 log_file.val
-  else Pervasives.stderr
+  else stderr
 ;
 
 value flush_log oc =
@@ -637,9 +636,10 @@ value build_env request str =
 value connection cgi (addr, request) str =
   let from =
     match addr with
-    [ ADDR_UNIX x -> x
-    | ADDR_INET iaddr port ->
-         try (gethostbyaddr iaddr).h_name with _ -> string_of_inet_addr iaddr ]
+    [ Unix.ADDR_UNIX x -> x
+    | Unix.ADDR_INET iaddr port ->
+         try (Unix.gethostbyaddr iaddr).Unix.h_name with _ ->
+           Unix.string_of_inet_addr iaddr ]
   in
   if excluded from then refuse_log from cgi
   else
@@ -682,7 +682,7 @@ where \"base\" is the name of the data base
 Type control C to stop the service
 "
             port_selected.val port_selected.val hostn port_selected.val;
-          flush Pervasives.stderr;
+          flush stderr;
           try Unix.mkdir (Filename.concat Util.base_dir.val "cnt") 0o755 with
           [ Unix.Unix_error _ _ _ -> () ];
        return ()
@@ -702,19 +702,19 @@ value geneweb_cgi str addr =
   let request = [] in
   let request = add "user-agent" "HTTP_USER_AGENT" request in
   let request = add "referer" "HTTP_REFERER" request in
-  connection True (ADDR_UNIX addr, request) str
+  connection True (Unix.ADDR_UNIX addr, request) str
 ;
 
 value read_input len =
   if len >= 0 then
     let buff = String.create len in
-    do really_input Pervasives.stdin buff 0 len; return buff
+    do really_input stdin buff 0 len; return buff
   else
     let buff = ref "" in
     do try
          while True do
-           let l = input_line Pervasives.stdin in
-           do Printf.eprintf "POST: %s\n" l; flush Pervasives.stderr; return
+           let l = input_line stdin in
+           do Printf.eprintf "POST: %s\n" l; flush stderr; return
            buff.val := buff.val ^ l;
          done
        with
@@ -843,12 +843,12 @@ value main () =
 
 ifdef UNIX then
 value test_eacces_bind err fun_name =
-  if err = EACCES && fun_name = "bind" && port_selected.val <= 1024 then
+  if err = Unix.EACCES && fun_name = "bind" && port_selected.val <= 1024 then
     do Printf.eprintf "\n\
 Error: invalid access to the port %d: users port number less than 1024
 are reserved to the system. Solution: become root or choose another port
 number greater than 1024.\n" port_selected.val;
-       flush Pervasives.stderr;
+       flush stderr;
     return True
   else False
 else
@@ -856,14 +856,14 @@ value test_eacces_bind err fun_name = False;
 
 value print_exc exc =
   match exc with
-  [ Unix_error EADDRINUSE "bind" _ ->
+  [ Unix.Unix_error Unix.EADDRINUSE "bind" _ ->
       do Printf.eprintf "\n\
 Error: the port %d is already used by another GeneWeb daemon
 or by another program. Solution: kill the other program or launch
 GeneWeb with another port number (option -p)\n" port_selected.val;
-         flush Pervasives.stderr;
+         flush stderr;
       return ()
-  | Unix_error err fun_name arg ->
+  | Unix.Unix_error err fun_name arg ->
       if test_eacces_bind err fun_name then ()
       else
 	do prerr_string "\"";
@@ -874,8 +874,8 @@ GeneWeb with another port number (option -p)\n" port_selected.val;
 	     return ()
 	   else ();
 	   prerr_string ": ";
-	   prerr_endline (error_message err);
-	   flush Pervasives.stderr;
+	   prerr_endline (Unix.error_message err);
+	   flush stderr;
 	return ()
   | _ -> try Printexc.print raise exc with _ -> () ]
 ;
