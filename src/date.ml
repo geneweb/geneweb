@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.36 2005-02-27 19:23:29 ddr Exp $ *)
+(* $Id: date.ml,v 4.37 2005-02-28 04:08:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -705,7 +705,9 @@ value print_calendar conf base =
           transl_nth conf
             "moon age/new moon/first quarter/full moon/last quarter" i
         in
-        let mp = Calendar.moon_phase_of_sdn jd in
+        let mp =
+          try Some (Calendar.moon_phase_of_sdn jd) with [ Failure _ -> None ]
+        in
         stag "tr" begin
           stag "td" "align=\"center\"" begin
             match mp with

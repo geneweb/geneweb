@@ -1,4 +1,4 @@
-(* $Id: calendar.ml,v 4.5 2005-02-27 19:23:29 ddr Exp $ *)
+(* $Id: calendar.ml,v 4.6 2005-02-28 04:08:21 ddr Exp $ *)
 
 (* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/;
    converted his C program into this OCaml program.
@@ -467,7 +467,7 @@ value hebrew_of_gregorian = conv hebrew_of_sdn 13 sdn_of_gregorian 12;
 (* Borrowed from G.Satre of CNRS's program found at:
    http://portail.imcce.fr/fr/ephemerides/astronomie/Promenade/pages4/441.html
    Program written in JavaScript; converted into OCaml with code cleaning
-   and transforming for interface jdn/moon-day: but I did not understand
+   and transforming for interface sdn -> moon-day: but I did not understand
    everything and the code could perhaps be improved *)
 
 type found 'a 'b = [ Found of 'a | NotYetFound of 'b ];
@@ -675,6 +675,6 @@ value moon_phase_of_gregorian date =
 
 value moon_phase_of_sdn jd =
   let date = gregorian_of_sdn Sure jd in
-  if date.year < -4000 || date.year > 2500 then None
-  else Some (moon_phase_of_gregorian date)
+  if date.year < -4000 || date.year > 2500 then failwith "moon_phase_of_sdn"
+  else moon_phase_of_gregorian date
 ;
