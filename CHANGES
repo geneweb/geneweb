@@ -38,6 +38,9 @@ GeneWeb version 3.12
     surname, if no complete name is found.
 
 * Setup program (gwsetup)
+  - [23 Feb 01] Added option -gd (gwsetup directory) to set a different
+    directory for the gwsetup files. It allows to launch gwsetup in another
+    directory, therefore to separate the data bases from the GeneWeb files.
   - [20 Feb 01] Added option -lang: if provided in parameter, the lang
     name is not asked the user. Changed all "http://localhost:" into
     "http://127.0.0.1:" which always work on Windows and in all OSes.
