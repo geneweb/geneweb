@@ -35,9 +35,9 @@ tell me.
 
 <h4>When displaying relationship links, some are missing.</h4>
 
-<font color=#2f6400><b>GeneWeb</b></font> does not display the links such that the right
-(resp. left) person is descended from a person of the left
-(resp. right) branch.
+<font color=#2f6400><b>GeneWeb</b></font> does not display the links
+such that the right (resp. left) person is descended from a person of
+the left (resp. right) branch.
 
 <p>
 
@@ -52,7 +52,37 @@ and are counted in the consanguinity computing.
 A frequent problem is about access rights. The Web server often runs
 CGIs as an user with very few rights (typically user "nobody" under
 Unix). It may not be able to run "gwd". Check the access rights of
-"gwd" and all the GeneWeb files!
+"gwd" and all the <font color=#2f6400><b>GeneWeb</b></font> files!
+
+<h4>Why the age of persons of more than 80 years old is not displayed? Why
+aren't they in the statistics of the oldest persons?</h4>
+
+In <font color=#2f6400><b>GeneWeb</b></font>, the indication of death
+has three states: "alive", "died" and "don't know". The age is
+displayed only for "alive" (still living) persons. If the age is not
+there, the reason is that either the person is dead (without
+indication of date), or the indication is at "don't know".
+
+<p>
+
+If you added this person with <font
+color=#2f6400><b>GeneWeb</b></font> and that you did not specify if
+he/she is alive or dead, or if your data base comes from a GEDCOM file
+(the indication "still living person" being not planed in standard
+GEDCOM 5.5), <font color=#2f6400><b>GeneWeb</b></font> applies the
+following algorithm:
+
+<ul>
+
+<li>if the person is less than 80 years old, he/she is indicated "alive".
+
+<li>if he/she is more than 120 years old, he/she is indicated "dead".
+
+<li>between the two ages, he/she is indicated "don't know".
+
+</ul>
+
+You have to fix these indications if they are incorrect.
 
 <p>
 <hr>

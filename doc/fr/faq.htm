@@ -55,7 +55,45 @@ Le serveur Web ex&eacute;cute souvent les CGI en tant qu'utilisateur
 avec tr&egrave;s peu de droits (typiquement l'utilisateur "nobody"
 sous Unix). Il se peut qu'il n'ait pas le droit d'ex&eacute;cuter
 "gwd". V&eacute;rifiez les droits d'acc&egrave;s de "gwd" et de tous
-les fichiers GeneWeb!
+les fichiers <font color=#2f6400><b>GeneWeb</b></font>!
+
+<p>
+
+<h4>Pourquoi l'&acirc;ge des personnes de plus de 80 ans n'est-il pas
+affich&eacute;&nbsp;? Pourquoi ne sont-elles pas dans les statistiques
+des personnes les plus &acirc;g&eacute;es&nbsp;?</h4>
+
+Dans <font color=#2f6400><b>GeneWeb</b></font>, l'indication de
+d&eacute;c&egrave;s a trois &eacute;tats: "vivant",
+"d&eacute;c&eacute;d&eacute;" et "ne sais pas". L'&acirc;ge n'est
+affich&eacute; que pour les personnes "vivantes". Si l'&acirc;ge n'y
+est pas, c'est que soit la personne est d&eacute;c&eacute;d&eacute;e
+(sans indication de date), soit que l'indication est &agrave; "ne sais
+pas".
+
+<p>
+
+Si vous avez ajout&eacute; cette personne avec <font
+color=#2f6400><b>GeneWeb</b></font> et que vous n'avez pas
+pr&eacute;cis&eacute; si elle est vivante ou
+d&eacute;c&eacute;d&eacute;e, ou bien si votre base de donn&eacute;es
+provient d'un GEDCOM (l'indication "personne encore vivante"
+n'&eacute;tant pas pr&eacute;vue dans le standard GEDCOM 5.5), <font
+color=#2f6400><b>GeneWeb</b></font> applique l'algorithme suivant:
+
+<ul>
+
+<li>si la personne a moins de 80 ans, elle est indiqu&eacute;e
+"vivante"
+
+<li>si elle a plus de 120 ans, elle est indiqu&eacute;e
+"d&eacute;c&eacute;d&eacute;e"
+
+<li>entre les deux elle est indiqu&eacute;e "ne sais pas".
+
+</ul>
+
+&Agrave; vous de corriger ces indications si elles sont incorrectes.
 
 <p>
 <hr>
