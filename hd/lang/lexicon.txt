@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.81 2002-03-15 12:43:28 ddr Exp $
+# $Id: lexicon.txt,v 4.82 2002-03-17 10:59:21 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7561,6 +7561,7 @@ fi: käyttajä/salasana/peruuta
 fr: utilisateur/mot de passe/annuler
 he:  îùúîù / ñéñîä / áéèåì
 nl: gebruiker/wachtwoord/annuleren
+no: bruker/passord/avbryt
 pl: u¿ytkownik/has³o/anuluj
 sv: användare/passord/avbryt
 
