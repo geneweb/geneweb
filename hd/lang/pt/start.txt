@@ -166,9 +166,9 @@ complexa</b></font></a>.
 <td valign=up>
 <ul>%x
 <li>as <a href="%sm=LD;k=10">mortes mais recentes</a>%x%j
-<li>o <a href="%sm=HIST;k=10">historial das actualiza&ccedil;&aacute;o</a>%j
+<li>o <a href="%sm=HIST;k=10">historial das actualiza&ccedil;&otilde;es</a>%j
 <li>os <a href="%sm=CAL">calend&aacute;rios</a>
-<li>o <a href="%sm=FORUM">forum de a base de dados</a>
+<li>o <a href="%sm=FORUM">forum da base de dados</a>
 </ul>
 </td>
 </tr>
@@ -177,7 +177,7 @@ complexa</b></font></a>.
 
 <p>
 
-Houve %q consultas, dos quais %c foram a esta p&aacute;gina, desde %d.
+Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
 
 </td></tr>
 
