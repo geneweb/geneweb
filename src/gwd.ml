@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.33 1999-03-04 12:36:50 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.34 1999-03-08 10:30:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -78,8 +78,9 @@ value refuse_log from cgi =
       Printf.fprintf oc " excluded: %s\n" from;
      close_out oc;
      if not cgi then
-       do Wserver.wprint "HTTP/1.0 403 Forbidden"; nl (); nl (); return ()
+       do Wserver.wprint "HTTP/1.0 403 Forbidden"; nl (); return ()
      else ();
+     Wserver.wprint "Content-type: text/html"; nl (); nl ();
      Wserver.wprint "Your access has been disconnected by administrator.\n";
   return ()
 ;
