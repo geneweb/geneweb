@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.20 1999-07-22 14:34:14 ddr Exp $ *)
+(* $Id: relation.ml,v 2.21 1999-07-22 22:14:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -189,34 +189,37 @@ value print_link conf base n p1 p2 x1 x2 =
      afficher_titre conf base p1;
      Wserver.wprint " %s" (transl conf "is");
      if n > 1 then Wserver.wprint " %s" (transl conf "also") else ();
-     Wserver.wprint "\n<strong>";
-     if x1 == 0 then Wserver.wprint "%s" (ancestor_label conf x2 p1.sex)
-     else if x2 == 0 then Wserver.wprint "%s" (descendant_label conf x1 p1)
-     else if x1 == x2 then
-       if x1 == 1 && not (same_parents base p1 p2) then
-         Wserver.wprint "%s" (half_brother_label conf p1.sex)
+     Wserver.wprint "\n";
+     stag "strong" begin
+       if x1 == 0 then Wserver.wprint "%s" (ancestor_label conf x2 p1.sex)
+       else if x2 == 0 then Wserver.wprint "%s" (descendant_label conf x1 p1)
+       else if x1 == x2 then
+         if x1 == 1 && not (same_parents base p1 p2) then
+           Wserver.wprint "%s" (half_brother_label conf p1.sex)
+         else
+           Wserver.wprint "%s" (nominative (brother_label conf x2 p1.sex))
+       else if x1 == 1 || x2 == 1 then
+         if x1 == 1 then Wserver.wprint "%s" (uncle_label conf (x2 - x1) p1)
+         else Wserver.wprint "%s" (nephew_label conf (x1 - x2) p1)
+       else if x1 < x2 then
+         do Wserver.wprint "%s" (nominative (brother_label conf x1 p1.sex));
+            Wserver.wprint " %s"
+              (transl_decline conf
+               "of (same or greater generation level)"
+               (ancestor_label conf (x2 - x1) Neuter));
+         return ()
        else
-         Wserver.wprint "%s" (nominative (brother_label conf x2 p1.sex))
-     else if x1 == 1 || x2 == 1 then
-       if x1 == 1 then Wserver.wprint "%s" (uncle_label conf (x2 - x1) p1)
-       else Wserver.wprint "%s" (nephew_label conf (x1 - x2) p1)
-     else if x1 < x2 then
-       do Wserver.wprint "%s" (nominative (brother_label conf x1 p1.sex));
-          Wserver.wprint " %s"
-            (transl_decline conf
-             "of (same or greater generation level)"
-             (ancestor_label conf (x2 - x1) Neuter));
-       return ()
-     else
-       do Wserver.wprint "%s" (descendant_label conf (x1 - x2) p1);
-          Wserver.wprint " %s"
-            (transl_decline conf "of (same or greater generation level)"
-             (brother_label conf x2 Male));
-       return ();
-     Wserver.wprint "</strong>\n%s "
-       (if x1 < x2 then transl_decline conf "of" ""
-        else transl_decline conf "of (same or greater generation level)" "");
-     afficher_personne_sans_titre conf base p2;
+         do Wserver.wprint "%s" (descendant_label conf (x1 - x2) p1);
+            Wserver.wprint " %s"
+              (transl_decline conf "of (same or greater generation level)"
+               (brother_label conf x2 Male));
+         return ();
+     end;
+     Wserver.wprint "\n";
+     let s = gen_person_text_without_title raw_access conf base p2 in
+     Wserver.wprint "%s"
+       (if x1 < x2 then transl_decline conf "of" s
+        else transl_decline conf "of (same or greater generation level)" s);
      afficher_titre conf base p2;
      Wserver.wprint ".\n";
   return ()
@@ -311,13 +314,15 @@ value print_solution_not_ancestor conf base long p1 p2 x1 x2 list =
   in
   do tag "ul" begin
        html_li conf;
-       Wserver.wprint "%s %s\n" (lab x1) (transl_decline conf "of" "");
-       afficher_personne_sans_titre conf base p1;
+       Wserver.wprint "%s %s\n" (lab x1)
+         (transl_decline conf "of"
+            (gen_person_text_without_title raw_access conf base p1));
        afficher_titre conf base p1;
        Wserver.wprint "\n";
        html_li conf;
-       Wserver.wprint "%s %s\n" (lab x2) (transl_decline conf "of" "");
-       afficher_personne_sans_titre conf base p2;
+       Wserver.wprint "%s %s\n" (lab x2)
+         (transl_decline conf "of"
+            (gen_person_text_without_title raw_access conf base p2));
        afficher_titre conf base p2;
        Wserver.wprint "\n";
      end;

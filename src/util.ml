@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.32 1999-07-22 21:19:02 ddr Exp $ *)
+(* $Id: util.ml,v 2.33 1999-07-22 22:14:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -215,10 +215,7 @@ value gen_person_text_no_html (p_first_name, p_surname) conf base p =
   beg ^ " " ^ p_surname base p
 ;
 
-value person_text = gen_person_text std_access;
-value person_text_no_html = gen_person_text_no_html std_access;
-
-value person_text_without_surname conf base p =
+value gen_person_text_without_surname (p_first_name, p_surname) conf base p =
   match (sou base p.public_name, p.nick_names) with
   [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
   | (n, []) when n <> "" -> n
@@ -226,6 +223,10 @@ value person_text_without_surname conf base p =
       p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
   | (_, []) -> p_first_name base p ]
 ;
+
+value person_text = gen_person_text std_access;
+value person_text_no_html = gen_person_text_no_html std_access;
+value person_text_without_surname = gen_person_text_without_surname std_access;
 
 value afficher_nom_titre_reference conf base p s =
   match p.nick_names with
@@ -329,21 +330,20 @@ value afficher_personne_titre conf base p =
   else Wserver.wprint "%s" (person_text conf base p)
 ;
 
-value afficher_personne_sans_titre conf base p =
+value gen_person_text_without_title p_access conf base p =
   match main_title base p with
   [ Some t ->
-      do if t.t_place == p.surname then
-           Wserver.wprint "%s" (person_text_without_surname conf base p)
-         else
-           match (t.t_name, p.nick_names) with
-           [ (Tname s, [nn :: _]) ->
-               Wserver.wprint "%s <em>%s</em>" (sou base s)
-                 (sou base nn)
-           | (Tname s, _) -> Wserver.wprint "%s" (sou base s)
-           | _ -> Wserver.wprint "%s" (person_text conf base p) ];
-      return ()
-  | None -> Wserver.wprint "%s" (person_text conf base p) ]
+      if t.t_place == p.surname then
+        gen_person_text_without_surname p_access conf base p
+      else
+        match (t.t_name, p.nick_names) with
+        [ (Tname s, [nn :: _]) -> sou base s ^ " <em>" ^ sou base nn ^ "</em>"
+        | (Tname s, _) -> sou base s
+        | _ -> gen_person_text p_access conf base p ]
+  | None -> gen_person_text p_access conf base p ]
 ;
+
+value person_text_without_title = gen_person_text_without_title std_access;
 
 value afficher_titre conf base p =
   if p.access <> Private || conf.friend || conf.wizard then
@@ -1058,4 +1058,8 @@ value afficher_personne_referencee conf base p =
 
 value afficher_personne_titre_referencee conf base p =
   Wserver.wprint "\n%s" (referenced_person_title_text conf base p)
+;
+
+value afficher_personne_sans_titre conf base p =
+  Wserver.wprint "%s" (person_text_without_title conf base p)
 ;
