@@ -1,6 +1,6 @@
 <head><title>Gwtp - %b</title></head>
 <body>
-<h1>Gwtp - %b</h1>
+<h1 align=center>Gwtp - %b</h1>
 <form method=POST action=gwtp enctype="multipart/form-data">
 <input type=hidden name=m value=SEND>
 <input type=hidden name=b value=%b>
