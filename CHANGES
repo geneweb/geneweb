@@ -2,6 +2,11 @@ GeneWeb version 3.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [14 Dec 00] Added a system of general macros for "sources" and
+    "notes". You can define customized variables in the configuration
+    file (base.gwf): their values will be replaced in the "sources" and
+    in the "notes". The syntax in configuration file is "var_ident=value"
+    and in the sources and notes: "%ident;".
   - [03 Dec 00] Fixed bug in Hebrew calendar computation (example: Hebrew
     day was good for Gregorian date 2001-11-30 but incorrect for the following
     day 2001-12-01).
