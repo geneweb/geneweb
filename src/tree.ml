@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: tree.ml,v 2.8 1999-10-08 10:19:55 ddr Exp $ *)
+(* $Id: tree.ml,v 2.9 1999-10-12 15:58:05 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -15,23 +15,24 @@ value rec tree_of_branch =
   | [x :: l] -> {node = x; sons = [tree_of_branch l]} ]
 ;
 
-value rec insert l tl =
+value rec insert do_merge l tl =
   match (l, tl) with
   [ ([x :: l], [t :: tl]) ->
-      if x == t.node then
-        let t = {node = t.node; sons = insert l t.sons} in
+      if do_merge && x == t.node then
+        let t = {node = t.node; sons = insert do_merge l t.sons} in
         [t :: tl]
-      else [t :: insert [x :: l] tl]
+      else [t :: insert do_merge [x :: l] tl]
   | ([], tl) -> tl
   | (l, []) -> [tree_of_branch l] ]
 ;
 
-value append t =
+value append do_merge t =
   fun
   [ [] -> t
   | [x :: l] ->
       let rec app t =
-        if x == t.node then Some {node = t.node; sons = insert l t.sons}
+        if x == t.node then
+          Some {node = t.node; sons = insert do_merge l t.sons}
         else
           match app_rev_sons (List.rev t.sons) with
           [ Some rev_tl -> Some {node = t.node; sons = List.rev rev_tl}
@@ -184,11 +185,11 @@ value print_tree conf base with_spouses one_branch t =
   end
 ;
 
-value print_branch_list_as_tree conf base with_spouses =
+value print_branch_list_as_tree conf base with_spouses do_merge =
   fun
   [ [] -> ()
   | [b :: bl] ->
-      let t = List.fold_left append (tree_of_branch b) bl in
+      let t = List.fold_left (append do_merge) (tree_of_branch b) bl in
       let one_branch =
         loop t.sons where rec loop =
           fun
@@ -221,8 +222,13 @@ value print_branches conf base =
     [ Some "on" -> True
     | _ -> False ]
   in
+  let do_merge =
+    match p_getenv conf.env "merge" with
+    [ Some "off" -> False
+    | _ -> True ]
+  in
   do header_no_page_title conf title;
-     print_branch_list_as_tree conf base with_spouses bl;
+     print_branch_list_as_tree conf base with_spouses do_merge bl;
      trailer conf;
   return ()
 ;
