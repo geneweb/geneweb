@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.25 2003-12-16 12:46:21 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.26 2003-12-23 11:56:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -104,7 +104,7 @@ value reconstitute_family conf =
     [ Some "not_marr" -> NotMarried
     | Some "engaged" -> Engaged
     | Some "nsck" -> NoSexesCheck
-    | Some "rape" -> Rape
+    | Some "no_ment" -> NoMention
     | _ -> Married ]
   in
   let marriage = Update.reconstitute_date conf "marr" in

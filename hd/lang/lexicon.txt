@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.173 2003-12-17 14:05:05 ddr Exp $
+# $Id: lexicon.txt,v 4.174 2003-12-23 11:56:04 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -5658,6 +5658,10 @@ ru: нет совпадений
 sl: brez
 sv: inga tr&auml;ffar
 
+    no mention
+en: no mention
+fr: pas de mention
+
     no sexes check
 af: geslag word nie aangedui nie
 bg: без проверка за пол
@@ -6549,14 +6553,6 @@ ru: прозвище
 sl: oznaka
 sv: smeknamn
 
-    rape
-da: voldt&aelig;gt
-en: rape
-fr: viol
-he:  аерс
-pl: gwaіt
-pt: violaзгo
-
     recognized son/recognized daughter/recognized child
 af: aanvaarde seun/aanvaarde dogter/aanvaarde kind
 bg: припознат син/припозната дъщеря/припознато дете
@@ -6949,14 +6945,6 @@ ro: sex
 ru: пол
 sl: spol
 sv: k&ouml;n
-
-    sexual abuse%t with
-da: har misbrugt%t/offer for seksuelt misbrug%t ved
-en: having abused%t/victim of sexual abuse%t by
-fr: ayant abus&eacute; sexuellement%t de/victime d'abus sexuel%t de
-he:  щрйцм баефп ойрй аъ%t/ щрецмд баефп ойрй тм йгй%t
-pl: zgwalcil%t/zgwalcona%t przez
-pt: tendo abusado%t de/vнtima de abuso sexual%t por
 
     short display
 af: beknopte weergawe
