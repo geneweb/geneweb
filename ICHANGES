@@ -8,6 +8,8 @@ GeneWeb Version 3.06
   - [28 Jun 00] Take only the 1st two characters of the language given.
 
 * GeneWeb daemon/CGI (gwd)
+  - [11 Jul 00] The first nobility title in personal page is no more
+    capitalized.
   - [23 Jun 00] Added the macro %u in trailer files (base.trl) which is
     expanded as the current URL.
   - [22 Jun 00] Added, in the system of translation in welcome page with [],
