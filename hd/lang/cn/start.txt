@@ -20,12 +20,15 @@
 搜索：<input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
-请输入：
 <ul>
 <li> <input type=radio name=t value=PN checked>
-<em>姓</em> <em>名、别名、或者其他公认的名字</em>
-<li> <input type=radio name=t value=P> <em>名</em>
-<li> <input type=radio name=t value=N> <em>姓</em>
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%u
+or <em>Sosa number</em> relative to %a%u
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 

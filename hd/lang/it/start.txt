@@ -22,14 +22,15 @@ La base di dati contiene attualmente %n persone.
 Ricerca: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
-Per:
 <ul>
 <li> <input type=radio name=t value=PN checked>
-<em>Nome</em> e <em>cognome</em> o <em>appellativo pubblico</em>
-o <em>alias</em>%u,
-o %[<em>Sosa number</em> relative to %a%]%u.
-<li> <input type=radio name=t value=P> <em>Nome</em>.
-<li> <input type=radio name=t value=N> <em>Cognome</em>.
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%u
+[or] %[<em>Sosa number</em> relative to %a%]%u
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
