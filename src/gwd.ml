@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.10 1999-11-30 15:35:04 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.11 1999-12-07 13:44:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -338,7 +338,7 @@ value start_with_base conf bname =
          Wserver.wprint " \"%s\".</ul>\n" conf.bname;
          match e with
          [ Failure s ->
-(**)
+(*
 do Wserver.wprint "
 <p>
 <table border=2><tr><td>
@@ -352,7 +352,7 @@ l'acc&egrave;s le plus t&ocirc;t possible... Merci de votre patience.
 </td></tr></table>
 <p>\n";
 return
-(**)
+*)
              Wserver.wprint
                "<em><font size=-1>Internal message: %s</font></em>\n" s
          | _ -> () ];

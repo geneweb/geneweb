@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.2 1999-11-04 12:47:37 ddr Exp $
+# $Id: geneweb.spec,v 3.3 1999-12-07 13:44:36 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -272,6 +272,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/se/start.htm
 /home/geneweb/gw/gw/doc/se/update.htm
 /home/geneweb/gw/gw/etc/copyr.txt
+/home/geneweb/gw/gw/etc/index.txt
 /home/geneweb/gw/gw/etc/redirect.txt
 /home/geneweb/gw/gw/etc/renamed.txt
 /home/geneweb/gw/gw/etc/robot.txt
@@ -288,6 +289,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/images/l-en.jpg
 /home/geneweb/gw/gw/images/l-eo.jpg
 /home/geneweb/gw/gw/images/l-es.jpg
+/home/geneweb/gw/gw/images/l-fi.jpg
 /home/geneweb/gw/gw/images/l-fr.jpg
 /home/geneweb/gw/gw/images/l-he.jpg
 /home/geneweb/gw/gw/images/l-is.jpg
@@ -305,6 +307,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/lang/en/start.txt
 /home/geneweb/gw/gw/lang/eo/start.txt
 /home/geneweb/gw/gw/lang/es/start.txt
+/home/geneweb/gw/gw/lang/fi/start.txt
 /home/geneweb/gw/gw/lang/fr/start.txt
 /home/geneweb/gw/gw/lang/he/start.txt
 /home/geneweb/gw/gw/lang/is/start.txt
@@ -568,6 +571,10 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %doc doc/*
 
 %changelog
+* Tue Dec  7 1999 Daniel de Rauglaudre
+Version 3.01
+- updated the file list
+
 * Mon Oct  4 1999 Daniel de Rauglaudre
 Version 2.07-2
 - added RPM_BUILD_ROOT to %install the package in /tmp
