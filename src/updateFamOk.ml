@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.21 2002-11-06 12:16:38 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.22 2003-12-04 20:30:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -725,9 +725,11 @@ value forbidden_disconnected conf sfam scpl sdes =
 
 value print_add o_conf base =
   let conf = Update.update_conf o_conf in
+(*
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock Iobase.lock_file bfile with
   [ Accept ->
+*)
       try
         let (sfam, scpl, sdes, ext) = reconstitute_family conf in
         let redisp =
@@ -776,13 +778,17 @@ value print_add o_conf base =
         }
       with
       [ Update.ModErr -> () ]
+(*
   | Refuse -> Update.error_locked conf base ]
+*)
 ;
 
 value print_del conf base =
+(*
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock Iobase.lock_file bfile with
   [ Accept ->
+*)
       match p_getint conf.env "i" with
       [ Some i ->
           let fam = foi base (Adef.ifam_of_int i) in
@@ -807,13 +813,17 @@ value print_del conf base =
             print_del_ok conf base []
           }
       | _ -> incorrect_request conf ]
+(*
   | Refuse -> Update.error_locked conf base ]
+*)
 ;
 
 value print_mod_aux conf base callback =
+(*
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock Iobase.lock_file bfile with
   [ Accept ->
+*)
       try
         let (sfam, scpl, sdes, ext) = reconstitute_family conf in
         let redisp =
@@ -832,7 +842,9 @@ value print_mod_aux conf base callback =
         else Update.error_digest conf base
       with
       [ Update.ModErr -> () ]
+(*
   | Refuse -> Update.error_locked conf base ]
+*)
 ;
 
 value print_mod o_conf base =
@@ -856,9 +868,11 @@ value print_mod o_conf base =
 ;
 
 value print_inv conf base =
+(*
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock Iobase.lock_file bfile with
   [ Accept ->
+*)
       match (p_getint conf.env "i", p_getint conf.env "f") with
       [ (Some ip, Some ifam) ->
           let p = base.data.persons.get ip in
@@ -874,5 +888,7 @@ value print_inv conf base =
           with
           [ Update.ModErr -> () ]
       | _ -> incorrect_request conf ]
+(*
   | Refuse -> Update.error_locked conf base ]
+*)
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.29 2003-09-22 12:08:57 ddr Exp $ *)
+(* $Id: forum.ml,v 4.30 2003-12-04 20:30:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -538,8 +538,10 @@ value forum_add conf base ident comm =
   in
   let bfile = base_path [] (conf.bname ^ ".gwb") in
   if ident <> "" && comm <> "" then
+(*
     lock (Iobase.lock_file bfile) with
     [ Accept ->
+*)
         let fname = forum_file conf in
         let tmp_fname = fname ^ "~" in
         let oc = Secure.open_out tmp_fname in
@@ -591,7 +593,9 @@ value forum_add conf base ident comm =
             try Sys.remove tmp_fname with [ Sys_error _ -> () ];
             raise e
           }
+(*
     | Refuse -> do { Update.error_locked conf base; raise Update.ModErr } ]
+*)
   else ()
 ;
 
@@ -672,9 +676,11 @@ value print_del_ok conf base =
 ;
 
 value delete_forum_message conf base pos =
+(*
   let bfile = base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
+*)
       match get_message conf pos with
       [ Some (m, next_pos, forum_length) ->
           if conf.wizard && conf.user <> "" && m.m_wizard = conf.user &&
@@ -689,7 +695,9 @@ value delete_forum_message conf base pos =
             [ Update.ModErr -> () ]
           else print_forum_headers conf base
       | None -> print_forum_headers conf base ]
+(*
   | Refuse -> Update.error_locked conf base ]
+*)
 ;
 
 value print_del conf base =

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.162 2003-11-27 14:59:31 ddr Exp $
+# $Id: lexicon.txt,v 4.163 2003-12-04 20:30:55 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2631,6 +2631,7 @@ sv: klicka "%s"
 
     color
 en: colour
+en-us: color
 fr: couleur
 
     comment

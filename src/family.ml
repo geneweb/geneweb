@@ -1,5 +1,5 @@
-(* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.39 2003-11-27 15:34:05 ddr Exp $ *)
+(* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
+(* $Id: family.ml,v 4.40 2003-12-04 20:30:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -381,12 +381,12 @@ value family_m conf base =
   | Some "DAG" -> Dag.print conf base
   | Some "DEL_FAM" when conf.wizard -> UpdateFam.print_del conf base
   | Some "DEL_FAM_OK" when conf.wizard -> UpdateFamOk.print_del conf base
-  | Some "DEL_IND" when conf.wizard -> UpdateInd.print_del conf base
-  | Some "DEL_IND_OK" when conf.wizard -> UpdateIndOk.print_del conf base
   | Some "DEL_IMAGE" when conf.wizard && conf.can_send_image ->
       SendImage.print_del conf base
   | Some "DEL_IMAGE_OK" when conf.wizard && conf.can_send_image ->
       SendImage.print_del_ok conf base
+  | Some "DEL_IND" when conf.wizard -> UpdateInd.print_del conf base
+  | Some "DEL_IND_OK" when conf.wizard -> UpdateIndOk.print_del conf base
   | Some "DOC" -> Doc.print conf
   | Some "FORUM" -> Forum.print conf base
   | Some "FORUM_ADD" -> Forum.print_add conf base
@@ -410,6 +410,12 @@ value family_m conf base =
   | Some "LM" when conf.wizard || conf.friend ->
       BirthDeath.print_marriage conf base
   | Some "LEX" -> Srcfile.print_lexicon conf base
+  | Some "MOD_FAM" when conf.wizard -> UpdateFam.print_mod conf base
+  | Some "MOD_FAM_OK" when conf.wizard -> UpdateFamOk.print_mod conf base
+  | Some "MOD_IND" when conf.wizard -> UpdateInd.print_mod conf base
+  | Some "MOD_IND_OK" when conf.wizard -> UpdateIndOk.print_mod conf base
+  | Some "MOD_NOTES" when conf.wizard -> Notes.print_mod conf base
+  | Some "MOD_NOTES_OK" when conf.wizard -> Notes.print_mod_ok conf base
   | Some "MRG" when conf.wizard ->
       match find_person_in_env conf base "" with
       [ Some p -> Merge.print conf base p
@@ -422,12 +428,6 @@ value family_m conf base =
   | Some "MRG_IND_OK" when conf.wizard -> MergeIndOk.print_merge conf base
   | Some "MRG_MOD_IND_OK" when conf.wizard ->
       MergeIndOk.print_mod_merge conf base
-  | Some "MOD_FAM" when conf.wizard -> UpdateFam.print_mod conf base
-  | Some "MOD_FAM_OK" when conf.wizard -> UpdateFamOk.print_mod conf base
-  | Some "MOD_IND" when conf.wizard -> UpdateInd.print_mod conf base
-  | Some "MOD_IND_OK" when conf.wizard -> UpdateIndOk.print_mod conf base
-  | Some "MOD_NOTES" when conf.wizard -> Notes.print_mod conf base
-  | Some "MOD_NOTES_OK" when conf.wizard -> Notes.print_mod_ok conf base
   | Some "RLM" -> Relation.print_multi conf base
   | Some "N" ->
       match p_getenv conf.env "v" with
@@ -613,7 +613,7 @@ value print_moved conf base s =
       } ]
 ;
 
-value family conf base log =
+value treat_request conf base log =
   do {
     match p_getenv conf.base_env "moved" with
     [ Some s ->
@@ -641,4 +641,69 @@ value family conf base log =
             } ] ];
     Wserver.wflush ();
   }
+;
+
+value treat_request_on_possibly_locked_base conf bfile log =
+  match try Left (Iobase.input bfile) with e -> Right e with
+  [ Left base ->
+      do {
+        try treat_request conf base log with exc ->
+          do { base.func.cleanup (); raise exc };
+        base.func.cleanup ();
+      }
+  | Right e ->
+      let transl conf w =
+        try Hashtbl.find conf.lexicon w with [ Not_found -> "[" ^ w ^ "]" ]
+      in
+      let title _ =
+        Wserver.wprint "%s" (Util.capitale (transl conf "error"))
+      in
+      do {
+        Util.rheader conf title;
+        Wserver.wprint "<ul>";
+        Util.html_li conf;
+        Wserver.wprint "%s"
+          (Util.capitale (transl conf "cannot access base"));
+        Wserver.wprint " \"%s\".</ul>\n" conf.bname;
+        match e with
+        [ Sys_error _ -> ()
+        | _ ->
+            Wserver.wprint
+              "<em><font size=-1>Internal message: %s</font></em>\n"
+              (Printexc.to_string e) ];
+        Util.trailer conf;
+      } ]
+;
+
+value this_request_updates_database conf =
+  if conf.wizard then
+    match p_getenv conf.env "m" with
+    [ Some
+        ("ADD_FAM_OK" | "ADD_IND_OK" | "CHG_CHN_OK" | "DEL_FAM_OK" |
+         "DEL_IMAGE_OK" | "DEL_IND_OK" | "FORUM_ADD_OK" | "FORUM_DEL" |
+         "INV_FAM_OK" | "KILL_ANC" | "MOD_FAM_OK" | "MOD_IND_OK" | "MRG_IND" |
+         "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" | "SND_IMAGE_OK") -> True
+    | _ -> False ]
+  else False
+;
+
+value error_locked conf =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  do {
+    rheader conf title;
+    Wserver.wprint
+      (fcapitale
+         (ftransl conf "the file is temporarily locked: please try again"));
+    Wserver.wprint ".\n";
+    trailer conf
+  }
+;
+
+value treat_request_on_base conf log =
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
+  if this_request_updates_database conf then
+    lock Iobase.lock_file bfile with
+    [ Accept -> treat_request_on_possibly_locked_base conf bfile log
+    | Refuse -> error_locked conf ]
+  else treat_request_on_possibly_locked_base conf bfile log
 ;

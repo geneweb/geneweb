@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.60 2003-10-20 07:11:56 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.61 2003-12-04 20:30:56 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -408,41 +408,6 @@ value print_redirected conf from request new_addr =
           Util.trailer conf;
         } ]
   }
-;
-
-value start_with_base conf bname =
-  let bfile = Util.base_path [] (bname ^ ".gwb") in
-  match try Left (Iobase.input bfile) with e -> Right e with
-  [ Left base ->
-      do {
-        try
-          Family.family conf base (log_file.val, log_oc, flush_log)
-        with exc ->
-          do { base.func.cleanup (); raise exc };
-        base.func.cleanup ();
-      }
-  | Right e ->
-      let transl conf w =
-        try Hashtbl.find conf.lexicon w with [ Not_found -> "[" ^ w ^ "]" ]
-      in
-      let title _ =
-        Wserver.wprint "%s" (Util.capitale (transl conf "error"))
-      in
-      do {
-        Util.rheader conf title;
-        Wserver.wprint "<ul>";
-        Util.html_li conf;
-        Wserver.wprint "%s"
-          (Util.capitale (transl conf "cannot access base"));
-        Wserver.wprint " \"%s\".</ul>\n" conf.bname;
-        match e with
-        [ Sys_error _ -> ()
-        | _ ->
-            Wserver.wprint
-              "<em><font size=-1>Internal message: %s</font></em>\n"
-              (Printexc.to_string e) ];
-        Util.trailer conf;
-      } ]
 ;
 
 value propose_base conf =
@@ -1132,7 +1097,8 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
                   [ Some n when n <> "" -> print_renamed conf n
                   | _ ->
                       do {
-                        start_with_base conf conf.bname;
+                        Family.treat_request_on_base conf
+                          (log_file.val, log_oc, flush_log);
                         if sleep > 0 then Unix.sleep sleep else ();
                       } ] ];
           } ] ]

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.5 2002-03-05 16:29:56 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.6 2003-12-04 20:30:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -267,9 +267,11 @@ value change_child conf base parent_surname ip =
 ;
 
 value print_change_ok conf base p u =
+(*
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
+*)
       try
         let ipl = select_children_of base u in
         let parent_surname = p_surname base p in
@@ -283,7 +285,9 @@ value print_change_ok conf base p u =
         }
       with
       [ Update.ModErr -> () ]
+(*
   | Refuse -> Update.error_locked conf base ]
+*)
 ;
 
 value print_ok conf base =

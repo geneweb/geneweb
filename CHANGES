@@ -2,6 +2,10 @@ GeneWeb version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [04 Dec 03] Fixed bug: in case of two wizards make changes at
+    the same time, there were (rare) cases where one of the changes
+    erases the other one (instead of being rejected by the message
+    "database is locked").
   - [29 Nov 03] Added optional "border" and "background color" for
     trees displaying (relationship links, ancestors and descendants).
   - [28 Nov 03] Fixed bug creating sometimes dates with null month
