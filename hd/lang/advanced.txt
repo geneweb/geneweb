@@ -7,7 +7,8 @@
   <title>[*advanced request]</title>
 %j</head>
 <body%b>
-<h1>[*advanced request]</h1>
+
+<center><h1><font color=%i>[*advanced request]</font></h1></center>
 
 <form method=POST action="%f">
 %h<input type=hidden name=m value=AS_OK>
