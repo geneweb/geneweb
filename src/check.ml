@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 2.1 1999-03-08 11:18:28 ddr Exp $ *)
+(* $Id: check.ml,v 2.2 1999-03-31 02:16:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -20,8 +20,8 @@ value error gen = gen.g_errored := True;
 
 value feminin =
   fun
-  [ Masculine -> ""
-  | Feminine -> "e"
+  [ Male -> ""
+  | Female -> "e"
   | Neuter -> "(e)" ]
 ;
 
@@ -132,8 +132,8 @@ value death_year current_year p =
 
 value update_stats base current_year s p =
   do match p.sex with
-     [ Masculine -> s.men := s.men + 1
-     | Feminine -> s.women := s.women + 1
+     [ Male -> s.men := s.men + 1
+     | Female -> s.women := s.women + 1
      | Neuter -> s.neutre := s.neutre + 1 ];
      if sou base p.first_name = "?" && sou base p.surname = "?" then
        s.noname := s.noname + 1

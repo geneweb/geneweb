@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.2 1999-03-15 00:02:06 ddr Exp $ *)
+(* $Id: relation.ml,v 2.3 1999-03-31 02:16:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -182,7 +182,7 @@ value print_link conf base n p1 p2 x1 x2 =
      else
        do Wserver.wprint "%s" (descendant_label conf (x1 - x2) p1);
           Wserver.wprint " %s"
-            (transl_decline conf "of" (brother_label conf x2 Masculine));
+            (transl_decline conf "of" (brother_label conf x2 Male));
        return ();
      Wserver.wprint "</strong>\n%s " (transl_decline conf "of" "");
      afficher_personne_sans_titre conf base p2;

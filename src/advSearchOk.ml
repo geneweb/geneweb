@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 2.1 1999-03-08 11:18:19 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 2.2 1999-03-31 02:16:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -125,8 +125,8 @@ value advanced_search conf base max_answers =
     && test "surname" (fun x -> name_eq x (sou base p.surname))
     && test "sex"
          (fun              
-          [ "M" -> p.sex = Masculine
-          | "F" -> p.sex = Feminine
+          [ "M" -> p.sex = Male
+          | "F" -> p.sex = Female
           | _ -> True ])
     && test "married"
          (fun              

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.4 1999-03-30 10:46:21 ddr Exp $ *)
+(* $Id: util.ml,v 2.5 1999-03-31 02:16:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -520,8 +520,8 @@ value ftransl_nth conf (s : format 'a 'b 'c) p : format 'a 'b 'c =
 
 value index_of_sex =
   fun
-  [ Masculine -> 0
-  | Feminine -> 1
+  [ Male -> 0
+  | Female -> 1
   | Neuter -> 2 ]
 ;
 
@@ -1001,8 +1001,8 @@ value branch_of_sosa base ip n =
         match (aoi base ip).parents with
         [ Some ifam ->
             let cpl = coi base ifam in
-            if goto_fath then loop [(ip, sp) :: ipl] cpl.father Masculine nl
-            else loop [(ip, sp) :: ipl] cpl.mother Feminine nl
+            if goto_fath then loop [(ip, sp) :: ipl] cpl.father Male nl
+            else loop [(ip, sp) :: ipl] cpl.mother Female nl
         | _ -> None ] ]
   in
   loop [] ip (poi base ip).sex (expand [] n)
@@ -1015,8 +1015,8 @@ value sosa_of_branch ipl =
     (fun b (ip, sp) ->
        let b = Num.twice b in
        match sp with
-       [ Masculine -> b
-       | Feminine -> Num.inc b 1
+       [ Male -> b
+       | Female -> Num.inc b 1
        | Neuter -> assert False ])
     Num.one ipl
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.6 1999-03-30 10:46:10 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.7 1999-03-31 02:16:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -370,8 +370,8 @@ value insere_famille gen co fo =
      gen.g_fcnt := gen.g_fcnt + 1;
      pere.family := Array.append pere.family [| fam.fam_index |];
      mere.family := Array.append mere.family [| fam.fam_index |];
-     noter_sexe gen pere Masculine;
-     noter_sexe gen mere Feminine;
+     noter_sexe gen pere Male;
+     noter_sexe gen mere Female;
      Array.iter
        (fun ix ->
           let x = poi gen.g_base ix in

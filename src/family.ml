@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.3 1999-03-30 10:46:08 ddr Exp $ *)
+(* $Id: family.ml,v 2.4 1999-03-31 02:16:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -146,7 +146,7 @@ value precisez conf base n pl =
                  return () ];
              Date.afficher_dates_courtes conf base p;
              match p.sex with
-             [ Feminine ->
+             [ Female ->
                  let husbands =
                    List.fold_right
                      (fun ifam husbands ->

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.4 1999-03-30 10:46:19 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.5 1999-03-31 02:16:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -52,8 +52,8 @@ value reconstitute_child conf var default_surname =
   let birth = Update.reconstitute_date conf var in
   let sex =
     match p_getenv conf.env (var ^ "_sex") with
-    [ Some "M" -> Masculine
-    | Some "F" -> Feminine
+    [ Some "M" -> Male
+    | Some "F" -> Female
     | _ -> Neuter ]
   in
   let create =
@@ -339,13 +339,13 @@ value effective_mod conf base sfam scpl =
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
   do match nfath.sex with
-     [ Feminine ->
+     [ Female ->
          do print_err_father_sex conf base nfath; return raise Update.ModErr
-     | _ -> nfath.sex := Masculine ];
+     | _ -> nfath.sex := Male ];
      match nmoth.sex with
-     [ Masculine ->
+     [ Male ->
          do print_err_mother_sex conf base nmoth; return raise Update.ModErr
-     | _ -> nmoth.sex := Feminine ];
+     | _ -> nmoth.sex := Female ];
      nfam.origin_file := ofam.origin_file;
      nfam.fam_index := fi;
      base.func.patch_family fi nfam;
@@ -427,13 +427,13 @@ value effective_add conf base sfam scpl =
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
   do match nfath.sex with
-     [ Feminine ->
+     [ Female ->
          do print_err_father_sex conf base nfath; return raise Update.ModErr
-     | _ -> nfath.sex := Masculine ];
+     | _ -> nfath.sex := Male ];
      match nmoth.sex with
-     [ Masculine ->
+     [ Male ->
          do print_err_mother_sex conf base nmoth; return raise Update.ModErr
-     | _ -> nmoth.sex := Feminine ];
+     | _ -> nmoth.sex := Female ];
      nfam.fam_index := fi;
      nfam.origin_file := origin_file;
      base.func.patch_family fi nfam;

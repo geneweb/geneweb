@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 2.2 1999-03-30 13:44:52 ddr Exp $ *)
+(* $Id: cousins.ml,v 2.3 1999-03-31 02:16:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -82,11 +82,11 @@ value siblings base p =
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath_sib =
-        List.map (fun ip -> (ip, (cpl.father, Masculine)))
+        List.map (fun ip -> (ip, (cpl.father, Male)))
           (siblings_by base cpl.father ip)
       in
       let moth_sib =
-        List.map (fun ip -> (ip, (cpl.mother, Feminine)))
+        List.map (fun ip -> (ip, (cpl.mother, Female)))
           (siblings_by base cpl.mother ip)
       in
       merge_siblings fath_sib moth_sib

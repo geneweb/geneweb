@@ -4,6 +4,10 @@ Internal, very small, or not visible Changes
 GeneWeb Version 2.01
 --------------------
 
+* General
+  - [Mar 31, 99] Changed terms "Masculine" and "Feminine" into "Male" and
+    "Female".
+
 * GeneWeb daemon/CGI (gwd)
   - [Mar 22, 99] Ability to put "*" (to match any characters) in lines in
     exclude file.

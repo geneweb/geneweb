@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.2 1999-03-25 20:25:42 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.3 1999-03-31 02:16:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -133,10 +133,10 @@ value print_child_person conf base var (first_name, surname, occ, create) =
         Wserver.wprint "<input type=radio name=%s_sex value=N%s>?\n" var
           (match create with [ Create Neuter _ -> " checked" | _ -> "" ]);
         Wserver.wprint "<input type=radio name=%s_sex value=M%s>%s\n" var
-          (match create with [ Create Masculine _ -> " checked" | _ -> "" ])
+          (match create with [ Create Male _ -> " checked" | _ -> "" ])
           (transl_nth conf "M/F" 0);
         Wserver.wprint "<input type=radio name=%s_sex value=F%s>%s\n" var
-          (match create with [ Create Feminine _ -> " checked" | _ -> "" ])
+          (match create with [ Create Female _ -> " checked" | _ -> "" ])
           (transl_nth conf "M/F" 1);
       end;
       tag "td" begin
@@ -474,13 +474,13 @@ value print_add conf base =
         let p = base.data.persons.get i in
         let fath =
           match p.sex with
-          [ Masculine | Neuter -> person_key base p.cle_index
-          | Feminine -> ("", "", 0, Create Neuter None) ]
+          [ Male | Neuter -> person_key base p.cle_index
+          | Female -> ("", "", 0, Create Neuter None) ]
         in
         let moth =
           match p.sex with
-          [ Feminine -> person_key base p.cle_index
-          | Masculine | Neuter -> ("", "", 0, Create Neuter None) ]
+          [ Female -> person_key base p.cle_index
+          | Male | Neuter -> ("", "", 0, Create Neuter None) ]
         in
         (fath, moth)
     | None ->

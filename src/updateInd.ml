@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.3 1999-03-30 10:46:19 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.4 1999-03-31 02:16:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -77,10 +77,10 @@ value print_surname conf base p =
     tag "td" begin Wserver.wprint "%s" (capitale (transl conf "sex")); end;
     tag "td" begin
       Wserver.wprint "<input type=radio name=sex value=M%s>%s\n"
-        (if p.sex = Masculine then " checked" else "")
+        (if p.sex = Male then " checked" else "")
         (transl_nth conf "M/F" 0);
       Wserver.wprint "<input type=radio name=sex value=F%s>%s\n"
-        (if p.sex = Feminine then " checked" else "")
+        (if p.sex = Female then " checked" else "")
         (transl_nth conf "M/F" 1);
       Wserver.wprint "<input type=radio name=sex value=N%s>?\n"
         (if p.sex = Neuter then " checked" else "");

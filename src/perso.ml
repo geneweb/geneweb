@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.8 1999-03-30 10:46:15 ddr Exp $ *)
+(* $Id: perso.ml,v 2.9 1999-03-31 02:16:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -617,7 +617,7 @@ value find_sosa conf base a p =
     | Left zil -> find zil
     | Right z -> Some z ]
 ;
-(* Masculine version
+(* Male version
 value find_sosa conf base a p =
   let mark = Array.create base.data.persons.len False in
   let rec find z ip =

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.5 1999-03-30 10:46:09 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.6 1999-03-31 02:16:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -135,7 +135,7 @@ value person_misc_names base p =
   let first_names = [p.first_name :: p.first_names_aliases @ public_names] in
   let surnames = [p.surname :: p.surnames_aliases @ p.nick_names] in
   let surnames =
-    if p.sex == Feminine then
+    if p.sex == Female then
       List.fold_left
         (fun list ifam ->
            let cpl = coi base ifam in
@@ -530,10 +530,10 @@ value sort_children base warning fam =
 value check_family base error warning fam =
   let cpl = coi base fam.fam_index in
   do match (poi base cpl.father).sex with
-     [ Masculine -> ()
+     [ Male -> ()
      | _ -> error (BadSexOfMarriedPerson (poi base cpl.father)) ];
      match (poi base cpl.mother).sex with
-     [ Feminine -> ()
+     [ Female -> ()
      | _ -> error (BadSexOfMarriedPerson (poi base cpl.mother)) ];
      check_normal_marriage_date base error warning fam;
      sort_children base warning fam;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 2.2 1999-03-30 10:46:14 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 2.3 1999-03-31 02:16:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -63,8 +63,8 @@ value print_differences conf base branches p1 p2 =
     string_field False (transl conf "sex") "sex"
       (fun p ->
          match p.sex with
-         [ Masculine -> "M"
-         | Feminine -> "F"
+         [ Male -> "M"
+         | Female -> "F"
          | Neuter -> "" ]);
     string_field False (transl conf "access") "access"
       (fun p ->
