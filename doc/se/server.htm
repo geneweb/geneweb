@@ -1,12 +1,122 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>GeneWeb</title></head>
-<body bgcolor="#d6bfaf">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>GeneWeb - Server</TITLE>
+<META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#d6bfaf">
 
-<h1>Translation soon available</h1>
+<H1>GeneWeb - Server</H1>
+<P>N&auml;r den &auml;r startad, &auml;r "gwd" en server. Normalt, den tredje adressen: "http://computer:2317/base" ska anv&auml;ndas f&ouml;r externa personer. </P>
+<P>Hursomhelst, detta g&auml;ller bara f&ouml;r datorer synliga p&aring; Internet, vilket betyder de som &auml;r direkt anslutna till Internet. </P>
+<P>Om du anv&auml;nder en provider &auml;r din dator inte synlig. I detta fallet, finns det ingen l&ouml;sning. Det &auml;r providerns ansvar att installera <EM>GeneWeb</EM>. Vid den tidpunkt jag skriver detta (okt. 98), tror jag ingen provider installerat den. </P>
+<P>S&aring;ledes, det f&ouml;ljande g&auml;ller bara de som har en direkt anslutning till Internet. </P>
+<P>Om du k&ouml;r under Unix eller Windows NT (allts&aring; inte Windows 95/98), m&aring;ste du ange ett anv&auml;ndarnamn n&auml;r du startar datorn, d&auml;r du anger ditt login namn och ditt passord. Kanske du vill kunna logga ut utan att <EM>GeneWeb</EM> stoppar. </P>
+<P>Du har d&aring; tv&aring; l&ouml;sningar f&ouml;r detta problem: installation i "service" och installation i "cgi". </P>
+<H4>Installation i "service" </H4>
+<P>I denna mod, beh&ouml;ver du inte ha en webbserver installerad p&aring; din dator. Gwd <EM>&auml;r</EM> en webbserver i sig sj&auml;lvt. Den enda skillnaden mot andra servers &auml;r att den bara servar genealogi. </P>
 
-<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
-GeneWeb</em></font><br>
+<UL>
+<LI>Om du &auml;r under Unix, ist&auml;llet f&ouml;r att skriva bara "gwd", skriv: </LI></UL>
 
-</body>
+<PRE>
+&#9;     nohup gwd 2&gt;&amp;1 &amp;             (under "sh", "ksh", "bash")
+&#9;     nohup gwd &gt;&amp; nohup.out &amp;     (under "csh", "tcsh")</PRE><DIR>
+<DIR>
 
+<P>D&aring; kan du logga ut. Gwd kommer att forts&auml;tta k&ouml;ra och s&auml;nda dess utskrift till filen "nohup.out" som du kan titta p&aring; sedan. F&ouml;r att stoppa den, titta efter dess process nummer med kommandot "ps" och d&ouml;da den med kommandot "kill". </P></DIR>
+</DIR>
+
+
+<UL>
+<LI>Om du k&ouml;r Windows NT, m&aring;ste du installera "gwd" i "service". Fr&aring;ga din systemadministrat&ouml;r. </LI></UL>
+
+<H4>Installation i "cgi" </H4>
+<P>I denna mod m&aring;ste en webbserver k&ouml;ras p&aring; din dator. "Cgi"s &auml;r program som webbservern kan starta. Endast system administrat&ouml;ren &auml;r beh&ouml;rig att l&auml;gga till "cgi"s. Du m&aring;ste fr&aring;ga f&ouml;re. </P>
+
+<UL>
+<LI>Under Unix, om du installerade <EM>GeneWeb</EM> i katalogen "/home/svensson/geneweb", skapa en fil med namn "geneweb" som inneh&aring;ller f&ouml;ljande rader: </LI></UL>
+
+<PRE>
+&#9;     #!/bin/sh
+&#9;     DIR=/home/svensson/geneweb
+&#9;     cd $DIR
+&#9;     $DIR/gwd -cgi</PRE><DIR>
+<DIR>
+
+<P>G&ouml;r den exekverbar (chmod +x geneweb) och fr&aring;ga din systemadministrat&ouml;r att installera denna fil i "cgi" katalogen. Fr&aring;ga vilken adress som ska anv&auml;ndas. Den kommer f&ouml;rmodligen att se ut s&aring; h&auml;r: </P>
+<PRE>
+&#9; http://blabla.xx.se/cgi-bin/geneweb</PRE>
+<P>Om du &ouml;ppnar URLen ovan i din webbl&auml;sare, kommer du att se en sida som fr&aring;gar endast "Base:". Mata in namnet p&aring; din databas. Du kan ocks&aring; l&auml;gga till "?b=karlsson" till denna URL, om "karlsson" &auml;r din databas namn. </P>
+<P>Obs: </P></DIR>
+</DIR>
+
+
+<UL>
+
+<UL>
+<LI>Om det senaste kommandot inte fungerar, &auml;r det m&ouml;jligt att webbservern inte har access r&auml;ttigheter till databasen och de andra katalogerna. G&ouml;r de f&ouml;ljande &aring;tg&auml;rderna: </LI></UL>
+</UL>
+
+<PRE>
+&#9;     cd /home/svensson/geneweb
+&#9;     chmod 777 . lang images base.gwb
+</PRE>
+
+<UL>
+
+<UL>
+<LI>Om den svarar men &auml;r v&auml;ldigt seg, &auml;r det m&ouml;jligt att din databas &auml;r acceded av NFS (om du inte vet vad det betyder fr&aring;ga din system administrat&ouml;r). Det vore b&auml;ttre om s&aring; inte var fallet: om m&ouml;jligt, kopiera katalogen geneweb till en lokal disk p&aring; webbservern. Om det inte &auml;r m&ouml;jligt, l&auml;gg till optionen "-nolock" i anropet till kommandot "gwd" f&ouml;r filen "geneweb" ovan: </LI></UL>
+</UL>
+
+<PRE>
+&#9;     $DIR/gwd -cgi -nolock
+</PRE>
+
+<UL>
+<LI>Under Windows NT, om du installerade <EM>GeneWeb</EM> i katalogen "c:\program\svensson\geneweb", skapa en fil som du d&ouml;per till "gwd.arg" och som inneh&aring;ller f&ouml;ljande rader: </LI></UL>
+
+<PRE>
+&#9;     -hd
+&#9;     c:\program\svensson\geneweb
+&#9;     -bd
+&#9;     c:\program\svensson\geneweb
+&#9;     -cgi</PRE><DIR>
+<DIR>
+
+<P>Dessa &auml;r de optioner som kan ges till kommandot "gwd". Skriv "gwd -help" f&ouml;r att se alla m&ouml;jliga optioner. </P>
+<P>Fr&aring;ga din systemadministrat&ouml;r: </P></DIR>
+</DIR>
+
+
+<UL>
+
+<UL>
+<LI>F&ouml;r att installera "gwd.arg" i "cgi" katalogen. </LI>
+<LI>F&ouml;r att kopiera filen "gwd.exe" fr&aring;n "geneweb" katalogen till denna "cgi" katalog. </LI></UL>
+</UL>
+<DIR>
+<DIR>
+
+<P>Fr&aring;ga vilken adress som ska anv&auml;ndas. Den kommer f&ouml;rmodligen att se ut s&aring; h&auml;r: </P>
+<PRE>
+     http://blabla.xx.se/cgi-bin/gwd.exe
+</PRE>
+<P>Om du &ouml;ppnar URLen ovan i din webbl&auml;sare, kommer du att se en sida som fr&aring;gar endast "Base:". Mata in namnet p&aring; din databas. Du kan ocks&aring; l&auml;gga till "?b=karlsson" till denna URL, om "karlsson" &auml;r din databas namn. </P>
+<P>Obs: om detta senaste kommando inte fungerar, &auml;r det m&ouml;jligt att webbservern inte har access r&auml;ttigheter till databasen och de andra katalogerna. Du m&aring;ste ge l&auml;s och skriv r&auml;ttigheter till katalogen "geneweb" och underkatalogerna "lang", "karlsson.gwb", "images" (och "cnt" om den katalogen finns). </P></DIR>
+</DIR>
+
+<H4>Installation i "service" eller i "cgi"? </H4>
+<P>Om du har m&ouml;jligheten att installera som "service" eller som "cgi", notera det f&ouml;ljande: </P>
+
+<UL>
+<LI>I "cgi" mod, f&ouml;rfr&aring;gningar &auml;r indirekta, eftersom de m&aring;ste passera genom webbservern, vilket kan sl&ouml;a ner behandlingen. </LI>
+<LI>Under Unix, installationen i "service" &auml;r enklare, eftersom den inte kr&auml;ver till&aring;telse eller hj&auml;lp av systemadministrat&ouml;ren. </LI>
+<LI>Under Windows NT, m&aring;ste du alltid fr&aring;ga din systemadministrat&ouml;r, vilken troligen kommer att f&ouml;redra "cgi" mod vilken &auml;r enklare att installera och mera kontrollerbar. </LI>
+<LI>Sj&auml;lvklart, om det inte finns n&aring;gon webbserver p&aring; din dator, &auml;r endast installation under "service" m&ouml;jlig. </LI></UL>
+
+<P>Tillbaka till <A HREF="diruse.htm">bruksanvisningen</A>. </P>
+<P><HR></P>
+<FONT SIZE=2><EM><P>&copy; Copyright INRIA 1999 - GeneWeb</P></FONT></EM></BODY>
+</HTML>
