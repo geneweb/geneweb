@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.31 1999-05-21 08:28:13 ddr Exp $ *)
+(* $Id: perso.ml,v 2.32 1999-06-02 22:43:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -949,12 +949,12 @@ value print conf base p =
      print_notes conf base p;
      if conf.cancel_links then ()
      else
-       do Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=R\">\n%s</a>\n</h4>\n"
+       do Wserver.wprint "\n<h4><a href=\"%s%s;m=R\">\n%s</a></h4>\n"
             (commd conf) (acces conf base p)
             (capitale (transl conf "relationship computing"));
           print_ancestors_descends_cousins conf base p a;
           if conf.wizard then
-            Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=U\">\n%s</a>\n</h4>\n"
+            Wserver.wprint "\n<h4><a href=\"%s%s;m=U\">\n%s</a></h4>\n"
               (commd conf) (acces conf base p)
               (capitale (transl conf "update"))
           else ();
