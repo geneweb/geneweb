@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.1 1999-10-31 20:09:33 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.2 1999-11-05 17:20:06 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -299,7 +299,7 @@ value rec find_all_fields lab =
 value rec lexing =
   parser
   [ [: `('0'..'9' as c); n = number (store 0 c) :] -> ("INT", n)
-  | [: `('A'..'Z' as c); i = ident (store 0 c) :] -> ("ID", i)
+  | [: `('A'..'Z' as c); i = ident (store 0 c) :] -> ("ID", String.uppercase i)
   | [: `'.' :] -> ("", ".")
   | [: `' ' | '\r'; s :] -> lexing s
   | [: _ = Stream.empty :] -> ("EOI", "")
@@ -346,6 +346,38 @@ type range 'a =
 value g = Grammar.create lexer;
 value date_value = Grammar.Entry.create g "date value";
 value date_interval = Grammar.Entry.create g "date interval";
+
+value roman_int_decode s =
+  let decode_digit one five ten r =
+    loop 0 where rec loop cnt i =
+      if i >= String.length s then (10 * r + cnt, i)
+      else if s.[i] = one then
+        loop (cnt + 1) (i + 1)
+      else if s.[i] = five then
+        if cnt = 0 then loop 5 (i + 1)
+        else (10 * r + 5 - cnt, i + 1)
+      else if s.[i] = ten then
+        (10 * r + 10 - cnt, i + 1)
+      else (10 * r + cnt, i)
+  in
+  let (r, i) = decode_digit 'M' 'M' 'M' 0 0 in
+  let (r, i) = decode_digit 'C' 'D' 'M' r i in
+  let (r, i) = decode_digit 'X' 'L' 'C' r i in
+  let (r, i) = decode_digit 'I' 'V' 'X' r i in
+  if i = String.length s then r else raise Not_found
+;
+
+value is_roman_int x =
+  try let _ = roman_int_decode x in True with [ Not_found -> False ]
+;
+
+value roman_int =
+  let p =
+    parser
+    [ [: `("ID", x) when is_roman_int x :] -> roman_int_decode x ]
+  in
+  Grammar.Entry.of_parser g "roman int" p
+;
 
 value date_str = ref "";
 
@@ -441,10 +473,18 @@ EXTEND
           make_date n1 n2 n3 ] ]
   ;
   date_fren:
-    [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." -> () | "/" -> () ];
-        n2 = OPT gen_french; LIST0 [ "." -> () | "/" -> () ]; n3 = OPT int;
-        LIST0 "." ->
-          make_date n1 n2 n3 ] ]
+    [ [ LIST0 "."; n1 = int; (n2, n3) = date_fren_kont ->
+          make_date (Some n1) n2 n3
+      | LIST0 "."; n1 = year_fren ->
+          make_date (Some n1) None None
+      | LIST0 "."; (n2, n3) = date_fren_kont ->
+          make_date None n2 n3 ] ]
+  ;
+  date_fren_kont:
+    [ [ LIST0 [ "." -> () | "/" -> () ];
+        n2 = OPT gen_french; LIST0 [ "." -> () | "/" -> () ];
+        n3 = OPT year_fren; LIST0 "." ->
+          (n2, n3) ] ]
   ;
   date_hebr:
     [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." -> () | "/" -> () ];
@@ -487,6 +527,11 @@ EXTEND
       | ID "THER" -> 11
       | ID "FRUC" -> 12
       | ID "COMP" -> 13 ] ]
+  ;
+  year_fren:
+    [ [ i = int -> i
+      | ID "AN"; i = roman_int -> i
+      | i = roman_int -> i ] ]
   ;
   gen_hebr:
     [ [ m = hebr -> Right m ] ]
@@ -719,15 +764,6 @@ value look_like_a_number s =
       | _ -> False ]
 ;
 
-value look_like_a_roman_number s =
-  loop 0 where rec loop i =
-    if i == String.length s then True
-    else
-      match s.[i] with
-      [ 'I' | 'V' | 'X' | 'L' -> loop (i + 1)
-      | _ -> False ]
-;
-
 value is_a_name_char =
   fun
   [ 'A'..'Z' | 'a'..'z' | 'À'..'Ö' | 'Ø'..'ö' | 'ø'..'ÿ' | '0'..'9' | '-' |
@@ -760,7 +796,7 @@ value rec is_a_public_name s i =
     if j > i then
       let w = String.sub s i (j - i) in
       if look_like_a_number w then True
-      else if look_like_a_roman_number w then True
+      else if is_roman_int w then True
       else if List.mem w public_name_word then True
       else is_a_public_name s j
     else False
