@@ -1,20 +1,21 @@
-# $Id: Makefile.inc,v 1.1.1.1 1998-09-01 14:32:18 ddr Exp $
+# $Id: Makefile.inc,v 1.2 1998-09-02 10:09:12 ddr Exp $
 
 CAMLP4_COMM=../tools/camlp4_comm.sh pa_ifdef.cmo pa_ru.cmo
-CAMLP4F=-DUNIX
-CAMLP4D=`camlp4 -where`
-LIBUNIX=-cclib -lunix
-OCAMLC=ocamlc.opt
-OCAMLOPT=ocamlopt.opt
+CAMLP4F=-DWIN95
+CAMLP4D=c:/camlp4/lib
+LIBUNIX=c:/ocaml/lib/libunix.lib wsock32.lib
+OCAMLC=ocamlc
+OCAMLOPT=ocamlopt
 OCAMLI=
-RM=/bin/rm -f
-EXE=
+RM=rm -f
+EXE=.exe
 
 all::
 opt::
 
 clean::
 	$(RM) *.out *.opt *.cm[oixa] *.cmxa *.pp[oi] *.o *.obj *.lck *.bak *~ .#*
+
 
 .SUFFIXES: .ml .cmo .mli .cmi .cmx
 
