@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.11 1999-03-31 08:59:28 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.12 1999-04-02 09:14:18 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -30,7 +30,6 @@ value ansel_characters = ref True;
 value try_negative_dates = ref False;
 value no_negative_dates = ref False;
 value month_number_dates = ref NoMonthNumberDates;
-value set_not_dead = ref False;
 
 (* Reading input *)
 
@@ -516,7 +515,20 @@ value unknown_fam gen i =
   (f, c)
 ;
 
-value this_year = 1998;
+value this_year =
+  let tm = Unix.localtime (Unix.time ()) in
+  tm.Unix.tm_year + 1900
+;
+
+value infer_death birth =
+  match birth with
+  [ Some d ->
+      let a = this_year - d.year in
+      if a > 120 then DeadDontKnowWhen
+      else if a <= 80 then NotDead
+      else DontKnowIfDead
+  | None -> DontKnowIfDead ]
+;
 
 value make_title gen (title, place) =
   {t_name = Tnone; t_title = add_string gen title;
@@ -941,8 +953,7 @@ value add_indi gen r =
     [ Some r ->
         if r.rsons = [] then
           if r.rval = "Y" then (DeadDontKnowWhen, "", "")
-          else if set_not_dead.val then (NotDead, "", "")
-          else (DontKnowIfDead, "", "")
+          else (infer_death birth, "", "")
         else
           let d =
             match find_field "DATE" r.rsons with
@@ -958,12 +969,7 @@ value add_indi gen r =
             | _ -> "" ]
           in
           (d, p, source gen r)
-    | None ->
-        match birth with
-        [ Some d ->
-            let age = this_year - annee d in
-            if age >= 100 then (DontKnowIfDead, "", "") else (NotDead, "", "")
-        | _ -> (NotDead, "", "") ] ]
+    | None -> (infer_death birth, "", "") ]
   in
   let (burial, burial_place, burial_src) =
     let (buri, buri_place, buri_src) =
@@ -1769,11 +1775,6 @@ value speclist =
     "  \
 - No ANSEL encoding -
        No ANSEL encoding, overriding the possible setting in GEDCOM."
-      );
-   ("-nd", Arg.Set set_not_dead,
-    "
-       Set \"not dead\" instead of \"don't know\" when existing but
-       empty fields DEAT"
       );
    ("-ta", Arg.Set titles_aurejac,
     "\n       [This option is ad hoc; please do not use it]")]

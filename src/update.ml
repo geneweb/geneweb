@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.4 1999-03-31 02:16:50 ddr Exp $ *)
+(* $Id: update.ml,v 2.5 1999-04-02 09:14:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -22,7 +22,7 @@ value rec find_free_occ base f s i =
   | None -> i ]
 ;
 
-value death_supposition conf birth =
+value infer_death conf birth =
   match birth with
   [ Some d ->
       let a = Gutil.annee (Gutil.temps_ecoule d conf.today) in

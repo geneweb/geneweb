@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.5 1999-03-31 02:16:51 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.6 1999-04-02 09:14:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -199,7 +199,7 @@ value insert_person conf base (f, s, o, create) =
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in
           let ip = Adef.iper_of_int (base.data.persons.len) in
-          let death = Update.death_supposition conf birth in
+          let death = Update.infer_death conf birth in
           let empty_string = Update.insert_string conf base "" in
           let p =
             {first_name = Update.insert_string conf base f;
