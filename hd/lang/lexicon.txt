@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.259 2001-03-15 10:36:02 ddr Exp $
+# $Id: lexicon.txt,v 3.260 2001-03-15 11:58:34 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -2736,6 +2736,7 @@ dk: vis ved delte sider/sidebredde/overlapning/total bredde
 en: display by slices/slice width/overlap/total width
 et: kuva osadena/osa laius/ülekate/kogulaius
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
+he:  äöâ øöåòåú  / øåçá øöåòåú  / çôéôä / ñ"ä øåçá
 nl: weergave per snede/sneebreedte/doorsnede/totale breedte
 no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
 pt: resultados por fracções/largura da fracção/sobreposição/largura total
@@ -2794,6 +2795,7 @@ dk: sl&aring; ikke f&aelig;lles anelinier sammen
 en: don't group the common branches together
 et: ära grupeeri ühiseid harusid
 fr: ne pas regrouper les branches communes
+he:  ìà ìùìá òğôé îùôçä îùåúôéí
 nl: voeg de gemeenschappelijke takken niet samen
 no: sammenfallende anelinjer skal ikke slås sammen
 pt: não reagrupar os ramos comuns
@@ -4534,6 +4536,7 @@ es: mensaje/mansaje anterior/mensaje siguiente
 et: teade/eelmine teade/järgmine teade
 fi: viesti/edellinen viesti/seuraava viesti
 fr: message/message pr&eacute;c&eacute;dent/message suivant
+he:  äåãòä / äåãòä ÷åãîú / äåãòä äáàä
 nl: bericht/vorig bericht/volgend bericht
 no: melding/forrige melding/neste melding
 pl: wiadomoœæ/poprzednia wiadomoœæ/nastêpna wiadomoœæ
@@ -4875,6 +4878,7 @@ dk: ingen verificering af k&oslash;nnene
 en: no sexes check
 et: ära kontrolli sugude sobivust
 fr: pas de v&eacute;rification des sexes
+he:  áìé ìååãà îéï
 nl: Geslachten niet verifi&euml;ren
 no: ikke kontroll av kj&oslash;nn
 pt: não verificar os sexos
