@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 2.5 1999-08-05 12:38:31 ddr Exp $ *)
+(* $Id: wserver.ml,v 2.6 1999-08-05 14:54:04 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value wserver_oc =
@@ -302,7 +302,7 @@ do Printf.eprintf "*** %s is a robot => access definitively refused\n" str1; Pri
   | _ -> False ]
 ;
 
-value robot_error t =
+value robot_error robot_excluder t =
 ifdef UNIX then
   match Unix.fork () with
   [ 0 ->
@@ -311,7 +311,15 @@ ifdef UNIX then
          wprint "HTTP/1.0 403 Forbidden"; nl ();
          wprint "Content-type: text/html; charset=iso-8859-1"; nl ();
          nl ();
-         wprint "<body><h1>Access refused</h1></body>"; nl ();
+         wprint "<body><h1>Access refused</h1>"; nl ();
+         match robot_excluder with
+         [ Some (cnt, sec) ->
+             wprint "\
+You made more than %d requests in less than %d seconds.
+Considering that you are probably a robot, your access has been disconnected.
+It will be reconnected at next server restart.\n" cnt sec
+         | None -> () ];
+         wprint "</body>"; nl ();
          wflush ();
          try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
          try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
@@ -460,7 +468,7 @@ value accept_connection tmout max_clients robot_excluder callback s =
   do wait_available max_clients s; return
   let (t, addr) = Unix.accept s in
   do Unix.setsockopt t Unix.SO_KEEPALIVE True; return
-  if is_robot robot_excluder addr then robot_error t else
+  if is_robot robot_excluder addr then robot_error robot_excluder t else
   ifdef UNIX then
     match try Some (Unix.fork ()) with _ -> None with
     [ Some 0 ->
