@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.168 2003-12-16 12:46:18 ddr Exp $
+# $Id: lexicon.txt,v 4.169 2003-12-16 13:06:41 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -6550,6 +6550,7 @@ sv: smeknamn
     rape
 en: rape
 fr: viol
+pl: gwa³t
 pt: violação
 
     recognized son/recognized daughter/recognized child
@@ -6948,6 +6949,7 @@ sv: k&ouml;n
     sexual abuse%t with
 en: having abused%t/victim of sexual abuse%t by
 fr: ayant abus&eacute; sexuellement%t de/victime d'abus sexuel%t de
+pl: uwiód³%t/uwiedziona%t przez
 pt: tendo abusado%t de/vítima de abuso sexual%t por
 
     short display
