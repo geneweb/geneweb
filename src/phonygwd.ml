@@ -1,4 +1,4 @@
-(* $Id: phonygwd.ml,v 1.1.1.1 1998-09-01 14:32:12 ddr Exp $ *)
+(* $Id: phonygwd.ml,v 1.2 1998-09-24 12:57:30 ddr Exp $ *)
 
 open Unix;
 
@@ -39,7 +39,7 @@ value print_text fname =
 
 value connection (addr, request) str =
   do log addr request str;
-     Wserver.html ();
+     Wserver.html "";
      print_text fname.val;
      Wserver.wflush ();
   return ()

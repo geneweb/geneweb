@@ -1,107 +1,28 @@
-<center>
-
 <table border=0>
 <tr>
-<th><font size=-1>Version</font></th>
-<th><font size=-1>version</font></th>
-<th><font size=-1>versio</font></th>
-<th><font size=-1>versi&oacute;n</font></th>
-<th><font size=-1>version</font></th>
-<th><font size=-1>versione</font></th>
-<th><font size=-1>versie</font></th>
-<th><font size=-1>version</font></th>
+<td><a href="%glang=cn"><img src="%sm=IM;v=l-cn.gif" alt=cn></a></td>
+<td><a href="%glang=de"><img src="%sm=IM;v=l-de.gif" alt=de></a></td>
+<td><a href="%glang=en"><img src="%sm=IM;v=l-en.gif" alt=en></a></td>
+<td><a href="%glang=eo"><img src="%sm=IM;v=l-eo.gif" alt=eo></a></td>
+<td><a href="%glang=es"><img src="%sm=IM;v=l-es.gif" alt=es></a></td>
+<td><a href="%glang=fr"><img src="%sm=IM;v=l-fr.gif" alt=fr></a></td>
+<td><a href="%glang=it"><img src="%sm=IM;v=l-it.gif" alt=it></a></td>
+<td><a href="%glang=nl"><img src="%sm=IM;v=l-nl.gif" alt=nl></a></td>
+<td><a href="%glang=se"><img src="%sm=IM;v=l-se.gif" alt=se></a></td>
 </tr>
-
 <tr>
-<td><font size=-1><a href="%glang=de">deutsche</a></font></td>
-<td><font size=-1><em>german</em></font></td>
-<td><font size=-1><em>germana</em></font></td>
-<td><font size=-1><em>alem&aacute;na</em></font></td>
-<td><font size=-1><em>allemande</em></font></td>
-<td><font size=-1><em>tedesca</em></font></td>
-<td><font size=-1><em>duitse</em></font></td>
-<td><font size=-1><em>tyska</em></font></td>
-</tr>
-
-<tr>
-<td><font size=-1><em>englische</em></font></td>
-<td><font size=-1><a href="%glang=en">english</a></font></td>
-<td><font size=-1><em>angla</em></font></td>
-<td><font size=-1><em>inglesa</em></font></td>
-<td><font size=-1><em>anglaise</em></font></td>
-<td><font size=-1><em>inglese</em></font></td>
-<td><font size=-1><em>engelse</em></font></td>
-<td><font size=-1><em>engelska</em></font></td>
-</tr>
-
-<tr>
-<td><font size=-1><em>esperantische</em></font></td>
-<td><font size=-1><em>esperanto</em></font></td>
-<td><font size=-1><a href="%glang=eo">esperanta</a></font></td>
-<td><font size=-1><em>esperanto</em></font></td>
-<td><font size=-1><em>esp&eacute;ranto</em></font></td>
-<td><font size=-1><em>esperanta</em></font></td>
-<td><font size=-1><em>esperanto</em></font></td>
-<td><font size=-1><em>esperanto</em></font></td>
-</tr>
-
-<tr>
-<td><font size=-1><em>spanische</em></font></td>
-<td><font size=-1><em>spanish</em></font></td>
-<td><font size=-1><em>hispana</em></font></td>
-<td><font size=-1><a href="%glang=es">espa&ntilde;ola</a></font></td>
-<td><font size=-1><em>espagnole</em></font></td>
-<td><font size=-1><em>spagnola</em></font></td>
-<td><font size=-1><em>spaanse</em></font></td>
-<td><font size=-1><em>spanska</em></font></td>
-</tr>
-
-<tr>
-<td><font size=-1><em>franz&ouml;sische</em></font></td>
-<td><font size=-1><em>french</em></font></td>
-<td><font size=-1><em>franca</em></font></td>
-<td><font size=-1><em>francesa</em></font></td>
-<td><font size=-1><a href="%glang=fr">fran&ccedil;aise</a></font></td>
-<td><font size=-1><em>francese</em></font></td>
-<td><font size=-1><em>franse</em></font></td>
-<td><font size=-1><em>franska</em></font></td>
-</tr>
-
-<tr>
-<td><font size=-1><em>italienische</em></font></td>
-<td><font size=-1><em>italian</em></font></td>
-<td><font size=-1><em>itala</em></font></td>
-<td><font size=-1><em>italiana</em></font></td>
-<td><font size=-1><em>italienne</em></font></td>
-<td><font size=-1><a href="%glang=it">italiana</a></font></td>
-<td><font size=-1><em>italiaanse</em></font></td>
-<td><font size=-1><em>italienska</em></font></td>
-</tr>
-
-<tr>
-<td><font size=-1><em>niederlandische</em></font></td>
-<td><font size=-1><em>dutch</em></font></td>
-<td><font size=-1><em>nederlanda</em></font></td>
-<td><font size=-1><em>holandesa</em></font></td>
-<td><font size=-1><em>n&eacute;erlandaise</em></font></td>
-<td><font size=-1><em>...</em></font></td>
-<td><font size=-1><a href="%glang=nl">nederlands</a></font></td>
-<td><font size=-1><em>nederländska</em></font></td>
-</tr>
-
-<tr>
-<td><font size=-1><em>schwedische</em></font></td>
-<td><font size=-1><em>swedish</em></font></td>
-<td><font size=-1><em>sveda</em></font></td>
-<td><font size=-1><em>sueca</em></font></td>
-<td><font size=-1><em>su&eacute;doise</em></font></td>
-<td><font size=-1><em>...</em></font></td>
-<td><font size=-1><em>...</em></font></td>
-<td><font size=-1><a href="%glang=se">svenska</a></font></td>
+<td align=center><a href="%glang=cn"><font size=-1>cn</font></a></td>
+<td align=center><a href="%glang=de"><font size=-1>de</font></a></td>
+<td align=center><a href="%glang=en"><font size=-1>en</font></a></td>
+<td align=center><a href="%glang=eo"><font size=-1>eo</font></a></td>
+<td align=center><a href="%glang=es"><font size=-1>es</font></a></td>
+<td align=center><a href="%glang=fr"><font size=-1>fr</font></a></td>
+<td align=center><a href="%glang=it"><font size=-1>it</font></a></td>
+<td align=center><a href="%glang=nl"><font size=-1>nl</font></a></td>
+<td align=center><a href="%glang=se"><font size=-1>se</font></a></td>
 </tr>
 </table>
-</center>
 
 <p>
 
-<font size=-1><a href="%gm=LEX">Lexicon</a></font>
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.3 1998-09-21 11:06:30 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.4 1998-09-24 12:57:19 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -19,6 +19,7 @@ value extract_public_names = ref True;
 value ansel_option = ref None;
 value ansel_characters = ref True;
 value try_negative_dates = ref False;
+value set_not_dead = ref False;
 
 (* Reading input *)
 
@@ -767,6 +768,7 @@ value add_indi gen r =
     [ Some r ->
         if r.rsons = [] then
           if r.rval = "Y" then (DeadDontKnowWhen, "")
+          else if set_not_dead.val then (NotDead, "")
           else (DontKnowIfDead, "")
         else
           let d =
@@ -1491,6 +1493,9 @@ value speclist =
    ("-no_ansel", Arg.Unit (fun () -> ansel_option.val := Some False),
        "  - No ANSEL encoding -
        No ANSEL encoding, overriding the possible setting in GEDCOM.");
+   ("-nd", Arg.Set set_not_dead, "
+       Set \"not dead\" instead of \"don't know\" when existing but
+       empty fields DEAT");
    ("-ta", Arg.Set titles_aurejac, "
        [This option is ad hoc; please do not use it]")]
 ;

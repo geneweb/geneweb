@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.2 1998-09-15 11:16:54 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.3 1998-09-24 12:57:29 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -34,7 +34,9 @@ value copy_decode s i1 i2 =
       do t.[j] := c; return loop_copy t (succ i) (succ j)
     else t
   in
+(*
   let i1 = if i1 < i2 && s.[i1] == '_' then i1 + 1 else i1 in
+*)
   loop_copy (String.create (i2 - i1)) i1 0
 ;
 
@@ -211,27 +213,33 @@ value get_burial l =
   | _ -> (UnknownBurial, l) ]
 ;              
 
+value cut_space x =
+  if String.length x > 0 && x.[0] == ' ' then
+    String.sub x 1 (String.length x - 1)
+  else x
+;
+
 value get_birth_place l =
   match l with
-  [ ["#bp"; x :: l'] -> (x, l')
+  [ ["#bp"; x :: l'] -> (cut_space x, l')
   | _ -> ("", l) ]
 ;
 
 value get_bapt_place l =
   match l with
-  [ ["#pp"; x :: l'] -> (x, l')
+  [ ["#pp"; x :: l'] -> (cut_space x, l')
   | _ -> ("", l) ]
 ;
 
 value get_death_place l =
   match l with
-  [ ["#dp"; x :: l'] -> (x, l')
+  [ ["#dp"; x :: l'] -> (cut_space x, l')
   | _ -> ("", l) ]
 ;
 
 value get_burial_place l =
   match l with
-  [ ["#rp"; x :: l'] -> (x, l')
+  [ ["#rp"; x :: l'] -> (cut_space x, l')
   | _ -> ("", l) ]
 ;
 
@@ -251,12 +259,6 @@ value make_int str x =
       [ '0'..'9' as c ->
           loop True (10 * n + Char.code c - Char.code '0') (succ i)
       | _ -> raise Not_found ]
-;
-
-value cut_space x =
-  if String.length x > 0 && x.[0] == ' ' then
-    String.sub x 1 (String.length x - 1)
-  else x
 ;
 
 value get_fst_name str l =
@@ -283,7 +285,7 @@ value rec get_fst_names_aliases str l =
   [ [x :: l'] ->
       if x.[0] == '{' && x.[String.length x - 1] == '}' then
         let n = String.sub x 1 (String.length x - 2) in
-        let (nl, l) = get_fst_names_aliases str l' in ([n :: nl], l)
+        let (nl, l) = get_fst_names_aliases str l' in ([cut_space n :: nl], l)
       else ([], l)
   | [] -> ([], l) ]
 ;
@@ -291,20 +293,21 @@ value rec get_fst_names_aliases str l =
 value rec get_surnames_aliases str l =
   match l with
   [ ["#salias"; x :: l'] ->
-      let (nl, l) = get_surnames_aliases str l' in ([x :: nl], l)
+      let (nl, l) = get_surnames_aliases str l' in ([cut_space x :: nl], l)
   | _ -> ([], l) ]
 ;
 
 value rec get_nick_names str l =
   match l with
   [ ["#nick"; x :: l'] ->
-      let (nl, l) = get_nick_names str l' in ([x :: nl], l)
+      let (nl, l) = get_nick_names str l' in ([cut_space x :: nl], l)
   | _ -> ([], l) ]
 ;
 
 value rec get_aliases str l =
   match l with
-  [ ["#alias"; x :: l'] -> let (nl, l) = get_aliases str l' in ([x :: nl], l)
+  [ ["#alias"; x :: l'] ->
+      let (nl, l) = get_aliases str l' in ([cut_space x :: nl], l)
   | _ -> ([], l) ]
 ;
 
@@ -324,7 +327,7 @@ value get_pub_name str l =
   match l with
   [ [x :: l'] ->
       if x.[0] == '(' && x.[String.length x - 1] == ')' then
-        let a = String.sub x 1 (String.length x - 2) in (a, l')
+        let a = String.sub x 1 (String.length x - 2) in (cut_space a, l')
       else ("", l)
   | _ -> ("", l) ]
 ;
@@ -341,13 +344,13 @@ value get_photo str l =
 
 value get_occu str l =
   match l with
-  [ ["#occu"; x :: l'] -> (x, l')
+  [ ["#occu"; x :: l'] -> (cut_space x, l')
   | _ -> ("", l) ]
 ;
 
 value get_sources str l =
   match l with
-  [ ["#src"; x :: l'] -> (x, l')
+  [ ["#src"; x :: l'] -> (cut_space x, l')
   | _ -> ("", l) ]
 ;
 
@@ -464,7 +467,7 @@ value get_mar_date str =
       in
       let (place, l) =
         match l with
-        [ ["#mp"; x :: l] -> (x, l)
+        [ ["#mp"; x :: l] -> (cut_space x, l)
         | _ -> ("", l) ]
       in
       let (divorce, l) =
@@ -574,9 +577,7 @@ value parse_parent str l =
     (Undefined key, np, l)
   else
     let u = create_person () in
-    do u.surname := np;
-       u.first_name := pp; u.occ := op;
-    return
+    do u.surname := np; u.first_name := pp; u.occ := op; return
     let l = set_infos str u l in
     (Defined u, np, l)
 ;
@@ -612,13 +613,13 @@ value lire_famille ic fname =
       let ligne = lire_ligne ic in
       let (fsrc, ligne) =
         match ligne with
-        [ Some (str, ["src"; x]) -> (x, lire_ligne ic)
+        [ Some (str, ["src"; x]) -> (cut_space x, lire_ligne ic)
         | Some (str, ["src" :: _]) -> failwith str
         | _ -> ("", ligne) ]
       in
       let (csrc, ligne) =
         match ligne with
-        [ Some (str, ["csrc"; x]) -> (x, lire_ligne ic)
+        [ Some (str, ["csrc"; x]) -> (cut_space x, lire_ligne ic)
         | Some (str, ["csrc" :: _]) -> failwith str
         | _ -> ("", ligne) ]
       in
@@ -643,7 +644,8 @@ value lire_famille ic fname =
           let fo =
             {marriage = marriage; marriage_place = marriage_place;
              divorce = divorce; children = Array.of_list cles_enfants;
-             comment = ""; origin_file = fname; fsources = fsrc;
+             comment = ""; origin_file = fname;
+             fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}
           in
           Some (Family co fo, lire_ligne ic)

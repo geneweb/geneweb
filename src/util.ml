@@ -1,4 +1,4 @@
-(* $Id: util.ml,v 1.3 1998-09-04 06:48:27 ddr Exp $ *)
+(* $Id: util.ml,v 1.4 1998-09-24 12:57:31 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -12,11 +12,15 @@ value base_dir = ref ".";
 value nl () = Wserver.wprint "\r\n";
 
 value html conf =
+  let charset =
+    try Hashtbl.find conf.lexicon " !charset" with
+    [ Not_found -> "iso-8859-1" ]
+  in
   if conf.cgi then
-    do Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
+    do Wserver.wprint "Content-type: text/html; charset=%s" charset;
        nl (); nl ();
     return ()
-  else Wserver.html ()
+  else Wserver.html charset
 ;
 
 value rindex s conf =

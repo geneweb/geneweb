@@ -1,3 +1,14 @@
+     !charset
+cn: gb2312
+de: iso-8859-1
+en: iso-8859-1
+eo: iso-8859-1
+es: iso-8859-1
+fr: iso-8859-1
+it: iso-8859-1
+nl: iso-8859-1
+se: iso-8859-1
+
      to see the first branch
 de: , um den Ersten zu sehen
 en:  to see the first one
@@ -83,6 +94,7 @@ nl: %t is geboren meer dan twee jaar na de dood van zijn/haar vader
 se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att hans/hennes far dog %t
 
     (day)
+cn: 1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31
 de: 1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31.
 en: 1st of/2nd of/3rd of/4th of/5th of/6th of/7th of/8th of/9th of/10th of/11th of/12th of/13th of/14th of/15th of/16th of/17th of/18th of/19th of/20th of/21st of/22nd of/23rd of/24th of/25th of/26th of/27th of/28th of/29th of/30th of/31st of
 eo: 1a de/2a de/3a de/4a de/5a de/6a de/7a de/8a de/9a de/10a de/11a de/12a de/13a de/14a de/15a de/16a de/17a de/18a de/19a de/20a de/21a de/22a de/23a de/24a de/25a de/26a de/27a de/28a de/29a de/30a de/31a de
@@ -103,6 +115,7 @@ nl: ,
 se: ,
 
     (month)
+cn:  1/ 2/ 3/ 4/ 5/ 6/ 7/ 8/ 9/ 10/ 11/ 12
 de: Januar/Februar/M&auml;rz/April/Mai/Juni/Juli/August/September/Oktober/November/Dezember
 en: January/February/March/April/May/June/July/August/September/October/November/December
 eo: januaro/februaro/marto/aprilo/majo/junio/julio/auxgusto/septembro/oktobro/novembro/decembro
@@ -998,6 +1011,7 @@ nl: voornaam niet gevonden
 se: hittar inte f&ouml;rnamn
 
     first name/first names
+cn: Ãû
 de: Vorname/Vornamen
 en: first name/first names
 eo: personnomo/personnomoj
@@ -1705,6 +1719,7 @@ nl: of gebruik "konnektie" inplaats van "maken"
 se: eller anv&auml;nd "l&auml;nk" ist&auml;llet f&ouml;r "skapa"
 
     parents
+cn: ¸¸Ä¸
 de: Eltern
 en: parents
 eo: gepatroj
@@ -2001,6 +2016,7 @@ nl: familienaam niet gevonden
 se: hittar inte efternamn
 
     surname/surnames
+cn: ÐÕ
 de: Nachname/Nachnamen
 en: surname/surnames
 eo: familinomo/familinomoj
