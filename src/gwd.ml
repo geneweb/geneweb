@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.20 1998-12-14 12:43:19 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.21 1998-12-17 15:43:16 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -575,10 +575,10 @@ Type control C to stop the service
 "
             port_selected.val port_selected.val hostn port_selected.val;
           flush Pervasives.stderr;
+          try Unix.mkdir (Filename.concat Util.base_dir.val "cnt") 0o755 with
+          [ Unix.Unix_error _ _ _ -> () ];
        return ()
      else ();
-     try Unix.mkdir (Filename.concat Util.base_dir.val "cnt") 0o755 with
-     [ Unix.Unix_error _ _ _ -> () ];
   return
   Wserver.f port_selected.val tmout
     (ifdef UNIX then max_clients.val else None) robot_xcl.val
