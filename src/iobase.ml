@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.19 2004-01-25 17:19:28 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.20 2004-02-12 20:53:04 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -818,18 +818,20 @@ value input bname =
   in
   let cleanup () = cleanup_ref.val () in
   let commit_patches () =
+    let tmp_fname = Filename.concat bname "1patches" in
     let fname = Filename.concat bname "patches" in
     do {
-      try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
-      try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
+      remove_file (fname ^ "~");
       let oc9 =
-        try Secure.open_out_bin fname with
+        try Secure.open_out_bin tmp_fname with
         [ Sys_error _ ->
             raise (Adef.Request_failure "the database is not writable") ]
       in
       let patches = patches_of_patches_ht patches in
       output_value_no_sharing oc9 (patches : Old.patches);
       close_out oc9;
+      try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
+      try Sys.rename tmp_fname fname with [ Sys_error _ -> () ];
     }
   in
   let patched_ascends () =
