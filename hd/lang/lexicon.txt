@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.69 1999-07-03 19:05:19 ddr Exp $
+# $Id: lexicon.txt,v 2.70 1999-07-08 10:46:14 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -720,7 +720,7 @@ it: un antenato/un'antenata
 nl: een voorouder
 no: stamfar
 pt: um ancestro/uma ancestra
-se: en anfader
+se: en ana
 
     an uncle/an aunt
 de: ein Onkel/eine Tante
@@ -749,7 +749,7 @@ it: antenati
 nl: voorouders
 no: forfedre
 pt: ascendentes
-se: anf&auml;der
+se: anor
 
     ancestors (some)
 de: Vorfahren
@@ -763,7 +763,7 @@ it: antenati
 nl: voorouders
 no: forfedre
 pt: ancestros
-se: en anfader
+se: anor
 
     and
 cn: ºÍ
@@ -1239,7 +1239,7 @@ it: giorni
 nl: dagen oud
 no: dager gammel
 pt: dias
-se: dagar gammal
+se: dagar
 
     dead young
 de: jung gestorben
@@ -1368,7 +1368,7 @@ it: divorziati
 nl: gescheiden
 no: skilt
 pt: divorceados
-se: skild
+se: skilda
 
     don't know
 de: unbekannt
@@ -1733,7 +1733,7 @@ it: sua moglie/suo marito
 nl: zijn vrouw/haar echtgenoot
 no: hans hustru/hennes mann
 pt: sua esposa/seu marido
-se: hans hustru/hennes man
+se: hans maka/hennes make
 
     husband/wife
 de: Ehemann/Ehefrau
@@ -1747,7 +1747,7 @@ it: marito/moglie
 nl: echtgenoot/echtgenote
 no: mann/hustru 
 pt: marido/esposa
-se: man/hustru
+se: make/maka
 
     if titles
 de: eingeschr&auml;nkt
@@ -1842,7 +1842,7 @@ it: includere i coniugi mancanti
 nl: ontbrekende echtgenoten tonen
 no: inkluder manglende (ekte)feller
 pt: incluir os c&ocirc;njugues que faltam
-se: inkludera gem&aring;ler som saknas
+se: inkludera makar som saknas
 
     incompatible sexes
 de: unvertr&aml;gliche Geschlechter
@@ -1925,7 +1925,7 @@ it: indice dei coniugi (non discendenti)
 nl: index van echtgenoten (geen nakomelingen)
 no: ektefelleindeks
 pt: index dos c&ocirc;njuges (n&atilde;o descendentes)
-se: f&ouml;rteckning &ouml;ver gem&aring;lerna (icke &auml;ttlingar)
+se: f&ouml;rteckning &ouml;ver makarna (icke &auml;ttlingar)
 
     insert
 de: einf&uuml;gen +before
@@ -2023,7 +2023,7 @@ it: meno di un mese
 nl: minder dan een maand oud
 no: mindre enn en m&aring;ned gammel
 pt: menos de um m&ecirc;s
-se: mindre &auml;n en m&aring;nad gammal
+se: mindre &auml;n en m&aring;nad
 
     link
 de: verbinden
@@ -2104,7 +2104,7 @@ it: matrimonio di %t dopo la sua morte
 nl: huwelijk van %t na zijn/haar dood
 no: ekteskap med %t etter ektefellens d&oslash;d
 pt: casamento de %t depois da sua morte
-se: &auml;ktenskap med %t f&ouml;re gem&aring;lens f&ouml;delse
+se: &auml;ktenskap med %t f&ouml;re makens/makans d&ouml;d
 
     marriage of %t before his/her birth
 de: Heirat von %t vor seiner/ihrer Geburt
@@ -2145,7 +2145,7 @@ it: sposati
 nl: gehuwd
 no: gift
 pt: casados
-se: gift
+se: gifta
 
     married at age %t
 de: verheiratet mit %t Jahren
@@ -2240,7 +2240,7 @@ it: antenati mancanti
 nl: ontbrekende voorouders
 no: manglende forfedre
 pt: ascendentes faltando
-se: anf&auml;der som saknas
+se: anor som saknas
 
     modify
 de: &auml;ndern +before
@@ -2268,7 +2268,7 @@ it: mesi
 nl: maanden oud
 no: m&aring;neder gammel
 pt: meses
-se: m&aring;nader gammal
+se: m&aring;nader
 
     more than %d answers
 de: mehr als %d Antworten
@@ -2436,7 +2436,7 @@ it: non divorziati
 nl: niet gescheiden
 no: ikke skilt
 pt: n&atilde;o divorceado
-se: inte skild
+se: inte skilda
 
     not found
 de: nicht gefunden
@@ -2463,7 +2463,7 @@ it: non sposati
 nl: niet gehuwd
 pt: n&atilde;o casados
 no: ugift
-se: ogift
+se: ogifta
 
     note/notes
 cn: ±¸×¢
@@ -2716,7 +2716,7 @@ it: un giorno
 nl: een dag oud
 no: en dag gammel
 pt: um dia
-se: en dag gammal
+se: en dag
 
     one month old
 de: einen Monat alt
@@ -2730,7 +2730,7 @@ it: un mese
 nl: een maand oud
 no: en m&aring;ned gammel
 pt: um mes
-se: en m&aring;nad gammal
+se: en m&aring;nad
 
     one year old
 de: ein Jahr alt
@@ -2744,7 +2744,7 @@ it: un anno
 nl: een jaar oud
 no: ett &aring;r gammel
 pt: um ano
-se: ett &aring;r gammal
+se: ett &aring;r
 
     only the generation selected
 de: nur die ausgew&auml;hlte Generation
@@ -2923,7 +2923,7 @@ it: ciclo probabile nella base di dati: qualcuno &egrave; il suo proprio antenat
 nl: waarschijnlijk een lus in de databank
 no: mulig loop i databasen: noen er sin egen etterkommer
 pt: la&ccedil;o prov&aacute;vel na base de dados: algu&eacute;m &eacute; his/her pr&oacute;prio antepassado
-se: trolig rundg&aring;ng i databasen: n&aring;gon &auml;r sin egen anfader
+se: trolig rundg&aring;ng i databasen: n&aring;gon &auml;r sin egen ana
 
     public
 de: &ouml;ffentlich
@@ -3225,7 +3225,7 @@ it: coniugi esclusi
 nl: echtgenoten weggelaten
 no: maker er utelatt
 pt: c&ocirc;njuges n&atilde;o inclu&iacute;dos
-se: exklusive gem&aring;ler
+se: exklusive makar
 
     starting with
 de: beginnend mit
@@ -3239,7 +3239,7 @@ it: partendo da
 nl: begint met
 no: som starter med
 pt: come&ccedil;ando com
-se: som startar med
+se: som b&ouml;rjar med
 
     surname alias
 de: Nachname Alias
@@ -3866,7 +3866,7 @@ it: sarebbe antenato(a) di se stesso(a)
 nl: zou zijn/haar eigen voorouder zijn
 no: ville v&aelig;re sin egen etterkommer 
 pt: seria seu pr&oacute;pio ancestro
-se: skulle vara sin egen anfader
+se: skulle vara sin egen ana
 
     years old
 cn: Ëê
@@ -3881,7 +3881,7 @@ it: anni
 nl: jaren oud
 no: &aring;r gammel
 pt: anos
-se: &aring;r gammal
+se: &aring;r
 
     you must first merge
 de: Sie m&uuml;ssen erst zusammenf&uuml;hren
