@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.40 2004-12-30 21:20:05 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.41 2005-01-21 10:12:59 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <title>%nn;
@@ -306,11 +306,11 @@ function checkCreate(create, redirect)
       </td>
       <td>
         <input type="radio" name="witn%cnt;_sex" value="N"%nn;
-         %if;(witness.sex = "neuter") checked="checked"%end;%/>?
+         %if;(witness.create.sex = "neuter") checked="checked"%end;%/>?
         <input type="radio" name="witn%cnt;_sex" value="M"%nn;
-         %if;(witness.sex = "male") checked="checked"%end;%/>[M/F]0
+         %if;(witness.create.sex = "male") checked="checked"%end;%/>[M/F]0
         <input type="radio" name="witn%cnt;_sex" value="F"%nn;
-         %if;(witness.sex = "female") checked="checked"%end;%/>[M/F]1
+         %if;(witness.create.sex = "female") checked="checked"%end;%/>[M/F]1
       </td>
     </tr>
   </table>
@@ -397,11 +397,11 @@ function checkCreate(create, redirect)
     <tr>
       <td>
         <input type="radio" name="chxcnt_sex" value="N"%nn;
-         %if;(child.sex = "neuter") checked="checked"%end;%/>?
+         %if;(child.create.sex = "neuter") checked="checked"%end;%/>?
         <input type="radio" name="chxcnt_sex" value="M"%nn;
-         %if;(child.sex = "male") checked="checked"%end;%/>[M/F]0
+         %if;(child.create.sex = "male") checked="checked"%end;%/>[M/F]0
         <input type="radio" name="chxcnt_sex" value="F"%nn;
-         %if;(child.sex = "female") checked="checked"%end;%/>[M/F]1
+         %if;(child.create.sex = "female") checked="checked"%end;%/>[M/F]1
       </td>
       %apply;death("chxcnt", "child", "false",
                    " onfocus='checkCreate(chxcnt_p,chxcnt_fn)'")

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.16 2005-01-21 07:22:04 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.17 2005-01-21 10:13:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -46,15 +46,17 @@ value extract_var sini s =
 
 value obsolete_list = ref [];
 
-value obsolete var new_var =
-  if List.mem var obsolete_list.val then ()
+value obsolete version var new_var r =
+  if List.mem var obsolete_list.val then r
   else ifdef UNIX then do {
-    Printf.eprintf "*** <W> updind.txt: \"%s\" obsolete since v4.11%s\n" var
+    Printf.eprintf "*** <W> updind.txt: \"%s\" obsolete since v%s%s\n"
+      var version
       (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
     flush stderr;
-    obsolete_list.val := [var :: obsolete_list.val]
+    obsolete_list.val := [var :: obsolete_list.val];
+    r
   }
-  else ()
+  else r
 ;
 
 value bool_val x = VVbool x;
@@ -247,8 +249,7 @@ and eval_date_var_aux od =
             eval_is_prec (fun [ YearInt _ -> True | _ -> False ]) od
         | _ -> raise Not_found ]
       in
-      let () = obsolete x (if x.[0] = 'c' then "calendar" else "prec") in
-      r ]
+      obsolete "4.11" x (if x.[0] = 'c' then "calendar" else "prec") r ]
 and eval_date_field =
   fun
   [ Some d ->
