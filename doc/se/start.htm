@@ -2,7 +2,7 @@
 <HTML><HEAD><TITLE>GeneWeb - Komma igång</TITLE>
 <META content="text/html; charset=windows-1252" http-equiv=Content-Type>
 <META content="MSHTML 5.00.2014.210" name=GENERATOR>
-<!-- $Id: start.htm,v 3.3 1999-11-02 18:59:33 ddr Exp $ -->
+<!-- $Id: start.htm,v 3.4 1999-11-02 19:16:44 ddr Exp $ -->
 </HEAD>
 <body background="../images/gwback.jpg">
 <table border=0 width="100%">
@@ -33,7 +33,8 @@ kortfattad beskrivning av kommandon och filer som behövs för att starta. </P>
   <LI><A href="#Lex">Katalogen "lang" - filen "lexicon.txt"</A> 
   <LI><A href="#Lng">Katalogen "lang" - underkataloger</A> </LI></UL>
 
-<H4><A name=Int>Introduktion</A> </H4>
+<HR>
+<H3><font color=#2f6400><A name=Int>Introduktion</A> </font></H3>
 <P>För att konfigurera och starta <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>, måste du använda ett DOS 
 fönster. Under Unix, starta ett xterm. Under Windows 95/98/NT, klicka på 
 "Start", "Programs" och "Command Prompt". </P>
@@ -93,7 +94,8 @@ Usage: gwd &lt;options&gt; where options are:
 Några kommandon skriver ut text. Du kan dirigera om utmatningen till en fil 
 genom att avsluta kommandot med "&gt;&nbsp;fil". Exempel: </P><PRE>     gwd -help &gt; foo.txt</PRE><EM>
 <P>GeneWeb</EM> databaser är kataloger med filändelsen ".gwb". </P>
-<H4>K<A name=Gwc>ommandot gwc</A> </H4>
+<HR>
+<H3><font color=#2f6400>K<A name=Gwc>ommandot gwc</A> </font></H3>
 
 <P>
 
@@ -104,7 +106,8 @@ antingen med kommandot "gwc", eller med "ged2gwb", (se nedan). </P>
 <P>Du måste ge ett namn till din databas. Använd helst inte mer än 8 tecken. 
 </P>
 <P>Till exempel, om du vill kalla den "svensson", skriv: </P><PRE>     gwc -o svensson</PRE>
-<H4><A name=Ged>Kommandot ged2gwb</A> </H4>
+<HR>
+<H3><font color=#2f6400><A name=Ged>Kommandot ged2gwb</A> </font></H3>
 <P>Ett annat sätt att skapa en <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> databas är att starta från en 
 GEDCOM-fil. </P>
 <P>Kommandot "ged2gwb" låter dig konvertera en GEDCOM-fil till en 
@@ -117,10 +120,12 @@ databas benämnd "svensson", skriv: </P><PRE>     ged2gwb foo.ged -o svensson</PR
 <P>Kommandot visar till viss del vad den gör, speciellt om den upptäcker fel i 
 GEDCOM-filen. Ignorera dessa fel till att börja med: din databas kommer att 
 skapas ändå. Om allt är Ok, ska kommandot avslutas med: </P><PRE>     *** Ok</PRE>
-<H4>K<A name=Gee>ommandot gwb2ged</A> </H4>
+<HR>
+<H3><font color=#2f6400>K<A name=Gee>ommandot gwb2ged</A> </font></H3>
 <P>Innan vi fortsätter, låt oss notera att med det omvända kommandot, "gwb2ged", 
 kan man återuppbygga en GEDCOM-fil från en <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> bas. </P>
-<H4><A name=Gwd>Kommandot gwd</A> </H4>
+<HR>
+<H3><font color=#2f6400><A name=Gwd>Kommandot gwd</A> </font></H3>
 <P>När du har skapat en databas, med en av kommandona "gwc" eller "ged2gwb", kan 
 du konsultera och utöka den. </P>
 <P>Alltid i DOS fönstret, skriv: </P><PRE>     gwd</PRE>
@@ -179,7 +184,8 @@ längre i din webbläsare. För att återstarta den, skriv "gwd" igen. </P>
 den. Den öppnar ett DOS fönster där "gwd" visar sina textrader. Om man trycker 
 a"Control-C" stoppar "gwd" och fönstret stängs. Om man skapar en genväg till 
 "gwd" på skrivbordet, kan du starta den enkelt. </P>
-<H4>Ko<A name=Csg>mmandot consang </A></H4>
+<HR>
+<H3><font color=#2f6400>Ko<A name=Csg>mmandot consang </A></font></H3>
 <P>Detta kommando måste startas i ett DOS fönster, som de andra. Om "gwd" 
 demonen körs, tryck "Control-C" för att stoppa den. Ett annat sätt, om du inte 
 vill stoppa demonen, är att starta ett andra DOS fönster och följa 
@@ -202,7 +208,8 @@ familje strukturen. Om den ändras, är de individuella blodsbanden inte längre
 åtkomliga och du måste räkna om dem. </P>
 <P>Vidare gör "consang" en intern "upprensning" av databasen, nödvändig efter 
 ett antal uppdateringar. </P>
-<H4>K<A name=Gwu>ommandot gwu</A> </H4>
+<HR>
+<H3><font color=#2f6400>K<A name=Gwu>ommandot gwu</A> </font></H3>
 <P>[Detta kommando hette "gwb2gw" i väldigt gamla versioner]. </P>
 <P>Detta kommando visar innehållet i databasen i textform. Omdirigering av 
 utmatningen till en fil, gör att man kan spara databasen. </P>
@@ -218,7 +225,8 @@ databasen har ändrats. </P>
 <P>För att återskapa din databas, måste du använda kommandot "gwc". Den lagrade 
 filen måste ha filändelsen ".gw". För att skapa en databas benämnd "svensson" 
 från filen "foo.gw", skriv: </P><PRE>     gwc foo.gw -o svensson</PRE>
-<H4><A name=Cnf>Filen a.gwf</A> </H4>
+<HR>
+<H3><font color=#2f6400><A name=Cnf>Filen a.gwf</A> </font></H3>
 <P>Denna fil innehåller en konfigurations mall för en databas. Om din databas 
 namn är "svensson", gör en kopia av "a.gwf" med nytt namn "svensson.gwf" och 
 editera filen "svensson.gwf". </P>
@@ -281,7 +289,8 @@ genom att klicka på flaggorna högst upp på sidan. </P></DIR>
   som bokmärke är det ett sätt att dirigera om dem till den nya databasen med 
   det nya namnet. Om man försöker att komma åt databasen med det gamla namnet 
   ses en sida med en länk till det nya namnet.</LI></UL>
-<H4><A name=Lex>Katalogen "lang" - filen "lexicon.txt"</A> </H4>
+<HR>
+<H3><font color=#2f6400><A name=Lex>Katalogen "lang" - filen "lexicon.txt"</A> </font></H3>
 <P>Denna fil innehåller ett lexikon över alla termer och fraser använda i 
 programmet. För varje finns det en översättning till varje språk. Om du vill 
 lägga till ett språk, välj en kod för detta språk och lägg till en rad för varje 
@@ -290,7 +299,8 @@ lägga till ett språk, välj en kod för detta språk och lägg till en rad för varje
 passar dig, kan du ändra den. </P>
 <P>När du sparar filen "lexicon.txt", kommer detta att appliceras omedelbart på 
 visningen i din webbläsare. Du behöver kanske trycka på "uppdatera". </P>
-<H4><A name=Lng>Katalogen "lang" - underkataloger</A></H4>
+<HR>
+<H3><font color=#2f6400><A name=Lng>Katalogen "lang" - underkataloger</A></font></H3>
 <P>Varje underkatalogs namn är en språk kod. Varje innehåller en välkomstsida 
 för detta språk: filen heter "start.txt". </P>
 <P>Du kan ändra denna välkomstsida för en given databas. För databasen 

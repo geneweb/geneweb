@@ -1,8 +1,20 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head><title>GeneWeb - Åtkomst restriktioner</title></head>
-<body>
-<h1>GeneWeb - Åtkomst restriktioner</h1>
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>GeneWeb - Åtkomst restriktioner</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
 
 Om din databas finns på webben, kanske du vill kunna hindra åtkomster
 till informationen den innehåller.
@@ -40,7 +52,8 @@ kapitel <a href="#Rob">robotar</a> och sätt att
 hindra dem från att förstöra. Den sista delen ger ett ännu tuffare
 sätt att begränsa behörigheten: den <a href="#Bla">svartalistan</a>.
 
-<h4><a name="Wiz">Begränsning av modifieringar: "wizard" behörighet</a></h4>
+<HR>
+<H3><font color=#2f6400><a name="Wiz">Begränsning av modifieringar: "wizard" behörighet</a></font></H3>
 
 Om du inte vill att någon ska kunna göra inline modifieringar,
 måste du sätta ett "wizard" passord till din databas.
@@ -146,7 +159,8 @@ För att installera ett "friend" passord, gör som med "wizard"
 passordet ovan. Om du skapar filen "foo.gwf" själv, är variabel namnet
 "friend_passwd".
 
-<h4><a name="DBA">Globala åtkomst restriktioner till en databas</a></h4>
+<HR>
+<H3><font color=#2f6400><a name="DBA">Globala åtkomst restriktioner till en databas</a></font></H3>
 
 Om du vill att bara vissa personer ska kunna komma åt din databas, kan
 du ange en global åtkomst restriktion.
@@ -209,7 +223,8 @@ I exemplet ovan, har du skrivit "svensson" som "användare" och
 
 Om ditt passord inte stämde, har du ingen behörighet alls till databasen.
 
-<h4><a name="GWA">Globala åtkomst restriktioner till gwd servicen</a></h4>
+<HR>
+<H3><font color=#2f6400><a name="GWA">Globala åtkomst restriktioner till gwd servicen</a></font></H3>
 
 Om du vill att bara vissa personer ska komma åt gwd servicen, kan
 du sätta en global åtkomst restriktion för gwd servicen. Detta gäller
@@ -238,7 +253,8 @@ Den globala åtkomstbehörigheten görs med parametrar för "gwd"
 kommandot. Optionen är "-auth" och måste följas av namnet
 för behörighetsfilen.
 
-<h4><a name="Rob">Robotar</a></h4>
+<HR>
+<H3><font color=#2f6400><a name="Rob">Robotar</a></font></H3>
 
 En del personer kan sända en "robot" till din sajt. Dessa robotar är
 program som går igenom hela din sajt metodiskt, till exempel genom att
@@ -332,7 +348,8 @@ bestämmer sig att "fria" den.
 För att fria de förbjudna adresserna, behöver bara sajt innehavaren radera
 filen benämnd "robot" som ligger i katalogen "cnt".
 
-<h4><a name="Bla">Den svartalistan</a></h4>
+<HR>
+<H3><font color=#2f6400><a name="Bla">Den svartalistan</a></font></H3>
 
 Den svartalistan gör det möjligt att förbjuda åtkomster till en
 <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> sajt
