@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 2.3 1999-07-15 08:52:51 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 2.4 1999-09-25 08:28:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -54,6 +54,9 @@ value print_differences conf base branches fam1 fam2 =
       (Adef.int_of_ifam fam1.fam_index);
     Wserver.wprint "<input type=hidden name=f2 value=%d>\n"
       (Adef.int_of_ifam fam2.fam_index);
+    match p_getenv conf.env "ip" with
+    [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
+    | None -> () ];
     loop branches where rec loop =
       fun
       [ [(ip1, ip2)] ->
