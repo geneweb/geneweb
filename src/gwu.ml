@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.29 2005-02-03 16:19:39 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.30 2005-02-03 16:47:21 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -105,9 +105,14 @@ value utf_8_of_iso_8859_1 str =
         loop (i + 1) (Buff.store len (Char.chr (Char.code c - 0x40)))
 ;
 
+value raw_output = ref False;
+
 value gen_correct_string no_colon s =
   let s = strip_spaces s in
-  let s = if Gutil.utf_8_db.val then s else utf_8_of_iso_8859_1 s in
+  let s =
+    if Gutil.utf_8_db.val || raw_output.val then s
+    else utf_8_of_iso_8859_1 s
+  in
   loop 0 0 where rec loop i len =
     if i == String.length s then Buff.get len
     else if len == 0 && not (starting_char s) then
@@ -1018,7 +1023,7 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
           let oc = open_out (Filename.concat out_dir fname) in
           let x = (oc, ref True) in
           do {
-            fprintf oc "encoding: utf-8\n\n";
+            if raw_output.val then () else fprintf oc "encoding: utf-8\n\n";
             src_oc_list.val := [(fname, x) :: src_oc_list.val]; x
           } ]
   in
@@ -1143,6 +1148,8 @@ value speclist =
 <num> :
      When a person is born less than <num> years ago, it is not exported unless
      it is Public. All the spouses and descendants are also censored.");
+   ("-raw", Arg.Set raw_output,
+    "raw output (without possible utf-8 conversion)");
    ("-sep",
     Arg.String (fun s -> separate_list.val := [s :: separate_list.val]), "\
 \"1st_name.num surname\" :
@@ -1277,7 +1284,7 @@ value main () =
     let out_oc =
       if out_file.val = "" then stdout else open_out out_file.val
     in
-    fprintf out_oc "encoding: utf-8\n\n";
+    if raw_output.val then () else fprintf out_oc "encoding: utf-8\n\n";
     gwu base out_dir.val out_oc src_oc_list anc desc ancdesc;
     List.iter (fun (src, (oc, _)) -> do { flush oc; close_out oc })
       src_oc_list.val;
