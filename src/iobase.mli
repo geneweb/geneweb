@@ -1,4 +1,4 @@
-(* $Id: iobase.mli,v 1.1.1.1 1998-09-01 14:32:05 ddr Exp $ *)
+(* $Id: iobase.mli,v 1.2 1998-11-30 20:26:31 ddr Exp $ *)
 
 open Def;
 
@@ -8,3 +8,5 @@ value input : string -> base;
 value output : string -> base -> unit;
 
 value lock_file : string -> string;
+
+value name_key : string -> string;

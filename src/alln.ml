@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 1.6 1998-11-30 00:51:23 ddr Exp $ *)
+(* $Id: alln.ml,v 1.7 1998-11-30 20:26:29 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -213,6 +213,34 @@ value print_frequency_any conf base is_surnames list len =
 (* selection *)
 
 value select_names conf base is_surnames ini =
+(* version using the index *)
+  let iii =
+    if is_surnames then base.persons_of_surname else base.persons_of_first_name
+  in
+  let list =
+    loop (iii.cursor (String.capitalize ini)) [] where rec loop istr list =
+      let s = sou base istr in
+      let k = Iobase.name_key s in
+      if string_start_with ini k then
+        let list =
+          if s <> "?" then
+            let cnt = List.length (iii.find istr) in
+            if cnt = 0 then list
+            else
+              match list with
+               [ [(k1, s1, cnt1) :: list1] ->
+                   if k = k1 then [(k1, s1, cnt1 + cnt) :: list1]
+                   else [(k, s, cnt) :: list]
+               | [] -> [(k, s, cnt)] ]
+          else list
+        in
+        match try Some (iii.next istr) with [ Not_found -> None ] with
+        [ Some istr -> loop istr list
+        | None -> list ]
+      else list
+  in
+  (List.rev list, True)
+(* version without index
   let table = Mhashtbl.create 801 in
   let list = ref [] in
   do for i = 0 to base.persons.len - 1 do
@@ -221,9 +249,7 @@ value select_names conf base is_surnames ini =
          if is_surnames then sou base p.surname
          else sou base p.first_name
        in
-       let k =
-         Name.lower (if is_surnames then surname_end s else s)
-       in
+       let k = Iobase.name_key s in
        if s <> "?" && string_start_with ini k then
          let cnt =
            try fst (Mhashtbl.find table k) with
@@ -237,12 +263,13 @@ value select_names conf base is_surnames ini =
      Mhashtbl.iter
        (fun k (cnt, s) -> list.val := [(k, s, cnt.val) :: list.val])
        table;
-  return list.val
+  return (list.val, False)
+*)
 ;
 
 value print_frequency conf base is_surnames =
   let list =
-    let list = select_names conf base is_surnames "" in
+    let (list, _) = select_names conf base is_surnames "" in
     Sort.list
       (fun (k1, _, cnt1) (k2, _, cnt2) ->
          if cnt1 > cnt2 then True
@@ -267,8 +294,9 @@ value print_alphabetic conf base is_surnames =
     | _ -> False ]
   in
   let list =
-    let list = select_names conf base is_surnames ini in
-    Sort.list (fun (k1, _, _) (k2, _, _) -> k1 <= k2) list
+    let (list, sorted) = select_names conf base is_surnames ini in
+    if sorted then list
+    else Sort.list (fun (k1, _, _) (k2, _, _) -> k1 <= k2) list
   in
   let len = List.length list in
   if len >= 50 then
