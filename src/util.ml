@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.16 1999-05-07 19:26:28 ddr Exp $ *)
+(* $Id: util.ml,v 2.17 1999-05-07 21:20:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -824,7 +824,7 @@ value print_link_to_welcome conf right_aligned =
     | None -> "" ]
   in
   do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-     Wserver.wprint "<img src=\"%sm=IM;v=up.gif\"%s alt=\"^^\"%s>"
+     Wserver.wprint "<img src=\"%sm=IM;v=/up.gif\"%s alt=\"^^\"%s>"
        (commd conf) wid_hei (if right_aligned then " align=" ^ dir else "");
      Wserver.wprint "</a>\n";
   return ()

@@ -2,6 +2,8 @@ GeneWeb Intermediate version 2.02-1
 -----------------------------------
 
 * Setup program
+  - [May 7, 99] Fixed bug: recovering data base from old version of GeneWeb
+    did not work when the old directory held spaces.
   - [May 7, 99] Fixed bad behavior under Windows: "GWU.EXE" (in uppercase)
     was not regognized when searching for old GeneWeb versions.
   - [May 7, 99] Fixed bug: "cleanup" under Windows did not work.

@@ -2,31 +2,31 @@
 <tr>
 <td align=center>
 <a href="%glang=cn">
-<img src="%gm=IM;v=l-cn.gif" width=36 height=22 alt=cn></a>
+<img src="%gm=IM;v=/l-cn.gif" width=36 height=22 alt=cn></a>
 <a href="%glang=de">
-<img src="%gm=IM;v=l-de.gif" width=36 height=22 alt=de></a>
+<img src="%gm=IM;v=/l-de.gif" width=36 height=22 alt=de></a>
 <a href="%glang=dk">
-<img src="%gm=IM;v=l-dk.gif" width=36 height=22 alt=dk></a>
+<img src="%gm=IM;v=/l-dk.gif" width=36 height=22 alt=dk></a>
 <a href="%glang=en">
-<img src="%gm=IM;v=l-en.gif" width=36 height=22 alt=en></a>
+<img src="%gm=IM;v=/l-en.gif" width=36 height=22 alt=en></a>
 <a href="%glang=eo">
-<img src="%gm=IM;v=l-eo.gif" width=36 height=22 alt=eo></a>
+<img src="%gm=IM;v=/l-eo.gif" width=36 height=22 alt=eo></a>
 <a href="%glang=es">
-<img src="%gm=IM;v=l-es.gif" width=36 height=22 alt=es></a>
+<img src="%gm=IM;v=/l-es.gif" width=36 height=22 alt=es></a>
 <a href="%glang=fr">
-<img src="%gm=IM;v=l-fr.gif" width=36 height=22 alt=fr></a>
+<img src="%gm=IM;v=/l-fr.gif" width=36 height=22 alt=fr></a>
 <a href="%glang=he">
-<img src="%gm=IM;v=l-he.gif" width=36 height=22 alt=he></a>
+<img src="%gm=IM;v=/l-he.gif" width=36 height=22 alt=he></a>
 <a href="%glang=it">
-<img src="%gm=IM;v=l-it.gif" width=36 height=22 alt=it></a>
+<img src="%gm=IM;v=/l-it.gif" width=36 height=22 alt=it></a>
 <a href="%glang=nl">
-<img src="%gm=IM;v=l-nl.gif" width=36 height=22 alt=nl></a>
+<img src="%gm=IM;v=/l-nl.gif" width=36 height=22 alt=nl></a>
 <a href="%glang=no">
-<img src="%gm=IM;v=l-no.gif" width=36 height=22 alt=no></a>
+<img src="%gm=IM;v=/l-no.gif" width=36 height=22 alt=no></a>
 <a href="%glang=pt">
-<img src="%gm=IM;v=l-pt.gif" width=36 height=22 alt=pt></a>
+<img src="%gm=IM;v=/l-pt.gif" width=36 height=22 alt=pt></a>
 <a href="%glang=se">
-<img src="%gm=IM;v=l-se.gif" width=36 height=22 alt=se></a>
+<img src="%gm=IM;v=/l-se.gif" width=36 height=22 alt=se></a>
 </td>
 </tr>
 </table>
