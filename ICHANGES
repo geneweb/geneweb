@@ -5,6 +5,7 @@ GeneWeb Version 4.03
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [06 Aug 01] Removed <nobr></nobr> in descendants display.
   - [13 Jul 01] In auth files, added ability to add a ':' after the password
     followed by a comment.
   - [11 Jul 01] Added trace of latest connected friends base_f.txt if there
