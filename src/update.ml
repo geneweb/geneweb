@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.25 2001-01-06 09:55:59 ddr Exp $ *)
+(* $Id: update.ml,v 3.26 2001-02-04 07:21:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -588,19 +588,19 @@ value print_date conf base lab var d =
              Wserver.wprint "<option value=about%s>%s\n"
                (match d with
                 [ Some (Dgreg {prec = About} _) -> " selected" | _ -> "" ])
-               (capitale (transl conf "about (date)"));
+               (capitale (transl_decline conf "about (date)" ""));
              Wserver.wprint "<option value=maybe%s>%s\n"
                (match d with
                 [ Some (Dgreg {prec = Maybe} _) -> " selected" | _ -> "" ])
-               (capitale (transl conf "possibly (date)"));
+               (capitale (transl_decline conf "possibly (date)" ""));
              Wserver.wprint "<option value=before%s>%s\n"
                (match d with
                 [ Some (Dgreg {prec = Before} _) -> " selected" | _ -> "" ])
-               (capitale (transl conf "before (date)"));
+               (capitale (transl_decline conf "before (date)" ""));
              Wserver.wprint "<option value=after%s>%s\n"
                (match d with
                 [ Some (Dgreg {prec = After} _) -> " selected" | _ -> "" ])
-               (capitale (transl conf "after (date)"));
+               (capitale (transl_decline conf "after (date)" ""));
              Wserver.wprint "<option value=oryear%s>&lt;- %s -&gt;\n"
                (match d with
                 [ Some (Dgreg {prec = OrYear _} _) -> " selected" | _ -> "" ])

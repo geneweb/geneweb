@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.75 2001-02-02 09:47:09 ddr Exp $ *)
+(* $Id: perso.ml,v 3.76 2001-02-04 07:21:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -581,7 +581,8 @@ value print_death_age conf base env p p_auth =
        approx) when d1 <> d2 ->
         let a = temps_ecoule d1 d2 in
         do if not approx && d1.prec = Sure && d2.prec = Sure then ()
-           else Wserver.wprint "%s " (transl conf "possibly (date)");
+           else
+             Wserver.wprint "%s " (transl_decline conf "possibly (date)" "");
            Date.print_age conf a;
         return ()
     | _ -> () ]

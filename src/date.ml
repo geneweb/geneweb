@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.22 2001-01-26 02:46:14 ddr Exp $ *)
+(* $Id: date.ml,v 3.23 2001-02-04 07:21:40 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -87,31 +87,29 @@ value string_of_on_prec_dmy conf sy d =
   [ Sure ->
       if d.day = 0 && d.month = 0 then
         transl conf "in (year)" ^ " " ^ sy
-      else if d.day = 0 then transl conf "in (month year)" ^ " " ^ sy
+      else if d.day = 0 then transl_decline conf "in (month year)" sy
       else transl_decline conf "on (day month year)" sy
   | About | Before | After ->
       let s = sy in
-      if d.prec = About then transl conf "about (date)" ^ " " ^ s
-      else if d.prec = Before then transl conf "before (date)" ^ " " ^ s
-      else transl conf "after (date)" ^ " " ^ s
+      if d.prec = About then transl_decline conf "about (date)" s
+      else if d.prec = Before then transl_decline conf "before (date)" s
+      else transl_decline conf "after (date)" s
   | Maybe ->
       let s =
-        if d.day = 0 && d.month = 0 then
-          transl conf "in (year)" ^ " " ^ sy
-        else if d.day = 0 then transl conf "in (month year)" ^ " " ^ sy
+        if d.day = 0 && d.month = 0 then transl conf "in (year)" ^ " " ^ sy
+        else if d.day = 0 then transl_decline conf "in (month year)" sy
         else transl_decline conf "on (day month year)" sy
       in
-      transl conf "possibly (date)" ^ " " ^ s
+      transl_decline conf "possibly (date)" s
   | OrYear z ->
       let s =
-        if d.day = 0 && d.month = 0 then
-          transl conf "in (year)" ^ " " ^ sy
-        else if d.day = 0 then transl conf "in (month year)" ^ " " ^ sy
+        if d.day = 0 && d.month = 0 then transl conf "in (year)" ^ " " ^ sy
+        else if d.day = 0 then transl_decline conf "in (month year)" sy
         else transl_decline conf "on (day month year)" sy
       in
       s ^ " " ^
       transl conf "or" ^ " " ^
-      code_date conf (transl_nth conf "(date)" 3) 0 0 z
+      nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z)
   | YearInt z ->
       let s =
         if d.day = 0 && d.month = 0 then sy
@@ -120,7 +118,7 @@ value string_of_on_prec_dmy conf sy d =
       in
       transl conf "between (date)" ^ " " ^ s ^ " " ^
       transl conf "and" ^ " " ^
-      code_date conf (transl_nth conf "(date)" 3) 0 0 z ]
+      nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z) ]
 ;
 
 value string_of_on_dmy conf d =
@@ -159,19 +157,19 @@ value string_of_dmy conf d =
   in
   let s = code_date conf encoding d.day d.month d.year in
   match d.prec with
-  [ Sure -> s
-  | About -> transl conf "about (date)" ^ " " ^ s
-  | Before -> transl conf "before (date)" ^ " " ^ s
-  | After -> transl conf "after (date)" ^ " " ^ s
-  | Maybe -> transl conf "possibly (date)" ^ " " ^ s
+  [ Sure -> nominative s
+  | About -> transl_decline conf "about (date)" s
+  | Before -> transl_decline conf "before (date)" s
+  | After -> transl_decline conf "after (date)" s
+  | Maybe -> transl_decline conf "possibly (date)" s
   | OrYear z ->
       s ^ " " ^
       transl conf "or" ^ " " ^
-      code_date conf (transl_nth conf "(date)" 3) 0 0 z
+      nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z)
   | YearInt z ->
       transl conf "between (date)" ^ " " ^ s ^ " " ^
       transl conf "and" ^ " " ^
-      code_date conf (transl_nth conf "(date)" 3) 0 0 z ]
+      nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z) ]
 ;
 
 value gregorian_precision conf d =
@@ -451,7 +449,9 @@ value print_dates conf base p =
            do Wserver.wprint "\n(";
               Wserver.wprint "%s " (transl conf "age at death:");
               if not approx && d1.prec = Sure && d2.prec = Sure then ()
-              else Wserver.wprint "%s " (transl conf "possibly (date)");
+              else
+                Wserver.wprint "%s "
+                  (transl_decline conf "possibly (date)" "");
               print_age conf a;
               Wserver.wprint ")";
            return ()
@@ -461,10 +461,11 @@ value print_dates conf base p =
 
 (* Calendar request *)
 
-value gregorian_month_name conf n = capitale (transl_nth conf "(month)" n);
+value gregorian_month_name conf n =
+  capitale (nominative (transl_nth conf "(month)" n));
 value julian_month_name = gregorian_month_name;
-value french_month_name conf n = capitale (french_month conf n);
-value hebrew_month_name conf n = capitale (hebrew_month conf n);
+value french_month_name conf n = capitale (nominative (french_month conf n));
+value hebrew_month_name conf n = capitale (nominative (hebrew_month conf n));
 
 value print_some_calendar conf date n month_name n_months var =
   do Wserver.wprint "\n";
