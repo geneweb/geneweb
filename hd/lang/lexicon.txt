@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.30 2001-07-18 08:58:00 ddr Exp $
+# $Id: lexicon.txt,v 4.31 2001-07-21 10:47:45 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -7373,8 +7373,10 @@ ru: הÿהט ט עועט
 sv: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
 
     undefined sex for %t
+de: Geschlecht nicht definiert f&uuml;r %t
 en: undefined sex for %t
 fr: sexe ind&eacute;fini pour %t
+he:  המין של %t לא מוגדר
 no: udefinert kjרnn for %t
 sv: odefinierat kצn fצr %t
 
