@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 3.6 2000-05-02 17:28:05 ddr Exp $ *)
+(* $Id: robot.ml,v 3.7 2000-06-17 21:04:44 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -60,7 +60,7 @@ value input_excl =
     else (input_value ic : excl)
 ;
 
-value check oc tm from max_call sec cgi suicide =
+value robot_excl () =
   let fname = Srcfile.adm_file "robot" in
   let xcl =
     match try Some (open_in_bin fname) with _ -> None with
@@ -72,6 +72,11 @@ value check oc tm from max_call sec cgi suicide =
         do close_in ic; return v
     | None -> {excl = []; who = W.empty; max_conn = (0, "")} ]
   in
+  (xcl, fname)
+;
+
+value check oc tm from max_call sec cgi suicide =
+  let (xcl, fname) = robot_excl () in
   let refused =
     match try Some (List.assoc from xcl.excl) with [ Not_found -> None ] with
     [ Some att ->
