@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.17 1999-09-25 21:23:02 ddr Exp $
+# $Id: geneweb.spec,v 1.18 1999-10-04 10:20:39 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -29,6 +29,7 @@ Source1: geneweb-initrc-%{version}.sh
 URL: http://cristal.inria.fr/~ddr/GeneWeb/
 Packager: Daniel de Rauglaudre <daniel.de_rauglaudre@inria.fr>
 # Requires: ld-linux.so.2 libc.so.6 libm.so.6 libncurses.so.4 libm.so.6(GLIBC_2.1) libm.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1) libc.so.6(GLIBC_2.0)
+BuildRoot: /tmp/%{name}-%{version}
 
 Prefix: /usr
 Summary(de): eine genealogische Software mit einem Web-Interface
@@ -84,22 +85,30 @@ make distrib
 #  This sets up the same files 'by hand'; rpm will then archive them.
 #  The end user installs the copies from the .rpm archive.)
 %install
-mkdir -p /home/geneweb
-cp -r distribution /home/geneweb/gw
-cp $RPM_SOURCE_DIR/geneweb-initrc-%{version}.sh /etc/rc.d/init.d/gwd
-ln -s ../init.d/gwd /etc/rc.d/rc0.d/K01gwd
-ln -s ../init.d/gwd /etc/rc.d/rc1.d/K01gwd
-ln -s ../init.d/gwd /etc/rc.d/rc2.d/S99gwd
-ln -s ../init.d/gwd /etc/rc.d/rc3.d/S99gwd
-ln -s ../init.d/gwd /etc/rc.d/rc5.d/S99gwd
-ln -s ../init.d/gwd /etc/rc.d/rc6.d/K01gwd
+mkdir -p $RPM_BUILD_ROOT/home/geneweb
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc0.d
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc1.d
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc2.d
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc3.d
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc4.d
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc5.d
+mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc6.d
+cp -r distribution $RPM_BUILD_ROOT/home/geneweb/gw
+cp $RPM_SOURCE_DIR/geneweb-initrc-%{version}.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/gwd
+ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc0.d/K01gwd
+ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc1.d/K01gwd
+ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc2.d/S99gwd
+ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc3.d/S99gwd
+ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc5.d/S99gwd
+ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc6.d/K01gwd
 
 # %clean: after installing, how to clean up.  (The files are all
 # in the .rpm archive by now.  Need to remove them before we
 # can test the whole thing with 'rpm -i foo.rpm'.)
 %clean
 make clean
-rm -rf /home/geneweb/gw /usr/doc/geneweb-%{version} /etc/rc.d/*/*gwd
+rm -rf $RPM_BUILD_ROOT
 
 # *********** INSTALLING .RPM *************
 # This stuff only happens on the user's machine.
