@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.15 1999-05-15 11:08:16 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.16 1999-05-17 16:40:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -431,6 +431,11 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
       else (True, passwd = real_wizard_passwd, passwd = real_friend_passwd)
     else (True, passwd = real_wizard_passwd, passwd = real_friend_passwd)
   in
+  let cancel_links =
+    match Util.p_getenv env "cgl" with
+    [ Some "on" -> True
+    | _ -> False ]
+  in
   if not ok then
     unauth base_file (if passwd = "w" then "Wizard" else "Friend")
   else
@@ -456,6 +461,7 @@ use \"can_send_image\".\n"
              return r
            with
            [ Not_found -> False ] ];
+     cancel_links = cancel_links;
      bname = base_file;
      env = env;
      senv = [];

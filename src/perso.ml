@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.27 1999-05-17 11:36:32 ddr Exp $ *)
+(* $Id: perso.ml,v 2.28 1999-05-17 16:40:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -954,7 +954,7 @@ value print conf base p =
      print_parents conf base a;
      print_families conf base p a;
      print_notes conf base p;
-     if cancel_geneweb_links.val then ()
+     if conf.cancel_links then ()
      else
        do Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=R\">\n%s</a>\n</h4>\n"
             (commd conf) (acces conf base p)

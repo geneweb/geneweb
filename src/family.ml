@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.10 1999-05-17 11:36:31 ddr Exp $ *)
+(* $Id: family.ml,v 2.11 1999-05-17 16:40:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -229,11 +229,7 @@ value make_senv conf base =
 ;
 
 value family_m conf base =
-  do make_senv conf base;
-     match p_getenv conf.env "cgl" with
-     [ Some "on" -> Util.cancel_geneweb_links.val := True
-     | _ -> () ];
-  return
+  do make_senv conf base; return
   match p_getenv conf.env "m" with
   [ Some "A" ->
       match find_person_in_env conf base "" with
