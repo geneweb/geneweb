@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.5 2001-11-27 12:10:08 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.6 2002-01-10 19:46:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -682,8 +682,11 @@ value link gwo_list =
      g_scnt = 0; g_base = empty_base; g_def = [| |]; g_separate = False;
      g_shift = 0; g_errored = False}
   in
-  let _ = unique_string gen "" in
+  let istr_empty = unique_string gen "" in
+  let istr_quest = unique_string gen "?" in
   do {
+    assert (istr_empty = Adef.istr_of_int 0);
+    assert (istr_quest = Adef.istr_of_int 1);
     List.iter (insert_comp_families gen) gwo_list;
     let base = linked_base gen in
     if do_check.val && gen.g_pcnt > 0 then do {

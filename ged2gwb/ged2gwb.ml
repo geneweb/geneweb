@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.14 2002-01-08 08:56:18 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.15 2002-01-10 19:46:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -797,9 +797,13 @@ value fam_index gen lab =
       } ]
 ;
 
+value string_empty = Adef.istr_of_int 0;
+value string_quest = Adef.istr_of_int 1;
+value string_x = Adef.istr_of_int 2;
+
 value unknown_per gen i =
-  let empty = add_string gen "" in
-  let what = add_string gen "?" in
+  let empty = string_empty in
+  let what = string_quest in
   let p =
     {first_name = what; surname = what; occ = i; public_name = empty;
      image = empty; qualifiers = []; aliases = []; first_names_aliases = [];
@@ -828,7 +832,7 @@ value phony_per gen sex =
 ;
 
 value unknown_fam gen i =
-  let empty = add_string gen "" in
+  let empty = string_empty in
   let father = phony_per gen Male in
   let mother = phony_per gen Female in
   let f =
@@ -1092,9 +1096,6 @@ value source gen r =
   | _ -> "" ]
 ;
 
-value string_empty = ref (Adef.istr_of_int 0);
-value string_x = ref (Adef.istr_of_int 0);
-
 value p_index_from s i c =
   if i >= String.length s then String.length s
   else try String.index_from s i c with [ Not_found -> String.length s ]
@@ -1208,7 +1209,7 @@ value set_adop_fam gen ip which_parent fath moth =
       in
       let r =
         {r_type = Adoption; r_fath = r_fath; r_moth = r_moth;
-         r_sources = add_string gen ""}
+         r_sources = string_empty}
       in
       per.rparents := [r :: per.rparents] ]
 ;
@@ -1455,7 +1456,7 @@ value add_indi gen r =
     if godf <> None || godm <> None then
       let r =
         {r_type = GodParent; r_fath = godf; r_moth = godm;
-         r_sources = add_string gen ""}
+         r_sources = string_empty}
       in
       [r :: rparents]
     else rparents
@@ -1566,7 +1567,6 @@ value add_indi gen r =
     | _ -> (buri, buri_place, buri_src) ]
   in
   let birth = Adef.codate_of_od birth in
-  let empty = add_string gen "" in
   let psources =
     let s = source gen r in
     if s = "" then default_source.val else s
@@ -1727,7 +1727,6 @@ value add_fam_norm gen r adop_list =
       [ Some r -> if r.rval <> "" && r.rval.[0] == '@' then "" else r.rval
       | None -> "" ]
     in
-    let empty = add_string gen "" in
     let fsources =
       let s = source gen r in
       if s = "" then default_source.val else s
@@ -1737,7 +1736,8 @@ value add_fam_norm gen r adop_list =
        marriage_place = add_string gen marr_place;
        marriage_src = add_string gen marr_src; witnesses = [| |];
        relation = relation; divorce = div; comment = add_string gen comment;
-       origin_file = empty; fsources = add_string gen fsources; fam_index = i}
+       origin_file = string_empty; fsources = add_string gen fsources;
+       fam_index = i}
     and cpl = {father = fath; mother = moth}
     and des = {children = Array.of_list children} in
     gen.g_fam.arr.(Adef.int_of_ifam i) := Right3 fam cpl des
@@ -2098,8 +2098,9 @@ value make_arrays in_file =
      g_adop = Hashtbl.create 3001; g_godp = []; g_witn = []}
   in
   do {
-    string_empty.val := add_string gen "";
-    string_x.val := add_string gen "x";
+    assert (add_string gen "" = string_empty);
+    assert (add_string gen "?" = string_quest);
+    assert (add_string gen "x" = string_x);
     Printf.eprintf "*** pass 1 (note)\n";
     flush stderr;
     pass1 gen fname;
@@ -2468,14 +2469,14 @@ value finish_base base =
       let a = ascends.(i) in
       let u = unions.(i) in
       if a.parents <> None && Array.length u.family != 0 ||
-         p.notes <> string_empty.val
+         p.notes <> string_empty
       then do {
         if sou base p.first_name = "?" then do {
-          p.first_name := string_x.val; p.occ := i
+          p.first_name := string_x; p.occ := i
         }
         else ();
         if sou base p.surname = "?" then do {
-          p.surname := string_x.val; p.occ := i
+          p.surname := string_x; p.occ := i
         }
         else ()
       }
@@ -2674,4 +2675,3 @@ try main () with e ->
     close_out log_oc.val;
     exit 2
   };
-

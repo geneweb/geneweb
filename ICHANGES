@@ -1,8 +1,12 @@
-Internal, very small, undocumented, or not visible changes
-**********************************************************
+Internal, very small, undocumented, or invisible changes
+********************************************************
 
 GeneWeb Version 4.05
 --------------------
+
+* GeneWeb compiler (gwc) and Gedcom to GeneWeb (ged2gwb)
+  - [10 Jan 02] Warranty that the index (istr) number of the empty string
+    is 0 and of the string "?" is 1.
 
 * All executables
   - [10 Jan 02] No more statically linked by default.

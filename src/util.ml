@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.23 2002-01-10 04:13:31 ddr Exp $ *)
+(* $Id: util.ml,v 4.24 2002-01-10 19:46:10 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -11,10 +11,6 @@ value base_dir = ref Filename.current_dir_name;
 value doc_dir = ref "";
 value cnt_dir = ref "";
 value images_url = ref "";
-
-value pget (conf : config) base ip =
-  base.data.persons.get (Adef.int_of_iper ip)
-;
 
 value secure s =
   let rec need_code i =
@@ -199,6 +195,12 @@ value age_autorise conf base p =
             | _ -> loop (i + 1) ]
         in
         loop 0 ]
+;
+
+value empty_string = Adef.istr_of_int 0;
+
+value pget (conf : config) base ip =
+  base.data.persons.get (Adef.int_of_iper ip)
 ;
 
 value is_old_person conf p =
