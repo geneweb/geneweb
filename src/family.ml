@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.40 2003-12-04 20:30:55 ddr Exp $ *)
+(* $Id: family.ml,v 4.41 2003-12-05 05:48:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -676,15 +676,16 @@ value treat_request_on_possibly_locked_base conf bfile log =
 ;
 
 value this_request_updates_database conf =
-  if conf.wizard then
-    match p_getenv conf.env "m" with
-    [ Some
-        ("ADD_FAM_OK" | "ADD_IND_OK" | "CHG_CHN_OK" | "DEL_FAM_OK" |
-         "DEL_IMAGE_OK" | "DEL_IND_OK" | "FORUM_ADD_OK" | "FORUM_DEL" |
-         "INV_FAM_OK" | "KILL_ANC" | "MOD_FAM_OK" | "MOD_IND_OK" | "MRG_IND" |
-         "MRG_MOD_FAM_OK" | "MRG_MOD_IND_OK" | "SND_IMAGE_OK") -> True
-    | _ -> False ]
-  else False
+  match p_getenv conf.env "m" with
+  [ Some ("FORUM_ADD_OK" | "FORUM_DEL") -> True
+  | Some x when conf.wizard ->
+      match x with
+      [ "ADD_FAM_OK" | "ADD_IND_OK" | "CHG_CHN_OK" | "DEL_FAM_OK" |
+        "DEL_IMAGE_OK" | "DEL_IND_OK" | "INV_FAM_OK" | "KILL_ANC" |
+	"MOD_FAM_OK" | "MOD_IND_OK" | "MRG_IND" | "MRG_MOD_FAM_OK" |
+	"MRG_MOD_IND_OK" | "SND_IMAGE_OK" -> True
+      | _ -> False ]
+  | _ -> False ]
 ;
 
 value error_locked conf =
