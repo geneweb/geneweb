@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 1.13 1999-01-18 16:01:50 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.14 1999-01-19 11:43:11 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -262,7 +262,7 @@ value rec display_note oc s i =
   if i == String.length s then Printf.fprintf oc "\n"
   else
     if i <= String.length s - String.length br
-    && String.sub s i (String.length br) = br then
+    && String.lowercase (String.sub s i (String.length br)) = br then
       do Printf.fprintf oc "\n2 CONT "; return
       let i = i + String.length br in
       let i =
