@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.11 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: history.ml,v 4.12 2004-12-28 15:13:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -140,30 +140,33 @@ value print_history_line conf base line wiz k i =
         if not_displayed then i
         else do {
           if i = 0 then Wserver.wprint "<dl>\n" else ();
-          Wserver.wprint "<dt><tt><b>*</b> %s</tt>\n" time;
-          Wserver.wprint "(%s)" (action_text conf action);
-          if user <> "" then do {
-            Wserver.wprint "\n<em>";
-            if wiz = "" then
-              Wserver.wprint "<a href=\"%sm=HIST;k=%d;wiz=%s\">" (commd conf) k
-                (Util.code_varenv user)
+          stagn "dt" begin
+            Wserver.wprint" <tt><b>*</b> %s</tt>\n" time;
+            Wserver.wprint "(%s)" (action_text conf action);
+            if user <> "" then do {
+              Wserver.wprint "\n<em>";
+              if wiz = "" then
+                Wserver.wprint "<a href=\"%sm=HIST;k=%d;wiz=%s\">"
+                  (commd conf) k (Util.code_varenv user)
+              else ();
+              Wserver.wprint "%s" user;
+              if wiz = "" then Wserver.wprint "</a>" else ();
+              Wserver.wprint "</em>";
+            }
             else ();
-            Wserver.wprint "%s" user;
-            if wiz = "" then Wserver.wprint "</a>" else ();
-            Wserver.wprint "</em>";
-          }
-          else ();
-          Wserver.wprint " :\n<dd>";
-          match po with
-          [ Some p ->
-              do {
-                Wserver.wprint "<!--%s/%s/%d-->" (p_first_name base p)
-                  (p_surname base p) p.occ;
-                Wserver.wprint "%s" (referenced_person_title_text conf base p);
-                Wserver.wprint "%s" (Date.short_dates_text conf base p);
-              }
-          | None -> Wserver.wprint "%s" key ];
-          Wserver.wprint "\n";
+          end;
+          stagn "dd" begin
+            match po with
+            [ Some p ->
+                do {
+                  Wserver.wprint "<!--%s/%s/%d-->" (p_first_name base p)
+                   (p_surname base p) p.occ;
+                  Wserver.wprint "%s"
+                    (referenced_person_title_text conf base p);
+                  Wserver.wprint "%s" (Date.short_dates_text conf base p);
+                }
+            | None -> Wserver.wprint "%s" key ];
+          end;
           i + 1
         }
       }
@@ -209,20 +212,26 @@ value print_history conf base ic =
     if n > 0 then Wserver.wprint "</dl>\n" else ();
     if pos > 0 then
       tag "form" "method=\"get\" action=\"%s\"" conf.command begin
-        html_p conf;
-        Util.hidden_env conf;
-        Wserver.wprint "<input type=hidden name=m value=HIST>\n";
-        Wserver.wprint "<input name=k size=3 value=%d>\n" k;
-        Wserver.wprint "<input type=hidden name=pos value=%d>\n" pos;
-        if wiz <> "" then do {
-          Wserver.wprint "<input type=hidden name=wiz value=\"%s\">\n" wiz;
-          Wserver.wprint "(%s)\n" wiz;
-        }
-        else ();
-        Wserver.wprint "<input type=submit value=\"&gt;&gt;\">\n";
-        if wiz <> "" then
-          Wserver.wprint "<input type=submit name=n value=\"&gt;&gt;\">\n"
-        else ();
+        tag "p" begin
+          Util.hidden_env conf;
+          Wserver.wprint
+            "<input type=\"hidden\" name=\"m\" value=\"HIST\"%s>\n" xhs;
+          Wserver.wprint
+            "<input name=\"k\" size=\"3\" value=\"%d\"%s>\n" k xhs;
+          Wserver.wprint
+            "<input type=\"hidden\" name=\"pos\" value=\"%d\"%s>\n" pos xhs;
+          if wiz <> "" then do {
+            Wserver.wprint
+              "<input type=\"hidden\" name=\"wiz\" value=\"%s\"%s>\n" wiz xhs;
+            Wserver.wprint "(%s)\n" wiz;
+          }
+          else ();
+          Wserver.wprint "<input type=\"submit\" value=\"&gt;&gt;\"%s>\n" xhs;
+          if wiz <> "" then
+            Wserver.wprint
+              "<input type=\"submit\" name=\"n\" value=\"&gt;&gt;\"%s>\n" xhs
+          else ();
+        end;
       end
     else ();
   }

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 4.10 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 4.11 2004-12-28 15:13:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -45,11 +45,11 @@ value print_differences conf base branches fam1 fam2 =
       Wserver.wprint "<h4>%s</h4>\n" (capitale title);
       tag "ul" begin
         html_li conf;
-        Wserver.wprint "<input type=radio name=\"%s\" value=1 checked>\n"
+        Wserver.wprint "<input type=\"radio\" name=\"%s\" value=\"1\" checked>\n"
           name;
         Wserver.wprint "%s\n" x1;
         html_li conf;
-        Wserver.wprint "<input type=radio name=\"%s\" value=2>\n" name;
+        Wserver.wprint "<input type=\"radio\" name=\"%s\" value=\"2\">\n" name;
         Wserver.wprint "%s\n" x2;
       end;
     }
@@ -57,21 +57,21 @@ value print_differences conf base branches fam1 fam2 =
   in
   tag "form" "method=\"post\" action=\"%s\"" conf.command begin
     Util.hidden_env conf;
-    Wserver.wprint "<input type=hidden name=m value=MRG_FAM_OK>\n";
-    Wserver.wprint "<input type=hidden name=i value=%d>\n"
+    Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"MRG_FAM_OK\">\n";
+    Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
       (Adef.int_of_ifam fam1.fam_index);
-    Wserver.wprint "<input type=hidden name=i2 value=%d>\n"
+    Wserver.wprint "<input type=\"hidden\" name=\"i2\" value=\"%d\">\n"
       (Adef.int_of_ifam fam2.fam_index);
     match p_getenv conf.env "ip" with
-    [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
+    [ Some ip -> Wserver.wprint "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
     | None -> () ];
     let rec loop =
       fun
       [ [(ip1, ip2)] ->
           do {
-            Wserver.wprint "<input type=hidden name=ini1 value=%d>\n"
+            Wserver.wprint "<input type=\"hidden\" name=\"ini1\" value=\"%d\">\n"
               (Adef.int_of_iper ip1);
-            Wserver.wprint "<input type=hidden name=ini2 value=%d>\n"
+            Wserver.wprint "<input type=\"hidden\" name=\"ini2\" value=\"%d\">\n"
               (Adef.int_of_iper ip2);
           }
       | [_ :: branches] -> loop branches
@@ -110,7 +110,7 @@ value print_differences conf base branches fam1 fam2 =
              in
              transl conf "divorced" ^ ds ]);
     html_p conf;
-    Wserver.wprint "<input type=submit value=Ok>\n";
+    Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
   end
 ;
 

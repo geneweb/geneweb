@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.24 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: date.ml,v 4.25 2004-12-28 15:12:56 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -478,16 +478,16 @@ value hebrew_month_name conf n = capitale (nominative (hebrew_month conf n));
 value print_year date var =
   do {
     stag "td" begin
-      Wserver.wprint "<input type=submit name=y%s1 value=\" &lt; \">" var;
+      Wserver.wprint "<input type=\"submit\" name=\"y%s1\" value=\" &lt; \">" var;
     end;
     Wserver.wprint "\n";
     stag "td" begin
-      Wserver.wprint "<input name=y%s size=5 maxlength=5 value=%d>" var
+      Wserver.wprint "<input name=\"y%s\" size=\"5\" maxlength=\"5\" value=\"%d\">" var
         date.year;
     end;
     Wserver.wprint "\n";
     stag "td" begin
-      Wserver.wprint "<input type=submit name=y%s2 value=\" &gt; \">" var;
+      Wserver.wprint "<input type=\"submit\" name=\"y%s2\" value=\" &gt; \">" var;
     end;
     Wserver.wprint "\n";
   }
@@ -496,11 +496,11 @@ value print_year date var =
 value print_month conf date month_name n_months var =
   do {
     stag "td" begin
-      Wserver.wprint "<input type=submit name=m%s1 value=\" &lt; \">" var;
+      Wserver.wprint "<input type=\"submit\" name=\"m%s1\" value=\" &lt; \">" var;
     end;
     Wserver.wprint "\n";
-    tag "td" "align=center" begin
-      tag "select" "name=m%s" var begin
+    tag "td" "align=\"center\"" begin
+      tag "select" "name=\"m%s\"" var begin
         for i = 1 to n_months do {
           Wserver.wprint "<option value=%d%s> %s\n" i
             (if date.month = i then " selected" else "")
@@ -682,7 +682,7 @@ value print_calendar conf base =
                 conf.henv;
               Wserver.wprint "<input type=hidden name=m value=CAL>\n\n";
               let order = transl conf " !dates order" in
-              tag "table" "border=1" begin
+              tag "table" "border=\"1\"" begin
                 print_calendar_head conf order;
                 print_some_calendar conf order date 0 gregorian_month_name
                   12 "g";
@@ -700,12 +700,12 @@ value print_calendar conf base =
           end;
         end;
         stag "tr" begin
-          stag "td" "align=left" begin
+          stag "td" "align=\"left\"" begin
             Wserver.wprint "&nbsp;";
           end;
         end;
         stag "tr" begin
-          tag "td" "align=center" begin
+          tag "td" "align=\"center\"" begin
             Wserver.wprint "%s: " (capitale (transl conf "julian day"));
             let jd = Calendar.sdn_of_gregorian date in
             if jd < 0 then Wserver.wprint "%d" jd

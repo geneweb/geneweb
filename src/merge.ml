@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 4.9 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: merge.ml,v 4.10 2004-12-28 15:13:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -32,27 +32,27 @@ value print conf base p =
     tag "form" "method=\"get\" action=\"%s\"" conf.command begin
       html_p conf;
       Util.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=m value=MRG_IND>\n";
-      Wserver.wprint "<input type=hidden name=i value=%d>\n"
+      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"MRG_IND\">\n";
+      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
         (Adef.int_of_iper p.cle_index);
       Wserver.wprint "%s " (capitale (transl_decline conf "with" ""));
       if list <> [] then
         Wserver.wprint
-          ":<br>\n<input type=radio name=select value=input checked>\n"
+          ":<br>\n<input type=\"radio\" name=\"select\" value=\"input\" checked>\n"
       else ();
       Wserver.wprint "(%s . %s %s):\n"
         (transl_nth conf "first name/first names" 0) (transl conf "number")
         (transl_nth conf "surname/surnames" 0);
-      Wserver.wprint "<input name=n size=30 maxlength=200>\n";
+      Wserver.wprint "<input name=\"n\" size=\"30\" maxlength=\"200\">\n";
       Wserver.wprint "<br>\n";
       if list <> [] then
-        Wserver.wprint "<table border=0 cellspacing=0 cellpadding=0>\n"
+        Wserver.wprint "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n"
       else ();
       List.iter
         (fun p ->
            do {
-             Wserver.wprint "<tr align=left><td valign=top>\n";
-             Wserver.wprint "<input type=radio name=select value=%d>\n"
+             Wserver.wprint "<tr align=\"left\"><td valign=\"top\">\n";
+             Wserver.wprint "<input type=\"radio\" name=\"select\" value=\"%d\">\n"
                (Adef.int_of_iper p.cle_index);
              Wserver.wprint "<td>\n";
              stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
@@ -78,7 +78,7 @@ value print conf base p =
            })
         list;
       if list <> [] then Wserver.wprint "</table>\n" else ();
-      Wserver.wprint "<p>\n<input type=submit value=Ok>\n";
+      Wserver.wprint "<p>\n<input type=\"submit\" value=\"Ok\">\n";
     end;
     trailer conf;
   }

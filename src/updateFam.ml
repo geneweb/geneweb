@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.45 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.46 2004-12-28 15:13:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -485,7 +485,7 @@ value print_update_fam conf base fcd digest =
       ("ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "MOD_FAM" | "MOD_FAM_OK" |
        "MRG_FAM" | "MRG_FAM_OK" | "MRG_MOD_FAM_OK") ->
       let astl = Templ.input conf "updfam" in
-      do { html1 conf; nl (); interp_templ conf base fcd digest astl }
+      do { html1 conf; interp_templ conf base fcd digest astl }
   | _ -> incorrect_request conf ]
 ;
 
@@ -517,15 +517,15 @@ value print_del1 conf base fam =
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       html_p conf;
       Util.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
+      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n\n"
         (Adef.int_of_ifam fam.fam_index);
       match p_getenv conf.env "ip" with
-      [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
+      [ Some ip -> Wserver.wprint "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
       | None -> () ];
-      Wserver.wprint "<input type=hidden name=m value=DEL_FAM_OK>\n";
+      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"DEL_FAM_OK\">\n";
       Wserver.wprint "\n";
       html_p conf;
-      Wserver.wprint "<input type=submit value=Ok>\n";
+      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     end;
     Wserver.wprint "\n";
     trailer conf
@@ -556,14 +556,14 @@ value print_inv1 conf base p fam1 fam2 =
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
       html_p conf;
       Util.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
+      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n\n"
         (Adef.int_of_iper p.cle_index);
-      Wserver.wprint "<input type=hidden name=f value=%d>\n\n"
+      Wserver.wprint "<input type=\"hidden\" name=\"f\" value=\"%d\">\n\n"
         (Adef.int_of_ifam fam2.fam_index);
-      Wserver.wprint "<input type=hidden name=m value=INV_FAM_OK>\n";
+      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\">\n";
       Wserver.wprint "\n";
       html_p conf;
-      Wserver.wprint "<input type=submit value=Ok>\n";
+      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     end;
     Wserver.wprint "\n";
     trailer conf

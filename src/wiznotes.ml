@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.18 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.19 2004-12-28 15:13:06 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -229,7 +229,7 @@ value print_wizard conf base wizfile wz =
     header conf title;
     print_link_to_welcome conf False;
     html_p conf;
-    tag "table" "border=0" begin
+    tag "table" "border=\"0\"" begin
       tag "tr" begin
         tag "td" begin
           Wserver.wprint "%s\n" (string_with_macros conf False [] s);
@@ -251,17 +251,17 @@ value print_wizard conf base wizfile wz =
       html_p conf;
       tag "form" "method=\"post\" action=\"%s\"" conf.command begin
         Util.hidden_env conf;
-        Wserver.wprint "<input type=hidden name=m value=WIZNOTES>\n";
-        Wserver.wprint "<input type=hidden name=v value=\"%s\">\n" wz;
+        Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"WIZNOTES\">\n";
+        Wserver.wprint "<input type=\"hidden\" name=\"v\" value=\"%s\">\n" wz;
         let digest = Iovalue.digest s in
-        Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n"
+        Wserver.wprint "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n"
           digest;
-        stag "textarea" "name=notes rows=30 cols=70 wrap=soft" begin
+        stag "textarea" "name=\"notes\" rows=\"30\" cols=\"70\" wrap=\"soft\"" begin
           if s <> "" then Wserver.wprint "%s" (quote_escaped s) else ();
         end;
         Wserver.wprint "\n";
         html_p conf;
-        Wserver.wprint "<input type=submit value=Ok>\n";
+        Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
       end
     }
     else ();

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.15 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.16 2004-12-28 15:12:55 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -114,13 +114,13 @@ value print_choice conf base p niveau_effectif =
   tag "form" "method=\"get\" action=\"%s\"" conf.command begin
     html_p conf;
     Util.hidden_env conf;
-    Wserver.wprint "<input type=hidden name=m value=C>\n";
+    Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"C\">\n";
     wprint_hidden_person conf base "" p;
-    tag "select" "name=v1" begin
+    tag "select" "name=\"v1\"" begin
       let rec boucle i =
         if i > niveau_effectif then ()
         else do {
-          Wserver.wprint "  <option value=%d%s> %s\n" i
+          Wserver.wprint "  <option value=\"%d\"%s> %s\n" i
             (if i == 2 then " selected" else "")
             (capitale (brother_label conf i));
           boucle (succ i)
@@ -128,9 +128,9 @@ value print_choice conf base p niveau_effectif =
       in
       boucle 1;
     end;
-    Wserver.wprint "<input type=submit value=\"Ok\">\n";
+    Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
     Wserver.wprint "<br>\n";
-    Wserver.wprint "<input type=checkbox name=csp value=on> %s\n"
+    Wserver.wprint "<input type=\"checkbox\" name=\"csp\" value=\"on\"> %s\n"
       (capitale (transl conf "include spouses"));
   end
 ;
@@ -491,10 +491,10 @@ value print_anniv conf base p level =
   in
   let mode () =
     do {
-      Wserver.wprint "<input type=hidden name=m value=C>\n";
-      Wserver.wprint "<input type=hidden name=i value=%d>\n"
+      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"C\">\n";
+      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
         (Adef.int_of_iper p.cle_index);
-      Wserver.wprint "<input type=hidden name=t value=AN>\n"
+      Wserver.wprint "<input type=\"hidden\" name=\"t\" value=\"AN\">\n"
     }
   in
   match p_getint conf.env "v" with

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.22 2004-12-28 10:13:27 ddr Exp $ *)
+(* $Id: dag.ml,v 4.23 2004-12-28 15:12:55 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -829,8 +829,8 @@ value print_slices_menu conf base hts_opt =
                (decode_varenv k) (decode_varenv v))
         conf.env;
       tag "table" begin
-        tag "tr" "align=left" begin
-          tag "td" "align=right" begin
+        tag "tr" "align=\"left\"" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n"
               (Util.capitale
                  (transl conf "don't group the common branches together"));
@@ -838,21 +838,21 @@ value print_slices_menu conf base hts_opt =
               "<input type=\"checkbox\" name=\"nogroup\" value=\"on\">\n";
           end;
         end;
-        tag "tr" "align=left" begin
-          tag "td" "align=right" begin
+        tag "tr" "align=\"left\"" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n" (txt 1);
             Wserver.wprint "<input name=\"dpos\" size=\"5\" value=\"78\">\n";
           end;
         end;
-        tag "tr" "align=left" begin
-          tag "td" "align=right" begin
+        tag "tr" "align=\"left\"" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n" (txt 2);
             Wserver.wprint
               "<input name=\"overlap\" size=\"5\" value=\"10\">\n";
           end;
         end;
-        tag "tr" "align=left" begin
-          tag "td" "align=right" begin
+        tag "tr" "align=\"left\"" begin
+          tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n" (txt 3);
             let wid =
               let wid = 78 in
