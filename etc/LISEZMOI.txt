@@ -1,4 +1,4 @@
-GeneWeb 3.10
+GeneWeb 3.11
 
 Pour demarrer avec GeneWeb, suivez les instructions suivantes:
 
