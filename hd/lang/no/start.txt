@@ -64,8 +64,7 @@ sortert
 
 %w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
 <li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-<li><a href="%sm=FORUM;t=w">[*wizards forum]</a>
-%w%x<li><a href="%sm=FORUM;t=f">[*friends forum]</a>
+%w%x<li><a href="%sm=FORUM">[*forum]</a>
 %x
 
 </ul>

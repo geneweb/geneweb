@@ -1,14 +1,14 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 2.3 1999-10-08 17:58:10 ddr Exp $ *)
+(* $Id: forum.ml,v 2.4 1999-10-08 19:13:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
 open Config;
 open Def;
 
-value forum_file conf label =
+value forum_file conf =
   List.fold_right Filename.concat [Util.base_dir.val; conf.bname ^ ".gwb"]
-    (label ^ "_forum")
+    "forum"
 ;
 
 value get_var ic lab s =
@@ -21,8 +21,8 @@ value get_var ic lab s =
   else ("", s)
 ;
 
-value print_forum conf base label =
-  let fname = forum_file conf label in
+value print_forum conf base =
+  let fname = forum_file conf in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       try
@@ -62,35 +62,20 @@ value print_forum conf base label =
   | None -> () ]
 ;
 
-value print conf base label forum_text =
-  let title _ = Wserver.wprint "%s" (capitale forum_text)  in
+value print conf base =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "forum")) in
   do header conf title;
      print_link_to_welcome conf True;
-(**)
      tag "form" "method=get action=\"%s\"" conf.command begin
        Srcfile.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=FORUM_ADD>\n";
-       Wserver.wprint "<input type=hidden name=t value=%s>\n" label;
        Wserver.wprint "<input type=submit value=\"%s\">\n"
          (capitale (transl_decline conf "add" (transl conf "comment")));
      end;
-(*
-     stag "a" "href=\"%sm=FORUM_ADD;t=%s\"" (commd conf) label begin
-       Wserver.wprint "%s\n"
-         (capitale (transl_decline conf "add" (transl conf "comment")));
-     end;
-*)
      Wserver.wprint "\n";
-     print_forum conf base label;
+     print_forum conf base;
      trailer conf;
   return ()
-;
-
-value print_wizard conf base =
-  print conf base "w" (transl conf "wizards forum")
-;
-value print_friend conf base =
-  print conf base "f" (transl conf "friends forum")
 ;
 
 value print_var conf name opt def_value =
@@ -108,7 +93,7 @@ value print_var conf name opt def_value =
   end
 ;
 
-value print_add conf base label =
+value print_add conf base =
   let title _ =
     Wserver.wprint "%s"
       (capitale (transl_decline conf "add" (transl conf "comment")))
@@ -118,7 +103,6 @@ value print_add conf base label =
      tag "form" "method=post action=\"%s\"" conf.command begin
        Srcfile.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=FORUM_ADD_OK>\n";
-       Wserver.wprint "<input type=hidden name=t value=%s>\n" label;
        tag "table" "border=%d" conf.border begin
          print_var conf "Ident" False conf.user;
          print_var conf "Email" True "";
@@ -133,22 +117,19 @@ value print_add conf base label =
   return ()
 ;
 
-value print_add_wizard conf base = print_add conf base "w";
-value print_add_friend conf base = print_add conf base "f";
-
 value get conf key =
   match p_getenv conf.env key with
   [ Some v -> v
   | None -> failwith (key ^ " unbound") ]
 ;
 
-value forum_add conf base label ident text =
+value forum_add conf base ident comm =
   let email = String.lowercase (Gutil.strip_spaces (get conf "Email")) in
   let bfile = Filename.concat Util.base_dir.val conf.bname in
-  if ident <> "" && text <> "" then
+  if ident <> "" && comm <> "" then
     lock (Iobase.lock_file bfile) with
     [ Accept ->
-        let fname = forum_file conf label in
+        let fname = forum_file conf in
         let tmp_fname = fname ^ "~" in
         let oc = open_out tmp_fname in
         try
@@ -159,12 +140,12 @@ value forum_add conf base label ident text =
              if email <> "" then Printf.fprintf oc "Email: %s\n" email else ();
              Printf.fprintf oc "Text:\n";
              loop 0 True where rec loop i bol =
-               if i == String.length text then ()
+               if i == String.length comm then ()
                else
                  do if bol then Printf.fprintf oc "  " else ();
-                    if text.[i] <> '\r' then output_char oc text.[i]
+                    if comm.[i] <> '\r' then output_char oc comm.[i]
                     else ();
-                 return loop (i + 1) (text.[i] = '\n');
+                 return loop (i + 1) (comm.[i] = '\n');
              Printf.fprintf oc "\n\n";
              match try Some (open_in fname) with [ Sys_error _ -> None ] with
              [ Some ic ->
@@ -186,26 +167,20 @@ value forum_add conf base label ident text =
   else ()
 ;
 
-value print_add_ok conf base label forum_text =
+value print_add_ok conf base =
   let ident = Gutil.strip_spaces (get conf "Ident") in
   let comm = Gutil.strip_spaces (get conf "Text") in
-  if ident = "" || comm = "" then print conf base label forum_text
+  if ident = "" || comm = "" then print conf base
   else
     let title _ =
       Wserver.wprint "%s" (capitale (transl conf "comment added"))
     in
     do header conf title;
-       forum_add conf base label ident comm;
+       forum_add conf base ident comm;
        print_link_to_welcome conf True;
-       Wserver.wprint "<a href=\"%sm=FORUM;t=%s\">%s</a>\n"
-         (commd conf) label (capitale forum_text);
+       Wserver.wprint "<a href=\"%sm=FORUM\">%s</a>\n"
+         (commd conf) (capitale (transl conf "forum"));
        trailer conf;
     return ()
 ;
 
-value print_add_ok_wizard conf base =
-  print_add_ok conf base "w" (transl conf "wizards forum")
-;
-value print_add_ok_friend conf base =
-  print_add_ok conf base "f" (transl conf "friends forum")
-;
