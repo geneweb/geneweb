@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.13 2000-11-05 06:19:12 ddr Exp $ *)
+(* $Id: forum.ml,v 3.14 2000-11-05 06:32:19 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -80,9 +80,10 @@ value print_headers conf =
   let fname = forum_file conf in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
+      let ic_len = in_channel_length ic in
       tag "table" "border=%d" conf.border begin
       loop "" where rec loop prec_date =
-        let pos = pos_in ic in
+        let pos = ic_len - pos_in ic in
         match try Some (input_line ic) with [ End_of_file -> None ] with
         [ Some s ->
             let (time, s) = get_var ic "Time:" s in
@@ -156,9 +157,10 @@ value get_message conf pos =
   let fname = forum_file conf in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
+      let ic_len = in_channel_length ic in
       let r =
         try
-          do seek_in ic pos; return
+          do seek_in ic (ic_len - pos); return
           let s = input_line ic in
           let (time, s) = get_var ic "Time:" s in
           let (ident, s) = get_var ic "Ident:" s in
@@ -173,7 +175,7 @@ value get_message conf pos =
               else (List.rev sl, s)
           in
           if ident <> "" then
-            Some (time, ident, email, subject, mess, pos_in ic)
+            Some (time, ident, email, subject, mess, ic_len - pos_in ic)
           else None
         with [ End_of_file -> None ]
       in
@@ -183,7 +185,7 @@ value get_message conf pos =
 
 value print_forum_message conf base pos =
   match get_message conf pos with
-  [ Some (time, ident, email, subject, mess, pos) ->
+  [ Some (time, ident, email, subject, mess, next_pos) ->
       let title _ =
         let subject =
           if subject = "" || subject = "-" then
@@ -197,9 +199,11 @@ value print_forum_message conf base pos =
          tag "ul" begin
            Wserver.wprint "<li><a href=\"%sm=FORUM\">%s</a>\n"
              (commd conf) (capitale (transl conf "data base forum"));
-           Wserver.wprint "<li><a href=\"%sm=FORUM;p=%d\">%s</a>\n"
-             (commd conf) pos
-             (capitale (transl_nth conf "message/next message" 1));
+           if next_pos > 0 then
+             Wserver.wprint "<li><a href=\"%sm=FORUM;p=%d\">%s</a>\n"
+               (commd conf) next_pos
+               (capitale (transl_nth conf "message/next message" 1))
+           else ();
          end;
          Wserver.wprint "<p>\n";
          Wserver.wprint "<strong>%s</strong>\n" (secure ident);
