@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.103 2002-07-25 09:25:41 ddr Exp $
+# $Id: lexicon.txt,v 4.104 2002-09-26 09:38:42 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -457,6 +457,7 @@ nl: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prair
 no: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 pl: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
 pt: Vindimiário/Brumário/Frimário/Nevoso/Pluvioso/Ventoso/Germinal/Floreal/Pradial/Messidor/Termidor/Frutidor/Complementar
+ru: Âàíäåìèåğ/Áğşìığ/Ôğèìığ/Íèâîç/Ïëşâè?ç/Âàíòîç/Æåğìèíàëü/Ôëîğåàëü/Ïğåğèÿëü/Ìåññèäîğ/Òığìèäîğ/Ôğşêòèäîğ
 sl: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 sv: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/komplementär
 
@@ -476,7 +477,8 @@ lv: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/A
 nl: Tishri/Marcheswan/Kislew/Tebeth/Shebat/Adar/Adar2/Niesan/Ijjar/Siwan/Tammuz/Ab/Elul
 no: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 pl: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
-pt: Tishrei/Cheshvan/Kislev/Adar/Tevet/Shevat/Adar I/Adar II/Nissan/Iyar/Sivan/Tamuz/Av/Elul
+pt: Tishrei/Cheshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nissan/Iyar/Sivan/Tamuz/Av/Elul
+ru: Òèøğè/Õåøâàí/Êèñëåâ/Òåâåò/Øåâàò/Àäàğ 1/Àäàğ 2/Íèñàí/Èÿğ/Ñèâàí/Òàììóç/Àâ/İëşëü
 sl: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 sv: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 
