@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.71 2004-12-28 15:12:59 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.72 2004-12-29 21:29:01 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -36,7 +36,7 @@ value trace_failed_passwd = ref False;
 
 value log_oc () =
   if log_file.val <> "" then
-    try Secure.open_out_gen log_flags 0o644 log_file.val with
+    try open_out_gen log_flags 0o644 log_file.val with
     [ Sys_error _ -> do { log_file.val := ""; stderr } ]
   else stderr
 ;
