@@ -3,7 +3,7 @@ OVERVIEW:
 GeneWeb is a genealogy software with a Web interface. It can be used
 off-line or as a Web service.
 
-This is the version 2.06.
+This is the version 2.07.
 
 To compile, you need the Objective Caml compiler, and the preprocessor
 Camlp4.
@@ -27,6 +27,7 @@ CONTENTS:
 	ged2gwb		converter GEDCOM -> GeneWeb
 	gwb2ged		converter GeneWeb -> GEDCOM
 	hd		html and image files for GeneWeb program
+	rpm		files to create Linux rpm packages
 	src		sources of main programs
 	tools		tools for compiling
 	wserver		library for creating Web services
