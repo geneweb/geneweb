@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.119 2000-06-22 19:46:29 ddr Exp $
+# $Id: lexicon.txt,v 3.120 2000-06-26 18:20:40 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -29,6 +29,7 @@ he: rtl
 de: cn:Chinesisch/dk:D&auml;nish/de:Deutsch/en:Englisch/eo:Esperanto/fr:Franz&ouml;sisch/he:Hebr&auml;isch/nl:Holl&auml;ndisch/is:Isl&auml;ndisch/it:Italienisch/no:Norwegisch/pt:Portugiesisch/es:Spanisch/se:Schwedisch/cs:Tschechisch
 en: af:Afrikaans/cn:Chinese/cs:Czech/dk:Danish/nl:Dutch/en:English/eo:Esperanto/fi:Finnish/fr:French/de:German/he:Hebrew/is:Icelandic/it:Italian/lv:Latvian/no:Norwegian/pt:Portuguese/es:Spanish/ru:Russian/se:Swedish
 es: de:Alem&aacute;n/cs:Checo/cn:Chino/dk:Dan&eacute;s/es:Espa&ntilde;ol/eo:Esperanto/fr:Franc&eacute;s/he:Hebreo/en:Ingl&eacute;s/it:Italiano/nl:N&eacute;erlandes/no:Noruego/pt:Portug&eacute;s/se:Sueco
+fi: af:afrikaani/cn:kiina/cs:tsekki/de:saksa/dk:tanska/en:englanti/eo:esperanto/es:espanja/fi:suomi/fr:ranska/he:heprea/is:islanti/it:italia/lv:latvia/nl:hollanti/no:norja/pt:portugali/ru:ven&auml:j&auml:/se:ruotsi
 fr: af:afrikaans/cn:chinois/cs:tch&egrave;que/de:allemand/dk:danois/en:anglais/eo:esp&eacute;ranto/es:espagnol/fi:finlandais/fr:fran&ccedil;ais/he:h&eacute;breu/is:islandais/it:italien/lv:letton/nl:n&eacute;erlandais/no:norv&eacute;gien/pt:portugais/ru:russe/se:su&eacute;dois
 lv: cn:Íînieğu/cs:Èehu/dk:Dâòu/nl:Holandieğu/en:Angïu/eo:Esperanto/fi:Somu/fr:Franèu/de:Vâcu/he:Ebreju/is:Islandieğû/it:Itâïu/lv:Latvieğu/no:Norvçìu/pt:Portugâïu/es:Spâòu/ru:Krievu/se:Zviedru
 se: cn:kinesiska/cs:tjeckiska/dk:danska/en:engelska/eo:esperanto/fi:finska/fr:franska/de:tyska/he:hebreiska/it:italienska/nl:holländska/no:norska/pt:portugisiska/es:spanska/se:svenska
@@ -1360,7 +1361,7 @@ dk: &aring;rsdage for d&oslash;de personer
 en: anniversaries of death
 eo: datrevenoj de la mortaj personoj
 es: aniversarios de las personas fallecidas
-fi: vainajien muistop&auml;iv&auml;t
+fi: vainajien muistop&auml:ivi&auml
 fr: anniversaires des personnes d&eacute;c&eacute;d&eacute;es
 he:   éîé ùğä ìîååú
 is: ártíğir
@@ -2313,6 +2314,7 @@ se: slutar
 de: verlobt
 dk: forlovet
 en: engaged
+fi: kihloissa
 fr: fianc&eacute;s
 nl: verloofd
 pt: Noivos
@@ -2322,6 +2324,7 @@ se: f&ouml;rlovad
 de: verlobt%t mit
 dk: forlovet%t med
 en: engaged%t to
+fi: kihlattu%t
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
 nl: verloofd%t met
 pt: noivo%t de/noiva%t de
@@ -2817,7 +2820,7 @@ dk: til lykke med f&oslash;dselsdagen!
 en: happy birthday to you!
 eo: felicxan datrevenon!
 es: &iexcl;feliz cumplea&ntilde;os!
-fi: Hyv&auml;&auml syntym&auml;p&auml;iv&auml;&auml;!
+fi: hyv&auml:&auml syntym&auml:p&auml:iv&auml:&auml:!
 fr: bon anniversaire!
 he:   éåí äåìãú ùîç
 is: til hamingju meğ afmæliğ !
@@ -3220,7 +3223,7 @@ dk: inds&aelig;t
 en: insert
 eo: inseri :a:
 es: insertar
-fi: liit&auml
+fi: lis&auml:&auml v&auml:liin
 fr: ins&eacute;rer
 he:  ìäëğéñ
 is: setja inn
@@ -3374,7 +3377,7 @@ de: verbinden
 dk: forbind
 en: link
 es: reunir
-fi: liit&auml
+fi: linkkaa
 fr: relier
 he:  ÷ùø
 is: tengsl
@@ -3394,7 +3397,7 @@ dk: sl&aelig;gtskab mellem
 en: link between
 eo: cxenero inter
 es: relaci&oacute;n entre
-fi: n&auml;iden v&auml;linen sukulaisuus
+fi: n&auml:iden v&auml:linen yhteys
 fr: lien entre
 he:   ÷ùø áéï
 is: tengsl á milli
@@ -3469,7 +3472,7 @@ af: manlike lyn/vroulike lyn
 de: v&auml;terlicherseits/m&uuml;tterlicherseits
 dk: mandlige linie/kvindelige linie
 en: male line/female line
-fi: miespuoleinen linja/naispuoleinen linja
+fi: miehen puoleinen linja/naisen puoleinen linja
 fr: ligne agnatique/ligne cognatique
 lv: tçva lînija/mâtes lînija
 nl: mannelijke lijn/vrouwelijke lijn
@@ -3832,7 +3835,7 @@ dk: n&aelig;ste s&oslash;skende
 en: next sibling
 eo: posta frato/posta fratino/posta frat(in)o
 es: hermano siguiente/hermana siguiente/hermano (a) siguiente
-fi: seuraava sisaruksista
+fi: seuraava veli/seuraava sisar/seuraava sisaruksista
 fr: fr&egrave;re suivant/soeur suivante/fr&egrave;re ou soeur suivant
 he:  àç(åú) öòéø(ä)
 is: næsta systkyni
@@ -3929,7 +3932,7 @@ dk: ikke skilt
 en: not divorced
 eo: ne eksedzigxitaj
 es: no divorciado
-fi: ei eronnut
+fi: eiv&auml:t eronneita
 fr: non divorc&eacute;s
 he:  ìà âøåùéí
 is: ekki skilin
@@ -3968,7 +3971,7 @@ de: nicht verheiratet
 dk: ikke gift
 en: not married
 es: no casados
-fi: ei naimisissa
+fi: eiv&auml:t naimisissa
 fr: non mari&eacute;s
 he:   ìà ğùåàéí
 is: ógift
@@ -4633,7 +4636,7 @@ dk: foreg&aring;ende s&oslash;skende
 en: previous sibling
 eo: precedento frato/precedento fratino/precedento frat(in)o
 es: hermano anterior/hermana anterior/hermano (a) anterior
-fi: edellinen sisaruksista
+fi: edellinen veli/edellinen sisar/edellinen sisaruksista
 fr: fr&egrave;re pr&eacute;c&eacute;dent/soeur pr&eacute;c&eacute;dente/fr&egrave;re ou soeur pr&eacute;c&eacute;dent
 he:   àç(åú) äâãåì(ä)
 is: fyrra systkyn
@@ -4973,6 +4976,7 @@ se: skicka
 de: getrennt lebend
 dk: separeret
 en: separated
+fi: asumuserossa
 fr: s&eacute;par&eacute;s
 nl: gescheiden
 pt: separados
@@ -5158,7 +5162,7 @@ dk: pr&aelig;ciser
 en: specify
 eo: specifu
 es: especificar
-fi: m&auml;&auml;rittele
+fi: tarkenna
 fr: pr&eacute;cisez
 he:  ôøè
 is: tilgreina
@@ -5315,6 +5319,7 @@ se: efternamn/efternamn
 de: Nachnamen-Liste
 dk: efternavnsoversigt
 en: surnames list
+fi: sukunimiluettelo
 fr: liste &eacute;clair
 nl: bijnamen lijst
 pt: lista de apelidos
@@ -5417,6 +5422,7 @@ se: de %d f&ouml;rnamnen
     the %d oldest perhaps still alive
 dk: de %d &aelig;ldste af de muligt levende
 en: the %d oldest perhaps still alive
+fi: %d vanhinta ehk&auml viel&auml el&auml:v&auml:&auml
 fr: les %d plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
 se: de %d &auml;ldsta som kanske lever
 
@@ -5645,7 +5651,7 @@ dk: de f&oslash;lgende b&oslash;rn af %t og %t er ikke i kronologisk orden
 en: the following children of %t and %t are not in chronological order
 eo: la malantauxa infanoj de %t kaj %t ne estas orde
 es: los hijos siguientes de %t y %t no est&aacute;n presentados en orden
-fi: lapsista %t ja %t eiv&auml;t ole ik&auml;j&auml;rjestyksess&auml
+fi: %t ja %t lapsista seuraavat eiv&auml:t ole ik&auml:j&auml:rjestyksess&auml
 fr: les enfants suivants de %t et de %t ne sont pas dans l'ordre
 he:  äéìãéí ùì %t å-%t ìà áñãø ğëåï
 is: şessi börn %t og %t eru ekki í röğ
@@ -6251,7 +6257,7 @@ af: getuie by die troue van %s met %s
 de: Trauzeugen bei der Hochzeit von %s und %s
 dk: vidne ved brylluppet mellem %s og %s
 en: witness at marriage of %s and %s
-fi: avioliiton %s ja %s todistaja
+fi: %s ja %s avioliiton todistaja
 fr: t&eacute;moin au mariage de %s et de %s
 he:  àãéí áçúåğä ùì %s å-%s
 is: vitni ağ giftingu %s og %s
