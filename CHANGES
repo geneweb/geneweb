@@ -9,8 +9,8 @@ GeneWeb version 4.02
 
 * Templates files (etc/*.txt)
   For programmers...
-  - [28 Apr 01] Added ability to use variable "cvar_x" in perso.txt, equal
-    to the base environment variable x.
+  - [28 Apr 01] Added ability to use variable "cvar_x" in perso.txt, returning
+    the value of the variable x of the base configuration file.
 
 * Setup program (gwsetup)
   - [11 Apr 01] Fixed security hole: if the file only.txt was not
