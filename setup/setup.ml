@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.31 2002-01-21 15:46:35 ddr Exp $ *)
+(* $Id: setup.ml,v 4.32 2002-01-30 09:41:37 ddr Exp $ *)
 
 open Printf;
 
@@ -312,7 +312,7 @@ value macro conf =
   fun
   [ '/' -> ifdef UNIX then "/" else "\\"
   | 'a' -> strip_spaces (s_getenv conf.env "anon")
-  | 'c' -> Filename.concat setup_dir.val conf.comm
+  | 'c' -> stringify (Filename.concat setup_dir.val conf.comm)
   | 'd' -> conf.comm
   | 'f' -> slashify (Filename.concat (Sys.getcwd ()) setup_dir.val)
   | 'i' -> strip_spaces (s_getenv conf.env "i")
@@ -820,7 +820,8 @@ value infer_rc conf rc =
 
 value gwc conf =
   let rc =
-    exec_f (Filename.concat setup_dir.val "gwc" ^ parameters conf.env)
+    let comm = stringify (Filename.concat setup_dir.val "gwc") in
+    exec_f (comm ^ parameters conf.env)
   in
   let rc = ifdef WIN95 then infer_rc conf rc else rc in
   do {
@@ -861,7 +862,8 @@ value gwb2ged = gwu_or_gwb2ged_check ".ged";
 
 value gwb2ged_or_gwu_1 ok_file conf =
   let rc =
-    exec_f (Filename.concat setup_dir.val conf.comm ^ parameters conf.env)
+    let comm = stringify (Filename.concat setup_dir.val conf.comm) in
+    exec_f (comm ^ parameters conf.env)
   in
   do {
     eprintf "\n";
@@ -1423,9 +1425,8 @@ value gwd_1 conf =
 
 value ged2gwb conf =
   let rc =
-    exec_f
-      (Filename.concat setup_dir.val conf.comm ^ " -fne '\"\"'" ^
-       parameters conf.env)
+    let comm = stringify (Filename.concat setup_dir.val conf.comm) in
+    exec_f (comm ^ " -fne '\"\"'" ^ parameters conf.env)
   in
   let rc = ifdef WIN95 then infer_rc conf rc else rc in
   do {
@@ -1438,7 +1439,8 @@ value ged2gwb conf =
 
 value consang conf ok_file =
   let rc =
-    exec_f (Filename.concat setup_dir.val conf.comm ^ parameters conf.env)
+    let comm = stringify (Filename.concat setup_dir.val conf.comm) in
+    exec_f (comm ^ parameters conf.env)
   in
   do {
     eprintf "\n";
