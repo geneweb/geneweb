@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.46 2001-01-29 15:33:24 ddr Exp $ *)
+(* $Id: family.ml,v 3.47 2001-02-01 12:17:32 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -259,18 +259,20 @@ value precisez conf base n pl =
                       tl;
                  return () ];
              Date.afficher_dates_courtes conf base p;
-             match p.first_names_aliases with
-             [ [] -> ()
-             | fnal ->
-                 do Wserver.wprint "\n<em>(";
-                    Gutil.list_iter_first
-                      (fun first fna ->
-                         do if not first then Wserver.wprint ", " else ();
-                            Wserver.wprint "%s" (sou base fna);
-                         return ())
-                      fnal;
-                    Wserver.wprint ")</em>";
-                 return () ];
+             if age_autorise conf base p then
+               match p.first_names_aliases with
+               [ [] -> ()
+               | fnal ->
+                   do Wserver.wprint "\n<em>(";
+                      Gutil.list_iter_first
+                        (fun first fna ->
+                           do if not first then Wserver.wprint ", " else ();
+                              Wserver.wprint "%s" (sou base fna);
+                           return ())
+                        fnal;
+                      Wserver.wprint ")</em>";
+                   return () ]
+             else ();
              let spouses =
                List.fold_right
                  (fun ifam spouses ->
