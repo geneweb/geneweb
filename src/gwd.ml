@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.2 2001-03-26 17:03:55 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.3 2001-03-28 12:32:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -631,7 +631,12 @@ value http_preferred_language request =
       fun
       [ [lang :: list] ->
           let lang = alias_lang lang in
-          if List.mem lang Version.available_languages then lang else loop list
+          if List.mem lang Version.available_languages then lang
+          else if String.length lang = 5 then
+            let blang = String.sub lang 0 2 in
+            if List.mem blang Version.available_languages then blang
+            else loop list
+          else loop list
       | [] -> "" ]
 ;
 
