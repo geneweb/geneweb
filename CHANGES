@@ -38,6 +38,12 @@ GeneWeb version 3.05
   - [25 May 00] Now save and restore the marriage witnesses (that was
     missing).
 
+* GeneWeb to Gedcom (gwb2ged)
+  - [04 Jun 00] Fixed bug: did not save the information "not married" when
+    no date specified. (Note: in GeneWeb, since there is no GEDCOM standard
+    for that, the information "not married" is written as "unmarried" in the
+    marriage place.)
+
 * Base configuration files (base.gwf)
   - [03 Jun 00] Added variable "propose_add_family" (default yes). If yes,
     propose to wizards a "add family" link in welcome page. If no, not
