@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.14 1999-11-29 09:07:03 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.15 1999-11-30 09:54:44 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogía - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -101,7 +101,7 @@ Para navegar en esta base de datos, puede hacer su búsqueda:<br><p>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>por el listo</b></font> de todos los
+<font color=#2f6400><b>por la lista</b></font> de todos los
 <select name=m>
 <option value="N" selected>apellidos
 <option value="P">nombres
@@ -116,7 +116,7 @@ por
 
 <li>
 
-<font color=#2f6400><b>por la</b></font>
+<font color=#2f6400><b>mediante una</b></font>
 <a href="%sm=H;v=advanced"><font color=#2f6400><b>consulta
 avanzada</b></font></a>.
 
@@ -161,7 +161,7 @@ avanzada</b></font></a>.
 <li>las <a href="%sm=LD;k=10">muertes recientes</a>%E%Ih
 <li>la <a href="%sm=HIST;k=10">historia de las actualizaciones</a>%E
 <li>los <a href="%sm=CAL">calendarios</a>
-<li>el <a href="%sm=FORUM">forum de la base de datos</a>
+<li>el <a href="%sm=FORUM">foro de la base de datos</a>
 </ul>
 </td>
 </tr>
@@ -170,7 +170,7 @@ avanzada</b></font></a>.
 
 <p>
 
-Han habido %q consultas, de las cuales %c corresponden a esta
+Ha habido %q consultas, de las cuales %c corresponden a esta
 p&aacute;gina, desde el %d.
 %Il<p>%E
 
