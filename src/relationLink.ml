@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.10 1998-12-18 10:29:48 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.11 1998-12-18 15:44:34 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -265,12 +265,12 @@ value find_prev_branch base dist ia sa ipl =
 ;
 
 value print_sign conf sign ip sp i1 i2 b1 b2 c1 c2 =
-  do Wserver.wprint "<a href=%sm=RL;i1=%d;i2=%d" (commd conf)
+  do Wserver.wprint "<a href=\"%sm=RL;i1=%d;i2=%d" (commd conf)
        (Adef.int_of_iper i1) (Adef.int_of_iper i2);
      Wserver.wprint ";b1=%s" (Num.to_string (sosa_of_branch [(ip, sp) :: b1]));
      Wserver.wprint ";b2=%s" (Num.to_string (sosa_of_branch [(ip, sp) :: b2]));
      Wserver.wprint ";c1=%d;c2=%d" c1 c2;
-     Wserver.wprint ">%s</a>" sign;
+     Wserver.wprint "\">%s</a>" sign;
      Wserver.wprint "\n";
   return ()
 ;

@@ -11,8 +11,6 @@ GeneWeb Version 1.10
     english.
 
 * GeneWeb daemon/CGI (gwd)
-  - [18/12/98] Changed some HTML generated in relationship links (one branch)
-    to work also with the Linux browser "lynx".
   - [15/12/98] Added forgotten i18n translation of "liens de parenté" (title)
     and added "head_no_page_title" in util's interface.
   - [14/12/98] Improved speed in families update: check_noloop made too
