@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.19 2001-04-14 10:36:06 ddr Exp $
+# $Id: lexicon.txt,v 4.20 2001-04-15 10:26:19 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -3624,7 +3624,7 @@ fr: si titres
 he:  אם בעל(ת) תואר
 is: ef titlar
 it: se titoli
-lv: ja tituli
+lv: ja ir tituli
 nl: als titels
 no: hvis titler
 pl: jeli z tytu³em
