@@ -5,6 +5,10 @@ GeneWeb Version 4.04
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [24 Dec 01] Added ability to create a file named "base_user_mess.txt"
+    where base is the data base name, user a wizard name: in this case
+    the connected wizard receive the contents of this file at each page
+    which he receives.
   - [20 Dec 01] Added "align=left" to all "<tr>" tags because some
     browsers display them centered by default.
   - [10 Dec 01] In configuration file (base.gwf), if the variable

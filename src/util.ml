@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.18 2001-12-20 19:58:17 ddr Exp $ *)
+(* $Id: util.ml,v 4.19 2001-12-24 11:46:36 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -926,6 +926,17 @@ value include_hed_trl conf base_opt suff =
   | None -> () ]
 ;
 
+value message_to_wizard conf =
+  if conf.wizard && conf.user <> "" then
+    let fname = conf.bname ^ "_" ^ conf.user ^ "_mess.txt" in
+    match try Some (open_in fname) with [ Sys_error _ -> None ] with
+    [ Some ic ->
+        try while True do { Wserver.wprint "%c" (input_char ic); } with
+        [ End_of_file -> close_in ic ]
+    | None -> () ]
+  else ()
+;
+
 value header_no_page_title conf title =
   do {
     html conf;
@@ -945,6 +956,7 @@ value header_no_page_title conf title =
     in
     let s = s ^ body_prop conf in Wserver.wprint "<body%s>" s;
     Wserver.wprint "\n";
+    message_to_wizard conf;
   }
 ;
 

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.1 2001-11-14 10:02:31 ddr Exp $ *)
+(* $Id: util.mli,v 4.2 2001-12-24 11:46:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -89,6 +89,7 @@ value copy_string_with_macros :
 value body_prop : config -> string;
 value include_hed_trl : config -> option base -> string -> unit;
 value url_no_index : config -> base -> string;
+value message_to_wizard : config -> unit;
 
 value print_alphab_list :
   config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;
