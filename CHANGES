@@ -59,6 +59,10 @@ GeneWeb version 3.10
 * Installation under Linux rpm
   - [07 Nov 00] Put logs for gwsetup and gwd on /var/log.
 
+* Documentation
+  - [27 Nov 00] Added a paragraph in the FAQ about the spelling correction
+    and its possible strange results.
+
 GeneWeb version 3.09
 --------------------
 
