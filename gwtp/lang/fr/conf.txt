@@ -22,28 +22,28 @@ Langue par défaut:
 <select name="default_lang">
 <option value=""%edefault_lang=;><tt>-</tt>
 <option value="af"%edefault_lang=af;>Afrikaans
-<option value="br"%edefault_lang=br;>Brésilien
-<option value="ct"%edefault_lang=ct;>Catalan
-<option value="cn"%edefault_lang=cn;>Chinois
-<option value="cs"%edefault_lang=cs;>Tchèque
-<option value="dk"%edefault_lang=dk;>Danois
-<option value="nl"%edefault_lang=nl;>Néerlandais
+<option value="de"%edefault_lang=de;>Allemand
 <option value="en"%edefault_lang=en;>Anglais
+<option value="pt-br"%edefault_lang=pt-br;>Brésilien
+<option value="ca"%edefault_lang=ca;>Catalan
+<option value="zh"%edefault_lang=zh;>Chinois
+<option value="da"%edefault_lang=da;>Danois
+<option value="es"%edefault_lang=es;>Espagnol
 <option value="eo"%edefault_lang=eo;>Esperanto
 <option value="et"%edefault_lang=et;>Estonien
 <option value="fi"%edefault_lang=fi;>Finlandais
 <option value="fr"%edefault_lang=fr;>Français
-<option value="de"%edefault_lang=de;>Allemand
 <option value="he"%edefault_lang=he;>Hébreu
 <option value="is"%edefault_lang=is;>Islandais
 <option value="it"%edefault_lang=it;>Italien
 <option value="lv"%edefault_lang=lv;>Letton
+<option value="nl"%edefault_lang=nl;>Néerlandais
 <option value="no"%edefault_lang=no;>Norvégien
 <option value="pl"%edefault_lang=pl;>Polonais
 <option value="pt"%edefault_lang=pt;>Portugais
-<option value="es"%edefault_lang=es;>Espagnol
 <option value="ru"%edefault_lang=ru;>Russe
-<option value="se"%edefault_lang=se;>Suédois
+<option value="sv"%edefault_lang=sv;>Suédois
+<option value="cs"%edefault_lang=cs;>Tchèque
 </select>
 <br>
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.2 2001-03-26 17:03:56 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.3 2001-04-05 13:59:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -345,6 +345,15 @@ value rec lexicon_translate conf base nomin ic first_c =
   if upp then capitale r else r
 ;
 
+value skip_lang s =
+  loop where rec loop i =
+    if i = String.length s then None
+    else
+      match s.[i] with
+      [ 'a'..'z' | '-' -> loop (i + 1)
+      | _ -> Some i ]
+;
+
 value inline_translate conf base ic =
   let s =
     loop 0 (input_char ic) where rec loop len c =
@@ -358,28 +367,31 @@ value inline_translate conf base ic =
       [ Some "" -> ""
       | Some s -> "[" ^ s ^ "]"
       | None -> ".........." ]
-    else if bol && i + 4 < String.length s then
-      let curr_lang = String.sub s i 3 in
-      if curr_lang = lang || curr_lang = "en:" then
-        let (s, i) =
-          let i = if s.[i+3] = ' ' then i + 1 else i in
-          loop 0 (i + 3) where rec loop len j =
-            if j = String.length s then (Lbuff.get len, j)
-            else if s.[j] = '\n' then
-              if j+1 < String.length s && s.[j+1] = ' ' then
-                let j =
-                  loop (j + 1) where rec loop j =
-                    if j < String.length s && s.[j] = ' ' then loop (j + 1)
-                    else j
-                in
-                loop (Lbuff.store len '\n') j
-              else (Lbuff.get len, j)
-            else if s.[j] == '%' then
-              loop (Lbuff.mstore len (macro conf base s.[j+1])) (j + 2)
-            else loop (Lbuff.store len s.[j]) (j + 1)
-        in
-        if curr_lang = lang then s else loop (Some s) True i
-      else loop en_version (s.[i] = '\n') (i + 1)
+    else if bol then
+      match skip_lang s i with
+      [ Some j when s.[j] = ':' ->
+          let curr_lang = String.sub s i (j + 1 - i) in
+          if curr_lang = lang || curr_lang = "en:" then
+            let (s, i) =
+              let j = if s.[j+1] = ' ' then j + 1 else j in
+              loop 0 (j + 1) where rec loop len j =
+                if j = String.length s then (Lbuff.get len, j)
+                else if s.[j] = '\n' then
+                  if j+1 < String.length s && s.[j+1] = ' ' then
+                    let j =
+                      loop (j + 1) where rec loop j =
+                        if j < String.length s && s.[j] = ' ' then loop (j + 1)
+                        else j
+                    in
+                    loop (Lbuff.store len '\n') j
+                  else (Lbuff.get len, j)
+                else if s.[j] == '%' then
+                  loop (Lbuff.mstore len (macro conf base s.[j+1])) (j + 2)
+                else loop (Lbuff.store len s.[j]) (j + 1)
+            in
+            if curr_lang = lang then s else loop (Some s) True i
+          else loop en_version (s.[i] = '\n') (i + 1)
+      | _ -> loop en_version (s.[i] = '\n') (i + 1) ]
     else loop en_version (s.[i] = '\n') (i + 1)
 ;
 
@@ -391,11 +403,13 @@ value src_translate conf base nomin ic =
 
 value language_name conf lang =
   let str = transl conf " !languages" in
+  let len = String.length lang in
   loop 0 0 where rec loop beg i =
     if i == String.length str && i == beg then lang
     else if i == String.length str || str.[i] == '/' then
-      if i > beg + 3 && String.sub str beg 2 = lang then
-        String.sub str (beg + 3) (i - beg - 3)
+      if i > beg + len + 1 && str.[beg+len] = '='
+      && String.sub str beg len = lang then
+        String.sub str (beg + len + 1) (i - beg - len - 1)
       else if i == String.length str then lang
       else loop (i + 1) (i + 1)
     else loop beg (i + 1)
@@ -487,10 +501,10 @@ value rec copy_from_channel conf base ic mode =
           | 'r' -> copy_from_file conf base (input_line ic) mode
           | 'u' ->
               let lang =
-                let c = String.create 2 in
-                do c.[0] := input_char ic;
-                   c.[1] := input_char ic;
-                return c
+                loop 0 where rec loop len =
+                  let c = input_char ic in
+                  if c = ';' then Buff.get len
+                  else loop (Buff.store len c)
               in
               Wserver.wprint "%s" (language_name conf lang)
           | c -> Wserver.wprint "%s" (macro conf base c) ]
