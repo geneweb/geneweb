@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.18 2005-02-13 23:08:52 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.19 2005-03-17 12:31:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -175,7 +175,7 @@ value print_dead conf base mois =
   gen_print conf base mois (f_scan conf base) True
 ;
 
-value print_birth_day conf base day_name verb wd dt list =
+value print_birth_day conf base day_name fphrase wd dt list =
   match list with
   [ [] ->
       tag "p" begin
@@ -185,17 +185,16 @@ value print_birth_day conf base day_name verb wd dt list =
   | _ ->
       do {
         tag "p" begin
-          Wserver.wprint "%s,\n" (capitale day_name);
-          Wserver.wprint "%s%s\n"
-            (std_color conf
-               ("<b>" ^
-                  transl_decline conf "on (weekday day month year)"
-                    (transl_nth conf "(week day)" wd ^ " " ^
-                       Date.code_dmy conf dt) ^
-                  "</b>"))
-            verb;
-          Wserver.wprint "%s\n"
-            (transl_a_of_b conf (transl conf "the birthday") "...");
+          Wserver.wprint fphrase
+            (capitale day_name ^ ",\n" ^
+             std_color conf
+                ("<b>" ^
+                   transl_decline conf "on (weekday day month year)"
+                     (transl_nth conf "(week day)" wd ^ " " ^
+                        Date.code_dmy conf dt) ^
+                   "</b>"))
+            (transl conf "the birthday");
+          Wserver.wprint "...\n";
         end;
         print_anniversary_list conf base False dt list;
       } ]
@@ -243,7 +242,7 @@ value day_after d =
   {day = day; month = month; year = year; prec = Sure; delta = 0}
 ;
 
-value print_anniv conf base day_name verb wd dt list =
+value print_anniv conf base day_name fphrase wd dt list =
   match list with
   [ [] ->
       tag "p" begin
@@ -253,14 +252,16 @@ value print_anniv conf base day_name verb wd dt list =
   | _ ->
       do {
         tag "p" begin
-          Wserver.wprint "%s, %s%s %s:\n" (capitale day_name)
-            (std_color conf
-               ("<b>" ^
-                  transl_decline conf "on (weekday day month year)"
-                    (transl_nth conf "(week day)" wd ^ " " ^
-                       Date.code_dmy conf dt) ^
-                  "</b>"))
-            verb (transl conf "the anniversary");
+          Wserver.wprint fphrase
+            (capitale day_name ^ ",\n" ^
+             std_color conf
+                ("<b>" ^
+                   transl_decline conf "on (weekday day month year)"
+                     (transl_nth conf "(week day)" wd ^ " " ^
+                        Date.code_dmy conf dt) ^
+                   "</b>"))
+            (transl conf "the anniversary");
+          Wserver.wprint "...\n";
         end;
         print_anniversary_list conf base True dt list;
       } ]
@@ -348,7 +349,7 @@ value print_anniversaries_of_marriage conf base y list =
   end
 ;
 
-value print_marriage_day conf base day_name verb wd dt list =
+value print_marriage_day conf base day_name fphrase wd dt list =
   match list with
   [ [] ->
       tag "p" begin
@@ -358,18 +359,16 @@ value print_marriage_day conf base day_name verb wd dt list =
   | _ ->
       do {
         tag "p" begin
-          Wserver.wprint "%s,\n" (capitale day_name);
-          Wserver.wprint "%s%s\n"
-            (std_color conf
-               ("<b>" ^
-                  transl_decline conf "on (weekday day month year)"
-                    (transl_nth conf "(week day)" wd ^ " " ^
-                       Date.code_dmy conf dt) ^
-                  "</b>"))
-            verb;
-          Wserver.wprint "%s\n"
-            (transl_a_of_b conf
-               (transl conf "the anniversary of marriage") "...");
+          Wserver.wprint fphrase
+            (capitale day_name ^ ",\n" ^
+             std_color conf
+                ("<b>" ^
+                   transl_decline conf "on (weekday day month year)"
+                     (transl_nth conf "(week day)" wd ^ " " ^
+                        Date.code_dmy conf dt) ^
+                   "</b>"))
+            (transl conf "the anniversary of marriage");
+          Wserver.wprint "...\n";
         end;
         print_anniversaries_of_marriage conf base dt.year list;
       } ]
@@ -418,13 +417,13 @@ value gen_print_menu_birth conf base f_scan mode =
            List.sort (fun (p1, a1, _, _) (p2, a2, _, _) -> compare a1 a2)
              xx.val)
       [list_tod; list_tom; list_aft];
-    print_birth_day conf base (transl conf "today") (transl conf ", it is")
-      conf.today_wd conf.today list_tod.val;
+    print_birth_day conf base (transl conf "today")
+      (ftransl conf "%s, it is %s of") conf.today_wd conf.today list_tod.val;
     print_birth_day conf base (transl conf "tomorrow")
-      (transl conf ", it will be") ((conf.today_wd + 1) mod 7) tom
+      (ftransl conf "%s, it will be %s of") ((conf.today_wd + 1) mod 7) tom
       list_tom.val;
     print_birth_day conf base (transl conf "the day after tomorrow")
-      (transl conf ", it will be") ((conf.today_wd + 2) mod 7) aft
+      (ftransl conf "%s, it will be %s of") ((conf.today_wd + 2) mod 7) aft
       list_aft.val;
     Wserver.wprint "\n";
     propose_months conf mode;
@@ -517,13 +516,13 @@ value print_menu_dead conf base =
            List.sort (fun (p1, a1, _, _) (p2, a2, _, _) -> compare a1 a2)
              xx.val)
       [list_tod; list_tom; list_aft];
-    print_anniv conf base (transl conf "today") (transl conf ", it is")
-      conf.today_wd conf.today list_tod.val;
+    print_anniv conf base (transl conf "today")
+      (ftransl conf "%s, it is %s of") conf.today_wd conf.today list_tod.val;
     print_anniv conf base (transl conf "tomorrow")
-      (transl conf ", it will be") ((conf.today_wd + 1) mod 7) tom
+      (ftransl conf "%s, it will be %s of") ((conf.today_wd + 1) mod 7) tom
       list_tom.val;
     print_anniv conf base (transl conf "the day after tomorrow")
-      (transl conf ", it will be") ((conf.today_wd + 2) mod 7) aft
+      (ftransl conf "%s, it will be %s of") ((conf.today_wd + 2) mod 7) aft
       list_aft.val;
     Wserver.wprint "\n";
     let mode () = xtag "input" "type=\"hidden\" name=\"m\" value=\"AD\"" in
@@ -586,13 +585,13 @@ value print_menu_marriage conf base =
       (fun xx ->
          xx.val := List.sort (fun (_, y1) (_, y2) -> compare y1 y2) xx.val)
       [list_tod; list_tom; list_aft];
-    print_marriage_day conf base (transl conf "today") (transl conf ", it is")
-      conf.today_wd conf.today list_tod.val;
+    print_marriage_day conf base (transl conf "today")
+      (ftransl conf "%s, it is %s of") conf.today_wd conf.today list_tod.val;
     print_marriage_day conf base (transl conf "tomorrow")
-      (transl conf ", it will be") ((conf.today_wd + 1) mod 7) tom
+      (ftransl conf "%s, it will be %s of") ((conf.today_wd + 1) mod 7) tom
       list_tom.val;
     print_marriage_day conf base (transl conf "the day after tomorrow")
-      (transl conf ", it will be") ((conf.today_wd + 2) mod 7) aft
+      (ftransl conf "%s, it will be %s of") ((conf.today_wd + 2) mod 7) aft
       list_aft.val;
     Wserver.wprint "\n";
     let mode () = xtag "input" "type=\"hidden\" name=\"m\" value=\"AM\"" in

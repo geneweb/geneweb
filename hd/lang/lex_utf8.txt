@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.20 2005-03-17 10:57:22 ddr Exp $
+# $Id: lex_utf8.txt,v 1.21 2005-03-17 12:31:36 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -224,6 +224,60 @@ ro: veri de gradul %s
 ru: %s кузены
 sl: %s bratranci/sestrične
 sv: %sm&auml;nningar
+
+    %s, it is %s of
+af: %s, dit is %s van
+bg: %s, е %s на
+br: %s, bez ez eo %s eus
+ca: %s, és %s de
+cs: %s, je %s
+da: %s, er det %s til
+de: %s ist %s von
+en: %s, it is %s of
+eo: %s, estas %s de
+es: %s, es %s de
+et: %s, on %s
+fi: %s, on %s
+fr: %s, c'est %s de
+he: %s, זה %s של
+is: %s, er %s
+it: %s, &egrave; %s di
+lv: %s, tas ir %s
+nl: %s is het %s van
+no: %s, er det %s til
+pl: %s, jest %s
+pt: %s, &eacute; %s de
+ro: %s, este %s pentru
+ru: %s, это %s
+sl: %s, je %s od
+sv: %s, &auml;r det %s till
+
+    %s, it will be %s of
+af: %s, dit sal wees %s van
+bg: %s, ще бъде %s на
+br: %s, bez e vo %s eus
+ca: %s, serà %s de
+cs: %s, bude %s
+da: %s, er det %s til
+de: %s ist %s von
+en: %s, it will be %s of
+eo: %s, estos %s de
+es: %s, ser&aacute; %s de
+et: %s, on %s
+fi: %s, on %s
+fr: %s, ce sera %s de
+he: %s , יהיה %s של
+is: %s, verða %s
+it: %s, sar&agrave; %s di
+lv: %s, tas bûs %s
+nl: %s zal het %s zijn van
+no: %s, vil det bli %s til
+pl: %s, będzie %s
+pt: %s, ser&aacute; %s de
+ro: %s, va fi %s pentru
+ru: %s, это будет %s
+sl: %s, bo %s od
+sv: %s, &auml;r det %s till
 
     %t already has parents
 af: %t het reeds ouers
@@ -607,60 +661,6 @@ ro: n-elea/primar/de gradul 2/de gradul 3/de gradul 4/de gardul 5/de gradul 6/de
 ru: энный/1-й/2-й/3-й/4-й/5-й/6-й/-7й/8-й/9-й/10-й/11-й/11-й/12-й/13-й/14-й/15-й/16-й/17-й/18-й/19-й/20-й
 sl: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 sv: n/tv&aring;/tre/fyra/fem/sex/sju/&aring;tta/nio/tio/elva/tolv/tretton/fjorton/femton/sexton/sjutton/arton/nitton/tjugo/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99/100/101/102/103/104/105/106/107/108/109/110/111/112/113/114/115/116/117/118/119/120/121/122/123/124/125/126/127/128/129/130
-
-    , it is
-af: , dit is
-bg: , е
-br: , bez ez eo
-ca: , és
-cs: , je
-da: , er det
-de:  ist
-en: , it is
-eo: , estas
-es: , es
-et: , on
-fi: , on
-fr: , c'est
-he:   , זה
-is: , er
-it: , &egrave;
-lv: , tas ir
-nl:  is het
-no: , er det
-pl: , jest
-pt: , &eacute;
-ro: , este
-ru: , это
-sl: , je
-sv: , &auml;r det
-
-    , it will be
-af: , dit sal wees
-bg: , ще бъде
-br: , bez e vo
-ca: , serà
-cs: , bude
-da: , er det
-de:  ist
-en: , it will be
-eo: , estos
-es: , ser&aacute;
-et: , on
-fi: , on
-fr: , ce sera
-he:  , יהיה
-is: , verða
-it: , sar&agrave;
-lv: , tas bûs
-nl:  zal het zijn
-no: , vil det bli
-pl: , będzie
-pt: , ser&aacute;
-ro: , va fi
-ru: , это будет
-sl: , bo
-sv: , &auml;r det
 
     2nd cousins
 af: kleinneef/kleinniggie

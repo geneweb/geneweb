@@ -6,6 +6,8 @@
 %1 of %2
 %d years ago
 %s cousins
+%s, it is %s of
+%s, it will be %s of
 %t already has parents
 %t died before his/her birth
 %t has incorrect title dates: %t
@@ -20,8 +22,6 @@
 (thousand separator)
 (week day)
 *nth (cousin)*
-, it is
-, it will be
 2nd cousins
 3rd cousins
 <em>Sosa number</em> relative to %t

@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 4.10 2004-12-14 09:30:16 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 4.11 2005-03-17 12:31:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open MLast;
@@ -18,24 +18,17 @@ value trace =
    "ftransl"; "ftransl_nth"]
 ;
 
+value loc = Token.dummy_loc;
+
 value rec expr e =
   match e with
   [ <:expr< $lid:f$ $_$ $str:s$ >> when List.mem f trace ->
-(*
-      let loc = Token.dummy_loc in
-*)
-      Printf.printf "%s\n" (Token.eval_string (*loc*) s)
+      Printf.printf "%s\n" (Token.eval_string loc s)
   | <:expr< Util.$lid:f$ $_$ $str:s$ >> when List.mem f trace ->
-(*
-      let loc = Token.dummy_loc in
-*)
-      Printf.printf "%s\n" (Token.eval_string (*loc*) s)
+      Printf.printf "%s\n" (Token.eval_string loc s)
   | <:expr< $lid:f$ $_$ ($lid:g$ $_$ $str:s$ $_$) >>
     when List.mem f trace && List.mem g trace ->
-(*
-      let loc = Token.dummy_loc in
-*)
-      Printf.printf "%s\n" (Token.eval_string (*loc*) s)
+      Printf.printf "%s\n" (Token.eval_string loc s)
   | <:expr< $lid:x$ >> when List.mem x trace ->
       Stdpp.raise_with_loc (MLast.loc_of_expr e) (Failure "Bad source")
   | <:expr< let $opt:_$ $list:pel$ in $e$ >> ->
