@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.17 2005-02-08 12:45:56 ddr Exp $ *)
+(* $Id: name.ml,v 4.18 2005-02-08 19:49:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 module Buff =
@@ -44,6 +44,7 @@ value unaccent_iso_8859_1 =
   | 'ù' | 'ú' | 'û' | 'ü' -> 'u'
   | 'ý' | 'ÿ' -> 'y'
   | 'þ' -> 'p'
+  | 'ß' -> 's'
   | c -> c ]
 ;
 
