@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.16 1999-05-06 19:26:42 ddr Exp $ *)
+(* $Id: setup.ml,v 1.17 1999-05-06 21:25:14 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -553,15 +553,41 @@ value infer_rc conf rc =
     | _ -> 0 ]
 ;
 
+value has_gwu dir =
+  match try Some (Unix.opendir dir) with [ Unix.Unix_error _ _ _ -> None ] with
+  [ Some dh ->
+      let gwu_found =
+	try
+	  loop () where rec loop () =
+	    let e = Unix.readdir dh in
+	    ifdef UNIX then
+	      match e with
+	      [ "gwu" -> raise Exit
+	      | _ -> loop () ]
+	    else
+	      match String.uncapitalize e with
+	      [ "gwu.exe" -> raise Exit
+	      | _ -> loop () ]
+	 with
+	 [ End_of_file -> False
+	 | Exit -> True ]
+      in
+      do Unix.closedir dh; return gwu_found
+  | None -> False ]
+;
+
 value recover conf =
   let init_dir =
     match p_getenv conf.env "anon" with
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
-  let init_dir =
-    if Sys.file_exists (Filename.concat init_dir ".") then init_dir
-    else Filename.dirname init_dir
+  let (init_dir, dir_has_gwu) =
+    if has_gwu init_dir then (init_dir, True)
+    else
+      let dir = Filename.dirname init_dir in
+      if has_gwu dir then (dir, True)
+      else (init_dir, False)
   in
   let conf = conf_with_env conf "anon" init_dir in
   let dest_dir = Sys.getcwd () in
@@ -579,28 +605,8 @@ value recover conf =
      else False)
   then
     print_file conf "err_same_dir.html"
-  else
-    let dh = Unix.opendir init_dir in
-    let gwu_found =
-      try
-        loop () where rec loop () =
-          let e = Unix.readdir dh in
-          ifdef UNIX then
-            match e with
-            [ "gwu" -> raise Exit
-            | _ -> loop () ]
-          else
-            match String.uncapitalize e with
-            [ "gwu.exe" -> raise Exit
-            | _ -> loop () ]
-       with
-       [ End_of_file -> False
-       | Exit -> True ]
-    in
-    do Unix.closedir dh;
-       if not gwu_found then print_file conf "err_not_gw.html"
-       else print_file conf "recover_1.html";
-    return ()
+  else if not dir_has_gwu then print_file conf "err_not_gw.html"
+  else print_file conf "recover_1.html"
 ;
 
 value recover_1 conf =
