@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.12 2001-02-18 15:44:51 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.13 2001-02-28 19:35:23 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -82,8 +82,6 @@
 %else;
   [*add::person/persons]0%end;
 </font></h1>
-
-<div align=right>(new version)</div>
 
 <form method=POST action="%action;">
 %hidden;

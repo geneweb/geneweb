@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.29 2001-02-28 19:07:54 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.30 2001-02-28 19:35:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -229,6 +229,16 @@ value print_err_mother_sex conf base p =
   return raise Update.ModErr
 ;
 
+value print_err conf base =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "error"))
+  in
+  do rheader conf title;
+     Update.print_return conf;
+     trailer conf;
+  return raise Update.ModErr
+;
+
 value print_error_deconnected conf =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "error"))
@@ -357,6 +367,7 @@ value effective_mod conf base sfam scpl sdes =
          [ Male -> print_err_mother_sex conf base nmoth
          | _ -> nmoth.sex := Female ];
        return ()
+     else if ncpl.father == ncpl.mother then print_err conf base
      else ();
      nfam.origin_file :=
        if sou base ofam.origin_file <> "" then ofam.origin_file
@@ -469,6 +480,7 @@ value effective_add conf base sfam scpl sdes =
                  base.func.patch_person ncpl.mother nmoth_p;
               return () ];
        return ()
+     else if ncpl.father == ncpl.mother then print_err conf base
      else ();
      nfam.fam_index := fi;
      nfam.origin_file := origin_file;
