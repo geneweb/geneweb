@@ -1,6 +1,114 @@
-(* $Id: httpEnv.ml,v 1.4 2000-08-05 12:42:38 ddr Exp $ *)
+(* $Id: httpEnv.ml,v 1.5 2000-08-16 08:15:59 ddr Exp $ *)
 
 open Printf;
+
+(* Decode/Encode for URLs *)
+
+value hexa_val conf =
+  match conf with
+  [ '0'..'9' -> Char.code conf - Char.code '0'
+  | 'a'..'f' -> Char.code conf - Char.code 'a' + 10
+  | 'A'..'F' -> Char.code conf - Char.code 'A' + 10
+  | _ -> 0 ]
+;
+
+value decode s =
+  let rec need_decode i =
+    if i < String.length s then
+      match s.[i] with
+      [ '%' | '+' -> True
+      | _ -> need_decode (succ i) ]
+    else False
+  in
+  let rec compute_len i i1 =
+    if i < String.length s then
+      let i =
+        match s.[i] with
+        [ '%' when i + 2 < String.length s -> i + 3
+        | _ -> succ i ]
+      in
+      compute_len i (succ i1)
+    else i1
+  in
+  let rec copy_decode_in s1 i i1 =
+    if i < String.length s then
+      let i =
+        match s.[i] with
+        [ '%' when i + 2 < String.length s ->
+            let v = hexa_val s.[i + 1] * 16 + hexa_val s.[i + 2] in
+            do s1.[i1] := Char.chr v; return i + 3
+        | '+' -> do s1.[i1] := ' '; return succ i
+        | x -> do s1.[i1] := x; return succ i ]
+      in
+      copy_decode_in s1 i (succ i1)
+    else s1
+  in
+  let rec strip_heading_and_trailing_spaces s =
+    if String.length s > 0 then
+      if s.[0] == ' ' then
+        strip_heading_and_trailing_spaces
+          (String.sub s 1 (String.length s - 1))
+      else if s.[String.length s - 1] == ' ' then
+        strip_heading_and_trailing_spaces
+          (String.sub s 0 (String.length s - 1))
+      else s
+    else s
+  in
+  if need_decode 0 then
+    let len = compute_len 0 0 in
+    let s1 = String.create len in
+    strip_heading_and_trailing_spaces (copy_decode_in s1 0 0)
+  else s
+;
+
+value hexa_digit x =
+  if x >= 10 then Char.chr (Char.code 'A' + x - 10)
+  else Char.chr (Char.code '0' + x)
+;
+
+value special =
+  fun
+  [ '\000'..'\031' | '\127'..'\255' | '<' | '>' | '"' | '#' | '%' |
+    '{' | '}' | '|' | '\\' | '^' | '~' | '[' | ']' | '`' | ';' | '/' | '?' |
+    ':' | '@' | '=' | '&' ->
+      True
+  | _ -> False ]
+;
+
+value encode s =
+  let rec need_code i =
+    if i < String.length s then
+      match s.[i] with
+      [ ' ' -> True
+      | x -> if special x then True else need_code (succ i) ]
+    else False
+  in
+  let rec compute_len i i1 =
+    if i < String.length s then
+      let i1 = if special s.[i] then i1 + 3 else succ i1 in
+      compute_len (succ i) i1
+    else i1
+  in
+  let rec copy_code_in s1 i i1 =
+    if i < String.length s then
+      let i1 =
+        match s.[i] with
+        [ ' ' -> do s1.[i1] := '+'; return succ i1
+        | c ->
+            if special c then
+              do s1.[i1] := '%';
+                 s1.[i1 + 1] := hexa_digit (Char.code c / 16);
+                 s1.[i1 + 2] := hexa_digit (Char.code c mod 16);
+              return i1 + 3
+            else do s1.[i1] := c; return succ i1 ]
+      in
+      copy_code_in s1 (succ i) i1
+    else s1
+  in
+  if need_code 0 then
+    let len = compute_len 0 0 in copy_code_in (String.create len) 0 0
+  else s
+;
 
 (* Env from a string *)
 
@@ -28,7 +136,7 @@ value create_env s =
 ;
 
 value getenv env label =
-  try Some (List.assoc label env) with [ Not_found -> None ]
+  try Some (decode (List.assoc label env)) with [ Not_found -> None ]
 ;
 
 (* Multipart env *)
@@ -135,61 +243,4 @@ value make content_type str =
     (str, env)
   else
     (str, create_env str)
-;
-
-value hexa_val conf =
-  match conf with
-  [ '0'..'9' -> Char.code conf - Char.code '0'
-  | 'a'..'f' -> Char.code conf - Char.code 'a' + 10
-  | 'A'..'F' -> Char.code conf - Char.code 'A' + 10
-  | _ -> 0 ]
-;
-
-value decode s =
-  let rec need_decode i =
-    if i < String.length s then
-      match s.[i] with
-      [ '%' | '+' -> True
-      | _ -> need_decode (succ i) ]
-    else False
-  in
-  let rec compute_len i i1 =
-    if i < String.length s then
-      let i =
-        match s.[i] with
-        [ '%' when i + 2 < String.length s -> i + 3
-        | _ -> succ i ]
-      in
-      compute_len i (succ i1)
-    else i1
-  in
-  let rec copy_decode_in s1 i i1 =
-    if i < String.length s then
-      let i =
-        match s.[i] with
-        [ '%' when i + 2 < String.length s ->
-            let v = hexa_val s.[i + 1] * 16 + hexa_val s.[i + 2] in
-            do s1.[i1] := Char.chr v; return i + 3
-        | '+' -> do s1.[i1] := ' '; return succ i
-        | x -> do s1.[i1] := x; return succ i ]
-      in
-      copy_decode_in s1 i (succ i1)
-    else s1
-  in
-  let rec strip_heading_and_trailing_spaces s =
-    if String.length s > 0 then
-      if s.[0] == ' ' then
-        strip_heading_and_trailing_spaces
-          (String.sub s 1 (String.length s - 1))
-      else if s.[String.length s - 1] == ' ' then
-        strip_heading_and_trailing_spaces
-          (String.sub s 0 (String.length s - 1))
-      else s
-    else s
-  in
-  if need_decode 0 then
-    let len = compute_len 0 0 in
-    let s1 = String.create len in
-    strip_heading_and_trailing_spaces (copy_decode_in s1 0 0)
-  else s
 ;
