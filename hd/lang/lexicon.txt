@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.221 2005-01-14 12:04:58 ddr Exp $
+# $Id: lexicon.txt,v 4.222 2005-01-20 07:04:46 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !charset
@@ -6206,7 +6206,7 @@ eo: okupado
 es: ocupaci&oacute;n
 et: amet
 fi: ammatti
-fr: occupation
+fr: profession
 he:  מקצוע
 is: starf
 it: professione
