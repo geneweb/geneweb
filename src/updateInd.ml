@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.16 2000-06-03 21:08:07 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.17 2000-07-07 19:43:33 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -104,7 +104,8 @@ value print_public_name conf base p =
 value print_image conf base p =
   tag "tr" begin
     tag "td" begin
-      Wserver.wprint "%s" (capitale (transl_nth conf "image/images" 0));
+      Wserver.wprint "%s"
+        (capitale (nominative (transl_nth conf "image/images" 0)));
     end;
     tag "td" "colspan=3" begin
       Wserver.wprint "<input name=image size=50";
