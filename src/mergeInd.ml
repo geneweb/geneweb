@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 3.17 2001-01-06 09:55:57 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.18 2001-01-20 09:16:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -542,4 +542,57 @@ value print conf base =
             return ()
         | Refuse -> Update.error_locked conf base ]
   | _ -> not_found_or_incorrect conf ]
+;
+
+(* Undocumented feature... Kill someone's ancestors *)
+
+value rec kill_ancestors conf base included_self p nb_ind nb_fam =
+  do match (aoi base p.cle_index).parents with
+     [ Some ifam ->
+         let cpl = coi base ifam in
+         do kill_ancestors conf base True (poi base cpl.father) nb_ind nb_fam;
+            kill_ancestors conf base True (poi base cpl.mother) nb_ind nb_fam;
+            UpdateFamOk.effective_del conf base (foi base ifam);
+            incr nb_fam;
+         return ()
+     | None -> () ];
+     if included_self then
+       let ip = p.cle_index in
+       do UpdateIndOk.effective_del conf base p;
+          base.func.patch_person ip p;
+          incr nb_ind;
+       return ()
+     else ();
+  return ()
+;
+
+value print_killed conf base p nb_ind nb_fam =
+  let title _ = Wserver.wprint "Ancestors killed" in
+  do Util.header conf title;
+     Wserver.wprint "%s's ancestors killed.<br>\n"
+       (referenced_person_title_text conf base p);
+     Wserver.wprint "%d persons and %d families deleted<p>\n" nb_ind nb_fam;
+     Util.trailer conf;
+  return ()
+;
+
+value print_kill_ancestors conf base =
+  match p_getenv conf.base_env "can_kill_ancestors" with
+  [ Some "yes" ->
+      match find_person_in_env conf base "" with
+      [ Some p ->
+          let key = (sou base p.first_name, sou base p.surname, p.occ) in
+          let bfile = Filename.concat Util.base_dir.val conf.bname in
+          lock (Iobase.lock_file bfile) with
+          [ Accept ->
+              let nb_ind = ref 0 in
+              let nb_fam = ref 0 in
+              do kill_ancestors conf base False p nb_ind nb_fam;
+                 base.func.commit_patches ();
+                 History.record conf base key "ka";
+                 print_killed conf base p nb_ind.val nb_fam.val;
+              return ()
+          | Refuse -> Update.error_locked conf base ]
+      | None -> incorrect_request conf ]
+  | _ -> incorrect_request conf ]
 ;
