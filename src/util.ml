@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.33 1999-07-22 22:14:04 ddr Exp $ *)
+(* $Id: util.ml,v 2.34 1999-07-23 10:27:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -60,7 +60,8 @@ value wprint_with_enclosing_tags conf (fmt : format 'a 'b 'c)  =
     if fmt.[1] <> '/' then
       List.fold_left (fun fmt t -> fmt ^ "<" ^ t ^ ">") fmt encl_tag
     else
-      List.fold_right (fun t fmt -> "</" ^ upto_space t ^ ">" ^ fmt) encl_tag fmt
+      List.fold_right (fun t fmt -> "</" ^ upto_space t ^ ">" ^ fmt) encl_tag
+        fmt
   in
   Wserver.wprint (Obj.magic fmt : format 'a 'b 'c)
 ;
@@ -425,7 +426,9 @@ value rec capitale s =
     | _ -> s ]
 ;
 
-value fcapitale a = Obj.magic capitale a;
+value fcapitale (a : format 'a 'b 'c) =
+  (Obj.magic capitale a : format 'a 'b 'c)
+;
 
 value nth_field w n =
   let rec start i n =
@@ -483,16 +486,35 @@ value gen_decline conf wt s =
 
 value transl_decline conf w s = gen_decline conf (transl conf w) s;
 
-value ftransl conf s : format 'a 'b 'c =
-  Obj.magic (transl conf (Obj.magic (s : format 'a 'b 'c) : string))
+value failed_format s = (Obj.magic ("[" ^ s ^ "]") : format 'a 'b 'c);
+
+value valid_format (ini_fmt : format 'a 'b 'c) (r : string) =
+  let s = (Obj.magic ini_fmt : string) in
+  loop 0 0 where rec loop i j =
+    if i < String.length s - 1 && j < String.length r - 1 then
+      match (s.[i], s.[i+1], r.[j], r.[j+1]) with
+      [ ('%', x, '%', y) ->
+          if x = y then loop (i+2) (j+2) else failed_format s
+      | ('%', _, _, _) -> loop i (j+1)
+      | (_, _, '%', _) -> loop (i+1) j
+      | _ -> loop (i+1) (j+1) ]
+    else if i < String.length s - 1 then
+      if s.[i] == '%' then failed_format s else loop (i+1) j
+    else if j < String.length r - 1 then
+      if r.[j] == '%' then failed_format s else loop i (j+1)
+    else (Obj.magic r : format 'a 'b 'c)
 ;
 
-value ftransl_nth conf s p : format 'a 'b 'c =
-  Obj.magic (transl_nth conf (Obj.magic (s : format 'a 'b 'c) : string) p)
+value ftransl conf s =
+  valid_format s (transl conf (Obj.magic s : string))
 ;
 
-value fdecline conf w s : format 'a 'b 'c =
-  Obj.magic (gen_decline conf (Obj.magic (w : format 'a 'b 'c) : string) s)
+value ftransl_nth conf s p =
+  valid_format s (transl_nth conf (Obj.magic s : string) p)
+;
+
+value fdecline conf w s =
+  valid_format w (gen_decline conf (Obj.magic w : string) s)
 ;
 
 value index_of_sex =
