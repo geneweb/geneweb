@@ -19,6 +19,9 @@ GeneWeb version 3.01
   - [Nov 10, 99] Added foster parents.
   - [Nov 10, 99] Changed structure of data bases for internal optimizations.
 
+* Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
+  - [Nov 23, 99] Updated Hebrew version (Jonathan Marder)
+
 * Base configuration files (base.gwf)
   - [Nov 15, 99] Added variables "max_anc_tree" (default = 5) and
     "max_desc_tree" (default = 4) to set the maximum number of generations
