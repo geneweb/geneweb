@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 2.4 1999-04-05 23:42:29 ddr Exp $ *)
+(* $Id: update.mli,v 2.5 1999-07-16 13:28:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -13,6 +13,7 @@ value print_same_name : config -> base -> person -> unit;
 value insert_string : config -> base -> string -> Adef.istr;
 value update_misc_names_of_family : base -> person -> unit;
 
+value print_return : config -> unit;
 value print_error : config -> base -> Gutil.base_error -> unit;
 value print_warnings : config -> base -> list Gutil.base_warning -> unit;
 value error : config -> base -> Gutil.base_error -> 'a;

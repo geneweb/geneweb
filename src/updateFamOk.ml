@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.11 1999-07-15 08:53:00 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.12 1999-07-16 13:28:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -143,8 +143,9 @@ value print_err_unknown conf base (f, s, o) =
   do header conf title;
      Wserver.wprint "%s: <strong>%s.%d %s</strong>\n"
        (capitale (transl conf "unknown person")) f o s;
+     Update.print_return conf;
      trailer conf;
-  return ()
+  return raise Update.ModErr
 ;
 
 value print_create_conflict conf base p =
@@ -163,8 +164,9 @@ value print_create_conflict conf base p =
        (capitale (transl conf "or use \"link\" instead of \"create\""));
      Wserver.wprint "</ul>\n";
      Update.print_same_name conf base p;
+     Update.print_return conf;
      trailer conf;
-  return ()
+  return raise Update.ModErr
 ;
 
 value insert_person conf base (f, s, o, create) =
@@ -182,8 +184,7 @@ value insert_person conf base (f, s, o, create) =
             else raise Not_found
         else
           let ip = person_ht_find_unique base f s o in
-          do print_create_conflict conf base (poi base ip); return
-          raise Update.ModErr
+          print_create_conflict conf base (poi base ip)
       with
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in
@@ -226,20 +227,15 @@ value insert_person conf base (f, s, o, create) =
   | UpdateFam.Link ->
       if f = "?" || s = "?" then
         if o < 0 || o >= base.data.persons.len then
-          do print_err_unknown conf base (f, s, o); return
-          raise Update.ModErr
+          print_err_unknown conf base (f, s, o)
         else
           let ip = Adef.iper_of_int o in
           let p = poi base ip in
           if sou base p.first_name = f && sou base p.surname = s then ip
-          else
-            do print_err_unknown conf base (f, s, o); return
-            raise Update.ModErr
+          else print_err_unknown conf base (f, s, o)
       else
         try person_ht_find_unique base f s o with
-        [ Not_found ->
-            do print_err_unknown conf base (f, s, o); return
-            raise Update.ModErr ] ]
+        [ Not_found -> print_err_unknown conf base (f, s, o) ] ]
 ;
 
 value strip_children pl =
@@ -272,8 +268,9 @@ value print_err_parents conf base p =
          (Update.find_free_occ base (sou base p.first_name)
             (sou base p.surname) 0);
      end;
+     Update.print_return conf;
      trailer conf;
-  return ()
+  return raise Update.ModErr
 ;
 
 value print_err_father_sex conf base p =
@@ -283,8 +280,9 @@ value print_err_father_sex conf base p =
   do header conf title;
      afficher_personne_referencee conf base p;
      Wserver.wprint "\n%s\n" (transl conf "should be male");
+     Update.print_return conf;
      trailer conf;
-  return ()
+  return raise Update.ModErr
 ;
 
 value print_err_mother_sex conf base p =
@@ -294,8 +292,9 @@ value print_err_mother_sex conf base p =
   do header conf title;
      afficher_personne_referencee conf base p;
      Wserver.wprint "\n%s\n" (transl conf "should be female");
+     Update.print_return conf;
      trailer conf;
-  return ()
+  return raise Update.ModErr
 ;
 
 value family_exclude pfams efam =
@@ -348,12 +347,10 @@ value effective_mod conf base sfam scpl =
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
   do match nfath.sex with
-     [ Female ->
-         do print_err_father_sex conf base nfath; return raise Update.ModErr
+     [ Female -> print_err_father_sex conf base nfath
      | _ -> nfath.sex := Male ];
      match nmoth.sex with
-     [ Male ->
-         do print_err_mother_sex conf base nmoth; return raise Update.ModErr
+     [ Male -> print_err_mother_sex conf base nmoth
      | _ -> nmoth.sex := Female ];
      nfam.origin_file :=
        if sou base ofam.origin_file <> "" then ofam.origin_file
@@ -399,9 +396,7 @@ value effective_mod conf base sfam scpl =
        (fun ip ->
           let a = find_asc ip in
           match a.parents with
-          [ Some _ ->
-              do print_err_parents conf base (poi base ip); return
-              raise Update.ModErr
+          [ Some _ -> print_err_parents conf base (poi base ip)
           | None ->
               do a.parents := Some fi; return
               if not (array_memq ip ofam.children) || not same_parents then
@@ -436,12 +431,10 @@ value effective_add conf base sfam scpl =
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
   do match nfath.sex with
-     [ Female ->
-         do print_err_father_sex conf base nfath; return raise Update.ModErr
+     [ Female -> print_err_father_sex conf base nfath
      | _ -> nfath.sex := Male ];
      match nmoth.sex with
-     [ Male ->
-         do print_err_mother_sex conf base nmoth; return raise Update.ModErr
+     [ Male -> print_err_mother_sex conf base nmoth
      | _ -> nmoth.sex := Female ];
      nfam.fam_index := fi;
      nfam.origin_file := origin_file;
@@ -456,8 +449,7 @@ value effective_add conf base sfam scpl =
           let a = aoi base ip in
           let p = poi base ip in
           match a.parents with
-          [ Some _ ->
-              do print_err_parents conf base p; return raise Update.ModErr
+          [ Some _ -> print_err_parents conf base p
           | None ->
               do a.parents := Some fi;
                  a.consang := Adef.fix (-1);
@@ -610,7 +602,12 @@ value print_add conf base =
   [ Accept ->
       try
         let (sfam, scpl, ext) = reconstitute_family conf in
-        if ext then UpdateFam.print_add1 conf base sfam scpl False
+        let redisp =
+          match p_getenv conf.env "return" with
+          [ Some "on" -> True
+          | _ -> False ]
+        in
+        if ext || redisp then UpdateFam.print_add1 conf base sfam scpl False
         else
           do strip_family sfam; return
           let (fam, cpl) = effective_add conf base sfam scpl in
@@ -649,9 +646,14 @@ value print_mod_aux conf base callback =
   [ Accept ->
       try
         let (sfam, scpl, ext) = reconstitute_family conf in
+        let redisp =
+          match p_getenv conf.env "return" with
+          [ Some "on" -> True
+          | _ -> False ]
+        in
         let digest = Update.digest_family (foi base sfam.fam_index) in
         if digest = raw_get conf "digest" then
-          if ext then UpdateFam.print_mod1 conf base sfam scpl digest
+          if ext || redisp then UpdateFam.print_mod1 conf base sfam scpl digest
           else
             do strip_family sfam; return
             callback sfam scpl

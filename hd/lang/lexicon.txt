@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.71 1999-07-14 11:50:54 ddr Exp $
+# $Id: lexicon.txt,v 2.72 1999-07-16 13:28:05 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -845,6 +845,10 @@ nl: op dezelfde tijd
 no: samtidig
 pt: ao mesmo tempo
 se: samtidigt
+
+    back
+en: back
+fr: retour
 
     baptism
 de: Taufe
