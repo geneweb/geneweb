@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 3.6 2000-04-02 19:09:28 ddr Exp $ *)
+(* $Id: some.ml,v 3.7 2000-08-10 23:04:28 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -73,7 +73,7 @@ value persons_of_fsname base find proj x =
 
 value print_elem conf base is_surname (p, xl) =
   match xl with
-  [ [x] ->
+  [ (* [x] ->
       do Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
          if is_surname then
            Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
@@ -81,7 +81,7 @@ value print_elem conf base is_surname (p, xl) =
          Wserver.wprint "</a>\n";
          Date.afficher_dates_courtes conf base x;
       return ()
-  | _ ->
+  | *) _ ->
       let _ =
         List.fold_left
           (fun first x ->

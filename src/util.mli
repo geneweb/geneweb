@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.26 2000-07-28 08:53:43 ddr Exp $ *)
+(* $Id: util.mli,v 3.27 2000-08-10 23:04:29 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -64,9 +64,9 @@ value titled_person_text : config -> base -> person -> title -> string;
 value one_title_text : config -> base -> person -> title -> string;
 value person_title_text : config -> base -> person -> string;
 value referenced_person_title_text : config -> base -> person -> string;
+value person_title : config -> base -> person -> string;
 
 value main_title : base -> person -> option title;
-value afficher_titre : config -> base -> person -> unit;
 value p_getenv : list (string * string) -> string -> option string;
 value p_getint : list (string * string) -> string -> option int;
 value create_env : string -> list (string * string);
@@ -175,4 +175,5 @@ value afficher_personne_referencee : config -> base -> person -> unit;
 value afficher_personne_titre : config -> base -> person -> unit;
 value afficher_personne_titre_referencee : config -> base -> person -> unit;
 value afficher_personne_sans_titre : config -> base -> person -> unit;
+value afficher_titre : config -> base -> person -> unit;
 (**)

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.65 2000-08-07 10:46:34 ddr Exp $ *)
+(* $Id: util.ml,v 3.66 2000-08-10 23:04:28 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -415,12 +415,12 @@ value gen_person_text_without_title p_access conf base p =
 
 value person_text_without_title = gen_person_text_without_title std_access;
 
-value afficher_titre conf base p =
+value person_title conf base p =
   if age_autorise conf base p then
     match main_title base p with
-    [ Some t -> Wserver.wprint "%s" (one_title_text conf base p t)
-    | None -> () ]
-  else ()
+    [ Some t -> one_title_text conf base p t
+    | None -> "" ]
+  else ""
 ;
 
 value surname_begin n =
@@ -1040,23 +1040,28 @@ value print_alphab_list conf crit print_elem liste =
   return ()
 ;
 
-value print_parent conf base p a =
+value parent conf base p a =
+  match a.public_name with
+  [ n when sou base n <> "" -> sou base n ^ person_title conf base a
+  | _ -> 
+      p_first_name base a ^
+        (if p.surname <> a.surname then " " ^ p_surname base a else "") ]
+;
+
+value print_parent conf base p fath moth =
+  let s =
+    match (fath, moth) with
+    [ (Some fath, None) -> parent conf base p fath
+    | (None, Some moth) -> parent conf base p moth
+    | (Some fath, Some moth) ->
+        parent conf base p fath ^ " " ^ transl conf "and" ^ " " ^
+        parent conf base p moth
+    | _ -> "" ]
+  in
   let is = index_of_sex p.sex in
-  match p.public_name with
-  [ n when sou base n <> "" ->
-      let n = sou base n in
-      do Wserver.wprint "%s"
-           (transl_decline2 conf "%1 of (same or greater generation level) %2"
-               (transl_nth conf "son/daughter/child" is) n);
-         afficher_titre conf base a;
-      return ()
-  | _ ->
-      Wserver.wprint "%s"
-        (transl_decline2 conf "%1 of (same or greater generation level) %2"
-           (transl_nth conf "son/daughter/child" is)
-           (p_first_name base a ^
-              (if p.surname <> a.surname then " " ^ p_surname base a
-               else ""))) ]
+  Wserver.wprint "%s"
+    (transl_decline2 conf "%1 of (same or greater generation level) %2"
+       (transl_nth conf "son/daughter/child" is) s)
 ;
 
 value preciser_homonyme conf base p =
@@ -1071,14 +1076,23 @@ value preciser_homonyme conf base p =
       Wserver.wprint "%s" (sou base n)
   | (_, []) ->
       let a = aoi base p.cle_index in
-      match a.parents with
-      [ Some fam
-        when p_first_name base (poi base (coi base fam).father) <> "?" ->
-          print_parent conf base p (poi base (coi base fam).father)
-      | Some fam
-        when p_first_name base (poi base (coi base fam).mother) <> "?" ->
-          print_parent conf base p (poi base (coi base fam).mother)
-      | _ ->
+      let ifam =
+        match a.parents with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            let fath =
+              let fath = poi base cpl.father in
+              if p_first_name base fath = "?" then None else Some fath
+            in
+            let moth =
+              let moth = poi base cpl.mother in
+              if p_first_name base moth = "?" then None else Some moth
+            in
+            Some (fath, moth)
+        | None -> None ]
+      in
+      match ifam with
+      [ Some (None, None) | None ->
           let u = uoi base p.cle_index in
           let rec loop i =
             if i < Array.length u.family then
@@ -1106,7 +1120,9 @@ value preciser_homonyme conf base p =
                 else loop (i + 1)
             else Wserver.wprint "..."
           in
-          loop 0 ] ]
+          loop 0
+      | Some (fath, moth) ->
+          print_parent conf base p fath moth ] ]
 ;
 
 value print_decimal_num conf f =
@@ -1658,4 +1674,8 @@ value afficher_personne_titre_referencee conf base p =
 
 value afficher_personne_sans_titre conf base p =
   Wserver.wprint "%s" (person_text_without_title conf base p)
+;
+
+value afficher_titre conf base p =
+  Wserver.wprint "%s" (person_title conf base p)
 ;
