@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 1.18 1999-02-12 12:37:08 ddr Exp $ *)
+(* $Id: relation.ml,v 1.19 1999-02-27 20:02:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -128,6 +128,11 @@ value brother_label conf x sex =
         (transl_nth conf (transl_nth conf "*nth (cousin)*" is) (n - 1)) ]
 ;
 
+value half_brother_label conf sex =
+  let is = index_of_sex sex in
+  transl_nth conf "a half-brother/a half-sister/a half-sibling" is
+;
+
 value uncle_label conf x p =
   let is = index_of_sex p.sex in
   match x with
@@ -150,6 +155,10 @@ value nephew_label conf x p =
           (transl_nth conf "nth (generation)" n) ]
 ;
 
+value same_parents base p1 p2 =
+  (aoi base p1.cle_index).parents = (aoi base p2.cle_index).parents
+;
+
 value print_link conf base n p1 p2 x1 x2 =
   let (p1, x1, p2, x2) =
     if p1.sex <> Neuter then (p1, x1, p2, x2) else (p2, x2, p1, x1)
@@ -161,7 +170,10 @@ value print_link conf base n p1 p2 x1 x2 =
      Wserver.wprint "\n<strong>";
      if x1 == 0 then Wserver.wprint "%s" (ancestor_label conf x2 p1.sex)
      else if x2 == 0 then Wserver.wprint "%s" (descendant_label conf x1 p1)
-     else if x1 == x2 then Wserver.wprint "%s" (brother_label conf x2 p1.sex)
+     else if x1 == x2 then
+       if x1 == 1 && not (same_parents base p1 p2) then
+         Wserver.wprint "%s" (half_brother_label conf p1.sex)
+       else Wserver.wprint "%s" (brother_label conf x2 p1.sex)
      else if x1 == 1 || x2 == 1 then
        if x1 == 1 then Wserver.wprint "%s" (uncle_label conf (x2 - x1) p1)
        else Wserver.wprint "%s" (nephew_label conf (x1 - x2) p1)

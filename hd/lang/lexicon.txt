@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 1.60 1999-02-26 10:35:11 ddr Exp $
+# $Id: lexicon.txt,v 1.61 1999-02-27 20:02:53 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -436,6 +436,18 @@ it: un prozio/una prozia
 nl: een oud-oom/een oud-tante
 pt: um tio av&ocirc;/uma tia av&oacute;
 se: en gammel-far(mor)bror/en gammel-faster(moster)
+
+    a half-brother/a half-sister/a half-sibling
+de: ein Halbbruder/eine Halbschwester/ein Halbbruder oder eine Halbschwester
+en: a half-brother/a half-sister/a half-sibling
+eo: frato/fratino/gefrato
+es: un hermano/una hermana/un(a) hermano(a)
+fr: un demi-fr&egrave;re/une demi-soeur/un demi-fr&egrave;re ou une demi-soeur
+he:   אח/ אחות 
+it: un fratello/una sorella/un fratello o una sorella
+nl: een broer/een zuster/een broer of een zuster
+pt: um irm&atilde;o/uma irm&atilde;/um(a) irm&atilde;o(&atilde;)
+se: en halvbror/en halvsyster/ett halvsyskon
 
     a nephew/a niece
 de: ein Neffe/eine Nichte
