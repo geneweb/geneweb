@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.105 1999-08-05 11:53:00 ddr Exp $
+# $Id: lexicon.txt,v 2.106 1999-08-06 09:04:08 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -562,7 +562,7 @@ en: a nephew (spouse's nephew)/a niece (spouse's niece)
 es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
 fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
 it: un nipote (dello sposo)/una nipote (dello sposo)
-nl: een neef/een nicht
+nl: een neef (van de echtgenoot)/een nicht (van de echtgenoot)
 no: nev&oslash; (ektefelles nev&oslash;)/niese (ektefelles niese)
 pt: um sobrinho/uma sobrinha
 se: en nev&ouml; (makens/makans nev&ouml;)/en niece (makens/makans niece)
@@ -3408,6 +3408,7 @@ en: relationships by marriage
 es: parentesco pol&iacute;tico
 fr: liens de parent&eacute; par alliance
 it: parentele per matrimonio
+nl: verwant door huwelijk
 no: slektskap gjennom gifte
 pt: rela&ccedil;&otilde;es por casamento
 se: sl&auml;ktskap genom &auml;ktenskap
@@ -4253,6 +4254,7 @@ se: totalt
 dk: tr&aelig;
 en: tree
 fr: arbre
+nl: boom
 se: antr&auml;d
 
     uncles and aunts
@@ -4263,7 +4265,7 @@ eo: onkloj kaj onklinoj
 es: t&iacute;os y t&iacute;as
 fr: oncles et tantes
 it: zii e zie
-nl: nonkels en tantes
+nl: ooms en tantes
 no: onkler og tanter
 pt: tios e tias
 se: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
