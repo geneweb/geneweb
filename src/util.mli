@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.18 2000-05-06 11:51:36 ddr Exp $ *)
+(* $Id: util.mli,v 3.19 2000-05-14 18:07:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -8,6 +8,8 @@ value lang_dir : ref string;
 value base_dir : ref string;
 value doc_dir: ref string;
 value cnt_dir : ref string;
+value images_url : ref string;
+value image_prefix : config -> string;
 
 value secure : string -> string;
 

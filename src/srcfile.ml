@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.16 2000-05-12 14:35:26 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.17 2000-05-14 18:07:35 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -265,6 +265,7 @@ value rec copy_from_channel conf base ic =
               Num.print (fun x -> Wserver.wprint "%s" x)
                 (transl conf "(thousand separator)")
                 (Num.of_int base.data.persons.len)
+          | 'o' -> Wserver.wprint "%s" (image_prefix conf)
           | 'q' ->
               let (wc, rc, d) = count conf in
               Num.print (fun x -> Wserver.wprint "%s" x)
