@@ -8,6 +8,7 @@ GeneWeb version 3.06
   - [20 Jun 00] Added Latvian version (Janeks Kamerovskis).
 
 * GeneWeb Service/CGI (gwd)
+  - [23 Jun 00] Added descendants displaying with d'Aboville encoding.
   - [21 Jun 00] Added displaying of oldest perhaps still alive (from welcome
     page).
   - [20 Jun 00] Changed displaying of marriage witnesses in personal pages.
