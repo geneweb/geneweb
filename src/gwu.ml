@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.20 2000-05-23 07:19:02 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.21 2000-05-23 12:42:12 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -690,7 +690,7 @@ value rec find_ancestors base surn p list =
 ;
 
 value mark_branch base mark surn p =
-  loop p where rec loop p =
+  loop True p where rec loop top p =
     let u = uoi base p.cle_index in
     for i = 0 to Array.length u.family - 1 do
       let ifam = u.family.(i) in
@@ -708,11 +708,11 @@ value mark_branch base mark surn p =
                    list desc.children)
               [] ifaml
           in
-          if List.exists (fun p -> p.surname = surn) children then
+          if top || List.exists (fun p -> p.surname = surn) children then
             do List.iter
                  (fun ifam -> mark.(Adef.int_of_ifam ifam) := ToSeparate)
                  ifaml;
-               List.iter loop children;
+               List.iter (loop False) children;
             return ()
           else ()
       | _ -> () ];
