@@ -1,3 +1,10 @@
+GeneWeb Intermediate version 2.02-1
+-----------------------------------
+
+* GeneWeb Daemon/CGI (gwd)
+  - [May 7, 99] Fixed bug visible in Danish: the AE ligature ("&aelig;")
+    was incorrectly capitalized.
+
 GeneWeb Version 2.02
 --------------------
 
