@@ -1,4 +1,4 @@
-GeneWeb 1.08
+GeneWeb 1.09
 
 To start with GeneWeb, launch your Web browser.
 If you installed GeneWeb, e.g. in the directory:

@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 1.5 1998-09-29 16:12:12 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.6 1998-11-03 13:30:54 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -55,16 +55,21 @@ value ged_header base oc ifile ofile =
 ;
 
 value ged_1st_name base p =
-  match sou base p.public_name with
-  [ "" -> sou base p.first_name
-  | n -> n ]
+  match p.first_names_aliases with
+  [ [n :: _] -> sou base n
+  | [] -> sou base p.first_name ]
 ;
 
 value ged_name base oc per =
   do Printf.fprintf oc "1 NAME %s/%s/\n" (ged_1st_name base per)
        (sou base per.surname);
+     let n = sou base per.public_name in
+     if n <> "" then Printf.fprintf oc "2 GIVN %s\n" n else ();
      match per.nick_names with
      [ [nn :: _] -> Printf.fprintf oc "2 NICK %s\n" (sou base nn)
+     | [] -> () ];
+     match per.surnames_aliases with
+     [ [n :: _] -> Printf.fprintf oc "2 SURN %s\n" (sou base n)
      | [] -> () ];
   return ()
 ;

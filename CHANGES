@@ -1,3 +1,10 @@
+GeneWeb Version 1.09
+--------------------
+
+* ged2gwb, gwb2ged:
+  - Write and read the fields "public name" and "surname alias" into "2 GIVN"
+    and "2 SURN", respectively.
+
 GeneWeb Version 1.08
 --------------------
 
