@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_html.ml,v 1.3 1999-02-14 19:31:34 ddr Exp $ *)
+(* $Id: pa_html.ml,v 1.4 1999-02-15 13:28:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Pcaml;
@@ -41,14 +41,7 @@ EXTEND
           <:expr< do $list:el$ return () >>
       | "stag"; (tn, al, el) = tag_body ->
           let el = tag_encloser loc tn False al el in
-          <:expr< do $list:el$ return () >>
-      | "html_ltr"; conf = LIDENT; "begin"; el = LIST0 expr_semi; "end" ->
-          <:expr<
-             do if $lid:conf$.is_rtl then Wserver.wprint "<span dir=ltr>"
-                else ();
-                do $list:el$ return ();
-                if $lid:conf$.is_rtl then Wserver.wprint "</span>" else ();
-             return () >> ] ]
+          <:expr< do $list:el$ return () >> ] ]
   ;
   tag_body:
     [ [ tn = STRING; a = OPT expr; "begin"; el = LIST0 expr_semi; "end" ->

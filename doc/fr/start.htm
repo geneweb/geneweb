@@ -437,9 +437,9 @@ toutes les pages affich&eacute;es de cette base.
 
 <p>
 
-<ul><li> <strong>friend_passwd</strong> permet de limiter la
-visibilit&eacute; des donn&eacute;es sur les personnes encore
-vivantes, en fait sur toutes les personnes n&eacute;es ou
+<ul><li> <strong>friend_passwd</strong> (mot de passe "ami") permet de
+limiter la visibilit&eacute; des donn&eacute;es sur les personnes
+encore vivantes, en fait sur toutes les personnes n&eacute;es ou
 d&eacute;c&eacute;d&eacute;es depuis moins d'un si&egrave;cle.
 
 <p>
@@ -452,14 +452,24 @@ auront acc&egrave;s &agrave; ces donn&eacute;es.
 
 <p>
 
-<ul><li> <strong>wizard_passwd</strong> permet de limiter le droit
-de faire des modifications dans votre base.
+<ul><li> <strong>wizard_passwd</strong> (mot de passe "sorcier")
+permet de limiter le droit de faire des modifications dans votre base.
 
 <p>
 
 Si vous mettez une valeur &agrave; ce champ, seulement les personnes
 qui auront mis le mot de passe &agrave; partir de la page d'accueil
 auront acc&egrave;s aux modifications.
+
+</ul>
+
+<p>
+
+<ul><li> <strong>wizard_just_friend</strong> ("sorcier" seulement
+"ami") permet d'interdire la mise &agrave; jour de la base. Mettez
+"yes" pour le faire, "no" pour remettre l'autorisation. Il peut
+&ecirc;tre utile de mettre "yes", temporairement, pendant la <a
+href="maint.htm">nettoyage</a> de votre base.
 
 </ul>
 
@@ -486,6 +496,30 @@ la langue est le fran&ccedil;ais. Les valeurs possibles sont:
 Notez que quelque soit la langue s&eacute;lectionn&eacute;e par
 d&eacute;faut vous pouvez en choisir une autre dans la page d'accueil,
 en cliquant dans son drapeau en haut de la page.
+
+</ul>
+
+<p>
+
+<ul><li> <strong>can_send_photo</strong> (peut envoyer des photos)
+permet d'autoriser les "sorciers" &agrave; envoyer des photos. Dans ce
+cas, au moment des <a href="update.htm#MAJ">mises &agrave; jour</a>,
+ils peuvent cliquer sur un lien <a href="update.htm#SndP">envoyer
+photo</a>. Par d&eacute;faut, c'est "no" (on ne peut pas en envoyer);
+pour l'autoriser, il faut mettre explicitement "yes".
+
+</ul>
+
+<p>
+
+<ul><li> <strong>renamed</strong> (renomm&eacute;e) permet d'indiquer
+qu'une base a &eacute;t&eacute; renomm&eacute;e. Si votre site a
+beaucoup &eacute;te consult&eacute; et que votre base a
+&eacute;t&eacute; mise dans beaucoup de signets de beaucoup de
+personnes, c'est un moyen pour les rediriger vers votre base, avec son
+nouveau nom. S'ils essaient d'acc&eacute;der &agrave; l'ancien nom,
+ils verront une page avec un lien de la m&ecirc;me requ&ecirc;te vers
+le nouveau nom.
 
 </ul>
 
