@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.10 2000-03-03 12:09:28 ddr Exp $ *)
+(* $Id: perso.ml,v 3.11 2000-03-05 17:15:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -895,51 +895,8 @@ value print_sub_titles conf base p =
   return ()
 ;
 
-value max_image_width = 240;
-value max_image_height = 240;
-
-value limited_image_size conf fname =
-  match image_size fname with
-  [ Some (wid, hei) ->
-      let (wid, hei) =
-        if hei > max_image_height then
-          let wid = wid * max_image_height / hei in
-          let hei = max_image_height in
-          (wid, hei)
-        else (wid, hei)
-      in
-      let (wid, hei) =
-        if wid > max_image_width then
-          let hei = hei * max_image_width / wid in
-          let wid = max_image_width in
-          (wid, hei)
-        else (wid, hei)
-      in
-      Some (wid, hei)
-  | None -> None ]
-;
-
-value photo_and_size conf base p =
-  if age_autorise conf base p then
-    let image_txt = capitale (transl conf "image") in
-    match sou base p.image with
-    [ "" ->
-        match auto_image_file conf base p with
-        [ Some f -> Some (f, limited_image_size conf f)
-        | None -> None ]
-    | s ->
-        let http = "http://" in
-        if String.length s > String.length http &&
-           String.sub s 0 (String.length http) = http then
-          Some (s, None)
-        else if Filename.is_implicit s then
-          let fname = Util.image_file_name conf.bname s in
-          if Sys.file_exists fname then
-            Some (fname, limited_image_size conf fname)
-          else None
-        else None ]
-  else None
-;
+value max_im_wid = 240;
+value max_im_hei = 240;
 
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 
@@ -988,19 +945,22 @@ value print_occupation_dates conf base in_table p =
 
 value print_photo_occupation_dates conf base p =
   let image_txt = capitale (transl conf "image") in
-  match photo_and_size conf base p with
+  match
+    image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
+  with
   [ Some (fname, Some (width, height)) ->
       tag "table" "border=%d width=\"95%%\"" conf.border begin
         tag "tr" begin
           let s = Unix.stat fname in
-          let b = Util.code_varenv (Filename.basename fname) in
+          let b = acces conf base p in
+          let k = default_image_name base p in
           tag "td" begin
-            Wserver.wprint "<a href=\"%sm=IM;v=/%s\">" (commd conf) b;
+            Wserver.wprint "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k;
             Wserver.wprint "\
-<img src=\"%sm=IM;d=%d;v=/%s\" width=%d height=%d border=0 alt=\"%s\">"
+<img src=\"%sm=IM;d=%d;%s;k=/%s\" width=%d height=%d border=0 alt=\"%s\">"
               (commd conf)
               (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
-              b width height image_txt;
+              b k width height image_txt;
             Wserver.wprint "</a>";
           end;
           print_occupation_dates conf base True p;

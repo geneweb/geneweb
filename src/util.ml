@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.34 2000-02-24 16:34:41 ddr Exp $ *)
+(* $Id: util.ml,v 3.35 2000-03-05 17:15:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1009,19 +1009,14 @@ value print_decimal_num conf f =
       return loop (i + 1)
 ;
 
-value image_file_name bname str =
-  let fname1 =
-    List.fold_right Filename.concat [base_dir.val; "images"; bname] str
-  in
-  let fname2 =
-    List.fold_right Filename.concat [base_dir.val; "images"] str
-  in
-  let fname3 =
-    List.fold_right Filename.concat [lang_dir.val; "images"] str
-  in
-  if Sys.file_exists fname1 then fname1
-  else if Sys.file_exists fname2 then fname2
-  else fname3
+value personal_image_file_name bname str =
+  List.fold_right Filename.concat [base_dir.val; "images"; bname] str
+;
+
+value image_file_name str =
+  let fname1 = List.fold_right Filename.concat [base_dir.val; "images"] str in
+  let fname2 = List.fold_right Filename.concat [lang_dir.val; "images"] str in
+  if Sys.file_exists fname1 then fname1 else fname2
 ;
 
 value png_image_size ic =
@@ -1103,6 +1098,27 @@ value image_size fname =
   | None -> None ]
 ;
 
+value limited_image_size max_wid max_hei fname =
+  match image_size fname with
+  [ Some (wid, hei) ->
+      let (wid, hei) =
+        if hei > max_hei then
+          let wid = wid * max_hei / hei in
+          let hei = max_hei in
+          (wid, hei)
+        else (wid, hei)
+      in
+      let (wid, hei) =
+        if wid > max_wid then
+          let hei = hei * max_wid / wid in
+          let wid = max_wid in
+          (wid, hei)
+        else (wid, hei)
+      in
+      Some (wid, hei)
+  | None -> None ]
+;
+
 value up_fname conf =
 (*
   let s = Wserver.extract_param "accept: " '\n' conf.request in
@@ -1129,7 +1145,7 @@ value print_link_to_welcome conf right_aligned =
     let fname = up_fname conf in
     let dir = if conf.is_rtl then "left" else "right" in
     let wid_hei =
-      match image_size (image_file_name conf.bname fname) with
+      match image_size (image_file_name fname) with
       [ Some (wid, hei) ->
           " width=" ^ string_of_int wid ^ " height=" ^ string_of_int hei
       | None -> "" ]
@@ -1369,6 +1385,28 @@ value auto_image_file conf base p =
   in
   if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
   else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
+  else None
+;
+
+value image_and_size conf base p image_size =
+  if age_autorise conf base p then
+    let image_txt = capitale (transl conf "image") in
+    match sou base p.image with
+    [ "" ->
+        match auto_image_file conf base p with
+        [ Some f -> Some (f, image_size f)
+        | None -> None ]
+    | s ->
+        let http = "http://" in
+        if String.length s > String.length http &&
+           String.sub s 0 (String.length http) = http then
+          Some (s, None)
+        else if Filename.is_implicit s then
+          let fname = personal_image_file_name conf.bname s in
+          if Sys.file_exists fname then
+            Some (fname, image_size fname)
+          else None
+        else None ]
   else None
 ;
 
