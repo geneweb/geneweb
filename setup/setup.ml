@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.45 2003-11-12 11:59:55 ddr Exp $ *)
+(* $Id: setup.ml,v 4.46 2003-11-12 17:25:19 ddr Exp $ *)
 
 open Printf;
 
@@ -123,12 +123,11 @@ value trailer conf =
     if conf.comm = "" then ()
     else
       Wserver.wprint "
-<img src=\"file://%s/images/gwlogo.gif\"
- width=64 height=72 align=right>
+<img src=\"images/gwlogo.gif\" width=64 height=72 align=right alt=logo>
 <br>
-" (slashify (abs_setup_dir ()));
+";
     Wserver.wprint "
-<hr><font size=-1><em>(c) Copyright 2002 INRIA -
+<hr><font size=-1><em>(c) Copyright 2003 INRIA -
 GeneWeb %s</em></font>" Version.txt;
     Wserver.wprint "<br>";
     Wserver.wprint "</body>\n"
@@ -320,7 +319,6 @@ value macro conf =
   | 'a' -> strip_spaces (s_getenv conf.env "anon")
   | 'c' -> stringify (Filename.concat setup_dir.val conf.comm)
   | 'd' -> conf.comm
-  | 'f' -> slashify (abs_setup_dir ())
   | 'i' -> strip_spaces (s_getenv conf.env "i")
   | 'l' -> conf.lang
   | 'm' -> server_string conf
@@ -1458,6 +1456,12 @@ value separate_slashed_filename s =
         else [String.sub s i (String.length s - i)] ]
 ;
 
+value start_with s x =
+  let slen = String.length s in
+  let xlen = String.length x in
+  slen >= xlen && String.sub s 0 xlen = x
+;
+
 value end_with s x =
   let slen = String.length s in
   let xlen = String.length x in
@@ -1495,7 +1499,7 @@ value print_typed_file conf typ fname =
       } ]
 ;
 
-value doc conf s =
+value raw_file conf s =
   let fname =
     List.fold_left Filename.concat setup_dir.val
       (separate_slashed_filename s)
@@ -1558,7 +1562,7 @@ value setup_comm_ok conf =
   | "gwd" -> gwd conf
   | "gwd_1" -> gwd_1 conf
   | x ->
-      if String.length x >= 3 && String.sub x 0 3 = "doc" then doc conf x
+      if start_with x "doc/" || start_with x "images/" then raw_file conf x
       else error conf ("bad command: \"" ^ x ^ "\"") ]
 ;
 
