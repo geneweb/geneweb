@@ -1,4 +1,4 @@
-(* $Id: calendar.mli,v 4.2 2005-02-27 04:29:43 ddr Exp $ *)
+(* $Id: calendar.mli,v 4.3 2005-02-27 16:41:53 ddr Exp $ *)
 
 open Def;
 
@@ -24,4 +24,4 @@ type moon_day =
   | LastQuarter of int and int ]
 ;
 
-value moon_phase_of_sdn : int -> (moon_day * int);
+value moon_phase_of_sdn : int -> option (moon_day * int);

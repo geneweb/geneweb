@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.34 2005-02-27 10:19:25 ddr Exp $ *)
+(* $Id: date.ml,v 4.35 2005-02-27 16:41:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -705,27 +705,32 @@ value print_calendar conf base =
           transl_nth conf
             "moon day/new moon/first quarter/full moon/last quarter" i
         in
-        let (mp, md) = Calendar.moon_phase_of_sdn jd in
+        let mp = Calendar.moon_phase_of_sdn jd in
         stag "tr" begin
           stag "td" "align=\"center\"" begin
             match mp with
-            [ Calendar.OrdinaryMoonDay -> ()
-            | Calendar.NewMoon hh mm ->
-                Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
-                  (capitale (moon_txt 1)) hh mm
-            | Calendar.FirstQuarter hh mm ->
-                Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
-                  (capitale (moon_txt 2)) hh mm
-            | Calendar.FullMoon hh mm ->
-                Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
-                  (capitale (moon_txt 3)) hh mm
-            | Calendar.LastQuarter hh mm ->
-                Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
-                  (capitale (moon_txt 4)) hh mm ];
-            xtag "br";
-            stag "span" "style=\"font-size:80%%\"" begin
-              Wserver.wprint "(%s = %d)" (moon_txt 0) md;
-            end;
+            [ Some (mp, md) ->
+                do {
+                  match mp with
+                  [ Calendar.OrdinaryMoonDay -> ()
+                  | Calendar.NewMoon hh mm ->
+                      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                       (capitale (moon_txt 1)) hh mm
+            	  | Calendar.FirstQuarter hh mm ->
+            	      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+            	        (capitale (moon_txt 2)) hh mm
+            	  | Calendar.FullMoon hh mm ->
+            	      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+            	        (capitale (moon_txt 3)) hh mm
+            	  | Calendar.LastQuarter hh mm ->
+            	      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+            	        (capitale (moon_txt 4)) hh mm ];
+                  xtag "br";
+                  stag "span" "style=\"font-size:80%%\"" begin
+                    Wserver.wprint "(%s = %d)" (moon_txt 0) md;
+                  end;
+                }
+            | None -> () ];
             xtag "br";
             xtag "br";
             Wserver.wprint "%s: " (capitale (transl conf "julian day"));
