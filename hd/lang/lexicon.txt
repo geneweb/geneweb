@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.200 2004-06-07 18:42:34 ddr Exp $
+# $Id: lexicon.txt,v 4.201 2004-09-30 09:41:46 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -4704,7 +4704,7 @@ sv: f&ouml;rteckning &ouml;ver makarna (icke &auml;ttlingar)
 
     insert
 af: invoeg
-bg: да се вмъкне
+bg: вмъкване на
 br: ensoc'haс
 ca: insertar
 cs: vloѕit
