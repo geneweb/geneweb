@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 2.3 1999-03-31 02:16:50 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 2.4 1999-04-16 21:32:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -13,23 +13,25 @@ value f_aoc conf s =
 ;
 
 value print_differences conf base branches p1 p2 =
-  let string_field str_orig title name proj =
+  let gen_string_field chk1 chk2 str_orig title name proj =
     let x1 = proj p1 in
     let x2 = proj p2 in
     if x1 <> "" && x1 <> "?" && x2 <> "" && x2 <> "?" && x1 <> x2 then
       do Wserver.wprint "<h4>%s</h4>\n" (capitale title);
          tag "ul" begin
            html_li conf;
-           Wserver.wprint "<input type=radio name=\"%s\" value=1 checked>\n"
-             name;
+           Wserver.wprint "<input type=radio name=\"%s\" value=1%s>\n"
+             name chk1;
            Wserver.wprint "%s\n" (if str_orig then coa conf x1 else x1);
            html_li conf;
-           Wserver.wprint "<input type=radio name=\"%s\" value=2>\n" name;
+           Wserver.wprint "<input type=radio name=\"%s\" value=2%s>\n"
+             name chk2;
            Wserver.wprint "%s\n" (if str_orig then coa conf x2 else x2);
          end;
       return ()
     else ()
   in
+  let string_field = gen_string_field " checked" "" in
   tag "form" "method=POST action=\"%s\"" conf.command begin
     Srcfile.hidden_env conf;
     Wserver.wprint "<input type=hidden name=m value=MRG_IND_OK>\n";
@@ -52,7 +54,10 @@ value print_differences conf base branches p1 p2 =
       (fun p -> sou base p.first_name);
     string_field True (transl_nth conf "surname/surnames" 0) "surname"
       (fun p -> sou base p.surname);
-    string_field False (transl conf "number") "number"
+    gen_string_field
+      (if p1.occ < p2.occ then " checked" else "")
+      (if p1.occ < p2.occ then "" else " checked")
+      False (transl conf "number") "number"
       (fun p -> string_of_int p.occ);
     string_field True (transl conf "image") "image"
       (fun p -> sou base p.image);
