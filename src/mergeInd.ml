@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 3.5 2000-01-21 12:01:18 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.6 2000-03-08 14:35:31 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -54,7 +54,7 @@ value print_differences conf base branches p1 p2 =
       (if p1.occ < p2.occ then "" else " checked")
       False (transl conf "number") "number"
       (fun p -> string_of_int p.occ);
-    string_field True (transl conf "image") "image"
+    string_field True (transl_nth conf "image/images" 0) "image"
       (fun p -> sou base p.image);
     string_field True (transl conf "public name") "public_name"
       (fun p -> sou base p.public_name);

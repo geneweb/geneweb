@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 3.1 2000-01-10 02:14:39 ddr Exp $ *)
+(* $Id: history.ml,v 3.2 2000-03-08 14:35:30 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -69,8 +69,8 @@ value action_text conf =
   | "mp" -> transl_decline conf "modify" (transl_nth conf "person/persons" 0)
   | "dp" -> transl_decline conf "delete" (transl_nth conf "person/persons" 0)
   | "fp" -> transl_decline conf "merge" (transl_nth conf "person/persons" 1)
-  | "si" -> transl_decline conf "send" (transl conf "image")
-  | "di" -> transl_decline conf "delete" (transl conf "image")
+  | "si" -> transl_decline conf "send" (transl_nth conf "image/images" 0)
+  | "di" -> transl_decline conf "delete" (transl_nth conf "image/images" 0)
   | "af" -> transl_decline conf "add" (transl_nth conf "family/families" 0)
   | "mf" -> transl_decline conf "modify" (transl_nth conf "family/families" 0)
   | "df" -> transl_decline conf "delete" (transl_nth conf "family/families" 0)

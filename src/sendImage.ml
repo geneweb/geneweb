@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 3.1 2000-01-10 11:14:19 ddr Exp $ *)
+(* $Id: sendImage.ml,v 3.2 2000-03-08 14:35:34 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -20,7 +20,8 @@ value raw_get conf key =
 value print_send_image conf base p =
   let title h =
     do Wserver.wprint "%s"
-         (capitale (transl_decline conf "send" (transl conf "image")));
+         (capitale
+            (transl_decline conf "send" (transl_nth conf "image/images" 0)));
        if h then ()
        else
          let fn = p_first_name base p in
@@ -70,7 +71,8 @@ value print conf base =
 value print_delete_image conf base p =
   let title h =
     do Wserver.wprint "%s"
-         (capitale (transl_decline conf "delete" (transl conf "image")));
+         (capitale
+            (transl_decline conf "delete" (transl_nth conf "image/images" 0)));
        if h then ()
        else
          let fn = p_first_name base p in
