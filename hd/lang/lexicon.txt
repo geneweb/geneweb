@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.14 1999-11-23 12:42:03 ddr Exp $
+# $Id: lexicon.txt,v 3.15 1999-11-23 13:28:12 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2156,22 +2156,22 @@ fr: fils &eacute;lev&eacute;/fille &eacute;lev&eacute;e/enfant &eacute;lev&eacut
 no: fosters&oslash;nn/fosterdatter/fosterbarn
 se: fosterson/fosterdotter/fosterbarn
 
-    generation
+    generation/generations
 cs: generace
-de: Generation
-dk: generation
-en: generation
-eo: generacio
-es: generaci&oacute;n
-fi: sukupolvi
-fr: g&eacute;n&eacute;ration
-he:   ãåø 
-is: kynslóğ
-it: generazione
-nl: generatie
-no: generasjon  
-pt: gera&ccedil;&atilde;o
-se: generation
+de: Generation/Generationen
+dk: generation/generationer
+en: generation/generations
+eo: generacio/generacioj
+es: generaci&oacute;n/generaci&oacute;nes
+fi: sukupolvi/sukupolvea
+fr: g&eacute;n&eacute;ration/g&eacute;n&eacute;rations
+he:   ãåø / ãåøåú 
+is: kynslóğ/kynslóğir
+it: generazione/generazioni
+nl: generatie/generaties
+no: generasjon/generasjoner
+pt: gera&ccedil;&atilde;o/gera&ccedil;&otilde;es
+se: generation/generationer
 
     godfather/godmother/godparents
 de: Taufzeuge/Taufzeugin/Taufzeuge und Taufzeugin
@@ -2896,20 +2896,20 @@ no: gift%t med
 pt: casado%t com/casada%t com
 se: gift%t med
 
-    max %d generations
-de: Maximal %d Generationen
-dk: maksimalt %d generationer
-en: max %d generations
-es: m&aacute;ximo %d generaci&oacute;nes
-fi: korkeintaan %d sukupolvea
-fr: max %d g&eacute;n&eacute;rations
-he:  î÷ñéîåí %d ãåøåú
-is: hámark %d kynslóğir
-it: max %d generazioni
-nl: maximaal %d generaties
-no: maksimalt %d generasjoner
-pt: maximo %d gera&ccedil;&otilde;es
-se: maximalt %d generationer
+    maximum
+de: Maximal
+dk: maksimalt
+en: maximum
+es: m&aacute;ximo
+fi: korkeintaan
+fr: maximum
+he:  î÷ñéîåí
+is: hámark
+it: maximum
+nl: maximaal
+no: maksimalt
+pt: maximo
+se: maximalt
 
     maybe (date)
 de: vielleicht

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.3 1999-11-15 12:41:00 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.4 1999-11-23 13:28:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -44,7 +44,8 @@ value niveau_max_ascendance base ip =
 
 value text_to conf =
   fun
-  [ 1 -> transl conf "specify" ^ " " ^ transl conf "generation"
+  [ 1 ->
+      transl conf "specify" ^ " " ^ transl_nth conf "generation/generations" 0
   | 2 -> transl conf "to the parents"
   | 3 -> transl conf "to the grandparents"
   | 4 -> transl conf "to the great-grandparents"
@@ -55,7 +56,8 @@ value text_to conf =
 
 value text_level conf =
   fun
-  [ 1 -> transl conf "specify" ^ " " ^ transl conf "generation"
+  [ 1 ->
+      transl conf "specify" ^ " " ^ transl_nth conf "generation/generations" 0
   | 2 -> transl conf "the parents"
   | 3 -> transl conf "the grandparents"
   | 4 -> transl conf "the great-grandparents"
@@ -105,20 +107,16 @@ value print_choice conf base p niveau_effectif =
           in
           if niveau_effectif <= limit then ()
           else
-            do Wserver.wprint "(";
-               Wserver.wprint (ftransl conf "max %d generations") limit;
-               Wserver.wprint ")\n";
-            return ();
+            Wserver.wprint "(%s %d %s)\n" (transl conf "maximum") limit
+              (transl_nth conf "generation/generations" 1);
           Wserver.wprint "<br>\n";
           Wserver.wprint "<input type=radio name=t value=L> %s\n"
             (capitale (transl conf "list"));
           if niveau_effectif <= limit_by_list conf then ()
           else
-            do Wserver.wprint "(";
-               Wserver.wprint (ftransl conf "max %d generations")
-                 (limit_by_list conf);
-               Wserver.wprint ")\n";
-            return ();
+            Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
+              (limit_by_list conf)
+              (transl_nth conf "generation/generations" 1);
           Wserver.wprint "<br>\n";
         end;
         tag "td valign=top" begin
@@ -356,7 +354,8 @@ value afficher_ascendants_numerotation conf base niveau_max p =
   let rec generation niveau gpl =
     if niveau <= niveau_max then
       do html_li conf;
-         Wserver.wprint "%s %d\n" (capitale (transl conf "generation")) niveau;
+         Wserver.wprint "%s %d\n"
+           (capitale (transl_nth conf "generation/generations" 0)) niveau;
          tag "ul" begin
            List.iter (print_generation_person conf base cnt) gpl;
          end;
@@ -768,7 +767,7 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
     [ [gpl :: gpll] ->
         do tag "h3" begin
              Wserver.wprint "<em>%s %d</em>\n"
-               (capitale (transl conf "generation")) niveau;
+               (capitale (transl_nth conf "generation/generations" 0)) niveau;
            end;
            List.iter
              (print_generation_person_long conf base ws wn all_gp (gpll = []))
@@ -841,7 +840,8 @@ value print_ancestors_same_time_descendants conf base p a =
   let rec generation niveau gpl =
     if List.exists will_print gpl then
       do html_li conf;
-         Wserver.wprint "%s %d\n" (capitale (transl conf "generation")) niveau;
+         Wserver.wprint "%s %d\n"
+           (capitale (transl_nth conf "generation/generations" 0)) niveau;
          tag "ul" begin
            List.iter
               (fun gp ->
@@ -925,8 +925,8 @@ value afficher_ascendants_niveau conf base niveau_max p =
   in
   let title h =
     if h then
-      Wserver.wprint "%s %d\n" (capitale (transl conf "generation"))
-        niveau_max
+      Wserver.wprint "%s %d\n"
+        (capitale (transl_nth conf "generation/generations" 0)) niveau_max
     else
       Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
         (transl_decline conf "of" (gen_person_text raw_access conf base p))
@@ -945,7 +945,8 @@ value print_generation_missing_persons conf base title sp_incl gp =
     match title.val with
     [ Some level ->
        do html_li conf;
-          Wserver.wprint "%s %d\n" (capitale (transl conf "generation")) level;
+          Wserver.wprint "%s %d\n"
+            (capitale (transl_nth conf "generation/generations" 0)) level;
           Wserver.wprint "<ul>\n";
           title.val := None;
        return ()

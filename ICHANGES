@@ -26,6 +26,10 @@ GeneWeb Version 3.01
     bad titles names without label an place for gedcoms not coming from
     GeneWeb
 
+* Lexicon
+  - [Nov 23, 99] Added entry "maximum". Deleted entry "max %d generations".
+    Changed entry "generation" into "generation/generations".
+
 GeneWeb Version 3.00
 --------------------
 

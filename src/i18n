@@ -127,7 +127,7 @@ for the first names by alphabetic order
 forum
 foster father/foster mother/foster parents
 foster son/foster daughter/foster child
-generation
+generation/generations
 godfather/godmother/godparents
 godson/goddaughter/godchild
 grand-parents
@@ -172,7 +172,7 @@ marriage/marriages
 married
 married at age %t
 married%t to
-max %d generations
+maximum
 maybe (date)
 merge
 merge done
