@@ -9,6 +9,9 @@ GeneWeb Version 2.01
     names, cleaned up some code.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Apr 15, 99] Changed link of "gwd.opt", separating the objects in two
+    parts, using cmxa files, because Windows 98 (or maybe Cygnus) does not
+    work with this too long line, I don't know why. No difference in Unix.
   - [Apr 6, 99] Big cleanup about titles (hopefully not introducing bugs).
   - [Apr 3, 99] Dont print "died" in personal page if this is the only
     information (no date, no place) and if it is older than 120 years.
