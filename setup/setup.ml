@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.39 1999-08-16 00:45:57 ddr Exp $ *)
+(* $Id: setup.ml,v 1.40 1999-08-16 15:59:09 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -622,9 +622,7 @@ value recover conf =
         let dir = Filename.dirname init_dir in
         if has_gwu dir then (dir, True)
         else
-(*
           let dir = Filename.concat dir "gw" in
-*)
           if has_gwu dir then (dir, True)
           else (init_dir, False)
   in
