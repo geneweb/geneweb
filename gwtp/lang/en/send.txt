@@ -6,6 +6,11 @@
 <input type=hidden name=b value=%b>
 <input type=hidden name=t value=%t>
 
+<div align=right>
+<a href="%s?m=UPL;b=%b;t=%t;lang=en">English</a> /
+<a href="%s?m=UPL;b=%b;t=%t;lang=fr">Français</a>
+</div><p>
+
 From your local GeneWeb data base directory (<em>%b.gwb</em> for the
 base named <em>%b</em>):<br><p>
 

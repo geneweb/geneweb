@@ -67,6 +67,8 @@ GeneWeb version 3.10
     consequences in displaying (depending on language).
 
 * GeneWeb data bases Transfer Program (gwtp)
+  - [14 Dec 00] Added a system to display pages on other languages than
+    English. Added French version.
   - [07 Nov 00] Added "body_prop" (text added inside the tag "body" in
     generated pages, what allows to change the background, for example)
     among configurable variables (conf.txt).

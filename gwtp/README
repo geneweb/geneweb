@@ -1,24 +1,24 @@
 What is gwtp?
 
-Gwtp is a CGI program allowing people to upload and download their
-GeneWeb data bases on a Web site and change their configuration
-parameters.
+Gwtp is a CGI program allowing owners of data bases accomodated in a
+GeneWeb site to upload and download their data bases on the site and
+change their configuration parameters.
 
 
 Installation on an Unix Web server
 
 In the site machine, create a directory which is *not* accessible on
 the Web, with any name you want. In that directory, copy the executable
-'gwtp' and the files 'send.txt', 'recv.txt', 'conf.txt', and create an
-empty file named 'passwd'. Put all read/write access rights (chmod a+rw)
-to that directory.
+'gwtp' the directory 'lang' and its contents, and create an empty file
+named 'passwd'. Put all read/write access rights (chmod a+rw) to that
+directory.
 
 Go to the cgi-bin directory and create you CGI (e.g. gwtp.cgi),
 holding the following lines, replacing the texts between brackets
 by the correct values:
 
   #!/bin/sh
-  tmp=[the above directory holding gwtp and the .txt files]
+  tmp=[the above directory holding gwtp, lang and passwd]
   dst=[the directory holding the GeneWeb data bases]
   site=[the URL of the GeneWeb site]
   cd $tmp

@@ -1,0 +1,44 @@
+<head><title>Gwtp - upload %b</title></head>
+<body>
+<h1 align=center>Gwtp - upload %b</h1>
+<form method=POST action="%s" enctype="multipart/form-data">
+<input type=hidden name=m value=SEND>
+<input type=hidden name=b value=%b>
+<input type=hidden name=t value=%t>
+
+<div align=right>
+<a href="%s?m=UPL;b=%b;t=%t;lang=en">English</a> /
+<a href="%s?m=UPL;b=%b;t=%t;lang=fr">Français</a>
+</div><p>
+
+À partir du répertoire de votre base de données GeneWeb locale
+(<em>%b.gwb</em> pour la base nommée <em>%b</em>):<br><p>
+
+<ul>
+<li>
+sélectionnez le fichier nommé <b>base</b>:
+</ul>
+<input type=file name=base size=60><br><p>
+
+<ul>
+<li>
+sélectionnez le fichier nommé <b>notes</b>, s'il existe:
+</ul>
+<input type=file name=notes size=60><br><p>
+
+<ul>
+<li>
+sélectionnez le fichier nommé <b>patches</b>, s'il existe:
+</ul>
+<input type=file name=patches size=60><br><p>
+
+<table border=1><tr><td>
+Attention: vous devez sélectionner <b>tous</b> ces fichiers s'ils
+existent.</br>
+Vérifiez que vous n'en oubliez aucun.
+</table>
+
+<p>
+
+<input type=submit value=Envoyer>
+</form>

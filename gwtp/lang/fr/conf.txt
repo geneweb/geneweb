@@ -1,0 +1,93 @@
+<head><title>Gwtp - configuration %b</title></head>
+<body>
+<h1 align=center>Gwtp - configuration %b</h1>
+
+<div align=right>
+<a href="%s?m=CNF;b=%b;t=%t;lang=en">English</a> /
+<a href="%s?m=CNF;b=%b;t=%t;lang=fr">Français</a>
+</div>
+
+<form method=POST action="%s">
+<input type=hidden name=m value=SCNF>
+<input type=hidden name=b value=%b>
+<input type=hidden name=t value=%t>
+
+<table>
+<tr><td>Mot de passe ami:
+<td><input name=friend_passwd value="%vfriend_passwd;"><br>
+<tr><td>Mot de passe sorcier:
+<td><input name=wizard_passwd value="%vwizard_passwd;"><br>
+</table>
+Langue par défaut:
+<select name="default_lang">
+<option value=""%edefault_lang=;><tt>-</tt>
+<option value="af"%edefault_lang=af;>Afrikaans
+<option value="cn"%edefault_lang=cn;>Chinese
+<option value="cs"%edefault_lang=cs;>Czech
+<option value="dk"%edefault_lang=dk;>Danish
+<option value="nl"%edefault_lang=nl;>Dutch
+<option value="en"%edefault_lang=en;>English
+<option value="eo"%edefault_lang=eo;>Esperanto
+<option value="fi"%edefault_lang=fi;>Finnish
+<option value="fr"%edefault_lang=fr;>French
+<option value="de"%edefault_lang=de;>German
+<option value="he"%edefault_lang=he;>Hebrew
+<option value="is"%edefault_lang=is;>Icelandic
+<option value="it"%edefault_lang=it;>Italian
+<option value="lv"%edefault_lang=lv;>Latvian
+<option value="no"%edefault_lang=no;>Norwegian
+<option value="pt"%edefault_lang=pt;>Portuguese
+<option value="es"%edefault_lang=es;>Spanish
+<option value="ru"%edefault_lang=ru;>Russian
+<option value="se"%edefault_lang=se;>Swedish
+</select>
+<br>
+
+<p>
+
+Propriété "body tag":
+<input name=body_prop value="%vbody_prop;" size=50><br>
+
+<p>
+
+URL pour les images:
+<input name=images_path value="%vimages_path;" size=50><br>
+
+<p>
+
+Propose la recherche par titres de noblesse dans la page d'accueil:
+<input type=radio name=propose_titles value=yes%cpropose_titles=yes;>oui
+<input type=radio name=propose_titles value=no%cpropose_titles=no;>non
+
+<p>
+
+Texte pour le bas des pages:
+<textarea name=trl rows=5 cols=70 maxlength=50 wrap=virtual>%ftrl;</textarea>
+
+<p>
+
+Remarques:
+
+<ul>
+
+<li>Si vous voulez que tout le monde soit "ami", effacez le mot de
+passe ami.
+
+<li>Choisissez un mot de passe "sorcier" non vide et pas trop simple.
+
+<li>Cela n'est pas vérifié: vous prenez vos responsabilités.
+
+<li>Si vous ne savez pas, gardez les mots de passe proposés.
+
+</ul>
+
+<p>
+
+D'autres paramètres de configuration existent, mais ils peuvent avoir
+une influence sur les performances de l'ordinateur serveur. Demandez
+à l'administrateur du site GeneWeb si vous voulez les changer. Soyez
+conscient du fait que votre requête peut ne pas être acceptée.
+
+<p>
+<input type=submit value="Modifier">
+</form>
