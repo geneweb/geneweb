@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.13 2002-10-31 14:48:37 ddr Exp $ *)
+(* $Id: templ.ml,v 4.14 2002-11-22 09:16:33 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -443,7 +443,7 @@ value rec skip_spaces_and_newlines s i =
     | _ -> i ]
 ;
 
-value eval_transl conf upp s c =
+value eval_transl_lexicon conf upp s c =
   let r =
     match try Some (int_of_string c) with [ Failure _ -> None ] with
     [ Some n ->
@@ -467,6 +467,17 @@ value eval_transl conf upp s c =
     | None -> Gutil.nominative (Util.transl conf s) ^ c ]
   in
   if upp then capitale r else r
+;
+
+value eval_transl_inline conf s =
+  Translate.inline conf.lang '%' (fun c -> "%" ^ String.make 1 c) s
+;
+
+value eval_transl conf upp s c =
+  if c = "" && String.length s > 0 && s.[0] = '\n' then
+    eval_transl_inline conf s
+  else
+    eval_transl_lexicon conf upp s c
 ;
 
 value eval_date_field =
