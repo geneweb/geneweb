@@ -8,6 +8,8 @@ GeneWeb Version 3.05
   - [07 May 00] The files CHANGES and LICENSE now end with .txt.
 
 * GeneWeb daemon/CGI (gwd)
+  - [04 Jun 00] Check about titles dates no more done agains the death date,
+    since titles can be given after death.
   - [19 May 00] Added a small + in display ancestors horizontally. Seems
     more pretty :-)
   - [17 May 00] Fixed problem of the request "robots.txt": the lines ends
