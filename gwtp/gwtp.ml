@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.38 2000-08-22 12:09:32 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.39 2000-08-22 13:59:08 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -480,7 +480,9 @@ value gwtp_receive str env b tok =
   [ Some fname ->
       let fname = filename_basename fname in
       let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
-      do printf "content-type: bin/geneweb"; crlf (); crlf ();
+      do printf "content-type: bin/geneweb"; crlf ();
+         printf "content-disposition: attachement; filename=%s" fname;
+         crlf (); crlf ();
          let ic = open_in (Filename.concat bdir fname) in
          do try
               while True do
