@@ -5,6 +5,9 @@ GeneWeb Version 3.10
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [26 Nov 00] In merging persons the default selected number is now 1/ the
+    lowest if the first names are the same or 2/ the first one if the first
+    names are different.
   - [18 Nov 00] Changed inference of origin file: trying to link to father
     or mother's other marriages first.
   - [10 Nov 00] Fixed bug in titles tree: when the same person appeared

@@ -34,6 +34,9 @@ GeneWeb version 3.10
     answer (infinite loop in gwd).
 
 * GeneWeb uncompiler (gwu)
+  - [26 Nov 00] Added option "-aws" (Ancestors With Siblings), extracting
+    somebody's ancestors, together with their siblings, siblings' spouses
+    and siblings' spouses' parents.
   - [16 Nov 00] Fixed bug: in some circumstances, relations could be
     printed several times, resulting of several definitions and therefore
     errors when using gwc.
