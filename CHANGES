@@ -6,6 +6,8 @@ License). The previous license still applies up to the version 1.11
 included.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Feb 23, 99] In non leap years, birthday anniversaries of February 29
+    are counted and celebrated March 1.
   - [Feb 19, 99] Replacement of "%s" by the name of the base with context,
     also in family comment.
   - [Feb 18, 99] Added deletion of photos.

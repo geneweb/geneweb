@@ -8,6 +8,9 @@ GeneWeb Version 2.00
   - [Feb 18. 99] Added (undocumented) feature: adding ";opt=spouse" to an
     URL of relationship link (m=RL), the spouses are displayed.
 
+* Doc
+  - [Feb 23, 99] Correct HTML for creation of LICENSE.htm in directory doc.
+
 GeneWeb Version 1.11
 --------------------
 

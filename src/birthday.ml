@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 1.9 1999-02-12 12:37:00 ddr Exp $ *)
+(* $Id: birthday.ml,v 1.10 1999-02-23 16:04:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -106,7 +106,7 @@ value gen_print conf base mois dead_people =
   return ()
 ;
 
-value anniversaire_du conf base dead_people jj mm =
+value anniversary_of conf base dead_people jj mm =
   let xx = ref [] in
   do for i = 0 to base.data.persons.len - 1 do
        let p = base.data.persons.get i in
@@ -152,7 +152,15 @@ value anniversaire_du conf base dead_people jj mm =
   return xx.val
 ;
 
-value afficher_liste_anniversaires conf base dead_people a_ref liste =
+value anniversaire_du conf base dead_people jj mm yy =
+  let list = anniversary_of conf base dead_people jj mm in
+  if not (leap_year yy) && jj = 1 && mm = 3 then
+    list @ anniversary_of conf base dead_people 29 2
+  else list
+;
+
+value afficher_liste_anniversaires conf base dead_people dt liste =
+  let a_ref = dt.year in
   do Wserver.wprint "<ul>\n";
      List.iter
        (fun (p, a, date_event) ->
@@ -219,7 +227,7 @@ value print_birth_day conf base day_name verb wd d m y list =
            (Date.string_of_date conf dt) verb
            (transl conf "the birthday")
            (transl_decline conf "of" "");
-         afficher_liste_anniversaires conf base False y list;
+         afficher_liste_anniversaires conf base False dt list;
       return () ]
 ;
 
@@ -246,9 +254,10 @@ value menu_print conf base =
      let (aft_d, aft_m, aft_y) = lendemain (tom_d, tom_m, tom_y) in
      let list_today =
        anniversaire_du conf base False conf.today.day conf.today.month
+         conf.today.year
      in
-     let list_tom = anniversaire_du conf base False tom_d tom_m in
-     let list_aft = anniversaire_du conf base False aft_d aft_m in
+     let list_tom = anniversaire_du conf base False tom_d tom_m tom_y in
+     let list_aft = anniversaire_du conf base False aft_d aft_m aft_y in
      do print_birth_day conf base (transl conf "today") (transl conf ", it is")
           conf.today_wd conf.today.day conf.today.month conf.today.year
           list_today;
@@ -279,7 +288,7 @@ value print_anniv conf base day_name verb wd d m y list =
            (capitale day_name) (transl_nth conf "(week day)" wd)
            (Date.string_of_date conf dt) verb
            (transl conf "the anniversary");
-         afficher_liste_anniversaires conf base True y list;
+         afficher_liste_anniversaires conf base True dt list;
       return () ]
 ;
 
@@ -294,9 +303,10 @@ value menu_print_dead conf base =
      let (aft_d, aft_m, aft_y) = lendemain (tom_d, tom_m, tom_y) in
      let list_today =
        anniversaire_du conf base True conf.today.day conf.today.month
+         conf.today.year
      in
-     let list_tom = anniversaire_du conf base True tom_d tom_m in
-     let list_aft = anniversaire_du conf base True aft_d aft_m in
+     let list_tom = anniversaire_du conf base True tom_d tom_m tom_y in
+     let list_aft = anniversaire_du conf base True aft_d aft_m aft_y in
      do print_anniv conf base (transl conf "today") (transl conf ", it is")
           conf.today_wd conf.today.day conf.today.month conf.today.year
           list_today;

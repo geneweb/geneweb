@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 1.7 1999-02-02 10:24:10 ddr Exp $ *)
+(* $Id: gutil.mli,v 1.8 1999-02-23 16:04:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -18,6 +18,7 @@ value person_ht_find_all : base -> string -> list iper;
 value person_ht_find_unique : base -> string -> string -> int -> iper;
 value person_misc_names : base -> base_person -> list string;
 
+value leap_year : int -> bool;
 value nb_jours_dans_mois : int -> int -> int;
 value temps_ecoule : date -> date -> date;
 value annee : date -> int;
