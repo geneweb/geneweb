@@ -4,6 +4,9 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 4.05
 --------------------
 
+* All executables
+  - [10 Jan 02] No more statically linked by default.
+
 GeneWeb Version 4.04
 --------------------
 
