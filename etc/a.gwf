@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.13 2000-03-31 19:44:59 ddr Exp $
+# $Id: a.gwf,v 3.14 2000-05-25 09:01:16 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -58,6 +58,10 @@ default_lang=fr
 
 # Authorization for wizards to send images (no: cannot; yes: can)
 can_send_image=no
+
+# Optional path for images defined by the "image" field, i.e. *not* added
+# by "send image" (this value, when set, typically could start with http://...)
+images_path=
 
 # Global authorization file for this data base (overriding the value
 # of the option "-auth" of "gwd"). This file must hold lines of the

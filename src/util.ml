@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.46 2000-05-16 17:21:15 ddr Exp $ *)
+(* $Id: util.ml,v 3.47 2000-05-25 09:01:16 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1425,7 +1425,13 @@ value image_and_size conf base p image_size =
           let fname = personal_image_file_name conf.bname s in
           if Sys.file_exists fname then
             Some (fname, image_size fname)
-          else None
+          else
+            match
+              try Some (List.assoc "images_path" conf.base_env) with
+              [ Not_found -> None ]
+            with
+            [ Some p when p <> "" -> Some (p ^ s, None)
+            | _ -> None ]
         else None ]
   else None
 ;
