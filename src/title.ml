@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 3.9 2000-11-01 13:38:09 ddr Exp $ *)
+(* $Id: title.ml,v 3.10 2000-11-10 16:46:30 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -348,16 +348,16 @@ value print_title_place_list conf base t p list =
      if browser_doesnt_have_tables conf then ()
      else
        let (list, _) =
-         List.fold_left (fun (list, n) (p, _) -> ([(p, n) :: list], n + 1))
+         List.fold_left
+           (fun (list, n) (p, _) ->
+              let list =
+                if List.mem_assq p list then list else [(p, n) :: list]
+              in
+              (list, n + 1))
            ([], 1) list
        in
-       let list =
-         List.fold_left
-           (fun pl (p, n) -> if List.mem_assq p pl then pl else [(p, n) :: pl])
-           [] list
-       in
-       match list with
-       [ [_; _ :: _] ->
+       match List.rev list with
+       [ [_; _ :: _] as list ->
            do Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
               let _ = List.fold_left
                 (fun i (p, n) ->
