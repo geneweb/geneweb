@@ -1,5 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
 <head><title>Param&egrave;tres "$a"</title></head>
 
 <body>
@@ -12,8 +13,9 @@
 
 <p>
 
-Configurez les param&egrave;tres de la base <a
-href="http://localhost:2317/$a">$a</a>:
+Voici les param&egrave;tres de la base <a
+href="http://localhost:2317/$a">$a</a>. Changez ceux que vous estimez
+n&eacute;cessaire:
 
 <p>
 
@@ -27,12 +29,13 @@ syntaxe HTML acceptée dans le tag "&lt;body&gt;" avant le "&gt;". Voyez votre
 documentation HTML. Exemple:
 <p>
 <pre>
-     background=fond.jpg text=#CC0000 vlink=yellow
+     text=#CC0000 vlink=yellow
 </pre>
 <p>
 Quelques variables int&eacute;ressantes...
 <ul>
-<li>background: image de fond
+<li>background: image de fond (voir la <a
+href="setup?lang=$l;o=$a;v=backg.html">note</a>)
 <li>bgcolor: couleur de fond
 <li>text: couleur du texte
 <li>link: couleur des liens
@@ -211,6 +214,24 @@ Si cette zone est vide, la base n'est pas renomm&eacute;e.
 <tr>
 <td>&nbsp;</td>
 <td><input name=renamed value="$R" size=30></td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td>
+Si vous voulez qu'un texte apparaisse au base de chaque page, indiquez-le
+ici. Vous pouvez y mettre des balises HTML.
+</td>
+</tr>
+<tr>
+<td>
+<textarea name=trailer rows=3 cols=60 wrap=virtual>$T</textarea>
+</td>
 </tr>
 
 </table></dl>
