@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.22 1999-05-09 09:16:34 ddr Exp $ *)
+(* $Id: setup.ml,v 1.23 1999-05-10 17:21:45 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -1192,8 +1192,8 @@ value intro () =
        let x = input_line stdin in
        if x = "" then default_lang else x
      in
-     do set_gwd_default_language_if_absent lang;
-        copy_text lang (Filename.concat lang "intro.txt");
+     do copy_text lang (Filename.concat lang "intro.txt");
+        set_gwd_default_language_if_absent lang;
      return ();
      Printf.printf "\n";
      flush stdout;
