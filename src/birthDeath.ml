@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.16 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.17 2005-01-02 01:09:13 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -136,32 +136,35 @@ value print_birth conf base =
            let future = strictly_after_dmy d conf.today in
            do {
              if not future && was_future then do {
-               Wserver.wprint "</ul>\n</ul>\n<p>\n<ul>\n";
+               Wserver.wprint "</li>\n</ul>\n</li>\n</ul>\n<p>\n<ul>\n";
                Wserver.wprint "<li>%s\n" month_txt;
                Wserver.wprint "<ul>\n";
              }
              else if month_txt <> last_month_txt then do {
-               if last_month_txt = "" then () else Wserver.wprint "</ul>\n";
+               if last_month_txt = "" then ()
+               else Wserver.wprint "</ul>\n</li>\n";
                Wserver.wprint "<li>%s\n" month_txt;
                Wserver.wprint "<ul>\n";
              }
              else ();
-             Wserver.wprint "<li>\n";
-             Wserver.wprint "<strong>\n";
-             Wserver.wprint "%s" (referenced_person_text conf base p);
-             Wserver.wprint "</strong>,\n";
-             if future then
-               Wserver.wprint "<em>%s</em>.\n"
-                 (Date.string_of_date conf (Dgreg d cal))
-             else
-               Wserver.wprint "%s <em>%s</em>.\n"
-                 (transl_nth conf "born" (index_of_sex p.sex))
-                 (Date.string_of_ondate conf (Dgreg d cal));
+             stagn "li" begin
+               stag "b" begin
+                 Wserver.wprint "%s" (referenced_person_text conf base p);
+               end;
+               Wserver.wprint ",\n";
+               if future then
+                 Wserver.wprint "<em>%s</em>.\n"
+                   (Date.string_of_date conf (Dgreg d cal))
+               else
+                 Wserver.wprint "%s <em>%s</em>.\n"
+                   (transl_nth conf "born" (index_of_sex p.sex))
+                   (Date.string_of_ondate conf (Dgreg d cal));
+             end;
              (month_txt, future)
            })
         ("", False) list
     in
-    Wserver.wprint "</ul>\n</ul>\n";
+    Wserver.wprint "</ul>\n</li>\n</ul>\n";
     trailer conf;
   }
 ;
@@ -190,34 +193,35 @@ value print_death conf base =
            in
            do {
              if month_txt <> last_month_txt then do {
-               if last_month_txt = "" then () else Wserver.wprint "</ul>\n";
+               if last_month_txt = "" then ()
+	       else Wserver.wprint "</ul>\n</li>\n";
                Wserver.wprint "<li>%s\n" month_txt;
                Wserver.wprint "<ul>\n";
              }
              else ();
-             Wserver.wprint "<li>\n";
-             Wserver.wprint "<strong>\n";
-             Wserver.wprint "%s" (referenced_person_text conf base p);
-             Wserver.wprint "</strong>,\n";
-             Wserver.wprint "%s <em>%s</em>"
-               (transl_nth conf "died" (index_of_sex p.sex))
-               (Date.string_of_ondate conf (Dgreg d cal));
-             let sure d = d.prec = Sure in
-             match Adef.od_of_codate p.birth with
-             [ Some (Dgreg d1 _) ->
-                 if sure d1 && sure d && d1 <> d then do {
-                   let a = time_gone_by d1 d in
-                   Wserver.wprint " <em>(%s)</em>"
-                     (Date.string_of_age conf a);
-                 }
-                 else ()
-             | _ -> () ];
-             Wserver.wprint "\n";
+             stagn "li" begin
+               Wserver.wprint "<b>";
+               Wserver.wprint "%s" (referenced_person_text conf base p);
+               Wserver.wprint "</b>,";
+               Wserver.wprint "%s <em>%s</em>"
+                 (transl_nth conf "died" (index_of_sex p.sex))
+                 (Date.string_of_ondate conf (Dgreg d cal));
+               let sure d = d.prec = Sure in
+               match Adef.od_of_codate p.birth with
+               [ Some (Dgreg d1 _) ->
+                   if sure d1 && sure d && d1 <> d then do {
+                     let a = time_gone_by d1 d in
+                     Wserver.wprint " <em>(%s)</em>"
+                       (Date.string_of_age conf a);
+                   }
+                   else ()
+               | _ -> () ];
+             end;
              month_txt
            })
         "" list
     in
-    Wserver.wprint "</ul>\n</ul>\n";
+    Wserver.wprint "</ul>\n</li>\n</ul>\n";
     trailer conf;
   }
 ;
@@ -245,26 +249,24 @@ value print_oldest_alive conf base =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<ul>\n";
-    List.iter
-      (fun (p, d, cal) ->
-         do {
-           Wserver.wprint "<li>\n";
-           Wserver.wprint "<strong>\n";
-           Wserver.wprint "%s" (referenced_person_text conf base p);
-           Wserver.wprint "</strong>,\n";
-           Wserver.wprint "%s <em>%s</em>"
-             (transl_nth conf "born" (index_of_sex p.sex))
-             (Date.string_of_ondate conf (Dgreg d cal));
-           if p.death = NotDead && d.prec = Sure then do {
-             let a = time_gone_by d conf.today in
-             Wserver.wprint " <em>(%s)</em>" (Date.string_of_age conf a);
-           }
-           else ();
-           Wserver.wprint ".\n";
-         })
-      list;
-    Wserver.wprint "</ul>\n\n";
+    tag "ul" begin
+      List.iter
+        (fun (p, d, cal) ->
+           tag "li" begin
+             Wserver.wprint "<b>%s</b>,\n"
+               (referenced_person_text conf base p);
+             Wserver.wprint "%s <em>%s</em>"
+               (transl_nth conf "born" (index_of_sex p.sex))
+               (Date.string_of_ondate conf (Dgreg d cal));
+             if p.death = NotDead && d.prec = Sure then do {
+               let a = time_gone_by d conf.today in
+               Wserver.wprint " <em>(%s)</em>" (Date.string_of_age conf a);
+             }
+             else ();
+             Wserver.wprint ".";
+           end)
+        list;
+    end;
     trailer conf;
   }
 ;
@@ -321,44 +323,47 @@ value print_marr_or_eng conf base title list len =
            let future = strictly_after_dmy d conf.today in
            do {
              if not future && was_future then do {
-               Wserver.wprint "</ul>\n</ul>\n<p>\n<ul>\n";
+               Wserver.wprint "</ul>\n</li>\n</ul>\n<ul>\n";
                Wserver.wprint "<li>%s\n" month_txt;
                Wserver.wprint "<ul>\n";
              }
              else if month_txt <> last_month_txt then do {
-               if last_month_txt = "" then () else Wserver.wprint "</ul>\n";
+               if last_month_txt = "" then () else
+               Wserver.wprint "</ul>\n</li>\n";
                Wserver.wprint "<li>%s\n" month_txt;
                Wserver.wprint "<ul>\n";
              }
              else ();
-             Wserver.wprint "<li>\n";
-             Wserver.wprint "<strong>\n";
-             Wserver.wprint "%s"
-               (referenced_person_text conf base
-                  (pget conf base (father cpl)));
-             Wserver.wprint "</strong>\n";
-             Wserver.wprint "%s\n" (transl_nth conf "and" 0);
-             Wserver.wprint "<strong>\n";
-             Wserver.wprint "%s"
-               (referenced_person_text conf base
-                  (pget conf base (mother cpl)));
-             Wserver.wprint "</strong>,\n";
-             if future then
-               Wserver.wprint "<em>%s</em>.\n"
-                 (Date.string_of_date conf (Dgreg d cal))
-             else
-               Wserver.wprint "%s <em>%s</em>.\n"
-                 (match fam.relation with
-                  [ NotMarried -> transl_nth conf "relation/relations" 0
-                  | Married | NoSexesCheck -> transl conf "married"
-                  | Engaged -> transl conf "engaged"
-                  | NoMention -> "" ])
-                 (Date.string_of_ondate conf (Dgreg d cal));
+             stagn "li" begin
+               stagn "b" begin
+                 Wserver.wprint "%s"
+                   (referenced_person_text conf base
+                      (pget conf base (father cpl)));
+               end;
+               Wserver.wprint "%s\n" (transl_nth conf "and" 0);
+               stag "b" begin
+                 Wserver.wprint "%s"
+                   (referenced_person_text conf base
+                      (pget conf base (mother cpl)));
+               end;
+               Wserver.wprint ",\n";
+               if future then
+                 Wserver.wprint "<em>%s</em>."
+                   (Date.string_of_date conf (Dgreg d cal))
+               else
+                 Wserver.wprint "%s <em>%s</em>."
+                   (match fam.relation with
+                    [ NotMarried -> transl_nth conf "relation/relations" 0
+                    | Married | NoSexesCheck -> transl conf "married"
+                    | Engaged -> transl conf "engaged"
+                    | NoMention -> "" ])
+                   (Date.string_of_ondate conf (Dgreg d cal));
+             end;
              (month_txt, future)
            })
         ("", False) list
     in
-    Wserver.wprint "</ul>\n</ul>\n";
+    Wserver.wprint "</ul>\n</li>\n</ul>\n";
     trailer conf;
   }
 ;
@@ -412,28 +417,40 @@ value print_statistics conf base =
     print_link_to_welcome conf True;
     tag "ul" begin
       if conf.wizard || conf.friend then do {
-        Wserver.wprint "<li><a href=\"%sm=LB;k=%d\">" (commd conf) n;
-        Wserver.wprint (ftransl conf "the latest %d births") n;
-        Wserver.wprint "</a>\n";
-        Wserver.wprint "<li><a href=\"%sm=LD;k=%d\">" (commd conf) n;
-        Wserver.wprint (ftransl conf "the latest %d deaths") n;
-        Wserver.wprint "</a>\n";
-        Wserver.wprint "<li><a href=\"%sm=LM;k=%d\">" (commd conf) n;
-        Wserver.wprint (ftransl conf "the latest %d marriages") n;
-        Wserver.wprint "</a>\n";
-        Wserver.wprint "<li><a href=\"%sm=OE;k=%d\">" (commd conf) n;
-        Wserver.wprint
-          (ftransl conf
-             "the %d oldest couples perhaps still alive and engaged") n;
-        Wserver.wprint "</a>\n";
-        Wserver.wprint "<li><a href=\"%sm=OA;k=%d;lim=0\">" (commd conf) n;
-        Wserver.wprint (ftransl conf "the %d oldest perhaps still alive") n;
-        Wserver.wprint "</a>\n";
+        stagn "li" begin
+          Wserver.wprint "<a href=\"%sm=LB;k=%d\">" (commd conf) n;
+          Wserver.wprint (ftransl conf "the latest %d births") n;
+          Wserver.wprint "</a>";
+        end;
+        stagn "li" begin
+          Wserver.wprint "<a href=\"%sm=LD;k=%d\">" (commd conf) n;
+          Wserver.wprint (ftransl conf "the latest %d deaths") n;
+          Wserver.wprint "</a>";
+        end;
+        stagn "li" begin
+          Wserver.wprint "<a href=\"%sm=LM;k=%d\">" (commd conf) n;
+          Wserver.wprint (ftransl conf "the latest %d marriages") n;
+          Wserver.wprint "</a>";
+        end;
+        stagn "li" begin
+          Wserver.wprint "<a href=\"%sm=OE;k=%d\">" (commd conf) n;
+          Wserver.wprint
+            (ftransl conf
+               "the %d oldest couples perhaps still alive and engaged") n;
+          Wserver.wprint "</a>";
+        end;
+        stagn "li" begin
+          Wserver.wprint "<a href=\"%sm=OA;k=%d;lim=0\">" (commd conf) n;
+          Wserver.wprint (ftransl conf "the %d oldest perhaps still alive") n;
+          Wserver.wprint "</a>";
+        end
       }
       else ();
-      Wserver.wprint "<li><a href=\"%sm=LL;k=%d\">" (commd conf) n;
-      Wserver.wprint (ftransl conf "the %d who lived the longest") n;
-      Wserver.wprint "</a>\n";
+      stagn "li" begin
+        Wserver.wprint "<a href=\"%sm=LL;k=%d\">" (commd conf) n;
+        Wserver.wprint (ftransl conf "the %d who lived the longest") n;
+        Wserver.wprint "</a>";
+      end;
     end;
     trailer conf;
   }
