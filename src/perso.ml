@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.14 1999-04-07 11:49:43 ddr Exp $ *)
+(* $Id: perso.ml,v 2.15 1999-04-07 19:22:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -847,7 +847,6 @@ value print conf base p =
               return ())
            nnl
      | _ -> () ];
-     let is = index_of_sex p.sex in
      List.iter
        (fun a ->
           do Wserver.wprint "%s <em><strong>%s</strong></em>"
