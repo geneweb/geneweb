@@ -22,6 +22,11 @@ GeneWeb version 4.05
   - [13 Jan 02] Proposes now both addresses localhost and 127.0.0.1.
     (sometimes just one of them work and not the other).
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [22 Jan 02] Added a search for godparents inside the baptism entry:
+    it is not gedcom standard, but some (other) genealogy software
+    exported them that way.
+
 * GeneWeb compiler (gwc) and Gedcom to GeneWeb (ged2gwb)
   - [15 Jan 02] Can fix now some cases of "sex not coherent with
     relations", e.g. when godfather and godmother are inverted.

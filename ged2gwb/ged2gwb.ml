@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.20 2002-01-15 16:48:23 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.21 2002-01-22 15:57:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1272,6 +1272,24 @@ value html_text_of_tags rl =
   Buff.get len
 ;
 
+value rec find_all_rela nl =
+  fun
+  [ [] -> []
+  | [r :: rl] ->
+      match find_field "RELA" r.rsons with
+      [ Some r1 ->
+          loop nl where rec loop =
+            fun
+            [ [n :: nl1] ->
+                let len = String.length n in
+                if String.length r1.rval >= len &&
+                   String.lowercase (String.sub r1.rval 0 len) = n
+                then [(n, r.rval) :: find_all_rela nl rl]
+                else loop nl1
+            | [] -> find_all_rela nl rl ]
+      | None -> find_all_rela nl rl ] ]
+;
+
 value add_indi gen r =
   let i = per_index gen r.rval in
   let name_sons = find_field "NAME" r.rsons in
@@ -1435,32 +1453,47 @@ value add_indi gen r =
     List.map (fun r -> fam_index gen r) rvl
   in
   let rparents =
-    let rparents = [] in
-    let rl = find_all_fields "ASSO" r.rsons in
-    let rec find_rela n f =
-      fun
-      [ [] -> None
-      | [r :: rl] ->
-          match find_field "RELA" r.rsons with
-          [ Some r1 ->
-              let len = String.length n in
-              if String.length r1.rval >= len &&
-                 String.lowercase (String.sub r1.rval 0 len) = n
-              then
-                Some (f gen i r.rval)
-              else find_rela n f rl
-          | None -> find_rela n f rl ] ]
+    let godparents = find_all_rela ["godf"; "godm"; "godp"] r.rsons in
+    let godparents =
+      if godparents = [] then
+        let ro =
+          match find_field "BAPM" r.rsons with
+          [ None -> find_field "CHR" r.rsons
+          | x -> x ]
+        in
+        match ro with
+        [ Some r -> find_all_rela ["godf"; "godm"; "godp"] r.rsons
+        | None -> [] ]
+      else godparents
     in
-    let godf = find_rela "godf" forward_godp r.rsons in
-    let godm = find_rela "godm" forward_godp r.rsons in
-    let witn = find_rela "witness" forward_witn r.rsons in
-    if godf <> None || godm <> None then
-      let r =
-        {r_type = GodParent; r_fath = godf; r_moth = godm;
-         r_sources = string_empty}
-      in
-      [r :: rparents]
-    else rparents
+    loop godparents where rec loop rl =
+      if rl <> [] then
+        let (r_fath, rl) =
+          match rl with
+          [ [("godf", r) :: rl] -> (Some (forward_godp gen i r), rl)
+          | _ -> (None, rl) ]
+        in
+        let (r_moth, rl) =
+          match rl with
+          [ [("godm", r) :: rl] -> (Some (forward_godp gen i r), rl)
+          | _ -> (None, rl) ]
+        in
+        let (r_fath, r_moth, rl) =
+          if r_fath <> None || r_moth <> None then (r_fath, r_moth, rl)
+          else
+            let (r_fath, rl) =
+              match rl with
+              [ [("godp", r) :: rl] -> (Some (forward_godp gen i r), rl)
+              | _ -> (None, rl) ]
+            in
+            (r_fath, None, rl)
+        in
+        let r =
+          {r_type = GodParent; r_fath = r_fath; r_moth = r_moth;
+           r_sources = string_empty}
+        in
+        [r :: loop rl]
+      else []
   in
   let (birth, birth_place, birth_src) =
     match find_field "BIRT" r.rsons with
