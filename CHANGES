@@ -10,6 +10,10 @@ GeneWeb version 3.09
     errors (for example if both "Anne.0 Le Blanc" and "Anne.0 Leblanc"
     were defined).
 
+* GeneWeb data bases Transfer Program (gwtp)
+  - [06 Oct 00] Added ability to put a trailer text. HTML tags allowed
+    only if not dangerous (from the security point of view).
+
 GeneWeb version 3.08
 --------------------
 
