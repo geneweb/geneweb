@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.5 1999-11-19 08:24:33 ddr Exp $ *)
+(* $Id: relation.ml,v 3.6 1999-11-23 12:25:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -499,6 +499,7 @@ value print_relation_with_alliance conf base ip1 ip2 =
       width_search queue1 visited1 queue2 visited2
   in
   do header conf title;
+     Util.print_link_to_welcome conf True;
      mark_per.(Adef.int_of_iper ip1) := Visited (True, ip1, Self);
      mark_per.(Adef.int_of_iper ip2) := Visited (False, ip2, Self);
      if try width_search [ip1] 0 [ip2] 0 with [ FoundLink -> False ] then
