@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.4 2001-06-07 18:45:29 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.5 2001-06-12 15:50:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -238,7 +238,7 @@ value print_err conf base =
   }
 ;
 
-value print_error_deconnected conf =
+value print_error_disconnected conf =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do {
     rheader conf title;
@@ -284,28 +284,36 @@ value infer_origin_file conf base ifam ncpl ndes =
       infer_origin_file_from_other_marriages conf base ifam ncpl.mother
     else r
   in
-  match r with
-  [ Some r -> r
-  | None ->
-      let afath = aoi base ncpl.father in
-      let amoth = aoi base ncpl.mother in
-      match (afath.parents, amoth.parents) with
-      [ (Some if1, _) when sou base (foi base if1).origin_file <> "" ->
-          (foi base if1).origin_file
-      | (_, Some if2) when sou base (foi base if2).origin_file <> "" ->
-          (foi base if2).origin_file
-      | _ ->
-          let rec loop i =
-            if i == Array.length ndes.children then
-              Update.insert_string base ""
-            else
-              let cifams = (uoi base ndes.children.(i)).family in
-              if Array.length cifams == 0 then loop (i + 1)
-              else if sou base (foi base cifams.(0)).origin_file <> "" then
-                (foi base cifams.(0)).origin_file
-              else loop (i + 1)
-          in
-          loop 0 ] ]
+  let r =
+    match r with
+    [ Some r -> r
+    | None ->
+        let afath = aoi base ncpl.father in
+        let amoth = aoi base ncpl.mother in
+        match (afath.parents, amoth.parents) with
+        [ (Some if1, _) when sou base (foi base if1).origin_file <> "" ->
+            (foi base if1).origin_file
+        | (_, Some if2) when sou base (foi base if2).origin_file <> "" ->
+            (foi base if2).origin_file
+        | _ ->
+            let rec loop i =
+              if i == Array.length ndes.children then
+                Update.insert_string base ""
+              else
+                let cifams = (uoi base ndes.children.(i)).family in
+                if Array.length cifams == 0 then loop (i + 1)
+                else if sou base (foi base cifams.(0)).origin_file <> "" then
+                  (foi base cifams.(0)).origin_file
+                else loop (i + 1)
+            in
+            loop 0 ] ]
+  in
+  let no_dec =
+    try List.assoc "propose_add_family" conf.base_env = "no" with
+    [ Not_found -> False ]
+  in
+  if no_dec && sou base r = "" then print_error_disconnected conf
+  else r
 ;
 
 value update_related_witnesses base ofam_witn nfam_witn ncpl =
@@ -690,7 +698,7 @@ value delete_topological_sort conf base =
 
 value get_create (_, _, _, create, _) = create;
 
-value forbidden_deconnected conf sfam scpl sdes =
+value forbidden_disconnected conf sfam scpl sdes =
   let no_dec =
     try List.assoc "propose_add_family" conf.base_env = "no" with
     [ Not_found -> False ]
@@ -719,8 +727,8 @@ value print_add o_conf base =
         in
         if ext || redisp then
           UpdateFam.print_add1 conf base sfam scpl sdes False
-        else if forbidden_deconnected conf sfam scpl sdes then
-          print_error_deconnected conf
+        else if forbidden_disconnected conf sfam scpl sdes then
+          print_error_disconnected conf
         else do {
           strip_family sfam sdes;
           let (fam, cpl, des) = effective_add conf base sfam scpl sdes in
