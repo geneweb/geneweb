@@ -1,11 +1,15 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.17 2000-04-26 08:53:20 ddr Exp $ *)
+(* $Id: perso.ml,v 3.18 2000-05-10 08:14:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
 open Gutil;
 open Util;
 open Config;
+
+value has_parents base p =
+  (aoi base p.cle_index).parents <> None
+;
 
 value has_grand_parents base p =
   let rec loop niveau a =
@@ -21,6 +25,14 @@ value has_grand_parents base p =
       | _ -> () ]
   in
   try do loop 0 (aoi base p.cle_index); return False with [ Exit -> True ]
+;
+
+value has_children base u =
+  List.exists
+    (fun ifam ->
+       let des = doi base ifam in
+       Array.length des.children > 0)
+    (Array.to_list u.family)
 ;
 
 value has_grand_children base u =
@@ -764,15 +776,8 @@ value find_sosa conf base a =
   [ Some p ->
       if a.cle_index = p.cle_index then Some (Num.one, p)
       else
-        let au = uoi base a.cle_index in
-	let has_children =
-	  List.exists
-	    (fun ifam ->
-	       let des = doi base ifam in
-	       Array.length des.children > 0)
-	    (Array.to_list au.family)
-	in
-	if has_children then find_sosa_aux conf base a p
+        let u = uoi base p.cle_index in
+	if has_children base u then find_sosa_aux conf base a p
 	else None
   | None -> None ]
 ;
@@ -1001,12 +1006,11 @@ value print_ancestors_descends_cousins conf base p a u =
        Wserver.wprint "\n";
     return ()
   in
-  let has_grand_parents = has_grand_parents base p in
-  do if has_grand_parents then print p "A" (transl conf "ancestors")
+  do if has_parents base p then print p "A" (transl conf "ancestors")
      else ();
-     if has_grand_children base u then print p "D" (transl conf "descendants")
+     if has_children base u then print p "D" (transl conf "descendants")
      else ();
-     if has_grand_parents then
+     if has_grand_parents base p then
        print p "C" (transl conf "cousins (general term)")
      else if has_nephews_or_nieces base p then
        print p "C;v1=1;v2=2" (transl conf "nephews and nieces")
