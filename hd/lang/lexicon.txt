@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.38 1999-05-12 06:23:27 ddr Exp $
+# $Id: lexicon.txt,v 2.39 1999-05-13 08:54:07 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2925,11 +2925,6 @@ no: slektskap
 pt: parentesco
 se: sl&auml;ktskap
 
-    relationship%t to
-dk: forbindelse%t med
-en: relationship%t to
-fr: relation%t avec
-
     relationship computing
 cn: œ‡πÿ≤È—Ø
 de: Verwandtschaft ermitteln
@@ -2958,6 +2953,12 @@ nl: verwantschap/verwantschappen
 no: slektslinje/slektslinjer
 pt: grau de parentesco/graus de parentesco
 se: sl&auml;ktl&auml;nk/sl&auml;ktl&auml;nkar
+
+    relationship%t to
+dk: forbindelse%t med
+en: relationship%t to
+fr: relation%t avec
+se: f&ouml;rh&aring;llande%t med
 
     see
 de: siehe
