@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.5 1998-11-21 10:54:09 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.6 1998-12-02 15:46:33 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -125,6 +125,19 @@ value afficher_menu_ascendants conf base p =
   in
   do header conf title;
      print_choice conf base p niveau_effectif;
+     Wserver.wprint "<p>\n";
+     Wserver.wprint
+       (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
+       (fun _ ->
+          do conf.henv := List.remove "iz" conf.henv;
+             stag "a" "href=\"%siz=%d\"" (commd conf)
+               (Adef.int_of_iper p.cle_index)
+             begin
+               afficher_personne_sans_titre conf base p;
+             end;
+             afficher_titre conf base p;
+          return ());
+     Wserver.wprint ".\n";
      trailer conf;
   return ()
 ;

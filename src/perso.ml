@@ -1,4 +1,5 @@
-(* $Id: perso.ml,v 1.10 1998-11-28 19:28:48 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: perso.ml,v 1.11 1998-12-02 15:46:35 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -498,6 +499,80 @@ value print_sources conf base p =
   return ()
 ;
 
+(* Version matching the Sosa number of the "ancestor" pages *)
+type choice 'a 'b = [ Left of 'a | Right of 'b ];
+
+value find_sosa conf base a p =
+  let mark = Array.create base.persons.len False in
+  let rec gene_find =
+    fun
+    [ [] -> Left []
+    | [(z, ip) :: zil] ->
+        if ip = a.cle_index then Right z
+        else if mark.(Adef.int_of_iper ip) then gene_find zil
+        else
+          do mark.(Adef.int_of_iper ip) := True; return
+          let asc = aoi base ip in
+          match asc.parents with
+          [ Some ifam ->
+              let cpl = coi base ifam in
+              let z = Num.twice z in
+              match gene_find zil with
+              [ Left zil ->
+                  Left [(z, cpl.father); (Num.inc z 1, cpl.mother) :: zil]
+              | Right z -> Right z ]
+          | None -> gene_find zil ] ]
+  in
+  find [(Num.one, p.cle_index)] where rec find zil =
+    match gene_find zil with
+    [ Left [] -> None
+    | Left zil -> find zil
+    | Right z -> Some z ]
+;
+(* Masculine version
+value find_sosa conf base a p =
+  let mark = Array.create base.persons.len False in
+  let rec find z ip =
+    if ip = a.cle_index then Some z
+    else if mark.(Adef.int_of_iper ip) then None
+    else
+      do mark.(Adef.int_of_iper ip) := True; return
+      let asc = aoi base ip in
+      match asc.parents with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          let z = Num.twice z in
+          match find z cpl.father with
+          [ Some z -> Some z
+          | None -> find (Num.inc z 1) cpl.mother ]
+      | None -> None ]
+  in
+  find Num.one p.cle_index
+;
+*)
+
+value print_sosa conf base a p =
+  match find_sosa conf base a p with
+  [ Some n ->
+      do Wserver.wprint "<em>Sosa:\n";
+         stag "a" "href=\"%sm=RL;i1=%d;i2=%d;b1=1;b2=%s\""
+           (commd conf) (Adef.int_of_iper a.cle_index)
+           (Adef.int_of_iper p.cle_index) (Num.to_string n)
+         begin
+           Num.print (fun x -> Wserver.wprint "%s" x)
+             (transl conf "(thousand separator)") n;
+         end;
+         Wserver.wprint "</em><p>\n";
+      return ()
+  | None -> () ]
+;
+
+value print_sosa_if_any conf base a =
+  match Util.find_person_in_env conf base "z" with
+  [ Some p -> print_sosa conf base a p 
+  | None -> () ]
+;
+
 value commd_no_params conf =
   conf.command ^
   List.fold_left
@@ -542,6 +617,7 @@ value print conf base p =
   in
   let a = aoi base p.cle_index in
   do header conf title;
+     print_sosa_if_any conf base p;
      Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
      Wserver.wprint "<img src=\"%sm=IM;v=up.gif\" alt=welcome align=right>"
        (commd conf);

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 1.10 1998-11-30 00:51:23 ddr Exp $ *)
+(* $Id: family.ml,v 1.11 1998-12-02 15:46:34 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -363,6 +363,7 @@ value print_no_index conf base =
       | [("i1", v) :: l] -> new_env "i1" v (fun x -> x ^ "1") l
       | [("i2", v) :: l] -> new_env "i1" v (fun x -> x ^ "2") l
       | [("ei", v) :: l] -> new_env "ei" v (fun x -> "e" ^ x) l
+      | [("iz", v) :: l] -> new_env "iz" v (fun x -> x ^ "z") l
       | [xv :: l] -> [xv :: loop l] ]
     and new_env x v c l =
       match get_person v with
@@ -407,12 +408,28 @@ value print_no_index conf base =
   return ()
 ;
 
+value rec except_sosa_env =
+  fun
+  [ [("iz" | "nz" | "pz" | "ocz", _) :: env] -> except_sosa_env env
+  | [x :: env] -> [env :: except_sosa_env env]
+  | [] -> [] ]
+;
+
+value extract_sosa_henv conf base =
+  match find_person_in_env conf base "z" with
+  [ Some p ->
+      conf.henv :=
+        conf.henv @ [("iz", string_of_int (Adef.int_of_iper p.cle_index))]
+  | None -> () ]
+;
+
 value family conf base =
-  do match p_getenv conf.env "opt" with
+  do extract_sosa_henv conf base;
+     match p_getenv conf.env "opt" with
      [ Some "no_index" ->
          print_no_index conf base
      | _ ->
-         if conf.env = [] then
+         if except_sosa_env conf.env = [] then
            do Srcfile.incr_welcome_counter conf; return
            Srcfile.print_start conf base
          else
