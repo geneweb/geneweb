@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.13 1999-07-15 08:52:34 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.14 1999-07-26 07:01:58 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -137,6 +137,38 @@ value ged_ev_detail oc n d pl src =
   return ()
 ;
 
+value adop_fam_list = ref [];
+value adop_fam_cnt = ref 0;
+
+value ged_adoption base oc per r =
+  do Printf.fprintf oc "1 ADOP Y\n";
+     adop_fam_list.val :=
+       [(r.r_fath, r.r_moth, per.cle_index) :: adop_fam_list.val];
+     incr adop_fam_cnt;
+     Printf.fprintf oc "2 FAMC @F%d@\n"
+       (base.data.families.len + adop_fam_cnt.val);
+     Printf.fprintf oc "3 ADOP ";
+     match (r.r_fath, r.r_moth) with
+     [ (Some _, None) -> Printf.fprintf oc "HUSB"
+     | (None, Some _) -> Printf.fprintf oc "WIFE"
+     | (Some _, Some _) -> Printf.fprintf oc "BOTH"
+     | _ -> () ];
+     Printf.fprintf oc "\n";
+  return ()
+;
+         
+value ged_fam_adop base oc i (fath, moth, child) =
+  do Printf.fprintf oc "0 @F%d@ FAM\n" i;
+     match fath with
+     [ Some i -> Printf.fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper i + 1)
+     | _ -> () ];
+     match moth with
+     [ Some i -> Printf.fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper i + 1)
+     | _ -> () ];
+     Printf.fprintf oc "1 CHIL @I%d@\n" (Adef.int_of_iper child + 1);
+  return ()
+;
+
 value ged_ind_ev_str base oc per =
   do let pl = sou base per.birth_place in
      let src = sou base per.birth_src in
@@ -150,6 +182,10 @@ value ged_ind_ev_str base oc per =
          do Printf.fprintf oc "1 BIRT";
             ged_ev_detail oc 2 od pl src;
          return () ];
+     List.iter
+       (fun r ->
+          if r.r_type = Adoption then ged_adoption base oc per r else ())
+       per.rparents;
      let pl = sou base per.baptism_place in
      let src = sou base per.baptism_src in
      match (Adef.od_of_codate per.baptism, pl) with
@@ -245,6 +281,26 @@ value ged_fams base (per_sel, fam_sel) oc ifam =
   if fam_sel ifam then
     Printf.fprintf oc "1 FAMS @F%d@\n" (Adef.int_of_ifam ifam + 1)
   else ()
+;
+
+value ged_godparent oc godp =
+  fun
+  [ Some ip ->
+      do Printf.fprintf oc "1 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
+         Printf.fprintf oc "2 RELA %s\n" godp;
+      return ()
+  | None -> () ]
+;
+
+value ged_asso base oc per =
+  List.iter
+    (fun r ->
+       if r.r_type = GodParent then
+         do ged_godparent oc "GODF" r.r_fath;
+            ged_godparent oc "GODM" r.r_moth;
+         return ()
+       else ())
+    per.rparents
 ;
 
 value ged_psource base oc per =
@@ -367,6 +423,7 @@ value ged_ind_record base sel oc i =
        ged_ind_attr_str base oc per;
        ged_famc base sel oc asc;
        Array.iter (ged_fams base sel oc) per.family;
+       ged_asso base oc per;
        ged_psource base oc per;
        ged_multimedia_link base oc per;
        ged_note base oc per;
@@ -434,12 +491,15 @@ value gwb2ged base ifile ofile anc desc mem =
        if per_sel (Adef.iper_of_int i) then ged_ind_record base sel oc i
        else ();
      done;
-     flush oc;
      for i = 0 to base.data.families.len - 1 do
        if fam_sel (Adef.ifam_of_int i) then ged_fam_record base sel oc i
        else ();
      done;
-     flush oc;
+     let _ =
+       List.fold_right
+         (fun adop i -> do ged_fam_adop base oc i adop; return i+1)
+         adop_fam_list.val (base.data.families.len + 1)
+     in ();
      Printf.fprintf oc "0 TRLR\n";
      flush oc;
      if ofile = "" then () else close_out oc;

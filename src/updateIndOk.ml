@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.18 1999-07-22 19:47:21 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.19 1999-07-26 07:02:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -85,6 +85,66 @@ value rec reconstitute_titles conf ext cnt =
   | _ -> ([], ext) ]
 ;
 
+value reconstitute_add_relation conf ext cnt rl =
+  match get_nth conf "add_relation" cnt with
+  [ Some "on" ->
+      let r = {r_type = Adoption; r_fath = None; r_moth = None} in
+      ([r :: rl], True)
+  | _ -> (rl, ext) ]
+;
+
+value rec reconstitute_relations conf ext cnt =
+  match
+    (get_nth conf "r_fath_fn" cnt, get_nth conf "r_fath_sn" cnt,
+     get_nth conf "r_moth_fn" cnt, get_nth conf "r_moth_sn" cnt)
+  with
+  [ (Some ("" | "?"), _, Some ("" | "?"), _)
+  | (Some ("" | "?"), _, _, Some ("" | "?"))
+  | (_, Some ("" | "?"), Some ("" | "?"), _)
+  | (_, Some ("" | "?"), _, Some ("" | "?")) ->
+      let (rl, ext) = reconstitute_relations conf ext (cnt + 1) in
+      let (rl, ext) = reconstitute_add_relation conf ext cnt rl in
+      (rl, ext)
+  | (Some r_fath_fn, Some r_fath_sn, Some r_moth_fn, Some r_moth_sn) ->
+      let r_fath_occ =
+        match get_nth conf "r_fath_occ" cnt with
+        [ Some x -> try int_of_string x with [ Failure _ -> 0 ]
+        | _ -> 0 ]
+      in
+      let r_moth_occ =
+        match get_nth conf "r_moth_occ" cnt with
+        [ Some x -> try int_of_string x with [ Failure _ -> 0 ]
+        | _ -> 0 ]
+      in
+      let r_fath =
+        if r_fath_fn = "" || r_fath_fn = "?" || r_fath_sn = "?" then None
+        else Some (r_fath_fn, r_fath_sn, r_fath_occ)
+      in
+      let r_moth =
+        if r_moth_fn = "" || r_moth_fn = "?" || r_moth_sn = "?" then None
+        else Some (r_moth_fn, r_moth_sn, r_moth_occ)
+      in
+      let r_start =
+        Update.reconstitute_date conf ("r_start" ^ string_of_int cnt)
+      in
+      let r_end =
+        Update.reconstitute_date conf ("r_end" ^ string_of_int cnt)
+      in
+      let r_type =
+        match get_nth conf "r_type" cnt with
+        [ Some "Adoption" -> Adoption
+        | Some "Recognition" -> Recognition
+        | Some "CandidateParent" -> CandidateParent
+        | Some "GodParent" -> GodParent
+        | _ -> Adoption ]
+      in
+      let r = {r_type = r_type; r_fath = r_fath; r_moth = r_moth} in
+      let (rl, ext) = reconstitute_relations conf ext (cnt + 1) in
+      let (rl, ext) = reconstitute_add_relation conf ext cnt rl in
+      ([r :: rl], ext)
+  | _ -> ([], ext) ]
+;
+
 value reconstitute_death conf birth death_place burial burial_place =
   let d = Update.reconstitute_date conf "death" in
   let dr =
@@ -151,6 +211,8 @@ value reconstitute_person conf =
   let (aliases, ext) = reconstitute_string_list conf "alias" ext 0 in
   let (titles, ext) = reconstitute_titles conf ext 1 in
   let (titles, ext) = reconstitute_add_title conf ext 0 titles in
+  let (rparents, ext) = reconstitute_relations conf ext 1 in
+  let (rparents, ext) = reconstitute_add_relation conf ext 0 rparents in
   let access =
     match p_getenv conf.env "access" with
     [ Some "Public" -> Public
@@ -192,8 +254,8 @@ value reconstitute_person conf =
      surnames_aliases = surnames_aliases;
      public_name = public_name;
      nick_names = nicknames; aliases = aliases; titles = titles;
-     occupation = occupation;
-     sex = sex; access = access;
+     rparents = rparents; occupation = occupation;
+     rchildren = []; sex = sex; access = access;
      birth = Adef.codate_of_od birth; birth_place = birth_place;
      birth_src = only_printable (get conf "birth_src");
      baptism = bapt; baptism_place = bapt_place;
@@ -330,6 +392,49 @@ value rename_image_file conf base op sp =
   | _ -> () ]
 ;
 
+value rparents_of p =
+  List.fold_left
+    (fun ipl r ->
+        match (r.r_fath, r.r_moth) with
+       [ (Some ip1, Some ip2) -> [ip1; ip2 :: ipl]
+       | (Some ip, _) -> [ip :: ipl]
+        | (_, Some ip) -> [ip :: ipl]
+       | _ -> ipl ])
+    [] p.rparents
+;
+
+value update_relation_parents base op np =
+  let op_rparents = rparents_of op in
+  let np_rparents = rparents_of np in
+  let pi = np.cle_index in
+  let mod_ippl = [] in
+  let mod_ippl =
+    List.fold_left
+      (fun ippl ip ->
+         if List.mem ip op_rparents then ippl
+         else
+           let p = poi base ip in
+           if not (List.mem pi p.rchildren) then
+             do p.rchildren := [pi :: p.rchildren]; return
+             if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
+           else ippl)
+      mod_ippl np_rparents
+  in
+  let mod_ippl =
+    List.fold_left
+      (fun ippl ip ->
+         if List.mem ip np_rparents then ippl
+         else
+           let p = poi base ip in
+           if List.mem pi p.rchildren then
+             do p.rchildren := List.filter (\<> pi) p.rchildren; return
+             if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
+           else ippl)
+      mod_ippl op_rparents
+  in
+  List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
+;
+
 value effective_mod conf base sp =
   let pi = sp.cle_index in
   let op = poi base pi in
@@ -349,8 +454,13 @@ value effective_mod conf base sp =
      else ();
      check_sex_married conf base sp op;
   return
-  let np = map_person_strings (Update.insert_string conf base) sp in
-  do np.family := op.family; return
+  let np =
+    map_person_ps (Update.link_person conf base)
+      (Update.insert_string conf base) sp
+  in
+  do np.family := op.family;
+     np.rchildren := op.rchildren;
+  return
   let op_misc_names = person_misc_names base op in
   let np_misc_names = person_misc_names base np in
   do List.iter
@@ -358,6 +468,7 @@ value effective_mod conf base sp =
           if List.mem key op_misc_names then ()
           else person_ht_add base key pi)
        np_misc_names;
+     update_relation_parents base op np;
   return np
 ;
 
@@ -368,7 +479,10 @@ value effective_add conf base sp =
   do check_conflict conf base sp ipl;
      person_ht_add base key pi;
   return
-  let np = map_person_strings (Update.insert_string conf base) sp in
+  let np =
+    map_person_ps (Update.link_person conf base)
+      (Update.insert_string conf base) sp
+  in
   let na = {parents = None; consang = Adef.fix (-1)} in
   do np.cle_index := pi;
      base.func.patch_person pi np;
@@ -412,6 +526,8 @@ value effective_del conf base p =
      p.first_names_aliases := [];
      p.surnames_aliases := [];
      p.titles := [];
+     p.rparents := [];
+     p.rchildren := [];
      p.occupation := empty;
      p.access := IfTitles;
      p.birth := Adef.codate_None;

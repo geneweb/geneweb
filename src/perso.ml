@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.36 1999-07-22 21:19:01 ddr Exp $ *)
+(* $Id: perso.ml,v 2.37 1999-07-26 07:02:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -532,7 +532,7 @@ value print_families conf base p a =
   match Array.to_list p.family with
   [ [] -> ()
   | faml ->
-      do Wserver.wprint "<h3> %s %s %s </h3>\n\n<ul>"
+      do Wserver.wprint "<h3>%s %s %s</h3>\n\n<ul>"
            (capitale (transl_nth conf "marriage/marriages" 1))
            (transl conf "and") (transl_nth conf "child/children" 1);
          List.iter (print_family conf base p a) faml;
@@ -545,7 +545,7 @@ value print_notes conf base p =
   [ "" -> ()
   | notes ->
       if age_autorise conf base p then
-        do Wserver.wprint "<h3> %s </h3>\n\n"
+        do Wserver.wprint "<h3>%s</h3>\n\n"
              (capitale (transl_nth conf "note/notes" 1));
            tag "ul" begin
              html_li conf;
@@ -554,6 +554,86 @@ value print_notes conf base p =
            end;
         return ()
       else () ]
+;
+
+value print_relation conf base r =
+  do match (r.r_fath, r.r_moth) with
+     [ (Some ip, None) ->
+         let p = poi base ip in
+         do html_li conf;
+            Wserver.wprint "%s"
+              (capitale (relation_type_text conf r.r_type 0));
+            Wserver.wprint ": %s" (referenced_person_title_text conf base p);
+            Date.afficher_dates_courtes conf base p;
+            Wserver.wprint "\n";
+         return ()
+     | (None, Some ip) ->
+         let p = poi base ip in
+         do html_li conf;
+            Wserver.wprint "%s"
+              (capitale (relation_type_text conf r.r_type 1));
+            Wserver.wprint ": %s" (referenced_person_title_text conf base p);
+            Date.afficher_dates_courtes conf base p;
+            Wserver.wprint "\n";
+         return ()
+     | (Some ip1, Some ip2) ->
+         let p1 = poi base ip1 in
+         let p2 = poi base ip2 in
+         do html_li conf;
+            Wserver.wprint "%s"
+              (capitale (relation_type_text conf r.r_type 2));
+            tag "ul" begin
+              html_li conf;
+              Wserver.wprint "%s" (referenced_person_title_text conf base p1);
+              Date.afficher_dates_courtes conf base p1;
+              Wserver.wprint "\n";
+              html_li conf;
+              Wserver.wprint "%s" (referenced_person_title_text conf base p2);
+              Date.afficher_dates_courtes conf base p2;
+              Wserver.wprint "\n";
+            end;
+         return ()
+     | _ -> () ];
+  return ()
+;
+
+value print_rchild conf base c r =
+  do html_li conf;
+     Wserver.wprint "%s"
+       (capitale (rchild_type_text conf r.r_type (index_of_sex c.sex)));
+     Wserver.wprint ": %s" (referenced_person_title_text conf base c);
+     Date.afficher_dates_courtes conf base c;
+     Wserver.wprint "\n";
+  return ()
+;
+
+value print_rchildren conf base p ic =
+  let c = poi base ic in
+  List.iter
+    (fun r ->
+       do match r.r_fath with
+          [ Some ip ->
+              if ip = p.cle_index then print_rchild conf base c r else ()
+          | None -> () ];
+          match r.r_moth with
+          [ Some ip ->
+              if ip = p.cle_index then print_rchild conf base c r else ()
+          | None -> () ];
+       return ())
+    c.rparents
+;
+
+value print_relations conf base p =
+  match (p.rparents, p.rchildren) with
+  [ ([], []) -> ()
+  | (rl, cl) ->
+      do Wserver.wprint "<h3>%s</h3>\n"
+           (capitale (transl_nth conf "relation/relations" 1));
+         tag "ul" begin
+           List.iter (print_relation conf base) rl;
+           List.iter (print_rchildren conf base p) cl;
+         end;
+      return () ]
 ;
 
 value print_not_empty_src conf base new_parag first txt isrc =
@@ -942,6 +1022,7 @@ value print conf base p =
      print_parents conf base a;
      print_families conf base p a;
      print_notes conf base p;
+     print_relations conf base p;
      if conf.cancel_links then ()
      else
        do Wserver.wprint "\n<h4><a href=\"%s%s;m=R\">\n%s</a></h4>\n"

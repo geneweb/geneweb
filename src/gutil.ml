@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.21 1999-07-23 12:38:04 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.22 1999-07-26 07:01:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -788,25 +788,33 @@ value map_title_strings f t =
    t_nth = t.t_nth}
 ;
 
-value map_person_strings f p =
-  {first_name = f p.first_name; surname = f p.surname; occ = p.occ;
-   image = f p.image; first_names_aliases = List.map f p.first_names_aliases;
-   surnames_aliases = List.map f p.surnames_aliases;
-   public_name = f p.public_name;
-   nick_names = List.map f p.nick_names;
-   titles = List.map (map_title_strings f) p.titles;
-   aliases = List.map f p.aliases;
-   occupation = f p.occupation;
+value map_relation_ps fp fs r =
+  {r_type = r.r_type;
+   r_fath = match r.r_fath with [ Some x -> Some (fp x) | None -> None ];
+   r_moth = match r.r_moth with [ Some x -> Some (fp x) | None -> None ] }
+;
+
+value map_person_ps fp fs p =
+  {first_name = fs p.first_name; surname = fs p.surname; occ = p.occ;
+   image = fs p.image; first_names_aliases = List.map fs p.first_names_aliases;
+   surnames_aliases = List.map fs p.surnames_aliases;
+   public_name = fs p.public_name;
+   nick_names = List.map fs p.nick_names;
+   titles = List.map (map_title_strings fs) p.titles;
+   rparents = List.map (map_relation_ps fp fs) p.rparents;
+   rchildren = p.rchildren;
+   aliases = List.map fs p.aliases;
+   occupation = fs p.occupation;
    sex = p.sex; access = p.access;
-   birth = p.birth; birth_place = f p.birth_place;
-   birth_src = f p.birth_src;
-   baptism = p.baptism; baptism_place = f p.baptism_place;
-   baptism_src = f p.baptism_src;
-   death = p.death; death_place = f p.death_place;
-   death_src = f p.death_src;
-   burial = p.burial; burial_place = f p.burial_place;
-   burial_src = f p.burial_src;
-   family = p.family; notes = f p.notes; psources = f p.psources;
+   birth = p.birth; birth_place = fs p.birth_place;
+   birth_src = fs p.birth_src;
+   baptism = p.baptism; baptism_place = fs p.baptism_place;
+   baptism_src = fs p.baptism_src;
+   death = p.death; death_place = fs p.death_place;
+   death_src = fs p.death_src;
+   burial = p.burial; burial_place = fs p.burial_place;
+   burial_src = fs p.burial_src;
+   family = p.family; notes = fs p.notes; psources = fs p.psources;
    cle_index = p.cle_index}
 ;
 

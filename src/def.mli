@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 2.7 1999-05-23 09:51:59 ddr Exp $ *)
+(* $Id: def.mli,v 2.8 1999-07-26 07:01:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = Adef.iper;
@@ -44,9 +44,17 @@ type gen_title 'string =
     t_nth : mutable int }
 ;
 
+type relation_type = [ Adoption | Recognition | CandidateParent | GodParent ];
+
+type gen_relation 'person 'string =
+  { r_type : mutable relation_type;
+    r_fath : mutable option 'person;
+    r_moth : mutable option 'person }
+;
+
 type sex = [ Male | Female | Neuter ];
 
-type gen_person 'string =
+type gen_person 'person 'string =
   { first_name : mutable 'string;
     surname : mutable 'string;
     occ : mutable int;
@@ -57,6 +65,8 @@ type gen_person 'string =
     first_names_aliases : mutable list 'string;
     surnames_aliases : mutable list 'string;
     titles : mutable list (gen_title 'string);
+    rparents : mutable list (gen_relation 'person 'string);
+    rchildren : mutable list iper;
     occupation : mutable 'string;
     sex : mutable sex;
     access : mutable access;
@@ -101,10 +111,11 @@ type gen_couple 'person =
     mother : mutable 'person }
 ;
 
-type person = gen_person istr;
+type person = gen_person iper istr;
 type ascend = gen_ascend;
 type family = gen_family iper istr;
 type couple = gen_couple iper;
+type relation = gen_relation iper istr;
 type title = gen_title istr;
 
 type cache 'a =
