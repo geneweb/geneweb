@@ -2,6 +2,9 @@ GeneWeb Version 1.10
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [13/12/98] The directory cnt is no more searched in the directory where
+    the daemon (or the CGI) is launched but in the base directory (option -bd
+    of gwd; no difference if option -bd not used).
   - [13/12/98] In relationship links, display the ancestor couple (if both
     are ancestors).
 --- [12/12/98..13/12/98] Added displaying of cousins.
@@ -15,11 +18,6 @@ GeneWeb Version 1.10
 
 * GeneWeb uncompiler (gwu)
   - [12/12/98] Added option "-mem" to save memory space, but slower.
-
-* Accesses count (directory cnt, files *.txt)
-  - [13/12/98] The directory cnt is no more searched in the directory where
-    the daemon (or the CGI) is launched but in the base directory (option -bd
-    of gwd).
 
 GeneWeb Version 1.09
 --------------------
