@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.32 2001-07-26 08:53:44 ddr Exp $
+# $Id: lexicon.txt,v 4.33 2001-08-04 09:28:03 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -5801,7 +5801,7 @@ lv: %t attiecîbas ar
 nl: verbonden%t met
 no: forbindelse%t med
 pl: pokrewieñstwo%t z:
-pt: relacionado%t com
+pt: relacionado%t com/relacionada%t com
 pt-br: junto%t com
 ru: ïðèõîäèòñÿ%t
 sv: f&ouml;rh&aring;llande%t med
