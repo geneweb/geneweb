@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.8 1999-11-01 23:29:44 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.9 1999-11-02 10:28:36 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -98,7 +98,7 @@ Per traversare in questa base di dati, potete fare la vostra ricerca:<br><p>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>{by the list}</b></font> de tutti i
+<font color=#2f6400><b>per la lista</b></font> de tutti i
 <select name=m>
 <option value="N" selected>cognomi
 <option value="P">nomi
@@ -113,7 +113,7 @@ in ordine
 
 <li>
 
-<font color=#2f6400><b>{by the}</b></font>
+<font color=#2f6400><b>per la</b></font>
 <a href="%sm=H;v=advanced"><font color=#2f6400><b>richiesta
 avanzata</b></font></a>.
 
@@ -121,18 +121,18 @@ avanzata</b></font></a>.
 
 %Iw<p>
 
-<center>{You can}<br><p>
+<center>Potete<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
-<li><a href="%sm=ADD_FAM">{add a family}</a>
+<li><a href="%sm=ADD_FAM">aggiungere una famiglia</a>
 %INl</ul>
 </td>
 <td align=left>
 <ul>%E
-<li><a href="%sm=MOD_NOTES">{modify the notes}</a>
+<li><a href="%sm=MOD_NOTES">modificare le note</a>
 </ul>
 </td>
 </tr>
@@ -140,7 +140,7 @@ avanzata</b></font></a>.
 </center>
 %E
 
-<center>{You can also consult}<br><p>
+<center>Potete anche consultare<br><p>
 
 <table border=0>
 <tr>
@@ -155,9 +155,9 @@ avanzata</b></font></a>.
 <td valign=up>
 <ul>%I|wf
 <li>le <a href="%sm=LD;k=10">ultime nascite</a>%E%Ih
-<li>{the <a href="%sm=HIST;k=10">history of updates}</a>%E
-<li>{the <a href="%sm=CAL">calendars}</a>
-<li>{the <a href="%sm=FORUM">data base forum</a>}
+<li>la <a href="%sm=HIST;k=10">storia degli aggiornamenti</a>%E
+<li>i <a href="%sm=CAL">calendarii</a>
+<li>la <a href="%sm=FORUM">tribuna della base di dati</a>}
 </ul>
 </td>
 </tr>
