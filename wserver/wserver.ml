@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 1.6 1998-09-24 16:52:01 ddr Exp $ *)
+(* $Id: wserver.ml,v 1.7 1998-10-31 09:37:53 ddr Exp $ *)
 
 open Unix;
 
@@ -267,7 +267,7 @@ value is_robot robot_excluder addr =
       else
         let tm = Unix.time () in
         let r = try W.find str who.val with [ Not_found -> [] ] in
-        let (cnt, r) =
+        let (cnt, r, t) =
           count r where rec count =
             fun
             [ [t :: tl] ->
@@ -276,9 +276,10 @@ value is_robot robot_excluder addr =
 (*
                 if tm - t < sec then
 *)
-                  let (cnt, tl) = count tl in (cnt + 1, [t :: tl])
-                else (0, [])
-            | [] -> (0, []) ]
+                  let (cnt, tl, t1) = count tl in
+                  (cnt + 1, [t :: tl], if t1 = 0.0 then t else t1)
+                else (0, [], t)
+            | [] -> (0, [], 0.0) ]
         in
         do who.val := W.add str [tm :: r] who.val; return
         if cnt > max_call then
@@ -289,7 +290,7 @@ value is_robot robot_excluder addr =
                 try (gethostbyaddr a).h_name with _ ->
                   string_of_inet_addr a ]
           in
-do Printf.eprintf "*** %s is a robot => access definitively refused\n" str1; flush Pervasives.stderr; return
+do Printf.eprintf "*** %s is a robot => access definitively refused\n" str1; Printf.eprintf "(%d > %d connections in %g < %d seconds)\n" cnt max_call (tm -. t) sec; flush Pervasives.stderr; return
           do excluded.val := [str :: excluded.val]; return True
         else False
   | _ -> False ]
