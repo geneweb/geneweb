@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.10 2003-10-20 07:11:56 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.11 2003-12-04 20:30:56 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -296,9 +296,11 @@ value effective_send_ok conf base p file =
 ;
 
 value print_send_ok conf base =
+(*
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock Iobase.lock_file bfile with
   [ Accept ->
+*)
       try
         let ip =
           let s = raw_get conf "i" in
@@ -313,7 +315,9 @@ let _ = do { Printf.eprintf "file size %d\n" (String.length file); flush stderr;
         else Update.error_digest conf base
       with
       [ Update.ModErr -> () ]
+(*
   | Refuse -> Update.error_locked conf base ]
+*)
 ;
 
 (* Delete image form validated *)
@@ -351,9 +355,11 @@ value effective_delete_ok conf base p =
 ;
 
 value print_del_ok conf base =
+(*
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock Iobase.lock_file bfile with
   [ Accept ->
+*)
       try
         match p_getint conf.env "i" with
         [ Some ip ->
@@ -362,5 +368,7 @@ value print_del_ok conf base =
         | None -> incorrect conf ]
       with
       [ Update.ModErr -> () ]
+(*
   | Refuse -> Update.error_locked conf base ]
+*)
 ;

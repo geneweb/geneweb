@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.12 2002-11-14 04:15:34 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.13 2003-12-04 20:30:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -678,9 +678,11 @@ value print_del_ok conf base wl =
 
 value print_add o_conf base =
   let conf = Update.update_conf o_conf in
+(*
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
+*)
       try
         let (sp, ext) = reconstitute_person conf in
         let redisp =
@@ -706,13 +708,17 @@ value print_add o_conf base =
         }
       with
       [ Update.ModErr -> () ]
+(*
   | Refuse -> Update.error_locked conf base ]
+*)
 ;
 
 value print_del conf base =
+(*
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
+*)
       match p_getint conf.env "i" with
       [ Some i ->
           let p = base.data.persons.get i in
@@ -725,13 +731,17 @@ value print_del conf base =
             print_del_ok conf base [];
           }
       | _ -> incorrect_request conf ]
+(*
   | Refuse -> Update.error_locked conf base ]
+*)
 ;
 
 value print_mod_aux conf base callback =
+(*
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
+*)
       try
         let (p, ext) = reconstitute_person conf in
         let redisp =
@@ -751,7 +761,9 @@ value print_mod_aux conf base callback =
         else Update.error_digest conf base
       with
       [ Update.ModErr -> () ]
+(*
   | Refuse -> Update.error_locked conf base ]
+*)
 ;
 
 value print_mod o_conf base =

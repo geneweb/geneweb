@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.21 2002-06-03 13:29:27 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.22 2003-12-04 20:30:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -626,8 +626,10 @@ value print_kill_ancestors conf base =
       [ Some p ->
           let key = (sou base p.first_name, sou base p.surname, p.occ) in
           let bfile = Util.base_path [] (conf.bname ^ ".lck") in
+(*
           lock (Iobase.lock_file bfile) with
           [ Accept ->
+*)
               let nb_ind = ref 0 in
               let nb_fam = ref 0 in
               do {
@@ -636,7 +638,9 @@ value print_kill_ancestors conf base =
                 History.record conf base key "ka";
                 print_killed conf base p nb_ind.val nb_fam.val;
               }
+(*
           | Refuse -> Update.error_locked conf base ]
+*)
       | None -> incorrect_request conf ]
   | _ -> incorrect_request conf ]
 ;
