@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.39 1999-12-17 00:26:57 ddr Exp $
+# $Id: lexicon.txt,v 3.40 1999-12-17 00:43:07 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -461,7 +461,7 @@ dk: en f&aelig;tter af %s grad/en kusine af %s grad
 en: a %s cousin
 eo: %s kuzo/%s kuzino/%s gekuzo
 es: un primo de %s grado/una prima de %s grado/un(a) primo(a) de %s grado
-fi: %s serkku
+fi: %s serkku:g:--un
 fr: un cousin au %s degr&eacute;/une cousine au %s degr&eacute;/un(e) cousin(e) au %s degr&eacute;
 he:  בן-דוד לדרגה  %s/ בת-דוד לדרגה  %s
 is: systkynabarn %s
@@ -996,7 +996,7 @@ dk: en forfader
 en: an ancestor
 eo: prapatro/prapatrino
 es: un ancestro
-fi: esi-is&auml;/esi&auml;iti
+fi: esi-is&auml;:g:+n/esi&auml;iti
 fr: un anc&ecirc;tre/une anc&ecirc;tre
 he:   אב קדמון 
 is: forfaנir
