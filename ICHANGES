@@ -4,6 +4,9 @@ Internal, very small, or not visible changes
 GeneWeb Intermediate Version 2.02-1
 -----------------------------------
 
+* Compilation
+  - [May 8, 99] Added "make opt" case in "setup" to build optimized versions.
+
 GeneWeb Version 2.02
 --------------------
 

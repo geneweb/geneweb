@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.2 1999-04-29 19:55:44 ddr Exp $
+# $Id: Makefile,v 2.3 1999-05-08 21:26:10 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -17,10 +17,10 @@ clean::
 	$(RM) gwb2ged
 
 gwb2ged.out: $(OBJS)
-	ocamlc -custom unix.cma $(CAMLP4D)/gramlib.cma $(OBJS) $(LIBUNIX) -o gwb2ged.out
+	$(OCAMLC) -custom unix.cma $(CAMLP4D)/gramlib.cma $(OBJS) $(LIBUNIX) -o gwb2ged.out
 
 gwb2ged.opt: $(OBJS:.cmo=.cmx)
-	ocamlopt unix.cmxa $(CAMLP4D)/gramlib.cmxa $(OBJS:.cmo=.cmx) $(LIBUNIX) -o gwb2ged.opt
+	$(OCAMLOPT) unix.cmxa $(CAMLP4D)/gramlib.cmxa $(OBJS:.cmo=.cmx) $(LIBUNIX) -o gwb2ged.opt
 
 depend:
 	../tools/camlp4_depend.sh $(OCAMLI) *.ml* > .depend

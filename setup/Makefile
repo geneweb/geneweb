@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.5 1999-05-04 14:54:53 ddr Exp $
+# $Id: Makefile,v 1.6 1999-05-08 21:26:14 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -10,7 +10,10 @@ all:: setup.out gwd.out
 	cp setup.out setup
 	cp gwd.out gwd
 
-opt:: all
+opt:: setup.opt gwd.opt
+	$(RM) setup gwd
+	cp setup.opt setup
+	cp gwd.opt gwd
 
 clean::
 	$(RM) setup gwd
@@ -33,11 +36,18 @@ test:
 	cd test/gw; ln -s ../../../ged2gwb/ged2gwb .
 	cd test/gw; ln -s ../../../gwb2ged/gwb2ged .
 	cd test/gw; ln -s ../../../etc/INSTALL.htm .
+
 setup.out: $(OBJS)
 	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(OBJS) -o setup.out
 
 gwd.out: gwd.cmo
 	$(OCAMLC) -custom unix.cma $(LIBUNIX) gwd.cmo -o gwd.out
+
+setup.opt: $(OBJS:.cmo=.cmx)
+	$(OCAMLOPT) unix.cmxa $(LIBUNIX) $(OBJS:.cmo=.cmx) -o setup.opt
+
+gwd.opt: gwd.cmx
+	$(OCAMLOPT) unix.cmxa $(LIBUNIX) gwd.cmx -o gwd.opt
 
 depend:
 	../tools/camlp4_depend.sh $(OCAMLI) *.ml* > .depend

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.20 1999-05-07 20:00:14 ddr Exp $ *)
+(* $Id: setup.ml,v 1.21 1999-05-08 21:26:15 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -1091,11 +1091,11 @@ value string_of_sockaddr =
 ;
 
 value setup (addr, req) str =
-(*
+(**)
   do Printf.eprintf "request from %s\n" (string_of_sockaddr addr);
      flush stderr;
   return
-*)
+(**)
   let (comm, env_str) =
     try
       let i = String.index str '?' in
