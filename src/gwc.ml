@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.7 2000-05-14 19:59:34 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.8 2000-06-05 22:40:16 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -649,6 +649,7 @@ value link gwo_list =
      g_base = empty_base;
      g_def = [| |]; g_shift = 0; g_errored = False}
   in
+  let _ = unique_string gen "" in
   do List.iter (insert_comp_families gen) gwo_list; return
   let base = linked_base gen in
   do if do_check.val && gen.g_pcnt > 0 then
