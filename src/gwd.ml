@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.76 2001-02-20 22:26:42 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.77 2001-02-23 20:03:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -16,6 +16,7 @@ value wizard_just_friend = ref False;
 value only_address = ref "";
 value cgi = ref False;
 value default_lang = ref "fr";
+value images_dir = ref "";
 value log_file = ref "";
 value log_flags =
   [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
@@ -1285,10 +1286,6 @@ value slashify s =
   return s1
 ;
 
-value set_image_url_from_dir x =
-  Util.images_url.val := "file://" ^ slashify (Sys.getcwd ()) ^ "/" ^ x
-;
-
 value available_languages =
   ["cn"; "cs"; "de"; "dk"; "en"; "es"; "eo"; "fr"; "he"; "it"; "nl"; "no";
    "pt"; "se"]
@@ -1331,7 +1328,7 @@ value main () =
      ("-images_url", Arg.String (fun x -> Util.images_url.val := x),
       "<url>
        URL for GeneWeb images (default: gwd send them)");
-     ("-images_dir", Arg.String set_image_url_from_dir,
+     ("-images_dir", Arg.String (fun x -> images_dir.val := x),
       "<dir>
        Same than previous but directory name relative to current");
      ("-a", Arg.String (fun x -> selected_addr.val := Some x),
@@ -1414,6 +1411,19 @@ value main () =
      arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg")
        speclist anonfun usage;
      Argl.parse speclist anonfun usage;
+     if images_dir.val <> "" then
+       let abs_dir =
+         let abs_path =
+           if Filename.is_relative images_dir.val then
+             if Filename.is_relative Util.lang_dir.val then
+               [(Sys.getcwd ()); Util.lang_dir.val]
+             else [Util.lang_dir.val]
+           else []
+         in
+         List.fold_right Filename.concat abs_path images_dir.val
+       in
+       Util.images_url.val := "file://" ^ slashify abs_dir
+     else ();
      if Util.doc_dir.val = "" then
        Util.doc_dir.val := Filename.concat Util.lang_dir.val "doc"
      else ();
