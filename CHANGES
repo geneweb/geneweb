@@ -2,6 +2,8 @@ GeneWeb Intermediate version 2.02-1
 -----------------------------------
 
 * Setup program
+  - [May 10, 99] Added ability to put relationship date for non married
+    persons.
   - [May 9, 99] Added predefined palette combination in "data base parameters";
     changed presentation of all page.
   - [May 9, 99] Added system to forbid non local accesses.

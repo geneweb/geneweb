@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.8 1999-04-30 08:53:07 ddr Exp $ *)
+(* $Id: descend.ml,v 2.9 1999-05-10 15:45:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -169,17 +169,17 @@ value print_marriage_text conf base fam =
 value afficher_marie conf base first fam p spouse =
   let is = index_of_sex p.sex in
   let auth = age_autorise conf base p && age_autorise conf base spouse in
-  do if fam.not_married && auth then
-       Wserver.wprint "%s" (capitale (transl conf "with"))
-     else
-       Wserver.wprint
-         (fcapitale (ftransl_nth conf "married%t to" is))
-         (fun _ ->
-            if auth then
-              do Wserver.wprint "\n";
-                 print_marriage_text conf base fam;
-              return ()
-            else ());
+  do let format =
+       if fam.not_married && auth then ftransl conf "relationship%t to"
+       else ftransl_nth conf "married%t to" is
+     in
+     Wserver.wprint (fcapitale format)
+       (fun _ ->
+          if auth then
+            do Wserver.wprint "\n";
+               print_marriage_text conf base fam;
+            return ()
+          else ());
      stag "strong" begin
        afficher_personne_referencee conf base spouse;
      end;
@@ -263,14 +263,8 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
              do if connais base conj then
                   do afficher_marie conf base first fam p conj;
                      if Array.length enfants <> 0 then
-                       let auth =
-                         age_autorise conf base p &&
-                         age_autorise conf base conj
-                       in
-                       if fam.not_married && auth then Wserver.wprint ":"
-                       else
-                         Wserver.wprint ", <em>%s</em>"
-                           (transl conf "having as children")
+                       Wserver.wprint ", <em>%s</em>"
+                         (transl conf "having as children")
                      else Wserver.wprint ".";
                      html_br conf;
                   return ()

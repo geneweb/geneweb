@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.15 1999-05-04 14:54:59 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.16 1999-05-10 15:45:57 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -437,25 +437,21 @@ value print_marriage_long conf base all_gp auth marr_nb p ifam =
   let divorce = fam.divorce in
   let is = index_of_sex p.sex in
   let auth = auth && age_autorise conf base spouse in
-  do if fam.not_married && auth then
-       do Wserver.wprint "%s" (capitale (transl conf "with"));
-          match marr_nb with
-          [ Some n -> Wserver.wprint " (%d)" n
-          | None -> () ];
-       return ()
-     else
-       Wserver.wprint
-         (fcapitale (ftransl_nth conf "married%t to" is))
-         (fun _ ->
-            do match marr_nb with
-               [ Some n -> Wserver.wprint " (%d)" n
-               | None -> () ];
-               if auth then
-                 do Wserver.wprint "\n";
-                    Perso.print_marriage_text conf base False fam;
-                 return ()
-               else ();
-            return ());
+  do let format =
+       if fam.not_married && auth then ftransl conf "relationship%t to"
+       else ftransl_nth conf "married%t to" is
+     in
+     Wserver.wprint (fcapitale format)
+       (fun _ ->
+          do match marr_nb with
+             [ Some n -> Wserver.wprint " (%d)" n
+             | None -> () ];
+             if auth then
+               do Wserver.wprint "\n";
+                  Perso.print_marriage_text conf base False fam;
+               return ()
+             else ();
+          return ());
      Wserver.wprint "\n";
      stag "strong" begin
        Wserver.wprint "%s"
@@ -594,17 +590,18 @@ value print_generation_person_long conf base all_gp last_generation gp =
                  age_autorise conf base (poi base cpl.mother)
                in
                do Wserver.wprint "... ";
-                  if fam.not_married && auth then
-                    Wserver.wprint "%s" (transl conf "with")
-                  else
-                    Wserver.wprint
-                      (ftransl_nth conf "married%t to" 0)
-                      (fun _ ->
-                         if auth then
-                           do Wserver.wprint "\n";
-                              Perso.print_marriage_text conf base False fam;
-                           return ()
-                         else ());
+                  let format =
+                    if fam.not_married && auth then
+                      ftransl conf "relationship%t to"
+                    else ftransl_nth conf "married%t to" 0
+                  in
+                  Wserver.wprint format
+                    (fun _ ->
+                       if auth then
+                         do Wserver.wprint "\n";
+                            Perso.print_marriage_text conf base False fam;
+                         return ()
+                       else ());
                   Wserver.wprint "...\n<p>\n";
                return ()
              else ()
