@@ -1,4 +1,4 @@
-(* $Id: gwdiff.ml,v 1.2 2001-05-14 18:24:08 ddr Exp $ *)
+(* $Id: gwdiff.ml,v 1.3 2001-12-27 14:38:10 ddr Exp $ *)
 (* Copyright (c) 2001 Ludovic LEDIEU *)
 
 open Def;
@@ -596,7 +596,7 @@ value check_args () =
     Argl.parse speclist anonfun errmsg;
     if in_file1.val = "" then
       do {
-        Printf.printf "Missing reference data base\n";
+        Printf.printf "Missing reference database\n";
         Printf.printf "Use option -help for usage\n";
         flush stdout;
         exit 2
@@ -604,7 +604,7 @@ value check_args () =
     else ();
     if in_file2.val = "" then
       do {
-        Printf.printf "Missing destination data base\n";
+        Printf.printf "Missing destination database\n";
         Printf.printf "Use option -help for usage\n";
         flush stdout;
         exit 2

@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.13 2001-11-27 12:11:38 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.14 2001-12-27 14:38:10 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -659,7 +659,7 @@ value send_gedcom_file str env b tok f fname =
     printf "New database created.\n";
     flush stdout;
     copy_temp b;
-    printf "Data base \"%s\" updated.\n" b;
+    printf "Database \"%s\" updated.\n" b;
     printf "<a href=\"%s?m=LOG;b=%s;t=%s\">Command output</a>\n"
       (cgi_script_name ()) b tok;
     flush stdout;
@@ -744,11 +744,11 @@ value send_file str env b tok f fname =
           printf "\nTemporary database created.\n";
           flush stdout;
           copy_temp b;
-          printf "Data base \"%s\" updated.\n" b;
+          printf "Database \"%s\" updated.\n" b;
         }
     | Refuse ->
         do {
-          printf "Data base is already being transfered.<br>\n";
+          printf "Database is already being transfered.<br>\n";
           printf "Please try again later.\n";
         } ];
     flush stdout;
@@ -1006,7 +1006,7 @@ value gwtp_login str env =
 <h1>Gwtp</h1>
 <form method=POST action=%s>
 <input type=hidden name=m value=LOGIN>
-Data base: <input name=b><br>
+Database: <input name=b><br>
 Password: <input name=p type=password><br>
 <input type=submit value=Login>
 </form>
