@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.16 2000-06-21 23:28:54 ddr Exp $ *)
+(* $Id: date.ml,v 3.17 2000-09-01 07:02:38 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -262,7 +262,7 @@ value year_text d =
   let s =
     match d.prec with
     [ Before -> "/"
-    | About | Maybe | OrYear _ | YearInt _ -> "ca "
+    | About | Maybe -> "ca "
     | _ -> "" ]
   in
   let s = s ^ string_of_int (annee d) in
