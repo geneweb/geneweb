@@ -1,6 +1,6 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: recv.txt,v 1.1 2002-01-30 13:59:19 ddr Exp $ -->
+  <!-- $Id: recv.txt,v 1.2 2002-06-18 07:13:05 ddr Exp $ -->
   <title>Gwtp - download %b</title>
 </head>
 <body>
@@ -8,7 +8,8 @@
 
 <div align=right>
 <a href="%s?m=DNL;b=%b;t=%t;lang=en">English</a> /
-<a href="%s?m=DNL;b=%b;t=%t;lang=fr">Français</a>
+<a href="%s?m=DNL;b=%b;t=%t;lang=fr">Français</a> /
+<a href="%s?m=DNL;b=%b;t=%t;lang=it">Italiano</a>
 </div><p>
 
 [
@@ -18,4 +19,8 @@ en: First, on your computer, create a directory named <em>%b.gwb</em>, or
 fr: D'abord, dans votre ordinateur, créez un répertoire nommé <em>%b.gwb</em>,
     ou de n'importe quel autre nom se terminant par <em>.gwb</em>. Puis
     téléchargez tous ces fichiers dedans en conservant leur nom.
+it: Create innanzitutto sul vostro computer una directory chiamata
+    <em>%b.gwb</em>, oppure un qualsiasi altro nome che termini con
+    <em>.gwb</em>. In seguito, scaricatevi dentro tutti i files conservando
+    il loro nome.
 ]

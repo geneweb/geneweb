@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.98 2002-06-04 11:45:54 ddr Exp $
+# $Id: lexicon.txt,v 4.99 2002-06-18 07:13:06 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -65,7 +65,7 @@ fi: af=afrikaans/ca=katalaani/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=espera
 fr: af=afrikaans/ca=catalan/cs=tch&egrave;que/da=danois/de=allemand/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finnois/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pl=polonais/pt=portugais/pt-br=portugais-du-Br&eacute;sil/ru=russe/sl=slov&egrave;ne/sv=su&eacute;dois/zh=chinois
 he: af=àôøé÷àğñ /cs=ö'ëéú /da=ãğéú /de=âøîğéú /en=àğâìéú /eo=àñôøğèå /es=ñôøãéú /fi=ôéğéú /fr=öøôúéú /he=òáøéú /is=àéñìğãéú /it=àéèì÷éú /lv=ìèååéú /no=ğåøáâéú /pt=ôåøèåâæéú /ru=øåñéú /sv=ùååãéú/zh=ñéğéú 
 is: af=afrikanska/cs=tékkneska/da=danska/de=şıska/en=enska/eo=esperanto/es=spænska/fi=finnska/fr=franska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/nl=hollenska/no=norska/pt=portúgalska/pt-br=Brasil-portúgalska/ru=rússneska/sv=sænska/zh=kínverska
-it: af=africano/cs=ceco/da=danese/de=tedesco/en=inglese/eo=esperanto/es=spagnolo/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pl=polonese/pt=portoghese/pt-br=portoghese-brasiliano/ru=russo/sl=sloveno/sv=svedese/zh=cinese
+it: af=afrikaans/cs=ceco/da=danese/de=tedesco/en=inglese/eo=esperanto/es=spagnolo/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pl=polacco/pt=portoghese/pt-br=portoghese-brasiliano/ru=russo/sl=sloveno/sv=svedese/zh=cinese
 lv: cs=Èehu/da=Dâòu/de=Vâcu/en=Angïu/eo=Esperanto/es=Spâòu/fi=Somu/fr=Franèu/he=Ebreju/is=Islandieğû/it=Itâïu/lv=Latvieğu/nl=Holandieğu/no=Norvçìu/pt=Portugâïu/pt-br=Brasil-Portugâïu/ru=Krievu/sv=Zviedru/zh=Íînieğu
 nl: af=Afrikaans/cs=Tsjechisch/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/fi=Fins/fr=Frans/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/nl=Nederlands/no=Noors/pt=Portugees/pt-br=Brasil-Portugees/ru=Russisch/sv=Zweeds/zh=Chinees
 no: af=afrikaans/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/pt-br=Brasil-portugisisk/ru=russisk/sv=svensk/zh=kinesisk
@@ -1191,7 +1191,7 @@ fi: noin
 fr: vers
 he:   áòøê
 is: um
-it: intorno
+it: circa
 lv: ap
 nl: circa
 no: ca
@@ -2696,7 +2696,7 @@ fi: kuolema
 fr: d&eacute;c&egrave;s
 he:   îååú
 is: látin(n)
-it: morto
+it: morte
 lv: nâve
 nl: overlijden
 no: d&oslash;d
@@ -3220,7 +3220,7 @@ fi: perhe/perheet
 fr: famille/familles
 he:   îùôçä/ îùôçåú
 is: fjölskyldu/fjölskyldum
-it: famiglia/famiglia
+it: famiglia/famiglie
 lv: ìimeni/ìimenes
 nl: gezin/gezinnen
 no: familie/familier
@@ -3613,7 +3613,7 @@ fi: gregoriaaninen/juliaaninen/Ranskan vallankumouksen/heprealainen
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
 he:  âøâåøé/ éåìéàğé/ öøôúé/ òáøé
 is: gregorísk/julian/franskt/hebreskt
-it: gregorian/julian/francese/ebraico
+it: gregoriano/giuliano/francese/ebraico
 lv: gregoriâòu/jûlija/franèu/senebreju
 nl: gregoriaans/juliaans/Frans/Hebreeuws
 no: gregoriansk/juliansk/fransk rep./j&oslash;disk
@@ -3734,7 +3734,7 @@ fi: p&auml;ivityshistoria
 fr: historique des mises-&agrave;-jour
 he:  øùéîú äòãëåğéí
 is: uppfærslusaga
-it: storia degli aggiornamenti
+it: riassunto degli aggiornamenti
 lv: labojumu vçsture
 nl: lijst van wijzigingen
 no: oppdateringshistorie
@@ -3903,7 +3903,7 @@ fi: kuva
 fr: image/images
 he:  úîåğä
 is: mynd
-it: immagine
+it: immagine/immagini
 lv: attçli
 nl: beeld
 no: bilde
@@ -4365,7 +4365,7 @@ fi: juliaaninen p&auml;iv&auml;
 fr: jour julien
 he:  éåí éåìéàğé
 is: julian dagur
-it: giorno julian
+it: giorno giuliano
 lv: pçc Jûlija kalendâra
 nl: juliaanse dag
 no: juliansk dag
@@ -4749,7 +4749,7 @@ fi: korkeintaan
 fr: maximum
 he:  î÷ñéîåí
 is: hámark
-it: maximum
+it: massimo
 lv: maksimums
 nl: maximaal
 no: maksimalt
@@ -5400,7 +5400,7 @@ fi: sukuhaarojen m&auml;&auml;r&auml;
 fr: nombre de branches
 he:  îñôø òğôéí
 is: fjöldi greina
-it: numero di ramo
+it: numero di rami
 lv: zaru skaits
 nl: aantal takken
 no: antall slektsgrener
@@ -6902,7 +6902,7 @@ fi: %d pisimpään elänyttä
 fr: les %d ayant v&eacute;cu le plus longtemps
 he:  ä %d áàøéëåú éîéí
 is: %d sem lifği lengst
-it: %d avendo visuto più a lungo
+it: %d avendo vissuto più a lungo
 lv: %d, kuri dzîvojuği visilgâk
 nl: de %d langst levende personen
 no: de %d som har levd lengst
@@ -7310,7 +7310,7 @@ fi: viimeiset %d kuolemantapausta
 fr: les %d derniers d&eacute;c&egrave;s
 he:  %d äîúéí äàçøåğéí
 is: síğustu %d andlát
-it: le ultime %d mortio
+it: le ultime %d morti
 lv: pçdçjie %d miruğie
 nl: de %d recentste overlijdens
 no: de siste %d d&oslash;de
@@ -7788,7 +7788,7 @@ fi: tuntematon henkil&ouml
 fr: personne inconnue
 he:  àãí ìà éãåò
 is: óşekktur einstaklingur
-it: sconosciuta persona sconosciuta
+it: persona sconosciuta
 lv: nezinâma persona
 nl: onbekend persoon
 no: ukjent person
@@ -7836,7 +7836,7 @@ fi: saakka
 fr: jusqu'&agrave;
 he:  òã
 is: upp ağ
-it: fino
+it: fino a
 lv: lîdz
 nl: tot
 no: opp til
@@ -7905,7 +7905,7 @@ et: kasutaja/parool/t&uuml;hista
 fi: käyttajä/salasana/peruuta
 fr: utilisateur/mot de passe/annuler
 he:  îùúîù / ñéñîä / áéèåì
-it: utente/password/cancellare
+it:utilizzatore/password/annullare
 lv: lietotâjs/parole/atcelt
 nl: gebruiker/wachtwoord/annuleren
 no: bruker/passord/avbryt
@@ -7999,7 +7999,7 @@ fi: todistaja/todistajat
 fr: t&eacute;moin/t&eacute;moins
 he:  àã/ àãéí
 is: vitni/vitni
-it: testimone/testimone
+it: testimone/testimoni
 lv: liecinieks:a:-u/liecinieki
 nl: getuige/getuigen
 no: forlover/forlovere
