@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Parametrar för "gwd"</title></head>
+
+<body>
+
+<h1>Parametrar för "gwd"</h1>
+
+<form mode=GET action="gwd_1">
+<input type=hidden name=lang value=$l>
+
+<p>
+
+Här är parametrarna för kommandot "gwd". Ändra dem som du anser
+behövs:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-lang</strong></td>
+<td>Förvalt språk.
+<p>
+Alla sidor för databasen visas i detta språk.
+Välj det språk du föredrar.
+<p>
+För en given databas, kan du ändå ändra detta val genom att
+konfigurera de specifika parametrarna för denna databas. Och på
+välkomstsidan för databasen, kan du också byta språk genom att
+klicka på en flagga. Detta val är därför som ett "förvalt förvalt"
+språk.
+<p>
+<p>
+Om "-" är valt, är det franska.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<select name=default_lang>
+<option value=$L{}>-
+<option value=$L{cn}>kinesiska
+<option value=$L{cs}>tjeckiska
+<option value=$L{dk}>danska
+<option value=$L{nl}>holländska
+<option value=$L{en}>engelska
+<option value=$L{eo}>esperanto
+<option value=$L{fr}>franska
+<option value=$L{de}>tyska
+<option value=$L{he}>hebreiska
+<option value=$L{it}>italienska
+<option value=$L{no}>norska
+<option value=$L{pt}>portugisiska
+<option value=$L{es}>spanska
+<option value=$L{se}>svenska
+</select>
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-only</strong></td>
+<td>
+Endast behöriga adresser.
+<p>
+Endast åtkomster från denna internet adress accepteras.
+<p>
+För att veta vilket värde du ska skriva in för din dator, titta på utskriften för
+kommandot "gwd" vilka visas varje gång du navigerar i din
+database. Du ska skriva in det som står efter "From:".
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=only value="$O" size=40>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-log</strong></td>
+<td>
+Åtkomst loggfil.
+<p>
+Åtkomst utskriften visas i "gwd" fönstret. Varje gång
+du navigerar, eller någon gör en åtkomst till din databas, visas
+4 eller 5 rader.
+<p>
+Om du istället vill att utskriften går till en fil, skriv namnet
+för filen här. Filen kommer att skapas, om den inte finns, i
+huvudkatalogen för <em>GeneWeb</em> där du ser kommandona "setup" och
+"gwd". Den kommer att utökas för varje åtkomst.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=log value="$T" size=40>
+</tr>
+</table></dl>
+
+<dl><dt><dd>Det finns andra parametrar för kommandot "gwd", men
+de kan inte konfigureras här ifrån, därför att de kan hindra
+operationen av "gwsetup".</dl>
+
+<dl><dt><dd>Faktiskt, navigation med "gwsetup" är huvudsakligen
+för att göra användandet av <em>GeneWeb</em> enklare, men det tillåter
+inte att utnyttja alla möjligheter. För att finna de andra
+parametrarna och deras användning, måste du vara lite av en "datahacker":
+en del av informationen kan hittas i dokumentationen.</dl>
+
+<p>
+
+Tryck sedan på denna knapp:
+
+<p>
+
+<input type=submit value="Konfigurera">
+
+</form>

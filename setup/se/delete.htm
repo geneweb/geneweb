@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Radera</title></head>
+
+<body>
+
+<h1>Radering av databaser</h1>
+
+<form mode=GET action="delete">
+<input type=hidden name=lang value=$l>
+
+Välj den databas eller de databaser du vill radera, genom att klicka på
+motsvarande knappar.
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+<td><input type=checkbox name="$a" value=on></td>
+</tr>|
+<tr><td>- det finns ingen databas för tillfället</tr></td>}
+</table></dl>
+
+<p>
+
+Tryck sedan på denna knapp:
+
+<p>
+
+<input type=submit value="Radera">
+
+</form>

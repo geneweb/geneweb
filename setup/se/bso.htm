@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Skapa en databas</title></head>
+
+<body>
+
+<h1>Skapa en databas</h1>
+
+$v{Varning: det existerar redan en databas med namnet "$o" i din
+<a href="setup?lang=$l;v=list.htm">katalog</a>. Om du trycker på knappen
+"Ok" nedan, kommer den att bli raderad.<p>
+
+Om du precis gjorde detta, har databasen blivit raderad nu.
+Annars, återvänd till föregående sida och välj ett annat
+namn för din databas.<p>}
+
+Vi ska nu skapa en databas benämnd "$o". Obs: denna operation
+kan gå blixtsnabbt eller ta tiotalet sekunder eller
+flera minuter, beroende på fallet. Ha tålamod.
+
+<p>
+
+Tryck på knappen nedan för att skapa din databas$v{ och radera den föregående
+databasen "$o" från målkatalogen}:
+
+<p>
+
+<form mode=GET action="$d">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+Denna operation motsvarar de följande kommandona:
+
+<pre>
+     $$ cd $w
+     $$ $c$p &gt; comm.log
+</pre>
+
+Detta skapar en katalog benämnd "$o.gwb".

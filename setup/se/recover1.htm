@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Återskapa en databas - fas 2</title></head>
+
+<body>
+
+<h1>Återskapa en databas</h1>
+
+Katalog
+
+<pre>
+  $a
+</pre>
+
+Välj den databas du vill återskapa:
+
+<p>
+
+<form mode=GET action="recover_1">
+<input type=hidden name=lang value=$l>
+<input type=hidden name=anon value="$a">
+
+<dl><dt><dd><table border=1>
+
+$y{<tr><td><input type=radio name=i value="$a"></td><td> $a </td></tr>|
+<tr><td>- det finns inga databaser i denna katalog</tr></td>}
+
+</table></dl>
+
+<p>
+
+Skriv in namnet du vill kalla din databas. Skriver du ingenting kommer
+den att heta samma i den nya katalogen.
+
+<p>
+
+<dl><dt><dd><input name=o size=30></dl>
+
+<p>
+
+Du kan välja en option:
+
+<p>
+
+<dl><dt><dd><table border=1>
+
+<tr><td><input type=checkbox name=ged value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Gå genom en GEDCOM-fil. Det är inte rekommenderat, men om det
+inte fungerar med den normala proceduren, försök med detta.</td></tr>
+
+</table></dl>
+
+<p>
+
+Tryck sedan på denna knapp:
+
+<p>
+
+<input type=submit value="Återskapa">
+</form>

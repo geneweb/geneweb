@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>Importera en GEDCOM-fil</title></head>
+
+<body>
+
+<h1>Importera en GEDCOM-fil</h1>
+
+<form mode=GET action="ged2gwb">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Skriv:
+
+<p>
+
+<ul><li>Det kompletta namnet på din GEDCOM-fil.
+
+<p>
+
+<input name=anon $n{type=file} size=55>
+
+</ul>
+
+<p>
+
+<ul><li>Namnet du vill kalla din <em>GeneWeb</em> databas.
+Om namnet utelämnas, kommer det att bli härlätt från GEDCOM-filens namn.
+
+<p>
+
+<input name=o size=30>
+
+</ul>
+
+<p>
+
+Välj de optioner du vill ha:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=lf value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Forcera gemena förnamn, bara deras initialer behålls som versaler.
+</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=ls value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Forcera gemena efternamn, bara deras initialer behålls som versaler.
+</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>När man skapar en person, om förnamnen i
+GEDCOM-filen innehåller flera namn separerade med mellanslag, kan
+du be att den första av dessa blir en persons "förnamn" och
+GEDCOM-filens kompletta förnamnsdel blir ett "förnnamns alias".</td>
+
+<tr>
+<td><input type=checkbox name=efn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Sätt denna option.</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Denna option är förvald: när man skapar en person,
+om GEDCOM-filens förnamnsdel ser ut som ett publikt namn, dvs innehåller:
+<ul>
+<li>Ett nummer eller ett romersktnummer, förmodas det vara ett nummer
+för en adels- eller kungligtitel (tex Gustaf V)
+<li>Ett av dessa ord: "der", "die", "el", "le", "la", "the",
+förmodas vara en bestämmning till (tex William the Conqueror)
+</ul>
+då blir GEDCOM-filens förnamnsdel personens "publika namn"
+och första ordet dess "förnamn".
+<tr>
+<td><input type=checkbox name=no_epn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Välj bort denna option.</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><input type=checkbox name=tnd value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Sätt negativt datum när datumen är motsägande varandra (tex födelse efter död).</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><input type=checkbox name=no_nd value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Inga negativa datum: tolka inte ett år med minus tecken framför som
+ett negativt år.</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>En del GEDCOM-filer innehåller ibland datum med
+numrerade månader (från 1 till 12). GEDCOM-standard 5.5 kräver att
+månaderna ska skrivas med identifierare (tex "MAY 1912" och inte
+"05/1912"). Notationen "02/05/1912" är tvetydig (den kan antingen betyda
+"May 2, 1912" eller "February 5, 1912" beroende på land).</td></tr>
+
+<tr>
+<td><input type=radio name=dates value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>För dessa datum, extrahera endast "år" delen.</td>
+</tr>
+
+<tr>
+<td><input type=radio name=dates value="_dm">&nbsp;&nbsp;&nbsp;</td>
+<td>Tolka dessa datum som "dag/månad/år".</td>
+</tr>
+
+<tr>
+<td><input type=radio name=dates value="_md">&nbsp;&nbsp;&nbsp;</td>
+<td>Tolka dessa datum som "månad/dag/år".</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Hur de accentuerade tecknen är kodade är normalt
+specifierat i GEDCOM-huvudet.</td></tr>
+
+<tr><td>
+<input type=radio name=charset value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>Följ GEDCOM-huvudets information.</td>
+</tr>
+
+<tr><td><input type=radio name=charset value=ANSEL>&nbsp;&nbsp;&nbsp;</td>
+<td>De accentuerade tecknen är ANSEL kodade.</td></tr>
+
+<tr><td><input type=radio name=charset value=ASCII>&nbsp;&nbsp;&nbsp;</td>
+<td>De accentuerade tecknen är ASCII kodade.</td></tr>
+
+<tr><td><input type=radio name=charset value=MSDOS>&nbsp;&nbsp;&nbsp;</td>
+<td>De accentuerade tecknen är MSDOS kodade.</td></tr>
+</table></dl>
+
+<p>
+
+Klicka sedan på "Ok".
+
+<p>
+
+<dl><dt><dd><input type=submit value="Ok"></dl>
+
+</form>

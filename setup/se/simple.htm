@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Enkel metod</title></head>
+
+<body>
+
+<h1>Enkel metod</h1>
+
+<form mode=GET action="simple">
+<input type=hidden name=lang value=$l>
+
+Om du vill starta från en GEDCOM-fil, skriv dess filnamn
+här. Lämna annars raden tom.
+
+<p>
+
+<input name=anon $n{type=file} size=55>
+
+<p>
+
+Skriv in namnet du vill kalla din databas:
+
+<p>
+
+<input name=o size=30 value="dbas">
+
+<p>
+
+Tryck sedan på knappen:
+
+<p>
+
+<input type=submit value="Skapa">
+</form>

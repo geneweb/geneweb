@@ -1,0 +1,16 @@
+
+Välkommen till GeneWeb $q
+
+Starta din webbläsare och öppna adressen:
+       http://localhost:$z/
+
+Om det inte fungerar, kanske du måste ställa in din webbläsare
+med optioner som "work off-line" eller "do not use the proxy for local
+addresses" eller "do not connect to Internet for the address
+'localhost'".
+
+Om det ändå inte fungerar fast du försökt på olika sätt, försök med det
+klassiska att titta på dokumentationen. För att göra det, stoppa detta
+program genom att trycka "control-c" i detta fönster, gå till katalogen
+"gw" och öppna filen:
+   INSTALL.htm

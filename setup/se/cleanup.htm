@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Upprensning</title></head>
+
+<body>
+
+<h1>Upprensning av en databas</h1>
+
+Om du har gjort många modifieringar i din databas, eller om du helt
+enkelt har skrivit in mycket data, är det rekommenderat att du gör en
+upprensning, speciellt om du ser att åtkomsten till din databas
+går saktare.
+
+<p>
+
+För en enkel upprensning, använd <a
+href="setup?lang=$l;v=consang.htm">beräkning</a> av
+blodsband.
+
+<p>
+
+<form mode=GET action="cleanup">
+<input type=hidden name=lang value=$l>
+
+För en radikal upprensning, välj din databas genom att klicka på
+motsvarande knapp:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr>
+<td><input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+</tr>|
+<tr><td>- det finns ingen databas för tillfället</tr></td>}
+</table></dl>
+
+<p>
+
+Tryck sedan på denna knapp:
+
+<p>
+
+<input type=submit value="Rensa upp">
+
+</form>

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.47 1999-09-06 08:10:56 ddr Exp $ *)
+(* $Id: setup.ml,v 1.48 1999-09-09 07:34:32 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -1279,7 +1279,7 @@ value gwd_available_languages =
   ["cn"; "cs"; "de"; "dk"; "en"; "es"; "eo"; "fr"; "he"; "it"; "nl"; "no";
    "pt"; "se"]
 ;
-value setup_available_languages = ["en"; "es"; "fr"];
+value setup_available_languages = ["en"; "es"; "fr"; "se"];
 
 value intro () =
   let (default_gwd_lang, default_setup_lang) =

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Återskapa en databas - fas 3</title></head>
+
+<body>
+
+<h1>Återskapa en databas</h1>
+
+$v{Varning: det finns redan en databas benämnd "$o" i
+<a href="setup?lang=$l;v=list.htm">målkatalogen</a>. Om du
+trycker på knappen nedan kommer den att raderas.
+Om du inte vill det, gå tillbaka och välj ett annat namn för din databas.<p>}
+
+Startkatalog och databas:
+
+<pre>
+  $a
+  $i
+</pre>
+
+Målkatalog och databas:
+
+<pre>
+  $w
+  $o
+</pre>
+
+<p>
+
+Varning: operationen kan ta flera sekunder eller minuter, beroende på fall.
+Ha tålamod.
+
+<p>
+
+Tryck på knappen nedan för att starta operationen$v{ och radera databasen
+"$o" i målkatalogen}.
+
+<p>
+
+<form mode=GET action="recover_2">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+Denna operation motsvarar de följande kommandona:
+
+<pre>
+     $$ cd $a
+     $$ .$/$U $i $O $w$/$T
+     $$ cd $w
+     $$ .$/$C $T -o $o > comm.log
+</pre>
