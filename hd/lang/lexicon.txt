@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.125 1999-09-22 09:26:57 ddr Exp $
+# $Id: lexicon.txt,v 2.126 1999-09-22 09:30:18 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -4391,7 +4391,7 @@ se: med
     witness/witnesses
 en: witness/witnesses
 fr: t&eacute;moin/t&eacute;moins
-se; vittne/vittnen
+se: vittne/vittnen
 
     would be his/her own ancestor
 cs: byl by svùj vlastní pøedek
