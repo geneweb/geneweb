@@ -3,35 +3,35 @@
 <tr>
 <td align=center>
 <a href="%glang=cn">
-<img src="%gm=IM;v=/l-cn.jpg" width=36 height=22 alt=cn></a>
+<img src="%km=IM;v=/l-cn.jpg" width=36 height=22 alt=cn></a>
 <a href="%glang=cs">
-<img src="%gm=IM;v=/l-cs.jpg" width=36 height=22 alt=cs></a>
+<img src="%km=IM;v=/l-cs.jpg" width=36 height=22 alt=cs></a>
 <a href="%glang=de">
-<img src="%gm=IM;v=/l-de.jpg" width=36 height=22 alt=de></a>
+<img src="%km=IM;v=/l-de.jpg" width=36 height=22 alt=de></a>
 <a href="%glang=dk">
-<img src="%gm=IM;v=/l-dk.jpg" width=36 height=22 alt=dk></a>
+<img src="%km=IM;v=/l-dk.jpg" width=36 height=22 alt=dk></a>
 <a href="%glang=en">
-<img src="%gm=IM;v=/l-en.jpg" width=36 height=22 alt=en></a>
+<img src="%km=IM;v=/l-en.jpg" width=36 height=22 alt=en></a>
 <a href="%glang=eo">
-<img src="%gm=IM;v=/l-eo.jpg" width=36 height=22 alt=eo></a>
+<img src="%km=IM;v=/l-eo.jpg" width=36 height=22 alt=eo></a>
 <a href="%glang=es">
-<img src="%gm=IM;v=/l-es.jpg" width=36 height=22 alt=es></a>
+<img src="%km=IM;v=/l-es.jpg" width=36 height=22 alt=es></a>
 <a href="%glang=fr">
-<img src="%gm=IM;v=/l-fr.jpg" width=36 height=22 alt=fr></a>
+<img src="%km=IM;v=/l-fr.jpg" width=36 height=22 alt=fr></a>
 <a href="%glang=he">
-<img src="%gm=IM;v=/l-he.jpg" width=36 height=22 alt=he></a>
+<img src="%km=IM;v=/l-he.jpg" width=36 height=22 alt=he></a>
 <a href="%glang=is">
-<img src="%gm=IM;v=/l-is.jpg" width=36 height=22 alt=is></a>
+<img src="%km=IM;v=/l-is.jpg" width=36 height=22 alt=is></a>
 <a href="%glang=it">
-<img src="%gm=IM;v=/l-it.jpg" width=36 height=22 alt=it></a>
+<img src="%km=IM;v=/l-it.jpg" width=36 height=22 alt=it></a>
 <a href="%glang=nl">
-<img src="%gm=IM;v=/l-nl.jpg" width=36 height=22 alt=nl></a>
+<img src="%km=IM;v=/l-nl.jpg" width=36 height=22 alt=nl></a>
 <a href="%glang=no">
-<img src="%gm=IM;v=/l-no.jpg" width=36 height=22 alt=no></a>
+<img src="%km=IM;v=/l-no.jpg" width=36 height=22 alt=no></a>
 <a href="%glang=pt">
-<img src="%gm=IM;v=/l-pt.jpg" width=36 height=22 alt=pt></a>
+<img src="%km=IM;v=/l-pt.jpg" width=36 height=22 alt=pt></a>
 <a href="%glang=se">
-<img src="%gm=IM;v=/l-se.jpg" width=36 height=22 alt=se></a>
+<img src="%km=IM;v=/l-se.jpg" width=36 height=22 alt=se></a>
 </td>
 </tr>
 </table>

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.4 1999-10-30 19:50:25 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.5 1999-10-30 23:05:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -261,6 +261,9 @@ value rec copy_from_channel conf base ic =
             | 'j' when compatibility.val ->
                 if Sys.file_exists (History.file_name conf) then ()
                 else echo.val := False
+            | 'k' ->
+                Wserver.wprint "%s?"
+                  (if conf.cgi then conf.command else "geneweb")
             | 'l' -> Wserver.wprint "%s" conf.lang
             | 'n' ->
                 Num.print (fun x -> Wserver.wprint "%s" x)
