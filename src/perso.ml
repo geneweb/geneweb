@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.19 1999-04-17 14:18:05 ddr Exp $ *)
+(* $Id: perso.ml,v 2.20 1999-04-19 09:41:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -237,15 +237,13 @@ value print_dates conf base in_perso p =
                  Wserver.wprint " (%s)"
                    (transl conf "happy birthday to you!")
                else ();
+               if birth_place <> "" then Wserver.wprint ",\n" else ();
             return ()
         | None ->
             if birth_place <> "" then
-              Wserver.wprint "%s\n" (cap (transl_nth conf "born" is))
+              Wserver.wprint "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
             else () ];
-        if birth_place <> "" then
-          do Wserver.wprint " -&nbsp;";
-             Wserver.wprint "%s" (coa conf birth_place);
-          return ()
+        if birth_place <> "" then Wserver.wprint "%s" (coa conf birth_place)
         else ();
         if in_perso then
           match (Adef.od_of_codate p.birth, birth_place) with
@@ -265,15 +263,15 @@ value print_dates conf base in_perso p =
             do Wserver.wprint "%s "
                  (cap (transl_nth conf "baptized" is));
                Wserver.wprint "%s" (Date.string_of_ondate conf d);
+               if baptism_place <> "" then Wserver.wprint ",\n" else ();
             return ()
         | None ->
             if baptism_place <> "" then
-              Wserver.wprint "%s\n"
+              Wserver.wprint "%s\n-&nbsp;"
                 (cap (transl_nth conf "baptized" is))
             else () ];
         if baptism_place <> "" then
-          do Wserver.wprint " -&nbsp; %s" (coa conf baptism_place);
-          return ()
+          Wserver.wprint "%s" (coa conf baptism_place)
         else ();
         if in_perso then
           match (baptism, baptism_place) with
@@ -303,19 +301,25 @@ value print_dates conf base in_perso p =
             let d = Adef.date_of_cdate d in
             do Wserver.wprint "%s " (cap dr_w);
                Wserver.wprint "%s" (Date.string_of_ondate conf d);
+               if death_place <> "" then Wserver.wprint ",\n" else ();
             return ()
         | DeadYoung ->
-            Wserver.wprint "%s" (cap (transl_nth conf "dead young" is))
+            do Wserver.wprint "%s" (cap (transl_nth conf "dead young" is));
+               if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
+            return ()
         | DeadDontKnowWhen ->
             match (death_place, p.burial) with
             [ ("", Buried _ | Cremated _) -> ()
             | _ ->
                 if not (of_course_died conf p) then
-                  Wserver.wprint "%s" (cap (transl_nth conf "died" is))
+                  do Wserver.wprint "%s" (cap (transl_nth conf "died" is));
+                     if death_place <> "" then Wserver.wprint "\n-&nbsp;"
+                     else ();
+                  return ()
                 else () ]
         | DontKnowIfDead | NotDead -> () ];
         if death_place <> "" then
-          do Wserver.wprint " -&nbsp;%s" (coa conf death_place);
+          do Wserver.wprint "%s" (coa conf death_place);
           return ()
         else ();
         if something && in_perso then
@@ -366,12 +370,13 @@ value print_dates conf base in_perso p =
      let burial_date_place cod =
        let place = sou base p.burial_place in
        do match Adef.od_of_codate cod with
-          [ Some d -> Wserver.wprint " %s" (Date.string_of_ondate conf d)
-          | None -> () ];
-          if place <> "" then
-            do Wserver.wprint " -&nbsp;%s" (coa conf place);
-            return ()
-          else ();
+          [ Some d ->
+              do Wserver.wprint " %s" (Date.string_of_ondate conf d);
+                 if place <> "" then Wserver.wprint ",\n" else ();
+              return ()
+          | None ->
+              if place <> "" then Wserver.wprint " -&nbsp;" else () ];
+          if place <> "" then Wserver.wprint "%s" (coa conf place) else ();
        return ()
      in
      do if something && in_perso then Wserver.wprint "<em>\n" else ();
