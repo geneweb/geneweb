@@ -1,10 +1,11 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.23 2001-02-11 17:00:26 ddr Exp $ *)
+(* $Id: setup.ml,v 3.24 2001-02-20 22:02:36 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
 value setup_dir = "setup";
 value charset = "iso-8859-1";
+value lang_param = ref "";
 
 value buff = ref (String.create 80);
 value store len x =
@@ -1335,7 +1336,9 @@ value daemon = ref False;
 
 value usage = "Usage: " ^ Sys.argv.(0) ^ " [options] where options are:";
 value speclist =
-  [("-daemon", Arg.Set daemon, "Unix daemon mode.");
+  [("-lang", Arg.String (fun x -> lang_param.val := x),
+    "<string> default lang");
+   ("-daemon", Arg.Set daemon, "Unix daemon mode.");
    ("-p", Arg.Int (fun x -> port.val := x),
       "<number>
        Select a port number (default = " ^
@@ -1397,13 +1400,15 @@ value intro () =
            return (default_gwd_lang, default_setup_lang)
          else (default_gwd_lang, default_setup_lang)
        else
-         do copy_text "" "intro.txt"; return
          let (gwd_lang, setup_lang) =
-           let x = String.lowercase (input_line stdin) in
-           if String.length x < 2 then (default_gwd_lang, default_setup_lang)
-           else
-             let x = String.sub x 0 2 in
-             (x, x)
+           if String.length lang_param.val <> 2 then
+             do copy_text "" "intro.txt"; return
+             let x = String.lowercase (input_line stdin) in
+             if String.length x < 2 then (default_gwd_lang, default_setup_lang)
+             else
+               let x = String.sub x 0 2 in
+               (x, x)
+           else (lang_param.val, lang_param.val)
          in
          do copy_text setup_lang (Filename.concat setup_lang "intro.txt");
          return

@@ -2,7 +2,7 @@
 Välkommen till GeneWeb $q
 
 Starta din webbläsare och öppna adressen:
-       http://localhost:$z/
+       http://127.0.0.1:$z/
 
 Varning: för att det här programmet ska fungera, får du inte stänga
 detta fönster!

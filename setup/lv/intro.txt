@@ -2,7 +2,7 @@
 Sveicinaati GeneWeb $q Ghenealoghijas datu baazee
 
 Atveriet Interneta caurluukprogramu un noraadiet sekojoshu adresi:
-       http://localhost:$z/
+       http://127.0.0.1:$z/
 
 Uzmaniibu: lai shii programma darbotos Juus nedriigstat aizveert sho logu!
 
