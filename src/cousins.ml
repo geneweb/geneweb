@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 2.6 1999-04-11 10:13:34 ddr Exp $ *)
+(* $Id: cousins.ml,v 2.7 1999-07-09 18:33:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -37,7 +37,7 @@ value niveau_max_ascendance base ip =
 
 value brother_label conf x =
   match x with
-  [ 1 -> transl conf "specify" ^ " " ^ transl conf "generation"
+  [ 1 -> transl conf "siblings"
   | 2 -> transl conf "cousins"
   | 3 -> transl conf "2nd cousins"
   | 4 -> transl conf "3rd cousins"
@@ -116,16 +116,16 @@ value print_choice conf base p niveau_effectif =
     Wserver.wprint "<input type=hidden name=m value=C>\n";
     Wserver.wprint "<input type=hidden name=i value=%d>\n"
       (Adef.int_of_iper p.cle_index);
-    tag "select" "name=v" begin
+    tag "select" "name=v1" begin
       let rec boucle i =
         if i > niveau_effectif then ()
         else
-          do Wserver.wprint "  <option value=%d%s> %s\n" (i - 1)
-               (if i == 0 then " selected" else "")
+          do Wserver.wprint "  <option value=%d%s> %s\n" i
+               (if i == 2 then " selected" else "")
                (capitale (brother_label conf i));
           return boucle (succ i)
       in
-      boucle 2;
+      boucle 1;
     end;
     html_p conf;
     Wserver.wprint "<input type=submit value=\"Ok\">";
@@ -195,63 +195,70 @@ value sibling_has_desc_lev base lev (ip, _) =
   has_desc_lev base lev (poi base ip)
 ;
 
-value print_cousins_side_of conf base a ini_p ini_br lev =
+value print_cousins_side_of conf base a ini_p ini_br lev1 lev2 =
   let sib = siblings base a in
-  if List.exists (sibling_has_desc_lev base lev) sib then
-    do html_li conf;
-       Wserver.wprint (fcapitale (ftransl conf "of %t's side"))
-         (fun _ -> afficher_personne_titre conf base a);
-       Wserver.wprint ":\n";
+  if List.exists (sibling_has_desc_lev base lev2) sib then
+    do if lev1 > 1 then
+         do html_li conf;
+            Wserver.wprint (fcapitale (ftransl conf "of %t's side"))
+              (fun _ -> afficher_personne_titre conf base a);
+            Wserver.wprint ":\n";
+         return ()
+       else ();
        let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
-       print_descend_upto conf base ini_p ini_br lev sib;
+       print_descend_upto conf base ini_p ini_br lev2 sib;
     return True
   else False
 ;
 
-value print_cousins_lev conf base p lev =
+value print_cousins_lev conf base p lev1 lev2 =
   let first_sosa =
-    loop (Num.one) lev where rec loop sosa lev =
+    loop Num.one lev1 where rec loop sosa lev =
       if lev <= 1 then sosa
       else loop (Num.twice sosa) (lev - 1)
   in
   let last_sosa = Num.twice first_sosa in
-  tag "ul" begin
-    let some =
-      loop first_sosa False where rec loop sosa some =
-        if cnt.val < max_cnt && Num.gt last_sosa sosa then
-          let some =
-            match Util.branch_of_sosa base p.cle_index sosa with
-            [ Some ([(ia, _) :: _] as br) ->
-                print_cousins_side_of conf base (poi base ia) p br lev ||
-                some
-            | _ -> some ]
-          in
-          loop (Num.inc sosa 1) some
-        else some
-    in
-    if some then ()
-    else
-      do html_li conf; return
-      Wserver.wprint "%s\n" (capitale (transl conf "no match"));
-  end
+  do if lev1 > 1 then Wserver.wprint "<ul>\n" else ();
+     let some =
+       loop first_sosa False where rec loop sosa some =
+         if cnt.val < max_cnt && Num.gt last_sosa sosa then
+           let some =
+             match Util.branch_of_sosa base p.cle_index sosa with
+             [ Some ([(ia, _) :: _] as br) ->
+                 print_cousins_side_of conf base (poi base ia) p br lev1 lev2
+                 || some
+             | _ -> some ]
+           in
+           loop (Num.inc sosa 1) some
+         else some
+     in
+     if some then ()
+     else
+       do html_li conf; return
+       Wserver.wprint "%s\n" (capitale (transl conf "no match"));
+     if lev1 > 1 then Wserver.wprint "</ul>\n" else ();
+  return ()
 ;
 
 (* HTML main *)
 
-value print_cousins conf base p lev =
+value print_cousins conf base p lev1 lev2 =
   let title h =
-    do Wserver.wprint "%s " (capitale (brother_label conf lev));
-       let txt =
-         if h then person_text_no_html conf base p
-         else person_text conf base p
-       in
-       Wserver.wprint "%s"
-         (transl_decline conf "of (same or greater generation level)" txt);
-    return ()
+    let txt =
+      if h then person_text_no_html conf base p
+      else person_text conf base p
+    in
+    if lev1 == lev2 then
+      Wserver.wprint "%s %s" (capitale (brother_label conf lev1))
+        (transl_decline conf "of (same or greater generation level)" txt)
+    else
+      Wserver.wprint "%s %d / %s %d"
+        (capitale (transl conf "ancestors")) lev1
+        (capitale (transl conf "descendants")) lev2
   in
   do header conf title;
      cnt.val := 0;
-     print_cousins_lev conf base p lev;
+     print_cousins_lev conf base p lev1 lev2;
      if cnt.val >= max_cnt then Wserver.wprint "etc...\n"
      else if cnt.val > 1 then
        Wserver.wprint "%s: %d %s.\n" (capitale (transl conf "total"))
@@ -279,10 +286,17 @@ value print_menu conf base p effective_level =
 ;
 
 value print conf base p =
-  match p_getint conf.env "v" with
-  [ Some lev -> print_cousins conf base p (min (max 1 lev) max_lev + 1)
+  match p_getint conf.env "v1" with
+  [ Some lev1 ->
+      let lev1 = min (max 1 lev1) 10 in
+      let lev2 =
+        match p_getint conf.env "v2" with
+        [ Some lev2 -> min (max 1 lev2) 10
+        | None -> lev1 ]
+      in
+      print_cousins conf base p lev1 lev2
   | _ ->
       let effective_level = niveau_max_ascendance base p.cle_index + 1 in
-      if effective_level == 2 then print_cousins conf base p 2
+      if effective_level == 2 then print_cousins conf base p 2 2
       else print_menu conf base p effective_level ]
 ;
