@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.25 2001-01-29 15:33:26 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.26 2001-02-10 11:04:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -91,6 +91,7 @@ value reconstitute_family conf =
     match p_getenv conf.env "mrel" with
     [ Some "not_marr" -> NotMarried
     | Some "engaged" -> Engaged
+    | Some "gay" -> Gay
     | _ -> Married ]
   in
   let marriage = Update.reconstitute_date conf "marriage" in
@@ -331,12 +332,15 @@ value effective_mod conf base sfam scpl sdes =
   let nmoth = poi base ncpl.mother in
   let nfath_u = uoi base ncpl.father in
   let nmoth_u = uoi base ncpl.mother in
-  do match nfath.sex with
-     [ Female -> print_err_father_sex conf base nfath
-     | _ -> nfath.sex := Male ];
-     match nmoth.sex with
-     [ Male -> print_err_mother_sex conf base nmoth
-     | _ -> nmoth.sex := Female ];
+  do if sfam.relation <> Gay then
+       do match nfath.sex with
+         [ Female -> print_err_father_sex conf base nfath
+         | _ -> nfath.sex := Male ];
+         match nmoth.sex with
+         [ Male -> print_err_mother_sex conf base nmoth
+         | _ -> nmoth.sex := Female ];
+       return ()
+     else ();
      nfam.origin_file :=
        if sou base ofam.origin_file <> "" then ofam.origin_file
        else infer_origin_file conf base fi ncpl ndes;
@@ -432,20 +436,23 @@ value effective_add conf base sfam scpl sdes =
   let nmoth_p = poi base ncpl.mother in
   let nfath_u = uoi base ncpl.father in
   let nmoth_u = uoi base ncpl.mother in
-  do match nfath_p.sex with
-     [ Female -> print_err_father_sex conf base nfath_p
-     | Male -> ()
-     | _ ->
-         do nfath_p.sex := Male;
-            base.func.patch_person ncpl.father nfath_p;
-         return () ];
-     match nmoth_p.sex with
-     [ Male -> print_err_mother_sex conf base nmoth_p
-     | Female -> ()
-     | _ ->
-         do nmoth_p.sex := Female;
-            base.func.patch_person ncpl.mother nmoth_p;
-         return () ];
+  do if sfam.relation <> Gay then
+       do match nfath_p.sex with
+          [ Female -> print_err_father_sex conf base nfath_p
+          | Male -> ()
+          | _ ->
+              do nfath_p.sex := Male;
+                 base.func.patch_person ncpl.father nfath_p;
+              return () ];
+          match nmoth_p.sex with
+          [ Male -> print_err_mother_sex conf base nmoth_p
+          | Female -> ()
+          | _ ->
+              do nmoth_p.sex := Female;
+                 base.func.patch_person ncpl.mother nmoth_p;
+              return () ];
+       return ()
+     else ();
      nfam.fam_index := fi;
      nfam.origin_file := origin_file;
      base.func.patch_family fi nfam;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.22 2001-01-29 15:33:26 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.23 2001-02-10 11:05:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -379,8 +379,11 @@ value check_conflict conf base sp ipl =
 value check_sex_married conf base sp op =
   if sp.sex <> op.sex then
     let u = uoi base op.cle_index in
-    if Array.length u.family != 0 then print_cannot_change_sex conf base op
-    else ()
+    let all_gay =
+      List.for_all (fun ifam -> (foi base ifam).relation = Gay)
+        (Array.to_list u.family)
+    in
+    if all_gay then () else print_cannot_change_sex conf base op
   else ()
 ;
 
