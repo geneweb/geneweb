@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 4.2 2002-02-17 09:48:52 ddr Exp $ *)
+(* $Id: doc.ml,v 4.3 2002-10-31 14:48:36 ddr Exp $ *)
 
 open Config;
 
@@ -111,7 +111,7 @@ value print conf =
     let fname =
       if Filename.check_suffix fname ".htm" then fname else fname ^ ".htm"
     in
-    let fname = Filename.concat Util.doc_dir.val fname in
+    let fname = Util.search_in_doc_path fname in
     match try Some (open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
         do {

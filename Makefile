@@ -1,5 +1,8 @@
-# $Id: Makefile,v 4.15 2002-09-11 08:24:53 ddr Exp $
+# $Id: Makefile,v 4.16 2002-10-31 14:48:35 ddr Exp $
 
+PREFIX=/usr
+LANGDIR=$(PREFIX)/share/geneweb
+DOCDIR=$(PREFIX)/share/geneweb/doc
 DESTDIR=distribution
 
 include tools/Makefile.inc
@@ -9,7 +12,7 @@ all:: opt
 out::
 	cd wserver; $(MAKE) all
 	cd dag2html; $(MAKE) out
-	cd src; $(MAKE) all
+	cd src; $(MAKE) PREFIX=$(PREFIX) all
 	cd ged2gwb; $(MAKE) all
 	cd gwb2ged; $(MAKE) all
 	cd doc; $(MAKE) all
@@ -19,12 +22,44 @@ out::
 opt::
 	cd wserver; $(MAKE) opt
 	cd dag2html; $(MAKE) opt
-	cd src; $(MAKE) opt
+	cd src; $(MAKE) PREFIX=$(PREFIX) opt
 	cd ged2gwb; $(MAKE) opt
 	cd gwb2ged; $(MAKE) opt
 	cd doc; $(MAKE) opt
 	cd setup; $(MAKE) opt
 	cd gwtp; $(MAKE) opt
+
+install:
+	mkdir -p $(PREFIX)/bin
+	cp src/gwc $(PREFIX)/bin/gwc$(EXE)
+	cp src/consang $(PREFIX)/bin/consang$(EXE)
+	cp src/gwd $(PREFIX)/bin/gwd$(EXE)
+	cp src/gwu $(PREFIX)/bin/gwu$(EXE)
+	cp ged2gwb/ged2gwb $(PREFIX)/bin/ged2gwb$(EXE)
+	cp gwb2ged/gwb2ged $(PREFIX)/bin/gwb2ged$(EXE)
+	mkdir -p $(DOCDIR)
+	cp doc/*.htm $(DOCDIR)/.
+	for i in de en fr it nl sv; do \
+	  mkdir -p $(DOCDIR)/$$i; \
+	  cp doc/$$i/*.htm $(DOCDIR)/$$i/.; \
+	done
+	mkdir -p $(DOCDIR)/images
+	cp doc/images/*.jpg doc/images/gwlogo.gif $(DOCDIR)/images/.
+	mkdir -p $(LANGDIR)/lang
+	cp hd/lang/*.txt $(LANGDIR)/lang/.
+	mkdir -p $(LANGDIR)/images
+	cp hd/images/*.jpg hd/images/*.gif $(LANGDIR)/images/.
+	mkdir -p $(LANGDIR)/etc
+	cp hd/etc/*.txt $(LANGDIR)/etc/.
+
+uninstall:
+	rm -f $(PREFIX)/bin/gwc$(EXE)
+	rm -f $(PREFIX)/bin/consang$(EXE)
+	rm -f $(PREFIX)/bin/gwd$(EXE)
+	rm -f $(PREFIX)/bin/gwu$(EXE)
+	rm -f $(PREFIX)/bin/ged2gwb$(EXE)
+	rm -f $(PREFIX)/bin/gwb2ged$(EXE)
+	rm -rf $(PREFIX)/share/geneweb
 
 distrib: new_distrib wrappers
 

@@ -1,11 +1,12 @@
-# $Id: Makefile,v 4.12 2002-02-14 10:19:39 ddr Exp $
+# $Id: Makefile,v 4.13 2002-10-31 14:48:36 ddr Exp $
 
 include ../tools/Makefile.inc
 
+PREFIX=/usr
 OCAMLI=-I ../wserver -I ../dag2html
 GWC_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo consangAll.cmo calendar.cmo gwcomp.cmo gwc.cmo
 CONSANG_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo consangAll.cmo mk_consang.cmo
-GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo util.cmo calendar.cmo date.cmo history.cmo srcfile.cmo templ.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
+GWD_OBJS1=../wserver/wserver.cmo ../dag2html/dag2html.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo translate.cmo gwlib.cmo util.cmo calendar.cmo date.cmo history.cmo srcfile.cmo templ.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo place.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo dag.cmo relationLink.cmo relation.cmo ascend.cmo descend.cmo birthday.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthDeath.cmo title.cmo notes.cmo doc.cmo forum.cmo image.cmo family.cmo base64.cmo robot.cmo
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo iobase.cmo select.cmo calendar.cmo gwu.cmo
@@ -14,6 +15,9 @@ MOSTDESC_OBJS=adef.cmo name.cmo buff.cmo gutil.cmo iovalue.cmo btree.cmo iobase.
 FPLA_OBJS=argl.cmo adef.cmo name.cmo buff.cmo gutil.cmo btree.cmo iovalue.cmo iobase.cmo fpla.cmo
 
 all:: out
+
+out:: gwlib.ml
+opt:: gwlib.ml
 
 out:: def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out i18n_check.out
 	$(RM) gwc consang gwd gwu
@@ -31,7 +35,14 @@ opt:: def.syn.cmo ansel.cmx gwc.opt consang.opt gwd.opt gwu.opt
 	$(STRIP) gwc consang gwd gwu
 
 clean::
-	$(RM) gwc consang gwd gwu
+	$(RM) gwc consang gwd gwu gwlib.ml
+
+gwlib.ml:
+	echo "value prefix =" > gwlib.ml
+	echo "  try Sys.getenv \"GWPREFIX\" with" >> gwlib.ml
+	echo "  [ Not_found -> \"$(PREFIX)\" ]" | \
+	sed -e 's|\\|/|g' >> gwlib.ml
+	echo ";" >> gwlib.ml
 
 gwc.out: $(GWC_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(GWC_OBJS) $(LIBUNIX) -o gwc.out

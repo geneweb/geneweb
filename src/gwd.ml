@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.49 2002-10-22 13:18:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.50 2002-10-31 14:48:36 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -214,8 +214,7 @@ value input_lexicon lang =
   try
     let ic =
       open_in
-        (List.fold_right Filename.concat [Util.lang_dir.val; "lang"]
-           "lexicon.txt")
+        (Util.search_in_lang_path (Filename.concat "lang" "lexicon.txt"))
     in
     let derived_lang =
       match Gutil.lindex lang '-' with
@@ -269,8 +268,7 @@ value alias_lang lang =
   if String.length lang < 2 then lang
   else
     let fname =
-      List.fold_right Filename.concat [Util.lang_dir.val; "lang"]
-        "alias_lg.txt"
+      Util.search_in_lang_path (Filename.concat "lang" "alias_lg.txt")
     in
     match try Some (open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
@@ -1492,9 +1490,11 @@ value main () =
       " [options] where options are:"
     in
     let speclist =
-      [("-hd", Arg.String (fun x -> Util.lang_dir.val := x),
+      [("-hd",
+        Arg.String (fun x -> Util.lang_path.val := [x :: Util.lang_path.val]),
         "<dir>\n       Directory where the directory lang is installed.");
-       ("-dd", Arg.String (fun x -> Util.doc_dir.val := x),
+       ("-dd",
+        Arg.String (fun x -> Util.doc_path.val := [x :: Util.doc_path.val]),
         "<dir>\n       Directory where the documentation is installed.");
        ("-bd", Arg.String (fun x -> Util.base_dir.val := x),
         "<dir>\n       Directory where the databases are installed.");
@@ -1581,19 +1581,19 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
     Argl.parse speclist anonfun usage;
     if images_dir.val <> "" then
       let abs_dir =
-        let abs_path =
-          if Filename.is_relative images_dir.val then
-            if Filename.is_relative Util.lang_dir.val then
-              [Sys.getcwd (); Util.lang_dir.val]
-            else [Util.lang_dir.val]
-          else []
+        let f =
+          Util.search_in_lang_path
+            (Filename.concat images_dir.val "gwback.jpg")
         in
-        List.fold_right Filename.concat abs_path images_dir.val
+        let d = Filename.dirname f in
+        if Filename.is_relative d then Filename.concat (Sys.getcwd ()) d
+        else d
       in
       Util.images_url.val := "file://" ^ slashify abs_dir
     else ();
-    if Util.doc_dir.val = "" then
-      Util.doc_dir.val := Filename.concat Util.lang_dir.val "doc"
+    if Util.doc_path.val = [] then
+      Util.doc_path.val :=
+        List.map (fun d -> Filename.concat d "doc") Util.lang_path.val
     else ();
     if Util.cnt_dir.val = "" then Util.cnt_dir.val := Util.base_dir.val
     else ();

@@ -1,16 +1,32 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.57 2002-10-31 12:22:22 ddr Exp $ *)
+(* $Id: util.ml,v 4.58 2002-10-31 14:48:38 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
 open Config;
 open Gutil;
 
-value lang_dir = ref Filename.current_dir_name;
+value sharelib =
+  List.fold_right Filename.concat [Gwlib.prefix; "share"] "geneweb"
+;
+
+value lang_path = ref [Filename.current_dir_name; sharelib];
+value doc_path = ref [];
 value base_dir = ref Filename.current_dir_name;
-value doc_dir = ref "";
 value cnt_dir = ref "";
 value images_url = ref "";
+
+value search_in_path p s =
+  loop p.val where rec loop =
+    fun
+    [ [d :: dl] ->
+        let f = Filename.concat d s in
+        if Sys.file_exists f then f else loop dl
+    | [] -> s ]
+;
+
+value search_in_lang_path = search_in_path lang_path;
+value search_in_doc_path = search_in_path doc_path;
 
 (* Internationalization *)
 
@@ -849,8 +865,8 @@ value base_len n =
 value open_etc_file fname =
   let fname1 = base_path ["etc"] (Filename.basename fname ^ ".txt") in
   let fname2 =
-    List.fold_right Filename.concat [lang_dir.val; "etc"]
-      (Filename.basename fname ^ ".txt")
+    search_in_lang_path
+      (Filename.concat "etc" (Filename.basename fname ^ ".txt"))
   in
   try Some (open_in fname1) with
   [ Sys_error _ -> try Some (open_in fname2) with [ Sys_error _ -> None ] ]
@@ -1546,8 +1562,8 @@ value source_image_file_name bname str =
 
 value image_file_name str =
   let fname1 = List.fold_right Filename.concat [base_dir.val; "images"] str in
-  let fname2 = List.fold_right Filename.concat [lang_dir.val; "images"] str in
-  if Sys.file_exists fname1 then fname1 else fname2
+  if Sys.file_exists fname1 then fname1
+  else search_in_lang_path (Filename.concat "images" str)
 ;
 
 value png_image_size ic =

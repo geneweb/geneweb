@@ -1,6 +1,12 @@
 GeneWeb version 4.08
 --------------------
 
+* Installation
+  - [31 Oct 02] When building GeneWeb from source files: added a "make
+    install" which installs the executables in /usr/bin and the system
+    files in /usr/share/geneweb. Added also "make uninstall" which undoes
+    it.
+
 * GeneWeb server or CGI (gwd)
   - [30 Oct 02] In places/surnames pages, now the surname links point
     to the surname, not to a person holding this surname associated with

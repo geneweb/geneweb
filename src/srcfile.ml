@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.11 2002-02-26 17:49:04 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.12 2002-10-31 14:48:37 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -193,16 +193,16 @@ value lang_file_name conf fname =
   in
   if Sys.file_exists fname1 then fname1
   else
-    List.fold_right Filename.concat [Util.lang_dir.val; "lang"; conf.lang]
-      (Filename.basename fname ^ ".txt")
+    search_in_lang_path
+      (Filename.concat conf.lang (Filename.basename fname ^ ".txt"))
 ;
 
 value any_lang_file_name fname =
   let fname1 = Util.base_path ["lang"] (Filename.basename fname ^ ".txt") in
   if Sys.file_exists fname1 then fname1
   else
-    List.fold_right Filename.concat [Util.lang_dir.val; "lang"]
-      (Filename.basename fname ^ ".txt")
+    search_in_lang_path
+      (Filename.concat "lang" (Filename.basename fname ^ ".txt"))
 ;
 
 value source_file_name conf fname =
@@ -567,9 +567,7 @@ value print_start conf base =
 
 value print_lexicon conf base =
   let title _ = Wserver.wprint "Lexicon" in
-  let fname =
-    List.fold_right Filename.concat [Util.lang_dir.val; "lang"] "lexicon.txt"
-  in
+  let fname = search_in_lang_path (Filename.concat "lang" "lexicon.txt") in
   do {
     Util.header conf title;
     match try Some (open_in fname) with [ Sys_error _ -> None ] with
