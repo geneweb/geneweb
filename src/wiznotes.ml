@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.10 2004-02-23 09:59:01 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.11 2004-03-03 10:29:36 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -23,7 +23,15 @@ value read_wizfile fname =
             let data =
               try
                 let i = String.index line ':' in
-                [String.sub line 0 i :: data]
+                let wizname =
+                  try
+                    let j = String.index_from line (i + 1) ':' in
+                    let k = String.index_from line (j + 1) ':' in
+                    String.sub line (j + 1) (k - j - 1)
+                  with
+                  [ Not_found -> "" ]
+                in
+                [(String.sub line 0 i, wizname) :: data]
               with
               [ Not_found -> data ]
             in
@@ -71,7 +79,8 @@ value print_main conf base wizfile =
     print_link_to_welcome conf False;
     html_p conf;
     Gutil.list_iter_first
-     (fun first wz ->
+     (fun first (wz, wname) ->
+        let wname = if wname = "" then wz else wname in
         Wserver.wprint "%s%t" (if first then "" else ",\n")
           (fun _ ->
              if (conf.wizard && conf.user = wz) ||
@@ -89,9 +98,9 @@ value print_main conf base wizfile =
                         tm.Unix.tm_sec
                     with
                     [ Unix.Unix_error _ _ _ -> () ])
-                 wz
+                 wname
              else
-               Wserver.wprint "%s" wz))
+               Wserver.wprint "%s" wname))
      wizdata;
     html_p conf;
     Wserver.wprint "%d %s\n" (List.length wizdata) wiztxt;
