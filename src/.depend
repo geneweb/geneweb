@@ -80,6 +80,8 @@ family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birthDeath.cmx \
     some.cmx srcfile.cmx title.cmx tree.cmx update.cmx updateFam.cmx \
     updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx family.cmi 
+fhashtbl.cmo: iovalue.cmi 
+fhashtbl.cmx: iovalue.cmx 
 forum.cmo: config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo srcfile.cmi \
     update.cmi util.cmi ../wserver/wserver.cmi 
 forum.cmx: config.cmi def.cmi gutil.cmx iobase.cmx lock.cmx srcfile.cmx \
