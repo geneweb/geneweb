@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.78 2000-11-08 21:36:53 ddr Exp $ *)
+(* $Id: util.ml,v 3.79 2000-11-09 12:40:06 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1152,11 +1152,11 @@ value personal_image_file_name bname str =
 
 value source_image_file_name bname str =
   let fname1 =
-    List.fold_right Filename.concat [base_dir.val; "sources"; bname; "images"]
+    List.fold_right Filename.concat [base_dir.val; "src"; bname; "images"]
       str
   in
   let fname2 =
-    List.fold_right Filename.concat [base_dir.val; "sources"; "images"] str
+    List.fold_right Filename.concat [base_dir.val; "src"; "images"] str
   in
   if Sys.file_exists fname1 then fname1 else fname2
 ;

@@ -6,9 +6,9 @@ GeneWeb version 3.10
     work.
   - [08 Nov 00] Added the ability to have associated HTML pages and
     images. The request "base?m=SRC;v=xxx" displays the file
-    "sources/base/xxx.txt" (interpreting the macros if any). The request
-    "base?m=IM;s=yyy" displays the image file "sources/base/images/yyy" or
-    "sources/images/yyy". Code written by Ludovic Ledieu.
+    "src/base/xxx.txt" (interpreting the macros if any). The request
+    "base?m=IM;s=yyy" displays the image file "src/base/images/yyy" or
+    "src/images/yyy". Code written by Ludovic Ledieu.
   - [08 Nov 00] Fixed bug: when giving 0 as Sosa number, it did not
     answer (infinite loop in gwd).
 
