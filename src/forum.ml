@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.9 2001-06-01 09:06:18 ddr Exp $ *)
+(* $Id: forum.ml,v 4.10 2001-06-01 13:03:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -35,35 +35,41 @@ value sp2nbsp lim s =
       loop (i + 1) len
 ;
 
-value print_one_header conf prec_date nmon pos h =
+value ndisp_items = 2;
+value change_item pd d = d.month <> pd.month;
+
+value print_one_header conf prec_date ndisp pos h =
   let (date, hour, ident, subject, beg_mess) = h in
-  let nmon =
+  let ndisp =
     if date <> prec_date then do {
-      let nmon =
+      let ndisp =
         match (prec_date, date) with
         [ (Dgreg pd _, Dgreg d _) ->
-            if d.month <> pd.month then
-              if nmon < 1 then do {
-                Wserver.wprint "<tr><td colspan=4>&nbsp;</td></tr>\n";
-                nmon + 1
+            if change_item d pd then
+              if ndisp > 1 then do {
+                if d.month <> pd.month then
+                  Wserver.wprint "<tr><td colspan=4>&nbsp;</td></tr>\n"
+                else ();
+                ndisp - 1
               }
               else do {
-                Wserver.wprint "</table>\n<p>\n";
+                Wserver.wprint "</table>\n";
+                if d.month <> pd.month then Wserver.wprint "<p>\n" else ();
                 Wserver.wprint "<table border=%d>\n" conf.border;
-                0
+                ndisp_items
               }
-            else nmon
+            else ndisp
         | _ ->
-            do { Wserver.wprint "<table border=%d>\n" conf.border; nmon } ]
+            do { Wserver.wprint "<table border=%d>\n" conf.border; ndisp } ]
       in
       tag "tr" begin
         tag "td" "colspan=4 align=left" begin
           Wserver.wprint "%s" (Date.string_of_date conf date);
         end;
       end;
-      nmon
+      ndisp
     }
-    else nmon
+    else ndisp
   in
   do {
     tag "tr" begin
@@ -79,7 +85,7 @@ value print_one_header conf prec_date nmon pos h =
         else Wserver.wprint "%s" (secure (sp2nbsp 30 subject));
       end;
     end;
-    nmon
+    ndisp
   }
 ;
 
@@ -89,7 +95,7 @@ value print_headers conf =
   [ Some ic ->
       let ic_len = in_channel_length ic in
       let last_date =
-        loop (Dtext "", 0) where rec loop (prec_date, nmon) =
+        loop (Dtext "", ndisp_items) where rec loop (prec_date, ndisp) =
           let pos = ic_len - pos_in ic in
           match try Some (input_line ic) with [ End_of_file -> None ] with
           [ Some s ->
@@ -139,13 +145,13 @@ value print_headers conf =
                 with
                 [ Failure _ | Invalid_argument _ -> Dtext date ]
               in
-              let nmon =
+              let ndisp =
                 if ident <> "" then
                   let h = (date, hour, ident, subject, beg_mess) in
-                  print_one_header conf prec_date nmon pos h
-                else nmon
+                  print_one_header conf prec_date ndisp pos h
+                else ndisp
               in
-              loop (date, nmon)
+              loop (date, ndisp)
           | None -> do { close_in ic; prec_date } ]
       in
       if last_date = Dtext "" then () else Wserver.wprint "</table>\n"
