@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.64 2005-01-22 20:30:38 ddr Exp $ *)
+(* $Id: perso.ml,v 4.65 2005-01-23 05:47:47 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -305,7 +305,7 @@ value make_ep conf base ip =
 
 value rec eval_var conf base env ep sl =
   try eval_simple_var conf base env ep sl with
-  [ Not_found -> eval_compound_var conf base env ep sl ]
+  [ Not_found -> eval_person_var conf base env ep sl ]
 and eval_simple_var conf base env ep sl =
   try bool_val (eval_simple_bool_var conf base env ep sl) with
   [ Not_found -> str_val (eval_simple_str_var conf base env ep sl) ]
@@ -510,7 +510,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
           try List.assoc v conf.base_env with [ Not_found -> "" ]
         else raise Not_found
   | _ -> raise Not_found ]
-and eval_compound_var conf base env ((_, a, _, _) as ep) =
+and eval_person_var conf base env ((_, a, _, _) as ep) =
   fun
   [ ["child" :: sl] ->
       match get_env "child" env with
@@ -521,12 +521,12 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) =
             | _ -> False ]
           in
           let ep = (p, a, u, auth) in
-          eval_compound_var conf base env ep sl
+          eval_person_var conf base env ep sl
       | _ -> raise Not_found ]
   | ["enclosing" :: sl] ->
       let rec loop =
         fun
-        [ [("#loop", _) :: env] -> eval_compound_var conf base env ep sl
+        [ [("#loop", _) :: env] -> eval_person_var conf base env ep sl
         | [_ :: env] -> loop env
         | [] -> raise Not_found ]
       in
@@ -538,7 +538,7 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) =
           let ep = make_ep conf base (father cpl) in
           let cpl = (father cpl, mother cpl) in
           let efam = Vfam (foi base ifam) cpl (doi base ifam) in
-          eval_compound_var conf base [("fam", efam) :: env] ep sl
+          eval_person_var conf base [("fam", efam) :: env] ep sl
       | None ->
           do {
             warning_use_has_parents_before_parent "father";
@@ -551,7 +551,7 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) =
           let ep = make_ep conf base (mother cpl) in
           let cpl = (father cpl, mother cpl) in
           let efam = Vfam (foi base ifam) cpl (doi base ifam) in
-          eval_compound_var conf base [("fam", efam) :: env] ep sl
+          eval_person_var conf base [("fam", efam) :: env] ep sl
       | None ->
           do {
             warning_use_has_parents_before_parent "mother";
@@ -561,45 +561,45 @@ and eval_compound_var conf base env ((_, a, _, _) as ep) =
       match get_env "parent" env with
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
-          eval_compound_var conf base env ep sl
+          eval_person_var conf base env ep sl
       | _ -> raise Not_found ]
   | ["related" :: sl] ->
       match get_env "c" env with
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
-          eval_compound_var conf base env ep sl
+          eval_person_var conf base env ep sl
       | _ -> raise Not_found ]
   | ["relation_her" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_moth = Some ip} ->
          let ep = make_ep conf base ip in
-         eval_compound_var conf base env ep sl
+         eval_person_var conf base env ep sl
       | _ -> raise Not_found ]
   | ["relation_him" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_fath = Some ip} ->
          let ep = make_ep conf base ip in
-         eval_compound_var conf base env ep sl
+         eval_person_var conf base env ep sl
       | _ -> raise Not_found ]
-  | ["self" :: sl] -> eval_compound_var conf base env ep sl
+  | ["self" :: sl] -> eval_person_var conf base env ep sl
   | ["spouse" :: sl] ->
       match get_env "fam" env with
       [ Vfam _ (_, ip) _ ->
           let ep = make_ep conf base ip in
-          eval_compound_var conf base env ep sl
+          eval_person_var conf base env ep sl
       | _ -> raise Not_found ]
   | ["witness" :: sl] ->
       match get_env "witness" env with
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
-          eval_compound_var conf base env ep sl
+          eval_person_var conf base env ep sl
       | _ -> raise Not_found ]
   | sl ->
-      try bool_val (eval_bool_var conf base env ep sl) with
+      try bool_val (eval_bool_person_field conf base env ep sl) with
       [ Not_found ->
-          try str_val (eval_str_var conf base env ep sl) with
+          try str_val (eval_str_person_field conf base env ep sl) with
           [ Not_found -> obsolete_eval conf base env ep sl ] ] ]
-and eval_bool_var conf base env ((p, a, u, p_auth) as ep) =
+and eval_bool_person_field conf base env ((p, a, u, p_auth) as ep) =
   fun
   [ ["birthday"] ->
       match (p_auth, Adef.od_of_codate p.birth) with
@@ -722,7 +722,7 @@ and eval_bool_var conf base env ((p, a, u, p_auth) as ep) =
   | ["is_public"] -> p.access = Public
   | ["is_restricted"] -> is_hidden p
   | _ -> raise Not_found ]
-and eval_str_var conf base env ((p, a, u, p_auth) as ep) =
+and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   fun
   [ ["access"] -> acces conf base p
   | ["age"] ->
