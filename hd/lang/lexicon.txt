@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.15 1999-11-23 13:28:12 ddr Exp $
+# $Id: lexicon.txt,v 3.16 1999-11-23 18:49:28 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -756,7 +756,7 @@ de: Pflegevater/Pflegemutter/Adoptiveltern
 dk: adoptivfader/adoptivmoder/adoptivfor&aelig;ldre
 en: adoptive father/adoptive mother/adoptive parents
 es: padre adoptivo/madre adoptiva/padres adoptivos
-fi: ottois&auml;/ottoauml;iti/ottovanhemmat
+fi: ottois&auml;/otto&auml;iti/ottovanhemmat
 fr: p&egrave;re adoptif/m&egrave;re adoptive/parents adoptifs
 is: kjörfaðir/kjörmóðir/kjörforeldrar
 it: padre adottivo/madre adottiva/genitori adottivi
@@ -890,7 +890,7 @@ dk: alle titler
 en: all the titles
 eo: cxiuj mosxtoj
 es: todos los t&iacute;tulos
-fi: kaikki arvot
+fi: kaikki arvonimet
 fr: tous les titres
 he:   ëì äúàøéí
 is: alla titla
@@ -1637,7 +1637,7 @@ dk: dato
 en: date
 eo: dato
 es: fecha
-fi: pvm (p/k/v)
+fi: p&auml;iv&auml;m&auml;&auml;r&auml;
 fr: date
 he:   úàøéê 
 is: dagsetning
@@ -3375,7 +3375,7 @@ dk: til
 en: of
 eo: de
 es: de
-fi: henkil&ouml 
+fi: :g:
 fr: de/d'
 he:    ùì
 is: &nbsp;
@@ -3392,7 +3392,7 @@ dk: til
 en: of
 eo: de
 es: de
-fi: henkil&ouml;lle 
+fi: :l:
 fr: de/d'
 he:    ùì
 is: &nbsp;
@@ -3608,7 +3608,7 @@ se: endast den valda generationen
     optional
 dk: efter behag
 en: optional
-fi: valinnainen
+fi: ei v&auml;ltt&auml;m&auml;t&ouml;n
 fr: facultatif
 is: má velja
 nl: optioneel
@@ -3870,7 +3870,7 @@ dk: tilnavn
 en: qualifier
 eo: kromnomo:a:+n
 es: calificativo
-fi: patronyymi
+fi: lis&auml;nimi
 fr: qualificatif
 he:  ëéðåé
 is: uppnefni

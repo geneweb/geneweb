@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.9 1999-11-10 22:38:47 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.10 1999-11-23 18:49:30 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogy - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -74,7 +74,7 @@ To navigate in this data base, you can do your search:<br><p>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
 [or] <em>[surname/surnames]</em>%Iz
-[or] <em>num&eacute;ro Sosa</em> par rapport &agrave; %a%E
+[or] <em>Sosa number</em> relative to %a%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
