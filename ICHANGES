@@ -5,6 +5,7 @@ GeneWeb Version 3.04
 --------------------
 
 * GeneWeb compiler (gwc) and uncompiler (gwu)
+  - [30 Mar 00] In latest births, skip a line after future births if any.
   - [23 Mar 00] Generates "csrc" if at least two children have the same
     #src value (save file length). Added "cbp", idem for the birth place
     (#bp value).
