@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.19 2000-08-05 10:46:02 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.20 2000-08-05 12:42:38 ddr Exp $ *)
 
 open Printf;
 
@@ -229,7 +229,7 @@ value lowercase_start_with s s_ini =
 ;
 
 value insert_file env bdir name =
-  let fname = List.assoc (name ^ "_name") env in
+  let fname = HttpEnv.decode (List.assoc (name ^ "_name") env) in
   let fname = filename_basename fname in
   do if fname = "" then ()
      else if fname <> name then
