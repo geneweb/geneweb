@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.4 1999-04-30 16:26:37 ddr Exp $ *)
+(* $Id: setup.ml,v 1.5 1999-04-30 17:23:21 ddr Exp $ *)
 
 value default_lang = "en";
 value setup_dir = ref "setup";
@@ -115,11 +115,17 @@ value parameters =
     (fun comm (k, s) ->
        let k = strip_spaces (decode_varenv k) in
        let s = strip_spaces (decode_varenv s) in
-       if k = "opt" then comm
-       else if k = "anon" then comm ^ " " ^ s
-       else if s = "on" then comm ^ " -" ^ k
-       else if s = "" then comm
-       else comm ^ " -" ^ k ^ " " ^ s)
+       match k with
+       [ "opt" -> comm
+       | "anon" -> comm ^ " " ^ s
+       | _ ->
+           match s with
+           [ "" | "none" -> comm
+           | "on" -> comm ^ " -" ^ k
+           | _ ->
+               if s.[0] = '_' then comm ^ " -" ^ k ^ s
+               else if s.[String.length s - 1] = '_' then comm ^ " -" ^ s ^ k
+               else comm ^ " -" ^ k ^ " " ^ s ] ])
     ""
 ;
 
