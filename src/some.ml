@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.8 2002-02-24 15:45:55 ddr Exp $ *)
+(* $Id: some.ml,v 4.9 2002-02-25 13:06:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -381,7 +381,7 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
     in
     if len > 1 && br = None then Wserver.wprint "</dl>\n" else ();
 (**)
-    Wserver.wprint "</table>\n";
+    Wserver.wprint "</td></tr></table>\n";
 (*
     Wserver.wprint "</nobr>\n";
 *)
