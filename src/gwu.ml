@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.3 1999-11-10 09:53:45 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.4 1999-11-10 10:39:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -570,7 +570,8 @@ value print_relation_for_person oc base mark def_p p r =
         [ Adoption -> Printf.fprintf oc "adop"
         | Recognition -> Printf.fprintf oc "reco"
         | CandidateParent -> Printf.fprintf oc "cand"
-        | GodParent -> Printf.fprintf oc "godp" ];
+        | GodParent -> Printf.fprintf oc "godp"
+        | FosterParent -> Printf.fprintf oc "fost" ];
         match (fath, moth) with
         [ (Some _, None) -> Printf.fprintf oc " fath"
         | (None, Some _) -> Printf.fprintf oc " moth"

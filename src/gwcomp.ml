@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.2 1999-11-10 08:44:22 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.3 1999-11-10 10:39:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -636,6 +636,7 @@ value get_relation str =
         | "reco" | "reco:" -> Recognition
         | "cand" | "cand:" -> CandidateParent
         | "godp" | "godp:" -> GodParent
+        | "fors" | "fost:" -> FosterParent
         | _ -> failwith str ]
       in
       if String.length x = 5 && x.[4] = ':' then
