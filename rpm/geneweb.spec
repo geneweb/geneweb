@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.4 1999-09-01 19:50:51 ddr Exp $
+# $Id: geneweb.spec,v 1.5 1999-09-01 21:32:58 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -127,7 +127,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
     echo -n "   "
     echo "/home/geneweb/gw-VERSION"
     echo
-    echo "Remember this directory name for further possible recovering."
+    echo "Remember this directory name for further possible recovery."
     echo
   fi
 )

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.43 1999-08-23 14:18:05 ddr Exp $ *)
+(* $Id: setup.ml,v 1.44 1999-09-01 21:30:59 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -1276,20 +1276,33 @@ else ()
 ;
 
 value intro () =
-  do Argl.parse speclist anonfun usage;
+  do ifdef UNIX then
+       try
+         let s = Sys.getenv "LC_CTYPE" in
+         if String.length s > 2 then
+           let s = String.sub s 0 2 in
+           default_lang.val :=
+             if s = "fr" then "fr"
+             else if s = "es" then "es"
+             else "en"
+         else ()
+       with
+       [ Not_found -> () ]
+     else ();
+     Argl.parse speclist anonfun usage;
      let lang =
        if daemon.val then
-         do Printf.printf "To start, open location http://localhost:2316/\n";
-            flush stdout;
-            ifdef UNIX then
+         ifdef UNIX then
+           do Printf.printf "To start, open location http://localhost:2316/\n";
+              flush stdout;
               if Unix.fork () = 0 then
                 do Unix.close Unix.stdin;
                    null_reopen [Unix.O_WRONLY] Unix.stdout;
                    null_reopen [Unix.O_WRONLY] Unix.stderr;
                 return ()
-              else exit 0
-            else ();
-         return default_lang.val
+              else exit 0;
+           return default_lang.val
+         else ()
        else
          do copy_text "" "intro.txt"; return
          let lang =
