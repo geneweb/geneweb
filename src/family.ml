@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.17 2000-03-08 16:02:08 ddr Exp $ *)
+(* $Id: family.ml,v 3.18 2000-03-20 15:39:26 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -550,8 +550,17 @@ value only_special_env = List.for_all (fun (x, _) -> List.mem x senv_vars);
 value extract_sosa_henv conf base =
   match find_person_in_env conf base "z" with
   [ Some p ->
-      conf.henv :=
-        conf.henv @ [("iz", string_of_int (Adef.int_of_iper p.cle_index))]
+      let x =
+        let first_name = p_first_name base p in
+        let surname = p_surname base p in
+        if (conf.wizard && conf.friend || conf.access_by_key)
+        && not (first_name = "?" || surname = "?") then
+          [("pz", Name.lower first_name); ("nz", Name.lower surname);
+           ("ocz", string_of_int p.occ)]
+        else
+          [("iz", string_of_int (Adef.int_of_iper p.cle_index))]
+      in
+      conf.henv := conf.henv @ x
   | None -> () ]
 ;
 
