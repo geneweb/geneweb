@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 2.6 1999-07-26 07:02:00 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 2.7 1999-08-13 03:35:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -20,6 +20,18 @@ value cat_strings base is1 sep is2 =
   if n1 = "" then n2
   else if n2 = "" then n1
   else n1 ^ sep ^ n2
+;
+
+value sorp base ip =
+  let p = poi base ip in
+  let first_name = p_first_name base p in
+  let surname = p_surname base p in
+  let occ =
+    if first_name = "?" || surname = "?" then Adef.int_of_iper p.cle_index
+    else p.occ
+  in
+  (sou base p.first_name, sou base p.surname, p.occ, Update.Link)
+
 ;
 
 value reconstitute conf base p1 p2 =
@@ -49,7 +61,9 @@ value reconstitute conf base p1 p2 =
    first_names_aliases = list (sou base) (fun p -> p.first_names_aliases);
    surnames_aliases = list (sou base) (fun p -> p.surnames_aliases);
    titles = list (map_title_strings (sou base)) (fun p -> p.titles);
-   rparents = []; rchildren = [];
+   rparents =
+     list (map_relation_ps (sorp base) (sou base)) (fun p -> p.rparents);
+   rchildren = [];
    occupation = field "occupation" (fun p -> sou base p.occupation) (\= "");
    sex = field "sex" (fun p -> p.sex) (\= Neuter);
    access = field "access" (fun p -> p.access) (\= IfTitles);
