@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.4 2001-12-17 13:34:56 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.5 2002-01-10 04:13:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -182,8 +182,8 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
             (fun a ifam ->
                let cpl = coi base ifam in
                let sp =
-                 if p2.sex = Female then poi base cpl.father
-                 else poi base cpl.mother
+                 if p2.sex = Female then pget conf base cpl.father
+                 else pget conf base cpl.mother
                in
                let _ = print_spouse sp a in
                False)
@@ -197,7 +197,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
     if lev <= 2 then Wserver.wprint "<ul>\n" else ();
     List.iter
       (fun (ip, ia_asex, rev_br) ->
-         let p = poi base ip in
+         let p = pget conf base ip in
          let u = uoi base ip in
          let br = List.rev [(ip, p.sex) :: rev_br] in
          let is_valid_rel = br_inter_is_empty ini_br br in
@@ -270,10 +270,10 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
       loop first_sosa False where rec loop sosa some =
         if cnt.val < max_cnt && Num.gt last_sosa sosa then
           let some =
-            match Util.branch_of_sosa base p.cle_index sosa with
+            match Util.branch_of_sosa conf base p.cle_index sosa with
             [ Some ([(ia, _) :: _] as br) ->
-                print_cousins_side_of conf base max_cnt (poi base ia) p br
-                  lev1 lev2 ||
+                print_cousins_side_of conf base max_cnt (pget conf base ia)
+                  p br lev1 lev2 ||
                 some
             | _ -> some ]
           in
@@ -373,12 +373,12 @@ value print_menu conf base p effective_level =
   }
 ;
 
-value sosa_of_persons base =
+value sosa_of_persons conf base =
   loop 1 where rec loop n =
     fun
     [ [] -> n
     | [ip :: list] ->
-        loop (if (poi base ip).sex = Male then 2 * n else 2 * n + 1) list ]
+        loop (if (pget conf base ip).sex = Male then 2 * n else 2 * n + 1) list ]
 ;
 
 value print_anniv conf base p level =
@@ -468,9 +468,9 @@ value print_anniv conf base p level =
       string_of_int up_sosa ^ ";" ^
       acces_n conf base "2"
         (match spouse with
-         [ Some ip -> poi base ip
+         [ Some ip -> pget conf base ip
          | _ -> c ]) ^
-      ";b2=" ^ string_of_int (sosa_of_persons base down_br) ^
+      ";b2=" ^ string_of_int (sosa_of_persons conf base down_br) ^
       (match spouse with
        [ Some _ -> ";" ^ acces_n conf base "4" c
        | _ -> "" ]) ^
@@ -480,7 +480,7 @@ value print_anniv conf base p level =
     let list = ref (S.fold (fun ip b list -> [(ip, b) :: list]) set []) in
     fun () ->
       match list.val with
-      [ [(x, b) :: l] -> do { list.val := l; (poi base x, txt_of b) }
+      [ [(x, b) :: l] -> do { list.val := l; (pget conf base x, txt_of b) }
       | [] -> raise Not_found ]
   in
   let mode () =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.2 2001-04-25 01:38:00 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.3 2002-01-10 04:13:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -169,7 +169,8 @@ value f_scan conf base =
     do {
       incr i;
       if i.val < base.data.persons.len then
-        (base.data.persons.get i.val, referenced_person_title_text)
+        (pget conf base (Adef.iper_of_int i.val),
+         referenced_person_title_text)
       else raise Not_found
     }
 ;
@@ -276,8 +277,8 @@ value print_marriage conf base month =
         [ Some (Dgreg {day = d; month = m; year = y; prec = Sure} _)
           when d <> 0 && m <> 0 ->
             let cpl = base.data.couples.get i in
-            if m == month && age_autorise conf base (poi base cpl.father) &&
-               age_autorise conf base (poi base cpl.mother) then
+            if m == month && age_autorise conf base (pget conf base cpl.father) &&
+               age_autorise conf base (pget conf base cpl.mother) then
               tab.(pred d) := [(cpl, y) :: tab.(pred d)]
             else ()
         | _ -> () ]
@@ -298,10 +299,10 @@ value print_marriage conf base month =
                    Wserver.wprint "\n";
                    html_li conf;
                    afficher_personne_titre_referencee conf base
-                     (poi base fam.father);
+                     (pget conf base fam.father);
                    Wserver.wprint "\n%s\n" (transl conf "and");
                    afficher_personne_titre_referencee conf base
-                     (poi base fam.mother);
+                     (pget conf base fam.mother);
                    Wserver.wprint ", <em>%s %d</em>\n"
                      (transl conf "in (year)") year;
                  })
@@ -322,9 +323,9 @@ value print_anniversaries_of_marriage conf base y list =
          do {
            Wserver.wprint "\n";
            html_li conf;
-           afficher_personne_titre_referencee conf base (poi base fam.father);
+           afficher_personne_titre_referencee conf base (pget conf base fam.father);
            Wserver.wprint "\n%s\n" (transl conf "and");
-           afficher_personne_titre_referencee conf base (poi base fam.mother);
+           afficher_personne_titre_referencee conf base (pget conf base fam.mother);
            Wserver.wprint ", <em>%s %d\n(" (transl conf "in (year)") year;
            Wserver.wprint (ftransl conf "%d years ago")
              (conf.today.year - year);
@@ -426,7 +427,8 @@ value print_menu_birth conf base =
     do {
       incr i;
       if i.val < base.data.persons.len then
-        (base.data.persons.get i.val, referenced_person_title_text)
+        (pget conf base (Adef.iper_of_int i.val),
+         referenced_person_title_text)
       else raise Not_found
     }
   in
@@ -448,7 +450,7 @@ value print_menu_dead conf base =
     header conf title;
     print_link_to_welcome conf True;
     for i = 0 to base.data.persons.len - 1 do {
-      let p = base.data.persons.get i in
+      let p = pget conf base (Adef.iper_of_int i) in
       match p.death with
       [ NotDead | DontKnowIfDead -> ()
       | _ ->
@@ -521,13 +523,13 @@ value print_menu_dead conf base =
 
 value match_mar_dates conf base cpl d1 d2 =
   if d1.day == d2.day && d1.month == d2.month then
-    age_autorise conf base (poi base cpl.father) &&
-    age_autorise conf base (poi base cpl.mother)
+    age_autorise conf base (pget conf base cpl.father) &&
+    age_autorise conf base (pget conf base cpl.mother)
   else if
     d1.day == 29 && d1.month == 2 && d2.day == 1 && d2.month = 3 &&
     not (leap_year d2.year) then
-    age_autorise conf base (poi base cpl.father) &&
-    age_autorise conf base (poi base cpl.mother)
+    age_autorise conf base (pget conf base cpl.father) &&
+    age_autorise conf base (pget conf base cpl.mother)
   else False
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.3 2001-12-07 16:39:36 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.4 2002-01-10 04:13:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -61,7 +61,7 @@ value select conf base get_date find_oldest =
       in
       loop [] q
     else
-      let p = base.data.persons.get i in
+      let p = pget conf base (Adef.iper_of_int i) in
       match get_date p with
       [ Some (Dgreg d cal) ->
           if before_date d ref_date then loop q len (i + 1)
@@ -342,11 +342,11 @@ value print_marriage conf base =
              else ();
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base (poi base cpl.father);
+             afficher_personne_referencee conf base (pget conf base cpl.father);
              Wserver.wprint "</strong>\n";
              Wserver.wprint "%s" (transl conf "and");
              Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base (poi base cpl.mother);
+             afficher_personne_referencee conf base (pget conf base cpl.mother);
              Wserver.wprint "</strong>,\n";
              if future then
                Wserver.wprint "<em>%s</em>.\n"

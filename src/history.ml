@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.4 2001-11-16 13:38:52 ddr Exp $ *)
+(* $Id: history.ml,v 4.5 2002-01-10 04:13:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -128,7 +128,7 @@ value print_history_line conf base line wiz k i =
       if wiz = "" || user = wiz then do {
         let po =
           match person_ht_find_all base key with
-          [ [ip] -> Some (poi base ip)
+          [ [ip] -> Some (pget conf base ip)
           | _ -> None ]
         in
         let not_displayed =
