@@ -33,7 +33,9 @@ let check lang =
       let list = get_all_versions ic_lex in
       if not (List.mem_assoc lang list) then begin
         let list =
-	  [("en", List.assoc "en" list); ("fr", List.assoc "fr" list)]
+	  Sort.list (fun (l1, _) (l2, _) -> l1 < l2)
+            [(lang, ""); ("en", List.assoc "en" list);
+	     ("fr", List.assoc "fr" list)]
 	in
         printf "    %s\n" line;
         List.iter (fun (lang, transl) -> printf "%s: %s\n" lang transl)
