@@ -1,12 +1,12 @@
-# $Id: Makefile.inc.win,v 4.4 2001-12-17 12:55:25 ddr Exp $
+# $Id: Makefile.inc.win,v 4.5 2002-11-29 06:03:04 ddr Exp $
 
 TOP=..
 CAMLP4_COMM=TOP=$(TOP) $(TOP)/tools/camlp4_comm.sh pa_ifdef.cmo
 CAMLP4F=-DWIN95
 CAMLP4D=c:/ocaml/lib/camlp4
 LIBUNIX=c:/ocaml/lib/libunix.lib wsock32.lib
-OCAMLC=ocamlc
-OCAMLOPT=ocamlopt
+OCAMLC=ocamlc -warn-error A
+OCAMLOPT=ocamlopt -warn-error A
 OCAMLI=
 OCAMLD=
 STRIP=true
