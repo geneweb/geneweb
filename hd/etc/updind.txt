@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.4 2001-12-24 11:46:36 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.5 2002-01-15 13:36:31 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -369,7 +369,7 @@
   </tr>
   </table>
 %end;
-%define;one_relation(xcnt,xvar,xrel)
+%define;one_relation(xcnt,xvar,xrel,xsex)
  <table border=1>
     <tr>
       <td>[*first name/first names]0</td>
@@ -395,6 +395,7 @@
       <td colspan=4>
         <input name=rxcnt_xvar_sn size=40 maxlength=200%sp;
          value="%relation.xrel.surname;">
+         ([sex]0 = xsex)
       </td>
     </tr>
   </table>
@@ -406,8 +407,8 @@
   %foreach;relation;
     %apply;relation_type(cnt)
     <p>
-    %apply;one_relation(cnt,"fath","r_father")
-    %apply;one_relation(cnt,"moth","r_mother")
+    %apply;one_relation(cnt,"fath","r_father",[M/F]0)
+    %apply;one_relation(cnt,"moth","r_mother",[M/F]1)
     <p>
     %apply;insert_relation(cnt)
     <p>
@@ -415,8 +416,8 @@
 %else;
   %apply;relation_type("1")
   <p>
-  %apply;one_relation("1","fath","r_father")
-  %apply;one_relation("1","moth","r_mother")
+  %apply;one_relation("1","fath","r_father",[M/F]0)
+  %apply;one_relation("1","moth","r_mother",[M/F]1)
   <p>
   %apply;insert_relation("1")
   <p>
