@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.4 2001-09-16 14:15:19 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.5 2001-09-16 14:16:53 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -255,7 +255,7 @@ value effective_send_ok conf base p file =
       incorrect_content_type conf base p ct
     }
     else
-      match p_getint conf.base_env "max_image_size" with
+      match p_getint conf.base_env "max_images_size" with
       [ Some len when String.length content > len ->
           error_too_big_image conf base p (String.length content) len
       | _ -> (x, c) ]
