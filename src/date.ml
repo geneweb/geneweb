@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.28 2005-01-02 10:37:00 ddr Exp $ *)
+(* $Id: date.ml,v 4.29 2005-01-02 15:56:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -206,7 +206,13 @@ value gregorian_precision conf d =
 
 value string_of_ondate conf =
   fun
-  [ Dgreg d Dgregorian -> string_of_on_dmy conf d
+  [ Dgreg d Dgregorian ->
+      let s = string_of_on_dmy conf d in
+      if d.day > 0 then
+        Printf.sprintf
+          "<a href=\"%sm=CAL;yg=%d;mg=%d;dg=%d;tg=1\" class=\"date\">%s</a>"
+          (commd conf) d.year d.month d.day s
+      else s
   | Dgreg d Djulian ->
       let cal_prec =
         if d.year < 1582 then "" else " (" ^ gregorian_precision conf d ^ ")"
@@ -217,6 +223,13 @@ value string_of_ondate conf =
   | Dgreg d Dfrench ->
       let d1 = Calendar.french_of_gregorian d in
       let s = string_of_on_french_dmy conf d1 in
+      let s =
+        if d1.day > 0 then
+          Printf.sprintf
+            "<a href=\"%sm=CAL;yf=%d;mf=%d;df=%d;tf=1\" class=\"date\">%s</a>"
+            (commd conf) d1.year d1.month d1.day s
+        else s
+      in
       match d.prec with
       [ Sure -> s ^ " " ^ " (" ^ gregorian_precision conf d ^ ")"
       | About | Before | After | Maybe | OrYear _ | YearInt _ -> s ]
