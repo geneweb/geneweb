@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.43 2003-04-10 20:09:17 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.44 2003-12-15 09:38:29 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -44,30 +44,30 @@ height=108 src="%o/gwlogo.gif" align=%L border=0 alt=GeneWeb></a>
 </td>
 <td align=%L>
 <table><tr align=left><td align=center><h1><font color=%i>[
-af: Genealogiese<br>databasis
-bg: Родословна<br>база от данни
-ca: Base de dades<br>geneal&ograve;gica
+af: Genealogiese databasis
+bg: Родословна база от данни
+ca: Base de dades geneal&ograve;gica
 cs: Genealogickб databбze
-da: Genealogisk<br>database
-de: Genealogische<br>Datenbank
-en: Genealogical<br>database
-eo: Datenbazo<br>genealogia
-es: Base de datos<br>geneal&oacute;gica
-et: Genealoogiline<br>andmebaas
+da: Genealogisk database
+de: Genealogische Datenbank
+en: Genealogical database
+eo: Datenbazo genealogia
+es: Base de datos geneal&oacute;gica
+et: Genealoogiline andmebaas
 fi: Sukutietokanta
-fr: Base de donn&eacute;es<br>g&eacute;n&eacute;alogique
-he: оавш ойгт <br> ъемгеъй
-is: Жttfrжрi<br>gagnagrunnur
-it: Base di dati<br>genealogica
-lv: Ciltsrakstu<br>datu bвze
-nl: Genealogische<br>databank
-no: Genealogisk<br>database
-pl: Genealogiczna<br>baza danych
-pt: Base de Dados<br>Geneal&oacute;gica
-ro: Basa de date <br>genealogice
-ru: Генеaлогическая<br>база данных
-sl: Genealo№ka<br>baza podatkov
-sv: Genealogisk<br>databas
+fr: Base de donn&eacute;es g&eacute;n&eacute;alogique
+he: оавш ойгт ъемгеъй
+is: Жttfrжрi gagnagrunnur
+it: Base di dati genealogica
+lv: Ciltsrakstu datu bвze
+nl: Genealogische databank
+no: Genealogisk database
+pl: Genealogiczna baza danych
+pt: Base de Dados Geneal&oacute;gica
+ro: Basa de date  genealogice
+ru: Генеaлогическая база данных
+sl: Genealo№ka baza podatkov
+sv: Genealogisk databas
 zh: НшВзјТЖЧ
 ]</font></h1></table>
 </td>
