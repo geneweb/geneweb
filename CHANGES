@@ -44,9 +44,9 @@ GeneWeb version 3.12
     %father_age_at_birth; and %mother_age_at_birth;
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
-  - [01 Mar 01] For translators: in "person/persons" phrase, it is possible
-    to add a third field to say how to translate "persons" when it is
-    after a number (e.g. 50 persons). Example with Estonian.
+  - [01 Mar 01] For translators: in "person/persons" phrase, it is now
+    possible to add a third field to say how to translate "persons" when
+    it is after a number (e.g. 50 persons). Example with Estonian.
   - [01 Mar 01] Added entry "on (weekday day month year)" for the
     anniversary page sentence: "today, weekday day month year, etc".
     Necessary at least for Finnish and Estonian.

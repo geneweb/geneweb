@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.42 2001-02-20 04:09:52 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.43 2001-03-02 06:54:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -794,6 +794,7 @@ and ast_expr = Templ.ast_expr ==
   | Eop of string and ast_expr and ast_expr
   | Enot of ast_expr
   | Estr of string
+  | Eint of string
   | Evar of string and list string
   | Etransl of bool and string and char ]
 ;
@@ -1207,6 +1208,7 @@ value eval_bool_value conf base env p =
     | Enot e -> not (bool_eval e)
     | Evar s sl -> eval_bool_variable conf base env p s sl
     | Estr s -> do Wserver.wprint "\"%s\"???" s; return False
+    | Eint s -> do Wserver.wprint "\"%s\"???" s; return False
     | Etransl _ s _ -> do Wserver.wprint "[%s]???" s; return False ]
   and string_eval =
     fun
@@ -1287,6 +1289,7 @@ and subste sf =
   | Eop op e1 e2 -> Eop (sf op) (subste sf e1) (subste sf e2)
   | Enot e -> Enot (subste sf e)
   | Estr s -> Estr (sf s)
+  | Eint s -> Eint s
   | Evar s sl -> Evar (sf s) (List.map sf sl)
   | Etransl upp s c -> Etransl upp s c ]
 and substel sf el =
