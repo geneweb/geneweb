@@ -1852,6 +1852,12 @@ nl: van
 pt: de
 se: till
 
+    of %t's side
+en: of %t's side
+fr: du c&ocirc;t&eacute; de %t
+nl: langs de zijde van %t
+se: fr&aring;n %t sl&auml;ktsida
+
     of the %s generation
 de: der %s Generation
 en: of the %s generation
@@ -1917,12 +1923,6 @@ it: dell'assassinio
 nl: van de moord
 pt: do assesinado
 se: av mordet
-
-    of the side of
-en: of the side of
-fr: du c&ocirc;t&eacute; de
-nl: langs de zijde van
-se: fr&aring;n sl&auml;ktsidan av
 
     on (day month year)
 cn: ÓÚ

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 1.2 1998-12-13 10:16:54 ddr Exp $ *)
+(* $Id: cousins.ml,v 1.3 1998-12-15 09:24:59 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -33,21 +33,6 @@ value niveau_max_ascendance base ip =
      loop 0 ip;
   return x.val
 ;
-
-(*
-value rec ancestor_of_sosa base ip sosa =
-  if Num.eq sosa Num.one then Some ip
-  else
-    match ancestor_of_sosa base ip (Num.half sosa) with
-    [ Some ip ->
-        match (aoi base ip).parents with
-        [ Some ifam ->
-            let cpl = coi base ifam in
-            Some (if Num.even sosa then cpl.father else cpl.mother)
-        | None -> None ]
-    | None -> None ]
-;
-*)
 
 value brother_label conf x =
   match x with
@@ -121,15 +106,6 @@ value rec has_desc_lev base lev p =
 value br_inter_is_empty b1 b2 =
   List.for_all (fun (ip, _) -> not (List.mem_assoc ip b2)) b1
 ;
-
-(*
-value select_having_desc base lev list =
-  List.fold_right
-    (fun ip list ->
-       if has_desc_lev base lev (poi base ip) then [ip :: list] else list)
-    list []
-;
-*)
 
 (* Algorithms *)
 
@@ -220,8 +196,9 @@ value print_cousins_side_of conf base a ini_p ini_br lev =
   let sib = siblings base a in
   if List.exists (sibling_has_desc_lev base lev) sib then
     do Wserver.wprint "<li>\n";
-       Wserver.wprint "%s " (capitale (transl conf "of the side of"));
-       afficher_personne_titre conf base a;
+       Wserver.wprint (fcapitale (ftransl conf "of %t's side"))
+         (fun _ -> afficher_personne_sans_titre conf base a);
+       afficher_titre conf base a;
        Wserver.wprint ":\n";
        let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
        print_descend_upto conf base ini_p ini_br lev sib;
