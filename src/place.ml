@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 3.1 2000-03-27 22:21:14 ddr Exp $ *)
+(* $Id: place.ml,v 3.2 2000-03-30 17:47:22 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -10,6 +10,17 @@ value fold_place s =
   loop [] 0 0 where rec loop list i ibeg =
     if i == String.length s then
       if i > ibeg then [String.sub s ibeg (i - ibeg) :: list] else list
+    else if
+      String.unsafe_get s i == '(' &&
+      String.unsafe_get s (String.length s - 1) == ')'
+    then
+      let list =
+        let j =
+          if i > 0 && String.unsafe_get s (i - 1) == ' ' then i - 1 else i
+        in
+        if j > ibeg then [String.sub s ibeg (j - ibeg) :: list] else list
+      in
+      [String.sub s (i + 1) (String.length s - i - 2) :: list]
     else
       let (list, ibeg) =
         match String.unsafe_get s i with
