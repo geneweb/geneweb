@@ -1,8 +1,13 @@
 Internal Changes
 ****************
 
-GeneWeb Version 1.06
+GeneWeb Version 1.07
 --------------------
+
+* gwd:
+  - Don't display person number any more in update form when holding ? in
+    his/her surname or first name
+  - Fixed bug: when updating person, checks were done before patch.
 
 * consang:
   - fixed bug: raised error for empty databases

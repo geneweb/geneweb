@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.1.1.1 1998-09-01 14:32:09 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.2 1998-09-07 11:36:21 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -516,12 +516,13 @@ value print_mod_aux conf base callback =
 value print_mod conf base =
   let callback p =
     let p = effective_mod conf base p in
+    do base.patch_person p.cle_index p;
+       Update.update_misc_names_of_family base p;
+    return
     let wl =
       all_checks_person conf base p (aoi base p.cle_index)
     in
-    do base.patch_person p.cle_index p;
-       Update.update_misc_names_of_family base p;
-       base.commit_patches ();
+    do base.commit_patches ();
        print_mod_ok conf base wl p;
     return ()
   in
