@@ -1,16 +1,16 @@
 
 <p><hr><font size=-1><em>[
 de: Seite angezeigt von
-    <a href="http://pauillac.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
+    <a href="http://www.geneweb.org/">GeneWeb %v</a>
 en: Page displayed by
-    <a href="http://pauillac.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
+    <a href="http://www.geneweb.org/">GeneWeb %v</a>
 et: Kasutusel on
-    <a href="http://pauillac.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
+    <a href="http://www.geneweb.org/">GeneWeb %v</a>
 fr: Page affichée par
-    <a href="http://pauillac.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
+    <a href="http://www.geneweb.org/">GeneWeb %v</a>
 it: Pagina visualizzata da
-    <a href="http://pauillac.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
+    <a href="http://www.geneweb.org/">GeneWeb %v</a>
 sl: Strani ustvarjene z:
-    <a href="http://pauillac.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
+    <a href="http://www.geneweb.org/">GeneWeb %v</a>
 ]
 Copyright (c) 1998-2005 INRIA %d</em></font><br>

@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.58 2004-12-14 10:04:38 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.59 2004-12-23 12:30:46 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -40,7 +40,7 @@ sv: Genealogi
 <table border=0 width="100%">
 <tr align=left>
 <td rowspan=2 width="20%">
-<a href="http://pauillac.inria.fr/~ddr/GeneWeb/"><img width=96
+<a href="http://www.geneweb.org/"><img width=96
 height=108 src="%o/gwlogo.png" align=%L border=0 alt=GeneWeb></a>
 </td>
 %I&wNf<td align=%R

@@ -11,17 +11,12 @@ problem, nodes are sometimes duplicated.
 
 This is the version 1.02.
 
-To compile, you need the Objective Caml compiler, and the preprocessor
-Camlp4.
-
-Objective Caml and Camlp4 can be found at address:
+To compile, you need the Objective Caml compiler which can be found at:
    http://caml.inria.fr/ocaml/
-   http://caml.inria.fr/camlp4/
-
 
 COPYRIGHT:
 
-All files marked in this distribution are copyright 2000 Institut
+All files marked in this distribution are copyright 2000-2005 Institut
 National de Recherche en Informatique et Automatique (INRIA) and
 distributed under the conditions stated in file LICENSE. They can be
 freely redistributed for non-commercial purposes, provided the

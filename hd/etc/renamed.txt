@@ -25,6 +25,6 @@ alt=GeneWeb width=64 height=72 align=right>
 <br>
 
 <p><hr><font size=-1><em>Copyright (c) 1998-2005 INRIA -
-<a href="http://pauillac.inria.fr/~ddr/GeneWeb/">
+<a href="http://www.geneweb.org/">
 GeneWeb %v</a></em></font><br>
 </body>
