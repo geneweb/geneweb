@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.186 2000-11-16 09:27:05 ddr Exp $
+# $Id: lexicon.txt,v 3.187 2000-11-18 17:38:10 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -280,6 +280,7 @@ ru: %t родился более, чем через 2 года после смерти его/ее отца %t
 se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
 
     %t's sex is not coherent with his/her relations
+de: %t's Geschlecht stimmt nicht ьberein mit ihren/seinen Beziehungen
 dk: %t's k&oslash;n er ikke koh&aelig;rent med hans/hendes forbindelser
 en: %t's sex is not coherent with his/her relations
 fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
