@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.3 1998-09-29 12:22:36 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.4 1998-09-30 15:00:45 ddr Exp $ *)
 
 open Def;
 open Check;
@@ -500,6 +500,21 @@ value link gwo_list =
   return base
 ;
 
+value output_command_line bname =
+  let bdir =
+    if Filename.check_suffix bname ".gwb" then bname
+    else bname ^ ".gwb"
+  in
+  let oc = open_out (Filename.concat bdir "command.txt") in
+  do Printf.fprintf oc "%s" Sys.argv.(0);
+     for i = 1 to Array.length Sys.argv - 1 do
+       Printf.fprintf oc " %s" Sys.argv.(i);
+     done;
+     Printf.fprintf oc "\n";
+     close_out oc;
+  return ()
+;
+
 value shift = ref 0;
 
 value main () =
@@ -549,6 +564,7 @@ and [options] are:";
               flush stderr;
            return exit 2 ]
      else ();
+     output_command_line out_file.val;
   return ()
 ;
 
