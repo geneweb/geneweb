@@ -1,6 +1,11 @@
 GeneWeb version 4.08
 --------------------
 
+* GeneWeb server or CGI (gwd)
+  - [12 Sep 02] Fixed bug: in relationship by "shortest path", the
+    selection "include spouses" was not reported when trying the
+    next path.
+
 * Languages
   - [11 Sep 02] Added Italian for documentation (Latino Imparato).
 

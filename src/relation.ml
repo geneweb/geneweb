@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.28 2002-08-19 18:38:34 ddr Exp $ *)
+(* $Id: relation.ml,v 4.29 2002-09-12 07:21:40 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -371,6 +371,7 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
   "href=\"" ^ commd conf ^ "em=R;ei=" ^
     string_of_int (Adef.int_of_iper ip1) ^ ";i=" ^
     string_of_int (Adef.int_of_iper ip2) ^
+    (if p_getenv conf.env "spouse" = Some "on" then ";spouse=on" else "") ^
     (if conf.cancel_links then ";cgl=on" else "") ^ ";et=S" ^
     fst
       (List.fold_left
