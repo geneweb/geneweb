@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 3.6 2000-09-10 13:25:56 ddr Exp $ *)
+(* $Id: def.mli,v 3.7 2000-09-10 14:30:42 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 type iper = Adef.iper;
