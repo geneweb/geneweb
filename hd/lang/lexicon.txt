@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.80 2000-04-03 14:00:00 ddr Exp $
+# $Id: lexicon.txt,v 3.81 2000-04-04 18:53:12 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2588,6 +2588,7 @@ ru: история обновлений
 se: uppdateringarnas historia
 
     horizontally
+dk: vandret
 en: horizontally
 fr: horizontalement
 
