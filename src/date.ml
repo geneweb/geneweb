@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 2.20 1999-10-01 06:24:31 ddr Exp $ *)
+(* $Id: date.ml,v 2.21 1999-10-01 06:51:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -369,9 +369,9 @@ value print_calendar conf base =
     [ Some x -> x
     | _ -> 0 ]
   in
-  let date =
+  let sdn =
     List.fold_left
-      (fun d (var, conv) ->
+      (fun d (var, conv, max_month) ->
          let yy = getint ("y" ^ var) in
          let mm = getint ("m" ^ var) in
          let dd = getint ("d" ^ var) in
@@ -394,10 +394,16 @@ value print_calendar conf base =
                  let yy = yy + 1 in
                  conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
              | (_, _, Some _, _, _, _) ->
-                 let mm = mm - 1 in
+                 let (yy, mm) =
+                   if mm = 1 then (yy - 1, max_month)
+                   else (yy, mm - 1)
+                 in
                  conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
              | (_, _, _, Some _, _, _) ->
-                 let mm = mm + 1 in
+                 let (yy, mm) =
+                   if mm = max_month then (yy + 1, 1)
+                   else (yy, mm + 1)
+                 in
                  conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
              | (_, _, _, _, Some _, _) ->
                  let dd = dd - 1 in
@@ -406,16 +412,13 @@ value print_calendar conf base =
                  let dd = dd + 1 in
                  conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
              | _ -> d ] ])
-      conf.today
-      [("g",
-        fun x -> Calendar.gregorian_of_sdn Sure (Calendar.sdn_of_gregorian x));
-       ("j",
-        fun x -> Calendar.gregorian_of_sdn Sure (Calendar.sdn_of_julian x));
-       ("f",
-        fun x -> Calendar.gregorian_of_sdn Sure (Calendar.sdn_of_french x));
-       ("h",
-        fun x -> Calendar.gregorian_of_sdn Sure (Calendar.sdn_of_hebrew x))]
+      (Calendar.sdn_of_gregorian conf.today)
+      [("g", Calendar.sdn_of_gregorian, 12);
+       ("j", Calendar.sdn_of_julian, 12);
+       ("f", Calendar.sdn_of_french, 13);
+       ("h", Calendar.sdn_of_hebrew, 13)]
   in
+  let date = Calendar.gregorian_of_sdn Sure sdn in
   do header conf title;
      tag "form" "method=GET action=\"%s\"" conf.command begin
        List.iter
