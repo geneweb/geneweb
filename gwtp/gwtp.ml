@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.1 2001-04-22 18:55:22 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.2 2001-04-28 19:47:50 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -961,7 +961,10 @@ value speclist =
    ("-dst", Arg.String (fun x -> gwtp_dst.val := x),
     "<dir>: directory for data bases; default: " ^ gwtp_dst.val);
    ("-site", Arg.String (fun x -> gw_site.val := x),
-    "<url>: site (if any) where data bases are accomodated")]
+    "<url>: site (if any) where data bases are accomodated");
+   ("-tmout", Arg.Float (fun x -> token_tmout.val := x),
+    "<sec>: tokens time out; default = " ^
+    string_of_float token_tmout.val ^ " sec") ]
 ;
 value anonfun _ = do { Arg.usage speclist usage_msg; exit 2 };
 

@@ -20,6 +20,10 @@ GeneWeb version 4.02
     modified: now, if this file is not accessible, only requests from
     127.0.0.1 (local machine) are accepted.
 
+* GeneWeb data bases Transfer Program (gwtp)
+  - [28 Apr 01] Added option -tmout to specify the time after which
+    unused logins expire (default is 900s = 15mn).
+
 GeneWeb version 4.01
 --------------------
 
