@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.8 1999-09-03 13:40:06 ddr Exp $
+# $Id: geneweb.spec,v 1.9 1999-09-04 16:00:33 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -24,8 +24,8 @@ Release: RELEASE
 Copyright: GPL
 Vendor: INRIA
 Group: Applications
-Source: ftp://ftp.inria.fr/INRIA/Projects/cristal/geneweb/Src/geneweb-VERSION.tar.gz
-Source1: geneweb-initrc-VERSION.sh
+Source: ftp://ftp.inria.fr/INRIA/Projects/cristal/geneweb/Src/geneweb-%{version}.tar.gz
+Source1: geneweb-initrc-%{version}.sh
 URL: http://cristal.inria.fr/~ddr/GeneWeb/
 Packager: Daniel de Rauglaudre <daniel.de_rauglaudre@inria.fr>
 # Requires: ld-linux.so.2 libc.so.6 libm.so.6 libncurses.so.4 libm.so.6(GLIBC_2.1) libm.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1) libc.so.6(GLIBC_2.0)
@@ -56,7 +56,7 @@ très efficaces.
 # Delete any stray CVS dirs that got included (they break 'make install')
 %prep
 rm -f /etc/rc.d/rc?.d/[KS]99gwd
-rm -rf /home/geneweb/gw /usr/doc/geneweb-VERSION
+rm -rf /home/geneweb/gw /usr/doc/geneweb-%{version}
 %setup
 find . -name CVS -print | /usr/bin/xargs /bin/rm -rf 
 
@@ -73,7 +73,7 @@ make distrib
 %install
 mkdir -p /home/geneweb
 cp -r distribution /home/geneweb/gw
-cp $RPM_SOURCE_DIR/geneweb-initrc-VERSION.sh /etc/rc.d/init.d/gwd
+cp $RPM_SOURCE_DIR/geneweb-initrc-%{version}.sh /etc/rc.d/init.d/gwd
 ln -s ../init.d/gwd /etc/rc.d/rc0.d/K99gwd
 ln -s ../init.d/gwd /etc/rc.d/rc1.d/K99gwd
 ln -s ../init.d/gwd /etc/rc.d/rc2.d/S99gwd
@@ -86,7 +86,7 @@ ln -s ../init.d/gwd /etc/rc.d/rc6.d/K99gwd
 # can test the whole thing with 'rpm -i foo.rpm'.)
 %clean
 make clean
-rm -rf /home/geneweb/gw /usr/doc/geneweb-VERSION /etc/rc.d/*/*gwd
+rm -rf /home/geneweb/gw /usr/doc/geneweb-%{version} /etc/rc.d/*/*gwd
 
 # *********** INSTALLING .RPM *************
 # This stuff only happens on the user's machine.
@@ -94,7 +94,7 @@ rm -rf /home/geneweb/gw /usr/doc/geneweb-VERSION /etc/rc.d/*/*gwd
 # then it automatically unpacks all the files and symlinks from the archive.
 # Finally it runs the %post script, in which I start the service.
 %pre
-/usr/sbin/adduser -r -d /home/geneweb -c "GeneWeb database" geneweb
+/usr/sbin/useradd -r -d /home/geneweb -c "GeneWeb database" geneweb
 
 %post
 # Sure, all the files are already owned by geneweb, but the directories ain't.
@@ -111,11 +111,11 @@ chown -R geneweb.geneweb /home/geneweb/gw
   cd /home/geneweb/gw/gw
   set *.gwb
   if test -d "$1"; then
-    mkdir -p /home/geneweb/gw-VERSION
-    cp gwu gwb2ged /home/geneweb/gw-VERSION/.
+    mkdir -p /home/geneweb/gw-%{version}
+    cp gwu gwb2ged /home/geneweb/gw-%{version}/.
     for i in $*; do
-      rm -rf /home/geneweb/gw-VERSION/$i
-      mv $i /home/geneweb/gw-VERSION/.
+      rm -rf /home/geneweb/gw-%{version}/$i
+      mv $i /home/geneweb/gw-%{version}/.
     done
     rm -f *.lck
     echo
@@ -126,7 +126,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
     done
     echo "have been moved to the directory:"
     echo -n "   "
-    echo "/home/geneweb/gw-VERSION"
+    echo "/home/geneweb/gw-%{version}"
     echo
     echo "Remember this directory name for further possible recovery."
     echo
@@ -134,7 +134,6 @@ chown -R geneweb.geneweb /home/geneweb/gw
 )
 
 %postun
-/usr/sbin/userdel geneweb
 (rmdir /home/geneweb/gw/gw/doc/* >/dev/null 2>&1; exit 0)
 (rmdir /home/geneweb/gw/gw/doc >/dev/null 2>&1; exit 0)
 (rmdir /home/geneweb/gw/gw/etc >/dev/null 2>&1; exit 0)
@@ -143,6 +142,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 (rmdir /home/geneweb/gw/gw/lang > /dev/null 2>&1; exit 0)
 (rmdir /home/geneweb/gw/gw/setup/* >/dev/null 2>&1; exit 0)
 (rmdir /home/geneweb/gw/gw/setup >/dev/null 2>&1; exit 0)
+/usr/sbin/userdel geneweb
 
 # *********** THE FILES OWNED BY THIS .RPM *************
 # These are the files belonging to this package.  We have to list
