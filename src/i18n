@@ -99,7 +99,6 @@ children's names changed
 click
 click on "%s"
 comment
-comment added
 consanguinity
 continue merging
 cousins
@@ -190,6 +189,8 @@ married%t to
 maximum
 merge
 merge done
+message added
+message/next message
 missing ancestors
 modify
 months old
@@ -271,6 +272,7 @@ spouse
 spouses not included
 starting with
 statistics
+subject
 surname alias
 surname missing
 surname not found
