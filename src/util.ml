@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.29 2002-01-23 14:28:45 ddr Exp $ *)
+(* $Id: util.ml,v 4.30 2002-01-30 11:46:23 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -11,6 +11,228 @@ value base_dir = ref Filename.current_dir_name;
 value doc_dir = ref "";
 value cnt_dir = ref "";
 value images_url = ref "";
+
+(* Internationalization *)
+
+value start_with_vowel s =
+  if String.length s > 0 then
+    match Char.lowercase s.[0] with
+    [ 'a' | 'e' | 'i' | 'o' | 'u' | 'y' | 'h' | 'à' | 'á' | 'â' | 'ã' | 'ä' |
+      'å' | 'æ' | 'è' | 'é' | 'ê' | 'ë' | 'ì' | 'í' | 'î' | 'ï' | 'ò' | 'ó' |
+      'ô' | 'õ' | 'ö' | 'ù' | 'ú' | 'û' | 'ü' | 'ý' | 'ÿ' ->
+        True
+    | _ -> False ]
+  else False
+;
+
+value match_begin s t =
+  loop 0 0 where rec loop i j =
+    if i >= String.length s || j >= String.length t then True
+    else if s.[i] = t.[j] then loop (i + 1) (j + 1)
+    else False
+;
+
+value rec capitale s =
+  if String.length s == 0 then ""
+  else
+    match s.[0] with
+    [ 'a'..'z' | 'à'..'ö' | 'ø'..'ý' ->
+        String.make 1
+          (Char.chr (Char.code s.[0] - Char.code 'a' + Char.code 'A')) ^
+          String.sub s 1 (String.length s - 1)
+    | '&' ->
+        if String.length s == 1 then s
+        else if match_begin s "&iexcl;" then
+          "&iexcl;" ^ capitale (String.sub s 7 (String.length s - 7))
+        else if match_begin s "&aelig;" then
+          "&AElig;" ^ String.sub s 7 (String.length s - 7)
+        else
+          match s.[1] with
+          [ 'a'..'z' ->
+              "&" ^
+                String.make 1
+                  (Char.chr
+                     (Char.code s.[1] - Char.code 'a' + Char.code 'A')) ^
+                String.sub s 2 (String.length s - 2)
+          | _ -> s ]
+    | _ -> s ]
+;
+
+value fcapitale (a : format 'a 'b 'c) : format 'a 'b 'c =
+  Obj.magic capitale a
+;
+
+value nth_field_abs w n =
+  let rec start i n =
+    if n == 0 then i
+    else if i < String.length w then
+      match w.[i] with
+      [ '<' -> start (i + 2) n
+      | '/' -> start (i + 1) (n - 1)
+      | _ -> start (i + 1) n ]
+    else i
+  in
+  let rec stop i =
+    if i < String.length w then
+      match w.[i] with
+      [ '<' -> stop (i + 2)
+      | '/' -> i
+      | _ -> stop (i + 1) ]
+    else i
+  in
+  let i1 = start 0 n in let i2 = stop i1 in (i1, i2)
+;
+
+value nth_field w n =
+  let (i1, i2) = nth_field_abs w n in
+  let (i1, i2) = if i2 == i1 then nth_field_abs w 0 else (i1, i2) in
+  String.sub w i1 (i2 - i1)
+;
+
+value transl conf w =
+  try Hashtbl.find conf.lexicon w with [ Not_found -> "[" ^ w ^ "]" ]
+;
+
+value transl_nth conf w n =
+  try nth_field (Hashtbl.find conf.lexicon w) n with
+  [ Not_found -> "[" ^ nth_field w n ^ "]" ]
+;
+
+value transl_nth_def conf w n def_n =
+  try
+    let w = Hashtbl.find conf.lexicon w in
+    let (i1, i2) = nth_field_abs w n in
+    if i2 == i1 then nth_field w def_n else String.sub w i1 (i2 - i1)
+  with
+  [ Not_found -> "[" ^ nth_field w def_n ^ "]" ]
+;
+
+value plus_decl s =
+  match rindex s '+' with
+  [ Some i ->
+      if i > 0 && s.[i - 1] == ' ' then
+        let start = String.sub s 0 (i - 1) in
+        let decl = String.sub s (i - 1) (String.length s - (i - 1)) in
+        Some (start, decl)
+      else None
+  | None -> None ]
+;
+
+value gen_decline conf wt s =
+  let s1 = if s = "" then "" else " " ^ s in
+  let len = String.length wt in
+  if len >= 1 && wt.[len - 1] = ''' then
+    if String.length s > 0 && start_with_vowel s then
+      nth_field wt 1 ^ decline 'n' s
+    else nth_field wt 0 ^ decline 'n' s1
+  else if len >= 3 && wt.[len - 3] == ':' && wt.[len - 1] == ':' then
+    let start = String.sub wt 0 (len - 3) in start ^ decline wt.[len - 2] s
+  else
+    match plus_decl wt with
+    [ Some (start, " +before") -> if s = "" then start else s ^ " " ^ start
+    | _ -> wt ^ decline 'n' s1 ]
+;
+
+value transl_decline conf w s = gen_decline conf (transl conf w) s;
+
+value gen_decline2 conf wt s1 s2 =
+  let string_of =
+    fun
+    [ '1' -> Some s1
+    | '2' -> Some s2
+    | _ -> None ]
+  in
+  let len = String.length wt in
+  let rec loop i =
+    if i = len then ""
+    else
+      let (s, i) =
+        match wt.[i] with
+        [ '%' when i + 1 < len ->
+            match string_of wt.[i + 1] with
+            [ Some s -> (s, i + 1)
+            | None -> ("%", i) ]
+        | ':' when i + 4 < len && wt.[i + 2] = ':' && wt.[i + 3] = '%' ->
+            let c = wt.[i + 1] in
+            match string_of wt.[i + 4] with
+            [ Some s -> (decline c s, i + 4)
+            | None -> (":", i) ]
+        | '[' ->
+            try
+              let j = String.index_from wt i ']' in
+              if j + 2 < len && wt.[j + 1] = '%' then
+                match string_of wt.[j + 2] with
+                [ Some s ->
+                    let s =
+                      if start_with_vowel s then String.make 1 wt.[j - 1] ^ s
+                      else String.sub wt (i + 1) (j - i - 2) ^ " " ^ s
+                    in
+                    (s, j + 2)
+                | None -> raise Not_found ]
+              else raise Not_found
+            with
+            [ Not_found -> ("[", i) ]
+        | c -> (String.make 1 c, i) ]
+      in
+      s ^ loop (i + 1)
+  in
+  loop 0
+;
+
+value transl_decline2 conf w s1 s2 = gen_decline2 conf (transl conf w) s1 s2;
+
+value failed_format s : format 'a 'b 'c = Obj.magic ("[" ^ s ^ "]");
+
+value valid_format (ini_fmt : format 'a 'b 'c) (r : string) =
+  let s : string = Obj.magic ini_fmt in
+  let rec loop i j =
+    if i < String.length s - 1 && j < String.length r - 1 then
+      match (s.[i], s.[i + 1], r.[j], r.[j + 1]) with
+      [ ('%', x, '%', y) ->
+          if x = y then loop (i + 2) (j + 2) else failed_format s
+      | ('%', _, _, _) -> loop i (j + 1)
+      | (_, _, '%', _) -> loop (i + 1) j
+      | _ -> loop (i + 1) (j + 1) ]
+    else if i < String.length s - 1 then
+      if s.[i] == '%' then failed_format s else loop (i + 1) j
+    else if j < String.length r - 1 then
+      if r.[j] == '%' then failed_format s else loop i (j + 1)
+    else (Obj.magic r : format 'a 'b 'c)
+  in
+  loop 0 0
+;
+
+value cftransl conf fmt =
+  let fmt = transl conf fmt in
+  let rec loop i =
+    fun
+    [ [] -> String.sub fmt i (String.length fmt - i)
+    | [a :: al] as gal ->
+        if i + 4 < String.length fmt && fmt.[i] == ':' &&
+           fmt.[i + 2] == ':' && fmt.[i + 3] == '%' && fmt.[i + 4] == 's' then
+          decline fmt.[i + 1] a ^ loop (i + 5) al
+        else if
+          i + 1 < String.length fmt && fmt.[i] == '%' &&
+          fmt.[i + 1] == 's' then
+          nominative a ^ loop (i + 2) al
+        else if i < String.length fmt then
+          String.make 1 fmt.[i] ^ loop (i + 1) gal
+        else "" ]
+  in
+  loop 0
+;
+
+value ftransl conf s = valid_format s (transl conf (Obj.magic s : string));
+
+value ftransl_nth conf s p =
+  valid_format s (transl_nth conf (Obj.magic s : string) p)
+;
+
+value fdecline conf w s =
+  valid_format w (gen_decline conf (Obj.magic w : string) s)
+;
+
+(* *)
 
 value secure s =
   let rec need_code i =
@@ -249,17 +471,6 @@ value exit_nobr () =
 ;
 *)
 
-value start_with_vowel s =
-  if String.length s > 0 then
-    match Char.lowercase s.[0] with
-    [ 'a' | 'e' | 'i' | 'o' | 'u' | 'y' | 'h' | 'à' | 'á' | 'â' | 'ã' | 'ä' |
-      'å' | 'æ' | 'è' | 'é' | 'ê' | 'ë' | 'ì' | 'í' | 'î' | 'ï' | 'ò' | 'ó' |
-      'ô' | 'õ' | 'ö' | 'ù' | 'ú' | 'û' | 'ü' | 'ý' | 'ÿ' ->
-        True
-    | _ -> False ]
-  else False
-;
-
 value connais base p =
   sou base p.first_name <> "?" || sou base p.surname <> "?"
 ;
@@ -490,213 +701,6 @@ value create_env s =
     else separate (succ i) s
   in
   List.map (separate 0) (get_assoc 0 0)
-;
-
-value match_begin s t =
-  loop 0 0 where rec loop i j =
-    if i >= String.length s || j >= String.length t then True
-    else if s.[i] = t.[j] then loop (i + 1) (j + 1)
-    else False
-;
-
-value rec capitale s =
-  if String.length s == 0 then ""
-  else
-    match s.[0] with
-    [ 'a'..'z' | 'à'..'ö' | 'ø'..'ý' ->
-        String.make 1
-          (Char.chr (Char.code s.[0] - Char.code 'a' + Char.code 'A')) ^
-          String.sub s 1 (String.length s - 1)
-    | '&' ->
-        if String.length s == 1 then s
-        else if match_begin s "&iexcl;" then
-          "&iexcl;" ^ capitale (String.sub s 7 (String.length s - 7))
-        else if match_begin s "&aelig;" then
-          "&AElig;" ^ String.sub s 7 (String.length s - 7)
-        else
-          match s.[1] with
-          [ 'a'..'z' ->
-              "&" ^
-                String.make 1
-                  (Char.chr
-                     (Char.code s.[1] - Char.code 'a' + Char.code 'A')) ^
-                String.sub s 2 (String.length s - 2)
-          | _ -> s ]
-    | _ -> s ]
-;
-
-value fcapitale (a : format 'a 'b 'c) : format 'a 'b 'c =
-  Obj.magic capitale a
-;
-
-value nth_field_abs w n =
-  let rec start i n =
-    if n == 0 then i
-    else if i < String.length w then
-      match w.[i] with
-      [ '<' -> start (i + 2) n
-      | '/' -> start (i + 1) (n - 1)
-      | _ -> start (i + 1) n ]
-    else i
-  in
-  let rec stop i =
-    if i < String.length w then
-      match w.[i] with
-      [ '<' -> stop (i + 2)
-      | '/' -> i
-      | _ -> stop (i + 1) ]
-    else i
-  in
-  let i1 = start 0 n in let i2 = stop i1 in (i1, i2)
-;
-
-value nth_field w n =
-  let (i1, i2) = nth_field_abs w n in
-  let (i1, i2) = if i2 == i1 then nth_field_abs w 0 else (i1, i2) in
-  String.sub w i1 (i2 - i1)
-;
-
-value transl conf w =
-  try Hashtbl.find conf.lexicon w with [ Not_found -> "[" ^ w ^ "]" ]
-;
-
-value transl_nth conf w n =
-  try nth_field (Hashtbl.find conf.lexicon w) n with
-  [ Not_found -> "[" ^ nth_field w n ^ "]" ]
-;
-
-value transl_nth_def conf w n def_n =
-  try
-    let w = Hashtbl.find conf.lexicon w in
-    let (i1, i2) = nth_field_abs w n in
-    if i2 == i1 then nth_field w def_n else String.sub w i1 (i2 - i1)
-  with
-  [ Not_found -> "[" ^ nth_field w def_n ^ "]" ]
-;
-
-value plus_decl s =
-  match rindex s '+' with
-  [ Some i ->
-      if i > 0 && s.[i - 1] == ' ' then
-        let start = String.sub s 0 (i - 1) in
-        let decl = String.sub s (i - 1) (String.length s - (i - 1)) in
-        Some (start, decl)
-      else None
-  | None -> None ]
-;
-
-value gen_decline conf wt s =
-  let s1 = if s = "" then "" else " " ^ s in
-  let len = String.length wt in
-  if len >= 1 && wt.[len - 1] = ''' then
-    if String.length s > 0 && start_with_vowel s then
-      nth_field wt 1 ^ decline 'n' s
-    else nth_field wt 0 ^ decline 'n' s1
-  else if len >= 3 && wt.[len - 3] == ':' && wt.[len - 1] == ':' then
-    let start = String.sub wt 0 (len - 3) in start ^ decline wt.[len - 2] s
-  else
-    match plus_decl wt with
-    [ Some (start, " +before") -> if s = "" then start else s ^ " " ^ start
-    | _ -> wt ^ decline 'n' s1 ]
-;
-
-value transl_decline conf w s = gen_decline conf (transl conf w) s;
-
-value gen_decline2 conf wt s1 s2 =
-  let string_of =
-    fun
-    [ '1' -> Some s1
-    | '2' -> Some s2
-    | _ -> None ]
-  in
-  let len = String.length wt in
-  let rec loop i =
-    if i = len then ""
-    else
-      let (s, i) =
-        match wt.[i] with
-        [ '%' when i + 1 < len ->
-            match string_of wt.[i + 1] with
-            [ Some s -> (s, i + 1)
-            | None -> ("%", i) ]
-        | ':' when i + 4 < len && wt.[i + 2] = ':' && wt.[i + 3] = '%' ->
-            let c = wt.[i + 1] in
-            match string_of wt.[i + 4] with
-            [ Some s -> (decline c s, i + 4)
-            | None -> (":", i) ]
-        | '[' ->
-            try
-              let j = String.index_from wt i ']' in
-              if j + 2 < len && wt.[j + 1] = '%' then
-                match string_of wt.[j + 2] with
-                [ Some s ->
-                    let s =
-                      if start_with_vowel s then String.make 1 wt.[j - 1] ^ s
-                      else String.sub wt (i + 1) (j - i - 2) ^ " " ^ s
-                    in
-                    (s, j + 2)
-                | None -> raise Not_found ]
-              else raise Not_found
-            with
-            [ Not_found -> ("[", i) ]
-        | c -> (String.make 1 c, i) ]
-      in
-      s ^ loop (i + 1)
-  in
-  loop 0
-;
-
-value transl_decline2 conf w s1 s2 = gen_decline2 conf (transl conf w) s1 s2;
-
-value failed_format s : format 'a 'b 'c = Obj.magic ("[" ^ s ^ "]");
-
-value valid_format (ini_fmt : format 'a 'b 'c) (r : string) =
-  let s : string = Obj.magic ini_fmt in
-  let rec loop i j =
-    if i < String.length s - 1 && j < String.length r - 1 then
-      match (s.[i], s.[i + 1], r.[j], r.[j + 1]) with
-      [ ('%', x, '%', y) ->
-          if x = y then loop (i + 2) (j + 2) else failed_format s
-      | ('%', _, _, _) -> loop i (j + 1)
-      | (_, _, '%', _) -> loop (i + 1) j
-      | _ -> loop (i + 1) (j + 1) ]
-    else if i < String.length s - 1 then
-      if s.[i] == '%' then failed_format s else loop (i + 1) j
-    else if j < String.length r - 1 then
-      if r.[j] == '%' then failed_format s else loop i (j + 1)
-    else (Obj.magic r : format 'a 'b 'c)
-  in
-  loop 0 0
-;
-
-value cftransl conf fmt =
-  let fmt = transl conf fmt in
-  let rec loop i =
-    fun
-    [ [] -> String.sub fmt i (String.length fmt - i)
-    | [a :: al] as gal ->
-        if i + 4 < String.length fmt && fmt.[i] == ':' &&
-           fmt.[i + 2] == ':' && fmt.[i + 3] == '%' && fmt.[i + 4] == 's' then
-          decline fmt.[i + 1] a ^ loop (i + 5) al
-        else if
-          i + 1 < String.length fmt && fmt.[i] == '%' &&
-          fmt.[i + 1] == 's' then
-          nominative a ^ loop (i + 2) al
-        else if i < String.length fmt then
-          String.make 1 fmt.[i] ^ loop (i + 1) gal
-        else "" ]
-  in
-  loop 0
-;
-
-value ftransl conf s = valid_format s (transl conf (Obj.magic s : string));
-
-value ftransl_nth conf s p =
-  valid_format s (transl_nth conf (Obj.magic s : string) p)
-;
-
-value fdecline conf w s =
-  valid_format w (gen_decline conf (Obj.magic w : string) s)
 ;
 
 value red_color = "red";
