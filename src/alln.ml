@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.2 2001-05-12 04:00:25 ddr Exp $ *)
+(* $Id: alln.ml,v 4.3 2001-07-01 21:25:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -287,13 +287,16 @@ value select_names conf base is_surnames ini =
 ;
 
 value print_frequency conf base is_surnames =
+  let _ = base.data.strings.array () in
   let list =
     let (list, _) = select_names conf base is_surnames "" in
-    Sort.list
+    List.sort
       (fun (k1, _, cnt1) (k2, _, cnt2) ->
-         if cnt1 > cnt2 then True
-         else if cnt1 < cnt2 then False
-         else k1 <= k2)
+         if cnt1 > cnt2 then -1
+         else if cnt1 < cnt2 then 1
+         else if k1 < k2 then -1
+         else if k1 > k2 then 1
+         else 0)
       list
   in
   let len = List.length list in

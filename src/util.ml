@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.7 2001-06-28 17:05:27 ddr Exp $ *)
+(* $Id: util.ml,v 4.8 2001-07-01 21:25:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1214,8 +1214,11 @@ value parent conf base p a =
   match a.public_name with
   [ n when sou base n <> "" -> sou base n ^ person_title conf base a
   | _ ->
-      p_first_name base a ^
-        (if p.surname <> a.surname then " " ^ p_surname base a else "") ]
+      if conf.hide_names && not (fast_auth_age conf a) then
+        "x x"
+      else
+        p_first_name base a ^
+          (if p.surname <> a.surname then " " ^ p_surname base a else "") ]
 ;
 
 value print_parent conf base p fath moth =
@@ -1269,13 +1272,19 @@ value preciser_homonyme conf base p =
               let ct = des.children in
               if Array.length ct > 0 then
                 let enfant = poi base ct.(0) in
+                let (child_fn, child_sn) =
+                  if conf.hide_names && not (fast_auth_age conf enfant) then
+                    ("x", " x")
+                  else
+                    (p_first_name base enfant,
+                     if p.surname <> enfant.surname then
+                       " " ^ p_surname base enfant
+                     else "")
+                in
                 Wserver.wprint "%s"
                   (transl_decline2 conf "%1 of %2"
                      (transl_nth conf "father/mother" is)
-                     (p_first_name base enfant ^
-                        (if p.surname <> enfant.surname then
-                           " " ^ p_surname base enfant
-                         else "")))
+                     (child_fn ^ child_sn))
               else
                 let conjoint = poi base conjoint in
                 if p_first_name base conjoint <> "?" ||
