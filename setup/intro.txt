@@ -1,3 +1,4 @@
 * Version francaise: tapez "fr"
 * English version: type "en"
+* Version espanola: escribir en el teclado "es"
 ? 
