@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.17 1999-07-17 05:30:24 ddr Exp $ *)
+(* $Id: relation.ml,v 2.18 1999-07-17 20:30:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -52,8 +52,10 @@ value print_menu conf base p =
            Wserver.wprint "<input type=radio name=t value=N> <em>%s</em>\n"
              (transl_nth conf "surname/surnames" 0);
          end;
+         let auth = age_autorise conf base p in
          Array.iter
            (fun ifam ->
+              let fam = foi base ifam in
               let cpl = coi base ifam in
               let c = spouse p cpl in
               let c = poi base c in
@@ -61,8 +63,10 @@ value print_menu conf base p =
                 do html_li conf;
                    Wserver.wprint "<input type=radio name=select value=%d>\n"
                      (Adef.int_of_iper c.cle_index);
-                   Wserver.wprint "%s\n"
-                     (transl_nth conf "his wife/her husband" is);
+                   if fam.not_married && auth && age_autorise conf base c then ()
+                   else
+                     Wserver.wprint "%s\n"
+                       (transl_nth conf "his wife/her husband" is);
                    afficher_personne_sans_titre conf base c;
                    Wserver.wprint "</a>";
                    afficher_titre conf base c;
@@ -72,11 +76,19 @@ value print_menu conf base p =
            p.family;
        end;
        html_p conf;
+       Wserver.wprint "%s\n" (capitale (transl conf "long display"));
+       Wserver.wprint "<input type=checkbox name=long value=on>\n";
+       html_br conf;
        Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
        Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
        html_br conf;
-       Wserver.wprint "%s\n" (capitale (transl conf "long display"));
-       Wserver.wprint "<input type=checkbox name=long value=on>\n";
+       Wserver.wprint "%s:\n" (capitale (transl_nth conf "branch/branches" 1));
+       Wserver.wprint "%s\n" (transl conf "include spouses");
+       Wserver.wprint "<input type=checkbox name=opt value=spouse>\n";
+       html_br conf;
+       Wserver.wprint "%s:\n" (capitale (transl_nth conf "branch/branches" 1));
+       Wserver.wprint "%s\n" (transl conf "cancel GeneWeb links");
+       Wserver.wprint "<input type=checkbox name=cglb value=on>\n";
        html_p conf;
        Wserver.wprint "<input type=submit value=\"Ok\">\n";
      end;
@@ -439,6 +451,12 @@ value print_path conf base i p1 p2 (l1, l2, list) =
 value print_main_relationship conf base long p1 p2 rel =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
   do header conf title;
+     match p_getenv conf.env "opt" with
+     [ Some "spouse" -> conf.senv := conf.senv @ [("opt", "spouse")]
+     | _ -> () ];
+     match p_getenv conf.env "cglb" with
+     [ Some "on" -> conf.senv := conf.senv @ [("cgl", "on")]
+     | _ -> () ];
      match rel with
      [ None ->
          if p1.cle_index == p2.cle_index then

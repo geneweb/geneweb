@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.13 1999-07-15 08:53:05 ddr Exp $ *)
+(* $Id: util.mli,v 2.14 1999-07-17 20:30:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -11,6 +11,9 @@ value html : config -> unit;
 value html_br : config -> unit;
 value html_p : config -> unit;
 value html_li : config -> unit;
+
+value enclosing_tags : config -> list string;
+value wprint_with_enclosing_tags : config -> format 'a out_channel unit -> 'a;
 
 value commd : config -> string;
 value code_varenv : string -> string;

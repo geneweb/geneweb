@@ -9,6 +9,10 @@ GeneWeb version 2.05
     problem.
 
 * Setup program
+  - [Jul 18, 99] Added in the menu "data base parameters" the ability to display
+    the characters in the pages 1/ in bold, 2/ in italic, 3/ in smaller or bigger     size (using the new key 'enclosing_tag': see below section "base configuration
+    files"). Bold is useful, for example, if a background image is used, to
+    make the text more readable. [Spanish version not yet translated]
   - [Jul 15, 99] Changed GEDCOM export menu to reflect new option "-charset"
     of "gwb2ged" (see below in section "GeneWeb to Gedcom").
   - [Jul 2, 99] Fixed bug: importing GeneWeb base from old version passing
@@ -25,8 +29,10 @@ GeneWeb version 2.05
     two words) into "Lepine" (one word).
   - [Jul 16, 99] Added a "back" button in case of update error (useful
     for browsers which loose the contents of the forms when navigating).
-  - [Jul 15, 99] In relationship computing, added ability to cancel
-    GeneWeb links and a long display.
+  - [Jul 15..17, 99] In relationship computing, added ability to cancel
+    GeneWeb links. Added a long display. Added the ability to see the spouses
+    in branches displayings. Added ability to cancel GeneWeb links in branches
+    displaying.
   - [Jul 15, 99] Added system of grammar declinations (required by German,
     Esperanto, (future) Czech). Changed the lexicon to use this new system.
   - [Jul 9, 99] Added link (upper arrow) to welcome page in displayings by
@@ -47,6 +53,12 @@ GeneWeb version 2.05
   - [Jul 15, 99] Added option "-charset" whose values can be "ANSEL" or
     "ASCII": "ASCII" is the default. Deleted option "-ascii" now unuseful.
   - [Jul 2, 99] Generate now dates of the form "FROM..TO.." for titles.
+
+* Base configuration files (base.gwf)
+  - [Jul 18, 99] Added the key 'enclosing_tag' to enclose whole displayed
+    text with one or several HTML tags. E.g. by setting it to 'strong', all
+    text is displayed bold. Added comment about that in the template file
+    "a.gwf".
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
   - [Jul 17, 99] In welcome pages, simplified the text "it is a first

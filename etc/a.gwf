@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 1.2 1999-06-19 11:33:17 ddr Exp $
+# $Id: a.gwf,v 1.3 1999-07-17 20:30:50 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -22,9 +22,20 @@
 # body_prop=bgcolor=#333333 text=#FFFFFF link=#99CCFF vlink=#CC99FF
 # body_prop=bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF
 # For a background pattern, e.g. foo.jpg:
-# body_prop=background="geneweb?m=IM;b=base;v=foo.jpg"
+# body_prop=background="geneweb?m=IM;b=base;v=/foo.jpg"
 #   the file foo.jpg must be in the directory "images/base"
 #   "base" is the base's name
+
+# Enclose whole text with HTML tags.
+# By using 'enclosing_tag=strong', all text is displayed bold.
+# By using 'enclosing_tag=em', all text is displayed in italic.
+# By using 'enclosing_tag=size=+2', all text is displayed bigger.
+# ... and so on...
+# -> Any valid HTML tag can be used
+# -> Several tags can be used together by using several lines
+# enclosing_tag=strong
+# enclosing_tag=em
+# enclosing_tag=font size=+2
 
 # Friend can see all dates
 # Choose a password or leave it empty

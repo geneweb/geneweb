@@ -221,6 +221,51 @@ value="bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF">
 
 <dl><dt><dd><table border=1>
 <tr>
+<td><strong>- enclosing_tag -</strong></td>
+</tr>
+
+<tr>
+<td>Affichage des caract&egrave;res.
+<p>
+Permet d'afficher les caract&egrave;res en gras, en italique, plus gros ou moins
+gros.
+<p>
+L'affichage en caract&egrave;res gras peut &ecirc;tre utile, par
+exemple, si on a s&eacute;lectionn&eacute; une image de fond, pour
+rendre le texte plus lisible.
+</td>
+</tr>
+
+<tr>
+<td align=center>
+Affichage en caract&egrave;res gras
+<input type=checkbox name=enclosing_tag_strong value=$1[on]>
+</td>
+</tr>
+
+<tr>
+<td align=center>
+Affichage en italique
+<input type=checkbox name=enclosing_tag_em value=$2[on]>
+</td>
+</tr>
+
+<tr>
+<td align=center>
+Caract&egrave;res
+<select name=enclosing_tag_size>
+<option value=$3{s2}>tr&egrave;s petits
+<option value=$3{s1}>petits
+<option value=$3{}>de taille normale
+<option value=$3{b1}>gros
+<option value=$3{b2}>tr&egrave;s gros
+</select>
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
 <td><strong>- default_lang -</strong></td>
 </tr>
 
