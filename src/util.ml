@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.31 2002-01-30 11:49:52 ddr Exp $ *)
+(* $Id: util.ml,v 4.32 2002-02-14 10:19:42 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -808,34 +808,49 @@ value open_etc_file fname =
   [ Sys_error _ -> try Some (open_in fname2) with [ Sys_error _ -> None ] ]
 ;
 
-value rec copy_from_etc env imcom ic =
+value macro_etc env imcom c =
+  try List.assoc c env () with
+  [ Not_found ->
+      match c with
+      [ '%' -> "%"
+      | 'k' -> imcom
+      | 'o' ->
+          if images_url.val <> "" then images_url.val else imcom ^ "m=IM;v="
+      | 'v' -> Version.txt
+      | c -> "%" ^ String.make 1 c ] ]
+;
+
+value rec copy_from_etc env lang imcom ic =
   let cnt = ref 0 in
   try
     while True do {
       match input_char ic with
       [ '%' ->
           let c = input_char ic in
-          try Wserver.wprint "%s" (List.assoc c env ()) with
-          [ Not_found ->
-              match c with
-              [ '%' -> Wserver.wprint "%%"
-              | '+' -> incr cnt
-              | '#' -> Wserver.wprint "%d" cnt.val
-              | 'k' -> Wserver.wprint "%s" imcom
-              | 'n' -> Wserver.wprint "%s" (base_len (input_to_semi ic))
-              | 'o' ->
-                  Wserver.wprint "%s"
-                    (if images_url.val <> "" then images_url.val
-                     else imcom ^ "m=IM;v=")
-              | 'r' ->
-                  let name = input_line ic in
-                  match open_etc_file name with
-                  [ Some ic -> copy_from_etc env imcom ic
-                  | None ->
-                      Wserver.wprint
-                        "<em>... file not found: \"%s.txt\"</em><br>" name ]
-              | 'v' -> Wserver.wprint "%s" Version.txt
-              | c -> Wserver.wprint "%%%c" c ] ]
+          match c with 
+          [ '+' -> incr cnt
+          | '#' -> Wserver.wprint "%d" cnt.val
+          | 'n' -> Wserver.wprint "%s" (base_len (input_to_semi ic))
+          | 'r' ->
+              let name = input_line ic in
+              match open_etc_file name with
+              [ Some ic -> copy_from_etc env lang imcom ic
+              | None ->
+                  Wserver.wprint
+                    "<em>... file not found: \"%s.txt\"</em><br>" name ]
+          | c -> Wserver.wprint "%s" (macro_etc env imcom c) ]
+      | '[' ->
+          let c = input_char ic in
+          if c = '\n' then
+            let s =
+              loop 0 (input_char ic) where rec loop len c =
+                if c = ']' then Buff.get len
+                else loop (Buff.store len c) (input_char ic)
+            in
+            let s = Translate.inline lang '%' (macro_etc env imcom) s in
+            Wserver.wprint "%s" s
+          else
+            Wserver.wprint "[%c" c
       | c -> Wserver.wprint "%c" c ]
     }
   with exc ->
@@ -1007,7 +1022,8 @@ value include_hed_trl conf base_opt suff =
         [ Some i -> String.sub s (i + 1) (String.length s - i - 1)
         | None -> "" ]
       in
-      copy_from_etc [('p', pref); ('s', suff)] conf.indep_command ic
+      copy_from_etc [('p', pref); ('s', suff)] conf.lang conf.indep_command
+        ic
   | None -> () ]
 ;
 
@@ -1267,7 +1283,7 @@ alt=... width=64 height=72 align=right>
 <br>
 " (image_prefix conf);
     match open_etc_file "copyr" with
-    [ Some ic -> copy_from_etc env conf.indep_command ic
+    [ Some ic -> copy_from_etc env conf.lang conf.indep_command ic
     | None ->
         do {
           html_p conf;

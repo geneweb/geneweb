@@ -1,9 +1,9 @@
-# $Id: Makefile,v 4.7 2002-01-21 12:06:44 ddr Exp $
+# $Id: Makefile,v 4.8 2002-02-14 10:19:38 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver -I ../src
-OBJS=../wserver/wserver.cmo ../src/version.cmo ../src/argl.cmo ../src/buff.cmo setup.cmo
+OBJS=../wserver/wserver.cmo ../src/version.cmo ../src/argl.cmo ../src/buff.cmo ../src/translate.cmo setup.cmo
 
 all:: out
 

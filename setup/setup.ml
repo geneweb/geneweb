@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.33 2002-02-04 18:36:31 ddr Exp $ *)
+(* $Id: setup.ml,v 4.34 2002-02-14 10:19:38 ddr Exp $ *)
 
 open Printf;
 
@@ -299,15 +299,6 @@ value referer conf =
   Wserver.extract_param "referer: " '\r' conf.request
 ;
 
-value skip_lang s =
-  loop where rec loop i =
-    if i = String.length s then None
-    else
-      match s.[i] with
-      [ 'a'..'z' | '-' -> loop (i + 1)
-      | _ -> Some i ]
-;
-
 value macro conf =
   fun
   [ '/' -> ifdef UNIX then "/" else "\\"
@@ -327,62 +318,6 @@ value macro conf =
   | 'w' -> slashify (Sys.getcwd ())
   | '$' -> "$"
   | c -> "BAD MACRO " ^ String.make 1 c ]
-;
-
-value inline_translate conf s =
-  let lang = conf.lang ^ ":" in
-  let derived_lang =
-    try
-      let i = String.index lang '-' in
-      String.sub lang 0 i ^ ":"
-    with
-    [ Not_found -> "" ]
-  in
-  let rec loop alt_version bol i =
-    if i = String.length s then
-      match alt_version with
-      [ Some s -> s
-      | None -> ".........." ]
-    else if bol then
-      match skip_lang s i with
-      [ Some j when s.[j] = ':' ->
-          let curr_lang = String.sub s i (j + 1 - i) in
-          if curr_lang = lang || curr_lang = derived_lang ||
-             curr_lang = "en:" then
-            let (s, i) =
-              let j = if s.[j + 1] = ' ' then j + 1 else j in
-              let rec loop len j =
-                if j = String.length s then (Buff.get len, j)
-                else if s.[j] = '\n' then
-                  if j + 1 < String.length s && s.[j + 1] = ' ' then
-                    let j =
-                      loop (j + 1) where rec loop j =
-                        if j < String.length s && s.[j] = ' ' then
-                          loop (j + 1)
-                        else j
-                    in
-                    loop (Buff.store len '\n') j
-                  else (Buff.get len, j)
-                else if s.[j] == '$' then
-                  loop (Buff.mstore len (macro conf s.[j + 1])) (j + 2)
-                else loop (Buff.store len s.[j]) (j + 1)
-              in
-              loop 0 (j + 1)
-            in
-            if curr_lang = lang then s
-            else
-              let alt_version =
-                if curr_lang = derived_lang then Some s
-                else if alt_version = None then
-                  let s = if s = "" then s else "[" ^ s ^ "]" in Some s
-                else alt_version
-              in
-              loop alt_version True i
-          else loop alt_version (s.[i] = '\n') (i + 1)
-      | _ -> loop alt_version (s.[i] = '\n') (i + 1) ]
-    else loop alt_version (s.[i] = '\n') (i + 1)
-  in
-  loop None True 0
 ;
 
 value get_variable strm =
@@ -442,7 +377,7 @@ value rec copy_from_stream conf print strm =
           match Stream.peek strm with
           [ Some '\n' ->
               let s = parse_upto ']' strm in
-              print (inline_translate conf s)
+              print (Translate.inline conf.lang '$' (macro conf) s)
           | _ ->
               print "[" ]
       | '$' ->

@@ -191,9 +191,11 @@ some.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
 some.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
     ../wserver/wserver.cmx 
 srcfile.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi history.cmi \
-    lock.cmi num.cmi util.cmi version.cmo ../wserver/wserver.cmi srcfile.cmi 
+    lock.cmi num.cmi translate.cmi util.cmi version.cmo \
+    ../wserver/wserver.cmi srcfile.cmi 
 srcfile.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx history.cmx \
-    lock.cmx num.cmx util.cmx version.cmx ../wserver/wserver.cmx srcfile.cmi 
+    lock.cmx num.cmx translate.cmx util.cmx version.cmx \
+    ../wserver/wserver.cmx srcfile.cmi 
 srcfile.cmi: config.cmi def.cmi 
 templ.cmo: buff.cmo calendar.cmi config.cmi def.cmi gutil.cmi templAst.cmi \
     util.cmi version.cmo ../wserver/wserver.cmi 
@@ -203,6 +205,8 @@ title.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
 title.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
     ../wserver/wserver.cmx 
+translate.cmo: buff.cmo translate.cmi 
+translate.cmx: buff.cmx translate.cmi 
 update.cmo: adef.cmi calendar.cmi config.cmi date.cmi def.cmi gutil.cmi \
     iovalue.cmi util.cmi ../wserver/wserver.cmi update.cmi 
 update.cmx: adef.cmx calendar.cmx config.cmi date.cmx def.cmi gutil.cmx \
@@ -230,11 +234,11 @@ updateIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx iobase.cmx \
     ../wserver/wserver.cmx updateIndOk.cmi 
 updateIndOk.cmi: config.cmi def.cmi gutil.cmi update.cmi 
 util.cmo: adef.cmi buff.cmo config.cmi consang.cmi def.cmi gutil.cmi \
-    iobase.cmi lock.cmi name.cmi num.cmi version.cmo ../wserver/wserver.cmi \
-    util.cmi 
+    iobase.cmi lock.cmi name.cmi num.cmi translate.cmi version.cmo \
+    ../wserver/wserver.cmi util.cmi 
 util.cmx: adef.cmx buff.cmx config.cmi consang.cmx def.cmi gutil.cmx \
-    iobase.cmx lock.cmx name.cmx num.cmx version.cmx ../wserver/wserver.cmx \
-    util.cmi 
+    iobase.cmx lock.cmx name.cmx num.cmx translate.cmx version.cmx \
+    ../wserver/wserver.cmx util.cmi 
 util.cmi: config.cmi def.cmi num.cmi 
 advSearchOk.cmo advSearchOk.cmx: pa_html.cmo def.syn.cmo
 alln.cmo alln.cmx: pa_html.cmo

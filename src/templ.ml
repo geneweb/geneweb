@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.11 2002-01-21 05:01:01 ddr Exp $ *)
+(* $Id: templ.ml,v 4.12 2002-02-14 10:19:41 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -547,12 +547,12 @@ value print_copyright conf base =
         else s ^ " - " ^ Util.setup_link conf)]
   in
   match open_etc_file "copyr" with
-  [ Some ic -> copy_from_etc env conf.indep_command ic
+  [ Some ic -> copy_from_etc env conf.lang conf.indep_command ic
   | None ->
       do {
         html_p conf;
         Wserver.wprint "
-<hr><font size=-1><em>(c) Copyright 2001 INRIA -
+<hr><font size=-1><em>(c) Copyright 2002 INRIA -
 GeneWeb %s</em></font>" Version.txt;
         html_br conf;
       } ]
