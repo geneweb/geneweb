@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.12 1999-04-05 23:42:28 ddr Exp $ *)
+(* $Id: perso.ml,v 2.13 1999-04-06 07:22:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -702,7 +702,7 @@ value print_ancestors_descends_cousins conf base p a =
       do head things;
          Wserver.wprint "<a href=\"%s%s;m=C\">%s</a>"
            (commd conf) (acces conf base p)
-           (capitale (transl conf "cousins"));
+           (capitale (transl conf "cousins (general term)"));
       return True
     else things
   in

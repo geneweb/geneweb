@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.7 1999-04-02 12:35:32 ddr Exp $
+# $Id: lexicon.txt,v 2.8 1999-04-06 07:22:33 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1061,6 +1061,19 @@ he:   απι γεγιν
 it: cugini
 nl: neven en nichten
 no: s&oslash;skenbarn
+pt: primos
+se: kusiner
+
+    cousins (general term)
+de: Cousins
+en: cousins
+eo: kuzoj
+es: primos
+fr: cousins
+he:   απι γεγιν
+it: cugini
+nl: neven en nichten
+no: s&oslash;skenbarn og flermenninger
 pt: primos
 se: kusiner
 
