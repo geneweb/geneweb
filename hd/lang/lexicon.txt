@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.77 2002-03-06 13:55:33 ddr Exp $
+# $Id: lexicon.txt,v 4.78 2002-03-06 14:55:44 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7547,8 +7547,7 @@ lv: "izveidot" vietв lietojiet "saite"
 nl: gebruik "connectie" inplaats van "creлren"
 no: bruk "koble" istedet for "opprett"
 pl: uїyj "link" zamiast "utwуrz"
-pt: use "reunir" em lugar de "criar"
-pt-br: use "ligar" em lugar de "criar"
+pt: use "ligar" em lugar de "criar"
 ru: используйте "связать" вместо "создать"
 sv: anv&auml;nd "l&auml;nk" ist&auml;llet f&ouml;r "skapa"
 
