@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.62 2004-03-03 10:29:36 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.63 2004-03-03 10:41:29 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -844,7 +844,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
                 (True, False, True, "")
               else
 	        match match_auth friend_passwd friend_passwd_file uauth with
-	        [ Some _ -> (True, False, True, "")
+	        [ Some username -> (True, False, True, username)
 	        | None -> (False, False, False, "") ]
             else assert False
           else if wizard_passwd = "" && wizard_passwd_file = "" then
@@ -857,7 +857,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
           	  (True, False, True, "")
           	else
 	          match match_auth friend_passwd friend_passwd_file uauth with
-          	  [ Some _ -> (True, False, True, "")
+          	  [ Some username -> (True, False, True, username)
 	          | None -> (True, False, False, "") ] ] ]
     in
     let user =
