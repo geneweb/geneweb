@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.19 1999-07-26 07:02:01 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.20 1999-07-28 08:02:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -20,9 +20,7 @@ value get conf key =
 ;
 
 value get_nth conf key cnt =
-  match p_getenv conf.env (key ^ string_of_int cnt) with
-  [ Some v -> Some v
-  | None -> None ]
+  p_getenv conf.env (key ^ string_of_int cnt)
 ;
 
 value rec reconstitute_string_list conf var ext cnt =
@@ -123,12 +121,6 @@ value rec reconstitute_relations conf ext cnt =
       let r_moth =
         if r_moth_fn = "" || r_moth_fn = "?" || r_moth_sn = "?" then None
         else Some (r_moth_fn, r_moth_sn, r_moth_occ)
-      in
-      let r_start =
-        Update.reconstitute_date conf ("r_start" ^ string_of_int cnt)
-      in
-      let r_end =
-        Update.reconstitute_date conf ("r_end" ^ string_of_int cnt)
       in
       let r_type =
         match get_nth conf "r_type" cnt with
