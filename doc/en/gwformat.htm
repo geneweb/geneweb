@@ -2,8 +2,9 @@
 <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <meta NAME="GENERATOR" CONTENT="Microsoft FrontPage 3.0">
 <title>GeneWeb - GW format</title>
-<!-- $Id: gwformat.htm,v 3.1 2000-09-24 12:30:36 ddr Exp $ -->
+<!-- $Id: gwformat.htm,v 3.2 2000-09-24 17:25:51 ddr Exp $ -->
 <!-- Documentation written by Yann Corno, 9/23/2000 -->
+<!-- Update : 9/24/2000 - Added some Family tags -->
 <!-- Special thanks to Daniel de Rauglaudre for his help and comments -->
 </head>
 
@@ -179,8 +180,8 @@ of their parents families.
 
 <dir>
   <p><b>fam</b> <i>HusbandLastName</i> <i>FirstName</i>[<b>.</b><i>Number</i>] <b>+</b>[<i>WeddingDate</i>]
-  [<b>-</b> <i>DivorceDate</i>] [<b>#nm</b>] [<b>#mp</b> <i>WeddingPlace</i>] [<b>#ms</b>
-  WeddingSource] <i>WifeLastName</i> <i>FirstName</i>[<b>.</b><i>Number</i>]<br>
+  [<strong>#sep</strong><b> | -</b> <i>DivorceDate</i>] [<b>#nm</b> | <strong>#eng</strong>]
+  [<b>#mp</b> <i>WeddingPlace</i>] [<b>#ms</b> WeddingSource] <i>WifeLastName</i> <i>FirstName</i>[<b>.</b><i>Number</i>]<br>
   [<b>src</b> <i>Family source</i>]<br>
   [<b>comm</b> <i>Family comments in free format</i>]<br>
   [<b>wit:</b> <i>Witness (use Person format, see Person Information section)</i> ]<br>
@@ -191,12 +192,15 @@ of their parents families.
 </dir>
 
 <ul>
+  <li>If the parents are not married (relationship), insert the <b>#nm</b> tag. If they are
+    engaged, use <strong>#eng</strong>.</li>
+  <li>If the parents are separated, use <strong>#sep</strong>. Or if they are divorced, use '<strong>-</strong>'
+    instead and optionally add the divorce date just after.</li>
   <li>If the <i>ChildLastName</i> is omitted, the Last Name of the father will be used.</li>
   <li>The <b>src</b>, <b>comm</b> and <b>wit:</b>: tags come in separate lines, after the <b>fam</b>
     tag. They are optional.</li>
   <li>If the child gender is unknown, do not put anything (no &#145;h&#146; nor &#145;f&#146;)
     after the &#145;-&#145; dash.</li>
-  <li>If the parents are not married (relationship), insert the <b>#nm</b> tag.</li>
 </ul>
 
 <p>If a family has no children, you can skip the whole <b>beg</b>/<b>end</b> tags sequence
