@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.33 2000-10-12 07:42:05 ddr Exp $ *)
+(* $Id: family.ml,v 3.34 2000-10-12 12:45:41 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -573,6 +573,7 @@ value print_no_index conf base =
       | [("opt", "no_index") :: l] -> loop l
       | [("escache", _) :: l] -> loop l
       | [("dsrc", _) :: l] -> loop l
+      | [("templ", _) :: l] -> loop l
       | [("i", v) :: l] -> new_env "i" v (fun x -> x) l
       | [("ei", v) :: l] -> new_env "ei" v (fun x -> "e" ^ x) l
       | [(k, v) :: l] when String.length k == 2 && k.[0] == 'i' ->
@@ -633,12 +634,12 @@ value print_no_index conf base =
   return ()
 ;
 
-value senv_vars =
+value special_vars =
   ["dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "et"; "long"; "spouse";
-   "cgl"; "iz"; "nz"; "pz"; "ocz"]
+   "cgl"; "iz"; "nz"; "pz"; "ocz"; "templ"]
 ;
 
-value only_special_env = List.for_all (fun (x, _) -> List.mem x senv_vars);
+value only_special_env = List.for_all (fun (x, _) -> List.mem x special_vars);
 
 value extract_henv conf base =
   do match find_person_in_env conf base "z" with
@@ -659,6 +660,9 @@ value extract_henv conf base =
      match p_getenv conf.env "dsrc" with
      [ Some "" | None -> ()
      | Some s -> conf.henv := conf.henv @ [("dsrc", code_varenv s)] ];
+     match p_getenv conf.env "templ" with
+     [ Some "" | None -> ()
+     | Some s -> conf.henv := conf.henv @ [("templ", code_varenv s)] ];
      match p_getenv conf.env "escache" with
      [ Some _ ->
          let bdir = Filename.concat Util.base_dir.val (conf.bname ^ ".gwb") in

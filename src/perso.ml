@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.46 2000-10-12 07:42:08 ddr Exp $ *)
+(* $Id: perso.ml,v 3.47 2000-10-12 12:45:42 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1134,15 +1134,22 @@ end;
 
 (* New version: interpretation of template file 'perso.txt' *)
 
-value open_templ conf name =
-  let fname =
-    List.fold_right Filename.concat [base_dir.val; "etc"; conf.bname]
-      (name ^ ".txt")
-  in
-  if Sys.file_exists fname then Some (open_in fname)
+value open_templ conf dir name =
+  if dir = "" then
+    let fname =
+      List.fold_right Filename.concat [base_dir.val; "etc"; conf.bname]
+        (name ^ ".txt")
+    in
+    if Sys.file_exists fname then Some (open_in fname)
+    else
+      let fname =
+        List.fold_right Filename.concat [lang_dir.val; "etc"]
+          (name ^ ".txt")
+      in
+      try Some (open_in fname) with [ Sys_error _ -> None ]
   else
     let fname =
-      List.fold_right Filename.concat [lang_dir.val; "etc"]
+      List.fold_right Filename.concat [base_dir.val; "etc"; dir]
         (name ^ ".txt")
     in
     try Some (open_in fname) with [ Sys_error _ -> None ]
@@ -1656,6 +1663,17 @@ value print_origin_file conf base env =
   else ()
 ;
 
+value print_prefix_no_templ conf base env =
+  let henv =
+    List.fold_right
+      (fun (k, v) henv -> if k = "templ" then henv else [(k, v) :: henv])
+      conf.henv []
+  in
+  do conf.henv := henv;
+      Wserver.wprint "%s" (commd conf);
+  return ()
+;
+
 value print_public_name conf base env p =
   Wserver.wprint "%s" (sou base p.public_name)
 ;
@@ -1856,8 +1874,9 @@ value print_variable conf base env =
   | "on_cremation_date" -> do_person "p" print_on_cremation_date conf base env
   | "on_death_date" -> do_person "p" print_on_death_date conf base env
   | "origin_file" -> print_origin_file conf base env
-  | "public_name" -> do_person "p" print_public_name conf base env
   | "prefix" -> Wserver.wprint "%s" (commd conf)
+  | "prefix_no_templ" -> print_prefix_no_templ conf base env
+  | "public_name" -> do_person "p" print_public_name conf base env
   | "qualifier" -> do_person "p" print_qualifier conf base env
   | "referer" -> print_referer conf base env
   | "related" -> do_person "c" print_related conf base env
@@ -1883,7 +1902,18 @@ value print_variable conf base env =
 
 value eval_bool_variable conf base env p =
   fun
-  [ "birthday" ->
+  [ "are_divorced" ->
+      match get_env "fam" env with
+      [ Efam fam cpl _ ->
+          match fam.divorce with
+          [ Divorced d -> True
+          | _ -> False ]
+      | _ -> False ]
+  | "are_separated" ->
+      match get_env "fam" env with
+      [ Efam fam cpl _ -> fam.divorce = Separated
+      | _ -> False ]
+  | "birthday" ->
       if age_autorise conf base p then
         match Adef.od_of_codate p.birth with
         [ Some (Dgreg d _) ->
@@ -1914,13 +1944,6 @@ value eval_bool_variable conf base env p =
             not (a.year < 0 || a.year = 0 && a.month = 0)
         | _ -> False ]
       else False
-  | "divorced" ->
-      match get_env "fam" env with
-      [ Efam fam cpl _ ->
-          match fam.divorce with
-          [ Divorced d -> True
-          | _ -> False ]
-      | _ -> False ]
   | "has_aliases" -> p.aliases <> []
   | "has_baptism_date" ->
       age_autorise conf base p && p.baptism <> Adef.codate_None
@@ -2386,20 +2409,27 @@ value copy_from_templ conf base ic p =
 (* Main *)
 
 value print_ok conf base p =
-  match open_templ conf "perso" with
-  [ Some ic ->
-      match p_getenv conf.env "templ" with
-      [ Some "off" -> do close_in ic; Classic.print_ok conf base p; return ()
-      | _ -> do html conf; copy_from_templ conf base ic p; return () ]
-   | None ->
-      let title _ = Wserver.wprint "Error" in
-      do Util.header conf title;
-         tag "ul" begin
-           html_li conf;
-           Wserver.wprint "Cannot access file \"%s.txt\".\n" "perso";
-         end;
-         Util.gen_trailer True conf;
-      return raise Exit ]
+  let templ =
+    match p_getenv conf.env "templ" with
+    [ Some "off" -> None
+    | Some x -> Some x
+    | None -> Some "" ]
+  in
+  match templ with
+  [ None -> Classic.print_ok conf base p
+  | Some dir ->
+      match open_templ conf dir "perso" with
+      [ Some ic ->
+          do html conf; copy_from_templ conf base ic p; return ()
+      | None ->
+          let title _ = Wserver.wprint "Error" in
+          do Util.header conf title;
+             tag "ul" begin
+               html_li conf;
+               Wserver.wprint "Cannot access file \"%s.txt\".\n" "perso";
+             end;
+             Util.gen_trailer True conf;
+          return raise Exit ] ]
 ;
 
 value print conf base p =
