@@ -1,8 +1,8 @@
-# $Id: Makefile,v 2.19 1999-08-14 12:56:38 ddr Exp $
+# $Id: Makefile,v 2.20 1999-08-16 00:43:15 ddr Exp $
 
 include tools/Makefile.inc
 
-all:: out
+all:: opt
 
 out::
 	cd wserver; $(MAKE) all
