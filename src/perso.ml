@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 4.5 2001-04-12 06:48:28 ddr Exp $ *)
+(* $Id: perso.ml,v 4.6 2001-04-13 19:24:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -710,9 +710,11 @@ value print_sosa_link conf base env a a_auth =
   | _ -> () ]
 ;
 
-value print_source conf base env =
+value print_source conf base env p =
   match get_env "src" env with
-  [ Vstring s -> copy_string_with_macros conf [] s
+  [ Vstring s ->
+      let env = [('i', fun () -> Util.default_image_name base p)] in
+      copy_string_with_macros conf [] s
   | _ -> () ]
 ;
 
@@ -845,7 +847,7 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "sosa" -> print_sosa conf base env p p_auth
   | "sosa_link" -> print_sosa_link conf base env p p_auth
   | "source_type" -> print_source_type conf base env
-  | "source" -> print_source conf base env
+  | "source" -> print_source conf base env p
   | "surname" -> Wserver.wprint "%s" (p_surname base p)
   | "surname_alias" -> print_surname_alias conf base env
   | "surname_key" -> print_surname_key conf base env p p_auth
