@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.38 2002-09-19 15:34:05 ddr Exp $ *)
+(* $Id: perso.ml,v 4.39 2002-09-19 15:39:04 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -568,7 +568,7 @@ value obsolete_list = ref [];
 value obsolete var new_var =
   if List.mem var obsolete_list.val then ()
   else ifdef UNIX then do {
-    Printf.eprintf "*** <W> perso.txt: variable \"%%%s;\" obsolete%s"
+    Printf.eprintf "*** <W> perso.txt: variable \"%%%s;\" obsolete%s\n"
       var
       (if new_var = "" then "" else "; use rather \"" ^ new_var ^ "%%%s;\"");
     flush stderr;
