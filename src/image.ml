@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 4.8 2003-07-15 11:39:00 ddr Exp $ *)
+(* $Id: image.ml,v 4.9 2003-08-07 09:25:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -88,7 +88,7 @@ value print_html conf base =
     Wserver.wprint "<html>\n<head>\n";
     Wserver.wprint "  <title>%s</title>\n"
       (Util.transl_nth conf "image/images" 0);
-    Wserver.wprint "</head>\n";
+    Wserver.wprint "</head>\n<body>\n";
     Wserver.wprint "<img src=\"%s" (commd conf);
     Gutil.list_iter_first
       (fun first (k, v) ->

@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml camlp4r.cma $0
 *) ".";
-(* $Id: mk_missing_i18n.sh,v 4.10 2003-03-03 09:50:52 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 4.11 2003-08-07 09:25:50 ddr Exp $ *)
 
 open Printf;
 
@@ -55,8 +55,8 @@ value check first lang =
   in
   do {
     linenum.val := 0;
-    let ic_lex = open_in "../hd/lang/lexicon.txt" in
-    let ic_i18n = open_in "i18n" in
+    let ic_lex = open_in "hd/lang/lexicon.txt" in
+    let ic_i18n = open_in "src/i18n" in
     printf "<h3><a name=%s>%s</h3>\n" lang lang;
     printf "<pre>\n";
     let has_missing = ref False in
