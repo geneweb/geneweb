@@ -9,6 +9,7 @@ GeneWeb version 3.12
     version is installed.
 
 * Languages
+  - [27 Feb 01] Added Polish (Sebastian Tuszynski)
   - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
 
 * GeneWeb server or CGI (gwd)

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.19 2001-02-20 23:00:36 ddr Exp $
+# $Id: Makefile,v 3.20 2001-02-27 21:41:44 ddr Exp $
 
 DESTDIR=distribution
 
@@ -100,7 +100,7 @@ classical_distrib:
 	mkdir $(DESTDIR)/lang
 	cp hd/lang/*.txt $(DESTDIR)/lang/.
 	for dir in \
-	  af cn cs ct de dk en eo es et fi fr he is it lv nl no pt ru se;\
+	  af cn cs ct de dk en eo es et fi fr he is it lv nl no pl pt ru se;\
 	do \
 		mkdir $(DESTDIR)/lang/$$dir; \
 		cp hd/lang/$$dir/start.txt $(DESTDIR)/lang/$$dir/.; \
