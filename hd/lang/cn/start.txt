@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.8 1999-12-26 13:29:56 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.9 2000-02-24 20:43:16 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -91,7 +91,7 @@ or <em>Sosa number</em> relative to %a%E
 </ul>
 
 <a href="%sm=AN">出生于今日的记录</a>%I|wf
-和<a href="%sm=B;k=10">最近出生的记录</a>%E。
+和<a href="%sm=B">最近出生的记录</a>%E。
 <br>
 <a href="%sm=AD">死亡于今日的记录</a>。
 <br>

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.18 2000-02-14 14:39:51 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.19 2000-02-24 20:43:18 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -156,12 +156,12 @@ s&ouml;kning</b></font></a>.
 <li><a href="%sm=AN">f&ouml;delsedagar</a>
 <li><a href="%sm=AD">&aring;rsdagar f&ouml;r d&ouml;da personer</a>
 <li><a href="%sm=AM">br&ouml;llopsdagar</a>%I|wf
-<li>de <a href="%sm=LB;k=10">senaste f&ouml;dslarna</a>%E
+<li>de <a href="%sm=LB">senaste f&ouml;dslarna</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>de <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>%E%Ih
+<li>de <a href="%sm=LD">senaste d&ouml;dsfallen</a>%E%Ih
 <li><a href="%sm=HIST;k=10">uppdateringarnas historia</a>%E
 <li><a href="%sm=CAL">kalender</a>
 <li><a href="%sm=FORUM">databas forum</a>

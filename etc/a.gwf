@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.9 2000-01-25 03:18:02 ddr Exp $
+# $Id: a.gwf,v 3.10 2000-02-24 20:43:16 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -90,6 +90,9 @@ max_desc_tree=4
 
 # Maximum number of cousins displayed
 max_cousins=2000
+
+# Number of latest events (birth, death) displayed
+latest_event=10
 
 # History: set it to yes to save update traces in data base (in file named
 # "history" in the data base directory "base.gwb"). When such a file exists,

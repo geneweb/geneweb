@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.13 2000-02-14 14:39:49 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.14 2000-02-24 20:43:17 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title> Genealogio - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -153,12 +153,12 @@ progresata</b></font></a>.
 <li>la <a href="%sm=AN">naskigxtagoj</a>
 <li>la <a href="%sm=AD">datrevenoj de la mortaj personoj</a>
 <li>la <a href="%sm=AM">datrevenoj de edzigxo</a>%I|wf
-<li>la <a href="%sm=LB;k=10">lastaj naskigxoj</a>%E
+<li>la <a href="%sm=LB">lastaj naskigxoj</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>la <a href="%sm=LD;k=10">lastaj mortoj</a>%E%Ih
+<li>la <a href="%sm=LD">lastaj mortoj</a>%E%Ih
 <li>la <a href="%sm=HIST;k=10">historio de la gxisdatigoj</a>%E
 <li>la <a href="%sm=CAL">kalendaroj</a>
 <li>la <a href="%sm=FORUM">datenbazforumo</a>

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.1 2000-01-10 02:14:37 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.2 2000-02-24 20:43:18 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -52,7 +52,9 @@ value select conf base get_date =
   let n =
     match p_getint conf.env "k" with
     [ Some x -> x
-    | _ -> 3 ]
+    | _ ->
+        try int_of_string (List.assoc "latest_event" conf.base_env) with
+        [ Not_found | Failure _ -> 10 ] ]
   in
   let n = min (max 0 n) base.data.persons.len in
   let tab = Array.create n None in
@@ -77,20 +79,33 @@ value print_birth conf base =
     Wserver.wprint (fcapitale (ftransl conf "the latest %d births")) len
   in
   do header conf title;
-     for i = 0 to Array.length tab - 1 do
-       match tab.(i) with
-       [ Some (p, d, cal) ->
-           tag "ul" begin
-             html_li conf;
-             Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base p;
-             Wserver.wprint "</strong>,\n";
-             Wserver.wprint "%s <em>%s</em>.\n"
-               (transl_nth conf "born" (index_of_sex p.sex))
-               (Date.string_of_ondate conf (Dgreg d cal));
-           end
-       | None -> () ];
-     done;
+     Wserver.wprint "<ul>\n";
+     loop "" 0 where rec loop last_month_txt i =
+       if i = Array.length tab  then ()
+       else
+         match tab.(i) with
+         [ Some (p, d, cal) ->
+             let month_txt =
+               let d = {(d) with day = 0} in
+               capitale (Date.string_of_date conf (Dgreg d cal))
+             in
+             do if month_txt <> last_month_txt then
+                  do if last_month_txt = "" then ()
+                     else Wserver.wprint "</ul>\n";
+                     Wserver.wprint "<li>%s\n" month_txt;
+                     Wserver.wprint "<ul>\n";
+                  return ()
+                else ();
+                Wserver.wprint "<li>\n";
+                Wserver.wprint "<strong>\n";
+                afficher_personne_referencee conf base p;
+                Wserver.wprint "</strong>,\n";
+                Wserver.wprint "%s <em>%s</em>.\n"
+                  (transl_nth conf "born" (index_of_sex p.sex))
+                  (Date.string_of_ondate conf (Dgreg d cal));
+             return loop month_txt (i + 1)
+         | None -> loop last_month_txt (i + 1) ];
+     Wserver.wprint "</ul>\n</ul>\n";
      trailer conf;
   return ()
 ;
@@ -107,32 +122,45 @@ value print_death conf base =
     Wserver.wprint (fcapitale (ftransl conf "the latest %d deaths")) len
   in
   do header conf title;
-     for i = 0 to Array.length tab - 1 do
-       match tab.(i) with
-       [ Some (p, d, cal) ->
-           tag "ul" begin
-             html_li conf;
-             Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base p;
-             Wserver.wprint "</strong>,\n";
-             Wserver.wprint "%s <em>%s</em>"
-               (transl_nth conf "died" (index_of_sex p.sex))
-               (Date.string_of_ondate conf (Dgreg d cal));
-             let sure d = d.prec = Sure in
-             match Adef.od_of_codate p.birth with
-             [ Some (Dgreg d1 _) ->
-                 if sure d1 && sure d && d1 <> d then
-                   let a = temps_ecoule d1 d in
-                   do Wserver.wprint " <em>(";
-                      Date.print_age conf a;
-                      Wserver.wprint ")</em>";
-                   return ()
-                 else ()
-             | _ -> () ];
-             Wserver.wprint ".\n";
-           end
-       | None -> () ];
-     done;
+     Wserver.wprint "<ul>\n";
+     loop "" 0 where rec loop last_month_txt i =
+       if i = Array.length tab  then ()
+       else
+         match tab.(i) with
+         [ Some (p, d, cal) ->
+             let month_txt =
+               let d = {(d) with day = 0} in
+               capitale (Date.string_of_date conf (Dgreg d cal))
+             in
+             do if month_txt <> last_month_txt then
+                  do if last_month_txt = "" then ()
+                     else Wserver.wprint "</ul>\n";
+                     Wserver.wprint "<li>%s\n" month_txt;
+                     Wserver.wprint "<ul>\n";
+                  return ()
+                else ();
+                Wserver.wprint "<li>\n";
+                Wserver.wprint "<strong>\n";
+                afficher_personne_referencee conf base p;
+                Wserver.wprint "</strong>,\n";
+                Wserver.wprint "%s <em>%s</em>"
+                  (transl_nth conf "died" (index_of_sex p.sex))
+                  (Date.string_of_ondate conf (Dgreg d cal));
+                let sure d = d.prec = Sure in
+                match Adef.od_of_codate p.birth with
+                [ Some (Dgreg d1 _) ->
+                    if sure d1 && sure d && d1 <> d then
+                      let a = temps_ecoule d1 d in
+                      do Wserver.wprint " <em>(";
+                         Date.print_age conf a;
+                         Wserver.wprint ")</em>";
+                      return ()
+                    else ()
+                | _ -> () ];
+                Wserver.wprint "\n";
+             return loop month_txt (i + 1)
+         | None -> loop last_month_txt (i + 1) ];
+     Wserver.wprint "</ul>\n</ul>\n";
      trailer conf;
   return ()
 ;
