@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.26 2001-01-13 04:12:15 ddr Exp $ *)
+(* $Id: descend.ml,v 3.27 2001-01-13 22:13:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -115,21 +115,18 @@ value print_choice conf base p niveau_effectif =
           Wserver.wprint "<input type=radio name=t value=F> %s\n"
             (capitale (transl_nth conf "male line/female line" 1));
           Wserver.wprint "<br>\n";
-          if browser_doesnt_have_tables conf then ()
+          Wserver.wprint "<br>\n";
+          Wserver.wprint "<input type=radio name=t value=T> %s\n"
+            (capitale (transl conf "tree"));
+          if niveau_effectif <= limit_by_tree conf then ()
           else
-            do Wserver.wprint "<br>\n";
-               Wserver.wprint "<input type=radio name=t value=T> %s\n"
-                 (capitale (transl conf "tree"));
-               if niveau_effectif <= limit_by_tree conf then ()
-               else
-                 Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
-                   (limit_by_tree conf)
-                   (transl_nth conf "generation/generations" 1);
-               Wserver.wprint "<br>\n";
-               Wserver.wprint
-                 "- %s <input type=checkbox name=image value=on><br>\n"
-                 (capitale (transl_nth conf "image/images" 1));
-            return ();
+            Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
+              (limit_by_tree conf)
+              (transl_nth conf "generation/generations" 1);
+          Wserver.wprint "<br>\n";
+          Wserver.wprint
+            "- %s <input type=checkbox name=image value=on><br>\n"
+            (capitale (transl_nth conf "image/images" 1));
         end;
         tag "td" begin
           Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
