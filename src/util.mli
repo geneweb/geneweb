@@ -1,9 +1,7 @@
-(* $Id: util.mli,v 1.4 1998-11-28 18:54:02 ddr Exp $ *)
+(* $Id: util.mli,v 1.5 1998-12-05 13:29:54 ddr Exp $ *)
 
 open Def;
 open Config;
-
-value version : string;
 
 value lang_dir : ref string;
 value base_dir : ref string;
@@ -86,3 +84,5 @@ value aoc : config -> string -> string;
 
 value get_server_string : config -> string;
 value get_request_string : config -> string;
+
+value create_topological_sort : config -> base -> array int;

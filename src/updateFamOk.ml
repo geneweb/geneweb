@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.5 1998-11-28 13:28:49 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.6 1998-12-05 13:29:51 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -557,6 +557,12 @@ value print_swi_ok conf base p =
   return ()
 ;
 
+value delete_topological_sort conf base =
+  let bfile = Filename.concat base_dir.val conf.bname in
+  let tstab_file = Filename.concat (bfile ^ ".gwb") "tstab" in
+  try Sys.remove tstab_file with [ Sys_error _ -> () ]
+;
+
 value print_add conf base =
   let bfile = Filename.concat Util.base_dir.val conf.bname in
   lock (Iobase.lock_file bfile) with
@@ -569,6 +575,7 @@ value print_add conf base =
           let (fam, cpl) = effective_add conf base sfam scpl in
           let wl = all_checks_family conf base fam cpl in
           do base.commit_patches ();
+             delete_topological_sort conf base;
              print_add_ok conf base wl fam cpl;
           return ()
       with
@@ -586,6 +593,7 @@ value print_del conf base =
           do if fam.fam_index <> Adef.ifam_of_int (-1) then
                do effective_del conf base fam;
                   base.commit_patches ();
+                  delete_topological_sort conf base;
                return ()
              else ();
              print_del_ok conf base [];
@@ -617,6 +625,7 @@ value print_mod conf base =
     let (fam, cpl) = effective_mod conf base sfam scpl in
     let wl = all_checks_family conf base fam cpl in
     do base.commit_patches ();
+       delete_topological_sort conf base;
        print_mod_ok conf base wl fam cpl;
     return ()
   in

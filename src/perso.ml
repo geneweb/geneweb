@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.13 1998-12-03 09:09:23 ddr Exp $ *)
+(* $Id: perso.ml,v 1.14 1998-12-05 13:29:48 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -503,6 +503,7 @@ value print_sources conf base p =
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 value find_sosa conf base a p =
+  let tstab = Util.create_topological_sort conf base in
   let mark = Array.create base.persons.len False in
   let rec gene_find =
     fun
@@ -512,16 +513,19 @@ value find_sosa conf base a p =
         else if mark.(Adef.int_of_iper ip) then gene_find zil
         else
           do mark.(Adef.int_of_iper ip) := True; return
-          let asc = aoi base ip in
-          match asc.parents with
-          [ Some ifam ->
-              let cpl = coi base ifam in
-              let z = Num.twice z in
-              match gene_find zil with
-              [ Left zil ->
-                  Left [(z, cpl.father); (Num.inc z 1, cpl.mother) :: zil]
-              | Right z -> Right z ]
-          | None -> gene_find zil ] ]
+          if tstab.(Adef.int_of_iper ip) > tstab.(Adef.int_of_iper a.cle_index)
+          then gene_find zil
+          else
+            let asc = aoi base ip in
+            match asc.parents with
+            [ Some ifam ->
+                let cpl = coi base ifam in
+                let z = Num.twice z in
+                match gene_find zil with
+                [ Left zil ->
+                    Left [(z, cpl.father); (Num.inc z 1, cpl.mother) :: zil]
+                | Right z -> Right z ]
+            | None -> gene_find zil ] ]
   in
   find [(Num.one, p.cle_index)] where rec find zil =
     match gene_find zil with

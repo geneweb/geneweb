@@ -103,10 +103,10 @@ pa_html.cmo: ../wserver/wserver.cmi
 pa_html.cmx: ../wserver/wserver.cmx 
 pa_lock.cmo: lock.cmo 
 pa_lock.cmx: lock.cmx 
-perso.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
-    ../wserver/wserver.cmi perso.cmi 
-perso.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
-    ../wserver/wserver.cmx perso.cmi 
+perso.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi num.cmi \
+    util.cmi ../wserver/wserver.cmi perso.cmi 
+perso.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx num.cmx \
+    util.cmx ../wserver/wserver.cmx perso.cmi 
 perso.cmi: config.cmi def.cmi 
 phonygwd.cmo: argl.cmo ../wserver/wserver.cmi 
 phonygwd.cmx: argl.cmx ../wserver/wserver.cmx 
@@ -116,20 +116,20 @@ relation.cmo: adef.cmi config.cmi consang.cmo def.cmi gutil.cmi num.cmi \
     srcfile.cmi util.cmi ../wserver/wserver.cmi 
 relation.cmx: adef.cmx config.cmi consang.cmx def.cmi gutil.cmx num.cmx \
     srcfile.cmx util.cmx ../wserver/wserver.cmx 
-relationLink.cmo: adef.cmi config.cmi consang.cmo date.cmi def.cmi gutil.cmi \
-    num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi 
-relationLink.cmx: adef.cmx config.cmi consang.cmx date.cmx def.cmi gutil.cmx \
-    num.cmx pqueue.cmx util.cmx ../wserver/wserver.cmx 
+relationLink.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi num.cmi \
+    pqueue.cmi util.cmi ../wserver/wserver.cmi 
+relationLink.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
+    pqueue.cmx util.cmx ../wserver/wserver.cmx 
 select.cmo: adef.cmi def.cmi gutil.cmi 
 select.cmx: adef.cmx def.cmi gutil.cmx 
 some.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
 some.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
     ../wserver/wserver.cmx 
-srcfile.cmo: config.cmi date.cmi def.cmi util.cmi ../wserver/wserver.cmi \
-    srcfile.cmi 
-srcfile.cmx: config.cmi date.cmx def.cmi util.cmx ../wserver/wserver.cmx \
-    srcfile.cmi 
+srcfile.cmo: config.cmi date.cmi def.cmi gutil.cmi num.cmi util.cmi \
+    ../wserver/wserver.cmi srcfile.cmi 
+srcfile.cmx: config.cmi date.cmx def.cmi gutil.cmx num.cmx util.cmx \
+    ../wserver/wserver.cmx srcfile.cmi 
 srcfile.cmi: config.cmi def.cmi 
 title.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
@@ -161,8 +161,8 @@ updateIndOk.cmx: adef.cmx ansel.cmx config.cmi def.cmi gutil.cmx iobase.cmx \
     name.cmx update.cmx updateInd.cmx util.cmx ../wserver/wserver.cmx \
     updateIndOk.cmi 
 updateIndOk.cmi: config.cmi def.cmi gutil.cmi 
-util.cmo: adef.cmi ansel.cmo config.cmi def.cmi gutil.cmi name.cmi \
-    ../wserver/wserver.cmi util.cmi 
-util.cmx: adef.cmx ansel.cmx config.cmi def.cmi gutil.cmx name.cmx \
-    ../wserver/wserver.cmx util.cmi 
+util.cmo: adef.cmi ansel.cmo config.cmi consang.cmo def.cmi gutil.cmi \
+    iobase.cmi name.cmi ../wserver/wserver.cmi util.cmi 
+util.cmx: adef.cmx ansel.cmx config.cmi consang.cmx def.cmi gutil.cmx \
+    iobase.cmx name.cmx ../wserver/wserver.cmx util.cmi 
 util.cmi: config.cmi def.cmi 

@@ -1,10 +1,9 @@
-(* $Id: util.ml,v 1.14 1998-11-28 18:54:02 ddr Exp $ *)
+(* camlp4r ./pa_lock.cmo *)
+(* $Id: util.ml,v 1.15 1998-12-05 13:29:53 ddr Exp $ *)
 
 open Def;
 open Config;
 open Gutil;
-
-value version = "1.09";
 
 value lang_dir = ref ".";
 value base_dir = ref ".";
@@ -777,4 +776,34 @@ value get_request_string conf =
       [ Not_found -> "" ]
     in
     script_name ^ "?" ^ query_string
+;
+
+value create_topological_sort conf base =
+  match p_getenv conf.env "opt" with
+  [ Some "no_tsfile" ->
+      let _ = base.ascends.array () in
+      let _ = base.couples.array () in
+      Consang.topological_sort base
+  | Some "no_tstab" -> Array.create base.persons.len 0
+  | _ ->
+      let bfile = Filename.concat base_dir.val conf.bname in
+      lock (Iobase.lock_file bfile) with
+      [ Accept ->
+          let tstab_file = Filename.concat (bfile ^ ".gwb") "tstab" in
+          match
+            try Some (open_in_bin tstab_file) with [ Sys_error _ -> None ]
+          with
+          [ Some ic -> Marshal.from_channel ic
+          | None ->
+              let _ = base.ascends.array () in
+              let _ = base.couples.array () in
+              let oc = open_out_bin tstab_file in
+              let tstab = Consang.topological_sort base in
+              do Marshal.to_channel oc tstab [Marshal.No_sharing];
+                 close_out oc;
+              return tstab ]
+      | Refuse ->
+          let _ = base.ascends.array () in
+          let _ = base.couples.array () in
+          Consang.topological_sort base ] ]
 ;
