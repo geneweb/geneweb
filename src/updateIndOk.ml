@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.7 1998-09-30 14:04:48 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.8 1998-10-30 10:11:21 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -392,12 +392,16 @@ value effective_del conf base p =
      p.access := IfTitles;
      p.birth := Adef.codate_None;
      p.birth_place := empty;
+     p.birth_src := empty;
      p.baptism := Adef.codate_None;
      p.baptism_place := empty;
+     p.baptism_src := empty;
      p.death := DontKnowIfDead;
      p.death_place := empty;
+     p.death_src := empty;
      p.burial := UnknownBurial;
      p.burial_place := empty;
+     p.burial_src := empty;
      p.notes := empty;
      p.psources := empty;
      base.patch_person p.cle_index p;
