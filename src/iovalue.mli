@@ -1,8 +1,7 @@
-(* $Id: iovalue.mli,v 4.0 2001-03-16 19:34:47 ddr Exp $ *)
+(* $Id: iovalue.mli,v 4.1 2004-05-15 03:39:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value input : in_channel -> 'a;
-value input_int : in_channel -> int;
 value output : out_channel -> 'a -> unit;
 
 value size : 'a -> int;
