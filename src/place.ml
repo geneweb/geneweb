@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 3.8 2000-04-05 12:16:42 ddr Exp $ *)
+(* $Id: place.ml,v 3.9 2000-04-30 12:23:17 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -8,28 +8,9 @@ open Util;
 open Config;
 
 value fold_place inverted s =
-  let rec loop list i ibeg =
-    if i == String.length s then
+  let rec loop iend list i ibeg =
+    if i == iend then
       if i > ibeg then [String.sub s ibeg (i - ibeg) :: list] else list
-    else if
-      String.unsafe_get s i == '(' &&
-      String.unsafe_get s (String.length s - 1) == ')'
-    then
-      let list =
-        let j =
-          loop i where rec loop i =
-            if i > 0 && String.unsafe_get s (i - 1) == ' ' then loop (i - 1)
-            else i
-        in
-        if j > ibeg then [String.sub s ibeg (j - ibeg) :: list] else list
-      in
-      let i =
-        loop (i + 1) where rec loop i =
-          if i < String.length s && String.unsafe_get s i == ' ' then
-            loop (i + 1)
-          else i
-      in
-      [String.sub s i (String.length s - i - 1) :: list]
     else
       let (list, ibeg) =
         match String.unsafe_get s i with
@@ -41,9 +22,17 @@ value fold_place inverted s =
         | ' ' -> if i = ibeg then (list, i + 1) else (list, ibeg)
         | _ -> (list, ibeg) ]
       in
-      loop list (i + 1) ibeg
+      loop iend list (i + 1) ibeg
   in
-  let list = loop [] 0 0 in
+  let (iend, rest) =
+    if String.length s > 0 && s.[String.length s - 1] == ')' then
+      match Gutil.rindex s '(' with
+      [ Some i when i < String.length s - 2 ->
+          (i, [String.sub s (i + 1) (String.length s - i - 2)])
+      | _ -> (String.length s, []) ]
+    else (String.length s, [])
+  in
+  let list = rest @ loop iend [] 0 0 in
   if inverted then List.rev list else list
 ;
 
