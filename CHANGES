@@ -1,3 +1,12 @@
+GeneWeb version 3.06
+--------------------
+
+* GeneWeb Service/CGI (gwd)
+  - [13 Jun 00] Deleted this stupid "<meta http-equiv...>" in welcome pages
+    and in other pages, because it makes some browsers generate two requests.
+    Moreover, it has no sense, even if it is standard, since the HTTP header
+    still contains that.
+
 GeneWeb version 3.05
 --------------------
 

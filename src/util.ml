@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.48 2000-06-03 21:08:08 ddr Exp $ *)
+(* $Id: util.ml,v 3.49 2000-06-13 10:06:56 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -722,9 +722,11 @@ value header_no_page_title conf title =
  \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n";
      Wserver.wprint "<head>\n";
      Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\">\n";
+(*
      Wserver.wprint "  \
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">\n"
        conf.charset;
+*)
      Wserver.wprint "  <title>";
      title True;
      Wserver.wprint "</title>\n";
