@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.41 1999-12-18 13:44:56 ddr Exp $
+# $Id: lexicon.txt,v 3.42 1999-12-26 13:29:53 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -4204,6 +4204,7 @@ pt: resultados sucintos
 se: kort rapport
 
     shortest path
+de: k&uuml;rzester Pfad
 dk: korteste vej
 en: shortest path
 fi: lyhin polku
