@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.101 1999-08-03 15:08:25 ddr Exp $
+# $Id: lexicon.txt,v 2.102 1999-08-05 10:10:05 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -401,6 +401,7 @@ es: un cu&ntilde;ado/una cu&ntilde;ada
 fr: un beau-fr&egrave;re/une belle-soeur
 it: un cognato/una cognata
 nl: een schoonbroer/een schoonzus
+no: svoger/svigerinne
 se: en sv&aring;ger/en sv&auml;gerska
 
     a brother/a sister/a sibling
@@ -561,6 +562,7 @@ es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
 fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
 it: un nipote (dello sposo)/una nipote (dello sposo)
 nl: een neef/een nicht
+no: nev&oslash; (ektefelles nev&oslash;)/niese (ektefelles niese)
 se: en nev&ouml; (makens/makans nev&ouml;)/en niece (makens/makans niece)
 
     a nephew/a niece
@@ -586,6 +588,7 @@ es: un yerno/una nuera
 fr: un beau-fils/une belle-fille
 it: un genero/una nuora
 nl: schoonzoon/schoondochter
+no: svigers&oslash;nn/svigerdatter
 se: en m&aring;g/en sv&auml;rdotter
 
     a son/a daughter/a child
@@ -655,6 +658,7 @@ es: padre adoptivo/madre adoptiva/padres adoptivos
 fr: p&egrave;re adoptif/m&egrave;re adoptive/parents adoptifs
 it: padre adottivo/madre adottiva/genitori adottivi
 nl: stiefvader/stiefmoeder/stiefouders
+no: adoptivfar/adoptivmor/adoptivforeldre
 se: adoptivfar/adoptivmor/adoptivf&ouml;r&auml;ldrar
 
     adoptive son/adoptive daughter/adoptive child
@@ -665,6 +669,7 @@ es: hijo adoptivo/hija adoptiva/hijo(a) adoptivo(a)
 fr: fils adoptif/fille adoptive/enfant adoptif
 it: figlio adottivo/figlia adottiva/figlio addotivo
 nl: geadopteerde zoon/geadopteerde dochter/adoptiekind
+no: adoptivs&oslash;nn/adoptivdatter/adoptivbarn
 se: adoptivson/adoptivdotter/adoptivbarn
 
     advanced request
@@ -827,6 +832,7 @@ es: un t&iacute;o pol&iacute;tico/una t&iacute;a pol&iacute;tica
 fr: un oncle (&eacute;poux d'une tante)/une tante (&eacute;pouse d'un oncle)
 it: uno zio (marito della zia)/una zia (moglie dello zio)
 nl: een oom/een tante
+no: onkel (tantes mann)/tante (onkels kone)
 se: en farbror (fasters make)/en faster (farbrors maka)/en morbror (mosters make)/en moster (morbrors maka)
 
     an uncle/an aunt
@@ -974,6 +980,7 @@ es: regreso
 fr: retour
 it: torna indietro
 nl: terug
+no: tilbake
 se: tillbaka
 
     baptism
@@ -1173,6 +1180,7 @@ es: padre posible/madre posible/padres posibles
 fr: p&egrave;re possible/m&egrave;re possible/parents possibles
 it: padre presunto/madre presunta/genitori presunti
 nl: kandidaat vader/kandidaat moeder/kandidaat ouders
+no: kandidatfar/kandidatmor/kandidatforeldre
 se: m&ouml;jlig far/m&ouml;jlig mor/m&ouml;jliga f&ouml;r&auml;ldrar
 
     candidate son/candidate daughter/candidate child
@@ -1183,6 +1191,7 @@ es: hijo posible/hija posible/hijo(a) posible
 fr: fils possible/fille possible/enfant possible
 it: figlio presunto/figlia presunta/figlio presunto
 nl: kandidaat zoon/kandidaat dochter/kandidaat kind
+no: kandidats&oslash;nn/kandidatdatter/kandidatbarn
 se: m&ouml;jlig son/m&ouml;jlig dotter/m&ouml;jliga barn
 
     cannot access base
@@ -1845,6 +1854,7 @@ en: godfather/godmother/godparents
 es: padrino/madrina/padrino y padrina
 fr: parrain/marraine/parrain et marraine
 it: padrino/madrina/padrini
+no: gudfar/gudmor/gudforeldre
 se: gudfar/gudmor/gudf&ouml;r&auml;ldrar
 
     godson/goddaughter/godchild
@@ -1854,6 +1864,7 @@ en: godson/goddaughter/godchild
 es: fahijado/fahijada/fahihado(a)
 fr: filleul/filleule/filleul(e)
 it: figlioccio/figlioccia/figlioccio
+no: guds&oslash;nn/guddatter/gudbarn
 se: gudson/guddotter/gudbarn
 
     grand-parents
@@ -2620,6 +2631,7 @@ es: sobrinos y sobrinas
 fr: neveux et ni&egrave;ces
 it: nipoti
 nl: neven en nichten
+no: nev&oslash;er og nieser
 pt: sobrinos e sobrinas
 se: nev&ouml;er och niecer
 
@@ -2634,7 +2646,7 @@ fr: fr&egrave;re suivant/soeur suivante/fr&egrave;re ou soeur suivant
 he:  אח(ות) צעיר(ה)  
 it: fratello seguente/sorella seguente/fratello o sorella seguente
 nl: volgende broer/volgende zus/volgende broer of zus
-no: Neste bror/neste s&oslash;ster/neste s&oslash;sken
+no: neste bror/neste s&oslash;ster/neste s&oslash;sken
 pt: seguinte irm&atilde;o/seguinte irm&atilde;/seguinte irm&atilde;(o)
 se: n&auml;sta bror/n&auml;sta syster/n&auml;sta syskon 
 
@@ -3294,6 +3306,7 @@ en: recognized son/recognized daughter/recognized child
 fr: fils reconnu/fille reconnue/enfant reconnu
 it: figlio riconosciuto/figlia riconosciuta/figlio riconosciuto
 nl: aanvaarde zoon/aanvaarde dochter/aanvaar kind
+no: bekreftet s&oslash;nn/bekreftet datter/bekreftet barn
 se: erk&auml;nd son/erk&auml;nd dotter/erk&auml;nt barn
 
     recognizing father/recognizing mother/recognizing parents
@@ -3301,6 +3314,7 @@ de: anerkennender Vater/anerkennende Mutter/anerkennende Eltern
 dk: sig vedkendende fader/sig vedkendende moder/sig vedkendende for&aelig;ldre
 en: recognizing father/recognizing mother/recognizing parents
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
+no: bekreftet far/bekreftet mor/bekreftede foreldre
 se: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
 
     relation/relations
@@ -3310,7 +3324,8 @@ en: relation/relations
 es: relaci&oacute;n/relaciones
 fr: relation/relations
 it: parentela
-nl relatie/relaties
+nl: relatie/relaties
+no: slektskap/slektskap
 se: relation/relationer
 
     relationship
@@ -3368,7 +3383,7 @@ es: parentesco%t con
 fr: relation%t avec
 it: legame%t con
 nl: verbonden%t met
-no: frilleforhold%t med
+no: forbindelse%t med
 pt: relacionado%t com
 se: f&ouml;rh&aring;llande%t med
 
@@ -3379,6 +3394,7 @@ en: relationships by marriage
 es: parentesco pol&iacute;tico
 fr: liens de parent&eacute; par alliance
 it: parentele per matrimonio
+no: slektskap gjennom gifte
 se: sl&auml;ktskap genom &auml;ktenskap
 
     see
@@ -3859,6 +3875,7 @@ en: the father-in-law/the mother-in-law
 es: el suegro/la suegra
 fr: le beau-p&egrave;re/la belle-m&egrave;re
 it: il suocero/la suocera
+no: svigerfaren/svigermoren
 se: sv&auml;rfadern/sv&auml;rmodern
 
     the father/the mother/a parent
@@ -4020,6 +4037,7 @@ es: el esposo/l'esposa
 fr: l'&eacute;poux/l'&eacute;pouse
 it: lo sposo/la sposa
 nl: echtgenoot
+no: maken
 se: maken/makan
 
     the whole list
@@ -4060,6 +4078,7 @@ es: para agregar un hijo a una familia, utiliza "%s"
 fr: pour ajouter un enfant &agrave; une famille, utiliser "%s"
 it: per aggiungere un figlio ad una famiglia, scegliere "%s"
 nl: gebruik "%s" om een familie toe te voegen
+no: for &aring; tilf&oslash;ye et barn til en familie, bruk "%s"
 se: f&ouml;r att l&auml;gga till ett barn i en familj, anv&auml;nd "%s"
 
     to the %s generation
@@ -4226,6 +4245,7 @@ es: t&iacute;os y t&iacute;as
 fr: oncles et tantes
 it: zii e zie
 nl: nonkels en tantes
+no: onkler og tanter
 pt: tios e tias
 se: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
 
