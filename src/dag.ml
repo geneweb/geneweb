@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.34 2001-01-08 23:57:27 ddr Exp $ *)
+(* $Id: dag.ml,v 3.35 2001-01-09 09:03:16 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -272,8 +272,7 @@ value strip_empty_tags s =
 value displayed_length s =
   loop 0 0 where rec loop len i =
     match displayed_next_char s i with
-    [ Some (i, j) ->
-        if s.[i] = '\n' || s.[i] = '\r' then len else loop (len + 1) j
+    [ Some (i, j) -> loop (len + 1) j
     | None -> len ]
 ;
 
@@ -417,20 +416,44 @@ value try_add_vbar stra_row stra_row_max hts i col =
   else ""
 ;
 
-value strip_newlines s =
+value strip_troublemakers s =
   loop 0 0 where rec loop len i =
     if i = String.length s then Buff.get len
-    else if start_with s i "<br>" then loop len (i + 4)
-    else if s.[i] = '\n' then loop (Buff.store len ' ') (i + 1)
-    else loop (Buff.store len s.[i]) (i + 1)
+    else
+      match s.[i] with
+      [ '<' ->
+          let j = i + 1 in
+          let j =
+            match s.[j] with
+            [ '/' -> j + 1
+            | _ -> j ]
+          in
+          let (tag_name, j) =
+            loop j where rec loop k =
+              match s.[k] with
+              [ 'a'..'z' | 'A'..'Z' -> loop (k + 1)
+              | _ -> (String.sub s j (k - j), k) ]
+          in
+          let j =
+            loop j where rec loop j =
+              if s.[j] = '>' then j + 1
+              else loop (j + 1)
+          in
+          let len =
+            if tag_name = "br" || tag_name = "font" then len
+            else buff_store_int s len i j
+          in
+          loop len j
+      | '\n' | '\r' -> loop (Buff.store len ' ') (i + 1)
+      | c -> loop (Buff.store len c) (i + 1) ]
 ;
 
-value table_strip_newlines hts =
+value table_strip_troublemakers hts =
   for i = 0 to Array.length hts - 1 do
     for j = 0 to Array.length hts.(i) - 1 do
       match hts.(i).(j) with
       [ (colspan, align, TDstring s) ->
-          hts.(i).(j) := (colspan, align, TDstring (strip_newlines s))
+          hts.(i).(j) := (colspan, align, TDstring (strip_troublemakers s))
       | _ -> () ];
     done;
   done
@@ -439,7 +462,7 @@ value table_strip_newlines hts =
 (* Main print table algorithm with <pre> *)
 
 value print_table_pre conf hts =
-  do table_strip_newlines hts; return
+  do table_strip_troublemakers hts; return
   let ncol =
     let hts0 = hts.(0) in
     loop 0 0 where rec loop ncol j =
@@ -531,8 +554,7 @@ return
                          Wserver.wprint " ";
                        done;
                        loop 0 where rec loop i =
-                         if i == String.length s || s.[i] = '\n'
-                         || start_with s i "<br>" then ()
+                         if i == String.length s then ()
                          else
                            do Wserver.wprint "%c" s.[i]; return
                            loop (i + 1);
