@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 4.1 2001-04-18 12:05:29 ddr Exp $ *)
+(* $Id: iovalue.ml,v 4.2 2004-05-15 03:39:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");
@@ -68,26 +68,6 @@ and input_block ifuns ic tag size =
   }
 ;
 
-value input_int ifuns ic =
-  let code = ifuns.input_byte ic in
-  if code >= <<PREFIX_SMALL_INT>> then
-    if code >= <<PREFIX_SMALL_BLOCK>> then raise Not_found
-    else code land 0x3f
-  else
-    match code with
-    [ <<CODE_INT8>> -> Obj.magic (sign_extend (ifuns.input_byte ic))
-    | <<CODE_INT16>> ->
-        let h = ifuns.input_byte ic in
-        (sign_extend h) lsl 8 + ifuns.input_byte ic
-    | <<CODE_INT32>> ->
-        let x1 = ifuns.input_byte ic in
-        let x2 = ifuns.input_byte ic in
-        let x3 = ifuns.input_byte ic in
-        let x4 = ifuns.input_byte ic in
-        (sign_extend x1) lsl 24 + x2 lsl 16 + x3 lsl 8 + x4
-    | _ -> raise Not_found ]
-;
-
 value in_channel_funs =
   {input_byte = input_byte;
    input_binary_int = input_binary_int;
@@ -95,7 +75,6 @@ value in_channel_funs =
 ;
 
 value input ic = Obj.magic (input_loop in_channel_funs ic);
-value input_int ic = input_int in_channel_funs ic;
 value gen_input ifuns i = Obj.magic (input_loop ifuns i);
 
 (* Output *)
