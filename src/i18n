@@ -10,6 +10,8 @@
 %t is born more than 2 years after the death of his/her father %t
 (date)
 (decimal separator)
+(french month)
+(hebrew month)
 (month)
 (thousand separator)
 (week day)

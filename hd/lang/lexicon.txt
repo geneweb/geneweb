@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.26 1999-11-30 09:54:41 ddr Exp $
+# $Id: lexicon.txt,v 3.27 1999-11-30 12:30:56 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -223,6 +223,14 @@ nl: ,
 no: ,
 pt: ,
 se: ,
+
+    (french month)
+en: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
+fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
+
+    (hebrew month)
+en: Tishri/Heshvan/Kislev/Tevet/Shevat/AdarI/AdarII/Nisan/Iyyar/Sivan/Tammuz/Av]/Elul
+fr: tishri/heshvan/kislev/tevet/shevat/adarI/adarII/nisan/iyyar/sivan/tammuz/av/elul
 
     (month)
 cn: 1月/2月/3月/4月/5月/6月/7月/8月/9月/10月/11月/12月
