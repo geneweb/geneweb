@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 1.54 2000-10-29 21:21:29 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.55 2000-12-14 14:37:04 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -140,8 +140,17 @@ value get_binding ic =
     | c -> loop (Buff.store len c) ]
 ;
 
-value copy_template (varenv, filenv) env fname =
-  let ic = open_in (Filename.concat gwtp_tmp.val (fname ^ ".txt")) in
+value template_fname env fname =
+  let dir =
+    match HttpEnv.getenv env "lang" with
+    [ Some x -> x
+    | _ -> "en" ]
+  in
+  List.fold_right Filename.concat [gwtp_tmp.val; "lang"; dir] (fname ^ ".txt")
+;
+
+value copy_template genv (varenv, filenv) env fname =
+  let ic = open_in (template_fname genv fname) in
   do try
        while True do
          match input_char ic with
@@ -172,8 +181,8 @@ value copy_template (varenv, filenv) env fname =
   return ()
 ;
 
-value variables () =
-  let ic = open_in (Filename.concat gwtp_tmp.val "conf.txt") in
+value variables env =
+  let ic = open_in (template_fname env "conf") in
   let vlist = ref [] in
   let flist = ref [] in
   do try
@@ -282,11 +291,11 @@ value mk_passwd size =
 
 (* Base configuration *)
 
-value get_base_conf b =
+value get_base_conf env b =
   let fname = Filename.concat gwtp_dst.val (b ^ ".gwf" ) in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      let (variables, files) = variables () in
+      let (variables, files) = variables env in
       let varenv =
         let varenv = ref [] in
         let rec record line =
@@ -685,7 +694,7 @@ value secure_html s =
 ;
 
 value gwtp_setconf str env b tok =
-  let (variables, files) = variables () in
+  let (variables, files) = variables env in
   let varenv =
     List.fold_right
       (fun k varenv ->
@@ -721,8 +730,8 @@ value gwtp_upload str env b tok =
     gwtp_error "no configuration file"
   else
     do printf "content-type: text/html"; crlf (); crlf ();
-       copy_template ([], []) [('s', cgi_script_name ()); ('b', b); ('t', tok)]
-         "send";
+       copy_template env ([], [])
+         [('s', cgi_script_name ()); ('b', b); ('t', tok)] "send";
        printf_link_to_main b tok;
        printf "</body>\n";
     return ()
@@ -737,7 +746,8 @@ value gwtp_download str env b tok =
     do printf "content-type: text/html"; crlf (); crlf ();
        if Sys.file_exists bdir then
        let dh = Unix.opendir bdir in
-       do copy_template ([], []) [('b', b); ('t', tok)] "recv";
+       do copy_template env ([], [])
+            [('s', cgi_script_name ()); ('b', b); ('t', tok)] "recv";
           printf "<ul>\n";
           try
             while True do
@@ -774,9 +784,9 @@ value gwtp_download str env b tok =
 ;
 
 value gwtp_config str env b tok =
-  let (varenv, filenv) = get_base_conf b in
+  let (varenv, filenv) = get_base_conf env b in
   do printf "content-type: text/html"; crlf (); crlf ();
-     copy_template (varenv, filenv)
+     copy_template env (varenv, filenv)
        [('s', cgi_script_name ()); ('b', b); ('t', tok)]
        "conf";
      printf_link_to_main b tok;

@@ -1,0 +1,13 @@
+<head><title>Gwtp - download %b</title></head>
+<body>
+<h1 align=center>Gwtp - download %b</h1>
+
+<div align=right>
+<a href="%s?m=DNL;b=%b;t=%t;lang=en">English</a> /
+<a href="%s?m=DNL;b=%b;t=%t;lang=fr">Français</a>
+</div><p>
+
+D'abord, dans votre ordinateur, créez un répertoire nommé <em>%b.gwb</em>,
+ou de n'importe quel autre nom se terminant par <em>.gwb</em>. Puis
+téléchargez tous ces fichiers dedans en conservant leur nom.
+

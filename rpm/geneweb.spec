@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.18 2000-11-17 18:54:24 ddr Exp $
+# $Id: geneweb.spec,v 3.19 2000-12-14 14:37:07 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -185,9 +185,7 @@ chkconfig --del gwd
 /home/geneweb/gw/gw/doc
 /home/geneweb/gw/gw/etc
 /home/geneweb/gw/gw/gwtp_tmp/README
-/home/geneweb/gw/gw/gwtp_tmp/conf.txt
-/home/geneweb/gw/gw/gwtp_tmp/recv.txt
-/home/geneweb/gw/gw/gwtp_tmp/send.txt
+/home/geneweb/gw/gw/gwtp_tmp/lang
 /home/geneweb/gw/gw/images
 /home/geneweb/gw/gw/lang
 /home/geneweb/gw/gw/only.txt

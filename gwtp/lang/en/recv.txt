@@ -1,0 +1,13 @@
+<head><title>Gwtp - download %b</title></head>
+<body>
+<h1 align=center>Gwtp - download %b</h1>
+
+<div align=right>
+<a href="%s?m=DNL;b=%b;t=%t;lang=en">English</a> /
+<a href="%s?m=DNL;b=%b;t=%t;lang=fr">Français</a>
+</div><p>
+
+First, on your computer, create a directory named <em>%b.gwb</em>, or
+any other name ending with <em>.gwb</em>. Then download all these
+files into it with the same name.
+

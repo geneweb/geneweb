@@ -2,6 +2,11 @@
 <body>
 <h1 align=center>Gwtp - configuration %b</h1>
 
+<div align=right>
+<a href="%s?m=CNF;b=%b;t=%t;lang=en">English</a> /
+<a href="%s?m=CNF;b=%b;t=%t;lang=fr">Français</a>
+</div>
+
 <form method=POST action="%s">
 <input type=hidden name=m value=SCNF>
 <input type=hidden name=b value=%b>

@@ -1,9 +1,0 @@
-<head><title>Gwtp - download %b</title></head>
-<body>
-<h1 align=center>Gwtp - download %b</h1>
-
-First, on your computer, create a new directory named <em>%b.gwb</em>,
-or any other name ending with <em>.gwb</em>. Then download all these
-files into it with the same name.
-
-
