@@ -1,4 +1,4 @@
-Internal, very small, or not visible Changes
+Internal, very small, or not visible changes
 ********************************************
 
 GeneWeb Version 2.01
@@ -6,7 +6,7 @@ GeneWeb Version 2.01
 
 * General
   - [Mar 31..Apr 5, 99] Changed some types, labels, constructors, functions
-    names, cleanuped some code.
+    names, cleaned up some code.
 
 * GeneWeb daemon/CGI (gwd)
   - [Apr 6, 99] Big cleanup about titles (hopefully not introducing bugs).
