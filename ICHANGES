@@ -5,6 +5,8 @@ GeneWeb Version 2.06
 --------------------
 
 * General
+  - [Aug 31, 99] Changed internal representation of data bases to add
+    "notes origin file" and "sources" for global notes.
   - [Aug 16, 99] Now "make" does "make opt". To run the older "make"
     do "make out". The installation tells to run "make" (i.e. "make opt").
     The previous installation version told to run "make" and "make opt"

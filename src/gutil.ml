@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.22 1999-07-26 07:01:59 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.23 1999-08-30 23:55:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -791,7 +791,8 @@ value map_title_strings f t =
 value map_relation_ps fp fs r =
   {r_type = r.r_type;
    r_fath = match r.r_fath with [ Some x -> Some (fp x) | None -> None ];
-   r_moth = match r.r_moth with [ Some x -> Some (fp x) | None -> None ] }
+   r_moth = match r.r_moth with [ Some x -> Some (fp x) | None -> None ];
+   r_sources = fs r.r_sources }
 ;
 
 value map_person_ps fp fs p =

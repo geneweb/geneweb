@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.24 1999-08-03 10:03:14 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.25 1999-08-30 23:55:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -92,7 +92,9 @@ value rec reconstitute_titles conf ext cnt =
 value reconstitute_add_relation conf ext cnt rl =
   match get_nth conf "add_relation" cnt with
   [ Some "on" ->
-      let r = {r_type = Adoption; r_fath = None; r_moth = None} in
+      let r =
+        {r_type = Adoption; r_fath = None; r_moth = None; r_sources = ""}
+      in
       ([r :: rl], True)
   | _ -> (rl, ext) ]
 ;
@@ -125,7 +127,7 @@ value reconstitute_relation conf var =
       | "GodParent" -> GodParent
       | _ -> Adoption ]
     in
-    Some {r_type = r_type; r_fath = r_fath; r_moth = r_moth}
+    Some {r_type = r_type; r_fath = r_fath; r_moth = r_moth; r_sources = ""}
   with
   [ Failure _ -> None ]
 ;

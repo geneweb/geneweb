@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 2.9 1999-08-14 09:26:38 ddr Exp $ *)
+(* $Id: def.mli,v 2.10 1999-08-30 23:55:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = Adef.iper;
@@ -49,7 +49,8 @@ type relation_type = [ Adoption | Recognition | CandidateParent | GodParent ];
 type gen_relation 'person 'string =
   { r_type : mutable relation_type;
     r_fath : mutable option 'person;
-    r_moth : mutable option 'person }
+    r_moth : mutable option 'person;
+    r_sources : mutable 'string }
 ;
 
 type sex = [ Male | Female | Neuter ];

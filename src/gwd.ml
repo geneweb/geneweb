@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.34 1999-08-20 15:27:33 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.35 1999-08-30 23:55:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -327,6 +327,18 @@ value start_with_base conf bname =
          Wserver.wprint " \"%s\".</ul>\n" conf.bname;
          match e with
          [ Failure s ->
+do Wserver.wprint "
+<p>
+<table border=2><tr><td>
+The service is not available for this data base for some minutes. Please
+try again a little bit later. Thank you for your patience.
+<p>
+Le service n'est pas disponible sur cette base de donn&eacute;es pendant
+quelques minutes. Merci de r&eacute;essayer un peu plus tard. Merci de votre
+patience.
+</td></tr></table>
+<p>\n";
+return
              Wserver.wprint
                "<em><font size=-1>Internal message: %s</font></em>\n" s
          | _ -> () ];

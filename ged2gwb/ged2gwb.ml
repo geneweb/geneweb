@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.29 1999-08-30 11:33:07 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.30 1999-08-30 23:55:48 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -926,7 +926,10 @@ value set_adop_fam gen ip which_parent fath moth =
         [ (("WIFE" | "BOTH"), Some r) -> adop_parent gen ip r
         | _ -> None ]
       in
-      let r = {r_type = Adoption; r_fath = r_fath; r_moth = r_moth} in
+      let r =
+        {r_type = Adoption; r_fath = r_fath; r_moth = r_moth;
+         r_sources = add_string gen ""}
+      in
       per.rparents := [r :: per.rparents] ]
 ;
 
@@ -1070,7 +1073,10 @@ value add_indi gen r =
     let godf = find_rela "godf" r.rsons in
     let godm = find_rela "godm" r.rsons in
     if godf <> None || godm <> None then
-      let r = {r_type = GodParent; r_fath = godf; r_moth = godm} in
+      let r =
+        {r_type = GodParent; r_fath = godf; r_moth = godm;
+         r_sources = add_string gen ""}
+      in
       [r :: rparents]
     else rparents
   in
