@@ -16,6 +16,8 @@ GeneWeb version 2.07
     in the lexicon.
 
 * GeneWeb Service/CGI (gwd)
+  - [Sep 22, 99] Fixed bug: bad display of "nth cousin" in Swedish (due
+    to problems with the character ":" in the translation).
   - [Sep 21, 99] Fixed bug: the "DOC" link did not work in CGI mode.
   - [Sep 21, 99] Added "CREDITS" in doc, accessible from the "DOC" link too.
   - [Sep 20, 99] Changed gif files (flags and up arrow) into jpeg files.

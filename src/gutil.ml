@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.25 1999-09-16 09:31:42 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.26 1999-09-22 09:11:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -35,8 +35,8 @@ value decline_word case s ibeg iend =
   in
   let j =
     loop i where rec loop i =
-      if i == iend then i
-      else if s.[i] == ':' then i
+      if i + 3 >= iend then iend
+      else if s.[i] == ':' && s.[i+2] == ':' then i
       else loop (i + 1)
   in
   if s.[i] == '+' then
