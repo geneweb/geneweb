@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.69 2000-12-27 16:03:13 ddr Exp $ *)
+(* $Id: perso.ml,v 3.70 2000-12-28 23:27:13 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -552,10 +552,11 @@ value print_consanguinity conf base env a p_auth =
 
 value print_copyright conf base env =
   let env =
-    [('s', commd conf);
+    [('s', fun _ -> commd conf);
      ('d',
-      if conf.cancel_links then ""
-      else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>")]
+      fun _ ->
+        if conf.cancel_links then ""
+        else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>")]
   in
   match open_etc_file "copyr" with
   [ Some ic -> copy_from_etc env conf.indep_command ic
@@ -895,8 +896,8 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "age" -> print_age conf base env p p_auth
   | "alias" -> print_alias conf base env
   | "baptism_place" -> print_baptism_place conf base env p p_auth
-  | "base_header" -> include_hed_trl conf ".hed"
-  | "base_trailer" -> include_hed_trl conf ".trl"
+  | "base_header" -> include_hed_trl conf (Some base) ".hed"
+  | "base_trailer" -> include_hed_trl conf (Some base) ".trl"
   | "birth_place" -> print_birth_place conf base env p p_auth
   | "body_prop" -> print_body_prop conf base env
   | "border" -> Wserver.wprint "%d" conf.border
@@ -1528,7 +1529,7 @@ value print_ok conf base p =
            Wserver.wprint "Cannot access file \"%s/%s.txt\".\n"
              dir "perso";
          end;
-         Util.gen_trailer True conf;
+         Util.trailer conf;
       return raise Exit ]
 ;
 
