@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.28 1999-07-18 06:42:56 ddr Exp $ *)
+(* $Id: util.ml,v 2.29 1999-07-21 17:36:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -63,11 +63,6 @@ value wprint_with_enclosing_tags conf (fmt : format 'a 'b 'c)  =
       List.fold_right (fun t fmt -> "</" ^ upto_space t ^ ">" ^ fmt) encl_tag fmt
   in
   Wserver.wprint (Obj.magic fmt : format 'a 'b 'c)
-;
-
-value rindex s c =
-  pos (String.length s - 1) where rec pos i =
-    if i < 0 then None else if s.[i] = c then Some i else pos (i - 1)
 ;
 
 value commd conf =
@@ -455,59 +450,6 @@ value plus_decl s =
   | None -> None ]
 ;
 
-value string_sub s i len =
-  let i = min (String.length s) (max 0 i) in
-  let len = min (String.length s - i) (max 0 len) in
-  String.sub s i len
-;
-
-value decline_word case s ibeg iend =
-  let i =
-    loop ibeg where rec loop i =
-      if i + 3 >= iend then ibeg
-      else if s.[i] == ':' && s.[i+1] == case && s.[i+2] == ':' then i + 3
-      else loop (i + 1)
-  in
-  let j =
-    loop i where rec loop i =
-      if i == iend then i
-      else if s.[i] == ':' then i
-      else loop (i + 1)
-  in
-  if s.[i] == '+' then
-    let k =
-      loop ibeg where rec loop i =
-        if i == iend then i
-        else if s.[i] == ':' then i
-        else loop (i + 1)
-    in
-    let i = i + 1 in
-    string_sub s ibeg (k - ibeg) ^ string_sub s i (j - i)
-  else if s.[i] == '-' then
-    let k =
-      loop ibeg where rec loop i =
-        if i == iend then i
-        else if s.[i] == ':' then i
-        else loop (i + 1)
-    in
-    let (i, cnt) =
-      loop (i + 1) 1 where rec loop i cnt =
-        if i < iend && s.[i] == '-' then loop (i + 1) (cnt + 1)
-        else (i, cnt)
-    in
-    string_sub s ibeg (k - ibeg - cnt) ^ string_sub s i (j - i)
-  else string_sub s i (j - i)
-;
-
-value decline case s =
-  loop 0 0 where rec loop ibeg i =
-    if i == String.length s then
-      if i == ibeg then "" else decline_word case s ibeg i
-    else if s.[i] == ' ' then
-      decline_word case s ibeg i ^ " " ^ loop (i + 1) (i + 1)
-    else loop ibeg (i + 1)
-;
-
 value transl_decline conf w s =
   let s1 = if s = "" then "" else " " ^ s in
   let wt = transl conf w in
@@ -523,12 +465,6 @@ value transl_decline conf w s =
     [ Some (start, " +before") ->
         if s = "" then start else s ^ " " ^ start
     | _ -> wt ^ s1 ]
-;
-
-value nominative s =
-  match rindex s ':' with
-  [ Some _ -> decline 'n' s
-  | _ -> s ]
 ;
 
 value ftransl conf (s : format 'a 'b 'c) : format 'a 'b 'c =
