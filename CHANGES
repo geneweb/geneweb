@@ -2,6 +2,8 @@ GeneWeb version 3.05
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [18 May 00] In displaying by places/surnames, baptism places are added
+    with birth places and burial with death.
   - [17 May 00] Added an "Ok" button after the password input area
     in CGI mode.
   - [14 May 00] Added case "engaged" in "family" forms.
