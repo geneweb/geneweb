@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.19 2002-04-06 09:09:50 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.20 2002-04-23 07:25:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -381,6 +381,18 @@ value effective_merge_fam conf base fam1 fam2 p1 p2 =
   let des1 = doi base fam1.fam_index in
   let des2 = doi base fam2.fam_index in
   do {
+    if fam1.marriage = Adef.codate_None then fam1.marriage := fam2.marriage
+    else ();
+    if fam1.marriage_place = Adef.istr_of_int 0 then
+      fam1.marriage_place := fam2.marriage_place
+    else ();
+    if fam1.marriage_src = Adef.istr_of_int 0 then
+      fam1.marriage_src := fam2.marriage_src
+    else ();
+    if fam1.fsources = Adef.istr_of_int 0 then
+      fam1.fsources := fam2.fsources
+    else ();
+    base.func.patch_family fam1.fam_index fam1;
     des1.children := Array.append des1.children des2.children;
     base.func.patch_descend fam1.fam_index des1;
     for i = 0 to Array.length des2.children - 1 do {
