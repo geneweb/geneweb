@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- $Id: start.txt,v 1.1 2001-02-27 21:27:17 ddr Exp $ -->
+  <!-- copyright (c) INRIA -->
+  <title>Genealogia - %t</title>
+  <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
+  <meta name="ROBOTS" content="NONE">
+%j</head>
+<body%b>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%o/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<table><tr><td align=center><h1><font color=%i>Genealogiczna<br>
+baza danych</font></h1></table>
+</td>
+<td align=right valign=top>%w</td>
+</tr>
+</table>
+
+<br>
+
+<font size=-1><em>Mo¿esz wybraæ inny jêzyk spoœród nastêpuj¹cych:</em></font>
+
+<br>
+
+%rversion
+
+<p>
+
+Baza danych <font color=%i><b>"%t"</b></font> zawiera obecnie osób:%n
+.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
+
+%I&NwNj<br><p>
+
+%I&NcNa<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w"><em>"Wizard"</em></a> dostêp<br>
+(has³o)<br></td>
+
+%INf<td align=center><a href="%sw=f"><em>"Friend"</em></a> dostêp<br>
+(has³o)</td>
+
+%E</tr></table>%E%I|ca<table border=0>
+<tr><td align=center>
+<form method=POST action="%f">
+%hHas³o dla dostêpu <em>"friend"</em> lub <em>"wizard"</em> :
+<input name=w type=password size=10 maxlength=200>
+<input type=submit value="Ok">
+</form>
+</td></tr>
+</table>
+
+%E%E<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+<center><table border=0 cellspacing=0 cellpadding=0><tr><td>
+Aby poruszaæ siê po bazie, mo¿esz j¹ przeszukiwaæ przez:<br><p>
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
+<font color=%i><b>osobê</b></font>
+<input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+<ul>
+<li> <input type=radio name=t value=PN checked>
+<em>[imiê/imiona]</em> <em>[nazwisko/nazwiska]</em>
+[or] <em>[imiê oficjalne]</em>
+[or] <em>[alias]</em>
+[or] <em>[nazwisko/nazwiska]</em>%Iz
+[or] [<em>Number "Sosa"</em> odnosz¹cy siê do %t](%a)%E
+<li> <input type=radio name=t value=P> <em>[imiê/imiona]</em>
+<li> <input type=radio name=t value=N> <em>[nazwisko/nazwiska]</em>
+</ul>
+</form>
+
+%Ispropose_titles;<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=TT>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<font color=%i><b>tytu³/funkcjê</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
+(<a href="%sm=TT;t=">[wszystkie tytu³y]</a>)<br>
+</td><td>...</td><td>
+<font color=%i><b>[domenê]</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
+(<a href="%sm=TT;p=*">[wszystkie domeny]</a>)
+</td><td>
+<input type=submit value="Ok">
+</td></tr></table>
+</form>
+
+%E<li>
+
+<form method=GET action="%f">
+%h
+<font color=%i><b>listê</b></font> wszystkich
+<select name=m>
+<option value="N" selected>nazwisk
+<option value="P">imion
+</select>
+by
+<select name=tri>
+<option value="A" u³o¿onych>alfabetycznie
+<option value="F">wed³ug czêstoœci
+</select>
+<input type=submit value="Ok">
+</form>
+
+<li>
+
+<form method=GET action="%s">
+%h<input type=hidden name=m value=PS>
+<font color=%i><b>[miejsce] / [nazwisko/nazwiska]0</b></font>
+- [urodzenia] <input type=checkbox name=bi value=on checked>
+- [œmierci] <input type=checkbox name=de value=on>
+- [œlubu]0 <input type=checkbox name=ma value=on>
+- <input type=submit value="Ok">
+</form>
+
+<li>
+
+<font color=%i><b>wyszukiwanie</b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>zaawansowane</b></font></a>.
+
+</ul>
+</td></tr></table></center>
+
+%Iw<p>
+<center>Mo¿esz<br><p>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+%Ispropose_add_family;<li><a href="%sm=ADD_FAM">dodaæ parê</a>
+%INl</ul>
+</td>
+<td align=left>
+<ul>%E
+%E<li><a href="%sm=MOD_NOTES">zmieniæ uwagi</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+%E<br><p>
+
+<center>Mo¿esz tak¿e sprawdziæ<br><p>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li><a href="%sm=AN">[urodziny (osób ¿yj¹cych)]</a>
+<li><a href="%sm=AD">[rocznice urodzin i œmierci osób nie¿yj¹cych]</a>
+<li><a href="%sm=AM">[rocznice œlubów]</a>
+<li><a href="%sm=STAT">[zestawienia]</a>
+</ul>
+</td>
+<td valign=up>
+<ul>%Ih
+<li><a href="%sm=HIST;k=10">[rejestr zmian]</a>%E
+<li><a href="%sm=CAL">[kalendarz/kalendarze]1</a>
+<li><a href="%sm=FORUM">[forum]</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+<p>
+
+Baza zosta³a od %d odwiedzona %q razy (w tym %c razy strona tytu³owa).
+%Il<p>%E
+
+<p>
+
+Je¿eli twoja przegl¹darka nie odœwie¿a automatycznie zmienionych stron 
+(zmuszaj¹c ciê do ich rêcznego odœwie¿ania), spróbuj wejœæ przez <a
+href="%sescache=0">to ³¹cze</a>.
+
+</td></tr>
+</table>
+
+<br>
+
+<p align=right><font size=-1><em><a href="%sm=LEX">leksykon</a></em></font></p>
+
+</center>
