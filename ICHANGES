@@ -5,6 +5,7 @@ GeneWeb Version 3.00
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Nov 1, 99] Print relations only for friends and wizards.
   - [Oct 31, 99] Added macro %k for images in order to have the same request
     for any data base in any language. And several changes to make the DOC
     request independant from the data base.

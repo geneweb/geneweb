@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.0 1999-10-29 10:31:29 ddr Exp $ *)
+(* $Id: perso.ml,v 3.1 1999-11-01 14:45:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -506,17 +506,15 @@ value print_notes conf base p =
   match sou base p.notes with
   [ "" -> ()
   | notes ->
-      if age_autorise conf base p then
-        do Wserver.wprint "<h3>%s</h3>\n"
-             (std_color
-                (capitale (nominative (transl_nth conf "note/notes" 1))));
-           tag "ul" begin
-             html_li conf;
-             copy_string_with_macros conf notes;
-             Wserver.wprint "\n";
-           end;
-        return ()
-      else () ]
+      do Wserver.wprint "<h3>%s</h3>\n"
+           (std_color
+              (capitale (nominative (transl_nth conf "note/notes" 1))));
+         tag "ul" begin
+           html_li conf;
+           copy_string_with_macros conf notes;
+           Wserver.wprint "\n";
+         end;
+      return () ]
 ;
 
 value print_relation conf base r =
@@ -1085,9 +1083,12 @@ value print conf base p =
      print_photo_occupation_dates conf base p;
      print_parents conf base a;
      print_families conf base p a;
-     print_notes conf base p;
-     print_relations conf base p;
-     if age_autorise conf base p then print_sources conf base True p else ();
+     if age_autorise conf base p then
+       do print_notes conf base p;
+          print_relations conf base p;
+          print_sources conf base True p;
+       return ()
+     else ();
      if conf.cancel_links then ()
      else
        do tag "table" "border=%d width=\"90%%\"" conf.border begin
