@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.23 1999-11-25 23:33:58 ddr Exp $
+# $Id: lexicon.txt,v 3.24 1999-11-26 12:21:40 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2069,7 +2069,7 @@ is: gælunafn á fornafni
 it: alias del nome
 nl: alias voor voornaam
 no: alias fornavn
-pt: outro nome
+pt: alias do nome
 se: f&ouml;rnamns alias
 
     first name missing
@@ -2138,7 +2138,7 @@ he:  ìùîåú äôøèééí áñãø àìó-áú
 it: per il primo nome in ordine alfabetico
 nl: dit geeft de voornamen in alfabetische volgorde
 no: alfabetisk p&aring; fornavn
-pt: para obter os nomes proprios por ordem alfab&eacute;tica
+pt: para obter os nomes pr&oacute;prios por ordem alfab&eacute;tica
 se: f&ouml;r f&ouml;rnamnen i bokstavsordning
 
     forum
@@ -2801,7 +2801,7 @@ is: löng skýrsla
 it: display esteso
 nl: uitgebreide weergave
 no: utvidet rapport
-pt: long display
+pt: resultados detalhados
 se: utvidgad rapport
 
     main title
@@ -3111,7 +3111,7 @@ is: leiðsögn með %t sem Sosa tilvísun
 it: percorso con %t come riferimento Sosa
 nl: navigatie met %t als proband
 no: navigering med %t som Sosa referanse
-pt: navega&ccedil;a&atilde;o com o %t como a refer&ecirc;ncia Sosa
+pt: navega&ccedil;a&atilde;o com %t como a refer&ecirc;ncia Sosa
 se: navigering med %t som Sosa referens
 
     nephews and nieces
@@ -3144,7 +3144,7 @@ is: næsta systkyni
 it: fratello seguente/sorella seguente/fratello o sorella seguente
 nl: volgende broer/volgende zus/volgende broer of zus
 no: neste bror/neste s&oslash;ster/neste s&oslash;sken
-pt: seguinte irm&atilde;o/seguinte irm&atilde;/seguinte irm&atilde;(o)
+pt: irm&atilde;o seguinte/irm&atilde; seguinte/irm&atilde;(o) seguinte 
 se: n&auml;sta bror/n&auml;sta syster/n&auml;sta syskon 
 
     no anniversary
@@ -3375,7 +3375,7 @@ is: fjöldi greina
 it: numero di ramo
 nl: aantal takken
 no: antall slektsgrener
-pt: n&uacute;mero de ramas
+pt: n&uacute;mero de ramos
 se: antal sl&auml;ktgrenar
 
     occupation
@@ -3823,7 +3823,7 @@ is: fyrra systkyn
 it: fratello precedente/sorella precedente/fratello o sorella precedente
 nl: vorige broer/vorige zus/vorige broer of zus
 no: forrige bror/forrige s&oslash;ster/forrige s&oslash;sken 
-pt: precedente irm&atilde;o/precedente irm&atilde;/precedente irm&atilde;(o)
+pt: irm&atilde;o precedente/irm&atilde; precedente/irm&atilde;(o) precedente 
 se: f&ouml;reg&aring;ende bror/f&ouml;reg&aring;ende syster/f&ouml;reg&aring;ende syskon
 
     private
@@ -4145,7 +4145,7 @@ is: stutt sýn
 it: display corto
 nl: beknopte weergave
 no: kort rapport
-pt: short display
+pt: resultados sucintos
 se: kort rapport
 
     shortest path
@@ -4389,7 +4389,7 @@ is: breyta röð
 it: scambiare
 nl: verander
 no: bytt rekkef&oslash;lge
-pt: cambiar
+pt: inverter
 se: byt ordning
 
     switch done
