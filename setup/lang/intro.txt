@@ -9,7 +9,7 @@ sv: Välkommen till GeneWeb $q
 ]
 
 [
-de: Nimm deinen Webbrowser und &ouml;ffne eine der folgenden Adressen:
+de: Nimm deinen Webbrowser und öffne eine der folgenden Adressen:
 en: Go to your Web browser and open one of the following addresses:
 fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
 ]
@@ -18,7 +18,7 @@ fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
 
 [
 de: Warnung: Damit dieses Programm funktioniert, darfst Du dieses 
-    Fenster nicht schlie&szlig;en!
+    Fenster nicht schließen!
 en: Warning: for this program to work, you must not close this window!
 fr: Attention: pour que cela fonctionne, vous ne devez pas fermer cette
     fenetre!
