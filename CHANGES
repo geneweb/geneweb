@@ -1,6 +1,9 @@
 GeneWeb version 3.12
 --------------------
 
+* Languages
+  - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
+
 * GeneWeb server or CGI (gwd)
   - [11 Feb 01] Fixed a (small) bug: in the ancestors page, if the maximum
     number of generations was the authorized limit plus one, the message

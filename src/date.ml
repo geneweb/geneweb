@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.24 2001-02-05 10:47:35 ddr Exp $ *)
+(* $Id: date.ml,v 3.25 2001-02-11 17:00:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -10,20 +10,30 @@ open Config;
 value nbsp = "&nbsp;";
 
 value code_date conf encoding d m y =
+  let apply_date_code =
+    fun
+    [ 'd' -> string_of_int d
+    | 'm' -> transl_nth conf "(month)" (m - 1)
+    | 'y' -> string_of_int y
+    | c -> "%" ^ String.make 1 c ]
+  in
   loop 0 where rec loop i =
     if i = String.length encoding then ""
     else
       let (s, i) =
         match encoding.[i] with
         [ '%' when i + 1 < String.length encoding ->
-            let s =
-              match encoding.[i+1] with
-              [ 'd' -> string_of_int d
-              | 'm' -> transl_nth conf "(month)" (m - 1)
-              | 'y' -> string_of_int y
-              | c -> "%" ^ String.make 1 c ]
-            in
+            let s = apply_date_code encoding.[i+1] in
             (s, i + 1)
+        | '['
+          when i + 5 < String.length encoding
+          && encoding.[i+3] = ']' && encoding.[i+4] = '%' ->
+            let s = apply_date_code encoding.[i+5] in
+            let s1 =
+              if start_with_vowel s then String.make 1 encoding.[i+2]
+              else String.make 1 encoding.[i+1] ^ " "
+            in
+            (s1 ^ s, i + 5)
         | c -> (String.make 1 c, i) ]
       in
       s ^ loop (i + 1)
