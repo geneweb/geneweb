@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.6 1999-09-02 12:38:18 ddr Exp $
+# $Id: geneweb.spec,v 1.7 1999-09-03 12:22:10 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -153,8 +153,8 @@ chown -R geneweb.geneweb /home/geneweb/gw
 # installed setuid, owned by geneweb, and can only be run by root.
 %files
 %defattr(-,geneweb,geneweb)
-%attr(4700, geneweb, geneweb) /home/geneweb/gw/gwd
-%attr(4700, geneweb, geneweb) /home/geneweb/gw/gwsetup
+%attr(4700, geneweb, geneweb) /home/geneweb/gw/gw/gwd
+%attr(4700, geneweb, geneweb) /home/geneweb/gw/gw/gwsetup
 %attr(744, root, root) /etc/rc.d/init.d/gwd
 %attr(744, root, root) /etc/rc.d/rc0.d/K99gwd
 %attr(744, root, root) /etc/rc.d/rc1.d/K99gwd
@@ -166,7 +166,6 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/LICENSE
 /home/geneweb/gw/gw/gwc
 /home/geneweb/gw/gw/consang
-/home/geneweb/gw/gw/gwd
 /home/geneweb/gw/gw/gwu
 /home/geneweb/gw/gw/ged2gwb
 /home/geneweb/gw/gw/gwb2ged
@@ -428,10 +427,11 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/setup/es/traces.htm
 /home/geneweb/gw/gw/setup/es/welcome.htm
 /home/geneweb/gw/gw/setup/es/intro.txt
-/home/geneweb/gw/gw/gwsetup
 /home/geneweb/gw/gw/only.txt
 /home/geneweb/gw/README.txt
 /home/geneweb/gw/LISEZMOI.txt
+/home/geneweb/gw/gwd
+/home/geneweb/gw/gwsetup
 %defattr(-,root,root)
 %doc doc/*
 

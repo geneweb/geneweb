@@ -17,8 +17,8 @@ case "$1" in
   start)
 	echo "Starting Geneweb Services:"
 	cd /home/geneweb/gw/gw
-	/home/geneweb/gw/gw/gwd -daemon
-	/home/geneweb/gw/gw/gwsetup -daemon
+	./gwd -daemon
+	./gwsetup -daemon
 	touch /var/lock/subsys/gwd
 	;;
   stop)
@@ -37,8 +37,8 @@ case "$1" in
         killproc gwsetup
 	echo
 	cd /home/geneweb/gw/gw
-	/home/geneweb/gw/gw/gwd -daemon
-	/home/geneweb/gw/gw/gwsetup -daemon
+	./gwd -daemon
+	./gwsetup -daemon
 	touch /var/lock/subsys/gwd
 	;;
   *)
