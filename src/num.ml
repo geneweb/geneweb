@@ -1,9 +1,10 @@
-(* $Id: num.ml,v 3.0 1999-10-29 10:31:26 ddr Exp $ *)
+(* $Id: num.ml,v 3.1 2000-01-08 20:03:39 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type t = array int;
 
 value base = 0x1000000;
+value max_mul_base = max_int / base;
 
 value zero = [| |];
 value one = [| 1 |];
@@ -100,26 +101,30 @@ value sub x y =
   Array.of_list (normalize l)
 ;
 value mul x n =
-  let l =
-    loop 0 0 where rec loop i r =
-      if i == Array.length x then
-        if r == 0 then [] else [r]
-      else
-        let d = x.(i) * n + r in
-        [d mod base :: loop (i + 1) (d / base)]
-  in
-  Array.of_list l
+  if n > max_mul_base then invalid_arg "Num.mul"
+  else
+    let l =
+      loop 0 0 where rec loop i r =
+        if i == Array.length x then
+          if r == 0 then [] else [r]
+        else
+          let d = x.(i) * n + r in
+          [d mod base :: loop (i + 1) (d / base)]
+    in
+    Array.of_list l
 ;
 value div x n =
-  let l =
-    loop (Array.length x - 1) [] 0 where rec loop i l r =
-      if i < 0 then l
-      else
-        let r = r mod n * base + x.(i) in
-        let d = r / n in
-        loop (i - 1) [d :: l] r
-  in
-  Array.of_list (normalize l)
+  if n > max_mul_base then invalid_arg "Num.mul"
+  else
+    let l =
+      loop (Array.length x - 1) [] 0 where rec loop i l r =
+        if i < 0 then l
+        else
+          let r = r mod n * base + x.(i) in
+          let d = r / n in
+          loop (i - 1) [d :: l] r
+    in
+    Array.of_list (normalize l)
 ;    
 value modl x n =
   let r = sub x (mul (div x n) n) in
