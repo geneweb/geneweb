@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.59 2001-12-19 17:47:39 ddr Exp $
+# $Id: lexicon.txt,v 4.60 2001-12-22 18:03:44 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -49,7 +49,7 @@ eo: en=anglo/eo=esperanto/fr=franco
 es: ca=Catalán/cs=Checo/da=Dan&eacute;s/de=Alem&aacute;n/en=Ingl&eacute;s/eo=Esperanto/es=Espa&ntilde;ol/fr=Franc&eacute;s/he=Hebreo/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/pt-br=Portug&eacute;s-del-Brasil/sv=Sueco/zh=Chino
 et: af=afrikaani/ca=katalaani/cs=t¨ehhi/da=taani/de=saksa/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/pl=poola/pt=portugali/ru=vene/sv=rootsi/zh=hiina
 fi: af=afrikaans/ca=katalaani/cs=tsekki/da=tanska/de=saksa/en=englanti/eo=esperanto/es=espanja/et=eesti/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/pt-br=Brasilian-portugali/ru=ven&auml;j&auml;/sv=ruotsi/zh=kiina
-fr: af=afrikaans/ca=catalan/cs=tch&egrave;que/da=danois/de=allemand/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pl=polonais/pt=portugais/pt-br=portugais-du-Br&eacute;sil/ru=russe/sv=su&eacute;dois/zh=chinois
+fr: af=afrikaans/ca=catalan/cs=tch&egrave;que/da=danois/de=allemand/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finnois/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pl=polonais/pt=portugais/pt-br=portugais-du-Br&eacute;sil/ru=russe/sv=su&eacute;dois/zh=chinois
 he: af=àôøé÷àğñ /cs=ö'ëéú /da=ãğéú /de=âøîğéú /en=àğâìéú /eo=àñôøğèå /es=ñôøãéú /fi=ôéğéú /fr=öøôúéú /he=òáøéú /is=àéñìğãéú /it=àéèì÷éú /lv=ìèååéú /no=ğåøáâéú /pt=ôåøèåâæéú /ru=øåñéú /sv=ùååãéú/zh=ñéğéú 
 is: af=afrikanska/cs=tékkneska/da=danska/de=şıska/en=enska/eo=esperanto/es=spænska/fi=finnska/fr=franska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/nl=hollenska/no=norska/pt=portúgalska/pt-br=Brasil-portúgalska/ru=rússneska/sv=sænska/zh=kínverska
 it: af=africano/cs=ceco/da=danese/de=tedesco/en=inglese/eo=esperanto/es=spagnolo/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pl=polonese/pt=portoghese/pt-br=portoghese-brasiliano/ru=russo/sv=svedese/zh=cinese
