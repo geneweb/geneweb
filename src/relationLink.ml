@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.1 1999-11-10 08:44:32 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.2 1999-11-13 08:45:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -615,10 +615,7 @@ value print_relation conf base ip1 ip2 =
       in
       print_relation_ok conf base info
   | _ ->
-      let title _ = Wserver.wprint "Param&egrave;tres erron&eacute;s" in
-      do header conf title;
-         trailer conf;
-      return () ]
+      incorrect_request conf ]
 ;
 
 value print conf base =

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.4 1999-11-13 08:11:52 ddr Exp $ *)
+(* $Id: family.ml,v 3.5 1999-11-13 08:45:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -50,7 +50,11 @@ value inconnu conf n =
 value relation_print conf base p =
   let p1 =
     match p_getint conf.senv "ei" with
-    [ Some i -> do conf.senv := []; return Some (base.data.persons.get i)
+    [ Some i ->
+        do conf.senv := []; return
+        if i >= 0 && i < base.data.persons.len then
+          Some (base.data.persons.get i)
+        else None
     | None ->
         match find_person_in_env conf base "1" with
         [ Some p1 -> do conf.senv := []; return Some p1
