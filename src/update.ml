@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.28 1999-10-10 20:30:05 ddr Exp $ *)
+(* $Id: update.ml,v 2.29 1999-10-15 10:32:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -459,8 +459,7 @@ value reconstitute_date_dmy conf var =
           [ Some d ->
               let d = {day = d; month = m; year = y; prec = prec; delta = 0} in
               if d.day >= 1 && d.day <= 31 && d.month >= 1
-              && d.month <= 13 then
-                Some d
+              && d.month <= 13 then Some d
               else bad_date conf d
           | None ->
               let d = {day = 0; month = m; year = y; prec = prec; delta = 0} in
@@ -470,12 +469,16 @@ value reconstitute_date_dmy conf var =
   | None -> None ]
 ;
 
+value check_greg_day conf d =
+  if d.day > nb_jours_dans_mois d.month d.year then bad_date conf d else ()
+;
+
 value reconstitute_date conf var =
   match reconstitute_date_dmy conf var with
   [ Some d ->
       let (d, cal) =
         match p_getenv conf.env (var ^ "_cal") with
-        [ Some "G" -> (d, Dgregorian)
+        [ Some "G" -> do check_greg_day conf d; return (d, Dgregorian)
         | Some "J" -> (Calendar.gregorian_of_julian d, Djulian)
         | Some "F" -> (Calendar.gregorian_of_french d, Dfrench)
         | Some "H" -> (Calendar.gregorian_of_hebrew d, Dhebrew)
