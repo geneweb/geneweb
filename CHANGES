@@ -44,6 +44,7 @@ GeneWeb version 2.03
     was incorrectly capitalized.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (*/start.txt)
+  - [Jun 3, 99] Added some missing terms in Italian (Daniel Hirschkoff).
   - [Jun 2, 99] Fixed and completed translations in Swedish (Lars Gustavsson;
     some help also from Stig Petersson).
   - [May 31, 99] Corrected and completed Spanish sentences in lexicon

@@ -11,6 +11,7 @@
 		Hebrew		Jonathan Marder
 				Ruth Marder
 		Italian         Raffaele Sena
+                                Daniel Hirschkoff
                 Norwegian       Brynjulf Langballe
 		Portuguese	Yves Guignard
                 Spanish         Luis Castro Guzman
