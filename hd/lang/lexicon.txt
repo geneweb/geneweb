@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.88 1999-07-30 10:14:52 ddr Exp $
+# $Id: lexicon.txt,v 2.89 1999-07-30 10:33:04 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -620,12 +620,14 @@ se: l&auml;gg till
     adoptive father/adoptive mother/adoptive parents
 dk: adoptivfader/adoptivmoder/adoptivfor&aelig;ldre
 en: adoptive father/adoptive mother/adoptive parents
+es: padre adoptivo/madre adoptiva/padres adoptivos
 fr: p&egrave;re adoptif/m&egrave;re adoptive/parents adoptifs
 se: adoptivfar/adoptivmor/adoptivf&ouml;r&auml;ldrar
 
     adoptive son/adoptive daughter/adoptive child
 dk: adoptivs&oslash;n/adoptivdatter/adoptivbarn
 en: adoptive son/adoptive daughter/adoptive child
+es: hijo adoptivo/hija adoptiva/hijo(a) adoptivo(a)
 fr: fils adoptif/fille adoptive/enfant adoptif
 se: adoptivson/adoptivdotter/adoptivbarn
 
@@ -920,6 +922,7 @@ se: samtidigt
 
     back
 en: back
+es: regreso
 fr: retour
 se: tillbaka
 
@@ -1115,12 +1118,14 @@ se: utan GeneWeb l&auml;nkar
     candidate father/candidate mother/candidate parents
 dk: mulig fader/mulig moder/mulige for&aelig;ldre
 en: candidate father/candidate mother/candidate parents
+es: padre posible/madre posible/padres posibles
 fr: p&egrave;re possible/m&egrave;re possible/parents possibles
 se: m&ouml;jlig far/m&ouml;jlig mor/m&ouml;jliga f&ouml;r&auml;ldrar
 
     candidate son/candidate daughter/candidate child
 dk: mulig s&oslash;n/mulig datter/muligt barn
 en: candidate son/candidate daughter/candidate child
+es: hijo posible/hija posible/hijo(a) posible
 fr: fils possible/fille possible/enfant possible
 se: m&ouml;jlig son/m&ouml;jlig dotter/m&ouml;jliga barn
 
@@ -1780,12 +1785,14 @@ se: generation
     godfather/godmother/godparents
 dk: gudfader/gudmoder/gudfader og gudmoder
 en: godfather/godmother/godparents
+es: padrino/madrina/padrino y padrina
 fr: parrain/marraine/parrain et marraine
 se: gudfar/gudmor/gudf&ouml;r&auml;ldrar
 
     godson/goddaughter/godchild
 dk: guds&oslash;n/guddatter/gudbarn
 en: godson/goddaughter/godchild
+es: fahijado/fahijada/fahihado(a)
 fr: filleul/filleule/filleul(e)
 se: gudson/guddotter/gudbarn
 
@@ -3232,6 +3239,7 @@ se: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
     relation/relations
 dk: forbindelse/forbindelser
 en: relation/relations
+es: relaci&oacute;n/relaciones
 fr: relation/relations
 se: relation/relationer
 
@@ -3947,6 +3955,7 @@ se: titel/titlar
 
     to add a child to a family, use "%s"
 en: to add a child to a family, use "%s"
+es: para agregar un hijo a una familia, utiliza "%s"
 fr: pour ajouter un enfant &agrave; une famille, utiliser "%s"
 se: f&ouml;r att l&auml;gga till ett barn i en familj, anv&auml;nd "%s"
 
