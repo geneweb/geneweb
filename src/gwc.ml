@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.10 2000-09-25 15:50:04 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.11 2000-10-04 00:24:17 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -164,15 +164,15 @@ value find_person_by_global_name gen first_name surname occ =
   let s = Name.crush_lower (first_name ^ " " ^ surname) in
   let key = Hashtbl.hash s in
   let ipl = Mhashtbl.find_all gen.g_names key in
-  let first_name = Name.strip_lower first_name in
-  let surname = Name.strip_lower surname in
+  let first_name = Name.lower first_name in
+  let surname = Name.lower surname in
   loop ipl where rec loop =
     fun
     [ [] -> raise Not_found
     | [ip :: ipl] ->
         let p = poi gen.g_base ip in
-        if Name.strip_lower (p_first_name gen.g_base p) = first_name
-        && Name.strip_lower (p_surname gen.g_base p) = surname
+        if Name.lower (p_first_name gen.g_base p) = first_name
+        && Name.lower (p_surname gen.g_base p) = surname
         && p.occ == occ
         then ip
         else loop ipl ]
@@ -184,15 +184,15 @@ value find_person_by_local_name gen first_name surname occ =
   let s = Name.crush_lower (first_name ^ " " ^ surname) in
   let key = Hashtbl.hash s in
   let ipl = Mhashtbl.find_all gen.g_local_names (key, occ) in
-  let first_name = Name.strip_lower first_name in
-  let surname = Name.strip_lower surname in
+  let first_name = Name.lower first_name in
+  let surname = Name.lower surname in
   loop ipl where rec loop =
     fun
     [ [] -> raise Not_found
     | [ip :: ipl] ->
         let p = poi gen.g_base ip in
-        if Name.strip_lower (p_first_name gen.g_base p) = first_name
-        && Name.strip_lower (p_surname gen.g_base p) = surname
+        if Name.lower (p_first_name gen.g_base p) = first_name
+        && Name.lower (p_surname gen.g_base p) = surname
         then ip
         else loop ipl ]
 ;
