@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.35 1999-02-19 13:32:10 ddr Exp $ *)
+(* $Id: perso.ml,v 1.36 1999-02-23 16:04:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -212,7 +212,10 @@ value print_dates conf base p =
           [ Some d ->
               let anniv =
                 if d.prec = Sure && p.death = NotDead then
-                  d.day = conf.today.day && d.month = conf.today.month
+                  d.day = conf.today.day && d.month = conf.today.month ||
+                  not (leap_year conf.today.year) && d.day = 29 &&
+                  d.month = 2 && conf.today.day = 1 &&
+                  conf.today.month = 3
                 else False
               in
               do Wserver.wprint "%s " (capitale (transl_nth conf "born" is));

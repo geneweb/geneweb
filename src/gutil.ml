@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 1.13 1999-02-15 18:51:37 ddr Exp $ *)
+(* $Id: gutil.ml,v 1.14 1999-02-23 16:04:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -11,13 +11,13 @@ value foi base i = base.data.families.get (Adef.int_of_ifam i);
 value coi base i = base.data.couples.get (Adef.int_of_ifam i);
 value sou base i = base.data.strings.get (Adef.int_of_istr i);
 
-value bissextile a =
+value leap_year a =
   if a mod 100 == 0 then a / 100 mod 4 == 0 else a mod 4 == 0
 ;
 
 value nb_jours_dans_mois =
   let tb = [| 31; 28; 31; 30; 31; 30; 31; 31; 30; 31; 30; 31 |] in
-  fun m a -> if m == 2 && bissextile a then 29 else tb.(m - 1)
+  fun m a -> if m == 2 && leap_year a then 29 else tb.(m - 1)
 ;
 
 value common_prec p1 p2 =
