@@ -5,6 +5,9 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [05 Jan 04] Added database configuration variable "show_consang":
+    when set to "no" the possible consanguinity is not displayed in
+    personal pages.
   - [23 Dec 03] Nicer calendars page.
   - [23 Dec 03] Optimization: suppressed no-loop-check for added or
     modified marriages when it is not necessary (for big databases,
