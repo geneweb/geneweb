@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.165 2000-11-02 10:31:22 ddr Exp $
+# $Id: lexicon.txt,v 3.166 2000-11-02 18:50:40 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5400,6 +5400,7 @@ se: statistik
     subject
 en: subject
 fr: sujet
+se: ämne
 
     surname alias
 af: van alias
