@@ -1,4 +1,4 @@
-(* $Id: gwdiff.ml,v 1.1 2001-05-12 13:22:14 ddr Exp $ *)
+(* $Id: gwdiff.ml,v 1.2 2001-05-14 18:24:08 ddr Exp $ *)
 (* Copyright (c) 2001 Ludovic LEDIEU *)
 
 open Def;
@@ -6,8 +6,14 @@ open Gutil;
 
 (*= TODO =====================================================================
   - About / About => test has to be improved.
-  - Found a way not to check several time the same persons.
+  - Improve the way not to check several time the same persons.
 =========================================================================== *)
+
+value in_file1 = ref "";
+value in_file2 = ref "";
+value html = ref False;
+value root = ref "";
+value cr = ref "";
 
 type messages =
   [ MsgBadChild of iper
@@ -33,65 +39,86 @@ value person_string base iper =
   let p = poi base iper in
   let fn = sou base p.first_name in
   let sn = sou base p.surname in
-  fn ^ "." ^ (string_of_int p.occ) ^ " " ^ sn
+  if sn = "?" || fn = "?" then
+    fn ^ " " ^ sn ^ " (#" ^ string_of_int (Adef.int_of_iper iper) ^ ")"
+  else fn ^ "." ^ (string_of_int p.occ) ^ " " ^ sn
+;
+
+value person_link bname base iper target =
+  if html.val then
+    Printf.sprintf "<A HREF=\"%s%s_w?i=%d\" TARGET=\"%s\">%s</A>"
+      root.val bname (Adef.int_of_iper iper) target (person_string base iper)
+  else
+    person_string base iper
 ;
 
 value print_message base1 base2 msg =
-  match msg with
-  [ MsgBadChild iper1 ->
-      Printf.printf " can not isolate one child match: %s\n"
-        (person_string base1 iper1)
-  | MsgBirthDate ->
-      Printf.printf " birth date\n"
-  | MsgBirthPlace ->
-      Printf.printf " birth place\n"
-  | MsgChildMissing iper1 ->
-      Printf.printf " child missing: %s\n" (person_string base1 iper1)
-  | MsgChildren iper1 ->
-      Printf.printf " more than one child match: %s\n"
-        (person_string base1 iper1)
-  | MsgDeathDate ->
-      Printf.printf " death (status or date)\n"
-  | MsgDeathPlace ->
-      Printf.printf " death place\n"
-  | MsgDivorce ->
-      Printf.printf " divorce\n"
-  | MsgFirstName ->
-      Printf.printf " first name\n"
-  | MsgOccupation ->
-      Printf.printf " occupation\n"
-  | MsgParentsMissing ->
-      Printf.printf " parents missing\n"
-  | MsgMarriageDate ->
-      Printf.printf " marriage date\n"
-  | MsgMarriagePlace ->
-      Printf.printf " marriage place\n"
-  | MsgSex ->
-      Printf.printf " sex\n"
-  | MsgSpouseMissing iper1 ->
-      Printf.printf " spouse missing: %s\n" (person_string base1 iper1)
-  | MsgSpouses iper1 ->
-      Printf.printf " more than one spouse match: %s\n"
-        (person_string base1 iper1)
-  | MsgSurname ->
-      Printf.printf " surname\n" ]
+  do {
+    match msg with
+    [ MsgBadChild iper1 ->
+        Printf.printf " can not isolate one child match: %s"
+          (person_link in_file1.val base1 iper1 "base1")
+    | MsgBirthDate ->
+        Printf.printf " birth date"
+    | MsgBirthPlace ->
+        Printf.printf " birth place"
+    | MsgChildMissing iper1 ->
+        Printf.printf " child missing: %s"
+          (person_link in_file1.val base1 iper1 "base1")
+    | MsgChildren iper1 ->
+        Printf.printf " more than one child match: %s"
+          (person_link in_file1.val base1 iper1 "base1")
+    | MsgDeathDate ->
+        Printf.printf " death (status or date)"
+    | MsgDeathPlace ->
+        Printf.printf " death place"
+    | MsgDivorce ->
+        Printf.printf " divorce"
+    | MsgFirstName ->
+        Printf.printf " first name"
+    | MsgOccupation ->
+        Printf.printf " occupation"
+    | MsgParentsMissing ->
+        Printf.printf " parents missing"
+    | MsgMarriageDate ->
+        Printf.printf " marriage date"
+    | MsgMarriagePlace ->
+        Printf.printf " marriage place"
+    | MsgSex ->
+        Printf.printf " sex"
+    | MsgSpouseMissing iper1 ->
+        Printf.printf " spouse missing: %s"
+          (person_link in_file1.val base1 iper1 "base1")
+    | MsgSpouses iper1 ->
+        Printf.printf " more than one spouse match: %s"
+          (person_link in_file1.val base1 iper1 "base1")
+    | MsgSurname ->
+        Printf.printf " surname" ];
+    Printf.printf "%s" cr.val
+  }
 ;
 
 value print_f_messages base1 base2 ifam1 ifam2 res =
   let c1 = coi base1 ifam1 in
   let c2 = coi base2 ifam2 in
   do {
-    Printf.printf "%s x %s\n/ %s x %s\n" (person_string base1 c1.father)
-      (person_string base1 c1.mother) (person_string base2 c2.father)
-      (person_string base2 c2.mother);
+    Printf.printf "%s x %s%s/ %s x %s%s"
+      (person_link in_file1.val base1 c1.father "base1")
+      (person_link in_file1.val base1 c1.mother "base1")
+      cr.val
+      (person_link in_file2.val base2 c2.father "base2")
+      (person_link in_file2.val base2 c2.mother "base2")
+      cr.val;
     List.iter (print_message base1 base2) res
   }
 ;
 
 value print_p_messages base1 base2 iper1 iper2 res =
   do { 
-    Printf.printf "%s / %s\n" (person_string base1 iper1)
-      (person_string base2 iper2);
+    Printf.printf "%s / %s%s"
+      (person_link in_file1.val base1 iper1 "base1")
+      (person_link in_file2.val base2 iper2 "base2")
+      cr.val;
     List.iter (print_message base1 base2) res
   }
 ;
@@ -192,11 +219,18 @@ value compatible_dmys dmy1 dmy2 =
 ;
 
 value compatible_dates date1 date2 =
+  let compatible_cals cal1 cal2 =
+    match (cal1, cal2) with
+    [ (Dgregorian, Djulian)
+    | (Dgregorian, Dfrench) -> True
+    | _ -> cal1 = cal2 ]
+  in
   if date1 = date2 then True
   else
     match (date1, date2) with
     [ (Dgreg dmy1 cal1, Dgreg dmy2 cal2) ->
-        compatible_dmys dmy1 dmy2 && cal1 = cal2
+        compatible_dmys dmy1 dmy2
+        && compatible_cals cal1 cal2
     | (Dgreg _ _, Dtext _) -> False
     | (Dtext _, _) -> True ]
 ;
@@ -287,12 +321,6 @@ value compatible_persons base1 base2 p1 p2 =
   @ compatible_birth base1 base2 p1 p2
   @ compatible_death base1 base2 p1 p2
   @ compatible_occupations base1 base2 p1 p2
-;
-
-value compatible_ipers base1 base2 iper1 iper2 =
-  let p1 = poi base1 iper1 in
-  let p2 = poi base2 iper2 in
-  compatible_persons base1 base2 p1 p2
 ;
 
 value rec find_compatible_persons_ligth base1 base2 iper1 iper2_list =
@@ -389,7 +417,11 @@ value compatible_parents base1 base2 iper1 iper2 =
        print_p_messages base1 base2 iper1 iper2 [ MsgParentsMissing ] ]
 ;
 
-value rec ddiff base1 base2 r iper1 iper2 =
+value rec ddiff base1 base2 iper1 iper2 d_tab =
+  let d_check = d_tab.(Adef.int_of_iper iper1) in
+  if List.mem iper2 d_check then ()
+  else
+    let _ = d_tab.(Adef.int_of_iper iper1) := [iper2 :: d_check ] in
   let spouse c iper =
     if iper = c.father then c.mother
     else c.father
@@ -397,12 +429,12 @@ value rec ddiff base1 base2 r iper1 iper2 =
   let rec udiff base1 base2 iper1 iper2 r ifam1 ifam2 =
     let fd b1 b2 ip2_list ip1 =
       match find_compatible_persons_ligth b1 b2 ip1 ip2_list with
-      [ [ip2] -> ddiff base1 base2 True ip1 ip2
+      [ [ip2] -> ddiff base1 base2 ip1 ip2 d_tab
       | [] -> 
           print_p_messages base1 base2 iper1 iper2 [ MsgChildMissing ip1 ] 
       | rest_list ->
           match find_compatible_persons b1 b2 ip1 rest_list with
-          [ [best_ip2] -> ddiff base1 base2 True ip1 best_ip2
+          [ [best_ip2] -> ddiff base1 base2 ip1 best_ip2 d_tab
           | [] -> 
               print_p_messages base1 base2 iper1 iper2 [ MsgBadChild ip1 ]
           | _ ->
@@ -443,36 +475,87 @@ value rec ddiff base1 base2 r iper1 iper2 =
   }
 ;
 
-(* Main *)
-
-value gwdiff base1 base2 iper1 iper2 =
-  ddiff base1 base2 True iper1 iper2
+value rec find_top base1 base2 iper1 iper2 =
+  let p1 = poi base1 iper1 in
+  let p2 = poi base2 iper2 in
+  if compatible_persons_ligth base1 base2 p1 p2 = [] then
+    let a1 = (aoi base1 iper1).parents in
+    let a2 = (aoi base2 iper2).parents in
+    match (a1, a2) with
+    [ (Some ifam1, Some ifam2) ->
+         let c1 = coi base1 ifam1 in
+         let c2 = coi base2 ifam2 in
+         let f_top_list = find_top base1 base2 c1.father c2.father in
+         let m_top_list = find_top base1 base2 c1.mother c2.mother in
+         f_top_list @ m_top_list
+    | _ -> [(iper1, iper2)] ]
+  else do {
+    Printf.printf " Warning: %s doesn't match %s%s"
+      (person_link in_file1.val base1 iper1 "base1")
+      (person_link in_file2.val base2 iper2 "base2")
+      cr.val;
+    []
+  }
 ;
 
-value in_file1 = ref "";
-value in_file2 = ref "";
-value d1_fn = ref "";
-value d1_occ = ref 0;
-value d1_sn = ref "";
-value d2_fn = ref "";
-value d2_occ = ref 0;
-value d2_sn = ref "";
+value addiff base1 base2 iper1 iper2 d_tab =
+  let topdiff (iper1, iper2) =
+    do {
+      Printf.printf "==> %s / %s%s"
+        (person_link in_file1.val base1 iper1 "base1")
+        (person_link in_file2.val base2 iper2 "base2")
+        cr.val;
+      ddiff base1 base2 iper1 iper2 d_tab
+    }
+  in
+  do {
+    Printf.printf "Building top list...%s" cr.val;
+    let top_list = find_top base1 base2 iper1 iper2 in
+    Printf.printf "Top list built.%s" cr.val;
+    List.iter topdiff top_list
+  }
+;
+
+(* Main *)
+
+value gwdiff base1 base2 iper1 iper2 d_mode ad_mode =
+  let desc_tab = Array.create base1.data.persons.len [] in
+  match (d_mode, ad_mode) with
+  [ (True, _)
+  | (False, False) -> ddiff base1 base2 iper1 iper2 desc_tab
+  | (False, True) -> addiff base1 base2 iper1 iper2 desc_tab ]
+;
+
+value p1_fn = ref "";
+value p1_occ = ref 0;
+value p1_sn = ref "";
+value p2_fn = ref "";
+value p2_occ = ref 0;
+value p2_sn = ref "";
 
 type arg_state =
   [ ASnone
-  | ASwaitD1occ
-  | ASwaitD1sn
-  | ASwaitD2occ
-  | ASwaitD2sn ]
+  | ASwaitP1occ
+  | ASwaitP1sn
+  | ASwaitP2occ
+  | ASwaitP2sn ]
 ;
 value arg_state = ref ASnone;
 value mem = ref False;
+value d_mode = ref False;
+value ad_mode = ref False;
 
 value speclist =
-  [("-d1", Arg.String (fun s -> do { d1_fn.val := s; arg_state.val := ASwaitD1occ }),
-    "<fn> <occ> <sn> : (mandatory) checks descendants of ... (in base1)");
-   ("-d2", Arg.String (fun s -> do { d2_fn.val := s; arg_state.val := ASwaitD2occ }),
-    "<fn> <occ> <sn> : (mandatory) checks descendants of ... (in base2)");
+  [("-1", Arg.String (fun s -> do { p1_fn.val := s; arg_state.val := ASwaitP1occ }),
+    "<fn> <occ> <sn> : (mandatory) defines starting person in base1");
+   ("-2", Arg.String (fun s -> do { p2_fn.val := s; arg_state.val := ASwaitP2occ }),
+    "<fn> <occ> <sn> : (mandatory) defines starting person in base2");
+   ("-ad", Arg.Set ad_mode,
+    ": checks descendants of all ascendants ");
+   ("-d", Arg.Set d_mode,
+    ": checks descendants (default)");
+   ("-html", Arg.String (fun s -> do { html.val := True; root.val := s }),
+    "<root>: HTML format used for report");
    ("-mem", Arg.Set mem, ": save memory space, but slower") ]
 ;
 
@@ -482,24 +565,24 @@ value anonfun s =
       if in_file1.val = "" then in_file1.val := s
       else if in_file2.val = "" then in_file2.val := s
       else raise (Arg.Bad "Too much arguments")
-  | ASwaitD1occ ->
+  | ASwaitP1occ ->
       try
         do {
-          d1_occ.val := int_of_string s;
-          arg_state.val := ASwaitD1sn
+          p1_occ.val := int_of_string s;
+          arg_state.val := ASwaitP1sn
         }
       with
-      [ Failure _ -> raise (Arg.Bad "Numeric value for occ (-d1)!") ]
-  | ASwaitD1sn -> do { d1_sn.val := s; arg_state.val := ASnone }
-  | ASwaitD2occ ->
+      [ Failure _ -> raise (Arg.Bad "Numeric value for occ (-1)!") ]
+  | ASwaitP1sn -> do { p1_sn.val := s; arg_state.val := ASnone }
+  | ASwaitP2occ ->
       try
         do {
-          d2_occ.val := int_of_string s;
-          arg_state.val := ASwaitD2sn
+          p2_occ.val := int_of_string s;
+          arg_state.val := ASwaitP2sn
         }
       with
-      [ Failure _ -> raise (Arg.Bad "Numeric value for occ (-d2)!") ]
-  | ASwaitD2sn -> do { d2_sn.val := s; arg_state.val := ASnone }]
+      [ Failure _ -> raise (Arg.Bad "Numeric value for occ (-2)!") ]
+  | ASwaitP2sn -> do { p2_sn.val := s; arg_state.val := ASnone }]
 ;
 
 value errmsg =
@@ -508,57 +591,66 @@ value errmsg =
 Options are: "
 ;
 
+value check_args () =
+  do {
+    Argl.parse speclist anonfun errmsg;
+    if in_file1.val = "" then
+      do {
+        Printf.printf "Missing reference data base\n";
+        Printf.printf "Use option -help for usage\n";
+        flush stdout;
+        exit 2
+      }
+    else ();
+    if in_file2.val = "" then
+      do {
+        Printf.printf "Missing destination data base\n";
+        Printf.printf "Use option -help for usage\n";
+        flush stdout;
+        exit 2
+      }
+    else ();
+    if p1_fn.val = "" then
+      do {
+        Printf.printf "-1 parameter is mandatory\n";
+        Printf.printf "Use option -help for usage\n";
+        flush stdout;
+        exit 2
+      }
+    else ();
+    if p1_sn.val = "" then
+      do {
+        Printf.printf "Incomplete -1 parameter\n";
+        Printf.printf "Use option -help for usage\n";
+        flush stdout;
+        exit 2
+      }
+    else ();
+    if p2_fn.val = "" then
+      do {
+        Printf.printf "-2 parameter is mandatory\n";
+        Printf.printf "Use option -help for usage\n";
+        flush stdout;
+        exit 2
+      }
+    else ();
+    if p2_sn.val = "" then
+      do {
+        Printf.printf "Incomplete -2 parameter\n";
+        Printf.printf "Use option -help for usage\n";
+        flush stdout;
+        exit 2
+      }
+    else ()
+  }
+;
+
 value main () =
-  do Argl.parse speclist anonfun errmsg;
-     if in_file1.val = "" then
-       do {
-         Printf.printf "Missing reference data base\n";
-         Printf.printf "Use option -help for usage\n";
-         flush stdout;
-         exit 2
-       }
-     else ();
-     if in_file2.val = "" then
-       do {
-         Printf.printf "Missing destination data base\n";
-         Printf.printf "Use option -help for usage\n";
-         flush stdout;
-         exit 2
-       }
-     else ();
-     if d1_fn.val = "" then
-       do {
-         Printf.printf "-d1 parameter is mandatory\n";
-         Printf.printf "Use option -help for usage\n";
-         flush stdout;
-         exit 2
-       }
-     else ();
-     if d1_sn.val = "" then
-       do {
-         Printf.printf "Incomplete d1 parameter\n";
-         Printf.printf "Use option -help for usage\n";
-         flush stdout;
-         exit 2
-       }
-     else ();
-     if d2_fn.val = "" then
-       do {
-         Printf.printf "-d2 parameter is mandatory\n";
-         Printf.printf "Use option -help for usage\n";
-         flush stdout;
-         exit 2
-       }
-     else ();
-     if d2_sn.val = "" then
-       do {
-         Printf.printf "Incomplete d2 parameter\n";
-         Printf.printf "Use option -help for usage\n";
-         flush stdout;
-         exit 2
-       }
-     else ();
-  return
+  let _ = check_args () in
+  let _ =
+    if not html.val then cr.val := "\n"
+    else cr.val := "<BR>\n"
+  in
   (* Reference base *)
   let base1 = Iobase.input in_file1.val in
   let _ = base1.data.ascends.array () in
@@ -594,9 +686,17 @@ value main () =
        (* Reference = Destination *)
        base1
   in
-  let iper1 = person_ht_find_unique base1 d1_fn.val d1_sn.val d1_occ.val in
-  let iper2 = person_ht_find_unique base2 d2_fn.val d2_sn.val d2_occ.val in
-  gwdiff base1 base2 iper1 iper2
+  let iper1 = person_ht_find_unique base1 p1_fn.val p1_sn.val p1_occ.val in
+  let iper2 = person_ht_find_unique base2 p2_fn.val p2_sn.val p2_occ.val in
+  do {
+    if html.val then
+      Printf.printf "<BODY>\n"
+    else ();
+    gwdiff base1 base2 iper1 iper2 d_mode.val ad_mode.val;
+    if html.val then
+      Printf.printf "</BODY>\n"
+    else ()
+  }
 ;
 
 Printexc.catch main ();
