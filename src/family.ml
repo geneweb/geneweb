@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.11 1999-12-14 05:16:08 ddr Exp $ *)
+(* $Id: family.ml,v 3.12 1999-12-16 16:21:26 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -520,7 +520,7 @@ value print_no_index conf base =
       List.fold_right
         (fun (x, v) s ->
            let sep = if s = "" then "" else ";" in
-           x ^ "=" ^ code_varenv v ^ sep ^ s)
+           x ^ "=" ^ v ^ sep ^ s)
         [("lang", conf.lang) :: env] ""
     in
     let suff =

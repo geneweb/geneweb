@@ -6,6 +6,8 @@ GeneWeb version 3.02
     another browser (see version 3.01).
 
 * GeneWeb Service/CGI (gwd)
+  - [Dec 16, 99] Fixed bug: the ";opt=no_index" did not work correctly
+    when the URL hold special characters.
   - [Dec 15, 99] Added things to be able to translate correctly the
     noun complement ("x of y") in Finnish which sucks in the present
     version.
