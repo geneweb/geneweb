@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.171 2000-11-05 11:06:41 ddr Exp $
+# $Id: lexicon.txt,v 3.172 2000-11-05 22:32:00 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3776,10 +3776,12 @@ ru: объединение завершено
 se: sammanslagning klar
 
     message added
+dk: meddelelse tilf&oslash;jet
 en: message added
 fr: message ajout&eacute;
 
     message/next message
+dk: meddelelse/n&aelig;ste meddelelse
 en: message/next message
 fr: message/message suivant
 
