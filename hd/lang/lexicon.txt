@@ -1726,6 +1726,7 @@ eo: posta frato/posta fratino/posta frat(in)o
 es: siguiente hermano/siguiente hermana/siguiente hermano(a)
 fr: fr&egrave;re suivant/soeur suivante/fr&egrave;re ou soeur suivant
 it: seguente fratello/seguente sorella/seguente fratello o sorella
+nl: volgende broer/volgende zus/volgende broer of zus
 pt: seguinte irm&atilde;o/seguinte irm&atilde;/seguinte irm&atilde;(o)
 se: n&auml;sta syskon
 
@@ -2133,6 +2134,7 @@ eo: precedento frato/precedento fratino/precedento frat(in)o
 es: anterior hermano/anterior hermana/anterior hermano(a)
 fr: fr&egrave;re pr&eacute;c&eacute;dent/soeur pr&eacute;c&eacute;dente/fr&egrave;re ou soeur pr&eacute;c&eacute;dent
 it: precedente fratello/precedente sorella/precedente fratello o sorella
+nl: vorige broer/vorige zus/vorige broer of zus
 pt: precedente irm&atilde;o/precedente irm&atilde;/precedente irm&atilde;(o)
 se: f&ouml;reg&aring;ende syskon
 
