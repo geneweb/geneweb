@@ -5,6 +5,9 @@ GeneWeb version 3.04
   - [06 Apr 00] Added Afrikaans (Louis Kruger).
 
 * GeneWeb Service/CGI (gwd)
+  - [16 Apr 00] Fixed problem: the kde browser (Konqueror) seems not to handle
+    the password protocol. Went around the problem by treating it as it were
+    in CGI mode, where the password has to be given in a form.
   - [14 Apr 00] Fixed bug: could no more access a person by his key after
     having changed his name, in the case when the initial first name or
     surname was a question marks *and* the changed name had nevertheless
