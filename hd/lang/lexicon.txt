@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.154 2000-08-27 16:08:31 ddr Exp $
+# $Id: lexicon.txt,v 3.155 2000-08-29 07:13:38 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5348,6 +5348,7 @@ se: som b&ouml;rjar med
 dk: statistikker
 en: statistics
 eo: statistikoj
+fi: tilastotietoja
 fr: statistiques
 lv: statistika
 nl: statistieken
@@ -5584,6 +5585,7 @@ dk: de %d som har levet l&aelig;ngst
 en: the %d who lived the longest
 eo: la %d, kiuj vivis plejlonge
 es: los %d que han vivido m&aacute;s mucho tiempo
+fi: %d pisimpään elänyttä
 fr: les %d ayant v&eacute;cu le plus longtemps
 lv: %d, kuri dzîvojuði visilgâk
 nl: de %d langst levende personen
