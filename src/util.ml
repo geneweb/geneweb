@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.52 2000-06-19 23:50:14 ddr Exp $ *)
+(* $Id: util.ml,v 3.53 2000-06-20 13:47:26 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1167,6 +1167,21 @@ value up_fname conf =
   "up.jpg"
 ;
 
+value link_to_referer conf =
+  let referer = Wserver.extract_param "referer: " '\n' conf.request in
+  if referer <> "" then
+    let fname = "left.jpg" in
+    let wid_hei =
+      match image_size (image_file_name fname) with
+      [ Some (wid, hei) ->
+          " width=" ^ string_of_int wid ^ " height=" ^ string_of_int hei
+      | None -> "" ]
+    in
+    "<a href=\"" ^ referer ^ "\"><img src=\"" ^ image_prefix conf ^
+    "/" ^ fname ^ "\"" ^ wid_hei ^ " alt=\"&lt;&lt;\"></a>\n"
+  else ""
+;
+
 value print_link_to_welcome conf right_aligned =
   if conf.cancel_links then ()
   else
@@ -1178,16 +1193,10 @@ value print_link_to_welcome conf right_aligned =
           " width=" ^ string_of_int wid ^ " height=" ^ string_of_int hei
       | None -> "" ]
     in
-    let referer = Wserver.extract_param "referer: " '\n' conf.request in
     do if right_aligned then Wserver.wprint "<table align=%s><tr><td>\n" dir
        else ();
-       if referer <> "" then
-         do Wserver.wprint "<a href=\"%s\">" referer;
-            Wserver.wprint "<img src=\"%s/%s\"%s alt=\"&lt;&lt;\">"
-              (image_prefix conf) "left.jpg" wid_hei;
-            Wserver.wprint "</a>\n";
-         return ()
-       else ();
+       let str = link_to_referer conf in
+       if str = "" then () else Wserver.wprint "%s" str;
        Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
        Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\">"
          (image_prefix conf) fname wid_hei;

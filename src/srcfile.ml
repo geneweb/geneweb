@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.20 2000-06-03 21:08:06 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.21 2000-06-20 13:47:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -182,6 +182,18 @@ value rec src_translate conf nom ic =
   if upp then capitale r else r
 ;
 
+value language_name conf lang =
+  let str = transl conf " !languages" in
+  loop 0 0 where rec loop beg i =
+    if i == String.length str && i == beg then lang
+    else if i == String.length str || str.[i] == '/' then
+      if i > beg + 3 && String.sub str beg 2 = lang then
+        String.sub str (beg + 3) (i - beg - 3)
+      else if i == String.length str then lang
+      else loop (i + 1) (i + 1)
+    else loop beg (i + 1)
+;
+
 value browser_cannot_handle_passwords conf =
   let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
   String.lowercase user_agent = "konqueror"
@@ -304,7 +316,18 @@ value rec copy_from_channel conf base ic =
           | 'r' -> copy_from_file conf base (input_line ic)
           | 's' -> Wserver.wprint "%s" (commd conf)
           | 't' -> Wserver.wprint "%s" conf.bname
+          | 'u' ->
+              let lang =
+                let c = String.create 2 in
+                do c.[0] := input_char ic;
+                   c.[1] := input_char ic;
+                return c
+              in
+              Wserver.wprint "%s" (language_name conf lang)
           | 'v' -> Wserver.wprint "%s" Version.txt
+          | 'w' ->
+              let s = Util.link_to_referer conf in
+              Wserver.wprint "%s" (if s = "" then "&nbsp;" else s)
           | c -> Wserver.wprint "%%%c" c ]
       | c -> if echo.val then Wserver.wprint "%c" c else () ];
     done
