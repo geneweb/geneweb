@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Parameters for "gwd"</title></head>
+
+<body>
+
+<h1>Parameters for "gwd"</h1>
+
+<form mode=GET action="gwd_1">
+<input type=hidden name=lang value=$l>
+
+<p>
+
+Here are the parameters of the command "gwd". Change the one you
+estimate necessary:
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>-lang</strong></td>
+<td>Default language.
+<p>
+By default, all the pages of the databases are displayed in this language.
+Select your preferred language.
+<p>
+For a given database, you can still change this choice by
+configurating the specific parameters of this database. And in the
+welcome page of the base, you can still click on another flag to
+select another language. The present choice is therefore like a
+"default default" language.
+<p>
+<p>
+If "-" is selected, it is French.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<select name=default_lang>
+<option value=$L{}>-
+<option value=$L{cn}>Chinese
+<option value=$L{dk}>Danish
+<option value=$L{nl}>Dutch
+<option value=$L{en}>English
+<option value=$L{eo}>Esperanto
+<option value=$L{fr}>French
+<option value=$L{de}>German
+<option value=$L{he}>Hebrew
+<option value=$L{it}>Italian
+<option value=$L{no}>Norwegian
+<option value=$L{pt}>Portuguese
+<option value=$L{es}>Spanish
+<option value=$L{se}>Swedish
+</select>
+</td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>-only</strong></td>
+<td>
+Only authorized address.
+<p>
+Only the requests from this Internet address are accepted.
+<p>
+To know which value put for your computer, look at the traces of the
+command "gwd" which are displayed each time you navigate in your
+databases. You have to put what you see behind the "From:".
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=only value="$O" size=40>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>-log</strong></td>
+<td>
+Connection log file.
+<p>
+By default the connection traces appear in the window of "gwd". Each time
+you navigate, or somebody accesses to one of your database, 4 or 5 lines
+are displayed.
+<p>
+If you want that the traces go rather in a file, write here the name of
+the file you wish. This file will be created if it does not exist, in the
+main directory of <em>GeneWeb</em> where you see the commands "setup" and
+"gwd". It will be extented &agrave; each request.
+<td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=log value="$T" size=40>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd>Other parameters exist for the command "gwd", but are not
+configurable here because they can perturbate the operation of
+"setup".
+<p>
+Indeed, the navigation by "setup" is mainly destinated to make the use
+of <em>GeneWeb</em> simpler, but does not allow to exploit quite all
+the possibilities. To find the other parameters and their use, you
+must be a little bit "hacker": some informations can be found in the
+documentation.</dl>
+
+<p>
+
+Then push this button:
+
+<p>
+
+<dl><dd><input type=submit value="Configurate"></dl>
+
+</form>

@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Parameters</title></head>
+
+<body>
+
+<h1>Parameters</h1>
+
+<form mode=GET action="gwf">
+<input type=hidden name=lang value=$l>
+
+Select your database by clicking on the corresponding button:
+
+<p>
+
+<dl><dd><table border=1 cellspacing=0 cellpadding=1>
+
+$b{
+<tr>
+<td><input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+</tr>|
+<tr><td>there is no database at present</tr></td>}
+
+</table></dl>
+
+<p>
+
+Then push this button:
+
+<p>
+
+<dl><dd><input type=submit value="Configurate"></dl>
+
+</form>

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.13 1999-05-05 06:23:09 ddr Exp $ *)
+(* $Id: setup.ml,v 1.14 1999-05-05 15:08:09 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -416,7 +416,7 @@ value setup_gen conf =
   | _ -> error "request needs \"v\" parameter" ]
 ;
 
-value simple_check conf =
+value simple conf =
   let ged =
     match p_getenv conf.env "anon" with
     [ Some f -> strip_spaces f
@@ -459,7 +459,7 @@ value gwc_or_ged2gwb_check out_name_of_in_name conf =
     if out_file = "" then out_name_of_in_name in_file else out_file
   in
   let conf = conf_with_env conf "o" out_file in
-  if in_file = "" then print_file conf "err_missing.html"
+  if in_file = "" || out_file = "" then print_file conf "err_missing.html"
   else if not (Sys.file_exists in_file) then
     print_file conf "err_unknown.html"
   else if not (good_name out_file) then print_file conf "err_name.html"
@@ -614,6 +614,7 @@ value recover_1 conf =
   let out_file = if out_file = "" then in_file else out_file in
   let conf = conf_with_env conf "o" out_file in
   if in_file = "" then print_file conf "err_not_appl.html"
+  else if not (good_name out_file) then print_file conf "err_name.html"
   else
     let (old_to_src, o_opt, tmp, src_to_new) =
       if not by_gedcom then ("gwu", " > ", "tmp.gw", "gwc")
@@ -1032,7 +1033,7 @@ value has_gwb_directories dh =
 value setup_comm conf =
   fun
   [ "setup" -> setup_gen conf
-  | "simple" -> simple_check conf
+  | "simple" -> simple conf
   | "recover" -> recover conf
   | "recover_1" -> recover_1 conf
   | "recover_2" -> recover_2 conf
@@ -1127,6 +1128,28 @@ value copy_text lang fname =
       return () ]
 ;
 
+value set_gwd_default_language lang =
+  let env = read_gwd_arg () in
+  match try Some (open_out "gwd.arg") with [ Sys_error _ -> None ] with
+  [ Some oc ->
+      let lang_found = ref False in
+      do List.iter
+           (fun (k, v) ->
+              do Printf.fprintf oc "-%s\n" k;
+                 if k = "lang" then
+                   do lang_found.val := True;
+                      Printf.fprintf oc "%s\n" lang;
+                   return ()
+                 else Printf.fprintf oc "%s\n" v;
+              return ())
+           env;
+         if not lang_found.val then Printf.fprintf oc "-lang\n%s\n" lang
+         else ();
+         close_out oc;
+      return ()
+  | None -> () ]
+;
+
 value intro () =
   do Sys.chdir "gw";
      copy_text "" "intro.txt";
@@ -1134,7 +1157,9 @@ value intro () =
        let x = input_line stdin in
        if x = "" then default_lang else x
      in
-     copy_text lang (Filename.concat lang "intro.txt");
+     do set_gwd_default_language lang;
+        copy_text lang (Filename.concat lang "intro.txt");
+     return ();
      Printf.printf "\n";
      flush stdout;
   return ()
