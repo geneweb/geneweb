@@ -61,12 +61,11 @@ by
 
 </ul>
 
-The <a href="%sm=AN">birthdays</a>%x
-and the <a href="%sm=B;k=10">last births</a>%x...
-<br>
-The <a href="%sm=AD">anniversaries of dead</a>.
-<br>
-And the <a href="%sm=AM">anniversaries of marriage</a>.
+The <a href="%sm=AN">birthdays</a>.<br>%x
+The <a href="%sm=LB;k=10">latest births</a>.<br>
+The <a href="%sm=LD;k=10">latest deaths</a>.<br>%x
+The <a href="%sm=AD">anniversaries of dead</a>.<br>
+The <a href="%sm=AM">anniversaries of marriage</a>.
 <p>
 There has been %q accesses, %c of them to this page, since %d.
 

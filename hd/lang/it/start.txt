@@ -61,12 +61,11 @@ in ordine
 
 </ul>
 
-Le <a href="%sm=AN">date di nascita</a>%x
-e le <a href="%sm=B;k=10">ultime nascite</a>%x...
-<br>
-Gli <a href="%sm=AD">anniversari delle persone decedute</a>.
-<br>
-E gli <a href="%sm=AM">anniversari di matrimonio</a>.
+Le <a href="%sm=AN">compleanni</a>.<br>%x
+Le <a href="%sm=LB;k=10">ultime nascite</a>.<br>
+Le <a href="%sm=LD;k=10">ultime morto</a>.<br>%x
+Gli <a href="%sm=AD">anniversari delle persone decedute</a>.<br>
+Gli <a href="%sm=AM">anniversari di matrimonio</a>.
 <p>
 Ci sono stati %c accessi a questa pagina.
 

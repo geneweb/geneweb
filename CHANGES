@@ -2,6 +2,7 @@ GeneWeb Version 1.11
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+--- [Jan 20, 99] Added display of latest deaths.
 --- [Jan 19, 99] Added direct links to siblings.
   - [Jan 18, 99] Family comment now displayed like dates (=> possible
     visibility by password restriction).

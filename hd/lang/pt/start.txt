@@ -64,12 +64,11 @@ por
 
 </ul>
 
-Os <a href="%sm=AN">anivers&aacute;rios</a>%x
-e os <a href="%sm=B;k=10">reci&eacute;n nacidos</a>%x...
-<br>
-Os <a href="%sm=AD">anivers&aacute;rios das pessoas falecidas</a>.
-<br>
-E os <a href="%sm=AM">anivers&aacute;rios de casamento</a>.
+Os <a href="%sm=AN">anivers&aacute;rios</a>.<br>%x
+Os <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>.<br>
+Os <a href="%sm=LD;k=10">reci&eacute;n mortes</a>.<br>%x
+Os <a href="%sm=AD">anivers&aacute;rios das pessoas falecidas</a>.<br>
+Os <a href="%sm=AM">anivers&aacute;rios de casamento</a>.
 
 <p>
 
