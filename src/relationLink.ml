@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.1 2001-04-21 14:35:49 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.2 2001-05-15 15:32:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -62,7 +62,7 @@ value make_dist_tab conf base ia maxlev =
           let d = dist.(k) in
           if not d.mark then do {
             dist.(k) := {dmin = infinity; dmax = 0; mark = True};
-            q.val := Pq.add k q.val;
+            q.val := Pq.add k q.val
           }
           else ()
         }
@@ -83,7 +83,7 @@ value make_dist_tab conf base ia maxlev =
               dist.(k).dmin := min dfath.dmin dmoth.dmin + 1;
               dist.(k).dmax := max dfath.dmax dmoth.dmax + 1;
               if dist.(k).dmin > maxlev then ()
-              else add_children (Adef.iper_of_int k);
+              else add_children (Adef.iper_of_int k)
             }
         | None -> () ]
       };
@@ -208,7 +208,7 @@ value spouse_text conf base end_sp ip ipl =
 value print_someone conf base ip =
   do {
     Wserver.wprint "%s\n" (someone_text conf base ip);
-    Wserver.wprint "%s" (Dag.image_txt conf base (poi base ip));
+    Wserver.wprint "%s" (Dag.image_txt conf base (poi base ip))
   }
 ;
 
@@ -220,7 +220,7 @@ value print_spouse conf base n ip ipl =
     Wserver.wprint "%s\n" s;
     match spo with
     [ Some ip -> Wserver.wprint "%s" (Dag.image_txt conf base (poi base ip))
-    | _ -> () ];
+    | _ -> () ]
   }
   else ()
 ;
@@ -258,7 +258,7 @@ value rec print_both_branches conf base info pl1 pl2 =
         [ Some p1 ->
             do {
               print_someone conf base p1;
-              print_spouse conf base info.sp1 p1 pl1;
+              print_spouse conf base info.sp1 p1 pl1
             }
         | None -> Wserver.wprint "&nbsp;" ];
       end;
@@ -268,7 +268,7 @@ value rec print_both_branches conf base info pl1 pl2 =
         [ Some p2 ->
             do {
               print_someone conf base p2;
-              print_spouse conf base info.sp2 p2 pl2;
+              print_spouse conf base info.sp2 p2 pl2
             }
         | None -> Wserver.wprint "&nbsp;" ];
       end;
@@ -306,7 +306,7 @@ value rec print_both_branches_pre conf base info sz pl1 pl2 =
         do {
           print_pre_left sz (someone_text conf base p1);
           let (s, d, _) = spouse_text conf base info.sp1 p1 pl1 in
-          if s <> "" then print_pre_left sz ("&amp;" ^ d ^ " " ^ s) else ();
+          if s <> "" then print_pre_left sz ("&amp;" ^ d ^ " " ^ s) else ()
         }
     | None -> Wserver.wprint "\n" ];
     match p2 with
@@ -314,8 +314,7 @@ value rec print_both_branches_pre conf base info sz pl1 pl2 =
         do {
           print_pre_right sz (someone_text conf base p2);
           let (s, d, _) = spouse_text conf base info.sp2 p2 pl2 in
-          if s <> "" then print_pre_right sz ("&amp;" ^ d ^ " " ^ s)
-          else ();
+          if s <> "" then print_pre_right sz ("&amp;" ^ d ^ " " ^ s) else ()
         }
     | None -> Wserver.wprint "\n" ];
     print_both_branches_pre conf base info sz pl1 pl2
@@ -331,14 +330,14 @@ value rec print_one_branch conf base ipl1 sp =
       | [] -> (None, []) ]
     in
     match ip1 with
-    [ Some ip1 -> do { Wserver.wprint "|"; html_br conf; }
+    [ Some ip1 -> do { Wserver.wprint "|"; html_br conf }
     | None -> () ];
     match ip1 with
     [ Some ip1 ->
         do {
           print_someone conf base ip1;
           print_spouse conf base sp ip1 ipl1;
-          html_br conf;
+          html_br conf
         }
     | None -> () ];
     print_one_branch conf base ipl1 sp
@@ -446,7 +445,7 @@ value print_other_parent_if_same conf base info =
   [ Some (s, ip) ->
       do {
         Wserver.wprint "%s" s;
-        Wserver.wprint "%s" (Dag.image_txt conf base (poi base ip));
+        Wserver.wprint "%s" (Dag.image_txt conf base (poi base ip))
       }
   | None -> () ]
 ;
@@ -472,7 +471,7 @@ value print_with_pre conf base info =
       if info.pb2 <> None || info.nb2 <> None then
         let s = prev_next_2_text conf base info info.pb2 info.nb2 in
         print_pre_right sz s
-      else ();
+      else ()
     }
     else ();
   end
@@ -480,7 +479,8 @@ value print_with_pre conf base info =
 
 value print_with_table conf base info =
   tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
-      conf.border begin
+    conf.border
+  begin
     tag "tr" begin
       stag "td" "colspan=3 align=center" begin
         print_someone conf base info.ip;
@@ -545,9 +545,9 @@ value print_relation_path conf base info =
       else ();
       if info.pb2 <> None || info.nb2 <> None then
         print_prev_next_2 conf base info info.pb2 info.nb2
-      else ();
+      else ()
     }
-    else ();
+    else ()
   }
   else
     let with_table =
@@ -570,13 +570,13 @@ value print_relation_ok conf base info =
       | _ -> Wserver.wprint " %d" info.c1 ];
       match (info.pb2, info.nb2) with
       [ (None, None) -> ()
-      | _ -> Wserver.wprint " %d" info.c2 ];
+      | _ -> Wserver.wprint " %d" info.c2 ]
     }
   in
   do {
     header_no_page_title conf title;
     print_relation_path conf base info;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -672,7 +672,8 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
              (fun set l2 ->
                 let dist = make_dist_tab conf base ia (max l1 l2 + 1) in
                 let (set, n) = add_branches dist set 0 p1.cle_index l1 in
-                let (set, n) = add_branches dist set n p2.cle_index l2 in set)
+                let (set, n) = add_branches dist set n p2.cle_index l2 in
+                set)
              set l2)
         (Dag.Pset.add ia Dag.Pset.empty) l1
     in
@@ -685,7 +686,8 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
         [(p1.cle_index, "3"); (p2.cle_index, "4")] []
     in
     let list = Dag.Pset.elements set in
-    let d = Dag.make_dag conf base list in Dag.print_dag conf base set spl d
+    let d = Dag.make_dag conf base list in
+    Dag.print_dag conf base set spl d
   with
   [ Exit -> Util.incorrect_request conf ]
 ;
