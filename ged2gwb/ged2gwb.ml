@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.31 1999-01-18 16:01:49 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.32 1999-02-01 15:06:32 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -249,11 +249,8 @@ value lexer =
    Token.text = fun _ -> "<tok>"}
 ;
 
-type title_date 'a = [ TDinterv of 'a and 'a | TDstart of 'a | TDend of 'a ];
-
 value g = Grammar.create lexer;
 value date = Grammar.Entry.create g "date";
-value title_date = Grammar.Entry.create g "title_date";
 value find_year =
   let rec find strm =
     match strm with parser
@@ -266,9 +263,28 @@ value find_year =
   Grammar.Entry.of_parser g "find_year" find
 ;
 EXTEND
-  GLOBAL: date title_date;
+  GLOBAL: date;
   date:
-    [[ p = prec; (n1, n2, n3) = simple_date; EOI -> (p, n1, n2, n3) ]];
+    [[ ID "BET"; _ = prec; d1 = simple_date;
+       ID "AND"; _ = prec; d2 = simple_date; EOI ->
+         match (d1, d2) with
+         [ (Some d1, Some d2) -> Some (d1, Some d2)
+         | (Some d1, None) ->
+              Some
+                ({day = d1.day; month = d1.month; year = d1.year;
+                  prec = After}, None)
+         | (None, Some d2) ->
+             Some
+               ({day = d2.day; month = d2.month; year = d2.year;
+                 prec = Before}, None)
+         | (None, None) -> None ]
+     | p = prec; d = simple_date; EOI ->
+         match d with
+         [ Some d ->
+             Some
+               ({day = d.day; month = d.month; year = d.year; prec = p}, None)
+         | None -> None ] ]]
+  ;
   simple_date:
     [[ LIST0 "."; n1 = OPT int; LIST0 ".";
        n2 = OPT [ i = int -> abs i | m = month -> m ]; LIST0 ".";
@@ -280,13 +296,17 @@ EXTEND
              | None -> None ]
            else n3
          in
-         (n1, n2, n3) ]];
-  title_date:
-    [[ ID "BET"; _ = prec; d1 = simple_date;
-       ID "AND"; _ = prec; d2 = simple_date ->
-         TDinterv d1 d2
-     | ID "BEF"; d = simple_date -> TDend d
-     | _ = prec; d = simple_date -> TDstart d ]];
+         match (n1, n2, n3) with
+         [ (Some d, Some m, Some y) ->
+             Some {day = d; month = m; year = y; prec = Sure}
+         | (None, Some m, Some y) ->
+             Some {day = 0; month = m; year = y; prec = Sure}
+         | (None, None, Some y) ->
+             Some {day = 0; month = 0; year = y; prec = Sure}
+         | (Some y, None, None) ->
+             Some {day = 0; month = 0; year = y; prec = Sure}
+         | _ -> None ] ]]
+  ;
   prec:
     [[ ID "ABT" -> About | ID "ENV" -> About
      | ID "BEF" -> Before | ID "AFT" -> After
@@ -306,19 +326,16 @@ value date_of_field pos d =
   else
     let s = Stream.of_string (String.uppercase d) in
     let r =
-      try Some (Grammar.Entry.parse date s) with
+      try Grammar.Entry.parse date s with
       [ Stdpp.Exc_located loc e -> None ]
     in
     match r with
-    [ Some (p, Some d, Some m, Some y) ->
-        Some {day = d; month = m; year = y; prec = p}
-    | Some (p, None, Some m, Some y) ->
-        Some {day = 0; month = m; year = y; prec = p}
-    | Some (p, None, None, Some y) ->
-        Some {day = 0; month = 0; year = y; prec = p}
-    | Some (p, Some y, None, None) ->
-        Some {day = 0; month = 0; year = y; prec = p}
-    | _ ->
+    [ Some (d1, Some d2) ->
+        Some
+          {day = d1.day; month = d1.month; year = d1.year;
+           prec = YearInt d2.year}
+    | Some (d, None) -> Some d
+    | None ->
         try
           let y = Grammar.Entry.parse find_year (Stream.of_string d) in
           Some {day = 0; month = 0; year = y; prec = Maybe}
@@ -677,22 +694,17 @@ value decode_title s =
   (title, place, nth)  
 ;
 
-value date_of_sd =
-  fun
-  [ (Some d, Some m, Some y) -> {day = d; month = m; year = y; prec = Sure}
-  | (None, Some m, Some y) -> {day = 0; month = m; year = y; prec = Sure}
-  | (None, None, Some y) -> {day = 0; month = 0; year = y; prec = Sure}
-  | (Some y, None, None) -> {day = 0; month = 0; year = y; prec = Sure}
-  | _ -> raise Not_found ]
-;
-
 value decode_date_interval pos s =
   let strm = Stream.of_string s in
   try
-    match Grammar.Entry.parse title_date strm with
-    [ TDinterv d1 d2 -> (Some (date_of_sd d1), Some (date_of_sd d2))
-    | TDstart d1 -> (Some (date_of_sd d1), None)
-    | TDend d2 -> (None, Some (date_of_sd  d2)) ]
+    match Grammar.Entry.parse date strm with
+    [ Some (d1, Some d2) -> (Some d1, Some d2)
+    | Some (d1, None) ->
+        match d1.prec with
+        [ After -> (Some {(d1) with prec = Sure}, None)
+        | Before -> (None, Some {(d1) with prec = Sure})
+        | _ -> (Some d1, None) ]
+    | _ -> do print_bad_date pos s; return (None, None) ]
   with
   [ Stdpp.Exc_located _ _ | Not_found ->
       do print_bad_date pos s; return (None, None) ]

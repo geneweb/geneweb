@@ -2,7 +2,7 @@ GeneWeb Version 1.11
 --------------------
 
 * General
-  - [Jan 27, 99] Added Hebrew (Jonathan B. Marder)
+  - [Jan 27, 99] Added Hebrew (Jonathan Marder, Ruth Marder)
 
 * GeneWeb daemon/CGI (gwd)
   - [Jan 30, 99] Added link to welcome page after updates.
@@ -27,6 +27,10 @@ GeneWeb Version 1.11
   - [Jan 26, 99] Fixed bug: failure when backslashes in source.
   - [Jan 18, 99] Fixed two bugs in dates parsing: 1. "x..y" (between x and
     y) was interpreted as "x|y" (x or y) 2. did not accept "d/m/y..y".
+
+* Gedcom to GeneWeb (ged2gwb)
+  - [Feb 1, 99] Accept now "BET x AND" as "AFT x" and "BET AND x" as "BEF x".
+  - [Feb 1, 99] Fixed bug: date intervals did not work (generating "maybe").
 
 * GeneWeb to Gedcom (gwb2ged)
   - [Jan 19, 99] Fixed bug: the tag "<br>" was converted into a new line
