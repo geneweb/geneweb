@@ -38,9 +38,15 @@ GeneWeb version 3.12
     without having to delete the marriage.
 
 * Templates files (etc/*.txt)
+  For programmers...
+  - [02 Mar 01] For the perso.txt template file, added the variables
+    %length; (family size in a %foreach;family;) and %count; (child
+    position in a %foreach;child;) and ability of expressions (e.g.
+    %if;(count = length) tests if the current child is the last of
+    the family).
   - [18 Feb 01] Added a template file for update person form (updind.txt),
     which is now user-configurable.
-  - [10 Feb 01] For the perso.txt template file, added the macros
+  - [10 Feb 01] For the perso.txt template file, added the variables
     %father_age_at_birth; and %mother_age_at_birth;
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
