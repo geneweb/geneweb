@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.155 1999-10-28 10:23:51 ddr Exp $
+# $Id: lexicon.txt,v 2.156 1999-10-28 11:56:46 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -833,7 +833,7 @@ se: alla platser
     all the titles
 cs: v¹echny tituly
 de: alle Titel
-dk: alle adelstitler
+dk: alle titler
 en: all the titles
 eo: cxiuj mosxtoj
 es: todos los t&iacute;tulos
@@ -2199,7 +2199,7 @@ se: make/maka
 
     if titles
 de: eingeschr&auml;nkt
-dk: hvis adelstitler
+dk: hvis titler
 en: if titles
 es: si t&iacute;tulos
 he:  àí áòì(ú) úåàø
@@ -3502,7 +3502,7 @@ se: personer som har samma namn
     place
 cs: místo
 de: Ort
-dk: sted/Adelsnavn
+dk: sted/Navn (nob.)
 en: place
 eo: loko
 es: lugar
@@ -4449,7 +4449,7 @@ se: hela listan
     title/titles
 cs: titul/tituly
 de: Titel/Titel
-dk: titel/adelstitler
+dk: titel/titler (nob.)
 en: title/titles
 eo: mosxto:a:+n/mosxtoj
 es: t&iacute;tulo/t&iacute;tulos
