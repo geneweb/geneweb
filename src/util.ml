@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.38 2000-04-02 12:50:02 ddr Exp $ *)
+(* $Id: util.ml,v 3.39 2000-04-03 04:45:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -861,7 +861,7 @@ value gen_trailer with_logo conf =
      else
         Wserver.wprint "<p>
 <img src=\"%sm=IM;v=/gwlogo.gif\"
-alt=GeneWeb width=64 height=72 align=right>\n<br>\n"
+alt=... width=64 height=72 align=right>\n<br>\n"
           conf.indep_command;
      match open_etc_file "copyr" with
      [ Some ic -> copy_from_etc env conf.indep_command ic
