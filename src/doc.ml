@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 2.2 1999-08-18 18:41:20 ddr Exp $ *)
+(* $Id: doc.ml,v 2.3 1999-08-20 15:27:32 ddr Exp $ *)
 
 open Config;
 
@@ -41,7 +41,12 @@ value has_dotslash s =
     else loop (i + 1)
 ;
 
-value print conf base v =
+value print conf =
+  let v =
+    match Util.p_getenv conf.env "v" with
+    [ Some f -> f
+    | None -> "" ]
+  in
   let v = if v = "" then "index.htm" else v in
   if Filename.is_implicit v && not (has_dotslash v) then
     let v =
