@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 1.1.1.1 1998-09-01 14:32:14 ddr Exp $ *)
+(* $Id: wserver.mli,v 1.2 1998-09-24 12:57:33 ddr Exp $ *)
 
 (* module [Wserver]: elementary web service *)
 
@@ -26,8 +26,10 @@ value wprint : format 'a out_channel unit -> 'a;
 value wflush : unit -> unit;
     (* To flush page contents print. *)
 
-value html : unit -> unit;
-    (* [Wserver.html ()] specifies that the text will be HTML. *)
+value html : string -> unit;
+    (* [Wserver.html charset] specifies that the text will be HTML.
+       where [charset] represents the character set. If empty string,
+       iso-8859-1 is assumed. *)
 
 value encode : string -> string;
     (* [Wserver.encode s] encodes the string [s] in another string

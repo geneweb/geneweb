@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 1.4 1998-09-09 08:16:49 ddr Exp $ *)
+(* $Id: wserver.ml,v 1.5 1998-09-24 12:57:31 ddr Exp $ *)
 
 open Unix;
 
@@ -111,9 +111,10 @@ value nl () =
   return ()
 ;
 
-value html () =
+value html charset =
+  let charset = if charset = "" then "iso-8859-1" else charset in
   do wprint "HTTP/1.0 200 OK"; nl ();
-     wprint "Content-type: text/html; charset=iso-8859-1"; nl (); nl ();
+     wprint "Content-type: text/html; charset=%s" charset; nl (); nl ();
   return ()
 ;
 
@@ -220,7 +221,7 @@ value get_request strm =
 ifdef UNIX then
 value timeout tmout spid _ =
   do Unix.kill spid Sys.sigkill;
-     html ();
+     html "";
      wprint "<head><title>Time out</title></head>\n";
      wprint "<body><h1>Time out</h1>\n";
      wprint "Computation time > %d second(s)\n" tmout;

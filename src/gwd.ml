@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: gwd.ml,v 1.5 1998-09-12 15:44:48 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.6 1998-09-24 12:57:29 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -38,6 +38,7 @@ value log from request s =
      Printf.fprintf oc "%02d/%02d/%4d %02d:%02d:%02d" tm.Unix.tm_mday
        (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year) tm.Unix.tm_hour
        tm.Unix.tm_min tm.Unix.tm_sec;
+     Printf.fprintf oc " (%d)" (Unix.getpid ());
      Printf.fprintf oc " %s\n" s;
      Printf.fprintf oc "  From: %s\n" from;
      Printf.fprintf oc "  Agent: %s\n" user_agent;
@@ -78,7 +79,7 @@ value only_log from cgi =
        do Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
           nl (); nl ();
        return ()
-     else Wserver.html ();
+     else Wserver.html "";
      Wserver.wprint "<head><title>Invalid access</title></head>\n";
      Wserver.wprint "<body><h1>Invalid access</h1></body>\n";
   return ()
