@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.42 2000-08-22 16:48:34 ddr Exp $ *)
+(* $Id: perso.ml,v 3.43 2000-08-24 20:14:51 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -670,29 +670,35 @@ value print_not_empty_src conf base new_parag first txt isrc =
 value print_sources conf base new_parag p =
   let u = uoi base p.cle_index in
   let first = ref True in
+  let auth = age_autorise conf base p in
   do print_not_empty_src conf base new_parag first
        (fun () -> nominative (transl_nth conf "person/persons" 0))
        p.psources;
-     print_not_empty_src conf base new_parag first
-       (fun () -> transl_nth conf "birth" 0)
-       p.birth_src;
-     print_not_empty_src conf base new_parag first
-       (fun () -> transl_nth conf "baptism" 0)
-       p.baptism_src;
-     print_not_empty_src conf base new_parag first
-       (fun () -> transl_nth conf "death" 0)
-       p.death_src;
-     print_not_empty_src conf base new_parag first
-       (fun () -> transl_nth conf "burial" 0)
-       p.burial_src;
+     if auth then
+       do print_not_empty_src conf base new_parag first
+            (fun () -> transl_nth conf "birth" 0)
+             p.birth_src;
+          print_not_empty_src conf base new_parag first
+            (fun () -> transl_nth conf "baptism" 0)
+            p.baptism_src;
+          print_not_empty_src conf base new_parag first
+            (fun () -> transl_nth conf "death" 0)
+            p.death_src;
+          print_not_empty_src conf base new_parag first
+            (fun () -> transl_nth conf "burial" 0)
+            p.burial_src;
+       return ()
+     else ();
      for i = 0 to Array.length u.family - 1 do
        let fam = foi base u.family.(i) in
-       do print_not_empty_src conf base new_parag first
-            (fun () ->
-               transl_nth conf "marriage/marriages" 0 ^
-               (if Array.length u.family == 1 then ""
-                else " " ^ string_of_int (i + 1)))
-            fam.marriage_src;
+       do if auth then
+            print_not_empty_src conf base new_parag first
+              (fun () ->
+                 transl_nth conf "marriage/marriages" 0 ^
+                 (if Array.length u.family == 1 then ""
+                  else " " ^ string_of_int (i + 1)))
+               fam.marriage_src
+          else ();
           print_not_empty_src conf base new_parag first
             (fun () ->
                nominative (transl_nth conf "family/families" 0) ^
