@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.13 1999-10-01 12:42:50 ddr Exp $ *)
+(* $Id: robot.ml,v 1.14 1999-10-09 16:50:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -63,7 +63,7 @@ value input_excl =
     else (input_value ic : excl)
 ;
 
-value check oc tm from max_call sec cgi =
+value check oc tm from max_call sec cgi suicide =
   let fname = Srcfile.adm_file "robot" in
   let xcl =
     match try Some (open_in_bin fname) with _ -> None with
@@ -109,7 +109,7 @@ value check oc tm from max_call sec cgi =
         let r = List.rev tml in
         do xcl.who := W.add from ([tm :: r], tm0, cnt) xcl.who; return
         let refused =
-          if cnt > max_call then
+          if suicide || cnt > max_call then
             do Printf.fprintf oc "--- %s is a robot" from;
                Printf.fprintf oc
                  " (%d > %d connections in %g <= %d seconds)\n" cnt
