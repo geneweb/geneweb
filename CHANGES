@@ -2,6 +2,11 @@ GeneWeb version 3.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [18 Nov 00] Fixed bug: while updating a person or a family, in
+    case of keys (first name/surname/number) conflicts, if there where
+    empty spaces (for example the ones of persons to be removed from the
+    list), the button "create" supposed to try again with the first free
+    number did not work.
   - [16 Nov 00] Fixed bug: in languages with declinations (e.g. German)
     some declinations structures sometimes incorrectly remained in the
     displayed text (e.g. "xx ist ein:d:+em Cousin")

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 3.6 2000-09-18 12:07:08 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 3.7 2000-11-18 09:51:59 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -140,7 +140,7 @@ value effective_mod_merge conf base sfam scpl sdes =
         UpdateFamOk.effective_mod conf base sfam scpl sdes
       in
       let wl = UpdateFamOk.all_checks_family conf base fam cpl des in
-      let (fn, sn, occ, _) =
+      let (fn, sn, occ, _, _) =
         match p_getint conf.env "ip" with
         [ Some i when Adef.int_of_iper cpl.mother = i -> scpl.mother
         | _ -> scpl.father ]
