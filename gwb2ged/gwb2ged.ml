@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 4.6 2002-01-12 14:20:52 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 4.7 2002-11-08 18:54:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -206,9 +206,9 @@ value ged_date_dmy oc dt cal =
     fprintf oc "%d" dt.year;
     match dt.prec with
     [ OrYear i ->
-        do { ged_calendar oc cal; fprintf oc " AND %d" i; }
+        do { fprintf oc " AND "; ged_calendar oc cal; fprintf oc "%d" i; }
     | YearInt i ->
-        do { ged_calendar oc cal; fprintf oc " AND %d" i; }
+        do { fprintf oc " AND "; ged_calendar oc cal; fprintf oc "%d" i; }
     | _ -> () ];
   }
 ;

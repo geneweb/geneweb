@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.34 2002-08-22 11:49:43 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.35 2002-11-08 18:54:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -627,8 +627,15 @@ EXTEND
           match dr with
           [ Begin (d, cal) -> Dgreg {(d) with prec = After} cal
           | End (d, cal) -> Dgreg {(d) with prec = Before} cal
-          | BeginEnd (d1, cal) (d2, _) ->
-              Dgreg {(d1) with prec = YearInt d2.year} cal ]
+          | BeginEnd (d1, cal1) (d2, cal2) ->
+              let y2 =
+                match cal2 with
+                [ Dgregorian -> d2.year
+                | Djulian -> (Calendar.julian_of_gregorian d2).year
+                | Dfrench -> (Calendar.french_of_gregorian d2).year
+                | Dhebrew -> (Calendar.hebrew_of_gregorian d2).year ]
+              in
+              Dgreg {(d1) with prec = YearInt y2} cal1 ]
       | (d, cal) = date -> Dgreg d cal
       | s = TEXT -> Dtext s ] ]
   ;
@@ -1840,11 +1847,9 @@ value add_fam_norm gen r adop_list =
             | None -> u ]
           in
           let d =
-            if u = NotMarried then None
-            else
-              match find_field "DATE" r.rsons with
-              [ Some r -> date_of_field r.rpos r.rval
-              | _ -> None ]
+            match find_field "DATE" r.rsons with
+            [ Some r -> date_of_field r.rpos r.rval
+            | _ -> None ]
           in
           let rec heredis_witnesses =
             fun
