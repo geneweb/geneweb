@@ -5,6 +5,7 @@ GeneWeb Version 2.00
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Mar 8, 99] Fixed bug for excluded addresses in cgi mode.
   - [Mar 4, 99] Deleted all "open Unix" and use of "Unix." for all unix
     function. Deleted "Pervasives.".
   - [Feb 27, 99] No more newline before the ending dot of the titles
