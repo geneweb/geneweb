@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.15 2000-03-11 18:55:48 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.16 2000-03-12 20:23:44 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -109,6 +109,12 @@ value print_choice conf base p niveau_effectif =
           else
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum") limit
               (transl_nth conf "generation/generations" 1);
+          Wserver.wprint "<br>\n";
+          Wserver.wprint "<input type=radio name=t value=A> %s\n"
+            (capitale (transl_nth conf "male line/female line" 0));
+          Wserver.wprint "<br>\n";
+          Wserver.wprint "<input type=radio name=t value=C> %s\n"
+            (capitale (transl_nth conf "male line/female line" 1));
           Wserver.wprint "<br>\n";
           Wserver.wprint "- %s <input type=checkbox name=image value=on><br>\n"
             (capitale (transl_nth conf "image/images" 1));
@@ -1474,30 +1480,6 @@ value print_tree_with_pre conf base v p =
   end
 ;
 
-value print_image conf base p fname width height =
-  let image_txt = capitale (transl_nth conf "image/images" 0) in
-  let s = Unix.stat fname in
-  let b = acces conf base p in
-  let k = default_image_name base p in
-  do Wserver.wprint "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k;
-     Wserver.wprint "\
-<img src=\"%sm=IM;d=%d;%s;k=/%s\" width=%d height=%d border=0 alt=\"%s\">"
-        (commd conf)
-        (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
-        b k width height image_txt;
-     Wserver.wprint "</a>\n";
-  return ()
-;
-
-value print_image_url conf base url height =
-  let image_txt = capitale (transl_nth conf "image/images" 0) in
-  do Wserver.wprint "<a href=\"%s\">" url;
-     Wserver.wprint "<img src=\"%s\"\nheight=%d border=0 alt=\"%s\">" url
-        height image_txt;
-     Wserver.wprint "</a>\n";
-  return ()
-;
-
 value print_tree_with_table conf base gv p =
   let gv = min (limit_by_tree conf) gv in
   let next_gen pol =
@@ -1547,22 +1529,8 @@ value print_tree_with_table conf base gv p =
            | _ -> "&nbsp;" ]
          in
          Wserver.wprint "%s" txt;
-         match (po, p_getenv conf.env "image") with
-         [ (Some p, Some "on") ->
-             match image_and_size conf base p (limited_image_size 100 75) with
-             [ Some (f, Some (wid, hei)) ->
-                 do Wserver.wprint "<br>\n";
-                    Wserver.wprint "<center><table border=0><tr><td>\n";
-                    print_image conf base p f wid hei;
-                    Wserver.wprint "</table></center>\n";
-                 return ()
-             | Some (url, None) ->
-                 do Wserver.wprint "<br>\n";
-                    Wserver.wprint "<center><table border=0><tr><td>\n";
-                    print_image_url conf base url 75;
-                    Wserver.wprint "</table></center>\n";
-                 return ()
-             | _ -> () ]
+         match po with
+         [ Some p -> Dag.print_image conf base p
          | _ -> () ];
        end;
        Wserver.wprint "\n";
@@ -1650,6 +1618,45 @@ value print_tree conf base v p =
   | _ -> print_normal_tree conf base v p ]
 ;
 
+value print_male_female_line male conf base v p =
+  let list =
+    loop [] v p.cle_index where rec loop list lev ip =
+      let list = [ip :: list] in
+      if lev <= 1 then list
+      else
+        match (aoi base ip).parents with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            loop list (lev - 1) (if male then cpl.father else cpl.mother)
+        | None -> list ]
+  in
+  let title _ =
+    Wserver.wprint "%s: %s"
+      (capitale
+         (transl_nth conf "male line/female line" (if male then 0 else 1)))
+      (person_text_no_html conf base p)
+  in
+  do header_no_page_title conf title;
+     tag "center" begin
+       let _ = List.fold_left
+         (fun first ip ->
+            let p = poi base ip in
+            do if not first then Wserver.wprint "|<br>\n" else ();
+               Wserver.wprint "%s<br>\n"
+                 (referenced_person_title_text conf base p);
+               Dag.print_image conf base p;
+            return False)
+         True list
+       in
+       ();
+     end;
+     trailer conf;
+  return ()
+;
+
+value print_male_line = print_male_female_line True;
+value print_female_line = print_male_female_line False;
+
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> afficher_ascendants_jusqu_a conf base v p
@@ -1681,6 +1688,8 @@ value print conf base p =
       if al then print_missing_ancestors_alphabetically conf base v si p
       else print_missing_ancestors conf base v si p
   | (Some "T", Some v) -> print_tree conf base v p
+  | (Some "A", Some v) -> print_male_line conf base v p
+  | (Some "C", Some v) -> print_female_line conf base v p
   | (Some "D", x) ->
       match (find_person_in_env conf base "1", x) with
       [ (Some anc, _) ->
