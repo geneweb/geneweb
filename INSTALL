@@ -9,8 +9,10 @@ They are freely distributed at addresses:
 1- If the command ocamlc.opt is not installed, edit the file
    "tools/Makefile.inc" and change:
        OCAMLC=ocamlc.opt
+       OCAMLOPT=ocamlopt.opt
    into
        OCAMLC=ocamlc
+       OCAMLOPT=ocamlopt
 
 2- From the top directory, do:
       make

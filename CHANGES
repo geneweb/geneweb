@@ -7,16 +7,16 @@ GeneWeb Version 1.08
   - fixed several displaying bugs due to ANSEL
   - in forms, when a precision (about, maybe, before, after, or year) is given
     for a date, the day and month part are ignored, since its works only for
-    years.
+    years (for the moment).
   - photos and background in directory "images" can be installed in a
     subdirectory having the name of the database; ex: "images/martin" for
-    the database "martin" (martin.gwb).
+    the database "martin".
+  - display "+" for dead people even if not known date
 
 * gwc, gwu:
   - added backslash as escape character for underscores
 
 * gwc:
-  - display "+" for dead people even if not known date
   - save much much memory space while running when there are many many notes
 
 * ged2gwb:
@@ -24,7 +24,7 @@ GeneWeb Version 1.08
     the gedcom file did not end with a newline
 
 * consang:
-  - more clear message when consang does not work, because of loop in database
+  - more clear message when consang does not work because of loop in database
 
 * doc:
   - added doc for merging databases, persons and families.
