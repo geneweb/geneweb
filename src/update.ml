@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 1.7 1998-10-24 15:24:59 ddr Exp $ *)
+(* $Id: update.ml,v 1.8 1998-11-27 20:09:49 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -372,9 +372,9 @@ value bad_date conf d =
   do header conf title;
      Wserver.wprint "%s:\n" (capitale (transl conf "incorrect date"));
      match d with
-     [ Djma j m a -> Wserver.wprint "%d/%d/%d" j m a
-     | Dma m a -> Wserver.wprint "%d/%d" m a
-     | Da _ a -> Wserver.wprint "%d" a ];
+     [ {day = 0; month = 0; year = a} -> Wserver.wprint "%d" a
+     | {day = 0; month = m; year = a} -> Wserver.wprint "%d/%d" m a
+     | {day = j; month = m; year = a} -> Wserver.wprint "%d/%d/%d" j m a ];
      trailer conf;
   return raise ModErr
 ;
@@ -382,25 +382,36 @@ value bad_date conf d =
 value reconstitute_date conf var =
   match get_number var "yyyy" conf.env with
   [ Some y ->
-      match get var "prec" conf.env with
-      [ "about" -> Some (Da About y)
-      | "maybe" -> Some (Da Maybe y)
-      | "before" -> Some (Da Before y)
-      | "after" -> Some (Da After y)
-      | "oryear" ->
-          Some (Da (OrYear (int_of_string (get var "oryear" conf.env))) y)
-      | _ ->
-          match get_number var "mm" conf.env with
-          [ Some m ->
-              match get_number var "dd" conf.env with
-              [ Some d ->
-                  if d >= 1 && d <= 31 && m >= 1 && m <= 12 then
-                    Some (Djma d m y)
-                  else bad_date conf (Djma d m y)
-              | None ->
-                  if m >= 1 && m <= 12 then Some (Dma m y)
-                  else bad_date conf (Dma m y) ]
-          | None -> Some (Da Sure y) ] ]
+      let prec =
+        match get var "prec" conf.env with
+        [ "about" -> About
+        | "maybe" -> Maybe
+        | "before" -> Before
+        | "after" -> After
+        | "oryear" ->
+            match get_number var "oryear" conf.env with
+            [ Some y -> OrYear y
+            | None -> Sure ]
+        | "yearint" ->
+            match get_number var "oryear" conf.env with
+            [ Some y -> YearInt y
+            | None -> Sure ]
+        | _ -> Sure ]
+      in
+      match get_number var "mm" conf.env with
+      [ Some m ->
+          match get_number var "dd" conf.env with
+          [ Some d ->
+              let d = {day = d; month = m; year = y; prec = prec} in
+              if d.day >= 1 && d.day <= 31 && d.month >= 1
+              && d.month <= 12 then
+                Some d
+              else bad_date conf d
+          | None ->
+              let d = {day = 0; month = m; year = y; prec = prec} in
+              if d.month >= 1 && d.month <= 12 then Some d
+              else bad_date conf d ]
+      | None -> Some {day = 0; month = 0; year = y; prec = prec} ]
   | None -> None ]
 ;
 
@@ -410,49 +421,51 @@ value print_date conf base lab var d =
        tag "td" begin
          Wserver.wprint "<input name=%s_dd size=2 maxlength=2%s>\n" var
            (match d with
-            [ Some (Djma j _ _) -> " value=" ^ string_of_int j
+            [ Some {day = d} when d <> 0 -> " value=" ^ string_of_int d
             | _ -> "" ]);
          Wserver.wprint "<input name=%s_mm size=2 maxlength=2%s>\n" var
            (match d with
-            [ Some (Djma _ m _) -> " value=" ^ string_of_int m
-            | Some (Dma m _) -> " value=" ^ string_of_int m
+            [ Some {month = m} when m <> 0 -> " value=" ^ string_of_int m
             | _ -> "" ]);
          Wserver.wprint "<input name=%s_yyyy size=5 maxlength=5%s>\n" var
            (match d with
-            [ Some (Djma _ _ y) -> " value=" ^ string_of_int y
-            | Some (Dma _ y) -> " value=" ^ string_of_int y
-            | Some (Da _ y) -> " value=" ^ string_of_int y
+            [ Some {year = y} -> " value=" ^ string_of_int y
             | _ -> "" ]);
        end;
        tag "td" begin
-         Wserver.wprint "%s\n" (capitale (transl conf "year precision"));
          tag "select" "name=%s_prec" var begin
            Wserver.wprint "<option%s>-\n"
              (match d with
-              [ Some (Djma _ _ _) | Some (Dma _ _) | None -> " selected"
+              [ None -> " selected"
               | _ -> "" ]);
-           Wserver.wprint "<option value=sure%s>%s\n"
-             (match d with [ Some (Da Sure _) -> " selected" | _ -> "" ])
+           Wserver.wprint "<option value=sure%s>&lt;- %s\n"
+             (match d with [ Some {prec = Sure} -> " selected" | _ -> "" ])
              (capitale (transl conf "exact"));
-           Wserver.wprint "<option value=about%s>%s\n"
-             (match d with [ Some (Da About _) -> " selected" | _ -> "" ])
-             (capitale (transl conf "about (year)"));
-           Wserver.wprint "<option value=maybe%s>%s\n"
-             (match d with [ Some (Da Maybe _) -> " selected" | _ -> "" ])
-             (capitale (transl conf "maybe in (year)"));
-           Wserver.wprint "<option value=before%s>%s\n"
-             (match d with [ Some (Da Before _) -> " selected" | _ -> "" ])
-             (capitale (transl conf "before (year)"));
-           Wserver.wprint "<option value=after%s>%s\n"
-             (match d with [ Some (Da After _) -> " selected" | _ -> "" ])
-             (capitale (transl conf "after (year)"));
-           Wserver.wprint "<option value=oryear%s>%s ->\n"
-             (match d with [ Some (Da (OrYear _) _) -> " selected" | _ -> "" ])
-             (capitale (transl conf "or" ^ " " ^ transl conf "year"));
+           Wserver.wprint "<option value=about%s>&lt;- %s\n"
+             (match d with [ Some {prec = About} -> " selected" | _ -> "" ])
+             (capitale (transl conf "about (date)"));
+           Wserver.wprint "<option value=maybe%s>&lt;- %s\n"
+             (match d with [ Some {prec = Maybe} -> " selected" | _ -> "" ])
+             (capitale (transl conf "maybe (date)"));
+           Wserver.wprint "<option value=before%s>&lt;- %s\n"
+             (match d with [ Some {prec = Before} -> " selected" | _ -> "" ])
+             (capitale (transl conf "before (date)"));
+           Wserver.wprint "<option value=after%s>&lt;- %s\n"
+             (match d with [ Some {prec = After} -> " selected" | _ -> "" ])
+             (capitale (transl conf "after (date)"));
+           Wserver.wprint "<option value=oryear%s>&lt;- %s -&gt;\n"
+             (match d with [ Some {prec = OrYear _} -> " selected" | _ -> "" ])
+             (capitale (transl conf "or"));
+           Wserver.wprint "<option value=yearint%s>&lt;- %s -&gt;\n"
+             (match d with
+              [ Some {prec = YearInt _} -> " selected"
+              | _ -> "" ])
+             (capitale (transl conf "between (date)"));
          end;
          Wserver.wprint "<input name=%s_oryear size=5 maxlength=5%s>\n" var
            (match d with
-            [ Some (Da (OrYear y) _) -> " value=" ^ string_of_int y
+            [ Some {prec = OrYear y} -> " value=" ^ string_of_int y
+            | Some {prec = YearInt y} -> " value=" ^ string_of_int y
             | _ -> "" ]);
        end;
      end;

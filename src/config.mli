@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 1.3 1998-11-21 10:54:09 ddr Exp $ *)
+(* $Id: config.mli,v 1.4 1998-11-27 20:09:39 ddr Exp $ *)
 
 open Def;
 
@@ -17,8 +17,5 @@ type config =
     lexicon : Hashtbl.t string string;
     charset : string;
     today : date;
-    today_d : int;
-    today_m : int;
-    today_y : int;
     today_wd : int }
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birth.ml,v 1.2 1998-10-12 13:26:55 ddr Exp $ *)
+(* $Id: birth.ml,v 1.3 1998-11-27 20:09:38 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -53,12 +53,11 @@ value print conf base =
        if age_autorise conf base p then
          match Adef.od_of_codate p.birth with
          [ Some d ->
-             match d with
-             [ Djma _ _ _ as d ->
-                 do insert conf tab len.val p d;
-                    if len.val == Array.length tab then () else incr len;
-                 return ()
-             | _ -> () ]
+             if d.day != 0 && d.month != 0 then
+               do insert conf tab len.val p d;
+                  if len.val == Array.length tab then () else incr len;
+               return ()
+             else ()
          | _ -> () ]
        else ();
      done;

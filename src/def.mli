@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 1.2 1998-09-29 12:22:35 ddr Exp $ *)
+(* $Id: def.mli,v 1.3 1998-11-27 20:09:40 ddr Exp $ *)
 
 type iper = Adef.iper;
 type ifam = Adef.ifam;
@@ -7,12 +7,13 @@ type cdate = Adef.cdate;
 type codate = Adef.codate;
 
 type precision = Adef.precision ==
-  [ Sure | About | Maybe | Before | After | OrYear of int ]
+  [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
 ;
 type date = Adef.date ==
-  [ Djma of int and int and int
-  | Dma of int and int
-  | Da of precision and int ]
+  { year : int;
+    month : int;
+    day : int;
+    prec : precision }
 ;
 
 type divorce = [ NotDivorced | Divorced of codate ];

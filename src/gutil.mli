@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 1.2 1998-09-08 09:13:25 ddr Exp $ *)
+(* $Id: gutil.mli,v 1.3 1998-11-27 20:09:41 ddr Exp $ *)
 
 open Def;
 
@@ -20,7 +20,6 @@ value temps_ecoule : date -> date -> date;
 value annee : date -> int;
 value strictement_avant : date -> date -> bool;
 value strictement_apres : date -> date -> bool;
-value string_of_date : date -> string;
 
 value denomination : base -> base_person -> string;
 

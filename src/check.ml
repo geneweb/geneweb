@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 1.3 1998-11-20 19:11:09 ddr Exp $ *)
+(* $Id: check.ml,v 1.4 1998-11-27 20:09:39 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -122,9 +122,7 @@ value birth_year p =
   match Adef.od_of_codate p.birth with
   [ Some d ->
       match d with
-      [ Da Sure y -> Some y
-      | Dma _ y -> Some y
-      | Djma _ _ y -> Some y
+      [ {year = y; prec = Sure} -> Some y
       | _ -> None ]
   | _ -> None ]
 ;
@@ -133,9 +131,7 @@ value death_year current_year p =
   match p.death with
   [ Death _ d ->
       match Adef.date_of_cdate d with
-      [ Da Sure y -> Some y
-      | Dma _ y -> Some y
-      | Djma _ _ y -> Some y
+      [ {year = y; prec = Sure} -> Some y
       | _ -> None ]
   | NotDead -> Some current_year
   | _ -> None ]

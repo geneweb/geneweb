@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: gwd.ml,v 1.11 1998-11-21 10:54:10 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.12 1998-11-27 20:09:44 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -354,9 +354,11 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      lexicon = lexicon;
      charset = charset;
      today =
-       Djma tm.Unix.tm_mday (succ tm.Unix.tm_mon) (tm.Unix.tm_year + 1900);
-     today_d = tm.Unix.tm_mday; today_m = succ tm.Unix.tm_mon;
-     today_y = tm.Unix.tm_year + 1900; today_wd = tm.Unix.tm_wday}
+       {day = tm.Unix.tm_mday;
+        month = succ tm.Unix.tm_mon;
+        year = tm.Unix.tm_year + 1900;
+        prec = Sure};
+     today_wd = tm.Unix.tm_wday}
   in
   if conf.bname = "" then propose_base conf
   else

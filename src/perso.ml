@@ -1,4 +1,4 @@
-(* $Id: perso.ml,v 1.7 1998-10-28 10:00:02 ddr Exp $ *)
+(* $Id: perso.ml,v 1.8 1998-11-27 20:09:46 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -165,12 +165,9 @@ value print_dates conf base p =
           match Adef.od_of_codate p.birth with
           [ Some d ->
               let anniv =
-                match (d, p.death) with
-                [ (Djma j1 m1 a1, NotDead) ->
-                    match conf.today with
-                    [ Djma j2 m2 a2 -> j1 == j2 && m1 == m2
-                    | _ -> False ]
-                | _ -> False ]
+                if d.prec = Sure && p.death = NotDead then
+                  d.day = conf.today.day && d.month = conf.today.month
+                else False
               in
               do Wserver.wprint "%s " (capitale (transl_nth conf "born" is));
                  Wserver.wprint "%s" (Date.string_of_ondate conf d);
@@ -256,22 +253,17 @@ value print_dates conf base p =
      if age_autorise conf base p then
        match (Adef.od_of_codate p.birth, p.death) with
        [ (Some d, NotDead) ->
-           match d with
-           [ Da p _ when p <> Sure -> ()
-           | d ->
-               let a = temps_ecoule d conf.today in
-               do Wserver.wprint "<em>%s: " (capitale (transl conf "age"));
-                  Date.print_age conf a;
-                  Wserver.wprint ".</em><br>\n";
-               return () ]
+           if d.day == 0 && d.month == 0 && d.prec <> Sure then ()
+           else
+             let a = temps_ecoule d conf.today in
+             do Wserver.wprint "<em>%s: " (capitale (transl conf "age"));
+                Date.print_age conf a;
+                Wserver.wprint ".</em><br>\n";
+             return ()
        | _ -> () ]
      else ();
      if age_autorise conf base p then
-       let sure =
-         fun
-         [ Djma _ _ _ | Dma _ _ | Da Sure _ -> True
-         | _ -> False ]
-       in
+       let sure d = d.prec = Sure in
        match (Adef.od_of_codate p.birth, p.death) with
        [ (Some d1, Death _ d2) ->
            let d2 = Adef.date_of_cdate d2 in

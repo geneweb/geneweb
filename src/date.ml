@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 1.4 1998-10-15 12:17:45 ddr Exp $ *)
+(* $Id: date.ml,v 1.5 1998-11-27 20:09:40 ddr Exp $ *)
 
 open Def;
 open Util;
@@ -28,53 +28,94 @@ value code_date conf encoding d m y =
 ;
 
 value string_of_ondate conf d =
-  match d with
-  [ Djma 1 m y ->
-      let encoding = transl_nth conf "(date)" 0 in
-      transl conf "on (day month year)" ^ nbsp ^
-      code_date conf encoding 0 m y
-  | Djma d m y ->
-      let encoding = transl_nth conf "(date)" 1 in
-      transl conf "on (day month year)" ^ nbsp ^
-      code_date conf encoding d m y
-  | Dma m y ->
-      let encoding = transl_nth conf "(date)" 2 in
-      transl conf "in (month year)" ^ nbsp ^
-      code_date conf encoding 0 m y
-  | Da p y ->
-      let encoding = transl_nth conf "(date)" 3 in
-      let sy = code_date conf encoding 0 0 y in
-      match p with
-      [ Sure -> transl conf "in (year)" ^ nbsp ^ sy
-      | About -> transl conf "about (year)" ^ nbsp ^ sy
-      | Maybe -> transl conf "maybe in (year)" ^ nbsp ^ sy
-      | Before -> transl conf "before (year)" ^ nbsp ^ sy
-      | After -> transl conf "after (year)" ^ nbsp ^ sy
-      | OrYear z ->
-          transl conf "in (year)" ^ nbsp ^ sy ^ " " ^
-          transl conf "or" ^ " " ^ code_date conf encoding 0 0 z ] ]
+  let encoding =
+    let n =
+      if d.day = 1 then 0
+      else if d.day != 0 then 1
+      else if d.month != 0 then 2
+      else 3
+    in
+    transl_nth conf "(date)" n
+  in
+  let sy = code_date conf encoding d.day d.month d.year in
+  match d.prec with
+  [ Sure ->
+      if d.day = 0 && d.month = 0 then
+        transl conf "in (year)" ^ nbsp ^ sy
+      else if d.day = 0 then transl conf "in (month year)" ^ nbsp ^ sy
+      else transl conf "on (day month year)" ^ nbsp ^ sy
+  | About | Before | After ->
+      let s =
+        if d.day = 0 && d.month = 0 then sy
+        else if d.day = 0 then sy
+        else transl conf "on (day month year)" ^ nbsp ^ sy
+      in
+      if d.prec = About then transl conf "about (date)" ^ nbsp ^ s
+      else if d.prec = Before then transl conf "before (date)" ^ nbsp ^ s
+      else transl conf "after (date)" ^ nbsp ^ s
+  | Maybe ->
+      let s =
+        if d.day = 0 && d.month = 0 then
+          transl conf "in (year)" ^ nbsp ^ sy
+        else if d.day = 0 then transl conf "in (month year)" ^ nbsp ^ sy
+        else transl conf "on (day month year)" ^ nbsp ^ sy
+      in
+      transl conf "maybe (date)" ^ nbsp ^ s
+  | OrYear z ->
+      let s =
+        if d.day = 0 && d.month = 0 then
+          transl conf "in (year)" ^ nbsp ^ sy
+        else if d.day = 0 then transl conf "in (month year)" ^ nbsp ^ sy
+        else transl conf "on (day month year)" ^ nbsp ^ sy
+      in
+      s ^ " " ^
+      transl conf "or" ^ " " ^
+      code_date conf (transl_nth conf "(date)" 3) 0 0 z
+  | YearInt z ->
+      let s =
+        if d.day = 0 && d.month = 0 then sy
+        else if d.day = 0 then sy
+        else transl conf "on (day month year)" ^ nbsp ^ sy
+      in
+      transl conf "between (date)" ^ nbsp ^ s ^ " " ^
+      transl conf "and" ^ " " ^
+      code_date conf (transl_nth conf "(date)" 3) 0 0 z ]
 ;
 
 value string_of_date conf d =
-  match d with
-  [ Djma 1 m y ->
-      let encoding = transl_nth conf "(date)" 0 in
-      code_date conf encoding 0 m y
-  | Djma d m y ->
-      let encoding = transl_nth conf "(date)" 1 in
-      code_date conf encoding d m y
-  | Dma m y ->
-      let encoding = transl_nth conf "(date)" 2 in
-      code_date conf encoding 0 m y
-  | Da Sure y ->
-      let encoding = transl_nth conf "(date)" 3 in
-      code_date conf encoding 0 0 y
-  | Da _ _ -> "..." ]
+  if d.prec = Sure then
+    let encoding =
+      let n =
+        if d.day = 1 then 0
+        else if d.day != 0 then 1
+        else if d.month != 0 then 2
+        else 3
+      in
+      transl_nth conf "(date)" n
+    in
+    code_date conf encoding d.day d.month d.year
+  else "..."
 ;
 
 value print_age conf a =
   match a with
-  [ Djma d m y ->
+  [ {day = 0; month = 0; year = y} ->
+      if y > 1 then
+        Wserver.wprint "%d %s" y (transl conf "years old")
+      else if y = 1 then
+        Wserver.wprint "%s" (transl conf "one year old")
+      else
+        Wserver.wprint "%s" (transl conf "less than one year old")
+  | {day = 0; month = m; year = y} ->
+      if y >= 2 then
+        Wserver.wprint "%d %s" y (transl conf "years old")
+      else if y > 0 || m > 1 then
+        Wserver.wprint "%d %s" (y * 12 + m) (transl conf "months old")
+      else if m = 1 then
+        Wserver.wprint "%s" (transl conf "one month old")
+      else
+        Wserver.wprint "%s" (transl conf "less than one month old")
+  | {day = d; month = m; year = y} ->
       if y >= 2 then
         Wserver.wprint "%d %s" y (transl conf "years old")
       else if y > 0 || m > 1 then
@@ -85,23 +126,7 @@ value print_age conf a =
         Wserver.wprint "%d %s" d (transl conf "days old")
       else if d == 1 then
         Wserver.wprint "%s" (transl conf "one day old")
-      else Wserver.wprint "0"
-  | Dma m y ->
-      if y >= 2 then
-        Wserver.wprint "%d %s" y (transl conf "years old")
-      else if y > 0 || m > 1 then
-        Wserver.wprint "%d %s" (y * 12 + m) (transl conf "months old")
-      else if m = 1 then
-        Wserver.wprint "%s" (transl conf "one month old")
-      else
-        Wserver.wprint "%s" (transl conf "less than one month old")
-  | Da _ y ->
-      if y > 1 then
-        Wserver.wprint "%d %s" y (transl conf "years old")
-      else if y = 1 then
-        Wserver.wprint "%s" (transl conf "one year old")
-      else
-        Wserver.wprint "%s" (transl conf "less than one year old") ]
+      else Wserver.wprint "0" ]
 ;
 
 value afficher_dates conf base p =
@@ -143,13 +168,13 @@ value afficher_dates conf base p =
 ;
 
 value display_year d =
-  do match d with
-     [ Da Before _ -> Wserver.wprint "/"
-     | Da (About | Maybe | OrYear _) _ -> Wserver.wprint "ca&nbsp;"
+  do match d.prec with
+     [ Before -> Wserver.wprint "/"
+     | About | Maybe | OrYear _ | YearInt _ -> Wserver.wprint "ca&nbsp;"
      | _ -> () ];
      Wserver.wprint "%d" (annee d);
-     match d with
-     [ Da After _ -> Wserver.wprint "/"
+     match d.prec with
+     [ After -> Wserver.wprint "/"
      | _ -> () ];
   return ()
 ;

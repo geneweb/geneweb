@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 1.7 1998-11-04 13:52:31 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.8 1998-11-27 20:09:35 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -81,23 +81,24 @@ value ged_sex base oc per =
   | Neutre -> () ]
 ;
 
-value ged_date oc =
-  fun
-  [ Djma d m y -> Printf.fprintf oc "%02d %s %d" d (ged_month m) y
-  | Dma m y -> Printf.fprintf oc "%s %d" (ged_month m) y
-  | Da p y ->
-      do match p with
-         [ Sure -> ()
-         | About -> Printf.fprintf oc "ABT "
-         | Maybe -> Printf.fprintf oc "EST "
-         | Before -> Printf.fprintf oc "BEF "
-         | After -> Printf.fprintf oc "AFT "
-         | OrYear i -> Printf.fprintf oc "BET " ];
-         Printf.fprintf oc "%d" y;
-         match p with
-         [ OrYear i -> Printf.fprintf oc " AND %d" i
-         | _ -> () ];
-      return () ]
+value ged_date oc dt =
+  do match dt.prec with
+     [ Sure -> ()
+     | About -> Printf.fprintf oc "ABT "
+     | Maybe -> Printf.fprintf oc "EST "
+     | Before -> Printf.fprintf oc "BEF "
+     | After -> Printf.fprintf oc "AFT "
+     | OrYear i -> Printf.fprintf oc "BET "
+     | YearInt i -> Printf.fprintf oc "BET " ];
+     if dt.day <> 0 then Printf.fprintf oc "%02d " dt.day else ();
+     if dt.month <> 0 then Printf.fprintf oc "%s " (ged_month dt.month)
+     else ();
+     Printf.fprintf oc "%d" dt.year;
+     match dt.prec with
+     [ OrYear i -> Printf.fprintf oc " AND %d" i
+     | YearInt i -> Printf.fprintf oc " AND %d" i
+     | _ -> () ];
+  return ()
 ;
 
 value ged_ev_detail oc n d pl src =

@@ -1,6 +1,10 @@
 GeneWeb Version 1.09
 --------------------
 
+* Precisions on dates now apply not only for years. So you can use things like:
+      "maybe on september 1815"
+      "after september, 23th 1815"
+
 * gwd:
   - Added error message in relationship computing when loop in database.
   - Fixed still several bugs (accents) due to new ANSEL encoding

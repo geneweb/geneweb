@@ -1,14 +1,14 @@
-(* $Id: iobase.ml,v 1.4 1998-09-29 12:22:39 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.5 1998-11-27 20:09:45 ddr Exp $ *)
 
 open Def;
 open Gutil;
 
-value magic_gwb = "GnWb001q";
+value magic_gwb = "GnWb001r";
 
 (*
  Files in base (directory .gwb)
 
-    gwb - the base itself
+    base - the base itself
        magic number (magic_gwb)                 : string of length 8
        number of persons                        : binary_int
        number of ascends (= number of persons)  : binary_int
@@ -26,14 +26,14 @@ value magic_gwb = "GnWb001q";
        couples array                            : value
        strings array                            : value
 
-    acc - direct accesses to arrays inside gwb
+    base.acc - direct accesses to arrays inside gwb
        persons offsets   : array of binary_ints
        ascends offsets   : array of binary_ints
        families offsets  : array of binary_ints
        couples offsets   : array of binary_ints
        strings offsets   : array of binary_ints
 
-    inx - index for names, strings of first names and surnames
+    names.inx - index for names, strings of first names and surnames
        2nd index offset : binary_int
        1st index (names) : value
          array, length = "table_size", associating:
@@ -45,7 +45,7 @@ value magic_gwb = "GnWb001q";
             surname (modulo length)
           - to the array of the corresponding string indexes
 
-    gw2 - index for strings, surnames, first names
+    strings.inx - index for strings, surnames, first names
        length of the strings offset array : binary_int
        offset of surnames index           : binary_int
        offset of first names index        : binary_int
@@ -65,7 +65,7 @@ value magic_gwb = "GnWb001q";
           - associating the string index of a first name
           - to the corresponding list of persons holding this first name
 
-    gw9 - patches
+    patches - patches
        When updated, none of the previous files are modified. Only this one
        is written and rewritten. It holds a record of type "patches", composed
        of association lists "index" - "new value".
@@ -104,7 +104,7 @@ value array_memq x a =
     else loop (i + 1)
 ;
 
-(* Search index of a given string in file .gw2 *)
+(* Search index of a given string in file strings.inx *)
 
 value int_size = 4;
 
@@ -136,7 +136,7 @@ value index_of_string strings ic start_pos hash_len string_patches s =
             return loop (input_binary_int ic) ]
 ;
 
-(* Search index of a given surname or given first name in file .gw2 *)
+(* Search index of a given surname or given first name in file strings.inx *)
 
 value compare_names = Gutil.alphabetique;
 value compare_istr = ref (fun []);
@@ -191,7 +191,7 @@ value persons_of_first_name_or_surname strings params =
   {find = find; cursor = cursor; next = next}
 ;
 
-(* Search index for a given name in file .inx *)
+(* Search index for a given name in file names.inx *)
 
 type name_index_data = array (array iper);
 
@@ -203,7 +203,7 @@ value persons_of_name bname patches =
       match t.val with
       [ Some a -> a
       | None ->
-          let ic_inx = open_in_bin (Filename.concat bname "inx") in
+          let ic_inx = open_in_bin (Filename.concat bname "names.inx") in
           do seek_in ic_inx int_size; return
           let a = (input_value ic_inx : name_index_data) in
           do close_in ic_inx; t.val := Some a; return a ]
@@ -226,7 +226,7 @@ value strings_of_fsname bname strings person_patches =
       match t.val with
       [ Some a -> a
       | None ->
-          let ic_inx = open_in_bin (Filename.concat bname "inx") in
+          let ic_inx = open_in_bin (Filename.concat bname "names.inx") in
           let pos = input_binary_int ic_inx in
           do seek_in ic_inx pos; return
           let a = (input_value ic_inx : strings_of_fsname) in
@@ -382,7 +382,7 @@ value input bname =
   in
   let patches =
     match
-      try Some (open_in_bin (Filename.concat bname "gw9")) with _ -> None
+      try Some (open_in_bin (Filename.concat bname "patches")) with _ -> None
     with
     [ Some ic ->
         let p = input_value ic in
@@ -391,10 +391,10 @@ value input bname =
         {p_person = ref []; p_ascend = ref []; p_family = ref [];
          p_couple = ref []; p_string = ref []; p_name = ref []} ]
   in
-  let ic = open_in_bin (Filename.concat bname "gwb") in
+  let ic = open_in_bin (Filename.concat bname "base") in
   do check_magic ic; return
-  let ic_acc = open_in_bin (Filename.concat bname "acc") in
-  let ic2 = open_in_bin (Filename.concat bname "gw2") in
+  let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
+  let ic2 = open_in_bin (Filename.concat bname "strings.inx") in
   let persons_len = input_binary_int ic in
   let ascends_len = input_binary_int ic in
   let families_len = input_binary_int ic in
@@ -439,7 +439,7 @@ value input bname =
     do close_in ic; close_in ic_acc; close_in ic2; return ()
   in
   let commit_patches () =
-    let fname = Filename.concat bname "gw9" in
+    let fname = Filename.concat bname "patches" in
     do try Sys.remove (fname ^ "~") with _ -> ();
        try Sys.rename fname (fname ^ "~") with _ -> ();
     return
@@ -666,10 +666,10 @@ value output bname base =
     else bname ^ ".gwb"
   in
   do try Unix.mkdir bname 0o755 with _ -> (); return
-  let tmp_fname = Filename.concat bname "1wb" in
-  let tmp_fname_acc = Filename.concat bname "1cc" in
-  let tmp_fname_inx = Filename.concat bname "1nx" in
-  let tmp_fname_gw2 = Filename.concat bname "1w2" in
+  let tmp_fname = Filename.concat bname "1base" in
+  let tmp_fname_acc = Filename.concat bname "1base.acc" in
+  let tmp_fname_inx = Filename.concat bname "1names.inx" in
+  let tmp_fname_gw2 = Filename.concat bname "1strings.inx" in
   let _ = base.persons.array () in
   let _ = base.ascends.array () in
   let _ = base.families.array () in
@@ -743,15 +743,15 @@ do Printf.eprintf "*** create first name index\n"; flush stderr; return
        return ();
 do Printf.eprintf "*** ok\n"; flush stderr; return
        close_out oc2;
-       try Sys.remove (Filename.concat bname "gwb") with _ -> ();
-       Sys.rename tmp_fname (Filename.concat bname "gwb");
-       try Sys.remove (Filename.concat bname "acc") with _ -> ();
-       Sys.rename tmp_fname_acc (Filename.concat bname "acc");
-       try Sys.remove (Filename.concat bname "inx") with _ -> ();
-       Sys.rename tmp_fname_inx (Filename.concat bname "inx");
-       try Sys.remove (Filename.concat bname "gw2") with _ -> ();
-       Sys.rename tmp_fname_gw2 (Filename.concat bname "gw2");
-       try Sys.remove (Filename.concat bname "gw9") with _ -> ();
+       try Sys.remove (Filename.concat bname "base") with _ -> ();
+       Sys.rename tmp_fname (Filename.concat bname "base");
+       try Sys.remove (Filename.concat bname "base.acc") with _ -> ();
+       Sys.rename tmp_fname_acc (Filename.concat bname "base.acc");
+       try Sys.remove (Filename.concat bname "names.inx") with _ -> ();
+       Sys.rename tmp_fname_inx (Filename.concat bname "names.inx");
+       try Sys.remove (Filename.concat bname "strings.inx") with _ -> ();
+       Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
+       try Sys.remove (Filename.concat bname "patches") with _ -> ();
     return ()
   with e ->
     do try close_out oc with _ -> ();

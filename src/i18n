@@ -31,12 +31,12 @@ a great-nephew/a great-niece
 a great-uncle/a great-aunt
 a nephew/a niece
 a son/a daughter/a child
-about (year)
+about (date)
 access
 add
 advanced request
 after
-after (year)
+after (date)
 age
 alias
 all the places
@@ -57,8 +57,9 @@ at the same time
 baptism
 baptized
 before
-before (year)
+before (date)
 begin
+between (date)
 birth
 birthdays
 born
@@ -138,7 +139,7 @@ marriage of %t before his/her birth
 marriage/marriages
 married at age %t
 max %d generations
-maybe in (year)
+maybe (date)
 merge
 merge done
 missing ancestors
@@ -184,6 +185,7 @@ persons having the same name
 photo
 place
 private
+probable loop in base
 public
 public name
 qualifier
@@ -247,8 +249,6 @@ update
 warnings
 with
 would be his/her own ancestor
-year
-year precision
 years old
 you must first merge
 you must first merge the 2 families
