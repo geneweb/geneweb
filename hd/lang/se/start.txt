@@ -19,12 +19,12 @@ Databasen innehåller nu %n personer.
 Sök: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
-Det är:
+Namntyp för sökningen:
 <ul>
 <li> <input type=radio name=t value=PN checked>
-Antingen <em>förnamn</em> och <em>efternamn</em>,
-eller <em>publiktnamn</em>, eller <em>alias</em>.
-<li> <input type=radio name=t value=P> Ett <em>förnamn</em>.
+Antingen <em>förnamn</em> och <em>efternamn</em>
+eller <em>publiktnamn</em> eller <em>alias</em>.
+<li> <input type=radio name=t value=P> Ett <em>f&ouml;rnamn</em>.
 <li> <input type=radio name=t value=N> Ett <em>efternamn</em>.
 </ul>
 </form>
@@ -33,7 +33,7 @@ eller <em>publiktnamn</em>, eller <em>alias</em>.
 
 <FORM method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-Efter titel <INPUT NAME=t size=14 maxlength=200>
+Sök efter titel <INPUT NAME=t size=14 maxlength=200>
 plats <INPUT NAME=p size=25 maxlength=200> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
 </FORM>
@@ -46,10 +46,10 @@ plats <INPUT NAME=p size=25 maxlength=200> =&gt;
    <OPTION VALUE="N" SELECTED> Efternamn
    <OPTION VALUE="P"> Förnamn
 </SELECT>
-efter
+sorterade i
 <SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED> Bokstavs ordning
-   <OPTION VALUE="F"> Frekvens
+   <OPTION VALUE="A" SELECTED> Bokstavsordning
+   <OPTION VALUE="F"> Frekvensordning
 </SELECT> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
 </FORM>
@@ -60,12 +60,11 @@ efter
 %w
 
 </ul>
-
-<a href="%sm=AN">Födelsedagar</a>.<br>
-<a href="%sm=AD">Döda personers årsdagar</a>.<br>
-<a href="%sm=AM">Bröllopsdagar</a>.<br>%x
+<a href="%sm=AN">F&ouml;delsedagar</a>.<br>
+<a href="%sm=AD">Årsdagar f&ouml;r d&ouml;da personer</a>.<br>
+<a href="%sm=AM">Br&ouml;llopsdagar</a>.<br>%x
 De <a href="%sm=LB;k=10">senaste f&ouml;dslarna</a>.<br>
-De <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>.%x
+De <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>.<br>%x
 <p>
 Det har varit %q åtkomster, %c av dem till den här sidan, sedan %d.
 
