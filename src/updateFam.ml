@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.12 2001-06-15 15:25:30 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.13 2001-06-15 18:07:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -33,6 +33,52 @@ value string_family_of base fam cpl des =
 ;
 
 module Old = struct
+
+value
+  print_simple_person conf base var (first_name, surname, occ, create, _) =
+  tag "table" "border=1" begin
+    tag "tr" begin
+      tag "td" begin
+        Wserver.wprint "%s"
+          (capitale (transl_nth conf "first name/first names" 0));
+      end;
+      tag "td" begin
+        Wserver.wprint "<input name=%s_fn size=23 maxlength=200" var;
+        Wserver.wprint " value=\"%s\">" (quote_escaped first_name);
+      end;
+      tag "td" "align=right" begin
+        let s = capitale (transl conf "number") in
+        Wserver.wprint "%s" s;
+      end;
+      tag "td" begin
+        Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
+          (if occ == 0 then "" else " value=" ^ string_of_int occ);
+      end;
+      tag "td" begin
+        tag "select" "name=%s_p" var begin
+          Wserver.wprint "<option value=link%s>%s\n"
+            (if create = Update.Link then " selected" else "")
+            (capitale (transl conf "link"));
+          Wserver.wprint "<option value=create%s>%s\n"
+            (match create with
+             [ Update.Create _ _ -> " selected"
+             | _ -> "" ])
+            (capitale (transl conf "create"));
+        end;
+      end;
+    end;
+    Wserver.wprint "\n";
+    tag "tr" begin
+      tag "td" begin
+        Wserver.wprint "%s" (capitale (transl_nth conf "surname/surnames" 0));
+      end;
+      tag "td" "colspan=4" begin
+        Wserver.wprint "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
+          var (quote_escaped surname);
+      end;
+    end;
+  end
+;
 
 value print_birth conf var create verbose =
   do {
@@ -261,7 +307,7 @@ value print_insert_witness conf base cnt =
 ;
 
 value print_witness conf base var key =
-  Update.print_simple_person conf base var key
+  print_simple_person conf base var key
 ;
 
 value print_witnesses conf base fam =
@@ -997,31 +1043,31 @@ value interp_templ conf base fcd digest astl =
 
 value print_update_fam conf base fcd digest =
   match p_getenv conf.env "m" with
-  [ Some ("ADD_FAM" | "ADD_PAR" | "MOD_FAM" | "MOD_FAM_OK") ->
+  [ Some
+      ("ADD_FAM" | "ADD_PAR" | "MOD_FAM" | "MOD_FAM_OK" | "MRG_FAM_OK" |
+       "MRG_MOD_FAM_OK") ->
       let astl = Templ.input conf base "updfam" in
       do { html conf; interp_templ conf base fcd digest astl }
   | _ -> incorrect_request conf ]
 ;
 
 value print_add1 conf base fam cpl des force_children_surnames =
-  if p_getenv conf.env "updfam" = Some "on" then
+  if p_getenv conf.base_env "updfam" = Some "on" then
     print_update_fam conf base (fam, cpl, des) ""
-  else
-    Old.print_add1 conf base fam cpl des force_children_surnames
+  else Old.print_add1 conf base fam cpl des force_children_surnames
 ;
 
 value print_mod1 conf base fam cpl des digest =
-  if p_getenv conf.env "updfam" = Some "on" then
+  if p_getenv conf.base_env "updfam" = Some "on" then
     print_update_fam conf base (fam, cpl, des) digest
   else Old.print_mod1 conf base fam cpl des digest
 ;
 
 value print_merge1 conf base fam des fam2 digest =
-  if p_getenv conf.env "updfam" = Some "on" then
+  if p_getenv conf.base_env "updfam" = Some "on" then
     let cpl = Gutil.map_couple_p (person_key base) (coi base fam.fam_index) in
     print_update_fam conf base (fam, cpl, des) digest
-  else
-    Old.print_merge1 conf base fam des fam2 digest
+  else Old.print_merge1 conf base fam des fam2 digest
 ;
 
 value print_del1 conf base fam =

@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 4.1 2001-04-09 18:14:22 ddr Exp $ *)
+(* $Id: update.mli,v 4.2 2001-06-15 18:07:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -33,8 +33,6 @@ value digest_family : family -> couple -> descend -> Digest.t;
 
 value reconstitute_date : config -> string -> option date;
 value print_date : config -> base -> string -> string -> option date -> unit;
-
-value print_simple_person : config -> base -> string -> key -> unit;
 
 value print_src : config -> string -> string -> unit;
 

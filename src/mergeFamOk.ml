@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 4.2 2001-06-15 15:25:30 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 4.3 2001-06-15 18:07:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -70,7 +70,7 @@ value reconstitute conf base fam1 des1 fam2 des2 =
 ;
 
 value print_merge conf base =
-  match (p_getint conf.env "f1", p_getint conf.env "f2") with
+  match (p_getint conf.env "i", p_getint conf.env "i2") with
   [ (Some f1, Some f2) ->
       let fam1 = base.data.families.get f1 in
       let des1 = base.data.descends.get f1 in
@@ -133,6 +133,7 @@ value effective_mod_merge conf base sfam scpl sdes =
   | None -> incorrect_request conf ]
 ;
 
-value print_mod_merge conf base =
+value print_mod_merge o_conf base =
+  let conf = Update.update_conf o_conf in
   UpdateFamOk.print_mod_aux conf base (effective_mod_merge conf base)
 ;

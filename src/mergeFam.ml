@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 4.1 2001-04-21 02:37:28 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 4.2 2001-06-15 18:07:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -57,9 +57,9 @@ value print_differences conf base branches fam1 fam2 =
   tag "form" "method=POST action=\"%s\"" conf.command begin
     Util.hidden_env conf;
     Wserver.wprint "<input type=hidden name=m value=MRG_FAM_OK>\n";
-    Wserver.wprint "<input type=hidden name=f1 value=%d>\n"
+    Wserver.wprint "<input type=hidden name=i value=%d>\n"
       (Adef.int_of_ifam fam1.fam_index);
-    Wserver.wprint "<input type=hidden name=f2 value=%d>\n"
+    Wserver.wprint "<input type=hidden name=i2 value=%d>\n"
       (Adef.int_of_ifam fam2.fam_index);
     match p_getenv conf.env "ip" with
     [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
