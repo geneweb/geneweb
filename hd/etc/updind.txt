@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.7 2001-02-17 18:58:09 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.8 2001-02-17 22:44:11 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -339,65 +339,78 @@
   <td>
   <select name=rxx_type>
   <option value=Undef%if;relation.rt_empty); selected%end;> -
-  <option value=Adoption>%sp;
+  <option value=Adoption%if;relation.rt_adoption; selected%end;>%sp;
     [*adoptive father/adoptive mother/adoptive parents]2
-  <option value=Recognition>%sp;
+  <option value=Recognition%if;relation.rt_regognition; selected%end;>%sp;
     [*recognizing father/recognizing mother/recognizing parents]2
-  <option value=CandidateParent>%sp;
-    [*candidate father/candidate mother/candidate parents]2
-  <option value=GodParent>%sp;
+  <option value=CandidateParent%if;relation.rt_candidate_parent; selected%end;
+    > [*candidate father/candidate mother/candidate parents]2
+  <option value=GodParent%if;relation.rt_godparent; selected%end;>%sp;
     [*godfather/godmother/godparents]2
-  <option value=FosterParent>%sp;
+  <option value=FosterParent%if;relation.rt_foster_parent; selected%end;>%sp;
     [*foster father/foster mother/foster parents]2
   </select>
   </td>
   </tr>
   </table>
 %end;
-%define;simple_person;xx;
-  tag "table" "border=1" begin
-    tag "tr" begin
-      tag "td" begin
-        Wserver.wprint "%s"
-          (capitale (transl_nth conf "first name/first names" 0));
-      end;
-      tag "td" begin
-        Wserver.wprint "<input name=%s_fn size=23 maxlength=200" var;
-        Wserver.wprint " value=\"%s\">"
-          (quote_escaped first_name);
-      end;
-      tag "td" "align=right" begin
-        let s = capitale (transl conf "number") in
-        Wserver.wprint "%s" s;
-      end;
-      tag "td" begin
-        Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
-          (if occ == 0 then "" else " value=" ^ string_of_int occ);
-      end;
-      tag "td" begin
-        tag "select" "name=%s_p" var begin
-          Wserver.wprint "<option value=link%s>%s\n"
-            (if create = Link then " selected" else "")
-            (capitale (transl conf "link"));
-          Wserver.wprint "<option value=create%s>%s\n"
-            (match create with [ Create _ _ -> " selected" | _ -> "" ])
-            (capitale (transl conf "create"));
-        end;
-      end;
-    end;
-    Wserver.wprint "\n";
-    tag "tr" begin
-      tag "td" begin
-        Wserver.wprint "%s"
-          (capitale (transl_nth conf "surname/surnames" 0));
-      end;
-      tag "td" "colspan=4" begin
-        Wserver.wprint
-          "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
-          var surname;
-      end;
-    end;
-  end
+%define;relation_father;xx;
+ <table border=1>
+    <tr>
+      <td>[*first name/first names]0</td>
+      <td>
+        <input name=rxx_fath_fn size=23 maxlength=200%sp;
+         value="%relation.r_father.first_name;">
+      </td>
+      <td align=right>[*number]</td>
+      <td>
+        <input name=rxx_occ size=5 maxlength=8 value="%relation.r_father.occ;">
+      </td>
+      <td>
+        <select name=rxx_p>
+        <option value=link%if;relation.r_father.link; selected%end;>[*link]0
+        <option value=create%if;relation.r_father.create; selected%end;
+          >[*create]0
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>[*surname/surnames]0</td>
+      <td colspan=4>
+        <input name=rxx_sn size=40 maxlength=200%sp;
+         value="%relation.r_father.surname;">
+      </td>
+    </tr>
+  </table>
+%end;
+%define;relation_mother;xx;
+ <table border=1>
+    <tr>
+      <td>[*first name/first names]0</td>
+      <td>
+        <input name=rxx_moth_fn size=23 maxlength=200%sp;
+         value="%relation.r_mother.first_name;">
+      </td>
+      <td align=right>[*number]</td>
+      <td>
+        <input name=rxx_occ size=5 maxlength=8 value="%relation.r_mother.occ;">
+      </td>
+      <td>
+        <select name=rxx_p>
+        <option value=link%if;relation.r_mother.link; selected%end;>[*link]0
+        <option value=create%if;relation.r_mother.create; selected%end;
+          >[*create]0
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>[*surname/surnames]0</td>
+      <td colspan=4>
+        <input name=rxx_sn size=40 maxlength=200%sp;
+         value="%relation.r_mother.surname;">
+      </td>
+    </tr>
+  </table>
 %end;
 
 %apply;insert_relation;"0";
@@ -406,13 +419,23 @@
   %foreach;relation;
     %apply;relation_type;cnt;
     <p>
+    %apply;relation_father;cnt;
+    %apply;relation_mother;cnt;
+    <p>
     %apply;insert_relation;cnt;
+    <p>
   %end;
 %else;
   %apply;relation_type;"1";
   <p>
+  %apply;relation_father;"1";
+  %apply;relation_mother;"1";
+  <p>
   %apply;insert_relation;"1";
+  <p>
 %end;
+
+<h4>[*title/titles]1</h4>
 
 <p>
 <input type=submit value=Ok>
