@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.18 2000-08-05 10:04:08 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.19 2000-08-05 10:46:02 ddr Exp $ *)
 
 open Printf;
 
@@ -399,7 +399,7 @@ value gwtp_main str env b tok =
      printf "</ul>\n";
      if gw_site.val <> "" then
        do printf "<p>\n<ul>\n";
-          printf "<li><a href=\"%s?b=%s\">Browse</a>\n" gw_site.val b;
+          printf "<li><a href=\"%s%s\">Browse</a>\n" gw_site.val b;
           printf "</ul>\n";
        return ()
      else ();
