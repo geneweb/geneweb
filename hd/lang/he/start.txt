@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.21 2000-05-17 06:34:15 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.22 2000-06-03 12:20:29 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -141,12 +141,12 @@ height=108 src="%o/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 <tr>
 <td align=right>
 <ul>
-<li><a href="%sm=ADD_FAM"> להוסיף משפחה</a>
+%Id<li><a href="%sm=ADD_FAM"> להוסיף משפחה</a>
 %INl</ul>
 </td>
 <td align=left>
 <ul>%E
-<li><a href="%sm=MOD_NOTES"> לעדכן את ההערות </a>
+%E<li><a href="%sm=MOD_NOTES"> לעדכן את ההערות </a>
 </ul>
 </td>
 </tr>
