@@ -1,8 +1,9 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 4.8 2001-11-23 13:13:12 ddr Exp $ *)
+(* $Id: robot.ml,v 4.9 2002-01-12 14:20:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
+open Printf;
 
 value magic_robot = "GWRB0002";
 
@@ -52,7 +53,7 @@ value purge_who tm xcl sec =
 ;
 
 value fprintf_date oc tm =
-  Printf.fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
+  fprintf oc "%4d-%02d-%02d %02d:%02d:%02d" (1900 + tm.Unix.tm_year)
     (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
     tm.Unix.tm_sec
 ;
@@ -97,10 +98,10 @@ value check oc tm from max_call sec cgi suicide =
           incr att;
           if att.val mod max_call == 0 then do {
             fprintf_date oc (Unix.localtime tm);
-            Printf.fprintf oc "\n";
-            Printf.fprintf oc "  From: %s\n" from;
-            Printf.fprintf oc "  %d refused attempts;" att.val;
-            Printf.fprintf oc " to restore access, delete file \"%s\"\n"
+            fprintf oc "\n";
+            fprintf oc "  From: %s\n" from;
+            fprintf oc "  %d refused attempts;" att.val;
+            fprintf oc " to restore access, delete file \"%s\"\n"
               fname;
           }
           else ();
@@ -130,11 +131,11 @@ value check oc tm from max_call sec cgi suicide =
           xcl.who := W.add from ([tm :: r], tm0, cnt) xcl.who;
           let refused =
             if suicide || cnt > max_call then do {
-              Printf.fprintf oc "--- %s is a robot" from;
+              fprintf oc "--- %s is a robot" from;
               if suicide then
-                Printf.fprintf oc " (called the \"suicide\" request)\n"
+                fprintf oc " (called the \"suicide\" request)\n"
               else
-                Printf.fprintf oc
+                fprintf oc
                   " (%d > %d connections in %g <= %d seconds)\n" cnt max_call
                   (tm -. tm0) sec;
               flush Pervasives.stderr;
@@ -149,12 +150,12 @@ value check oc tm from max_call sec cgi suicide =
             List.iter
               (fun (s, att) ->
                  do {
-                   Printf.fprintf oc "--- excluded:";
-                   Printf.fprintf oc " %s (%d refused attempts)\n" s att.val;
+                   fprintf oc "--- excluded:";
+                   fprintf oc " %s (%d refused attempts)\n" s att.val;
                    ()
                  })
               xcl.excl;
-            Printf.fprintf oc "--- to restore access, delete file \"%s\"\n"
+            fprintf oc "--- to restore access, delete file \"%s\"\n"
               fname;
           }
           else ();
@@ -179,10 +180,10 @@ value check oc tm from max_call sec cgi suicide =
           in
           List.iter
             (fun (k, tm0, nb) ->
-               Printf.fprintf oc "--- %3d req - %3.0f sec - %s\n" nb
+               fprintf oc "--- %3d req - %3.0f sec - %s\n" nb
                  (tm -. tm0) k)
             list;
-          Printf.fprintf oc "--- max %d req by %s / conn %d\n"
+          fprintf oc "--- max %d req by %s / conn %d\n"
             (fst xcl.max_conn) (snd xcl.max_conn) nconn;
           refused
         } ]

@@ -1,11 +1,12 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.7 2002-01-12 12:06:21 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.8 2002-01-12 14:20:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Check;
 open Gutil;
 open Gwcomp;
+open Printf;
 
 value default_source = ref "";
 
@@ -256,13 +257,13 @@ value insert_undefined gen key =
       if sou gen.g_base x.first_name <> key.pk_first_name ||
          sou gen.g_base x.surname <> key.pk_surname then
          do {
-        Printf.printf "\nPerson defined with two spellings:\n";
-        Printf.printf "  \"%s%s %s\"\n" key.pk_first_name
+        printf "\nPerson defined with two spellings:\n";
+        printf "  \"%s%s %s\"\n" key.pk_first_name
           (match x.occ with
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
           key.pk_surname;
-        Printf.printf "  \"%s%s %s\"\n" (p_first_name gen.g_base x)
+        printf "  \"%s%s %s\"\n" (p_first_name gen.g_base x)
           (match occ with
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
@@ -313,14 +314,14 @@ value insert_person gen so =
   in
   do {
     if gen.g_def.(Adef.int_of_iper x.cle_index) then do {
-      Printf.printf "\nPerson already defined: \"%s%s %s\"\n" so.first_name
+      printf "\nPerson already defined: \"%s%s %s\"\n" so.first_name
         (match x.occ with
          [ 0 -> ""
          | n -> "." ^ string_of_int n ])
         so.surname;
       if p_first_name gen.g_base x <> so.first_name ||
          p_surname gen.g_base x <> so.surname then
-        Printf.printf "as name: \"%s%s %s\"\n" (p_first_name gen.g_base x)
+        printf "as name: \"%s%s %s\"\n" (p_first_name gen.g_base x)
           (match occ with
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
@@ -335,13 +336,13 @@ value insert_person gen so =
       if sou gen.g_base x.first_name <> so.first_name ||
          sou gen.g_base x.surname <> so.surname then
          do {
-        Printf.printf "\nPerson defined with two spellings:\n";
-        Printf.printf "  \"%s%s %s\"\n" so.first_name
+        printf "\nPerson defined with two spellings:\n";
+        printf "  \"%s%s %s\"\n" so.first_name
           (match x.occ with
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
           so.surname;
-        Printf.printf "  \"%s%s %s\"\n" (p_first_name gen.g_base x)
+        printf "  \"%s%s %s\"\n" (p_first_name gen.g_base x)
           (match occ with
            [ 0 -> ""
            | n -> "." ^ string_of_int n ])
@@ -396,7 +397,7 @@ value verif_parents_non_deja_definis gen x pere mere =
       let p = cpl.father in
       let m = cpl.mother in
       do {
-        Printf.printf "
+        printf "
 I cannot add \"%s\", child of
     - \"%s\"
     - \"%s\",
@@ -419,7 +420,7 @@ value notice_sex gen p s =
   if p.sex == Neuter then p.sex := s
   else if p.sex == s || s == Neuter then ()
   else do {
-    Printf.printf "\nInconcistency about the sex of\n  %s %s\n"
+    printf "\nInconcistency about the sex of\n  %s %s\n"
       (p_first_name gen.g_base p) (p_surname gen.g_base p);
     Check.error gen
   }
@@ -499,8 +500,8 @@ value insert_notes fname gen key str =
   [ Some ip ->
       let p = poi gen.g_base ip in
       if sou gen.g_base p.notes <> "" then do {
-        Printf.printf "\nFile \"%s\"\n" fname;
-        Printf.printf "Notes already defined for \"%s%s %s\"\n"
+        printf "\nFile \"%s\"\n" fname;
+        printf "Notes already defined for \"%s%s %s\"\n"
           key.pk_first_name (if occ == 0 then "" else "." ^ string_of_int occ)
           key.pk_surname;
         Check.error gen
@@ -508,8 +509,8 @@ value insert_notes fname gen key str =
       else p.notes := unique_string gen str
   | None ->
       do {
-        Printf.printf "File \"%s\"\n" fname;
-        Printf.printf "*** warning: undefined person: \"%s%s %s\"\n"
+        printf "File \"%s\"\n" fname;
+        printf "*** warning: undefined person: \"%s%s %s\"\n"
           key.pk_first_name (if occ == 0 then "" else "." ^ string_of_int occ)
           key.pk_surname;
         flush stdout;
@@ -551,8 +552,8 @@ value insert_relation gen p r =
 value insert_relations fname gen sb sex rl =
   let p = insert_somebody gen sb in
   if p.rparents <> [] then do {
-    Printf.printf "\nFile \"%s\"\n" fname;
-    Printf.printf "Relations already defined for \"%s%s %s\"\n"
+    printf "\nFile \"%s\"\n" fname;
+    printf "Relations already defined for \"%s%s %s\"\n"
       (sou gen.g_base p.first_name)
       (if p.occ == 0 then "" else "." ^ string_of_int p.occ)
       (sou gen.g_base p.surname);
@@ -707,11 +708,11 @@ value output_command_line bname =
   let bdir = Filename.concat Filename.current_dir_name bdir in
   let oc = open_out (Filename.concat bdir "command.txt") in
   do {
-    Printf.fprintf oc "%s" Sys.argv.(0);
+    fprintf oc "%s" Sys.argv.(0);
     for i = 1 to Array.length Sys.argv - 1 do {
-      Printf.fprintf oc " %s" Sys.argv.(i)
+      fprintf oc " %s" Sys.argv.(i)
     };
-    Printf.fprintf oc "\n";
+    fprintf oc "\n";
     close_out oc;
   }
 ;
@@ -766,7 +767,7 @@ value main () =
          if Filename.check_suffix x ".gw" then do {
            try Gwcomp.comp_families x with e ->
              do {
-               Printf.printf "File \"%s\", line %d:\n" x line_cnt.val; raise e
+               printf "File \"%s\", line %d:\n" x line_cnt.val; raise e
              };
            gwo.val := [(x ^ "o", separate, shift) :: gwo.val];
          }
@@ -780,7 +781,7 @@ value main () =
         else out_file.val ^ ".gwb"
       in
       if not force.val && Sys.file_exists bdir then do {
-        Printf.printf "\
+        printf "\
 The database \"%s\" already exists. Use option -f to overwrite it.
 " out_file.val;
         flush stdout;
@@ -793,7 +794,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
           do { Gc.compact (); Iobase.output out_file.val base; }
       | Refuse ->
           do {
-            Printf.printf "Base is locked: cannot write it\n";
+            printf "Base is locked: cannot write it\n";
             flush stdout;
             exit 2
           } ];
@@ -807,7 +808,7 @@ The database \"%s\" already exists. Use option -f to overwrite it.
 value print_exc =
   fun
   [ Failure txt ->
-      do { Printf.printf "Failed: %s\n" txt; flush stdout; exit 2 }
+      do { printf "Failed: %s\n" txt; flush stdout; exit 2 }
   | exc -> Printexc.catch raise exc ]
 ;
 
