@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.56 2000-06-26 09:17:10 ddr Exp $ *)
+(* $Id: util.ml,v 3.57 2000-07-12 11:50:47 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -56,7 +56,10 @@ value nl () = Wserver.wprint "\013\010";
 
 value html conf =
   let charset = if conf.charset = "" then "iso-8859-1" else conf.charset in
-  do if not conf.cgi then do Wserver.wprint "HTTP/1.0 200 OK"; nl (); return ()
+  do if not conf.cgi then
+       do Wserver.wprint "HTTP/1.0 200 OK"; nl ();
+          Wserver.wprint "Server: GeneWeb %s" Version.txt; nl ();
+       return ()
      else ();
      Wserver.wprint "Content-type: text/html; charset=%s" charset;
      nl (); nl ();
