@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.20 2000-03-17 19:34:13 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.21 2000-03-17 21:27:29 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -455,7 +455,7 @@ value get_actlog utm str =
         | None ->
             do close_in ic; return
             let list =
-              Sort.list (fun (_, (t1, _)) (_, (t2, _)) -> t1 <= t2) list
+              Sort.list (fun (_, (t1, _)) (_, (t2, _)) -> t2 <= t1) list
             in
             (list, r, changed) ]
   | None -> ([], ATnormal, False) ]
