@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.13 2000-06-02 20:46:46 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.14 2000-06-19 17:42:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -79,12 +79,17 @@ value select_family conf base get_date =
           loop [e :: list] q
     else
       let p = base.data.families.get i in
-      match get_date p with
-      [ Some (Dgreg d cal) ->
-          let e = (p, d, cal) in
-          if len < n then loop (QF.add e q) (len + 1) (i + 1)
-          else loop (snd (QF.take (QF.add e q))) len (i + 1)
-      | _ -> loop q len (i + 1) ]
+      let (q, len) =
+        if p.relation == Married then
+          match get_date p with
+          [ Some (Dgreg d cal) ->
+              let e = (p, d, cal) in
+              if len < n then (QF.add e q, len + 1)
+              else (snd (QF.take (QF.add e q)), len)
+          | _ -> (q, len) ]
+        else (q, len)
+      in
+      loop q len (i + 1)
 ;
 
 value print_birth conf base =

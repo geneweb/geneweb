@@ -2,6 +2,9 @@ GeneWeb version 3.06
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [19 Jun 00] Changed page design of relationship computing.
+  - [19 Jun 00] In latest marriages, display now only marriages (i.e. not
+    "relations" nor "engagements").
   - [18 Jun 00] Added link in bottom of welcome pages to be used if you have a
     browser which does not automatically update the modified pages (and you
     need to click each time on "reload current document").

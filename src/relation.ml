@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.41 2000-06-17 14:51:30 ddr Exp $ *)
+(* $Id: relation.ml,v 3.42 2000-06-19 17:42:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -174,20 +174,29 @@ value print_menu conf base p =
              Wserver.wprint "<input type=checkbox name=long value=on><br>\n";
              Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
              Wserver.wprint "<input type=checkbox name=spouse value=on><br>\n";
-             Wserver.wprint "%s\n"
-               (capitale (transl_nth conf "image/images" 1));
-             Wserver.wprint "<input type=checkbox name=image value=on><br>\n";
            end;
            tag "td" "align=right" begin
              Wserver.wprint "%s\n"
-               (capitale (transl conf "relationships by marriage"));
-             Wserver.wprint "<input type=checkbox name=marr value=on><br>\n";
-             Wserver.wprint "%s\n" (capitale (transl conf "shortest path"));
-             Wserver.wprint
-               "<input type=checkbox name=shortest value=on><br>\n";
+               (capitale (transl_nth conf "image/images" 1));
+             Wserver.wprint "<input type=checkbox name=image value=on><br>\n";
              Wserver.wprint "%s\n"
                (capitale (transl conf "cancel GeneWeb links"));
              Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
+           end;
+         end;
+         tag "tr" begin
+           tag "td" "align=center colspan=2" begin
+             Wserver.wprint "<table><tr><td>\n";
+             Wserver.wprint "<input type=radio name=et value=A checked>\n";
+             Wserver.wprint "%s<br>\n"
+               (capitale (transl conf "ancestors"));
+             Wserver.wprint "<input type=radio name=et value=M>\n";
+             Wserver.wprint "%s<br>\n"
+               (capitale (transl conf "relationships by marriage"));
+             Wserver.wprint "<input type=radio name=et value=S>\n";
+             Wserver.wprint "%s<br>\n"
+               (capitale (transl conf "shortest path"));
+             Wserver.wprint "</td></tr></table>\n";
            end;
          end;
          tag "tr" begin
@@ -1439,28 +1448,20 @@ value print_base_loop conf base =
 value print conf base p =
   fun
   [ Some p1 ->
-      let is_shortest =
-        match p_getenv conf.env "shortest" with
-        [ Some "on" -> True
-        | _ -> False ]
-      in
-      if is_shortest then print_shortest_path conf base p1 p
-      else
-        let long =
-          match p_getenv conf.env "long" with
-          [ Some "on" -> True
-          | _ -> False ]
-        in
-        let by_marr =
-          match p_getenv conf.env "marr" with
-          [ Some "on" -> True
-          | _ -> False ]
-        in
-        match
-          try Some (compute_relationship conf base by_marr p1 p) with
-          [ Consang.TopologicalSortError -> None ]
-        with
-        [ Some rel -> print_main_relationship conf base long p1 p rel
-        | None -> print_base_loop conf base ]
+      match p_getenv conf.env "et" with
+      [ Some "S" -> print_shortest_path conf base p1 p
+      | x ->
+          let by_marr = x = Some "M" in
+          let long =
+            match p_getenv conf.env "long" with
+            [ Some "on" -> True
+            | _ -> False ]
+          in
+          match
+            try Some (compute_relationship conf base by_marr p1 p) with
+            [ Consang.TopologicalSortError -> None ]
+          with
+          [ Some rel -> print_main_relationship conf base long p1 p rel
+          | None -> print_base_loop conf base ] ]
   | None -> print_menu conf base p ]
 ;
