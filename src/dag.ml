@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.46 2001-01-30 13:05:16 ddr Exp $ *)
+(* $Id: dag.ml,v 3.47 2001-01-30 14:17:11 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -740,7 +740,8 @@ value print_only_dag conf base elem_txt spouse_on invert set spl d =
     [ Left _ -> False
     | Right _ -> True ]
   in
-  let hts = html_table_of_dag indi_txt phony invert d in
+  let no_group = p_getenv conf.env "nogroup" = Some "on" in
+  let hts = Dag2html.html_table_of_dag indi_txt phony invert no_group d in
   print_html_table conf hts
 ;
 

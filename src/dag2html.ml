@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.36 2001-01-11 02:13:30 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.37 2001-01-30 14:17:11 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -896,7 +896,7 @@ value group_span_last_row t =
   loop 1
 ;
 
-value tablify no_optim d =
+value tablify no_optim no_group d =
   let a = ancestors d in
   let r = group_by_common_children d a in
   let t = {table = [| Array.of_list r |]} in
@@ -906,13 +906,15 @@ value tablify no_optim d =
     else
       let t = {table = Array.append t.table [| Array.of_list new_row |]} in
       let t =
-        let _ = if no_optim then () else equilibrate t in
-        let _ = group_elem t in
-        let _ = group_ghost t in
-        let _ = group_children t in
-        let _ = group_span_by_common_children d t in
-        let t = if no_optim then t else treat_gaps d t in
-        let _ = group_span_last_row t in t
+        if no_group then t
+        else
+          let _ = if no_optim then () else equilibrate t in
+          let _ = group_elem t in
+          let _ = group_ghost t in
+          let _ = group_children t in
+          let _ = group_span_by_common_children d t in
+          let t = if no_optim then t else treat_gaps d t in
+          let _ = group_span_last_row t in t
       in
       loop t
   in
@@ -1248,10 +1250,10 @@ value invert_table t =
 
 (* main *)
 
-value html_table_of_dag indi_txt phony invert d =
+value html_table_of_dag indi_txt phony invert no_group d =
   let no_optim = False in
   let d = if invert then invert_dag d else d in
-  let t = tablify no_optim d in
+  let t = tablify no_optim no_group d in
   let t = if invert then invert_table t else t in
   let _ = fall () t in
   let t = fall2_right t in
