@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.18 2002-01-13 04:19:01 ddr Exp $ *)
+(* $Id: setup.ml,v 4.19 2002-01-13 04:59:40 ddr Exp $ *)
 
 open Printf;
 
@@ -113,7 +113,7 @@ value trailer conf =
 <br>
 " (slashify (Filename.concat (Sys.getcwd ()) setup_dir.val));
     Wserver.wprint "
-<hr><font size=-1><em>(c) Copyright 2001 INRIA -
+<hr><font size=-1><em>(c) Copyright 2002 INRIA -
 GeneWeb %s</em></font>" Version.txt;
     Wserver.wprint "<br>";
     Wserver.wprint "</body>\n"
@@ -568,6 +568,8 @@ value print_file conf bname =
   let ic_opt =
     try Some (open_in fname) with
     [ Sys_error _ ->
+        (* temporary try the old files location; can be suppressed
+           when all files are grouped in the "lang" directory together *)
         let fname = Filename.concat (Filename.concat dir conf.lang) bname in
         try Some (open_in fname) with [ Sys_error _ -> None ] ]
   in
