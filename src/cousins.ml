@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.3 2001-12-17 12:55:24 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.4 2001-12-17 13:34:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -127,6 +127,9 @@ value print_choice conf base p niveau_effectif =
       boucle 1;
     end;
     Wserver.wprint "<input type=submit value=\"Ok\">\n";
+    Wserver.wprint "<br>\n";
+    Wserver.wprint "<input type=checkbox name=csp value=on> %s\n"
+      (capitale (transl conf "include spouses"));
   end
 ;
 
@@ -140,11 +143,53 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
       Num.to_string (Util.sosa_of_branch [ia_asex :: b2]) ^ ";spouse=on\">" ^
       s ^ "</a>"
   in
-  do {
-    Wserver.wprint "%s"
-      (gen_person_title_text reference std_access conf base p2);
-    Date.afficher_dates_courtes conf base p2
-  }
+  let reference_sp p3 _ _ _ s =
+    "<a href=\"" ^ commd conf ^ "m=RL;" ^ acces_n conf base "1" p1 ^ ";b1=" ^
+      Num.to_string (Util.sosa_of_branch [ia_asex :: b1]) ^ ";" ^
+      acces_n conf base "2" p2 ^ ";b2=" ^
+      Num.to_string (Util.sosa_of_branch [ia_asex :: b2]) ^ ";" ^
+      acces_n conf base "4" p3 ^ ";spouse=on\">" ^ s ^ "</a>"
+  in
+  let print_nospouse _ =
+    Wserver.wprint "%s%s"
+      (gen_person_title_text reference std_access conf base p2)
+      (Date.short_dates_text conf base p2)
+  in
+  let print_spouse sp first =
+    do {
+      if first then
+        Wserver.wprint "%s"
+          (gen_person_title_text reference std_access conf base p2)
+      else
+        Wserver.wprint "<br>%s" (person_title_text conf base p2);
+      Wserver.wprint "%s & %s%s" (Date.short_dates_text conf base p2)
+        (gen_person_title_text (reference_sp sp) std_access conf base sp)
+        (Date.short_dates_text conf base sp);
+    }
+  in
+  if match p_getenv conf.env "csp" with
+     [ Some "on" -> False
+     | _ -> True ]
+  then
+    print_nospouse ()
+  else
+    let u = Array.to_list (uoi base p2.cle_index).family in
+    match u with
+    [ [] -> print_nospouse ()
+    | _ ->
+        let _ =
+          List.fold_left
+            (fun a ifam ->
+               let cpl = coi base ifam in
+               let sp =
+                 if p2.sex = Female then poi base cpl.father
+                 else poi base cpl.mother
+               in
+               let _ = print_spouse sp a in
+               False)
+            True u
+        in
+        () ]
 ;
 
 value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
