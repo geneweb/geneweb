@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.20 1999-10-04 16:31:28 ddr Exp $
+# $Id: geneweb.spec,v 1.21 1999-10-28 04:33:57 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -271,6 +271,8 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/gwb2ged
 /home/geneweb/gw/gw/gwc
 /home/geneweb/gw/gw/gwu
+/home/geneweb/gw/gw/images/gwback.jpg
+/home/geneweb/gw/gw/images/gwlogo.gif
 /home/geneweb/gw/gw/images/l-cn.jpg
 /home/geneweb/gw/gw/images/l-cs.jpg
 /home/geneweb/gw/gw/images/l-de.jpg
@@ -280,6 +282,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/images/l-es.jpg
 /home/geneweb/gw/gw/images/l-fr.jpg
 /home/geneweb/gw/gw/images/l-he.jpg
+/home/geneweb/gw/gw/images/l-is.jpg
 /home/geneweb/gw/gw/images/l-it.jpg
 /home/geneweb/gw/gw/images/l-nl.jpg
 /home/geneweb/gw/gw/images/l-no.jpg
@@ -296,6 +299,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/lang/es/start.txt
 /home/geneweb/gw/gw/lang/fr/start.txt
 /home/geneweb/gw/gw/lang/he/start.txt
+/home/geneweb/gw/gw/lang/is/start.txt
 /home/geneweb/gw/gw/lang/it/start.txt
 /home/geneweb/gw/gw/lang/lexicon.txt
 /home/geneweb/gw/gw/lang/nl/start.txt
