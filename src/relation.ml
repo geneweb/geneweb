@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.14 1999-07-15 11:45:23 ddr Exp $ *)
+(* $Id: relation.ml,v 2.15 1999-07-15 22:22:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -51,6 +51,11 @@ value print_menu conf base p =
        end;
        Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
        Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
+(**)
+       html_br conf;
+       Wserver.wprint "%s\n" (capitale (transl conf "long display"));
+       Wserver.wprint "<input type=checkbox name=long value=on>\n";
+(**)
      end;
      Array.iter
        (fun ifam ->
@@ -214,14 +219,14 @@ value string_of_big_int conf i =
       else s ^ sep ^ Printf.sprintf "%03d" (i mod 1000)
 ;
 
-value print_solution_ancestor conf p1 p2 x1 x2 list =
+value print_solution_ancestor conf long p1 p2 x1 x2 list =
   do Wserver.wprint "<ul>\n";
      List.iter
        (fun (a, n) ->
           do html_li conf;
              Wserver.wprint "<em>%s %s" (string_of_big_int conf n)
                (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
-             if conf.cancel_links then ()
+             if conf.cancel_links || long then ()
              else
                do Wserver.wprint ":\n%s " (transl conf "click");
                   Wserver.wprint
@@ -242,7 +247,7 @@ value print_solution_ancestor conf p1 p2 x1 x2 list =
   return ()
 ;
 
-value print_solution_not_ancestor conf base p1 p2 x1 x2 list =
+value print_solution_not_ancestor conf base long p1 p2 x1 x2 list =
   do Wserver.wprint "<ul>";
      html_li conf;
      Wserver.wprint "%s\n" (capitale (transl conf "indeed,"));
@@ -256,7 +261,7 @@ value print_solution_not_ancestor conf base p1 p2 x1 x2 list =
                Wserver.wprint "%d %s" n
                  (transl_nth conf "relationship link/relationship links"
                     (if n = 1 then 0 else 1));
-               if conf.cancel_links then ()
+               if conf.cancel_links || long then ()
                else
                  do Wserver.wprint ":\n%s" (transl conf "click");
                     Wserver.wprint
@@ -302,10 +307,10 @@ value print_solution_not_ancestor conf base p1 p2 x1 x2 list =
   return ()
 ;
 
-value print_solution conf base n p1 p2 (x1, x2, list) =
+value print_solution conf base long n p1 p2 (x1, x2, list) =
   do print_link conf base n p2 p1 x2 x1; return
-  if x1 == 0 || x2 == 0 then print_solution_ancestor conf p1 p2 x1 x2 list
-  else print_solution_not_ancestor conf base p1 p2 x1 x2 list
+  if x1 == 0 || x2 == 0 then print_solution_ancestor conf long p1 p2 x1 x2 list
+  else print_solution_not_ancestor conf base long p1 p2 x1 x2 list
 ;
 
 value print_propose_upto conf base p1 p2 rl =
@@ -391,7 +396,44 @@ value compute_relationship conf base p1 p2 =
       Some (rl, total, relationship)
 ;
 
-value print_main_relationship conf base p1 p2 rel =
+open RelationLink;
+
+value print_one_path conf base found a p1 p2 l1 l2 =
+  let ip = a.cle_index in
+  let ip1 = p1.cle_index in
+  let ip2 = p2.cle_index in
+  let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
+  let b1 = find_first_branch base dist ip l1 ip1 Neuter in
+  let b2 = find_first_branch base dist ip l2 ip2 Neuter in
+  match (b1, b2) with
+  [ (Some b1, Some b2) ->
+      let info =
+        {ip = ip; sp = a.sex; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2;
+         c1 = 1; c2 = 1; pb1 = None; pb2 = None; nb1 = None; nb2 = None}
+      in
+      if List.mem (b1, b2) found.val then ()
+      else
+        do tag "center" begin
+             tag "table" "border=1" begin
+               tag "tr" begin
+                 tag "td" begin
+                   RelationLink.print_relation_path conf base info;
+                 end;
+               end;
+             end;
+           end;
+           html_p conf;
+           found.val := [(b1, b2) :: found.val];
+        return ()
+  | _ -> () ]
+;
+
+value print_path conf base i p1 p2 (l1, l2, list) =
+  let found = ref [] in
+  List.iter (fun (a, n) -> print_one_path conf base found a p1 p2 l1 l2) list
+;
+
+value print_main_relationship conf base long p1 p2 rel =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
   do header conf title;
      match rel with
@@ -418,7 +460,9 @@ value print_main_relationship conf base p1 p2 rel =
          do let _ =
               List.fold_left
                 (fun i sol ->
-                   do print_solution conf base i p1 p2 sol; return succ i)
+                   do print_solution conf base long i p1 p2 sol;
+                      if long then print_path conf base i p1 p2 sol else ();
+                   return succ i)
                 1 rl
             in
             ();
@@ -444,6 +488,19 @@ value print_main_relationship conf base p1 p2 rel =
                  html_p conf;
               return ()
             else ();
+(*
+            if long then ()
+            else
+              let href =
+                List.fold_right
+                  (fun (x, v) s ->
+                     let sep = if s = "" then "" else ";" in
+                     x ^ "=" ^ code_varenv v ^ sep ^ s)
+                  (conf.env @ [("long", "on")]) ""
+              in
+              Wserver.wprint "<a href=\"%s%s\">%s</a>\n" (commd conf)
+                href (capitale (transl conf "long display"));
+*)
             if conf.cancel_links then ()
             else print_propose_upto conf base p1 p2 rl;
          return () ];
@@ -462,11 +519,16 @@ value print_base_loop conf base =
 value print conf base p =
   fun
   [ Some p1 ->
+      let long =
+        match p_getenv conf.env "long" with
+        [ Some "on" -> True
+        | _ -> False ]
+      in
       match
         try Some (compute_relationship conf base p1 p) with
         [ Consang.TopologicalSortError -> None ]
       with
-      [ Some rel -> print_main_relationship conf base p1 p rel
+      [ Some rel -> print_main_relationship conf base long p1 p rel
       | None -> print_base_loop conf base ]
   | None -> print_menu conf base p ]
 ;

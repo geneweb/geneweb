@@ -130,9 +130,9 @@ phonygwd.cmx: argl.cmx ../wserver/wserver.cmx
 pqueue.cmo: pqueue.cmi 
 pqueue.cmx: pqueue.cmi 
 relation.cmo: adef.cmi config.cmi consang.cmi def.cmi gutil.cmi num.cmi \
-    srcfile.cmi util.cmi ../wserver/wserver.cmi 
+    relationLink.cmo srcfile.cmi util.cmi ../wserver/wserver.cmi 
 relation.cmx: adef.cmx config.cmi consang.cmx def.cmi gutil.cmx num.cmx \
-    srcfile.cmx util.cmx ../wserver/wserver.cmx 
+    relationLink.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
 relationLink.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi num.cmi \
     pqueue.cmi util.cmi ../wserver/wserver.cmi 
 relationLink.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
@@ -208,6 +208,7 @@ mk_consang.cmo mk_consang.cmx: pa_lock.cmo
 perso.cmo perso.cmx: pa_html.cmo
 relation.cmo relation.cmx: pa_lock.cmo pa_html.cmo
 relationLink.cmo relationLink.cmx: pa_html.cmo
+relationLink.ml.ini.cmo relationLink.ml.ini.cmx: pa_html.cmo
 sendImage.cmo sendImage.cmx: pa_lock.cmo pa_html.cmo
 some.cmo some.cmx: def.syn.cmo
 srcfile.cmo srcfile.cmx: pa_lock.cmo pa_html.cmo

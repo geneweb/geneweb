@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.14 1999-07-15 17:13:20 ddr Exp $ *)
+(* $Id: family.ml,v 2.15 1999-07-15 22:22:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -156,6 +156,7 @@ value precisez conf base n pl =
       pl
   in
   do header conf title;
+     conf.cancel_links := False;
      Wserver.wprint "<ul>\n";
      List.iter
        (fun (p, tl) ->
@@ -214,13 +215,13 @@ value precisez conf base n pl =
 
 value set_senv conf vm vi =
   do conf.senv := [("em", vm); ("ei", vi)];
-     if conf.cancel_links then
-       do conf.senv := conf.senv @ [("cgl", "on")];
-          match p_getenv conf.env "m" with
-          [ Some _ -> conf.cancel_links := False
-          | None -> () ];
-       return ()
+     if conf.cancel_links then conf.senv := conf.senv @ [("cgl", "on")]
      else ();
+(**)
+     match p_getenv conf.env "long" with
+     [ Some "on" -> conf.senv := conf.senv @ [("long", "on")]
+     | _ -> () ];
+(**)
   return ()
 ;
 
@@ -348,8 +349,12 @@ value family_m conf base =
       [ Some n ->
           let an = n in
           match p_getenv conf.env "t" with
-          [ Some "P" -> Some.first_name_print conf base an
-          | Some "N" -> Some.surname_print conf base an
+          [ Some "P" ->
+              do conf.cancel_links := False; return
+              Some.first_name_print conf base an
+          | Some "N" ->
+              do conf.cancel_links := False; return
+              Some.surname_print conf base an
           | _ ->
               let pl = find_all conf base an in
               match pl with
