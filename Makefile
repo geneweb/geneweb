@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.18 2001-02-11 17:00:23 ddr Exp $
+# $Id: Makefile,v 3.19 2001-02-20 23:00:36 ddr Exp $
 
 DESTDIR=distribution
 
@@ -63,6 +63,7 @@ new_distrib: classical_distrib
 	  echo "</pre>" >> $(DESTDIR)/$$i.htm; \
 	done
 	cp LICENSE $(DESTDIR)/LICENSE.txt
+	cp etc/START.htm $(DESTDIR)/.
 	echo "127.0.0.1" > $(DESTDIR)/gw/only.txt
 
 classical_distrib:
