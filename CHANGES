@@ -27,6 +27,12 @@ GeneWeb version 4.08
     selection "include spouses" was not reported when trying the
     next path.
 
+* Gedcom to GeneWeb (ged2gwb) and GeneWeb to Gedcom (gwb2ged)
+  - [08 Nov 02] Fixed bad imports and exports of non Gregorian dates
+    intervals.
+  - [08 Nov 02] Fixed bug: relation date of unmaried persons was not
+    imported.
+
 * Templates files (etc/*.txt)
   - [25 Oct 02] For perso.txt, added macros: "file_exists_nnn"
     returning true (for a "%if") if the file nnn exists; and
