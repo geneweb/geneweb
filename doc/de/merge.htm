@@ -55,18 +55,15 @@ Gib ein:</LI>
 Erzeuge eine gemeinsame Datenbank "base". Gib ein:</LI>
 
 <PRE>
-     gwc bla.gw blub.gw -o base
+     gwc bla.gw -sep blub.gw -o base
 </PRE>
-Es kann passieren (und das ist auch sehr wahrscheinlich),
-da&szlig; gwc Fehler anzeigt,
-weil Personen zweimal in "bla.gw" und "blub.gw" definiert sind. Um das zu
-korrigieren, hat gwc eine Option "-sh" um die Nummern der Personen zu verschieben
-und so Konflikte zu vermeiden. Versuche:
-<PRE>
-     gwc bla.gw -sh 10 blub.gw -o base
-</PRE>
-Wenn der Wert 10 das Problem nicht behebt, versuche es mit 20, 30 oder
-100...</UL>
+
+Die Option "-sep" erlaubt es, "blub.gw" getrennt zu behandeln: Wenn eine
+Person aus "blub.gw" schon mit demselben Schlüssel (Vorname/Name/Nummer) in
+"bla.gw" existiert, wird die Nummer dieses Schlüssels automatisch erhöht, um
+einen Konflikt zu vermeiden
+
+</UL>
 
 <p>
 <hr>

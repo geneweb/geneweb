@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 3.3 2000-11-15 18:58:58 ddr Exp $ *)
+(* $Id: consang.ml,v 3.4 2000-11-16 20:17:12 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -43,6 +43,13 @@ value new_mark () = do incr mark; return mark.val;
 exception TopologicalSortError of person;
 
 (* Return tab such as: i is an ancestor of j => tab.(i) > tab.(j) *)
+(* This complicated topological sort has the important following properties:
+   - only "ascends" has to be loaded; no need to load "union" and "descend"
+     which use much memory space.
+   - the value of tab is minimum; it is important for the optimization of
+     relationship computation (stopping the computation when the ancestor
+     list of one of the person is exhausted).
+*)
 
 value topological_sort base =
   let tab = Array.create base.data.persons.len 0 in
