@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.21 2000-03-09 09:53:41 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.22 2000-03-17 19:34:12 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -46,10 +46,10 @@ tilltr&auml;de<br> (passord)</td>
 
 %E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
-<form method=get action="%f">
+<form method=POST action="%f">
 %hPassord, f&ouml;r <em>v&auml;nner</em> eller
 <em>uppdaterings</em> tilltr&auml;de:
-<input name=w size=10 maxlength=200>
+<input name=w type=password size=10 maxlength=200>
 </form>
 </td></tr>
 </table>

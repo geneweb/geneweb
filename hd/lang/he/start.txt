@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.14 2000-03-08 16:02:05 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.15 2000-03-17 19:34:08 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -43,9 +43,9 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 
 %E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
-<form method=get action="%f">
+<form method=POST action="%f">
 %hסיסמה לכניסה <em> מיוחסת  </em> או <em>כגאון</em>
-<input name=w size=10 maxlength=200>
+<input name=w type=password size=10 maxlength=200>
 </form>
 </td></tr>
 </table>

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.16 2000-03-08 16:02:02 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.17 2000-03-17 19:34:05 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -46,9 +46,9 @@ z. Zt. %n Personen.%In<br>
 
 %E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
-<form method=get action="%f">
+<form method=POST action="%f">
 %hPasswort für <em>Freund</em>- oder <em>Wizard</em>-Zugang</em>:
-<input name=w size=10 maxlength=200>
+<input name=w type=password size=10 maxlength=200>
 </form>
 </td></tr>
 </table>

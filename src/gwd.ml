@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.19 2000-03-05 17:47:37 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.20 2000-03-17 19:34:13 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -26,6 +26,7 @@ value max_clients = ref None;
 value robot_xcl = ref None;
 value auth_file = ref "";
 value daemon = ref False;
+value login_timeout = ref 1800;
 
 value log_oc () =
   if log_file.val <> "" then open_out_gen log_flags 0o644 log_file.val
@@ -424,10 +425,93 @@ value match_auth passwd auth_file uauth =
   else match_auth_file auth_file uauth
 ;
 
-value make_conf cgi (addr, request) str env =
-  let tm = Unix.localtime (Unix.time ()) in
+type access_type = [ ATwizard | ATfriend | ATnormal | ATnone | ATset ];
+
+value get_actlog utm str =
+  let fname = Srcfile.adm_file "actlog" in
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let tmout = float_of_int login_timeout.val in
+      loop False ATnormal [] where rec loop changed r list =
+        match
+          try Some (input_line ic) with [ End_of_file -> None ]
+        with
+        [ Some line ->
+            let i = index ' ' line in
+            let a = float_of_string (String.sub line 0 i) in
+            let b =
+              String.sub line (i + 1) (String.length line - i - 3)
+            in
+            let c = line.[String.length line - 1] in
+            let (list, r, changed) =
+              if utm -. a >= tmout then (list, r, True)
+              else if b = str then
+                let r = if c = 'w' then ATwizard else ATfriend in
+                ([(b, (utm, c)) :: list], r, True)
+              else
+                ([(b, (a, c)) :: list], r, changed)
+            in
+            loop changed r list
+        | None ->
+            do close_in ic; return
+            let list =
+              Sort.list (fun (_, (t1, _)) (_, (t2, _)) -> t1 <= t2) list
+            in
+            (list, r, changed) ]
+  | None -> ([], ATnormal, False) ]
+;
+
+value set_actlog list =
+  let fname = Srcfile.adm_file "actlog" in
+  let oc = open_out fname in
+  do List.iter (fun (b, (a, c)) -> Printf.fprintf oc "%.0f %s %c\n" a b c)
+       list;
+     close_out oc;
+  return ()
+;
+
+value get_login utm str =
+  lock_wait Srcfile.adm_file "gwd.lck" with
+  [ Accept ->
+      let (list, r, changed) = get_actlog utm str in
+      do if changed then set_actlog list else (); return r
+  | Refuse -> ATnormal ]
+;
+
+value mkpasswd () =
+  loop 0 where rec loop len =
+    if len = 9 then Buff.get len
+    else
+      let v = Char.code 'a' + Random.int 26 in
+      loop (Buff.store len (Char.chr v))
+;
+
+value set_login utm from_addr base_file acc =
+  lock_wait Srcfile.adm_file "gwd.lck" with
+  [ Accept ->
+      do Random.self_init (); return
+      let (list, _, _) = get_actlog utm "" in
+      let (x, xx) =
+        let base = from_addr ^ "/" ^ base_file ^ "_" in
+        loop 50 where rec loop ntimes =
+          if ntimes = 0 then failwith "set_login"
+          else
+            let x = mkpasswd () in
+            let xx = base ^ x in
+            match try Some (List.assoc xx list) with [ Not_found -> None ] with
+            [ Some _ -> loop (ntimes - 1)
+            | None -> (x, xx) ]
+      in
+      let list = [(xx, (utm, acc)) :: list] in
+      do set_actlog list; return x
+  | Refuse -> "" ]
+;
+
+value make_conf cgi from_addr (addr, request) str env =
+  let utm = Unix.time () in
+  let tm = Unix.localtime utm in
   let iq = index '?' str in
-  let (command, base_file, passwd, env) =
+  let (command, base_file, passwd, env, access_type) =
     let (base_passwd, env) =
       let (x, env) = extract_assoc "b" env in
       if x <> "" || cgi then (x, env)
@@ -440,10 +524,11 @@ value make_conf cgi (addr, request) str env =
         Filename.chop_suffix base_file ".gwb"
       else base_file
     in
-    let (passwd, env) =
+    let (passwd, env, access_type) =
       let has_passwd = List.mem_assoc "w" env in
       let (x, env) = extract_assoc "w" env in
-      if has_passwd then (x, env)
+      if has_passwd then
+        (x, env, if x = "w" || x = "f" then ATnone else ATset)
       else
         let passwd =
           if ip = String.length base_passwd then ""
@@ -451,15 +536,18 @@ value make_conf cgi (addr, request) str env =
             String.sub base_passwd (ip + 1)
               (String.length base_passwd - ip - 1)
         in
-        (passwd, env)
+        let access_type =
+          match passwd with
+          [ "" | "w" | "f" -> ATnone
+          | _ -> get_login utm (from_addr ^ "/" ^ base_passwd) ]
+        in
+        (passwd, env, access_type)
     in
+(*
     let passwd = if cgi then Util.decode_varenv passwd else passwd in
-    let command =
-      if cgi then String.sub str 0 iq
-      else if passwd = "" then base_file
-      else base_file ^ "_" ^ passwd
-    in
-    (command, base_file, passwd, env)
+*)
+    let command = String.sub str 0 iq in
+    (command, base_file, passwd, env, access_type)
   in
   let (lang, env) = extract_assoc "lang" env in
   let (from, env) =
@@ -514,31 +602,55 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     if passwd = "w" || passwd = "f" then passwd1 else ""
   in
   let (ok, wizard, friend, user) =
-    if not cgi then
-      if passwd = "w" then
-        if wizard_passwd = "" && wizard_passwd_file = "" then
-          (True, True, friend_passwd = "", "")
-        else if match_auth wizard_passwd wizard_passwd_file uauth then
-          (True, True, False, uauth)
-        else (False, False, False, "")
-      else if passwd = "f" then
-        if friend_passwd = "" && friend_passwd_file = "" then
-          (True, False, True, "")
-        else if match_auth friend_passwd friend_passwd_file uauth then
-          (True, False, True, uauth)
-        else (False, False, False, "")
-      else (True, passwd = wizard_passwd, passwd = friend_passwd, "")
-    else
-      if wizard_passwd = "" && wizard_passwd_file = "" then
-        (True, True, friend_passwd = "", "")
-      else if match_auth wizard_passwd wizard_passwd_file passwd then
-        (True, True, False, "")
-      else if friend_passwd = "" && friend_passwd_file = "" then
-        (True, False, True, "")
-      else if match_auth friend_passwd friend_passwd_file passwd then
-        (True, False, True, "")
-      else
-        (True, False, False, "")
+    match access_type with
+    [ ATwizard -> (True, True, False, "")
+    | ATfriend -> (True, False, True, "")
+    | ATnormal -> (True, False, False, "")
+    | ATnone | ATset ->
+        if not cgi then
+          if passwd = "w" then
+            if wizard_passwd = "" && wizard_passwd_file = "" then
+              (True, True, friend_passwd = "", "")
+            else if match_auth wizard_passwd wizard_passwd_file uauth then
+              (True, True, False, uauth)
+            else (False, False, False, "")
+          else if passwd = "f" then
+            if friend_passwd = "" && friend_passwd_file = "" then
+              (True, False, True, "")
+            else if match_auth friend_passwd friend_passwd_file uauth then
+              (True, False, True, uauth)
+            else (False, False, False, "")
+          else (True, passwd = wizard_passwd, passwd = friend_passwd, "")
+        else
+          if wizard_passwd = "" && wizard_passwd_file = "" then
+            (True, True, friend_passwd = "", "")
+          else if match_auth wizard_passwd wizard_passwd_file passwd then
+            (True, True, False, "")
+          else if friend_passwd = "" && friend_passwd_file = "" then
+            (True, False, True, "")
+          else if match_auth friend_passwd friend_passwd_file passwd then
+            (True, False, True, "")
+          else
+            (True, False, False, "") ]
+  in
+  let (command, passwd) =
+    match access_type with
+    [ ATset ->
+        if wizard then
+          let pwd_id = set_login utm from_addr base_file 'w' in
+          if cgi then (command, pwd_id)
+          else (base_file ^ "_" ^ pwd_id, "")
+        else if friend then
+          let pwd_id = set_login utm from_addr base_file 'f' in
+          if cgi then (command, pwd_id)
+          else (base_file ^ "_" ^ pwd_id, "")
+        else if cgi then (command, "")
+        else (base_file, "")
+    | ATnormal -> if cgi then (command, "") else (base_file, "")
+    | _ ->
+        if cgi then (command, passwd)
+        else if passwd = "" then (base_file, "")
+        else (base_file ^ "_" ^ passwd, "") ]
   in
   let user =
     match lindex user ':' with
@@ -678,7 +790,7 @@ value auth_err request auth_file =
 ;
 
 value conf_and_connection cgi from (addr, request) str env =
-  let (conf, sleep, passwd_err) = make_conf cgi (addr, request) str env in
+  let (conf, sleep, passwd_err) = make_conf cgi from (addr, request) str env in
   let (auth_err, auth) =
     if cgi then (False, "")
     else if conf.auth_file = "" then (False, "")
@@ -1110,6 +1222,10 @@ value main () =
      ("-robot_xcl", Arg.String robot_exclude_arg,
       "<cnt>,<sec>
        Exclude connections when more than <cnt> requests in <sec> seconds.");
+     ("-login_tmout", Arg.Int (fun x -> login_timeout.val := x),
+      "<sec>
+       Login timeout for passwords in CGI mode (default " ^
+       string_of_int login_timeout.val ^ "s)");
      ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x),
       "<addr>
        Send a message to say that this service has been redirected to <addr>");
