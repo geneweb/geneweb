@@ -2,9 +2,11 @@ GeneWeb version 3.06
 --------------------
 
 * GeneWeb Service/CGI (gwd)
-  - [17 Jun 00] In update family form, added a button close to the family
-    sources: when selected, the family sources text is automatically put 
-    (as default value) in future family sources fields.
+  - [17 Jun 00] In update family forms, added a button close to the "family
+    source": when selected, the "family source" text is automatically put 
+    (as default value) in "family source" fields in future other family
+    updates. It avoids to have to copy it each time when it is always the
+    same one.
   - [16 Jun 00] Added feature: in relationship computing, when option
     "shortest path" is selected, it is displayed together with a link
     to see the next shortest path.
@@ -12,6 +14,11 @@ GeneWeb version 3.06
     and in other pages, because it makes some browsers generate two requests
     and we see the page blinking. Moreover, it has no sense (even if it is
     standard), since the HTTP header already contains that.
+
+* Base configuration files (base.gwf)
+  - [17 Jun 00] By default now, the "can_send_image" is "yes", meaning that
+    if you specify nothing, the "send image" is proposed in update pages. To
+    unset it, you must now specify: can_send_image=no
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
   - [14 Jun 00] Completed and fixed Portuguese version (Jose Paulo Moitinho

@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.16 2000-06-03 12:20:24 ddr Exp $
+# $Id: a.gwf,v 3.17 2000-06-17 19:50:53 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -57,7 +57,7 @@ wizard_just_friend=no
 default_lang=fr
 
 # Authorization for wizards to send images (no: cannot; yes: can)
-can_send_image=no
+can_send_image=yes
 
 # Optional path for images defined by the "image" field (i.e. *not* added
 # by "send image"). Applies only for images not found in the image/base

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.40 2000-05-31 09:15:22 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.41 2000-06-17 19:50:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -704,21 +704,8 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      lang = if lang = "" then default_lang else lang;
      default_lang = default_lang;
      can_send_image =
-       try List.assoc "can_send_image" base_env = "yes" with
-       [ Not_found ->
-           try
-             let r = List.assoc "can_send_photo" base_env = "yes" in
-             do if not cgi then
-                  do Printf.eprintf "\
-*** Config file for \"%s\": \"can_send_photo\" is deprecated; \
-use \"can_send_image\".\n"
-                       base_file;
-                    flush stderr;
-                  return ()
-                else ();
-             return r
-           with
-           [ Not_found -> False ] ];
+       try List.assoc "can_send_image" base_env <> "no" with
+       [ Not_found -> False ];
      public_if_titles =
        try List.assoc "public_if_titles" base_env = "yes" with
        [ Not_found -> False ];
