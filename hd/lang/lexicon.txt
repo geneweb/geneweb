@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.15 1999-04-09 13:29:15 ddr Exp $
+# $Id: lexicon.txt,v 2.16 1999-04-09 20:44:05 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2358,7 +2358,7 @@ fr: de la naissance
 he:   של הלידה
 it: di nascita
 nl: van de geboorte
-no: av f&oslash;dselen
+no: for f&oslash;dselen
 pt: do nascimento
 se: av f&ouml;delsen
 

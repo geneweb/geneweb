@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 2.4 1999-04-06 07:22:34 ddr Exp $ *)
+(* $Id: cousins.ml,v 2.5 1999-04-09 20:40:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -244,7 +244,8 @@ value print_cousins conf base p lev =
          if h then person_text_no_html conf base p
          else person_text conf base p
        in
-       Wserver.wprint "%s" (transl_decline conf "of" txt);
+       Wserver.wprint "%s"
+         (transl_decline conf "of (same or greater generation level)" txt);
     return ()
   in
   do header conf title;
@@ -266,7 +267,8 @@ value print_menu conf base p effective_level =
          if h then person_text_no_html conf base p
          else person_text conf base p
        in
-       Wserver.wprint "%s" (transl_decline conf "of" txt);
+       Wserver.wprint "%s"
+         (transl_decline conf "of (same or greater generation level)" txt);
     return ()
   in
   do header conf title;
