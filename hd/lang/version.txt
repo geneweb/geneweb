@@ -1,6 +1,4 @@
-<table border=0>
-<tr>
-<td align=center>
+<center>
 <a href="%glang=cn">
 <img src="%gm=IM;v=/l-cn.gif" width=36 height=22 alt=cn></a>
 <a href="%glang=de">
@@ -27,6 +25,4 @@
 <img src="%gm=IM;v=/l-pt.gif" width=36 height=22 alt=pt></a>
 <a href="%glang=se">
 <img src="%gm=IM;v=/l-se.gif" width=36 height=22 alt=se></a>
-</td>
-</tr>
-</table>
+</center>
