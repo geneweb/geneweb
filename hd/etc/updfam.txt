@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.24 2002-11-18 10:02:50 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.25 2003-12-16 07:45:34 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -203,6 +203,8 @@
 >[*not married]
 <input type=radio name=mrel value=engaged%if;(mrel = "engaged") checked%end;
 >[*engaged]
+<input type=radio name=mrel value=rap%if;(mrel = "rap") checked%end;
+>[*rap]
 <input type=radio name=mrel value=nsck%if;(mrel = "nsck") checked%end;
 >[*no sexes check]
 <table border=1>

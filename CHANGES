@@ -2,6 +2,8 @@ GeneWeb version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [16 Dec 03] Added case of "rap" in "marriage" kind in update
+    family form.
   - [04 Dec 03] Fixed bug: in case of two wizards make changes at
     the same time, there were (rare) cases where one of the changes
     erases the other one (instead of being rejected by the message

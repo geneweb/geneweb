@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.34 2002-10-23 15:20:15 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.35 2003-12-16 07:45:35 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -128,7 +128,8 @@ value eval_relation_kind =
   [ Married -> "marr"
   | NotMarried -> "not_marr"
   | Engaged -> "engaged"
-  | NoSexesCheck -> "nsck" ]
+  | NoSexesCheck -> "nsck"
+  | Rap -> "rap" ]
 ;
 
 value eval_divorce =
