@@ -45,6 +45,8 @@ function WorkOnBrowser() {
  onmouseover="if (WorkOnBrowser()) ies.src='%o/t-es.gif'"
  onmouseout="ies.src='%o/l-es.jpg'">
 <img src="%o/l-es.jpg" width=36 height=22 alt=%ues name=ies border=0></a>
+<a href="%glang=et">
+<img src="%o/l-et.jpg" width=36 height=22 alt=%uet border=0></a>
 <a href="%glang=fi"
  onmouseover="if (WorkOnBrowser()) ifi.src='%o/t-fi.gif'"
  onmouseout="ifi.src='%o/l-fi.jpg'">
