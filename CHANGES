@@ -6,6 +6,8 @@ GeneWeb Version 2.01
   - [Mar 30, 99] Changed term "photo" into "image".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Apr 6, 99] Fixed bug in personal pages, titles dates were sometimes
+    displayed just as "...".
   - [Apr 2, 99] Fixed bug: in missing ancestors in alphabetic order, the
     accents in surnames were incorrectly displayed.
   - [Mar 30, 99] Added the spouses when displaying relationship links with
@@ -67,7 +69,7 @@ included.
     in families forms.
   - [Feb 27, 99] Added case "half-siblings" in relationship links.
   - [Feb 27, 99] In personal pages, titles dates when complete are
-    displayed completely (not just date).
+    displayed completely (not just year).
   - [Feb 26, 99] For a birth the present day, does not display "happy
     birthday" any more! And displayed age is "birth" and not "less than
     one year".

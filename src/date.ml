@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.1 1999-03-08 11:18:31 ddr Exp $ *)
+(* $Id: date.ml,v 2.2 1999-04-06 21:18:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -80,18 +80,30 @@ value string_of_ondate conf d =
 ;
 
 value string_of_date conf d =
-  if d.prec = Sure then
-    let encoding =
-      let n =
-        if d.day = 1 then 0
-        else if d.day != 0 then 1
-        else if d.month != 0 then 2
-        else 3
-      in
-      transl_nth conf "(date)" n
+  let encoding =
+    let n =
+      if d.day = 1 then 0
+      else if d.day != 0 then 1
+      else if d.month != 0 then 2
+      else 3
     in
-    code_date conf encoding d.day d.month d.year
-  else "..."
+    transl_nth conf "(date)" n
+  in
+  let s = code_date conf encoding d.day d.month d.year in
+  match d.prec with
+  [ Sure -> s
+  | About -> transl conf "about (date)" ^ nbsp ^ s
+  | Before -> transl conf "before (date)" ^ nbsp ^ s
+  | After -> transl conf "after (date)" ^ nbsp ^ s
+  | Maybe -> transl conf "maybe (date)" ^ nbsp ^ s
+  | OrYear z ->
+      s ^ " " ^
+      transl conf "or" ^ " " ^
+      code_date conf (transl_nth conf "(date)" 3) 0 0 z
+  | YearInt z ->
+      transl conf "between (date)" ^ nbsp ^ s ^ " " ^
+      transl conf "and" ^ " " ^
+      code_date conf (transl_nth conf "(date)" 3) 0 0 z ]
 ;
 
 value print_age conf a =
