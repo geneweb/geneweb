@@ -21,6 +21,9 @@ GeneWeb Version 1.10
   - [14/12/98] Fixed bug in Windows version (displaying "uncaught exception:
     Stream.Failure").
 
+* GeneWeb compiler (gwc)
+  - [02/01/99] Fixed missing accents displaying for undefined persons.    
+
 * Lexicon file (lexicon.txt)
   - [15/12/98] Added some missing phrases in some languages (mainly Espagnol,
     Italian).
