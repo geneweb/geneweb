@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.61 2001-03-01 19:42:45 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.62 2001-03-08 14:13:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -770,7 +770,7 @@ value print_not_empty_src conf base new_parag first txt isrc =
        Wserver.wprint "-\n";
        first.val := False;
        Wserver.wprint "<font size=-1><em>%s: " (txt ());
-       copy_string_with_macros conf src;
+       copy_string_with_macros conf [] src;
        Wserver.wprint "</em></font>\n";
     return ()
 ;
@@ -831,7 +831,7 @@ value print_notes_for_someone conf base p n child_n =
          end;
        end;
        Wserver.wprint ": \n<dd>\n";
-       copy_string_with_macros conf notes;
+       copy_string_with_macros conf [] notes;
        print_sources conf base (notes <> "") p;
        Wserver.wprint "<p>\n";
     return ()

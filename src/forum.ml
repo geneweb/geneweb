@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.19 2001-02-15 16:18:41 ddr Exp $ *)
+(* $Id: forum.ml,v 3.20 2001-03-08 14:13:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -267,7 +267,7 @@ value print_forum_message conf base pos =
             else
               loop (mess.[i] = '\n') (Buff.store len mess.[i]) (i + 1)
          in
-         copy_string_with_macros conf mess;
+         copy_string_with_macros conf [] mess;
          Wserver.wprint "\n";
          if browser_doesnt_have_tables conf then ()
          else Wserver.wprint "</table>";

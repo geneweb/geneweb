@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./q_codes.cmo *)
-(* $Id: perso.ml,v 3.93 2001-03-07 03:13:15 ddr Exp $ *)
+(* $Id: perso.ml,v 3.94 2001-03-08 14:13:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -376,7 +376,7 @@ value print_burial_place conf base env p p_auth =
 value print_comment conf base env p p_auth =
   fun
   [ Vfam fam _ _ ->
-      if p_auth then copy_string_with_macros conf (sou base fam.comment)
+      if p_auth then copy_string_with_macros conf [] (sou base fam.comment)
       else ()
   | _ -> () ]
 ;
@@ -528,7 +528,10 @@ value print_nobility_titles conf base env p p_auth =
 ;
 
 value print_notes conf base env p p_auth =
-  if p_auth then copy_string_with_macros conf (sou base p.notes) else ()
+  if p_auth then
+    let env = [('i', fun () -> Util.default_image_name base p)] in
+    copy_string_with_macros conf env (sou base p.notes)
+  else ()
 ;
 
 value print_occupation conf base env p p_auth =
@@ -707,7 +710,7 @@ value print_sosa_link conf base env a a_auth =
 
 value print_source conf base env =
   match get_env "src" env with
-  [ Vstring s -> copy_string_with_macros conf s
+  [ Vstring s -> copy_string_with_macros conf [] s
   | _ -> () ]
 ;
 
