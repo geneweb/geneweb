@@ -1,5 +1,6 @@
 ca=ct
 da=dk
+fr-fr=fr
 pt-br=br
 sv=se
 zh=cn

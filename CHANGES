@@ -48,7 +48,7 @@ GeneWeb version 4.01
 
 * Lexicon (lang/lexicon.txt) and Welcome page (lang/start.txt)
   - [26 Mar 01] (technical point) Grouped together all lang/*/start.txt in
-    one only file lang/start.txt, easier to manipulate
+    one only file lang/start.txt, easier to manipulate (at least for me!)
   - [14 Mar 01] Added the ability to add "derived" languages,
     i.e. languages where most of the phrases are the same than some other
     already existing language, but with some changes here and there. In
