@@ -13,6 +13,9 @@ GeneWeb Version 4.02
     of Camlp4.
 
 * GeneWeb daemon/CGI (gwd)
+  - [17 Jun 01] Fixed problem in display by places/surnames when surnames
+    have declinations: were displayed with their declinations instead of
+    the nominative form.
   - [03 Jun 01] Fixed inverted alphabetic order of first name for index
     of descendants and spouses.
   - [01 Jun 01] Changed displaying in forum: the header are displayed by

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.1 2001-04-20 16:54:39 ddr Exp $ *)
+(* $Id: place.ml,v 4.2 2001-06-17 11:05:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -168,7 +168,7 @@ value print_html_places_surnames conf base =
               List.map
                 (fun (len, ip) ->
                    let p = poi base ip in
-                   let sn = sou base p.surname in (len, p, sn))
+                   let sn = p_surname base p in (len, p, sn))
                 snl
             in
             let snl =
