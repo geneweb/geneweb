@@ -2138,6 +2138,7 @@ nl: overmorgen
 se: i &ouml;vermorgon
 
     the father/the mother/a parent
+cn: ¸¸/Ä¸/a parent
 de: der Vater/die Mutter/ein Elternteil
 en: the father/the mother/a parent
 eo: la patro/la patrino/gepatro

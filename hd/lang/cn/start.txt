@@ -20,7 +20,7 @@
 请输入：
 <ul>
 <li> <input type=radio name=t value=PN checked>
-<em>姓、</em>  <em>名、别名、或者其他公认的名字</em>
+<em>姓</em> <em>名、别名、或者其他公认的名字</em>
 <li> <input type=radio name=t value=P> <em>名</em>
 <li> <input type=radio name=t value=N> <em>姓</em>
 </ul>
