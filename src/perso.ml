@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.54 1999-10-26 22:35:39 ddr Exp $ *)
+(* $Id: perso.ml,v 2.55 1999-10-27 13:14:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1079,7 +1079,7 @@ value print conf base p =
         else print_linked_first_name_and_surname conf base p ]
   in
   let a = aoi base p.cle_index in
-  do cheader conf title;
+  do header conf title;
      print_sub_titles conf base p;
      print_link_to_welcome conf True;
      print_photo_occupation_dates conf base p;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.53 1999-10-26 22:35:46 ddr Exp $ *)
+(* $Id: util.ml,v 2.54 1999-10-27 13:14:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -548,7 +548,16 @@ value index_of_sex =
 ;
 
 value default_body_prop conf =
-  " background=\"" ^ conf.command ^ "?m=IM;v=/gwback.jpg\""
+ "background=\"" ^ conf.command ^ "?m=IM;v=/gwback.jpg\""
+;
+
+value body_prop conf =
+  try
+    match List.assoc "body_prop" conf.base_env with
+    [ "" -> default_body_prop conf
+    | s -> s ]
+  with
+  [ Not_found -> default_body_prop conf ]
 ;
 
 value header_no_page_title conf title =
@@ -576,19 +585,11 @@ value header_no_page_title conf title =
   return ()
 ;
 
-value cheader conf title =
+value header conf title =
   do header_no_page_title conf title;
      Wserver.wprint "<center><h1><font color=%s>" green_color;
      title False;
      Wserver.wprint "</font></h1></center>\n";
-  return ()
-;
-
-value header conf title =
-  do header_no_page_title conf title;
-     Wserver.wprint "<h1>";
-     title False;
-     Wserver.wprint "</h1>\n";
   return ()
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 2.6 1999-10-26 22:35:33 ddr Exp $ *)
+(* $Id: birthday.ml,v 2.7 1999-10-27 13:14:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -399,7 +399,7 @@ value print_menu_birth conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "birthdays"))
   in
-  do cheader conf title;
+  do header conf title;
      let tom = day_after conf.today in
      let aft = day_after tom in
      let list_today = anniversaire_du conf base False conf.today in
@@ -426,7 +426,7 @@ value print_menu_dead conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "anniversaries of dead"))
   in
-  do cheader conf title;
+  do header conf title;
      let tom = day_after conf.today in
      let aft = day_after tom in
      let list_today = anniversaire_du conf base True conf.today in
@@ -453,7 +453,7 @@ value print_menu_marriage conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "anniversaries of marriage"))
   in
-  do cheader conf title;
+  do header conf title;
      let tom = day_after conf.today in
      let aft = day_after tom in
      let list_today = anniversary_of_marriage_of_day conf base conf.today in

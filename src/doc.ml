@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 2.8 1999-10-26 22:35:36 ddr Exp $ *)
+(* $Id: doc.ml,v 2.9 1999-10-27 13:14:13 ddr Exp $ *)
 
 open Config;
 
@@ -58,11 +58,7 @@ value copy conf pref_doc pref_img s =
        let img = Filename.basename img in
        do Wserver.wprint "\"%s%s\"" pref_img img; return loop i
       else if last_is s i "<body>" then
-        let s =
-          try " " ^ List.assoc "body_prop" conf.base_env with
-          [ Not_found -> Util.default_body_prop conf ]
-        in
-        do Wserver.wprint "%s>" s; return loop (i + 1)
+        do Wserver.wprint " %s>" (Util.body_prop conf); return loop (i + 1)
       else do Wserver.wprint "%c" s.[i]; return loop (i + 1)
 ;
 
