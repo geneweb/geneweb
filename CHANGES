@@ -52,6 +52,9 @@ included.
     errors in English version (Lars Gustavsson).
 
 * Documentation
+  - [Mar 8, 99] Added a short paragraph in update.htm, section 5.2,
+    paragraph "Filling", alinea "Create" about the fact that one can add his
+    birth date.
   - [Feb 26, 99] Small change in French version (translation of "first
     name alias") in file update.htm, section 5.4.
   - [Feb 18, 99] Explained how to delete photos (new feature) in file
