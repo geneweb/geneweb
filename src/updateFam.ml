@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.11 2001-06-15 04:34:25 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.12 2001-06-15 15:25:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -31,6 +31,8 @@ value string_family_of base fam cpl des =
   let sdes = Gutil.map_descend_p (person_key base) des in
   (sfam, scpl, sdes)
 ;
+
+module Old = struct
 
 value print_birth conf var create verbose =
   do {
@@ -509,6 +511,124 @@ value print_family conf base fam cpl des force_children_surnames =
   }
 ;
 
+value print_add1 conf base fam cpl des force_children_surnames =
+  let title _ =
+    let s = transl_nth conf "family/families" 0 in
+    Wserver.wprint "%s" (capitale (transl_decline conf "add" s))
+  in
+  do {
+    header conf title;
+    Wserver.wprint "\n";
+    tag "form" "method=POST action=\"%s\"" conf.command begin
+      Util.hidden_env conf;
+      match p_getenv conf.env "ip" with
+      [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
+      | None -> () ];
+      Wserver.wprint "<input type=hidden name=m value=ADD_FAM_OK>\n";
+      print_family conf base fam cpl des force_children_surnames;
+      Wserver.wprint "\n";
+      html_p conf;
+      Wserver.wprint "<input type=submit value=Ok>\n";
+    end;
+    Wserver.wprint "\n";
+    trailer conf
+  }
+;
+
+value merge_call conf =
+  do {
+    Wserver.wprint "<input type=hidden name=m value=MRG_MOD_FAM_OK>\n";
+    match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
+    [ (Some i1, Some i2) ->
+        do {
+          Wserver.wprint "<input type=hidden name=ini1 value=%d>\n" i1;
+          Wserver.wprint "<input type=hidden name=ini2 value=%d>\n" i2;
+          ()
+        }
+    | _ -> () ];
+    match p_getint conf.env "i2" with
+    [ Some i2 -> Wserver.wprint "<input type=hidden name=i2 value=%d>\n" i2
+    | _ -> () ]
+  }
+;
+
+value print_mod1 conf base fam cpl des digest =
+  let title _ =
+    match p_getenv conf.env "m" with
+    [ Some "MRG_MOD_FAM_OK" ->
+        let s = transl_nth conf "family/families" 1 in
+        Wserver.wprint "%s # %d" (capitale (transl_decline conf "merge" s))
+          (Adef.int_of_ifam fam.fam_index)
+    | _ ->
+        let s = transl_nth conf "family/families" 0 in
+        Wserver.wprint "%s # %d" (capitale (transl_decline conf "modify" s))
+          (Adef.int_of_ifam fam.fam_index) ]
+  in
+  do {
+    header conf title;
+    Wserver.wprint "\n";
+    tag "form" "method=POST action=\"%s\"" conf.command begin
+      Util.hidden_env conf;
+      match p_getenv conf.env "m" with
+      [ Some "MRG_MOD_FAM_OK" -> merge_call conf
+      | _ -> Wserver.wprint "<input type=hidden name=m value=MOD_FAM_OK>\n" ];
+      Wserver.wprint "<input type=hidden name=i value=%d>\n"
+        (Adef.int_of_ifam fam.fam_index);
+      match p_getenv conf.env "ip" with
+      [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
+      | None -> () ];
+      Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
+      print_family conf base fam cpl des False;
+      Wserver.wprint "\n";
+      html_p conf;
+      Wserver.wprint "<input type=submit value=Ok>\n";
+    end;
+    Wserver.wprint "\n";
+    trailer conf
+  }
+;
+
+value print_merge1 conf base fam des fam2 digest =
+  let title _ =
+    let s = transl_nth conf "family/families" 1 in
+    Wserver.wprint "%s # %d" (capitale (transl_decline conf "merge" s))
+      (Adef.int_of_ifam fam.fam_index)
+  in
+  let cpl = Gutil.map_couple_p (person_key base) (coi base fam.fam_index) in
+  do {
+    header conf title;
+    Wserver.wprint "\n";
+    tag "form" "method=POST action=\"%s\"" conf.command begin
+      Util.hidden_env conf;
+      Wserver.wprint "<input type=hidden name=m value=MRG_MOD_FAM_OK>\n";
+      Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
+      Wserver.wprint "<input type=hidden name=i value=%d>\n"
+        (Adef.int_of_ifam fam.fam_index);
+      Wserver.wprint "<input type=hidden name=i2 value=%d>\n"
+        (Adef.int_of_ifam fam2.fam_index);
+      match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
+      [ (Some i1, Some i2) ->
+          do {
+            Wserver.wprint "<input type=hidden name=ini1 value=%d>\n" i1;
+            Wserver.wprint "<input type=hidden name=ini2 value=%d>\n" i2;
+          }
+      | _ -> () ];
+      match p_getenv conf.env "ip" with
+      [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
+      | None -> () ];
+      Wserver.wprint "\n";
+      print_family conf base fam cpl des False;
+      Wserver.wprint "\n";
+      html_p conf;
+      Wserver.wprint "<input type=submit value=Ok>\n";
+    end;
+    Wserver.wprint "\n";
+    trailer conf;
+  }
+;
+
+end;
+
 (* Interpretation of template file 'updfam.txt' *)
 
 type ast =
@@ -883,66 +1003,25 @@ value print_update_fam conf base fcd digest =
   | _ -> incorrect_request conf ]
 ;
 
-value merge_call conf =
-  do {
-    Wserver.wprint "<input type=hidden name=m value=MRG_MOD_FAM_OK>\n";
-    match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
-    [ (Some i1, Some i2) ->
-        do {
-          Wserver.wprint "<input type=hidden name=ini1 value=%d>\n" i1;
-          Wserver.wprint "<input type=hidden name=ini2 value=%d>\n" i2;
-          ()
-        }
-    | _ -> () ];
-    match p_getint conf.env "i2" with
-    [ Some i2 -> Wserver.wprint "<input type=hidden name=i2 value=%d>\n" i2
-    | _ -> () ]
-  }
+value print_add1 conf base fam cpl des force_children_surnames =
+  if p_getenv conf.env "updfam" = Some "on" then
+    print_update_fam conf base (fam, cpl, des) ""
+  else
+    Old.print_add1 conf base fam cpl des force_children_surnames
 ;
 
 value print_mod1 conf base fam cpl des digest =
-  let title _ =
-    match p_getenv conf.env "m" with
-    [ Some "MRG_MOD_FAM_OK" ->
-        let s = transl_nth conf "family/families" 1 in
-        Wserver.wprint "%s # %d" (capitale (transl_decline conf "merge" s))
-          (Adef.int_of_ifam fam.fam_index)
-    | _ ->
-        let s = transl_nth conf "family/families" 0 in
-        Wserver.wprint "%s # %d" (capitale (transl_decline conf "modify" s))
-          (Adef.int_of_ifam fam.fam_index) ]
-  in
-  do {
-    header conf title;
-    Wserver.wprint "\n";
-    tag "form" "method=POST action=\"%s\"" conf.command begin
-      Util.hidden_env conf;
-      match p_getenv conf.env "m" with
-      [ Some "MRG_MOD_FAM_OK" -> merge_call conf
-      | _ -> Wserver.wprint "<input type=hidden name=m value=MOD_FAM_OK>\n" ];
-      Wserver.wprint "<input type=hidden name=i value=%d>\n"
-        (Adef.int_of_ifam fam.fam_index);
-      match p_getenv conf.env "ip" with
-      [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
-      | None -> () ];
-      Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
-      print_family conf base fam cpl des False;
-      Wserver.wprint "\n";
-      html_p conf;
-      Wserver.wprint "<input type=submit value=Ok>\n";
-    end;
-    Wserver.wprint "\n";
-    trailer conf
-  }
+  if p_getenv conf.env "updfam" = Some "on" then
+    print_update_fam conf base (fam, cpl, des) digest
+  else Old.print_mod1 conf base fam cpl des digest
 ;
 
-value print_mod1 conf base fam cpl des digest =
-  do {
-    if p_getenv conf.env "updfam" = Some "on" then
-      print_update_fam conf base (fam, cpl, des) digest
-    else ();
-    print_mod1 conf base fam cpl des digest
-  }
+value print_merge1 conf base fam des fam2 digest =
+  if p_getenv conf.env "updfam" = Some "on" then
+    let cpl = Gutil.map_couple_p (person_key base) (coi base fam.fam_index) in
+    print_update_fam conf base (fam, cpl, des) digest
+  else
+    Old.print_merge1 conf base fam des fam2 digest
 ;
 
 value print_del1 conf base fam =
@@ -1005,39 +1084,6 @@ value print_swi1 conf base p fam1 fam2 =
     end;
     Wserver.wprint "\n";
     trailer conf
-  }
-;
-
-value print_add1 conf base fam cpl des force_children_surnames =
-  let title _ =
-    let s = transl_nth conf "family/families" 0 in
-    Wserver.wprint "%s" (capitale (transl_decline conf "add" s))
-  in
-  do {
-    header conf title;
-    Wserver.wprint "\n";
-    tag "form" "method=POST action=\"%s\"" conf.command begin
-      Util.hidden_env conf;
-      match p_getenv conf.env "ip" with
-      [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
-      | None -> () ];
-      Wserver.wprint "<input type=hidden name=m value=ADD_FAM_OK>\n";
-      print_family conf base fam cpl des force_children_surnames;
-      Wserver.wprint "\n";
-      html_p conf;
-      Wserver.wprint "<input type=submit value=Ok>\n";
-    end;
-    Wserver.wprint "\n";
-    trailer conf
-  }
-;
-
-value print_add1 conf base fam cpl des force_children_surnames =
-  do {
-    if p_getenv conf.env "updfam" = Some "on" then
-      print_update_fam conf base (fam, cpl, des) ""
-    else ();
-    print_add1 conf base fam cpl des force_children_surnames
   }
 ;
 
