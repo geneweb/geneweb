@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.37 1999-12-16 17:29:52 ddr Exp $
+# $Id: lexicon.txt,v 3.38 1999-12-16 17:52:13 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1350,7 +1350,7 @@ dk: gren/grene
 en: branch/branches
 eo: brancxo/brancxoj
 es: rama/ramas
-fi: haara/haarat
+fi: haara/haaraa
 fr: branche/branches
 he:   ענף/ ענפים
 is: grein/greinar
