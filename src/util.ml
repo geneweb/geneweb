@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 1.33 1999-02-18 15:52:56 ddr Exp $ *)
+(* $Id: util.ml,v 1.34 1999-02-20 21:59:17 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -948,10 +948,14 @@ value space_to_unders s =
   | None -> s ]
 ;
 
+value default_photo_name_of_key fnam surn occ =
+  let f = space_to_unders (Name.lower fnam) in
+  let s = space_to_unders (Name.lower surn) in
+  f ^ "." ^ string_of_int occ ^ "." ^ s
+;
+
 value default_photo_name base p =
-  let f = space_to_unders (Name.lower (sou base p.first_name)) in
-  let s = space_to_unders (Name.lower (sou base p.surname)) in
-  f ^ "." ^ string_of_int p.occ ^ "." ^ s
+  default_photo_name_of_key (sou base p.first_name) (sou base p.surname) p.occ
 ;
 
 value auto_photo_file conf base p =

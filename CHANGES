@@ -9,7 +9,7 @@ included.
   - [Feb 19, 99] Replacement of "%s" by the name of the base with context,
     also in family comment.
   - [Feb 18, 99] Added deletion of photos.
-  - [Feb 13, 99] Added ability to send photos.
+  - [Feb 13, 99; Feb 20, 99] Added ability to send photos.
   - [Feb 12, 99] Improved displaying in Hebrew language.
   - [Feb 8, 99] Fixed bug in CGI mode under Windows: images (flags e.g.) 
     were often truncated.
