@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.8 1999-04-29 19:55:52 ddr Exp $ *)
+(* $Id: family.ml,v 2.9 1999-05-11 09:24:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -429,7 +429,7 @@ value print_no_index conf base =
         (fun (x, v) s ->
            let sep = if s = "" then "" else ";" in
            x ^ "=" ^ code_varenv v ^ sep ^ s)
-        env ""
+        [("lang", conf.lang) :: env] ""
     in
     let suff =
       if conf.cgi then "b=" ^ conf.bname ^ ";" ^ suff else suff

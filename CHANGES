@@ -12,6 +12,9 @@ GeneWeb Intermediate version 2.02-1
   - [May 7, 99] Fixed bug: "cleanup" under Windows did not work.
 
 * GeneWeb Daemon/CGI (gwd)
+  - [May 11, 99] Fixed bug: when adding ";opt=no_index" in URLs like explained
+    in the doc "(How to put links to your base"), the used language was
+    missing in the new URL.
   - [May 10, 99] Added ability to put relationship date for non married
     persons.
   - [May 7, 99] Fixed bug visible in Danish: the AE ligature ("&aelig;")
