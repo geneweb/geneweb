@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.26 2000-05-06 17:13:39 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.27 2000-05-06 18:11:26 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1843,7 +1843,7 @@ value build_flash_list conf base v p =
                 let r =
                   try Hashtbl.find ht surn with
                   [ Not_found ->
-                      let r = ref (fst dp, []) in
+                      let r = ref ((fst dp, p), []) in
                       do Hashtbl.add ht surn r; return r ]
                 in
                 r.val := (fst r.val, [sosa :: snd r.val]) ];
@@ -1868,13 +1868,28 @@ value print_flash_list conf base v p =
      return ()
   in
   let list = build_flash_list conf base v p in
+  let with_tab =
+    not (Util.browser_doesnt_have_tables conf) &&
+    p_getenv conf.env "tab" = Some "on"
+  in
   do Util.header conf title;
      Util.print_link_to_welcome conf True;
-     tag "ul" begin
-       List.iter
-         (fun (surn, ((d1, d2, pl), sosa_list)) ->
-            let d2 = if d2 = d1 then None else d2 in
-            do Wserver.wprint "<li>\n";
+     if with_tab then Wserver.wprint "<br>\n" else ();
+     Wserver.wprint "<%s>\n"
+       (if with_tab then "table border=1 width=90%%" else "ul");
+     List.iter
+       (fun (surn, (((d1, d2, pl), anc), sosa_list)) ->
+          let d2 = if d2 = d1 then None else d2 in
+          do Wserver.wprint "<%s>\n" (if with_tab then "tr><td" else "li");
+             if Util.browser_doesnt_have_tables conf then
+               let sosa = List.hd sosa_list in
+               wprint_geneweb_link conf
+                 ("m=RL;" ^ acces conf base anc ^ ";" ^
+                  acces_n conf base "1" p ^ ";" ^
+                  acces_n conf base "2" anc ^ ";b1=" ^
+                  Num.to_string sosa ^ ";b2=1")
+                 (surname_end surn ^ surname_begin surn)
+             else
                let (str, _) =
                  List.fold_right
                    (fun sosa (str, n) ->
@@ -1888,29 +1903,30 @@ value print_flash_list conf base v p =
                wprint_geneweb_link conf
                  ("m=DAG;" ^ acces conf base p ^ str)
                  (surname_end surn ^ surname_begin surn);
-               if conf.cancel_links then ()
-               else
-                 let comm =
-                   match List.length sosa_list with
-                   [ 1 -> ""
-                   | n -> " (" ^ string_of_int n ^ ")" ]
-                 in
-                 Wserver.wprint "%s" comm;
-               Wserver.wprint "; %s;" pl;
-               if d1 <> None || d2 <> None then Wserver.wprint " " else ();
-               match d1 with
-               [ Some (Dgreg d _) -> Wserver.wprint "%d" d.year
-               | Some (Dtext s) -> Wserver.wprint "%s" s
-               | None -> () ];
-               if d1 <> None && d2 <> None then Wserver.wprint "-" else ();
-               match d2 with
-               [ Some (Dgreg d _) -> Wserver.wprint "%d" d.year
-               | Some (Dtext s) -> Wserver.wprint "%s" s
-               | None -> () ];
-               Wserver.wprint "\n";
-            return ())
-         list;
-     end;
+             if conf.cancel_links then ()
+             else
+               let comm =
+                 match List.length sosa_list with
+                 [ 1 -> ""
+                 | n -> " (" ^ string_of_int n ^ ")" ]
+               in
+               Wserver.wprint "%s" comm;
+             Wserver.wprint "%s&nbsp;%s%s" (if with_tab then "<td>" else ";")
+               pl (if with_tab then "<td>" else ";");
+             Wserver.wprint "&nbsp;";
+             match d1 with
+             [ Some (Dgreg d _) -> Wserver.wprint "%d" d.year
+             | Some (Dtext s) -> Wserver.wprint "%s" s
+             | None -> () ];
+             if d1 <> None && d2 <> None then Wserver.wprint "-" else ();
+             match d2 with
+             [ Some (Dgreg d _) -> Wserver.wprint "%d" d.year
+             | Some (Dtext s) -> Wserver.wprint "%s" s
+             | None -> () ];
+             Wserver.wprint "\n";
+          return ())
+       list;
+     Wserver.wprint "</%s>\n" (if with_tab then "table" else "ul");
      Util.trailer conf;
   return ()
 ;
