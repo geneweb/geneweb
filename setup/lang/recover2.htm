@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: recover2.htm,v 1.1 2002-01-14 19:40:03 ddr Exp $ -->
+  <title>[
+de: Eine bestehende Datenbank &uuml;bernehmen - Phase 3
+en: Recover a database - Phase 3
+es: Recuperar una base - Fase 3
+fr: R&eacute;cup&eacute;rer une base - Phase 3
+lv: Datu bâzes atjauninâðana - 3. fâze
+sv: Återskapa en databas - fas 3
+]</title>
+</head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>[
+de: Eine bestehende Datenbank &uuml;bernehmen
+en: Recover a database
+es: Recuperar una base
+fr: R&eacute;cup&eacute;rer une base
+lv: Datu bâzes atjauninâðana - 2. fâze
+sv: Återskapa en databas
+]</font></h1></center>
+
+<br><p>
+
+$v{[
+de: <b>Warnung:</b> Im <a href="gwsetup?lang=$l;v=list.htm">Zielverzeichnis</a>
+    existiert bereits eine Datenbank mit dem Namen "$o".
+    Wenn du den "Ok"-Knopf dr&uuml;ckst, wird sie gel&ouml;scht.<p>
+    Falls du diese Funktion gerade schonmal ausgef&uuml;hrt hattest, dann
+    war diese Datenbank wahrscheinlich das Ergebnis und daher kann dieser
+    Fehler hier ignoriert werden. Andernfalls kehre auf die vorherige Seite
+    zur&uuml;ck und w&auml;hle einen anderen Namen f&uuml;r deine Datenbank.
+en: Warning: there already exists a database named "$o" in the
+    <a href="gwsetup?lang=$l;v=list.htm">destination directory</a>. If you
+    push the button below, it will be erased. If you just made this
+    handling, it is probably its result, therefore it is not important.
+    Otherwise, go back and choose another name for your database.
+es: Atenci&oacute;n: una base que tiene por nombre "$o" ya existe en
+    la <a href="gwsetup?lang=$l;v=list.htm">carpeta de destinaci&oacute;n
+    </a>. Si Ud. apoya en el bot&oacute;n de la parte inferior; el fichero
+    ser&aacute; borrado. Si Ud. viene de realizar esta manipulaci&oacute;n,
+    debe tratarse probablemente de su resultado, entonces no hay
+    ning&uacute;n problema. En caso contrario; regrese a la p&aacute;gina
+    anterior y escoja otro nombre para su base.
+fr: <b>Attention</b>: il existe d&eacute;j&agrave; une base de nom "$o" dans
+    le <a href="gwsetup?lang=$l;v=list.htm">r&eacute;pertoire
+    d'arriv&eacute;e</a>. Si vous appuyez sur le bouton ci-dessous, cela
+    va l'effacer. Si vous venez d&eacute;j&agrave; de faire cette
+    manipulation, il s'agit probablement de son r&eacute;sultat, ce n'est
+    donc pas grave. Sinon, revenez en arri&egrave;re et choisissez un
+    autre nom pour votre base.
+lv: Brîdinâjums: datu bâze ar nosaukumu "$o" jau eksistç
+    <a href="gwsetup?lang=$l;v=list.htm">dotajâ katalogâ</a>. Ja Jûs
+    nospiedîsiet zemâk esoðo podziòu ðî datu bâze tiks izdzçsta. Iespçjams,
+    ka Jûs jau to esiet izveidojuði. Esiet uzmanîgi. Ja nepiecieðams,
+    atgriezieties iepriekðçjâs lapâs un izvçlieties citu datu bâzes nosaukumu.
+sv: Varning: det finns redan en databas benämnd "$o" i
+    <a href="gwsetup?lang=$l;v=list.htm">målkatalogen</a>. Om du
+    trycker på knappen nedan kommer den att raderas.
+    Om du inte vill det, gå tillbaka och välj ett annat namn för din databas.
+]<p>}
+
+[
+de: Startverzeichnis und Datenbank:
+en: Starting directory and database:
+es: Carpeta y base inicial:
+fr: R&eacute;pertoire et base de d&eacute;part:
+lv: Vecâs datu bâzes katalogs un datu bâze:
+sv: Startkatalog och databas:
+]
+
+<pre>
+  $a
+  $i
+</pre>
+
+[
+de: Zielverzeichnis und Datenbank:
+en: Destination directory and database:
+es: Carpeta y base final:
+fr: R&eacute;pertoire et base d'arriv&eacute;e:
+lv: Jaunais datu bâzes katalogs un datu bâze:
+sv: Målkatalog och databas:
+]
+
+<pre>
+  $w
+  $o
+</pre>
+
+<p>
+
+[
+de: Warnung: Je nach Fall kann diese Operation 
+    einige Sekunden oder Minuten ben&ouml;tigen. Bitte habe Geduld.
+en: Warning: the operation can take several seconds or minutes, depending
+    on the case. Be patient.
+es: Atenci&oacute;n: la operaci&oacute;n puede tomar algunos segundos o
+    algunos minutos, de acuerdo al caso. Sea paciente
+fr: Attention: l'op&eacute;ration peut prendre quelques secondes ou
+    quelques minutes, suivant les cas. Soyez patient.
+lv: Brîdinâjums: Atkarîbâ no apstakïiem atjauninâðana var ilgt no daþâm
+    sekundçm lîdz minûtçm. Esiet pacietîgs.
+sv: Varning: operationen kan ta flera sekunder eller minuter, beroende på fall.
+    Ha tålamod.
+]
+
+<p>
+
+[
+de: Dr&uuml;cke den Knopf, um die Operation zu starten
+en: Push the below button to launch the operation
+es: Apoye en el bot&oacute;n siguiente para lanzar la operaci&oacute;n
+fr: Appuyez sur le bouton ci-dessous pour lancer l'op&eacute;ration
+lv: Nospiediet zemâk esoðo podziòu, lai uzsâktu datu bâzes atjauninâðanu
+sv: Tryck på knappen nedan för att starta operationen
+]$v{[
+de:  und die Datenbank "$o" im Zielverzeichnis zu l&ouml;schen
+en: , and overwrite the database "$o" of the destination directory
+es:  y destruir la "$o" de la carpeta final
+fr:  et &eacute;craser la base "$o" du r&eacute;pertoire d'arriv&eacute;e
+lv: , un pârrakstîtu datu bâzi "$o" mçría katalogâ
+sv:  och radera databasen "$o" i målkatalogen
+]}:
+
+<p>
+
+<form method=POST action="recover_2">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+[
+de: Zu deiner Information: Diese Funktion entspricht der Ausf&uuml;hrung
+    der folgenden Kommandos:
+en: For information, this operation corresponds to the following commands:
+es: Por informaci&oacute;n esta operaci&oacute;n corresponde a la ejecuci&oacute;n de los comandos
+    siguientes:
+fr: Pour information, cette op&eacute;ration correspond &agrave; la suite
+    des commandes suivantes:
+lv: Informâcijai: ðî darbîba atbilst sekojoðâm komandâm:
+sv: Denna operation motsvarar de följande kommandona:
+]
+
+<pre>
+     $$ cd $a
+     $$ .$/$U $i $O $w$/$T
+     $$ cd $w
+     $$ $x$/$C $T -f -o $o > comm.log
+</pre>
