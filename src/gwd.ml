@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.45 1999-09-23 13:44:01 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.46 1999-09-26 19:24:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -510,7 +510,9 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
   in
   let user =
     match lindex user ':' with
-    [ Some i -> String.sub user 0 i
+    [ Some i ->
+        let s = String.sub user 0 i in
+        if s = wizard_passwd || s = friend_passwd then "" else s
     | None -> "" ]
   in
   let cancel_links =
