@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.192 2004-03-02 11:50:39 ddr Exp $
+# $Id: lexicon.txt,v 4.193 2004-03-02 18:17:09 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2266,7 +2266,7 @@ zh:  ³öÉúÓÚ½ñÈÕµÄ¼ÇÂ¼
     border
 bg: ğàìêà
 br: bord 
-ca: vora
+ca: contorn
 da: ramme
 de: Rand
 en: border
