@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.8 2001-03-25 18:33:31 ddr Exp $ *)
+(* $Id: relation.ml,v 4.9 2001-03-26 21:04:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -584,41 +584,6 @@ value print_shortest_path conf base p1 p2 =
         return () ]
 ;
 
-value parents_label conf =
-  fun
-  [ 1 -> transl conf "the parents"
-  | 2 -> transl conf "grand-parents"
-  | 3 -> transl conf "great-grand-parents"
-  | n ->
-      transl conf "ancestors (some)" ^ " " ^
-        Printf.sprintf (ftransl conf "of the %s generation")
-          (transl_nth conf "nth (generation)" n) ]
-;
-
-value parent_in_law_label conf sex =
-  let is = index_of_sex sex in
-  transl_nth conf "the father-in-law/the mother-in-law" is
-;
-
-value ancestor_label conf x sex =
-  let is = index_of_sex sex in
-  match x with
-  [ 1 -> transl_nth conf "the father/the mother/a parent" is
-  | 2 -> transl_nth conf "a grandfather/a grandmother/a grandparent" is
-  | 3 ->
-      transl_nth conf
-        "a great-grandfather/a great-grandmother/a great-grandparent" is
-  | n ->
-      transl_nth conf "an ancestor" is ^ " " ^
-        Printf.sprintf (ftransl conf "of the %s generation")
-          (transl_nth conf "nth (generation)" n) ]
-;
-
-value child_in_law_label conf sex =
-  let is = index_of_sex sex in
-  transl_nth conf "a son-in-law/a daughter-in-law" is
-;
-
 value nb_fields s =
   loop 1 0 where rec loop cnt i =
     if i == String.length s then cnt
@@ -655,6 +620,50 @@ value get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
                   else loop2 ipl
               | [] -> loop1 ifaml ]
         | [] -> [] ]
+;
+
+value parents_label conf =
+  fun
+  [ 1 -> transl conf "the parents"
+  | 2 -> transl conf "grand-parents"
+  | 3 -> transl conf "great-grand-parents"
+  | n ->
+      transl conf "ancestors (some)" ^ " " ^
+        Printf.sprintf (ftransl conf "of the %s generation")
+          (transl_nth conf "nth (generation)" n) ]
+;
+
+value parent_in_law_label conf sex =
+  let is = index_of_sex sex in
+  transl_nth conf "the father-in-law/the mother-in-law" is
+;
+
+value ancestor_label conf base info x sex =
+  let is = index_of_sex sex in
+  match x with
+  [ 1 -> transl_nth conf "the father/the mother/a parent" is
+  | 2 ->
+      let txt = transl conf "a grandfather/a grandmother/a grandparent" in
+      let is =
+        if nb_fields txt = 6 then
+          match get_piece_of_branch conf base info (1, 1) with
+          [ [ip1] -> if (poi base ip1).sex = Male then is else is + 3
+          | _ -> (* must be a bug *) is ]
+        else is
+      in
+      nth_field txt is
+  | 3 ->
+      transl_nth conf
+        "a great-grandfather/a great-grandmother/a great-grandparent" is
+  | n ->
+      transl_nth conf "an ancestor" is ^ " " ^
+        Printf.sprintf (ftransl conf "of the %s generation")
+          (transl_nth conf "nth (generation)" n) ]
+;
+
+value child_in_law_label conf sex =
+  let is = index_of_sex sex in
+  transl_nth conf "a son-in-law/a daughter-in-law" is
 ;
 
 value descendant_label conf base info x p =
@@ -761,13 +770,9 @@ value same_parents base p1 p2 =
   (aoi base p1.cle_index).parents = (aoi base p2.cle_index).parents
 ;
 
-value print_link_name conf base info n p1 p2 pp1 pp2 x1 x2 =
-(*
-  let (p2, pp2, x2, p1, pp1, x1) =
-    if p2.sex <> Neuter then (p2, pp2, x2, p1, pp1, x1)
-    else (p1, pp1, x1, p2, pp2, x2)
-  in
-*)
+value print_link_name conf base n p1 p2 sol =
+  let (pp1, pp2, (x1, x2, list), reltab) = sol in
+  let info = (reltab, list) in
   do Wserver.wprint "%s" (person_title_text conf base p2);
      Wserver.wprint " %s" (transl conf "is");
      if n > 1 then Wserver.wprint " %s" (transl conf "also") else ();
@@ -781,7 +786,9 @@ value print_link_name conf base info n p1 p2 pp1 pp2 x1 x2 =
        if x2 == 0 then
          if sp1 && x1 == 1 then
            (parent_in_law_label conf ini_p2.sex, False, sp2)
-         else (ancestor_label conf x1 p2.sex, sp1, sp2)
+         else
+           let info = ((info, x1), fun r -> r.Consang.lens1) in
+           (ancestor_label conf base info x1 p2.sex, sp1, sp2)
        else if x1 == 0 then
          if sp2 && x2 == 1 then
            (child_in_law_label conf ini_p2.sex, sp1, False)
@@ -799,9 +806,10 @@ value print_link_name conf base info n p1 p2 pp1 pp2 x1 x2 =
          (nephew_label conf (x2 - x1) p2, sp1, sp2)
        else if x2 < x1 then
          let s =
+           let info = ((info, x1), fun r -> r.Consang.lens1) in
            transl_decline2 conf "%1 of (same or greater generation level) %2"
              (brother_label conf x2 p2.sex)
-             (ancestor_label conf (x1 - x2) Neuter)
+             (ancestor_label conf base info (x1 - x2) Neuter)
          in
          (s, sp1, sp2)
        else
@@ -905,7 +913,8 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   end
 ;
 
-value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
+value print_solution_not_ancestor conf base long p1 p2 sol =
+  let (pp1, pp2, (x1, x2, list), reltab) = sol in
   let image_opt =
     match p_getenv conf.env "image" with
     [ Some "on" -> ";image=on"
@@ -960,9 +969,11 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
      in
      Wserver.wprint "%s %s\n" is_are (transl conf "at the same time");
   return
-  let lab x =
+  let lab proj x =
     match list with
-    [ [(a, _)] -> ancestor_label conf x a.sex
+    [ [(a, _)] ->
+        let info = (((reltab, list), x), proj) in
+        ancestor_label conf base info x a.sex
     | _ -> parents_label conf x ]
   in
   do tag "ul" begin
@@ -974,7 +985,9 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
            transl_decline2 conf "%1 of (same or greater generation level) %2"
              (transl_nth conf "the spouse" (1 - index_of_sex p1.sex)) s
        in
-       let s = transl_decline2 conf "%1 of %2" (lab x1) s in
+       let s =
+         transl_decline2 conf "%1 of %2" (lab (fun r -> r.Consang.lens1) x1) s
+       in
        Wserver.wprint "%s\n" (nominative s);
        html_li conf;
        let s = gen_person_title_text no_reference raw_access conf base p2 in
@@ -984,19 +997,21 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
            transl_decline2 conf "%1 of (same or greater generation level) %2"
              (transl_nth conf "the spouse" (1 - index_of_sex p2.sex)) s
        in
-       let s = transl_decline2 conf "%1 of %2" (lab x2) s in
+       let s =
+         transl_decline2 conf "%1 of %2" (lab (fun r -> r.Consang.lens2) x2) s
+       in
        Wserver.wprint "%s\n" (nominative s);
      end;
      Wserver.wprint "</ul>\n";
   return ()
 ;
 
-value print_solution conf base long n p1 p2 (pp1, pp2, (x1, x2, list), reltab)
-=
-  do print_link_name conf base (reltab, list) n p1 p2 pp1 pp2 x1 x2;
+value print_solution conf base long n p1 p2 sol =
+  let (pp1, pp2, (x1, x2, list), reltab) = sol in
+  do print_link_name conf base n p1 p2 sol;
      if x1 == 0 || x2 == 0 then
        print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
-     else print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list;
+     else print_solution_not_ancestor conf base long p1 p2 sol;
      Wserver.wprint "\n";
   return ()
 ;
