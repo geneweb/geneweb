@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 2.5 1999-07-22 14:33:59 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 2.6 1999-07-27 14:18:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -103,7 +103,7 @@ value advanced_search conf base max_answers =
         match df () with
         [ Some d when age_autorise conf base p ->
             if d strictement_avant d1 then False
-            else if d strictement_apres d2 then False
+            else if d2 strictement_avant d then False
             else True
         | _ -> False ]
     | (Some d1, _) ->
