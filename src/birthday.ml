@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.12 2000-06-03 21:08:01 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.13 2000-11-06 10:37:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -414,7 +414,7 @@ value print_menu_birth conf base =
 
 value print_menu_dead conf base =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "anniversaries of death"))
+    Wserver.wprint "%s" (capitale (transl conf "anniversaries of dead people"))
   in
   let tom = day_after conf.today in
   let aft = day_after tom in
