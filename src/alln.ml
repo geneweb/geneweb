@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 2.3 1999-06-25 09:26:26 ddr Exp $ *)
+(* $Id: alln.ml,v 2.4 1999-06-25 09:48:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -357,17 +357,24 @@ value print_alphabetic_short conf base is_surnames ini list len =
              let _ =
                List.fold_left
                  (fun first (s, cnt) ->
-                    do if first then
-                         if need_ref then Wserver.wprint "<a name=%s>" ini_k
-                         else ()
-                       else Wserver.wprint ",\n";
-                       let href =
-                         "m=" ^ mode ^ ";v=" ^ code_varenv (Name.lower s)
-                       in
-                       wprint_geneweb_link conf href
-                         (alphab_string conf is_surnames s);
+                    let href =
+                      if not conf.cancel_links then
+                        " href=" ^ commd conf ^ "\"m=" ^ mode ^ ";v=" ^
+                         code_varenv (Name.lower s) ^ "\""
+                      else ""
+                    in
+                    let name =
+                      if first && need_ref then " name=" ^ ini_k
+                      else ""
+                    in
+                    do if not first then Wserver.wprint ",\n" else ();
+                       if href <> "" || name <> "" then
+                         Wserver.wprint "<a%s%s>" href name
+                       else ();
+                       Wserver.wprint "%s" (alphab_string conf is_surnames s);
                        Wserver.wprint "(%d)" cnt;
-                       if first && need_ref then Wserver.wprint "</a>" else ();
+                       if href <> "" || name <> "" then Wserver.wprint "</a>"
+                       else ();
                     return False)
                  True l
              in ();
