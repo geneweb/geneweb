@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.146 2003-01-06 12:54:58 ddr Exp $
+# $Id: lexicon.txt,v 4.147 2003-01-08 12:54:45 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -3046,6 +3046,7 @@ sv: f&ouml;rsvunnen
 af: weergawe per gedeelte/gedeelte breedte/oorvleul/totale breedte
 bg: да се покаже на части/широчина на частите/застъпване/обща широчина
 ca: visualitzar per seccions/llargada de la secciу/encavalcament/llargada total
+cs: zobraz po segmentech/№ншka segmentu/pшekrytн/celkovб №ншka
 da: vis ved delte sider/sidebredde/overlapning/total bredde
 de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
 en: display by slices/slice width/overlap/total width
@@ -5221,6 +5222,7 @@ sv: meddelande inlagt
     message deleted
 bg: съобщението е изтрито
 ca: missatge suprimit
+cs: zprбva smazбna
 da: meddelelse slettet
 de: Nachricht gel&ouml;scht
 en: message deleted
@@ -5242,6 +5244,7 @@ sv: meddelandet borttaget
 af: boodskap/vorige boodskap/vorige boodskappe/volgende boodskap
 bg: съобщение/предходното съобщение/предходните съобщения/следващото съобщение
 ca: missatge/missate anterior//missate anterior/missate segьent
+cs: zprбva:a:-u/pшedchozн zprбva/pшedchozн zprбvy/nбsledujнcн zprбva
 da: meddelelse/foreg&aring;ende meddelelse/foreg&aring;ende meddelelse/n&aelig;ste meddelelse
 de: Nachricht/vorherige Nachricht/vorherige Nachricht/n&auml;chste Nachricht
 en: message/previous message/previous messages/next message
