@@ -2,7 +2,7 @@
 <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
 <meta NAME="GENERATOR" CONTENT="Microsoft FrontPage 3.0">
 <title>GeneWeb - GW formatet</title>
-<!-- $Id: gwformat.htm,v 1.1 2001-04-05 13:58:53 ddr Exp $ -->
+<!-- $Id: gwformat.htm,v 1.2 2001-04-13 20:11:09 ddr Exp $ -->
 <!-- Documentation written by Yann Corno, 9/23/2000 -->
 <!-- Update : 9/24/2000 - Added some Family tags -->
 <!-- Special thanks to Daniel de Rauglaudre for his help and comments -->
@@ -22,16 +22,15 @@ height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a></td>
 
 <p>&nbsp;</p>
 
-<p ALIGN="JUSTIFY">GW formatet är ett textfil format som kan be output by <b><font
-color="#2f6400">GeneWeb</font></b> using the <strong>gwu</strong> kommandot. It contains all
-the <b><font color="#2f6400">GeneWeb</font></b> database information in a way that can be
-easily parsed by other programs, or manually changed in your favorite text editor.You can
-then rebuild a database using the <strong>gwc</strong> command. The GW format is also a
-convenient way to make backup files of your database, exchange your data with other
-programs, etc.</p>
+<p ALIGN="JUSTIFY">GW formatet är ett textfil format som kan exporteras från <b><font
+color="#2f6400">GeneWeb</font></b> med hjälp av <strong>gwu</strong> kommandot. Det innehåller all
+<b><font color="#2f6400">GeneWeb</font></b> databas information i ett format som lätt kan användas
+av andra program eller ändras manuellt i din favorit texteditor. Du kan
+sedan återskapa en databas genom att använda <strong>gwc</strong> kommandot. GW formatet är
+också ett enkelt sätt att göra backup filer av din databas, byta data mellan andra program, etc.</p>
 
 <ul>
-  <li><a href="#Styles">1.</a> Styles Guide</li>
+  <li><a href="#Styles">1.</a> Stilguide</li>
   <li><a href="#Dates">2.</a> Datum</li>
   <li><a href="#Strings">3.</a> Strängar</li>
   <li><a href="#PersonRef">4.</a> Person referenser</li>
@@ -50,15 +49,15 @@ Detta kapitel har skrivits av Yann Corno.
 
 <hr>
 
-<h3 ALIGN="JUSTIFY"><font color="#2f6400"><a name="Styles">1.</a> Styles Guide</font></h3>
+<h3 ALIGN="JUSTIFY"><font color="#2f6400"><a name="Styles">1.</a> Stilguide</font></h3>
 
 <ul>
-  <li>Text that should appear &#145;as is&#146; is written in <b>bold</b> typeface.</li>
-  <li>Words in <i>italic</i> should be replaced by their actual value. Such names are
-    capitalized, e.g. <i>HusbandLastName</i></li>
-  <li>Things enclosed in [brackets] are optional : they can be omitted.</li>
-  <li><p ALIGN="JUSTIFY">Words separated by vertical bars &#145;|&#146; mean choices : one of
-    the item is to be used.</p>
+  <li>Text som ska användas &#145;som det står&#146; är skriven i <b>fet</b> stil.</li>
+  <li>Ord i <i>kursiv</i> stil ska ersättas med deras riktiga värde. Dessa namn är
+    skrivna i versaler, t.ex. <i>MakeEfternamn</i></li>
+  <li>Delar inneslutna inom [hakar] är valfria : de kan uteslutas.</li>
+  <li><p ALIGN="JUSTIFY">Ord separerade med vertikala linjer &#145;|&#146; betyder val : en av
+    delarna ska användas.</p>
   </li>
 </ul>
 <u>
@@ -67,11 +66,11 @@ Detta kapitel har skrivits av Yann Corno.
 </u>
 
 <blockquote>
-  <b><p>fam</b> <i>HusbandLastName</i> <i>FirstName</i>[<b>.</b><i>Number</i>] <b>+</b> [<i>WeddingDate</i>]
-  [<b>#mp</b> <i>WeddingPlace</i>] <i>WifeLastName</i> <i>FirstName</i>[<b>.</b><i>Number</i>]</p>
+  <b><p>fam</b> <i>MakensEfternamn</i> <i>Förnamn</i>[<b>.</b><i>Nummer</i>] <b>+</b> [<i>BröllopsDatum</i>]
+  [<b>#mp</b> <i>BröllopsPlats</i>] <i>MakansEfternamn</i> <i>Förnamn</i>[<b>.</b><i>Nummer</i>]</p>
 </blockquote>
 
-<p ALIGN="JUSTIFY">can give the following valid lines : </p>
+<p ALIGN="JUSTIFY">ger de följande raderna : </p>
 
 <dir>
   <dir>
@@ -84,16 +83,16 @@ Detta kapitel har skrivits av Yann Corno.
 
 <h3 ALIGN="JUSTIFY"><font color="#2f6400"><a name="Dates">2.</a> Datum </font></h3>
 
-<p ALIGN="JUSTIFY">Dates can be in the following formats : dd/mm/yyyy, yyyy, mm/yyyy.
-Sometimes, when you really need to give a date, but do not have one, just give 0. </p>
+<p ALIGN="JUSTIFY">Datum kan skrivas i de följande formaten : dd/mm/åååå, åååå, mm/åååå.
+Ibland, när du verkligen måste skriva ett datum, men inte har något, skriv bara 0. </p>
 
-<p>Date modifiers use special prefix characters to specify &quot;about&quot;,
-&quot;before&quot;, etc.</p>
+<p>För att specificera datum används special tecken tex. &quot;omkring&quot;,
+&quot;före&quot;, etc.</p>
 
 <table BORDER="1" CELLSPACING="2" BORDERCOLOR="#000000" CELLPADDING="4" WIDTH="445">
   <tr>
-    <td WIDTH="26%" VALIGN="TOP" BGCOLOR="#808080"><font COLOR="#ffffff"><b><p ALIGN="CENTER">Type
-    of date</b></font></td>
+    <td WIDTH="26%" VALIGN="TOP" BGCOLOR="#808080"><font COLOR="#ffffff"><b><p ALIGN="CENTER">Datum
+    specificering</b></font></td>
     <td WIDTH="28%" VALIGN="TOP" BGCOLOR="#808080"><font COLOR="#ffffff"><b><p ALIGN="CENTER">Special
     Tecken</b></font></td>
     <td WIDTH="46%" VALIGN="TOP" BGCOLOR="#808080"><font COLOR="#ffffff"><b>Exempel</b></font></td>
@@ -130,15 +129,15 @@ Sometimes, when you really need to give a date, but do not have one, just give 0
   </tr>
 </table>
 
-<p ALIGN="JUSTIFY">Type of calendar is Gregorian by default. For Julian, append
-&#145;J&#146; to the date, for French Republican use &#145;F&#146;, and for Hebrew, use
-&#145;H&#146;. Example : 10/9/5750H</p>
+<p ALIGN="JUSTIFY">Kalendern är gregoriansk som standard. För juliansk, lägg till
+&#145;J&#146; till datumet, för franska republikens använd &#145;F&#146; och för hebreisk, använd
+&#145;H&#146;. Exempel : 10/9/5750H</p>
 
-<p ALIGN="JUSTIFY">For a free &#145;text&#146; date, put 0 and use parenthesis this way : </p>
+<p ALIGN="JUSTIFY">För ett fritt "text" datum, skriv 0 och använd parenteser så här : </p>
 
 <dir>
   <dir>
-    <pre>0(5th_May_1990)</pre>
+    <pre>0(5_maj_1990)</pre>
   </dir>
 </dir>
 
@@ -146,64 +145,66 @@ Sometimes, when you really need to give a date, but do not have one, just give 0
 
 <h3><font color="#2f6400"><a name="Strings">3.</a> Strängar </font></h3>
 
-<p ALIGN="JUSTIFY">Spaces in strings are replaced by &#145;_&#146; underscores (except in
-notes and in some comments) : Marie_Julienne</p>
+<p ALIGN="JUSTIFY">Mellanslag i strängar är ersatta av "_" understrykning (underscore) (utom i
+noteringar och i vissa kommentarer) : Carl_Gustaf</p>
 
-<p ALIGN="JUSTIFY">High ASCII follow the iso-8859-1 character set.</p>
+<p ALIGN="JUSTIFY">High ASCII följer iso-8859-1 character set.</p>
 
 <hr>
 
 <h3><font color="#2f6400"><a name="PersonRef">4.</a> Person referenser</font></h3>
 
-<p ALIGN="JUSTIFY">A person can be referenced several times in a file : as a parent, as a
-child, or in a note. Last Name, First Name and number (if any) must match exactly, or the
-software will not link the pieces together.</p>
+<p ALIGN="JUSTIFY">En person kan refereras flera gånger i en fil : som en förälder, som ett
+barn eller i en notering. Efternamn, förnamn och nummer (om det finns) måste matcha exakt, annars
+kommer inte programmet att länka ihop bitarna.</p>
 
 <hr>
 
 <h3><font color="#2f6400"><a name="Family">5.</a> Huvud strukturen : Familjen</font></h3>
 
-<p>The file format is based on <b>Families</b>. A family describes the husband and wife,
-and lists the children. The personal information (DoB, etc.) is located at the children
-level. If someone does not have any parents, then its personal information is inserted
-directly after his/her name in the family line.<font COLOR="#ff0000"></p>
+<p>Filformatet är baserat på <b>Familjer</b>. En familj beskrivs som en man och hustru
+samt listar barnen. Den personliga informationen (födelsedatum, etc.) finns på barnens
+nivå. Om någon inte har föräldrar, då skrivs den personliga informationen direkt efter
+personens namn på familje raden.<font COLOR="#ff0000"></p>
 </font>
 
-<p>Note that a consequence of this is that people that are all alone in the <font
-color="#2f6400"><b>GeneWeb</b></font> database will <strong>not</strong> be exported to
-the GW file. This is how deleted persons are purged during a <strong>gwu/gwc</strong>
-sequence : they are simply not exported in the first place.</p>
+<p>Notera att en konsekvens av detta är att personer som är ensamma i <font
+color="#2f6400"><b>GeneWeb</b></font> databasen kommer <strong>inte</strong> att bli
+exporterade till GW filen. Det är så raderade personer blir rensade med en
+<strong>gwu/gwc</strong> sekvens : de är helt enkelt inte exporterade med gwc.</p>
 <u>
 
-<p>1<sup>st</sup> case :</u> both husband and wife are listed somewhere else as children
-of their parents families. 
+<p>1:a fallet :</u> både mannen och hustrun är listade någon annanstans som barn
+till deras föräldrars familjer. 
 
 <dir>
-  <p><b>fam</b> <i>HusbandLastName</i> <i>FirstName</i>[<b>.</b><i>Number</i>] <b>+</b>[<i>WeddingDate</i>]
-  [<strong>#sep</strong><b> | -</b> <i>DivorceDate</i>] [<b>#nm</b> | <strong>#eng</strong>]
-  [<b>#mp</b> <i>WeddingPlace</i>] [<b>#ms</b> WeddingSource] <i>WifeLastName</i> <i>FirstName</i>[<b>.</b><i>Number</i>]<br>
-  [<b>src</b> <i>Family source</i>]<br>
-  [<b>comm</b> <i>Family comments in free format</i>]<br>
-  [<b>wit:</b> <i>Witness (use Person format, see Person Information section)</i> ]<br>
+  <p><b>fam</b> <i>MannensEfternamn</i> <i>Förnamn</i>[<b>.</b><i>Nummer</i>] <b>+</b>[<i>BröllopsDatum</i>]
+  [<strong>#sep</strong><b> | -</b> <i>Datum för skilsmässa</i>] [<b>#nm</b> | <strong>#eng</strong>]
+  [<b>#mp</b> <i>Bröllops plats</i>] [<b>#ms</b> Bröllops källa] <i>HustrunsEfternamn</i> <i>Förnamn</i>[<b>.
+  </b><i>Nummer</i>]<br>
+  [<b>src</b> <i>Familje källa</i>]<br>
+  [<b>comm</b> <i>Familje kommentarer i ett fritt format</i>]<br>
+  [<b>wit:</b> <i>Vittne (använd Person format, se Person information kapitlet)</i> ]<br>
   <b>beg<br>
-  - </b>[<b>h </b>|<b> f </b>|<b> </b>]<i> Person (see detailed description at the next
-  section</i>)<br>
+  - </b>[<b>h </b>|<b> f </b>|<b> </b>]<i> Person (se detaljerad beskrivning i nästa
+  kapitel</i>)<br>
   <b>end</b></p>
 </dir>
 
 <ul>
-  <li>If the parents are not married (relationship), insert the <b>#nm</b> tag. If they are
-    engaged, use <strong>#eng</strong>.</li>
-  <li>If the parents are separated, use <strong>#sep</strong>. Or if they are divorced, use '<strong>-</strong>'
-    instead and optionally add the divorce date just after.</li>
-  <li>If the <i>ChildLastName</i> is omitted, the Last Name of the father will be used.</li>
-  <li>The <b>src</b>, <b>comm</b> and <b>wit:</b>: tags come in separate lines, after the <b>fam</b>
-    tag. They are optional.</li>
-  <li>If the child gender is unknown, do not put anything (no &#145;h&#146; nor &#145;f&#146;)
-    after the &#145;-&#145; dash.</li>
+  <li>Om föräldrarna inte är gifta (relation), skriv in <b>#nm</b> taggen. Om de är
+    förlovade, använd <strong>#eng</strong>.</li>
+  <li>Om föräldrarna har separerat, använd <strong>#sep</strong>. Eller om de är skilda, använd
+ '<strong>-</strong>'
+    istället och eventuellt lägg till skillsmässo datumet direkt efter.</li>
+  <li>Om <i>Barnets efternamn</i> är uteslutet, kommer faderns efternamn att användas.</li>
+  <li>The <b>src</b>, <b>comm</b> och <b>wit:</b>: taggarna läggs i separata rader, efter <b>fam</b>
+    taggen. De är valfria.</li>
+  <li>Om barnets kön är okänt, skriv ingenting (inte &#145;h&#146; och inte heller &#145;f&#146;)
+    efter &#145;-&#145; strecket.</li>
 </ul>
 
-<p>If a family has no children, you can skip the whole <b>beg</b>/<b>end</b> tags sequence
+<p>Om en familj inte har några barn, kan du hoppa över hela <b>beg</b>/<b>end</b> tagg sekvensen
 : 
 
 <dir>
@@ -213,13 +214,13 @@ of their parents families.
 </dir>
 <u>
 
-<p>2<sup>nd</sup> case :</u> the husband or the wife is not listed as a child of another
-family. Simply stick all his/her personal information just like you would do it with a
-child. See the <a href="#Person">Person Information</a> section below for all details on
-personal information.</p>
+<p>2:a fallet :</u> mannen eller hustrun är inte listad som ett barn från en annan
+familj. Sätt helt enkelt personens hela person information som du skulle göra med
+ett barn. Se <a href="#Person">Person information</a> kapitlet nedan för alla detaljer om
+personlig information.</p>
 
-<p>Example : John Corno (o 1935 at Soisy, +1997) information is put directly in the family
-line, because he appears nowhere else : 
+<p>Exempel : John Corno (född 1935 i Soisy, +1997) informationen skrivs direkt i familje
+raden, därför han finns ingen annanstans : 
 
 <dir>
   <dir>
@@ -227,9 +228,9 @@ line, because he appears nowhere else :
   </dir>
 </dir>
 
-<p>If you really have no&nbsp; information on a person but his/her name, then just append
-0 to his/her name, which will serve as a blank DoB and as an indicator that the person is
-not described anywhere else : 
+<p>Om du verkligen inte har någon information om en person men du har personens namn,
+lägg då bara till 0 till personens namn. Vilket kommer att användas som ett blankt
+födelsedatum och en indikator att personen inte är beskriven någon annanstans : 
 
 <dir>
   <dir>
@@ -241,11 +242,11 @@ not described anywhere else :
 
 <h3><font color="#2f6400"><a name="Person">6.</a> Person information </font></h3>
 
-<p>Personal information can appear either on a child line in a family, or in a family line
-if the person is not listed as a child somewhere else.</p>
+<p>Person information kan finnas antingen på ett barns rad i en familj eller i en
+familje rad, om personen inte är listad som ett barn någon annanstans.</p>
 
-<p>The very minimum information for a parent is his/her Last Name and First Name, with a 0
-Date of Birth (DoB) : 
+<p>Den minsta information för en förälder är sitt Efternamn och Förnamn, med ett 0 som
+födelsedatum : 
 
 <dir>
   <dir>
@@ -253,14 +254,14 @@ Date of Birth (DoB) :
   </dir>
 </dir>
 
-<p>For children, the DoB is not compulsory (the Last Name can also be omitted : the one
-from the father will be used).</p>
+<p>För barn, är födelsedatumet inte obligatoriskt (efternamnet kan också uteslutas : faderns
+efternamn kommer att användas).</p>
 
-<p>So in other words, the DoB is compulsory only if the person is a Parent, or if the
-person has a Date of Death (DoD). In the last case, if the DoB is unknown,&nbsp; simply
-give 0.</p>
+<p>Så med andra ord, födelsedatumet är obligatoriskt endast om personen är en förälder, eller om
+personen har ett dödsdatum. I det senare fallet, om födelsedatumet är okänt, skriv helt
+enkelt 0.</p>
 
-<p>Example : Maurice, unknown DoB, died in 1935 in Caen : 
+<p>Exempel : Maurice, okänt födelsedatum, dog i 1935 i Caen : 
 
 <dir>
   <dir>
@@ -268,42 +269,41 @@ give 0.</p>
   </dir>
 </dir>
 
-<p>The complete format for a person goes as follows : 
+<p>Det kompletta formatet för en person är som följer : 
 
 <dir>
-  <i><p>LastName</i> <i>FirstName</i> [<b>{</b><i>FirstNameAlias</i><b>}</b>] [<b>#salias</b>
-  <i>SurnameAlias</i>] [<b>(</b><i>PublicName</i><b>)</b>] [<b>#image</b> <i>ImageFilePath</i>]
-  [<b>#nick</b> <i>Qualifier</i>] [<b>#alias </b><i>Alias</i>] [<i>Titles (see Title
-  section)</i>] [<b>#apubl</b> | <b>#apriv</b>] [<b>#occu</b> <i>Occupation</i>] [<b>#src</b>
-  <i>PersonSource</i>] <i>DateOfBirth</i> [<b>#bs</b> <i>BirthSource</i>] [<b>#bp</b> <i>PlaceOfBirth</i>]
-  [<b>!</b><i>BaptizeDate</i>] [<b>#pp</b> <i>BaptizePlace</i>] [<b>#ps</b> <i>BaptizeSource</i>]
-  [<i>DateOfDeath</i>] [<b>#dp</b> <i>PlaceOfDeath</i>] [<b>#ds</b> <i>DeathSource</i>] [<b>#buri
-  </b>| <b>#crem</b> [<i>BurialDate</i>]] [<b>#rp</b> <i>BurialPlace</i>] [<b>#rs</b> <i>BurialSource</i>]</p>
+  <i><p>Efternamn</i> <i>Förnamn</i> [<b>{</b><i>Förnamns alias</i><b>}</b>] [<b>#salias</b>
+  <i>Efternamns alias</i>] [<b>(</b><i>PubliktNamn</i><b>)</b>] [<b>#image</b> <i>Bildfilens sökväg</i>]
+  [<b>#nick</b> <i>Qualifier</i>] [<b>#alias </b><i>Alias</i>] [<i>Titlar (se titel
+  kapitlet)</i>] [<b>#apubl</b> | <b>#apriv</b>] [<b>#occu</b> <i>Yrke</i>] [<b>#src</b>
+  <i>Person källa</i>] <i>Födelsedatum</i> [<b>#bs</b> <i>Födelse källa</i>] [<b>#bp</b> <i>Födelse plats</i>]
+  [<b>!</b><i>Dop datum</i>] [<b>#pp</b> <i>Dop plats</i>] [<b>#ps</b> <i>Dop källa</i>]
+  [<i>Döds datum</i>] [<b>#dp</b> <i>Döds plats</i>] [<b>#ds</b> <i>Döds källa</i>] [<b>#buri
+  </b>| <b>#crem</b> [<i>Begravnings datum</i>]] [<b>#rp</b> <i>Begravnings plats</i>] [<b>#rs</b> <i>Begravnings källa</i>]</p>
 </dir>
 
 <ul>
-  <li>See the notes above about the need to provide the DoB or not.</li>
-  <li>If you don&#146;t know if the person is still living (&quot;don&#146;t know&quot; item
-    in the Death section), put a &#145;?&#146; for the DoD.</li>
-  <li>If you do know that the person is dead, but don&#146;t know the date, use &#145;0&#146;
-    as the DoD.</li>
-  <li>If the person died young, use the &#145;<b>mj</b>&#146; tag as a DoD.</li>
-  <li><b>#apubl</b> and <b>#apriv</b> control the access : Public or Private. Default is
-    nothing, which means &quot;If Titles&quot;.</li>
+  <li>Se noteringarna ovan om nödvändigheten att ange födelsedatumet.</li>
+  <li>Om du inte vet om personen forfarande lever (&quot;vet ej&quot; delen
+    i Död avdelningen), skriv ett "?" för dödsdatumet.</li>
+  <li>Om du vet att personen är död, men inte datumet, använd "0" som dödsdatum.</li>
+  <li>Om personen dog ung, använd &#145;<b>mj</b>&#146; taggen som ett dödsdatum.</li>
+  <li><b>#apubl</b> och <b>#apriv</b> kontrollerar åtkomsten : Publik eller Privat. Förvalt är
+    ingenting, vilket betyder &quot;Om titlar&quot;.</li>
 </ul>
 
-<p>To specify the different types of death, use a prefix character before the DoD :</p>
+<p>För att specificera olika sätt för en persons död, använd en prefix karaktär före dödsdatumet :</p>
 
 <table BORDER="1" CELLSPACING="2" BORDERCOLOR="#000000" CELLPADDING="4" WIDTH="445">
   <tr>
-    <td WIDTH="26%" VALIGN="TOP" BGCOLOR="#808080"><font COLOR="#ffffff"><b><p ALIGN="CENTER">Type
-    of Death</b></font></td>
+    <td WIDTH="26%" VALIGN="TOP" BGCOLOR="#808080"><font COLOR="#ffffff"><b><p ALIGN="CENTER">Döds
+   sätt</b></font></td>
     <td WIDTH="28%" VALIGN="TOP" BGCOLOR="#808080"><font COLOR="#ffffff"><b><p ALIGN="CENTER">Special
     Tecken</b></font></td>
     <td WIDTH="46%" VALIGN="TOP" BGCOLOR="#808080"><font COLOR="#ffffff"><b>Exempel</b></font></td>
   </tr>
   <tr>
-    <td WIDTH="26%" VALIGN="TOP"><p ALIGN="CENTER">Dödad</td>
+    <td WIDTH="26%" VALIGN="TOP"><p ALIGN="CENTER">Stupad</td>
     <td WIDTH="28%" VALIGN="TOP"><p ALIGN="CENTER">k</td>
     <td WIDTH="46%" VALIGN="TOP">k10/5/1990</td>
   </tr>
@@ -324,40 +324,41 @@ give 0.</p>
   </tr>
 </table>
 
-<p>Använd <b>#buri</b> för specifiera en begravd person, eller <b>#crem</b> för en kremering. The
-corresponding date is optional.</p>
+<p>Använd <b>#buri</b> för specificera en begravd person eller <b>#crem</b> för en kremering.
+Datumet är valfritt.</p>
 
 <hr>
 
 <h3><font color="#2f6400"><a name="Titles">7.</a> Titlar </font></h3>
 
-<p ALIGN="JUSTIFY">Although titles appear as just another tag in the Person line, they are
-described separately in this section for better clarity. Titles are enclosed in brackets <b>[]</b>
-(Ooops, so much for using brackets as a formatting descriptor&#133;). If there are several
-titles, they are just appended one after the other, repeating the brackets pairs.</p>
+<p ALIGN="JUSTIFY">Även om titlar listas som en vanlig tagg i person raden, beskrivs de
+separat i denna del för bättre tydlighet. Titlar är inneslutna i hakar <b>[]</b>
+(Hoppsan, så mycket för att använda hakar som en formaterings deskriptor&#133;). Om det finns flera
+titlar, är de bara tillagda en efter den andra, med en återupprepning av hak paren.</p>
 
 <blockquote>
-  <b><p ALIGN="JUSTIFY">[</b> <i>TitleName</i><b>:</b><i>Title</i><b>:</b><i>TitlePlace</i><b>:</b><i>StartDate</i><b>:</b><i>EndDate</i><b>:</b><i>Nth</i><b>]</p>
+  <b><p ALIGN="JUSTIFY">[</b> <i>Titelnamn</i><b>:</b><i>Titel</i><b>:</b><i>Titelplats</i><b>:</b><i>
+Startdatum</i><b>:</b><i>Slutdatum</i><b>:</b><i>nte</i><b>]</p>
   </b>
 </blockquote>
 
 <ul>
-  <li>Each item is separated by a &#145;:&#146; character. If no information is available, the
-    item should be empty.</li>
-  <li>The Main Title is marked by using a &#145;*&#146; character as the Title Name.</li>
+  <li>Varje del är separerad med en ":" karaktär. Om det inte finns någon information,
+    ska del vara tom.</li>
+  <li>Huvudtiteln är markerad genom att använda en "*" karaktär som titelnamn.</li>
 </ul>
 
 <hr>
 
 <h3><font color="#2f6400"><a name="Notes">8.</a> Noteringar </font></h3>
 
-<p>Notes are stored separately in the file, between <strong>notes</strong> ... <strong>end
-notes</strong> tokens :</p>
+<p>Noteringar är lagrade separat i filen, mellan <strong>notes</strong> ... <strong>end
+notes</strong> taggar :</p>
 
 <blockquote>
-  <b><p>notes</b> <i>LastName</i> <i>FirstName</i>[<b>.</b><i>Number</i>]<br>
+  <b><p>notes</b> <i>Efternamn</i> <i>Förnamn</i>[<b>.</b><i>Nummer</i>]<br>
   <b>beg<br>
-  </b><i>Notes go here in a free format<br>
+  </b><i>Noteringar skrivs här i ett fritt format<br>
   </i><b>end notes</b></p>
 </blockquote>
 
@@ -365,28 +366,28 @@ notes</strong> tokens :</p>
 
 <h3><font color="#2f6400"><a name="Relations">9.</a> Relationer </font></h3>
 
-<p>Relations are stored separately, just like notes. They reference people in a similar
-way as children in a family. In the following list, all tokens are listed alltogether,
-which in fact never happens of course.</p>
+<p>Relationer är lagrade separat, precis som noteringar. De refererar till personer på
+samma sätt som barn i en familj. I den följande listan, visas alla taggar tillsammans,
+vilket aldrig händer förstås.</p>
 
 <blockquote>
-  <b><p>rel </b><i>LastName</i> <i>FirstName</i>[<b>.</b><i>Number</i>]<br>
+  <b><p>rel </b><i>Efternamn</i> <i>Förnamn</i>[<b>.</b><i>Nummer</i>]<br>
   <b>beg<br>
-  - adop:</b> <i>AdoptiveFather</i> <b>+</b> <i>AdoptiveMother<br>
-  </i><b>- adop fath :</b> <i>AdoptiveFather<br>
-  </i><b>- adop moth :</b> <i>AdoptiveMother<br>
-  </i><b>- reco:</b> <i>RecognizingFather + RecognizingFather<br>
-  </i><b>- reco fath :</b> <i>RecognizingFather<br>
-  </i><b>- reco moth :</b><i> RecognizingMother<br>
-  </i><b>- cand:</b> <i>CandidateFather + CandidateMother<br>
-  </i><b>- cand fath :</b> <i>CandidateFather<br>
-  </i><b>- cand moth :</b><i> CandidateMother<br>
-  </i><b>- godp:</b> <i>GodFather + GodMother<br>
-  </i><b>- godp fath :</b> <i>GodFather<br>
-  </i><b>- godp moth :</b><i> GodMother<br>
-  </i><b>- fost:</b> <i>FosterFather + FosterMother<br>
-  </i><b>- fost fath :</b> <i>FosterFather<br>
-  </i><b>- fost moth :</b><i> FosterMother<br>
+  - adop:</b> <i>Adoptivfar</i> <b>+</b> <i>Adoptivmor<br>
+  </i><b>- adop fath :</b> <i>Adoptivfar<br>
+  </i><b>- adop moth :</b> <i>Adoptivmor<br>
+  </i><b>- reco:</b> <i>Erkännande far + Erkännande mor<br>
+  </i><b>- reco fath :</b> <i>Erkännande far<br>
+  </i><b>- reco moth :</b><i> Erkännande mor<br>
+  </i><b>- cand:</b> <i>Möjlig far + Möjlig mor<br>
+  </i><b>- cand fath :</b> <i>Möjlig far<br>
+  </i><b>- cand moth :</b><i> Möjlig mor<br>
+  </i><b>- godp:</b> <i>Gudfar + Gudmor<br>
+  </i><b>- godp fath :</b> <i>Gudfar<br>
+  </i><b>- godp moth :</b><i> Gudmor<br>
+  </i><b>- fost:</b> <i>Fosterfar + Fostermor<br>
+  </i><b>- fost fath :</b> <i>Fosterfar<br>
+  </i><b>- fost moth :</b><i> Fostermor<br>
   </i><b>end</b></p>
 </blockquote>
 
@@ -394,6 +395,6 @@ which in fact never happens of course.</p>
 <br>
 <center>Tillbaka till <a href="diruse.htm">bruksanvisningen</a></center>
 
-<p><hr><font size=-1><em>&copy; Copyright 2001 INRIA -
+<p><hr><font size=-1><em>&copy; Copyright INRIA 2001 -
 GeneWeb</em></font><br>
 </body>
