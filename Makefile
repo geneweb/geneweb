@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.23 2001-03-14 17:18:55 ddr Exp $
+# $Id: Makefile,v 4.0 2001-03-16 19:01:35 ddr Exp $
 
 DESTDIR=distribution
 
