@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.9 2002-01-23 11:39:51 ddr Exp $ *)
+(* $Id: family.ml,v 4.10 2002-01-30 11:49:48 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -188,7 +188,13 @@ value find_all conf base an =
           | None -> (an, ipl) ]
         else (an, ipl)
       in
-      let pl = List.map (pget conf base) ipl in
+      let pl = 
+        List.fold_left
+          (fun l ip ->
+             let p = pget conf base ip in
+             if is_hidden p then l else [p :: l])
+        [] ipl
+      in
       let spl = select_std_eq base pl an in
       let pl =
         if spl = [] then

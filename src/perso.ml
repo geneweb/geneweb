@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.28 2002-01-23 11:39:52 ddr Exp $ *)
+(* $Id: perso.ml,v 4.29 2002-01-30 11:49:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1006,7 +1006,17 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
       match get_env "rel" env with
       [ Vrel {r_fath = Some _} -> True
       | _ -> False ]
-  | "has_relations" -> p_auth && (p.rparents <> [] || p.related <> [])
+  | "has_relations" ->
+      if p_auth && conf.use_restrict then
+        let related =
+          List.fold_left
+            (fun l ip ->
+               let rp = pget conf base ip in
+               if is_hidden rp then l else [ip :: l])
+          [] p.related
+        in
+        (p.rparents <> [] || related <> [])
+      else p_auth && (p.rparents <> [] || p.related <> [])
   | "has_siblings" ->
       match a.parents with
       [ Some ifam -> Array.length (doi base ifam).children > 1
@@ -1057,6 +1067,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
   | "is_sibling_before" -> get_env "pos" env = Vstring "prev"
   | "is_private" -> p.access = Private
   | "is_public" -> p.access = Public
+  | "is_restricted" -> is_hidden p
   | "is_self" -> get_env "pos" env = Vstring "self"
   | "wizard" -> conf.wizard
   | v -> do { Wserver.wprint ">%%%s???" v; False } ]
@@ -1249,9 +1260,9 @@ and eval_foreach_child conf base env al =
            let env = [("child", Vind p a u) :: env] in
            let env = [("child_cnt", Vint (i + 1)) :: env] in
            let env =
-             if i = n - 1 then [("pos", Vstring "prev") :: env]
+             if i = n - 1 && not (is_hidden p) then [("pos", Vstring "prev") :: env]
              else if i = n then [("pos", Vstring "self") :: env]
-             else if i = n + 1 then [("pos", Vstring "next") :: env]
+             else if i = n + 1 && not (is_hidden p) then [("pos", Vstring "next") :: env]
              else env
            in
            List.iter (eval_ast conf base env) al)

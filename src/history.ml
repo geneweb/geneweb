@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.5 2002-01-10 04:13:30 ddr Exp $ *)
+(* $Id: history.ml,v 4.6 2002-01-30 11:49:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -133,7 +133,8 @@ value print_history_line conf base line wiz k i =
         in
         let not_displayed =
           match po with
-          [ Some p -> conf.hide_names && not (fast_auth_age conf p)
+          [ Some p ->
+              is_hidden p || (conf.hide_names && not (fast_auth_age conf p))
           | None -> False ]
         in
         if not_displayed then i

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.9 2002-01-20 14:03:54 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.10 2002-01-30 11:49:45 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -160,11 +160,11 @@
   <h3><font color=%highlight;>[*parents]</font></h3>
   <ul>
   <li type=%if;father.has_parents;disk%else;circle%end;>
-  %if;cancel_links;%father;
+  %if;(cancel_links or father.is_restricted);%father;
   %else;<a href="%prefix;%father.access;">%father;</a>%end;
   %father.title;%father.dates;%nl;
   <li type=%if;mother.has_parents;disk%else;circle%end;>
-  %if;cancel_links;%mother;
+  %if;(cancel_links or mother.is_restricted);%mother;
   %else;<a href="%prefix;%mother.access;">%mother;</a>%end;
   %mother.title;%mother.dates;%nl;
   </ul>
@@ -177,14 +177,14 @@
   %foreach;family;
     <li type=%if;spouse.has_parents;disk%else;circle%end;>
     %married_to;%sp;
-    %if;cancel_links;%spouse;
+    %if;(cancel_links or spouse.is_restricted);%spouse;
     %else;<a href="%prefix;%spouse.access">%spouse;</a>%end;
     %spouse.title;%spouse.dates;
     %if;has_witnesses;
       %sp;([witness/witnesses]w:
       %foreach;witness;
         %if;not is_first;, %end;
-	%if;cancel_links;%witness;
+	%if;(cancel_links or witness.is_restricted);%witness;
 	%else;<a href="%prefix;%witness.access">%witness;</a>%end;
 	%witness.title;%witness.dates;
       %end;
@@ -197,7 +197,7 @@
       <ul>
         %foreach;child;
           <li type=%if;child.has_families;disk%else;circle%end;>
-	  %if;cancel_links;%child.child_name;
+	  %if;(cancel_links or child.is_restricted);%child.child_name;
 	  %else;
 	    <a href="%prefix;%child.access;">%child.child_name;</a>
           %end;
@@ -220,7 +220,7 @@
       %child_name;%nl;
     %else;
       <li type=disk>
-      %if;cancel_links;%child.child_name;
+      %if;(cancel_links or child_is_restricted);%child.child_name;
       %else;
         <a href="%prefix;%child.access;">%child.child_name;</a>
       %end;
@@ -240,20 +240,20 @@
         %nl;
         <ul>
 	<li type=%if;relation_him.has_families;disk%else;circle%end;>
-        %if;cancel_links;%relation_him;
+        %if;(cancel_links or relation_him.is_restricted);%relation_him;
         %else;<a href="%prefix;%relation_him.access">%relation_him;</a>%end;
         %relation_him.title;%relation_him.dates;%nl;
 	<li type=%if;relation_her.has_families;disk%else;circle%end;>
-        %if;cancel_links;%relation_her;
+        %if;(cancel_links or relation_her.is_restricted);%relation_her;
         %else;<a href="%prefix;%relation_her.access">%relation_her;</a>%end;
         %relation_her.title;%relation_her.dates;%nl;
         </ul>
       %elseif;has_relation_him;:
-        %if;cancel_links;%relation_him;
+        %if;(cancel_links or relation_him.is_restricted);%relation_him;
         %else;<a href="%prefix;%relation_him.access">%relation_him;</a>%end;
         %relation_him.title;%relation_him.dates;%nl;
       %elseif;has_relation_her;:
-        %if;cancel_links;%relation_her;
+        %if;(cancel_links or relation_her.is_restricted);%relation_her;
         %else;<a href="%prefix;%relation_her.access">%relation_her;</a>%end;
         %relation_her.title;%relation_her.dates;%nl;
       %end;

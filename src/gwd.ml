@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.23 2002-01-23 18:34:41 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.24 2002-01-30 11:49:49 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -920,6 +920,11 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
          if wizard || friend then False
          else
            try List.assoc "hide_private_names" base_env = "yes" with
+           [ Not_found -> False ];
+       use_restrict =
+         if wizard || friend then False
+         else
+           try List.assoc "use_restrict" base_env = "yes" with
            [ Not_found -> False ];
        bname = base_file; env = env; senv = [];
        henv =

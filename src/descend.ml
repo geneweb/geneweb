@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.8 2002-01-23 11:39:50 ddr Exp $ *)
+(* $Id: descend.ml,v 4.9 2002-01-30 11:49:48 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -404,12 +404,15 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
     html_p conf;
     print_alphab_list conf
       (fun (p, _) ->
+         if is_hidden p then "?" else
          String.sub (p_surname base p) (initiale (p_surname base p)) 1)
       (fun (p, c) ->
          do {
            afficher_personne_titre_referencee conf base p;
            Date.afficher_dates_courtes conf base p;
-           if c > 1 then Wserver.wprint " <em>(%d)</em>" c else ();
+           if not (is_hidden p) && c > 1 then
+             Wserver.wprint " <em>(%d)</em>" c
+           else ();
            Wserver.wprint "\n"
          })
       liste;
@@ -785,11 +788,9 @@ value print_elem conf base paths precision (n, pll) =
     match pll with
     [ [[p]] ->
         do {
-          Wserver.wprint "<strong>%s " (surname_end n);
-          wprint_geneweb_link conf
-            ("i=" ^ string_of_int (Adef.int_of_iper p.cle_index))
-            (p_first_name base p);
-          Wserver.wprint "%s</strong>" (surname_begin n);
+          Wserver.wprint "<strong>%s %s %s</strong>" (surname_end n)
+            (reference conf base p (person_text_without_surname conf base p))
+            (surname_begin n);
           Date.afficher_dates_courtes conf base p;
           print_ref conf base paths p;
           Wserver.wprint "\n"

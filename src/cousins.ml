@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.7 2002-01-23 11:39:49 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.8 2002-01-30 11:49:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -137,14 +137,18 @@ value print_choice conf base p niveau_effectif =
 value cnt = ref 0;
 
 value give_access conf base ia_asex p1 b1 p2 b2 =
-  let reference _ _ _ s =
+  let reference _ _ p s =
+    if is_hidden p then s
+    else
     "<a href=\"" ^ commd conf ^ "m=RL;" ^ acces_n conf base "1" p1 ^ ";b1=" ^
       Num.to_string (Util.sosa_of_branch [ia_asex :: b1]) ^ ";" ^
       acces_n conf base "2" p2 ^ ";b2=" ^
       Num.to_string (Util.sosa_of_branch [ia_asex :: b2]) ^ ";spouse=on\">" ^
       s ^ "</a>"
   in
-  let reference_sp p3 _ _ _ s =
+  let reference_sp p3 _ _ p s =
+    if is_hidden p then s
+    else
     "<a href=\"" ^ commd conf ^ "m=RL;" ^ acces_n conf base "1" p1 ^ ";b1=" ^
       Num.to_string (Util.sosa_of_branch [ia_asex :: b1]) ^ ";" ^
       acces_n conf base "2" p2 ^ ";b2=" ^

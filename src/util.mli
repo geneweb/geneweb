@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.6 2002-01-23 11:39:57 ddr Exp $ *)
+(* $Id: util.mli,v 4.7 2002-01-30 11:49:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -27,6 +27,7 @@ value decode_varenv : string -> string;
 value hidden_env : config -> unit;
 
 value age_autorise : config -> base -> person -> bool;
+value is_old_person : config -> person -> bool;
 value fast_auth_age : config -> person -> bool;
 
 (*
@@ -43,6 +44,9 @@ value wprint_hidden_person : config -> base -> string -> person -> unit;
 
 value geneweb_link : config -> string -> string -> string;
 value wprint_geneweb_link : config -> string -> string -> unit;
+
+value is_restricted : config -> base -> iper -> bool;
+value is_hidden : person -> bool;
 
 value pget : config -> base -> iper -> person;
 value aget : config -> base -> iper -> ascend;
