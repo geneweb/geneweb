@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.10 1999-08-23 10:24:50 ddr Exp $
+# $Id: Makefile,v 1.11 1999-09-02 12:52:14 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -14,7 +14,7 @@ opt:: setup.opt
 	cp setup.opt gwsetup
 
 clean::
-	$(RM) gwsetup
+	$(RM) gwsetup gwsetup.bat
 	$(RM) -rf test
 
 test: test_dir wrappers
@@ -22,7 +22,7 @@ test: test_dir wrappers
 wrappers:
 	if test "$(CAMLP4F)" = "-DWIN95"; then \
 	  echo 'cd gw; gwd' > test/gwd.bat; \
-	  echo 'cd gw; setup' > test/setup.bat; \
+	  echo 'cd gw; gwsetup' > test/gwsetup.bat; \
 	else \
 	  echo '#!/bin/sh' > test/gwd; \
 	  echo 'cd gw; exec ./gwd' >> test/gwd; \

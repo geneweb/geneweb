@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.23 1999-09-01 13:51:32 ddr Exp $
+# $Id: Makefile,v 2.24 1999-09-02 12:54:40 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -25,7 +25,7 @@ distrib: new_distrib wrappers
 wrappers:
 	if test "$(CAMLP4F)" = "-DWIN95"; then \
 	  echo 'cd gw; gwd' > distribution/gwd.bat; \
-	  echo 'cd gw; setup' > distribution/setup.bat; \
+	  echo 'cd gw; gwsetup' > distribution/gwsetup.bat; \
 	else \
 	  echo '#!/bin/sh' > distribution/gwd; \
 	  echo 'cd gw; exec ./gwd' >> distribution/gwd; \
