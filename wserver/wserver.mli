@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 3.1 1999-12-19 09:14:15 ddr Exp $ *)
+(* $Id: wserver.mli,v 3.2 2000-01-16 10:34:51 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -55,9 +55,7 @@ value extract_param : string -> char -> list string -> string;
 
 value get_request_and_content : Stream.t char -> (list string * string);
 
-ifdef WIN95 then
 value sock_in : ref string;
-ifdef WIN95 then
 value sock_out : ref string;
 
 (* Example:
