@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.13 1999-05-12 17:24:25 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.14 1999-05-13 12:05:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -820,7 +820,10 @@ value arg_parse_in_file fname speclist anonfun errmsg =
       let list =
         let list = ref [] in
         do try
-             while True do list.val := [input_line ic :: list.val]; done
+             while True do
+               let line = input_line ic in
+               if line <> "" then list.val := [line :: list.val] else ();
+             done
            with [ End_of_file -> () ];
            close_in ic;
         return List.rev list.val
