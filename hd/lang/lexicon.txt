@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.224 2005-01-24 13:11:04 ddr Exp $
+# $Id: lexicon.txt,v 4.225 2005-02-01 10:58:09 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !charset
@@ -61,7 +61,7 @@ he: rtl
 
      !languages
 af: af=Afrikaans/ca=Catalan/cs=Czeck/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/fi=Fins/fr=Frans/he=Hibreeus/is=Yslandies/it=Italiaans/nl=Nederlands/no=Noorweegs/pl=Pools/pt=Portugees/pt-br=Portugees-in-Braziliл/ru=Russies/sv=Sweeds/zh=Chinees
-bg: af=бурски/bg=български/ca=каталонски/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lv=латвийски/nl=холандски/no=норвежки/pl=полски/pt=португалски/pt-br=бразилско-португалски/ro=румънски/ru=руски/sl=словенски/sv=шведски/zh=китайски
+bg: af=бурски/bg=български/br=бретонски/ca=каталонски/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lv=латвийски/nl=холандски/no=норвежки/pl=полски/pt=португалски/pt-br=бразилско-португалски/ro=румънски/ru=руски/sl=словенски/sv=шведски/zh=китайски
 br: af=afrikaaneg/bg=bulgareg/br=brezhoneg/ca=katalaneg/cs=tchekeg/da=daneg/de=alamaneg/en=saozneg/eo=esperanteg/es=spagnoleg/et=estonieg/fi=finneg/fr=galleg/he=hebreeg/is=islandeg/it=italianeg/lv=letoneg/nl=izelvroeg/no=norvegieg/pl=poloneg/pt=portugaleg/pt-br=portugaleg bro-Vrazil/ro=roumaneg/ru=rusianeg/sl=sloveneg/sv=svedeg/zh=sinaeg
 ca: af=africа/ca=catalа/cs=xec/da=danиs/de=alemany/en=anglиs/eo=esperanto/es=castellа/et=estу/fi=finlandиs/fr=francиs/he=hebreu/is=islandиs/it=italiа/lv=letу/nl=holandиs/no=norueg/pl=polac/pt=portuguиs/pt-br=brasiler/ru=rus/sl=eslovи/sv=suec/zh=Xinиs
 cs: af=afrikбn№tina/bg=bulhar№tina/cs=иe№tina/da=dбn№tina/de=nмmиina/en=angliиtina/eo=esperanto/es=№panмl№tina/fi=fin№tina/fr=francouz№tina/he=hebrej№tina/is=island№tina/it=ital№tina/lv=loty№№tina/nl=holand№tina/no=nor№tina/pt=portugal№tina/pt-br=brasil№tina/ru=ru№tina/sv=№vйd№tina/zh=инn№tina
