@@ -2,7 +2,7 @@ GeneWeb Version 1.11
 --------------------
 
 * General
-  - [Jan 27, 99] Added Hebrew.
+  - [Jan 27, 99] Added Hebrew (Jonathan B. Marder)
 
 * GeneWeb daemon/CGI (gwd)
   - [Jan 24, 99] Added default photo names: not necessary to specify a
