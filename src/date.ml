@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.32 2005-02-27 08:44:56 ddr Exp $ *)
+(* $Id: date.ml,v 4.33 2005-02-27 09:34:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -701,23 +701,30 @@ value print_calendar conf base =
             end;
           end;
         end;
-        let moon_txt = "new moon/first quarter/full moon/last quarter" in
+        let moon_txt =
+          "moon day/new moon/first quarter/full moon/last quarter"
+        in
+        let (mp, md) = Calendar.moon_phase_of_sdn jd in
         stag "tr" begin
           stag "td" "align=\"center\"" begin
-            match Calendar.moon_phase_of_sdn jd with
-            [ (Calendar.OrdinaryMoonDay, _) -> Wserver.wprint "&nbsp;"
-            | (Calendar.NewMoon hh mm, _) ->
-                Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
-                  (capitale (transl_nth conf moon_txt 0)) hh mm
-            | (Calendar.FirstQuarter hh mm, _) ->
+            match mp with
+            [ Calendar.OrdinaryMoonDay -> ()
+            | Calendar.NewMoon hh mm ->
                 Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
                   (capitale (transl_nth conf moon_txt 1)) hh mm
-            | (Calendar.FullMoon hh mm, _) ->
+            | Calendar.FirstQuarter hh mm ->
                 Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
                   (capitale (transl_nth conf moon_txt 2)) hh mm
-            | (Calendar.LastQuarter hh mm, _) ->
+            | Calendar.FullMoon hh mm ->
                 Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
-                  (capitale (transl_nth conf moon_txt 3)) hh mm ];
+                  (capitale (transl_nth conf moon_txt 3)) hh mm
+            | Calendar.LastQuarter hh mm ->
+                Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                  (capitale (transl_nth conf moon_txt 4)) hh mm ];
+            xtag "br";
+            stag "span" "style=\"font-size:80%%\"" begin
+              Wserver.wprint "(%s = %d)" (transl_nth conf moon_txt 0) md;
+            end;
             xtag "br";
             xtag "br";
             Wserver.wprint "%s: " (capitale (transl conf "julian day"));
