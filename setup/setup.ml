@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.47 2003-12-08 09:56:49 ddr Exp $ *)
+(* $Id: setup.ml,v 4.48 2004-02-02 11:50:40 ddr Exp $ *)
 
 open Printf;
 
@@ -413,7 +413,9 @@ value rec copy_from_stream conf print strm =
           match Stream.peek strm with
           [ Some '\n' ->
               let s = parse_upto ']' strm in
-              print (Translate.inline conf.lang '%' (macro conf) s)
+              let (s, alt) = Translate.inline conf.lang '%' (macro conf) s in
+              let s = if alt then "[" ^ s ^ "]" else s in
+              print s
           | _ ->
               let s =
                 loop 0 where rec loop len =

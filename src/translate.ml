@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: translate.ml,v 4.2 2002-11-03 20:16:09 ddr Exp $ *)
+(* $Id: translate.ml,v 4.3 2004-02-02 11:47:54 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 module Buff =
@@ -44,8 +44,8 @@ value inline lang macro_char macro s =
   let rec loop alt_version bol i =
     if i = String.length s then
       match alt_version with
-      [ Some s -> s
-      | None -> ".........." ]
+      [ Some s -> (s, True)
+      | None -> ("..........", False) ]
     else if bol then
       match skip_lang s i with
       [ Some j when s.[j] = ':' ->
@@ -72,12 +72,11 @@ value inline lang macro_char macro s =
               in
               loop 0 (j + 1)
             in
-            if curr_lang = lang then s
+            if curr_lang = lang then (s, False)
             else
               let alt_version =
                 if curr_lang = derived_lang then Some s
-                else if alt_version = None then
-                  let s = if s = "" then s else "[" ^ s ^ "]" in Some s
+                else if alt_version = None then Some s
                 else alt_version
               in
               loop alt_version True i

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.21 2004-01-08 13:30:41 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.22 2004-02-02 11:47:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -454,7 +454,7 @@ and src_translate conf base nomin strm echo mode =
   	    else loop (lev - 1) (Lbuff.store len ']') (Stream.next strm)
         | c -> loop lev (Lbuff.store len c) (Stream.next strm) ]
     in
-    let s = Translate.inline conf.lang '%' (macro conf base) s in
+    let (s, _) = Translate.inline conf.lang '%' (macro conf base) s in
     if not echo.val then ()
     else copy_from_stream conf base (Stream.of_string s) mode
   else
