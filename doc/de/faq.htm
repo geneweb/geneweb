@@ -16,6 +16,68 @@ height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </font>
 <br><br>
 
+<h4>Beim ersten Start von GeneWeb erhalte ich die Mitteilung: Cannot access
+file "start.txt".</h4>
+
+Siehe in die Dokumentation: "L&ouml;sungen zu oft auftretenden
+<a href="problem.htm">Problemen</a>".
+Wenn das nicht funktioniert, bitte mir mitteilen.
+
+<h4>Unter Windows funktioniert &uuml;berhaupt nichts!</h4>
+ 
+Ein h&auml;ufiges Problem ist, dass dein Web-Browser, wenn eine Webadresse
+ eingegeben wird (http://...), eine Verbindung zum Netzwerk aufzubauen versucht
+ und aufgibt, wenn die Modemverbindung getrennt ist. Das ist ein Fehler von
+Windows, denn da die Adresse "localhost" heisst, sollte es nicht versuchen,
+eine Verbindung aufzubauen: "localhost" hei&szlig;t "dein eigener Rechner".
+ 
+<p>
+ 
+Das h&auml;ngt damit zusammen, dass von deinem Internet-Provider eine automatische
+Verbindung installiert wurde. Diese automatische Verbindung ist verantwortlich
+f&uuml;r dieses Ph&auml;nomen. Eine L&ouml;sung ist daher,
+diese abzustellen. Suche in einem Menu, welches "Einstellungen" oder
+"Optionen" oder "Konfiguration" hei&szlig;t, nach einer Stelle, wo eine automatische
+Verbindung zu sehen ist, und trenne diese.
+ 
+<p>
+ 
+Eine andere L&ouml;sung besteht darin, einen anderen Web-Browser zu benutzen: wenn
+dein Internet-Provider den "Internet Explorer" auf dem Computer installiert hat,
+verwende Netscape. Wenn Netscape installiert wurde, verwende den Internet Explorer.
+ 
+<p>
+ 
+Eine dritte L&ouml;sung ist, das Modem w&auml;hlen zu lassen und auf die
+Internetverbindung zu warten. Funktioniert es, wenn diese aufgebaut ist? Wenn ja,
+so sind wir sicher, dass es sich um dieses Problem handelt. Wird die Modem-Verbindung
+wieder getrennt, funktioniert es meist auch weiterhin. Nat&uuml;rlich ist das
+nicht sehr zufriedenstellend, denn man muss immer erst die Internetverbindung
+aufbauen, um <font color=#2f6400><b>GeneWeb</b></font> zu nutzen, auch wenn das
+nur f&uuml;r 10 Sekunden ist.
+ 
+<p>
+ 
+Information eines Nutzers (Paul Laredo, vielen Dank an ihn):                           
+<p>
+ 
+<ol>
+ 
+<li>starte gwsetup (oder gwd)
+ 
+<li>starte deinen Web browser
+ 
+<li>stoppe die automatische Verbindung mit dem Provider
+ 
+<li>gib die Adresse des Dienstes ein
+ 
+<li>wenn eine Meldung ausgegeben wird, dass die Seite offline nicht verf&uuml;gbar
+ ist, darfst du nicht auf "offline bleiben" klicken, sondern auf "Verbinden".
+ 
+</ol>
+ 
+<p>                                                                             
+
 <h4>Meine Genealogie-Software sagt mir, da&szlig; die Datenbank 3000 Individuen
 enth&auml;lt, aber GeneWeb sagt: 3050 Individuen. Warum dieser Unterschied?</h4>
 
@@ -28,20 +90,39 @@ fehlenden Elternteilen
 (die aber existiert haben).
 
 
-<h4>Beim ersten Start von GeneWeb erhalte ich die Mitteilung: Cannot access
-file "start.txt".</h4>
-
-Siehe in die Dokumentation: "L&ouml;sungen zu oft auftretenden
-<a href="problem.htm">Problemen</a>".
-Wenn das nicht funktioniert, bitte mir mitteilen.
-
 <h4>Wenn man Verwandtschaftsbeziehungen anzeigt, fehlen einige.</h4>
 
-<font color=#2f6400><b>GeneWeb</b></font> zeigt nicht die Beziehungen an, bei denen die rechte (bzw.
-linke) Person abstammt von einer Person im linken (bzw. rechten) Zweig.
-<p>Das kommt daher, weil diese Verwandschaftsbeziehungen oft so zahlreich
-werden, da&szlig; die Anzeige unlesbar wird. Das sind trotzdem reale Verwandschaftsbeziehungen
-und diese werden bei der Blutverwandschaftsberechnung mitgez&auml;hlt.
+Um zu vermeiden, dass die Liste der Verwandtschaftsbeziehungen zu lang wird, 
+l&ouml;scht <font color=#2f6400><b>GeneWeb</b></font> einige von diesen, wenn
+das Ergebnis angezeigt wird. Daf&uuml;r wird die folgende Methode genutzt: wenn eine
+Verwandtschaftsbeziehung gefunden wird mit einem gemeinsamen Vorfahren, werden alle
+Vorfahren dieses Vorfahren von der Suche ausgenommen.
+ 
+<p>
+ 
+Eine Konsequenz diesrr S&auml;uberung ist, dass, wenn jemand nach der Berechnung
+einer Verwandtschaftsbeziehung mit einem Vorfahren fragt, dieser nur als ein Vorfahre
+angezeigt wird, auch wenn er manchmal genauso ein Cousin sein k&ouml;nnte.
+ 
+<p>
+ 
+Zum Beispiel, wenn mein Vater und meine Mutter Cousins w&auml;ren und ich nach
+der Verwandtschaftsbeziehung mit meiner Mutter suche, wird nur angezeigt,
+dass ich ihr Sohn bin, nicht dass ich der Sohn ihres Cousins bin, auch wenn
+diese Beziehung tats&auml;chlich existiert.
+ 
+<p>
+ 
+Das S&auml;ubern ist notwendig: ohne dieses wird die Anzeige - bei etwas "vermischten"
+Familien - schnell mit einer Menge Verwandtschaftsbeziehungen durchsetzt und
+eventuell unverst&auml;ndlich (ich habe das getestet).
+ 
+<p>
+ 
+Die nicht angezeigten Verwandtschaftsbeziehungen sind jedoch reale Verwandtschaftsbeziehungen
+und werden bei der Blutverwandtschaftsberechnung mit gez&auml;hlt.
+ 
+<p>                                                                             
 
 <h4>Im CGI-Modus erhalte ich immer nur die Meldung "Internal Server Error"</h4>
 
@@ -51,6 +132,163 @@ unter Unix). Dieser kann m&ouml;glicherweise "gwd" nicht starten. Kontrolliere d
 von "gwd" und allen <font color=#2f6400><b>GeneWeb</b></font>-Dateien!
 
 <p>
+<h4>Warum wird das Alter von Personen von mehr als 80 Jahren nicht angezeigt? Warum
+sind sie nicht in der Statistik der &auml;ltesten Personen?</h4>
+ 
+In <font color=#2f6400><b>GeneWeb</b></font> hat die Anzeige des Todes
+drei Zust&auml;nde: "lebend", "tot" und "unbekannt". Das Alter wird nur
+angezeigt  f&uuml;r "lebend" (noch lebende) Personen. Wenn das Alter nicht
+da ist, ist der Grund, dass entweder die Person tot ist (ohne Angabe des Datums),
+oder die Angabe ist "unbekannt".
+ 
+<p>
+ 
+Wenn diese Person mit <font color=#2f6400><b>GeneWeb</b></font> hinzugef&uuml;gt
+wurde und es wurde nicht angegeben, ob er/sie am Leben oder tot ist, oder wenn
+deine Datenbank aus einer GEDCOM-Datei stammt (die Angabe "noch lebende Person" 
+wurde nicht eingeplant im Standard GEDCOM 5.5), verwendet <font color=#2f6400><b>GeneWeb</b></font>
+den folgenden Algorithmus:
+ 
+<ul>
+ 
+<li>wenn die Person weniger als 80 Jahre alt ist, wird er/sie als "lebend" angezeigt.
+ 
+<li>wenn er/sie mehr als 120 Jahre alt ist, wird er/sie als "tot" angezeigt.
+ 
+<li>zwischen den beiden Altersstufen wird sein/ihr Alter als "unbekannt" angezeigt.
+ 
+</ul>
+ 
+Du mu&szlig;t diese Angaben korrigieren, wenn sie inkorrekt sind.                         
+<p>
+ 
+<h4>Die Personen, welche ein ? (Fragezeichen) als Vorname und/oder Nachname
+haben, scheinen eine besonderen Status zu haben. Welchen und warum?</h4>
+ 
+Diese Personen werden von <font color=#2f6400><b>GeneWeb</b></font> als "totes Ende" 
+betrachtet: wenn es Kinder sind, k&ouml;nnen sie keine Ehegatten sein,
+wenn sie Ehegatten sind, k&ouml;nnen sie keine Eltern haben.  Und sie k&ouml;nnen
+keine verkn&uuml;pften Notizen haben.
+ 
+<p>
+ 
+Weiterhin, wenn sie Ehegatten sind, werden sie nicht in die GEDCOM-Dateien
+exportiert, und ihre pers&ouml;nlichen Informationen (wenn vorhanden) gehen
+konsequent verloren.
+ 
+<p>
+ 
+Es ist manchmal - durch Hacken - m&ouml;glich, ihnen Notizen zu geben oder
+sie zu verbinden, aber Vorsicht: beim ersten Aufr&auml;umen der Datenbank
+verschwinden dies Notizen und die Verbindungen: Es ist daher angeraten, dies
+nicht zu tun.
+ 
+<p>
+ 
+Der Vor-/Nachname "?" ist "reserviert" in <font color=#2f6400><b>GeneWeb</b></font>, Du
+darfst daher Personen nicht so benennen wenn du willst, dass diese Personen
+zum Rest der Datenbank verbindbar sind oder Notizen oder Beziehungen
+zugewiesen werden k&ouml;nnen (Taufeltern, Adoptiveltern oder Kinder usw.).
+Die L&ouml;sung besteht darin, diese Personen zu editieren und ihre Vor- oder
+Nachnamen zu etwas anderem zu &auml;ndern: trage "N", "Ne", "N...", "x",
+"??" oder was du willst ein, aber nicht nur "?".
+ 
+<p>
+
+<h4>K&ouml;nnte die "Erweiterte Suche" durch dies oder jenes verbessert werden? </h4>
+ 
+Die "erweiterte Suche" ist ein Hack, den ich programmiert habe, der aber
+nicht sehr zufriedenstellend ist. Da <font color=#2f6400><b>GeneWeb</b></font> kein richtiges
+Datenbanksystem verwendet, w&uuml;rde jede Verbesserung dieses Teils darin
+bestehen, ein neues Datenbanksystem zu programmieren, was ich nicht vor habe zu machen,
+weil das eine riesige Arbeit ist.
+ 
+<p>
+ 
+Wenn <font color=#2f6400><b>GeneWeb</b></font> eines Tages ein richtiges
+Datenbanksystem verwendet (das ist eine der m&ouml;glichen Richtungen), wird
+die erweiterte Suche vermutlich umgeschrieben und viel leistungsf&auml;higer
+und leicht zu verwenden sein.
+ 
+<p>
+ 
+<h4>W&auml;re es m&ouml;glich, eine komplette Anzeige der Vorfahren zu haben, wenn
+auch mit Wiederholungen der Sosa-Nummern?</h4>
+ 
+Ich wei&szlig;, dass das n&uuml;tzlich w&auml;re, aber es gibt da gro&szlig;e Probleme. Ich
+habe bereits mit diesem Feature experimentiert, aber mir wurde klar, dass f&uuml;r Personen,
+die viele Vorfahren haben, die Anzeige voll mit Referenzen zu anderen Vorfahren 
+und unlesbar wird. Au&szlig;erdem verursacht das mehr Berechnungen ("exponentialer Algorithmus").
+ 
+<p>
+ 
+Wenn du wissen willst, ob eine Vorfahrenlinie komplett ist, sieh auf das umgekehrte Problem
+unter Verwendung der "fehlenden Vorfahren".
+ 
+<p>                                                                             
+
+<h4>Was ist die Konvention f&uuml;r die Anzeige des Kurzdatums?</h4>
+ 
+<pre>
+     Schmidt 1935-1950 = geboren in 1935, gestorben in 1950
+     Schmidt 1935-     = geboren in 1935, nicht tot (noch lebend)
+     Schmidt 1935 +    = geboren in 1935, gestorben mit unbekanntem Datum
+     Schmidt *1935     = geboren in 1935, unbekannt ob tot oder nicht
+     Schmidt +1950     = gestorben in 1950, unbekanntes Geburtsdatum
+ 
+        /1935        = vor 1935
+        1935/        = nach 1935
+        ca 1935      = um 1935
+                       vermutlich in 1935
+        1935/1938    = in 1935 oder in 1938
+                       zwischen 1935 und 1938
+</pre>
+ 
+Diese Konvention bezieht sich nicht auf einen spezifischen "Standard". Wenn du eine
+bessere, besser bekannte, standardm&auml;&szlig;igere Konvention kennst, z&ouml;gere nicht,
+mir das mitzuteilen. Danke.
+ 
+<h4>W&auml;re es m&ouml;glich, mehr Information &uuml;ber Personen in
+den "Familien"-Aktualisierungsformularen anzugeben, um schneller zu werden?</h4>
+ 
+Das w&auml;re sicherlich nett, aber ich mag keine Dinge mehr hinzuf&uuml;gen.
+Je mehr ich hinzuf&uuml;ge, um so mehr fragen mich die Leute danach. Am Anfang
+habe ich nur den Namen der Person eingetragen, dann wurde ich gefragt, die Daten
+einzutragen, ich trug die Daten ein, dann die Orte, ich trug die Orte ein, dann
+fragten mich die Leute nach der Datumsgenauigkeit, der Besch&auml;ftigung usw.
+All diese Informationen vergr&ouml&szlig;ern dieses Familienformular,
+welches wirklich schon ziemlich kompliziert ist.
+ 
+<p>
+                                                                                
+Ich wei&szlig;, dass es erm&uuml;dend ist, zum "Personen"-Formular zur&uuml;ckzugehen
+f&uuml;r jede hinzugef&uuml;gte Person, aber ich bin nicht sicher, ob es eine gute
+L&ouml;sung ist, wieder und wieder Dinge hinzuzuf&uuml;gen. Das ist auch ein
+HTML-eigenes Problem, da HTML nicht sehr "dynamisch" ist. Ich bin jedoch pers&ouml;nlich
+gegen L&ouml;sungen, die Java verwenden (Risiko von Sicherheitsl&ouml;chern)
+und JavaScript (unter anderem eine Sprache, die  - neben anderen Problemen - f&uuml;r
+Werbung vereinnahmt wird). Andere L&ouml;sungen werden studiert, sind aber nicht
+einfach zu implementieren.
+ 
+<h4>In einem Aktualisierungsformular habe ich einige Felder ausgef&uuml;llt,
+aber sie verschwinden</h4>
+ 
+Einige Felder werden nur in manchen F&auml;llen in Betracht gezogen. Wenn eine
+Person als "lebend" gekennzeichnet ist, werden die Felder "Datum" und 
+"Ort" des Todes ignoriert. Ist in einem "Familien"-Formular das Feld "getrennt lebend" 
+ausgew&auml;hlt, wird das Feld "Scheidungsdatum" ignoriert. Wenn die Anzeige einer Person
+auf "Verbinden" (anstelle von "Erzeugen") steht, werden die Felder zu Geschlecht,
+Datum und Ort ignoriert. Usw.
+ 
+<p>
+ 
+Im allgemeinen werden bei dieser Art von Formularen die Auswahlen bewertet oder
+verworfen, wenn man diese oder jene Taste dr&uuml;ckt. Es ist nicht m&ouml;glich,
+so etwas zu programmieren, entsprechend der Tatsache, dass <font color=#2f6400><b>GeneWeb</b></font>
+auf pures HTML limitiert ist: JavaScript sollte verwendet werden, was aber meinen
+Prinzipien wiederspricht (siehe die Frage zum Familien-Aktualisierungsformular).
+ 
+<p>                                                                                                                                                             
 <hr>
 <br>
 <center>
