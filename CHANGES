@@ -1,6 +1,10 @@
 GeneWeb version 2.06
 --------------------
 
+* GeneWeb Daemon/CGI (gwd)
+  - [Aug 8, 99] Added option "-redirect" to say that the address of the
+    GeneWeb service has been redirected to some other address.
+
 GeneWeb version 2.05
 --------------------
 
