@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.1 2001-03-31 08:26:57 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.2 2001-04-09 18:14:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -476,7 +476,7 @@ value effective_mod conf base sp =
   let created_p = ref [] in
   let np =
     map_person_ps (Update.insert_person conf base sp.psources created_p)
-      (Update.insert_string conf base) sp
+      (Update.insert_string base) sp
   in
   do np.related := op.related; return
   let op_misc_names = person_misc_names base op in
@@ -500,7 +500,7 @@ value effective_add conf base sp =
   let created_p = ref [] in
   let np =
     map_person_ps (Update.insert_person conf base sp.psources created_p)
-      (Update.insert_string conf base) sp
+      (Update.insert_string base) sp
   in
   let na = {parents = None; consang = Adef.fix (-1)} in
   let nu = {family = [| |]} in
@@ -524,8 +524,8 @@ value array_except v a =
 ;
 
 value effective_del conf base p =
-  let none = Update.insert_string conf base "?" in
-  let empty = Update.insert_string conf base "" in
+  let none = Update.insert_string base "?" in
+  let empty = Update.insert_string base "" in
   let asc = aoi base p.cle_index in
   do match asc.parents with
      [ Some ifam ->

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.0 2001-03-16 19:35:07 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.1 2001-04-09 18:14:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -296,7 +296,7 @@ value infer_origin_file conf base ifam ncpl ndes =
       | _ ->
           loop 0 where rec loop i =
             if i == Array.length ndes.children then
-              Update.insert_string conf base ""
+              Update.insert_string base ""
             else
               let cifams = (uoi base ndes.children.(i)).family in
               if Array.length cifams == 0 then loop (i + 1)
@@ -350,7 +350,7 @@ value effective_mod conf base sfam scpl sdes =
   in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)
-      (Update.insert_string conf base) sfam
+      (Update.insert_string base) sfam
   in
   let ndes =
     map_descend_p (Update.insert_person conf base psrc created_p) sdes
@@ -454,7 +454,7 @@ value effective_add conf base sfam scpl sdes =
   in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)
-      (Update.insert_string conf base) sfam
+      (Update.insert_string base) sfam
   in
   let ndes =
     map_descend_p (Update.insert_person conf base psrc created_p) sdes
@@ -554,7 +554,7 @@ value effective_del conf base fam =
      cpl.mother := Adef.iper_of_int (-1);
      fam.witnesses := [| |];
      des.children := [| |];
-     fam.comment := Update.insert_string conf base "";
+     fam.comment := Update.insert_string base "";
      fam.fam_index := Adef.ifam_of_int (-1);
      base.func.patch_family ifam fam;
      base.func.patch_couple ifam cpl;
