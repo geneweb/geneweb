@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.19 1999-07-22 14:34:05 ddr Exp $ *)
+(* $Id: family.ml,v 2.20 1999-07-29 16:02:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -215,16 +215,14 @@ value precisez conf base n pl =
 
 value set_senv conf vm vi =
   do conf.senv := [("em", vm); ("ei", vi)];
-     if conf.cancel_links then conf.senv := conf.senv @ [("cgl", "on")]
-     else ();
      match p_getenv conf.env "long" with
      [ Some "on" -> conf.senv := conf.senv @ [("long", "on")]
      | _ -> () ];
      match p_getenv conf.env "opt" with
      [ Some "spouse" -> conf.senv := conf.senv @ [("opt", "spouse")]
      | _ -> () ];
-     match p_getenv conf.env "cglb" with
-     [ Some "on" -> conf.senv := conf.senv @ [("cglb", "on")]
+     match p_getenv conf.env "cgl" with
+     [ Some "on" -> conf.senv := conf.senv @ [("cgl", "on")]
      | _ -> () ];
   return ()
 ;
