@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.87 2001-01-29 17:15:25 ddr Exp $ *)
+(* $Id: util.ml,v 3.88 2001-01-30 13:05:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -180,13 +180,13 @@ value age_autorise conf base p =
        p.death, date_of_death p.death)
     with
     [ (_, _, NotDead, _) when conf.private_years > 0 -> False
-    | (_, _, _, Some (Dgreg d _)) ->
-        let a = temps_ecoule d conf.today in
-        a.year > conf.private_years
     | (Some (Dgreg d _), _, _, _) ->
         let a = temps_ecoule d conf.today in
         a.year > conf.private_years
     | (_, Some (Dgreg d _), _, _) ->
+        let a = temps_ecoule d conf.today in
+        a.year > conf.private_years
+    | (_, _, _, Some (Dgreg d _)) ->
         let a = temps_ecoule d conf.today in
         a.year > conf.private_years
     | _ ->
@@ -212,13 +212,13 @@ value fast_auth_age conf p =
        p.death, date_of_death p.death)
     with
     [ (_, _, NotDead, _) when conf.private_years > 0 -> False
-    | (_, _, _, Some (Dgreg d _)) ->
-        let a = temps_ecoule d conf.today in
-        a.year > conf.private_years
     | (Some (Dgreg d _), _, _,  _) ->
         let a = temps_ecoule d conf.today in
         a.year > conf.private_years
     | (_, Some (Dgreg d _), _, _) ->
+        let a = temps_ecoule d conf.today in
+        a.year > conf.private_years
+    | (_, _, _, Some (Dgreg d _)) ->
         let a = temps_ecoule d conf.today in
         a.year > conf.private_years
     | _ -> False ]
