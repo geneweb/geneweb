@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.23 2005-03-13 13:31:31 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.24 2005-03-17 10:36:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -552,17 +552,13 @@ value print_two_branches_with_table conf base info =
     end;
     tag "tr" "align=\"%s\"" "left" begin
       stagn "td" "align=\"%s\"" conf.right begin
-        stagn "div" "style=\"margin-%s:50%%\"" conf.left begin
-          xtag "hr";
-        end;
+        xtag "hr" "dir=\"ltr\" width=\"50%%\" align=\"%s\"" conf.right;
       end;
       stagn "td" begin
         xtag "hr";
       end;
       stagn "td" "align=\"%s\"" conf.left begin
-        stagn "div" "style=\"margin-%s:50%%\"" conf.right begin
-          xtag "hr";
-        end;
+        xtag "hr" "dir=\"ltr\" width=\"50%%\" align=\"%s\"" conf.left;
       end;
     end;
     print_both_branches conf base info info.b1 info.b2;
