@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.116 1999-09-08 10:46:31 ddr Exp $
+# $Id: lexicon.txt,v 2.117 1999-09-10 12:05:29 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1180,7 +1180,7 @@ pt: cancelar os links Geneweb
 se: utan GeneWeb l&auml;nkar
 
     candidate father/candidate mother/candidate parents
-de: m&ouml;gliches Vater/m&ouml;gliche Mutter/m&ouml;glichen Eltern
+de: m&ouml;gliches Vater/m&ouml;gliche Mutter/m&ouml;gliche Eltern
 dk: mulig fader/mulig moder/mulige for&aelig;ldre
 en: candidate father/candidate mother/candidate parents
 es: padre posible/madre posible/padres posibles
@@ -4254,6 +4254,7 @@ pt: total
 se: totalt
 
     tree
+de: Baum
 dk: tr&aelig;
 en: tree
 fr: arbre
