@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.6 2005-02-22 17:54:30 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.7 2005-02-23 10:31:24 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -128,6 +128,7 @@ sv: Du kan välja ett annat språk bland de följande:
 
 <p>[
 af: Die databasis <span class="highlight">"%t"</span> bevat tans %n persone.
+ar: قاعدة المعلومات <span class="highlight">"%t"</span> تحوي إلى يومنا %n فرد
 bg: Базата от данни <span class="highlight">"%t"</span> в момента съдържа
     сведения за %n души.
 br: Niver an dud a zo er bon roadoù <span class="highlight">"%t"</span>
