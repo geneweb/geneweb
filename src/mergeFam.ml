@@ -1,11 +1,33 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 2.1 1999-03-08 11:18:52 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 2.2 1999-03-20 10:59:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;
 open Util;
 open Gutil;
+
+value need_differences_selection conf base fam1 fam2 =
+  let need_selection proj =
+    let x1 = proj fam1 in
+    let x2 = proj fam2 in
+    x1 <> "" && x2 <> "" && x1 <> x2
+  in
+  need_selection
+    (fun fam ->
+       match Adef.od_of_codate fam.marriage with
+       [ None -> ""
+       | Some d -> Date.string_of_ondate conf d ])
+  || need_selection (fun fam -> sou base fam.marriage_place)
+  || need_selection
+       (fun fam ->
+          match fam.divorce with
+          [ NotDivorced -> ""
+          | Divorced cod ->
+              match Adef.od_of_codate cod with
+              [ Some d -> Date.string_of_ondate conf d
+              | None -> "" ] ])
+;
 
 value print_differences conf base branches fam1 fam2 =
   let string_field str_orig title name proj =
@@ -79,7 +101,10 @@ value merge_fam conf base fam1 fam2 =
   let cpl1 = coi base fam1.fam_index in
   let cpl2 = coi base fam2.fam_index in
   if cpl1.father = cpl2.father && cpl1.mother = cpl2.mother then
-    merge_fam1 conf base fam1 fam2
+    if need_differences_selection conf base fam1 fam2 then
+      merge_fam1 conf base fam1 fam2
+    else
+      MergeFamOk.print_merge conf base
   else incorrect_request conf
 ;
 
