@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.0 2001-03-16 19:32:05 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.1 2001-03-23 09:44:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -30,6 +30,8 @@ value extract_first_names = ref False;
 value extract_public_names = ref True;
 value charset_option = ref None;
 value charset = ref Ascii;
+value alive_years = ref 80;
+value dead_years = ref 120;
 value try_negative_dates = ref False;
 value no_negative_dates = ref False;
 value month_number_dates = ref NoMonthNumberDates;
@@ -722,8 +724,8 @@ value infer_death birth =
   match birth with
   [ Some (Dgreg d _) ->
       let a = this_year - d.year in
-      if a > 120 then DeadDontKnowWhen
-      else if a <= 80 then NotDead
+      if a > dead_years.val then DeadDontKnowWhen
+      else if a <= alive_years.val then NotDead
       else DontKnowIfDead
   | _ -> DontKnowIfDead ]
 ;
@@ -2270,6 +2272,22 @@ value output_command_line bname =
   return ()
 ;
 
+value set_undefined_death_interval s =
+  try
+    match Stream.of_string s with parser
+      [: a = number 0; `'-'; b = number 0 :] ->
+do Printf.eprintf "ay %s dy %s\n" a b; flush stderr; return
+        let a = if a = "" then alive_years.val else int_of_string a in
+        let b = max a (if b = "" then dead_years.val else int_of_string b) in
+        do alive_years.val := a;
+           dead_years.val := b;
+do Printf.eprintf "ay %d dy %d\n" a b; flush stderr; return ();
+        return ()
+  with
+  [ Stream.Error _ -> raise (Arg.Bad "bad parameter for -udi")
+  | e -> raise e ]
+;
+
 (* Main *)
 
 value out_file = ref "a";
@@ -2346,6 +2364,15 @@ value speclist =
 - No negative dates -
        Don't interpret a year preceded by a minus sign as a negative year"
       );
+   ("-udi", Arg.String set_undefined_death_interval,
+    "x-y   \
+- Undefined death interval -
+       Set the interval for persons whose death part is undefined:
+       - if before x years, they are considered as alive
+       - if after y year, they are considered as death
+       - between x and y year, they are considered as \"don't know\"
+       Default x is " ^ string_of_int alive_years.val ^ " and y is " ^
+       string_of_int dead_years.val);
    ("-uin", Arg.Set untreated_in_notes,
     " \
 - Untreated in notes -
