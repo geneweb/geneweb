@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.33 1999-02-02 10:23:46 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.34 1999-02-03 10:59:43 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1107,6 +1107,7 @@ do Printf.printf "%s %s\n" r.rlab r.rval; flush stdout; return
          flush stderr;
          treat_header r;
       return ()
+  | "SUBM" -> ()
   | "INDI" -> add_indi gen r
   | "FAM" -> add_fam gen r
   | "NOTE" -> ()
