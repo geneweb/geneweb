@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 2.6 1999-06-28 19:04:32 ddr Exp $ *)
+(* $Id: consang.ml,v 2.7 1999-06-28 19:11:03 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -158,17 +158,11 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
       let ty = tab.(y) in
       let p1 = half u.weight1 in
       let p2 = half u.weight2 in
-      do if u.anc_stat1 = IsAnc
-         && ty.anc_stat1 <> IsAnc then
-           do ty.anc_stat1 := IsAnc;
-              incr nb_anc1;
-           return ()
+      do if u.anc_stat1 = IsAnc && ty.anc_stat1 <> IsAnc then
+           do ty.anc_stat1 := IsAnc; incr nb_anc1; return ()
          else ();
-         if u.anc_stat2 = IsAnc
-         && ty.anc_stat2 <> IsAnc then
-           do ty.anc_stat2 := IsAnc;
-              incr nb_anc2;
-           return ()
+         if u.anc_stat2 = IsAnc && ty.anc_stat2 <> IsAnc then
+           do ty.anc_stat2 := IsAnc; incr nb_anc2; return ()
          else ();
          ty.weight1 := ty.weight1 +. p1;
          ty.weight2 := ty.weight2 +. p2;
