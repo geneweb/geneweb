@@ -9,6 +9,8 @@ GeneWeb Version 3.08
     (request from Debian packagers).
 
 * GeneWeb daemon/CGI (gwd)
+  - [12 Sep 00] In traces suspension points for long requests are applied
+    in the middle instead of at end.
   - [25 Aug 00] Fixed option -redirect: did not apply to all requests
   - [22 Aug 00] Added test: no more display "age at death" if negative
     (because of erroneous dates).
