@@ -5,6 +5,13 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [12 Feb 04] Changed method output of "patches" file: instead of
+    1/ renaming "patches" into "patches~" 2/ writing "patches", which
+    can be dangerous (writing of "patches" file can fail in the middle
+    and therefore the database is no more accessible) or creating
+    temporary bad accesses ("Internal message: end of file"). Now it:
+    1/ writes the file "1patches" 2/ renames "patches" into "patches~"
+    3/ renames "1patches" into "patches". Why didn't I do it earlier?
   - [24 Jan 04] Improved much memory usage on large databases by adding
     an access file (name.acc) of the names index (name.inx). Built when
     database created or after consang. Still work if name.acc does not
