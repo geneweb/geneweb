@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.32 2002-01-30 09:41:37 ddr Exp $ *)
+(* $Id: setup.ml,v 4.33 2002-02-04 18:36:31 ddr Exp $ *)
 
 open Printf;
 
@@ -842,7 +842,7 @@ value gwu_or_gwb2ged_check suffix conf =
   in
   let out_file =
     match p_getenv conf.env "o" with
-    [ Some f -> strip_spaces f
+    [ Some f -> Filename.basename (strip_spaces f)
     | None -> "" ]
   in
   let out_file =

@@ -20,6 +20,10 @@ GeneWeb Version 4.05
 * GeneWeb databases Transfer Program (gwtp)
   - [30 Jan 02] Grouped the two languages en and fr in common templates.
 
+* Setup program (gwsetup)
+  - [04 Feb 02] When extracting a file (source or gedcom), take now the
+    base name (the possible directory part is removed).
+
 * All executables
   - [10 Jan 02] No more statically linked by default.
 
