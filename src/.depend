@@ -125,8 +125,10 @@ mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx iobase.cmx \
     name.cmx num.cmx pqueue.cmx 
 name.cmo: name.cmi 
 name.cmx: name.cmi 
-notes.cmo: def.cmi util.cmi ../wserver/wserver.cmi 
-notes.cmx: def.cmi util.cmx ../wserver/wserver.cmx 
+notes.cmo: config.cmi def.cmi gutil.cmi perso.cmi srcfile.cmi util.cmi \
+    ../wserver/wserver.cmi 
+notes.cmx: config.cmi def.cmi gutil.cmx perso.cmx srcfile.cmx util.cmx \
+    ../wserver/wserver.cmx 
 num.cmo: num.cmi 
 num.cmx: num.cmi 
 perso.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi num.cmi \
@@ -209,6 +211,7 @@ mergeFamOk.cmo mergeFamOk.cmx: pa_html.cmo
 mergeInd.cmo mergeInd.cmx: pa_html.cmo
 mergeIndOk.cmo mergeIndOk.cmx: pa_lock.cmo pa_html.cmo
 mk_consang.cmo mk_consang.cmx: pa_lock.cmo
+notes.cmo notes.cmx: pa_html.cmo
 perso.cmo perso.cmx: pa_html.cmo
 relation.cmo relation.cmx: pa_lock.cmo pa_html.cmo
 relationLink.cmo relationLink.cmx: pa_html.cmo
