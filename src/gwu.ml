@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.26 2000-08-29 15:34:03 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.27 2000-10-02 10:27:42 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -380,16 +380,18 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
      Printf.fprintf oc "\n";
      Array.iter
        (fun ip ->
-          let p = poi base ip in
-          do Printf.fprintf oc "wit";
-             match p.sex with
-             [ Male -> Printf.fprintf oc " m"
-             | Female -> Printf.fprintf oc " f"
-             | _ -> () ];
-             Printf.fprintf oc ": ";
-             print_witness oc base mark p notes_pl_p;
-             Printf.fprintf oc "\n";
-          return ())
+          if per_sel ip then
+            let p = poi base ip in
+            do Printf.fprintf oc "wit";
+               match p.sex with
+               [ Male -> Printf.fprintf oc " m"
+               | Female -> Printf.fprintf oc " f"
+               | _ -> () ];
+               Printf.fprintf oc ": ";
+               print_witness oc base mark p notes_pl_p;
+               Printf.fprintf oc "\n";
+            return ()
+          else ())
        fam.witnesses;
      match sou base fam.fsources with
      [ "" -> ()
@@ -533,21 +535,25 @@ value print_relation_parent oc base mark defined_p p =
   return ()
 ;
 
-value print_relation_for_person oc base mark def_p p r =
+value print_relation_for_person oc base mark per_sel def_p p r =
   let fath =
     match r.r_fath with
     [ Some ip ->
-        let p = poi base ip in
-        if sou base p.first_name = "?" || sou base p.surname = "?" then None
-        else Some p
+        if per_sel ip then
+          let p = poi base ip in
+          if sou base p.first_name = "?" || sou base p.surname = "?" then None
+          else Some p
+        else None
     | None -> None ]
   in
   let moth =
     match r.r_moth with
     [ Some ip ->
-        let p = poi base ip in
-        if sou base p.first_name = "?" || sou base p.surname = "?" then None
-        else Some p
+        if per_sel ip then
+          let p = poi base ip in
+          if sou base p.first_name = "?" || sou base p.surname = "?" then None
+          else Some p
+        else None
     | None -> None ]
   in
   match (fath, moth) with
@@ -578,10 +584,20 @@ value print_relation_for_person oc base mark def_p p r =
      return () ]
 ;
 
-value print_relations_for_person oc base mark def_p is_definition p =
+value print_relations_for_person oc base mark per_sel def_p is_definition p =
   let surn = correct_string base p.surname in
   let fnam = correct_string base p.first_name in
-  if surn <> "?" || fnam <> "?" then
+  let exist_relation =
+    List.exists
+      (fun r ->
+         match (r.r_fath, r.r_moth) with
+         [ (Some ip1, Some ip2) -> per_sel ip1 && per_sel ip2
+         | (Some ip1, _) -> per_sel ip1
+         | (_, Some ip2) -> per_sel ip2
+         | _ -> False ])
+      p.rparents
+  in
+  if surn <> "?" && fnam <> "?" && exist_relation then
     do Printf.fprintf oc "\n";
        Printf.fprintf oc "rel %s %s%s" surn fnam
          (if p.occ == 0 then "" else "." ^ string_of_int p.occ);
@@ -596,7 +612,8 @@ value print_relations_for_person oc base mark def_p is_definition p =
        else ();
        Printf.fprintf oc "\n";
        Printf.fprintf oc "beg\n";
-       List.iter (print_relation_for_person oc base mark def_p p) p.rparents;
+       List.iter (print_relation_for_person oc base mark per_sel def_p p)
+         p.rparents;
        Printf.fprintf oc "end\n";
     return ()
   else ()
@@ -615,7 +632,7 @@ value print_relations oc base mark per_sel ml =
     | [p :: pl] ->
          let def_p = ref [] in
          do if p.rparents <> [] && per_sel p.cle_index then
-              do print_relations_for_person oc base mark def_p False p;
+              do print_relations_for_person oc base mark per_sel def_p False p;
                  List.iter (print_notes_for_person oc base) def_p.val;
               return ()
             else ();
@@ -666,7 +683,7 @@ value get_isolated_related base mark m list =
 
 value print_isolated_related oc base mark per_sel ml =
   let pl = List.fold_right (get_isolated_related base mark) ml [] in
-  List.iter (print_relations_for_person oc base mark (ref []) True) pl
+  List.iter (print_relations_for_person oc base mark per_sel (ref []) True) pl
 ;
 
 value rec merge_families ifaml1f ifaml2f =

@@ -50,14 +50,16 @@ GeneWeb version 3.08
     <img src=...>? did not work because the program changed it into
     <img src=<a href=http://...>>
 
-* Gedcom to GeneWeb (ged2gwb)
-  - [28 Sep 00] Strip now possible tabulations found in the GEDCOM.
-  - [26 Aug 00] If -epn (which is default) and -lf, tries now to lowercase
-    the public names.
-
 * Gedcom to GeneWeb (ged2gwb) and GeneWeb to Gedcom (gwb2ged)
   - [31 Aug 00] All surnames aliases (instead of only the first one) are
     now saved and restored.
+
+* Gedcom to GeneWeb (ged2gwb)
+  - [02 Oct 00] Fixed bug: did not treat begin or end dates in titles
+    when defined as texts.
+  - [28 Sep 00] Strip now possible tabulations found in the GEDCOM.
+  - [26 Aug 00] If -epn (which is default) and -lf, tries now to lowercase
+    the public names.
 
 * GeneWeb to Gedcom (gwb2ged)
   - [06 Sep 00] Fixed bug: newlines in notes were incorrectly saved,
@@ -65,6 +67,9 @@ GeneWeb version 3.08
     were catenated without any spaces.
 
 * GeneWeb to Gedcom (gwb2ged) and GeneWeb uncompiler (gwu)
+  - [02 Oct 00] Fixed problem: when selecting somebody's ancestors, links to
+    relations (godparents, for example) were included, even if these relation
+    were not selected.
   - [29 Aug 00] Now, when option "-d" (descendants of) is applied, the
     spouses' parents are included, except if the option "-nsp" is given.
 

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.30 2000-09-27 22:15:19 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.31 2000-10-02 10:27:38 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -293,12 +293,13 @@ value rec find_all_fields lab =
   | [] -> [] ]
 ;
 
-value rec lexing =
+value rec lexing_date =
   parser
   [ [: `('0'..'9' as c); n = number (Buff.store 0 c) :] -> ("INT", n)
   | [: `('A'..'Z' as c); i = ident (Buff.store 0 c) :] -> ("ID", i)
+  | [: `'('; t = text 0 :] -> ("TEXT", t)
   | [: `'.' :] -> ("", ".")
-  | [: `' ' | '\t' | '\013'; s :] -> lexing s
+  | [: `' ' | '\t' | '\013'; s :] -> lexing_date s
   | [: _ = Stream.empty :] -> ("EOI", "")
   | [: `x :] -> ("", String.make 1 x) ]
 and number len =
@@ -309,9 +310,13 @@ and ident len =
   parser
   [ [: `('A'..'Z' as c); a = ident (Buff.store len c) :] -> a
   | [: :] -> Buff.get len ]
+and text len =
+  parser
+  [ [: `')' :] -> Buff.get len
+  | [: `c; strm :] -> text (Buff.store len c) strm ]
 ;
 
-value make_lexing s = Stream.from (fun _ -> Some (lexing s));
+value make_date_lexing s = Stream.from (fun _ -> Some (lexing_date s));
 
 value tparse (p_con, p_prm) =
   ifdef CAMLP4_300 then None
@@ -322,7 +327,7 @@ value tparse (p_con, p_prm) =
 
 value using_token (p_con, p_prm) =
   match p_con with
-  [ "" | "INT" | "ID" | "EOI" -> ()
+  [ "" | "INT" | "ID" | "TEXT" | "EOI" -> ()
   | _ ->
       raise
         (Token.Error
@@ -330,8 +335,8 @@ value using_token (p_con, p_prm) =
               "\" is not recognized by the lexer")) ]
 ;
 
-value lexer =
-  {Token.func = fun s -> (make_lexing s, fun _ -> (0, 0));
+value date_lexer =
+  {Token.func = fun s -> (make_date_lexing s, fun _ -> (0, 0));
    Token.using = using_token; Token.removing = fun _ -> ();
    Token.tparse = tparse; Token.text = fun _ -> "<tok>"}
 ;
@@ -342,9 +347,9 @@ type range 'a =
   | BeginEnd of 'a and 'a ]
 ; 
 
-value g = Grammar.create lexer;
-value date_value = Grammar.Entry.create g "date value";
-value date_interval = Grammar.Entry.create g "date interval";
+value date_g = Grammar.create date_lexer;
+value date_value = Grammar.Entry.create date_g "date value";
+value date_interval = Grammar.Entry.create date_g "date interval";
 
 value roman_int_decode s =
   let decode_digit one five ten r =
@@ -375,7 +380,7 @@ value roman_int =
     parser
     [ [: `("ID", x) when is_roman_int x :] -> roman_int_decode x ]
   in
-  Grammar.Entry.of_parser g "roman int" p
+  Grammar.Entry.of_parser date_g "roman int" p
 ;
 
 value date_str = ref "";
@@ -433,11 +438,23 @@ EXTEND
           | End (d, cal) -> Dgreg {(d) with prec = Before} cal
           | BeginEnd (d1, cal) (d2, _) ->
               Dgreg {(d1) with prec = YearInt d2.year} cal ]
-      | (d, cal) = date; EOI -> Dgreg d cal ] ]
+      | (d, cal) = date; EOI -> Dgreg d cal
+      | s = TEXT -> Dtext s ] ]
   ;
   date_interval:
-    [ [ dr = date_range; EOI -> dr
-      | (d, cal) = date; EOI -> Begin (d, cal) ] ]
+    [ [ ID "BEF"; dt = date_or_text; EOI -> End dt
+      | ID "AFT"; dt = date_or_text; EOI -> Begin dt
+      | ID "BET"; dt = date_or_text; ID "AND"; dt1 = date_or_text; EOI ->
+          BeginEnd dt dt1
+      | ID "TO"; dt = date_or_text; EOI -> End dt
+      | ID "FROM"; dt = date_or_text; EOI -> Begin dt
+      | ID "FROM"; dt = date_or_text; ID "TO"; dt1 = date_or_text; EOI ->
+          BeginEnd dt dt1
+      | dt = date_or_text; EOI -> Begin dt ] ]
+  ;
+  date_or_text:
+    [ [ (d, cal) = date -> Dgreg d cal
+      | s = TEXT -> Dtext s ] ]
   ;
   date_range:
     [ [ ID "BEF"; dt = date -> End dt
@@ -561,13 +578,7 @@ value date_of_field pos d =
     let s = Stream.of_string (String.uppercase d) in
     do date_str.val := d; return
     try Some (Grammar.Entry.parse date_value s) with
-    [ Stdpp.Exc_located loc (Stream.Error _) -> 
-        let d =
-          if d.[0] = '(' && d.[String.length d - 1] = ')' then
-            String.sub d 1 (String.length d - 2)
-          else d
-        in
-        Some (Dtext d) ]
+    [ Stdpp.Exc_located loc (Stream.Error _) -> Some (Dtext d) ]
 ;
 
 (* Creating base *)
@@ -704,11 +715,13 @@ value infer_death birth =
   | _ -> DontKnowIfDead ]
 ;
 
+(*
 value make_title gen (title, place) =
   {t_name = Tnone; t_ident = add_string gen title;
    t_place = add_string gen place; t_date_start = Adef.codate_None;
    t_date_end = Adef.codate_None; t_nth = 0}
 ;
+*)
 
 value string_ini_eq s1 i s2 =
   loop i 0 where rec loop i j =
@@ -963,10 +976,9 @@ value decode_date_interval pos s =
   let strm = Stream.of_string s in
   try
     match Grammar.Entry.parse date_interval strm with
-    [ BeginEnd (d1, cal1) (d2, cal2) ->
-        (Some (Dgreg d1 cal1), Some (Dgreg d2 cal2))
-    | Begin (d, cal) -> (Some (Dgreg d cal), None)
-    | End (d, cal) -> (None, Some (Dgreg d cal)) ]
+    [ BeginEnd d1 d2 -> (Some d1, Some d2)
+    | Begin d -> (Some d, None)
+    | End d -> (None, Some d) ]
   with
   [ Stdpp.Exc_located _ _ | Not_found ->
       do print_bad_date pos s; return (None, None) ]
