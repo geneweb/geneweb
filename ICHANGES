@@ -5,6 +5,8 @@ GeneWeb Version 4.04
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [19 Sep 01] In etc/updfam.txt, added test if MSIE 5.0, because it seems
+    to have a problem with the form mode=POST.
   - [19 Sep 01] Trace: too big texts in referer now cut.
 
 * Compilation
