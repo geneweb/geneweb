@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.22 1999-08-04 18:34:16 ddr Exp $ *)
+(* $Id: descend.ml,v 2.23 1999-08-04 22:16:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -35,6 +35,8 @@ value make_level_table base niveau_max p =
 ;
 
 value level_max base p =
+  let _ = base.data.persons.array () in
+  let _ = base.data.families.array () in
   let levt = make_level_table base infini p in
   let x = ref 0 in
   do for i = 0 to Array.length levt - 1 do
@@ -944,13 +946,16 @@ value short_dates_text v conf base p =
   no_spaces v txt
 ;
 
+value short_marriage_date_text v conf base fam p sp =
+  Date.short_marriage_date_text conf base fam p sp
+;
+
 value print_tree conf base gv p =
   let title _ =
     Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
       (person_text_no_html conf base p)
   in
   let gv = min limit_by_tree gv in
-  let asc_v = p_getenv conf.env "k" in
   let rec nb_column n v p =
     if v == 0 then n + 1
     else
@@ -1048,18 +1053,11 @@ value print_tree conf base gv p =
                        fam.children;
                 return ())
              (Array.to_list p.family)
-       | _ -> Wserver.wprint "<td>&nbsp;</td>" ];
-       Wserver.wprint "\n";
+       | _ -> Wserver.wprint "<td>&nbsp;</td>\n" ];
     return ()
   in
   let horizontal_bars v gen =
     tag "tr" begin list_iter_first (print_horizontal_bar v) gen; end
-  in
-  let up_reference i p txt =
-    if conf.cancel_links then txt
-    else
-      "<a href=\"" ^ commd conf ^ "m=A;t=T;v=" ^ i ^ ";" ^
-      acces conf base p ^ "\">" ^ txt ^ "</a>"
   in
   let print_person v first po =
     do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
@@ -1071,11 +1069,7 @@ value print_tree conf base gv p =
              else person_title_text conf base p
            in
            let txt = no_spaces gv txt in
-           let txt =
-             match asc_v with
-             [ Some i when v = 1 -> up_reference i p txt
-             | _ -> reference conf base p txt ]
-           in
+           let txt = reference conf base p txt in
            let txt =
              if auth && v == 1 then txt ^ Date.short_dates_text conf base p
              else if auth then txt ^ short_dates_text gv conf base p
@@ -1112,7 +1106,7 @@ value print_tree conf base gv p =
                      in
                      Wserver.wprint "&amp;%s&nbsp;%s"
                        (if auth then
-                          Date.short_marriage_date_text conf base fam p sp
+                          short_marriage_date_text gv conf base fam p sp
                         else "")
                        txt;
                    end;
