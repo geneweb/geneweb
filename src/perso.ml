@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.17 2001-09-27 13:29:42 ddr Exp $ *)
+(* $Id: perso.ml,v 4.18 2001-09-28 17:22:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -31,7 +31,12 @@ value print_marriage_text conf base in_perso fam =
     | _ -> () ];
     match marriage_place with
     [ "" -> ()
-    | s -> Wserver.wprint ", %s," s ];
+    | s ->
+        do {
+          Wserver.wprint ", ";
+          copy_string_with_macros conf [] s;
+          Wserver.wprint ","
+        } ];
     if in_perso then
       match (marriage, marriage_place) with
       [ (None, "") -> ()
@@ -399,16 +404,20 @@ value print_alias conf base env =
   | _ -> () ]
 ;
 
+value print_place conf base istr =
+  copy_string_with_macros conf [] (sou base istr)
+;
+
 value print_baptism_place conf base env p p_auth =
-  if p_auth then Wserver.wprint "%s" (sou base p.baptism_place) else ()
+  if p_auth then print_place conf base p.baptism_place else ()
 ;
 
 value print_birth_place conf base env p p_auth =
-  if p_auth then Wserver.wprint "%s" (sou base p.birth_place) else ()
+  if p_auth then print_place conf base p.birth_place else ()
 ;
 
 value print_burial_place conf base env p p_auth =
-  if p_auth then Wserver.wprint "%s" (sou base p.burial_place) else ()
+  if p_auth then print_place conf base p.burial_place else ()
 ;
 
 value print_comment conf base env p p_auth =
@@ -446,7 +455,7 @@ value print_death_age conf base env p p_auth =
 ;
 
 value print_death_place conf base env p p_auth =
-  if p_auth then Wserver.wprint "%s" (sou base p.death_place) else ()
+  if p_auth then print_place conf base p.death_place else ()
 ;
 
 value print_died conf base env p p_auth =
