@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 3.1 1999-11-10 08:44:34 ddr Exp $ *)
+(* $Id: title.ml,v 3.2 1999-11-26 21:54:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -225,31 +225,24 @@ value select_place base place =
   return (list.val, clean_name.val)
 ;
 
-value select_all_titles conf base =
-  let list = ref [] in
-  let add_title t =
-    let tn = sou base t.t_ident in
-    if not (List.mem tn list.val) then list.val := [tn :: list.val] else ()
+value select_all proj conf base =
+  let module O = struct type t = string; value compare = compare; end in
+  let module S = Set.Make O in
+  let s =
+    loop 0 S.empty where rec loop i s =
+      if i = base.data.persons.len then s
+      else
+        let x = base.data.persons.get i in
+        let s =
+          List.fold_left (fun s t -> S.add (sou base (proj t)) s) s x.titles
+        in
+        loop (i + 1) s  
   in
-  do for i = 0 to base.data.persons.len - 1 do
-       let x = base.data.persons.get i in List.iter add_title x.titles;
-     done;
-  return list.val
+  S.elements s
 ;
 
-value select_all_places conf base =
-  let list = ref [] in
-  let add_place t =
-    let pl = sou base t.t_place in
-    if not (List.mem pl list.val) then
-      list.val := [pl :: list.val]
-    else ()
-  in
-  do for i = 0 to base.data.persons.len - 1 do
-       let x = base.data.persons.get i in List.iter add_place x.titles;
-     done;
-  return list.val
-;
+value select_all_titles = select_all (fun t -> t.t_ident);
+value select_all_places = select_all (fun t -> t.t_place);
 
 value give_access_someone conf base (x, t) list =
   let t_date_start = Adef.od_of_codate t.t_date_start in
