@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.47 1999-06-02 11:59:26 ddr Exp $
+# $Id: lexicon.txt,v 2.48 1999-06-03 10:24:55 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -56,6 +56,7 @@ en:  to try again with this number, or do "back" and change it yourself
 es:  para ensayar de nuevo con este n&uacute;mero, o haga "back" y escoja otro
 fr:  pour r&eacute;essayer avec ce num&eacute;ro, ou bien faites "back" et choisissez-en un autre
 he:  לנסות שוב עם המספר הזה, או "חזרה" ולשנות בעצמך
+it:  per provare di nuovo con questo numero, oppure fate "back" e scieglietene un'altro
 nl: , om dit nummer weer te proberen, of druk "terug" en verander het zelf
 no:  for ו pr&oslash;ve igjen med dette nummeret, eller g&aring; tilbake og endre det selv
 pt: para tentar novamente com este n&uacute;mero ou fazer "back" e escolher outro
@@ -601,7 +602,7 @@ es: consulta avanzada
 eo: progresata rekesto
 fr: requ&ecirc;te &eacute;volu&eacute;e
 he:   בקשה מתקדמת 
-it: avanzata richiesta
+it: richiesta avanzata
 nl: gedetailleerde opzoeking
 no: avansert s&oslash;k
 pt: investiga&ccedil;&atilde;o complexa
@@ -868,6 +869,7 @@ dk: d&aring;b
 en: baptism
 es: bautismo
 fr: bapt&ecirc;me
+it: battesimo
 nl: doop
 no: d&aring;p
 pt: baptism
@@ -1030,6 +1032,7 @@ dk: uden GeneWeb-links
 es: anular los lazos GeneWeb
 en: cancel GeneWeb links
 fr: annuler les liens GeneWeb
+it: annullare i links
 se: utan GeneWeb l&auml;nkar
 
     cannot access base
@@ -1039,6 +1042,7 @@ en: cannot access base
 es: acceso a la base imposible
 fr: impossible d'acc&eacute;der &agrave; la base
 he:  אין כניסה למאגר המידע
+it: accesso alla base impossibile
 nl: geen toegang tot bestand
 no: kan ikke n&aring; databasen
 pt: n&atilde;o se pode acceder a base
@@ -1063,6 +1067,7 @@ dk: &aelig;ndre b&oslash;rns navne
 es: cambiar los nombres de los hijos
 en: change children's names
 fr: changer noms des enfants
+it: cambiare i nomi dei figli
 se: &auml;ndra barnens namn
 
     changed order of children
@@ -1072,6 +1077,7 @@ en: changed order of children
 es: cambio del orden de los hijos
 fr: changement de l'ordre des enfants
 he:  סדר הילדים השתנה
+it: ordine dei figli cambiato
 nl: veranderd de volgorde der kinderen
 no: barnas rekkef&oslash;lge er endret 
 pt: cambio da ordem dos filhos
@@ -1097,6 +1103,7 @@ dk: b&oslash;rns navne &aelig;ndret
 en: children's names changed
 es: nombres de los hijos cambiados
 fr: noms des enfants chang&eacute;s
+it: nomi dei figli cambiati
 se: barnens namn &auml;ndrade
 
     click
@@ -1523,6 +1530,7 @@ en: file
 es: fichero
 fr: fichier
 he:  קובץ 
+it: file
 no: fil
 se: fil
 
@@ -1745,6 +1753,7 @@ en: if titles
 es: si t&iacute;tulos
 he:  אם בעל(ת) תואר
 fr: si titres
+it: se titoli
 nl: als titels
 no: hvis titler
 pt: si t&iacute;tulos
@@ -1757,7 +1766,7 @@ en: image
 es: imagen
 fr: image
 he:  תמונה
-it: foto
+it: immagine
 nl: beeld
 no: bilde
 pt: foto
@@ -1771,7 +1780,7 @@ eo: foto malkonstruita
 es: imagen suprimida
 fr: image supprim&eacute;e
 he:  תמונה נמחקה
-it: foto cancellata
+it: immagine cancellata
 nl: beeld verwijderd
 no: bildet er fjernet
 pt: foto suprimida
@@ -1783,6 +1792,7 @@ en: image received
 es: imagen recibida
 fr: image re&ccedil;ue
 he:  התמונה התקבלה
+it: immagine ricevuta
 no: bildet er mottatt
 se: foto mottaget
 
@@ -1821,6 +1831,7 @@ dk: medtag ukendte &aelig;gtef&aelig;ller
 en: include missing spouses
 es: incluir las esposas faltantes
 fr: inclure les conjoints manquants
+it: includere i coniugi mancanti
 se: inkludera gem&aring;ler som saknas
 
     incompatible sexes
@@ -1830,6 +1841,7 @@ en: incompatible sexes
 es: sexos incompatibles
 fr: sexes incompatibles
 he:  אי התאמה במינים
+it: sessi incompatibili
 nl: geslacht komt niet overeen
 no: uforenlig kj&oslash;nn
 pt: sexos incompativeis
@@ -1912,6 +1924,7 @@ en: insert
 eo: inseri +decl
 es: insertar
 he:  להכניס
+it: inserire
 fr: ins&eacute;rer
 nl: invoegen
 no: skyt inn
@@ -2009,6 +2022,7 @@ en: link
 es: reunir
 he:  קשר
 fr: relier
+it: link
 nl: konnektie
 no: koble
 pt: reunir
@@ -2073,6 +2087,7 @@ en: marriage of %t after his/her death
 es: casamiento de %t despu&eacute;s de su muerte
 he:  נישואין של %t אחרי מותו/מותה
 fr: mariage de %t apr&egrave;s sa mort
+it: matrimonio di %t dopo la sua morte
 nl: huwelijk van %t na zijn/haar dood
 no: ekteskap med %t etter ektefellens d&oslash;d
 pt: casamento de %t depois da sua morte
@@ -2085,6 +2100,7 @@ en: marriage of %t before his/her birth
 es: casamiento de %t antes de su nacimiento
 he:  נישואין של %t לפני הולדתו/הולדתה
 fr: mariage de %t avant sa naissance
+it: matrimonio di %t prima della sua nascita
 nl: huwelijk van %t voor zijn/haar geboorte
 no: ekteskap med %t f&oslash;r ektefellens f&oslash;dsel
 pt: casamento de %t antes do seu nascimento
@@ -2112,6 +2128,7 @@ en: married
 es: casados
 fr: mari&eacute;s
 he:  נשואים
+it: sposati
 nl: gehuwd
 no: gift
 pt: casados
@@ -2124,6 +2141,7 @@ en: married at age %t
 es: casado a la edad de %t
 he:  התחתן בגיל %t
 fr: mari&eacute;(e) &agrave; l'&agrave;ge de %t
+it: sposato(a) all'et&agrave; di %t
 nl: gehuwd op de leeftijd van %t
 no: gift %t &aring;r gammel
 pt: casado com a idade de %t
@@ -2150,6 +2168,7 @@ dk: maksimalt %d generationer
 en: max %d generations
 es: m&acute;ximo %d generaci&oacute;nes
 he:  מקסימום %d דורות
+it: max %d generazioni
 fr: max %d g&eacute;n&eacute;rations
 nl: maximaal %d generaties
 no: maksimalt %d generasjoner
@@ -2201,6 +2220,7 @@ dk: manglende forf&aelig;dre
 en: missing ancestors
 es: ascendientes faltantes
 he:  אבות חסרים
+it: antenati mancanti
 fr: ascendants manquants
 nl: ontbrekende voorouders
 no: manglende forfedre
@@ -2242,6 +2262,7 @@ en: more than %d answers
 es: m&aacute;s de %d respuestas
 he:  יותר מ-%d תשובות
 fr: plus de %d r&eacute;ponses
+it: pi&ugrave; di %d risposte
 nl: meer dan %d antwoorden
 no: fler enn %d svar
 pt: m&aacute;s de %d respostas
@@ -2313,7 +2334,7 @@ eo: posta frato/posta fratino/posta frat(in)o
 es: hermano siguiente/hermana siguiente/hermano (a) siguiente
 fr: fr&egrave;re suivant/soeur suivante/fr&egrave;re ou soeur suivant
 he:  אח(ות) צעיר(ה)  
-it: seguente fratello/seguente sorella/seguente fratello o sorella
+it: fratello seguente/sorella seguente/fratello o sorella seguente
 nl: volgende broer/volgende zus/volgende broer of zus
 no: Neste bror/neste s&oslash;ster/neste s&oslash;sken
 pt: seguinte irm&atilde;o/seguinte irm&atilde;/seguinte irm&atilde;(o)
@@ -2368,6 +2389,7 @@ en: no match
 es: ninguna respuesta
 fr: aucune r&eacute;ponse
 he:  אין דבר דומה
+it: nessuna risposta
 nl: niets gevonden
 no: ingen treff
 pt: nenhuma resposta
@@ -2422,6 +2444,7 @@ en: not married
 es: no casados
 fr: non mari&eacute;s
 he:   לא נשואים
+it: non sposati
 nl: niet gehuwd
 pt: n&atilde;o casados
 no: ugift
@@ -2546,6 +2569,7 @@ en: of %t's side
 es: por parte de %t
 he:  בצד של %t
 fr: du c&ocirc;t&eacute; de %t
+it: dalla parte di %t
 nl: langs de zijde van %t
 no: fra %ts slektside
 pt: pelo lado de %t
@@ -2709,9 +2733,10 @@ se: ett &aring;r gammal
     only the generation selected
 de: nur die ausgew&auml;hlte Generation
 dk: kun den valgte generation
-en: only the generation selected
+en: only the selected generation
 es: solamente la generaci&oacute;n elegida
 he:  דור הנבכר בלבד
+it: soltanto la generazione selezionata
 fr: seulement la g&eacute;n&eacute;ration s&eacute;lectionn&eacute;e
 nl: alleen de geselecteerde generatie
 no: bare den valgte generasjonen
@@ -2738,6 +2763,7 @@ dk: eller anvend "forbind" i stedet for "opret"
 en: or use "link" instead of "create"
 es: o utilise "reunir" en lugar de "crear"
 he:  או להשתמש ב-"קשר" במקום "עשה" 
+it: oppure usare "link" invece di "create"
 fr: ou bien utilisez "relier" au lieu de "cr&eacute;er"
 nl: of gebruik "konnektie" inplaats van "maken"
 no: eller bruk "koble" istedet for "opprett"
@@ -2823,6 +2849,7 @@ eo: personaj kun sama nomo
 es: personas con el mismo nombre
 fr: personnes ayant le m&ecirc;me nom
 he:  אנשים עם אותו השם 
+it: persone con lo stesso nome
 nl: personen met dezelfde naam
 no: personer som har samme navn
 pt: pessoas com o mesmo apelido
@@ -2850,7 +2877,7 @@ eo: precedento frato/precedento fratino/precedento frat(in)o
 es: hermano anterior/hermana anterior/hermano (a) anterior
 fr: fr&egrave;re pr&eacute;c&eacute;dent/soeur pr&eacute;c&eacute;dente/fr&egrave;re ou soeur pr&eacute;c&eacute;dent
 he:   אח(ות) הגדול(ה) 
-it: precedente fratello/precedente sorella/precedente fratello o sorella
+it: fratello precedente/sorella precedente/fratello o sorella precedente
 nl: vorige broer/vorige zus/vorige broer of zus
 no: forrige bror/forrige s&oslash;ster/forrige s&oslash;sken 
 pt: precedente irm&atilde;o/precedente irm&atilde;/precedente irm&atilde;(o)
@@ -2972,6 +2999,7 @@ dk: forbindelse%t med
 en: relationship%t to
 es: parentesco%t con
 fr: relation%t avec
+it: legame%t con
 se: f&ouml;rh&aring;llande%t med
 
     see
@@ -3022,6 +3050,7 @@ en: send
 es: enviar
 fr: envoyer
 he:  שלח
+it: mandare
 no: send
 se: skicka
 
@@ -3228,6 +3257,7 @@ en: switch
 es: invertir
 fr: intervertir
 he:  החלפה 
+it: scambiare
 nl: verander
 no: bytt rekkef&oslash;lge
 pt: cambiar
@@ -3240,6 +3270,7 @@ en: switch done
 es: inversi&oacute;n realizada
 he:  ההחלפה בוצעה  
 fr: interversion effectu&eacute;e
+it: scambio fatto
 nl: veranderd
 no: rekkef&oslash;lgen er endret
 pt: invers&atilde;o efectuada
@@ -3250,8 +3281,9 @@ de: die Reihenfolge der folgenden Familien umkehren
 dk: omvend r&aelig;kkef&oslash;lgen for de f&oslash;lgende familier
 en: switch the order of the following families
 es: invertir el orden de las familias siguientes
-he:  לשנות סדר המשפחות הבאות
 fr: intervertir l'ordre des familles suivantes
+he:  לשנות סדר המשפחות הבאות
+it: scambiare l'ordine delle famiglie seguenti
 nl: verander de volgorde van de volgende families
 no: bytt rekkef&oslash;lgen til f&oslash;lgende familier
 pt: inverter a ordem das familias seguintes
@@ -3334,6 +3366,7 @@ en: the base has changed; do "back", "reload", and refill the form
 es: la base ha cambiado: hacer "back", "reload" y completar nuevamente el formulario
 fr: la base a chang&eacute;: faire "back", "reload", et refaire le formulaire
 he:  מאגר המידה השתנה: לעשות "back" ו-"reload"  ולמלא מחדש את הטופס
+it: la base &egrave; cambiata; fate "back", "reload" e rifate la scheda
 nl: de informatie is veranderd; druk "back", "reload" en vul in de details
 no: databasen er endret; klikk tilbake og oppfrisk, og fyll ut formularet p&aring; nytt
 pt: a base mudou : fazer "back", "reload" e preencher novamente o formul&aacute;rio
