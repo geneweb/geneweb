@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.66 2000-08-10 23:04:28 ddr Exp $ *)
+(* $Id: util.ml,v 3.67 2000-08-12 10:30:12 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -184,11 +184,17 @@ value age_autorise conf base p =
     (p.titles <> [] || parent_has_title base p)
   then True
   else
-    match (Adef.od_of_codate p.birth, date_of_death p.death) with
-    [ (_, Some (Dgreg d _)) ->
+    match
+      (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism,
+       date_of_death p.death)
+    with
+    [ (_, _, Some (Dgreg d _)) ->
         let a = temps_ecoule d conf.today in
         a.year > nb_year_for_public
-    | (Some (Dgreg d _), _) ->
+    | (Some (Dgreg d _), _, _) ->
+        let a = temps_ecoule d conf.today in
+        a.year > nb_year_for_public
+    | (_, Some (Dgreg d _), _) ->
         let a = temps_ecoule d conf.today in
         a.year > nb_year_for_public
     | _ ->
@@ -209,11 +215,17 @@ value fast_auth_age conf p =
   else if conf.public_if_titles && p.access = IfTitles && p.titles <> []
   then True
   else
-    match (Adef.od_of_codate p.birth, date_of_death p.death) with
-    [ (_, Some (Dgreg d _)) ->
+    match
+      (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism,
+       date_of_death p.death)
+    with
+    [ (_, _, Some (Dgreg d _)) ->
         let a = temps_ecoule d conf.today in
         a.year > nb_year_for_public
-    | (Some (Dgreg d _), _) ->
+    | (Some (Dgreg d _), _,  _) ->
+        let a = temps_ecoule d conf.today in
+        a.year > nb_year_for_public
+    | (_, Some (Dgreg d _), _) ->
         let a = temps_ecoule d conf.today in
         a.year > nb_year_for_public
     | _ -> False ]
