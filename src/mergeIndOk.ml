@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 4.1 2001-04-21 02:58:40 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 4.2 2001-12-04 12:23:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -235,6 +235,7 @@ value effective_mod_merge conf base sp =
   | _ -> incorrect_request conf ]
 ;
 
-value print_mod_merge conf base =
+value print_mod_merge o_conf base =
+  let conf = Update.update_conf o_conf in
   UpdateIndOk.print_mod_aux conf base (effective_mod_merge conf base)
 ;
