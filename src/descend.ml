@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.36 2005-02-15 01:32:51 ddr Exp $ *)
+(* $Id: descend.ml,v 4.37 2005-03-04 17:51:06 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -355,15 +355,11 @@ value display_descendants_upto conf base max_level p line =
            let conj = spouse p.cle_index cpl in
            let conj = pget conf base conj in
            let children =
-             let list = Array.to_list des.children in
-             List.fold_right
-               (fun ip pl ->
-                  let p = pget conf base ip in
-                  if line = Neuter || line = Male && p.sex <> Female ||
-                     line = Female && p.sex <> Male then
-                    [p :: pl]
-                  else pl)
-               list []
+             if line = Neuter || line = Male && p.sex <> Female ||
+                line = Female && p.sex <> Male || level = 1
+             then
+               List.map (pget conf base) (Array.to_list des.children)
+             else []
            in
            do {
              if know base conj || List.length ifaml > 1 then do {
@@ -371,6 +367,8 @@ value display_descendants_upto conf base max_level p line =
                if children <> [] then
                  Wserver.wprint ", <em>%s</em>"
                    (transl conf "having as children")
+               else if Array.length des.children <> 0 then
+                 Wserver.wprint ", ..."
                else Wserver.wprint ".";
                Wserver.wprint "\n";
                if level = 1 then Wserver.wprint "</p>\n" else ();
