@@ -6,6 +6,9 @@ License). The previous license still applies up to the version 1.11
 included.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Feb 26, 99] For a birth the present day, does not display "happy
+    birthday" any more! And displayed age is "birth" and not "less than
+    one year".
   - [Feb 26, 99] Displaying of first name alias in personal pages does
     not include the surname any more.
   - [Feb 23, 99] In non leap years, birthday anniversaries of February 29

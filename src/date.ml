@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 1.8 1999-02-02 10:24:04 ddr Exp $ *)
+(* $Id: date.ml,v 1.9 1999-02-26 21:30:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -102,7 +102,7 @@ value print_age conf a =
       else if y = 1 then
         Wserver.wprint "%s" (transl conf "one year old")
       else
-        Wserver.wprint "%s" (transl conf "less than one year old")
+        Wserver.wprint "%s" (transl conf "birth")
   | {day = 0; month = m; year = y} ->
       if y >= 2 then
         Wserver.wprint "%d %s" y (transl conf "years old")
