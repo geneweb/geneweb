@@ -1,12 +1,12 @@
-# $Id: Makefile,v 2.6 1999-04-15 11:52:28 ddr Exp $
+# $Id: Makefile,v 2.7 1999-04-29 19:55:49 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver
 GWC_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo check.cmo pqueue.cmo consang.cmo gwcomp.cmo gwc.cmo
 CONSANG_OBJS=argl.cmo mhashtbl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo mk_consang.cmo
-GWD_OBJS1=../wserver/wserver.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo util.cmo date.cmo srcfile.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo
-GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo sendImage.cmo relation.cmo relationLink.cmo ascend.cmo descend.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthday.cmo birthDeath.cmo title.cmo family.cmo base64.cmo
+GWD_OBJS1=../wserver/wserver.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo num.cmo version.cmo util.cmo date.cmo srcfile.cmo perso.cmo update.cmo updateInd.cmo updateIndOk.cmo updateFam.cmo updateFamOk.cmo
+GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo relation.cmo relationLink.cmo ascend.cmo descend.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthday.cmo birthDeath.cmo title.cmo family.cmo base64.cmo
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iobase.cmo select.cmo gwu.cmo
 all:: out

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.7 1999-04-17 14:18:04 ddr Exp $ *)
+(* $Id: family.ml,v 2.8 1999-04-29 19:55:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -265,6 +265,10 @@ value family_m conf base =
       match find_person_in_env conf base "" with
       [ Some p -> Cousins.print conf base p
       | _ -> inconnu_au_bataillon conf ]
+  | Some "CHG_CHN" when conf.wizard ->
+      ChangeChildren.print conf base
+  | Some "CHG_CHN_OK" when conf.wizard ->
+      ChangeChildren.print_ok conf base
   | Some "D" ->
       match find_person_in_env conf base "" with
       [ Some p -> Descend.print conf base p

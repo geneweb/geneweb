@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.14 1999-04-18 20:54:01 ddr Exp $ *)
+(* $Id: util.ml,v 2.15 1999-04-29 19:56:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -533,7 +533,7 @@ value rec copy_from_channel ic =
           let c = input_char ic in
           match c with
           [ '%' -> Wserver.wprint "%%"
-          | 'v' -> Wserver.wprint "%s" version
+          | 'v' -> Wserver.wprint "%s" Version.txt
           | c -> do Wserver.wprint "%%"; return Wserver.wprint "%c" c ]
       | c -> Wserver.wprint "%c" c ];
     done
@@ -555,7 +555,7 @@ value trailer conf =
        do html_p conf;
           Wserver.wprint "
 <hr><font size=-1><em>(c) Copyright INRIA 1999 -
-GeneWeb %s</em></font>" version;
+GeneWeb %s</em></font>" Version.txt;
           html_br conf;
        return ();
      let trl_fname =
@@ -1020,6 +1020,18 @@ value auto_image_file conf base p =
   if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
   else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
   else None
+;
+
+value only_printable s =
+  let s = strip_spaces s in
+  let s' = String.create (String.length s) in
+  do for i = 0 to String.length s - 1 do
+       s'.[i] :=
+         match s.[i] with
+         [ ' '..'~' | '\160'..'\255' -> s.[i]
+         | _ -> ' ' ];
+     done;
+  return s'
 ;
 
 (* Deprecated *)

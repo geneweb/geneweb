@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.14 1999-04-29 09:06:43 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.15 1999-04-29 19:55:42 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1370,7 +1370,9 @@ value check_undefined gen =
 
 value make_arrays in_file =
   let fname =
-    if Filename.check_suffix in_file ".ged" then in_file else in_file ^ ".ged"
+    if Filename.check_suffix in_file ".ged" then in_file
+    else if Filename.check_suffix in_file ".GED" then in_file
+    else in_file ^ ".ged"
   in
   let gen =
     {g_per = {arr = [| |]; tlen = 0}; g_asc = {arr = [| |]; tlen = 0};

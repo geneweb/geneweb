@@ -5,6 +5,8 @@ GeneWeb Intermediate Version 2.01-2
   - [Apr 22, 99] Added Danish language (by Hans Albeck).
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Apr 29, 99] Added ability to change the first name and the surname
+    of all children of a person in one only form. See new doc.
   - [Apr 26, 99] Fixed upload of "jpeg" files which sometimes did not work
     with Windows (message: "incorrect request")
   - [Apr 25, 99] Added space before "+" in short dates.
@@ -19,6 +21,11 @@ GeneWeb Intermediate Version 2.01-2
 * GeneWeb uncompiler (gwu)
   - [Apr 22, 99] Do not save notes any more for persons having "?" as
     first name or surname.
+
+* Documentation
+  - [Apr 29, 99] Added doc for the new feature "change children's names":
+    in "update.htm", modified section 3, added a point 5 (shifting the
+    point "add a family to number 6), added point 5.8 for explanations.
 
 GeneWeb Version 2.01
 --------------------

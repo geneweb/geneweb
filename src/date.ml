@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.6 1999-04-25 22:10:45 ddr Exp $ *)
+(* $Id: date.ml,v 2.7 1999-04-29 19:55:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -233,6 +233,8 @@ value short_dates_text conf base p =
     if s <> "" then " <em>" ^ s ^ "</em>" else s
   else ""
 ;
+
+(* Deprecated *)
 
 value afficher_dates_courtes conf base p =
   Wserver.wprint "%s" (short_dates_text conf base p)

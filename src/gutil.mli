@@ -1,9 +1,7 @@
-(* $Id: gutil.mli,v 2.2 1999-04-05 23:42:28 ddr Exp $ *)
+(* $Id: gutil.mli,v 2.3 1999-04-29 19:55:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
-
-value version : string;
 
 value poi : base -> iper -> person;
 value aoi : base -> iper -> ascend;

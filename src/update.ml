@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.7 1999-04-07 11:49:47 ddr Exp $ *)
+(* $Id: update.ml,v 2.8 1999-04-29 19:55:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -20,6 +20,14 @@ value rec find_free_occ base f s i =
   with
   [ Some _ -> find_free_occ base f s (i + 1)
   | None -> i ]
+;
+
+value has_children base p =
+  List.exists
+    (fun ifam ->
+       let fam = foi base ifam in
+       Array.length fam.children > 0)
+    (Array.to_list p.family)
 ;
 
 value infer_death conf birth =
@@ -608,6 +616,20 @@ value print conf base p =
      Wserver.wprint "</ul>\n";
      Wserver.wprint "\n";
      print_family_stuff conf base p a;
+     if has_children base p then
+       do Wserver.wprint "<p>\n";
+          tag "ul" begin
+            html_li conf;
+            stag "a" "href=\"%sm=CHG_CHN;i=%d\"" (commd conf)
+              (Adef.int_of_iper p.cle_index)
+            begin
+              Wserver.wprint "%s"
+                (capitale (transl conf "change children's names"));
+            end;
+            Wserver.wprint "\n";
+          end;
+       return ()
+     else ();
      match a.parents with
      [ Some _ -> ()
      | None ->

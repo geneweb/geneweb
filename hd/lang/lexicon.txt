@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.29 1999-04-28 09:10:50 ddr Exp $
+# $Id: lexicon.txt,v 2.30 1999-04-29 19:55:46 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1051,6 +1051,10 @@ no: kan ikke endre kj&oslash;nn til en gift person
 pt: n&atilde;o se pode modificar o sexo de uma pessoa casada
 se: kan inte &auml;ndra k&ouml;n p&aring; en gift person
 
+    change children's names
+en: change children's names
+fr: changer noms des enfants
+
     changed order of children
 de: Reihenfolge der Kinder gewechselt
 dk: &aelig;ndret r&aelig;kkef&oslash;lge for b&oslash;rn
@@ -1062,6 +1066,10 @@ nl: veranderd de volgorde der kinderen
 no: barnas rekkef&oslash;lge er endret 
 pt: cambio da ordem dos filhos
 se: &auml;ndrade ordningen f&ouml;r barnen
+
+    children's names changed
+en: children's names changed
+fr: noms des enfants chang&eacute;s
 
     child/children
 cn: все╝
