@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 3.4 2001-02-15 14:24:51 ddr Exp $ *)
+(* $Id: templ.ml,v 3.5 2001-02-16 04:39:47 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -110,28 +110,29 @@ value parse_templ conf base strm =
              | [: :] -> e ] :] -> e ]
     and parse_3 =
       parser
-      [ [: e = parse_4;
+      [ [: e = parse_simple;
            e =
              parser
-             [ [: `EQUAL; e2 = parse_4 :] -> Eop "=" e e2
-             | [: `BANGEQUAL; e2 = parse_4 :] -> Eop "!=" e e2
+             [ [: `EQUAL; e2 = parse_simple :] -> Eop "=" e e2
+             | [: `BANGEQUAL; e2 = parse_simple :] -> Eop "!=" e e2
              | [: :] -> e ] :] -> e ]
-    and parse_4 =
+    and parse_simple =
       parser
       [ [: `LPAREN; e = parse_1;
            e = parser
-               [ [: `RPAREN :] -> e | [: :] -> Estr "parse error" ] :] -> e
-      | [: `IDENT "not"; e = parse_4 :] -> Enot e
+               [ [: `RPAREN :] -> e
+               | [: `_ :] -> Evar "parse_error" [] ] :] -> e
+      | [: `IDENT "not"; e = parse_simple :] -> Enot e
       | [: `IDENT id; idl = ident_list :] -> Evar id idl
       | [: `STRING s :] -> Estr s
-      | [: :] -> Evar "bad_variable" [] ]
+      | [: `_ :] -> Evar "parse_error" [] ]
     and ident_list =
       parser
       [ [: `DOT; `IDENT id; idl = ident_list :] -> [id :: idl]
       | [: :] -> [] ]
     in
     let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
-    let r = parse_3 (Stream.from f) in
+    let r = parse_simple (Stream.from f) in
     do match strm with parser [ [: `';' :] -> () | [: :] -> () ]; return r
   in
   let rec parse_astl astl bol len end_list strm =
