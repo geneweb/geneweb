@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.32 2002-10-21 18:57:08 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.33 2002-10-23 02:39:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -196,6 +196,7 @@ value eval_create_variable c =
           [ Maybe -> "?" ^ s
           | Before -> "<" ^ s
           | After -> ">" ^ s
+          | About -> "/" ^ s ^ "/"
           | _ -> s ]
       | _ -> "" ]
   | "birth_month" ->
@@ -223,6 +224,7 @@ value eval_create_variable c =
           [ Maybe -> "?" ^ s
           | Before -> "<" ^ s
           | After -> ">" ^ s
+          | About -> "/" ^ s ^ "/"
           | _ -> s ]
       | Update.Create _ (Some (_, _, death, None, _)) ->
           match death with
