@@ -37,6 +37,8 @@ a son/a daughter/a child
 about (date)
 access
 add
+adoptive father/adoptive mother/adoptive parents
+adoptive son/adoptive daughter/adoptive child
 advanced request
 after
 after (date)
@@ -56,6 +58,7 @@ anniversaries of dead
 anniversaries of marriage
 are
 at the same time
+back
 baptism
 baptized
 before
@@ -69,6 +72,8 @@ branch/branches
 burial
 buried
 cancel GeneWeb links
+candidate father/candidate mother/candidate parents
+candidate son/candidate daughter/candidate child
 cannot access base
 cannot change sex of a married person
 change children's names
@@ -113,6 +118,8 @@ first name not found
 first name/first names
 for the first names by alphabetic order
 generation
+godfather/godmother/godparents
+godson/goddaughter/godchild
 grand-parents
 great-grand-parents
 happy birthday to you!
@@ -128,6 +135,7 @@ image received
 in (month year)
 in (year)
 include missing spouses
+include spouses
 incompatible sexes
 incorrect date
 incorrect request
@@ -164,10 +172,11 @@ murdered
 name
 name "%s.%d %s" already used by %tthis person%t
 navigation with %t as Sosa reference
+nephews and nieces
 next sibling
 no anniversary
 no birthday
-no known relationship link between %t and %t
+no known relationship link between %s and %s
 no match
 not dead
 not divorced
@@ -180,7 +189,7 @@ number
 number of branches
 occupation
 of
-of %t's side
+of %s's side
 of (same or greater generation level)
 of the %s generation
 of the birth
@@ -208,6 +217,9 @@ probable loop in base
 public
 public name
 qualifier
+recognized son/recognized daughter/recognized child
+recognizing father/recognizing mother/recognizing parents
+relation/relations
 relationship
 relationship computing
 relationship link/relationship links
@@ -266,6 +278,7 @@ to the parents
 today
 tomorrow
 total
+uncles and aunts
 unknown person
 unspecified
 up to

@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 2.1 1999-03-08 11:19:07 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 2.2 1999-07-27 09:18:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open MLast;
@@ -14,7 +14,8 @@ value not_impl name x =
 ;
 
 value trace =
-  ["transl"; "transl_nth"; "transl_decline"; "ftransl"; "ftransl_nth"]
+  ["cftransl"; "transl"; "transl_nth"; "transl_decline"; "ftransl";
+   "ftransl_nth"]
 ;
 
 value rec expr e =
