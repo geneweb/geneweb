@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 2.1 1999-03-08 11:18:20 ddr Exp $ *)
+(* $Id: alln.ml,v 2.2 1999-06-25 08:50:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -114,9 +114,15 @@ value print_alphabetic_big conf base is_surnames ini list len =
           return ())
        list;
      html_p conf;
+     Wserver.wprint "%s:\n" (capitale (transl conf "the whole list"));
      stag "a" "href=\"%sm=%s;tri=A;o=A;k=%s\"" (commd conf) mode ini begin
-       Wserver.wprint "%s" (capitale (transl conf "the whole list"));
+       Wserver.wprint "%s" ((transl conf "long display"));
      end;
+     Wserver.wprint ",\n";
+     stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s\"" (commd conf) mode ini begin
+       Wserver.wprint "%s" ((transl conf "short display"));
+     end;
+     Wserver.wprint ".\n";
      trailer conf;
   return ()
 ;
@@ -318,16 +324,82 @@ value print_alphabetic conf base is_surnames =
   else print_alphabetic_small conf base is_surnames ini list len
 ;
 
+(* short print *)
+
+value print_alphabetic_short conf base is_surnames ini list len =
+  let title _ = print_title conf base is_surnames ini len in
+  let mode = if is_surnames then "N" else "P" in
+  let need_ref = len >= 250 in
+  do header conf title;
+     if need_ref then
+       List.iter
+         (fun (ini_k, _) ->
+            do stag "a" "href=\"#%s\"" ini_k begin
+                 Wserver.wprint "%s" (String.capitalize ini_k);
+               end;
+               Wserver.wprint "\n";
+            return ())
+         list
+     else ();
+     List.iter
+       (fun (ini_k, l) ->
+          do html_p conf;
+             let _ =
+               List.fold_left
+                 (fun first (s, cnt) ->
+                    do if first then () else Wserver.wprint ",\n";
+                       stag "a" "href=\"%sm=%s;v=%s\"%s"
+                         (commd conf) mode (code_varenv (Name.lower s))
+                         (if first && need_ref then "name=" ^ ini_k ^ " "
+                          else "")
+                       begin
+                         Wserver.wprint "%s" 
+                           (alphab_string conf is_surnames s);
+                       end;
+                       Wserver.wprint "(%d)" cnt;
+                    return False)
+                 True l
+             in ();
+             Wserver.wprint "\n";
+          return ())
+       list;
+     trailer conf;
+  return ()
+;
+
+value print_short conf base is_surnames =
+  let ini =
+    match p_getenv conf.env "k" with
+    [ Some k -> String.lowercase k
+    | _ -> "" ]
+  in
+  let all =
+    match p_getenv conf.env "o" with
+    [ Some "A" -> True
+    | _ -> False ]
+  in
+  let list =
+    let (list, sorted) = select_names conf base is_surnames ini in
+    if sorted then list
+    else Sort.list (fun (k1, _, _) (k2, _, _) -> k1 <= k2) list
+  in
+  let len = List.length list in
+  let list = combine_by_ini ini list in
+  print_alphabetic_short conf base is_surnames ini list len
+;
+
 (* main *)
 
 value print_surnames conf base =
   match p_getenv conf.env "tri" with
   [ Some "F" -> print_frequency conf base True
+  | Some "S" -> print_short conf base True
   | _ -> print_alphabetic conf base True ]
 ;
 
 value print_first_names conf base =
   match p_getenv conf.env "tri" with
   [ Some "F" -> print_frequency conf base False
+  | Some "S" -> print_short conf base False
   | _ -> print_alphabetic conf base False ]
 ;
