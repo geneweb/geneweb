@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.9 2002-10-21 10:57:17 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.10 2003-07-07 06:28:16 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -504,7 +504,7 @@
 
 <h4>[*note/notes]1</h4>
 
-<textarea name=notes rows=6 cols=70 wrap=virtual>%notes;</textarea>
+<textarea name=notes rows=6 cols=70 wrap=soft>%notes;</textarea>
 
 <h4>[*source/sources]0</h4>
 

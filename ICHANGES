@@ -5,6 +5,7 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [07 Jul 03] Changed "wrap=virtual" into "wrap=soft" in textareas.
   - [31 May 03] Fixed little problem which can be dangerous: in case
     of empty line in wizard (or friend) authorization file, everybody
     is wizard (or friend).
