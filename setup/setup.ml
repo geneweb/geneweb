@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.20 2002-01-13 12:03:09 ddr Exp $ *)
+(* $Id: setup.ml,v 4.21 2002-01-13 15:24:21 ddr Exp $ *)
 
 open Printf;
 
@@ -377,10 +377,12 @@ value rec copy_from_stream conf print strm =
     while True do {
       match Stream.next strm with
       [ '[' ->
-          let s = parse_upto ']' strm in
-          if String.length s > 0 && s.[0] = '\n' then
-            print (inline_translate conf s)
-          else print ("[" ^ s ^ "]")
+          match Stream.peek strm with
+          [ Some '\n' ->
+              let s = parse_upto ']' strm in
+              print (inline_translate conf s)
+          | _ ->
+              print "[" ]
       | '$' ->
           let c = Stream.next strm in
           match c with
