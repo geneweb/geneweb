@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.25 2000-06-30 12:25:11 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.26 2000-08-29 15:34:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1043,7 +1043,7 @@ value speclist =
    ("-s", Arg.String (fun x -> surnames.val := [x :: surnames.val]),
     "\"<surname>\" : select this surname (option usable several times)");
    ("-nsp", Arg.Set no_spouses_parents,
-    ": no spouses' parents (for option -s)");
+    ": no spouses' parents (for options -s and -d)");
    ("-nn", Arg.Set no_notes,
     ": no (data base) notes");
    ("-sep",
