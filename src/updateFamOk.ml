@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.23 1999-09-14 22:34:00 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.24 1999-09-16 09:31:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -69,7 +69,7 @@ value reconstitute_family conf =
     | _ -> False ]
   in
   let marriage = Update.reconstitute_date conf "marriage" in
-  let marriage_place = strip_spaces (get conf "marriage_place") in
+  let marriage_place = only_printable (get conf "marriage_place") in
   let divorce =
     match p_getenv conf.env "divorce" with
     [ Some "not_divorced" -> NotDivorced

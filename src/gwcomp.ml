@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 2.13 1999-09-14 22:33:50 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.14 1999-09-16 09:31:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000g";
+value magic_gwo = "GnWo000h";
 
 type key =
   { pk_first_name : string;
@@ -104,7 +104,8 @@ value date_of_string s i =
             else if day < 1 || day > 31 then error ()
             else
               let d =
-                {day = day; month = month; year = year; prec = precision}
+                {day = day; month = month; year = year; prec = precision;
+                 delta = 0}
               in
               Some (Dgreg d Dgregorian, i)
         | None ->
@@ -112,7 +113,8 @@ value date_of_string s i =
             else if month < 1 || month > 13 then error ()
             else
               let d =
-                {day = 0; month = month; year = year; prec = precision}
+                {day = 0; month = month; year = year; prec = precision;
+                 delta = 0}
               in
               Some (Dgreg d Dgregorian, i) ]
     | None ->
@@ -123,7 +125,9 @@ value date_of_string s i =
             Some (Dtext txt, String.length s)
           else failwith ("date_of_string " ^ s)
         else
-          let d = {day = 0; month = 0; year = year; prec = precision} in
+          let d =
+            {day = 0; month = 0; year = year; prec = precision; delta = 0}
+          in
           Some (Dgreg d Dgregorian, i) ]
   in
   let date =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 2.7 1999-09-14 22:33:41 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 2.8 1999-09-16 09:31:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -17,14 +17,14 @@ value reconstitute_date_dmy conf var =
           match get_number var "dd" conf.env with
           [ Some d ->
               if d >= 1 && d <= 31 && m >= 1 && m <= 12 then
-                Some {day = d; month = m; year = y; prec = Sure}
+                Some {day = d; month = m; year = y; prec = Sure; delta = 0}
               else None
           | None ->
               if m >= 1 && m <= 12 then
-                Some {day = 0; month = m; year = y; prec = Sure}
+                Some {day = 0; month = m; year = y; prec = Sure; delta = 0}
               else None ]
       | None ->
-          Some {day = 0; month = 0; year = y; prec = Sure} ]
+          Some {day = 0; month = 0; year = y; prec = Sure; delta = 0} ]
   | None -> None ]
 ;
 

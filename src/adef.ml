@@ -1,4 +1,4 @@
-(* $Id: adef.ml,v 2.3 1999-09-16 08:13:36 ddr Exp $ *)
+(* $Id: adef.ml,v 2.4 1999-09-16 09:31:39 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = int;
@@ -30,7 +30,8 @@ and dmy =
   { day : int;
     month : int;
     year : int;
-    prec : precision }
+    prec : precision;
+    delta : int }
 and precision =
   [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
 ;
@@ -51,7 +52,8 @@ value compress d =
   let simple =
     match d.prec with
     [ Sure | About | Maybe | Before | After ->
-        d.day >= 0 && d.month >= 0 && d.year > 0 && d.year < 2500
+        d.day >= 0 && d.month >= 0 && d.year > 0 && d.year < 2500 &&
+        d.delta = 0
     | _ -> False ]
   in
   if simple then
@@ -93,7 +95,7 @@ value uncompress x =
     | 4 -> After
     | _ -> Sure ]
   in
-  {day = day; month = month; year = year; prec = prec}
+  {day = day; month = month; year = year; prec = prec; delta = 0}
 ;
 
 value date_of_cdate =

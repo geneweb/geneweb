@@ -1,4 +1,4 @@
-(* $Id: calendar.ml,v 2.2 1999-09-16 08:13:36 ddr Exp $ *)
+(* $Id: calendar.ml,v 2.3 1999-09-16 09:31:41 ddr Exp $ *)
 (* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/; converted his
    C program into an Ocaml program.
 
@@ -36,7 +36,7 @@ value gregorian_of_sdn prec sdn =
   in
   let year = year - 4800 in
   let year = if year <= 0 then year - 1 else year in
-  {day = day; month = month; year = year; prec = prec}
+  {day = day; month = month; year = year; prec = prec; delta = 0}
 ;
 
 (* julian *)
@@ -66,7 +66,7 @@ value julian_of_sdn prec sdn =
   in
   let year = year - 4800 in
   let year = if year <= 0 then year - 1 else year in
-  {day = day; month = month; year = year; prec = prec}
+  {day = day; month = month; year = year; prec = prec; delta = 0}
 ;
 
 (* french *)
@@ -89,7 +89,7 @@ value french_of_sdn prec sdn =
   let dayOfYear = temp / 4 in
   let month = dayOfYear / days_per_month + 1 in
   let day = dayOfYear mod days_per_month + 1 in
-  {day = day; month = month; year = year; prec = prec}
+  {day = day; month = month; year = year; prec = prec; delta = 0}
 ;
 
 (* hebrew *)

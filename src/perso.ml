@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.46 1999-09-14 22:33:55 ddr Exp $ *)
+(* $Id: perso.ml,v 2.47 1999-09-16 09:31:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -237,8 +237,7 @@ value print_dates conf base in_perso p =
             if birth_place <> "" then
               Wserver.wprint "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
             else () ];
-        if birth_place <> "" then Wserver.wprint "%s" birth_place
-        else ();
+        if birth_place <> "" then Wserver.wprint "%s" birth_place else ();
         if in_perso then
           match (Adef.od_of_codate p.birth, birth_place) with
           [ (None, "") -> ()

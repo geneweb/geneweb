@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.33 1999-09-14 22:33:32 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.34 1999-09-16 09:31:38 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -376,18 +376,18 @@ value make_date n1 n2 n3 =
                 else (0, 0) ] ]
       in
       let (d, m) = if m < 1 || m > 13 then (0, 0) else (d, m) in
-      {day = d; month = m; year = y; prec = Sure}
+      {day = d; month = m; year = y; prec = Sure; delta = 0}
   | (None, Some m, Some y) ->
       let m =
         match m with
         [ Right m -> m
         | Left m -> m ]
       in
-      {day = 0; month = m; year = y; prec = Sure}
+      {day = 0; month = m; year = y; prec = Sure; delta = 0}
   | (None, None, Some y) ->
-      {day = 0; month = 0; year = y; prec = Sure}
+      {day = 0; month = 0; year = y; prec = Sure; delta = 0}
   | (Some y, None, None) ->
-      {day = 0; month = 0; year = y; prec = Sure}
+      {day = 0; month = 0; year = y; prec = Sure; delta = 0}
   | _ -> raise (Stream.Error "bad date") ]
 ;
 
@@ -1818,11 +1818,12 @@ value check_parents_sex base =
 value neg_year_dmy =
   fun
   [ {day = d; month = m; year = y; prec = OrYear y2} ->
-      {day = d; month = m; year = - abs y; prec = OrYear (- abs y2)}
+      {day = d; month = m; year = - abs y; prec = OrYear (- abs y2); delta = 0}
   | {day = d; month = m; year = y; prec = YearInt y2} ->
-      {day = d; month = m; year = - abs y; prec = YearInt (- abs y2)}
+      {day = d; month = m; year = - abs y; prec = YearInt (- abs y2);
+       delta = 0}
   | {day = d; month = m; year = y; prec = p} ->
-      {day = d; month = m; year = - abs y; prec = p} ]
+      {day = d; month = m; year = - abs y; prec = p; delta = 0} ]
 ;
 
 value neg_year =

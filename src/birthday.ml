@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 2.4 1999-09-14 22:33:45 ddr Exp $ *)
+(* $Id: birthday.ml,v 2.5 1999-09-16 09:31:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -226,7 +226,7 @@ value print_birth_day conf base day_name verb wd d m y list =
       Wserver.wprint "%s %s.\n"
         (capitale (transl conf "no birthday")) day_name
   | _ ->
-      let dt = {day = d; month = m; year = y; prec = Sure} in
+      let dt = {day = d; month = m; year = y; prec = Sure; delta = 0} in
       do Wserver.wprint "%s, %s %s%s %s %s:\n"
            (capitale day_name) (transl_nth conf "(week day)" wd)
            (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
@@ -289,7 +289,7 @@ value print_anniv conf base day_name verb wd d m y list =
       Wserver.wprint "%s %s.\n"
         (capitale (transl conf "no anniversary")) day_name
   | _ ->
-      let dt = {day = d; month = m; year = y; prec = Sure} in
+      let dt = {day = d; month = m; year = y; prec = Sure; delta = 0} in
       do Wserver.wprint "%s, %s %s%s %s:"
            (capitale day_name) (transl_nth conf "(week day)" wd)
            (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
@@ -435,7 +435,7 @@ value print_marriage_day conf base day_name verb wd d m y list =
       Wserver.wprint "%s %s.\n"
         (capitale (transl conf "no anniversary")) day_name
   | _ ->
-      let dt = {day = d; month = m; year = y; prec = Sure} in
+      let dt = {day = d; month = m; year = y; prec = Sure; delta = 0} in
       do Wserver.wprint "%s, %s %s%s %s %s:\n"
            (capitale day_name) (transl_nth conf "(week day)" wd)
            (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
