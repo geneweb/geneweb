@@ -2,6 +2,10 @@ GeneWeb version 3.07
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [30 Jul 00] Contribution from Ludovic Ledieu: changed displaying
+    of ancestors trees: 1/ clicks on persons fall on their personal pages
+    (no more for navigation) 2/ vertical bars are clickable to navigate 3/
+    no more bars for missing ancestors.
   - [28 Jul 00] Fixed problem in images displaying in personal pages
     and in trees. Sometimes the image was "broken", its URL being
     incorrect. Details:
