@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.35 2000-11-11 12:50:42 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.36 2000-12-04 16:22:05 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1112,21 +1112,34 @@ value add_indi gen r =
         let fal = [] in
         let (f, fal) =
           match first_names_brackets.val with
-          [ Some (bb, eb) ->
+          [ Some (' ', eb) ->
+              try
+                let j = String.index f eb in
+                let i =
+                  try String.rindex_from f (j - 1) ' ' with
+                  [ Not_found -> -1 ]
+                in
+                let fn = String.sub f (i + 1) (j - i - 1) in
+                let fa =
+                  String.sub f 0 j ^
+                  String.sub f (j + 1) (String.length f - j - 1)
+                in
+                if fn = fa then (fn, fal) else (fn, [fa :: fal])
+              with
+              [ Not_found -> (f, fal) ]
+          | Some (bb, eb) ->
               try
                 let i = String.index f bb in
                 let j =
                   if i + 2 == String.length f then raise Not_found
                   else String.index_from f (i + 2) eb
                 in
-                if j > i then
-                  let fn = String.sub f (i + 1) (j - i - 1) in
-                  let fa =
-                    String.sub f 0 i ^ fn ^
-                    String.sub f (j + 1) (String.length f - j - 1)
-                  in
-                  if fn = fa then (fn, fal) else (fn, [fa :: fal])
-                else raise Not_found
+                let fn = String.sub f (i + 1) (j - i - 1) in
+                let fa =
+                  String.sub f 0 i ^ fn ^
+                  String.sub f (j + 1) (String.length f - j - 1)
+                in
+                if fn = fa then (fn, fal) else (fn, [fa :: fal])
               with
               [ Not_found -> (f, fal) ]
           | None -> (f, fal) ]

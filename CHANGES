@@ -38,6 +38,11 @@ GeneWeb version 3.10
   - [08 Nov 00] Fixed bug: when giving 0 as Sosa number, it did not
     answer (infinite loop in gwd).
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [04 Dec 00] Now, the option -fne works (i.e. extracts the main first name)
+    even when the first character is a space, allowing to treat Gedcoms with
+    for example, just a star after the main first name.
+
 * GeneWeb uncompiler (gwu)
   - [26 Nov 00] Added option "-aws" (Ancestors With Siblings), extracting
     somebody's ancestors, together with their siblings, siblings' spouses
