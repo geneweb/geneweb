@@ -446,7 +446,7 @@ GeneWeb Version 2.01
     "Modify" in page "update" for example.
   - [Mar 14, 99] Cleaned up some generated HTML code.
   - [Mar 10, 99] Inlined "List.remove_assoc" in order to be compilable
-    by Ocaml and Camlp4 2.01 as well.
+    by OCaml and Camlp4 2.01 as well.
 
 * Welcome pages (hd/lang/xx/start.txt)
   - [Mar 20, 99] Changed order of links for displayed anniversaries and
@@ -614,7 +614,7 @@ GeneWeb Version 1.06
 
 * Restructuration (perestroika) for distribution of sources.
 
-* Some changes for compilation with version 2.00 of Ocaml and Camlp4.
+* Some changes for compilation with version 2.00 of OCaml and Camlp4.
 
 * gwd:
   - added cannot change sex of married person while updating person,

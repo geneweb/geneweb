@@ -22,6 +22,10 @@ GeneWeb version 3.07
     places and surnames could be displayed several times.
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [28 Jul 00] Fixed bug: when a person was married several times,
+    the order of families were sometimes incorrect. Actually, the order
+    wrongly followed the order where the families appeared in the
+    gedcom, not the order indicated in the individual record.
   - [26 Jul 00] Added a lock to the data base before writing it (to avoid
     multiple accesses which risk to damage it).
 

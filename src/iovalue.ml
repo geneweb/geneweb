@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 3.1 2000-01-10 02:14:39 ddr Exp $ *)
+(* $Id: iovalue.ml,v 3.2 2000-07-28 14:49:22 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");
@@ -8,7 +8,7 @@ value fun_tag = Obj.tag (Obj.repr (fun x -> x));
 
 (* Input:
    read inside a value output by output_value (no headers) must
-   match Ocaml's input_value system (intern.c) *)
+   match OCaml's input_value system (intern.c) *)
 
 value sizeof_long = 4;
 value sign_extend_shift = (sizeof_long - 1) * 8 - 1;

@@ -63,7 +63,7 @@ You need:
 In directory tools, move the file Makefile.inc as another name, and
 move the file Makefile.inc.win as Makefile.inc. Edit it and possibly
 change "CAMLP4D" and "LIBUNIX" to point file where the corresponding
-Ocaml and Camlp4 files or directories are installed.
+OCaml and Camlp4 files or directories are installed.
 
 Then follow the same instructions above than for the Unix installation,
 starting at point 2.
