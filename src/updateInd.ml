@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.10 2000-03-08 14:35:34 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.11 2000-03-10 09:38:42 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -502,7 +502,7 @@ value print_relation_person conf base r proj var =
         | None -> ("", "", 0, Update.Link) ]
     | None -> ("", "", 0, Update.Link) ]
   in
-  Update.print_parent_person conf base var key
+  Update.print_simple_person conf base var key
 ;
 
 value print_relation conf base r cnt =

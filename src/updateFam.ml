@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.6 2000-03-09 20:06:48 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.7 2000-03-10 09:38:41 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -24,6 +24,134 @@ value string_family_of base fam cpl des =
   let scpl = Gutil.map_couple_p (person_key base) cpl in
   let sdes = Gutil.map_descend_p (person_key base) des in
   (sfam, scpl, sdes)
+;
+
+value print_birth conf var create verbose =
+  do tag "td" begin
+       Wserver.wprint "%s" (capitale (transl conf "birth"));
+     end;
+     tag "td" begin
+       Wserver.wprint "<input name=%sb_yyyy size=5 maxlength=5%s>\n" var
+         (match create with
+          [ Update.Create _ (Some (Some (Dgreg {year = y} _), _, _, _)) ->
+              " value=" ^ string_of_int y
+          | _ -> "" ]);
+       Wserver.wprint "<input name=%sb_mm size=2 maxlength=2%s>\n" var
+         (match create with
+          [ Update.Create _ (Some (Some (Dgreg {month = m} _), _, _, _))
+            when m <> 0 ->
+              " value=" ^ string_of_int m
+          | _ -> "" ]);
+       Wserver.wprint "<input name=%sb_dd size=2 maxlength=2%s>\n" var
+         (match create with
+          [ Update.Create _ (Some (Some (Dgreg {day = d} _), _, _, _))
+            when d <> 0 ->
+              " value=" ^ string_of_int d
+          | _ -> "" ]);
+     end;
+     if verbose then
+       tag "td" begin Wserver.wprint "%s" (capitale (transl conf "place")); end
+     else ();
+     tag "td" "colspan=2" begin
+       Wserver.wprint "<input name=%sb_pl size=20 maxlength=200%s>\n" var
+         (match create with
+          [ Update.Create _ (Some (_, pl, _, _)) when pl <> "" ->
+              " value=\"" ^ quote_escaped pl ^ "\""
+          | _ -> "" ]);
+     end;
+  return ()
+;
+
+value print_death conf var create verbose =
+  do tag "td" begin
+       Wserver.wprint "%s" (capitale (transl conf "death"));
+     end;
+     tag "td" begin
+       Wserver.wprint "<input name=%sd_yyyy size=5 maxlength=5%s>\n" var
+         (match create with
+          [ Update.Create _ (Some (_, _, Some (Dgreg {year = y} _), _)) ->
+              " value=" ^ string_of_int y
+          | _ -> "" ]);
+       Wserver.wprint "<input name=%sd_mm size=2 maxlength=2%s>\n" var
+         (match create with
+          [ Update.Create _ (Some (_, _, Some (Dgreg {month = m} _), _))
+            when m <> 0 ->
+              " value=" ^ string_of_int m
+          | _ -> "" ]);
+       Wserver.wprint "<input name=%sd_dd size=2 maxlength=2%s>\n" var
+         (match create with
+          [ Update.Create _ (Some (_, _, Some (Dgreg {day = d} _), _))
+            when d <> 0 ->
+              " value=" ^ string_of_int d
+          | _ -> "" ]);
+     end;
+     if verbose then
+       tag "td" begin Wserver.wprint "%s" (capitale (transl conf "place")); end
+     else ();
+     tag "td" "colspan=2" begin
+       Wserver.wprint "<input name=%sd_pl size=20 maxlength=200%s>\n" var
+         (match create with
+          [ Update.Create _ (Some (_, _, _, pl)) when pl <> "" ->
+              " value=\"" ^ quote_escaped pl ^ "\""
+          | _ -> "" ]);
+     end;
+  return ()
+;
+
+value print_parent_person conf base var (first_name, surname, occ, create) =
+  do tag "table" "border=1" begin
+       tag "tr" begin
+         tag "td" begin
+           Wserver.wprint "%s"
+             (capitale (transl_nth conf "first name/first names" 0));
+         end;
+         tag "td" begin
+           Wserver.wprint "<input name=%s_fn size=23 maxlength=200" var;
+           Wserver.wprint " value=\"%s\">"
+             (quote_escaped first_name);
+         end;
+         tag "td" "align=right" begin
+           let s = capitale (transl conf "number") in
+           Wserver.wprint "%s" s;
+         end;
+         tag "td" begin
+           Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
+             (if occ == 0 then "" else " value=" ^ string_of_int occ);
+         end;
+         tag "td" begin
+           tag "select" "name=%s_p" var begin
+             Wserver.wprint "<option value=link%s>%s\n"
+               (if create = Update.Link then " selected" else "")
+               (capitale (transl conf "link"));
+             Wserver.wprint "<option value=create%s>%s\n"
+               (match create with
+                [ Update.Create _ _ -> " selected" | _ -> "" ])
+               (capitale (transl conf "create"));
+           end;
+         end;
+       end;
+       Wserver.wprint "\n";
+       tag "tr" begin
+         tag "td" begin
+           Wserver.wprint "%s"
+             (capitale (transl_nth conf "surname/surnames" 0));
+         end;
+         tag "td" "colspan=4" begin
+           Wserver.wprint
+             "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
+             var surname;
+         end;
+       end;
+     end;
+     tag "table" "border=1" begin
+       tag "tr" begin
+         print_birth conf var create True;
+       end;
+       tag "tr" begin
+         print_death conf var create True;
+       end;
+     end;
+  return ()
 ;
 
 value print_child_person conf base var (first_name, surname, occ, create) =
@@ -71,35 +199,7 @@ value print_child_person conf base var (first_name, surname, occ, create) =
             (capitale (transl conf "create"));
         end;
       end;
-      tag "td" begin
-        Wserver.wprint "%s" (capitale (transl conf "birth"));
-      end;
-      tag "td" begin
-        Wserver.wprint "<input name=%sb_yyyy size=5 maxlength=5%s>\n" var
-          (match create with
-           [ Update.Create _ (Some (Some (Dgreg {year = y} _), _, _, _)) ->
-               " value=" ^ string_of_int y
-           | _ -> "" ]);
-        Wserver.wprint "<input name=%sb_mm size=2 maxlength=2%s>\n" var
-          (match create with
-           [ Update.Create _ (Some (Some (Dgreg {month = m} _), _, _, _))
-             when m <> 0 ->
-               " value=" ^ string_of_int m
-           | _ -> "" ]);
-        Wserver.wprint "<input name=%sb_dd size=2 maxlength=2%s>\n" var
-          (match create with
-           [ Update.Create _ (Some (Some (Dgreg {day = d} _), _, _, _))
-             when d <> 0 ->
-               " value=" ^ string_of_int d
-           | _ -> "" ]);
-      end;
-      tag "td" "colspan=2" begin
-        Wserver.wprint "<input name=%sb_pl size=20 maxlength=200%s>\n" var
-          (match create with
-           [ Update.Create _ (Some (_, pl, _, _)) when pl <> "" ->
-               " value=\"" ^ quote_escaped pl ^ "\""
-           | _ -> "" ]);
-      end;
+      print_birth conf var create False;
     end;
     Wserver.wprint "\n";
     tag "tr" begin
@@ -115,35 +215,7 @@ value print_child_person conf base var (first_name, surname, occ, create) =
            [ Update.Create Female _ -> " checked" | _ -> "" ])
           (transl_nth conf "M/F" 1);
       end;
-      tag "td" begin
-        Wserver.wprint "%s" (capitale (transl conf "death"));
-      end;
-      tag "td" begin
-        Wserver.wprint "<input name=%sd_yyyy size=5 maxlength=5%s>\n" var
-          (match create with
-           [ Update.Create _ (Some (_, _, Some (Dgreg {year = y} _), _)) ->
-               " value=" ^ string_of_int y
-           | _ -> "" ]);
-        Wserver.wprint "<input name=%sd_mm size=2 maxlength=2%s>\n" var
-          (match create with
-           [ Update.Create _ (Some (_, _, Some (Dgreg {month = m} _), _))
-             when m <> 0 ->
-               " value=" ^ string_of_int m
-           | _ -> "" ]);
-        Wserver.wprint "<input name=%sd_dd size=2 maxlength=2%s>\n" var
-          (match create with
-           [ Update.Create _ (Some (_, _, Some (Dgreg {day = d} _), _))
-             when d <> 0 ->
-               " value=" ^ string_of_int d
-           | _ -> "" ]);
-      end;
-      tag "td" "colspan=2" begin
-        Wserver.wprint "<input name=%sd_pl size=20 maxlength=200%s>\n" var
-          (match create with
-           [ Update.Create _ (Some (_, _, _, pl)) when pl <> "" ->
-               " value=\"" ^ quote_escaped pl ^ "\""
-           | _ -> "" ]);
-      end;
+      print_death conf var create False;
     end;
   end
 ;
@@ -153,7 +225,7 @@ value print_father conf base cpl =
        Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 0));
      end;
      Wserver.wprint "\n";
-     Update.print_parent_person conf base "his" cpl.father;
+     print_parent_person conf base "him" cpl.father;
      Wserver.wprint "\n";
   return ()
 ;
@@ -163,7 +235,7 @@ value print_mother conf base cpl =
        Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 1));
      end;
      Wserver.wprint "\n";
-     Update.print_parent_person conf base "her" cpl.mother;
+     print_parent_person conf base "her" cpl.mother;
      Wserver.wprint "\n";
   return ()
 ;
@@ -183,7 +255,7 @@ value print_insert_witness conf base cnt =
 ;
 
 value print_witness conf base var key =
-  Update.print_parent_person conf base var key
+  Update.print_simple_person conf base var key
 ;
 
 value print_witnesses conf base fam =

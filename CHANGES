@@ -10,8 +10,8 @@ GeneWeb version 3.03
     telling not to delete the window! (English, French, Swedish versions)
 
 * GeneWeb Service/CGI (gwd)
-  - [09 Mar 00] In update family form, added ability to specify birth
-    place, death date and death place for children.
+  - [09..10 Mar 00] In update family form, added ability to specify birth
+    place, death date and death place for parents and children.
   - [08 Mar 00] Added latest marriages (accessible only by "wizards" and
     "friends")
   - [08 Mar 00] Added optional displaying of images in ancestors displaying

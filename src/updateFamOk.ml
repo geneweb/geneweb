@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.7 2000-03-09 20:06:49 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.8 2000-03-10 09:38:41 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -37,7 +37,7 @@ value reconstitute_somebody conf var =
   (first_name, surname, occ, create)
 ;
 
-value reconstitute_child conf var default_surname =
+value reconstitute_parent_or_child conf var default_surname =
   let first_name = getn conf var "fn" in
   let surname =
     let surname = getn conf var "sn" in
@@ -85,8 +85,8 @@ value insert_child conf (children, ext) i =
 
 value reconstitute_family conf =
   let ext = False in
-  let father = reconstitute_somebody conf "his" in
-  let mother = reconstitute_somebody conf "her" in
+  let father = reconstitute_parent_or_child conf "him" "" in
+  let mother = reconstitute_parent_or_child conf "her" "" in
   let not_married =
     match p_getenv conf.env "not_married" with
     [ Some "true" -> True
@@ -124,12 +124,14 @@ value reconstitute_family conf =
           (Adef.codate_of_od
              (Update.reconstitute_date conf "divorce")) ]
   in
-  let surname = getn conf "his" "sn" in
+  let surname = getn conf "him" "sn" in
   let (children, ext) =
     loop 1 ext where rec loop i ext =
       match
         try
-          Some (reconstitute_child conf ("ch" ^ string_of_int i) surname)
+          Some
+            (reconstitute_parent_or_child conf ("ch" ^ string_of_int i)
+               surname)
         with
         [ Failure _ -> None ]
       with

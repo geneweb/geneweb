@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.7 2000-03-09 20:06:47 ddr Exp $ *)
+(* $Id: update.ml,v 3.8 2000-03-10 09:38:39 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -615,7 +615,7 @@ value print_date conf base lab var d =
   return ()
 ;
 
-value print_parent_person conf base var (first_name, surname, occ, create) =
+value print_simple_person conf base var (first_name, surname, occ, create) =
   tag "table" "border=1" begin
     tag "tr" begin
       tag "td" begin
