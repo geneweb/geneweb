@@ -1,0 +1,18 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <meta name="ROBOTS" content="NONE">
+  <title>Access refused</title>
+</head>
+<body>
+<h1>Access refused</h1>
+
+This address made more than %c requests in less than %s seconds.
+Considering that you probably sent a robot, your access has been
+automatically disconnected.
+<p>
+Contact the site administrator to restore it.
+
+<p><hr><font size=-1><em>(c) Copyright INRIA 1999 -
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/">
+GeneWeb %v</a></em></font><br>
+</body>

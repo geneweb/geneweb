@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.41 1999-08-05 14:26:49 ddr Exp $ *)
+(* $Id: util.ml,v 2.42 1999-08-12 19:37:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -576,7 +576,7 @@ value header conf title =
   return ()
 ;
 
-value rec copy_from_channel ic =
+value copy_from_channel env ic =
   try
     while True do
       match input_char ic with
@@ -585,42 +585,46 @@ value rec copy_from_channel ic =
           match c with
           [ '%' -> Wserver.wprint "%%"
           | 'v' -> Wserver.wprint "%s" Version.txt
-          | c -> do Wserver.wprint "%%"; return Wserver.wprint "%c" c ]
+          | c ->
+              try Wserver.wprint "%s" (List.assoc c env) with
+              [ Not_found -> Wserver.wprint "%%%c" c ] ]
       | c -> Wserver.wprint "%c" c ];
     done
   with
   [ End_of_file -> close_in ic ]
 ;
 
-value copy_from_file fname =
+value copy_from_file env fname =
   let fname =
     List.fold_right Filename.concat [lang_dir.val; "lang"]
        (Filename.basename fname ^ ".txt")
   in
   let ic = open_in fname in
-  copy_from_channel ic
+  copy_from_channel env ic
 ;
 
 value trailer conf =
-  do try copy_from_file "copyr" with _ ->
-       do html_p conf;
-          Wserver.wprint "
+  do try copy_from_file [] "copyr" with
+     [ Sys_error _ ->
+         do html_p conf;
+            Wserver.wprint "
 <hr><font size=-1><em>(c) Copyright INRIA 1999 -
 GeneWeb %s</em></font>" Version.txt;
-          html_br conf;
-       return ();
+            html_br conf;
+         return () ];
      let trl_fname =
        List.fold_right Filename.concat [base_dir.val; "lang"; conf.lang]
          (conf.bname ^ ".trl")
      in
-     match try Some (open_in trl_fname) with _ -> None with
-     [ Some ic -> copy_from_channel ic
+     match try Some (open_in trl_fname) with [ Sys_error _ -> None ] with
+     [ Some ic -> copy_from_channel [] ic
      | None ->
          let trl_fname =
            List.fold_right Filename.concat [base_dir.val; "lang"]
              (conf.bname ^ ".trl")
          in
-         try copy_from_channel (open_in trl_fname) with _ -> () ];
+         try copy_from_channel [] (open_in trl_fname) with
+         [ Sys_error _ -> () ] ];
      List.iter (fun t -> Wserver.wprint "</%s>" (upto_space t))
        (List.rev (enclosing_tags conf));
      Wserver.wprint "</body>\n";

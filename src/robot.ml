@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.9 1999-08-09 15:02:13 ddr Exp $ *)
+(* $Id: robot.ml,v 1.10 1999-08-12 19:37:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -18,24 +18,21 @@ value nl () =
   ifdef UNIX then Wserver.wprint "\r\n" else Wserver.wprint "\n"
 ;
 
-value robot_error from cnt sec =
-  let title _ = Wserver.wprint "Access refused" in
-  do Wserver.wprint "HTTP/1.0 403 Forbidden"; nl ();
+value robot_error cgi from cnt sec =
+  do if cgi then ()
+     else do Wserver.wprint "HTTP/1.0 403 Forbidden"; nl (); return ();
      Wserver.wprint "Content-type: text/html; charset=iso-8859-1"; nl ();
      nl ();
-     Wserver.wprint "<head><title>";
-     title True;
-     Wserver.wprint "</title>\n<body>\n<h1>";
-     title False;
-     Wserver.wprint "</h1>\n";
-     Wserver.wprint "
-This address made more than %d requests in less than %d seconds.
-Considering that you probably sent a robot, your access has been
-automatically disconnected.
-<p>
-Contact the site administrator to restore it.
-" cnt sec;
-     Wserver.wprint "</body>\n";
+     let env = [('c', string_of_int cnt); ('s', string_of_int sec)] in
+     try copy_from_file env "robot" with
+     [ Sys_error _ ->
+         let title _ = Wserver.wprint "Access refused" in
+         do Wserver.wprint "<head><title>";
+             title True;
+             Wserver.wprint "</title>\n<body>\n<h1>";
+             title False;
+             Wserver.wprint "</body>\n";
+         return () ];
   return raise Exit
 ;
 
@@ -66,7 +63,7 @@ value input_excl =
     else (input_value ic : excl)
 ;
 
-value check oc tm from max_call sec =
+value check oc tm from max_call sec cgi =
   let fname = Srcfile.adm_file "robot" in
   let xcl =
     match try Some (open_in_bin fname) with _ -> None with
@@ -154,5 +151,5 @@ value check oc tm from max_call sec =
          return ()
      | None -> () ];
   return
-  if refused then robot_error from max_call sec else ()
+  if refused then robot_error cgi from max_call sec else ()
 ;

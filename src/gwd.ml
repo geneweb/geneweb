@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.25 1999-08-08 12:11:45 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.26 1999-08-12 19:37:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -227,9 +227,6 @@ rename it as \"%s.gwf\".\n" bname bname;
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
 value print_renamed conf new_n =
-  let  title _ =
-    Wserver.wprint "%s -&gt; %s" conf.bname new_n
-  in
   let link =
     let req = Util.get_request_string conf in
     let new_req =
@@ -243,45 +240,41 @@ value print_renamed conf new_n =
     in
     "http://" ^ Util.get_server_string conf ^ new_req
   in
-  do Util.header conf title;
-     Wserver.wprint "The database \"%s\" has been renamed \"%s\".\n"
-       conf.bname new_n;
-     Wserver.wprint "Please use now:\n";
-     Util.html_br conf;
-     Wserver.wprint "La base de données \"%s\" est renommée \"%s\".\n"
-       conf.bname new_n;
-     Wserver.wprint "Utiliser maintenant:\n";
-     Util.html_p conf;
-     tag "ul" begin
-       Util.html_li conf;
-       tag "a" "href=\"%s\"" link begin
-         Wserver.wprint "%s" link;
-       end;
-     end;
-     Util.trailer conf;
-  return ()
+  let env = [('o', conf.bname); ('n', new_n); ('l', link)] in
+  try Util.copy_from_file env "renamed" with
+  [ Sys_error _ ->
+      let  title _ =
+        Wserver.wprint "%s -&gt; %s" conf.bname new_n
+      in
+      do Util.header conf title;
+         tag "ul" begin
+           Util.html_li conf;
+           tag "a" "href=\"%s\"" link begin
+             Wserver.wprint "%s" link;
+           end;
+         end;
+         Util.trailer conf;
+      return () ]
 ;
 
 value print_redirected conf new_addr =
-  let  title _ = Wserver.wprint "Address changed" in
   let link =
     let req = Util.get_request_string conf in
     "http://" ^ new_addr ^ req
   in
-  do Util.header conf title;
-     Wserver.wprint "The address of this service has changed.\n";
-     Wserver.wprint "Please use now:\n";
-     Util.html_br conf;
-     Wserver.wprint "L'adresse du service a changé.\n";
-     Wserver.wprint "Utiliser maintenant:\n";
-     Util.html_p conf;
-     tag "ul" begin
-       Util.html_li conf;
-       stag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
-       Wserver.wprint "\n";
-     end;
-     Util.trailer conf;
-  return ()
+  let env = [('l', link)] in
+  try Util.copy_from_file env "redirect" with
+  [ Sys_error _ ->
+      let  title _ = Wserver.wprint "Address changed" in
+      do Util.header conf title;
+         Wserver.wprint "Use the following address:\n<p>\n";
+         tag "ul" begin
+           Util.html_li conf;
+           stag "a" "href=\"%s\"" link begin Wserver.wprint "%s" link; end;
+           Wserver.wprint "\n";
+         end;
+         Util.trailer conf;
+      return () ]
 ;
 
 value log_count =
@@ -749,7 +742,7 @@ value log_and_robot_check cgi from request str =
         let oc = log_oc () in
         do try
              do match robot_xcl.val with
-                [ Some (cnt, sec) -> Robot.check oc tm from cnt sec
+                [ Some (cnt, sec) -> Robot.check oc tm from cnt sec cgi
                 | None -> () ];
                 if cgi && log_file.val = "" then ()
                 else log oc tm from request str;
