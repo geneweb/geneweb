@@ -160,10 +160,10 @@ notes.cmo: config.cmi def.cmi gutil.cmi util.cmi ../wserver/wserver.cmi
 notes.cmx: config.cmi def.cmi gutil.cmx util.cmx ../wserver/wserver.cmx 
 num.cmo: num.cmi 
 num.cmx: num.cmi 
-perso.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi num.cmi \
-    util.cmi ../wserver/wserver.cmi perso.cmi 
-perso.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx num.cmx \
-    util.cmx ../wserver/wserver.cmx perso.cmi 
+perso.cmo: adef.cmi buff.cmo config.cmi date.cmi def.cmi gutil.cmi name.cmi \
+    num.cmi util.cmi version.cmo ../wserver/wserver.cmi perso.cmi 
+perso.cmx: adef.cmx buff.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx \
+    num.cmx util.cmx version.cmx ../wserver/wserver.cmx perso.cmi 
 phonygwd.cmo: argl.cmo ../wserver/wserver.cmi 
 phonygwd.cmx: argl.cmx ../wserver/wserver.cmx 
 place.cmo: adef.cmi config.cmi def.cmi gutil.cmi iobase.cmi util.cmi \

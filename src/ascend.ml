@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.43 2000-09-15 12:04:40 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.44 2000-10-28 08:49:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -750,6 +750,68 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
   | _ -> () ]
 ;
 
+value print_not_empty_src conf base new_parag first txt isrc =
+  let src = sou base isrc in
+  if src = "" then ()
+  else
+    do if first.val then
+         do if new_parag then html_p conf else ();
+            Wserver.wprint "<font size=-1><em>%s:</em></font>\n"
+              (capitale (transl_nth conf "source/sources" 1));
+         return ()
+       else ();
+       html_br conf;
+       Wserver.wprint "-\n";
+       first.val := False;
+       Wserver.wprint "<font size=-1><em>%s: " (txt ());
+       copy_string_with_macros conf src;
+       Wserver.wprint "</em></font>\n";
+    return ()
+;
+
+value print_sources conf base new_parag p =
+  let u = uoi base p.cle_index in
+  let first = ref True in
+  let auth = age_autorise conf base p in
+  do print_not_empty_src conf base new_parag first
+       (fun () -> nominative (transl_nth conf "person/persons" 0))
+       p.psources;
+     if auth then
+       do print_not_empty_src conf base new_parag first
+            (fun () -> transl_nth conf "birth" 0)
+             p.birth_src;
+          print_not_empty_src conf base new_parag first
+            (fun () -> transl_nth conf "baptism" 0)
+            p.baptism_src;
+          print_not_empty_src conf base new_parag first
+            (fun () -> transl_nth conf "death" 0)
+            p.death_src;
+          print_not_empty_src conf base new_parag first
+            (fun () -> transl_nth conf "burial" 0)
+            p.burial_src;
+       return ()
+     else ();
+     for i = 0 to Array.length u.family - 1 do
+       let fam = foi base u.family.(i) in
+       do if auth then
+            print_not_empty_src conf base new_parag first
+              (fun () ->
+                 transl_nth conf "marriage/marriages" 0 ^
+                 (if Array.length u.family == 1 then ""
+                  else " " ^ string_of_int (i + 1)))
+               fam.marriage_src
+          else ();
+          print_not_empty_src conf base new_parag first
+            (fun () ->
+               nominative (transl_nth conf "family/families" 0) ^
+               (if Array.length u.family == 1 then ""
+                else " " ^ string_of_int (i + 1)))
+            fam.fsources;
+       return ();
+     done;
+  return ()
+;
+
 value print_notes_for_someone conf base p n child_n =
   if age_autorise conf base p && person_has_notes base p then
     let notes = sou base p.notes in
@@ -764,7 +826,7 @@ value print_notes_for_someone conf base p n child_n =
        end;
        Wserver.wprint ": \n<dd>\n";
        copy_string_with_macros conf notes;
-       Perso.print_sources conf base (notes <> "") p;
+       print_sources conf base (notes <> "") p;
        Wserver.wprint "<p>\n";
     return ()
   else ()
