@@ -5,6 +5,15 @@ GeneWeb version 4.01
   - [13 Mar 01] Fixed problem in displaying "anniversaries month"
     in Estonian: the month appeared with all its declinations.
 
+* Lexicon (lang/lexicon.txt)
+  - [14 Mar 01] Changed the translation of nth (cousin) for French, where
+    the "n" should be "2n+2" (e.g. a "3nd cousin" is litterally "a cousin
+    of the 8th degree"). Perhaps the same thing has to be done in other
+    languages?
+  - [14 Mar 01] Changed the "*nth (cousin)*" entry to directly represent
+    what has to be used to translate the "nth". Previously, it was
+    "indirect", looking for another entry in the lexicon.
+
 GeneWeb version 4.00
 --------------------
 
