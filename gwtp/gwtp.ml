@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.6 2001-10-27 20:03:01 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.7 2001-10-29 08:39:10 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -1062,7 +1062,6 @@ value gwtp () =
   let (str, env) = HttpEnv.make content_type content in
   let oc_log = log_open () in
   do {
-    ifdef UNIX then let _ = Unix.umask 0 in () else ();
     log oc_log str;
     flush oc_log;
     Unix.dup2 (Unix.descr_of_out_channel oc_log) Unix.stderr;
