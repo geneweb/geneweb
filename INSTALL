@@ -3,7 +3,7 @@ INSTALLATIONS INSTRUCTIONS IN UNIX MACHINES
 
 For the compilation, you need
    the Objective Caml compiler version 3.01
-   the preprocessor Camlp4 version 3.01.4
+   the preprocessor Camlp4 version 3.01.5
 installed in your computer.
 
 They are freely distributed at addresses:
