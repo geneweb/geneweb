@@ -46,11 +46,16 @@ GeneWeb version 3.12
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
   - [01 Mar 01] Added entry "on (weekday day month year)" for the
     anniversary page sentence: "today, weekday day month year, etc".
+    Necessary at least for Finnish and Estonian.
   - [19 Feb 01] Updated several lexicon entries in Estonian (Hanno
     Kuus)
   - [16 Feb 01] In all welcome pages, suppressed the text "or surname" in
     the first choice of the first case. But it goes on searching up by
     surname, if no complete name is found.
+
+* Base configuration files (base.gwf)
+  - [29 Dec 00] The variable "always_surname" now applies not also to pages
+    displaying surnames by branch (no more only to descendants pages).
 
 * Setup program (gwsetup)
   - [24 Feb 01] Fixed big bug: when creating a data base, a page
