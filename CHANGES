@@ -9,10 +9,12 @@ GeneWeb version 2.05
     problem.
 
 * Setup program
-  - [Jul 18, 99] Added in the menu "data base parameters" the ability to display
-    the characters in the pages 1/ in bold, 2/ in italic, 3/ in smaller or bigger     size (using the new key 'enclosing_tag': see below section "base configuration
-    files"). Bold is useful, for example, if a background image is used, to
-    make the text more readable. [Spanish version not yet translated]
+  - [Jul 18, 99] Added in the menu "data base parameters" the ability to
+    display the characters in the pages 1/ in bold, 2/ in italic, 3/ in
+    smaller or bigger size (using the new key 'enclosing_tag': see below
+    section "base configuration files"). Bold is useful, for example, if
+    a background image is used, to make the text more readable. [Spanish
+    version not yet translated]
   - [Jul 15, 99] Changed GEDCOM export menu to reflect new option "-charset"
     of "gwb2ged" (see below in section "GeneWeb to Gedcom").
   - [Jul 2, 99] Fixed bug: importing GeneWeb base from old version passing
@@ -21,12 +23,15 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Jul 18, 99] In update families, set "sources" of created persons (info got
-    from the family "sources").
+  - [Jul 19, 99] Fixed bug in descendants by list: displaying was incorrect
+    when several marriages and one of them with an unknown ("? ?") person.
+  - [Jul 18, 99] When updating families, the "sources" field is propagated
+    into the created persons.
   - [Jul 18, 99] After a successful update, direct print a personal page
     (display intermediate page only on case of warnings).
   - [Jul 18, 99] Fixed small bug for the access by subparts of surnames
-    (it accepted too small subparts).
+    (it sometimes accepted too small subparts: then the "search" could
+    give weird results).
   - [Jul 17, 99] In welcome page, now search by surname when search by
     full name fails (no need to select "surname"). Idem in relationship
     computing.

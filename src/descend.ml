@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.14 1999-07-15 08:52:43 ddr Exp $ *)
+(* $Id: descend.ml,v 2.15 1999-07-19 09:56:17 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -233,6 +233,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
   let compte = ref 0 in
   let rec boucle niveau p =
     if niveau <= niveau_max then
+      let ifaml = Array.to_list p.family in
       let _ =
         List.fold_left
           (fun first ifam ->
@@ -241,7 +242,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
              let conj = spouse p cpl in
              let enfants = fam.children in
              let conj = poi base conj in
-             do if connais base conj then
+             do if connais base conj || List.length ifaml > 1 then
                   do afficher_marie conf base first fam p conj;
                      if Array.length enfants <> 0 then
                        Wserver.wprint ", <em>%s</em>"
@@ -259,7 +260,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
                   end
                 else ();
              return False)
-          True (Array.to_list p.family)
+          True ifaml
       in
       ()
     else ()
