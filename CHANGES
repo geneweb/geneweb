@@ -37,6 +37,7 @@ GeneWeb version 4.10
     generations (descendants only) to export.
 
 * GeneWeb databases Transfer Program (gwtp)
+  - [08 Dec 03] Added German (Falko Trojahn).
   - [03 Jan 03] Fixed bug: when wizard notes, the "send database" did
     not work.
 
