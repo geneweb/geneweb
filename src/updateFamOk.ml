@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.8 2000-03-10 09:38:41 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.9 2000-03-16 10:58:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -235,7 +235,18 @@ value family_exclude pfams efam =
   Array.of_list pfaml
 ;
 
-value infer_origin_file conf base ncpl ndes =
+value infer_origin_file_from_other_marriages conf base ifam ip =
+  let u = uoi base ip in
+  loop 0 where rec loop i =
+    if i = Array.length u.family then None
+    else if u.family.(i) = ifam then loop (i + 1)
+    else
+      let r = (foi base u.family.(i)).origin_file in
+      if sou base r <> "" then Some r
+      else loop (i + 1)
+;
+
+value infer_origin_file conf base ifam ncpl ndes =
   let afath = aoi base ncpl.father in
   let amoth = aoi base ncpl.mother in
   match (afath.parents, amoth.parents) with
@@ -244,15 +255,29 @@ value infer_origin_file conf base ncpl ndes =
   | (_, Some if2) when sou base (foi base if2).origin_file <> "" ->
       (foi base if2).origin_file
   | _ ->
-      loop 0 where rec loop i =
-        if i == Array.length ndes.children then
-          Update.insert_string conf base ""
-        else
-          let cifams = (uoi base ndes.children.(i)).family in
-          if Array.length cifams == 0 then loop (i + 1)
-          else if sou base (foi base cifams.(0)).origin_file <> "" then
-            (foi base cifams.(0)).origin_file
-          else loop (i + 1) ]
+      let r =
+        loop 0 where rec loop i =
+          if i == Array.length ndes.children then None
+          else
+            let cifams = (uoi base ndes.children.(i)).family in
+            if Array.length cifams == 0 then loop (i + 1)
+            else if sou base (foi base cifams.(0)).origin_file <> "" then
+              Some (foi base cifams.(0)).origin_file
+            else loop (i + 1)
+      in
+      let r =
+        if r = None then
+          infer_origin_file_from_other_marriages conf base ifam ncpl.father
+        else r
+      in
+      let r =
+        if r = None then
+          infer_origin_file_from_other_marriages conf base ifam ncpl.mother
+        else r
+      in
+      match r with
+      [ None -> Update.insert_string conf base ""
+      | Some r -> r ] ]
 ;
 
 value list_filter p =
@@ -328,7 +353,7 @@ value effective_mod conf base sfam scpl sdes =
      | _ -> nmoth.sex := Female ];
      nfam.origin_file :=
        if sou base ofam.origin_file <> "" then ofam.origin_file
-       else infer_origin_file conf base ncpl ndes;
+       else infer_origin_file conf base fi ncpl ndes;
      nfam.fam_index := fi;
      base.func.patch_family fi nfam;
      base.func.patch_couple fi ncpl;
@@ -416,7 +441,7 @@ value effective_add conf base sfam scpl sdes =
   let ndes =
     map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
-  let origin_file = infer_origin_file conf base ncpl ndes in
+  let origin_file = infer_origin_file conf base fi ncpl ndes in
   let nfath_p = poi base ncpl.father in
   let nmoth_p = poi base ncpl.mother in
   let nfath_u = uoi base ncpl.father in

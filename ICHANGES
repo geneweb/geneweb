@@ -5,7 +5,9 @@ GeneWeb Version 3.03
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [5 Mar 00] Changed images request, because it was possible to display
+  - [16 Mar 00] Improved the inferring of origin_file field when updating
+    a family. Now searches also among other marriages.
+  - [05 Mar 00] Changed images request, because it was possible to display
     the images even for private persons ("friend" security hole).
     Consequently, there are now two forms of the "m=IM" requests: one for
     persons (images accessed in directory "bd/images/base"), one for
