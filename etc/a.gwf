@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.24 2000-12-30 09:52:57 ddr Exp $
+# $Id: a.gwf,v 3.25 2001-01-25 13:35:14 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -52,6 +52,10 @@ wizard_passwd_file=
 # Wizard loosing his powers, becoming just a "friend"
 # Set it to "yes" or "no"
 wizard_just_friend=no
+
+# Number of years for private access. Dates of persons whose age < this value
+# are not displayed (except for wizards, friends and public persons).
+private_years=150
 
 # Default language
 default_lang=fr

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.53 2001-01-21 16:17:49 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.54 2001-01-25 13:35:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -2044,7 +2044,7 @@ value get_date_place conf base auth_for_all_anc p =
       else
         match d2 with
         [ Some (Dgreg d _)
-          when (temps_ecoule d conf.today).year > nb_year_for_public -> True
+          when (temps_ecoule d conf.today).year > conf.private_years -> True
         | _ -> False ]
     in
     let pl =

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.71 2001-01-18 05:24:55 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.72 2001-01-25 13:35:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -788,6 +788,9 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      access_by_key =
        try List.assoc "access_by_key" base_env = "yes" with
        [ Not_found -> False ];
+     private_years =
+       try int_of_string (List.assoc "private_years" base_env) with
+       [ Not_found | Failure _ -> 150 ];
      bname = base_file;
      env = env;
      senv = [];
