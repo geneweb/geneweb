@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.3 2001-06-24 13:20:33 ddr Exp $
+# $Id: a.gwf,v 4.4 2001-06-28 17:05:22 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -55,6 +55,10 @@ wizard_just_friend=no
 # Number of years for private access. Dates of persons whose age < this value
 # are not displayed (except for wizards, friends and public persons).
 private_years=150
+
+# Hide the private persons names ("x" is displayed instead of their first
+# name or surname).
+hide_private_names=no
 
 # Default language
 default_lang=fr

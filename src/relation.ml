@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.15 2001-05-15 15:57:13 ddr Exp $ *)
+(* $Id: relation.ml,v 4.16 2001-06-28 17:05:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -55,15 +55,17 @@ value print_with_witness conf base p fam ip =
 ;
 
 value print_menu conf base p =
+  let auth = age_autorise conf base p in
   let title h =
     do {
       Wserver.wprint "%s " (capitale (transl conf "link between"));
-      if h then
-        match sou base p.public_name with
-        [ "" ->
-            Wserver.wprint "%s %s" (p_first_name base p) (p_surname base p)
-        | n -> Wserver.wprint "%s" n ]
-      else Wserver.wprint "%s" (person_text conf base p);
+      Wserver.wprint "%s"
+        (if conf.hide_names && not auth then "x x"
+         else if h then
+           match sou base p.public_name with
+           [ "" -> p_first_name base p ^ " " ^ p_surname base p
+           | n -> n ]
+         else person_text conf base p);
       Wserver.wprint " %s..." (transl conf "and")
     }
   in
@@ -107,7 +109,6 @@ value print_menu conf base p =
           Wserver.wprint "<input type=radio name=t value=N> <em>%s</em>\n"
             (transl_nth conf "surname/surnames" 0);
         end;
-        let auth = age_autorise conf base p in
         Array.iter
           (fun ifam ->
              let fam = foi base ifam in
@@ -803,7 +804,9 @@ value print_link_name conf base n p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), reltab) = sol in
   let info = (reltab, list) in
   do {
-    Wserver.wprint "%s" (person_title_text conf base p2);
+    Wserver.wprint "%s"
+      (if conf.hide_names && not (fast_auth_age conf p2) then "x x"
+       else person_title_text conf base p2);
     Wserver.wprint " %s" (transl conf "is");
     if n > 1 then Wserver.wprint " %s" (transl conf "also") else ();
     Wserver.wprint "\n";
@@ -880,7 +883,10 @@ value print_link_name conf base n p1 p2 sol =
       else s
     in
     let s1 = "<strong>" ^ std_color conf s ^ "</strong>" in
-    let s2 = gen_person_title_text no_reference raw_access conf base p1 in
+    let s2 =
+      if conf.hide_names && not (fast_auth_age conf p1) then "x x"
+      else gen_person_title_text no_reference raw_access conf base p1
+    in
     let s =
       if x2 < x1 then transl_decline2 conf "%1 of %2" s1 s2
       else

@@ -1,5 +1,12 @@
 GeneWeb version 4.03
 --------------------
+
+* Base configuration files (base.gwf)
+  - [28 Jun 01] Added variable "hide_private_names". If set (i.e. if
+    the value is "yes"), the names of the private persons (less than 150
+    years) are not displayed: an "x" is displayed instead. To see the real
+    names, one must be "wizard" or "friend".
+
 GeneWeb version 4.02
 --------------------
 

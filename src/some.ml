@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.1 2001-04-22 03:31:16 ddr Exp $ *)
+(* $Id: some.ml,v 4.2 2001-06-28 17:05:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -162,8 +162,10 @@ value rec merge_insert ((sstr, (strl, iperl)) as x) =
 
 value first_name_print conf base x =
   let (list, _) =
-    persons_of_fsname base base.func.persons_of_first_name.find
-      (fun x -> x.first_name) x
+    if x = "" then ([], fun [])
+    else
+      persons_of_fsname base base.func.persons_of_first_name.find
+        (fun x -> x.first_name) x
   in
   let list =
     List.map (fun (str, istr, iperl) -> (Name.lower str, ([str], iperl))) list
@@ -172,7 +174,15 @@ value first_name_print conf base x =
   match list with
   [ [] -> first_name_not_found conf x
   | [(_, (strl, iperl))] ->
-      first_name_print_list conf base strl (List.map (poi base) iperl)
+      let pl = List.map (poi base) iperl in
+      let pl =
+        if conf.hide_names then
+          List.fold_right
+            (fun p pl -> if fast_auth_age conf p then [p :: pl] else pl)
+            pl []
+        else pl
+      in
+      first_name_print_list conf base strl pl
   | _ -> select_first_name conf base x list ]
 ;
 
@@ -195,9 +205,12 @@ value rec print_branch conf base first_lev psn lev name p =
   do {
     if lev == 0 then () else html_li conf;
     Wserver.wprint "<strong>";
-    if not psn && p_surname base p = name then
-      afficher_prenom_de_personne_referencee conf base p
-    else afficher_personne_referencee conf base p;
+    Wserver.wprint "%s"
+      (Util.reference conf base p
+         (if conf.hide_names && not (fast_auth_age conf p) then "x"
+          else if not psn && p_surname base p = name then
+            person_text_without_surname conf base p
+          else person_text conf base p));
     Wserver.wprint "</strong>";
     Date.afficher_dates_courtes conf base p;
     Wserver.wprint "\n";
@@ -216,9 +229,11 @@ value rec print_branch conf base first_lev psn lev name p =
                if need_br then html_br conf else ();
                if not first then do {
                  Wserver.wprint "<em>";
-                 if p_surname base p = name then
-                   afficher_prenom_de_personne conf base p
-                 else afficher_personne conf base p;
+                 Wserver.wprint "%s"
+                   (if conf.hide_names && not (fast_auth_age conf p) then "x"
+                    else if p_surname base p = name then
+                      person_text_without_surname conf base p
+                    else person_text conf base p);
                  Wserver.wprint "</em>";
                  Date.afficher_dates_courtes conf base p;
                  Wserver.wprint "\n";
@@ -227,7 +242,10 @@ value rec print_branch conf base first_lev psn lev name p =
                Wserver.wprint "  &amp;";
                afficher_date_mariage conf base fam p c;
                Wserver.wprint " <strong>";
-               afficher_personne_referencee conf base c;
+               Wserver.wprint "%s"
+                 (reference conf base c
+                    (if conf.hide_names && not (fast_auth_age conf c) then "x"
+                     else person_text conf base c));
                Wserver.wprint "</strong>";
                Date.afficher_dates_courtes conf base c;
                Wserver.wprint "\n";
@@ -257,13 +275,12 @@ value rec print_branch conf base first_lev psn lev name p =
   }
 ;
 
-value print_by_branch x conf base not_found_fun (ipl, homonymes) =
-  let l = List.map (poi base) ipl in
+value print_by_branch x conf base not_found_fun (pl, homonymes) =
   let ancestors =
     Sort.list
       (fun p1 p2 ->
          alphabetique (p_first_name base p1) (p_first_name base p2) <= 0)
-      l
+      pl
   in
   let len = List.length ancestors in
   if len == 0 then not_found_fun conf x
@@ -443,8 +460,10 @@ value select_ancestors base name_inj ipl =
 
 value surname_print conf base not_found_fun x =
   let (l, name_inj) =
-    persons_of_fsname base base.func.persons_of_surname.find
-      (fun x -> x.surname) x
+    if x = "" then ([], fun [])
+    else
+      persons_of_fsname base base.func.persons_of_surname.find
+        (fun x -> x.surname) x
   in
   let (iperl, strl) =
     List.fold_right
@@ -457,11 +476,19 @@ value surname_print conf base not_found_fun x =
   let strl = List.map fst strl in
   match p_getenv conf.env "o" with
   [ Some "i" ->
-      let liste =
+      let pl =
         List.fold_right (fun ip ipl -> [poi base ip :: ipl]) iperl []
       in
-      print_family_alphabetic x conf base liste
+      let pl =
+        if conf.hide_names then
+          List.fold_right
+            (fun p pl -> if Util.fast_auth_age conf p then [p :: pl] else pl)
+            pl []
+        else pl
+      in
+      print_family_alphabetic x conf base pl
   | _ ->
       let iperl = select_ancestors base name_inj iperl in
-      print_by_branch x conf base not_found_fun (iperl, strl) ]
+      let pl = List.map (poi base) iperl in
+      print_by_branch x conf base not_found_fun (pl, strl) ]
 ;

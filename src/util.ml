@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.6 2001-04-19 12:34:57 ddr Exp $ *)
+(* $Id: util.ml,v 4.7 2001-06-28 17:05:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -250,8 +250,9 @@ value connais base p =
 value acces_n conf base n x =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
-  if (conf.wizard && conf.friend || conf.access_by_key) &&
-     not (first_name = "?" || surname = "?") then
+  if (conf.wizard && conf.friend || conf.access_by_key)
+  && not conf.hide_names
+  && not (first_name = "?" || surname = "?") then
     "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ ";n" ^ n ^ "=" ^
       code_varenv (Name.lower surname) ^
       (if x.occ > 0 then ";oc" ^ n ^ "=" ^ string_of_int x.occ else "")
@@ -273,33 +274,40 @@ value raw_access =
 ;
 
 value gen_person_text (p_first_name, p_surname) conf base p =
-  let beg =
-    match (sou base p.public_name, p.qualifiers) with
-    [ ("", [nn :: _]) -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
-    | ("", []) -> p_first_name base p
-    | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
-    | (n, []) -> n ]
-  in
-  beg ^ " " ^ p_surname base p
+  if conf.hide_names && not (fast_auth_age conf p) then "x x"
+  else
+    let beg =
+      match (sou base p.public_name, p.qualifiers) with
+      [ ("", [nn :: _]) ->
+          p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
+      | ("", []) -> p_first_name base p
+      | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
+      | (n, []) -> n ]
+    in
+    beg ^ " " ^ p_surname base p
 ;
 
 value gen_person_text_no_html (p_first_name, p_surname) conf base p =
-  let beg =
-    match (sou base p.public_name, p.qualifiers) with
-    [ ("", [nn :: _]) -> p_first_name base p ^ " " ^ sou base nn
-    | ("", []) -> p_first_name base p
-    | (n, [nn :: _]) -> n ^ " " ^ sou base nn
-    | (n, []) -> n ]
-  in
-  beg ^ " " ^ p_surname base p
+  if conf.hide_names && not (fast_auth_age conf p) then "x x"
+  else
+    let beg =
+      match (sou base p.public_name, p.qualifiers) with
+      [ ("", [nn :: _]) -> p_first_name base p ^ " " ^ sou base nn
+      | ("", []) -> p_first_name base p
+      | (n, [nn :: _]) -> n ^ " " ^ sou base nn
+      | (n, []) -> n ]
+    in
+    beg ^ " " ^ p_surname base p
 ;
 
 value gen_person_text_without_surname (p_first_name, p_surname) conf base p =
-  match (sou base p.public_name, p.qualifiers) with
-  [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
-  | (n, []) when n <> "" -> n
-  | (_, [nn :: _]) -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
-  | (_, []) -> p_first_name base p ]
+  if conf.hide_names && not (fast_auth_age conf p) then "x x"
+  else
+    match (sou base p.public_name, p.qualifiers) with
+    [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
+    | (n, []) when n <> "" -> n
+    | (_, [nn :: _]) -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
+    | (_, []) -> p_first_name base p ]
 ;
 
 value person_text = gen_person_text std_access;

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.14 2001-05-12 17:45:35 ddr Exp $ *)
+(* $Id: perso.ml,v 4.15 2001-06-28 17:05:25 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -500,7 +500,9 @@ value print_first_name_alias conf base env =
 ;  
 
 value print_first_name_key conf base env p p_auth =
-  Wserver.wprint "%s" (code_varenv (Name.lower (p_first_name base p)))
+  Wserver.wprint "%s"
+    (if conf.hide_names && not p_auth then ""
+     else code_varenv (Name.lower (p_first_name base p)))
 ;
 
 value print_image_size conf base env p p_auth =
@@ -745,7 +747,9 @@ value print_surname_alias conf base env =
 ;  
 
 value print_surname_key conf base env p p_auth =
-  Wserver.wprint "%s" (code_varenv (Name.lower (p_surname base p)))
+  Wserver.wprint "%s"
+    (if conf.hide_names && not p_auth then ""
+     else code_varenv (Name.lower (p_surname base p)))
 ;
 
 value print_witness_relation conf base env =
@@ -815,7 +819,8 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
               p_surname base p ]
       in
       Wserver.wprint "%s"
-        (if force_surname then person_text conf base p
+        (if not p_auth && conf.hide_names then "x x"
+         else if force_surname then person_text conf base p
          else person_text_without_surname conf base p)
   | "cremation_place" -> print_burial_place conf base env p p_auth
   | "comment" -> print_comment conf base env p p_auth efam
@@ -833,7 +838,9 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
       | _ -> () ]
   | "father_age_at_birth" ->
       print_parent_age conf base p a p_auth (fun cpl -> cpl.father)
-  | "first_name" -> Wserver.wprint "%s" (p_first_name base p)
+  | "first_name" ->
+      Wserver.wprint "%s"
+        (if not p_auth && conf.hide_names then "x" else p_first_name base p)
   | "first_name_alias" -> print_first_name_alias conf base env
   | "first_name_key" -> print_first_name_key conf base env p p_auth
   | "image_size" -> print_image_size conf base env p p_auth
@@ -862,7 +869,9 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "sosa_link" -> print_sosa_link conf base env p p_auth
   | "source_type" -> print_source_type conf base env
   | "source" -> print_source conf base env p
-  | "surname" -> Wserver.wprint "%s" (p_surname base p)
+  | "surname" ->
+      Wserver.wprint "%s"
+        (if not p_auth && conf.hide_names then "x" else p_surname base p)
   | "surname_alias" -> print_surname_alias conf base env
   | "surname_key" -> print_surname_key conf base env p p_auth
   | "title" -> Wserver.wprint "%s" (person_title conf base p)
@@ -875,6 +884,7 @@ value simple_person_text conf base p p_auth =
     match main_title base p with
     [ Some t -> titled_person_text conf base p t
     | None -> person_text conf base p ]
+  else if conf.hide_names then "x x"
   else person_text conf base p
 ;
 
