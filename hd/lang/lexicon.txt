@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.50 2000-01-14 14:25:37 ddr Exp $
+# $Id: lexicon.txt,v 3.51 2000-01-14 14:43:34 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2858,7 +2858,7 @@ it: non deceduto/non deceduta/non deceduto(a)
 nl: niet overleden
 no: ikke d&oslash;d
 pt: n&atilde;o falecido/n&atilde;o falecida/n&atilde;o falecido(a)
-se: inte d&ouml;d
+se: lever
 
     long display
 cs: dlouhý seznam
