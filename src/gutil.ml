@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.6 2000-05-14 19:59:34 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.7 2000-05-16 10:10:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -207,10 +207,7 @@ value strictement_apres d1 d2 =
 value denomination base p =
   let prenom = p_first_name base p in
   let nom = p_surname base p in
-  prenom ^
-   (if p.occ == 0 || prenom = "?" || nom = "?" then ""
-    else "." ^ string_of_int p.occ) ^
-   " " ^ nom
+  prenom ^ "." ^ string_of_int p.occ ^ " " ^ nom
 ;
 
 value saints = ["saint"; "sainte"];
