@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.17 2000-05-03 12:08:19 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.18 2000-05-09 12:56:02 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -816,6 +816,17 @@ value find_sources_record gen addr =
   | None -> None ]
 ;
 
+value rec flatten_notes =
+  fun
+  [ [r :: rl] ->
+      let n = flatten_notes rl in
+      match r.rlab with
+      [ "CONC" | "CONT" | "NOTE" ->
+          [(r.rlab, r.rval) :: flatten_notes r.rsons @ n]
+      | _ -> n ]
+  | [] -> [] ]
+;
+
 value extract_notes gen rl =
   List.fold_right
     (fun r lines ->
@@ -825,7 +836,10 @@ value extract_notes gen rl =
               let addr = extract_addr r.rval in
               match find_notes_record gen addr with
               [ Some r ->
+                  let l = flatten_notes r.rsons in
+(*
                   let l = List.map (fun r -> (r.rlab, r.rval)) r.rsons in
+*)
                   [("NOTE", r.rcont) :: l @ lines]
               | None ->
                   do print_location r.rpos;

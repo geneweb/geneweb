@@ -15,6 +15,9 @@ GeneWeb Version 3.05
   - [03 May 00] Delete possible trailing space or newline at end of sources
     (code missing in some places).
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [09 May 00] Added notes CONC when sons (e.g. 2 CONC following 1 CONC).
+
 GeneWeb Version 3.04
 --------------------
 
