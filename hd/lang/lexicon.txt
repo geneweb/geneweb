@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.235 2001-02-15 16:18:40 ddr Exp $
+# $Id: lexicon.txt,v 3.236 2001-02-16 13:27:05 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -2600,6 +2600,7 @@ en: display by slices/slice width/overlap/total width
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
 nl: weergave per snede/sneebreedte/doorsnede/totale breedte
 no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
+pt: resultados por fracções/largura da fracção/sobreposição/largura total
 se: visa genom att dela sidan/sidbredd/överlappning/global bredd
 
     divorce
@@ -2654,6 +2655,7 @@ en: don't group the common branches together
 fr: ne pas regrouper les branches communes
 nl: voeg de gemeenschappelijke takken niet samen
 no: sammenfallende anelinjer skal ikke slås sammen
+pt: não reagrupar os ramos comuns
 se: gruppera inte ihop de gemensamma anlinjerna
 
     don't know
@@ -4303,6 +4305,7 @@ et: teade/eelmine teade/järgmine teade
 fi: viesti/edellinen viesti/seuraava viesti
 fr: message/message pr&eacute;c&eacute;dent/message suivant
 no: melding/forrige melding/neste melding
+pt: mensagem/mensagem anterior/mensagem seguinte
 se: meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
 
     missing ancestors
@@ -4623,6 +4626,7 @@ dk: ingen verificering af k&oslash;nnene
 en: no sexes check
 fr: pas de v&eacute;rification des sexes
 nl: Geslachten niet verifi&euml;ren
+pt: não verificar os sexos
 se: ingen kontroll av könen
 
     not divorced
