@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.36 2003-11-22 05:03:18 ddr Exp $ *)
+(* $Id: relation.ml,v 4.37 2003-11-25 14:39:39 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -151,8 +151,10 @@ value print_menu conf base p =
             Wserver.wprint "<input type=checkbox name=long value=on><br>\n";
             Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
             Wserver.wprint "<input type=checkbox name=spouse value=on><br>\n";
+            Wserver.wprint "%s\n" (capitale (transl conf "border"));
+            Wserver.wprint "<input name=bd size=1 maxlength=2 value=0><br>\n";
           end;
-          tag "td" "align=right" begin
+          tag "td" "align=right valign=top" begin
             Wserver.wprint "%s\n"
               (capitale (transl_nth conf "image/images" 1));
             Wserver.wprint "<input type=checkbox name=image value=on><br>\n";
@@ -368,6 +370,11 @@ value html_table_of_relation_path_dag conf base elem_txt vbar_txt path =
 ;
 
 value next_relation_link_txt conf ip1 ip2 excl_faml =
+  let bd =
+    match p_getenv conf.env "bd" with
+    [ Some x -> ";bd=" ^ x
+    | None -> "" ]
+  in
   let (sl, _) =
     List.fold_left
       (fun (sl, i) ifam ->
@@ -380,7 +387,7 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
      string_of_int (Adef.int_of_iper ip1); ";i=";
      string_of_int (Adef.int_of_iper ip2);
      if p_getenv conf.env "spouse" = Some "on" then ";spouse=on" else "";
-     if conf.cancel_links then ";cgl=on" else ""; ";et=S" :: sl]
+     if conf.cancel_links then ";cgl=on" else ""; bd; ";et=S" :: sl]
   in
   String.concat "" sl
 ;
@@ -1468,6 +1475,9 @@ value print_main_relationship conf base long p1 p2 rel =
     match p_getenv conf.env "cgl" with
     [ Some "on" -> conf.senv := conf.senv @ [("cgl", "on")]
     | _ -> () ];
+    match p_getenv conf.env "bd" with
+    [ None | Some "" | Some "0" -> ()
+    | Some x -> conf.senv := conf.senv @ [("bd", x)] ];
     match rel with
     [ None ->
         if p1.cle_index == p2.cle_index then
