@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.10 2000-05-14 19:59:33 ddr Exp $ *)
+(* $Id: descend.ml,v 3.11 2000-05-23 07:19:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -182,6 +182,7 @@ value afficher_marie conf base first fam p spouse =
      if auth then
        match fam.divorce with
        [ NotDivorced -> ()
+       | Separated -> Wserver.wprint ",\n%s" (transl conf "separated")
        | Divorced cod ->
            do Wserver.wprint ",\n";
               stag "em" begin

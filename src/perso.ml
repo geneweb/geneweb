@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.22 2000-05-19 23:55:36 ddr Exp $ *)
+(* $Id: perso.ml,v 3.23 2000-05-23 07:19:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -464,6 +464,7 @@ value print_family conf base p a ifam =
                 return ()
             | _ -> () ];
          return ()
+     | Separated -> Wserver.wprint ",\n%s" (transl conf "separated")
      | _ -> () ];
      if age_autorise conf base p then
        match sou base fam.comment with

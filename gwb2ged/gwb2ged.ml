@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.7 2000-05-14 21:03:13 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.8 2000-05-23 07:18:58 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -430,6 +430,7 @@ value ged_marriage base oc fam =
 value ged_divorce base oc fam =
   match fam.divorce with
   [ NotDivorced -> ()
+  | Separated -> ()
   | Divorced cd ->
       let d = Adef.od_of_codate cd in
       do Printf.fprintf oc "1 DIV";
