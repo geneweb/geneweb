@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.1 1999-11-10 08:44:12 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.2 1999-11-18 17:42:22 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -135,7 +135,7 @@ value ged_1st_name base p =
 ;
 
 value ged_name base oc per =
-  do Printf.fprintf oc "1 NAME %s/%s/\n" (encode (ged_1st_name base per))
+  do Printf.fprintf oc "1 NAME %s /%s/\n" (encode (ged_1st_name base per))
        (encode (sou base per.surname));
      let n = sou base per.public_name in
      if n <> "" then Printf.fprintf oc "2 GIVN %s\n" (encode n) else ();
