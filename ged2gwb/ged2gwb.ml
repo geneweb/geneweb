@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.36 2002-11-14 09:55:29 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.37 2002-11-14 11:09:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -505,33 +505,18 @@ value date_value = Grammar.Entry.create date_g "date value";
 value date_interval = Grammar.Entry.create date_g "date interval";
 value date_value_recover = Grammar.Entry.create date_g "date value";
 
-value roman_int_decode s =
-  let decode_digit one five ten r =
-    loop 0 where rec loop cnt i =
-      if i >= String.length s then (10 * r + cnt, i)
-      else if s.[i] = one then loop (cnt + 1) (i + 1)
-      else if s.[i] = five then
-        if cnt = 0 then loop 5 (i + 1) else (10 * r + 5 - cnt, i + 1)
-      else if s.[i] = ten then (10 * r + 10 - cnt, i + 1)
-      else (10 * r + cnt, i)
-  in
-  let (r, i) = decode_digit 'M' 'M' 'M' 0 0 in
-  let (r, i) = decode_digit 'C' 'D' 'M' r i in
-  let (r, i) = decode_digit 'X' 'L' 'C' r i in
-  let (r, i) = decode_digit 'I' 'V' 'X' r i in
-  if i = String.length s then r else raise Not_found
-;
-
 value is_roman_int x =
   try
-    let _ = roman_int_decode x in
+    let _ = Gutil.arabian_of_roman x in
     True
   with
   [ Not_found -> False ]
 ;
 
 value roman_int =
-  let p = parser [: `("ID", x) when is_roman_int x :] -> roman_int_decode x in
+  let p =
+    parser [: `("ID", x) when is_roman_int x :] -> Gutil.arabian_of_roman x
+  in
   Grammar.Entry.of_parser date_g "roman int" p
 ;
 
