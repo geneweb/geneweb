@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.64 2004-03-15 10:58:51 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.65 2004-04-05 09:30:35 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -836,29 +836,29 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
               if wizard_passwd = "" && wizard_passwd_file = "" then
                 (True, True, friend_passwd = "", "")
               else
-	        match match_auth wizard_passwd wizard_passwd_file uauth with
+                match match_auth wizard_passwd wizard_passwd_file uauth with
                 [ Some username -> (True, True, False, username)
                 | None -> (False, False, False, "") ]
             else if passwd = "f" then
               if friend_passwd = "" && friend_passwd_file = "" then
                 (True, False, True, "")
               else
-	        match match_auth friend_passwd friend_passwd_file uauth with
-	        [ Some username -> (True, False, True, username)
-	        | None -> (False, False, False, "") ]
+                match match_auth friend_passwd friend_passwd_file uauth with
+                [ Some username -> (True, False, True, username)
+                | None -> (False, False, False, "") ]
             else assert False
           else if wizard_passwd = "" && wizard_passwd_file = "" then
             (True, True, friend_passwd = "", "")
           else
-	     match match_auth wizard_passwd wizard_passwd_file uauth with
-	     [ Some username -> (True, True, False, username)
-	     | _ ->
-          	if friend_passwd = "" && friend_passwd_file = "" then
-          	  (True, False, True, "")
-          	else
-	          match match_auth friend_passwd friend_passwd_file uauth with
-          	  [ Some username -> (True, False, True, username)
-	          | None -> (True, False, False, "") ] ] ]
+             match match_auth wizard_passwd wizard_passwd_file uauth with
+             [ Some username -> (True, True, False, username)
+             | _ ->
+                  if friend_passwd = "" && friend_passwd_file = "" then
+                    (True, False, True, "")
+                  else
+                  match match_auth friend_passwd friend_passwd_file uauth with
+                    [ Some username -> (True, False, True, username)
+                  | None -> (True, False, False, "") ] ] ]
     in
     let user =
       match lindex uauth ':' with
@@ -1067,62 +1067,62 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
         else if cgi then (True, "")
         else auth_err request conf.auth_file
       in
-      match (cgi, auth_err, passwd_err) with
-      [ (True, True, _) ->
-          if is_robot from then Robot.robot_error cgi from 0 0
-          else no_access conf
-      | (_, True, _) ->
-          if is_robot from then Robot.robot_error cgi from 0 0
-          else
-            let auth_type =
-              let x =
-                try List.assoc "auth_file" conf.base_env with
-                [ Not_found -> "" ]
+      let mode = Util.p_getenv conf.env "m" in
+      do {
+        if mode <> Some "IM" then
+          let contents =
+            if List.mem_assoc "log_pwd" env then "..." else contents
+          in
+          log_and_robot_check conf auth from request script_name contents
+        else ();
+        match (cgi, auth_err, passwd_err) with
+        [ (True, True, _) ->
+            if is_robot from then Robot.robot_error cgi from 0 0
+            else no_access conf
+        | (_, True, _) ->
+            if is_robot from then Robot.robot_error cgi from 0 0
+            else
+              let auth_type =
+                let x =
+                  try List.assoc "auth_file" conf.base_env with
+                  [ Not_found -> "" ]
+                in
+                if x = "" then "GeneWeb service" else "database " ^ conf.bname
               in
-              if x = "" then "GeneWeb service" else "database " ^ conf.bname
-            in
-            refuse_auth conf from auth auth_type
-      | (_, _, Some (passwd, uauth)) ->
-          if is_robot from then Robot.robot_error cgi from 0 0
-          else do {
-            let tm = Unix.time () in
-            lock_wait Srcfile.adm_file "gwd.lck" with
-            [ Accept ->
-                let oc = log_oc () in
-                do {
-                  log_passwd_failed passwd uauth oc tm from request
-                    conf.bname;
-                  flush_log oc;
-                }
-            | Refuse -> () ];
-            unauth_server conf passwd;
-          }
-      | _ ->
-          let mode = Util.p_getenv conf.env "m" in
-          do {
-            if mode <> Some "IM" then
-              let contents =
-                if List.mem_assoc "log_pwd" env then "..." else contents
-              in
-              log_and_robot_check conf auth from request script_name contents
-            else ();
+              refuse_auth conf from auth auth_type
+        | (_, _, Some (passwd, uauth)) ->
+            if is_robot from then Robot.robot_error cgi from 0 0
+            else do {
+              let tm = Unix.time () in
+              lock_wait Srcfile.adm_file "gwd.lck" with
+              [ Accept ->
+                  let oc = log_oc () in
+                  do {
+                    log_passwd_failed passwd uauth oc tm from request
+                      conf.bname;
+                    flush_log oc;
+                  }
+              | Refuse -> () ];
+              unauth_server conf passwd;
+            }
+        | _ ->
             match mode with
             [ Some "DOC" -> Doc.print conf
             | _ ->
-                if conf.bname = "" then general_welcome conf
-                else
-                  match
-                    try Some (List.assoc "renamed" conf.base_env) with
-                    [ Not_found -> None ]
-                  with
-                  [ Some n when n <> "" -> print_renamed conf n
-                  | _ ->
-                      do {
-                        Family.treat_request_on_base conf
-                          (log_file.val, log_oc, flush_log);
-                        if sleep > 0 then Unix.sleep sleep else ();
-                      } ] ];
-          } ] ]
+               if conf.bname = "" then general_welcome conf
+               else
+                 match
+                   try Some (List.assoc "renamed" conf.base_env) with
+                   [ Not_found -> None ]
+                 with
+                 [ Some n when n <> "" -> print_renamed conf n
+                 | _ ->
+                     do {
+                       Family.treat_request_on_base conf
+                         (log_file.val, log_oc, flush_log);
+                       if sleep > 0 then Unix.sleep sleep else ();
+                     } ] ] ]
+      } ]
 ;
 
 value chop_extension name =
