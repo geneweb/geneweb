@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.0 2001-03-16 19:34:26 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.1 2001-04-22 14:37:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -25,8 +25,8 @@ value select conf base get_date find_oldest =
       (struct
          type t = (Def.person * Def.dmy * Def.calendar);
          value leq x y =
-           if find_oldest then before_date x y
-           else before_date y x;
+           if find_oldest then before_date x y else before_date y x
+         ;
        end)
   in
   let n =
@@ -37,13 +37,13 @@ value select conf base get_date find_oldest =
         [ Not_found | Failure _ -> 20 ] ]
   in
   let n = min (max 0 n) base.data.persons.len in
-  loop Q.empty 0 0 where rec loop q len i =
+  let rec loop q len i =
     if i = base.data.persons.len then
-      loop [] q where rec loop list q =
+      let rec loop list q =
         if Q.is_empty q then (list, len)
-        else
-          let (e, q) = Q.take q in
-          loop [e :: list] q
+        else let (e, q) = Q.take q in loop [e :: list] q
+      in
+      loop [] q
     else
       let p = base.data.persons.get i in
       match get_date p with
@@ -52,6 +52,8 @@ value select conf base get_date find_oldest =
           if len < n then loop (Q.add e q) (len + 1) (i + 1)
           else loop (snd (Q.take (Q.add e q))) len (i + 1)
       | _ -> loop q len (i + 1) ]
+  in
+  loop Q.empty 0 0
 ;
 
 value select_family conf base get_date =
@@ -60,7 +62,8 @@ value select_family conf base get_date =
       (struct
          type t = (Def.family * Def.dmy * Def.calendar);
          value leq x y = before_date y x;
-       end)
+       end
+       )
   in
   let n =
     match p_getint conf.env "k" with
@@ -70,13 +73,13 @@ value select_family conf base get_date =
         [ Not_found | Failure _ -> 20 ] ]
   in
   let n = min (max 0 n) base.data.families.len in
-  loop QF.empty 0 0 where rec loop q len i =
+  let rec loop q len i =
     if i = base.data.families.len then
-      loop [] q where rec loop list q =
+      let rec loop list q =
         if QF.is_empty q then (list, len)
-        else
-          let (e, q) = QF.take q in
-          loop [e :: list] q
+        else let (e, q) = QF.take q in loop [e :: list] q
+      in
+      loop [] q
     else
       let p = base.data.families.get i in
       let (q, len) =
@@ -90,6 +93,8 @@ value select_family conf base get_date =
         else (q, len)
       in
       loop q len (i + 1)
+  in
+  loop QF.empty 0 0
 ;
 
 value print_birth conf base =
@@ -99,27 +104,29 @@ value print_birth conf base =
   let title _ =
     Wserver.wprint (fcapitale (ftransl conf "the latest %d births")) len
   in
-  do header conf title;
-     print_link_to_welcome conf True;
-     Wserver.wprint "<ul>\n";
-     let _ = List.fold_left
-       (fun (last_month_txt, was_future) (p, d, cal) ->
-          let month_txt =
-            let d = {(d) with day = 0} in
-            capitale (Date.string_of_date conf (Dgreg d cal))
-          in
-          let future = strictement_apres_dmy d conf.today in
-          do if not future && was_future then
-               do Wserver.wprint "</ul>\n</ul>\n<p>\n<ul>\n";
-                  Wserver.wprint "<li>%s\n" month_txt;
-                  Wserver.wprint "<ul>\n";
-               return ()
-             else if month_txt <> last_month_txt then
-               do if last_month_txt = "" then ()
-                  else Wserver.wprint "</ul>\n";
-                  Wserver.wprint "<li>%s\n" month_txt;
-                  Wserver.wprint "<ul>\n";
-               return ()
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<ul>\n";
+    let _ =
+      List.fold_left
+        (fun (last_month_txt, was_future) (p, d, cal) ->
+           let month_txt =
+             let d = {(d) with day = 0} in
+             capitale (Date.string_of_date conf (Dgreg d cal))
+           in
+           let future = strictement_apres_dmy d conf.today in
+           do {
+             if not future && was_future then do {
+               Wserver.wprint "</ul>\n</ul>\n<p>\n<ul>\n";
+               Wserver.wprint "<li>%s\n" month_txt;
+               Wserver.wprint "<ul>\n";
+             }
+             else if month_txt <> last_month_txt then do {
+               if last_month_txt = "" then () else Wserver.wprint "</ul>\n";
+               Wserver.wprint "<li>%s\n" month_txt;
+               Wserver.wprint "<ul>\n";
+             }
              else ();
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
@@ -132,12 +139,13 @@ value print_birth conf base =
                Wserver.wprint "%s <em>%s</em>.\n"
                  (transl_nth conf "born" (index_of_sex p.sex))
                  (Date.string_of_ondate conf (Dgreg d cal));
-          return (month_txt, future))
-       ("", False) list
-     in ();
-     Wserver.wprint "</ul>\n</ul>\n";
-     trailer conf;
-  return ()
+             (month_txt, future)
+           })
+        ("", False) list
+    in
+    Wserver.wprint "</ul>\n</ul>\n";
+    trailer conf;
+  }
 ;
 
 value get_death p =
@@ -151,21 +159,23 @@ value print_death conf base =
   let title _ =
     Wserver.wprint (fcapitale (ftransl conf "the latest %d deaths")) len
   in
-  do header conf title;
-     print_link_to_welcome conf True;
-     Wserver.wprint "<ul>\n";
-     let _ = List.fold_left
-       (fun last_month_txt (p, d, cal) ->
-          let month_txt =
-            let d = {(d) with day = 0} in
-            capitale (Date.string_of_date conf (Dgreg d cal))
-          in
-          do if month_txt <> last_month_txt then
-               do if last_month_txt = "" then ()
-                  else Wserver.wprint "</ul>\n";
-                  Wserver.wprint "<li>%s\n" month_txt;
-                  Wserver.wprint "<ul>\n";
-               return ()
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<ul>\n";
+    let _ =
+      List.fold_left
+        (fun last_month_txt (p, d, cal) ->
+           let month_txt =
+             let d = {(d) with day = 0} in
+             capitale (Date.string_of_date conf (Dgreg d cal))
+           in
+           do {
+             if month_txt <> last_month_txt then do {
+               if last_month_txt = "" then () else Wserver.wprint "</ul>\n";
+               Wserver.wprint "<li>%s\n" month_txt;
+               Wserver.wprint "<ul>\n";
+             }
              else ();
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
@@ -177,21 +187,22 @@ value print_death conf base =
              let sure d = d.prec = Sure in
              match Adef.od_of_codate p.birth with
              [ Some (Dgreg d1 _) ->
-                 if sure d1 && sure d && d1 <> d then
+                 if sure d1 && sure d && d1 <> d then do {
                    let a = temps_ecoule d1 d in
-                   do Wserver.wprint " <em>(";
-                      Date.print_age conf a;
-                      Wserver.wprint ")</em>";
-                   return ()
+                   Wserver.wprint " <em>(";
+                   Date.print_age conf a;
+                   Wserver.wprint ")</em>";
+                 }
                  else ()
              | _ -> () ];
              Wserver.wprint "\n";
-          return month_txt)
-       "" list
-     in ();
-     Wserver.wprint "</ul>\n</ul>\n";
-     trailer conf;
-  return ()
+             month_txt
+           })
+        "" list
+    in
+    Wserver.wprint "</ul>\n</ul>\n";
+    trailer conf;
+  }
 ;
 
 value print_oldest_alive conf base =
@@ -214,31 +225,33 @@ value print_oldest_alive conf base =
     Wserver.wprint
       (fcapitale (ftransl conf "the %d oldest perhaps still alive")) len
   in
-  do header conf title;
-     print_link_to_welcome conf True;
-     Wserver.wprint "<ul>\n";
-     List.iter
-       (fun (p, d, cal) ->
-          do Wserver.wprint "<li>\n";
-             Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base p;
-             Wserver.wprint "</strong>,\n";
-             Wserver.wprint "%s <em>%s</em>"
-               (transl_nth conf "born" (index_of_sex p.sex))
-               (Date.string_of_ondate conf (Dgreg d cal));
-             if p.death = NotDead && d.prec = Sure then
-               let a = temps_ecoule d conf.today in
-               do Wserver.wprint " <em>(";
-                  Date.print_age conf a;
-                  Wserver.wprint ")</em>";
-               return ()
-             else ();
-             Wserver.wprint ".\n";
-          return ())
-       list;
-     Wserver.wprint "</ul>\n\n";
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<ul>\n";
+    List.iter
+      (fun (p, d, cal) ->
+         do {
+           Wserver.wprint "<li>\n";
+           Wserver.wprint "<strong>\n";
+           afficher_personne_referencee conf base p;
+           Wserver.wprint "</strong>,\n";
+           Wserver.wprint "%s <em>%s</em>"
+             (transl_nth conf "born" (index_of_sex p.sex))
+             (Date.string_of_ondate conf (Dgreg d cal));
+           if p.death = NotDead && d.prec = Sure then do {
+             let a = temps_ecoule d conf.today in
+             Wserver.wprint " <em>(";
+             Date.print_age conf a;
+             Wserver.wprint ")</em>";
+           }
+           else ();
+           Wserver.wprint ".\n";
+         })
+      list;
+    Wserver.wprint "</ul>\n\n";
+    trailer conf;
+  }
 ;
 
 value print_longest_lived conf base =
@@ -257,22 +270,24 @@ value print_longest_lived conf base =
     Wserver.wprint (fcapitale (ftransl conf "the %d who lived the longest"))
       len
   in
-  do header conf title;
-     print_link_to_welcome conf True;
-     Wserver.wprint "<ul>\n";
-     List.iter
-       (fun (p, d, cal) ->
-          do Wserver.wprint "<li>\n";
-             Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base p;
-             Wserver.wprint "</strong>%s" (Date.short_dates_text conf base p);
-             Wserver.wprint "\n(%d %s)" d.year (transl conf "years old");
-             Wserver.wprint ".\n";
-          return ())
-       list;
-     Wserver.wprint "</ul>\n\n";
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<ul>\n";
+    List.iter
+      (fun (p, d, cal) ->
+         do {
+           Wserver.wprint "<li>\n";
+           Wserver.wprint "<strong>\n";
+           afficher_personne_referencee conf base p;
+           Wserver.wprint "</strong>%s" (Date.short_dates_text conf base p);
+           Wserver.wprint "\n(%d %s)" d.year (transl conf "years old");
+           Wserver.wprint ".\n";
+         })
+      list;
+    Wserver.wprint "</ul>\n\n";
+    trailer conf;
+  }
 ;
 
 value print_marriage conf base =
@@ -282,28 +297,30 @@ value print_marriage conf base =
   let title _ =
     Wserver.wprint (fcapitale (ftransl conf "the latest %d marriages")) len
   in
-  do header conf title;
-     print_link_to_welcome conf True;
-     Wserver.wprint "<ul>\n";
-     let _ = List.fold_left
-       (fun (last_month_txt, was_future) (fam, d, cal) ->
-          let month_txt =
-            let d = {(d) with day = 0} in
-            capitale (Date.string_of_date conf (Dgreg d cal))
-          in
-          let cpl = coi base fam.fam_index in
-          let future = strictement_apres_dmy d conf.today in
-          do if not future && was_future then
-               do Wserver.wprint "</ul>\n</ul>\n<p>\n<ul>\n";
-                  Wserver.wprint "<li>%s\n" month_txt;
-                  Wserver.wprint "<ul>\n";
-               return ()
-             else if month_txt <> last_month_txt then
-               do if last_month_txt = "" then ()
-                  else Wserver.wprint "</ul>\n";
-                  Wserver.wprint "<li>%s\n" month_txt;
-                  Wserver.wprint "<ul>\n";
-               return ()
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<ul>\n";
+    let _ =
+      List.fold_left
+        (fun (last_month_txt, was_future) (fam, d, cal) ->
+           let month_txt =
+             let d = {(d) with day = 0} in
+             capitale (Date.string_of_date conf (Dgreg d cal))
+           in
+           let cpl = coi base fam.fam_index in
+           let future = strictement_apres_dmy d conf.today in
+           do {
+             if not future && was_future then do {
+               Wserver.wprint "</ul>\n</ul>\n<p>\n<ul>\n";
+               Wserver.wprint "<li>%s\n" month_txt;
+               Wserver.wprint "<ul>\n";
+             }
+             else if month_txt <> last_month_txt then do {
+               if last_month_txt = "" then () else Wserver.wprint "</ul>\n";
+               Wserver.wprint "<li>%s\n" month_txt;
+               Wserver.wprint "<ul>\n";
+             }
              else ();
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
@@ -323,45 +340,44 @@ value print_marriage conf base =
                   | Married | NoSexesCheck -> transl conf "married"
                   | Engaged -> transl conf "engaged" ])
                  (Date.string_of_ondate conf (Dgreg d cal));
-          return (month_txt, future))
-       ("", False) list
-     in ();
-     Wserver.wprint "</ul>\n</ul>\n";
-     trailer conf;
-  return ()
+             (month_txt, future)
+           })
+        ("", False) list
+    in
+    Wserver.wprint "</ul>\n</ul>\n";
+    trailer conf;
+  }
 ;
 
 value print_statistics conf base =
-  let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "statistics"))
-  in
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "statistics")) in
   let n =
     try int_of_string (List.assoc "latest_event" conf.base_env) with
     [ Not_found | Failure _ -> 20 ]
   in
-  do header conf title;
-     print_link_to_welcome conf True;
-     tag "ul" begin
-       if conf.wizard || conf.friend then
-         do Wserver.wprint "<li><a href=\"%sm=LB;k=%d\">" (commd conf) n;
-            Wserver.wprint (ftransl conf "the latest %d births") n;
-            Wserver.wprint "</a>\n";
-            Wserver.wprint "<li><a href=\"%sm=LD;k=%d\">" (commd conf) n;
-            Wserver.wprint (ftransl conf "the latest %d deaths") n;
-            Wserver.wprint "</a>\n";
-            Wserver.wprint "<li><a href=\"%sm=LM;k=%d\">" (commd conf) n;
-            Wserver.wprint (ftransl conf "the latest %d marriages") n;
-            Wserver.wprint "</a>\n";
-            Wserver.wprint "<li><a href=\"%sm=OA;k=%d;lim=0\">" (commd conf) n;
-            Wserver.wprint (ftransl conf "the %d oldest perhaps still alive")
-              n;
-            Wserver.wprint "</a>\n";
-         return ()
-       else ();
-       Wserver.wprint "<li><a href=\"%sm=LL;k=%d\">" (commd conf) n;
-       Wserver.wprint (ftransl conf "the %d who lived the longest") n;
-       Wserver.wprint "</a>\n";
-     end;
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    tag "ul" begin
+      if conf.wizard || conf.friend then do {
+        Wserver.wprint "<li><a href=\"%sm=LB;k=%d\">" (commd conf) n;
+        Wserver.wprint (ftransl conf "the latest %d births") n;
+        Wserver.wprint "</a>\n";
+        Wserver.wprint "<li><a href=\"%sm=LD;k=%d\">" (commd conf) n;
+        Wserver.wprint (ftransl conf "the latest %d deaths") n;
+        Wserver.wprint "</a>\n";
+        Wserver.wprint "<li><a href=\"%sm=LM;k=%d\">" (commd conf) n;
+        Wserver.wprint (ftransl conf "the latest %d marriages") n;
+        Wserver.wprint "</a>\n";
+        Wserver.wprint "<li><a href=\"%sm=OA;k=%d;lim=0\">" (commd conf) n;
+        Wserver.wprint (ftransl conf "the %d oldest perhaps still alive") n;
+        Wserver.wprint "</a>\n";
+      }
+      else ();
+      Wserver.wprint "<li><a href=\"%sm=LL;k=%d\">" (commd conf) n;
+      Wserver.wprint (ftransl conf "the %d who lived the longest") n;
+      Wserver.wprint "</a>\n";
+    end;
+    trailer conf;
+  }
 ;
