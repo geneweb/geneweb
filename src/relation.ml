@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.57 2000-11-01 04:11:16 ddr Exp $ *)
+(* $Id: relation.ml,v 3.58 2000-11-01 18:15:46 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1412,7 +1412,8 @@ value print_multi_relation conf base pl lim assoc_txt =
                  return n + 1)
               1 pl2
             in ();
-            Wserver.wprint ";lim=%d\">&gt;&gt;</a>\n" lim;
+            if lim > 0 then Wserver.wprint ";lim=%d" lim else ();
+            Wserver.wprint "\">&gt;&gt;</a>\n";
          return () ];
      trailer conf;
   return ()
