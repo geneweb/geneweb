@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.4 2002-12-10 08:40:37 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.5 2002-12-11 15:55:04 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -43,14 +43,17 @@ value read_wizard_notes fname =
 ;
 
 value write_wizard_notes fname nn =
-  match try Some (open_out fname) with [ Sys_error _ -> None ] with
-  [ Some oc ->
-      do {
-        output_string oc nn;
-        output_string oc "\n";
-        close_out oc;
-      }
-  | None -> () ]
+  if nn = "" then
+    try Sys.remove fname with [ Sys_error _ -> () ]
+  else
+    match try Some (open_out fname) with [ Sys_error _ -> None ] with
+    [ Some oc ->
+        do {
+          output_string oc nn;
+          output_string oc "\n";
+          close_out oc;
+        }
+    | None -> () ]
 ;
 
 value print_main conf base wizfile =
