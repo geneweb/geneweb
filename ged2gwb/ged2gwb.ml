@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.0 1999-10-29 10:29:16 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.1 1999-10-31 20:09:33 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -749,7 +749,7 @@ value rec next_sep_pos s i =
 ;
 
 value public_name_word =
-  ["Ier"; "Ière"; "der"; "die"; "el"; "le"; "la"; "the"]
+  ["Ier"; "Ière"; "der"; "den"; "die"; "el"; "le"; "la"; "the"]
 ;
 
 value rec is_a_public_name s i =
@@ -2049,8 +2049,8 @@ value speclist =
        public name, i.e. holds:
        * a number or a roman number, supposed to be a number of a
          nobility title,
-       * one of the words: \"der\", \"die\", \"el\", \"le\", \"la\", \"the\",
-         supposed to be the beginning of a qualifier,
+       * one of the words: \"der\", \"den\", \"die\", \"el\", \"le\", \"la\",
+         \"the\", supposed to be the beginning of a qualifier,
        then the GEDCOM first name part becomes the person \"public name\"
        and its first word his \"first name\"."
       );
