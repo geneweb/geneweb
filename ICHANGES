@@ -18,6 +18,7 @@ GeneWeb Version 1.11
   - [Jan 12, 99] Failure error now displayed in stdout instead of stderr.
 
 * Most descendants computation (mostdesc)
+  - [Jan 25, 99] Fixed little problem of alphabetic order.
   - [Jan 16, 99] Added mostdesc.opt in Makefile.
 
 GeneWeb Version 1.10
