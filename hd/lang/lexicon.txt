@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.159 2003-09-15 06:42:55 ddr Exp $
+# $Id: lexicon.txt,v 4.160 2003-11-03 09:02:54 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -8224,7 +8224,7 @@ fi: lapsen-lapsenlapsiin
 fr: jusqu'aux arri&egrave;re-petits-enfants
 he:  òã äðéðéí
 is: til barnabarnabarna
-it: fino ai bisnonni
+it: fino ai pronipoti
 lv: lîdz mazmazbçrniem
 nl: tot de achterkleinkinderen
 no: til oldebarna
