@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 2.2 1999-03-30 10:46:07 ddr Exp $ *)
+(* $Id: config.mli,v 2.3 1999-05-17 16:40:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -10,6 +10,7 @@ type config =
     command : string;
     lang : string;
     can_send_image : bool;
+    cancel_links : bool;
     bname : string;
     env : list (string * string);
     senv : mutable list (string * string);

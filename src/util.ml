@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.19 1999-05-17 11:36:34 ddr Exp $ *)
+(* $Id: util.ml,v 2.20 1999-05-17 16:40:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -285,15 +285,13 @@ value one_title_text conf base p t =
   ", <em>" ^ s ^ "</em>"
 ;
 
-value cancel_geneweb_links = ref False;
-
 value geneweb_link conf href s =
-  if cancel_geneweb_links.val then s
+  if conf.cancel_links then s
   else "<a href=\"" ^ commd conf ^ href ^ "\">" ^ s ^ "</a>"
 ;
 
 value reference conf base p s =
-  if cancel_geneweb_links.val then s
+  if conf.cancel_links then s
   else "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">" ^ s ^ "</a>"
 ;
 
@@ -824,7 +822,7 @@ value image_size fname =
 ;
 
 value print_link_to_welcome conf right_aligned =
-  if cancel_geneweb_links.val then ()
+  if conf.cancel_links then ()
   else
     let dir = if conf.is_rtl then "left" else "right" in
     let wid_hei =
