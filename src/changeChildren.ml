@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.13 2004-12-28 15:12:55 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.14 2004-12-29 03:03:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -19,15 +19,16 @@ value print_child_person conf base p =
           (capitale (transl_nth conf "first name/first names" 0));
       end;
       tag "td" "colspan=\"3\"" begin
-        Wserver.wprint "<input name=\"%s_first_name\" size=\"23\" maxlength=\"200\"" var;
-        Wserver.wprint " value=\"%s\">" (quote_escaped first_name);
+        xtag "input"
+          "name=\"%s_first_name\" size=\"23\" maxlength=\"200\" value=\"%s\""
+          var (quote_escaped first_name);
       end;
       tag "td" "align=\"right\"" begin
         let s = capitale (transl conf "number") in Wserver.wprint "%s" s;
       end;
       tag "td" begin
-        Wserver.wprint "<input name=\"%s_occ\" size=\"5\" maxlength=\"8\"%s>" var
-          (if occ == 0 then "" else " value=" ^ string_of_int occ);
+        xtag "input" "name=\"%s_occ\" size=\"5\" maxlength=\"8\"%s" var
+          (if occ == 0 then "" else " value=\"" ^ string_of_int occ ^ "\"");
       end;
     end;
     tag "tr" "align=\"left\"" begin
@@ -35,8 +36,8 @@ value print_child_person conf base p =
         Wserver.wprint "%s" (capitale (transl_nth conf "surname/surnames" 0));
       end;
       tag "td" "colspan=\"5\"" begin
-        Wserver.wprint
-          "<input name=\"%s_surname\" size=\"40\" maxlength=\"200\" value=\"%s\">" var
+        xtag "input"
+          "name=\"%s_surname\" size=\"40\" maxlength=\"200\" value=\"%s\"" var
           surname;
       end;
     end;
@@ -69,21 +70,19 @@ value check_digest conf base digest =
 
 value print_children conf base ipl =
   do {
-    stag "h4" begin
+    stagn "h4" begin
       Wserver.wprint "%s" (capitale (transl_nth conf "child/children" 1));
     end;
-    Wserver.wprint "\n<p>\n";
     tag "ul" begin
       List.iter
         (fun ip ->
            let p = poi base ip in
-           do {
-             html_li conf;
+           tag "li" begin
              Wserver.wprint "%s"
                (reference conf base p (person_text conf base p));
              Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
              print_child_person conf base p;
-           })
+           end)
         ipl;
     end;
   }
@@ -98,20 +97,23 @@ value print_change conf base p u =
   let digest = digest_children base children in
   do {
     header conf title;
-    html_p conf;
-    Wserver.wprint "%s" (reference conf base p (person_text conf base p));
-    Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
+    tag "p" begin
+      Wserver.wprint "%s" (reference conf base p (person_text conf base p));
+      Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
+    end;
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      html_p conf;
-      Util.hidden_env conf;
-      Wserver.wprint "<input type=\"hidden\" name=\"ip\" value=\"%d\">\n"
-        (Adef.int_of_iper p.cle_index);
-      Wserver.wprint "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n" digest;
-      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\">\n";
+      tag "p" begin
+        Util.hidden_env conf;
+        xtag "input" "type=\"hidden\" name=\"ip\" value=\"%d\""
+          (Adef.int_of_iper p.cle_index);
+        xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
+        xtag "input" "type=\"hidden\" name=\"m\" value=\"CHG_CHN_OK\"";
+      end;
       print_children conf base children;
       Wserver.wprint "\n";
-      html_p conf;
-      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
+      tag "p" begin
+        xtag "input" "type=\"submit\" value=\"Ok\"";
+      end;
     end;
     Wserver.wprint "\n";
     trailer conf;

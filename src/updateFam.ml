@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.46 2004-12-28 15:13:04 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.47 2004-12-29 03:03:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -515,17 +515,18 @@ value print_del1 conf base fam =
     print_link_to_welcome conf True;
     Wserver.wprint "\n";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      html_p conf;
-      Util.hidden_env conf;
-      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n\n"
-        (Adef.int_of_ifam fam.fam_index);
-      match p_getenv conf.env "ip" with
-      [ Some ip -> Wserver.wprint "<input type=\"hidden\" name=\"ip\" value=\"%s\">\n" ip
-      | None -> () ];
-      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"DEL_FAM_OK\">\n";
-      Wserver.wprint "\n";
-      html_p conf;
-      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
+      tag "p" begin
+        Util.hidden_env conf;
+        xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
+          (Adef.int_of_ifam fam.fam_index);
+        match p_getenv conf.env "ip" with
+        [ Some ip -> xtag "input" "type=\"hidden\" name=\"ip\" value=\"%s\"" ip
+        | None -> () ];
+        xtag "input" "type=\"hidden\" name=\"m\" value=\"DEL_FAM_OK\"";
+      end;
+      tag "p" begin
+        xtag "input" "type=\"submit\" value=\"Ok\"";
+      end;
     end;
     Wserver.wprint "\n";
     trailer conf
@@ -543,27 +544,30 @@ value print_inv1 conf base p fam1 fam2 =
     Wserver.wprint "%s:"
       (capitale (transl conf "invert the order of the following families"));
     tag "ul" begin
-      html_li conf;
-      Update.print_someone conf base (poi base (father cpl1));
-      Wserver.wprint " %s " (transl_nth conf "and" 0);
-      Update.print_someone conf base (poi base (mother cpl1));
-      html_li conf;
-      Update.print_someone conf base (poi base (father cpl2));
-      Wserver.wprint " %s " (transl_nth conf "and" 0);
-      Update.print_someone conf base (poi base (mother cpl2));
+      tag "li" begin
+        Update.print_someone conf base (poi base (father cpl1));
+        Wserver.wprint " %s " (transl_nth conf "and" 0);
+        Update.print_someone conf base (poi base (mother cpl1));
+      end;
+      tag "li" begin
+        Update.print_someone conf base (poi base (father cpl2));
+        Wserver.wprint " %s " (transl_nth conf "and" 0);
+        Update.print_someone conf base (poi base (mother cpl2));
+      end;
     end;
     Wserver.wprint "\n";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      html_p conf;
-      Util.hidden_env conf;
-      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n\n"
-        (Adef.int_of_iper p.cle_index);
-      Wserver.wprint "<input type=\"hidden\" name=\"f\" value=\"%d\">\n\n"
-        (Adef.int_of_ifam fam2.fam_index);
-      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\">\n";
-      Wserver.wprint "\n";
-      html_p conf;
-      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
+      tag "p" begin
+        Util.hidden_env conf;
+        xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
+          (Adef.int_of_iper p.cle_index);
+        xtag "input" "type=\"hidden\" name=\"f\" value=\"%d\""
+          (Adef.int_of_ifam fam2.fam_index);
+        xtag "input" "type=\"hidden\" name=\"m\" value=\"INV_FAM_OK\"";
+      end;
+      tag "p" begin
+        xtag "input" "type=\"submit\" value=\"Ok\"";
+      end;
     end;
     Wserver.wprint "\n";
     trailer conf

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.12 2004-12-28 15:13:04 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.13 2004-12-29 03:03:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -523,18 +523,15 @@ value print_del1 conf base p =
   in
   do {
     header conf title;
-    Wserver.wprint "\n";
     tag "form" "method=\"post\" action=\"%s\"" conf.command begin
-      html_p conf;
-      Util.hidden_env conf;
-      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\">\n";
-      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n\n"
-        (Adef.int_of_iper p.cle_index);
-      Wserver.wprint "\n";
-      html_p conf;
-      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
+      tag "p" begin
+        Util.hidden_env conf;
+        xtag "input" "type=\"hidden\" name=\"m\" value=\"DEL_IND_OK\"";
+        xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
+          (Adef.int_of_iper p.cle_index);
+        xtag "input" "type=\"submit\" value=\"Ok\"";
+      end;
     end;
-    Wserver.wprint "\n";
     trailer conf;
   }
 ;

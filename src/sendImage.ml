@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.16 2004-12-28 15:13:01 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.17 2004-12-29 03:03:26 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -13,9 +13,11 @@ value incorrect_content_type conf base p s =
   do {
     rheader conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "<p>\n<font size=\"-1\"><em>";
-    Wserver.wprint "Error: incorrect image content type: %s" s;
-    Wserver.wprint "</em></font>\n<p>\n";
+    tag "p" begin
+      Wserver.wprint "<font size=\"-1\"><em>";
+      Wserver.wprint "Error: incorrect image content type: %s" s;
+      Wserver.wprint "</em></font>\n";
+    end;
     Wserver.wprint "<ul><li>%s</ul>\n"
       (referenced_person_title_text conf base p);
     trailer conf;
@@ -67,26 +69,25 @@ value print_send_image conf base p =
     tag "form" "method=\"post\" action=\"%s\" enctype=\"multipart/form-data\""
       conf.command
     begin
-      html_p conf;
-      Util.hidden_env conf;
-      Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\">\n";
-      Wserver.wprint "<input type=\"hidden\" name=\"i\" value=\"%d\">\n"
-        (Adef.int_of_iper p.cle_index);
-      Wserver.wprint "<input type=\"hidden\" name=\"digest\" value=\"%s\">\n" digest;
-      Wserver.wprint "\n";
-      Wserver.wprint "%s:\n" (capitale (transl conf "file"));
-      Wserver.wprint "\
-<input type=\"file\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\">
-";
+      tag "p" begin
+        Util.hidden_env conf;
+        xtag "input" "type=\"hidden\" name=\"m\" value=\"SND_IMAGE_OK\"";
+        xtag "input" "type=\"hidden\" name=\"i\" value=\"%d\""
+          (Adef.int_of_iper p.cle_index);
+        xtag "input" "type=\"hidden\" name=\"digest\" value=\"%s\"" digest;
+        Wserver.wprint "%s:\n" (capitale (transl conf "file"));
+        xtag "input" "\
+type=\"file\" name=\"file\" size=\"50\" maxlength=\"250\" accept=\"image/*\"";
+      end;
       match p_getint conf.base_env "max_images_size" with
       [ Some len ->
-          do {
-            Wserver.wprint "<p>\n";
-            Wserver.wprint "(maximum authorized size = %d bytes)\n" len
-          }
+          tag "p" begin
+            Wserver.wprint "(maximum authorized size = %d bytes)\n" len;
+          end
       | None -> () ];
-      Wserver.wprint "<p>\n";
-      Wserver.wprint "<input type=\"submit\" value=\"Ok\">\n";
+      tag "p" begin
+        xtag "input" "type=\"submit\" value=\"Ok\"";
+      end;
     end;
     trailer conf
   }
