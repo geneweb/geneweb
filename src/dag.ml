@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.31 2005-03-17 10:36:18 ddr Exp $ *)
+(* $Id: dag.ml,v 4.32 2005-03-24 11:43:15 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -199,7 +199,7 @@ value print_table conf hts =
                     "<hr dir=\"ltr\" width=\"50%%\" align=\"%s\"%s>" conf.right
                       conf.xhs
               | _ ->
-                  Wserver.wprint "<hr%s>" conf.xhs ] ];
+                  Wserver.wprint "<hr width=\"100%%\"%s>" conf.xhs ] ];
           Wserver.wprint "</td>\n"
         };
       end;
