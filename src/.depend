@@ -38,12 +38,12 @@ birthday.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx srcfile.cmx \
     util.cmx ../wserver/wserver.cmx 
 calendar.cmo: def.cmi 
 calendar.cmx: def.cmi 
-changeChildren.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi iobase.cmi \
-    iovalue.cmi lock.cmo name.cmi srcfile.cmi update.cmi util.cmi \
-    ../wserver/wserver.cmi 
-changeChildren.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx iobase.cmx \
-    iovalue.cmx lock.cmx name.cmx srcfile.cmx update.cmx util.cmx \
-    ../wserver/wserver.cmx 
+changeChildren.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi \
+    history.cmi iobase.cmi iovalue.cmi lock.cmo name.cmi srcfile.cmi \
+    update.cmi util.cmi ../wserver/wserver.cmi 
+changeChildren.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx \
+    history.cmx iobase.cmx iovalue.cmx lock.cmx name.cmx srcfile.cmx \
+    update.cmx util.cmx ../wserver/wserver.cmx 
 check.cmo: adef.cmi def.cmi gutil.cmi mhashtbl.cmo 
 check.cmx: adef.cmx def.cmi gutil.cmx mhashtbl.cmx 
 consang.cmo: adef.cmi check.cmo def.cmi gutil.cmi pqueue.cmi consang.cmi 
@@ -162,10 +162,12 @@ robot.cmo: srcfile.cmi util.cmi ../wserver/wserver.cmi
 robot.cmx: srcfile.cmx util.cmx ../wserver/wserver.cmx 
 select.cmo: adef.cmi def.cmi gutil.cmi 
 select.cmx: adef.cmx def.cmi gutil.cmx 
-sendImage.cmo: adef.cmi buff.cmo config.cmi def.cmi gutil.cmi iobase.cmi \
-    lock.cmo srcfile.cmi update.cmi util.cmi ../wserver/wserver.cmi 
-sendImage.cmx: adef.cmx buff.cmx config.cmi def.cmi gutil.cmx iobase.cmx \
-    lock.cmx srcfile.cmx update.cmx util.cmx ../wserver/wserver.cmx 
+sendImage.cmo: adef.cmi buff.cmo config.cmi def.cmi gutil.cmi history.cmi \
+    iobase.cmi lock.cmo srcfile.cmi update.cmi util.cmi \
+    ../wserver/wserver.cmi 
+sendImage.cmx: adef.cmx buff.cmx config.cmi def.cmi gutil.cmx history.cmx \
+    iobase.cmx lock.cmx srcfile.cmx update.cmx util.cmx \
+    ../wserver/wserver.cmx 
 some.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
 some.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
