@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.3 2001-06-13 14:35:27 ddr Exp $ *)
+(* $Id: templ.ml,v 4.4 2001-06-14 17:09:33 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -430,6 +430,31 @@ value split_at_coloncolon s =
       | _ -> loop (i + 1) ]
 ;
 
+value eval_transl conf base env upp s c =
+  let r =
+    match c with
+    [ '0'..'9' ->
+        let n = Char.code c - Char.code '0' in
+        match split_at_coloncolon s with
+        [ None -> Gutil.nominative (Util.transl_nth conf s n)
+        | Some (s1, s2) ->
+            let s2 =
+              try
+                if String.length s2 > 0 && s2.[0] = '|' then
+                  let i = String.rindex s2 '|' in
+                  let s3 = String.sub s2 1 (i - 1) in
+                  let s4 = String.sub s2 (i + 1) (String.length s2 - i - 1) in
+                  s3 ^ Util.transl_nth conf s4 n
+                else raise Not_found
+              with
+              [ Not_found -> Util.transl_nth conf s2 n ]
+            in
+            Util.transl_decline conf s1 s2 ]
+    | _ -> Gutil.nominative (Util.transl conf s) ^ String.make 1 c ]
+  in
+  if upp then capitale r else r
+;
+
 value eval_date_field =
   fun
   [ Some d ->
@@ -486,20 +511,6 @@ value eval_date_variable od =
       | Some (Dgreg {prec = YearInt _} _) -> "yearint"
       | _ -> "" ]
   | v -> ">%" ^ v ^ "???" ]
-;
-
-value eval_transl conf base env upp s c =
-  let r =
-    match c with
-    [ '0'..'9' ->
-        let n = Char.code c - Char.code '0' in
-        match split_at_coloncolon s with
-        [ None -> Gutil.nominative (Util.transl_nth conf s n)
-        | Some (s1, s2) ->
-            Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
-    | _ -> Gutil.nominative (Util.transl conf s) ^ String.make 1 c ]
-  in
-  if upp then capitale r else r
 ;
 
 value print_body_prop conf base =
