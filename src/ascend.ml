@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.13 1999-04-20 19:48:21 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.14 1999-04-21 09:41:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -423,7 +423,7 @@ value print_persons_parents conf base all_gp p =
   | None -> () ]
 ;
 
-value print_marriage_long conf base all_gp auth p ifam =
+value print_marriage_long conf base all_gp auth marr_nb p ifam =
   let fam = foi base ifam in
   let ispouse = spouse p (coi base ifam) in
   let spouse = poi base ispouse in
@@ -431,16 +431,24 @@ value print_marriage_long conf base all_gp auth p ifam =
   let is = index_of_sex p.sex in
   let auth = auth && age_autorise conf base spouse in
   do if fam.not_married && auth then
-       Wserver.wprint "%s" (capitale (transl conf "with"))
+       do Wserver.wprint "%s" (capitale (transl conf "with"));
+          match marr_nb with
+          [ Some n -> Wserver.wprint " (%d)" n
+          | None -> () ];
+       return ()
      else
        Wserver.wprint
          (fcapitale (ftransl_nth conf "married%t to" is))
          (fun _ ->
-            if auth then
-              do Wserver.wprint "\n";
-                 Perso.print_marriage_text conf base False fam;
-              return ()
-            else ());
+            do match marr_nb with
+               [ Some n -> Wserver.wprint " (%d)" n
+               | None -> () ];
+               if auth then
+                 do Wserver.wprint "\n";
+                    Perso.print_marriage_text conf base False fam;
+                 return ()
+               else ();
+            return ());
      Wserver.wprint "\n";
      stag "strong" begin
        Wserver.wprint "%s"
@@ -481,6 +489,87 @@ value has_notes conf base =
          let p = poi base ip in
          age_autorise conf base p && person_has_notes base p
      | _ -> False ])
+;
+
+value print_other_marriages conf base all_gp auth ifamo p =
+  if ifamo = None || Array.length p.family >= 2 then
+    do for i = 0 to Array.length p.family - 1 do
+         if ifamo = None || ifamo <> Some p.family.(i) then
+           let marr_nb = if ifamo = None then None else Some (i + 1) in
+           print_marriage_long conf base all_gp auth marr_nb p p.family.(i)
+         else ();
+       done;
+    return ()
+  else ()
+;
+
+value print_family_long conf base all_gp ifam nth =
+  let fam = foi base ifam in
+  let cpl = coi base ifam in
+  let auth =
+    age_autorise conf base (poi base cpl.father) &&
+    age_autorise conf base (poi base cpl.mother)
+  in
+  do Wserver.wprint "<p>\n... ";
+     Wserver.wprint "%s" (transl conf "having as children");
+     match nth with
+     [ Some (n, i) ->
+         do Wserver.wprint " ";
+            print_link_long conf n;
+            Wserver.wprint "-(X%d)" i;
+         return ()
+     | None -> () ];
+     Wserver.wprint ":\n<p>\n";
+     let auth =
+       List.for_all
+         (fun ip -> age_autorise conf base (poi base ip))
+         (Array.to_list fam.children)
+     in
+     tag "ol" "type=a" begin
+       for i = 0 to Array.length fam.children - 1 do
+         let ipc = fam.children.(i) in
+         let pc = poi base ipc in
+         let n = get_link all_gp ipc in
+         do Wserver.wprint "<li>\n";
+            stag "strong" begin
+              if pc.surname = (poi base cpl.father).surname then
+                afficher_prenom_de_personne_referencee conf base
+                  pc
+              else
+                afficher_personne_referencee conf base pc;
+            end;
+            print_person_long_info conf base auth n pc;
+            Wserver.wprint ".\n";
+            match n with
+            [ Some _ -> ()
+            | None ->
+                for i = 0 to Array.length pc.family - 1 do
+                  print_marriage_long conf base all_gp auth None
+                    pc (pc.family.(i));
+                done ];
+            if i <> Array.length fam.children - 1 then
+              Wserver.wprint "<br>&nbsp;\n"
+            else ();
+         return ();
+       done;
+     end;
+  return ()
+;
+
+value print_other_families conf base all_gp excl_ifam moth_nb =
+  let print ip n =
+    let p = poi base ip in
+    for i = 0 to Array.length p.family - 1 do
+      let ifam = p.family.(i) in
+      if ifam <> excl_ifam && Array.length (foi base ifam).children <> 0 then
+        print_family_long conf base all_gp ifam (Some (n, i + 1))
+      else ();
+    done
+  in
+  let cpl = coi base excl_ifam in
+  do print cpl.father (Num.sub moth_nb (Num.one));
+     print cpl.mother moth_nb;
+  return ()
 ;
 
 value print_generation_person_long conf base all_gp last_generation gp =
@@ -552,54 +641,16 @@ value print_generation_person_long conf base all_gp last_generation gp =
                   Num.print wpr (transl conf "(thousand separator)") n;
                 end;
               end;
-              Wserver.wprint ".]\n";
+              Wserver.wprint "].\n";
            return ()
          else ();
+         print_other_marriages conf base all_gp (age_autorise conf base p)
+           ifamo p;
          match ifamo with
          [ Some ifam ->
              if not (Num.even n) then
-               let fam = foi base ifam in
-               let cpl = coi base ifam in
-               let auth =
-                 age_autorise conf base (poi base cpl.father) &&
-                 age_autorise conf base (poi base cpl.mother)
-               in
-               do Wserver.wprint "<p>\n... ";
-                  Wserver.wprint "%s:\n" (transl conf "having as children");
-                  Wserver.wprint "\n<p>\n";
-                  let auth =
-                    List.for_all
-                      (fun ip -> age_autorise conf base (poi base ip))
-                      (Array.to_list fam.children)
-                  in
-                  tag "ol" "type=a" begin
-                    for i = 0 to Array.length fam.children - 1 do
-                      let ipc = fam.children.(i) in
-                      let pc = poi base ipc in
-                      let n = get_link all_gp ipc in
-                      do Wserver.wprint "<li>\n";
-                         stag "strong" begin
-                           if pc.surname = (poi base cpl.father).surname then
-                             afficher_prenom_de_personne_referencee conf base
-                               pc
-                           else
-                             afficher_personne_referencee conf base pc;
-                         end;
-                         print_person_long_info conf base auth n pc;
-                         Wserver.wprint ".\n";
-                         match n with
-                         [ Some _ -> ()
-                         | None ->
-                             for i = 0 to Array.length pc.family - 1 do
-                               print_marriage_long conf base all_gp auth pc
-                                 (pc.family.(i));
-                             done ];
-                         if i <> Array.length fam.children - 1 then
-                           Wserver.wprint "<br>&nbsp;\n"
-                         else ();
-                      return ();
-                    done;
-                  end;
+               do print_family_long conf base all_gp ifam None;
+                  print_other_families conf base all_gp ifam n;
                return ()
              else ()
          | None -> () ];
