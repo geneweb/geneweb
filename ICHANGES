@@ -5,8 +5,6 @@ GeneWeb Version 4.05
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [02 Feb 02] Added an indication "wizard" or "friend" in upper right corner
-    of the welcome page.
   - [26 Jan 02] The "calendars" page shows the time (of the server machine).
   - [20 Jan 02] Use of dates order (according to the language) in calendars
     page.

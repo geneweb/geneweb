@@ -2,6 +2,8 @@ GeneWeb version 4.05
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [02 Feb 02] Added an indication "wizard" or "friend" in upper
+    right corner of the welcome page.
   - [31 Jan 02] Added a system to restrict access more strict than the
     "hide_private_names" system. It can be set by setting the variable
     "use_restrict" to "yes" in the configuration file. In this context,
