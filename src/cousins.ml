@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.14 2001-03-01 19:42:46 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.15 2001-03-14 16:34:20 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -43,7 +43,7 @@ value brother_label conf x =
   | 4 -> transl conf "3rd cousins"
   | n ->
       Printf.sprintf (ftransl conf "%s cousins")
-        (transl_nth conf (transl_nth conf "*nth (cousin)*" 0) (n - 1)) ]
+        (transl_nth conf "*nth (cousin)*" (n - 1)) ]
 ;
 
 value rec except x =
