@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: tree.ml,v 2.2 1999-08-21 17:17:13 ddr Exp $ *)
+(* $Id: tree.ml,v 2.3 1999-08-21 18:17:34 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -15,22 +15,32 @@ value rec tree_of_branch =
   | [x :: l] -> {node = x; sons = [tree_of_branch l]} ]
 ;
 
-value append t b =
-  match b with
+value append t =
+  fun
   [ [] -> t
   | [x :: l] ->
-      loop t where rec loop t =
+      let rec app t =
         if x == t.node then
           let tl = if l = [] then t.sons else t.sons @ [tree_of_branch l] in
-          {node = t.node; sons = tl}
+          Some {node = t.node; sons = tl}
         else
-          let tl =
-            let tl = List.rev t.sons in
-            match tl with
-            [ [last :: tl] -> List.rev tl @ [loop last]
-            | [] -> [] ]
-          in
-          {node = t.node; sons = tl} ]
+          match app_rev_sons (List.rev t.sons) with
+          [ Some rev_tl -> Some {node = t.node; sons = List.rev rev_tl}
+          | None -> None ]
+      and app_rev_sons =
+        fun
+        [ [last :: rev_tl] ->
+            match app last with
+            [ Some t -> Some [t :: rev_tl]
+            | None ->
+                match app_rev_sons rev_tl with
+                [ Some rev_tl -> Some [last :: rev_tl]
+                | None -> None ] ]
+        | [] -> None ]
+      in
+      match app t with
+      [ Some t -> t
+      | None -> t ] ]
 ;
 
 value colspan_tree =
@@ -128,7 +138,13 @@ value print_tree conf base with_spouses one_branch t =
       else ();
     end
   in
-  tag "table" "border=0 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
+  let border =
+    match p_getenv conf.env "border" with
+    [ Some x -> x
+    | None -> "0" ]
+  in
+  tag "table" "border=%s cellspacing=0 cellpadding=0 width=\"100%%\"" border
+  begin
     loop True [(t.node, t)] where rec loop first tl =
       do if not first && not one_branch then
            do print_row print_horizontal_bar tl;
