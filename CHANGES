@@ -50,6 +50,11 @@ GeneWeb version 4.01
     - between x and y, their death value is "don't know if death"
     Default x is 80, y is 120.
 
+* GeneWeb uncompiler (gwu) and GeneWeb to Gedcom (gwb2ged)
+  - [04 Apr 01] Fixed bug: the option -d to select descendants
+    sometimes forgot people, typically when there was a couple whose both
+    were descendant.
+
 * Lexicon (lang/lexicon.txt) and Welcome page (lang/start.txt)
   - [26 Mar 01] (technical point) Grouped together all lang/*/start.txt in
     one only file lang/start.txt, easier to manipulate (at least for me!)
