@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.9 2000-06-06 21:01:49 ddr Exp $ *)
+(* $Id: setup.ml,v 3.10 2000-06-19 22:23:20 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1293,7 +1293,7 @@ else ()
 
 value gwd_available_languages =
   ["af"; "cn"; "cs"; "de"; "dk"; "en"; "es"; "eo"; "fi"; "fr"; "he"; "is";
-   "it"; "nl"; "no"; "pt"; "ru"; "se"]
+   "it"; "lv"; "nl"; "no"; "pt"; "ru"; "se"]
 ;
 value setup_available_languages = ["de"; "en"; "es"; "fr"; "se"];
 

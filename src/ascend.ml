@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.36 2000-06-03 21:08:00 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.37 2000-06-19 22:23:22 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -389,6 +389,7 @@ value afficher_ascendants_numerotation conf base niveau_max p =
       (transl_decline conf "of" (txt_fun raw_access conf base p))
   in
   do header conf title;
+     print_link_to_welcome conf True;
      Wserver.wprint "%s.\n" (capitale (text_to conf niveau_max));
      tag "ul" begin
        mark.(Adef.int_of_iper p.cle_index) := Num.one;

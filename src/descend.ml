@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.11 2000-05-23 07:19:01 ddr Exp $ *)
+(* $Id: descend.ml,v 3.12 2000-06-19 22:23:23 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -286,6 +286,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
     else ()
   in
   do header conf (descendants_title conf base p);
+     print_link_to_welcome conf True;
 (**)
      if niveau_max > 6 then enter_nobr () else ();
 (**)

@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- $Id: start.txt,v 1.1 2000-06-19 22:23:19 ddr Exp $ -->
+  <!-- copyright (c) INRIA -->
+  <title>Genealogy - %t</title>
+  <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
+  <meta name="ROBOTS" content="NONE">
+%j</head>
+<body%b>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%o/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<table><tr><td align=center><h1><font color=%i>Ciltsrakstu<br>
+datu bâze</font></h1></table>
+</td>
+</tr>
+</table>
+
+<br>
+
+<font size=-1><em>Jûs variet apskatît datu bâzi arî citâs sekojoðâs
+valodâs:</em></font>
+
+<br>
+
+%rversion
+
+<p>
+
+Datu bâze <font color=%i><b>"%t"</b></font> patreiz satur %n personas.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
+
+%I&NwNj<br><p>
+
+%I&NcNa<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w"><em>Wizard</em></a> access<br>
+(password)<br></td>
+
+%INf<td align=center><a href="%sw=f"><em>Friend</em></a> access<br>
+(password)</td>
+
+%E</tr></table>%E%I|ca<table border=0>
+<tr><td align=center>
+<form method=POST action="%f">
+%hPassword, for <em>friend</em> or <em>wizard</em> access:
+<input name=w type=password size=10 maxlength=200>
+<input type=submit value="Ok">
+</form>
+</td></tr>
+</table>
+
+%E%E<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+<center><table border=0 cellspacing=0 cellpadding=0><tr><td>
+Jûs variet meklçt ðinî datu bâzç:<br><p>
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
+<font color=%i><b>personas</b></font>
+<input name=n size=40 maxlength=200>
+<input type=submit value="Meklçt">
+<br>
+<ul>
+<li> <input type=radio name=t value=PN checked>
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em>SOSA pakâpe</em> attiecîbâ pret %a%E
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
+</ul>
+</form>
+
+%It<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=TT>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<font color=%i><b>tituls</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
+(<a href="%sm=TT;t=">[all the titles]</a>)<br>
+</td><td>...</td><td>
+<font color=%i><b>[estate]</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
+(<a href="%sm=TT;p=*">[all the estates]</a>)
+</td><td>
+<input type=submit value="Meklçt">
+</td></tr></table>
+</form>
+
+%E<li>
+
+<form method=GET action="%f">
+%h
+<font color=%i><b>visus</b></font>
+<select name=m>
+<option value="N" selected>uzvârdus
+<option value="P">vârdus
+</select>
+
+<select name=tri>
+<option value="A" selected>alfabçtiskâ kârtîbâ
+<option value="F">pçc sastopamîbas
+</select>
+<input type=submit value="Parâdît">
+</form>
+
+<li>
+
+<form method=GET action="%s">
+%h<input type=hidden name=m value=PS>
+<font color=%i><b>[place] / [surname/surnames]0</b></font>
+- [birth] <input type=checkbox name=bi value=on checked>
+- [death] <input type=checkbox name=de value=on>
+- [marriage/marriages]0 <input type=checkbox name=ma value=on>
+- <input type=submit value="Ok">
+</form>
+
+<li>
+
+<font color=%i><b>meklçt pçc</b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>citiem parametriem</b></font></a>.
+
+</ul>
+</td></tr></table></center>
+
+%Iw<p>
+<center>Izmaiòu veikðana:<br><p>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+%Id<li><a href="%sm=ADD_FAM">pievienot ìimeni</a>
+%INl</ul>
+</td>
+<td align=left>
+<ul>%E
+%E<li><a href="%sm=MOD_NOTES">labot piezîmes</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+%E<br><p>
+
+<center>Informâcija par:<br><p>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li><a href="%sm=AN">dzimðanas dienâm</a>
+<li><a href="%sm=AD">piemiòas dienâm</a>
+<li><a href="%sm=AM">kâzu dienâm</a>%I|wf
+<li><a href="%sm=LB">pçdçjiem piedzimuðajiem</a>%E
+</ul>
+</td>
+<td valign=up>
+<ul>%I|wf
+<li><a href="%sm=LD">pçdçjiem miruðajiem</a>
+<li><a href="%sm=LM">pçdçjâm precîbâm</a>%E%Ih
+<li><a href="%sm=HIST;k=10">labojumu vçsturi</a>%E
+<li><a href="%sm=CAL">kalendâriem</a>
+<li><a href="%sm=FORUM">datu bâzes " ziòojumu dçlis" </a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+<p>
+
+Kopð %d datu bâze ir apmeklçta %q reizes, %c no tiem ir bijuði ðinî lappusç. 
+%Il<p>%E
+
+<p>
+
+{If your browser does not automatically update the modified pages (forcing you
+to do "reload current document"), try navigating from <a
+href="%sescache=-%c">this link</a>}.
+
+</td></tr>
+</table>
+
+<br>
+
+<p align=right><font size=-1><em><a href="%sm=LEX">lexicon</a></em></font></p>
+
+</center>

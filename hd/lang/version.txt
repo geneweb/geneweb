@@ -65,6 +65,9 @@ function WorkOnBrowser() {
  onmouseover="if (WorkOnBrowser()) iit.src='%o/t-it.gif'"
  onmouseout="iit.src='%o/l-it.jpg'">
 <img src="%o/l-it.jpg" width=36 height=22 alt=it name=iit border=0></a>
+<a href="%glang=lv"
+ onmouseout="ilv.src='%o/l-lv.jpg'">
+<img src="%o/l-lv.jpg" width=36 height=22 alt=lv name=ilv border=0></a>
 <a href="%glang=nl"
  onmouseover="if (WorkOnBrowser()) inl.src='%o/t-nl.gif'"
  onmouseout="inl.src='%o/l-nl.jpg'">
