@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.2 1999-03-11 12:56:50 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.3 1999-03-15 20:12:56 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -16,7 +16,7 @@ type record =
 value titles_aurejac = ref False;
 value lowercase_first_names = ref False;
 value lowercase_surnames = ref False;
-value extract_first_names = ref False;
+value extract_first_names = ref True;
 value extract_public_names = ref True;
 value ansel_option = ref None;
 value ansel_characters = ref True;
