@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.130 2000-07-06 09:22:23 ddr Exp $
+# $Id: lexicon.txt,v 3.131 2000-07-06 09:46:51 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5455,7 +5455,7 @@ ru: %d фамилий
 se: de %d efternamnen
 
     the %d who lived the longest
-dK; de %d som har levet l&aelig;ngst
+dk: de %d som har levet l&aelig;ngst
 en: the %d who lived the longest
 fr: les %d ayant v&eacute;cu le plus longtemps
 nl: de %d langst levende personen
