@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.113 2000-06-19 22:23:15 ddr Exp $
+# $Id: lexicon.txt,v 3.114 2000-06-20 13:47:14 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -24,6 +24,14 @@ se: iso-8859-1
 
      !dir
 he: rtl
+
+     !languages
+de: cn:Chinesisch/dk:D&auml;nish/de:Deutsch/en:Englisch/eo:Esperanto/fr:Franz&ouml;sisch/he:Hebr&auml;isch/nl:Holl&auml;ndisch/is:Isl&auml;ndisch/it:Italienisch/no:Norwegisch/pt:Portugiesisch/es:Spanisch/se:Schwedisch/cs:Tschechisch
+en: af:Afrikaans/cn:Chinese/cs:Czech/dk:Danish/nl:Dutch/en:English/eo:Esperanto/fi:Finnish/fr:French/de:German/he:Hebrew/is:Icelandic/it:Italian/lv:Latvian/no:Norwegian/pt:Portuguese/es:Spanish/ru:Russian/se:Swedish
+es: de:Alem&aacute;n/cs:Checo/cn:Chino/dk:Dan&eacute;s/es:Espa&ntilde;ol/eo:Esperanto/fr:Franc&eacute;s/he:Hebreo/en:Ingl&eacute;s/it:Italiano/nl:N&eacute;erlandes/no:Noruego/pt:Portug&eacute;s/se:Sueco
+fr: af:afrikaans/cn:chinois/cs:tch&egrave;que/de:allemand/dk:danois/en:anglais/eo:esp&eacute;ranto/es:espagnol/fi:finlandais/fr:fran&ccedil;ais/he:h&eacute;breu/is:islandais/it:italien/lv:letton/nl:n&eacute;erlandais/no:norv&eacute;gien/pt:portugais/ru:russe/se:su&eacute;dois
+lv: cn:Íînieðu/cs:Èehu/dk:Dâòu/nl:Holandieðu/en:Angïu/eo:Esperanto/fi:Somu/fr:Franèu/de:Vâcu/he:Ebreju/is:Islandieðû/it:Itâïu/lv:Latvieðu/no:Norvçìu/pt:Portugâïu/es:Spâòu/ru:Krievu/se:Zviedru
+se: cn:kinesiska/cs:tjeckiska/dk:danska/en:engelska/eo:esperanto/fi:finska/fr:franska/de:tyska/he:hebreiska/it:italienska/nl:holländska/no:norska/pt:portugisiska/es:spanska/se:svenska
 
      to see the first branch
 af:  om die eerste staak te sien

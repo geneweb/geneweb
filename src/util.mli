@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.22 2000-06-03 21:08:09 ddr Exp $ *)
+(* $Id: util.mli,v 3.23 2000-06-20 13:47:27 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -132,6 +132,7 @@ value create_topological_sort : config -> base -> array int;
 value branch_of_sosa : base -> iper -> Num.t -> option (list (iper * sex));
 value sosa_of_branch : list (iper * sex) -> Num.t;
 
+value link_to_referer : config -> string;
 value print_link_to_welcome : config -> bool -> unit;
 
 value image_file_name : string -> string;
