@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.12 1999-12-03 03:25:19 ddr Exp $ *)
+(* $Id: relation.ml,v 3.13 1999-12-03 19:14:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -787,7 +787,7 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                     else ";" ^ acces_n conf base "3" p1)
                    (if pp2 = None then ""
                     else ";" ^ acces_n conf base "4" p2)
-                   (if n > 1 && n < 10 then ";dag=on" else "");
+                   (if n > 1 && n <= 10 then ";dag=on" else "");
                  Wserver.wprint "%s</a>" (transl conf "here");
                  if n > 10 then
                    Wserver.wprint "%s"
@@ -828,7 +828,7 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                        else ";" ^ acces_n conf base "3" p1)
                       (if pp2 = None then ""
                        else ";" ^ acces_n conf base "4" p2)
-                      (if n > 1 && n < 10 then ";dag=on" else "");
+                      (if n > 1 && n <= 10 then ";dag=on" else "");
                     Wserver.wprint "%s</a>" (transl conf "here");
                     if n > 10 then
                       Wserver.wprint "%s"
