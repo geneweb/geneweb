@@ -1,8 +1,9 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: conf.txt,v 1.7 2002-11-13 12:29:28 ddr Exp $ -->
+  <!-- $Id: conf.txt,v 1.8 2003-10-14 07:09:09 ddr Exp $ -->
   <title>Gwtp - [
 en: configuration
+es: configuración
 fr: configuration
 it: configurazione
 ] %b</title>
@@ -10,12 +11,14 @@ it: configurazione
 <body>
 <h1 align=center>Gwtp - [
 en: configuration
+es: configuración
 fr: configuration
 it: configurazione
 ] %b</h1>
 
 <div align=right>
 <a href="%s?m=CNF;b=%b;t=%t;lang=en">English</a> /
+<a href="%s?m=CNF;b=%b;t=%t;lang=es">Español</a> /
 <a href="%s?m=CNF;b=%b;t=%t;lang=fr">Français</a> /
 <a href="%s?m=CNF;b=%b;t=%t;lang=it">Italiano</a>
 </div>
@@ -28,12 +31,14 @@ it: configurazione
 <table>
 <tr><td>[
 en: Friend password:
+es: Contraseña de amigo:
 fr: Mot de passe ami:
 it: Password amico:
 ]
 <td><input name=friend_passwd value="%vfriend_passwd;"><br>
 <tr><td>[
 en: Wizard password:
+es: Contraseña de mago:
 fr: Mot de passe magicien:
 it: Password Wizard:
 ]
@@ -41,6 +46,7 @@ it: Password Wizard:
 </table>
 [
 en: Default language:
+es: Lengua estandar:
 fr: Langue par défaut:
 it: Lingua standard:
 ]
@@ -48,125 +54,150 @@ it: Lingua standard:
 <option value=""%edefault_lang=;><tt>-</tt>
 <option value="af"%edefault_lang=af;>[
 en: Afrikaans
+es: Afrikaans
 fr: Afrikaans
 it: Afrikaans
 ]
 <option value="bg"%edefault_lang=bg;>[
 en: Bulgarian
+es: Búlgaro
 fr: Bulgare
 ]
 <option value="ca"%edefault_lang=ca;>[
 en: Catalan
+es: Catalán
 fr: Catalan
 it: Catalano
 ]
 <option value="cs"%edefault_lang=cs;>[
 en: Czech
+es: Checo
 fr: Tchèque
 it: Ceco
 ]
 <option value="de"%edefault_lang=de;>[
 en: German
+es: Alemán
 fr: Allemand
 it: Tedesco
 ]
 <option value="da"%edefault_lang=da;>[
 en: Danish
+es: Danés
 fr: Danois
 it: Danese
 ]
 <option value="nl"%edefault_lang=nl;>[
 en: Dutch
+es: Holandés
 fr: Néerlandais
 it: Olandese
 ]
 <option value="en"%edefault_lang=en;>[
 en: English
+es: Ingles
 fr: Anglais
 it: Inglese
 ]
 <option value="eo"%edefault_lang=eo;>[
 en: Esperanto
+es: Esperanto
 fr: Espéranto
 it: Esperanto
 ]
 <option value="et"%edefault_lang=et;>[
 en: Estonian
+es: Estoniano
 fr: Estonien
 it: Estone
 ]
 <option value="fi"%edefault_lang=fi;>[
 en: Finnish
+es: Finlandes
 fr: Finnois
 it: Finlandese
 ]
 <option value="fr"%edefault_lang=fr;>[
 en: French
+es: Frances
 fr: Français
 it: Francese
 ]
 <option value="he"%edefault_lang=he;>[
 en: Hebrew
+es: Hebreo
 fr: Hébreu
 it: Ebraico
 ]
 <option value="is"%edefault_lang=is;>[
 en: Icelandic
+es: Islandes
 fr: Islandais
 it: Islandese
 ]
 <option value="it"%edefault_lang=it;>[
 en: Italian
+es: Italiano
 fr: Italien
 it: Italiano
 ]
 <option value="lv"%edefault_lang=lv;>[
 en: Latvian
+es: Litoniano
 fr: Letton
 it: Lettone
 ]
 <option value="no"%edefault_lang=no;>[
-fr: Norwegian
 en: Norvégien
+es: Norues
+fr: Norwegian
 it: Norvegese
 ]
 <option value="pl"%edefault_lang=pl;>[
 en: Polish
+es: Polaco
 fr: Polonais
 it: Polacco
 ]
 <option value="pt"%edefault_lang=pt;>[
 en: Portuguese
+es: Portugues
 fr: Portugais
 it: Portoghese
 ]
 <option value="pt-br"%edefault_lang=pt-br;>[
 en: Brazilian
+es: Brasileño
 fr: Brésilien
 it: Portoghese-Brasiliano
 ]
 <option value="es"%edefault_lang=es;>[
 en: Spanish
+es: Español
 fr: Espagnol
 it: Spagnolo
 ]
 <option value="ru"%edefault_lang=ru;>[
 en: Russian
+es: Ruso
 fr: Russe
 it: Russo
 ]
 <option value="sl"%edefault_lang=sl;>[
 en: Slovenian
+es: Slóvano
 fr: Slovène
 it: Sloveno
 ]
 <option value="sv"%edefault_lang=sv;>[
 en: Swedish
+es: Sueco
 fr: Suédois
 it: Svedese
 ]
 <option value="zh"%edefault_lang=zh;>[
 en: Chinese
+es: Chino
 fr: Chinois
 it: Cinese
 ]
@@ -177,6 +208,7 @@ it: Cinese
 
 [
 en: Body tag property:
+es: Propiedad "body tag":
 fr: Propriété "body tag":
 it: Proprietà "body tag":
 ]
@@ -186,6 +218,7 @@ it: Proprietà "body tag":
 
 [
 en: Images URL:
+es: URL para las imagenes:
 fr: URL pour les images:
 it: URL per le immagini:
 ]
@@ -195,16 +228,19 @@ it: URL per le immagini:
 
 [
 en: Propose search by nobility titles in welcome page:
+es: Proposición para búsqueda por títulos de nobleza in la página de bienvenida: 
 fr: Propose la recherche par titres de noblesse dans la page d'accueil:
 it: Propone la ricerca per titoli di nobiltà nella pagina di benvenuto:
 ]
 <input type=radio name=propose_titles value=yes%cpropose_titles=yes;>[
 en: yes
+es: si
 fr: oui
 it: si
 ]
 <input type=radio name=propose_titles value=no%cpropose_titles=no;>[
 en: no
+es: no
 fr: non
 it: no
 ]
@@ -213,18 +249,21 @@ it: no
 
 [
 en: Hide private names:
+es: Esconder mensajes privados:
 fr: Cacher les noms privés:
 it: Nascondere i nomi privati:
 ]
 <input type=radio name=hide_private_names
  value=yes%chide_private_names=yes;>[
 en: yes
+es: si
 fr: oui
 it: si
 ]
 <input type=radio name=hide_private_names
  value=no%chide_private_names=no;>[
 en: no
+es: no
 fr: non
 it: no
 ]
@@ -233,18 +272,21 @@ it: no
 
 [
 en: Use the "restricted access" system (more strict):
+es: Usar el sistema de "área restringida" (más estricta):
 fr: Utiliser le system "accès restreint" (plus strict):
 it: Utilizzare il sistema "accesso limitato"(più rigoroso):
 ]
 <input type=radio name=use_restrict
  value=yes%cuse_restrict=yes;>[
 en: yes
+es: si
 fr: oui
 it: si
 ]
 <input type=radio name=use_restrict
  value=no%cuse_restrict=no;>[
 en: no
+es: no
 fr: non
 it: no
 ]
@@ -253,18 +295,21 @@ it: no
 
 [
 en: Wizard just friend (for temporary update)
+es: Mago sólo amigo (para actialización temporal):
 fr: Magiciens seulement amis (pour mises à jour temporaires):
 it: Wizard solo amico (per aggiornamenti temporanei):
 ]
 <input type=radio name=wizard_just_friend
  value=yes%cwizard_just_friend=yes;>[
 en: yes
+es: si
 fr: oui
 it: si
 ]
 <input type=radio name=wizard_just_friend
  value=no%cwizard_just_friend=no;>[
 en: no
+es: no
 fr: non
 it: no
 ]
@@ -274,18 +319,21 @@ it: no
 <dl><dt>
 [
 en: Accesses to distant images for "normal" visitors:
+es: Acceder imagenes distantes para visitantes "normales":
 fr: Accès aux images distantes pour les visiteurs "normaux":
 ]
 <dd>
 <input type=radio name=no_image_for_visitor
  value=yes%cno_image_for_visitor=yes;> [
 en: don't generate them
+es: no, no las generes
 fr: ne pas les générer
 ]
 <dd>
 <input type=radio name=no_image_for_visitor
  value=no%cno_image_for_visitor=no;> [
 en: generate them
+es: genéralas
 fr: les générer
 ]
 </dl>
@@ -295,18 +343,21 @@ fr: les générer
 <dl><dt>
 [
 en: In display places/surnames, links point to:
+es: En mostrar lugares/apellidos, enlaces apuntan a:
 fr: Dans l'affichage lieux/patronymes, les liens vont sur:
 ]
 <dd>
 <input type=radio name=place_surname_link_to_ind
  value=yes%cplace_surname_link_to_ind=yes;>[
 en: one individual concerned by the place
+es: un individuo empeñado por el lugar
 fr: une des personnes concernée par le lieu
 ]
 <dd>
 <input type=radio name=place_surname_link_to_ind
  value=no%cplace_surname_link_to_ind=no;>[
 en: the whole surname
+es: el apellido completo
 fr: tout le patronyme
 ]
 </dl>
@@ -315,6 +366,7 @@ fr: tout le patronyme
 
 [
 en: Trailer text:
+es: Texto para el pie de la página:
 fr: Texte pour le bas des pages:
 it: Testo per il piede di pagina:
 ]
@@ -324,6 +376,7 @@ it: Testo per il piede di pagina:
 
 [
 en: Advice:
+es: Aviso:
 fr: Remarques:
 it: Osservazioni:
 ]
@@ -332,6 +385,7 @@ it: Osservazioni:
 
 <li>[
 en: If you want that everybody be "friend", clear your friend password
+es: Si quieres qe todos sean "amigos",  limpia la clave de amigo
 fr: Si vous voulez que tout le monde soit "ami", effacez le mot de
     passe ami.
 it: Se volete che tutti siano "amico", cancellate la password amico.
@@ -339,18 +393,21 @@ it: Se volete che tutti siano "amico", cancellate la password amico.
 
 <li>[
 en: Keep an non-empty and not too simple wizard password.
+es: Manten una clave no vacia y no muy simple para el mago.
 fr: Choisissez un mot de passe "magicien" non vide et pas trop simple.
 it: Scegliete una password "Wizard" non vuota e non troppo facile.
 ]
 
 <li>[
 en: This is not checked: you take your responsabilities.
+es: Esto no esta revisado: te tomas tus responsabilidades.
 fr: Cela n'est pas vérifié: vous prenez vos responsabilités.
 it: Non verificato: vi assumete tutte le responsabilità.
 ]
 
 <li>[
 en: If you don't know, keep the proposed passwords.
+es: Si no sabes, manten las contraseñas propuestas.
 fr: Si vous ne savez pas, gardez les mots de passe proposés.
 it: Se non ne sapete, usate le password proposte.
 ]
@@ -364,6 +421,10 @@ en: Other configuration parameters exist, but they may have an influence
     on the performances of the server computer. Ask the GeneWeb site
     administrator if you want to change them. Be aware of the fact that
     your resquest may not be accepted.
+es: Otros parametros para configuracion existen, pero ellos pueden 
+    influenciar la rapidez del servidor. Pregunta al administrator
+    de la página de GeneWeb si quieres cambiarlos. Ten presente que tu
+    pedido puede ser ignorado. 
 fr: D'autres paramètres de configuration existent, mais ils peuvent avoir
     une influence sur les performances de l'ordinateur serveur. Demandez
     à l'administrateur du site GeneWeb si vous voulez les changer. Soyez
@@ -377,6 +438,7 @@ it: Esistono altri parametri di configurazione che possono avere un'influenza
 <p>
 <input type=submit value="[
 en: Update
+es: Modificar
 fr: Modifier
 it: Modificare
 ]">

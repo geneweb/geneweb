@@ -1,6 +1,6 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: send.txt,v 1.3 2002-06-27 09:46:46 ddr Exp $ -->
+  <!-- $Id: send.txt,v 1.4 2003-10-14 07:12:05 ddr Exp $ -->
   <title>Gwtp - upload %b</title>
 </head>
 <body>
@@ -12,6 +12,7 @@
 
 <div align=right>
 <a href="%s?m=UPL;b=%b;t=%t;lang=en">English</a> /
+<a href="%s?m=UPL;b=%b;t=%t;lang=es">Español</a> /
 <a href="%s?m=UPL;b=%b;t=%t;lang=fr">Français</a> /
 <a href="%s?m=UPL;b=%b;t=%t;lang=it">Italiano</a>
 </div><p>
@@ -19,6 +20,8 @@
 [
 en: From your local GeneWeb database directory (<em>%b.gwb</em> for the
     base named <em>%b</em>):
+es: Desde tu copia local del directorio GeneWeb (<em>%b.gwb</em> nombre
+    base llamado <em>%b</em>))
 fr: À partir du répertoire de votre base de données GeneWeb locale
     (<em>%b.gwb</em> pour la base nommée <em>%b</em>):
 it: A partire dalla directory della vostra base di dati GeneWeb locale
@@ -29,6 +32,7 @@ it: A partire dalla directory della vostra base di dati GeneWeb locale
 <li>
 [
 en: select the file named <b>base</b>:
+es: seleccionar el archivo llamado <b>base</b>:
 fr: sélectionnez le fichier nommé <b>base</b>:
 it: selezionate il file chiamato <b>base</b>:
 ]
@@ -39,6 +43,7 @@ it: selezionate il file chiamato <b>base</b>:
 <li>
 [
 en: select the file named <b>notes</b>, if it exists:
+es: seleccionar el archivo llamado <b>notes</b>, si existe:
 fr: sélectionnez le fichier nommé <b>notes</b>, s'il existe:
 it: selezionate il file chiamato <b>note</b>, se esiste:
 ]
@@ -49,6 +54,7 @@ it: selezionate il file chiamato <b>note</b>, se esiste:
 <li>
 [
 en: select the file named <b>patches</b>, if it exists:
+es: seleccionar el archivo llamado <b>patches</b>, si existe:
 fr: sélectionnez le fichier nommé <b>patches</b>, s'il existe:
 it: selezionate il file chiamato <b>patches</b>, se esiste:
 ]
@@ -59,6 +65,8 @@ it: selezionate il file chiamato <b>patches</b>, se esiste:
 [
 en: Warning: you have to select <b>all</b> these files when they exist.<br>
     Check that you forget none of them.
+es: Atencion: tu has seleccionado <b>todos</b> estos archivos si ellos
+    existen.<br>Verifique que no olvides ninguno.
 fr: Attention: vous devez sélectionner <b>tous</b> ces fichiers s'ils
     existent.<br>Vérifiez que vous n'en oubliez aucun.
 it: Attenzione: dovete selezionare<b>tutti</b> questi files se
@@ -70,6 +78,7 @@ it: Attenzione: dovete selezionare<b>tutti</b> questi files se
 
 <input type=submit value="[
 en: Send
+es: Enviar
 fr: Envoyer
 ]">
 </form>
