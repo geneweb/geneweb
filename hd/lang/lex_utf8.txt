@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.3 2005-02-05 14:29:20 ddr Exp $
+# $Id: lex_utf8.txt,v 1.4 2005-02-06 18:35:47 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -2245,6 +2245,7 @@ de: Rand
 en: border
 eo: limo
 es: borde
+et: ääris
 fi: raja
 fr: bordure
 he:  מסגרת
@@ -2541,7 +2542,7 @@ de: Namen der Kinder &auml;ndern
 en: change children's names
 eo: ŝanĝi nomojn de la idoj
 es: cambiar los nombres de los hijos
-et: muuda laste nimed
+et: muuda laste nimesid
 fi: muuta lasten nimi&auml;
 fr: changer noms des enfants
 he:  עדכן שמות הילדים
@@ -2731,6 +2732,7 @@ en: colour
 en-us: color
 eo: koloro
 es: color 
+et: värv
 fi: v&auml;ri
 fr: couleur
 he:  צבע
@@ -5530,7 +5532,7 @@ de: &auml;ndern +before
 en: modify
 eo: modifi :a:
 es: modificar
-et: muuda
+et: muuda :g:
 fi: muokkaa
 fr: modifier
 he:  לשנות
@@ -5885,6 +5887,7 @@ de: nicht erv&auml;hnt
 en: no mention
 eo: neniu mencio
 es: sin informaci&oacute;n
+et: pole mainitud
 fi: ei mainintaa
 fr: pas de mention
 it: senza menzione
@@ -6043,6 +6046,7 @@ de: ge&auml;nderte Notizen
 en: notes modified
 eo: notoj modifitaj
 es: notas modificadas
+et: märkused muudetud
 fi: muistiinpanoja muokattu
 fr: notes modifi&eacute;es
 it: note modificate
@@ -7753,6 +7757,7 @@ cs: %d nejstarších párů pravděpodobně žijících a zadaných
 da: og de %d &aelig;ldste par muligvis stadig i live og forlovede
 de: Die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
 en: the %d oldest couples perhaps still alive and engaged
+et: %d vanimat paari kes on võib-olla veel elus ja kihlatud
 fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
 nl: De %d langst paren die mogelijk nog steeds leven en getrouwd zijn
