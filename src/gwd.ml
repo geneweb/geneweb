@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.37 1999-09-01 21:30:59 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.38 1999-09-02 05:19:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -984,6 +984,11 @@ value robot_exclude_arg s =
       return exit 2 ]
 ;
 
+value available_languages =
+  ["cn"; "cs"; "de"; "dk"; "en"; "es"; "eo"; "fr"; "he"; "it"; "nl"; "no";
+   "pt"; "se"]
+;
+
 value main () =
   let usage = "Usage: " ^ Sys.argv.(0) ^ " [options] where options are:" in
   let speclist =
@@ -1050,17 +1055,15 @@ value main () =
   in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
   do ifdef UNIX then
-       try
-         let s = Sys.getenv "LC_CTYPE" in
-         if String.length s > 2 then
-          let s = String.sub s 0 2 in
-          default_lang.val :=
-            if s = "fr" then "fr"
-            else if s = "es" then "es"
-            else "en"
-         else ()
-       with
-       [ Not_found -> () ]
+       default_lang.val :=
+         let s = try Sys.getenv "LANG" with [ Not_found -> "" ] in
+         if List.mem s available_languages then s
+         else
+           let s = try Sys.getenv "LC_CTYPE" with [ Not_found -> "" ] in
+           if String.length s >= 2 then
+             let s = String.sub s 0 2 in
+             if List.mem s available_languages then s else "en"
+           else "en"
      else ();
      arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg")
        speclist anonfun usage;

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.44 1999-09-01 21:30:59 ddr Exp $ *)
+(* $Id: setup.ml,v 1.45 1999-09-02 05:19:33 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -1275,22 +1275,31 @@ ifdef UNIX then
 else ()
 ;
 
+value gwd_available_languages =
+  ["cn"; "cs"; "de"; "dk"; "en"; "es"; "eo"; "fr"; "he"; "it"; "nl"; "no";
+   "pt"; "se"]
+;
+value setup_available_languages = ["en"; "es"; "fr"];
+
 value intro () =
-  do ifdef UNIX then
-       try
-         let s = Sys.getenv "LC_CTYPE" in
-         if String.length s > 2 then
-           let s = String.sub s 0 2 in
-           default_lang.val :=
-             if s = "fr" then "fr"
-             else if s = "es" then "es"
-             else "en"
-         else ()
-       with
-       [ Not_found -> () ]
-     else ();
-     Argl.parse speclist anonfun usage;
-     let lang =
+  let (default_gwd_lang, default_setup_lang) =
+    ifdef UNIX then
+      let s = try Sys.getenv "LANG" with [ Not_found -> "" ] in
+      if List.mem s gwd_available_languages then
+        (s, if List.mem s setup_available_languages then s else "en")
+      else
+        let s = try Sys.getenv "LC_CTYPE" with [ Not_found -> "" ] in
+        if String.length s >= 2 then
+          let s = String.sub s 0 2 in
+          if List.mem s gwd_available_languages then
+            (s, if List.mem s setup_available_languages then s else "en")
+          else (default_lang.val, default_lang.val)
+        else (default_lang.val, default_lang.val)
+    else (default_lang.val, default_lang.val)
+  in
+  do Argl.parse speclist anonfun usage;
+     default_lang.val := default_setup_lang;
+     let (gwd_lang, setup_lang) =
        if daemon.val then
          ifdef UNIX then
            do Printf.printf "To start, open location http://localhost:2316/\n";
@@ -1301,19 +1310,22 @@ value intro () =
                    null_reopen [Unix.O_WRONLY] Unix.stderr;
                 return ()
               else exit 0;
-           return default_lang.val
+           return (default_gwd_lang, default_setup_lang)
          else ()
        else
          do copy_text "" "intro.txt"; return
-         let lang =
+         let (gwd_lang, setup_lang) =
            let x = input_line stdin in
-           if x = "" then default_lang.val else x
+           if x = "" then (default_gwd_lang, default_setup_lang)
+           else (x, x)
          in
-         do copy_text lang (Filename.concat lang "intro.txt"); return lang
+         do copy_text setup_lang (Filename.concat setup_lang "intro.txt");
+         return
+         (gwd_lang, setup_lang)
      in
-     do set_gwd_default_language_if_absent lang;
-        default_lang.val := lang;
-        ifdef WIN95 then Unix.putenv "GWLANG" lang else ();
+     do set_gwd_default_language_if_absent gwd_lang;
+        default_lang.val := setup_lang;
+        ifdef WIN95 then Unix.putenv "GWLANG" setup_lang else ();
      return ();
      Printf.printf "\n";
      flush stdout;
