@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.69 2005-01-18 02:18:50 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.70 2005-01-23 05:47:47 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -147,10 +147,10 @@ et: Andmebaas <span class="highlight">"%t"</span> sisaldab andmeid %n
     isiku kohta.
 fi: Tietokannassa <span class="highlight">"%t"</span> on nyt %n
     henkil&ouml;&auml;.
-fi: Tietokannassa <span class="highlight">"%t"</span> on nyt %n
-    henkil&ouml;&auml;.
 fr: La base de donn&eacute;es <span class="highlight">"%t"</span> contient
     actuellement %n personnes.
+fr-cr: Ni atchuèlement %n nhon-m, fan-m, yiche adan chagement
+       <span class="highlight">"%t"</span> ta-la
 he: áîàâø äîéãò <span class="highlight">"%t"</span> éù %n àğùéí.
 is: Gagnagrunnurinn <span class="highlight">"%t"</span> er nú meğ %n
     einstaklinga skráğa.
@@ -320,6 +320,7 @@ et: Navigeeri andmebaasis:
 fi: Liikkuaksesi t&auml;ss&auml; tietokannassa voit etsi&auml;:
 fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez effectuer
     votre recherche:
+fr-cr: L'heù zott lé chaché ti-tac toupatou, zott pé jiss crié:
 he: ğååè áîàâø îéãä òì-éãé çéôåñ:
 is: Í şessum gagnagrunni getur şú leitağ:
 it: Per spostarsi in questa base di dati, si pu&ograve; fare una ricerca:
@@ -356,6 +357,7 @@ es: por persona
 et: isik
 fi: henkil&ouml;n mukaan
 fr: par personne
+fr-cr: an-ni an seul moune
 he: ìôé ùí àå æäåú
 is: eftir nafni
 it: per persona
@@ -452,6 +454,7 @@ es: <span class="highlight">por la lista</span> de todos los
 et: <span class="highlight">loendis</span> kõik
 fi: <span class="highlight">listasta</span> kaikki
 fr: <span class="highlight">par la liste</span> de tous les
+fr-cr: <span class="highlight">an-ni</span> an
 he: <span class="highlight">øùéîä</span> ùì ëì ùîåú
 is: <span class="highlight">eftir lista</span> yfir öll
 it: <span class="highlight">per la lista</span> di tutti i
@@ -481,6 +484,7 @@ es: apellidos
 et: perekonnanimed
 fi: sukunimet
 fr: patronymes
+fr-cr: nom-fan-mille
 he:   äîùôçä
 is: eftirnöfn
 it: cognomi
@@ -540,6 +544,7 @@ es: por
 et: järjestatud
 fi: lajiteltuina
 fr: par
+fr-cr: zott pé trappé assou liste-la
 he: ìôé
 is: eftir
 it: in ordine
@@ -569,6 +574,7 @@ es: orden alfab&eacute;tico
 et: tähestiku
 fi: aakkosj&auml;rjestykseen
 fr: ordre alphab&eacute;tique
+fr-cr: ça ki coumencé con ça a.b.c.d...
 he:  ñãø äàìó-áéú
 is: stafrófsröğ
 it: alfabetico
@@ -597,6 +603,7 @@ es: frecuencia
 et: sageduse
 fi: m&auml;&auml;r&auml;j&auml;rjestykseen
 fr: fr&eacute;quence
+fr-cr: ça ki ka ruvini empile
 he:  äùëéçåú
 is: tíğni
 it: di frequenza

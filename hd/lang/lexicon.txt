@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.222 2005-01-20 07:04:46 ddr Exp $
+# $Id: lexicon.txt,v 4.223 2005-01-23 05:47:47 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !charset
@@ -7676,6 +7676,7 @@ es: apellido/apellidos
 et: perekonnanimi/perekonnanimed
 fi: sukunimi/sukunimet
 fr: patronyme/patronymes
+fr-cr: nom-fan-mille
 he:  שם משפחה/ שמות משפחה
 is: eftirnafn/eftirnצfn
 it: cognome/cognomi

@@ -1,9 +1,7 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.28 2005-01-22 20:11:41 ddr Exp $ *)
+(* $Id: templ.ml,v 4.29 2005-01-23 05:47:47 ddr Exp $ *)
 
 open Config;
-open Util;
-open Def;
 open TemplAst;
 
 (* Parsing *)
@@ -109,12 +107,6 @@ value buff_store len x =
     buff.val.[len] := x;
     succ len
   }
-;
-
-value buff_mstore len s =
-  add_rec len 0 where rec add_rec len i =
-    if i == String.length s then len
-    else add_rec (buff_store len s.[i]) (succ i)
 ;
 
 value buff_get len = String.sub buff.val 0 len;
@@ -315,7 +307,7 @@ value parse_templ conf strm =
 
 value open_templ conf dir name =
   let std_fname =
-    search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
+    Util.search_in_lang_path (Filename.concat "etc" (name ^ ".txt"))
   in
   if dir = "" then
     try Some (Secure.open_in std_fname) with [ Sys_error _ -> None ]
@@ -364,7 +356,7 @@ value input conf fname =
     [ Not_found -> [conf.bname; "*"] ]
   in
   let dir =
-    match p_getenv conf.env "templ" with
+    match Util.p_getenv conf.env "templ" with
     [ Some x when List.mem "*" config_templ -> x
     | Some x when List.mem x config_templ -> x
     | Some _ | None ->
@@ -383,8 +375,9 @@ value input conf fname =
       do {
         Util.header conf title;
         tag "ul" begin
-          html_li conf;
-          Wserver.wprint "Cannot access file \"%s/%s.txt\".\n" dir fname;
+          tag "li" begin
+            Wserver.wprint "Cannot access file \"%s/%s.txt\".\n" dir fname;
+          end;
         end;
         Util.trailer conf;
         raise Exit
@@ -464,16 +457,20 @@ value not_impl func x =
 ;
 
 value eval_variable conf =
-  fun
-  [ "sp" -> " "
+  fun 
+  [ "nl" -> "\n"
+  | "nn" -> ""
+  | "sp" -> " "
   | "/" -> conf.xhs
-  | s -> "%%%" ^ s ^ "???" ]
+  | _ -> raise Not_found ]
 ;
 
 value eval_ast conf =
   fun
   [ Atext s -> s
-  | Avar s [] -> eval_variable conf s
+  | Avar s [] ->
+      try eval_variable conf s with
+      [ Not_found -> " %%" ^ s ^ "?" ]
   | x -> not_impl "eval_ast" x ]
 ;
 
@@ -527,7 +524,7 @@ value eval_transl_lexicon conf upp s c =
             in
             Util.transl_decline conf s1 s3 ] ]
   in
-  if upp then capitale r else r
+  if upp then Util.capitale r else r
 ;
 
 value eval_transl_inline conf s =
@@ -544,6 +541,7 @@ value eval_transl conf upp s c =
     eval_transl_lexicon conf upp s c
 ;
 
+(*
 value eval_date_field =
   fun
   [ Some d ->
@@ -606,30 +604,29 @@ value eval_date_variable od =
       | _ -> "" ]
   | v -> ">%" ^ v ^ "???" ]
 ;
+*)
 
 value print_body_prop conf base =
   let s =
     try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with [ Not_found -> "" ]
   in
-  let s = s ^ body_prop conf in Wserver.wprint "%s" s
+  Wserver.wprint "%s" (s ^ Util.body_prop conf)
 ;
 
 value print_variable conf base =
   fun
   [ "action" -> Wserver.wprint "%s" conf.command
-  | "base_header" -> include_hed_trl conf (Some base) ".hed"
-  | "base_trailer" -> include_hed_trl conf (Some base) ".trl"
+  | "base_header" -> Util.include_hed_trl conf (Some base) ".hed"
+  | "base_trailer" -> Util.include_hed_trl conf (Some base) ".trl"
   | "body_prop" -> print_body_prop conf base
   | "copyright" -> Util.print_copyright conf
   | "doctype" -> Wserver.wprint "%s\n" (Util.doctype conf)
   | "hidden" -> Util.hidden_env conf
   | "highlight" -> Wserver.wprint "%s" conf.highlight
-  | "image_prefix" -> Wserver.wprint "%s" (image_prefix conf)
+  | "image_prefix" -> Wserver.wprint "%s" (Util.image_prefix conf)
   | "message_to_wizard" -> Util.message_to_wizard conf
-  | "nl" -> Wserver.wprint "\n"
-  | "nn" -> ()
-  | "prefix" -> Wserver.wprint "%s" (commd conf)
-  | "sp" -> Wserver.wprint " "
-  | "/" -> Wserver.wprint "%s" conf.xhs
-  | s -> Wserver.wprint " %%%s?" s ]
+  | "prefix" -> Wserver.wprint "%s" (Util.commd conf)
+  | s ->
+      try Wserver.wprint "%s" (eval_variable conf s) with
+      [ Not_found -> Wserver.wprint " %%%s?" s ] ]
 ;
