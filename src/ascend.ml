@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.40 1999-08-03 13:10:58 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.41 1999-08-03 14:41:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -11,6 +11,8 @@ value limit_by_list = 8;
 value limit_by_tree = 5;
 
 value niveau_max_ascendance base ip =
+  let _ = base.data.ascends.array () in
+  let _ = base.data.couples.array () in
   let x = ref 0 in
   let mark = Array.create base.data.persons.len False in
   do let rec loop niveau ip =

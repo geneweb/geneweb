@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.99 1999-08-03 14:41:18 ddr Exp $
+# $Id: lexicon.txt,v 2.100 1999-08-03 14:46:01 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -395,6 +395,7 @@ se: en brylling
 
     a brother-in-law/a sister-in-law
 de: ein Schwager/eine Schw&agrave;gerin
+dk: en svoger/en svigerinde
 en: a brother-in-law/a sister-in-law
 es: un cu&ntilde;ado/una cu&ntilde;ada
 fr: un beau-fr&egrave;re/une belle-soeur
@@ -554,6 +555,7 @@ se: en halvbror/en halvsyster/ett halvsyskon
 
     a nephew (spouse's nephew)/a niece (spouse's niece)
 de: ein Neffe (des Ehegattes)/eine Nichte (des Ehegattes)
+dk: en nev&oslash; (&aelig;gtef&aelig;lles nev&oslash;)/en niece (&aelig;gtef&aelig;lles niece)
 en: a nephew (spouse's nephew)/a niece (spouse's niece)
 es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
 fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
@@ -578,6 +580,7 @@ se: en nev&ouml;/en niece
 
     a son-in-law/a daughter-in-law
 de: ein Schwiegersohn/eine Schweigertochter
+dk: en svigers&oslash;n/en svigerdatter
 en: a son-in-law/a daughter-in-law
 es: un yerno/una nuera
 fr: un beau-fils/une belle-fille
@@ -818,6 +821,7 @@ se: en ana
 
     an uncle (aunt's husband)/an aunt (uncle's wife)
 de: ein Onkel (Ehemann der Tante)/eine Tante (Ehefrau des Onkels)
+dk: en onkel (tantes mand)/en tante (onkels hustru)
 en: an uncle (aunt's husband)/an aunt (uncle's wife)
 es: un t&iacute;o pol&iacute;tico/una t&iacute;a pol&iacute;tica
 fr: un oncle (&eacute;poux d'une tante)/une tante (&eacute;pouse d'un oncle)
@@ -964,6 +968,7 @@ se: samtidigt
 
     back
 de: zur&uuml;ck
+dk: tilbage
 en: back
 es: regreso
 fr: retour
@@ -3369,6 +3374,7 @@ se: f&ouml;rh&aring;llande%t med
 
     relationships by marriage
 de: Heiratsbeziehungen
+dk: sl&aelig;gtskaber ved gifterm&aring;l
 en: relationships by marriage
 es: parentesco pol&iacute;tico
 fr: liens de parent&eacute; par alliance
@@ -3848,6 +3854,7 @@ se: i &ouml;vermorgon
 
     the father-in-law/the mother-in-law
 de: der Schwiegervater/die Schwiegetmutter
+dk: svigerfaderen/svigermoderen
 en: the father-in-law/the mother-in-law
 es: el suegro/la suegra
 fr: le beau-p&egrave;re/la belle-m&egrave;re
@@ -4006,6 +4013,7 @@ se: f&ouml;r&auml;ldrarna
 
     the spouse
 de: der Ehemann/die Ehefrau
+dk: &aelig;gtef&aelig;llen
 en: the spouse
 eo: la edzo/la edzino
 es: el esposo/l'esposa
@@ -4046,6 +4054,7 @@ se: titel/titlar
 
     to add a child to a family, use "%s"
 de: um ein Kind zu einer familie zu hinzuf&uuml;gen, benutzen Sie "%s"
+dk: brug "%s" for at f&oslash;je et barn til en familie
 en: to add a child to a family, use "%s"
 es: para agregar un hijo a una familia, utiliza "%s"
 fr: pour ajouter un enfant &agrave; une famille, utiliser "%s"
