@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.45 2001-02-07 17:47:22 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.46 2001-02-07 19:24:16 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -1204,8 +1204,8 @@ value try_shorten_too_long t i j =
       let separated_right =
         loop i where rec loop i =
           if i = i2 then True
-          else if j2 < Array.length t.table.(i) - 1
-               && t.table.(i).(j2).span = t.table.(i).(j2 + 1).span then False
+          else if j2 < Array.length t.table.(i)
+               && t.table.(i).(j2 - 1).span = t.table.(i).(j2).span then False
           else loop (i + 1)
       in
       if not separated_left || not separated_right then None
