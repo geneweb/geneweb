@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.218 2005-01-02 10:37:00 ddr Exp $
+# $Id: lexicon.txt,v 4.219 2005-01-02 14:43:15 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !charset
@@ -6065,7 +6065,7 @@ zh: ±ёЧў
 bg: бележките са променени
 br: notenno&ugrave; kemmet
 ca: notes modificades
-cs: poznГЎmky zmД›nД›ny
+cs: poznбmky zmмnмny
 da: noter &aelig;ndret
 de: ge&auml;nderte Notizen
 en: notes modified
@@ -7776,7 +7776,6 @@ sv: de %d f&ouml;rnamnen
 
     the %d oldest couples perhaps still alive and engaged
 bg: най-отдавнашните %d двойки от евентуално още живи и сгодени лица
-cs: %d nejstarЕЎГ­ch pГЎrЕЇ je zЕ™ejmД› stГЎle ЕѕijГ­cГ­ch a zadanГЅch
 da: og de %d &aelig;ldste par muligvis stadig i live og forlovede
 de: Die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
 en: the %d oldest couples perhaps still alive and engaged

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.28 2004-12-31 03:59:53 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.29 2005-01-02 14:43:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -539,7 +539,13 @@ value print_lexicon conf base =
     [ Some ic ->
         do {
           Wserver.wprint "<pre>\n";
-          try while True do { Wserver.wprint "%s\n" (input_line ic) } with
+          try
+            while True do {
+              match input_char ic with
+              [ '<' -> Wserver.wprint "&lt;"
+              | c -> Wserver.wprint "%c" c ];
+            }
+          with
           [ End_of_file -> () ];
           Wserver.wprint "</pre>\n";
           close_in ic;
