@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.30 1999-08-30 23:55:48 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.31 1999-08-31 00:54:24 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1321,35 +1321,35 @@ value add_fam gen r =
   [ Not_found -> add_fam_norm gen r ]
 ;
 
-value treat_header gen r =
-  do match charset_option.val with
-     [ Some v -> charset.val := v
-     | None ->
-         match find_field "CHAR" r.rsons with
-         [ Some r ->
-             match r.rval with
-             [ "ANSEL" -> charset.val := Ansel
-             | "ASCII" | "IBMPC" -> charset.val := Ascii
-             | _ -> charset.val := Ascii ]
-         | None -> () ] ];
-     match find_all_fields "NOTE" r.rsons with
-     [ [] -> ()
-     | rl -> gen.g_bnot := treat_notes gen rl ];
-  return ()
+value treat_header2 gen r =
+  match charset_option.val with
+  [ Some v -> charset.val := v
+  | None ->
+      match find_field "CHAR" r.rsons with
+      [ Some r ->
+          match r.rval with
+          [ "ANSEL" -> charset.val := Ansel
+          | "ASCII" | "IBMPC" -> charset.val := Ascii
+          | _ -> charset.val := Ascii ]
+      | None -> () ] ]
+;
+
+value treat_header3 gen r =
+   match find_all_fields "NOTE" r.rsons with
+   [ [] -> ()
+   | rl -> gen.g_bnot := treat_notes gen rl ]
 ;
 
 value make_gen2 gen r =
   match r.rlab with
-  [ "HEAD" ->
-      do Printf.eprintf "*** Header ok\n"; flush stderr; treat_header gen r;
-      return ()
+  [ "HEAD" -> treat_header2 gen r
   | "INDI" -> add_indi gen r
   | _ -> () ]
 ;
 
 value make_gen3 gen r =
   match r.rlab with
-  [ "HEAD" -> ()
+  [ "HEAD" -> treat_header3 gen r
   | "SUBM" -> ()
   | "INDI" -> ()
   | "FAM" -> add_fam gen r

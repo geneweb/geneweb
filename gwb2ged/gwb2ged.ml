@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.15 1999-08-14 09:26:35 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.16 1999-08-31 00:54:24 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -207,7 +207,9 @@ value ged_fam_adop base oc i (fath, moth, child) =
      match moth with
      [ Some i -> Printf.fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper i + 1)
      | _ -> () ];
+(*
      Printf.fprintf oc "1 CHIL @I%d@\n" (Adef.int_of_iper child + 1);
+*)
   return ()
 ;
 
