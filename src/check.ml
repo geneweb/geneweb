@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 4.7 2004-07-16 16:17:54 ddr Exp $ *)
+(* $Id: check.ml,v 4.8 2004-07-19 01:27:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -6,9 +6,9 @@ open Gutil;
 open Printf;
 
 type gen =
-  { g_strings : mutable Mhashtbl.t string istr;
-    g_names : mutable Mhashtbl.t int iper;
-    g_local_names : mutable Mhashtbl.t (int * int) iper;
+  { g_strings : mutable Hashtbl.t string istr;
+    g_names : mutable Hashtbl.t int iper;
+    g_local_names : mutable Hashtbl.t (int * int) iper;
     g_pcnt : mutable int;
     g_fcnt : mutable int;
     g_scnt : mutable int;
