@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 4.1 2001-04-18 16:10:18 ddr Exp $ *)
+(* $Id: consangAll.ml,v 4.2 2001-09-19 18:46:32 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -50,6 +50,7 @@ value trace quiet cnt max_cnt =
       if cnt = 1 then Printf.eprintf " \008"
       else if to_disp > already_disp then
         let k = to_disp mod progr_bar_draw_len in
+        let k = if k < 0 then progr_bar_draw_len + k else k in
         Printf.eprintf "%c\008" progr_bar_draw.[k]
       else ()
     }
