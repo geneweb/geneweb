@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.29 2000-06-18 12:48:59 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.30 2000-06-18 17:17:08 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -59,6 +59,7 @@ einstaklinga skráða.%In<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
+<center><table border=0 cellspacing=0 cellpadding=0><tr><td>
 Í þessum gagnagrunni getur þú leitað:<br><p>
 
 <ul>
@@ -135,9 +136,9 @@ eftir
 óskum</b></font></a>.
 
 </ul>
+</td></tr></table></center>
 
 %Iw<p>
-
 <center>Þú getur<br><p>
 
 <table border=0>
@@ -190,15 +191,15 @@ eftir
 
 <p>
 
-{If your browser does not automatically update the modified pages (and you
-must each time do "reload current document"), try navigating from <a
+{If your browser does not automatically update the modified pages (forcing you
+each time to do "reload current document"), try navigating from <a
 href="%sescache=-%c">this link</a>}.
 
 </td></tr>
 </table>
 
-<br><p align=right>
+<br>
 
-<font size=-1><em><a href="%sm=LEX">lexicon</a></em></font>
+<p align=right><font size=-1><em><a href="%sm=LEX">lexicon</a></em></font></p>
 
 </center>
