@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 3.4 2000-03-22 04:38:02 ddr Exp $ *)
+(* $Id: iobase.ml,v 3.5 2000-05-02 17:15:45 doligez Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -899,6 +899,9 @@ value gen_output no_patches bname base =
     if Filename.check_suffix bname ".gwb" then bname
     else bname ^ ".gwb"
   in
+(*
+  let bname = Filename.concat Filename.current_dir_name bname in
+*)
   do try Unix.mkdir bname 0o755 with _ -> (); return
   let tmp_fname = Filename.concat bname "1base" in
   let tmp_fname_acc = Filename.concat bname "1base.acc" in

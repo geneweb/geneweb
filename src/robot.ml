@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 3.4 2000-01-20 10:34:40 ddr Exp $ *)
+(* $Id: robot.ml,v 3.5 2000-05-02 17:15:45 doligez Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -14,9 +14,7 @@ type excl =
     max_conn : mutable (int * string) }
 ;
 
-value nl () =
-  ifdef UNIX then Wserver.wprint "\r\n" else Wserver.wprint "\n"
-;
+value nl () = Wserver.wprint "\013\010";
 
 value robot_error cgi from cnt sec =
   do if cgi then ()

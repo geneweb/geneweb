@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.26 2000-05-02 02:38:21 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.27 2000-05-02 17:15:45 doligez Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -93,7 +93,7 @@ value log_passwd_failed passwd uauth oc tm from request base_file =
 ;
 
 value nl () =
-  Wserver.wprint "\r\n"
+  Wserver.wprint "\013\010"
 ;
 
 value copy_file fname =
