@@ -15,6 +15,7 @@
 		Portuguese	Yves Guignard
                 Spanish         Luis Castro Guzman
 		Swedish		Lars Gustavsson
+                                Stig Petersson (few changes)
 
 	Documentation
 		Dutch		Joris Esch

@@ -1,5 +1,5 @@
-GeneWeb Intermediate version 2.02-1
------------------------------------
+GeneWeb version 2.03
+--------------------
 
 * Setup program
   - [Jun 1, 99] The location to open is now always "http://localhost:2316/"
@@ -44,6 +44,8 @@ GeneWeb Intermediate version 2.02-1
     was incorrectly capitalized.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (*/start.txt)
+  - [Jun 2, 99] Fixed and completed translations in Swedish (Lars Gustavsson;
+    some help also from Stig Petersson).
   - [May 31, 99] Corrected and completed Spanish sentences in lexicon
     and Spanish welcome page (Luis Castro Guzman).
 
