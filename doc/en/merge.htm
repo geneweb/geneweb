@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Merging databases</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Merging databases</h1>
+
+This part indicates the procedure to you to merge databases. It is
+still rather manual, but it may be improved in the future.
+
+<p>
+
+The merging of data bases is done in two steps:
+
+<p><ul><li> First gathering the two bases into a new one.</ul>
+
+<p><ul><li> Second, merging the persons.</ul>
+
+<h4> First step: concatenation of bases </h4>
+
+That can be done only in an interactive window (see "How to start with
+GeneWeb").
+
+<p><ul><li> If you have a base called "foo" and another which is
+called "bar", extract these two bases as source files with the command
+"gwu". Type:
+
+<pre>
+     gwu foo &gt; foo.gw
+     gwu bar &gt; bar.gw
+</pre>
+
+</ul>
+
+<p><ul><li> Create a common base "base".  Type:
+
+<pre>
+     gwc foo.gw bar.gw -o base
+</pre>
+
+It may happens (and probably it will) that gwc displays errors because
+persons are defined twice in "foo.gw" and "bar.gw". To fix that, gwc
+has an option "-sh" to shift the numbers of the persons and to avoid
+conflicts. Try:
+
+<pre>
+     gwc foo.gw -sh 10 bar.gw -o base
+</pre>
+
+If the value 10 does not solve the problem, try 20, 30 or 100...
+
+</ul>
+
+<h4> Second step: merge of persons </h4>
+
+You now have a data base "base" holding "toto" and "titi" with some
+persons recorded twice.
+
+<p>
+
+You will be able to merge these people in your navigator. If "gwd" is
+not launched, launch it.
+
+<p>
+
+Then apply <a href="update.htm#Merg">persons merging</a>, which is in
+the part "How to make modifications in the data base" (forget the
+comment about the fact that it is not about "databases merging").
+
+<h4> Final cleaning up </h4>
+
+At the end of merging, it is wise to make a final cleaning up of the
+base. Indeed, when persons or families are removed (what occurs when
+merging are done), the space of the removed persons and families is
+not recovered. In particular, the welcome page always indicates the
+same number of persons.
+
+<p>
+
+To do the cleaning up of the base "base" (you can make at any time,
+and even several times), use again an interactive window. Type:
+
+<pre>
+     gwu base &gt; base.gw
+     gwc base.gw -o base
+</pre>
+
+<p>
+
+Note that if you want to scratch the old base "foo", type simply "-o
+foo" in this second command:
+
+<pre>
+     gwc base.gw -o foo
+</pre>
+
+<p>
+
+Return to <a href="diruse.htm">Directions for Use</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>

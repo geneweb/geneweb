@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Fusion de bases de donn&eacute;es</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Fusion de bases de donn&eacute;es</h1>
+
+Cette partie vous indique la proc&eacute;dure pour fusionner des bases
+de donn&eacute;es. C'est encore assez manuel, mais ce sera
+peut-&ecirc;tre am&eacute;lior&eacute; dans le futur.
+
+<p>
+
+La fusion de bases de donn&eacute;es se fait en deux temps:
+
+<p><ul><li> Dans un premier temps on fabrique une base regroupant les
+deux bases.</ul>
+
+<p><ul><li> Dans un deuxi&egrave;me temps, on fusionne les personnes en
+double.</ul>
+
+<h4> Premier temps: concat&eacute;nation des bases </h4>
+
+Cela ne peut se faire que dans une fen&ecirc;tre int&eacute;ractive
+(voir "Comment d&eacute;marrer avec GeneWeb").
+
+<p><ul><li> Si vous avez une base qui s'appelle "toto" et une autre
+qui s'appelle "titi", extrayez ces deux bases sous forme de source
+avec la commande "gwu". Tapez:
+
+<pre>
+     gwu toto &gt; toto.gw
+     gwu titi &gt; titi.gw 
+</pre>
+
+</ul>
+
+<p><ul><li> Fabriquez une base commune "tutu". Tapez:
+
+<pre>
+     gwc toto.gw titi.gw -o tutu
+</pre>
+
+Il se peut (et il est m&ecirc;me probable) que gwc mette des erreurs
+parce que des personnes se retrouvent d&eacute;finies deux fois, dans
+"toto.gw" et dans "titi.gw". Pour rem&eacute;dier &agrave; cela, gwc a
+une option "-sh" pour demander de d&eacute;caler les num&eacute;ros
+des personnes et &eacute;viter les conflits. Essayez:
+
+<pre>
+     gwc toto.gw -sh 10 titi.gw -o tutu
+</pre>
+
+Si la valeur 10 ne r&eacute;sout pas le probl&egrave;me, essayez 20,
+30 ou 100...
+
+</ul>
+
+<h4> Deuxi&egrave;me temps: fusion des personnes </h4>
+
+Vous disposez maintenant d'une base de donn&eacute;es "tutu" contenant
+"toto" et "titi" avec des personnes en double.
+
+<p>
+
+Vous allez pouvoir fusionner ces personnes dans votre navigateur. Si
+"gwd" n'est pas lanc&eacute;, lancez-le.
+
+<p>
+
+Appliquez alors la <a href="update.htm#Merg">fusion de personnes</a>,
+qui se trouve dans la partie "Comment faire des modifications dans la
+base de données" (ignorez le commentaire disant qu'il ne s'agit pas de
+fusions de bases de donn&eacute;es).
+
+<h4> Nettoyage final </h4>
+
+&Agrave; la fin de la fusion, il est bon de faire un nettoyage final
+de la base. En effet, quand on supprime des personnes ou des familles
+(ce qui se passe quand on fait des fusions), la place des personnes et
+familles supprim&eacute;es n'est pas r&eacute;cup&eacute;r&eacute;e.
+En particulier, la page d'accueil indique toujours le m&ecirc;me
+nombre de personnes de d&eacute;part.
+
+<p>
+
+Pour faire le nettoyage de la base "tutu" (que vous pouvez faire
+&agrave; n'importe quel moment, et plusieurs fois), reprenez une
+fen&ecirc;tre int&eacute;ractive, et tapez:
+
+<pre>
+     gwu tutu &gt; tutu.gw
+     gwc tutu.gw -o tutu
+</pre>
+
+<p>
+
+Notez que si vous voulez &eacute;craser l'ancienne base "toto", mettez
+simplement "-o toto" dans cette deuxi&egrave;me commande:
+
+<pre>
+     gwc tutu.gw -o toto
+</pre>
+
+<p>
+
+Retour vers <a href="diruse.htm">Mode d'Emploi</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1998 -
+GeneWeb</em></font><br>
+
+</body>

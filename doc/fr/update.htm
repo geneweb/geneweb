@@ -54,6 +54,8 @@ d'un enfant.
 
 </ul>
 
+<li> <a href="#Merg">6.</a> Comment fusionner deux personnes.
+
 </ul>
 
 <h4> <a name="FSO">1.</a> Pr&eacute;noms, noms, num&eacute;ros </h4>
@@ -1206,6 +1208,150 @@ son pr&eacute;nom et son nom) ainsi que sa connexion avec ses parents.
 Mais il subsiste toujours une "entit&eacute; personne" reli&eacute;e
 &agrave; son &eacute;ventuel conjoint et &agrave; ses &eacute;ventuels
 enfants.
+
+<h4> <a name="Merg">6.</a> Comment fusionner deux personnes </h4>
+
+Cette section d&eacute;crit le moyen de fusionner deux
+<strong>personnes</strong> dans une base de donn&eacute;es, dans le
+cas o&ugrave; vous auriez mis deux fois la m&ecirc;me personne.
+
+<p>
+
+Remarque: nous ne parlons pas ici de comment fusionner deux
+<strong>bases de donn&eacute;es</strong>: cela est trait&eacute; <a
+href="merge.htm">ailleurs</a>: il n'est pas possible de le faire en
+ligne (ce chapitre ne concerne que les mises-&agrave;-jour en ligne).
+
+<p>
+
+La fusion de deux personnes est assez manuelle, mais &agrave; tout
+moment, vous gardez une base de donn&eacute;es coh&eacute;rente.
+
+<p>
+
+Le principe est le suivant:
+
+<p><ul><li> Vous s&eacute;lectionnez les deux personnes &agrave;
+fusionner. Mais l&agrave; se pose le probl&egrave;me de leurs
+parents. S'ils ont tous les deux des parents, il faudra d'abord
+fusionner les parents. Et il faut recommencer en regardant les parents
+des parents, etc.</ul>
+
+<p>
+
+Il faut donc remonter les anc&ecirc;tres jusqu'&agrave; ce qu'on tombe
+sur des anc&ecirc;tres "fusionnables". <em>GeneWeb</em> fait cette
+remont&eacute;e pour vous: il vous indiquera les anc&ecirc;tres qu'il
+est possible de fusionner.
+
+<p>
+
+Voici comment proc&eacute;der. Suivez les instructions ci-dessous en
+faisant votre fusion:
+
+<p>
+
+<ul><li> Le mieux est de prendre deux fen&ecirc;tres de votre
+navigateur.</ul>
+
+<ul><li> Dans la fen&ecirc;tre de gauche, cherchez la premi&egrave;re
+personne &agrave; fusionner.  </ul>
+
+<p><ul><li> Dans l'autre fen&ecirc;tre, celle de droite, cherchez la
+deuxi&egrave;me. </ul>
+
+<p><ul><li> Dans chacune des deux fen&ecirc;tres, faites "Mise &agrave;
+jour".</ul>
+
+<p><ul><li> Dans la fen&ecirc;tre de gauche, faites "fusionner".</ul>
+
+<p><ul><li> Dans le formulaire propos&eacute;, mettez le pr&eacute;nom,
+un point, le num&eacute;ro et le nom de la deuxi&egrave;me
+personne. Vous trouvez cela dans le titre de la fen&ecirc;tre de
+droite. Le mieux, si vous pouvez le faire, est d'utiliser le
+"couper-coller".</ul>
+
+<p><ul><li> Puis faites "Ok". &Agrave; partir de l&agrave;, la fen&ecirc;tre
+de droite ne vous sert plus &agrave; rien. Vous pouvez la fermer.</ul>
+
+<p><ul><li> Si les deux personnes sont directement "fusionnables" (au
+moins un des deux n'a pas de parents), <em>GeneWeb</em> vous propose
+de les fusionner. Sinon, il vous dit que vous devez d'abord fusionner
+tel et tel anc&ecirc;tres ou telle ou telle familles.</ul>
+
+<p><ul><li> S'il s'agit de <strong>personnes</strong> &agrave;
+fusionner (les personnes elles-m&ecirc;mes ou leurs anc&ecirc;tres):
+
+<p>
+
+<ul>
+
+<li> Dans le cas d'anc&ecirc;tres, le bas du formulaire indique les
+deux branches en train d'&ecirc;tre fusionn&eacute;es. Avec votre
+aide, il fusionnera le haut, puis les intermédiaires, et finira par
+fusionner le bas, ceux que vous avez demand&eacute;s &agrave;
+l'origine.
+
+<li> Le formulaire contient les valeurs en conflit, s'il y en a, entre
+les deux personnes &agrave; fusionner. Choisissez et faites "Ok".
+
+<li> Vous voyez alors un formulaire "Fusionner/Personne" qui se
+pr&eacute;sente comme un "Modifier/Personne". Contr&ocirc;lez les
+diff&eacute;rents champs, ajoutez, modifiez, supprimez ce que vous
+voulez et faites "Ok".
+
+<li> &Ccedil;a y est: les deux personnes sont fusionn&eacute;es. S'il
+s'agit d'anc&ecirc;tres de vos personnes initiales, la page vous
+propose de continuer &agrave; &agrave; les fusionner. Cliquez sur
+"continuer &agrave; fusionner". Avancez ainsi jusqu'&agrave; ce que
+vous ayez fusionn&eacute; les deux personnes du d&eacute;but.
+
+</ul>
+
+</ul>
+
+<p><ul><li> S'il s'agit de <strong>familles</strong> &agrave;
+fusionner:
+
+<p>
+
+<ul>
+
+<li> Cela arrive quand on a fusionn&eacute; un couple
+d'anc&ecirc;tres. Dans ce cas, il reste toujours deux familles. C'est
+comme si ce couple s'&eacute;tait mari&eacute; deux fois. Il faut donc
+regrouper les deux familles en une seule.
+
+<li> D'abord, comme pour le cas de personnes &agrave; fusionner
+ci-dessus, selectionnez dans les &eacute;ventuelles valeurs en conflit
+et faites "Ok".
+
+<li> Vous voyez alors un formulaire "Fusionner/Familles" qui ressemble
+&agrave; "Ajouter/Famille" ou "Modifier/Famille". Faites les mises
+&agrave; jour que vous voulez. Remarquez que certains enfants peuvent
+&ecirc;tre en double. Laissez-les: ils seront fusionn&eacute;s plus
+tard.
+
+<li> Faites "Ok" et les familles seront fusionn&eacute;es
+effectivement. Avancez dans la fusion en cliquant sur "continuer
+&agrave; fusionner".
+
+</ul>
+
+</ul>
+
+<p><ul><li> Remarquez que dans les formulaires de fusion de personnes
+ou de familles, les personnes affich&eacute;es sont cliquables. Vous
+pouvez cliquer dessus si vous d&eacute;sirez v&eacute;rifier que cette
+fusion est correcte (revenez en arri&egrave;re ensuite avec votre
+navigateur).</ul>
+
+<p><ul><li> Notez &eacute;galement que vous pouvez vous arr&ecirc;ter
+&agrave; tout moment: votre base reste coh&eacute;rente et les fusions
+que vous avez d&eacute;j&agrave; faites sont enregistr&eacute;es. Vous
+pouvez redemander plus tard la fusion de vos deux personnes du
+d&eacute;but, cela continuera la fusion l&agrave; o&ugrave; vous
+l'avez laiss&eacute;e.</ul>
 
 <p>
 

@@ -51,6 +51,8 @@ of a child.
 
 </ul>
 
+<li> <a href="#Merg">6.</a> How to merge to persons.
+
 </ul>
 
 <h4> <a name="FSO">1.</a> First names, surnames, numbers </h4>
@@ -1065,6 +1067,131 @@ his first name and surname) as well as his connection with his parents.
 
 But an "entity person" is subsisting, linked to his possible spouse and
 children.
+
+<h4> <a name="Merg">6.</a> How to merge two persons </h4>
+
+This section describes how to merge two <strong>persons</strong> in a
+data base, if the case you recorded the same person twice.
+
+<p>
+
+Note: we do not speak here how to merge two <strong>data
+bases</strong>: this is treated <a href="merge.htm">elsewhere</a>: it
+is not possible to do it on line (this chapter relates only to on line
+updates).
+
+<p>
+
+The merge of two persons is rather manual, but constantly, you keep a
+coherent data base.
+
+<p>
+
+The principle is the following:
+
+<p><ul><li> You select the two persons to be merged. But there, the
+difficulty of their parents arises. If both have parents, their
+parents must be first merged. And it is necessary to start again by
+looking at the parents of the parents, etc.</ul>
+
+<p>
+
+It is thus necessary to scan the ancestors until we find "mergeable"
+ones. <em>GeneWeb</em> does this work for you: it indicates you the
+possible ancestors to be merged.
+
+<p>
+
+Here is how to proceed. Follow the instructions below while doing
+your merge:
+
+<p>
+
+<ul><li> Take two windows of your navigator.</ul>
+
+<ul><li> In the left window, search the first person to merge. </ul>
+
+<p><ul><li> In the other window, the right one, search the second
+one. </ul>
+
+<p><ul><li> In both windows, do "Update".</ul>
+
+<p><ul><li> In the left window, do "Merge".</ul>
+
+<p><ul><li> In the form, put the first name, a dot, the number and the
+name of the second person. You find that in the title of the right
+window. Use "cut-and-paste", if you can.</ul>
+
+<p><ul><li> Then do "Ok". From there, the right window is no more
+useful. You can close it.</ul>
+
+<p><ul><li> If the two persons are directly "mergeable" (at least one
+of them does not have parents), <em>GeneWeb</em> proposes to you to
+merge them. Otherwise, it says that you must initially merge some
+ancestors or some families.</ul>
+
+<p><ul><li> If <strong>persons</strong> are to be merged (persons
+themselves or their ancestors):
+
+<p>
+
+<ul>
+
+<li> In the case of ancestors, the bottom of the form indicates the
+two branches to be merged. With your assistance, it will merge the
+top, then the intermediaries, and will end up merging the bottom,
+those you requested initially.
+
+<li> The form contains the values in conflict, if any, between the two
+persons to be merged. Choose and do "Ok".
+
+<li> You then see a form " Merge/Person" which is presented like the
+form "Update/Person". Control the various fields, add, modify, remove
+what you want and do "Ok".
+
+<li> Now, the two persons are merged. If they were ancestors of your
+initial persons, the page proposes to you to continue merging.  Click
+on "continue merging". Advance until you have merged the two initial
+persons.
+
+</ul>
+
+</ul>
+
+<p><ul><li> If <strong>families</strong> are to be merged:
+
+<p>
+
+<ul>
+
+<li> This happens when a couple of ancestors was merged. In this case,
+two families are remaining. It is as if this couple had married twice.
+It is thus necessary to gather the two families.
+
+<li> First, as in the case above of persons being merged, select the
+the possible conflicting values and do "Ok".
+
+<li> You then see a form "Merge/Families" which looks like
+"Add/Family" or "Modify/Family". Do the changes you want. Notice that
+some children can be displayed twice. Leave them: they will be merged
+later.
+
+<li> Do "Ok": the families are merged. Go on while clicking on
+"continue merging".
+
+</ul>
+
+</ul>
+
+<p><ul><li> Notice that in the forms for merging persons or families,
+the displayed persons are clickable. You can click on them if you wish
+to check that this merge is correct (go back with your
+navigator afterwards).</ul>
+
+<p><ul><li> Also note that you can stop at any time: your base remains
+coherent and the merges you already did are recorded. You can ask
+again later for the merge of your two initial persons, and the merge
+restarts where you stopped it.</ul>
 
 <p>
 
