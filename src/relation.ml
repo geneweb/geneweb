@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.15 1999-12-06 15:06:40 ddr Exp $ *)
+(* $Id: relation.ml,v 3.16 1999-12-07 13:06:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -776,6 +776,9 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
             Wserver.wprint "<em>%s %s" (string_of_big_int conf n)
               (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
             if not long then
+              let propose_dag =
+                n > 1 && n <= 10 && not (browser_doesnt_have_tables conf)
+              in
               do Wserver.wprint ":\n%s " (transl conf "click");
                  let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
                  let dp2 = match pp2 with [ Some p -> p | _ -> p2 ] in
@@ -787,9 +790,9 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                     else ";" ^ acces_n conf base "3" p1)
                    (if pp2 = None then ""
                     else ";" ^ acces_n conf base "4" p2)
-                   (if n > 1 && n <= 10 then ";dag=on" else "");
+                   (if propose_dag then ";dag=on" else "");
                  Wserver.wprint "%s</a>" (transl conf "here");
-                 if n > 10 then
+                 if n > 1 && not propose_dag then
                    Wserver.wprint "%s"
                      (transl conf " to see the first branch")
                  else ();
@@ -816,6 +819,9 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                  (transl_nth conf "relationship link/relationship links"
                     (if n = 1 then 0 else 1));
                if not long then
+                 let propose_dag =
+                   n > 1 && n <= 10 && not (browser_doesnt_have_tables conf)
+                 in
                  do Wserver.wprint ":\n%s" (transl conf "click");
                     let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
                     let dp2 = match pp2 with [ Some p -> p | _ -> p2 ] in
@@ -828,9 +834,9 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
                        else ";" ^ acces_n conf base "3" p1)
                       (if pp2 = None then ""
                        else ";" ^ acces_n conf base "4" p2)
-                      (if n > 1 && n <= 10 then ";dag=on" else "");
+                      (if propose_dag then ";dag=on" else "");
                     Wserver.wprint "%s</a>" (transl conf "here");
-                    if n > 10 then
+                    if n > 1 && not propose_dag then
                       Wserver.wprint "%s"
                         (transl conf " to see the first relationship link")
                     else ();
@@ -1246,7 +1252,7 @@ value print_main_relationship conf base long p1 p2 rel =
             Wserver.wprint "</em> %s\n"
               (transl_nth conf "relationship link/relationship links"
                  (if Num.eq total Num.one then 0 else 1));
-            if long then ()
+            if long || browser_doesnt_have_tables conf then ()
             else print_dag_links conf base p1 p2 rl;
             if age_autorise conf base p1 && age_autorise conf base p2 &&
                a1.consang != Adef.fix (-1) && a2.consang != Adef.fix (-1) then
