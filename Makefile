@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.12 1999-02-02 13:06:46 ddr Exp $
+# $Id: Makefile,v 1.13 1999-02-15 18:51:35 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -21,7 +21,7 @@ opt::
 distrib:
 	$(RM) -rf distribution
 	mkdir distribution
-	cp CHANGES LICENCE distribution/.
+	cp CHANGES LICENSE distribution/.
 	cp src/gwc distribution/gwc$(EXE)
 	cp src/consang distribution/consang$(EXE)
 	cp src/gwd distribution/gwd$(EXE)
@@ -35,7 +35,7 @@ distrib:
 	cp etc/CREDITS.txt distribution/.
 	mkdir distribution/doc
 	cp doc/index.htm distribution/doc/.
-	cp doc/LICENCE.htm distribution/doc/.
+	cp doc/LICENSE.htm distribution/doc/.
 	for i in fr en nl se; do \
 	  mkdir distribution/doc/$$i; \
 	  cp doc/$$i/*.htm distribution/doc/$$i/.; \

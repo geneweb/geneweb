@@ -1,7 +1,7 @@
-all opt: LICENCE.htm
+all opt: LICENSE.htm
 
 clean:
-	$(RM) LICENCE.htm
+	$(RM) LICENSE.htm
 
-LICENCE.htm: ../LICENCE
-	(echo "<pre>"; cat ../LICENCE; echo "</pre>") > LICENCE.htm
+LICENSE.htm: ../LICENSE
+	(echo "<pre>"; cat ../LICENSE; echo "</pre>") > LICENSE.htm

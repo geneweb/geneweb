@@ -1,5 +1,8 @@
-GeneWeb Version 1.12
+GeneWeb Version 2.00
 --------------------
+
+The license is now the GPL (GNU General Public License). The previous license
+still applies up to the version 1.11 included.
 
 * GeneWeb daemon/CGI (gwd)
   - [Feb 13, 99] Added ability to send photos.
