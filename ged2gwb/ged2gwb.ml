@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.4 1999-11-09 06:33:43 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.5 1999-11-10 08:44:09 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -16,6 +16,7 @@ type record =
 ;
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
+type choice3 'a 'b 'c 'd = [ Left3 of 'a | Right3 of 'b and 'c and 'd ];
 type month_number_dates =
   [ MonthDayDates | DayMonthDates | NoMonthNumberDates
   | MonthNumberHappened of string ]
@@ -576,10 +577,8 @@ value date_of_field pos d =
 type tab 'a = { arr : mutable array 'a; tlen : mutable int };
 
 type gen =
-  { g_per : tab (choice string person);
-    g_asc : tab (choice string ascend);
-    g_fam : tab (choice string family);
-    g_cpl : tab (choice string couple);
+  { g_per : tab (choice3 string person ascend union);
+    g_fam : tab (choice3 string family couple descend);
     g_str : tab string;
     g_bnot : mutable string;
     g_ic : in_channel;
@@ -629,12 +628,9 @@ value per_index gen lab =
   try Hashtbl.find gen.g_hper lab with
   [ Not_found ->
       let i = gen.g_per.tlen in
-      do assume_tab "gen.g_per" gen.g_per (Left "");
-         gen.g_per.arr.(i) := Left lab;
+      do assume_tab "gen.g_per" gen.g_per (Left3 "");
+         gen.g_per.arr.(i) := Left3 lab;
          gen.g_per.tlen := gen.g_per.tlen + 1;
-         assume_tab "gen.g_asc" gen.g_asc (Left "");
-         gen.g_asc.arr.(i) := Left lab;
-         gen.g_asc.tlen := gen.g_asc.tlen + 1;
          Hashtbl.add gen.g_hper lab (Adef.iper_of_int i);
       return Adef.iper_of_int i ]
 ;
@@ -644,12 +640,9 @@ value fam_index gen lab =
   try Hashtbl.find gen.g_hfam lab with
   [ Not_found ->
       let i = gen.g_fam.tlen in
-      do assume_tab "gen.g_fam" gen.g_fam (Left "");
-         gen.g_fam.arr.(i) := Left lab;
+      do assume_tab "gen.g_fam" gen.g_fam (Left3 "");
+         gen.g_fam.arr.(i) := Left3 lab;
          gen.g_fam.tlen := gen.g_fam.tlen + 1;
-         assume_tab "gen.g_cpl" gen.g_cpl (Left "");
-         gen.g_cpl.arr.(i) := Left lab;
-         gen.g_cpl.tlen := gen.g_cpl.tlen + 1;
          Hashtbl.add gen.g_hfam lab (Adef.ifam_of_int i);
       return Adef.ifam_of_int i ]
 ;
@@ -666,22 +659,19 @@ value unknown_per gen i =
      baptism = Adef.codate_None; baptism_place = empty; baptism_src = empty;
      death = DontKnowIfDead; death_place = empty; death_src = empty;
      burial = UnknownBurial; burial_place = empty; burial_src = empty;
-     family = [| |]; notes = empty; psources = empty;
-     cle_index = Adef.iper_of_int i}
-  and a = {parents = None; consang = Adef.fix (-1)} in
-  (p, a)
+     notes = empty; psources = empty; cle_index = Adef.iper_of_int i}
+  and a = {parents = None; consang = Adef.fix (-1)}
+  and u = {family = [| |]} in
+  (p, a, u)
 ;
 
 value phony_per gen sex =
   let i = gen.g_per.tlen in
-  let (person, ascend) = unknown_per gen i in
+  let (person, ascend, union) = unknown_per gen i in
   do person.sex := sex;
-     assume_tab "gen.g_per" gen.g_per (Left "");
+     assume_tab "gen.g_per" gen.g_per (Left3 "");
      gen.g_per.tlen := gen.g_per.tlen + 1;
-     gen.g_per.arr.(i) := Right person;
-     assume_tab "gen.g_asc" gen.g_asc (Left "");
-     gen.g_asc.arr.(i) := Right ascend;
-     gen.g_asc.tlen := gen.g_asc.tlen + 1;
+     gen.g_per.arr.(i) := Right3 person ascend union;
   return Adef.iper_of_int i
 ;
 
@@ -693,10 +683,11 @@ value unknown_fam gen i =
     {marriage = Adef.codate_None; marriage_place = empty;
      marriage_src = empty; witnesses = [| |]; not_married = False;
      divorce = NotDivorced;
-     children = [| |]; comment = empty; origin_file = empty; fsources = empty;
+     comment = empty; origin_file = empty; fsources = empty;
      fam_index = Adef.ifam_of_int i}
-  and c = {father = father; mother = mother} in
-  (f, c)
+  and c = {father = father; mother = mother}
+  and d = {children = [| |]} in
+  (f, c, d)
 ;
 
 value this_year =
@@ -985,8 +976,8 @@ value forward_adop gen ip lab which_parent =
 value adop_parent gen ip r =
   let i = per_index gen r.rval in
   match gen.g_per.arr.(Adef.int_of_iper i) with
-  [ Left _ -> None
-  | Right p ->
+  [ Left3 _ -> None
+  | Right3 p _ _ ->
       do if List.memq ip p.related then ()
          else p.related := [ip :: p.related];
       return Some p.cle_index ]
@@ -994,8 +985,8 @@ value adop_parent gen ip r =
 
 value set_adop_fam gen ip which_parent fath moth =
   match gen.g_per.arr.(Adef.int_of_iper ip) with
-  [ Left _ -> ()
-  | Right per ->
+  [ Left3 _ -> ()
+  | Right3 per _ _ ->
       let r_fath =
         match (which_parent, fath) with
         [ (("HUSB" | "BOTH"), Some r) -> adop_parent gen ip r
@@ -1312,11 +1303,11 @@ value add_indi gen r =
      death_place = add_string gen death_place;
      death_src = add_string gen death_src; burial = burial;
      burial_place = add_string gen burial_place;
-     burial_src = add_string gen burial_src; family = Array.of_list family;
+     burial_src = add_string gen burial_src;
      notes = notes; psources = add_string gen psources; cle_index = i}
-  and ascend = {parents = parents; consang = Adef.fix (-1)} in
-  do gen.g_per.arr.(Adef.int_of_iper i) := Right person;
-     gen.g_asc.arr.(Adef.int_of_iper i) := Right ascend;
+  and ascend = {parents = parents; consang = Adef.fix (-1)}
+  and union = {family = Array.of_list family} in
+  do gen.g_per.arr.(Adef.int_of_iper i) := Right3 person ascend union;
      match find_field "ADOP" r.rsons with
      [ Some r ->
          match find_field "FAMC" r.rsons with
@@ -1339,18 +1330,18 @@ value add_fam_norm gen r =
     | None -> phony_per gen Female ]
   in
   do match gen.g_per.arr.(Adef.int_of_iper fath) with
-     [ Left lab -> ()
-     | Right p ->
-         do if not (List.memq i (Array.to_list p.family)) then
-              p.family := Array.append p.family [| i |]
+     [ Left3 lab -> ()
+     | Right3 p _ u ->
+         do if not (List.memq i (Array.to_list u.family)) then
+              u.family := Array.append u.family [| i |]
             else ();
             if p.sex = Neuter then p.sex := Male else ();
          return () ];
      match gen.g_per.arr.(Adef.int_of_iper moth) with
-     [ Left lab -> ()
-     | Right p ->
-         do if not (List.memq i (Array.to_list p.family)) then
-              p.family := Array.append p.family [| i |]
+     [ Left3 lab -> ()
+     | Right3 p _ u ->
+         do if not (List.memq i (Array.to_list u.family)) then
+              u.family := Array.append u.family [| i |]
             else ();
             if p.sex = Neuter then p.sex := Female else ();
          return () ];
@@ -1405,13 +1396,12 @@ value add_fam_norm gen r =
      marriage_src = add_string gen marr_src;
      witnesses = [| |];
      not_married = not_married;
-     divorce = div; children = Array.of_list children;
+     divorce = div;
      comment = add_string gen comment; origin_file = empty;
      fsources = add_string gen fsources; fam_index = i}
-  and cpl = {father = fath; mother = moth} in
-  do gen.g_fam.arr.(Adef.int_of_ifam i) := Right fam;
-     gen.g_cpl.arr.(Adef.int_of_ifam i) := Right cpl;
-  return ()
+  and cpl = {father = fath; mother = moth}
+  and des = {children = Array.of_list children} in
+  gen.g_fam.arr.(Adef.int_of_ifam i) := Right3 fam cpl des
 ;
 
 value add_fam gen r =
@@ -1504,13 +1494,13 @@ value print_base_warning base =
   [ BirthAfterDeath p ->
       Printf.fprintf log_oc.val "%s\n  born after his/her death\n"
         (denomination base p)
-  | ChangedOrderOfChildren fam _ ->
-      let cpl = coi base fam.fam_index in
+  | ChangedOrderOfChildren ifam des _ ->
+      let cpl = coi base ifam in
       Printf.fprintf log_oc.val "Changed order of children of %s and %s\n"
         (denomination base (poi base cpl.father))
         (denomination base (poi base cpl.mother))
-  | ChildrenNotInOrder fam elder x ->
-      let cpl = coi base fam.fam_index in
+  | ChildrenNotInOrder ifam des elder x ->
+      let cpl = coi base ifam in
       do Printf.fprintf log_oc.val
            "The following children of\n  %s\nand\n  %s\nare not in order:\n"
            (denomination base (poi base cpl.father))
@@ -1608,7 +1598,7 @@ value pass2 gen fname =
      List.iter
        (fun (ipp, ip) ->
           match gen.g_per.arr.(Adef.int_of_iper ipp) with
-          [ Right p ->
+          [ Right3 p _ _ ->
               if List.memq ip p.related then ()
               else p.related := [ip :: p.related]
           | _ -> () ])
@@ -1652,22 +1642,20 @@ value pass3 gen fname =
 value check_undefined gen =
   do for i = 0 to gen.g_per.tlen - 1 do
        match gen.g_per.arr.(i) with
-       [ Right _ -> ()
-       | Left lab ->
-           let (p, a) = unknown_per gen i in
+       [ Right3 _ _ _ -> ()
+       | Left3 lab ->
+           let (p, a, u) = unknown_per gen i in
            do Printf.fprintf log_oc.val "Warning: undefined person %s\n" lab;
-              gen.g_per.arr.(i) := Right p;
-              gen.g_asc.arr.(i) := Right a;
+              gen.g_per.arr.(i) := Right3 p a u;
            return () ];
      done;
      for i = 0 to gen.g_fam.tlen - 1 do
        match gen.g_fam.arr.(i) with
-       [ Right _ -> ()
-       | Left lab ->
-           let (f, c) = unknown_fam gen i in
+       [ Right3 _ _ _ -> ()
+       | Left3 lab ->
+           let (f, c, d) = unknown_fam gen i in
            do Printf.fprintf log_oc.val "Warning: undefined family %s\n" lab;
-              gen.g_fam.arr.(i) := Right f;
-              gen.g_cpl.arr.(i) := Right c;
+              gen.g_fam.arr.(i) := Right3 f c d;
            return () ];
      done;
   return ()
@@ -1680,8 +1668,7 @@ value make_arrays in_file =
     else in_file ^ ".ged"
   in
   let gen =
-    {g_per = {arr = [| |]; tlen = 0}; g_asc = {arr = [| |]; tlen = 0};
-     g_fam = {arr = [| |]; tlen = 0}; g_cpl = {arr = [| |]; tlen = 0};
+    {g_per = {arr = [| |]; tlen = 0}; g_fam = {arr = [| |]; tlen = 0};
      g_str = {arr = [| |]; tlen = 0}; g_bnot = "";
      g_ic = open_in_bin fname;
      g_not = Hashtbl.create 3001; g_src = Hashtbl.create 3001;
@@ -1702,48 +1689,36 @@ value make_arrays in_file =
      pass3 gen fname;
      close_in gen.g_ic;
      check_undefined gen;
-  return (gen.g_per, gen.g_asc, gen.g_fam, gen.g_cpl, gen.g_str, gen.g_bnot)
+  return (gen.g_per, gen.g_fam, gen.g_str, gen.g_bnot)
 ;
 
-value make_subarrays (g_per, g_asc, g_fam, g_cpl, g_str, g_bnot) =
+value make_subarrays (g_per, g_fam, g_str, g_bnot) =
   let persons =
-    let a = Array.create g_per.tlen (Obj.magic 0) in
+    let pa = Array.create g_per.tlen (Obj.magic 0) in
+    let aa = Array.create g_per.tlen (Obj.magic 0) in
+    let ua = Array.create g_per.tlen (Obj.magic 0) in
     do for i = 0 to g_per.tlen - 1 do
          match g_per.arr.(i) with
-         [ Right p -> a.(i) := p
-         | Left lab -> failwith ("undefined person " ^ lab) ];
+         [ Right3 p a u ->
+             do pa.(i) := p; aa.(i) := a; ua.(i) := u; return ()
+         | Left3 lab -> failwith ("undefined person " ^ lab) ];
        done;
-    return a
-  in
-  let ascends =
-    let a = Array.create g_asc.tlen (Obj.magic 0) in
-    do for i = 0 to g_asc.tlen - 1 do
-         match g_asc.arr.(i) with
-         [ Right p -> a.(i) := p
-         | Left lab -> failwith ("undefined person " ^ lab) ];
-       done;
-    return a
+    return (pa, aa, ua)
   in
   let families =
-    let a = Array.create g_fam.tlen (Obj.magic 0) in
+    let fa = Array.create g_fam.tlen (Obj.magic 0) in
+    let ca = Array.create g_fam.tlen (Obj.magic 0) in
+    let da = Array.create g_fam.tlen (Obj.magic 0) in
     do for i = 0 to g_fam.tlen - 1 do
          match g_fam.arr.(i) with
-         [ Right f -> a.(i) := f
-         | Left lab -> failwith ("undefined family " ^ lab) ];
+         [ Right3 f c d ->
+             do fa.(i) := f; ca.(i) := c; da.(i) := d; return ()
+         | Left3 lab -> failwith ("undefined family " ^ lab) ];
        done;
-    return a
-  in
-  let couples =
-    let a = Array.create g_cpl.tlen (Obj.magic 0) in
-    do for i = 0 to g_cpl.tlen - 1 do
-         match g_cpl.arr.(i) with
-         [ Right c -> a.(i) := c
-         | Left lab -> failwith ("undefined family " ^ lab) ];
-       done;
-    return a
+    return (fa, ca, da)
   in
   let strings = Array.sub g_str.arr 0 g_str.tlen in
-  (persons, ascends, families, couples, strings, g_bnot)
+  (persons, families, strings, g_bnot)
 ;
 
 value cache_of tab =
@@ -1754,11 +1729,15 @@ value cache_of tab =
   do c.get := fun i -> (c.array ()).(i); return c
 ;
 
-value make_base (persons, ascends, families, couples, strings, bnotes) =
+value make_base (persons, families, strings, bnotes) =
+  let (persons, ascends, unions) = persons in
+  let (families, couples, descends) = families in
   let bnotes = {nread = fun _ -> bnotes; norigin_file = ""} in
   let base_data =
     {persons = cache_of persons; ascends = cache_of ascends;
+     unions = cache_of unions;
      families = cache_of families; couples = cache_of couples;
+     descends = cache_of descends;
      strings = cache_of strings; bnotes = bnotes}
   in
   let base_func =
@@ -1766,8 +1745,9 @@ value make_base (persons, ascends, families, couples, strings, bnotes) =
      index_of_string = fun [];
      persons_of_surname = {find = fun []; cursor = fun []; next = fun []};
      persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
-     patch_person = fun []; patch_ascend = fun []; patch_family = fun [];
-     patch_couple = fun []; patch_string = fun []; patch_name = fun [];
+     patch_person = fun []; patch_ascend = fun []; patch_union = fun [];
+     patch_family = fun []; patch_couple = fun []; patch_descend = fun [];
+     patch_string = fun []; patch_name = fun [];
      commit_patches = fun []; commit_notes = fun [];
      patched_ascends = fun []; cleanup = fun () -> ()}
   in
@@ -1791,7 +1771,8 @@ value check_parents_children base =
            if fam.fam_index == Adef.ifam_of_int (-1) then a.parents := None
            else
              let cpl = coi base ifam in
-             if array_memq (Adef.iper_of_int i) fam.children then ()
+             let des = doi base ifam in
+             if array_memq (Adef.iper_of_int i) des.children then ()
              else
                let p = base.data.persons.get i in
                do Printf.fprintf log_oc.val
@@ -1812,9 +1793,10 @@ value check_parents_children base =
        to_delete.val := [];
        let fam = base.data.families.get i in
        let cpl = base.data.couples.get i in
-       do for j = 0 to Array.length fam.children - 1 do
-            let a = aoi base fam.children.(j) in
-            let p = poi base fam.children.(j) in
+       let des = base.data.descends.get i in
+       do for j = 0 to Array.length des.children - 1 do
+            let a = aoi base des.children.(j) in
+            let p = poi base des.children.(j) in
             match a.parents with
             [ Some ifam ->
                 if Adef.int_of_ifam ifam <> i then
@@ -1849,9 +1831,9 @@ value check_parents_children base =
               List.fold_right
                 (fun ip l ->
                    if List.memq ip to_delete.val then l else [ip :: l])
-                (Array.to_list fam.children) []
+                (Array.to_list des.children) []
             in
-            fam.children := Array.of_list l
+            des.children := Array.of_list l
           else ();
        return ();
      done;
@@ -1859,26 +1841,26 @@ value check_parents_children base =
 ;
 
 value kill_family base fam ip =
-  let p = poi base ip in
+  let u = uoi base ip in
   let l =
     List.fold_right
       (fun ifam ifaml ->
          if ifam == fam.fam_index then ifaml else [ifam :: ifaml])
-      (Array.to_list p.family) []
+      (Array.to_list u.family) []
   in
-  p.family := Array.of_list l
+  u.family := Array.of_list l
 ;
 
 value kill_parents base ip = let a = aoi base ip in a.parents := None;
 
-value effective_del_fam base fam cpl =
+value effective_del_fam base fam cpl des =
   let ifam = fam.fam_index in
   do kill_family base fam cpl.father;
      kill_family base fam cpl.mother;
-     Array.iter (kill_parents base) fam.children;
+     Array.iter (kill_parents base) des.children;
      cpl.father := Adef.iper_of_int (-1);
      cpl.mother := Adef.iper_of_int (-1);
-     fam.children := [| |];
+     des.children := [| |];
      fam.fam_index := Adef.ifam_of_int (-1);
   return ()
 ;
@@ -1903,7 +1885,8 @@ value check_parents_sex base =
            (denomination base moth) (string_of_sex moth.sex);
          Printf.fprintf log_oc.val "=> family deleted\n\n";
          flush log_oc.val;
-         effective_del_fam base (base.data.families.get i) cpl;
+         effective_del_fam base (base.data.families.get i) cpl
+           (base.data.descends.get i);
       return ()
     else do fath.sex := Male; moth.sex := Female; return ();
   done
@@ -1937,8 +1920,9 @@ value rec negative_date_ancestors base p =
      match p.death with
      [ Death dr cd2 -> p.death := Death dr (neg_year_cdate cd2)
      | _ -> () ];
-     for i = 0 to Array.length p.family - 1 do
-       let fam = foi base p.family.(i) in
+     let u = uoi base p.cle_index in
+     for i = 0 to Array.length u.family - 1 do
+       let fam = foi base u.family.(i) in
        match Adef.od_of_codate fam.marriage with
        [ Some d -> fam.marriage := Adef.codate_of_od (Some (neg_year d))
        | None -> () ];
@@ -1969,31 +1953,34 @@ value negative_dates base =
 value finish_base base =
   let persons = base.data.persons.array () in
   let ascends = base.data.ascends.array () in
+  let unions = base.data.unions.array () in
   let families = base.data.families.array () in
+  let descends = base.data.descends.array () in
   let strings = base.data.strings.array () in
-  do for i = 0 to Array.length families - 1 do
-       let fam = families.(i) in
+  do for i = 0 to Array.length descends - 1 do
+       let des = descends.(i) in
        let children =
          sort_by_date
            (fun ip -> Adef.od_of_codate persons.(Adef.int_of_iper ip).birth)
-           (Array.to_list fam.children)
+           (Array.to_list des.children)
        in
-       fam.children := Array.of_list children;
+       des.children := Array.of_list children;
      done;
-     for i = 0 to Array.length persons - 1 do
-       let p = persons.(i) in
+     for i = 0 to Array.length unions - 1 do
+       let u = unions.(i) in
        let family =
          sort_by_date
            (fun ifam ->
               Adef.od_of_codate families.(Adef.int_of_ifam ifam).marriage)
-           (Array.to_list p.family)
+           (Array.to_list u.family)
        in
-       p.family := Array.of_list family;
+       u.family := Array.of_list family;
      done;
      for i = 0 to Array.length persons - 1 do
        let p = persons.(i) in
        let a = ascends.(i) in
-       if a.parents <> None && Array.length p.family != 0 ||
+       let u = unions.(i) in
+       if a.parents <> None && Array.length u.family != 0 ||
           p.notes <> string_empty.val then
          do if sou base p.first_name = "?" then
               do p.first_name := string_x.val; p.occ := i; return ()
