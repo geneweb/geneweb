@@ -1,5 +1,5 @@
 (* camlp4r ./q_codes.cmo *)
-(* $Id: iovalue.ml,v 2.1 1999-03-08 11:18:48 ddr Exp $ *)
+(* $Id: iovalue.ml,v 2.2 1999-10-06 16:10:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value string_tag = Obj.tag (Obj.repr "a");
@@ -77,18 +77,13 @@ value gen_input ifuns i = Obj.magic (input_loop ifuns i);
 
 (* Output *)
 
-type sizes =
-  { size_32 : mutable int;
-    size_64 : mutable int }
-;
-
 type out_funs 'a =
   { output_byte : 'a -> int -> unit;
     output_binary_int : 'a -> int -> unit;
     output : 'a -> string -> int -> int -> unit }
 ;
 
-value rec output_loop sz ofuns oc x =
+value rec output_loop ofuns oc x =
   if not (Obj.is_block x) then
     if Obj.magic x >= 0 && Obj.magic x < 0x40 then
       ofuns.output_byte oc (<<PREFIX_SMALL_INT>> + Obj.magic x)
@@ -119,8 +114,6 @@ value rec output_loop sz ofuns oc x =
               ofuns.output_binary_int oc len;
            return ();
          ofuns.output oc (Obj.magic x) 0 len;
-         sz.size_32 := sz.size_32 + 1 + (len + 4) / 4;
-         sz.size_64 := sz.size_64 + 1 + (len + 8) / 8;
       return ()
     else if Obj.tag x == float_tag then
       failwith "Iovalue.output: floats not implemented"
@@ -133,10 +126,8 @@ value rec output_loop sz ofuns oc x =
               ofuns.output_binary_int oc (Obj.tag x + Obj.size x lsl 10);
            return ();
          for i = 0 to Obj.size x - 1 do
-           output_loop sz ofuns oc (Obj.field x i);
+           output_loop ofuns oc (Obj.field x i);
          done;
-         sz.size_32 := sz.size_32 + 1 + Obj.size x;
-         sz.size_64 := sz.size_64 + 1 + Obj.size x;
       return ()
 ;
 
@@ -146,10 +137,8 @@ value out_channel_funs =
    output = output}
 ;
 
-value sz = {size_32 = 0; size_64 = 0};
-
-value output oc x = output_loop sz out_channel_funs oc (Obj.repr x);
-value gen_output sz ofuns i x = output_loop sz ofuns i (Obj.repr x);
+value output oc x = output_loop out_channel_funs oc (Obj.repr x);
+value gen_output ofuns i x = output_loop ofuns i (Obj.repr x);
 
 (* Size *)
 
@@ -163,7 +152,7 @@ value size = ref 0;
 
 value size v =
   do size.val := 0;
-     gen_output sz size_funs size v;
+     gen_output size_funs size v;
   return size.val;
 
 (* Digest *)
