@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.7 2001-04-23 03:02:38 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.8 2001-05-09 10:46:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -680,6 +680,16 @@ value http_preferred_language request =
 value make_conf cgi from_addr (addr, request) script_name contents env =
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
+  let _ =
+    let s = script_name in
+    if Util.start_with s 0 "images/" then
+      let i = String.length "images/" in
+      let fname = String.sub s i (String.length s - i) in
+      let fname = Filename.basename fname in
+      let fname = Util.image_file_name fname in
+      let _ = Image.print_image_file cgi fname in raise Exit
+    else ()
+  in
   let (command, base_file, passwd, env, access_type) =
     let (base_passwd, env) =
       let (x, env) = extract_assoc "b" env in
@@ -694,11 +704,6 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
       in
       let i = index_not_name s in
       if i = String.length s then s
-      else if String.sub s 0 (i + 1) = "images/" then
-        let fname = String.sub s (i + 1) (String.length s - i - 1) in
-        let fname = Filename.basename fname in
-        let fname = Util.image_file_name fname in
-        let _ = Image.print_image_file cgi fname in raise Exit
       else refresh_url cgi request s i
     in
     let (passwd, env, access_type) =
