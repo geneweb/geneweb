@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 3.6 2000-04-02 15:58:47 ddr Exp $ *)
+(* $Id: place.ml,v 3.7 2000-04-04 12:19:49 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -65,7 +65,9 @@ value get_all conf base =
     in
     incr cnt
   in
-  let empty = base.func.index_of_string "" in
+  let empty =
+    try base.func.index_of_string "" with [ Not_found -> Adef.istr_of_int 0 ]
+  in
   loop 0 where rec loop i =
     if i = base.data.persons.len then
       let list = ref [] in
