@@ -1,8 +1,10 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 3.1 2001-02-10 19:30:55 ddr Exp $ *)
+(* $Id: templ.ml,v 3.2 2001-02-14 15:26:42 ddr Exp $ *)
 
 open Config;
 open Util;
+
+(* Parsing *)
 
 type ast =
   [ Atext of string
@@ -22,7 +24,7 @@ type token = [ LPAREN | RPAREN | DOT | IDENT of string ];
 
 value rec get_ident len =
   parser
-  [ [: `('a'..'z' | 'A'..'Z' | '_' as c); strm :] ->
+  [ [: `('a'..'z' | 'A'..'Z' | '0'..'9' | '_' as c); strm :] ->
       get_ident (Buff.store len c) strm
   | [: :] -> Buff.get len ]
 ;
@@ -239,4 +241,27 @@ value input conf base fname =
          end;
          Util.trailer conf;
       return raise Exit ]
+;
+
+(* Common evaluation functions *)
+
+value print_body_prop conf base =
+  let s =
+    try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
+    [ Not_found -> "" ]
+  in
+  let s = s ^ body_prop conf in
+  Wserver.wprint "%s" s
+;
+
+value print_variable conf base =
+  fun
+  [ "action" -> Wserver.wprint "%s" conf.command
+  | "base_header" -> include_hed_trl conf (Some base) ".hed"
+  | "base_trailer" -> include_hed_trl conf (Some base) ".trl"
+  | "body_prop" -> print_body_prop conf base
+  | "hidden" -> Util.hidden_env conf
+  | "highlight" -> Wserver.wprint "%s" conf.highlight
+  | "nl" -> Wserver.wprint "\n"
+  | s -> Wserver.wprint "%%%s;" s ]
 ;

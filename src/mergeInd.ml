@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 3.20 2001-02-13 16:15:51 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.21 2001-02-14 15:26:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -34,6 +34,9 @@ value print_differences conf base branches p1 p2 =
       (Adef.int_of_iper p1.cle_index);
     Wserver.wprint "<input type=hidden name=i2 value=%d>\n"
       (Adef.int_of_iper p2.cle_index);
+if p_getenv conf.env "opt" = Some "new" then
+   Wserver.wprint "<input type=hidden name=opt value=new>\n"
+else ();
     loop branches where rec loop =
       fun
       [ [(ip1, ip2)] ->

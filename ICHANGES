@@ -19,6 +19,9 @@ GeneWeb Version 3.12
     (shorten_too_long and bottom_adjust) to shorten too long branches
     which may appear in the algorithm.
 
+* GeneWeb compiler (gwc)
+  - [14 Feb 01] Delete empty titles (titles with empty identifier)
+
 GeneWeb Version 3.11
 --------------------
 
