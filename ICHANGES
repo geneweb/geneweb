@@ -14,6 +14,9 @@ GeneWeb Version 3.04
     #src value (save file length). Added "cbp", idem for the birth place
     (#bp value).
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [10 Apr 00] Applies now "-fne" before "-efn".
+
 GeneWeb Version 3.03
 --------------------
 
