@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 3.9 2001-02-17 18:58:10 ddr Exp $ *)
+(* $Id: templ.ml,v 3.10 2001-02-18 09:30:14 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -13,20 +13,22 @@ type ast =
   | Awid_hei of string
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
-  | Adefine of string and string and list ast and list ast
-  | Aapply of string and ast_expr ]
+  | Adefine of string and list string and list ast and list ast
+  | Aapply of string and list ast_expr ]
 and ast_expr =
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
   | Eop of string and ast_expr and ast_expr
   | Enot of ast_expr
   | Estr of string
-  | Evar of string and list string ]
+  | Evar of string and list string
+  | Etransl of bool and string and char ]
 ;
 
 type token =
-  [ BANGEQUAL | DOT | EQUAL | LPAREN | RPAREN
-  | IDENT of string | STRING of string ]
+  [ BANGEQUAL | COMMA | DOT | EQUAL | LPAREN | RPAREN
+  | IDENT of string | STRING of string
+  | LEXICON of bool and string and char ]
 ;
 
 value rec get_ident len =
@@ -54,15 +56,27 @@ value get_variable =
   | [: v = get_ident 0; vl = var_kont :] -> (v, vl) ]
 ;
 
+value lexicon_word =
+  let upper = parser [ [: `'*' :] -> True | [: :] -> False ] in
+  let rec text len =
+    parser
+    [ [: `']' :] -> Buff.get len
+    | [: `c; strm:] -> text (Buff.store len c) strm ]
+  in
+  parser [: upp = upper; s = text 0; `n :] -> (upp, s, n)
+;
+
 value rec get_token =
   parser
   [ [: `(' ' | '\t' | '\n' | '\r'); strm :] -> get_token strm
   | [: `'(' :] -> LPAREN
   | [: `')' :] -> RPAREN
+  | [: `',' :] -> COMMA
   | [: `'.' :] -> DOT
   | [: `'=' :] -> EQUAL
   | [: `'!'; `'=' :] -> BANGEQUAL
   | [: `'"'; s = get_string 0 :] -> STRING s
+  | [: `'['; (upp, s, n) = lexicon_word :] -> LEXICON upp s n
   | [: s = get_ident 0 :] -> IDENT s ]
 ;
 
@@ -84,64 +98,116 @@ value buff_mstore len s =
 
 value buff_get len = String.sub buff.val 0 len;
 
-value lexicon_word =
-  let upper = parser [ [: `'*' :] -> True | [: :] -> False ] in
-  let rec text len =
+value rec parse_var =
+  parser
+  [ [: `IDENT id; idl = ident_list :] -> (id, idl) ]
+and ident_list =
+  parser
+  [ [: `DOT;
+       id =
+         parser
+         [ [: `IDENT id :] -> id
+         | [: `_ :] -> "parse_error" ];
+       idl = ident_list :] -> [id :: idl]
+  | [: :] -> [] ]
+;
+
+value rec parse_expr strm =
+  let rec parse_1 =
     parser
-    [ [: `']' :] -> Buff.get len
-    | [: `c; strm:] -> text (Buff.store len c) strm ]
+    [ [: e = parse_2;
+         e =
+           parser
+           [ [: `IDENT "or"; strm :] -> Eor e (parse_1 strm)
+           | [: :] -> e ] :] -> e ]
+  and parse_2 =
+    parser
+    [ [: e = parse_3;
+         e =
+           parser
+           [ [: `IDENT "and"; strm :] -> Eand e (parse_2 strm)
+           | [: :] -> e ] :] -> e ]
+  and parse_3 =
+    parser
+    [ [: e = parse_simple;
+         e =
+           parser
+           [ [: `EQUAL; e2 = parse_simple :] -> Eop "=" e e2
+           | [: `BANGEQUAL; e2 = parse_simple :] -> Eop "!=" e e2
+           | [: :] -> e ] :] -> e ]
+  and parse_simple =
+    parser
+    [ [: `LPAREN; e = parse_1;
+         e = parser
+             [ [: `RPAREN :] -> e
+             | [: `_ :] -> Evar "parse_error" [] ] :] -> e
+    | [: `IDENT "not"; e = parse_simple :] -> Enot e
+    | [: `STRING s :] -> Estr s
+    | [: (id, idl) = parse_var :] -> Evar id idl
+    | [: `_ :] -> Evar "parse_error" [] ]
   in
-  parser [: upp = upper; s = text 0; `n :] -> Atransl upp s n
+  let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
+  let r = parse_simple (Stream.from f) in
+  do match strm with parser [ [: `';' :] -> () | [: :] -> () ]; return r
+;
+
+value parse_real_params strm =
+  let expr =
+    parser
+    [ [: `STRING s :] -> Estr s
+    | [: `LEXICON upp s n :] -> Etransl upp s n
+    | [: (id, idl) = parse_var :] -> Evar id idl ]
+  in
+  let rec parse_expr_list =
+    parser
+    [ [: x = expr;
+         xl =
+           parser
+           [ [: `COMMA; xl = parse_expr_list :] -> xl
+           | [: :] -> [] ] :] -> [x :: xl] ]
+  in
+  let parse_tuple =
+    parser
+    [ [: `LPAREN;
+         xl =
+           parser
+           [ [: xl = parse_expr_list :] -> xl
+           | [: :] -> [] ];
+         xl =
+           parser
+           [ [: `RPAREN :] -> xl
+           | [: :] -> [Estr "parse_error"] ] :] -> xl ]
+  in
+  let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
+  parse_tuple (Stream.from f)
+;
+
+value parse_formal_params strm =
+  let rec parse_ident_list =
+    parser
+    [ [: `IDENT x;
+         xl =
+           parser
+           [ [: `COMMA; xl = parse_ident_list :] -> xl
+           | [: :] -> [] ] :] -> [x :: xl] ]
+  in
+  let parse_tuple =
+    parser
+    [ [: `LPAREN;
+         xl =
+           parser
+           [ [: xl = parse_ident_list :] -> xl
+           | [: :] -> [] ];
+         xl =
+           parser
+           [ [: `RPAREN :] -> xl
+           | [: :] -> ["parse_error"] ] :] -> xl ]
+  in
+  let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
+  parse_tuple (Stream.from f)
 ;
 
 value parse_templ conf base strm =
-  let rec parse_expr () =
-    let rec parse_1 =
-      parser
-      [ [: e = parse_2;
-           e =
-             parser
-             [ [: `IDENT "or"; strm :] -> Eor e (parse_1 strm)
-             | [: :] -> e ] :] -> e ]
-    and parse_2 =
-      parser
-      [ [: e = parse_3;
-           e =
-             parser
-             [ [: `IDENT "and"; strm :] -> Eand e (parse_2 strm)
-             | [: :] -> e ] :] -> e ]
-    and parse_3 =
-      parser
-      [ [: e = parse_simple;
-           e =
-             parser
-             [ [: `EQUAL; e2 = parse_simple :] -> Eop "=" e e2
-             | [: `BANGEQUAL; e2 = parse_simple :] -> Eop "!=" e e2
-             | [: :] -> e ] :] -> e ]
-    and parse_simple =
-      parser
-      [ [: `LPAREN; e = parse_1;
-           e = parser
-               [ [: `RPAREN :] -> e
-               | [: `_ :] -> Evar "parse_error" [] ] :] -> e
-      | [: `IDENT "not"; e = parse_simple :] -> Enot e
-      | [: `IDENT id; idl = ident_list :] -> Evar id idl
-      | [: `STRING s :] -> Estr s
-      | [: `_ :] -> Evar "parse_error" [] ]
-    and ident_list =
-      parser
-      [ [: `DOT;
-           id =
-             parser
-             [ [: `IDENT id :] -> id
-             | [: `_ :] -> "parse_error" ];
-           idl = ident_list :] -> [id :: idl]
-      | [: :] -> [] ]
-    in
-    let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
-    let r = parse_simple (Stream.from f) in
-    do match strm with parser [ [: `';' :] -> () | [: :] -> () ]; return r
-  in
   let rec parse_astl astl bol len end_list strm =
     match strm with parser
     [ [: `'%' :] ->
@@ -166,7 +232,10 @@ value parse_templ conf base strm =
         let astl =
           if len = 0 then astl else [Atext (buff_get len) :: astl]
         in
-        let a = lexicon_word strm in
+        let a =
+          let (x, y, z) = lexicon_word strm in
+          Atransl x y z
+        in
         parse_astl [a :: astl] False 0 end_list strm
     | [: `c :] ->
         let empty_c = c = ' ' || c = '\t' in
@@ -179,17 +248,31 @@ value parse_templ conf base strm =
         in
         (List.rev astl, "") ]
   and parse_define astl end_list strm =
-    let (f, _) = get_variable strm in
-    let (x, _) = get_variable strm in
-    let (al, _) = parse_astl [] False 0 ["end"] strm in
+    let fxlal =
+      try
+        let f = get_ident 0 strm in
+        let xl = parse_formal_params strm in
+        let (al, _) = parse_astl [] False 0 ["end"] strm in
+        Some (f, xl, al)
+      with
+      [ Stream.Failure | Stream.Error _ -> None ]
+    in
     let (alk, v) = parse_astl [] False 0 end_list strm in
-    (List.rev [Adefine f x al alk :: astl], v)
+    let astl =
+      match fxlal with
+      [ Some (f, xl, al) -> [Adefine f xl al alk :: astl]
+      | None -> [Atext "define error" :: alk @ astl] ]
+    in
+    (List.rev astl, v)
   and parse_apply strm =
-    let (f, _) = get_variable strm in
-    let x = parse_expr () in
-    Aapply f x
+    try
+      let f = get_ident 0 strm in
+      let el = parse_real_params strm in
+      Aapply f el
+    with
+    [ Stream.Failure | Stream.Error _ -> Atext "apply error" ]
   and parse_if strm =
-    let e = parse_expr () in
+    let e = parse_expr strm in
     let (al1, al2) =
       loop () where rec loop () =
         let (al1, tok) =
@@ -197,7 +280,7 @@ value parse_templ conf base strm =
         in
         match tok with
         [ "elseif" ->
-            let e2 = parse_expr () in
+            let e2 = parse_expr strm in
             let (al2, al3) = loop () in
             (al1, [Aif e2 al2 al3])
         | "else" ->

@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.9 2001-02-18 00:26:40 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.10 2001-02-18 09:30:14 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -14,56 +14,56 @@
 </head>
 <body%body_prop;>
 
-%define;date;xx;
+%define;date(xlab,xvar,xdate)
   <table border=1>
   <tr>
-  <td>[*date]0</td>
+  <td>xlab</td>
   <td>
   [year/month/day]0
-  <input name=xx_yyyy size=5 maxlength=5 value="%xx.year;">
+  <input name=xvar_yyyy size=5 maxlength=5 value="%xdate.year;">
   [year/month/day]1
-  <input name=xx_mm size=2 maxlength=2 value="%xx.month;">
+  <input name=xvar_mm size=2 maxlength=2 value="%xdate.month;">
   [year/month/day]2
-  <input name=xx_mm size=2 maxlength=2 value="%xx.day;">
+  <input name=xvar_mm size=2 maxlength=2 value="%xdate.day;">
   </td>
   <td>
   ...[or]0 [text]0
-  <input name=xx_text size=15 maxlength=30 value="%xx.text;">
+  <input name=xvar_text size=15 maxlength=30 value="%xdate.text;">
   </td>
   </table>
   <table border=1>
   <tr>
   <td>[*calendar/calendars]0
-  <select name=xx_cal>
-  <option value=G%if;xx.cal_gregorian; selected%end;
+  <select name=xvar_cal>
+  <option value=G%if;xdate.cal_gregorian; selected%end;
   >[*gregorian/julian/french/hebrew]0
-  <option value=J%if;xx.cal_julian; selected%end;
+  <option value=J%if;xdate.cal_julian; selected%end;
   >[*gregorian/julian/french/hebrew]1
-  <option value=F%if;xx.cal_french; selected%end;
+  <option value=F%if;xdate.cal_french; selected%end;
   >[*gregorian/julian/french/hebrew]2
-  <option value=H%if;xx.cal_hebrew; selected%end;
+  <option value=H%if;xdate.cal_hebrew; selected%end;
   >[*gregorian/julian/french/hebrew]3
   </select>
   </td>
   <td>[*precision]0
-  <select name=xx_prec>
-  <option%if;xx.prec_no; selected%end;>-
-  <option value=sure%if;xx.prec_sure; selected%end;>[*exact]0
-  <option value=about%if;xx.prec_about; selected%end;>[*about (date)]0
-  <option value=maybe%if;xx.prec_maybe; selected%end;>[*possibly (date)]0
-  <option value=before%if;xx.prec_before; selected%end;>[*before (date)]0
-  <option value=after%if;xx.prec_after; selected%end;>[*after (date)]0
-  <option value=oryear%if;xx.prec_oryear; selected%end;
+  <select name=xvar_prec>
+  <option%if;xdate.prec_no; selected%end;>-
+  <option value=sure%if;xdate.prec_sure; selected%end;>[*exact]0
+  <option value=about%if;xdate.prec_about; selected%end;>[*about (date)]0
+  <option value=maybe%if;xdate.prec_maybe; selected%end;>[*possibly (date)]0
+  <option value=before%if;xdate.prec_before; selected%end;>[*before (date)]0
+  <option value=after%if;xdate.prec_after; selected%end;>[*after (date)]0
+  <option value=oryear%if;xdate.prec_oryear; selected%end;
       >&lt;- [*or] -&gt;
-  <option value=yearint%if;xx.prec_yearint; selected%end;
+  <option value=yearint%if;xdate.prec_yearint; selected%end;
       >&lt;- [*between (date)] -&gt;
   </select>
-  <input name=xx_oryear size=5 maxlength=5 value="%xx.oryear;">
+  <input name=xvar_oryear size=5 maxlength=5 value="%xdate.oryear;">
   </td>
   </tr>
   </table>
 %end;
-%define;source;xx;
+%define;source(xx)
   <table border=1>
   <tr>
   <td>[*source/sources]0</td>
@@ -224,9 +224,9 @@
 </tr>
 </table>
 
-%apply;date;"birth";
+%apply;date([*date]0, "birth", "birth")
 
-%apply;source;"birth";
+%apply;source("birth")
 
 <p>
 
@@ -240,9 +240,9 @@
 </tr>
 </table>
 
-%apply;date;"bapt";
+%apply;date([*date]0, "bapt", "bapt")
 
-%apply;source;"bapt";
+%apply;source("bapt")
 
 <h4>[*death]</h4>
 
@@ -268,7 +268,7 @@
 </tr>
 </table>
 
-%apply;date;"death";
+%apply;date([*date]0, "death", "death")
 
 <table border=1>
 <tr>
@@ -287,7 +287,7 @@
 </tr>
 </table>
 
-%apply;source;"death";
+%apply;source("death")
 
 <h4>[*burial]</h4>
 
@@ -307,9 +307,9 @@
 </tr>
 </table>
 
-%apply;date;"burial";
+%apply;date([*date]0, "burial", "burial")
 
-%apply;source;"burial";
+%apply;source("burial")
 
 <h4>[*occupation]</h4>
 
@@ -323,7 +323,7 @@
 
 <h4>[*relation/relations]1</h4>
 
-%define;insert_relation;xx;
+%define;insert_relation(xx)
   <table border=1>
   <tr>
   <td>
@@ -333,7 +333,7 @@
   </tr>
   </table>
 %end;
-%define;relation_type;xx;
+%define;relation_type(xx)
   <table border=1>
   <tr>
   <td>
@@ -354,7 +354,7 @@
   </tr>
   </table>
 %end;
-%define;relation_father;xx;
+%define;relation_father(xx)
  <table border=1>
     <tr>
       <td>[*first name/first names]0</td>
@@ -383,7 +383,7 @@
     </tr>
   </table>
 %end;
-%define;relation_mother;xx;
+%define;relation_mother(xx)
  <table border=1>
     <tr>
       <td>[*first name/first names]0</td>
@@ -413,31 +413,31 @@
   </table>
 %end;
 
-%apply;insert_relation;"0";
+%apply;insert_relation("0")
 <p>
 %if;has_relations;
   %foreach;relation;
-    %apply;relation_type;cnt;
+    %apply;relation_type(cnt)
     <p>
-    %apply;relation_father;cnt;
-    %apply;relation_mother;cnt;
+    %apply;relation_father(cnt)
+    %apply;relation_mother(cnt)
     <p>
-    %apply;insert_relation;cnt;
+    %apply;insert_relation(cnt)
     <p>
   %end;
 %else;
-  %apply;relation_type;"1";
+  %apply;relation_type("1")
   <p>
-  %apply;relation_father;"1";
-  %apply;relation_mother;"1";
+  %apply;relation_father("1")
+  %apply;relation_mother("1")
   <p>
-  %apply;insert_relation;"1";
+  %apply;insert_relation("1")
   <p>
 %end;
 
 <h4>[*title/titles]1</h4>
 
-%define;insert_title;xx;
+%define;insert_title(xx)
   <table border=1>
   <tr>
   <td>
@@ -449,87 +449,51 @@
   </tr>
   </table>
 %end;
-%define;one_title;xx;
-value print_title conf base t cnt =
+%define;one_title(xcnt)
   <table border=1>
     <tr>
+      <td>[*title/titles]0</td>
       <td>
-        Wserver.wprint "%s\n"
-          (capitale (nominative (transl_nth conf "title/titles" 0)));
+        <input name=t_identxcnt size=15 value="%title.t_ident;">
       </td>
-      <td>
-        Wserver.wprint "<input name=t_ident%d size=15%s>" cnt
-          (match t with
-           [ Some {t_ident = n} -> " value=\"" ^ quote_escaped n ^ "\""
-           | _ -> "" ]);
-      </td>
-      <td>
-        Wserver.wprint "%s\n" (capitale (transl conf "estate"));
-      </td>
+      <td>[*estate]0</td>
       <td colspan=2>
-        Wserver.wprint "<input name=t_place%d size=30%s>" cnt
-          (match t with
-           [ Some {t_place = n} -> " value=\"" ^ quote_escaped n ^ "\""
-         | _ -> "" ]);
+        <input name=t_placexcnt size=30 value="%title.t_estate;">
       </td>
     </tr>
     <tr>
+      <td>[*name]0</td>
       <td>
-        Wserver.wprint "%s" (capitale (transl conf "name"));
+        <input name=t_namexcnt size=20 value="%title.t_name;">
+      </td>
+      <td>[*nth]0</td>
+      <td>
+        <input name=t_nthxcnt size=3 value="%title.t_nth;">
       </td>
       <td>
-        Wserver.wprint "<input name=t_name%d size=20%s>" cnt
-          (match t with
-           [ Some {t_name = Tname n} -> " value=\"" ^ quote_escaped n ^ "\""
-           | _ -> "" ]);
-      </td>
-      <td>
-        Wserver.wprint "%s" (capitale (transl_nth conf "nth" 0));
-      </td>
-      <td>
-        Wserver.wprint "<input name=t_nth%d size=3%s>"
-          cnt
-          (match t with
-           [ Some {t_nth = n} when n <> 0 -> " value=" ^ string_of_int n
-           | _ -> "" ]);
-      </td>
-      <td>
-        Wserver.wprint
-          "%s <input type=checkbox name=t_main_title%d%s value=on>"
-          (capitale (transl conf "main title")) cnt
-          (match t with
-           [ Some {t_name = Tmain} -> " checked"
-           | _ -> "" ]);
+        [*main title]0
+        <input type=checkbox name=t_main_titlexcnt value=on%sp;
+         %if;title.t_main; checked%end;>
       </td>
     </tr>
   </table>
-  %apply;dateu;([*begin]0, t_date_startxx, title.t_date_start);
-  Update.print_date conf base (capitale (transl conf "begin"))
-    ("t_date_start" ^ string_of_int cnt)
-    (match t with
-     [ Some t -> Adef.od_of_codate t.t_date_start
-     | _ -> None ]);
-  Wserver.wprint "\n";
-  Update.print_date conf base (capitale (transl conf "end"))
-    ("t_date_end" ^ string_of_int cnt)
-    (match t with
-     [ Some t -> Adef.od_of_codate t.t_date_end
-     | _ -> None ]);
+  %apply;date([*begin]0, "t_date_startxcnt", "title_date_start")
+  %apply;date([*end]0, "t_date_endxcnt", "title_date_end")
 %end
 
-%apply;insert_title;"0";
+%apply;insert_title("0")
 <p>
 %if;has_titles;
   %foreach;title;
-    %apply;one_title;cnt;
+    %apply;one_title(cnt)
     <p>
-    %apply;insert_title;cnt;
+    %apply;insert_title(cnt)
     <p>
   %end;
 %else;
-  %apply;one_title;"1";
+  %apply;one_title("1")
   <p>
-  %apply;insert_title;"1";
+  %apply;insert_title("1")
   <p>
 %end;
 
