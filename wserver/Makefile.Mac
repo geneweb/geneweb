@@ -1,15 +1,15 @@
-# $Id: Makefile.Mac,v 1.2 2000-04-16 15:40:19 ddr Exp $
+# $Id: Makefile.Mac,v 1.3 2000-05-02 17:10:32 doligez Exp $
 
 CAMLP4_COMM = ::tools:camlp4_comm.mpw pa_ifdef.cmo pa_ru.cmo
 CAMLP4F = -DMAC
-CAMLP4D = `camlp4 -where`
+CAMLP4D = "``camlp4 -where``"
 LIBUNIX = -cclib -lunix
 OCAMLC = ocamlc
 OCAMLI =
 OCAMLD =
 RM = delete -y
 
-all ÄÄ
+# all ÄÄ
 
 clean ÄÄ
     {RM} Å.out Å.opt Å.cm[oixa] Å.cmxa Å.pp[oi] Å.o Å.a Å.obj Å.lib Å.lck Å.bak Å~ .#Å
@@ -27,6 +27,7 @@ clean ÄÄ
 OBJS = wserver.cmo
 
 all ÄÄ {OBJS}
+    echo
 
 depend Ä
     ::tools:camlp4_depend.mpw {OCAMLI} Å.mlÅ > Makefile.Mac.depend
