@@ -6,6 +6,7 @@ GeneWeb Version 2.01
   - [Mar 30, 99] Changed term "photo" into "image".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Apr 16, 99] Added long display for ancestors.
   - [Apr 13, 99] Fixed bug in personal pages: for people having a public
     name, the (small) links to the first name and surname could work
     bad in case of accents. Fixed other bug same kind: in advanced
