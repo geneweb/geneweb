@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.16 2002-03-04 14:10:37 ddr Exp $ *)
+(* $Id: family.ml,v 4.17 2002-03-05 16:16:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -628,19 +628,6 @@ value family conf base log =
             family_m conf base;
           };
         } ];
-    if Wserver.bufferize.val then do {
-      let out = Wserver.buffer_contents () in
-(*
-let _ = do { Printf.eprintf "buffer length %d\n" (String.length out); flush stderr; } in
-*)
-      Wserver.bufferize.val := False;
-      Util.html conf;
-      Wserver.wprint "Content-length: %d" (String.length out); nl ();
-      nl ();
-      Wserver.wprint "%s" out;
-      nl ();
-    }
-    else ();
     Wserver.wflush ();
   }
 ;

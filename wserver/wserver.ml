@@ -1,51 +1,16 @@
-(* $Id: wserver.ml,v 4.15 2002-02-27 16:15:20 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.16 2002-03-05 16:16:26 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 value sock_in = ref "wserver.sin";
 value sock_out = ref "wserver.sou";
 value noproc = ref False;
-value bufferize = ref False;
 
 value wserver_oc =
   do { set_binary_mode_out stdout True; ref stdout }
 ;
 
-value buffer = Buffer.create 211;
-
-value flush_buffer () =
-  if Buffer.length buffer > 0 then do {
-    Buffer.output_buffer wserver_oc.val buffer;
-    Buffer.clear buffer;
-  }
-  else ()
-;
-
-value buffer_contents () =
-  let r = Buffer.contents buffer in
-  do {
-    Buffer.clear buffer;
-    r
-  }
-;
-
-value wprint fmt =
-  do {
-    if not bufferize.val then flush_buffer () else ();
-    Printf.bprintf buffer fmt
-  }
-;
-
-value wflush () =
-  do {
-    if bufferize.val then do {
-      Printf.eprintf "buffer size %d\n" (Buffer.length buffer);
-      flush stderr;
-    }
-    else ();
-    flush_buffer ();
-    flush wserver_oc.val
-  }
-;
+value wprint fmt = Printf.fprintf wserver_oc.val fmt;
+value wflush () = flush wserver_oc.val;
 
 value hexa_digit x =
   if x >= 10 then Char.chr (Char.code 'A' + x - 10)
@@ -313,13 +278,6 @@ value string_of_sockaddr =
 ;
 value sockaddr_of_string s = Unix.ADDR_UNIX s;
 
-(* hack for bugged clients under Windows; see mli *)
-
-value keep_alive_condition request =
-  extract_param "POST /" ' ' request <> "" &&
-  String.lowercase (extract_param "connection: " '\n' request) = "keep-alive"
-;
-
 value treat_connection tmout callback addr fd =
   do {
     ifdef NOFORK then ()
@@ -373,14 +331,12 @@ value treat_connection tmout callback addr fd =
       flush stderr;
     }
     else do {
-      Buffer.clear buffer;
       try callback (addr, request) script_name contents with
       [ Unix.Unix_error Unix.EPIPE "write" _ -> ()
       | exc -> print_err_exc exc ];
       try wflush () with _ -> ();
       try flush stderr with _ -> ();
     };
-    keep_alive_condition request
   }
 ;
 
@@ -488,7 +444,6 @@ value wait_and_compact s =
 
 value skip_possible_remaining_chars fd =
   do {
-    let x = Unix.getpid () in
     let b = "..." in
     try
       loop () where rec loop () =
@@ -535,14 +490,14 @@ value accept_connection tmout max_clients callback s =
    j'ai l'impression que cette fermeture fait parfois bloquer le serveur...
               try Unix.close t with _ -> ();
 *)
-              let keep_alive = treat_connection tmout callback addr t in
-              if keep_alive then skip_possible_remaining_chars t else ()
+              treat_connection tmout callback addr t;
             }
             with exc ->
               try do { print_err_exc exc; flush stderr; }
               with _ -> ();
             try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
             try Unix.shutdown Unix.stdout Unix.SHUTDOWN_SEND with _ -> ();
+            skip_possible_remaining_chars t;
             try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
             try Unix.shutdown Unix.stdin Unix.SHUTDOWN_RECEIVE with _ -> ();
             exit 0
@@ -562,54 +517,45 @@ value accept_connection tmout max_clients callback s =
       [ Unix.Unix_error _ _ _ -> ()
       | exc -> do { cleanup (); raise exc } ];
       cleanup ();
-      let keep_alive =
-        ifdef SYS_COMMAND then
-          let comm =
-            let stringify_if_spaces s =
-              try let _ = String.index s ' ' in "\"" ^ s ^ "\"" with
-              [ Not_found -> s ]
-            in
-            List.fold_left (fun s a -> s ^ stringify_if_spaces a ^ " ") ""
-              (Array.to_list Sys.argv) ^
-            "-wserver " ^ string_of_sockaddr addr
+      ifdef SYS_COMMAND then
+        let comm =
+          let stringify_if_spaces s =
+            try let _ = String.index s ' ' in "\"" ^ s ^ "\"" with
+            [ Not_found -> s ]
           in
-          let _ = Sys.command comm in False
-        else if noproc.val then do {
-          let fd = Unix.openfile sock_in.val [Unix.O_RDONLY] 0 in
-          let oc = open_out_bin sock_out.val in
-          wserver_oc.val := oc;
-          let keep_alive = treat_connection tmout callback addr fd in
-          flush oc;
-          close_out oc;
-          Unix.close fd;
-          keep_alive
-        }
-        else
-          let pid =
-            let env =
-              Array.append (Unix.environment ())
-                [| "WSERVER=" ^ string_of_sockaddr addr |]
-            in
-            let args = Array.map (fun x -> "\"" ^ x ^ "\"") Sys.argv in
-            Unix.create_process_env Sys.argv.(0) args env Unix.stdin
-              Unix.stdout Unix.stderr
+          List.fold_left (fun s a -> s ^ stringify_if_spaces a ^ " ") ""
+            (Array.to_list Sys.argv) ^
+          "-wserver " ^ string_of_sockaddr addr
+        in
+        let _ = Sys.command comm in ()
+      else if noproc.val then do {
+        let fd = Unix.openfile sock_in.val [Unix.O_RDONLY] 0 in
+        let oc = open_out_bin sock_out.val in
+        wserver_oc.val := oc;
+        treat_connection tmout callback addr fd;
+        flush oc;
+        close_out oc;
+        Unix.close fd;
+      }
+      else
+        let pid =
+          let env =
+            Array.append (Unix.environment ())
+              [| "WSERVER=" ^ string_of_sockaddr addr |]
           in
-          let _ = Unix.waitpid [] pid in
-          let keep_alive =
-            let ic = open_in_bin sock_in.val in
-            let request = get_request (Stream.of_channel ic) in
-            let keep_alive = keep_alive_condition request in
-            do {
-              close_in ic;
-              keep_alive
-            }
-          in
-          keep_alive
-      in
+          let args = Array.map (fun x -> "\"" ^ x ^ "\"") Sys.argv in
+          Unix.create_process_env Sys.argv.(0) args env Unix.stdin
+            Unix.stdout Unix.stderr
+        in
+        let _ = Unix.waitpid [] pid in
+        let ic = open_in_bin sock_in.val in
+        let request = get_request (Stream.of_channel ic) in
+        close_in ic
+      ;
       let cleanup () =
         do {
-          if keep_alive then skip_possible_remaining_chars t else ();
           try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
+          skip_possible_remaining_chars t;
           try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
           try Unix.close t with _ -> ();
         }
