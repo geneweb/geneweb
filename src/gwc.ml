@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.10 1998-12-16 17:36:30 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.11 1999-01-12 12:35:18 ddr Exp $ *)
 
 open Def;
 open Check;
@@ -611,8 +611,8 @@ and [options] are:";
 value print_exc =
   fun
   [ Failure txt ->
-      do Printf.eprintf "Failed: %s\n" txt;
-         flush stderr;
+      do Printf.printf "Failed: %s\n" txt;
+         flush stdout;
       return exit 2
   | exc -> Printexc.catch raise exc ]
 ;
