@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 3.3 1999-11-13 08:11:53 ddr Exp $ *)
+(* $Id: some.ml,v 3.4 1999-11-23 10:35:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -179,7 +179,7 @@ value first_name_print conf base x =
       (fun x -> x.first_name) x
   in
   let list =
-    List.map (fun (str, istr, iperl) -> (Name.strip_lower str, ([str], iperl)))
+    List.map (fun (str, istr, iperl) -> (Name.lower str, ([str], iperl)))
       list
   in
   let list = List.fold_right merge_insert list [] in
