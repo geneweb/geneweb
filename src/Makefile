@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.20 1999-09-14 22:33:40 ddr Exp $
+# $Id: Makefile,v 2.21 1999-09-20 04:13:01 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -68,6 +68,9 @@ mostdesc.opt: $(MOSTDESC_OBJS:.cmo=.cmx)
 
 fpla.out: $(FPLA_OBJS)
 	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(FPLA_OBJS) -o fpla.out
+
+fpla.opt: $(FPLA_OBJS:.cmo=.cmx)
+	$(OCAMLOPT) unix.cmxa $(LIBUNIX) $(FPLA_OBJS:.cmo=.cmx) -o fpla.opt
 
 i18n_check.out: i18n_check.cmo
 	$(OCAMLC) i18n_check.cmo -o i18n_check.out
