@@ -2,6 +2,8 @@ GeneWeb version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [08 Nov 02] Fixed bad (strange) displaying of French Republican
+    and Hebrew dates when the precision is not "Sure".
   - [06 Nov 02] In family form, one can now set the sex of created
     witnesses.
   - [30 Oct 02] In places/surnames pages, now the surname links point
