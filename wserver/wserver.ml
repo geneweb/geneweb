@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 1.2 1998-09-04 15:04:54 ddr Exp $ *)
+(* $Id: wserver.ml,v 1.3 1998-09-08 09:13:28 ddr Exp $ *)
 
 open Unix;
 
@@ -270,11 +270,11 @@ value is_robot robot_excluder addr =
           count r where rec count =
             fun
             [ [t :: tl] ->
-(**)
-                if tm -. t < float sec then
 (*
-                if tm - t < sec then
+                if tm -. t < float sec then
 *)
+                if tm - t < sec then
+(**)
                   let (cnt, tl) = count tl in (cnt + 1, [t :: tl])
                 else (0, [])
             | [] -> (0, []) ]

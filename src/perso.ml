@@ -1,4 +1,4 @@
-(* $Id: perso.ml,v 1.1.1.1 1998-09-01 14:32:06 ddr Exp $ *)
+(* $Id: perso.ml,v 1.2 1998-09-08 09:13:27 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -582,7 +582,7 @@ value print conf base p =
      [ "" -> ()
      | s ->
          if age_autorise conf base p then
-           Wserver.wprint "<em>%s.</em>\n<br>\n" (capitale s)
+           Wserver.wprint "<em>%s</em>\n<br>\n" (capitale s)
          else () ];
      print_dates conf base p;
      if age_autorise conf base p && a.consang != Adef.fix (-1) &&

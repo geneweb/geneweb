@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.1.1.1 1998-09-01 14:32:04 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.2 1998-09-08 09:13:25 ddr Exp $ *)
 
 open Def;
 open Check;
@@ -132,7 +132,7 @@ value title_unique_string gen t =
 ;
 
 value find_person_by_name gen first_name surname occ =
-  let s = Name.strip_lower (first_name ^ "." ^ string_of_int occ ^ surname) in
+  let s = Name.crush_lower (first_name ^ " " ^ surname) in
   let key = Hashtbl.hash s in
   let ipl = Mhashtbl.find_all gen.g_names key in
   let first_name = Name.strip_lower first_name in
@@ -150,7 +150,7 @@ value find_person_by_name gen first_name surname occ =
 ;
 
 value add_person_by_name gen first_name surname occ iper =
-  let s = Name.strip_lower (first_name ^ "." ^ string_of_int occ ^ surname) in
+  let s = Name.crush_lower (first_name ^ " " ^ surname) in
   let key = Hashtbl.hash s in
   Mhashtbl.add gen.g_names key iper
 ;
