@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.31 1999-07-22 19:47:21 ddr Exp $ *)
+(* $Id: util.ml,v 2.32 1999-07-22 21:19:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -185,7 +185,12 @@ value calculer_age conf p =
   | Some d -> Some (temps_ecoule d conf.today) ]
 ;
 
-type gen_access = (base -> person -> string * base -> person -> string);
+type p_access = (base -> person -> string * base -> person -> string);
+value std_access = (p_first_name, p_surname);
+value raw_access =
+  (fun base p -> sou base (p.first_name),
+   fun base p -> sou base (p.surname))
+;
 
 value gen_person_text (p_first_name, p_surname) conf base p =
   let beg =
@@ -199,9 +204,7 @@ value gen_person_text (p_first_name, p_surname) conf base p =
   beg ^ " " ^ p_surname base p
 ;
 
-value person_text = gen_person_text (p_first_name, p_surname);
-
-value person_text_no_html conf base p =
+value gen_person_text_no_html (p_first_name, p_surname) conf base p =
   let beg =
     match (sou base p.public_name, p.nick_names) with
     [ ("", [nn :: _]) -> p_first_name base p ^ " " ^ sou base nn
@@ -211,6 +214,9 @@ value person_text_no_html conf base p =
   in
   beg ^ " " ^ p_surname base p
 ;
+
+value person_text = gen_person_text std_access;
+value person_text_no_html = gen_person_text_no_html std_access;
 
 value person_text_without_surname conf base p =
   match (sou base p.public_name, p.nick_names) with
@@ -287,14 +293,18 @@ value reference conf base p s =
   else "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">" ^ s ^ "</a>"
 ;
 
-value referenced_person_title_text conf base p =
+value gen_referenced_person_title_text p_access conf base p =
   if p.access <> Private || conf.friend || conf.wizard then
     match main_title base p with
     [ Some t ->
         reference conf base p (titled_person_text conf base p t) ^
         one_title_text conf base p t
-    | None -> reference conf base p (person_text conf base p) ]
-  else reference conf base p (person_text conf base p)
+    | None -> reference conf base p (gen_person_text p_access conf base p) ]
+  else reference conf base p (gen_person_text p_access conf base p)
+;
+
+value referenced_person_title_text =
+  gen_referenced_person_title_text std_access
 ;
 
 value afficher_personne_un_titre conf base p t =
@@ -454,9 +464,8 @@ value plus_decl s =
   | None -> None ]
 ;
 
-value transl_decline conf w s =
+value gen_decline conf wt s =
   let s1 = if s = "" then "" else " " ^ s in
-  let wt = transl conf w in
   let len = String.length wt in
   if wt.[len - 1] = ''' then
     if String.length s > 0 && start_with_vowel s then
@@ -472,12 +481,18 @@ value transl_decline conf w s =
     | _ -> wt ^ decline 'n' s1 ]
 ;
 
-value ftransl conf (s : format 'a 'b 'c) : format 'a 'b 'c =
-  Obj.magic transl conf s
+value transl_decline conf w s = gen_decline conf (transl conf w) s;
+
+value ftransl conf s : format 'a 'b 'c =
+  Obj.magic (transl conf (Obj.magic (s : format 'a 'b 'c) : string))
 ;
 
-value ftransl_nth conf (s : format 'a 'b 'c) p : format 'a 'b 'c =
-  Obj.magic transl_nth conf s p
+value ftransl_nth conf s p : format 'a 'b 'c =
+  Obj.magic (transl_nth conf (Obj.magic (s : format 'a 'b 'c) : string) p)
+;
+
+value fdecline conf w s : format 'a 'b 'c =
+  Obj.magic (gen_decline conf (Obj.magic (w : format 'a 'b 'c) : string) s)
 ;
 
 value index_of_sex =
