@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.210 2001-01-27 21:40:09 ddr Exp $
+# $Id: lexicon.txt,v 3.211 2001-01-30 01:55:51 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -2355,10 +2355,6 @@ no: forsvunnet
 pt: desaparecido/desaparecida/desaparecido(a)
 ru: исчез/исчезла
 se: f&ouml;rsvunnen
-
-    display by slices of %t characters
-en: display by slices of %t characters
-fr: affichage par tranches de %t caract&egrave;res
 
     divorce
 af: geskei
