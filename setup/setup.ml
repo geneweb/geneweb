@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.35 2002-03-06 04:08:48 ddr Exp $ *)
+(* $Id: setup.ml,v 4.36 2002-03-22 13:09:57 ddr Exp $ *)
 
 open Printf;
 
@@ -678,9 +678,18 @@ value out_name_of_gw in_file =
   else f
 ;
 
+value basename s =
+  loop (String.length s - 1) where rec loop i =
+    if i < 0 then s
+    else
+      match s.[i] with
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '_' | '.' -> loop (i - 1)
+      | _ -> String.sub s (i + 1) (String.length s - i - 1) ]
+;
+
 value setup_gen conf =
   match p_getenv conf.env "v" with
-  [ Some fname -> print_file conf fname
+  [ Some fname -> print_file conf (basename fname)
   | _ -> error conf "request needs \"v\" parameter" ]
 ;
 
