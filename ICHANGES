@@ -5,9 +5,15 @@ GeneWeb Version 3.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Nov 9, 99] Chop suffix ".gwb" if the base name has it in URL
   - [Nov 6, 99] The URL for the "up" image now independent from the data base
   - [Nov 5, 99] Red display title for not found persons.
   - [Nov 5, 99] Lengthened the height of the data base notes area.
+
+* Gedcom to GeneWeb (ged2gwb)
+  - [Nov 8, 99] Fixed little problem with TITL field: could sometimes create
+    bad titles names without label an place for gedcoms not coming from
+    GeneWeb
 
 GeneWeb Version 3.00
 --------------------

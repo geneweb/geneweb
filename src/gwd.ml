@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.4 1999-11-05 17:20:08 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.5 1999-11-09 06:33:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -423,6 +423,11 @@ value make_conf cgi (addr, request) str env =
     in
     let ip = index '_' base_passwd in
     let base_file = String.sub base_passwd 0 ip in
+    let base_file =
+      if Filename.check_suffix base_file ".gwb" then
+        Filename.chop_suffix base_file ".gwb"
+      else base_file
+    in
     let (passwd, env) =
       let has_passwd = List.mem_assoc "w" env in
       let (x, env) = extract_assoc "w" env in

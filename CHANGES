@@ -2,8 +2,8 @@ GeneWeb version 3.01
 --------------------
 
 * Setup program (gwsetup)
-  - [Nov 7, 99] Fixed problem in Windows version: images did not appear in
-    Netscape...
+  - [Nov 7, 99] Fixed problem in Windows version under Netscape: images did
+    not appear...
 
 * Gedcom to GeneWeb (ged2gwb)
   - [Nov 5, 99] Accept roman digits in years of French Republican dates.

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.3 1999-11-05 17:33:44 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.4 1999-11-09 06:33:43 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -959,12 +959,13 @@ value treat_indi_title gen public_name r =
     [ Some r -> decode_date_interval r.rpos r.rval
     | None -> (None, None) ]
   in
-  let name =
+  let (name, title, place) =
     match find_field "NOTE" r.rsons with
     [ Some r ->
-        if r.rval = public_name then Tmain
-        else Tname (add_string gen (strip_spaces r.rval))
-    | None -> Tnone ]
+        if title = "" then (Tnone, strip_spaces r.rval, "")
+        else if r.rval = public_name then (Tmain, title, place)
+        else (Tname (add_string gen (strip_spaces r.rval)), title, place)
+    | None -> (Tnone, title, place) ]
   in
   {t_name = name; t_ident = add_string gen title;
    t_place = add_string gen place;
