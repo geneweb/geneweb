@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 2.7 1999-08-13 03:35:20 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 2.8 1999-09-25 08:28:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -155,27 +155,22 @@ value print_mod_merge_ok conf base wl p =
   return ()
 ;
 
-value effective_mod_merge conf base p =
+value effective_mod_merge conf base sp =
   match p_getint conf.env "i2" with
   [ Some i2 ->
       let p2 = base.data.persons.get i2 in
-      let a1 = aoi base p.cle_index in
+      let a1 = aoi base sp.cle_index in
       let a2 = aoi base p2.cle_index in
       do match (a1.parents, a2.parents) with
          [ (None, Some ifam) ->
              let fam = foi base ifam in
              do replace 0 where rec replace i =
                   if fam.children.(i) = p2.cle_index then
-                    fam.children.(i) := p.cle_index
+                    fam.children.(i) := sp.cle_index
                   else replace (i + 1);
                 a1.parents := Some ifam;
                 a1.consang := Adef.fix (-1);
-                base.func.patch_ascend p.cle_index a1;
-(* unuseful, if I understand my code... 'cause of effective_del below...
-                a2.parents := None;
-                a2.consang := Adef.fix (-1);
-                base.func.patch_ascend p2.cle_index a2;
-*)
+                base.func.patch_ascend sp.cle_index a1;
                 base.func.patch_family ifam fam;
              return ()
          | _ -> () ];
@@ -187,7 +182,7 @@ value effective_mod_merge conf base p =
          Update.update_misc_names_of_family base p2;
          base.func.patch_person p2.cle_index p2;
       return
-      let p = UpdateIndOk.effective_mod conf base p in
+      let p = UpdateIndOk.effective_mod conf base sp in
       do for i = 0 to Array.length p2_family - 1 do
            let ifam = p2_family.(i) in
            let cpl = coi base ifam in
@@ -199,10 +194,6 @@ value effective_mod_merge conf base p =
            return ();
          done;
          p.family := Array.append p.family p2_family;
-(* unuseful, if I understand my code... already done above in the only
-   useful cases...
-         base.func.patch_ascend p.cle_index a1;
-*)
          Update.update_misc_names_of_family base p;
          base.func.patch_person p.cle_index p;
          Gutil.check_noloop_for_person_list base (Update.error conf base)
@@ -211,7 +202,9 @@ value effective_mod_merge conf base p =
       let wl =
         UpdateIndOk.all_checks_person conf base p (aoi base p.cle_index)
       in
+      let key = (sp.first_name, sp.surname, sp.occ) in
       do base.func.commit_patches ();
+         History.record conf base key "fp";
          print_mod_merge_ok conf base wl p;
       return ()
   | _ -> incorrect_request conf ]

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 2.4 1999-09-14 22:33:53 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 2.5 1999-09-25 08:28:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -44,7 +44,8 @@ value print_merge1 conf base fam fam2 digest =
   let title _ =
     let s = transl_nth conf "family/families" 1 in
     Wserver.wprint "%s # %d"
-      (capitale (transl_decline conf "merge" s)) (Adef.int_of_ifam fam.fam_index)
+      (capitale (transl_decline conf "merge" s))
+      (Adef.int_of_ifam fam.fam_index)
   in
   let cpl =
     Gutil.map_couple_p (UpdateFam.person_key base) (coi base fam.fam_index)
@@ -54,9 +55,9 @@ value print_merge1 conf base fam fam2 digest =
      tag "form" "method=POST action=\"%s\"" conf.command begin
        Srcfile.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=MRG_MOD_FAM_OK>\n";
+       Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
        Wserver.wprint "<input type=hidden name=i value=%d>\n"
          (Adef.int_of_ifam fam.fam_index);
-       Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
        Wserver.wprint "<input type=hidden name=i2 value=%d>\n"
          (Adef.int_of_ifam fam2.fam_index);
        match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
@@ -65,6 +66,9 @@ value print_merge1 conf base fam fam2 digest =
               Wserver.wprint "<input type=hidden name=ini2 value=%d>\n" i2;
            return ()
        | _ -> () ];
+       match p_getenv conf.env "ip" with
+       [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
+       | None -> () ];
        Wserver.wprint "\n";
        UpdateFam.print_family conf base fam cpl False;
        Wserver.wprint "\n";
@@ -122,7 +126,13 @@ value effective_mod_merge conf base sfam scpl =
       do UpdateFamOk.effective_del conf base fam2; return
       let (fam, cpl) = UpdateFamOk.effective_mod conf base sfam scpl in
       let wl = UpdateFamOk.all_checks_family conf base fam cpl in
+      let (fn, sn, occ, _) =
+        match p_getint conf.env "ip" with
+        [ Some i when Adef.int_of_iper cpl.mother = i -> scpl.mother
+        | _ -> scpl.father ]
+      in
       do base.func.commit_patches ();
+         History.record conf base (fn, sn, occ) "ff";
          print_mod_merge_ok conf base wl fam cpl;
       return ()
   | None -> incorrect_request conf ]
