@@ -1,4 +1,4 @@
-(* $Id: secure.ml,v 4.5 2005-03-01 05:50:43 ddr Exp $ *)
+(* $Id: secure.ml,v 4.6 2005-03-25 15:07:24 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 (* secure open; forbids to access anywhere in the machine;
@@ -13,7 +13,7 @@ value base_dir_r = ref Filename.current_dir_name;
 value decompose =
   loop [] where rec loop r s =
     let b = Filename.basename s in
-    if b = "" then
+    if b = "" || b = Filename.current_dir_name then
       let d = Filename.dirname s in
       if d = "" then r
       else if d = s then [d :: r]
