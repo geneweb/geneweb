@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.16 2000-10-02 12:10:57 ddr Exp $
+# $Id: Makefile,v 3.17 2000-10-25 02:34:55 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -79,7 +79,7 @@ i18n_check.out: i18n_check.cmo
 
 i18n: pr_transl.cmo always
 	if test -f i18n; then mv i18n i18n.bak; fi
-	unset LC_ALL; OBJS=`(grep -w -c "transl conf" *.ml;grep -w -c "transl_nth conf" *.ml) | grep -v :0 | sed s/:.*$$// | sort | uniq`; for i in $$OBJS; do echo $$i 1>&2; camlp4r pa_ifdef.cmo ./pa_lock.cmo ./pa_html.cmo ./pr_transl.cmo pa_extend.cmo $$i; done | sort | uniq > i18n
+	unset LC_ALL; OBJS=`(grep -w -c "transl conf" *.ml; grep -w -c "transl_nth conf" *.ml) | grep -v :0 | sed s/:.*$$// | sort | uniq`; (for i in $$OBJS; do echo $$i 1>&2; camlp4r pa_ifdef.cmo ./pa_lock.cmo ./pa_html.cmo ./pr_transl.cmo pa_extend.cmo $$i; done; grep -h "\[" ../hd/etc/*.txt ../hd/lang/advanced.txt | sed -e "s/^.*\[\*\?//" -e "s/].*$$//") | sort | uniq > i18n
 
 always:
 

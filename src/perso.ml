@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.62 2000-10-24 15:47:13 ddr Exp $ *)
+(* $Id: perso.ml,v 3.63 2000-10-25 02:34:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1142,19 +1142,21 @@ value iter_first f al =
 ;
 
 value open_templ conf dir name =
-  if dir = "" then
-    let fname =
-      List.fold_right Filename.concat [lang_dir.val; "etc"]
-        (name ^ ".txt")
-    in
-    try Some (open_in fname) with [ Sys_error _ -> None ]
+  let std_fname =
+    List.fold_right Filename.concat [lang_dir.val; "etc"] (name ^ ".txt")
+  in
+  if dir = "" then try Some (open_in std_fname) with [ Sys_error _ -> None ]
   else
     let dir = Filename.basename dir in
     let fname =
       List.fold_right Filename.concat [base_dir.val; "etc"; dir]
         (name ^ ".txt")
     in
-    try Some (open_in fname) with [ Sys_error _ -> None ]
+    try Some (open_in fname) with
+    [ Sys_error _ ->
+        if dir = conf.bname then
+          try Some (open_in std_fname) with [ Sys_error _ -> None ]
+        else None ]
 ;
 
 (* 1/ Parsing template *)
@@ -2410,7 +2412,7 @@ value print_ok conf base p =
         else
           loop list (i + 1) (Buff.store len s.[i])
     with
-    [ Not_found -> ["*"] ]
+    [ Not_found -> [conf.bname; "*"] ]
   in
   let templ =
     match p_getenv conf.env "templ" with
@@ -2425,6 +2427,7 @@ value print_ok conf base p =
   match templ with
   [ None -> Classic.print_ok conf base p
   | Some dir ->
+      let dir = Filename.basename dir in
       match open_templ conf dir "perso" with
       [ Some ic ->
           do html conf; copy_from_templ conf base ic p; return ()
@@ -2433,7 +2436,8 @@ value print_ok conf base p =
           do Util.header conf title;
              tag "ul" begin
                html_li conf;
-               Wserver.wprint "Cannot access file \"%s.txt\".\n" "perso";
+               Wserver.wprint "Cannot access file \"%s/%s.txt\".\n"
+                 dir "perso";
              end;
              Util.gen_trailer True conf;
           return raise Exit ] ]
