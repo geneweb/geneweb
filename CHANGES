@@ -9,8 +9,6 @@ GeneWeb version 2.05
     problem.
 
 * Setup program
-  - [Jul 15, 99] Added ability to cancel GeneWeb links in relationship
-    computing.
   - [Jul 15, 99] Changed GEDCOM export menu to reflect new option "-charset"
     of "gwb2ged" (see below in section "GeneWeb to Gedcom").
   - [Jul 2, 99] Fixed bug: importing GeneWeb base from old version passing
@@ -19,6 +17,8 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jul 15, 99] Added ability to cancel GeneWeb links in relationship
+    computing.
   - [Jul 15, 99] Added system of grammar declinations (required by German,
     Esperanto, (future) Czech). Changed the lexicon to use this new system.
   - [Jul 9, 99] Added link (upper arrow) to welcome page in displayings by
