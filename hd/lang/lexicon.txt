@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.106 2002-09-26 19:12:33 ddr Exp $
+# $Id: lexicon.txt,v 4.107 2002-10-28 10:33:32 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -473,6 +473,7 @@ et: tishrei/chesvan/kislev/tevet/shvat/adar I/adar II/nisan/iyyar/sivan/tammuz/a
 fi: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 he: תשרי/ חשון/ כסלו/ טבת/ שבט/ אדר א'/ אדר ב'/ ניסן/ אייר/ סיון/ תמוז/ אב/ אלול
+it: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar 1/Adar 2/Nisan/Iyar/Sivan/Tammuz/Av/Elul
 lv: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 nl: Tishri/Marcheswan/Kislew/Tebeth/Shebat/Adar/Adar2/Niesan/Ijjar/Siwan/Tammuz/Ab/Elul
 no: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
