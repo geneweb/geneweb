@@ -11,11 +11,11 @@ GeneWeb version 3.03
 
 * GeneWeb Service/CGI (gwd)
   - [05 Mar 00] In birthday anniversaries for close parents (accessible
-    in "cousin" page), the links give now the relationship trees, instead
-    of the persons.
+    in "cousin" page for "friends" and "wizards"), the links give now the
+    relationship trees, instead of the persons.
   - [04 Mar 00] In person and family forms, added input area to specify
     a number greater than 1 of titles and children to insert.
-  - [24 Feb 00] In latest births and deaths, display by month.
+  - [24 Feb 00] In latest births and deaths pages, display monthes.
   - [02 Feb 00] In personal pages, relations are now displayed before notes.
   - [20 Jan 00] When sorting the children, use now the baptism date
     when there is no birth date.
@@ -24,12 +24,12 @@ GeneWeb version 3.03
     it did not work (incorrect URL).
 
 * Gedcom to GeneWeb (ged2gwb)
-  - [19 Feb 00] Added option "-uin" (untreated in notes) to put unused
-    Gedcom tags (of indiduals) in notes.
+  - [19 Feb 00] Added option "-uin" (untreated in notes) asking to put
+    unused Gedcom tags (of indiduals) in notes.
 
 * Base configuration files (base.gwf)
   - [24 Feb 00] Added variable "latest_event" to give the number of latest
-    events (births, deaths) displayed.
+    events (births, deaths) displayed (default: 10).
   - [25 Jan 00] Added variable "public_if_titles": if "yes", consider persons
     having nobility titles as public ("public" means that their private data
     is displayed even if their dates is less than 150 years). Warning: the
@@ -54,7 +54,7 @@ GeneWeb version 3.03
 * Documentation
   - [17..25 Feb 00] Added a new chapter "Keeping data divided inside a
     database" (written by Lars Gustavsson: thanks, Lars!). Only
-    English and Swedish version for the moment.
+    English and Swedish versions for the moment.
   - [11 Feb 00] Changed some Swedish files (Lars Gustavsson).
   - [03 Feb 00] In chapter "modifications" (update.htm), section 1,
     added a footnote to explain that it is better to use western Europe
