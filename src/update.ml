@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.27 1999-09-28 20:11:28 ddr Exp $ *)
+(* $Id: update.ml,v 2.28 1999-10-10 20:30:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -70,6 +70,7 @@ value print_same_name conf base p =
                        (p_first_name base p) p.occ
                        (p_surname base p);
                    end;
+                   Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
                 return ())
              pl;
          end;
