@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.30 2002-04-22 17:14:43 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.31 2002-05-27 09:27:18 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -90,6 +90,7 @@ fr: Vous pouvez sélectionner une autre langue d'affichage
     parmi les suivantes:
 it: Potete scegliere un'altra lingua fra le seguenti:
 lv: Jûs variet apskatît datu bâzi arî citâs sekojoðâs valodâs:
+nl: U kunt een andere taal kiezen uit een van de volgende mogelijkheden:
 no: Du kan velge sidevisning p&aring; et annet spr&aring;k blant
     f&oslash;lgende:
 pl: Mo¿esz wybraæ inny jêzyk spo¶ród nastêpuj±cych:
@@ -844,6 +845,9 @@ lv: Ja Jûsu Interneta caurlûkprogramma automâtiski nepârlâdç lappuses pçc
     veiktajâm izmaiòâm (tâdçjâdi radot Jums nepiecieðamîbu "pârlâdçt
     tekoðo dokumentu"), tad pamçìiniet uzklikðíinât <a
     href="%sescache=0">ðeit</a>.
+nl: Indien Uw browser de gewijzigde pagina's niet automatisch toont (maar dit
+    alleen doet na klikken op "Vernieuwen"), probeer het dan eens via
+    <a href="%sescache=0">deze link</a>.
 no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever 
     oppfrisking av den aktuelle siden), prøv da å navigere <a
     href="%sescache=0">herfra</a>.
