@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.147 2000-07-23 18:50:07 ddr Exp $
+# $Id: lexicon.txt,v 3.148 2000-08-06 13:44:06 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2369,6 +2369,7 @@ fi: kihloissa
 fr: fianc&eacute;s
 lv: saderin&acirc;ti
 nl: verloofd
+no: forlovet
 pt: Noivos
 se: f&ouml;rlovad
 
@@ -2381,6 +2382,7 @@ fi: kihlattu%t
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
 lv: saderin&acirc;ts%t ar
 nl: verloofd%t met
+no: forlovet%t med
 pt: noivo%t de/noiva%t de
 se: f&ouml;rlovad%t med
 
@@ -5345,6 +5347,7 @@ eo: statistikoj
 fr: statistiques
 lv: statistika
 nl: statistieken
+no: statistikk
 se: statistik
 
     surname alias
