@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 1.3 1998-10-14 17:03:49 ddr Exp $ *)
+(* $Id: date.ml,v 1.4 1998-10-15 12:17:45 ddr Exp $ *)
 
 open Def;
 open Util;
@@ -171,7 +171,7 @@ value afficher_dates_courtes conf base p =
          | _ -> () ];
          match (Adef.od_of_codate p.birth, p.death) with
          [ (Some _, Death _ _ | NotDead) -> Wserver.wprint "-"
-         | (_, Death _ _ | DeadDontKnowWhen) -> Wserver.wprint "+"
+         | (_, Death _ _ | DeadDontKnowWhen | DeadYoung) -> Wserver.wprint "+"
          | _ -> () ];
          match p.death with
          [ Death _ d ->
