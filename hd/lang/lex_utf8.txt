@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.2 2005-02-05 13:34:34 ddr Exp $
+# $Id: lex_utf8.txt,v 1.3 2005-02-05 14:29:20 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -3927,7 +3927,7 @@ cs: generace
 da: generation/generationer
 de: Generation/Generationen
 en: generation/generations
-eo: generacio/generacioj
+eo: generacio:a:+n/generacioj
 es: generaci&oacute;n/generaciones
 et: sugupõlv/sugupõlve
 fi: sukupolvi/sukupolvea
