@@ -15,6 +15,7 @@ de: , um den Ersten zu sehen
 en:  to see the first one
 es:  para ver la primera
 fr:  pour voir la premi&egrave;re
+it:  per vedere il primo
 nl:  om de eerste tak te zien
 pt:  para ver a primeira
 se:  f&ouml;r att se den f&ouml;rsta
@@ -24,8 +25,9 @@ de: , um die Erste zu sehen
 en:  to see the first one
 es:  para ver el primero
 fr:  pour voir le premier
+it:  per vedere il primo
 nl:  om de eerste te zien
-pt: para ver o primeiro
+pt:  para ver o primeiro
 se:  f&ouml;r att se den f&ouml;rsta
 
      to try again with this number, or do "back" and change it yourself
@@ -425,6 +427,7 @@ se: ca
     access
 de: Zugriff
 en: access
+es: accesso
 fr: acc&egrave;s
 it: accesso
 nl: toegang
@@ -446,8 +449,10 @@ se: l&auml;gg till
 cn: ∏ﬂº∂∑√Œ «Î«Û
 de: Erweiterte Suche
 en: advanced request
+es: avanzada consulta
 eo: progresata rekesto
 fr: requ&ecirc;te &eacute;volu&eacute;e
+it: avanzata richiesta
 nl: gedetailleerde opzoeking
 pt: investigaÁ&atilde;o complexa
 se: avancerad s&ouml;kning
@@ -668,6 +673,7 @@ se: samtidigt
     baptism
 de: Taufe
 en: baptism
+es: bautismo
 fr: bapt&ecirc;me
 nl: doop
 se: dop
@@ -775,7 +781,9 @@ se: gren/grenar
     burial
 de: Beisetzung
 en: burial
+es: entierro
 fr: enterrement
+it: sepoltura
 nl: begrafenis
 pt: enterro
 se: begravning
@@ -783,9 +791,11 @@ se: begravning
     buried
 de: beigesetzt
 en: buried
+es: nterrado/nterrada/nterrado(a)
 fr: enterr&eacute;/enterr&eacute;e/enterr&eacute;(e)
+it: sepolto/sepolta/sepolto(a)
 nl: begraven
-pt: enterrado
+pt: enterrado/enterrada/enterrado(a)
 se: begravd
 
     cannot access base
@@ -865,6 +875,7 @@ se: sl&auml;ktskap
     continue merging
 de: Zusammenf&uuml;hrung fortsetzen
 en: continue merging
+es: contin&uacute;e fusi&oacute;n
 fr: continuer &agrave; fusionner
 nl: verdergaan met samenvoegen
 pt: continuar fus&atilde;o
@@ -886,6 +897,7 @@ de: erzeugen
 en: create
 es: crear
 fr: cr&eacute;er
+it: creare
 nl: maken
 pt: crear
 se: skapa
@@ -893,9 +905,11 @@ se: skapa
     cremated
 de: einge&auml;schert
 en: cremated
+es: incinerado/incinerada/incinerado(a)
 fr: incin&eacute;r&eacute;/incin&eacute;r&eacute;e/incin&eacute;r&eacute;(e)
+it: cremato/cremata/cremato(a)
 nl: gecremeerd
-pt: incinerado(a)
+pt: incinerado/incinerada/incinerado(a)
 se: kremerad
 
     date
@@ -1313,6 +1327,7 @@ se: man/hustru
     if titles
 de: eingeschr&auml;nkt
 en: if titles
+es: si t&iacute;tulos
 fr: si titres
 nl: als titels
 pt: si t&iacute;tulos
@@ -1345,6 +1360,7 @@ se: i
     incompatible sexes
 de: unvertr&aml;gliche Geschlechter
 en: incompatible sexes
+es: sexos incompatibles
 fr: sexes incompatibles
 nl: geslacht komt niet overeen
 pt: sexos incompativeis
@@ -1408,6 +1424,7 @@ se: f&ouml;rteckning &ouml;ver gem&aring;lerna (icke &auml;ttlingar)
     insert
 de: einf&uuml;gen
 en: insert
+es: insertar
 fr: ins&eacute;rer
 nl: invoegen
 pt: inserir
@@ -1594,6 +1611,7 @@ se: kanske
     merge
 de: zusammenf&uuml;hren
 en: merge
+es: fusionar
 fr: fusionner
 nl: samenvoegen
 pt: fus&atilde;o
@@ -1602,6 +1620,7 @@ se: sl&aring;samman
     merge done
 de: Zusammenf&uuml;hrung abgeschlossen
 en: merge done
+es: fusi&oacute;n hecha
 fr: fusion termin&eacute;e
 nl: samenvoeging is gedaan
 pt: fus&atilde;o terminada
@@ -1641,6 +1660,7 @@ se: m&aring;nader gammal
     more than %d answers
 de: mehr als %d Antworten
 en: more than %d answers
+es: m&aacute;s de %d respuestas
 fr: plus de %d r&eacute;ponses
 nl: meer dan %d antwoorden
 pt: m&aacute;s de %d respostas
@@ -1728,6 +1748,7 @@ se: ingen k&auml;nd sl&auml;ktskap emellan %t och %t
     no match
 de: keine passenden Eintr&auml;ge
 en: no match
+es: ninguna respuesta
 fr: aucune r&eacute;ponse
 nl: niets gevonden
 pt: nenhuma resposta
@@ -1854,6 +1875,7 @@ se: till
 
     of %t's side
 en: of %t's side
+es: de la cara de %t
 fr: du c&ocirc;t&eacute; de %t
 nl: langs de zijde van %t
 se: fr&aring;n %t sl&auml;ktsida
@@ -2088,7 +2110,9 @@ se: plats
     private
 de: privat
 en: private
+es: privado
 fr: priv&eacute;
+it: riservato
 nl: priv&eacute;
 pt: privado
 se: privat
@@ -2106,6 +2130,7 @@ se: trolig rundg&aring;ng i databasen: n&aring;gon &auml;r hans/hennes egen sl&a
     public
 de: &ouml;ffentlich
 en: public
+es: p&uacute;blico
 eo: publika
 fr: public
 it: pubblico
@@ -2194,7 +2219,9 @@ se: se vidare
     several answers
 de: mehrere Antworten
 en: several answers
+es: varias respuestas
 fr: plusieurs r&eacute;ponses
+it: parecchie risposte
 nl: meerdere antwoorden
 pt: varias respostas
 se: flera svar
@@ -2248,6 +2275,7 @@ de: Quelle/Quellen
 en: source/sources
 es: fuente/fuentes
 fr: source/sources
+it: sorgente/sorgenti
 nl: bron/bronnen
 pt: fonte/fontes
 se: k&auml;llor
@@ -2483,6 +2511,7 @@ de: die Datei ist z.Z. gesch&uuml;tzt: versuchen Sie es bitte noch mal
 en: the file is temporarily locked: please try again. If it still does not work, wait a while before trying again
 es: la base est&aacute; temporalmente cerrada: ensayar de nuevo. Si no funciona, espere un instante antes de ensayar
 fr: le fichier est temporairement verrouill&eacute: essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de r&eacute;essayer
+it: l'archivio &egrave; temporaneamente locked: prego prova ancora. Se ancora non funziona, attendere un istante prima di provare ancora
 nl: de informatie is tijdelijk ontoegankelijk: probeer later
 pt: a base esta temporalmente fechada: tentar novamente. Si n&atilde;o funciona, espere um momento antes de tentar
 se: filen &auml;r tempor&auml;rt l&aring;st: f&ouml;rs&ouml;k igen. Om det &auml;nd&aring; inte fungerar, v&auml;nta ett tag innan n&auml;sta f&ouml;rs&ouml;k
@@ -2701,6 +2730,7 @@ de: unbekannte Person
 en: unknown person
 es: persona no conocida
 fr: personne inconnue
+it: sconosciuta persona
 nl: onbekend persoon
 pt: pessoa n&atilde;o conhecida
 se: ok&auml;nd person
@@ -2787,14 +2817,18 @@ se: &aring;r gammal
     you must first merge
 de: Sie m&uuml;ssen erst zusammenf&uuml;hren
 en: you must first merge
+es: debe primero fusionar
 fr: vous devez d'abord fusionner
+it: dovete in primo luogo fondere
 nl: je moet eerst samenvoegen
 se: du m&aring;ste f&ouml;rst sl&aring;samman
 
     you must first merge the 2 families
 de: Sie m&uuml;ssen erst beide Familien zusammenf&uuml;hren
 en: you must first merge the 2 families
+es: debe primero fusionar las 2 familias
 fr: vous devez d'abord fusionner les 2 familles
+it: dovete in primo luogo fondere le 2 famiglie
 nl: je moet de twee families eerst samenvoegen
 pt: VocÍ tem que fusionar primeiro as 2 familias
 se: du m&aring;ste f&ouml;rst sl&aring;samman de 2 familjerna
