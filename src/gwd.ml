@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.22 2000-03-18 19:00:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.23 2000-03-19 17:57:53 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -648,7 +648,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     | _ ->
         if cgi then (command, passwd)
         else if passwd = "" then (base_file, "")
-        else (base_file ^ "_" ^ passwd, "") ]
+        else (base_file ^ "_" ^ passwd, passwd) ]
   in
   let user =
     match lindex user ':' with
