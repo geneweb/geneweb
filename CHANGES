@@ -19,6 +19,7 @@ GeneWeb version 3.11
     father's (default = no).
 
 * Lexicon (lang/lexicon.txt)
+  - [30 Dec 00] Fixed German translations (Frank Komarek + Falko Trojahn)
   - [29 Dec 00] Fixed some Spanish translations (Frank Komarek)
 
 GeneWeb version 3.10
