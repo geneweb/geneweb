@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.239 2001-02-21 12:28:19 ddr Exp $
+# $Id: lexicon.txt,v 3.240 2001-02-23 12:48:48 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -43,7 +43,7 @@ is: af=afrikanska/cn=kínverska/cs=tékkneska/dk=danska/nl=hollenska/en=enska/eo=e
 it: af=africano/cn=cinese/cs=ceco/de=tedesco/dk=danese/en=inglese/eo=esperanto/es=spagnolo/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pt=portoghese/ru=russo/se=svedese
 lv: cn=Íînieðu/cs=Èehu/dk=Dâòu/nl=Holandieðu/en=Angïu/eo=Esperanto/fi=Somu/fr=Franèu/de=Vâcu/he=Ebreju/is=Islandieðû/it=Itâïu/lv=Latvieðu/no=Norvçìu/pt=Portugâïu/es=Spâòu/ru=Krievu/se=Zviedru
 nl: af=Afrikaans/cn=Chinees/cs=Tsjechisch/dk=Deens/nl=Nederlands/en=Engels/eo=Esperanto/fi=Fins/fr=Frans/de=Duits/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/no=Noors/pt=Portugees/es=Spaans/ru=Russisch/se=Zweeds
-no: af=afrikaans/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
+no: af=afrikaans/cn=kinesisk/cs=tjekkisk/ct=katalansk/dk=dansk/en=engelsk/eo=esperanto/et=estisk/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
 pt: af=Afrikaans/cn=Chin&ecirc;/cs=Checo/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;/en=Ingl&ecirc;/eo=Esperanto/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
 se: af=afrikaans/dk=danska/en=engelska/eo=esperanto/et=estniska/fi=finska/fr=franska/he=hebreiska/nl=holländska/is=isländska/it=italienska/cn=kinesiska/lv=litauiska/no=norska/pt=portugisiska/ru=ryska/es=spanska/se=svenska/cs=tjeckiska/de=tyska
 
@@ -4631,6 +4631,7 @@ dk: ingen verificering af k&oslash;nnene
 en: no sexes check
 fr: pas de v&eacute;rification des sexes
 nl: Geslachten niet verifi&euml;ren
+no: ikke kontroll av kj&oslash;nn
 pt: não verificar os sexos
 se: ingen kontroll av könen
 
