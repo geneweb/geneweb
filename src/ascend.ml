@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.40 2000-07-30 13:10:38 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.41 2000-07-31 22:10:27 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1492,10 +1492,10 @@ type cell = [ Cell of person and
          1
 
 1) Build list of levels (t1 = True for parents flag, size 1)
-   => [ [8At1 E E] [4Lt1 5Rt1 7At1] [2Lt1 3Rt1] [1At1] ] 
+   => [ [8At1 E E] [4Lt1 5Rt1 7At1] [2Lt1 3Rt1] [1Ct1] ] 
 
 2) Enrich list of levels (parents flag, sizing)
-   => [ [8At1 E E] [4Lt1 5Rf1 7Af1] [2Lt3 3Rt1] [1At5] ]
+   => [ [8At1 E E] [4Lt1 5Rf1 7Af1] [2Lt3 3Rt1] [1Ct5] ]
 
 3) Display it
     For each cell:
@@ -1525,15 +1525,23 @@ value rec enrich lst1 lst2 =
   ]
 ;
     
+value is_empty lst =
+  List.fold_left
+    (fun test po -> test && (po == Empty)
+    ) True lst
+;
+     
 value rec enrich_tree lst =
   match lst with
   [ [] -> []
   | [head :: tail] ->
-      match tail with
-      [ [] -> [head]
-      | [thead :: ttail] ->
-          [head :: enrich_tree [(enrich head thead) :: ttail]]
-      ]
+      if is_empty head then
+        enrich_tree tail
+      else
+        match tail with
+        [ [] -> [head]
+        | [thead :: ttail] ->
+            [head :: enrich_tree [(enrich head thead) :: ttail]] ]
   ]
 ;
 
@@ -1572,7 +1580,7 @@ value print_tree_with_table conf base gv p =
   in
   (* build tree: go up (initialisation) *)
   let gen =
-    loop (gv - 1) [Cell p Alone True 1] [] where rec loop i gen list =
+    loop (gv - 1) [Cell p Center True 1] [] where rec loop i gen list =
       if i == 0 then [gen :: list]
       else loop (i - 1) (next_gen gen) [gen :: list]
   in
@@ -1700,7 +1708,9 @@ value print_tree_with_table conf base gv p =
                     True gen
                 in ();
               end;
-              if List.length gen > 1 then
+              match gen with
+              [ [ Cell _ Center _ _ :: _ ] -> ()
+              | _ ->
                 do tag "tr" begin
                     let _ =
                       List.fold_left 
@@ -1720,7 +1730,7 @@ value print_tree_with_table conf base gv p =
                     in ();
                   end;
                 return ()
-              else ();
+              ];
            return False)
         True gen
     in
