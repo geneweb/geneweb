@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.42 2001-10-16 11:51:29 ddr Exp $
+# $Id: lexicon.txt,v 4.43 2001-10-17 09:31:49 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -1547,7 +1547,6 @@ zh: ×æÏÈ
 
     ancestors (some)
 af: voorsate
-
 ca: avantpassats
 cs: pøedkové
 da: forf&aelig;dre
