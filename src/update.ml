@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.0 1999-10-29 10:31:39 ddr Exp $ *)
+(* $Id: update.ml,v 3.1 1999-11-01 23:19:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -95,7 +95,7 @@ value print_err_unknown conf base (f, s, o) =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "error"))
   in
-  do header conf title;
+  do rheader conf title;
      Wserver.wprint "%s: <strong>%s.%d %s</strong>\n"
        (capitale (transl conf "unknown person")) f o s;
      print_return conf;
@@ -378,7 +378,7 @@ value print_warnings conf base wl =
 
 value error conf base x =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do header conf title;
+  do rheader conf title;
      print_error conf base x;
      Wserver.wprint "\n";
      print_return conf;
@@ -388,7 +388,7 @@ value error conf base x =
 
 value error_locked conf base =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do header conf title;
+  do rheader conf title;
      Wserver.wprint
        (fcapitale
           (ftransl conf
@@ -400,7 +400,7 @@ value error_locked conf base =
 
 value error_digest conf base =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do header conf title;
+  do rheader conf title;
      Wserver.wprint
        (fcapitale
           (ftransl conf
@@ -424,7 +424,7 @@ value get_number var key env = p_getint env (var ^ "_" ^ key);
 
 value bad_date conf d =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  do header conf title;
+  do rheader conf title;
      Wserver.wprint "%s:\n" (capitale (transl conf "incorrect date"));
      match d with
      [ {day = 0; month = 0; year = a} -> Wserver.wprint "%d" a
@@ -663,7 +663,7 @@ value print_create_conflict conf base p =
   let n =
     find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
-  do header conf title;
+  do rheader conf title;
      print_error conf base (AlreadyDefined p);
      html_p conf;
      Wserver.wprint "<ul>\n";

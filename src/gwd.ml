@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.1 1999-10-30 23:53:16 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.2 1999-11-01 23:19:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -328,7 +328,7 @@ value start_with_base conf bname =
       let title _ =
         Wserver.wprint "%s" (Util.capitale (transl conf "error"))
       in
-      do Util.header conf title;
+      do Util.rheader conf title;
          Wserver.wprint "<ul>";
          Util.html_li conf;
          Wserver.wprint "%s"

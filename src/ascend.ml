@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.0 1999-10-29 10:30:57 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.1 1999-11-01 23:19:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -114,6 +114,7 @@ value print_choice conf base p niveau_effectif =
                  (limit_by_list conf);
                Wserver.wprint ")\n";
             return ();
+          Wserver.wprint "<br>\n";
         end;
         tag "td valign=top" begin
           Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
