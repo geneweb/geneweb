@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.35 1999-02-06 14:45:27 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.36 1999-02-06 14:45:58 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -289,7 +289,7 @@ EXTEND
   simple_date:
     [[ LIST0 "."; n1 = OPT int; LIST0 [ "." | "/" ];
        n2 = OPT [ i = int -> abs i | m = month -> m ]; LIST0 [ "." | "/" ];
-       n3 = OPT int; LIST0 [ "." | "/" ] ->
+       n3 = OPT int; LIST0 "." ->
          let n3 =
            if no_negative_dates.val then
              match n3 with
