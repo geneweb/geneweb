@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.10 1999-08-02 22:28:47 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.11 1999-08-03 05:14:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -517,11 +517,11 @@ value print_with_table conf base info =
       end;
     end;
     tag "tr" begin
-      stag "td" begin
+      stag "td" "align=right" begin
         Wserver.wprint "<hr size=1 noshade width=\"50%%\" align=right>";
       end;
       Wserver.wprint "\n";
-      stag "td" begin
+      stag "td" "align=left" begin
         Wserver.wprint "<hr size=1 noshade width=\"50%%\" align=left>";
       end;
       Wserver.wprint "\n";

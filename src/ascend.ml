@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.37 1999-08-02 22:28:46 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.38 1999-08-03 05:14:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -69,6 +69,8 @@ value print_choice conf base p niveau_effectif =
       in
       boucle 1;
     end;
+    Wserver.wprint "<input type=submit value=\"Ok\">\n";
+    html_br conf;
     tag "ul" begin
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=N checked> %s\n"
@@ -87,26 +89,23 @@ value print_choice conf base p niveau_effectif =
           (capitale (transl_nth conf "note/notes" 1));
       end;
       html_li conf;
-      Wserver.wprint "<input type=radio name=t value=T> %s%t\n"
-        (capitale (transl conf "tree"))
-        (fun oc ->
-          if niveau_effectif <= 4 then ()
-          else
-            do Printf.fprintf oc " (";
-               Printf.fprintf oc (ftransl conf "max %d generations") 4;
-               Printf.fprintf oc ")";
-            return ());
+      Wserver.wprint "<input type=radio name=t value=T> %s\n"
+        (capitale (transl conf "tree"));
+      if niveau_effectif <= 4 then ()
+      else
+        do Wserver.wprint "(";
+           Wserver.wprint (ftransl conf "max %d generations") 4;
+           Wserver.wprint ")\n";
+        return ();
       html_li conf;
-      Wserver.wprint "<input type=radio name=t value=L> %s%t\n"
-        (capitale (transl conf "list"))
-        (fun oc ->
-          if niveau_effectif <= limit_by_list then ()
-          else
-            do Printf.fprintf oc " (";
-               Printf.fprintf oc (ftransl conf "max %d generations")
-                 limit_by_list;
-               Printf.fprintf oc ")";
-            return ());
+      Wserver.wprint "<input type=radio name=t value=L> %s\n"
+        (capitale (transl conf "list"));
+      if niveau_effectif <= limit_by_list then ()
+      else
+        do Wserver.wprint "(";
+           Wserver.wprint (ftransl conf "max %d generations") limit_by_list;
+           Wserver.wprint ")\n";
+        return ();
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=S> %s\n"
         (capitale (transl conf "only the generation selected"));
@@ -134,9 +133,6 @@ value print_choice conf base p niveau_effectif =
       Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
       Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
     end;
-    html_p conf;      
-    Wserver.wprint "<input type=submit value=\"Ok\">";
-    html_br conf;
   end
 ;
 
@@ -1418,9 +1414,9 @@ value print_tree conf base v p =
                  else tree_reference p txt
                in
                txt ^ Date.short_dates_text conf base p
-           | _ -> "&nbsp;" ]
+           | _ -> "" ]
          in
-         Wserver.wprint "%s" txt;
+         Wserver.wprint "&nbsp;%s&nbsp;" txt;
        end;
        Wserver.wprint "\n";
     return ()
@@ -1433,11 +1429,11 @@ value print_tree conf base v p =
   in
   let print_horizontal_line n cs =
     for i = 1 to n do
-      stag "td" "%s" (colspan (cs / 2)) begin
+      stag "td" "align=right%s" (colspan (cs / 2)) begin
         Wserver.wprint "<hr noshade size=1 width=\"50%%\" align=right>";
       end;
       Wserver.wprint "\n";
-      stag "td" "%s" (colspan (cs / 2)) begin
+      stag "td" "align=left%s" (colspan (cs / 2)) begin
         Wserver.wprint "<hr noshade size=1 width=\"50%%\" align=left>";
       end;
       Wserver.wprint "\n";
