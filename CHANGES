@@ -12,6 +12,9 @@ GeneWeb version 4.05
     (sometimes just one of them work and not the other).
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [13 Jan 02] Fixed bug: failed under Windows if there was a first name
+    ending with a quote (this is a typical example of the bug, but it can
+    happen in other circumstances: the bug comes from the option -fne).
   - [08 Jan 02] Fixed bug: the divorce dates were not imported
 
 GeneWeb version 4.04
