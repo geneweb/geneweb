@@ -21,16 +21,20 @@ case "$1" in
 	echo "Starting GeneWeb Services:"
         touch /var/log/gwd.log /var/log/gwsetup.log
         chown geneweb /var/log/gwd.log /var/log/gwsetup.log
-	cd /home/geneweb/gw/gw
-	./gwd -log /var/log/gwd.log -daemon
-	./gwsetup -daemon 2>> /var/log/gwsetup.log
+	mkdir -p /home/geneweb/bases
+	chmod a+rw /home/geneweb/bases
+	cd /home/geneweb/bases
+	hd=../gw/gw
+	$hd/gwd -log /var/log/gwd.log -daemon -hd $hd
+	$hd/gwsetup -daemon -gd $hd 2>> /var/log/gwsetup.log
 	touch /var/lock/subsys/gwd
 	;;
   stop)
 	echo -n "Shutting down GeneWeb Services: "
-	cd /home/geneweb/gw/gw
-	killproc ./gwd
-	killproc ./gwsetup
+	cd /home/geneweb/bases
+	hd=../gw/gw
+	killproc $hd/gwd
+	killproc $hd/gwsetup
 	rm -f /var/lock/subsys/gwd
 	echo
 	;;
@@ -39,14 +43,16 @@ case "$1" in
 	;;
   restart)
 	echo -n "Restarting GeneWeb Services: "
-	cd /home/geneweb/gw/gw
-        killproc ./gwd
-        killproc ./gwsetup
+	mkdir -p /home/geneweb/bases
+	cd /home/geneweb/bases
+	hd=../gw/gw
+        killproc $hd/gwd
+        killproc $hd/gwsetup
 	echo
         touch /var/log/gwd.log /var/log/gwsetup.log
         chown geneweb /var/log/gwd.log /var/log/gwsetup.log
-	./gwd -log /var/log/gwd.log -daemon
-	./gwsetup -daemon 2>> /var/log/gwsetup.log
+	$hd/gwd -log /var/log/gwd.log -daemon
+	$hd/gwsetup -daemon 2>> /var/log/gwsetup.log
 	touch /var/lock/subsys/gwd
 	;;
   *)

@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.20 2000-12-19 15:42:09 ddr Exp $
+# $Id: geneweb.spec,v 3.21 2001-03-03 20:59:19 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -118,41 +118,10 @@ chkconfig --add gwd
 %preun
 /etc/rc.d/init.d/gwd stop
 chkconfig --del gwd
-(
-  cd /home/geneweb/gw/gw
-  set *.gwb
-  if test -d "$1"; then
-    mkdir -p /home/geneweb/gw-%{version}
-    cp gwu gwb2ged /home/geneweb/gw-%{version}/.
-    for i in $*; do
-      rm -rf /home/geneweb/gw-%{version}/$i
-      mv $i /home/geneweb/gw-%{version}/.
-    done
-    rm -f *.lck
-    echo
-    echo "Warning: the following data bases:"
-    for i in $*; do
-      echo -n "   "
-      echo $i
-    done
-    echo "have been moved to the directory:"
-    echo -n "   "
-    echo "/home/geneweb/gw-%{version}"
-    echo
-    echo "Remember this directory name for further possible recovery."
-    echo
-  fi
-)
 
 %postun
-(rmdir /home/geneweb/gw/gw/doc/* >/dev/null 2>&1; exit 0)
-(rmdir /home/geneweb/gw/gw/doc >/dev/null 2>&1; exit 0)
-(rmdir /home/geneweb/gw/gw/etc >/dev/null 2>&1; exit 0)
-(rmdir /home/geneweb/gw/gw/images >/dev/null 2>&1; exit 0)
-(rmdir /home/geneweb/gw/gw/lang/* >/dev/null 2>&1; exit 0)
-(rmdir /home/geneweb/gw/gw/lang > /dev/null 2>&1; exit 0)
-(rmdir /home/geneweb/gw/gw/setup/* >/dev/null 2>&1; exit 0)
-(rmdir /home/geneweb/gw/gw/setup >/dev/null 2>&1; exit 0)
+cd /home/geneweb/gw/gw
+rm -rf doc etc images lang setup gwtp_tmp
 
 # *********** THE FILES OWNED BY THIS .RPM *************
 # These are the files belonging to this package.  We have to list
