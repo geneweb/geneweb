@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.33 2001-08-04 09:28:03 ddr Exp $
+# $Id: lexicon.txt,v 4.34 2001-08-21 09:09:22 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -1857,7 +1857,7 @@ de: zwischen
 en: between
 eo: inter
 es: entre
-et: vahel
+et: vahemikus
 fi: v&auml;lill&auml
 fr: entre
 he:  áéï
@@ -2596,7 +2596,7 @@ de: Nachkommen
 en: descendants
 eo: posteuloj
 es: descendientes
-et: järglased
+et: järeltulijad
 fi: j&auml;lkel&auml;isi&auml
 fr: descendants
 he:   öàöàéí
@@ -7375,6 +7375,7 @@ sv: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
     undefined sex for %t
 de: Geschlecht nicht definiert f&uuml;r %t
 en: undefined sex for %t
+et: %t sugu on määratlemata
 fi: %t:n sukupuoli tuntematon
 fr: sexe ind&eacute;fini pour %t
 he:  äîéï ùì %t ìà îåâãø
