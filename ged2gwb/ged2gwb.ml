@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.2 1999-11-05 17:20:06 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.3 1999-11-05 17:33:44 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -299,7 +299,7 @@ value rec find_all_fields lab =
 value rec lexing =
   parser
   [ [: `('0'..'9' as c); n = number (store 0 c) :] -> ("INT", n)
-  | [: `('A'..'Z' as c); i = ident (store 0 c) :] -> ("ID", String.uppercase i)
+  | [: `('A'..'Z' as c); i = ident (store 0 c) :] -> ("ID", i)
   | [: `'.' :] -> ("", ".")
   | [: `' ' | '\r'; s :] -> lexing s
   | [: _ = Stream.empty :] -> ("EOI", "")

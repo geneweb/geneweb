@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 3.0 1999-10-29 10:31:36 ddr Exp $ *)
+(* $Id: some.ml,v 3.1 1999-11-05 17:33:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -12,7 +12,7 @@ value first_name_not_found conf x =
     Wserver.wprint "%s: \"%s\""
       (capitale (transl conf "first name not found")) x
   in
-  do header conf title; trailer conf; return ()
+  do rheader conf title; trailer conf; return ()
 ;
 
 value surname_not_found conf x =
@@ -20,7 +20,7 @@ value surname_not_found conf x =
     Wserver.wprint "%s: \"%s\"" (capitale (transl conf "surname not found"))
       x
   in
-  do header conf title; trailer conf; return ()
+  do rheader conf title; trailer conf; return ()
 ;
 
 value persons_of_fsname base find proj x =
