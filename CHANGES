@@ -2,6 +2,8 @@ GeneWeb version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [25 Nov 03] Added optional border around people in displaying
+    relationship links.
   - [18 Jan 03] Added a system of black list for the database forum;
     the environment variable "forum_exclude_file" can be set to a
     file name containing a list of excluded IP addresses which cannot

@@ -80,6 +80,7 @@ begin
 between (date)
 birth
 birthdays
+border
 born
 branch/branches
 burial

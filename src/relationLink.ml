@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.6 2002-05-17 10:06:46 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.7 2003-11-25 14:39:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -365,6 +365,9 @@ value sign_text conf base sign info b1 b2 c1 c2 =
     (match p_getenv conf.env "image" with
      [ Some "on" -> ";image=on"
      | _ -> "" ]) ^
+    (match p_getenv conf.env "bd" with
+     [ Some x -> ";bd=" ^ x
+     | _ -> "" ]) ^
     include_marr conf base "3" ^ include_marr conf base "4" ^ "\">" ^ sign ^
     "</a>"
 ;
@@ -497,7 +500,9 @@ value print_with_table conf base info =
         Wserver.wprint "<hr size=1 noshade width=\"50%%\" align=right>";
       end;
       Wserver.wprint "\n";
-      stag "td" begin Wserver.wprint "<hr size=1 noshade>"; end;
+      stag "td" begin
+        Wserver.wprint "<hr size=1 noshade width=\"100%%\">";
+      end;
       Wserver.wprint "\n";
       stag "td" "align=left" begin
         Wserver.wprint "<hr size=1 noshade width=\"50%%\" align=left>";

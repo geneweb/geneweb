@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.160 2003-11-03 09:02:54 ddr Exp $
+# $Id: lexicon.txt,v 4.161 2003-11-25 14:39:38 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2179,6 +2179,10 @@ ru: дни рождени€
 sl: rojstni dnevi
 sv: f&ouml;delsedagar
 zh:  ≥ц…ъ”Џљс»’µƒЉ«¬Љ
+
+    border
+en: border
+fr: bordure
 
     born
 af: gebore
