@@ -1,6 +1,8 @@
 GeneWeb Version 1.08
 --------------------
 
+* Added portuguese among languages
+
 * gwd:
   - fixed several displaying bugs due to ANSEL
   - in forms, when a precision (about, maybe, before, after, or year) is given
