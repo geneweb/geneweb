@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.9 2000-05-17 09:08:13 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.10 2000-07-20 05:01:42 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -538,8 +538,8 @@ value f addr_opt port tmout max_clients g =
          else ();
       return
       let tm = Unix.localtime (Unix.time ()) in
-      do Printf.eprintf "Ready %02d/%02d/%4d %02d:%02d port"
-           tm.Unix.tm_mday (succ tm.Unix.tm_mon) (1900 + tm.Unix.tm_year)
+      do Printf.eprintf "Ready %4d-%02d-%02d %02d:%02d port"
+           (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
            tm.Unix.tm_hour tm.Unix.tm_min;
          Printf.eprintf " %d" port;
          Printf.eprintf "...\n";

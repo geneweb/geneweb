@@ -5,6 +5,7 @@ GeneWeb Version 3.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [19 Jul 00] Message "Ready" of gwd display now date as yyyy-mm-dd.
   - [12 Jul 00] Refreshes with possible good address when bad character in
     base name (e.g. http://host.com/foo/ instead of http://host.com/foo?)
   - [12 Jul 00] "Server" answer separate "GeneWeb" and version number with
