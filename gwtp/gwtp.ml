@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.12 2000-07-31 01:10:59 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.13 2000-08-04 17:37:38 ddr Exp $ *)
 
 open Printf;
 
@@ -283,8 +283,17 @@ value copy_temp b =
   return ()
 ;
 
+value filename_basename str =
+  loop (String.length str - 1) where rec loop i =
+    if i < 0 then str
+    else
+      match str.[i] with
+      [ 'A'..'Z' | 'a'..'z' | '-' -> loop (i - 1)
+      | _ -> String.sub str (i + 1) (String.length str - i - 1) ]
+;
+
 value send_file str env b t f fname =
-  if Filename.basename fname = "base" then
+  if filename_basename fname = "base" then
     do printf "content-type: text/html\r\n\r\n\
 <head><title>Gwtp...</title></head>\n<body>
 <h1 align=center>Gwtp...</h1>
@@ -312,7 +321,7 @@ value gwtp_send str env b t =
 value gwtp_receive str env b t =
   match HttpEnv.getenv env "f" with
   [ Some fname ->
-      let fname = Filename.basename fname in
+      let fname = filename_basename fname in
       let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
       do printf "content-type: bin/geneweb\r\n\r\n";
          let ic = open_in (Filename.concat bdir fname) in
