@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.15 2004-06-16 10:07:31 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.16 2004-06-16 11:25:48 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -211,8 +211,18 @@ value print_main conf base wizfile =
   }
 ;
 
-value print_wizard conf base wz =
-  let title _ = Wserver.wprint "%s" wz in
+value print_wizard conf base wizfile wz =
+  let wizname =
+    let wizdata = read_wizfile wizfile in
+    try List.assoc wz wizdata with
+    [ Not_found -> wz ]
+  in
+  let title h =
+    Wserver.wprint "%s%s" wizname
+      (if wz <> wizname && not h then
+         "<br><font size=\"-1\">(" ^ wz ^ ")</font>"
+       else "")
+  in
   let wfile = wzfile (dir conf) wz in
   let (s, date) = read_wizard_notes wfile in
   do {
@@ -300,6 +310,6 @@ value print conf base =
             if conf.wizard && conf.user = wz then
               print_wizard_mod conf base wizfile wz nn
             else incorrect_request conf
-        | None -> print_wizard conf base wz ]
+        | None -> print_wizard conf base wizfile wz ]
     | None -> print_main conf base wizfile ]
 ;
