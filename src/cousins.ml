@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.5 2000-01-10 12:15:13 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.6 2000-02-13 19:37:50 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -307,8 +307,12 @@ value print_menu conf base p effective_level =
          do html_p conf;
             tag "ul" begin
               html_li conf;
-              Wserver.wprint "<a href=\"%s%s;m=C;t=AN\">%s</a>\n"
-                (commd conf) (acces conf base p)
+              Wserver.wprint "<a href=\"%s%s;m=C;t=AN"
+                (commd conf) (acces conf base p);
+(*
+              Wserver.wprint ";em=R;%s" (acces_n conf base "e" p);
+*)
+              Wserver.wprint "\">%s</a>\n"
                 (capitale (transl conf "birthdays"));
             end;
          return ()
@@ -356,14 +360,15 @@ value print_anniv conf base p level =
     S.fold
       (fun ip set ->
          let u = (uoi base ip).family in
-         if Array.length u = 0 then S.add ip set
+         let set = S.add ip set in
+         if Array.length u = 0 then set
          else
            loop set 0 where rec loop set i =
              if i = Array.length u then set
              else
                let cpl = coi base u.(i) in
-               let set = S.add cpl.father (S.add cpl.mother set) in
-               loop set (i + 1))
+               let c = spouse ip cpl in
+               loop (S.add c set) (i + 1))
       set S.empty
   in
   let f_scan =
