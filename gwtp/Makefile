@@ -1,9 +1,9 @@
-# $Id: Makefile,v 1.13 2000-08-18 18:40:07 ddr Exp $
+# $Id: Makefile,v 1.14 2000-10-29 21:21:29 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../src
-GWTP_OTHER=../src/buff.cmo ../src/name.cmo ../src/iovalue.cmo ../src/adef.cmo ../src/gutil.cmo ../src/btree.cmo ../src/iobase.cmo
+GWTP_OTHER=../src/lock.cmo ../src/buff.cmo ../src/name.cmo ../src/iovalue.cmo ../src/adef.cmo ../src/gutil.cmo ../src/btree.cmo ../src/iobase.cmo
 GWTP_OBJS=httpEnv.cmo iolight.cmo gwtp.cmo
 OBJS=$(GWTP_OTHER) $(GWTP_OBJS)
 
