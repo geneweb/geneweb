@@ -5,6 +5,7 @@ GeneWeb Version 1.11
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Jan 29, 99] Print clear messages when missing files (lexicon.txt, etc.)
   - [Jan 12, 99] Changed test in input_lexicon (gwd.ml): length of line < 4
     instead of line = "": better test to avoid failures when bad lexicon
     files.

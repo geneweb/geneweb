@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.13 1999-01-28 14:53:10 ddr Exp $ *)
+(* $Id: srcfile.ml,v 1.14 1999-01-29 15:23:06 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -210,10 +210,12 @@ value rec copy_from_channel conf base ic =
     done
   with
   [ End_of_file -> close_in ic ]
-and copy_from_file conf base fname =
-  let fname = any_lang_file_name fname in
-  let ic = open_in fname in
-  copy_from_channel conf base ic
+and copy_from_file conf base name =
+  let fname = any_lang_file_name name in
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic -> copy_from_channel conf base ic
+  | None ->
+      Wserver.wprint "<em>... file not found: \"%s.txt\"</em><br>\n" name ]
 ;
 
 value print conf base fname =
@@ -250,13 +252,18 @@ value print_start conf base =
 value print_lexicon conf base =
   let title _ = Wserver.wprint "Lexicon" in
   let fname = any_lang_file_name "lexicon" in
-  let ic = open_in fname in
   do Util.header conf title;
-     Wserver.wprint "<pre>\n";
-     try while True do Wserver.wprint "%s\n" (input_line ic); done with
-     [ End_of_file -> () ];
-     Wserver.wprint "</pre>\n";
-     close_in ic;
+     match try Some (open_in fname) with [ Sys_error _ -> None ] with
+     [ Some ic ->
+         do Wserver.wprint "<pre>\n";
+            try while True do Wserver.wprint "%s\n" (input_line ic); done with
+            [ End_of_file -> () ];
+            Wserver.wprint "</pre>\n";
+            close_in ic;
+         return ()
+     | None ->
+         Wserver.wprint "<em>... file not found: \"%s.txt\"</em><br>\n"
+           "lexicon" ];
      Util.trailer conf;
   return ()
 ;
