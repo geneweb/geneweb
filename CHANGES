@@ -42,6 +42,10 @@ GeneWeb version 3.02
   - [Dec 13, 99] Fixed bug: the option '-s' (extraction of a surname)
     also selected children with different surnames.
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [Jan 6, 00] Added option -ds (default source) to set a default source
+    to the persons having no source data.
+
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
   - [Dec 18, 99] Fixed and completed some Norwegian phrases (Brynjulf
     Langballe)
