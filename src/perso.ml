@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.13 2001-05-02 09:04:41 ddr Exp $ *)
+(* $Id: perso.ml,v 4.14 2001-05-12 17:45:35 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -728,7 +728,7 @@ value print_source conf base env p =
   match get_env "src" env with
   [ Vstring s ->
       let env = [('i', fun () -> Util.default_image_name base p)] in
-      copy_string_with_macros conf [] s
+      copy_string_with_macros conf env s
   | _ -> () ]
 ;
 
