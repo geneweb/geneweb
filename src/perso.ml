@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.51 2003-12-16 07:45:35 ddr Exp $ *)
+(* $Id: perso.ml,v 4.52 2003-12-16 12:46:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -944,9 +944,9 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
       match efam with
       [ Vfam fam cpl _ -> fam.divorce = Separated
       | _ -> False ]
-  | "is_a_rap" ->
+  | "is_a_rape" ->
       match efam with
-      [ Vfam fam _ _ -> fam.relation = Rap
+      [ Vfam fam _ _ -> fam.relation = Rape
       | _ -> False ]
   | "birthday" ->
       if p_auth then

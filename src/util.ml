@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.78 2003-12-16 07:45:35 ddr Exp $ *)
+(* $Id: util.ml,v 4.79 2003-12-16 12:46:21 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -2106,7 +2106,7 @@ value relation_txt conf sex fam =
   [ NotMarried -> ftransl_nth conf "relationship%t to" is
   | Married | NoSexesCheck -> ftransl_nth conf "married%t to" is
   | Engaged -> ftransl_nth conf "engaged%t to" is
-  | Rap -> ftransl_nth conf "sexual abuse%t with" is ]
+  | Rape -> ftransl_nth conf "sexual abuse%t with" is ]
 ;
 
 value escache_value conf =
