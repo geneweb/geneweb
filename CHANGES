@@ -6,6 +6,8 @@ GeneWeb Version 2.01
   - [Mar 30, 99] Changed term "photo" into "image".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Apr 17, 99] Improved relationship branches displaying to be readable
+    with Lynx (terminal browser without tables).
   - [Apr 16, 99] When merging persons, the lowest number is proposed by
     default.
   - [Apr 16, 99] Added long display for ancestors.

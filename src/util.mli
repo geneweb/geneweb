@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.5 1999-04-07 11:49:50 ddr Exp $ *)
+(* $Id: util.mli,v 2.6 1999-04-17 14:18:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -26,24 +26,19 @@ value connais : base -> person -> bool;
 value acces : config -> base -> person -> string;
 value calculer_age : config -> person -> option date;
 
+value reference : config -> base -> person -> string -> string;
 value person_text : config -> base -> person -> string;
 value person_text_no_html : config -> base -> person -> string;
 value person_text_without_surname : config -> base -> person -> string;
 value titled_person_text : config -> base -> person -> title -> string;
+value one_title_text : config -> base -> person -> title -> string;
+value referenced_person_title_text : config -> base -> person -> string;
 
 value main_title : base -> person -> option title;
-(**)
-value afficher_personne : config -> base -> person -> unit;
-value afficher_prenom_de_personne_referencee :
-  config -> base -> person -> unit;
-value afficher_personne_referencee : config -> base -> person -> unit;
-(**)
 value afficher_prenom_de_personne : config -> base -> person -> unit;
 value afficher_personne_titre : config -> base -> person -> unit;
-value afficher_personne_titre_referencee : config -> base -> person -> unit;
 value afficher_personne_sans_titre : config -> base -> person -> unit;
 value afficher_titre : config -> base -> person -> unit;
-value afficher_un_titre : config -> base -> person -> title -> unit;
 value p_getenv : list (string * string) -> string -> option string;
 value p_getint : list (string * string) -> string -> option int;
 value create_env : string -> list (string * string);
@@ -104,3 +99,11 @@ value image_size : string -> option (int * int);
 value default_image_name_of_key : string -> string -> int -> string;
 value default_image_name : base -> person -> string;
 value auto_image_file : config -> base -> person -> option string;
+
+(* Deprecated *)
+value afficher_personne : config -> base -> person -> unit;
+value afficher_prenom_de_personne_referencee :
+  config -> base -> person -> unit;
+value afficher_personne_referencee : config -> base -> person -> unit;
+value afficher_personne_titre_referencee : config -> base -> person -> unit;
+(**)
