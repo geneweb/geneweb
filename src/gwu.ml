@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.12 1999-07-22 19:47:21 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.13 1999-07-24 10:13:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -264,7 +264,7 @@ value print_infos oc base is_child print_sources p =
   return ()
 ;
 
-value print_parent oc base ml fam_sel fam p =
+value print_parent oc base mark fam_sel fam p =
   let a = aoi base p.cle_index in
   let has_printed_parents =
     match a.parents with
@@ -272,15 +272,8 @@ value print_parent oc base ml fam_sel fam p =
     | None -> False ]
   in
   let first_parent_definition =
-    loop ml where rec loop =
-      fun
-      [ [m1 :: ml1] ->
-          if m1.m_fath.cle_index == p.cle_index
-          || m1.m_moth.cle_index == p.cle_index
-          then
-            fam.fam_index == m1.m_fam.fam_index
-          else loop ml1
-      | [] -> assert False ]
+    if mark.(Adef.int_of_iper p.cle_index) then False
+    else do mark.(Adef.int_of_iper p.cle_index) := True; return True
   in
   let pr = not has_printed_parents && first_parent_definition in
   let has_infos = if pr then has_infos base p else False in
@@ -516,6 +509,7 @@ value gwu base out_dir out_oc src_oc_list anc desc =
   in
   let ((per_sel, fam_sel) as sel) = Select.functions base anc desc in
   let fam_done = Array.create (base.data.families.len) False in
+  let mark = Array.create base.data.persons.len False in
   let out_oc_first = ref True in
   for i = 0 to base.data.families.len - 1 do
     let fam = base.data.families.get i in
@@ -555,7 +549,7 @@ value gwu base out_dir out_oc src_oc_list anc desc =
            if ml <> [] then
              do if not first.val then Printf.fprintf oc "\n" else ();
                 first.val := False;
-                List.iter (print_family oc base ml sel fam_done) ml;
+                List.iter (print_family oc base mark sel fam_done) ml;
                 print_notes oc base ml per_sel;
              return ()
            else ()
