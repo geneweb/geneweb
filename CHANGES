@@ -1,7 +1,7 @@
 GeneWeb version 3.10
 --------------------
 
-* Installation with Linux rpm
+* Installation under Linux rpm
   - [07 Nov 00] Put logs for gwsetup and gwd on /var/log.
 
 GeneWeb version 3.09
