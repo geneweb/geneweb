@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.23 2001-01-05 23:25:42 ddr Exp $ *)
+(* $Id: dag.ml,v 3.24 2001-01-06 09:14:16 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -184,6 +184,91 @@ else Wserver.wprint " colspan=%d" colspan;
   return () 
 ;
 
+value displayed_length s =
+  loop 0 0 where rec loop len i =
+    if i = String.length s then len
+    else
+      match s.[i] with
+      [ '<' ->
+          loop1 (i + 1) where rec loop1 i =
+            if i = String.length s then len
+            else if s.[i] = '>' then loop len (i + 1)
+            else loop1 (i + 1)
+      | '&' ->
+          let len = len + 1 in
+          loop1 (i + 1) where rec loop1 i =
+            if i = String.length s then len
+            else
+              match s.[i] with
+              [ 'a'..'z' | 'A'..'Z' -> loop1 (i + 1)
+              | ';' -> loop len (i + 1)
+              | _ -> loop len i ]
+      | '\n' | '\r' -> len
+      | _ -> loop (len + 1) (i + 1) ]
+;
+
+value print_table_pre conf hts =
+  let ncol =
+    let hts0 = hts.(0) in
+    loop 0 0 where rec loop ncol j =
+      if j = Array.length hts0 then ncol
+      else
+        let (colspan, _, _) = hts0.(j) in
+        loop (ncol + colspan) (j + 1)
+  in
+  let colsz = Array.make ncol 0 in
+  do for i = 0 to Array.length hts - 1 do
+       loop 0 0 where rec loop col j =
+         if j = Array.length hts.(i) then ()
+         else
+           let (colspan, _, td) = hts.(i).(j) in
+           do match td with
+              [ TDstring s ->
+                  if colspan = 1 then
+                    colsz.(col) := max colsz.(col) (displayed_length s)
+                  else ()
+              | TDhr _ -> () ];
+           return loop (col + colspan) (j + 1);
+     done;
+     Wserver.wprint "<pre>\n";
+     for i = 0 to Array.length hts - 1 do
+       loop 0 0 where rec loop col j =
+         if j = Array.length hts.(i) then Wserver.wprint "\n"
+         else
+           let (colspan, align, td) = hts.(i).(j) in
+           let sz =
+             loop 0 colspan where rec loop sz k =
+               if k = 0 then sz else loop (sz + colsz.(col + k - 1)) (k - 1)
+           in
+           do match td with
+              [ TDstring s ->
+                  let len = displayed_length s in
+                  do for i = 1 to (sz - len) / 2 do
+                       Wserver.wprint " ";
+                     done;
+                     Wserver.wprint "%s" s;
+                     for i = (sz + len) / 2 + 1 to sz do
+                       Wserver.wprint " ";
+                     done;
+                  return ()
+              | TDhr LeftA ->
+                  let len = (sz + 1) / 2 in
+                  do for i = 1 to len do Wserver.wprint "-"; done;
+                     for i = len + 1 to sz do Wserver.wprint " "; done;
+                  return ()
+              | TDhr RightA ->
+                  let len = sz / 2 in
+                  do for i = 1 to sz - len - 1 do Wserver.wprint " "; done;
+                     for i = sz - len to sz do Wserver.wprint "-"; done;
+                  return ()
+              | TDhr CenterA ->
+                  for i = 1 to sz do Wserver.wprint "-"; done ];
+           return loop (col + colspan) (j + 1);
+     done;
+     Wserver.wprint "</pre>\n";
+  return () 
+;
+
 (* main *)
 
 value print_only_dag conf base elem_txt spouse_on invert set spl d =
@@ -271,6 +356,9 @@ value print_only_dag conf base elem_txt spouse_on invert set spl d =
         conf.border d t
   | _ ->
       let hts = html_table_struct indi_txt phony d t in
+(*
+      print_table_pre conf hts
+*)
       print_table conf hts ]
 ;
 
