@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.9 2001-08-22 11:33:07 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.10 2001-08-22 12:21:03 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -2358,6 +2358,16 @@ value check_parents_sex base =
     let moth = poi base cpl.mother in
     if fam.relation = NoSexesCheck then ()
     else if fath.sex = Female || moth.sex = Male then
+(*
+let _ = do {
+     Printf.fprintf log_oc.val "No standard sex for parents:";
+     Printf.fprintf log_oc.val " father = %s (sex: %s); "
+       (denomination base fath) (string_of_sex fath.sex);
+     Printf.fprintf log_oc.val " mother = %s (sex: %s)\n"
+       (denomination base moth) (string_of_sex moth.sex);
+     flush log_oc.val
+} in
+*)
       fam.relation := NoSexesCheck
     else do { fath.sex := Male; moth.sex := Female }
   }
