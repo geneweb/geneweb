@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.26 2000-09-14 02:22:56 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.27 2000-09-18 17:07:44 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -212,7 +212,7 @@ value macro conf base =
   | c -> "%" ^ String.make 1 c ]
 ;
 
-value rec src_translate conf base nom ic =
+value rec src_translate conf base nomin ic =
   let (upp, s) =
     loop 0 (input_char ic) where rec loop len c =
       if c = ']' then
@@ -250,7 +250,7 @@ value rec src_translate conf base nom ic =
           String.sub r 0 i ^ sa ^
           String.sub r (i + 2) (String.length r - i - 2)
       | _ ->
-          (if nom then Gutil.nominative r else r) ^ c ]
+          (if nomin then Gutil.nominative r else r) ^ c ]
   in
   if upp then capitale r else r
 ;
