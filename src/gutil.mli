@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.9 2002-11-19 12:43:52 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.10 2003-02-04 13:21:15 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -115,3 +115,5 @@ value list_iter_first : (bool -> 'a -> unit) -> list 'a -> unit;
 value surnames_pieces : string -> list string;
 
 value arg_list_of_string : string -> list string;
+
+value sort_person_list : base -> list person -> list person;
