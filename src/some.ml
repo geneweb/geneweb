@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.25 2004-12-14 09:30:17 ddr Exp $ *)
+(* $Id: some.ml,v 4.26 2004-12-26 21:48:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -119,6 +119,7 @@ value first_name_print_list conf base xl liste =
   do {
     header conf title;
     print_link_to_welcome conf True;
+    html_p conf;
     print_alphab_list conf (fun (p, _) -> String.sub p (initial p) 1)
       (print_elem conf base True) liste;
     trailer conf;
@@ -277,12 +278,12 @@ value print_branch conf base psn name =
                  Wserver.wprint "\n";
                  match select with
                  [ Some (_, True) ->
-                     do {
-                       Wserver.wprint "<dl><dt>\n";
-                       List.iter
-                         (fun e -> loop False (succ lev) (pget conf base e))
-                         (Array.to_list des.children);
-                       Wserver.wprint "</dt></dl>\n";
+		     do {
+                       tag "dl" begin
+                         List.iter
+                           (fun e -> loop False (succ lev) (pget conf base e))
+                           (Array.to_list des.children);
+		       end;
                        False
                      }
                  | Some (_, False) | None -> False ]
@@ -348,17 +349,18 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
     header conf title;
     print_link_to_welcome conf True;
     if br = None then do {
-      Wserver.wprint "<font size=-1><em>\n";
+      html_p conf;
+      Wserver.wprint "<em style=\"font-size:80%%\">\n";
       Wserver.wprint "%s " (capitale (transl conf "click"));
       Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
         (code_varenv fx) (transl conf "here");
       Wserver.wprint "%s"
         (transl conf "for the first names by alphabetic order");
-      Wserver.wprint ".</em></font>\n";
+      Wserver.wprint ".</em>\n";
       html_p conf;
     }
     else ();
-    Wserver.wprint "<table border=0><tr><td nowrap>\n";
+    Wserver.wprint "<table border=0><tr><td style=\"white-space:nowrap\">\n";
     if len > 1 && br = None then do {
       Wserver.wprint "%s: %d" (capitale (transl conf "number of branches"))
         len;
@@ -371,19 +373,21 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
         (fun n p ->
            do {
              if len > 1 && br = None then do {
-               Wserver.wprint "<dt>";
-               stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
-                   (Util.code_varenv fx) n begin
-                 Wserver.wprint "%d." n;
-               end;
-               Wserver.wprint "\n<dd>\n";
+               Wserver.wprint "\n";
+	       stag "dt" begin
+                 stag "a" "href=\"%sm=N;v=%s;br=%d\"" (commd conf)
+                     (Util.code_varenv fx) n begin
+                   Wserver.wprint "%d." n;
+                 end;
+	       end;
+               Wserver.wprint "\n";
              }
              else ();
              if br = None || br = Some n then
                match parents (aget conf base p.cle_index) with
                [ Some ifam ->
                    let cpl = coi base ifam in
-                   do {
+                   tag "dd" begin
                      let pp = pget conf base (father cpl) in
                      if is_hidden pp then
                        Wserver.wprint "&lt;&lt;"
@@ -399,11 +403,9 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
                        wprint_geneweb_link conf href "&lt;&lt;";
                      Wserver.wprint "\n";
                      tag "dl" begin
-                       tag "dt" begin
-                         print_branch conf base psn x 1 p;
-                       end;
+                       print_branch conf base psn x 1 p;
                      end;
-                   }
+                   end
                | None ->
                    print_branch conf base psn x
                      (if len > 1 && br = None then 1 else 0) p ]
@@ -412,7 +414,7 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
            })
         1 ancestors
     in
-    if len > 1 && br = None then Wserver.wprint "</dt></dl>\n" else ();
+    if len > 1 && br = None then Wserver.wprint "</dl>\n" else ();
     Wserver.wprint "</td></tr></table>\n";
     trailer conf;
   }
@@ -464,6 +466,7 @@ value print_family_alphabetic x conf base liste =
       do {
         header conf title;
         print_link_to_welcome conf True;
+	html_p conf;
         print_alphab_list conf (fun (p, _) -> String.sub p (initial p) 1)
           (print_elem conf base False) liste;
         trailer conf;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.52 2004-12-26 13:29:23 ddr Exp $ *)
+(* $Id: relation.ml,v 4.53 2004-12-26 21:48:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1280,7 +1280,7 @@ value print_propose_upto conf base p1 p2 rl =
       let (p, a) = if x1 == 0 then (p2, p1) else (p1, p2) in
       do {
         html_p conf;
-        Wserver.wprint "<font size=-1>";
+        Wserver.wprint "<span style=\"font-size:80%%\">";
         Wserver.wprint "%s"
           (capitale
              (transl_a_of_b conf (transl conf "ancestors")
@@ -1291,7 +1291,7 @@ value print_propose_upto conf base p1 p2 rl =
         Wserver.wprint "<a href=\"%sm=A;t=D;%s;%s;l=%d\">" (commd conf)
           (acces conf base p) (acces_n conf base "1" a) maxlen;
         Wserver.wprint "%s</a>" (transl conf "here");
-        Wserver.wprint ".</em></font>\n"
+        Wserver.wprint ".</em></span>\n"
       }
   | _ -> () ]
 ;

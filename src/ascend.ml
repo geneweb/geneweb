@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.40 2004-12-26 10:00:14 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.41 2004-12-26 21:48:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -421,6 +421,7 @@ value display_ancestors_with_numbers conf base max_level p =
   do {
     header conf title;
     print_link_to_welcome conf True;
+    html_p conf;
     Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
     tag "ul" begin
       mark.(Adef.int_of_iper p.cle_index) := Num.one;
@@ -639,7 +640,7 @@ value print_family_long conf base ws wn all_gp ifam nth moth_nb =
       List.for_all (fun ip -> authorized_age conf base (pget conf base ip))
         (Array.to_list des.children)
     in
-    tag "ol" "type=a" begin
+    tag "ol" "style=\"list-style-type:lower-latin\"" begin
       for i = 0 to Array.length des.children - 1 do {
         let ipc = des.children.(i) in
         if ws || get_link all_gp ipc <> None then do {
@@ -791,14 +792,14 @@ value print_not_empty_src conf base new_parag first txt isrc =
   else do {
     if first.val then do {
       if new_parag then html_p conf else ();
-      Wserver.wprint "<font size=-1><em>%s:</em></font>\n"
+      Wserver.wprint "<em style=\"font-size:80%%\">%s:</em>\n"
         (capitale (transl_nth conf "source/sources" 1))
     }
     else ();
     html_br conf;
     Wserver.wprint "-\n";
     first.val := False;
-    Wserver.wprint "<font size=-1><em>%s: %s</em></font>\n" (txt ())
+    Wserver.wprint "<em style=\"font-size:80%%\">%s: %s</em>\n" (txt ())
       (string_with_macros conf False [] src);
   }
 ;
@@ -846,11 +847,11 @@ value print_notes_for_someone conf base p n child_n =
     let notes = sou base p.notes in
     Wserver.wprint "<dt>\n";
     stag "strong" begin
-      stag "a" "name=\"notes-%s%s\"" (Num.to_string n) child_n begin
-        stag "a" "href=#%s" (Num.to_string n) begin
-          Num.print wpr (transl conf "(thousand separator)") n;
-          Wserver.wprint "%s" child_n;
-        end;
+      stag "a" "name=\"notes-%s%s\" href=\"#%s\"" (Num.to_string n)
+        child_n (Num.to_string n)
+      begin
+        Num.print wpr (transl conf "(thousand separator)") n;
+        Wserver.wprint "%s" child_n;
       end;
     end;
     Wserver.wprint ": \n<dd>\n";
@@ -954,6 +955,7 @@ value display_ancestors_with_numbers_long conf base max_level ws wn p =
   in
   do {
     header conf title;
+    html_p conf;
     if only then ()
     else Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
     mark.(Adef.int_of_iper p.cle_index) := Num.one;
