@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.40 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: forum.ml,v 4.41 2005-02-04 17:22:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -541,7 +541,7 @@ value get conf key =
 ;
 
 value forum_add conf base ident comm =
-  let email = String.lowercase (Gutil.strip_spaces (get conf "Email")) in
+  let email = Gutil.strip_spaces (get conf "Email") in
   let subject = Gutil.strip_spaces (get conf "Subject") in
   let access =
     if conf.wizard || conf.friend then
