@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.1 1999-04-30 11:45:48 ddr Exp $ *)
+(* $Id: setup.ml,v 1.2 1999-04-30 13:56:33 ddr Exp $ *)
 
 value default_lang = "en";
 value setup_dir = ref "setup";
@@ -376,7 +376,7 @@ value root_dir = ref "gw";
 
 value main () =
   do Sys.chdir root_dir.val;
-     intro ();
+     try let _ = Sys.getenv "WSERVER" in () with [ Not_found -> intro () ];
      Wserver.f 2318 0 None (None, None) wrap_setup;
   return ()
 ;
