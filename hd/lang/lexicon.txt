@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.175 2000-11-06 19:01:32 ddr Exp $
+# $Id: lexicon.txt,v 3.176 2000-11-06 19:19:08 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -567,6 +567,7 @@ he:   ÷/ì
 is: J/N
 it: S/N
 lv: J/N
+nl: J/N
 no: J/N
 pt: S/N
 ru: Ä/Í
@@ -3560,6 +3561,7 @@ se: ut&ouml;kad rapport
 dk: loop i databasen: %s er sin egen ane
 en: loop in data base: %s is his/her own ancestor
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
+nl: loop in de data base: %s is zijn/haar eigen voorouder
 se: loop i databasen: %s &auml;r sin egen ana
 
     main title
@@ -3781,12 +3783,14 @@ se: sammanslagning klar
 dk: meddelelse tilf&oslash;jet
 en: message added
 fr: message ajout&eacute;
+nl: bericht toegevoegd
 se: meddelande inlagt
 
     message/next message
 dk: meddelelse/n&aelig;ste meddelelse
 en: message/next message
 fr: message/message suivant
+nl: bericht/volgend bericht
 se: meddelande/n&auml;sta meddelande
 
     missing ancestors
@@ -5381,6 +5385,7 @@ se: statistik
 dk: emne
 en: subject
 fr: sujet
+nl: onderwerp
 se: ämne
 
     surname alias
