@@ -4,6 +4,9 @@ GeneWeb Version 1.07
 * gwd:
   - fixed bug, could not find file "start.txt" in -hd directory.
 
+* ged2gwb:
+  - does not stop any more when bad GEDCOM line found => warning and goes on.
+
 GeneWeb Version 1.06
 --------------------
 

@@ -1,11 +1,13 @@
-(* $Id: argl.ml,v 1.1.1.1 1998-09-01 14:32:02 ddr Exp $ *)
+(* $Id: argl.ml,v 1.2 1998-09-04 15:04:53 ddr Exp $ *)
 
 value action_arg s sl =
   fun
   [ Arg.Unit f -> if s = "" then do f (); return Some sl else None
   | Arg.Set r -> if s = "" then do r.val := True; return Some sl else None
   | Arg.Clear r -> if s = "" then do r.val := False; return Some sl else None
+(**)
   | Arg.Rest f -> do List.iter f [s :: sl]; return Some []
+(**)
   | Arg.String f ->
       if s = "" then
         match sl with
