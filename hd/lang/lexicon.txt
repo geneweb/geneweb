@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.216 2001-02-02 07:57:25 ddr Exp $
+# $Id: lexicon.txt,v 3.217 2001-02-02 16:29:26 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -2478,6 +2478,7 @@ se: f&ouml;rsvunnen
 de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
 en: display by slices/slice width/overlap/total width
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
+no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
 se: visa genom att dela sidan/sidbredd/överlappning/global bredd
 
     divorce
@@ -2525,6 +2526,7 @@ se: skilda
     don't group the common branches together
 en: don't group the common branches together
 fr: ne pas regrouper les branches communes
+no: sammenfallende anelinjer skal ikke slås sammen
 se: gruppera inte ihop de gemensamma anlinjerna
 
     don't know
