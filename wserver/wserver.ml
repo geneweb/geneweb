@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 2.4 1999-04-07 13:08:10 ddr Exp $ *)
+(* $Id: wserver.ml,v 2.5 1999-08-05 12:38:31 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value wserver_oc =
@@ -265,6 +265,64 @@ value string_of_sockaddr =
 ;
 value sockaddr_of_string s = Unix.ADDR_UNIX s;
 
+module W = Map.Make (struct type t = string ; value compare = compare; end);
+value who = ref W.empty;
+value excluded = ref [];
+
+value is_robot robot_excluder addr =
+  match robot_excluder with
+  [ Some (max_call, sec) ->
+      let str = string_of_sockaddr addr in
+      if List.mem str excluded.val then True
+      else
+        let tm = Unix.time () in
+        let r = try W.find str who.val with [ Not_found -> [] ] in
+        let (cnt, r, t) =
+          count r where rec count =
+            fun
+            [ [t :: tl] ->
+                if tm -. t < float sec then
+                  let (cnt, tl, t1) = count tl in
+                  (cnt + 1, [t :: tl], if t1 = 0.0 then t else t1)
+                else (0, [], t)
+            | [] -> (0, [], 0.0) ]
+        in
+        do who.val := W.add str [tm :: r] who.val; return
+        if cnt > max_call then
+          let str1 =
+            match addr with
+            [ Unix.ADDR_UNIX s -> s
+            | Unix.ADDR_INET a _ ->
+                try (Unix.gethostbyaddr a).Unix.h_name with _ ->
+                  Unix.string_of_inet_addr a ]
+          in
+do Printf.eprintf "*** %s is a robot => access definitively refused\n" str1; Printf.eprintf "(%d > %d connections in %g < %d seconds)\n" cnt max_call (tm -. t) sec; flush Pervasives.stderr; return
+          do excluded.val := [str :: excluded.val]; return True
+        else False
+  | _ -> False ]
+;
+
+value robot_error t =
+ifdef UNIX then
+  match Unix.fork () with
+  [ 0 ->
+      do if Unix.fork () <> 0 then exit 0 else ();
+         Unix.dup2 t Unix.stdout;
+         wprint "HTTP/1.0 403 Forbidden"; nl ();
+         wprint "Content-type: text/html; charset=iso-8859-1"; nl ();
+         nl ();
+         wprint "<body><h1>Access refused</h1></body>"; nl ();
+         wflush ();
+         try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
+         try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
+         try Unix.close t with _ -> ();
+         exit 2;
+      return ()
+  | pid ->
+      let _ = Unix.waitpid [] pid in Unix.close t ]
+else ()
+;
+
 value treat_connection tmout callback addr ic =
   do ifdef UNIX then
        if tmout > 0 then
@@ -398,10 +456,11 @@ do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining aft
   | None -> () ]
 ;
 
-value accept_connection tmout max_clients callback s =
+value accept_connection tmout max_clients robot_excluder callback s =
   do wait_available max_clients s; return
   let (t, addr) = Unix.accept s in
   do Unix.setsockopt t Unix.SO_KEEPALIVE True; return
+  if is_robot robot_excluder addr then robot_error t else
   ifdef UNIX then
     match try Some (Unix.fork ()) with _ -> None with
     [ Some 0 ->
@@ -473,7 +532,7 @@ value accept_connection tmout max_clients callback s =
    return ()
 ;
 
-value f port tmout max_clients (uid, gid) g =
+value f port tmout max_clients (uid, gid) robot_excluder g =
   match try Some (Sys.getenv "WSERVER") with [ Not_found -> None ] with
   [ Some s ->
       let addr = sockaddr_of_string s in
@@ -505,7 +564,7 @@ value f port tmout max_clients (uid, gid) g =
          Printf.eprintf "...\n";
          flush stderr;
          while True do
-           try accept_connection tmout max_clients g s with
+           try accept_connection tmout max_clients robot_excluder g s with
            [ Unix.Unix_error _ "accept" _ -> ()
            | exc -> print_err_exc exc ];
            wflush ();
