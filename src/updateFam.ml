@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.7 2000-03-10 09:38:41 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.8 2000-05-14 17:01:23 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -301,7 +301,7 @@ value print_marriage conf base fam =
            Wserver.wprint
              "<input name=marriage_place size=40 maxlength=200%s>\n"
              (if fam.marriage_place = "" then ""
-             else " value=\"" ^ fam.marriage_place ^ "\"");
+             else " value=\"" ^ quote_escaped fam.marriage_place ^ "\"");
          end;
        end;
      end;
