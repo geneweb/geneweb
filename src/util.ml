@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.96 2004-12-25 23:03:17 ddr Exp $ *)
+(* $Id: util.ml,v 4.97 2004-12-26 05:44:15 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1241,8 +1241,8 @@ value tag_id s i =
 
 value good_tags_list =
   ["a"; "b"; "br"; "dd"; "div"; "dl"; "dt"; "em"; "font"; "hr"; "h1"; "h2";
-   "h3"; "h4"; "i"; "img"; "li"; "ol"; "p"; "pre"; "strong"; "sup"; "table";
-   "td"; "tr"; "u"; "ul"]
+   "h3"; "h4"; "i"; "img"; "li"; "ol"; "p"; "pre"; "span"; "strong"; "sup";
+   "table"; "td"; "tr"; "u"; "ul"]
 ;
 value bad_tags_list =
   ["applet"; "embed"; "form"; "input"; "object"; "script"]
@@ -1335,7 +1335,10 @@ value string_with_macros conf positive_filtering env s =
             match http_string s i with
             [ Some j ->
                 let x = String.sub s i (j - i) in
-                do { Printf.bprintf buff "<a href=%s>%s</a>" x x; loop Out j }
+                do {
+                  Printf.bprintf buff "<a href=\"%s\">%s</a>" x x;
+                  loop Out j
+                }
             | None ->
                 match email_addr s i with
                 [ Some j ->
