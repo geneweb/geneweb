@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.23 2000-06-22 20:19:09 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.24 2000-07-07 12:11:15 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -233,7 +233,7 @@ value rec src_translate conf base nom ic =
     else
       let r = Util.transl_nth conf s n in
       match Gutil.lindex r '%' with
-      [ Some i when r.[i+1] == 'd' && c = "(" ->
+      [ Some i when (*r.[i+1] == 'd' &&*) c = "(" ->
           let sa =
             loop 0 where rec loop len =
               let c = input_char ic in

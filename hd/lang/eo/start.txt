@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.37 2000-07-05 12:56:17 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.38 2000-07-07 12:11:08 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title> Genealogio - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -78,7 +78,7 @@ Por navigi en cxi datenbazo, vi povas fari via sercxo:<br><p>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
 [or] <em>[surname/surnames]</em>%Iz
-or <em>Sosa number</em> relative to %a%E
+[or] [<em>Sosa number</em> relative to %t](%a)%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.44 2000-07-05 12:56:17 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.45 2000-07-07 12:11:08 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogía - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -79,7 +79,7 @@ Para navegar en esta base de datos, puede hacer su búsqueda:<br><p>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
 [or] <em>[surname/surnames]</em>%Iz
-[or] <em>n&uacute;mero Sosa</em> respecto a %a%E
+[or] [<em>Sosa number</em> relative to %t](%a)%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
