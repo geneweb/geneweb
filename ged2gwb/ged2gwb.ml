@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.24 2000-07-26 04:42:33 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.25 2000-07-28 14:31:21 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1175,7 +1175,7 @@ value add_indi gen r =
     let rl = find_all_fields "FAMS" r.rsons in
     let rvl =
       List.fold_right
-        (fun r rvl -> if List.mem r.rval rvl then [r.rval :: rvl] else rvl) rl
+        (fun r rvl -> if List.mem r.rval rvl then rvl else [r.rval :: rvl]) rl
         []
     in
     List.map (fun r -> fam_index gen r) rvl
