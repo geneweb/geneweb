@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.31 2005-02-27 04:29:43 ddr Exp $ *)
+(* $Id: date.ml,v 4.32 2005-02-27 08:44:56 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -604,9 +604,9 @@ value print_calendar conf base =
          let yy = getint ("y" ^ var) in
          let mm = getint ("m" ^ var) in
          let dd = getint ("d" ^ var) in
+         let dt = {day = dd; month = mm; year = yy; prec = Sure; delta = 0} in
          match p_getenv conf.env ("t" ^ var) with
-         [ Some _ ->
-             conv {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+         [ Some _ -> conv dt
          | None ->
              match
                (p_getenv conf.env ("y" ^ var ^ "1"),
@@ -616,34 +616,27 @@ value print_calendar conf base =
                 p_getenv conf.env ("d" ^ var ^ "1"),
                 p_getenv conf.env ("d" ^ var ^ "2"))
              with
-             [ (Some _, _, _, _, _, _) ->
-                 let yy = yy - 1 in
-                 conv
-                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
-             | (_, Some _, _, _, _, _) ->
-                 let yy = yy + 1 in
-                 conv
-                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+             [ (Some _, _, _, _, _, _) -> conv {(dt) with year = yy - 1}
+             | (_, Some _, _, _, _, _) -> conv {(dt) with year = yy + 1}
              | (_, _, Some _, _, _, _) ->
                  let (yy, mm) =
                    if mm = 1 then (yy - 1, max_month) else (yy, mm - 1)
                  in
-                 conv
-                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+                 conv {(dt) with year = yy; month = mm}
              | (_, _, _, Some _, _, _) ->
                  let (yy, mm) =
                    if mm = max_month then (yy + 1, 1) else (yy, mm + 1)
                  in
-                 conv
-                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
-             | (_, _, _, _, Some _, _) ->
-                 let dd = dd - 1 in
-                 conv
-                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
-             | (_, _, _, _, _, Some _) ->
-                 let dd = dd + 1 in
-                 conv
-                   {day = dd; month = mm; year = yy; prec = Sure; delta = 0}
+                 let r = conv {(dt) with year = yy; month = mm} in
+                 if r = conv dt then
+                   (* turn around problem with Hebrew Adar1/Adar2 *)
+                   let (yy, mm) =
+                     if mm = max_month then (yy + 1, 1) else (yy, mm + 1)
+                   in
+                   conv {(dt) with year = yy; month = mm}
+                 else r
+             | (_, _, _, _, Some _, _) -> conv {(dt) with day = dd - 1}
+             | (_, _, _, _, _, Some _) -> conv {(dt) with day = dd + 1}
              | _ -> d ] ])
       (Calendar.sdn_of_gregorian conf.today)
       [("g", Calendar.sdn_of_gregorian, 12);
