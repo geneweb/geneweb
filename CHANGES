@@ -34,8 +34,8 @@ GeneWeb Version 1.09
          2 FILE ...
 
 * ged2gwb:
-  - Automatic delete of dupplicate FAMS which sometimes happen in erroneous
-    Gedcoms.
+  - Delete of duplicated FAMS which sometimes happen in erroneous Gedcoms.
+  - Delete families from GEDCOM when parents dont have the good sex..
 
 GeneWeb Version 1.08
 --------------------
