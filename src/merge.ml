@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 2.3 1999-07-22 14:34:11 ddr Exp $ *)
+(* $Id: merge.ml,v 2.4 1999-07-23 12:44:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -27,7 +27,7 @@ value print conf base p =
        Wserver.wprint "<input type=hidden name=m value=MRG_IND>\n";
        Wserver.wprint "<input type=hidden name=i value=%d>\n"
          (Adef.int_of_iper p.cle_index);
-       Wserver.wprint "%s " (capitale (transl conf "with"));
+       Wserver.wprint "%s " (capitale (transl_decline conf "with" ""));
        Wserver.wprint "(%s . %s %s):\n"
          (transl_nth conf "first name/first names" 0)
          (transl conf "number") (transl_nth conf "surname/surnames" 0);
