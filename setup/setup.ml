@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.29 2002-01-21 13:25:33 ddr Exp $ *)
+(* $Id: setup.ml,v 4.30 2002-01-21 15:28:50 ddr Exp $ *)
 
 open Printf;
 
@@ -1391,16 +1391,10 @@ value gwd conf =
   let aenv = read_gwd_arg () in
   let get v = try List.assoc v aenv with [ Not_found -> "" ] in
   let conf =
-    let nolock =
-      try let _ = List.assoc "nolock" aenv in "on" with [ Not_found -> "" ]
-    in
     {(conf) with
       env =
-        [("H", get "hd"); ("B", get "bd"); ("P", get "p");
-         ("W", get "wizard"); ("L", get "lang");
-         ("O", get "only"); ("A", get "auth");
-         ("T", Filename.basename (get "log")); ("N", nolock);
-         ("M", get "max_clients"); ("U", get "setuid"); ("G", get "setgid") ::
+        [("default_lang", get "lang"); ("only", get "only");
+         ("log", Filename.basename (get "log")) ::
          conf.env]}
   in
   print_file conf "gwd.htm"
@@ -1410,35 +1404,18 @@ value gwd_1 conf =
   let oc = open_out (Filename.concat setup_dir.val "gwd.arg") in
   let print_param k =
     match p_getenv conf.env k with
-    [ Some v when v <> "" -> fprintf oc "-%s\n%s" k v
+    [ Some v when v <> "" -> fprintf oc "-%s\n%s\n" k v
     | _ -> () ]
   in
   do {
     match p_getenv conf.env "setup_link" with
     [ Some v -> fprintf oc "-setup_link\n"
     | _ -> () ];
-    print_param "hd";
-    print_param "bd";
-    print_param "p";
-    print_param "wizard";
-    print_param "friend";
+    print_param "only";
     match p_getenv conf.env "default_lang" with
     [ Some v when v <> "" -> fprintf oc "-lang\n%s\n" v
     | _ -> () ];
-    print_param "only";
-    print_param "auth";
-    match p_getenv conf.env "log" with
-    [ Some v when v <> "" -> fprintf oc "-log\n%s\n" v
-    | _ -> () ];
-    match p_getenv conf.env "nolock" with
-    [ Some "on" -> fprintf oc "-nolock\n"
-    | _ -> () ];
-    ifdef UNIX then do {
-      print_param "max_clients";
-      print_param "setuid";
-      print_param "setgid"
-    }
-    else ();
+    print_param "log";
     close_out oc;
     print_file conf "gwd_ok.htm"
   }
