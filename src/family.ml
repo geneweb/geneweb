@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.18 2000-03-20 15:39:26 ddr Exp $ *)
+(* $Id: family.ml,v 3.19 2000-03-20 21:39:30 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -555,7 +555,8 @@ value extract_sosa_henv conf base =
         let surname = p_surname base p in
         if (conf.wizard && conf.friend || conf.access_by_key)
         && not (first_name = "?" || surname = "?") then
-          [("pz", Name.lower first_name); ("nz", Name.lower surname);
+          [("pz", code_varenv (Name.lower first_name));
+           ("nz", code_varenv (Name.lower surname));
            ("ocz", string_of_int p.occ)]
         else
           [("iz", string_of_int (Adef.int_of_iper p.cle_index))]
