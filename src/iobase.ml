@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.29 2004-08-05 19:41:05 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.30 2004-08-09 11:35:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1426,9 +1426,11 @@ value gen_output no_patches bname base =
     base.func.cleanup ();
     let oc = Secure.open_out_bin tmp_base in
     let oc_acc = Secure.open_out_bin tmp_base_acc in
-    let output_array arr =
+    let output_array arrname arr =
       let bpos = pos_out oc in
       do {
+        Printf.eprintf "*** saving %s array\n" arrname;
+        flush stderr;
         match try Some (arr.array ()) with [ Failure _ -> None ] with
         [ Some a -> output_value_no_sharing oc a
 	| None -> output_cache_array_no_sharing oc arr ];
@@ -1452,25 +1454,25 @@ value gen_output no_patches bname base =
         output_binary_int oc 0;
         output_value_no_sharing oc base.data.bnotes.norigin_file;
         let persons_array_pos = pos_out oc in
-        if not no_patches then output_array base.data.persons
+        if not no_patches then output_array "persons" base.data.persons
         else just_copy bname "persons" oc oc_acc;
         let ascends_array_pos = pos_out oc in
         if not no_patches then () else trace "saving ascends";
-        output_array base.data.ascends;
+        output_array "ascends" base.data.ascends;
         let unions_array_pos = pos_out oc in
-        if not no_patches then output_array base.data.unions
+        if not no_patches then output_array "unions" base.data.unions
         else just_copy bname "unions" oc oc_acc;
         let families_array_pos = pos_out oc in
-        if not no_patches then output_array base.data.families
+        if not no_patches then output_array "families" base.data.families
         else just_copy bname "families" oc oc_acc;
         let couples_array_pos = pos_out oc in
-        if not no_patches then output_array base.data.couples
+        if not no_patches then output_array "couples" base.data.couples
         else just_copy bname "couples" oc oc_acc;
         let descends_array_pos = pos_out oc in
-        if not no_patches then output_array base.data.descends
+        if not no_patches then output_array "descends" base.data.descends
         else just_copy bname "descends" oc oc_acc;
         let strings_array_pos = pos_out oc in
-        if not no_patches then output_array base.data.strings
+        if not no_patches then output_array "strings" base.data.strings
         else just_copy bname "strings" oc oc_acc;
         seek_out oc array_start_indexes;
         output_binary_int oc persons_array_pos;
