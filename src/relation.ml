@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.43 2003-11-27 18:03:35 ddr Exp $ *)
+(* $Id: relation.ml,v 4.44 2003-11-28 01:38:58 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -170,7 +170,7 @@ value print_menu conf base p =
         tag "tr" begin
           tag "td" "align=right" begin
             Wserver.wprint "%s\n" (capitale (transl conf "border"));
-            Wserver.wprint "<input name=bd size=1 maxlength=2 value=0><br>\n";
+            Wserver.wprint "<input name=bd size=1 maxlength=2 value=0>\n";
           end;
           tag "td" "align=right" begin
             Wserver.wprint "\
