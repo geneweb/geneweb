@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.2 1998-09-02 11:58:58 ddr Exp $
+# $Id: Makefile,v 1.3 1998-09-29 12:22:34 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -11,21 +11,21 @@ all:: out
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 
 out:: def.syn.cmo gwc.out consang.out gwd.out gwu.out phonygwd.out i18n_check.out
-	$(RM) lgwc lconsang lgwd lgwu
-	cp gwc.out lgwc
-	cp consang.out lconsang
-	cp gwd.out lgwd
-	cp gwu.out lgwu
+	$(RM) gwc consang gwd gwu
+	cp gwc.out gwc
+	cp consang.out consang
+	cp gwd.out gwd
+	cp gwu.out gwu
 
 opt:: def.syn.cmo gwc.opt consang.opt gwd.opt gwu.opt
-	$(RM) lgwd lconsang lgwd lgwu
-	cp gwc.opt lgwc
-	cp consang.opt lconsang
-	cp gwd.opt lgwd
-	cp gwu.opt lgwu
+	$(RM) gwd consang gwd gwu
+	cp gwc.opt gwc
+	cp consang.opt consang
+	cp gwd.opt gwd
+	cp gwu.opt gwu
 
 clean::
-	$(RM) lgwc lconsang lgwd lgwu
+	$(RM) gwc consang gwd gwu
 
 gwc.out: $(GWC_OBJS)
 	$(OCAMLC) -custom unix.cma $(GWC_OBJS) $(LIBUNIX) -o gwc.out

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 1.1.1.1 1998-09-01 14:32:06 ddr Exp $ *)
+(* $Id: update.ml,v 1.2 1998-09-29 12:22:43 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -89,6 +89,23 @@ value print_someone base p =
 value print_first_name base p =
   Wserver.wprint "<strong>%s%s</strong>" (sou base p.first_name)
     (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
+;
+
+value print_src conf name field =
+  tag "table" "border=1" begin
+    tag "tr" begin
+      tag "td" begin
+        Wserver.wprint "%s" (capitale (transl_nth conf "source/sources" 0));
+      end;
+      tag "td" begin
+        Wserver.wprint "<input name=%s size=40 maxlength=200%s>\n"
+          name
+          (match field with
+           [ s when s <> "" -> " value=\"" ^ quote_escaped s ^ "\""
+           | _ -> "" ]);
+      end;
+    end;
+  end
 ;
 
 value print_error conf base =

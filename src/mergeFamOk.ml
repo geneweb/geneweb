@@ -1,10 +1,18 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 1.1.1.1 1998-09-01 14:32:11 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 1.2 1998-09-29 12:22:40 ddr Exp $ *)
 
 open Config;
 open Def;
 open Util;
 open Gutil;
+
+value cat_strings base is1 sep is2 =
+  let n1 = sou base is1 in
+  let n2 = sou base is2 in
+  if n1 = "" then n2
+  else if n2 = "" then n1
+  else n1 ^ sep ^ n2
+;
 
 value reconstitute conf base fam1 fam2 =
   let field name proj null =
@@ -18,18 +26,14 @@ value reconstitute conf base fam1 fam2 =
   {marriage = field "marriage" (fun f -> f.marriage) (\= Adef.codate_None);
    marriage_place =
      field "marriage_place" (fun f -> sou base f.marriage_place) (\= "");
+   marriage_src = cat_strings base fam1.marriage_src ", " fam2.marriage_src;
    divorce = field "divorce" (fun f -> f.divorce) (\= NotDivorced);
    children =
      Array.map (UpdateFam.person_key base)
        (Array.append fam1.children fam2.children);
    comment = sou base fam1.comment;
    origin_file = sou base fam1.origin_file;
-   fsources =
-     let n1 = sou base fam1.fsources in
-     let n2 = sou base fam2.fsources in
-     if n1 = "" then n2
-     else if n2 = "" then n1
-     else n1 ^ ", " ^ n2;
+   fsources = cat_strings base fam1.fsources ", " fam2.fsources;
    fam_index = fam1.fam_index}
 ;
 

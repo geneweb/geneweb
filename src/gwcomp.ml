@@ -1,9 +1,9 @@
-(* $Id: gwcomp.ml,v 1.3 1998-09-24 12:57:29 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.4 1998-09-29 12:22:37 ddr Exp $ *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo0008";
+value magic_gwo = "GnWo0009";
 
 type key =
   { pk_first_name : string;
@@ -219,27 +219,9 @@ value cut_space x =
   else x
 ;
 
-value get_birth_place l =
+value get_field lab l =
   match l with
-  [ ["#bp"; x :: l'] -> (cut_space x, l')
-  | _ -> ("", l) ]
-;
-
-value get_bapt_place l =
-  match l with
-  [ ["#pp"; x :: l'] -> (cut_space x, l')
-  | _ -> ("", l) ]
-;
-
-value get_death_place l =
-  match l with
-  [ ["#dp"; x :: l'] -> (cut_space x, l')
-  | _ -> ("", l) ]
-;
-
-value get_burial_place l =
-  match l with
-  [ ["#rp"; x :: l'] -> (cut_space x, l')
+  [ [lab1; x :: l'] when lab1 = lab -> (cut_space x, l')
   | _ -> ("", l) ]
 ;
 
@@ -465,11 +447,8 @@ value get_mar_date str =
              else Adef.codate_None, l)
         | _ -> failwith str ]
       in
-      let (place, l) =
-        match l with
-        [ ["#mp"; x :: l] -> (cut_space x, l)
-        | _ -> ("", l) ]
-      in
+      let (place, l) = get_field "#mp" l in
+      let (src, l) = get_field "#ms" l in
       let (divorce, l) =
         match l with
         [ [x :: l] when x.[0] == '-' ->
@@ -478,7 +457,7 @@ value get_mar_date str =
             else (Divorced Adef.codate_None, l)
         | _ -> (NotDivorced, l) ]
       in
-      (mar, place, divorce, l)
+      (mar, place, src, divorce, l)
   | [] -> failwith str ]
 ;
 
@@ -492,10 +471,10 @@ value create_person () =
    public_name = ""; nick_names = []; aliases = [];
    first_names_aliases = []; surnames_aliases = [];
    titles = []; occupation = ""; sexe = Neutre; access = IfTitles;
-   birth = Adef.codate_None; birth_place = "";
-   baptism = Adef.codate_None; baptism_place = "";
-   death = DontKnowIfDead; death_place = "";
-   burial = UnknownBurial; burial_place = "";
+   birth = Adef.codate_None; birth_place = ""; birth_src = "";
+   baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
+   death = DontKnowIfDead; death_place = ""; death_src = "";
+   burial = UnknownBurial; burial_place = ""; burial_src = "";
    family = [| |]; notes = ""; psources = "";
    cle_index = Adef.iper_of_int (-1)}
 ;
@@ -524,11 +503,14 @@ value set_infos str u l =
   let (n, l) = get_sources str l in
   do if n <> "" then u.psources := n else (); return
   let (naissance, l) = get_optional_birthdate l in
-  let (birth_place, l) = get_birth_place l in
+  let (birth_place, l) = get_field "#bp" l in
+  let (birth_src, l) = get_field "#bs" l in
   let (baptism, l) = get_optional_baptdate l in
-  let (baptism_place, l) = get_bapt_place l in
+  let (baptism_place, l) = get_field "#pp" l in
+  let (bapt_src, l) = get_field "#ps" l in
   let (mort, l) = get_optional_deathdate l in
-  let (death_place, l) = get_death_place l in
+  let (death_place, l) = get_field "#dp" l in
+  let (death_src, l) = get_field "#ds" l in
   let mort =
     match (naissance, mort) with
     [ (None, _) | (_, Some _) | (Some None, _) ->
@@ -549,15 +531,21 @@ value set_infos str u l =
   in
   do u.birth := naissance;
      u.birth_place := birth_place;
+     u.birth_src := birth_src;
      u.baptism := baptism;
      u.baptism_place := baptism_place;
+     u.baptism_src := bapt_src;
      u.death := mort;
      u.death_place := death_place;
+     u.death_src := death_src;
   return
   let (burial, l) = get_burial l in
   do u.burial := burial; return
-  let (burial_place, l) = get_burial_place l in
-  do u.burial_place := burial_place; return
+  let (burial_place, l) = get_field "#rp" l in
+  let (burial_src, l) = get_field "#rs" l in
+  do u.burial_place := burial_place;
+     u.burial_src := burial_src;
+  return
   l
 ;
 
@@ -607,7 +595,7 @@ value lire_famille ic fname =
   fun
   [ Some (str, ["fam" :: l]) ->
       let (cle_pere, surname, l) = parse_parent str l in
-      let (marriage, marriage_place, divorce, l) = get_mar_date str l in
+      let (marriage, marr_place, marr_src, divorce, l) = get_mar_date str l in
       let (cle_mere, _, l) = parse_parent str l in
       do if l <> [] then failwith str else (); return
       let ligne = lire_ligne ic in
@@ -642,7 +630,8 @@ value lire_famille ic fname =
             List.rev (loop [])
           in
           let fo =
-            {marriage = marriage; marriage_place = marriage_place;
+            {marriage = marriage; marriage_place = marr_place;
+             marriage_src = marr_src;
              divorce = divorce; children = Array.of_list cles_enfants;
              comment = ""; origin_file = fname;
              fsources = fsrc;
@@ -652,7 +641,8 @@ value lire_famille ic fname =
       | Some (str, ["comm" :: _]) ->
           let comm = String.sub str 5 (String.length str - 5) in
           let fo =
-            {marriage = marriage; marriage_place = marriage_place;
+            {marriage = marriage; marriage_place = marr_place;
+             marriage_src = marr_src;
              divorce = divorce; children = [||]; comment = comm;
              origin_file = fname; fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}
@@ -660,7 +650,8 @@ value lire_famille ic fname =
           Some (Family co fo, lire_ligne ic)
       | ligne ->
           let fo =
-            {marriage = marriage; marriage_place = marriage_place;
+            {marriage = marriage; marriage_place = marr_place;
+             marriage_src = marr_src;
              divorce = divorce; children = [||]; comment = "";
              origin_file = fname; fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}

@@ -1,9 +1,9 @@
-(* $Id: iobase.ml,v 1.3 1998-09-15 12:30:05 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.4 1998-09-29 12:22:39 ddr Exp $ *)
 
 open Def;
 open Gutil;
 
-value magic_gwb = "GnWb001p";
+value magic_gwb = "GnWb001q";
 
 (*
  Files in base (directory .gwb)

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 1.1.1.1 1998-09-01 14:32:04 ddr Exp $ *)
+(* $Id: gutil.ml,v 1.2 1998-09-29 12:22:35 ddr Exp $ *)
 
 open Def;
 
@@ -692,15 +692,20 @@ value map_person_strings f p =
    occupation = f p.occupation;
    sexe = p.sexe; access = p.access;
    birth = p.birth; birth_place = f p.birth_place;
+   birth_src = f p.birth_src;
    baptism = p.baptism; baptism_place = f p.baptism_place;
+   baptism_src = f p.baptism_src;
    death = p.death; death_place = f p.death_place;
+   death_src = f p.death_src;
    burial = p.burial; burial_place = f p.burial_place;
+   burial_src = f p.burial_src;
    family = p.family; notes = f p.notes; psources = f p.psources;
    cle_index = p.cle_index}
 ;
 
 value map_family_ps fp fs fam =
   {marriage = fam.marriage; marriage_place = fs fam.marriage_place;
+   marriage_src = fs fam.marriage_src;
    divorce = fam.divorce;
    children = Array.map fp fam.children;
    comment = fs fam.comment;

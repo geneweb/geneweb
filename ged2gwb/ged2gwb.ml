@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.4 1998-09-24 12:57:19 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.5 1998-09-29 12:22:30 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -360,10 +360,10 @@ value unknown_per gen i =
      surnames_aliases = [];
      titles = []; occupation = empty;
      sexe = Neutre; access = IfTitles;
-     birth = Adef.codate_None; birth_place = empty;
-     baptism = Adef.codate_None; baptism_place = empty;
-     death = DontKnowIfDead; death_place = empty;
-     burial = UnknownBurial; burial_place = empty;
+     birth = Adef.codate_None; birth_place = empty; birth_src = empty;
+     baptism = Adef.codate_None; baptism_place = empty; baptism_src = empty;
+     death = DontKnowIfDead; death_place = empty; death_src = empty;
+     burial = UnknownBurial; burial_place = empty; burial_src = empty;
      family = [| |];
      notes = empty;
      psources = empty;
@@ -439,12 +439,12 @@ value lowercase_name s =
       do s.[i] := c; return loop uncap (i + 1)
 ;
 
-value add_sour gen r l =
+value source gen r =
   match find_field "SOUR" r.rsons with
   [ Some r ->
-      if String.length r.rval > 0 && r.rval.[0] = '@' then l
-      else if List.mem r.rval l then l else [r.rval :: l]
-  | _ -> l ]
+      if String.length r.rval > 0 && r.rval.[0] = '@' then ""
+      else r.rval
+  | _ -> "" ]
 ;
 
 value look_like_a_number s =
@@ -726,7 +726,7 @@ value add_indi gen r =
 *)
     List.map (fun r -> fam_index gen r.rval) rl
   in
-  let (birth, birth_place) =
+  let (birth, birth_place, birth_src) =
     match find_field "BIRT" r.rsons with
     [ Some r ->
         let d =
@@ -739,10 +739,10 @@ value add_indi gen r =
           [ Some r -> r.rval
           | _ -> "" ]
         in
-        (d, p)
-    | None -> (None, "") ]
+        (d, p, source gen r)
+    | None -> (None, "", "") ]
   in
-  let (bapt, bapt_place) =
+  let (bapt, bapt_place, bapt_src) =
     let ro =
       match find_field "BAPM" r.rsons with
       [ None -> find_field "CHR" r.rsons
@@ -760,16 +760,16 @@ value add_indi gen r =
           [ Some r -> r.rval
           | _ -> "" ]
         in
-        (Adef.codate_of_od d, p)
-    | None -> (Adef.codate_None, "") ]
+        (Adef.codate_of_od d, p, source gen r)
+    | None -> (Adef.codate_None, "", "") ]
   in
-  let (death, death_place) =
+  let (death, death_place, death_src) =
     match find_field "DEAT" r.rsons with
     [ Some r ->
         if r.rsons = [] then
-          if r.rval = "Y" then (DeadDontKnowWhen, "")
-          else if set_not_dead.val then (NotDead, "")
-          else (DontKnowIfDead, "")
+          if r.rval = "Y" then (DeadDontKnowWhen, "", "")
+          else if set_not_dead.val then (NotDead, "", "")
+          else (DontKnowIfDead, "", "")
         else
           let d =
             match find_field "DATE" r.rsons with
@@ -784,23 +784,22 @@ value add_indi gen r =
             [ Some r -> r.rval
             | _ -> "" ]
           in
-          (d, p)
+          (d, p, source gen r)
     | None ->
         match birth with
         [ Some d ->
             let age = this_year - annee d in
-            if age >= 100 then (DontKnowIfDead, "")
-            else (NotDead, "")
-        | _ -> (NotDead, "") ] ]
+            if age >= 100 then (DontKnowIfDead, "", "")
+            else (NotDead, "", "")
+        | _ -> (NotDead, "", "") ] ]
   in
-  let birth = Adef.codate_of_od birth in
-  let (burial, burial_place) =
-    let (buri, buri_place) =
+  let (burial, burial_place, burial_src) =
+    let (buri, buri_place, buri_src) =
       match find_field "BURI" r.rsons with
       [ Some r ->
           if r.rsons = [] then
-            if r.rval = "Y" then (Buried Adef.codate_None, "")
-            else (UnknownBurial, "")
+            if r.rval = "Y" then (Buried Adef.codate_None, "", "")
+            else (UnknownBurial, "", "")
           else
             let d =
               match find_field "DATE" r.rsons with
@@ -812,15 +811,15 @@ value add_indi gen r =
               [ Some r -> r.rval
               | _ -> "" ]
             in
-            (Buried (Adef.codate_of_od d), p)
-      | None -> (UnknownBurial, "") ]
+            (Buried (Adef.codate_of_od d), p, source gen r)
+      | None -> (UnknownBurial, "", "") ]
     in
-    let (crem, crem_place) =
+    let (crem, crem_place, crem_src) =
       match find_field "CREM" r.rsons with
       [ Some r ->
           if r.rsons = [] then
-            if r.rval = "Y" then (Cremated Adef.codate_None, "")
-            else (UnknownBurial, "")
+            if r.rval = "Y" then (Cremated Adef.codate_None, "", "")
+            else (UnknownBurial, "", "")
           else
             let d =
               match find_field "DATE" r.rsons with
@@ -832,32 +831,15 @@ value add_indi gen r =
               [ Some r -> r.rval
               | _ -> "" ]
             in
-            (Cremated (Adef.codate_of_od d), p)
-      | None -> (UnknownBurial, "") ]
+            (Cremated (Adef.codate_of_od d), p, source gen r)
+      | None -> (UnknownBurial, "", "") ]
     in
     match (buri, crem) with
-    [ (UnknownBurial, Cremated _) -> (crem, crem_place)
-    | _ -> (buri, buri_place) ]
+    [ (UnknownBurial, Cremated _) -> (crem, crem_place, crem_src)
+    | _ -> (buri, buri_place, buri_src) ]
   in
-  let psources =
-    let l = add_sour gen r [] in
-    let l =
-      match find_field "BIRT" r.rsons with
-      [ Some r -> add_sour gen r l
-      | _ -> l ]
-    in
-    let l =
-      match find_field "DEAT" r.rsons with
-      [ Some r -> add_sour gen r l
-      | _ -> l ]
-    in
-    List.fold_left
-      (fun s s1 ->
-         if s = "" then s1
-         else if s1 = "" then s
-         else s1 ^ "; " ^ s)
-      "" l
-  in
+  let birth = Adef.codate_of_od birth in
+  let psources = source gen r in
   let empty = add_string gen "" in
   let person =
     {first_name = add_string gen first_name;
@@ -874,9 +856,13 @@ value add_indi gen r =
      titles = titles; occupation = add_string gen occupation;
      sexe = sex; access = IfTitles;
      birth = birth; birth_place = add_string gen birth_place;
+     birth_src = add_string gen birth_src;
      baptism = bapt; baptism_place = add_string gen bapt_place;
+     baptism_src = add_string gen bapt_src;
      death = death; death_place = add_string gen death_place;
+     death_src = add_string gen death_src;
      burial = burial; burial_place = add_string gen burial_place;
+     burial_src = add_string gen burial_src;
      family = Array.of_list family;
      notes = notes;
      psources = add_string gen psources;
@@ -923,7 +909,7 @@ value add_fam gen r =
     let rl = find_all_fields "CHIL" r.rsons in
     List.map (fun r -> per_index gen r.rval) rl
   in
-  let (marr, marr_place) =
+  let (marr, marr_place, marr_src) =
     match find_field "MARR" r.rsons with
     [ Some r ->
         let d =
@@ -936,8 +922,8 @@ value add_fam gen r =
           [ Some r -> r.rval
           | _ -> "" ]
         in
-        (d, p)
-    | None -> (None, "") ]
+        (d, p, source gen r)
+    | None -> (None, "", "") ]
   in
   let div =
     match find_field "DIV" r.rsons with
@@ -951,23 +937,11 @@ value add_fam gen r =
     | None -> NotDivorced ]
   in
   let empty = add_string gen "" in
-  let fsources =
-    let l = add_sour gen r [] in
-    let l =
-      match find_field "MARR" r.rsons with
-      [ Some r -> add_sour gen r l
-      | _ -> l ]
-    in
-    List.fold_left
-      (fun s s1 ->
-         if s = "" then s1
-         else if s1 = "" then s
-         else s1 ^ "; " ^ s)
-      "" l
-  in
+  let fsources = source gen r in
   let fam =
     {marriage = Adef.codate_of_od marr;
      marriage_place = add_string gen marr_place;
+     marriage_src = add_string gen marr_src;
      divorce = div;
      children = Array.of_list children;
      comment = empty; origin_file = empty; fsources = add_string gen fsources;

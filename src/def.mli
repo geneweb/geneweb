@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 1.1.1.1 1998-09-01 14:32:04 ddr Exp $ *)
+(* $Id: def.mli,v 1.2 1998-09-29 12:22:35 ddr Exp $ *)
 
 type iper = Adef.iper;
 type ifam = Adef.ifam;
@@ -60,12 +60,16 @@ type person 'string =
     access : mutable access;
     birth : mutable codate;
     birth_place : mutable 'string;
+    birth_src : mutable 'string;
     baptism : mutable codate;
     baptism_place : mutable 'string;
+    baptism_src : mutable 'string;
     death : mutable death;
     death_place : mutable 'string;
+    death_src : mutable 'string;
     burial : mutable burial;
     burial_place : mutable 'string;
+    burial_src : mutable 'string;
     family : mutable array ifam;
     notes : mutable 'string;
     psources : mutable 'string;
@@ -80,6 +84,7 @@ type ascend =
 type family 'person 'string =
   { marriage : mutable codate;
     marriage_place : mutable 'string;
+    marriage_src : mutable 'string;
     divorce : mutable divorce;
     children : mutable array 'person;
     comment : mutable 'string;

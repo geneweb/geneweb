@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.2 1998-09-07 11:36:21 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.3 1998-09-29 12:22:46 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -415,15 +415,16 @@ value print_titles conf base p =
   in ()
 ;
 
-value print_sources conf base field =
+value print_source conf base field =
   do tag "h4" begin
-       Wserver.wprint "%s" (capitale (transl conf "sources"));
+       Wserver.wprint "%s" (capitale (transl_nth conf "source/sources" 0));
      end;
      Wserver.wprint "\n";
      tag "table" "border=1" begin
        tag "tr" begin
          tag "td" begin
-           Wserver.wprint "<input name=src size=50 maxlength=200%s>\n"
+           Wserver.wprint "<input name=%s size=50 maxlength=200%s>\n"
+             "src"
              (match field with
               [ s when s <> "" -> " value=\"" ^ quote_escaped s ^ "\""
               | _ -> "" ]);
@@ -510,6 +511,9 @@ value print_person conf base p =
      tag "table" "border=1" begin
        print_birth_date conf base p;
      end;
+     Wserver.wprint "\n";
+     Update.print_src conf "birth_src" p.birth_src;
+     Wserver.wprint "\n";
      Wserver.wprint "<p>\n";
      tag "table" "border=1" begin
        print_bapt_place conf base p;
@@ -518,6 +522,8 @@ value print_person conf base p =
      tag "table" "border=1" begin
        print_bapt_date conf base p;
      end;
+     Wserver.wprint "\n";
+     Update.print_src conf "bapt_src" p.baptism_src;
      Wserver.wprint "\n";
      tag "h4" begin
        Wserver.wprint "%s" (capitale (transl conf "death"));
@@ -541,6 +547,12 @@ value print_person conf base p =
        end;
      end;
      Wserver.wprint "\n";
+     Update.print_src conf "death_src" p.death_src;
+     Wserver.wprint "\n";
+     tag "h4" begin
+       Wserver.wprint "%s" (capitale (transl conf "burial"));
+     end;
+     Wserver.wprint "\n";
      tag "table" "border=1" begin
        tag "tr" begin
          tag "td" begin print_burial_type conf base p; end;
@@ -551,6 +563,8 @@ value print_person conf base p =
      tag "table" "border=1" begin
        print_burial_date conf base p;
      end;
+     Wserver.wprint "\n";
+     Update.print_src conf "burial_src" p.burial_src;
      Wserver.wprint "\n";
      print_occupation conf base p;
      Wserver.wprint "\n";
@@ -567,7 +581,7 @@ value print_person conf base p =
      end;
      print_notes conf base p;
      Wserver.wprint "\n";
-     print_sources conf base p.psources;
+     print_source conf base p.psources;
   return ()
 ;
 
@@ -657,10 +671,10 @@ value print_add conf base =
      public_name = ""; nick_names = []; aliases = [];
      titles = []; occupation = "";
      sexe = Neutre; access = IfTitles;
-     birth = Adef.codate_None; birth_place = "";
-     baptism = Adef.codate_None; baptism_place = "";
-     death = DontKnowIfDead; death_place = "";
-     burial = UnknownBurial; burial_place = "";
+     birth = Adef.codate_None; birth_place = ""; birth_src = "";
+     baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
+     death = DontKnowIfDead; death_place = ""; death_src = "";
+     burial = UnknownBurial; burial_place = ""; burial_src = "";
      family = [| |];
      notes = ""; psources = "";
      cle_index = bogus_person_index}

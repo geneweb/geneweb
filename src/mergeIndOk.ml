@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 1.1.1.1 1998-09-01 14:32:11 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 1.2 1998-09-29 12:22:40 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -11,6 +11,14 @@ value rec merge_lists l1 =
   [ [x2 :: l2] ->
       if List.mem x2 l1 then merge_lists l1 l2 else merge_lists (l1 @ [x2]) l2
   | [] -> l1 ]
+;
+
+value cat_strings base is1 sep is2 =
+  let n1 = sou base is1 in
+  let n2 = sou base is2 in
+  if n1 = "" then n2
+  else if n2 = "" then n1
+  else n1 ^ sep ^ n2
 ;
 
 value reconstitute conf base p1 p2 =
@@ -45,27 +53,21 @@ value reconstitute conf base p1 p2 =
    access = field "access" (fun p -> p.access) (\= IfTitles);
    birth = field "birth" (fun p -> p.birth) (\= Adef.codate_None);
    birth_place = field "birth_place" (fun p -> sou base p.birth_place) (\= "");
+   birth_src = cat_strings base p1.birth_src ", " p2.birth_src;
    baptism = field "baptism" (fun p -> p.baptism) (\= Adef.codate_None);
    baptism_place =
      field "baptism_place" (fun p -> sou base p.baptism_place) (\= "");
+   baptism_src = cat_strings base p1.baptism_src ", " p2.baptism_src;
    death = field "death" (fun p -> p.death) (\= DontKnowIfDead);
    death_place = field "death_place" (fun p -> sou base p.death_place) (\= "");
+   death_src = cat_strings base p1.death_src ", " p2.death_src;
    burial = field "burial" (fun p -> p.burial) (\= UnknownBurial);
    burial_place =
      field "burial_place" (fun p -> sou base p.burial_place) (\= "");
+   burial_src = cat_strings base p1.burial_src ", " p2.burial_src;
    family = [| |];
-   notes =
-     let n1 = sou base p1.notes in
-     let n2 = sou base p2.notes in
-     if n1 = "" then n2
-     else if n2 = "" then n1
-     else n1 ^ "<br>\n" ^ n2;
-   psources =
-     let n1 = sou base p1.psources in
-     let n2 = sou base p2.psources in
-     if n1 = "" then n2
-     else if n2 = "" then n1
-     else n1 ^ ", " ^ n2;
+   notes = cat_strings base p1.notes "<br>\n" p2.notes;
+   psources = cat_strings base p1.psources ", " p2.psources;
    cle_index = p1.cle_index}
 ;
 

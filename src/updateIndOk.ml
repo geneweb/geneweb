@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.3 1998-09-12 15:43:11 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.4 1998-09-29 12:22:47 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -198,9 +198,13 @@ value reconstitute_person conf =
      occupation = occupation;
      sexe = sex; access = access;
      birth = birth; birth_place = birth_place;
+     birth_src = get conf.env "birth_src";
      baptism = bapt; baptism_place = bapt_place;
+     baptism_src = get conf.env "bapt_src";
      death = death; death_place = death_place;
+     death_src = get conf.env "death_src";
      burial = burial; burial_place = burial_place;
+     burial_src = get conf.env "burial_src";
      family = [| |]; notes = notes; psources = psources;
      cle_index = Adef.iper_of_int cle_index}
   in

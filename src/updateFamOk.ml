@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.1.1.1 1998-09-01 14:32:07 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.2 1998-09-29 12:22:45 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -108,6 +108,7 @@ value reconstitute_family conf =
   let fam =
     {marriage = Adef.codate_of_od marriage;
      marriage_place = marriage_place;
+     marriage_src = get conf.env "marr_src";
      divorce = divorce; children = Array.of_list children; comment = comment;
      origin_file = ""; fsources = fsources;
      fam_index = Adef.ifam_of_int fam_index}
@@ -190,9 +191,13 @@ value insert_person conf base (f, s, o, create) =
              occupation = empty_string;
              sexe = sexe; access = IfTitles;
              birth = Adef.codate_None; birth_place = empty_string;
+             birth_src = empty_string;
              baptism = Adef.codate_None; baptism_place = empty_string;
+             baptism_src = empty_string;
              death = DontKnowIfDead; death_place = empty_string;
+             death_src = empty_string;
              burial = UnknownBurial; burial_place = empty_string;
+             burial_src = empty_string;
              family = [| |];
              notes = empty_string;
              psources = empty_string;

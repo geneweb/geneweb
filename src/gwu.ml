@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 1.1.1.1 1998-09-01 14:32:11 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.2 1998-09-29 12:22:38 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -70,6 +70,11 @@ value has_infos base p =
   p.baptism <> Adef.codate_None ||  p.death <> NotDead
 ;
 
+value print_if_no_empty oc base lab is =
+  if sou base is = "" then ()
+  else Printf.fprintf oc " %s %s" lab (correct_string base is)
+;
+
 value print_first_name_alias oc base is =
   Printf.fprintf oc " {%s}" (correct_string base is)
 ;
@@ -84,11 +89,6 @@ value print_nick_name oc base is =
 
 value print_alias oc base is =
   Printf.fprintf oc " #alias %s" (correct_string base is)
-;
-
-value print_photo oc base is =
-  if sou base is = "" then ()
-  else Printf.fprintf oc " #photo %s" (correct_string base is)
 ;
 
 value print_burial oc base b =
@@ -112,10 +112,6 @@ value print_burial oc base b =
          | _ -> () ];
       return ()
   | UnknownBurial -> () ]
-;
-
-value print_burial_place oc base is =
-  Printf.fprintf oc " #rp %s" (correct_string base is)
 ;
 
 value print_title oc base t =
@@ -154,7 +150,7 @@ value print_infos oc base is_child print_sources p =
      [ s when sou base s <> "" ->
          Printf.fprintf oc " (%s)" (correct_string base s)
      | _ -> () ];
-     print_photo oc base p.photo;
+     print_if_no_empty oc base "#photo" p.photo;
      List.iter (print_nick_name oc base) p.nick_names;
      List.iter (print_alias oc base) p.aliases;
      List.iter (print_title oc base) p.titles;
@@ -162,15 +158,8 @@ value print_infos oc base is_child print_sources p =
      [ IfTitles -> ()
      | Public -> Printf.fprintf oc " #apubl"
      | Private -> Printf.fprintf oc " #apriv" ];
-     match p.occupation with
-     [ s when sou base s <> "" ->
-         Printf.fprintf oc " #occu %s" (correct_string base s)
-     | _ -> () ];
-     if print_sources then
-       match p.psources with
-       [ s when sou base s <> "" ->
-           Printf.fprintf oc " #src %s" (correct_string base s)
-       | _ -> () ]
+     print_if_no_empty oc base "#occu" p.occupation;
+     if print_sources then print_if_no_empty oc base "#src" p.psources
      else ();
      match Adef.od_of_codate p.birth with
      [ Some d ->
@@ -187,18 +176,16 @@ value print_infos oc base is_child print_sources p =
              sou base p.first_name <> "?" && sou base p.surname <> "?" ->
                Printf.fprintf oc " 0"
            | _ -> () ] ];
-     if sou base p.birth_place <> "" then
-       Printf.fprintf oc " #bp %s" (correct_string base p.birth_place)
-     else ();
+     print_if_no_empty oc base "#bp" p.birth_place;
+     print_if_no_empty oc base "#bs" p.birth_src;
      match Adef.od_of_codate p.baptism with
      [ Some d ->
          do Printf.fprintf oc " !";
             print_date oc d;
          return ()
      | _ -> () ];
-     if sou base p.baptism_place <> "" then
-       Printf.fprintf oc " #pp %s" (correct_string base p.baptism_place)
-     else ();
+     print_if_no_empty oc base "#pp" p.baptism_place;
+     print_if_no_empty oc base "#ps" p.baptism_src;
      match p.death with
      [ Death dr d ->
          do Printf.fprintf oc " ";
@@ -217,13 +204,11 @@ value print_infos oc base is_child print_sources p =
          [ (Some _, _) | (_, Some _) -> Printf.fprintf oc " ?"
          | _ -> () ]
      | NotDead -> () ];
-     if sou base p.death_place <> "" then
-       Printf.fprintf oc " #dp %s" (correct_string base p.death_place)
-     else ();
+     print_if_no_empty oc base "#dp" p.death_place;
+     print_if_no_empty oc base "#ds" p.death_src;
      print_burial oc base p.burial;
-     if sou base p.burial_place <> "" then
-       print_burial_place oc base p.burial_place
-     else ();
+     print_if_no_empty oc base "#rp" p.burial_place;
+     print_if_no_empty oc base "#rs" p.burial_src;
   return ()
 ;
 
@@ -315,11 +300,8 @@ value print_family oc base ifaml (per_sel, fam_sel) fam_done ifam =
      print_parent oc base ifaml fam_sel fam cpl.father;
      Printf.fprintf oc " +";
      print_date_option oc (Adef.od_of_codate fam.marriage);
-     match sou base fam.marriage_place with
-     [ "" -> ()
-     | s ->
-         Printf.fprintf oc " #mp %s"
-           (correct_string base fam.marriage_place) ];
+     print_if_no_empty oc base "#mp" fam.marriage_place;
+     print_if_no_empty oc base "#ms" fam.marriage_src;
      match fam.divorce with
      [ NotDivorced -> ()
      | Divorced d ->
@@ -461,13 +443,18 @@ value find_person base p1 po p2 =
       return exit 2 ]
 ;
 
-value gwu base out_dir src_oc_list anc =
+value gwu base out_dir src_oc_list anc desc =
   let anc =
     match anc with
     [ Some (p1, po, p2) -> Some (find_person base p1 po p2)
     | None -> None ]
   in
-  let ((per_sel, fam_sel) as sel) = Select.functions base anc None in
+  let desc =
+    match desc with
+    [ Some (p1, po, p2) -> Some (find_person base p1 po p2)
+    | None -> None ]
+  in
+  let ((per_sel, fam_sel) as sel) = Select.functions base anc desc in
   let fam_done = Array.create (base.families.len) False in
   for i = 0 to base.families.len - 1 do
     let fam = base.families.get i in
@@ -514,8 +501,13 @@ value out_dir = ref "";
 value anc_1st = ref "";
 value anc_occ = ref 0;
 value anc_2nd = ref "";
+value desc_1st = ref "";
+value desc_occ = ref 0;
+value desc_2nd = ref "";
 
-type arg_state = [ ASnone | ASwaitAncOcc | ASwaitAncSurn ];
+type arg_state =
+  [ ASnone | ASwaitAncOcc | ASwaitAncSurn | ASwaitDescOcc | ASwaitDescSurn ]
+;
 value arg_state = ref ASnone;
 
 value speclist =
@@ -524,7 +516,11 @@ value speclist =
    ("-a",
     Arg.String
       (fun s -> do anc_1st.val := s; return arg_state.val := ASwaitAncOcc),
-    "\"<1st_name>\" [num] \"<surname>\": select ancestors of...")]
+    "\"<1st_name>\" [num] \"<surname>\": select ancestors of...");
+   ("-d",
+    Arg.String
+      (fun s -> do desc_1st.val := s; return arg_state.val := ASwaitDescOcc),
+    "\"<1st_name>\" [num] \"<surname>\": select descendants of...")]
 ;
 
 value anon_fun s =
@@ -539,7 +535,17 @@ value anon_fun s =
           do anc_occ.val := 0; anc_2nd.val := s; return
           arg_state.val := ASnone ]
   | ASwaitAncSurn ->
-      do anc_2nd.val := s; return arg_state.val := ASnone ]
+      do anc_2nd.val := s; return arg_state.val := ASnone
+  | ASwaitDescOcc ->
+      try
+        do desc_occ.val := int_of_string s; return
+        arg_state.val := ASwaitDescSurn
+      with
+      [ Failure _ ->
+          do desc_occ.val := 0; desc_2nd.val := s; return
+          arg_state.val := ASnone ]
+  | ASwaitDescSurn ->
+      do desc_2nd.val := s; return arg_state.val := ASnone ]
 ;
 
 value errmsg = "Usage: " ^ Sys.argv.(0) ^ " [options] <base_file>
@@ -564,6 +570,16 @@ value main () =
       else Some (anc_1st.val, anc_occ.val, anc_2nd.val)
     else None
   in
+  let desc =
+    if desc_1st.val <> "" then
+      if desc_2nd.val = "" then
+        do Printf.eprintf "Misused option -d\n";
+           Printf.eprintf "Use option -help for usage\n";
+           flush stderr;
+        return exit 2
+      else Some (desc_1st.val, desc_occ.val, desc_2nd.val)
+    else None
+  in
   let base = Iobase.input in_file.val in
   let src_oc_list = ref [] in
   let _ = base.persons.array () in
@@ -572,28 +588,7 @@ value main () =
   let _ = base.couples.array () in
   let _ = base.strings.array () in
   let oc_list = ref [] in
-(*
-     for i = 0 to base.families.len - 1 do
-       let fam = base.families.get i in
-       if is_deleted_family fam then ()
-       else
-         let first = ref True in
-         try let _ = List.assoc fam.origin_file src_oc_list.val in () with
-         [ Not_found ->
-             let oc_f =
-               if out_dir.val = "" then (stdout, first)
-               else if sou base fam.origin_file = "" then
-                 (stdout, first)
-               else
-                 (open_out
-                    (Filename.concat out_dir.val (sou base fam.origin_file)),
-                  ref True)
-             in
-             src_oc_list.val :=
-               [(fam.origin_file, oc_f) :: src_oc_list.val] ];
-     done;
-*)
-  do gwu base out_dir.val src_oc_list anc;
+  do gwu base out_dir.val src_oc_list anc desc;
      List.iter
        (fun (src, (oc, _)) ->
           do flush oc; return

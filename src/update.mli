@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 1.1.1.1 1998-09-01 14:32:07 ddr Exp $ *)
+(* $Id: update.mli,v 1.2 1998-09-29 12:22:43 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -24,6 +24,8 @@ value digest_family : base_family -> Digest.t;
 value reconstitute_date : config -> string -> option date;
 value print_date :
   config -> base -> string -> string -> option date -> unit;
+
+value print_src : config -> string -> string -> unit;
 
 value print_someone : base -> base_person -> unit;
 
