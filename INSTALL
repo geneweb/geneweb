@@ -39,7 +39,7 @@ They are freely distributed at addresses:
    Go to this directory and launch the command "./gwsetup".
 
    The reason why it is better to move this directory is that "make clean"
-   deletes it, and another "make distrib" scratches it. If you created
+   deletes it, and another "make distrib" overwrites it. If you created
    genealogic databases inside, they would be deleted.
 
 
