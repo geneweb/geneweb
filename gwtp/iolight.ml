@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 4.2 2002-01-10 20:34:18 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.3 2002-01-12 12:06:20 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -187,7 +187,7 @@ value input bname =
      index_of_string = fun [];
      persons_of_surname = {find = fun []; cursor = fun []; next = fun []};
      persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
-     is_restricted = fun []; patch_person = fun []; patch_ascend = fun [];
+     patch_person = fun []; patch_ascend = fun [];
      patch_union = fun []; patch_family = fun []; patch_couple = fun [];
      patch_descend = fun []; patch_string = fun []; patch_name = fun [];
      patched_ascends = fun []; commit_patches = fun [];

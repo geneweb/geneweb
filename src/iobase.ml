@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.9 2002-01-10 20:34:18 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.10 2002-01-12 12:06:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -491,48 +491,6 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
   do { r.array := array; r.get := gen_get; r }
 ;
 
-value is_restricted bname cleanup_ref =
-  let ic_opt_opt = ref None in
-  fun ip ->
-    let ic_opt =
-      match ic_opt_opt.val with
-      [ Some x -> x
-      | None ->
-          let fname = Filename.concat bname "restrict" in
-          let ic_opt =
-            match try Some (open_in fname) with [ Sys_error _ -> None ] with
-            [ Some ic ->
-                let cleanup = cleanup_ref.val in
-                do {
-                  cleanup_ref.val := fun () -> do { close_in ic; cleanup () };
-                  Some ic
-                }
-            | None -> None ]
-          in
-          do { ic_opt_opt.val := Some ic_opt; ic_opt } ]
-    in
-    match ic_opt with
-    [ Some ic ->
-        try
-          let c =
-            do {
-              seek_in ic
-                (output_value_header_size + 1 + Iovalue.sizeof_long +
-                   Adef.int_of_iper ip);
-              input_char ic
-            }
-          in
-          let v = Iovalue.input_int ic in
-          if v = 0 then Left False
-          else if v = 1 then Left True
-          else raise Not_found
-        with
-        [ End_of_file -> Right True
-        | Not_found ->
-            do { Printf.eprintf "bad bool\n"; flush stderr; Left False } ]
-    | None -> Right False ]
-;
-
 value input_patches bname =
   let patches =
     match
@@ -802,7 +760,6 @@ value input bname =
        persons_of_first_name_or_surname base_data strings
          (ic2, ic2_first_name_start_pos, fun p -> p.first_name,
           snd patches.h_person, "first_name");
-     is_restricted = is_restricted bname cleanup_ref;
      patch_person = patch_person; patch_ascend = patch_ascend;
      patch_union = patch_union; patch_family = patch_family;
      patch_couple = patch_couple; patch_descend = patch_descend;

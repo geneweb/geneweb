@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.6 2002-01-10 19:46:10 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.7 2002-01-12 12:06:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -618,7 +618,7 @@ value empty_base : Def.base =
   let base_func =
     {persons_of_name = fun []; strings_of_fsname = fun [];
      index_of_string = fun []; persons_of_surname = no_istr_iper_index;
-     persons_of_first_name = no_istr_iper_index; is_restricted = fun [];
+     persons_of_first_name = no_istr_iper_index;
      patch_person = fun []; patch_ascend = fun []; patch_union = fun [];
      patch_family = fun []; patch_couple = fun []; patch_descend = fun [];
      patch_string = fun []; patch_name = fun []; commit_patches = fun [];
@@ -666,7 +666,7 @@ value linked_base gen : Def.base =
   let base_func =
     {persons_of_name = fun []; strings_of_fsname = fun [];
      index_of_string = fun []; persons_of_surname = no_istr_iper_index;
-     persons_of_first_name = no_istr_iper_index; is_restricted = fun [];
+     persons_of_first_name = no_istr_iper_index;
      patch_person = fun []; patch_ascend = fun []; patch_union = fun [];
      patch_family = fun []; patch_couple = fun []; patch_descend = fun [];
      patch_string = fun []; patch_name = fun []; commit_patches = fun [];
