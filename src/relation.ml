@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.3 1999-03-31 02:16:50 ddr Exp $ *)
+(* $Id: relation.ml,v 2.4 1999-04-07 10:49:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -184,7 +184,9 @@ value print_link conf base n p1 p2 x1 x2 =
           Wserver.wprint " %s"
             (transl_decline conf "of" (brother_label conf x2 Male));
        return ();
-     Wserver.wprint "</strong>\n%s " (transl_decline conf "of" "");
+     Wserver.wprint "</strong>\n%s "
+       (if x1 < x2 then transl_decline conf "of+" ""
+        else transl_decline conf "of" "");
      afficher_personne_sans_titre conf base p2;
      afficher_titre conf base p2;
      Wserver.wprint ".\n";
@@ -273,12 +275,12 @@ value print_solution_not_ancestor conf base p1 p2 x1 x2 list =
   in
   do tag "ul" begin
        html_li conf;
-       Wserver.wprint "%s %s\n" (lab x1) (transl_decline conf "of" "");
+       Wserver.wprint "%s %s\n" (lab x1) (transl_decline conf "of+" "");
        afficher_personne_sans_titre conf base p1;
        afficher_titre conf base p1;
        Wserver.wprint "\n";
        html_li conf;
-       Wserver.wprint "%s %s\n" (lab x2) (transl_decline conf "of" "");
+       Wserver.wprint "%s %s\n" (lab x2) (transl_decline conf "of+" "");
        afficher_personne_sans_titre conf base p2;
        afficher_titre conf base p2;
        Wserver.wprint "\n";

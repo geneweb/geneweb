@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.11 1999-04-07 09:29:45 ddr Exp $
+# $Id: lexicon.txt,v 2.12 1999-04-07 10:49:35 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2400,6 +2400,19 @@ nl: van de moord
 no: av mordet
 pt: do assesinado
 se: av mordet
+
+    of+
+de: von +decl
+en: of
+eo: de
+es: de
+fr: de/d'
+he:    ωμ
+it: di/d'
+nl: van
+no: til
+pt: de
+se: till
 
     on (day month year)
 cn: ΣΪ
