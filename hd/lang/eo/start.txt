@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.21 2000-05-14 18:07:29 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.22 2000-05-17 06:34:14 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title> Genealogio - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -47,6 +47,7 @@ personojn.%In<br>
 <form method=POST action="%f">
 %hPasvorto, por aliro <em>amiko</em> a&ugrave; <em>sorcxisto</em>:
 <input name=w type=password size=10 maxlength=200>
+<input type=submit value="Ok">
 </form>
 </td></tr>
 </table>
