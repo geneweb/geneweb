@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 3.0 1999-10-29 10:31:24 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 3.1 1999-11-10 08:44:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -31,7 +31,6 @@ value sorp base ip =
     else p.occ
   in
   (sou base p.first_name, sou base p.surname, p.occ, Update.Link)
-
 ;
 
 value reconstitute conf base p1 p2 =
@@ -81,7 +80,6 @@ value reconstitute conf base p1 p2 =
    burial_place =
      field "burial_place" (fun p -> sou base p.burial_place) (\= "");
    burial_src = cat_strings base p1.burial_src ", " p2.burial_src;
-   family = [| |];
    notes = cat_strings base p1.notes "<br>\n" p2.notes;
    psources = cat_strings base p1.psources ", " p2.psources;
    cle_index = p1.cle_index}
@@ -159,30 +157,32 @@ value effective_mod_merge conf base sp =
   match p_getint conf.env "i2" with
   [ Some i2 ->
       let p2 = base.data.persons.get i2 in
+      let u2 = base.data.unions.get i2 in
       let a1 = aoi base sp.cle_index in
       let a2 = aoi base p2.cle_index in
       do match (a1.parents, a2.parents) with
          [ (None, Some ifam) ->
-             let fam = foi base ifam in
+             let des = doi base ifam in
              do replace 0 where rec replace i =
-                  if fam.children.(i) = p2.cle_index then
-                    fam.children.(i) := sp.cle_index
+                  if des.children.(i) = p2.cle_index then
+                    des.children.(i) := sp.cle_index
                   else replace (i + 1);
                 a1.parents := Some ifam;
                 a1.consang := Adef.fix (-1);
                 base.func.patch_ascend sp.cle_index a1;
-                base.func.patch_family ifam fam;
+                base.func.patch_descend ifam des;
              return ()
          | _ -> () ];
       return
-      let p2_family = p2.family in
+      let p2_family = u2.family in
       let p2_sexe = p2.sex in
       do UpdateIndOk.effective_del conf base p2;
-         p2.family := [| |];
-         Update.update_misc_names_of_family base p2;
          base.func.patch_person p2.cle_index p2;
+         u2.family := [| |];
+         base.func.patch_union p2.cle_index u2;
       return
       let p = UpdateIndOk.effective_mod conf base sp in
+      let u = uoi base p.cle_index in
       do for i = 0 to Array.length p2_family - 1 do
            let ifam = p2_family.(i) in
            let cpl = coi base ifam in
@@ -193,14 +193,18 @@ value effective_mod_merge conf base sp =
               base.func.patch_couple ifam cpl;
            return ();
          done;
-         p.family := Array.append p.family p2_family;
-         Update.update_misc_names_of_family base p;
+         Update.update_misc_names_of_family base p u;
          base.func.patch_person p.cle_index p;
+         if p2_family <> [| |] then
+           do u.family := Array.append u.family p2_family;
+              base.func.patch_union p.cle_index u;
+           return ()
+         else ();
          Gutil.check_noloop_for_person_list base (Update.error conf base)
            [p.cle_index];
       return
       let wl =
-        UpdateIndOk.all_checks_person conf base p (aoi base p.cle_index)
+        UpdateIndOk.all_checks_person conf base p (aoi base p.cle_index) u
       in
       let key = (sp.first_name, sp.surname, sp.occ) in
       do base.func.commit_patches ();

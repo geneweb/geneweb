@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.1 1999-11-09 22:03:19 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.2 1999-11-10 08:44:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -361,11 +361,12 @@ value empty_family base m =
 
 value print_witness oc base mark p notes_pl_p =
   let a = aoi base p.cle_index in
+  let u = uoi base p.cle_index in
   do Printf.fprintf oc "%s %s%s"
        (correct_string base p.surname)
        (correct_string base p.first_name)
        (if p.occ = 0 then "" else "." ^ string_of_int p.occ);
-     if Array.length p.family = 0 && a.parents = None
+     if Array.length u.family = 0 && a.parents = None
      && not mark.(Adef.int_of_iper p.cle_index) then
        do mark.(Adef.int_of_iper p.cle_index) := True;
           if has_infos base p then print_infos oc base False True p
@@ -528,11 +529,12 @@ value get_persons_with_relations base m list =
 
 value print_relation_parent oc base mark defined_p p =
   let a = aoi base p.cle_index in
+  let u = uoi base p.cle_index in
   do Printf.fprintf oc "%s %s%s"
        (correct_string base p.surname)
        (correct_string base p.first_name)
        (if p.occ = 0 then "" else "." ^ string_of_int p.occ);
-     if Array.length p.family = 0 && a.parents = None
+     if Array.length u.family = 0 && a.parents = None
      && not mark.(Adef.int_of_iper p.cle_index) then
        do mark.(Adef.int_of_iper p.cle_index) := True;
           if has_infos base p then print_infos oc base False True p
@@ -650,8 +652,8 @@ value connected_families base fam_sel fam cpl =
     [ [ip :: ipl] ->
         if List.memq ip ipl_scanned then loop ifaml ipl_scanned ipl
         else
-          let p = poi base ip in
-          let ifaml1 = Array.to_list p.family in
+          let u = uoi base ip in
+          let ifaml1 = Array.to_list u.family in
           let ifaml1 = filter fam_sel ifaml1 in
           let ifaml = merge_families ifaml ifaml1 in
           let ipl =
@@ -717,14 +719,14 @@ value gwu base out_dir out_oc src_oc_list anc desc =
               let ml =
                 List.fold_right
                   (fun ifam ml ->
-                     let fam = foi base ifam in
+                     let des = doi base ifam in
                      let cpl = coi base ifam in
                      let m =
                        {m_fam = fam;
                         m_fath = poi base cpl.father;
                         m_moth = poi base cpl.mother;
                         m_chil =
-                          Array.map (fun ip -> poi base ip) fam.children}
+                          Array.map (fun ip -> poi base ip) des.children}
                      in
                      if empty_family base m then ml else [m :: ml])
                   ifaml []

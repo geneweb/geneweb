@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 3.1 1999-11-05 17:33:46 ddr Exp $ *)
+(* $Id: some.ml,v 3.2 1999-11-10 08:44:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -215,13 +215,15 @@ value rec print_branch conf base first_lev lev name p =
      Date.afficher_dates_courtes conf base p;
      Wserver.wprint "\n";
   return
-  if Array.length p.family == 0 then ()
+  let u = uoi base p.cle_index in
+  if Array.length u.family == 0 then ()
   else
     let _ = List.fold_left
       (fun (first, need_br) ifam ->
          let fam = foi base ifam in
-         let c = spouse p (coi base ifam) in
-         let el = fam.children in
+         let des = doi base ifam in
+         let c = spouse p.cle_index (coi base ifam) in
+         let el = des.children in
          let c = poi base c in
          do if need_br then html_br conf else ();
             if not first then
@@ -258,7 +260,7 @@ value rec print_branch conf base first_lev lev name p =
               Wserver.wprint "</ul>\n";
            return (False, not down)
          else (False, not down))
-      (True, False) (Array.to_list p.family)
+      (True, False) (Array.to_list u.family)
     in ()
 ;
 
@@ -367,11 +369,11 @@ value print_family_alphabetic x conf base liste =
       return () ]
 ;
 
-value has_at_least_2_children_with_surname base fam surname =
+value has_at_least_2_children_with_surname base des surname =
   loop 0 0 where rec loop cnt i =
-    if i == Array.length fam.children then False
+    if i == Array.length des.children then False
     else
-      let p = poi base fam.children.(i) in
+      let p = poi base des.children.(i) in
       if p.surname == surname then
         if cnt == 1 then True
         else loop (cnt + 1) (i + 1)
@@ -394,7 +396,7 @@ value select_ancestors base name_inj ipl =
            && not (List.memq ip ipl) then
              if List.memq cpl.father ipl then ipl
              else if
-               has_at_least_2_children_with_surname base (foi base ifam)
+               has_at_least_2_children_with_surname base (doi base ifam)
                  p.surname
              then [cpl.father :: ipl]
              else [ip :: ipl]

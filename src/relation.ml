@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.1 1999-11-01 23:19:44 ddr Exp $ *)
+(* $Id: relation.ml,v 3.2 1999-11-10 08:44:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -75,6 +75,7 @@ value print_menu conf base p =
     return ()
   in
   let is = index_of_sex p.sex in
+  let u = uoi base p.cle_index in
   do header conf title;
      tag "form" "method=get action=\"%s\"" conf.command begin
        Srcfile.hidden_env conf;
@@ -118,7 +119,7 @@ value print_menu conf base p =
            (fun ifam ->
               let fam = foi base ifam in
               let cpl = coi base ifam in
-              let c = spouse p cpl in
+              let c = spouse p.cle_index cpl in
               let c = poi base c in
               if p_first_name base c <> "?" || p_surname base c <> "?" then
                 do html_li conf;
@@ -139,7 +140,7 @@ value print_menu conf base p =
                    Wserver.wprint "\n";
                 return ()
               else ())
-           p.family;
+           u.family;
          List.iter
            (fun r ->
               do print_with_relation relation_type_text conf base p r 0
@@ -153,7 +154,7 @@ value print_menu conf base p =
            (fun ifam ->
               let fam = foi base ifam in
               Array.iter (print_with_witness conf base p ifam) fam.witnesses)
-           p.family;
+           u.family;
        end;
        html_p conf;
        tag "table" "border=%d width=\"90%%\"" conf.border begin
@@ -635,14 +636,15 @@ value compute_simple_relationship conf base tstab p1 p2 =
 ;
 
 value known_spouses_list base p excl_p =
+  let u = uoi base p.cle_index in
   List.fold_left
     (fun spl ifam ->
-       let sp = poi base (spouse p (coi base ifam)) in
+       let sp = poi base (spouse p.cle_index (coi base ifam)) in
        if sou base sp.first_name <> "?" && sou base sp.surname <> "?"
        && sp.cle_index <> excl_p.cle_index then
          [sp :: spl]
        else spl)
-    [] (Array.to_list p.family)
+    [] (Array.to_list u.family)
 ;
 
 value merge_relations rl1 rl2 =

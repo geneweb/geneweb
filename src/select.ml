@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 3.0 1999-10-29 10:31:35 ddr Exp $ *)
+(* $Id: select.ml,v 3.1 1999-11-10 08:44:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -42,8 +42,8 @@ value select_descendants base per_tab fam_tab flag =
                let i = Adef.int_of_iper cpl.mother in
                per_tab.(i) := per_tab.(i) lor flag;
             return
-            Array.iter loop (foi base ifam).children)
-        (poi base iper).family
+            Array.iter loop (doi base ifam).children)
+        (uoi base iper).family
 ;
 
 value select_surname base per_tab fam_tab no_spouses_parents surname =
@@ -53,6 +53,7 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
     let cpl = base.data.couples.get i in
     if is_deleted_family fam then ()
     else
+      let des = base.data.descends.get i in
       let fath = poi base cpl.father in
       let moth = poi base cpl.mother in
       if Name.strip_lower (sou base fath.surname) = surname
@@ -63,7 +64,7 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
            per_tab.(Adef.int_of_iper cpl.mother) := True;
            Array.iter
              (fun ic -> per_tab.(Adef.int_of_iper ic) := True)
-             fam.children;
+             des.children;
            if no_spouses_parents then ()
            else
              List.iter

@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 3.0 1999-10-29 10:31:25 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 3.1 1999-11-10 08:44:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Gutil;
@@ -69,12 +69,12 @@ value most_desc base p =
      while not (Pq.is_empty q.val) do
        let (ip, nq) = Pq.take q.val in
        do q.val := nq; return
-       let p = poi base ip in
+       let u = uoi base ip in
        let n = tab.(Adef.int_of_iper ip) in
-       for i = 0 to Array.length p.family - 1 do
-         let fam = foi base p.family.(i) in
-         for j = 0 to Array.length fam.children - 1 do
-           let ip = fam.children.(j) in
+       for i = 0 to Array.length u.family - 1 do
+         let des = doi base u.family.(i) in
+         for j = 0 to Array.length des.children - 1 do
+           let ip = des.children.(j) in
            do tab.(Adef.int_of_iper ip) := Num.add tab.(Adef.int_of_iper ip) n;
               if not entered.(Adef.int_of_iper ip) then
                 do q.val := Pq.add ip q.val;

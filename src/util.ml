@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.7 1999-11-06 22:11:17 ddr Exp $ *)
+(* $Id: util.ml,v 3.8 1999-11-10 08:44:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -99,10 +99,11 @@ value age_autorise conf base p =
         let a = temps_ecoule d conf.today in
         a.year > 100
     | _ ->
+        let u = uoi base p.cle_index in
         loop 0 where rec loop i =
-          if i >= Array.length p.family then False
+          if i >= Array.length u.family then False
           else
-            let fam = foi base p.family.(i) in
+            let fam = foi base u.family.(i) in
             match Adef.od_of_codate fam.marriage with
             [ Some (Dgreg d _) ->
                 let a = temps_ecoule d conf.today in
@@ -815,9 +816,9 @@ value print_parent conf base p a =
          else "") ]
 ;
 
-value spouse p cpl =
-  if p.cle_index == cpl.father then cpl.mother
-  else if p.cle_index == cpl.mother then cpl.father
+value spouse ip cpl =
+  if ip == cpl.father then cpl.mother
+  else if ip == cpl.mother then cpl.father
   else invalid_arg "spouse"
 ;
 
@@ -841,11 +842,12 @@ value preciser_homonyme conf base p =
         when p_first_name base (poi base (coi base fam).mother) <> "?" ->
           print_parent conf base p (poi base (coi base fam).mother)
       | _ ->
+          let u = uoi base p.cle_index in
           let rec loop i =
-            if i < Array.length p.family then
-              let fam = foi base p.family.(i) in
-              let conjoint = spouse p (coi base p.family.(i)) in
-              let ct = fam.children in
+            if i < Array.length u.family then
+              let des = doi base u.family.(i) in
+              let conjoint = spouse p.cle_index (coi base u.family.(i)) in
+              let ct = des.children in
               if Array.length ct > 0 then
                 let enfant = poi base ct.(0) in
                 Wserver.wprint "%s %s%s" (transl_nth conf "father/mother" is)
@@ -1276,18 +1278,18 @@ value has_nephews_or_nieces base p =
     let a = aoi base p.cle_index in
     match a.parents with
     [ Some ifam ->
-        let fam = foi base ifam in
+        let des = doi base ifam in
         do Array.iter
              (fun ip ->
                 if ip == p.cle_index then ()
                 else
                   Array.iter
                     (fun ifam ->
-                       if Array.length (foi base ifam).children > 0 then
+                       if Array.length (doi base ifam).children > 0 then
                          raise Ok
                        else ())
-                    (poi base ip).family)
-             fam.children;
+                    (uoi base ip).family)
+             des.children;
         return False
     | _ -> False ]
   with

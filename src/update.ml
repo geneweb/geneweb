@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.1 1999-11-01 23:19:44 ddr Exp $ *)
+(* $Id: update.ml,v 3.2 1999-11-10 08:44:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -19,12 +19,12 @@ value rec find_free_occ base f s i =
   | None -> i ]
 ;
 
-value has_children base p =
+value has_children base u =
   List.exists
     (fun ifam ->
-       let fam = foi base ifam in
-       Array.length fam.children > 0)
-    (Array.to_list p.family)
+       let des = doi base ifam in
+       Array.length des.children > 0)
+    (Array.to_list u.family)
 ;
 
 value infer_death conf birth =
@@ -110,12 +110,12 @@ value insert_string conf base s =
       do base.func.patch_string i s; return i ]
 ;
 
-value update_misc_names_of_family base p =
+value update_misc_names_of_family base p u =
   match p.sex with
   [ Male ->
       List.iter
         (fun ifam ->
-           let fam = foi base ifam in
+           let des = doi base ifam in
            let cpl = coi base ifam in
            List.iter
              (fun ip ->
@@ -125,8 +125,8 @@ value update_misc_names_of_family base p =
                        person_ht_add base name ip
                      else ())
                   (person_misc_names base (poi base ip)))
-             [cpl.mother :: Array.to_list fam.children])
-        (Array.to_list p.family)
+             [cpl.mother :: Array.to_list des.children])
+        (Array.to_list u.family)
   | _ -> () ]
 ;
 
@@ -220,8 +220,8 @@ value print_warning conf base =
            do print_someone_strong conf base p;
               Date.afficher_dates_courtes conf base p;
            return ())
-  | ChangedOrderOfChildren fam before ->
-      let cpl = coi base fam.fam_index in
+  | ChangedOrderOfChildren ifam des before ->
+      let cpl = coi base ifam in
       let fath = poi base cpl.father in
       let moth = poi base cpl.mother in
       do Wserver.wprint "%s\n"
@@ -261,12 +261,12 @@ value print_warning conf base =
                    Date.afficher_dates_courtes conf base p;
                    Wserver.wprint "\n";
                 return ())
-             fam.children;
+             des.children;
          end;
          Wserver.wprint "</ul>";
       return ()
-  | ChildrenNotInOrder fam elder x ->
-      let cpl = coi base fam.fam_index in
+  | ChildrenNotInOrder ifam des elder x ->
+      let cpl = coi base ifam in
       do Wserver.wprint
            (fcapitale
                (ftransl conf
@@ -412,7 +412,9 @@ the base has changed; do \"back\", \"reload\", and refill the form"));
 ;
 
 value digest_person (p : person) = Iovalue.digest p;
-value digest_family (fam : family) = Iovalue.digest fam;
+value digest_family (fam : family) (cpl : couple) (des : descend) =
+  Iovalue.digest (fam, cpl, des)
+;
 
 value get var key env =
   match p_getenv env (var ^ "_" ^ key) with
@@ -727,16 +729,18 @@ value insert_person conf base src new_persons (f, s, o, create) =
              death_src = empty_string;
              burial = UnknownBurial; burial_place = empty_string;
              burial_src = empty_string;
-             family = [| |];
              notes = empty_string;
              psources = insert_string conf base src;
              cle_index = ip}
           and a =
             {parents = None;
              consang = Adef.fix (-1)}
+          and u =
+            {family = [| |]}
           in
           do base.func.patch_person p.cle_index p;
              base.func.patch_ascend p.cle_index a;
+             base.func.patch_union p.cle_index u;
              if f <> "?" && s <> "?" then
                do person_ht_add base (nominative (f ^ " " ^ s)) ip;
                   new_persons.val := [p :: new_persons.val];
@@ -763,7 +767,7 @@ value print_someone conf base p =
     (p_surname base p)
 ;
 
-value print_family_stuff conf base p a =
+value print_family_stuff conf base p a u =
   do let _ = List.fold_left
        (fun prev fi ->
   	   do match prev with
@@ -791,7 +795,7 @@ value print_family_stuff conf base p a =
   		  return ()
   	      | None -> () ];
   	   return
-  	   let c = spouse p (coi base fi) in
+  	   let c = spouse p.cle_index (coi base fi) in
   	   do Wserver.wprint "<a href=\"%sm=MOD_FAM;i=%d;ip=%d\">" (commd conf)
   		(Adef.int_of_ifam fi) (Adef.int_of_iper p.cle_index);
   	      let s = transl_nth conf "family/families" 0 in
@@ -810,10 +814,10 @@ value print_family_stuff conf base p a =
   		(transl_decline conf "with"
   		   (gen_someone_txt raw_access conf base (poi base c)));
   	   return Some fi)
-       None (Array.to_list p.family)
+       None (Array.to_list u.family)
      in ();
      if (p_first_name base p = "?" || p_surname base p = "?")
-     && (Array.length p.family <> 0 || a.parents <> None) then ()
+     && (Array.length u.family <> 0 || a.parents <> None) then ()
      else
        let s = transl_nth conf "family/families" 0 in
        Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d\">%s</a><br>\n"
@@ -839,6 +843,7 @@ value print conf base p =
     return ()
   in
   let a = aoi base p.cle_index in
+  let u = uoi base p.cle_index in
   do header conf title;
      tag "table" "border=%d width=\"95%%\"" conf.border begin
        tag "tr" begin
@@ -890,13 +895,13 @@ value print conf base p =
                  let s = transl conf "parents" in
                  do Wserver.wprint "<br>\n";
                     Wserver.wprint "<a href=\"%sm=ADD_PAR;i=%d\">%s</a><br>\n"
-     		      (commd conf) (Adef.int_of_iper p.cle_index)
+                      (commd conf) (Adef.int_of_iper p.cle_index)
                       (capitale (transl_decline conf "add" s));
                  return () ];
          end;
          tag "td" "valign=top" begin
-           print_family_stuff conf base p a;
-           if has_children base p then
+           print_family_stuff conf base p a u;
+           if has_children base u then
              do Wserver.wprint "<br>\n";
                 stag "a" "href=\"%sm=CHG_CHN;i=%d\"" (commd conf)
                   (Adef.int_of_iper p.cle_index)
@@ -910,7 +915,7 @@ value print conf base p =
          end;
        end;
      end;
-     if Array.length p.family > 0 then
+     if Array.length u.family > 0 then
        do html_p conf;
           Wserver.wprint
             (fcapitale (ftransl conf "to add a child to a family, use \"%s\""))

@@ -1,10 +1,10 @@
-(* $Id: iobase.ml,v 3.0 1999-10-29 10:31:20 ddr Exp $ *)
+(* $Id: iobase.ml,v 3.1 1999-11-10 08:44:26 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwb = "GnWb001x";
+value magic_gwb = "GnWb001y";
 
 (*
  Files in base (directory .gwb)
@@ -12,27 +12,31 @@ value magic_gwb = "GnWb001x";
     base - the base itself
        magic number (magic_gwb)                 : string of length 8
        number of persons                        : binary_int
-       number of ascends (= number of persons)  : binary_int
        number of families                       : binary_int
-       number of couples (= number of families) : binary_int
        number of strings                        : binary_int
        persons array offset in file             : binary_int
        ascends array offset in file             : binary_int
+       unions array offset in file              : binary_int
        families array offset in file            : binary_int
        couples array offset in file             : binary_int
+       descends array offset in file            : binary_int
        strings array offset in file             : binary_int
        notes origin file                        : value
        persons array                            : value
        ascends array                            : value
+       unions array                             : value
        families array                           : value
        couples array                            : value
+       descends array                           : value
        strings array                            : value
 
     base.acc - direct accesses to arrays inside base
        persons offsets   : array of binary_ints
        ascends offsets   : array of binary_ints
+       unions offsets    : array of binary_ints
        families offsets  : array of binary_ints
        couples offsets   : array of binary_ints
+       descends offsets  : array of binary_ints
        strings offsets   : array of binary_ints
 
     names.inx - index for names, strings of first names and surnames
@@ -370,8 +374,10 @@ value rec patch_len len =
 type patches =
   { p_person : ref (list (int * person));
     p_ascend : ref (list (int * ascend));
+    p_union : ref (list (int * union));
     p_family : ref (list (int * family));
     p_couple : ref (list (int * couple));
+    p_descend : ref (list (int * descend));
     p_string : ref (list (int * string));
     p_name : ref (list (int * list iper)) }
 ;
@@ -469,8 +475,9 @@ value input bname =
         let p = input_value ic in
         do close_in ic; return p
     | None ->
-        {p_person = ref []; p_ascend = ref []; p_family = ref [];
-         p_couple = ref []; p_string = ref []; p_name = ref []} ]
+        {p_person = ref []; p_ascend = ref []; p_union = ref [];
+         p_family = ref []; p_couple = ref []; p_descend = ref [];
+         p_string = ref []; p_name = ref []} ]
   in
   let ic =
     let ic = open_in_bin (Filename.concat bname "base") in
@@ -479,14 +486,14 @@ value input bname =
   let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
   let ic2 = open_in_bin (Filename.concat bname "strings.inx") in
   let persons_len = input_binary_int ic in
-  let ascends_len = input_binary_int ic in
   let families_len = input_binary_int ic in
-  let couples_len = input_binary_int ic in
   let strings_len = input_binary_int ic in
   let persons_array_pos = input_binary_int ic in
   let ascends_array_pos = input_binary_int ic in
+  let unions_array_pos = input_binary_int ic in
   let families_array_pos = input_binary_int ic in
   let couples_array_pos = input_binary_int ic in
+  let descends_array_pos = input_binary_int ic in
   let strings_array_pos = input_binary_int ic in
   let norigin_file = input_value ic in
   let ic2_string_start_pos = 3 * int_size in
@@ -500,20 +507,30 @@ value input bname =
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let ascends =
-    make_cache ic ic_acc shift ascends_array_pos patches.p_ascend ascends_len
+    make_cache ic ic_acc shift ascends_array_pos patches.p_ascend persons_len
       "ascends"
   in
-  let shift = shift + ascends_len * Iovalue.sizeof_long in
+  let shift = shift + persons_len * Iovalue.sizeof_long in
+  let unions =
+    make_cache ic ic_acc shift unions_array_pos patches.p_union persons_len
+      "unions"
+  in
+  let shift = shift + persons_len * Iovalue.sizeof_long in
   let families =
     make_cache ic ic_acc shift families_array_pos patches.p_family
       families_len "families"
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let couples =
-    make_cache ic ic_acc shift couples_array_pos patches.p_couple couples_len
+    make_cache ic ic_acc shift couples_array_pos patches.p_couple families_len
       "couples"
   in
-  let shift = shift + couples_len * Iovalue.sizeof_long in
+  let shift = shift + families_len * Iovalue.sizeof_long in
+  let descends =
+    make_cache ic ic_acc shift descends_array_pos patches.p_descend
+      families_len "descends"
+  in
+  let shift = shift + families_len * Iovalue.sizeof_long in
   let strings_cache = Hashtbl.create 101 in
   let strings =
     make_cached ic ic_acc shift strings_array_pos patches.p_string strings_len
@@ -549,6 +566,13 @@ value input bname =
          [(i, a) :: list_remove_assoc i patches.p_ascend.val];
     return ()
   in
+  let patch_union i a =
+    let i = Adef.int_of_iper i in
+    do unions.len := max unions.len (i + 1);
+       patches.p_union.val :=
+         [(i, a) :: list_remove_assoc i patches.p_union.val];
+    return ()
+  in
   let patch_family i f =
     let i = Adef.int_of_ifam i in
     do families.len := max families.len (i + 1);
@@ -561,6 +585,13 @@ value input bname =
     do couples.len := max couples.len (i + 1);
        patches.p_couple.val :=
          [(i, c) :: list_remove_assoc i patches.p_couple.val];
+    return ()
+  in
+  let patch_descend i c =
+    let i = Adef.int_of_ifam i in
+    do descends.len := max descends.len (i + 1);
+       patches.p_descend.val :=
+         [(i, c) :: list_remove_assoc i patches.p_descend.val];
     return ()
   in
   let patch_string i s =
@@ -619,8 +650,10 @@ value input bname =
   let base_data =
     {persons = persons;
      ascends = ascends;
+     unions = unions;
      families = families;
      couples = couples;
+     descends = descends;
      strings = strings;
      bnotes = bnotes}
   in
@@ -640,8 +673,10 @@ value input bname =
           patches.p_person, "first_name");
      patch_person = patch_person;
      patch_ascend = patch_ascend;
+     patch_union = patch_union;
      patch_family = patch_family;
      patch_couple = patch_couple;
+     patch_descend = patch_descend;
      patch_string = patch_string;
      patch_name = patch_name;
      patched_ascends = patched_ascends;
@@ -805,33 +840,38 @@ do Printf.eprintf "*** copying %s\n" what; flush stderr; return
   in
   let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
   let persons_len = input_binary_int ic in
-  let ascends_len = input_binary_int ic in
   let families_len = input_binary_int ic in
-  let couples_len = input_binary_int ic in
   let strings_len = input_binary_int ic in
   let persons_array_pos = input_binary_int ic in
   let ascends_array_pos = input_binary_int ic in
+  let unions_array_pos = input_binary_int ic in
   let families_array_pos = input_binary_int ic in
   let couples_array_pos = input_binary_int ic in
+  let descends_array_pos = input_binary_int ic in
   let strings_array_pos = input_binary_int ic in
   let norigin_file = input_value ic in
   let (beg_pos, end_pos, beg_acc_pos, array_len) =
     match what with
     [ "persons" ->
-        (persons_array_pos, ascends_array_pos, 0, persons_len)
+        let pos = 0 in
+        (persons_array_pos, ascends_array_pos, pos, persons_len)
+    | "ascends" ->
+        let pos = persons_len * Iovalue.sizeof_long in
+        (ascends_array_pos, unions_array_pos, pos, persons_len)
+    | "unions" ->
+        let pos = 2 * persons_len * Iovalue.sizeof_long in
+        (unions_array_pos, families_array_pos, pos, persons_len)
     | "families" ->
-        let pos = (persons_len + ascends_len) * Iovalue.sizeof_long in
+        let pos = 3 * persons_len * Iovalue.sizeof_long in
         (families_array_pos, couples_array_pos, pos, families_len)
     | "couples" ->
-        let pos =
-          (persons_len + ascends_len + families_len) * Iovalue.sizeof_long
-        in
-        (couples_array_pos, strings_array_pos, pos, couples_len)
+        let pos = (3 * persons_len + families_len) * Iovalue.sizeof_long in
+        (couples_array_pos, descends_array_pos, pos, families_len)
+    | "descends" ->
+        let pos = (3 * persons_len + 2 * families_len) * Iovalue.sizeof_long in
+        (descends_array_pos, strings_array_pos, pos, families_len)
     | "strings" ->
-        let pos =
-          (persons_len + ascends_len + families_len + couples_len) *
-          Iovalue.sizeof_long
-        in
+        let pos = (3 * persons_len + 3 * families_len) * Iovalue.sizeof_long in
         (strings_array_pos, in_channel_length ic, pos, strings_len)
     | _ -> failwith ("just copy " ^ what) ]
   in
@@ -868,8 +908,10 @@ value gen_output no_patches bname base =
   do if not no_patches then
        let _ = base.data.persons.array () in
        let _ = base.data.ascends.array () in
+       let _ = base.data.unions.array () in
        let _ = base.data.families.array () in
        let _ = base.data.couples.array () in
+       let _ = base.data.descends.array () in
        let _ = base.data.strings.array () in
        ()
      else ();
@@ -886,13 +928,13 @@ value gen_output no_patches bname base =
   try
     do output_string oc magic_gwb;
        output_binary_int oc base.data.persons.len;
-       output_binary_int oc base.data.ascends.len;
        output_binary_int oc base.data.families.len;
-       output_binary_int oc base.data.couples.len;
        output_binary_int oc base.data.strings.len;
     return
     let array_start_indexes = pos_out oc in
     do output_binary_int oc 0;
+       output_binary_int oc 0;
+       output_binary_int oc 0;
        output_binary_int oc 0;
        output_binary_int oc 0;
        output_binary_int oc 0;
@@ -904,7 +946,14 @@ value gen_output no_patches bname base =
        else just_copy bname "persons" oc oc_acc;
     return
     let ascends_array_pos = pos_out oc in
-    do output_array (base.data.ascends.array ()); return
+    do if not no_patches then ()
+       else do Printf.eprintf "*** saving ascends\n"; flush stderr; return ();
+       output_array (base.data.ascends.array ());
+    return
+    let unions_array_pos = pos_out oc in
+    do if not no_patches then output_array (base.data.unions.array ())
+       else just_copy bname "unions" oc oc_acc;
+    return
     let families_array_pos = pos_out oc in
     do if not no_patches then output_array (base.data.families.array ())
        else just_copy bname "families" oc oc_acc;
@@ -913,6 +962,10 @@ value gen_output no_patches bname base =
     do if not no_patches then output_array (base.data.couples.array ())
        else just_copy bname "couples" oc oc_acc;
     return
+    let descends_array_pos = pos_out oc in
+    do if not no_patches then output_array (base.data.descends.array ())
+       else just_copy bname "descends" oc oc_acc;
+    return
     let strings_array_pos = pos_out oc in
     do if not no_patches then output_array (base.data.strings.array ())
        else just_copy bname "strings" oc oc_acc;
@@ -920,10 +973,13 @@ value gen_output no_patches bname base =
     do seek_out oc array_start_indexes;
        output_binary_int oc persons_array_pos;
        output_binary_int oc ascends_array_pos;
+       output_binary_int oc unions_array_pos;
        output_binary_int oc families_array_pos;
        output_binary_int oc couples_array_pos;
+       output_binary_int oc descends_array_pos;
        output_binary_int oc strings_array_pos;
        base.data.families.clear_array ();
+       base.data.descends.clear_array ();
        close_out oc;
        close_out oc_acc;
        if not no_patches then
@@ -934,6 +990,7 @@ do Printf.eprintf "*** create name index\n"; flush stderr; return
            do output_binary_int oc_inx 0;
 	      create_name_index oc_inx base;
               base.data.ascends.clear_array ();
+              base.data.unions.clear_array ();
               base.data.couples.clear_array ();
               if save_mem.val then
 do Printf.eprintf "*** compacting\n"; flush stderr; return

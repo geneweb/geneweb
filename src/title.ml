@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 3.0 1999-10-29 10:31:38 ddr Exp $ *)
+(* $Id: title.ml,v 3.1 1999-11-10 08:44:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -41,22 +41,24 @@ value date_interval conf base t x =
           match t with
           [ JustSelf -> ()
           | _ ->
+              let u = uoi base x.cle_index in
               Array.iter
                 (fun ifam ->
                    let fam = foi base ifam in
                    let md = fam.marriage in
-                   let conj = spouse x (coi base ifam) in
+                   let conj = spouse x.cle_index (coi base ifam) in
                    do match Adef.od_of_codate md with
                       [ Some (Dgreg d _) -> set d
                       | _ -> () ];
                       loop JustSelf (poi base conj);
                       match t with
                       [ AddChildren ->
+                          let des = doi base ifam in
                           Array.iter (fun e -> loop JustSelf (poi base e))
-                            fam.children
+                            des.children
                       | _ -> () ];
                    return ())
-                x.family ];
+                u.family ];
        return ()
      in
      loop t x;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.1 1999-11-01 23:19:44 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.2 1999-11-10 08:44:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -263,7 +263,7 @@ value reconstitute_person conf =
      death_src = only_printable (get conf "death_src");
      burial = burial; burial_place = burial_place;
      burial_src = only_printable (get conf "burial_src");
-     family = [| |]; notes = notes; psources = psources;
+     notes = notes; psources = psources;
      cle_index = Adef.iper_of_int cle_index}
   in
   (p, ext)
@@ -374,7 +374,8 @@ value check_conflict conf base sp ipl =
 
 value check_sex_married conf base sp op =
   if sp.sex <> op.sex then
-    if Array.length op.family != 0 then print_cannot_change_sex conf base op
+    let u = uoi base op.cle_index in
+    if Array.length u.family != 0 then print_cannot_change_sex conf base op
     else ()
   else ()
 ;
@@ -406,12 +407,15 @@ value rparents_of p =
 ;
 
 value is_witness_at_marriage base ip p =
+(*
 do Printf.eprintf "cherche si %s est temoin au mariage de %s\n" (denomination base (poi base ip)) (denomination base p); flush stderr; return
+*)
+  let u = uoi base ip in
   List.exists
     (fun ifam ->
        let fam = foi base ifam in
        array_memq ip fam.witnesses)
-    (Array.to_list p.family)
+    (Array.to_list u.family)
 ;
 
 value update_relation_parents base op np =
@@ -472,9 +476,7 @@ value effective_mod conf base sp =
     map_person_ps (Update.insert_person conf base sp.psources created_p)
       (Update.insert_string conf base) sp
   in
-  do np.family := op.family;
-     np.related := op.related;
-  return
+  do np.related := op.related; return
   let op_misc_names = person_misc_names base op in
   let np_misc_names = person_misc_names base np in
   do List.iter
@@ -499,9 +501,11 @@ value effective_add conf base sp =
       (Update.insert_string conf base) sp
   in
   let na = {parents = None; consang = Adef.fix (-1)} in
+  let nu = {family = [| |]} in
   do np.cle_index := pi;
      base.func.patch_person pi np;
      base.func.patch_ascend pi na;
+     base.func.patch_union pi nu;
   return
   let np_misc_names = person_misc_names base np in
   do List.iter (fun key -> person_ht_add base key pi) np_misc_names; return
@@ -523,11 +527,11 @@ value effective_del conf base p =
   let asc = aoi base p.cle_index in
   do match asc.parents with
      [ Some ifam ->
-         let fam = foi base ifam in
-         do fam.children := array_except p.cle_index fam.children;
+         let des = doi base ifam in
+         do des.children := array_except p.cle_index des.children;
             asc.parents := None;
             asc.consang := Adef.fix (-1);
-            base.func.patch_family ifam fam;
+            base.func.patch_descend ifam des;
             base.func.patch_ascend p.cle_index asc;
          return ()
      | None -> () ];
@@ -582,21 +586,24 @@ value print_mod_ok conf base wl p =
 ;
 *)
 
-value all_checks_person conf base p a =
+value all_checks_person conf base p a u =
   let wl = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
   do Gutil.check_person base error warning p;
      match a.parents with
-     [ Some ifam -> Gutil.check_family base error warning (foi base ifam)
+     [ Some ifam ->
+         Gutil.check_family base error warning (foi base ifam)
+           (coi base ifam) (doi base ifam)
      | _ -> () ];
      Array.iter
-       (fun ifam -> Gutil.check_family base error warning (foi base ifam))
-       p.family;
+       (fun ifam ->
+          Gutil.check_family base error warning (foi base ifam)
+            (coi base ifam) (doi base ifam))
+       u.family;
      List.iter
        (fun
-        [ ChangedOrderOfChildren fam _ ->
-            base.func.patch_family fam.fam_index fam
+        [ ChangedOrderOfChildren ifam des _ -> base.func.patch_descend ifam des
         | _ -> () ])
        wl.val;
   return List.rev wl.val
@@ -649,7 +656,8 @@ value print_add conf base =
           [ Some err -> error_person conf base sp err
           | None ->
               let (p, a) = effective_add conf base sp in
-              let wl = all_checks_person conf base p a in
+              let u = uoi base p.cle_index in
+              let wl = all_checks_person conf base p a u in
               let k = (sp.first_name, sp.surname, sp.occ) in
               do base.func.commit_patches ();
                  History.record conf base k "ap";
@@ -706,12 +714,11 @@ value print_mod_aux conf base callback =
 value print_mod conf base =
   let callback sp =
     let p = effective_mod conf base sp in
+    let u = uoi base p.cle_index in
     do base.func.patch_person p.cle_index p;
-       Update.update_misc_names_of_family base p;
+       Update.update_misc_names_of_family base p u;
     return
-    let wl =
-      all_checks_person conf base p (aoi base p.cle_index)
-    in
+    let wl = all_checks_person conf base p (aoi base p.cle_index) u in
     let k = (sp.first_name, sp.surname, sp.occ) in
     do base.func.commit_patches ();
        History.record conf base k "mp";

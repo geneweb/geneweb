@@ -1,12 +1,12 @@
 GeneWeb version 3.01
 --------------------
 
-* GeneWeb Service/CGI (gwd)
-  - [Nov 10, 99] Changed structure of data bases for internal optimisations.
-
 * Setup program (gwsetup)
   - [Nov 7, 99] Fixed problem in Windows version under Netscape: images did
     not appear...
+
+* GeneWeb Service/CGI (gwd)
+  - [Nov 10, 99] Changed structure of data bases for internal optimizations.
 
 * Gedcom to GeneWeb (ged2gwb)
   - [Nov 5, 99] Accept roman digits in years of French Republican dates.
