@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.14 2002-10-26 01:22:42 ddr Exp $ *)
+(* $Id: date.ml,v 4.15 2002-11-08 03:41:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -54,6 +54,10 @@ value code_dmy conf d =
   code_date conf encoding d.day d.month d.year
 ;
 
+value code_year conf y =
+  code_date conf (transl_nth conf "(date)" 3) 0 0 y
+;
+
 value default_french_month =
   let tab =
     [| "Vendemiaire"; "Brumaire"; "Frimaire"; "Nivose"; "Pluviose"; "Ventose";
@@ -82,6 +86,11 @@ value hebrew_month conf m =
   if r = "[(hebrew month)]" then "[" ^ default_hebrew_month m ^ "]" else r
 ;
 
+value code_french_year conf y =
+  transl_nth conf "year/month/day" 0 ^ " " ^
+    (if y >= 1 && y < 4000 then roman_of_arabian y else string_of_int y)
+;
+
 value code_french_date conf d m y =
   let s =
     if d = 0 then ""
@@ -91,9 +100,7 @@ value code_french_date conf d m y =
     if m = 0 then ""
     else s ^ (if s = "" then "" else " ") ^ french_month conf (m - 1)
   in
-  s ^ (if s = "" then "" else " ") ^
-    transl_nth conf "year/month/day" 0 ^ " " ^
-    (if y >= 1 && y < 4000 then roman_of_arabian y else string_of_int y)
+  s ^ (if s = "" then "" else " ") ^ code_french_year conf y
 ;
 
 value code_hebrew_date conf d m y =
@@ -105,7 +112,7 @@ value code_hebrew_date conf d m y =
   s ^ (if s = "" then "" else " ") ^ string_of_int y
 ;
 
-value string_of_on_prec_dmy_aux conf sy d =
+value string_of_on_prec_dmy_aux conf code_year sy d =
   match d.prec with
   [ Sure ->
       if d.day = 0 && d.month = 0 then transl conf "in (year)" ^ " " ^ sy
@@ -129,8 +136,7 @@ value string_of_on_prec_dmy_aux conf sy d =
         else if d.day = 0 then transl_decline conf "in (month year)" sy
         else transl_decline conf "on (day month year)" sy
       in
-      s ^ " " ^ transl conf "or" ^ " " ^
-        nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z)
+      s ^ " " ^ transl conf "or" ^ " " ^ nominative (code_year conf z)
   | YearInt z ->
       let s =
         if d.day = 0 && d.month = 0 then sy
@@ -138,8 +144,7 @@ value string_of_on_prec_dmy_aux conf sy d =
         else transl_decline conf "on (day month year)" sy
       in
       transl conf "between (date)" ^ " " ^ s ^ " " ^
-        transl_nth conf "and" 0 ^ " " ^
-        nominative (code_date conf (transl_nth conf "(date)" 3) 0 0 z) ]
+        transl_nth conf "and" 0 ^ " " ^ nominative (code_year conf z) ]
 ;
 
 value replace_spaces_by_nbsp s =
@@ -149,22 +154,24 @@ value replace_spaces_by_nbsp s =
     else loop (i + 1) (Buff.store len s.[i])
 ;
 
-value string_of_on_prec_dmy conf sy d =
-  let r = string_of_on_prec_dmy_aux conf sy d in replace_spaces_by_nbsp r
+value string_of_on_prec_dmy conf code_dmy sy d =
+  let r = string_of_on_prec_dmy_aux conf code_dmy sy d in
+  replace_spaces_by_nbsp r
 ;
 
 value string_of_on_dmy conf d =
-  let sy = code_dmy conf d in string_of_on_prec_dmy conf sy d
+  let sy = code_dmy conf d in
+  string_of_on_prec_dmy conf code_year sy d
 ;
 
 value string_of_on_french_dmy conf d =
   let sy = code_french_date conf d.day d.month d.year in
-  string_of_on_prec_dmy conf sy d
+  string_of_on_prec_dmy conf code_french_year sy d
 ;
 
 value string_of_on_hebrew_dmy conf d =
   let sy = code_hebrew_date conf d.day d.month d.year in
-  string_of_on_prec_dmy conf sy d
+  string_of_on_prec_dmy conf code_year sy d
 ;
 
 value string_of_prec_dmy conf s d =
@@ -209,12 +216,16 @@ value string_of_ondate conf =
         transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
   | Dgreg d Dfrench ->
       let d1 = Calendar.french_of_gregorian d in
-      let s = gregorian_precision conf d in
-      string_of_on_french_dmy conf d1 ^ " " ^ " (" ^ s ^ ")"
+      let s = string_of_on_french_dmy conf d1 in
+      match d.prec with
+      [ Sure -> s ^ " " ^ " (" ^ gregorian_precision conf d ^ ")"
+      | About | Before | After | Maybe | OrYear _ | YearInt _ -> s ]
   | Dgreg d Dhebrew ->
       let d1 = Calendar.hebrew_of_gregorian d in
-      let s = gregorian_precision conf d in
-      string_of_on_hebrew_dmy conf d1 ^ " " ^ " (" ^ s ^ ")"
+      let s = string_of_on_hebrew_dmy conf d1 in
+      match d.prec with
+      [ Sure -> s ^ " " ^ " (" ^ gregorian_precision conf d ^ ")"
+      | About | Before | After | Maybe | OrYear _ | YearInt _ -> s ]
   | Dtext t -> "(" ^ t ^ ")" ]
 ;
 
