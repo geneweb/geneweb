@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.8 1999-05-23 09:51:58 ddr Exp $
+# $Id: Makefile,v 2.9 1999-05-30 15:57:05 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -12,6 +12,7 @@ GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo ansel.cmo gutil.cmo btree.cmo io
 all:: out
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 MOSTDESC_OBJS=adef.cmo name.cmo ansel.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
+FPLA_OBJS=argl.cmo adef.cmo name.cmo ansel.cmo gutil.cmo btree.cmo iovalue.cmo iobase.cmo fpla.cmo
 
 out:: def.syn.cmo gwc.out consang.out gwd.out gwu.out phonygwd.out i18n_check.out mostdesc.out
 	$(RM) gwc consang gwd gwu
@@ -64,6 +65,9 @@ mostdesc.out: $(MOSTDESC_OBJS)
 
 mostdesc.opt: $(MOSTDESC_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) unix.cmxa $(LIBUNIX) $(MOSTDESC_OBJS:.cmo=.cmx) -o mostdesc.opt
+
+fpla.out: $(FPLA_OBJS)
+	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(FPLA_OBJS) -o fpla.out
 
 i18n_check.out: i18n_check.cmo
 	$(OCAMLC) i18n_check.cmo -o i18n_check.out

@@ -4,6 +4,12 @@ Internal, very small, or not visible changes
 GeneWeb Intermediate Version 2.02-1
 -----------------------------------
 
+* New
+  - [May 30, 99] Added program "fpla": first parentless ancestors. Given
+    a data base, displays the Sosa number of the first ancestor without
+    parent. Sorted by Sosa numbers: the first displayed person is therefore
+    the person whose ancestors list is the most complete.
+
 * Setup program
   - [May 12, 99] Added "charset=iso-8859-1" in headers (undefined, before).
   - [May 11, 99] Give up the second command of base recovery when the first
