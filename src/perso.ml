@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.35 2000-07-20 10:29:00 ddr Exp $ *)
+(* $Id: perso.ml,v 3.36 2000-07-26 13:32:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -936,7 +936,7 @@ value print_occupation_dates conf base in_table p =
 ;
 
 value print_photo_occupation_dates conf base p =
-  let image_txt = capitale (transl_nth conf "image/images" 0) in
+  let image_txt = transl_nth conf "image/images" 0 in
   match
     image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
   with
@@ -949,7 +949,7 @@ value print_photo_occupation_dates conf base p =
           tag "td" begin
             Wserver.wprint "<a href=\"%sm=IM;%s;k=/%s\">" (commd conf) b k;
             Wserver.wprint "\
-<img src=\"%sm=IM;d=%d;%s;k=/%s\" width=%d height=%d border=0 alt=\"%s\">"
+<img src=\"%sm=IM;d=%d;%s;k=/%s\" width=%d height=%d border=0 alt=\"(%s)\">"
               (commd conf)
               (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
               b k width height image_txt;
@@ -1041,7 +1041,19 @@ value print_ok conf base p =
   in
   let a = aoi base p.cle_index in
   let u = uoi base p.cle_index in
-  do header conf title;
+  do header_no_page_title conf title;
+     let img f t =
+       Wserver.wprint
+         "<img src=\"%s/%s\" width=13 height=13 alt=\"(%s)\" align=left>\n"
+         (image_prefix conf) f t
+     in
+     match p.sex with
+     [ Male -> img "male.gif" (transl_nth conf "M/F" 0)
+     | Female -> img "female.gif" (transl_nth conf "M/F" 1)
+     | Neuter -> () ];
+     Wserver.wprint "<h1 align=center><font color=%s>" conf.highlight;
+     title False;
+     Wserver.wprint "</font></h1>\n";
      print_sub_titles conf base p;
      print_link_to_welcome conf True;
      print_photo_occupation_dates conf base p;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.61 2000-07-18 07:45:06 ddr Exp $ *)
+(* $Id: util.ml,v 3.62 2000-07-26 13:32:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -823,9 +823,9 @@ value header_no_page_title conf title =
 
 value header conf title =
   do header_no_page_title conf title;
-     Wserver.wprint "<center><h1><font color=%s>" conf.highlight;
+     Wserver.wprint "<h1 align=center><font color=%s>" conf.highlight;
      title False;
-     Wserver.wprint "</font></h1></center>\n";
+     Wserver.wprint "</font></h1>\n";
   return ()
 ;
 
