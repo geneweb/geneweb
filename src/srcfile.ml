@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.15 2002-12-18 14:08:34 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.16 2002-12-19 22:54:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -15,10 +15,9 @@ type counter =
     normal_cnt : mutable int }
 ;
 
-value get_date () =
-  let tm = Unix.localtime (Unix.time ()) in
-  Printf.sprintf "%02d/%02d/%d" tm.Unix.tm_mday (succ tm.Unix.tm_mon)
-    (tm.Unix.tm_year + 1900)
+value get_date conf =
+  Printf.sprintf "%02d/%02d/%d" conf.today.day conf.today.month
+    conf.today.year
 ;
 
 value adm_file f =
@@ -46,12 +45,12 @@ value count conf =
         {welcome_cnt = wc; request_cnt = rc; start_date = d; wizard_cnt = wzc;
          friend_cnt = frc; normal_cnt = nrc}
       with _ ->
-        {welcome_cnt = 0; request_cnt = 0; start_date = get_date ();
+        {welcome_cnt = 0; request_cnt = 0; start_date = get_date conf;
          wizard_cnt = 0; friend_cnt = 0; normal_cnt = 0}
     in
     do { close_in ic; rd }
   with _ ->
-    {welcome_cnt = 0; request_cnt = 0; start_date = get_date ();
+    {welcome_cnt = 0; request_cnt = 0; start_date = get_date conf;
      wizard_cnt = 0; friend_cnt = 0; normal_cnt = 0}
 ;
 
