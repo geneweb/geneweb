@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.4 2000-01-24 09:45:51 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.5 2000-03-04 17:42:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -226,9 +226,9 @@ value print_insert_child conf base cnt =
       let var = "ins_child" ^ string_of_int cnt in
       tag "td" begin
         let s = transl_nth conf "child/children" 0 in
+        let sn = "<input name=" ^ var ^ "_n size=1 maxlength=1 value=1> " in
         Wserver.wprint "%s <input type=checkbox name=%s value=on>"
-          (capitale (transl_decline conf "insert" s))
-          var;
+          (capitale (transl_decline conf "insert" (sn ^ s))) var;
       end;
     end;
   end
