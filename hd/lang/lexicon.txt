@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.22 2001-04-21 12:50:39 ddr Exp $
+# $Id: lexicon.txt,v 4.23 2001-04-24 09:10:09 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -5792,7 +5792,7 @@ fi: tunnustanut is&auml;/tunnustanut &auml;iti/tunnustaneet vanhemmat
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
 he:   àá îëéø / àí îëéøä / äåøéí îëéøéí
 is: viğurkenndur fağir/viğurkennd móğir/viğurkennd foreldri
-it: padre avente riconosciuto/madre avente riconosciuta/genitori aventi riconusciuti
+it: padre avente riconosciuto/madre avente
 lv: atzîts tçvs/mâte/vecâki (?)
 nl: erkennende vader/erkennende moeder/erkennende ouders
 no: bekreftet far/bekreftet mor/bekreftede foreldre
@@ -7062,7 +7062,7 @@ fi: viimeiset %d kuolemantapausta
 fr: les %d derniers d&eacute;c&egrave;s
 he:  %d äîúéí äàçøåğéí
 is: síğustu %d andlát
-it: le ultime %d morto
+it: le ultime %d mortio
 lv: pçdçjie %d miruğie
 nl: de %d recentste overlijdens
 no: de siste %d d&oslash;de
@@ -7498,7 +7498,7 @@ fi: tuntematon henkil&ouml
 fr: personne inconnue
 he:  àãí ìà éãåò
 is: óşekktur einstaklingur
-it: sconosciuta persona
+it: sconosciuta persona sconosciuta
 lv: nezinâma persona
 nl: onbekend persoon
 no: ukjent person
