@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.7 1999-12-03 20:32:36 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.8 1999-12-04 05:10:45 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -30,6 +30,44 @@ value new_ghost_id =
 ;
 
 (* print *)
+
+value print_table print_newline print_elem print_span t =
+  for i = 0 to Array.length t.table - 1 do
+    for j = 0 to Array.length t.table.(i) - 1 do
+      print_elem t.table.(i).(j).elem;
+    done;
+    print_newline ();
+    if i < Array.length t.table - 1 then
+      do for j = 0 to Array.length t.table.(i) - 1 do
+           print_span i j t.table.(i).(j).span;
+         done;
+         print_newline ();
+      return ()
+    else ();
+  done
+;
+
+value print_char_table d t =
+  let print_elem =
+    fun
+    [ Elem e -> Printf.eprintf "  %s" (d.dag.(int_of_idag e).valu)
+    | Ghost x -> Printf.eprintf "  |" (*int_of_ghost_id x*)
+    | Nothing -> Printf.eprintf "   " ]
+  in
+(*
+  let print_span i j r =
+    let n = int_of_span_id r in
+    let c = Char.chr (Char.code 'a' + n mod 26) in
+    Printf.eprintf "*%c" c
+  in
+*)
+  let print_span i j r =
+    if j > 0 && t.table.(i).(j-1).span = r then Printf.eprintf "---"
+    else Printf.eprintf "  -"
+  in
+(**)
+  print_table prerr_newline print_elem print_span t
+;
 
 value print_html_table print print_indi border d t =
   let jlast = Array.length t.table.(0) - 1 in
@@ -565,15 +603,27 @@ value find_linked_children t i j1 j2 j3 j4 =
       loop (i + 1) j1 j2 j3 j4
 ;
 
+value mirror_block t i1 i2 j1 j2 =
+  for i = i1 to i2 do
+    let line = t.(i) in
+    loop j1 j2 where rec loop j1 j2 =
+      if j1 >= j2 then ()
+      else
+        let v = line.(j1) in
+        do line.(j1) := line.(j2);
+           line.(j2) := v;
+        return loop (j1 + 1) (j2 - 1);
+  done
+;
+
 value exch_blocks t i1 i2 j1 j2 j3 j4 =
-  do for i = i1 to i2 do
-       let line = t.(i) in
-       let saved = Array.copy line in
-       do for j = j1 to j2 do line.(j4 - j2 + j) := saved.(j); done;
-          for j = j3 to j4 do line.(j1 - j3 + j) := saved.(j); done;
-       return ();
-     done;
-  return ()
+  for i = i1 to i2 do
+    let line = t.(i) in
+    let saved = Array.copy line in
+    do for j = j1 to j2 do line.(j4 - j2 + j) := saved.(j); done;
+       for j = j3 to j4 do line.(j1 - j3 + j) := saved.(j); done;
+    return ();
+  done
 ;
 
 value find_block_with_parents t i jj1 jj2 jj3 jj4 =
@@ -623,7 +673,9 @@ value push_to_right d t i j1 j2 =
       in
       if jj4 < j2 && jj2 < jj3 then
         do exch_blocks t ii i jj1 jj2 jj3 jj4; return loop (jj4 + 1)
-      else j1
+      else if jj4 < j2 && jj1 = j && jj2 <= jj4 then
+        do mirror_block t ii i jj1 jj4; return loop (jj4 + 1)
+      else j - 1
   in
   loop (j1 + 1)
 ;
@@ -658,7 +710,9 @@ value push_to_left d t i j1 j2 =
       in
       if jj1 > j1 && jj2 < jj3 then
         do exch_blocks t ii i jj1 jj2 jj3 jj4; return loop (jj1 - 1)
-      else j2
+      else if jj1 > j1 && jj4 = j + 1 && jj3 >= jj1 then
+        do mirror_block t ii i jj1 jj4; return loop (jj1 - 1)
+      else j + 1
   in
   loop (j2 - 1)
 ;
