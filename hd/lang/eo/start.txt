@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.40 2000-07-09 10:33:09 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.41 2000-07-18 09:28:09 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title> Genealogio - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -26,8 +26,8 @@ genealogia</font></h1></table>
 
 <br>
 
-<font size=-1><em>Vi povas elekti alian lingvon de afisxajxo inter la
-sekvanton:</em></font>
+<font size=-1><em>Vi povas elekti alian lingvon inter la
+sekvantajn:</em></font>
 
 <br>
 
@@ -35,7 +35,7 @@ sekvanton:</em></font>
 
 <p>
 
-La datenbazo <font color=%i><b>"%t"</b></font> enhavas nune %n
+La datenbazo <font color=%i><b>"%t"</b></font> enhavas nun %n
 personojn.%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 
@@ -67,7 +67,7 @@ personojn.%In<br>
 
 <tr><td>
 <center><table border=0 cellspacing=0 cellpadding=0><tr><td>
-Por navigi en cxi datenbazo, vi povas fari via sercxo:<br><p>
+Por navigi en cxi tiu datenbazo, vi povas fari vian sercxon:<br><p>
 
 <ul>
 
@@ -75,7 +75,7 @@ Por navigi en cxi datenbazo, vi povas fari via sercxo:<br><p>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=%i><b>per persono</b></font>
+<font color=%i><b>laù la persono</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -96,7 +96,7 @@ Por navigi en cxi datenbazo, vi povas fari via sercxo:<br><p>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=%i><b>per mosxto</b></font>%INl<br>%E
+<font color=%i><b>laù la mosxto</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
@@ -115,12 +115,12 @@ Por navigi en cxi datenbazo, vi povas fari via sercxo:<br><p>
 <font color=%i><b>per la listo</b></font> de cxiuj
 <select name=m>
 <option value="N" selected>familinomoj
-<option value="P">personnomoj
+<option value="P">propraj nomoj
 </select>
-per
+laù
 <select name=tri>
-<option value="A" selected>alfabetica ordo
-<option value="F">frekvenko
+<option value="A" selected>alfabeta ordo
+<option value="F">ofteco
 </select>
 <input type=submit value="Ok">
 </form>
@@ -139,7 +139,7 @@ per
 <li>
 
 <font color=%i><b>per la</b></font>
-<a href="%sm=H;v=advanced"><font color=%i><b>rekesto
+<a href="%sm=H;v=advanced"><font color=%i><b>sercxado
 progresata</b></font></a>.
 
 </ul>
@@ -191,14 +191,14 @@ progresata</b></font></a>.
 
 <p>
 
-Estis %q alirejoj kaj %c al cxi pagxo, ekde la %d.
+Estis %q alirejoj, el kiuj %c al cxi tiu pagxo, ekde la %d.
 %Il<p>%E
 
 <p>
 
-Se via navigisto ne auxtomate gxisdatigas la modificitajn pagxojn (vi
-deviganta fari "resxargi kurantan dokumenton"), eksperimentu ekde <a
-href="%sescache=0">cxi legilo</a>.
+Se via navigisto ne auxtomate gxisdatigas la modifigitajn pagxojn (se vi
+devas fari "resxargxi kurantan dokumenton"), provu ekde <a
+href="%sescache=0">cxi tiu legilo</a>.
 
 </td></tr>
 </table>

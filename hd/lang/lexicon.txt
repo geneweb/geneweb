@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.140 2000-07-18 08:04:27 ddr Exp $
+# $Id: lexicon.txt,v 3.141 2000-07-18 09:28:07 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -61,7 +61,7 @@ cs:  vidìt první
 de: , um die erste zu sehen
 dk:  for at se det f&oslash;rste
 en:  to see the first one
-eo:  por vidi la unuan cxeneron de parenceco
+eo:  por vidi la unuan ligon de parenceco
 es:  para ver el primer v&iacute;nculo de parentesco
 fi:  n&auml;hd&auml;ksesi ensimm&auml;isen sukulaisuuden
 fr:  pour voir le premier
@@ -81,7 +81,7 @@ cs:  zkusit znovu s tímto èíslem, nebo jít zpìt (back) a zmìnit èíslo
 de: , um es mit dieser Nummer nochmals zu versuchen, oder dr&uuml;cken Sie "back" und &auml;ndern Sie es selbst
 dk:  for at fors&oslash;ge igen med dette nummer, eller g&aring; tilbage og v&aelig;lg et andet
 en:  to try again with this number, or do "back" and change it yourself
-eo:  por reprobi kun cxi numero, aux faru "malantauxe" kaj sxangxu ion vimem
+eo:  por reprovi kun cxi tiu numero, aù faru "malantauxe" kaj sxangxu ion mem
 es:  para ensayar de nuevo con este n&uacute;mero, o haga "back" y escoja otro
 fi:  yritt&auml;&auml;ksesi uudelleen t&auml;ll&auml numerolla,  tai peruuta ja muuta se itse
 fr:  pour r&eacute;essayer avec ce num&eacute;ro, ou bien faites "back" et choisissez-en un autre
@@ -141,7 +141,7 @@ cs: pøed %d rokem;lety
 de: vor %d Jahren
 dk: for %d &aring;r siden
 en: %d years ago
-eo: antaux %d jaroj
+eo: antaù %d jaroj
 es: hace %d a&ntilde;s
 fi: %d vuotta sitten
 fr: il y a %d ans
@@ -161,7 +161,7 @@ cs: %s bratranci/sestøenice
 de: Cousins %s Grades
 dk: f&aelig;tre og kusiner af %s grad
 en: %s cousins
-eo: %s gekuzoj
+eo: %s gradaj  gekuzoj 
 es: primos de %s grado
 fr: cousins au %s degr&eacute;
 fi: %s serkut
@@ -181,7 +181,7 @@ cs: %t u¾ má rodièe
 de: %t hat schon Eltern
 dk: %t har allerede for&aelig;ldre
 en: %t already has parents
-eo: %t havas jam gepatroj
+eo: %t havas jam gepatrojn
 es: los padres de %t ya existen
 fi: henkil&ouml;ll&auml %t on jo vanhemmat
 fr: %t a d&eacute;j&agrave; des parents
@@ -201,7 +201,7 @@ cs: %t zemøel pøed svým narozením/zemøela pøed svým narozením
 de: %t ist vor der Geburt gestorben
 dk: %t er d&oslash;de f&oslash;r f&oslash;dslen
 en: %t died before his/her birth
-eo: %t estis morta antaux lia/sxia naskigxo
+eo: %t mortis antaù sia naskigxo
 es: %t ha muerto antes de su nacimiento
 fi: %t on kuollut ennen syntym&auml;&auml;ns&auml
 fr: %t est mort(e) avant sa naissance
@@ -221,7 +221,7 @@ cs: %t má nesprávné údaje o titulech: %t
 de: die Datumsangaben eines Titels von %t sind falsch: %t
 dk: %t har ukorrekte titeldatoangivelser: %t
 en: %t has incorrect title dates: %t
-eo: la datoj de mosxto de %t estas malkorektaj: %t
+eo: la nobeltitolaj datoj de %t estas malkorektaj: %t
 es: las fechas de un t&iacute;tulo de %t son incorrectas: %t
 fi: henkil&ouml;n %t arvonimen p&auml;iv&auml;m&auml;&auml;r&auml;ss&auml %t on virhe
 fr: %t a des dates de titre incorrectes: %t
@@ -241,7 +241,7 @@ cs: %t narozen/narozena po smrti své matky %t
 de: %t ist nach dem Tod der Mutter %t geboren
 dk: %t er f&oslash;dt efter moderens d&oslash;d %t
 en: %t is born after the death of his/her mother %t
-eo: %t naskigxis post la morto de lia/sxia patrino %t
+eo: %t naskigxis post la morto de sia patrino %t
 es: %t ha nacido despu&eacute;s de la muerte de su madre %t
 fi: %t on syntynyt &auml;itins&auml kuoleman j&auml;lkeen
 fr: %t est n&eacute;(e) apr&egrave;s la mort de sa m&egrave;re %t
@@ -261,7 +261,7 @@ cs: %t narozen/narozena více ne¾ dva roky po smrti svého otce: %t
 de: %t ist mehr als 2 Jahre nach dem Tod des Vaters %t geboren
 dk: %t er f&oslash;dt senere end 2 &aring; efter faderens d&oslash;d %t
 en: %t is born more than 2 years after the death of his/her father %t
-eo: %t naskigxis plu de 2 jaroj post la morto de lia/sxia patro %t
+eo: %t naskigxis pli ol 2 jaroj post la morto de sia patro %t
 es: %t ha nacido mas de 2 a&ntilde;os despu&eacuet;s de la muerte de su padre %
 fi: %t on syntynyt yli 2 vuotta is&auml;ns&auml kuoleman j&auml;lkeen
 fr: %t est n&eacute;(e) plus de 2 ans apr&egrave;s la mort de son p&egrave;re %t
@@ -282,7 +282,7 @@ cs: 1. %m %y/%d. %m %y/%m %y/%y
 de: 1. %m %y/%d. %m %y/%m %y/%y
 dk: 1. %m %y/%d. %m %y/%m %y/%y
 en: 1 %m %y/%d %m %y/%m %y/%y
-eo: 1a de %m %y/%da de %m %y/%m %y/%y
+eo: 1an de %m %y/%da de %m %y/%m %y/%y
 es: 1ro %m %y/%d %m %y/%m %y/%y
 fi: 1. %mta %y/%d. %mta %y/%mssa %y/%y
 fr: 1er %m %y/%d %m %y/%m %y/%y
@@ -302,7 +302,7 @@ cs: ,
 de: ,
 dk: ,
 en: .
-eo: .
+eo: ,
 es: ,
 fi: ,
 fr: ,
@@ -359,7 +359,7 @@ cs: &nbsp;
 de: .
 dk: .
 en: ,
-eo: ,
+eo: .
 es: .
 fi: .
 fr: .
@@ -379,7 +379,7 @@ cs: nedìle/pondìlí/úterý/støeda/ètvrtek/pátek/sobota
 de: Sonntag/Montag/Dienstag/Mittwoch/Donnerstag/Freitag/Samstag
 dk: s&oslash;ndag/mandag/tirsdag/onsdag/torsdag/fredag/l&oslash;rdag
 en: Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday
-eo: dimancxo/lundo/mardo/merkredo/jauxdo/vendredo/sabato
+eo: dimancxo/lundo/mardo/merkredo/jaùdo/vendredo/sabato
 es: domingo/lunes/martes/mi&eacute;rcoles/jueves/viernes/s&aacute;bado
 fi: sunnuntai:e:+na/maanantai:e:+na/tiistai:e:+na/keskiviikko:e:+na/torstai:e:+na/perjantai:e:+na/lauantai:e:+na
 fr: dimanche/lundi/mardi/mercredi/jeudi/vendredi/samedi
@@ -439,7 +439,7 @@ cs: , bude
 de: , das wird sein
 dk: , er det
 en: , it will be
-eo: , estus
+eo: , estos
 es: , ser&aacute;
 fi: ,
 fr: , ce sera
@@ -459,7 +459,7 @@ cs: bratranec/sestøenice z druhého kolena
 de: Cousins 2ten Grades
 dk: f&aelig;tre og kusiner af 2. grad
 en: 2nd cousins
-eo: 2a gekuzoj
+eo: rektaj geprakuzoj
 es: primos de 2ndo grado
 fi: pikkuserkut
 fr: cousins issus de germains
@@ -479,7 +479,7 @@ cs: bratranec/sestøenice z tøetího kolena
 de: Cousins 3ten Grades
 dk: f&aelig;tre og kusiner af 3. grad
 en: 3rd cousins
-eo: 3a gekuzoj
+eo: 3aj gradaj gekuzoj
 es: primos de 3er grado
 fi: kolmannet serkut
 fr: cousins issus d'issus de germains
@@ -518,7 +518,7 @@ cs: M/®
 de: M/F
 dk: M/K
 en: M/F
-eo: M/F
+eo: Maskla/Ina
 es: M/F
 fi: M/N
 fr: H/F
@@ -538,7 +538,7 @@ cs: A/N
 de: J/N
 dk: J/N
 en: Y/N
-eo: Y/N
+eo: J/N
 es: S/N
 fi: K/E
 fr: O/N
@@ -557,7 +557,7 @@ cs: bratranec z %s kolena/sestøenice z %s. kolena
 de: ein:d:+em Cousin %s Grades/eine Kusine %s Grades
 dk: en f&aelig;tter af %s grad/en kusine af %s grad
 en: a %s cousin
-eo: %s kuzo/%s kuzino/%s gekuzo
+eo: %s grada kuzo/%s grada kuzino/%s grada kuz(in)o
 es: un primo de %s grado/una prima de %s grado/un(a) primo(a) de %s grado
 fi: %s serkku:g:--un
 fr: un cousin au %s degr&eacute;/une cousine au %s degr&eacute;/un(e) cousin(e) au %s degr&eacute;
@@ -577,7 +577,7 @@ cs: bratranec z druhého kolena/sestøenice z druhého kolena
 de: ein:d:+em Cousin 2ten Grades/eine:d:+r Kusine 2ten Grades
 dk: en f&aelig;tter af 2. grad/en kusine af 2. grad
 en: a 2nd cousin
-eo: 2a kuzo/2a kuzino/2a gekuzo
+eo: rekta prakuzo/rekta prakuzino/rekta kuz(in)o
 es: un primo nacido de primos hermanos/una prima nacida de primos hermanos/un(a) primo(a) nacido(a) de primos hermanos
 fi: pikkuserkku
 fr: un cousin issu de germains/une cousine issue de germains/un(e) cousin(e) issu(e) de germains
@@ -597,7 +597,7 @@ cs: bratranec z tøetího kolena/sestøenice z tøetího kolena
 de: ein:d:+em Cousin 3ten Grades/eine:d:+r Kusine 3ten Grades
 dk: en f&aelig;tter af 3. grad/en kusine af 3. grad
 en: a 3rd cousin
-eo: 3a kuzo/3a kuzino/3a gekuzo
+eo: 3a grada kuzo/3a grada kuzino/3a grada kuz(in)o
 es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
 fi: kolmas serkku
 fr: un cousin issu d'issus de germains/une cousine issue d'issus de germains/un(e) cousin(e) issu(e) d'issus de germains
@@ -636,7 +636,7 @@ cs: bratr/sestra/sourozenec
 de: ein Bruder/eine Schwester/ein Bruder oder eine Schwester
 dk: en broder/en s&oslash;ster/en broder eller en s&oslash;ster
 en: a brother/a sister/a sibling
-eo: frato/fratino/gefrato
+eo: frato/fratino/frat(in)o
 es: un hermano/una hermana/un(a) hermano(a)
 fi: veli/sisar/sisarus
 fr: un fr&egrave;re/une soeur/un fr&egrave;re ou une soeur
@@ -696,7 +696,7 @@ cs: dìdeèek/babièka/prarodiè
 de: ein Gro&szlig;vater/eine Gro&szlig;mutter/ein:d:+em Gro&szlig;elternteil
 dk: en bedstefader/en bedstemoder/en bedstefor&aelig;lder
 en: a grandfather/a grandmother/a grandparent
-eo: avo/avino/geavo
+eo: avo/avino/av(in)o
 es: un abuelo/una abuela/un(a) abuelo(a)
 fi: isois&auml;:g:+n/iso&auml;iti:g:--din/isovanhempi:g:--man
 fr: un grand-p&egrave;re/une grand-m&egrave;re/un grand-parent
@@ -716,7 +716,7 @@ cs: vnuk/vnuèka/vnuk
 de: ein Enkel/eine Enkelin/ein Enkelkind
 dk: en s&oslash;nne(datter)-s&oslash;n/en s&oslash;nne(datter)-datter/et barnebarn
 en: a grandson/a granddaughter/a grandchild
-eo: nepo/nepino/genepo
+eo: nepo/nepino/nep(in)o
 es: un nieto/una nieta/un(a) nieto(a)
 fi: pojan tai tytt&auml;ren poika/pojan tai tytt&auml;ren tyt&auml;r/lapsenlapsi
 fr: un petit fils/une petite fille/un petit enfant
@@ -736,7 +736,7 @@ cs: pradìdeèek/prababièka/praprarodiè
 de: ein Urgro&szlig;vater/eine Urgro&szlig;mutter/ein:d:+em Urgro&szlig;elternteil
 dk: en oldefader/en oldemoder/en oldefor&aelig;lder
 en: a great-grandfather/a great-grandmother/a great-grandparent
-eo: praevo/praevino/gepraevo
+eo: praavo/praavino/praav(in)o
 es: un bisabuelo/una bisabuela/un(a) bisabuelo(a)
 fi: iso-isois&auml;:g:+n/iso-iso&auml;iti:g:--din/iso-isovanhempi:g:--man
 fr: un arri&egrave;re-grand-p&egrave;re/une arri&egrave;re-grand-m&egrave;re/un arri&egrave;re-grand-parent
@@ -756,7 +756,7 @@ cs: pravnuk/pravnuèka/pravnouèata
 de: ein Urenkel/eine Urenkelin/ein Urenkelkind
 dk: en oldes&oslash;n/en oldedatter/et oldebarn
 en: a great-grandson/a great-granddaughter/a great-grandchild
-eo: pranepo/pranepino/gepranepo
+eo: pranepo/pranepino/pranep(in)o
 es: un bisnieto/una bisnieta/un(a) bisnieto(a)
 fi: isois&auml;n(-&auml;idin) poika/isois&auml;n(-&auml;idin) tyt&auml;r/lapsen-lapsenlapsi
 fr: un arri&egrave;re-petit-fils/une arri&egrave;re-petite-fille/un arri&egrave;re-petit-enfant
@@ -816,7 +816,7 @@ cs: nevlastní bratr/nevlastní sestra/nevlastní sourozenec
 de: ein Halbbruder/eine Halbschwester/ein Halbbruder oder eine Halbschwester
 dk: en halvbroder/en halvsøster/en halvsøskende
 en: a half-brother/a half-sister/a half-sibling
-eo: frato/fratino/gefrato
+eo: duonfrato/duonfratino/duonfrat(in)o
 es: un hermano/una hermana/un(a) hermano(a)
 fi: velipuoli/sisarpuoli/is&auml;(&auml;iti)puolen lapsi
 fr: un demi-fr&egrave;re/une demi-soeur/un demi-fr&egrave;re ou une demi-soeur
@@ -835,7 +835,7 @@ af: 'n neef van die eggenoot/'n niggie van die eggenoot
 de: ein Neffe (des Ehegatten)/eine Nichte (des Ehegatten)
 dk: en nev&oslash; (&aelig;gtef&aelig;lles nev&oslash;)/en niece (&aelig;gtef&aelig;lles niece)
 en: a nephew (spouse's nephew)/a niece (spouse's niece)
-eo: nevo (nevo de edz(in)o)/nevino (nevino de edz(in)o)
+eo: nevo (de edz(in)o)/nevino (de edz(in)o)
 es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
 fi: veljen tai sisaren poika (puolison veljen tai sisaren poika)/veljen tai sisaren tyt&auml;r (puolison veljen tai sisaren tyt&auml;r)
 fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
@@ -894,7 +894,7 @@ cs: syn/dcera/dítì
 de: ein Sohn/eine Tochter/ein Kind
 dk: en s&oslash;n/en datter/et barn
 en: a son/a daughter/a child
-eo: filo/filino/infano
+eo: filo/filino/ido
 es: un hijo/una hija/un(a) hijo(a)
 fi: poika/tyt&auml;r/lapsi
 fr: un fils/une fille/un enfant
@@ -914,7 +914,7 @@ cs: kolem
 de: ca.
 dk: omkring
 en: about
-eo: cxirkaux
+eo: cxirkaù
 es: alrededor de
 fi: noin
 fr: vers
@@ -934,7 +934,7 @@ cs: pøístup
 de: Zugriff
 dk: adgang
 en: access
-eo: alirejo
+eo: eniro
 es: acceso
 fi: p&auml;&auml;sy
 fr: acc&egrave;s
@@ -992,7 +992,7 @@ af: aangenome seun/aangenome dogter/aangenome kind
 de: Adoptivsohn/Adoptivtochter/Adoptivkind
 dk: adoptivs&oslash;n/adoptivdatter/adoptivbarn
 en: adoptive son/adoptive daughter/adoptive child
-eo: adoptita filo/adoptita filino/adoptita infano
+eo: adoptita filo/adoptita filino/adoptita ido
 es: hijo adoptivo/hija adoptiva/hijo(a) adoptivo(a)
 fi: ottopoika/ottotyt&auml;r/ottolapsi
 fr: fils adoptif/fille adoptive/enfant adoptif
@@ -1014,7 +1014,7 @@ de: Erweiterte Suche
 dk: avanceret s&oslash;gning
 en: advanced request
 es: consulta avanzada
-eo: rekesto progresata
+eo: sercxo pli preciza
 fi: erityishaku
 fr: requ&ecirc;te &eacute;volu&eacute;e
 he:   á÷ùä îú÷ãîú
@@ -1095,7 +1095,7 @@ cs: vìk v dobì úmrtí
 de: Alter:
 dk: alder ved d&oslash;d:
 en: age at death:
-eo: agxo de morto:
+eo: mortagxo
 es: a la edad de
 fi: ik&auml kuollessa
 fr: &agrave; l'&acirc;ge de
@@ -1115,7 +1115,7 @@ cs: alias
 de: Alias
 dk: alias
 en: alias
-eo: aliaso:a:+n
+eo: aliasa
 es: alias
 fi: alias
 fr: alias
@@ -1174,7 +1174,7 @@ cs: v¹echny tituly
 de: alle Titel
 dk: alle titler
 en: all the titles
-eo: cxiuj mosxtoj
+eo: cxiuj nobeltitoloj
 es: todos los t&iacute;tulos
 fi: kaikki arvonimet
 fr: tous les titres
@@ -1194,7 +1194,7 @@ cs: v abecedním poøadí
 de: alphabetische Ordnung
 dk: alfabetisk orden
 en: alphabetic order
-eo: alfabetic ordo
+eo: alfabeta ordo
 es: orden alfab&eacute;tico
 fi: aakkosj&auml;rjestys
 fr: ordre alphab&eacute;tique
@@ -1214,7 +1214,7 @@ cs: také
 de: auch
 dk: ogs&aring;
 en: also
-eo: ankaux
+eo: ankaù
 es: tambi&eacute;n
 fi: my&ouml;s
 fr: aussi
@@ -1294,7 +1294,7 @@ cs: pøedkové
 de: Vorfahren
 dk: forf&aelig;dre
 en: ancestors
-eo: antauxeuloj
+eo: prapatro
 es: ascendientes
 fi: esivanhemmat
 fr: ascendants
@@ -1375,7 +1375,7 @@ cs: výroèí úmrtí
 de: Jahrestage der verstorbenen Personen
 dk: &aring;rsdage for d&oslash;de personer
 en: anniversaries of death
-eo: datrevenoj de la mortaj personoj
+eo: mortotagaj datrevenoj 
 es: aniversarios de las personas fallecidas
 fi: vainajien muistop&auml;ivi&auml
 fr: anniversaires des personnes d&eacute;c&eacute;d&eacute;es
@@ -1435,7 +1435,7 @@ cs: souèasnì
 de: zugleich
 dk: p&aring; en gang
 en: at the same time
-eo: samfoje
+eo: samtempe
 es: a la vez
 fi: samaan aikaan
 fr: en m&ecirc;me temps
@@ -1454,7 +1454,7 @@ af: terug
 de: zur&uuml;ck
 dk: tilbage
 en: back
-eo: returniro
+eo: reveno
 es: regreso
 fi: takaisin
 fr: retour
@@ -1513,7 +1513,7 @@ cs: pøed
 de: vor
 dk: f&oslash;r
 en: before
-eo: antaux
+eo: antaù
 es: antes
 fi: ennen
 fr: avant
@@ -1533,7 +1533,7 @@ cs: pøed
 de: vor
 dk: f&oslash;r
 en: before
-eo: antaux
+eo: antaù
 es: antes de
 fi: ennen
 fr: avant
@@ -1553,7 +1553,7 @@ cs: zaèátek
 de: Anfang
 dk: p&aring;begyndelse
 en: begin
-eo: komenko
+eo: komenco
 es: principio
 fi: alku
 fr: d&eacute;but
@@ -1613,7 +1613,7 @@ cs: narozeniny
 de: Geburtstage
 dk: f&oslash;dselsdage
 en: birthdays
-eo: naskigxtagoj
+eo: datrevenoj de naskigxo
 es: cumplea&ntilde;os
 fi: syntym&auml;p&auml;ivi&auml
 fr: anniversaires
@@ -1634,7 +1634,7 @@ cs: narozen/narozena
 de: geboren
 dk: f&oslash;dt
 en: born
-eo: naskigxita
+eo: naskigxinta
 es: nacido/nacida/nacido(a)
 fi: syntynyt
 fr: n&eacute;/n&eacute;e/n&eacute;(e)
@@ -1733,7 +1733,7 @@ cs: zru¹it svazky GeneWebu
 de: GeneWeb-Links entfernen
 dk: uden GeneWeb-links
 en: cancel GeneWeb links
-eo: nuligi legilojn GeneWeb
+eo: nuligi GeneWeb-ajn ligilojn
 es: anular los lazos GeneWeb
 fi: ei GeneWeb-linkkej&auml
 fr: annuler les liens GeneWeb
@@ -1770,7 +1770,7 @@ af: moontlike seun/moontlike dogter/moontlike kind
 de: m&ouml;glicher Sohn/m&ouml;gliche Tochter/m&ouml;gliches Kind
 dk: mulig s&oslash;n/mulig datter/muligt barn
 en: candidate son/candidate daughter/candidate child
-eo: ebla filo/ebla filino/eblaj infano
+eo: ebla filo/ebla filino/eblaj idoj
 es: hijo posible/hija posible/hijo(a) posible
 fi: mahdollinen poika/mahdollinen tyt&auml;r/mahdollinen lapsi
 fr: fils possible/fille possible/enfant possible
@@ -1789,7 +1789,7 @@ cs: databáze je nepøístupná
 de: Datenbank nicht erreichbar
 dk: kan ikke n&aring; databasen
 en: cannot access base
-eo: ne povas alireji bazo
+eo: ne eblas eniri la bazon
 es: acceso a la base imposible
 fi: tietokantaan ei p&auml;&auml;se
 fr: impossible d'acc&eacute;der &agrave; la base
@@ -1809,7 +1809,7 @@ cs: nemohu zmìnit pohlaví ¾enatého mu¾e/nemohu zmìnit pohlaví vdané ¾eny
 de: kann das Geschlecht einer verheirateten Person nicht &auml;ndern
 dk: kan ikke &aelig;ndre k&oslash;n for en gift person
 en: cannot change sex of a married person
-eo: ne povas aliigi sekso de edzita persono
+eo: ne eblas aliigi sekson de edzigxinta persono
 es: no puede modificarse el sexo de una persona casada
 fi: et voi vaihtaa naimisissa olevan henkil&ouml;n sukupuolta
 fr: on ne peut pas changer le sexe d'une personne mari&eacute;e
@@ -1829,7 +1829,7 @@ cs: zmìnit jména dìtí
 de: Namen der Kinder &auml;ndern
 dk: &aelig;ndre b&oslash;rns navne
 en: change children's names
-eo: sxangxi nomojn de la infanoj
+eo: sxangxi nomojn de la idoj
 es: cambiar los nombres de los hijos
 fi: muuta lasten nimi&auml;
 fr: changer noms des enfants
@@ -1849,7 +1849,7 @@ cs: zmìnit poøadí dìtí
 de: Reihenfolge der Kinder gewechselt
 dk: &aelig;ndret r&aelig;kkef&oslash;lge for b&oslash;rn
 en: changed order of children
-eo: sxangxo de la nomojn de la infanon
+eo: sxangxo de la ordo de la idoj
 es: cambio del orden de los hijos
 fi: lasten j&auml;rjestyst&auml on muutettu
 fr: changement de l'ordre des enfants
@@ -1870,7 +1870,7 @@ cs: dítì/dìti
 de: Kind/Kinder
 dk: barn/b&oslash;rn
 en: child/children
-eo: infano:a:+n/infanoj
+eo: ido:a:+n/idoj
 es: hijo/hijos
 fi: lapsi/lapset
 fr: enfant/enfants
@@ -1890,7 +1890,7 @@ cs: jména dìtí zmìnìna
 de: Namen der Kinder ge&auml;ndert
 dk: b&oslash;rns navne &aelig;ndret
 en: children's names changed
-eo: nomoj de la infanoj sxangxita
+eo: nomoj de la idoj sxangxitaj
 es: nombres de los hijos cambiados
 fi: lasten nimi&auml on muutettu
 fr: noms des enfants chang&eacute;s
@@ -1910,7 +1910,7 @@ cs: kliknìte
 de: klicken Sie
 dk: klik
 en: click
-eo: clika
+eo: kliku
 es: cliquear
 fi: klikkaa
 fr: cliquez
@@ -1987,7 +1987,7 @@ cs: pokraèovat ve spojování
 de: Zusammenf&uuml;hrung fortsetzen
 dk: forts&aelig;t sammenf&oslash;jning
 en: continue merging
-eo: dauxri fuzion
+eo: daùrigu la kunigxon
 es: continuar la fusi&oacute;n
 fi: jatka yhdist&auml;mist&auml
 fr: continuer &agrave; fusionner
@@ -2007,7 +2007,7 @@ cs: bratranci/sestøenice
 de: Cousins
 dk: f&aelig;tre og kusiner
 en: cousins
-eo: kuzoj
+eo: gekuzoj
 es: primos
 fi: serkut
 fr: cousins
@@ -2027,7 +2027,7 @@ cs: bratranci/sestøenice
 de: Cousins
 dk: f&aelig;tre og kusiner
 en: cousins
-eo: kuzoj
+eo: gekuzoj
 es: primos
 fi: serkuksia
 fr: cousins
@@ -2067,7 +2067,7 @@ cs: spálen/spálena
 de: einge&auml;schert
 dk: kremeret
 en: cremated
-eo: incinerata
+eo: cindrigita
 es: incinerado/incinerada/incinerado(a)
 fi: polttohaudattu
 fr: incin&eacute;r&eacute;/incin&eacute;r&eacute;e/incin&eacute;r&eacute;(e)
@@ -2085,7 +2085,7 @@ af: databasis forum
 de: Datenbankforum
 dk: database-forum
 en: data base forum
-eo: datenbazforumo
+eo: datenbankforumo
 es: foro de la base de datos
 fi: tietokantafoorumin
 fr: forum de la base de donn&eacute;es
@@ -2165,7 +2165,7 @@ cs: smazat
 de: l&ouml;schen +before
 dk: slet
 en: delete
-eo: malkonstrui :a:
+eo: detrui :a:
 es: borrar
 fi: poista
 fr: supprimer
@@ -2207,7 +2207,7 @@ cs: zemøel/zemøela/zemøeli
 de: verstorben
 dk: d&oslash;d
 en: died
-eo: morta
+eo: mortinta
 es: fallecido/fallecida/fallecido(a)
 fi: kuollut
 fr: d&eacute;c&eacute;d&eacute;/d&eacute;c&eacute;d&eacute;e/d&eacute;c&eacute;d&eacute;(e)
@@ -2227,7 +2227,7 @@ cs: zemøel mladý/zemøela mladá/zemøeli mladí
 de: jung gestorben
 dk: d&oslash;d som ung
 en: died young
-eo: morta juna
+eo: june mortinta
 es: muerto joven/muerta joven/muerto(a) joven
 fi: kuollut nuorena
 fr: mort jeune/morte jeune/mort(e) jeune
@@ -2287,7 +2287,7 @@ cs: rozveden/rozvedena
 de: geschieden
 dk: skilt
 en: divorced
-eo: eksedzigxitaj
+eo: eksedzigxintaj
 es: divorciados
 fi: eronneet
 fr: divorc&eacute;s
@@ -2345,7 +2345,7 @@ se: slutar
 de: verlobt
 dk: forlovet
 en: engaged
-eo: fiancxaj
+eo: gefiancxigintaj
 fi: kihloissa
 fr: fianc&eacute;s
 lv: saderin&acirc;ti
@@ -2357,7 +2357,7 @@ se: f&ouml;rlovad
 de: verlobt%t mit
 dk: forlovet%t med
 en: engaged%t to
-eo: fiancxa%t kun
+eo: fiancxigita%t kun/fiancxinigita%t kun
 fi: kihlattu%t
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
 lv: saderin&acirc;ts%t ar
@@ -2411,7 +2411,7 @@ cs: pøesnì
 de: genau
 dk: n&oslash;jagtigt
 en: exact
-eo: ekzakta
+eo: korekta
 es: exacto
 fi: tarkka
 fr: exact
@@ -2450,7 +2450,7 @@ af: gekodeerde families
 de: Familien mit Kodierung
 dk: familier med kodning
 en: families with encoding
-eo: familioj kun kodagxo
+eo: familioj kun kodajxo
 es: familias con c&oacute;digo
 fi: perheet koodeineen
 fr: familles avec codage
@@ -2470,7 +2470,7 @@ cs: rodina pøidána
 de: Familie hinzugef&uuml;gt
 dk: familie tilf&oslash;jet
 en: family added
-eo: familio aldonita
+eo: aldonita familio 
 es: familia agregada
 fi: perhe lis&auml;tty
 fr: famille ajout&eacute;e
@@ -2490,7 +2490,7 @@ cs: rodina smazána
 de: Familie gel&ouml;scht
 dk: familie slettet
 en: family deleted
-eo: familio malkonstruita
+eo: nuligita familio 
 es: familia borrada
 fi: perhe poistettu
 fr: famille supprim&eacute;e
@@ -2590,7 +2590,7 @@ cs: první volné èíslo
 de: erste freie Nummer
 dk: f&oslash;rste ledige l&oslash;benummer
 en: first free number
-eo: una dispona nombro
+eo: unua dispona nombro
 es: primer n&uacute;mero libre
 fi: ensimm&auml;inen vapaa numero
 fr: premier num&eacute;ro libre
@@ -2610,7 +2610,7 @@ cs: alias køestního jména
 de: Vornamen Alias
 dk: fornavns alias
 en: first name alias
-eo: personnomo:a:+n aliaso:a:+n
+eo: aliasa:a:+n propra:a:+n nomo:a:+n
 es: nombre alias
 fi: etunimi alias
 fr: pr&eacute;nom alias
@@ -2630,7 +2630,7 @@ cs: køestní jméno chybí
 de: fehlender Vorname
 dk: fornavn mangler
 en: first name missing
-eo: personnomo maltrafanta
+eo: propra nomo mankanta
 es: falta el nombre
 fi: etunimi puuttuu
 fr: pr&eacute;nom manquant
@@ -2650,7 +2650,7 @@ cs: køestní jméno nebylo nalezeno
 de: Vorname nicht gefunden
 dk: fornavn ikke fundet
 en: first name not found
-eo: personnomo ne trovita
+eo: propra nomo ne trovita
 es: nombre no encontrado
 fi: etunime&auml ei l&ouml;ydy
 fr: pr&eacute;nom pas trouv&eacute;
@@ -2671,7 +2671,7 @@ cs: køestní jméno/køestní jména
 de: Vorname/Vornamen
 dk: fornavn/fornavne
 en: first name/first names
-eo: personnomo/personnomoj
+eo: propra nomo/propraj nomoj
 es: nombre/nombres
 fi: etunimi/etunimet
 fr: pr&eacute;nom/pr&eacute;noms
@@ -2691,7 +2691,7 @@ cs: pro køestní jména v abecedním poøádku
 de: f&uuml;r die Vornamen in alphabetischer Ordnung
 dk: for fornavnene i alfabetisk orden
 en: for the first names by alphabetic order
-eo: por la personnomoj por alfabetic ordo
+eo: por la propraj nomoj laù la alfabeta ordo
 es: por los nombres en orden alfab&eacute;tico
 fi: etunimien mukaan aakkosj&auml;rjestyksess&auml
 fr: pour les pr&eacute;noms par ordre alphab&eacute;tique
@@ -2726,7 +2726,7 @@ af: pleegseun/pleegdogter/pleegkind
 de: Pflegesohn/Pflegetochter/Pflegekind
 dk: plejes&oslash;n/plejedatter/plejebarn
 en: foster son/foster daughter/foster child
-eo: nutrita filo/nutrita filino/nutrita infano
+eo: nutrita filo/nutrita filino/nutrita ido
 fi: kasvattipoika/kasvattityt&auml;r/kasvattilapsi
 fr: fils &eacute;lev&eacute;/fille &eacute;lev&eacute;e/enfant &eacute;lev&eacute;
 he:  áï çåøâ/ áú çåøâú/ éìã çåøâ
@@ -2840,7 +2840,7 @@ af: gregoriaans/juliaans/frans/hebreeus
 de: Gregorianisch/Julianisch/Franz&ouml;sisch/Hebr&auml;isch
 dk: gregoriansk/juliansk/fransk rep./j&oslash;disk
 en: Gregorian/Julian/French/Hebrew
-eo: gregoriana/juliana/franco/hebro
+eo: gregoriana/juliana/franca/hebra
 es: gregoriano/julian/franc&eacute;s/hebreo
 fi: gregoriaaninen/juliaaninen/ranskalainen/heprealainen
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
@@ -2880,7 +2880,7 @@ cs: dìti
 de: mit
 dk: b&oslash;rn
 en: with
-eo: kun
+eo: havis ido(j)n
 es: con
 fi: lapset
 fr: dont
@@ -2990,7 +2990,7 @@ af: as titels
 de: eingeschr&auml;nkt
 dk: hvis titler
 en: if titles
-eo: se mosxtoj
+eo: se nobeltitoloj
 es: si t&iacute;tulos
 fi: jos arvonimi&auml
 fr: si titres
@@ -3009,7 +3009,7 @@ cs: obrázek smazán
 de: Bild gel&ouml;scht
 dk: billede slettet
 en: image deleted
-eo: bildo malkonstruita
+eo: bildo detruita
 es: imagen suprimida
 fi: kuva poistettu
 fr: image supprim&eacute;e
@@ -3111,7 +3111,7 @@ cs: vèetnì chybìjících man¾elù/man¾elek
 de: Fehlende Ehegatten einbeziehen
 dk: medtag ukendte &aelig;gtef&aelig;ller
 en: include missing spouses
-eo: inklui mankantajn edz(in)ojn
+eo: inkludi mankantajn edz(in)ojn
 es: incluir los c&oacute;nyuges faltantes
 fi: lue mukaan puuttuvat puolisot
 fr: inclure les conjoints manquants
@@ -3130,7 +3130,7 @@ af: eggenote ingesluit
 de: Ehegatten einbeziehen
 dk: medtag &aelig;gtef&aelig;ller
 en: include spouses
-eo: inklui edz(in)ojn
+eo: inkludi edz(in)ojn
 es: incluir los c&oacute;nyuges
 fi: mukaanlue puolisot
 fr: inclure les conjoints
@@ -3170,7 +3170,7 @@ cs: nesprávné datum
 de: falsches Datum
 dk: forkert dato
 en: incorrect date
-eo: malkorekta dato
+eo: nekorekta dato
 es: fecha incorrecta
 fi: virheellinen p&auml;iv&auml;m&auml;&auml;r&auml
 fr: date incorrecte
@@ -3190,7 +3190,7 @@ cs: nesprávný po¾adavek
 de: falsche Anfrage
 dk: forkert anmodning
 en: incorrect request
-eo: malkorekta rekesto
+eo: nekorekta sercxado
 es: consulta incorrecta
 fi: v&auml;&auml;rin kysytty
 fr: requ&ecirc;te incorrecte
@@ -3270,7 +3270,7 @@ cs: vlo¾it
 de: einf&uuml;gen +before
 dk: inds&aelig;t
 en: insert
-eo: inseri :a:
+eo: enmeti :a:
 es: insertar
 fi: lis&auml;&auml v&auml;liin
 fr: ins&eacute;rer
@@ -3310,7 +3310,7 @@ cs: je velmi mladý otec/je velmi mladá matka
 de: ist ein(e) viel zu junge(r) Vater/Mutter
 dk: er en meget ung for&aelig;lder
 en: is a very young parent
-eo: estas tro juna gepatro
+eo: estas treege juna patr(in)o
 es: es un padre demasiado joven
 fi: on kovin nuori is&auml tai &auml;iti
 fr: est vraiment un parent tr&egrave;s jeune
@@ -3330,7 +3330,7 @@ cs: se narodil a¾ po svém dítìti/se narodila a¾ po svém dítìti
 de: ist nach seinem/ihrem Kind geboren
 dk: er f&oslash;dt efter hans/hendes barn
 en: is born after his/her child
-eo: naskigxis post lia/sxia infano
+eo: naskigxis post sia infano
 es: ha nacido(a) despu&eacute;s de su hijo
 fi: on syntynyt my&ouml;hemmin kuin lapsensa
 fr: est n&eacute;(e) apr&egrave;s son enfant
@@ -3387,7 +3387,7 @@ cs: zabit/zabita/zabiti
 de: gefallen
 dk: faldet
 en: killed
-eo: mortigxita
+eo: mortigita
 es: muerto/muerta/muerto(a)
 fi: kaatunut
 fr: tu&eacute;/tu&eacute;e/tu&eacute;(e)
@@ -3407,7 +3407,7 @@ cs: ménì ne¾ mìsíc starý/ménì ne¾ mìsíc stará
 de: weniger als einen Monat alt
 dk: mindre end en m&aring;ned gammel
 en: less than one month old
-eo: malpli de un monato
+eo: malpli ol unu monato
 es: menos de un mes
 fi: alle kuukauden ik&auml;inen
 fr: moins d'un mois
@@ -3446,7 +3446,7 @@ cs: vztah mezi
 de: Beziehung zwischen
 dk: sl&aelig;gtskab mellem
 en: link between
-eo: cxenero inter
+eo: bindo inter
 es: relaci&oacute;n entre
 fi: n&auml;iden v&auml;linen yhteys
 fr: lien entre
@@ -3486,7 +3486,7 @@ cs: dlouhý seznam
 de: Lange Ansicht
 dk: udvidet rapport
 en: long display
-eo: longa afisxajxo
+eo: longa afisxado
 es: presentaci&oacute;n extensa
 fi: laaja raportti
 fr: affichage long
@@ -3506,7 +3506,7 @@ cs: hlavní titul
 de: Haupttitel
 dk: hovedtitel
 en: main title
-eo: cxefa mosxto
+eo: cxefa nobeltitolo
 es: t&iacute;tulo principal
 fi: p&auml;&auml;arvonimi
 fr: titre principal
@@ -3524,7 +3524,7 @@ af: manlike lyn/vroulike lyn
 de: v&auml;terlicherseits/m&uuml;tterlicherseits
 dk: mandlige linie/kvindelige linie
 en: male line/female line
-eo: linio vira/linio virina
+eo: vira linio /virina linio
 fi: miehen puoleinen linja/naisen puoleinen linja
 fr: ligne agnatique/ligne cognatique
 lv: tçva lînija/mâtes lînija
@@ -3538,7 +3538,7 @@ cs: sòatek s %t po své smrti
 de: Heirat von %t nach seinem/ihrem Tod
 dk: gifterm&aring;l af %t efter hans/hendes d&oslash;d
 en: marriage of %t after his/her death
-eo: geedzo de %t post sua morto
+eo: edz(in)igxo de %t post sia morto
 es: casamiento de %t despu&eacute;s de su muerte
 fi: %t olisi naitu vainajana
 fr: mariage de %t apr&egrave;s sa mort
@@ -3558,7 +3558,7 @@ cs: sòatek s %t pøed svým narozením
 de: Heirat von %t vor seiner/ihrer Geburt
 dk: gifterm&aring;l af %t f&oslash;r hans/hendes f&oslash;dsel
 en: marriage of %t before his/her birth
-eo: geedzo de %t antaux sua naskigxo
+eo: edz(in)igxo de %t antaù sia naskigxo
 es: casamiento de %t antes de su nacimiento
 fi: %t olisi naitu ennen syntym&auml;&auml
 fr: mariage de %t avant sa naissance
@@ -3599,7 +3599,7 @@ cs: vdaná
 de: verheiratet
 dk: gift
 en: married
-eo: edzitaj
+eo: edzigxintaj
 es: casados
 fr: mari&eacute;s
 fi: vihitty
@@ -3619,7 +3619,7 @@ cs: o¾enil se ve vìku %t/vdala se ve vìku %t
 de: verheiratet mit %t Jahren
 dk: gift i alderen %t
 en: married at age %t
-eo: edzigxita %t
+eo: edzigxinta je la agxo de %t jaroj
 es: casado a la edad de %t
 fi: vihitty %t ik&auml;isen&auml
 fr: mari&eacute;(e) &agrave; l'&agrave;ge de %t
@@ -3640,7 +3640,7 @@ cs: %t si vzal :a:/%t si vzala :a:
 de: verheiratet%t mit
 dk: gift%t med
 en: married%t to
-eo: edzagxita%t kun
+eo: edzigxinta%t kun
 es: casado%t con/casada%t con
 fi: puoliso%t
 fr: mari&eacute;%t avec/mari&eacute;e%t avec
@@ -3659,7 +3659,7 @@ af: maksimum
 de: Maximal
 dk: maksimalt
 en: maximum
-eo: maksimumo
+eo: maksimume
 es: m&aacute;ximo
 fi: korkeintaan
 fr: maximum
@@ -3679,7 +3679,7 @@ cs: spojit
 de: zusammenf&uuml;hren +before
 dk: sammenl&aelig;g
 en: merge
-eo: fuzii :a:
+eo: kunigi :a:
 es: fusionar
 fi: yhdist&auml;
 fr: fusionner
@@ -3698,7 +3698,7 @@ af: saamgevoeg
 de: Zusammenf&uuml;hrung abgeschlossen
 dk: sammenl&aelig;gning udf&oslash;rt
 en: merge done
-eo: fuzio farita
+eo: kunigo farita
 es: fusi&oacute;n terminada
 fr: fusion termin&eacute;e
 fi: yhdistetty
@@ -3717,7 +3717,7 @@ af: ontbrekende voorsate
 de: fehlende Vorfahren
 dk: manglende forf&aelig;dre
 en: missing ancestors
-eo: mankintaj antauxeuloj
+eo: mankintaj antaùeuloj
 es: ascendientes faltantes
 fi: puuttuvat esivanhemmat
 fr: ascendants manquants
@@ -3775,7 +3775,7 @@ af: meer as %d antwoorde
 de: mehr als %d Antworten
 dk: mere end %d svar
 en: more than %d answers
-eo: pli ke %d respondoj
+eo: pli ol %d respondoj
 es: m&aacute;s de %d respuestas
 he:  éåúø î-%d úùåáåú
 fi: yli %d vastausta
@@ -3795,7 +3795,7 @@ cs: zavra¾dìn/zavra¾dìna
 de: ermordet
 dk: myrdet
 en: murdered
-eo: murdita
+eo: murdigita
 es: asesinado/asesinada/asesinado(a)
 fi: murhattu
 fr: assassin&eacute;/assassin&eacute;e/assassin&eacute;(e)
@@ -3837,7 +3837,7 @@ af: "%s.%d %s" is reeds gebruik deur %t
 de: Name "%s.%d %s" wird schon bei %tdieser Person%t benutzt
 dk: navn "%s.%d %s" er allerede anvendt af %tdenne person%t
 en: name "%s.%d %s" already used by %tthis person%t
-eo: nomo "%s.%d %s" jam uzata por %ttiu cxi persono%t
+eo: nomo "%s.%d %s" jam uzita de %ttiu persono%t
 es: nombre "%s.%d %s" ya utilizado por %testa persona%t
 fi: nimi "%s.%d %s" on jo k&auml;yt&ouml;ss&auml %tt&auml;ll&auml; henkil&ouml;ll&auml;%t
 fr: nom "%s.%d %s" d&eacute;j&agrave; utilis&eacute; par %tcette personne%t
@@ -3856,7 +3856,7 @@ af: stap met %t as Sosa verwysing
 de: Navigation mit %t als Sosareferenz
 dk: navigering med %t som reference for fortl&oslash;bende anenummerering (Sosa o.a.)
 en: navigation with %t as Sosa reference
-eo: navigado kun %t kiel referenco Sosa
+eo: navigado kun %t kiel Sosa referenco
 es: navegaci&oacute;n con %t como referencia de Sosa
 fi: navigointi %t Sosa-viitteen&auml
 fr: navigation avec %t comme r&eacute;f&eacute;rence Sosa
@@ -3875,7 +3875,7 @@ af: broers- en susterskinders
 de: Neffen und Nichten
 dk: nev&oslash;er og niecer
 en: nephews and nieces
-eo: nevoj kay nevinoj
+eo: nevoj kaj nevinoj
 es: sobrinos y sobrinas
 fi: sisarusten lapset
 fr: neveux et ni&egrave;ces
@@ -3895,7 +3895,7 @@ cs: následující sourozenec
 de: folgende Geschwister
 dk: n&aelig;ste s&oslash;skende
 en: next sibling
-eo: posta frato/posta fratino/posta frat(in)o
+eo: sekvanta frato/sekvanta fratino/sekvanta frat(in)o
 es: hermano siguiente/hermana siguiente/hermano (a) siguiente
 fi: seuraava veli/seuraava sisar/seuraava sisaruksista
 fr: fr&egrave;re suivant/soeur suivante/fr&egrave;re ou soeur suivant
@@ -3914,7 +3914,7 @@ af: geen herdenking
 de: kein Jahrestag
 dk: ingen &aring;rsdag
 en: no anniversary
-eo: ne datreveno
+eo: neniu datreveno
 es: ning&uacute;n aniversario
 fi: ei vuosip&auml;iv&auml;&auml
 fr: pas d'anniversaire
@@ -3934,7 +3934,7 @@ cs: ¾ádné narozeniny
 de: kein Geburtstag
 dk: ingen f&oslash;dselsdag
 en: no birthday
-eo: no naskigxtago
+eo: neniu naskigxtago
 es: ning&uacute;n cumplea&ntilde;os
 fi: ei syntym&auml;p&auml;iv&auml;&auml
 fr: pas d'anniversaire
@@ -3954,7 +3954,7 @@ cs: ¾ádný známý vztah mezi :i:%s a :i:%s
 de: %s und %s sind anscheinend nicht verwandt
 dk: intet kendt sl&aelig;gtskab mellem %s og %s
 en: no known relationship link between %s and %s
-eo: ne sciita cxenero de parenceco inter %s kaj %s
+eo: neniu sciita ligo de parenceco inter %s kaj %s
 es: ning&uacute;n grado de parentesco conocido entre %s y %s
 fi: ei todettua sukulaisuutta %s ja %s v&auml;lill&auml
 fr: pas de lien de parent&eacute; connu entre %s et %s
@@ -3973,7 +3973,7 @@ af: geen passing
 de: keine passenden Eintr&auml;ge
 dk: intet resultat af s&oslash;gningen
 en: no match
-eo: nenia respondo
+eo: neniu respondo
 es: ninguna respuesta
 fi: ei l&ouml;ytynyt
 fr: aucune r&eacute;ponse
@@ -3993,7 +3993,7 @@ cs: nerozveden/nerozvedená
 de: nicht geschieden
 dk: ikke skilt
 en: not divorced
-eo: ne eksedzigxitaj
+eo: ne eksedzigxintaj
 es: no divorciado
 fi: eiv&auml;t eronneita
 fr: non divorc&eacute;s
@@ -4033,7 +4033,7 @@ cs: svobodný/svobodná
 de: nicht verheiratet
 dk: ikke gift
 en: not married
-eo: ne edzitaj
+eo: ne edzigxintaj
 es: no casados
 fi: eiv&auml;t naimisissa
 fr: non mari&eacute;s
@@ -4147,7 +4147,7 @@ cs: poèet vìtví
 de: Anzahl der &Auml;ste
 dk: antal grene
 en: number of branches
-eo: nombro de brancxoj
+eo: nombro da brancxoj
 es: n&uacute;mero de ramas
 fi: sukuhaarojen m&auml;&auml;r&auml
 fr: nombre de branches
@@ -4167,7 +4167,7 @@ cs: zamìstnání
 de: Beruf
 dk: stilling
 en: occupation
-eo: okupo
+eo: okupado
 es: ocupaci&oacute;n
 fi: ammatti
 fr: occupation
@@ -4227,7 +4227,7 @@ cs: %s. generace
 de: der %s Generation
 dk: af den %s generation
 en: of the %s generation
-eo: de la %s generacio
+eo: el la %s generacio
 es: a la %s generaci&oacute;n
 fi: %s sukupolvea
 fr: &agrave; la %s g&eacute;n&eacute;ration
@@ -4368,7 +4368,7 @@ cs: dne
 de: am
 dk: den
 en: on
-eo: en la
+eo: la
 es: el
 fi:  
 fr: le
@@ -4448,7 +4448,7 @@ cs: pouze zvolená generace
 de: nur die ausgew&auml;hlte Generation
 dk: kun den valgte generation
 en: only the selected generation
-eo: nur la generacio elekta
+eo: nur la elektita generacio
 es: solamente la generaci&oacute;n elegida
 he:  ãåø äðáëø áìáã
 is: aðeins valda kynslóðin
@@ -4486,7 +4486,7 @@ cs: nebo
 de: oder
 dk: eller
 en: or
-eo: aux
+eo: aù
 es: o
 fi: tai
 fr: ou
@@ -4506,7 +4506,7 @@ cs: nebo pou¾ij "svázat" namísto "vytvoøit"
 de: oder benutzen Sie "verbinden" an Stelle von "erzeugen"
 dk: eller anvend "forbind" i stedet for "opret"
 en: or use "link" instead of "create"
-eo: aux uzu "bindi" anstataux "krei"
+eo: aù uzu "bindi" anstataù ol "krei"
 es: o utilise "reunir" en lugar de "crear"
 he:  àå ìäùúîù á-"÷ùø" áî÷åí "òùä"
 is: eða notaðu "tengja" í stað "búa til"
@@ -4567,7 +4567,7 @@ cs: osoba smazána
 de: Person gel&ouml;scht
 dk: person slettet
 en: person deleted
-eo: persono malkonstruita
+eo: persono nuligita
 es: persona borrada
 fi: poistettu henkil&ouml
 fr: personne supprim&eacute;e
@@ -4627,7 +4627,7 @@ cs: osoby mají stejné jméno
 de: Personen haben denselben Namen
 dk: personer som har samme navn
 en: persons having the same name
-eo: personaj kun sama nomo
+eo: personoj samnomaj
 es: personas con el mismo nombre
 fi: samannimisi&auml henkil&ouml;it&auml;
 fr: personnes ayant le m&ecirc;me nom
@@ -4685,7 +4685,7 @@ af: akkuraatheid
 de: Genauigkeit
 dk: pr&aelig;cisering
 en: precision
-eo: precizo
+eo: precizeco
 fi: tarkennus
 fr: pr&eacute;cision
 he:  ãééå÷
@@ -4704,7 +4704,7 @@ cs: pøedchozí sourozenec
 de: vorhergehende Geschwister
 dk: foreg&aring;ende s&oslash;skende
 en: previous sibling
-eo: precedento frato/precedento fratino/precedento frat(in)o
+eo: antaùa frato/antaùa fratino/antaùa frat(in)o
 es: hermano anterior/hermana anterior/hermano (a) anterior
 fi: edellinen veli/edellinen sisar/edellinen sisaruksista
 fr: fr&egrave;re pr&eacute;c&eacute;dent/soeur pr&eacute;c&eacute;dente/fr&egrave;re ou soeur pr&eacute;c&eacute;dent
@@ -4744,7 +4744,7 @@ cs: pravdìpodobná smyèka v databázi
 de: wahrscheinliche Schleife in der Datenbank: jemand ist sein/ihre eigene(r) Vorfahr(in)
 dk: tilsyneladende loop i databasen: nogen bliver sin egen forfader
 en: probable loop in database: someone being his/her own ancestor
-eo: buklo probabla en datenbazo: iu estanda su propra prapatro
+eo: buklo probabla en datenbazo: iu estanta sia propra prapatro
 es: bucle probable en base de datos: alguien es su propio antepasado
 fi: ilmeisesti silmukka tietokannassa; joku on itsens&auml esi-is&auml
 fr: boucle probable dans la base de donn&eacute;es: quelqu'un est son propre anc&ecirc;tre
@@ -4822,7 +4822,7 @@ af: aanvaarde seun/aanvaarde dogter/aanvaarde kind
 de: anerkannter Sohn/anerkannte Tochter/anerkanntes Kind
 dk: anerkendt s&oslash;n/anerkendt datter/anerkendt barn
 en: recognized son/recognized daughter/recognized child
-eo: agnoskita filo/agnoskita filino/agnoskita infano
+eo: agnoskita filo/agnoskita filino/agnoskita ido
 fi: tunnustettu poika/tunnustettu tyt&auml;r/tunnustettu lapsi
 fr: fils reconnu/fille reconnue/enfant reconnu
 he:  áï éãåò/ áú éãåòä/ éìã éãåò
@@ -4897,7 +4897,7 @@ cs: nalezení vztahù
 de: Verwandtschaft ermitteln
 dk: sl&aelig;gtskabsberegning
 en: relationship computing
-eo: komputo de parenceco
+eo: kalkulo de parenceco
 es: c&aacute;lculo de parentesco
 fi: sukulaisuuslaskelma
 fr: calcul de parent&eacute;
@@ -4917,7 +4917,7 @@ cs: vztah/vztahy
 de: Verwandtschaft/Verwandtschaften
 dk: sl&aelig;gtskabsforbindelse/sl&aelig;gtskabsforbindelser
 en: relationship link/relationship links
-eo: cxenero de parenceco/cxeneroj de parenceco
+eo: ligo de parenceco/ligoj de parenceco
 es: grado de parentesco/grados de parentesco
 fi: sukulaisuuskytkent&auml;/sukulaisuuskytkent&auml;&auml
 fr: lien de parent&eacute;/liens de parent&eacute;
@@ -4956,7 +4956,7 @@ af: aangetroude verwantskappe
 de: Heiratsbeziehungen
 dk: sl&aelig;gtskaber ved gifterm&aring;l
 en: relationships by marriage
-eo: parenceco per edzeco
+eo: ligoj per edzigxo
 es: parentesco pol&iacute;tico
 fi: sukulaisuus avioliiton kautta
 fr: liens de parent&eacute; par alliance
@@ -4976,7 +4976,7 @@ cs: viz
 de: siehe
 dk: se
 en: see
-eo: vidu
+eo: vidu :a:
 es: ver
 fi: katso
 fr: voir
@@ -4996,7 +4996,7 @@ cs: viz vý¹e
 de: siehe oben
 dk: se ovenfor
 en: see above
-eo: vidu supre
+eo: vidu cxi-supre
 es: ver m&aacute;s arriba
 fi: katso yll&auml
 fr: voir ci-dessus
@@ -5016,7 +5016,7 @@ cs: viz dále
 de: siehe unten
 dk: se nedenfor
 en: see further
-eo: vidu malsupre
+eo: vidu cxi-malsupre
 es: ver a continuaci&oacute;n
 fi: katso alla
 fr: voir plus loin
@@ -5054,7 +5054,7 @@ se: skicka
 de: getrennt lebend
 dk: separeret
 en: separated
-eo: apartigaj
+eo: apartigitaj
 fi: asumuserossa
 fr: s&eacute;par&eacute;s
 lv: nedzîvo kop&acirc;
@@ -5108,7 +5108,7 @@ cs: krátký výpis
 de: kurze Ansicht
 dk: standardrapport
 en: short display
-eo: mallonga afisxajxo
+eo: mallonga afisxado
 es: presentaci&oacute;n corta
 fi: lyhyt raportti
 fr: affichage court
@@ -5127,7 +5127,7 @@ af: kortste pad
 de: k&uuml;rzester Pfad
 dk: korteste vej
 en: shortest path
-eo: pado plej mallonga
+eo: vojo plej mallonga
 fi: lyhin polku
 fr: chemin le plus court
 it: legame più diretto
@@ -5144,7 +5144,7 @@ cs: mìla by být ¾enského pohlaví
 de: m&uuml;&szlig;te weiblichen Geschlechts sein
 dk: burde v&aelig;re kvinde
 en: should be female
-eo: devus havi sekso ina
+eo: devus esti ina
 es: deber&iacute;a ser de sexo feminino
 fi: pit&auml;isi olla naispuolinen
 fr: devrait &ecirc;tre de sexe f&eacute;mining
@@ -5164,7 +5164,7 @@ cs: mìl by být mu¾ského pohlaví
 de: m&uuml;&szlig;te m&auml;nnlichen Geschlechts sein
 dk: burde v&aelig;re mand
 en: should be male
-eo: devus havi sekso maskla
+eo: devus esti maskla
 es: deber&iacute;a ser de sexo masculino
 fi: pit&auml;isi olla miespuolinen
 fr: devrait &ecirc;tre de sexe masculin
@@ -5203,7 +5203,7 @@ af: seun/dogter/kind
 de: Sohn/Tochter/Kind
 dk: s&oslash;n/datter/barn
 en: son/daughter/child
-eo: filo/filino/infano
+eo: filo/filino/ido
 es: hijo/hija/hijo(a)
 fi: poika/tyt&auml;r/lapsi
 fr: fils/fille/enfant
@@ -5244,7 +5244,7 @@ cs: zvol
 de: pr&auml;zisieren
 dk: pr&aelig;ciser
 en: specify
-eo: specifu
+eo: specifu :a:
 es: especificar
 fi: tarkenna
 fr: pr&eacute;cisez
@@ -5304,7 +5304,7 @@ cs: poèínaje
 de: beginnend mit
 dk: som begynder med
 en: starting with
-eo: ekanta kun
+eo: komencante kun
 es: comenzando con
 fi: ensimm&auml;isen&auml
 fr: commen&ccedil;ant par
@@ -5333,10 +5333,10 @@ cs: alias pøíjmení
 de: Nachname Alias
 dk: efternavns alias
 en: surname alias
-eo: familinomo:a:+n aliaso:a:+n
+eo: familia:a:+n nomo:a:+n aliasa:a:+n
 es: apellido alias
 fi: sukunimi alias
-fr: nom alias
+fr: patronyme alias
 he:  ùí îùôçä àçø
 is: auka eftirnafn
 it: alias del cognome
@@ -5353,7 +5353,7 @@ cs: pøíjmení schází
 de: fehlender Nachname
 dk: efternavn mangler
 en: surname missing
-eo: familinomo maltrafanta
+eo: familia nomo mankanta
 es: falta apellido
 fi: sukunimi puuttuu
 fr: patronyme manquant
@@ -5373,7 +5373,7 @@ cs: pøíjmení nenalezeno
 de: Nachname nicht gefunden
 dk: efternavn ikke fundet
 en: surname not found
-eo: familinomo ne trovita
+eo: familia nomo ne trovita
 es: apellido no encontrado
 fi: sukunime&auml ei l&ouml;ydy
 fr: patronyme pas trouv&eacute;
@@ -5394,7 +5394,7 @@ cs: pøíjmení
 de: Nachname/Nachnamen
 dk: efternavn/efternavne
 en: surname/surnames
-eo: familinomo/familinomoj
+eo: familia nomo/familiaj nomoj
 es: apellido/apellidos
 fi: sukunimi/sukunimet
 fr: patronyme/patronymes
@@ -5412,7 +5412,7 @@ se: efternamn/efternamn
 de: Nachnamen-Liste
 dk: efternavnsoversigt
 en: surnames list
-eo: listo de la familinomoj
+eo: listo de la familiaj nomoj
 fi: sukunimiluettelo
 fr: liste &eacute;clair
 lv: uzv&acirc;rdu saraksts
@@ -5426,7 +5426,7 @@ cs: prohodit
 de: umkehren
 dk: omvend r&aelig;kkef&oslash;lge
 en: switch
-eo: intersxangxi
+eo: intersxangxi :a:
 es: invertir
 fi: vaihda
 fr: intervertir
@@ -5466,7 +5466,7 @@ cs: prohodit poøadí následujících rodin
 de: die Reihenfolge der folgenden Familien umkehren
 dk: omvend r&aelig;kkef&oslash;lgen for de f&oslash;lgende familier
 en: switch the order of the following families
-eo: intersxangxi la ordon de la familiaj sekvantaj
+eo: intersxangxi la ordon de la familioj sekvantaj
 es: invertir el orden de las familias siguientes
 fi: vaihda seuraavien perheiden j&auml;rjestyst&auml
 fr: intervertir l'ordre des familles suivantes
@@ -5505,7 +5505,7 @@ cs: %d køestních jmen
 de: die %d Vornamen
 dk: de %d fornavne
 en: the %d first names
-eo: la %d personaj nomoj
+eo: la %d unuaj nomoj
 es: los %d nombres
 fi: %d etunime&auml
 fr: les %d pr&eacute;noms
@@ -5522,7 +5522,7 @@ se: de %d f&ouml;rnamnen
     the %d oldest perhaps still alive
 dk: de %d &aelig;ldste af de muligt levende
 en: the %d oldest perhaps still alive
-eo: la %d plej maljunoj eble ankoraux vivantaj
+eo: la %d plej maljunaj eble ankoraù vivantaj
 es: los %s m&aacute;s viejos quiz&aacute;s todov&iacute;a vivo
 fi: %d vanhinta ehk&auml viel&auml el&auml;v&auml;&auml
 fr: les %d les plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
@@ -5536,7 +5536,7 @@ cs: %d pøíjmení
 de: die %d Nachnamen
 dk: de %d efternavne
 en: the %d surnames
-eo: la %d familinomoj
+eo: la %d familiaj nomoj
 es: los %d apellidos
 fi: %d sukunime&auml
 fr: les %d patronymes
@@ -5553,7 +5553,7 @@ se: de %d efternamnen
     the %d who lived the longest
 dk: de %d som har levet l&aelig;ngst
 en: the %d who lived the longest
-eo: la %d kiu vivis plejlonge
+eo: la %d, kiuj vivis plejlonge
 es: los %d que han vivido m&aacute;s mucho tiempo
 fr: les %d ayant v&eacute;cu le plus longtemps
 lv: %d, kuri dzîvojuði visilgâk
@@ -5606,7 +5606,7 @@ cs: výroèí svatby
 de: der Hochzeitstag
 dk: bryllupsdagen
 en: the anniversary of marriage
-eo: la datreveno de la edzigxo
+eo: la datreveno de edzigxo
 es: el aniversario de casamiento
 fi: h&auml;&auml;p&auml;iv&auml
 fr: l'anniversaire de mariage
@@ -5646,7 +5646,7 @@ cs: narozeniny
 de: der Geburtstag
 dk: f&oslash;dselsdagen
 en: the birthday
-eo: la naskigxtagoj
+eo: la naskigxdatreveno
 es: el cumplea&ntilde;os
 fi: syntym&auml;p&auml;iv&auml
 fr: l'anniversaire
@@ -5666,7 +5666,7 @@ cs: dìti
 de: die Kinder
 dk: b&oslash;rnene
 en: the children
-eo: la infanoj
+eo: la idoj
 es: los hijos
 fi: lapset
 fr: les enfants
@@ -5686,7 +5686,7 @@ cs: pozítøí
 de: &Uuml;bermorgen
 dk: i overmorgen
 en: the day after tomorrow
-eo: postmorgaux
+eo: postmorgaù
 es: pasado ma&ntilde;ana
 fi: ylihuomenna
 fr: apr&egrave;s-demain
@@ -5726,7 +5726,7 @@ cs: otec/matka/rodièe
 de: der Vater/die Mutter/ein:d:+em Elternteil
 dk: faderen/moderen/en for&aelig;lder
 en: the father/the mother/a parent
-eo: la patro/la patrino/gepatro
+eo: la patro/la patrino/unu el la gepatroj
 es: el padre/la madre/un padre
 fi: is&auml;:g:+n/&auml;iti:g:--din/vanhempi:g:--man
 fr: le p&egrave;re/la m&egrave;re/un parent
@@ -5746,7 +5746,7 @@ cs: soubor je doèasnì uzamèen: zkuste to znova. Pokud to stále nefunguje, chvíli
 de: die Datei ist z.Z. gesch&uuml;tzt: versuchen Sie es bitte nochmals
 dk: filen er midlertidigt l&aring;st: pr&oslash;v igen. Hvis dette gentagne gange ikke fungerer, da vent lidt inden n&aelig;ste fors&oslash;g
 en: the file is temporarily locked: please try again. If it still does not work, wait a while before trying again
-eo: la sliparo estas provizore riglata: provas ankoraux
+eo: la sliparo estas provizore riglata: provu denove. Se tio ne funkcios, atendu iomete kaj provu ankoraù unufoje
 es: la base est&aacute; temporalmente cerrada: ensayar de nuevo. Si no funciona, espere un instante antes de ensayar nuevamente
 fi: tiedosto on lukkiutunut, yrit&auml hetken kuluttua uudelleen
 fr: le fichier est temporairement verrouill&eacute: essayez encore. Si cela ne fonctionne toujours pas, attendez quelques instants avant de r&eacute;essayer
@@ -5766,7 +5766,7 @@ cs: následující dìti rodièù %t a %t nejsou v chronologickém poøadí
 de: die folgenden Kinder von %t und %t sind nicht geordnet
 dk: de f&oslash;lgende b&oslash;rn af %t og %t er ikke i kronologisk orden
 en: the following children of %t and %t are not in chronological order
-eo: la malantauxa infanoj de %t kaj %t ne estas orde
+eo: la sekvantaj infanoj de %t kaj %t ne estas orde
 es: los hijos siguientes de %t y %t no est&aacute;n presentados en orden
 fi: %t ja %t lapsista seuraavat eiv&auml;t ole ik&auml;j&auml;rjestyksess&auml
 fr: les enfants suivants de %t et de %t ne sont pas dans l'ordre
@@ -5786,7 +5786,7 @@ cs: vnouèata
 de: die Enkel
 dk: b&oslash;rneb&oslash;rnene
 en: the grandchildren
-eo: la nepoj
+eo: la genepoj
 es: los nietos
 fi: lapsenlapset
 fr: les petits enfants
@@ -5980,7 +5980,7 @@ cs: titul/tituly
 de: Titel/Titel
 dk: titel/titler (nob.)
 en: title/titles
-eo: mosxto:a:+n/mosxtoj
+eo: nobeltitolo:a:+n/nobeltitoloj
 es: t&iacute;tulo/t&iacute;tulos
 fi: arvo/arvot
 fr: titre/titres
@@ -5999,7 +5999,7 @@ af: om 'n kind by te voeg by 'n familie, gebruik "%s"
 de: um ein Kind zu einer Familie zu hinzuzuf&uuml;gen, benutzen Sie "%s"
 dk: brug "%s" for at f&oslash;je et barn til en familie
 en: to add a child to a family, use "%s"
-eo: por aldoni infanon al familion, uzu "%s"
+eo: por aldoni infanon al familio, uzu "%s"
 es: para agregar un hijo a una familia, utiliza "%s"
 fi: lis&auml;t&auml;ksesi perheeseen lapsen k&auml;yt&auml; "%s"
 fr: pour ajouter un enfant &agrave; une famille, utiliser "%s"
@@ -6039,7 +6039,7 @@ cs: k dìtem
 de: bis zu den Kindern
 dk: til b&oslash;rnene
 en: to the children
-eo: gxis la infanoj
+eo: gxis la idoj
 es: hasta los hijos
 fi: lapsiin
 fr: jusqu'aux enfants
@@ -6159,7 +6159,7 @@ cs: dnes
 de: heute
 dk: i dag
 en: today
-eo: hodiaux
+eo: hodiaù
 es: hoy
 fi: t&auml;n&auml;&auml;n
 fr: aujourd'hui
@@ -6179,7 +6179,7 @@ cs: zítra
 de: morgen
 dk: i morgen
 en: tomorrow
-eo: morgaux
+eo: morgaù
 es: ma&ntilde;ana
 fi: huomenna
 fr: demain
@@ -6199,7 +6199,7 @@ cs: souèet
 de: Summe
 dk: totalt
 en: total
-eo: totalo
+eo: tuto
 es: total
 fi: yhteens&auml
 fr: total
@@ -6277,7 +6277,7 @@ cs: nespecifikováno
 de: nicht pr&auml;zisiert
 dk: uspecificeret
 en: unspecified
-eo: no specifita
+eo: ne specifita
 es: no especificado
 fi: m&auml;&auml;rittelem&auml;t&ouml;n
 fr: non pr&eacute;cis&eacute;
@@ -6377,7 +6377,7 @@ af: getuie by die troue van %s met %s
 de: Trauzeugen bei der Hochzeit von %s und %s
 dk: vidne ved brylluppet mellem %s og %s
 en: witness at marriage of %s and %s
-eo: atestant(in)o en edzigxo de %s kaj %s
+eo: atestant(in)o pri la edzigxo de %s kaj %s
 es: testigo en el casamiento de %s y %s
 fi: %s ja %s avioliiton todistaja
 fr: t&eacute;moin au mariage de %s et de %s
@@ -6414,7 +6414,7 @@ cs: byl by svùj vlastní pøedek
 de: w&uuml;rde sein/ihr eigener Vorfahre sein
 dk: skal v&aelig;re sin egen forfader
 en: would be his/her own ancestor
-eo: estus tia/lia propra prapatro
+eo: estus sia propra prapatro
 es: ser&iacute;a su proprio ancestro
 fi: olisi oma esivanhempansa
 fr: serait son propre anc&ecirc;tre
@@ -6474,7 +6474,7 @@ cs: nejdøív musíte spojovat
 de: Sie m&uuml;ssen erst zusammenf&uuml;hren
 dk: du skal f&oslash;rst sammenl&aelig;gge
 en: you must first merge
-eo: vi devas unue fuzii
+eo: vi devas unue kunigi
 es: antes Ud. debe fusionar
 fi: yhdist&auml ensin
 fr: vous devez d'abord fusionner
@@ -6494,7 +6494,7 @@ cs: nejdøív musíte spojit tyto dvì rodiny
 de: Sie m&uuml;ssen erst beide Familien zusammenf&uuml;hren
 dk: du skal f&oslash;rst sammenl&aelig;gge de 2 familier
 en: you must first merge the 2 families
-eo: vi devas unue fuzii la 2 familioj
+eo: vi devas unue kunigi la 2 familiojn
 es: debe primero fusionar las 2 familias
 fi: yhdist&auml ensin molemmat perheet
 fr: vous devez d'abord fusionner les 2 familles
