@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.11 1999-05-19 10:19:16 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.12 1999-07-02 14:26:55 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -200,19 +200,19 @@ value ged_title base oc per tit =
      with
      [ (None, None) -> ()
      | (Some sd, None) ->
-         do Printf.fprintf oc "2 DATE ";
+         do Printf.fprintf oc "2 DATE FROM ";
             ged_date oc sd;
             Printf.fprintf oc "\n";
          return ()
      | (None, Some sd) ->
-         do Printf.fprintf oc "2 DATE BET AND ";
+         do Printf.fprintf oc "2 DATE TO ";
             ged_date oc sd;
             Printf.fprintf oc "\n";
          return ()
      | (Some sd1, Some sd2) ->
-         do Printf.fprintf oc "2 DATE BET ";
+         do Printf.fprintf oc "2 DATE FROM ";
             ged_date oc sd1;
-            Printf.fprintf oc " AND ";
+            Printf.fprintf oc " TO ";
             ged_date oc sd2;
             Printf.fprintf oc "\n";
          return () ];
