@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.4 2001-04-17 21:29:21 ddr Exp $
+# $Id: Makefile,v 4.5 2001-06-03 14:42:54 ddr Exp $
 
 DESTDIR=distribution
 NS=tools/pa_newseq
@@ -10,6 +10,7 @@ all:: opt
 out::
 	$(MAKE) tools/pa_newseq.cmo
 	cd wserver; $(MAKE) all
+	cd dag2html; $(MAKE) out
 	cd src; $(MAKE) all
 	cd ged2gwb; $(MAKE) all
 	cd gwb2ged; $(MAKE) all
@@ -20,6 +21,7 @@ out::
 opt::
 	$(MAKE) tools/pa_newseq.cmo
 	cd wserver; $(MAKE) opt
+	cd dag2html; $(MAKE) opt
 	cd src; $(MAKE) opt
 	cd ged2gwb; $(MAKE) opt
 	cd gwb2ged; $(MAKE) opt
@@ -117,6 +119,7 @@ classical_distrib:
 clean::
 	$(RM) $(NS).cm[oi]
 	cd wserver; $(MAKE) clean
+	cd dag2html; $(MAKE) clean
 	cd src; $(MAKE) clean
 	cd ged2gwb; $(MAKE) clean
 	cd gwb2ged; $(MAKE) clean
