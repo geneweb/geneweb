@@ -4,11 +4,13 @@ GeneWeb Version 2.02
 * General
   - [Apr 22, 99] Added Danish language (by Hans Albeck).
 
+* GeneWeb Daemon/CGI (gwd)
+  - [Apr 26, 99] Fixed upload of "jpeg" files which sometimes did not work
+    with Windows.
+  - [Apr 25, 99] Added space before "+" in short dates.
+
 * Lexicon (lexicon.txt)
   - [Apr 23, 99] Some changes in Hebrew version (by Jonathan Marder).
-
-* GeneWeb Daemon/CGI (gwd)
-  - [Apr 25, 99] Added space before "+" in short dates.
 
 * GeneWeb compiler (gwc)
   - [Apr 22, 99] Do not consider the message "notes before definition"

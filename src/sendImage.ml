@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 2.1 1999-03-30 10:46:16 ddr Exp $ *)
+(* $Id: sendImage.ml,v 2.2 1999-04-25 23:56:45 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -181,7 +181,7 @@ value effective_send_ok conf base p file =
   let typ =
     match content_type with
     [ "image/gif" -> ".gif"
-    | "image/jpeg" -> ".jpg"
+    | "image/jpeg" | "image/pjpeg" -> ".jpg"
     | _ -> incorrect conf ]
   in
   let bfname = default_image_name base p in
