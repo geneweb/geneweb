@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 3.0 1999-10-29 10:31:02 ddr Exp $ *)
+(* $Id: check.ml,v 3.1 1999-11-10 08:44:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -39,13 +39,13 @@ value print_base_warning base =
   fun
   [ BirthAfterDeath p ->
       Printf.printf "%s\n  born after his/her death\n" (denomination base p)
-  | ChangedOrderOfChildren fam _ ->
-      let cpl = coi base fam.fam_index in
+  | ChangedOrderOfChildren ifam des _ ->
+      let cpl = coi base ifam in
       Printf.printf "changed order of children of %s and %s\n"
         (denomination base (poi base cpl.father))
         (denomination base (poi base cpl.mother))
-  | ChildrenNotInOrder fam elder x ->
-      let cpl = coi base fam.fam_index in
+  | ChildrenNotInOrder ifam des elder x ->
+      let cpl = coi base ifam in
       do Printf.printf
            "the following children of\n  %s\nand\n  %s\nare not in order:\n"
            (denomination base (poi base cpl.father))

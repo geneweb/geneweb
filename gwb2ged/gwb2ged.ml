@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.0 1999-10-29 10:29:19 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.1 1999-11-10 08:44:12 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -465,6 +465,7 @@ value has_personal_infos base per asc =
 value ged_ind_record base sel oc i =
   let per = base.data.persons.get i in
   let asc = base.data.ascends.get i in
+  let uni = base.data.unions.get i in
   if has_personal_infos base per asc then
     do Printf.fprintf oc "0 @I%d@ INDI\n" (i + 1);
        ged_name base oc per;
@@ -472,7 +473,7 @@ value ged_ind_record base sel oc i =
        ged_ind_ev_str base oc per;
        ged_ind_attr_str base oc per;
        ged_famc base sel oc asc;
-       Array.iter (ged_fams base sel oc) per.family;
+       Array.iter (ged_fams base sel oc) uni.family;
        ged_asso base oc per;
        ged_psource base oc per;
        ged_multimedia_link base oc per;
@@ -486,6 +487,7 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
   if is_deleted_family fam then ()
   else
     let cpl = base.data.couples.get i in
+    let des = base.data.descends.get i in
     do Printf.fprintf oc "0 @F%d@ FAM\n" (i + 1);
        ged_marriage base oc fam;
        ged_divorce base oc fam;
@@ -499,7 +501,7 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
        then
          Printf.fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper cpl.mother + 1)
        else ();
-       Array.iter (ged_child base sel oc) fam.children;
+       Array.iter (ged_child base sel oc) des.children;
        ged_fsource base oc fam;
        ged_comment base oc fam;
     return ()

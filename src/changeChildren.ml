@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 3.1 1999-11-01 23:19:44 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 3.2 1999-11-10 08:44:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -48,13 +48,13 @@ value print_child_person conf base p =
   end
 ;
 
-value select_children_of base p =
+value select_children_of base u =
   List.fold_right
     (fun ifam ipl ->
-       let fam = foi base ifam in
+       let des = doi base ifam in
        List.fold_right (fun ip ipl -> [ip :: ipl])
-         (Array.to_list fam.children) ipl)
-    (Array.to_list p.family) []
+         (Array.to_list des.children) ipl)
+    (Array.to_list u.family) []
 ;
 
 value digest_children base ipl =
@@ -96,12 +96,12 @@ value print_children conf base ipl =
   return ()
 ;
 
-value print_change conf base p =
+value print_change conf base p u =
   let title _ =
     let s = transl conf "change children's names" in
     Wserver.wprint "%s" (capitale s)
   in
-  let children = select_children_of base p in
+  let children = select_children_of base u in
   let digest = digest_children base children in
   do header conf title;
      Wserver.wprint "%s" (reference conf base p (person_text conf base p));
@@ -129,11 +129,12 @@ value print conf base =
   match p_getint conf.env "i" with
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
-      print_change conf base p
+      let u = uoi base (Adef.iper_of_int i) in
+      print_change conf base p u
   | _ -> incorrect_request conf ]
 ;
 
-value print_children_list conf base p =
+value print_children_list conf base u =
   do stag "h4" begin
        Wserver.wprint "%s" (capitale (transl_nth conf "child/children" 1));
      end;
@@ -141,7 +142,7 @@ value print_children_list conf base p =
      tag "ul" begin
        Array.iter
          (fun ifam ->
-            let fam = foi base ifam in
+            let des = doi base ifam in
             Array.iter
               (fun ip ->
                  let p = poi base ip in
@@ -150,13 +151,13 @@ value print_children_list conf base p =
                       (reference conf base p (person_text conf base p));
                     Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
                  return ())
-              fam.children)
-         p.family;
+              des.children)
+         u.family;
      end;
   return ()
 ;
 
-value print_change_done conf base p =
+value print_change_done conf base p u =
   let title _ =
     let s = transl conf "children's names changed" in
     Wserver.wprint "%s" (capitale s)
@@ -165,7 +166,7 @@ value print_change_done conf base p =
      Wserver.wprint "\n%s"
        (reference conf base p (person_text conf base p));
      Wserver.wprint "%s\n" (Date.short_dates_text conf base p);
-     print_children_list conf base p;
+     print_children_list conf base u;
      trailer conf;
   return ()
 ;
@@ -265,19 +266,19 @@ value change_child conf base parent_surname ip =
   else ()
 ;
 
-value print_change_ok conf base p =
+value print_change_ok conf base p u =
   let bfile = Filename.concat Util.base_dir.val conf.bname in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       try
-        let ipl = select_children_of base p in
+        let ipl = select_children_of base u in
         let parent_surname = p_surname base p in
         do check_digest conf base (digest_children base ipl);
            List.iter (change_child conf base parent_surname) ipl;
            base.func.commit_patches ();
            let key = (sou base p.first_name, sou base p.surname, p.occ) in
            History.record conf base key "cn";
-           print_change_done conf base p;
+           print_change_done conf base p u;
         return ()      
       with
       [ Update.ModErr -> () ]
@@ -288,6 +289,7 @@ value print_ok conf base =
   match p_getint conf.env "i" with
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
-      print_change_ok conf base p
+      let u = uoi base (Adef.iper_of_int i) in
+      print_change_ok conf base p u
   | _ -> incorrect_request conf ]
 ;

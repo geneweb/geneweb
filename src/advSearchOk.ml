@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 3.0 1999-10-29 10:30:54 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 3.1 1999-11-10 08:44:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -126,7 +126,7 @@ value advanced_search conf base max_answers =
   in
   let list = ref [] in
   let len = ref 0 in
-  let test_person p =
+  let test_person p u =
     if test "first_name" (fun x -> name_eq x (p_first_name base p))
     && test "surname" (fun x -> name_eq x (p_surname base p))
     && test "sex"
@@ -136,8 +136,8 @@ value advanced_search conf base max_answers =
           | _ -> True ])
     && test "married"
          (fun              
-          [ "Y" -> p.family <> [| |]
-          | "N" -> p.family = [| |]
+          [ "Y" -> u.family <> [| |]
+          | "N" -> u.family = [| |]
           | _ -> True ])
     && test_auth p "birth_place"
          (fun x -> name_incl x (sou base p.birth_place))
@@ -185,11 +185,11 @@ value advanced_search conf base max_answers =
              (fun x -> x.surname) (gets "surname")
        in
        let slist = List.fold_right (fun (_, _, l) sl -> l @ sl) slist [] in
-       List.iter (fun ip -> test_person (poi base ip)) slist
+       List.iter (fun ip -> test_person (poi base ip) (uoi base ip)) slist
      else
        for i = 0 to base.data.persons.len - 1 do
          if len.val > max_answers then ()
-         else test_person (base.data.persons.get i);
+         else test_person (base.data.persons.get i) (base.data.unions.get i);
        done;
   return (List.rev list.val, len.val)
 ;
