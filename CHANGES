@@ -20,6 +20,9 @@ GeneWeb version 3.10
   - [08 Nov 00] Fixed bug: when giving 0 as Sosa number, it did not
     answer (infinite loop in gwd).
 
+* Consanguinity computing (consang)
+  - [15 Nov 00] Improved the program: now 30% faster.
+
 * Lexicon (lang/lexicon.txt)
   - [13 Nov 00] Deleted entry "of": using only "%1 of %2" now. Some
     consequences in displaying (depending on language).

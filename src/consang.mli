@@ -1,4 +1,4 @@
-(* $Id: consang.mli,v 3.2 2000-11-05 10:17:23 ddr Exp $ *)
+(* $Id: consang.mli,v 3.3 2000-11-15 18:58:58 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -14,7 +14,6 @@ type relationship =
     elim_ancestors : mutable bool;
     anc_stat1 : mutable anc_stat;
     anc_stat2 : mutable anc_stat;
-    rank : int;
     mark : mutable int }
 and relationship_table = { id : array int; info : array relationship }
 ;

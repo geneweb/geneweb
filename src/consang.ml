@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 3.2 2000-11-05 10:17:23 ddr Exp $ *)
+(* $Id: consang.ml,v 3.3 2000-11-15 18:58:58 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -14,8 +14,6 @@ type anc_stat = [ MaybeAnc | IsAnc ];
         to prune displayed relationships
    - anc_stat1, anc_stat2
         optimization to answer faster when ancestors list is exhausted
-   - rank
-        to display common ancestors in canonical order
 *)
 
 type relationship =
@@ -27,7 +25,6 @@ type relationship =
     elim_ancestors : mutable bool;
     anc_stat1 : mutable anc_stat;
     anc_stat2 : mutable anc_stat;
-    rank : int;
     mark : mutable int }
 ;
 
@@ -110,7 +107,7 @@ value make_relationship_table base tstab =
   let phony =
     {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = []; lens2 = [];
      mark = 0; elim_ancestors = False; anc_stat1 = MaybeAnc;
-     anc_stat2 = MaybeAnc; rank = 0}
+     anc_stat2 = MaybeAnc}
   in
   let tab = Array.create base.data.persons.len phony in
   {id = tstab; info = tab}
@@ -132,12 +129,36 @@ value consang_of p =
   if p.consang == no_consang then 0.0 else Adef.float_of_fix p.consang
 ;
 
-(* tsort_leq: a version returning just "tstab.(x) <= tstab.(y)" is ok
-   but it seems that our Pqueue algorithm is faster when there are no
-   equal values *)
-value tsort_leq tstab tab x y =
-  if tstab.(x) = tstab.(y) then tab.(x).rank <= tab.(y).rank
-  else tstab.(x) < tstab.(y)
+module type FastPqueueOrd = sig type t = 'a; value f : t -> int; end;
+
+module FastPqueue (Ord : FastPqueueOrd) =
+  struct
+    type t = { a : mutable array (list Ord.t); m : mutable int };
+    value create () =
+      {a = [| |]; m = 0}
+    ;
+    value rec is_empty q =
+      if q.m = Array.length q.a then True
+      else if q.a.(q.m) = [] then do q.m := q.m + 1; return is_empty q
+      else False
+    ;
+    value rec take q =
+      if q.m = Array.length q.a then raise Not_found
+      else
+        match q.a.(q.m) with
+        [ [x :: l] -> do q.a.(q.m) := l; return x
+        | [] -> do q.m := q.m + 1; return take q ]
+    ;
+    value add u q =
+      let v = Ord.f u in
+      do if v >= Array.length q.a then
+           let len = Array.length q.a in
+           q.a := Array.append q.a (Array.create (v + 1 - len) [])
+         else ();
+         q.a.(v) := [u :: q.a.(v)];
+      return ()
+    ;
+  end
 ;
 
 value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
@@ -145,20 +166,18 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
   let i2 = Adef.int_of_iper ip2 in
   if i1 == i2 then (1.0, [])
   else
-    let rank = ref 0 in
     let reset u mark =
       tab.(u) :=
         {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = [];
          lens2 = []; mark = mark; elim_ancestors = False;
-         anc_stat1 = MaybeAnc; anc_stat2 = MaybeAnc;
-         rank = do incr rank; return rank.val}
+         anc_stat1 = MaybeAnc; anc_stat2 = MaybeAnc}
     in
     let module Pq =
-      Pqueue.Make (struct type t = int; value leq = tsort_leq id tab; end)
+      FastPqueue (struct type t = int; value f x = id.(x); end)
     in
-    let q = ref Pq.empty in
+    let q = Pq.create () in
     let inserted = new_mark () in
-    let add u = do reset u inserted; q.val := Pq.add u q.val; return () in
+    let add u = do reset u inserted; Pq.add u q; return () in
     let relationship = ref 0.0 in
     let nb_anc1 = ref 1 in
     let nb_anc2 = ref 1 in
@@ -193,12 +212,11 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
        tab.(i2).lens2 := [(0, 1)];
        tab.(i1).anc_stat1 := IsAnc;
        tab.(i2).anc_stat2 := IsAnc;
-       while not (Pq.is_empty q.val) && nb_anc1.val > 0 && nb_anc2.val > 0 do
-         let (u, nq) = Pq.take q.val in
+       while not (Pq.is_empty q) && nb_anc1.val > 0 && nb_anc2.val > 0 do
+         let u = Pq.take q in
 (*
 do Printf.eprintf "take %s (%d)\n" (denomination base (base.data.persons.get u)) id.(u); flush stdout; return
 *)
-         do q.val := nq; return
          let tu = tab.(u) in
          let a = base.data.ascends.get u in
          let contribution =

@@ -41,7 +41,7 @@ Body tag property:
 
 <p>
 
-Images path:
+Images URL:
 <input name=images_path value="%vimages_path;" size=50><br>
 
 <p>
