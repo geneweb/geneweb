@@ -1,11 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.3 2001-02-15 14:24:49 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.4 2001-02-16 04:39:47 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
-    %if;merging;[*merge::person/persons]1 # %index;
-    %elseif;modifying;[*modify::person/persons]0 # %index;
+    %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
+      [*merge::person/persons]1 # %index;
+    %elseif;(evar_m = "MOD_IND" or eval_m = "MOD_IND_OK");
+      [*modify::person/persons]0 # %index;
     %else;[*add::person/persons]0%end;
   </title>
 %base_header;
@@ -13,19 +15,22 @@
 <body%body_prop;>
 
 <h1 align=center><font color=%highlight;>
-%if;merging;[*merge::person/persons]1 # %index;
-%elseif;modifying;[*modify::person/persons]0 # %index;
-%else;[*add::person/persons]0%end;
+%if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
+  [*merge::person/persons]1 # %index;
+%elseif;(evar_m = "MOD_IND" or eval_m = "MOD_IND_OK");
+  [*modify::person/persons]0 # %index;
+%else;
+  [*add::person/persons]0%end;
 </font></h1>
 
 <form method=POST action="%action;">
 %hidden;
 <input type=hidden name=digest value="%digest;">
 <input type=hidden name=i value="%index;">
-%if;merging;
+%if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
   %if;evar_i2;<input type=hidden name=i2 value="%evar_i2;">%end;%nl;
   <input type=hidden name=m value=MRG_MOD_IND_OK>
-%elseif;modifying;
+%elseif;(evar_m = "MOD_IND" or eval_m = "MOD_IND_OK");
   <input type=hidden name=m value=MOD_IND_OK>
 %else;
   <input type=hidden name=m value=ADD_IND_OK>
@@ -78,16 +83,14 @@
     <td><input type=checkbox name="add_qualifier%cnt;" value=on></td>
     </tr>
   %end;
-%else;
-  %if;not (cvar_propose_qualifier = "no");
-    <tr>
-    <td>[*qualifier]0</td>
-    <td>
-    <input name="qualifier0" size=30 value="">
-    <td>[*insert::qualifier]0</td>
-    <td><input type=checkbox name="add_qualifier0" value=on></td>
-    </tr>
-  %end;
+%elseif;(cvar_propose_qualifier != "no");
+  <tr>
+  <td>[*qualifier]0</td>
+  <td>
+  <input name="qualifier0" size=30 value="">
+  <td>[*insert::qualifier]0</td>
+  <td><input type=checkbox name="add_qualifier0" value=on></td>
+  </tr>
 %end;
 %if;has_aliases;
   %foreach;alias;
@@ -99,16 +102,14 @@
     <td><input type=checkbox name="add_alias%cnt;" value=on></td>
     </tr>
   %end;
-%else;
-  %if;not (cvar_propose_alias = "no");
-    <tr>
-    <td>[*alias]0</td>
-    <td>
-    <input name="alias0" size=30 value="">
-    <td>[*insert::alias]0</td>
-    <td><input type=checkbox name="add_alias0" value=on></td>
-    </tr>
-  %end;
+%elseif;(cvar_propose_alias != "no");
+  <tr>
+  <td>[*alias]0</td>
+  <td>
+  <input name="alias0" size=30 value="">
+  <td>[*insert::alias]0</td>
+  <td><input type=checkbox name="add_alias0" value=on></td>
+  </tr>
 %end;
 </tr>
 %if;has_first_names_aliases;
@@ -209,6 +210,7 @@
 </td>
 </tr>
 </table>
+
 <table border=1>
 <tr>
 <td>[*source/sources]0</td>
@@ -276,6 +278,7 @@
 </td>
 </tr>
 </table>
+
 <table border=1>
 <tr>
 <td>[*source/sources]0</td>
@@ -355,11 +358,113 @@
 </td>
 </tr>
 </table>
+
+<table border=1>
+<tr>
+<td>
+<input type=radio name=death_reason value=Killed%if;dr_killed;
+%sp;checked%end;>[*killed (in action)]2
+<input type=radio name=death_reason value=Murdered%if;dr_murdered;
+%sp;checked%end;>[*murdered]2
+<input type=radio name=death_reason value=Executed%if;dr_executed;
+%sp;checked%end;>[*executed (legally killed)]2
+<input type=radio name=death_reason value=Disappeared%if;dr_disappeared;
+%sp;checked%end;>[*disappeared]2
+<input type=radio name=death_reason value=Unspecified%if;dr_unspecified;
+%sp;checked%end;>[*unspecified]2
+</td>
+</tr>
+</table>
+
 <table border=1>
 <tr>
 <td>[*source/sources]0</td>
 <td>
 <input name=death_src size=40 maxlength=200 value="%death_src;">
+</td>
+</tr>
+</table>
+
+<h4>[*burial]</h4>
+
+<table border=1>
+<tr>
+<td>
+<select name=burial>
+<option value=UnknownBurial%if;bt_unknown_burial; selected%end;>-
+<option value=Buried%if;bt_buried; selected%end;>[*buried]2
+<option value=Cremated%if;bt_cremated; selected%end;>[*cremated]2
+</select>
+</td>
+<td>
+[*place]0
+<input name=burial_place size=40 maxlength=200 value="%burial_place;">
+</td>
+</tr>
+</table>
+
+<table border=1>
+<tr>
+<td>[*date]0</td>
+<td>
+[year/month/day]0
+<input name=burial_yyyy size=5 maxlength=5 value="%burial.year;">
+[year/month/day]1
+<input name=burial_mm size=2 maxlength=2 value="%burial.month;">
+[year/month/day]2
+<input name=burial_mm size=2 maxlength=2 value="%burial.day;">
+</td>
+<td>
+...[or]0 [text]0
+<input name=burial_text size=15 maxlength=30 value="%burial.text;">
+</td>
+</table>
+<table border=1>
+<tr>
+<td>[*calendar/calendars]0
+<select name=burial_cal>
+<option value=G%if;burial.cal_gregorian; selected%end;>
+[*gregorian/julian/french/hebrew]0
+<option value=J%if;burial.cal_julian; selected%end;>
+[*gregorian/julian/french/hebrew]1
+<option value=F%if;burial.cal_french; selected%end;>
+[*gregorian/julian/french/hebrew]2
+<option value=H%if;burial.cal_hebrew; selected%end;>
+[*gregorian/julian/french/hebrew]3
+</select>
+</td>
+<td>[*precision]0
+<select name=burial_prec>
+<option%if;burial.prec_no; selected%end;>-
+<option value=sure%if;burial.prec_sure; selected%end;>[*exact]0
+<option value=about%if;burial.prec_about; selected%end;>[*about (date)]0
+<option value=maybe%if;burial.prec_maybe; selected%end;>[*possibly (date)]0
+<option value=before%if;burial.prec_before; selected%end;>[*before (date)]0
+<option value=after%if;burial.prec_after; selected%end;>[*after (date)]0
+<option value=oryear%if;burial.prec_oryear; selected%end;>&lt;- [*or] -&gt;
+<option value=yearint%if;burial.prec_yearint; selected%end;>
+&lt;- [*between (date)] -&gt;
+</select>
+<input name=burial_oryear size=5 maxlength=5 value="%burial.oryear;">
+</td>
+</tr>
+</table>
+
+<table border=1>
+<tr>
+<td>[*source/sources]0</td>
+<td>
+<input name=burial_src size=40 maxlength=200 value="%burial_src;">
+</td>
+</tr>
+</table>
+
+<h4>[*occupation]</h4>
+
+<table border=1>
+<tr>
+<td>
+<input name=occu size=50 maxlength=200 value="%occupation;">
 </td>
 </tr>
 </table>
