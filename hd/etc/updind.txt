@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.24 2005-02-05 14:29:20 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.25 2005-03-01 10:14:55 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -353,7 +353,7 @@ function changeDeath()
 <td>
 <label>[*place]0
 <input name="death_place" size="40" maxlength="200" value="%death_place;"%sp;
- onfocus="setDead()"%/></label>
+ %/></label>
 </td>
 </tr>
 </table>
