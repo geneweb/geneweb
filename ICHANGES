@@ -5,6 +5,9 @@ GeneWeb Version 3.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [16 Aug 00] In personal pages, does not display the age at death
+    if less than one year and undefined (it displayed "age at death:
+    birth"!)
   - [14 Aug 00] In personal pages, sources are now printed, even for
     non friends, non wizards.
   - [12 Aug 00] For relationlinks by shortest path, if "cancel GeneWeb

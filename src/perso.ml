@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.40 2000-08-14 09:23:18 ddr Exp $ *)
+(* $Id: perso.ml,v 3.41 2000-08-17 16:38:10 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -360,13 +360,15 @@ value print_dates conf base open_area p =
         Some (Dgreg ({prec = Sure | About | Maybe} as d2) _),
         approx) when d1 <> d2 ->
          let a = temps_ecoule d1 d2 in
-         do open_area ();
-            Wserver.wprint "%s " (capitale (transl conf "age at death:"));
-            if not approx && d1.prec = Sure && d2.prec = Sure then ()
-            else Wserver.wprint "%s " (transl conf "possibly (date)");
-            Date.print_age conf a;
-            Wserver.wprint "\n";
-         return ()
+         if a.year = 0 && a.month = 0 then ()
+         else
+           do open_area ();
+              Wserver.wprint "%s " (capitale (transl conf "age at death:"));
+              if not approx && d1.prec = Sure && d2.prec = Sure then ()
+              else Wserver.wprint "%s " (transl conf "possibly (date)");
+              Date.print_age conf a;
+              Wserver.wprint "\n";
+           return ()
      | _ -> () ];
   return ()
 ;

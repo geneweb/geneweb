@@ -1,4 +1,2 @@
 gwtp.cmo: httpEnv.cmo iolight.cmo 
 gwtp.cmx: httpEnv.cmx iolight.cmx 
-rebuild.cmo: iolight.cmo 
-rebuild.cmx: iolight.cmx 
