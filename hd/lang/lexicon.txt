@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.171 2003-12-17 06:48:13 ddr Exp $
+# $Id: lexicon.txt,v 4.172 2003-12-17 14:03:24 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2184,6 +2184,7 @@ zh:  ³צֹת׃Ú½סָױµִ¼ֲַ¼
 da: ramme
 en: border
 fr: bordure
+he:  מסגרת
 pl: granica 
 pt: borda
 
@@ -2637,6 +2638,7 @@ da: farve
 en: colour
 en-us: color
 fr: couleur
+he:  צבע
 pl: kolor
 pt: cפr
 
@@ -6951,6 +6953,7 @@ sv: k&ouml;n
 da: har misbrugt%t/offer for seksuelt misbrug%t ved
 en: having abused%t/victim of sexual abuse%t by
 fr: ayant abus&eacute; sexuellement%t de/victime d'abus sexuel%t de
+he:  שניצל באופן מיני את%t/ שנוצלה באופן מיני על ידי%t
 pl: zgwalcil%t/zgwalcona%t przez
 pt: tendo abusado%t de/vםtima de abuso sexual%t por
 
