@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.44 2003-03-07 10:43:02 ddr Exp $ *)
+(* $Id: setup.ml,v 4.45 2003-11-12 11:59:55 ddr Exp $ *)
 
 open Printf;
 
@@ -1447,6 +1447,67 @@ value consang conf ok_file =
   }
 ;
 
+value separate_slashed_filename s =
+  loop 0 where rec loop i =
+    match try Some (String.index_from s i '/') with [ Not_found -> None ] with
+    [ Some j ->
+        if j > i then [String.sub s i (j - i) :: loop (j + 1)]
+        else loop (j + 1)
+    | None ->
+        if i >= String.length s then []
+        else [String.sub s i (String.length s - i)] ]
+;
+
+value end_with s x =
+  let slen = String.length s in
+  let xlen = String.length x in
+  slen >= xlen && String.sub s (slen - xlen) xlen = x
+;
+
+value print_typed_file conf typ fname =
+  let ic_opt =
+    try Some (open_in fname) with
+    [ Sys_error _ -> None ]
+  in
+  match ic_opt with
+  [ Some ic ->
+      do {
+        Wserver.http "";
+        Wserver.wprint "Content-type: %s; charset=%s" typ (charset conf);
+        nl (); nl ();
+	try
+          while True do {
+            let c = input_char ic in
+            Wserver.wprint "%c" c
+          }
+        with [ End_of_file -> () ];
+        close_in ic;
+      }
+  | None ->
+      let title _ = Wserver.wprint "Error" in
+      do {
+        header conf title;
+        Wserver.wprint "<ul><li>\n";
+        Wserver.wprint "Cannot access file \"%s\".\n" fname;
+        Wserver.wprint "</ul>\n";
+        trailer conf;
+        raise Exit
+      } ]
+;
+
+value doc conf s =
+  let fname =
+    List.fold_left Filename.concat setup_dir.val
+      (separate_slashed_filename s)
+  in
+  let typ =
+    if end_with s ".gif" then "image/gif"
+    else if end_with s ".jpg" then "image/jpeg"
+    else "text/html"
+  in
+  print_typed_file conf typ fname
+;
+
 value has_gwb_directories dh =
   try
     let rec loop () =
@@ -1496,7 +1557,9 @@ value setup_comm_ok conf =
   | "gwf_1" -> gwf_1 conf
   | "gwd" -> gwd conf
   | "gwd_1" -> gwd_1 conf
-  | x -> error conf ("bad command: \"" ^ x ^ "\"") ]
+  | x ->
+      if String.length x >= 3 && String.sub x 0 3 = "doc" then doc conf x
+      else error conf ("bad command: \"" ^ x ^ "\"") ]
 ;
 
 value setup_comm conf comm =
