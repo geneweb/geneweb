@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.90 2000-05-06 11:51:36 ddr Exp $
+# $Id: lexicon.txt,v 3.91 2000-05-06 18:54:35 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2469,10 +2469,6 @@ no: fornavn/fornavn
 pt: nome/nomes
 ru: имя/имена
 se: f&ouml;rnamn/f&ouml;rnamn
-
-    flash list
-en: flash list
-fr: liste &eacute;clair
 
     for the first names by alphabetic order
 af: om die voorname in alfabetiese volgorde te kry
@@ -4949,6 +4945,10 @@ no: alias for etternavn
 pt: alias do apelido
 ru: новая:a:--ую фамилия:a:-ю
 se: efternamns alias
+
+    surname list
+en: surname list
+fr: liste &eacute;clair
 
     surname missing
 af: van ontbreek

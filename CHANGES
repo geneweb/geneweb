@@ -2,7 +2,7 @@ GeneWeb version 3.05
 --------------------
 
 * GeneWeb Service/CGI (gwd)
-  - [06 May 00] Added flash list in ancestors page (ancestors surnames list).
+  - [06 May 00] Added surname list from "ancestors" page.
   - [02 May 00] [technical] In Unix version now, each request gets the
     user id and the group id of the owner of the data base directory
     (base.gwb). No error if cannot change to these ids. Deleted the gwd
