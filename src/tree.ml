@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: tree.ml,v 2.1 1999-08-21 10:57:28 ddr Exp $ *)
+(* $Id: tree.ml,v 2.2 1999-08-21 17:17:13 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -46,7 +46,7 @@ value colspan_tree =
     ({node = (t.node, n1, n2); sons = List.rev rev_tree}, n2)
 ;
 
-value print_tree conf base with_spouses t =
+value print_tree conf base with_spouses one_branch t =
   let (_, _, last_n) = t.node in
   let print_person cs ip parent t =
     do stag "td" begin Wserver.wprint "&nbsp;"; end;
@@ -130,7 +130,7 @@ value print_tree conf base with_spouses t =
   in
   tag "table" "border=0 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
     loop True [(t.node, t)] where rec loop first tl =
-      do if not first then
+      do if not first && not one_branch then
            do print_row print_horizontal_bar tl;
               print_row print_vertical_bar tl;
            return ()
@@ -152,24 +152,33 @@ value print_branch_list_as_tree conf base with_spouses =
   [ [] -> ()
   | [b :: bl] ->
       let t = List.fold_left append (tree_of_branch b) bl in
-     let (t, _) = colspan_tree t in
-     print_tree conf base with_spouses t ]
+      let one_branch =
+        loop t.sons where rec loop =
+          fun
+          [ [] -> True
+          | [t] -> loop t.sons
+          | _ -> False ]
+      in
+      let (t, _) = colspan_tree t in
+      print_tree conf base with_spouses one_branch t ]
 ;
 
-value print conf base =
+value find_branch_list conf base =
+  loop 1 where rec loop i =
+    let s = string_of_int i in
+    let po = find_person_in_env conf base s in
+    let so = p_getenv conf.env ("s" ^ s) in
+    match (po, so) with
+    [ (Some p, Some s) ->
+        match branch_of_sosa base p.cle_index (Num.of_string s) with
+        [ Some ipsl -> [List.map fst ipsl :: loop (i + 1)]
+        | None -> loop (i + 1) ]
+    | _ -> [] ]
+;
+
+value print_branches conf base =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "tree")) in
-  let bl =
-    loop 1 where rec loop i =
-      let s = string_of_int i in
-      let po = find_person_in_env conf base s in
-      let so = p_getenv conf.env ("s" ^ s) in
-      match (po, so) with
-      [ (Some p, Some s) ->
-          match branch_of_sosa base p.cle_index (Num.of_string s) with
-          [ Some ipsl -> [List.map fst ipsl :: loop (i + 1)]
-          | None -> loop (i + 1) ]
-      | _ -> [] ]
-  in
+  let bl = find_branch_list conf base in
   let with_spouses =
     match p_getenv conf.env "spouse" with
     [ Some "on" -> True
@@ -179,4 +188,8 @@ value print conf base =
      print_branch_list_as_tree conf base with_spouses bl;
      trailer conf;
   return ()
+;
+
+value print conf base =
+  print_branches conf base
 ;
