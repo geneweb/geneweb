@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.75 2003-11-04 13:29:38 ddr Exp $ *)
+(* $Id: util.ml,v 4.76 2003-12-10 09:45:03 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1760,7 +1760,7 @@ value find_person_in_env conf base suff =
                    x.occ == occ)
                 xl
             in
-            Some r
+            if authorized_age conf base r then Some r else None
           with
           [ Not_found -> None ]
       | _ -> None ] ]
