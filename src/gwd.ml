@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.31 2002-02-24 14:10:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.32 2002-03-03 09:24:50 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1256,22 +1256,25 @@ value connection cgi (addr, request) script_name contents =
         try (Unix.gethostbyaddr iaddr).Unix.h_name with _ ->
           Unix.string_of_inet_addr iaddr ]
   in
-  if excluded from then refuse_log from cgi
-  else
-    let accept =
-      if only_address.val = "" then True else only_address.val = from
-    in
-    if not accept then only_log from cgi
+  do {
+    if excluded from then refuse_log from cgi
     else
-      try
-        let (contents, env) = build_env request contents in
-        if image_request cgi env then ()
-        else
-          conf_and_connection cgi from (addr, request) script_name contents
-            env
-      with
-      [ Adef.Request_failure msg -> print_request_failure cgi msg
-      | Exit -> () ]
+      let accept =
+        if only_address.val = "" then True else only_address.val = from
+      in
+      if not accept then only_log from cgi
+      else
+        try
+          let (contents, env) = build_env request contents in
+          if image_request cgi env then ()
+          else
+            conf_and_connection cgi from (addr, request) script_name contents
+              env
+        with
+        [ Adef.Request_failure msg -> print_request_failure cgi msg
+        | Exit -> () ];
+    Wserver.wflush ();
+  }
 ;
 
 value null_reopen flags fd =
