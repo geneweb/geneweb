@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.9 2000-09-11 07:46:28 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.10 2000-09-11 16:25:31 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -458,7 +458,36 @@ value rec enrich_relation pos lrel =
 ;
 
 value enrich_person sp =
-  { (sp) with rparents = enrich_relation 1 sp.rparents }
+  { first_name = sp.first_name;
+    surname = sp.surname;
+    occ = sp.occ;
+    image = sp.image;
+    public_name = sp.public_name;
+    nick_names = sp.nick_names;
+    aliases = sp.aliases;
+    first_names_aliases = sp.first_names_aliases;
+    surnames_aliases = sp.surnames_aliases;
+    titles = sp.titles;
+    rparents = enrich_relation 1 sp.rparents;
+    related = sp.related;
+    occupation = sp.occupation;
+    sex = sp.sex;
+    access = sp.access;
+    birth = sp.birth;
+    birth_place = sp.birth_place;
+    birth_src = sp.birth_src;
+    baptism = sp.baptism;
+    baptism_place = sp.baptism_place;
+    baptism_src = sp.baptism_src;
+    death = sp.death;
+    death_place = sp.death_place;
+    death_src = sp.death_src;
+    burial = sp.burial;
+    burial_place = sp.burial_place;
+    burial_src = sp.burial_src;
+    notes = sp.notes;
+    psources = sp.psources;
+    cle_index = sp.cle_index }
 ;
 
 value effective_mod conf base sp =
