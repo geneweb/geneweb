@@ -38,6 +38,12 @@ GeneWeb version 3.06
     and we see the page blinking. Moreover, it has no sense (even if it is
     standard), since the HTTP header already contains that.
 
+* General
+  - [26 Jun 00] In programs ged2gwb (gedcom import), gwb2ged (gedcom export),
+    consang (consanguinity initialization) and gwu (uncompiler), added an
+    error message in case of several input is given (these programs can
+    treat only one file at a time).
+
 * Base configuration files (base.gwf)
   - [17 Jun 00] By default now, the "can_send_image" is "yes", meaning that
     if you specify nothing, the "send image" is proposed in update pages. To

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.21 2000-05-25 11:46:28 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.22 2000-06-26 09:25:35 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -2210,7 +2210,10 @@ value speclist =
        GEDCOM")]
 ;
 
-value anonfun s = in_file.val := s;
+value anonfun s =
+  if in_file.val = "" then in_file.val := s
+  else raise (Arg.Bad "Cannot treat several GEDCOM files")
+;
 
 value errmsg = "Usage: ged2gwb [<ged>] [options] where options are:";
 
