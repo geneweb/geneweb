@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.38 2003-11-26 17:08:09 ddr Exp $ *)
+(* $Id: relation.ml,v 4.39 2003-11-27 14:29:03 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -145,22 +145,43 @@ value print_menu conf base p =
       end;
       html_p conf;
       tag "table" "border=%d width=\"90%%\"" conf.border begin
-        tag "tr" "align=left" begin
+        tag "tr" begin
           tag "td" "align=right" begin
             Wserver.wprint "%s\n" (capitale (transl conf "long display"));
-            Wserver.wprint "<input type=checkbox name=long value=on><br>\n";
+            Wserver.wprint "<input type=checkbox name=long value=on>\n";
+          end;
+          tag "td" "align=right" begin
+            Wserver.wprint "%s\n"
+              (capitale (transl_nth conf "image/images" 1));
+            Wserver.wprint "<input type=checkbox name=image value=on>\n";
+          end;
+        end;
+        tag "tr" begin
+          tag "td" "align=right" begin
             Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
-            Wserver.wprint "<input type=checkbox name=spouse value=on><br>\n";
+            Wserver.wprint "<input type=checkbox name=spouse value=on>\n";
+          end;
+          tag "td" "align=right" begin
+            Wserver.wprint "%s\n"
+              (capitale (transl conf "cancel GeneWeb links"));
+            Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
+          end;
+        end;
+        tag "tr" begin
+          tag "td" "align=right" begin
             Wserver.wprint "%s\n" (capitale (transl conf "border"));
             Wserver.wprint "<input name=bd size=1 maxlength=2 value=0><br>\n";
           end;
-          tag "td" "align=right valign=top" begin
-            Wserver.wprint "%s\n"
-              (capitale (transl_nth conf "image/images" 1));
-            Wserver.wprint "<input type=checkbox name=image value=on><br>\n";
-            Wserver.wprint "%s\n"
-              (capitale (transl conf "cancel GeneWeb links"));
-            Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
+          tag "td" "align=right" begin
+            Wserver.wprint "&nbsp;";
+          end;
+        end;
+        tag "tr" begin
+          tag "td" "align=right" begin
+            Wserver.wprint "&nbsp;";
+          end;
+          tag "td" "align=right" begin
+            Wserver.wprint "&nbsp;";
           end;
         end;
         tag "tr" "align=left" begin
