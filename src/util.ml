@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.17 1999-11-30 15:35:08 ddr Exp $ *)
+(* $Id: util.ml,v 3.18 1999-12-07 14:25:17 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1073,8 +1073,8 @@ value incorrect_request conf =
 value list_find f =
   loop where rec loop =
     fun
-    [ [] -> None
-    | [x :: l] -> if f x then Some x else loop l ]
+    [ [] -> raise Not_found
+    | [x :: l] -> if f x then x else loop l ]
 ;
 
 value find_person_in_env conf base suff =
@@ -1096,13 +1096,19 @@ value find_person_in_env conf base suff =
           let k = p ^ " " ^ n in
           let xl = List.map (poi base) (person_ht_find_all base k) in
           let k = Name.strip_lower k in
-          list_find
-            (fun x ->
-               Name.strip_lower
-                 (p_first_name base x ^ " " ^ p_surname base x)
-                 = k &&
-               x.occ == occ)
-            xl
+          try
+            let r =
+              list_find
+                (fun x ->
+                   Name.strip_lower
+                     (p_first_name base x ^ " " ^ p_surname base x)
+                     = k &&
+                   x.occ == occ)
+                xl
+            in
+            Some r
+          with
+          [ Not_found -> None ]
       | _ -> None ] ]
 ;
 
