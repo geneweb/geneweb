@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 3.8 2000-06-03 21:08:04 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.9 2000-06-18 07:38:41 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -492,7 +492,12 @@ value print conf base =
           try_merge conf base [] p1.cle_index p2.cle_index False
         in
         do if changes_done then base.func.commit_patches () else ();
-           if ok then print_merged conf base p1 else ();
+           if ok then
+             let key = (sou base p1.first_name, sou base p1.surname, p1.occ) in
+             do History.record conf base key "fp";
+                print_merged conf base p1;
+             return ()
+           else ();
         return ()
   | _ -> not_found_or_incorrect conf ]
 ;
