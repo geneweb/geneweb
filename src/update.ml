@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.11 2001-06-18 07:06:00 ddr Exp $ *)
+(* $Id: update.ml,v 4.12 2001-07-14 09:05:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -354,7 +354,7 @@ value print_warning conf base =
               [ Some d -> Date.string_of_date conf d
               | _ -> "" ]))
   | UndefinedSex p ->
-      Wserver.wprint "Undefined sex for %t"
+      Wserver.wprint (fcapitale (ftransl conf "undefined sex for %t"))
         (fun _ -> print_someone_strong conf base p)
   | YoungForMarriage p a ->
       do {
