@@ -1,9 +1,11 @@
-# $Id: Makefile.Mac,v 1.6 2000-05-03 12:38:48 ddr Exp $
+# $Id: Makefile.Mac,v 1.7 2000-05-03 12:40:50 ddr Exp $
 
 #include ::tools:Makefile.Mac
 
 OCAMLI = -I ::src
 OBJS = ::src:argl.cmo ::src:adef.cmo ::src:iovalue.cmo ::src:name.cmo ::src:ansel.cmo ::src:buff.cmo ::src:gutil.cmo ::src:btree.cmo ::src:iobase.cmo ::src:calendar.cmo ged2gwb.cmo
+
+all Ä out
 
 out ÄÄ ged2gwb.out
     delete -i ged2gwb
