@@ -1,11 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.20 2000-03-31 15:13:33 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.21 2000-03-31 17:07:14 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
-  <meta name="ROBOTS" content="NONE">
-  <meta http-equiv="Content-Type" content="text/html; charset=%e">
   <title>Genealogie - %t</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=%e">
+  <meta name="ROBOTS" content="NONE">
 %j</head>
 <body%b>
 
@@ -18,7 +18,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
 <table><tr><td align=center><h1><font color=%i>Genealogische<br>
-databank</font></h1></center>
+databank</font></h1></table>
 </td>
 </tr>
 </table>
