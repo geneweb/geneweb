@@ -1,11 +1,12 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.35 2003-12-03 09:08:27 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.36 2004-01-12 13:39:42 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
+open Printf;
 
 value limit_by_list conf =
   match p_getint conf.base_env "max_anc_level" with
@@ -47,7 +48,7 @@ value text_to conf =
   | 3 -> transl conf "to the grandparents"
   | 4 -> transl conf "to the great-grandparents"
   | i ->
-      Printf.sprintf (ftransl conf "to the %s generation")
+      sprintf (ftransl conf "to the %s generation")
         (transl_nth conf "nth (generation)" i) ]
 ;
 
@@ -59,7 +60,7 @@ value text_level conf =
   | 3 -> transl conf "the grandparents"
   | 4 -> transl conf "the great-grandparents"
   | i ->
-      Printf.sprintf (ftransl conf "the %s generation")
+      sprintf (ftransl conf "the %s generation")
         (transl_nth conf "nth (generation)" i) ]
 ;
 
@@ -202,9 +203,8 @@ value display_ancestor_menu conf base p =
            do {
              conf.henv := List.remove_assoc "iz" conf.henv;
              let reference _ _ _ s =
-               "<a href=\"" ^ commd conf ^ "iz=" ^
-                 string_of_int (Adef.int_of_iper p.cle_index) ^ "\">" ^ s ^
-                 "</a>"
+               sprintf "<a href=\"%siz=%d\">%s</a>" (commd conf)
+                 (Adef.int_of_iper p.cle_index) s
              in
              Wserver.wprint "%s"
                (gen_person_title_text reference std_access conf base p)
@@ -1572,14 +1572,14 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
   }
 ;
 
-value tree_reference gv bd conf base p s =
+value tree_reference gv bd color conf base p s =
   if conf.cancel_links || is_hidden p then s
   else
     let im = p_getenv conf.env "image" = Some "on" in
-    "<a href=\"" ^ commd conf ^ "m=A;t=T;v=" ^ string_of_int gv ^ ";" ^
-      acces conf base p ^ (if im then ";image=on" else "") ^
-      (if bd > 0 then ";bd=" ^ string_of_int bd else "") ^ "\">" ^ s ^
-      "</a>"
+    sprintf "<a href=\"%sm=A;t=T;v=%d;%s%s%s%s\">%s</a>"
+      (commd conf) gv (acces conf base p) (if im then ";image=on" else "")
+      (if bd > 0 then ";bd=" ^ string_of_int bd else "")
+      (if color <> "" then ";color=" ^ color else "") s
 ;
 
 type pos = [ Left | Right | Center | Alone ];
@@ -1649,13 +1649,15 @@ value rec enrich_tree lst =
 value print_tree_with_table conf base gv p =
   let gv = min (limit_by_tree conf) gv in
   let bd = match p_getint conf.env "bd" with [ Some x -> x | None -> 0 ] in
+  let color =
+    match Util.p_getenv conf.env "color" with
+    [ None -> ""
+    | Some x -> x ]
+  in
   let td_prop =
     match Util.p_getenv conf.env "td" with
     [ Some x -> " " ^ x
-    | _ ->
-        match Util.p_getenv conf.env "color" with
-	[ None | Some "" -> ""
-        | Some x -> " bgcolor=" ^ x ] ]
+    | _ -> if color = "" then "" else " bgcolor=" ^ color ]
   in
   let next_gen pol =
     List.fold_right
@@ -1710,7 +1712,7 @@ value print_tree_with_table conf base gv p =
         let txt =
           match po with
           [ Empty -> "&nbsp;"
-          | Cell p _ _ _ -> tree_reference gv bd conf base p "|" ]
+          | Cell p _ _ _ -> tree_reference gv bd color conf base p "|" ]
         in
         Wserver.wprint "%s" txt;
       end;
@@ -1730,7 +1732,7 @@ value print_tree_with_table conf base gv p =
               let txt = txt ^ Date.short_dates_text conf base p in
               let txt =
                 if bd > 0 || td_prop <> "" then
-                  Printf.sprintf
+                  sprintf
                     "<table border=%d><tr>\
                      <td align=center%s>%s</td></tr></table>"
                     bd td_prop txt
