@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.21 2005-02-05 03:51:58 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.22 2005-02-06 10:17:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -60,7 +60,7 @@ value obsolete version var new_var r =
 value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
-value rec eval_var conf base env p =
+value rec eval_var conf base env p loc =
   fun
   [ ["alias"] -> eval_string_env "alias" env
   | ["acc_if_titles"] -> bool_val (p.access = IfTitles)
@@ -344,10 +344,11 @@ value rec print_ast conf base env p =
   fun
   [ Atext s -> Wserver.wprint "%s" s
   | Atransl upp s n -> Wserver.wprint "%s" (Templ.eval_transl conf upp s n)
-  | Avar s sl -> Templ.print_var conf base (eval_var conf base env p) s sl
+  | Avar loc s sl ->
+      Templ.print_var conf base (eval_var conf base env p loc) s sl
   | Awid_hei s -> Wserver.wprint "Awid_hei"
   | Aif e alt ale -> print_if conf base env p e alt ale
-  | Aforeach s sl al -> print_foreach conf base env p s sl al
+  | Aforeach v al -> print_foreach conf base env p v al
   | Adefine f xl al alk -> print_define conf base env p f xl al alk
   | Aapply f el -> print_apply conf base env p f el ]
 and print_define conf base env p f xl al alk =
@@ -363,7 +364,7 @@ and print_if conf base env p e alt ale =
   let eval_var = eval_var conf base env p in
   let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
   List.iter (print_ast conf base env p) al
-and print_foreach conf base env p s sl al =
+and print_foreach conf base env p (loc, s, sl) al =
   match [s :: sl] with
   [ ["alias"] -> print_foreach_string conf base env p al p.aliases s
   | ["first_name_alias"] ->

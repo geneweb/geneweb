@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.70 2005-02-05 03:51:58 ddr Exp $ *)
+(* $Id: perso.ml,v 4.71 2005-02-06 10:17:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -262,10 +262,12 @@ value extract_var sini s =
   else ""
 ;
 
-value warning_use_has_parents_before_parent var =
+value warning_use_has_parents_before_parent (bp, ep) var =
   ifdef UNIX then do {
+    Printf.eprintf "*** <W> perso.txt";
+    Printf.eprintf ", chars %d-%d" bp ep;
     Printf.eprintf "\
-*** <W> perso.txt: since v5.00, must test \"has_parents\" before using \"%s\"\n"
+: since v5.00, must test \"has_parents\" before using \"%s\"\n"
       var;
     flush stderr;
   }
@@ -301,9 +303,9 @@ value make_ep conf base ip =
   let p_auth = authorized_age conf base p in (p, a, u, p_auth)
 ;
 
-value rec eval_var conf base env ep sl =
+value rec eval_var conf base env ep loc sl =
   try eval_simple_var conf base env ep sl with
-  [ Not_found -> eval_person_var conf base env ep sl ]
+  [ Not_found -> eval_person_var conf base env ep loc sl ]
 and eval_simple_var conf base env ep sl =
   try bool_val (eval_simple_bool_var conf base env ep sl) with
   [ Not_found -> str_val (eval_simple_str_var conf base env ep sl) ]
@@ -508,7 +510,7 @@ and eval_simple_str_var conf base env (_, _, _, p_auth) =
           try List.assoc v conf.base_env with [ Not_found -> "" ]
         else raise Not_found
   | _ -> raise Not_found ]
-and eval_person_var conf base env ((_, a, _, _) as ep) =
+and eval_person_var conf base env ((_, a, _, _) as ep) loc =
   fun
   [ ["child" :: sl] ->
       match get_env "child" env with
@@ -519,12 +521,12 @@ and eval_person_var conf base env ((_, a, _, _) as ep) =
             | _ -> False ]
           in
           let ep = (p, a, u, auth) in
-          eval_person_var conf base env ep sl
+          eval_person_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["enclosing" :: sl] ->
       let rec loop =
         fun
-        [ [("#loop", _) :: env] -> eval_person_var conf base env ep sl
+        [ [("#loop", _) :: env] -> eval_person_var conf base env ep loc sl
         | [_ :: env] -> loop env
         | [] -> raise Not_found ]
       in
@@ -536,10 +538,10 @@ and eval_person_var conf base env ((_, a, _, _) as ep) =
           let ep = make_ep conf base (father cpl) in
           let cpl = (father cpl, mother cpl) in
           let efam = Vfam (foi base ifam) cpl (doi base ifam) in
-          eval_person_var conf base [("fam", efam) :: env] ep sl
+          eval_person_var conf base [("fam", efam) :: env] ep loc sl
       | None ->
           do {
-            warning_use_has_parents_before_parent "father";
+            warning_use_has_parents_before_parent loc "father";
             str_val ""
           } ]
   | ["mother" :: sl] ->
@@ -549,48 +551,48 @@ and eval_person_var conf base env ((_, a, _, _) as ep) =
           let ep = make_ep conf base (mother cpl) in
           let cpl = (father cpl, mother cpl) in
           let efam = Vfam (foi base ifam) cpl (doi base ifam) in
-          eval_person_var conf base [("fam", efam) :: env] ep sl
+          eval_person_var conf base [("fam", efam) :: env] ep loc sl
       | None ->
           do {
-            warning_use_has_parents_before_parent "mother";
+            warning_use_has_parents_before_parent loc "mother";
             str_val ""
           } ]
   | ["parent" :: sl] ->
       match get_env "parent" env with
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
-          eval_person_var conf base env ep sl
+          eval_person_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["related" :: sl] ->
       match get_env "c" env with
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
-          eval_person_var conf base env ep sl
+          eval_person_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["relation_her" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_moth = Some ip} ->
          let ep = make_ep conf base ip in
-         eval_person_var conf base env ep sl
+         eval_person_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["relation_him" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_fath = Some ip} ->
          let ep = make_ep conf base ip in
-         eval_person_var conf base env ep sl
+         eval_person_var conf base env ep loc sl
       | _ -> raise Not_found ]
-  | ["self" :: sl] -> eval_person_var conf base env ep sl
+  | ["self" :: sl] -> eval_person_var conf base env ep loc sl
   | ["spouse" :: sl] ->
       match get_env "fam" env with
       [ Vfam _ (_, ip) _ ->
           let ep = make_ep conf base ip in
-          eval_person_var conf base env ep sl
+          eval_person_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["witness" :: sl] ->
       match get_env "witness" env with
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
-          eval_person_var conf base env ep sl
+          eval_person_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | sl ->
       try bool_val (eval_bool_person_field conf base env ep sl) with
@@ -1018,10 +1020,11 @@ value rec print_ast conf base env ep =
   fun
   [ Atext s -> Wserver.wprint "%s" s
   | Atransl upp s n -> Wserver.wprint "%s" (eval_transl conf base env upp s n)
-  | Avar s sl -> Templ.print_var conf base (eval_var conf base env ep) s sl
+  | Avar loc s sl ->
+      Templ.print_var conf base (eval_var conf base env ep loc) s sl
   | Awid_hei s -> print_wid_hei conf base env s
   | Aif e alt ale -> print_if conf base env ep e alt ale
-  | Aforeach s sl al -> print_foreach conf base env ep s sl al
+  | Aforeach (loc, s, sl) al -> print_foreach conf base env ep loc s sl al
   | Adefine f xl al alk -> print_define conf base env ep f xl al alk
   | Aapply f el -> print_apply conf base env ep f el ]
 and print_define conf base env ep f xl al alk =
@@ -1037,7 +1040,7 @@ and print_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in
   let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
   List.iter (print_ast conf base env ep) al
-and print_foreach conf base env ep s sl al =
+and print_foreach conf base env ep loc s sl al =
   let rec loop ((_, a, _, _) as ep) efam =
     fun 
     [ [s] -> print_simple_foreach conf base env al ep efam s
@@ -1061,7 +1064,7 @@ and print_foreach conf base env ep s sl al =
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
         | None ->
-            warning_use_has_parents_before_parent "father" ]
+            warning_use_has_parents_before_parent loc "father" ]
     | ["mother" :: sl] ->
         match parents a with
         [ Some ifam ->
@@ -1071,7 +1074,7 @@ and print_foreach conf base env ep s sl al =
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
         | None ->
-            warning_use_has_parents_before_parent "mother" ]
+            warning_use_has_parents_before_parent loc "mother" ]
     | _ -> raise Not_found ]
   in
   let efam = get_env "fam" env in

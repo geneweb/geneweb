@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.52 2005-02-05 03:51:58 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.53 2005-02-06 10:17:35 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -78,7 +78,7 @@ value obsolete version var new_var r =
 value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
-value rec eval_var conf base env ((fam, cpl, des) as fcd) =
+value rec eval_var conf base env ((fam, cpl, des) as fcd) loc =
   fun
   [ ["child" :: sl] ->
         let k =
@@ -346,9 +346,10 @@ value rec print_ast conf base env fcd =
   fun
   [ Atext s -> Wserver.wprint "%s" s
   | Atransl upp s n -> Wserver.wprint "%s" (Templ.eval_transl conf upp s n)
-  | Avar s sl -> Templ.print_var conf base (eval_var conf base env fcd) s sl
+  | Avar loc s sl ->
+      Templ.print_var conf base (eval_var conf base env fcd loc) s sl
   | Aif e alt ale -> print_if conf base env fcd e alt ale
-  | Aforeach s sl al -> print_foreach conf base env fcd s sl al
+  | Aforeach v al -> print_foreach conf base env fcd v al
   | Adefine f xl al alk -> print_define conf base env fcd f xl al alk
   | Aapply f el -> print_apply conf base env fcd f el
   | x -> not_impl "print_ast" x ]
@@ -365,7 +366,7 @@ and print_if conf base env fcd e alt ale =
   let eval_var = eval_var conf base env fcd in
   let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
   List.iter (print_ast conf base env fcd) al
-and print_foreach conf base env ((fam, cpl, des) as fcd) s sl al =
+and print_foreach conf base env ((fam, cpl, des) as fcd) (_, s, sl) al =
   match [s :: sl] with
   [ ["child"] -> print_foreach_child conf base env fcd al des.children s
   | ["witness"] -> print_foreach_witness conf base env fcd al fam.witnesses s
