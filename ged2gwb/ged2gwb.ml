@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.3 1999-03-15 20:12:56 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.4 1999-03-16 18:37:13 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -443,16 +443,37 @@ value unknown_per gen i =
   (p, a)
 ;
 
-value phony_per gen =
+value phony_per gen sex =
   let i = gen.g_per.tlen in
   let (person, ascend) = unknown_per gen i in
-  do assume_tab "gen.g_per" gen.g_per (Left "");
+  do person.sex := sex;
+     assume_tab "gen.g_per" gen.g_per (Left "");
      gen.g_per.tlen := gen.g_per.tlen + 1;
      gen.g_per.arr.(i) := Right person;
      assume_tab "gen.g_asc" gen.g_asc (Left "");
      gen.g_asc.arr.(i) := Right ascend;
      gen.g_asc.tlen := gen.g_asc.tlen + 1;
   return Adef.iper_of_int i
+;
+
+value unknown_fam gen i =
+  let empty = add_string gen "" in
+  let father = phony_per gen Masculine in
+  let mother = phony_per gen Feminine in
+  let f =
+    {marriage = Adef.codate_None;
+     marriage_place = empty;
+     marriage_src = empty;
+     divorce = NotDivorced;
+     children = [| |];
+     comment = empty;
+     origin_file = empty;
+     fsources = empty;
+     fam_index = Adef.ifam_of_int i}
+  and c =
+    {father = father; mother = mother}
+  in
+  (f, c)
 ;
 
 value this_year = 1998;
@@ -1003,12 +1024,12 @@ value add_fam gen r =
   let fath =
     match find_field "HUSB" r.rsons with
     [ Some r -> per_index gen r.rval
-    | None -> phony_per gen ]
+    | None -> phony_per gen Masculine ]
   in
   let moth =
     match find_field "WIFE" r.rsons with
     [ Some r -> per_index gen r.rval
-    | None -> phony_per gen ]
+    | None -> phony_per gen Feminine ]
   in
   do match gen.g_per.arr.(Adef.int_of_iper fath) with
      [ Left lab -> ()
@@ -1306,16 +1327,27 @@ value pass3 gen fname =
 ;
 
 value check_undefined gen =
-  for i = 0 to gen.g_per.tlen - 1 do
-    match gen.g_per.arr.(i) with
-    [ Right _ -> ()
-    | Left lab ->
-        let (p, a) = unknown_per gen i in
-        do Printf.printf "Warning: undefined person %s\n" lab;
-           gen.g_per.arr.(i) := Right p;
-           gen.g_asc.arr.(i) := Right a;
-        return () ];
-  done
+  do for i = 0 to gen.g_per.tlen - 1 do
+       match gen.g_per.arr.(i) with
+       [ Right _ -> ()
+       | Left lab ->
+           let (p, a) = unknown_per gen i in
+           do Printf.printf "Warning: undefined person %s\n" lab;
+              gen.g_per.arr.(i) := Right p;
+              gen.g_asc.arr.(i) := Right a;
+           return () ];
+     done;
+     for i = 0 to gen.g_fam.tlen - 1 do
+       match gen.g_fam.arr.(i) with
+       [ Right _ -> ()
+       | Left lab ->
+           let (f, c) = unknown_fam gen i in
+           do Printf.printf "Warning: undefined family %s\n" lab;
+              gen.g_fam.arr.(i) := Right f;
+              gen.g_cpl.arr.(i) := Right c;              
+           return () ];
+     done;
+  return ()
 ;
 
 value make_arrays in_file =
@@ -1528,20 +1560,30 @@ value effective_del_fam base fam cpl =
   return ()
 ;
 
+value string_of_sex =
+  fun
+  [ Masculine -> "M"
+  | Feminine -> "F"
+  | Neuter -> "N" ]
+;
+
 value check_parents_sex base =
   for i = 0 to base.data.couples.len - 1 do
     let cpl = base.data.couples.get i in
     let fath = poi base cpl.father in
     let moth = poi base cpl.mother in
-    if fath.sex <> Masculine || moth.sex <> Feminine then
+    if fath.sex = Feminine || moth.sex = Masculine then
       do Printf.printf "Bad sex for parents\n";
-         Printf.printf "- father: %s\n" (denomination base fath);
-         Printf.printf "- mother: %s\n" (denomination base moth);
+         Printf.printf "- father: %s (sex: %s)\n" (denomination base fath)
+           (string_of_sex fath.sex);
+         Printf.printf "- mother: %s (sex: %s)\n" (denomination base moth)
+           (string_of_sex moth.sex);
          Printf.printf "=> family deleted\n\n";
          flush stdout;
          effective_del_fam base (base.data.families.get i) cpl;
       return ()
-    else ();
+    else
+      do fath.sex := Masculine; moth.sex := Feminine; return ();
   done
 ;
 

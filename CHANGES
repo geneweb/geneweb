@@ -2,7 +2,10 @@ GeneWeb Version 2.01
 --------------------
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Mar 14, 99] In anniversaries, in the list of months menus, the selected
+  - [Mar 16, 99] Presence of images no more blocking the display of the
+    text. E.g. in welcome pages, the flags are displayed after the text.
+    (Work only for GIF images, not JPEG).
+  - [Mar 14, 99] In anniversaries, in the list of months, the selected
     month is now the current month, not always January.
 
 * Gedcom to GeneWeb (ged2gwb)
