@@ -9,7 +9,7 @@ GeneWeb version 3.01
     not appear...
 
 * GeneWeb Service/CGI (gwd)
-  - [Nov 22, 99] The flags is now in one only image
+  - [Nov 22, 99] The flags are now in one only image
   - [Nov 19, 99] Added ability of customization of the page displayed when
     no data base is given (must make a file etc/index.txt).
   - [Nov 16, 99] Fixed bug: some old dates failed the calendars page

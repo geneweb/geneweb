@@ -5,6 +5,9 @@ GeneWeb Version 3.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Nov 23, 99] Fixed problem of selecting a first name: sometimes it
+    did not work. Used "Name.lower" instead of "Name.strip_lower" for the
+    list for a future selection.
   - [Nov 19, 99] Fixed bug: redirected service and renamed service messages
     did not work in cgi mode
   - [Nov 13, 99] Added some checks of access tables out of bounds
