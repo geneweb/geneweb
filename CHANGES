@@ -6,6 +6,8 @@ License). The previous license still applies up to the version 1.11
 included.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Feb 19, 99] Replacement of "%s" by the name of the base with context,
+    also in family comment.
   - [Feb 18, 99] Added deletion of photos.
   - [Feb 13, 99] Added ability to send photos.
   - [Feb 12, 99] Improved displaying in Hebrew language.
