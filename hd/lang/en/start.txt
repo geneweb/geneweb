@@ -64,11 +64,11 @@ by
 
 </ul>
 
-The <a href="%sm=AN">birthday anniversaries</a>.<br>%x
-The <a href="%sm=LB;k=10">latest births</a>.<br>
-The <a href="%sm=LD;k=10">latest deaths</a>.<br>%x
+The <a href="%sm=AN">birthday anniversaries</a>.<br>
 The <a href="%sm=AD">death anniversaries</a>.<br>
-The <a href="%sm=AM">marriage anniversaries</a>.
+The <a href="%sm=AM">marriage anniversaries</a>.<br>%x
+The <a href="%sm=LB;k=10">latest births</a>.<br>
+The <a href="%sm=LD;k=10">latest deaths</a>.%x
 <p>
 There has been %q accesses, %c of them to this page, since %d.
 

@@ -61,11 +61,11 @@ efter
 
 </ul>
 
-<a href="%sm=AN">Födelsedagar</a>.<br>%x
-De <a href="%sm=LB;k=10">senaste f&ouml;dslarna</a>.<br>
-De <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>.<br>%x
+<a href="%sm=AN">Födelsedagar</a>.<br>
 <a href="%sm=AD">Döda personers årsdagar</a>.<br>
-<a href="%sm=AM">Bröllopsdagar</a>.
+<a href="%sm=AM">Bröllopsdagar</a>.<br>%x
+De <a href="%sm=LB;k=10">senaste f&ouml;dslarna</a>.<br>
+De <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>.%x
 <p>
 Det har varit %q åtkomster, %c av dem till den här sidan, sedan %d.
 

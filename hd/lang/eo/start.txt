@@ -64,11 +64,11 @@ por
 
 </ul>
 
-La <a href="%sm=AN">naskigxtagoj</a>.<br>%x
-La <a href="%sm=LB;k=10">finaj naskigxoj</a>.<br>
-La <a href="%sm=LD;k=10">finaj mortoj</a>.<br>%x
+La <a href="%sm=AN">naskigxtagoj</a>.<br>
 La <a href="%sm=AD">datrevenoj de la mortaj personoj</a>.<br>
-La <a href="%sm=AM">datrevenoj de edzigxo</a>.
+La <a href="%sm=AM">datrevenoj de edzigxo</a>.<br>%x
+La <a href="%sm=LB;k=10">finaj naskigxoj</a>.<br>
+La <a href="%sm=LD;k=10">finaj mortoj</a>.%x
 <p>
 Estis %q alirejoj kaj %c al cxi pagxo, ekde la %d.
 

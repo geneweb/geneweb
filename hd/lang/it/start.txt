@@ -64,11 +64,11 @@ in ordine
 
 </ul>
 
-Le <a href="%sm=AN">compleanni</a>.<br>%x
+Le <a href="%sm=AN">compleanni</a>.<br>
+Gli <a href="%sm=AD">anniversari delle persone decedute</a>.<br>
+Gli <a href="%sm=AM">anniversari di matrimonio</a>.<br>%x
 Le <a href="%sm=LB;k=10">ultime nascite</a>.<br>
 Le <a href="%sm=LD;k=10">ultime morto</a>.<br>%x
-Gli <a href="%sm=AD">anniversari delle persone decedute</a>.<br>
-Gli <a href="%sm=AM">anniversari di matrimonio</a>.
 <p>
 Dal %d ci sono stati %q accessi, %c dei quali a questa pagina.
 
