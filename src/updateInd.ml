@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.1 1999-11-10 08:44:39 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.2 1999-11-10 10:39:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -480,6 +480,11 @@ value print_relation_type conf base r var =
              [ Some {r_type = GodParent} -> " selected" | _ -> "" ]);
           Wserver.wprint "%s\n"
             (capitale (relation_type_text conf GodParent 2));
+          Wserver.wprint "<option value=FosterParent%s>"
+            (match r with
+             [ Some {r_type = FosterParent} -> " selected" | _ -> "" ]);
+          Wserver.wprint "%s\n"
+            (capitale (relation_type_text conf FosterParent 2));
         end;
       end;
     end;

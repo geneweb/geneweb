@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.2 1999-11-10 08:44:40 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.3 1999-11-10 10:39:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -125,6 +125,7 @@ value reconstitute_relation conf var =
       | "Recognition" -> Recognition
       | "CandidateParent" -> CandidateParent
       | "GodParent" -> GodParent
+      | "FosterParent" -> FosterParent
       | _ -> Adoption ]
     in
     Some {r_type = r_type; r_fath = r_fath; r_moth = r_moth; r_sources = ""}

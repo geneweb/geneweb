@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.8 1999-11-10 08:44:42 ddr Exp $ *)
+(* $Id: util.ml,v 3.9 1999-11-10 10:39:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1237,7 +1237,9 @@ value relation_type_text conf t n =
   | CandidateParent ->
       transl_nth conf "candidate father/candidate mother/candidate parents" n
   | GodParent ->
-      transl_nth conf "godfather/godmother/godparents" n ]
+      transl_nth conf "godfather/godmother/godparents" n
+  | FosterParent ->
+      transl_nth conf "foster father/foster mother/foster parents" n ]
 ;
 
 value rchild_type_text conf t n =
@@ -1250,7 +1252,9 @@ value rchild_type_text conf t n =
   | CandidateParent ->
       transl_nth conf "candidate son/candidate daughter/candidate child" n
   | GodParent ->
-      transl_nth conf "godson/goddaughter/godchild" n ]
+      transl_nth conf "godson/goddaughter/godchild" n
+  | FosterParent ->
+      transl_nth conf "foster son/foster daughter/foster child" n ]
 ;
 
 value wprint_hidden pref name valu =
