@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.140 2002-12-16 13:30:49 ddr Exp $
+# $Id: lexicon.txt,v 4.141 2002-12-20 10:01:21 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -1522,7 +1522,7 @@ zh: ѕнƒк
     alias
 af: alias
 bg: именува се още
-ca: аlias
+ca: аlies
 cs: alias
 da: alias
 de: Alias
@@ -3563,7 +3563,7 @@ sv: f&ouml;rsta lediga nummer
     first name alias
 af: bynaam
 bg: друго собствено име
-ca: аlias del nom
+ca: аlies del nom
 cs: alias kшestnнho jmйna
 da: fornavns alias
 de: Vornamen-Alias
