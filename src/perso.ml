@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.67 2005-01-24 04:35:50 ddr Exp $ *)
+(* $Id: perso.ml,v 4.68 2005-01-24 13:14:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -829,7 +829,9 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
         string_with_macros conf False env (sou base p.notes)
       else ""
   | ["occupation"] ->
-      if p_auth then capitale (sou base p.occupation) else ""
+      if p_auth then
+        string_with_macros conf False [] (capitale (sou base p.occupation))
+      else ""
   | ["on_baptism_date"] ->
       match (p_auth, Adef.od_of_codate p.baptism) with
       [ (True, Some d) -> Date.string_of_ondate conf d
