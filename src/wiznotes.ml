@@ -1,9 +1,10 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.12 2004-05-24 15:11:39 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.13 2004-05-24 15:42:07 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
 open Util;
+open Def;
 
 value dir conf =
   Filename.concat (Util.base_path [] (conf.bname ^ ".gwb")) "wiznotes"
@@ -131,7 +132,8 @@ value print_main conf base wizfile =
 
 value print_wizard conf base wz =
   let title _ = Wserver.wprint "%s" wz in
-  let s = read_wizard_notes (wzfile (dir conf) wz) in
+  let wfile = wzfile (dir conf) wz in
+  let s = read_wizard_notes wfile in
   do {
     header conf title;
     print_link_to_welcome conf False;
@@ -143,6 +145,21 @@ value print_wizard conf base wz =
         end;
       end;
     end;
+    if Sys.file_exists wfile then
+      do {
+        html_p conf;
+        let tm =
+          let s = Unix.stat wfile in
+          Unix.localtime s.Unix.st_mtime
+        in
+        let dmy =
+          {day = tm.Unix.tm_mday; month = tm.Unix.tm_mon + 1;
+           year = 1900 + tm.Unix.tm_year; prec = Sure; delta = 0}
+        in
+        Wserver.wprint "<tt>(%s %02d:%02d)</tt>\n" (Date.code_dmy conf dmy)
+          tm.Unix.tm_hour tm.Unix.tm_min;
+      }
+    else ();
     if conf.wizard && conf.user = wz then
       do {
         html_p conf;
