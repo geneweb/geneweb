@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.36 1999-07-26 07:02:01 ddr Exp $ *)
+(* $Id: util.ml,v 2.37 1999-07-28 07:48:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1104,6 +1104,31 @@ value rchild_type_text conf t n =
       transl_nth conf "candidate son/candidate daughter/candidate child" n
   | GodParent ->
       transl_nth conf "godson/goddaughter/godchild" n ]
+;
+
+exception Ok;
+
+value has_nephews_or_nieces base p =
+  try
+    let a = aoi base p.cle_index in
+    match a.parents with
+    [ Some ifam ->
+        let fam = foi base ifam in
+        do Array.iter
+             (fun ip ->
+                if ip == p.cle_index then ()
+                else
+                  Array.iter
+                    (fun ifam ->
+                       if Array.length (foi base ifam).children > 0 then
+                         raise Ok
+                       else ())
+                    (poi base ip).family)
+             fam.children;
+        return False
+    | _ -> False ]
+  with
+  [ Ok -> True ]
 ;
 
 (* Deprecated *)

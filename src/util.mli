@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.20 1999-07-26 07:02:01 ddr Exp $ *)
+(* $Id: util.mli,v 2.21 1999-07-28 07:48:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -119,6 +119,8 @@ value only_printable : string -> string;
 
 value relation_type_text : config -> relation_type -> int -> string;
 value rchild_type_text : config -> relation_type -> int -> string;
+
+value has_nephews_or_nieces : base -> person -> bool;
 
 (* Deprecated *)
 value afficher_personne : config -> base -> person -> unit;

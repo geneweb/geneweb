@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 2.10 1999-07-26 14:07:17 ddr Exp $ *)
+(* $Id: cousins.ml,v 2.11 1999-07-28 07:48:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -127,9 +127,7 @@ value print_choice conf base p niveau_effectif =
       in
       boucle 1;
     end;
-    html_p conf;
-    Wserver.wprint "<input type=submit value=\"Ok\">";
-    html_br conf;
+    Wserver.wprint "<input type=submit value=\"Ok\">\n";
   end
 ;
 
@@ -283,7 +281,21 @@ value print_menu conf base p effective_level =
          (txt_fun raw_access conf base p))
   in
   do header conf title;
-     print_choice conf base p effective_level;
+     tag "ul" begin
+       html_li conf;
+       print_choice conf base p effective_level;
+       html_li conf;
+       Wserver.wprint "<a href=\"%s%s;m=C;v1=2;v2=1\">%s</a>\n"
+         (commd conf) (acces conf base p)
+         (capitale (transl conf "uncles and aunts"));
+       if has_nephews_or_nieces base p then
+         do html_li conf;
+            Wserver.wprint "<a href=\"%s%s;m=C;v1=1;v2=2\">%s</a>\n"
+              (commd conf) (acces conf base p)
+              (capitale (transl conf "nephews and nieces"));
+         return ()
+       else ();
+     end;
      trailer conf;
   return ()
 ;

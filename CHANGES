@@ -23,7 +23,7 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Jul 26, 99] In personal pages, added link to uncles and aunts, nephews
+  - [Jul 28, 99] In "cousins" pages, added link to uncles and aunts, nephews
     and nieces.
   - [Jul 26, 99] Added other relations: godparents, adoptive parents,
     recognizing parents, candidate parents.
