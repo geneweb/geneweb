@@ -67,11 +67,6 @@ GeneWeb version 4.01
   - [05 Apr 01] Fixed several Dutch phrases in lexicon (Herman Theys)
   - [26 Mar 01] (technical point) Grouped together all lang/*/start.txt in
     one only file lang/start.txt, easier to manipulate (at least for me!)
-  - [14 Mar 01] Added the ability to add "derived" languages,
-    i.e. languages where most of the phrases are the same than some other
-    already existing language, but with some changes here and there. In
-    the lexicon, one can write a line with "xx=yy" to indicate that, where
-    xx is the derived language and yy the initial language.
   - [14 Mar 01] Changed the French translation of "nth cousin":
     indeed, in French, the "nth cousin" is translated, litterally, by
     "cousin of the pth degree" where "p" is "n+1": e.g. a "4th cousin" is

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.3 2001-04-05 13:59:42 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.4 2001-04-05 18:07:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -361,17 +361,22 @@ value inline_translate conf base ic =
       else loop (Lbuff.store len c) (input_char ic)
   in
   let lang = conf.lang ^ ":" in
-  loop None True 0 where rec loop en_version bol i =
+  let derived_lang =
+    match Gutil.lindex lang '-' with
+    [ Some i -> String.sub lang 0 i ^ ":"
+    | _ -> "" ]
+  in
+  loop None True 0 where rec loop alt_version bol i =
     if i = String.length s then
-      match en_version with
-      [ Some "" -> ""
-      | Some s -> "[" ^ s ^ "]"
+      match alt_version with
+      [ Some s -> s
       | None -> ".........." ]
     else if bol then
       match skip_lang s i with
       [ Some j when s.[j] = ':' ->
           let curr_lang = String.sub s i (j + 1 - i) in
-          if curr_lang = lang || curr_lang = "en:" then
+          if curr_lang = lang || curr_lang = derived_lang
+          || curr_lang = "en:" then
             let (s, i) =
               let j = if s.[j+1] = ' ' then j + 1 else j in
               loop 0 (j + 1) where rec loop len j =
@@ -389,10 +394,17 @@ value inline_translate conf base ic =
                   loop (Lbuff.mstore len (macro conf base s.[j+1])) (j + 2)
                 else loop (Lbuff.store len s.[j]) (j + 1)
             in
-            if curr_lang = lang then s else loop (Some s) True i
-          else loop en_version (s.[i] = '\n') (i + 1)
-      | _ -> loop en_version (s.[i] = '\n') (i + 1) ]
-    else loop en_version (s.[i] = '\n') (i + 1)
+            if curr_lang = lang then s
+            else
+              let alt_version =
+                if curr_lang = derived_lang then Some s
+                else if alt_version = None then Some ("[" ^ s ^ "]")
+                else alt_version
+              in
+              loop alt_version True i
+          else loop alt_version (s.[i] = '\n') (i + 1)
+      | _ -> loop alt_version (s.[i] = '\n') (i + 1) ]
+    else loop alt_version (s.[i] = '\n') (i + 1)
 ;
 
 value src_translate conf base nomin ic =
