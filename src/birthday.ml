@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.4 2000-01-05 12:58:15 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.5 2000-01-08 14:58:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -320,7 +320,7 @@ value print_marriage_day conf base day_name verb wd dt list =
 ;
 
 value match_dates conf base p d1 d2 =
-  (* to programmer: dont factorize "age_autorise": it is slow *)
+  (* dont factorize "age_autorise": it is slow *)
   if d1.day == d2.day && d1.month == d2.month then
     age_autorise conf base p
   else if d1.day == 29 && d1.month == 2 && d2.day == 1 && d2.month = 3 &&
