@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.16 2000-11-10 15:14:05 ddr Exp $
+# $Id: geneweb.spec,v 3.17 2000-11-11 10:26:08 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -83,23 +83,10 @@ make distrib
 %install
 mkdir -p $RPM_BUILD_ROOT/home/geneweb
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc0.d
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc1.d
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc2.d
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc3.d
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc4.d
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc5.d
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/rc6.d
 mkdir -p $RPM_BUILD_ROOT/etc/logrotate.d
 cp -r distribution $RPM_BUILD_ROOT/home/geneweb/gw
 cp rpm/geneweb-initrc.sh $RPM_BUILD_ROOT/etc/rc.d/init.d/gwd
 cp rpm/geneweb-logrotate $RPM_BUILD_ROOT/etc/logrotate.d/gwd
-ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc0.d/K01gwd
-ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc1.d/K01gwd
-ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc2.d/S99gwd
-ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc3.d/S99gwd
-ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc5.d/S99gwd
-ln -s ../init.d/gwd $RPM_BUILD_ROOT/etc/rc.d/rc6.d/K01gwd
 
 # %clean: after installing, how to clean up.  (The files are all
 # in the .rpm archive by now.  Need to remove them before we
@@ -120,6 +107,7 @@ chmod a+rx /home/geneweb
 %post
 # Sure, all the files are already owned by geneweb, but the directories ain't.
 chown -R geneweb.geneweb /home/geneweb/gw
+chkconfig --add gwd
 /etc/rc.d/init.d/gwd start
 
 # *********** UNINSTALLING .RPM *************
@@ -128,6 +116,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 # script.  I use them to stop the service & remove the pseudouser.
 %preun
 /etc/rc.d/init.d/gwd stop
+chkconfig --del gwd
 (
   cd /home/geneweb/gw/gw
   set *.gwb
@@ -184,12 +173,6 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/consang
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwtp_tmp/gwtp
 %attr(755, root, root) /etc/rc.d/init.d/gwd
-%attr(755, root, root) /etc/rc.d/rc0.d/K01gwd
-%attr(755, root, root) /etc/rc.d/rc1.d/K01gwd
-%attr(755, root, root) /etc/rc.d/rc2.d/S99gwd
-%attr(755, root, root) /etc/rc.d/rc3.d/S99gwd
-%attr(755, root, root) /etc/rc.d/rc5.d/S99gwd
-%attr(755, root, root) /etc/rc.d/rc6.d/K01gwd
 %attr(644, root, root) /etc/logrotate.d/gwd
 /home/geneweb/gw/LICENSE.txt
 /home/geneweb/gw/LISEZMOI.htm
@@ -216,6 +199,9 @@ chown -R geneweb.geneweb /home/geneweb/gw
 #%doc doc/*
 
 %changelog
+* Sat Nov 10 2000 Daniel de Rauglaudre
+- Used chkconfig (Eddie Bindt's hint)
+
 * Thu Nov  9 2000 Ludovic Ledieu
 - Simplified files list (a directory includes its contents). It's thus easier
   to maintain the list.

@@ -1,4 +1,5 @@
 #!/bin/sh
+# chkconfig: 345 99 01
 #
 # gwd:       Starts the genealogy Server
 #
