@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.37 2000-06-19 22:23:22 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.38 2000-07-12 13:21:45 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -164,13 +164,6 @@ value print_choice conf base p niveau_effectif =
       end;
     end;
   end
-;
-
-value rec list_remove_assoc x =
-  fun
-  [ [] -> []
-  | [((a, b) as pair) :: l] ->
-      if a = x then l else [pair :: list_remove_assoc x l] ]
 ;
 
 value afficher_menu_ascendants conf base p =
