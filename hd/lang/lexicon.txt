@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.12 2001-03-27 04:43:00 ddr Exp $
+# $Id: lexicon.txt,v 4.13 2001-04-04 17:43:20 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -2684,6 +2684,7 @@ ct: visualitzar per seccions/llargada de la secciף/encavalcament/llargada total
 de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
 dk: vis ved delte sider/sidebredde/overlapning/total bredde
 en: display by slices/slice width/overlap/total width
+es: editar por sector/ancho/superpuesto/ancho total
 et: kuva osadena/osa laius/ülekate/kogulaius
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
 he:  הצג רצועות  / רוחב רצועות  / חפיפה / ס"ה רוחב
@@ -2743,6 +2744,7 @@ ct: no reagrupar les branques comunes
 de: gemeinsame Zweige nicht zusammenfassen
 dk: sl&aring; ikke f&aelig;lles anelinier sammen
 en: don't group the common branches together
+es: no agrupar las ramas comunes
 et: הra grupeeri ühiseid harusid
 fr: ne pas regrouper les branches communes
 he:  לא לשלב ענפי משפחה משותפים
@@ -4845,6 +4847,7 @@ ct: no verificar els sexes
 de: keine Kontrolle des Geschlechts
 dk: ingen verificering af k&oslash;nnene
 en: no sexes check
+es: sin comprobacion de sexo
 et: הra kontrolli sugude sobivust
 fr: pas de v&eacute;rification des sexes
 he:  בלי לוודא מין
