@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.1 2001-04-12 08:49:53 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.2 2001-04-18 13:27:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -79,8 +79,7 @@ value magic_gwb = "GnWb001y";
 
 value verbose = ref True;
 value trace s =
-  if verbose.val then
-    do Printf.eprintf "*** %s\n" s; flush stderr; return ()
+  if verbose.val then do { Printf.eprintf "*** %s\n" s; flush stderr }
   else ()
 ;
 
@@ -91,18 +90,15 @@ value output_value_no_sharing oc v =
   Marshal.to_channel oc v [Marshal.No_sharing]
 ;
 
-value array_header_size arr =
-  if Array.length arr < 8 then 1 else 5
-;
+value array_header_size arr = if Array.length arr < 8 then 1 else 5;
 
 value output_array_access oc arr pos =
-  let rec loop pos i =
+  loop (pos + output_value_header_size + array_header_size arr) 0 where rec
+    loop pos i =
     if i == Array.length arr then pos
-    else
-      do output_binary_int oc pos; return
-      loop (pos + Iovalue.size arr.(i)) (i + 1)
-  in
-  loop (pos + output_value_header_size + array_header_size arr) 0
+    else do {
+      output_binary_int oc pos; loop (pos + Iovalue.size arr.(i)) (i + 1)
+    }
 ;
 
 (* Search index of a given string in file strings.inx *)
@@ -126,15 +122,19 @@ value index_of_string strings ic start_pos hash_len string_patches s =
   try Adef.istr_of_int (list_right_assoc s string_patches.val) with
   [ Not_found ->
       let ia = Hashtbl.hash s mod hash_len in
-      do seek_in ic (start_pos + ia * int_size); return
-      let i1 = input_binary_int ic in
-      loop i1 where rec loop i =
-        if i == -1 then raise Not_found
-        else
-          if strings.get i = s then Adef.istr_of_int i
-          else
-            do seek_in ic (start_pos + (hash_len + i) * int_size);
-            return loop (input_binary_int ic) ]
+      do {
+        seek_in ic (start_pos + ia * int_size);
+        let i1 = input_binary_int ic in
+        let rec loop i =
+          if i == -1 then raise Not_found
+          else if strings.get i = s then Adef.istr_of_int i
+          else do {
+            seek_in ic (start_pos + (hash_len + i) * int_size);
+            loop (input_binary_int ic)
+          }
+        in
+        loop i1
+      } ]
 ;
 
 (* Search index of a given surname or given first name in file strings.inx *)
@@ -154,7 +154,7 @@ value initial s =
     if i == String.length s then 0
     else
       match s.[i] with
-      [ 'A'..'Z' | 'À'.. 'Ý' -> i
+      [ 'A'..'Z' | 'À'..'Ý' -> i
       | _ -> loop (succ i) ]
 ;
 
@@ -182,19 +182,14 @@ value compare_names s1 s2 =
       else
         let c1 = unaccent (Char.lowercase s1.[i1]) in
         let c2 = unaccent (Char.lowercase s2.[i2]) in
-(*
-        if Char.code c1 > 127 then loop (i1 + 1) i2
-        else if Char.code c2 > 127 then loop i1 (i2 + 1)
-        else
-*)
-          match (c1, c2) with
-          [ ('a'..'z', 'a'..'z') ->
-              if c1 < c2 then -1
-              else if c1 > c2 then 1
-              else loop (i1 + 1) (i2 + 1)
-          | ('a'..'z', _) -> 1
-          | (_, 'a'..'z') -> -1
-          | _ -> loop (i1 + 1) (i2 + 1) ]
+        match (c1, c2) with
+        [ ('a'..'z', 'a'..'z') ->
+            if c1 < c2 then -1
+            else if c1 > c2 then 1
+            else loop (i1 + 1) (i2 + 1)
+        | ('a'..'z', _) -> 1
+        | (_, 'a'..'z') -> -1
+        | _ -> loop (i1 + 1) (i2 + 1) ]
   in
   if s1 = s2 then 0
   else
@@ -233,29 +228,31 @@ value persons_of_first_name_or_surname base_data strings params =
       match btr.val with
       [ Some bt -> bt
       | None ->
-          do seek_in ic2 start_pos; return
-          let bt : IstrTree.t (list iper) = input_value ic2 in
-          let bt =
-            List.fold_left
-              (fun bt (i, p) ->
-                 let istr = proj p in
-                 let ipera =
-                   try IstrTree.find istr bt with
-                   [ Not_found -> [] ]
-                 in
-                 if List.memq p.cle_index ipera then bt
-                 else IstrTree.add istr [p.cle_index :: ipera] bt)
-              bt person_patches.val
-          in
-          do btr.val := Some bt; return bt ]
+          do {
+            seek_in ic2 start_pos;
+            let bt : IstrTree.t (list iper) = input_value ic2 in
+            let bt =
+              List.fold_left
+                (fun bt (i, p) ->
+                   let istr = proj p in
+                   let ipera =
+                     try IstrTree.find istr bt with [ Not_found -> [] ]
+                   in
+                   if List.memq p.cle_index ipera then bt
+                   else IstrTree.add istr [p.cle_index :: ipera] bt)
+                bt person_patches.val
+            in
+            btr.val := Some bt;
+            bt
+          } ]
   in
   let check_patches istr ipl =
     List.fold_left
       (fun ipl (i, p) ->
          if List.memq (Adef.iper_of_int i) ipl then
-           if compare_istr_fun base_data istr p.first_name == 0
-           || compare_istr_fun base_data istr p.surname == 0
-           then ipl
+           if compare_istr_fun base_data istr p.first_name == 0 ||
+              compare_istr_fun base_data istr p.surname == 0 then
+             ipl
            else list_remove_elemq (Adef.iper_of_int i) ipl
          else ipl)
       ipl person_patches.val
@@ -269,7 +266,7 @@ value persons_of_first_name_or_surname base_data strings params =
       (fun key -> compare_names str (strings.get (Adef.int_of_istr key)))
       (bt ())
   in
-  let next key = IstrTree.next key (bt ()) in  
+  let next key = IstrTree.next key (bt ()) in
   {find = find; cursor = cursor; next = next}
 ;
 
@@ -286,16 +283,20 @@ value persons_of_name bname patches =
       [ Some a -> a
       | None ->
           let ic_inx = open_in_bin (Filename.concat bname "names.inx") in
-          do seek_in ic_inx int_size; return
-          let a = (input_value ic_inx : name_index_data) in
-          do close_in ic_inx; t.val := Some a; return a ]
+          do {
+            seek_in ic_inx int_size;
+            let a : name_index_data = input_value ic_inx in
+            close_in ic_inx;
+            t.val := Some a;
+            a
+          } ]
     in
     let i = Hashtbl.hash s in
     match patches.val with
-    [ [] -> Array.to_list a.(i mod (Array.length a))
+    [ [] -> Array.to_list a.(i mod Array.length a)
     | pl ->
         let l = try List.assoc i patches.val with [ Not_found -> [] ] in
-        l @ Array.to_list a.(i mod (Array.length a)) ]
+        l @ Array.to_list a.(i mod Array.length a) ]
 ;
 
 type strings_of_fsname = array (array istr);
@@ -310,12 +311,16 @@ value strings_of_fsname bname strings person_patches =
       | None ->
           let ic_inx = open_in_bin (Filename.concat bname "names.inx") in
           let pos = input_binary_int ic_inx in
-          do seek_in ic_inx pos; return
-          let a = (input_value ic_inx : strings_of_fsname) in
-          do close_in ic_inx; t.val := Some a; return a ]
+          do {
+            seek_in ic_inx pos;
+            let a : strings_of_fsname = input_value ic_inx in
+            close_in ic_inx;
+            t.val := Some a;
+            a
+          } ]
     in
     let i = Hashtbl.hash s in
-    let r = a.(i mod (Array.length a)) in
+    let r = a.(i mod Array.length a) in
     match person_patches.val with
     [ [] -> Array.to_list r
     | _ ->
@@ -335,7 +340,8 @@ value strings_of_fsname bname strings person_patches =
                    let s1 = nominative s1 in
                    if s = Name.crush_lower s1 then [p.surname :: l] else l
                  else l
-               in l)
+               in
+               l)
             (Array.to_list r) person_patches.val
         in
         l ]
@@ -354,15 +360,18 @@ value lock_file bname =
 
 value apply_patches tab plist plen =
   if plist = [] then tab
-  else
+  else do {
     let new_tab =
-      if plen > Array.length tab then
+      if plen > Array.length tab then do {
         let new_tab = Array.create plen (Obj.magic 0) in
-        do Array.blit tab 0 new_tab 0 (Array.length tab); return
+        Array.blit tab 0 new_tab 0 (Array.length tab);
         new_tab
+      }
       else tab
     in
-    do List.iter (fun (i, v) -> new_tab.(i) := v) plist; return new_tab
+    List.iter (fun (i, v) -> new_tab.(i) := v) plist;
+    new_tab
+  }
 ;
 
 value rec patch_len len =
@@ -385,13 +394,15 @@ type patches =
 value check_magic =
   let b = String.create (String.length magic_gwb) in
   fun ic ->
-    do really_input ic b 0 (String.length b); return
-    if b <> magic_gwb then
-      if String.sub magic_gwb 0 4 = String.sub b 0 4 then
-        failwith "this is a GeneWeb base, but not compatible"
-      else
-        failwith "this is not a GeneWeb base, or it is a very old version"
-    else ()
+    do {
+      really_input ic b 0 (String.length b);
+      if b <> magic_gwb then
+        if String.sub magic_gwb 0 4 = String.sub b 0 4 then
+          failwith "this is a GeneWeb base, but not compatible"
+        else
+          failwith "this is not a GeneWeb base, or it is a very old version"
+      else ()
+    }
 ;
 
 value make_cache ic ic_acc shift array_pos patches len name =
@@ -399,16 +410,28 @@ value make_cache ic ic_acc shift array_pos patches len name =
   let cleared = ref False in
   let r =
     {array = fun []; get = fun []; len = patch_len len patches.val;
-     clear_array = fun _ -> do cleared.val := True; return tab.val := None}
+     clear_array = fun _ -> do { cleared.val := True; tab.val := None }}
   in
   let array () =
     match tab.val with
     [ Some x -> x
     | None ->
-do ifdef UNIX then if verbose.val then do Printf.eprintf "*** read %s%s\n" name (if cleared.val then " (again)" else ""); flush stderr; return () else () else (); return
-        do seek_in ic array_pos; return
-        let t = apply_patches (input_value ic) patches.val r.len in
-        do tab.val := Some t; return t ]
+        do {
+          ifdef UNIX then
+            if verbose.val then do {
+              Printf.eprintf "*** read %s%s\n" name
+                (if cleared.val then " (again)" else "");
+              flush stderr;
+            }
+            else ()
+          else ();
+          do {
+            seek_in ic array_pos;
+            let t = apply_patches (input_value ic) patches.val r.len in
+            tab.val := Some t;
+            t
+          }
+        } ]
   in
   let gen_get i =
     if tab.val <> None then (r.array ()).(i)
@@ -417,13 +440,14 @@ do ifdef UNIX then if verbose.val then do Printf.eprintf "*** read %s%s\n" name 
       [ Not_found ->
           if i < 0 || i >= len then
             failwith ("access " ^ name ^ " out of bounds")
-          else
-            do seek_in ic_acc (shift + Iovalue.sizeof_long * i); return
+          else do {
+            seek_in ic_acc (shift + Iovalue.sizeof_long * i);
             let pos = input_binary_int ic_acc in
-            do seek_in ic pos; return
-            Iovalue.input ic ]
+            seek_in ic pos;
+            Iovalue.input ic
+          } ]
   in
-  do r.array := array; r.get := gen_get; return r
+  do { r.array := array; r.get := gen_get; r }
 ;
 
 value make_cached ic ic_acc shift array_pos patches len cache_htab name =
@@ -436,10 +460,20 @@ value make_cached ic ic_acc shift array_pos patches len cache_htab name =
     match tab.val with
     [ Some x -> x
     | None ->
-do ifdef UNIX then if verbose.val then do Printf.eprintf "*** read %s\n" name; flush stderr; return () else () else (); return
-        do seek_in ic array_pos; return
-        let t = apply_patches (input_value ic) patches.val r.len in
-        do tab.val := Some t; return t ]
+        do {
+          ifdef UNIX then
+            if verbose.val then do {
+              Printf.eprintf "*** read %s\n" name; flush stderr;
+            }
+            else ()
+          else ();
+          do {
+            seek_in ic array_pos;
+            let t = apply_patches (input_value ic) patches.val r.len in
+            tab.val := Some t;
+            t
+          }
+        } ]
   in
   let gen_get i =
     if tab.val <> None then (r.array ()).(i)
@@ -451,15 +485,16 @@ do ifdef UNIX then if verbose.val then do Printf.eprintf "*** read %s\n" name; f
             [ Not_found ->
                 if i < 0 || i >= len then
                   failwith ("access " ^ name ^ " out of bounds")
-                else
-                  do seek_in ic_acc (shift + Iovalue.sizeof_long * i); return
+                else do {
+                  seek_in ic_acc (shift + Iovalue.sizeof_long * i);
                   let pos = input_binary_int ic_acc in
-                  do seek_in ic pos; return
-                  Iovalue.input ic ]
+                  seek_in ic pos;
+                  Iovalue.input ic
+                } ]
           in
-          do Hashtbl.add cache_htab i r; return r ]
+          do { Hashtbl.add cache_htab i r; r } ]
   in
-  do r.array := array; r.get := gen_get; return r
+  do { r.array := array; r.get := gen_get; r }
 ;
 
 value is_restricted bname cleanup_ref =
@@ -474,45 +509,45 @@ value is_restricted bname cleanup_ref =
             match try Some (open_in fname) with [ Sys_error _ -> None ] with
             [ Some ic ->
                 let cleanup = cleanup_ref.val in
-                do cleanup_ref.val :=
-                     fun () -> do close_in ic; return cleanup ();
-                return Some ic
+                do {
+                  cleanup_ref.val := fun () -> do { close_in ic; cleanup () };
+                  Some ic
+                }
             | None -> None ]
           in
-          do ic_opt_opt.val := Some ic_opt; return ic_opt ]
+          do { ic_opt_opt.val := Some ic_opt; ic_opt } ]
     in
     match ic_opt with
     [ Some ic ->
         try
           let c =
-            do seek_in ic
+            do {
+              seek_in ic
                 (output_value_header_size + 1 + Iovalue.sizeof_long +
-                 Adef.int_of_iper ip);
-            return input_char ic
+                   Adef.int_of_iper ip);
+              input_char ic
+            }
           in
-          let v = Iovalue.input_int ic (* can raise Not_found *) in
+          let v = Iovalue.input_int ic in
           if v = 0 then Left False
           else if v = 1 then Left True
           else raise Not_found
         with
         [ End_of_file -> Right True
         | Not_found ->
-            do Printf.eprintf "bad bool\n"; flush stderr; return Left False ]
+            do { Printf.eprintf "bad bool\n"; flush stderr; Left False } ]
     | None -> Right False ]
 ;
 
 value input bname =
   let bname =
-    if Filename.check_suffix bname ".gwb" then bname
-    else bname ^ ".gwb"
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
   let patches =
     match
       try Some (open_in_bin (Filename.concat bname "patches")) with _ -> None
     with
-    [ Some ic ->
-        let p = input_value ic in
-        do close_in ic; return p
+    [ Some ic -> let p = input_value ic in do { close_in ic; p }
     | None ->
         {p_person = ref []; p_ascend = ref []; p_union = ref [];
          p_family = ref []; p_couple = ref []; p_descend = ref [];
@@ -520,7 +555,7 @@ value input bname =
   in
   let ic =
     let ic = open_in_bin (Filename.concat bname "base") in
-    do check_magic ic; return ic
+    do { check_magic ic; ic }
   in
   let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
   let ic2 = open_in_bin (Filename.concat bname "strings.inx") in
@@ -576,71 +611,78 @@ value input bname =
       strings_cache "strings"
   in
   let cleanup_ref =
-    ref (fun () -> do close_in ic; close_in ic_acc; close_in ic2; return ())
+    ref (fun () -> do { close_in ic; close_in ic_acc; close_in ic2; })
   in
   let cleanup () = cleanup_ref.val () in
   let commit_patches () =
     let fname = Filename.concat bname "patches" in
-    do try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
-       try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
-    return
-    let oc9 = open_out_bin fname in
-    do output_value_no_sharing oc9 patches;
-       close_out oc9;
-    return ()
+    do {
+      try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
+      try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
+      let oc9 = open_out_bin fname in
+      output_value_no_sharing oc9 patches;
+      close_out oc9;
+    }
   in
   let patched_ascends () =
     List.map (fun (i, _) -> Adef.iper_of_int i) patches.p_ascend.val
   in
   let patch_person i p =
     let i = Adef.int_of_iper i in
-    do persons.len := max persons.len (i + 1);
-       patches.p_person.val :=
-         [(i, p) :: List.remove_assoc i patches.p_person.val];
-    return ()
+    do {
+      persons.len := max persons.len (i + 1);
+      patches.p_person.val :=
+        [(i, p) :: List.remove_assoc i patches.p_person.val];
+    }
   in
   let patch_ascend i a =
     let i = Adef.int_of_iper i in
-    do ascends.len := max ascends.len (i + 1);
-       patches.p_ascend.val :=
-         [(i, a) :: List.remove_assoc i patches.p_ascend.val];
-    return ()
+    do {
+      ascends.len := max ascends.len (i + 1);
+      patches.p_ascend.val :=
+        [(i, a) :: List.remove_assoc i patches.p_ascend.val];
+    }
   in
   let patch_union i a =
     let i = Adef.int_of_iper i in
-    do unions.len := max unions.len (i + 1);
-       patches.p_union.val :=
-         [(i, a) :: List.remove_assoc i patches.p_union.val];
-    return ()
+    do {
+      unions.len := max unions.len (i + 1);
+      patches.p_union.val :=
+        [(i, a) :: List.remove_assoc i patches.p_union.val];
+    }
   in
   let patch_family i f =
     let i = Adef.int_of_ifam i in
-    do families.len := max families.len (i + 1);
-       patches.p_family.val :=
-         [(i, f) :: List.remove_assoc i patches.p_family.val];
-    return ()
+    do {
+      families.len := max families.len (i + 1);
+      patches.p_family.val :=
+        [(i, f) :: List.remove_assoc i patches.p_family.val];
+    }
   in
   let patch_couple i c =
     let i = Adef.int_of_ifam i in
-    do couples.len := max couples.len (i + 1);
-       patches.p_couple.val :=
-         [(i, c) :: List.remove_assoc i patches.p_couple.val];
-    return ()
+    do {
+      couples.len := max couples.len (i + 1);
+      patches.p_couple.val :=
+        [(i, c) :: List.remove_assoc i patches.p_couple.val];
+    }
   in
   let patch_descend i c =
     let i = Adef.int_of_ifam i in
-    do descends.len := max descends.len (i + 1);
-       patches.p_descend.val :=
-         [(i, c) :: List.remove_assoc i patches.p_descend.val];
-    return ()
+    do {
+      descends.len := max descends.len (i + 1);
+      patches.p_descend.val :=
+        [(i, c) :: List.remove_assoc i patches.p_descend.val];
+    }
   in
   let patch_string i s =
     let i = Adef.int_of_istr i in
-    do strings.len := max strings.len (i + 1);
-       patches.p_string.val :=
-         [(i, s) :: List.remove_assoc i patches.p_string.val];
-       Hashtbl.add strings_cache i s;
-    return ()
+    do {
+      strings.len := max strings.len (i + 1);
+      patches.p_string.val :=
+        [(i, s) :: List.remove_assoc i patches.p_string.val];
+      Hashtbl.add strings_cache i s;
+    }
   in
   let patch_name s ip =
     let s = Name.crush_lower s in
@@ -663,38 +705,34 @@ value input bname =
     with
     [ Some ic ->
         let len = ref 0 in
-        do try
-             while mlen = 0 || len.val < mlen do
-               len.val := Buff.store len.val (input_char ic);
-             done
-           with
-           [ End_of_file -> () ];
-           close_in ic;
-        return Buff.get len.val
+        do {
+          try
+            while mlen = 0 || len.val < mlen do {
+              len.val := Buff.store len.val (input_char ic)
+            }
+          with
+          [ End_of_file -> () ];
+          close_in ic;
+          Buff.get len.val
+        }
     | None -> "" ]
   in
   let commit_notes s =
     let fname = Filename.concat bname "notes" in
-    do try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
-       try Sys.rename fname (fname ^ "~") with _ -> ();
-    return
-    if s = "" then ()
-    else
-      let oc = open_out fname in
-      do output_string oc s;
-         close_out oc;
-      return ()
+    do {
+      try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
+      try Sys.rename fname (fname ^ "~") with _ -> ();
+      if s = "" then ()
+      else do {
+        let oc = open_out fname in output_string oc s; close_out oc; ()
+      }
+    }
   in
   let bnotes = {nread = read_notes; norigin_file = norigin_file} in
   let base_data =
-    {persons = persons;
-     ascends = ascends;
-     unions = unions;
-     families = families;
-     couples = couples;
-     descends = descends;
-     strings = strings;
-     bnotes = bnotes}
+    {persons = persons; ascends = ascends; unions = unions;
+     families = families; couples = couples; descends = descends;
+     strings = strings; bnotes = bnotes}
   in
   let base_func =
     {persons_of_name = persons_of_name bname patches.p_name;
@@ -711,18 +749,12 @@ value input bname =
          (ic2, ic2_first_name_start_pos, fun p -> p.first_name,
           patches.p_person, "first_name");
      is_restricted = is_restricted bname cleanup_ref;
-     patch_person = patch_person;
-     patch_ascend = patch_ascend;
-     patch_union = patch_union;
-     patch_family = patch_family;
-     patch_couple = patch_couple;
-     patch_descend = patch_descend;
-     patch_string = patch_string;
-     patch_name = patch_name;
-     patched_ascends = patched_ascends;
-     commit_patches = commit_patches;
-     commit_notes = commit_notes;
-     cleanup = cleanup}
+     patch_person = patch_person; patch_ascend = patch_ascend;
+     patch_union = patch_union; patch_family = patch_family;
+     patch_couple = patch_couple; patch_descend = patch_descend;
+     patch_string = patch_string; patch_name = patch_name;
+     patched_ascends = patched_ascends; commit_patches = commit_patches;
+     commit_notes = commit_notes; cleanup = cleanup}
   in
   {data = base_data; func = base_func}
 ;
@@ -731,14 +763,10 @@ value input bname =
 
 value is_prime a =
   loop 2 where rec loop b =
-    if a / b < b then True
-    else if a mod b == 0 then False
-    else loop (b + 1)
+    if a / b < b then True else if a mod b == 0 then False else loop (b + 1)
 ;
 
-value rec prime_after n =
-  if is_prime n then n else prime_after (n + 1)
-;
+value rec prime_after n = if is_prime n then n else prime_after (n + 1);
 
 value output_strings_hash oc2 base =
   let strings_array = base.data.strings.array () in
@@ -746,23 +774,24 @@ value output_strings_hash oc2 base =
     Array.create (prime_after (max 2 (10 * Array.length strings_array))) (-1)
   in
   let tabl = Array.create (Array.length strings_array) (-1) in
-  do for i = 0 to Array.length strings_array - 1 do
-       let ia = Hashtbl.hash (strings_array.(i)) mod (Array.length taba) in
-       do tabl.(i) := taba.(ia);
-          taba.(ia) := i;
-       return ();
-     done;
-  return
-  do output_binary_int oc2 (Array.length taba);
-     output_binary_int oc2 0;
-     output_binary_int oc2 0;
-     for i = 0 to Array.length taba - 1 do
-       output_binary_int oc2 taba.(i);
-     done;
-     for i = 0 to Array.length tabl - 1 do
-       output_binary_int oc2 tabl.(i);
-     done;
-  return ()
+  do {
+    for i = 0 to Array.length strings_array - 1 do {
+      let ia = Hashtbl.hash strings_array.(i) mod Array.length taba in
+      tabl.(i) := taba.(ia);
+      taba.(ia) := i;
+    };
+    do {
+      output_binary_int oc2 (Array.length taba);
+      output_binary_int oc2 0;
+      output_binary_int oc2 0;
+      for i = 0 to Array.length taba - 1 do {
+        output_binary_int oc2 taba.(i)
+      };
+      for i = 0 to Array.length tabl - 1 do {
+        output_binary_int oc2 tabl.(i)
+      };
+    }
+  }
 ;
 
 value output_surname_index oc2 base =
@@ -771,16 +800,14 @@ value output_surname_index oc2 base =
       (struct type t = istr; value compare = compare_istr_fun base.data; end)
   in
   let bt = ref IstrTree.empty in
-  do for i = 0 to base.data.persons.len - 1 do
-       let p = base.data.persons.get i in
-       let a =
-         try IstrTree.find p.surname bt.val with
-         [ Not_found -> [] ]
-       in
-       bt.val := IstrTree.add p.surname [p.cle_index :: a] bt.val;
-     done;
-     output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
-  return ()
+  do {
+    for i = 0 to base.data.persons.len - 1 do {
+      let p = base.data.persons.get i in
+      let a = try IstrTree.find p.surname bt.val with [ Not_found -> [] ] in
+      bt.val := IstrTree.add p.surname [p.cle_index :: a] bt.val
+    };
+    output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
+  }
 ;
 
 value output_first_name_index oc2 base =
@@ -789,16 +816,16 @@ value output_first_name_index oc2 base =
       (struct type t = istr; value compare = compare_istr_fun base.data; end)
   in
   let bt = ref IstrTree.empty in
-  do for i = 0 to base.data.persons.len - 1 do
-       let p = base.data.persons.get i in
-       let a =
-         try IstrTree.find p.first_name bt.val with
-         [ Not_found -> [] ]
-       in
-       bt.val := IstrTree.add p.first_name [p.cle_index :: a] bt.val;
-     done;
-     output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
-  return ()
+  do {
+    for i = 0 to base.data.persons.len - 1 do {
+      let p = base.data.persons.get i in
+      let a =
+        try IstrTree.find p.first_name bt.val with [ Not_found -> [] ]
+      in
+      bt.val := IstrTree.add p.first_name [p.cle_index :: a] bt.val
+    };
+    output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
+  }
 ;
 
 value table_size = 0x3fff;
@@ -806,28 +833,30 @@ value make_name_index base =
   let t = Array.create table_size [| |] in
   let a = base.data.persons.array () in
   let add_name key valu =
-    let i = Hashtbl.hash (Name.crush (Name.abbrev key)) mod (Array.length t) in
+    let i = Hashtbl.hash (Name.crush (Name.abbrev key)) mod Array.length t in
     if array_memq valu t.(i) then ()
     else t.(i) := Array.append [| valu |] t.(i)
   in
   let rec add_names ip =
     fun
     [ [] -> ()
-    | [n :: nl] -> do add_name n ip; return add_names ip nl ]
+    | [n :: nl] -> do { add_name n ip; add_names ip nl } ]
   in
-  do for i = 0 to Array.length a - 1 do
-       let p = base.data.persons.get i in
-       let first_name = p_first_name base p in
-       let surname = p_surname base p in
-       if first_name <> "?" && surname <> "?" then
-         let names =
-           [Name.lower (first_name ^ " " ^ surname) ::
-            person_misc_names base p]
-         in
-         add_names p.cle_index names
-       else ();       
-     done;
-  return t
+  do {
+    for i = 0 to Array.length a - 1 do {
+      let p = base.data.persons.get i in
+      let first_name = p_first_name base p in
+      let surname = p_surname base p in
+      if first_name <> "?" && surname <> "?" then
+        let names =
+          [Name.lower (first_name ^ " " ^ surname) ::
+           person_misc_names base p]
+        in
+        add_names p.cle_index names
+      else ()
+    };
+    t
+  }
 ;
 
 value create_name_index oc_inx base =
@@ -836,29 +865,29 @@ value create_name_index oc_inx base =
 ;
 
 value add_name t key valu =
-  let i = Hashtbl.hash (Name.crush_lower key) mod (Array.length t) in
-  if array_memq valu t.(i) then ()
-  else t.(i) := Array.append [| valu |] t.(i)
+  let i = Hashtbl.hash (Name.crush_lower key) mod Array.length t in
+  if array_memq valu t.(i) then () else t.(i) := Array.append [| valu |] t.(i)
 ;
 
 value make_strings_of_fsname base =
-  let t = Array.create table_size [||] in
+  let t = Array.create table_size [| |] in
   let a = base.data.persons.array () in
-  do for i = 0 to Array.length a - 1 do
-       let p = base.data.persons.get i in
-       let first_name = p_first_name base p in
-       let surname = p_surname base p in
-       do if first_name <> "?" then add_name t first_name p.first_name
-          else ();
-          if surname <> "?" then
-            do add_name t surname p.surname;
-               List.iter (fun sp -> add_name t sp p.surname)
-                 (surnames_pieces surname);
-            return ()
-          else ();
-       return ();
-     done;
-  return t
+  do {
+    for i = 0 to Array.length a - 1 do {
+      let p = base.data.persons.get i in
+      let first_name = p_first_name base p in
+      let surname = p_surname base p in
+      if first_name <> "?" then add_name t first_name p.first_name else ();
+      if surname <> "?" then do {
+        add_name t surname p.surname;
+        List.iter (fun sp -> add_name t sp p.surname)
+          (surnames_pieces surname);
+      }
+      else ();
+      ()
+    };
+    t
+  }
 ;
 
 value create_strings_of_fsname oc_inx base =
@@ -867,153 +896,152 @@ value create_strings_of_fsname oc_inx base =
 ;
 
 value count_error computed found =
-  do Printf.eprintf "Count error. Computed %d. Found %d.\n" computed found;
-     flush stderr;
-  return exit 2
+  do {
+    Printf.eprintf "Count error. Computed %d. Found %d.\n" computed found;
+    flush stderr;
+    exit 2
+  }
 ;
 
 value just_copy bname what oc oc_acc =
-do Printf.eprintf "*** copying %s\n" what; flush stderr; return
-  let ic =
-    let ic = open_in_bin (Filename.concat bname "base") in
-    do check_magic ic; return ic
-  in
-  let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
-  let persons_len = input_binary_int ic in
-  let families_len = input_binary_int ic in
-  let strings_len = input_binary_int ic in
-  let persons_array_pos = input_binary_int ic in
-  let ascends_array_pos = input_binary_int ic in
-  let unions_array_pos = input_binary_int ic in
-  let families_array_pos = input_binary_int ic in
-  let couples_array_pos = input_binary_int ic in
-  let descends_array_pos = input_binary_int ic in
-  let strings_array_pos = input_binary_int ic in
-  let norigin_file = input_value ic in
-  let (beg_pos, end_pos, beg_acc_pos, array_len) =
-    match what with
-    [ "persons" ->
-        let pos = 0 in
-        (persons_array_pos, ascends_array_pos, pos, persons_len)
-    | "ascends" ->
-        let pos = persons_len * Iovalue.sizeof_long in
-        (ascends_array_pos, unions_array_pos, pos, persons_len)
-    | "unions" ->
-        let pos = 2 * persons_len * Iovalue.sizeof_long in
-        (unions_array_pos, families_array_pos, pos, persons_len)
-    | "families" ->
-        let pos = 3 * persons_len * Iovalue.sizeof_long in
-        (families_array_pos, couples_array_pos, pos, families_len)
-    | "couples" ->
-        let pos = (3 * persons_len + families_len) * Iovalue.sizeof_long in
-        (couples_array_pos, descends_array_pos, pos, families_len)
-    | "descends" ->
-        let pos = (3 * persons_len + 2 * families_len) * Iovalue.sizeof_long in
-        (descends_array_pos, strings_array_pos, pos, families_len)
-    | "strings" ->
-        let pos = (3 * persons_len + 3 * families_len) * Iovalue.sizeof_long in
-        (strings_array_pos, in_channel_length ic, pos, strings_len)
-    | _ -> failwith ("just copy " ^ what) ]
-  in
-  let shift = pos_out oc - beg_pos in
-(*
-do Printf.eprintf "old_pos %d new_pos %d shift %d\n" beg_pos (pos_out oc) shift; flush stderr; return
-*)
-  do seek_in ic beg_pos;
-     loop beg_pos where rec loop pos =
-       if pos = end_pos then close_in ic
-       else do output_char oc (input_char ic); return loop (pos + 1);
-     seek_in ic_acc beg_acc_pos;
-     loop 0 where rec loop len =
-       if len = array_len then close_in ic_acc
-       else
-         do output_binary_int oc_acc (input_binary_int ic_acc + shift);
-         return loop (len + 1);
-  return ()
+  do {
+    Printf.eprintf "*** copying %s\n" what;
+    flush stderr;
+    let ic =
+      let ic = open_in_bin (Filename.concat bname "base") in
+      do { check_magic ic; ic }
+    in
+    let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
+    let persons_len = input_binary_int ic in
+    let families_len = input_binary_int ic in
+    let strings_len = input_binary_int ic in
+    let persons_array_pos = input_binary_int ic in
+    let ascends_array_pos = input_binary_int ic in
+    let unions_array_pos = input_binary_int ic in
+    let families_array_pos = input_binary_int ic in
+    let couples_array_pos = input_binary_int ic in
+    let descends_array_pos = input_binary_int ic in
+    let strings_array_pos = input_binary_int ic in
+    let norigin_file = input_value ic in
+    let (beg_pos, end_pos, beg_acc_pos, array_len) =
+      match what with
+      [ "persons" ->
+          let pos = 0 in
+          (persons_array_pos, ascends_array_pos, pos, persons_len)
+      | "ascends" ->
+          let pos = persons_len * Iovalue.sizeof_long in
+          (ascends_array_pos, unions_array_pos, pos, persons_len)
+      | "unions" ->
+          let pos = 2 * persons_len * Iovalue.sizeof_long in
+          (unions_array_pos, families_array_pos, pos, persons_len)
+      | "families" ->
+          let pos = 3 * persons_len * Iovalue.sizeof_long in
+          (families_array_pos, couples_array_pos, pos, families_len)
+      | "couples" ->
+          let pos = (3 * persons_len + families_len) * Iovalue.sizeof_long in
+          (couples_array_pos, descends_array_pos, pos, families_len)
+      | "descends" ->
+          let pos =
+            (3 * persons_len + 2 * families_len) * Iovalue.sizeof_long
+          in
+          (descends_array_pos, strings_array_pos, pos, families_len)
+      | "strings" ->
+          let pos =
+            (3 * persons_len + 3 * families_len) * Iovalue.sizeof_long
+          in
+          (strings_array_pos, in_channel_length ic, pos, strings_len)
+      | _ -> failwith ("just copy " ^ what) ]
+    in
+    let shift = pos_out oc - beg_pos in
+    seek_in ic beg_pos;
+    let rec loop pos =
+      if pos = end_pos then close_in ic
+      else do { output_char oc (input_char ic); loop (pos + 1) }
+    in
+    loop beg_pos;
+    seek_in ic_acc beg_acc_pos;
+    let rec loop len =
+      if len = array_len then close_in ic_acc
+      else do {
+        output_binary_int oc_acc (input_binary_int ic_acc + shift);
+        loop (len + 1)
+      }
+    in
+    loop 0;
+  }
 ;
 
 value save_mem = ref False;
 
 value gen_output no_patches bname base =
   let bname =
-    if Filename.check_suffix bname ".gwb" then bname
-    else bname ^ ".gwb"
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
-(*
-  let bname = Filename.concat Filename.current_dir_name bname in
-*)
-  do try Unix.mkdir bname 0o755 with _ -> (); return
-  let tmp_fname = Filename.concat bname "1base" in
-  let tmp_fname_acc = Filename.concat bname "1base.acc" in
-  let tmp_fname_inx = Filename.concat bname "1names.inx" in
-  let tmp_fname_gw2 = Filename.concat bname "1strings.inx" in
-  let tmp_fname_not = Filename.concat bname "1notes" in
-  do if not no_patches then
-       let _ = base.data.persons.array () in
-       let _ = base.data.ascends.array () in
-       let _ = base.data.unions.array () in
-       let _ = base.data.families.array () in
-       let _ = base.data.couples.array () in
-       let _ = base.data.descends.array () in
-       let _ = base.data.strings.array () in
-       ()
-     else ();
-     base.func.cleanup ();
-  return
-  let oc = open_out_bin tmp_fname in
-  let oc_acc = open_out_bin tmp_fname_acc in
-  let output_array arr =
-    let bpos = pos_out oc in
-    do output_value_no_sharing oc arr; return
-    let epos = output_array_access oc_acc arr bpos in
-    if epos <> pos_out oc then count_error epos (pos_out oc) else ()
-  in
-  do try
-       do output_string oc magic_gwb;
-          output_binary_int oc base.data.persons.len;
-          output_binary_int oc base.data.families.len;
-          output_binary_int oc base.data.strings.len;
-       return
-       let array_start_indexes = pos_out oc in
-       do output_binary_int oc 0;
-          output_binary_int oc 0;
-          output_binary_int oc 0;
-          output_binary_int oc 0;
-          output_binary_int oc 0;
-          output_binary_int oc 0;
-          output_binary_int oc 0;
-          output_value_no_sharing oc base.data.bnotes.norigin_file;
-       return
-       let persons_array_pos = pos_out oc in
-       do if not no_patches then output_array (base.data.persons.array ())
-          else just_copy bname "persons" oc oc_acc;
-       return
-       let ascends_array_pos = pos_out oc in
-       do if not no_patches then ()
-          else trace "saving ascends";
-          output_array (base.data.ascends.array ());
-       return
-       let unions_array_pos = pos_out oc in
-       do if not no_patches then output_array (base.data.unions.array ())
-          else just_copy bname "unions" oc oc_acc;
-       return
-       let families_array_pos = pos_out oc in
-       do if not no_patches then output_array (base.data.families.array ())
-          else just_copy bname "families" oc oc_acc;
-       return
-       let couples_array_pos = pos_out oc in
-       do if not no_patches then output_array (base.data.couples.array ())
-          else just_copy bname "couples" oc oc_acc;
-       return
-       let descends_array_pos = pos_out oc in
-       do if not no_patches then output_array (base.data.descends.array ())
-          else just_copy bname "descends" oc oc_acc;
-       return
-       let strings_array_pos = pos_out oc in
-       do if not no_patches then output_array (base.data.strings.array ())
-          else just_copy bname "strings" oc oc_acc;
-       return
-       do seek_out oc array_start_indexes;
+  do {
+    try Unix.mkdir bname 0o755 with _ -> ();
+    let tmp_fname = Filename.concat bname "1base" in
+    let tmp_fname_acc = Filename.concat bname "1base.acc" in
+    let tmp_fname_inx = Filename.concat bname "1names.inx" in
+    let tmp_fname_gw2 = Filename.concat bname "1strings.inx" in
+    let tmp_fname_not = Filename.concat bname "1notes" in
+    if not no_patches then
+      let _ = base.data.persons.array () in
+      let _ = base.data.ascends.array () in
+      let _ = base.data.unions.array () in
+      let _ = base.data.families.array () in
+      let _ = base.data.couples.array () in
+      let _ = base.data.descends.array () in
+      let _ = base.data.strings.array () in ()
+    else ();
+    base.func.cleanup ();
+    let oc = open_out_bin tmp_fname in
+    let oc_acc = open_out_bin tmp_fname_acc in
+    let output_array arr =
+      let bpos = pos_out oc in
+      do {
+        output_value_no_sharing oc arr;
+        let epos = output_array_access oc_acc arr bpos in
+        if epos <> pos_out oc then count_error epos (pos_out oc) else ()
+      }
+    in
+    try
+      do {
+        output_string oc magic_gwb;
+        output_binary_int oc base.data.persons.len;
+        output_binary_int oc base.data.families.len;
+        output_binary_int oc base.data.strings.len;
+        let array_start_indexes = pos_out oc in
+        output_binary_int oc 0;
+        output_binary_int oc 0;
+        output_binary_int oc 0;
+        output_binary_int oc 0;
+        output_binary_int oc 0;
+        output_binary_int oc 0;
+        output_binary_int oc 0;
+        output_value_no_sharing oc base.data.bnotes.norigin_file;
+        let persons_array_pos = pos_out oc in
+        if not no_patches then output_array (base.data.persons.array ())
+        else just_copy bname "persons" oc oc_acc;
+        let ascends_array_pos = pos_out oc in
+        if not no_patches then () else trace "saving ascends";
+        output_array (base.data.ascends.array ());
+        let unions_array_pos = pos_out oc in
+        if not no_patches then output_array (base.data.unions.array ())
+        else just_copy bname "unions" oc oc_acc;
+        let families_array_pos = pos_out oc in
+        if not no_patches then output_array (base.data.families.array ())
+        else just_copy bname "families" oc oc_acc;
+        let couples_array_pos = pos_out oc in
+        if not no_patches then output_array (base.data.couples.array ())
+        else just_copy bname "couples" oc oc_acc;
+        let descends_array_pos = pos_out oc in
+        if not no_patches then output_array (base.data.descends.array ())
+        else just_copy bname "descends" oc oc_acc;
+        let strings_array_pos = pos_out oc in
+        if not no_patches then output_array (base.data.strings.array ())
+        else just_copy bname "strings" oc oc_acc;
+        do {
+          seek_out oc array_start_indexes;
           output_binary_int oc persons_array_pos;
           output_binary_int oc ascends_array_pos;
           output_binary_int oc unions_array_pos;
@@ -1029,106 +1057,91 @@ value gen_output no_patches bname base =
             let oc_inx = open_out_bin tmp_fname_inx in
             let oc2 = open_out_bin tmp_fname_gw2 in
             try
-              do trace "create name index";
-                 output_binary_int oc_inx 0;
-                 create_name_index oc_inx base;
-                 base.data.ascends.clear_array ();
-                 base.data.unions.clear_array ();
-                 base.data.couples.clear_array ();
-                 if save_mem.val then
-                   do trace "compacting"; return
-                   Gc.compact ()
-                 else ();
-                 let surname_or_first_name_pos = pos_out oc_inx in
-                 do trace "create strings of fsname";
-                    create_strings_of_fsname oc_inx base;
-                    seek_out oc_inx 0;
-                    output_binary_int oc_inx surname_or_first_name_pos;
-                    close_out oc_inx;
-                 return ();
-                 if save_mem.val then
-                   do trace "compacting"; return
-                   Gc.compact ()
-                 else ();
-                 trace "create string index";
-                 output_strings_hash oc2 base;
-                 if save_mem.val then
-                   do trace "compacting"; return
-                   Gc.compact ()
-                 else ();
-                 let surname_pos = pos_out oc2 in
-                 do trace "create surname index";
-                    output_surname_index oc2 base;
-                    if save_mem.val then
-                      do trace "compacting"; return
-                      Gc.compact ()
-                    else ();
-                 return
-                 let first_name_pos = pos_out oc2 in
-                 do trace "create first name index";
-                    output_first_name_index oc2 base;
-                    seek_out oc2 int_size;
-                    output_binary_int oc2 surname_pos;
-                    output_binary_int oc2 first_name_pos;
-                 return ();
-                 let s = base.data.bnotes.nread 0 in
-                 if s = "" then ()
-                 else
-                   let oc_not = open_out tmp_fname_not in
-                   do output_string oc_not s;
-                      close_out oc_not;
-                   return ();
-                 close_out oc2;
-              return ()
+              do {
+                trace "create name index";
+                output_binary_int oc_inx 0;
+                create_name_index oc_inx base;
+                base.data.ascends.clear_array ();
+                base.data.unions.clear_array ();
+                base.data.couples.clear_array ();
+                if save_mem.val then do { trace "compacting"; Gc.compact () }
+                else ();
+                let surname_or_first_name_pos = pos_out oc_inx in
+                trace "create strings of fsname";
+                create_strings_of_fsname oc_inx base;
+                seek_out oc_inx 0;
+                output_binary_int oc_inx surname_or_first_name_pos;
+                close_out oc_inx;
+                if save_mem.val then do { trace "compacting"; Gc.compact () }
+                else ();
+                trace "create string index";
+                output_strings_hash oc2 base;
+                if save_mem.val then do { trace "compacting"; Gc.compact () }
+                else ();
+                let surname_pos = pos_out oc2 in
+                trace "create surname index";
+                output_surname_index oc2 base;
+                if save_mem.val then do {
+                  trace "compacting"; Gc.compact ()
+                }
+                else ();
+                let first_name_pos = pos_out oc2 in
+                trace "create first name index";
+                output_first_name_index oc2 base;
+                seek_out oc2 int_size;
+                output_binary_int oc2 surname_pos;
+                output_binary_int oc2 first_name_pos;
+                let s = base.data.bnotes.nread 0 in
+                if s = "" then ()
+                else do {
+                  let oc_not = open_out tmp_fname_not in
+                  output_string oc_not s;
+                  close_out oc_not;
+                };
+                close_out oc2;
+              }
             with e ->
-              do try close_out oc_inx with _ -> ();
-                 try close_out oc2 with _ -> ();
-              return raise e
+              do {
+                try close_out oc_inx with _ -> ();
+                try close_out oc2 with _ -> ();
+                raise e
+              }
           else ();
           trace "ok";
-       return ()
-     with e ->
-       do try close_out oc with _ -> ();
-          try close_out oc_acc with _ -> ();
-          remove_file tmp_fname;
-          remove_file tmp_fname_acc;
-          if not no_patches then
-            do remove_file tmp_fname_inx;
-               remove_file tmp_fname_gw2;
-            return ()
-          else ();
-       return raise e;
-     remove_file (Filename.concat bname "restrict");
-     remove_file (Filename.concat bname "base");
-     Sys.rename tmp_fname (Filename.concat bname "base");
-     remove_file (Filename.concat bname "base.acc");
-     Sys.rename tmp_fname_acc (Filename.concat bname "base.acc");
-     if not no_patches then
-       do remove_file (Filename.concat bname "names.inx");
-          Sys.rename tmp_fname_inx (Filename.concat bname "names.inx");
-          remove_file (Filename.concat bname "strings.inx");
-          Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
-          remove_file (Filename.concat bname "notes");
-          if Sys.file_exists tmp_fname_not then
-            Sys.rename tmp_fname_not (Filename.concat bname "notes")
-          else ();
-          remove_file (Filename.concat bname "patches");
-          remove_file (Filename.concat bname "patches~");
-          remove_file (Filename.concat bname "tstab");
-       return ()
-     else ();
-  return ()
+        }
+      }
+    with e ->
+      do {
+        try close_out oc with _ -> ();
+        try close_out oc_acc with _ -> ();
+        remove_file tmp_fname;
+        remove_file tmp_fname_acc;
+        if not no_patches then do {
+          remove_file tmp_fname_inx; remove_file tmp_fname_gw2; ()
+        }
+        else ();
+        raise e
+      };
+    remove_file (Filename.concat bname "restrict");
+    remove_file (Filename.concat bname "base");
+    Sys.rename tmp_fname (Filename.concat bname "base");
+    remove_file (Filename.concat bname "base.acc");
+    Sys.rename tmp_fname_acc (Filename.concat bname "base.acc");
+    if not no_patches then do {
+      remove_file (Filename.concat bname "names.inx");
+      Sys.rename tmp_fname_inx (Filename.concat bname "names.inx");
+      remove_file (Filename.concat bname "strings.inx");
+      Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
+      remove_file (Filename.concat bname "notes");
+      if Sys.file_exists tmp_fname_not then
+        Sys.rename tmp_fname_not (Filename.concat bname "notes")
+      else ();
+      remove_file (Filename.concat bname "patches");
+      remove_file (Filename.concat bname "patches~");
+      remove_file (Filename.concat bname "tstab");
+    }
+    else ();
+  }
 ;
 
 value output = gen_output False;
-
-value simple_output bname base =
-  let no_patches =
-    let bname =
-      if Filename.check_suffix bname ".gwb" then bname
-      else bname ^ ".gwb"
-    in
-    not (Sys.file_exists (Filename.concat bname "patches"))
-  in
-  gen_output no_patches bname base
-;
