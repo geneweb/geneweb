@@ -1,0 +1,2230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- $Id: perso.txt,v 1.1 2001-06-13 19:50:27 ddr Exp $ -->
+  <!-- copyright (c) INRIA -->
+  <meta name="ROBOTS" content="NONE">
+  <title>
+    %if;has_public_name;
+      %if;has_qualifiers;%public_name; %qualifier;
+      %else;%public_name; %surname;%end;
+    %else;
+      %if;has_qualifiers;%first_name; %qualifier;
+      %else;%first_name; %surname;%end;
+    %end;
+  </title>
+%base_header;
+</head>
+<body%body_prop;>
+
+%if;is_male;
+<img src="%image_prefix;/male.gif" width=13 height=13
+ alt="[M/F]0" align=left>
+%elseif;is_female;
+<img src="%image_prefix;/female.gif" width=13 height=13
+ alt="[M/F]1" align=left>
+%end;
+
+<h1 align=center><font color=%highlight;>
+%if;has_public_name;
+  %if;has_qualifiers;%public_name; <em>%qualifier;</em>
+  %else;%public_name; %surname;%end;
+%else;
+  %if;has_qualifiers;%first_name; <em>%qualifier;</em>
+  %else;
+    %if;cancel_links;%first_name; %surname;
+    %else;
+      <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
+      <a href="%prefix;m=N;v=%surname_key;">%surname;</a>
+    %end;
+  %end;
+%end;
+</font></h1>
+
+%if;(has_sosa or has_qualifiers or has_aliases or has_nobility_titles or
+     has_public_name or has_surnames_aliases or has_first_names_aliases)
+  <center>
+  <table border=%border; cellspacing=0 cellpadding=0>
+  <tr><td align=center>
+  %if;has_sosa;
+    <em>[*Sosa]:
+    %if;cancel_links;%sosa;
+    %else;<a href="%prefix;%sosa_link;">%sosa;</a>%end;
+    </em><br>
+  %end;
+  %foreach;qualifier;
+    %if;not is_first;
+      %if;has_public_name;%public_name; %qualifier;
+      %else;%first_name; %qualifier;%end;<br>
+    %end;
+  %end;
+  %foreach;alias;
+    <em><strong>%alias;</strong></em><br>
+  %end;
+  %if;has_nobility_titles;
+    <em>
+    %foreach;nobility_title;
+      %if;not is_first;,
+      %end;
+      %nobility_title;
+    %end;
+    </em><br>
+  %end;
+  %if;(has_public_name or has_qualifiers)
+    <em>(%if;cancel_links;%first_name; %surname;
+         %else;
+           <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
+           <a href="%prefix;m=N;v=%surname_key;">%surname;</a>
+         %end;)</em><br>
+  %end;
+  %foreach;surname_alias;
+    <em>(%first_name; %surname_alias;)</em><br>
+  %end;
+  %foreach;first_name_alias;
+    <em>- %first_name_alias; %surname; -</em>
+  %end;
+  </td></tr>
+  </table>
+  </center><p>
+%end;
+
+%if;not cancel_links;
+  <table align=right><tr><td>
+    %if;has_referer;
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"></a>
+    %end;
+    <a href="%prefix;"><img
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"></a>
+  </td></tr></table>
+%end;
+
+%if;has_image;
+  <table border=%border; width="90%%">
+  <tr><td>
+   <a href="%image_url;"><img
+    src="%image_url;"%image_size; border=0
+    alt="[image/images]0"></a>
+%end;
+%if;(has_occupation or has_birth_date or has_birth_place or
+     has_baptism_date or has_baptism_place or is_dead or is_buried or
+     is_cremated or has_consanguinity)
+  %if;has_image;<td>%end;
+  <ul>
+    %if;has_occupation;<li>%occupation;%nl;%end;
+    %if;has_birth_date;
+      <li>[*born]s %on_birth_date;
+      %if;birthday; ([happy birthday to you!])%end;
+      %if;has_birth_place; - %birth_place;%end;%nl;
+    %else;
+      %if;has_birth_place;<li>[*born]s -&nbsp;%birth_place;%nl;%end;
+    %end;
+    %if;has_baptism_date;
+      <li>[*baptized]s %on_baptism_date;
+      %if;has_baptism_place; - %baptism_place;%end;%nl;
+    %else;
+      %if;has_baptism_place;<li>[*baptized]s -&nbsp;%baptism_place;%nl;%end;
+    %end;
+    %if;is_dead;
+      <li>%died;
+      %if;has_death_date; %on_death_date;%end;
+      %if;has_death_place; -&nbsp;%death_place;%end;%nl;
+    %end;
+    %if;computable_age;
+      <li>[*age]: %age;%nl;
+    %end;
+    %if;is_buried;
+      <li>[*buried]s
+      %if;has_burial_date; %on_burial_date;%end;
+      %if;has_burial_place; -&nbsp;%burial_place;%end;%nl;
+    %end;
+    %if;is_cremated;
+      <li>[*cremated]s
+      %if;has_cremation_date; %on_cremation_date;%end;
+      %if;has_cremation_place; -&nbsp;%cremation_place;%end;%nl;
+    %end;
+    %if;computable_death_age;
+      <li>[*age at death:] %death_age;%nl;
+    %end;
+    %if;has_consanguinity;
+      <li>[*consanguinity]: %consanguinity;%nl;
+    %end;
+  </ul>
+%end;
+%if;has_image;
+  </table>
+%end;
+
+%if;(has_parents or has_children)
+ <table border=0 width=100%% cellspacing=0 cellpading=0>
+  <tr>
+   <td width=44%%>
+    <table width=100%% border=0 cellspacing=0 cellpading=0>
+     <tr>
+      <td width=40%%></td>
+      <td width=40%%></td>
+      <td width=1></td>
+      <td width=5></td>
+      <td width=1></td>
+      <td width=10%%></td>
+      <td width=1></td>
+      <td width=5></td>
+      <td width=1></td>
+      <td width=10%%></td>
+      <td width=1></td>
+      <td width=5></td>
+      <td width=1></td>
+      <td width=5></td>
+     </tr>
+     <tr>
+      <td colspan=10 align=right valign=middle><font size=3 color=%highlight;><b>Parents</b></font></td>
+      <td width=1></td>
+      <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+      <td width=1 align=center valign=bottom><font color=%highlight;><b>|</b></font></td>
+      <td width=5 align=center valign=middle>&nbsp;</td>
+     </tr>
+     <tr>
+      <td colspan=6 align=right valign=middle><font size=3 color=%highlight;><b>Grands-parents</b></font></td>
+      <td width=1></td>
+      <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+      <td width=1 align=center valign=bottom><font color=%highlight;><b>|</b></font></td>
+      <td width=10%%></td>
+      <td width=1></td>
+      <td width=5 align=center valign=middle></td>
+      <td width=1 align=center valign=middle><font color=%highlight;><b>|</b></font></td>
+      <td width=5></td>
+     </tr>
+     <tr>
+      <td colspan=2 align=right valign=middle><font size=3 color=%highlight;><b>Arrières-grands-parents</b></font></td>
+      <td width=1></td>
+      <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+      <td width=1 align=center valign=bottom><font color=%highlight;><b>|</b></font></td>
+      <td width=10%%></td>
+      <td width=1></td>
+      <td width=5 align=center valign=middle></td>
+      <td width=1 align=center valign=middle><font color=%highlight;><b>|</b></font></td>
+      <td width=10%%></td>
+      <td width=1></td>
+      <td width=5 align=center valign=middle></td>
+      <td width=1 align=center valign=middle><font color=%highlight;><b>|</b></font></td>
+      <td width=5></td>
+     </tr>
+    </table>
+   </td>
+   <td width=12%%>
+    <table border=0 width=100%% cellspacing=0 cellpading=0>
+     <tr>
+      <td>&nbsp;</td>
+     </tr>
+     <tr>
+      <td align=center valign=bottom width=100%%><font size=3 color=%highlight;><b>Fratrie</b></font></td>
+     </tr>
+     <tr>
+      <td align=center valign=bottom width=100%%><font color=%highlight;><b>|</b></font></td>
+     </tr>
+    </table>
+   </td>
+   <td width=44%%>
+    <table border=0 width=100%% cellspacing=0 cellpading=0>
+     <tr>
+      <td width=5></td>
+      <td width=1></td>
+      <td width=5></td>
+      <td width=1></td>
+      <td width=10%%></td>
+      <td width=1></td>
+      <td width=5></td>
+      <td width=1></td>
+      <td width=10%%></td>
+      <td width=1></td>
+      <td width=5></td>
+      <td width=1></td>
+      <td width=40%%></td>
+      <td width=40%%></td>
+     </tr>
+     <tr>
+      <td width=5>&nbsp;</td>
+      <td width=1 align=center valign=bottom><font color=%highlight;><b>|</b></font></td>
+      <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+      <td width=1></td>
+      <td colspan=10 align=left valign=bottom><font size=3 color=%highlight;><b>Enfants</b></font></td>
+     </tr>
+     <tr>
+      <td width=5></td>
+      <td width=1 align=center valign=middle><font color=%highlight;><b>|</b></font></td>
+      <td width=5 align=center valign=middle></td>
+      <td width=1></td>
+      <td width=10%%></td>
+      <td width=1 align=center valign=bottom><font color=%highlight;><b>|</b></font></td>
+      <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+      <td width=1></td>
+      <td colspan=6 align=left valign=bottom><font size=3 color=%highlight;><b>Petits-enfants</b></font></td>
+     </tr>
+     <tr>
+      <td width=5></td>
+      <td width=1 align=center valign=middle><font color=%highlight;><b>|</b></font></td>
+      <td width=5 align=center valign=middle></td>
+      <td width=1></td>
+      <td width=10%%></td>
+      <td width=1 align=center valign=middle><font color=%highlight;><b>|</b></font></td>
+      <td width=5 align=center valign=middle></td>
+      <td width=1></td>
+      <td width=10%%></td>
+      <td width=1 align=center valign=bottom><font color=%highlight;><b>|</b></font></td>
+      <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+      <td width=1></td>
+      <td colspan=2 align=left valign=bottom><font size=3 color=%highlight;><b>Arrières-petits-enfants</b></font></td>
+     </tr>
+    </table>
+   </td>
+  </tr>
+ </table>
+ <table width=100%% border=0 cellspacing=0 cellpading=0>
+  <tr>
+   <td align=right valign=top width=44%%>
+    %if;has_parents;
+     <table width=100%% border=0 cellspacing=0 cellpading=0>
+      <tr>
+       <td width=40%%></td>
+       <td width=40%%></td>
+       <td width=1></td>
+       <td width=5></td>
+       <td width=1></td>
+       <td width=10%%></td>
+       <td width=1></td>
+       <td width=5></td>
+       <td width=1></td>
+       <td width=10%%></td>
+       <td width=1></td>
+       <td width=5></td>
+       <td width=1></td>
+       <td width=5></td>
+      </tr>
+      <tr>
+       <td colspan=10 align=right valign=middle>
+        %father.dates;&nbsp;
+        <a href="%prefix;%father.access;">%father;</a></td>
+       <td width=1></td>
+       <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+       <td width=1 align=center valign=middle><b>|</b></td>
+       <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+      </tr>
+      %if;father.has_parents;
+       <tr>
+        <td colspan=6 align=right valign=middle>
+         %father.father.dates;&nbsp;
+         <a href="%prefix;%father.father.access;">%father.father;</a></td>
+        <td width=1></td>
+        <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+        <td width=1 align=center valign=middle><b>|</b></td>
+        <td></td>
+        <td width=1></td>
+        <td width=5 align=center valign=middle></td>
+        <td width=1 align=center valign=middle><b>|</b></td>
+        <td width=5 align=center valign=middle></td>
+       </tr>
+       %if;father.father.has_parents;
+        <tr>
+         <td colspan=2 align=right valign=middle>
+          %father.father.father.dates;&nbsp;
+          <a href="%prefix;%father.father.father.access;">%father.father.father;</a></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td width=5 align=center valign=middle></td>
+        </tr>
+        <tr>
+         <td colspan=2 align=right valign=middle>
+          %father.father.mother.dates;&nbsp;
+          <a href="%prefix;%father.father.mother.access;">%father.father.mother;</a></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td width=5 align=center valign=middle></td>
+        </tr>
+       %end;
+       <tr>
+        <td colspan=6 align=right valign=middle>
+         %father.mother.dates;&nbsp;
+         <a href="%prefix;%father.mother.access;">%father.mother;</a></td>
+        <td width=1></td>
+        <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+        <td width=1 align=center valign=middle><b>|</b></td>
+        <td></td>
+        <td width=1></td>
+        <td width=5 align=center valign=middle></td>
+        <td width=1 align=center valign=middle><b>|</b></td>
+        <td width=5 align=center valign=middle></td>
+       </tr>
+       %if;father.mother.has_parents;
+        <tr>
+         <td colspan=2 align=right valign=middle>
+          %father.mother.father.dates;&nbsp;
+          <a href="%prefix;%father.mother.father.access;">%father.mother.father;</a></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b></b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td width=5 align=center valign=middle></td>
+        </tr>
+        <tr>
+         <td colspan=2 align=right valign=middle>
+          %father.mother.mother.dates;&nbsp;
+          <a href="%prefix;%father.mother.mother.access;">%father.mother.mother;</a></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b></b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td width=5 align=center valign=middle></td>
+        </tr>
+       %end;
+      %end;
+      </tr>
+      <tr>
+       <td colspan=10 align=right valign=middle>
+        %mother.dates;&nbsp;
+        <a href="%prefix;%mother.access;">%mother;</a></td>
+       <td width=1></td>
+       <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+       <td width=1 align=center valign=middle><b>|</b></td>
+       <td width=5 align=center valign=middle></td>
+      </tr>
+      %if;mother.has_parents;
+       <tr>
+        <td colspan=6 align=right valign=middle>
+         %mother.father.dates;&nbsp;
+         <a href="%prefix;%mother.father.access;">%mother.father;</a></td>
+        <td width=1></td>
+        <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+        <td width=1 align=center valign=middle><b>|</b></td>
+        <td></td>
+        <td width=1></td>
+        <td width=5 align=center valign=middle></td>
+        <td width=1 align=center valign=middle><b></b></td>
+        <td width=5 align=center valign=middle></td>
+       </tr>
+       %if;mother.father.has_parents;
+        <tr>
+         <td colspan=2 align=right valign=middle>
+          %mother.father.father.dates;&nbsp;
+          <a href="%prefix;%mother.father.father.access;">%mother.father.father;</a></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b></b></td>
+         <td width=5 align=center valign=middle></td>
+        </tr>
+        <tr>
+         <td colspan=2 align=right valign=middle>
+          %mother.father.mother.dates;&nbsp;
+          <a href="%prefix;%mother.father.mother.access;">%mother.father.mother;</a></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b></b></td>
+         <td width=5 align=center valign=middle></td>
+        </tr>
+       %end;
+       <tr>
+        <td colspan=6 align=right valign=middle>
+         %mother.mother.dates;&nbsp;
+         <a href="%prefix;%mother.mother.access;">%mother.mother;</a></td>
+        <td width=1></td>
+        <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+        <td width=1 align=center valign=middle><b>|</b></td>
+        <td></td>
+        <td width=1></td>
+        <td width=5 align=center valign=middle></td>
+        <td width=1 align=center valign=middle><b></b></td>
+        <td width=5 align=center valign=middle></td>
+       </tr>
+       %if;mother.mother.has_parents;
+        <tr>
+         <td colspan=2 align=right valign=middle>
+          %mother.mother.father.dates;&nbsp;
+          <a href="%prefix;%mother.mother.father.access;">%mother.mother.father;</a></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b></b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b></b></td>
+         <td width=5 align=center valign=middle></td>
+        </tr>
+        <tr>
+         <td colspan=2 align=right valign=middle>
+          %mother.mother.mother.dates;&nbsp;
+          <a href="%prefix;%mother.mother.mother.access;">%mother.mother.mother;</a></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1 align=center valign=bottom><b>|</b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b></b></td>
+         <td></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b></b></td>
+         <td width=5 align=center valign=middle></td>
+        </tr>
+       %end;
+      %end;
+      </tr>
+     </table>
+    %end;
+   </td>
+   <td align=center valign=top width=12%%>
+    <table width=100%% border=0 cellspacing=0 cellpadding=0>
+     <tr>
+      <td width=1></td>
+      <td align=center valign=middle><b>%self;</b></td>
+      <td width=1></td>
+     </tr>
+      %if;has_siblings;
+       <tr>
+        <td width=1></td>
+        <td align=center valign=middle><b>|</b></td>
+        <td width=1></td>
+       </tr>
+       %foreach;father.child;
+        <tr>
+         %if;is_self;
+          <td width=1></td>
+          <td align=center valign=middle>%child.child_name<br>%child.dates;&nbsp;</td>
+          <td width=1></td>
+         %else;
+          <td width=1></td>
+          <td align=center valign=middle><a
+           href="%prefix;%child.access;">%child.child_name;</a>
+           <br>%child.dates;&nbsp;</td>
+          <td width=1></td>
+         %end;
+        </tr>
+       %end;
+      %end;
+    </table>
+   </td>
+   <td nowrap align=left valign=top width=44%%>
+   %if;has_children;
+    <table border=0 width=100%% cellspacing=0 cellpading=0>
+     <tr>
+      <td width=5></td>
+      <td width=1></td>
+      <td width=5></td>
+      <td width=1></td>
+      <td width=10%%></td>
+      <td width=1></td>
+      <td width=5></td>
+      <td width=1></td>
+      <td width=10%%></td>
+      <td width=1></td>
+      <td width=5></td>
+      <td width=1></td>
+      <td width=40%%></td>
+      <td width=40%%></td>
+     </tr>
+      %foreach;family;
+       %foreach;child;
+        <tr>
+        %if;(child_cnt=1 and child_cnt=nb_children)
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1></td>
+         <td colspan=10 align=left valign=middle><a
+          href="%prefix;%child.access;">%child.child;</a>
+          %child.child.dates;</td>
+         <td colspan=2></td>
+          %if;child.has_children;
+           </tr>
+           %foreach;child.family;
+            %foreach;child.child;
+             <tr>
+              %if;(child_cnt=1 and child_cnt=nb_children)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=bottom><b></b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=bottom><b></b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td>
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %elseif;(child_cnt=1)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=bottom><b></b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=bottom><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %elseif;(child_cnt=nb_children)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=bottom><b></b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=top><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %else;
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=bottom><b></b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %end;
+             </tr>
+            %end;
+           %end;
+          %end;
+        %elseif;(child_cnt=1)
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1 align=center valign=bottom><b>|</b></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1></td>
+         <td colspan=10 align=left valign=middle><a
+          href="%prefix;%child.access;">%child.child;</a>
+          %child.child.dates;</td>
+         <td colspan=2></td>
+         %if;child.has_children;
+          </tr>
+           %foreach;child.family;
+            %foreach;child.child;
+             <tr>
+              %if;(child_cnt=1 and child_cnt=nb_children)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=bottom><b></b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td>
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %elseif;(child_cnt=1)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=bottom><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %elseif;(child_cnt=nb_children)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=top><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %else;
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %end;
+             </tr>
+            %end;
+           %end;
+          %end;
+        %elseif;(child_cnt=nb_children)
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=top><b>|</b></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1></td>
+         <td colspan=10 align=left valign=middle><a
+          href="%prefix;%child.access;">%child.child;</a>
+          %child.child.dates;</td>
+         <td colspan=2></td>
+         %if;child.has_children;
+          </tr>
+           %foreach;child.family;
+            %foreach;child.child;
+             <tr>
+              %if;(child_cnt=1 and child_cnt=nb_children)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b></b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=bottom><b></b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %elseif;(child_cnt=1)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b></b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=bottom><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %elseif;(child_cnt=nb_children)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b></b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=top><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %else;
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b></b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %end;
+             </tr>
+            %end;
+           %end;
+          %end;
+        %else;
+         <td width=5 align=center valign=middle></td>
+         <td width=1 align=center valign=middle><b>|</b></td>
+         <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+         <td width=1></td>
+         <td colspan=10 align=left valign=middle><a
+          href="%prefix;%child.access;">%child.child;</a>
+          %child.child.dates;</td>
+         <td colspan=2></td>
+          %if;child.has_children;
+           </tr>
+           %foreach;child.family;
+            %foreach;child.child;
+             <tr>
+              %if;(child_cnt=1 and child_cnt=nb_children)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=bottom><b></b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %elseif;(child_cnt=1)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=bottom><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %elseif;(child_cnt=nb_children)
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=top><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b></b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %else;
+               <td width=5 align=center valign=middle></td>
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle></td>
+               <td width=1></td>
+               <td></td> 
+               <td width=1 align=center valign=middle><b>|</b></td>
+               <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+               <td width=1></td>
+               <td colspan=6 align=left valign=middle>
+                <a href="%prefix;%child.child.access;">%child.child.child;</a>
+                %child.child.child.dates;</td>
+               <td></td> 
+               %if;child.child.has_children;
+                </tr>
+                 %foreach;child.child.family;
+                  %foreach;child.child.child;
+                   <tr>
+                    %if;(child_cnt=1 and child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b></b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=1)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=bottom><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %elseif;(child_cnt=nb_children)
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=top><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %else;
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle></td>
+                     <td width=1></td>
+                     <td></td> 
+                     <td width=1 align=center valign=middle><b>|</b></td>
+                     <td width=5 align=center valign=middle><hr noshade size=1 width=5></td>
+                     <td width=1></td>
+                     <td colspan=2 align=left valign=middle>
+                      <a href="%prefix;%child.child.child.access;">%child.child.child.child;</a>
+                      %child.child.child.dates;</td>
+                    %end;
+                   </tr>
+                  %end;
+                 %end;
+               %end;
+              %end;
+             </tr>
+            %end;
+           %end;
+          %end;
+         %end;
+        </tr>
+       %end;
+      %end;
+     </table>
+    %end;
+   </td>
+  </tr>
+ </table>
+%end;
+
+%if;has_families;
+  <h3><font color=%highlight;>[*marriage/marriages]1 [and]0%sp;
+  [child/children]1</font></h3>
+  <ul>
+  %foreach;family;
+    <li type=%if;spouse.has_parents;disk%else;circle%end;>
+    %married_to;%sp;
+    %if;cancel_links;%spouse;
+    %else;<a href="%prefix;%spouse.access">%spouse;</a>%end;
+    %spouse.title;%spouse.dates;
+    %if;has_witnesses;
+      %sp;([witness/witnesses]w:
+      %foreach;witness;
+        %if;not is_first;, %end;
+	%if;cancel_links;%witness;
+	%else;<a href="%prefix;%witness.access">%witness;</a>%end;
+	%witness.title;%witness.dates;
+      %end;
+    )%end;
+    %if;are_divorced;, [divorced] %divorce_date;%end;
+    %if;are_separated;, [separated]0%end;
+    %if;has_comment; (%comment;)%end;
+    %if;has_children;
+      , [having as children]0
+      <ol>
+        %foreach;child;
+          <li type=%if;child.has_families;disk%else;circle%end;>
+	  %if;cancel_links;%child.child_name;
+	  %else;
+	    <a href="%prefix;%child.access;">%child.child_name;</a>
+          %end;
+	  %child.dates;%nl;
+        %end;
+      </ol>
+    %end;
+    %if;(evar_opt = "from" and wizard);<em>(%origin_file;)</em><br>%nl;%end;
+  %end;
+  </ul>
+%end;
+
+<!--
+%if;has_siblings;
+  <h3><font color=%highlight;>[*siblings]</font></h3>
+  <ul>
+  %foreach;father.child;
+    %if;is_self;
+      <li type=circle>
+      %child_name;%nl;
+    %else;
+      <li type=disk>
+      %if;cancel_links;%child.child_name;
+      %else;
+        <a href="%prefix;%child.access;">%child.child_name;</a>
+      %end;
+      %child.dates;%nl;
+    %end;
+  %end;
+  </ul>
+%end;
+-->
+
+%if;has_relations;
+  <h3><font color=%highlight;>[*relation/relations]1</font></h3>
+  <ul>
+    %foreach;relation;
+      <li>%relation_type;
+      %if;(has_relation_him and has_relation_her)
+        %nl;
+        <ul>
+	<li type=%if;relation_him.has_families;disk%else;circle%end;>
+        %if;cancel_links;%relation_him;
+        %else;<a href="%prefix;%relation_him.access">%relation_him;</a>%end;
+        %relation_him.dates;%nl;
+	<li type=%if;relation_her.has_families;disk%else;circle%end;>
+        %if;cancel_links;%relation_her;
+        %else;<a href="%prefix;%relation_her.access">%relation_her;</a>%end;
+        %relation_her.dates;%nl;
+        </ul>
+      %elseif;has_relation_him;:
+        %if;cancel_links;%relation_him;
+        %else;<a href="%prefix;%relation_him.access">%relation_him;</a>%end;
+        %relation_him.dates;%nl;
+      %elseif;has_relation_her;:
+        %if;cancel_links;%relation_her;
+        %else;<a href="%prefix;%relation_her.access">%relation_her;</a>%end;
+        %relation_her.dates;%nl;
+      %end;
+    %end;
+    %foreach;related;
+      <li type=%if;related.has_families;disk%else;circle%end;>%related_type;:
+      %if;cancel_links;%related;
+      %else;<a href="%prefix;%related.access">%related;</a>%end;
+      %related.dates;%nl;
+    %end;
+    %foreach;witness_relation;
+      <li type=disk>%witness_relation;%nl;
+    %end;
+  </ul>
+%end;
+
+%if;has_notes;
+ %notes;
+%end;
+
+%if;has_sources;
+  <font size=-1><em>[*source/sources]1:
+  %foreach;source;
+    <br>- %source_type;: %source;
+  %end;
+  </em></font>
+%end;
+
+%if;not cancel_links;
+  <table border=%border; width="90%%">
+  <tr>
+  <td align=center>
+    <a href="%prefix;m=R;%access;"><b><font
+    color=%highlight;>[*relationship computing]</font></b></a>
+  </td>
+  <td align=left><p><br>
+    <ul>
+      %if;has_parents;
+        <li>
+        <a href="%prefix;m=A;%access;"><b><font
+         color=%highlight;>[*ancestors]</font></b></a>
+      %end;
+      %if;has_children;
+        <li>
+        <a href="%prefix;m=D;%access;"><b><font
+         color=%highlight;>[*descendants]</font></b></a>
+      %end;
+      %if;(father.has_parents or mother.has_parents)
+        <li>
+        <a href="%prefix;m=C;%access;"><b><font
+         color=%highlight;>[*cousins (general term)]</font></b></a>
+      %else;
+        %if;has_nephews_or_nieces;
+          <li>
+          <a href="%prefix;m=C;v1=1;v2=2;%access;"><b><font
+           color=%highlight;>[*nephews and nieces]</font></b></a>
+        %end;
+      %end;
+<!-- -->
+      %foreach;father.child;
+	%if;is_sibling_before;
+	  <li>
+          <a href="%prefix;%child.access;"><b><font
+           color=%highlight;>[*previous sibling]s</font></b></a>
+	%end;
+	%if;is_sibling_after;
+	  <li>
+          <a href="%prefix;%child.access;"><b><font
+           color=%highlight;>[*next sibling]s</font></b></a>
+	%end;
+      %end;
+<!-- -->
+    </ul>
+  </td>
+  %if;wizard;
+    <td align=center>
+      <li><a href="%prefix;m=U;%access;"><b><font
+      color=%highlight;>[*update]</font></b></a></li>
+    </td>
+  %end;
+  </tr>
+  </table>
+%end;
+
+<img src="%image_prefix;/gwlogo.gif"
+ alt=... width=64 height=72 align=right>
+<br>
+%copyright;
+%base_trailer;
+</body>
