@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.24 2001-02-10 22:05:37 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.25 2001-02-13 00:23:45 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -670,7 +670,7 @@ value print_add o_conf base =
           [ Some _ -> True
           | _ -> False ]
         in
-        if ext || redisp then UpdateInd.print_add1 conf base sp
+        if ext || redisp then UpdateInd.print_update_ind conf base sp ""
         else
           do strip_person sp; return
           match check_person conf base sp with
@@ -720,7 +720,7 @@ value print_mod_aux conf base callback =
         in
         let digest = Update.digest_person (poi base p.cle_index) in
         if digest = raw_get conf "digest" then
-          if ext || redisp then UpdateInd.print_mod1 conf base p digest
+          if ext || redisp then UpdateInd.print_update_ind conf base p digest
           else
             do strip_person p; return
             match check_person conf base p with

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 3.9 2001-01-06 09:55:57 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 3.10 2001-02-13 00:23:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -89,33 +89,6 @@ value reconstitute conf base p1 p2 =
    cle_index = p1.cle_index}
 ;
 
-value print_merge1 conf base p p2 digest =
-  let title _ =
-    let s = transl_nth conf "person/persons" 0 in
-    Wserver.wprint "%s # %d" (capitale (transl_decline conf "merge" s))
-      (Adef.int_of_iper p.cle_index)
-  in
-  do header conf title;
-     Wserver.wprint "\n";
-     tag "form" "method=POST action=\"%s\"" conf.command begin
-       Util.hidden_env conf;
-       UpdateInd.merge_call conf;
-       Wserver.wprint "<input type=hidden name=i value=%d>\n"
-         (Adef.int_of_iper p.cle_index);
-       Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
-       Wserver.wprint "<input type=hidden name=i2 value=%d>\n"
-         (Adef.int_of_iper p2.cle_index);
-       Wserver.wprint "\n";
-       UpdateInd.print_person conf base p;
-       Wserver.wprint "\n";
-       html_p conf;
-       Wserver.wprint "<input type=submit value=Ok>\n";
-     end;
-     Wserver.wprint "\n";
-     trailer conf;
-  return ()
-;
-
 value print_merge conf base =
   match (p_getint conf.env "i1", p_getint conf.env "i2") with
   [ (Some i1, Some i2) ->
@@ -123,7 +96,7 @@ value print_merge conf base =
       let p2 = base.data.persons.get i2 in
       let p = reconstitute conf base p1 p2 in
       let digest = Update.digest_person p1 in
-      print_merge1 conf base p p2 digest
+      UpdateInd.print_update_ind conf base p digest
   | _ -> incorrect_request conf ]
 ;
 
