@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.28 2000-08-16 16:45:51 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.29 2000-08-18 10:43:52 ddr Exp $ *)
 
 open Printf;
 
@@ -50,13 +50,6 @@ value cgi_content () =
 value cgi_from () =
   try Sys.getenv "REMOTE_HOST" with [ Not_found -> Sys.getenv "REMOTE_ADDR" ]
 ;
-
-(*
-value server_extract str =
-  let content_type = Wserver.extract_param "content-type: " '\n' request in
-  (content_type, str)
-;
-*)
 
 (* Utilitaires *)
 
@@ -453,21 +446,6 @@ Password: <input name=p type=password><br>
 ;
 
 (* Wrappers *)
-
-(*
-value gwtp_redirect_to_main str env b tok =
-  do printf "content-type: text/html\r\n\r\n";
-     printf "<head>\n";
-     printf "\
-<meta http-equiv=\"REFRESH\"
- content=\"0;URL=gwtp?m=MAIN&b=%s&t=%s\">\n" b tok;
-     printf "</head>\n";
-     printf "<body>\n";
-     printf_link_to_main b tok;
-     printf "</body>\n";
-  return ()
-;
-*)
 
 value gwtp_check_login from str env gwtp_fun =
   match (HttpEnv.getenv env "b", HttpEnv.getenv env "p") with
