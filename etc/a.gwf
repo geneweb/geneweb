@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.2 1999-10-30 19:50:16 ddr Exp $
+# $Id: a.gwf,v 3.3 1999-11-13 21:50:23 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -63,7 +63,9 @@ auth_file=
 
 # Access by key, when set to "yes", generates HTML requests with
 # "n=first+name;p=surname;oc=number" instead of (shorter) "i=integer"
-# in URLs.
+# in URLs. Useful e.g. when doing a cleanup of the data base (where the
+# integer access for persons may change) to let the service continue
+# correctly.
 access_by_key=no
 
 # Set to no if you don't want that the search by (nobility) titles be
