@@ -21,7 +21,7 @@ changements par rapport aux versions precedentes.
 
      -----------------
 
-GeneWeb est copyright INRIA 2003.
+GeneWeb est Copyright (c) 1998-2005 INRIA.
 
 Remarques, suggestions, questions, rapports d'anomalie a:
 	daniel.de_rauglaudre@inria.fr

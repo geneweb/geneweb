@@ -1,8 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.34 2004-09-30 12:15:02 ddr Exp $ -->
-  <!-- copyright 2001 (c) INRIA -->
+  <!-- $Id: updfam.txt,v 4.35 2004-12-14 10:04:38 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
     %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")[*add::family/families]0

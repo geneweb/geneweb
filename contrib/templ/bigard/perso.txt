@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 1.2 2002-01-20 13:09:38 ddr Exp $ -->
-  <!-- copyright (c) INRIA -->
+  <!-- $Id: perso.txt,v 1.3 2004-12-14 10:04:37 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
     %if;has_public_name;
