@@ -16,6 +16,8 @@ GeneWeb Version 2.06
     Added the executable "setup" in "gw" directory as name "gwsetup".
 
 * GeneWeb daemon/CGI (gwd)
+  - [Aug 30, 99] To make the new option "-no_pit" of ged2gwb, had to change
+    the policy of private/public/iftitles.
   - [Aug 21, 99] Added request mode "TREE" to display general tree; no
     interface for it for the moment...
   - [Aug 17, 99] If option "-auth" used, print the password area like in

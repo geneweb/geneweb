@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.44 1999-08-21 11:45:44 ddr Exp $ *)
+(* $Id: perso.ml,v 2.45 1999-08-30 11:33:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -949,8 +949,7 @@ value print conf base p =
              html_br conf;
           return ())
        p.aliases;
-     if List.length p.titles > 0 &&
-        (p.access <> Private || conf.friend || conf.wizard) then
+     if p.titles <> [] && age_autorise conf base p then
        do Wserver.wprint "<em>";
           print_titles conf base True (transl conf "and") p;
           Wserver.wprint ".</em>\n";
