@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.51 2002-10-14 04:23:13 ddr Exp $ *)
+(* $Id: util.ml,v 4.52 2002-10-16 17:54:01 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1487,7 +1487,7 @@ value specify_homonymous conf base p =
 
 (* fix system bug: string_of_float 17.97 = "17.969999999999" *)
 value my_string_of_float f =
-  Printf.sprintf "%.16g" f
+  Printf.sprintf "%.6g" f
 ;
 
 value print_decimal_num conf f =
