@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.121 2005-02-23 02:15:21 ddr Exp $ *)
+(* $Id: util.ml,v 4.122 2005-03-01 05:50:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -883,12 +883,13 @@ value input_to_semi ic =
 value base_path pref bname =
   let pref = [Secure.base_dir () :: pref] in
   let bfile = List.fold_right Filename.concat pref bname in
-  ifdef WIN95 then bfile
-  else if Sys.file_exists bfile then bfile
+  IFDEF WIN95 THEN bfile
+  ELSE if Sys.file_exists bfile then bfile
   else if String.length bname >= 6 then
     let dirs = pref @ [String.make 1 bname.[0]; String.make 1 bname.[1]] in
     List.fold_right Filename.concat dirs bname
   else bfile
+  END
 ;
 
 value base_len n =

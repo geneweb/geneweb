@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.37 2005-02-28 04:08:21 ddr Exp $ *)
+(* $Id: date.ml,v 4.38 2005-03-01 05:50:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -717,16 +717,16 @@ value print_calendar conf base =
                   [ Calendar.NoPhase -> ()
                   | Calendar.NewMoon hh mm ->
                       Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
-                       (capitale (moon_txt 1)) hh mm
-            	  | Calendar.FirstQuarter hh mm ->
-            	      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
-            	        (capitale (moon_txt 2)) hh mm
-            	  | Calendar.FullMoon hh mm ->
-            	      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
-            	        (capitale (moon_txt 3)) hh mm
-            	  | Calendar.LastQuarter hh mm ->
-            	      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
-            	        (capitale (moon_txt 4)) hh mm ];
+                        (capitale (moon_txt 1)) hh mm
+                  | Calendar.FirstQuarter hh mm ->
+                      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                        (capitale (moon_txt 2)) hh mm
+                  | Calendar.FullMoon hh mm ->
+                      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                        (capitale (moon_txt 3)) hh mm
+                  | Calendar.LastQuarter hh mm ->
+                      Wserver.wprint "%s - <tt>%02d:%02d</tt> UT"
+                        (capitale (moon_txt 4)) hh mm ];
                   xtag "br";
                   stag "span" "style=\"font-size:80%%\"" begin
                     Wserver.wprint "(%s = %d)" (moon_txt 0) md;

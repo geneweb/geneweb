@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.75 2005-02-21 12:42:06 ddr Exp $ *)
+(* $Id: perso.ml,v 4.76 2005-03-01 05:50:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -263,7 +263,7 @@ value extract_var sini s =
 ;
 
 value warning_use_has_parents_before_parent (bp, ep) var r =
-  ifdef UNIX then do {
+  IFDEF UNIX THEN do {
     Printf.eprintf "*** <W> perso.txt";
     Printf.eprintf ", chars %d-%d" bp ep;
     Printf.eprintf "\
@@ -272,25 +272,25 @@ value warning_use_has_parents_before_parent (bp, ep) var r =
     flush stderr;
     r
   }
-  else r
+  ELSE r END
 ;
 
 value warning_not_impl (bp, ep) =
-  ifdef UNIX then do {
+  IFDEF UNIX THEN do {
     Printf.eprintf "*** <W> perso.txt";
     Printf.eprintf ", chars %d-%d" bp ep;
     Printf.eprintf " not implemented\n";
     flush stderr;
     raise Not_found
   }
-  else raise Not_found
+  ELSE raise Not_found END
 ;
 
 value obsolete_list = ref [];
 
 value obsolete (bp, ep) version var new_var r =
   if List.mem var obsolete_list.val then r
-  else ifdef UNIX then do {
+  else IFDEF UNIX THEN do {
     Printf.eprintf "*** <W> perso.txt, chars %d-%d:" bp ep;
     Printf.eprintf " \"%s\" obsolete since v%s%s\n" var version
       (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
@@ -298,7 +298,7 @@ value obsolete (bp, ep) version var new_var r =
     obsolete_list.val := [var :: obsolete_list.val];
     r
   }
-  else r
+  ELSE r END
 ;
 
 value bool_val x = VVbool x;

@@ -1,4 +1,4 @@
-(* $Id: argl.ml,v 4.8 2005-02-13 23:08:52 ddr Exp $ *)
+(* $Id: argl.ml,v 4.9 2005-03-01 05:50:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Printf;
@@ -31,7 +31,7 @@ value action_arg s sl =
         | [] -> None ]
       else do { f (float_of_string s); Some sl }
   | x ->
-      ifdef OCAML_307 then
+      IFDEF OCAML_307 THEN
         match x with
         [ Arg.Unit f -> if s = "" then do { f (); Some sl } else None
         | Arg.Set_string r ->
@@ -61,10 +61,11 @@ value action_arg s sl =
             [ [s :: sl] when List.mem s syms -> do { f s; Some sl }
             | _ -> None ]
         | x -> assert False ]
-      else
+      ELSE
         match x with
         [ Arg.Unit f -> if s = "" then do { f (); Some sl } else None
-        | x -> assert False ] ]
+        | x -> assert False ]
+      END ]
 ;
 
 value common_start s1 s2 =

@@ -1,4 +1,4 @@
-(* $Id: secure.ml,v 4.4 2004-12-14 09:30:17 ddr Exp $ *)
+(* $Id: secure.ml,v 4.5 2005-03-01 05:50:43 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 (* secure open; forbids to access anywhere in the machine;
@@ -72,13 +72,13 @@ value check_open fname =
   with
   [ Exit ->
       do {
-        ifdef UNIX then
+        IFDEF UNIX THEN
           do {
             Printf.eprintf "*** secure rejects open %s\n"
               (String.escaped fname);
             flush stderr;
           }
-        else ();
+        ELSE () END;
         raise (Sys_error "invalid access")
       } ]
 ;
