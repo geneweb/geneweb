@@ -3,16 +3,63 @@
 <head>
   <!-- copyright (c) INRIA -->
   <title>Ættfræði - %t</title>
+  <meta name="ROBOTS" content="NONE">
 </head>
 <body%b>
-<h1>Ættfræði</h1>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>Ættfræði <br>gagnagrunnur</font></h1>
+</td>
+</tr>
+</table>
+
+<br>
 
 %rversion
 
 <p>
 
-Gagnagrunnurinn er nú með %n einstaklinga%o
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+Gagnagrunnurinn <font color=#2f6400><b>"%t"</b></font> er nú með %n einstaklinga.%o<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%o
+
+%y<br><p>
+
+<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w"><em>Wizard</em></a> aðgangur<br>
+(aðgangsorð)</td>
+
+%y%z<td align=center><a href="%sw=f"><em>Vina</em></a> aðgangur<br>
+(aðgangsorð)</td>
+
+%z%y</tr></table>
+
+%y%i<br><br>
+
+<table border=0>
+<tr><td align=center>
+<form method=get action="%f">
+%hAðgangsorð, fyrir <em>vin</em> eða <em>wizard</em> aðgang:
+<input name=w size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+%i
+
+<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+Til að lóðsa þig í gegnum gagnagrunninn getur þú leitað:<br><br>
 
 <ul>
 
@@ -20,77 +67,118 @@ Gagnagrunnurinn er nú með %n einstaklinga%o
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-Leita: <input name=n size=40 maxlength=200>
+<font color=#2f6400><b>by person</b></font>
+<input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
 <ul>
-<li> <input type=radio name=t value=PN>
+<li> <input type=radio name=t value=PN checked>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
 [or] <em>[surname/surnames]</em>%u
-[or] <em>Sosa number</em> relative to %a%u
-<li> <input type=radio name=t value=P checked> <em>[first name/first names]</em>
+[or] <em>Sosa</em> skýrsla; %a%u
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
 <li>
 
-<FORM method=GET action="%f">
+<form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-Eftir titli <INPUT NAME=t size=14 maxlength=200>
-stað <INPUT NAME=p size=25 maxlength=200> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<font color=#2f6400><b>eftir titli</b></font>
+<input name=t size=14 maxlength=200>
+<font color=#2f6400><b>stað</b></font>
+<input name=p size=25 maxlength=200>
+<input type=submit value="Ok">
+<br>
+td:
+<font color=#2f6400><b>[title/titles]</b></font>: hertoginn...
+<font color=#2f6400><b>[place]</b></font>: af Frakklandi, af Sax...
+</form>
 
 <li>
 
-<FORM method=GET action="%f">
-%hÖll
-<SELECT NAME=m>
-   <OPTION VALUE="N"> Eftirnöfn
-   <OPTION VALUE="P" SELECTED> Fornöfn
-</SELECT>
+<form method=GET action="%f">
+%h
+<font color=#2f6400><b>með lista</b></font> yfir öll
+<select name=m>
+<option value="N" selected>eftirnöfn
+<option value="P">fornöfn
+</select>
 eftir
-<SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED> Stafrófsröð
-   <OPTION VALUE="F"> Tíðni
-</SELECT> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<select name=tri>
+<option value="A" selected>stafrófsröð
+<option value="F">tíðni
+</select>
+<input type=submit value="Ok">
+</form>
 
-<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+<li>
 
-%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
-<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w
+<font color=#2f6400><b>með </b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>nánari 
+ósk</b></font></a>.
 
 </ul>
 
-<a href="%sm=AN">Afmæli</a>.<br>
-<a href="%sm=AD">Dánarafmæli</a>.<br>
-<a href="%sm=AM">Brúðkaupsafmæli</a>.<br>%x
-<a href="%sm=LB;k=10">Síðust fæðingar</a>.<br>
-<a href="%sm=LD;k=10">Síðust andlát</a>.<br>%x%j
-<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.
+%w<p>
+
+<center>Þú getur<br><br>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM">bætt við fjölskyldu</a>
+</ul>
+</td>
+<td align=left>
+<ul>
+<li><a href="%sm=MOD_NOTES">breytt athugasemdum</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+<br>
+%w
+
+<center>Þú getur líka athugað<br><br>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li><a href="%sm=AN">afmælisdaga</a>
+<li><a href="%sm=AD">dánarafmæli</a>
+<li><a href="%sm=AM">brúðkaupsafmæli</a>%x
+<li><a href="%sm=LB;k=10">síðustu fæðingar</a>%x
+</ul>
+</td>
+<td valign=up>
+<ul>%x
+<li><a href="%sm=LD;k=10">síðustu andlát</a>%x%j
+<li><a href="%sm=HIST;k=10">uppfærslusögu</a>%j
+<li><a href="%sm=CAL">dagatöl</a>
+<li><a href="%sm=FORUM"><font color=#2f6400><b>GeneWeb</b></font> umræður</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
 <p>
+
 Það hafa verið %q heimsóknir, %c af þeim á þessa síðu, síðan %d.
 
-%y<p>
+</td></tr>
 
-<ul>
-<li> <a href="%sw=w"><em>Wizard</em></a> aðgangur (aðgangsorð).
-%y%z<li> <a href="%sw=f"><em>Vina</em></a> aðgangur (aðgangsorð).
-%z%y</ul>
+<tr>
+<td align=right><br><font size=-1><em><a
+href="%sm=LEX">lexicon</a></em></font></td>
+</tr>
 
-%y%i<p>
-<form method=get action="%f">
-%h<font size=-1>Aðgangsorð, fyrir <em>vin</em> eða <em>wizard</em> aðgang:</font>
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
-%i<p>
-
-<font size=-1><a href="%sm=LEX">Lexicon</a></font>
+</table>
+</center>

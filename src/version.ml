@@ -1,4 +1,4 @@
-(* $Id: version.ml,v 2.9 1999-10-03 20:38:38 ddr Exp $ *)
+(* $Id: version.ml,v 2.10 1999-10-26 22:35:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
-value txt = "2.08";
+value txt = "3.00";

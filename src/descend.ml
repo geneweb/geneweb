@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.32 1999-10-25 09:07:52 ddr Exp $ *)
+(* $Id: descend.ml,v 2.33 1999-10-26 22:35:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -94,42 +94,43 @@ value print_choice conf base p niveau_effectif =
       boucle 0;
     end;
     Wserver.wprint "<input type=submit value=\"Ok\">\n";
-    html_br conf;
-    tag "ul" begin
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=L checked> %s\n"
-        (capitale (transl conf "list"));
-      if browser_doesnt_have_tables conf then ()
-      else
-        do html_li conf;
-           Wserver.wprint "<input type=radio name=t value=T> %s\n"
-             (capitale (transl conf "tree"));
-           if niveau_effectif <= limit_by_tree then ()
-           else
-             do Wserver.wprint "(";
-                Wserver.wprint (ftransl conf "max %d generations")
-                  limit_by_tree;
-                Wserver.wprint ")\n";
-             return ();
-        return ();
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=N> %s\n"
-        (capitale (transl conf "families with encoding"));
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=G> -> %s\n"
-        (capitale (transl conf "index of the descendants"));
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=C> -> %s\n"
-        (capitale (transl conf "index of the spouses (non descendants)"));
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=S> %s\n"
-        (capitale (transl conf "only the generation selected"));
-    end;
     html_p conf;
-    tag "ul" begin
-      html_li conf;
-      Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
-      Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
+    tag "table" "border=%d width=\"90%%\"" conf.border begin
+      tag "tr" begin
+        tag "td" begin
+          Wserver.wprint "<input type=radio name=t value=L checked> %s<br>\n"
+            (capitale (transl conf "list"));
+          if browser_doesnt_have_tables conf then ()
+          else
+            Wserver.wprint "<input type=radio name=t value=T> %s\n"
+              (capitale (transl conf "tree"));
+            if niveau_effectif <= limit_by_tree then ()
+            else
+              do Wserver.wprint "(";
+                 Wserver.wprint (ftransl conf "max %d generations")
+                   limit_by_tree;
+                 Wserver.wprint ")\n";
+              return ();
+          Wserver.wprint "<br>\n";
+          Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
+            (capitale (transl conf "only the generation selected"));
+        end;
+        tag "td" begin
+          Wserver.wprint "<input type=radio name=t value=N> %s<br>\n"
+            (capitale (transl conf "families with encoding"));
+          Wserver.wprint "<input type=radio name=t value=G> - %s<br>\n"
+            (capitale (transl conf "index of the descendants"));
+          Wserver.wprint "<input type=radio name=t value=C> - %s<br>\n"
+            (capitale (transl conf "index of the spouses (non descendants)"));
+        end;
+      end;
+      tag "tr" begin
+        tag "td" "colspan=2 align=center" begin
+          Wserver.wprint "<br>\n%s\n"
+            (capitale (transl conf "cancel GeneWeb links"));
+          Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
+        end;
+      end;
     end;
     html_p conf;      
   end
@@ -144,8 +145,10 @@ value descendants_title conf base p h =
 
 value afficher_menu_descendants conf base p =
   let niveau_effectif = min (limit_desc conf) (level_max base p) in
-  do header conf (descendants_title conf base p);
-     print_choice conf base p niveau_effectif;
+  do cheader conf (descendants_title conf base p);
+     tag "center" begin
+       print_choice conf base p niveau_effectif;
+     end;
      trailer conf;
   return ()
 ;
@@ -171,7 +174,7 @@ value afficher_marie conf base first fam p spouse =
      stag "strong" begin
        afficher_personne_referencee conf base spouse;
      end;
-     if auth then Perso.print_dates conf base False spouse else ();
+     if auth then Date.print_dates conf base spouse else ();
      if auth then
        match fam.divorce with
        [ NotDivorced -> ()
@@ -196,7 +199,7 @@ value print_child conf base levt boucle niveau_max niveau compte auth ix =
          afficher_prenom_de_personne_referencee conf base x
        else afficher_personne_referencee conf base x;
      end;
-     if auth then Perso.print_dates conf base False x else ();
+     if auth then Date.print_dates conf base x else ();
      if levt.(Adef.int_of_iper x.cle_index) < niveau then
        Wserver.wprint "<em>, %s</em>"
          (transl conf "see further")
@@ -284,7 +287,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
      stag "strong" begin
        afficher_personne_referencee conf base p;
      end;
-     if age_autorise conf base p then Perso.print_dates conf base False p
+     if age_autorise conf base p then Date.print_dates conf base p
      else ();
      Wserver.wprint ".";
      html_br conf;

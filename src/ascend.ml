@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.55 1999-10-08 10:19:48 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.56 1999-10-26 22:35:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -65,84 +65,80 @@ value print_choice conf base p niveau_effectif =
     Wserver.wprint "\n";
     Wserver.wprint "<input type=hidden name=m value=A>\n";
     wprint_hidden_person conf base "" p;
-    tag "select" "name=v" begin
-      let rec boucle i =
-        if i > niveau_effectif + 1 then ()
-        else
-          do Wserver.wprint "  <option value=%d%s> %s\n" i
-               (if i == 0 then " selected" else "")
-               (capitale (text_to conf i));
-          return boucle (succ i)
-      in
-      boucle 1;
+    tag "center" begin
+      tag "select" "name=v" begin
+        let rec boucle i =
+          if i > niveau_effectif + 1 then ()
+          else
+            do Wserver.wprint "  <option value=%d%s> %s\n" i
+                 (if i == 0 then " selected" else "")
+                 (capitale (text_to conf i));
+            return boucle (succ i)
+        in
+        boucle 1;
+      end;
+      Wserver.wprint "<input type=submit value=\"Ok\">\n";
     end;
-    Wserver.wprint "<input type=submit value=\"Ok\">\n";
     html_br conf;
-    tag "ul" begin
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=N checked> %s\n"
-        (capitale (transl conf "short display"));
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=G> %s\n"
-        (capitale (transl conf "long display"));
-      tag "ul" begin
-        html_li conf;
-        Wserver.wprint
-          "%s <input type=checkbox name=siblings value=on checked>\n"
-          (capitale (transl conf "siblings"));
-        html_li conf;
-        Wserver.wprint
-          "%s <input type=checkbox name=notes value=on checked>\n"
-          (capitale (nominative (transl_nth conf "note/notes" 1)));
+    tag "table" "border=%d width=\"90%%\"" conf.border begin
+      tag "tr" begin
+        tag "td" "valign=top" begin
+          Wserver.wprint "<input type=radio name=t value=N checked> %s<br>\n"
+            (capitale (transl conf "short display"));
+          Wserver.wprint "<input type=radio name=t value=G> %s<br>\n"
+            (capitale (transl conf "long display"));
+          Wserver.wprint
+            "- %s <input type=checkbox name=siblings value=on checked><br>\n"
+            (capitale (transl conf "siblings"));
+          Wserver.wprint
+            "- %s <input type=checkbox name=notes value=on checked><br>\n"
+            (capitale (nominative (transl_nth conf "note/notes" 1)));
+          Wserver.wprint "<input type=radio name=t value=T> %s\n"
+            (capitale (transl conf "tree"));
+          let limit =
+            if browser_doesnt_have_tables conf then 3 else limit_by_tree
+          in
+          if niveau_effectif <= limit then ()
+          else
+            do Wserver.wprint "(";
+               Wserver.wprint (ftransl conf "max %d generations") limit;
+               Wserver.wprint ")\n";
+            return ();
+          Wserver.wprint "<br>\n";
+          Wserver.wprint "<input type=radio name=t value=L> %s\n"
+            (capitale (transl conf "list"));
+          if niveau_effectif <= limit_by_list conf then ()
+          else
+            do Wserver.wprint "(";
+               Wserver.wprint (ftransl conf "max %d generations")
+                 (limit_by_list conf);
+               Wserver.wprint ")\n";
+            return ();
+        end;
+        tag "td valign=top" begin
+          Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
+            (capitale (transl conf "only the generation selected"));
+          Wserver.wprint "<input type=radio name=t value=M> %s<br>\n"
+            (capitale (transl conf "missing ancestors"));
+          Wserver.wprint "- %s\n"
+            (capitale (transl conf "alphabetic order"));
+          Wserver.wprint "<input type=checkbox name=al value=on><br>\n";
+          Wserver.wprint "- %s\n"
+            (capitale (transl conf "include missing spouses"));
+          Wserver.wprint "<input type=checkbox name=ms value=on><br>\n";
+          Wserver.wprint "- %s\n" (capitale (transl conf "after"));
+          Wserver.wprint "<input name=after size=5 maxlength=5>\n";
+          Wserver.wprint "%s\n" (capitale (transl conf "before"));
+          Wserver.wprint "<input name=before size=5 maxlength=5><br>\n";
+        end;
       end;
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=T> %s\n"
-        (capitale (transl conf "tree"));
-      let limit =
-        if browser_doesnt_have_tables conf then 3 else limit_by_tree
-      in
-      if niveau_effectif <= limit then ()
-      else
-        do Wserver.wprint "(";
-           Wserver.wprint (ftransl conf "max %d generations") limit;
-           Wserver.wprint ")\n";
-        return ();
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=L> %s\n"
-        (capitale (transl conf "list"));
-      if niveau_effectif <= limit_by_list conf then ()
-      else
-        do Wserver.wprint "(";
-           Wserver.wprint (ftransl conf "max %d generations")
-             (limit_by_list conf);
-           Wserver.wprint ")\n";
-        return ();
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=S> %s\n"
-        (capitale (transl conf "only the generation selected"));
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=M> %s\n"
-        (capitale (transl conf "missing ancestors"));
-      tag "ul" begin
-        html_li conf;
-        Wserver.wprint "%s\n" (capitale (transl conf "alphabetic order"));
-        Wserver.wprint "<input type=checkbox name=al value=on>\n";
-        html_li conf;
-        Wserver.wprint "%s\n"
-          (capitale (transl conf "include missing spouses"));
-        Wserver.wprint "<input type=checkbox name=ms value=on>\n";
-        html_li conf;
-        Wserver.wprint "%s\n" (capitale (transl conf "after"));
-        Wserver.wprint "<input name=after size=5 maxlength=5>\n";
-        Wserver.wprint "%s\n" (capitale (transl conf "before"));
-        Wserver.wprint "<input name=before size=5 maxlength=5>\n";
+      tag "tr" begin
+        tag "td" "colspan=2 align=center" begin
+          Wserver.wprint "%s\n"
+            (capitale (transl conf "cancel GeneWeb links"));
+          Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
+        end;
       end;
-    end;
-    html_p conf;
-    tag "ul" begin
-      html_li conf;
-      Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
-      Wserver.wprint "<input type=checkbox name=cgl value=on><br>\n";
     end;
   end
 ;
@@ -161,21 +157,24 @@ value afficher_menu_ascendants conf base p =
     Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
       (transl_decline conf "of" (txt_fun raw_access conf base p))
   in
-  do header conf title;
-     print_choice conf base p niveau_effectif;
-     html_p conf;
-     Wserver.wprint
-       (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
-       (fun _ ->
-          do conf.henv := list_remove_assoc "iz" conf.henv;
-             stag "a" "href=\"%siz=%d\"" (commd conf)
-               (Adef.int_of_iper p.cle_index)
-             begin
-               afficher_personne_sans_titre conf base p;
-             end;
-             afficher_titre conf base p;
-          return ());
-     Wserver.wprint ".\n";
+  do cheader conf title;
+     tag "center" begin
+       print_choice conf base p niveau_effectif;
+       html_p conf;
+       Wserver.wprint
+         (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
+         (fun _ ->
+            do conf.henv := list_remove_assoc "iz" conf.henv;
+               stag "a" "href=\"%siz=%d\"" (commd conf)
+                 (Adef.int_of_iper p.cle_index)
+               begin
+                 afficher_personne_sans_titre conf base p;
+               end;
+               afficher_titre conf base p;
+            return ());
+       Wserver.wprint ".\n";
+     end;
+     Wserver.wprint "<br>\n";
      trailer conf;
   return ()
 ;
@@ -400,7 +399,7 @@ value print_person_long_info conf base auth link p =
           Wserver.wprint "</em>";
        return ()
      else ();
-     if auth then Perso.print_dates conf base False p else ();
+     if auth then Date.print_dates conf base p else ();
      let occu = sou base p.occupation in
      if auth && link = None && occu <> "" then
        Wserver.wprint ", %s" occu

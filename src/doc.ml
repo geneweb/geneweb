@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 2.7 1999-10-05 20:59:24 ddr Exp $ *)
+(* $Id: doc.ml,v 2.8 1999-10-26 22:35:36 ddr Exp $ *)
 
 open Config;
 
@@ -7,30 +7,62 @@ value start_with s i p =
   && String.lowercase (String.sub s i (String.length p)) = p
 ;
 
+value last_is s i p =
+  loop i (String.length p - 1) where rec loop i k =
+    if i <= 0 then False
+    else if k < 0 then True
+    else
+      let c = Char.lowercase s.[i] in
+      let c = if c = '\n' || c = '\r' then ' ' else c in
+      if c = ' ' && p.[k] = ' ' then
+        loop1 (i - 1) where rec loop1 i =
+          if i <= 0 then False
+          else
+            match s.[i] with
+            [ '\n' | '\r' | ' ' -> loop1 (i - 1)
+            | _ -> loop i (k - 1) ]
+      else if c = p.[k] then loop (i - 1) (k - 1)
+      else False
+;
+
 value http = "http://";
 
-value copy pref s =
-  let last8 = String.make 8 ' ' in
-  let insert c =
-    let c = Char.lowercase c in
-    let c = if c = '\n' || c = '\r' then ' ' else c in
-    if c = ' ' && last8.[7] = ' ' then ()
-    else do String.blit last8 1 last8 0 7; last8.[7] := c; return ()
-  in
+value copy conf pref_doc pref_img s =
   loop 0 where rec loop i =
     if i == String.length s then ()
     else
-      do insert s.[i]; return
-      if last8 = "<a href=" then
-        let i = do Wserver.wprint "%c" s.[i]; return i + 1 in
+      if last_is s i "<a href=" then
+        let i = do Wserver.wprint "="; return i + 1 in
         let i =
           if s.[i] = '"' then do Wserver.wprint "\""; return i + 1 else i
         in
         do if s.[i] = '#' || start_with s i http || start_with s i "mailto:"
            then ()
-           else Wserver.wprint "%s" pref;
+           else Wserver.wprint "%s" pref_doc;
         return
         loop i
+      else if last_is s i " src=" || last_is s i " background=" then
+        let i = do Wserver.wprint "="; return i + 1 in
+        let (img, i) =
+          if s.[i] = '"' then
+            loop (i + 1) 0 where rec loop i len =
+              if i = String.length s then (Buff.get len, i)
+              else if s.[i] = '"' then (Buff.get len, i + 1)
+              else loop (i + 1) (Buff.store len s.[i])
+          else
+            loop (i + 1) 0 where rec loop i len =
+              if i = String.length s then (Buff.get len, i)
+              else if s.[i] = '>' then (Buff.get len, i)
+              else loop (i + 1) (Buff.store len s.[i])
+       in
+       let img = Filename.basename img in
+       do Wserver.wprint "\"%s%s\"" pref_img img; return loop i
+      else if last_is s i "<body>" then
+        let s =
+          try " " ^ List.assoc "body_prop" conf.base_env with
+          [ Not_found -> Util.default_body_prop conf ]
+        in
+        do Wserver.wprint "%s>" s; return loop (i + 1)
       else do Wserver.wprint "%c" s.[i]; return loop (i + 1)
 ;
 
@@ -67,12 +99,13 @@ value print conf =
              [ End_of_file -> close_in ic ];
           return Buff.get len.val
        in
-       let pref =
+       let pref_doc =
          let dir = Filename.dirname v ^ "/" in
          let dir = if dir = "./" then "" else dir in
          conf.command ^ "?m=DOC;v=" ^ dir
        in
-       copy pref s
+       let pref_img = conf.command ^ "?m=IM;v=/" in
+       copy conf pref_doc pref_img s
     | None -> Util.incorrect_request conf ]
   else Util.incorrect_request conf
 ;

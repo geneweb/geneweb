@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 2.23 1999-10-03 20:38:37 ddr Exp $ *)
+(* $Id: date.ml,v 2.24 1999-10-26 22:35:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -303,6 +303,115 @@ value short_marriage_date_text conf base fam p1 p2 =
   else ""
 ;
 
+value print_dates conf base p =
+  let cap s = ", " ^ s in
+  let is = index_of_sex p.sex in
+  do let birth_place = sou base p.birth_place in
+     do match Adef.od_of_codate p.birth with
+        [ Some d ->
+            do Wserver.wprint "%s " (cap (transl_nth conf "born" is));
+               Wserver.wprint "%s" (string_of_ondate conf d);
+               if birth_place <> "" then Wserver.wprint ",\n" else ();
+            return ()
+        | None ->
+            if birth_place <> "" then
+              Wserver.wprint "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
+            else () ];
+        if birth_place <> "" then Wserver.wprint "%s" birth_place else ();
+     return ();
+     let baptism = Adef.od_of_codate p.baptism in
+     let baptism_place = sou base p.baptism_place in
+     do match baptism with
+        [ Some d ->
+            do Wserver.wprint "%s "
+                 (cap (transl_nth conf "baptized" is));
+               Wserver.wprint "%s" (string_of_ondate conf d);
+               if baptism_place <> "" then Wserver.wprint ",\n" else ();
+            return ()
+        | None ->
+            if baptism_place <> "" then
+              Wserver.wprint "%s\n-&nbsp;"
+                (cap (transl_nth conf "baptized" is))
+            else () ];
+        if baptism_place <> "" then
+          Wserver.wprint "%s" baptism_place
+        else ();
+     return ();
+     let death_place = sou base p.death_place in
+     do match p.death with
+        [ Death dr d ->
+            let dr_w =
+              match dr with
+              [ Unspecified -> transl_nth conf "died" is
+              | Murdered -> transl_nth conf "murdered" is
+              | Killed -> transl_nth conf "killed (in action)" is
+              | Executed -> transl_nth conf "executed (legally killed)" is
+              | Disappeared -> transl_nth conf "disappeared" is ]
+            in
+            let d = Adef.date_of_cdate d in
+            do Wserver.wprint "%s " (cap dr_w);
+               Wserver.wprint "%s" (string_of_ondate conf d);
+               if death_place <> "" then Wserver.wprint ",\n" else ();
+            return ()
+        | DeadYoung ->
+            do Wserver.wprint "%s" (cap (transl_nth conf "dead young" is));
+               if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
+            return ()
+        | DeadDontKnowWhen ->
+            match (death_place, p.burial) with
+            [ ("", Buried _ | Cremated _) -> ()
+            | _ ->
+                if death_place <> "" || not (of_course_died conf p) then
+                  do Wserver.wprint "%s" (cap (transl_nth conf "died" is));
+                     if death_place <> "" then Wserver.wprint "\n-&nbsp;"
+                     else ();
+                  return ()
+                else () ]
+        | DontKnowIfDead | NotDead -> () ];
+        if death_place <> "" then
+          do Wserver.wprint "%s" death_place;
+          return ()
+        else ();
+     return ();
+     let sure d = d.prec = Sure in
+     match (Adef.od_of_codate p.birth, date_of_death p.death) with
+     [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
+         if sure d1 && sure d2 && d1 <> d2 then
+           let a = temps_ecoule d1 d2 in
+           do Wserver.wprint "\n(";
+              Wserver.wprint "%s " (transl conf "death age:");
+              print_age conf a;
+              Wserver.wprint ")";
+           return ()
+         else ()
+     | _ -> () ];
+     let burial_date_place cod =
+       let place = sou base p.burial_place in
+       do match Adef.od_of_codate cod with
+          [ Some d ->
+              do Wserver.wprint " %s" (string_of_ondate conf d);
+                 if place <> "" then Wserver.wprint ",\n" else ();
+              return ()
+          | None ->
+              if place <> "" then Wserver.wprint " -&nbsp;" else () ];
+          if place <> "" then Wserver.wprint "%s" place else ();
+       return ()
+     in
+     do match p.burial with
+        [ Buried cod ->
+            do Wserver.wprint "%s" (cap (transl_nth conf "buried" is));
+               burial_date_place cod;
+            return ()
+        | Cremated cod ->
+            do Wserver.wprint "%s"
+                 (cap (transl_nth conf "cremated" is));
+               burial_date_place cod;
+            return ()
+        | UnknownBurial -> () ];
+     return ();
+  return ()
+;
+
 (* Calendar request *)
 
 value gregorian_month_name conf n = capitale (transl_nth conf "(month)" n);
@@ -424,7 +533,7 @@ value print_calendar conf base =
     let x = conf.today_wd - sdn_today + sdn in
     if x < 0 then 6 + (x + 1) mod 7 else x mod 7
   in
-  do header conf title;
+  do cheader conf title;
      Wserver.wprint "- %s -\n"
        (capitale (transl_nth conf "(week day)" wday));
      html_p conf;

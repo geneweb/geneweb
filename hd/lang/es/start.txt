@@ -6,14 +6,60 @@
   <meta name="ROBOTS" content="NONE">
 </head>
 <body%b>
-<h1>Genealogía</h1>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>Base de datos<br>geneal&oacute;gica</font></h1>
+</td>
+</tr>
+</table>
+
+<br>
 
 %rversion
 
 <p>
 
-La base contiene actualmente %n personas%o
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+La base <font color=#2f6400><b>"%t"</b></font> contiene actualmente %n
+personas.%o<br> (<a href="%sm=NOTES">[note/notes]1</a>)%o
+
+%y<br><p>
+
+<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w">Entrada <em>brujo</em></a><br>
+(contrase&ntilde;a)</td>
+
+%y%z<td align=center><a href="%sw=f">Entrada <em>amigo</em></a><br>
+(contrase&ntilde;a)</td>
+
+%z%y</tr></table>
+
+%y%i<br><br>
+
+<table border=0>
+<tr><td align=center>
+<form method=get action="%f">
+%hContrase&ntilde;a, para entrada <em>amigo</em> o <em>brujo</em>:
+<input name=w size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+%i
+
+<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+{To navigate in this data base, you can do your search}:<br><br>
 
 <ul>
 
@@ -21,7 +67,8 @@ La base contiene actualmente %n personas%o
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-Buscar: <input name=n size=40 maxlength=200>
+<font color=#2f6400><b>por persona</b></font>
+<input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
 <ul>
@@ -38,65 +85,101 @@ Buscar: <input name=n size=40 maxlength=200>
 
 <li>
 
-<FORM method=GET action="%f">
+<form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-Por título <INPUT NAME=t size=14 maxlength=200>
-lugar <INPUT NAME=p size=25 maxlength=200> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<font color=#2f6400><b>por t&iacute;tulo</b></font>
+<input name=t size=14 maxlength=200>
+<font color=#2f6400><b>lugar</b></font>
+<input name=p size=25 maxlength=200>
+<input type=submit value="Ok">
+<br>
+ej:
+<font color=#2f6400><b>[title/titles]</b></font>: roi, duke...
+<font color=#2f6400><b>[place]</b></font>: de France, of Sax...
+</form>
 
 <li>
 
-<FORM method=GET action="%f">
-%hTodos los
-<SELECT NAME=m>
-   <OPTION VALUE="N" SELECTED> Apellidos
-   <OPTION VALUE="P"> Nombres
-</SELECT>
+<form method=GET action="%f">
+%h
+<font color=#2f6400><b>por el listo</b></font> de todo los
+<select name=m>
+<option value="N" selected>apellidos
+<option value="P">nombres
+</select>
 por
-<SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED> Orden alfab&eacute;tico
-   <OPTION VALUE="F"> Frecuencia
-</SELECT> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<select name=tri>
+<option value="A" selected>orden alfab&eacute;tico
+<option value="F">frecuencia
+</select>
+<input type=submit value="Ok">
+</form>
 
-<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+<li>
 
-%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
-<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w
+<font color=#2f6400><b>por la</b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>consulta
+avanzada</b></font></a>.
 
 </ul>
 
-Los <a href="%sm=AN">cumplea&ntilde;os</a>.<br>
-Los <a href="%sm=AD">aniversarios de las personas fallecidas</a>.<br>
-Los <a href="%sm=AM">aniversarios de casamiento</a>.<br>%x
-Los <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>.<br>
-Las <a href="%sm=LD;k=10">muertes recientes</a>.<br>%x%j
-<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
-<a href="%sm=FORUM">[*forum]</a>.
+%w<p>
+
+<center>Puede<br><br>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM">agregar una familia</a>
+</ul>
+</td>
+<td align=left>
+<ul>
+<li><a href="%sm=MOD_NOTES">modificar las notas</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+<br>
+%w
+
+<center>Puede consultar<br><br>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li>los <a href="%sm=AN">cumplea&ntilde;os</a>
+<li>los <a href="%sm=AD">aniversarios de las personas fallecidas</a>
+<li>los <a href="%sm=AM">aniversarios de casamiento</a>%x
+<li>los <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>%x
+</ul>
+</td>
+<td valign=up>
+<ul>%x
+<li>las <a href="%sm=LD;k=10">muertes recientes</a>%x%j
+<li>los <a href="%sm=HIST;k=10">{history of updates}</a>%j
+<li>los <a href="%sm=CAL">{calendars}</a>
+<li>el <a href="%sm=FORUM">forum <font color=#2f6400><b>GeneWeb</b></font></a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
 
 <p>
 
 Han habido %q consultas, de las cuales %c corresponden a esta
 p&aacute;gina, desde el %d.
 
-%y<p>
+</td></tr>
 
-<ul>
-<li> Entrada <a href="%sw=w"><em>brujo</em></a> (contrase&ntilde;a).
-%y%z<li> Entrada <a href="%sw=f"><em>amigo</em></a> (contrase&ntilde;a).
-%z%y</ul>
+<tr>
+<td align=right><br><font size=-1><em><a
+href="%sm=LEX">lexicon</a></em></font></td>
+</tr>
 
-%y%i<p>
-<form method=get action="%f">
-%h<font size=-1>Contrase&ntilde;a, para entrada <em>amigo</em> o
-<em>brujo</em>:</font>
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
-%i<p>
-
-<font size=-1><a href="%sm=LEX">Lexicon</a></font>
+</table>
+</center>

@@ -181,7 +181,7 @@
 <input type=radio name=sex value=F>[M/F]1
 <input type=radio name=sex value=N checked>-
 
-<h4>[*marriage/marriages]1</h4>
+<h4>[*married]0</h4>
 
 <input type=radio name=married value=Y>[Y/N]0
 <input type=radio name=married value=N>[Y/N]1

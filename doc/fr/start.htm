@@ -1,10 +1,22 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head><title>D&eacute;marrer avec GeneWeb</title></head>
-<body>
-<h1>D&eacute;marrer avec GeneWeb</h1>
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>D&eacute;marrer avec GeneWeb</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
 
-Ce chapitre contient une introduction &agrave; <em>GeneWeb</em>, avec
+Ce chapitre contient une introduction &agrave; <b><font color=#2f6400>GeneWeb</font></b>, avec
 une description succinte des commandes et des fichiers afin de pouvoir
 d&eacute;marrer.
 
@@ -33,11 +45,12 @@ d&eacute;marrer.
 <li> <a href="#Lng">R&eacute;pertoire "lang" - sous-r&eacute;pertoires</a>
 
 </ul>
+<hr>
+<h3> <a name="Int"><font color=#2f6400>
+Introduction</font></a> </h3>
 
-<h4> <a name="Int">Introduction</a> </h4>
-
-Pour configurer et d&eacute;marrer <em>GeneWeb</em>, vous devez
-utiliser des commandes int&eacute;ractives. Sous Unix, lancez un
+Pour configurer et d&eacute;marrer <b><font color=#2f6400>GeneWeb</font></b>, vous devez
+utiliser des commandes interactives. Sous Unix, lancez un
 xterm. Sous Windows 95/NT, cliquez sur "D&eacute;marrer", "Programmes"
 et "Invite de Commandes" (&ccedil;a s'appelle parfois "Commandes
 MSdos").
@@ -46,7 +59,7 @@ MSdos").
 
 Dans cette fen&ecirc;tre, tapez la commande pour aller dans le
 r&eacute;pertoire o&ugrave; vous avez install&eacute;
-<em>GeneWeb</em>:
+<b><font color=#2f6400>GeneWeb</font></b>:
 
 <ul>
 
@@ -70,7 +83,7 @@ Puis allez dans le sous-r&eacute;pertoire "gw", en tapant:
      cd gw
 </pre>
 
-Toutes les commandes de <em>GeneWeb</em> peuvent &ecirc;tre
+Toutes les commandes de <b><font color=#2f6400>GeneWeb</font></b> peuvent &ecirc;tre
 lanc&eacute;es avec l'option -help qui affiche les diff&eacute;rentes
 options possibles, avec une petite explication, en anglais.
 
@@ -121,19 +134,20 @@ Exemple:
 
 <p>
 
-Les bases de donn&eacute;es <em>GeneWeb</em> sont des
+Les bases de donn&eacute;es <b><font color=#2f6400>GeneWeb</font></b> sont des
 r&eacute;pertoires avec l'extension ".gwb".
 
-<h4> <a name="Gwc">Commande gwc</a> </h4>
+<hr>
+<h3> <a name="Gwc"><font color=#2f6400>Commande gwc</font></a> </h3>
 
-Pour utiliser <em>GeneWeb</em>, vous devez cr&eacute;er une base de
+Pour utiliser <b><font color=#2f6400>GeneWeb</font></b>, vous devez cr&eacute;er une base de
 donn&eacute;es. Vous pouvez le faire soit avec cette commande-ci,
 "gwc", soit avec "ged2gwb", section suivante.
 
 <p>
 
 La commande "gwc", dans son utilisation la plus simple, cr&eacute;e
-une base de donn&eacute;es vide: sous <em>GeneWeb</em>, vous allez
+une base de donn&eacute;es vide: sous <b><font color=#2f6400>GeneWeb</font></b>, vous allez
 pouvoir la remplir.
 
 <p>
@@ -149,22 +163,24 @@ Par exemple, si vous voulez l'appeler "dupont", tapez:
      gwc -o dupont
 </pre>
 
-<h4> <a name="Ged">Commande ged2gwb</a> </h4>
+<hr>
+<h3> <a name="Ged"><font color=#2f6400>
+Commande ged2gwb </font></a> </h3>
 
-Un autre moyen de cr&eacute;er une base de donn&eacute;es <em>GeneWeb</em>
+Un autre moyen de cr&eacute;er une base de donn&eacute;es <b><font color=#2f6400>GeneWeb</font></b>
 est de partir d'un fichier GEDCOM.
 
 <p>
 
 La commande "ged2gwb" vous permet de convertir un fichier GEDCOM en
-base de donn&eacute;es <em>GeneWeb</em>.
+base de donn&eacute;es <b><font color=#2f6400>GeneWeb</font></b>.
 
 <p>
 
 Le plus simple est d'abord de copier votre fichier GEDCOM dans le
 r&eacute;pertoire o&ugrave; vous avez install&eacute;
-<em>GeneWeb</em>. Faites-le avec votre m&eacute;thode habituelle pour
-copier des fichiers, soit avec une commande int&eacute;ractive, si
+<b><font color=#2f6400>GeneWeb</font></b>. Faites-le avec votre m&eacute;thode habituelle pour
+copier des fichiers, soit avec une commande interactive, si
 vous savez le faire, soit en d&eacute;pla&ccedil;ant les ic&ocirc;nes.
 
 <p>
@@ -187,13 +203,17 @@ passe bien, la commande doit se terminer par:
      *** Ok
 </pre>
 
-<h4> <a name="Gee">Commande gwb2ged</a> </h4>
+<hr>
+<h3> <a name="Gee"><font color=#2f6400>
+Commande gwb2ged </font></a> </h3>
 
 Avant de continuer, notons en passant la commande inverse, "gwb2ged",
 permettant de reconstituer un fichier GEDCOM &agrave; partir d'une
-base <em>GeneWeb</em>.
+base <b><font color=#2f6400>GeneWeb</font></b>.
 
-<h4> <a name="Gwd">Commande gwd</a> </h4>
+<hr>
+<h3> <a name="Gwd"><font color=#2f6400>
+Commande gwd </font></a> </h3>
 
 Une fois que vous avez cr&eacute;&eacute; une base, avec une des deux
 commandes "gwc" ou "ged2gwb", vous allez pouvoir enfin la consulter et
@@ -201,7 +221,7 @@ l'&eacute;tendre.
 
 <p>
 
-Toujours dans la fen&ecirc;tre int&eacute;ractive, tapez simplement:
+Toujours dans la fen&ecirc;tre interactive, tapez simplement:
 
 <pre>
      gwd
@@ -209,7 +229,7 @@ Toujours dans la fen&ecirc;tre int&eacute;ractive, tapez simplement:
 
 <p>
 
-Cette commande lance le "d&eacute;mon" <em>GeneWeb</em>. La commande
+Cette commande lance le "d&eacute;mon" <b><font color=#2f6400>GeneWeb</font></b>. La commande
 doit afficher:
 
 <pre>
@@ -227,11 +247,11 @@ doit afficher:
 
 
 Remarquez que vous ne reprenez pas la main dans la fen&ecirc;tre
-int&eacute;ractive. Ce programme attend des requ&ecirc;tes que vous
+interactive. Ce programme attend des requ&ecirc;tes que vous
 allez lui faire par l'interm&eacute;diaire de votre navigateur
-Web. Quand vous avez fini d'utiliser <em>Geneweb</em>, vous pouvez
+Web. Quand vous avez fini d'utiliser <b><font color=#2f6400>GeneWeb</font></b>, vous pouvez
 l'arrêter en faisant control-C dans la fen&ecirc;tre
-int&eacute;ractive.
+interactive.
 
 <p>
 
@@ -248,7 +268,7 @@ Attention: ne mettez pas le nom complet (style "c:\geneweb\gw\dupont" ou
 
 <p>
 
-Vous devez voir appara&icirc;tre la page d'accueil de <em>GeneWeb</em>.
+Vous devez voir appara&icirc;tre la page d'accueil de <b><font color=#2f6400>GeneWeb</font></b>.
 
 <p>
 
@@ -293,14 +313,14 @@ donn&eacute;es.
 
 Pendant ce temps, vous pouvez constater que chaque fois que vous
 cliquez sur un bouton ou un lien, une trace apparait dans la
-fen&ecirc;tre int&eacute;ractive. Quand vous ferez fonctionner votre
-<a href="server.htm">serveur</a> <em>GeneWeb</em> sur le
+fen&ecirc;tre interactive. Quand vous ferez fonctionner votre
+<a href="server.htm">serveur</a> <b><font color=#2f6400>GeneWeb</font></b> sur le
 r&eacute;seau, vous pourrez ainsi voir les requ&ecirc;tes qui seront
 faites sur votre base.
 
 <p>
 
-Notez que si vous tapez control-C dans la fen&ecirc;tre int&eacute;ractive,
+Notez que si vous tapez control-C dans la fen&ecirc;tre interactive,
 le service ne r&eacute;pondra plus dans votre navigateur. Pour le relancer,
 tapez simplement "gwd" de nouveau.
 
@@ -308,18 +328,20 @@ tapez simplement "gwd" de nouveau.
 
 Sous Windows, vous pouvez simplement double-cliquer sur l'ic&ocirc;ne
 de "gwd" pour le lancer. Cela ouvrira une fen&ecirc;tre
-int&eacute;ractive o&ugrave; "gwd" affichera ses traces. En tapant
+interactive o&ugrave; "gwd" affichera ses traces. En tapant
 Control-C, "gwd" s'arr&ecirc;tera et la fen&ecirc;tre se fermera. En
 cr&eacute;ant un raccourci de "gwd" sur le bureau, vous pourrez
 l'utiliser de mani&egrave;re tr&egrave;s simple.
 
-<h4> <a name="Csg"> Commande consang </a> </h4>
+<hr>
+<h3> <a name="Csg"><font color=#2f6400>
+Commande consang </font></a> </h3>
 
 Cette commande doit &ecirc;tre lanc&eacute;e dans la fen&ecirc;tre
-int&eacute;rative, comme les autres. Si le d&eacute;mon "gwd" tourne,
+interactive, comme les autres. Si le d&eacute;mon "gwd" tourne,
 tapez control-c pour l'arr&ecirc;ter. Une autre solution, si vous ne
 voulez pas arr&ecirc;ter le d&eacute;mon, consiste &agrave; lancer une
-autre fen&ecirc;tre de commande int&eacute;ractives, en suivant
+autre fen&ecirc;tre de commande interactive, en suivant
 l'indication de l'introduction.
 
 <p>
@@ -347,7 +369,7 @@ tapez:
 Le programme va calculer quelques secondes ou minutes, suivant la
 taille de votre base, en affichant sans arr&ecirc;t le nombre de
 personnes restant &agrave; traiter. &Agrave; la fin, vous reprendrez
-la main dans la fen&ecirc;tre int&eacute;ractive et les
+la main dans la fen&ecirc;tre interactive et les
 consanguinit&eacute;s individuelles seront enregistr&eacute;es.
 
 <p>
@@ -371,7 +393,9 @@ En outre "consang" fait un "nettoyage" interne de votre base,
 n&eacute;cessaire apr&egrave;s un certain nombre de mises &agrave;
 jour.
 
-<h4> <a name="Gwu">Commande gwu</a> </h4>
+<hr>
+<h3> <a name="Gwu"><font color=#2f6400>
+Commande gwu </font></a> </h3>
 
 Cette commande permet d'afficher le contenu de la base sous forme de
 texte. En redirigeant cet affichage vers un fichier, cela peut constituer
@@ -399,7 +423,7 @@ fait des modifications dans votre base.
 <p>
 
 C'est enfin une m&eacute;thode pour reconstituer votre base quand vous
-prenez une nouvelle version de <em>GeneWeb</em>, dans le cas o&ugrave;
+prenez une nouvelle version de <b><font color=#2f6400>GeneWeb</font></b>, dans le cas o&ugrave;
 la repr&eacute;sention interne des bases a chang&eacute;.
 
 <p>
@@ -414,7 +438,9 @@ ci dessus, tapez:
      gwc toto.gw -o durand
 </pre>
 
-<h4> <a name="Cnf">Fichier a.gwf</a> </h4>
+<hr>
+<h3> <a name="Cnf"><font color=#2f6400>
+Fichier a.gwf </font></a> </h3>
 
 Ce fichier contient une configuration-type pour une base de donn&eacute;es.
 Si votre base s'appelle "dupont", faites une copie de "a.gwf" en l'appelant
@@ -502,8 +528,8 @@ la langue est le fran&ccedil;ais. Les valeurs possibles sont:
 
 <p>
 
-Notez que quelque soit la langue s&eacute;lectionn&eacute;e par
-d&eacute;faut vous pouvez en choisir une autre dans la page d'accueil,
+Notez que, quelque soit la langue s&eacute;lectionn&eacute;e par
+d&eacute;faut, vous pouvez en choisir une autre dans la page d'accueil,
 en cliquant dans son drapeau en haut de la page.
 
 </ul>
@@ -523,7 +549,7 @@ pour l'autoriser, il faut mettre explicitement "yes".
 
 Attention: les images seront enregistr&eacute;es sur votre ordinateur,
 et peuvent donc consommer beaucoup d'espace disque, s'il y a beaucoup
-de images envoy&eacute;es.
+d' images envoy&eacute;es.
 
 </ul>
 
@@ -540,7 +566,9 @@ le nouveau nom.
 
 </ul>
 
-<h4> <a name="Lex">R&eacute;pertoire "lang" - fichier "lexicon.txt"</a> </h4>
+<hr>
+<h3> <a name="Lex"><font color=#2f6400>
+R&eacute;pertoire "lang" - fichier "lexicon.txt"</font></a> </h3>
 
 Ce fichier contient le lexique. Pour chaque terme utilis&eacute; dans
 le programme, il y a une traduction dans chaque langue. Si vous voulez
@@ -560,7 +588,9 @@ Quand vous sauvegarderez le fichier "lexicon.txt", cela sera
 imm&eacute;diatement visible &agrave; l'affichage dans le navigateur.
 Il faudra tout de m&ecirc;me faire "recharger la page".
 
-<h4> <a name="Lng">R&eacute;pertoire "lang" - sous-r&eacute;pertoires</a> </h4>
+<hr>
+<h3> <a name="Lng"><font color=#2f6400>
+R&eacute;pertoire "lang" - sous-r&eacute;pertoires</font></a> </h3>
 
 Chaque nom de sous-r&eacute;pertoire est un code de langue. Chacun
 contient la page d'accueil dans cette langue: le fichier s'appelle
@@ -588,10 +618,11 @@ La description compl&egrave;te de ces macros est donn&eacute;e <a
 href="pcustom.htm">ici</a>.
 
 <p>
+<hr>
+<br>
+<center>Retour vers <a href="diruse.htm">Mode d'Emploi</a></center>.
 
-Retour vers <a href="diruse.htm">Mode d'Emploi</a>.
-
-<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
+<hr><font size=-1><em>&copy; Copyright INRIA 1999 -
 GeneWeb</em></font><br>
 
 </body>

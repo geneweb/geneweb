@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.53 1999-10-25 22:10:54 ddr Exp $ *)
+(* $Id: perso.ml,v 2.54 1999-10-26 22:35:39 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -41,12 +41,6 @@ value has_grand_children base p =
     return False
   with
   [ Ok -> True ]
-;
-
-value of_course_died conf p =
-  match Adef.od_of_codate p.birth with
-  [ Some (Dgreg d _) -> conf.today.year - d.year > 120
-  | _ -> False ]
 ;
 
 value prev_sibling base p a =
@@ -205,32 +199,29 @@ value print_titles conf base cap and_txt p =
   ()
 ;
 
-value print_dates conf base in_perso p =
-  let cap s = if in_perso then capitale s else ", " ^ s in
+value print_dates conf base open_area p =
   let is = index_of_sex p.sex in
   do let birth_place = sou base p.birth_place in
-     do if in_perso then
-          match (Adef.od_of_codate p.birth, birth_place) with
-          [ (None, "") -> ()
-          | _ -> Wserver.wprint "<em>\n" ]
-        else ();
-        let anniv =
-          match Adef.od_of_codate p.birth with
-          [ Some (Dgreg d _) ->
-              if d.prec = Sure && p.death = NotDead then
-                d.day = conf.today.day && d.month = conf.today.month &&
-                d.year < conf.today.year
-              || not (leap_year conf.today.year) && d.day = 29 &&
-                d.month = 2 && conf.today.day = 1 &&
-                conf.today.month = 3
-              else False
-          | _ -> False ]
-       in
+     let anniv =
+       match Adef.od_of_codate p.birth with
+       [ Some (Dgreg d _) ->
+           if d.prec = Sure && p.death = NotDead then
+             d.day = conf.today.day && d.month = conf.today.month &&
+             d.year < conf.today.year
+           || not (leap_year conf.today.year) && d.day = 29 &&
+             d.month = 2 && conf.today.day = 1 &&
+             conf.today.month = 3
+           else False
+       | _ -> False ]
+     in
+     do match (Adef.od_of_codate p.birth, birth_place) with
+        [ (None, "") -> ()
+        | _ -> open_area () ];
         match Adef.od_of_codate p.birth with
         [ Some d ->
-            do Wserver.wprint "%s " (cap (transl_nth conf "born" is));
+            do Wserver.wprint "%s " (capitale (transl_nth conf "born" is));
                Wserver.wprint "%s" (Date.string_of_ondate conf d);
-               if in_perso && anniv then
+               if anniv then
                  Wserver.wprint " (%s)"
                    (transl conf "happy birthday to you!")
                else ();
@@ -238,42 +229,37 @@ value print_dates conf base in_perso p =
             return ()
         | None ->
             if birth_place <> "" then
-              Wserver.wprint "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
+              Wserver.wprint "%s\n-&nbsp;"
+                (capitale (transl_nth conf "born" is))
             else () ];
         if birth_place <> "" then Wserver.wprint "%s" birth_place else ();
-        if in_perso then
-          match (Adef.od_of_codate p.birth, birth_place) with
-          [ (None, "") -> ()
-          | _ -> do Wserver.wprint ".</em>"; html_br conf; return () ]
-        else ();
+        match (Adef.od_of_codate p.birth, birth_place) with
+        [ (None, "") -> ()
+        | _ -> Wserver.wprint "\n" ];
      return ();
      let baptism = Adef.od_of_codate p.baptism in
      let baptism_place = sou base p.baptism_place in
-     do if in_perso then
-          match (baptism, baptism_place) with
-          [ (None, "") -> ()
-          | _ -> Wserver.wprint "<em>\n" ]
-        else ();
+     do match (baptism, baptism_place) with
+        [ (None, "") -> ()
+        | _ -> open_area () ];
         match baptism with
         [ Some d ->
             do Wserver.wprint "%s "
-                 (cap (transl_nth conf "baptized" is));
+                 (capitale (transl_nth conf "baptized" is));
                Wserver.wprint "%s" (Date.string_of_ondate conf d);
                if baptism_place <> "" then Wserver.wprint ",\n" else ();
             return ()
         | None ->
             if baptism_place <> "" then
               Wserver.wprint "%s\n-&nbsp;"
-                (cap (transl_nth conf "baptized" is))
+                (capitale (transl_nth conf "baptized" is))
             else () ];
         if baptism_place <> "" then
           Wserver.wprint "%s" baptism_place
         else ();
-        if in_perso then
-          match (baptism, baptism_place) with
-          [ (None, "") -> ()
-          | _ -> do Wserver.wprint ".</em>"; html_br conf; return () ]
-        else ();
+        match (baptism, baptism_place) with
+        [ (None, "") -> ()
+        | _ -> Wserver.wprint "\n" ];
      return ();
      let death_place = sou base p.death_place in
      let something =
@@ -281,10 +267,10 @@ value print_dates conf base in_perso p =
        [ (DontKnowIfDead | NotDead, "", _) -> False
        | (DeadDontKnowWhen, "", Buried _ | Cremated _) -> False
        | (DeadDontKnowWhen, _, _) ->
-           death_place <> "" || not (of_course_died conf p)
+           death_place <> "" || not (Util.of_course_died conf p)
        | _ -> True ]
      in
-     do if something && in_perso then Wserver.wprint "<em>\n" else ();
+     do if something then open_area () else ();
         match p.death with
         [ Death dr d ->
             let dr_w =
@@ -296,12 +282,13 @@ value print_dates conf base in_perso p =
               | Disappeared -> transl_nth conf "disappeared" is ]
             in
             let d = Adef.date_of_cdate d in
-            do Wserver.wprint "%s " (cap dr_w);
+            do Wserver.wprint "%s " (capitale dr_w);
                Wserver.wprint "%s" (Date.string_of_ondate conf d);
                if death_place <> "" then Wserver.wprint ",\n" else ();
             return ()
         | DeadYoung ->
-            do Wserver.wprint "%s" (cap (transl_nth conf "dead young" is));
+            do Wserver.wprint "%s"
+                 (capitale (transl_nth conf "dead young" is));
                if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
             return ()
         | DeadDontKnowWhen ->
@@ -309,7 +296,8 @@ value print_dates conf base in_perso p =
             [ ("", Buried _ | Cremated _) -> ()
             | _ ->
                 if death_place <> "" || not (of_course_died conf p) then
-                  do Wserver.wprint "%s" (cap (transl_nth conf "died" is));
+                  do Wserver.wprint "%s"
+                       (capitale (transl_nth conf "died" is));
                      if death_place <> "" then Wserver.wprint "\n-&nbsp;"
                      else ();
                   return ()
@@ -319,50 +307,31 @@ value print_dates conf base in_perso p =
           do Wserver.wprint "%s" death_place;
           return ()
         else ();
-        if something && in_perso then
-          do Wserver.wprint ".</em>"; html_br conf; return ()
-        else ();
+        if something then Wserver.wprint "\n" else ();
      return ();
-     if in_perso then
-       match (Adef.od_of_codate p.birth, p.death) with
-       [ (Some (Dgreg d _), NotDead) ->
-           if d.day == 0 && d.month == 0 && d.prec <> Sure then ()
-           else
-             let a = temps_ecoule d conf.today in
-             do Wserver.wprint "<em>%s: " (cap (transl conf "age"));
-                Date.print_age conf a;
-                Wserver.wprint ".</em>";
-                html_br conf;
-            return ()
-       | _ -> () ]
-     else ();
+     match (Adef.od_of_codate p.birth, p.death) with
+     [ (Some (Dgreg d _), NotDead) ->
+         if d.day == 0 && d.month == 0 && d.prec <> Sure then ()
+         else
+           let a = temps_ecoule d conf.today in
+           do open_area ();
+              Wserver.wprint "%s: " (capitale (transl conf "age"));
+              Date.print_age conf a;
+              Wserver.wprint "\n";
+          return ()
+     | _ -> () ];
      let sure d = d.prec = Sure in
      match (Adef.od_of_codate p.birth, date_of_death p.death) with
      [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
          if sure d1 && sure d2 && d1 <> d2 then
            let a = temps_ecoule d1 d2 in
-           do if in_perso then
-                do Wserver.wprint "\n<em>";
-                   Wserver.wprint "%s " (capitale (transl conf "death age:"));
-                return ()
-              else
-                do Wserver.wprint "\n(";
-                   Wserver.wprint "%s " (transl conf "death age:");
-                return ();
+           do open_area ();
+              Wserver.wprint "%s " (capitale (transl conf "death age:"));
               Date.print_age conf a;
-              if in_perso then
-                do Wserver.wprint ".</em>";
-                   html_br conf;
-                return ()
-              else Wserver.wprint ")";
+              Wserver.wprint "\n";
            return ()
          else ()
      | _ -> () ];
-     let something =
-       match p.burial with
-       [ Buried _ | Cremated _ -> True
-       | _ -> False ]
-     in
      let burial_date_place cod =
        let place = sou base p.burial_place in
        do match Adef.od_of_codate cod with
@@ -375,21 +344,20 @@ value print_dates conf base in_perso p =
           if place <> "" then Wserver.wprint "%s" place else ();
        return ()
      in
-     do if something && in_perso then Wserver.wprint "<em>\n" else ();
-        match p.burial with
+     do match p.burial with
         [ Buried cod ->
-            do Wserver.wprint "%s" (cap (transl_nth conf "buried" is));
+            do open_area ();
+               Wserver.wprint "%s" (capitale (transl_nth conf "buried" is));
                burial_date_place cod;
+               Wserver.wprint "\n";
             return ()
         | Cremated cod ->
-            do Wserver.wprint "%s"
-                 (cap (transl_nth conf "cremated" is));
+            do open_area ();
+               Wserver.wprint "%s" (capitale (transl_nth conf "cremated" is));
                burial_date_place cod;
+               Wserver.wprint "\n";
             return ()
         | UnknownBurial -> () ];
-        if something && in_perso then
-          do Wserver.wprint ".</em>"; html_br conf; return ()
-        else ();
      return ();
   return ()
 ;
@@ -401,8 +369,8 @@ value print_parents conf base p =
       let imoth = (coi base ifam).mother in
       let fath = poi base ifath in
       let moth = poi base imoth in
-      do Wserver.wprint "<h3>%s</h3>\n\n<ul>\n"
-           (capitale (nominative (transl conf "parents")));
+      do Wserver.wprint "<h3>%s</h3>\n<ul>\n"
+           (std_color (capitale (nominative (transl conf "parents"))));
          html_li conf;
          Wserver.wprint "%s" (referenced_person_title_text conf base fath);
          Date.afficher_dates_courtes conf base fath;
@@ -525,9 +493,10 @@ value print_families conf base p a =
   match Array.to_list p.family with
   [ [] -> ()
   | faml ->
-      do Wserver.wprint "<h3>%s %s %s</h3>\n\n<ul>"
-           (capitale (transl_nth conf "marriage/marriages" 1))
-           (transl conf "and") (transl_nth conf "child/children" 1);
+      do Wserver.wprint "<h3>%s</h3>\n<ul>"
+           (std_color
+              (capitale (transl_nth conf "marriage/marriages" 1) ^ " " ^
+               transl conf "and" ^ " " ^ transl_nth conf "child/children" 1));
          List.iter (print_family conf base p a) faml;
          Wserver.wprint "</ul>\n";
       return () ]
@@ -538,8 +507,9 @@ value print_notes conf base p =
   [ "" -> ()
   | notes ->
       if age_autorise conf base p then
-        do Wserver.wprint "<h3>%s</h3>\n\n"
-             (capitale (nominative (transl_nth conf "note/notes" 1)));
+        do Wserver.wprint "<h3>%s</h3>\n"
+             (std_color
+                (capitale (nominative (transl_nth conf "note/notes" 1))));
            tag "ul" begin
              html_li conf;
              copy_string_with_macros conf notes;
@@ -667,7 +637,7 @@ value print_relations conf base p =
   [ ([], [], False) -> ()
   | (rl, cl, _) ->
       do Wserver.wprint "<h3>%s</h3>\n"
-           (capitale (transl_nth conf "relation/relations" 1));
+           (std_color (capitale (transl_nth conf "relation/relations" 1)));
          tag "ul" begin
            List.iter (print_relation conf base) rl;
            List.iter (print_related conf base p) cl;
@@ -765,7 +735,7 @@ value find_sosa_aux conf base a p =
     match gene_find zil with
     [ Left [] -> None
     | Left zil -> find zil
-    | Right z -> Some z ]
+    | Right z -> Some (z, p) ]
 ;
 (* Male version
 value find_sosa_aux conf base a p =
@@ -789,24 +759,28 @@ value find_sosa_aux conf base a p =
 ;
 *)
 
-value find_sosa conf base a p =
-  if a.cle_index = p.cle_index then Some Num.one
-  else
-    let has_children =
-      List.exists
-        (fun ifam ->
-           let fam = foi base ifam in
-           Array.length fam.children > 0)
-        (Array.to_list a.family)
-    in
-    if has_children then find_sosa_aux conf base a p
-    else None
+value find_sosa conf base a =
+  match Util.find_person_in_env conf base "z" with
+  [ Some p ->
+      if a.cle_index = p.cle_index then Some (Num.one, p)
+      else
+	let has_children =
+	  List.exists
+	    (fun ifam ->
+	       let fam = foi base ifam in
+	       Array.length fam.children > 0)
+	    (Array.to_list a.family)
+	in
+	if has_children then find_sosa_aux conf base a p
+	else None
+  | None -> None ]
 ;
 
-value print_sosa conf base a p =
-  match find_sosa conf base a p with
-  [ Some n ->
-      do Wserver.wprint "<em>Sosa:\n";
+value print_sosa conf base open_area a =
+  fun
+  [ Some (n, p) ->
+      do open_area ();
+         Wserver.wprint "<em>Sosa:\n";
          stag "a" "href=\"%sm=RL;i1=%d;i2=%d;b1=1;b2=%s\""
            (commd conf) (Adef.int_of_iper a.cle_index)
            (Adef.int_of_iper p.cle_index) (Num.to_string n)
@@ -814,78 +788,15 @@ value print_sosa conf base a p =
            Num.print (fun x -> Wserver.wprint "%s" x)
              (transl conf "(thousand separator)") n;
          end;
-         Wserver.wprint "</em>";
-         html_p conf;
+         Wserver.wprint "</em><br>\n";
       return ()
   | None -> () ]
 ;
 
-value print_sosa_if_any conf base a =
-  match Util.find_person_in_env conf base "z" with
-  [ Some p -> print_sosa conf base a p 
-  | None -> () ]
-;
-
-value print_ancestors_descends_cousins conf base p a =
-  let st = ref 0 in
-  let head () =
-    match st.val with
-    [ 0 -> do Wserver.wprint "\n<h4>"; st.val := 1; return ()
-    | 1 -> Wserver.wprint " /\n"
-    | 2 -> st.val := 1
-    | _ -> () ]
-  in
-  let has_grand_parents = has_grand_parents base p in
-  do if has_grand_parents then
-       do head ();
-          Wserver.wprint "<a href=\"%s%s;m=A\">%s</a>"
-            (commd conf) (acces conf base p)
-            (capitale (transl conf "ancestors"));
-       return ()
-     else ();
-     if has_grand_children base p then
-       do head ();
-          Wserver.wprint "<a href=\"%s%s;m=D\">%s</a>"
-            (commd conf) (acces conf base p)
-            (capitale (transl conf "descendants"));
-       return ()
-     else ();
-     if has_grand_parents then
-       do head ();
-          Wserver.wprint "<a href=\"%s%s;m=C\">%s</a>"
-            (commd conf) (acces conf base p)
-            (capitale (transl conf "cousins (general term)"));
-       return ()
-     else if has_nephews_or_nieces base p then
-       do head ();
-          Wserver.wprint "<a href=\"%s%s;m=C;v1=1;v2=2\">%s</a>"
-            (commd conf) (acces conf base p)
-            (capitale (transl conf "nephews and nieces"));
-       return ()
-     else ();
-     match prev_sibling base p a with
-     [ Some p ->
-         do head ();
-            stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
-              Wserver.wprint "%s"
-                (capitale
-                   (transl_nth conf "previous sibling" (index_of_sex p.sex)));
-            end;
-         return ()
-     | None -> () ];
-     match next_sibling base p a with
-     [ Some p ->
-         do head ();
-            stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
-              Wserver.wprint "%s"
-                (capitale
-                   (transl_nth conf "next sibling" (index_of_sex p.sex)));
-            end;
-         return ()
-     | None -> () ];
-     if st.val != 0 then Wserver.wprint "</h4>" else ();
-     Wserver.wprint "\n";
-  return ()
+value print_compute_link conf base p mode text =
+  Wserver.wprint "<a href=\"%s%s%s\"><b>%s</b></a>"
+    (commd conf) (if mode <> "" then "m=" ^ mode ^ ";" else "")
+    (acces conf base p) (std_color (capitale text))
 ;
 
 value print_linked_first_name_and_surname conf base p =
@@ -899,18 +810,248 @@ value print_linked_first_name_and_surname conf base p =
   return ()
 ;
 
+value print_sub_titles conf base p =
+  let (open_area, close_area) =
+    let opened = ref False in
+    (fun () ->
+       if not opened.val then
+         do Wserver.wprint "\
+<center>
+<table border=%d cellspacing=0 cellpadding=0>
+<tr><td>\n" conf.border;
+            opened.val := True;
+         return ()
+       else (),
+     fun () ->
+       if opened.val then
+         Wserver.wprint "</td></tr>\n</table>\n</center>\n<p>\n"
+       else ())
+  in
+  do print_sosa conf base open_area p (find_sosa conf base p);
+     match (p.public_name, p.nick_names) with
+     [ (n, [_ :: nnl]) when sou base n <> "" ->
+         let n = sou base n in
+         List.iter
+           (fun nn ->
+              do open_area ();
+                 Wserver.wprint "%s <em>%s</em>" n (sou base nn);
+                 html_br conf;
+              return ())
+           nnl
+     | (_, [_ :: nnl]) ->
+         let n = p_first_name base p in
+         List.iter
+           (fun nn ->
+              do open_area ();
+                 Wserver.wprint "%s <em>%s</em>" n (sou base nn);
+                 html_br conf;
+              return ())
+           nnl
+     | _ -> () ];
+     List.iter
+       (fun a ->
+          do open_area ();
+             Wserver.wprint "%s <em><strong>%s</strong></em>"
+               (capitale (transl conf "alias")) (sou base a);
+             html_br conf;
+          return ())
+       p.aliases;
+     if p.titles <> [] && age_autorise conf base p then
+       do open_area ();
+          Wserver.wprint "<em>";
+          print_titles conf base True (transl conf "and") p;
+          Wserver.wprint ".</em>\n";
+          html_br conf;
+       return ()
+     else ();
+     match (sou base p.public_name, p.nick_names) with
+     [ ("", []) -> ()
+     | _ ->
+         do open_area ();
+            Wserver.wprint "<em>(";
+            print_linked_first_name_and_surname conf base p;
+            Wserver.wprint ")</em>\n";
+            html_br conf;
+         return () ];
+     List.iter
+       (fun n ->
+          do open_area ();
+             Wserver.wprint "<em>(%s %s)</em>\n"
+               (p_first_name base p) (sou base n);
+             html_br conf;
+          return ())
+       p.surnames_aliases;
+     if age_autorise conf base p then
+       List.iter
+         (fun n ->
+            do open_area ();
+               Wserver.wprint "<em>(%s...)</em>\n" (sou base n);
+               html_br conf;
+            return ())
+         p.first_names_aliases
+     else ();
+     close_area ();
+  return ()
+;
+
+value max_image_width = 240;
 value max_image_height = 240;
 
 value limited_image_size conf fname =
   match image_size fname with
   [ Some (wid, hei) ->
-      if hei > max_image_height then
-        Some (wid * max_image_height / hei, max_image_height)
-      else Some (wid, hei)
+      let (wid, hei) =
+        if hei > max_image_height then
+          let wid = wid * max_image_height / hei in
+          let hei = max_image_height in
+          (wid, hei)
+        else (wid, hei)
+      in
+      let (wid, hei) =
+        if wid > max_image_width then
+          let hei = hei * max_image_width / wid in
+          let wid = max_image_width in
+          (wid, hei)
+        else (wid, hei)
+      in
+      Some (wid, hei)
   | None -> None ]
 ;
 
+value photo_and_size conf base p =
+  if age_autorise conf base p then
+    let image_txt = capitale (transl conf "image") in
+    match sou base p.image with
+    [ "" ->
+        match auto_image_file conf base p with
+        [ Some f -> Some (f, limited_image_size conf f)
+        | None -> None ]
+    | s ->
+        let http = "http://" in
+        if String.length s > String.length http &&
+           String.sub s 0 (String.length http) = http then
+          Some (s, None)
+        else if Filename.is_implicit s then
+          let fname = Util.image_file_name conf.bname s in
+          if Sys.file_exists fname then
+            Some (fname, limited_image_size conf fname)
+          else None
+        else None ]
+  else None
+;
+
 value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
+
+value print_occupation_dates conf base in_table p =
+  let a = aoi base p.cle_index in
+  let (open_area, close_area) =
+    let opened = ref False in
+    (fun () ->
+       do if not opened.val then
+            do if in_table then Wserver.wprint "<td>\n" else ();
+               Wserver.wprint "<ul>\n";
+	       opened.val := True;
+	    return ()
+          else ();
+          html_li conf;
+       return (),
+     fun () ->
+       if opened.val then
+         do Wserver.wprint "</ul>\n";
+	    if in_table then Wserver.wprint "</td>\n" else ();
+	 return ()
+       else ())
+  in
+  do match sou base p.occupation with
+     [ "" -> ()
+     | s ->
+         if age_autorise conf base p then
+           do open_area ();
+              Wserver.wprint "%s" (capitale s);
+           return ()
+         else () ];
+     if age_autorise conf base p then print_dates conf base open_area p
+     else ();
+     if age_autorise conf base p && a.consang != Adef.fix (-1) &&
+        a.consang != Adef.fix 0 then
+       do open_area ();
+          Wserver.wprint "%s: " (capitale (transl conf "consanguinity"));
+          print_decimal_num conf
+            (round_2_dec (Adef.float_of_fix a.consang *. 100.0));
+          Wserver.wprint "%%\n";
+       return ()
+     else ();
+     close_area ();
+  return ()
+;
+
+value print_photo_occupation_dates conf base p =
+  let image_txt = capitale (transl conf "image") in
+  match photo_and_size conf base p with
+  [ Some (fname, Some (width, height)) ->
+      tag "table" "border=%d width=\"95%%\"" conf.border begin
+        tag "tr" begin
+          let s = Unix.stat fname in
+          let b = Filename.basename fname in
+          tag "td" begin
+            Wserver.wprint
+              "<img src=\"%sm=IM;d=%d;v=/%s\" width=%d height=%d alt=\"%s\">"
+              (commd conf)
+              (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
+              (Util.code_varenv b) width height image_txt;
+          end;
+          print_occupation_dates conf base True p;
+        end;
+      end
+  | Some (link, None) ->
+      do Wserver.wprint "<img src=\"%s\" alt=\"%s\">" link image_txt;
+         html_p conf;
+         print_occupation_dates conf base False p;
+      return ()
+  | None ->
+      print_occupation_dates conf base False p ]
+;
+
+value print_ancestors_descends_cousins conf base p a =
+  let (open_area, close_area) =
+    let opened = ref False in
+    (fun () ->
+       if not opened.val then
+         do Wserver.wprint "<td align=left><p><br>\n<ul>\n";
+            opened.val := True;
+         return ()
+       else (),
+     fun () ->
+       if opened.val then Wserver.wprint "</ul>\n</td>\n" else ())
+  in
+  let print p mode txt =
+    do open_area ();
+       html_li conf;
+       print_compute_link conf base p mode txt;
+       Wserver.wprint "\n";
+    return ()
+  in
+  let has_grand_parents = has_grand_parents base p in
+  do if has_grand_parents then print p "A" (transl conf "ancestors")
+     else ();
+     if has_grand_children base p then print p "D" (transl conf "descendants")
+     else ();
+     if has_grand_parents then
+       print p "C" (transl conf "cousins (general term)")
+     else if has_nephews_or_nieces base p then
+       print p "C;v1=1;v2=2" (transl conf "nephews and nieces")
+     else ();
+     match prev_sibling base p a with
+     [ Some p ->
+         print p "" (transl_nth conf "previous sibling" (index_of_sex p.sex))
+     | None -> () ];
+     match next_sibling base p a with
+     [ Some p ->
+         print p "" (transl_nth conf "next sibling" (index_of_sex p.sex))
+     | None -> () ];
+     close_area ();
+  return ()
+;
 
 value print conf base p =
   let title h =
@@ -938,155 +1079,35 @@ value print conf base p =
         else print_linked_first_name_and_surname conf base p ]
   in
   let a = aoi base p.cle_index in
-  do header conf title;
-     print_sosa_if_any conf base p;
+  do cheader conf title;
+     print_sub_titles conf base p;
      print_link_to_welcome conf True;
-     if age_autorise conf base p then
-       let image_txt = capitale (transl conf "image") in
-       match sou base p.image with
-       [ "" ->
-           match auto_image_file conf base p with
-           [ Some f ->
-               let s = Unix.stat f in
-               let b = Filename.basename f in
-               let wid_hei =
-                 match limited_image_size conf f with
-                 [ Some (wid, hei) ->
-                     " width=" ^ string_of_int wid ^ " height=" ^
-                     string_of_int hei
-                 | None -> "" ]
-               in
-               do Wserver.wprint "<img src=\"%sm=IM;d=%d;v=/%s\"%s alt=\"%s\">"
-                    (commd conf)
-                    (int_of_float
-                       (mod_float s.Unix.st_mtime (float_of_int max_int)))
-                    (Util.code_varenv b)
-                    wid_hei image_txt;
-                  html_p conf;
-               return ()
-           | None -> () ]
-       | s ->
-           let http = "http://" in
-           if String.length s > String.length http &&
-              String.sub s 0 (String.length http) = http then
-             do Wserver.wprint "<img src=\"%s\" alt=\"%s\">" s image_txt;
-                html_p conf;
-             return ()
-           else if Filename.is_implicit s then
-             let fname = Util.image_file_name conf.bname s in
-             if Sys.file_exists fname then
-               let wid_hei =
-                 match limited_image_size conf fname with
-                 [ Some (wid, hei) ->
-                     " width=" ^ string_of_int wid ^ " height=" ^
-                     string_of_int hei
-                 | None -> "" ]
-               in
-               do Wserver.wprint "<img src=\"%sm=IM;v=/%s\"%s alt=\"%s\">"
-                    (commd conf) s wid_hei image_txt;
-                  html_p conf;
-               return ()
-             else ()
-           else () ]
-     else ();
-     match (p.public_name, p.nick_names) with
-     [ (n, [_ :: nnl]) when sou base n <> "" ->
-         let n = sou base n in
-         List.iter
-           (fun nn ->
-              do Wserver.wprint "%s <em>%s</em>" n (sou base nn);
-                 html_br conf;
-              return ())
-           nnl
-     | (_, [_ :: nnl]) ->
-         let n = p_first_name base p in
-         List.iter
-           (fun nn ->
-              do Wserver.wprint "%s <em>%s</em>" n (sou base nn);
-                 html_br conf;
-              return ())
-           nnl
-     | _ -> () ];
-     List.iter
-       (fun a ->
-          do Wserver.wprint "%s <em><strong>%s</strong></em>"
-               (capitale (transl conf "alias")) (sou base a);
-             html_br conf;
-          return ())
-       p.aliases;
-     if p.titles <> [] && age_autorise conf base p then
-       do Wserver.wprint "<em>";
-          print_titles conf base True (transl conf "and") p;
-          Wserver.wprint ".</em>\n";
-          html_br conf;
-       return ()
-     else ();
-     match (sou base p.public_name, p.nick_names) with
-     [ ("", []) -> ()
-     | _ ->
-         do Wserver.wprint "<em>(";
-            print_linked_first_name_and_surname conf base p;
-            Wserver.wprint ")</em>\n";
-            html_br conf;
-         return () ];
-     List.iter
-       (fun n ->
-          do Wserver.wprint "<em>(%s %s)</em>\n"
-               (p_first_name base p) (sou base n);
-             html_br conf;
-          return ())
-       p.surnames_aliases;
-     if age_autorise conf base p then
-       List.iter
-         (fun n ->
-            do Wserver.wprint "<em>(%s...)</em>\n" (sou base n);
-               html_br conf;
-            return ())
-         p.first_names_aliases
-     else ();
-     match
-       (sou base p.public_name, p.nick_names, p.aliases,
-        List.length p.titles <> 0)
-     with
-     [ ("", [], _, _) | (_, _, [_ :: _], _) | (_, _, _, True) -> html_p conf
-     | _ -> () ];
-     match sou base p.occupation with
-     [ "" -> ()
-     | s ->
-         if age_autorise conf base p then
-           do stag "em" begin
-                Wserver.wprint "%s" (capitale s);
-              end;
-              html_br conf;
-           return ()
-         else () ];
-     if age_autorise conf base p then print_dates conf base True p else ();
-     if age_autorise conf base p && a.consang != Adef.fix (-1) &&
-        a.consang != Adef.fix 0 then
-       do Wserver.wprint "<em>%s: " (capitale (transl conf "consanguinity"));
-          print_decimal_num conf
-            (round_2_dec (Adef.float_of_fix a.consang *. 100.0));
-          Wserver.wprint "%%</em>";
-          html_br conf;
-       return ()
-     else ();
+     print_photo_occupation_dates conf base p;
      print_parents conf base a;
      print_families conf base p a;
      print_notes conf base p;
      print_relations conf base p;
+     if age_autorise conf base p then print_sources conf base True p else ();
      if conf.cancel_links then ()
      else
-       do Wserver.wprint "\n<h4><a href=\"%s%s;m=R\">\n%s</a></h4>\n"
-            (commd conf) (acces conf base p)
-            (capitale (transl conf "relationship computing"));
-          print_ancestors_descends_cousins conf base p a;
-          if conf.wizard then
-            Wserver.wprint "\n<h4><a href=\"%s%s;m=U\">\n%s</a></h4>\n"
-              (commd conf) (acces conf base p)
-              (capitale (transl conf "update"))
-          else ();
+       do tag "table" "border=%d width=\"90%%\"" conf.border begin
+            tag "tr" begin
+              tag "td" "align=center" begin
+                print_compute_link conf base p "R"
+                  (transl conf "relationship computing");
+                Wserver.wprint "\n";
+              end;
+              print_ancestors_descends_cousins conf base p a;
+              if conf.wizard then
+                do stag "td" "align=center" begin
+                     print_compute_link conf base p "U" (transl conf "update");
+                   end;
+                   Wserver.wprint "\n";
+                return ()
+              else ();
+            end;
+          end;
        return ();
-     if age_autorise conf base p then print_sources conf base True p else ();
      match p_getenv conf.env "opt" with
      [ Some "misc" ->
          tag "ol" begin

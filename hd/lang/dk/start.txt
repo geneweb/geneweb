@@ -5,14 +5,61 @@
   <meta name="ROBOTS" content="NONE">
 </head>
 <body%b>
-<h1>Genealogi</h1>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>Genealogisk<br>database</font></h1>
+</td>
+</tr>
+</table>
+
+<br>
 
 %rversion
 
 <p>
 
-Databasen indeholder for &oslash;jeblikket %n personer%o
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+Databasen <font color=#2f6400><b>"%t"</b></font> indeholder for
+&oslash;jeblikket %n personer.%o<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%o
+
+%y<br><p>
+
+<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w"><em>Opdaterings</em></a> adgang<br>
+(adgangsord)</td>
+
+%y%z<td align=center><a href="%sw=f"><em>Betroet</em></a> adgang<br>
+(adgangsord)</td>
+
+%z%y</tr></table>
+
+%y%i<br><br>
+
+<table border=0>
+<tr><td align=center>
+<form method=get action="%f">
+%hAdgangsord, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
+<input name=w size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+%i
+
+<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+For at navigere i denne database, kan du søge:<br><br>
 
 <ul>
 
@@ -20,7 +67,8 @@ Databasen indeholder for &oslash;jeblikket %n personer%o
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-S&oslash;g: <input name=n size=40 maxlength=200>
+<font color=#2f6400><b>personnavn</b></font>
+<input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
 <ul>
@@ -37,62 +85,101 @@ eller <em>Sosa-nummer</em>, refererende til %a%u
 
 <li>
 
-<FORM method=GET action="%f">
+<form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-S&oslash;g <em>adelstitel</em>: <INPUT NAME=t size=14 maxlength=200>
-og/eller <em>-navn</em>: <INPUT NAME=p size=25 maxlength=200> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<font color=#2f6400><b>adelstitel</b></font>
+<input name=t size=14 maxlength=200>
+<font color=#2f6400><b>og/eller adelsnavn</b></font>
+<input name=p size=25 maxlength=200>
+<input type=submit value="Ok">
+<br>
+Eks:
+<font color=#2f6400><b>adelstitel</b></font>: adelsmand, greve, konge...
+<font color=#2f6400><b>og/eller adelsnavn</b></font>: von Klingenberg,
+Griffenfeld, af Danmark...
+</form>
 
 <li>
 
-<FORM method=GET action="%f">
-%hAlle
-<SELECT NAME=m>
-   <OPTION VALUE="N" SELECTED> efternavne
-   <OPTION VALUE="P"> fornavne
-</SELECT>
+<form method=GET action="%f">
+%h
+<font color=#2f6400><b>i liste</b></font> over alle
+<select name=m>
+<option value="N" selected>efternavne
+<option value="P">fornavne
+</select>
 sorteret efter
-<SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED> alfabetisk orden
-   <OPTION VALUE="F"> hyppighed
-</SELECT> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<select name=tri>
+<option value="A" selected>alfabetisk orden
+<option value="F">hyppighed
+</select>
+<input type=submit value="Ok">
+</form>
 
-<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
-
-%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
-<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w
+<li>
+<font color=#2f6400><b>ved</b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>avanceret
+søgning</b></font></a>.
 
 </ul>
 
-<a href="%sm=AN">&Aring;rsdage for f&oslash;dsler</a>.<br>
-<a href="%sm=AD">&Aring;rsdage for d&oslash;de personer</a>.<br>
-<a href="%sm=AM">&Aring;rsdage for bryllupper</a>.<br>%x
-De <a href="%sm=LB;k=10">seneste f&oslash;dsler</a>.<br>
-De <a href="%sm=LD;k=10">seneste d&oslash;dsfald</a>.<br>%x%j
-<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
-<a href="%sm=FORUM">[*forum]</a>
+%w<p>
+
+<center>Du kan<br><br>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM">tilføje en familie</a>
+</ul>
+</td>
+<td align=left>
+<ul>
+<li><a href="%sm=MOD_NOTES">ændre noterne</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+<br>
+%w
+
+<center>Du kan også fremkalde<br><br>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li><a href="%sm=AN">&aring;rsdage for f&oslash;dsler</a>
+<li><a href="%sm=AD">&aring;rsdage for d&oslash;de personer</a>
+<li><a href="%sm=AM">&aring;rsdage for bryllupper</a>%x
+<li><a href="%sm=LB;k=10">seneste f&oslash;dsler</a>%x
+</ul>
+</td>
+<td valign=up>
+<ul>%x
+<li><a href="%sm=LD;k=10">seneste d&oslash;dsfald</a>%x%j
+<li><a href="%sm=HIST;k=10">opdateringers historie</a>%j
+<li><a href="%sm=CAL">kalendere</a>
+<li><a href="%sm=FORUM"><font color=#2f6400><b>GeneWeb</b></font>
+forum</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
 <p>
+
 Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
 
-%y<p>
+</td></tr>
 
-<ul>
-<li> <a href="%sw=w"><em>Opdaterings</em></a> adgang (password).
-%y%z<li> <a href="%sw=f"><em>Betroet</em></a> adgang (password).
-%z%y</ul>
+<tr>
+<td align=right><br><font size=-1><em><a
+href="%sm=LEX">leksikon</a></em></font></td>
+</tr>
 
-%y%i<p>
-<form method=get action="%f">
-%h<font size=-1>Password, for <em>betroet</em> eller
-<em>opdaterings</em> adgang:</font>
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
-%i<p>
-
-<font size=-1><a href="%sm=LEX">Leksikon</a></font>
+</table>
+</center>
