@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.5 2001-09-16 14:15:19 ddr Exp $
+# $Id: a.gwf,v 4.6 2001-09-16 14:16:53 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -66,9 +66,9 @@ default_lang=fr
 # Authorization for wizards to send images (no: cannot; yes: can)
 can_send_image=yes
 
-# Maximum image size in bytes (which can be accepted in "send image").
+# Maximum images size in bytes (which can be accepted in "send image").
 # Default: no limit
-# max_image_size=...
+# max_images_size=...
 
 # Allow the usage of the request m=KILL_ANC
 can_kill_ancestors=no
