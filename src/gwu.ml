@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.17 2000-05-16 17:21:14 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.18 2000-05-16 19:52:42 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -688,12 +688,6 @@ value rec find_ancestors base surn p list =
   | None -> [p :: list] ]
 ;
 
-value alone_family base ifam p u =
-  let isp = spouse p.cle_index (coi base ifam) in
-  Array.length u.family = 1 &&
-  Array.length (uoi base isp).family = 1
-;
-
 value mark_branch base mark surn p =
   loop p where rec loop p =
     let u = uoi base p.cle_index in
@@ -701,15 +695,22 @@ value mark_branch base mark surn p =
       let ifam = u.family.(i) in
       match mark.(Adef.int_of_ifam ifam) with
       [ NotScanned ->
-          let desc = doi base ifam in
-          let children =
-            Array.fold_left (fun list ip -> [poi base ip :: list])
-              [] desc.children
+          let ifaml =
+            connected_families base (fun _ -> True) (foi base ifam)
+               (coi base ifam)
           in
-          if alone_family base ifam p u && Array.length desc.children = 0
-          || List.exists (fun p -> p.surname = surn) children
-          then
-            do mark.(Adef.int_of_ifam ifam) := ToSeparate;
+          let children =
+            List.fold_left
+              (fun list ifam ->
+                 let desc = doi base ifam in
+                 Array.fold_left (fun list ip -> [poi base ip :: list])
+                   list desc.children)
+              [] ifaml
+          in
+          if List.exists (fun p -> p.surname = surn) children then
+            do List.iter
+                 (fun ifam -> mark.(Adef.int_of_ifam ifam) := ToSeparate)
+                 ifaml;
                List.iter loop children;
             return ()
           else ()
