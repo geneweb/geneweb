@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.123 2000-07-05 08:30:11 ddr Exp $
+# $Id: lexicon.txt,v 3.124 2000-07-05 08:34:45 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5472,7 +5472,7 @@ se: den %s generationen
 
     the %d who lived the longest
 en: the %d who lived the longest
-fr: les %d ayant v&eacute;cu le plus longtemps
+fr: les %d personnes ayant v&eacute;cu le plus longtemps
 
     the anniversary
 af: die herdenking
