@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.13 2000-08-04 17:37:38 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.14 2000-08-05 08:26:00 ddr Exp $ *)
 
 open Printf;
 
@@ -54,6 +54,20 @@ value server_extract str =
 *)
 
 (* Utilitaires *)
+
+value log_open () = 
+  let fname = Filename.concat gwtp_tmp.val "gwtp.log" in
+  open_out_gen [Open_wronly; Open_creat; Open_append] 0o666 fname
+;
+
+value filename_basename str =
+  loop (String.length str - 1) where rec loop i =
+    if i < 0 then str
+    else
+      match str.[i] with
+      [ 'A'..'Z' | 'a'..'z' | '-' -> loop (i - 1)
+      | _ -> String.sub str (i + 1) (String.length str - i - 1) ]
+;
 
 value copy_template env fname =
   let ic = open_in (Filename.concat gwtp_tmp.val (fname ^ ".txt")) in
@@ -215,6 +229,7 @@ value lowercase_start_with s s_ini =
 
 value insert_file env bdir name =
   let fname = List.assoc (name ^ "_name") env in
+  let fname = filename_basename fname in
   do if fname = "" then ()
      else if fname <> name then
        printf "You selected \"%s\" instead of \"%s\" -&gt; ignored.\n"
@@ -283,22 +298,12 @@ value copy_temp b =
   return ()
 ;
 
-value filename_basename str =
-  loop (String.length str - 1) where rec loop i =
-    if i < 0 then str
-    else
-      match str.[i] with
-      [ 'A'..'Z' | 'a'..'z' | '-' -> loop (i - 1)
-      | _ -> String.sub str (i + 1) (String.length str - i - 1) ]
-;
-
 value send_file str env b t f fname =
   if filename_basename fname = "base" then
     do printf "content-type: text/html\r\n\r\n\
 <head><title>Gwtp...</title></head>\n<body>
 <h1 align=center>Gwtp...</h1>
 <pre>\n";
-       Unix.dup2 Unix.stdout Unix.stderr;
        flush stdout;
        make_temp env b;
        printf "\nTemporary data base created.\n";
@@ -409,9 +414,8 @@ Download <input type=radio name=m value=DNL><br>
   return ()  
 ;
 
-value log str =
+value log oc_log str =
   let tm = Unix.localtime (Unix.time ()) in
-  let fname = Filename.concat gwtp_tmp.val "gwtp.log" in
   let user_agent = try Sys.getenv "HTTP_USER_AGENT" with [ Not_found -> "" ] in
   let referer = try Sys.getenv "HTTP_REFERER" with [ Not_found -> "" ] in
   let from =
@@ -420,15 +424,16 @@ value log str =
         try Sys.getenv "REMOTE_ADDR" with
         [ Not_found -> "" ] ]
   in
-  let oc = open_out_gen [Open_wronly; Open_creat; Open_append] 0o666 fname in
-  do fprintf oc "%4d-%02d-%02d %02d:%02d:%02d"
+  do fprintf oc_log "%4d-%02d-%02d %02d:%02d:%02d"
        (1900 + tm.Unix.tm_year) (succ tm.Unix.tm_mon) tm.Unix.tm_mday
         tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec;
-     fprintf oc " gwtp?%s\n" str;
-     if from <> "" then fprintf oc "  From: %s\n" from else ();
-     if user_agent <> "" then fprintf oc "  Agent: %s\n" user_agent else ();
-     if referer <> "" then fprintf oc "  Referer: %s\n" referer else ();
-     close_out oc;
+     fprintf oc_log " gwtp?%s\n" str;
+     if from <> "" then fprintf oc_log "  From: %s\n" from else ();
+     if user_agent <> "" then
+       fprintf oc_log "  Agent: %s\n" user_agent
+     else ();
+     if referer <> "" then fprintf oc_log "  Referer: %s\n" referer
+     else ();
   return ()
 ;
 
@@ -436,8 +441,10 @@ value gwtp () =
   let content_type = cgi_content_type () in
   let content = cgi_content () in
   let (str, env) = HttpEnv.make content_type content in
+  let oc_log = log_open () in
   do let _ = Unix.umask 0 in ();
-     log str;
+     log oc_log str;
+     Unix.dup2 (Unix.descr_of_out_channel oc_log) Unix.stderr;
      match HttpEnv.getenv env "m" with
      [ Some "UPL" -> gwtp_check_login str env gwtp_upload
      | Some "DNL" -> gwtp_check_login str env gwtp_download
@@ -445,6 +452,7 @@ value gwtp () =
      | Some "RECV" -> gwtp_logged str env gwtp_receive
      | Some _ -> gwtp_invalid_request str env
      | None -> gwtp_welcome str env ];
+     close_out oc_log;
   return ()
 ;
 
