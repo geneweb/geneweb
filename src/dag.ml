@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.35 2001-01-09 09:03:16 ddr Exp $ *)
+(* $Id: dag.ml,v 3.36 2001-01-09 09:13:10 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -663,17 +663,12 @@ value print_only_dag conf base elem_txt spouse_on invert set spl d =
     [ Left _ -> False
     | Right _ -> True ]
   in
-  match Util.p_getenv conf.env "version" with
-  [ Some "prev" ->
-      let print_indi n = Wserver.wprint "%s" (indi_txt n) in
-      print_html_table (fun x -> Wserver.wprint "%s" x) print_indi phony
-        conf.border d t
-  | x ->
-      let hts = html_table_struct indi_txt phony d t in
-      if x = Some "notab" || browser_doesnt_have_tables conf then
-        print_table_pre conf hts
-      else
-        print_table conf hts ]
+  let hts = html_table_struct indi_txt phony d t in
+  if Util.p_getenv conf.env "version" = Some "notab"
+  || browser_doesnt_have_tables conf then
+    print_table_pre conf hts
+  else
+    print_table conf hts
 ;
 
 value gen_print_dag conf base spouse_on invert set spl d =
