@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.19 2002-10-21 10:57:20 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.20 2002-10-23 15:20:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -50,7 +50,7 @@ value reconstitute_parent_or_child conf var default_surname =
     let death =
       match p_getenv conf.env (var ^ "d_yyyy") with
       [ Some "+" -> DeadDontKnowWhen
-      | Some "=" -> NotDead
+      | Some ("-" | "=") -> NotDead
       | _ -> DontKnowIfDead ]
     in
     let d = Update.reconstitute_date conf (var ^ "d") in

@@ -6,7 +6,7 @@ GeneWeb version 4.08
     persons' dates: one can write: "?year" to indicate "perhaps",
     ">year" or "year/" to indicate "after", "<year" or "/year" to
     indicate "before", "/year/" to indicate "about". And in the "death"
-    field, one can write "+" to indicate "died don't know when", and "="
+    field, one can write "+" to indicate "died don't know when", and "-"
     to indicate "alive".
   - [10 Oct 02] The GeneWeb logo in bottom of pages is now clickable
     and return to the database welcome page.
