@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.8 1998-10-16 11:55:40 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.9 1998-10-16 13:11:59 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -1451,7 +1451,7 @@ value speclist =
        * a number or a roman number, supposed to be a number of a
          nobility title,
        * one of the words: \"der\", \"die\", \"el\", \"le\", \"la\", \"the\",
-         supposed to be the beginning of a nick name,
+         supposed to be the beginning of a qualifier,
        then the GEDCOM first name part becomes the person \"public name\"
        and its first word his \"first name\".");
    ("-no_epn", Arg.Clear extract_public_names, "
