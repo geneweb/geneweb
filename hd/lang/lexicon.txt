@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.106 1999-08-06 09:04:08 ddr Exp $
+# $Id: lexicon.txt,v 2.107 1999-08-06 10:22:47 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -3338,7 +3338,7 @@ es: relaci&oacute;n/relaciones
 fr: relation/relations
 it: parentela
 nl: relatie/relaties
-no: slektskap/slektskap
+no: forbindelse/forbindelser
 pt: rela&ccedil;a&atilde;o/rela&ccedil;&otilde;es
 se: relation/relationer
 

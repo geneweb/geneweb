@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.19 1999-07-29 19:05:45 ddr Exp $ *)
+(* $Id: update.ml,v 2.20 1999-08-06 10:22:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -762,36 +762,38 @@ value print conf base p =
   in
   let a = aoi base p.cle_index in
   do header conf title;
-     Wserver.wprint "<ul>\n";
-     html_li conf;
-     Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a>\n" (commd conf)
-       (Adef.int_of_iper p.cle_index)
-       (capitale (transl_decline conf "modify" ""));
-     Wserver.wprint "\n";
-     html_li conf;
-     Wserver.wprint "<a href=\"%sm=DEL_IND;i=%d\">%s</a>\n"
-       (commd conf) (Adef.int_of_iper p.cle_index)
-       (capitale (transl_decline conf "delete" ""));
-     if conf.can_send_image && sou base p.image = "" then
-       do Wserver.wprint "\n";
-          html_li conf;
-          Wserver.wprint "<a href=\"%sm=SND_IMAGE;i=%d\">%s</a>\n"
-            (commd conf) (Adef.int_of_iper p.cle_index)
-            (capitale (transl_decline conf "send" (transl conf "image")));
-          match auto_image_file conf base p with
-          [ Some _ ->
-              do Wserver.wprint "\n";
-                 html_li conf;
-                 Wserver.wprint "<a href=\"%sm=DEL_IMAGE;i=%d\">%s</a>\n"
-                   (commd conf) (Adef.int_of_iper p.cle_index)
-                   (capitale
-                      (transl_decline conf "delete" (transl conf "image")));
-              return ()
-          | None -> () ];
-       return ()
-     else ();
-     Wserver.wprint "</ul>\n";
-     Wserver.wprint "\n";
+     tag "ul" begin
+       html_li conf;
+       Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a>\n" (commd conf)
+         (Adef.int_of_iper p.cle_index)
+         (capitale (transl_decline conf "modify" ""));
+       Wserver.wprint "\n";
+       if conf.can_send_image && sou base p.image = "" then
+         do Wserver.wprint "\n";
+            html_li conf;
+            Wserver.wprint "<a href=\"%sm=SND_IMAGE;i=%d\">%s</a>\n"
+              (commd conf) (Adef.int_of_iper p.cle_index)
+              (capitale (transl_decline conf "send" (transl conf "image")));
+            match auto_image_file conf base p with
+            [ Some _ ->
+                do Wserver.wprint "\n";
+                   html_li conf;
+                   Wserver.wprint "<a href=\"%sm=DEL_IMAGE;i=%d\">%s</a>\n"
+                     (commd conf) (Adef.int_of_iper p.cle_index)
+                     (capitale
+                        (transl_decline conf "delete" (transl conf "image")));
+                return ()
+            | None -> () ];
+         return ()
+       else ();
+     end;
+     Wserver.wprint "<p>\n";
+     tag "ul" begin
+       html_li conf;
+       Wserver.wprint "<a href=\"%sm=DEL_IND;i=%d\">%s</a>\n"
+         (commd conf) (Adef.int_of_iper p.cle_index)
+         (capitale (transl_decline conf "delete" ""));
+     end;
      print_family_stuff conf base p a;
      if has_children base p then
        do Wserver.wprint "<p>\n";
