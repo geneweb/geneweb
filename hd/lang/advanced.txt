@@ -3,7 +3,7 @@
 <head>
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
-  <meta http-equiv="Content-Type" content="text/html; charset=%e">
+  <!--meta http-equiv="Content-Type" content="text/html; charset=%e"-->
   <title>[*advanced request]</title>
 %j</head>
 <body%b>
