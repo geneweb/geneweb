@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.56 2003-01-18 08:24:59 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.57 2003-01-30 13:07:07 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1534,6 +1534,9 @@ value main () =
        ("-robot_xcl", Arg.String robot_exclude_arg, "\
 <cnt>,<sec>
        Exclude connections when more than <cnt> requests in <sec> seconds.");
+       ("-min_disp_req", Arg.Int (fun x -> Robot.min_disp_req.val := x),
+        "\n       Minimum number of requests in robot trace (default: " ^
+        string_of_int Robot.min_disp_req.val ^ ")");
        ("-login_tmout", Arg.Int (fun x -> login_timeout.val := x), "\
 <sec>
        Login timeout for entries with passwords in CGI mode (default " ^ string_of_int login_timeout.val ^ "\

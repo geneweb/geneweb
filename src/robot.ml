@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 4.11 2002-12-31 08:38:07 ddr Exp $ *)
+(* $Id: robot.ml,v 4.12 2003-01-30 13:07:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -89,6 +89,8 @@ value robot_excl () =
   (xcl, fname)
 ;
 
+value min_disp_req = ref 6;
+
 value check oc tm from max_call sec cgi suicide =
   let (xcl, fname) = robot_excl () in
   let refused =
@@ -165,7 +167,8 @@ value check oc tm from max_call sec cgi suicide =
                  do {
                    if nb > fst xcl.max_conn then xcl.max_conn := (nb, k)
                    else ();
-                   (if nb <= 5 then list else [(k, tm, nb) :: list],
+                   (if nb < min_disp_req.val then list
+                    else [(k, tm, nb) :: list],
                     nconn + 1)
                  })
               xcl.who ([], 0)
