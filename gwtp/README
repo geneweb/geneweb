@@ -1,0 +1,59 @@
+What is gwtp?
+
+Gwtp is a CGI program allowing people to upload and download their
+GeneWeb data bases on a Web site and change their configuration
+parameters.
+
+
+Installation on an Unix Web server
+
+In the site machine, create a directory which is *not* accessible on
+the Web, with any name you want. In that directory, copy the executable
+'gwtp' and the files 'send.txt', 'recv.txt', 'conf.txt', and create an
+empty file named 'passwd'. Put all read/write access rights (chmod a+rw)
+to that directory.
+
+Go to the cgi-bin directory and create you CGI (e.g. gwtp.cgi),
+holding the following lines, replacing the texts between brackets
+by the correct values:
+
+  #!/bin/sh
+  tmp=[the above directory holding gwtp and the .txt files]
+  dst=[the directory holding the GeneWeb data bases]
+  site=[the URL of the GeneWeb site]
+  cd $tmp
+  ./gwtp -tmp $tmp -dst $dst -site $site
+
+The above variable 'site' is the Web address of a GeneWeb data base
+*minus* its name. Things like that:
+   http://my.site.net/cgi-bin/geneweb.cgi?b=
+   http://my.site.net:2317/
+
+Make your CGI executable:
+   chmod a+x gwtp.cgi
+
+Then, when accessing that CGI, people get a login page where they have to
+enter a data base name and a password.
+
+
+Adding an user
+
+To add a new accomodated data base, just add a line in the passwd file
+of the directory $tmp above, holding:
+    base:passwd
+
+replacing "base" by the name of the data base you want and "passwd" by
+a complicated enough password. Send these values to the data base owner.
+
+The data base owner can then access the CGI and log in. The first
+time, he has to configurate his data base parameters; once done, he
+can upload his data base. Later, using the same login, he can at any
+time change his configuration, or upload or download his GeneWeb
+data base.
+
+
+Removing an user
+
+Remove his entry in the passwd file, delete his GeneWeb data base
+(directory ending with ".gwb"), and delete his data base configuration
+file (file ending with ".gwf").

@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.41 2000-09-06 16:11:54 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.42 2000-09-08 01:58:15 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -132,6 +132,13 @@ value get_variable ic =
     | c -> loop (Buff.store len c) ]
 ;
 
+value get_binding ic =
+  loop 0 where rec loop len =
+    match input_char ic with
+    [ '=' -> let k = Buff.get len in (k, get_variable ic)
+    | c -> loop (Buff.store len c) ]
+;
+
 value copy_template varenv env fname =
   let ic = open_in (Filename.concat gwtp_tmp.val (fname ^ ".txt")) in
   do try
@@ -139,7 +146,13 @@ value copy_template varenv env fname =
          match input_char ic with
          [ '%' ->
              match input_char ic with
-             [ 'v' ->
+             [ 'e' ->
+                 let (v, k) = get_binding ic in
+                 try
+                   if k = List.assoc v varenv then print_string " selected"
+                   else ()
+                 with [ Not_found -> () ]
+             | 'v' ->
                  let v = get_variable ic in
                  try print_string (quote_escaped (List.assoc v varenv)) with
                  [ Not_found -> () ]
@@ -151,6 +164,31 @@ value copy_template varenv env fname =
      with [ End_of_file -> () ];
      close_in ic;
   return ()
+;
+
+value variables () =
+  let ic = open_in (Filename.concat gwtp_tmp.val "conf.txt") in
+  let list = ref [] in
+  do try
+       while True do
+         match input_char ic with
+         [ '%' ->
+             match input_char ic with
+             [ 'e' ->
+                 let (v, _) = get_binding ic in
+                 if not (List.mem v list.val) then list.val := [v :: list.val]
+                 else ()
+             | 'v' ->
+                 let v = get_variable ic in
+                 if not (List.mem v list.val) then list.val := [v :: list.val]
+                 else ()
+             | _ -> () ]
+         | _ -> () ];
+       done
+     with
+     [ End_of_file -> () ];
+     close_in ic;
+  return list.val
 ;
 
 value sys_copy src dst =
@@ -207,26 +245,45 @@ value gwtp_error txt =
 
 value gwtp_invalid_request str env = gwtp_error "Invalid request";
 
-(* Base configuration *)
+value random_self_init () =
+  let seed = int_of_float (mod_float (Unix.time ()) (float max_int)) in
+  let seed = seed + 256 * Unix.getpid () in
+  Random.init seed
+;
 
-value variables = ["wizard_passwd"; "friend_passwd"; "default_lang"];
+random_self_init ();
+
+value mk_passwd size =
+  loop 0 where rec loop len =
+    if len = size then Buff.get len
+    else
+      let r = Random.int (26 + 26 + 10) in
+      let v =
+        if r < 26 then Char.code 'a' + r
+        else if r < 52 then Char.code 'A' + r - 26
+        else Char.code '0' + r - 52
+      in
+      loop (Buff.store len (Char.chr v))
+;
+
+(* Base configuration *)
 
 value get_base_conf b =
   let fname = Filename.concat gwtp_dst.val (b ^ ".gwf" ) in
-  let env = ref [] in
-  let rec record line =
-    fun
-    [ [v :: l] ->
-        if lowercase_start_with line (v ^ "=") then
-          let len = String.length v + 1 in
-          let x = String.sub line len (String.length line - len) in
-          env.val := [(v, x) :: env.val]
-        else record line l
-    | [] -> () ]
-  in
-  do match try Some (open_in fname) with [ Sys_error _ -> None ] with
-     [ Some ic ->
-         try
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let env = ref [] in
+      let rec record line =
+        fun
+        [ [v :: l] ->
+            if lowercase_start_with line (v ^ "=") then
+              let len = String.length v + 1 in
+              let x = String.sub line len (String.length line - len) in
+              env.val := [(v, x) :: env.val]
+            else record line l
+        | [] -> () ]
+      in
+      do try
            while True do
              let line =
                let line = input_line ic in
@@ -235,12 +292,13 @@ value get_base_conf b =
                  String.sub line 0 (String.length line - 1)
                else line
              in
-             record line variables;
+             record line (variables ());
            done
          with
-         [ End_of_file -> close_in ic ]
-     | None -> () ];
-  return env.val
+         [ End_of_file -> close_in ic ];
+      return env.val
+  | None ->
+      [("friend_passwd", mk_passwd 8); ("wizard_passwd", mk_passwd 8)] ]
 ;
 
 value set_base_conf b varenv =
@@ -315,21 +373,6 @@ value write_tokens fname tokens =
   return ()
 ;
 
-value random_self_init () =
-  let seed = int_of_float (mod_float (Unix.time ()) (float max_int)) in
-  Random.init seed
-;
-
-random_self_init ();
-
-value mk_passwd () =
-  loop 0 where rec loop len =
-    if len = 12 then Buff.get len
-    else
-      let v = Char.code 'a' + Random.int 26 in
-      loop (Buff.store len (Char.chr v))
-;
-
 value check_login b p =
   let line1 = b ^ ":" ^ p in
   let ic = open_in (Filename.concat gwtp_tmp.val "passwd") in
@@ -340,7 +383,7 @@ value check_login b p =
       | None -> False ]
   in
   do close_in ic; return
-  if login_ok then Some (mk_passwd ()) else None
+  if login_ok then Some (mk_passwd 12) else do Unix.sleep 5; return None
 ;
 
 value check_token fname from b tok =
@@ -527,7 +570,7 @@ value gwtp_setconf str env b tok =
          match HttpEnv.getenv env k with
          [ Some v -> [(k, v) :: varenv]
          | None -> varenv ])
-      variables []
+      (variables ()) []
   in
   do printf "content-type: text/html"; crlf (); crlf ();
      printf "\
