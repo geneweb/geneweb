@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.23 2001-02-14 02:47:09 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.24 2001-02-14 03:19:04 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -553,7 +553,7 @@ value print_del1 conf base fam =
 
 value print_swi1 conf base p fam1 fam2 =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "switch"))
+    Wserver.wprint "%s" (capitale (transl_decline conf "switch" ""))
   in
   let cpl1 = coi base fam1.fam_index in
   let cpl2 = coi base fam2.fam_index in

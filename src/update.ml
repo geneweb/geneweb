@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.26 2001-02-04 07:21:41 ddr Exp $ *)
+(* $Id: update.ml,v 3.27 2001-02-14 03:19:04 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -870,7 +870,7 @@ value print_family_stuff conf base p a u =
   		       (commd conf) (Adef.int_of_iper p.cle_index)
   		       (Adef.int_of_ifam fi);
   		     Wserver.wprint "%s</a><br>\n"
-  			(capitale (transl conf "switch"));
+  			(capitale (transl_decline conf "switch" ""));
   		     if cpl1.father = cpl2.father && cpl1.mother = cpl2.mother
   		     then
   		       do stag "a" "href=\"%sm=MRG_FAM;f1=%d;f2=%d;ip=%d\""
@@ -958,7 +958,8 @@ value print conf base p =
          end;
          tag "th" "align=left" begin
            Wserver.wprint "%s<br>&nbsp;\n"
-             (std_color conf (capitale (transl_nth conf "family/families" 1)));
+             (std_color conf
+                (capitale (nominative (transl_nth conf "family/families" 1))));
          end;
        end;
        tag "tr" begin
