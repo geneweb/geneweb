@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.10 2000-08-18 15:06:43 ddr Exp $
+# $Id: Makefile,v 3.11 2000-08-18 15:31:05 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -37,7 +37,6 @@ wrappers:
 	  echo 'cd gw; exec ./gwsetup' >> distribution/gwsetup; \
 	  chmod +x distribution/gwd distribution/gwsetup; \
 	fi
-	cp LICENSE distribution/LICENSE.txt
 
 new_distrib: classical_distrib
 	mkdir t
@@ -56,8 +55,12 @@ new_distrib: classical_distrib
 	  fi; \
 	done
 	cp setup/gwsetup distribution/gw/gwsetup$(EXE)
-	cp etc/README.distrib.txt distribution/README.txt
-	cp etc/LISEZMOI.distrib.txt distribution/LISEZMOI.txt
+	for i in README LISEZMOI; do \
+	  echo "<pre>" > distribution/$$i.htm; \
+	  cat etc/$$i.distrib.txt >> distribution/$$i.htm; \
+	  echo "</pre>" >> distribution/$$i.htm; \
+	done
+	cp LICENSE distribution/LICENSE.txt
 	echo "127.0.0.1" > distribution/gw/only.txt
 
 classical_distrib:
