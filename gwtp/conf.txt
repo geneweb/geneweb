@@ -7,18 +7,21 @@
 <input type=hidden name=b value=%b>
 <input type=hidden name=t value=%t>
 
-Wizard password: <input name=wizpw value="%w"><br>
 Friend password: <input name=fripw value="%f"><br>
+Wizard password: <input name=wizpw value="%w"><br>
 
 <p>
 
-You can change these values. Remarks:
+Advice:
 
 <ul>
 
-<li>You can erase the friend password: in this case, everybody is a "friend".
+<li>You can choose an empty friend password: in this case, everybody
+is a "friend".
 
-<li>Don't erase the wizard password. Don't choose a too simple password.
+<li>Choose a non-empty and not too simple wizard password.
+
+<li>This is not checked: you take your responsabilities.
 
 </ul>
 
