@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.2 2001-03-19 14:44:39 ddr Exp $
+# $Id: lexicon.txt,v 4.3 2001-03-22 17:16:28 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -411,7 +411,7 @@ he:  ååğãîéàéàø / áøåîàéàø / ôøéîàéàø / ğéáåæ / ôìåáéåæ / â'øîéğàì / ôìåøéàì / ô
 nl: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 no: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 pl: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
-pt: vindemiário/brumário/frimário/nivoso/pluviose/ventoso/germinal/floreal/prairial/messidor/termidor/frutidor/complementar
+pt: Vindimiário/Brumário/Frimário/Nevoso/Pluvioso/Ventoso/Germinal/Floreal/Pradial/Messidor/Termidor/Frutidor/Complementar
 se: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/komplementär
 
     (hebrew month)
@@ -4740,7 +4740,7 @@ lv: meklçt senèus -&gt; %t pçc Sosa pakâpes
 nl: navigatie met %t als proband
 no: navigering med %t som Sosa referanse
 pl: nawigacja z numerami "Sosa" odnosz¹cymi siê do osoby: %t
-pt: navega&ccedil;a&atilde;o com %t como a refer&ecirc;ncia Sosa
+pt: navega&ccedil;&atilde;o com %t como a refer&ecirc;ncia Sosa
 ru: íàâèãàöèÿ ñ %t êàê ññûëêà Sosa
 se: navigering med %t som proband (Kekules system)
 
