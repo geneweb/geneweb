@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.0 2001-03-16 19:35:02 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.1 2001-03-26 05:18:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -276,15 +276,34 @@ value macro conf base =
   | c -> "%" ^ String.make 1 c ]
 ;
 
-value rec src_translate conf base nomin ic =
+module Lbuff =
+  struct
+    value buff = ref (String.create 80);
+    value store len x =
+      do if len >= String.length buff.val then
+           buff.val := buff.val ^ String.create (String.length buff.val)
+         else ();
+         buff.val.[len] := x;
+      return succ len
+    ;
+    value mstore len s =
+      add_rec len 0 where rec add_rec len i =
+        if i == String.length s then len
+        else add_rec (store len s.[i]) (succ i)
+    ;
+    value get len = String.sub buff.val 0 len;
+  end
+;
+
+value rec lexicon_translate conf base nomin ic first_c =
   let (upp, s) =
-    loop 0 (input_char ic) where rec loop len c =
+    loop 0 first_c where rec loop len c =
       if c = ']' then
-        let s = Buff.get len in
+        let s = Lbuff.get len in
         if len > 0 && s.[0] == '*' then
           (True, String.sub s 1 (len - 1))
         else (False, s)
-      else loop (Buff.store len c) (input_char ic)
+      else loop (Lbuff.store len c) (input_char ic)
   in
   let (n, c) =
     match input_char ic with
@@ -293,7 +312,8 @@ value rec src_translate conf base nomin ic =
   in
   let r =
     if c = "[" then
-      Util.transl_decline conf s (src_translate conf base False ic)
+      Util.transl_decline conf s
+        (lexicon_translate conf base False ic (input_char ic))
     else
       let r = Util.transl_nth conf s n in
       match Gutil.lindex r '%' with
@@ -301,13 +321,13 @@ value rec src_translate conf base nomin ic =
           let sa =
             loop 0 where rec loop len =
               let c = input_char ic in
-              if c == ')' then Buff.get len
+              if c == ')' then Lbuff.get len
               else
                 let len =
                   if c == '%' then
                     let c = input_char ic in
-                    Buff.mstore len (macro conf base c)
-                  else Buff.store len c
+                    Lbuff.mstore len (macro conf base c)
+                  else Lbuff.store len c
                 in
                 loop len
           in
@@ -317,6 +337,39 @@ value rec src_translate conf base nomin ic =
           (if nomin then Gutil.nominative r else r) ^ c ]
   in
   if upp then capitale r else r
+;
+
+value inline_translate conf base ic =
+  let s =
+    loop 0 (input_char ic) where rec loop len c =
+      if c = ']' then Lbuff.get len
+      else loop (Lbuff.store len c) (input_char ic)
+  in
+  let lang = conf.lang ^ ": " in
+  loop True 0 where rec loop bol i =
+    if i = String.length s then ".........."
+    else if bol && i + 4 < String.length s && String.sub s i 4 = lang then
+      loop 0 (i + 4) where rec loop len j =
+        if j = String.length s then Lbuff.get len
+        else if s.[j] = '\n' then
+          if j+1 < String.length s && s.[j+1] = ' ' then
+            let j =
+              loop (j + 1) where rec loop j =
+                if j < String.length s && s.[j] = ' ' then loop (j + 1)
+                else j
+            in
+            loop (Lbuff.store len '\n') j
+          else Lbuff.get len
+        else if s.[j] == '%' then
+          loop (Lbuff.mstore len (macro conf base s.[j+1])) (j + 2)
+        else loop (Lbuff.store len s.[j]) (j + 1)
+    else loop (s.[i] = '\n') (i + 1)
+;
+
+value src_translate conf base nomin ic =
+  let c = input_char ic in
+  if c = '\n' then inline_translate conf base ic
+  else lexicon_translate conf base nomin ic c
 ;
 
 value language_name conf lang =
