@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.20 2000-08-05 12:42:38 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.21 2000-08-05 12:57:57 ddr Exp $ *)
 
 open Printf;
 
@@ -66,7 +66,7 @@ value filename_basename str =
     if i < 0 then str
     else
       match str.[i] with
-      [ 'A'..'Z' | 'a'..'z' | '-' -> loop (i - 1)
+      [ 'A'..'Z' | 'a'..'z' | '-' | '.' -> loop (i - 1)
       | _ -> String.sub str (i + 1) (String.length str - i - 1) ]
 ;
 
@@ -233,7 +233,8 @@ value insert_file env bdir name =
   let fname = filename_basename fname in
   do if fname = "" then ()
      else if fname <> name then
-       printf "You selected \"%s\" instead of \"%s\" -&gt; ignored.\n"
+       printf
+         "You selected <b>%s</b> instead of <b>%s</b> -&gt; ignored.\n"
          fname name
      else
        let contents = List.assoc name env in
@@ -309,7 +310,8 @@ value printf_link_to_main b tok =
 ;
 
 value send_file str env b tok f fname =
-  if filename_basename fname = "base" then
+  let fname = filename_basename fname in
+  if fname = "base" then
     do printf "content-type: text/html\r\n\r\n\
 <head><title>Gwtp...</title></head>\n<body>
 <h1 align=center>Gwtp...</h1>
@@ -325,12 +327,21 @@ value send_file str env b tok f fname =
        printf_link_to_main b tok;
        printf "</body>\n";
     return ()
-  else gwtp_error "Bad \"base\" file selection"
+  else
+    do printf "content-type: text/html\r\n\r\n";
+       printf "\
+<head><title>Error</title></head>\n<body>
+<h1><font color=red>Error</font></h1>
+You selected the file <b>%s</b> instead of <b>base</b>
+</body>
+" fname;
+       printf_link_to_main b tok;
+    return ()
 ;
 
 value gwtp_send str env b t =
   match (HttpEnv.getenv env "base", HttpEnv.getenv env "base_name") with
-  [ (Some f, Some fname) -> send_file str env b t f fname
+  [ (Some f, Some fname) -> send_file str env b t f (HttpEnv.decode fname)
   | _ -> gwtp_invalid_request str env ]
 ;
 
