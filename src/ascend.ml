@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.35 1999-08-02 10:15:59 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.36 1999-08-02 21:47:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -86,6 +86,16 @@ value print_choice conf base p niveau_effectif =
           "%s <input type=checkbox name=notes value=on checked>\n"
           (capitale (transl_nth conf "note/notes" 1));
       end;
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=T> %s%t\n"
+        (capitale (transl conf "tree"))
+        (fun oc ->
+          if niveau_effectif <= 4 then ()
+          else
+            do Printf.fprintf oc " (";
+               Printf.fprintf oc (ftransl conf "max %d generations") 4;
+               Printf.fprintf oc ")";
+            return ());
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=L> %s%t\n"
         (capitale (transl conf "list"))
@@ -1358,6 +1368,97 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
   return ()
 ;
 
+value print_tree conf base v p =
+  let title _ =
+    Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
+      (person_text_no_html conf base p)
+  in
+  let v = min 4 v in
+  let next_gen ipol =
+    List.fold_right
+      (fun ipo list ->
+         match ipo with
+         [ Some ip ->
+             match (aoi base ip).parents with
+             [ Some ifam ->
+                 let cpl = coi base ifam in
+                 [Some cpl.father; Some cpl.mother :: list]
+             | _ -> [None; None :: list] ]
+         | None -> [None; None :: list] ])
+      ipol []
+  in
+  let gen =
+    loop (v - 1) [Some p.cle_index] [] where rec loop i gen list =
+      if i == 0 then [gen :: list]
+      else loop (i - 1) (next_gen gen) [gen :: list]
+  in
+  let tree_reference p s =
+    if conf.cancel_links then s
+    else
+      "<a href=\"" ^ commd conf ^ "m=A;t=T;v=" ^ string_of_int v ^ ";" ^
+      acces conf base p ^ "\">" ^ s ^ "</a>"
+  in
+  let print_ancestor gen n ipo =
+    do stag "td" "align=center colspan=%d" n begin
+         let txt =
+           match ipo with
+           [ Some ip ->
+               let p = poi base ip in
+               let txt = person_title_text conf base p in
+               let txt =
+                 if List.length gen = 1 then reference conf base p txt
+                 else tree_reference p txt
+               in
+               txt ^ Date.short_dates_text conf base p
+           | _ -> "&nbsp;" ]
+         in
+         Wserver.wprint "%s" txt;
+       end;
+       Wserver.wprint "\n";
+    return ()
+  in
+  let print_vertical_bars n cs =
+    for i = 1 to n do
+      stag "td" "align=center colspan=%d" cs begin Wserver.wprint "|"; end;
+      Wserver.wprint "\n";
+    done
+  in
+  let print_horizontal_line n cs =
+    for i = 1 to n do
+      stag "td" "colspan=%d" (cs / 2) begin
+        Wserver.wprint "<hr noshade size=1 width=\"50%%\" align=right>";
+      end;
+      Wserver.wprint "\n";
+      stag "td" "colspan=%d" (cs / 2) begin
+        Wserver.wprint "<hr noshade size=1 width=\"50%%\" align=left>";
+      end;
+      Wserver.wprint "\n";
+    done
+  in
+  do header_no_page_title conf title;
+     tag "table" "border=0 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
+       let _ =
+         List.fold_left
+           (fun cs gen ->
+              do if cs > 1 then
+                   let n = List.length gen in
+                   do tag "tr" begin print_vertical_bars (2 * n) (cs / 2); end;
+                      tag "tr" begin print_horizontal_line n cs; end;
+                      tag "tr" begin print_vertical_bars n cs; end;
+                   return ()
+                 else ();
+                 tag "tr" begin
+                   List.iter (print_ancestor gen cs) gen;
+                 end;
+              return 2 * cs)
+           1 gen
+       in
+       ();
+     end;
+     trailer conf;
+  return ()
+;
+
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> afficher_ascendants_jusqu_a conf base v p
@@ -1388,6 +1489,7 @@ value print conf base p =
       in
       if al then print_missing_ancestors_alphabetically conf base v si p
       else print_missing_ancestors conf base v si p
+  | (Some "T", Some v) -> print_tree conf base v p
   | (Some "D", x) ->
       match (find_person_in_env conf base "1", x) with
       [ (Some anc, _) ->

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.94 1999-08-02 16:08:25 ddr Exp $
+# $Id: lexicon.txt,v 2.95 1999-08-02 21:47:02 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -4185,6 +4185,10 @@ nl: totaal
 no: totalt
 pt: total
 se: totalt
+
+    tree
+en: tree
+fr: arbre
 
     uncles and aunts
 de: Onkel und Tanten
