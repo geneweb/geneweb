@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.23 2000-03-17 19:34:07 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.24 2000-03-27 18:21:48 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogía - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -115,6 +115,12 @@ por
 </select>
 <input type=submit value="Ok">
 </form>
+
+<li>
+
+<font color=%i><b>por </b></font>
+<a href="%sm=PS"><font color=%i><b>[place] /
+[surname/surnames]0</b></font></a>.
 
 <li>
 

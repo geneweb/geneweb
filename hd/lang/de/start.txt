@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.17 2000-03-17 19:34:05 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.18 2000-03-27 18:21:47 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -114,6 +114,12 @@ Zum Benutzen dieser Datenbank kannst du hier suchen:<br><p>
 </select>
 <input type=submit value="Ok">
 </form>
+
+<li>
+
+<font color=%i><b>mit </b></font>
+<a href="%sm=PS"><font color=%i><b>[place] /
+[surname/surnames]0</b></font></a>.
 
 <li>
 <font color=%i><b>mit der</b></font>
