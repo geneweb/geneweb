@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.46 2000-07-17 09:29:09 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.47 2000-07-17 09:34:45 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -857,18 +857,19 @@ value conf_and_connection cgi from (addr, request) str env =
   [ (True, True, _) ->
       if is_robot from then () else no_access conf
   | (_, True, _) ->
-      if is_robot from then () else
-      let auth_type =
-        let x =
-          try List.assoc "auth_file" conf.base_env with
-          [ Not_found -> "" ]
+      if is_robot from then Robot.error cgi from 0 0
+      else
+        let auth_type =
+          let x =
+            try List.assoc "auth_file" conf.base_env with
+            [ Not_found -> "" ]
+          in
+          if x = "" then "GeneWeb service" else "data base " ^ conf.bname
         in
-        if x = "" then "GeneWeb service" else "data base " ^ conf.bname
-      in
-      refuse_auth conf from auth auth_type
+        refuse_auth conf from auth auth_type
   | (_, _, Some (passwd, uauth, base_file)) ->
       if is_robot from then
-        ()
+        Robot.robot_error cgi from 0 0
       else
         let tm = Unix.time () in
         do lock_wait Srcfile.adm_file "gwd.lck" with
