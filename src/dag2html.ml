@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.26 2000-01-02 16:04:37 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.27 2000-01-05 04:48:10 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -485,12 +485,18 @@ value treat_new_row d t =
             List.fold_left
               (fun (t, parents, j) (x, c) ->
                  let to_add = parent_colspan / c - 1 in
-                 let t = insert_columns t to_add j in
+                 let t =
+                   loop c t j where rec loop cc t j =
+                     if cc = 0 then t
+                     else
+                       let t = insert_columns t to_add j in
+                       loop (cc - 1) t (j + to_add + 1)
+                 in
                  (t, [(x, parent_colspan) :: parents], j + parent_colspan))
               (t, [], j) parents
           in
           let parents = List.rev parents in
-          let parents_colspan = max_parent_colspan * List.length parents in
+          let parents_colspan = parent_colspan * List.length parents in
           let children_colspan = List.length children in
           let g = gcd parents_colspan children_colspan in
           let (t, j) =
