@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.9 2001-12-05 19:55:15 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.10 2001-12-07 16:39:36 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1167,7 +1167,6 @@ value errmsg =
 [options] <base_file>
 If both options -a and -d are used, intersection is assumed.
 If several options -s are used, union is assumed.
-When option -s is used, the options -a and -d are ignored.
 Options are:"
 ;
 
