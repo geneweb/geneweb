@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 4.4 2001-07-17 08:50:44 ddr Exp $ *)
+(* $Id: select.ml,v 4.5 2001-12-06 11:56:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -378,6 +378,13 @@ value functions
   let (per_sel2, fam_sel2) =
     select_surnames base surnames no_spouses_parents
   in
-  (fun i -> per_sel1 i || per_sel2 i,
-   fun i -> fam_sel1 i || fam_sel2 i)
+  match (censor, anc, desc, ancdesc, surnames) with
+  [ (0, None, None, None, [_ :: _]) -> (per_sel2, fam_sel2)
+  | (_, _, _, _, []) -> (per_sel1, fam_sel1)
+  | (0, _, _, _, _) ->
+      (fun i -> per_sel1 i || per_sel2 i,
+       fun i -> fam_sel1 i || fam_sel2 i)
+  | _ ->
+      (fun i -> per_sel1 i && per_sel2 i,
+       fun i -> fam_sel1 i && fam_sel2 i) ]
 ;
