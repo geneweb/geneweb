@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.18 2000-03-05 17:15:07 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.19 2000-03-05 17:47:37 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -706,8 +706,11 @@ value conf_and_connection cgi from (addr, request) str env =
          unauth base_file (if passwd = "w" then "Wizard" else "Friend");
       return ()
   | _ ->
-      do log_and_robot_check conf auth from request str;
-         match Util.p_getenv conf.env "m" with
+      let mode = Util.p_getenv conf.env "m" in
+      do if mode <> Some "IM" then
+           log_and_robot_check conf auth from request str
+         else ();
+         match mode with
          [ Some "DOC" -> Doc.print conf
          | _ ->
              if conf.bname = "" then general_welcome conf
