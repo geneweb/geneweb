@@ -1,4 +1,4 @@
-(* $Id: adef.ml,v 2.2 1999-09-14 22:33:40 ddr Exp $ *)
+(* $Id: adef.ml,v 2.3 1999-09-16 08:13:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = int;
@@ -50,7 +50,8 @@ type codate = cdate;
 value compress d =
   let simple =
     match d.prec with
-    [ Sure | About | Maybe | Before | After -> d.year > 0 && d.year < 2500
+    [ Sure | About | Maybe | Before | After ->
+        d.day >= 0 && d.month >= 0 && d.year > 0 && d.year < 2500
     | _ -> False ]
   in
   if simple then
