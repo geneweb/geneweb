@@ -2,24 +2,26 @@ GeneWeb version 2.05
 --------------------
 
 * Setup program
-  - [Jul 3, 99] Added "af" as possible surnames particles (this is Danish)
-    possibly ignored in "search".
   - [Jul 2, 99] Fixed bug: importing GeneWeb base from old version passing
     by a GEDCOM file did not work if the current directory held spaces.
   - [Jul 2, 99] Changed names of html files to hold 8 characters maximum
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
+* GeneWeb Daemon/CGI (gwd)
+  - [Jul 3, 99] Added "af" as possible surnames particles (this is Danish)
+    possibly ignored in "search".
+
 * Gedcom to GeneWeb (ged2gwb)
-  - [Jun 5, 99] Fixed bug sometimes raising exception "Invalid_argument"
-    after a detection of an error of parents with inverted sex (female
-    father and male mother).
+  - [Jun 5, 99] Fixed bug sometimes stopping the program (exception
+    "Invalid_argument") after the detection of an error of a family whose
+    parents are of bad sex (female father and male mother).
   - [Jul 2, 99] Recognizes the dates of the form "FROM..TO..".
 
 * GeneWeb to Gedcom (gwb2ged)
-  - [Jul 2, 99] Generates dates of the form "FROM..TO.." for titles.
+  - [Jul 2, 99] Generate now dates of the form "FROM..TO.." for titles.
 
-* Lexicon (lang/lexicon.txt) and Welcome pages (*/start.txt)
-  - [Jun 3, 99] Updated Danish phrases (Hans Albeck)
+* Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
+  - [Jul 3, 99] Updated Danish phrases (Hans Albeck)
 
 GeneWeb version 2.04
 --------------------
