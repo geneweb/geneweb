@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.42 1999-12-26 13:29:53 ddr Exp $
+# $Id: lexicon.txt,v 3.43 2000-01-02 16:28:38 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -269,8 +269,7 @@ dk: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/a
 en: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 fr: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 he: תשרי/ חשון/ כסלו/ טבת/ שבט/ אדר א'/ אדר ב'/ ניסן/ אייר/ סיון/ תמוז/ אב/ אלול 
-se: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av
-/elul
+se: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 
     (month)
 cn: 1װֲ/2װֲ/3װֲ/4װֲ/5װֲ/6װֲ/7װֲ/8װֲ/9װֲ/10װֲ/11װֲ/12װֲ
