@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.30 1999-08-14 23:16:55 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.31 1999-08-17 11:39:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -501,6 +501,7 @@ use \"can_send_image\".\n"
        try Hashtbl.find lexicon " !charset" with [ Not_found -> "iso-8859-1" ];
      is_rtl =
        try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ];
+     auth_file = auth_file.val;
      today =
        {day = tm.Unix.tm_mday;
         month = succ tm.Unix.tm_mon;

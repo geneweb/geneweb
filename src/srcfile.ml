@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.14 1999-08-14 23:47:53 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.15 1999-08-17 11:39:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -200,7 +200,9 @@ value rec copy_from_channel conf base ic =
                    if conf.cgi then Wserver.wprint "b=%s;" conf.bname else ();
                 return ()
             | 'h' -> hidden_env conf
-            | 'i' -> if conf.cgi then () else echo.val := False
+            | 'i' ->
+                if conf.cgi || conf.auth_file <> "" then ()
+                else echo.val := False
             | 'l' -> Wserver.wprint "%s" conf.lang
             | 'n' ->
                 Num.print (fun x -> Wserver.wprint "%s" x)
@@ -232,10 +234,11 @@ value rec copy_from_channel conf base ic =
                 if conf.wizard || conf.friend then () else echo.val := False
             | 'y' ->
                 if not conf.wizard && not conf.just_friend_wizard
-                && not conf.cgi then ()
+                && not conf.cgi && conf.auth_file = "" then ()
                 else echo.val := False
             | 'z' ->
-                if not conf.wizard && not conf.friend && not conf.cgi then ()
+                if not conf.wizard && not conf.friend && not conf.cgi
+                && conf.auth_file = "" then ()
                 else echo.val := False
             | c -> Wserver.wprint "%%%c" c ]
       | c -> if echo.val then Wserver.wprint "%c" c else () ];
