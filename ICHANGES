@@ -12,6 +12,10 @@ GeneWeb Version 1.09
     forms.
   - Fixed some displayed "value=" when the value hold the " character
 
+* ged2gwb:
+  - Display message "Strange input" giving the line number instead of character
+    number.
+
 GeneWeb Version 1.08
 --------------------
 
