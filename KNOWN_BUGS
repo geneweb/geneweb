@@ -4,12 +4,6 @@ NOT FIXED
   Some variables in perso.txt do not work in all cases. Due to rewritting of
   code to make it cleaner. Cases to be checked. Urgency 3/5.
 
-[08 Feb 2005] Probable bug in version 5.00-exp
-  Running "consang" on old databases (i.e. created before utf-8) may create
-  bad utf-8 strings (names, texts, etc.), because there is no conversion.
-  Np idea for the moment how to fix it. Anyway, this error has not been
-  experimented, it is just supposed. Urgency 1/5.
-
 FIXED
 
 [13 Feb 2005] Bug found in version 5.00-exp; existed probably before

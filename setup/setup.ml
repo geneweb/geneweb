@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.54 2005-02-13 13:35:46 ddr Exp $ *)
+(* $Id: setup.ml,v 4.55 2005-02-13 17:05:31 ddr Exp $ *)
 
 open Printf;
 
@@ -1125,7 +1125,7 @@ value cleanup_1 conf =
     flush stderr;
     Sys.rename in_base_dir (Filename.concat "old" in_base_dir);
     let c =
-      Filename.concat setup_dir.val "gwc" ^ " tmp.gw -o " ^ in_base ^
+      Filename.concat setup_dir.val "gwc" ^ " tmp.gw -nofail -o " ^ in_base ^
         " > comm.log "
     in
     eprintf "$ %s\n" c;
