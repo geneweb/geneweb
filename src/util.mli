@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 2.23 1999-08-02 16:08:28 ddr Exp $ *)
+(* $Id: util.mli,v 2.24 1999-08-05 06:22:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -124,6 +124,14 @@ value relation_type_text : config -> relation_type -> int -> string;
 value rchild_type_text : config -> relation_type -> int -> string;
 
 value has_nephews_or_nieces : base -> person -> bool;
+
+value browser_doesnt_have_tables : config -> bool;
+
+(* Printing for browsers without tables *)
+
+value print_pre_center : int -> string -> unit;
+value print_pre_left : int -> string -> unit;
+value print_pre_right : int -> string -> unit;
 
 (* Deprecated *)
 value afficher_personne : config -> base -> person -> unit;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.39 1999-08-02 10:16:05 ddr Exp $ *)
+(* $Id: util.ml,v 2.40 1999-08-05 06:22:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1145,6 +1145,58 @@ value has_nephews_or_nieces base p =
     | _ -> False ]
   with
   [ Ok -> True ]
+;
+
+value browser_doesnt_have_tables conf =
+  let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
+  String.lowercase user_agent = "lynx"
+;
+
+(* Printing for browsers without tables *)
+
+value text_size txt =
+  let rec normal len i =
+    if i = String.length txt then len
+    else if txt.[i] = '<' then in_tag len (i + 1)
+    else if txt.[i] = '&' then in_char (len + 1) (i + 1)
+    else normal (len + 1) (i + 1)
+  and in_tag len i =
+    if i = String.length txt then len
+    else if txt.[i] = '>' then normal len (i + 1)
+    else in_tag len (i + 1)
+  and in_char len i =
+    if i = String.length txt then len
+    else if txt.[i] = ';' then normal len (i + 1)
+    else in_char len (i + 1)
+  in
+  normal 0 0
+;
+
+value print_pre_center sz txt =
+  do for i = 1 to (sz - text_size txt) / 2 do Wserver.wprint " "; done;
+     Wserver.wprint "%s\n" txt;
+  return ()
+;
+
+value print_pre_left sz txt =
+  let tsz = text_size txt in
+  do if tsz < sz / 2 - 1 then
+       for i = 2 to (sz / 2 - 1 - tsz) / 2 do Wserver.wprint " "; done
+     else ();
+     Wserver.wprint " %s\n" txt;
+  return ()
+;
+
+value print_pre_right sz txt =
+  let tsz = text_size txt in
+  do if tsz < sz / 2 - 1 then
+       do for i = 1 to sz / 2 do Wserver.wprint " "; done;
+          for i = 1 to (sz / 2 - 1 - tsz) / 2 do Wserver.wprint " "; done;
+       return ()
+     else
+       for i = 1 to sz - text_size txt - 1 do Wserver.wprint " "; done;
+     Wserver.wprint " %s\n" txt;
+  return ()
 ;
 
 (* Deprecated *)
