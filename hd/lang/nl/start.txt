@@ -69,7 +69,8 @@ De <a href="%sm=AD">verjaardagen van overleden mensen</a>.
 <br>
 En de <a href="%sm=AM">verjaardagen van huwelijken</a>.
 <p>
-Deze paginas zijn %c maal bezocht.
+Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
+deze verwelkomingspagina.
 
 <p>
 

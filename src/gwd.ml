@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.21 1998-12-17 15:43:16 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.22 1999-01-04 14:28:34 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -565,7 +565,7 @@ value geneweb_server () =
   in
   do if not auto_call then
        do Printf.eprintf "GeneWeb %s - " Gutil.version;
-          Printf.eprintf "Copyright (c) INRIA 1998
+          Printf.eprintf "Copyright (c) INRIA 1999
 Possible addresses:
    http://localhost:%d/base
    http://127.0.0.1:%d/base

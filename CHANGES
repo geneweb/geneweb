@@ -29,11 +29,15 @@ GeneWeb Version 1.10
     Italian).
   - [11/12/98] Fixed bug and completed Dutch version (thanks to Joris Esch).
 
-* Dutch welcome file (nl/start.txt)
-  - [11/12/98] Fixed and completed (thanks to Joris Esch).
+* Welcome files (xx/start.txt)
+  - [04/01/99] (de) Fixed some typo (thanks to Markus Mottl).
+  - [11/12/98, 04/01/99] (nl) Fixed and completed (thanks to Joris Esch).
 
 * GeneWeb uncompiler (gwu)
   - [12/12/98] Added option "-mem" to save memory space, but slower.
+
+* Documentation
+--- [04/01/99] Added dutch version (thanks to Joris Esch).
 
 GeneWeb Version 1.09
 --------------------
