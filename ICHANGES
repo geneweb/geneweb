@@ -1,6 +1,15 @@
 Internal, very small, undocumented, or not visible changes
 **********************************************************
 
+GeneWeb Version 3.03
+--------------------
+
+* Welcome pages (lang/*/start.txt)
+  - [Jan 17, 00] Added a message in welcome pages when the flag
+    "wizard_just_friend" is set for the data base to inform the
+    wizards that they cannot make changes for some minutes. This
+    message is actually added in the file 'version.txt'
+
 GeneWeb Version 3.02
 --------------------
 
