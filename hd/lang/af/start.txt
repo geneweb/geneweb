@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.18 2000-07-04 14:22:16 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.19 2000-07-05 02:39:08 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogie/Familiekunde - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -172,12 +172,12 @@ navraag</b></font></a>.
 <ul>
 <li><a href="%sm=AN">[birthdays]</a>
 <li><a href="%sm=AD">[anniversaries of death]</a>
-<li><a href="%sm=AM">[anniversaries of marriage]</a>
+<li><a href="%sm=AM">[anniversaries of marriage]</a>%I|wf
+<li><a href="%sm=STAT">[statistics]</a>%E
 </ul>
 </td>
 <td valign=up>
-<ul>%I|wf
-<li><a href="%sm=STAT">[statistics]</a>%E%Ih
+<ul>%Ih
 <li><a href="%sm=HIST;k=10">[history of updates]</a>%E
 <li><a href="%sm=CAL">[calendar/calendars]1</a>
 <li><a href="%sm=FORUM">[data base forum]</a>
