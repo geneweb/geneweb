@@ -61,6 +61,8 @@ of a child.
 
 <li> <a href="#MrgF">7.</a> How to merge two families.
 
+<li> <a href="#Dcln">8.</a> Languages with declinations.
+
 </ul>
 
 <h4> <a name="FSO">1.</a> First names, surnames, numbers </h4>
@@ -1344,7 +1346,103 @@ two families are next to the other, you can see a "Merge" between
 them.  Click on it. If they are not next the one to the other, use
 "Switch" as many times as necessary.
 
+<h4><a name="Dcln">8.</a> Languages with declinations</h4>
+
+Some languages have declinations, i.e. the proper nouns and the common
+nouns are written differently according to the place they are in the
+sentence. It is the case of Czech, one of the languages provided by
+<em>GeneWeb</em>.
+
 <p>
+
+So the English phrases:
+
+<pre>
+   ... married with Vladana
+   ... cousins of Vladana
+</pre>
+
+are translated in Czech by:
+
+<pre>
+   ... si vzal Vladanu
+   ... bratranci Vladany
+</pre>
+
+<p>
+
+The Czech first name "Vladana" has therefore several forms: "Vladana"
+is the nominative, "Vladanu" the accusative, "Vladany" the genitive.
+
+<h4>8.1. Data entering</h4>
+
+In the language lexicon and in the data, the cases are indicated by a
+letter enclosed by two <code>":"</code>.
+
+<p>
+
+So in Czech, the accusative and the genitive are respectively
+represented by:
+
+<pre>
+   :a:
+   :g:
+</pre>
+
+<p>
+	
+In an update form, to enter a first name or a surname with its
+declinations, the nominative has to be given followed by the code and
+the form of each case. For example, for "Vladana":
+
+<pre>
+   Vladana:a:Vladanu:g:Vladany
+</pre>
+
+Two shortcuts are possible:
+
+<ul>
+
+<li> A form starting with '+' indicates that one must start with the
+nominative: so "Adler:g:+a" means that the genitive of "Adler" is
+"Adlera".
+
+<li> A form starting with '-' also indicates that one must start with
+the nominative, but removing the last letter ('--' for the last two
+letters, and so on).
+
+</ul>
+
+The form with '-' can be used for "Vladana":
+
+<pre>
+   Vladana:a:-u:g:-y
+</pre>
+
+<h4>8.2. Displaying, documentation</h4>
+
+In the page, only the nominative is normally visible. The other forms
+are used only if the expressions of the language ask for them.
+
+<p>
+
+While browsing with a language without declinations, the nominative is
+systematically displayed.
+
+<p>
+
+The complete form (with the complete description of the forms) appears
+only in the update forms.
+
+<p>
+
+There is no documentation on the various used cases because it depends
+on the language. The better way is to to look at the lexicon. This can
+be consulted from the welcome page by clicking on "lexicon" in the
+bottom of the page. Look at the phrases corresponding to your
+language.
+
+<p><hr width=20%><p>
 
 Return to <a href="diruse.htm">Directions for Use</a>.
 
