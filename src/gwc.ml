@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.11 2002-03-23 05:48:44 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.12 2003-11-26 10:35:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -762,6 +762,7 @@ and [options] are:"
 value main () =
   do {
     Argl.parse speclist anonfun errmsg;
+    Secure.set_base_dir (Filename.dirname out_file.val);
     let gwo = ref [] in
     List.iter
       (fun (x, separate, shift) ->
