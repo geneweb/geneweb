@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.62 1999-06-28 19:04:30 ddr Exp $
+# $Id: lexicon.txt,v 2.63 1999-06-29 09:51:05 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2587,7 +2587,7 @@ se: fr&aring;n %ts sl&auml;ktsida
 
     of (same or greater generation level)
 de: von +decl
-dk: af
+dk: til
 en: of
 eo: de
 es: de
