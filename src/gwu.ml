@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.0 1999-10-29 10:31:18 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.1 1999-11-09 22:03:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -71,19 +71,26 @@ value starting_char s =
   | _ -> False ]
 ;
 
-value s_correct_string s =
+value gen_correct_string no_colon s =
   loop 0 0 where rec loop i len =
     if i == String.length s then Buff.get len
     else
       if i == 0 && not (starting_char s) then
         loop (i + 1) (Buff.store (Buff.store len '_') s.[0])
-      else if s.[i] == ' ' then loop (i + 1) (Buff.store len '_')
-      else if s.[i] == '_' || s.[i] == '\\' then
-        loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
-      else loop (i + 1) (Buff.store len s.[i])
+      else
+        match s.[i] with
+        [ ' ' -> loop (i + 1) (Buff.store len '_')
+        | '_' | '\\' ->
+            loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
+        | ':' when no_colon ->
+            let len = Buff.store len '\\' in
+            loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
+        | c -> loop (i + 1) (Buff.store len c) ]
 ;
 
+value s_correct_string = gen_correct_string False;
 value correct_string base is = s_correct_string (sou base is);
+value correct_string_no_colon base is = gen_correct_string True (sou base is);
 
 value has_infos_not_dates base p =
   p.first_names_aliases <> [] || p.surnames_aliases <> [] ||
@@ -151,9 +158,9 @@ value print_title oc base t =
      | Tname s -> Printf.fprintf oc "%s" (correct_string base s)
      | Tnone -> () ];
      Printf.fprintf oc ":";
-     Printf.fprintf oc "%s" (correct_string base t.t_ident);
+     Printf.fprintf oc "%s" (correct_string_no_colon base t.t_ident);
      Printf.fprintf oc ":";
-     Printf.fprintf oc "%s" (correct_string base t.t_place);
+     Printf.fprintf oc "%s" (correct_string_no_colon base t.t_place);
      if t.t_nth <> 0 then Printf.fprintf oc ":"
      else
        match (t_date_start, t_date_end) with

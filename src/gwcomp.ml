@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.0 1999-10-29 10:31:16 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.1 1999-11-09 22:03:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -407,14 +407,19 @@ value rec get_access str l =
 ;
 
 value scan_title t =
-  let i = 0 in
-  let (name, i) =
+  let next_field i =
     loop "" i where rec loop s i =
       if i < String.length t then
         match t.[i] with
         [ ':' -> (s, i + 1)
+        | '\\' -> loop (s ^ String.make 1 t.[i+1]) (i + 2)
         | c -> loop (s ^ String.make 1 c) (i + 1) ]
-      else failwith t
+      else (s, i)
+  in
+  let i = 0 in
+  let (name, i) =
+    let (s, i) = next_field i in
+    if i = String.length t then failwith t else (s, i)
   in
   let name =
     match name with
@@ -423,62 +428,21 @@ value scan_title t =
     | _ -> Tname name ]
   in
   let (title, i) =
-    loop "" i where rec loop s i =
-      if i < String.length t then
-        match t.[i] with
-        [ ':' -> (s, i + 1)
-        | c -> loop (s ^ String.make 1 c) (i + 1) ]
-      else failwith t
+    let (s, i) = next_field i in
+    if t.[i-1] <> ':' then failwith t else (s, i)
   in
-  let (place, i) =
-    loop "" i where rec loop s i =
-      if i < String.length t then
-        match t.[i] with
-        [ ':' -> (s, i)
-(*
-        | '0'..'9' -> failwith t
-*)
-        | c -> loop (s ^ String.make 1 c) (i + 1) ]
-      else (s, i)
-  in
+  let (place, i) = next_field i in
   let (date_start, i) =
-    if i < String.length t && t.[i] == ':' then
-      let (d, i) =
-        loop "" (i + 1) where rec loop s i =
-          if i < String.length t then
-            match t.[i] with
-            [ ':' -> (s, i)
-            | c -> loop (s ^ String.make 1 c) (i + 1) ]
-          else (s, i)
-      in
-      (if d <> "" then date_of_string d 0 else None, i)
-    else (None, i)
+    let (d, i) = next_field i in
+    (if d = "" then None else date_of_string d 0, i)
   in
   let (date_end, i) =
-    if i < String.length t && t.[i] == ':' then
-      let (d, i) =
-        loop "" (i + 1) where rec loop s i =
-          if i < String.length t then
-            match t.[i] with
-            [ ':' -> (s, i)
-            | c -> loop (s ^ String.make 1 c) (i + 1) ]
-          else (s, i)
-      in
-      (if d <> "" then date_of_string d 0 else None, i)
-    else (None, i)
+    let (d, i) = next_field i in
+    (if d = "" then None else date_of_string d 0, i)
   in
   let (nth, i) =
-    if i < String.length t && t.[i] == ':' then
-      let (d, i) =
-        loop "" (i + 1) where rec loop s i =
-          if i < String.length t then
-            match t.[i] with
-            [ ':' -> (s, i)
-            | c -> loop (s ^ String.make 1 c) (i + 1) ]
-          else (s, i)
-      in
-      (if d <> "" then int_of_string d else 0, i)
-    else (0, i)
+    let (d, i) = next_field i in
+    (if d = "" then 0 else int_of_string d, i)
   in
   if i <> String.length t then failwith t
   else
