@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.0 1999-10-29 10:28:25 ddr Exp $
+# $Id: Makefile,v 3.1 1999-11-22 09:33:35 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -81,7 +81,7 @@ classical_distrib:
 	cp doc/images/*.jpg doc/images/gwlogo.gif distribution/doc/images/.
 	mkdir distribution/lang
 	cp hd/lang/*.txt distribution/lang/.
-	for dir in cn cs de dk en eo es fr he is it nl no pt se; do \
+	for dir in cn cs de dk en eo es fi fr he is it nl no pt se; do \
 		mkdir distribution/lang/$$dir; \
 		cp hd/lang/$$dir/start.txt distribution/lang/$$dir/.; \
 	done
