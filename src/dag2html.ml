@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.17 1999-12-21 14:32:53 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.18 1999-12-21 15:35:10 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -304,8 +304,9 @@ let next_l = min next_l next_j in
               do print_hbars i i; print_alone_bar i; return ()
             else ();
             if exist_several_branches i (i + 1)
-            && (i < Array.length t.table - 2 || all_empty (i + 1)) then
-              do print_hbars i (i + 1); print_vbars (i + 1) (i + 1); return ()
+            && (i < Array.length t.table - 2 || not (all_empty (i + 1))) then
+              do print_hbars i (i + 1); print_vbars (i + 1) (i + 1); return
+              ()
             else ();
          return ()
        else ();
@@ -1058,13 +1059,20 @@ value try_fall2_right t i j =
             [ Ghost _ -> loop (i - 1)
             | _ -> i + 1 ]
       in
-      let separated =
+      let separated1 =
         loop (i1 - 1) where rec loop i =
           if i < 0 then True
-          else if t.table.(i).(j - 1).span = t.table.(i).(j).span then False
+          else if j > 0
+               && t.table.(i).(j - 1).span = t.table.(i).(j).span then False
           else loop (i - 1)
       in
-      if not separated then t
+      let separated2 =
+        loop (i + 1) where rec loop i =
+          if i = Array.length t.table then True
+          else if t.table.(i).(j).span = t.table.(i).(j + 1).span then False
+          else loop (i + 1)
+      in
+      if not separated1 || not separated2 then t
       else do_fall2_right t i1 (i + 1) j
   | _ -> t ]
 ;
@@ -1080,13 +1088,20 @@ value try_fall2_left t i j =
             [ Ghost _ -> loop (i - 1)
             | _ -> i + 1 ]
       in
-      let separated =
+      let separated1 =
         loop (i1 - 1) where rec loop i =
           if i < 0 then True
-          else if t.table.(i).(j).span = t.table.(i).(j + 1).span then False
+          else if j < Array.length t.table.(i) - 1
+               && t.table.(i).(j).span = t.table.(i).(j + 1).span then False
           else loop (i - 1)
       in
-      if not separated then t
+      let separated2 =
+        loop (i + 1) where rec loop i =
+          if i = Array.length t.table then True
+          else if t.table.(i).(j - 1).span = t.table.(i).(j).span then False
+          else loop (i + 1)
+      in
+      if not separated1 || not separated2 then t
       else do_fall2_left t i1 (i + 1) j
   | _ -> t ]
 ;
