@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.24 1998-12-01 08:42:24 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.25 1998-12-02 11:29:35 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -303,7 +303,7 @@ value date_of_field pos d =
     in
     match r with
     [ Some (p, Some d, Some m, Some y) ->
-        Some {day = 0; month = 0; year = y; prec = p}
+        Some {day = d; month = m; year = y; prec = p}
     | Some (p, None, Some m, Some y) ->
         Some {day = 0; month = m; year = y; prec = p}
     | Some (p, None, None, Some y) ->
