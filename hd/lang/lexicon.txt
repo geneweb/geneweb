@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.24 2001-04-25 01:38:00 ddr Exp $
+# $Id: lexicon.txt,v 4.25 2001-04-30 08:48:17 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -37,7 +37,7 @@ en: af=Afrikaans/pt-br=Brazilian-Portuguese/zh=Chinese/cs=Czech/ca=Catalan/da=Da
 eo: en=anglo/eo=esperanto/fr=franco
 es: pt-br=Portug&eacute;s-del-Brasil/cs=Checo/zh=Chino/ca=Catalán/de=Alem&aacute;n/da=Dan&eacute;s/es=Espa&ntilde;ol/eo=Esperanto/fr=Franc&eacute;s/he=Hebreo/en=Ingl&eacute;s/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/sv=Sueco
 et: af=afrikaani/zh=hiina/cs=t¨ehhi/ca=katalaani/de=saksa/da=taani/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/pl=poola/pt=portugali/ru=vene/sv=rootsi
-fi: af=afrikaani/pt-br=Brasil-portugali/zh=kiina/cs=tsekki/de=saksa/da=tanska/en=englanti/eo=esperanto/es=espanja/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/sv=ruotsi
+fi: af=afrikaans/pt-br=Brasilian-portugali/zh=kiina/cs=tsekki/ca=katalaani/de=saksa/da=tanska/en=englanti/eo=esperanto/es=espanja/et=eesti/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/sv=ruotsi
 fr: af=afrikaans/pt-br=portugais-du-Br&eacute;sil/zh=chinois/cs=tch&egrave;que/ca=catalan/de=allemand/da=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pl=polonais/pt=portugais/ru=russe/sv=su&eacute;dois
 he: af=àôøé÷àğñ /zh=ñéğéú /cs=ö'ëéú /de=âøîğéú /da=ãğéú /en=àğâìéú /eo=àñôøğèå /es=ñôøãéú /fi=ôéğéú /fr=öøôúéú /he=òáøéú /is=àéñìğãéú /it=àéèì÷éú /lv=ìèååéú /no=ğåøáâéú /pt=ôåøèåâæéú /ru=øåñéú /sv=ùååãéú
 is: af=afrikanska/pt-br=Brasil-portúgalska/zh=kínverska/cs=tékkneska/da=danska/nl=hollenska/en=enska/eo=esperanto/fi=finnska/fr=franska/de=şıska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/no=norska/pt=portúgalska/es=spænska/ru=rússneska/sv=sænska
@@ -535,7 +535,7 @@ en: , it is
 eo: , estas
 es: , es
 et: , on
-fi: ,
+fi: , on
 fr: , c'est
 he:   , æä
 is: , er
@@ -558,7 +558,7 @@ en: , it will be
 eo: , estos
 es: , ser&aacute;
 et: , on
-fi: ,
+fi: , on
 fr: , ce sera
 he:  , éäéä
 is: , verğa
@@ -627,7 +627,7 @@ en: <em>Sosa number</em> relative to %t
 eo: <em>numero Sosa</em> relative al %t
 es: <em>n&uacute;mero Sosa</em> respecto a %t
 et: <em>Sosa number</em> %t suhtes
-fi: <em>Sosa-numero</em> henkil&ouml;n&auml %t
+fi: <em>Sosa-numero</em> %t suhteen
 fr: <em>num&eacute;ro Sosa</em> par rapport &agrave; %t
 he: <em> îñôø Sosa </em> áéçñ ì- %t
 is: <em>Sosa númer</em> tengt %t
@@ -788,7 +788,7 @@ en: a brother-in-law/a sister-in-law
 eo: bofrato/bofratino
 es: un cu&ntilde;ado/una cu&ntilde;ada
 et: küdi või nääl:g:+u või õemees:g:--he/nadu või käli või vennanaine:g:--se
-fi: lanko/k&auml;ly
+fi: lanko:g:--gon/k&auml;ly:g:+n
 fr: un beau-fr&egrave;re/une belle-soeur
 he:  âéñ/ âéñä
 is: mágur/mágkona
@@ -1064,7 +1064,7 @@ en: a son-in-law/a daughter-in-law
 eo: bofilo/bofilino
 es: un yerno/una nuera
 et: väimees:g:--he/minia
-fi: v&auml;vy/mini&auml;
+fi: v&auml;vy:g:+n/mini&auml;:g:+n
 fr: un beau-fils/une belle-fille
 he:  çúï/ ëìä
 is: tengdasonur/tengdadóttir
@@ -1087,7 +1087,7 @@ en: a son/a daughter/a child
 eo: filo/filino/ido
 es: un hijo/una hija/un(a) hijo(a)
 et: poeg:g:--ja/tütar:g:--re/laps:g:+e
-fi: poika/tyt&auml;r/lapsi
+fi: poika:g:---jan/tyt&auml;r:g:--t&auml;ren/lapsi:g:-en
 fr: un fils/une fille/un enfant
 he:   áï/ áú/ éìã
 is: sonur/dóttir/barn
@@ -1345,7 +1345,7 @@ en: alias
 eo: aliasa
 es: alias
 et: hüüdnimi
-fi: alias
+fi: kutsumanimi
 fr: alias
 he:   ùí ğåñó
 is: aukanafn
@@ -2688,6 +2688,7 @@ de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
 en: display by slices/slice width/overlap/total width
 es: editar por sector/ancho/superpuesto/ancho total
 et: kuva osadena/osa laius/ülekate/kogulaius
+fi: n&auml;yt&auml jaettuna kaistoihin/kaistan leveys/ylitys/koko leveys
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
 he:  äöâ øöåòåú  / øåçá øöåòåú  / çôéôä / ñ"ä øåçá
 it: visualizzare per segmenti/larghezza del segmento/superposizione/larghezza totale
@@ -2750,6 +2751,7 @@ de: gemeinsame Zweige nicht zusammenfassen
 en: don't group the common branches together
 es: no agrupar las ramas comunes
 et: ära grupeeri ühiseid harusid
+fi: ei yhteisten sukuhaarojen ryhmittely&auml
 fr: ne pas regrouper les branches communes
 he:  ìà ìùìá òğôé îùôçä îùåúôéí
 it: non ragruppare i rami comuni
@@ -3137,7 +3139,7 @@ en: first name alias
 eo: aliasa:a:+n propra:a:+n nomo:a:+n
 es: nombre alias
 et: muu eesnimi
-fi: etunimi alias
+fi: muu etunimi
 fr: pr&eacute;nom alias
 he:  ùí ôøèé àçø
 is: gælunafn á fornafni
@@ -3419,7 +3421,7 @@ en: Gregorian/Julian/French/Hebrew
 eo: gregoriana/juliana/franca/hebra
 es: gregoriano/juliano/franc&eacute;s/hebreo
 et: gregooriuse/juuliuse/prantsuse revolutsiooni/juudi
-fi: gregoriaaninen/juliaaninen/ranskalainen/heprealainen
+fi: gregoriaaninen/juliaaninen/Ranskan vallankumouksen/heprealainen
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
 he:  âøâåøé/ éåìéàğé/ öøôúé/ òáøé
 is: gregorísk/julian/franskt/hebreskt
@@ -4865,6 +4867,7 @@ de: keine Kontrolle des Geschlechts
 en: no sexes check
 es: sin comprobacion de sexo
 et: ära kontrolli sugude sobivust
+fi: ei sukupuolitarkistusta
 fr: pas de v&eacute;rification des sexes
 he:  áìé ìååãà îéï
 it: senza verifica del sesso
