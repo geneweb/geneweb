@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.14 2000-11-03 16:53:36 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.15 2000-11-03 19:22:21 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -269,7 +269,7 @@ value string_of_sockaddr =
 value sockaddr_of_string s = Unix.ADDR_UNIX s;
 
 value treat_connection tmout callback addr ic =
-  do ifdef MAC then ()
+  do ifdef NOFORK then ()
      else ifdef UNIX then
        if tmout > 0 then
          let spid = Unix.fork () in
@@ -354,11 +354,11 @@ value rec list_remove x =
   | [y :: l] -> if x = y then l else [y :: list_remove x l] ]
 ;
 
-ifdef MAC then declare end else
+ifdef NOFORK then declare end else
 value pids = ref [];
-ifdef MAC then declare end else
+ifdef NOFORK then declare end else
 value cleanup_verbose = ref True;
-ifdef MAC then declare end else
+ifdef NOFORK then declare end else
 value cleanup_sons () =
   List.iter
     (fun p ->
@@ -383,7 +383,7 @@ value cleanup_sons () =
      pids.val
 ;
 
-ifdef MAC then declare end else
+ifdef NOFORK then declare end else
 value wait_available max_clients s =
   match max_clients with
   [ Some m ->
@@ -413,7 +413,7 @@ do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining aft
   | None -> () ]
 ;
 
-ifdef MAC then
+ifdef NOFORK then
 value wait_and_compact s =
   if Unix.select [s] [] [] 15.0 = ([], [], []) then
     do Printf.eprintf "Compacting... "; flush stderr;
@@ -424,12 +424,12 @@ value wait_and_compact s =
 ;
 
 value accept_connection tmout max_clients callback s =
-  do ifdef MAC then wait_and_compact s
+  do ifdef NOFORK then wait_and_compact s
      else wait_available max_clients s;
   return
   let (t, addr) = Unix.accept s in
   do Unix.setsockopt t Unix.SO_KEEPALIVE True; return
-  ifdef MAC then
+  ifdef NOFORK then
     let cleanup () =
       do try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
          try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
@@ -518,7 +518,7 @@ value accept_connection tmout max_clients callback s =
 
 value f addr_opt port tmout max_clients g =
   match
-    ifdef MAC then None
+    ifdef NOFORK then None
     else ifdef WIN95 then
       let len = Array.length Sys.argv in
       if len > 2 && Sys.argv.(len - 2) = "-wserver" then
@@ -527,7 +527,7 @@ value f addr_opt port tmout max_clients g =
     else None
   with
   [ Some s ->
-      ifdef MAC then ()
+      ifdef NOFORK then ()
       else ifdef WIN95 then
         let addr = sockaddr_of_string s in
         let ic = open_in_bin sock_in.val in
@@ -548,8 +548,8 @@ value f addr_opt port tmout max_clients g =
       do Unix.setsockopt s Unix.SO_REUSEADDR True;
          Unix.bind s (Unix.ADDR_INET addr port);
          Unix.listen s 4;
-         ifdef UNIX then let _ = Unix.nice 1 in () else ();
-         ifdef MAC then Sys.set_signal Sys.sigpipe Sys.Signal_ignore
+         ifdef NOFORK then Sys.set_signal Sys.sigpipe Sys.Signal_ignore
+         else ifdef UNIX then let _ = Unix.nice 1 in ()
          else ();
       return
       let tm = Unix.localtime (Unix.time ()) in

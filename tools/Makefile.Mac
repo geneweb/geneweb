@@ -1,7 +1,7 @@
-# $Id: Makefile.Mac,v 3.1 2000-05-03 12:33:25 ddr Exp $
+# $Id: Makefile.Mac,v 3.2 2000-11-03 19:22:21 ddr Exp $
 
 CAMLP4_COMM = ::tools:camlp4_comm.mpw pa_ifdef.cmo pa_ru.cmo
-CAMLP4F = -DMAC
+CAMLP4F = -DMAC -DNOFORK
 CAMLP4D = "``camlp4 -where``"
 OCAMLC = ocamlc
 OCAMLD =
