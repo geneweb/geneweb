@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 3.1 2000-01-10 02:14:40 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 3.2 2000-01-28 14:11:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 value fname = ref "";
@@ -13,6 +13,17 @@ value speclist =
    ("-mem", Arg.Set Iobase.save_mem,
     ": Save memory, but slower when rewritting data base");
    ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
+;
+
+value simple_output bname base =
+  let no_patches =
+    let bname =
+      if Filename.check_suffix bname ".gwb" then bname
+      else bname ^ ".gwb"
+    in
+    not (Sys.file_exists (Filename.concat bname "patches"))
+  in
+  Iobase.gen_output (no_patches && not scratch.val) bname base
 ;
 
 value main () =
@@ -30,7 +41,7 @@ value main () =
       do Sys.catch_break True;
          try ConsangAll.compute base scratch.val quiet.val with
          [ Sys.Break -> do Printf.eprintf "\n"; flush stderr; return () ];
-         Iobase.simple_output fname.val base;
+         simple_output fname.val base;
       return ()
     with
     [ Consang.TopologicalSortError ->
