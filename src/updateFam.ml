@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.33 2002-10-23 02:39:23 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.34 2002-10-23 15:20:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -229,7 +229,7 @@ value eval_create_variable c =
       | Update.Create _ (Some (_, _, death, None, _)) ->
           match death with
           [ DeadDontKnowWhen -> "+"
-          | NotDead -> "="
+          | NotDead -> "-"
           | _ -> "" ]
       | _ -> "" ]
   | "death_month" ->
