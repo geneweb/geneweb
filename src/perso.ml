@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.36 2000-07-26 13:32:32 ddr Exp $ *)
+(* $Id: perso.ml,v 3.37 2000-07-28 08:53:41 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -940,7 +940,7 @@ value print_photo_occupation_dates conf base p =
   match
     image_and_size conf base p (limited_image_size max_im_wid max_im_wid)
   with
-  [ Some (fname, Some (width, height)) ->
+  [ Some (fname, Some (Some (width, height))) ->
       tag "table" "border=%d width=\"90%%\"" conf.border begin
         tag "tr" begin
           let s = Unix.stat fname in
@@ -970,7 +970,7 @@ value print_photo_occupation_dates conf base p =
           print_occupation_dates conf base True p;
         end;
       end
-  | None ->
+  | None | Some (_, Some None) ->
       print_occupation_dates conf base False p ]
 ;
 
