@@ -172,8 +172,8 @@ relationLink.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
     pqueue.cmx util.cmx ../wserver/wserver.cmx 
 robot.cmo: srcfile.cmi util.cmi ../wserver/wserver.cmi 
 robot.cmx: srcfile.cmx util.cmx ../wserver/wserver.cmx 
-select.cmo: adef.cmi def.cmi gutil.cmi 
-select.cmx: adef.cmx def.cmi gutil.cmx 
+select.cmo: adef.cmi def.cmi gutil.cmi name.cmi 
+select.cmx: adef.cmx def.cmi gutil.cmx name.cmx 
 sendImage.cmo: adef.cmi buff.cmo config.cmi def.cmi gutil.cmi history.cmi \
     iobase.cmi lock.cmo srcfile.cmi update.cmi util.cmi \
     ../wserver/wserver.cmi 
@@ -248,7 +248,7 @@ perso.cmo perso.cmx: pa_html.cmo
 relation.cmo relation.cmx: pa_lock.cmo pa_html.cmo
 relationLink.cmo relationLink.cmx: pa_html.cmo
 sendImage.cmo sendImage.cmx: pa_lock.cmo pa_html.cmo
-some.cmo some.cmx: def.syn.cmo
+some.cmo some.cmx: def.syn.cmo pa_html.cmo
 srcfile.cmo srcfile.cmx: pa_lock.cmo pa_html.cmo
 title.cmo title.cmx: def.syn.cmo pa_html.cmo
 tree.cmo tree.cmx: pa_html.cmo
