@@ -48,6 +48,15 @@ GeneWeb version 3.04
     instead of "New York, USA"). Important to specify correcty this variable
     for the new displaying by places/surnames.
 
+* Documentation
+  - [20 Apr 00] Changed the title of the chapter "How to install GeneWeb as a
+    server" into "How to install GeneWeb as a server or CGI" (English and
+    French versions).
+  - [20 Apr 00] Changed the chapter "How to customize the welcome page".
+    The title becomes "How to customize the welcome page and the other pages"
+    A section "Customization of all the pages" has been inserted at end
+    (English and French versions).
+
 GeneWeb version 3.03
 --------------------
 

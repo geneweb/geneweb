@@ -17,10 +17,11 @@ height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <br><br>
 
 
-Cette partie indique comment personnaliser les pages d'accueil et
-mettre des pages associ&eacute;es. Elle s'adresse aux personnes ayant
-d&eacute;j&agrave; un peu manipul&eacute; <font color=#2f6400><b>GeneWeb</b></font> et qui
-veulent entrer dans les d&eacute;tails.
+Cette partie indique comment personnaliser les pages d'accueil et les
+autres pages et mettre des pages associ&eacute;es. Elle s'adresse aux
+personnes ayant d&eacute;j&agrave; un peu manipul&eacute; <font
+color=#2f6400><b>GeneWeb</b></font> et qui veulent entrer dans les
+d&eacute;tails.
 
 <ul>
 
@@ -29,6 +30,8 @@ veulent entrer dans les d&eacute;tails.
 <li> <a href="#Mac">Macros</a>
 
 <li> <a href="#Ass">Pages associ&eacute;es</a>
+
+<li> Personnalisation de <a href="#All">toutes les pages</a>
 
 </ul>
 
@@ -362,6 +365,39 @@ href="links.htm">liens</a> vers des pages de <font color=#2f6400><b>GeneWeb</b><
 
 Remarquez que la "requ&ecirc;te &eacute;volu&eacute;e" fonctionne comme
 un fichier associ&eacute;, de nom "advanced.txt".
+
+<p>
+
+<hr>
+<h3><a name="All">
+</a> <font color=#2f6400>Toutes les pages</font></a></h3>
+
+Les pages, y compris la page d'accueil, peuvent &ecirc;tre
+personnalis&eacute;es &agrave; trois endroits:
+
+<ul>
+
+<li>Vous pouvez ajouter un fichier de nom <b>base.hed</b> (si "base"
+est le nom de votre base de donn&eacute;es) qui sera
+ins&eacute;r&eacute; dans tous les en-t&ecirc;tes des pages (entre
+&lt;head&gt; et &lt;/head&gt;). Permet d'y ins&eacute;rer des feuilles
+de style, par exemple. &Agrave; mettre dans le r&eacute;pertoire
+"lang" et/ou, si vous voulez qu'il soit diff&eacute;rent pour la
+langue "xy" dans le r&eacute;pertoire "lang/xy".
+
+<li>De m&ecirc;me, vous pouvez ajouter un fichier de nom
+<b>base.trl</b> qui sera ins&eacute;r&eacute; derri&egrave;re le
+copyright de GeneWeb &agrave; chaque page.
+
+<li>Enfin, vous avez la possibilit&eacute; de positionner la variable
+<tt>body_prop</tt> de votre fichier <b>base.gwf</b> qui sera
+ins&eacute;r&eacute; dans la balise "&lt;body&gt;" de toutes les
+pages. Utile pour mettre une couleur ou un motif de fond, ou pour
+changer les couleurs des textes affich&eacute;s. Voir cette <a
+href="start.htm#Cnf">section</a> du chapitre "comment d&eacute;marrer
+avec GeneWeb".
+
+</ul>
 
 <p>
 <hr>
