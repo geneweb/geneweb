@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 2.2 1999-03-15 00:02:06 ddr Exp $ *)
+(* $Id: birthday.ml,v 2.3 1999-04-20 09:32:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -186,7 +186,7 @@ value afficher_liste_anniversaires conf base dead_people dt liste =
                   Wserver.wprint " (";
                   Wserver.wprint (ftransl conf "%d years ago")
                     (conf.today.year - a);
-                  Wserver.wprint ")\n</em>";
+                  Wserver.wprint ")</em>";
                return ()
              else
                do afficher_personne_titre_referencee conf base p;
