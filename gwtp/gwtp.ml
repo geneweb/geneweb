@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.2 2000-07-25 13:23:03 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.3 2000-07-25 16:35:42 ddr Exp $ *)
 
 open Printf;
 
@@ -85,16 +85,14 @@ value gwtp_send (str, env) =
   return
   try
     let oc = open_out (Filename.concat "tmp" (List.assoc "file_name" env)) in
-    let (ctype, contents) =
-      let s = List.assoc "file" env in
-      let i =
-        if lowercase_start_with s "content-type: " then String.index s '\n'
-        else 0
-      in
-      let j = String.index_from s (i + 1) '\n' in
-      (String.sub s 0 i, String.sub s (j + 1) (String.length s - j - 3))
+    let contents = List.assoc "file" env in
+    let i =
+      if lowercase_start_with contents "content-type: " then
+        String.index contents '\n'
+      else 0
     in
-    do output oc contents 0 (String.length contents);
+    let j = String.index_from contents (i + 1) '\n' in
+    do output oc contents (j + 1) (String.length contents - j - 3);
        close_out oc;
     return ()
   with
