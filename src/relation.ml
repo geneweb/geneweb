@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.56 2000-10-31 17:43:43 ddr Exp $ *)
+(* $Id: relation.ml,v 3.57 2000-11-01 04:11:16 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -309,7 +309,7 @@ value dag_of_ind_dag_list indl =
     indl
 ;
 
-value print_relation_path_dag conf base path =
+value print_relation_path_dag conf base print_elem path =
   let indl = dag_ind_list_of_path path in
   let indl = add_missing_parents_of_siblings base indl in
   let faml = dag_fam_list_of_ind_list indl in
@@ -356,14 +356,19 @@ value print_relation_path_dag conf base path =
     [ Some "on" -> True
     | _ -> False ]
   in
-  Dag.print_only_dag conf base spouse_on invert set [] d
+  Dag.print_only_dag conf base print_elem spouse_on invert set [] d
 ;
 
 value print_relation_path conf base ip1 ip2 path excl_faml =
   if path == [] then ()
   else
+    let print_elem conf base p =
+      do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
+         Wserver.wprint "%s" (Date.short_dates_text conf base p);
+      return ()
+    in
     do Wserver.wprint "<p>\n";
-       print_relation_path_dag conf base path;
+       print_relation_path_dag conf base print_elem path;
        Wserver.wprint "<p>\n";
        Wserver.wprint "<a href=\"%s" (commd conf);
        Wserver.wprint "em=R;ei=%d;i=%d%s;et=S" (Adef.int_of_iper ip1)
@@ -1346,9 +1351,21 @@ value print_main_relationship conf base long p1 p2 rel =
   return ()
 ;
 
-value print_multi_relation conf base pl =
+value print_multi_relation conf base pl lim assoc_txt =
+  let (pl1, pl2) =
+    if lim <= 0 then (pl, [])
+    else
+      loop lim [] pl where rec loop n rev_pl1 pl2 =
+        match (n, pl2) with
+        [ (_, []) | (_, [_]) -> (pl, [])
+        | (0, _) ->
+            match rev_pl1 with
+            [ [p :: _] -> (List.rev rev_pl1, [p :: pl2])
+            | _ -> (pl, []) ]
+        | (n, [p :: pl]) -> loop (n - 1) [p :: rev_pl1] pl ]
+  in
   let path =
-    loop [] (List.rev pl) where rec loop path =
+    loop [] pl1 where rec loop path =
       fun
       [ [p1 :: ([p2 :: _] as pl)] ->
           let ip1 = p1.cle_index in
@@ -1368,8 +1385,35 @@ value print_multi_relation conf base pl =
       | [_] | [] -> path ]
   in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
+  let print_elem conf base p =
+    do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
+       Wserver.wprint "%s" (Date.short_dates_text conf base p);
+       try
+         let t = Hashtbl.find assoc_txt p.cle_index in
+         Wserver.wprint " <b>(%s)</b>" t
+       with
+       [ Not_found -> () ];
+    return ()
+  in
   do header_no_page_title conf title;
-     print_relation_path_dag conf base path;
+     print_relation_path_dag conf base print_elem path;
+     match pl2 with
+     [ [] -> ()
+     | _ ->
+         do Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
+            let _ = List.fold_left
+              (fun n p ->
+                 do Wserver.wprint ";i%d=%d" n (Adef.int_of_iper p.cle_index);
+                    try
+                      let t = Hashtbl.find assoc_txt p.cle_index in
+                      Wserver.wprint ";t%d=%s" n t
+                    with
+                    [ Not_found -> () ];
+                 return n + 1)
+              1 pl2
+            in ();
+            Wserver.wprint ";lim=%d\">&gt;&gt;</a>\n" lim;
+         return () ];
      trailer conf;
   return ()
 ;
@@ -1404,11 +1448,22 @@ value print conf base p =
 ;
 
 value print_multi conf base =
+  let assoc_txt = Hashtbl.create 53 in
   let pl =
     loop [] 1 where rec loop pl i =
-      match find_person_in_env conf base (string_of_int i) with
-      [ Some p -> loop [p :: pl] (i + 1)
-      | None -> pl ]
+      let k = string_of_int i in
+      match find_person_in_env conf base k with
+      [ Some p ->
+          do match p_getenv conf.env ("t" ^ k) with
+             [ Some x -> Hashtbl.add assoc_txt p.cle_index x
+             | None -> () ];
+          return loop [p :: pl] (i + 1)
+      | None -> List.rev pl ]
   in
-  print_multi_relation conf base pl
+  let lim =
+    match p_getint conf.env "lim" with
+    [ Some x -> x
+    | None -> 0 ]
+  in
+  print_multi_relation conf base pl lim assoc_txt
 ;
