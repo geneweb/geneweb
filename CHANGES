@@ -43,7 +43,7 @@ GeneWeb Intermediate version 2.02-1
 
 * GeneWeb to Gedcom (gwb2ged)
   - [May 19, 99] Fold notes lines at 255 characters (required by GEDCOM
-    standard).
+    standard) adding CONC.
 
 * Documentation
   - [May 13, 99] Updated Swedish documentation (Lars Gustavsson).
