@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updfam.txt,v 4.13 2001-09-19 11:19:09 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.14 2001-09-19 13:26:55 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -73,11 +73,11 @@
   </table>
 %end;
 
-%define;source(xx)
+%define;source(xvar,xx)
   <table border=1>
     <tr>
       <td>[*source/sources]0</td>
-      <td><input name=xx_src size=40 maxlength=200 value="%xx_src;"></td>
+      <td><input name=xvar_src size=40 maxlength=200 value="%xx_src;"></td>
     </tr>
   </table>
 %end;
@@ -196,13 +196,13 @@
   <tr>
     <td>[*place]</td>
     <td>
-      <input name=marriage_place size=40 maxlength=200 value="%marriage_place;">
+      <input name=marr_place size=40 maxlength=200 value="%marriage_place;">
     </td>
   </tr>
 </table>
 
-%apply;date([*date]0, "marriage", "marriage")
-%apply;source("marriage")
+%apply;date([*date]0, "marr", "marriage")
+%apply;source("marr", "marriage")
 
 <h4>[*witness/witnesses]1</h4>
 
@@ -252,13 +252,13 @@
 
 <h4>[*divorce]</h4>
 
-<input type=radio name=divorce value=not_divorced%nn;
+<input type=radio name=div value=not_divorced%nn;
  %if;(divorce = "not_divorced") checked%end;>[*not divorced]
-<input type=radio name=divorce value=divorced%nn;
+<input type=radio name=div value=divorced%nn;
  %if;(divorce = "divorced") checked%end;>[*divorced]
-<input type=radio name=divorce value=separated%nn;
+<input type=radio name=div value=separated%nn;
  %if;(divorce = "separated") checked%end;>[*separated]
-%apply;date([*date]0, "divorce", "divorce")
+%apply;date([*date]0, "div", "divorce")
 
 <h4>[*comment]</h4>
 
