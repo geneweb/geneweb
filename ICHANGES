@@ -5,6 +5,9 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [17 Jul 03] Added URL variable "alwsurn": if "yes" the surnames
+    are always displayed in display by surname and in descendants
+    (same behaviour than the configuration variable "always_surname").
   - [15 Jul 03] Changed the personal image URL: now displays an HTML
     page with the image inside without width and height bounds (before,
     the image URL displayed the image itself, but it does not work with

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.21 2002-12-09 12:16:19 ddr Exp $ *)
+(* $Id: some.ml,v 4.22 2003-07-17 08:38:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -325,8 +325,11 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
     let psn =
       match homonymes with
       [ [_] ->
-          try List.assoc "always_surname" conf.base_env = "yes" with
-          [ Not_found -> False ]
+          match p_getenv conf.env "alwsurn" with
+          [ Some x -> x = "yes"
+          | None ->
+              try List.assoc "always_surname" conf.base_env = "yes" with
+              [ Not_found -> False ] ]
       | _ -> True ]
     in
     let title h =
