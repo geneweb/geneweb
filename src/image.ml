@@ -1,17 +1,19 @@
 (* camlp4r *)
-(* $Id: image.ml,v 3.4 2000-05-03 17:54:34 ddr Exp $ *)
+(* $Id: image.ml,v 3.5 2000-08-22 15:14:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
 open Config;
 
-value content cgi t len =
+value content cgi t len fname =
   do if not cgi then
        do Wserver.wprint "HTTP/1.0 200 OK"; Util.nl (); return ()
      else ();
      Wserver.wprint "Content-type: image/%s" t; Util.nl ();
      Wserver.wprint "Content-length: %d" len; Util.nl ();
-     Util.nl ();
+     Wserver.wprint "Content-disposition: attachement; filename=%s"
+       (Filename.basename fname);
+     Util.nl (); Util.nl ();
      Wserver.wflush ();
   return ()
 ;
@@ -21,7 +23,7 @@ value print_image_type cgi fname itype =
   [ Some ic ->
       let buf = String.create 1024 in
       let len = in_channel_length ic in
-      do content cgi itype len;
+      do content cgi itype len fname;
          loop len where rec loop len =
            if len == 0 then ()
            else
