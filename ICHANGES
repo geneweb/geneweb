@@ -5,8 +5,11 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [23 Dec 03] Optimization: suppressed no-loop-check for added or
+    modified marriages when it is not necessary (for big databases,
+    this check can take much time and memory).
   - [23 Dec 03] Added "no mention" in marriage kinds (display only
-    "with ..." (instead of "married with", "relationship with"...)
+    "with ...", instead of "married with", "relationship with"...)
   - [15 Dec 03] Added ability to add parameter ";title=..." in URL
     to display a title for pages which have no titles.
   - [07 Dec 03] French revolution year is now displayed in French as "an"
