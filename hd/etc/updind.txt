@@ -1,8 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.14 2004-11-08 10:29:55 ddr Exp $ -->
-  <!-- copyright (c) INRIA -->
+  <!-- $Id: updind.txt,v 4.15 2004-12-14 10:04:38 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
     %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
