@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.18 1999-09-16 15:01:13 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.19 1999-09-17 18:14:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -352,10 +352,26 @@ value empty_family base m =
   array_forall (bogus_person base) m.m_chil
 ;
 
-value print_family oc base ml (per_sel, fam_sel) fam_done m =
+value print_witness oc base mark p =
+  let a = aoi base p.cle_index in
+  do Printf.fprintf oc "%s %s%s"
+       (correct_string base p.surname)
+       (correct_string base p.first_name)
+       (if p.occ = 0 then "" else "." ^ string_of_int p.occ);
+     if Array.length p.family = 0 && a.parents = None
+     && not mark.(Adef.int_of_iper p.cle_index) then
+       do mark.(Adef.int_of_iper p.cle_index) := True;
+          if has_infos base p then print_infos oc base False True p
+          else Printf.fprintf oc " 0";
+       return ()
+     else ();
+  return ()
+;
+
+value print_family oc base mark (per_sel, fam_sel) fam_done m =
   let fam = m.m_fam in
   do Printf.fprintf oc "fam ";
-     print_parent oc base ml fam_sel fam m.m_fath;
+     print_parent oc base mark fam_sel fam m.m_fath;
      Printf.fprintf oc " +";
      print_date_option oc (Adef.od_of_codate fam.marriage);
      if fam.not_married then Printf.fprintf oc " #nm" else ();
@@ -367,8 +383,21 @@ value print_family oc base ml (per_sel, fam_sel) fam_done m =
          let d = Adef.od_of_codate d in
          do Printf.fprintf oc " -"; print_date_option oc d; return () ];
      Printf.fprintf oc " ";
-     print_parent oc base ml fam_sel fam m.m_moth;
+     print_parent oc base mark fam_sel fam m.m_moth;
      Printf.fprintf oc "\n";
+     Array.iter
+       (fun ip ->
+          let p = poi base ip in
+          do Printf.fprintf oc "witn";
+             match p.sex with
+             [ Male -> Printf.fprintf oc " m"
+             | Female -> Printf.fprintf oc " f"
+             | _ -> () ];
+             Printf.fprintf oc ": ";
+             print_witness oc base mark p;
+             Printf.fprintf oc "\n";
+          return ())
+       fam.witnesses;
      match sou base fam.fsources with
      [ "" -> ()
      | s -> Printf.fprintf oc "src %s\n" (correct_string base fam.fsources) ];
@@ -469,6 +498,15 @@ value get_persons_with_relations base m list =
     match (moth.rparents, (aoi base moth.cle_index).parents) with
     [ ([], _) | (_, Some _) -> list
     | _ -> [moth :: list] ]
+  in
+  let list =
+    List.fold_right
+      (fun ip list ->
+         let p = poi base ip in
+         match (p.rparents, (aoi base p.cle_index).parents) with
+         [ ([], _) | (_, Some _) -> list
+         | _ -> [p :: list] ])
+      (Array.to_list m.m_fam.witnesses) list
   in
   List.fold_right
     (fun p list ->
