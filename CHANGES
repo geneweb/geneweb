@@ -83,6 +83,10 @@ GeneWeb version 2.05
   - [Jul 8, 99] Updated Swedish phrases (Stig Petersson)
   - [Jul 3, 99] Updated Danish phrases (Hans Albeck)
 
+* Documentation
+  - [Jul 23, 99] Added documentation about the languages with declinations:
+    "How to make modifications in the database", section 8.
+
 GeneWeb version 2.04
 --------------------
 
