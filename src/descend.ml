@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.32 2005-02-05 15:27:55 ddr Exp $ *)
+(* $Id: descend.ml,v 4.33 2005-02-08 18:05:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -193,7 +193,7 @@ type=\"radio\" name=\"color\" value=\"\" checked=\"checked\"";
             xtag "input" "type=\"radio\" name=\"t\" value=\"C\"";
             Wserver.wprint "- %s"
               (capitale
-	        (transl conf "index of the spouses (non descendants)"));
+                 (transl conf "index of the spouses (non descendants)"));
           end;
           xtag "br";
           tag "label" begin
