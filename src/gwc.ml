@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.4 2000-03-24 13:54:52 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.5 2000-05-02 17:15:45 doligez Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -531,7 +531,7 @@ value insert_comp_families gen (x, shift) =
 
 value just_comp = ref False;
 value do_check = ref True;
-value out_file = ref "a";
+value out_file = ref (Filename.concat Filename.current_dir_name "a");
 value force = ref False;
 value do_consang = ref False;
 value pr_stats = ref False;
@@ -666,6 +666,7 @@ value output_command_line bname =
     if Filename.check_suffix bname ".gwb" then bname
     else bname ^ ".gwb"
   in
+  let bdir = Filename.concat Filename.current_dir_name bdir in
   let oc = open_out (Filename.concat bdir "command.txt") in
   do Printf.fprintf oc "%s" Sys.argv.(0);
      for i = 1 to Array.length Sys.argv - 1 do

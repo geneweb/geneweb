@@ -1,15 +1,12 @@
-# $Id: Makefile.Mac,v 1.3 2000-04-16 15:43:50 ddr Exp $
+# $Id: Makefile.Mac,v 1.4 2000-05-02 17:15:45 doligez Exp $
 
 CAMLP4_COMM = ::tools:camlp4_comm.mpw pa_ifdef.cmo pa_ru.cmo
 CAMLP4F = -DMAC
-CAMLP4D = `camlp4 -where`
-LIBUNIX = -cclib -lunix
+CAMLP4D = "``camlp4 -where``"
+LIBUNIX = 
 OCAMLC = ocamlc
-OCAMLI =
 OCAMLD =
 RM = delete -y
-
-all ÄÄ
 
 clean ÄÄ
     {RM} Å.out Å.opt Å.cm[oixa] Å.cmxa Å.pp[oi] Å.o Å.a Å.obj Å.lib Å.lck Å.bak Å~ .#Å
@@ -37,33 +34,33 @@ FPLA_OBJS = argl.cmo adef.cmo name.cmo gutil.cmo btree.cmo buff.cmo iovalue.cmo 
 
 all Ä out
 
-out ÄÄ def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out phonygwd.out i18n_check.out mostdesc.out
-   delete -y gwc consang gwd gwu
+out ÄÄ def.syn.cmo ansel.cmo gwc.out consang.out gwd.out gwu.out i18n_check.out mostdesc.out
+   delete -i gwc consang gwd gwu
    duplicate -y gwc.out gwc
    duplicate -y consang.out consang
    duplicate -y gwd.out gwd
    duplicate -y gwu.out gwu
 
 clean ÄÄ
-   delete -y gwc consang gwd gwu
+   delete -i gwc consang gwd gwu
 
 gwc.out Ä {GWC_OBJS}
-   {OCAMLC} -custom unix.cma {GWC_OBJS} {LIBUNIX} -o gwc.out
+   ocamlmkappli unix.cma {GWC_OBJS} -name gwc.out
 
 consang.out Ä {CONSANG_OBJS}
-   {OCAMLC} -custom unix.cma {LIBUNIX} {CONSANG_OBJS} -o consang.out
+   ocamlmkappli unix.cma {CONSANG_OBJS} -name consang.out
 
 gwd.out Ä {GWD_OBJS}
-    {OCAMLC} -custom {OCAMLD} unix.cma {CAMLP4D}:gramlib.cma {GWD_OBJS} {LIBUNIX} -o gwd.out
+    ocamlmkappli {OCAMLD} unix.cma {CAMLP4D}gramlib.cma {GWD_OBJS} -name gwd.out
 
 gwu.out Ä {GWU_OBJS}
-    {OCAMLC} -custom unix.cma {LIBUNIX} {GWU_OBJS} -o gwu.out
+    ocamlmkappli unix.cma {GWU_OBJS} -name gwu.out
 
 mostdesc.out Ä {MOSTDESC_OBJS}
-    {OCAMLC} -custom unix.cma {LIBUNIX} {MOSTDESC_OBJS} -o mostdesc.out
+    ocamlmkappli unix.cma {MOSTDESC_OBJS} -name mostdesc.out
 
 fpla.out Ä {FPLA_OBJS}
-    {OCAMLC} -custom unix.cma {LIBUNIX} {FPLA_OBJS} -o fpla.out
+    ocamlmkappli unix.cma {FPLA_OBJS} -name fpla.out
 
 i18n_check.out Ä i18n_check.cmo
     {OCAMLC} i18n_check.cmo -o i18n_check.out

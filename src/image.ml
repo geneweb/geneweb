@@ -1,11 +1,11 @@
 (* camlp4r *)
-(* $Id: image.ml,v 3.1 2000-03-05 17:15:07 ddr Exp $ *)
+(* $Id: image.ml,v 3.2 2000-05-02 17:15:45 doligez Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
 open Config;
 
-value nl () = Wserver.wprint "\r\n";
+value nl () = Wserver.wprint "\013\010";
 
 value content cgi t len =
   do if not cgi then

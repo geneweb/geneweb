@@ -1,13 +1,13 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.40 2000-04-12 15:22:09 ddr Exp $ *)
+(* $Id: util.ml,v 3.41 2000-05-02 17:15:45 doligez Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
 open Config;
 open Gutil;
 
-value lang_dir = ref ".";
-value base_dir = ref ".";
+value lang_dir = ref Filename.current_dir_name;
+value base_dir = ref Filename.current_dir_name;
 value doc_dir = ref "";
 value cnt_dir = ref "";
 
@@ -51,7 +51,7 @@ value html_li conf =
   return ()
 ;
 
-value nl () = Wserver.wprint "\r\n";
+value nl () = Wserver.wprint "\013\010";
 
 value html conf =
   let charset = if conf.charset = "" then "iso-8859-1" else conf.charset in
