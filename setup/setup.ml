@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.14 1999-05-05 15:08:09 ddr Exp $ *)
+(* $Id: setup.ml,v 1.15 1999-05-06 06:20:30 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -202,7 +202,8 @@ value parameters =
 type config =
   { lang : string;
     comm : string;
-    env : list (string * string) }
+    env : list (string * string);
+    request : list string }
 ;
 
 value rec list_replace k v =
@@ -214,6 +215,11 @@ value rec list_replace k v =
 
 value conf_with_env conf k v =
   {(conf) with env = list_replace k v conf.env}
+;
+
+value browser_with_type_file conf =
+  let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
+  String.lowercase user_agent <> "lynx"
 ;
 
 value all_db dir =
@@ -285,6 +291,7 @@ value rec copy_from_stream conf print strm =
           | 'i' -> print (strip_spaces (s_getenv conf.env "i"))
           | 'k' -> for_all conf print (fst (List.split conf.env)) strm
           | 'l' -> print conf.lang
+          | 'n' -> print_if conf print (browser_with_type_file conf) strm
           | 'o' -> print (strip_spaces (s_getenv conf.env "o"))
           | 'p' -> print (parameters conf.env)
           | 'q' -> print Version.txt
@@ -292,7 +299,7 @@ value rec copy_from_stream conf print strm =
           | 'u' -> print (Filename.dirname (Sys.getcwd ()))
           | 'v' ->
               let out = strip_spaces (s_getenv conf.env "o") in
-              print_if_exists conf print (out ^ ".gwb") strm
+              print_if conf print (Sys.file_exists (out ^ ".gwb")) strm
           | 'w' -> print (Sys.getcwd ())
           | 'y' -> for_all conf print (all_db (s_getenv conf.env "anon")) strm
           | 'z' -> print (string_of_int port)
@@ -331,11 +338,11 @@ and print_specific_file conf print fname strm =
         return ()
       else copy_from_stream conf print (Stream.of_string s)
   | _ -> () ]
-and print_if_exists conf print fname strm =
+and print_if conf print cond strm =
   match Stream.next strm with
   [ '{' ->
       let s = parse_upto '}' strm in
-      if Sys.file_exists fname then
+      if cond then
         copy_from_stream conf print (Stream.of_string s)
       else ()
   | _ -> () ]
@@ -435,7 +442,8 @@ value simple conf =
   let conf =
     {comm = if ged = "" then "gwc" else "ged2gwb";
      env = list_replace "o" out_file conf.env;
-     lang = conf.lang}
+     lang = conf.lang;
+     request = conf.request}
   in
   if ged <> "" && not (Sys.file_exists ged) then
     print_file conf "err_unknown.html"
@@ -864,7 +872,7 @@ value read_gwd_arg () =
               [ [y :: l] when y.[0] <> '-' -> loop [(x, y) :: env] l
               | _ -> loop [(x, "") :: env] l ]
             else loop env l
-        | [] -> env ]
+        | [] -> List.rev env ]
   | None -> [] ]
 ;
 
@@ -1092,7 +1100,7 @@ value setup (addr, req) str =
   let env = create_env env_str in
   if env = [] && (comm = "" || String.length comm = 2) then
     let lang = if comm = "" then default_lang else String.uncapitalize comm in
-    let conf = {lang = lang; comm = ""; env = env} in
+    let conf = {lang = lang; comm = ""; env = env; request = req} in
     print_file conf "welcome.html"
   else
     let (lang, env) =
@@ -1100,7 +1108,7 @@ value setup (addr, req) str =
       [ Some x -> (x, list_remove_assoc "lang" env)
       | _ -> (default_lang, env) ]
     in
-    let conf = {lang = lang; comm = comm; env = env} in
+    let conf = {lang = lang; comm = comm; env = env; request = req} in
     setup_comm conf comm
 ;
 
@@ -1114,7 +1122,7 @@ value copy_text lang fname =
   let fname = Filename.concat dir fname in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      let conf = {lang = lang; comm = ""; env = []} in
+      let conf = {lang = lang; comm = ""; env = []; request = []} in
       do copy_from_stream conf print_string (Stream.of_channel ic);
          flush stdout;
          close_in ic;
@@ -1128,7 +1136,7 @@ value copy_text lang fname =
       return () ]
 ;
 
-value set_gwd_default_language lang =
+value set_gwd_default_language_if_absent lang =
   let env = read_gwd_arg () in
   match try Some (open_out "gwd.arg") with [ Sys_error _ -> None ] with
   [ Some oc ->
@@ -1136,11 +1144,8 @@ value set_gwd_default_language lang =
       do List.iter
            (fun (k, v) ->
               do Printf.fprintf oc "-%s\n" k;
-                 if k = "lang" then
-                   do lang_found.val := True;
-                      Printf.fprintf oc "%s\n" lang;
-                   return ()
-                 else Printf.fprintf oc "%s\n" v;
+                 if k = "lang" then lang_found.val := True else ();
+                 Printf.fprintf oc "%s\n" v;
               return ())
            env;
          if not lang_found.val then Printf.fprintf oc "-lang\n%s\n" lang
@@ -1157,7 +1162,7 @@ value intro () =
        let x = input_line stdin in
        if x = "" then default_lang else x
      in
-     do set_gwd_default_language lang;
+     do set_gwd_default_language_if_absent lang;
         copy_text lang (Filename.concat lang "intro.txt");
      return ();
      Printf.printf "\n";

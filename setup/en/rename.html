@@ -1,24 +1,24 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <!-- (c) Copyright INRIA 1999 - GeneWeb -->
-<head><title>Parameters</title></head>
+<head><title>Renaming</title></head>
 
 <body>
 
-<h1>Parameters</h1>
+<h1>Renaming</h1>
 
-<form mode=GET action="gwf">
+<form mode=GET action="rename">
 <input type=hidden name=lang value=$l>
 
-Select your database by clicking on the corresponding button:
+Change the names you want:
 
 <p>
 
 <dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
 $b{
 <tr>
-<td><input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
 <td><a href="http://localhost:2317/$a">$a</a></td>
+<td><input name="$a" value="$a" size=20></td>
 </tr>|
 <tr><td>there is no database at present</tr></td>}
 </table></dl>
@@ -29,6 +29,6 @@ Then push this button:
 
 <p>
 
-<input type=submit value="Configurate">
+<input type=submit value="Rename">
 
 </form>

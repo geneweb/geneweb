@@ -19,8 +19,7 @@ necessary:
 
 <p>
 
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
 <td valign=top><strong>body_prop</strong></td>
 <td>Allows to change the background color, put a background pattern,
@@ -50,13 +49,9 @@ for this database.
 <tr>
 <td colspan=2><input name=body_prop value="$B" size=60></td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
 <td valign=top><strong>default_lang</strong></td>
 <td>Default language.
@@ -86,13 +81,9 @@ If it is "-", the default language of the command "gwd" is applied.
 </select>
 </td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
 <td valign=top><strong>friend_passwd</strong></td>
 <td>Password for "friends".
@@ -109,13 +100,9 @@ If this area is empty, everybody is a "friend".
 <td>&nbsp;</td>
 <td><input name=friend_passwd value="$F" size=30></td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
 <td valign=top><strong>wizard_passwd</strong></td>
 <td>Password for "wizards".
@@ -130,13 +117,9 @@ If this area is empty, everybody is a "wizard".
 <td>&nbsp;</td>
 <td><input name=wizard_passwd value="$W" size=30></td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
 <td valign=top><strong>can_send_image</strong></td>
 <td>Ability to send images.
@@ -156,13 +139,9 @@ with the appropriate file name.
 <input type=radio name=can_send_image value=$I[no]>No
 </td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
 <td valign=top><strong>wizard_just_friend</strong></td>
 <td>"Wizards" become simple "friend".
@@ -183,13 +162,9 @@ cleanup).
 <input type=radio name=wizard_just_friend value=$J[no]>No
 </td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
 <td valign=top><strong>renamed</strong></td>
 <td>Base has been renamed.
@@ -209,13 +184,9 @@ If this area is empty, the database has not been renamed.
 <td>&nbsp;</td>
 <td><input name=renamed value="$R" size=30></td>
 </tr>
-
 </table></dl>
 
-<p>
-
-<dl><dd><table border=1>
-
+<dl><dt><dd><table border=1>
 <tr>
 <td>
 If you want that a text appears in the bottom of each page, write it
@@ -227,7 +198,6 @@ here. You can use HTML tags.
 <textarea name=trailer rows=3 cols=60 wrap=virtual>$T</textarea>
 </td>
 </tr>
-
 </table></dl>
 
 <p>
@@ -236,6 +206,6 @@ Then push this button:
 
 <p>
 
-<dl><dd><input type=submit value="Apply"></dl>
+<input type=submit value="Apply">
 
 </form>

@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Extract a GeneWeb source file</title></head>
+
+<body>
+
+<h1>Extract a GeneWeb source file</h1>
+
+<form mode=GET action="gwu">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Select your database:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+
+$b{<tr><td><input type=radio name=anon
+value="$a">&nbsp;&nbsp;&nbsp;</td><td>$a</td></tr>|
+<tr><td>there is no database at present</tr></td>}
+
+</table></dl>
+
+<p>
+
+Enter the name you want to give to your <em>GeneWeb</em> source
+file. It must end with "<tt>.gw</tt>". If you write nothing, its name
+will be deducted from the name of the database.
+
+<p>
+
+<dl><dt><dd><input name=o size=30></dl>
+
+<p>
+
+Select the options you want:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=mem value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Save memory space during operation (but it will be slower).</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td colspan=3>Extract only the ancestors of...</td></tr>
+
+<tr><td>First name</td><td><input name="a1" size=30
+maxlength=200></td><td>Num</td> <td><input name="a2" size=5
+maxlength=8></td></tr>
+
+<tr><td>Surname</td> <td colspan=3><input name="a3" size=40
+maxlength=200></td></tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td colspan=3>Extract only the descendants of...</td></tr>
+
+<tr><td>First name</td><td><input name="d1" size=30
+maxlength=200></td><td>Num</td><td><input name="d2" size=5
+maxlength=8></td></tr>
+
+<tr><td>Surname</td> <td colspan=3><input name="d3" size=40
+maxlength=200></td></tr>
+</table></dl>
+
+<dl><dt><dd>If you use both above options, the intersection is assumed:
+persons <em>at the same time</em> ancestors of the one and descendants
+of the other.</dl>
+
+<p>
+
+Then push this button:
+
+<p>
+
+<input type=submit value="Extract">
+
+</form>
