@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 4.0 2001-03-16 19:34:34 ddr Exp $ *)
+(* $Id: def.mli,v 4.1 2001-12-27 14:38:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -137,7 +137,7 @@ type gen_descend 'person =
   { children : mutable array 'person }
 ;
 
-(* data base *)
+(* database *)
 
 type person = gen_person iper istr;
 type ascend = gen_ascend ifam;
