@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.8 2000-05-02 02:38:21 ddr Exp $ *)
+(* $Id: setup.ml,v 3.9 2000-06-06 21:01:49 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -837,7 +837,9 @@ value cleanup_1 conf =
      do Printf.eprintf "\n";
         flush stderr;
      return
-     if rc > 1 then print_file conf "cleanup_err.htm"
+     if rc > 1 then
+       let conf = {(conf) with comm = "gwc"} in
+       print_file conf "bsi_err.htm"
      else print_file conf "clean_ok.htm";
   return ()
 ;  
