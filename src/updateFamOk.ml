@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.5 2001-06-12 15:50:42 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.6 2001-06-13 08:01:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -734,7 +734,7 @@ value print_add o_conf base =
           let (fam, cpl, des) = effective_add conf base sfam scpl sdes in
           let wl = all_checks_family conf base fam cpl des in
           let ((fn, sn, occ, _, _), act) =
-            match p_getint conf.env "i" with
+            match p_getint conf.env "ip" with
             [ Some i ->
                 if Adef.int_of_iper cpl.mother = i then (scpl.mother, "af")
                 else

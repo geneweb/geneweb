@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.6 2001-06-07 18:45:28 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.7 2001-06-13 08:02:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -509,6 +509,174 @@ value print_family conf base fam cpl des force_children_surnames =
   }
 ;
 
+(* Interpretation of template file 'updfam.txt' *)
+
+type ast =
+  Templ.ast ==
+    [ Atext of string
+    | Avar of string and list string
+    | Atransl of bool and string and char
+    | Awid_hei of string
+    | Aif of ast_expr and list ast and list ast
+    | Aforeach of string and list string and list ast
+    | Adefine of string and list string and list ast and list ast
+    | Aapply of string and list ast_expr ]
+and ast_expr =
+  Templ.ast_expr ==
+    [ Eor of ast_expr and ast_expr
+    | Eand of ast_expr and ast_expr
+    | Eop of string and ast_expr and ast_expr
+    | Enot of ast_expr
+    | Estr of string
+    | Eint of string
+    | Evar of string and list string
+    | Etransl of bool and string and char ]
+;
+
+type env =
+  [ Vstring of string
+  | Vnone ]
+;
+
+type variable_value =
+  [ VVgen of string
+  | VVcvar of string
+  | VVnone ]
+;
+
+value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
+
+value extract_var sini s =
+  let len = String.length sini in
+  if String.length s > len && String.sub s 0 (String.length sini) = sini then
+    String.sub s len (String.length s - len)
+  else ""
+;
+
+value not_impl func x =
+  let desc =
+    if Obj.is_block (Obj.repr x) then
+      "tag = " ^ string_of_int (Obj.\tag (Obj.repr x))
+    else "int_val = " ^ string_of_int (Obj.magic x)
+  in
+  Wserver.wprint ">%s<p>\n" ("UpdateFam." ^ func ^ ": not impl " ^ desc)
+;
+
+(* string values *)
+
+value rec eval_variable conf base env fcd =
+  fun
+  [ [] -> VVgen ""
+  | [s] ->
+      let v = extract_var "cvar_" s in if v <> "" then VVcvar v else VVgen s
+  | [s :: sl] -> VVnone ]
+;
+
+value eval_string_env var env =
+  match get_env var env with
+  [ Vstring x -> quote_escaped x
+  | _ -> "" ]
+;
+
+value try_eval_gen_variable conf base env fcd =
+  fun
+  [ "digest" -> eval_string_env "digest" env
+  | s ->
+      let v = extract_var "evar_" s in
+      if v <> "" then
+        match p_getenv (conf.env @ conf.henv) v with
+        [ Some vv -> quote_escaped vv
+        | _ -> "" ]
+      else raise Not_found ]
+;
+
+(* bool values *)
+
+value eval_gen_bool_variable conf base env fcd =
+  fun
+  [ s ->
+      let v = extract_var "evar_" s in
+      if v <> "" then
+        match p_getenv conf.env v with
+        [ Some "" | None -> False
+        | _ -> True ]
+      else do { Wserver.wprint ">%%%s???" s; False } ]
+;
+
+value eval_bool_variable conf base env fcd s sl =
+  match eval_variable conf base env fcd [s :: sl] with
+  [ VVgen s -> eval_gen_bool_variable conf base env fcd s
+  | VVcvar _ -> do { Wserver.wprint ">%%%s???" s; False }
+  | VVnone -> do { Wserver.wprint ">%%%s???" s; False } ]
+;
+
+value eval_bool_value conf base env fcd =
+  let rec bool_eval =
+    fun
+    [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
+    | Eand e1 e2 -> bool_eval e1 && bool_eval e2
+    | Eop op e1 e2 ->
+        match op with
+        [ "=" -> string_eval e1 = string_eval e2
+        | "!=" -> string_eval e1 <> string_eval e2
+        | _ -> do { Wserver.wprint "op %s???" op; False } ]
+    | Enot e -> not (bool_eval e)
+    | Evar s sl -> eval_bool_variable conf base env fcd s sl
+    | Estr s -> do { Wserver.wprint "\"%s\"???" s; False }
+    | Eint s -> do { Wserver.wprint "\"%s\"???" s; False }
+    | Etransl _ s _ -> do { Wserver.wprint "[%s]???" s; False } ]
+  and string_eval =
+    fun
+    [ Estr s -> s
+    | Evar s sl ->
+        try
+          match eval_variable conf base env fcd [s :: sl] with
+          [ VVgen s -> try_eval_gen_variable conf base env fcd s
+          | VVcvar s -> do { Wserver.wprint ">%%%s???" s; "" }
+          | VVnone -> do { Wserver.wprint ">%%%s???" s; "" } ]
+        with
+        [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
+    | x -> do { Wserver.wprint "val???"; "" } ]
+  in
+  bool_eval
+;
+
+(* print *)
+
+value print_variable conf base env fcd sl =
+  match eval_variable conf base env fcd sl with
+  [ VVgen s ->
+      try Wserver.wprint "%s" (try_eval_gen_variable conf base env fcd s) with
+      [ Not_found -> Templ.print_variable conf base s ]
+  | x -> not_impl "print_variable" x ]
+;
+
+value rec print_ast conf base env fcd =
+  fun
+  [ Atext s -> Wserver.wprint "%s" s
+  | Atransl upp s n ->
+      Wserver.wprint "%s" (Templ.eval_transl conf base env upp s n)
+  | Avar s sl -> print_variable conf base env fcd [s :: sl]
+  | Aif e alt ale -> print_if conf base env fcd e alt ale
+  | x -> not_impl "print_ast" x ]
+and print_if conf base env fcd e alt ale =
+  let al = if eval_bool_value conf base env fcd e then alt else ale in
+  List.iter (print_ast conf base env fcd) al
+;
+
+value interp_templ conf base fcd digest astl =
+  let env = [("digest", Vstring digest)] in
+  List.iter (print_ast conf base env fcd) astl
+;
+
+value print_update_fam conf base fcd digest =
+  match p_getenv conf.env "m" with
+  [ Some "ADD_FAM" ->
+      let astl = Templ.input conf base "updfam" in
+      do { html conf; interp_templ conf base fcd digest astl }
+  | _ -> incorrect_request conf ]
+;
+
 value merge_call conf =
   do {
     Wserver.wprint "<input type=hidden name=m value=MRG_MOD_FAM_OK>\n";
@@ -635,8 +803,8 @@ value print_add1 conf base fam cpl des force_children_surnames =
     Wserver.wprint "\n";
     tag "form" "method=POST action=\"%s\"" conf.command begin
       Util.hidden_env conf;
-      match p_getenv conf.env "i" with
-      [ Some ip -> Wserver.wprint "<input type=hidden name=i value=%s>\n" ip
+      match p_getenv conf.env "ip" with
+      [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
       | None -> () ];
       Wserver.wprint "<input type=hidden name=m value=ADD_FAM_OK>\n";
       print_family conf base fam cpl des force_children_surnames;
@@ -651,7 +819,7 @@ value print_add1 conf base fam cpl des force_children_surnames =
 
 value print_add conf base =
   let (fath, moth) =
-    match p_getint conf.env "i" with
+    match p_getint conf.env "ip" with
     [ Some i ->
         let p = base.data.persons.get i in
         let fath =
@@ -678,7 +846,12 @@ value print_add conf base =
      fam_index = bogus_family_index}
   and cpl = {father = fath; mother = moth}
   and des = {children = [| |]} in
-  print_add1 conf base fam cpl des False
+  do {
+    if p_getenv conf.env "updfam" = Some "on" then
+      print_update_fam conf base (fam, cpl, des) ""
+    else ();
+    print_add1 conf base fam cpl des False
+  }
 ;
 
 value print_add_parents conf base =

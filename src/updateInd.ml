@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.2 2001-04-20 11:54:25 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.3 2001-06-13 08:01:45 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -274,39 +274,13 @@ value eval_title_variable conf base env p t =
   | _ -> ">???" ]
 ;
 
-value split_at_coloncolon s =
-  loop 0 where rec loop i =
-    if i >= String.length s - 1 then None
-    else
-      match (s.[i], s.[i + 1]) with
-      [ (':', ':') ->
-          let s1 = String.sub s 0 i in
-          let s2 = String.sub s (i + 2) (String.length s - i - 2) in
-          Some (s1, s2)
-      | _ -> loop (i + 1) ]
-;
-
-value eval_transl conf base env upp s c =
-  let r =
-    match c with
-    [ '0'..'9' ->
-        let n = Char.code c - Char.code '0' in
-        match split_at_coloncolon s with
-        [ None -> nominative (Util.transl_nth conf s n)
-        | Some (s1, s2) ->
-            Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
-    | _ -> nominative (Util.transl conf s) ^ String.make 1 c ]
-  in
-  if upp then capitale r else r
-;
-
 value eval_expr conf base env p =
   fun
   [ Estr s -> s
   | Evar s [] ->
       try try_eval_gen_variable conf base env p s with
       [ Not_found -> ">" ^ s ^ "???" ]
-  | Etransl upp s c -> eval_transl conf base env upp s c
+  | Etransl upp s c -> Templ.eval_transl conf base env upp s c
   | _ -> ">parse_error" ]
 ;
 
@@ -547,7 +521,8 @@ and substel sf el = List.map (subste sf) el;
 value rec print_ast conf base env p =
   fun
   [ Atext s -> Wserver.wprint "%s" s
-  | Atransl upp s n -> Wserver.wprint "%s" (eval_transl conf base env upp s n)
+  | Atransl upp s n ->
+      Wserver.wprint "%s" (Templ.eval_transl conf base env upp s n)
   | Avar s sl -> print_variable conf base env p [s :: sl]
   | Awid_hei s -> Wserver.wprint "Awid_hei"
   | Aif e alt ale -> print_if conf base env p e alt ale

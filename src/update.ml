@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.6 2001-06-02 13:52:58 ddr Exp $ *)
+(* $Id: update.ml,v 4.7 2001-06-13 08:01:03 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -910,15 +910,15 @@ value print_family_stuff conf base p a u =
        (Array.length u.family <> 0 || a.parents <> None) then
       ()
     else if p.sex = Neuter then do {
-      Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d;sex=M\">%s (%s)</a><br>\n"
+      Wserver.wprint "<a href=\"%sm=ADD_FAM;ip=%d;sex=M\">%s (%s)</a><br>\n"
         (commd conf) (Adef.int_of_iper p.cle_index)
         (capitale (transl_decline conf "add" s)) (transl_nth conf "M/F" 0);
-      Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d;sex=F\">%s (%s)</a><br>\n"
+      Wserver.wprint "<a href=\"%sm=ADD_FAM;ip=%d;sex=F\">%s (%s)</a><br>\n"
         (commd conf) (Adef.int_of_iper p.cle_index)
         (capitale (transl_decline conf "add" s)) (transl_nth conf "M/F" 1)
     }
     else
-      Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d\">%s</a><br>\n" (commd conf)
+      Wserver.wprint "<a href=\"%sm=ADD_FAM;ip=%d\">%s</a><br>\n" (commd conf)
         (Adef.int_of_iper p.cle_index)
         (capitale (transl_decline conf "add" s))
   }
@@ -1008,7 +1008,7 @@ value print conf base p =
           print_family_stuff conf base p a u;
           if has_children base u then do {
             Wserver.wprint "<br>\n";
-            stag "a" "href=\"%sm=CHG_CHN;i=%d\"" (commd conf)
+            stag "a" "href=\"%sm=CHG_CHN;ip=%d\"" (commd conf)
               (Adef.int_of_iper p.cle_index)
             begin
               Wserver.wprint "%s"
