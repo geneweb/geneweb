@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.23 2004-01-05 14:21:37 ddr Exp $
+# $Id: a.gwf,v 4.24 2004-11-09 12:33:49 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -183,6 +183,10 @@ places_inverted=no
 # Uncomment the following definition to specify that the present database has
 # been renamed:
 #renamed=newname
+
+# Select a default Sosa reference while navigating. This must be the
+# person's key (first-name dot number space surname).
+#default_sosa_ref=john.3 smith
 
 # Uncomment the following definition to specify that the present database has
 # been moved to another site:

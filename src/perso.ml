@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.58 2004-09-16 17:18:46 ddr Exp $ *)
+(* $Id: perso.ml,v 4.59 2004-11-09 12:33:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -225,7 +225,7 @@ value find_sosa_aux conf base a p =
 *)
 
 value find_sosa conf base a =
-  match Util.find_person_in_env conf base "z" with
+  match Util.find_sosa_ref conf base with
   [ Some p ->
       if a.cle_index = p.cle_index then Some (Num.one, p)
       else

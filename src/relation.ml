@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.48 2004-07-17 09:16:54 ddr Exp $ *)
+(* $Id: relation.ml,v 4.49 2004-11-09 12:33:49 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -94,7 +94,7 @@ value print_menu conf base p =
             (transl_nth conf "surname/surnames" 0) (transl conf "or")
             (transl conf "public name") (transl conf "or")
             (nominative (transl conf "alias"));
-          match Util.find_person_in_env conf base "z" with
+          match Util.find_sosa_ref conf base with
           [ Some p ->
               do {
                 Wserver.wprint "%s " (transl conf "or");
