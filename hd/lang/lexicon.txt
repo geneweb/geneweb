@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.60 2001-12-22 18:03:44 ddr Exp $
+# $Id: lexicon.txt,v 4.61 2001-12-26 20:41:54 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -26,6 +26,7 @@ sv: iso-8859-1
 zh: gb2312
 
      !dates in forms
+af: yymmdd
 da: ddmmyy
 de: ddmmyy
 en: yymmdd
@@ -40,6 +41,7 @@ sv: ddmmyy
 he: rtl
 
      !languages
+af: af=Afrikaans/ca=Catalan/cs=Czeck/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/fi=Fins/fr=Frans/he=Hibreeus/is=Yslandies/it=Italiaans/nl=Nederlands/no=Noorweegs/pl=Pools/pt=Portugees/pt-br=Portugees-in-Brazilië/ru=Russies/sv=Sweeds/zh=Chinees
 ca: af=africà/ca=català/cs=xec/da=danès/de=alemany/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/pt=portuguès/ru=rus/sv=suec/zh=Xinès
 cs: af=afrikán¹tina/cs=èe¹tina/da=dán¹tina/de=nìmèina/en=angliètina/eo=esperanto/es=¹panìl¹tina/fi=fin¹tina/fr=francouz¹tina/he=hebrej¹tina/is=island¹tina/it=ital¹tina/lv=loty¹¹tina/nl=holand¹tina/no=nor¹tina/pt=portugal¹tina/pt-br=brasil¹tina/ru=ru¹tina/sv=¹véd¹tina/zh=èín¹tina
 da: af=afrikaans/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ru=russisk/sv=svensk/zh=kinesisk
@@ -340,6 +342,7 @@ ru: %t ğîäèëñÿ áîëåå, ÷åì ÷åğåç 2 ãîäà ïîñëå ñìåğòè åãî/åå îòöà %t
 sv: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
 
     %t's sex is not coherent with his/her relations
+af: %t se geslag stem nie ooreen met sy/haar verwantskap nie
 ca: el sexe de %t no és coherent amb les seves relacions
 cs: pohlaví %t se neshoduje s jeho/jejími vztahy
 da: %t's k&oslash;n er ikke koh&aelig;rent med hans/hendes forbindelser
@@ -2696,6 +2699,7 @@ ru: èñ÷åç/èñ÷åçëà
 sv: f&ouml;rsvunnen
 
     display by slices/slice width/overlap/total width
+af: weergawe per gedeelte/gedeelte breedte/oorvleul/totale breedte
 ca: visualitzar per seccions/llargada de la secció/encavalcament/llargada total
 da: vis ved delte sider/sidebredde/overlapning/total bredde
 de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
@@ -2760,6 +2764,7 @@ ru: â ğàçâîäå
 sv: skilda
 
     don't group the common branches together
+af: moet nie takke van ooreenstemende oorsprong saamvoeg nie
 ca: no reagrupar les branques comunes
 da: sl&aring; ikke f&aelig;lles anelinier sammen
 de: gemeinsame Zweige nicht zusammenfassen
@@ -2824,6 +2829,7 @@ ru: êîí÷àÿ
 sv: slutar
 
     engaged
+af: verloof
 ca: promesos
 cs: snoubenci
 da: forlovet
@@ -2845,6 +2851,7 @@ pt: Noivos
 sv: f&ouml;rlovad
 
     engaged%t to
+af: verloof%t aan
 ca: promès%t amb/promesa%t amb
 cs: zasnoubenı s/zasnoubená s
 da: forlovet%t med
@@ -3570,6 +3577,7 @@ ru: èñòîğèÿ îáíîâëåíèé
 sv: uppdateringarnas historia
 
     horizontally
+af: horisontaal
 ca: horitzontalment
 cs: horizontálnì
 da: vandret
@@ -3614,11 +3622,12 @@ ru: ìóæ/æåíà
 sv: make/maka
 
     ident/email/subject
+af: ident/e-pos/onderwerp
 ca: ident/email/tema
 cs: ident/email/pøedmìt (osoba?)
 da: ident/email/emne
 de: ident/E-Mail/Betreff
-en: ident/email/subject
+en: ident/e-mail/subject
 eo: ident/email/objekto
 es: ident/Email/asunto
 et: ident/email/teema
@@ -4308,6 +4317,7 @@ ru: ïîäğîáíî
 sv: ut&ouml;kad rapport
 
     loop in database: %s is his/her own ancestor
+af: fout in die databasis: %s sy/haar eie voorvader
 ca: bucle a la base de dades: %s és avantpassat d'ell mateix
 cs: smyèka v databázi: %s je svùj pøedek
 da: loop i databasen: %s er sin egen ane
@@ -4582,6 +4592,7 @@ ru: îáúåäèíåíèå çàâåğøåíî
 sv: sammanslagning klar
 
     message added
+af: boodskap bygevoeg
 ca: missatge afegit
 cs: zpráva pøidána
 da: meddelelse tilf&oslash;jet
@@ -4604,6 +4615,7 @@ ru: äğ÷âşíåïğ õğğ÷üåïêå
 sv: meddelande inlagt
 
     message/previous message/previous messages/next message
+af: boodskap/vorige boodskap/vorige boodskappe/volgende boodskap
 ca: missatge/missate anterior//missate anterior/missate següent
 da: meddelelse/foreg&aring;ende meddelelse/foreg&aring;ende meddelelse/n&aelig;ste meddelelse
 de: Nachricht/vorherige Nachricht/vorherige Nachricht/n&auml;chste Nachricht
@@ -4951,6 +4963,7 @@ ru: íåò ñîâïàäåíèé
 sv: inga tr&auml;ffar
 
     no sexes check
+af: geslag word nie aangedui nie
 ca: no verificar els sexes
 da: ingen verificering af k&oslash;nnene
 de: keine Kontrolle des Geschlechts
@@ -6014,6 +6027,7 @@ ru: ïîñëàòü
 sv: skicka
 
     separated
+af: separated
 ca: separats
 cs: odlouèeni
 da: separeret
@@ -6335,6 +6349,7 @@ ru: íà÷èíàşòñÿ ñ
 sv: som b&ouml;rjar med
 
     statistics
+af: statistiek
 ca: estadístiques
 cs: statistika
 da: statistikker
@@ -6454,6 +6469,7 @@ sv: efternamn/efternamn
 zh: ĞÕ
 
     surnames list
+af: vanne lys
 ca: llistat de cognoms
 cs: seznam pøíjmení
 da: efternavnsoversigt
@@ -6523,6 +6539,7 @@ ru: %d èì¸í
 sv: de %d f&ouml;rnamnen
 
     the %d oldest perhaps still alive
+af: die %d oudstes wat nog leef
 ca: les %d persones més grans, potser encara vives
 cs: %d nejstar¹ích snad je¹tì ¾ijících osob
 da: de %d &aelig;ldste af de muligt levende
@@ -6568,6 +6585,7 @@ ru: %d ôàìèëèé
 sv: de %d efternamnen
 
     the %d who lived the longest
+af: die %d wat die langste gelewe het
 ca: les %d persones que han viscut més anys
 cs: %d osob které ¾ili nejdéle
 da: de %d som har levet l&aelig;ngst
@@ -7395,6 +7413,7 @@ ru: äÿäè è òåòè
 sv: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
 
     undefined sex for %t
+af: geslag onbekend vir %t
 ca: no s'ha definit el sexe de %t
 da: udefineret k&oslash;n for %t
 de: Geschlecht nicht definiert f&uuml;r %t
