@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.38 1999-08-03 05:14:05 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.39 1999-08-03 08:54:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -8,6 +8,7 @@ open Gutil;
 open Util;
 
 value limit_by_list = 8;
+value limit_by_tree = 5;
 
 value niveau_max_ascendance base ip =
   let x = ref 0 in
@@ -91,10 +92,10 @@ value print_choice conf base p niveau_effectif =
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=T> %s\n"
         (capitale (transl conf "tree"));
-      if niveau_effectif <= 4 then ()
+      if niveau_effectif <= limit_by_tree then ()
       else
         do Wserver.wprint "(";
-           Wserver.wprint (ftransl conf "max %d generations") 4;
+           Wserver.wprint (ftransl conf "max %d generations") limit_by_tree;
            Wserver.wprint ")\n";
         return ();
       html_li conf;
@@ -1369,7 +1370,7 @@ value print_tree conf base v p =
     Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
       (person_text_no_html conf base p)
   in
-  let v = min 4 v in
+  let v = min limit_by_tree v in
   let next_gen pol =
     List.fold_right
       (fun po list ->
