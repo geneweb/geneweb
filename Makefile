@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.0 2001-03-16 19:01:35 ddr Exp $
+# $Id: Makefile,v 4.1 2001-03-26 17:03:54 ddr Exp $
 
 DESTDIR=distribution
 
@@ -101,13 +101,6 @@ classical_distrib:
 	cp doc/images/*.jpg doc/images/gwlogo.gif $(DESTDIR)/doc/images/.
 	mkdir $(DESTDIR)/lang
 	cp hd/lang/*.txt $(DESTDIR)/lang/.
-	for dir in \
-	  af br cn cs ct de dk en eo es et fi fr he is it lv nl no pl \
-	  pt ru se;\
-	do \
-		mkdir $(DESTDIR)/lang/$$dir; \
-		cp hd/lang/$$dir/start.txt $(DESTDIR)/lang/$$dir/.; \
-	done
 	mkdir $(DESTDIR)/images
 	cp hd/images/*.jpg hd/images/*.gif $(DESTDIR)/images/.
 	mkdir $(DESTDIR)/etc

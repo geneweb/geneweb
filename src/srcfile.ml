@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.1 2001-03-26 05:18:59 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.2 2001-03-26 17:03:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -253,6 +253,9 @@ value macro conf base =
   | 'i' -> conf.highlight
   | 'k' -> conf.indep_command
   | 'l' -> conf.lang
+  | 'L' ->
+      let s = try Hashtbl.find conf.lexicon " !dir" with [ Not_found -> "" ] in
+      if s = "rtl" then "right" else "left"
   | 'm' ->
       try
         let s = List.assoc "latest_event" conf.base_env in
@@ -267,6 +270,9 @@ value macro conf base =
       let r = count conf in
       string_of_num (transl conf "(thousand separator)")
         (Num.of_int (r.welcome_cnt + r.request_cnt))
+  | 'R' ->
+      let s = try Hashtbl.find conf.lexicon " !dir" with [ Not_found -> "" ] in
+      if s = "rtl" then "left" else "right"
   | 's' -> commd conf
   | 't' -> conf.bname
   | 'v' -> Version.txt
@@ -345,25 +351,36 @@ value inline_translate conf base ic =
       if c = ']' then Lbuff.get len
       else loop (Lbuff.store len c) (input_char ic)
   in
-  let lang = conf.lang ^ ": " in
-  loop True 0 where rec loop bol i =
-    if i = String.length s then ".........."
-    else if bol && i + 4 < String.length s && String.sub s i 4 = lang then
-      loop 0 (i + 4) where rec loop len j =
-        if j = String.length s then Lbuff.get len
-        else if s.[j] = '\n' then
-          if j+1 < String.length s && s.[j+1] = ' ' then
-            let j =
-              loop (j + 1) where rec loop j =
-                if j < String.length s && s.[j] = ' ' then loop (j + 1)
-                else j
-            in
-            loop (Lbuff.store len '\n') j
-          else Lbuff.get len
-        else if s.[j] == '%' then
-          loop (Lbuff.mstore len (macro conf base s.[j+1])) (j + 2)
-        else loop (Lbuff.store len s.[j]) (j + 1)
-    else loop (s.[i] = '\n') (i + 1)
+  let lang = conf.lang ^ ":" in
+  loop None True 0 where rec loop en_version bol i =
+    if i = String.length s then
+      match en_version with
+      [ Some "" -> ""
+      | Some s -> "[" ^ s ^ "]"
+      | None -> ".........." ]
+    else if bol && i + 4 < String.length s then
+      let curr_lang = String.sub s i 3 in
+      if curr_lang = lang || curr_lang = "en:" then
+        let (s, i) =
+          let i = if s.[i+3] = ' ' then i + 1 else i in
+          loop 0 (i + 3) where rec loop len j =
+            if j = String.length s then (Lbuff.get len, j)
+            else if s.[j] = '\n' then
+              if j+1 < String.length s && s.[j+1] = ' ' then
+                let j =
+                  loop (j + 1) where rec loop j =
+                    if j < String.length s && s.[j] = ' ' then loop (j + 1)
+                    else j
+                in
+                loop (Lbuff.store len '\n') j
+              else (Lbuff.get len, j)
+            else if s.[j] == '%' then
+              loop (Lbuff.mstore len (macro conf base s.[j+1])) (j + 2)
+            else loop (Lbuff.store len s.[j]) (j + 1)
+        in
+        if curr_lang = lang then s else loop (Some s) True i
+      else loop en_version (s.[i] = '\n') (i + 1)
+    else loop en_version (s.[i] = '\n') (i + 1)
 ;
 
 value src_translate conf base nomin ic =

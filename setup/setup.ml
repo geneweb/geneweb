@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.0 2001-03-16 19:33:05 ddr Exp $ *)
+(* $Id: setup.ml,v 4.1 2001-03-26 17:03:55 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1381,24 +1381,19 @@ ifdef UNIX then
 else ()
 ;
 
-value gwd_available_languages =
-  ["af"; "br"; "cn"; "cs"; "ct"; "de"; "dk"; "en"; "es"; "eo";
-   "et"; "fi"; "fr"; "he"; "is"; "it"; "lv"; "nl"; "no"; "pl";
-   "pt"; "ru"; "se"]
-;
 value setup_available_languages = ["de"; "en"; "es"; "fr"; "lv"; "se"];
 
 value intro () =
   let (default_gwd_lang, default_setup_lang) =
     ifdef UNIX then
       let s = try Sys.getenv "LANG" with [ Not_found -> "" ] in
-      if List.mem s gwd_available_languages then
+      if List.mem s Version.available_languages then
         (s, if List.mem s setup_available_languages then s else "en")
       else
         let s = try Sys.getenv "LC_CTYPE" with [ Not_found -> "" ] in
         if String.length s >= 2 then
           let s = String.sub s 0 2 in
-          if List.mem s gwd_available_languages then
+          if List.mem s Version.available_languages then
             (s, if List.mem s setup_available_languages then s else "en")
           else (default_lang.val, default_lang.val)
         else (default_lang.val, default_lang.val)
