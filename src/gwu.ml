@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.36 2000-11-16 05:03:56 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.37 2000-11-26 14:45:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -905,6 +905,7 @@ value surnames = ref [];
 value no_spouses_parents = ref False;
 value no_notes = ref False;
 value censor = ref 0;
+value with_siblings = ref False;
 
 value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
   let to_separate = separate base in
@@ -925,7 +926,7 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
   in
   let ((per_sel, fam_sel) as sel) =
     Select.functions base anc desc surnames.val ancdesc no_spouses_parents.val
-      censor.val
+      censor.val with_siblings.val
   in
   let fam_done = Array.create base.data.families.len False in
   let mark = Array.create base.data.persons.len False in
@@ -1042,6 +1043,14 @@ value speclist =
     "\"<1st_name>\" [num] \"<surname>\" : select ancestors of...
     and all their descendants (has no effect if -a and/or -d used,
     option -nsp is forced).");
+   ("-aws",
+    Arg.String
+      (fun s ->
+         do anc_1st.val := s;
+            arg_state.val := ASwaitAncOcc;
+            with_siblings.val := True;
+         return ()),
+    "\"<1st_name>\" [num] \"<surname>\" : select ancestors with siblings");
    ("-s", Arg.String (fun x -> surnames.val := [x :: surnames.val]),
     "\"<surname>\" : select this surname (option usable several times)");
    ("-nsp", Arg.Set no_spouses_parents,
