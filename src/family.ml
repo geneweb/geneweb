@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.0 1999-10-29 10:31:10 ddr Exp $ *)
+(* $Id: family.ml,v 3.1 1999-11-05 17:33:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -30,7 +30,7 @@ value inconnu_au_bataillon conf =
         Wserver.wprint "%s: \"%s %s\"" (capitale (transl conf "not found"))
           prenom nom
       in
-      do header conf title; trailer conf; return ()
+      do rheader conf title; trailer conf; return ()
   | _ -> incorrect_request conf ]
 ;
 
@@ -38,7 +38,7 @@ value inconnu conf n =
   let title _ =
     Wserver.wprint "%s: \"%s\"" (capitale (transl conf "not found")) n
   in
-  do header conf title; trailer conf; return ()
+  do rheader conf title; trailer conf; return ()
 ;
 
 value relation_print conf base p =
