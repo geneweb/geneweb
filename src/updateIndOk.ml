@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.2 1998-09-07 11:36:21 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.3 1998-09-12 15:43:11 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -109,8 +109,8 @@ value reconstitute_person conf =
     [ Some s -> try int_of_string (strip_spaces s) with [ Failure _ -> -1 ]
     | _ -> -1 ]
   in
-  let first_name = get conf.env "first_name" in
-  let surname = get conf.env "surname" in
+  let first_name = strip_spaces (get conf.env "first_name") in
+  let surname = strip_spaces (get conf.env "surname") in
   let occ =
 (*
     if first_name = "?" || surname = "?" then 0

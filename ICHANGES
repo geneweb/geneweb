@@ -13,6 +13,7 @@ GeneWeb Version 1.07
   - Don't display person number any more in update form when holding ? in
     his/her surname or first name
   - Fixed bug: when updating person, checks were done before patch.
+  - Strip spaces of first names and surnames in forms.
 
 * consang:
   - fixed bug: raised error for empty databases

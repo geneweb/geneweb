@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: gwd.ml,v 1.4 1998-09-08 10:19:12 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.5 1998-09-12 15:44:48 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -210,12 +210,13 @@ value propose_base conf =
   return ()
 ;
 
-value unauth typ =
+value unauth bname typ =
   do Wserver.wprint "HTTP/1.0 401 Unauthorized"; nl ();
-     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s\"" typ;
+     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ bname;
      nl (); nl ();
-     Wserver.wprint "<head><title>%s access failed</title></head>\n" typ;
-     Wserver.wprint "<body><h1>%s access failed</h1></body>\n" typ;
+     Wserver.wprint "<head><title>%s %s access failed</title></head>\n"
+       typ bname;
+     Wserver.wprint "<body><h1>%s %s access failed</h1></body>\n" typ bname;
   return ()
 ;
 
@@ -311,7 +312,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     else (True, passwd = real_wizard_passwd, passwd = real_friend_passwd)
   in
   if not ok then
-    unauth (if passwd = "w" then "Wizard" else "Friend")
+    unauth base_file (if passwd = "w" then "Wizard" else "Friend")
   else
   let conf =
     {wizard = wizard;
