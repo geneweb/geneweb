@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.66 2005-01-23 09:41:05 ddr Exp $ *)
+(* $Id: perso.ml,v 4.67 2005-01-24 04:35:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1028,19 +1028,8 @@ and print_apply conf base env ep f el =
   match get_env f env with
   [ Vfun xl al ->
       let eval_var = eval_var conf base env ep in
-      let vl = List.map (Templ.eval_expr conf eval_var) el in
-      List.iter
-        (fun a ->
-           let a =
-             loop a xl vl where rec loop a xl vl =
-               match (xl, vl) with
-               [ ([x :: xl], [v :: vl]) ->
-                   loop (Templ.subst (Templ.subst_text x v) a) xl vl
-               | ([], []) -> a
-               | _ -> Atext "parse_error" ]
-           in
-           print_ast conf base env ep a)
-        al
+      let print_ast = print_ast conf base env ep in
+      Templ.print_apply conf print_ast eval_var xl al el
   | _ -> Wserver.wprint " %%%s?" f ]
 and print_if conf base env ep e alt ale =
   let eval_var = eval_var conf base env ep in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.110 2005-01-16 20:07:18 ddr Exp $ *)
+(* $Id: util.ml,v 4.111 2005-01-24 04:35:50 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2093,12 +2093,11 @@ value wprint_hidden_person conf base pref p =
   let first_name = p_first_name base p in
   let surname = p_surname base p in
   if (conf.wizard && conf.friend || conf.access_by_key) &&
-     not (first_name = "?" || surname = "?") then
-     do {
+     not (first_name = "?" || surname = "?") then do {
     wprint_hidden conf pref "p" (Name.lower first_name);
     wprint_hidden conf pref "n" (Name.lower surname);
     if p.occ > 0 then wprint_hidden conf pref "oc" (string_of_int p.occ)
-     else ();
+    else ();
   }
   else
     wprint_hidden conf pref "i" (string_of_int (Adef.int_of_iper p.cle_index))
