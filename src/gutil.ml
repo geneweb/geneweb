@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.20 2004-07-18 18:51:36 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.21 2004-07-19 15:50:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -543,9 +543,7 @@ value check_noloop_for_person_list base error ipl =
               let cpl = coi base ifam in
               do {
                 tab.(i) := BeingVisited;
-                noloop (father cpl);
-                noloop (mother cpl);
-                ()
+                Array.iter noloop (parent_array cpl);
               }
           | None -> () ];
           tab.(i) := Visited;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.34 2004-07-19 14:51:08 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.35 2004-07-19 15:50:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -657,7 +657,7 @@ value is_a_link =
   | _ -> False ]
 ;
 
-value is_created_or_already_child ochil_arr nchil schil =
+value is_created_or_already_there ochil_arr nchil schil =
   not (is_a_link schil) || array_memq nchil ochil_arr
 ;
 
@@ -665,21 +665,23 @@ value is_created_or_already_child ochil_arr nchil schil =
      The no-loop check being a big work on large databases, this
    optimization tests if this is really necessary or not. It is not
    necessary if:
-   1/ either both parents are created,
+   1/ either all parents are created,
    2/ or all children are created,
    3/ or the new family have the same parents than the old one *and*
       all linked (not created) new children were already children.
 *)
 
 value need_check_noloop (scpl, sdes, onfs) =
-  if (is_a_link (father scpl) || is_a_link (mother scpl)) &&
+  if array_exists is_a_link (parent_array scpl) &&
      array_exists is_a_link sdes.children
   then
     match onfs with
-    [ Some ((ofath, omoth, ochil), (nfath, nmoth, nchil)) ->
-        nfath != ofath || omoth != nmoth ||
+    [ Some ((opar, ochil), (npar, nchil)) ->
         not
-          (array_forall2 (is_created_or_already_child ochil) nchil
+          (array_forall2 (is_created_or_already_there opar) npar
+	     (parent_array scpl)) ||
+        not
+          (array_forall2 (is_created_or_already_there ochil) nchil
 	     sdes.children)
     | None -> True ]
   else False
@@ -690,8 +692,10 @@ value all_checks_family conf base fam cpl des scdo =
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
   do {
+let _ = do { Printf.eprintf "need_check_noloop %b\n" (need_check_noloop scdo); flush stderr; } in
     if need_check_noloop scdo then
-      Gutil.check_noloop_for_person_list base error [(father cpl); (mother cpl)]
+      Gutil.check_noloop_for_person_list base error
+        (Array.to_list (parent_array cpl))
     else ();
     Gutil.check_family base error warning fam cpl des;
     List.rev wl.val
@@ -917,7 +921,7 @@ value print_mod_aux conf base callback =
 value family_structure conf base ifam =
   let cpl = coi base ifam in
   let des = doi base ifam in
-  ((father cpl), (mother cpl), des.children)
+  (parent_array cpl, des.children)
 ;
 
 value print_mod o_conf base =
@@ -925,7 +929,7 @@ value print_mod o_conf base =
   let callback sfam scpl sdes =
     let ofs = family_structure conf base sfam.fam_index in
     let (fam, cpl, des) = effective_mod conf base sfam scpl sdes in
-    let nfs = ((father cpl), (mother cpl), des.children) in
+    let nfs = (parent_array cpl, des.children) in
     let onfs = Some (ofs, nfs) in
     let wl = all_checks_family conf base fam cpl des (scpl, sdes, onfs) in
     let (fn, sn, occ, _, _) =
