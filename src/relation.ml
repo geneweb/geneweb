@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.25 1999-12-20 09:03:14 ddr Exp $ *)
+(* $Id: relation.ml,v 3.26 1999-12-20 14:33:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -383,7 +383,15 @@ value print_only_dag conf base d =
         return ()
     | Right _ -> Wserver.wprint "&nbsp;" ]
   in
-  print_html_table (fun x -> Wserver.wprint "%s" x) print_indi
+  let phony n =
+    match n with
+    [ Elem i ->
+        match d.dag.(int_of_idag i).valu with
+        [ Left _ -> False
+        | Right _ -> True ]
+    | _ -> False ]
+  in
+  print_html_table (fun x -> Wserver.wprint "%s" x) print_indi phony
     conf.border d t
 ;
 
@@ -427,24 +435,6 @@ value print_relation_path_dag conf base path =
       ([], 0) (List.rev path)
   in
   let d = {dag = Array.of_list (List.rev nl)} in
-(*
-  let set =
-    List.fold_left
-      (fun set (ip, fl) ->
-         let set = Dag.Pset.add ip set in
-         match fl with
-         [ Sibling | HalfSibling ->
-             match (aoi base ip).parents with
-             [ Some ifam ->
-                 let cpl = coi base ifam in
-                 let set = Dag.Pset.add cpl.mother set in
-                 Dag.Pset.add cpl.father set
-             | None -> set ]
-         | _ -> set ])
-      Dag.Pset.empty path
-  in
-  let d = Dag.make_dag base (Dag.Pset.elements set) in
-*)
   do Wserver.wprint "<p>\n";
      print_only_dag conf base d;
   return ()
@@ -454,8 +444,9 @@ value print_relation_path conf base path =
   if path == [] then ()
   else
     do print_relation_path_list conf base path;
-       print_relation_path_table conf base path;
-       print_relation_path_dag conf base path;
+       match p_getenv conf.env "dag" with
+       [ Some "on" -> print_relation_path_dag conf base path
+       | _ -> print_relation_path_table conf base path ];
     return ()
 ;
 

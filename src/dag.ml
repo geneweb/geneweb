@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.8 1999-12-17 20:49:21 ddr Exp $ *)
+(* $Id: dag.ml,v 3.9 1999-12-20 14:33:28 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -153,8 +153,8 @@ value gen_print_dag conf base spouse_on invert set spl d =
 do let d = tag_dag d in print_char_table d (table_of_dag d); flush stderr; return
 *)
   do Util.header_no_page_title conf title;
-     print_html_table (fun x -> Wserver.wprint "%s" x) print_indi conf.border
-       d t;
+     print_html_table (fun x -> Wserver.wprint "%s" x) print_indi
+       (fun _ -> False) conf.border d t;
      Util.trailer conf;
   return ()
 ;
