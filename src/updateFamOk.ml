@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.13 1999-07-18 06:42:56 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.14 1999-07-21 12:35:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -559,7 +559,8 @@ value print_mod_ok_aux conf base wl fam cpl =
 value print_mod_ok conf base wl fam cpl =
   if wl = [] then
     match p_getenv conf.env "ip" with
-    [ Some ip -> Perso.print conf base (base.data.persons.get (int_of_string ip))
+    [ Some ip ->
+        Perso.print conf base (base.data.persons.get (int_of_string ip))
     | None -> print_mod_ok_aux conf base wl fam cpl ]
   else print_mod_ok_aux conf base wl fam cpl
 ;
@@ -578,7 +579,8 @@ value print_add_ok_aux conf base wl fam cpl =
 value print_add_ok conf base wl fam cpl =
   if wl = [] then
     match p_getenv conf.env "i" with
-    [ Some ip -> Perso.print conf base (base.data.persons.get (int_of_string ip))
+    [ Some ip ->
+        Perso.print conf base (base.data.persons.get (int_of_string ip))
     | None -> print_add_ok_aux conf base wl fam cpl ]
   else print_add_ok_aux conf base wl fam cpl
 ;
