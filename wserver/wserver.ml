@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.2 2001-04-22 03:31:16 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.3 2001-04-26 14:37:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -133,7 +133,6 @@ value html charset =
   do {
     wprint "HTTP/1.0 200 OK"; nl ();
     wprint "Content-type: text/html; charset=%s" charset; nl (); nl ();
-    ()
   }
 ;
 
@@ -145,12 +144,11 @@ value print_exc exc =
         prerr_string fun_name;
         prerr_string "\" failed";
         if String.length arg > 0 then do {
-          prerr_string " on \""; prerr_string arg; prerr_string "\""; ()
+          prerr_string " on \""; prerr_string arg; prerr_string "\"";
         }
         else ();
         prerr_string ": ";
         prerr_endline (Unix.error_message err);
-        ()
       }
   | Out_of_memory -> prerr_string "Out of memory\n"
   | Match_failure (file, first_char, last_char) ->
@@ -198,7 +196,7 @@ value print_exc exc =
 ;
 
 value print_err_exc exc =
-  do { print_exc exc; flush stderr; () }
+  do { print_exc exc; flush stderr; }
 ;
 
 value case_unsensitive_eq s1 s2 =
@@ -304,7 +302,6 @@ value treat_connection tmout callback addr ic =
             Sys.signal Sys.sigalrm Sys.Signal_default
           in ();
           exit 0;
-          ()
         }
         else ()
       else ()
@@ -335,7 +332,6 @@ value treat_connection tmout callback addr ic =
       wflush ();
       Printf.eprintf "Robot request\n";
       flush stderr;
-      ()
     }
     else do {
       try callback (addr, request) script_name contents with
@@ -343,7 +339,6 @@ value treat_connection tmout callback addr ic =
       | exc -> print_err_exc exc ];
       try wflush () with _ -> ();
       try flush stderr with _ -> ();
-      ()
     }
   }
 ;
@@ -362,7 +357,6 @@ value copy_what_necessary t oc =
              len.val := Unix.read t buff 0 (String.length buff);
 	     i.val := 0;
 	     if len.val > 0 then output oc buff 0 len.val else ();
-	     ()
            }
 	   else ();
            if len.val == 0 then None
@@ -400,7 +394,6 @@ value cleanup_sons () =
                  Printf.eprintf "]\n";
                  flush stderr;
                  cleanup_verbose.val := False;
-                 ()
                }
                else ();
                p
@@ -439,7 +432,6 @@ Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining after 
           }
           else ();
         };
-        ()
       }
   | None -> () ]
 ;
@@ -449,7 +441,6 @@ value wait_and_compact s =
     Printf.eprintf "Compacting... "; flush stderr;
     Gc.compact ();
     Printf.eprintf "Ok\n"; flush stderr;
-    ()
   }
   else ()
 ;
@@ -467,7 +458,6 @@ value accept_connection tmout max_clients callback s =
           try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
           try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
           try Unix.close t with _ -> ();
-          ()
         }
       in
       let ic = Unix.in_channel_of_descr t in
@@ -475,7 +465,6 @@ value accept_connection tmout max_clients callback s =
         wserver_oc.val := Unix.out_channel_of_descr t;
         treat_connection tmout callback addr ic;
         cleanup ();
-        ()
       }
     else ifdef UNIX then
       match try Some (Unix.fork ()) with _ -> None with
@@ -493,7 +482,7 @@ value accept_connection tmout max_clients callback s =
               treat_connection tmout callback addr stdin;
             }
             with exc ->
-              try do { print_err_exc exc; flush stderr; () }
+              try do { print_err_exc exc; flush stderr; }
               with _ -> ();
             exit 0
           }
@@ -502,7 +491,6 @@ value accept_connection tmout max_clients callback s =
             Unix.close t;
             if max_clients = None then let _ = Unix.waitpid [] id in ()
             else pids.val := [id :: pids.val];
-            ()
           }
       | None ->
           do { Unix.close t; Printf.eprintf "Fork failed\n"; flush stderr } ]
@@ -532,7 +520,6 @@ value accept_connection tmout max_clients callback s =
         flush oc;
         close_in ic;
         close_out oc;
-        ()
       }
       else
         let pid =
@@ -550,7 +537,6 @@ value accept_connection tmout max_clients callback s =
           try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
           try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
           try Unix.close t with _ -> ();
-          ()
         }
       in
       try
@@ -571,13 +557,11 @@ value accept_connection tmout max_clients callback s =
           [ Unix.Unix_error _ _ _ -> ()
           | exc -> do { cleanup (); raise exc } ];
           cleanup ();
-          ()
         }
       with
       [ Unix.Unix_error _ _ _ -> ()
       | exc -> do { cleanup (); raise exc } ];
       cleanup ();
-      ()
     }
   }
 ;
@@ -637,6 +621,5 @@ value f addr_opt port tmout max_clients g =
           try flush stdout with [ Sys_error _ -> () ];
           flush stderr;
         };
-        ()
       } ]
 ;
