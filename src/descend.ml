@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.28 1999-08-20 13:06:32 ddr Exp $ *)
+(* $Id: descend.ml,v 2.29 1999-09-08 13:47:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -79,19 +79,7 @@ value print_choice conf base p niveau_effectif =
          Wserver.wprint "\n<input type=hidden name=%s value=%s>" k v)
       conf.henv;
     Wserver.wprint "<input type=hidden name=m value=D>\n";
-    if conf.wizard && conf.friend && p_surname base p <> "?"
-    && p_first_name base p <> "?" then
-      do Wserver.wprint "<input type=hidden name=n value=\"%s\">\n"
-           (p_surname base p);
-         Wserver.wprint "<input type=hidden name=p value=\"%s\">\n"
-           (p_first_name base p);
-         if p.occ > 0 then
-           Wserver.wprint "<input type=hidden name=oc value=\"%d\">\n" p.occ
-         else ();
-      return ()
-    else
-      Wserver.wprint "<input type=hidden name=i value=%d>\n"
-        (Adef.int_of_iper p.cle_index);
+    wprint_hidden_person conf base "" p;
     tag "select" "name=v" begin
       let rec boucle i =
         if i > niveau_effectif then ()
