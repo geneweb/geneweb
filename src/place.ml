@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.9 2002-01-25 12:04:52 ddr Exp $ *)
+(* $Id: place.ml,v 4.10 2002-01-26 10:04:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -155,9 +155,10 @@ value get_all conf base =
     let list =
       Sort.list
         (fun (s1, _, _) (s2, _, _) ->
-           let s1 = List.map Name.lower s1 in
-           let s2 = List.map Name.lower s2 in
-           s1 <= s2)
+           let s1_l = List.map Name.lower s1 in
+           let s2_l = List.map Name.lower s2 in
+           if s1_l = s2_l then s1 <= s2 
+           else s1_l <= s2_l)
         list.val
     in
     (list, len.val)
@@ -307,9 +308,10 @@ value print_all_places_surnames_long conf base list =
   let list =
     Sort.list
       (fun (pl1, _) (pl2, _) ->
-         let pl1 = List.map Name.lower pl1 in
-         let pl2 = List.map Name.lower pl2 in
-         pl1 <= pl2)
+         let pl1_l = List.map Name.lower pl1 in
+         let pl2_l = List.map Name.lower pl2 in
+         if pl1_l = pl2_l then pl1 <= pl2
+         else pl1_l <= pl2_l)
       list
   in
   let title _ =
