@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.143 2000-07-20 13:45:54 ddr Exp $
+# $Id: lexicon.txt,v 3.144 2000-07-20 14:32:56 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5159,7 +5159,7 @@ nl: beknopte weergave
 no: kort rapport
 pt: resultados sucintos
 ru: кратко
-se: anlista
+se: kort rapport
 
     shortest path
 af: kortste pad
