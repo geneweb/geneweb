@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.21 2000-03-17 21:27:29 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.22 2000-03-18 19:00:24 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -543,9 +543,7 @@ value make_conf cgi from_addr (addr, request) str env =
         in
         (passwd, env, access_type)
     in
-(*
     let passwd = if cgi then Util.decode_varenv passwd else passwd in
-*)
     let command = String.sub str 0 iq in
     (command, base_file, passwd, env, access_type)
   in
