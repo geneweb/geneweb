@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
               "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>CDrom</title></head>
+<head><title>CD-ROM</title></head>
 <body background="../images/gwback.jpg">
 <table border=0 width="100%">
 <tr>
@@ -9,22 +9,22 @@
 height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>GeneWeb - Create a CDrom</font></h1>
+<h1><font color=#2f6400>GeneWeb - Create a CD-ROM</font></h1>
 </td>
 </tr>
 </table>
 </font>
 <br><br>
 
-You can create a CDrom of your data base with <font
-color=#2f6400><b>GeneWeb</b></font> included inside: il allows you
+You can create a CD-ROM of your data base with <font
+color=#2f6400><b>GeneWeb</b></font> included inside: it allows you
 to distribute your data base directly usable.
 
 <p>
 
 This chapter explains the minimum steps to manage to do it. This
 installation has the advantage that the user has nothing to install
-in his hard disk, neither the softwarre, nor the data base.
+in his hard disk, neither the software, nor the data base.
 
 <p>
 
@@ -45,7 +45,7 @@ it).
 to distribute a data base which is optimized in memory space and in
 access speed. However, if your data base comes from a GEDCOM file or
 from a <font color=#2f6400><b>GeneWeb</b></font> source file and if
-you made no changes in your data base, it is not unuseful.</font>
+you made no changes in your data base, it is un-useful.</font>
 
 <p>
 
@@ -63,42 +63,42 @@ displayed.</font>
 <p>
 
 <li> Enter in your data base and do any relationship computing, for
-example between a father an his son.
+example between a father and his son.
 
 <p>
 
 <font size=-1>Remark: this is also an optional step to optimize the
 access to the data base. Indeed, the first relationship computing
-buils a file (named fstab) in the data base which allows the future
+builds a file (named fstab) in the data base which allows the future
 relationship computings to go faster. If this file was not created, it
-will not be possible in the CDrom and the relationship computings will
+will not be possible in the CD-ROM and the relationship computings will
 be slower.</font>
 
 <p>
 
 <li> Create a directory for the items that you are going to put in
-your CDrom. This directory is named "destination" for the following
+your CD-ROM. This directory is named "destination" for the following
 explanation.
 
 <p>
 
 <li> Transfer your data base in the destination directory: your data
-base a directory ending with ".gwb". For example, if your data base is
-named "xyz", the directory is "xyz.gwb". This directory is located in
-the data bases directory (depending on your installation: Windows,
+base is a directory ending with ".gwb". For example, if your data base
+is named "xyz", the directory is "xyz.gwb". This directory is located
+in the data bases directory (depending on your installation: Windows,
 MacOS X, Unix, Linux rpm, Linux Debian...)
 
 <p>
 
 <li> Add a configuration file in the destination directory. If you
-have some which fits you, use it, otherwize create-it. The
-configuation file is a text file ending by ".gwf": if your data base
+have some which fits you, use it, otherwise create it. The
+configuration file is a text file ending by ".gwf": if your data base
 is "xyz", the file is "xyz.gwf". If this file already exists, it is
 also in the data base directory.
 
 <p>
 
-In this file, add a phony "wizard" password, by adding the line:
+In this file, add a phoney "wizard" password, by adding the line:
 
 <pre>
      wizard_passwd=a
@@ -109,23 +109,23 @@ In this file, add a phony "wizard" password, by adding the line:
 <font size=-1>Remark: this operation is optional but it allows to avoid
 that it proposes a "update" in the personal pages, updating which would
 not work anyway on a write-only support. Warning: if you create a
-configuration file, check that the extention ".txt" be <em>not</em>
+configuration file, check that the extension ".txt" is <em>not</em>
 added like some OS badly do automatically: the extension must be .gwf
 and nothing else.</font>
 
 <p>
 
-<li> Copy the exectutable "gwd" in the destination directory. In some
+<li> Copy the executable "gwd" in the destination directory. In some
 systems, it has the extension ".exe". Warning: there may be several
 files named "gwd" in your <font color=#2f6400><b>GeneWeb</b></font>
-installation.  The good one is a rather big file (more that 1Mb). It
+installation.  The good one is a rather big file (more thab 1 Mb). It
 is generally under a directory named "gw".
 
 <p>
 
 <li> Copy in the destination directory the directories "lang", "etc"
 and "images" (and their contents) which must be located in the same
-directory than the one where you found gwd.
+directory as the one where you found gwd.
 
 <p>
 
@@ -174,7 +174,7 @@ For that, create a text file named "gwd.arg" (warning: not "gwd.arg.txt"
 but just "gwd.arg") and write inside:
 
 <pre>
-   If you prepare a CDrom for Windows:
+   If you prepare a CD-ROM for Windows:
           -wd
           c:/temp/geneweb
    If it is for Unix or MacOS X:
@@ -200,7 +200,7 @@ bases, other HTML files and so on.
 
 <font size=-1>
 
-Don't ask me how to make a CDrom which launches all of that automatically
+Don't ask me how to make a CD-ROM which launches all of that automatically
 when you insert it in its support: there is probably tricks to do that
 but I don't know.
 
@@ -218,16 +218,16 @@ access path to the data base (options -hd and -bd of gwd).
 
 <p>
 
-<li>Before engrave your disk, do a test. For that, let the destination
-directory non writable together with all its subdirectories and files.
-Then launch the command gwd (by double-click or by an interactive
-command). Open in your Web navigator the address
+<li>Before engraving your disk, do a test. For that, change the access
+rights of the destination directory and all its files and directory:
+make them no-writable. Then launch the command gwd (by double-click or
+by an interactive command). Open in your Web navigator the address
 http://127.0.0.1:2317/xyz (if your data base is named xyz) and check
 if it works.
 
 <p>
 
-<li>If it is Ok, engrave your CDrom with the destination directory and
+<li>If it is Ok, create your CD-ROM with the destination directory and
 its contents.
 
 </ol>
