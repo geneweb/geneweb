@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.8 2001-06-20 16:34:48 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.9 2001-09-17 04:27:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -725,7 +725,16 @@ value print_add o_conf base =
           [ Some _ -> True
           | _ -> False ]
         in
-        if ext || redisp then
+        let digest =
+          match p_getint conf.env "ip" with
+          [ Some ip ->
+              string_of_int (Array.length (base.data.unions.get ip).family)
+          | None -> "" ]
+        in
+        let sdigest = raw_get conf "digest" in
+        if digest <> "" && sdigest <> "" && digest <> sdigest then
+          Update.error_digest conf base
+        else if ext || redisp then
           UpdateFam.print_update_fam conf base (sfam, scpl, sdes) ""
         else if forbidden_disconnected conf sfam scpl sdes then
           print_error_disconnected conf

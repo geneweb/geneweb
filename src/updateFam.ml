@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.19 2001-09-16 11:03:55 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.20 2001-09-17 04:27:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -415,8 +415,8 @@ value print_update_fam conf base fcd digest =
   | _ -> incorrect_request conf ]
 ;
 
-value print_add1 conf base fam cpl des force_children_surnames =
-  print_update_fam conf base (fam, cpl, des) ""
+value print_add1 conf base fam cpl des digest force_children_surnames =
+  print_update_fam conf base (fam, cpl, des) digest
 ;
 
 value print_mod1 conf base fam cpl des digest =
@@ -492,7 +492,7 @@ value print_swi1 conf base p fam1 fam2 =
 ;
 
 value print_add conf base =
-  let (fath, moth) =
+  let (fath, moth, digest) =
     match p_getint conf.env "ip" with
     [ Some i ->
         let p = base.data.persons.get i in
@@ -508,10 +508,13 @@ value print_add conf base =
             person_key base p.cle_index
           else ("", "", 0, Update.Create Female None, "")
         in
-        (fath, moth)
+        let digest =
+          string_of_int (Array.length (uoi base p.cle_index).family)
+        in
+        (fath, moth, digest)
     | None ->
         (("", "", 0, Update.Create Male None, ""),
-         ("", "", 0, Update.Create Female None, "")) ]
+         ("", "", 0, Update.Create Female None, ""), "") ]
   in
   let fam =
     {marriage = Adef.codate_None; marriage_place = ""; marriage_src = "";
@@ -520,7 +523,7 @@ value print_add conf base =
      fam_index = bogus_family_index}
   and cpl = {father = fath; mother = moth}
   and des = {children = [| |]} in
-  print_add1 conf base fam cpl des False
+  print_add1 conf base fam cpl des digest False
 ;
 
 value print_add_parents conf base =
@@ -540,7 +543,7 @@ value print_add_parents conf base =
            [| (sou base p.first_name, sou base p.surname, p.occ, Update.Link,
                "") |]}
       in
-      print_add1 conf base fam cpl des True
+      print_add1 conf base fam cpl des "" True
   | _ -> incorrect_request conf ]
 ;
 
