@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.2 2001-12-05 19:44:45 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.3 2002-04-22 11:39:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -22,12 +22,15 @@ type syntax_o =
 value copy_decode s i1 i2 =
   let len =
     loop 0 i1 where rec loop len i =
-      if i == i2 then len
+      if i >= i2 then len
+      else if i == i2 - 1 then len + 1
       else if s.[i] == '\\' then loop (len + 1) (i + 2)
       else loop (len + 1) (i + 1)
   in
   let rec loop_copy t i j =
-    if i < i2 then do {
+    if i >= i2 then t
+    else if i == i2 - 1 then do { t.[j] := s.[i]; t }
+    else do {
       let (c, i) =
         match s.[i] with
         [ '_' -> (' ', i)
@@ -37,7 +40,6 @@ value copy_decode s i1 i2 =
       t.[j] := c;
       loop_copy t (succ i) (succ j)
     }
-    else t
   in
   loop_copy (String.create len) i1 0
 ;

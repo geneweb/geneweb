@@ -13,6 +13,9 @@ GeneWeb version 4.07
     badly written).
 
 * GeneWeb compiler (gwc)
+  - [22 Apr 02] Fixed bug: failed when a string contained a backslash
+    followed by a space (this failure could happen for example in a
+    "cleanup" of a database, which calls gwc).
   - [23 Mar 02] Fixed bug: failed at end of creation of database when
     the target database (option -o) was indicated by an absolute path.
 
