@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.115 2002-11-18 11:08:00 ddr Exp $
+# $Id: lexicon.txt,v 4.116 2002-11-18 12:36:24 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -173,32 +173,7 @@ is: %1 %2
 it: %1 d[i']%2
 lv: %1 -&gt; %2
 nl: %1 van %2
-no: %1 til %2
-pl: %1 :g:%2
-pt: %1 de %2
-ru: %1 :g:%2
-sl: %1 od :g:%2
-sv: %1 till %2
-
-    %1 of (same or greater generation level) %2
-af: %1 van %2
-bg: %1 םא :a:%2
-ca: %1 d[e']%2
-cs: %1 :g:%2
-da: %1 til %2
-de: %1 von :d:%2
-en: %1 of %2
-eo: %1 de %2
-es: %1 de %2
-et: :g:%2 %1
-fi: :g:%2 %1
-fr: %1 d[e']%2
-he: %1 של %2
-is: %1 %2
-it: %1 d[i']%2
-lv: %1 -&gt; %2
-nl: %1 van %2
-no: %1 av %2
+no: %1 til %2/%1 av %2
 pl: %1 :g:%2
 pt: %1 de %2
 ru: %1 :g:%2

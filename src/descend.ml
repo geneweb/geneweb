@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.17 2002-10-26 01:22:42 ddr Exp $ *)
+(* $Id: descend.ml,v 4.18 2002-11-18 12:36:27 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -154,7 +154,7 @@ value print_choice conf base p effective_level =
 value descendants_title conf base p h =
   let txt_fun = if h then gen_person_text_no_html else gen_person_text in
   let s =
-    transl_decline2 conf "%1 of (same or greater generation level) %2"
+    transl_a_of_gr_eq_gen_lev conf
       (transl conf "descendants") (txt_fun raw_access conf base p)
   in
   Wserver.wprint "%s" (capitale s)
@@ -732,7 +732,7 @@ value display_descendants_with_numbers conf base max_level ancestor =
         ("m=D;i=" ^ string_of_int (Adef.int_of_iper ancestor.cle_index) ^
            ";v=" ^ string_of_int max_level ^ ";t=G")
         (capitale
-           (transl_decline2 conf "%1 of (same or greater generation level) %2"
+           (transl_a_of_gr_eq_gen_lev conf
               (transl conf "descendants") (person_text conf base ancestor)))
   in
   let marks = Array.create base.data.persons.len False in

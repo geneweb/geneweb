@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.30 2002-10-26 12:07:33 ddr Exp $ *)
+(* $Id: relation.ml,v 4.31 2002-11-18 12:36:28 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -895,7 +895,7 @@ value print_link_name conf base n p1 p2 sol =
       else if x2 < x1 then
         let s =
           let info = ((info, x1), fun r -> r.Consang.lens1) in
-          transl_decline2 conf "%1 of (same or greater generation level) %2"
+          transl_a_of_gr_eq_gen_lev conf
             (brother_label conf x2 p2.sex)
             (ancestor_label conf base info (x1 - x2) Neuter)
         in
@@ -913,20 +913,19 @@ value print_link_name conf base n p1 p2 sol =
               [ [ip2] -> if (pget conf base ip2).sex = Male then sm else sf
               | _ -> sm ]
           in
-          transl_decline2 conf "%1 of (same or greater generation level) %2" d
-            s
+          transl_a_of_gr_eq_gen_lev conf d s
         in
         (s, sp1, sp2)
     in
     let s =
       if sp2 then
-        transl_decline2 conf "%1 of (same or greater generation level) %2"
+        transl_a_of_gr_eq_gen_lev conf
           (transl_nth conf "the spouse" (index_of_sex p2.sex)) s
       else s
     in
     let s =
       if sp1 then
-        transl_decline2 conf "%1 of (same or greater generation level) %2" s
+        transl_a_of_gr_eq_gen_lev conf s
           (transl_nth conf "the spouse" (1 - index_of_sex p1.sex))
       else s
     in
@@ -936,10 +935,8 @@ value print_link_name conf base n p1 p2 sol =
       else gen_person_title_text no_reference raw_access conf base p1
     in
     let s =
-      if x2 < x1 then transl_decline2 conf "%1 of %2" s1 s2
-      else
-        transl_decline2 conf "%1 of (same or greater generation level) %2" s1
-          s2
+      if x2 < x1 then transl_a_of_b conf s1 s2
+      else transl_a_of_gr_eq_gen_lev conf s1 s2
     in
     Wserver.wprint "%s.\n" (nominative s)
   }
@@ -1078,22 +1075,22 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
       let s =
         if pp1 = None then s
         else
-          transl_decline2 conf "%1 of (same or greater generation level) %2"
+          transl_a_of_gr_eq_gen_lev conf
             (transl_nth conf "the spouse" (1 - index_of_sex p1.sex)) s
       in
       let s =
-        transl_decline2 conf "%1 of %2" (lab (fun r -> r.Consang.lens1) x1) s
+        transl_a_of_b conf
+          (lab (fun r -> r.Consang.lens1) x1) s
       in
       Wserver.wprint "%s\n" (nominative s);
       html_li conf;
       let s = gen_person_title_text no_reference raw_access conf base p2 in
       let s =
         if pp2 = None then
-          transl_decline2 conf "%1 of %2" (lab (fun r -> r.Consang.lens2) x2)
-            s
+          transl_a_of_b conf (lab (fun r -> r.Consang.lens2) x2) s
         else
-          transl_decline2 conf "%1 of (same or greater generation level) %2"
-            (transl_decline2 conf "%1 of %2"
+          transl_a_of_gr_eq_gen_lev conf
+            (transl_a_of_b conf
                (lab (fun r -> r.Consang.lens2) x2)
                (transl_nth conf "the spouse" (1 - index_of_sex p2.sex)))
             s
@@ -1233,7 +1230,7 @@ value print_propose_upto conf base p1 p2 rl =
         Wserver.wprint "<font size=-1>";
         Wserver.wprint "%s"
           (capitale
-             (transl_decline2 conf "%1 of %2" (transl conf "ancestors")
+             (transl_a_of_b conf (transl conf "ancestors")
                 (person_title_text conf base p)));
         Wserver.wprint " %s"
           (transl_decline conf "up to" (person_title_text conf base a));

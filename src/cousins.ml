@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.10 2002-08-31 08:58:51 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.11 2002-11-18 12:36:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -214,8 +214,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
              }
              else do {
                let s =
-                 transl_decline2 conf
-                   "%1 of (same or greater generation level) %2"
+                 transl_a_of_gr_eq_gen_lev conf
                    (transl_nth conf "child/children" 1)
                    (person_title_text conf base p)
                in
@@ -299,19 +298,19 @@ value print_cousins conf base p lev1 lev2 =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
     if lev1 == lev2 then
       let s =
-        transl_decline2 conf "%1 of (same or greater generation level) %2"
+        transl_a_of_gr_eq_gen_lev conf
           (brother_label conf lev1) (txt_fun raw_access conf base p)
       in
       Wserver.wprint "%s" (capitale s)
     else if lev1 == 2 && lev2 == 1 then
       let s =
-        transl_decline2 conf "%1 of %2" (transl conf "uncles and aunts")
+        transl_a_of_b conf (transl conf "uncles and aunts")
           (txt_fun raw_access conf base p)
       in
       Wserver.wprint "%s" (capitale s)
     else if lev1 == 1 && lev2 == 2 then
       let s =
-        transl_decline2 conf "%1 of (same or greater generation level) %2"
+        transl_a_of_gr_eq_gen_lev conf
           (transl conf "nephews and nieces") (txt_fun raw_access conf base p)
       in
       Wserver.wprint "%s" (capitale s)
@@ -340,7 +339,7 @@ value print_menu conf base p effective_level =
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
     let s =
-      transl_decline2 conf "%1 of (same or greater generation level) %2"
+      transl_a_of_gr_eq_gen_lev conf
         (transl conf "cousins (general term)")
         (txt_fun raw_access conf base p)
     in
