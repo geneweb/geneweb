@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 4.1 2001-04-21 01:48:29 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 4.2 2001-06-15 15:25:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -69,47 +69,6 @@ value reconstitute conf base fam1 des1 fam2 des2 =
   (fam, des)
 ;
 
-value print_merge1 conf base fam des fam2 digest =
-  let title _ =
-    let s = transl_nth conf "family/families" 1 in
-    Wserver.wprint "%s # %d" (capitale (transl_decline conf "merge" s))
-      (Adef.int_of_ifam fam.fam_index)
-  in
-  let cpl =
-    Gutil.map_couple_p (UpdateFam.person_key base) (coi base fam.fam_index)
-  in
-  do {
-    header conf title;
-    Wserver.wprint "\n";
-    tag "form" "method=POST action=\"%s\"" conf.command begin
-      Util.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=m value=MRG_MOD_FAM_OK>\n";
-      Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
-      Wserver.wprint "<input type=hidden name=i value=%d>\n"
-        (Adef.int_of_ifam fam.fam_index);
-      Wserver.wprint "<input type=hidden name=i2 value=%d>\n"
-        (Adef.int_of_ifam fam2.fam_index);
-      match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
-      [ (Some i1, Some i2) ->
-          do {
-            Wserver.wprint "<input type=hidden name=ini1 value=%d>\n" i1;
-            Wserver.wprint "<input type=hidden name=ini2 value=%d>\n" i2;
-          }
-      | _ -> () ];
-      match p_getenv conf.env "ip" with
-      [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
-      | None -> () ];
-      Wserver.wprint "\n";
-      UpdateFam.print_family conf base fam cpl des False;
-      Wserver.wprint "\n";
-      html_p conf;
-      Wserver.wprint "<input type=submit value=Ok>\n";
-    end;
-    Wserver.wprint "\n";
-    trailer conf;
-  }
-;
-
 value print_merge conf base =
   match (p_getint conf.env "f1", p_getint conf.env "f2") with
   [ (Some f1, Some f2) ->
@@ -121,7 +80,7 @@ value print_merge conf base =
       let digest =
         Update.digest_family fam1 (base.data.couples.get f1) des1
       in
-      print_merge1 conf base sfam sdes fam2 digest
+      UpdateFam.print_merge1 conf base sfam sdes fam2 digest
   | _ -> incorrect_request conf ]
 ;
 

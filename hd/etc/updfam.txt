@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updfam.txt,v 4.4 2001-06-15 04:34:24 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.5 2001-06-15 15:25:29 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -160,7 +160,6 @@
 %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
   <input type=hidden name=m value=MOD_FAM_OK>%nl;
 %end;
-<input type=hidden name=updfam value=on>
 
 <h4>[*him/her]0</h4>
 %apply;parent("him", "father")
@@ -357,5 +356,3 @@
 %copyright;
 %base_trailer;
 </body>
-
-<br><p>
