@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.22 2002-01-13 17:07:24 ddr Exp $ *)
+(* $Id: setup.ml,v 4.23 2002-01-13 19:08:54 ddr Exp $ *)
 
 open Printf;
 
@@ -317,6 +317,7 @@ value macro conf =
   | 'q' -> Version.txt
   | 'u' -> Filename.dirname (Filename.concat (Sys.getcwd ()) setup_dir.val)
   | 'x' -> setup_dir.val
+  | 'w' -> slashify (Sys.getcwd ())
   | '$' -> "$"
   | c -> "BAD MACRO " ^ String.make 1 c ]
 ;
@@ -431,7 +432,6 @@ value rec copy_from_stream conf print strm =
           | 'v' ->
               let out = strip_spaces (s_getenv conf.env "o") in
               print_if conf print (Sys.file_exists (out ^ ".gwb")) strm
-          | 'w' -> print (slashify (Sys.getcwd ()))
           | 'y' -> for_all conf print (all_db (s_getenv conf.env "anon")) strm
           | 'z' -> print (string_of_int port.val)
           | 'A'..'Z' | '0'..'9' as c ->
