@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.32 2002-03-11 17:24:52 ddr Exp $ *)
+(* $Id: perso.ml,v 4.33 2002-03-11 17:56:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -839,7 +839,9 @@ value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
   | "death_place" -> print_death_place conf base env p p_auth
   | "died" -> print_died conf base env p p_auth
   | "divorce_date" -> print_divorce_date conf base env p p_auth efam
-  | "dates" -> if p_auth then Date.afficher_dates_courtes conf base p else ()
+  | "dates" ->
+      if p_auth then Wserver.wprint "%s" (Date.short_dates_text conf base p)
+      else ()
   | "fam_access" ->
       match efam with
       [ Vfam fam _ _ ->

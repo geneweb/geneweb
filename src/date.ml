@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.9 2002-03-11 17:24:47 ddr Exp $ *)
+(* $Id: date.ml,v 4.10 2002-03-11 17:56:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -272,8 +272,6 @@ value year_text d =
   | YearInt x -> s ^ "/" ^ string_of_int x
   | _ -> s ]
 ;
-
-value display_year d = Wserver.wprint "%s" (year_text d);
 
 value of_course_died conf p =
   match Adef.od_of_codate p.birth with
@@ -643,10 +641,4 @@ value print_calendar conf base =
     end;
     trailer conf;
   }
-;
-
-(* Deprecated *)
-
-value afficher_dates_courtes conf base p =
-  Wserver.wprint "%s" (short_dates_text conf base p)
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.18 2002-03-11 17:50:40 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.19 2002-03-11 17:56:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -205,7 +205,7 @@ value afficher_menu_ascendants conf base p =
 value afficher_ancetre conf base p =
   do {
     Wserver.wprint "\n%s" (referenced_person_text conf base p);
-    Date.afficher_dates_courtes conf base p
+    Wserver.wprint "%s" (Date.short_dates_text conf base p)
   }
 ;
 
@@ -328,7 +328,7 @@ value print_generation_person conf base cnt gp =
         Num.print wpr (transl conf "(thousand separator)") n;
         Wserver.wprint " -\n";
         Wserver.wprint "%s" (referenced_person_title_text conf base p);
-        Date.afficher_dates_courtes conf base p;
+        Wserver.wprint "%s" (Date.short_dates_text conf base p);
         Wserver.wprint "\n";
         incr cnt
       }
@@ -1141,7 +1141,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
                   Date.short_dates_text conf base (pget conf base conj)))
         else do {
           Wserver.wprint "\n%s" (referenced_person_title_text conf base p);
-          Date.afficher_dates_courtes conf base p
+          Wserver.wprint "%s" (Date.short_dates_text conf base p)
         };
         Wserver.wprint "\n"
       }
@@ -1372,7 +1372,7 @@ value print_spouses conf base p u =
          Wserver.wprint "\n&amp;%s\n"
            (Date.short_marriage_date_text conf base fam p sp);
          Wserver.wprint "%s" (person_title_text conf base sp);
-         Date.afficher_dates_courtes conf base sp
+         Wserver.wprint "%s" (Date.short_dates_text conf base sp)
        })
     u.family
 ;
@@ -1383,7 +1383,7 @@ value
   do {
     wprint_geneweb_link conf href (person_text_without_surname conf base p);
     Wserver.wprint "%s %s" begin_surname (person_title_text conf base p);
-    Date.afficher_dates_courtes conf base p;
+    Wserver.wprint "%s" (Date.short_dates_text conf base p);
     if spouses_incl then do {
       Wserver.wprint "\n=&gt; ";
       print_missing_type conf mt;

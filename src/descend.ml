@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.11 2002-03-11 17:50:42 ddr Exp $ *)
+(* $Id: descend.ml,v 4.12 2002-03-11 17:56:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -412,7 +412,7 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
       (fun (p, c) ->
          do {
            Wserver.wprint "\n%s" (referenced_person_title_text conf base p);
-           Date.afficher_dates_courtes conf base p;
+           Wserver.wprint "%s" (Date.short_dates_text conf base p);
            if not (is_hidden p) && c > 1 then
              Wserver.wprint " <em>(%d)</em>" c
            else ();
@@ -527,7 +527,7 @@ value print_child conf base p1 p2 e =
           (referenced_person_text_without_surname conf base e)
       else Wserver.wprint "\n%s" (referenced_person_text conf base e);
     end;
-    Date.afficher_dates_courtes conf base e
+    Wserver.wprint "%s" (Date.short_dates_text conf base e)
   }
 ;
 
@@ -554,7 +554,7 @@ value afficher_spouse conf base marks paths fam p c =
     end;
     if marks.(Adef.int_of_iper c.cle_index) then
       Wserver.wprint " (<tt><b>%s</b></tt>)" (label_of_path paths c)
-    else Date.afficher_dates_courtes conf base c
+    else Wserver.wprint "%s" (Date.short_dates_text conf base c)
   }
 ;
 
@@ -747,7 +747,7 @@ value afficher_descendants_numerotation conf base niveau_max ancetre =
   do {
     header conf title;
     total.val := 0;
-    Date.afficher_dates_courtes conf base ancetre;
+    Wserver.wprint "%s" (Date.short_dates_text conf base ancetre);
     let p = ancetre in
     if authorized_age conf base p then
       match (Adef.od_of_codate p.birth, p.death) with
@@ -797,7 +797,7 @@ value print_elem conf base paths precision (n, pll) =
           Wserver.wprint "<strong>%s %s %s</strong>" (surname_end n)
             (reference conf base p (person_text_without_surname conf base p))
             (surname_begin n);
-          Date.afficher_dates_courtes conf base p;
+          Wserver.wprint "%s" (Date.short_dates_text conf base p);
           print_ref conf base paths p;
           Wserver.wprint "\n"
         }
@@ -829,7 +829,8 @@ value print_elem conf base paths precision (n, pll) =
                           Wserver.wprint "</em>"
                         }
                         else ();
-                        Date.afficher_dates_courtes conf base p;
+                        Wserver.wprint "%s"
+                          (Date.short_dates_text conf base p);
                         print_ref conf base paths p;
                         Wserver.wprint "\n"
                       })
@@ -961,7 +962,7 @@ value afficher_index_spouses conf base niveau_max ancetre =
 value print_someone conf base p =
   do {
     Wserver.wprint "\n%s" (referenced_person_title_text conf base p);
-    Date.afficher_dates_courtes conf base p;
+    Wserver.wprint "%s" (Date.short_dates_text conf base p);
     Wserver.wprint "\n"
   }
 ;
