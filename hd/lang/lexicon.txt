@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.137 2000-07-09 10:33:09 ddr Exp $
+# $Id: lexicon.txt,v 3.138 2000-07-11 16:37:53 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5480,6 +5480,7 @@ de: Text
 dk: tekst
 en: text
 eo: teksto
+es: texto
 fi: teksti
 fr: texte
 he:  כתוב
@@ -5516,6 +5517,7 @@ se: de %d f&ouml;rnamnen
 dk: de %d &aelig;ldste af de muligt levende
 en: the %d oldest perhaps still alive
 eo: la %d plej maljunoj eble ankoraux vivantaj
+es: los %s m&aacute;s viejos quiz&aacute;s todov&iacute;a vivo
 fi: %d vanhinta ehk&auml viel&auml el&auml;v&auml;&auml
 fr: les %d les plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
 nl: de %d oudsten, mogelijk nog in leven
@@ -5545,6 +5547,7 @@ se: de %d efternamnen
 dk: de %d som har levet l&aelig;ngst
 en: the %d who lived the longest
 eo: la %d kiu vivis plejlonge
+es: los %d que han vivido m&aacute;s mucho tiempo
 fr: les %d ayant v&eacute;cu le plus longtemps
 nl: de %d langst levende personen
 se: de %d som har levt l&auml;ngst
@@ -6367,6 +6370,7 @@ de: Trauzeugen bei der Hochzeit von %s und %s
 dk: vidne ved brylluppet mellem %s og %s
 en: witness at marriage of %s and %s
 eo: atestant(in)o en edzigxo de %s kaj %s
+es: testigo en el casamiento de %s y %s
 fi: %s ja %s avioliiton todistaja
 fr: t&eacute;moin au mariage de %s et de %s
 he:  אדים בחתונה של %s ו-%s
@@ -6384,6 +6388,7 @@ de: Trauzeuge/Trauzeugen
 dk: vidne/vidner
 en: witness/witnesses
 eo: atestanto:a:+n/atestantoj
+es: testigo/testigos
 fi: todistaja/todistajat
 fr: t&eacute;moin/t&eacute;moins
 he:  אד/ אדים
