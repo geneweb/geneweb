@@ -55,9 +55,9 @@ eo: %s gekuzoj
 es: primos %s
 fr: cousins au %s degr&eacute;
 it: cugini di %s grado
-nl: neef %s generaties verwijderd
+nl: neven en nichten %s generaties verwijderd
 pt: primos %s
-se: %s kusin
+se: %s kusiner
 
     %t already has parents
 de: %t hat schon Eltern
@@ -212,9 +212,9 @@ eo: 2a gekuzoj
 es: primos 2ndos
 fr: cousins issus de germains
 it: cugini di 2o grado
-nl: neef 2de generaties verwijderd
+nl: neven en nichten in de 2de graad
 pt: primos 2ndos
-se: syssling
+se: sysslingar
 
     3rd cousins
 de: Vettere 3ten Grades
@@ -223,9 +223,9 @@ eo: 3a gekuzoj
 es: primos 3ros
 fr: cousins issus d'issus de germains
 it: cugini di 3o grado
-nl: neef 3de generaties verwijderd
+nl: neven en nichten in de 3e graad
 pt: primos 3ro
-se: brylling
+se: bryllingar
 
     M/F
 de: M/F
@@ -877,9 +877,9 @@ eo: kuzoj
 es: primos
 fr: cousins
 it: cugini
-nl: neef
+nl: neven en nichten
 pt: primos
-se: kusin
+se: kusiner
 
     create
 de: erzeugen
@@ -1688,7 +1688,7 @@ en: navigation with %t as Sosa reference
 es: navegaci&oacute;n con %t como referencia de Sosa
 fr: navigation avec %t comme r&eacute;f&eacute;rence Sosa
 it: percorso con %t come riferimento Sosa
-nl: naviagatie met %t als Sosa referentie
+nl: navigatie met %t als proband
 pt: navega&ccedil;a&atilde;o com o %t como a refer&ecirc;ncia Sosa
 se: navigering med %t som Sosa referens
 
@@ -1921,6 +1921,8 @@ se: av mordet
     of the side of
 en: of the side of
 fr: du c&ocirc;t&eacute; de
+nl: langs de zijde van
+se: fr&aring;n sl&auml;ktsidan av
 
     on (day month year)
 cn: ÓÚ
@@ -2246,7 +2248,7 @@ de: Quelle/Quellen
 en: source/sources
 es: fuente/fuentes
 fr: source/sources
-nl: bronne/bronnen
+nl: bron/bronnen
 pt: fonte/fontes
 se: k&auml;llor
 
