@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.13 1999-07-15 08:52:55 ddr Exp $ *)
+(* $Id: relation.ml,v 2.14 1999-07-15 11:45:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -49,6 +49,8 @@ value print_menu conf base p =
          Wserver.wprint "<input type=radio name=t value=N> <em>%s</em>\n"
            (capitale (transl_nth conf "surname/surnames" 0));
        end;
+       Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
+       Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
      end;
      Array.iter
        (fun ifam ->
@@ -217,18 +219,22 @@ value print_solution_ancestor conf p1 p2 x1 x2 list =
      List.iter
        (fun (a, n) ->
           do html_li conf;
-             Wserver.wprint "<em>%s %s:\n" (string_of_big_int conf n)
+             Wserver.wprint "<em>%s %s" (string_of_big_int conf n)
                (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
-             Wserver.wprint "%s " (transl conf "click");
-             Wserver.wprint
-               "<a href=\"%sm=RL;i=%d;l1=%d;i1=%d;l2=%d;i2=%d\">%s</a>"
-               (commd conf) (Adef.int_of_iper a.cle_index) x1
-               (Adef.int_of_iper p1.cle_index) x2
-               (Adef.int_of_iper p2.cle_index)
-               (transl conf "here");
-             if n > 1 then
-               Wserver.wprint "%s" (transl conf " to see the first branch")
-             else ();
+             if conf.cancel_links then ()
+             else
+               do Wserver.wprint ":\n%s " (transl conf "click");
+                  Wserver.wprint
+                    "<a href=\"%sm=RL;i=%d;l1=%d;i1=%d;l2=%d;i2=%d\">%s</a>"
+                    (commd conf) (Adef.int_of_iper a.cle_index) x1
+                    (Adef.int_of_iper p1.cle_index) x2
+                    (Adef.int_of_iper p2.cle_index)
+                    (transl conf "here");
+                  if n > 1 then
+                    Wserver.wprint "%s"
+                      (transl conf " to see the first branch")
+                  else ();
+               return ();
              Wserver.wprint ".</em>\n";
           return ())
        list;
@@ -247,20 +253,23 @@ value print_solution_not_ancestor conf base p1 p2 x1 x2 list =
                afficher_personne_sans_titre conf base a;
                afficher_titre conf base a;
                Wserver.wprint "\n<em>(";
-               Wserver.wprint "%d %s:\n" n
+               Wserver.wprint "%d %s" n
                  (transl_nth conf "relationship link/relationship links"
                     (if n = 1 then 0 else 1));
-               Wserver.wprint "%s" (transl conf "click");
-               Wserver.wprint
-                 " <a href=\"%sm=RL;i=%d;l1=%d;i1=%d;l2=%d;i2=%d\">"
-                 (commd conf) (Adef.int_of_iper a.cle_index) x1
-                 (Adef.int_of_iper p1.cle_index) x2
-                 (Adef.int_of_iper p2.cle_index);
-               Wserver.wprint "%s</a>" (transl conf "here");
-               if n > 1 then
-                 Wserver.wprint "%s"
-                   (transl conf " to see the first relationship link")
-               else ();
+               if conf.cancel_links then ()
+               else
+                 do Wserver.wprint ":\n%s" (transl conf "click");
+                    Wserver.wprint
+                      " <a href=\"%sm=RL;i=%d;l1=%d;i1=%d;l2=%d;i2=%d\">"
+                      (commd conf) (Adef.int_of_iper a.cle_index) x1
+                      (Adef.int_of_iper p1.cle_index) x2
+                      (Adef.int_of_iper p2.cle_index);
+                    Wserver.wprint "%s</a>" (transl conf "here");
+                    if n > 1 then
+                      Wserver.wprint "%s"
+                        (transl conf " to see the first relationship link")
+                    else ();
+                 return ();
                Wserver.wprint "</em>).\n";
             return ())
          list;
@@ -435,7 +444,8 @@ value print_main_relationship conf base p1 p2 rel =
                  html_p conf;
               return ()
             else ();
-            print_propose_upto conf base p1 p2 rl;
+            if conf.cancel_links then ()
+            else print_propose_upto conf base p1 p2 rl;
          return () ];
      trailer conf;
   return ()
