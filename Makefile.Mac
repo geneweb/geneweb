@@ -1,0 +1,97 @@
+# $Id: Makefile.Mac,v 3.1 2000-04-16 09:45:47 ddr Exp $
+
+#include tools/Makefile.inc
+
+all ÄÄ out
+
+out ÄÄ
+    directory :wserver; domake all; directory ::
+    directory :src; domake all; directory ::
+    directory :ged2gwb; domake all; directory ::
+    directory :gwb2ged; domake all; directory ::
+    directory :doc; domake all; directory ::
+
+#distrib: new_distrib wrappers
+
+#wrappers:
+#	if test "$(CAMLP4F)" = "-DWIN95"; then \
+#	  echo 'cd gw' > distribution/gwd.bat; \
+#	  echo 'gwd' >> distribution/gwd.bat; \
+#	  echo 'cd gw' > distribution/gwsetup.bat; \
+#	  echo 'gwsetup' >> distribution/gwsetup.bat; \
+#	else \
+#	  echo '#!/bin/sh' > distribution/gwd; \
+#	  echo 'cd gw; exec ./gwd' >> distribution/gwd; \
+#	  echo '#!/bin/sh' > distribution/gwsetup; \
+#	  echo 'cd gw; exec ./gwsetup' >> distribution/gwsetup; \
+#	  chmod +x distribution/gwd distribution/gwsetup; \
+#	fi
+
+#new_distrib: classical_distrib
+#	mkdir t
+#	mv distribution t/gw
+#	mv t distribution
+#	mkdir distribution/gw/old
+#	mkdir distribution/gw/setup
+#	cp setup/intro.txt distribution/gw/setup/.
+#	for i in de en es fr se; do \
+#	  mkdir distribution/gw/setup/$$i; \
+#	  cp setup/$$i/*.htm distribution/gw/setup/$$i; \
+#	  if test "$(CAMLP4F)" = "-DWIN95"; then \
+#	    cp setup/$$i/intro.txt.dos distribution/gw/setup/$$i/intro.txt; \
+#	  else \
+#	    cp setup/$$i/intro.txt distribution/gw/setup/$$i/intro.txt; \
+#	  fi; \
+#	done
+#	cp setup/gwsetup distribution/gw/gwsetup$(EXE)
+#	cp etc/README.distrib.txt distribution/README.txt
+#	cp etc/LISEZMOI.distrib.txt distribution/LISEZMOI.txt
+#	echo "127.0.0.1" > distribution/gw/only.txt
+
+classical_distrib Ä
+    delete -y -i :distribution
+    newfolder :distribution
+    duplicate -y CHANGES LICENSE :distribution:
+    duplicate -y :src:gwc :distribution:gwc
+    duplicate -y :src:consang :distribution:consang
+    duplicate -y :src:gwd :distribution:gwd
+    duplicate -y :src:gwu :distribution:gwu
+    duplicate -y :ged2gwb:ged2gwb :distribution:ged2gwb
+    duplicate -y :gwb2ged:gwb2ged :distribution:gwb2ged
+    duplicate -y :etc:LISEZMOI.txt :distribution:
+    duplicate -y :etc:README.txt :distribution:
+    duplicate -y :etc:INSTALL.htm :distribution:
+    duplicate -y :etc:a.gwf :distribution:
+    newfolder :distribution:doc
+    duplicate -y :doc:Å.htm :distribution:doc:
+    for i in de fr en nl se
+      newfolder :distribution:{i}
+      duplicate -y :doc:Å.htm :distribution:doc:{i}:
+    end
+    newfolder :distribution:doc:images
+    duplicate -y :doc:images:Å.jpg :distribution:doc:images:
+    duplicate -y :doc:images:gwlogo.gif :distribution:doc:images:
+    newfolder :distribution:lang
+    duplicate -y :hd:lang:Å.txt :distribution:lang:
+    for dir in af cn cs de dk en eo es fi fr he is it nl no pt ru se
+      newfolder -y :distribution:lang:{dir}
+      duplicate -y :hd:lang:{dir}:start.txt :distribution:lang:{dir}:
+    end
+    newfolder :distribution:images
+    duplicate -y :hd:images:Å.jpg :hd:images:Å.gif :distribution:images:
+    newfolder :distribution:etc
+    duplicate -y :hd:etc:Å.txt :distribtion:etc:
+
+clean Ä
+    directory :wserver; domake clean; directory ::
+    directory :src; domake clean; directory ::
+    directory :ged2gwb; domake clean; directory ::
+    directory :gwb2ged; domake clean; directory ::
+    directory :doc; domake clean; directory ::
+    delete -y -i :distribution
+
+depend Ä
+    directory :wserver; domake depend; directory ::
+    directory :src; domake depend; directory ::
+    directory :ged2gwb; domake depend; directory ::
+    directory :gwb2ged; domake depend; directory ::
