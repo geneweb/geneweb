@@ -1,4 +1,4 @@
-(* $Id: alln.ml,v 1.3 1998-11-21 10:54:08 ddr Exp $ *)
+(* $Id: alln.ml,v 1.4 1998-11-29 13:40:43 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -194,31 +194,6 @@ value afficher_tous_x proj mode is_fam conf base =
       [ Some x -> print_alphab mode conf base is_fam liste len x
       | _ -> print_menu mode conf base is_fam liste len par_frequence ]
   else print_all mode conf base is_fam liste len par_frequence
-;
-
-value first_alphabetique =
-  let iv_min = ref 500000 in
-  let i_min = ref 0 in
-  do for i = 0 to 255 do
-       let iv = valeur_alphabetique (Char.chr i) in
-       if iv < iv_min.val then do iv_min.val := iv; i_min.val := i; return ()
-       else ();
-     done;
-  return Char.chr (i_min.val)
-;
-
-value next_alphabetique c =
-  let v = valeur_alphabetique c in
-  let iv_min = ref 500000 in
-  let i_min = ref (-1) in
-  do for i = 0 to 255 do
-       let iv = valeur_alphabetique (Char.chr i) in
-       if iv > v && iv < iv_min.val then
-         do iv_min.val := iv; i_min.val := i; return ()
-       else ();
-     done;
-  return
-  if i_min.val = -1 then raise Not_found else Char.chr (i_min.val)
 ;
 
 value person_has_surname base key ip =

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 1.8 1998-11-28 18:54:02 ddr Exp $ *)
+(* $Id: family.ml,v 1.9 1998-11-29 13:40:44 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -40,8 +40,7 @@ value inconnu_au_bataillon conf =
 
 value inconnu conf n =
   let title _ =
-    Wserver.wprint "%s: \"%s\"" (capitale (transl conf "not found"))
-      (coa conf n)
+    Wserver.wprint "%s: \"%s\"" (capitale (transl conf "not found")) n
   in
   do header conf title; trailer conf; return ()
 ;

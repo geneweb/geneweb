@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 1.3 1998-11-27 20:09:41 ddr Exp $ *)
+(* $Id: gutil.mli,v 1.4 1998-11-29 13:40:44 ddr Exp $ *)
 
 open Def;
 
@@ -74,7 +74,6 @@ value check_base :
 
 value strip_controls_m : string -> string;
 value strip_spaces : string -> string;
-value valeur_alphabetique : char -> int;
 value alphabetique : string -> string -> int;
 value initiale : string -> int;
 
