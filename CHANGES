@@ -8,6 +8,10 @@ GeneWeb Version 1.11
       * in Esperanto: "aldoni personon"
           ("personon" instead of the incorrect "persono")
 
+* GeneWeb compiler (gwc)
+  - [18/01/99] Fixed two bugs in dates parsing: 1. "x..y" (between x and
+    y) was interpreted as "x|y" (x or y) 2. did not accept "d/m/y..y".
+
 * Lexicon file (lexicon.txt)
   - [16/01/99] Changed text "Date" into "Date (d/m/y)" in english version
     to be sure there is no ambiguity.
