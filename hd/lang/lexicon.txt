@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.92 2002-04-15 05:59:03 ddr Exp $
+# $Id: lexicon.txt,v 4.93 2002-04-15 09:53:37 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -167,7 +167,7 @@ no: %1 til %2
 pl: %1 :g:%2
 pt: %1 de %2
 ru: %1 :g:%2
-sl: %1 od %2
+sl: %1 od :g:%2
 sv: %1 till %2
 
     %1 of (same or greater generation level) %2
@@ -191,7 +191,7 @@ no: %1 av %2
 pl: %1 :g:%2
 pt: %1 de %2
 ru: %1 :g:%2
-sl: %1 od %2
+sl: %1 od :g:%2
 sv: %1 till %2
 
     %d years ago
@@ -545,7 +545,7 @@ no: s&oslash;ndag/mandag/tirsdag/onsdag/torsdag/fredag/l&oslash;rdag
 pl: niedziela:a:-к/poniedziaіek/wtorek/¶roda:a:-к/czwartek/pi±tek/sobota:a:-к
 pt: domingo/segunda-feira/ter&ccedil;a-feira/quarta-feira/quinta-feira/sexta-feira/s&aacute;bado
 ru: воскресенье/понедельник/вторник/среда/четверг/пятница
-sl: ponedeljek/torek/sreda/иetrtek/petek/sobota/nedelja
+sl: nedelja/ponedeljek/torek/sreda/иetrtek/petek/sobota
 sv: s&ouml;ndag/m&aring;ndag/tisdag/onsdag/torsdag/fredag/l&ouml;rdag
 
     *nth (cousin)*
@@ -786,7 +786,7 @@ no: %smenning
 pl: kuzyn %s-tego stopnia/kuzynka %s-tego stopnia
 pt: um primo em %s grau/uma prima em %s grau/um(a) primo(a) em %s grau
 ru: %s-ий кузен/%s-я кузина
-sl: bratranca v %s kolenu/sestriиne v %s kolenu
+sl: bratranec v %s kolenu/sestriиna v %s kolenu
 sv: %sm&auml;nning
 
     a 2nd cousin
@@ -810,7 +810,7 @@ no: tremenning
 pl: kuzyn/kuzynka drugiego stopnia
 pt: um primo em 2&ordm; grau/uma prima em 2&ordm; grau/um(a) primo(a) em 2&ordm; grau
 ru: троюродный брат/троюродная сестра
-sl: bratranca iz drugega kolena/sestriиne iz drugega kolena 
+sl: bratranec iz drugega kolena/sestriиna iz drugega kolena 
 sv: en syssling
 
     a 3rd cousin
@@ -834,7 +834,7 @@ no: firmenning
 pl: kuzyn/kuzynka trzeciego stopnia
 pt: um primo em 3&ordm; grau/uma prima em 3&ordm; grau/um(a) primo(a) em 3&ordm; grau
 ru: троюродный кузен/троюродная кузина
-sl: bratranecv tretjem kolenu/sestriиna v tretjem kolenu
+sl: bratranec v tretjem kolenu/sestriиna v tretjem kolenu
 sv: en brylling
 
     a brother-in-law/a sister-in-law
@@ -858,7 +858,7 @@ no: svoger/svigerinne
 pl: szwagier/szwagierka
 pt: um cunhado/uma cunhada
 ru: деверь-шурин/заловка-свояченица
-sl: svaka/svakinje
+sl: svak/svakinja
 sv: en sv&aring;ger/en sv&auml;gerska
 
     a brother/a sister/a sibling
@@ -906,7 +906,7 @@ no: fetter/kusine
 pl: kuzyn/kuzynka
 pt: um primo/uma prima
 ru: кузен/кузина
-sl: bratranca/sestriиne
+sl: bratranec/sestriиna
 sv: en kusin
 
     a descendant
@@ -930,7 +930,7 @@ no: etterkommer
 pl: potomek
 pt: um descendente/uma descendente
 ru: потомок
-sl: potomca
+sl: potomec
 sv: en &auml;ttling
 
     a grandfather/a grandmother/a grandparent
@@ -978,7 +978,7 @@ no: barnebarn/barnebarn/barnebarn
 pl: wnuk/wnuczka/wnuki
 pt: um neto/uma neta/um(a) neto(a)
 ru: внук/внучка/ребенок детей
-sl: vnuka/vnukinje/vnuka(inje)
+sl: vnuk/vnukinja/pravnuk ali pravnukinja
 sv: en sonson/en sondotter/ett barnbarn/en dotterson/en dotterdotter/ett barnbarn
 
     a great-grandfather/a great-grandmother/a great-grandparent
@@ -1002,7 +1002,7 @@ no: oldefar/oldemor/en av oldeforeldrene
 pl: pradziadek/prababka/pradziadkowie
 pt: um bisav&ocirc;/uma bisav&oacute;/um(a) bisav&ocirc;(&oacute;)
 ru: прапрадед/прапрабабка/прапрапрародитель
-sl: pradedka/prababice/prastarega star№a
+sl: pradedek/prababica/prastari star№
 sv: en gammel-farfar/en gammel-farmor/en gammel-farf&ouml;r&auml;lder/en gammel-morfar/en gammel-mormor/en gammel-morf&ouml;r&auml;lder
 
     a great-grandson/a great-granddaughter/a great-grandchild
@@ -1026,7 +1026,7 @@ no: oldebarn
 pl: prawnuk/prawnuczka/prawnuki
 pt: um bisneto/uma bisneta/um(a) bisneto(a)
 ru: праправнук/праправнучка/праправнук
-sl: pravnuk/pravnukinja/pravnuka ali pravnukinje
+sl: pravnuk/pravnukinja/pravnuk ali pravnukinja
 sv: en sonsons son/en sonsons dotter/ett barnbarns barn/en sondotters son/en sondotters dotter/ett barnbarns barn/en dottersons son/en dottersons dotter/ett barnbarns barn/en dotterdotters son/en dotterdotters dotter/ett barnbarns barn
 
     a great-nephew/a great-niece
@@ -1050,7 +1050,7 @@ no: grandnev&oslash;/grandniese
 pl: wnuk brata lub siostry/wnuczka brata lub siostry
 pt: um sobrinho-neto/uma sobrinha-neta
 ru: внучатый племянник/внучатая племянница
-sl: praneиaka/praneиakinje
+sl: praneиak/praneиakinja
 sv: en gammel-nev&ouml;/en gammel-niece
 
     a great-uncle/a great-aunt
@@ -1074,7 +1074,7 @@ no: en grandonkel/en grandtante
 pl: brat dziadka lub babki/siostra dziadka lub babki
 pt: um tio-av&ocirc;/uma tia-av&oacute;
 ru: дядя родителя/тетя родителя
-sl: prastrica/pratete
+sl: prastric/prateta
 sv: en gammel-farbror/en gammel-faster/en gammel-morbror/en gammel-moster
 
     a half-brother/a half-sister/a half-sibling
@@ -1098,7 +1098,7 @@ no: halvbror/halvs&oslash;ster/halvs&oslash;sken
 pl: brat przyrodni/siostra przyrodnia/przyrodni brat lub siostra
 pt: um meio-irm&atilde;o/uma meia-irm&atilde;/um(a) meio(a) irm&atilde;o(&atilde;)
 ru: полуродной брат/полуродная сестра/полуродной брат
-sl: polbrata/polsestre/polbrata ali polsestre
+sl: polbrata/polsestra/polbrat ali polsestra
 sv: en halvbror/en halvsyster/ett halvsyskon
 
     a nephew/a niece
@@ -1122,7 +1122,7 @@ no: nev&oslash;/niese
 pl: bratanek lub siostrzeniec/bratanica lub siostrzenica
 pt: um sobrinho/uma sobrinha
 ru: племянник/племянница
-sl: neиaka/neиakinje/neиaka ali neиakinje
+sl: neиak/neиakinja/neиak ali neиakinja
 sv: en nev&ouml;/en niece
 
     a son-in-law/a daughter-in-law
@@ -1146,7 +1146,7 @@ no: svigers&oslash;nn/svigerdatter
 pl: ziкж/synowa
 pt: um genro/uma nora
 ru: зять/невестка
-sl: zeta/snahe
+sl: zet/snaha
 sv: en m&aring;g/en sv&auml;rdotter
 
     a son/a daughter/a child
@@ -1170,7 +1170,7 @@ no: s&oslash;nn/datter/barn
 pl: syn/cуrka/dziecko
 pt: um filho/uma filha/um(a) filho(a)
 ru: сын/дочь/ребенок
-sl: sina/hиerke/otroka
+sl: sin/hиerka/otrok
 sv: en son/en dotter/ett barn
 
     about (date)
@@ -5087,7 +5087,7 @@ no: neste bror/neste s&oslash;ster/neste s&oslash;sken
 pl: nastкpny brat lub siostra
 pt: irm&atilde;o seguinte/irm&atilde; seguinte/irm&atilde;(o) seguinte
 ru: следующий брат/следующая сестра
-sl: naslednji brat/naslednja sestra
+sl: mlaj№i brat/mlaj№a sestra
 sv: n&auml;sta bror/n&auml;sta syster/n&auml;sta syskon
 
     no anniversary
@@ -5906,7 +5906,7 @@ no: forrige bror/forrige s&oslash;ster/forrige s&oslash;sken
 pl: poprzedni brat lub siostra
 pt: irm&atilde;o precedente/irm&atilde; precedente/irm&atilde;(o) precedente
 ru: предшествующий брат/предшествующая сестра
-sl: prej№nji brat/prej№nja sestra
+sl: starej№i brat/starej№a sestra
 sv: f&ouml;reg&aring;ende bror/f&ouml;reg&aring;ende syster/f&ouml;reg&aring;ende syskon
 
     private
@@ -7378,7 +7378,7 @@ no: maken
 pl: m±ї/їona
 pt: o marido/a esposa
 ru: муж/жена
-sl: moѕa/ѕene
+sl: moѕ/ѕena
 sv: maken/makan
 
     the whole list
@@ -7450,7 +7450,7 @@ no: for &aring; tilf&oslash;ye et barn til en familie, bruk "%s"
 pl: aby dodaж dziecko do pary rodzicуw uїyj "%s"
 pt: para acrescentar um filho a uma fam&iacute;lia utilizar "%s"
 ru: чтобы добавить ребенка к семье, используй "%s"
-sl: da bi dodal otroka k druѕini, uporabi "%s"
+sl: da bi dodal otroka k druѕini, uporabite "%s"
 sv: f&ouml;r att l&auml;gga till ett barn i en familj, anv&auml;nd "%s"
 
     to the %s generation
