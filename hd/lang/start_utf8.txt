@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.5 2005-02-05 13:34:34 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.6 2005-02-22 17:54:30 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -56,6 +56,7 @@ valign="top"><em>([wizard/wizards/friend/friends]2)</em></td>
 <table border="0">
 <tr align="center"><td align="center"><h1><span style="color: %i">[
 af: Genealogiese databasis
+ar: قاعدة المعلومات العائلية (جينيالوجيا)
 bg: Родословна база от данни
 br: Bon roadoù genealogiezh
 ca: Base de dades geneal&ograve;gica
