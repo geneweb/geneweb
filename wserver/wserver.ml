@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.14 2002-02-24 12:43:42 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.15 2002-02-27 16:15:20 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -495,21 +495,10 @@ value skip_possible_remaining_chars fd =
         match Unix.select [fd] [] [] 5.0 with
         [ ([_], [], []) ->
             let len = Unix.read fd b 0 (String.length b) in
-            do {
-              if len > 0 then do {
-                Printf.eprintf "epilog (%d): read %d chars after end: \"%s\"\n"
-                  x len (String.escaped (String.sub b 0 len));
-                flush stderr;
-              }
-              else ();
-              if len = String.length b then loop () else ()
-            }
-        | _ ->
-            Printf.eprintf "epilog (%d): nothing to read\n" x ]
+            if len = String.length b then loop () else ()
+        | _ -> () ]
     with
-    [ Unix.Unix_error Unix.ECONNRESET _ _ ->
-        Printf.eprintf "epilog (%d): disconnection\n" x ];
-    flush stderr;
+    [ Unix.Unix_error Unix.ECONNRESET _ _ -> () ]
   }
 ;
 
