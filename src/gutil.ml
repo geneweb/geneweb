@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.18 2000-11-11 12:50:48 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.19 2000-11-11 15:42:16 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -628,7 +628,7 @@ value titles_after_birth base warning p t =
   return ()
 ;
 
-value sex_is_coherent base warning p_ref =
+value related_sex_is_coherent base warning p_ref =
   let p_index = Some p_ref.cle_index in
   let merge_sex g1 g2 =
     match (g1, g2) with
@@ -658,6 +658,23 @@ value sex_is_coherent base warning p_ref =
   match new_sex with
   [ Some g -> if p_ref.sex != g then p_ref.sex := g else () 
   | None -> warning (IncoherentSex p_ref) ]
+;
+
+value relation_sex_is_coherent base warning p =
+  List.iter
+    (fun r ->
+       do match r.r_fath with
+          [ Some ip ->
+              let p = poi base ip in
+              if p.sex <> Male then warning (IncoherentSex p) else ()
+          | None -> () ];
+          match r.r_moth with
+          [ Some ip ->
+              let p = poi base ip in
+              if p.sex <> Female then warning (IncoherentSex p) else ()
+          | None -> () ];
+       return ())
+    p.rparents
 ;
 
 value check_normal_marriage_date_for_someone base error warning fam ip =
@@ -767,7 +784,8 @@ value check_family base error warning fam cpl des =
 value check_person base error warning p =
   do birth_before_death base warning p;
      List.iter (titles_after_birth base warning p) p.titles;
-     sex_is_coherent base warning p;
+     related_sex_is_coherent base warning p;
+     relation_sex_is_coherent base warning p;
   return ()
 ;
 
