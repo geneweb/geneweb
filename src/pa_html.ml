@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_html.ml,v 4.4 2004-12-28 15:13:01 ddr Exp $ *)
+(* $Id: pa_html.ml,v 4.5 2004-12-31 03:59:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Pcaml;
@@ -54,7 +54,7 @@ value tag_alone loc tag a =
     List.fold_left (fun f e -> <:expr< $f$ $e$ >>)
       <:expr< Wserver.wprint $str:"<" ^ tag ^ frm ^ "%s>" ^ s$ >> al
   in
-  <:expr< $e$ xhs >>
+  <:expr< $e$ conf.xhs >>
 ;
 
 EXTEND

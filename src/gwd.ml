@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.72 2004-12-29 21:29:01 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.73 2004-12-31 03:59:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -965,6 +965,10 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
            (if lang = "" then [] else [("lang", lang)]) @
            (if from = "" then [] else [("opt", from)]);
        base_env = base_env; request = request; lexicon = lexicon;
+       xhs =
+         match p_getenv  base_env "doctype" with
+         [ Some "xhtml-1.1" -> " /"
+         | _ -> "" ];
        charset =
          try Hashtbl.find lexicon " !charset" with
          [ Not_found -> "iso-8859-1" ];

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.27 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.28 2004-12-31 03:59:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -259,14 +259,14 @@ value macro conf base =
       if s = "rtl" then "left" else "right"
   | 's' -> commd conf
   | 't' -> conf.bname
-  | 'T' -> Util.doctype
+  | 'T' -> Util.doctype conf
   | 'U' ->
       if (conf.wizard || conf.just_friend_wizard) && conf.user <> "" then
         ": " ^ conf.user
       else ""
   | 'v' -> Version.txt
   | 'w' -> let s = Util.link_to_referer conf in if s = "" then "&nbsp;" else s
-  | '/' -> Util.xhs
+  | '/' -> conf.xhs
   | c -> "%" ^ String.make 1 c ]
 ;
 

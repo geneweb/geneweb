@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.24 2004-12-29 01:16:17 ddr Exp $ *)
+(* $Id: templ.ml,v 4.25 2004-12-31 03:59:53 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -463,17 +463,17 @@ value not_impl func x =
   "Templ." ^ func ^ ": not impl " ^ desc
 ;
 
-value eval_variable =
+value eval_variable conf =
   fun
   [ "sp" -> " "
-  | "/" -> Util.xhs
+  | "/" -> conf.xhs
   | s -> "%%%" ^ s ^ "???" ]
 ;
 
-value eval_ast =
+value eval_ast conf =
   fun
   [ Atext s -> s
-  | Avar s [] -> eval_variable s
+  | Avar s [] -> eval_variable conf s
   | x -> not_impl "eval_ast" x ]
 ;
 
@@ -498,7 +498,7 @@ value eval_transl_lexicon conf upp s c =
               let s = String.sub s2 i (j - i) in
               let astl = parse_templ conf (Stream.of_string s) in
               let astl = strip_newlines_after_variables astl in
-              List.fold_left (fun s a -> s ^ eval_ast a) "" astl
+              List.fold_left (fun s a -> s ^ eval_ast conf a) "" astl
             in
             let s4 = String.sub s2 k (String.length s2 - k) in
             let s5 =
@@ -625,7 +625,7 @@ value print_copyright conf base =
         in
         if not conf.setup_link then s
         else s ^ " - " ^ Util.setup_link conf);
-     ('/', fun _ -> Util.xhs)]
+     ('/', fun _ -> conf.xhs)]
   in
   match open_etc_file "copyr" with
   [ Some ic -> copy_from_etc env conf.lang conf.indep_command ic
@@ -646,7 +646,7 @@ value print_variable conf base =
   | "base_trailer" -> include_hed_trl conf (Some base) ".trl"
   | "body_prop" -> print_body_prop conf base
   | "copyright" -> print_copyright conf base
-  | "doctype" -> Wserver.wprint "%s\n" Util.doctype
+  | "doctype" -> Wserver.wprint "%s\n" (Util.doctype conf)
   | "hidden" -> Util.hidden_env conf
   | "highlight" -> Wserver.wprint "%s" conf.highlight
   | "image_prefix" -> Wserver.wprint "%s" (image_prefix conf)
@@ -655,6 +655,6 @@ value print_variable conf base =
   | "nn" -> ()
   | "prefix" -> Wserver.wprint "%s" (commd conf)
   | "sp" -> Wserver.wprint " "
-  | "/" -> Wserver.wprint "%s" Util.xhs
+  | "/" -> Wserver.wprint "%s" conf.xhs
   | s -> Wserver.wprint ">%%%s???" s ]
 ;

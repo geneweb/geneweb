@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.24 2004-11-09 12:33:49 ddr Exp $
+# $Id: a.gwf,v 4.25 2004-12-31 03:59:53 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -50,6 +50,9 @@ wizard_passwd_file=
 # Wizard loosing his powers, becoming just a "friend"
 # Set it to "yes" or "no"
 wizard_just_friend=no
+
+# Generates pages with DOCTYPE XHTML 1.1 (default HTML 4.01).
+# doctype=xhtml-1.1
 
 # File recording a black list for the database forum.
 # forum_exclude_file=

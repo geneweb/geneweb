@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.35 2004-12-30 21:20:05 ddr Exp $ *)
+(* $Id: util.mli,v 4.36 2004-12-31 03:59:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -190,8 +190,7 @@ value browser_doesnt_have_tables : config -> bool;
 
 value start_with : string -> int -> string -> bool;
 
-value xhs : string;
-value doctype : string;
+value doctype : config -> string;
 
 value begin_centered : config -> unit;
 value end_centered : config -> unit;

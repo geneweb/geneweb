@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.58 2004-12-30 18:50:19 ddr Exp $ *)
+(* $Id: relation.ml,v 4.59 2004-12-31 03:59:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -16,9 +16,8 @@ value print_with_relation text conf base p r is =
       if is_hidden c then ()
       else
         tag "li" begin        
-          Wserver.wprint
-            "<input type=\"radio\" name=\"select\" value=\"%d\"%s>\n"
-            (Adef.int_of_iper ic) xhs;
+          xtag "input" "type=\"radio\" name=\"select\" value=\"%d\""
+            (Adef.int_of_iper ic);
           Wserver.wprint "(%s)\n" (text conf r.r_type is);
           Wserver.wprint "%s\n" (person_title_text conf base c);
         end
@@ -50,8 +49,8 @@ value print_with_witness conf base p fam ip =
   if is_hidden w then ()
   else do {
     html_li conf;
-    Wserver.wprint "<input type=\"radio\" name=\"select\" value=\"%d\"%s>\n"
-      (Adef.int_of_iper ip) xhs;
+    xtag "input" "type=\"radio\" name=\"select\" value=\"%d\""
+      (Adef.int_of_iper ip);
     Wserver.wprint "(%s)\n"
       (nominative (transl_nth conf "witness/witnesses" 0));
     Wserver.wprint "%s\n" (person_title_text conf base w)
@@ -80,20 +79,19 @@ value print_menu conf base p =
     tag "form" "method=\"get\" action=\"%s\"" conf.command begin
       tag "p" begin
         Util.hidden_env conf;
-        Wserver.wprint
-          "<input type=\"hidden\" name=\"em\" value=\"R\"%s>\n" xhs;
+        xtag "input" "type=\"hidden\" name=\"em\" value=\"R\"";
         wprint_hidden_person conf base "e" p;
       end;
       tag "ul" begin
         tag "li" begin
-          Wserver.wprint "\
-<input type=\"hidden\" name=\"m\" value=\"NG\"%s>
-<input type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"%s>
-<input name=\"n\" size=\"40\" maxlength=\"200\"%s>\n" xhs xhs xhs;
+          xtag "input" "type=\"hidden\" name=\"m\" value=\"NG\"";
+          xtag "input" "\
+type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
+          xtag "input" "name=\"n\" size=\"40\" maxlength=\"200\"";
           tag "ul" begin
             tag "li" begin
-              Wserver.wprint "\
-<input type=\"radio\" name=\"t\" value=\"PN\" checked=\"checked\"%s>\n" xhs;
+              xtag "input"
+                "type=\"radio\" name=\"t\" value=\"PN\" checked=\"checked\"";
               Wserver.wprint "<em>%s %s</em> %s <em>%s</em> %s <em>%s</em>\n"
                 (transl_nth conf "first name/first names" 0)
                 (transl_nth conf "surname/surnames" 0) (transl conf "or")
@@ -112,14 +110,17 @@ value print_menu conf base p =
               | None -> () ];
             end;
             stagn "li" begin
-              Wserver.wprint
-                "<input type=\"radio\" name=\"t\" value=\"P\"%s> <em>%s</em>"
-                xhs (transl_nth conf "first name/first names" 0);
+              xtag "input" "type=\"radio\" name=\"t\" value=\"P\"";
+              stag "em" begin
+                Wserver.wprint "%s"
+                  (transl_nth conf "first name/first names" 0);
+              end;
             end;
             stagn "li" begin
-              Wserver.wprint
-                "<input type=\"radio\" name=\"t\" value=\"N\"%s> <em>%s</em>"
-                xhs (transl_nth conf "surname/surnames" 0);
+              xtag "input" "type=\"radio\" name=\"t\" value=\"N\"";
+              stag "em" begin
+                Wserver.wprint "%s" (transl_nth conf "surname/surnames" 0);
+              end;
             end;
           end;
         end;
@@ -133,9 +134,8 @@ value print_menu conf base p =
                 && not (is_hidden c)
              then
                tag "li" begin
-                 Wserver.wprint
-                   "<input type=\"radio\" name=\"select\" value=\"%d\"%s>\n"
-                   (Adef.int_of_iper c.cle_index) xhs;
+                 xtag "input" "type=\"radio\" name=\"select\" value=\"%d\""
+                   (Adef.int_of_iper c.cle_index);
                  Wserver.wprint "%s\n" (person_title_text conf base c);
                end
              else ())
@@ -158,35 +158,29 @@ value print_menu conf base p =
         tag "tr" begin
           tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n" (capitale (transl conf "long display"));
-            Wserver.wprint
-              "<input type=\"checkbox\" name=\"long\" value=\"on\"%s>\n" xhs;
+            xtag "input" "type=\"checkbox\" name=\"long\" value=\"on\"";
           end;
           tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n"
               (capitale (transl_nth conf "image/images" 1));
-            Wserver.wprint
-              "<input type=\"checkbox\" name=\"image\" value=\"on\"%s>\n" xhs;
+            xtag "input" "type=\"checkbox\" name=\"image\" value=\"on\"";
           end;
         end;
         tag "tr" begin
           tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
-            Wserver.wprint
-              "<input type=\"checkbox\" name=\"spouse\" value=\"on\"%s>\n" xhs;
+            xtag "input" "type=\"checkbox\" name=\"spouse\" value=\"on\"";
           end;
           tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n"
               (capitale (transl conf "cancel GeneWeb links"));
-            Wserver.wprint
-              "<input type=\"checkbox\" name=\"cgl\" value=\"on\"%s>\n" xhs;
+            xtag "input" "type=\"checkbox\" name=\"cgl\" value=\"on\"";
           end;
         end;
         tag "tr" begin
           tag "td" "align=\"right\"" begin
             Wserver.wprint "%s\n" (capitale (transl conf "border"));
-            Wserver.wprint
-              "<input name=\"bd\" size=\"1\" maxlength=\"2\" value=\"0\"%s>\n"
-              xhs;
+            xtag "input" "name=\"bd\" size=\"1\" maxlength=\"2\" value=\"0\"";
           end;
           tag "td" "align=\"right\"" begin
             Wserver.wprint "\
@@ -194,12 +188,12 @@ value print_menu conf base p =
 <td>
 <input type=\"radio\" name=\"color\" value=\"\" checked=\"checked\"%s>
 </td>\n"
-              (capitale (transl conf "color")) xhs;
+              (capitale (transl conf "color")) conf.xhs;
             List.iter
               (fun c ->
                  Wserver.wprint "\
 <td style=\"background:#%s\">
-<input type=\"radio\" name=\"color\" value=\"#%s\"%s></td>\n" c c xhs)
+<input type=\"radio\" name=\"color\" value=\"#%s\"%s></td>\n" c c conf.xhs)
               ["FFC0C0"; "FFFFC0"; "C0FFC0"; "C0FFFF"; "C0C0FF"; "FFC0FF"];
             Wserver.wprint "</tr></table>\n";
           end;
@@ -215,24 +209,22 @@ value print_menu conf base p =
         tag "tr" "align=\"left\"" begin
           tag "td" "align=\"center\" colspan=\"2\"" begin
             Wserver.wprint "<table><tr align=\"left\"><td>\n";
-            Wserver.wprint "\
-<input type=\"radio\" name=\"et\" value=\"A\" checked=\"checked\"%s>\n" xhs;
+            xtag "input"
+              "type=\"radio\" name=\"et\" value=\"A\" checked=\"checked\"";
             Wserver.wprint "%s<br%s>\n" (capitale (transl conf "ancestors"))
-              xhs;
-            Wserver.wprint
-              "<input type=\"radio\" name=\"et\" value=\"M\"%s>\n" xhs;
+              conf.xhs;
+            xtag "input" "type=\"radio\" name=\"et\" value=\"M\"";
             Wserver.wprint "%s<br%s>\n"
-              (capitale (transl conf "relationships by marriage")) xhs;
-            Wserver.wprint
-              "<input type=\"radio\" name=\"et\" value=\"S\"%s>\n" xhs;
+              (capitale (transl conf "relationships by marriage")) conf.xhs;
+            xtag "input" "type=\"radio\" name=\"et\" value=\"S\"";
             Wserver.wprint "%s<br%s>\n"
-              (capitale (transl conf "shortest path")) xhs;
+              (capitale (transl conf "shortest path")) conf.xhs;
             Wserver.wprint "</td></tr></table>\n";
           end;
         end;
         tag "tr" "align=\"left\"" begin
           tag "td" "align=\"center\" colspan=\"2\"" begin
-            Wserver.wprint "<input type=\"submit\" value=\"Ok\"%s>\n" xhs;
+            xtag "input" "type=\"submit\" value=\"Ok\"";
           end;
         end;
       end;
