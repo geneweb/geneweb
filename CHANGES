@@ -2,6 +2,8 @@ GeneWeb version 4.04
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [17 Dec 01] In cousins displaying, added button to include the
+    spouses (code written by Ludovic Ledieu).
   - [01 Dec 01] Fixed problem in case of changing a person's name, if
     the new name entered in conflict with somebody els&eacute;s (same
     "keys"). The proposed link "click here to try again" with the first
