@@ -1,0 +1,1337 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: gwf_1.htm,v 1.1 2002-01-13 18:59:32 ddr Exp $ -->
+  <title>[
+de: Parameter "$a"
+en: Parameters "$a"
+es: Par&aacute;metros "$a"
+fr: Param&egrave;tres "$a"
+lv: "$a" parametri
+sv: Parametrar "$a"
+]</title>
+</head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>[
+de: Parameter "$a"
+en: Parameters "$a"
+es: Par&aacute;metros "$a"
+fr: Param&egrave;tres "$a"
+lv: "$a" parametri
+sv: Parametrar "$a"
+]</font></h1></center>
+
+<p><p>
+
+<form method=POST action="gwf_1">
+<input type=hidden name=lang value=$l>
+<input type=hidden name=anon value=$a>
+
+<p>
+
+[
+de: Hier sind die Parameter der Datenbank <a
+    href="http://$m:2317/$a">$a</a>. 
+    Nimm die ge&uuml;nschten &Auml;nderungen vor:
+en: Here are the parameters of the base <a
+    href="http://$m:2317/$a">$a</a>. Change what you estimate
+    necessary:
+es: He aqu&iacute; los par&aacute;metros de la base <a
+    href="http://$m:2317/$a">$a</a>. Cambie aquellos que Ud. estime
+    necesarios:
+fr: Voici les param&egrave;tres de la base <a
+    href="http://$m:2317/$a">$a</a>. Effectuez les modifications de
+    votre choix:
+lv: Sekojoðie ir datu bâzes <a
+    href="http://$m:2317/$a">$a</a> parametri. Mainiet, ja kas Jums ðíiet
+    nepiecieðams:
+sv: Här är parametrarna för databasen <a
+    href="http://$m:2317/$a">$a</a>. Ändra vad du anser nödvändigt:
+]
+
+<p>
+
+<dl><dt>
+<dd><table border=1>
+<tr align=left>
+<td><strong>- body_prop -</strong></td>
+</tr>
+
+<tr align=left>
+<td>[
+de: Erlaubt die &Auml;nderung der Hintergrundfarbe oder das Hinzuf&uuml;gen
+    eines Hintergrundmusters, sowie das &Auml;ndern der Farbe von Text und
+    Links. Seine Syntax entspricht der, die im HTML im 
+    "&lt;body&gt;"-Tag vor dem "&gt;" erlaubt ist. Details findest du
+    in deiner HTML-Dokumentation. Beispiel:
+en: Allows to change the background color, put a background pattern,
+    or change the color of the text or the links. Its syntax is the one
+    of HTML accepted in the tag "&lt;body&gt;" before the "&gt;". See your
+    HTML documentation. Example:
+es: Permite de configurar los colores de fondo, o de introducir un motivo asi
+    como de cambiar el color del texto y de los enlaces. Su sintaxis es la
+    sintaxis HTML aceptada en el "tag" "&lt;body&gt;" antes de "&gt;". Lea
+    Ud. su documentaci&oacute;n HTML. Por ejemplo:
+fr: Permet de configurer les couleurs de fond, ou d'y mettre un motif
+    et de changer la couleur du texte et des liens. Sa syntaxe est la
+    syntaxe HTML acceptée dans le tag "&lt;body&gt;" avant le "&gt;". Voyez
+    votre documentation HTML. Exemple:
+lv: Ar ðo Jûs variet mainît fonu, fona krâsu un arî norâþu krâsu. Ðî
+    parametra sintakse atbilst HTML sintaksei pie "&lt;body&gt;" pirms
+    "&gt;". Skatiet HTML dokumentâciju. Piemçram:
+sv: Gör det möjligt att ändra bakgrunds färgen, att sätta in ett bakgrunds
+    mönster eller att ändra färgen för texten eller länkarna. Syntaxen är
+    den samma som HTML accepterar i taggen "&lt;body&gt;" före "&gt;". Se din
+    HTML dokumentation. Exempel:
+]
+
+<p>
+<pre>
+     text=#CC0000 vlink=yellow
+</pre>
+<p>
+
+[
+de: Ein paar interessante Variablen... 
+en: Some interesting variables...
+es: Algunas variable interesantes...
+fr: Quelques variables int&eacute;ressantes...
+lv: Daþas nozîmîgâkâs vçrtîbas...
+sv: Några intressanta variabler...
+]
+
+<ul>
+<li>background:
+[
+de: Hintergrundbild (siehe auch diesen <a
+    href="gwsetup?lang=$l;o=$a;v=backg.htm">Hinweis</a>)
+en: background image (see the <a
+    href="gwsetup?lang=$l;o=$a;v=backg.htm">note</a>)
+es: imagen de fondo (vea la <a
+    href="gwsetup?lang=$l;o=$a;v=backg.htm">nota</a>)
+fr: image de fond (voir la <a
+    href="gwsetup?lang=$l;o=$a;v=backg.htm">note</a>)
+lv: fona attçls (skatiet <a
+    href="gwsetup?lang=$l;o=$a;v=backg.htm">piezîmi</a>)
+sv: bakgrundsbild (se <a
+    href="gwsetup?lang=$l;o=$a;v=backg.htm">noteringen</a>)
+]
+
+<li>bgcolor:
+[
+de: Hintergrundfarbe
+en: background color
+es: color de fondo
+fr: couleur de fond
+lv: fona krâsa
+sv: bakgrundsfärg
+]
+
+<li>text:
+[
+de: Textfarbe
+en: text color
+es: color del texto
+fr: couleur du texte
+lv: teksta krâsa
+sv: textfärg
+]
+
+<li>link:
+[
+de: Linkfarbe
+en: links color
+es: color de los enlaces
+fr: couleur des liens
+lv: norâþu krâsa
+sv: länkfärg
+]
+
+<li>vlink:
+[
+de: Farbe f&uuml;r bereits besuchte Links
+en: color of already visited links
+es: color de los enlaces que ya han sido visitados
+fr: couleur des liens d&eacute;j&agrave; visit&eacute;s
+lv: izmantoto norâþu krâsa
+sv: färg för de redan besökta länkarna
+]
+
+</ul>
+
+<p>
+
+[
+de: Du kannst auch eine der vorgeschlagenen Farbkombinationen w&auml;hlen.
+en: You can also select one of the proposed colors combinations.
+es: Ud. puede asi mismo seleccionar una de las combinaciones de colores
+    propuesta.
+fr: Vous pouvez aussi s&eacute;lectionner une des combinaisons de couleurs
+    propos&eacute;es.
+lv: Jûs variet arî izvçlçties arî kâdu no sekojoðâm gatavajâm krâsu
+    kombinâcijâm.
+sv: Du kan också välja en av följande föreslagna färg kombinationer.
+]
+
+<p>
+
+[
+de: Diese Konfiguration gilt nicht nur f&uuml;r die Willkommensseite,
+    sondern f&uuml;r alle Seiten dieser Datenbank.
+en: This applies not only to the welcome page but to all the displayed pages
+    for this database.
+es: Esto se aplica no solamente a la "P&aacute;gina de Recepci&oacute;n", sino
+    tambi&eacute;n, a todas las p&aacute;ginas de esta base visualizables en
+    la pantalla.
+fr: Ceci s'applique non seulement à la page d'accueil mais à toutes les pages
+    affichées de cette base.
+lv: Ðâdi tiks attçlota ne tikai sveicinâjuma lappause, bet arî uz visâm
+    pârçjâm datu bâzes lappusçm.
+sv: Detta gäller inte bara för välkomstsidan utan för alla visade sidor
+    för denna databas.
+]
+
+</td>
+</tr>
+
+<tr align=left><td align=center>
+<table border=0>
+<tr align=left>
+<td colspan=3>
+<input type=radio name=proposed_body_prop value="" checked>
+<input name=body_prop value="$B" size=55><br>
+</td>
+</tr>
+
+<tr align=left>
+
+<td bgcolor="#FFFFFF">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFFFF text=#333333 link=#006699 vlink=#999900">
+<font color="#333333">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#006699">[
+de: link
+en: link 
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#999900">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#FFFFEE">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFFEE text=#000000 link=#006699 vlink=#990000">
+<font color="#000000">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#006699">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#990000">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#CCCCCC">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCCCCC text=#000000 link=#0000CC vlink=#660066">
+<font color="#000000">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#0000CC">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#660066">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+</tr>
+<tr align=left>
+
+<td bgcolor="#FFFF00">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFF00 text=#FF6600 link=#FF0033 vlink=#336633">
+<font color="#FF6600">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#FF0033">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#336633">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#CCCC66">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCCC66 text=#330000 link=#CC0000 vlink=#003300">
+<font color="#330000">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#CC0000">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#003300">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#FFFF99">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFF99 text=#330000 link=#CC0000 vlink=#333333">
+<font color="#330000">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#CC0000">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#333333">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+</tr>
+<tr align=left>
+
+<td bgcolor="#99CCCC">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#99CCCC text=#000066 link=#0000CC vlink=#003366">
+<font color="#000066">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#0000CC">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#003366">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#CC99FF">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CC99FF text=#000000 link=#FF0033 vlink=#660066">
+<font color="#000000">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#FF0033">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#660066">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#CCFF99">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCFF99 text=#666600 link=#006699 vlink=#003300">
+<font color="#666600">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#006699">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#003300">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+</tr>
+<tr align=left>
+
+<td bgcolor="#FFCC00">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFCC00 text=#330000 link=#CC0000 vlink=#660066">
+<font color="#330000">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#CC0000">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#660066">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#00FF33">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#00FF33 text=#0000CC link=#FF0099 vlink=#660066">
+<font color="#0000CC">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#FF0099">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#660066">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#006699">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#006699 text=#CCFFCC link=#FFFF00 vlink=#00FFFF">
+<font color="#CCFFCC">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#FFFF00">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#00FFFF">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+</tr>
+<tr align=left>
+
+<td bgcolor="#330000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#330000 text=#FF6666 link=#FFCC00 vlink=#CCFF99">
+<font color="#FF6666">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#FFCC00">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#CCFF99">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#003300">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#003300 text=#CCCC66 link=#FFFFFF vlink=#FFFF00">
+<font color="#CCCC66">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#FFFFFF">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#FFFF00">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#333333">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#333333 text=#CCCCCC link=#FF6666 vlink=#CCCC66">
+<font color="#CCCCCC">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#FF6666">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#CCCC66">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+</tr>
+<tr align=left>
+
+<td bgcolor="#666600">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#666600 text=#FFFFFF link=#FFFF00 vlink=#99CCFF">
+<font color="#FFFFFF">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#FFFF00">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#99CCFF">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#000000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#000000 text=#99CCFF link=#FFFF00 vlink=#CCCC66">
+<font color="#99CCFF">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#FFFF00">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#CCCC66">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+<td bgcolor="#333333">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#333333 text=#FFFFFF link=#99CCFF vlink=#CC99FF">
+<font color="#FFFFFF">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#99CCFF">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#CC99FF">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+</tr>
+<tr align=left>
+
+<td bgcolor="#CC0000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF">
+<font color="#FFFFFF">[
+de: text
+en: text
+es: texto
+fr: texte
+lv: text
+sv: text
+]</font>
+<font color="#FFFF00">[
+de: link
+en: link
+es: enlace
+fr: lien
+lv: link
+sv: link
+]</font>
+<font color="#00FFFF">[
+de: vlink
+en: vlink
+es: visitado
+fr: visit&eacute;
+lv: vlink
+sv: vlink
+]</font>
+</td>
+
+</tr>
+
+</table>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td><strong>- default_lang -</strong></td>
+</tr>
+
+<tr align=left>
+<td>[
+de: Standardsprache.
+en: Default language.
+es: Lenguaje por defecto.
+fr: Langue par d&eacute;faut.
+lv: Noklusçtâ valoda.
+sv: Förvalt språk.
+]
+
+<p>
+
+[
+de: Wenn dieser Wert "-" ist, wird die Standardsprache des Kommandos "gwd"
+    verwendet.
+en: If it is "-", the default language of the command "gwd" is applied.
+es: Si es "-", es el lenguaje por defecto del comando "gwd"
+    que se tendr&aacute; en cuenta.
+fr: Si c'est "-", c'est la langue par d&eacute;faut de la commande "gwd"
+    qui sera prise.
+lv: Ja atstâsiet vçrtîbu "-", noklusçtâ valoda bûs tâ pati, kas "gwd" komandai.
+sv: Om det är "-", kommer det förvalda språket för kommandot "gwd" att gälla.
+]</td>
+
+</tr>
+
+<tr align=left>
+<td align=center>
+<select name=default_lang>
+<option value=$L{}>-
+[
+de: <option value=$L{zh}>Chinesisch
+    <option value=$L{da}>D&auml;nish
+    <option value=$L{de}>Deutsch
+    <option value=$L{en}>Englisch
+    <option value=$L{eo}>Esperanto
+    <option value=$L{fr}>Franz&ouml;sisch
+    <option value=$L{he}>Hebr&auml;isch
+    <option value=$L{nl}>Holl&auml;ndisch
+    <option value=$L{is}>Isl&auml;ndisch
+    <option value=$L{it}>Italienisch
+    <option value=$L{no}>Norwegisch
+    <option value=$L{pt}>Portugiesisch
+    <option value=$L{es}>Spanisch
+    <option value=$L{sv}>Schwedisch
+    <option value=$L{cs}>Tschechisch
+en: <option value=$L{}>-
+    <option value=$L{af}>Afrikaans
+    <option value=$L{br-pt}>Brazilian
+    <option value=$L{ca}>Catalan
+    <option value=$L{zh}>Chinese
+    <option value=$L{cs}>Czech
+    <option value=$L{da}>Danish
+    <option value=$L{nl}>Dutch
+    <option value=$L{en}>English
+    <option value=$L{eo}>Esperanto
+    <option value=$L{et}>Estonian
+    <option value=$L{fi}>Finnish
+    <option value=$L{fr}>French
+    <option value=$L{de}>German
+    <option value=$L{he}>Hebrew
+    <option value=$L{is}>Icelandic
+    <option value=$L{it}>Italian
+    <option value=$L{lv}>Latvian
+    <option value=$L{no}>Norwegian
+    <option value=$L{pl}>Polish
+    <option value=$L{pt}>Portuguese
+    <option value=$L{es}>Spanish
+    <option value=$L{ru}>Russian
+    <option value=$L{sv}>Swedish
+es: <option value=$L{de}>Alem&aacute;n
+    <option value=$L{cs}>Checo
+    <option value=$L{zh}>Chino
+    <option value=$L{da}>Dan&eacute;s
+    <option value=$L{es}>Espa&ntilde;ol
+    <option value=$L{eo}>Esperanto
+    <option value=$L{fr}>Franc&eacute;s
+    <option value=$L{he}>Hebreo
+    <option value=$L{en}>Ingl&eacute;s
+    <option value=$L{it}>Italiano
+    <option value=$L{nl}>N&eacute;erlandes
+    <option value=$L{no}>Noruego
+    <option value=$L{pt}>Portug&eacute;s
+    <option value=$L{sv}>Sueco
+fr: <option value=$L{af}>Afrikaans
+    <option value=$L{pt-br}>Br&eacute;silien
+    <option value=$L{de}>Allemand
+    <option value=$L{en}>Anglais
+    <option value=$L{ca}>Catalan
+    <option value=$L{zh}>Chinois
+    <option value=$L{da}>Danois
+    <option value=$L{es}>Espagnol
+    <option value=$L{eo}>Esp&eacute;ranto
+    <option value=$L{et}>Estonien
+    <option value=$L{fi}>Finlandais
+    <option value=$L{fr}>Fran&ccedil;ais
+    <option value=$L{he}>H&eacute;breu
+    <option value=$L{is}>Islandais
+    <option value=$L{it}>Italien
+    <option value=$L{lv}>Letton
+    <option value=$L{nl}>N&eacute;erlandais
+    <option value=$L{no}>Norv&eacute;gien
+    <option value=$L{pl}>Polonais
+    <option value=$L{pt}>Portugais
+    <option value=$L{ru}>Russe
+    <option value=$L{sv}>Su&eacute;dois
+    <option value=$L{cs}>Tch&egrave;que
+lv: <option value=$L{zh}>Íînieðu
+    <option value=$L{cs}>Èehu
+    <option value=$L{da}>Dâòu
+    <option value=$L{nl}>Holandieðu
+    <option value=$L{en}>Angïu
+    <option value=$L{eo}>Esperanto
+    <option value=$L{fi}>Somu
+    <option value=$L{fr}>Franèu
+    <option value=$L{de}>Vâcu
+    <option value=$L{he}>Ebreju
+    <option value=$L{is}>Islandieðû
+    <option value=$L{it}>Itâïu
+    <option value=$L{lv}>Latvieðu
+    <option value=$L{no}>Norvçìu
+    <option value=$L{pt}>Portugâïu
+    <option value=$L{es}>Spâòu
+    <option value=$L{ru}>Krievu
+    <option value=$L{sv}>Zviedru
+sv: <option value=$L{zh}>kinesiska
+    <option value=$L{cs}>tjeckiska
+    <option value=$L{da}>danska
+    <option value=$L{en}>engelska
+    <option value=$L{eo}>esperanto
+    <option value=$L{fi}>finska
+    <option value=$L{fr}>franska
+    <option value=$L{de}>tyska
+    <option value=$L{he}>hebreiska
+    <option value=$L{it}>italienska
+    <option value=$L{nl}>holländska
+    <option value=$L{no}>norska
+    <option value=$L{pt}>portugisiska
+    <option value=$L{es}>spanska
+    <option value=$L{sv}>svenska
+]
+</select>
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td><strong>- friend_passwd -</strong></td>
+
+</tr>
+
+<tr align=left>
+<td>[
+de: Kennwort f&uuml;r "Freunde".
+en: Password for "friends".
+es: Contrase&ntilde;a "amigo".
+fr: Mot de passe "ami".
+lv: "Draugu" parole.
+sv: Passord för "friends".
+]
+
+<p>
+
+[
+de: "Freunde" k&ouml;nnen alle Daten, Notizen und Fotos von Personen sehen, die
+    vor weniger als einem Jahrhundert geboren wurden.
+    Wer dieses Kennwort nicht eingegeben hat, kann diese Informationen nicht
+    abrufen.
+en: "Friends" can see all dates, notes and photos of the persons born
+    since less than one century. The ones who have not entered the below
+    password will not see these informations.
+es: Los "amigos" pueden ver todas las fechas, notas y fotos de las personas
+    nacidas despu&eacute;s menos de un siglo. Aquellos que no han entrado
+    la contrase&ntilde;a
+    indicada a continuaci&oacute;n no ver&aacute;n estas informaciones.
+fr: Les "amis" peuvent voir toutes les dates, notes et photos des
+    personnes n&eacute;es depuis moins d'un si&egrave;cle. Ceux qui n'ont
+    pas entr&eacute; le mot de passe ci-dessous ne verront pas ces
+    informations.
+lv: "Draugi" var apsatît visus datumus, piezîmes un fotogrâfijas par
+    personâm, kuras dzimuðas pçdçjos simts gados. Citiem, kuri nebûs
+    ievadîjuði ðo paroli, ðî informâcija nebûs pieejama.
+sv: "Friends" kan se alla datum, noteringar och bilder för personer födda
+    det senaste århundradet. De som inte anger passordet nedan
+    kommer inte att se denna information.
+]
+
+<p>
+
+[
+de: Wenn dieser Eintrag leer bleibt, ist jeder ein "Freund".
+en: If this area is empty, everybody is a "friend".
+es: Si esta zona est&aacute; vac&iacute;a todo el mundo es "amigo".
+fr: Si cette zone est vide, tout le monde est "ami".
+lv: Ja ðis lodziòð tiks atstâts tukðs, tad ikviens tiks uzskatîts par "draugu".
+sv:  Om den lämnas tom, är alla en "friend".
+]
+
+</td>
+</tr>
+
+<tr align=left>
+<td align=center><input name=friend_passwd value="$F" size=30></td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td><strong>- wizard_passwd -</strong></td>
+</tr>
+
+<tr align=left>
+<td>[
+de: Kennwort f&uuml;r "Wizards".
+en: Password for "wizards".
+es: Contrase&ntilde;a "mago".
+fr: Mot de passe "magicien".
+lv: "Burvja" parole.
+sv: Passord för "wizards".
+]
+
+<p>
+
+[
+de: "Wizards" k&ouml;nnen dar&uuml;berhinaus auch &Auml;nderungen an
+    der Datenbank machen.
+en: "Wizards" can moreover make modifications in the database.
+es: Los "magos" pueden adem&aacute;s efectuar modificaciones en la base de
+    datos.
+fr: Les "magiciens" peuvent en outre faire des modifications dans la base de
+    donn&eacute;es.
+lv: "Burvji" var veikt arî izmaiòas datu bâzç.
+sv: "Wizards" kan göra modifieringar i databasen.
+]
+
+<p>
+
+[
+de: Wenn dieser Eintrag leer bleibt, ist jeder ein "Wizard".
+en: If this area is empty, everybody is a "wizard".
+es: Si esta zona est&aacute; vac&iacute;a todo el mundo es "mago".
+fr: Si cette zone est vide, tout le monde est "magicien".
+lv: Ja ðis lodziòð tiks atsâts tukðs, tad ikviens tiks uzskatîts par "burvi".
+sv: Om den lämnas tom, är alla en "wizard".
+]</td>
+</tr>
+
+<tr align=left>
+<td align=center><input name=wizard_passwd value="$W" size=30></td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td><strong>- can_send_image -</strong></td>
+</tr>
+
+<tr align=left>
+<td>[
+de: Erlaubnis, Bilder zu senden.
+en: Ability to send images.
+es: Posibilidad de enviar im&aacute;genes.
+fr: Possibilit&eacute; d'envoyer des images.
+lv: Atïaut sûtît attçlus.
+sv: Möjlighet att sända en bild.
+]
+
+<p>
+
+[
+de: Wenn dieser Parameter auf "Ja" gesetzt wird, haben "Wizards" die
+    Berechtigung, Bilder hochzuladen.
+en: If yes, the "wizards" are authorized to upload images.
+es: Si la opci&oacute;n "si" es escogida, los "magos" son autorisados a
+    enviar im&aacute;genes por la red.
+fr: Si oui, les "magiciens" ont l'autorisation d'envoyer des images par
+    le r&eacute;seau.
+lv: Ja jâ, tad "burvjiem" tiek atïauts iesûtît attçlus.
+sv: Om "Yes", har "wizards" behörighet att sända bilder.
+]
+
+<p>
+
+[
+de: Dies kann auch bei lokalem Zugiff sinnvoll sein, um Bilder f&uuml;r
+    jemanden
+    zu installieren, da die Funktion das Bild automatisch mit dem richtigen
+    Namen an die richtige Stelle kopiert. 
+en: Can be useful in local, in order to be able to put an image for somebody,
+    because the procedure installs automatically the image at the right place
+    with the appropriate file name.
+es: Esto puede ser util a nivel local para poder as&iacute; agregar una
+    imagen a las personas, debido a que este proceso instala
+    autom&aacute;ticamente la foto en el lugar adecuado con
+    el nombre apropiado.
+fr: Peut &ecirc;tre utile en local pour pouvoir mettre une image &agrave; des
+    personnes, car la proc&eacute;dure installe automatiquement la photo au
+    bon endroit avec le nom appropri&eacute;.
+lv: Tas var bût noderîgi, ja nepiecieðams kâdai personai pievienot attçlu,
+    jo programma to automâtiski pievienos atbilstoðjâ vietâ ar atbilstoðo
+    datnes nosaukumu.
+sv: Det kan vara användbart lokalt, när man vill sätta in en bild av någon,
+    därför att proceduren lägger in bilden automatiskt på rätt plats och
+    med rätt filnamn.
+]</td>
+</tr>
+
+<tr align=left>
+<td align=center>
+<input type=radio name=can_send_image value=$I[yes]>[
+de: Ja
+en: Yes
+es: si
+fr: oui
+lv: Jâ
+sv: Yes
+]
+
+<input type=radio name=can_send_image value=$I[no]>[
+de: Nein
+en: No
+es: no
+fr: non
+lv: Nç
+sv: No 
+]
+
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td valign=top><strong>- wizard_just_friend -</strong></td>
+</tr>
+
+<tr align=left>
+<td>[
+de: "Wizards" werden zu "Freunden".
+en: "Wizards" become simple "friend".
+es: Los "magos" se transforman en simples "amigos".
+fr: Les "magiciens" deviennent de simples "amis".
+lv: "Burvji" kïûst par parastiem "draugiem".
+sv: "Wizards" blir enkla "friend".
+]
+
+
+<p>
+
+[
+de: Wenn dieser Wert auf "ja" steht, verlieren "Wizards" die Berechtigung,
+    &Auml;nderungen zu machen.
+en: If yes, the "wizards" loose their power to make updates.
+es: Si la opci&oacute;n si es escogida, los "magos" pierden su poder de
+    actualisaci&oacute;n.
+fr: Si oui, les "magiciens" perdent leur pouvoir de mise-&agrave;-jour.
+lv: Ja "jâ", tad "burvji" zaudç savas iespçjas veikt izmaiòas datu bâzç.
+sv: Om "Yes", förlorar "wizards" deras behörighet att göra uppdateringar.
+]
+
+<p>
+
+[
+de: Dies kann sinnvoll sein, um z.&nbsp;B. beim Aufr&auml;umen der Datenbank,
+    wenn sie &uuml;ber das Internet zugreifbar ist, tempor&auml;r zu
+    vermeiden, da&szlig; "Wizards" Daten &auml;ndern, die durch die
+    Operation verloren gehen
+    w&uuml;rden. (Denke in diesem Fall daran, diese Option nach Beendigung des
+    Aufr&auml;umens dann wieder zur&uuml;ckzusetzen.)
+en: This can be useful, temporarilly, when you make a cleanup of your database,
+    if it is accessible to Internet, to avoid that "wizards" make changes which
+    would be lost during the operation (remember to suppress this option after
+    cleanup).
+es: Esto puede ser util, temporalmente, cuando uno realiza una limpieza
+    de la base si esta es accesible por Internet, afin de evitar
+    que los "magos" realizen actualizaciones, que serian perdidas
+    durante esta operaci&oacute;n (piense luego a suprimir esta opci&oacute;n
+    despu&eacute;s de finalizar la limpieza).
+fr: Cela peut-&ecirc;tre utile, temporairement, quand on fait un nettoyage
+    de la base, si elle est accessible sur Internet, pour &eacute;viter
+    que des "magiciens" ne fassent des mises-&agrave;-jour qui seraient
+    perdues pendant l'op&eacute;ration (penser alors &agrave; supprimer cette
+    option apr&egrave;s nettoyage).
+lv: Tas var bût noderîgi islaîcîgi, ja Jûs veicat datu bâzes sakopðanu. Ja
+    tâ ir pieejama no Interneta, tad tas novçrð iespçju, ka "burvji" varçtu
+    veikt izmaiòas, kas tiktu pazaudçtas sakopðanas laikâ (atcerieties pçc
+    datu bâzes sakopðanas atcelt ðo aizliegumu).
+sv: Detta kan vara användbart, temporärt, när du gör en upprensning av din
+    databas, om den är åtkomstbar över internet, för att undvika att
+    "wizards" gör ändringar
+    vilka skulle förloras under operationen (kom ihåg att ta bort denna
+    option efter upprensningen).
+]
+</td>
+</tr>
+
+<tr align=left>
+<td align=center>
+<input type=radio name=wizard_just_friend value=$J[yes]>[
+de: Ja
+en: Yes
+es: si
+fr: oui
+lv: Yes
+sv: Yes
+]
+
+<input type=radio name=wizard_just_friend value=$J[no]>[
+de: Nein
+en: No
+es: no
+fr: non
+lv: Nç
+sv: No 
+]
+
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td><strong>- renamed -</strong></td>
+</tr>
+
+<tr align=left>
+<td>[
+de: Datenbank wurde umbenannt.
+en: Base has been renamed.
+es: Cambio de nombre de la base.
+fr: Base renomm&eacute;e.
+lv: Datu bâzei ir mainîts nosaukums.
+sv: Databasen har blivit omdöpt.
+]
+
+<p>
+
+[
+de: Wenn du den Namen deiner Datenbank ge&auml;ndert hast, diese Datenbank aber
+    schon seit langer Zeit bestand und du glaubst, da&szlig; viele Leute
+    Links auf sie gemacht haben, dann behalte die Parameterdatei und trage
+    hier den Namen der neuen Datenbank ein. Leute, die die Datenbank unter
+    dem alten Namen abfragen, erhalten dann automatisch eine Seite mit einem
+    Verweis auf die neue Datenbank, mit einem klickbaren Kommando, das auf der
+    neuen Datenbank sofort den gleichen Befehl ausf&uuml;hrt.
+en: If you changed the name of your database, but this database has been
+    existed since a long time and you think that many people made links to
+    it, keep this parameter file for this base and write here the new name
+    of the database. People who consult the database with the old name
+    receive then a page indicating them the new name to use with the same
+    clickable request.
+es: Si Ud. ha cambiado el nombre de su base, pero que esta es una base que
+    existe despu&eacute;s de mucho tiempo, y que Ud. piensa que muchas
+    personas han efectuado enlaces en ella, conserve el fichero de
+    par&aacute;metros de esta base he indique a continuaci&oacute;n el
+    nuevo nombre de la base. Las personas que consultar&aacute;n la base
+    con el nombre antig&uuml;o recibir&aacute;n una p&aacute;gina que les
+    indicar&aacute; el nuevo nombre a utilizar con la misma demanda clicable.
+fr: Si vous avez chang&eacute; le nom de votre base, mais que c'est une base
+    qui existe depuis longtemps et que vous pensez que beaucoup de gens ont
+    mis des liens dessus, conservez ce fichier de param&egrave;tres pour cette
+    base et indiquez ci-dessous le nouveau nom de la base. Les gens qui
+    consulteront la base avec l'ancien nom recevront une page qui leur
+    indiquera le nouveau nom &agrave; utiliser avec leur m&ecirc;me
+    requ&ecirc;te cliquable.
+lv: Ja Jûs iesiet nomainîjuði datu bâzes nosaukumu, kura jau ir eksistçjusi
+    krietni ilgu laiku, un daudz ïauþu ir izveidojuði norâdes uz to, tad
+    ierakstiet ðet vecâs datu bâzes nosaukumu. Uz pieprasîjumiem, kas tiks
+    veikti ar veco datu bâzes nosaukumu, tiks atbildçts no jaunâs datu bâzes.
+sv: Om du ändrar namnet på din databas, men databasen har funnits
+    ett bra tag och du tror att många personer har lagt upp länkar till
+    den, behåll denna parameter fil för denna databas och skriv här det nya
+    namnet för databasen. Personer som konsulterat databasen med det gamla
+    namnet kommer då att se en sida som hänvisar dem till den nya databasen.
+]
+
+<p>
+
+[
+de: Wenn dieses Feld leer ist, wurde die Datenbank nicht umbenannt.
+en: If this area is empty, the database has not been renamed.
+es: Si esta zona permanece vacia, la base no cambiar&aacute; de nombre.
+fr: Si cette zone est vide, la base n'est pas renomm&eacute;e.
+lv: Ja datu bâzei nosaukums nav mainîts, tad ðis lodziòð atstâjams tukðs.
+sv: Om den är tom, har databasen inte blivit omdöpt.
+]
+
+</td>
+</tr>
+
+<tr align=left>
+<td align=center><input name=renamed value="$R" size=30></td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr align=left>
+<td>
+[
+de: Wenn Du m&ouml;chtest, da&szlig; ein bestimmter Text am Ende jeder
+    Seite angezeigt wird, gib ihn hier an. Du kannst HTML-Tags benutzen.
+en: If you want that a text appears in the bottom of each page, write it
+    here. You can use HTML tags.
+es: Si Ud desea que un texto aparezca en la parte inferior de cada
+    p&aacute;gina, ind&iacute;quela
+    aqu&iacute;. Ud. puede agregar all&iacute; las balizas HTML.
+fr: Si vous voulez qu'un texte apparaisse au base de chaque page, indiquez-le
+    ici. Vous pouvez y mettre des balises HTML.
+lv: Ðeit Jûs variet ierakstît tekstu, kurð tikts parâdîts katras lappuses
+    beigâs. Jûs variet izmantot HTML sintaksi.
+sv: Om du vill att en text ska synas längst ner på varje sida, skriv den här.
+    Du kan använda HTML taggar.
+]
+
+</td>
+</tr>
+<tr align=left>
+<td>
+
+<textarea name=trailer rows=3 cols=60 wrap=virtual>$T</textarea>
+</td>
+</tr>
+</table></dl>
+
+<p>
+
+[
+de: Dann dr&uuml;cke diesen Knopf:
+en: Then push this button:
+es: Apoye a continuaci&oacute;n en este bot&oacute;n:
+fr: Puis appuyez sur ce bouton:
+lv: Beigâs nospiediet ðo podziòu:
+sv: Tryck sedan på denna knapp:
+]
+
+<p>
+
+<input type=submit value="[
+de: Ausf&uuml;hren
+en: Apply
+es: Aplicar
+fr: Appliquer
+lv: Darîts
+sv: Sätt
+]">
+
+</form>
