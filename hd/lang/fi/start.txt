@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.2 1999-11-22 10:49:44 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.3 1999-11-23 12:25:07 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title></head>
   <meta name="ROBOTS" content="NONE">
@@ -16,7 +16,7 @@
 height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>{Genealogical<br>data base}</font></h1>
+<h1><font color=#2f6400>Sukututkimustietokanta</font></h1>
 </td>
 </tr>
 </table>
@@ -56,7 +56,7 @@ henkil&ouml;&auml.%In<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-{To navigate in this data base, you can do your search}:<br><p>
+Liikkuaksesi t&auml;ss&auml; tietokannassa voit etsi&auml;:<br><p>
 
 <ul>
 
@@ -64,7 +64,7 @@ henkil&ouml;&auml.%In<br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=#2f6400><b>{by person}</b></font>
+<font color=#2f6400><b>henkil&ouml;n mukaan</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -85,7 +85,7 @@ henkil&ouml;&auml.%In<br>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>{by title}</b></font>%INl<br>%E
+<font color=#2f6400><b>arvonimen mukaan</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (ex: roi, duke...)<br>
 </td><td>...</td><td>
@@ -101,7 +101,7 @@ henkil&ouml;&auml.%In<br>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>{by the list}</b></font> {of all}
+<font color=#2f6400><b>listasta</b></font> kaikki
 <select name=m>
 <option value="N" selected>sukunimet
 <option value="P">etunimet
@@ -116,25 +116,24 @@ lajiteltuina
 
 <li>
 
-<font color=#2f6400><b>by the</b></font>
 <a href="%sm=H;v=advanced"><font color=#2f6400><b>erityishaku</b></font></a>.
 
 </ul>
 
 %Iw<p>
 
-<center>{You can}<br><p>
+<center>Taikka<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
-<li><a href="%sm=ADD_FAM">lis&auml;&auml perhe</a>
+<li><a href="%sm=ADD_FAM">lis&auml;&auml; perhe</a>
 %INl</ul>
 </td>
 <td align=left>
 <ul>%E
-<li><a href="%sm=MOD_NOTES">{modify the notes}</a>
+<li><a href="%sm=MOD_NOTES">muokkaa huomautuksia</a>
 </ul>
 </td>
 </tr>
@@ -143,24 +142,24 @@ lajiteltuina
 
 %E<br><p>
 
-<center>{You can also consult}<br><p>
+<center>Voit my&ouml;s katsoa<br><p>
 
 <table border=0>
 <tr>
 <td valign=up>
 <ul>
-<li>{the} <a href="%sm=AN">syntym&auml;p&auml;iv&auml;t</a>
-<li>{the} <a href="%sm=AD">vainajien vuosip&auml;iv&auml;t</a>
-<li>{the} <a href="%sm=AM">h&auml;&auml;p&auml;iv&auml;t</a>%I|wf
-<li>{the} <a href="%sm=LB;k=10">viime syntym&auml;t</a>%E
+<li><a href="%sm=AN">syntym&auml;p&auml;iv&auml;t</a>
+<li><a href="%sm=AD">vainajien vuosip&auml;iv&auml;t</a>
+<li><a href="%sm=AM">h&auml;&auml;p&auml;iv&auml;t</a>%I|wf
+<li><a href="%sm=LB;k=10">viime syntym&auml;t</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>{the} <a href="%sm=LD;k=10">Viime kuolemat</a>%E%Ih
-<li>{the} <a href="%sm=HIST;k=10">{history of updates}</a>%E
-<li>{the} <a href="%sm=CAL">{calendars}</a>
-<li>{the} <a href="%sm=FORUM">{data base forum}</a>
+<li><a href="%sm=LD;k=10">viime kuolemat</a>%E%Ih
+<li><a href="%sm=HIST;k=10">p&auml;ivityshistorian</a>%E
+<li><a href="%sm=CAL">eri kalenterit</a>
+<li><a href="%sm=FORUM">tietokantafoorumin</a>
 </ul>
 </td>
 </tr>
