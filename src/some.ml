@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 3.2 1999-11-10 08:44:33 ddr Exp $ *)
+(* $Id: some.ml,v 3.3 1999-11-13 08:11:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -7,20 +7,22 @@ open Gutil;
 open Config;
 open Util;
 
-value first_name_not_found conf x =
+value not_found conf txt x =
   let title _ =
-    Wserver.wprint "%s: \"%s\""
-      (capitale (transl conf "first name not found")) x
+    Wserver.wprint "%s: \"%s\"" (capitale txt) x
   in
-  do rheader conf title; trailer conf; return ()
+  do rheader conf title;
+     print_link_to_welcome conf False;
+     trailer conf;
+  return ()
 ;
 
-value surname_not_found conf x =
-  let title _ =
-    Wserver.wprint "%s: \"%s\"" (capitale (transl conf "surname not found"))
-      x
-  in
-  do rheader conf title; trailer conf; return ()
+value first_name_not_found conf =
+  not_found conf (transl conf "first name not found")
+;
+
+value surname_not_found conf =
+  not_found conf (transl conf "surname not found")
 ;
 
 value persons_of_fsname base find proj x =
