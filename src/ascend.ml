@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.41 2000-07-31 22:10:27 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.42 2000-09-05 20:40:20 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -2138,7 +2138,7 @@ value print_surnames_list conf base v p =
           let d2 = if d2 = d1 then None else d2 in
           do Wserver.wprint "<%s>\n" (if with_tab then "tr><td" else "li");
              if Util.browser_doesnt_have_tables conf then
-               let sosa = List.hd sosa_list in
+               let sosa = List.hd (List.rev sosa_list) in
                wprint_geneweb_link conf
                  ("m=RL;" ^ acces conf base anc ^ ";" ^
                   acces_n conf base "1" p ^ ";" ^

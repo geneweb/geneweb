@@ -2,6 +2,9 @@ GeneWeb version 3.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+   - [05 Sep 00] Fixed bug: in ancestors surnames list, under Lynx
+     (browser for alphanumeric terminals), sometimes displayed "incorrect
+     request" when clicking on certain surnames.
    - [04 Sep 00] Fixed bug: in descendants with encoding, for children
      married several times, could sometimes display the father's name
      instead of a repetition of the child's name.
