@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.10 2000-01-10 02:14:41 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.11 2000-01-11 14:10:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -240,6 +240,7 @@ value rec print_both_branches conf base info pl1 pl2 =
            [ Some p1 -> Wserver.wprint "|"
            | None -> Wserver.wprint "&nbsp;" ];
          end;
+         stag "td" begin Wserver.wprint "&nbsp;"; end;
          stag "td" "align=center" begin
            match p2 with
            [ Some p2 -> Wserver.wprint "|"
@@ -256,6 +257,7 @@ value rec print_both_branches conf base info pl1 pl2 =
                return ()
            | None -> Wserver.wprint "&nbsp;" ];
          end;
+         tag "td" begin Wserver.wprint "&nbsp;"; end;
          tag "td" "valign=top align=center width=\"50%%\"" begin
            match p2 with
            [ Some p2 ->
@@ -461,19 +463,23 @@ value print_with_table conf base info =
     conf.border
   begin
     tag "tr" begin
-      stag "td" "colspan=2 align=center" begin
+      stag "td" "colspan=3 align=center" begin
         print_someone conf base info.ip;
         print_other_parent_if_same conf base info;
       end;
     end;
     tag "tr" begin
-      stag "td" "colspan=2 align=center" begin
+      stag "td" "colspan=3 align=center" begin
         Wserver.wprint "|";
       end;
     end;
     tag "tr" begin
       stag "td" "align=right" begin
         Wserver.wprint "<hr size=1 noshade width=\"50%%\" align=right>";
+      end;
+      Wserver.wprint "\n";
+      stag "td" begin
+        Wserver.wprint "<hr size=1 noshade>";
       end;
       Wserver.wprint "\n";
       stag "td" "align=left" begin
@@ -493,6 +499,7 @@ value print_with_table conf base info =
             print_prev_next_1 conf base info info.pb1 info.nb1
           else Wserver.wprint "&nbsp;";
         end;
+        tag "td" begin Wserver.wprint "&nbsp;"; end;
         tag "td" begin
           if info.pb2 <> None || info.nb2 <> None then
             do html_br conf; return
