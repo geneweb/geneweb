@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.152 2003-02-03 07:47:43 ddr Exp $
+# $Id: lexicon.txt,v 4.153 2003-02-24 09:31:01 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -36,6 +36,7 @@ cs: yymmdd
 da: ddmmyy
 de: ddmmyy
 en: yymmdd
+eo: ddmmyy
 es: ddmmyy
 et: ddmmyy
 fi: ddmmyy
@@ -3050,6 +3051,7 @@ cs: zobraz po segmentech/¹íøka segmentu/pøekrytí/celková ¹íøka
 da: vis ved delte sider/sidebredde/overlapning/total bredde
 de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
 en: display by slices/slice width/overlap/total width
+eo: montro intervale/amplekso de la intervalo/supermeto/tutamplekso
 es: mostrar en segmentos/ancho de segmento/superpuesto/ancho total
 et: kuva osadena/osa laius/ülekate/kogulaius
 fi: n&auml;yt&auml; jaettuna kaistoihin/kaistan leveys/ylitys/koko leveys
@@ -3126,6 +3128,7 @@ cs: nespojovat spolecné vetve
 da: sl&aring; ikke f&aelig;lles anelinier sammen
 de: gemeinsame Zweige nicht zusammenfassen
 en: don't group the common branches together
+eo: ne grupigu la brancxojn komunajn
 es: no agrupar las ramas comunes
 et: ära grupeeri ühiseid harusid
 fi: ei yhteisten sukuhaarojen ryhmittely&auml;
@@ -5644,6 +5647,7 @@ cs: bez kontroly pohlaví
 da: ingen verificering af k&oslash;nnene
 de: keine Kontrolle des Geschlechts
 en: no sexes check
+eo: sen kontrolo pri seksoj
 es: sin comprobacion de sexo
 et: ära kontrolli sugude sobivust
 fi: ei sukupuolitarkistusta
@@ -8419,6 +8423,7 @@ cs: neznámé pohlaví pro %t
 da: udefineret k&oslash;n for %t
 de: Geschlecht nicht definiert f&uuml;r %t
 en: undefined sex for %t
+eo: sekso nedifinita por %t
 es: sexo no definido por %t
 et: %t sugu on määratlemata
 fi: %t:n sukupuoli tuntematon
