@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.45 2002-03-26 13:21:16 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.46 2002-06-20 08:08:30 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1447,6 +1447,27 @@ value slashify s =
   }
 ;
 
+value mkdir_p x =
+  loop x where rec loop x =
+    do  {
+      let y = Filename.dirname x;
+      if y <> x && String.length y < String.length x then loop y else ();
+      try Unix.mkdir x 0o755 with [ Unix.Unix_error _ _ _ -> () ];
+    }
+;
+
+value make_cnt_dir x =
+  do {
+    mkdir_p x;
+    ifdef WIN95 then do {
+      Wserver.sock_in.val := Filename.concat x "gwd.sin";
+      Wserver.sock_out.val := Filename.concat x "gwd.sou";
+    }
+    else ();
+    Util.cnt_dir.val := x;
+  }
+;
+
 value available_languages =
   ["cn"; "cs"; "de"; "dk"; "en"; "es"; "eo"; "fr"; "he"; "it"; "nl"; "no";
    "pt"; "se"]
@@ -1469,19 +1490,7 @@ value main () =
         "<dir>\n       Directory where the documentation is installed.");
        ("-bd", Arg.String (fun x -> Util.base_dir.val := x),
         "<dir>\n       Directory where the databases are installed.");
-       ("-wd",
-        Arg.String
-          (fun x ->
-             do {
-               try Unix.mkdir x 0o755 with [ Unix.Unix_error _ _ _ -> () ];
-               ifdef WIN95 then do {
-                 Wserver.sock_in.val := Filename.concat x "gwd.sin";
-                 Wserver.sock_out.val := Filename.concat x "gwd.sou";
-               }
-               else ();
-               Util.cnt_dir.val := x;
-             }),
-        "\
+       ("-wd", Arg.String make_cnt_dir, "\
 <dir>
        Directory for socket communication (Windows) and access count.");
        ("-cgi", Arg.Set cgi, "\n       Force cgi mode.");
