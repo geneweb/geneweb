@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.19 2005-03-14 22:54:39 ddr Exp $
+# $Id: lex_utf8.txt,v 1.20 2005-03-17 10:57:22 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5596,6 +5596,7 @@ cs: měsíční fáze/nov/první čtvrt'/úplněk/poslední čtvrt'
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
 fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
+pl: faza księżyca/nów/pierwsza kwadra/pełnia/trzecia kwadra
 pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
 
     more than %d answers
