@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.32 2003-03-19 13:00:08 ddr Exp $ *)
+(* $Id: family.ml,v 4.33 2003-03-19 13:39:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -589,7 +589,6 @@ value print_moved conf base s =
         Util.html conf;
         Util.nl ();
         Util.copy_from_etc env conf.lang conf.indep_command ic;
-        Util.trailer conf;
       }
   | None ->
       let title _ = Wserver.wprint "%s -&gt; %s" conf.bname s in
