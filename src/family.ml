@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.1 1999-03-08 11:18:36 ddr Exp $ *)
+(* $Id: family.ml,v 2.2 1999-03-23 21:15:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -442,16 +442,18 @@ value extract_sosa_henv conf base =
 ;
 
 value family conf base =
-  do extract_sosa_henv conf base;
-     match p_getenv conf.env "opt" with
-     [ Some "no_index" ->
-         print_no_index conf base
-     | _ ->
-         if except_sosa_env conf.env = [] then
-           do Srcfile.incr_welcome_counter conf; return
-           Srcfile.print_start conf base
-         else
-           do Srcfile.incr_request_counter conf; return
-           family_m conf base ];
-  return Wserver.wflush ()
+  do extract_sosa_henv conf base; return
+  let r =
+    match p_getenv conf.env "opt" with
+    [ Some "no_index" ->
+        do print_no_index conf base; return None
+    | _ ->
+        if except_sosa_env conf.env = [] then
+          let r = Srcfile.incr_welcome_counter conf in
+          do Srcfile.print_start conf base; return r
+        else
+          let r = Srcfile.incr_request_counter conf in
+          do family_m conf base; return r ]
+  in
+  do Wserver.wflush (); return r
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.1 1999-03-08 11:19:14 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.2 1999-03-23 21:15:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -54,8 +54,9 @@ value incr_welcome_counter conf =
   lock_wait lname with
   [ Accept ->
       let (welcome_cnt, request_cnt, start_date) = count conf in
-      write_counter conf (welcome_cnt + 1, request_cnt, start_date)
-  | Refuse -> () ]
+      let r = (welcome_cnt + 1, request_cnt, start_date) in
+      do write_counter conf r; return Some r
+  | Refuse -> None ]
 ;
 
 value incr_request_counter conf =
@@ -63,8 +64,9 @@ value incr_request_counter conf =
   lock_wait lname with
   [ Accept -> 
       let (welcome_cnt, request_cnt, start_date) = count conf in
-      write_counter conf (welcome_cnt, request_cnt + 1, start_date)
-  | Refuse -> () ]
+      let r = (welcome_cnt, request_cnt + 1, start_date) in
+      do write_counter conf r; return Some r
+  | Refuse -> None ]
 ;
 
 value hidden_env conf =
