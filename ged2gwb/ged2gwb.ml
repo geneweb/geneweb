@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.6 1999-11-28 10:17:34 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.7 2000-01-06 15:21:29 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -36,6 +36,7 @@ value month_number_dates = ref NoMonthNumberDates;
 value no_public_if_titles = ref False;
 value first_names_brackets = ref None;
 value force = ref False;
+value default_source = ref "";
 
 (* Reading input *)
 
@@ -1243,8 +1244,11 @@ value add_indi gen r =
     | _ -> (buri, buri_place, buri_src) ]
   in
   let birth = Adef.codate_of_od birth in
-  let psources = source gen r in
   let empty = add_string gen "" in
+  let psources =
+    let s = source gen r in
+    if s = "" then default_source.val else s
+  in
   let person =
     {first_name = add_string gen first_name; surname = add_string gen surname;
      occ = occ; public_name = add_string gen public_name;
@@ -2058,6 +2062,10 @@ value speclist =
 - No negative dates -
        Don't interpret a year preceded by a minus sign as a negative year"
       );
+   ("-ds", Arg.String (fun s -> default_source.val := s),
+    " \
+- Default source -
+       Set the source field for persons without source data");
    ("-dates_dm", Arg.Unit (fun () -> month_number_dates.val := DayMonthDates),
     "\n       Interpret months-numbered dates as day/month/year");
    ("-dates_md", Arg.Unit (fun () -> month_number_dates.val := MonthDayDates),
