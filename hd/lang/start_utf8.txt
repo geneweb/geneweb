@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.1 2005-02-03 16:20:09 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.2 2005-02-03 16:21:43 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -30,7 +30,7 @@ ru: Genealogy
 sl: Genealogija - Družinsko drevo
 sv: Genealogi
 ] - %t</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=%e"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="ROBOTS" content="NONE"%/>
   <style type="text/css"><!--
