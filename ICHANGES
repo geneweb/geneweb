@@ -5,6 +5,8 @@ GeneWeb Version 2.05
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Jul 9, 99] Changed request syntax for cousins: "v1=#" instead of "v=#"
+    and ability to ask for "v1=#;v2=#" for uncles and nephews...
   - [Jul 2, 99] Added "access_by_key" in "base.gwf" files to generate accesses
     by keys, allowing to update the data base without disturbing the users
     accessing it.
