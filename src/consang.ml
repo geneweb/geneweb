@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 1.2 1998-09-04 06:48:26 ddr Exp $ *)
+(* $Id: consang.ml,v 1.3 1998-10-20 09:22:04 ddr Exp $ *)
 
 (* Algorithm relationship and links from Didier Remy *)
 
@@ -134,10 +134,8 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
          ty.relationship := ty.relationship +. p1 *. p2;
          if u.elim_ancestors then ty.elim_ancestors := True else ();
          if b && not ty.elim_ancestors then
-           do ty.lens1 :=
-                List.fold_left insert_branch_len ty.lens1 u.lens1;
-              ty.lens2 :=
-                List.fold_left insert_branch_len ty.lens2 u.lens2;
+           do ty.lens1 := List.fold_left insert_branch_len ty.lens1 u.lens1;
+              ty.lens2 := List.fold_left insert_branch_len ty.lens2 u.lens2;
            return ()
          else ();
       return ()
@@ -179,13 +177,18 @@ value relationship base tab ip1 ip2 =
   fst (relationship_and_links base tab False ip1 ip2)
 ;
 
+exception Error;
+
 value compute_all_consang base from_scratch =
   let _ = base.ascends.array () in
   let _ = base.couples.array () in
   let _ = base.families.array () in
   do Printf.eprintf "Computing consanguinity..."; flush stderr; return
   let running = ref True in
-  let tab = make_relationship_table base in
+  let tab =
+    try make_relationship_table base with
+    [ Failure _ -> raise Error ]
+  in
   let cnt = ref 0 in
   let most = ref None in
   do for i = 0 to base.ascends.len - 1 do

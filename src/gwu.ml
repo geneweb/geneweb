@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 1.4 1998-10-10 15:53:00 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.5 1998-10-20 09:22:05 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -42,7 +42,7 @@ value get_buff len = String.sub buff.val 0 len;
 
 value starting_char =
   fun
-  [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '0'..'9' | '?' | ' ' -> True
+  [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '?' | ' ' -> True
   | _ -> False ]
 ;
 

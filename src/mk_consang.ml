@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 1.1.1.1 1998-09-01 14:32:05 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 1.2 1998-10-20 09:22:06 ddr Exp $ *)
 
 value fname = ref "";
 value scratch = ref False;
@@ -20,12 +20,19 @@ value main () =
   return
   let f () =
     let base = Iobase.input fname.val in
-    do if base.Def.has_family_patches then scratch.val := True else ();
-       Sys.catch_break True;
-       try Consang.compute_all_consang base scratch.val with
-       [ Sys.Break -> do Printf.eprintf "\n"; flush stderr; return () ];
-       Iobase.output fname.val base;
-    return ()
+    try
+      do if base.Def.has_family_patches then scratch.val := True else ();
+         Sys.catch_break True;
+         try Consang.compute_all_consang base scratch.val with
+         [ Sys.Break -> do Printf.eprintf "\n"; flush stderr; return () ];
+         Iobase.output fname.val base;
+      return ()
+    with
+    [ Consang.Error ->
+        do Printf.eprintf "
+Error: probable loop in database (persons being their own ancestors).\n";
+           flush stderr;
+        return () ]
   in
   lock (Iobase.lock_file fname.val) with
   [ Accept -> f ()
