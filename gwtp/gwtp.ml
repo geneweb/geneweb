@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.14 2000-08-05 08:26:00 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.15 2000-08-05 08:44:22 ddr Exp $ *)
 
 open Printf;
 
@@ -444,6 +444,7 @@ value gwtp () =
   let oc_log = log_open () in
   do let _ = Unix.umask 0 in ();
      log oc_log str;
+     flush oc_log;
      Unix.dup2 (Unix.descr_of_out_channel oc_log) Unix.stderr;
      match HttpEnv.getenv env "m" with
      [ Some "UPL" -> gwtp_check_login str env gwtp_upload
