@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.50 1999-06-03 12:49:19 ddr Exp $
+# $Id: lexicon.txt,v 2.51 1999-06-03 13:41:21 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1034,6 +1034,7 @@ es: anular los lazos GeneWeb
 en: cancel GeneWeb links
 fr: annuler les liens GeneWeb
 it: annullare i links
+nl: geen GeneWeb links
 se: utan GeneWeb l&auml;nkar
 
     cannot access base
@@ -1070,6 +1071,7 @@ es: cambiar los nombres de los hijos
 en: change children's names
 fr: changer noms des enfants
 it: cambiare i nomi dei figli
+nl: namen van kinderen wijzigen
 se: &auml;ndra barnens namn
 
     changed order of children
@@ -1107,6 +1109,7 @@ en: children's names changed
 es: nombres de los hijos cambiados
 fr: noms des enfants chang&eacute;s
 it: nomi dei figli cambiati
+nl: namen van kinderen gewijzigd
 se: barnens namn &auml;ndrade
 
     click
@@ -1535,6 +1538,7 @@ es: fichero
 fr: fichier
 he:  קובץ 
 it: file
+nl: bestand
 no: fil
 se: fil
 
@@ -1798,6 +1802,7 @@ es: imagen recibida
 fr: image re&ccedil;ue
 he:  התמונה התקבלה
 it: immagine ricevuta
+nl: foto ontvangen
 no: bildet er mottatt
 se: foto mottaget
 
@@ -1838,6 +1843,7 @@ en: include missing spouses
 es: incluir las esposas faltantes
 fr: inclure les conjoints manquants
 it: includere i coniugi mancanti
+nl: ontbrekende echtgenoten tonen
 se: inkludera gem&aring;ler som saknas
 
     incompatible sexes
@@ -3008,6 +3014,7 @@ en: relationship%t to
 es: parentesco%t con
 fr: relation%t avec
 it: legame%t con
+nl: verbonden%t met
 se: f&ouml;rh&aring;llande%t med
 
     see
@@ -3060,6 +3067,7 @@ es: enviar
 fr: envoyer
 he:  שלח
 it: mandare
+nl: zenden
 no: send
 se: skicka
 
