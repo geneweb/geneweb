@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.42 1999-08-12 19:37:35 ddr Exp $ *)
+(* $Id: util.ml,v 2.43 1999-08-13 02:44:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -594,9 +594,9 @@ value copy_from_channel env ic =
   [ End_of_file -> close_in ic ]
 ;
 
-value copy_from_file env fname =
+value copy_etc_file env fname =
   let fname =
-    List.fold_right Filename.concat [lang_dir.val; "lang"]
+    List.fold_right Filename.concat [lang_dir.val; "etc"]
        (Filename.basename fname ^ ".txt")
   in
   let ic = open_in fname in
@@ -604,7 +604,7 @@ value copy_from_file env fname =
 ;
 
 value trailer conf =
-  do try copy_from_file [] "copyr" with
+  do try copy_etc_file [] "copyr" with
      [ Sys_error _ ->
          do html_p conf;
             Wserver.wprint "
