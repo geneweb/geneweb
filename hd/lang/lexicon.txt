@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.92 1999-08-01 19:38:12 ddr Exp $
+# $Id: lexicon.txt,v 2.93 1999-08-02 14:21:58 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -398,6 +398,7 @@ de: ein Schwager/eine Schw&agrave;gerin
 en: a brother-in-law/a sister-in-law
 es: un cu&ntilde;ado/una cu&ntilde;ada
 fr: un beau-fr&egrave;re/une belle-soeur
+it: un cognato/una cognata
 
     a brother/a sister/a sibling
 cs: bratr/sestra/sourozenec
@@ -554,6 +555,7 @@ de: ein Neffe (des Ehegattes)/eine Nichte (des Ehegattes)
 en: a nephew (spouse's nephew)/a niece (spouse's niece)
 es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
 fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
+it: un nipote (dello sposo)/una nipote (dello sposo)
 
     a nephew/a niece
 cs: synovec/neteø
@@ -575,6 +577,7 @@ de: ein Schwiegersohn/eine Schweigertochter
 en: a son-in-law/a daughter-in-law
 es: un yerno/una nuera
 fr: un beau-fils/une belle-fille
+it: un genero/una nuora
 
     a son/a daughter/a child
 cs: syn/dcera/dítì
@@ -641,6 +644,7 @@ dk: adoptivfader/adoptivmoder/adoptivfor&aelig;ldre
 en: adoptive father/adoptive mother/adoptive parents
 es: padre adoptivo/madre adoptiva/padres adoptivos
 fr: p&egrave;re adoptif/m&egrave;re adoptive/parents adoptifs
+it: padre adottivo/madre adottiva/genitori adottivi
 se: adoptivfar/adoptivmor/adoptivf&ouml;r&auml;ldrar
 
     adoptive son/adoptive daughter/adoptive child
@@ -649,6 +653,7 @@ dk: adoptivs&oslash;n/adoptivdatter/adoptivbarn
 en: adoptive son/adoptive daughter/adoptive child
 es: hijo adoptivo/hija adoptiva/hijo(a) adoptivo(a)
 fr: fils adoptif/fille adoptive/enfant adoptif
+it: figlio adottivo/figlia adottiva/figlio addotivo
 se: adoptivson/adoptivdotter/adoptivbarn
 
     advanced request
@@ -808,6 +813,7 @@ de: ein Onkel (Ehemann der Tante)/eine Tante (Ehefrau des Onkels)
 en: an uncle (aunt's husband)/an aunt (uncle's wife)
 es: un t&iacute;o pol&iacute;tico/una t&iacute;a pol&iacute;tica
 fr: un oncle (&eacute;poux de la tante)/une tante (&eacute;pouse de l'oncle)
+it: uno zio (marito della zia)/una zia (moglie dello zio)
 
     an uncle/an aunt
 cs: strýc/teta
@@ -951,6 +957,7 @@ de: zur&uuml;ck
 en: back
 es: regreso
 fr: retour
+it: torna indietro
 se: tillbaka
 
     baptism
@@ -1148,6 +1155,7 @@ dk: mulig fader/mulig moder/mulige for&aelig;ldre
 en: candidate father/candidate mother/candidate parents
 es: padre posible/madre posible/padres posibles
 fr: p&egrave;re possible/m&egrave;re possible/parents possibles
+it: padre presunto/madre presunta/genitori presunti
 se: m&ouml;jlig far/m&ouml;jlig mor/m&ouml;jliga f&ouml;r&auml;ldrar
 
     candidate son/candidate daughter/candidate child
@@ -1156,6 +1164,7 @@ dk: mulig s&oslash;n/mulig datter/muligt barn
 en: candidate son/candidate daughter/candidate child
 es: hijo posible/hija posible/hijo(a) posible
 fr: fils possible/fille possible/enfant possible
+it: figlio presunto/figlia presunta/figlio presunto
 se: m&ouml;jlig son/m&ouml;jlig dotter/m&ouml;jliga barn
 
     cannot access base
@@ -1817,6 +1826,7 @@ dk: gudfader/gudmoder/gudfader og gudmoder
 en: godfather/godmother/godparents
 es: padrino/madrina/padrino y padrina
 fr: parrain/marraine/parrain et marraine
+it: padrino/madrina/padrini
 se: gudfar/gudmor/gudf&ouml;r&auml;ldrar
 
     godson/goddaughter/godchild
@@ -1825,6 +1835,7 @@ dk: guds&oslash;n/guddatter/gudbarn
 en: godson/goddaughter/godchild
 es: fahijado/fahijada/fahihado(a)
 fr: filleul/filleule/filleul(e)
+it: figlioccio/figlioccia/figlioccio
 se: gudson/guddotter/gudbarn
 
     grand-parents
@@ -2589,6 +2600,7 @@ en: nephews and nieces
 eo: nevoj kay nevinoj
 es: sobrinos y sobrinas
 fr: neveux et ni&egrave;ces
+it: nipoti
 pt: sobrinos e sobrinas
 se: nev&ouml;er och niecer
 
@@ -3260,6 +3272,7 @@ se: smeknamn
 dk: anerkendt s&oslash;n/anerkendt datter/anerkendt barn
 en: recognized son/recognized daughter/recognized child
 fr: fils reconnu/fille reconnue/enfant reconnu
+it: figlio riconosciuto/figlia riconosciuta/figlio riconosciuto
 se: erk&auml;nd son/erk&auml;nd dotter/erk&auml;nt barn
 
     recognizing father/recognizing mother/recognizing parents
@@ -3274,6 +3287,7 @@ dk: forbindelse/forbindelser
 en: relation/relations
 es: relaci&oacute;n/relaciones
 fr: relation/relations
+it: parentela
 se: relation/relationer
 
     relationship
@@ -3339,6 +3353,7 @@ se: f&ouml;rh&aring;llande%t med
 en: relationships by marriage
 es: parentesco pol&iacute;tico
 fr: liens de parent&eacute; par alliance
+it: parentele per matrimonio
 
     see
 cs: viz
@@ -3816,6 +3831,7 @@ de: der Schwiegervater/die Schwiegetmutter
 en: the father-in-law/the mother-in-law
 es: el suegro/la suegra
 fr: le beau-p&egrave;re/la belle-m&egrave;re
+it: il suocero/la suocera
 
     the father/the mother/a parent
 cn: ¸¸/Ä¸/a parent
@@ -3973,6 +3989,7 @@ en: the spouse
 eo: la edzo/la edzino
 es: el esposo/l'esposa
 fr: l'&eacute;poux/l'&eacute;pouse
+it: lo sposo/la sposa
 
     the whole list
 cs: kompletní seznam
@@ -4009,6 +4026,7 @@ de: um ein Kind zu einer familie zu hinzuf&uuml;gen, benutzen Sie "%s"
 en: to add a child to a family, use "%s"
 es: para agregar un hijo a una familia, utiliza "%s"
 fr: pour ajouter un enfant &agrave; une famille, utiliser "%s"
+it: per aggiungere un figlio ad una famiglia, scegliere "%s"
 se: f&ouml;r att l&auml;gga till ett barn i en familj, anv&auml;nd "%s"
 
     to the %s generation
@@ -4168,6 +4186,7 @@ en: uncles and aunts
 eo: onkloj kaj onklinoj
 es: t&iacute;os y t&iacute;as
 fr: oncles et tantes
+it: zii e zie
 pt: tios e tias
 se: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
 
