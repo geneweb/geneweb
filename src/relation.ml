@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.42 2000-06-19 17:42:04 ddr Exp $ *)
+(* $Id: relation.ml,v 3.43 2000-06-19 22:23:24 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1372,6 +1372,7 @@ value print_path conf base i p1 p2 (pp1, pp2, (l1, l2, list)) =
 value print_main_relationship conf base long p1 p2 rel =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
   do header conf title;
+     print_link_to_welcome conf True;
      match p_getenv conf.env "spouse" with
      [ Some "on" -> conf.senv := conf.senv @ [("spouse", "on")]
      | _ -> () ];
