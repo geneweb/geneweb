@@ -4,9 +4,8 @@ GeneWeb version 3.11
 * GeneWeb server or CGI (gwd)
   - [30 Jan 01] Added a way to be able to print trees which are too
     wide for printers. In tree displaying, a link is proposed in the upper
-    right corner of the page. When clicking on it, the tree is displayed
-    by slices of 80 characters. At each so displayed page, a new link
-    allows to display the next right side slice.
+    right corner of the page. When clicking on it, a page is proposed for
+    a parametrizable display of the tree by slices.
   - [29 Jan 01] For GeneWeb sites accomodating many data bases: to
     avoid the creation of too many files in the same directories, added
     the ability to put them in sub-sub-directories. A data base file can

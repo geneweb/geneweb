@@ -1,4 +1,5 @@
-(* $Id: dag.ml,v 3.47 2001-01-30 14:17:11 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: dag.ml,v 3.48 2001-01-30 16:53:22 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -484,6 +485,14 @@ value print_next_pos conf pos1 pos2 tcol =
       [ Some pos2 -> pos2
       | None -> dpos ]
     in
+    let overlap =
+      let overlap =
+        match p_getint conf.env "overlap" with
+        [ Some x -> x
+        | None -> 10 ]
+      in
+      min overlap dpos
+    in
     let env =
       List.fold_right
         (fun (k, v) env ->
@@ -497,7 +506,8 @@ value print_next_pos conf pos1 pos2 tcol =
        else
          do Wserver.wprint "<a href=\"%s" (commd conf);
             List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
-            Wserver.wprint "pos1=%d;pos2=%d" (pos2 - 10) (pos2 - 10 + dpos);
+            Wserver.wprint "pos1=%d;pos2=%d" (pos2 - overlap)
+              (pos2 - overlap + dpos);
             Wserver.wprint "\">&gt;&gt;</a>\n";
          return ();
        Wserver.wprint "</div>\n";
@@ -553,7 +563,11 @@ do for i = 0 to ncol - 1 do
 return
 *)
   let pos1 = p_getint conf.env "pos1" in
-  let pos2 = p_getint conf.env "pos2" in
+  let pos2 =
+    match p_getint conf.env "pos2" with
+    [ None -> p_getint conf.env "dpos"
+    | x -> x ]
+  in
   do print_next_pos conf pos1 pos2 (Array.fold_left \+ 0 colsz);
      Wserver.wprint "<pre>\n";
      for i = 0 to Array.length hts - 1 do
@@ -650,7 +664,7 @@ value print_html_table conf hts =
   do if Util.p_getenv conf.env "notab" <> Some "on" then
        do Wserver.wprint "<div align=right><a href=\"%s" (commd conf);
           List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
-          Wserver.wprint "notab=on;pos2=78";
+          Wserver.wprint "notab=on;slices=on";
           Wserver.wprint "\"><tt>//</tt></a></div>\n";
        return ()
      else ();
@@ -745,7 +759,7 @@ value print_only_dag conf base elem_txt spouse_on invert set spl d =
   print_html_table conf hts
 ;
 
-value gen_print_dag conf base spouse_on invert set spl d =
+value gen_print_dag_aux conf base spouse_on invert set spl d =
   let title _ =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
   in
@@ -757,6 +771,62 @@ value gen_print_dag conf base spouse_on invert set spl d =
      print_only_dag conf base elem_txt spouse_on invert set spl d;
      Util.trailer conf;
   return ()
+;
+
+value print_slices_menu conf base =
+  let txt n =
+    Util.capitale
+       (transl_nth conf
+          "display by slices/slice width/overlap/global width" n)
+  in
+  let title _ = Wserver.wprint "%s" (txt 0) in
+  do Util.header conf title;
+     tag "form" "method=get action=\"%s\"" conf.command begin
+       List.iter
+         (fun (k, v) ->
+            if k = "slices" then ()
+            else
+              Wserver.wprint "<input type=hidden name=%s value=%s>\n"
+                (code_varenv k) (code_varenv v))
+         conf.env;
+       tag "table" begin
+         tag "tr" begin
+           tag "td" "align=right" begin
+             Wserver.wprint "%s\n"
+               (Util.capitale
+                  (transl conf
+                   "don't group the common branches together"));
+             Wserver.wprint "<input type=checkbox name=nogroup value=on>\n";
+           end;
+         end;
+         tag "tr" begin
+           tag "td" "align=right" begin
+             Wserver.wprint "%s\n" (txt 1);
+             Wserver.wprint "<input name=dpos size=4 value=78>\n";
+           end;
+         end;
+         tag "tr" begin
+           tag "td" "align=right" begin
+             Wserver.wprint "%s\n" (txt 2);
+             Wserver.wprint "<input name=overlap size=4 value=10>\n";
+           end;
+         end;
+         tag "tr" begin
+           tag "td" "align=right" begin
+             Wserver.wprint "%s\n" (txt 3);
+             Wserver.wprint "<input name=width size=4 value=78>\n";
+           end;
+         end;
+       end;
+       Wserver.wprint "<input type=submit value=\"Ok\">\n";
+     end;
+     Util.trailer conf;
+  return ()
+;
+
+value gen_print_dag conf base spouse_on invert set spl d =
+  if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf base
+  else gen_print_dag_aux conf base spouse_on invert set spl d
 ;
 
 value print_dag conf base set spl d =

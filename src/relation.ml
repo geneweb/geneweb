@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.69 2001-01-29 10:54:07 ddr Exp $ *)
+(* $Id: relation.ml,v 3.70 2001-01-30 16:53:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -555,14 +555,20 @@ value print_shortest_path conf base p1 p2 =
     in
     let ip1 = p1.cle_index in
     let ip2 = p2.cle_index in
-    do header_no_page_title conf title;
-       match get_shortest_path_relation base ip1 ip2 excl_faml with
-       [ Some (path, ifam) ->
-           let excl_faml = [ifam :: excl_faml] in
-           print_relation_path conf base ip1 ip2 path excl_faml
-       | None ->
-           let s1 = gen_referenced_person_title_text raw_access conf base p1 in
-           let s2 = gen_referenced_person_title_text raw_access conf base p2 in
+    match get_shortest_path_relation base ip1 ip2 excl_faml with
+    [ Some (path, ifam) ->
+        if p_getenv conf.env "slices" = Some "on" then
+          Dag.print_slices_menu conf base
+        else
+          do header_no_page_title conf title;
+             let excl_faml = [ifam :: excl_faml] in
+             print_relation_path conf base ip1 ip2 path excl_faml;
+             trailer conf;
+          return ()
+    | None ->
+        let s1 = gen_referenced_person_title_text raw_access conf base p1 in
+        let s2 = gen_referenced_person_title_text raw_access conf base p2 in
+        do header_no_page_title conf title;
            if excl_faml = [] then
              do Wserver.wprint "<center><h1><font color=%s>" conf.highlight;
                 title False;
@@ -578,9 +584,9 @@ value print_shortest_path conf base p1 p2 =
              tag "ul" begin
                Wserver.wprint "<li>%s\n" s1;
                Wserver.wprint "<li>%s\n" s2;
-             end ];
-       trailer conf;
-    return ()
+             end;
+           trailer conf;
+        return () ]
 ;
 
 value parents_label conf =
