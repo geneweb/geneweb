@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.18 1999-05-17 11:36:29 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.19 1999-05-18 22:34:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -895,10 +895,9 @@ value print_generation_missing_persons conf base title sp_incl gp =
                [ Male -> (0, cpl.mother)
                | _ -> (1, cpl.father) ]
              in
-             do Wserver.wprint "%s"
-                  (geneweb_link conf (acces conf base p)
-                     (capitale
-                        (transl_nth conf "husband/wife" parent_name_index)));
+             do wprint_geneweb_link conf (acces conf base p)
+                  (capitale
+                     (transl_nth conf "husband/wife" parent_name_index));
                 Wserver.wprint " %s\n" (transl_decline conf "of" "");
                 afficher_personne_titre conf base (poi base conj);
                 Date.afficher_dates_courtes conf base (poi base conj);
@@ -1146,8 +1145,7 @@ value print_spouses conf base p =
 
 value print_someone_missing conf base begin_surname spouses_incl (mt, mtl, p) =
   do let href= "i=" ^ string_of_int (Adef.int_of_iper p.cle_index) in
-     Wserver.wprint "%s"
-       (geneweb_link conf href (person_text_without_surname conf base p));
+     wprint_geneweb_link conf href (person_text_without_surname conf base p);
      Wserver.wprint "%s" begin_surname;
      afficher_titre conf base p;
      Date.afficher_dates_courtes conf base p;
