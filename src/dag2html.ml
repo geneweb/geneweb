@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.10 1999-12-05 16:01:35 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.11 1999-12-06 14:54:41 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -682,7 +682,7 @@ value push_to_right d t i j1 j2 =
   let rec loop j =
     if j = j2 then j - 1
     else
-      let jj1 =
+      let ini_jj1 =
         match line.(j - 1).elem with
         [ Nothing -> j - 1
         | x ->
@@ -693,6 +693,7 @@ value push_to_right d t i j1 j2 =
             in
             same_value (j - 2) ]
       in
+      let jj1 = ini_jj1 in
       let jj2 = j - 1 in
       let jj3 = j in
       let jj4 =
@@ -711,7 +712,7 @@ value push_to_right d t i j1 j2 =
       in
       if jj4 < j2 && jj2 < jj3 then
         do exch_blocks t ii i jj1 jj2 jj3 jj4; return loop (jj4 + 1)
-      else if jj4 < j2 && jj1 = j && jj2 <= jj4 then
+      else if jj4 < j2 && jj1 = ini_jj1 && jj2 <= jj4 then
         do mirror_block t ii i jj1 jj4; return loop (jj4 + 1)
       else j - 1
   in
@@ -736,7 +737,7 @@ value push_to_left d t i j1 j2 =
       in
       let jj2 = j in
       let jj3 = j + 1 in
-      let jj4 =
+      let ini_jj4 =
         match line.(j + 1).elem with
         [ Nothing -> j + 1
         | x ->
@@ -747,12 +748,13 @@ value push_to_left d t i j1 j2 =
             in
             same_value (j + 2) ]
       in
+      let jj4 = ini_jj4 in
       let (ii, jj1, jj2, jj3, jj4) =
         find_block_with_parents t i jj1 jj2 jj3 jj4
       in
       if jj1 > j1 && jj2 < jj3 then
         do exch_blocks t ii i jj1 jj2 jj3 jj4; return loop (jj1 - 1)
-      else if jj1 > j1 && jj4 = j + 1 && jj3 >= jj1 then
+      else if jj1 > j1 && jj4 = ini_jj4 && jj3 >= jj1 then
         do mirror_block t ii i jj1 jj4; return loop (jj1 - 1)
       else j + 1
   in
