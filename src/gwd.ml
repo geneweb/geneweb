@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.33 2002-03-04 14:10:38 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.34 2002-03-04 18:01:33 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -467,7 +467,8 @@ value general_welcome conf =
   | None -> propose_base conf ]
 ;
 
-value unauth_not_cgi conf typ =
+value unauth_server conf passwd =
+  let typ = if passwd = "w" then "Wizard" else "Friend" in
   do {
     Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
@@ -491,19 +492,28 @@ value unauth_not_cgi conf typ =
   }
 ;
 
-value unauth_cgi conf typ =
+value unauth_cgi conf passwd =
   let title _ =
-    Wserver.wprint "Enter username for %s %s" typ conf.bname
+    let i = if passwd = "w" then 0 else 1 in
+    Wserver.wprint "%s / %s"
+      (Util.capitale (transl_nth conf "wizard/friend" i)) conf.bname
   in
+  let message_txt i = transl_nth conf "user/password/cancel" i in
   do {
+    conf.set_cookie := Some (conf.bname ^ "_" ^ passwd, "");
     Util.header conf title;
     Wserver.wprint "<div align=center><table border=0><tr><td>\n";
     tag "form" "method=POST action=\"%s\"" conf.command begin
       Util.hidden_env conf;
+      List.iter
+        (fun (k, v) ->
+           Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" k
+             (Util.quote_escaped (Util.decode_varenv v)))
+        conf.env;
       tag "table" "border=1" begin
         tag "tr" "align=left" begin
           tag "td" "align=right" begin
-            Wserver.wprint "User ID:";
+            Wserver.wprint "%s:" (Util.capitale (message_txt 0));
           end;
           tag "td" "align=left" begin
             Wserver.wprint "<input name=\"log_uid\" size=30>\n";
@@ -511,7 +521,7 @@ value unauth_cgi conf typ =
         end;
         tag "tr" "align=left" begin
           tag "td" "align=right" begin
-            Wserver.wprint "Password:";
+            Wserver.wprint "%s:" (Util.capitale (message_txt 1));
           end;
           tag "td" "align=left" begin
             Wserver.wprint "<input name=\"log_pwd\" type=password size=30>\n";
@@ -519,15 +529,16 @@ value unauth_cgi conf typ =
         end;
       end;
       Wserver.wprint "<input type=submit value=Ok>\n";
-      Wserver.wprint "<input type=submit name=log_cnl value=Cancel>\n";
+      Wserver.wprint "<input type=submit name=log_cnl value=\"%s\">\n"
+        (Util.capitale (message_txt 2));
     end;
     Wserver.wprint "</td></tr></table></div>\n";
     Util.trailer conf;
   }
 ;
 
-value unauth conf typ =
-  if conf.cgi then unauth_cgi conf typ else unauth_not_cgi conf typ
+value unauth conf passwd =
+  if conf.cgi then unauth_cgi conf passwd else unauth_server conf passwd
 ;
 
 value match_auth_file auth_file uauth =
@@ -871,22 +882,36 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
         try List.assoc "wizard_just_friend" base_env = "yes" with
         [ Not_found -> False ]
     in
-    let passwd1 =
+    let (passwd1, set_cookie) =
       if cgi then
         match (Util.p_getenv env "log_uid", Util.p_getenv env "log_pwd") with
-        [ (Some uid, Some passwd) -> uid ^ ":" ^ passwd
-        | _ -> "" ]
+        [ (Some uid, Some pwd) ->
+            let v = uid ^ ":" ^ pwd in
+            let set_cookie =
+              if passwd = "w" || passwd = "f" then
+                Some (base_file ^ "_" ^ passwd, Base64.encode v)
+              else None
+            in
+            (v, set_cookie)
+        | _ ->
+            if passwd = "w" || passwd = "f" then
+              let cookie = Wserver.extract_param "cookie: " '\n' request in
+              let cookenv = Util.create_env cookie in
+              let k = base_file ^ "_" ^ passwd in
+              let v = try List.assoc k cookenv with [ Not_found -> "" ] in
+              (if v = "" then "" else Base64.decode v, None)
+            else ("", None) ]
       else
         let auth = Wserver.extract_param "authorization: " '\r' request in
-        if auth = "" then ""
+        if auth = "" then ("", None)
         else
           let i = String.length "Basic " in
-          Base64.decode (String.sub auth i (String.length auth - i))
+          (Base64.decode (String.sub auth i (String.length auth - i)), None)
     in
-    let passwd =
+    let (passwd, set_cookie) =
       match Util.p_getenv env "log_cnl" with
-      [ Some "" | None -> passwd
-      | Some _ -> "" ]
+      [ Some "" | None -> (passwd, set_cookie)
+      | Some _ -> ("", None) ]
     in
     let uauth = if passwd = "w" || passwd = "f" then passwd1 else passwd in
     let (ok, wizard, friend) =
@@ -934,11 +959,20 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
       match access_type with
       [ ATnone | ATset ->
           if cgi then
+            let has_accepted_cookie =
+              Wserver.extract_param "cookie: " '\n' request <> ""
+            in
             if wizard then
-              let pwd_id = set_token utm from_addr base_file 'w' user in
+              let pwd_id =
+                if has_accepted_cookie then passwd
+                else set_token utm from_addr base_file 'w' user
+              in
               (command, pwd_id)
             else if friend then
-              let pwd_id = set_token utm from_addr base_file 'f' user in
+              let pwd_id =
+                if has_accepted_cookie then passwd
+                else set_token utm from_addr base_file 'f' user
+              in
               (command, pwd_id)
             else (command, passwd)
           else if passwd = "" then (base_file, "")
@@ -978,6 +1012,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
          [ Not_found -> False ];
        cancel_links = cancel_links;
        setup_link = setup_link.val;
+       set_cookie = set_cookie;
        access_by_key =
          try List.assoc "access_by_key" base_env = "yes" with
          [ Not_found -> False ];
@@ -1144,7 +1179,7 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
                   flush_log oc;
                 }
             | Refuse -> () ];
-            unauth conf (if passwd = "w" then "Wizard" else "Friend");
+            unauth conf passwd;
           }
       | _ ->
           let mode = Util.p_getenv conf.env "m" in
