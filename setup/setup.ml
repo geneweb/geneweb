@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.52 2004-12-14 13:46:48 ddr Exp $ *)
+(* $Id: setup.ml,v 4.53 2004-12-14 15:03:05 ddr Exp $ *)
 
 open Printf;
 
@@ -579,7 +579,12 @@ and print_selector conf print =
       List.map
         (fun x ->
            let d =
-             if x = ".." then Filename.dirname sel
+             if x = ".." then
+	       ifdef WIN95 then
+	         if sel.[String.length sel - 1] <> '\\' then
+		   Filename.dirname sel ^ "\\"
+		 else Filename.dirname sel
+	       else Filename.dirname sel
              else Filename.concat sel x
            in
            let x = if is_directory d then Filename.concat x "" else x in
