@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.31 2002-03-06 12:21:21 ddr Exp $ *)
+(* $Id: perso.ml,v 4.32 2002-03-11 17:24:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -77,7 +77,7 @@ value print_title conf base and_txt p (nth, name, title, places, dates) =
       match (nth, dates, name) with
       [ (n, _, _) when n > 0 -> True
       | (_, _, Tname _) -> True
-      | (_, [(Some _, _) :: _], _) -> age_autorise conf base p
+      | (_, [(Some _, _) :: _], _) -> authorized_age conf base p
       | _ -> False ]
     in
     if paren then Wserver.wprint "\n(" else ();
@@ -100,7 +100,7 @@ value print_title conf base and_txt p (nth, name, title, places, dates) =
           }
       | _ -> first ]
     in
-    if age_autorise conf base p && dates <> [(None, None)] then
+    if authorized_age conf base p && dates <> [(None, None)] then
       let _ =
         List.fold_left
           (fun first (date_start, date_end) ->
@@ -292,7 +292,7 @@ value rec eval_variable conf base env sl =
     let p = pget conf base ip in
     let a = aget conf base ip in
     let u = uget conf base ip in
-    let p_auth = age_autorise conf base p in (p, a, u, p_auth)
+    let p_auth = authorized_age conf base p in (p, a, u, p_auth)
   in
   let rec loop (p, a, u, p_auth) efam =
     fun
@@ -301,7 +301,7 @@ value rec eval_variable conf base env sl =
         [ Vind p a u ->
             let auth =
               match get_env "auth" env with
-              [ Vbool True -> age_autorise conf base p
+              [ Vbool True -> authorized_age conf base p
               | _ -> False ]
             in
             let ep = (p, a, u, auth) in loop ep efam sl
@@ -327,7 +327,7 @@ value rec eval_variable conf base env sl =
     | ["related" :: sl] ->
         match get_env "c" env with
         [ Vind p a u ->
-            let ep = (p, a, u, age_autorise conf base p) in loop ep efam sl
+            let ep = (p, a, u, authorized_age conf base p) in loop ep efam sl
         | _ -> VVnone ]
     | ["relation_her" :: sl] ->
         match get_env "rel" env with
@@ -345,7 +345,7 @@ value rec eval_variable conf base env sl =
     | ["witness" :: sl] ->
         match get_env "witness" env with
         [ Vind p a u ->
-            let ep = (p, a, u, age_autorise conf base p) in loop ep efam sl
+            let ep = (p, a, u, authorized_age conf base p) in loop ep efam sl
         | _ -> VVnone ]
     | ["enclosing" :: sl] ->
         let rec loop =
@@ -476,7 +476,7 @@ value print_divorce_date conf base env p p_auth =
           let d = Adef.od_of_codate d in
           let auth =
             let spouse = pget conf base isp in
-            p_auth && age_autorise conf base spouse
+            p_auth && authorized_age conf base spouse
           in
           match d with
           [ Some d when auth ->
@@ -538,7 +538,7 @@ value print_married_to conf base env p p_auth =
   fun
   [ Vfam fam (_, ispouse) des ->
       let spouse = pget conf base ispouse in
-      let auth = p_auth && age_autorise conf base spouse in
+      let auth = p_auth && authorized_age conf base spouse in
       let format = relation_txt conf p.sex fam in
       Wserver.wprint (fcapitale format)
         (fun _ -> if auth then print_marriage_text conf base True fam else ())
@@ -646,7 +646,7 @@ value print_parent_age conf base p a p_auth parent =
   [ Some ifam ->
       let cpl = coi base ifam in
       let pp = pget conf base (parent cpl) in
-      if p_auth && age_autorise conf base pp then
+      if p_auth && authorized_age conf base pp then
         match (Adef.od_of_codate pp.birth, Adef.od_of_codate p.birth) with
         [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
             Date.print_age conf (temps_ecoule d1 d2)
@@ -727,7 +727,7 @@ value print_sosa_link conf base env a a_auth =
 value print_sosa_ref conf base env a a_auth =
   match get_env "sosa" env with
   [ Vsosa (Some (_, p)) ->
-      let p_auth = age_autorise conf base p in
+      let p_auth = authorized_age conf base p in
       Wserver.wprint "%s" (simple_person_text conf base p p_auth)
   | _ -> () ]
 ;
@@ -1235,7 +1235,7 @@ and eval_foreach_child conf base env al =
   fun
   [ Vfam _ _ des ->
       let auth =
-        List.for_all (fun ip -> age_autorise conf base (pget conf base ip))
+        List.for_all (fun ip -> authorized_age conf base (pget conf base ip))
           (Array.to_list des.children)
       in
       let env = [("auth", Vbool auth) :: env] in
@@ -1460,7 +1460,7 @@ value interp_templ conf base p astl =
       in
       [("image", Vimage v) :: env]
     in
-    let env = [("p_auth", Vbool (age_autorise conf base p)) :: env] in
+    let env = [("p_auth", Vbool (authorized_age conf base p)) :: env] in
     let env = [("p", Vind p a u) :: env] in env
   in
   List.iter (eval_ast conf base env) astl

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.16 2002-03-06 12:21:17 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.17 2002-03-11 17:24:45 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -219,8 +219,8 @@ value afficher_ascendants_jusqu_a conf base niveau_max p =
           let cpl = coi base ifam in
           let pere = pget conf base cpl.father in
           let mere = pget conf base cpl.mother in
-          let know_fath = connais base pere in
-          let know_moth = connais base mere in
+          let know_fath = know base pere in
+          let know_moth = know base mere in
           if know_fath || know_moth then
             tag "ul" begin
               if know_fath then do {
@@ -521,7 +521,7 @@ value print_marriage_long conf base all_gp auth marr_nb p ifam =
   let ispouse = spouse p.cle_index (coi base ifam) in
   let spouse = pget conf base ispouse in
   let divorce = fam.divorce in
-  let auth = auth && age_autorise conf base spouse in
+  let auth = auth && authorized_age conf base spouse in
   do {
     Wserver.wprint (fcapitale (relation_txt conf p.sex fam))
       (fun _ ->
@@ -570,7 +570,7 @@ value has_notes conf base =
     (fun
      [ GP_person _ ip _ ->
          let p = pget conf base ip in
-         age_autorise conf base p && person_has_notes conf base p
+         authorized_age conf base p && person_has_notes conf base p
      | _ -> False ])
 ;
 
@@ -586,7 +586,7 @@ value print_other_marriages conf base ws all_gp auth ifamo p u =
 ;
 
 value print_notes_ref conf base p wn n child_n =
-  if wn && age_autorise conf base p && person_has_notes conf base p then do {
+  if wn && authorized_age conf base p && person_has_notes conf base p then do {
     Wserver.wprint "[%s " (capitale (transl_nth conf "note/notes" 0));
     stag "strong" begin
       stag "a" "href=\"#notes-%s%s\"" (Num.to_string n) child_n begin
@@ -603,8 +603,8 @@ value print_family_long conf base ws wn all_gp ifam nth moth_nb =
   let cpl = coi base ifam in
   let des = doi base ifam in
   let auth =
-    age_autorise conf base (pget conf base cpl.father) &&
-    age_autorise conf base (pget conf base cpl.mother)
+    authorized_age conf base (pget conf base cpl.father) &&
+    authorized_age conf base (pget conf base cpl.mother)
   in
   do {
     Wserver.wprint "<p>\n... ";
@@ -619,7 +619,7 @@ value print_family_long conf base ws wn all_gp ifam nth moth_nb =
     | None -> () ];
     Wserver.wprint ":\n<p>\n";
     let auth =
-      List.for_all (fun ip -> age_autorise conf base (pget conf base ip))
+      List.for_all (fun ip -> authorized_age conf base (pget conf base ip))
         (Array.to_list des.children)
     in
     tag "ol" "type=a" begin
@@ -691,8 +691,8 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
               let fam = foi base ifam in
               let cpl = coi base ifam in
               let auth =
-                age_autorise conf base (pget conf base cpl.father) &&
-                age_autorise conf base (pget conf base cpl.mother)
+                authorized_age conf base (pget conf base cpl.father) &&
+                authorized_age conf base (pget conf base cpl.mother)
               in
               Wserver.wprint "... ";
               Wserver.wprint (relation_txt conf Male fam)
@@ -710,7 +710,7 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
         end;
         Wserver.wprint ":\n";
         stag "strong" begin afficher_personne_referencee conf base p; end;
-        print_person_long_info conf base (age_autorise conf base p) None p;
+        print_person_long_info conf base (authorized_age conf base p) None p;
         Wserver.wprint ".\n";
         match (aget conf base ip).parents with
         [ Some ifam ->
@@ -735,7 +735,7 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
             | _ -> () ]
         | None -> () ];
         print_notes_ref conf base p wn n "";
-        print_other_marriages conf base ws all_gp (age_autorise conf base p)
+        print_other_marriages conf base ws all_gp (authorized_age conf base p)
           ifamo p u;
         match ifamo with
         [ Some ifam ->
@@ -785,7 +785,7 @@ value print_not_empty_src conf base new_parag first txt isrc =
 value print_sources conf base new_parag p =
   let u = uget conf base p.cle_index in
   let first = ref True in
-  let auth = age_autorise conf base p in
+  let auth = authorized_age conf base p in
   do {
     print_not_empty_src conf base new_parag first
       (fun () -> nominative (transl_nth conf "person/persons" 0)) p.psources;
@@ -821,7 +821,7 @@ value print_sources conf base new_parag p =
 ;
 
 value print_notes_for_someone conf base p n child_n =
-  if age_autorise conf base p && person_has_notes conf base p then do {
+  if authorized_age conf base p && person_has_notes conf base p then do {
     let notes = sou base p.notes in
     Wserver.wprint "<dt>\n";
     stag "strong" begin
@@ -1645,11 +1645,11 @@ value print_tree_with_table conf base gv p =
                  let cpl = coi base ifam in
                  let fath =
                    let p = pget conf base cpl.father in
-                   if connais base p then Some p else None
+                   if know base p then Some p else None
                  in
                  let moth =
                    let p = pget conf base cpl.mother in
-                   if connais base p then Some p else None
+                   if know base p then Some p else None
                  in
                  match (fath, moth) with
                  [ (Some f, Some m) ->
@@ -1942,7 +1942,7 @@ value print_female_line = print_male_female_line False;
 (* Surnames list *)
 
 value get_date_place conf base auth_for_all_anc p =
-  if auth_for_all_anc || age_autorise conf base p then
+  if auth_for_all_anc || authorized_age conf base p then
     let d1 =
       match Adef.od_of_codate p.birth with
       [ None -> Adef.od_of_codate p.baptism

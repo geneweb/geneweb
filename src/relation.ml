@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.26 2002-03-10 16:24:20 ddr Exp $ *)
+(* $Id: relation.ml,v 4.27 2002-03-11 17:24:56 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -58,7 +58,7 @@ value print_with_witness conf base p fam ip =
 ;
 
 value print_menu conf base p =
-  let auth = age_autorise conf base p in
+  let auth = authorized_age conf base p in
   let title h =
     do {
       Wserver.wprint "%s " (capitale (transl conf "link between"));
@@ -1511,8 +1511,8 @@ value print_main_relationship conf base long p1 p2 rel =
             (transl_nth conf "relationship link/relationship links"
                (if Num.eq total Num.one then 0 else 1));
           if long then () else print_dag_links conf base p1 p2 rl;
-          if not all_by_marr && age_autorise conf base p1 &&
-             age_autorise conf base p2 && a1.consang != Adef.fix (-1) &&
+          if not all_by_marr && authorized_age conf base p1 &&
+             authorized_age conf base p2 && a1.consang != Adef.fix (-1) &&
              a2.consang != Adef.fix (-1)
           then do {
             html_p conf;

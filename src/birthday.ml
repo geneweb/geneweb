@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.5 2002-03-06 12:21:19 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.6 2002-03-11 17:24:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -57,7 +57,7 @@ value gen_print conf base mois f_scan dead_people =
           [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
               if d.prec = Sure && d.day <> 0 && d.month <> 0 &&
                  d.month = mois && d.delta = 0 then
-                if age_autorise conf base p then
+                if authorized_age conf base p then
                   let j = d.day in
                   tab.(pred j) :=
                     [(p, d.year, DeBirth, txt_of) :: tab.(pred j)]
@@ -73,7 +73,7 @@ value gen_print conf base mois f_scan dead_people =
                 [ Some (Dgreg dt _) ->
                     if dt.prec = Sure && dt.day <> 0 && dt.month <> 0 &&
                        dt.month = mois && dt.delta = 0 then
-                      if age_autorise conf base p then
+                      if authorized_age conf base p then
                         let j = dt.day in
                         tab.(pred j) :=
                           [(p, dt.year, DeBirth, txt_of) :: tab.(pred j)]
@@ -86,7 +86,7 @@ value gen_print conf base mois f_scan dead_people =
                     [ Dgreg dt _ ->
                         if dt.prec = Sure && dt.day <> 0 && dt.month <> 0 &&
                            dt.month = mois && dt.delta = 0 then
-                          if age_autorise conf base p then
+                          if authorized_age conf base p then
                             let j = dt.day in
                             let a = dt.year in
                             tab.(pred j) :=
@@ -280,8 +280,8 @@ value print_marriage conf base month =
             let father = pget conf base cpl.father in
             let mother = pget conf base cpl.mother in
             if m == month &&
-               age_autorise conf base father && not (is_hidden father) &&
-               age_autorise conf base mother && not (is_hidden mother) then
+               authorized_age conf base father && not (is_hidden father) &&
+               authorized_age conf base mother && not (is_hidden mother) then
               tab.(pred d) := [(cpl, y) :: tab.(pred d)]
             else ()
         | _ -> () ]
@@ -369,11 +369,11 @@ value print_marriage_day conf base day_name verb wd dt list =
 ;
 
 value match_dates conf base p d1 d2 =
-  if d1.day == d2.day && d1.month == d2.month then age_autorise conf base p
+  if d1.day == d2.day && d1.month == d2.month then authorized_age conf base p
   else if
     d1.day == 29 && d1.month == 2 && d2.day == 1 && d2.month = 3 &&
     not (leap_year d2.year) then
-    age_autorise conf base p
+    authorized_age conf base p
   else False
 ;
 
@@ -528,13 +528,13 @@ value print_menu_dead conf base =
 
 value match_mar_dates conf base cpl d1 d2 =
   if d1.day == d2.day && d1.month == d2.month then
-    age_autorise conf base (pget conf base cpl.father) &&
-    age_autorise conf base (pget conf base cpl.mother)
+    authorized_age conf base (pget conf base cpl.father) &&
+    authorized_age conf base (pget conf base cpl.mother)
   else if
     d1.day == 29 && d1.month == 2 && d2.day == 1 && d2.month = 3 &&
     not (leap_year d2.year) then
-    age_autorise conf base (pget conf base cpl.father) &&
-    age_autorise conf base (pget conf base cpl.mother)
+    authorized_age conf base (pget conf base cpl.father) &&
+    authorized_age conf base (pget conf base cpl.mother)
   else False
 ;
 

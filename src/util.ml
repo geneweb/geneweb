@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.41 2002-03-06 12:21:25 ddr Exp $ *)
+(* $Id: util.ml,v 4.42 2002-03-11 17:24:57 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -426,7 +426,7 @@ value parent_has_title base p =
   | _ -> False ]
 ;
 
-value age_autorise conf base p =
+value authorized_age conf base p =
   if p.access = Public || conf.friend || conf.wizard then True
   else if
     conf.public_if_titles && p.access = IfTitles &&
@@ -562,7 +562,7 @@ value exit_nobr () =
 ;
 *)
 
-value connais base p =
+value know base p =
   sou base p.first_name <> "?" || sou base p.surname <> "?"
 ;
 
@@ -586,12 +586,6 @@ value acces_n conf base n x =
 ;
 
 value acces conf base x = acces_n conf base "" x;
-
-value calculer_age conf p =
-  match Adef.od_of_codate p.birth with
-  [ Some (Dgreg d _) -> Some (temps_ecoule d conf.today)
-  | _ -> None ]
-;
 
 type p_access = (base -> person -> string * base -> person -> string);
 value std_access = (p_first_name, p_surname);
@@ -724,7 +718,7 @@ value reference conf base p s =
 value no_reference conf base p s = s;
 
 value gen_person_title_text reference p_access conf base p =
-  if age_autorise conf base p then
+  if authorized_age conf base p then
     match main_title base p with
     [ Some t ->
         reference conf base p (titled_person_text conf base p t) ^
@@ -755,7 +749,7 @@ value gen_person_text_without_title p_access conf base p =
 value person_text_without_title = gen_person_text_without_title std_access;
 
 value person_title conf base p =
-  if age_autorise conf base p then
+  if authorized_age conf base p then
     match main_title base p with
     [ Some t -> one_title_text conf base p t
     | None -> "" ]
@@ -1842,7 +1836,7 @@ value auto_image_file conf base p =
 ;
 
 value image_and_size conf base p image_size =
-  if age_autorise conf base p then
+  if authorized_age conf base p then
     let image_txt = capitale (transl_nth conf "image/images" 0) in
     match sou base p.image with
     [ "" ->
@@ -1870,7 +1864,7 @@ value image_and_size conf base p image_size =
 ;
 
 value has_image conf base p =
-  if age_autorise conf base p then
+  if authorized_age conf base p then
     p.image <> Adef.istr_of_int 0 || auto_image_file conf base p <> None
   else False
 ;
