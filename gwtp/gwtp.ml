@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.25 2005-01-09 01:41:29 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.26 2005-01-09 11:31:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Printf;
@@ -262,6 +262,7 @@ value copy_template genv (varenv, filenv) env if_env fname =
             [ 'I' -> push_echo (echo.val && if_expr (input_char ic))
             | 'E' -> pop_echo ()
             | _ when not echo.val -> ()
+            | 's' -> print_string (cgi_script_name ())
             | 'c' | 'e' as x ->
                 let (v, k) = get_binding ic in
                 try
@@ -832,9 +833,7 @@ value gwtp_upload_gedcom str env b tok =
     printf "content-type: text/html";
     crlf ();
     crlf ();
-    copy_template env ([], [])
-      [('s', Val (cgi_script_name ())); ('b', Val b); ('t', Val tok)] []
-      "send_gedcom";
+    copy_template env ([], []) [('b', Val b); ('t', Val tok)] [] "send_gedcom";
   }
 ;
 
@@ -1070,9 +1069,7 @@ value gwtp_upload str env b tok =
     printf "content-type: text/html";
     crlf ();
     crlf ();
-    copy_template env ([], [])
-      [('s', Val (cgi_script_name ())); ('b', Val b); ('t', Val tok)] []
-      "send";
+    copy_template env ([], []) [('b', Val b); ('t', Val tok)] [] "send";
   }
 ;
 
@@ -1116,8 +1113,7 @@ value gwtp_download str env b tok =
         }
       in
       copy_template env ([], [])
-        [('s', Val (cgi_script_name ())); ('b', Val b); ('t', Val tok);
-         ('d', Fun print_directory)] []
+        [('b', Val b); ('t', Val tok); ('d', Fun print_directory)] []
         "recv";
     }
     else do {
@@ -1139,8 +1135,7 @@ value gwtp_config str env b tok =
     printf "content-type: text/html";
     crlf ();
     crlf ();
-    copy_template env (varenv, filenv)
-      [('s', Val (cgi_script_name ())); ('b', Val b); ('t', Val tok)] []
+    copy_template env (varenv, filenv) [('b', Val b); ('t', Val tok)] []
       "conf";
   }
 ;
@@ -1151,8 +1146,7 @@ value gwtp_main str env b tok =
     crlf ();
     crlf ();
     copy_template env ([], [])
-      [('s', Val (cgi_script_name ())); ('b', Val b); ('t', Val tok);
-       ('w', Val gw_site.val)]
+      [('b', Val b); ('t', Val tok); ('w', Val gw_site.val)]
       [('c', Sys.file_exists (Filename.concat gwtp_dst.val (b ^ ".gwf")));
        ('g', Sys.file_exists (Filename.concat gwtp_etc.val "ged2gwb"));
        ('w', gw_site.val <> "")]

@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 4.5 2004-12-14 09:30:09 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.6 2005-01-09 11:31:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -52,6 +52,19 @@ value apply_patches tab plist plen =
   }
 ;
 
+value value_header_size = 20;
+value array_header_size len = if len < 8 then 1 else 5;
+
+(* to turn around lack of header in some output valued arrays version 4.10 *)
+value input_4_10_array ic pos len =
+  do {
+    Printf.eprintf "*** recovering 4.10 array...\n";
+    flush stderr;
+    seek_in ic (pos + value_header_size + array_header_size len);
+    Array.init len (fun _ -> Iovalue.input ic)
+  }
+;
+
 value make_cache ic shift array_pos patches len name =
   let tab = ref None in
   let r =
@@ -67,7 +80,11 @@ value make_cache ic shift array_pos patches len name =
           flush stderr;
           do {
             seek_in ic array_pos;
-            let t = apply_patches (input_value ic) patches.val r.len in
+            let v =
+              try input_value ic with
+              [ Failure _ -> input_4_10_array ic array_pos len ]
+            in
+            let t = apply_patches v patches.val r.len in
             tab.val := Some t;
             t
           }
