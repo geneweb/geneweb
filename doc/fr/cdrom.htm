@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+              "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>CDrom</title></head>
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>GeneWeb - Créer un CDrom</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
+
+Vous pouvez créer un CDrom de votre base de données avec <font
+color=#2f6400><b>GeneWeb</b></font> inclus dedans: cela vous permet de
+distribuer votre base de données directement utilisable.
+
+<p>
+
+Ce chapitre vous explique les étapes minimums pour y arriver. Cette
+installation a l'avantage que l'utilisateur n'aura rien à installer
+sur son disque dur, ni le logiciel, ni la base de données.
+
+<p>
+
+Voici les opérations à faire:
+
+<p>
+
+<ol>
+
+<li> Faites un nettoyage en profondeur de votre base. Si vous avez
+gwsetup, utilisez-le: regardez dans son "menu principal" comment faire
+cette opération. Cela peut se faire aussi intéractivement avec les
+commandes gwu et gwc (gwu extrait la base sous forme texte source et
+gwc la recrée).
+
+<p>
+
+<font size=-1>Remarque: cette étape n'est pas absolument obligatoire
+mais vous permet de distribuer une base de données optimisée en
+mémoire et en vitesse d'accès. Cependant, si votre base de données
+vient d'un fichier GEDCOM ou d'un fichier source <font
+color=#2f6400><b>GeneWeb</b></font> et que vous n'avez pas fait de
+modifications dedans, elle est inutile.</font>
+
+<p>
+
+<li> Si vous voulez que les consanguinités s'affichent dans les pages
+personnelles et dans les calculs de parenté, passez le programme
+d'initialisation des consanguinités. Sous gwsetup, voyez le "menu
+principal". Intéractivement, cela peut se faire avec la commande
+consang.
+
+<p>
+
+<font size=-1>Remarque: étape facultative aussi. Si vous ne la faites
+pas, les calculs de parenté fonctionneront quand même mais les
+consanguinités ne s'afficheront pas.</font>
+
+<p>
+
+<li> Entrez dans votre base et faites un calcul de parenté quelconque,
+par exemple entre un père et son fils.
+
+<p>
+
+<font size=-1>Remarque: c'est encore une étape facultative destinée à
+optimiser l'accès à la base. En effet, le premier calcul de parenté
+fabrique un fichier (de nom fstab) dans la base de données qui permet
+aux calculs de parenté suivants d'aller plus vite. Si ce fichier n'a
+pas été créé, ce ne sera plus possible dans le CDrom et les calculs de
+parenté seront plus lents.</font>
+
+<p>
+
+<li> Faites un répertoire pour les éléments que vous allez mettre dans
+le CDrom. Dans la suite de ces explications, on désignera ce répertoire
+par "répertoire destination".
+
+<p>
+
+<li> Commencez par y transférer votre base de données: c'est un
+répertoire se terminant par ".gwb". Par exemple, si votre base
+s'appelle "xyz", c'est un répertoire qui s'appelle "xyz.gwb".  Ce
+répertoire se trouve dans le répertoire des bases (cela dépend de votre
+installation: Windows, MacOS X, Unix...).
+
+<p>
+
+<li> Ajoutez dans le répertoire destination un fichier de
+configuration. Si vous en avez un qui vous convient, utilisez-le,
+sinon créez-le. Le fichier de configuration est un fichier texte se
+terminant par ".gwf". Si votre base s'appelle "xyz", c'est le fichier
+"xyz.gwf". S'il y a déjà un fichier de configuration, il se trouve
+également dans le répertoire des bases.
+
+<p>
+
+Dans ce fichier, ajoutez un mot de passe "sorcier" bidon, en ajoutant
+la ligne:
+
+<pre>
+     wizard_passwd=a
+</pre>
+
+<p>
+
+<font size=-1>Remarque: cette opération est facultative mais elle
+permet d'éviter que cela propose une "mise à jour" dans les pages
+personnelles, mise à jour qui, de toutes façons, ne fonctionnerait pas
+sur un support non inscriptible.  Attention: si vous créez le fichier
+de configuration, faites en sorte qu'il n'ait pas l'extension .txt
+comme certains systèmes font malheureusement automatiquement:
+l'extension doit être .gwf et rien d'autre.</font>
+
+<p>
+
+<li> Copiez l'exécutable "gwd" dans le répertoire destination. Sur
+certains systèmes, il porte l'extension ".exe". Attention: il peut y
+avoir plusieurs fichiers qui s'appellent "gwd" dans votre installation
+<font color=#2f6400><b>GeneWeb</b></font>. Il s'agit ici d'un fichier
+assez gros (plus de 1Mo). Il se trouve généralement dans un répertoire
+qui s'appelle "gw".
+
+<p>
+
+<li> Copiez dans le répertoire destination les répertoires "lang",
+"etc" et "images" qui doivent se trouver dans le même répertoire où
+vous avez trouvé l'exécutable gwd.
+
+<p>
+
+<font size=-1>Remarque: la présence de ces répertoires est
+obligatoire. Ils contiennent des fichiers utilisés par gwd, en
+particulier pour les langues et pour l'affichage de certaines
+pages.</font>
+
+<p>
+
+<li> Dans le répertoire "lang" du répertoire destination, éditez le
+fichier nommé "start.txt" et supprimez le groupe de lignes qui
+contiennent les liens pour accès "sorcier". Elles commencent par
+quelque chose comme:
+
+<pre>
+   &lt;td align=center&gt;[
+   af: &lt;a href="%sw=w"&gt;&lt;em&gt;Medewerkers&lt;/em&gt;&lt;/a&gt; toegang&lt;br&gt; (password)
+   ca: acc&eacute;s &lt;a href="%sw=w"&gt;&lt;em&gt;administrador&lt;/em&gt;&lt;/a&gt;&lt;br&gt; (clau)
+</pre>
+
+et finissent par:
+
+<pre>
+   pl: &lt;a href="%sw=w"&gt;&lt;em&gt;"Wizard"&lt;/em&gt;&lt;/a&gt; dostêp&lt;br&gt; (has³o)
+   pt: Entrada &lt;a href="%sw=w"&gt;&lt;em&gt;feiticeiro&lt;/em&gt;&lt;/a&gt;&lt;br&gt; (palavra chave)
+   sv: &lt;a href="%sw=w"&gt;&lt;em&gt;Uppdaterings&lt;/em&gt;&lt;/a&gt; tilltr&auml;de&lt;br&gt; (passord)
+   ]&lt;br&gt;&lt;/td&gt;
+</pre>
+
+<p>
+
+<font size=-1>Cette étape n'est pas obligatoire mais évite que la page
+d'accueil propose un accès sorcier qui, de toutes façons, ne servirait
+à rien.</font>
+
+<p>
+
+<li><b>Étape importante</b>. L'exécutable gwd fabrique des fichiers
+dans son répertoire courant. S'il ne peut pas le faire, ça peut
+bloquer son fonctionnement (en particulier sous Windows, ça le
+bloquera certainement). Il faut donc lui indiquer une option pour
+qu'il utilise le disque dur (note: ces fichiers ne sont pas gros, sont
+temporaires et les détruire volontairement ou involontairement pendant
+ou après visite ne perturbera pas le fonctionnement de gwd).
+
+<p>
+
+Pour cela, créez un fichier texte de nom "gwd.arg" (attention: pas
+d'extension ".txt") et écrivez dedans:
+
+<pre>
+   Si vous préparez un CDrom pour Windows:
+          -wd
+          c:/temp/geneweb
+   Si c'est pour Unix ou MacOS X:
+          -wd
+          /tmp/geneweb
+</pre>
+
+<p>
+
+<li>Si votre base de données a des images, mettez-les dans le
+répertoire "images", sous-répertoire portant le nom de votre base
+("images/xyz" si votre base s'appelle "xyz").
+
+<p>
+
+<li> Après toutes ces étapes, vous disposez d'une installation
+minimum, obligeant l'utilisateur à lancer lui-même gwd et à ouvrir
+l'adresse URL pour accéder à la base. Vous pouvez améliorer cela en
+fournissant des fichiers HTML et/ou des scripts (shell, batch) qui
+lanceront tout cela tout seul. Vous pouvez aussi mettre plusieurs
+bases de données, d'autres fichiers HTML, etc, etc.
+
+<p>
+
+<font size=-1>
+
+Ne me demandez pas comment on fait un CDrom qui lance tout
+automatiquement quand on l'insère sur son support: ça doit pouvoir se
+faire mais je ne sais pas comment.
+
+<p>
+
+Remarque: si vous voulez que votre base de données soit lisible sur
+d'autres Systèmes d'Exploitation (Windows, MacOS X, Unix) que vous
+utilisez, vous pouvez créer un répertoire par SE et y mettre la
+version de gwd pour ce SE-là. Bien sûr il vous faudra avoir téléchargé
+toutes les versions de <font color=#2f6400><b>GeneWeb</b></font> des
+SE que vous voulez rendre disponibles. Il faut également revoir
+l'installation des fichiers gwd.arg et en particulier leur indiquer le
+chemin d'accès aux fichiers système et à la base (options -hd et -bd
+de gwd).
+
+</font>
+
+<p>
+
+<li>Avant de graver votre disque, faites un test. Pour cela, rendez le
+répertoire destination non inscriptible ainsi que tous ses
+sous-répertoires et fichiers. Puis lancez la commande gwd (par
+double-clic si votre système le permet ou par une commande
+intéractive). Ouvez dans votre navigateur l'adresse
+http://127.0.0.1:2317/xyz (si la base s'appelle xyz) et vérifiez si ça
+fonctionne.
+
+<p>
+
+<li>Si c'est bon gravez votre CDrom en y mettant le répertoire
+destination et son contenu.
+
+</ol>
+
+<p>
+
+<p>
+<hr>
+<br>
+<center>Retour vers <a href="diruse.htm">Mode d'Emploi</a></center>
+
+<p><hr><font size=-1><em>&copy; Copyright 2001 INRIA -
+GeneWeb</em></font><br>
+
+</body>
