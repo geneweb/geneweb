@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.31 2001-01-08 19:30:44 ddr Exp $ *)
+(* $Id: dag.ml,v 3.32 2001-01-08 22:05:30 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -186,7 +186,16 @@ else Wserver.wprint " colspan=%d" colspan;
   return () 
 ;
 
-(* Print without HTML table tags: using <pre> *)
+(*
+ * Print without HTML table tags: using <pre>
+ *)
+
+(* Machinery opering to 'displayed texts', i.e. strings where not all
+   characters correspond to a displayed character (due to html tags or
+   encoded characters) *)
+
+(* Return next 'displayed character' location: can be on several 'string
+   characters', like "&nbsp;" *)
 
 value displayed_next_char s i =
   loop i where rec loop i =
@@ -213,6 +222,8 @@ value buff_store_int s blen i j =
   loop blen i where rec loop blen i =
     if i = j then blen else loop (Buff.store blen s.[i]) (i + 1)
 ;
+
+(* Remove empty tags, i.e. <a href=..></a> enclosing empty text, from s *)
 
 value strip_empty_tags s =
   loop 0 None 0 where rec loop blen opened_tag i =
@@ -266,11 +277,6 @@ value displayed_length s =
     | None -> len ]
 ;
 
-value buff_get len =
-  let s = Buff.get len in
-  strip_empty_tags s
-;
-
 value displayed_sub s ibeg ilen =
   loop 0 0 0 0 where rec loop blen di dlen i =
     match displayed_next_char s i with
@@ -283,7 +289,8 @@ value displayed_sub s ibeg ilen =
         in
         loop blen (di + 1) dlen k
    | None ->
-        buff_get (buff_store_int s blen i (String.length s)) ]
+        let s = Buff.get (buff_store_int s blen i (String.length s)) in
+        strip_empty_tags s ]
 ;
 
 value longuest_word_length s =
@@ -301,6 +308,8 @@ value displayed_end_word s di i =
     [ Some (j, k) -> if s.[j] = ' ' then (di, Some j) else loop (di + 1) k
     | None -> (di, None) ]
 ;
+
+(* Strip 'displayed text' s by subtexts of limited size sz *)
 
 value displayed_strip s sz =
   loop [] 0 0 0 where rec loop strl dibeg di i =
@@ -325,7 +334,9 @@ value displayed_strip s sz =
         List.rev strl ]
 ;
 
-value gen_compute_columns_sizes length hts ncol =
+(* Determine columns sizes; scan all table by increasing colspans *)
+
+value gen_compute_columns_sizes size_fun hts ncol =
   let colsz = Array.make ncol 0 in
   do loop 1 where rec loop curr_colspan =
        let next_colspan = ref (ncol + 1) in
@@ -339,7 +350,7 @@ value gen_compute_columns_sizes length hts ncol =
                   do match td with
                      [ TDstring s ->
                          if colspan = curr_colspan then
-                           let len = length s in
+                           let len = size_fun s in
                            let currsz =
                              loop 0 col colspan
                              where rec loop currsz col cnt =
@@ -374,6 +385,35 @@ value compute_columns_sizes =
   gen_compute_columns_sizes displayed_length;
 value compute_columns_minimum_sizes =
   gen_compute_columns_sizes longuest_word_length;
+
+(* Gadget to add a | to fill upper/lower part of a table data when
+   preceded/followed by a |; not obligatory but nicer *)
+
+value try_add_vbar stra_row stra_row_max hts i col =
+  if stra_row < 0 then
+    if i = 0 then ""
+    else
+      loop 0 0 where rec loop pcol pj =
+        let (colspan, _, td) = hts.(i-1).(pj) in
+        if pcol = col then
+          match td with
+          [ TDstring "|" -> "|"
+          | _ -> "" ]
+        else loop (pcol + colspan) (pj + 1)
+  else if stra_row >= stra_row_max then
+    if i = Array.length hts - 1 then ""
+    else
+      loop 0 0 where rec loop ncol nj =
+        let (colspan, _, td) = hts.(i+1).(nj) in
+        if ncol = col then
+          match td with
+          [ TDstring "|" -> "|"
+          | _ -> "" ]
+        else loop (ncol + colspan) (nj + 1)
+  else ""
+;
+
+(* Main print table algorithm with <pre> *)
 
 value print_table_pre conf hts =
   let ncol =
@@ -454,13 +494,13 @@ return
              do match td with
                 [ TDstring s ->
                     let s =
-                      let i =
-                        let di = (max_row - Array.length stra.(j)) / 2 in
-                        row - di
+                      let k =
+                        let dk = (max_row - Array.length stra.(j)) / 2 in
+                        row - dk
                       in
-                      if i >= 0 && i < Array.length stra.(j) then stra.(j).(i)
-                      else if s <> "&nbsp;" then "|"
-                      else ""
+                      if k >= 0 && k < Array.length stra.(j) then stra.(j).(k)
+                      else if s = "|" then s
+                      else try_add_vbar k (Array.length stra.(j)) hts i col
                     in
                     let len = displayed_length s in
                     do for i = 1 to (sz - len) / 2 do
