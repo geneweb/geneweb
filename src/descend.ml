@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.20 2000-10-28 21:52:32 ddr Exp $ *)
+(* $Id: descend.ml,v 3.21 2000-11-03 15:25:27 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1143,11 +1143,13 @@ value print_tree conf base gv p =
                        if auth then txt ^ short_dates_text gv conf base sp
                        else txt
                      in
-                     Wserver.wprint "&amp;%s&nbsp;%s"
-                       (if auth then
-                          short_marriage_date_text gv conf base fam p sp
-                        else "")
-                       txt;
+                     do Wserver.wprint "&amp;%s&nbsp;%s\n"
+                          (if auth then
+                             short_marriage_date_text gv conf base fam p sp
+                           else "")
+                          txt;
+                        Dag.print_image conf base sp;
+                     return ();
                    end;
                    Wserver.wprint "\n";
                 return ())
