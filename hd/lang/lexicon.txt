@@ -1880,7 +1880,7 @@ es: por parte de %t
 fr: du c&ocirc;t&eacute; de %t
 nl: langs de zijde van %t
 pt: pelo lado de %t
-se: fr&aring;n %t sl&auml;ktsida
+se: fr&aring;n %ts sl&auml;ktsida
 
     of the %s generation
 de: der %s Generation

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.6 1998-12-13 10:16:55 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.7 1998-12-15 22:04:43 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -412,7 +412,9 @@ value print_relation conf base ip1 ip2 =
         if c2 == 0 then None else find_next_branch base dist ip sp b2
       in
       let title _ =
-        do Wserver.wprint "Lien de parent&eacute;";
+        do Wserver.wprint "%s"
+             (capitale
+                (transl_nth conf "relationship link/relationship links" 0));
            match (pb1, nb1) with
            [ (None, None) -> ()
            | _ -> Wserver.wprint " %d" c1 ];
@@ -421,20 +423,7 @@ value print_relation conf base ip1 ip2 =
            | _ -> Wserver.wprint " %d" c2 ];
         return ()
       in
-      do Util.html conf;
-         Wserver.wprint "\
-<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
- \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n";
-         tag "head" begin
-           Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\">\n";
-           Wserver.wprint "  <title>";
-           title True;
-           Wserver.wprint "</title>\n";
-         end;
-         Wserver.wprint "\n";
-         Wserver.wprint "<body%s>\n"
-           (try " " ^ List.assoc "body_prop" conf.base_env with
-            [ Not_found -> "" ]);
+      do header_no_page_title conf title;
          tag "table" "cellspacing=0 cellpadding=0 width=\"100%%\"" begin
            if b1 = [] || b2 = [] then
              let b = if b1 = [] then b2 else b1 in

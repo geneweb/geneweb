@@ -5,6 +5,8 @@ GeneWeb Version 1.10
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [15/12/98] Added forgotten i18n translation of "liens de parenté" (title)
+    and added "head_no_page_title" in util's interface.
   - [14/12/98] Improved speed in families update: check_noloop made too
     many accesses to the base (unnecessary accesses to "persons").
   - [11/12/98] Fixed bugs: newlines at end of fields displayed as newlines
