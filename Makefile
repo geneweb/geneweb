@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.13 2002-04-13 09:26:51 ddr Exp $
+# $Id: Makefile,v 4.14 2002-04-13 17:25:28 ddr Exp $
 
 DESTDIR=distribution
 
@@ -116,6 +116,9 @@ clean::
 	cd gwtp; $(MAKE) clean
 	$(RM) -rf $(DESTDIR)
 	$(RM) -f *~ .#*
+
+clean_mismatch:
+	rm src/pa_lock.cmo src/pa_html.cmo src/def.syn.cmo
 
 depend:
 	cd wserver; $(MAKE) depend
