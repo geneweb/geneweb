@@ -1,6 +1,10 @@
 GeneWeb version 4.10
 --------------------
 
+* GeneWeb databases Transfer Program (gwtp)
+  - [03 Jan 03] Fixed bug: when wizard notes, the "send database" did
+    not work.
+
 GeneWeb version 4.09
 --------------------
 

@@ -1,47 +1,65 @@
-(* $Id: secure.ml,v 4.1 2002-12-31 08:38:07 ddr Exp $ *)
+(* $Id: secure.ml,v 4.2 2003-01-05 17:42:17 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 (* secure open; forbids to access anywhere in the machine;
    this is an extra security: the program should check for
    correct open instead of hoping Secure do it for it *)
 
-value lang_path = ref [];
-value doc_path = ref [];
+value ok_path = ref [];
+value lang_path_r = ref [];
+value doc_path_r = ref [];
 
-value start_with s p =
-  String.length p <= String.length s &&
-  String.sub s 0 (String.length p) = p
+value decompose =
+  loop [] where rec loop r s =
+    let b = Filename.basename s in
+    if b = "" then
+      let d = Filename.dirname s in
+      if d = "" then r
+      else if d = s then [d :: r]
+      else loop r d
+    else if b = s then [b :: r]
+    else loop [b :: r] (Filename.dirname s)
 ;
 
-value string_contains s ss =
-  let sslen = String.length ss in
-  let mlen = String.length s - sslen in
-  loop 0 where rec loop i =
-    if i >= mlen then False
-    else if String.sub s i sslen = ss then True
-    else loop (i + 1)
+value add_path path s =
+  do {
+    path.val := [s :: path.val];
+    ok_path.val := [decompose s :: ok_path.val]
+  }
+;
+
+value add_lang_path = add_path lang_path_r;
+value add_doc_path = add_path doc_path_r;
+value lang_path () = lang_path_r.val;
+value doc_path () = doc_path_r.val;
+
+value suffix d df =
+  loop (d, df) where rec loop =
+    fun
+    [ ([x :: xl], [y :: yl]) ->
+        if x = y then loop (xl, yl) else None
+    | ([], df) -> Some df
+    | (d, []) -> None ]
 ;
 
 value check_open fname =
-  let ok_path = lang_path.val @ doc_path.val in
   try
     do {
       if String.contains fname '\000' then raise Exit else ();
-      let (bname, is_absolute) =
-        loop ok_path where rec loop =
-          fun
-          [ [d :: dl] ->
-              if start_with fname d then
-                let len = String.length d in
-                (String.sub fname (String.length fname - len) len, False)
-              else loop dl
-          | [] -> (fname, True) ]
-      in
-      if string_contains bname ".." || string_contains bname "::" then
-        raise Exit
-      else ();
-      if is_absolute && not (Filename.is_relative fname) then raise Exit
-      else ();
+      let df = decompose fname in
+      loop ok_path.val where rec loop =
+        fun
+        [ [d :: dl] ->
+            match suffix d df with
+            [ Some bf ->
+                if List.mem Filename.parent_dir_name bf then raise Exit
+                else ()
+            | None -> loop dl ]
+        | [] ->
+            if Filename.is_relative fname then
+              if List.mem Filename.parent_dir_name df then raise Exit
+              else ()  
+            else raise Exit ]
     }
   with
   [ Exit ->
@@ -53,7 +71,7 @@ value check_open fname =
             flush stderr;
           }
         else ();
-        raise (Sys_error "")
+        raise (Sys_error "invalid access")
       } ]
 ;
 

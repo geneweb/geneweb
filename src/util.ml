@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.71 2002-12-31 08:38:07 ddr Exp $ *)
+(* $Id: util.ml,v 4.72 2003-01-05 17:42:18 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -10,17 +10,18 @@ value sharelib =
   List.fold_right Filename.concat [Gwlib.prefix; "share"] "geneweb"
 ;
 
-value lang_path = Secure.lang_path;
-value doc_path = Secure.doc_path;
+value add_lang_path = Secure.add_lang_path;
+value add_doc_path = Secure.add_doc_path;
 
-lang_path.val := [Filename.current_dir_name; sharelib];
+add_lang_path sharelib;
+add_lang_path Filename.current_dir_name;
 
 value base_dir = ref Filename.current_dir_name;
 value cnt_dir = ref "";
 value images_url = ref "";
 
 value search_in_path p s =
-  loop p.val where rec loop =
+  loop (p ()) where rec loop =
     fun
     [ [d :: dl] ->
         let f = Filename.concat d s in
@@ -28,8 +29,8 @@ value search_in_path p s =
     | [] -> s ]
 ;
 
-value search_in_lang_path = search_in_path lang_path;
-value search_in_doc_path = search_in_path doc_path;
+value search_in_lang_path = search_in_path Secure.lang_path;
+value search_in_doc_path = search_in_path Secure.doc_path;
 
 (* Internationalization *)
 
