@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.12 1998-12-16 06:04:55 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.13 1999-01-18 14:14:09 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -67,7 +67,7 @@ value date_de_string s i =
         | _ -> (if neg then - n else n, i) ]
   in
   let skip_slash i =
-    if s.[i] == '/' then succ i else failwith ("date_de_string " ^ s)
+    if i < String.length s && s.[i] == '/' then Some (succ i) else None
   in
   let (precision, i) =
     match s.[i] with
@@ -77,40 +77,52 @@ value date_de_string s i =
     | '<' -> (Before, succ i)
     | _ -> (Sure, i) ]
   in
-  let (undef, annee, i) =
+  let (undefined, annee, i) =
     let (annee, j) = champ i in
     if j = i + 1 && s.[i] == '0' then (True, annee, j)
     else (False, annee, j)
   in
-  let (precision, i) =
-    if i < String.length s && s.[i] == '|' then
-      let (y2, i) = champ (succ i) in (OrYear y2, i)
-    else if i + 1 < String.length s && s.[i] == '.' && s.[i+1] == '.' then
-      let (y2, i) = champ (i + 2) in (OrYear y2, i)
-    else (precision, i)
-  in
-  if i == String.length s then
-    if undef then None
-    else Some {day = 0; month = 0; year = annee; prec = precision}
-  else
-    let i = skip_slash i in
-    let mois = annee in
-    let (annee, i) = champ i in
-    if i == String.length s then
-      if annee == 0 then None
-      else if mois < 1 || mois > 12 then failwith ("date_de_string " ^ s)
-      else Some {day = 0; month = mois; year = annee; prec = precision}
-    else
-      let i = skip_slash i in
-      let jour = mois in
-      let mois = annee in
-      let (annee, i) = champ i in
-      if i == String.length s then
-        if annee == 0 then None
-        else if mois < 1 || mois > 12 then failwith ("date_de_string " ^ s)
-        else if jour < 1 || jour > 31 then failwith ("date_de_string " ^ s)
-        else Some {day = jour; month = mois; year = annee; prec = precision}
-      else failwith ("date_de_string " ^ s)
+  let error () = failwith ("date_de_string " ^ s) in
+  let date =
+    match skip_slash i with
+    [ Some i ->
+        let mois = annee in
+        let (annee, i) = champ i in
+        match skip_slash i with
+        [ Some i ->
+            let jour = mois in
+            let mois = annee in
+            let (annee, i) = champ i in
+            if annee == 0 then
+              if i == String.length s then None else error ()
+            else if mois < 1 || mois > 12 then error ()
+            else if jour < 1 || jour > 31 then error ()
+            else
+              Some
+                ({day = jour; month = mois; year = annee; prec = precision}, i)
+        | None ->
+            if annee == 0 then None
+            else if mois < 1 || mois > 12 then error ()
+            else
+              Some
+                ({day = 0; month = mois; year = annee; prec = precision}, i) ]
+    | None ->
+        if undefined then None
+        else Some ({day = 0; month = 0; year = annee; prec = precision}, i) ]
+  in    
+  match date with
+  [ Some (d, i) ->
+      if i == String.length s then Some d
+      else if s.[i] == '|' then
+        let (y2, i) = champ (succ i) in
+        if i == String.length s then Some {(d) with prec = OrYear y2}
+        else error ()
+      else if i + 1 < String.length s && s.[i] == '.' && s.[i+1] == '.' then
+        let (y2, i) = champ (i + 2) in
+        if i == String.length s then Some {(d) with prec = YearInt y2}
+        else  error ()
+      else error ()
+  | None -> None ]
 ;
 
 value rindex s c =
