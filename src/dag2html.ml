@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.42 2001-02-01 14:30:30 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.43 2001-02-01 18:38:49 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -194,12 +194,12 @@ value html_table_struct indi_txt phony d t =
             if l = next_j then loop les next_j
             else
               let next_l =
-                let y = t.table.(k).(l).elem in
-                match y with
+                let y = t.table.(k).(l) in
+                match y.elem with
                 [ Elem _ | Ghost _ ->
                     let rec loop l =
                       if l = Array.length t.table.(i) then l
-                      else if t.table.(k).(l).elem = y then loop (l + 1)
+                      else if t.table.(k).(l) = y then loop (l + 1)
                       else l
                     in
                     loop (l + 1)
