@@ -39,6 +39,9 @@ GeneWeb version 3.06
     unset it, you must now specify: can_send_image=no
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
+  - [20 Jun 00] Added entry !language for the translation of languages names
+    in all languages. Used as labels associated with the flags of welcome
+    pages.
   - [14 Jun 00] Completed and fixed Portuguese version (Jose Paulo Moitinho
     de Almeida).
   - [14 Jun 00] Completed Dutch lexicon (Bernard Ceurstemont).
