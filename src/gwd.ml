@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.50 2000-07-25 15:40:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.51 2000-07-25 15:46:16 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -958,6 +958,19 @@ value image_request cgi env =
   | _ -> False ]
 ;
 
+value strip_quotes s =
+  let i0 =
+    if String.length s > 0 && s.[0] == '"' then 1 else 0
+  in
+  let i1 =
+    if String.length s > 0
+    && s.[String.length s - 1] == '"' then
+      String.length s - 1
+    else String.length s
+  in
+  String.sub s i0 (i1 - i0)
+;
+
 value extract_multipart boundary str =
   let rec skip_nl i =
     if i < String.length str && str.[i] == '\r' then skip_nl (i + 1)
@@ -982,6 +995,8 @@ value extract_multipart boundary str =
         let env = Util.create_env s in
         match (Util.p_getenv env "name", Util.p_getenv env "filename") with
         [ (Some var, Some filename) ->
+            let var = strip_quotes var in
+            let filename = strip_quotes filename in
             let i = skip_nl i in
             let i1 =
               loop i where rec loop i =
@@ -994,20 +1009,9 @@ value extract_multipart boundary str =
                 else i
             in
             let v = String.sub str i (i1 - i) in
-            [("file", v) :: loop i1]
+            [(var ^ "_name", filename); (var, v) :: loop i1]
         | (Some var, None) ->
-            let var =
-              let i0 =
-                if String.length var > 0 && var.[0] == '"' then 1 else 0
-              in
-              let i1 =
-                if String.length var > 0
-                && var.[String.length var - 1] == '"' then
-                  String.length var - 1
-                else String.length var
-              in
-              String.sub var i0 (i1 - i0)
-            in
+            let var = strip_quotes var in
             let (s, i) = next_line i in
             if s = "" then
               let (s, i) = next_line i in
