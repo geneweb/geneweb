@@ -1,6 +1,6 @@
-<head><title>Gwtp - %b</title></head>
+<head><title>Gwtp - upload %b</title></head>
 <body>
-<h1 align=center>Gwtp - %b</h1>
+<h1 align=center>Gwtp - upload %b</h1>
 <form method=POST action=gwtp enctype="multipart/form-data">
 <input type=hidden name=m value=SEND>
 <input type=hidden name=b value=%b>
@@ -29,4 +29,3 @@ select the file named <b>patches</b>, if it exists:
 
 <input type=submit value=Send>
 </form>
-</body>

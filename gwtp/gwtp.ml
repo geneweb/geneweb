@@ -1,9 +1,10 @@
-(* $Id: gwtp.ml,v 1.15 2000-08-05 08:44:22 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.16 2000-08-05 09:44:54 ddr Exp $ *)
 
 open Printf;
 
 value gwtp_tmp = ref "gwtp_tmp";
 value gwtp_dst = ref "gwtp_dst";
+value gw_site = ref "";
 value token_tmout = ref 900.0;
 
 (* Get CGI contents *)
@@ -298,7 +299,16 @@ value copy_temp b =
   return ()
 ;
 
-value send_file str env b t f fname =
+(* Actions *)
+
+value print_return_to_main b tok =
+  do printf "<p><hr><div align=right>\n";
+     printf "Return to <a href=\"gwtp?m=MAIN;b=%s;t=%s\">main page</a></div>\n"
+       b tok;
+  return ()
+;
+
+value send_file str env b tok f fname =
   if filename_basename fname = "base" then
     do printf "content-type: text/html\r\n\r\n\
 <head><title>Gwtp...</title></head>\n<body>
@@ -312,6 +322,7 @@ value send_file str env b t f fname =
        printf "Data base \"%s\" updated.\n" b;
        flush stdout;
        printf "</pre>\n";
+       print_return_to_main b tok;
        printf "</body>\n";
     return ()
   else gwtp_error "Bad \"base\" file selection"
@@ -323,7 +334,7 @@ value gwtp_send str env b t =
   | _ -> gwtp_invalid_request str env ]
 ;
 
-value gwtp_receive str env b t =
+value gwtp_receive str env b tok =
   match HttpEnv.getenv env "f" with
   [ Some fname ->
       let fname = filename_basename fname in
@@ -338,8 +349,87 @@ value gwtp_receive str env b t =
             with [ End_of_file -> () ];
             close_in ic;
          return ();
-         flush stdout;
+         print_return_to_main b tok;
       return ()
+  | _ -> gwtp_invalid_request str env ]
+;
+
+value gwtp_upload str env b tok =
+  do printf "content-type: text/html\r\n\r\n";
+     copy_template [('b', b); ('t', tok)] "send";
+     print_return_to_main b tok;
+     printf "</body>\n";
+  return ()
+;
+
+value gwtp_download str env b tok =
+  let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
+  do printf "content-type: text/html\r\n\r\n";
+     copy_template [('b', b); ('t', tok)] "recv";
+     if Sys.file_exists bdir then
+       let dh = Unix.opendir bdir in
+       do printf "<ul>\n";
+          try
+            while True do
+              match Unix.readdir dh with
+              [ "." | ".." -> ()
+              | f ->
+                  printf "<li><a href=\"gwtp?m=RECV;b=%s;t=%s;f=/%s\">%s</a>\n"
+                    b tok f f ];
+            done
+          with
+          [ End_of_file -> Unix.closedir dh ];
+          printf "</ul>\n";
+       return ()
+     else
+       printf "<p>Your data base does not exist or is empty.\n";
+     print_return_to_main b tok;
+     printf "</body>\n";
+  return ()
+;
+
+value gwtp_main str env b tok =
+  do printf "content-type: text/html\r\n\r\n";
+     printf "\
+<head><title>Gwtp - %s</title></head>\n<body>
+<h1 align=center>Gwtp - %s</h1>
+<ul>\n" b b;
+     printf "<li><a href=\"gwtp?m=UPL;b=%s;t=%s\">Upload</a>\n" b tok;
+     printf "<li><a href=\"gwtp?m=DNL;b=%s;t=%s\">Download</a>\n" b tok;
+     if gw_site.val <> "" then
+       printf "<li><a href=\"%s?b=%s\">Browse</a>\n" gw_site.val b
+     else ();
+     printf "</body>\n";
+  return ()  
+;
+
+value gwtp_login str env =
+  do printf "content-type: text/html\r\n\r\n";
+     printf "\
+<head><title>Gwtp</title></head>\n<body>
+<h1>Gwtp</h1>
+<form method=POST action=gwtp>
+<input type=hidden name=m value=LOGIN>
+Data base: <input name=b><br>
+Password: <input name=p type=password><br>
+<input type=submit value=Login>
+</form>
+</body>
+";
+  return ()
+;
+
+(* Wrappers *)
+
+value gwtp_check_login str env gwtp_fun =
+  match (HttpEnv.getenv env "b", HttpEnv.getenv env "p") with
+  [ (Some b, Some p) ->
+      match check_login b p with
+      [ Some tok ->
+          do set_token b tok;
+             gwtp_fun str env b tok;
+          return ()
+      | None -> gwtp_error "Invalid login" ]
   | _ -> gwtp_invalid_request str env ]
 ;
 
@@ -356,63 +446,7 @@ value gwtp_logged str env gwtp_fun =
   | _ -> gwtp_invalid_request str env ]
 ;
 
-value gwtp_upload b tok =
-  copy_template [('b', b); ('t', tok)] "send"
-;
-
-value gwtp_download b tok =
-  let bdir = Filename.concat gwtp_dst.val (b ^ ".gwb") in
-  do copy_template [('b', b); ('t', tok)] "recv";
-     if Sys.file_exists bdir then
-       let dh = Unix.opendir bdir in
-       do printf "<ul>\n";
-          try
-            while True do
-              match Unix.readdir dh with
-              [ "." | ".." -> ()
-              | f ->
-                  printf "<li><a href=\"gwtp?m=RECV;b=%s;t=%s;f=/%s\">%s</a>\n"
-                    b tok f f ];
-            done
-          with
-          [ End_of_file -> Unix.closedir dh ];
-          printf "</ul>\n";
-       return ()
-     else ();
-     printf "</body>\n";
-     flush stdout;
-  return ()
-;
-
-value gwtp_check_login str env gwtp_fun =
-  match (HttpEnv.getenv env "b", HttpEnv.getenv env "p") with
-  [ (Some b, Some p) ->
-      match check_login b p with
-      [ Some tok ->
-          do set_token b tok;
-             printf "content-type: text/html\r\n\r\n";
-             gwtp_fun b tok;
-          return ()
-      | None -> gwtp_error "Invalid login" ]
-  | _ -> gwtp_invalid_request str env ]
-;
-
-value gwtp_welcome str env =
-  do printf "content-type: text/html\r\n\r\n";
-     printf "\
-<head><title>Gwtp</title></head>\n<body>
-<h1>Gwtp</h1>
-<form method=POST action=gwtp>
-Data base: <input name=b><br>
-Password: <input name=p type=password><br>
-Upload <input type=radio name=m value=UPL checked>
-Download <input type=radio name=m value=DNL><br>
-<input type=submit value=Login>
-</form>
-</body>
-";
-  return ()  
-;
+(* Main *)
 
 value log oc_log str =
   let tm = Unix.localtime (Unix.time ()) in
@@ -447,12 +481,16 @@ value gwtp () =
      flush oc_log;
      Unix.dup2 (Unix.descr_of_out_channel oc_log) Unix.stderr;
      match HttpEnv.getenv env "m" with
-     [ Some "UPL" -> gwtp_check_login str env gwtp_upload
-     | Some "DNL" -> gwtp_check_login str env gwtp_download
+     [ Some "LOGIN" -> gwtp_check_login str env gwtp_main
+     | Some "MAIN" -> gwtp_logged str env gwtp_main
+     | Some "UPL" -> gwtp_logged str env gwtp_upload
+     | Some "DNL" -> gwtp_logged str env gwtp_download
      | Some "SEND" -> gwtp_logged str env gwtp_send
      | Some "RECV" -> gwtp_logged str env gwtp_receive
      | Some _ -> gwtp_invalid_request str env
-     | None -> gwtp_welcome str env ];
+     | None -> gwtp_login str env ];
+     flush stdout;
+     flush oc_log;
      close_out oc_log;
   return ()
 ;
@@ -460,7 +498,8 @@ value gwtp () =
 value usage_msg = "Usage: gwtp";
 value speclist =
   [("-tmp", Arg.String (fun x -> gwtp_tmp.val := x), "<dir>");
-   ("-dst", Arg.String (fun x -> gwtp_dst.val := x), "<dir>")]
+   ("-dst", Arg.String (fun x -> gwtp_dst.val := x), "<dir>");
+   ("-site", Arg.String (fun x -> gw_site.val := x), "<url>")]
 ;
 value anonfun _ = do Arg.usage speclist usage_msg; return exit 2;
 
@@ -470,7 +509,4 @@ value main () =
   return ()
 ;
 
-(*
-Printexc.catch (Unix.handle_unix_error main) ();
-*)
 main ();
