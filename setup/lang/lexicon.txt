@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 1.5 2002-11-14 13:08:59 ddr Exp $
+# $Id: lexicon.txt,v 1.6 2002-11-14 16:54:30 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -35,3 +35,32 @@ pt-br: af=Afrikaner/ca=Catal&atilde;o/cs=Checo/da=Dinamarqu&ecirc;s/de=Alem&atil
 ru: af=àôğèêàíñêèé/ca=êàòàëàíñêèé/cs=÷åøñêèé/da=äàòñêèé/de=íåìåöêèé/en=àíãëèéñêèé/eo=ıñïåğàíòî/es=èñïàíñêèé/et=ıñòîíñêèé/fi=ôèíñêèé/fr=ôğàíöóçñêèé/he=èâğèò/is=èñëàíäñêèé/it=èòàëüÿíñêèé/lv=ëàòûøñêèé/nl=ãîëëàíäñêèé/no=íîğâåæñêèé/pl=ïîëüñêèé/pt=ïîğòóãàëüñêèé/pt-br=áğàçèëüñêî-ïîğòóãàëüñêèé/ru=ğóññêèé/sl=ñëàâÿíñêèé/sv=øâåäñêèé/zh=êèòàéñêèé
 sl: af=afrikaan¹èina/ca=katalon¹èina/cs=èe¹èina/da=dan¹èina/de=nem¹èina/en=angle¹èina/eo=esperanto/es=¹pan¹èina/et=eston¹èina/fi=fin¹èina/fr=franco¹èina/he=hebrej¹èina/is=island¹èina/it=italijan¹èina/lv=litvan¹èina/nl=nizozem¹èina/no=norve¹èina/pl=polj¹èina/pt=portugal¹èina/pt-br=brazilska-portugal¹èina/ru=ru¹èina/sl=sloven¹èina/sv=¹ved¹èina/zh=kitaj¹èina
 sv: af=afrikaans/ca=katalanska/cs=tjeckiska/da=danska/de=tyska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/pt-br=brasiliansk-portugisiska/ru=ryska/sv=svenska/zh=kinesiska
+
+    cancel
+en: Cancel
+fr: Annuler
+it: Annullare
+
+    error
+de: Fehler
+en: Error
+es: Error
+fr: Erreur
+it: Errore
+lv: Kïûda
+sv: Fel
+
+    text/link/vlink
+en: text/link/vlink
+es: texto/enlace/visitado
+fr: texte/lien/visit&eacute;
+it: testo/link/visitato
+
+    yes/no
+de: Ja/Nein
+en: Yes/No
+es: Si/No
+fr: oui/non
+it: Si/No
+lv: Yes/Nç
+sv: Yes/No
