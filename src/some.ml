@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.18 2002-10-14 04:23:13 ddr Exp $ *)
+(* $Id: some.ml,v 4.19 2002-10-21 13:53:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -249,7 +249,8 @@ value print_branch conf base psn name =
             (fun first (fam, des, c, select) ->
                do {
                  if not first then do {
-                   if lev == 0 then () else Wserver.wprint "</dd><dd>\n";
+                   if lev == 0 then Wserver.wprint "<br>\n"
+                   else Wserver.wprint "</dd><dd>\n";
                    Util.print_selection_bullet conf select;
                    Wserver.wprint "<em>";
                    Wserver.wprint "%s"
