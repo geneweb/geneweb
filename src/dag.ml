@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.1 2001-04-21 14:06:52 ddr Exp $ *)
+(* $Id: dag.ml,v 4.2 2001-05-15 15:26:51 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -163,12 +163,12 @@ value print_table conf hts =
               [ LeftA -> Wserver.wprint " width=\"50%%\" align=left"
               | RightA -> Wserver.wprint " width=\"50%%\" align=right"
               | _ -> () ];
-              Wserver.wprint ">";
+              Wserver.wprint ">"
             } ];
-        Wserver.wprint "</td>\n";
+        Wserver.wprint "</td>\n"
       }
     };
-    Wserver.wprint "</table></center>\n";
+    Wserver.wprint "</table></center>\n"
   }
 ;
 
@@ -313,8 +313,11 @@ value displayed_strip s sz =
         let strl =
           if dj - dibeg > sz then
             let str2 = displayed_sub s dibeg (di - dibeg - 1) in
-            let str1 = displayed_sub s di (dj - di) in [str1; str2 :: strl]
-          else let str = displayed_sub s dibeg (dj - dibeg) in [str :: strl]
+            let str1 = displayed_sub s di (dj - di) in
+            [str1; str2 :: strl]
+          else
+            let str = displayed_sub s dibeg (dj - dibeg) in
+            [str :: strl]
         in
         List.rev strl ]
 ;
@@ -323,57 +326,54 @@ value displayed_strip s sz =
 
 value gen_compute_columns_sizes size_fun hts ncol =
   let colsz = Array.make ncol 0 in
-  do {
-    let rec loop curr_colspan =
-      let next_colspan = ref (ncol + 1) in
-      do {
-        for i = 0 to Array.length hts - 1 do {
-          if i = Array.length hts then ()
-          else
-            let rec loop col j =
-              if j = Array.length hts.(i) then ()
-              else do {
-                let (colspan, _, td) = hts.(i).(j) in
-                match td with
-                [ TDstring s ->
-                    if colspan = curr_colspan then
-                      let len = size_fun s in
-                      let currsz =
-                        loop 0 col colspan where rec loop currsz col cnt =
-                          if cnt = 0 then currsz
-                          else
-                            let currsz = currsz + colsz.(col) in
-                            loop currsz (col + 1) (cnt - 1)
+  let rec loop curr_colspan =
+    let next_colspan = ref (ncol + 1) in
+    do {
+      for i = 0 to Array.length hts - 1 do {
+        if i = Array.length hts then ()
+        else
+          let rec loop col j =
+            if j = Array.length hts.(i) then ()
+            else do {
+              let (colspan, _, td) = hts.(i).(j) in
+              match td with
+              [ TDstring s ->
+                  if colspan = curr_colspan then
+                    let len = size_fun s in
+                    let currsz =
+                      loop 0 col colspan where rec loop currsz col cnt =
+                        if cnt = 0 then currsz
+                        else
+                          let currsz = currsz + colsz.(col) in
+                          loop currsz (col + 1) (cnt - 1)
+                    in
+                    if currsz >= len then ()
+                    else
+                      let rec loop n col cnt =
+                        if cnt = 0 then ()
+                        else do {
+                          let inc_sz =
+                            n * (len - currsz) / colspan -
+                              (n - 1) * (len - currsz) / colspan
+                          in
+                          colsz.(col) := colsz.(col) + inc_sz;
+                          loop (n + 1) (col + 1) (cnt - 1)
+                        }
                       in
-                      if currsz >= len then ()
-                      else
-                        let rec loop n col cnt =
-                          if cnt = 0 then ()
-                          else do {
-                            let inc_sz =
-                              n * (len - currsz) / colspan -
-                                (n - 1) * (len - currsz) / colspan
-                            in
-                            colsz.(col) := colsz.(col) + inc_sz;
-                            loop (n + 1) (col + 1) (cnt - 1)
-                          }
-                        in
-                        loop 1 col colspan
-                    else if colspan > curr_colspan then
-                      next_colspan.val := min colspan next_colspan.val
-                    else ()
-                | TDhr _ -> () ];
-                loop (col + colspan) (j + 1)
-              }
-            in
-            loop 0 0
-        };
-        if next_colspan.val > ncol then () else loop next_colspan.val
-      }
-    in
-    loop 1;
-    colsz
-  }
+                      loop 1 col colspan
+                  else if colspan > curr_colspan then
+                    next_colspan.val := min colspan next_colspan.val
+                  else ()
+              | TDhr _ -> () ];
+              loop (col + colspan) (j + 1)
+            }
+          in
+          loop 0 0
+      };
+      if next_colspan.val > ncol then () else loop next_colspan.val
+    }
+  in
+  do { loop 1; colsz }
 ;
 
 value compute_columns_sizes = gen_compute_columns_sizes displayed_length;
@@ -502,7 +502,7 @@ value print_next_pos conf pos1 pos2 tcol =
       List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
       Wserver.wprint "pos1=%d;pos2=%d" (pos1 + overlap - dpos)
         (pos1 + overlap);
-      Wserver.wprint "\">&lt;&lt;</a>\n";
+      Wserver.wprint "\">&lt;&lt;</a>\n"
     };
     if pos2 >= tcol then Wserver.wprint "&nbsp;"
     else do {
@@ -510,9 +510,9 @@ value print_next_pos conf pos1 pos2 tcol =
       List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) env;
       Wserver.wprint "pos1=%d;pos2=%d" (pos2 - overlap)
         (pos2 - overlap + dpos);
-      Wserver.wprint "\">&gt;&gt;</a>\n";
+      Wserver.wprint "\">&gt;&gt;</a>\n"
     };
-    Wserver.wprint "</div>\n";
+    Wserver.wprint "</div>\n"
   }
   else ()
 ;
@@ -526,7 +526,9 @@ value table_pre_dim conf hts =
       let hts0 = hts.(0) in
       let rec loop ncol j =
         if j = Array.length hts0 then ncol
-        else let (colspan, _, _) = hts0.(j) in loop (ncol + colspan) (j + 1)
+        else
+          let (colspan, _, _) = hts0.(j) in
+          loop (ncol + colspan) (j + 1)
       in
       loop 0 0
     in
@@ -647,7 +649,7 @@ value print_table_pre conf hts =
         loop 0 0 0
       }
     };
-    Wserver.wprint "</pre>\n";
+    Wserver.wprint "</pre>\n"
   }
 ;
 
@@ -659,7 +661,7 @@ value print_html_table conf hts =
       Wserver.wprint "<div align=right><a href=\"%s" (commd conf);
       List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
       Wserver.wprint "notab=on;slices=on";
-      Wserver.wprint "\"><tt>//</tt></a></div>\n";
+      Wserver.wprint "\"><tt>//</tt></a></div>\n"
     }
     else ();
     if Util.p_getenv conf.env "notab" = Some "on" ||
@@ -717,7 +719,7 @@ value make_tree_hts conf base elem_txt spouse_on invert no_group set spl d =
                    Date.short_dates_text conf base ps)
             txt spouses
         in
-        let txt = txt ^ image_txt conf base p in txt
+        txt ^ image_txt conf base p
     | Right _ -> "&nbsp;" ]
   in
   let bd =
@@ -746,7 +748,7 @@ value make_tree_hts conf base elem_txt spouse_on invert no_group set spl d =
     [ Left _ -> False
     | Right _ -> True ]
   in
-  let hts = Dag2html.html_table_of_dag indi_txt phony invert no_group d in hts
+  Dag2html.html_table_of_dag indi_txt phony invert no_group d
 ;
 
 value print_slices_menu conf base hts_opt =
@@ -808,7 +810,7 @@ value print_slices_menu conf base hts_opt =
       end;
       Wserver.wprint "<input type=submit value=\"Ok\">\n";
     end;
-    Util.trailer conf;
+    Util.trailer conf
   }
 ;
 
@@ -829,7 +831,7 @@ value gen_print_dag conf base spouse_on invert set spl d =
     in
     Util.header_no_page_title conf title;
     print_html_table conf hts;
-    Util.trailer conf;
+    Util.trailer conf
   }
 ;
 
