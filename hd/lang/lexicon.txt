@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.131 1999-09-24 18:20:18 ddr Exp $
+# $Id: lexicon.txt,v 2.132 1999-09-25 21:23:01 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2513,7 +2513,7 @@ se: kanske
 
     merge
 cs: spojit
-de: zusammenf&uuml;hren
+de: zusammenf&uuml;hren +before
 dk: sammenl&aelig;g
 en: merge
 eo: fuzii :a:

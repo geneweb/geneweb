@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.52 1999-09-22 09:11:43 ddr Exp $ *)
+(* $Id: setup.ml,v 1.53 1999-09-25 21:23:02 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -975,12 +975,18 @@ value gwf conf =
     print_file conf "gwf_1.htm"
 ;
 
+value gwf_keys =
+  ["body_prop"; "default_lang"; "friend_passwd"; "wizard_passwd";
+   "can_send_image"; "wizard_just_friend"; "renamed"]
+;
+
 value gwf_1 conf =
   let in_base =
     match p_getenv conf.env "anon" with
     [ Some f -> strip_spaces f
     | None -> "" ]
   in
+  let benv = read_base_env in_base in
   do let oc = open_out (in_base ^ ".gwf") in
      let body_prop =
        match p_getenv conf.env "proposed_body_prop" with
@@ -1013,6 +1019,11 @@ value gwf_1 conf =
           (s_getenv conf.env "wizard_just_friend");
         Printf.fprintf oc "renamed=%s\n"
           (s_getenv conf.env "renamed");
+        List.iter
+          (fun (k, v) ->
+             if List.mem k gwf_keys then ()
+             else Printf.fprintf oc "%s=%s\n" k v)
+          benv;
         close_out oc;
      return ();
      let trl = s_getenv conf.env "trailer" in
