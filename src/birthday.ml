@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.9 2000-02-02 16:07:17 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.10 2000-02-09 03:01:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -95,6 +95,7 @@ value gen_print conf base mois f_scan dead_people =
        done
      with [ Not_found -> () ];
      header conf title;
+     print_link_to_welcome conf True;
      Wserver.wprint "<ul>\n";
      for j = 1 to 31 do
        if tab.(pred j) <> [] then
@@ -247,6 +248,7 @@ value print_marriage conf base month =
   in
   let tab = Array.create 31 [] in
   do header conf title;
+     print_link_to_welcome conf True;
      for i = 0 to base.data.families.len - 1 do
        let fam = base.data.families.get i in
        if is_deleted_family fam then ()
@@ -350,6 +352,7 @@ value gen_print_menu_birth conf base f_scan mode =
   let list_tom = ref [] in
   let list_aft = ref [] in
   do header conf title;
+     print_link_to_welcome conf True;
      try
        while True do
          let p = f_scan () in
@@ -417,6 +420,7 @@ value print_menu_dead conf base =
   let _ = base.data.persons.array () in
 *)
   do header conf title;
+     print_link_to_welcome conf True;
      for i = 0 to base.data.persons.len - 1 do
        let p = base.data.persons.get i in
        match p.death with
@@ -501,6 +505,7 @@ value print_menu_marriage conf base =
   let _ = base.data.families.array () in
 *)
   do header conf title;
+     print_link_to_welcome conf True;
      for i = 0 to base.data.families.len - 1 do
        let fam = base.data.families.get i in
        if is_deleted_family fam then ()
