@@ -1,9 +1,9 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.24 2001-02-20 22:02:36 ddr Exp $ *)
+(* $Id: setup.ml,v 3.25 2001-02-23 08:31:17 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
-value setup_dir = "setup";
+value setup_dir = ref ".";
 value charset = "iso-8859-1";
 value lang_param = ref "";
 
@@ -109,7 +109,7 @@ value trailer conf =
        Wserver.wprint "
 <img src=\"file://%s/images/gwlogo.gif\"
  width=64 height=72 align=right>\n<br>\n"
-         (slashify (Sys.getcwd ()));
+         (slashify (Filename.concat (Sys.getcwd ()) setup_dir.val));
      Wserver.wprint "
 <hr><font size=-1><em>(c) Copyright 2001 INRIA -
 GeneWeb %s</em></font>" Version.txt;
@@ -307,6 +307,8 @@ value rec copy_from_stream conf print strm =
                         return ())
                    conf.env;
               return ()
+          | 'f' ->
+              print (slashify (Filename.concat (Sys.getcwd ()) setup_dir.val))
           | 'g' -> print_specific_file conf print "comm.log" strm
           | 'h' ->
               do print "<input type=hidden name=lang value=";
@@ -408,7 +410,7 @@ and for_all conf print list strm =
 ;
 
 value print_file conf fname =
-  let dir = setup_dir in
+  let dir = Filename.concat setup_dir.val "setup" in
   let fname = Filename.concat (Filename.concat dir conf.lang) fname in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -1295,7 +1297,7 @@ value wrap_setup a b c =
 ;
 
 value copy_text lang fname =
-  let dir = setup_dir in
+  let dir = Filename.concat setup_dir.val "setup" in
   let fname = Filename.concat dir fname in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -1343,7 +1345,9 @@ value speclist =
       "<number>
        Select a port number (default = " ^
        string_of_int port.val ^
-       "); > 1024 for normal users.") ::
+       "); > 1024 for normal users.");
+   ("-gd", Arg.String (fun x -> setup_dir.val := x),
+    "<string> gwsetup directory") ::
    ifdef SYS_COMMAND then
      [("-wserver", Arg.String (fun _ -> ()), " (internal feature)")]
    else []]
