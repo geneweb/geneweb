@@ -1,6 +1,9 @@
 GeneWeb version 2.08
 --------------------
 
+* Languages
+  - [Oct 26, 99] Added Icelandic (Ólafur Sigurgeirsson).
+
 * GeneWeb Service/CGI (gwd)
   - [Oct 24, 99] In display by surname, added a specific indication for
     the branches whose ancestor has parents with a different surname, in order

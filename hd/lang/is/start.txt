@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- copyright (c) INRIA -->
+  <title>Ættfræði - %t</title>
+</head>
+<body%b>
+<h1>Ættfræði</h1>
+
+%rversion
+
+<p>
+
+Gagnagrunnurinn er nú með %n einstaklinga%o
+(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
+Leita: <input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+<ul>
+<li> <input type=radio name=t value=PN>
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%u
+[or] <em>Sosa number</em> relative to %a%u
+<li> <input type=radio name=t value=P checked> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
+</ul>
+</form>
+
+<li>
+
+<FORM method=GET action="%f">
+%h<input type=hidden name=m value=TT>
+Eftir titli <INPUT NAME=t size=14 maxlength=200>
+stað <INPUT NAME=p size=25 maxlength=200> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li>
+
+<FORM method=GET action="%f">
+%hÖll
+<SELECT NAME=m>
+   <OPTION VALUE="N"> Eftirnöfn
+   <OPTION VALUE="P" SELECTED> Fornöfn
+</SELECT>
+eftir
+<SELECT NAME=tri>
+   <OPTION VALUE="A" SELECTED> Stafrófsröð
+   <OPTION VALUE="F"> Tíðni
+</SELECT> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+
+%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
+<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
+%w
+
+</ul>
+
+<a href="%sm=AN">Afmæli</a>.<br>
+<a href="%sm=AD">Dánarafmæli</a>.<br>
+<a href="%sm=AM">Brúðkaupsafmæli</a>.<br>%x
+<a href="%sm=LB;k=10">Síðust fæðingar</a>.<br>
+<a href="%sm=LD;k=10">Síðust andlát</a>.<br>%x%j
+<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
+<a href="%sm=CAL">[*calendar/calendars]1</a>.
+<p>
+Það hafa verið %q heimsóknir, %c af þeim á þessa síðu, síðan %d.
+
+%y<p>
+
+<ul>
+<li> <a href="%sw=w"><em>Wizard</em></a> aðgangur (aðgangsorð).
+%y%z<li> <a href="%sw=f"><em>Vina</em></a> aðgangur (aðgangsorð).
+%z%y</ul>
+
+%y%i<p>
+<form method=get action="%f">
+%h<font size=-1>Aðgangsorð, fyrir <em>vin</em> eða <em>wizard</em> aðgang:</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+%i<p>
+
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>
