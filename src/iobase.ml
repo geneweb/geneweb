@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.2 2001-04-18 13:27:56 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.3 2001-05-11 14:01:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -112,14 +112,21 @@ value string_piece s =
   else s
 ;
 
-value rec list_right_assoc s =
-  fun
-  [ [(i1, s1) :: l] -> if s = s1 then i1 else list_right_assoc s l
-  | [] -> raise Not_found ]
+exception Found of int;
+
+value hashtbl_right_assoc s ht =
+  try
+    do {
+      Hashtbl.iter
+        (fun i1 s1 -> if s = s1 then raise (Found i1) else ()) ht;
+      raise Not_found;
+    }
+  with
+  [ Found x -> x ]
 ;
 
 value index_of_string strings ic start_pos hash_len string_patches s =
-  try Adef.istr_of_int (list_right_assoc s string_patches.val) with
+  try Adef.istr_of_int (hashtbl_right_assoc s string_patches) with
   [ Not_found ->
       let ia = Hashtbl.hash s mod hash_len in
       do {
@@ -232,30 +239,40 @@ value persons_of_first_name_or_surname base_data strings params =
             seek_in ic2 start_pos;
             let bt : IstrTree.t (list iper) = input_value ic2 in
             let bt =
-              List.fold_left
-                (fun bt (i, p) ->
-                   let istr = proj p in
-                   let ipera =
-                     try IstrTree.find istr bt with [ Not_found -> [] ]
-                   in
-                   if List.memq p.cle_index ipera then bt
-                   else IstrTree.add istr [p.cle_index :: ipera] bt)
-                bt person_patches.val
+              do {
+                let r = ref bt in
+                Hashtbl.iter
+                  (fun i p ->
+                     let istr = proj p in
+                     let ipera =
+                       try IstrTree.find istr bt with [ Not_found -> [] ]
+                     in
+                     if List.memq p.cle_index ipera then ()
+                     else
+                       r.val := IstrTree.add istr [p.cle_index :: ipera]
+                         r.val)
+                  person_patches;
+                r.val
+              }
             in
             btr.val := Some bt;
             bt
           } ]
   in
   let check_patches istr ipl =
-    List.fold_left
-      (fun ipl (i, p) ->
-         if List.memq (Adef.iper_of_int i) ipl then
-           if compare_istr_fun base_data istr p.first_name == 0 ||
-              compare_istr_fun base_data istr p.surname == 0 then
-             ipl
-           else list_remove_elemq (Adef.iper_of_int i) ipl
-         else ipl)
-      ipl person_patches.val
+    let ipl = ref ipl in
+    do {
+      Hashtbl.iter
+        (fun i p ->
+           if List.memq (Adef.iper_of_int i) ipl.val then
+             if compare_istr_fun base_data istr p.first_name == 0 ||
+                compare_istr_fun base_data istr p.surname == 0 then
+               ()
+             else ipl.val := list_remove_elemq (Adef.iper_of_int i) ipl.val
+           else ())
+        person_patches;
+      ipl.val
+    }
   in
   let find istr =
     try check_patches istr (IstrTree.find istr (bt ())) with
@@ -292,16 +309,16 @@ value persons_of_name bname patches =
           } ]
     in
     let i = Hashtbl.hash s in
-    match patches.val with
-    [ [] -> Array.to_list a.(i mod Array.length a)
-    | pl ->
-        let l = try List.assoc i patches.val with [ Not_found -> [] ] in
-        l @ Array.to_list a.(i mod Array.length a) ]
+    try
+      let l = Hashtbl.find patches i in
+      l @ Array.to_list a.(i mod Array.length a)
+    with
+    [ Not_found -> Array.to_list a.(i mod Array.length a) ]
 ;
 
 type strings_of_fsname = array (array istr);
 
-value strings_of_fsname bname strings person_patches =
+value strings_of_fsname bname strings (_, person_patches) =
   let t = ref None in
   fun s ->
     let s = Name.crush_lower s in
@@ -321,30 +338,29 @@ value strings_of_fsname bname strings person_patches =
     in
     let i = Hashtbl.hash s in
     let r = a.(i mod Array.length a) in
-    match person_patches.val with
-    [ [] -> Array.to_list r
-    | _ ->
-        let l =
-          List.fold_left
-            (fun l (_, p) ->
-               let l =
-                 if not (List.memq p.first_name l) then
-                   let s1 = strings.get (Adef.int_of_istr p.first_name) in
-                   let s1 = nominative s1 in
-                   if s = Name.crush_lower s1 then [p.first_name :: l] else l
-                 else l
-               in
-               let l =
-                 if not (List.memq p.surname l) then
-                   let s1 = strings.get (Adef.int_of_istr p.surname) in
-                   let s1 = nominative s1 in
-                   if s = Name.crush_lower s1 then [p.surname :: l] else l
-                 else l
-               in
-               l)
-            (Array.to_list r) person_patches.val
-        in
-        l ]
+    let l = ref (Array.to_list r) in
+    do {
+      Hashtbl.iter
+        (fun _ p ->
+           do {
+             if not (List.memq p.first_name l.val) then
+               let s1 = strings.get (Adef.int_of_istr p.first_name) in
+               let s1 = nominative s1 in
+               if s = Name.crush_lower s1 then
+                 l.val := [p.first_name :: l.val]
+               else ()
+             else ();
+             if not (List.memq p.surname l.val) then
+               let s1 = strings.get (Adef.int_of_istr p.surname) in
+               let s1 = nominative s1 in
+               if s = Name.crush_lower s1 then
+                 l.val := [p.surname :: l.val]
+               else ()
+             else ();
+           })
+        person_patches;
+      l.val
+    }
 ;
 
 value lock_file bname =
@@ -358,8 +374,8 @@ value lock_file bname =
 
 (* Input *)
 
-value apply_patches tab plist plen =
-  if plist = [] then tab
+value apply_patches tab patches plen =
+  if plen = 0 then tab
   else do {
     let new_tab =
       if plen > Array.length tab then do {
@@ -369,26 +385,49 @@ value apply_patches tab plist plen =
       }
       else tab
     in
-    List.iter (fun (i, v) -> new_tab.(i) := v) plist;
+    Hashtbl.iter (fun i v -> new_tab.(i) := v) patches;
     new_tab
   }
 ;
 
+(*
 value rec patch_len len =
   fun
   [ [] -> len
   | [(i, _) :: l] -> patch_len (max len (i + 1)) l ]
 ;
+*)
 
-type patches =
-  { p_person : ref (list (int * person));
-    p_ascend : ref (list (int * ascend));
-    p_union : ref (list (int * union));
-    p_family : ref (list (int * family));
-    p_couple : ref (list (int * couple));
-    p_descend : ref (list (int * descend));
-    p_string : ref (list (int * string));
-    p_name : ref (list (int * list iper)) }
+(* patches data; should be saved instead of Old.patches, but not done yet
+   for backward compatibility; in case of major change, it can be done
+   and module Old deleted; think of output_value_no_sharing which may
+   not be good for this type (anyway I think not useful for the file
+   patches) *)
+
+type patches_ht =
+  { h_person : (ref int * Hashtbl.t int person);
+    h_ascend : (ref int * Hashtbl.t int ascend);
+    h_union : (ref int * Hashtbl.t int union);
+    h_family : (ref int * Hashtbl.t int family);
+    h_couple : (ref int * Hashtbl.t int couple);
+    h_descend : (ref int * Hashtbl.t int descend);
+    h_string : (ref int * Hashtbl.t int string);
+    h_name : (ref int * Hashtbl.t int (list iper)) }
+;
+
+module Old =
+  struct
+    type patches =
+      { p_person : ref (list (int * person));
+        p_ascend : ref (list (int * ascend));
+        p_union : ref (list (int * union));
+        p_family : ref (list (int * family));
+        p_couple : ref (list (int * couple));
+        p_descend : ref (list (int * descend));
+        p_string : ref (list (int * string));
+        p_name : ref (list (int * list iper)) }
+    ;
+  end
 ;
 
 value check_magic =
@@ -405,11 +444,11 @@ value check_magic =
     }
 ;
 
-value make_cache ic ic_acc shift array_pos patches len name =
+value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
   let tab = ref None in
   let cleared = ref False in
   let r =
-    {array = fun []; get = fun []; len = patch_len len patches.val;
+    {array = fun []; get = fun []; len = max len plenr.val;
      clear_array = fun _ -> do { cleared.val := True; tab.val := None }}
   in
   let array () =
@@ -427,7 +466,7 @@ value make_cache ic ic_acc shift array_pos patches len name =
           else ();
           do {
             seek_in ic array_pos;
-            let t = apply_patches (input_value ic) patches.val r.len in
+            let t = apply_patches (input_value ic) patches r.len in
             tab.val := Some t;
             t
           }
@@ -436,7 +475,7 @@ value make_cache ic ic_acc shift array_pos patches len name =
   let gen_get i =
     if tab.val <> None then (r.array ()).(i)
     else
-      try List.assoc i patches.val with
+      try Hashtbl.find patches i with
       [ Not_found ->
           if i < 0 || i >= len then
             failwith ("access " ^ name ^ " out of bounds")
@@ -446,53 +485,6 @@ value make_cache ic ic_acc shift array_pos patches len name =
             seek_in ic pos;
             Iovalue.input ic
           } ]
-  in
-  do { r.array := array; r.get := gen_get; r }
-;
-
-value make_cached ic ic_acc shift array_pos patches len cache_htab name =
-  let tab = ref None in
-  let r =
-    {array = fun []; get = fun []; len = patch_len len patches.val;
-     clear_array = fun _ -> tab.val := None}
-  in
-  let array () =
-    match tab.val with
-    [ Some x -> x
-    | None ->
-        do {
-          ifdef UNIX then
-            if verbose.val then do {
-              Printf.eprintf "*** read %s\n" name; flush stderr;
-            }
-            else ()
-          else ();
-          do {
-            seek_in ic array_pos;
-            let t = apply_patches (input_value ic) patches.val r.len in
-            tab.val := Some t;
-            t
-          }
-        } ]
-  in
-  let gen_get i =
-    if tab.val <> None then (r.array ()).(i)
-    else
-      try Hashtbl.find cache_htab i with
-      [ Not_found ->
-          let r =
-            try List.assoc i patches.val with
-            [ Not_found ->
-                if i < 0 || i >= len then
-                  failwith ("access " ^ name ^ " out of bounds")
-                else do {
-                  seek_in ic_acc (shift + Iovalue.sizeof_long * i);
-                  let pos = input_binary_int ic_acc in
-                  seek_in ic pos;
-                  Iovalue.input ic
-                } ]
-          in
-          do { Hashtbl.add cache_htab i r; r } ]
   in
   do { r.array := array; r.get := gen_get; r }
 ;
@@ -539,20 +531,76 @@ value is_restricted bname cleanup_ref =
     | None -> Right False ]
 ;
 
-value input bname =
-  let bname =
-    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
-  in
+value input_patches bname =
   let patches =
     match
       try Some (open_in_bin (Filename.concat bname "patches")) with _ -> None
     with
     [ Some ic -> let p = input_value ic in do { close_in ic; p }
     | None ->
-        {p_person = ref []; p_ascend = ref []; p_union = ref [];
-         p_family = ref []; p_couple = ref []; p_descend = ref [];
-         p_string = ref []; p_name = ref []} ]
+        {Old.p_person = ref []; Old.p_ascend = ref []; Old.p_union = ref [];
+         Old.p_family = ref []; Old.p_couple = ref []; Old.p_descend = ref [];
+         Old.p_string = ref []; Old.p_name = ref []} ]
   in
+  let ht =
+    {h_person = (ref 0, Hashtbl.create 101);
+     h_ascend = (ref 0, Hashtbl.create 101);
+     h_union = (ref 0, Hashtbl.create 101);
+     h_family = (ref 0, Hashtbl.create 101);
+     h_couple = (ref 0, Hashtbl.create 101);
+     h_descend = (ref 0, Hashtbl.create 101);
+     h_string = (ref 0, Hashtbl.create 101);
+     h_name = (ref 0, Hashtbl.create 101)}
+  in
+  let add (ir, ht) (k, v) =
+    do {
+      if k >= ir.val then ir.val := k + 1 else ();
+      Hashtbl.add ht k v;
+    }
+  in
+  do {
+    List.iter (add ht.h_person) patches.Old.p_person.val;
+    List.iter (add ht.h_ascend) patches.Old.p_ascend.val;
+    List.iter (add ht.h_union) patches.Old.p_union.val;
+    List.iter (add ht.h_family) patches.Old.p_family.val;
+    List.iter (add ht.h_couple) patches.Old.p_couple.val;
+    List.iter (add ht.h_descend) patches.Old.p_descend.val;
+    List.iter (add ht.h_string) patches.Old.p_string.val;
+    List.iter (add ht.h_name) patches.Old.p_name.val;
+    ht
+   }
+;
+
+value patches_of_patches_ht patches =
+  let p =
+    {Old.p_person = ref [];
+     Old.p_ascend = ref [];
+     Old.p_union = ref [];
+     Old.p_family = ref [];
+     Old.p_couple = ref [];
+     Old.p_descend = ref [];
+     Old.p_string = ref [];
+     Old.p_name = ref []}
+  in
+  let add r k v = r.val := [(k, v) :: r.val] in
+  do {
+    Hashtbl.iter (add p.Old.p_person) (snd patches.h_person);
+    Hashtbl.iter (add p.Old.p_ascend) (snd patches.h_ascend);
+    Hashtbl.iter (add p.Old.p_union) (snd patches.h_union);
+    Hashtbl.iter (add p.Old.p_family) (snd patches.h_family);
+    Hashtbl.iter (add p.Old.p_couple) (snd patches.h_couple);
+    Hashtbl.iter (add p.Old.p_descend) (snd patches.h_descend);
+    Hashtbl.iter (add p.Old.p_string) (snd patches.h_string);
+    Hashtbl.iter (add p.Old.p_name) (snd patches.h_name);
+    p
+  }
+;
+
+value input bname =
+  let bname =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  let patches = input_patches bname in
   let ic =
     let ic = open_in_bin (Filename.concat bname "base") in
     do { check_magic ic; ic }
@@ -576,39 +624,38 @@ value input bname =
   let ic2_first_name_start_pos = input_binary_int ic2 in
   let shift = 0 in
   let persons =
-    make_cache ic ic_acc shift persons_array_pos patches.p_person persons_len
+    make_cache ic ic_acc shift persons_array_pos patches.h_person persons_len
       "persons"
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let ascends =
-    make_cache ic ic_acc shift ascends_array_pos patches.p_ascend persons_len
+    make_cache ic ic_acc shift ascends_array_pos patches.h_ascend persons_len
       "ascends"
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let unions =
-    make_cache ic ic_acc shift unions_array_pos patches.p_union persons_len
+    make_cache ic ic_acc shift unions_array_pos patches.h_union persons_len
       "unions"
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let families =
-    make_cache ic ic_acc shift families_array_pos patches.p_family
+    make_cache ic ic_acc shift families_array_pos patches.h_family
       families_len "families"
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let couples =
-    make_cache ic ic_acc shift couples_array_pos patches.p_couple families_len
-      "couples"
+    make_cache ic ic_acc shift couples_array_pos patches.h_couple
+      families_len "couples"
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let descends =
-    make_cache ic ic_acc shift descends_array_pos patches.p_descend
+    make_cache ic ic_acc shift descends_array_pos patches.h_descend
       families_len "descends"
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
-  let strings_cache = Hashtbl.create 101 in
   let strings =
-    make_cached ic ic_acc shift strings_array_pos patches.p_string strings_len
-      strings_cache "strings"
+    make_cache ic ic_acc shift strings_array_pos patches.h_string
+      strings_len "strings"
   in
   let cleanup_ref =
     ref (fun () -> do { close_in ic; close_in ic_acc; close_in ic2; })
@@ -620,83 +667,84 @@ value input bname =
       try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
       try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
       let oc9 = open_out_bin fname in
-      output_value_no_sharing oc9 patches;
+      let patches = patches_of_patches_ht patches in
+      output_value_no_sharing oc9 (patches : Old.patches);
       close_out oc9;
     }
   in
   let patched_ascends () =
-    List.map (fun (i, _) -> Adef.iper_of_int i) patches.p_ascend.val
+    let r = ref [] in
+    do {
+      Hashtbl.iter (fun i _ -> r.val := [Adef.iper_of_int i :: r.val])
+        (snd patches.h_ascend);
+      r.val
+    }
   in
   let patch_person i p =
     let i = Adef.int_of_iper i in
     do {
       persons.len := max persons.len (i + 1);
-      patches.p_person.val :=
-        [(i, p) :: List.remove_assoc i patches.p_person.val];
+      (fst patches.h_person).val := persons.len;
+      Hashtbl.replace (snd patches.h_person) i p;
     }
   in
   let patch_ascend i a =
     let i = Adef.int_of_iper i in
     do {
       ascends.len := max ascends.len (i + 1);
-      patches.p_ascend.val :=
-        [(i, a) :: List.remove_assoc i patches.p_ascend.val];
+      (fst patches.h_ascend).val := ascends.len;
+      Hashtbl.replace (snd patches.h_ascend) i a;
     }
   in
   let patch_union i a =
     let i = Adef.int_of_iper i in
     do {
       unions.len := max unions.len (i + 1);
-      patches.p_union.val :=
-        [(i, a) :: List.remove_assoc i patches.p_union.val];
+      (fst patches.h_union).val := ascends.len;
+      Hashtbl.replace (snd patches.h_union) i a;
     }
   in
   let patch_family i f =
     let i = Adef.int_of_ifam i in
     do {
       families.len := max families.len (i + 1);
-      patches.p_family.val :=
-        [(i, f) :: List.remove_assoc i patches.p_family.val];
+      (fst patches.h_family).val := families.len;
+      Hashtbl.replace (snd patches.h_family) i f;
     }
   in
   let patch_couple i c =
     let i = Adef.int_of_ifam i in
     do {
       couples.len := max couples.len (i + 1);
-      patches.p_couple.val :=
-        [(i, c) :: List.remove_assoc i patches.p_couple.val];
+      (fst patches.h_couple).val := couples.len;
+      Hashtbl.replace (snd patches.h_couple) i c;
     }
   in
   let patch_descend i c =
     let i = Adef.int_of_ifam i in
     do {
       descends.len := max descends.len (i + 1);
-      patches.p_descend.val :=
-        [(i, c) :: List.remove_assoc i patches.p_descend.val];
+      (fst patches.h_descend).val := descends.len;
+      Hashtbl.replace (snd patches.h_descend) i c;
     }
   in
   let patch_string i s =
     let i = Adef.int_of_istr i in
     do {
       strings.len := max strings.len (i + 1);
-      patches.p_string.val :=
-        [(i, s) :: List.remove_assoc i patches.p_string.val];
-      Hashtbl.add strings_cache i s;
+      (fst patches.h_string).val := strings.len;
+      Hashtbl.replace (snd patches.h_string) i s;
     }
   in
   let patch_name s ip =
     let s = Name.crush_lower s in
     let i = Hashtbl.hash s in
-    let (ipl, name_patches_rest) =
-      find patches.p_name.val where rec find =
-        fun
-        [ [] -> ([], [])
-        | [(i1, ipl1) :: l] ->
-            if i = i1 then (ipl1, l)
-            else let (ipl, l) = find l in (ipl, [(i1, ipl1) :: l]) ]
-    in
-    if List.memq ip ipl then ()
-    else patches.p_name.val := [(i, [ip :: ipl]) :: name_patches_rest]
+    try
+      let ipl = Hashtbl.find (snd patches.h_name) i in
+      if List.memq ip ipl then ()
+      else Hashtbl.replace (snd patches.h_name) i [ip :: ipl]
+    with
+    [ Not_found -> Hashtbl.add (snd patches.h_name) i [ip] ]
   in
   let read_notes mlen =
     match
@@ -735,19 +783,19 @@ value input bname =
      strings = strings; bnotes = bnotes}
   in
   let base_func =
-    {persons_of_name = persons_of_name bname patches.p_name;
-     strings_of_fsname = strings_of_fsname bname strings patches.p_person;
+    {persons_of_name = persons_of_name bname (snd patches.h_name);
+     strings_of_fsname = strings_of_fsname bname strings patches.h_person;
      index_of_string =
        index_of_string strings ic2 ic2_string_start_pos ic2_string_hash_len
-         patches.p_string;
+         (snd patches.h_string);
      persons_of_surname =
        persons_of_first_name_or_surname base_data strings
-         (ic2, ic2_surname_start_pos, fun p -> p.surname, patches.p_person,
+         (ic2, ic2_surname_start_pos, fun p -> p.surname, snd patches.h_person,
           "surname");
      persons_of_first_name =
        persons_of_first_name_or_surname base_data strings
          (ic2, ic2_first_name_start_pos, fun p -> p.first_name,
-          patches.p_person, "first_name");
+          snd patches.h_person, "first_name");
      is_restricted = is_restricted bname cleanup_ref;
      patch_person = patch_person; patch_ascend = patch_ascend;
      patch_union = patch_union; patch_family = patch_family;
