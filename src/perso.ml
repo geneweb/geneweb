@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.78 2001-02-10 19:30:54 ddr Exp $ *)
+(* $Id: perso.ml,v 3.79 2001-02-14 15:26:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -353,15 +353,6 @@ value print_baptism_place conf base env p p_auth =
 
 value print_birth_place conf base env p p_auth =
   if p_auth then Wserver.wprint "%s" (sou base p.birth_place) else ()
-;
-
-value print_body_prop conf base env =
-  let s =
-    try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
-    [ Not_found -> "" ]
-  in
-  let s = s ^ body_prop conf in
-  Wserver.wprint "%s" s
 ;
 
 value print_burial_place conf base env p p_auth =
@@ -752,10 +743,7 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "age" -> print_age conf base env p p_auth
   | "alias" -> print_alias conf base env
   | "baptism_place" -> print_baptism_place conf base env p p_auth
-  | "base_header" -> include_hed_trl conf (Some base) ".hed"
-  | "base_trailer" -> include_hed_trl conf (Some base) ".trl"
   | "birth_place" -> print_birth_place conf base env p p_auth
-  | "body_prop" -> print_body_prop conf base env
   | "border" -> Wserver.wprint "%d" conf.border
   | "burial_place" -> print_burial_place conf base env p p_auth
   | "child_name" ->
@@ -789,7 +777,6 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "first_name" -> Wserver.wprint "%s" (p_first_name base p)
   | "first_name_alias" -> print_first_name_alias conf base env
   | "first_name_key" -> print_first_name_key conf base env p p_auth
-  | "highlight" -> Wserver.wprint "%s" conf.highlight
   | "image_prefix" -> Wserver.wprint "%s" (image_prefix conf)
   | "image_size" -> print_image_size conf base env p p_auth
   | "image_url" -> print_image_url conf base env p p_auth
@@ -797,7 +784,6 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "married_to" -> print_married_to conf base env p p_auth efam
   | "mother_age_at_birth" ->
       print_parent_age conf base p a p_auth (fun cpl -> cpl.mother)
-  | "nl" -> Wserver.wprint "\n"
   | "nobility_title" -> print_nobility_title conf base env p p_auth
   | "nobility_titles" -> print_nobility_titles conf base env p p_auth
   | "notes" -> print_notes conf base env p p_auth
@@ -828,7 +814,7 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "surname_key" -> print_surname_key conf base env p p_auth
   | "title" -> Wserver.wprint "%s" (person_title conf base p)
   | "witness_relation" -> print_witness_relation conf base env efam
-  | v -> Wserver.wprint "%%%s;" v ]
+  | v -> Templ.print_variable conf base v ]
 ;
 
 value simple_person_text conf base p p_auth =

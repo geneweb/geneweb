@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.27 2001-02-14 03:19:04 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.28 2001-02-14 15:26:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -791,7 +791,8 @@ and ast_expr = Templ.ast_expr ==
 ;
 
 type env =
-  [ Estring of string ]
+  [ Estring of string
+  | Enone ]
 ;
 
 type variable_value =
@@ -799,6 +800,8 @@ type variable_value =
   | VVdate of option date and string
   | VVnone ]
 ;
+
+value get_env v env = try List.assoc v env with [ Not_found -> Enone ];
 
 value eval_variable conf base env p =
   fun
@@ -808,10 +811,27 @@ value eval_variable conf base env p =
   | _ -> VVnone ]
 ;
 
+value start_with s sini =
+  String.length s > String.length sini &&
+  String.sub s 0 (String.length sini) = sini
+;
 
 value eval_person_bool_variable conf base env p =
   fun 
-  [ v -> do Wserver.wprint "%%%s;" v; return True ]
+  [ "adding" ->
+      List.mem (p_getenv conf.env "m") [Some "ADD_IND"; Some "ADD_IND_OK"]
+  | "modifying" ->
+      List.mem (p_getenv conf.env "m") [Some "MOD_IND"; Some "MOD_IND_OK"]
+  | "merging" ->
+      List.mem (p_getenv conf.env "m")
+        [Some "MRG_IND_OK"; Some "MRG_MOD_IND_OK"]
+  | s ->
+      if start_with s "evar_" then
+        let v = String.sub s 5 (String.length s - 5) in
+        match p_getenv conf.env v with
+        [ Some "" | None -> False
+        | _ -> True ]
+      else do Wserver.wprint "%%%s;" s; return True ]
 ;
 
 value is_calendar cal =
@@ -861,7 +881,18 @@ value eval_bool_value conf base env p =
 
 value print_person_variable conf base env p =
   fun
-  [ s -> Wserver.wprint "%%%s;" s ]
+  [ "digest" ->
+      match get_env "digest" env with
+      [ Estring x -> Wserver.wprint "%s" x
+      | _ -> () ]
+  | "index" -> Wserver.wprint "%d" (Adef.int_of_iper p.cle_index)
+  | s ->
+      if start_with s "evar_" then
+        let v = String.sub s 5 (String.length s - 5) in
+        match p_getenv conf.env v with
+        [ Some vv -> Wserver.wprint "%s" (quote_escaped vv)
+        | _ -> () ]
+     else Templ.print_variable conf base s ]
 ;
 
 value print_date_field proj =

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.19 2001-02-10 19:30:54 ddr Exp $
+# $Id: Makefile,v 3.20 2001-02-14 15:26:41 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -84,7 +84,7 @@ i18n: pr_transl.cmo always
 always:
 
 depend:
-	../tools/camlp4_depend.sh $(OCAMLI) *.mli *.ml > .depend.new
+	../tools/camlp4_depend.sh $(OCAMLI) `ls *.mli *.ml` > .depend.new
 	mv .depend.new .depend
 
 include .depend
