@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.104 2000-05-29 08:40:39 ddr Exp $
+# $Id: lexicon.txt,v 3.105 2000-05-30 07:41:59 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5028,7 +5028,7 @@ ru: фамилия/фамилии
 se: efternamn/efternamn
 
     surnames list
-de: Tiny Tafel
+de: Nachnamen-Liste
 dk: efternavnsoversigt
 en: surnames list
 fr: liste &eacute;clair
