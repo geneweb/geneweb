@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.32 2000-06-18 12:35:43 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.33 2000-06-18 12:48:58 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -189,7 +189,7 @@ sivulle %d j&auml;lkeen.
 
 <p>
 
-{If your browser does not automatically update the modified pages (you
+{If your browser does not automatically update the modified pages (and you
 must each time do "reload current document"), try navigating from <a
 href="%sescache=-%c">this link</a>}.
 

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.33 2000-06-18 12:35:44 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.34 2000-06-18 12:48:58 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>G&eacute;n&eacute;alogie - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -198,9 +198,9 @@ Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 <p>
 
 Si votre navigateur ne met pas &agrave; jour automatiquement les pages
-modifi&eacute;es (vous devez faire chaque fois "actualiser la page"),
-essayez la navigation &agrave; partir de <a href="%sescache=-%c">ce
-lien</a>.
+modifi&eacute;es (vous obligeant &agrave; chaque fois &agrave;
+"actualiser la page"), essayez la navigation &agrave; partir de <a
+href="%sescache=-%c">ce lien</a>.
 
 </td></tr>
 </table>
