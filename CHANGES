@@ -5,6 +5,8 @@ GeneWeb Version 2.01
   - [Mar 30, 99] Changed term "photo" into "image".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Apr 2, 99] Fixed bug: in missing ancestors in alphabetic order, the
+    accents in surnames were incorrectly displayed.
   - [Mar 30, 99] Added the spouses when displaying relationship links with
     cousins (from the "cousin" link in personal pages).
   - [Mar 25, 99] Added the "unmarried" case for couples.

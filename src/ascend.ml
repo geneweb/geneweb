@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.3 1999-03-31 02:16:48 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.4 1999-04-02 07:02:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -733,7 +733,7 @@ value print_someone_missing conf base begin_surname spouses_incl (mt, mtl, p) =
 ;
 
 value print_alphabetic_missing conf base spouses_included (surname, list) =
-  do Wserver.wprint "%s " (surname_end surname);
+  do Wserver.wprint "%s " (coa conf (surname_end surname));
      match list with
      [ [e] ->
          print_someone_missing conf base (surname_begin surname)
