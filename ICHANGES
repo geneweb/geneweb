@@ -5,6 +5,8 @@ GeneWeb Version 3.03
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [21 Feb 00] Add a + for dead people without date, even if their
+    birth date clearly shows that they must be dead.
   - [09 Feb 00] Added link to welcome in anniversaries pages.
   - [02 Feb 00] Fixed little problem in anniversaries: when other
     calendars than Gregorian (e.g. Julian), could select "anniversary"
