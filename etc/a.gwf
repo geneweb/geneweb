@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.27 2001-01-31 12:34:15 ddr Exp $
+# $Id: a.gwf,v 3.28 2001-02-13 14:13:39 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -86,7 +86,8 @@ access_by_key=no
 propose_titles=yes
 
 # Set to no if you don't want that the link "add a family" be added in
-# the welcome page for wizards.
+# the welcome page for wizards. In "no", forbid also adding families not
+# connected to the rest.
 propose_add_family=yes
 
 # Maximum level when displaying ancestors

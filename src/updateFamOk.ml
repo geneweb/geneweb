@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.27 2001-02-10 22:05:37 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.28 2001-02-13 14:13:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -225,6 +225,23 @@ value print_err_mother_sex conf base p =
      afficher_personne_referencee conf base p;
      Wserver.wprint "\n%s\n" (transl conf "should be female");
      Update.print_return conf;
+     trailer conf;
+  return raise Update.ModErr
+;
+
+value print_error_deconnected conf =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "error"))
+  in
+  do rheader conf title;
+     Util.print_link_to_welcome conf True;
+     Wserver.wprint "\
+Sorry, you can add only families connected to the rest.<br>
+This restriction has been added by this data base owner.
+<p>
+Désolé, vous ne pouvez ajouter que des familles connectées au reste.<br>
+Cette restriction a été ajoutée par le propriétaire de cette base de
+données.\n";
      trailer conf;
   return raise Update.ModErr
 ;
@@ -678,6 +695,22 @@ value delete_topological_sort conf base =
   try Sys.remove tstab_file with [ Sys_error _ -> () ]
 ;
 
+value get_create (_, _, _, create, _) = create;
+
+value forbidden_deconnected conf sfam scpl sdes =
+  let no_dec =
+    try List.assoc "propose_add_family" conf.base_env = "no" with
+    [ Not_found -> False ]
+  in
+  if no_dec then
+    if get_create scpl.father = Update.Link
+    || get_create scpl.mother = Update.Link then False
+    else
+      List.for_all (fun p -> get_create p <> Update.Link)
+        (Array.to_list sdes.children)
+  else False
+;
+
 value print_add o_conf base =
   let conf = Update.update_conf o_conf in
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
@@ -692,6 +725,8 @@ value print_add o_conf base =
         in
         if ext || redisp then
           UpdateFam.print_add1 conf base sfam scpl sdes False
+        else if forbidden_deconnected conf sfam scpl sdes then
+          print_error_deconnected conf
         else
           do strip_family sfam sdes; return
           let (fam, cpl, des) = effective_add conf base sfam scpl sdes in
