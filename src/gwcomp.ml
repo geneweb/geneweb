@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.4 2002-10-22 13:18:23 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.5 2002-11-14 04:15:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -699,7 +699,7 @@ value read_notes ic =
     with
     [ End_of_file -> failwith "end of file" ]
   in
-  strip_spaces (strip_controls_m notes)
+  strip_all_trailing_spaces notes
 ;
 
 value read_family ic fname =

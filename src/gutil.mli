@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.6 2002-10-06 15:42:54 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.7 2002-11-14 04:15:34 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -99,10 +99,10 @@ value check_base :
   base -> (base_error -> unit) -> (base_warning -> unit) -> unit
 ;
 
-value strip_controls_m : string -> string;
 value strip_spaces : string -> string;
 value alphabetic : string -> string -> int;
 value initial : string -> int;
+value strip_all_trailing_spaces : string -> string;
 
 value rindex : string -> char -> option int;
 value lindex : string -> char -> option int;

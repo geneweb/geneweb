@@ -5,6 +5,7 @@ GeneWeb Version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [14 Nov 02] Fixed bug: in notes, the spaces were incorrectly stripped.
   - [14 Nov 02] Changed links in forum so that the URL for "next message"
     is the same as the URL in the forum main page. This way, it is
     indicated as "visited" the same way.
