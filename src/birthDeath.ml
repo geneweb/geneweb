@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.4 2002-01-10 04:13:30 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.5 2002-03-06 12:21:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -342,11 +342,13 @@ value print_marriage conf base =
              else ();
              Wserver.wprint "<li>\n";
              Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base (pget conf base cpl.father);
+             afficher_personne_referencee conf base
+               (pget conf base cpl.father);
              Wserver.wprint "</strong>\n";
-             Wserver.wprint "%s" (transl conf "and");
+             Wserver.wprint "%s" (transl_nth conf "and" 0);
              Wserver.wprint "<strong>\n";
-             afficher_personne_referencee conf base (pget conf base cpl.mother);
+             afficher_personne_referencee conf base
+               (pget conf base cpl.mother);
              Wserver.wprint "</strong>,\n";
              if future then
                Wserver.wprint "<em>%s</em>.\n"

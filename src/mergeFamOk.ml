@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 4.5 2002-03-05 16:29:56 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 4.6 2002-03-06 12:21:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -106,7 +106,7 @@ value print_mod_merge_ok conf base wl cpl des =
           end;
           Wserver.wprint "\n";
           Merge.print_someone conf base p1;
-          Wserver.wprint "\n%s\n" (transl conf "and");
+          Wserver.wprint "\n%s\n" (transl_nth conf "and" 0);
           Merge.print_someone conf base p2;
           Wserver.wprint "\n";
         }

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.29 2002-03-05 15:29:53 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.30 2002-03-06 12:21:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -460,11 +460,11 @@ value print_inv1 conf base p fam1 fam2 =
     tag "ul" begin
       html_li conf;
       Update.print_someone conf base (poi base cpl1.father);
-      Wserver.wprint " %s " (transl conf "and");
+      Wserver.wprint " %s " (transl_nth conf "and" 0);
       Update.print_someone conf base (poi base cpl1.mother);
       html_li conf;
       Update.print_someone conf base (poi base cpl2.father);
-      Wserver.wprint " %s " (transl conf "and");
+      Wserver.wprint " %s " (transl_nth conf "and" 0);
       Update.print_someone conf base (poi base cpl2.mother);
     end;
     Wserver.wprint "\n";

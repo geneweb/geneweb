@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.11 2002-03-05 12:04:37 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.12 2002-03-06 12:21:15 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -171,8 +171,8 @@
 %end;
 
 %if;has_families;
-  <h3><font color=%highlight;>[*marriage/marriages]1 [and]0%sp;
-  [child/children]1</font></h3>
+  <h3><font color=%highlight;>[*marriage/marriages]1
+  [and::child/children]1</font></h3>
   <ul>
   %foreach;family;
     <li type=%if;spouse.has_parents;disc%else;circle%end;>

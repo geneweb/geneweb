@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 4.3 2001-12-20 19:58:15 ddr Exp $ *)
+(* $Id: merge.ml,v 4.4 2002-03-06 12:21:20 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -70,7 +70,7 @@ value print conf base p =
                       (transl_nth conf "son/daughter/child"
                          (index_of_sex p.sex))
                       (person_title_text conf base (poi base cpl.father) ^
-                         " " ^ transl conf "and" ^ " " ^
+                         " " ^ transl_nth conf "and" 0 ^ " " ^
                          person_title_text conf base (poi base cpl.mother)))
              | None -> () ];
              Wserver.wprint "\n<br>\n";

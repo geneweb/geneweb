@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.30 2002-02-17 09:48:52 ddr Exp $ *)
+(* $Id: perso.ml,v 4.31 2002-03-06 12:21:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -547,7 +547,7 @@ value print_married_to conf base env p p_auth =
 
 value print_nobility_title conf base env p p_auth =
   match get_env "nobility_title" env with
-  [ Vtitle t when p_auth -> print_title conf base (transl conf "and") p t
+  [ Vtitle t when p_auth -> print_title conf base (transl_nth conf "and" 0) p t
   | _ -> () ]
 ;
 
@@ -568,7 +568,8 @@ value obsolete var new_var =
 value print_nobility_titles conf base env p p_auth =
   do {
     obsolete "nobility_titles" "nobility_title";
-    if p_auth then print_titles conf base True (transl conf "and") p else ()
+    if p_auth then print_titles conf base True (transl_nth conf "and" 0) p
+    else ()
   }
 ;
 

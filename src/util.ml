@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.40 2002-03-05 16:29:58 ddr Exp $ *)
+(* $Id: util.ml,v 4.41 2002-03-06 12:21:25 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -121,10 +121,13 @@ value plus_decl s =
 value gen_decline conf wt s =
   let s1 = if s = "" then "" else " " ^ s in
   let len = String.length wt in
-  if len >= 1 && wt.[len - 1] = ''' then
-    if String.length s > 0 && start_with_vowel s then
-      nth_field wt 1 ^ decline 'n' s
-    else nth_field wt 0 ^ decline 'n' s1
+  if rindex wt '/' <> None then
+    match rindex wt '/' with
+    [ Some i ->
+        if String.length s > 0 && start_with_vowel s then
+          nth_field wt 1 ^ decline 'n' s
+        else nth_field wt 0 ^ decline 'n' s1
+    | None -> wt ^ decline 'n' s1 ]
   else if len >= 3 && wt.[len - 3] == ':' && wt.[len - 1] == ':' then
     let start = String.sub wt 0 (len - 3) in start ^ decline wt.[len - 2] s
   else
@@ -1422,7 +1425,7 @@ value print_parent conf base p fath moth =
     [ (Some fath, None) -> parent conf base p fath
     | (None, Some moth) -> parent conf base p moth
     | (Some fath, Some moth) ->
-        parent conf base p fath ^ " " ^ transl conf "and" ^ " " ^
+        parent conf base p fath ^ " " ^ transl_nth conf "and" 0 ^ " " ^
           parent conf base p moth
     | _ -> "" ]
   in
