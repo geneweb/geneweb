@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.4 2001-02-16 04:39:47 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.5 2001-02-17 03:51:14 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -13,6 +13,66 @@
 %base_header;
 </head>
 <body%body_prop;>
+
+%define;date;xx;
+  <table border=1>
+  <tr>
+  <td>[*date]0</td>
+  <td>
+  [year/month/day]0
+  <input name=%xx;_yyyy size=5 maxlength=5 value="%xx.year;">
+  [year/month/day]1
+  <input name=%xx;_mm size=2 maxlength=2 value="%xx.month;">
+  [year/month/day]2
+  <input name=%xx;_mm size=2 maxlength=2 value="%xx.day;">
+  </td>
+  <td>
+  ...[or]0 [text]0
+  <input name=%xx;_text size=15 maxlength=30 value="%xx.text;">
+  </td>
+  </table>
+  <table border=1>
+  <tr>
+  <td>[*calendar/calendars]0
+  <select name=%xx;_cal>
+  <option value=G%if;xx.cal_gregorian; selected%end;
+  >[*gregorian/julian/french/hebrew]0
+  <option value=J%if;xx.cal_julian; selected%end;
+  >[*gregorian/julian/french/hebrew]1
+  <option value=F%if;xx.cal_french; selected%end;
+  >[*gregorian/julian/french/hebrew]2
+  <option value=H%if;xx.cal_hebrew; selected%end;
+  >[*gregorian/julian/french/hebrew]3
+  </select>
+  </td>
+  <td>[*precision]0
+  <select name=%xx;_prec>
+  <option%if;xx.prec_no; selected%end;>-
+  <option value=sure%if;xx.prec_sure; selected%end;>[*exact]0
+  <option value=about%if;xx.prec_about; selected%end;>[*about (date)]0
+  <option value=maybe%if;xx.prec_maybe; selected%end;>[*possibly (date)]0
+  <option value=before%if;xx.prec_before; selected%end;>[*before (date)]0
+  <option value=after%if;xx.prec_after; selected%end;>[*after (date)]0
+  <option value=oryear%if;xx.prec_oryear; selected%end;
+      >&lt;- [*or] -&gt;
+  <option value=yearint%if;xx.prec_yearint; selected%end;
+      >&lt;- [*between (date)] -&gt;
+  </select>
+  <input name=%xx;_oryear size=5 maxlength=5 value="%xx.oryear;">
+  </td>
+  </tr>
+  </table>
+%end;
+%define;source;xx;
+  <table border=1>
+  <tr>
+  <td>[*source/sources]0</td>
+  <td>
+  <input name=%xx;_src size=40 maxlength=200 value="%eval;(xx ^ "_src");">
+  </td>
+  </tr>
+  </table>
+%end;
 
 <h1 align=center><font color=%highlight;>
 %if;(evar_m = "MRG_IND_OK" or evar_m = "MRG_MOD_IND_OK");
@@ -164,61 +224,9 @@
 </tr>
 </table>
 
-<table border=1>
-<tr>
-<td>[*date]0</td>
-<td>
-[year/month/day]0
-<input name=birth_yyyy size=5 maxlength=5 value="%birth.year;">
-[year/month/day]1
-<input name=birth_mm size=2 maxlength=2 value="%birth.month;">
-[year/month/day]2
-<input name=birth_mm size=2 maxlength=2 value="%birth.day;">
-</td>
-<td>
-...[or]0 [text]0
-<input name=birth_text size=15 maxlength=30 value="%birth.text;">
-</td>
-</table>
-<table border=1>
-<tr>
-<td>[*calendar/calendars]0
-<select name=birth_cal>
-<option value=G%if;birth.cal_gregorian; selected%end;>
-[*gregorian/julian/french/hebrew]0
-<option value=J%if;birth.cal_julian; selected%end;>
-[*gregorian/julian/french/hebrew]1
-<option value=F%if;birth.cal_french; selected%end;>
-[*gregorian/julian/french/hebrew]2
-<option value=H%if;birth.cal_hebrew; selected%end;>
-[*gregorian/julian/french/hebrew]3
-</select>
-</td>
-<td>[*precision]0
-<select name=birth_prec>
-<option%if;birth.prec_no; selected%end;>-
-<option value=sure%if;birth.prec_sure; selected%end;>[*exact]0
-<option value=about%if;birth.prec_about; selected%end;>[*about (date)]0
-<option value=maybe%if;birth.prec_maybe; selected%end;>[*possibly (date)]0
-<option value=before%if;birth.prec_before; selected%end;>[*before (date)]0
-<option value=after%if;birth.prec_after; selected%end;>[*after (date)]0
-<option value=oryear%if;birth.prec_oryear; selected%end;>&lt;- [*or] -&gt;
-<option value=yearint%if;birth.prec_yearint; selected%end;>
-&lt;- [*between (date)] -&gt;
-</select>
-<input name=birth_oryear size=5 maxlength=5 value="%birth.oryear;">
-</td>
-</tr>
-</table>
+%apply;date;birth;
 
-<table border=1>
-<tr>
-<td>[*source/sources]0</td>
-<td>
-<input name=birth_src size=40 maxlength=200 value="%birth_src;">
-</td>
-</tr>
-</table>
+%apply;source;birth;
 
 <p>
 
@@ -232,61 +240,9 @@
 </tr>
 </table>
 
-<table border=1>
-<tr>
-<td>[*date]0</td>
-<td>
-[year/month/day]0
-<input name=bapt_yyyy size=5 maxlength=5 value="%bapt.year;">
-[year/month/day]1
-<input name=bapt_mm size=2 maxlength=2 value="%bapt.month;">
-[year/month/day]2
-<input name=bapt_mm size=2 maxlength=2 value="%bapt.day;">
-</td>
-<td>
-...[or]0 [text]0
-<input name=bapt_text size=15 maxlength=30 value="%bapt.text;">
-</td>
-</table>
-<table border=1>
-<tr>
-<td>[*calendar/calendars]0
-<select name=bapt_cal>
-<option value=G%if;bapt.cal_gregorian; selected%end;>
-[*gregorian/julian/french/hebrew]0
-<option value=J%if;bapt.cal_julian; selected%end;>
-[*gregorian/julian/french/hebrew]1
-<option value=F%if;bapt.cal_french; selected%end;>
-[*gregorian/julian/french/hebrew]2
-<option value=H%if;bapt.cal_hebrew; selected%end;>
-[*gregorian/julian/french/hebrew]3
-</select>
-</td>
-<td>[*precision]0
-<select name=bapt_prec>
-<option%if;bapt.prec_no; selected%end;>-
-<option value=sure%if;bapt.prec_sure; selected%end;>[*exact]0
-<option value=about%if;bapt.prec_about; selected%end;>[*about (date)]0
-<option value=maybe%if;bapt.prec_maybe; selected%end;>[*possibly (date)]0
-<option value=before%if;bapt.prec_before; selected%end;>[*before (date)]0
-<option value=after%if;bapt.prec_after; selected%end;>[*after (date)]0
-<option value=oryear%if;bapt.prec_oryear; selected%end;>&lt;- [*or] -&gt;
-<option value=yearint%if;bapt.prec_yearint; selected%end;>
-&lt;- [*between (date)] -&gt;
-</select>
-<input name=bapt_oryear size=5 maxlength=5 value="%bapt.oryear;">
-</td>
-</tr>
-</table>
+%apply;date;bapt;
 
-<table border=1>
-<tr>
-<td>[*source/sources]0</td>
-<td>
-<input name=bapt_src size=40 maxlength=200 value="%bapt_src;">
-</td>
-</tr>
-</table>
+%apply;source;bapt;
 
 <h4>[*death]</h4>
 
@@ -312,52 +268,7 @@
 </tr>
 </table>
 
-<table border=1>
-<tr>
-<td>[*date]0</td>
-<td>
-[year/month/day]0
-<input name=death_yyyy size=5 maxlength=5 value="%death.year;">
-[year/month/day]1
-<input name=death_mm size=2 maxlength=2 value="%death.month;">
-[year/month/day]2
-<input name=death_mm size=2 maxlength=2 value="%death.day;">
-</td>
-<td>
-...[or]0 [text]0
-<input name=death_text size=15 maxlength=30 value="%death.text;">
-</td>
-</table>
-<table border=1>
-<tr>
-<td>[*calendar/calendars]0
-<select name=death_cal>
-<option value=G%if;death.cal_gregorian; selected%end;>
-[*gregorian/julian/french/hebrew]0
-<option value=J%if;death.cal_julian; selected%end;>
-[*gregorian/julian/french/hebrew]1
-<option value=F%if;death.cal_french; selected%end;>
-[*gregorian/julian/french/hebrew]2
-<option value=H%if;death.cal_hebrew; selected%end;>
-[*gregorian/julian/french/hebrew]3
-</select>
-</td>
-<td>[*precision]0
-<select name=death_prec>
-<option%if;death.prec_no; selected%end;>-
-<option value=sure%if;death.prec_sure; selected%end;>[*exact]0
-<option value=about%if;death.prec_about; selected%end;>[*about (date)]0
-<option value=maybe%if;death.prec_maybe; selected%end;>[*possibly (date)]0
-<option value=before%if;death.prec_before; selected%end;>[*before (date)]0
-<option value=after%if;death.prec_after; selected%end;>[*after (date)]0
-<option value=oryear%if;death.prec_oryear; selected%end;>&lt;- [*or] -&gt;
-<option value=yearint%if;death.prec_yearint; selected%end;>
-&lt;- [*between (date)] -&gt;
-</select>
-<input name=death_oryear size=5 maxlength=5 value="%death.oryear;">
-</td>
-</tr>
-</table>
+%apply;date;death;
 
 <table border=1>
 <tr>
@@ -376,14 +287,7 @@
 </tr>
 </table>
 
-<table border=1>
-<tr>
-<td>[*source/sources]0</td>
-<td>
-<input name=death_src size=40 maxlength=200 value="%death_src;">
-</td>
-</tr>
-</table>
+%apply;source;death;
 
 <h4>[*burial]</h4>
 
@@ -403,61 +307,9 @@
 </tr>
 </table>
 
-<table border=1>
-<tr>
-<td>[*date]0</td>
-<td>
-[year/month/day]0
-<input name=burial_yyyy size=5 maxlength=5 value="%burial.year;">
-[year/month/day]1
-<input name=burial_mm size=2 maxlength=2 value="%burial.month;">
-[year/month/day]2
-<input name=burial_mm size=2 maxlength=2 value="%burial.day;">
-</td>
-<td>
-...[or]0 [text]0
-<input name=burial_text size=15 maxlength=30 value="%burial.text;">
-</td>
-</table>
-<table border=1>
-<tr>
-<td>[*calendar/calendars]0
-<select name=burial_cal>
-<option value=G%if;burial.cal_gregorian; selected%end;>
-[*gregorian/julian/french/hebrew]0
-<option value=J%if;burial.cal_julian; selected%end;>
-[*gregorian/julian/french/hebrew]1
-<option value=F%if;burial.cal_french; selected%end;>
-[*gregorian/julian/french/hebrew]2
-<option value=H%if;burial.cal_hebrew; selected%end;>
-[*gregorian/julian/french/hebrew]3
-</select>
-</td>
-<td>[*precision]0
-<select name=burial_prec>
-<option%if;burial.prec_no; selected%end;>-
-<option value=sure%if;burial.prec_sure; selected%end;>[*exact]0
-<option value=about%if;burial.prec_about; selected%end;>[*about (date)]0
-<option value=maybe%if;burial.prec_maybe; selected%end;>[*possibly (date)]0
-<option value=before%if;burial.prec_before; selected%end;>[*before (date)]0
-<option value=after%if;burial.prec_after; selected%end;>[*after (date)]0
-<option value=oryear%if;burial.prec_oryear; selected%end;>&lt;- [*or] -&gt;
-<option value=yearint%if;burial.prec_yearint; selected%end;>
-&lt;- [*between (date)] -&gt;
-</select>
-<input name=burial_oryear size=5 maxlength=5 value="%burial.oryear;">
-</td>
-</tr>
-</table>
+%apply;date;burial;
 
-<table border=1>
-<tr>
-<td>[*source/sources]0</td>
-<td>
-<input name=burial_src size=40 maxlength=200 value="%burial_src;">
-</td>
-</tr>
-</table>
+%apply;source;burial;
 
 <h4>[*occupation]</h4>
 
