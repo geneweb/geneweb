@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.135 2000-07-08 16:21:32 ddr Exp $
+# $Id: lexicon.txt,v 3.136 2000-07-08 20:21:36 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -80,6 +80,7 @@ cs:  zkusit znovu s tímto èíslem, nebo jít zpìt (back) a zmìnit èíslo
 de: , um es mit dieser Nummer nochmals zu versuchen, oder dr&uuml;cken Sie "back" und &auml;ndern Sie es selbst
 dk:  for at fors&oslash;ge igen med dette nummer, eller g&aring; tilbage og v&aelig;lg et andet
 en:  to try again with this number, or do "back" and change it yourself
+eo:  por reprobi kun cxi numero, aux faru "malantauxe" kaj sxangxu ion vimem
 es:  para ensayar de nuevo con este n&uacute;mero, o haga "back" y escoja otro
 fi:  yritt&auml;&auml;ksesi uudelleen t&auml;ll&auml numerolla,  tai peruuta ja muuta se itse
 fr:  pour r&eacute;essayer avec ce num&eacute;ro, ou bien faites "back" et choisissez-en un autre
@@ -1768,6 +1769,7 @@ af: moontlike seun/moontlike dogter/moontlike kind
 de: m&ouml;glicher Sohn/m&ouml;gliche Tochter/m&ouml;gliches Kind
 dk: mulig s&oslash;n/mulig datter/muligt barn
 en: candidate son/candidate daughter/candidate child
+eo: ebla filo/ebla filino/eblaj infano
 es: hijo posible/hija posible/hijo(a) posible
 fi: mahdollinen poika/mahdollinen tyt&auml;r/mahdollinen lapsi
 fr: fils possible/fille possible/enfant possible
@@ -1984,6 +1986,7 @@ cs: pokraèovat ve spojování
 de: Zusammenf&uuml;hrung fortsetzen
 dk: forts&aelig;t sammenf&oslash;jning
 en: continue merging
+eo: dauxri fuzion
 es: continuar la fusi&oacute;n
 fi: jatka yhdist&auml;mist&auml
 fr: continuer &agrave; fusionner
@@ -2564,6 +2567,7 @@ cs: soubor
 de: Datei
 dk: fil
 en: file
+eo: sliparo
 es: fichero
 fi: tiedosto
 fr: fichier
@@ -2703,7 +2707,7 @@ af: pleegvader/pleegmoeder/pleegouers
 de: Pflegevater/Pflegemutter/Pflegeeltern
 dk: plejefader/plejemoder/plejefor&aelig;ldre
 en: foster father/foster mother/foster parents
-eo: nutrinto patro/nutrinto patrino/nutrintoj gepatroj
+eo: nutrinta patro/nutrinta patrino/nutrintaj gepatroj
 fi: kasvatusis&auml;/kasvatus&auml;iti/kasvatusvanhemmat
 fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
 he:   àá çåøâ/ àí çåøâú/ äåøéí çåøâéí
@@ -2719,6 +2723,7 @@ af: pleegseun/pleegdogter/pleegkind
 de: Pflegesohn/Pflegetochter/Pflegekind
 dk: plejes&oslash;n/plejedatter/plejebarn
 en: foster son/foster daughter/foster child
+eo: nutrita filo/nutrita filino/nutrita infano
 fi: kasvattipoika/kasvattityt&auml;r/kasvattilapsi
 fr: fils &eacute;lev&eacute;/fille &eacute;lev&eacute;e/enfant &eacute;lev&eacute;
 he:  áï çåøâ/ áú çåøâú/ éìã çåøâ
@@ -3000,7 +3005,7 @@ cs: obrázek smazán
 de: Bild gel&ouml;scht
 dk: billede slettet
 en: image deleted
-eo: foto malkonstruita
+eo: bildo malkonstruita
 es: imagen suprimida
 fi: kuva poistettu
 fr: image supprim&eacute;e
@@ -3020,6 +3025,7 @@ cs: obrázek obdr¾en
 de: Bild erhalten
 dk: billede indsat
 en: image received
+eo: bildo ricevita
 es: imagen recibida
 fi: kuva saatu
 fr: image re&ccedil;ue
@@ -3528,6 +3534,7 @@ cs: sòatek s %t po své smrti
 de: Heirat von %t nach seinem/ihrem Tod
 dk: gifterm&aring;l af %t efter hans/hendes d&oslash;d
 en: marriage of %t after his/her death
+eo: geedzo de %t post sua morto
 es: casamiento de %t despu&eacute;s de su muerte
 fi: %t olisi naitu vainajana
 fr: mariage de %t apr&egrave;s sa mort
@@ -3547,6 +3554,7 @@ cs: sòatek s %t pøed svım narozením
 de: Heirat von %t vor seiner/ihrer Geburt
 dk: gifterm&aring;l af %t f&oslash;r hans/hendes f&oslash;dsel
 en: marriage of %t before his/her birth
+eo: geedzo de %t antaux sua naskigxo
 es: casamiento de %t antes de su nacimiento
 fi: %t olisi naitu ennen syntym&auml;&auml
 fr: mariage de %t avant sa naissance
@@ -3607,6 +3615,7 @@ cs: o¾enil se ve vìku %t/vdala se ve vìku %t
 de: verheiratet mit %t Jahren
 dk: gift i alderen %t
 en: married at age %t
+eo: edzigxita %t
 es: casado a la edad de %t
 fi: vihitty %t ik&auml;isen&auml
 fr: mari&eacute;(e) &agrave; l'&agrave;ge de %t
@@ -3685,6 +3694,7 @@ af: saamgevoeg
 de: Zusammenf&uuml;hrung abgeschlossen
 dk: sammenl&aelig;gning udf&oslash;rt
 en: merge done
+eo: fuzio farita
 es: fusi&oacute;n terminada
 fr: fusion termin&eacute;e
 fi: yhdistetty
@@ -4730,6 +4740,7 @@ cs: pravdìpodobná smyèka v databázi
 de: wahrscheinliche Schleife in der Datenbank: jemand ist sein/ihre eigene(r) Vorfahr(in)
 dk: tilsyneladende loop i databasen: nogen bliver sin egen forfader
 en: probable loop in database: someone being his/her own ancestor
+eo: buklo probabla en datenbazo: iu estanda su propra prapatro
 es: bucle probable en base de datos: alguien es su propio antepasado
 fi: ilmeisesti silmukka tietokannassa; joku on itsens&auml esi-is&auml
 fr: boucle probable dans la base de donn&eacute;es: quelqu'un est son propre anc&ecirc;tre
@@ -4807,6 +4818,7 @@ af: aanvaarde seun/aanvaarde dogter/aanvaarde kind
 de: anerkannter Sohn/anerkannte Tochter/anerkanntes Kind
 dk: anerkendt s&oslash;n/anerkendt datter/anerkendt barn
 en: recognized son/recognized daughter/recognized child
+eo: agnoskita filo/agnoskita filino/agnoskita infano
 fi: tunnustettu poika/tunnustettu tyt&auml;r/tunnustettu lapsi
 fr: fils reconnu/fille reconnue/enfant reconnu
 he:  áï éãåò/ áú éãåòä/ éìã éãåò
@@ -5602,6 +5614,7 @@ cs: databáze se zmìnila; bì¾te zpìt (back), znovu naètìte stránku (reload) a vyp
 de: die Datei wurde ver&auml;ndert; dr&uuml;cken Sie bitte "back", "reload" und f&uuml;llen Sie das Formular neu aus
 dk: databasen er &aelig;ndret; g&aring; tilbage, klik for opdatering og udfyld formularen igen
 en: the base has changed; do "back", "reload", and refill the form
+eo: la bazo sxangis; faru "malantauxe", "resxargi", kaj replenigu la formularon
 es: la base ha cambiado: hacer "back", "reload" y completar nuevamente el formulario
 fi: tietokanta on muuttunut; peruuta, lataa uudelleen ja t&auml;yt&auml kaavake
 fr: la base a chang&eacute;: faire "back", "reload", et refaire le formulaire
