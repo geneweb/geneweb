@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head><title> Genealogio - %t</title></head>
 <body%b>
-<h1> Genealogio </h1>
+<h1>Genealogio</h1>
 
 %rversion
 
