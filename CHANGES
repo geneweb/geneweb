@@ -1,6 +1,9 @@
 GeneWeb version 4.07
 --------------------
 
+* Languages
+  - [11 Apr 02] Added Slovenian (Mitja Iskric).
+
 * GeneWeb server or CGI (gwd)
   - [06 Apr 02] Fixed bug: in fast merge, sources were sometimes lost.
   - [18 Mar 02] Had to remove the cookie system added in previous version
