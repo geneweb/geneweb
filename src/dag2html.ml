@@ -1,8 +1,4 @@
-(* $Id: dag2html.ml,v 3.44 2001-02-07 01:29:20 ddr Exp $ *)
-
-(* Warning: this data structure for dags is not satisfactory, its
-   consistency must always be checked, resulting on a complicated
-   code difficult to debug *)
+(* $Id: dag2html.ml,v 3.45 2001-02-07 17:47:22 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
