@@ -9,6 +9,9 @@ GeneWeb version 4.03
     versions using hyperlinks.
 
 * GeneWeb server or CGI (gwd)
+  - [24 Jul 01] Fixed bug in update family form: when updating a family
+    whose marriage date was in French Revolution calendar, this calendar
+    was not selected in the menu.
   - [15 Jul 01] Improved alphabetical order of places in the display
     by places/surnames (code by Ludovic Ledieu).
   - [13 Jul 01] Fixed bug: in update person form, when clicking on

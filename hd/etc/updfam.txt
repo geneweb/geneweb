@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updfam.txt,v 4.11 2001-06-24 13:20:34 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.12 2001-07-24 08:47:01 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -43,7 +43,7 @@
           >[*gregorian/julian/french/hebrew]0
           <option value=J%if;(xdate.calendar = "julian") selected%end;
           >[*gregorian/julian/french/hebrew]1
-          <option value=F%if;(xdate.calendra = "french") selected%end;
+          <option value=F%if;(xdate.calendar = "french") selected%end;
           >[*gregorian/julian/french/hebrew]2
           <option value=H%if;(xdate.calendar = "hebrew") selected%end;
           >[*gregorian/julian/french/hebrew]3
