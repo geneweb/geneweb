@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.5 1999-12-10 02:35:51 ddr Exp $ *)
+(* $Id: dag.ml,v 3.6 1999-12-13 21:06:48 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -122,7 +122,7 @@ value print_dag conf base set d =
     let p = poi base ip in
     do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
        Wserver.wprint "%s" (Date.short_dates_text conf base p);
-       if spouse_on && n.chil <> [] then
+       if spouse_on && n.chil <> [] || n.pare = [] then
          let spouses =
            List.fold_left
              (fun list id ->

@@ -6,12 +6,18 @@ GeneWeb version 3.02
     another browser (see version 3.01).
 
 * GeneWeb Service/CGI (gwd)
+  - [Dec 13, 99] In tree displays with several branches, add the spouse(s)
+    of the top person(s), like in other relationship tree displays.
   - [Dec 13, 99] Fixed bug: when merging two persons, the godchildren,
     possible children, foster children (and so on...) of the second
     person were not transferred to the first person (problem only
     with "children" relations, not "parents").
   - [Dec 10, 99] In tree displays with several branches, the option
     "add spouses" did not work. Fixed.
+
+* GeneWeb uncompiler (gwu) and GeneWeb to gedcom (gwb2ged)
+  - [Dec 13, 99] Fixed bug: the option '-s' (extraction of a surname)
+    also selected children with different surnames.
 
 GeneWeb version 3.01
 --------------------
