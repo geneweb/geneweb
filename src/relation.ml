@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.54 2000-10-30 16:21:01 ddr Exp $ *)
+(* $Id: relation.ml,v 3.55 2000-10-30 19:30:27 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -190,9 +190,7 @@ type famlink = [ Self | Parent | Sibling | HalfSibling | Mate | Child ];
 
 open Dag2html;
 
-value special_henv = ["dsrc"; "escache"];
-
-value print_relation_path_dag conf base ip1 ip2 path excl_faml =
+value print_relation_path_dag conf base path =
   let (nl, _) =
     List.fold_left
       (fun (nl, cnt) (ip, fl) ->
@@ -272,27 +270,28 @@ value print_relation_path_dag conf base ip1 ip2 path excl_faml =
     [ Some "on" -> True
     | _ -> False ]
   in
-  do Wserver.wprint "<p>\n";
-     Dag.print_only_dag conf base spouse_on invert set [] d;
-     Wserver.wprint "<p>\n";
-     Wserver.wprint "<a href=\"%s" (commd conf);
-     Wserver.wprint "em=R;ei=%d;i=%d%s;et=S" (Adef.int_of_iper ip1)
-       (Adef.int_of_iper ip2)
-       (if conf.cancel_links then ";cgl=on" else "");
-     let _ =
-       List.fold_left
-         (fun i ifam ->
-            do Wserver.wprint ";ef%d=%d" i (Adef.int_of_ifam ifam); return
-            i + 1)
-         0 (List.rev excl_faml)
-     in ();
-     Wserver.wprint "\">&gt;&gt;</a>\n";
-  return ()
+  Dag.print_only_dag conf base spouse_on invert set [] d
 ;
 
 value print_relation_path conf base ip1 ip2 path excl_faml =
   if path == [] then ()
-  else print_relation_path_dag conf base ip1 ip2 path excl_faml
+  else
+    do Wserver.wprint "<p>\n";
+       print_relation_path_dag conf base path;
+       Wserver.wprint "<p>\n";
+       Wserver.wprint "<a href=\"%s" (commd conf);
+       Wserver.wprint "em=R;ei=%d;i=%d%s;et=S" (Adef.int_of_iper ip1)
+         (Adef.int_of_iper ip2)
+         (if conf.cancel_links then ";cgl=on" else "");
+       let _ =
+         List.fold_left
+           (fun i ifam ->
+              do Wserver.wprint ";ef%d=%d" i (Adef.int_of_ifam ifam); return
+              i + 1)
+           0 (List.rev excl_faml)
+       in ();
+       Wserver.wprint "\">&gt;&gt;</a>\n";
+    return ()
 ;
 
 type node = [ NotVisited | Visited of (bool * iper * famlink) ];
@@ -1313,8 +1312,7 @@ return
   in
   let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
   do header_no_page_title conf title;
-     print_relation_path_dag conf base (Adef.iper_of_int 0)
-       (Adef.iper_of_int 0) path [];
+     print_relation_path_dag conf base path;
      trailer conf;
   return ()
 ;
