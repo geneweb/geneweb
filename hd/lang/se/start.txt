@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.44 2000-07-05 02:39:10 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.45 2000-07-05 12:56:23 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -169,8 +169,8 @@ s&ouml;kning</b></font></a>.
 <ul>
 <li><a href="%sm=AN">[birthdays]</a>
 <li><a href="%sm=AD">[anniversaries of death]</a>
-<li><a href="%sm=AM">[anniversaries of marriage]</a>%I|wf
-<li><a href="%sm=STAT">[statistics]</a>%E
+<li><a href="%sm=AM">[anniversaries of marriage]</a>
+<li><a href="%sm=STAT">[statistics]</a>
 </ul>
 </td>
 <td valign=up>

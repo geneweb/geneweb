@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.18 2000-07-04 14:22:25 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.19 2000-07-05 12:56:23 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -342,18 +342,22 @@ value print_statistics conf base =
   do header conf title;
      print_link_to_welcome conf True;
      tag "ul" begin
-       Wserver.wprint "<li><a href=\"%sm=LB;k=%d\">" (commd conf) n;
-       Wserver.wprint (ftransl conf "the latest %d births") n;
-       Wserver.wprint "</a>\n";
-       Wserver.wprint "<li><a href=\"%sm=LD;k=%d\">" (commd conf) n;
-       Wserver.wprint (ftransl conf "the latest %d deaths") n;
-       Wserver.wprint "</a>\n";
-       Wserver.wprint "<li><a href=\"%sm=LM;k=%d\">" (commd conf) n;
-       Wserver.wprint (ftransl conf "the latest %d marriages") n;
-       Wserver.wprint "</a>\n";
-       Wserver.wprint "<li><a href=\"%sm=OA;k=%d;lim=0\">" (commd conf) n;
-       Wserver.wprint (ftransl conf "the %d oldest perhaps still alive") n;
-       Wserver.wprint "</a>\n";
+       if conf.wizard || conf.friend then
+         do Wserver.wprint "<li><a href=\"%sm=LB;k=%d\">" (commd conf) n;
+            Wserver.wprint (ftransl conf "the latest %d births") n;
+            Wserver.wprint "</a>\n";
+            Wserver.wprint "<li><a href=\"%sm=LD;k=%d\">" (commd conf) n;
+            Wserver.wprint (ftransl conf "the latest %d deaths") n;
+            Wserver.wprint "</a>\n";
+            Wserver.wprint "<li><a href=\"%sm=LM;k=%d\">" (commd conf) n;
+            Wserver.wprint (ftransl conf "the latest %d marriages") n;
+            Wserver.wprint "</a>\n";
+            Wserver.wprint "<li><a href=\"%sm=OA;k=%d;lim=0\">" (commd conf) n;
+            Wserver.wprint (ftransl conf "the %d oldest perhaps still alive")
+              n;
+            Wserver.wprint "</a>\n";
+         return ()
+       else ();
        Wserver.wprint "<li><a href=\"%sm=LL;k=%d\">" (commd conf) n;
        Wserver.wprint (ftransl conf "the %d who lived the longest") n;
        Wserver.wprint "</a>\n";
