@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 2.7 1999-08-05 16:14:20 ddr Exp $ *)
+(* $Id: wserver.ml,v 2.8 1999-08-05 16:45:06 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value wserver_oc =
@@ -269,6 +269,19 @@ module W = Map.Make (struct type t = string ; value compare = compare; end);
 value who = ref W.empty;
 value excluded = ref [];
 
+value purge_who tm sec =
+  let sec = float sec in
+  let to_remove =
+    W.fold
+      (fun k v l ->
+         match v with
+         [ [tm0 :: _] -> if tm -. tm0 > sec then [k :: l] else l
+         | [] -> [k :: l] ])
+      who.val []
+  in
+  List.iter (fun k -> who.val := W.remove k who.val) to_remove
+;
+
 value is_robot robot_excluder addr =
   match robot_excluder with
   [ Some (max_call, sec) ->
@@ -276,7 +289,7 @@ value is_robot robot_excluder addr =
       if List.mem str excluded.val then True
       else
         let tm = Unix.time () in
-do W.iter (fun k v -> Printf.eprintf "... address %s: %d requests since %.0f seconds\n" k (List.length v) (tm -. List.hd (List.rev [tm :: v]))) who.val; flush stderr; return
+        do purge_who tm sec; return
         let r = try W.find str who.val with [ Not_found -> [] ] in
         let (cnt, r, t) =
           count r where rec count =
@@ -289,6 +302,7 @@ do W.iter (fun k v -> Printf.eprintf "... address %s: %d requests since %.0f sec
             | [] -> (0, [], 0.0) ]
         in
         do who.val := W.add str [tm :: r] who.val; return
+do W.iter (fun k v -> Printf.eprintf "... address %s%s%d requests since %.0f seconds\n" k (String.make (20 - String.length k) ' ') (List.length v) (tm -. List.hd (List.rev [tm :: v]))) who.val; flush stderr; return
         if cnt > max_call then
           let str1 =
             match addr with
