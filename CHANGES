@@ -6,6 +6,9 @@ GeneWeb Version 1.08
   - in forms, when a precision (about, maybe, before, after, or year) is given
     for a date, the day and month part are ignored, since its works only for
     years.
+  - photos and background in directory "images" must be in a subdirectory
+    having the name of the database; ex: "images/martin" for the database
+    "martin" (martin.gwb) (backward compatibility assumed).
 
 * gwc, gwu:
   - added backslash as escape character for underscores

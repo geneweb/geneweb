@@ -20,8 +20,9 @@
 # body_prop=bgcolor=#333333 text=#FFFFFF link=#99CCFF vlink=#CC99FF
 # body_prop=bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF
 # For a background pattern, e.g. foo.jpg:
-# body_prop=background="geneweb?m=IM;v=foo.jpg"
-# (the file foo.jpg must be in the directory "images")
+# body_prop=background="geneweb?m=IM;b=base;v=foo.jpg"
+#   the file foo.jpg must be in the directory "images/base"
+#   "base" is the base's name
 
 # Friend can see all dates
 # Choose a password or leave it empty

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: gwd.ml,v 1.8 1998-10-16 11:56:17 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.9 1998-10-28 10:00:00 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -30,7 +30,19 @@ value flush_log oc =
   if log_file.val <> "" then close_out oc else flush oc
 ;
 
+value is_multipart_form =
+  let s = "multipart/form-data" in
+  fun content_type ->
+    loop 0 where rec loop i =
+      if i >= String.length content_type then False
+      else if i >= String.length s then True
+      else if content_type.[i] == s.[i] then loop (i + 1)
+      else False
+;
+
 value log from request s =
+  let content_type = Wserver.extract_param "content-type: " '\n' request in
+  let s = if is_multipart_form content_type then "(multipart form)" else s in
   let referer = Wserver.extract_param "referer: " '\n' request in
   let user_agent = Wserver.extract_param "user-agent: " '\n' request in
   let oc = log_oc () in
@@ -381,13 +393,20 @@ value content_image cgi t len =
   return ()
 ;
 
-value print_image cgi str t =
+value print_image cgi bname str t =
   let fname =
-    let fname =
+    let fname1 =
+      List.fold_right Filename.concat [Util.base_dir.val; "images"; bname] str
+    in
+    let fname2 =
+      List.fold_right Filename.concat [Util.lang_dir.val; "images"] str
+    in
+    let fname3 =
       List.fold_right Filename.concat [Util.base_dir.val; "images"] str
     in
-    if Sys.file_exists fname then fname else
-    List.fold_right Filename.concat [Util.lang_dir.val; "images"] str
+    if Sys.file_exists fname1 then fname1
+    else if Sys.file_exists fname2 then fname2
+    else fname3
   in
   match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -407,16 +426,25 @@ value print_image cgi str t =
  | None -> () ]
 ;
 
-value image_request cgi env =
+value image_request cgi str env =
+  let bname =
+    let (x, _) = extract_assoc "b" env in
+    if x <> "" || cgi then x
+    else
+      let iq = index '?' str in
+      let b = String.sub str 0 iq in
+      let ip = index '_' b in
+      String.sub str 0 (min ip iq)
+  in
   match (Util.p_getenv env "m", Util.p_getenv env "v") with
   [ (Some "IM", Some fname) ->
       do if Filename.is_implicit fname then
            if Filename.check_suffix fname ".jpg"
            || Filename.check_suffix fname ".JPG" then
-             print_image cgi fname "jpeg"
+             print_image cgi bname fname "jpeg"
            else if Filename.check_suffix fname ".gif"
            || Filename.check_suffix fname ".GIF" then
-             print_image cgi fname "gif"
+             print_image cgi bname fname "gif"
            else ()
          else ();
       return True
@@ -471,9 +499,10 @@ value connection cgi (addr, request) str =
               in
               Util.create_env query_string
             in
-            if image_request cgi env then ()
+            if image_request cgi str env then ()
             else
-              do if cgi && log_file.val = "" then () else log from request str;
+              do if cgi && log_file.val = "" then ()
+                 else log from request str;
                  connection_accepted cgi (addr, request) str env;
               return ()
           with
