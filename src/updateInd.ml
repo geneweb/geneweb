@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.18 2005-01-22 20:11:41 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.19 2005-01-23 09:41:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -32,8 +32,6 @@ type env =
   | Vint of int
   | Vnone ]
 ;
-
-type var_value = [ VVbool of bool | VVstring of string ];
 
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
 
@@ -340,106 +338,13 @@ and eval_string_env var env =
   | _ -> str_val "" ]
 ;
 
-value eval_expr conf base env p =
-  fun
-  [ Estr s -> s
-  | Evar s sl ->
-      try
-        match eval_var conf base env p [s :: sl] with
-        [ VVstring s -> s
-        | VVbool True -> "1"
-        | VVbool False -> "0" ]
-      with
-      [ Not_found ->
-          do {
-            Wserver.wprint ">%%%s" s;
-            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-            Wserver.wprint "?";
-            ""
-          } ]
-  | Etransl upp s c -> Templ.eval_transl conf upp s c
-  | _ -> ">parse_error" ]
-;
-
-value eval_bool_variable conf base env p s sl =
-  try
-    match eval_var conf base env p [s :: sl] with
-    [ VVbool x -> x
-    | VVstring "" -> False
-    | VVstring _ -> True ]
-  with
-  [ Not_found ->
-      do {
-        Wserver.wprint ">%%%s" s;
-        List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-        Wserver.wprint "?";
-        False
-      } ]
-;
-
-value eval_bool_value conf base env p e =
-  let rec bool_eval =
-    fun
-    [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
-    | Eand e1 e2 -> bool_eval e1 && bool_eval e2
-    | Eop op e1 e2 ->
-        match op with
-        [ "=" -> string_eval e1 = string_eval e2
-        | "!=" -> string_eval e1 <> string_eval e2
-        | _ -> do { Wserver.wprint "op %s???" op; False } ]
-    | Enot e -> not (bool_eval e)
-    | Evar s sl -> eval_bool_variable conf base env p s sl
-    | Estr s -> do { Wserver.wprint "\"%s\"???" s; False }
-    | Eint s -> do { Wserver.wprint "\"%s\"???" s; False }
-    | Etransl _ s _ -> do { Wserver.wprint "[%s]???" s; False } ]
-  and string_eval =
-    fun
-    [ Estr s -> s
-    | Evar s sl ->
-        try
-          match eval_var conf base env p [s :: sl] with
-          [ VVbool True -> "1"
-          | VVbool False -> "0"
-          | VVstring s -> s ]
-        with
-        [ Not_found ->
-            do {
-              Wserver.wprint ">%%%s" s;
-              List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-              Wserver.wprint "?";
-              ""
-            } ]
-    | Etransl upp s c -> Templ.eval_transl conf upp s c
-    | x -> do { Wserver.wprint "val???"; "" } ]
-  in
-  bool_eval e
-;
-
 (* print *)
-
-value print_variable conf base env p s sl =
-  try
-    match eval_var conf base env p [s :: sl] with
-    [ VVstring s -> Wserver.wprint "%s" s
-    | VVbool True -> Wserver.wprint "1"
-    | VVbool False -> Wserver.wprint "0" ]
-  with
-  [ Not_found ->
-      match sl with
-      [ [] -> Templ.print_variable conf base s
-      | _ ->
-          do {
-            Wserver.wprint ">%%%s" s;
-            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
-            Wserver.wprint "?"
-          } ] ]
-;
 
 value rec print_ast conf base env p =
   fun
   [ Atext s -> Wserver.wprint "%s" s
   | Atransl upp s n -> Wserver.wprint "%s" (Templ.eval_transl conf upp s n)
-  | Avar s sl -> print_variable conf base env p s sl
+  | Avar s sl -> Templ.print_var conf base (eval_var conf base env p) s sl
   | Awid_hei s -> Wserver.wprint "Awid_hei"
   | Aif e alt ale -> print_if conf base env p e alt ale
   | Aforeach s sl al -> print_foreach conf base env p s sl al
@@ -450,7 +355,8 @@ and print_define conf base env p f xl al alk =
 and print_apply conf base env p f el =
   match get_env f env with
   [ Vfun xl al ->
-      let vl = List.map (eval_expr conf base env p) el in
+      let eval_var = eval_var conf base env p in
+      let vl = List.map (Templ.eval_expr conf eval_var) el in
       List.iter
         (fun a ->
            let a =
@@ -463,9 +369,10 @@ and print_apply conf base env p f el =
            in
            print_ast conf base env p a)
         al
-  | _ -> Wserver.wprint ">%%%s???" f ]
+  | _ -> Wserver.wprint " %%%s?" f ]
 and print_if conf base env p e alt ale =
-  let al = if eval_bool_value conf base env p e then alt else ale in
+  let eval_var = eval_var conf base env p in
+  let al = if Templ.eval_bool_expr conf eval_var e then alt else ale in
   List.iter (print_ast conf base env p) al
 and print_foreach conf base env p s sl al =
   match [s :: sl] with

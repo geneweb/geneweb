@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.29 2005-01-23 05:47:47 ddr Exp $ *)
+(* $Id: templ.ml,v 4.30 2005-01-23 09:41:05 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -606,6 +606,79 @@ value eval_date_variable od =
 ;
 *)
 
+value eval_bool_expr conf eval_var =
+  let rec bool_eval =
+    fun
+    [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
+    | Eand e1 e2 -> bool_eval e1 && bool_eval e2
+    | Eop op e1 e2 ->
+        match op with
+        [ "=" -> string_eval e1 = string_eval e2
+        | "!=" -> string_eval e1 <> string_eval e2
+        | _ -> do { Wserver.wprint "op %s???" op; False } ]
+    | Enot e -> not (bool_eval e)
+    | Evar s sl ->
+        try
+          match eval_var [s :: sl] with
+          [ VVbool x -> x
+          | VVstring "" -> False
+          | VVstring _ -> True ]
+        with
+        [ Not_found ->
+            do {
+              Wserver.wprint " %%%s" s;
+              List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+              Wserver.wprint "?";
+              False
+            } ]
+    | Estr s -> do { Wserver.wprint "\"%s\"???" s; False }
+    | Eint s -> do { Wserver.wprint "\"%s\"???" s; False }
+    | Etransl _ s _ -> do { Wserver.wprint "[%s]???" s; False } ]
+  and string_eval =
+    fun
+    [ Estr s -> s
+    | Eint s -> s
+    | Evar s sl ->
+        try
+          match eval_var [s :: sl] with
+          [ VVbool True -> "1"
+          | VVbool False -> "0"
+          | VVstring s -> s ]
+        with
+        [ Not_found ->
+            do {
+              Wserver.wprint " %%%s" s;
+              List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+              Wserver.wprint "?";
+              ""
+            } ]
+    | Etransl upp s c -> eval_transl conf upp s c
+    | x -> do { Wserver.wprint "val???"; "" } ]
+  in
+  bool_eval
+;
+
+value eval_expr conf eval_var =
+  fun
+  [ Estr s -> s
+  | Evar s sl ->
+      try
+        match eval_var [s :: sl] with
+        [ VVstring s -> s
+        | VVbool True -> "1"
+        | VVbool False -> "0" ]
+      with
+      [ Not_found ->
+          do {
+            Wserver.wprint " %%%s" s;
+            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+            Wserver.wprint "?";
+            ""
+          } ]
+  | Etransl upp s c -> eval_transl conf upp s c
+  | _ -> ">parse_error" ]
+;
+
 value print_body_prop conf base =
   let s =
     try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with [ Not_found -> "" ]
@@ -629,4 +702,22 @@ value print_variable conf base =
   | s ->
       try Wserver.wprint "%s" (eval_variable conf s) with
       [ Not_found -> Wserver.wprint " %%%s?" s ] ]
+;
+
+value print_var conf base eval_var s sl =
+  try
+    match eval_var [s :: sl] with
+    [ VVstring s -> Wserver.wprint "%s" s
+    | VVbool True -> Wserver.wprint "1"
+    | VVbool False -> Wserver.wprint "0" ]
+  with
+  [ Not_found ->
+      match sl with
+      [ [] -> print_variable conf base s
+      | _ ->
+          do {
+            Wserver.wprint " %%%s" s;
+            List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+            Wserver.wprint "?"
+          } ] ]
 ;
