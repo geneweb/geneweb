@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.51 2000-06-19 23:45:53 ddr Exp $ *)
+(* $Id: util.ml,v 3.52 2000-06-19 23:50:14 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1179,7 +1179,7 @@ value print_link_to_welcome conf right_aligned =
       | None -> "" ]
     in
     let referer = Wserver.extract_param "referer: " '\n' conf.request in
-    do if right_aligned then Wserver.wprint "<div align=%s>\n" dir
+    do if right_aligned then Wserver.wprint "<table align=%s><tr><td>\n" dir
        else ();
        if referer <> "" then
          do Wserver.wprint "<a href=\"%s\">" referer;
@@ -1192,7 +1192,7 @@ value print_link_to_welcome conf right_aligned =
        Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\">"
          (image_prefix conf) fname wid_hei;
        Wserver.wprint "</a>\n";
-       if right_aligned then Wserver.wprint "</div>\n" else ();
+       if right_aligned then Wserver.wprint "</td></tr></table>\n" else ();
     return ()
 ;
 
