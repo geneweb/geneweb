@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.66 2002-12-18 14:08:35 ddr Exp $ *)
+(* $Id: util.ml,v 4.67 2002-12-19 22:54:31 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -2103,11 +2103,10 @@ value adm_file f =
   List.fold_right Filename.concat [cnt_dir.val; "cnt"] f
 ;
 
-value std_date () =
-  let tm = Unix.localtime (Unix.time ()) in
-  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" (tm.Unix.tm_year + 1900)
-    (succ tm.Unix.tm_mon) tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-    tm.Unix.tm_sec
+value std_date conf =
+  let (hour, min, sec) = conf.time in
+  Printf.sprintf "%04d-%02d-%02d %02d:%02d:%02d" conf.today.year
+    conf.today.month conf.today.day hour min sec
 ;
 
 value read_wf_trace fname =
@@ -2131,7 +2130,7 @@ value write_wf_trace fname wt =
 ;
 
 value update_wf_trace conf fname =
-  let dt = std_date () in
+  let dt = std_date conf in
   let wt =
     let r = read_wf_trace fname in
     let dtlen = String.length dt in
