@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.2 2001-09-29 12:47:57 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.3 2001-12-17 12:55:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -169,7 +169,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                    "%1 of (same or greater generation level) %2"
                    (transl_nth conf "child/children" 1)
                    (person_title_text conf base p)
-               in
+               ;
                Wserver.wprint "%s" (capitale s);
                Wserver.wprint ":"
              };
@@ -180,7 +180,7 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
              List.map
                (fun ip -> (ip, ia_asex, [(p.cle_index, p.sex) :: rev_br]))
                (children_of base u)
-           in
+           ;
            print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
              children
          }
@@ -206,7 +206,7 @@ value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
               [gen_person_title_text no_reference raw_access conf base a]))
     }
     else ();
-    let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
+    let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib;
     print_descend_upto conf base max_cnt ini_p ini_br lev2 sib;
     True
   }
@@ -234,7 +234,7 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
           in
           loop (Num.inc sosa 1) some
         else some
-    in
+    ;
     if some then ()
     else do {
       html_li conf; Wserver.wprint "%s\n" (capitale (transl conf "no match"))
