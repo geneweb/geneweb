@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.21 2004-11-08 10:29:56 ddr Exp $ *)
+(* $Id: templ.ml,v 4.22 2004-12-14 09:53:21 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -603,7 +603,7 @@ value print_copyright conf base =
       do {
         html_p conf;
         Wserver.wprint "
-<hr><font size=-1><em>(c) Copyright 2002 INRIA -
+<hr><font size=-1><em>Copyright (c) 1998-2005 INRIA -
 GeneWeb %s</em></font>" Version.txt;
         html_br conf;
       } ]

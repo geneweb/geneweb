@@ -1,6 +1,6 @@
 <head>
-  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: recv.txt,v 1.4 2003-12-08 10:12:56 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA - GeneWeb -->
+  <!-- $Id: recv.txt,v 1.5 2004-12-14 09:53:17 ddr Exp $ -->
   <title>Gwtp - download %b</title>
 </head>
 <body>

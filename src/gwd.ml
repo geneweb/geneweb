@@ -1,6 +1,6 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.68 2004-12-14 09:30:12 ddr Exp $ *)
-(* Copyright (c) 1998-2004 INRIA *)
+(* $Id: gwd.ml,v 4.69 2004-12-14 09:53:21 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
 open Def;

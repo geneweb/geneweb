@@ -13,4 +13,4 @@ it: Pagina visualizzata da
 sl: Strani ustvarjene z:
     <a href="http://pauillac.inria.fr/~ddr/GeneWeb/">GeneWeb %v</a>
 ]
-(c) Copyright 2003 INRIA %d</em></font><br>
+Copyright (c) 1998-2005 INRIA %d</em></font><br>

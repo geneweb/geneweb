@@ -1,6 +1,6 @@
 <head>
-  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: send.txt,v 1.5 2003-12-08 10:14:26 ddr Exp $ -->
+  <!-- Copyright (c) 1998-2005 INRIA - GeneWeb -->
+  <!-- $Id: send.txt,v 1.6 2004-12-14 09:53:17 ddr Exp $ -->
   <title>Gwtp - upload %b</title>
 </head>
 <body>
