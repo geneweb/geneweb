@@ -3,7 +3,8 @@ GeneWeb version 2.07
 
 * Setup program (gwsetup)
   - [Sep 16, 99] Distribute different versions of the introduction text
-    for Windows and Unix (problems of accents).
+    for Windows and Unix (problems of accents). (Does not concern
+    the Linux distribution by rpm package.)
   - [Sep 13, 99] Added German version (Thomas Omerzu).
   - [Sep 9, 99] Added Swedish version (Lars Gustavsson).
   - [Sep 8, 99] Fixed lot of typos and errors in English version
@@ -29,6 +30,10 @@ GeneWeb version 2.07
     quotes in his name, the displaying was sometimes wrong.
   - [Sep 8, 99] In "DOC" links, in the bottom of the pages, the links
     with Email addresses did not work correctly. Fixed.
+
+* Consanguinity computing (consang)
+  - [Sep 17, 99] Run faster when no modifications have been done (e.g. just
+    after the creation of the data base).
 
 * Documentation
   - [Sep 10, 99] Updated Swedish files (Lars Gustavsson).
