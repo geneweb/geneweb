@@ -1,4 +1,4 @@
-(* $Id: adef.mli,v 1.2 1998-11-27 20:09:37 ddr Exp $ *)
+(* $Id: adef.mli,v 1.3 1998-11-27 23:10:01 ddr Exp $ *)
 
 type iper = 'a;
 type ifam = 'a;
@@ -11,9 +11,9 @@ type precision =
   [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
 ;
 type date =
-  { year : int;
+  { day : int;
     month : int;
-    day : int;
+    year : int;
     prec : precision }
 ;
 
