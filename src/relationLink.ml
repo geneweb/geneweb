@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.5 1999-07-15 22:22:45 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.6 1999-07-22 13:44:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -246,9 +246,14 @@ value spouse_text conf base ip ipl =
             if ip = c.father then c.mother
             else c.father
           in
-          someone_text conf base sp
-      | _ -> "" ]
-  | _ -> "" ]
+          let d =
+            match Adef.od_of_codate (foi base ifam).marriage with
+            [ Some d -> "<font size=-2>" ^ Date.year_text d ^ "</font>"
+            | None -> "" ]
+          in
+          (someone_text conf base sp, d)
+      | _ -> ("", "") ]
+  | _ -> ("", "") ]
 ;
 
 value print_someone conf base ip =
@@ -256,9 +261,9 @@ value print_someone conf base ip =
 ;
 
 value print_spouse conf base ip ipl =
-  let s = spouse_text conf base ip ipl in
+  let (s, d) = spouse_text conf base ip ipl in
   if s <> "" then
-    do Wserver.wprint "&amp;";
+    do Wserver.wprint "&amp;%s" d;
        html_br conf;
        Wserver.wprint "%s\n" s;
     return ()
@@ -343,15 +348,17 @@ value rec print_both_branches_pre conf base sz pl1 pl2 =
        match p1 with
        [ Some p1 ->
            do print_pre_left sz (someone_text conf base p1);
-              let s = spouse_text conf base p1 pl1 in
-              if s <> "" then print_pre_left sz ("&amp; " ^ s) else ();
+              let (s, d) = spouse_text conf base p1 pl1 in
+              if s <> "" then print_pre_left sz ("&amp;" ^ d ^ " " ^ s)
+              else ();
            return ()
        | None -> () ];
        match p2 with
        [ Some p2 ->
            do print_pre_right sz (someone_text conf base p2);
-              let s = spouse_text conf base p2 pl2 in
-              if s <> "" then print_pre_right sz ("&amp; " ^ s) else ();
+              let (s, d) = spouse_text conf base p2 pl2 in
+              if s <> "" then print_pre_right sz ("&amp;" ^ d ^ " " ^ s)
+              else ();
            return ()
        | None -> () ];
     return print_both_branches_pre conf base sz pl1 pl2
@@ -452,7 +459,13 @@ value other_parent_text_if_same conf base info =
               else None
           in
           match other_parent with
-          [ Some ip -> "&amp; " ^ someone_text conf base ip
+          [ Some ip ->
+              let d =
+                match Adef.od_of_codate (foi base ifam1).marriage with
+                [ Some d -> "<font size=-2>" ^ Date.year_text d ^ "</font>"
+                | None -> "" ]
+              in
+              "&amp;" ^ d ^ " " ^ someone_text conf base ip
           | _ -> "" ]
       | _ -> "" ]
   | _ -> "" ]

@@ -23,6 +23,8 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jul 22, 99] In relationship branches displaying, when the spouses are
+    displayed, display also the marriage date.
   - [Jul 20, 99] In the titles displaying, sort preferably the persons by
     the nth rank (e.g. "nth duke of ...") when existing.
   - [Jul 19, 99] Fixed bug in descendants by list: displaying was incorrect
