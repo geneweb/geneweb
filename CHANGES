@@ -72,7 +72,7 @@ Thanks to Emmanuelle Visseaux.
     me).
 
 * Base configuration files (base.gwf)
-  - [Oct 29, 99] Added a variable "propose_titles" (yes by défault). When
+  - [Oct 29, 99] Added a variable "propose_titles" (yes by default). When
     set to "no", the search by (nobility) titles is not proposed in the
     welcome page.
 
