@@ -5,6 +5,8 @@ GeneWeb Version 4.04
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [31 Dec 01] Fixed bug: [*(month)]10 did not work in templates, because
+    only one character was scanned.
   - [24 Dec 01] Added ability to create a file named "base_user_mess.txt"
     where base is the data base name, user a wizard name: in this case
     the connected wizard receive the contents of this file at each page

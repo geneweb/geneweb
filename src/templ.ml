@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.8 2001-12-24 11:46:36 ddr Exp $ *)
+(* $Id: templ.ml,v 4.9 2001-12-31 15:12:36 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -10,7 +10,7 @@ open Def;
 type ast =
   [ Atext of string
   | Avar of string and list string
-  | Atransl of bool and string and char
+  | Atransl of bool and string and string
   | Awid_hei of string
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
@@ -24,7 +24,7 @@ and ast_expr =
   | Estr of string
   | Eint of string
   | Evar of string and list string
-  | Etransl of bool and string and char ]
+  | Etransl of bool and string and string ]
 ;
 
 type token =
@@ -37,7 +37,7 @@ type token =
   | IDENT of string
   | STRING of string
   | INT of string
-  | LEXICON of bool and string and char ]
+  | LEXICON of bool and string and string ]
 ;
 
 value rec get_ident len =
@@ -71,6 +71,19 @@ value get_variable =
   | [: v = get_ident 0; vl = var_kont :] -> (v, vl) ]
 ;
 
+value rec transl_num_index =
+  parser
+  [ [: `('0'..'9' as c); s :] -> String.make 1 c ^ transl_num_index s
+  | [: :] -> "" ]
+;
+
+value transl_index =
+  parser
+  [ [: `('0'..'9' as c); s :] -> String.make 1 c ^ transl_num_index s
+  | [: `('a'..'z' as c) :] -> String.make 1 c
+  | [: :] -> "" ]
+;
+
 value lexicon_word =
   let upper = parser [ [: `'*' :] -> True | [: :] -> False ] in
   let rec text len =
@@ -78,7 +91,7 @@ value lexicon_word =
     [ [: `']' :] -> Buff.get len
     | [: `c; s :] -> text (Buff.store len c) s ]
   in
-  parser [: upp = upper; s = text 0; `n :] -> (upp, s, n)
+  parser [: upp = upper; s = text 0; n = transl_index :] -> (upp, s, n)
 ;
 
 value rec get_token =
@@ -451,9 +464,8 @@ value rec skip_spaces_and_newlines s i =
 
 value eval_transl conf base env upp s c =
   let r =
-    match c with
-    [ '0'..'9' ->
-        let n = Char.code c - Char.code '0' in
+    match try Some (int_of_string c) with [ Failure _ -> None ] with
+    [ Some n ->
         match split_at_coloncolon s with
         [ None -> Gutil.nominative (Util.transl_nth conf s n)
         | Some (s1, s2) ->
@@ -471,7 +483,7 @@ value eval_transl conf base env upp s c =
               [ Not_found -> Util.transl_nth conf s2 n ]
             in
             Util.transl_decline conf s1 s2 ]
-    | _ -> Gutil.nominative (Util.transl conf s) ^ String.make 1 c ]
+    | None -> Gutil.nominative (Util.transl conf s) ^ c ]
   in
   if upp then capitale r else r
 ;
