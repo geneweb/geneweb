@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.17 1998-11-25 18:45:45 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.18 1998-11-25 20:31:49 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -1110,6 +1110,10 @@ value print_base_warning base =
       Printf.printf "%s married at age %d\n" (denomination base p) (annee a) ]
 ;      
 
+value pass1 gen fname =
+  ()
+;
+
 value get_lev0 =
   parser
   [ [: `'0'; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
@@ -1125,30 +1129,8 @@ value get_lev0 =
       {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l} ]
 ;
 
-value make_arrays in_file =
-  let gen =
-    {g_per = {arr = [| |]; tlen = 0};
-     g_asc = {arr = [| |]; tlen = 0};
-     g_fam = {arr = [| |]; tlen = 0};
-     g_cpl = {arr = [| |]; tlen = 0};
-     g_str = {arr = [| |]; tlen = 0};
-     g_hper = Hashtbl.create 3001;
-     g_hfam = Hashtbl.create 3001;
-     g_hstr = Hashtbl.create 3001;
-     g_hnot = Hashtbl.create 3001;
-     g_hnam = Hashtbl.create 3001;
-     g_fnot = []}
-  in
-  let ic =
-    match in_file with
-    [ "" -> stdin
-    | f ->
-        let fname =
-          if Filename.check_suffix f ".ged" then f
-          else f ^ ".ged"
-        in
-        open_in f ]
-  in
+value pass2 gen fname =
+  let ic = open_in fname in
   do line_cnt.val := 0; return
   let strm =
     Stream.from
@@ -1163,26 +1145,22 @@ value make_arrays in_file =
   do string_empty.val := add_string gen "";
      string_x.val := add_string gen "x";
      loop () where rec loop () =
-       do try
-            while True do
-              let r = get_lev0 strm in
-              make_gen gen r;
-            done
-          with
-          [ Stream.Failure -> () ];
-       return
-       match strm with parser
-       [ [: `'1'..'9' :] ->
-              do let _ : string = get_to_eoln 0 strm in (); return
-              loop ()
-       | [: `_ :] ->
-             do print_location ();
-                Printf.printf "Strange input.\n";
-                flush stdout;
-                let _ : string = get_to_eoln 0 strm in ();
-             return loop ()
-       | [: :] -> () ];
-     if ic != stdin then close_in ic else ();
+       match try Some (get_lev0 strm) with [ Stream.Failure -> None ] with
+       [ Some r ->
+           do make_gen gen r; return loop ()
+       | None ->
+           match strm with parser
+           [ [: `'1'..'9' :] ->
+                  do let _ : string = get_to_eoln 0 strm in (); return
+                  loop ()
+           | [: `_ :] ->
+                 do print_location ();
+                    Printf.printf "Strange input.\n";
+                    flush stdout;
+                    let _ : string = get_to_eoln 0 strm in ();
+                 return loop ()
+           | [: :] -> () ] ];
+     close_in ic;
      let nf n =
        do Printf.printf "Note not found %s\n" n;
           flush stdout;
@@ -1211,6 +1189,29 @@ value make_arrays in_file =
               gen.g_asc.arr.(i) := Right a;
            return () ];
      done;
+  return ()
+;
+
+value make_arrays in_file =
+  let gen =
+    {g_per = {arr = [| |]; tlen = 0};
+     g_asc = {arr = [| |]; tlen = 0};
+     g_fam = {arr = [| |]; tlen = 0};
+     g_cpl = {arr = [| |]; tlen = 0};
+     g_str = {arr = [| |]; tlen = 0};
+     g_hper = Hashtbl.create 3001;
+     g_hfam = Hashtbl.create 3001;
+     g_hstr = Hashtbl.create 3001;
+     g_hnot = Hashtbl.create 3001;
+     g_hnam = Hashtbl.create 3001;
+     g_fnot = []}
+  in
+  let fname =
+    if Filename.check_suffix in_file ".ged" then in_file
+    else in_file ^ ".ged"
+  in
+  do pass1 gen fname;
+     pass2 gen fname;
   return
   (gen.g_per, gen.g_asc, gen.g_fam, gen.g_cpl, gen.g_str)
 ;
