@@ -49,6 +49,8 @@ You need:
 
 - The Microsoft Visual C++ compiler.
 
+- The Microsoft Assembler masm.
+
 - The Objective Caml compiler (get the binaries, *not* the sources, which are
   not compilable under Cygnus GUN-Win32).
 
