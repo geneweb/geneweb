@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.2 1999-11-10 08:44:14 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.3 1999-11-15 12:41:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -12,7 +12,12 @@ value limit_by_list conf =
   [ Some x -> max 1 x
   | None -> 8 ]
 ;
-value limit_by_tree = 5;
+
+value limit_by_tree conf =
+  match p_getint conf.base_env "max_anc_tree" with
+  [ Some x -> max 1 x
+  | None -> 5 ]
+;
 
 value niveau_max_ascendance base ip =
   let _ = base.data.ascends.array () in
@@ -96,7 +101,7 @@ value print_choice conf base p niveau_effectif =
           Wserver.wprint "<input type=radio name=t value=T> %s\n"
             (capitale (transl conf "tree"));
           let limit =
-            if browser_doesnt_have_tables conf then 3 else limit_by_tree
+            if browser_doesnt_have_tables conf then 3 else limit_by_tree conf
           in
           if niveau_effectif <= limit then ()
           else
@@ -1458,7 +1463,7 @@ value print_tree_with_pre conf base v p =
 ;
 
 value print_tree_with_table conf base gv p =
-  let gv = min limit_by_tree gv in
+  let gv = min (limit_by_tree conf) gv in
   let next_gen pol =
     List.fold_right
       (fun po list ->
