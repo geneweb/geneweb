@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.42 2001-03-03 20:59:18 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.43 2001-03-07 03:13:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1944,6 +1944,7 @@ value make_base (persons, families, strings, bnotes) =
      index_of_string = fun [];
      persons_of_surname = {find = fun []; cursor = fun []; next = fun []};
      persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
+     is_restricted = fun [];
      patch_person = fun []; patch_ascend = fun []; patch_union = fun [];
      patch_family = fun []; patch_couple = fun []; patch_descend = fun [];
      patch_string = fun []; patch_name = fun [];

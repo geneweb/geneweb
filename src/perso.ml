@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./q_codes.cmo *)
-(* $Id: perso.ml,v 3.92 2001-03-04 15:41:36 ddr Exp $ *)
+(* $Id: perso.ml,v 3.93 2001-03-07 03:13:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -858,50 +858,14 @@ value print_variable conf base env sl =
       return () ]
 ;
 
-value output_value_header_size = 20;
-
-
 value is_restricted conf base p =
-  let fname =
-    Filename.concat (Util.base_path [] (conf.bname ^ ".gwb")) "restrict"
-  in
-  match try Some (open_in fname) with [ Sys_error _ -> None ] with
-  [ Some ic ->
-(**)
-      let i = Adef.int_of_iper p.cle_index in
-      let r =
-        try
-           let c =
-             do seek_in ic
-                  (output_value_header_size + 1 (* <<CODE_BLOCK32>> *) +
-                   Iovalue.sizeof_long + i);
-             return
-             input_char ic
-           in
-           if Char.code c == <<PREFIX_SMALL_INT>> then False
-           else if Char.code c == <<PREFIX_SMALL_INT>> + 1 then True
-           else
-             do Printf.eprintf "bad bool %d\n" (Char.code c); flush stderr;
-             return False
-        with
-        [ End_of_file ->
-            match Adef.od_of_codate p.birth with
-            [ Some (Dgreg d _) -> (temps_ecoule d conf.today).year <= 100
-            | _ -> True ] ]
-      in
-      do close_in ic; return r
-(*  
-      let hidden = input_value ic in
-      let r =
-        if i >= Array.length hidden then
-          match Adef.od_of_codate p.birth with
-          [ Some (Dgreg d _) -> (temps_ecoule d conf.today).year <= 100
-          | _ -> True ]
-        else hidden.(i)
-      in
-      do close_in ic; return r
-*)
-  | _ -> False ]
+  match base.func.is_restricted p.cle_index with
+  [ Left x -> x
+  | Right False -> False
+  | Right True ->
+      match Adef.od_of_codate p.birth with
+      [ Some (Dgreg d _) -> (temps_ecoule d conf.today).year <= 100
+      | _ -> True ] ]
 ;
 
 value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =

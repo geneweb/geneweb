@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 1.3 2001-01-06 09:55:34 ddr Exp $ *)
+(* $Id: iolight.ml,v 1.4 2001-03-07 03:13:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -180,6 +180,7 @@ value input bname =
      index_of_string = fun [];
      persons_of_surname = {find = fun []; cursor = fun []; next = fun []};
      persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
+     is_restricted = fun [];
      patch_person = fun [];
      patch_ascend = fun [];
      patch_union = fun [];
