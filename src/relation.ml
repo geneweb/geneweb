@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.50 2000-08-07 14:32:15 ddr Exp $ *)
+(* $Id: relation.ml,v 3.51 2000-08-12 20:05:22 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -276,8 +276,9 @@ value print_relation_path_dag conf base ip1 ip2 path excl_faml =
      Dag.print_only_dag conf base spouse_on invert set [] d;
      Wserver.wprint "<p>\n";
      Wserver.wprint "<a href=\"%s" (commd conf);
-     Wserver.wprint "em=R;ei=%d;i=%d;et=S" (Adef.int_of_iper ip1)
-       (Adef.int_of_iper ip2);
+     Wserver.wprint "em=R;ei=%d;i=%d%s;et=S" (Adef.int_of_iper ip1)
+       (Adef.int_of_iper ip2)
+       (if conf.cancel_links then ";cgl=on" else "");
      let _ =
        List.fold_left
          (fun i ifam ->
