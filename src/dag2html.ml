@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.40 2001-02-01 12:51:18 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.41 2001-02-01 14:13:46 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -71,11 +71,11 @@ value html_table_struct indi_txt phony d t =
       loop [] 0 where rec loop les j =
         if j = Array.length t.table.(i) then les
         else
-          let x = t.table.(i).(j).elem in
+          let x = t.table.(i).(j) in
           let next_j =
             loop (j + 1) where rec loop j =
               if j = Array.length t.table.(i) then j
-              else if t.table.(i).(j).elem = x then loop (j + 1)
+              else if t.table.(i).(j) = x then loop (j + 1)
               else j
           in
           let colspan = 3 * (next_j - j) in
@@ -83,7 +83,7 @@ value html_table_struct indi_txt phony d t =
           let les =
             let s =
               if t.table.(i).(j).elem = Nothing then "&nbsp;"
-              else elem_txt x
+              else elem_txt t.table.(i).(j).elem
             in
             [(colspan - 2, CenterA, TDstring s) :: les]
           in
@@ -97,11 +97,11 @@ value html_table_struct indi_txt phony d t =
       loop [] 0 where rec loop les j =
         if j = Array.length t.table.(i) then les
         else
-          let x = t.table.(i).(j).elem in
+          let x = t.table.(i).(j) in
           let next_j =
             loop (j + 1) where rec loop j =
               if j = Array.length t.table.(i) then j
-              else if t.table.(i).(j).elem = x then loop (j + 1)
+              else if t.table.(i).(j) = x then loop (j + 1)
               else j
           in
           let colspan = 3 * (next_j - j) in
@@ -112,7 +112,7 @@ value html_table_struct indi_txt phony d t =
                  t.table.(k).(j).elem = Nothing then
                 "&nbsp;"
               else if phony t.table.(i).(j).elem then "&nbsp;"
-              else bar_txt x
+              else bar_txt t.table.(i).(j).elem
             in
             [(colspan - 2, CenterA, TDstring s) :: les]
           in
@@ -880,11 +880,7 @@ value tablify no_optim no_group d =
     else
       let t = {table = Array.append t.table [| Array.of_list new_row |]} in
       let t =
-        if no_group then
-          let _ = group_elem t in
-          let _ = group_ghost t in
-          let _ = group_children t in
-          t
+        if no_group then t
         else
           let _ = if no_optim then () else equilibrate t in
           let _ = group_elem t in
