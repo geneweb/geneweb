@@ -6,9 +6,10 @@ GeneWeb Version 2.01
   - [Mar 30, 99] Changed term "photo" into "image".
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Apr 13, 99] Fixed bug in personal pages: for people having public
-    names, the (small) links to the first name and surnames could work
-    bad in case of accents.
+  - [Apr 13, 99] Fixed bug in personal pages: for people having a public
+    name, the (small) links to the first name and surname could work
+    bad in case of accents. Fixed other bug same kind: in advanced
+    request, research did not work if accents were used...
   - [Apr 6, 99] Fixed bug in personal pages, titles dates were sometimes
     displayed just as "...".
   - [Apr 2, 99] Fixed bug: in missing ancestors in alphabetic order, the
@@ -49,7 +50,7 @@ GeneWeb Version 2.01
 
 * Documentation
   - [Mar 24, 99] Deleted all background colors.
-  - [Mar 18, 99] Swedish version updated (Lars Gustavsson).
+  - [Mar 18..Apr 13, 99] Swedish version updated (Lars Gustavsson).
   - [Mar 17, 99] Changed documentation for the new feature "automatic choice"
     for the "death state" (see above), file "update.htm", section 5.4 "modify
     a person", paragraph "Death".
