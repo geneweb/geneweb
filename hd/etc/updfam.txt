@@ -1,12 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updfam.txt,v 4.3 2001-06-14 19:55:11 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.4 2001-06-15 04:34:24 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
-    %if;(evar_m = "ADD_FAM");[*add::family/families]0
-    %elseif;(evar_m = "ADD_PAR");[*add::family/families]0
-    %elseif;(evar_m = "MOD_FAM");[*modify::family/families]0 # %evar_i;
+    %if;(evar_m = "ADD_FAM")[*add::family/families]0
+    %elseif;(evar_m = "ADD_PAR")[*add::family/families]0
+    %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
+      [*modify::family/families]0 # %evar_i;
     %end;
   </title>
 %base_header;
@@ -15,129 +16,128 @@
 
 %define;date(xlab,xvar,xdate)
   <table border=1>
-  <tr>
-  <td>xlab</td>
-  <td>
-  [year/month/day]0
-  <input name=xvar_yyyy size=5 maxlength=5 value="%xdate.year;">
-  [year/month/day]1
-  <input name=xvar_mm size=2 maxlength=2 value="%xdate.month;">
-  [year/month/day]2
-  <input name=xvar_dd size=2 maxlength=2 value="%xdate.day;">
-  </td>
-  <td>
-  ...[or]0 [text]0
-  <input name=xvar_text size=15 maxlength=30 value="%xdate.text;">
-  </td>
+    <tr>
+      <td>xlab</td>
+      <td>
+        [year/month/day]0
+        <input name=xvar_yyyy size=5 maxlength=5 value="%xdate.year;">
+        [year/month/day]1
+        <input name=xvar_mm size=2 maxlength=2 value="%xdate.month;">
+        [year/month/day]2
+        <input name=xvar_dd size=2 maxlength=2 value="%xdate.day;">
+      </td>
+      <td>
+        ...[or]0 [text]0
+        <input name=xvar_text size=15 maxlength=30 value="%xdate.text;">
+      </td>
+    </tr>
   </table>
   <table border=1>
-  <tr>
-  <td>[*calendar/calendars]0
-  <select name=xvar_cal>
-  <option value=G%if;(xdate.calendar = "gregorian"); selected%end;
-  >[*gregorian/julian/french/hebrew]0
-  <option value=J%if;(xdate.calendar = "julian"); selected%end;
-  >[*gregorian/julian/french/hebrew]1
-  <option value=F%if;(xdate.calendra = "french"); selected%end;
-  >[*gregorian/julian/french/hebrew]2
-  <option value=H%if;(xdate.calendar = "hebrew"); selected%end;
-  >[*gregorian/julian/french/hebrew]3
-  </select>
-  </td>
-  <td>[*precision]0
-  <select name=xvar_prec>
-  <option%if;(xdate.prec = ""); selected%end;>-
-  <option value=sure%if;(xdate.prec = "sure"); selected%end;
-      >[*exact]0
-  <option value=about%if;(xdate.prec = "about"); selected%end;
-      >[*about (date)]0
-  <option value=maybe%if;(xdate.prec = "maybe"); selected%end;
-      >[*possibly (date)]0
-  <option value=before%if;(xdate.prec = "before"); selected%end;
-      >[*before (date)]0
-  <option value=after%if;(xdate.prec = "after"); selected%end;
-      >[*after (date)]0
-  <option value=oryear%if;(xdate.prec = "oryear"); selected%end;
-      >&lt;- [*or] -&gt;
-  <option value=yearint%if;(xdate.prec = "yearint"); selected%end;
-      >&lt;- [*between (date)] -&gt;
-  </select>
-  <input name=xvar_oryear size=5 maxlength=5 value="%xdate.oryear;">
-  </td>
-  </tr>
+    <tr>
+      <td>[*calendar/calendars]0
+        <select name=xvar_cal>
+          <option value=G%if;(xdate.calendar = "gregorian") selected%end;
+          >[*gregorian/julian/french/hebrew]0
+          <option value=J%if;(xdate.calendar = "julian") selected%end;
+          >[*gregorian/julian/french/hebrew]1
+          <option value=F%if;(xdate.calendra = "french") selected%end;
+          >[*gregorian/julian/french/hebrew]2
+          <option value=H%if;(xdate.calendar = "hebrew") selected%end;
+          >[*gregorian/julian/french/hebrew]3
+        </select>
+      </td>
+      <td>[*precision]0
+        <select name=xvar_prec>
+          <option%if;(xdate.prec = "") selected%end;>-
+          <option value=sure%if;(xdate.prec = "sure") selected%end;
+              >[*exact]0
+          <option value=about%if;(xdate.prec = "about") selected%end;
+              >[*about (date)]0
+          <option value=maybe%if;(xdate.prec = "maybe") selected%end;
+              >[*possibly (date)]0
+          <option value=before%if;(xdate.prec = "before") selected%end;
+              >[*before (date)]0
+          <option value=after%if;(xdate.prec = "after") selected%end;
+              >[*after (date)]0
+          <option value=oryear%if;(xdate.prec = "oryear") selected%end;
+              >&lt;- [*or] -&gt;
+          <option value=yearint%if;(xdate.prec = "yearint") selected%end;
+              >&lt;- [*between (date)] -&gt;
+        </select>
+        <input name=xvar_oryear size=5 maxlength=5 value="%xdate.oryear;">
+      </td>
+    </tr>
   </table>
 %end;
 
 %define;source(xx)
   <table border=1>
-  <tr>
-  <td>[*source/sources]0</td>
-  <td>
-  <input name=xx_src size=40 maxlength=200 value="%xx_src;">
-  </td>
-  </tr>
+    <tr>
+      <td>[*source/sources]0</td>
+      <td><input name=xx_src size=40 maxlength=200 value="%xx_src;"></td>
+    </tr>
   </table>
 %end;
 
 %define;birth(xvar,xx,verbose)
-<td>[*birth]</td>
-<td>
-<input name=xvarb_yyyy size=5 maxlength=5 value="%xx.create.birth_year;">-
-<input name=xvarb_mm size=2 maxlength=2 value="%xx.create.birth_month;">-
-<input name=xvarb_dd size=2 maxlength=2 value="%xx.create.birth_day;">
-</td>
-%if;("verbose" = "true");<td>[*place]</td>%end;
-<td colspan=2>
-<input name=xvarb_pl size=20 maxlength=200 value="%xx.create.birth_place;">
-</td>
+  <td>[*birth]</td>
+  <td>
+    <input name=xvarb_yyyy size=5 maxlength=5 value="%xx.create.birth_year;">-
+    <input name=xvarb_mm size=2 maxlength=2 value="%xx.create.birth_month;">-
+    <input name=xvarb_dd size=2 maxlength=2 value="%xx.create.birth_day;">
+  </td>
+  %if;("verbose" = "true")<td>[*place]</td>%end;
+  <td colspan=2>
+    <input name=xvarb_pl size=20 maxlength=200 value="%xx.create.birth_place;">
+  </td>
 %end;
 
 %define;death(xvar,xx,verbose)
-<td>[*death]</td>
-<td>
-<input name=xvard_yyyy size=5 maxlength=5 value="%xx.create.death_year;">-
-<input name=xvard_mm size=2 maxlength=2 value="%xx.create.death_month;">-
-<input name=xvard_dd size=2 maxlength=2 value="%xx.create.death_day;">
-</td>
-%if;("verbose" = "true");<td>[*place]</td>%end;
-<td colspan=2>
-<input name=xvard_pl size=20 maxlength=200 value="%xx.create.death_place;">
-</td>
+  <td>[*death]</td>
+  <td>
+    <input name=xvard_yyyy size=5 maxlength=5 value="%xx.create.death_year;">-
+    <input name=xvard_mm size=2 maxlength=2 value="%xx.create.death_month;">-
+    <input name=xvard_dd size=2 maxlength=2 value="%xx.create.death_day;">
+  </td>
+  %if;("verbose" = "true")<td>[*place]</td>%end;
+  <td colspan=2>
+    <input name=xvard_pl size=20 maxlength=200 value="%xx.create.death_place;">
+  </td>
 %end;
 
 %define;parent(xvar,xx)
-<table border=1>
-<tr>
-<td>[*first name/first names]0</td>
-<td>
-<input name=xvar_fn size=23 maxlength=200 value="%xx.first_name;">
-</td>
-<td align=right>[*number]</td>
-<td>
-<input name=var_occ size=5 maxlength=8 value="%xx.occ;">
-</td>
-<td>
-<select name=xvar_p>
-<option value=create%if;(xx.create = "create"); selected%end;>[*create]
-<option value=link%if;(xx.create = "link") selected%end;>[*link]
-</select>
-</td>
-</tr>
-<tr>
-<td>[*surname/surnames]0</td>
-<td colspan=4>
-<input name=xvar_sn size=40 maxlength=200 value="%xx.surname">
-</td>
-</tr>
-</table>
-<table border=1>
-<tr>
-%apply;birth("xvar","xx","true")
-</tr>
-<tr>
-%apply;death("xvar","xx","true")
-</tr>
-</table>
+  <table border=1>
+    <tr>
+      <td>[*first name/first names]0</td>
+      <td>
+        <input name=xvar_fn size=23 maxlength=200 value="%xx.first_name;">
+      </td>
+      <td align=right>[*number]</td>
+      <td>
+        <input name=xvar_occ size=5 maxlength=8 value="%xx.occ;">
+      </td>
+      <td>
+        <select name=xvar_p>
+        <option value=create%if;(xx.create = "create") selected%end;>[*create]0
+        <option value=link%if;(xx.create = "link") selected%end;>[*link]0
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>[*surname/surnames]0</td>
+      <td colspan=4>
+        <input name=xvar_sn size=40 maxlength=200 value="%xx.surname">
+      </td>
+    </tr>
+  </table>
+  <table border=1>
+    <tr>
+      %apply;birth("xvar","xx","true")
+    </tr>
+    <tr>
+      %apply;death("xvar","xx","true")
+    </tr>
+  </table>
 %end;
 
 <h1 align=center><font color=%highlight;>%nn;
@@ -145,20 +145,22 @@
   [*add::family/families]0
 %elseif;(evar_m = "ADD_PAR")
   [*add::family/families]0
-%elseif;(evar_m = "MOD_FAM")
+%elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
   [*modify::family/families]0 # %evar_i;
 %end;
 </font></h1>
 
 <form method=POST action="%action;">
 %hidden;
-%if;(evar_i != "");<input type=hidden name=i value="%evar_i;">%nl;%end;
-%if;(evar_ip != "");<input type=hidden name=ip value="%evar_ip;">%nl;%end;
+%if;(evar_i != "")<input type=hidden name=i value="%evar_i;">%nl;%end;
+%if;(evar_ip != "")<input type=hidden name=ip value="%evar_ip;">%nl;%end;
 <input type=hidden name=digest value="%digest;">
-%if;(evar_m = "ADD_FAM");<input type=hidden name=m value=ADD_FAM_OK>%nl;
-%elseif;(evar_m = "ADD_PAR");<input type=hidden name=m value=ADD_FAM_OK>%nl;
-%elseif;(evar_m = "MOD_FAM");<input type=hidden name=m value=MOD_FAM_OK>%nl;
+%if;(evar_m = "ADD_FAM")<input type=hidden name=m value=ADD_FAM_OK>%nl;
+%elseif;(evar_m = "ADD_PAR")<input type=hidden name=m value=ADD_FAM_OK>%nl;
+%elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
+  <input type=hidden name=m value=MOD_FAM_OK>%nl;
 %end;
+<input type=hidden name=updfam value=on>
 
 <h4>[*him/her]0</h4>
 %apply;parent("him", "father")
@@ -176,12 +178,12 @@
 <input type=radio name=mrel value=nsck%if;(mrel = "nsck") checked%end;
 >[*no sexes check]
 <table border=1>
-<tr>
-<td>[*place]</td>
-<td>
-<input name=marriage_place size=40 maxlength=200 value="%marriage_place;">
-</td>
-</tr>
+  <tr>
+    <td>[*place]</td>
+    <td>
+      <input name=marriage_place size=40 maxlength=200 value="%marriage_place;">
+    </td>
+  </tr>
 </table>
 
 %apply;date([*date]0, "marriage", "marriage")
@@ -190,43 +192,47 @@
 <h4>[*witness/witnesses]1</h4>
 
 <table border=1>
-<tr>
-<td>[*insert::witness/witnesses]0
-<input type=checkbox name=ins_witn0 value=on></td>
-</tr>
+  <tr>
+    <td>[*insert::witness/witnesses]0
+      <input type=checkbox name=ins_witn0 value=on></td>
+  </tr>
 </table>
 
 %foreach;witness;
-<table border=1>
-<tr>
-<td>[*first name/first names]0</td>
-<td>
-<input name=witn%cnt;_fn size=23 maxlength=200 value="%witness.first_name;">
-</td>
-<td align=right>[*number]</td>
-<td>
-<input name=witn%cnt;_occ size=5 maxlength=8 value="%witness.occ;">
-</td>
-<td>
-<select name=witn%cnt;_p>
-<option value=link%if;(witness.create = "link") selected%end;>[*link]0
-<option value=create%if;(witness.create = "create") selected%end;>[*create]0
-</select>
-</td>
-</tr>
-<tr>
-<td>[*surname/surnames]0</td>
-<td colspan=4>
-<input name=witn%cnt;_sn size=40 maxlength=200 value="%witness.surname;">
-</td>
-</tr>
-</table>
-<table border=1>
-<tr>
-<td>[*insert::witness/witnesses]0
-<input type=checkbox name=ins_witn%cnt; value=on></td>
-</tr>
-</table>
+  <table border=1>
+    <tr>
+      <td>[*first name/first names]0</td>
+      <td>
+        <input name=witn%cnt;_fn size=23 maxlength=200%sp;
+         value="%witness.first_name;">
+      </td>
+      <td align=right>[*number]</td>
+      <td>
+        <input name=witn%cnt;_occ size=5 maxlength=8 value="%witness.occ;">
+      </td>
+      <td>
+        <select name=witn%cnt;_p>
+          <option value=link%nn;
+           %if;(witness.create = "link") selected%end;>[*link]0
+          <option value=create%nn;
+           %if;(witness.create = "create") selected%end;>[*create]0
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>[*surname/surnames]0</td>
+      <td colspan=4>
+        <input name=witn%cnt;_sn size=40 maxlength=200%sp;
+         value="%witness.surname;">
+      </td>
+    </tr>
+  </table>
+  <table border=1>
+    <tr>
+      <td>[*insert::witness/witnesses]0
+      <input type=checkbox name=ins_witn%cnt; value=on></td>
+    </tr>
+  </table>
 %end;
 
 <h4>[*divorce]</h4>
@@ -242,26 +248,71 @@
 <h4>[*comment]</h4>
 
 <table border=1>
-<tr>
-<td>
-<input name=comment size=50 maxlength=200 value="%comment;">
-</td>
-</tr>
+  <tr>
+    <td><input name=comment size=50 maxlength=200 value="%comment;"></td>
+  </tr>
 </table>
 
 <h4>[*child/children]1</h4>
 
 %define;insert_child(xcnt)
-<table border=1>
-<tr>
-<td>
-[*insert::|
-<input name=ins_chxcnt_n size=1 maxlength=1 value=1>
-|child/children]0
-<input type=checkbox name=ins_chxcnt value=on>
-</td>
-</tr>
-</table>
+  <table border=1>
+    <tr>
+      <td>
+        [*insert::|<input name=ins_chxcnt_n size=1 maxlength=1 value=1> |
+        child/children]0
+        <input type=checkbox name=ins_chxcnt value=on>
+      </td>
+    </tr>
+  </table>
+%end;
+
+%define;child(xcnt)
+  <table border=1>
+    <tr>
+      <td>[*first name/first names]0</td>
+      <td colspan=2>
+        <input name=chxcnt_fn size=23 maxlength=200 value="%child.first_name;">
+      </td>
+      <td align=right>[*number]</td>
+      <td>
+        <input name=chxcnt_occ size=5 maxlength=8 value="%child.occ;">
+      </td>
+    </tr>
+    <tr>
+      <td>[*surname/surnames]0</td>
+      <td colspan=4>
+        <input name=chxcnt_sn size=40 maxlength=200%sp;
+         value="%nn;
+           %if;
+             ((evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK") and
+              child.surname = father.surname)
+           %else;%child.surname;%end;">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <select name=chxcnt_p>
+          <option value=link%if;(child.create = "link") selected%end;
+           >[*link]0
+          <option value=create%if;(child.create = "create") selected%end;
+           >[*create]0
+        </select>
+      </td>
+      %apply;birth("chxcnt", "child", "false")
+    </tr>
+    <tr>
+      <td>
+        <input type=radio name=chxcnt_sex value=N%sp;
+         %if;(child.sex = "neuter") checked%end;>?
+        <input type=radio name=chxcnt_sex value=M%sp;
+         %if;(child.sex = "male") checked%end;>[M/F]0
+        <input type=radio name=chxcnt_sex value=F%sp;
+         %if;(child.sex = "female") checked%end;>[M/F]1
+      </td>
+      %apply;death("chxcnt", "child", "false")
+    </tr>
+  </table>
 %end;
 
 <ul>
@@ -269,50 +320,31 @@
 %apply;insert_child("0")
 %foreach;child;
   <li>
-  <table border=1>
-    <tr>
-      <td>[*first name/first names]0</td>
-      <td colspan=2>
-        <input name=ch%cnt;_fn size=23 maxlength=200 value="%child.first_name;">
-      </td>
-      <td align=right>[*number]</td>
-      <td>
-        <input name=ch%cnt;_occ size=5 maxlength=8 value="%child.occ;">
-      </td>
-    </tr>
-    <tr>
-      <td>[*surname/surnames]0</td>
-      <td colspan=4>
-        <input name=ch%cnt;_sn size=40 maxlength=200 value="%child.surname;">
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <select name=ch%cnt_p>
-          <option value=link%if;(child.create = "link") selected%end;
-           >[*link]0
-          <option value=create%if;(child.create = "create") selected%end;
-           >[*create]0
-        </select>
-      </td>
-      %apply;birth("ch%cnt;", "child", "false")
-    </tr>
-    <tr>
-      <td>
-        <input type=radio name=ch%cnt;_sex value=N%sp;
-         %if;(child.sex = "neuter"); checked%end;>?
-        <input type=radio name=ch%cnt;_sex value=M%sp;
-         %if;(child.sex = "male"); checked%end;>[M/F]0
-        <input type=radio name=ch%cnt;_sex value=F%sp;
-         %if;(child.sex = "female"); checked%end;>[M/F]1
-      </td>
-      %apply;death("ch%cnt;", "child", "false")
-    </tr>
-  </table>
+  %apply;child(cnt)
   <li>
   %apply;insert_child(cnt)
 %end;
 </ul>
+
+<h4>[*source/sources]0</h4>
+
+<table border=1>
+  <tr>
+    <td>[*person/persons]1</td>
+    <td>
+      <input name=psrc size=50 maxlength=200 value="%nn;
+       %if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;">
+    </td>
+  </tr>
+  <tr>
+    <td>[*family/families]0</td>
+    <td>
+      <input name=src size=50 maxlength=200 value="%fsources;">
+      <input type=checkbox name=rdsrc value=on%sp;
+       %if;(evar_rdsrc = "on") checked%end;>
+    </td>
+  </tr>
+</table>
 
 <p>
 <input type=submit value=Ok>

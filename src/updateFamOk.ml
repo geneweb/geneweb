@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.6 2001-06-13 08:01:29 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.7 2001-06-15 04:34:25 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -158,7 +158,7 @@ value reconstitute_family conf =
   in
   let fam =
     {marriage = Adef.codate_of_od marriage; marriage_place = marriage_place;
-     marriage_src = strip_spaces (get conf "marr_src");
+     marriage_src = strip_spaces (get conf "marriage_src");
      witnesses = Array.of_list witnesses; relation = relation;
      divorce = divorce; comment = comment; origin_file = origin_file;
      fsources = fsources; fam_index = Adef.ifam_of_int fam_index}
