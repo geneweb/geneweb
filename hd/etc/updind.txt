@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.20 2005-01-18 02:18:50 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.21 2005-01-20 15:45:36 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <title>%nn;
@@ -88,32 +88,32 @@ function changeDeath()
   <tr>
   <td>[*calendar/calendars]0
   <select name="xvar_cal"xcond>
-  <option value="G"%if;xdt.cal_gregorian; selected="selected"%end;
+  <option value="G"%if;(xdt.calendar = "gregorian"); selected="selected"%end;
   >[*gregorian/julian/french/hebrew]0</option>
-  <option value="J"%if;xdt.cal_julian; selected="selected"%end;
+  <option value="J"%if;(xdt.calendar = "julian"); selected="selected"%end;
   >[*gregorian/julian/french/hebrew]1</option>
-  <option value="F"%if;xdt.cal_french; selected="selected"%end;
+  <option value="F"%if;(xdt.calendar = "french"); selected="selected"%end;
   >[*gregorian/julian/french/hebrew]2</option>
-  <option value="H"%if;xdt.cal_hebrew; selected="selected"%end;
+  <option value="H"%if;(xdt.calendar = "hebrew"); selected="selected"%end;
   >[*gregorian/julian/french/hebrew]3</option>
   </select>
   </td>
   <td>[*precision]0
   <select name="xvar_prec"xcond>
-  <option value="-"%if;xdt.prec_no; selected="selected"%end;>-</option>
-  <option value="sure"%if;xdt.prec_sure; selected="selected"%end;
+  <option value="-"%if;(xdt.prec = ""); selected="selected"%end;>-</option>
+  <option value="sure"%if;(xdt.prec = "sure"); selected="selected"%end;
   >[*exact]0</option>
-  <option value="about"%if;xdt.prec_about; selected="selected"%end;
+  <option value="about"%if;(xdt.prec = "about"); selected="selected"%end;
   >[*about (date)]0</option>
-  <option value="maybe"%if;xdt.prec_maybe; selected="selected"%end;
+  <option value="maybe"%if;(xdt.prec = "maybe"); selected="selected"%end;
   >[*possibly (date)]0</option>
-  <option value="before"%if;xdt.prec_before; selected="selected"%end;
+  <option value="before"%if;(xdt.prec = "before"); selected="selected"%end;
   >[*before (date)]0</option>
-  <option value="after"%if;xdt.prec_after; selected="selected"%end;
+  <option value="after"%if;(xdt.prec = "after"); selected="selected"%end;
   >[*after (date)]0</option>
-  <option value="oryear"%if;xdt.prec_oryear; selected="selected"%end;
+  <option value="oryear"%if;(xdt.prec = "oryear"); selected="selected"%end;
       >&lt;- [*or] -&gt;</option>
-  <option value="yearint"%if;xdt.prec_yearint; selected="selected"%end;
+  <option value="yearint"%if;(xdt.prec = "yearint"); selected="selected"%end;
       >&lt;- [*between (date)] -&gt;</option>
   </select>
   <input name="xvar_oryear" size="5" maxlength="5" value="%xdt.oryear;"xcond%/>
