@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.35 2000-11-16 04:45:36 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.36 2000-11-16 05:03:56 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -538,6 +538,7 @@ value get_persons_with_relations base m list =
          let p = poi base ip in
          match (p.rparents, (aoi base p.cle_index).parents) with
          [ ([], _) | (_, Some _) -> list
+         | ([{r_fath = Some x} :: _], _) when x <> m.m_fath.cle_index -> list
          | _ -> [(p, False) :: list] ])
       (Array.to_list m.m_fam.witnesses) list
   in
