@@ -19,9 +19,13 @@ n&eacute;cessaire:
 
 <p>
 
-<dl><dt><dd><table border=1>
+<dl><dt>
+<dd><table border=1>
 <tr>
-<td valign=top><strong>body_prop</strong></td>
+<td><strong>- body_prop -</strong></td>
+</tr>
+
+<tr>
 <td>Permet de configurer les couleurs de fond, ou d'y mettre un motif
 et de changer la couleur du texte et des liens. Sa syntaxe est la
 syntaxe HTML acceptée dans le tag "&lt;body&gt;" avant le "&gt;". Voyez votre
@@ -41,19 +45,175 @@ href="setup?lang=$l;o=$a;v=backg.html">note</a>)
 <li>vlink: couleur des liens d&eacute;j&agrave; visit&eacute;s
 </ul>
 <p>
+Vous pouvez aussi s&eacute;lectionner une des combinaisons de couleurs
+propos&eacute;es.
+<p>
 Ceci s'applique non seulement à la page d'accueil mais à toutes les pages
 affichées de cette base.
 </td>
 </tr>
 
+<tr><td align=center>
+<table border=0>
 <tr>
-<td colspan=2><input name=body_prop value="$B" size=60></td>
+<td colspan=3>
+<input type=radio name=proposed_body_prop value="" checked>
+<input name=body_prop value="$B" size=55><br>
+</td>
 </tr>
+
+<tr>
+<td bgcolor="#FFFFFF">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFFFF text=#333333 link=#006699 vlink=#999900">
+<font color="#333333">texte</font>
+<font color="#006699">lien</font>
+<font color="#999900">visit&eacute;</font>
+</td>
+<td bgcolor="#CCCCCC">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCCCCC text=#000000 link=#0000CC vlink=#660066">
+<font color="#000000">texte</font>
+<font color="#0000CC">lien</font>
+<font color="#660066">visit&eacute;</font>
+</td>
+<td bgcolor="#FFFF00">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFF00 text=#FF6600 link=#FF0033 vlink=#336633">
+<font color="#FF6600">texte</font>
+<font color="#FF0033">lien</font>
+<font color="#336633">visit&eacute;</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#CCCC66">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCCC66 text=#330000 link=#CC0000 vlink=#003300">
+<font color="#330000">texte</font>
+<font color="#CC0000">lien</font>
+<font color="#003300">visit&eacute;</font>
+</td>
+<td bgcolor="#FFFF99">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFF99 text=#330000 link=#CC0000 vlink=#333333">
+<font color="#330000">texte</font>
+<font color="#CC0000">lien</font>
+<font color="#333333">visit&eacute;</font>
+</td>
+<td bgcolor="#99CCCC">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#99CCCC text=#000066 link=#0000CC vlink=#003366">
+<font color="#000066">texte</font>
+<font color="#0000CC">lien</font>
+<font color="#003366">visit&eacute;</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#CC99FF">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CC99FF text=#000000 link=#FF0033 vlink=#660066">
+<font color="#000000">texte</font>
+<font color="#FF0033">lien</font>
+<font color="#660066">visit&eacute;</font>
+</td>
+<td bgcolor="#CCFF99">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCFF99 text=#666600 link=#006699 vlink=#003300">
+<font color="#666600">texte</font>
+<font color="#006699">lien</font>
+<font color="#003300">visit&eacute;</font>
+</td>
+<td bgcolor="#FFCC00">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFCC00 text=#330000 link=#CC0000 vlink=#660066">
+<font color="#330000">texte</font>
+<font color="#CC0000">lien</font>
+<font color="#660066">visit&eacute;</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#00FF33">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#00FF33 text=#0000CC link=#FF0099 vlink=#660066">
+<font color="#0000CC">texte</font>
+<font color="#FF0099">lien</font>
+<font color="#660066">visit&eacute;</font>
+</td>
+<td bgcolor="#006699">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#006699 text=#CCFFCC link=#FFFF00 vlink=#00FFFF">
+<font color="#CCFFCC">texte</font>
+<font color="#FFFF00">lien</font>
+<font color="#00FFFF">visit&eacute;</font>
+</td>
+<td bgcolor="#330000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#330000 text=#FF6666 link=#FFCC00 vlink=#CCFF99">
+<font color="#FF6666">texte</font>
+<font color="#FFCC00">lien</font>
+<font color="#CCFF99">visit&eacute;</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#003300">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#003300 text=#CCCC66 link=#FFFFFF vlink=#FFFF00">
+<font color="#CCCC66">texte</font>
+<font color="#FFFFFF">lien</font>
+<font color="#FFFF00">visit&eacute;</font>
+</td>
+<td bgcolor="#333333">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#333333 text=#CCCCCC link=#FF6666 vlink=#CCCC66">
+<font color="#CCCCCC">texte</font>
+<font color="#FF6666">lien</font>
+<font color="#CCCC66">visit&eacute;</font>
+</td>
+<td bgcolor="#666600">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#666600 text=#FFFFFF link=#FFFF00 vlink=#99CCFF">
+<font color="#FFFFFF">texte</font>
+<font color="#FFFF00">lien</font>
+<font color="#99CCFF">visit&eacute;</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#000000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#000000 text=#99CCFF link=#FFFF00 vlink=#CCCC66">
+<font color="#99CCFF">texte</font>
+<font color="#FFFF00">lien</font>
+<font color="#CCCC66">visit&eacute;</font>
+</td>
+<td bgcolor="#333333">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#333333 text=#FFFFFF link=#99CCFF vlink=#CC99FF">
+<font color="#FFFFFF">texte</font>
+<font color="#99CCFF">lien</font>
+<font color="#CC99FF">visit&eacute;</font>
+</td>
+<td bgcolor="#CC0000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF">
+<font color="#FFFFFF">texte</font>
+<font color="#FFFF00">lien</font>
+<font color="#00FFFF">visit&eacute;</font>
+</td>
+</tr>
+</table>
 </table></dl>
 
 <dl><dt><dd><table border=1>
 <tr>
-<td valign=top><strong>default_lang</strong></td>
+<td><strong>- default_lang -</strong></td>
+</tr>
+
+<tr>
 <td>Langue par d&eacute;faut.
 <p>
 Si c'est "-", c'est la langue par d&eacute;faut de la commande "gwd"
@@ -62,8 +222,7 @@ qui sera prise.
 </tr>
 
 <tr>
-<td>&nbsp;</td>
-<td>
+<td align=center>
 <select name=default_lang>
 <option value=$L{}>-
 <option value=$L{de}>Allemand
@@ -86,7 +245,10 @@ qui sera prise.
 
 <dl><dt><dd><table border=1>
 <tr>
-<td valign=top><strong>friend_passwd</strong></td>
+<td><strong>- friend_passwd -</strong></td>
+</tr>
+
+<tr>
 <td>Mot de passe "ami".
 <p>
 Les "amis" peuvent voir toutes les dates, notes et photos des
@@ -99,14 +261,16 @@ Si cette zone est vide, tout le monde est "ami".
 </tr>
 
 <tr>
-<td>&nbsp;</td>
-<td><input name=friend_passwd value="$F" size=30></td>
+<td align=center><input name=friend_passwd value="$F" size=30></td>
 </tr>
 </table></dl>
 
 <dl><dt><dd><table border=1>
 <tr>
-<td valign=top><strong>wizard_passwd</strong></td>
+<td><strong>- wizard_passwd -</strong></td>
+</tr>
+
+<tr>
 <td>Mot de passe "sorcier".
 <p>
 Les "sorciers" peuvent en outre faire des modifications dans la base de
@@ -117,14 +281,16 @@ Si cette zone est vide, tout le monde est "sorcier".
 </tr>
 
 <tr>
-<td>&nbsp;</td>
-<td><input name=wizard_passwd value="$W" size=30></td>
+<td align=center><input name=wizard_passwd value="$W" size=30></td>
 </tr>
 </table></dl>
 
 <dl><dt><dd><table border=1>
 <tr>
-<td valign=top><strong>can_send_image</strong></td>
+<td><strong>- can_send_image -</strong></td>
+</tr>
+
+<tr>
 <td>Possibilit&eacute; d'envoyer des images.
 <p>
 Si oui, les "sorciers" ont l'autorisation d'envoyer des images par
@@ -137,8 +303,7 @@ bon endroit avec le nom appropri&eacute;.
 </tr>
 
 <tr>
-<td>&nbsp;</td>
-<td>
+<td align=center>
 <input type=radio name=can_send_image value=$I[yes]>oui
 <input type=radio name=can_send_image value=$I[no]>non
 </td>
@@ -147,7 +312,9 @@ bon endroit avec le nom appropri&eacute;.
 
 <dl><dt><dd><table border=1>
 <tr>
-<td valign=top><strong>wizard_just_friend</strong></td>
+<td><strong>- wizard_just_friend -</strong></td>
+</tr>
+<tr>
 <td>Les "sorciers" deviennent de simples "amis".
 <p>
 Si oui, les "sorciers" perdent leur pouvoir de mise-&agrave;-jour.
@@ -161,8 +328,7 @@ option apr&egrave;s nettoyage).
 </tr>
 
 <tr>
-<td>&nbsp;</td>
-<td>
+<td align=center>
 <input type=radio name=wizard_just_friend value=$J[yes]>oui
 <input type=radio name=wizard_just_friend value=$J[no]>non
 </td>
@@ -171,7 +337,10 @@ option apr&egrave;s nettoyage).
 
 <dl><dt><dd><table border=1>
 <tr>
-<td valign=top><strong>renamed</strong></td>
+<td><strong>- renamed -</strong></td>
+</tr>
+
+<tr>
 <td>Base renomm&eacute;e.
 <p>
 Si vous avez chang&eacute; le nom de votre base, mais que c'est une base
@@ -187,8 +356,7 @@ Si cette zone est vide, la base n'est pas renomm&eacute;e.
 </tr>
 
 <tr>
-<td>&nbsp;</td>
-<td><input name=renamed value="$R" size=30></td>
+<td align=center><input name=renamed value="$R" size=30></td>
 </tr>
 </table></dl>
 
@@ -200,7 +368,7 @@ ici. Vous pouvez y mettre des balises HTML.
 </td>
 </tr>
 <tr>
-<td>
+<td align=center>
 <textarea name=trailer rows=3 cols=60 wrap=virtual>$T</textarea>
 </td>
 </tr>

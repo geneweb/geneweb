@@ -2,6 +2,9 @@ GeneWeb Intermediate version 2.02-1
 -----------------------------------
 
 * Setup program
+  - [May 9, 99] Added predefined palette combination in "data base parameters";
+    changed presentation of all page.
+  - [May 9, 99] Added system to forbid non local accesses.
   - [May 7, 99] Fixed bug: recovering data base from old version of GeneWeb
     did not work when the old directory held spaces.
   - [May 7, 99] Fixed bad behavior under Windows: "GWU.EXE" (in uppercase)

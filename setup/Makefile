@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 1999-05-08 21:26:14 ddr Exp $
+# $Id: Makefile,v 1.7 1999-05-09 09:16:34 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -36,6 +36,7 @@ test:
 	cd test/gw; ln -s ../../../ged2gwb/ged2gwb .
 	cd test/gw; ln -s ../../../gwb2ged/gwb2ged .
 	cd test/gw; ln -s ../../../etc/INSTALL.htm .
+	cd test/gw; echo "127.0.0.1" > only.txt
 
 setup.out: $(OBJS)
 	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(OBJS) -o setup.out
