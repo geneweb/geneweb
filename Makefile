@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.3 2001-04-15 05:40:56 ddr Exp $
+# $Id: Makefile,v 4.4 2001-04-17 21:29:21 ddr Exp $
 
 DESTDIR=distribution
 NS=tools/pa_newseq
@@ -28,7 +28,7 @@ opt::
 	cd gwtp; $(MAKE) opt
 
 $(NS).cmo: $(NS).ml
-	camlp4r pa_extend.cmo q_MLast.cmo $(NS).ml -o $(NS).ppo
+	camlp4r pa_extend.cmo q_MLast.cmo pa_ifdef.cmo $(NS).ml -o $(NS).ppo
 	$(OCAMLC) -I $(CAMLP4D) -c -impl $(NS).ppo
 	$(RM) $*.ppo
 

@@ -5,8 +5,9 @@ GeneWeb Version 4.02
 --------------------
 
 * Compilation
-  - [15 Apr 01] Added tools/pa_newseq.ml because the Camlp4 revised syntax
-    is going to change. Soon, all files with new syntax.
+  - [17 Apr 01] Added tools/pa_newseq.ml because the Camlp4 revised syntax
+    has changed for sequences. Allow to compile with both old and new versions
+    of Camlp4.
 
 * GeneWeb daemon/CGI (gwd)
   - [15 Apr 01] In case of overflow while counting relationships, now display

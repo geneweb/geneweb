@@ -1,33 +1,24 @@
-(* $Id: pa_newseq.ml,v 4.1 2001-04-15 05:40:56 ddr Exp $ *)
+(* $Id: pa_newseq.ml,v 4.2 2001-04-17 21:29:21 ddr Exp $ *)
 
-open Pcaml;
+ifndef NEWSEQ then
 
-value o2b =
-  fun
-  [ Some _ -> True
-  | None -> False ]
-;
-
-value mkseq loc el =
-  match List.rev el with
-  [ [] -> <:expr< () >>
-  | [e] -> e
-  | [e :: el] -> <:expr< do $list:List.rev el$ return $e$ >> ]
-;
-
-let direction_flag =
-  (Obj.magic Grammar.Entry.find Pcaml.expr "direction_flag" :
-   Grammar.Entry.e bool)
-in
-do
-(*
-  DELETE_RULE expr: "do"; LIST0 [ expr; ";" ]; "return"; SELF END;
-  DELETE_RULE
-    expr:
-      "for"; LIDENT; "="; SELF; direction_flag; SELF; "do";
-      LIST0 [ expr; ";" ]; "done"
-  END;
-*)
+declare
+  open Pcaml;
+  value o2b =
+    fun
+    [ Some _ -> True
+    | None -> False ]
+  ;
+  value mkseq loc el =
+    match List.rev el with
+    [ [] -> <:expr< () >>
+    | [e] -> e
+    | [e :: el] -> MLast.ExSeq loc (List.rev el) e ]
+  ;
+  let direction_flag =
+    (Obj.magic Grammar.Entry.find Pcaml.expr "direction_flag" :
+     Grammar.Entry.e bool)
+  in
   EXTEND
     GLOBAL: expr direction_flag;
     expr: LEVEL "top"
@@ -35,9 +26,9 @@ do
             mkseq loc seq
         | "for"; i = LIDENT; "="; e1 = SELF; df = direction_flag; e2 = SELF;
           "do"; "{"; el = sequence; "}" ->
-            <:expr< for $i$ = $e1$ $to:df$ $e2$ do $list:el$ done >>
+            MLast.ExFor loc i e1 df e2 el
         | "while"; e = SELF; "do"; "{"; el = sequence; "}" ->
-            <:expr< while $e$ do $list:el$ done >> ] ]
+            MLast.ExWhi loc e el ] ]
     ;
     sequence:
       [ [ "let"; o = OPT "rec"; l = LIST1 let_binding SEP "and"; "in";
@@ -51,4 +42,4 @@ do
             [e] ] ]
     ;
   END;
-return ();
+end;
