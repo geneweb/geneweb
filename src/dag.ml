@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.33 2001-01-08 23:34:14 ddr Exp $ *)
+(* $Id: dag.ml,v 3.34 2001-01-08 23:57:27 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -394,22 +394,26 @@ value try_add_vbar stra_row stra_row_max hts i col =
     if i = 0 then ""
     else
       loop 0 0 where rec loop pcol pj =
-        let (colspan, _, td) = hts.(i-1).(pj) in
-        if pcol = col then
-          match td with
-          [ TDstring "|" -> "|"
-          | _ -> "" ]
-        else loop (pcol + colspan) (pj + 1)
+        if pj >= Array.length hts.(i-1) then ""
+        else
+          let (colspan, _, td) = hts.(i-1).(pj) in
+          if pcol = col then
+            match td with
+            [ TDstring "|" -> "|"
+            | _ -> "" ]
+          else loop (pcol + colspan) (pj + 1)
   else if stra_row >= stra_row_max then
     if i = Array.length hts - 1 then ""
     else
       loop 0 0 where rec loop ncol nj =
-        let (colspan, _, td) = hts.(i+1).(nj) in
-        if ncol = col then
-          match td with
-          [ TDstring "|" -> "|"
-          | _ -> "" ]
-        else loop (ncol + colspan) (nj + 1)
+        if nj >= Array.length hts.(i+1) then ""
+        else
+          let (colspan, _, td) = hts.(i+1).(nj) in
+          if ncol = col then
+            match td with
+            [ TDstring "|" -> "|"
+            | _ -> "" ]
+          else loop (ncol + colspan) (nj + 1)
   else ""
 ;
 
