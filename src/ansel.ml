@@ -1,4 +1,4 @@
-(* $Id: ansel.ml,v 4.2 2001-07-06 08:08:24 ddr Exp $ *)
+(* $Id: ansel.ml,v 4.3 2002-01-20 19:55:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value no_accent =
@@ -23,17 +23,18 @@ value no_accent =
 ;
 
 value of_iso_8859_1 s =
-  let len =
-    loop 0 0 where rec loop i len =
-      if i == String.length s then len
+  let (len, identical) =
+    loop 0 0 True where rec loop i len identical =
+      if i == String.length s then (len, identical)
       else
         match s.[i] with
         [ 'À'..'Å' | 'Ç'.. 'Ï' | 'Ñ'..'Ö' | 'Ù'..'Ý'
         | 'à'..'å' | 'ç'.. 'ï' | 'ñ'..'ö' | 'ù'..'ý' | 'ÿ' ->
-            loop (i + 1) (len + 2)
-        | _ -> loop (i + 1) (len + 1) ]
+            loop (i + 1) (len + 2) False
+        | 'ß' -> loop (i + 1) (len + 1) False
+        | _ -> loop (i + 1) (len + 1) identical ]
   in
-  if len == String.length s then s
+  if identical then s
   else
     let s' = String.create len in
     loop 0 0 where rec loop i i' =
@@ -80,6 +81,7 @@ value of_iso_8859_1 s =
                 s'.[i'] := Char.chr 240; s'.[i'+1] := no_accent s.[i];
                 i' + 1
               }
+          | 'ß' -> do { s'.[i'] := Char.chr 207; i' }
           | c -> do { s'.[i'] := c; i' } ]
         in
         loop (i + 1) (i' + 1)
@@ -174,16 +176,18 @@ value cedil =
 ;
 
 value to_iso_8859_1 s =
-  let len =
-    loop 0 0 where rec loop i len =
-      if i == String.length s then len
-      else if i == String.length s - 1 then len + 1
+  let (len, identical) =
+    loop 0 0 True where rec loop i len identical =
+      if i == String.length s then (len, identical)
+      else if i == String.length s - 1 then (len + 1, identical)
       else
         match Char.code s.[i] with
-        [ 225 | 226 | 227 | 228 | 232 | 234 | 240 -> loop (i + 2) (len + 1)
-        | _ -> loop (i + 1) (len + 1) ]
+        [ 225 | 226 | 227 | 228 | 232 | 234 | 240 ->
+            loop (i + 2) (len + 1) False
+        | 207 -> loop (i + 1) (len + 1) False
+        | _ -> loop (i + 1) (len + 1) identical]
   in
-  if len == String.length s then s
+  if identical then s
   else
     let s' = String.create len in
     loop 0 0 where rec loop i i' =
@@ -193,7 +197,8 @@ value to_iso_8859_1 s =
       else
         let i =
           match Char.code s.[i] with
-          [ 225 -> do { s'.[i'] := grave s.[i+1]; i + 1 }
+          [ 207 -> do { s'.[i'] := 'ß'; i }
+          | 225 -> do { s'.[i'] := grave s.[i+1]; i + 1 }
           | 226 -> do { s'.[i'] := acute s.[i+1]; i + 1 }
           | 227 -> do { s'.[i'] := circum s.[i+1]; i + 1 }
           | 228 -> do { s'.[i'] := tilde s.[i+1]; i + 1 }
