@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.23 2000-01-01 07:55:40 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.24 2000-01-01 09:46:18 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -1194,7 +1194,7 @@ value table_of_dag no_optim invert d =
   let d = if invert then invert_dag d else d in
   let t = tablify no_optim d in
   let t = if invert then invert_table t else t in
-  let _ = fall d t in
+  let _ = fall () t in
   let t = fall2_right t in
   let t = fall2_left t in
 (*

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.29 1999-12-29 18:12:01 ddr Exp $ *)
+(* $Id: relation.ml,v 3.30 2000-01-01 09:46:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -439,6 +439,14 @@ return ();
       ([], 0) (List.rev path)
   in
   let d = {dag = Array.of_list (List.rev nl)} in
+  let set =
+    List.fold_left
+      (fun set n ->
+         match n.valu with
+         [ Dag.Left ip -> Dag.Pset.add ip set
+         | Dag.Right _ -> set ])
+      Dag.Pset.empty nl
+  in
   let spouse_on =
     match Util.p_getenv conf.env "spouse" with
     [ Some "on" -> True
@@ -450,7 +458,7 @@ return ();
     | _ -> False ]
   in
   do Wserver.wprint "<p>\n";
-     Dag.print_only_dag conf base spouse_on invert Dag.Pset.empty [] d;
+     Dag.print_only_dag conf base spouse_on invert set [] d;
   return ()
 ;
 
