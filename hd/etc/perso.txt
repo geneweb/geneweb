@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.6 2000-10-14 00:50:16 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.7 2000-10-15 22:52:33 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -63,14 +63,12 @@
   %if;has_nobility_titles;
     <em>%nobility_titles;</em><br>
   %end;
-  %if;has_public_name;
-    %if;has_qualifiers;
-      <em>(%if;cancel_links;%first_name; %surname;
-           %else;
-             <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
-             <a href="%prefix;m=N;v=%surname_key;">%surname;</a>
-           %end;)</em><br>
-    %end;
+  %if;(has_public_name or has_qualifiers)
+    <em>(%if;cancel_links;%first_name; %surname;
+         %else;
+           <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
+           <a href="%prefix;m=N;v=%surname_key;">%surname;</a>
+         %end;)</em><br>
   %end;
   %foreach;surname_alias;
     <em>(%first_name; %surname_alias;)</em><br>
@@ -153,8 +151,14 @@
 %if;has_parents;
   <h3><font color=%highlight;>[*parents]</font></h3>
   <ul>
-  <li>%father;%nl;
-  <li>%mother;%nl;
+  <li>
+  %if;cancel_links;%father;
+  %else;<a href="%prefix;%father.access;">%father;</a>%end;
+  %father.dates;%nl;
+  <li>
+  %if;cancel_links;%mother;
+  %else;<a href="%prefix;%mother.access;">%mother;</a>%end;
+  %mother.dates;%nl;
   </ul>
 %end;
 
@@ -164,7 +168,10 @@
   <ul>
   %foreach;family;
     <li>
-    %married_to; %spouse;
+    %married_to;%sp;
+    %if;cancel_links;%spouse;
+    %else;<a href="%prefix;%spouse.access">%spouse;</a>%end;
+    %spouse.dates;
     %if;has_witnesses;
       %sp;([witness/witnesses]w:
       %foreach;witness;%if;not is_first;, %end;%witness;%end;
@@ -176,7 +183,12 @@
       , [having as children]0
       <ul>
         %foreach;child;
-          <li>%child;%nl;
+          <li>
+	  %if;cancel_links;%child.child_name;
+	  %else;
+	    <a href="%prefix;%child.access;">%child.child_name;</a>
+          %end;
+	  %child.dates;%nl;
         %end;
       </ul>
     %end;
@@ -185,23 +197,26 @@
   </ul>
 %end;
 
-<!--
+<!-- -->
 %if;has_parents;
   <h3><font color=%highlight;>[*siblings]</font></h3>
   <ul>
-  %foreach;sibling;
+  %foreach;father.child;
     %if;is_self;
       <li type=circle>
-      %sibling;%nl;
+      %child_name;%nl;
     %else;
       <li type=disk>
-      %if;cancel_links;%sibling;
-      %else;<a href="%prefix;%sibling_access;">%sibling;</a>%end;%nl;
+      %if;cancel_links;%child.child_name;
+      %else;
+        <a href="%prefix;%child.access;">%child.child_name;</a>
+      %end;
+      %child.dates;%nl;
     %end;
   %end;
   </ul>
 %end;
--->
+<!-- -->
 
 %if;has_relations;
   <h3><font color=%highlight;>[*relation/relations]1</font></h3>
@@ -271,15 +286,15 @@
         %end;
       %end;
 <!-- -->
-      %foreach;sibling;
+      %foreach;father.child;
 	%if;is_sibling_before;
 	  <li>
-          <a href="%prefix;%sibling_access;"><b><font
+          <a href="%prefix;%child.access;"><b><font
            color=%highlight;>[*previous sibling]s</font></b></a>
 	%end;
 	%if;is_sibling_after;
 	  <li>
-          <a href="%prefix;%sibling_access;"><b><font
+          <a href="%prefix;%child.access;"><b><font
            color=%highlight;>[*next sibling]s</font></b></a>
 	%end;
       %end;

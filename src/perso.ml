@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.49 2000-10-14 00:50:17 ddr Exp $ *)
+(* $Id: perso.ml,v 3.50 2000-10-15 22:52:33 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1164,7 +1164,7 @@ type ast =
   | Atransl of bool and string and char
   | Awid_hei of string
   | Aif of ast_expr and list ast and list ast
-  | Aforeach of string and list ast ]
+  | Aforeach of string and list string and list ast ]
 and ast_expr =
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
@@ -1267,18 +1267,17 @@ value parse_templ conf base strm =
           if len = 0 then astl else [Atext (buff_get len) :: astl]
         in
         match get_variable strm with
-        [ ("%", _) -> parse_astl [Atext "%" :: astl] False 0 end_list strm
-        | (v, vl) ->
-            if List.mem v end_list then (List.rev astl, v)
-            else
-              let ast =
-                match v with
-                [ "if" -> parse_if strm
-                | "foreach" -> parse_foreach strm
-                | "wid_hei" -> Awid_hei (get_ident 0 strm)
-                | v -> Avar v vl ]
-              in
-              parse_astl [ast :: astl] False 0 end_list strm ]
+        [ ("%", []) -> parse_astl [Atext "%" :: astl] False 0 end_list strm
+        | (v, []) when List.mem v end_list -> (List.rev astl, v)
+        | x ->
+            let ast =
+              match x with
+              [ ("if", []) -> parse_if strm
+              | ("foreach", []) -> parse_foreach strm
+              | ("wid_hei", []) -> Awid_hei (get_ident 0 strm)
+              | (v, vl) -> Avar v vl ]
+            in
+            parse_astl [ast :: astl] False 0 end_list strm ]
     | [: `'[' :] ->
         let astl =
           if len = 0 then astl else [Atext (buff_get len) :: astl]
@@ -1314,9 +1313,9 @@ value parse_templ conf base strm =
     in
     Aif e al1 al2
   and parse_foreach strm =
-    let (v, _) = get_variable strm in
+    let (v, vl) = get_variable strm in
     let (astl, _) = parse_astl [] False 0 ["end"] strm in
-    Aforeach v astl
+    Aforeach v vl astl
   in
   fst (parse_astl [] True 0 [] strm)
 ;
@@ -1375,28 +1374,6 @@ value print_body_prop conf base env =
 
 value print_burial_place conf base env p p_auth =
   if p_auth then Wserver.wprint "%s" (sou base p.burial_place) else ()
-;
-
-value print_child conf base env =
-  match get_env "child" env with
-  [ Eind p a u ->
-      let age_auth =
-        match get_env "auth" env with
-        [ Ebool x -> x
-        | _ -> False ]
-      in
-      let force_surname =
-        match a.parents with
-        [ None -> False
-        | Some ifam ->
-            p_surname base (poi base (coi base ifam).father) <>
-            p_surname base p ]
-      in
-      do if force_surname then afficher_personne_referencee conf base p
-         else afficher_prenom_de_personne_referencee conf base p;
-         if age_auth then Date.afficher_dates_courtes conf base p else ();
-      return ()
-  | _ -> () ]
 ;
 
 value print_comment conf base env p p_auth =
@@ -1499,23 +1476,6 @@ value print_divorce_date conf base env p p_auth =
   | _ -> () ]
 ;
 
-value print_father conf base env =
-  match get_env "p" env with
-  [ Eind _ a _ ->
-      match a.parents with
-      [ Some ifam ->
-          let fath = poi base (coi base ifam).father in
-          do Wserver.wprint "%s" (referenced_person_title_text conf base fath);
-             Date.afficher_dates_courtes conf base fath;
-          return ()
-      | _ -> () ]
-  | _ -> () ]
-;
-
-value print_first_name conf base env p p_auth =
-  Wserver.wprint "%s" (p_first_name base p)
-;
-
 value print_first_name_alias conf base env =
   match get_env "first_name_alias" env with
   [ Estring s -> Wserver.wprint "%s" s
@@ -1569,19 +1529,6 @@ value print_married_to conf base env p p_auth =
       Wserver.wprint (fcapitale format)
         (fun _ ->
            if auth then print_marriage_text conf base True fam else ())
-  | _ -> () ]
-;
-
-value print_mother conf base env =
-  match get_env "p" env with
-  [ Eind _ a _ ->
-      match a.parents with
-      [ Some ifam ->
-          let moth = poi base (coi base ifam).mother in
-          do Wserver.wprint "%s" (referenced_person_title_text conf base moth);
-             Date.afficher_dates_courtes conf base moth;
-          return ()
-      | _ -> () ]
   | _ -> () ]
 ;
 
@@ -1733,18 +1680,6 @@ value print_relation_type conf base env =
   | _ -> () ]
 ;
 
-value print_sibling conf base env =
-  match get_env "sibling" env with
-  [ Eind p _ _ -> Wserver.wprint "%s" (person_text conf base p)
-  | _ -> () ]
-;
-
-value print_sibling_access conf base env =
-  match get_env "sibling" env with
-  [ Eind p _ _ -> Wserver.wprint "%s" (acces conf base p)
-  | _ -> () ]
-;
-
 value print_sosa conf base env a a_auth =
   match get_env "sosa" env with
   [ Esosa x ->
@@ -1778,24 +1713,6 @@ value print_source_type conf base env =
   match get_env "src_typ" env with
   [ Estring s -> Wserver.wprint "%s" s
   | _ -> () ]
-;
-
-value print_spouse conf base env p p_auth =
-  match get_env "fam" env with
-  [ Efam fam cpl des ->
-      let ispouse = spouse p.cle_index cpl in
-      let spouse = poi base ispouse in
-      let txt =
-        gen_referenced_person_title_text raw_access conf base spouse
-      in
-      do Wserver.wprint "%s" txt;
-         Date.afficher_dates_courtes conf base spouse;
-      return ()
-  | _ -> () ]
-;
-
-value print_surname conf base env p p_auth =
-  Wserver.wprint "%s" (p_surname base p)
 ;
 
 value print_surname_alias conf base env =
@@ -1833,10 +1750,9 @@ value do_person f conf base env =
   | _ -> () ]
 ;
 
-value print_variable conf base env =
+value print_simple_variable conf base env =
   fun
-  [ "access" -> do_person print_access conf base env
-  | "age" -> do_person print_age conf base env
+  [ "age" -> do_person print_age conf base env
   | "alias" -> print_alias conf base env
   | "base_header" -> include_hed_trl conf ".hed"
   | "base_trailer" -> include_hed_trl conf ".trl"
@@ -1846,7 +1762,6 @@ value print_variable conf base env =
   | "border" -> Wserver.wprint "%d" conf.border
   | "burial_place" -> do_person print_burial_place conf base env
   | "cremation_place" -> do_person print_burial_place conf base env
-  | "child" -> print_child conf base env
   | "comment" -> do_person print_comment conf base env
   | "consanguinity" -> print_consanguinity conf base env
   | "copyright" -> print_copyright conf base env
@@ -1854,8 +1769,6 @@ value print_variable conf base env =
   | "death_place" -> do_person print_death_place conf base env
   | "died" -> do_person print_died conf base env
   | "divorce_date" -> do_person print_divorce_date conf base env
-  | "father" -> print_father conf base env
-  | "first_name" -> do_person print_first_name conf base env
   | "first_name_alias" -> print_first_name_alias conf base env
   | "first_name_key" -> do_person print_first_name_key conf base env
   | "highlight" -> Wserver.wprint "%s" conf.highlight
@@ -1863,13 +1776,11 @@ value print_variable conf base env =
   | "image_size" -> do_person print_image_size conf base env
   | "image_url" -> do_person print_image_url conf base env
   | "married_to" -> do_person print_married_to conf base env
-  | "mother" -> print_mother conf base env
   | "nl" -> Wserver.wprint "\n"
   | "nobility_titles" -> do_person print_nobility_titles conf base env
   | "notes" -> do_person print_notes conf base env
   | "occupation" -> do_person print_occupation conf base env
   | "on_baptism_date" -> do_person print_on_baptism_date conf base env
-  | "on_birth_date" -> do_person print_on_birth_date conf base env
   | "on_burial_date" -> do_person print_on_burial_date conf base env
   | "on_cremation_date" -> do_person print_on_cremation_date conf base env
   | "on_death_date" -> do_person print_on_death_date conf base env
@@ -1884,20 +1795,90 @@ value print_variable conf base env =
   | "relation_him" -> print_relation_him conf base env
   | "relation_type" -> print_relation_type conf base env
   | "related_type" -> print_related_type conf base env
-  | "sibling" -> print_sibling conf base env
-  | "sibling_access" -> print_sibling_access conf base env
   | "sosa" -> do_person print_sosa conf base env
   | "sosa_link" -> do_person print_sosa_link conf base env
   | "source_type" -> print_source_type conf base env
   | "source" -> print_source conf base env
   | "sp" -> Wserver.wprint " "
-  | "spouse" -> do_person print_spouse conf base env
-  | "surname" -> do_person print_surname conf base env
   | "surname_alias" -> print_surname_alias conf base env
   | "surname_key" -> do_person print_surname_key conf base env
   | "witness_relation" -> print_witness_relation conf base env
   | "witness" -> print_witness conf base env
   | v -> Wserver.wprint "%%%s;" v ]
+;
+
+value print_variable conf base env s sl =
+  let ep =
+    match (get_env "p" env, get_env "p_auth" env) with
+    [ (Eind p a u, Ebool p_auth) -> (p, a, u, p_auth)
+    | _ -> assert False ]
+  in
+  let efam = get_env "fam" env in
+  let make_ep ip =
+    let p = poi base ip in
+    let a = aoi base ip in
+    let u = uoi base ip in
+    let p_auth = age_autorise conf base p in
+    (p, a, u, p_auth)
+  in
+  loop ep efam [s :: sl] where rec loop (p, a, u, p_auth) efam =
+    fun
+    [ ["access"] -> print_access conf base env p p_auth
+    | ["child" :: sl] ->
+        match get_env "child" env with
+        [ Eind p a u ->
+            let auth =
+              match get_env "auth" env with
+              [ Ebool True -> age_autorise conf base p
+              | _ -> False ]
+            in
+            let ep = (p, a, u, auth) in
+            loop ep efam sl
+        | _ -> () ]
+    | ["child_name"] ->
+        let force_surname =
+          match a.parents with
+          [ None -> False
+          | Some ifam ->
+              p_surname base (poi base (coi base ifam).father) <>
+              p_surname base p ]
+        in
+        Wserver.wprint "%s"
+          (if force_surname then person_text conf base p
+           else person_text_without_surname conf base p)
+    | ["dates"] ->
+        if p_auth then Date.afficher_dates_courtes conf base p else ()
+    | ["father" :: sl] ->
+        match a.parents with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            let ep = make_ep cpl.father in
+            let efam = Efam (foi base ifam) cpl (doi base ifam) in
+            loop ep efam sl
+        | None -> () ]
+    | ["first_name"] -> Wserver.wprint "%s" (p_first_name base p)
+    | ["mother" :: sl] ->
+        match a.parents with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            let ep = make_ep cpl.mother in
+            let efam = Efam (foi base ifam) cpl (doi base ifam) in
+            loop ep efam sl
+        | None -> () ]
+    | ["on_birth_date"] -> print_on_birth_date conf base env p p_auth
+    | ["spouse" :: sl] ->
+        match efam with
+        [ Efam fam cpl _ ->
+            let ip = spouse p.cle_index cpl in
+            let ep = make_ep ip in
+            loop ep efam sl
+        | _ -> () ]
+    | ["surname"] -> Wserver.wprint "%s" (p_surname base p)
+    | [s :: sl] ->
+        do print_simple_variable conf base env s;
+           List.iter (fun s -> Wserver.wprint ".%s" s) sl;
+        return ()
+    | [] -> Wserver.wprint "%s" (person_title_text conf base p) ]
 ;
 
 value eval_bool_variable conf base env p =
@@ -2092,9 +2073,16 @@ value print_transl conf base env upp s c =
   let r =
     match c with
     [ '0'..'9' -> transl_nth conf s (Char.code c - Char.code '0')
+    | 'n' ->
+        let n =
+          match get_env "p" env with
+          [ Eind p _ _ -> 1 - index_of_sex p.sex
+          | _ -> 2 ]
+        in
+        transl_nth conf s n
     | 's' ->
         let n =
-          match get_env "sibling" env with
+          match get_env "child" env with
           [ Eind p _ _ -> index_of_sex p.sex
           | _ ->
               match get_env "p" env with
@@ -2139,28 +2127,58 @@ value iter_first f al =
   in ()
 ;
 
+value make_ep base ip =
+  let p = poi base ip in
+  let a = aoi base ip in
+  let u = uoi base ip in
+  Eind p a u
+;
+
 value rec eval_ast conf base env =
   fun
   [ Atext s -> Wserver.wprint "%s" s
   | Atransl upp s n -> print_transl conf base env upp s n
-  | Avar s _ -> print_variable conf base env s
+  | Avar s sl -> print_variable conf base env s sl
   | Awid_hei s -> print_wid_hei conf base env s
   | Aif e alt ale -> eval_if conf base env e alt ale
-  | Aforeach "alias" al -> eval_foreach_alias conf base env al
-  | Aforeach "child" al -> eval_foreach_child conf base env al
-  | Aforeach "family" al -> eval_foreach_family conf base env al
-  | Aforeach "first_name_alias" al ->
-      eval_foreach_first_name_alias conf base env al
-  | Aforeach "qualifier" al -> eval_foreach_qualifier conf base env al
-  | Aforeach "related" al -> eval_foreach_related conf base env al
-  | Aforeach "relation" al -> eval_foreach_relation conf base env al
-  | Aforeach "sibling" al -> eval_foreach_sibling conf base env al
-  | Aforeach "source" al -> eval_foreach_source conf base env al
-  | Aforeach "surname_alias" al -> eval_foreach_surname_alias conf base env al
-  | Aforeach "witness" al -> eval_foreach_witness conf base env al
-  | Aforeach "witness_relation" al ->
-      eval_foreach_witness_relation conf base env al
-  | Aforeach x al -> Wserver.wprint "foreach %s???" x ]
+  | Aforeach s sl al -> eval_foreach conf base env s sl al ]
+and eval_foreach conf base env s sl al =
+  let (sl, s) =
+    let sl = List.rev [s :: sl] in
+    (List.rev (List.tl sl), List.hd sl)
+  in
+  let x =
+    loop (get_env "p" env) (get_env "fam" env) sl
+    where rec loop ep efam =
+      fun
+      [ [] -> (ep, efam)
+      | ["father" :: sl] ->
+          match ep with
+          [ Eind _ a _ ->
+              match a.parents with
+              [ Some ifam ->
+                  let cpl = coi base ifam in
+                  let ep = make_ep base cpl.father in
+                  let efam = Efam (foi base ifam) cpl (doi base ifam) in
+                  loop ep efam sl
+              | None -> (ep, efam) ]
+          | _ -> (ep, efam) ]
+      | [s :: sl] ->
+          do Wserver.wprint "foreach %s???" s; return (ep, efam) ]
+  in
+  match s with
+  [ "alias" -> eval_foreach_alias conf base env al
+  | "child" -> eval_foreach_child conf base env x al
+  | "family" -> eval_foreach_family conf base env al
+  | "first_name_alias" -> eval_foreach_first_name_alias conf base env al
+  | "qualifier" -> eval_foreach_qualifier conf base env al
+  | "related" -> eval_foreach_related conf base env al
+  | "relation" -> eval_foreach_relation conf base env al
+  | "source" -> eval_foreach_source conf base env al
+  | "surname_alias" -> eval_foreach_surname_alias conf base env al
+  | "witness" -> eval_foreach_witness conf base env al
+  | "witness_relation" -> eval_foreach_witness_relation conf base env al
+  | s -> Wserver.wprint "foreach %s???" s ]
 and eval_if conf base env e alt ale =
   let al = if eval_bool_value conf base env e then alt else ale in
   List.iter (eval_ast conf base env) al
@@ -2173,15 +2191,37 @@ and eval_foreach_alias conf base env al =
            List.iter (eval_ast conf base env) al)
         p.aliases
   | _ -> () ]
-and eval_foreach_child conf base env al =
-  match get_env "fam" env with
-  [ Efam _ _ des ->
-      Array.iter
-        (fun ip ->
+and eval_foreach_child conf base env x al =
+  match x with
+  [ (_, Efam _ _ des) ->
+      let auth =
+        List.for_all
+          (fun ip -> age_autorise conf base (poi base ip))
+          (Array.to_list des.children)
+      in
+      let env = [("auth", Ebool auth) :: env] in
+      let n =
+        let p =
+          match get_env "p" env with
+          [ Eind p _ _ -> p
+          | _ -> assert False ]
+        in
+        loop 0 where rec loop i =
+          if i = Array.length des.children then -2
+          else if des.children.(i) = p.cle_index then i else loop (i + 1)
+      in
+      Array.iteri
+        (fun i ip ->
            let p = poi base ip in
            let a = aoi base ip in
            let u = uoi base ip in
            let env = [("child", Eind p a u) :: env] in
+           let env =
+             if i = n - 1 then [("pos", Estring "prev") :: env]
+             else if i = n then [("pos", Estring "self") :: env]
+             else if i = n + 1 then [("pos", Estring "next") :: env]
+             else env
+           in
            List.iter (eval_ast conf base env) al)
         des.children
   | _ -> () ]
@@ -2194,12 +2234,6 @@ and eval_foreach_family conf base env al =
            let cpl = coi base ifam in
            let des = doi base ifam in
            let env = [("fam", Efam fam cpl des) :: env] in
-           let auth =
-             List.for_all
-               (fun ip -> age_autorise conf base (poi base ip))
-               (Array.to_list des.children)
-           in
-           let env = [("auth", Ebool auth) :: env] in
            List.iter (eval_ast conf base env) al)
         u.family
   | _ -> () ]
@@ -2259,33 +2293,6 @@ and eval_foreach_related conf base env al =
                 return ())
              c.rparents)
         p.related
-  | _ -> () ]
-and eval_foreach_sibling conf base env al =
-  match get_env "p" env with
-  [ Eind p a _ ->
-      match a.parents with
-      [ Some ifam ->
-          let des = doi base ifam in
-          let n =
-            loop 0 where rec loop i =
-              do assert (i < Array.length des.children); return
-              if des.children.(i) = p.cle_index then i else loop (i + 1)
-          in
-          Array.iteri
-            (fun i ip ->
-               let p = poi base ip in
-               let a = aoi base ip in
-               let u = uoi base ip in
-               let env = [("sibling", Eind p a u) :: env] in
-               let env =
-                 if i = n - 1 then [("pos", Estring "prev") :: env]
-                 else if i = n then [("pos", Estring "self") :: env]
-                 else if i = n + 1 then [("pos", Estring "next") :: env]
-                 else env
-               in
-               List.iter (eval_ast conf base env) al)
-            des.children
-      | None -> () ]
   | _ -> () ]
 and eval_foreach_source conf base env al =
   match get_env "p" env with
@@ -2377,7 +2384,7 @@ value strip_newlines_after_variables =
         in
         [Atext s :: loop astl]
     | [Aif s alt ale :: astl] -> [Aif s (loop alt) (loop ale) :: loop astl]
-    | [Aforeach s al :: astl] -> [Aforeach s (loop al) :: loop astl]
+    | [Aforeach s sl al :: astl] -> [Aforeach s sl (loop al) :: loop astl]
     | [(Avar _ _ as ast) :: astl] -> [ast :: loop astl]
     | [(Atransl _ _ _ | Awid_hei _ as ast1); ast2 :: astl] ->
         [ast1; ast2 :: loop astl]
