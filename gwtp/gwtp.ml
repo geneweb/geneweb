@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 1.56 2001-01-06 09:55:34 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.57 2001-02-05 10:03:27 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -936,4 +936,8 @@ value main () =
   return ()
 ;
 
-main ();
+try main () with exc ->
+  do eprintf "Exception raised: %s\n" (Printexc.to_string exc);
+     flush stderr;
+  return ()
+;
