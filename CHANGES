@@ -2,6 +2,10 @@ GeneWeb version 3.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+   - [30 Aug 00] Fixed bug: sometimes accepted two persons with the same
+     key. E.g.: after having defined "Charles de Gaulle" and "Charles
+     Degaulle", when changing the second person' s surname into "de Gaulle",
+     did not display a name conflict error.
    - [28 Aug 00] Added option "-wjf" (= wizard just friend) to permanently
      prevent all wizards in all data bases to make changes.
    - [26 Aug 00] In descendants page, added male line and female line.
