@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.19 2000-11-11 15:42:16 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.20 2000-11-11 20:29:50 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -660,23 +660,6 @@ value related_sex_is_coherent base warning p_ref =
   | None -> warning (IncoherentSex p_ref) ]
 ;
 
-value relation_sex_is_coherent base warning p =
-  List.iter
-    (fun r ->
-       do match r.r_fath with
-          [ Some ip ->
-              let p = poi base ip in
-              if p.sex <> Male then warning (IncoherentSex p) else ()
-          | None -> () ];
-          match r.r_moth with
-          [ Some ip ->
-              let p = poi base ip in
-              if p.sex <> Female then warning (IncoherentSex p) else ()
-          | None -> () ];
-       return ())
-    p.rparents
-;
-
 value check_normal_marriage_date_for_someone base error warning fam ip =
   let p = poi base ip in
   match Adef.od_of_codate fam.marriage with
@@ -785,7 +768,6 @@ value check_person base error warning p =
   do birth_before_death base warning p;
      List.iter (titles_after_birth base warning p) p.titles;
      related_sex_is_coherent base warning p;
-     relation_sex_is_coherent base warning p;
   return ()
 ;
 
