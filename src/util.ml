@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.22 2002-01-07 16:00:35 ddr Exp $ *)
+(* $Id: util.ml,v 4.23 2002-01-10 04:13:31 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -11,6 +11,10 @@ value base_dir = ref Filename.current_dir_name;
 value doc_dir = ref "";
 value cnt_dir = ref "";
 value images_url = ref "";
+
+value pget (conf : config) base ip =
+  base.data.persons.get (Adef.int_of_iper ip)
+;
 
 value secure s =
   let rec need_code i =
@@ -821,7 +825,7 @@ value url_no_index conf base =
     match try Some (int_of_string v) with [ Failure _ -> None ] with
     [ Some i ->
         if i >= 0 && i < base.data.persons.len then
-          let p = base.data.persons.get i in
+          let p = pget conf base (Adef.iper_of_int i) in
           if conf.hide_names && not (fast_auth_age conf p) then None
           else
             let f = scratch p.first_name in
@@ -838,7 +842,7 @@ value url_no_index conf base =
           if is_deleted_family (base.data.families.get i) then None
           else
             let cpl = base.data.couples.get i in
-            let p = poi base cpl.father in
+            let p = pget conf base cpl.father in
             let f = scratch p.first_name in
             let s = scratch p.surname in
             if f = "" || s = "" then None
@@ -1304,11 +1308,11 @@ value preciser_homonyme conf base p =
         [ Some ifam ->
             let cpl = coi base ifam in
             let fath =
-              let fath = poi base cpl.father in
+              let fath = pget conf base cpl.father in
               if p_first_name base fath = "?" then None else Some fath
             in
             let moth =
-              let moth = poi base cpl.mother in
+              let moth = pget conf base cpl.mother in
               if p_first_name base moth = "?" then None else Some moth
             in
             Some (fath, moth)
@@ -1323,7 +1327,7 @@ value preciser_homonyme conf base p =
               let conjoint = spouse p.cle_index (coi base u.family.(i)) in
               let ct = des.children in
               if Array.length ct > 0 then
-                let enfant = poi base ct.(0) in
+                let enfant = pget conf base ct.(0) in
                 let (child_fn, child_sn) =
                   if conf.hide_names && not (fast_auth_age conf enfant) then
                     ("x", " x")
@@ -1338,7 +1342,7 @@ value preciser_homonyme conf base p =
                      (transl_nth conf "father/mother" is)
                      (child_fn ^ child_sn))
               else
-                let conjoint = poi base conjoint in
+                let conjoint = pget conf base conjoint in
                 if p_first_name base conjoint <> "?" ||
                    p_surname base conjoint <> "?" then
                   Wserver.wprint "%s"
@@ -1534,7 +1538,7 @@ value find_person_in_env conf base suff =
   match p_getint conf.env ("i" ^ suff) with
   [ Some i ->
       if i >= 0 && i < base.data.persons.len then
-        Some (base.data.persons.get i)
+        Some (pget conf base (Adef.iper_of_int i))
       else None
   | None ->
       match
@@ -1547,7 +1551,7 @@ value find_person_in_env conf base suff =
             | None -> 0 ]
           in
           let k = p ^ " " ^ n in
-          let xl = List.map (poi base) (person_ht_find_all base k) in
+          let xl = List.map (pget conf base) (person_ht_find_all base k) in
           let k = Name.lower k in
           try
             let r =
@@ -1612,7 +1616,7 @@ value create_topological_sort conf base =
           Consang.topological_sort base ] ]
 ;
 
-value branch_of_sosa base ip n =
+value branch_of_sosa conf base ip n =
   do {
     if Num.eq n Num.zero then invalid_arg "branch_of_sosa" else ();
     let rec expand bl n =
@@ -1629,7 +1633,7 @@ value branch_of_sosa base ip n =
               else loop [(ip, sp) :: ipl] cpl.mother Female nl
           | _ -> None ] ]
     in
-    loop [] ip (poi base ip).sex (expand [] n)
+    loop [] ip (pget conf base ip).sex (expand [] n)
   }
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.20 2001-12-20 19:58:16 ddr Exp $ *)
+(* $Id: relation.ml,v 4.21 2002-01-10 04:13:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -12,7 +12,7 @@ value round_2_dec x = floor (x *. 100.0 +. 0.5) /. 100.0;
 value print_with_relation text conf base p r is =
   fun
   [ Some ic ->
-      let c = poi base ic in
+      let c = pget conf base ic in
       do {
         html_li conf;
         Wserver.wprint "<input type=radio name=select value=%d>\n"
@@ -24,7 +24,7 @@ value print_with_relation text conf base p r is =
 ;
 
 value print_with_related conf base p ip =
-  let c = poi base ip in
+  let c = pget conf base ip in
   List.iter
     (fun r ->
        do {
@@ -43,7 +43,7 @@ value print_with_related conf base p ip =
 ;
 
 value print_with_witness conf base p fam ip =
-  let w = poi base ip in
+  let w = pget conf base ip in
   do {
     html_li conf;
     Wserver.wprint "<input type=radio name=select value=%d>\n"
@@ -114,7 +114,7 @@ value print_menu conf base p =
              let fam = foi base ifam in
              let cpl = coi base ifam in
              let c = spouse p.cle_index cpl in
-             let c = poi base c in
+             let c = pget conf base c in
              if p_first_name base c <> "?" || p_surname base c <> "?"
              then do {
                html_li conf;
@@ -655,7 +655,7 @@ value parents_label conf base info =
       let is =
         if nb_fields txt = 2 then
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (poi base ip1).sex = Male then 0 else 1
+          [ [ip1] -> if (pget conf base ip1).sex = Male then 0 else 1
           | _ -> (* must be a bug *) 0 ]
         else 0
       in
@@ -665,7 +665,7 @@ value parents_label conf base info =
       let is =
         if nb_fields txt = 2 then
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (poi base ip1).sex = Male then 0 else 1
+          [ [ip1] -> if (pget conf base ip1).sex = Male then 0 else 1
           | _ -> (* must be a bug *) 0 ]
         else 0
       in
@@ -690,7 +690,7 @@ value ancestor_label conf base info x sex =
       let is =
         if nb_fields txt = 6 then
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (poi base ip1).sex = Male then is else is + 3
+          [ [ip1] -> if (pget conf base ip1).sex = Male then is else is + 3
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -703,7 +703,7 @@ value ancestor_label conf base info x sex =
       let is =
         if nb_fields txt = 6 then
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (poi base ip1).sex = Male then is else is + 3
+          [ [ip1] -> if (pget conf base ip1).sex = Male then is else is + 3
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -729,7 +729,7 @@ value descendant_label conf base info x p =
         if nb_fields txt = 6 then
           let info = (info, fun r -> r.Consang.lens2) in
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (poi base ip1).sex = Male then is else is + 3
+          [ [ip1] -> if (pget conf base ip1).sex = Male then is else is + 3
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -744,8 +744,8 @@ value descendant_label conf base info x p =
           let info = (info, fun r -> r.Consang.lens2) in
           match get_piece_of_branch conf base info (1, 2) with
           [ [ip1; ip2] ->
-              let is = if (poi base ip1).sex = Male then is else is + 6 in
-              if (poi base ip2).sex = Male then is else is + 3
+              let is = if (pget conf base ip1).sex = Male then is else is + 6 in
+              if (pget conf base ip2).sex = Male then is else is + 3
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -787,7 +787,7 @@ value uncle_label conf base info x p =
         if nb_fields txt == 4 then
           let info = (info, fun r -> r.Consang.lens1) in
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (poi base ip1).sex = Male then is else is + 2
+          [ [ip1] -> if (pget conf base ip1).sex = Male then is else is + 2
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -798,7 +798,7 @@ value uncle_label conf base info x p =
         if nb_fields txt == 4 then
           let info = (info, fun r -> r.Consang.lens1) in
           match get_piece_of_branch conf base info (1, 1) with
-          [ [ip1] -> if (poi base ip1).sex = Male then is else is + 2
+          [ [ip1] -> if (pget conf base ip1).sex = Male then is else is + 2
           | _ -> (* must be a bug *) is ]
         else is
       in
@@ -886,7 +886,7 @@ value print_link_name conf base n p1 p2 sol =
             else
               let info = ((info, x2), fun r -> r.Consang.lens2) in
               match get_piece_of_branch conf base info (x2 - x1, x2 - x1) with
-              [ [ip2] -> if (poi base ip2).sex = Male then sm else sf
+              [ [ip2] -> if (pget conf base ip2).sex = Male then sm else sf
               | _ -> sm ]
           in
           transl_decline2 conf "%1 of (same or greater generation level) %2" d
@@ -1139,7 +1139,7 @@ value print_dag_links conf base p1 p2 rl =
            | _ -> p2 ]
          in
          if nt > 1 && nn > 1 && nn < max_br then do {
-           let a = poi base ip in
+           let a = pget conf base ip in
            if is_anc then () else html_li conf;
            if not is_anc then
              Wserver.wprint "%s:\n" (person_title_text conf base a)
@@ -1247,7 +1247,7 @@ value compute_simple_relationship conf base tstab p1 p2 =
       List.fold_left
         (fun rl i ->
            let u = tab.Consang.reltab.(i) in
-           let p = base.data.persons.get i in
+           let p = pget conf base (Adef.iper_of_int i) in
            List.fold_left
              (fun rl (len1, n1, _) ->
                 List.fold_left
@@ -1279,11 +1279,11 @@ value compute_simple_relationship conf base tstab p1 p2 =
     Some (rl, total, relationship, tab.Consang.reltab)
 ;
 
-value known_spouses_list base p excl_p =
+value known_spouses_list conf base p excl_p =
   let u = uoi base p.cle_index in
   List.fold_left
     (fun spl ifam ->
-       let sp = poi base (spouse p.cle_index (coi base ifam)) in
+       let sp = pget conf base (spouse p.cle_index (coi base ifam)) in
        if sou base sp.first_name <> "?" && sou base sp.surname <> "?" &&
           sp.cle_index <> excl_p.cle_index
        then
@@ -1334,8 +1334,8 @@ value compute_relationship conf base by_marr p1 p2 =
     let sol = compute_simple_relationship conf base tstab p1 p2 in
     let sol_by_marr =
       if by_marr then
-        let spl1 = known_spouses_list base p1 p2 in
-        let spl2 = known_spouses_list base p2 p1 in
+        let spl1 = known_spouses_list conf base p1 p2 in
+        let spl2 = known_spouses_list conf base p2 p1 in
         let sl = [] in
         let sl =
           match sol with

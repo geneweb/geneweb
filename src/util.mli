@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.2 2001-12-24 11:46:38 ddr Exp $ *)
+(* $Id: util.mli,v 4.3 2002-01-10 04:13:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -43,6 +43,8 @@ value wprint_hidden_person : config -> base -> string -> person -> unit;
 
 value geneweb_link : config -> string -> string -> string;
 value wprint_geneweb_link : config -> string -> string -> unit;
+
+value pget : config -> base -> iper -> person;
 
 type p_access = (base -> person -> string * base -> person -> string);
 value std_access : p_access;
@@ -136,7 +138,8 @@ value get_request_string_aux : bool -> list string -> string;
 
 value create_topological_sort : config -> base -> array int;
 
-value branch_of_sosa : base -> iper -> Num.t -> option (list (iper * sex));
+value branch_of_sosa :
+  config -> base -> iper -> Num.t -> option (list (iper * sex));
 value sosa_of_branch : list (iper * sex) -> Num.t;
 
 value link_to_referer : config -> string;

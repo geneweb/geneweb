@@ -1,4 +1,4 @@
-(* $Id: restrict.ml,v 4.1 2001-04-22 03:31:16 ddr Exp $ *)
+(* $Id: restrict.ml,v 4.2 2002-01-10 04:13:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 (* Build restrict file marking persons of less than 100 years *)
 
@@ -34,7 +34,7 @@ value restrict bname base =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       if not hidden.(i) then
-        let p = base.data.persons.get i in
+        let p = pget conf base (Adef.iper_of_int i) in
         match Adef.od_of_codate p.birth with
         [ Some (Dgreg d _) ->
             if (temps_ecoule d today).year <= 100 then

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.22 2001-12-31 15:12:34 ddr Exp $ *)
+(* $Id: perso.ml,v 4.23 2002-01-10 04:13:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -310,7 +310,7 @@ value rec eval_variable conf base env sl =
   in
   let efam = get_env "fam" env in
   let make_ep ip =
-    let p = poi base ip in
+    let p = pget conf base ip in
     let a = aoi base ip in
     let u = uoi base ip in
     let p_auth = age_autorise conf base p in (p, a, u, p_auth)
@@ -487,7 +487,7 @@ value print_divorce_date conf base env p p_auth =
       [ Divorced d ->
           let d = Adef.od_of_codate d in
           let auth =
-            let spouse = poi base isp in
+            let spouse = pget conf base isp in
             p_auth && age_autorise conf base spouse
           in
           match d with
@@ -549,7 +549,7 @@ value print_image_url conf base env p p_auth =
 value print_married_to conf base env p p_auth =
   fun
   [ Vfam fam (_, ispouse) des ->
-      let spouse = poi base ispouse in
+      let spouse = pget conf base ispouse in
       let auth = p_auth && age_autorise conf base spouse in
       let format = relation_txt conf p.sex fam in
       Wserver.wprint (fcapitale format)
@@ -656,7 +656,7 @@ value print_parent_age conf base p a p_auth parent =
   match a.parents with
   [ Some ifam ->
       let cpl = coi base ifam in
-      let pp = poi base (parent cpl) in
+      let pp = pget conf base (parent cpl) in
       if p_auth && age_autorise conf base pp then
         match (Adef.od_of_codate pp.birth, Adef.od_of_codate p.birth) with
         [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
@@ -766,8 +766,8 @@ value print_witness_relation conf base env =
   [ Vfam _ (ip1, ip2) _ ->
       Wserver.wprint
         (fcapitale (ftransl conf "witness at marriage of %s and %s"))
-        (referenced_person_title_text conf base (poi base ip1))
-        (referenced_person_title_text conf base (poi base ip2))
+        (referenced_person_title_text conf base (pget conf base ip1))
+        (referenced_person_title_text conf base (pget conf base ip2))
   | _ -> () ]
 ;
 
@@ -828,7 +828,7 @@ value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
         match a.parents with
         [ None -> False
         | Some ifam ->
-            p_surname base (poi base (coi base ifam).father) <>
+            p_surname base (pget conf base (coi base ifam).father) <>
               p_surname base p ]
       in
       Wserver.wprint "%s"
@@ -1198,11 +1198,6 @@ value eval_bool_value conf base env =
   bool_eval
 ;
 
-value make_ep base ip =
-  let p = poi base ip in
-  let a = aoi base ip in let u = uoi base ip in Vind p a u
-;
-
 value rec eval_ast conf base env =
   fun
   [ Atext s -> Wserver.wprint "%s" s
@@ -1256,7 +1251,7 @@ and eval_foreach_child conf base env al =
   fun
   [ Vfam _ _ des ->
       let auth =
-        List.for_all (fun ip -> age_autorise conf base (poi base ip))
+        List.for_all (fun ip -> age_autorise conf base (pget conf base ip))
           (Array.to_list des.children)
       in
       let env = [("auth", Vbool auth) :: env] in
@@ -1275,7 +1270,7 @@ and eval_foreach_child conf base env al =
       in
       Array.iteri
         (fun i ip ->
-           let p = poi base ip in
+           let p = pget conf base ip in
            let a = aoi base ip in
            let u = uoi base ip in
            let env = [("#loop", Vint 0) :: env] in
@@ -1340,7 +1335,7 @@ and eval_foreach_related conf base env al (p, _, _, p_auth) =
     let list =
       List.fold_left
         (fun list ic ->
-           let c = poi base ic in
+           let c = pget conf base ic in
            loop c.rparents where rec loop =
              fun
              [ [r :: rl] ->
@@ -1439,7 +1434,7 @@ and eval_foreach_witness conf base env al =
   [ Vfam fam _ _ ->
       list_iter_first
         (fun first ip ->
-           let p = poi base ip in
+           let p = pget conf base ip in
            let a = aoi base ip in
            let u = uoi base ip in
            let env = [("witness", Vind p a u) :: env] in
@@ -1450,7 +1445,7 @@ and eval_foreach_witness conf base env al =
 and eval_foreach_witness_relation conf base env al (p, _, _, _) =
   List.iter
     (fun ic ->
-       let c = poi base ic in
+       let c = pget conf base ic in
        if c.sex = Male then
          Array.iter
            (fun ifam ->

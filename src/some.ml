@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.3 2001-11-14 10:02:29 ddr Exp $ *)
+(* $Id: some.ml,v 4.4 2002-01-10 04:13:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -22,7 +22,7 @@ value surname_not_found conf =
   not_found conf (transl conf "surname not found")
 ;
 
-value persons_of_fsname base find proj x =
+value persons_of_fsname conf base find proj x =
   let istrl = base.func.strings_of_fsname x in
   let l =
     let x = Name.crush_lower x in
@@ -35,7 +35,7 @@ value persons_of_fsname base find proj x =
            let iperl =
              List.fold_left
                (fun iperl iper ->
-                  if proj (poi base iper) = istr then [iper :: iperl]
+                  if proj (pget conf base iper) = istr then [iper :: iperl]
                   else iperl)
                [] iperl
            in
@@ -164,7 +164,7 @@ value first_name_print conf base x =
   let (list, _) =
     if x = "" then ([], fun [])
     else
-      persons_of_fsname base base.func.persons_of_first_name.find
+      persons_of_fsname conf base base.func.persons_of_first_name.find
         (fun x -> x.first_name) x
   in
   let list =
@@ -174,7 +174,7 @@ value first_name_print conf base x =
   match list with
   [ [] -> first_name_not_found conf x
   | [(_, (strl, iperl))] ->
-      let pl = List.map (poi base) iperl in
+      let pl = List.map (pget conf base) iperl in
       let pl =
         if conf.hide_names then
           List.fold_right
@@ -186,12 +186,13 @@ value first_name_print conf base x =
   | _ -> select_first_name conf base x list ]
 ;
 
-value she_has_children_with_her_name base wife husband children =
+value she_has_children_with_her_name conf base wife husband children =
   let wife_surname = Name.strip_lower (p_surname base wife) in
   if Name.strip_lower (p_surname base husband) = wife_surname then False
   else
     List.exists
-      (fun c -> Name.strip_lower (p_surname base (poi base c)) = wife_surname)
+      (fun c ->
+         Name.strip_lower (p_surname base (pget conf base c)) = wife_surname)
       (Array.to_list children)
 ;
 
@@ -224,7 +225,7 @@ value rec print_branch conf base first_lev psn lev name p =
              let des = doi base ifam in
              let c = spouse p.cle_index (coi base ifam) in
              let el = des.children in
-             let c = poi base c in
+             let c = pget conf base c in
              do {
                if need_br then html_br conf else ();
                if not first then do {
@@ -255,14 +256,15 @@ value rec print_branch conf base first_lev psn lev name p =
                     Name.crush_lower name ||
                   first_lev) &&
                  Array.length el <> 0 ||
-                 p.sex = Female && she_has_children_with_her_name base p c el
+                 p.sex = Female &&
+                 she_has_children_with_her_name conf base p c el
                in
                if down then do {
                  Wserver.wprint "<ul>\n";
                  List.iter
                    (fun e ->
                       print_branch conf base False psn (succ lev) name
-                        (poi base e))
+                        (pget conf base e))
                    (Array.to_list el);
                  Wserver.wprint "</ul>\n";
                  (False, not down)
@@ -351,10 +353,10 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
                [ Some ifam ->
                    let cpl = coi base ifam in
                    do {
-                     let href = Util.acces conf base (poi base cpl.father) in
+                     let href = Util.acces conf base (pget conf base cpl.father) in
                      wprint_geneweb_link conf href "&lt;&lt";
                      Wserver.wprint "\n&amp;\n";
-                     let href = Util.acces conf base (poi base cpl.mother) in
+                     let href = Util.acces conf base (pget conf base cpl.mother) in
                      wprint_geneweb_link conf href "&lt;&lt";
                      Wserver.wprint "\n";
                      tag "ul" begin
@@ -427,33 +429,33 @@ value print_family_alphabetic x conf base liste =
       } ]
 ;
 
-value has_at_least_2_children_with_surname base des surname =
+value has_at_least_2_children_with_surname conf base des surname =
   loop 0 0 where rec loop cnt i =
     if i == Array.length des.children then False
     else
-      let p = poi base des.children.(i) in
+      let p = pget conf base des.children.(i) in
       if p.surname == surname then
         if cnt == 1 then True else loop (cnt + 1) (i + 1)
       else loop cnt (i + 1)
 ;
 
-value select_ancestors base name_inj ipl =
+value select_ancestors conf base name_inj ipl =
   let str_inj s = name_inj (sou base s) in
   List.fold_left
     (fun ipl ip ->
-       let p = poi base ip in
+       let p = pget conf base ip in
        let a = aoi base ip in
        match a.parents with
        [ Some ifam ->
            let cpl = coi base ifam in
-           let fath = poi base cpl.father in
-           let moth = poi base cpl.mother in
+           let fath = pget conf base cpl.father in
+           let moth = pget conf base cpl.mother in
            let s = str_inj p.surname in
            if str_inj fath.surname <> s && str_inj moth.surname <> s &&
               not (List.memq ip ipl) then
              if List.memq cpl.father ipl then ipl
              else if
-               has_at_least_2_children_with_surname base (doi base ifam)
+               has_at_least_2_children_with_surname conf base (doi base ifam)
                  p.surname then
                [cpl.father :: ipl]
              else [ip :: ipl]
@@ -466,7 +468,7 @@ value surname_print conf base not_found_fun x =
   let (l, name_inj) =
     if x = "" then ([], fun [])
     else
-      persons_of_fsname base base.func.persons_of_surname.find
+      persons_of_fsname conf base base.func.persons_of_surname.find
         (fun x -> x.surname) x
   in
   let (iperl, strl) =
@@ -481,7 +483,7 @@ value surname_print conf base not_found_fun x =
   match p_getenv conf.env "o" with
   [ Some "i" ->
       let pl =
-        List.fold_right (fun ip ipl -> [poi base ip :: ipl]) iperl []
+        List.fold_right (fun ip ipl -> [pget conf base ip :: ipl]) iperl []
       in
       let pl =
         if conf.hide_names then
@@ -492,7 +494,7 @@ value surname_print conf base not_found_fun x =
       in
       print_family_alphabetic x conf base pl
   | _ ->
-      let iperl = select_ancestors base name_inj iperl in
-      let pl = List.map (poi base) iperl in
+      let iperl = select_ancestors conf base name_inj iperl in
+      let pl = List.map (pget conf base) iperl in
       print_by_branch x conf base not_found_fun (pl, strl) ]
 ;
