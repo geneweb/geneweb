@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.220 2005-01-02 21:27:17 ddr Exp $
+# $Id: lexicon.txt,v 4.221 2005-01-14 12:04:58 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !charset
@@ -7782,6 +7782,7 @@ en: the %d oldest couples perhaps still alive and engaged
 fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
 nl: De %d langst paren die mogelijk nog steeds leven en getrouwd zijn
+pl: %d najstarsza para prawdopodobnie jeszcze zyje i pozostaje zareczona
 pt: o %d mais velho casal talvez ainda vivo e noivado
 ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
 sv: de %d &auml;ldsta nu levande paren som kanske fortfarande &auml;r f&ouml;rlovade
