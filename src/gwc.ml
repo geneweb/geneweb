@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.20 1999-07-22 14:34:07 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.21 1999-07-22 19:47:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -138,6 +138,8 @@ value title_unique_string gen t =
 ;
 
 value find_person_by_name gen first_name surname occ =
+  let first_name = nominative first_name in
+  let surname = nominative surname in
   let s = Name.crush_lower (first_name ^ " " ^ surname) in
   let key = Hashtbl.hash s in
   let ipl = Mhashtbl.find_all gen.g_names key in
@@ -156,7 +158,7 @@ value find_person_by_name gen first_name surname occ =
 ;
 
 value add_person_by_name gen first_name surname occ iper =
-  let s = Name.crush_lower (first_name ^ " " ^ surname) in
+  let s = Name.crush_lower (nominative (first_name ^ " " ^ surname)) in
   let key = Hashtbl.hash s in
   Mhashtbl.add gen.g_names key iper
 ;
@@ -188,8 +190,8 @@ value insert_undefined_parent gen key =
         return x ]
   in
   do if not gen.g_errored then
-       if p_first_name gen.g_base x <> key.pk_first_name ||
-          p_surname gen.g_base x <> key.pk_surname then
+       if sou gen.g_base x.first_name <> key.pk_first_name ||
+          sou gen.g_base x.surname <> key.pk_surname then
          do Printf.printf "\nPerson defined with two spellings:\n";
             Printf.printf "  \"%s%s %s\"\n" key.pk_first_name
               (match x.occ with
@@ -254,8 +256,8 @@ value insert_person gen so =
        return Check.error gen
      else gen.g_def.(Adef.int_of_iper x.cle_index) := True;
      if not gen.g_errored then
-       if p_first_name gen.g_base x <> so.first_name ||
-          p_surname gen.g_base x <> so.surname then
+       if sou gen.g_base x.first_name <> so.first_name ||
+          sou gen.g_base x.surname <> so.surname then
          do Printf.printf "\nPerson defined with two spellings:\n";
             Printf.printf "  \"%s%s %s\"\n" so.first_name
               (match x.occ with

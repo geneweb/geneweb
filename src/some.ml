@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.11 1999-07-22 14:34:15 ddr Exp $ *)
+(* $Id: some.ml,v 2.12 1999-07-22 19:47:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -29,7 +29,7 @@ value persons_of_fsname base find proj x =
     let x = Name.crush_lower x in
     List.fold_right
       (fun istr l ->
-         let str = sou base istr in
+         let str = nominative (sou base istr) in
          if Name.crush_lower str = x
          || List.mem x (List.map Name.crush_lower (surnames_pieces str)) then
            let iperl = find istr in

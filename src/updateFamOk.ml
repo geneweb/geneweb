@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.17 1999-07-22 14:34:18 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.18 1999-07-22 19:47:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -219,7 +219,7 @@ value insert_person conf base src (f, s, o, create) =
           do base.func.patch_person p.cle_index p;
              base.func.patch_ascend p.cle_index a;
              if f <> "?" && s <> "?" then
-               do person_ht_add base (f ^ " " ^ s) ip;
+               do person_ht_add base (nominative (f ^ " " ^ s)) ip;
                   new_persons.val := [p :: new_persons.val];
                return ()
              else ();

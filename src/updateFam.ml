@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.8 1999-07-22 14:34:18 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.9 1999-07-22 19:47:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -510,11 +510,11 @@ value print_add_parents conf base =
          marriage_src = ""; not_married = False;
          divorce = NotDivorced;
          children =
-           [| (p_first_name base p, p_surname base p, p.occ, Link) |];
+           [| (sou base p.first_name, sou base p.surname, p.occ, Link) |];
          comment = ""; origin_file = ""; fsources = "";
          fam_index = bogus_family_index}
       and cpl =
-        {father = ("", p_surname base p, 0, Create Neuter None);
+        {father = ("", sou base p.surname, 0, Create Neuter None);
          mother = ("", "", 0, Create Neuter None)}
       in
       print_add1 conf base fam cpl True

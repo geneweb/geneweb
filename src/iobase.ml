@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.11 1999-07-22 14:34:10 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.12 1999-07-22 19:47:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -327,12 +327,14 @@ value strings_of_fsname bname strings person_patches =
                let l =
                  if not (List.memq p.first_name l) then
                    let s1 = strings.get (Adef.int_of_istr p.first_name) in
+                   let s1 = nominative s1 in
                    if s = Name.crush_lower s1 then [p.first_name :: l] else l
                  else l
                in
                let l =
                  if not (List.memq p.surname l) then
                    let s1 = strings.get (Adef.int_of_istr p.surname) in
+                   let s1 = nominative s1 in
                    if s = Name.crush_lower s1 then [p.surname :: l] else l
                  else l
                in l)

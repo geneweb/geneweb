@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.32 1999-07-22 14:34:01 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.33 1999-07-22 19:47:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -151,12 +151,16 @@ value rec list_remove_assoc x =
 value afficher_menu_ascendants conf base p =
   let niveau_effectif = niveau_max_ascendance base p.cle_index in
   let title h =
+    let gen_access =
+      (fun base p -> sou base (p.first_name),
+       fun base p -> sou base (p.surname))
+    in
     if h then
       Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
         (transl_decline conf "of" (person_text_no_html conf base p))
     else
       Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-        (transl_decline conf "of" (person_text conf base p))
+        (transl_decline conf "of" (gen_person_text gen_access conf base p))
   in
   do header conf title;
      print_choice conf base p niveau_effectif;
