@@ -6,6 +6,10 @@ GeneWeb version 4.08
   - [11 Sep 02] Added documentation in Italian (Latino Imparato).
 
 * GeneWeb server or CGI (gwd)
+  - [14 Nov 02] Fixed bug: in database notes updates, there was no check
+    that the update form was up to date: it was then possible to submit
+    old versions, and there was no check that two wizards tried to change
+    the notes at the same time.
   - [08 Nov 02] Fixed bad (strange) displaying of French Republican
     and Hebrew dates when the precision is not "Sure".
   - [06 Nov 02] In family form, one can now set the sex of created
