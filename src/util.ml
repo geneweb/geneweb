@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.115 2005-02-05 06:34:39 ddr Exp $ *)
+(* $Id: util.ml,v 4.116 2005-02-11 21:32:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1969,18 +1969,7 @@ value sosa_of_branch ipl =
   }
 ;
 
-value space_to_unders s =
-  match rindex s ' ' with
-  [ Some _ ->
-      let s' = String.create (String.length s) in
-      do {
-        for i = 0 to String.length s - 1 do {
-          s'.[i] := if s.[i] = ' ' then '_' else s.[i]
-        };
-        s'
-      }
-  | None -> s ]
-;
+value space_to_unders = Gutil.tr ' ' '_';
 
 value default_image_name_of_key fnam surn occ =
   let f = space_to_unders (Name.lower fnam) in

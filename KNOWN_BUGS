@@ -1,6 +1,7 @@
-[08 Feb 2005] Bug in version 5.00-exp
-  Surnames and first names by alphabetic order do not work. Code has been
-  to be rewritten because of utf-8. Urgency 5/5.
+[11 Feb 2005] Bug in version 5.00-exp
+  Surnames and first names by alphabetic order do not work for deleted or
+  renamed persons (the index is not updated). This bug probably still existed
+  in previous versions. Urgency 4/5.
 
 [08 Feb 2005] Bug since version 4.10
   gwc and ged2gwb do not set the sex of isolated "relation" (godparents,
@@ -16,4 +17,4 @@
   Running "consang" on old databases (i.e. created before utf-8) may create
   bad utf-8 strings (names, texts, etc.), because there is no conversion.
   Np idea for the moment how to fix it. Anyway, this error has not been
-  experimented, it is just supposed.
+  experimented, it is just supposed. Urgency 1/5.

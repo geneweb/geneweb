@@ -13,6 +13,14 @@ The new version number (5.00) is in honour of this new encoding.
     in base configuration file (base.gwf), the alphabetical order was done
     before the vars substitutions.
 
+* GeneWeb compiler (gwc)
+  - [11 Feb 05] Added option "-part <file>" to set particles. A file named
+    "particles.txt" in GeneWeb system directory has been added as example.
+    Default is some list of predefined particles. Create a file named
+    "particles.txt" in database directory (.gwb): this file has an influence
+    when displaying surnames by alphabetic order and when applying consang
+    option -i.
+
 * GeneWeb databases Transfer Program (gwtp)
   - [08 Jan 05] Fixed bug: databases created by version 4.10 could
     not be uploaded.

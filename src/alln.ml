@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.11 2005-02-11 00:53:34 ddr Exp $ *)
+(* $Id: alln.ml,v 4.12 2005-02-11 21:32:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -84,9 +84,31 @@ value combine_by_count list =
   List.fold_left (fun new_l (cnt, l) -> [(cnt, List.rev l) :: new_l]) [] list
 ;
 
-value alphab_string conf is_surname s =
-  if Gutil.utf_8_db.val then s
-  else if is_surname then surname_end s ^ surname_begin s
+value get_particle base s =
+  loop base.data.particles where rec loop =
+    fun
+    [ [part :: parts] -> if string_start_with part s then part else loop parts
+    | [] -> "" ]
+;
+
+value new_surname_begin base s =
+  let part = get_particle base s in
+  let len = String.length part in
+  if len = 0 then ""
+  else if part.[len-1] = ' ' then " (" ^ String.sub part 0 (len - 1) ^ ")"
+  else " (" ^ part ^ ")"
+;
+
+value new_surname_end base s =
+  let part_len = String.length (get_particle base s) in
+  String.sub s part_len (String.length s - part_len)
+;
+
+value alphab_string conf base is_surname s =
+  if is_surname then
+    if Gutil.utf_8_db.val then
+      new_surname_end base s ^ new_surname_begin base s
+    else surname_end s ^ surname_begin s
   else s
 ;
 
@@ -102,8 +124,16 @@ value lowercase_if_not_utf8 s =
   if Gutil.utf_8_db.val then s else String.lowercase s
 ;
 
-value name_key_if_not_utf8 s =
-  if Gutil.utf_8_db.val then s else Iobase.name_key s
+value new_name_key base s =
+  let part = get_particle base s in
+  if part = "" then s
+  else
+    let i = String.length part in
+    String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i
+;
+
+value name_key_if_not_utf8 base s =
+  if Gutil.utf_8_db.val then new_name_key base s else Iobase.name_key s
 ;
 
 (* print *)
@@ -149,9 +179,9 @@ value print_alphabetic_big conf base is_surnames ini list len =
       List.iter
         (fun (ini_k, _) ->
            stagn "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode
-             (Util.code_varenv ini_k)
+	     (Util.code_varenv ini_k)
            begin
-             Wserver.wprint "%s" (displayify ini_k);
+             Wserver.wprint "%s" (displayify (tr '_' ' ' ini_k));
            end)
         list;
     end;
@@ -209,7 +239,7 @@ value print_alphabetic_all conf base is_surnames ini list len =
                         "m=" ^ mode ^ ";v=" ^ code_varenv (Name.lower s)
                       in
                       wprint_geneweb_link conf href
-                        (alphab_string conf is_surnames s);
+                        (alphab_string conf base is_surnames s);
                       Wserver.wprint " (%d)" cnt;
                     end)
                  l;
@@ -235,7 +265,7 @@ value print_alphabetic_small conf base is_surnames ini list len =
                stag "a" "href=\"%sm=%s;v=%s;t=A\"" (commd conf) mode
                  (code_varenv (lower_if_not_utf8 s))
                begin
-                 Wserver.wprint "%s" (alphab_string conf is_surnames s);
+                 Wserver.wprint "%s" (alphab_string conf base is_surnames s);
                end;
                Wserver.wprint " (%d)" cnt;
              end)
@@ -262,7 +292,7 @@ value print_frequency_any conf base is_surnames list len =
                       stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
                           (code_varenv (Name.lower s)) begin
                         Wserver.wprint "%s"
-                          (alphab_string conf is_surnames s);
+                          (alphab_string conf base is_surnames s);
                       end;
                     end)
                  l;
@@ -284,9 +314,13 @@ value select_names conf base is_surnames ini =
   in
   let list =
     let start_k =
+(*
       if String.length ini > 0 && ini.[String.length ini - 1] == '_' then
         String.sub ini 0 (String.length ini - 1)
       else ini
+*)
+      Gutil.tr '_' ' ' ini
+(**)
     in
     match
       try Some (iii.cursor (capitalize_if_not_utf8 start_k)) with
@@ -295,7 +329,7 @@ value select_names conf base is_surnames ini =
     [ Some istr ->
         loop istr [] where rec loop istr list =
           let s = nominative (sou base istr) in
-          let k = name_key_if_not_utf8 s in
+          let k = name_key_if_not_utf8 base s in
           if string_start_with ini k then
             let list =
               if s <> "?" then
@@ -437,7 +471,7 @@ value print_alphabetic_short conf base is_surnames ini list len =
                   if href <> "" || name <> "" then
                     Wserver.wprint "<a%s%s>" href name
                   else ();
-                  Wserver.wprint "%s" (alphab_string conf is_surnames s);
+                  Wserver.wprint "%s" (alphab_string conf base is_surnames s);
                   if href <> "" || name <> "" then Wserver.wprint "</a>"
                   else ();
                   Wserver.wprint " (%d)" cnt;

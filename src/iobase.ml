@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.39 2005-02-10 05:20:19 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.40 2005-02-11 21:32:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -290,14 +290,46 @@ value compare_names_1 s1 s2 =
     | x -> x ]
 ;
 
-value compare_names s1 s2 =
-  if utf_8_db.val then compare s1 s2 else compare_names_1 s1 s2
+value start_with ini s =
+  loop 0 0 where rec loop i j =
+    if i = String.length ini then True
+    else if j = String.length s then False
+    else if String.unsafe_get ini i = String.unsafe_get s j then
+      loop (i + 1) (j + 1)
+    else False
+;
+
+value get_particle s =
+  loop where rec loop =
+    fun
+    [ [part :: parts] -> if start_with part s then part else loop parts
+    | [] -> "" ]
+;
+
+value compare_part particles s1 s2 =
+  let p1 = get_particle s1 particles in
+  let p2 = get_particle s2 particles in
+  loop (String.length p1) (String.length p2) where rec loop i1 i2 =
+    if i1 = String.length s1 && i2 = String.length s2 then compare p1 p2
+    else if i1 = String.length s1 then -1
+    else if i2 = String.length s2 then 1
+    else
+      let c1 = String.unsafe_get s1 i1 in
+      let c2 = String.unsafe_get s2 i2 in
+      if c1 < c2 then -1
+      else if c1 > c2 then 1
+      else loop (i1 + 1) (i2 + 1)
+;
+
+value compare_names base_data s1 s2 =
+  if utf_8_db.val then compare_part base_data.particles s1 s2
+  else compare_names_1 s1 s2
 ;
 
 value compare_istr_fun base_data is1 is2 =
   if is1 == is2 then 0
   else
-    compare_names (base_data.strings.get (Adef.int_of_istr is1))
+    compare_names base_data (base_data.strings.get (Adef.int_of_istr is1))
       (base_data.strings.get (Adef.int_of_istr is2))
 ;
 
@@ -387,7 +419,8 @@ flush stderr;
   in
   let cursor str =
     IstrTree.key_after
-      (fun key -> compare_names str (strings.get (Adef.int_of_istr key)))
+      (fun key ->
+	 compare_names base_data str (strings.get (Adef.int_of_istr key)))
       (bt None)
   in
   let next key = IstrTree.next key (bt None) in
@@ -482,7 +515,8 @@ flush stderr;
   in
   let cursor str =
     IstrTree.key_after
-      (fun key -> compare_names str (strings.get (Adef.int_of_istr key)))
+      (fun key ->
+         compare_names base_data str (strings.get (Adef.int_of_istr key)))
       (bt_patched ())
   in
   let next key = IstrTree.next key (bt_patched ()) in
@@ -954,11 +988,30 @@ value patches_of_patches_ht patches =
   }
 ;
 
+value input_particles fname =
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      loop [] 0 where rec loop list len =
+        match try Some (input_char ic) with [ End_of_file -> None ] with
+        [ Some '_' -> loop list (Buff.store len ' ')
+        | Some '\n' ->
+            loop (if len = 0 then list else [Buff.get len :: list]) 0
+        | Some '\r' -> loop list len
+        | Some c -> loop list (Buff.store len c)
+        | None ->
+            do {
+              close_in ic;
+              List.rev (if len = 0 then list else [Buff.get len :: list])
+            } ]
+  | None -> [] ]
+;
+
 value input bname =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
   let patches = input_patches bname in
+  let particles = input_particles (Filename.concat bname "particles.txt") in
   let ic =
     let ic = Secure.open_in_bin (Filename.concat bname "base") in
     do { check_magic ic; ic }
@@ -1145,7 +1198,7 @@ value input bname =
     {persons = persons; ascends = ascends; unions = unions;
      visible = make_visible_cache bname persons;
      families = families; couples = couples; descends = descends;
-     strings = strings; bnotes = bnotes}
+     strings = strings; particles = particles; bnotes = bnotes}
   in
   let base_func =
     {persons_of_name = persons_of_name bname (snd patches.h_name);

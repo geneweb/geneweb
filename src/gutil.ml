@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.29 2005-02-04 20:18:59 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.30 2005-02-11 21:32:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -42,6 +42,19 @@ value array_memq x a =
 value string_sub s i len =
   let i = min (String.length s) (max 0 i) in
   let len = min (String.length s - i) (max 0 len) in String.sub s i len
+;
+
+value tr c1 c2 s =
+  match rindex s c1 with
+  [ Some _ ->
+      let s' = String.create (String.length s) in
+      do {
+        for i = 0 to String.length s - 1 do {
+          s'.[i] := if s.[i] = c1 then c2 else s.[i]
+        };
+        s'
+      }
+  | None -> s ]
 ;
 
 value utf_8_of_iso_8859_1 str =
