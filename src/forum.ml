@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.12 2000-11-04 22:38:45 ddr Exp $ *)
+(* $Id: forum.ml,v 3.13 2000-11-05 06:19:12 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -23,11 +23,65 @@ value get_var ic lab s =
   else ("", s)
 ;
 
-value get_headers conf =
+value sp2nbsp lim s =
+  loop 0 0 where rec loop i len =
+    if i >= String.length s then Buff.get len
+    else if i > lim && String.length s > lim + 3 then Buff.get len ^ "..."
+    else
+      let len =
+        match s.[i] with
+        [ ' ' -> Buff.mstore len "&nbsp;"
+        | x -> Buff.store len x ]
+      in
+      loop (i + 1) len
+;
+
+value print_one_header conf prec_date pos h =
+  let (date, hour, ident, subject, beg_mess) = h in
+  do if date <> prec_date then
+       let d =
+         try
+           let y = int_of_string (String.sub date 0 4) in
+           let m = int_of_string (String.sub date 5 2) in
+           let d = int_of_string (String.sub date 8 2) in
+           Dgreg
+             {year = y; month = m; day = d; prec = Sure; delta = 0}
+             Dgregorian
+         with
+         [ Failure _ -> Dtext date ]
+       in
+       tag "tr" begin
+         tag "td" "colspan=4 align=left" begin
+           Wserver.wprint "%s" (Date.string_of_date conf d);
+         end;
+       end
+     else ();
+     tag "tr" begin
+       tag "td" begin
+         Wserver.wprint "<tt>&nbsp;&nbsp;&nbsp;</tt>";
+       end;
+       tag "td" begin Wserver.wprint "<tt>%s</tt>" hour; end;
+       tag "td" begin
+         Wserver.wprint
+           "<a href=\"%sm=FORUM;p=%d\"><b>%s</b></a>"
+           (commd conf) pos (secure (sp2nbsp 23 ident));
+       end;
+       tag "td" begin
+         if subject = "" || subject = "-" then
+           Wserver.wprint "<em>... %s</em>" (secure (sp2nbsp 30 beg_mess))
+         else              
+           Wserver.wprint "%s" (secure (sp2nbsp 30 subject));
+       end;
+     end;
+  return ()
+;
+
+value print_headers conf =
   let fname = forum_file conf in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      loop [] where rec loop r =
+      tag "table" "border=%d" conf.border begin
+      loop "" where rec loop prec_date =
         let pos = pos_in ic in
         match try Some (input_line ic) with [ End_of_file -> None ] with
         [ Some s ->
@@ -49,85 +103,27 @@ value get_headers conf =
                     skip_mess (input_line ic)
                   else ([], s)
             in
+            let (date, hour) =
+              try
+                let i = String.index time ' ' in
+                (String.sub time 0 i,
+                 String.sub time (i + 1) (String.length time - i - 1))
+              with
+              [ Not_found -> ("", time) ]
+            in
             let beg_mess =
               match text with
               [ [x :: _] -> x
               | _ -> "" ]
             in
-            let r =
-              if ident <> "" then [(pos, time, ident, subject, beg_mess) :: r]
-              else r
-            in
-            loop r
-        | None -> List.rev r ]
-  | None -> [] ]
-;
-
-value sp2nbsp lim s =
-  loop 0 0 where rec loop i len =
-    if i >= String.length s then Buff.get len
-    else if i > lim && String.length s > lim + 3 then Buff.get len ^ "..."
-    else
-      let len =
-        match s.[i] with
-        [ ' ' -> Buff.mstore len "&nbsp;"
-        | x -> Buff.store len x ]
-      in
-      loop (i + 1) len
-;
-
-value print_headers conf h =
-  let h = Sort.list (fun (_, t1, _, _, _) (_, t2, _, _, _) -> t1 >= t2) h in
-  tag "table" "border=%d" conf.border begin
-    let _ = List.fold_left
-      (fun prec_date (pos, time, ident, subject, beg_mess) ->
-         let (date, hour) =
-           try
-             let i = String.index time ' ' in
-             (String.sub time 0 i,
-              String.sub time (i + 1) (String.length time - i - 1))
-           with
-           [ Not_found -> ("", time) ]
-         in
-         do if date <> prec_date then
-              let d =
-                try
-                  let y = int_of_string (String.sub date 0 4) in
-                  let m = int_of_string (String.sub date 5 2) in
-                  let d = int_of_string (String.sub date 8 2) in
-                  Dgreg {year = y; month = m; day = d; prec = Sure; delta = 0}
-                    Dgregorian
-                with
-                [ Failure _ -> Dtext date ]
-              in
-              tag "tr" begin
-                tag "td" "colspan=4 align=left" begin
-                  Wserver.wprint "%s" (Date.string_of_date conf d);
-                end;
-              end
-            else ();
-            tag "tr" begin
-              tag "td" begin
-                Wserver.wprint "<tt>&nbsp;&nbsp;&nbsp;</tt>";
-              end;
-              tag "td" begin Wserver.wprint "<tt>%s</tt>" hour; end;
-              tag "td" begin
-                Wserver.wprint
-                  "<a href=\"%sm=FORUM;p=%d\"><b>%s</b></a>"
-                  (commd conf) pos (secure (sp2nbsp 23 ident));
-              end;
-              tag "td" begin
-                if subject = "" || subject = "-" then
-                  Wserver.wprint "<em>... %s</em>"
-                    (secure (sp2nbsp 30 beg_mess))
-                else              
-                  Wserver.wprint "%s" (secure (sp2nbsp 30 subject));
-              end;
-            end;
-         return date)
-      "" h
-    in ();
-  end
+            do if ident <> "" then
+                 let h = (date, hour, ident, subject, beg_mess) in
+                 print_one_header conf prec_date pos h
+               else ();
+            return loop date
+        | None -> close_in ic ];
+      end
+  | None -> () ]
 ;
 
 value print_add_message conf =
@@ -149,8 +145,7 @@ value print_forum_headers conf base =
      print_link_to_welcome conf True;
      print_add_message conf;
      Wserver.wprint "\n";
-     let h = get_headers conf in
-     print_headers conf h;
+     print_headers conf;
      trailer conf;
   return ()
 ;
