@@ -2,8 +2,9 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: merge.htm,v 1.1 2002-01-14 07:21:39 ddr Exp $ -->
+  <!-- $Id: merge.htm,v 1.2 2002-03-05 09:07:57 ddr Exp $ -->
   <title>[
+de: Datenbanken zusammenf&uuml;hren
 en: Merging databases
 fr: Fusion de bases de donn&eacute;es
 sv: Sammanslagning av databaser
@@ -13,6 +14,7 @@ sv: Sammanslagning av databaser
 <body background="file://$f/images/gwback.jpg">
 
 <center><h1><font color=#2f6400>[
+de: Datenbanken zusammenf&uuml;hren
 en: Merging databases
 fr: Fusion de bases de donn&eacute;es
 sv: Sammanslagning av databaser
@@ -22,6 +24,9 @@ sv: Sammanslagning av databaser
 <input type=hidden name=lang value=$l>
 
 [
+de: Alle Datenbanken, die zusammengef&uuml;hrt werden sollen,
+    m&uuml;ssen unter <b><font color=#2f6400>GeneWeb</font></b>
+    verf&uuml;gbar sein.
 en: All your databases to be merged must be first under
     <b><font color=#2f6400>GeneWeb</font></b>.
 fr: Il faut d'abord que toutes vos bases &agrave; fusionner soient sous
@@ -33,6 +38,11 @@ sv: Alla databaser som ska slås samman måste finnas under
 <p>
 
 [
+de: Falls das nicht der Fall ist, sondern einige von ihnen z.B. nur
+    als GEDCOM-Dateien oder GeneWeb-Quelldateien vorliegen, kehre zum
+    <a href="gwsetup?lang=$l;v=main.htm">Hauptmen&uuml;</a> zur&uuml;ck,
+    um sie unter <b><font color=#2f6400>GeneWeb</font></b> anzulegen,
+    dann kehre hierher zur&uuml;ck.
 en: If it is not the case, if, for example, some of them are just GEDCOM
     files or GeneWeb source files, return to the <a
     href="gwsetup?lang=$l;v=main.htm">main menu</a> to create them under
@@ -52,6 +62,8 @@ sv: Om det inte är så, om till exempel, någon av dem bara är GEDCOM
 <p>
 
 [
+de: Wenn das geschehen ist, w&auml;hle die Datenbanken, die du
+    zusammenf&uuml;hren m&ouml;chtest:
 en: Once done, select the databases you want to merge by pushing their
     associated buttons:
 fr: Une fois fait, s&eacute;lectionnez les bases que vous voulez fusionner
@@ -69,6 +81,7 @@ $b{
 <td><input type=checkbox name="$a" value="on_"></td>
 </tr>|
 <tr align=left><td>- [
+de: keine Datenbank vorhanden
 en: there is no database at present
 fr: il n'y a aucune base de donn&eacute;es actuellement
 sv: det finns ingen databas för närvarande
@@ -78,6 +91,8 @@ sv: det finns ingen databas för närvarande
 <p>
 
 [
+de: Gib den Namen ein, den du deiner resultierenden Datenbank geben
+    willst:
 en: Indicate the name you want to give to your resulting database:
 fr: Indiquez le nom que vous voulez donner &agrave; votre base de
     donn&eacute;es r&eacute;sultante:
@@ -91,6 +106,7 @@ sv: Skriv namnet du vill ge din databas:
 <p>
 
 [
+de: Dann dr&uuml;cke diesen Knopf:
 en: Then push this button:
 fr: Puis appuyez sur ce bouton:
 sv: Tryck sedan denna knapp:
@@ -99,6 +115,7 @@ sv: Tryck sedan denna knapp:
 <p>
 
 <input type=submit value="[
+de: Zusammenf&uuml;hren
 en: Merge
 fr: Fusionner
 sv: Slåsamman
@@ -109,6 +126,13 @@ sv: Slåsamman
 <p>
 
 [
+de: Bemerkung: Das Zusammenf&uuml;hren geschieht durch simple
+    Konkatenation der Datenbanken. Es wird keine &Uuml;berpr&uuml;fung
+    auf identische Personen durchgef&uuml;hrt. Nach dem
+    Zusammenf&uuml;hren musst du deshalb die m&ouml;glicherweise nun
+    doppelt vorhandenen Personen oder Familien ausfindig machen und
+    sie einzeln zusammenf&uuml;hren.
+    Siehe dazu die <a href="file://$f/doc/$l/update.htm#MrgP">Documentation</a>.
 en: Remark: merging consists on simple concatenation of the databases. There
     is no research for identical persons. After merging, you therefore have
     to research the possible doubled persons or families and merge them.

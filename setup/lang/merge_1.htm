@@ -2,8 +2,9 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: merge_1.htm,v 1.1 2002-01-14 14:36:42 ddr Exp $ -->
+  <!-- $Id: merge_1.htm,v 1.2 2002-03-05 09:07:57 ddr Exp $ -->
   <title>[
+de: Datenbanken zusammenf&uuml;hren
 en: Merging databases
 fr: Fusion de bases de donn&eacute;es
 sv: Sammanslagning av databaser
@@ -13,6 +14,7 @@ sv: Sammanslagning av databaser
 <body background="file://$f/images/gwback.jpg">
 
 <center><h1><font color=#2f6400>[
+de: Datenbanken zusammenf&uuml;hren
 en: Merging databases
 fr: Fusion de bases  de donn&eacute;es
 sv: Sammanslagning av databaser
@@ -21,6 +23,10 @@ sv: Sammanslagning av databaser
 <p>
 
 $v{<b>[
+de: Warnung</b>: Es existiert bereits eine Datenbank mit dem Namen "$o" 
+    in deinem <a href="gwsetup?lang=$l;v=list.htm">Verzeichnis</a>. 
+    Wenn Du den "Ok"-Knopf unten dr&uuml;ckst, wird diese
+    Datenbank gel&ouml;scht!
 en: Warning</b>: there already exists a database with the name "$o" in your
     <a href="gwsetup?lang=$l;v=list.htm">directory</a>. If you push the button
     "Ok" below, it will be erased.
@@ -34,6 +40,10 @@ sv: Varning</b>: det finns redan en databas med namnet "$o" i din
 ]<p>
 
 [
+de: Wenn du diese Operation gerade schonmal durchgef&uuml;hrt hat, war das 
+    wahrscheinlich das Ergebnis, und ist dann unwichtig. Andernfalls
+    kehre auf die vorherige Seite zur&uuml;ck und w&auml;hle einen
+    anderen Namen f&uuml;r deine Datenbank.
 en: If you just made this, it is probably its result, and therefore it is
     not important. Else, return to the previous page and choose another
     name for your database.
@@ -49,6 +59,8 @@ sv: Om du just gjorde detta, är den nu nog raderad och därför är det
 <p>
 
 [
+de: Wir legen nun eine Datenbank namens "$o" aus den folgenden
+    Datenbanken an:
 en: We are going to create a database named "$o" from the following databases:
 fr: Nous allonc cr&eacute;er une base de nom "$o" &agrave; partir des bases
     suivantes:
@@ -62,6 +74,10 @@ $s{<li>$a</b>|}
 <p>
 
 [
+de: Bemerkung: Diese Operation kann entweder innerhalb eines
+    Augenzwinkerns erledigt sein, oder aber einige Zehntelsekunden oder
+    mehrere Minuten dauern, abh&auml;ngig vom jeweiligen Fall. Bitte sei
+    geduldig.
 en: Remark: this operation can answer in the twinkling of a eye or take
     some tenths of seconds or some minutes, depending on the cases. Be
     patient.
@@ -75,11 +91,13 @@ sv: Obs: denna operation kan gå blixtsnabbt eller ta tiotalet
 <p>
 
 [
-en: Push the button below to create you database
+de: Dr&uuml;cke den Knopf unten um deine Datenbank anzulegen
+en: Push the button below to create your database
 fr: Appuyez sur le bouton ci-dessous pour cr&eacute;er votre base de
     donn&eacute;es
 sv: Klicka knappen nedan för att skapa din databas
 ]$v{[
+de:  und die vorige Datenbank "$o" im Zielverzeichnis zu &uuml;berschreiben
 en: , and overwrite the previous database "$o" of the target directory
 fr:  et &eacute;craser la base "$o" du r&eacute;pertoire d'arriv&eacute;e
 sv:  och skriva över den tidigare databasen "$o" i mål katalogen
@@ -95,6 +113,7 @@ $h
 <p>
 
 [
+de: Zur Information: Diese Operation entspricht folgenden Kommandos:
 en: For information, this operation corresponds to the following commands:
 fr: Pour information, cette op&eacute;ration correspond &agrave; la suite
     des commandes suivantes:
