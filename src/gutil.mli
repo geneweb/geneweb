@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.14 2004-07-18 14:26:38 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.15 2004-08-06 01:04:40 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -132,3 +132,7 @@ value consang : gen_ascend 'a -> Adef.fix;
 value no_ascend : unit -> gen_ascend 'a;
 value set_parents : gen_ascend 'a -> option 'a -> unit;
 value set_consang : gen_ascend 'a -> Adef.fix -> unit;
+
+value start_progr_bar : unit -> unit;
+value run_progr_bar : int -> int -> unit;
+value finish_progr_bar : unit -> unit;

@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 4.7 2004-08-05 19:41:05 ddr Exp $ *)
+(* $Id: consangAll.ml,v 4.8 2004-08-06 01:04:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -25,37 +25,13 @@ value relationship base tab ip1 ip2 =
   fst (Consang.relationship_and_links base tab False ip1 ip2)
 ;
 
-value progr_bar_size = 60;
-value progr_bar_draw_rep = 5;
-value progr_bar_draw = "|/-\\";
-value progr_bar_empty = '.';
-value progr_bar_full = '#';
-
-value progr_bar_draw_len = String.length progr_bar_draw;
-value progr_bar_cnt =
-  progr_bar_size * progr_bar_draw_rep * progr_bar_draw_len
-;
-
 value trace quiet cnt max_cnt =
   do {
-    if quiet then do {
-      let x = max_cnt - cnt in
-      let already_disp = x * progr_bar_size / max_cnt in
-      let to_disp = (x + 1) * progr_bar_size / max_cnt in
-      for i = already_disp + 1 to to_disp do {
-        Printf.eprintf "%c" progr_bar_full
-      };
-      let already_disp = x * progr_bar_cnt / max_cnt in
-      let to_disp = (x + 1) * progr_bar_cnt / max_cnt in
-      if cnt = 1 then Printf.eprintf " \008"
-      else if to_disp > already_disp then
-        let k = to_disp mod progr_bar_draw_len in
-        let k = if k < 0 then progr_bar_draw_len + k else k in
-        Printf.eprintf "%c\008" progr_bar_draw.[k]
-      else ()
+    if quiet then run_progr_bar (max_cnt - cnt) max_cnt
+    else do {
+      Printf.eprintf "%6d\008\008\008\008\008\008" cnt;
+      flush stderr;
     }
-    else Printf.eprintf "%6d\008\008\008\008\008\008" cnt;
-    flush stderr;
   }
 ;
 
@@ -92,10 +68,7 @@ value compute base from_scratch quiet =
     let most = ref None in
     Printf.eprintf "To do: %d persons\n" max_cnt;
     if max_cnt = 0 then ()
-    else if quiet then do {
-      for i = 1 to progr_bar_size do { Printf.eprintf "%c" progr_bar_empty };
-      Printf.eprintf "\013"
-    }
+    else if quiet then start_progr_bar ()
     else Printf.eprintf "Computing consanguinity...";
     flush stderr;
     let running = ref True in
@@ -150,7 +123,7 @@ value compute base from_scratch quiet =
       }
     };
     if max_cnt = 0 then ()
-    else if quiet then Printf.eprintf "\n"
+    else if quiet then finish_progr_bar ()
     else Printf.eprintf " done   \n";
     flush stderr;
   }

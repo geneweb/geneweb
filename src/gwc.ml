@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.22 2004-08-05 19:41:05 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.23 2004-08-06 01:04:40 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -22,6 +22,18 @@ value designation base p =
   let nom = p_surname base p in
   prenom ^ "." ^ string_of_int p.m_occ ^ " " ^ nom
 ;
+
+(*
+value output_item_value oc v =
+  Marshal.to_channel oc v [Marshal.No_sharing]
+;
+value input_item_value ic =
+  input_value ic
+;
+*)
+value output_item_value = Iovalue.output;
+value input_item_value = Iovalue.input;
+(**)
 
 value check_magic =
   let b = String.create (String.length magic_gwo) in
@@ -263,6 +275,12 @@ value insert_undefined gen key =
       }
       else ()
     else ();
+    if not gen.g_errored then do {
+      seek_out gen.g_per_index (Iovalue.sizeof_long * Adef.int_of_iper ip);
+      output_binary_int gen.g_per_index (pos_out gen.g_per);
+      output_char gen.g_per 'U';
+    }
+    else ();
     (x, ip)
   }
 ;
@@ -349,48 +367,36 @@ value insert_person gen so =
       let empty_string = unique_string gen "" in
       let x =
         {first_name = empty_string; surname = empty_string;
-         occ = 0; image = empty_string; first_names_aliases = [];
-         surnames_aliases = []; public_name = empty_string; qualifiers = [];
-         aliases = []; titles = []; rparents = []; related = [];
-         occupation = empty_string; sex = Neuter; access = IfTitles;
-         birth = Adef.codate_None; birth_place = empty_string;
-         birth_src = empty_string; baptism = Adef.codate_None;
-         baptism_place = empty_string; baptism_src = empty_string;
-         death = DontKnowIfDead; death_place = empty_string;
-         death_src = empty_string; burial = UnknownBurial;
-         burial_place = empty_string; burial_src = empty_string;
-         notes = empty_string; psources = empty_string;
+         occ = 0; image = unique_string gen so.image;
+         first_names_aliases =
+           List.map (unique_string gen) so.first_names_aliases;
+         surnames_aliases = List.map (unique_string gen) so.surnames_aliases;
+         public_name = unique_string gen so.public_name;
+         qualifiers = List.map (unique_string gen) so.qualifiers;
+         aliases = List.map (unique_string gen) so.aliases;
+         titles = List.map (title_unique_string gen) so.titles;
+         rparents = []; related = [];
+         occupation = unique_string gen so.occupation;
+         sex = Neuter; access = so.access;
+         birth = so.birth; birth_place = unique_string gen so.birth_place;
+         birth_src =  unique_string gen so.birth_src;
+         baptism = so.baptism;
+         baptism_place = unique_string gen so.baptism_place;
+         baptism_src = unique_string gen so.baptism_src;
+         death = so.death; death_place = unique_string gen so.death_place;
+         death_src = unique_string gen so.death_src; burial = so.burial;
+         burial_place = unique_string gen so.burial_place;
+         burial_src = unique_string gen so.burial_src;
+         notes = empty_string;
+         psources =
+           unique_string gen
+             (if so.psources = "" then default_source.val else so.psources);
          cle_index = ip}
       in
-      x.birth := so.birth;
-      x.birth_place := unique_string gen so.birth_place;
-      x.birth_src := unique_string gen so.birth_src;
-      x.baptism := so.baptism;
-      x.baptism_place := unique_string gen so.baptism_place;
-      x.baptism_src := unique_string gen so.baptism_src;
-      x.death := so.death;
-      x.death_place := unique_string gen so.death_place;
-      x.death_src := unique_string gen so.death_src;
-      x.burial := so.burial;
-      x.burial_place := unique_string gen so.burial_place;
-      x.burial_src := unique_string gen so.burial_src;
-      x.first_names_aliases :=
-        List.map (unique_string gen) so.first_names_aliases;
-      x.surnames_aliases := List.map (unique_string gen) so.surnames_aliases;
-      x.public_name := unique_string gen so.public_name;
-      x.image := unique_string gen so.image;
-      x.qualifiers := List.map (unique_string gen) so.qualifiers;
-      x.aliases := List.map (unique_string gen) so.aliases;
-      x.titles := List.map (title_unique_string gen) so.titles;
-      x.access := so.access;
-      x.occupation := unique_string gen so.occupation;
-      x.psources :=
-        unique_string gen
-          (if so.psources = "" then default_source.val else so.psources);
-      seek_out gen.g_per_index
-	(Iovalue.sizeof_long * (Adef.int_of_iper x.cle_index));
+      seek_out gen.g_per_index (Iovalue.sizeof_long * Adef.int_of_iper ip);
       output_binary_int gen.g_per_index (pos_out gen.g_per);
-      output_value gen.g_per (x : person);
+      output_char gen.g_per 'D';
+      output_item_value gen.g_per (x : person);
     }
     else ();
     (x, ip)
@@ -487,7 +493,7 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
     let moth_uni = uoi gen.g_base imere in
     seek_out gen.g_fam_index (Iovalue.sizeof_long * i);
     output_binary_int gen.g_fam_index (pos_out gen.g_fam);
-    output_value gen.g_fam (fam : family);
+    output_item_value gen.g_fam (fam : family);
     gen.g_base.c_couples.(gen.g_fcnt) := cpl;
     gen.g_base.c_descends.(gen.g_fcnt) := des;
     gen.g_fcnt := gen.g_fcnt + 1;
@@ -591,9 +597,9 @@ value insert_syntax fname gen =
 ;
 
 value insert_comp_families gen (x, separate, shift) =
-(*
+(**)
   let _ = do { Printf.eprintf "%s " x; flush stderr; } in
-*)
+(**)
   let ic = open_in_bin x in
   do {
     check_magic x ic;
@@ -634,7 +640,27 @@ value persons_cache per_index_ic per_ic persons =
       seek_in per_index_ic (Iovalue.sizeof_long * i);
       let pos = input_binary_int per_index_ic in
       seek_in per_ic pos;
-      let p : person = input_value per_ic in
+      let p : person =
+        match input_char per_ic with
+        [ 'D' -> input_item_value per_ic
+        | 'U' ->
+            let empty_string = Adef.istr_of_int 0 in
+            {first_name = empty_string; surname = empty_string;
+             occ = 0; image = empty_string; first_names_aliases = [];
+             surnames_aliases = []; public_name = empty_string;
+             qualifiers = [];
+             aliases = []; titles = []; rparents = []; related = [];
+             occupation = empty_string; sex = Neuter; access = IfTitles;
+             birth = Adef.codate_None; birth_place = empty_string;
+             birth_src = empty_string; baptism = Adef.codate_None;
+             baptism_place = empty_string; baptism_src = empty_string;
+             death = DontKnowIfDead; death_place = empty_string;
+             death_src = empty_string; burial = UnknownBurial;
+             burial_place = empty_string; burial_src = empty_string;
+             notes = empty_string; psources = empty_string;
+             cle_index = Adef.iper_of_int 0}
+        | _ -> assert False ]
+      in
       p.first_name := mp.m_first_name;
       p.surname := mp.m_surname;
       p.occ := mp.m_occ;
@@ -657,7 +683,7 @@ value families_cache fam_index_ic fam_ic len =
       seek_in fam_index_ic (Iovalue.sizeof_long * i);
       let pos = input_binary_int fam_index_ic in
       seek_in fam_ic pos;
-      let fam : family = input_value fam_ic in
+      let fam : family = input_item_value fam_ic in
       fam
     }
   in
@@ -672,7 +698,7 @@ value empty_base : Check.cbase =
 ;
 
 value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
-(*
+(**)
   let _ =
     do {
       Printf.eprintf "\npcnt %d persons %d\n" gen.g_pcnt
@@ -680,7 +706,7 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
       flush stderr;
     }
   in
-*)
+(**)
   let persons =
     let a = Array.sub gen.g_base.c_persons 0 gen.g_pcnt in
     do { gen.g_base.c_persons := [| |]; a }
@@ -693,7 +719,7 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
     let a = Array.sub gen.g_base.c_unions 0 gen.g_pcnt in
     do { gen.g_base.c_unions := [| |]; a }
   in
-(*
+(**)
   let _ =
     do {
       Printf.eprintf "fcnt %d families %d\n" gen.g_fcnt
@@ -701,7 +727,7 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
       flush stderr;
     }
   in
-*)
+(**)
   let couples =
     let a = Array.sub gen.g_base.c_couples 0 gen.g_fcnt in
     do { gen.g_base.c_couples := [| |]; a }
@@ -710,7 +736,7 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
     let a = Array.sub gen.g_base.c_descends 0 gen.g_fcnt in
     do { gen.g_base.c_descends := [| |]; a }
   in
-(*
+(**)
   let _ =
     do {
       Printf.eprintf "scnt %d strings %d\n" gen.g_scnt
@@ -718,7 +744,7 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
       flush stderr;
     }
   in
-*)
+(**)
   let strings =
     let a = Array.sub gen.g_base.c_strings 0 gen.g_scnt in
     do { gen.g_base.c_strings := [| |]; a }
