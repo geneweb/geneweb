@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.48 2001-02-16 05:36:49 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.49 2001-03-03 18:50:16 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -128,10 +128,10 @@ lajiteltuina
 - <input type=submit value="Ok">
 </form>
 
-<li>
+<!--<li>
 
 <a href="%sm=H;v=advanced"><font
-color=%i><b>erityishaulla</b></font></a>.
+color=%i><b>erityishaulla</b></font></a>.-->
 
 </ul>
 </td></tr></table></center>
