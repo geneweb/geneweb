@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.68 1999-07-01 08:06:40 ddr Exp $
+# $Id: lexicon.txt,v 2.69 1999-07-03 19:05:19 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2330,7 +2330,7 @@ se: namn "%s.%d %s" anv&auml;nds redan av %tdenna person%t
 
     navigation with %t as Sosa reference
 de: Navigation mit %t als Sosareferenz
-dk: navigering med %t som Sosa-nummer reference
+dk: navigering med %t som reference for fortl&oslash;bende anenummerering (Sosa o.a.)
 en: navigation with %t as Sosa reference
 es: navegaci&oacute;n con %t como referencia de Sosa
 fr: navigation avec %t comme r&eacute;f&eacute;rence Sosa

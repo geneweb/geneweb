@@ -13,6 +13,9 @@ GeneWeb version 2.05
 * GeneWeb to Gedcom (gwb2ged)
   - [Jul 2, 99] Generates dates of the form "FROM..TO.." for titles.
 
+* Lexicon (lang/lexicon.txt) and Welcome pages (*/start.txt)
+  - [Jun 3, 99] Updated Danish phrases (Hans Albeck)
+
 GeneWeb version 2.04
 --------------------
 
