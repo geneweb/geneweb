@@ -6,6 +6,11 @@ GeneWeb version 4.06
     specify the database directory.
 
 * GeneWeb server or CGI (gwd)
+  - [05 Mar 02] Fixed bug, in personal page: the circle before
+    children was supposed to be empty for the non married ones and full
+    for the married ones, but it did not work in all browser. Technical:
+    it was due to the <li> item type, wrongly written "disk" instead
+    of "disc".
   - [05 Mar 02] Fixed bug: the navigation supposed to avoid the
     "reloading" of pages (proposed in bottom of welcome pages) did not
     work immediately after updates.
