@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.4 2000-01-10 02:14:42 ddr Exp $ *)
+(* $Id: update.ml,v 3.5 2000-01-10 11:14:20 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -827,12 +827,12 @@ value print_family_stuff conf base p a u =
 ;
 
 value print conf base p =
+  let fn = p_first_name base p in
+  let sn = p_surname base p in
   let title h =
     do Wserver.wprint "%s" (capitale (transl conf "update"));
        if h then ()
        else
-         let fn = p_first_name base p in
-         let sn = p_surname base p in
          let occ =
            if fn = "?" || sn = "?" then Adef.int_of_iper p.cle_index
            else p.occ
@@ -861,7 +861,8 @@ value print conf base p =
            Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a><br>\n"
              (commd conf) (Adef.int_of_iper p.cle_index)
              (capitale (transl_decline conf "modify" ""));
-           if conf.can_send_image && sou base p.image = "" then
+           if conf.can_send_image && sou base p.image = "" && fn <> "?"
+           && sn <> "?" then
              do Wserver.wprint "<a href=\"%sm=SND_IMAGE;i=%d\">%s</a><br>\n"
                   (commd conf) (Adef.int_of_iper p.cle_index)
                   (capitale

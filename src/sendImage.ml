@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 3.0 1999-10-29 10:31:35 ddr Exp $ *)
+(* $Id: sendImage.ml,v 3.1 2000-01-10 11:14:19 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -25,12 +25,8 @@ value print_send_image conf base p =
        else
          let fn = p_first_name base p in
          let sn = p_surname base p in
-         let occ =
-         if fn = "?" || sn = "?" then Adef.int_of_iper p.cle_index
-           else p.occ
-         in
          do Wserver.wprint ": ";
-            Wserver.wprint "%s.%d %s" fn occ sn;
+            Wserver.wprint "%s.%d %s" fn p.occ sn;
          return ();
     return ()
   in
@@ -61,7 +57,10 @@ value print conf base =
   match p_getint conf.env "i" with
   [ Some ip ->
       let p = base.data.persons.get ip in
-      if sou base p.image <> "" then incorrect_request conf
+      let fn = p_first_name base p in
+      let sn = p_surname base p in
+      if sou base p.image <> "" || fn = "?" || sn = "?" then
+        incorrect_request conf
       else print_send_image conf base p
   | _ -> incorrect_request conf ]
 ;
