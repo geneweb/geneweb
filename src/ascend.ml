@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.7 2001-05-15 13:56:57 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.8 2001-07-03 06:22:11 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -2024,7 +2024,9 @@ value build_surnames_list conf base v p =
   in
   let rec loop lev sosa p surn dp =
     if mark.(Adef.int_of_iper p.cle_index) = 0 then ()
-    else if lev = v then add_surname sosa p surn dp
+    else if lev = v then
+      if conf.hide_names && not (fast_auth_age conf p) then ()
+      else add_surname sosa p surn dp
     else do {
       mark.(Adef.int_of_iper p.cle_index) :=
         mark.(Adef.int_of_iper p.cle_index) - 1;
