@@ -31,11 +31,14 @@ GeneWeb version 3.05
     containing several (at least two) indications between parentheses.
 
 * Base configuration files (base.gwf)
+  - [25 May 00] Added variable "images_path" to specify a path to access
+    the images defined in the "image" field (i.e *not* added by "send image").
   - [08 May 00] (detail) The possible trailing spaces or control-m are
     now stripped (allowing to move a base.gwf file from Windows to
     Unix without needing to remove them).
 
 * Documentation
+  - [25 May 00] Updated German documentation (Falko Trojahn).
   - [06 May 00] Updated Swedish documentation (Lars Gustavsson).
   - [04 May 00] Added one item in FAQ about a possible problem in CGI mode.
 
