@@ -1,12 +1,125 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>GeneWeb</title></head>
-<body bgcolor="#d6bfaf">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>GeneWeb - Modifiering av sidor</TITLE>
+<META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#d6bfaf">
 
-<h1>Translation soon available</h1>
+<H1>GeneWeb - Modifiering av sidor</H1>
+<P>Denna del visar hur man modifierar v&auml;lkomst sidan och g&ouml;ra associerade sidor. Det &auml;r skrivet f&ouml;r personer som redan har anv&auml;nt <EM>GeneWeb</EM> och som vill g&aring; in p&aring; detaljer. </P>
 
-<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
-GeneWeb</em></font><br>
+<UL>
+<LI><A HREF="#Wel">V&auml;lkomst sidan</A> </LI>
+<LI><A HREF="#Mac">Makros</A> </LI>
+<LI><A HREF="#Ass">Associerade sidor</A> </LI></UL>
 
-</body>
+<H4><A NAME="Wel">V&auml;lkomst sidan</A></H4>
+<P>V&auml;lkomst sidan &auml;r uppbyggd fr&aring;n en text fil, "start.txt" som ing&aring;r i <EM>GeneWeb</EM>. Det &auml;r m&ouml;jligt att modifiera denna fil och/eller g&ouml;ra en speciell version f&ouml;r en databas. </P>
+<P>Denna fil inneh&aring;ller HTML kod mixat med "makros" (se n&auml;sta del). Om du vill skapa eller &auml;ndra en s&aring;dan fil, anv&auml;nd inte en HTML editor, utan en normal text editor. </P>
+<P>F&ouml;r att skapa v&auml;lkomst sidan f&ouml;r databasen "foo", kommer <EM>GeneWeb</EM> att leta efter f&ouml;ljande filer, i denna ordning: </P>
 
+<UL>
+<LI>bdir/lang/lg/toto.txt </LI>
+<LI>hdir/lang/lg/toto.txt </LI>
+<LI>bdir/lang/toto.txt </LI>
+<LI>hdir/lang/toto.txt </LI>
+<LI>bdir/lang/lg/start.txt </LI>
+<LI>hdir/lang/lg/start.txt </LI>
+<LI>bdir/lang/start.txt </LI>
+<LI>hdir/lang/start.txt </LI></UL>
+
+<P>d&auml;r: </P>
+
+<UL>
+<LI>"bdir" = v&auml;rdet av "-bd" till kommandot "gwd" (default: nuvarande katalog). </LI>
+<LI>"hdir" = v&auml;rdet av "-hd" till kommandot "gwd" (default: nuvarande katalog). </LI>
+<LI>"lg" = nuvarande spr&aring;k. </LI></UL>
+
+<P>Filen "hdir/lang/lg/start.txt" ing&aring;r. F&ouml;r att skapa den modifierade filen, &auml;r det enklast att starta fr&aring;n en kopia av filen "start.txt" som du sedan kan &auml;ndra som du vill. Om presentationen av filen "start.txt" inte passar dig kan du ocks&aring; &auml;ndra den direkt. </P>
+<P>En varning: fr&aring;n en version av <EM>GeneWeb</EM> till n&auml;sta kan filen "start.txt" ha f&ouml;rb&auml;ttrats. Om du installerar en ny version och vill dra nytta av f&ouml;rb&auml;ttringarna, titta i filen "start.txt" f&ouml;r att se var den har &auml;ndrats och kopiera in dessa &auml;ndringar in din modifierade fil. </P>
+<H4>Makro<A NAME="Mac">s</A></H4>
+<P>Som sades tidigare, v&auml;lkomst sidan &auml;r inte i ren HTML kod. Den inneh&aring;ller "makros". Det &auml;r sekvenser som b&ouml;rjar med ett tecken "%" f&ouml;ljt av en bokstav. Exempel: "%s", "%x", etc. </P>
+<P>Dessa makros bytts ut mot v&auml;rden vilka beror p&aring; sammanhanget: namnet p&aring; databasen, spr&aring;ket, antal personer i databasen, etc. </P>
+<P>Det &auml;r ocks&aring; en speciell behandling f&ouml;r hakarna "[" och "]": om texten mellan hakarna &auml;r &ouml;versatt till det nuvarande spr&aring;ket fr&aring;n lexikonet (filen "lexicon.txt") med de f&ouml;ljande modifieringarna: </P>
+
+<UL>
+<LI>Om det &auml;r en stj&auml;rna efter start haken, &auml;r den f&ouml;rsta bokstaven av &ouml;vers&auml;ttningen om gjord till versal. </LI>
+<LI>Om den avslutande haken &auml;r f&ouml;ljt av ett nummer, korresponderar det till den N-2 f&ouml;rekomsten f&ouml;r &ouml;vers&auml;ttningen (startar med 0), f&ouml;rekomsterna &auml;r separerade med "/". Om denna f&ouml;rekomst inte existerar, tas den f&ouml;rsta. </LI></UL>
+
+<P>F&ouml;r att f&ouml;rst&aring; hur makros anv&auml;nds, &auml;r det b&auml;st att titta p&aring; filen "start.txt" som ing&aring;r. </P>
+<P>H&auml;r &auml;r betydelsen f&ouml;r makrona "%": </P>
+
+<UL>
+<STRONG><LI>Databas. </LI>
+
+<UL>
+</STRONG><LI>"<TT>%t</TT>": namnet p&aring; databasen. </LI>
+<LI>"<TT>%f</TT>": i server mod, namnet p&aring; databasen, f&ouml;ljt av ett m&ouml;jligt passord (t.ex.: "foo_xyzzy"); i CGI mod, namnet p&aring; CGI kommandot (t.ex.: "gwd.exe"). </LI>
+<LI>"<TT>%g</TT>": i server mod, som "%f"; i CGI mode, namnet p&aring; CGI kommandot f&ouml;ljt av "?b=", namnet p&aring; databasen och ett semikolon (t.ex.: "gwd.exe?b=foo;"). </LI>
+<LI>"<TT>%s</TT>": v&auml;rdet av "%f" f&ouml;ljt av ett fr&aring;getecken och variabler beroende p&aring; sammanhanget (se nedan) f&ouml;ljt av ett semikolon. T.ex.: "foo?lang=it;iz=8233;". </LI></UL>
+
+<STRONG><LI>Uppr&auml;kning. </LI>
+
+<UL>
+</STRONG><LI>"<TT>%c</TT>": antal &aring;tkomster till v&auml;lkomst sidan. </LI>
+<LI>"<TT>%q</TT>": antal f&ouml;rfr&aring;gningar. </LI>
+<LI>"<TT>%d</TT>": datum f&ouml;r den f&ouml;rsta konsultationen. </LI></UL>
+
+<STRONG><LI>Villkor. </LI>
+
+<UL>
+</STRONG><LI>"<TT>%w... %w</TT>": visning om "wizard". </LI>
+<LI>"<TT>%x... %x</TT>": visning om "wizard" eller "friend". </LI>
+<LI>"<TT>%y... %y</TT>": visning om "server" mod (ej CGI) och inte "wizard". </LI>
+<LI>"<TT>%z... %z</TT>": visning om "server" mod (not CGI) och varken "wizard" eller "friend". </LI>
+<LI>"<TT>%i... %i</TT>": visning om i CGI mod. </LI></UL>
+
+<STRONG><LI>Andra. </LI>
+
+<UL>
+</STRONG><LI>"<TT>%r</TT>" f&ouml;ljt av ett namn och ny rad: till&auml;gg till filen "name.txt". </LI>
+<LI>"<TT>%b</TT>": v&auml;rdet p&aring; variabeln "body_prop" till filen "foo.cnf" f&ouml;r databasen "foo". </LI>
+<LI>"<TT>%h</TT>": variabler beroende p&aring; sammanhanget (se nedan) p&aring; formen "&lt; input type=hidden name=var value=val&amp;gt". </LI>
+<LI>"<TT>%l</TT>": spr&aring;k. </LI>
+<LI>"<TT>%n</TT>": antal personer i databasen. </LI>
+<LI>"<TT>%%</TT>": endast ett "%". </LI>
+<LI>"<TT>%[</TT>": "[". </LI>
+<LI>"<TT>%]</TT>": "]". </LI></UL>
+</UL>
+
+<P>En del makros refererar till <STRONG>variabler beroende p&aring; sammanhanget</STRONG>. Dessa &auml;r: </P>
+
+<UL>
+<LI>b: i CGI mod, databasens namn. </LI>
+<LI>lang: spr&aring;k. </LI>
+<LI>iz: antal personer med generationsnummer (&auml;ven kallat Sosa referens) om n&aring;gra. </LI></UL>
+
+<P>Det <STRONG>konditionella</STRONG> kan inte &ouml;verlappa: man kan inte s&auml;tta en "<TT>%w... %w</TT>" inuti en "<TT>%i... %i</TT>". </P>
+<H4><A NAME="Ass">Associerade sidor</A></H4>
+<P>P&aring; din anpassade v&auml;lkomst sida kan du s&auml;tta in l&auml;nkar till associerade filer som kommer att behandlas av <EM>GeneWeb</EM> p&aring; samma s&auml;tt: makrona kommer att bli transformerade. </P>
+<P>Till exempel, om du vill skapa en speciell sida f&ouml;r en k&auml;nd person fr&aring;n din databas, skapa en fil ben&auml;mnd "famous.txt" och i katalogen "bdir/lang/lg" eller i katalogen "bdir/lang" (se f&ouml;rsta delen). </P>
+<P>F&ouml;rfr&aring;gningarna till "famous.txt" &auml;r: "m=H;v=famous". P&aring; v&auml;lkomst sidan, skriver du: </P>
+<PRE>
+   &lt;a href="%sm=H;v=famous"&gt;K&auml;nda&lt;/a&gt; personer i min
+   databas.</PRE>
+<P>I "famous.txt", kan du l&auml;gga in l&auml;nkar till personer i din databas, oberoende fr&aring;n hans namn och fr&aring;n sammanhanget, anv&auml;ndandes makros. </P>
+<P>De riktigt intressanta makron &auml;r: </P>
+
+<UL>
+<LI>"<TT>%b</TT>" du kan s&auml;tta in en tag "&lt;body&gt;" genom att skriva "&lt;body%b&gt;". </LI>
+<LI>"<TT>%s</TT>" du kan anv&auml;nda i l&auml;nkar. </LI></UL>
+
+<P>Exempel p&aring; mening i "famous.txt": </P>
+<PRE>
+   Se min kusin &lt;a href="%sp=louis;n=de+bourbon;oc=5"&gt;
+   Ludvig XIV&lt;/a&gt; och min
+   &lt;a href="%em=R;ep=bertil;en=svensson;m=NG;n=louis+xiv;t=PN"&gt;
+   sl&auml;ktskaps l&auml;nk&lt;/a&gt; med honom.</PRE>
+<P>Se ocks&aring; hur du g&ouml;r korrekta <A HREF="links.htm">l&auml;nkar</A> till <EM>GeneWeb</EM> sidor. </P>
+<P>Notera att "avancerad f&ouml;rfr&aring;gan" fungerar som en associerad fil ben&auml;mnd "advanced.txt". </P>
+<P>Tillbaka till <A HREF="diruse.htm">bruksanvisningen</A>. </P>
+<P><HR></P>
+<FONT SIZE=2><EM><P>&copy; Copyright INRIA 1999 - GeneWeb</P></FONT></EM></BODY>
+</HTML>
