@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.43 2005-02-05 11:36:30 ddr Exp $ *)
+(* $Id: forum.ml,v 4.44 2005-02-19 17:57:38 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -264,10 +264,12 @@ value header_txt conf i = transl_nth conf "ident/email/subject" i;
 
 value print_add_message conf =
   tag "form" "method=\"get\" action=\"%s\"" conf.command begin
-    Util.hidden_env conf;
-    Wserver.wprint "<input type=\"hidden\" name=\"m\" value=\"FORUM_ADD\">\n";
-    Wserver.wprint "<input type=\"submit\" value=\"%s\">\n"
-      (capitale (transl_decline conf "add" (message_txt conf 0)));
+    tag "p" begin
+      Util.hidden_env conf;
+      xtag "input" "type=\"hidden\" name=\"m\" value=\"FORUM_ADD\"";
+      xtag "input" "type=\"submit\" value=\"%s\""
+        (capitale (transl_decline conf "add" (message_txt conf 0)));
+    end;
   end
 ;
 
@@ -383,52 +385,61 @@ value print_one_forum_message conf m pos next_pos forum_length =
     header_no_page_title conf title;
     print_link_to_welcome conf True;
     tag "ul" begin
-      Wserver.wprint "<li><a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
+      Wserver.wprint "<li><a href=\"%sm=FORUM\">%s</a></li>\n" (commd conf)
         (capitale (transl conf "database forum"));
-      Wserver.wprint "<li>";
-      loop pos where rec loop pos =
-        if pos = forum_length then Wserver.wprint "&nbsp;"
-        else
-          let back_pos = backward_pos conf pos in
-          match get_message conf back_pos with
-          [ Some (m, _, _, _) ->
-              if m.m_access = "priv" && not conf.wizard && not conf.friend then
-                loop back_pos
-              else if back_pos <> pos then
-                Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n"
-                  (commd conf) back_pos (capitale (message_txt conf 3))
-              else Wserver.wprint "&nbsp;"
-          | None -> Wserver.wprint "&nbsp;" ];
-      Wserver.wprint "<li>";
-      loop next_pos where rec loop next_pos =
-        if next_pos > 0 then
-          match get_message conf next_pos with
-          [ Some (m, next_pos, next_next_pos, _) ->
-              if m.m_access = "priv" && not conf.wizard && not conf.friend then
-                loop next_next_pos
-              else
-                Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n"
-                  (commd conf) next_pos (capitale (message_txt conf 1))
-          | None -> Wserver.wprint "&nbsp;" ]
-        else Wserver.wprint "&nbsp;";
+      tag "li" begin
+        loop pos where rec loop pos =
+          if pos = forum_length then Wserver.wprint "&nbsp;"
+          else
+            let back_pos = backward_pos conf pos in
+            match get_message conf back_pos with
+            [ Some (m, _, _, _) ->
+                if m.m_access = "priv" && not conf.wizard && not conf.friend
+                then
+                  loop back_pos
+                else if back_pos <> pos then
+                  Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n"
+                    (commd conf) back_pos (capitale (message_txt conf 3))
+                else Wserver.wprint "&nbsp;"
+            | None -> Wserver.wprint "&nbsp;" ];
+      end;
+      tag "li" begin
+        loop next_pos where rec loop next_pos =
+          if next_pos > 0 then
+            match get_message conf next_pos with
+            [ Some (m, next_pos, next_next_pos, _) ->
+                if m.m_access = "priv" && not conf.wizard && not conf.friend
+                then
+                  loop next_next_pos
+                else
+                  Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n"
+                    (commd conf) next_pos (capitale (message_txt conf 1))
+            | None -> Wserver.wprint "&nbsp;" ]
+          else Wserver.wprint "&nbsp;";
+      end;
     end;
-    Wserver.wprint "<p>\n";
-    Wserver.wprint "<strong>%s</strong>\n" (secure m.m_ident);
-    if m.m_email <> "" then
-      let email = secure m.m_email in
-      Wserver.wprint " <a href=\"mailto:%s\">%s</a>\n" email email
-    else ();
-    Wserver.wprint "<br>\n";
-    if m.m_subject <> "" then
-      Wserver.wprint "<b>%s: %s</b>\n<br>\n"
-        (capitale (header_txt conf 2)) (secure m.m_subject)
-    else ();
-    if m.m_access = "priv" then
-      Wserver.wprint "<b>%s: %s</b>\n<br>\n"
-        (capitale (transl conf "access")) (transl conf "private")
-    else ();
-    Wserver.wprint "<em>%s</em>\n" m.m_time;
-    Wserver.wprint "<dl><dt><dd>\n";
+    tag "p" begin
+      Wserver.wprint "<strong>%s</strong>\n" (secure m.m_ident);
+      if m.m_email <> "" then
+        let email = secure m.m_email in
+        Wserver.wprint " <a href=\"mailto:%s\">%s</a>\n" email email
+      else ();
+      xtag "br";
+      if m.m_subject <> "" then do {
+        Wserver.wprint "<b>%s: %s</b>\n"
+          (capitale (header_txt conf 2)) (secure m.m_subject);
+        xtag "br";
+      }
+      else ();
+      if m.m_access = "priv" then do {
+        Wserver.wprint "<b>%s: %s</b>\n"
+          (capitale (transl conf "access")) (transl conf "private");
+        xtag "br";
+      }
+      else ();
+      Wserver.wprint "<em>%s</em>\n" m.m_time;
+    end;
+    Wserver.wprint "<dl><dd>\n";
     if browser_doesnt_have_tables conf then ()
     else
       Wserver.wprint
@@ -444,8 +455,8 @@ value print_one_forum_message conf m pos next_pos forum_length =
     in
     Wserver.wprint "%s\n" (string_with_macros conf True [] mess);
     if browser_doesnt_have_tables conf then ()
-    else Wserver.wprint "</table>";
-    Wserver.wprint "</dl>\n";
+    else Wserver.wprint "</td></tr></table>";
+    Wserver.wprint "</dd></dl>\n";
     if m.m_wizard <> "" && conf.wizard && conf.user = m.m_wizard &&
       passwd_in_file conf
     then
@@ -521,7 +532,8 @@ value print_add conf base =
       html_p conf;
       Wserver.wprint "%s<br>\n"
         (capitale (Gutil.nominative (message_txt conf 0)));
-      stag "textarea" "name=\"Text\" rows=\"15\" cols=\"70\" wrap=\"soft\"" begin end;
+      stag "textarea" "name=\"Text\" rows=\"15\" cols=\"70\" wrap=\"soft\""
+      begin end;
       Wserver.wprint "\n<br>\n";
       if conf.wizard || conf.friend then
         do {
