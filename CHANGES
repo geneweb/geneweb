@@ -26,8 +26,11 @@ GeneWeb version 4.08
   - [11 Sep 02] Added Italian for documentation (Latino Imparato).
 
 * Base configuration files (base.gwf)
+  - [22 Oct 02] Addes configuration variable propose_place_surnames to
+    propose or not the displaying by place / surnames in the welcome
+    page (defaut: yes).
   - [31 Aug 02] Added configuration variable max_cousins_level to specify
-    the maximum level of displayed cousins.
+    the maximum level of displayed cousins (default: 5)
 
 GeneWeb version 4.07
 --------------------
