@@ -97,6 +97,10 @@ function WorkOnBrowser() {
  onmouseover="if (WorkOnBrowser()) iru.src='%o/t-ru.gif'"
  onmouseout="iru.src='%o/l-ru.jpg'">
 <img src="%o/l-ru.jpg" width=36 height=22 alt=%uru; name=iru border=0></a>
+<a href="%glang=sl"
+ onmouseover="if (WorkOnBrowser()) isl.src='%o/t-sl.gif'"
+ onmouseout="isl.src='%o/l-sl.jpg'">
+<img src="%o/l-sl.jpg" width=36 height=22 alt=%usl; name=isl border=0></a>
 <a href="%glang=sv"
  onmouseover="if (WorkOnBrowser()) ise.src='%o/t-sv.gif'"
  onmouseout="ise.src='%o/l-se.jpg'">
@@ -120,3 +124,21 @@ fr: Maintenance! les droits des magiciens sont momentanément suspendus...
 
 <p>
 %E
+
+<p><table border=1><tr><td><strong><font color=red>[
+en: Information about network cut (updated Thu 11 Apr 07:00 GMT).<p>
+    Monday 8th, 21:57 GMT to Wednesday 10th, 08:10 GMT. INRIA
+    was disconnected from the network, E-mail included.
+    It seems that RERIF (France Telecom) changed some machines but had
+    problems to "interconnect" them (no more information from them).<p>
+    We are sorry for these problems independant from our will.<p>
+    Daniel de Rauglaudre
+fr: Information coupure (mis à jour jeudi 11 avril 09:05).<p>
+    Coupure de lundi 8, 23h57 au mercredi 10, 10h10 (heure de Paris):
+    l'INRIA était déconnectée du réseau, y compris pour les courriels.
+    Il semble que RERIF (France Télécom) ait changé des machines, mais
+    qu'ils n'arrivaient pas à les "interconnecter" (pas davantage
+    d'informations de leur part).<p>
+    Nous sommes désolés pour ces problèmes indépendants de notre volonté.<p>
+    Daniel de Rauglaudre
+]</font></strong></td></tr></table><p>

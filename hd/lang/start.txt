@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.27 2002-04-04 10:57:15 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.28 2002-04-11 07:48:59 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -25,6 +25,7 @@ no: Genealogi
 pl: Genealogia
 pt: Genealogia
 ru: Genealogy
+sl: Genealogija - Drevo ¾ivljenja
 sv: Genealogi
 ] - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -61,6 +62,7 @@ no: Genealogisk<br>database
 pl: Genealogiczna<br>baza danych
 pt: Base de Dados<br>Geneal&oacute;gica
 ru: Ãåíåaëîãè÷åñêàÿ<br>áàçà äàííûõ
+sl: Genealo¹ka<br>baza podatkov
 sv: Genealogisk<br>databas
 zh: ÍøÂç¼ÒÆ×
 ]</font></h1></table>
@@ -91,6 +93,7 @@ lv: Jûs variet apskatît datu bâzi arî citâs sekojoğâs valodâs:
 no: Du kan velge sidevisning p&aring; et annet spr&aring;k blant
     f&oslash;lgende:
 pl: Mo¿esz wybraæ inny jêzyk spo¶ród nastêpuj±cych:
+sl: Lahko izberete drug jezik:
 sv: Du kan välja ett annat språk bland de följande:
 ]</em></font>
 
@@ -135,6 +138,7 @@ pt: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
 pt-br: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
     atualmente %n pessoas.
 ru: Áàçà äàííûõ <font color=%i><b>"%t"</b></font> ñåé÷àñ ñîäåğæèò %n ÷åëîâåê.
+sl: Baza podatkov <font color=%i><b>"%t"</b></font> vsebuje %n oseb.
 sv: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
     %n personer.
 zh: ÏÖÓĞ %n ÈËÔÚÊı¾İ¿âÖĞ¡£
@@ -166,6 +170,7 @@ nl: Toegang als <a href="%sw=w"><em>tovenaar</em></a><br> (wachtwoord)
 no: <a href="%sw=w"><em>Oppdaterings</em></a> adgang<br> (passord)
 pl: <a href="%sw=w"><em>"Wizard"</em></a> dostêp<br> (has³o)
 pt: Entrada <a href="%sw=w"><em>feiticeiro</em></a><br> (palavra chave)
+sl: Urejanje kot <a href="%sw=w"><em>"èarovnik"</em></a> (geslo)
 sv: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
 ]<br></td>
 
@@ -189,6 +194,7 @@ nl: Toegang als <a href="%sw=f"><em>vriend</em></a><br> (wachtwoord)
 no: <a href="%sw=f"><em>Venners</em></a> adgang<br> (passord)
 pl: <a href="%sw=f"><em>"Friend"</em></a> dostêp<br> (has³o)
 pt: Entrada <a href="%sw=f"><em>amigo</em></a><br> (palavra chave)
+sl: Urejanje kot <a href="%sw=f"><em>prijatelj</em></a><br> (geslo)
 sv: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
 ]</td>
 
@@ -253,6 +259,7 @@ no: For &aring; navigere i databasen, kan du s&oslash;ke:
 pl: Aby poruszaæ siê po bazie, mo¿esz:
 pt: Para consultar esta base de dados, pode procurar:
 ru: ×òîáû íàéòè â ıòîé áàçå äàííûõ, Âû ìîæåòå èñêàòü:
+sl: Da bi pregledali va¹o bazo podatkov, lahko i¹èete:
 sv: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
 zh:
 ]<br><p>
@@ -284,6 +291,7 @@ no: etter person
 pl: znale¼æ osobê:
 pt: por pessoa
 ru: ïî ÷åëîâåêó
+sl: osebo:
 sv: efter person
 zh: ËÑË÷£º
 ]</b></font>
@@ -327,6 +335,7 @@ no: etter titel
 pl: znale¼æ: tytu³
 pt: por t&iacute;tulo
 ru: ïî òèòóëó
+sl: naziv:
 sv: efter titel
 zh: ¸ù¾İÃûÏÎ
 ]</b></font>%INl<br>%E
@@ -369,6 +378,7 @@ no: <font color=%i><b>med liste</b></font> over alle
 pl: <font color=%i><b>przejrzeæ listê</b></font> wszystkich
 pt: <font color=%i><b>pela lista</b></font> de todos os
 ru: <font color=%i><b>ïî ñïèñêó</b></font>  âñåõ
+sl: <font color=%i><b>seznam</b></font> vseh
 sv: <font color=%i><b>efter listan</b></font> av alla
 zh: ÏÔÊ¾ËùµÄ
 ]
@@ -395,6 +405,7 @@ pl: nazwisk
 pt: apelidos
 pt-br: sobrenomes
 ru: ôàìèëèé
+sl: priimkov
 sv: efternamn
 zh: ĞÕ
 ]
@@ -420,6 +431,7 @@ pl: imion
 pt: nomes pr&oacute;prios
 pt-br: prenomes
 ru: èì¸í
+sl: osebnih imen
 sv: f&ouml;rnamn
 zh: Ãû
 ]
@@ -445,6 +457,7 @@ no: sortert
 pl: u³o¿onych
 pt: por
 ru: óïîğÿäî÷åííûõ
+sl: po
 sv: sorterade i
 zh: ¸ù¾İ
 ]
@@ -470,6 +483,7 @@ no: alfabetisk
 pl: w porz±dku alfabetycznym
 pt: ordem alfab&eacute;tica
 ru: ïî àëôàâèòó
+sl: abecednem redu
 sv: bokstavsordning
 zh: ×ÖÄ¸Ğò
 ]
@@ -494,6 +508,7 @@ no: etter frekvens
 pl: wed³ug czêsto¶ci wystêpowania
 pt: frequ&ecirc;ncia
 ru: ïî ÷àñòîòå
+sl: pogostosti
 sv: frekvensordning
 zh: ·ÃÎÊ´ÎÊı
 ]
@@ -528,6 +543,7 @@ nl: via
 no: etter
 pl: przejrzeæ listê:
 pt: por
+sl: 
 sv: efter
 ] [place] / [surname/surnames]0</b></font>
 - [birth] <input type=checkbox name=bi value=on checked>
@@ -597,6 +613,9 @@ pt: <font color=%i><b>por</b></font>
 ru: <font color=%i><b>÷åğåç</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>ğàñøèğåííûé
        çàïğîñ</b></font></a>.
+sl: <font color=%i><b>s pomoèjo</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>naprednega iskanja
+       </b></font></a>.
 sv: <font color=%i><b>genom</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>avancerad
        s&ouml;kning</b></font></a>.
@@ -627,6 +646,7 @@ no: Du kan
 pl: Mo¿esz:
 pt: Pode
 ru: Âû ìîæåòå
+sl: Lahko:
 sv: Du kan
 zh:
 ]<br><p>
@@ -656,6 +676,7 @@ no: legge til en familie
 pl: dodaæ rodzinê (parê)
 pt: acrescentar uma família
 ru: äîáàâèòü ñåìüş
+sl: dodate dru¾ino
 sv: l&auml;gga till en familj
 zh: Ôö¼Ó¼ÒÍ¥¼ÇÂ¼
 ]</a>
@@ -684,6 +705,7 @@ no: endre notater
 pl: zmodyfikowaæ uwagi
 pt: modificar as notas
 ru: èçìåíèòü çàìåòêó
+sl: spremenite zapiske
 sv: &auml;ndra noteringar
 ]</a>
 </ul>
@@ -715,6 +737,7 @@ no: Du kan ogs&aring; sl&aring; opp
 pl: Mo¿esz tak¿e obejrzeæ:
 pt: Tamb&eacute;m pode consultar
 ru: Âû ìîæåòå òàêæå îáğàòèòüñÿ ê
+sl: Lahko pregledate:
 sv: Du kan ocks&aring; konsultera
 zh:
 ]<br><p>
@@ -768,6 +791,7 @@ no: Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
 pl: Baza zosta³a od %d odwiedzona %q razy (w tym %c razy strona tytu³owa).
 pt: Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
 ru: Âñåãî áûëî %q îáğàùåíèé, èç íèõ %c ê ıòîé ñòğàíèöå, íà÷èíàÿ ñ %d.
+sl: %q dostopov, %c od teh na to stran, od %d.
 sv: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
     sedan %d.
 zh: ÒÑ¾­ÓĞ %q ´Î·ÃÎÊÊı¾İ¿â£¬ÆäÖĞ %c ´Î·ÃÎÊ±¾Ö÷Ò³£¬ ×Ô´Ó %d¡£
@@ -834,6 +858,9 @@ pt-br: Se o seu <i>browser</i> n&atilde;o atualiza automaticamente as
     p&aacute;ginas modificadas (for&ccedil;ando a fazer
     "reload current document"), tente navegar desde <a
     href="%sescache=0">este link</a>.
+sl: Èe va¹ brskalnik ne more obnavljati strani avtomatièno (morate
+    "reload current document"), kliknite <a
+    href="%sescache=0">tukaj</a>.
 sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
     navigera <a href="%sescache=0">härifrån</a>.
@@ -858,6 +885,7 @@ fr: lexique
 he: ì÷ñé÷åï 
 no: leksikon
 pl: leksykon
+sl: leksikon
 sv: lexikon
 zh: ±¾Õ¾Ê¹ÓÃµÄÊõÓï
 ]</a></em></font></p>
