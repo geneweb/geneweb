@@ -10,6 +10,10 @@ GeneWeb Version 3.01
   - [Nov 5, 99] Red display title for not found persons.
   - [Nov 5, 99] Lengthened the height of the data base notes area.
 
+* GeneWeb compiler (gwc) and uncompiler (gwu) 
+  - [Nov 9, 99] Fixed problem for titles holding the character colon. The
+    gwc raised syntax error.
+
 * Gedcom to GeneWeb (ged2gwb)
   - [Nov 8, 99] Fixed little problem with TITL field: could sometimes create
     bad titles names without label an place for gedcoms not coming from
