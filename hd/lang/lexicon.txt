@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.214 2004-12-20 10:57:39 ddr Exp $
+# $Id: lexicon.txt,v 4.215 2004-12-22 09:29:36 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !charset
@@ -2267,6 +2267,7 @@ zh:  іцЙъУЪЅсИХµДјЗВј
 bg: рамка
 br: bord 
 ca: contorn
+cs: okraj
 da: ramme
 de: Rand
 en: border
@@ -2751,6 +2752,7 @@ sv: klicka "%s"
 bg: цвят
 br: liv
 ca: color
+cs: barva
 da: farve
 de: Farbe
 en: colour
@@ -5905,6 +5907,7 @@ sv: inga tr&auml;ffar
 bg: не се споменава
 br: meneg ebet
 ca: no esmentat
+cs: bez zmГ­nky
 da: andet
 de: nicht erv&auml;hnt
 en: no mention
@@ -6062,6 +6065,7 @@ zh: ±ёЧў
 bg: бележките са променени
 br: notenno&ugrave; kemmet
 ca: notes modificades
+cs: poznГЎmky zmД›nД›ny
 da: noter &aelig;ndret
 de: ge&auml;nderte Notizen
 en: notes modified
@@ -7772,6 +7776,7 @@ sv: de %d f&ouml;rnamnen
 
     the %d oldest couples perhaps still alive and engaged
 bg: най-отдавнашните %d двойки от евентуално още живи и сгодени лица
+cs: %d nejstarЕЎГ­ch pГЎrЕЇ je zЕ™ejmД› stГЎle ЕѕijГ­cГ­ch a zadanГЅch
 da: og de %d &aelig;ldste par muligvis stadig i live og forlovede
 de: Die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
 en: the %d oldest couples perhaps still alive and engaged
