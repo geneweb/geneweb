@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 4.1 2001-03-31 03:39:25 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.2 2001-03-31 04:46:00 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -194,7 +194,7 @@
       , [having as children]0
       <ul>
         %foreach;child;
-          <li type=%if;(nb_families=0);circle%else;disk%end;>
+          <li type=%if;child.has_families;disk%else;circle%end;>
 	  %if;cancel_links;%child.child_name;
 	  %else;
 	    <a href="%prefix;%child.access;">%child.child_name;</a>
@@ -237,18 +237,33 @@
       %if;(has_relation_him and has_relation_her)
         %nl;
         <ul>
-	<li>%relation_him;%nl;
-	<li>%relation_her;%nl;
+	<li type=%if;relation_him.has_families;disk%else;circle%end;>
+        %if;cancel_links;%relation_him;
+        %else;<a href="%prefix;%relation_him.access">%relation_him;</a>%end;
+        %relation_him.dates;%nl;
+	<li type=%if;relation_her.has_families;disk%else;circle%end;>
+        %if;cancel_links;%relation_her;
+        %else;<a href="%prefix;%relation_her.access">%relation_her;</a>%end;
+        %relation_her.dates;%nl;
         </ul>
-      %elseif;has_relation_him;: %relation_him;%nl;
-      %elseif;has_relation_her;: %relation_her;%nl;
+      %elseif;has_relation_him;:
+        %if;cancel_links;%relation_him;
+        %else;<a href="%prefix;%relation_him.access">%relation_him;</a>%end;
+        %relation_him.dates;%nl;
+      %elseif;has_relation_her;:
+        %if;cancel_links;%relation_her;
+        %else;<a href="%prefix;%relation_her.access">%relation_her;</a>%end;
+        %relation_her.dates;%nl;
       %end;
     %end;
     %foreach;related;
-      <li>%related_type;: %related;%nl;
+      <li type=%if;related.has_families;disk%else;circle%end;>%related_type;:
+      %if;cancel_links;%related;
+      %else;<a href="%prefix;%related.access">%related;</a>%end;
+      %related.dates;%nl;
     %end;
     %foreach;witness_relation;
-      <li>%witness_relation;%nl;
+      <li type=disk>%witness_relation;%nl;
     %end;
   </ul>
 %end;
