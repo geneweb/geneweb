@@ -2,7 +2,8 @@ GeneWeb version 3.05
 --------------------
 
 * GeneWeb Service/CGI (gwd)
-  - [02 Jun 00] Merge of individuals faster now.
+  - [02 Jun 00] Merge of individuals faster now: can automatically merge
+    families and individuals when they are identical in both ancestors trees.
   - [23 May 00] In "divorce" section, added case "separated".
   - [18 May 00] In displaying by places/surnames, baptism places are added
     with birth places and burial with death.
