@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: camlp4_comm.sh,v 4.7 2001-04-20 06:54:14 ddr Exp $
+# $Id: camlp4_comm.sh,v 4.8 2001-05-14 12:38:03 ddr Exp $
 
 ARGS1=
 FILE=
@@ -24,7 +24,7 @@ else
 fi
 
 if test "$COMM" = "camlp4r"; then
-    ARGS2="$ARGS2 ../tools/pa_newseq.cmo"
+    ARGS2="$ARGS2 $TOP/tools/pa_newseq.cmo"
     ARGS1="$ARGS1 -warn_seq"
 fi
 

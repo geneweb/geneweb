@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.0 2001-03-16 19:32:10 ddr Exp $
+# $Id: Makefile,v 4.1 2001-05-14 12:38:01 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -28,6 +28,6 @@ gwb2ged.opt: $(OBJS:.cmo=.cmx)
 	$(OCAMLOPT) unix.cmxa $(CAMLP4D)/gramlib.cmxa x.cmxa gwb2ged.cmx $(LIBUNIX) -o gwb2ged.opt
 
 depend:
-	../tools/camlp4_depend.sh $(OCAMLI) *.ml* > .depend
+	TOP=.. ../tools/camlp4_depend.sh $(OCAMLI) *.ml* > .depend
 
 include .depend
