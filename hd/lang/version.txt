@@ -2,6 +2,8 @@
 <table border=0>
 <tr>
 <td align=center>
+<a href="%glang=af">
+<img src="%km=IM;v=/l-af.jpg" width=36 height=22 alt=af></a>
 <a href="%glang=cn">
 <img src="%km=IM;v=/l-cn.jpg" width=36 height=22 alt=cn></a>
 <a href="%glang=cs">

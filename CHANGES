@@ -1,6 +1,9 @@
 GeneWeb version 3.04
 --------------------
 
+* Languages
+  - [06 Apr 00] Added Afrikaans (Louis Kruger).
+
 * GeneWeb Service/CGI (gwd)
   - [05 Apr 00] In ancestor page, deleted displaying by "list", not really
     interesting, replaced by the better "horizontal displaying".

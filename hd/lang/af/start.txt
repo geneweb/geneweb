@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- $Id: start.txt,v 1.1 2000-04-06 08:06:23 ddr Exp $ -->
+  <!-- copyright (c) INRIA -->
+  <title>Genealogie/Familiekunde - %t</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=%e">
+  <meta name="ROBOTS" content="NONE">
+%j</head>
+<body%b>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<table><tr><td align=center><h1><font color=%i>Genealogiese<br>
+databasis</font></h1></table>
+</td>
+</tr>
+</table>
+
+<br>
+
+<font size=-1><em>Taalvoorkeur/Language preference:</em></font>
+
+<br>
+
+%rversion
+
+<p>
+
+Die databasis <font color=%i><b>"%t"</b></font> bevat tans %n
+persone.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
+
+%I&NwNj<br><p>
+
+%I&NcNa<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w"><em>Medewerkers</em></a> toegang<br>
+(password)<br></td>
+
+%INf<td align=center><a href="%sw=f"><em>Vriend</em></a> toegang<br>
+(password)</td>
+
+%E</tr></table>%E%I|ca<table border=0>
+<tr><td align=center>
+<form method=POST action="%f">
+%hToegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
+<input name=w type=password size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+
+%E%E<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+Om in die databasis rond te blaai, kan jy die volgende soektogte loods:<br><p>
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
+<font color=%i><b>per persoon</b></font>
+<input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+<ul>
+<li> <input type=radio name=t value=PN checked>
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em>Sosa nommer</em> relatiefe tot %a%E
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
+</ul>
+</form>
+
+%It<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=TT>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<font color=%i><b>by title</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
+(<a href="%sm=TT;t=">[all the titles]</a>)<br>
+</td><td>...</td><td>
+<font color=%i><b>[estate]</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
+(<a href="%sm=TT;p=*">[all the estates]</a>)
+</td><td>
+<input type=submit value="Ok">
+</td></tr></table>
+</form>
+
+%E<li>
+
+<form method=GET action="%f">
+%h
+<font color=%i><b>in die lys </b></font>van alle
+<select name=m>
+<option value="N" selected>vanne
+<option value="P">voorname
+</select>
+volgens
+<select name=tri>
+<option value="A" selected>alfabeties volgorde
+<option value="F">frekwensie
+</select>
+<input type=submit value="Ok">
+</form>
+
+<li>
+
+<font color=%i><b>deur 'n</b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>detail
+navraag</b></font></a>.
+
+</ul>
+
+%Iw<p>
+
+<center>Jy kan<br><p>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM">'n familie byvoeg</a>
+%INl</ul>
+</td>
+<td align=left>
+<ul>%E
+<li><a href="%sm=MOD_NOTES">die notas wysig</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+%E<br><p>
+
+<center>Jy kan ook kyk na<br><p>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li>die <a href="%sm=AN">verjaarsdae</a>
+<li>die <a href="%sm=AD">sterfdagherdenkinge</a>
+<li>die <a href="%sm=AM">huwelikherdenkinge</a>%I|wf
+<li>die <a href="%sm=LB">laaste geboortes</a>%E
+</ul>
+</td>
+<td valign=up>
+<ul>%I|wf
+<li>die <a href="%sm=LD">laaste sterftes</a>
+<li>die <a href="%sm=LM">laaste huwelike</a>%E%Ih
+<li>die <a href="%sm=HIST;k=10">bywerkingsverloop</a>%E
+<li>die <a href="%sm=CAL">kalenders</a>
+<li>die <a href="%sm=FORUM">databasis forum</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+<p>
+
+Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
+%Il<p>%E
+
+</td></tr>
+
+<tr>
+<td align=right><br><font size=-1><em><a
+href="%sm=LEX">lexicon</a></em></font></td>
+</tr>
+
+</table>
+</center>
