@@ -1,6 +1,9 @@
 GeneWeb Version 1.09
 --------------------
 
+* gwd:
+  - Added error message in relationship computing when loop in database.
+
 * ged2gwb, gwb2ged:
   - Added save and restore of the GeneWeb fields
        public name

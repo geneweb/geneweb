@@ -1,4 +1,4 @@
-(* $Id: relation.ml,v 1.2 1998-10-03 16:54:09 ddr Exp $ *)
+(* $Id: relation.ml,v 1.3 1998-11-06 17:57:27 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -395,11 +395,22 @@ value print_main_relationship conf base p1 p2 =
       return ()
 ;
 
+value print_base_loop conf base =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  do header conf title;
+     Wserver.wprint "%s\n" (capitale (transl conf "probable loop in base"));
+     trailer conf;
+  return ()
+;
+
 value print conf senv base p =
-  match p_getint senv "i" with
-  [ Some i -> print_main_relationship conf base (base.persons.get i) p
-  | _ ->
-      match find_person_in_env conf base "1" with
-      [ Some p1 -> print_main_relationship conf base p1 p
-      | _ -> print_menu conf base p ] ]
+  try
+    match p_getint senv "i" with
+    [ Some i -> print_main_relationship conf base (base.persons.get i) p
+    | _ ->
+        match find_person_in_env conf base "1" with
+        [ Some p1 -> print_main_relationship conf base p1 p
+        | _ -> print_menu conf base p ] ]
+  with
+  [ Consang.TopologicalSortError -> print_base_loop conf base ]
 ;

@@ -6,6 +6,8 @@ GeneWeb Version 1.09
 
 * gwc:
   - Send error and warning messages on stdout, instead of stderr.
+  - Delete non printable characters (e.g. newlines) in strings (first names,
+    etc.) coming from forms.
 
 GeneWeb Version 1.08
 --------------------
