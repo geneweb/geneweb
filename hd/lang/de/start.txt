@@ -88,15 +88,17 @@ Zum Benutzen dieser Datenbank kannst du hier suchen:<br><br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-<font color=#2f6400><b>nach einem Titel</b></font>
-<input name=t size=14 maxlength=200>
-<font color=#2f6400><b>am Ort</b></font>
-<input name=p size=25 maxlength=200>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<font color=#2f6400><b>nach einem Titel</b></font><br>
+<input name=t size=14 maxlength=200><br>
+(ex: roi, duke...)
+</td><td>...</td><td>
+<font color=#2f6400><b>am Ort:</b></font><br>
+<input name=p size=25 maxlength=200><br>
+(ex: de France, of Sax...)
+</td><td>
 <input type=submit value="Ok">
-<br>
-ex:
-<font color=#2f6400><b>[title/titles]</b></font>: roi, duke...
-<font color=#2f6400><b>[place]</b></font>: de France, of Sax...
+</table>
 </form>
 
 <li>

@@ -87,32 +87,38 @@ actualmente %n pessoas%o<br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-<font color=#2f6400><b>por t&iacute;tulo</b></font>
-<input name=t size=14 maxlength=200>
-<font color=#2f6400><b>lugar</b></font>
-<input name=p size=25 maxlength=200>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<font color=#2f6400><b>por t&iacute;tulo</b></font><br>
+<input name=t size=14 maxlength=200><br>
+(ex: roi, duke...)
+</td><td>...</td><td>
+<font color=#2f6400><b>lugar</b></font><br>
+<input name=p size=25 maxlength=200><br>
+(ex: de France, of Sax...)
+</td><td>
 <input type=submit value="Ok">
-<br>
-ex:
-<font color=#2f6400><b>[title/titles]</b></font>: roi, duke...
-<font color=#2f6400><b>[place]</b></font>: de France, of Sax...
+</td></tr></table>
 </form>
 
 <li>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>{by the list}</b></font> de todos os
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=center>
+<font color=#2f6400><b>{by the list}</b></font> de todos os<br>
 <select name=m>
 <option value="N" selected>apelidos
 <option value="P">nomes pr&oacute;prios
 </select>
-por
+</td><td>...</td><td align=center>
+por<br>
 <select name=tri>
 <option value="A" selected>ordem alfab&eacute;tico
 <option value="F">frequ&ecirc;ncia
 </select>
+</td><td>
 <input type=submit value="Ok">
+</td></tr></table>
 </form>
 
 <li>
