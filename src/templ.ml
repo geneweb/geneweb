@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 3.3 2001-02-15 06:22:17 ddr Exp $ *)
+(* $Id: templ.ml,v 3.4 2001-02-15 14:24:51 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -16,14 +16,15 @@ type ast =
 and ast_expr =
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
-  | Eequal of ast_expr and ast_expr
+  | Eop of string and ast_expr and ast_expr
   | Enot of ast_expr
   | Estr of string
   | Evar of string and list string ]
 ;
 
 type token =
-  [ LPAREN | RPAREN | DOT | EQUAL | IDENT of string | STRING of string ]
+  [ LPAREN | RPAREN | DOT | BANGEQUAL | EQUAL
+  | IDENT of string | STRING of string ]
 ;
 
 value rec get_ident len =
@@ -58,6 +59,7 @@ value rec get_token =
   | [: `')' :] -> RPAREN
   | [: `'.' :] -> DOT
   | [: `'=' :] -> EQUAL
+  | [: `'!'; `'=' :] -> BANGEQUAL
   | [: `'"'; s = get_string 0 :] -> STRING s
   | [: s = get_ident 0 :] -> IDENT s ]
 ;
@@ -111,12 +113,14 @@ value parse_templ conf base strm =
       [ [: e = parse_4;
            e =
              parser
-             [ [: `EQUAL; e2 = parse_4 :] -> Eequal e e2
+             [ [: `EQUAL; e2 = parse_4 :] -> Eop "=" e e2
+             | [: `BANGEQUAL; e2 = parse_4 :] -> Eop "!=" e e2
              | [: :] -> e ] :] -> e ]
     and parse_4 =
       parser
       [ [: `LPAREN; e = parse_1;
-           _ = parser [ [: `RPAREN :] -> () | [: :] -> () ] :] -> e
+           e = parser
+               [ [: `RPAREN :] -> e | [: :] -> Estr "parse error" ] :] -> e
       | [: `IDENT "not"; e = parse_4 :] -> Enot e
       | [: `IDENT id; idl = ident_list :] -> Evar id idl
       | [: `STRING s :] -> Estr s
@@ -283,5 +287,6 @@ value print_variable conf base =
   | "hidden" -> Util.hidden_env conf
   | "highlight" -> Wserver.wprint "%s" conf.highlight
   | "nl" -> Wserver.wprint "\n"
+  | "sp" -> Wserver.wprint " "
   | s -> Wserver.wprint "%%%s;" s ]
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.81 2001-02-15 06:22:17 ddr Exp $ *)
+(* $Id: perso.ml,v 3.82 2001-02-15 14:24:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -248,7 +248,7 @@ type ast = Templ.ast ==
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
-  | Eequal of ast_expr and ast_expr
+  | Eop of string and ast_expr and ast_expr
   | Enot of ast_expr
   | Estr of string
   | Evar of string and list string ]
@@ -818,7 +818,6 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "sosa_link" -> print_sosa_link conf base env p p_auth
   | "source_type" -> print_source_type conf base env
   | "source" -> print_source conf base env
-  | "sp" -> Wserver.wprint " "
   | "surname" -> Wserver.wprint "%s" (p_surname base p)
   | "surname_alias" -> print_surname_alias conf base env
   | "surname_key" -> print_surname_key conf base env p p_auth
@@ -1087,7 +1086,7 @@ value eval_bool_value conf base env =
     fun
     [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
     | Eand e1 e2 -> bool_eval e1 && bool_eval e2
-    | Eequal e1 e2 -> do Wserver.wprint "=???"; return False
+    | Eop s e1 e2 -> do Wserver.wprint "op %s???" s; return False
     | Enot e -> not (bool_eval e)
     | Estr s -> do Wserver.wprint "\"%s\"???" s; return False
     | Evar s sl -> eval_bool_variable conf base env [s :: sl] ]
