@@ -5,6 +5,7 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [01 Jul 04] Changed all gif files into png.
   - [22 Jun 04] Fixed slowness of "find_free_occ" if many many
     names in the list.
   - [16 Jun 04] Added "history of updates" in wizards notes.
