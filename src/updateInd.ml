@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.15 2005-01-20 15:45:37 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.16 2005-01-21 07:22:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -33,6 +33,8 @@ type env =
   | Vnone ]
 ;
 
+type var_value = [ VVbool of bool | VVstring of string ];
+
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
 
 value extract_var sini s =
@@ -55,8 +57,6 @@ value obsolete var new_var =
   else ()
 ;
 
-type var_value = [ VVbool of bool | VVstring of string ];
-
 value bool_val x = VVbool x;
 value str_val x = VVstring x;
 
@@ -68,10 +68,10 @@ value rec eval_var conf base env p =
   | ["acc_public"] -> bool_val (p.access = Public)
   | ["bapt_place"] -> str_val (quote_escaped p.baptism_place)
   | ["bapt_src"] -> str_val (quote_escaped p.baptism_src)
-  | ["birth"; s] -> eval_date_var conf base env (Adef.od_of_codate p.birth) s
+  | ["birth"; s] -> eval_date_var (Adef.od_of_codate p.birth) s
   | ["birth_place"] -> str_val (quote_escaped p.birth_place)
   | ["birth_src"] -> str_val (quote_escaped p.birth_src)
-  | ["bapt"; s] -> eval_date_var conf base env (Adef.od_of_codate p.baptism) s
+  | ["bapt"; s] -> eval_date_var (Adef.od_of_codate p.baptism) s
   | ["bt_buried"] ->
         bool_val (match p.burial with [ Buried _ -> True | _ -> False ])
   | ["bt_cremated"] ->
@@ -84,7 +84,7 @@ value rec eval_var conf base env p =
         | Cremated cod -> Adef.od_of_codate cod
         | _ -> None ]
       in
-      eval_date_var conf base env od s
+      eval_date_var od s
   | ["burial_place"] -> str_val (quote_escaped p.burial_place)
   | ["burial_src"] -> str_val (quote_escaped p.burial_src)
   | ["cnt"] -> eval_int_env "cnt" env
@@ -95,7 +95,7 @@ value rec eval_var conf base env p =
         [ Death _ cd -> Some (Adef.date_of_cdate cd)
         | _ -> None ]
       in
-      eval_date_var conf base env od s
+      eval_date_var od s
   | ["death_place"] -> str_val (quote_escaped p.death_place)
   | ["death_src"] -> str_val (quote_escaped p.death_src)
   | ["died_young"] -> bool_val (p.death = DeadYoung)
@@ -155,7 +155,7 @@ value rec eval_var conf base env p =
             [ Failure _ -> None ]
         | _ -> None ]
       in
-      eval_date_var conf base env od s
+      eval_date_var od s
   | ["title_date_end"; s] ->
       let od =
         match get_env "cnt" env with
@@ -167,7 +167,7 @@ value rec eval_var conf base env p =
             [ Failure _ -> None ]
         | _ -> None ]
       in
-      eval_date_var conf base env od s
+      eval_date_var od s
   | [s] ->
       let v = extract_var "evar_" s in
       if v <> "" then
@@ -180,57 +180,52 @@ value rec eval_var conf base env p =
           str_val (try List.assoc v conf.base_env with [ Not_found -> "" ])
         else raise Not_found
   | _ -> raise Not_found ]
-and eval_date_var conf base env od =
+and eval_date_var od s = str_val (eval_date_var_aux od s)
+and eval_date_var_aux od =
   fun
   [ "calendar" ->
       match od with
-      [ Some (Dgreg _ Dgregorian) -> str_val "gregorian"
-      | Some (Dgreg _ Djulian) -> str_val "julian"
-      | Some (Dgreg _ Dfrench) -> str_val "french"
-      | Some (Dgreg _ Dhebrew) -> str_val "hebrew"
-      | _ -> str_val "" ]
+      [ Some (Dgreg _ Dgregorian) -> "gregorian"
+      | Some (Dgreg _ Djulian) -> "julian"
+      | Some (Dgreg _ Dfrench) -> "french"
+      | Some (Dgreg _ Dhebrew) -> "hebrew"
+      | _ -> "" ]
   | "day" ->
       match eval_date_field od with
-      [ Some d -> str_val (if d.day = 0 then "" else string_of_int d.day)
-      | None -> str_val "" ]
+      [ Some d -> if d.day = 0 then "" else string_of_int d.day
+      | None -> "" ]
   | "month" ->
-      let s =
-        match eval_date_field od with
-        [ Some d ->
-            if d.month = 0 then ""
-            else
-              match od with
-              [ Some (Dgreg _ Dfrench) -> short_f_month d.month
-              | _ -> string_of_int d.month ]
-        | None -> "" ]
-      in
-      str_val s
+      match eval_date_field od with
+      [ Some d ->
+          if d.month = 0 then ""
+          else
+            match od with
+            [ Some (Dgreg _ Dfrench) -> short_f_month d.month
+            | _ -> string_of_int d.month ]
+      | None -> "" ]
   | "oryear" ->
-      let s =
-        match od with
-        [ Some (Dgreg {prec = OrYear y} _) -> string_of_int y
-        | Some (Dgreg {prec = YearInt y} _) -> string_of_int y
-        | _ -> "" ]
-      in
-      str_val s
+      match od with
+      [ Some (Dgreg {prec = OrYear y} _) -> string_of_int y
+      | Some (Dgreg {prec = YearInt y} _) -> string_of_int y
+      | _ -> "" ]
   | "prec" ->
       match od with
-      [ Some (Dgreg {prec = Sure} _) -> str_val "sure"
-      | Some (Dgreg {prec = About} _) -> str_val "about"
-      | Some (Dgreg {prec = Maybe} _) -> str_val "maybe"
-      | Some (Dgreg {prec = Before} _) -> str_val "before"
-      | Some (Dgreg {prec = After} _) -> str_val "after"
-      | Some (Dgreg {prec = OrYear _} _) -> str_val "oryear"
-      | Some (Dgreg {prec = YearInt _} _) -> str_val "yearint"
-      | _ -> str_val "" ]
+      [ Some (Dgreg {prec = Sure} _) -> "sure"
+      | Some (Dgreg {prec = About} _) -> "about"
+      | Some (Dgreg {prec = Maybe} _) -> "maybe"
+      | Some (Dgreg {prec = Before} _) -> "before"
+      | Some (Dgreg {prec = After} _) -> "after"
+      | Some (Dgreg {prec = OrYear _} _) -> "oryear"
+      | Some (Dgreg {prec = YearInt _} _) -> "yearint"
+      | _ -> "" ]
   | "text" ->
       match od with
-      [ Some (Dtext s) -> str_val s
-      | _ -> str_val "" ]
+      [ Some (Dtext s) -> s
+      | _ -> "" ]
   | "year" ->
       match eval_date_field od with
-      [ Some d -> str_val (string_of_int d.year)
-      | None -> str_val "" ]
+      [ Some d -> string_of_int d.year
+      | None -> "" ]
   | x ->
       let r =
         match x with
@@ -238,7 +233,7 @@ and eval_date_var conf base env od =
         | "cal_gregorian" -> eval_is_cal Dgregorian od
         | "cal_hebrew" -> eval_is_cal Dhebrew od
         | "cal_julian" -> eval_is_cal Djulian od
-        | "prec_no" -> bool_val (od = None)
+        | "prec_no" -> if od = None then "1" else ""
         | "prec_sure" -> eval_is_prec (fun [ Sure -> True | _ -> False ]) od
         | "prec_about" -> eval_is_prec (fun [ About -> True | _ -> False ]) od
         | "prec_maybe" -> eval_is_prec (fun [ Maybe -> True | _ -> False ]) od
@@ -320,12 +315,12 @@ and eval_person_var conf base env (fn, sn, oc, create, var) =
   | _ -> raise Not_found ]
 and eval_is_cal cal =
   fun
-  [ Some (Dgreg _ x) -> bool_val (x = cal)
-  | _ -> bool_val False ]
+  [ Some (Dgreg _ x) -> if x = cal then "1" else ""
+  | _ -> "" ]
 and eval_is_prec cond =
   fun
-  [ Some (Dgreg {prec = x} _) -> bool_val (cond x)
-  | _ -> bool_val False ]
+  [ Some (Dgreg {prec = x} _) -> if cond x then "1" else ""
+  | _ -> "" ]
 and eval_is_death_reason dr =
   fun
   [ Death dr1 _ -> bool_val (dr = dr1)
