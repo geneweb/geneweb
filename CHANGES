@@ -76,6 +76,13 @@ GeneWeb version 3.11
     the children surnames in descendant display, even if same than the
     father's (default = no).
 
+* Header and trailer files (lang/base.hed lang/base.trl)
+  - [26 Jan 01] Added two macros usable in header or trailer files: %p
+    which is replaced by the prefix of the current URL (the whole address
+    up to the question mark) and %s by its suffix (after the question
+    mark). In personal pages, this suffix is independant from the index:
+    can therefore be used to specify a bookmarkable address.
+
 * Lexicon (lang/lexicon.txt)
   - [26 Jan 01] Changed entry name "(french month)" into "(french revolution
     month)" (which is more exact).
