@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.13 2005-02-04 20:18:59 ddr Exp $ *)
+(* $Id: name.ml,v 4.14 2005-02-05 11:18:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 module Buff =
@@ -174,18 +174,8 @@ value crush s =
                 else len
               in
               copy (i + 1) len first_vowel
-(*
-  In case of need of major release, I can add this feature also and add the
-  following comment in the CHANGES file. Not done now (3 May 2001) because
-  it is a minor change, but with a probleming incompatibility.
-
-  - [date] Changed index: names ending with s, z, sz, ss (s-tsett?) are now
-    treated like if only ended by one s (therefore could be ignored in
-    search). The index being different, databases must be rebuild (radical
-    cleanup or consang program, option -i), otherwise the requests concerning
-    people whose names end with z, sz or ss may not return the good result.
-
-          | 's' | 'z' when i == String.length s - 1 || s.[i + 1] == ' ' ->
+          | 's' | 'z' when
+	    utf_8_db.val && (i == String.length s - 1 || s.[i + 1] == ' ') ->
               let len =
                 loop (i - 1) (len - 1) where rec loop i len =
                   if i > 0 && len > 0 && s.[i] = Buff.buff.val.[len] &&
@@ -194,10 +184,8 @@ value crush s =
                   else len + 1
               in
               copy (i + 1) len False
-*)
           | 's' when i == String.length s - 1 || s.[i + 1] == ' ' ->
               copy (i + 1) len False
-(**)
           | c ->
               if i > 0 && s.[i-1] == c then copy (i + 1) len False
               else

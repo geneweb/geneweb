@@ -1,8 +1,10 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.70 2005-01-23 05:47:47 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.71 2005-02-05 11:18:20 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
+  <!-- This file is kept by compatibility to allow the displaying of
+       databases created before version 5.00. It does not change any more. -->
   <title>[
 af: Genealogie/Familiekunde
 bg: Genealogy
