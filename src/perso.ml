@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.20 1999-04-19 09:41:15 ddr Exp $ *)
+(* $Id: perso.ml,v 2.21 1999-04-20 18:04:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -560,12 +560,12 @@ value print_notes conf base p =
       else () ]
 ;
 
-value print_not_empty_src conf base first txt isrc =
+value print_not_empty_src conf base new_parag first txt isrc =
   let src = sou base isrc in
   if src = "" then ()
   else
     do if first.val then
-         do html_p conf;
+         do if new_parag then html_p conf else ();
             Wserver.wprint "<font size=-1><em>%s:</em></font>\n"
               (capitale (transl_nth conf "source/sources" 1));
          return ()
@@ -579,32 +579,32 @@ value print_not_empty_src conf base first txt isrc =
     return ()
 ;
 
-value print_sources conf base p =
+value print_sources conf base new_parag p =
   let first = ref True in
-  do print_not_empty_src conf base first
+  do print_not_empty_src conf base new_parag first
        (fun () -> transl_nth conf "person/persons" 0)
        p.psources;
-     print_not_empty_src conf base first
+     print_not_empty_src conf base new_parag first
        (fun () -> transl_nth conf "birth" 0)
        p.birth_src;
-     print_not_empty_src conf base first
+     print_not_empty_src conf base new_parag first
        (fun () -> transl_nth conf "baptism" 0)
        p.baptism_src;
-     print_not_empty_src conf base first
+     print_not_empty_src conf base new_parag first
        (fun () -> transl_nth conf "death" 0)
        p.death_src;
-     print_not_empty_src conf base first
+     print_not_empty_src conf base new_parag first
        (fun () -> transl_nth conf "burial" 0)
        p.burial_src;
      for i = 0 to Array.length p.family - 1 do
        let fam = foi base p.family.(i) in
-       do print_not_empty_src conf base first
+       do print_not_empty_src conf base new_parag first
             (fun () ->
                transl_nth conf "marriage/marriages" 0 ^
                (if Array.length p.family == 1 then ""
                 else " " ^ string_of_int (i + 1)))
             fam.marriage_src;
-          print_not_empty_src conf base first
+          print_not_empty_src conf base new_parag first
             (fun () ->
                transl_nth conf "family/families" 0 ^
                (if Array.length p.family == 1 then ""
@@ -965,7 +965,7 @@ value print conf base p =
        Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=U\">\n%s</a>\n</h4>\n"
          (commd conf) (acces conf base p) (capitale (transl conf "update"))
      else ();
-     if age_autorise conf base p then print_sources conf base p else ();
+     if age_autorise conf base p then print_sources conf base True p else ();
      match p_getenv conf.env "opt" with
      [ Some "misc" ->
          tag "ol" begin
