@@ -5,8 +5,8 @@ GeneWeb version 3.03
   - [23 Jan 00] Added Russian (Konstantin Abakumov).
 
 * Setup program (gwsetup)
-  - [27 Jan 00] Added a comment in the introduction text telling not to
-    delete the window!
+  - [27 Jan 00; 03 Feb 00] Added a comment in the introduction text
+    telling not to delete the window! (English, French, Swedish versions)
 
 * GeneWeb Service/CGI (gwd)
   - [02 Fev 00] In personal pages, relations are now displayed before notes.
