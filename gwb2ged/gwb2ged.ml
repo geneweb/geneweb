@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.4 1999-03-31 02:16:48 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.5 1999-04-05 23:42:27 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -188,7 +188,7 @@ value ged_ind_ev_str base oc per =
 
 value ged_title base oc per tit =
   do Printf.fprintf oc "1 TITL ";
-     Printf.fprintf oc "%s" (encode (sou base tit.t_title));
+     Printf.fprintf oc "%s" (encode (sou base tit.t_ident));
      match sou base tit.t_place with
      [ "" -> ()
      | pl -> Printf.fprintf oc ", %s" (encode pl) ];

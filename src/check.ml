@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 2.2 1999-03-31 02:16:48 ddr Exp $ *)
+(* $Id: check.ml,v 2.3 1999-04-05 23:42:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -79,7 +79,7 @@ value print_base_warning base =
   | TitleDatesError p t ->
       do Printf.printf "%s\n" (denomination base p);
          Printf.printf "has incorrect title dates as:\n";
-         Printf.printf "  %s %s\n" (sou base t.t_title) (sou base t.t_place);
+         Printf.printf "  %s %s\n" (sou base t.t_ident) (sou base t.t_place);
       return ()
   | YoungForMarriage p a ->
       Printf.printf "%s married at age %d\n" (denomination base p) (annee a) ]
@@ -103,12 +103,12 @@ type stats =
    women : mutable int;
    neutre : mutable int;
    noname : mutable int;
-   oldest_father : mutable (int * base_person);
-   oldest_mother : mutable (int * base_person);
-   youngest_father : mutable (int * base_person);
-   youngest_mother : mutable (int * base_person);
-   oldest_dead : mutable (int * base_person);
-   oldest_still_alive : mutable (int * base_person)}
+   oldest_father : mutable (int * person);
+   oldest_mother : mutable (int * person);
+   youngest_father : mutable (int * person);
+   youngest_mother : mutable (int * person);
+   oldest_dead : mutable (int * person);
+   oldest_still_alive : mutable (int * person)}
 ;
 
 value birth_year p =

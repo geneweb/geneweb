@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.7 1999-03-31 02:16:49 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.8 1999-04-05 23:42:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -132,7 +132,7 @@ value title_name_unique_string gen =
 
 value title_unique_string gen t =
   {t_name = title_name_unique_string gen t.t_name;
-   t_title = unique_string gen t.t_title;
+   t_ident = unique_string gen t.t_ident;
    t_place = unique_string gen t.t_place; t_date_start = t.t_date_start;
    t_date_end = t.t_date_end; t_nth = t.t_nth}
 ;

@@ -1,10 +1,12 @@
-(* $Id: date.mli,v 2.1 1999-03-08 11:18:32 ddr Exp $ *)
+(* $Id: date.mli,v 2.2 1999-04-05 23:42:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
-value string_of_ondate : Config.config -> Def.date -> string;
-value string_of_date : Config.config -> Def.date -> string;
-value print_age : Config.config -> Def.date -> unit;
-value afficher_dates : Config.config -> Def.base -> Def.base_person -> unit;
-value display_year : Def.date -> unit;
-value afficher_dates_courtes :
-  Config.config -> Def.base -> Def.base_person -> unit;
+open Def;
+open Config;
+
+value string_of_ondate : config -> date -> string;
+value string_of_date : config -> date -> string;
+value print_age : config -> date -> unit;
+value afficher_dates : config -> base -> person -> unit;
+value display_year : date -> unit;
+value afficher_dates_courtes : config -> base -> person -> unit;

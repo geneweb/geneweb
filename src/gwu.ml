@@ -1,14 +1,14 @@
-(* $Id: gwu.ml,v 2.4 1999-03-31 02:16:50 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.5 1999-04-05 23:42:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
 type mfam =
-  { m_fam : base_family;
-    m_fath : base_person;
-    m_moth : base_person;
-    m_chil : array base_person }
+  { m_fam : family;
+    m_fath : person;
+    m_moth : person;
+    m_chil : array person }
 ;
 
 value soy y = if y == 0 then "-0" else string_of_int y;
@@ -136,7 +136,7 @@ value print_title oc base t =
      | Tname s -> Printf.fprintf oc "%s" (correct_string base s)
      | Tnone -> () ];
      Printf.fprintf oc ":";
-     Printf.fprintf oc "%s" (correct_string base t.t_title);
+     Printf.fprintf oc "%s" (correct_string base t.t_ident);
      Printf.fprintf oc ":";
      Printf.fprintf oc "%s" (correct_string base t.t_place);
      if t.t_nth <> 0 then Printf.fprintf oc ":"

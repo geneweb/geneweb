@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 2.4 1999-03-31 02:16:49 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.5 1999-04-05 23:42:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -14,11 +14,11 @@ type key =
 
 type somebody =
   [ Undefined of key
-  | Defined of Def.person string ]
+  | Defined of gen_person string ]
 ;
 
 type syntax_o =
-  [ Family of couple somebody and Def.family (Def.person string) string
+  [ Family of gen_couple somebody and gen_family (gen_person string) string
   | Notes of key and string ]
 ;
 
@@ -443,7 +443,7 @@ value scan_title t =
   in
   if i <> String.length t then failwith t
   else
-    {t_name = name; t_title = title; t_place = place;
+    {t_name = name; t_ident = title; t_place = place;
      t_date_start = Adef.codate_of_od date_start;
      t_date_end = Adef.codate_of_od date_end;
      t_nth = nth}

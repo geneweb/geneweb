@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.12 1999-04-02 09:14:18 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.13 1999-04-05 23:42:27 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -409,10 +409,10 @@ value date_of_field pos d =
 type tab 'a = { arr : mutable array 'a; tlen : mutable int };
 
 type gen =
-  { g_per : tab (choice string base_person);
-    g_asc : tab (choice string base_ascend);
-    g_fam : tab (choice string base_family);
-    g_cpl : tab (choice string base_couple);
+  { g_per : tab (choice string person);
+    g_asc : tab (choice string ascend);
+    g_fam : tab (choice string family);
+    g_cpl : tab (choice string couple);
     g_str : tab string;
     g_ic : in_channel;
     g_not : Hashtbl.t string int;
@@ -531,7 +531,7 @@ value infer_death birth =
 ;
 
 value make_title gen (title, place) =
-  {t_name = Tnone; t_title = add_string gen title;
+  {t_name = Tnone; t_ident = add_string gen title;
    t_place = add_string gen place; t_date_start = Adef.codate_None;
    t_date_end = Adef.codate_None; t_nth = 0}
 ;
@@ -789,7 +789,7 @@ value treat_indi_title gen public_name r =
         else Tname (add_string gen (strip_spaces r.rval))
     | None -> Tnone ]
   in
-  {t_name = name; t_title = add_string gen title;
+  {t_name = name; t_ident = add_string gen title;
    t_place = add_string gen place;
    t_date_start = Adef.codate_of_od date_start;
    t_date_end = Adef.codate_of_od date_end; t_nth = nth}
@@ -1248,7 +1248,7 @@ value print_base_warning base =
   | TitleDatesError p t ->
       do Printf.fprintf log_oc.val "%s\n" (denomination base p);
          Printf.fprintf log_oc.val "has incorrect title dates as:\n";
-         Printf.fprintf log_oc.val "  %s %s\n" (sou base t.t_title)
+         Printf.fprintf log_oc.val "  %s %s\n" (sou base t.t_ident)
            (sou base t.t_place);
       return ()
   | YoungForMarriage p a ->

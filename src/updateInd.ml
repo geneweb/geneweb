@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.4 1999-03-31 02:16:51 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.5 1999-04-05 23:42:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -20,7 +20,7 @@ value string_title_of base t =
      [ Tmain -> Tmain
      | Tname s -> Tname (sou base s)
      | Tnone -> Tnone ];
-   t_title = sou base t.t_title; t_place = sou base t.t_place;
+   t_ident = sou base t.t_ident; t_place = sou base t.t_place;
    t_date_start = t.t_date_start; t_date_end = t.t_date_end;
    t_nth = t.t_nth}
 ;
@@ -357,7 +357,7 @@ value print_title conf base t cnt =
          tag "td" begin
            Wserver.wprint "<input name=t_title%d size=15%s>" cnt
              (match t with
-              [ Some {t_title = n} -> " value=\"" ^ f_coa conf n ^ "\""
+              [ Some {t_ident = n} -> " value=\"" ^ f_coa conf n ^ "\""
               | _ -> "" ]);
          end;
          tag "td" begin

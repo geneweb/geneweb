@@ -1,4 +1,4 @@
-(* $Id: perso.mli,v 2.1 1999-03-08 11:19:04 ddr Exp $ *)
+(* $Id: perso.mli,v 2.2 1999-04-05 23:42:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
-value print : Config.config -> Def.base -> Def.base_person -> unit;
+value print : Config.config -> Def.base -> Def.person -> unit;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.5 1999-03-31 02:16:51 ddr Exp $ *)
+(* $Id: util.ml,v 2.6 1999-04-05 23:42:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -252,7 +252,7 @@ value afficher_prenom_de_personne conf base p =
   Wserver.wprint "%s" (person_text_without_surname conf base p)
 ;
 
-value most_prestigious base =
+value main_title =
   let val =
     fun
     [ "empereur" | "impératrice" -> 6
@@ -263,51 +263,59 @@ value most_prestigious base =
     | "vicomte" | "vicomtesse" -> 1
     | _ -> 0 ]
   in
-  let rec loop r =
-    fun
-    [ [] -> r
-    | [x :: l] ->
-        if x.t_name == Tmain then Some x
-        else
-          match r with
-          [ Some t ->
-              if val (sou base x.t_title) > val (sou base t.t_title) then
-                loop (Some x) l
-              else loop r l
-          | None -> loop (Some x) l ] ]
-  in
-  loop None
+  fun base p ->
+    let rec loop r =
+      fun
+      [ [] -> r
+      | [x :: l] ->
+          if x.t_name == Tmain then Some x
+          else
+            match r with
+            [ Some t ->
+                if val (sou base x.t_ident) > val (sou base t.t_ident) then
+                  loop (Some x) l
+                else loop r l
+            | None -> loop (Some x) l ] ]
+    in
+    loop None p.titles
 ;
 
-value afficher_personne_un_titre_referencee conf base p t =
-  do if Name.strip_lower (sou base t.t_place) =
-        Name.strip_lower (sou base p.surname)
-     then
-       match (t.t_name, p.nick_names) with
-       [ (Tname n, []) ->
-           Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
-             (acces conf base p) (coa conf (sou base n))
-       | (Tname n, [nn :: _]) ->
-           Wserver.wprint "<a href=\"%s%s\">%s <em>%s</em></a>" (commd conf)
-             (acces conf base p) (coa conf (sou base n))
-             (coa conf (sou base nn))
-       | _ -> afficher_prenom_de_personne_referencee conf base p ]
-     else
-       match t.t_name with
-       [ Tname s -> afficher_nom_titre_reference conf base p (sou base s)
-       | _ -> afficher_personne_referencee conf base p ];
-     Wserver.wprint ", <em>";
-     Wserver.wprint "%s" (coa conf (sou base t.t_title));
-     Wserver.wprint " ";
-     Wserver.wprint "%s" (coa conf (sou base t.t_place));
+value titled_person_text conf base p t =
+  if Name.strip_lower (sou base t.t_place) =
+     Name.strip_lower (sou base p.surname)
+  then
+    match (t.t_name, p.nick_names) with
+    [ (Tname n, []) -> coa conf (sou base n)
+    | (Tname n, [nn :: _]) ->
+        coa conf (sou base n) ^ " <em>" ^ coa conf (sou base nn) ^ "</em>"
+    | _ -> person_text_without_surname conf base p ]
+  else
+    match t.t_name with
+    [ Tname s ->
+        let s = coa conf (sou base s) in
+        match p.nick_names with
+        [ [] -> s
+        | [nn :: _] -> s ^ " <em>" ^ coa conf (sou base nn) ^ "</em>" ]
+    | _ -> person_text conf base p ]
+;
+
+value afficher_un_titre conf base p t =
+  let place = sou base t.t_place in
+  do Wserver.wprint ", <em>%s" (coa conf (sou base t.t_ident));
+     if place = "" then () else Wserver.wprint " %s" (coa conf place);
      Wserver.wprint "</em>";
   return ()
 ;
 
 value afficher_personne_titre_referencee conf base p =
   if p.access <> Private || conf.friend || conf.wizard then
-    match most_prestigious base p.titles with
-    [ Some t -> afficher_personne_un_titre_referencee conf base p t
+    match main_title base p with
+    [ Some t ->
+        do tag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
+             Wserver.wprint "%s" (titled_person_text conf base p t);
+           end;
+           afficher_un_titre conf base p t;
+        return ()
     | None -> afficher_personne_referencee conf base p ]
   else
     afficher_personne_referencee conf base p
@@ -322,21 +330,21 @@ value afficher_personne_un_titre conf base p t =
        match t.t_name with
        [ Tname s -> Wserver.wprint "%s" (coa conf (sou base s))
        | _ -> afficher_personne conf base p ];
-     Wserver.wprint ", <em>%s %s</em>" (coa conf (sou base t.t_title))
+     Wserver.wprint ", <em>%s %s</em>" (coa conf (sou base t.t_ident))
        (coa conf (sou base t.t_place));
   return ()
 ;
 
 value afficher_personne_titre conf base p =
   if p.access <> Private || conf.friend || conf.wizard then
-    match most_prestigious base p.titles with
+    match main_title base p with
     [ Some t -> afficher_personne_un_titre conf base p t
     | None -> afficher_personne conf base p ]
   else afficher_personne conf base p
 ;
 
 value afficher_personne_sans_titre conf base p =
-  match most_prestigious base p.titles with
+  match main_title base p with
   [ Some t ->
       do if t.t_place == p.surname then
            afficher_prenom_de_personne conf base p
@@ -351,17 +359,9 @@ value afficher_personne_sans_titre conf base p =
   | None -> afficher_personne conf base p ]
 ;
 
-value afficher_un_titre conf base p t =
-  let place = sou base t.t_place in
-  do Wserver.wprint ", <em>%s" (coa conf (sou base t.t_title));
-     if place = "" then () else Wserver.wprint " %s" (coa conf place);
-     Wserver.wprint "</em>";
-  return ()
-;
-
 value afficher_titre conf base p =
   if p.access <> Private || conf.friend || conf.wizard then
-    match most_prestigious base p.titles with
+    match main_title base p with
     [ Some t -> afficher_un_titre conf base p t
     | None -> () ]
   else ()
