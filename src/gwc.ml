@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.33 2005-02-18 19:56:36 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.34 2005-02-19 14:19:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -849,9 +849,8 @@ value link gwo_list =
   let gen =
     {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
      g_local_names = Hashtbl.create 20011; g_pcnt = 0; g_fcnt = 0;
-     g_scnt = 0; g_base = empty_base; g_patch_p = Hashtbl.create 1009;
-     g_def = [| |];
-     g_separate = False; g_shift = 0; g_errored = False;
+     g_scnt = 0; g_base = empty_base; g_patch_p = Hashtbl.create 20011;
+     g_def = [| |]; g_separate = False; g_shift = 0; g_errored = False;
      g_per_index = open_out_bin "gwc_per_index";
      g_per = open_out_bin "gwc_per";
      g_fam_index = open_out_bin "gwc_fam_index";
