@@ -1,14 +1,12 @@
-# $Id: Makefile,v 4.5 2001-06-03 14:42:54 ddr Exp $
+# $Id: Makefile,v 4.6 2001-06-26 16:39:48 ddr Exp $
 
 DESTDIR=distribution
-NS=tools/pa_newseq
 
 include tools/Makefile.inc
 
 all:: opt
 
 out::
-	$(MAKE) tools/pa_newseq.cmo
 	cd wserver; $(MAKE) all
 	cd dag2html; $(MAKE) out
 	cd src; $(MAKE) all
@@ -19,7 +17,6 @@ out::
 	cd gwtp; $(MAKE) all
 
 opt::
-	$(MAKE) tools/pa_newseq.cmo
 	cd wserver; $(MAKE) opt
 	cd dag2html; $(MAKE) opt
 	cd src; $(MAKE) opt
@@ -28,11 +25,6 @@ opt::
 	cd doc; $(MAKE) opt
 	cd setup; $(MAKE) opt
 	cd gwtp; $(MAKE) opt
-
-$(NS).cmo: $(NS).ml
-	camlp4r pa_extend.cmo q_MLast.cmo pa_ifdef.cmo $(NS).ml -o $(NS).ppo
-	$(OCAMLC) -I $(CAMLP4D) -c -impl $(NS).ppo
-	$(RM) $*.ppo
 
 distrib: new_distrib wrappers
 
@@ -117,7 +109,6 @@ classical_distrib:
 	cp hd/etc/*.txt $(DESTDIR)/etc/.
 
 clean::
-	$(RM) $(NS).cm[oi]
 	cd wserver; $(MAKE) clean
 	cd dag2html; $(MAKE) clean
 	cd src; $(MAKE) clean
