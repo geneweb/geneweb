@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.18 2004-12-14 09:30:12 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.19 2005-02-03 01:50:45 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -130,3 +130,6 @@ value set_parents : gen_ascend 'a -> option 'a -> unit;
 value set_consang : gen_ascend 'a -> Adef.fix -> unit;
 
 value find_free_occ : base -> string -> string -> int -> int;
+
+value input_lexicon :
+  string -> (unit -> in_channel) -> Hashtbl.t string string;
