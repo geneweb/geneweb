@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 1.12 1998-12-16 17:36:33 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.13 1998-12-17 10:59:19 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -192,19 +192,12 @@ value compare_names s1 s2 =
 value compare_names s1 s2 = compare (name_key s1) (name_key s2);
 *)
 
-value compare_istr = ref (fun []);
-value compare_istr_fun base is1 is2 =
+value compare_istr_fun base_data is1 is2 =
   if is1 == is2 then 0
   else
-    compare_names (base.data.strings.get (Adef.int_of_istr is1))
-      (base.data.strings.get (Adef.int_of_istr is2))
+    compare_names (base_data.strings.get (Adef.int_of_istr is1))
+      (base_data.strings.get (Adef.int_of_istr is2))
 ;
-module IstrTree =
-  Btree.Make
-    (struct type t = istr; value compare x y = compare_istr.val x y; end)
-;
-
-type first_name_or_surname_index = IstrTree.t (list iper);
 
 value rec list_remove_elemq x =
   fun
@@ -212,8 +205,12 @@ value rec list_remove_elemq x =
   | [] -> [] ]
 ;
 
-value persons_of_first_name_or_surname strings params =
+value persons_of_first_name_or_surname base_data strings params =
   let (ic2, start_pos, proj, person_patches, tree_name) = params in
+  let module IstrTree =
+    Btree.Make
+      (struct type t = istr; value compare = compare_istr_fun base_data; end)
+  in
   let bt =
     let btr = ref None in
     fun () ->
@@ -240,8 +237,8 @@ value persons_of_first_name_or_surname strings params =
     List.fold_left
       (fun ipl (i, p) ->
          if List.memq (Adef.iper_of_int i) ipl then
-           if compare_istr.val istr p.first_name == 0
-           || compare_istr.val istr p.surname == 0
+           if compare_istr_fun base_data istr p.first_name == 0
+           || compare_istr_fun base_data istr p.surname == 0
            then ipl
            else list_remove_elemq (Adef.iper_of_int i) ipl
          else ipl)
@@ -336,23 +333,6 @@ value lock_file bname =
 ;
 
 (* Input *)
-
-(*
-value rec apply_patches tab =
-  fun
-  [ [] -> tab
-  | [(i, v) :: l] ->
-      let tab = apply_patches tab l in
-      let tab =
-        if i >= Array.length tab then
-          let new_tab = Array.create (i + 1) (Obj.magic 0) in
-          do Array.blit tab 0 new_tab 0 (Array.length tab); return
-          new_tab
-        else tab
-      in
-      do tab.(i) := v; return tab ]
-;
-*)
 
 value apply_patches tab plist plen =
   if plist = [] then tab
@@ -598,11 +578,11 @@ value input bname =
        index_of_string strings ic2 ic2_string_start_pos ic2_string_hash_len
          patches.p_string;
      persons_of_surname =
-       persons_of_first_name_or_surname strings
+       persons_of_first_name_or_surname base_data strings
          (ic2, ic2_surname_start_pos, fun p -> p.surname, patches.p_person,
           "surname");
      persons_of_first_name =
-       persons_of_first_name_or_surname strings
+       persons_of_first_name_or_surname base_data strings
          (ic2, ic2_first_name_start_pos, fun p -> p.first_name,
           patches.p_person, "first_name");
      patch_person = patch_person;
@@ -613,8 +593,7 @@ value input bname =
      patch_name = patch_name;
      commit_patches = commit_patches; cleanup = cleanup}
   in
-  let base = {data = base_data; func = base_func} in
-  do compare_istr.val := compare_istr_fun base; return base
+  {data = base_data; func = base_func}
 ;
 
 (* Output *)
@@ -655,29 +634,40 @@ value output_strings_hash oc2 base =
   return ()
 ;
 
-value create_first_name_or_surname_index base proj =
+value output_surname_index oc2 base =
+  let module IstrTree =
+    Btree.Make
+      (struct type t = istr; value compare = compare_istr_fun base.data; end)
+  in
   let bt = ref IstrTree.empty in
-  do compare_istr.val := compare_istr_fun base;
-     for i = 0 to base.data.persons.len - 1 do
+  do for i = 0 to base.data.persons.len - 1 do
        let p = base.data.persons.get i in
        let a =
-         try IstrTree.find (proj p) bt.val with
+         try IstrTree.find p.surname bt.val with
          [ Not_found -> [] ]
        in
-       bt.val :=
-         IstrTree.add (proj p) [ p.cle_index :: a] bt.val;
+       bt.val := IstrTree.add p.surname [ p.cle_index :: a] bt.val;
      done;
-  return bt.val
-;
-
-value output_surname_index oc2 base =
-  let bt = create_first_name_or_surname_index base (fun p -> p.surname) in
-  output_value_no_sharing oc2 (bt : first_name_or_surname_index)
+     output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
+  return ()
 ;
 
 value output_first_name_index oc2 base =
-  let bt = create_first_name_or_surname_index base (fun p -> p.first_name) in
-  output_value_no_sharing oc2 (bt : first_name_or_surname_index)
+  let module IstrTree =
+    Btree.Make
+      (struct type t = istr; value compare = compare_istr_fun base.data; end)
+  in
+  let bt = ref IstrTree.empty in
+  do for i = 0 to base.data.persons.len - 1 do
+       let p = base.data.persons.get i in
+       let a =
+         try IstrTree.find p.first_name bt.val with
+         [ Not_found -> [] ]
+       in
+       bt.val := IstrTree.add p.first_name [ p.cle_index :: a] bt.val;
+     done;
+     output_value_no_sharing oc2 (bt.val : IstrTree.t (list iper));
+  return ()
 ;
 
 value table_size = 0x3fff;
