@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.10 2002-01-30 11:49:44 ddr Exp $
+# $Id: a.gwf,v 4.11 2002-01-30 12:05:20 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -59,7 +59,9 @@ private_years=150
 # name or surname).
 hide_private_names=no
 
-# More restricted system to hide private names
+# More restricted system to hide private names; the hidden persons are
+# not clickable, the links to their children, ancestors and spouses are
+# not accessible.
 use_restrict=no
 
 # Default language

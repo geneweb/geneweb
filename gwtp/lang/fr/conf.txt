@@ -73,6 +73,14 @@ Cacher les noms privés:
 
 <p>
 
+Utiliser le system "accès restreint" (plus strict):
+<input type=radio name=use_restrict
+ value=yes%cuse_restrict=yes;>oui
+<input type=radio name=use_restrict
+ value=no%cuse_restrict=no;>non
+
+<p>
+
 Magiciens seulement amis (pour mises à jour temporaires):
 <input type=radio name=wizard_just_friend
  value=yes%cwizard_just_friend=yes;>oui
