@@ -8,6 +8,10 @@ GeneWeb Version 3.06
   - [17 Jun 00] Suppressed traces of rejected robots failing on password
     accesses.
 
+* Welcome pages (*/start.txt)
+  - [21 Jun 00] The texts after "You can also consult" are now the same
+    for all the welcome pages and translated from the lexicon.
+
 GeneWeb Version 3.05
 --------------------
 

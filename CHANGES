@@ -8,6 +8,8 @@ GeneWeb version 3.06
   - [20 Jun 00] Added Latvian version (Janeks Kamerovskis).
 
 * GeneWeb Service/CGI (gwd)
+  - [21 Jun 00] Added computation of oldest perhaps still alive (from welcome
+    page).
   - [20 Jun 00] Changed displaying of marriage witnesses in personal pages.
   - [20 Jun 00] Together with the link to the welcome page (up arrow), added
     a link to the referer page (left arrow).

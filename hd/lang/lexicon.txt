@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.115 2000-06-21 21:13:00 ddr Exp $
+# $Id: lexicon.txt,v 3.116 2000-06-21 22:19:32 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2049,23 +2049,23 @@ ru: кремирован/кремирована
 se: kremerad
 
     data base forum
-af: forum
+af: databasis forum
 de: Datenbankforum
-dk: forum
+dk: database-forum
 en: data base forum
-eo: forumo
-es: foro
-fi: foorumi
+eo: datenbazforumo
+es: foro de la base de datos
+fi: tietokantafoorumin
 fr: forum de la base de donn&eacute;es
-he:   гйеп
+he:  гййеп тм оавш дойгд дъемгеъй
 is: umrжрur
-it: tribuna
-lv: forums
-nl: forum
-no: forum
-pt: forum
-ru: форум
-se: forum
+it: tribuna della base di dati
+lv: datu bвzes "ziтojumu dзlis"
+nl: databank forum
+no: database forum
+pt: forum da base de dados
+ru: форум базы данных
+se: databas forum
 
     date
 af: datum
@@ -5416,7 +5416,7 @@ se: de %d f&ouml;rnamnen
 
     the %d oldest perhaps still alive
 en: the %d oldest perhaps still alive
-fr: les %d plus anciens peut-&ecirc;tre encore vivants
+fr: les %d plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
 
     the %d surnames
 af: die %d vanne
@@ -5776,7 +5776,7 @@ ru: %d последних смертей
 se: de senaste %d d&ouml;dsfallen
 
     the latest %d marriages
-af: die laaste % huwelike
+af: die laaste %d huwelike
 de: die letzen %d Heiraten
 dk: de seneste %d bryllupper
 en: the latest %d marriages
