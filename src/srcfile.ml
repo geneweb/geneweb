@@ -1,10 +1,19 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.17 2000-05-14 18:07:35 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.18 2000-05-28 02:55:27 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
 open Def;
 open Util;
+
+type counter =
+  {welcome_cnt : mutable int;
+   request_cnt : mutable int;
+   start_date : string;
+   wizard_cnt : mutable int;
+   friend_cnt : mutable int;
+   normal_cnt : mutable int}
+;
 
 value get_date () =
   let tm = Unix.localtime (Unix.time ()) in
@@ -18,6 +27,11 @@ value adm_file f =
 
 value cnt conf ext = adm_file (conf.bname ^ ext);
 
+value input_int ic =
+  try int_of_string (input_line ic) with
+  [ End_of_file | Failure _ -> 0 ]
+;
+
 value count conf =
   let fname = cnt conf ".txt" in
   try
@@ -27,23 +41,36 @@ value count conf =
         let wc = int_of_string (input_line ic) in
         let rc = int_of_string (input_line ic) in
         let d = input_line ic in
-        (wc, rc, d)
-      with _ -> (0, 0, get_date ())
+        let wzc = input_int ic in
+        let frc = input_int ic in
+        let nrc = input_int ic in
+        {welcome_cnt = wc; request_cnt = rc; start_date = d;
+         wizard_cnt = wzc; friend_cnt = frc; normal_cnt = nrc}
+      with _ ->
+        {welcome_cnt = 0; request_cnt = 0; start_date = get_date ();
+         wizard_cnt = 0; friend_cnt = 0; normal_cnt = 0}
     in
     do close_in ic; return rd
   with _ ->
-    (0, 0, get_date ())
+    {welcome_cnt = 0; request_cnt = 0; start_date = get_date ();
+     wizard_cnt = 0; friend_cnt = 0; normal_cnt = 0}
 ;
 
-value write_counter conf (welcome_cnt, request_cnt, start_date) =
+value write_counter conf r =
   let fname = cnt conf ".txt" in
   try
     let oc = open_out_bin fname in
-    do output_string oc (string_of_int welcome_cnt);
+    do output_string oc (string_of_int r.welcome_cnt);
        output_string oc "\n";
-       output_string oc (string_of_int request_cnt);
+       output_string oc (string_of_int r.request_cnt);
        output_string oc "\n";
-       output_string oc start_date;
+       output_string oc r.start_date;
+       output_string oc "\n";
+       output_string oc (string_of_int r.wizard_cnt);
+       output_string oc "\n";
+       output_string oc (string_of_int r.friend_cnt);
+       output_string oc "\n";
+       output_string oc (string_of_int r.normal_cnt);
        output_string oc "\n";
        close_out oc;
     return ()
@@ -55,9 +82,13 @@ value incr_welcome_counter conf =
   let lname = cnt conf ".lck" in
   lock_wait lname with
   [ Accept ->
-      let (welcome_cnt, request_cnt, start_date) = count conf in
-      let r = (welcome_cnt + 1, request_cnt, start_date) in
-      do write_counter conf r; return Some r
+      let r = count conf in
+      do r.welcome_cnt := r.welcome_cnt + 1;
+         if conf.wizard then r.wizard_cnt := r.wizard_cnt + 1
+         else if conf.friend then r.friend_cnt := r.friend_cnt + 1
+         else r.normal_cnt := r.normal_cnt + 1;
+         write_counter conf r;
+      return Some (r.welcome_cnt, r.request_cnt, r.start_date)
   | Refuse -> None ]
 ;
 
@@ -65,9 +96,13 @@ value incr_request_counter conf =
   let lname = cnt conf ".lck" in
   lock_wait lname with
   [ Accept -> 
-      let (welcome_cnt, request_cnt, start_date) = count conf in
-      let r = (welcome_cnt, request_cnt + 1, start_date) in
-      do write_counter conf r; return Some r
+      let r = count conf in
+      do r.request_cnt := r.request_cnt + 1;
+         if conf.wizard then r.wizard_cnt := r.wizard_cnt + 1
+         else if conf.friend then r.friend_cnt := r.friend_cnt + 1
+         else r.normal_cnt := r.normal_cnt + 1;
+         write_counter conf r;
+      return Some (r.welcome_cnt, r.request_cnt, r.start_date)
   | Refuse -> None ]
 ;
 
@@ -119,14 +154,14 @@ value extract_date d =
 ;
 
 value print_date conf =
-  let (wc, rc, d) = count conf in
-  match extract_date d with
+  let r = count conf in
+  match extract_date r.start_date with
   [ Some (d, m, y) ->
       let d =
         Dgreg {day = d; month = m; year = y; prec = Sure; delta = 0} Dgregorian
       in
       Wserver.wprint "%s" (Date.string_of_date conf d)
-  | _ -> Wserver.wprint "%s" d ]
+  | _ -> Wserver.wprint "%s" r.start_date ]
 ;
 
 value rec src_translate conf nom ic =
@@ -239,10 +274,10 @@ value rec copy_from_channel conf base ic =
               let s = s ^ " " ^ body_prop conf in
               Wserver.wprint "%s" s
           | 'c' ->
-              let (wc, rc, d) = count conf in
+              let r = count conf in
               Num.print (fun x -> Wserver.wprint "%s" x)
                 (transl conf "(thousand separator)")
-                (Num.of_int wc)
+                (Num.of_int r.welcome_cnt)
           | 'd' -> print_date conf
           | 'e' -> Wserver.wprint "%s" conf.charset
           | 'f' -> Wserver.wprint "%s" conf.command
@@ -267,10 +302,10 @@ value rec copy_from_channel conf base ic =
                 (Num.of_int base.data.persons.len)
           | 'o' -> Wserver.wprint "%s" (image_prefix conf)
           | 'q' ->
-              let (wc, rc, d) = count conf in
+              let r = count conf in
               Num.print (fun x -> Wserver.wprint "%s" x)
                 (transl conf "(thousand separator)")
-                (Num.of_int (wc + rc))
+                (Num.of_int (r.welcome_cnt + r.request_cnt))
           | 'r' -> copy_from_file conf base (input_line ic)
           | 's' -> Wserver.wprint "%s" (commd conf)
           | 't' -> Wserver.wprint "%s" conf.bname
