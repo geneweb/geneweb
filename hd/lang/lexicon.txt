@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 1.58 1999-02-18 15:52:48 ddr Exp $
+# $Id: lexicon.txt,v 1.59 1999-02-24 08:54:19 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1161,7 +1161,7 @@ he:   סוף
 it: fine
 nl: Einde
 pt: fim
-se: slut
+se: slutar
 
     error
 de: Fehler
@@ -2328,7 +2328,7 @@ fr: photo supprim&eacute;e
 it: foto cancellata
 nl: foto verwijderd
 pt: foto suprimida
-se: foto borttagen
+se: foto borttaget
 
     photo received
 en: photo received
@@ -2692,7 +2692,7 @@ he: %d שמות הפרטיים
 it: i %d nomi
 nl: de %d voornamen
 pt: os %d nomes
-se: de %d f&ouml;rsta namnen
+se: de %d f&ouml;rnamnen
 
     the %d surnames
 de: die %d Nachnamen
