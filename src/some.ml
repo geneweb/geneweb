@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.32 2005-02-15 09:14:34 ddr Exp $ *)
+(* $Id: some.ml,v 4.33 2005-02-24 03:20:07 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -86,7 +86,7 @@ value print_elem conf base is_surname (p, xl) =
     xl
 ;
 
-value first_name_print_list conf base xl liste =
+value first_name_print_list conf base x1 xl liste =
   let liste =
     let l =
       List.sort
@@ -110,11 +110,14 @@ value first_name_print_list conf base xl liste =
          | _ -> [(px, [x]) :: l] ])
       [] l
   in
-  let title _ =
-    do {
-      Wserver.wprint "%s" (List.hd xl);
-      List.iter (fun x -> Wserver.wprint ", %s" x) (List.tl xl);
-    }
+  let title h =
+    if h then Wserver.wprint "%s" x1
+    else
+      Gutil.list_iter_first
+        (fun first x ->
+	   Wserver.wprint "%s<a href=\"%sm=P;v=%s;t=A\">%s</a>"
+	     (if first then "" else ", ") (commd conf) (code_varenv x) x)
+      xl
   in
   do {
     header conf title;
@@ -204,7 +207,7 @@ value first_name_print conf base x =
             pl []
         else pl
       in
-      first_name_print_list conf base strl pl
+      first_name_print_list conf base x strl pl
   | _ -> select_first_name conf base x list ]
 ;
 
@@ -357,7 +360,7 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
     let title h =
       let access x =
         if h || List.length homonymes = 1 then x
-        else geneweb_link conf ("m=N;v=" ^ code_varenv (Name.lower x)) x
+        else geneweb_link conf ("m=N;v=" ^ code_varenv x ^ ";t=A") x
       in
       do {
         let homonymes = List.sort compare homonymes in
@@ -373,7 +376,7 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
       tag "p" begin
         Wserver.wprint "<em style=\"font-size:80%%\">\n";
         Wserver.wprint "%s " (capitale (transl conf "click"));
-        Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
+        Wserver.wprint "<a href=\"%sm=N;o=i;v=%s;t=A\">%s</a>\n" (commd conf)
           (code_varenv fx) (transl conf "here");
         Wserver.wprint "%s"
           (transl conf "for the first names by alphabetic order");
@@ -476,7 +479,7 @@ value print_family_alphabetic x conf base liste =
       let title h =
         let access x =
           if h || List.length homonymes = 1 then x
-          else geneweb_link conf ("m=N;o=i;v=" ^ code_varenv (Name.lower x)) x
+          else geneweb_link conf ("m=N;o=i;v=" ^ code_varenv x ^ ";t=A") x
         in
         do {
           Wserver.wprint "%s" (access (List.hd homonymes));
