@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 1.4 2002-11-12 12:32:40 ddr Exp $
+# $Id: lexicon.txt,v 1.5 2002-11-14 13:08:59 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -28,7 +28,7 @@ is: af=afrikanska/cs=tékkneska/da=danska/de=þýska/en=enska/eo=esperanto/es=spæns
 it: af=afrikaans/bg=bulgaro/ca=catalano/cs=ceco/da=danese/de=tedesco/en=inglese/eo=esperanto/es=spagnolo/et=estone/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pl=polacco/pt=portoghese/pt-br=portoghese-brasiliano/ru=russo/sl=sloveno/sv=svedese/zh=cinese
 lv: cs=Èehu/da=Dâòu/de=Vâcu/en=Angïu/eo=Esperanto/es=Spâòu/fi=Somu/fr=Franèu/he=Ebreju/is=Islandieðû/it=Itâïu/lv=Latvieðu/nl=Holandieðu/no=Norvçìu/pt=Portugâïu/pt-br=Brasil-Portugâïu/ru=Krievu/sv=Zviedru/zh=Íînieðu
 nl: af=Afrikaans/cs=Tsjechisch/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/fi=Fins/fr=Frans/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/nl=Nederlands/no=Noors/pt=Portugees/pt-br=Brasil-Portugees/ru=Russisch/sv=Zweeds/zh=Chinees
-no: af=afrikaans/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/pt-br=Brasil-portugisisk/ru=russisk/sv=svensk/zh=kinesisk
+no: af=afrikaans/bg=bulgarsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=Brasil-portugisisk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
 pl: af=afrikaans/bg=bu³garski/ca=kataloñski/cs=czeski/da=duñski/de=niemiecki/en=angielski/eo=esperanto/es=hiszpañski/et=estoñski/fi=fiñski/fr=francuski/he=hebrajski/is=islandzki/it=w³oski/lv=³otewski/nl=niderlandzki/no=norweski/pl=polski/pt=portugalski/pt-br=portugalski (Brazylia)/ru=rosyjski/sv=szwedzki/zh=chiñski
 pt: af=Afrikaans/ca=Catal&atilde;/cs=Checo/da=Dinamarqu&ecirc;s/de=Alem&atilde;o/en=Ingl&ecirc;s/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finland&ecirc;s/fr=Franc&ecirc;s/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/nl=Holand&ecirc;s/no=Noruegu&ecirc;s/pl=Polon&ecirc;s/pt=Portugu&ecirc;s/pt-br=Portugu&ecirc;s-do-Brasil/ru=Russo/sv=Sueco/zh=Chin&ecirc;s
 pt-br: af=Afrikaner/ca=Catal&atilde;o/cs=Checo/da=Dinamarqu&ecirc;s/de=Alem&atilde;o/en=Ingl&ecirc;s/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finland&ecirc;s/fr=Franc&ecirc;s/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/nl=Holand&ecirc;s/no=Noruegu&ecirc;s/pl=Polon&ecirc;s/pt=Portugu&ecirc;s/pt-br=Portugu&ecirc;s-do-Brasil/ru=Russo/sv=Sueco/zh=Chin&ecirc;s
