@@ -1,4 +1,4 @@
-(* $Id: pa_newseq.ml,v 4.3 2001-04-17 22:41:57 ddr Exp $ *)
+(* $Id: pa_newseq.ml,v 4.4 2001-04-19 13:22:54 ddr Exp $ *)
 
 ifndef NEWSEQ then
 
@@ -42,4 +42,5 @@ declare
             [e] ] ]
     ;
   END;
+  Pcaml.add_option "-warn_seq" (Arg.Unit (fun () -> ())) "";
 end;
