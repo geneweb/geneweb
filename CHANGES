@@ -9,6 +9,11 @@ GeneWeb version 4.01
     in Estonian: the month appeared with all its declinations.
 
 * Lexicon (lang/lexicon.txt)
+  - [14 Mar 01] Added the ability to add "derived" languages, i.e. a language
+    where most of the translations are the same than some other already
+    existing language, but with some changes here and there. In the lexicon,
+    one can write a line with "xx=yy" to indicate that, where xx is the
+    derived language and yy the initial language.
   - [14 Mar 01] Changed the French translation of "nth cousin":
     indeed, in French, the "nth cousin" is translated, litterally, by
     "cousin of the pth degree" where "p" is "2n+2": e.g. a "4th cousin" is
