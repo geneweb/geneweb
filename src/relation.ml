@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.7 2001-03-25 13:06:46 ddr Exp $ *)
+(* $Id: relation.ml,v 4.8 2001-03-25 18:33:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -991,7 +991,8 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   return ()
 ;
 
-value print_solution conf base reltab long n p1 p2 (pp1, pp2, (x1, x2, list)) =
+value print_solution conf base long n p1 p2 (pp1, pp2, (x1, x2, list), reltab)
+=
   do print_link_name conf base (reltab, list) n p1 p2 pp1 pp2 x1 x2;
      if x1 == 0 || x2 == 0 then
        print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
@@ -1009,7 +1010,7 @@ value print_dag_links conf base p1 p2 rl =
   let module M = Map.Make O in
   let anc_map =
     List.fold_left
-      (fun anc_map (pp1, pp2, (x1, x2, list)) ->
+      (fun anc_map (pp1, pp2, (x1, x2, list), _) ->
          List.fold_left
            (fun anc_map (p, n) ->
               let (pp1, pp2, nn, nt, maxlev) =
@@ -1025,7 +1026,7 @@ value print_dag_links conf base p1 p2 rl =
   in
   let is_anc =
     match rl with
-    [ [(_, _, (x1, x2, _)) :: _] -> x1 = 0 || x2 = 0
+    [ [(_, _, (x1, x2, _), _) :: _] -> x1 = 0 || x2 = 0
     | _ -> False ]
   in
   let something =
@@ -1057,7 +1058,7 @@ value print_dag_links conf base p1 p2 rl =
                  else Wserver.wprint ";%s" (acces_n conf base "4" p2);
                  let (l1, l2) =
                    List.fold_left
-                     (fun (l1, l2) (_, _, (x1, x2, list)) ->
+                     (fun (l1, l2) (_, _, (x1, x2, list), _) ->
                         List.fold_left
                           (fun (l1, l2) (a, _) ->
                              if a.cle_index = ip then
@@ -1103,10 +1104,10 @@ value print_dag_links conf base p1 p2 rl =
 
 value print_propose_upto conf base p1 p2 rl =
   match rl with
-  [ [(None, None, (x1, x2, _)) :: _] when x1 == 0 || x2 == 0 ->
+  [ [(None, None, (x1, x2, _), _) :: _] when x1 == 0 || x2 == 0 ->
       let maxlen =
         List.fold_right
-          (fun (_, _, (x1, x2, _)) maxlen -> max maxlen (max x1 x2)) rl 0
+          (fun (_, _, (x1, x2, _), _) maxlen -> max maxlen (max x1 x2)) rl 0
       in
       let (p, a) = if x1 == 0 then (p2, p1) else (p1, p2) in
       do html_p conf;
@@ -1126,7 +1127,8 @@ value print_propose_upto conf base p1 p2 rl =
   | _ -> () ]
 ;
 
-value compute_simple_relationship conf base tab p1 p2 =
+value compute_simple_relationship conf base tstab p1 p2 =
+  let tab = Consang.make_relationship_info base tstab in
   let (relationship, ancestors) =
     Consang.relationship_and_links base tab True p1.cle_index p2.cle_index
   in
@@ -1176,7 +1178,7 @@ value compute_simple_relationship conf base tab p1 p2 =
            | _ -> [(len1, len2, [sol]) :: l] ])
         [] rl
     in
-    Some (rl, total, relationship)
+    Some (rl, total, relationship, tab.Consang.reltab)
 ;
 
 value known_spouses_list base p excl_p =
@@ -1193,7 +1195,7 @@ value known_spouses_list base p excl_p =
 
 value merge_relations rl1 rl2 =
   Sort.merge
-    (fun (po11, po12, (l11, l12, _)) (po21, po22, (l21, l22, _)) ->
+    (fun (po11, po12, (l11, l12, _), _) (po21, po22, (l21, l22, _), _) ->
        if l11 + l12 < l21 + l22 then True
        else if l11 + l12 > l21 + l22 then False
        else if l11 < l21 then True
@@ -1211,12 +1213,11 @@ value combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 =
     (fun p1 sl ->
        List.fold_right
          (fun p2 sl ->
-            let tab = Consang.make_relationship_info base tstab in
-            let sol = compute_simple_relationship conf base tab p1 p2 in
+            let sol = compute_simple_relationship conf base tstab p1 p2 in
             match sol with
-            [ Some (rl, total, _) ->
+            [ Some (rl, total, _, reltab) ->
                 let s = List.map (fun r -> (f_sp1 p1, f_sp2 p2, r)) rl in
-                [(s, total) :: sl]
+                [(s, total, reltab) :: sl]
             | None -> sl ])
          pl2 sl)
     pl1
@@ -1231,8 +1232,7 @@ value compute_relationship conf base by_marr p1 p2 =
     let _ = base.data.ascends.array () in
     let _ = base.data.couples.array () in
     let tstab = Util.create_topological_sort conf base in
-    let tab = Consang.make_relationship_info base tstab in
-    let sol = compute_simple_relationship conf base tab p1 p2 in
+    let sol = compute_simple_relationship conf base tstab p1 p2 in
     let sol_by_marr =
       if by_marr then
         let spl1 = known_spouses_list base p1 p2 in
@@ -1240,17 +1240,17 @@ value compute_relationship conf base by_marr p1 p2 =
         let sl = [] in
         let sl =
           match sol with
-          [ Some ([(_, 0, _) :: _], _, _) -> sl
+          [ Some ([(_, 0, _) :: _], _, _, _) -> sl
           | _ -> combine_relationship conf base tstab [p1] spl2 no_sp sp sl ]
         in
         let sl =
           match sol with
-          [ Some ([(0, _, _) :: _], _, _) -> sl
+          [ Some ([(0, _, _) :: _], _, _, _) -> sl
           | _ -> combine_relationship conf base tstab spl1 [p2] sp no_sp sl ]
         in
         match (sol, sl) with
-        [ (Some ([(x1, x2, _) :: _], _, _), _) when x1 == 0 || x2 == 0 -> sl
-        | (_, [([(_, _, (x1, x2, _)) :: _], _) :: _])
+        [ (Some ([(x1, x2, _) :: _], _, _, _), _) when x1 == 0 || x2 == 0 -> sl
+        | (_, [([(_, _, (x1, x2, _)) :: _], _, _) :: _])
           when x1 == 0 || x2 == 0 ->
             sl
         | _ -> combine_relationship conf base tstab spl1 spl2 sp sp sl ]
@@ -1258,18 +1258,21 @@ value compute_relationship conf base by_marr p1 p2 =
     in
     let (all_sol, rel) =
       match sol with
-      [ Some (rl, total, rel) ->
+      [ Some (rl, total, rel, reltab) ->
           let s = List.map (fun r -> (None, None, r)) rl in
-          ([(s, total) :: sol_by_marr], rel)
+          ([(s, total, reltab) :: sol_by_marr], rel)
       | None -> (sol_by_marr, 0.0) ]
     in
     let (sl, total) =
       List.fold_right
-        (fun (rl1, total1) (rl, total) ->
+        (fun (rl1, total1, reltab) (rl, total) ->
+           let rl1 =
+             List.map (fun (po1, po2, list) -> (po1, po2, list, reltab)) rl1
+           in
            (merge_relations rl1 rl, Num.add total1 total))
         all_sol ([], Num.zero)
     in
-    if sl = [] then None else Some (sl, total, rel, tab.Consang.reltab)
+    if sl = [] then None else Some (sl, total, rel)
 ;
 
 value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
@@ -1307,7 +1310,7 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
   | _ -> () ]
 ;
 
-value print_path conf base i p1 p2 (pp1, pp2, (l1, l2, list)) =
+value print_path conf base i p1 p2 (pp1, pp2, (l1, l2, list), _) =
   let found = ref [] in
   do List.iter
        (fun (a, n) -> print_one_path conf base found a p1 p2 pp1 pp2 l1 l2)
@@ -1337,20 +1340,20 @@ value print_main_relationship conf base long p1 p2 rel =
                 (cftransl conf "no known relationship link between %s and %s"
                    [gen_person_title_text reference raw_access conf base p1;
                     gen_person_title_text reference raw_access conf base p2]))
-     | Some (rl, total, relationship, reltab) ->
+     | Some (rl, total, relationship) ->
          let a1 = aoi base p1.cle_index in
          let a2 = aoi base p2.cle_index in
          let all_by_marr =
            List.for_all
              (fun
-              [ (Some _, _, _) | (_, Some _, _) -> True
+              [ (Some _, _, _, _) | (_, Some _, _, _) -> True
               | _ -> False ])
              rl
          in
          do let _ =
               List.fold_left
                 (fun i sol ->
-                   do print_solution conf base reltab long i p1 p2 sol;
+                   do print_solution conf base long i p1 p2 sol;
                       if long then print_path conf base i p1 p2 sol else ();
                    return succ i)
                 1 rl
