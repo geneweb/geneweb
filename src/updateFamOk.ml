@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.7 1998-12-11 14:24:11 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.8 1998-12-11 15:11:46 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -30,8 +30,8 @@ value getn conf var key =
 ;
 
 value reconstitute_person conf var =
-  let first_name = getn conf var "first_name" in
-  let surname = getn conf var "surname" in
+  let first_name = strip_spaces (getn conf var "first_name") in
+  let surname = strip_spaces (getn conf var "surname") in
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
   let create =
     match getn conf var "p" with
@@ -65,7 +65,7 @@ value reconstitute_family conf =
   let father = reconstitute_person conf "his" in
   let mother = reconstitute_person conf "her" in
   let marriage = Update.reconstitute_date conf "marriage" in
-  let marriage_place = get conf "marriage_place" in
+  let marriage_place = strip_spaces (get conf "marriage_place") in
   let divorce =
     match p_getenv conf.env "divorce" with
     [ Some "not_divorced" -> NotDivorced
@@ -106,7 +106,7 @@ value reconstitute_family conf =
   let fam =
     {marriage = Adef.codate_of_od marriage;
      marriage_place = marriage_place;
-     marriage_src = get conf "marr_src";
+     marriage_src = strip_spaces (get conf "marr_src");
      divorce = divorce; children = Array.of_list children; comment = comment;
      origin_file = ""; fsources = fsources;
      fam_index = Adef.ifam_of_int fam_index}

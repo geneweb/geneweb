@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 1.8 1998-12-11 09:45:59 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.9 1998-12-11 15:11:46 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -531,10 +531,13 @@ type arg_state =
   [ ASnone | ASwaitAncOcc | ASwaitAncSurn | ASwaitDescOcc | ASwaitDescSurn ]
 ;
 value arg_state = ref ASnone;
+value fast = ref False;
 
 value speclist =
   [("-odir", Arg.String (fun s -> out_dir.val := s),
    "<dir>   create files in this directories (else all on stdout)");
+   ("-fast", Arg.Set fast,
+   "        faster, but can alloc much more memory");
    ("-a",
     Arg.String
       (fun s -> do anc_1st.val := s; return arg_state.val := ASwaitAncOcc),
@@ -604,15 +607,15 @@ value main () =
   in
   let base = Iobase.input in_file.val in
   let src_oc_list = ref [] in
-(*
-  let _ = base.persons.array () in
-*)
   let _ = base.ascends.array () in
-(*
-  let _ = base.families.array () in
-  let _ = base.couples.array () in
-*)
   let _ = base.strings.array () in
+  do if fast.val then
+       let _ = base.persons.array () in
+       let _ = base.families.array () in
+       let _ = base.couples.array () in
+       ()
+     else ();
+  return
   let oc_list = ref [] in
   do gwu base out_dir.val src_oc_list anc desc;
      List.iter
