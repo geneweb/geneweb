@@ -2,6 +2,10 @@ GeneWeb version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [30 Oct 02] In places/surnames pages, now the surname links point
+    to the surname, not to a person holding this surname associated with
+    the place: it is less useful but too many people blamed me that it
+    was a bug.
   - [23 Oct 02] In families forms, added shortcuts for created
     persons' dates: one can write: "?year" to indicate "perhaps",
     ">year" or "year/" to indicate "after", "<year" or "/year" to
