@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.16 2002-12-31 08:38:07 ddr Exp $ *)
+(* $Id: templ.ml,v 4.17 2003-12-11 08:38:05 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -26,6 +26,12 @@ value rec get_ident len =
   [ [: `('a'..'z' | 'A'..'Z' | '0'..'9' | '_' as c); s :] ->
       get_ident (Buff.store len c) s
   | [: :] -> Buff.get len ]
+;
+
+value rec get_value len =
+  parser
+  [ [: `(' ' | '>' | ';' | '\n' | '\r' | '\t') :] -> Buff.get len
+  | [: `c; s :] -> get_value (Buff.store len c) s ]
 ;
 
 value rec get_string len =
@@ -232,7 +238,7 @@ value parse_templ conf strm =
               [ ("if", []) -> parse_if strm
               | ("foreach", []) -> parse_foreach strm
               | ("apply", []) -> parse_apply strm
-              | ("wid_hei", []) -> Awid_hei (get_ident 0 strm)
+              | ("wid_hei", []) -> Awid_hei (get_value 0 strm)
               | (v, vl) -> Avar v vl ]
             in
             parse_astl [ast :: astl] False 0 end_list strm ]

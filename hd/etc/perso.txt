@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.21 2003-11-21 11:44:39 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.22 2003-12-11 08:38:04 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -19,10 +19,10 @@
 %message_to_wizard;
 
 %if;is_male;
-<img src="%image_prefix;/male.gif" width=13 height=13
+<img src="%image_prefix;/male.gif"%wid_hei;male.gif;
  alt="[M/F]0" align=left>
 %elseif;is_female;
-<img src="%image_prefix;/female.gif" width=13 height=13
+<img src="%image_prefix;/female.gif"%wid_hei;female.gif;
  alt="[M/F]1" align=left>
 %end;
 
