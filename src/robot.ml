@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 4.3 2001-04-21 15:51:29 ddr Exp $ *)
+(* $Id: robot.ml,v 4.4 2001-04-21 16:39:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -176,9 +176,8 @@ value check oc tm from max_call sec cgi suicide =
                  else ();
                })
             list;
-          Printf.fprintf oc "--- conn %d\n" nconn;
-          Printf.fprintf oc "--- max %d req by %s\n" (fst xcl.max_conn)
-            (snd xcl.max_conn);
+          Printf.fprintf oc "--- max %d req by %s / conn %d\n"
+            (fst xcl.max_conn) (snd xcl.max_conn) nconn;
           refused
         } ]
   in
