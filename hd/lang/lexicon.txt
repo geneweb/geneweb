@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.194 2004-03-10 09:59:50 ddr Exp $
+# $Id: lexicon.txt,v 4.195 2004-03-29 10:16:26 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2272,6 +2272,7 @@ de: Rand
 en: border
 eo: limo
 es: borde
+fi: raja
 fr: bordure
 he:  מסגרת
 it: bordo
@@ -2754,6 +2755,7 @@ en: colour
 en-us: color
 eo: koloro
 es: color 
+fi: v&auml;ri
 fr: couleur
 he:  צבע
 it: colore
@@ -5904,6 +5906,7 @@ de: nicht erv&auml;hnt
 en: no mention
 eo: neniu mencio
 es: sin informaci&oacute;n
+fi: ei mainintaa
 fr: pas de mention
 it: senza menzione
 nl: geen vermelding
@@ -6057,6 +6060,7 @@ de: ge&auml;nderte Notizen
 en: notes modified
 eo: notoj modifitaj
 es: notas modificadas
+fi: muistiinpanoja muokattu
 fr: notes modifi&eacute;es
 it: note modificate
 nl: notitities veranderd
