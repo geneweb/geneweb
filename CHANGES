@@ -9,7 +9,12 @@ GeneWeb version 3.05
     options -setuid and -setgid now unuseful.
   - [30 Apr 00] Fixed little problem with displaying by places for the ones
     containing several (at least two) indications between parentheses.
-  
+
+* Base configuration files (base.gwf)
+  - [08 May 00] (detail) The possible trailing spaces or control-m are
+    now stripped (allowing to move a base.gwf file from Windows to
+    Unix without needing to remove them).
+
 * Documentation
   - [06 May 00] Updated Swedish documentation (Lars Gustavsson).
   - [04 May 00] Added one item in FAQ about a possible problem in CGI mode.
