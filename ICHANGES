@@ -5,6 +5,10 @@ GeneWeb Version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [08 Nov 02] Changed in Util.string_with_macros the filtering of
+    tags: now positive list (good_tags_list) instead of negative
+    list (dangerous_tags_list): this is better protection against present
+    and future HTML tags.
   - [07 Nov 02] The option -images_url did not apply in pages from the
     "DOC" link. Fixed.
   - [26 Oct 02] Some cleanup in src/perso.ml, using more strings than
