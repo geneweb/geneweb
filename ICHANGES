@@ -4,6 +4,10 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.05
 --------------------
 
+* GeneWeb daemon/CGI (gwd) and uncompiler (gwu)
+  - [03 May 00] Delete possible trailing space or newline at end of sources
+    (code missing in some places).
+
 GeneWeb Version 3.04
 --------------------
 
