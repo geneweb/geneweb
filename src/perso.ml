@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.74 2005-02-17 04:04:39 ddr Exp $ *)
+(* $Id: perso.ml,v 4.75 2005-02-21 12:42:06 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -869,6 +869,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
         let env = [('i', fun () -> Util.default_image_name base p)] in
         string_with_macros conf False env (sou base p.notes)
       else ""
+  | "occ" -> if p_auth then string_of_int p.occ else ""
   | "occupation" ->
       if p_auth then
         string_with_macros conf False [] (capitale (sou base p.occupation))

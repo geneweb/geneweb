@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.119 2005-02-20 17:10:06 ddr Exp $ *)
+(* $Id: util.ml,v 4.120 2005-02-21 12:42:09 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -133,12 +133,12 @@ value nth_field w n =
 
 value transl conf w =
   try Hashtbl.find conf.lexicon w with
-  [ Not_found -> "<bdo dir=\"ltr\">[" ^ w ^ "]</bdo>" ]
+  [ Not_found -> "[" ^ w ^ "]" ]
 ;
 
 value transl_nth conf w n =
   try nth_field (Hashtbl.find conf.lexicon w) n with
-  [ Not_found -> "<bdo dir=\"ltr\">[" ^ nth_field w n ^ "]</bdo>" ]
+  [ Not_found -> "[" ^ nth_field w n ^ "]" ]
 ;
 
 value transl_nth_def conf w n def_n =
@@ -147,7 +147,7 @@ value transl_nth_def conf w n def_n =
     let (i1, i2) = nth_field_abs w n in
     if i2 == i1 then nth_field w def_n else String.sub w i1 (i2 - i1)
   with
-  [ Not_found -> "<bdo dir=\"ltr\">[" ^ nth_field w def_n ^ "]</bdo>" ]
+  [ Not_found -> "[" ^ nth_field w def_n ^ "]" ]
 ;
 
 value plus_decl s =
@@ -233,7 +233,7 @@ value transl_a_of_gr_eq_gen_lev conf =
 ;
 
 value failed_format s : format 'a 'b 'c =
-  Obj.magic ("<bdo dir=\"ltr\">[" ^ s ^ "]</bdo>");
+  Obj.magic ("[" ^ s ^ "]");
 
 value valid_format ini_fmt (r : string) =
   let s : string = Obj.magic (ini_fmt : format 'a 'b 'c) in
