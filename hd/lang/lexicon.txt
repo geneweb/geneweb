@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.203 2004-11-06 05:38:31 ddr Exp $
+# $Id: lexicon.txt,v 4.204 2004-11-08 09:45:55 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -8391,7 +8391,7 @@ sv: maken/makan
 
     the whole list
 af: die hele lys
-bg: целият:a:целия списък
+bg: целият списък
 br: ar roll en e bezh
 ca: tot el llistat
 cs: kompletnн seznam
