@@ -6,7 +6,8 @@ GeneWeb version 3.07
     places and surnames could be displayed several times.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
-  - [20 Jul 00] Added the terms "Sosa" and "list (descendants)" in lexicon.
+  - [21 Jul 00] In lexicon: added the terms "Sosa"; changed "list" into
+    "list/list (ancestors)" (specially for better translation in Swedish)
   - [18 Jul 00] Fixed Esperanto version (Thomas Ailleret).
 
 GeneWeb version 3.06
