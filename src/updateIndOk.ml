@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.8 1999-04-29 21:01:33 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.9 1999-05-01 11:45:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -118,7 +118,10 @@ value reconstitute_death conf birth death_place burial burial_place =
 value reconstitute_burial conf =
   let d = Update.reconstitute_date conf "burial" in
   match p_getenv conf.env "burial" with
-  [ Some "UnknownBurial" | None -> UnknownBurial
+  [ Some "UnknownBurial" | None ->
+      match d with
+      [ Some _ -> Buried (Adef.codate_of_od d)
+      | _ -> UnknownBurial ]
   | Some "Buried" -> Buried (Adef.codate_of_od d)
   | Some "Cremated" -> Cremated (Adef.codate_of_od d)
   | Some x -> failwith ("bad burial type " ^ x) ]
