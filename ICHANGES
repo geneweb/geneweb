@@ -5,6 +5,9 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [25 Sep 03] Added ability to put macros of start.txt in "motd"
+    (in general macros in variables defined by macro %V); useful for
+    example to put a "motd" for only wizards.
   - [26 Aug 03] In the titles in display by surname, the surnames are
     now displayed in alphabetic order.
   - [17 Jul 03] Added URL variable "alwsurn": if "yes" the surnames

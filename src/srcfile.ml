@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.18 2003-01-06 12:55:01 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.19 2003-09-25 11:23:02 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -289,36 +289,36 @@ module Lbuff =
   end
 ;
 
-value rec lexicon_translate conf base nomin ic first_c =
+value rec lexicon_translate conf base nomin strm first_c =
   let (upp, s) =
     loop 0 first_c where rec loop len c =
       if c = ']' then
         let s = Lbuff.get len in
         if len > 0 && s.[0] == '*' then (True, String.sub s 1 (len - 1))
         else (False, s)
-      else loop (Lbuff.store len c) (input_char ic)
+      else loop (Lbuff.store len c) (Stream.next strm)
   in
   let (n, c) =
-    match input_char ic with
+    match Stream.next strm with
     [ '0'..'9' as c -> (Char.code c - Char.code '0', "")
     | c -> (0, String.make 1 c) ]
   in
   let r =
     if c = "[" then
       Util.transl_decline conf s
-        (lexicon_translate conf base False ic (input_char ic))
+        (lexicon_translate conf base False strm (Stream.next strm))
     else
       let r = Util.transl_nth conf s n in
       match Gutil.lindex r '%' with
       [ Some i when c = "(" ->
           let sa =
             loop 0 where rec loop len =
-              let c = input_char ic in
+              let c = Stream.next strm in
               if c == ')' then Lbuff.get len
               else
                 let len =
                   if c == '%' then
-                    let c = input_char ic in
+                    let c = Stream.next strm in
                     Lbuff.mstore len (macro conf base c)
                   else Lbuff.store len c
                 in
@@ -331,16 +331,16 @@ value rec lexicon_translate conf base nomin ic first_c =
   if upp then capitale r else r
 ;
 
-value src_translate conf base nomin ic =
-  let c = input_char ic in
+value src_translate conf base nomin strm =
+  let c = Stream.next strm in
   if c = '\n' then
     let s =
-      loop 0 (input_char ic) where rec loop len c =
+      loop 0 (Stream.next strm) where rec loop len c =
         if c = ']' then Lbuff.get len
-        else loop (Lbuff.store len c) (input_char ic)
+        else loop (Lbuff.store len c) (Stream.next strm)
     in
     Translate.inline conf.lang '%' (macro conf base) s
-  else lexicon_translate conf base nomin ic c
+  else lexicon_translate conf base nomin strm c
 ;
 
 value browser_cannot_handle_passwords conf =
@@ -348,16 +348,22 @@ value browser_cannot_handle_passwords conf =
   String.lowercase user_agent = "konqueror"
 ;
 
-value get_variable ic =
+value get_variable strm =
   loop 0 where rec loop len =
-    match input_char ic with
+    match Stream.next strm with
     [ ';' -> Buff.get len
     | c -> loop (Buff.store len c) ]
 ;
 
+value rec stream_line =
+  parser
+  [ [: `'\n' :] -> ""
+  | [: `c; s :] -> String.make 1 c ^ stream_line s ]
+;
+
 type src_mode = [ Lang | Source ];
 
-value rec copy_from_channel conf base ic mode =
+value rec copy_from_stream conf base strm mode =
   let echo = ref True in
   let no_tables = browser_doesnt_have_tables conf in
   let (push_echo, pop_echo) =
@@ -370,7 +376,7 @@ value rec copy_from_channel conf base ic mode =
   in
   let rec if_expr =
     fun
-    [ 'N' -> not (if_expr (input_char ic))
+    [ 'N' -> not (if_expr (Stream.next strm))
     | 'a' -> conf.auth_file <> ""
     | 'c' -> conf.cgi || browser_cannot_handle_passwords conf
     | 'f' -> conf.friend
@@ -380,74 +386,76 @@ value rec copy_from_channel conf base ic mode =
     | 'n' -> base.data.bnotes.nread 1 <> ""
     | 'o' -> Sys.file_exists (Wiznotes.dir conf)
     | 'p' ->
-        match p_getenv conf.base_env (get_variable ic) with
+        match p_getenv conf.base_env (get_variable strm) with
         [ Some "" | None -> False
         | Some _ -> True ]
-    | 's' -> p_getenv conf.base_env (get_variable ic) <> Some "no"
+    | 's' -> p_getenv conf.base_env (get_variable strm) <> Some "no"
     | 'w' -> conf.wizard
     | 'z' -> Util.find_person_in_env conf base "z" <> None
     | '|' ->
-        let a = if_expr (input_char ic) in
-        let b = if_expr (input_char ic) in a || b
+        let a = if_expr (Stream.next strm) in
+        let b = if_expr (Stream.next strm) in a || b
     | '&' ->
-        let a = if_expr (input_char ic) in
-        let b = if_expr (input_char ic) in a && b
+        let a = if_expr (Stream.next strm) in
+        let b = if_expr (Stream.next strm) in a && b
     | c -> do { Wserver.wprint "!!!!!%c!!!!!" c; True } ]
   in
   try
     while True do {
-      match input_char ic with
+      match Stream.next strm with
       [ '[' ->
-          let s = src_translate conf base True ic in
+          let s = src_translate conf base True strm in
           if not echo.val then () else Wserver.wprint "%s" s
       | '<' when no_tables && echo.val ->
-          let c = input_char ic in
+          let c = Stream.next strm in
           let (slash, c) =
-            if c = '/' then ("/", input_char ic) else ("", c)
+            if c = '/' then ("/", Stream.next strm) else ("", c)
           in
           let (atag, c) =
             loop 0 c where rec loop len =
               fun
               [ '>' | ' ' | '\n' as c -> (Buff.get len, c)
-              | c -> loop (Buff.store len c) (input_char ic) ]
+              | c -> loop (Buff.store len c) (Stream.next strm) ]
           in
           match atag with
           [ "table" | "tr" | "td" ->
               let rec loop =
                 fun
                 [ '>' -> ()
-                | _ -> loop (input_char ic) ]
+                | _ -> loop (Stream.next strm) ]
               in
               loop c
           | _ -> Wserver.wprint "<%s%s%c" slash atag c ]
       | '%' ->
-          let c = input_char ic in
+          let c = Stream.next strm in
           match c with
-          [ 'I' -> push_echo (echo.val && if_expr (input_char ic))
+          [ 'I' -> push_echo (echo.val && if_expr (Stream.next strm))
           | 'E' -> pop_echo ()
           | _ when not echo.val -> ()
           | '%' -> Wserver.wprint "%%"
           | '[' | ']' -> Wserver.wprint "%c" c
           | 'h' -> hidden_env conf
           | 'j' -> include_hed_trl conf (Some base) ".hed"
-          | 'r' -> copy_from_file conf base (input_line ic) mode
+          | 'r' -> copy_from_file conf base (stream_line strm) mode
           | 'u' ->
               let lang =
                 loop 0 where rec loop len =
-                  let c = input_char ic in
+                  let c = Stream.next strm in
                   if c = ';' then Buff.get len else loop (Buff.store len c)
               in
               let lang_def = transl conf " !languages" in
               Wserver.wprint "%s" (Translate.language_name lang lang_def)
           | 'V' ->
-              match p_getenv conf.base_env (get_variable ic) with
-              [ Some txt -> Wserver.wprint "%s" txt
-              | None -> () ]
+	      let txt =
+                try List.assoc (get_variable strm) conf.base_env with
+		[ Not_found -> "" ]
+	      in
+              copy_from_string conf base txt mode
           | c -> Wserver.wprint "%s" (macro conf base c) ]
       | c -> if echo.val then Wserver.wprint "%c" c else () ]
     }
   with
-  [ End_of_file -> close_in ic ]
+  [ Stream.Failure -> () ]
 and copy_from_file conf base name mode =
   let fname =
     match mode with
@@ -461,6 +469,13 @@ and copy_from_file conf base name mode =
         Wserver.wprint "<em>... file not found: \"%s.txt\"</em>" name;
         html_br conf;
       } ]
+and copy_from_channel conf base ic mode =
+  do {
+    copy_from_stream conf base (Stream.of_channel ic) mode;
+    close_in ic
+  }
+and copy_from_string conf base str mode =
+  copy_from_stream conf base (Stream.of_string str) mode
 ;
 
 value gen_print with_logo mode conf base fname =
