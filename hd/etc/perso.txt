@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.4 2000-10-12 12:45:41 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.5 2000-10-13 14:37:10 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -94,30 +94,62 @@
   </td></tr></table>
 %end;
 
-%if;has_image; <table border=%border; width="90%%"> <tr><td> <a
-  href="%image_url;"><img src="%image_url;"%image_size; border=0
-  alt="[image/images]0"></a> %end; %if;(has_occupation or
-  has_birth_date or has_birth_place or has_baptism_date or
-  has_baptism_place or is_dead or is_buried or is_cremated or
-  has_consanguinity) %if;has_image;<td>%end; <ul>
-  %if;has_occupation;<li>%occupation;%end; %if;has_birth_date;
-  <li>[*born]s %on_birth_date; %if;birthday; ([happy birthday to
-  you!])%end; %if;has_birth_place;, %birth_place;%end; %else;
-  %if;has_birth_place;<li>[*born]s -&nbsp;%birth_place;%end; %end;
-  %if;has_baptism_date; <li>[*baptized]s %on_baptism_date;
-  %if;has_baptism_place;, %baptism_place;%end; %else;
-  %if;has_baptism_place;<li>[*baptized]s -&nbsp;%baptism_place;%end;
-  %end; %if;is_dead; <li>%died; %if;has_death_date;
-  %on_death_date;%end; %if;has_death_place; -&nbsp;%death_place;%end;
-  %end; %if;computable_age; <li>[*age]: %age; %end; %if;is_buried;
-  <li>[*buried]s %if;has_burial_date; %on_burial_date;%end;
-  %if;has_burial_place;- &nbsp;%burial_place;%end; %end;
-  %if;is_cremated; <li>[*cremated]s %if;has_cremation_date;
-  %on_cremation_date;%end; %if;has_cremation_place;-
-  &nbsp;%cremation_place;%end; %end; %if;computable_death_age;
-  <li>[*age at death:] %death_age; %end; %if;has_consanguinity;
-  <li>[*consanguinity]: %consanguinity; %end; </ul> %end;
-  %if;has_image; </table> %end;
+%if;has_image;
+  <table border=%border; width="90%%">
+  <tr><td>
+   <a href="%image_url;"><img
+    src="%image_url;"%image_size; border=0
+    alt="[image/images]0"></a>
+%end;
+%if;(has_occupation or has_birth_date or has_birth_place or
+     has_baptism_date or has_baptism_place or is_dead or is_buried or
+     is_cremated or has_consanguinity)
+  %if;has_image;<td>%end;
+  <ul>
+    %if;has_occupation;<li>%occupation;%end;
+    %if;has_birth_date;
+      <li>[*born]s %on_birth_date;
+      %if;birthday; ([happy birthday to you!])%end;
+      %if;has_birth_place;, %birth_place;%end;
+    %else;
+      %if;has_birth_place;<li>[*born]s -&nbsp;%birth_place;%end;
+    %end;
+    %if;has_baptism_date;
+      <li>[*baptized]s %on_baptism_date;
+      %if;has_baptism_place;, %baptism_place;%end;
+    %else;
+      %if;has_baptism_place;<li>[*baptized]s -&nbsp;%baptism_place;%end;
+    %end;
+    %if;is_dead;
+      <li>%died;
+      %if;has_death_date; %on_death_date;%end;
+      %if;has_death_place; -&nbsp;%death_place;%end;
+    %end;
+    %if;computable_age;
+      <li>[*age]: %age;
+    %end;
+    %if;is_buried;
+      <li>[*buried]s
+      %if;has_burial_date; %on_burial_date;%end;
+      %if;has_burial_place; -&nbsp;%burial_place;%end;
+    %end;
+    %if;is_cremated;
+      <li>[*cremated]s
+      %if;has_cremation_date; %on_cremation_date;%end;
+      %if;has_cremation_place; -&nbsp;%cremation_place;%end;
+    %end;
+    %if;computable_death_age;
+      <li>[*age at death:] %death_age;
+    %end;
+    %if;has_consanguinity;
+      <li>[*consanguinity]: %consanguinity;
+    %end;
+  </ul>
+%end;
+
+%if;has_image;
+  </table>
+%end;
 
 %if;has_parents;
   <h3><font color=%highlight;>[*parents]</font></h3>
