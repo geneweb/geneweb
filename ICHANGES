@@ -5,6 +5,9 @@ GeneWeb Version 3.12
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [14 Feb 01] Fixed problem in lexicon: declinations were missing, e.g.
+    combinations "merge persons" or "switch families" did not work in
+    Esperanto.
   - [13 Feb 01] If "propose_add_family" is "no" in config file, forbid
     to add families not connected to the rest (i.e. "ok" on "add family"
     form when everybody is "create").

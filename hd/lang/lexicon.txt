@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.232 2001-02-14 02:47:08 ddr Exp $
+# $Id: lexicon.txt,v 3.233 2001-02-14 03:19:04 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -2857,7 +2857,7 @@ ct: família afegida
 de: Familie hinzugef&uuml;gt
 dk: familie tilf&oslash;jet
 en: family added
-eo: aldonita familio 
+eo: familio aldonita 
 es: familia agregada
 et: pere lisatud		
 fi: perhe lis&auml;tty
@@ -2879,7 +2879,7 @@ ct: família esborrada
 de: Familie gel&ouml;scht
 dk: familie slettet
 en: family deleted
-eo: nuligita familio 
+eo: familio nuligita 
 es: familia borrada
 et: pere kustutatud
 fi: perhe poistettu
@@ -2923,7 +2923,7 @@ ct: família/famílies
 de: Familie/Familien
 dk: familie/familier
 en: family/families
-eo: familio:a:+n/familioj
+eo: familio:a:+n/familioj:a:+n
 es: familia/familias
 et: pere/pered
 fi: perhe/perheet
@@ -4280,7 +4280,7 @@ ct: missatge afegit
 de: Nachricht hinzugef&uuml;gt
 dk: meddelelse tilf&oslash;jet
 en: message added
-eo: almetita mesagxo
+eo: mesagxo almetita
 es: mensaje agregado
 et: teade lisatud
 fi: viesti lis&auml;tty

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.26 2001-02-14 02:47:09 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.27 2001-02-14 03:19:04 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -946,7 +946,7 @@ value rec eval_ast conf base env p =
   | Avar s sl -> print_variable conf base env p [s :: sl]
   | Awid_hei s -> Wserver.wprint "Awid_hei"
   | Aif e alt ale -> eval_if conf base env p e alt ale
-  | Aforeach s sl al -> Wserver.wprint "Aforeach" ]
+  | Aforeach s sl al -> Wserver.wprint "Aforeach &#034;%s&#034;" s ]
 and eval_if conf base env p e alt ale =
   let al = if eval_bool_value conf base env p e then alt else ale in
   List.iter (eval_ast conf base env p) al
