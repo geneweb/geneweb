@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.15 1999-07-15 08:52:46 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.16 1999-07-18 16:51:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -439,6 +439,7 @@ value do_check = ref True;
 value out_file = ref "a";
 value do_consang = ref False;
 value pr_stats = ref False;
+value force = ref False;
 
 value cache_of tab =
   let c =
@@ -566,6 +567,7 @@ value main () =
        [("-c", Arg.Set just_comp, "Only compiling");
         ("-o", Arg.String (fun s -> out_file.val := s),
          "<file> Output data base (default: a.gwb)");
+        ("-f", Arg.Set force, "Overwrite output if existing");
         ("-stats", Arg.Set pr_stats, "Print statistics");
         ("-nc", Arg.Clear do_check, "No consistency check");
         ("-cg", Arg.Set do_consang, "Compute consanguinity");
@@ -596,18 +598,25 @@ and [options] are:";
           else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\"")))
        (List.rev files.val);
      if not just_comp.val then
-       do lock (Iobase.lock_file out_file.val) with
-          [ Accept ->
-              let base = link (List.rev gwo.val) in
-              do Gc.compact ();
-                 Iobase.output out_file.val base;
-              return ()
-          | Refuse ->
-              do Printf.printf "Base is locked: cannot write it\n";
-                 flush stdout;
-              return exit 2 ];
-          output_command_line out_file.val;
-       return ()
+       if Sys.file_exists (out_file.val ^ ".gwb") && not force.val then
+         do Printf.eprintf
+              "Base \"%s\" already exists: use option -f to erase it\n"
+              out_file.val;
+            flush stdout;
+         return exit 2
+       else
+         do lock (Iobase.lock_file out_file.val) with
+            [ Accept ->
+                let base = link (List.rev gwo.val) in
+                do Gc.compact ();
+                   Iobase.output out_file.val base;
+                return ()
+            | Refuse ->
+                do Printf.printf "Base is locked: cannot write it\n";
+                   flush stdout;
+                return exit 2 ];
+            output_command_line out_file.val;
+         return ()
      else ();
   return ()
 ;
