@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.31 2004-08-20 08:52:07 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.32 2004-08-27 11:08:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1433,7 +1433,6 @@ value gen_output no_patches bname base =
       let _ = base.data.descends.array () in
       let _ = base.data.strings.array () in ()
     else ();
-    base.func.cleanup ();
     let oc = Secure.open_out_bin tmp_base in
     let oc_acc = Secure.open_out_bin tmp_base_acc in
     let output_array arrname arr =
@@ -1569,6 +1568,7 @@ value gen_output no_patches bname base =
         else ();
         raise e
       };
+    base.func.cleanup ();
     remove_file (Filename.concat bname "base");
     Sys.rename tmp_base (Filename.concat bname "base");
     remove_file (Filename.concat bname "base.acc");
