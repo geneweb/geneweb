@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.7 2000-06-22 12:18:58 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.8 2000-06-22 20:19:08 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogy - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -191,14 +191,14 @@ Jûs variet meklçt ðinî datu bâzç:<br><p>
 
 <p>
 
-Kopð %d datu bâze ir apmeklçta %q reizes, %c no tiem ir bijuði ðinî lappusç. 
+Kopð %D datu bâze ir apmeklçta %q reizes, %c no tiem ir bijuði ðinî lappusç. 
 %Il<p>%E
 
 <p>
 
-Ja Jûsu Interneta caurlûkprograma automâtiski nepârlâdç lappuses pçc
+Ja Jûsu Interneta caurlûkprogramma automâtiski nepârlâdç lappuses pçc
 veiktajâm izmaiòâm (tâdçjâdi radot Jums nepiecieðamîbu "pârlâdçt
-tekoðo dokumentu"), tad pemçìiniet uzklikðíinât <a
+tekoðo dokumentu"), tad pamçìiniet uzklikðíinât <a
 href="%sescache=0">ðeit</a>.
 
 </td></tr>
