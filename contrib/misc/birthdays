@@ -1,0 +1,61 @@
+#!/bin/sh
+#
+# $version 0.01
+#
+# Get the "Birthdays" page from a GeneWeb database.
+# Output all birthdays near a day or whole month
+#
+# Quick hack for GeneWeb linux users
+#   by Falko Trojahn 
+#
+# Needed programs:  bash lynx grep 
+#
+#
+# Arguments:       without args, give us the birthdays from the localhost
+#                   GeneWeb Database (PLEASE change GWBASE according to your
+#                   database dir)
+#	     month  as argument number one, get all anniversaries for this month
+#	     $1    if there is an argument 1, this is the geneweb host we use, 
+#                   e.g. localhost:2317/base (optional)
+#            $2    if there is an argument 2, it is the number of the month, 
+#		    e. g. 12 for december    (optional)
+# 
+# crontab usage:
+#   put the script in your home path (or whereever your sysadmin
+#   permitted you to do so) and put the following two lines
+#   (without the  "#", fill in your correct link) into your crontab:
+#
+# 1 0 * * * ~/birthdays localhost\:2317/base
+# 1 0 1 * * ~/birthdays localhost\:2317/base `date +\%m`
+#
+# short usage:
+# 1 0 * * * ~/birthdays
+# 1 0 1 * * ~/birthdays month
+#
+#   Whenever there is an anniversary in one of the following days,
+#   you get a mail!
+#
+# Put the Name of your GeneWeb-Database here:
+#
+GWBASE=familie
+#
+# No lines to change from here
+#
+#   echo $0
+   if [ -z $1 ] ; then
+      genewebhost="localhost:2317/$GWBASE"
+      selection=""
+   elif [ $1 == month ] ; then
+      genewebhost="localhost:2317/$GWBASE"
+      selection=";v=`date +\%m`"
+   elif [ -z $2 ] ; then
+      genewebhost=$1
+   else
+      genewebhost=$1
+      selection=";v=$2"
+   fi
+	lynx -dump -width 200 http://$genewebhost\?m=AN$selection | grep "[\*\|\+|\,]"| grep -v http
+	lynx -dump -width 200 http://$genewebhost\?m=AM$selection | grep "[\*\|\+|\,]"| grep -v http
+#
+# End of Script
+#
