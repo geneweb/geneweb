@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: gwf_1.htm,v 1.5 2002-01-17 13:14:57 ddr Exp $ -->
+  <!-- $Id: gwf_1.htm,v 1.6 2002-01-17 13:59:48 ddr Exp $ -->
   <title>[
 de: Parameter "$a"
 en: Parameters "$a"
@@ -1011,6 +1011,28 @@ en: History of updates
 fr: Historique des mises &agrave; jour
 ]
 
+<p>
+
+[
+en: Ask to indicate the updates in the welcome pages as a link
+    "history of updates".
+    <p>
+    Remark (technical): the updates traces are saved in a file named
+    "history" in the directory of the database ($a.gwb). This file
+    grows indefinitively. You can edit it to remove the old information.
+    Or you can also delete this file to restart empty.
+fr: Demande d'indiquer les mises &agrave; jour dans la page d'accueil
+    sous le lien "historique des mises &agrave; jour".
+    <p>
+    Remarque (technique): les traces des mises &agrave; jour sont
+    sauv&eacute;es dans un fichier de nom "history" dans le r&eacute;pertoire
+    de la base de donn&eacute;e ($a.gwb). Ce fichier grossit
+    ind&eacute;finiment. Si vous voulez effacer les anciennes traces,
+    il faut &eacute;diter ce fichier pour les supprimer. Ou vous pouvez
+    aussi supprimer le fichier pour repartir &agrave; vide.
+]
+</tr>
+
 <tr align=left>
 <td align=center>
 <input type=radio name=history value=yes$Chistory=yes;>[
@@ -1040,9 +1062,36 @@ sv: No
 <td>[
 en: Images path
 fr: Chemin d'acc&egrave;s aux images
-]</td>
-</tr>
+]
 
+<p>
+
+[
+en: If you want that your images are installed in the standard place
+    (databases directory, sub-directory "images", sub-sub-directory "$a"),
+    indicate here the path to the directory you want to use. This path is
+    an URL: if it is a Web site, it must start with <tt>http://</tt>, if
+    it is a local directory, it must start with <tt>file://</tt>.
+    <p>
+    This concerns the images which are indicated in the person form, field
+    "image". This does not concern the images installed by the link "send
+    image" which are installed as a standard name in a standard place.
+fr: Si vous d&eacute;sirez que vos images ne soient pas install&eacute;es
+    dans l'endroit standard (r&eacute;pertoire des bases,
+    sous-r&eacute;pertoire "images", sous-sous-r&eacute;pertoire "$a"),
+    indiquez ici le chemin d'acc&egrave;s au r&eacute;pertoire que vous
+    voulez utiliser. Ce chemin d'acc&egrave;s est une URL: si c'est un
+    site Web, il doit commencer par <tt>http://</tt>, si c'est un
+    r&eacute;pertoire local, il doit commencer par <tt>file://</tt>.
+    <p>
+    Cela ne concerne que les images qui sont indiqu&eacute;es dans le
+    formulaire des personnes, champ "image". Cela ne concerne pas les
+    images install&eacute;es par le lien "envoyer images" qui, elles, sont
+    install&eacute;es avec un nom standard dans le r&eacute;pertoire
+    standard.
+]
+
+</tr>
 <tr align=left>
 <td align=center><input name=images_path value="$Vimages_path;"
 size=50></td>
@@ -1099,9 +1148,12 @@ sv: "Friends" kan se alla datum, noteringar och bilder för personer födda
 
 [
 de: Wenn dieser Eintrag leer bleibt, ist jeder ein "Freund".
-en: If this area is empty, everybody is a "friend".
+en: If this area is empty, everybody is a "friend". You can leave
+    this area empty if your computer is not accessible from outside.
 es: Si esta zona est&aacute; vac&iacute;a todo el mundo es "amigo".
-fr: Si cette zone est vide, tout le monde est "ami".
+fr: Si cette zone est vide, tout le monde est "ami". Vous pouvez
+    laisser cette zone vide si votre ordinateur n'est pas accessible
+    de l'ext&eacute;rieur.
 lv: Ja ðis lodziòð tiks atstâts tukðs, tad ikviens tiks uzskatîts par "draugu".
 sv:  Om den lämnas tom, är alla en "friend".
 ]
@@ -1150,9 +1202,12 @@ sv: "Wizards" kan göra modifieringar i databasen.
 
 [
 de: Wenn dieser Eintrag leer bleibt, ist jeder ein "Wizard".
-en: If this area is empty, everybody is a "wizard".
+en: If this area is empty, everybody is a "wizard". You can leave
+    this area empty if your computer is not accessible from outside.
 es: Si esta zona est&aacute; vac&iacute;a todo el mundo es "mago".
-fr: Si cette zone est vide, tout le monde est "magicien".
+fr: Si cette zone est vide, tout le monde est "magicien". Vous pouvez
+    laisser cette zone vide si votre ordinateur n'est pas accessible
+    de l'ext&eacute;rieur.
 lv: Ja ðis lodziòð tiks atsâts tukðs, tad ikviens tiks uzskatîts par "burvi".
 sv: Om den lämnas tom, är alla en "wizard".
 ]</td>
