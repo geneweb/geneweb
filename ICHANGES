@@ -4,8 +4,16 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 2.05
 --------------------
 
+* General
+  - [Jul 15, 99] Changed internal reprentation of strings in data bases:
+    no more use of ansel encoding, returning back to version 1.06. Should
+    not change anything to normal users. This was done because of too
+    many drawbacks (many displaying bugs, code more complicated) against
+    too few advantages (displaying supposed to be correct when mixing
+    various encodings). Anyway, code is smaller.
+
 * GeneWeb daemon/CGI (gwd)
-  - [Jun 14, 99] Tried to make charset iso-8859-1 work.
+  - [Jun 14, 99] Tried to make charset iso-8859-2 work.
   - [Jun 14, 99] Fixed Name.lower to reflect Ansel encoding and changing
     "oslash" into "o".
   - [Jul 9, 99] Changed request syntax for cousins: "v1=#" instead of "v=#"

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.23 1999-07-05 09:39:22 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.24 1999-07-15 08:52:33 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -28,7 +28,7 @@ value lowercase_surnames = ref False;
 value extract_first_names = ref True;
 value extract_public_names = ref True;
 value charset_option = ref None;
-value charset = ref Ansel;
+value charset = ref Ascii;
 value try_negative_dates = ref False;
 value no_negative_dates = ref False;
 value month_number_dates = ref NoMonthNumberDates;
@@ -84,7 +84,7 @@ value rec line_start num =
   parser [ [: `' '; s :] -> line_start num s | [: `x when x = num :] -> () ]
 ;
 
-value ansel_of_msdos s =
+value ascii_of_msdos s =
   let need_copy =
     loop 0 where rec loop i =
       if i == String.length s then False
@@ -121,15 +121,15 @@ value ansel_of_msdos s =
          in
          s'.[i] := Char.chr cc;
        done;
-    return Ansel.of_iso_8859_1 s'
+    return s'
   else s
 ;
 
-value ansel_of_string s =
+value ascii_of_string s =
   match charset.val with
-  [ Ansel -> s
-  | Ascii -> Ansel.of_iso_8859_1 s
-  | Msdos -> ansel_of_msdos s ]
+  [ Ansel -> Ansel.to_iso_8859_1 s
+  | Ascii -> s
+  | Msdos -> ascii_of_msdos s ]
 ;
 
 value rec get_lev n =
@@ -140,8 +140,8 @@ value rec get_lev n =
         else parse_text n r1 strm
       in
       {rlab = rlab;
-       rval = ansel_of_string rval;
-       rcont = ansel_of_string rcont;
+       rval = ascii_of_string rval;
+       rcont = ascii_of_string rcont;
        rsons = List.rev l; rpos = line_cnt.val}
 and parse_address n r1 =
   parser
@@ -696,8 +696,8 @@ value get_lev0 =
        r3 = get_to_eoln 0 ? "get to eoln";
        l = get_lev_list [] '1' ? "get lev list" :] ->
       let (rlab, rval) = if r2 = "" then (r1, "") else (r2, r1) in
-      let rval = ansel_of_string rval in
-      let rcont = ansel_of_string r3 in
+      let rval = ascii_of_string rval in
+      let rcont = ascii_of_string r3 in
       {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l;
        rpos = line_cnt.val}
 ;

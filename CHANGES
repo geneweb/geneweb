@@ -1,7 +1,16 @@
 GeneWeb version 2.05
 --------------------
 
+* General
+  - [Jul 15, 99] Changed internal representation of strings in data bases.
+    Should not make any differences. However, as it is a major internal
+    change in the program, problems may appear (mainly in displaying or in
+    access by name, first name, surname, title): in this case, please
+    report.
+
 * Setup program
+  - [Jul 15, 99] Changed GEDCOM export menu to reflect new option "-charset"
+    of "gwb2ged" (see below in section "GeneWeb to Gedcom").
   - [Jul 2, 99] Fixed bug: importing GeneWeb base from old version passing
     by a GEDCOM file did not work if the current directory held spaces.
   - [Jul 2, 99] Changed names of html files to hold 8 characters maximum
@@ -25,6 +34,8 @@ GeneWeb version 2.05
   - [Jul 2, 99] Recognizes the dates of the form "FROM..TO..".
 
 * GeneWeb to Gedcom (gwb2ged)
+  - [Jul 15, 99] Added option "-charset" whose values can be "ANSEL" or
+    "ASCII": "ASCII" is the default. Deleted option "-ascii".
   - [Jul 2, 99] Generate now dates of the form "FROM..TO.." for titles.
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
