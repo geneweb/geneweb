@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.4 1999-10-30 23:14:09 ddr Exp $ *)
+(* $Id: util.ml,v 3.5 1999-10-30 23:53:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -686,18 +686,19 @@ value copy_string_with_macros conf s =
 ;
 
 value gen_trailer with_logo conf =
+  let action = if conf.cgi then conf.command else "geneweb" in
   let env =
     [('s', commd conf);
      ('d',
       if conf.cancel_links then ""
-      else " - <a href=\"" ^ commd conf ^ "m=DOC\">DOC</a>")]
+      else " - <a href=\"" ^ action ^ "?m=DOC\">DOC</a>")]
   in
   do if not with_logo then ()
      else
         Wserver.wprint "<p>
 <img src=\"%s?m=IM;v=/gwlogo.gif\"
 alt=GeneWeb width=64 height=72 align=right>\n<br>\n"
-          (if conf.cgi then conf.command else "geneweb");
+          action;
      try copy_etc_file env "copyr" with
      [ Sys_error _ ->
          do html_p conf;

@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 3.0 1999-10-29 10:31:09 ddr Exp $ *)
+(* $Id: doc.ml,v 3.1 1999-10-30 23:53:16 ddr Exp $ *)
 
 open Config;
 
@@ -94,14 +94,15 @@ value print conf =
              with
              [ End_of_file -> close_in ic ];
           return Buff.get len.val
-       in
-       let pref_doc =
-         let dir = Filename.dirname v ^ "/" in
-         let dir = if dir = "./" then "" else dir in
-         conf.command ^ "?m=DOC;v=" ^ dir
-       in
-       let pref_img = conf.command ^ "?m=IM;v=/" in
-       copy conf pref_doc pref_img s
+        in
+        let action = if conf.cgi then conf.command else "geneweb" in
+        let pref_doc =
+          let dir = Filename.dirname v ^ "/" in
+          let dir = if dir = "./" then "" else dir in
+          action ^ "?m=DOC;v=" ^ dir
+        in
+        let pref_img = action ^ "?m=IM;v=/" in
+        copy conf pref_doc pref_img s
     | None -> Util.incorrect_request conf ]
   else Util.incorrect_request conf
 ;
