@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 4.13 2005-02-04 20:18:59 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 4.14 2005-02-20 10:52:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -36,21 +36,8 @@ value ged_month cal m =
       else failwith "ged_month" ]
 ;
 
-value iso_8859_1_of_utf_8 s =
-  loop 0 0 where rec loop i len =
-    if i == String.length s then Buff.get len
-    else
-      let c = s.[i] in
-      match Char.code c with
-      [ 0xC2 when i + 1 < String.length s ->
-          loop (i + 2) (Buff.store len s.[i+1])
-      | 0xC3 when i + 1 < String.length s ->
-          loop (i + 2) (Buff.store len (Char.chr (Char.code s.[i+1] + 0x40)))
-      | _ -> loop (i + 1) (Buff.store len c) ]
-;
-
 value encode s =
-  let s = if Gutil.utf_8_db.val then iso_8859_1_of_utf_8 s else s in
+  let s = if Gutil.utf_8_db.val then Gutil.iso_8859_1_of_utf_8 s else s in
   if ascii.val then s else Ansel.of_iso_8859_1 s
 ;
 

@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.23 2005-02-12 18:34:29 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.24 2005-02-20 10:52:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -99,6 +99,7 @@ value check_noloop_for_person_list :
 ;
 
 value strip_spaces : string -> string;
+value alphabetic_utf_8 : string -> string -> int;
 value alphabetic : string -> string -> int;
 value initial : string -> int;
 value strip_all_trailing_spaces : string -> string;
@@ -136,6 +137,7 @@ value input_lexicon :
   string -> Hashtbl.t string string -> (unit -> in_channel) -> unit;
 
 value utf_8_of_iso_8859_1 : string -> string;
+value iso_8859_1_of_utf_8 : string -> string;
 
 (* for compatibility databases version <= 4.10 which are not in utf-8 *)
 
