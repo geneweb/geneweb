@@ -2,6 +2,13 @@ GeneWeb version 4.04
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [01 Dec 01] Fixed problem in case of changing a person's name, if
+    the new name entered in conflict with somebody els&eacute;s (same
+    "keys"). The proposed link "click here to try again" with the first
+    free number could fail with some browsers (technical: the request
+    could be truncated by the browser if too long). This have been changed
+    into a button "create" which always works (the same change had been
+    done for family forms, for the same problem, some time ago).
   - [16 Nov 01] Changed the term "switch" into "invert" (English is
     not my native language, I made a miskake when translating it).
   - [14 Nov 01] Suppressed the <nobr> tag used in several displayings,
