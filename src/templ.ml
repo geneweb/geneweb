@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.1 2001-04-19 17:26:00 ddr Exp $ *)
+(* $Id: templ.ml,v 4.2 2001-06-13 08:00:45 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -375,6 +375,32 @@ value input conf base fname =
 ;
 
 (* Common evaluation functions *)
+
+value split_at_coloncolon s =
+  loop 0 where rec loop i =
+    if i >= String.length s - 1 then None
+    else
+      match (s.[i], s.[i + 1]) with
+      [ (':', ':') ->
+          let s1 = String.sub s 0 i in
+          let s2 = String.sub s (i + 2) (String.length s - i - 2) in
+          Some (s1, s2)
+      | _ -> loop (i + 1) ]
+;
+
+value eval_transl conf base env upp s c =
+  let r =
+    match c with
+    [ '0'..'9' ->
+        let n = Char.code c - Char.code '0' in
+        match split_at_coloncolon s with
+        [ None -> Gutil.nominative (Util.transl_nth conf s n)
+        | Some (s1, s2) ->
+            Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
+    | _ -> Gutil.nominative (Util.transl conf s) ^ String.make 1 c ]
+  in
+  if upp then capitale r else r
+;
 
 value print_body_prop conf base =
   let s =

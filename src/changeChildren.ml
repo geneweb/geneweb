@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.2 2001-04-21 13:50:56 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.3 2001-06-13 08:00:35 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -105,7 +105,7 @@ value print_change conf base p u =
     Wserver.wprint "<p>\n";
     tag "form" "method=POST action=\"%s\"" conf.command begin
       Util.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=i value=%d>\n"
+      Wserver.wprint "<input type=hidden name=ip value=%d>\n"
         (Adef.int_of_iper p.cle_index);
       Wserver.wprint "\n<p>\n";
       Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
@@ -122,10 +122,11 @@ value print_change conf base p u =
 ;
 
 value print conf base =
-  match p_getint conf.env "i" with
+  match p_getint conf.env "ip" with
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
-      let u = uoi base (Adef.iper_of_int i) in print_change conf base p u
+      let u = uoi base (Adef.iper_of_int i) in
+      print_change conf base p u
   | _ -> incorrect_request conf ]
 ;
 
@@ -286,9 +287,10 @@ value print_change_ok conf base p u =
 ;
 
 value print_ok conf base =
-  match p_getint conf.env "i" with
+  match p_getint conf.env "ip" with
   [ Some i ->
       let p = poi base (Adef.iper_of_int i) in
-      let u = uoi base (Adef.iper_of_int i) in print_change_ok conf base p u
+      let u = uoi base (Adef.iper_of_int i) in
+      print_change_ok conf base p u
   | _ -> incorrect_request conf ]
 ;
