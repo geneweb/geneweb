@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.11 2000-11-04 20:00:03 ddr Exp $ *)
+(* $Id: forum.ml,v 3.12 2000-11-04 22:38:45 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -190,7 +190,11 @@ value print_forum_message conf base pos =
   match get_message conf pos with
   [ Some (time, ident, email, subject, mess, pos) ->
       let title _ =
-        let subject = if subject = "" then "-" else secure subject in
+        let subject =
+          if subject = "" || subject = "-" then
+            capitale (transl conf "data base forum")
+          else secure subject
+        in
         Wserver.wprint "%s" subject
       in
       do header_no_page_title conf title;
