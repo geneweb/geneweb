@@ -4,6 +4,8 @@ GeneWeb Version 1.09
 * gwd:
   - Added error message in relationship computing when loop in database.
   - Fixed still several displaying bugs due to ANSEL
+  - Added "wizard_just_friend" in .cnf files (see example etc/a.cnf) to
+    suspend the powers of wizards.
 
 * ged2gwb, gwb2ged:
   - Added save and restore of the GeneWeb fields

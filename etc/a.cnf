@@ -32,5 +32,9 @@ friend_passwd=
 # Choose a password or leave it empty
 wizard_passwd=
 
+# Wizard loosing his powers, becoming just a "friend"
+# Set it to "yes" or "no"
+wizard_just_friend=no
+
 # Default language
 default_lang=fr

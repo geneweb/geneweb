@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: gwd.ml,v 1.9 1998-10-28 10:00:00 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.10 1998-11-11 15:33:30 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -296,6 +296,10 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     try List.assoc "friend_passwd" base_env with
     [ Not_found -> friend_passwd.val ]
   in
+  let wizard_just_friend =
+    try List.assoc "wizard_just_friend" base_env = "yes" with
+    [ Not_found -> False ]
+  in
   let (ok, wizard, friend) =
     if not cgi then
       if passwd = "w" then
@@ -331,8 +335,8 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     unauth base_file (if passwd = "w" then "Wizard" else "Friend")
   else
   let conf =
-    {wizard = wizard;
-     friend = friend;
+    {wizard = wizard && not wizard_just_friend;
+     friend = friend || wizard_just_friend && wizard;
      cgi = cgi;
      command = command;
      lang = if lang = "" then default_lang else lang;
