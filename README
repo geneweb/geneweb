@@ -1,0 +1,49 @@
+OVERVIEW:
+
+GeneWeb is a genealogy software with a Web interface. It can be used
+off-line or as a Web service.
+
+This is the version 1.06.
+
+To compile, you need the Objective Caml compiler, the preprocessor Camlp4,
+and a C compiler.
+
+Objective Caml can be found at address:
+   http://caml.inria.fr/ocaml/
+
+Camlp4 can be found at address:
+   http://caml.inria.fr/camlp4/
+
+CONTENTS:
+
+	CHANGES		changes (for genealogists non computer scientists)
+	ICHANGES	changes (for computer scientists)
+	LICENCE		licence notice
+	Makefile	main Makefile
+	README		this file
+	doc		users' html documentation
+	etc		additional files for distribution
+	ged2gwb		converter GEDCOM -> GeneWeb
+	gwb2ged		converter GeneWeb -> GEDCOM
+	hd		html and image files for GeneWeb program
+	src		sources of main programs
+	tools		tools for compiling
+	wserver		library for creating Web services
+
+COPYRIGHT:
+
+All files marked in this distribution are copyright 1998 Institut
+National de Recherche en Informatique et Automatique (INRIA) and
+distributed under the conditions stated in file LICENSE. They can be
+freely redistributed for non-commercial purposes, provided the
+copyright notice remains attached.
+
+INSTALLATION:
+
+See the file INSTALL for installation instructions.
+
+BUG REPORTS AND USER FEEDBACK:
+
+Send your bug reports by E-mail to:
+
+          daniel.de_rauglaudre@inria.fr
