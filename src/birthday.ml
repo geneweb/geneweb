@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 2.5 1999-09-16 09:31:40 ddr Exp $ *)
+(* $Id: birthday.ml,v 2.6 1999-10-26 22:35:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -157,9 +157,9 @@ value anniversary_of conf base dead_people jj mm =
   return xx.val
 ;
 
-value anniversaire_du conf base dead_people jj mm yy =
-  let list = anniversary_of conf base dead_people jj mm in
-  if not (leap_year yy) && jj = 1 && mm = 3 then
+value anniversaire_du conf base dead_people dt =
+  let list = anniversary_of conf base dead_people dt.day dt.month in
+  if not (leap_year dt.year) && dt.day = 1 && dt.month = 3 then
     list @ anniversary_of conf base dead_people 29 2
   else list
 ;
@@ -216,119 +216,69 @@ value afficher_liste_anniversaires conf base dead_people dt liste =
   return ()
 ;
 
-value print conf base mois = gen_print conf base mois False;
+value print_birth conf base mois = gen_print conf base mois False;
 value print_dead conf base mois = gen_print conf base mois True;
 
-value print_birth_day conf base day_name verb wd d m y list =
+value print_birth_day conf base day_name verb wd dt list =
   do Wserver.wprint "\n"; html_p conf; return
   match list with
   [ [] ->
       Wserver.wprint "%s %s.\n"
         (capitale (transl conf "no birthday")) day_name
   | _ ->
-      let dt = {day = d; month = m; year = y; prec = Sure; delta = 0} in
-      do Wserver.wprint "%s, %s %s%s %s %s:\n"
-           (capitale day_name) (transl_nth conf "(week day)" wd)
-           (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
-           (transl conf "the birthday")
+      do Wserver.wprint "%s, %s%s %s %s:\n"
+           (capitale day_name)
+           (std_color
+              ("<b>" ^ transl_nth conf "(week day)" wd ^ " " ^
+               Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
+           verb (transl conf "the birthday")
            (transl_decline conf "of" "");
          afficher_liste_anniversaires conf base False dt list;
       return () ]
 ;
 
 value propose_months conf mode =
-  tag "form" "method=get action=\"%s\"" conf.command begin
-    Srcfile.hidden_env conf;
-    Wserver.wprint "<input type=hidden name=m value=%s>\n" mode;
-    tag "select" "name=v" begin
-      for i = 1 to 12 do
-        Wserver.wprint "<option value=%d%s>%s\n" i
-          (if i = conf.today.month then " selected" else "")
-          (capitale (transl_nth conf "(month)" (i - 1)));
-      done;
+  tag "center" begin
+    tag "form" "method=get action=\"%s\"" conf.command begin
+      Srcfile.hidden_env conf;
+      Wserver.wprint "<input type=hidden name=m value=%s>\n" mode;
+      tag "select" "name=v" begin
+        for i = 1 to 12 do
+          Wserver.wprint "<option value=%d%s>%s\n" i
+            (if i = conf.today.month then " selected" else "")
+            (capitale (transl_nth conf "(month)" (i - 1)));
+        done;
+      end;
+      Wserver.wprint "<input type=submit value=\"Ok\">\n";
     end;
-    Wserver.wprint "<input type=submit value=\"Ok\">\n";
   end
 ;
 
-value menu_print conf base =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "birthdays")) in
-  do header conf title;
-     let (tom_d, tom_m, tom_y) =
-       lendemain (conf.today.day, conf.today.month, conf.today.year)
-     in
-     let (aft_d, aft_m, aft_y) = lendemain (tom_d, tom_m, tom_y) in
-     let list_today =
-       anniversaire_du conf base False conf.today.day conf.today.month
-         conf.today.year
-     in
-     let list_tom = anniversaire_du conf base False tom_d tom_m tom_y in
-     let list_aft = anniversaire_du conf base False aft_d aft_m aft_y in
-     do print_birth_day conf base (transl conf "today") (transl conf ", it is")
-          conf.today_wd conf.today.day conf.today.month conf.today.year
-          list_today;
-        print_birth_day conf base (transl conf "tomorrow")
-          (transl conf ", it will be") ((conf.today_wd + 1) mod 7)
-          tom_d tom_m tom_y list_tom;
-        print_birth_day conf base (transl conf "the day after tomorrow")
-          (transl conf ", it will be") ((conf.today_wd + 2) mod 7)
-          aft_d aft_m aft_y list_aft;
-     return ();
-     Wserver.wprint "\n";
-     html_p conf;
-     propose_months conf "AN";
-     Wserver.wprint "\n";
-     trailer conf;
-  return ()
+value day_after d =
+  let (day, r) =
+    if d.day >= nb_jours_dans_mois d.month d.year then (1, 1)
+    else (succ d.day, 0)
+  in
+  let (month, r) = if d.month + r > 12 then (1, 1) else (d.month + r, 0) in
+  let year = d.year + r in
+  {day = day; month = month; year = year; prec = Sure; delta = 0}
 ;
 
-value print_anniv conf base day_name verb wd d m y list =
+value print_anniv conf base day_name verb wd dt list =
   do Wserver.wprint "\n"; html_p conf; return
   match list with
   [ [] ->
       Wserver.wprint "%s %s.\n"
         (capitale (transl conf "no anniversary")) day_name
   | _ ->
-      let dt = {day = d; month = m; year = y; prec = Sure; delta = 0} in
-      do Wserver.wprint "%s, %s %s%s %s:"
-           (capitale day_name) (transl_nth conf "(week day)" wd)
-           (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
-           (transl conf "the anniversary");
+      do Wserver.wprint "%s, %s%s %s:\n"
+           (capitale day_name)
+           (std_color
+              ("<b>" ^ transl_nth conf "(week day)" wd ^ " " ^
+               Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
+           verb (transl conf "the anniversary");
          afficher_liste_anniversaires conf base True dt list;
       return () ]
-;
-
-value menu_print_dead conf base =
-  let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "anniversaries of dead"))
-  in
-  do header conf title;
-     let (tom_d, tom_m, tom_y) =
-       lendemain (conf.today.day, conf.today.month, conf.today.year)
-     in
-     let (aft_d, aft_m, aft_y) = lendemain (tom_d, tom_m, tom_y) in
-     let list_today =
-       anniversaire_du conf base True conf.today.day conf.today.month
-         conf.today.year
-     in
-     let list_tom = anniversaire_du conf base True tom_d tom_m tom_y in
-     let list_aft = anniversaire_du conf base True aft_d aft_m aft_y in
-     do print_anniv conf base (transl conf "today") (transl conf ", it is")
-          conf.today_wd conf.today.day conf.today.month conf.today.year
-          list_today;
-        print_anniv conf base (transl conf "tomorrow")
-          (transl conf ", it will be") ((conf.today_wd + 1) mod 7)
-          tom_d tom_m tom_y list_tom;
-        print_anniv conf base (transl conf "the day after tomorrow")
-          (transl conf ", it will be") ((conf.today_wd + 2) mod 7)
-          aft_d aft_m aft_y list_aft;
-     return ();
-     Wserver.wprint "\n";
-     html_p conf;
-     propose_months conf "AD";
-     Wserver.wprint "\n";
-     trailer conf;
-  return ()
 ;
 
 value print_marriage conf base month =
@@ -369,8 +319,7 @@ value print_marriage conf base month =
                       html_li conf;
                       afficher_personne_titre_referencee conf base
                         (poi base fam.father);
-                      html_br conf;
-                      Wserver.wprint "%s\n" (transl conf "and");
+                      Wserver.wprint "\n%s\n" (transl conf "and");
                       afficher_personne_titre_referencee conf base
                         (poi base fam.mother);
                       Wserver.wprint ", <em>%s %d</em>\n"
@@ -385,7 +334,7 @@ value print_marriage conf base month =
   return ()
 ;
 
-value anniversary_of_marriage_of_day conf base dd mm =
+value anniversary_of_marriage_of_day conf base dt =
   let xx = ref [] in
   do for i = 0 to base.data.families.len - 1 do
        let fam = base.data.families.get i in
@@ -397,7 +346,8 @@ value anniversary_of_marriage_of_day conf base dd mm =
              let cpl = base.data.couples.get i in
              if age_autorise conf base (poi base cpl.father)
              && age_autorise conf base (poi base cpl.mother)
-             && d == dd && m == mm then xx.val := [(cpl, y) :: xx.val]
+             && d == dt.day && m == dt.month then
+               xx.val := [(cpl, y) :: xx.val]
              else ()
          | _ -> () ];
      done;
@@ -413,8 +363,7 @@ value print_anniversaries_of_marriage conf base y list =
              html_li conf;
              afficher_personne_titre_referencee conf base
                (poi base fam.father);
-             html_br conf;
-             Wserver.wprint "%s\n" (transl conf "and");
+             Wserver.wprint "\n%s\n" (transl conf "and");
              afficher_personne_titre_referencee conf base
                (poi base fam.mother);
              Wserver.wprint ", <em>%s %d\n("
@@ -428,50 +377,96 @@ value print_anniversaries_of_marriage conf base y list =
   return ()
 ;
 
-value print_marriage_day conf base day_name verb wd d m y list =
+value print_marriage_day conf base day_name verb wd dt list =
   do Wserver.wprint "\n"; html_p conf; return
   match list with
   [ [] ->
       Wserver.wprint "%s %s.\n"
         (capitale (transl conf "no anniversary")) day_name
   | _ ->
-      let dt = {day = d; month = m; year = y; prec = Sure; delta = 0} in
-      do Wserver.wprint "%s, %s %s%s %s %s:\n"
-           (capitale day_name) (transl_nth conf "(week day)" wd)
-           (Date.string_of_date conf (Dgreg dt Dgregorian)) verb
-           (transl conf "the anniversary of marriage")
+      do Wserver.wprint "%s, %s%s %s %s:\n"
+           (capitale day_name)
+           (std_color
+              ("<b>" ^ transl_nth conf "(week day)" wd ^ " " ^
+               Date.string_of_date conf (Dgreg dt Dgregorian) ^ "</b>"))
+           verb (transl conf "the anniversary of marriage")
            (transl_decline conf "of" "");
-         print_anniversaries_of_marriage conf base y list;
+         print_anniversaries_of_marriage conf base dt.year list;
       return () ]
+;
+
+value print_menu_birth conf base =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "birthdays"))
+  in
+  do cheader conf title;
+     let tom = day_after conf.today in
+     let aft = day_after tom in
+     let list_today = anniversaire_du conf base False conf.today in
+     let list_tom = anniversaire_du conf base False tom in
+     let list_aft = anniversaire_du conf base False aft in
+     do print_birth_day conf base (transl conf "today") (transl conf ", it is")
+          conf.today_wd conf.today list_today;
+        print_birth_day conf base (transl conf "tomorrow")
+          (transl conf ", it will be") ((conf.today_wd + 1) mod 7)
+          tom list_tom;
+        print_birth_day conf base (transl conf "the day after tomorrow")
+          (transl conf ", it will be") ((conf.today_wd + 2) mod 7)
+          aft list_aft;
+     return ();
+     Wserver.wprint "\n";
+     html_p conf;
+     propose_months conf "AN";
+     Wserver.wprint "\n";
+     trailer conf;
+  return ()
+;
+
+value print_menu_dead conf base =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "anniversaries of dead"))
+  in
+  do cheader conf title;
+     let tom = day_after conf.today in
+     let aft = day_after tom in
+     let list_today = anniversaire_du conf base True conf.today in
+     let list_tom = anniversaire_du conf base True tom in
+     let list_aft = anniversaire_du conf base True aft in
+     do print_anniv conf base (transl conf "today") (transl conf ", it is")
+          conf.today_wd conf.today list_today;
+        print_anniv conf base (transl conf "tomorrow")
+          (transl conf ", it will be") ((conf.today_wd + 1) mod 7)
+          tom list_tom;
+        print_anniv conf base (transl conf "the day after tomorrow")
+          (transl conf ", it will be") ((conf.today_wd + 2) mod 7)
+          aft list_aft;
+     return ();
+     Wserver.wprint "\n";
+     html_p conf;
+     propose_months conf "AD";
+     Wserver.wprint "\n";
+     trailer conf;
+  return ()
 ;
 
 value print_menu_marriage conf base =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "anniversaries of marriage"))
   in
-  do header conf title;
-     let (tom_d, tom_m, tom_y) =
-       lendemain (conf.today.day, conf.today.month, conf.today.year)
-     in
-     let (aft_d, aft_m, aft_y) = lendemain (tom_d, tom_m, tom_y) in
-     let list_today =
-       anniversary_of_marriage_of_day conf base conf.today.day conf.today.month
-     in
-     let list_tomorrow =
-       anniversary_of_marriage_of_day conf base tom_d tom_m
-     in
-     let list_after =
-       anniversary_of_marriage_of_day conf base aft_d aft_m
-     in
+  do cheader conf title;
+     let tom = day_after conf.today in
+     let aft = day_after tom in
+     let list_today = anniversary_of_marriage_of_day conf base conf.today in
+     let list_tomorrow = anniversary_of_marriage_of_day conf base tom in
+     let list_after = anniversary_of_marriage_of_day conf base aft in
      do print_marriage_day conf base (transl conf "today")
-          (transl conf ", it is") conf.today_wd conf.today.day conf.today.month
-          conf.today.year list_today;
+          (transl conf ", it is") conf.today_wd conf.today list_today;
         print_marriage_day conf base (transl conf "tomorrow")
           (transl conf ", it will be") ((conf.today_wd + 1) mod 7)
-          tom_d tom_m tom_y list_tomorrow;
+          tom list_tomorrow;
         print_marriage_day conf base (transl conf "the day after tomorrow")
           (transl conf ", it will be") ((conf.today_wd + 2) mod 7)
-          aft_d aft_m aft_y list_after;
+          aft list_after;
        return ();
      Wserver.wprint "\n";
      html_p conf;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.20 1999-10-08 14:52:19 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.21 1999-10-26 22:35:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -184,7 +184,7 @@ value rec copy_from_channel conf base ic =
                 in
                 let s =
                   try s ^ " " ^ List.assoc "body_prop" conf.base_env with
-                  [ Not_found -> s ]
+                  [ Not_found -> s ^ default_body_prop conf ]
                 in
                 do if s <> "" then Wserver.wprint "%s" s else ();
                    List.iter (fun t -> Wserver.wprint "><%s" t)
@@ -223,11 +223,7 @@ value rec copy_from_channel conf base ic =
                   (transl conf "(thousand separator)")
                   (Num.of_int (wc + rc))
             | 'r' -> copy_from_file conf base (input_line ic)
-            | 's' ->
-                do Wserver.wprint "%s?" conf.command;
-                   List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v)
-                     (conf.henv @ conf.senv);
-                return ()
+            | 's' -> Wserver.wprint "%s" (commd conf)
             | 't' -> Wserver.wprint "%s" conf.bname
             | 'u' ->
                 match Util.find_person_in_env conf base "z" with
@@ -260,7 +256,7 @@ and copy_from_file conf base name =
       return () ]
 ;
 
-value print conf base fname =
+value gen_print with_logo conf base fname =
   match
     try Some (open_in (lang_file_name conf fname)) with
     [ Sys_error _ ->
@@ -270,7 +266,7 @@ value print conf base fname =
   [ Some ic ->
       do Util.html conf;
          copy_from_channel conf base ic;
-         Util.trailer conf;
+         Util.gen_trailer with_logo conf;
       return ()
   | _ ->
       let title _ = Wserver.wprint "Error" in
@@ -279,9 +275,11 @@ value print conf base fname =
            html_li conf;
            Wserver.wprint "Cannot access file \"%s.txt\".\n" fname;
          end;
-         Util.trailer conf;
+         Util.gen_trailer with_logo conf;
       return raise Exit ]
 ;
+
+value print = gen_print True;
 
 value print_start conf base =
   let fname =
@@ -289,7 +287,7 @@ value print_start conf base =
     else if Sys.file_exists (any_lang_file_name conf.bname) then conf.bname
     else "start"
   in
-  print conf base fname
+  gen_print False conf base fname
 ;
 
 value print_lexicon conf base =

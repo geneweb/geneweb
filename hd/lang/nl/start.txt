@@ -5,14 +5,61 @@
   <meta name="ROBOTS" content="NONE">
 </head>
 <body%b>
-<h1>Genealogie</h1>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>Genealogische<br>databank</font></h1>
+</td>
+</tr>
+</table>
+
+<br>
 
 %rversion
 
 <p>
 
-Deze verzameling heeft nu %n personen%o
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+Deze databank <font color=#2f6400><b>"%t"</b></font> bevat nu %n
+personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
+
+%y<br><p>
+
+<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w">Toegang als <em>tovenaar</em></a><br>
+(wachtwoord)</td>
+
+%y%z<td align=center><a href="%sw=f">Toegang als <em>vriend</em></a><br>
+(wachtwoord)</td>
+
+%z%y</tr></table>
+
+%y%i<br><br>
+
+<table border=0>
+<tr><td align=center>
+<form method=get action="%f">
+%h<font size=-1>Wachtwoord, voor toegang als <em>vriend</em> of
+<em>tovenaar</em>:
+<input name=w size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+%i
+
+<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+Om deze databank te consulteren, kan u een opzoeking doen:<br><br>
 
 <ul>
 
@@ -20,7 +67,8 @@ Deze verzameling heeft nu %n personen%o
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-Zoek: <input name=n size=40 maxlength=200>
+<font color=#2f6400><b>op naam</b></font>
+<input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
 <ul>
@@ -29,7 +77,7 @@ Zoek: <input name=n size=40 maxlength=200>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
 [or] <em>[surname/surnames]</em>%u
-[or] <em>Sosa number</em> relative to %a%u
+[or] <em>Sosa nummer</em> ten opzichte van %a%u
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
@@ -38,63 +86,101 @@ Zoek: <input name=n size=40 maxlength=200>
 
 <li>
 
-<FORM method=GET action="%f">
+<form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-Op titel <INPUT NAME=t size=14 maxlength=200>
-plaats <INPUT NAME=p size=25 maxlength=200> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<font color=#2f6400><b>op titel</b></font>
+<input name=t size=14 maxlength=200>
+<font color=#2f6400><b>plaats</b></font>
+<input name=p size=25 maxlength=200>
+<input type=submit value="Ok">
+<br>
+vb:
+<font color=#2f6400><b>[title/titles]</b></font>: koning, hertog...
+<font color=#2f6400><b>[place]</b></font>: van Frankrijk, van Brabant...
+</form>
 
 <li>
 
-<FORM method=GET action="%f">
-%hAlle
-<SELECT NAME=m>
-   <OPTION VALUE="N" SELECTED> Familienamen
-   <OPTION VALUE="P"> Voornamen
-</SELECT>
+<form method=GET action="%f">
+%h
+<font color=#2f6400><b>via de lijst</b></font> van alle
+<select name=m>
+<option value="N" selected>familienamen
+<option value="P">voornamen
+</select>
 volgens
-<SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED> Alfabet
-   <OPTION VALUE="F"> Aantal
-</SELECT> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<select name=tri>
+<option value="A" selected>alfabet
+<option value="F">aantal
+</select> =&gt;
+<input type=submit value="Ok">
+</form>
 
-<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+<li>
 
-%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
-<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w
+<font color=#2f6400><b>via een</b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>gedetailleerde
+opzoeking</b></font></a>.
 
 </ul>
 
-De <a href="%sm=AN">verjaardagen</a>.<br>
-De <a href="%sm=AD">verjaardagen van overleden mensen</a>.<br>
-De <a href="%sm=AM">verjaardagen van huwelijken</a>.<br>%x
-De <a href="%sm=LB;k=10">laatste geboorten</a>.<br>
-De <a href="%sm=LD;k=10">laatste overlijdens</a>.<br>%x%j
-<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
-<a href="%sm=FORUM">[*forum]</a>.
+%w<p>
+
+<center>U kan:<br><br>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM">een familie toevoegen</a>
+</ul>
+</td>
+<td align=left>
+<ul>
+<li><a href="%sm=MOD_NOTES">de nota's wijzigen</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+<br>
+%w
+
+<center>U kan de volgende zaken bekijken:<br><br>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li>de <a href="%sm=AN">verjaardagen</a>
+<li>de <a href="%sm=AD">verjaardagen van overleden mensen</a>
+<li>de <a href="%sm=AM">verjaardagen van huwelijken</a>%x
+<li>de <a href="%sm=LB;k=10">laatste geboorten</a>%x
+</ul>
+</td>
+<td valign=up>
+<ul>%x
+<li>de <a href="%sm=LD;k=10">laatste overlijdens</a>%x%j
+<li>de <a href="%sm=HIST;k=10">lijst van wijzigingen</a>%j
+<li>de <a href="%sm=CAL">kalenders</a>
+<li>de <a href="%sm=FORUM"><font color=#2f6400><b>GeneWeb</b></font> forum</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
 <p>
+
 Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
 deze verwelkomingspagina.
 
-%y<p>
+</td></tr>
 
-<ul>
-<li> <a href="%sw=w"><em>Wijzigen</em></a> toegang (wachtwoord).
-%y%z<li> <a href="%sw=f"><em>Vriend</em></a> toegang (wachtwoord).
-%z%y</ul>
+<tr>
+<td align=right><br><font size=-1><em><a
+href="%sm=LEX">lexicon</a></em></font></td>
+</tr>
 
-%y%i<p>
-<form method=get action="%f">
-%h<font size=-1>Wachtwoord, voor <em>vriend</em> of <em>wijzigen</em> toegang:
-</font>
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
-%i<p>
-
-<font size=-1><a href="%sm=LEX">Lexicon</a></font>
+</table>
+</center>

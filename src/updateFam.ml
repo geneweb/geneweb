@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.16 1999-09-17 18:15:16 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.17 1999-10-26 22:35:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -177,7 +177,7 @@ value print_marriage conf base fam =
      Wserver.wprint "\n";
      Wserver.wprint "<input type=radio name=not_married value=false%s>"
        (match fam.not_married with [ False -> " checked" | _ -> "" ]);
-     Wserver.wprint "%s\n" (capitale (transl conf "married"));
+     Wserver.wprint "%s\n" (capitale (transl_nth conf "married" 1));
      Wserver.wprint "<input type=radio name=not_married value=true%s>"
        (match fam.not_married with [ True -> " checked" | _ -> "" ]);
      Wserver.wprint "%s\n" (capitale (transl conf "not married"));

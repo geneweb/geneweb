@@ -6,14 +6,60 @@
   <meta name="ROBOTS" content="NONE">
 </head>
 <body%b>
-<h1>Genealogio</h1>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>Datenbazo<br>genealogia</font></h1>
+</td>
+</tr>
+</table>
 
 %rversion
 
 <p>
 
-La datenbazo enhavas nune %n personojn%o
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+La datenbazo <font color=#2f6400><b>"%t"</b></font> enhavas nune %n
+personojn.%o<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%o
+
+
+%y<br><p>
+
+<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w">Aliro <em>sorcxisto</em></a><br>
+(pasvorto)</td>
+
+%y%z<td align=center><a href="%sw=f">Aliro <em>amiko</em></a><br>
+(pasvorto)</td>
+
+%z%y</tr></table>
+
+%y%i<br><br>
+
+<table border=0>
+<tr><td align=center>
+<form method=get action="%f">
+%hPasvorto, por aliro <em>amiko</em> a&ugrave; <em>sorcxisto</em>:
+<input name=w size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+%i
+
+<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+Por navigi en cxi datenbazo, vi povas fari via sercxo:<br><br>
 
 <ul>
 
@@ -21,7 +67,8 @@ La datenbazo enhavas nune %n personojn%o
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-Sercxu: <input name=n size=40 maxlength=200>
+<font color=#2f6400><b>per persono</b></font>
+<input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
 <ul>
@@ -38,64 +85,100 @@ or <em>Sosa number</em> relative to %a%u
 
 <li>
 
-<FORM method=GET action="%f">
+<form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-Por mosxto <INPUT NAME=t size=14 maxlength=200>
-loko <INPUT NAME=p size=25 maxlength=200> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<font color=#2f6400><b>per mosxto</b></font>
+<input name=t size=14 maxlength=200>
+<font color=#2f6400><b>loko</b></font>
+<input name=p size=25 maxlength=200>
+<input type=submit value="Ok">
+<br>
+ex:
+<font color=#2f6400><b>[title/titles]</b></font>: roi, duke...
+<font color=#2f6400><b>[place]</b></font>: de France, of Sax...
+</form>
 
 <li>
 
 <form method=GET action="%f">
-%hCxiuj
+%h
+<font color=#2f6400><b>per la listo</b></font> de cxiuj
 <select name=m>
-   <option value="N" selected> Familinomoj
-   <option value="P"> Personnomoj
+<option value="N" selected>familinomoj
+<option value="P">personnomoj
 </select>
-por
+per
 <select name=tri>
-   <option value="A" selected> Alfabetica ordo
-   <option value="F"> Frekvenko
-</select> =&gt;
+<option value="A" selected>alfabetica ordo
+<option value="F">frekvenko
+</select>
 <input type=submit value="Ok">
 </form>
 
-<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+<li>
 
-%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
-<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w
+<font color=#2f6400><b>per la</b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>rekesto
+progresata</b></font></a>.
 
 </ul>
 
+%w<p>
+
+<center>You can<br><br>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM">aldoni familion</a>
+</ul>
+</td>
+<td align=left>
+<ul>
+<li><a href="%sm=MOD_NOTES">modifi la notojn</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+<br>
+%w
+
+<center>Vi povas anka&ugrave; konsulti<br><br>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li>la <a href="%sm=AN">naskigxtagoj</a>
+<li>la <a href="%sm=AD">datrevenoj de la mortaj personoj</a>
+<li>la <a href="%sm=AM">datrevenoj de edzigxo</a>%x
+<li>la <a href="%sm=LB;k=10">lastaj naskigxoj</a>%x
+</ul>
+</td>
+<td valign=up>
+<ul>%x
+<li>la <a href="%sm=LD;k=10">lastaj mortoj</a>%x%j
+<li>la <a href="%sm=HIST;k=10">historio de la gxisdatigoj</a>%j
+<li>la <a href="%sm=CAL">kalendaroj</a>
+<li>la <a href="%sm=FORUM">forumo <font color=#2f6400><b>GeneWeb</b></font></a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
 <p>
 
-La <a href="%sm=AN">naskigxtagoj</a>.<br>
-La <a href="%sm=AD">datrevenoj de la mortaj personoj</a>.<br>
-La <a href="%sm=AM">datrevenoj de edzigxo</a>.<br>%x
-La <a href="%sm=LB;k=10">finaj naskigxoj</a>.<br>
-La <a href="%sm=LD;k=10">finaj mortoj</a>.<br>%x%j
-<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
-<a href="%sm=FORUM">[*forum]</a>
-<p>
 Estis %q alirejoj kaj %c al cxi pagxo, ekde la %d.
 
-%y<p>
+</td></tr>
 
-<ul>
-<li> Aliro <a href="%sw=w"><em>sorcxisto</em></a> (pasvorto).
-%y%z<li> Aliro <a href="%sw=f"><em>amiko</em></a> (pasvorto).
-%z%y</ul>
+<tr>
+<td align=right><br><font size=-1><em><a
+href="%sm=LEX">leksikono</a></em></font></td>
+</tr>
 
-%y%i<p>
-<form method=get action="%f">
-%h<font size=-1>Pasvorto, por aliro <em>amiko</em> a&ugrave;
-<em>sorcxisto</em>:
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
-%i<p>
-
-<font size=-1><a href="%sm=LEX">Lexicon</a></font>
+</table>
+</center>

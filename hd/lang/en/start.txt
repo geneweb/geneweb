@@ -6,14 +6,60 @@
   <meta name="ROBOTS" content="NONE">
 </head>
 <body%b>
-<h1>Genealogy</h1>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>Genealogical<br>data base</font></h1>
+</td>
+</tr>
+</table>
+
+<br>
 
 %rversion
 
 <p>
 
-The data base now holds %n persons%o
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+The data base <font color=#2f6400><b>"%t"</b></font> now holds %n persons.%o<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%o
+
+%y<br><p>
+
+<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w"><em>Wizard</em></a> access<br>
+(password)</td>
+
+%y%z<td align=center><a href="%sw=f"><em>Friend</em></a> access<br>
+(password)</td>
+
+%z%y</tr></table>
+
+%y%i<br><br>
+
+<table border=0>
+<tr><td align=center>
+<form method=get action="%f">
+%hPassword, for <em>friend</em> or <em>wizard</em> access:
+<input name=w size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+%i
+
+<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+To navigate in this data base, you can do your search:<br><br>
 
 <ul>
 
@@ -21,7 +67,8 @@ The data base now holds %n persons%o
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-Search: <input name=n size=40 maxlength=200>
+<font color=#2f6400><b>by person</b></font>
+<input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
 <ul>
@@ -30,7 +77,7 @@ Search: <input name=n size=40 maxlength=200>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
 [or] <em>[surname/surnames]</em>%u
-[or] <em>Sosa number</em> relative to %a%u
+[or] <em>num&eacute;ro Sosa</em> par rapport &agrave; %a%u
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
@@ -38,61 +85,100 @@ Search: <input name=n size=40 maxlength=200>
 
 <li>
 
-<FORM method=GET action="%f">
+<form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-By title <INPUT NAME=t size=14 maxlength=200>
-place <INPUT NAME=p size=25 maxlength=200> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<font color=#2f6400><b>by title</b></font>
+<input name=t size=14 maxlength=200>
+<font color=#2f6400><b>place</b></font>
+<input name=p size=25 maxlength=200>
+<input type=submit value="Ok">
+<br>
+ex:
+<font color=#2f6400><b>[title/titles]</b></font>: roi, duke...
+<font color=#2f6400><b>[place]</b></font>: de France, of Sax...
+</form>
 
 <li>
 
-<FORM method=GET action="%f">
-%hAll the
-<SELECT NAME=m>
-   <OPTION VALUE="N" SELECTED> Surnames
-   <OPTION VALUE="P"> First names
-</SELECT>
+<form method=GET action="%f">
+%h
+<font color=#2f6400><b>by the list</b></font> of all
+<select name=m>
+<option value="N" selected>surnames
+<option value="P">first names
+</select>
 by
-<SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED> Alphabetic order
-   <OPTION VALUE="F"> Frequency
-</SELECT> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<select name=tri>
+<option value="A" selected>alphabetic order
+<option value="F">frequency
+</select>
+<input type=submit value="Ok">
+</form>
 
-<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+<li>
 
-%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
-<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w
+<font color=#2f6400><b>by the</b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>advanced
+request</b></font></a>.
 
 </ul>
 
-The <a href="%sm=AN">birthday anniversaries</a>.<br>
-The <a href="%sm=AD">death anniversaries</a>.<br>
-The <a href="%sm=AM">marriage anniversaries</a>.<br>%x
-The <a href="%sm=LB;k=10">latest births</a>.<br>
-The <a href="%sm=LD;k=10">latest deaths</a>.<br>%x%j
-<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
-<a href="%sm=FORUM">[*forum]</a>
+%w<p>
+
+<center>You can<br><br>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM">add a family</a>
+</ul>
+</td>
+<td align=left>
+<ul>
+<li><a href="%sm=MOD_NOTES">modify the notes</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+<br>
+%w
+
+<center>You can also consult<br><br>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li>the <a href="%sm=AN">birthday anniversaries</a>
+<li>the <a href="%sm=AD">death anniversaries</a>
+<li>the <a href="%sm=AM">marriage anniversaries</a>%x
+<li>the <a href="%sm=LB;k=10">latest births</a>%x
+</ul>
+</td>
+<td valign=up>
+<ul>%x
+<li>the <a href="%sm=LD;k=10">latest deaths</a>%x%j
+<li>the <a href="%sm=HIST;k=10">history of updates</a>%j
+<li>the <a href="%sm=CAL">calendars</a>
+<li>the <a href="%sm=FORUM"><font color=#2f6400><b>GeneWeb</b></font> forum</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
 <p>
+
 There has been %q accesses, %c of them to this page, since %d.
 
-%y<p>
+</td></tr>
 
-<ul>
-<li> <a href="%sw=w"><em>Wizard</em></a> access (password).
-%y%z<li> <a href="%sw=f"><em>Friend</em></a> access (password).
-%z%y</ul>
+<tr>
+<td align=right><br><font size=-1><em><a
+href="%sm=LEX">lexicon</a></em></font></td>
+</tr>
 
-%y%i<p>
-<form method=get action="%f">
-%h<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:</font>
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
-%i<p>
-
-<font size=-1><a href="%sm=LEX">Lexicon</a></font>
+</table>
+</center>

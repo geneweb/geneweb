@@ -1,8 +1,20 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head><title>GeneWeb - Maintenance</title></head>
-<body>
-<h1>GeneWeb - Maintenance</h1>
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>GeneWeb - Maintenance</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
 
 Cette partie vous indique quelques "trucs" importants pour la maintenance
 de votre base de donn&eacute;es.
@@ -19,7 +31,9 @@ de votre base de donn&eacute;es.
 
 <p>
 
-<h4> <a name="Clea">1.</a> Nettoyage </h4>
+<hr>
+<h3><a name="Clea">
+</a> <font color=#2f6400>1.Nettoyage </font></a></h3>
 
 Au fur et &agrave; mesure que vous modifiez votre base de
 donn&eacute;es avec votre navigateur, quelques petits probl&egrave;mes
@@ -44,7 +58,7 @@ Il faut alors nettoyer la base.
 "consang" qui recalcule la consanguinit&eacute; pour toute la base et
 permet de rendre au temps d'acc&egrave;s &agrave; sa vitesse
 maximum. Si votre base s'appelle "toto", prenez une fen&ecirc;tre
-int&eacute;ractive (voir la partie "Comment <a
+interactive (voir la partie "Comment <a
 href="start.htm#Int">d&eacute;marrer</a> avec GeneWeb") et tapez:
 
 <pre>
@@ -64,7 +78,7 @@ r&eacute;essayer plus tard.
 
 Sous Unix, vous pouvez interrompre cette commande &agrave; tout
 moment, en tapant "control-C" dans la fen&ecirc;tre
-int&eacute;ractive. Le calcul des consanguinit&eacute;s ne sera pas
+interactive. Le calcul des consanguinit&eacute;s ne sera pas
 termin&eacute; mais la base sera nettoy&eacute;e. Vous pourrez
 recommencer "consang" plus tard, il reprendra le calcul o&ugrave; il
 l'avait laiss&eacute; (sauf si vous faites des modifications de
@@ -77,7 +91,7 @@ pr&eacute;c&eacute;dent n'&eacute;tait que gris-clair) consiste
 &agrave; utiliser "gwu" et "gwc". Ce nettoyage-l&agrave; repart d'une
 base toute neuve ou la place des personnes supprim&eacute;es a
 &eacute;t&eacute; r&eacute;cup&eacute;r&eacute;e. Dans une
-fen&ecirc;tre int&eacute;ractive, tapez, pour la base "toto":
+fen&ecirc;tre interactive, tapez, pour la base "toto":
 
 <pre>
      gwu toto &gt; toto.gw
@@ -115,9 +129,11 @@ aussi repasser "consang" sur cette base toute neuve.
 
 </ul>
 
-<h4> <a name="Rena">2.</a> Renommage </h4>
+<hr>
+<h3><a name="Rena">
+</a> <font color=#2f6400>2.Renommage </font></a></h3>
 
-Les bases de donn&eacute;es <em>GeneWeb</em> sont des
+Les bases de donn&eacute;es <b><font color=#2f6400>GeneWeb</font></b> sont des
 r&eacute;pertoires avec l'extension ".gwb". Si vous changez simplement
 le nom du r&eacute;pertoire "titi.gwb" en "toto.gwb", votre base qui
 s'appelait "titi" s'appellera "toto".
@@ -126,7 +142,7 @@ s'appelait "titi" s'appellera "toto".
 
 Pour faire cette manipulation, vous avez le choix entre les
 fen&ecirc;tres d'ic&ocirc;nes, si votre syst&egrave;me en a un, ou les
-commandes int&eacute;ractives.
+commandes interactives.
 
 <p><ul><li> Avec des fen&ecirc;tres d'ic&ocirc;nes, pour changer
 "titi.gwb" en "toto.gwb":
@@ -145,7 +161,7 @@ commandes int&eacute;ractives.
 
 </ul>
 
-<p><ul><li> Avec une fen&ecirc;tre de commandes int&eacute;ractives:
+<p><ul><li> Avec une fen&ecirc;tre de commandes interactives:
 
 <p>
 
@@ -172,7 +188,9 @@ commandes int&eacute;ractives.
 
 </ul>
 
-<h4> <a name="Save">3.</a> Sauvegarde </h4>
+<hr>
+<h3><a name="Save">
+</a> <font color=#2f6400>3.Sauvegarde</font></a></h3>
 
 Les ordinateurs ne sont pas des machines fiables &agrave; 100%. Vous
 avez tout int&eacute;r&ecirc;t &agrave; sauvegarder vos donn&eacute;es
@@ -195,7 +213,7 @@ interm&eacute;diaire).
 
 Mais il existe un moyen plus malin pour la sauvegarde: sauvez plut&ocirc;t
 votre base sous forme de fichiers sources. Pour la base "toto", tapez dans
-une fen&ecirc;tre de commandes int&eacute;ractives:
+une fen&ecirc;tre de commandes interactives:
 
 <pre>
      gwu toto &gt; toto.gw
@@ -215,7 +233,7 @@ alors que la base, c'est tout un répertoire.</ul>
 <p><ul><li> C'est plus petit en taille.</ul>
 
 <p><ul><li> On peut le reconstituer avec n'importe quel autre "gwc",
-même d'une version future de GeneWeb.</ul>
+même d'une version future de <b><font color=#2f6400>GeneWeb</font></b>.</ul>
 
 <p><ul><li> Étant sous forme de texte, il est lisible sous un
 &eacute;diteur (Word, Emacs, etc.); on ne sait jamais, ça peut
@@ -234,10 +252,12 @@ Pour restaurer la base "toto" &agrave; partir du fichier "toto.gw", tapez:
 </pre>
 
 <p>
+<hr>
+<br>
+<center>Retour vers <a href="diruse.htm">Mode d'Emploi</a></center>.
 
-Retour vers <a href="diruse.htm">Mode d'Emploi</a>.
-
-<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
+<hr><font size=-1><em>&copy; Copyright INRIA 1999 -
 GeneWeb</em></font><br>
+
 
 </body>

@@ -5,14 +5,61 @@
   <meta name="ROBOTS" content="NONE">
 </head>
 <body%b>
-<h1>Genealogi</h1>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>Genealogisk<br>databas</font></h1>
+</td>
+</tr>
+</table>
+
+<br>
 
 %rversion
 
 <p>
 
-Databasen innehåller nu %n personer%o
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+Databasen <font color=#2f6400><b>"%t"</b></font> inneh&aring;ller nu %n personer.%o<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%o
+
+%y<br><p>
+
+<table border=0 width="70%">
+<tr>
+
+<td align=center><a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br>
+(passord)</td>
+
+%y%z<td align=center><a href="%sw=f"><em>V&auml;nners</em></a>
+tilltr&auml;de<br> (passord)</td>
+
+%z%y</tr></table>
+
+%y%i<br><br>
+
+<table border=0>
+<tr><td align=center>
+<form method=get action="%f">
+%hPassord, f&ouml;r <em>v&auml;nner</em> eller
+<em>uppdaterings</em> tilltr&auml;de:
+<input name=w size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+%i
+
+<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+F&ouml;r att navigera i denna databas, kan du s&ouml;ka:<br><br>
 
 <ul>
 
@@ -20,7 +67,8 @@ Databasen innehåller nu %n personer%o
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-Sök: <input name=n size=40 maxlength=200>
+<font color=#2f6400><b>efter person</b></font>
+<input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
 <ul>
@@ -37,61 +85,100 @@ Sök: <input name=n size=40 maxlength=200>
 
 <li>
 
-<FORM method=GET action="%f">
+<form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-Sök efter titel <INPUT NAME=t size=14 maxlength=200>
-plats <INPUT NAME=p size=25 maxlength=200> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<font color=#2f6400><b>efter titel</b></font>
+<input name=t size=14 maxlength=200>
+<font color=#2f6400><b>plats</b></font>
+<input name=p size=25 maxlength=200>
+<input type=submit value="Ok">
+<br>
+ex:
+<font color=#2f6400><b>[title/titles]</b></font>: roi, duke...
+<font color=#2f6400><b>[place]</b></font>: de France, of Sax...
+</form>
 
 <li>
 
-<FORM method=GET action="%f">
-%hAlla
-<SELECT NAME=m>
-   <OPTION VALUE="N" SELECTED> Efternamn
-   <OPTION VALUE="P"> Förnamn
-</SELECT>
+<form method=GET action="%f">
+%h
+<font color=#2f6400><b>efter listan</b></font> av alla
+<select name=m>
+<option value="N" selected>efternamn
+<option value="P">f&ouml;rnamn
+</select>
 sorterade i
-<SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED> Bokstavsordning
-   <OPTION VALUE="F"> Frekvensordning
-</SELECT> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
-
-<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
-
-%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
-<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w
-
-</ul>
-<a href="%sm=AN">F&ouml;delsedagar</a>.<br>
-<a href="%sm=AD">Årsdagar f&ouml;r d&ouml;da personer</a>.<br>
-<a href="%sm=AM">Br&ouml;llopsdagar</a>.<br>%x
-De <a href="%sm=LB;k=10">senaste f&ouml;dslarna</a>.<br>
-De <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>.<br>%x%j
-<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
-<a href="%sm=FORUM">[*forum]</a>.
-<p>
-Det har varit %q åtkomster, %c av dem till den här sidan, sedan %d.
-
-%y<p>
-
-<ul>
-<li> <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de (passord).
-%y%z<li> <a href="%sw=f"><em>V&auml;nner</em></a> tilltr&auml;de (passord).
-%z%y</ul>
-
-%y%i<p>
-<form method=get action="%f">
-%h<font size=-1>Passord, f&ouml;r <em>v&auml;nner</em> eller
-<em>uppdaterings</em> tilltr&auml;de:</font>
-<input name=w size=20 maxlength=200> =&gt;
+<select name=tri>
+<option value="A" selected>bokstavsordning
+<option value="F">frekvensordning
+</select>
 <input type=submit value="Ok">
 </form>
-%i<p>
 
-<font size=-1><a href="%sm=LEX">Lexicon</a></font>
+<li>
+
+<font color=#2f6400><b>genom</b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>avancerad
+s&ouml;kning</b></font></a>.
+
+</ul>
+
+%w<p>
+
+<center>Du kan<br><br>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM">l&auml;gga till en familj</a>
+</ul>
+</td>
+<td align=left>
+<ul>
+<li><a href="%sm=MOD_NOTES">&auml;ndra noteringar</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+<br>
+%w
+
+<center>Du kan ocks&aring; konsultera<br><br>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li><a href="%sm=AN">f&ouml;delsedagar</a>
+<li><a href="%sm=AD">&aring;rsdagar f&ouml;r d&ouml;da personer</a>
+<li><a href="%sm=AM">br&ouml;llopsdagar</a>%x
+<li>de <a href="%sm=LB;k=10">senaste f&ouml;dslarna</a>%x
+</ul>
+</td>
+<td valign=up>
+<ul>%x
+<li>de <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>%x%j
+<li><a href="%sm=HIST;k=10">uppdateringarnas historia</a>%j
+<li><a href="%sm=CAL">kalender</a>
+<li><a href="%sm=FORUM"><font color=#2f6400><b>GeneWeb</b></font> forum</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+<p>
+
+Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan, sedan %d.
+
+</td></tr>
+
+<tr>
+<td align=right><br><font size=-1><em><a
+href="%sm=LEX">lexicon</a></em></font></td>
+</tr>
+
+</table>
+</center>

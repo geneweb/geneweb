@@ -1,10 +1,22 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head><title>GeneWeb - Serveur</title></head>
-<body>
-<h1>GeneWeb - Serveur</h1>
+<body background="../images/gwback.jpg">
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>GeneWeb - serveur</font></h1>
+</td>
+</tr>
+</table>
+</font>
+<br><br>
 
-Gwd, quand il est lanc&eacute;, est un serveur. En principe, la
+<b><b>Gwd</b></b>, quand il est lanc&eacute;, est un serveur. En principe, la
 troisi&egrave;me adresse: "http://ordinateur:2317/base" est celle
 &agrave; utiliser pour les gens de l'ext&eacute;rieur.
 
@@ -19,7 +31,7 @@ directement sur Internet.
 Si vous passez par un fournisseur d'acc&egrave;s, votre ordinateur
 personnel n'est pas visible. Dans ce cas, on ne peut rien
 faire. C'est au fournisseur d'acc&egrave;s d'installer
-<em>GeneWeb</em> sur son site. Au moment o&ugrave; j'&eacute;cris ces
+<b><font color=#2f6400>GeneWeb</font></b> sur son site. Au moment o&ugrave; j'&eacute;cris ces
 lignes (oct 98), je ne crois pas qu'aucun fournisseur d'acc&egrave;s
 ne l'ait install&eacute;.
 
@@ -33,31 +45,33 @@ Internet.
 Si vous &ecirc;tes sous Unix ou Windows NT (donc pas Windows 95), vous
 avez d&ucirc; entrer dans l'ordinateur en tant qu'utilisateur, en
 donnant votre nom de "login" et votre mot de passe. Vous voulez
-peut-&ecirc;tre alors sortir sans que <em>GeneWeb</em> s'arr&ecirc;te.
+peut-&ecirc;tre alors sortir sans que <b><font color=#2f6400>GeneWeb</font></b> s'arr&ecirc;te.
 
 <p>
 
 Vous avez alors deux solutions pour r&eacute;soudre ce probl&egrave;me:
 l'installation en "service" et en l'installation en "cgi".
 
-<h4> Installation en "service" </h4>
+<hr>
+<h3><font color=#2f6400>
+Installation en "service "</font></h3>
 
 Dans ce mode de fonctionnement, vous n'avez pas besoin qu'un serveur Web soit
-install&eacute; sur votre ordinateur. Gwd <em>est</em> un serveur Web
+install&eacute; sur votre ordinateur. <b><b>Gwd</b></b> <em>est</em> un serveur Web
 &agrave; lui tout seul. Sa seule diff&eacute;rence avec les
 autres serveurs, c'est qu'il ne sert que de la
 g&eacute;n&eacute;alogie.
 
 <ul>
 
-<li> Si vous &ecirc;tes sous Unix, au lieu de taper juste "gwd", tapez:
+<li> Si vous &ecirc;tes sous Unix, au lieu de taper juste "<b>Gwd</b>", tapez:
 
 <pre>
      nohup gwd 2&gt;&amp;1 &amp             (sous "sh", "ksh", "bash")
      nohup gwd &gt;&amp; nohup.out &amp;     (sous "csh", "tcsh")
 </pre>
 
-Vous pourrez alors vous d&eacute;connecter. Gwd continuera &agrave;
+Vous pourrez alors vous d&eacute;connecter. <b>Gwd</b> continuera &agrave;
 tourner et enverra sa trace sur le fichier "nohup.out" que vous
 pourrez consulter plus tard. Pour l'arr&ecirc;ter, il faut regarder
 quel est son num&eacute;ro de processus, avec la commande "ps" et le
@@ -67,12 +81,15 @@ tuer avec la commande "kill".
 
 <p>
 
-<ul><li> Si vous &ecirc;tres sous Windows NT, il faut installer "gwd" en
+<ul><li> Si vous &ecirc;tres sous Windows NT, il faut installer <b>Gwd</b> en
 "service". Demandez &agrave; votre administrateur syst&egrave;me.
 
 </ul>
 
-<h4> Installation en "cgi" </h4>
+<hr>
+<h3><font color=#2f6400>
+Installation en "cgi"</font></h3>
+
 
 Dans ce mode de fonctionnement, il faut qu'un serveur Web soit
 install&eacute; sur votre ordinateur. Les "cgi" sont des programmes que
@@ -84,7 +101,7 @@ pr&eacute;alablement lui demander la permission.
 
 <ul><li>
 
-Sous Unix, si vous avez par exemple install&eacute; <em>GeneWeb</em> dans
+Sous Unix, si vous avez par exemple install&eacute; <b><font color=#2f6400>GeneWeb</font></b> dans
 le r&eacute;pertoire "/home/dupont/geneweb", fabriquez un fichier que
 vous allez nommer "geneweb" et contenant les lignes suivantes:
 
@@ -116,7 +133,7 @@ de votre base.
 <p>
 
 Remarques:
-
+<p>
 <ul>
 
 <li> Si cette derni&egrave;re commande ne fonctionne pas, il est possible
@@ -135,7 +152,7 @@ administrateur syst&egrave;me). Il est pr&eacute;f&eacute;rable que ce
 ne soit pas le cas: si c'est possible, copiez donc le
 r&eacute;pertoire geneweb sur un disque local du serveur Web. Si cela
 ne vous est pas possible, ajoutez l'option "-nolock" dans l'appel de
-la commande "gwd" du fichier "geneweb" ci-dessus:
+la commande <b>Gwd</b> du fichier "geneweb" ci-dessus:
 
 <pre>
      $DIR/gwd -cgi -nolock
@@ -148,7 +165,7 @@ la commande "gwd" du fichier "geneweb" ci-dessus:
 <ul><li>
 
 Sous Windows NT, si vous avez par exemple install&eacute;
-<em>GeneWeb</em> dans le r&eacute;pertoire "c:\home\dupont\geneweb",
+<b><font color=#2f6400>GeneWeb</font></b> dans le r&eacute;pertoire "c:\home\dupont\geneweb",
 cr&eacute;ez un fichier que vous allez nommer "gwd.arg" et contenant
 les lignes suivantes:
 
@@ -163,12 +180,12 @@ les lignes suivantes:
 <p>
 
 Ce sont les options que l'on peut passer &agrave; la commande
-"gwd". Faire "gwd -help" pour voir l'ensemble de ces options.
+"Gwd". Faire "gwd -help" pour voir l'ensemble de ces options.
 
 <p>
 
 Demandez ensuite &agrave; votre administrateur syst&egrave;me:
-
+<p>
 <ul>
 
 <li> D'installer le fichier "gwd.arg" dans le r&eacute;pertoire des
@@ -206,7 +223,9 @@ son sous-r&eacute;pertoire "gw" et aux sous-r&eacute;pertoires "lang",
 
 </ul>
 
-<h4> Installation en "service" ou en "cgi"? </h4>
+<hr>
+<h3><font color=#2f6400>
+Installation en "service" ou en "cgi"? </font></h3>
 
 Si vous avez le choix entre installation en "service" ou en "cgi", notez
 les points suivants:
@@ -232,10 +251,10 @@ seule l'installation en "service" est possible.
 </ul>
 
 <p>
+<hr>
+<br>
+<center>Retour vers <a href="diruse.htm">Mode d'Emploi</a></center>.
 
-Retour vers <a href="diruse.htm">Mode d'Emploi</a>.
-
-<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
+<hr><font size=-1><em>&copy; Copyright INRIA 1999 -
 GeneWeb</em></font><br>
-
 </body>

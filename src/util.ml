@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.52 1999-10-19 08:58:45 ddr Exp $ *)
+(* $Id: util.ml,v 2.53 1999-10-26 22:35:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -69,8 +69,7 @@ value wprint_with_enclosing_tags conf (fmt : format 'a 'b 'c)  =
 
 value commd conf =
   let c = conf.command ^ "?" in
-  List.fold_left
-    (fun c (k, v) -> c ^ k ^ (if v = "" then "" else "=" ^ v) ^ ";") c
+  List.fold_left (fun c (k, v) -> c ^ k ^ "=" ^ v ^ ";") c
     (conf.henv @ conf.senv)
 ;
 
@@ -95,14 +94,6 @@ value p_getint env label =
   match p_getenv env label with
   [ Some s -> try Some (int_of_string (strip_spaces s)) with _ -> None
   | None -> None ]
-;
-
-value lendemain (j, m, a) =
-  let (jour, r) =
-    if j >= nb_jours_dans_mois m a then (1, 1) else (succ j, 0)
-  in
-  let (mois, r) = if m + r > 12 then (1, 1) else (m + r, 0) in
-  let annee = a + r in (jour, mois, annee)
 ;
 
 value parent_has_title base p =
@@ -546,11 +537,18 @@ value fdecline conf w s =
   valid_format w (gen_decline conf (Obj.magic w : string) s)
 ;
 
+value green_color = "#2f6400";
+value std_color s = "<font color=" ^ green_color ^ ">" ^ s ^ "</font>";
+
 value index_of_sex =
   fun
   [ Male -> 0
   | Female -> 1
   | Neuter -> 2 ]
+;
+
+value default_body_prop conf =
+  " background=\"" ^ conf.command ^ "?m=IM;v=/gwback.jpg\""
 ;
 
 value header_no_page_title conf title =
@@ -570,11 +568,19 @@ value header_no_page_title conf title =
      in
      let s =
        try s ^ " " ^ List.assoc "body_prop" conf.base_env with
-       [ Not_found -> s ]
+       [ Not_found -> s ^ default_body_prop conf ]
      in
      Wserver.wprint "<body%s>" s;
      List.iter (fun t -> Wserver.wprint "<%s>" t) (enclosing_tags conf);
      Wserver.wprint "\n";
+  return ()
+;
+
+value cheader conf title =
+  do header_no_page_title conf title;
+     Wserver.wprint "<center><h1><font color=%s>" green_color;
+     title False;
+     Wserver.wprint "</font></h1></center>\n";
   return ()
 ;
 
@@ -703,14 +709,19 @@ value copy_string_with_macros conf s =
     else ()
 ;
 
-value trailer conf =
+value gen_trailer with_logo conf =
   let env =
-    [('s', conf.command ^ "?");
+    [('s', commd conf);
      ('d',
       if conf.cancel_links then ""
-      else " - <a href=\"" ^ conf.command ^ "?m=DOC\">DOC</a>")]
+      else " - <a href=\"" ^ commd conf ^ "m=DOC\">DOC</a>")]
   in
-  do try copy_etc_file env "copyr" with
+  do if not with_logo then ()
+     else
+        Wserver.wprint "<p>
+<img width=64 height=72 src=\"%s?m=IM;v=/gwlogo.gif\" align=right>\n<br>\n"
+          conf.command;
+     try copy_etc_file env "copyr" with
      [ Sys_error _ ->
          do html_p conf;
             Wserver.wprint "
@@ -736,6 +747,8 @@ GeneWeb %s</em></font>" Version.txt;
      Wserver.wprint "</body>\n";
   return ()
 ;
+
+value trailer = gen_trailer True;
 
 value menu_threshold = 20;
 
@@ -1346,6 +1359,12 @@ value print_pre_right sz txt =
        for i = 1 to sz - pre_text_size txt - 1 do Wserver.wprint " "; done;
      Wserver.wprint " %s\n" txt;
   return ()
+;
+
+value of_course_died conf p =
+  match Adef.od_of_codate p.birth with
+  [ Some (Dgreg d _) -> conf.today.year - d.year > 120
+  | _ -> False ]
 ;
 
 (* Deprecated *)

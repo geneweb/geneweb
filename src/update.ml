@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.29 1999-10-15 10:32:30 ddr Exp $ *)
+(* $Id: update.ml,v 2.30 1999-10-26 22:35:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -764,70 +764,62 @@ value print_someone conf base p =
 ;
 
 value print_family_stuff conf base p a =
-  tag "ul" begin
-    let _ = List.fold_left
-      (fun prev fi ->
-         do match prev with
-            [ Some prev_fi ->
-                let cpl1 = coi base prev_fi in
-                let cpl2 = coi base fi in
-                do Wserver.wprint "\n";
-                   html_li conf;
-                   Wserver.wprint "<a href=\"%sm=SWI_FAM;i=%d;f=%d\">"
-                     (commd conf) (Adef.int_of_iper p.cle_index)
-                     (Adef.int_of_ifam fi);
-                   Wserver.wprint "%s</a>\n" (capitale (transl conf "switch"));
-                   if cpl1.father = cpl2.father && cpl1.mother = cpl2.mother
-                   then
-                     do html_li conf;
-                        stag "a" "href=\"%sm=MRG_FAM;f1=%d;f2=%d;ip=%d\""
-                          (commd conf) (Adef.int_of_ifam prev_fi)
-                          (Adef.int_of_ifam fi) (Adef.int_of_iper p.cle_index)
-                        begin
-                          Wserver.wprint "%s"
-                            (capitale (transl_decline conf "merge" ""));
-                        end;
-                        Wserver.wprint "\n";
-                     return ()
-                   else ();
-                return ()
-            | None -> () ];
-         return
-         let c = spouse p (coi base fi) in
-         do Wserver.wprint "\n";
-            html_li conf;
-            Wserver.wprint "<a href=\"%sm=MOD_FAM;i=%d;ip=%d\">" (commd conf)
-              (Adef.int_of_ifam fi) (Adef.int_of_iper p.cle_index);
-            let s = transl_nth conf "family/families" 0 in
-            Wserver.wprint "%s</a>\n"
-              (capitale (transl_decline conf "modify" s));
-            Wserver.wprint "\n<em>%s</em>\n"
-              (transl_decline conf "with"
-                 (gen_someone_txt raw_access conf base (poi base c)));
-            Wserver.wprint "\n";
-            html_li conf;
-            Wserver.wprint "<a href=\"%sm=DEL_FAM;i=%d;ip=%d\">" (commd conf)
-              (Adef.int_of_ifam fi) (Adef.int_of_iper p.cle_index);
-            let s = transl_nth conf "family/families" 0 in
-            Wserver.wprint "%s</a>\n"
-              (capitale (transl_decline conf "delete" s));
-            Wserver.wprint "\n<em>%s</em>\n"
-              (transl_decline conf "with"
-                 (gen_someone_txt raw_access conf base (poi base c)));
-         return Some fi)
-      None (Array.to_list p.family)
-    in ();
-    if (p_first_name base p = "?" || p_surname base p = "?")
-    && (Array.length p.family <> 0 || a.parents <> None) then ()
-    else
-      let s = transl_nth conf "family/families" 0 in
-      do Wserver.wprint "\n";
-         html_li conf;
-         Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d\">%s</a>\n"
-           (commd conf) (Adef.int_of_iper p.cle_index)
-           (capitale (transl_decline conf "add" s));
-      return ();
-  end
+  do let _ = List.fold_left
+       (fun prev fi ->
+  	   do match prev with
+  	      [ Some prev_fi ->
+  		  let cpl1 = coi base prev_fi in
+  		  let cpl2 = coi base fi in
+  		  do Wserver.wprint "<a href=\"%sm=SWI_FAM;i=%d;f=%d\">"
+  		       (commd conf) (Adef.int_of_iper p.cle_index)
+  		       (Adef.int_of_ifam fi);
+  		     Wserver.wprint "%s</a><br>\n"
+  			(capitale (transl conf "switch"));
+  		     if cpl1.father = cpl2.father && cpl1.mother = cpl2.mother
+  		     then
+  		       do stag "a" "href=\"%sm=MRG_FAM;f1=%d;f2=%d;ip=%d\""
+  			    (commd conf) (Adef.int_of_ifam prev_fi)
+  			    (Adef.int_of_ifam fi)
+			    (Adef.int_of_iper p.cle_index)
+  			  begin
+  			    Wserver.wprint "%s"
+  			      (capitale (transl_decline conf "merge" ""));
+  			  end;
+  			  Wserver.wprint "<br>\n";
+  		       return ()
+  		     else ();
+  		  return ()
+  	      | None -> () ];
+  	   return
+  	   let c = spouse p (coi base fi) in
+  	   do Wserver.wprint "<a href=\"%sm=MOD_FAM;i=%d;ip=%d\">" (commd conf)
+  		(Adef.int_of_ifam fi) (Adef.int_of_iper p.cle_index);
+  	      let s = transl_nth conf "family/families" 0 in
+  	      Wserver.wprint "%s</a>\n"
+  		(capitale (transl_decline conf "modify" s));
+  	      Wserver.wprint "\n<em>%s</em>\n"
+  		(transl_decline conf "with"
+  		   (gen_someone_txt raw_access conf base (poi base c)));
+  	      Wserver.wprint "<br>\n";
+  	      Wserver.wprint "<a href=\"%sm=DEL_FAM;i=%d;ip=%d\">" (commd conf)
+  		(Adef.int_of_ifam fi) (Adef.int_of_iper p.cle_index);
+  	      let s = transl_nth conf "family/families" 0 in
+  	      Wserver.wprint "%s</a>\n"
+  		(capitale (transl_decline conf "delete" s));
+  	      Wserver.wprint "\n<em>%s</em><br>\n"
+  		(transl_decline conf "with"
+  		   (gen_someone_txt raw_access conf base (poi base c)));
+  	   return Some fi)
+       None (Array.to_list p.family)
+     in ();
+     if (p_first_name base p = "?" || p_surname base p = "?")
+     && (Array.length p.family <> 0 || a.parents <> None) then ()
+     else
+       let s = transl_nth conf "family/families" 0 in
+       Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d\">%s</a><br>\n"
+  	 (commd conf) (Adef.int_of_iper p.cle_index)
+  	 (capitale (transl_decline conf "add" s));
+  return ()
 ;
 
 value print conf base p =
@@ -841,92 +833,94 @@ value print conf base p =
            if fn = "?" || sn = "?" then Adef.int_of_iper p.cle_index
            else p.occ
          in
-         do Wserver.wprint ": ";
+         do Wserver.wprint ":<br>";
             Wserver.wprint "%s.%d %s" fn occ sn;
          return ();
     return ()
   in
   let a = aoi base p.cle_index in
-  do header conf title;
-     tag "ul" begin
-       html_li conf;
-       Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a>\n" (commd conf)
-         (Adef.int_of_iper p.cle_index)
-         (capitale (transl_decline conf "modify" ""));
-       Wserver.wprint "\n";
-       if conf.can_send_image && sou base p.image = "" then
-         do Wserver.wprint "\n";
-            html_li conf;
-            Wserver.wprint "<a href=\"%sm=SND_IMAGE;i=%d\">%s</a>\n"
-              (commd conf) (Adef.int_of_iper p.cle_index)
-              (capitale (transl_decline conf "send" (transl conf "image")));
-            match auto_image_file conf base p with
-            [ Some _ ->
-                do Wserver.wprint "\n";
-                   html_li conf;
-                   Wserver.wprint "<a href=\"%sm=DEL_IMAGE;i=%d\">%s</a>\n"
-                     (commd conf) (Adef.int_of_iper p.cle_index)
-                     (capitale
-                        (transl_decline conf "delete" (transl conf "image")));
-                return ()
-            | None -> () ];
-         return ()
-       else ();
-     end;
-     Wserver.wprint "<p>\n";
-     tag "ul" begin
-       html_li conf;
-       Wserver.wprint "<a href=\"%sm=DEL_IND;i=%d\">%s</a>\n"
-         (commd conf) (Adef.int_of_iper p.cle_index)
-         (capitale (transl_decline conf "delete" ""));
-     end;
-     print_family_stuff conf base p a;
-     if has_children base p then
-       do Wserver.wprint "<p>\n";
-          tag "ul" begin
-            html_li conf;
-            stag "a" "href=\"%sm=CHG_CHN;i=%d\"" (commd conf)
-              (Adef.int_of_iper p.cle_index)
-            begin
-              Wserver.wprint "%s"
-                (capitale (transl conf "change children's names"));
-            end;
-            Wserver.wprint "\n";
-          end;
-       return ()
-     else ();
-     match a.parents with
-     [ Some _ -> ()
-     | None ->
-         if p_first_name base p = "?" || p_surname base p = "?" then ()
-         else
-           do Wserver.wprint "<ul>\n";
-              html_li conf;
-              let s = transl conf "parents" in              
-              Wserver.wprint "<a href=\"%sm=ADD_PAR;i=%d\">%s</a>\n"
-                (commd conf) (Adef.int_of_iper p.cle_index)
-                (capitale (transl_decline conf "add" s));
-              Wserver.wprint "</ul>\n";
-           return () ];
-     Wserver.wprint "\n";
-     html_p conf;
-     tag "ul" begin
-       html_li conf;
-       stag "a" "href=\"%sm=MRG;i=%d\"" (commd conf)
-         (Adef.int_of_iper p.cle_index)
-       begin
-         Wserver.wprint "%s" (capitale (transl_decline conf "merge" ""));
+  do cheader conf title;
+     tag "table" "border=%d width=\"95%%\"" conf.border begin
+       tag "tr" begin
+         tag "th" "align=left" begin
+           Wserver.wprint "%s<br>&nbsp;\n"
+             (std_color (capitale (transl_nth conf "person/persons" 0)));
+         end;
+         tag "th" "align=left" begin
+           Wserver.wprint "%s<br>&nbsp;\n"
+             (std_color (capitale (transl_nth conf "family/families" 1)));
+         end;
+       end;
+       tag "tr" begin
+         tag "td" "valign=top" begin
+           Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a><br>\n"
+             (commd conf) (Adef.int_of_iper p.cle_index)
+             (capitale (transl_decline conf "modify" ""));
+           if conf.can_send_image && sou base p.image = "" then
+             do Wserver.wprint "<a href=\"%sm=SND_IMAGE;i=%d\">%s</a><br>\n"
+                  (commd conf) (Adef.int_of_iper p.cle_index)
+                  (capitale
+                     (transl_decline conf "send" (transl conf "image")));
+                match auto_image_file conf base p with
+                [ Some _ ->
+                    Wserver.wprint
+                      "<a href=\"%sm=DEL_IMAGE;i=%d\">%s</a><br>\n"
+                       (commd conf) (Adef.int_of_iper p.cle_index)
+                       (capitale
+                          (transl_decline conf "delete" (transl conf "image")))
+                | None -> () ];
+             return ()
+           else ();
+           Wserver.wprint "<br>\n";
+           Wserver.wprint "<a href=\"%sm=DEL_IND;i=%d\">%s</a><br>\n"
+             (commd conf) (Adef.int_of_iper p.cle_index)
+             (capitale (transl_decline conf "delete" ""));
+           Wserver.wprint "<br>\n";
+           stag "a" "href=\"%sm=MRG;i=%d\"" (commd conf)
+            (Adef.int_of_iper p.cle_index)
+           begin
+             Wserver.wprint "%s" (capitale (transl_decline conf "merge" ""));
+           end;
+           Wserver.wprint "<br>\n";
+     	   match a.parents with
+     	   [ Some _ -> ()
+     	   | None ->
+     	       if p_first_name base p = "?" || p_surname base p = "?" then ()
+     	       else
+                 let s = transl conf "parents" in
+                 do Wserver.wprint "<br>\n";
+                    Wserver.wprint "<a href=\"%sm=ADD_PAR;i=%d\">%s</a><br>\n"
+     		      (commd conf) (Adef.int_of_iper p.cle_index)
+                      (capitale (transl_decline conf "add" s));
+                 return () ];
+         end;
+         tag "td" "valign=top" begin
+           print_family_stuff conf base p a;
+           if has_children base p then
+             do Wserver.wprint "<br>\n";
+                stag "a" "href=\"%sm=CHG_CHN;i=%d\"" (commd conf)
+                  (Adef.int_of_iper p.cle_index)
+	        begin
+		  Wserver.wprint "%s"
+		    (capitale (transl conf "change children's names"));
+	        end;
+	        Wserver.wprint "<br>\n";
+             return ()
+           else ();
+         end;
        end;
      end;
      if Array.length p.family > 0 then
-       do Wserver.wprint
+       do html_p conf;
+          Wserver.wprint
             (fcapitale (ftransl conf "to add a child to a family, use \"%s\""))
             (capitale
                (transl_decline conf "modify"
                   (transl_nth conf "family/families" 0)));
-          Wserver.wprint ".\n";
+          Wserver.wprint ".<br>\n";
        return ()
      else ();
+     Wserver.wprint "<br>\n";
      trailer conf;
   return ()
 ;

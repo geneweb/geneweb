@@ -7,9 +7,23 @@
 </head>
 <body%b>
 
-<h1>תולדות</h1>
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>תולדות</font></h1>
+</td>
+</tr>
+</table>
+
+<br>
 
 %rversion
+</center>
 
 <p>
 יש במאגר המידע %n אנשים %o

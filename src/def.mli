@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 2.14 1999-10-06 08:47:53 ddr Exp $ *)
+(* $Id: def.mli,v 2.15 1999-10-26 22:35:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = Adef.iper;
@@ -63,6 +63,8 @@ type gen_relation 'person 'string =
 
 type sex = [ Male | Female | Neuter ];
 
+(* person *)
+
 type gen_person 'person 'string =
   { first_name : mutable 'string;
     surname : mutable 'string;
@@ -101,6 +103,8 @@ type gen_ascend =
   { parents : mutable option ifam;
     consang : mutable Adef.fix }
 ;
+
+(* family *)
 
 type gen_family 'person 'string =
   { marriage : mutable codate;

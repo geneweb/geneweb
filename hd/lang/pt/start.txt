@@ -5,14 +5,61 @@
   <meta name="ROBOTS" content="NONE">
 </head>
 <body%b>
-<h1>Genealogia</h1>
+
+<center>
+<table border=0 width="100%">
+<tr>
+<td>
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
+height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+</td>
+<td align=left>
+<h1><font color=#2f6400>{Genealogical<br>data base}</font></h1>
+</td>
+</tr>
+</table>
+
+<br>
 
 %rversion
 
 <p>
 
-A base de dados cont&eacute;m actualmente %n pessoas%o
+A base de dados <font color=#2f6400><b>"%t"</b></font> cont&eacute;m
+actualmente %n pessoas%o<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%o.
+
+%y<br><p>
+
+<table border=0 width="70%">
+<tr>
+
+<td align=center>Entrada <a href="%sw=w"><em>bruxo</em></a><br>
+(palavra de paso)</td>
+
+%y%z<td align=center>Entrada <a href="%sw=f"><em>amigo</em></a><br>
+(palavra de paso)</td>
+
+%z%y</tr></table>
+
+%y%i<br><br>
+
+<table border=0>
+<tr><td align=center>
+<form method=get action="%f">
+%hPalavra de paso para entrada <em>amigo</em> o <em>bruxo</em>:
+<input name=w size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+%i
+
+<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+{To navigate in this data base, you can do your search}:<br><br>
 
 <ul>
 
@@ -20,81 +67,118 @@ A base de dados cont&eacute;m actualmente %n pessoas%o
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-Procurar: <input name=n size=40 maxlength=200>
+<font color=#2f6400><b>por pessoa</b></font>
+<input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
 <ul>
-<li> <input type=radio name=t value=PN checked>
+<li><input type=radio name=t value=PN checked>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
 [or] <em>[surname/surnames]</em>%u
 [or] <em>Sosa number</em> relative to %a%u
-<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
-<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
+<li><input type=radio name=t value=P> <em>[first name/first names]</em>
+<li><input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
 <li>
 
-<FORM method=GET action="%f">
+<form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-Por t&iacute;tulo <INPUT NAME=t size=14 maxlength=200>
-lugar <INPUT NAME=p size=25 maxlength=200> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<font color=#2f6400><b>por t&iacute;tulo</b></font>
+<input name=t size=14 maxlength=200>
+<font color=#2f6400><b>lugar</b></font>
+<input name=p size=25 maxlength=200>
+<input type=submit value="Ok">
+<br>
+ex:
+<font color=#2f6400><b>[title/titles]</b></font>: roi, duke...
+<font color=#2f6400><b>[place]</b></font>: de France, of Sax...
+</form>
 
 <li>
 
-<FORM method=GET action="%f">
-%hTodos os
-<SELECT NAME=m>
-   <OPTION VALUE="N" SELECTED> Apelidos
-   <OPTION VALUE="P"> Nomes Pr&oacute;prios
-</SELECT>
+<form method=GET action="%f">
+%h
+<font color=#2f6400><b>{by the list}</b></font> de todos os
+<select name=m>
+<option value="N" selected>apelidos
+<option value="P">nomes pr&oacute;prios
+</select>
 por
-<SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED> Ordem alfab&eacute;tico
-   <OPTION VALUE="F"> Frequ&ecirc;ncia
-</SELECT> =&gt;
-<INPUT TYPE=submit VALUE="Ok">
-</FORM>
+<select name=tri>
+<option value="A" selected>ordem alfab&eacute;tico
+<option value="F">frequ&ecirc;ncia
+</select>
+<input type=submit value="Ok">
+</form>
 
-<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+<li>
 
-%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
-<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w
+<font color=#2f6400><b>por o</b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>investigaç&atilde;o
+complexa</b></font></a>.
 
 </ul>
 
-Os <a href="%sm=AN">anivers&aacute;rios</a>.<br>
-Os <a href="%sm=AD">anivers&aacute;rios das pessoas falecidas</a>.<br>
-Os <a href="%sm=AM">anivers&aacute;rios de casamento</a>.<br>%x
-Os <a href="%sm=LB;k=10">nascimentos mais recentes</a>.<br>
-Os <a href="%sm=LD;k=10">mortes mais recentes</a>.<br>%x%j
-<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
-<a href="%sm=FORUM">[*forum]</a>.
+%w<p>
+
+<center>{You can}<br><br>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM">acrescentar a família</a>
+</ul>
+</td>
+<td align=left>
+<ul>
+<li><a href="%sm=MOD_NOTES">modificar as notas</a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+<br>
+%w
+
+<center>{You can also consult}<br><br>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li>os <a href="%sm=AN">anivers&aacute;rios</a>
+<li>os <a href="%sm=AD">anivers&aacute;rios das pessoas falecidas</a>
+<li>os <a href="%sm=AM">anivers&aacute;rios de casamento</a>%x
+<li>os <a href="%sm=LB;k=10">nascimentos mais recentes</a>%x
+</ul>
+</td>
+<td valign=up>
+<ul>%x
+<li>os <a href="%sm=LD;k=10">mortes mais recentes</a>%x%j
+<li>os <a href="%sm=HIST;k=10">{history of updates}</a>%j
+<li>os <a href="%sm=CAL">{calendars}</a>
+<li>o <a href="%sm=FORUM">forum <font color=#2f6400><b>GeneWeb</b></font></a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
 
 <p>
 
 Houve %q consultas, dos quais %c foram a esta p&aacute;gina, desde %d.
 
-%y<p>
+</td></tr>
 
-<ul>
-<li> Entrada <a href="%sw=w"><em>bruxo</em></a> (palavra de paso).
-%y%z<li> Entrada <a href="%sw=f"><em>amigo</em></a> (palavra de paso).
-%z%y</ul>
+<tr>
+<td align=right><br><font size=-1><em><a
+href="%sm=LEX">lexicon</a></em></font></td>
+</tr>
 
-%y%i<p>
-<form method=get action="%f">
-%h<font size=-1>Palavra de paso para entrada <em>amigo</em> o
-<em>bruxo</em>:</font>
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
-%i<p>
-
-<font size=-1><a href="%sm=LEX">Lexicon</a></font>
+</table>
+</center>

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.38 1999-10-12 15:58:04 ddr Exp $ *)
+(* $Id: family.ml,v 2.39 1999-10-26 22:35:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -318,12 +318,12 @@ value family_m conf base =
       UpdateFam.print_add_parents conf base
   | Some "AN" ->
       match p_getenv conf.env "v" with
-      [ Some x -> Birthday.print conf base (int_of_string x)
-      | _ -> Birthday.menu_print conf base ]
+      [ Some x -> Birthday.print_birth conf base (int_of_string x)
+      | _ -> Birthday.print_menu_birth conf base ]
   | Some "AD" ->
       match p_getenv conf.env "v" with
       [ Some x -> Birthday.print_dead conf base (int_of_string x)
-      | _ -> Birthday.menu_print_dead conf base ]
+      | _ -> Birthday.print_menu_dead conf base ]
   | Some "AM" ->
       match p_getenv conf.env "v" with
       [ Some x -> Birthday.print_marriage conf base (int_of_string x)
