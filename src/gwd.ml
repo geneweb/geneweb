@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.36 1999-08-31 09:09:44 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.37 1999-09-01 21:30:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1049,7 +1049,20 @@ value main () =
      else []]
   in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
-  do arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg")
+  do ifdef UNIX then
+       try
+         let s = Sys.getenv "LC_CTYPE" in
+         if String.length s > 2 then
+          let s = String.sub s 0 2 in
+          default_lang.val :=
+            if s = "fr" then "fr"
+            else if s = "es" then "es"
+            else "en"
+         else ()
+       with
+       [ Not_found -> () ]
+     else ();
+     arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg")
        speclist anonfun usage;
      Argl.parse speclist anonfun usage;
      if Util.doc_dir.val = "" then
