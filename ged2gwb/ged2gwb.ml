@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.46 2004-12-14 09:30:09 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.47 2005-02-04 20:18:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -261,11 +261,14 @@ value ascii_of_macintosh s =
 ;
 
 value ascii_of_string s =
-  match charset.val with
-  [ Ansel -> Ansel.to_iso_8859_1 s
-  | Ascii -> s
-  | Msdos -> ascii_of_msdos s
-  | MacIntosh -> ascii_of_macintosh s ]
+  let s =
+    match charset.val with
+    [ Ansel -> Ansel.to_iso_8859_1 s
+    | Ascii -> s
+    | Msdos -> ascii_of_msdos s
+    | MacIntosh -> ascii_of_macintosh s ]
+  in
+  Gutil.utf_8_of_iso_8859_1 s
 ;
 
 value rec get_lev n =

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.28 2005-02-03 16:19:34 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.29 2005-02-04 20:18:59 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -44,7 +44,21 @@ value string_sub s i len =
   let len = min (String.length s - i) (max 0 len) in String.sub s i len
 ;
 
-value utf_8_db = ref True;
+value utf_8_of_iso_8859_1 str =
+  loop 0 0 where rec loop i len =
+    if i = String.length str then Buff.get len
+    else
+      let c = str.[i] in
+      if Char.code c < 0x80 then loop (i + 1) (Buff.store len c)
+      else if Char.code c < 0xC0 then
+        let len = Buff.store len (Char.chr 0xC2) in
+        loop (i + 1) (Buff.store len c)
+      else 
+        let len = Buff.store len (Char.chr 0xC3) in
+        loop (i + 1) (Buff.store len (Char.chr (Char.code c - 0x40)))
+;
+
+value utf_8_db = Name.utf_8_db;
 
 value utf_8_intern_byte c =
   utf_8_db.val && Char.code c >= 0x80 && Char.code c < 0xC0;
