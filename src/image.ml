@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 4.2 2001-10-15 13:22:51 ddr Exp $ *)
+(* $Id: image.ml,v 4.3 2001-11-22 19:06:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -7,7 +7,10 @@ open Config;
 
 value content cgi t len fname =
   do {
-    if not cgi then do { Wserver.wprint "HTTP/1.0 200 OK"; Util.nl (); }
+    if not cgi then do {
+      Wserver.wprint "HTTP/1.0 200 OK"; Util.nl ();
+      Wserver.wprint "Connection: close"; Util.nl ();
+    }
     else ();
     Wserver.wprint "Content-type: image/%s" t;
     Util.nl ();
