@@ -2,13 +2,13 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: mk_missing_i18n.sh,v 3.6 2000-12-26 15:12:24 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 3.7 2001-01-31 09:50:46 ddr Exp $ *)
 
 open Printf
 
 let languages =
-  ["af"; "cn"; "cs"; "de"; "dk"; "en"; "eo"; "es"; "fi"; "fr"; "he"; "is";
-   "it"; "lv"; "nl"; "no"; "pt"; "ru"; "se"]
+  ["af"; "cn"; "cs"; "de"; "dk"; "en"; "eo"; "es"; "et"; "fi"; "fr"; "he";
+   "is"; "it"; "lv"; "nl"; "no"; "pt"; "ru"; "se"]
 
 let rec skip_to_same_line ic line_ref =
   let line = input_line ic in

@@ -28,6 +28,7 @@ Langue par défaut:
 <option value="nl"%edefault_lang=nl;>Dutch
 <option value="en"%edefault_lang=en;>English
 <option value="eo"%edefault_lang=eo;>Esperanto
+<option value="et"%edefault_lang=et;>Estonien
 <option value="fi"%edefault_lang=fi;>Finnish
 <option value="fr"%edefault_lang=fr;>French
 <option value="de"%edefault_lang=de;>German
