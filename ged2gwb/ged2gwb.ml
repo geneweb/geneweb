@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.6 1999-03-20 19:12:57 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.7 1999-03-25 11:18:08 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -124,6 +124,14 @@ value print_bad_date pos d =
        Printf.printf "Can't decode date %s\n" d;
        flush stdout;
     return ()
+;
+
+value check_month m =
+  if m < 1 || m > 12 then
+    do Printf.printf "Bad (numbered) month in date: %d\n" m;
+       flush stdout;
+    return ()
+  else ()
 ;
 
 value warning_month_number_dates () =
@@ -331,12 +339,13 @@ EXTEND
                [ Right m -> (d, m)
                | Left m ->
             	   match month_number_dates.val with
-            	   [ DayMonthDates -> (d, m)
-            	   | MonthDayDates -> (m, d)
+            	   [ DayMonthDates -> do check_month m; return (d, m)
+            	   | MonthDayDates -> do check_month d; return (m, d)
             	   | _ ->
                        do month_number_dates.val := MonthNumberHappened; return
                        (0, 0) ] ]
              in
+             let (d, m) = if m < 1 || m > 12 then (0, 0) else (d, m) in
              Some {day = d; month = m; year = y; prec = Sure}
          | (None, Some m, Some y) ->
 	     let m =
