@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.3 2001-03-20 11:14:13 ddr Exp $ *)
+(* $Id: forum.ml,v 4.4 2001-04-01 20:56:16 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -72,6 +72,7 @@ value print_one_header conf prec_date pos h =
            Wserver.wprint "%s" (secure (sp2nbsp 30 subject));
        end;
      end;
+     Wserver.wflush ();
   return ()
 ;
 
