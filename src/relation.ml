@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.70 2001-01-30 16:53:23 ddr Exp $ *)
+(* $Id: relation.ml,v 3.71 2001-01-31 17:43:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -558,7 +558,7 @@ value print_shortest_path conf base p1 p2 =
     match get_shortest_path_relation base ip1 ip2 excl_faml with
     [ Some (path, ifam) ->
         if p_getenv conf.env "slices" = Some "on" then
-          Dag.print_slices_menu conf base
+          Dag.print_slices_menu conf base None
         else
           do header_no_page_title conf title;
              let excl_faml = [ifam :: excl_faml] in

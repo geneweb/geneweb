@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 3.49 2001-01-31 12:50:24 ddr Exp $ *)
+(* $Id: dag.ml,v 3.50 2001-01-31 17:43:30 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -525,7 +525,7 @@ value print_next_pos conf pos1 pos2 tcol =
 
 (* Main print table algorithm with <pre> *)
 
-value print_table_pre conf hts =
+value table_pre_dim conf hts =
   do table_strip_troublemakers hts; return
   let ncol =
     let hts0 = hts.(0) in
@@ -535,10 +535,15 @@ value print_table_pre conf hts =
         let (colspan, _, _) = hts0.(j) in
         loop (ncol + colspan) (j + 1)
   in
-  let colsz = compute_columns_sizes hts ncol in
-  let colminsz = compute_columns_minimum_sizes hts ncol in
-  let tcol = Array.fold_left \+ 0 colsz in
-  let tmincol = Array.fold_left \+ 0 colminsz in
+  let min_widths_tab = compute_columns_minimum_sizes hts ncol in
+  let max_widths_tab = compute_columns_sizes hts ncol in
+  let min_wid = Array.fold_left \+ 0 min_widths_tab in
+  let max_wid = Array.fold_left \+ 0 max_widths_tab in
+  (min_wid, max_wid, min_widths_tab, max_widths_tab, ncol)
+;
+
+value print_table_pre conf hts =
+  let (tmincol, tcol, colminsz, colsz, ncol) = table_pre_dim conf hts in
   let dcol =
     let dcol =
       match p_getint conf.env "width" with
@@ -685,7 +690,7 @@ value print_html_table conf hts =
     print_table conf hts
 ;
 
-value print_only_dag conf base elem_txt spouse_on invert set spl d =
+value make_tree_hts conf base elem_txt spouse_on invert set spl d =
   let indi_txt n =
     match n.valu with
     [ Left ip ->
@@ -764,31 +769,23 @@ value print_only_dag conf base elem_txt spouse_on invert set spl d =
   in
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let hts = Dag2html.html_table_of_dag indi_txt phony invert no_group d in
+  hts
+;
+
+value print_only_dag conf base elem_txt spouse_on invert set spl d =
+  let hts = make_tree_hts conf base elem_txt spouse_on invert set spl d in
   print_html_table conf hts
 ;
 
-value gen_print_dag_aux conf base spouse_on invert set spl d =
-  let title _ =
-    Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
-  in
-  let elem_txt conf base p =
-    Util.referenced_person_title_text conf base p ^
-    Date.short_dates_text conf base p
-  in
-  do Util.header_no_page_title conf title;
-     print_only_dag conf base elem_txt spouse_on invert set spl d;
-     Util.trailer conf;
-  return ()
-;
-
-value print_slices_menu conf base =
+value print_slices_menu conf base hts_opt =
   let txt n =
     Util.capitale
        (transl_nth conf
-          "display by slices/slice width/overlap/global width" n)
+          "display by slices/slice width/overlap/total width" n)
   in
   let title _ = Wserver.wprint "%s" (txt 0) in
   do Util.header conf title;
+     Util.print_link_to_welcome conf True;
      tag "form" "method=get action=\"%s\"" conf.command begin
        List.iter
          (fun (k, v) ->
@@ -810,19 +807,28 @@ value print_slices_menu conf base =
          tag "tr" begin
            tag "td" "align=right" begin
              Wserver.wprint "%s\n" (txt 1);
-             Wserver.wprint "<input name=dpos size=4 value=78>\n";
+             Wserver.wprint "<input name=dpos size=5 value=78>\n";
            end;
          end;
          tag "tr" begin
            tag "td" "align=right" begin
              Wserver.wprint "%s\n" (txt 2);
-             Wserver.wprint "<input name=overlap size=4 value=10>\n";
+             Wserver.wprint "<input name=overlap size=5 value=10>\n";
            end;
          end;
          tag "tr" begin
            tag "td" "align=right" begin
              Wserver.wprint "%s\n" (txt 3);
-             Wserver.wprint "<input name=width size=4 value=78>\n";
+             let wid =
+               let wid = 78 in
+               match hts_opt with
+               [ Some hts ->
+                   let (min_wid, max_wid, _, _, _) = table_pre_dim conf hts in
+                   do Wserver.wprint "(%d-%d)\n" min_wid max_wid; return
+                   max min_wid (min max_wid wid)
+               | None -> wid ]
+             in
+             Wserver.wprint "<input name=width size=5 value=%d>\n" wid;
            end;
          end;
        end;
@@ -833,8 +839,21 @@ value print_slices_menu conf base =
 ;
 
 value gen_print_dag conf base spouse_on invert set spl d =
-  if p_getenv conf.env "slices" = Some "on" then print_slices_menu conf base
-  else gen_print_dag_aux conf base spouse_on invert set spl d
+  let dag_elem_txt conf base p =
+    Util.referenced_person_title_text conf base p ^
+    Date.short_dates_text conf base p
+  in
+  let hts = make_tree_hts conf base dag_elem_txt spouse_on invert set spl d in
+  if p_getenv conf.env "slices" = Some "on" then
+    print_slices_menu conf base (Some hts)
+  else
+    let title _ =
+      Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
+    in
+    do Util.header_no_page_title conf title;
+       print_html_table conf hts;
+       Util.trailer conf;
+    return ()
 ;
 
 value print_dag conf base set spl d =

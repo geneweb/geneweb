@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.213 2001-01-31 09:31:40 ddr Exp $
+# $Id: lexicon.txt,v 3.214 2001-01-31 17:43:29 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -2474,9 +2474,9 @@ pt: desaparecido/desaparecida/desaparecido(a)
 ru: исчез/исчезла
 se: f&ouml;rsvunnen
 
-    display by slices/slice width/overlap/global width
-en: display by slices/slice width/overlap/global width
-fr: affichage par tranches/largeur de la tranche/chevauchement/largeur globale
+    display by slices/slice width/overlap/total width
+en: display by slices/slice width/overlap/total width
+fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
 
     divorce
 af: geskei
