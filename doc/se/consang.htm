@@ -70,7 +70,7 @@ En sannolikhets ber&auml;kning visar att:
 <LI>Blodsbandet <EM>cg(x)</EM> &auml;r lika med sl&auml;ktskapet
 <EM>pr(px, mx)</EM> f&ouml;r
 <I>x</I> f&ouml;r&auml;ldrar <EM>px</EM> och <EM>mx</EM>. </LI>
-<p><LI>Om <EM>x..a..y</EM> &auml;r en minimal sl&auml;ktskapsl&auml;nk
+<p><LI>Om <EM>x..a..y</EM> &auml;r en minimal anlinje
 mellan <EM>x</EM> och <EM>y</EM> (vilket betyder att grenarna
 <EM>x..a</EM> och <EM>a..y</EM> endast har <EM>a</EM>
 gemensam), d&aring; best&auml;ms bidraget till sl&auml;ktskapet mellan
@@ -78,14 +78,17 @@ gemensam), d&aring; best&auml;ms bidraget till sl&auml;ktskapet mellan
 </EM> och <EM>y</EM> med faktorn: </LI>
 
 <PRE>
-     1 / 2**(n+1) * (1 + cg(a))
+        1
+     ------ (1 + cg a)
+       n+1
+      2
 </PRE>
 
 
-<P>d&auml;r <EM>n</EM> &auml;r l&auml;ngden (distansen av <EM>x..a</EM> +
-distansen av <EM>a..y</EM>) av sl&auml;ktskapsl&auml;nken <EM>x..a..y</EM>.
+<P>d&auml;r <EM>n</EM> &auml;r l&auml;ngden (l&auml;ngden av <EM>x..a</EM> +
+l&auml;ngden av <EM>a..y</EM>) av anlinjen <EM>x..a..y</EM>.
 <P>Sl&auml;ktskapet mellan <EM>x</EM> och <EM>y</EM> &auml;r summan av
-bidragen f&ouml;r alla deras minimala sl&auml;ktskapsl&auml;nkar.
+bidragen f&ouml;r alla deras minimala anlinjer.
 </ul>
 
 <HR>
