@@ -2,6 +2,9 @@ GeneWeb version 4.05
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [30 Jan 02] Fixed (hope so!) displaying of relationship by shortest
+    path in case of half siblings: sometimes intermediate parents were
+    missing, introducing confusion.
   - [21 Jan 02] Added a link to the "gwsetup" service in bottom of pages.
     (The command "gwd" has a new option "-setup_link" to add that).
   - [12 Jan 02] Fixed bug: when merging two persons, in case of fast

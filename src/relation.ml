@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.22 2002-01-23 11:39:54 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: relation.ml,v 4.23 2002-01-30 03:04:43 ddr Exp $ *)
+(* Copyright (c) 2002 INRIA *)
 
 open Def;
 open Gutil;
@@ -198,7 +198,8 @@ open Dag2html;
 
 type dag_ind 'a =
   { di_val : 'a; di_famc : mutable dag_fam 'a; di_fams : mutable dag_fam 'a }
-and dag_fam 'a = { df_pare : list (dag_ind 'a); df_chil : list (dag_ind 'a) }
+and dag_fam 'a =
+  { df_pare : mutable list (dag_ind 'a); df_chil : list (dag_ind 'a) }
 ;
 
 value dag_ind_list_of_path path =
@@ -251,20 +252,36 @@ value add_missing_parents_of_siblings conf base indl =
          match ind.di_famc with
          [ {df_pare = []; df_chil = [_]} -> indl
          | {df_pare = []; df_chil = children} ->
-             let ip =
-               match ind.di_val with
-               [ Some ip ->
-                   match (aget conf base ip).parents with
-                   [ Some ifam -> (coi base ifam).father
-                   | None -> assert False ]
-               | _ -> assert False ]
+             let ipl =
+               List.fold_right
+                 (fun ind ipl ->
+                    match ind.di_val with
+                    [ Some ip ->
+                        let ip =
+                          match (aget conf base ip).parents with
+                          [ Some ifam -> (coi base ifam).father
+                          | None -> assert False ]
+                        in
+                        if List.mem ip ipl then ipl else [ip :: ipl]
+                    | _ -> assert False ])
+                 children []
              in
-             let rec indp = {di_val = Some ip; di_famc = famc; di_fams = fams}
-             and famc = {df_pare = []; df_chil = [indp]}
-             and fams = {df_pare = [indp]; df_chil = children} in
+             let fams = {df_pare = []; df_chil = children} in
+             let indl1 =
+               List.fold_left
+                 (fun indl ip ->
+                    let rec indp =
+                      {di_val = Some ip; di_famc = famc; di_fams = fams}
+                    and famc = {df_pare = []; df_chil = [indp]} in
+                    do {
+                      fams.df_pare := [indp :: fams.df_pare];
+                      [indp :: indl]
+                    })
+                 [] ipl
+             in
              do {
                List.iter (fun ind -> ind.di_famc := fams) children;
-               [indp :: indl]
+               indl1 @ indl
              }
          | _ -> indl ]
        in
@@ -744,7 +761,9 @@ value descendant_label conf base info x p =
           let info = (info, fun r -> r.Consang.lens2) in
           match get_piece_of_branch conf base info (1, 2) with
           [ [ip1; ip2] ->
-              let is = if (pget conf base ip1).sex = Male then is else is + 6 in
+              let is =
+                if (pget conf base ip1).sex = Male then is else is + 6
+              in
               if (pget conf base ip2).sex = Male then is else is + 3
           | _ -> (* must be a bug *) is ]
         else is
