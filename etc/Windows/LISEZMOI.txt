@@ -1,0 +1,44 @@
+APERCU
+
+GeneWeb est compose de deux serveurs (programmes qui recoivent des
+requetes du navigateur Web et leur renvoient des informations):
+ - gwsetup:
+     gere les bases de donnees: creation, suppression, renommage, fusion,
+     import/export de GEDCOM, etc.
+ - gwd:
+     permet de consulter une base de donnees, faire des changements, calculer
+     des liens de parente, afficher les ancetres, etc.
+
+  Les serveurs sont juste des programmes qui tournent dans des fenetres.
+  Vous n'avez pas besoin de savoir ce qui s'y passe, mais tant que vous
+  utilisez GeneWeb, vous ne devez pas fermer leurs fenetres. Elles sont
+  d'ailleurs lancees reduites.
+
+  Tout se fait dans votre navigateur Web favori, qui discute avec ces
+  programmes avec le protocole internet. Mais vous n'avez pas besoin
+  normalement, d'etre connecte au Web.
+
+DEMARRAGE
+
+  Pour demarrer avec GeneWeb, double-cliquez sur l'icone de gwsetup puis
+  sur l'icone de gwd. Ils doivent apparaitre dans la barre des taches, en
+  bas de l'ecran.
+
+  Puis double-cliquez sur "START.htm" pour faire apparaitre votre navigateur.
+  Il vous affiche une URL a cliquer pour vous connecter au service gwsetup.
+
+ARRET
+
+  Pour arreter, fermez les fenetres gwsetup et gwd. Si vous les avez laissees
+  reduites, utilisez le bouton droit de votre souris pour cette operation.
+  Windows va peut etre vous dire que des donnees risquent d'etre perdues.
+  Ne vous en faites pas et ignorez ce message. Rien n'est perdu en realite.
+
+Toutes les commandes, ce LISEZMOI compris, peuvent aussi etre lancees a
+partir du bouton "Demarrer", Menu "Programmes", "GeneWeb-xxx".
+
+   ---
+
+Si vous lisez ce fichier pendant l'installation, fermez la presente
+fenetre pour terminer l'installation. Pour revoir ce fichier, double-
+cliquez sur LISEZMOI.
