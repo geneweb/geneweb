@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 4.11 2001-04-24 11:36:03 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.12 2001-05-31 12:45:30 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -84,6 +84,8 @@ fr: Vous pouvez sélectionner une autre langue d'affichage
     parmi les suivantes:
 it: Potete scegliere un'altra lingua fra le seguenti:
 lv: Jûs variet apskatît datu bâzi arî citâs sekojoðâs valodâs:
+no: Du kan velge sidevisning p&aring; et annet spr&aring;k blant
+    f&oslash;lgende:
 pl: Mo¿esz wybraæ inny jêzyk spoœród nastêpuj¹cych:
 sv: Du kan välja ett annat språk bland de följande:
 ]</em></font>
