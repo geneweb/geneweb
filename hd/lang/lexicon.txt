@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.82 2002-03-17 10:59:21 ddr Exp $
+# $Id: lexicon.txt,v 4.83 2002-03-21 10:31:34 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -36,6 +36,7 @@ fi: ddmmyy
 fr: ddmmyy
 he: ddmmyy
 it: ddmmyy
+lv: ddmmyy
 nl: ddmmyy
 no: ddmmyy
 pl: ddmmyy
@@ -427,6 +428,7 @@ fi: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prair
 fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 he:  ååğãîéàéàø / áøåîàéàø / ôøéîàéàø / ğéáåæ / ôìåáéåæ / â'øîéğàì / ôìåøéàì / ôøàøéàì / îñéãåø / úøîéãåø / ôøå÷èéãåø / ğåñó
 it: vendemmiaio/brumaio/frimaio/nevoso/piovioso/ventoso/germinale/fiorile/pratile/ messidoro/termidoro/fruttidoro/complementare
+lv: vendemiaire/brumaire/frimaire/nivose/pluviose/ventose/germinal/floreal/prairial/messidor/thermidor/fructidor/complementaire
 nl: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 no: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 pl: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
@@ -444,6 +446,7 @@ et: tishrei/chesvan/kislev/tevet/shvat/adar I/adar II/nisan/iyyar/sivan/tammuz/a
 fi: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 he: úùøé/ çùåï/ ëñìå/ èáú/ ùáè/ àãø à'/ àãø á'/ ğéñï/ àééø/ ñéåï/ úîåæ/ àá/ àìåì
+lv: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 nl: Tishri/Marcheswan/Kislew/Tebeth/Shebat/Adar/Adar2/Niesan/Ijjar/Siwan/Tammuz/Ab/Elul
 no: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 pl: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
@@ -7429,6 +7432,7 @@ fi: %t:n sukupuoli tuntematon
 fr: sexe ind&eacute;fini pour %t
 he:  äîéï ùì %t ìà îåâãø
 it: sesso indefinito per %t
+lv: nenoskaidrots dzimums personai %t
 nl: onbepaald geslacht voor %t
 no: udefinert kjønn for %t
 pl: %t ma nieokre¶lon± p³eæ
@@ -7560,6 +7564,7 @@ es: usuario/contrase&ntilde;a/cancelar
 fi: käyttajä/salasana/peruuta
 fr: utilisateur/mot de passe/annuler
 he:  îùúîù / ñéñîä / áéèåì
+lv: lietotâjs/parole/atcelt
 nl: gebruiker/wachtwoord/annuleren
 no: bruker/passord/avbryt
 pl: u¿ytkownik/has³o/anuluj
