@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.42 2000-11-06 10:37:05 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.43 2000-11-08 19:28:15 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -32,6 +32,7 @@ database</font></h1></table>
 
 Databasen <font color=%i><b>"%t"</b></font> inneholder n&aring; %n
 personer.%In<br>
+
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 
 %I&NwNj<br><p>
@@ -123,7 +124,7 @@ sortert
 
 <form method=GET action="%s">
 %h<input type=hidden name=m value=PS>
-<font color=%i><b>{by} [place] / [surname/surnames]0</b></font>
+<font color=%i><b>etter [place] / [surname/surnames]0</b></font>
 - [birth] <input type=checkbox name=bi value=on checked>
 - [death] <input type=checkbox name=de value=on>
 - [marriage/marriages]0 <input type=checkbox name=ma value=on>
@@ -189,10 +190,9 @@ Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
 %Il<p>%E
 
 <p>
-
-{If your browser does not automatically update the modified pages (forcing you
-to do "reload current document"), try navigating from <a
-href="%sescache=0">this link</a>}.
+Hvis din browser ikke automatisk oppdaterer endrede sider (krever 
+oppfrisking av den aktuelle siden), prøv da å navigere <a
+href="%sescache=0">herfra</a>.
 
 </td></tr>
 </table>
