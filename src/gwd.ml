@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.79 2001-03-05 14:05:36 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.80 2001-03-05 14:12:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -392,9 +392,13 @@ value start_with_base conf bname =
          Wserver.wprint "%s"
            (Util.capitale (transl conf "cannot access base"));
          Wserver.wprint " \"%s\".</ul>\n" conf.bname;
-         Wserver.wprint "<em><font size=-1>Internal message: %s</font></em>\n"
-           (Printexc.to_string e);
-         Wserver.wprint "</body>\n";
+         match e with
+         [ Sys_error _ -> ()
+         | _ ->
+             Wserver.wprint
+               "<em><font size=-1>Internal message: %s</font></em>\n"
+               (Printexc.to_string e) ];
+         Util.trailer conf;
       return () ]
 ;
 
