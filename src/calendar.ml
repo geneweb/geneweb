@@ -1,4 +1,4 @@
-(* $Id: calendar.ml,v 4.2 2005-02-27 04:29:43 ddr Exp $ *)
+(* $Id: calendar.ml,v 4.3 2005-02-27 09:34:26 ddr Exp $ *)
 
 (* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/;
    converted his C program into this OCaml program.
@@ -470,6 +470,15 @@ value hebrew_of_gregorian = conv hebrew_of_sdn 13 sdn_of_gregorian 12;
    code cleaning and transforming for interface jdn/moon-day: but I did
    not understand everything and the code could perhaps be improved *)
 
+type found 'a 'b = [ Found of 'a | NotYetFound of 'b ];
+type moon_day =
+  [ OrdinaryMoonDay
+  | NewMoon of int and int
+  | FirstQuarter of int and int
+  | FullMoon of int and int
+  | LastQuarter of int and int ]
+;
+
 value jjdate date_JJD =
   let z1 = date_JJD +. 0.5 in
   let z = truncate z1 in
@@ -529,15 +538,6 @@ value testmon i date first_moon_day_found date_JJD month_day moon_day =
   (inside_month, date_JJD, leap_year, month_day, moon_day)
 ;
 
-type found 'a 'b = [ Found of 'a | NotYetFound of 'b ];
-type moon_day =
-  [ OrdinaryMoonDay
-  | NewMoon of int and int
-  | FirstQuarter of int and int
-  | FullMoon of int and int
-  | LastQuarter of int and int ]
-;
-
 value affmoph i date_JJD leap_year first_moon_day_found month_day moon_day
       date =
   let tabjm = [| 31; 28; 31; 30; 31; 30; 31; 31; 30; 31; 30; 31 |] in
@@ -562,14 +562,14 @@ value affmoph i date_JJD leap_year first_moon_day_found month_day moon_day
       if month_day = date.day then Found (OrdinaryMoonDay, moon_day)
       else loop (month_day + 1) (moon_day + 1)
     else if month_day = date.day then
-      let md =
+      let r =
         match i with
-        [ 0 -> NewMoon hh mm
-        | 1 -> FirstQuarter hh mm
-        | 2 -> FullMoon hh mm
-        | _ -> LastQuarter hh mm ]
+        [ 0 -> (NewMoon hh mm, 1)
+        | 1 -> (FirstQuarter hh mm, moon_day)
+        | 2 -> (FullMoon hh mm, moon_day)
+        | _ -> (LastQuarter hh mm, moon_day) ]
       in
-      Found (md, moon_day)
+      Found r
     else
       let (moon_day, first_moon_day_found) =
         if i == 0 then (2, True) else (moon_day + 1, first_moon_day_found)
