@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.40 2001-02-10 11:04:58 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.41 2001-02-10 22:05:37 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -355,14 +355,14 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
      [ NotMarried -> Printf.fprintf oc " #nm"
      | Married -> ()
      | Engaged -> Printf.fprintf oc " #eng"
-     | Gay ->
+     | NoSexesCheck ->
          let c x =
            match x.sex with
            [ Male -> 'm'
            | Female -> 'f'
            | Neuter -> '?' ]
          in
-         Printf.fprintf oc " #gay %c%c" (c m.m_fath) (c m.m_moth) ];
+         Printf.fprintf oc " #sex %c%c" (c m.m_fath) (c m.m_moth) ];
      print_if_no_empty oc base "#mp" fam.marriage_place;
      print_if_no_empty oc base "#ms" fam.marriage_src;
      match fam.divorce with

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.26 2001-02-10 11:04:59 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.27 2001-02-10 22:05:37 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -91,7 +91,7 @@ value reconstitute_family conf =
     match p_getenv conf.env "mrel" with
     [ Some "not_marr" -> NotMarried
     | Some "engaged" -> Engaged
-    | Some "gay" -> Gay
+    | Some "nsck" -> NoSexesCheck
     | _ -> Married ]
   in
   let marriage = Update.reconstitute_date conf "marriage" in
@@ -332,7 +332,7 @@ value effective_mod conf base sfam scpl sdes =
   let nmoth = poi base ncpl.mother in
   let nfath_u = uoi base ncpl.father in
   let nmoth_u = uoi base ncpl.mother in
-  do if sfam.relation <> Gay then
+  do if sfam.relation <> NoSexesCheck then
        do match nfath.sex with
          [ Female -> print_err_father_sex conf base nfath
          | _ -> nfath.sex := Male ];
@@ -436,7 +436,7 @@ value effective_add conf base sfam scpl sdes =
   let nmoth_p = poi base ncpl.mother in
   let nfath_u = uoi base ncpl.father in
   let nmoth_u = uoi base ncpl.mother in
-  do if sfam.relation <> Gay then
+  do if sfam.relation <> NoSexesCheck then
        do match nfath_p.sex with
           [ Female -> print_err_father_sex conf base nfath_p
           | Male -> ()

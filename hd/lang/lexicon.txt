@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.224 2001-02-10 17:05:25 ddr Exp $
+# $Id: lexicon.txt,v 3.225 2001-02-10 22:05:36 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -3012,11 +3012,6 @@ pt: filho adoptivo/filha adoptiva/filho(a) adoptivo(a)
 ru: приемный сын/приемная дочь/приемный ребенок
 se: fosterson/fosterdotter/fosterbarn
 
-    gay
-en: gay
-fr: homosexuel
-nl: homosexueel
-
     generation/generations
 af: geslag/geslagte
 cs: generace
@@ -4416,6 +4411,10 @@ no: ingen treff
 pt: nenhuma resposta
 ru: нет совпадений
 se: inga tr&auml;ffar
+
+    no sexes check
+en: no sexes check
+fr: pas de v&eacute;rification des sexes
 
     not divorced
 af: nie geskei nie
