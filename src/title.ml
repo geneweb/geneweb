@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: title.ml,v 1.4 1998-11-25 09:32:57 ddr Exp $ *)
+(* $Id: title.ml,v 1.5 1998-11-26 20:12:42 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -396,10 +396,9 @@ value print conf base =
   match
     (p_getenv conf.env "sm", p_getenv conf.env "t", p_getenv conf.env "p")
   with
-  [ (Some _, Some t, Some p) ->
-      print_title_place conf base (aoc conf t) (aoc conf p)
-  | (Some _, Some t, None) -> print_places conf base (aoc conf t)
-  | (Some _, None, Some p) -> print_titles conf base (aoc conf p)
+  [ (Some _, Some t, Some p) -> print_title_place conf base t p
+  | (Some _, Some t, None) -> print_places conf base t
+  | (Some _, None, Some p) -> print_titles conf base p
   | (_, Some "" | None, Some "" | None) -> print_all_titles conf base
   | (_, Some "" | None, Some "*") -> print_all_places conf base
   | (_, Some "" | None, Some p) -> print_titles conf base (aoc conf p)
