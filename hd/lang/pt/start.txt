@@ -26,25 +26,21 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <p>
 
 A base de dados <font color=#2f6400><b>"%t"</b></font> cont&eacute;m
-actualmente %n pessoas%o<br>
-(<a href="%sm=NOTES">[note/notes]1</a>)%o.
+actualmente %n pessoas.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
 
-%y<br><p>
+%I&NwNj<br><p>
 
-<table border=0 width="70%">
+%I&NcNa<table border=0 width="70%">
 <tr>
 
 <td align=center>Entrada <a href="%sw=w"><em>bruxo</em></a><br>
 (palavra de paso)<br></td>
 
-%y%z<td align=center>Entrada <a href="%sw=f"><em>amigo</em></a><br>
+%INf<td align=center>Entrada <a href="%sw=f"><em>amigo</em></a><br>
 (palavra de paso)</td>
 
-%z%y</tr></table>
-
-%y%i<br><p>
-
-<table border=0>
+%E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=get action="%f">
 %hPalavra de paso para entrada <em>amigo</em> o <em>bruxo</em>:
@@ -52,9 +48,8 @@ actualmente %n pessoas%o<br>
 </form>
 </td></tr>
 </table>
-%i
 
-<br><p>
+%E%E<br><p>
 
 <table border=0 cellspacing=0 cellpadding=0>
 
@@ -76,31 +71,31 @@ Para consultar esta base de dados, pode procurar:<br><p>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
-[or] <em>[surname/surnames]</em>%u
-[or] <em>Sosa number</em> relative to %a%u
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em>Sosa number</em> relative to %a%E
 <li><input type=radio name=t value=P> <em>[first name/first names]</em>
 <li><input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
-%T<li>
+%It<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>por t&iacute;tulo</b></font>$INl<br>$E
-<input name=t size=14 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>por t&iacute;tulo</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
 (ex: roi, duke...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>lugar</b></font>$INl<br>$E
-<input name=p size=25 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>lugar</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
 (ex: de France, of Sax...)
 </td><td>
 <input type=submit value="Ok">
 </td></tr></table>
 </form>
 
-%T<li>
+%E<li>
 
 <form method=GET action="%f">
 %h
@@ -125,7 +120,7 @@ complexa</b></font></a>.
 
 </ul>
 
-%w<p>
+%Iw<p>
 
 <center>Pode<br><p>
 
@@ -134,10 +129,10 @@ complexa</b></font></a>.
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">acrescentar a família</a>
-$INl</ul>
+%INl</ul>
 </td>
 <td align=left>
-<ul>$E
+<ul>%E
 <li><a href="%sm=MOD_NOTES">modificar as notas</a>
 </ul>
 </td>
@@ -145,7 +140,7 @@ $INl</ul>
 </table>
 </center>
 <br>
-%w
+%E
 
 <center>Tamb&eacute;m pode consultar<br><p>
 
@@ -155,14 +150,14 @@ $INl</ul>
 <ul>
 <li>os <a href="%sm=AN">anivers&aacute;rios</a>
 <li>os <a href="%sm=AD">anivers&aacute;rios das pessoas falecidas</a>
-<li>os <a href="%sm=AM">anivers&aacute;rios de casamento</a>%x
-<li>os <a href="%sm=LB;k=10">nascimentos mais recentes</a>%x
+<li>os <a href="%sm=AM">anivers&aacute;rios de casamento</a>%I|wf
+<li>os <a href="%sm=LB;k=10">nascimentos mais recentes</a>%E
 </ul>
 </td>
 <td valign=up>
-<ul>%x
-<li>as <a href="%sm=LD;k=10">mortes mais recentes</a>%x%j
-<li>o <a href="%sm=HIST;k=10">historial das actualiza&ccedil;&otilde;es</a>%j
+<ul>%I|wf
+<li>as <a href="%sm=LD;k=10">mortes mais recentes</a>%E%Ih
+<li>o <a href="%sm=HIST;k=10">historial das actualiza&ccedil;&otilde;es</a>%E
 <li>os <a href="%sm=CAL">calend&aacute;rios</a>
 <li>o <a href="%sm=FORUM">forum da base de dados</a>
 </ul>
@@ -174,7 +169,7 @@ $INl</ul>
 <p>
 
 Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
-$Il<p>$E
+%Il<p>%E
 
 </td></tr>
 

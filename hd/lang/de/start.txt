@@ -27,25 +27,21 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <p>
 
 Die Datenbank <font color=#2f6400><b>"%t"</b></font> enth&auml;lt
-z. Zt. %n Personen.%o<br>
-(<a href="%sm=NOTES">[note/notes]1</a>)%o
+z. Zt. %n Personen.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
 
-%y<br><p>
+%I&NwNj<br><p>
 
-<table border=0 width="70%">
+%I&NcNa<table border=0 width="70%">
 <tr>
 
 <td align=center><a href="%sw=w"><em>Wizard</em></a>-Zugang<br>
 (Passwort).<br></td>
 
-%y%z<td align=center><a href="%sw=f"><em>Freund</em></a>-Zugang<br>
+%INf<td align=center><a href="%sw=f"><em>Freund</em></a>-Zugang<br>
 (Passwort).</td>
 
-%z%y</tr></table>
-
-%y%i<br><p>
-
-<table border=0>
+%E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=get action="%f">
 %hPasswort für <em>Freund</em>- oder <em>Wizard</em>-Zugang</em>:
@@ -53,9 +49,8 @@ z. Zt. %n Personen.%o<br>
 </form>
 </td></tr>
 </table>
-%i
 
-<br><p>
+%E%E<br><p>
 
 <table border=0 cellspacing=0 cellpadding=0>
 
@@ -77,31 +72,31 @@ Zum Benutzen dieser Datenbank kannst du hier suchen:<br><p>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
-[or] <em>[surname/surnames]</em>%u
-[or] <em>Sosa-Nummer</em> relativ zu %a%u
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em>Sosa-Nummer</em> relativ zu %a%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
-%T<li>
+%It<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>nach einem Titel</b></font>$INl<br>$E
-<input name=t size=14 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>nach einem Titel</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
 (ex: roi, duke...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>am Ort:</b></font>$INl<br>$E
-<input name=p size=25 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>am Ort:</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
 (ex: de France, of Sax...)
 </td><td>
 <input type=submit value="Ok">
 </table>
 </form>
 
-%T<li>
+%E<li>
 
 <form method=GET action="%f">
 %h
@@ -124,7 +119,7 @@ Suche</b></font></a>.
 
 </ul>
 
-%w<p>
+%Iw<p>
 
 <center>Du kannst<br><p>
 
@@ -133,19 +128,18 @@ Suche</b></font></a>.
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">eine Familie hinzuf&uuml;gen</a>
-$INl</ul>
+%INl</ul>
 </td>
 <td align=left>
-<ul>$E
+<ul>%E
 <li><a href="%sm=MOD_NOTES">die Notizen &auml;ndern</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-%w
 
-<center>Du kannst zugreifen auf<br><p>
+%E<center>Du kannst zugreifen auf<br><p>
 
 <table border=0>
 <tr>
@@ -153,14 +147,14 @@ $INl</ul>
 <ul>
 <li>die <a href="%sm=AN">Geburtstage</a>
 <li>die <a href="%sm=AD">Jahrestage der verstorbenen Personen</a>
-<li>die <a href="%sm=AM">Hochzeitstage</a>%x
-<li>die <a href="%sm=LB;k=10">letzten Geburten</a>%x
+<li>die <a href="%sm=AM">Hochzeitstage</a>%I|wf
+<li>die <a href="%sm=LB;k=10">letzten Geburten</a>%E
 </ul>
 </td>
 <td valign=up>
-<ul>%x
-<li>die <a href="%sm=LD;k=10">letzten Ableben</a>%x%j
-<li>die <a href="%sm=HIST;k=10">Chronik der Aktualisierungen</a>%j
+<ul>%I|wf
+<li>die <a href="%sm=LD;k=10">letzten Ableben</a>%E%Ih
+<li>die <a href="%sm=HIST;k=10">Chronik der Aktualisierungen</a>%E
 <li>den <a href="%sm=CAL">Kalender</a>
 <li>das <a href="%sm=FORUM">Datenbankforum</a>
 </ul>
@@ -172,7 +166,7 @@ $INl</ul>
 <p>
 
 Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.
-$Il<p>$E
+%Il<p>%E
 
 </td></tr>
 

@@ -27,25 +27,21 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <p>
 
 Databasen <font color=#2f6400><b>"%t"</b></font> inneholder n&aring; %n
-personer.%o<br>
-(<a href="%sm=NOTES">[note/notes]1</a>)%o
+personer.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
 
-%y<br><p>
+%I&NwNj<br><p>
 
-<table border=0 width="70%">
+%I&NcNa<table border=0 width="70%">
 <tr>
 
 <td align=center><a href="%sw=w"><em>Oppdaterings</em></a> adgang<br>
 (passord)<br></td>
 
-%y%z<td align=center><a href="%sw=f"><em>Venners</em></a> adgang<br>
+%INf<td align=center><a href="%sw=f"><em>Venners</em></a> adgang<br>
 (passord)</td>
 
-%z%y</tr></table>
-
-%y%i<br><p>
-
-<table border=0>
+%E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=get action="%f">
 %hPassord, for <em>venner</em> eller <em>oppdaterings</em> adgang:
@@ -53,9 +49,8 @@ personer.%o<br>
 </form>
 </td></tr>
 </table>
-%i
 
-<br><p>
+%E%E<br><p>
 
 <table border=0 cellspacing=0 cellpadding=0>
 
@@ -77,31 +72,31 @@ For &aring; navigere i databasen, kan du s&oslash;ke:<br><p>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
-[or] <em>[surname/surnames]</em>%u
-[or] <em>Sosa number</em> relative to %a%u
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em>Sosa number</em> relative to %a%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
-%T<li>
+%It<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>etter titel</b></font>$INl<br>$E
-<input name=t size=14 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>etter titel</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
 (ex: roi, duke...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>sted</b></font>$INl<br>$E
-<input name=p size=25 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>sted</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
 (ex: de France, of Sax...)
 </td><td>
 <input type=submit value="Ok">
 </td></tr></table>
 </form>
 
-%T<li>
+%E<li>
 
 <form method=GET action="%f">
 %h
@@ -126,7 +121,7 @@ s&oslash;king</b></font></a>.
 
 </ul>
 
-%w<p>
+%Iw<p>
 
 <center>Du kan<br><p>
 
@@ -135,17 +130,17 @@ s&oslash;king</b></font></a>.
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">legge til en familie</a>
-$INl</ul>
+%INl</ul>
 </td>
 <td align=left>
-<ul>$E
+<ul>%E
 <li><a href="%sm=MOD_NOTES">endre notater</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-%w
+%E
 
 <center>Du kan ogs&aring; sl&aring; opp<br><p>
 
@@ -155,14 +150,14 @@ $INl</ul>
 <ul>
 <li><a href="%sm=AN">f&oslash;dselsdager</a>
 <li><a href="%sm=AD">&aring;rsdager for d&oslash;de personer</a>
-<li><a href="%sm=AM">bryllupsdager</a>%x
-<li><a href="%sm=LB;k=10">sist f&oslash;dte</a>%x
+<li><a href="%sm=AM">bryllupsdager</a>%I|wf
+<li><a href="%sm=LB;k=10">sist f&oslash;dte</a>%E
 </ul>
 </td>
 <td valign=up>
-<ul>%x
-<li><a href="%sm=LD;k=10">sist d&oslash;de</a>%x%j
-<li><a href="%sm=HIST;k=10">oppdateringshistorie</a>%j
+<ul>%I|wf
+<li><a href="%sm=LD;k=10">sist d&oslash;de</a>%E%Ih
+<li><a href="%sm=HIST;k=10">oppdateringshistorie</a>%E
 <li><a href="%sm=CAL">kalendere</a>
 <li><a href="%sm=FORUM">database forum</a>
 </ul>
@@ -174,7 +169,7 @@ $INl</ul>
 <p>
 
 Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
-$Il<p>$E
+%Il<p>%E
 
 </td></tr>
 
