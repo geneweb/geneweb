@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.194 2000-12-02 09:28:37 ddr Exp $
+# $Id: lexicon.txt,v 3.195 2000-12-03 22:37:12 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2617,7 +2617,7 @@ se: familj &auml;ndrad
 
     family/families
 af: familie/families
-cs: rodina:a:-u/rodiny:a:-y
+cs: rodina:a:-u/rodiny
 de: Familie/Familien
 dk: familie/familier
 en: family/families

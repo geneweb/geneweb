@@ -2,6 +2,9 @@ GeneWeb version 3.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [03 Dec 00] Fixed bug in Hebrew calendar computation (example: Hebrew
+    day was good for Gregorian date 2001-11-30 but incorrect for the following
+    day 2001-12-01).
   - [28 Nov 00] Fixed bug: it was possible to create a loop by merging
     somebody with one of his/her ancestor.
   - [25 Nov 00] Small improvements: in update page, added "back" link,
