@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.28 2001-02-23 18:49:50 ddr Exp $ *)
+(* $Id: setup.ml,v 3.29 2001-02-24 08:22:38 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1261,7 +1261,8 @@ value string_of_sockaddr =
 ;
 
 value only_addr () =
-  match try Some (open_in "only.txt") with [ Sys_error _ -> None ] with
+  let fname = Filename.concat setup_dir.val "only.txt" in
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let v = try Some (input_line ic) with [ End_of_file -> None ] in
       do close_in ic; return v
