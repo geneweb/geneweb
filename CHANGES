@@ -2,10 +2,9 @@ GeneWeb version 3.09
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [01 Nov 00] In display of persons having the same nobility title,
-    added a link to display a tree of their relationship links. The
-    tree contains only six persons at the same time and a link for the
-    next ones.
+  - [01 Nov 00] In nobility title display, added a link to display the
+    tree of their relationship links. The tree contains only six persons
+    at the same time (and a link for the next ones).
   - [28 Oct 00] Added a trace of the last "wizard" accesses (in the
     file cnt/base_w.txt). The idea is to know if some "wizards" are no
     more using their connections. Applies only to wizards defined in the
