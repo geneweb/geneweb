@@ -43,6 +43,10 @@ GeneWeb version 3.05
     now stripped (allowing to move a base.gwf file from Windows to
     Unix without needing to remove them).
 
+* Counters (cnt/base.txt)
+  - [28 May 00] Now, a count of "wizard", "friend" and normal accesses
+    are added in this file, for statistics.
+
 * Documentation
   - [25 May 00] Updated German documentation (Falko Trojahn).
   - [06 May 00] Updated Swedish documentation (Lars Gustavsson).
