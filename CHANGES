@@ -2,10 +2,10 @@ GeneWeb version 3.11
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [27 Dec 00] In personal template page (etc/perso.txt), changed the
-    %witness; value to refer the witness person himself (instead of the
-    text with link and date). This allows to customize now the display
-    of witnesses, e.g. by adding his profession, or his parents, etc.
+  - [27 Dec 00] In personal pages template file (etc/perso.txt), the value
+    "%witness;" refers now to the witness person himself (instead of being
+    the text with link and dates). This allows to customize now the display
+    of witnesses, e.g. by adding their professions, or their parents, etc.
   - [19 Dec 00] In update page, changed "add family" into "add
     marriage" because, despite the warning at end of this page, many
     people are mistaken by thinking it was "add a child in a family".
