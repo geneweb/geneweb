@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.23 1999-05-31 07:24:06 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.24 1999-06-02 14:14:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -448,9 +448,7 @@ value print_persons_parents conf base all_gp p =
       let print ip =
         let p = poi base ip in        
         let link = get_link all_gp ip in
-        do Wserver.wprint " %s\n"
-             (transl_decline conf "of (same or greater generation level)" "");
-           Wserver.wprint "%s"
+        do Wserver.wprint "%s"
               (strong_referenced_person_title_text conf base p);
            Wserver.wprint "%s" (Date.short_dates_text conf base p);
            match link with
@@ -465,8 +463,10 @@ value print_persons_parents conf base all_gp p =
       in
       do Wserver.wprint ", %s"
            (transl_nth conf "son/daughter/child" (index_of_sex p.sex));
+         Wserver.wprint " %s\n"
+           (transl_decline conf "of (same or greater generation level)" "");
          print cpl.father;
-         Wserver.wprint "\n%s" (transl conf "and");
+         Wserver.wprint "\n%s\n" (transl conf "and");
          print cpl.mother;
       return ()
   | None -> () ]
