@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.29 1999-09-08 13:47:33 ddr Exp $ *)
+(* $Id: descend.ml,v 2.30 1999-09-23 08:32:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -896,7 +896,7 @@ value children_of base ip =
 
 value rec print_table_person conf base max_lev ip =
   do Wserver.wprint "\n";
-     tag "table" "border" begin
+     tag "table" "border=1" begin
        Wserver.wprint "<tr>\n";
        tag "td" "valign=top" begin
          print_someone conf base (poi base ip);
@@ -1142,7 +1142,13 @@ value print_tree conf base gv p =
       gen []
   in
   do header_no_page_title conf title;
-     tag "table" "border=0 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
+     let border =
+       match p_getint conf.env "border" with
+       [ Some i -> i
+       | None -> 0 ]
+     in
+     tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\"" border
+     begin
        loop [] [Some (p, True)] (gv + 1) where rec loop prev_gen gen v =
          do if prev_gen <> [] then
               do spouses_vertical_bar (v + 1) prev_gen;
