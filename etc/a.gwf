@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 1.4 1999-08-18 05:10:32 ddr Exp $
+# $Id: a.gwf,v 1.5 1999-08-20 12:46:18 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -63,9 +63,15 @@ can_send_image=no
 auth_file=
 
 # Access by key, when set to "yes", generates HTML requests with
-# "n=first+name;p=surname;oc=number" instead of (the shorter) "i=integer"
+# "n=first+name;p=surname;oc=number" instead of (shorter) "i=integer"
 # in URLs.
 access_by_key=no
+
+# Maximum level when displaying ancestors
+max_anc_level=
+
+# Maximum_level when displaying descendants
+max_desc_level=
 
 # Uncomment the following definition to specify that the present database has
 # been renamed:
