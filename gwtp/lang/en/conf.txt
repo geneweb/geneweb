@@ -69,6 +69,14 @@ Hide private names:
 
 <p>
 
+Wizard just friend (for temporary update)
+<input type=radio name=wizard_just_friend
+ value=yes%cwizard_just_friend=yes;>yes
+<input type=radio name=wizard_just_friend
+ value=no%cwizard_just_friend=no;>no
+
+<p>
+
 Trailer text:
 <textarea name=trl rows=5 cols=70 maxlength=50 wrap=virtual>%ftrl;</textarea>
 

@@ -73,6 +73,14 @@ Cacher les noms privés:
 
 <p>
 
+Sorciers seulement amis (pour mises à jour temporaires):
+<input type=radio name=wizard_just_friend
+ value=yes%cwizard_just_friend=yes;>oui
+<input type=radio name=wizard_just_friend
+ value=no%cwizard_just_friend=no;>non
+
+<p>
+
 Texte pour le bas des pages:
 <textarea name=trl rows=5 cols=70 maxlength=50 wrap=virtual>%ftrl;</textarea>
 
