@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.22 2001-02-10 22:05:37 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.23 2001-02-14 02:47:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -432,7 +432,7 @@ value print_source conf base field =
        tag "tr" begin
          tag "td" begin
            Wserver.wprint "%s"
-             (capitale (transl_nth conf "person/persons" 1));
+             (nominative (capitale (transl_nth conf "person/persons" 1)));
          end;
          tag "td" begin
            Wserver.wprint "<input name=psrc size=50 maxlength=200%s>\n"

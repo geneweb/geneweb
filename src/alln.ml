@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 3.5 2001-01-06 09:55:52 ddr Exp $ *)
+(* $Id: alln.ml,v 3.6 2001-02-14 02:47:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -95,7 +95,7 @@ value print_title conf base is_surnames ini len =
          (String.capitalize ini)
      else
        Wserver.wprint " (%d %s)" base.data.persons.len
-         (transl_nth conf "person/persons" 1);
+         (nominative (transl_nth conf "person/persons" 1));
   return ()
 ;
 
