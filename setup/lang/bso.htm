@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: bso.htm,v 1.3 2002-01-13 16:05:38 ddr Exp $ -->
+  <!-- $Id: bso.htm,v 1.4 2002-03-06 04:08:48 ddr Exp $ -->
   <title>[
 de: Datenbank anlegen
 en: Creation of a database
@@ -111,20 +111,26 @@ fr: Appuyez sur le bouton ci-dessous pour cr&eacute;er votre base de
     donn&eacute;es
 lv: Nospiediet zemâk esoðo podziòu, lai izveidotu datu bâzi
 sv: Tryck på knappen nedan för att skapa din databas
-]$v{[
+]$v{<br><blink><font color=red>[
 de:  und die alte Datenbank "$o" im Zielverzeichnis zu l&ouml;schen
 en: , and overwrite the previous database "$o" of the target directory
 es:  y destruir  la base "$o" de la carpeta de llegada
 fr:  et &eacute;craser la base "$o" du r&eacute;pertoire d'arriv&eacute;e
 lv: , un dzçstu iepriekðçjo datu bâzi "$o" katalogâ
 sv:  och radera den föregående databasen "$o" från målkatalogen
-]}:
+]</font></blink>}:
 
 <p>
 
 <form method=POST action="$d">
 $h
-<dl><dt><dd><input type=submit value="Ok"></dl>
+<dl><dt><dd>
+<input type=submit value="Ok">
+<input type=submit name=cancel value="[
+en: Cancel
+fr: Annuler
+]">
+</dl>
 </form>
 
 <p>
