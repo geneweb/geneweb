@@ -57,7 +57,7 @@
 <INPUT TYPE=submit value="בסדר">
 </FORM>
 
-<li> <a href="%sm=H;v=advanced">[*בקשה מתקדמת]</a>.
+<li> <a href="%sm=H;v=advanced">בקשה מתקדמת</a>.
 
 %w<li> <a href="%sm=ADD_FAM">הוספת משפחה</a>.
 %w
