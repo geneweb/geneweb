@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.51 1999-06-03 13:41:21 ddr Exp $
+# $Id: lexicon.txt,v 2.52 1999-06-04 08:39:40 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1035,6 +1035,7 @@ en: cancel GeneWeb links
 fr: annuler les liens GeneWeb
 it: annullare i links
 nl: geen GeneWeb links
+no: undertrykk GeneWeb koblinger
 se: utan GeneWeb l&auml;nkar
 
     cannot access base
@@ -1072,6 +1073,7 @@ en: change children's names
 fr: changer noms des enfants
 it: cambiare i nomi dei figli
 nl: namen van kinderen wijzigen
+no: endre barnas navn
 se: &auml;ndra barnens namn
 
     changed order of children
@@ -1083,7 +1085,7 @@ fr: changement de l'ordre des enfants
 he:  סדר הילדים השתנה
 it: ordine dei figli cambiato
 nl: veranderd de volgorde der kinderen
-no: barnas rekkef&oslash;lge er endret 
+no: rekkef&oslash;lgen er endret for barna til
 pt: cambio da ordem dos filhos
 se: &auml;ndrade ordningen f&ouml;r barnen
 
@@ -1110,6 +1112,7 @@ es: nombres de los hijos cambiados
 fr: noms des enfants chang&eacute;s
 it: nomi dei figli cambiati
 nl: namen van kinderen gewijzigd
+no: barnas navn er endret
 se: barnens namn &auml;ndrade
 
     click
@@ -1844,6 +1847,7 @@ es: incluir las esposas faltantes
 fr: inclure les conjoints manquants
 it: includere i coniugi mancanti
 nl: ontbrekende echtgenoten tonen
+no: inkluder manglende (ekte)feller
 se: inkludera gem&aring;ler som saknas
 
     incompatible sexes
@@ -3015,6 +3019,7 @@ es: parentesco%t con
 fr: relation%t avec
 it: legame%t con
 nl: verbonden%t met
+no: frilleforhold%t med
 se: f&ouml;rh&aring;llande%t med
 
     see
