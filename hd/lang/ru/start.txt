@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.12 2000-05-17 06:34:18 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.13 2000-06-03 12:20:33 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogy - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -143,12 +143,12 @@ height=108 src="%o/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <tr>
 <td align=right>
 <ul>
-<li><a href="%sm=ADD_FAM">добавить семью</a>
+%Id<li><a href="%sm=ADD_FAM">добавить семью</a>
 %INl</ul>
 </td>
 <td align=left>
 <ul>%E
-<li><a href="%sm=MOD_NOTES">изменить заметку</a>
+%E<li><a href="%sm=MOD_NOTES">изменить заметку</a>
 </ul>
 </td>
 </tr>

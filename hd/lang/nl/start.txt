@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.25 2000-05-17 06:34:17 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.26 2000-06-03 12:20:31 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogie - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -145,12 +145,12 @@ opzoeking</b></font></a>.
 <tr>
 <td align=right>
 <ul>
-<li><a href="%sm=ADD_FAM">een familie toevoegen</a>
+%Id<li><a href="%sm=ADD_FAM">een familie toevoegen</a>
 %INl</ul>
 </td>
 <td align=left>
 <ul>%E
-<li><a href="%sm=MOD_NOTES">de nota's wijzigen</a>
+%E<li><a href="%sm=MOD_NOTES">de nota's wijzigen</a>
 </ul>
 </td>
 </tr>

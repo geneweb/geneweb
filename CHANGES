@@ -37,6 +37,9 @@ GeneWeb version 3.05
     missing).
 
 * Base configuration files (base.gwf)
+  - [03 Jun 00] Added variable "propose_add_family" (default yes). If yes,
+    propose to wizards a "add family" link in welcome page. If no, not
+    proposed.
   - [25 May 00] Added variable "images_path" to specify a path to access
     the images defined in the "image" field (i.e *not* added by "send image").
     Applies only for images not found in the image/base directory. This
