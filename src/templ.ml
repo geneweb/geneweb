@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.30 2005-01-23 09:41:05 ddr Exp $ *)
+(* $Id: templ.ml,v 4.31 2005-01-24 04:35:50 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -720,4 +720,20 @@ value print_var conf base eval_var s sl =
             List.iter (fun s -> Wserver.wprint ".%s" s) sl;
             Wserver.wprint "?"
           } ] ]
+;
+
+value print_apply conf print_ast eval_var xl al el =
+  let vl = List.map (eval_expr conf eval_var) el in
+  List.iter
+    (fun a ->
+       let a =
+         loop a xl vl where rec loop a xl vl =
+           match (xl, vl) with
+           [ ([x :: xl], [v :: vl]) ->
+               loop (subst (subst_text x v) a) xl vl
+           | ([], []) -> a
+           | _ -> Atext "parse_error" ]
+       in
+       print_ast a)
+    al
 ;
