@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.32 2000-05-08 20:00:38 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.33 2000-05-10 14:04:00 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -790,15 +790,24 @@ value auth_err request auth_file =
     else (True, "(authorization not provided)")
 ;
 
+value no_access conf =
+  let  title _ = Wserver.wprint "Error" in
+  do Util.rheader conf title;
+     Wserver.wprint "No access to this data base in CGI mode\n";
+     Util.trailer conf;
+  return ()
+;
+
 value conf_and_connection cgi from (addr, request) str env =
   let (conf, sleep, passwd_err) = make_conf cgi from (addr, request) str env in
   let (auth_err, auth) =
-    if cgi then (False, "")
-    else if conf.auth_file = "" then (False, "")
+    if conf.auth_file = "" then (False, "")
+    else if cgi then (True, "")
     else auth_err request conf.auth_file
   in
-  match (auth_err, passwd_err) with
-  [ (True, _) ->
+  match (cgi, auth_err, passwd_err) with
+  [ (True, True, _) -> no_access conf
+  | (_, True, _) ->
       let auth_type =
         let x =
           try List.assoc "auth_file" conf.base_env with
@@ -807,7 +816,7 @@ value conf_and_connection cgi from (addr, request) str env =
         if x = "" then "GeneWeb service" else "data base " ^ conf.bname
       in
       refuse_auth conf from auth auth_type
-  | (_, Some (passwd, uauth, base_file)) ->
+  | (_, _, Some (passwd, uauth, base_file)) ->
       let tm = Unix.time () in
       do lock_wait Srcfile.adm_file "gwd.lck" with
          [ Accept ->
