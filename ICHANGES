@@ -1,8 +1,8 @@
 Internal, very small, or not visible changes
 ********************************************
 
-GeneWeb Version 2.02
---------------------
+GeneWeb Intermediate Version 2.01-1
+-----------------------------------
 
 * GeneWeb daemon/CGI (gwd)
   - [Apr 24, 99] Dont print "+" in short dates for died person if there is
