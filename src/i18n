@@ -2,6 +2,7 @@
  to see the first relationship link
  to try again with this number, or do "back" and change it yourself
 %d years ago
+%s cousins
 %t already has parents
 %t died before his/her birth
 %t has incorrect title dates: %t
@@ -15,6 +16,8 @@
 *nth (cousin)*
 , it is
 , it will be
+2nd cousins
+3rd cousins
 M/F
 Sosa numbers
 a %s cousin
@@ -74,6 +77,7 @@ click
 comment
 consanguinity
 continue merging
+cousins
 create
 cremated
 date
@@ -170,6 +174,7 @@ of the death
 of the disappearance
 of the execution
 of the murder
+of the side of
 on (day month year)
 one day old
 one month old

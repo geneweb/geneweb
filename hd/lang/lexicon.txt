@@ -48,6 +48,17 @@ nl: %d jaren geleden
 pt: h&aacute; %d anos
 se: %d &aring;r sedan
 
+    %s cousins
+de: Vettere %s Grades
+en: %s cousins
+eo: %s gekuzoj
+es: primos %s
+fr: cousins au %s degr&eacute;
+it: cugini di %s grado
+nl: neef %s generaties verwijderd
+pt: primos %s
+se: %s kusin
+
     %t already has parents
 de: %t hat schon Eltern
 en: %t already has parents
@@ -194,6 +205,28 @@ nl:  zal het zijn
 pt: , ser&aacute;
 se: , &auml;r det
 
+    2nd cousins
+de: Vettere 2ten Grades
+en: 2nd cousin
+eo: 2a gekuzoj
+es: primos 2ndos
+fr: cousins issus de germains
+it: cugini di 2o grado
+nl: neef 2de generaties verwijderd
+pt: primos 2ndos
+se: syssling
+
+    3rd cousins
+de: Vettere 3ten Grades
+en: 3rd cousin
+eo: 3a gekuzoj
+es: primos 3ros
+fr: cousins issus d'issus de germains
+it: cugini di 3o grado
+nl: neef 3de generaties verwijderd
+pt: primos 3ro
+se: brylling
+
     M/F
 de: M/F
 en: M/F
@@ -230,7 +263,7 @@ en: a %s cousin
 eo: %s kuzo/%s kuzino/%s gekuzo
 es: un primo %s/una prima %s/un(a) primo(a) %s
 fr: un cousin au %s degr&eacute;/une cousine au %s degr&eacute;/un(e) cousin(e) au %s degr&eacute;
-it: un cugino di %s grado/una cugina di %s grado/un(a) cugino/a di %s grado
+it: un cugino di %s grado/una cugina di %s grado/un(a) cugino(a) di %s grado
 nl: een neef %s generaties verwijderd/een nicht %s generaties verwijderd
 pt: um primo %s/uma prima %s/um(a) primo(a) %s
 se: en %s kusin
@@ -241,7 +274,7 @@ en: a 2nd cousin
 eo: 2a kuzo/2a kuzino/2a gekuzo
 es: un primo 2ndo/una prima 2ndo/un(a) primo(a) 2ndo
 fr: un cousin issu de germains/une cousine issue de germains/un(e) cousin(e) issu(e) de germains
-it: un cugino di 2o grado/una cugina di 2o grado/un(a) cugino/a di 2o grado
+it: un cugino di 2o grado/una cugina di 2o grado/un(a) cugino(a) di 2o grado
 nl: een neef 2de generaties verwijderd/een nicht 2de generaties verwijderd
 pt: um primo 2ndo/uma prima 2ndo/um(a) primo(a) 2ndo
 se: en syssling
@@ -252,7 +285,7 @@ en: a 3rd cousin
 eo: 3a kuzo/3a kuzino/3a gekuzo
 es: un primo 3ro/una prima 3ro/un(a) primo(a) 3ro
 fr: un cousin issu d'issus de germains/une cousine issue d'issus de germains/un(e) cousin(e) issu(e) d'issus de germains
-it: un cugino di 3o grado/una cugina di 3o grado/un(a) cugino/a di 3o grado
+it: un cugino di 3o grado/una cugina di 3o grado/un(a) cugino(a) di 3o grado
 nl: een neef 3de generaties verwijderd/een nicht 3de generaties verwijderd
 pt: um primo 3ro/uma prima 3ro/um(a) primo(a) 3ro
 se: en brylling
@@ -835,6 +868,17 @@ en: continue merging
 fr: continuer &agrave; fusionner
 pt: continuar fus&atilde;o
 se: forts&auml;tt sl&aring;samman
+
+    cousins
+de: Vetter
+en: cousins
+eo: kuzoj
+es: primos
+fr: cousins
+it: cugini
+nl: neef
+pt: primos
+se: kusin
 
     create
 de: erzeugen
@@ -1871,6 +1915,10 @@ it: dell'assassinio
 nl: van de moord
 pt: do assesinado
 se: av mordet
+
+    of the side of
+en: of the side of
+fr: du c&ocirc;t&eacute; de
 
     on (day month year)
 cn: ÓÚ

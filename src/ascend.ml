@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.7 1998-12-02 20:48:54 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.8 1998-12-12 17:26:25 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -897,9 +897,11 @@ value print conf base p =
   | _ -> afficher_menu_ascendants conf base p ]
 ;
 
+(*
 value incorrect_request conf =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "incorrect request"))
   in
   do header conf title; trailer conf; return ()
 ;
+*)
