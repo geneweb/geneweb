@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.5 2005-02-22 17:54:29 ddr Exp $
+# $Id: lex_utf8.txt,v 1.6 2005-02-23 10:31:24 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -521,6 +521,7 @@ zh: 1月/2月/3月/4月/5月/6月/7月/8月/9月/10月/11月/12月
 
     (thousand separator)
 af: &nbsp;
+ar: .
 bg: &nbsp;
 br: .
 ca: .
