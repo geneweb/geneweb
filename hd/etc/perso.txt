@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 4.0 2001-03-16 19:32:26 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.1 2001-03-31 03:39:25 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -157,11 +157,11 @@
 %if;has_parents;
   <h3><font color=%highlight;>[*parents]</font></h3>
   <ul>
-  <li>
+  <li type=%if;father.has_parents;disk%else;circle%end;>
   %if;cancel_links;%father;
   %else;<a href="%prefix;%father.access;">%father;</a>%end;
   %father.title;%father.dates;%nl;
-  <li>
+  <li type=%if;mother.has_parents;disk%else;circle%end;>
   %if;cancel_links;%mother;
   %else;<a href="%prefix;%mother.access;">%mother;</a>%end;
   %mother.title;%mother.dates;%nl;
@@ -194,7 +194,7 @@
       , [having as children]0
       <ul>
         %foreach;child;
-          <li>
+          <li type=%if;(nb_families=0);circle%else;disk%end;>
 	  %if;cancel_links;%child.child_name;
 	  %else;
 	    <a href="%prefix;%child.access;">%child.child_name;</a>
