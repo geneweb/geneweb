@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.23 2000-12-29 10:02:45 ddr Exp $ *)
+(* $Id: descend.ml,v 3.24 2001-01-05 23:25:43 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1125,7 +1125,7 @@ value print_tree conf base gv p =
            tag "td" "colspan=%d align=center valign=top" (2 * ncol - 1)
            begin
              Wserver.wprint "%s\n" txt;
-             Dag.print_image conf base p;
+             Wserver.wprint "%s" (Dag.image_txt conf base p);
            end
        | None -> Wserver.wprint "<td>&nbsp;</td>\n" ];
     return ()
@@ -1157,7 +1157,7 @@ value print_tree conf base gv p =
                              short_marriage_date_text gv conf base fam p sp
                            else "")
                           txt;
-                        Dag.print_image conf base sp;
+                        Wserver.wprint "%s" (Dag.image_txt conf base sp);
                      return ();
                    end;
                    Wserver.wprint "\n";

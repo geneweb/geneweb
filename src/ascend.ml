@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.48 2000-12-19 15:42:09 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.49 2001-01-05 23:25:42 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1781,7 +1781,7 @@ value print_tree_with_table conf base gv p =
          Wserver.wprint "%s" txt;
          match po with
          [ Empty -> ()
-         | Cell p _ _ _ -> Dag.print_image conf base p ];
+         | Cell p _ _ _ -> Wserver.wprint "%s" (Dag.image_txt conf base p) ];
        end;
        Wserver.wprint "\n";
     return ()
@@ -2096,7 +2096,7 @@ value print_male_female_line male conf base v p =
                Wserver.wprint "%s\n%s<br>\n"
                  (referenced_person_title_text conf base p)
                  (Date.short_dates_text conf base p);
-               Dag.print_image conf base p;
+               Wserver.wprint "%s" (Dag.image_txt conf base p);
             return ())
          list;
      end;

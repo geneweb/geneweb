@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.33 2000-10-30 19:30:27 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.34 2001-01-05 23:25:43 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -85,6 +85,8 @@ value print_char_table d t =
   in
   print_table prerr_newline print_elem print_span t
 ;
+
+(* previous version: still here to check that new version is correct *)
 
 value print_html_table print print_indi phony border d t =
   let phony =
@@ -342,6 +344,253 @@ let next_l = min next_l next_j in
      done;
      print "</table></center>\n";
   return ()
+;
+
+(* end of previous version *)
+
+(* creating the html table structure *)
+
+type align = [ LeftA | CenterA | RightA ];
+type table_data = [ TDstring of string | TDhr of align ];
+
+value html_table_struct indi_txt phony d t =
+  let phony =
+    fun
+    [ Elem e -> phony d.dag.(int_of_idag e)
+    | Ghost _ -> False
+    | Nothing -> True ]
+  in
+  let jlast = Array.length t.table.(0) - 1 in
+  let elem_txt =
+    fun
+    [ Elem e -> indi_txt d.dag.(int_of_idag e)
+    | Ghost _ -> "|"
+    | Nothing -> "&nbsp;" ]
+  in
+  let bar_txt =
+    fun
+    [ Elem _ | Ghost _ -> "|"
+    | Nothing -> "&nbsp;" ]
+  in
+  let all_empty i =
+    loop 0 where rec loop j =
+      if j = Array.length t.table.(i) then True
+      else
+        match t.table.(i).(j).elem with
+        [ Nothing -> loop (j + 1)
+        | e -> if phony e then loop (j + 1) else False ]
+  in
+  let line_elem_txt i =
+    let les =
+      loop [] 0 where rec loop les j =
+        if j = Array.length t.table.(i) then les
+        else
+          let x = t.table.(i).(j).elem in
+          let next_j =
+            loop (j + 1) where rec loop j =
+              if j = Array.length t.table.(i) then j
+              else if t.table.(i).(j).elem = x then loop (j + 1)
+              else j
+          in
+          let colspan = 3 * (next_j - j) in
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          let les =
+            let s =
+              if t.table.(i).(j).elem = Nothing then "&nbsp;"
+              else elem_txt x
+            in
+            [(colspan - 2, CenterA, TDstring s) :: les]
+          in
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          loop les next_j
+    in
+    Array.of_list (List.rev les)
+  in
+  let vbars_txt k i =
+    let les =
+      loop [] 0 where rec loop les j =
+        if j = Array.length t.table.(i) then les
+        else
+          let x = t.table.(i).(j).elem in
+          let next_j =
+            loop (j + 1) where rec loop j =
+              if j = Array.length t.table.(i) then j
+              else if t.table.(i).(j).elem = x then loop (j + 1)
+              else j
+          in
+          let colspan = 3 * (next_j - j) in
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          let les =
+            let s =
+              if k > 0 && t.table.(k - 1).(j).elem = Nothing ||
+                 t.table.(k).(j).elem = Nothing then
+                "&nbsp;"
+              else if phony t.table.(i).(j).elem then "&nbsp;"
+              else bar_txt x
+            in
+            [(colspan - 2, CenterA, TDstring s) :: les]
+          in
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          loop les next_j
+    in
+    Array.of_list (List.rev les)
+  in
+  let alone_bar_txt i =
+    let les =
+      loop [] 0 where rec loop les j =
+        if j = Array.length t.table.(i) then les
+        else
+          let next_j =
+            let x = t.table.(i).(j).span in
+            let rec loop j =
+              if j = Array.length t.table.(i) then j
+              else if t.table.(i).(j).span = x then loop (j + 1)
+              else j
+            in
+            loop (j + 1)
+          in
+          let colspan = 3 * (next_j - j) - 2 in
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          let les =
+            if t.table.(i).(j).elem = Nothing ||
+               t.table.(i + 1).(j).elem = Nothing then
+              [(colspan, LeftA, TDstring "&nbsp;") :: les]
+            else
+              let s =
+                let all_ph =
+                  loop j where rec loop j =
+                    if j = next_j then True
+                    else if phony t.table.(i + 1).(j).elem then loop (j + 1)
+                    else False
+                in
+                if all_ph then "&nbsp;" else "|"
+              in
+              [(colspan, CenterA, TDstring s) :: les]
+          in
+          let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+          loop les next_j
+    in
+    Array.of_list (List.rev les)
+  in
+  let exist_several_branches i k =
+    loop 0 where rec loop j =
+      if j = Array.length t.table.(i) then False
+      else
+        let x = t.table.(i).(j).span in
+        let e = t.table.(k).(j).elem in
+        let rec loop1 j =
+          if j = Array.length t.table.(i) then False
+          else if t.table.(i).(j).elem = Nothing then loop j
+          else if t.table.(i).(j).span <> x then loop j
+          else if t.table.(k).(j).elem <> e then True
+          else loop1 (j + 1)
+        in
+        loop1 (j + 1)
+  in
+  let hbars_txt i k =
+    let les =
+      loop [] 0 where rec loop les j =
+        if j = Array.length t.table.(i) then les
+        else
+          let next_j =
+            let e = t.table.(i).(j).elem in
+            let x = t.table.(i).(j).span in
+            let rec loop j =
+              if j = Array.length t.table.(i) then j
+              else if e = Nothing && t.table.(i).(j).elem = Nothing then
+                loop (j + 1)
+              else if t.table.(i).(j).span = x then loop (j + 1)
+              else j
+            in
+            loop (j + 1)
+          in
+          let rec loop1 les l =
+            if l = next_j then loop les next_j
+            else
+              let next_l =
+                let y = t.table.(k).(l).elem in
+                match y with
+                [ Elem _ | Ghost _ ->
+                    let rec loop l =
+                      if l = Array.length t.table.(i) then l
+                      else if t.table.(k).(l).elem = y then loop (l + 1)
+                      else l
+                    in
+                    loop (l + 1)
+                | _ -> l + 1 ]
+              in
+(* happens sometimes: should be debugged *)
+do if next_l > next_j then do Printf.eprintf "assert false i %d k %d l %d next_l %d next_j %d\n" i k l next_l next_j; flush stderr; return () else (); return
+let next_l = min next_l next_j in
+(*
+              do assert (next_l <= next_j); return
+*)
+              let colspan = 3 * (next_l - l) - 2 in
+              let les =
+                match (t.table.(i).(l).elem, t.table.(i + 1).(l).elem) with
+                [ (Nothing, _) | (_, Nothing) ->
+                    [(colspan + 2, LeftA, TDstring "&nbsp;") :: les]
+                | _ ->
+                    let ph s =
+                      if phony t.table.(k).(l).elem then TDstring "&nbsp;"
+                      else s
+                    in
+                    if l = j && next_l = next_j then
+                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+                      let s = ph (TDstring "|") in
+                      let les = [(colspan, CenterA, s) :: les] in
+                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+                      les
+                    else if l = j then
+                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+                      let s = ph (TDhr RightA) in
+                      let les = [(colspan, RightA, s) :: les] in
+                      let s = ph (TDhr CenterA) in
+                      let les = [(1, LeftA, s) :: les] in
+                      les
+                    else if next_l = next_j then
+                      let s = ph (TDhr CenterA) in
+                      let les = [(1, LeftA, s) :: les] in
+                      let s = ph (TDhr LeftA) in
+                      let les = [(colspan, LeftA, s) :: les] in
+                      let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
+                      les
+                    else
+                      let s = ph (TDhr CenterA) in
+                      [(colspan + 2, LeftA, s) :: les] ]
+              in loop1 les next_l
+          in
+          loop1 les j
+    in
+    Array.of_list (List.rev les)
+  in
+  let hts =
+    loop [] 0 where rec loop hts i =
+      if i = Array.length t.table then hts
+      else if i = Array.length t.table - 1 && all_empty i then hts
+      else
+        let hts = [line_elem_txt i :: hts] in
+        let hts =
+          if i < Array.length t.table - 1 then
+            let hts = [vbars_txt (i + 1) i :: hts] in
+            let hts =
+              if exist_several_branches i i then
+                [alone_bar_txt i; hbars_txt i i :: hts]
+              else hts
+            in
+            let hts =
+              if exist_several_branches i (i + 1)
+              && (i < Array.length t.table - 2 || not (all_empty (i + 1))) then
+                [vbars_txt (i + 1) (i + 1); hbars_txt i (i + 1) :: hts]
+              else hts
+            in
+            hts
+          else hts
+        in
+        loop hts (i + 1)
+        
+  in
+  Array.of_list (List.rev hts)
 ;
 
 (* transforming dag into table *)
