@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.158 2003-08-22 06:27:42 ddr Exp $
+# $Id: lexicon.txt,v 4.159 2003-09-15 06:42:55 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -6230,7 +6230,7 @@ en: person deleted
 eo: persono nuligita
 es: persona borrada
 et: isik kustutatud
-fi: poistettu henkil&ouml
+fi: poistettu henkil&ouml;
 fr: personne supprim&eacute;e
 he:  אדם נמחק
 is: einstaklingi eytt
@@ -8454,7 +8454,7 @@ en: unknown person
 eo: nekonata persono
 es: persona desconocida
 et: tundmatu isik
-fi: tuntematon henkil&ouml
+fi: tuntematon henkil&ouml;
 fr: personne inconnue
 he:  אדם לא ידוע
 is: ף‏ekktur einstaklingur
