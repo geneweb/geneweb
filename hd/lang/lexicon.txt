@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.52 2000-01-15 18:55:47 ddr Exp $
+# $Id: lexicon.txt,v 3.53 2000-01-16 09:15:52 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2746,8 +2746,18 @@ pt: &eacute; a mesma pessoa !
 se: det &auml;r samma person!
 
     julian day
+de: Julianisch
+dk: juliansk dag
 en: Julian day
+es: dia julian
+fi: juliaaninen p&auml;iv&auml;
 fr: jour julien
+is: julian dagur
+it: giorno julian
+nl: juliaans dag
+no: juliansk dag
+pt: dia juliano
+se: juliansk dag
 
     killed (in action)
 cs: zabit/zabita/zabiti
