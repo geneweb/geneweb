@@ -1,6 +1,12 @@
 GeneWeb version 3.08
 --------------------
 
+* Setup program (gwsetup)
+  - [21 Sep 00] Fixed bug: in recovery from an old version, if the
+    destination data base already existed (created e.g. by a previous
+    attempt), it could not overwrite the data base, even it pretended
+    it was going to do it.
+
 * GeneWeb Service/CGI (gwd)
   - [18 Sep 00] In family updating, when creating an unknown person
     (i.e. having "?" as firstname or surname), does not set the "source"
