@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.127 2000-07-05 10:43:27 ddr Exp $
+# $Id: lexicon.txt,v 3.128 2000-07-05 12:00:49 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5237,6 +5237,7 @@ se: som b&ouml;rjar med
     statistics
 en: statistics
 fr: statistiques
+nl: statistieken
 se: statistik
 
     surname alias
@@ -5428,7 +5429,8 @@ se: de %d f&ouml;rnamnen
 dk: de %d &aelig;ldste af de muligt levende
 en: the %d oldest perhaps still alive
 fi: %d vanhinta ehk&auml viel&auml el&auml;v&auml;&auml
-fr: les %d plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
+fr: les %d les plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
+nl: de %d oudsten, mogelijk nog in leven
 se: de %d &auml;ldsta som kanske lever
 
     the %d surnames
@@ -5451,6 +5453,12 @@ pt: os %d apelidos
 ru: %d фамилий
 se: de %d efternamnen
 
+    the %d who lived the longest
+en: the %d who lived the longest
+fr: les %d personnes ayant v&eacute;cu le plus longtemps
+nl: de %d langst levende personen
+se: de %d som har levt l&auml;ngst
+
     the %s generation
 af: die %s geslag
 cs: %s. generace
@@ -5470,11 +5478,6 @@ no: %s generasjon
 pt: a %s gera&ccedil;&atilde;o
 ru: %s-е поколение
 se: den %s generationen
-
-    the %d who lived the longest
-en: the %d who lived the longest
-fr: les %d personnes ayant v&eacute;cu le plus longtemps
-se: de %d som har levt l&auml;ngst
 
     the anniversary
 af: die herdenking
