@@ -5,6 +5,8 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [26 Aug 03] In the titles in display by surname, the surnames are
+    now displayed in alphabetic order.
   - [17 Jul 03] Added URL variable "alwsurn": if "yes" the surnames
     are always displayed in display by surname and in descendants
     (same behaviour than the configuration variable "always_surname").
@@ -38,6 +40,8 @@ GeneWeb Version 4.10
     replaced with empty strings.
 
 * Setup program (gwsetup)
+  - [17 Sep 03] Added interface for option -uin (code from Olivier
+    Pasteur).
   - [07 Mar 03] Fixed bug: the -lang parameter of gwsetup did not work
     when option -daemon was set.
   - [12 Feb 03] Added double quotes around directories for information
