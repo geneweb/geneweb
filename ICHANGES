@@ -5,6 +5,9 @@ GeneWeb Version 4.09
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [23 Dec 02] Now, gwd can definitively fail if errors Unix.EBADF or
+    Unix.ENOTSOCK on "accept", because they make the server loop with the
+    same error message. I don't know why it happens sometimes.
   - [18 Dec 02] Save now a file named base_u.txt in the cnt directory,
     recording the latest wizards updates.
 

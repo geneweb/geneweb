@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.18 2002-12-23 13:37:53 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.19 2002-12-23 13:38:37 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -639,7 +639,7 @@ value f addr_opt port tmout max_clients g =
         while True do {
           try accept_connection tmout max_clients g s with
           [ Unix.Unix_error Unix.ECONNRESET "accept" _ -> ()
-          | Unix.Unix_error (Unix.EBADF | Unix.ENOTSOCK) "accept" as x ->
+          | Unix.Unix_error (Unix.EBADF | Unix.ENOTSOCK) "accept" _ as x ->
               (* oops! *) raise x
           | exc -> print_err_exc exc ];
           try wflush () with [ Sys_error _ -> () ];
