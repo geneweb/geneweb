@@ -4,6 +4,13 @@ Internal, very small, undocumented, or invisible changes
 GeneWeb Version 4.08
 --------------------
 
+* GeneWeb server or CGI (gwd)
+  - [19 Aug 02] Fixed a declination problem in phrase (e.g. in German):
+       grand-parents of the spouse of s.o.
+    which was incorrectly translated:
+       Groﬂeltern von der Ehemann von s.o
+    ("der" was displayed instead of "dem")
+
 * Lexicon (lang/lexicon.txt)
   - [25 Jul 02] Fixed and completed some phrases in Russian (Yuri Gavaga).
 
