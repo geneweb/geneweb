@@ -1,0 +1,82 @@
+.TH gwu 1 "2002 October 16th"
+.SH NAME
+gwu \- Dump a GeneWeb database
+.SH SYNOPSIS
+.B gwu
+[
+.I options
+] \<
+.I base_file
+\>
+.br
+.SH DESCRIPTION
+.I
+gwu 
+dumps the contents of the 
+.IR GeneWeb 
+database to standard output.
+It's  a  good  way  to  backup  the database in a neutral form, and can
+facilitate upgrades to new software.
+.PP
+The primary documentation of 
+.I gwu 
+is in the HTML documentation, which
+you  can find in the documentation directory (/usr/share/doc/geneweb on
+Debian systems).
+.br
+Please look there for complete and up-to-date documentation.
+.PP
+.SH OPTIONS
+.PP
+.TP 20
+.B \-help
+command-line help
+.TP
+.B  \-o <file>    
+output file name (else stdout)
+.TP
+.B  \-odir <dir>  
+create files from original name in directory (else on -o file)
+.TP
+.B  \-mem         
+save memory space, but slower
+.TP
+.B  \-a "<1st_name>" [num] "<surname>" 
+select ancestors of ...
+.TP
+.B  \-d "<1st_name>" [num] "<surname>"
+select descendants of ...
+.TP
+.B  \-ad "<1st_name>" [num] "<surname>"
+select ancestors of ... and all their descendants (has no effect if \-a and/or \-d used, option \-nsp is forced).
+.TP
+.B  \-aws "<1st_name>" [num] "<surname>" 
+select ancestors with siblings
+.TP
+.B  \-s "<surname>"
+select this surname (option usable several times)
+.TP
+.B  \-nsp
+no spouses' parents (for options -s and -d)
+.TP
+.B  \-nn
+no (database) notes
+.TP
+.B  \-c <num>
+When a person is born less than <num> years ago, it is not exported unless
+it is Public. All the spouses and descendants are also censored.
+.TP
+.B  \-sep "1st_name.num surname"
+To use together with the option "-odir": separate this person and
+all his ancestors and descendants sharing the same surname. All the
+concerned families are displayed on standard output instead of their
+associated files. This option can be used several times.
+.TP
+.B  \-sep_only_file <file>
+With option "-sep", tells to separate only groups of that file.
+.TP
+.B  \-sep_limit <num>
+When using the option "-sep", groups of families can become isolated
+in the files. Gwu reconnects them to the separated families (i.e.
+displays them to standard output) if the size of these groups is less
+than 21. The present option changes this limit.

@@ -1,0 +1,62 @@
+.TH gwc 1 "2002 October 16th"
+.SH NAME
+gwc \- Create a GeneWeb database
+.SH SYNOPSIS
+.B gwc
+[
+.I options
+] [
+.I files
+]
+.br
+.SH DESCRIPTION
+.I gwc
+creates a starter database for use by 
+.IR GeneWeb.
+.PP
+The primary documentation of
+.I gwc 
+is in the HTML documentation, which you can find in the documentation directory (/usr/share/doc/geneweb on
+Debian systems).
+.br
+Please look there for complete and up-to-date documentation.
+.PP
+.SH OPTIONS
+.PP
+.TP 8
+.B \-help
+command-line help
+.TP
+.B \-o <file>
+output database (default: a.gwb)
+.TP
+.BI \-c
+only compiling
+.TP
+.BI \-f
+Remove database if already existing
+.TP
+.BI \-stats
+Print statistics
+.TP
+.BI \-nc
+No consistency check
+.TP
+.BI \-cg
+Compute consanguinity
+.TP
+.BI \-sep
+Separate all persons in next file
+.TP
+.BI \-sh  \f\<int\>\f
+Shift all persons numbers in next files
+.TP
+.BI \-ds 
+set the source field for persons and families without source data
+.TP
+.BI \-mem  
+Save memory, but slower
+.TP
+.BI \-nolock  
+do not lock database
+
