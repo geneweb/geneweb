@@ -39,7 +39,8 @@ GeneWeb Intermediate version 2.02-1
     was incorrectly capitalized.
 
 * Gedcom to GeneWeb (ged2gwb)
-  - [May 19, 99] Better catenation of continuation (CONC) notes.
+  - [May 19, 99] Better catenation of continuation (CONC) notes. In particular
+    fixes the bug which sometimes added spaces inside words.
 
 * GeneWeb to Gedcom (gwb2ged)
   - [May 19, 99] Fold notes lines at 255 characters (required by GEDCOM
