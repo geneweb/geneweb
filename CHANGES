@@ -23,6 +23,11 @@ GeneWeb version 3.11
     marriage" because, despite the warning at end of this page, many
     people are mistaken by thinking it was "add a child in a family".
 
+* GeneWeb to Gedcom (gwb2ged)
+  - [18 Jan 01] Fixed problem for names with declinations: they were
+    exported with all their declinations; now just the 'nominative'
+    form is exported.
+
 * Geneweb compiler (gwc)
   - [07 Jan 01] Put back the option "-sh #" (removed in version 3.08):
     it seems that some users are be still interested in this option, even
