@@ -8,8 +8,8 @@
 		German		Markus Mottl
 		Hebrew		Jonathan Marder
 				Ruth Marder
-		Italian		...
-				Raffaele Sena
+		Italian         Raffaele Sena
+                Norwegian       Brynjulf Langballe
 		Portuguese	Yves Guignard
 		Swedish		Lars Gustavsson
 
