@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.10 2001-09-19 11:19:09 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.11 2001-09-19 11:29:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -94,8 +94,8 @@ value reconstitute_family conf =
     | Some "nsck" -> NoSexesCheck
     | _ -> Married ]
   in
-  let marriage = Update.reconstitute_date conf "marr" in
-  let marriage_place = only_printable (get conf "marr_place") in
+  let marriage = Update.reconstitute_date conf "marriage" in
+  let marriage_place = only_printable (get conf "marriage_place") in
   let (witnesses, ext) =
     loop 1 ext where rec loop i ext =
       match
@@ -158,7 +158,7 @@ value reconstitute_family conf =
   in
   let fam =
     {marriage = Adef.codate_of_od marriage; marriage_place = marriage_place;
-     marriage_src = strip_spaces (get conf "marr_src");
+     marriage_src = strip_spaces (get conf "marriage_src");
      witnesses = Array.of_list witnesses; relation = relation;
      divorce = divorce; comment = comment; origin_file = origin_file;
      fsources = fsources; fam_index = Adef.ifam_of_int fam_index}
