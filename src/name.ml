@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 1.2 1998-09-29 16:12:19 ddr Exp $ *)
+(* $Id: name.ml,v 1.3 1998-11-25 09:47:01 ddr Exp $ *)
 
 (* Name.lower *)
 
@@ -43,8 +43,8 @@ value lower s =
 (* Name.abbrev *)
 
 value abbrev_list =
-  [("a", None); ("d", None); ("de", None); ("di", None); ("of", None);
-   ("saint", Some "st"); ("sainte", Some "ste");
+  [("a", None); ("d", None); ("de", None); ("di", None); ("ier", Some "i");
+   ("of", None); ("saint", Some "st"); ("sainte", Some "ste");
    ("van", None); ("von", None); ("zu", None)]
 ;
 
