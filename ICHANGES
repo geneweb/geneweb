@@ -5,6 +5,9 @@ GeneWeb Version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [04 Oct 02] When entering a complete name (first name + surname), if
+    the spelling does not match, display now an intermediate page ("specify")
+    even if there is only one matching person.
   - [16 Sep 02] Fixed bug: the "renamed" variable did not work.
   - [19 Aug 02] Fixed a declination problem in phrase (e.g. in German):
        grand-parents of the spouse of s.o.
