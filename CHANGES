@@ -2,9 +2,9 @@ GeneWeb version 3.11
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [28 Dec 00] (detail) In short dates, print now "year" instead of "*year"
-    for the case "don't know if dead". Changed all FAQ for this convention
-    of short dates.
+  - [28 Dec 00] (detail) In short dates, for the case "don't know if
+    dead", now print just "year" instead of "*year". Changed all FAQ about
+    this convention of short dates.
   - [27 Dec 00] In personal pages template file (etc/perso.txt), the value
     "%witness;" refers now to the witness person himself (instead of being
     the text with link and dates). This allows to customize now the display
