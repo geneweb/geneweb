@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.33 2004-07-18 18:51:36 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.34 2004-07-19 14:51:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -176,9 +176,7 @@ value reconstitute_family conf =
     loop 1 ext where rec loop i ext =
       match
         try
-          Some
-            (reconstitute_parent_or_child conf ("pa" ^ string_of_int i)
-               surname)
+          Some (reconstitute_parent_or_child conf ("pa" ^ string_of_int i) "")
         with
         [ Failure _ -> None ]
       with
