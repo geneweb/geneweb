@@ -1,7 +1,7 @@
-(* $Id: calendar.ml,v 2.3 1999-09-16 09:31:41 ddr Exp $ *)
-(* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/; converted his
-   C program into an Ocaml program.
+(* $Id: calendar.ml,v 2.4 1999-09-16 12:17:24 ddr Exp $ *)
 
+(* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/;
+   converted his C program into this Ocaml program.
    SDN 1 is November 25, 4714 BC Gregorian calendar *)
 
 open Def;
@@ -239,31 +239,39 @@ value sdn_of_hebrew d =
 
 (* from and to gregorian *)
 
-value gregorian_of_julian d =
-  if d.day = 0 then d else gregorian_of_sdn d.prec (sdn_of_julian d)
+value conv f f_max_month g g_max_month d =
+  let sdn =
+    if d.day = 0 then
+      if d.month = 0 then g {(d) with day = 1; month = 1}
+      else g {(d) with day = 1}
+    else g d
+  in
+  let sdn_max =
+    if d.day = 0 then
+      if d.month = 0 || d.month = g_max_month then
+        g {day = 1; month = 1; year = d.year + 1; prec = d.prec; delta = 0}
+      else
+        g {day = 1; month = d.month + 1; year = d.year; prec = d.prec;
+           delta = 0}
+    else sdn + 1
+  in
+  let d1 = f d.prec sdn in
+  let d2 = f d.prec (sdn_max + d.delta) in
+  if d1.day = 1 && d2.day = 1 then
+    if d1.month = 1 && d2.month = 1 then
+      if d1.year + 1 = d2.year then
+        {day = 0; month = 0; year = d1.year; prec = d.prec; delta = 0}
+      else {(d1) with delta = sdn_max + d.delta - sdn - 1}
+    else if
+      d1.month + 1 = d2.month
+    || d1.month = f_max_month && d1.year + 1 = d2.year then
+      {(d1) with day = 0}
+    else {(d1) with delta = sdn_max + d.delta - sdn - 1}
+  else {(d1) with delta = sdn_max + d.delta - sdn - 1}
 ;
 
-value julian_of_gregorian d =
-  if d.day = 0 then d else julian_of_sdn d.prec (sdn_of_gregorian d)
-;
+value gregorian_of_julian = conv gregorian_of_sdn 12 sdn_of_julian 12;
+value julian_of_gregorian = conv julian_of_sdn 12 sdn_of_gregorian 12;
 
-value gregorian_of_french d =
-  if d.day = 0 then
-    if d.month = 0 then {(d) with year = d.year + 1791}
-    else if d.month < 5 then
-      {(d) with month = d.month + 8; year = d.year + 1791}
-    else
-      {(d) with month = d.month - 4; year = d.year + 1792}
-  else gregorian_of_sdn d.prec (sdn_of_french d)
-;
-
-value french_of_gregorian d =
-  if d.day = 0 then
-    if d.month = 0 then {(d) with year = d.year - 1791}
-    else if d.month > 8 then
-      {(d) with month = d.month - 8; year = d.year - 1791}
-    else
-      {(d) with month = d.month + 4; year = d.year - 1792}
-
-  else french_of_sdn d.prec (sdn_of_gregorian d)
-;
+value gregorian_of_french = conv gregorian_of_sdn 12 sdn_of_french 13;
+value french_of_gregorian = conv french_of_sdn 13 sdn_of_gregorian 12;

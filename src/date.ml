@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.11 1999-09-14 22:33:47 ddr Exp $ *)
+(* $Id: date.ml,v 2.12 1999-09-16 12:17:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -138,6 +138,19 @@ value string_of_dmy conf d =
       code_date conf (transl_nth conf "(date)" 3) 0 0 z ]
 ;
 
+value gregorian_precision conf d =
+  if d.delta = 0 then string_of_dmy conf d
+  else
+    let d2 =
+      Calendar.gregorian_of_sdn d.prec
+        (Calendar.sdn_of_gregorian d + d.delta)
+    in
+    transl conf "between (date)" ^ " " ^
+    string_of_on_dmy conf d ^ " " ^
+    transl conf "and" ^ " " ^
+    string_of_on_dmy conf d2
+;
+
 value string_of_ondate conf =
   fun
   [ Dgreg d Dgregorian -> string_of_on_dmy conf d
@@ -145,15 +158,17 @@ value string_of_ondate conf =
   | Dgreg d Djulian ->
       let cal_prec =
         if d.year < 1582 then ""
-        else " (" ^ string_of_dmy conf d ^ ")"
+        else " (" ^ gregorian_precision conf d ^ ")"
       in
       let d1 = Calendar.julian_of_gregorian d in
       string_of_on_dmy conf d1 ^ " " ^
       transl_nth conf "gregorian/julian/french/hebrew" 1 ^ cal_prec
-  | Dgreg d french ->
+  | Dgreg d Dfrench ->
       let d1 = Calendar.french_of_gregorian d in
+      let s = gregorian_precision conf d in
       string_of_on_french_dmy conf d1 ^ " "
-      ^ " (" ^ string_of_dmy conf d ^ ")"
+      ^ " (" ^ s ^ ")"
+  | Dgreg d Dhebrew -> string_of_on_dmy conf d
   | Dtext t -> "(" ^ t ^ ")" ]
 ;
 
