@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 3.10 2001-02-08 23:17:03 ddr Exp $ *)
+(* $Id: some.ml,v 3.11 2001-02-16 11:53:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -299,7 +299,7 @@ value print_by_branch x conf base not_found_fun (ipl, homonymes) =
          do Wserver.wprint "<font size=-1><em>\n";
             Wserver.wprint "%s " (capitale (transl conf "click"));
             Wserver.wprint "<a href=\"%sm=N;o=i;v=%s\">%s</a>\n" (commd conf)
-              (code_varenv x) (transl conf "here");
+              (code_varenv fx) (transl conf "here");
             Wserver.wprint "%s"
               (transl conf "for the first names by alphabetic order");
             Wserver.wprint ".</em></font>\n";

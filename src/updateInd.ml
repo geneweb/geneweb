@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.32 2001-02-16 04:39:47 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.33 2001-02-16 11:53:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -874,7 +874,7 @@ value eval_gen_variable conf base env p =
   | s ->
       let v = extract_var "evar_" s in
       if v <> "" then
-        match p_getenv conf.env v with
+        match p_getenv (conf.env @ conf.henv) v with
         [ Some vv -> quote_escaped vv
         | _ -> "" ]
      else raise Not_found ]
