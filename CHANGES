@@ -23,6 +23,9 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Aug 2, 99] In relationship computing, can make the difference in the
+    displaying between father's or mother's side for uncles, aunts,
+    great-uncles and great-aunts (used in Swedish).
   - [Aug 1, 99] Added relationships computing by marriage.
   - [Jul 28, 99] In "cousins" pages, added link to uncles and aunts, nephews
     and nieces.
