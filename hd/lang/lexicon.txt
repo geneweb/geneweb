@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.13 2001-04-04 17:43:20 ddr Exp $
+# $Id: lexicon.txt,v 4.14 2001-04-05 12:42:38 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -184,7 +184,7 @@ he:  ìôğé %d ùğéí
 is: fyrir %d árum síğan
 it: ha %d anni
 lv: %d gadus atakaï
-nl: %d jaren geleden
+nl: %d jaar geleden
 no: %d &aring;r siden
 pl: przed %d laty
 pt: h&aacute; %d anos
@@ -277,7 +277,7 @@ he:  úàøéëéí ìúàøéí ùì %t àéğí ğëåğéí: %t
 is: %t hefur vitlausa dagsetningu %t
 it: alcune date dei titoli di %t sono incorrette: %t
 lv: %t ir nekorekti datumi: %t
-nl: %t de datum voor titels zijn inkorrekt
+nl: %t de datum voor titels zijn niet correct
 no: %t har feil titeldato %t
 pl: %t ma wpisane nieprawid³owe daty noszenia tytu³u
 pt: as datas de um t&iacute;tulo de %t n&atilde;o est&atilde;o correctas
@@ -344,7 +344,7 @@ fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
 he:  äîéï ùì %t ìà îúàéí ìéçñéå/ìéçñéä
 is: kyn %t er ekki í samræmi viğ skyldleika
 it: il sesso di %t non e' coerente con le sue relazioni
-nl: het geslacht van %t is niet samenhangend met zijn/haar relaties
+nl: het geslacht van %t klopt niet met zijn/haar relaties
 no: %ts kjønn er uforenlig med forbindelsene hans/hennes
 pl: %t: jego/jej p³eæ nie odpowiada jego/jej zwi¹zkom
 pt: o sexo de %t não é coerente com suas rela&ccedil;&otilde;es
@@ -447,7 +447,7 @@ he:  éğåàø/ ôáøåàø/ îøõ/ àôøéì/ îàé/ éåğé/ éåìé/ àåâåñè/ ñôèîáø/ àå÷èåáø/ ğåáîáø
 is: Janúar/febrúar/mars/apríl/mai/júní/júlí/ágúst/september/oktober/nóvember/desember
 it: gennaio/febbraio/marzo/aprile/maggio/giugno/luglio/agosto/settembre/ottobre/novembre/dicembre
 lv: janvâris/februâris/marts/aprîlis/maijs/jûnijs/jûlijs/augusts/septembris/oktobris/novembris/decembris
-nl: Januari/Februari/Maart/April/Mei/Juni/Juli/Augustus/September/Oktober/November/December
+nl: januari/februari/maart/april/mei/juni/juli/augustus/september/oktober/november/december
 no: januar/februar/mars/april/mai/juni/juli/august/september/oktober/november/desember
 pl: stycznia/lutego/marca/kwietnia/maja/czerwca/lipca/sierpnia/wrzeœnia/paŸdziernika/listopada/grudnia
 pt: Janeiro/Fevereiro/Mar&ccedil;o/Abril/Maio/Junho/Julho/Agosto/Setembro/Outubro/Novembro/Dezembro
@@ -494,7 +494,7 @@ he:  éåí à'/ éåí á'/ éåí â'/ éåí ã'/ éåí ä'/ éåí å'/ ùáú
 is: sunnudagur/mánudagur/şriğjudagur/miğvikudagur/fimmtudagur/föstudagur/laugardagur
 it: domenica/luned&igrave;/marted&igrave;/mercoled&igrave;/gioved&igrave;/venerd&igrave;/sabato
 lv: svçtdiena/pirmdiena/otrdiena/treğdiena/ceturdiena/piekdiena/sesdiena
-nl: Zondag/Maandag/Dinsdag/Woensdag/Donderdag/Vrijdag/Zaterdag
+nl: zondag/maandag/dinsdag/woensdag/donderdag/vrijdag/zaterdag
 no: s&oslash;ndag/mandag/tirsdag/onsdag/torsdag/fredag/l&oslash;rdag
 pl: niedziela:a:-ê/poniedzia³ek/wtorek/œroda:a:-ê/czwartek/pi¹tek/sobota:a:-ê
 pt: domingo/segunda-feira/ter&ccedil;a-feira/quarta-feira/quinta-feira/sexta-feira/s&aacute;bado
@@ -794,7 +794,7 @@ he:  âéñ/ âéñä
 is: mágur/mágkona
 it: un cognato/una cognata
 lv: svainis/svaine
-nl: een schoonbroer/een schoonzus
+nl: een schoonbroer(zwager)/een schoonzus
 no: svoger/svigerinne
 pl: szwagier/szwagierka
 pt: um cunhado/uma cunhada
@@ -817,7 +817,7 @@ he:   àç/ àçåú/ àç(åú)
 is: bróğir/systir/systkyn
 it: un fratello/una sorella/un fratello o una sorella
 lv: brâlis/mâsa/a sibling
-nl: een broer/een zuster/een broer of een zuster
+nl: een broer/een zus/een broer of een zus
 no: bror/s&oslash;ster/s&oslash;sken
 pl: brat/siostra/brat lub siostra
 pt: um irm&atilde;o/uma irm&atilde;/um(a) irm&atilde;o(&atilde;)
@@ -932,7 +932,7 @@ he:   øá-ñáà/ øá-ñáúà
 is: langafi/langamma/langafi og langamma
 it: un bisnonno/una bisnonna/un(a) bisnonno(a)
 lv: vecvectçvs/vecvecmamma/vecvecvecâki
-nl: een over-grootvader/een over-grootmoeder/een over-grootouder
+nl: een overgrootvader/een overgrootmoeder/een overgrootouder
 no: oldefar/oldemor/en av oldeforeldrene
 pl: pradziadek/prababka/pradziadkowie
 pt: um bisav&ocirc;/uma bisav&oacute;/um(a) bisav&ocirc;(&oacute;)
@@ -955,7 +955,7 @@ he:   ğéï/ ğéğä
 is: barnabarnabarn/barnabarnabarn/barnabarnabarn
 it: un pronipote/una pronipote/un(a) pronipote
 lv: mazmazdçls/mazmazmeita/mazmazbçrni
-nl: een achter-kleinzoon/een achter-kleindochter/een achter-kleinkind
+nl: een achterkleinzoon/een achterkleindochter/een achterkleinkind
 no: oldebarn
 pl: prawnuk/prawnuczka/prawnuki
 pt: um bisneto/uma bisneta/um(a) bisneto(a)
@@ -978,7 +978,7 @@ he:   áï äàçééï/ áú äàçééï
 is: frændi/frænka
 it: un pronipote/una pronipote
 lv: brâïa/mâsas mazdçls/mazmeita
-nl: een achter-neef/een achter-nicht
+nl: een achterneef/een achternicht
 no: grandnev&oslash;/grandniese
 pl: wnuk/wnuczka brata lub siostry
 pt: um sobrinho-neto/uma sobrinha-neta
@@ -1001,7 +1001,7 @@ he:   ãåã-ñá/ ãåãä-ñáä
 is: afa(ömmu)bróğir/afa(ömmu)systir
 it: un prozio/una prozia
 lv: vectçva/vecmamas brâlis/mâsa
-nl: een oud-oom/een oud-tante
+nl: een oudoom/een oudtante
 no: en grandonkel/en grandtante
 pl: brat/siostra dziadka lub babki
 pt: um tio-av&ocirc;/uma tia-av&oacute;
@@ -1024,7 +1024,7 @@ he:   çöé àç/ çöé àçåú/ çöé àç(åú)
 is: hálfbróğir/hálfsystir/hálfsystkin
 it: un fratello/una sorella/un fratello o una sorella
 lv: pusbrâlis/pusmâsa/pusbçrns a half-sibling
-nl: een broer/een zuster/een broer of een zuster
+nl: een broer/een zus/een broer of een zus
 no: halvbror/halvs&oslash;ster/halvs&oslash;sken
 pl: brat przyrodni/siostra przyrodnia/przyrodni brat lub siostra
 pt: um meio-irm&atilde;o/uma meia-irm&atilde;/um(a) meio(a) irm&atilde;o(&atilde;)
@@ -1210,7 +1210,7 @@ he:  áï çåøâ/ áú çåøâú/ éìã çåøâ
 is: kjörsonur/kjördóttir/kjörbarn
 it: figlio adottivo/figlia adottiva/figlio addotivo
 lv: padçls/pameita/pabçrns
-nl: geadopteerde zoon/geadopteerde dochter/adoptiekind
+nl: adoptiefzoon/adoptiefdochter/adoptiefkind
 no: adoptivs&oslash;nn/adoptivdatter/adoptivbarn
 pl: syn adoptowany/córka adoptowana/dziecko adoptowane
 pt: filho adoptivo/filha adoptiva/filho(a) adoptivo(a)
@@ -1513,7 +1513,7 @@ he:   ãåã/ ãåãä
 is: föğur(móğur)bróğir/föğur(móğur)systir
 it: uno zio/una zia
 lv: onkulis/tante
-nl: een Oom/een Tante
+nl: een oom/een tante
 no: onkel/tante
 pl: stryj lub wuj/ciotka
 pt: um tio/uma tia
@@ -1655,7 +1655,7 @@ he:   éîé ğéùåàéï
 is: brúğkaupsafmæli
 it: anniversari di matrimonio
 lv: kâzu dienas
-nl: huwelijks verjaardag
+nl: huwelijksverjaardag
 no: bryllupsdager
 pl: rocznice œlubów
 pt: anivers&aacute;rios de casamento
@@ -1701,7 +1701,7 @@ he:   âí
 is: einnig
 it: nello stesso tempo
 lv: vienlaicîgi
-nl: op dezelfde tijd
+nl: terzeldertijd
 no: samtidig
 pl: równoczeœnie
 pt: ao mesmo tempo
@@ -2209,7 +2209,7 @@ he:  ñãø äéìãéí äùúğä
 is: breytti röğ barna
 it: ordine dei figli cambiato
 lv: mainît bçrnu secîbu
-nl: veranderd de volgorde der kinderen
+nl: de volgorde der kinderen veranderd
 no: rekkef&oslash;lgen er endret for barna til
 pl: kolejnoœæ dzieci zosta³a zmieniona
 pt: mudar a ordem dos filhos
@@ -2279,7 +2279,7 @@ he:   ìçõ
 is: İtiğ
 it: seleziona
 lv: spiest
-nl: druk
+nl: klik
 no: klikk
 pl: kliknij
 pt: clicar
@@ -2302,7 +2302,7 @@ he:   ìçõ "%s"
 is: İtiğ "%s"
 it: seleziona "%s"
 lv: spiest "%s"
-nl: druk "%s"
+nl: klik "%s"
 no: klikk "%s"
 pl: kliknij "%s"
 pt: clicar "%s"
@@ -2325,7 +2325,7 @@ he:   äòøä
 is: athugasemd
 it: commento
 lv: piebilde
-nl: Kommentaar
+nl: commentaar
 no: kommentar
 pl: uwagi
 pt: coment&aacute;rio
@@ -2348,7 +2348,7 @@ he:   ÷åñğâååéğéåú
 is: skyldleiki
 it: consanguineit&agrave;
 lv: asinsradniecîba
-nl: bloed verwantschap
+nl: bloedverwantschap
 no: blodsb&aring;nd
 pl: pokrewieñstwo
 pt: consanguinidade
@@ -2371,7 +2371,7 @@ he:  ìäîùéê ìàçã
 is: halda áfram ağ sameina
 it: continua la fusione
 lv: turpinât apvienoğanu
-nl: verdergaan met samenvoegen
+nl: doorgaan met samenvoegen
 no: fortsett sammensl&aring;ing
 pl: kontynuuj scalanie
 pt: continuar a fus&atilde;o
@@ -2440,7 +2440,7 @@ he:  òùä
 is: búa til
 it: creare
 lv: izveidot
-nl: maken
+nl: creëren
 no: opprett
 pl: utwórz
 pt: criar
@@ -2792,7 +2792,7 @@ he:   ñåó
 is: endar
 it: fine
 lv: beigas
-nl: Einde
+nl: einde
 no: slutt
 pl: koniec
 pt: fim
@@ -2929,7 +2929,7 @@ he:   äåöà ìäåøâ/ äåöàä ìäåøâ
 is: líflátin(n)
 it: giustiziato/giustiziato/giustiziato(a)
 lv: sodîts(a) ar nâvi
-nl: ge-exekuteerd
+nl: geëxecuteerd
 no: henrettet
 pl: egzekucja
 pt: executado/executada/executado(a)
@@ -2952,7 +2952,7 @@ he:  îùôçåú òí ÷åãéí
 is: fjölskyldur meğ táknum
 it: famiglia con codice
 lv: ğifrçtâs ìimenes
-nl: families met kode
+nl: families met code
 no: familier med kode
 pl: rodziny z kodowaniem
 pt: fam&iacute;lias com c&oacute;digo
@@ -3417,7 +3417,7 @@ he:  âøâåøé/ éåìéàğé/ öøôúé/ òáøé
 is: gregorísk/julian/franskt/hebreskt
 it: gregorian/julian/francese/ebraico
 lv: gregoriâòu/jûlija/franèu/senebreju
-nl: gregoriaans/juliaans/frans/hebreeuws
+nl: gregoriaans/juliaans/Frans/Hebreeuws
 no: gregoriansk/juliansk/fransk rep./j&oslash;disk
 pl: gregoriañski/juliañski/rewolucyjny francuski/hebrajski
 pt: gregoriano/juliano/franc&ecirc;s/hebraico
@@ -3464,7 +3464,7 @@ he:    òí éìãéí
 is: börn
 it: da cui
 lv: bçrni:
-nl: hier uit
+nl: hieruit
 no: barn
 pl: dzieci:
 pt: tiveram
@@ -3806,7 +3806,7 @@ he:  àé äúàîä áîéğéí
 is: kyn passa ekki
 it: sessi incompatibili
 lv: nesavietojami dzimumi
-nl: geslacht komt niet overeen
+nl: geslacht klopt niet
 no: uforenlig kj&oslash;nn
 pl: niezgodne p³cie
 pt: sexos incompat&iacute;veis
@@ -3877,7 +3877,7 @@ he:   ìëï
 is: jú,
 it: infatti,
 lv: patieğâm,
-nl: inderdaad:
+nl: immers:
 no: felles forfedre,
 pl: œciœlej bior¹c,
 pt: com efeito,
@@ -4016,7 +4016,7 @@ he:   ğìã àçøé éìãå/ ğìãä àçøé éìãä
 is: er fædd eftir barn sitt
 it: sarebbe nato/a dopo i suoi figli
 lv: ir dzimis(usi) pçc saviem bçrniem
-nl: zal geboren worden na zijn/haar kind
+nl: wordt geboren na zijn/haar kind
 no: er f&oslash;dt etter sitt barn
 pl: jest urodzony/urodzona póŸniej ni¿ swoje dziecko
 pt: nasceu depois do seu filho
@@ -4061,7 +4061,7 @@ fr: jour julien
 he:  éåí éåìéàğé
 is: julian dagur
 it: giorno julian
-nl: juliaans dag
+nl: juliaanse dag
 no: juliansk dag
 pl: dzieñ w kalendarzu juliañskim
 pt: dia juliano
@@ -4130,7 +4130,7 @@ he:  ÷ùø
 is: tengsl
 it: link
 lv: saite
-nl: konnektie
+nl: connectie
 no: koble
 pl: link
 pt: ligar
@@ -4153,7 +4153,7 @@ he:   ÷ùø áéï
 is: tengsl á milli
 it: legame tra
 lv: saite starp
-nl: konnektie tussen
+nl: connectie tussen
 no: slektskap mellom
 pl: wiêzy pokrewieñstwa pomiêdzy
 pt: rela&ccedil;&atilde;o entre
@@ -4219,7 +4219,7 @@ fi: silmukka tietokannassa: %s on oma esivanhempansa
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 he:  îòâì áîàâø äğúåğéí: %s  öàöà(ä) ìàöîå/ìàöîä
 it: loop nel data-base: %s e' antenato di se stesso
-nl: loop in de data base: %s is zijn/haar eigen voorouder
+nl: kring in de data base: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
 pl: pêtla w bazie: %s jest swoim w³asnym przodkiem
 pt: refer&ecirc;ncia circular no banco de dados: %s &eacute; seu pr&oacute;prio ancestral
@@ -4674,7 +4674,7 @@ he:  äùí %s áùéîåù ëáø ò"é %tàãí æä%t
 is: nafniğ %s er şegar í %tnotkun af%t
 it: nome %s gi&agrave; utilizzato da %tquesta persona%t
 lv: vârds - %s jau ir %tğai personai%t
-nl: naam %s is al gebruikt door %tdit persoon%t
+nl: naam %s is al gebruikt door %tdeze persoon%t
 no: navnet %s er alt i bruk av %tdenne personen%t
 pl: imiê %s jest ju¿ u¿ywane przez %ttê osobê%t
 pt: apelido %s j&aacute; utilizado por %testa pessoa%t
@@ -4851,7 +4851,7 @@ es: sin comprobacion de sexo
 et: ära kontrolli sugude sobivust
 fr: pas de v&eacute;rification des sexes
 he:  áìé ìååãà îéï
-nl: Geslachten niet verifi&euml;ren
+nl: geslachten niet verifi&euml;ren
 no: ikke kontroll av kj&oslash;nn
 pt: não verificar os sexos
 se: ingen kontroll av könen
@@ -4990,7 +4990,7 @@ he:  än/øàùåï/ ùğé/ ùìéùé/ øáéòé/ çîùé/ ùéùé/ ùáéòé/ ùîéğé/ úùéòé/ òùéøé/11/12/1
 is: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 it: n-esima/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/21a/22a/23a/24a/25a/26a/27a/28a/29a/30a/31a/32a/33a/34a/35a/36a/37a/38a/39a/40a/41a/42a/43a/44a/45a/46a/47a/48a/49a/50a/51a/52a/53a/54a/55a/56a/57a/58a/59a/60a/61a/62a/63a/64a/65a/66a/67a/68a/69a/70a/71a/72a/73a/74a/75a/76a/77a/78a/79a/80a/81a/82a/83a/84a/85a/86a/87a/88a/89a/90a/91a/92a/93a/94a/95a/96a/97a/98a/99a
 lv: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
-nl: n-te/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
+nl: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
 no: n./f&oslash;rste/andre/tredje/fjerde/femte/sjette/syvende/&aring;ttende/niende/tiende/ellevte/tolvte/trettende/fjortende/femtende/sekstende/s&oslash;ttende/attende/nittende/tyvende/21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99./100./101./102./103./104./105./106./107./108./109./110./111./112./113./114./115./116./117./118./119./120./121./122./123./124./125./126./127./128./129./130.
 pl: n/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
 pt: n-&eacute;sima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
@@ -5220,7 +5220,7 @@ he:  áöã ùì %s
 is: á %s hliğ
 it: dalla parte di %s
 lv: %s-jâ pusç
-nl: langs de zijde van %s
+nl: aan de kant van %s
 no: fra %ss slektside
 pl: ze strony osoby: %s
 pt: pelo lado de %s
@@ -5753,7 +5753,7 @@ he:  áï éãåò/ áú éãåòä/ éìã éãåò
 is: viğurkendur sonur/viğurkend dóttir/viğurkent barn
 it: figlio riconosciuto/figlia riconosciuta/figlio riconosciuto
 lv: atzîts dçls/mâsa/bçrns (?)
-nl: aanvaarde zoon/aanvaarde dochter/aanvaar kind
+nl: erkende zoon/erkende dochter/erkend kind
 no: bekreftet s&oslash;nn/bekreftet datter/bekreftet barn
 pl: uznany syn/uznana córka/uznane dziecko
 pt: filho reconhecido/filha reconhecida/filhos reconhecidos
@@ -6471,7 +6471,7 @@ he:  øùéîú ùîåú îùôçä
 is: eftirnafna listi
 it: lista dei cognomi
 lv: uzv&acirc;rdu saraksts
-nl: bijnamen lijst
+nl: lijst van bijnamen
 no: liste over etternavn
 pl: lista nazwisk
 pt: lista de apelidos
@@ -6723,7 +6723,7 @@ he:  éåí äğéùåàéï
 is: brúğkaupsafmæli
 it: l'anniversario di matrimonio
 lv: kâzu diena
-nl: huwelijks verjaardag
+nl: huwelijksverjaardag
 no: bryllupsdagen
 pl: rocznica œlubu
 pt: o anivers&aacute;rio de casamento
@@ -6746,7 +6746,7 @@ he:  îàâø äîéãä äùúğä: ìòùåú "back" å-"reload"  åìîìà îçãù àú äèåôñ
 is: gagnagrunnurinn hefur breyst; gerğu "Back", "Reload", og settu aftur í formiğ
 it: la base &egrave; cambiata; fate "back", "reload" e rifate la scheda
 lv: datu bâzç ir veiktas izmaiòas; nospiediet "back", "reload", un aizpildiet formu
-nl: de informatie is veranderd; druk "back", "reload" en vul in de details
+nl: de informatie is veranderd; klik "back", "reload" en vul de details in
 no: databasen er endret; klikk tilbake og oppfrisk, og fyll ut formularet p&aring; nytt
 pl: w bazie zosta³y dokonane zmiany; kliknij "wstecz" i "odœwie¿", a nastêpnie powtórnie wprowadŸ dane
 pt: a base mudou: fazer "back", "reload" e preencher novamente o formul&aacute;rio
@@ -7046,7 +7046,7 @@ he:  %d äîúéí äàçøåğéí
 is: síğustu %d andlát
 it: le ultime %d morto
 lv: pçdçjie %d miruğie
-nl: de %d meest recente overlijdens
+nl: de %d recentste overlijdens
 no: de siste %d d&oslash;de
 pl: %d osób ostatnio zmar³ych
 pt: os %d &oacute;bitos mais recentes
@@ -7069,7 +7069,7 @@ he:  %d äğéùåàéí äàçøåğéí
 is: síğast giftist %d
 it: gli ultimi %d matrimoni
 lv: pçdçjâs %d laulîbas
-nl: de %d laatste huwelijken
+nl: de %d jongste huwelijken
 no: de %d sist gifte
 pl: %d ostatnich œlubów
 pt: os %d casamentos mais recentes
@@ -7183,7 +7183,7 @@ he:  ìäåñéó éìã ìîùôçä, äùúîù á-"%s"
 is: til ağ bæta barni viğ fjölskyldu, notağu "%s"
 it: per aggiungere un figlio ad una famiglia, scegliere "%s"
 lv: lai pievienotu bçrnu ìimenei, lietojiet "%s"
-nl: gebruik "%s" om een kind aan een familie toe te voegen
+nl: gebruik "%s" om een kind aan een gezin toe te voegen
 no: for &aring; tilf&oslash;ye et barn til en familie, bruk "%s"
 pl: aby dodaæ dziecko do pary rodziców u¿yj "%s"
 pt: para acrescentar um filho a uma fam&iacute;lia utilizar "%s"
@@ -7577,7 +7577,7 @@ he:  ìäùúîù á-"÷ùø" áî÷åí "òùä"
 is: notağu "tengja" í stağ "búa til"
 it: usare "link" invece di "create"
 lv: "izveidot" vietâ lietojiet "saite"
-nl: gebruik "konnektie" inplaats van "maken"
+nl: gebruik "connectie" inplaats van "creëren"
 no: bruk "koble" istedet for "opprett"
 pl: u¿yj "link" zamiast "utwórz"
 pt: use "reunir" em lugar de "criar"
@@ -7739,7 +7739,7 @@ he:  ùğéí
 is: ára
 it: anni
 lv: gadi
-nl: jaren oud
+nl: jaar oud
 no: &aring;r gammel
 pl: lat
 pt: anos
@@ -7762,7 +7762,7 @@ he:  öøéê ìàçã ÷åãí
 is: şú şarft fyrst ağ sameina
 it: dovete in primo luogo fondere
 lv: Jums vispirms ir jâapvieno
-nl: je moet eerst samenvoegen
+nl: u moet eerst samenvoegen
 no: du m&aring; f&oslash;rst sl&aring; sammen
 pl: musisz najpierw dokonaæ scalenia
 pt: tem que fundir primeiro
@@ -7785,7 +7785,7 @@ he:  öøéê ìàçã ÷åãí àú 2 äîùôçåú
 is: şú verğur fyrst ağ sameina şessar 2 fjölskyldur
 it: dovete in primo luogo fondere le 2 famiglie
 lv: Jums vispirms ir jâpvieno 2 ìimenes
-nl: je moet de twee families eerst samenvoegen
+nl: u moet de twee families eerst samenvoegen
 no: du m&aring; f&oslash;rst sl&aring; sammen de 2 familiene
 pl: musisz najpierw scaliæ 2 rodziny
 pt: primeiro tem que fundir as 2 fam&iacute;lias
