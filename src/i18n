@@ -170,6 +170,9 @@ indeed,
 index of the descendants
 index of the spouses (non descendants)
 insert
+inversion done
+invert
+invert the order of the following families
 is
 is a very young parent
 is born after his/her child
@@ -275,9 +278,6 @@ surname missing
 surname not found
 surname/surnames
 surnames list
-switch
-switch done
-switch the order of the following families
 text
 the %d first names
 the %d oldest perhaps still alive

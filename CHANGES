@@ -2,6 +2,8 @@ GeneWeb version 4.04
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [16 Nov 01] Changed the term "switch" into "invert" (I am not English,
+    I made an error when translating from my language).
   - [14 Nov 01] Suppressed the <nobr> tag used in several displayings,
     because it is not html standard. Its effect was to ask not to cut
     too large lines.

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.51 2001-11-11 08:18:54 ddr Exp $
+# $Id: lexicon.txt,v 4.52 2001-11-16 13:38:49 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -3980,6 +3980,76 @@ pt: inserir
 ru: âñòàâèòü :a:
 sv: infoga
 
+    inversion done
+af: omgeruil
+ca: inversió realitzada
+cs: prohození dokonèeno
+da: r&aelig;kkef&oslash;lge omvendt
+de: umgekehrt
+en: inversion done
+eo: intersxangxo farita
+es: inversi&oacute;n realizada
+et: vahetatud
+fi: vaihto tehty
+fr: interversion effectu&eacute;e
+he:  ääçìôä áåöòä
+is: breyting gerğ
+it: scambio fatto
+lv: pârslçgğana izpildîta
+nl: veranderd
+no: rekkef&oslash;lgen er endret
+pl: kolejno¶æ zosta³a zmieniona
+pt: invers&atilde;o efectuada
+pt-br: invers&atilde;o feita
+ru: ïåğåêëş÷åíèå çàâåğøåíî
+sv: omflyttning klar
+
+    invert
+af: omruil
+ca: invertir
+cs: prohodit
+da: omvend r&aelig;kkef&oslash;lge
+de: umkehren
+en: invert
+eo: intersxangxi :a:
+es: invertir
+et: vaheta
+fi: vaihda
+fr: intervertir
+he:  äçìôä
+is: breyta röğ
+it: scambiare
+lv: pârslçgt(?)
+nl: verander
+no: bytt rekkef&oslash;lge
+pl: zmieñ kolejno¶æ
+pt: inverter
+ru: ïåğåêëş÷èòü
+sv: byt ordning
+
+    invert the order of the following families
+af: ruil die orde van die families om
+ca: invertir l'ordre de les famílies següents
+cs: prohodit poøadí následujících rodin
+da: omvend r&aelig;kkef&oslash;lgen for de f&oslash;lgende familier
+de: die Reihenfolge der folgenden Familien umkehren
+en: invert the order of the following families
+eo: intersxangxi la ordon de la familioj sekvantaj
+es: invertir el orden de las familias siguientes
+et: vaheta järgmiste perede järjekord
+fi: vaihda seuraavien perheiden j&auml;rjestyst&auml
+fr: intervertir l'ordre des familles suivantes
+he:  ìùğåú ñãø äîùôçåú äáàåú
+is: breyta röğ eftirfarandi fjölskyldna
+it: scambiare l'ordine delle famiglie seguenti
+lv: pârslçgt sekojoğo ìimeòu secîbu (?)
+nl: verwissel de volgorde van de volgende gezinnen
+no: bytt rekkef&oslash;lgen til f&oslash;lgende familier
+pl: czy zmieniæ kolejno¶æ nastepuj±cych ma³¿eñstw lub zwi±zków?
+pt: inverter a ordem das fam&iacute;lias seguintes
+ru: èçìåíèòü ïîğÿäîê ñëåäóşùèõ ñåìåé
+sv: &auml;ndra ordningen p&aring; de f&ouml;ljande familjerna
+
     is
 af: is
 ca: és
@@ -6401,76 +6471,6 @@ pl: lista nazwisk
 pt: lista de apelidos
 pt-br: lista de sobrenomes
 sv: efternamns lista
-
-    switch
-af: omruil
-ca: invertir
-cs: prohodit
-da: omvend r&aelig;kkef&oslash;lge
-de: umkehren
-en: switch
-eo: intersxangxi :a:
-es: invertir
-et: vaheta
-fi: vaihda
-fr: intervertir
-he:  äçìôä
-is: breyta röğ
-it: scambiare
-lv: pârslçgt(?)
-nl: verander
-no: bytt rekkef&oslash;lge
-pl: zmieñ kolejno¶æ
-pt: inverter
-ru: ïåğåêëş÷èòü
-sv: byt ordning
-
-    switch done
-af: omgeruil
-ca: inversió realitzada
-cs: prohození dokonèeno
-da: r&aelig;kkef&oslash;lge omvendt
-de: umgekehrt
-en: switch done
-eo: intersxangxo farita
-es: inversi&oacute;n realizada
-et: vahetatud
-fi: vaihto tehty
-fr: interversion effectu&eacute;e
-he:  ääçìôä áåöòä
-is: breyting gerğ
-it: scambio fatto
-lv: pârslçgğana izpildîta
-nl: veranderd
-no: rekkef&oslash;lgen er endret
-pl: kolejno¶æ zosta³a zmieniona
-pt: invers&atilde;o efectuada
-pt-br: invers&atilde;o feita
-ru: ïåğåêëş÷åíèå çàâåğøåíî
-sv: omflyttning klar
-
-    switch the order of the following families
-af: ruil die orde van die families om
-ca: invertir l'ordre de les famílies següents
-cs: prohodit poøadí následujících rodin
-da: omvend r&aelig;kkef&oslash;lgen for de f&oslash;lgende familier
-de: die Reihenfolge der folgenden Familien umkehren
-en: switch the order of the following families
-eo: intersxangxi la ordon de la familioj sekvantaj
-es: invertir el orden de las familias siguientes
-et: vaheta järgmiste perede järjekord
-fi: vaihda seuraavien perheiden j&auml;rjestyst&auml
-fr: intervertir l'ordre des familles suivantes
-he:  ìùğåú ñãø äîùôçåú äáàåú
-is: breyta röğ eftirfarandi fjölskyldna
-it: scambiare l'ordine delle famiglie seguenti
-lv: pârslçgt sekojoğo ìimeòu secîbu (?)
-nl: verwissel de volgorde van de volgende gezinnen
-no: bytt rekkef&oslash;lgen til f&oslash;lgende familier
-pl: czy zmieniæ kolejno¶æ nastepuj±cych ma³¿eñstw lub zwi±zków?
-pt: inverter a ordem das fam&iacute;lias seguintes
-ru: èçìåíèòü ïîğÿäîê ñëåäóşùèõ ñåìåé
-sv: &auml;ndra ordningen p&aring; de f&ouml;ljande familjerna
 
     text
 af: teks

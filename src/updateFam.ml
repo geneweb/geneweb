@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.23 2001-10-20 10:59:01 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.24 2001-11-16 13:38:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -469,16 +469,16 @@ value print_del1 conf base fam =
   }
 ;
 
-value print_swi1 conf base p fam1 fam2 =
+value print_inv1 conf base p fam1 fam2 =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl_decline conf "switch" ""))
+    Wserver.wprint "%s" (capitale (transl_decline conf "invert" ""))
   in
   let cpl1 = coi base fam1.fam_index in
   let cpl2 = coi base fam2.fam_index in
   do {
     header conf title;
     Wserver.wprint "%s:"
-      (capitale (transl conf "switch the order of the following families"));
+      (capitale (transl conf "invert the order of the following families"));
     tag "ul" begin
       html_li conf;
       Update.print_someone conf base (poi base cpl1.father);
@@ -496,7 +496,7 @@ value print_swi1 conf base p fam1 fam2 =
         (Adef.int_of_iper p.cle_index);
       Wserver.wprint "<input type=hidden name=f value=%d>\n\n"
         (Adef.int_of_ifam fam2.fam_index);
-      Wserver.wprint "<input type=hidden name=m value=SWI_FAM_OK>\n";
+      Wserver.wprint "<input type=hidden name=m value=INV_FAM_OK>\n";
       Wserver.wprint "\n";
       html_p conf;
       Wserver.wprint "<input type=submit value=Ok>\n";
@@ -590,7 +590,7 @@ value rec find_families ifam =
   | _ -> None ]
 ;
 
-value print_swi conf base =
+value print_inv conf base =
   match (p_getint conf.env "i", p_getint conf.env "f") with
   [ (Some ip, Some ifam) ->
       let u = base.data.unions.get ip in
@@ -599,7 +599,7 @@ value print_swi conf base =
       with
       [ Some (ifam1, ifam2) ->
           let p = base.data.persons.get ip in
-          print_swi1 conf base p (foi base ifam1) (foi base ifam2)
+          print_inv1 conf base p (foi base ifam1) (foi base ifam2)
       | _ -> incorrect_request conf ]
   | _ -> incorrect_request conf ]
 ;
