@@ -1,6 +1,10 @@
 GeneWeb version 4.10
 --------------------
 
+* Languages
+  - [29 Jan 04] Added "britany" (Tepod Gwilhmod, Gwenael Emilianoff,
+    Bertrand Yeurc'h).
+
 * GeneWeb server or CGI (gwd)
   - [06 Jan 04] Fixed bug: when changing a child's name using "change
     children's names", the possible image was not renamed, causing

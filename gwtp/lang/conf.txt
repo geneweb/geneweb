@@ -1,6 +1,6 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: conf.txt,v 1.11 2003-12-08 20:50:31 ddr Exp $ -->
+  <!-- $Id: conf.txt,v 1.12 2004-01-29 16:34:16 ddr Exp $ -->
   <title>Gwtp - [
 de: Konfiguration
 en: configuration
@@ -60,6 +60,7 @@ it: Lingua standard:
 <option value=""%edefault_lang=;><tt>-</tt>
 <option value="af"%edefault_lang=af;>%Laf;
 <option value="bg"%edefault_lang=bg;>%Lbg;
+<option value="br"%edefault_lang=br;>%Lbr;
 <option value="ca"%edefault_lang=ca;>%Lca;
 <option value="cs"%edefault_lang=cs;>%Lcs;
 <option value="de"%edefault_lang=de;>%Lde;
