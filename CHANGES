@@ -19,6 +19,9 @@ GeneWeb version 4.07
   - [23 Mar 02] Fixed bug: failed at end of creation of database when
     the target database (option -o) was indicated by an absolute path.
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [16 May 02] Added option -us: uppercase surnames.
+
 GeneWeb version 4.06
 --------------------
 

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.32 2002-03-11 19:02:51 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.33 2002-05-16 15:14:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -35,8 +35,14 @@ type charset =
   | MacIntosh ]
 ;
 
+type case =
+  [ NoCase
+  | LowerCase
+  | UpperCase ]
+;
+
 value lowercase_first_names = ref False;
-value lowercase_surnames = ref False;
+value case_surnames = ref NoCase;
 value extract_first_names = ref False;
 value extract_public_names = ref True;
 value charset_option = ref None;
@@ -1378,6 +1384,13 @@ value rec build_remain_tags =
           rest] ]
 ;
 
+value applycase_surname s =
+  match case_surnames.val with
+  [ NoCase -> s
+  | LowerCase -> lowercase_name s
+  | UpperCase -> String.uppercase s ]
+;
+
 value add_indi gen r =
   let ip = per_index gen r.rval in
   let name_sons = find_field "NAME" r.rsons in
@@ -1456,7 +1469,7 @@ value add_indi gen r =
           List.fold_right (fun fa fal -> if fa = pn then fal else [fa :: fal])
             fal []
         in
-        let s = if lowercase_surnames.val then lowercase_name s else s in
+        let s = applycase_surname s in
         let r =
           let key = Name.strip_lower (nominative f ^ " " ^ nominative s) in
           try Hashtbl.find gen.g_hnam key with
@@ -1483,9 +1496,7 @@ value add_indi gen r =
             let list = purge_list (list_of_string r.rval) in
             List.fold_right
               (fun x list ->
-                 let x =
-                   if lowercase_surnames.val then lowercase_name x else x
-                 in
+                 let x = applycase_surname x in
                  if x <> surname then [x :: list] else list)
               list []
         | _ -> [] ]
@@ -2752,10 +2763,13 @@ value speclist =
 - Lowercase first names -
        Convert first names to lowercase letters, with initials in
        uppercase.");
-   ("-ls", Arg.Set lowercase_surnames, "   \
+   ("-ls", Arg.Unit (fun () -> case_surnames.val := LowerCase), "   \
 - Lowercase surnames -
        Convert surnames to lowercase letters, with initials in
        uppercase. Try to keep lowercase particles.");
+   ("-us", Arg.Unit (fun () -> case_surnames.val := UpperCase), "   \
+- Uppercase surnames -
+       Convert surnames to uppercase letters.");
    ("-fne",
     Arg.String
       (fun s ->
