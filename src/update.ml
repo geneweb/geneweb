@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.26 2004-06-22 15:11:16 ddr Exp $ *)
+(* $Id: update.ml,v 4.27 2004-06-27 02:02:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -25,19 +25,20 @@ value rec find_free_occ base f s i =
   let ipl = base.func.persons_of_name (f ^ " " ^ s) in
   let first_name = Name.lower f in
   let surname = Name.lower s in
-  let list =
+  let list_occ =
     loop [] ipl where rec loop list =
       fun
       [ [ip :: ipl] ->
           let p = poi base ip in
-          if first_name = Name.lower (p_first_name base p) &&
+          if not (List.mem p.occ list) &&
+             first_name = Name.lower (p_first_name base p) &&
              surname = Name.lower (p_surname base p) then
             loop [p.occ :: list] ipl
           else loop list ipl
       | [] -> list ]
   in
-  let list = List.sort compare list in
-  loop 0 list where rec loop cnt1 =
+  let list_occ = List.sort compare list_occ in
+  loop 0 list_occ where rec loop cnt1 =
     fun
     [ [cnt2 :: list] ->
         if cnt1 = cnt2 then loop (cnt1 + 1) list else cnt1
