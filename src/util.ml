@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.59 2002-11-08 16:03:14 ddr Exp $ *)
+(* $Id: util.ml,v 4.60 2002-11-08 16:34:38 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1200,7 +1200,8 @@ value email_addr s i =
 ;
 
 value good_tags_list =
-  ["a"; "br"; "i"; "img"; "p"; "pre"]
+  ["a"; "b"; "br"; "div"; "em"; "font"; "hr"; "h1"; "h2"; "h3"; "h4"; "i";
+   "img"; "li"; "p"; "pre"; "strong"; "ul"]
 ;
 
 value good_tag s i =
@@ -1209,7 +1210,7 @@ value good_tag s i =
       if i = String.length s then Buff.get len
       else
         match s.[i] with
-        [ 'a'..'z' | 'A'..'Z' as c ->
+        [ 'a'..'z' | 'A'..'Z' | '0'..'9' as c ->
             loop (i + 1) (Buff.store len (Char.lowercase s.[i]))
         | _ -> if len = 0 then loop (i + 1) 0 else Buff.get len ]
   in
