@@ -4,6 +4,10 @@ Internal, very small, or not visible changes
 GeneWeb Version 2.04
 --------------------
 
+* Installation
+  - [Jun 30, 99] Added "README.txt" (English) and "ALIRE.txt" (French) in
+    distribution just to say that you have to launch the program "setup".
+
 GeneWeb Version 2.03
 --------------------
 
