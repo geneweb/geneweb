@@ -2,11 +2,12 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.51 2004-01-08 13:30:41 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.52 2004-01-29 16:11:37 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
 bg: Genealogy
+br: Genealogiezh
 ca: Genealogia
 cs: Genealogy
 da: Genealogi
@@ -50,6 +51,7 @@ height=108 src="%o/gwlogo.gif" align=%L border=0 alt=GeneWeb></a>
 <table border=0><tr align=center><td align=center><h1><font color=%i>[
 af: Genealogiese databasis
 bg: Родословна база от данни
+br: Bon roadoщ genealogiezh
 ca: Base de dades geneal&ograve;gica
 cs: Genealogickб databбze
 da: Genealogisk database
@@ -83,6 +85,7 @@ zh: НшВзјТЖЧ
 <font size=-1><em>[
 af: Taalvoorkeur/Language preference:
 bg: Можете да изберете друг език за съобщения измежду следните:
+br: Dibab a c'hellit ur yezh all etre ar re-maс:
 ca: Podeu seleccionar una altre llengua, hi ha disponibles les seg&uuml;ents:
 cs: Zvolte jazyk pro prohlнѕenн databбze:
 da: Du kan v&aelig;lge fremstilling p&aring; et andet sprog blandt de
@@ -116,6 +119,7 @@ sv: Du kan vдlja ett annat sprеk bland de fцljande:
 [
 af: Die databasis <font color=%i><b>"%t"</b></font> bevat tans %n persone.
 bg: Базата от данни <font color=%i><b>"%t"</b></font> в момента съдържа сведения за %n души.
+br: Niver an dud a zo er bon roadoщ <font color=%i><b>"%t"</b></font> bremaс a zo : %n.
 ca: La base de dades <font color=%i><b>"%t"</b></font> cont&eacute;
     actualment %n persones.
 cs: Databбze <font color=%i><b>"%t"</b></font> obsahuje %n osob.
@@ -170,6 +174,8 @@ af: <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a> toegang<br>
     (password)
 bg: Достъп като <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a><br>
     (парола)
+br: mont e-barzh evel <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a><br>
+    (ger-tremen)
 ca: acc&eacute;s <a href="%sw=w"><em>[wizard/wizards/friend]0</em></a><br>
     (clau)
 cs: <a href="%sw=w">{<em>"[wizard/wizards/friend]0"</em></a> pшнstup<br>
@@ -210,6 +216,7 @@ sv: <a href="%sw=w"><em>[*wizard/wizards/friend]0</em></a> tilltr&auml;de<br>
 %INf<td align=center>[
 af: <a href="%sw=f"><em>Vriend</em></a> toegang<br> (password)
 bg: Достъп като <a href="%sw=f"><em>приятел</em></a><br> (парола)
+br: mont e-barzh evel <a href="%sw=f"><em>mignon</em></a><br> (ger-tremen)
 ca: acc&eacute;s <a href="%sw=f"><em>amic</em></a><br> (clau)
 cs: <a href="%sw=f">{<em>"Friend"</em></a> pшнstup<br> (heslo)
 da: <a href="%sw=f"><em>Betroet adgang</em></a><br> (adgangskode)
@@ -240,6 +247,7 @@ sv: <a href="%sw=f"><em>V&auml;n</em></a> tilltr&auml;de<br> (passord)
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
 bg: Парола за достъп като <em>приятел</em> или
     <em>администратор</em>:
+br: Ger-tremen evit mont e-barzh evel <em>mignon</em> pe <em>strobineller</em>:
 ca: Clau, per acc&eacute;s <em>amic</em> o <em>administrador</em>:
 cs: Heslo pro<em>"friend"</em> nebo <em>"wizard"</em> pшнstup:</em>:
 da: Adgangskode, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
@@ -278,6 +286,7 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
 bg: Можете да използвате тази база от данни за търсене:
+br: Evit merdeiс er bon roadoщ-maс e c'hellit klask:
 ca: Per navegar en aquesta base, podeu fer la vostra recerca:
 cs: Databбzi lze prohledбvat:
 da: For at navigere i denne database kan du sшge:
@@ -313,6 +322,7 @@ zh:
 <font color=%i><b>[
 af: per persoon
 bg: по име на човек
+br: dre anv-den
 ca: per persona
 cs: Podle osob
 da: personnavn
@@ -359,6 +369,7 @@ zh: ЛСЛчЈє
 <font color=%i><b>[
 af: by title
 bg: по титла
+br: dre ditl
 ca: per tнtol
 cs: podle titulu
 da: titel (nob.)
@@ -404,6 +415,7 @@ en:
 [
 af: <font color=%i><b>in die lys </b></font>van alle
 bg: <font color=%i><b>в списъка</b></font> на всички
+br: <font color=%i><b>dre roll</b></font> an holl
 ca: <font color=%i><b>pel llistat</b></font> de tots els
 cs: <font color=%i><b>ze seznamu</b></font> v№ech
 da: <font color=%i><b>i liste</b></font> over alle
@@ -432,6 +444,7 @@ zh: ПФКѕЛщµД
 <option value="N" selected>[
 af: vanne
 bg: фамилни имена
+br: anvioщ-familh
 ca: cognoms
 cs: pшнjmenн
 da: efternavne
@@ -460,6 +473,7 @@ zh: РХ
 <option value="P">[
 af: voorname
 bg: собствени имена
+br: raganvioщ
 ca: noms
 cs: kшestnн jmйno
 da: fornavne
@@ -489,6 +503,7 @@ zh: Гы
 [
 af: volgens
 bg: ,&nbsp; подредени по
+br: dre
 ca: per
 cs: seшazenб podle
 da: sorteret efter
@@ -517,6 +532,7 @@ zh: ёщѕЭ
 <option value="A" selected>[
 af: alfabeties volgorde
 bg: азбучен ред
+br: urzh al lizherenneg
 ca: ordre alfab&egrave;tic
 cs: abecedy
 da: alfabetisk orden
@@ -544,6 +560,7 @@ zh: ЧЦДёРт
 <option value="F">[
 af: frekwensie
 bg: честота на срещане
+br: stankted
 ca: freq&uuml&egrave;ncia
 cs: иetnosti
 da: hyppighed
@@ -583,6 +600,7 @@ et: jдrgi
 <font color=%i><b>[
 af: by
 bg: по
+br: dre
 ca: per
 cs: podle
 da: ved
@@ -619,6 +637,9 @@ af: <font color=%i><b>deur 'n</b></font>
 bg: <font color=%i><b>чрез</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>разширено
        търсене</b></font></a>.
+br: <font color=%i><b> dre ar</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>klask
+       a-raokaet</b></font></a>.
 ca: <font color=%i><b>per la</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>consulta
        avanзada</b></font></a>.
@@ -692,6 +713,7 @@ sv: <font color=%i><b>genom</b></font>
 <center>[
 af: Jy kan
 bg: Можете още
+br: Gellout a rit
 ca: Podeu
 cs: Zde mщѕete
 da: Du kan:
@@ -724,6 +746,7 @@ zh:
 %Ispropose_add_family;<li><a href="%sm=ADD_FAM">[
 af: 'n familie byvoeg
 bg: да добавите семейство
+br: ouzhpennaс ur familh
 ca: afegir una fam&iacute;lia
 cs: pшidat novou rodinu
 da: tilfшje en familie
@@ -755,6 +778,7 @@ zh: ФцјУјТНҐјЗВј
 %E<li><a href="%sm=MOD_NOTES">[
 af: die notas wysig
 bg: да промените бележките
+br: kemm an notennoщ
 ca: modificar les notes
 cs: upravit poznбmky
 da: жndre noterne
@@ -789,6 +813,7 @@ sv: &auml;ndra noteringar
 <center>[
 af: Jy kan ook kyk na
 bg: Можете също да се насочите към
+br: Gellout a rit ivez gweladenniс
 ca: Tamb&eacute; podeu consultar
 cs: Lze takй zobrazit
 da: Du kan ogsе fremkalde:
@@ -839,6 +864,7 @@ zh:
 [
 af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
 bg: От %d насам е имало %q посещения, от които %c са на настоящата страница.
+br: gweladennoщ a zo bet : %q, er bajenn-maс : %c, abaoe an deiz-maс : %d.
 ca: Hi ha hagut %q consultes, de les quals %c en aquesta p&agrave;gina, des
     del %d.
 cs: %q pшнstupщ, z toho %c na tuto strбnku, od %d.
@@ -884,6 +910,7 @@ bg: Ако Вашият браузър не актуализира автоматично страниците, които
     са модифицирани (принуждавайки Ви да ги презареждате Вие),
     опитайте се да тръгнете от <a href="%sescache=0">тази
     препратка</a>.
+br: Ma ne nevesa ket ho merdeer ent-gefreek ar pajennoщ kemmet (ha dre-se emaс ret deoc'h "nevesaat ar bajenn"), klakit merdeiс gant al liamm-maс.
 ca: Si el vostre navegador no actualitza autom&agrave;ticament les
     p&agrave;gines modificades (obligant-vos a fer actualitzar manualment
     la p&agrave;gina), proveu de navegar des d'<a href="%sescache=0">aquest
@@ -960,6 +987,7 @@ sv: Om din webblдsare inte automatiskt uppdaterar de modifierade sidorna
 
 <p align=right><font size=-1><em><a href="%sm=LEX">[
 bg: лексикон
+br: geriaoueg
 ca: L&egrave;xic
 cs: lexikon
 da: leksikon
