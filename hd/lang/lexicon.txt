@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.198 2004-05-03 09:03:00 ddr Exp $
+# $Id: lexicon.txt,v 4.199 2004-06-07 18:37:48 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -4742,7 +4742,7 @@ eo: intersxangxo farita
 es: inversi&oacute;n realizada
 et: vahetatud
 fi: vaihto tehty
-fr: interversion effectu&eacute;e
+fr: permutation effectu&eacute;e
 he:  ääçìôä áåöòä
 is: breyting gerğ
 it: scambio fatto
@@ -4770,7 +4770,7 @@ eo: intersxangxi :a:
 es: invertir
 et: vaheta
 fi: vaihda
-fr: intervertir
+fr: permutter
 he:  äçìôä
 is: breyta röğ
 it: scambiare
@@ -4797,7 +4797,7 @@ eo: intersxangxi la ordon de la familioj sekvantaj
 es: invertir el orden de las familias siguientes
 et: vaheta järgmiste perede järjekord
 fi: vaihda seuraavien perheiden j&auml;rjestyst&auml;
-fr: intervertir l'ordre des familles suivantes
+fr: permutter l'ordre des familles suivantes
 he:  ìùğåú ñãø äîùôçåú äáàåú
 is: breyta röğ eftirfarandi fjölskyldna
 it: scambiare l'ordine delle famiglie seguenti
