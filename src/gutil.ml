@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.26 2004-12-14 09:30:12 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.27 2005-02-03 01:50:45 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1125,4 +1125,56 @@ value find_free_occ base f s i =
     [ [cnt2 :: list] ->
         if cnt1 = cnt2 then loop (cnt1 + 1) list else cnt1
     | [] -> cnt1 ]
+;
+
+value input_lexicon lang open_fname =
+  let t = Hashtbl.create 501 in
+  try
+    let ic = open_fname () in
+    let derived_lang =
+      match lindex lang '-' with
+      [ Some i -> String.sub lang 0 i
+      | _ -> "" ]
+    in
+    try
+      do {
+        try
+          while True do {
+            let k =
+              find_key (input_line ic) where rec find_key line =
+                if String.length line < 4 then find_key (input_line ic)
+                else if String.sub line 0 4 <> "    " then
+                  find_key (input_line ic)
+                else line
+            in
+            let k = String.sub k 4 (String.length k - 4) in
+            let rec loop line =
+              match lindex line ':' with
+              [ Some i ->
+                  let line_lang = String.sub line 0 i in
+                  do {
+                    if line_lang = lang ||
+                       line_lang = derived_lang && not (Hashtbl.mem t k) then
+                      let v =
+                        if i + 1 = String.length line then ""
+                        else
+                          String.sub line (i + 2) (String.length line - i - 2)
+                      in
+                      Hashtbl.add t k v
+                    else ();
+                    loop (input_line ic)
+                  }
+              | None -> () ]
+            in
+            loop (input_line ic)
+          }
+        with
+        [ End_of_file -> () ];
+        close_in ic;
+        t
+      }
+    with e ->
+      do { close_in ic; raise e }
+  with
+  [ Sys_error _ -> t ]
 ;
