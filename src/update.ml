@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.39 2005-02-05 06:34:39 ddr Exp $ *)
+(* $Id: update.ml,v 4.40 2005-02-05 12:36:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -154,7 +154,7 @@ value print_first_name_strong conf base p =
 
 value print_src conf name field =
   tag "table" "border=\"1\"" begin
-    tag "tr" "align=\"left\"" begin
+    tag "tr" "align=\"%s\"" conf.left begin
       tag "td" begin
         Wserver.wprint "%s" (capitale (transl_nth conf "source/sources" 0));
       end;
@@ -561,7 +561,7 @@ value reconstitute_date conf var =
 value print_date conf base lab var d =
   do {
     tag "table" "border=\"1\"" begin
-      tag "tr" "align=\"left\"" begin
+      tag "tr" "align=\"%s\"" conf.left begin
         stag "td" begin Wserver.wprint "%s" lab; end;
         let d =
           match d with
@@ -598,7 +598,7 @@ value print_date conf base lab var d =
       end;
     end;
     tag "table" "border=\"1\"" begin
-      tag "tr" "align=\"left\"" begin
+      tag "tr" "align=\"%s\"" conf.left begin
         tag "td" begin
           Wserver.wprint "%s\n"
             (capitale (transl_nth conf "calendar/calendars" 0));

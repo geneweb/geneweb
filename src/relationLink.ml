@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.19 2004-12-31 03:59:53 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.20 2005-02-05 12:36:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -249,7 +249,7 @@ value rec print_both_branches conf base info pl1 pl2 =
       [ [(p2, _) :: pl2] -> (Some p2, pl2)
       | [] -> (None, []) ]
     in
-    tag "tr" "align=\"left\"" begin
+    tag "tr" "align=\"%s\"" conf.left begin
       stag "td" "align=\"center\"" begin
         match p1 with
         [ Some p1 -> Wserver.wprint "|"
@@ -263,7 +263,7 @@ value rec print_both_branches conf base info pl1 pl2 =
       end;
       Wserver.wprint "\n";
     end;
-    tag "tr" "align=\"left\"" begin
+    tag "tr" "align=\"%s\"" conf.left begin
       tag "td" "valign=\"top\" align=\"center\"" begin
         match p1 with
         [ Some p1 ->
@@ -542,22 +542,22 @@ value print_two_branches_with_table conf base info =
     "border=\"%d\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\""
     conf.border
   begin
-    tag "tr" "align=\"left\"" begin
+    tag "tr" "align=\"%s\"" "left" begin
       stag "td" "colspan=\"3\" align=\"center\"" begin
         print_someone_and_other_parent_if_same conf base info;
       end;
     end;
-    tag "tr" "align=\"left\"" begin
+    tag "tr" "align=\"%s\"" "left" begin
       stag "td" "colspan=\"3\" align=\"center\"" begin Wserver.wprint "|"; end;
     end;
-    tag "tr" "align=\"left\"" begin
-      stagn "td" "align=\"right\"" begin
+    tag "tr" "align=\"%s\"" "left" begin
+      stagn "td" "align=\"%s\" dir=\"ltr\"" conf.right begin
         xtag "hr" "style=\"width:50%%\"";
       end;
       stagn "td" begin
         xtag "hr";
       end;
-      stagn "td" "align=\"left\"" begin
+      stagn "td" "align=\"%s\" dir=\"ltr\"" conf.left begin
         xtag "hr" "style=\"width:50%%\"";
       end;
     end;
@@ -565,7 +565,7 @@ value print_two_branches_with_table conf base info =
     if not conf.cancel_links &&
        (info.pb1 <> None || info.nb1 <> None || info.pb2 <> None ||
         info.nb2 <> None) then
-      tag "tr" "align=\"left\"" begin
+      tag "tr" "align=\"%s\"" "left" begin
         tag "td" begin
           if info.pb1 <> None || info.nb1 <> None then do {
             html_br conf; print_prev_next_1 conf base info info.pb1 info.nb1

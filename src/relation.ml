@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.62 2005-01-20 14:20:37 ddr Exp $ *)
+(* $Id: relation.ml,v 4.63 2005-02-05 12:36:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -166,13 +166,13 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
       end;
       tag "table" "border=\"%d\" width=\"90%%\"" conf.border begin
         tag "tr" begin
-          tag "td" "align=\"right\"" begin
+          tag "td" "align=\"%s\"" conf.right begin
             tag "label" begin
               Wserver.wprint "%s\n" (capitale (transl conf "long display"));
               xtag "input" "type=\"checkbox\" name=\"long\" value=\"on\"";
             end;
           end;
-          tag "td" "align=\"right\"" begin
+          tag "td" "align=\"%s\"" conf.right begin
             tag "label" begin
               Wserver.wprint "%s\n"
                 (capitale (transl_nth conf "image/images" 1));
@@ -181,13 +181,13 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
           end;
         end;
         tag "tr" begin
-          tag "td" "align=\"right\"" begin
+          tag "td" "align=\"%s\"" conf.right begin
             tag "label" begin
               Wserver.wprint "%s\n" (capitale (transl conf "include spouses"));
               xtag "input" "type=\"checkbox\" name=\"spouse\" value=\"on\"";
             end;
           end;
-          tag "td" "align=\"right\"" begin
+          tag "td" "align=\"%s\"" conf.right begin
             tag "label" begin
               Wserver.wprint "%s\n"
                 (capitale (transl conf "cancel GeneWeb links"));
@@ -196,14 +196,14 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
           end;
         end;
         tag "tr" begin
-          tag "td" "align=\"right\"" begin
+          tag "td" "align=\"%s\"" conf.right begin
             tag "label" begin
               Wserver.wprint "%s\n" (capitale (transl conf "border"));
               xtag "input"
                 "name=\"bd\" size=\"1\" maxlength=\"2\" value=\"0\"";
             end;
           end;
-          tag "td" "align=\"right\"" begin
+          tag "td" "align=\"%s\"" conf.right begin
             Wserver.wprint "\
 <table><tr><td>%s</td>
 <td>
@@ -220,16 +220,16 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
           end;
         end;
         tag "tr" begin
-          tag "td" "align=\"right\"" begin
+          tag "td" "align=\"%s\"" conf.right begin
             Wserver.wprint "&nbsp;";
           end;
-          tag "td" "align=\"right\"" begin
+          tag "td" "align=\"%s\"" conf.right begin
             Wserver.wprint "&nbsp;";
           end;
         end;
-        tag "tr" "align=\"left\"" begin
+        tag "tr" "align=\"%s\"" conf.left begin
           tag "td" "align=\"center\" colspan=\"2\"" begin
-            Wserver.wprint "<table><tr align=\"left\"><td>\n";
+            Wserver.wprint "<table><tr align=\"%s\"><td>\n" conf.left;
             tag "label" begin
               xtag "input"
                 "type=\"radio\" name=\"et\" value=\"A\" checked=\"checked\"";
@@ -249,7 +249,7 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
             Wserver.wprint "</td></tr></table>\n";
           end;
         end;
-        tag "tr" "align=\"left\"" begin
+        tag "tr" "align=\"%s\"" conf.left begin
           tag "td" "align=\"center\" colspan=\"2\"" begin
             xtag "input" "type=\"submit\" value=\"Ok\"";
           end;
@@ -1542,7 +1542,7 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
       else do {
         tag "center" begin
           tag "table" "border=\"1\"" begin
-            tag "tr" "align=\"left\"" begin
+            tag "tr" "align=\"%s\"" conf.left begin
               tag "td" begin
                 RelationLink.print_relation_path conf base info;
               end;

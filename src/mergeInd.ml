@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.30 2004-12-30 11:05:07 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.31 2005-02-05 12:36:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -248,7 +248,7 @@ value propose_merge_ind conf base branches p1 p2 =
              let p1 = poi base ip1 in
              let p2 = poi base ip2 in
              do {
-               tag "tr" "align=\"left\"" begin
+               tag "tr" "align=\"%s\"" conf.left begin
                  tag "td" begin
                    Wserver.wprint "\n%s" (referenced_person_text conf base p1);
                    Wserver.wprint "%s" (Date.short_dates_text conf base p1);
