@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 4.4 2001-05-02 09:04:41 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.5 2001-07-07 19:17:03 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -187,7 +187,7 @@
 	%witness.title;%witness.dates;
       %end;
     )%end;
-    %if;are_divorced;, [divorced] %divorce_date;%end;
+    %if;are_divorced;, [divorced]0%divorce_date;%end;
     %if;are_separated;, [separated]0%end;
     %if;has_comment; (%comment;)%end;
     %if;has_children;
