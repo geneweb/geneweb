@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.80 2002-03-10 16:09:11 ddr Exp $
+# $Id: lexicon.txt,v 4.81 2002-03-15 12:43:28 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7562,6 +7562,7 @@ fr: utilisateur/mot de passe/annuler
 he:  משתמש / סיסמה / ביטול
 nl: gebruiker/wachtwoord/annuleren
 pl: u¿ytkownik/has³o/anuluj
+sv: anvהndare/passord/avbryt
 
     warnings
 af: waarskuwings
