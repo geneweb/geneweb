@@ -2,6 +2,8 @@ GeneWeb version 2.05
 --------------------
 
 * Setup program
+  - [Jul 3, 99] Added "af" as possible surnames particles (this is Danish)
+    possibly ignored in "search".
   - [Jul 2, 99] Fixed bug: importing GeneWeb base from old version passing
     by a GEDCOM file did not work if the current directory held spaces.
   - [Jul 2, 99] Changed names of html files to hold 8 characters maximum
