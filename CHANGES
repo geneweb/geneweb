@@ -27,6 +27,10 @@ GeneWeb version 2.06
     GeneWeb service has been redirected to some other address.
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [Aug 30, 99] Added option "-no_pit" (= no public if titles): do not
+    consider persons having titles as public.
+  - [Aug 29, 99] Fixed bug on access with pointers (between '@' in the
+    gedcom) resulting on bad errors detections.
   - [Aug 22, 99] The option "-no_efn" is now the default. Made the change
     in "setup" files too.
 

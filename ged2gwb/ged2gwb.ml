@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.28 1999-08-22 16:00:47 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.29 1999-08-30 11:33:07 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -33,6 +33,7 @@ value charset = ref Ascii;
 value try_negative_dates = ref False;
 value no_negative_dates = ref False;
 value month_number_dates = ref NoMonthNumberDates;
+value no_public_if_titles = ref False;
 value conc_spc = ref False;
 
 (* Reading input *)
@@ -523,7 +524,18 @@ value add_string gen s =
       return Adef.istr_of_int i ]
 ;        
 
+value extract_addr addr =
+  if String.length addr > 0 && addr.[0] = '@' then
+    try
+      let r = String.index_from addr 1 '@' in
+      String.sub addr 0 (r + 1)
+    with
+    [ Not_found -> addr ]
+  else addr
+;
+
 value per_index gen lab =
+  let lab = extract_addr lab in
   try Hashtbl.find gen.g_hper lab with
   [ Not_found ->
       let i = gen.g_per.tlen in
@@ -538,6 +550,7 @@ value per_index gen lab =
 ;
 
 value fam_index gen lab =
+  let lab = extract_addr lab in
   try Hashtbl.find gen.g_hfam lab with
   [ Not_found ->
       let i = gen.g_fam.tlen in
@@ -743,13 +756,14 @@ value extract_notes gen rl =
        List.fold_right
          (fun r lines ->
             if r.rlab = "NOTE" && r.rval <> "" && r.rval.[0] == '@' then
-              match find_notes_record gen r.rval with
+              let addr = extract_addr r.rval in
+              match find_notes_record gen addr with
               [ Some r ->
                   let l = List.map (fun r -> (r.rlab, r.rval)) r.rsons in
                   [("NOTE", r.rcont) :: l @ lines]
               | None ->
                   do print_location r.rpos;
-                     Printf.fprintf log_oc.val "Note %s not found\n" r.rval;
+                     Printf.fprintf log_oc.val "Note %s not found\n" addr;
                      flush log_oc.val;
                   return lines ]
             else [(r.rlab, r.rval) :: lines])
@@ -1181,7 +1195,10 @@ value add_indi gen r =
        if surname_alias <> "" then [add_string gen surname_alias] else [];
      titles = titles; rparents = rparents; rchildren = [];
      occupation = add_string gen occupation;
-     sex = sex; access = IfTitles; birth = birth;
+     sex = sex;
+     access =
+       if no_public_if_titles.val && titles <> [] then Private else IfTitles;
+     birth = birth;
      birth_place = add_string gen birth_place;
      birth_src = add_string gen birth_src; baptism = bapt;
      baptism_place = add_string gen bapt_place;
@@ -1942,13 +1959,17 @@ value speclist =
       );
    ("-no_epn", Arg.Clear extract_public_names,
     "\n       Cancels the previous option.");
+   ("-no_pit", Arg.Set no_public_if_titles,
+    " \
+- No public if titles -
+       Do not consider persons having titles as public");
    ("-tnd", Arg.Set try_negative_dates,
     "  \
 - Try negative dates -
        Set negative dates when inconsistency (e.g. birth after death)"
       );
    ("-no_nd", Arg.Set no_negative_dates,
-    "  \
+    " \
 - No negative dates -
        Don't interpret a year preceded by a minus sign as a negative year"
       );
