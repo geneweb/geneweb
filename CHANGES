@@ -2,7 +2,7 @@ GeneWeb Version 1.11
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [11/01/99] Display accusative form (for some languages). E.g.:
+  - [11/01/99] Display declined forms (for some languages). E.g.:
       * in German: "x ist ein Sohn von einem Cousin von y"
 	  ("einem" instead of the inkorrect "ein").
       * in Esperanto: "aldoni personon"

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 1.9 1998-12-19 12:36:11 roglo Exp $ *)
+(* $Id: util.mli,v 1.10 1999-01-11 15:05:33 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -60,7 +60,7 @@ value preciser_homonyme : config -> base -> base_person -> unit;
 
 value transl : config -> string -> string;
 value transl_nth : config -> string -> int -> string;
-value transl_concat : config -> string -> string -> string;
+value transl_decline : config -> string -> string -> string;
 value ftransl : config -> format 'a 'b 'c -> format 'a 'b 'c;
 value ftransl_nth : config -> format 'a 'b 'c -> int -> format 'a 'b 'c;
 value fcapitale : format 'a 'b 'c -> format 'a 'b 'c;

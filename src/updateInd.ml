@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.11 1999-01-11 14:36:02 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.12 1999-01-11 15:05:31 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -152,7 +152,7 @@ value gen_print_ext_items conf base item i_proj =
   in ()
 ;
 
-value cons_insert conf name = capitale (transl_concat conf "insert" name);
+value cons_insert conf name = capitale (transl_decline conf "insert" name);
 
 value print_nick_names conf base p =
   gen_print_ext_items conf base
@@ -326,7 +326,7 @@ value print_add_title conf base cnt =
          tag "td" begin
            let s = transl_nth conf "title/titles" 0 in
            Wserver.wprint "%s <input type=checkbox name=add_title%d>"
-             (capitale (transl_concat conf "insert" s)) cnt;
+             (capitale (transl_decline conf "insert" s)) cnt;
          end;
        end;
      end;
@@ -611,11 +611,11 @@ value print_mod1 conf base p digest =
     match p_getenv conf.env "m" with
     [ Some "MRG_MOD_IND_OK" ->
         let s = transl_nth conf "person/persons" 1 in
-        Wserver.wprint "%s # %d" (capitale (transl_concat conf "merge" s))
+        Wserver.wprint "%s # %d" (capitale (transl_decline conf "merge" s))
           (Adef.int_of_iper p.cle_index)
     | _ ->
         let s = transl_nth conf "person/persons" 0 in
-        Wserver.wprint "%s # %d" (capitale (transl_concat conf "modify" s))
+        Wserver.wprint "%s # %d" (capitale (transl_decline conf "modify" s))
           (Adef.int_of_iper p.cle_index) ]
   in
   do header conf title;
@@ -641,7 +641,7 @@ value print_mod1 conf base p digest =
 value print_add1 conf base p =
   let title _ =
     let s = transl_nth conf "person/persons" 0 in
-    Wserver.wprint "%s" (capitale (transl_concat conf "add" s))
+    Wserver.wprint "%s" (capitale (transl_decline conf "add" s))
   in
   do header conf title;
      Wserver.wprint "\n";
@@ -660,7 +660,7 @@ value print_add1 conf base p =
 value print_del1 conf base p =
   let title _ =
     let s= transl_nth conf "person/persons" 0 in
-    Wserver.wprint "%s" (capitale (transl_concat conf "delete" s))
+    Wserver.wprint "%s" (capitale (transl_decline conf "delete" s))
   in
   do header conf title;
      Wserver.wprint "\n";

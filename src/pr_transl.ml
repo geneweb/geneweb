@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 1.1.1.1 1998-09-01 14:32:12 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 1.2 1999-01-11 15:05:28 ddr Exp $ *)
 
 open MLast;
 
@@ -13,7 +13,7 @@ value not_impl name x =
 ;
 
 value trace =
-  ["transl"; "transl_nth"; "transl_concat"; "ftransl"; "ftransl_nth"]
+  ["transl"; "transl_nth"; "transl_decline"; "ftransl"; "ftransl_nth"]
 ;
 
 value rec expr e =
@@ -43,6 +43,7 @@ value rec expr e =
   | <:expr< for $_$ = $_$ $to:_$ $_$ do $list:el$ done >> ->
       List.iter expr el
   | <:expr< while $_$ do $list:el$ done >> -> List.iter expr el
+  | <:expr< let module $m$ = $me$ in $e$ >> -> expr e
   | <:expr< ($list:el$) >> -> List.iter expr el
   | <:expr< ($e$:$_$) >> -> expr e
   | <:expr< [| $list:el$ |] >> -> List.iter expr el

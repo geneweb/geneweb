@@ -10,9 +10,9 @@ nl: iso-8859-1
 pt: iso-8859-1
 se: iso-8859-1
 
-     +acc
-de: ein=einem
+     +decl
 eo: =+n
+de: ein=einem
 
      to see the first branch
 de: , um den ersten zu sehen
@@ -441,7 +441,7 @@ se: tilltr&auml;de
     add
 de: hinzuf&uuml;gen
 en: add
-eo: aldoni +acc
+eo: aldoni +decl
 es: agregar
 fr: ajouter
 it: aggiungere
@@ -976,7 +976,7 @@ se: &aring;lder:
     delete
 de: l&ouml;schen
 en: delete
-eo: malkonstrui +acc
+eo: malkonstrui +decl
 es: borrar
 fr: supprimer
 it: cancellare
@@ -1429,7 +1429,7 @@ se: f&ouml;rteckning &ouml;ver gem&aring;lerna (icke &auml;ttlingar)
     insert
 de: einf&uuml;gen
 en: insert
-eo: inseri +acc
+eo: inseri +decl
 es: insertar
 fr: ins&eacute;rer
 nl: invoegen
@@ -1617,7 +1617,7 @@ se: kanske
     merge
 de: zusammenf&uuml;hren
 en: merge
-eo: fuzii +acc
+eo: fuzii +decl
 es: fusionar
 fr: fusionner
 nl: samenvoegen
@@ -1645,7 +1645,7 @@ se: stamf&auml;der som fattas
     modify
 de: &auml;ndern
 en: modify
-eo: modifi +acc
+eo: modifi +decl
 es: modificar
 fr: modifier
 it: modificare
@@ -1870,7 +1870,7 @@ pt: ocupaç&atilde;o
 se: yrke
 
     of
-de: von +acc
+de: von +decl
 en: of
 eo: de
 es: de

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 1.6 1999-01-11 14:35:54 ddr Exp $ *)
+(* $Id: birthday.ml,v 1.7 1999-01-11 15:05:23 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -170,7 +170,7 @@ value afficher_liste_anniversaires conf base dead_people a_ref liste =
                       Wserver.wprint "%s"
                         (transl conf "of the disappearance") ];
                   Wserver.wprint "</em>\n";
-                  Wserver.wprint "%s " (transl_concat conf "of" "");
+                  Wserver.wprint "%s " (transl_decline conf "of" "");
                   afficher_personne_titre_referencee conf base p;
                   Wserver.wprint "\n<em>%s %d" (transl conf "in (year)") a;
                   Wserver.wprint " (";
@@ -215,7 +215,7 @@ value print_birth_day conf base day_name verb wd d m y list =
            (capitale day_name) (transl_nth conf "(week day)" wd)
            (Date.string_of_date conf dt) verb
            (transl conf "the birthday")
-           (transl_concat conf "of" "");
+           (transl_decline conf "of" "");
          afficher_liste_anniversaires conf base False y list;
       return () ]
 ;
@@ -412,7 +412,7 @@ value print_marriage_day conf base day_name verb wd d m y list =
            (capitale day_name) (transl_nth conf "(week day)" wd)
            (Date.string_of_date conf dt) verb
            (transl conf "the anniversary of marriage")
-           (transl_concat conf "of" "");
+           (transl_decline conf "of" "");
          print_anniversaries_of_marriage conf base y list;
       return () ]
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.11 1999-01-11 14:35:53 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.12 1999-01-11 15:05:21 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -118,10 +118,10 @@ value afficher_menu_ascendants conf base p =
   let title h =
     if h then
       Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-        (transl_concat conf "of" (person_text_no_html conf base p))
+        (transl_decline conf "of" (person_text_no_html conf base p))
     else
       Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-        (transl_concat conf "of" (person_text conf base p))
+        (transl_decline conf "of" (person_text conf base p))
   in
   do header conf title;
      print_choice conf base p niveau_effectif;
@@ -183,10 +183,10 @@ value afficher_ascendants_jusqu_a conf base niveau_max p =
   let title h =
     if h then
       Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-        (transl_concat conf "of" (person_text_no_html conf base p))
+        (transl_decline conf "of" (person_text_no_html conf base p))
     else
       Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-        (transl_concat conf "of" (person_text conf base p))
+        (transl_decline conf "of" (person_text conf base p))
   in
   do header conf title;
      tag "nobr" begin
@@ -292,10 +292,10 @@ value afficher_ascendants_numerotation conf base niveau_max p =
   let title h =
     if h then
       Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-        (transl_concat conf "of" (person_text_no_html conf base p))
+        (transl_decline conf "of" (person_text_no_html conf base p))
     else
       Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-        (transl_concat conf "of" (person_text conf base p))
+        (transl_decline conf "of" (person_text conf base p))
   in
   do header conf title;
      Wserver.wprint "%s.\n" (capitale (text_to conf niveau_max));
@@ -362,7 +362,7 @@ value print_ancestors_same_time_descendants conf base p a =
         (transl conf "up to")
     else
       Wserver.wprint "%s %s %s %s" (capitale (transl conf "ancestors"))
-        (transl_concat conf "of" (person_text conf base p))
+        (transl_decline conf "of" (person_text conf base p))
         (transl conf "up to") (person_text conf base a)
   in
   do header conf title;
@@ -400,7 +400,7 @@ value afficher_ascendants_niveau conf base niveau_max p =
         (transl conf "generation")
     else
       Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
-        (transl_concat conf "of" (person_text conf base p))
+        (transl_decline conf "of" (person_text conf base p))
   in
   do header conf title;
      tag "nobr" begin
@@ -446,7 +446,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
                     (capitale
                        (transl_nth conf "husband/wife" parent_name_index));
                 end;
-                Wserver.wprint " %s\n" (transl_concat conf "of" "");
+                Wserver.wprint " %s\n" (transl_decline conf "of" "");
                 afficher_personne_titre conf base (poi base conj);
                 Date.afficher_dates_courtes conf base (poi base conj);
              return ()
@@ -471,7 +471,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
            Wserver.wprint " -\n";
            if sp_incl then
              Wserver.wprint "%s %s" (capitale (transl conf "parents"))
-               (transl_concat conf "of" "")
+               (transl_decline conf "of" "")
            else ();
            afficher_personne_titre_referencee conf base p;
            Date.afficher_dates_courtes conf base p;
@@ -551,10 +551,10 @@ value print_missing_ancestors conf base v spouses_included p =
   let title h =
     if h then
       Wserver.wprint "%s %s" (capitale (transl conf "missing ancestors"))
-        (transl_concat conf "of" (person_text_no_html conf base p))
+        (transl_decline conf "of" (person_text_no_html conf base p))
     else
       Wserver.wprint "%s %s" (capitale (transl conf "missing ancestors"))
-        (transl_concat conf "of" (person_text conf base p))
+        (transl_decline conf "of" (person_text conf base p))
   in
   do header conf title;
      Wserver.wprint "%s" (capitale (text_to conf v));
@@ -567,7 +567,7 @@ value print_missing_ancestors conf base v spouses_included p =
      Wserver.wprint ".\n";
      if not spouses_included then
        Wserver.wprint "<br>\n%s %s:\n" (capitale (transl conf "parents"))
-         (transl_concat conf "of" "")
+         (transl_decline conf "of" "")
      else ();  
      mark.(Adef.int_of_iper p.cle_index) := Num.one;
      tag "ul" begin
@@ -656,12 +656,12 @@ value print_missing_type conf =
   | A_surname_of_husband_of x ->
       Wserver.wprint "%s %s %s %s"
         (transl_nth conf "surname/surnames" 0)
-        (transl_concat conf "of" "")
+        (transl_decline conf "of" "")
         (transl_nth conf "his wife/her husband" 1) x
   | A_surname_of_wife_of x ->
       Wserver.wprint "%s %s %s %s"
         (transl_nth conf "surname/surnames" 0)
-        (transl_concat conf "of" "")
+        (transl_decline conf "of" "")
         (transl_nth conf "his wife/her husband" 0) x
   | A_husband_of ->
       Wserver.wprint "%s" (transl_nth conf "husband/wife" 0) 
@@ -750,10 +750,10 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
   let title h =
     if h then
       Wserver.wprint "%s %s" (capitale (transl conf "missing ancestors"))
-        (transl_concat conf "of" (person_text_no_html conf base p))
+        (transl_decline conf "of" (person_text_no_html conf base p))
     else
       Wserver.wprint "%s %s" (capitale (transl conf "missing ancestors"))
-        (transl_concat conf "of" (person_text conf base p))
+        (transl_decline conf "of" (person_text conf base p))
   in
   let after = p_getint conf.env "after" in
   let before = p_getint conf.env "before" in
@@ -840,7 +840,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
         Wserver.wprint ".\n";
         if not spouses_included then
           Wserver.wprint "<br>\n%s %s:\n" (capitale (transl conf "parents"))
-            (transl_concat conf "of" "")
+            (transl_decline conf "of" "")
         else ();  
         tag "ul" begin
           let _ = List.fold_left

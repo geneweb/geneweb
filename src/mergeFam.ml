@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 1.4 1999-01-11 14:35:55 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 1.5 1999-01-11 15:05:26 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -66,7 +66,7 @@ value print_differences conf base branches fam1 fam2 =
 value merge_fam1 conf base fam1 fam2 =
   let title h =
     let s = transl_nth conf "family/families" 1 in
-    Wserver.wprint "%s" (capitale (transl_concat conf "merge" s))
+    Wserver.wprint "%s" (capitale (transl_decline conf "merge" s))
   in
   do header conf title;
      print_differences conf base [] fam1 fam2;
