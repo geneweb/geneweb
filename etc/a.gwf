@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.25 2001-01-25 13:35:14 ddr Exp $
+# $Id: a.gwf,v 3.26 2001-01-30 10:33:40 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -93,7 +93,7 @@ propose_add_family=yes
 max_anc_level=8
 
 # Maximum level when displaying ancestors by tree
-max_anc_tree=5
+max_anc_tree=6
 
 # Maximum_level when displaying descendants
 max_desc_level=12
