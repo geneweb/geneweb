@@ -16,6 +16,10 @@ GeneWeb version 4.10
   - [19 Mar 03] Added a variable "moved" to indicate that the database
     has been moved. This displays the new template file "moved.txt".
 
+* Setup program (gwsetup)
+  - [12 Nov 03] Fixed bug: the links to the documentation did not work
+    with modern browsers.
+
 * GeneWeb uncompiler (gwu)
   - [12 Feb 03] Fixed bug: exporting bad format when places containing
     just spaces.
