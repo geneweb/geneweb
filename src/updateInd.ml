@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.6 1999-04-15 01:10:45 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.7 1999-04-19 06:48:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -133,7 +133,7 @@ value gen_print_ext_item conf base item i_cnt i_val =
     end;
     tag "td" begin Wserver.wprint "%s" (capitale item.i_txt_add); end;
     tag "td" begin
-      Wserver.wprint "<input type=checkbox name=\"add_%s%d\">"
+      Wserver.wprint "<input type=checkbox name=\"add_%s%d\" value=on>"
         item.i_name i_cnt;
     end;
   end
@@ -337,7 +337,7 @@ value print_add_title conf base cnt =
        tag "tr" begin
          tag "td" begin
            let s = transl_nth conf "title/titles" 0 in
-           Wserver.wprint "%s <input type=checkbox name=add_title%d>"
+           Wserver.wprint "%s <input type=checkbox name=add_title%d value=on>"
              (capitale (transl_decline conf "insert" s)) cnt;
          end;
        end;
@@ -392,7 +392,8 @@ value print_title conf base t cnt =
               | _ -> "" ]);
          end;
          tag "td" begin
-           Wserver.wprint "%s <input type=checkbox name=t_main_title%d%s>"
+           Wserver.wprint
+             "%s <input type=checkbox name=t_main_title%d%s value=on>"
              (capitale (transl conf "main title")) cnt
              (match t with
               [ Some {t_name = Tmain} -> " checked"

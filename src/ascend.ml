@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.9 1999-04-18 22:30:08 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.10 1999-04-19 06:48:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -84,7 +84,8 @@ value print_choice conf base p niveau_effectif =
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=N checked> %s\n"
         (capitale (transl conf "Sosa numbers"));
-      Wserver.wprint "<ul><li>%s <input type=checkbox name=long></ul>\n"
+      Wserver.wprint
+        "<ul><li>%s <input type=checkbox name=long value=on></ul>\n"
         (capitale (transl conf "long display"));
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=L> %s%t\n"
@@ -365,9 +366,9 @@ value title_reference conf base t =
   let ident = sou base t.t_ident in
   let place = sou base t.t_place in
   let s = if place = "" then ident else ident ^ " " ^ place in
-  "<a href=\"" ^ commd conf ^ "m=TT;sm=S;t=" ^
-  code_varenv ident ^ ";p=" ^ code_varenv place ^ "\"><em>" ^
-  coa conf s ^ "</em></a>"
+  "<em><a href=\"" ^ commd conf ^ "m=TT;sm=S;t=" ^
+  code_varenv ident ^ ";p=" ^ code_varenv place ^ "\">" ^
+  coa conf s ^ "</a></em>"
 ;
 
 value strong_referenced_person_title_text conf base p =
