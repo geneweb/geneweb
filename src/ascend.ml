@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.43 2004-12-28 02:54:15 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.44 2004-12-28 10:13:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -172,18 +172,20 @@ value print_choice conf base p effective_level =
             "<input name=\"before\" size=\"5\" maxlength=\"5\"><br>\n";
         end;
       end;
-      tag "tr" "align=left" begin
+      tag "tr" begin
         tag "td" "colspan=\"2\" align=\"center\"" begin
           Wserver.wprint "%s\n"
             (capitale (transl conf "cancel GeneWeb links"));
-          Wserver.wprint "<input type=\"checkbox\" name=\"cgl\" value=\"on\">\n";
+          Wserver.wprint
+            "<input type=\"checkbox\" name=\"cgl\" value=\"on\">\n";
         end;
       end;
-      tag "tr" "align=left" begin
+      tag "tr" begin
         tag "td" "colspan=2 align=\"center\"" begin
           Wserver.wprint "(*) %s\n"
             (capitale (transl conf "only the generation selected"));
-          Wserver.wprint "<input type=\"checkbox\" name=\"only\" value=\"on\">\n";
+          Wserver.wprint
+            "<input type=\"checkbox\" name=\"only\" value=\"on\">\n";
         end;
       end;
     end;
@@ -1716,18 +1718,19 @@ value print_tree_with_table conf base gv p =
   let colspan =
     fun
     [ Empty | Cell _ _ _ 1 -> ""
-    | Cell _ _ _ s -> " colspan=" ^ string_of_int s ]
+    | Cell _ _ _ s -> " colspan=\"" ^ string_of_int s ^ "\"" ]
   in
   let align =
     fun
-    [ Cell _ Center _ _ | Cell _ Alone _ _ -> "align=center"
-    | Cell _ Left _ _ -> "align=right"
+    [ Cell _ Center _ _ | Cell _ Alone _ _ -> "align=\"center\""
+    | Cell _ Left _ _ -> "align=\"right\""
+    | Cell _ Right _ _ -> "align=\"left\""
     | _ -> "" ]
   in
   let print_ancestor_link gen first po =
     do {
       if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
-      stag "td" "align=center%s" (colspan po) begin
+      stag "td" "align=\"center\"%s" (colspan po) begin
         let txt =
           match po with
           [ Empty -> "&nbsp;"
@@ -1741,7 +1744,7 @@ value print_tree_with_table conf base gv p =
   let print_ancestor gen first po =
     do {
       if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
-      stag "td" "align=center%s" (colspan po) begin
+      stag "td" "align=\"center\"%s" (colspan po) begin
         let txt =
           match po with
           [ Empty -> "&nbsp;"
@@ -1767,7 +1770,7 @@ value print_tree_with_table conf base gv p =
   let print_vertical_bars gen first po =
     do {
       if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
-      stag "td" "align=center%s" (colspan po) begin
+      stag "td" "align=\"center\"%s" (colspan po) begin
         let txt =
           match po with
           [ Empty | Cell _ _ False _ -> "&nbsp;"
@@ -1796,8 +1799,7 @@ value print_tree_with_table conf base gv p =
         let txt =
           match po with
           [ Empty -> "&nbsp;"
-          | Cell _ Left _ _ -> "<hr style=\"margin-left:50%\">"
-          | Cell _ Right _ _ -> "<hr style=\"margin-right:50%\">"
+          | Cell _ (Left | Right) _ _ -> "<hr style=\"width:50%\">"
           | Cell _ Alone _ _ -> "|"
           | Cell _ Center _ _ -> "<hr noshade size=\"1\">" ]
         in
@@ -1806,19 +1808,20 @@ value print_tree_with_table conf base gv p =
       Wserver.wprint "\n"
     }
   in
-  tag "table" "border=%d cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\""
+  tag "table"
+    "border=\"%d\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\""
     conf.border
   begin
     list_iter_first
       (fun firstline gen ->
          do {
            if not firstline then
-             tag "tr" "align=left" begin
+             tag "tr" begin
                list_iter_first
                  (fun first po -> print_vertical_bars gen first po) gen;
              end
            else ();
-           tag "tr" "align=left" begin
+           tag "tr" begin
              list_iter_first (fun first po -> print_ancestor gen first po)
                gen;
            end;
@@ -1826,11 +1829,11 @@ value print_tree_with_table conf base gv p =
            [ [Cell _ Center _ _ :: _] -> ()
            | _ ->
                do {
-                 tag "tr" "align=left" begin
+                 tag "tr" begin
                    list_iter_first
                      (fun first po -> print_ancestor_link gen first po) gen;
                  end;
-                 tag "tr" "align=left" begin
+                 tag "tr" begin
                    list_iter_first
                      (fun first po -> print_horizontal_line gen first po) gen;
                  end

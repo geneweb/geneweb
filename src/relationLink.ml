@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.16 2004-12-28 03:59:18 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.17 2004-12-28 10:13:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -551,18 +551,15 @@ value print_two_branches_with_table conf base info =
       stag "td" "colspan=\"3\" align=\"center\"" begin Wserver.wprint "|"; end;
     end;
     tag "tr" "align=\"left\"" begin
-      stag "td" "align=\"right\"" begin
-        Wserver.wprint "<hr style=\"margin-left:50%%\"%s>" xhs;
+      stagn "td" "align=\"right\"" begin
+        Wserver.wprint "<hr style=\"width:50%%\"%s>" xhs;
       end;
-      Wserver.wprint "\n";
-      stag "td" begin
+      stagn "td" begin
         Wserver.wprint "<hr%s>" xhs;
       end;
-      Wserver.wprint "\n";
-      stag "td" "align=\"left\"" begin
-        Wserver.wprint "<hr style=\"margin-right:50%%\"%s>" xhs;
+      stagn "td" "align=\"left\"" begin
+        Wserver.wprint "<hr style=\"width:50%%\"%s>" xhs;
       end;
-      Wserver.wprint "\n";
     end;
     print_both_branches conf base info info.b1 info.b2;
     if not conf.cancel_links &&
