@@ -8,6 +8,7 @@
 <td><a href="%glang=fr"><img src="%gm=IM;v=l-fr.gif" alt=fr></a></td>
 <td><a href="%glang=it"><img src="%gm=IM;v=l-it.gif" alt=it></a></td>
 <td><a href="%glang=nl"><img src="%gm=IM;v=l-nl.gif" alt=nl></a></td>
+<td><a href="%glang=pt"><img src="%gm=IM;v=l-pt.gif" alt=pt></a></td>
 <td><a href="%glang=se"><img src="%gm=IM;v=l-se.gif" alt=se></a></td>
 </tr>
 <tr>
@@ -19,6 +20,7 @@
 <td align=center><a href="%glang=fr"><font size=-1>fr</font></a></td>
 <td align=center><a href="%glang=it"><font size=-1>it</font></a></td>
 <td align=center><a href="%glang=nl"><font size=-1>nl</font></a></td>
+<td align=center><a href="%glang=pt"><font size=-1>pt</font></a></td>
 <td align=center><a href="%glang=se"><font size=-1>se</font></a></td>
 </tr>
 </table>
