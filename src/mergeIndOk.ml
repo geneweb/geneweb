@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 3.3 2000-01-10 02:14:40 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 3.4 2000-06-01 22:25:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -20,6 +20,10 @@ value cat_strings base is1 sep is2 =
   if n1 = "" then n2
   else if n2 = "" then n1
   else n1 ^ sep ^ n2
+;
+
+value merge_strings base is1 sep is2 =
+  if is1 = is2 then sou base is1 else cat_strings base is1 sep is2
 ;
 
 value sorp base ip =
@@ -68,20 +72,20 @@ value reconstitute conf base p1 p2 =
    access = field "access" (fun p -> p.access) (\= IfTitles);
    birth = field "birth" (fun p -> p.birth) (\= Adef.codate_None);
    birth_place = field "birth_place" (fun p -> sou base p.birth_place) (\= "");
-   birth_src = cat_strings base p1.birth_src ", " p2.birth_src;
+   birth_src = merge_strings base p1.birth_src ", " p2.birth_src;
    baptism = field "baptism" (fun p -> p.baptism) (\= Adef.codate_None);
    baptism_place =
      field "baptism_place" (fun p -> sou base p.baptism_place) (\= "");
-   baptism_src = cat_strings base p1.baptism_src ", " p2.baptism_src;
+   baptism_src = merge_strings base p1.baptism_src ", " p2.baptism_src;
    death = field "death" (fun p -> p.death) (\= DontKnowIfDead);
    death_place = field "death_place" (fun p -> sou base p.death_place) (\= "");
-   death_src = cat_strings base p1.death_src ", " p2.death_src;
+   death_src = merge_strings base p1.death_src ", " p2.death_src;
    burial = field "burial" (fun p -> p.burial) (\= UnknownBurial);
    burial_place =
      field "burial_place" (fun p -> sou base p.burial_place) (\= "");
-   burial_src = cat_strings base p1.burial_src ", " p2.burial_src;
+   burial_src = merge_strings base p1.burial_src ", " p2.burial_src;
    notes = cat_strings base p1.notes "<br>\n" p2.notes;
-   psources = cat_strings base p1.psources ", " p2.psources;
+   psources = merge_strings base p1.psources ", " p2.psources;
    cle_index = p1.cle_index}
 ;
 
@@ -158,26 +162,11 @@ value effective_mod_merge conf base sp =
   [ Some i2 ->
       let p2 = base.data.persons.get i2 in
       let u2 = base.data.unions.get i2 in
-      let a1 = aoi base sp.cle_index in
-      let a2 = aoi base p2.cle_index in
-      do match (a1.parents, a2.parents) with
-         [ (None, Some ifam) ->
-             let des = doi base ifam in
-             do replace 0 where rec replace i =
-                  if des.children.(i) = p2.cle_index then
-                    des.children.(i) := sp.cle_index
-                  else replace (i + 1);
-                a1.parents := Some ifam;
-                a1.consang := Adef.fix (-1);
-                base.func.patch_ascend sp.cle_index a1;
-                base.func.patch_descend ifam des;
-             return ()
-         | _ -> () ];
-      return
       let rel_chil = p2.related in
       let p2_family = u2.family in
       let p2_sexe = p2.sex in
-      do UpdateIndOk.effective_del conf base p2;
+      do MergeInd.reparent_ind base sp p2;
+         UpdateIndOk.effective_del conf base p2;
          base.func.patch_person p2.cle_index p2;
          u2.family := [| |];
          base.func.patch_union p2.cle_index u2;

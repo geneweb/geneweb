@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 3.6 2000-03-08 14:35:31 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.7 2000-06-01 22:25:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -128,7 +128,94 @@ value print_differences conf base branches p1 p2 =
   end
 ;
 
-value merge_ind conf base branches p1 p2 =
+value compatible_codates cd1 cd2 =
+  cd1 = cd2 || cd2 = Adef.codate_None
+;
+
+value compatible_cdates cd1 cd2 =
+  cd1 = cd2
+;
+
+value compatible_death_reasons dr1 dr2 =
+  dr1 = dr2 || dr2 = Unspecified
+;
+
+value compatible_deaths d1 d2 =
+  if d1 = d2 then True
+  else
+    match (d1, d2) with
+    [ (_, NotDead) -> False
+    | (Death dr1 cd1, Death dr2 cd2) ->
+        compatible_death_reasons dr1 dr2 && compatible_cdates cd1 cd2
+    | _ -> True ]
+;
+
+value compatible_burials b1 b2 =
+  if b1 = b2 then True
+  else
+    match (b1, b2) with
+    [ (_, UnknownBurial) -> True
+    | (Buried cd1, Buried cd2) -> compatible_codates cd1 cd2
+    | (Cremated cd1, Cremated cd2) -> compatible_codates cd1 cd2
+    | _ -> False ]
+;
+
+value compatible_strings s1 s2 =
+  s1 = s2 || s2 = Adef.istr_of_int 0
+;
+
+value compatible_divorces d1 d2 =
+  d1 = d2
+;
+
+value compatible_relation_kinds rk1 rk2 =
+  rk1 = rk2
+;
+
+value compatible_accesses a1 a2 =
+  a1 = a2
+;
+
+value compatible_titles t1 t2 =
+  t1 = t2 || t2 = []
+;
+
+value compatible_strings_lists sl1 sl2 =
+  sl2 = [] || sl1 = sl2
+;
+
+value compatible_ind base p1 p2 =
+  p1.first_name = p2.first_name && p1.surname = p2.surname &&
+  compatible_strings p1.image p2.image &&
+  compatible_strings p1.public_name p2.public_name &&
+  compatible_strings_lists p1.nick_names p2.nick_names &&
+  compatible_strings_lists p1.aliases p2.aliases &&
+  compatible_strings_lists p1.first_names_aliases p2.first_names_aliases &&
+  compatible_strings_lists p1.surnames_aliases p2.surnames_aliases &&
+  compatible_titles p1.titles p2.titles &&
+  p2.rparents = [] &&
+  p2.related = [] &&
+  compatible_strings p1.occupation p2.occupation &&
+  compatible_accesses p1.access p2.access &&
+  compatible_codates p1.birth p2.birth &&
+  compatible_strings p1.birth_place p2.birth_place &&
+  compatible_codates p1.baptism p2.baptism &&
+  compatible_strings p1.baptism_place p2.baptism_place &&
+  compatible_deaths p1.death p2.death &&
+  compatible_strings p1.death_place p2.death_place &&
+  compatible_burials p1.burial p2.burial &&
+  compatible_strings p1.burial_place p2.burial_place
+;
+
+value compatible_fam base fam1 fam2 =
+  compatible_codates fam1.marriage fam2.marriage &&
+  compatible_strings fam1.marriage_place fam2.marriage_place &&
+  Array.length fam2.witnesses = 0 &&
+  compatible_relation_kinds fam1.relation fam2.relation &&
+  compatible_divorces fam1.divorce fam2.divorce
+;
+
+value propose_merge_ind conf base branches p1 p2 =
   let title h =
     let s = transl_nth conf "person/persons" 1 in
     Wserver.wprint "%s" (capitale (transl_decline conf "merge" s))
@@ -175,7 +262,7 @@ value merge_ind conf base branches p1 p2 =
                       end;
                     end;
                  return ())
-              branches;
+              [(p1.cle_index, p2.cle_index) :: branches];
           end;
        return ()
      else ();
@@ -183,7 +270,66 @@ value merge_ind conf base branches p1 p2 =
   return ()
 ;
 
-value merge_fam_first conf base branches fam1 fam2 p1 p2 =
+value reparent_ind base p1 p2 =
+  let a1 = aoi base p1.cle_index in
+  let a2 = aoi base p2.cle_index in
+  match (a1.parents, a2.parents) with
+  [ (None, Some ifam) ->
+     let des = doi base ifam in
+     do replace 0 where rec replace i =
+           if des.children.(i) = p2.cle_index then
+             des.children.(i) := p1.cle_index
+           else replace (i + 1);
+         a1.parents := Some ifam;
+         a1.consang := Adef.fix (-1);
+         base.func.patch_ascend p1.cle_index a1;
+         base.func.patch_descend ifam des;
+      return ()
+  | _ -> () ]
+;
+
+value effective_merge_ind conf base p1 p2 =
+(*
+do Printf.eprintf "merging %s and %s\n" (Gutil.denomination base p1) (Gutil.denomination base p2); flush stderr; return
+*)
+  do reparent_ind base p1 p2;
+     let u2 = uoi base p2.cle_index in
+     if Array.length u2.family <> 0 then
+       do for i = 0 to Array.length u2.family - 1 do
+            let ifam = u2.family.(i) in
+            let cpl = coi base ifam in
+            do match p2.sex with
+               [ Male -> cpl.father := p1.cle_index
+               | Female -> cpl.mother := p1.cle_index
+               | Neuter -> assert False ];
+               base.func.patch_couple ifam cpl;
+            return ();
+          done;
+          let u1 = uoi base p1.cle_index in
+          do u1.family := Array.append u1.family u2.family;
+             base.func.patch_union p1.cle_index u1;
+             u2.family := [| |];
+             base.func.patch_union p2.cle_index u2;
+          return ();
+       return ()
+     else ();
+     UpdateIndOk.effective_del conf base p2;
+     base.func.patch_person p2.cle_index p2;
+  return ()
+;
+
+value merge_ind conf base branches ip1 ip2 changes_done =
+  let p1 = poi base ip1 in
+  let p2 = poi base ip2 in
+  if compatible_ind base p1 p2 then
+    do effective_merge_ind conf base p1 p2; return
+    (True, True)
+  else
+    do propose_merge_ind conf base branches p1 p2; return
+    (False, changes_done)
+;
+
+value propose_merge_fam conf base branches fam1 fam2 p1 p2 =
   let title h =
     let s = transl_nth conf "family/families" 1 in
     Wserver.wprint "%s" (capitale (transl_decline conf "merge" s))
@@ -206,6 +352,40 @@ value merge_fam_first conf base branches fam1 fam2 p1 p2 =
      MergeFam.print_differences conf base branches fam1 fam2;
      trailer conf;
   return ()
+;
+
+value effective_merge_fam conf base fam1 fam2 p1 p2 =
+(*
+do Printf.eprintf "merging families %s and %s\n" (Gutil.denomination base p1) (Gutil.denomination base p2); flush stderr; return
+*)
+  let des1 = doi base fam1.fam_index in
+  let des2 = doi base fam2.fam_index in
+  do des1.children := Array.append des1.children des2.children;
+     base.func.patch_descend fam1.fam_index des1;
+     for i = 0 to Array.length des2.children - 1 do
+       let ip = des2.children.(i) in
+       let a = aoi base ip in
+       do a.parents := Some fam1.fam_index;
+          base.func.patch_ascend ip a; 
+       return ();
+     done;
+     des2.children := [| |];
+     base.func.patch_descend fam2.fam_index des2;
+     UpdateFamOk.effective_del conf base fam2;
+  return ()
+;
+
+value merge_fam conf base branches ifam1 ifam2 ip1 ip2 changes_done =
+  let p1 = poi base ip1 in
+  let p2 = poi base ip2 in
+  let fam1 = foi base ifam1 in
+  let fam2 = foi base ifam2 in
+  if compatible_fam base fam1 fam2 then
+    do effective_merge_fam conf base fam1 fam2 p1 p2; return
+    (True, True)
+  else
+    do propose_merge_fam conf base branches fam1 fam2 p1 p2; return
+    (False, changes_done)
 ;
 
 value not_found_or_incorrect conf =
@@ -237,23 +417,53 @@ value different_sexes conf =
   return ()
 ;
 
-value rec propose_ancestors_merge conf base branches ip1 ip2 =
+value rec try_merge conf base branches ip1 ip2 changes_done =
   let a1 = aoi base ip1 in
   let a2 = aoi base ip2 in
-  let branches = [(ip1, ip2) :: branches] in
-  match (a1.parents, a2.parents) with
-  [ (Some ifam1, Some ifam2) when ifam1 <> ifam2 ->
-      let cpl1 = coi base ifam1 in
-      let cpl2 = coi base ifam2 in
-      if cpl1.father <> cpl2.father then
-        propose_ancestors_merge conf base branches cpl1.father cpl2.father
-      else if cpl1.mother <> cpl2.mother then
-        propose_ancestors_merge conf base branches cpl1.mother cpl2.mother
-      else
-        merge_fam_first conf base branches (foi base ifam1) (foi base ifam2)
-          (poi base cpl1.father) (poi base cpl1.mother)
-  | _ ->
-      merge_ind conf base branches (poi base ip1) (poi base ip2) ]
+  let ok_so_far = True in
+  let (ok_so_far, changes_done) =
+    match (a1.parents, a2.parents) with
+    [ (Some ifam1, Some ifam2) when ifam1 <> ifam2 ->
+        let branches = [(ip1, ip2) :: branches] in
+        let cpl1 = coi base ifam1 in
+        let cpl2 = coi base ifam2 in
+        let (ok_so_far, changes_done) =
+          if ok_so_far then
+            if cpl1.father = cpl2.father then (True, changes_done)
+            else
+              try_merge conf base branches cpl1.father cpl2.father changes_done
+          else (False, changes_done)
+        in
+        let (ok_so_far, changes_done) =
+          if ok_so_far then
+            if cpl1.mother = cpl2.mother then (True, changes_done)
+            else
+              try_merge conf base branches cpl1.mother cpl2.mother changes_done
+          else (False, changes_done)
+        in
+        let (ok_so_far, changes_done) =
+          if ok_so_far then
+            merge_fam conf base branches ifam1 ifam2 cpl1.father cpl1.mother
+              changes_done
+          else (False, changes_done)
+        in
+        (ok_so_far, changes_done)
+    | _ -> (ok_so_far, changes_done) ]
+  in
+  if ok_so_far then merge_ind conf base branches ip1 ip2 changes_done
+  else (False, changes_done)
+;
+
+value print_merged conf base p =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "merge done"))
+  in
+  do header conf title;
+     print_link_to_welcome conf True;
+     afficher_personne_referencee conf base p;
+     Wserver.wprint "\n";
+     trailer conf;
+  return ()
 ;
 
 value print conf base =
@@ -278,11 +488,11 @@ value print conf base =
       else if p1.sex <> p2.sex && p1.sex <> Neuter && p2.sex <> Neuter
       then different_sexes conf
       else
-        let a1 = aoi base p1.cle_index in
-        let a2 = aoi base p2.cle_index in
-        if a1.parents <> None && a2.parents <> None
-        && a1.parents <> a2.parents then
-          propose_ancestors_merge conf base [] p1.cle_index p2.cle_index
-        else merge_ind conf base [] p1 p2
+        let (ok, changes_done) =
+          try_merge conf base [] p1.cle_index p2.cle_index False
+        in
+        do if changes_done then base.func.commit_patches () else ();
+           if ok then print_merged conf base p1 else ();
+        return ()
   | _ -> not_found_or_incorrect conf ]
 ;
