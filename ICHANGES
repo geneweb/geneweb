@@ -15,6 +15,10 @@ GeneWeb Version 3.11
   - [19 Dec 00] Fixed several problems of declinations appearing in esperanto
     version (e.g. texts "parents", "notes").
 
+* Setup program (gwsetup)
+  - [30 Dec 00] Fixed information file about how to put a background image,
+    the URL to use and the directory were wrong (obsolete).
+
 GeneWeb Version 3.10
 --------------------
 
