@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.19 2004-12-28 15:13:06 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.20 2005-01-04 12:45:41 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -110,7 +110,6 @@ value print_main conf base wizfile =
   do {
     header conf title;
     print_link_to_welcome conf False;
-    html_p conf;
     let list =
       List.map
         (fun (wz, wname) ->
@@ -118,34 +117,54 @@ value print_main conf base wizfile =
            (wz, wname, wfile, wnote))
         wizdata
     in
-    let list =
-      if by_alphab_order then list
-      else
+    if by_alphab_order then
+      tag "p" begin
+        let _ =
+          List.fold_left
+            (fun prev (wz, wname, wfile, stm) ->
+               let tm = Unix.localtime stm in
+               let wname = if wname = "" then wz else wname in
+               do {
+                 Wserver.wprint "%s%t"
+                   (if prev = None then "" else ",\n")
+                   (fun _ ->
+                      if conf.wizard && conf.user = wz || wfile <> "" then
+                        Wserver.wprint "<a href=\"%sm=WIZNOTES;v=%s%t\">%s</a>"
+                          (commd conf) (Util.code_varenv wz)
+                          (fun _ ->
+                             Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
+                               (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
+                               tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+                               tm.Unix.tm_sec)
+                          wname
+                      else Wserver.wprint "%s" wname);
+                 Some tm
+               })
+            None list
+        in
+        Wserver.wprint "\n";
+      end
+    else do {
+      let sep_period_list =
+        [(fun tm -> tm.Unix.tm_mon,
+          fun tm ->
+            Wserver.wprint "%s"
+              (capitale (Date.code_dmy conf
+                 {year = tm.Unix.tm_year + 1900; month = tm.Unix.tm_mon + 1;
+                  day = 0; prec = Sure; delta = 0})));
+         (fun tm -> tm.Unix.tm_year,
+          fun tm -> Wserver.wprint "%d" (tm.Unix.tm_year + 1900))]
+      in
+      let list =
         List.sort (fun (_, _, _, mtm1) (_, _, _, mtm2) -> compare mtm2 mtm1)
           list
-    in
-    let sep_period_list =
-      [(fun tm -> tm.Unix.tm_mon,
-        fun tm ->
-          Wserver.wprint "%s"
-            (Date.code_dmy conf
-               {year = tm.Unix.tm_year + 1900; month = tm.Unix.tm_mon + 1;
-                day = 0; prec = Sure; delta = 0}));
-       (fun tm -> tm.Unix.tm_year,
-        fun tm ->
-          Wserver.wprint "%s"
-            (Date.code_dmy conf
-               {year = tm.Unix.tm_year + 1900; month = 0; day = 0;
-                prec = Sure; delta = 0}))]
-    in
-    if by_alphab_order then () else Wserver.wprint "<dl>\n<dt>";
-    let _ =
-      List.fold_left
-        (fun (spl, prev) (wz, wname, wfile, stm) ->
-           let tm = Unix.localtime stm in
-           let (new_item, spl) =
-             if by_alphab_order then (False, spl)
-             else
+      in
+      Wserver.wprint "<dl>\n<dt>";
+      let _ =
+        List.fold_left
+          (fun (spl, prev) (wz, wname, wfile, stm) ->
+             let tm = Unix.localtime stm in
+             let (new_item, spl) =
                match prev with
                [ Some prev_tm ->
                    let (sep_period, _) =
@@ -166,10 +185,8 @@ value print_main conf base wizfile =
                    }
                    else (False, spl)
                | None -> (True, spl) ]
-           in
-           do {
-             if by_alphab_order then ()
-             else do {
+             in
+             do {
                if new_item then
                  if stm = 0.0 then Wserver.wprint "....."
                  else
@@ -177,35 +194,36 @@ value print_main conf base wizfile =
                    [ [(_, disp_sep_period) :: _] -> disp_sep_period tm
                    | [] -> () ]
                else ();
-               if new_item then Wserver.wprint "</dt>\n<dd>\n" else ()
-             };
-             let () =
-               let wname = if wname = "" then wz else wname in
-               Wserver.wprint "%s%t"
-                 (if prev = None || new_item then "" else ",\n")
-                 (fun _ ->
-                    if conf.wizard && conf.user = wz || wfile <> "" then
-                      Wserver.wprint "<a href=\"%sm=WIZNOTES;v=%s%t\">%s</a>"
-                        (commd conf) (Util.code_varenv wz)
-                        (fun _ ->
-                           Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
-                             (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
-                             tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
-                             tm.Unix.tm_sec)
-                        wname
-                    else Wserver.wprint "%s" wname)
-             in
-             (spl, Some tm)
-           })
-        (sep_period_list, None) list
-    in
-    ();
-    if by_alphab_order then () else Wserver.wprint "</dd></dl>\n";
-    html_p conf;
-    Wserver.wprint "%d %s\n" (List.length wizdata) wiztxt;
+               if new_item then Wserver.wprint "</dt>\n<dd>\n" else ();
+                let () =
+                 let wname = if wname = "" then wz else wname in
+                 Wserver.wprint "%s%t"
+                   (if prev = None || new_item then "" else ",\n")
+                   (fun _ ->
+                      if conf.wizard && conf.user = wz || wfile <> "" then
+                        Wserver.wprint "<a href=\"%sm=WIZNOTES;v=%s%t\">%s</a>"
+                          (commd conf) (Util.code_varenv wz)
+                          (fun _ ->
+                             Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
+                               (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
+                               tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+                               tm.Unix.tm_sec)
+                          wname
+                      else Wserver.wprint "%s" wname)
+               in
+               (spl, Some tm)
+             })
+          (sep_period_list, None) list
+      in
+      ();
+      Wserver.wprint "</dd></dl>\n"
+    };
+    tag "p" begin
+      Wserver.wprint "%d %s\n" (List.length wizdata) wiztxt;
+    end;
     if by_alphab_order then
-      Wserver.wprint "<p>\n<a href=\"%sm=WIZNOTES;o=H\">%s</a>" (commd conf)
-        (transl conf "history of updates")
+      Wserver.wprint "<p>\n<a href=\"%sm=WIZNOTES;o=H\">%s</a>\n</p>\n"
+        (commd conf) (transl conf "history of updates")
     else ();
     trailer conf
   }

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.107 2005-01-03 07:34:33 ddr Exp $ *)
+(* $Id: util.ml,v 4.108 2005-01-04 12:45:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1781,14 +1781,15 @@ value print_link_to_welcome conf right_aligned =
     in
     if right_aligned then
       Wserver.wprint "<table style=\"float:%s\"><tr><td>\n" dir
-    else ();
+    else Wserver.wprint "<p>\n";
     let str = link_to_referer conf in
     if str = "" then () else Wserver.wprint "%s" str;
     Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
     Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\"%s>" (image_prefix conf)
       fname wid_hei conf.xhs;
     Wserver.wprint "</a>\n";
-    if right_aligned then Wserver.wprint "</td></tr></table>\n" else ();
+    if right_aligned then Wserver.wprint "</td></tr></table>\n"
+    else Wserver.wprint "</p>\n"
   }
 ;
 
