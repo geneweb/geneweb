@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.60 2000-09-25 01:46:39 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.61 2000-09-29 08:00:28 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -767,7 +767,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      default_lang = default_lang;
      can_send_image =
        try List.assoc "can_send_image" base_env <> "no" with
-       [ Not_found -> False ];
+       [ Not_found -> True ];
      public_if_titles =
        try List.assoc "public_if_titles" base_env = "yes" with
        [ Not_found -> False ];
