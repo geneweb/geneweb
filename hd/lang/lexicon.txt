@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.59 2000-01-25 09:39:46 ddr Exp $
+# $Id: lexicon.txt,v 3.60 2000-01-26 09:28:38 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -742,7 +742,7 @@ he:  азййп (щм бп еа бъ джев)/ азййрйъ (щм бп еа бъ джев))
 it: un nipote (dello sposo)/una nipote (dello sposo)
 nl: een neef (van de echtgenoot)/een nicht (van de echtgenoot)
 no: nev&oslash; (ektefelles nev&oslash;)/niese (ektefelles niese)
-pt: um sobrinho (por afenidade)/uma sobrinha (por afenidade)
+pt: um sobrinho (por afinidade)/uma sobrinha (por afinidade)
 ru: племянник супруга/племянница супруга
 se: en nev&ouml; (gem&aring;lens nev&ouml;)/en niece (gem&aring;lens niece)
 
@@ -812,7 +812,7 @@ is: um
 it: intorno
 nl: circa
 no: ca
-pt: acerca
+pt: cerca
 ru: около
 se: omkring
 
@@ -1976,7 +1976,7 @@ is: hvarf
 it: scomparso/scomparsa/scomparso(a)
 nl: verdwenen
 no: forsvunnet
-pt: desaperecido/desaperecida/desaperecido(a)
+pt: desaparecido/desaparecida/desaparecido(a)
 ru: исчез/исчезла
 se: f&ouml;rsvunnen
 
@@ -2244,7 +2244,7 @@ is: fyrsta lausa nъmer
 it: primo numero disponibile
 nl: eerste vrij nummer
 no: f&oslash;rste ledige nummer
-pt: primer n&uacute;mero libre
+pt: primeiro n&uacute;mero livre
 ru: первый свободный номер
 se: f&ouml;rsta lediga nummer
 
@@ -2442,7 +2442,7 @@ is: afi og amma
 it: nonni
 nl: grootouders
 no: besteforeldre
-pt: avos
+pt: av&oacute;s
 ru: прародители
 se: far(mor)f&ouml;r&auml;ldrar
 
@@ -2460,7 +2460,7 @@ is: langafi og langamma
 it: bisnonni
 nl: overgrootouders
 no: oldeforeldre
-pt: bisavos
+pt: bisav&oacute;s
 ru: прапрародители
 se: gammel-far(mor)f&ouml;r&auml;ldrar
 
@@ -2811,7 +2811,7 @@ is: skrб afkomenda
 it: indice dei discendenti
 nl: index van de nakomelingen
 no: etterkommerindeks
-pt: index dos descendentes
+pt: &iacute;ndice dos descendentes
 ru: индекс потомков
 se: f&ouml;rteckning &ouml;ver &auml;ttlingarna
 
@@ -2829,7 +2829,7 @@ is: skrб make (ekki afkomenda)
 it: indice dei coniugi (non discendenti)
 nl: index van echtgenoten (geen nakomelingen)
 no: ektefelleindeks
-pt: index dos c&ocirc;njuges (n&atilde;o descendentes)
+pt: &iacute;ndice dos c&ocirc;njuges (n&atilde;o descendentes)
 ru: индекс супругов (не потомков)
 se: f&ouml;rteckning &ouml;ver makarna (icke &auml;ttlingar)
 
@@ -2883,7 +2883,7 @@ is: er mjцg ungt foreldri
 it: &egrave; veramente un genitore molto giovane
 nl: is een jonge ouder
 no: er en sv&aelig;rt ung far/mor
-pt: &eacute; um pai demais jovem
+pt: &eacute; um pai demasiado jovem
 ru: очень молодые родители
 se: &auml;r en v&auml;ldigt ung f&ouml;r&auml;lder
 
@@ -2901,7 +2901,7 @@ is: er fжdd eftir barn sitt
 it: sarebbe nato/a dopo i suoi figli
 nl: zal geboren worden na zijn/haar kind
 no: er f&oslash;dt etter sitt barn
-pt: ha nacido(a) depois do seu filho
+pt: nasceu depois do seu filho
 ru: рожден после его/ее ребенка
 se: &auml;r f&ouml;dd efter sitt barn
 
@@ -3179,7 +3179,7 @@ is: hбmark
 it: maximum
 nl: maximaal
 no: maksimalt
-pt: maximo
+pt: m&aacute;ximo
 ru: максимально
 se: maximalt
 
@@ -3297,7 +3297,7 @@ is: fleiri en %d svцr
 it: pi&ugrave; di %d risposte
 nl: meer dan %d antwoorden
 no: fler enn %d svar
-pt: m&aacute;s de %d respostas
+pt: mais de %d respostas
 ru: более, чем %d ответы
 se: fler &auml;n %d svar
 
@@ -3315,7 +3315,7 @@ is: myrtur
 it: assassinato/assassinata/assassinato(a)
 nl: vermoord
 no: myrdet
-pt: asesinado/asesinada/asesinado(a)
+pt: assassinado/assassinada/assassinado(a)
 ru: убит/убита
 se: m&ouml;rdad
 
@@ -3352,7 +3352,7 @@ is: nafniр "%s %d %s" er юegar н notkun af%t
 it: nome "%s.%d %s" gi&agrave; utilizzato da %tquesta persona%t
 nl: naam "%s.%d %s" is al gebruikt door %tdit persoon%t
 no: navnet "%s.%d %s" er alt i bruk av %tdenne personen%t
-pt: apelido "%s.%d %s" j&aacute; utilizado por %testa persona%t
+pt: apelido "%s.%d %s" j&aacute; utilizado por %testa pessoa%t
 ru: имя "%s.%d %s" уже использовано %tэтим человеком%t
 se: namn "%s.%d %s" anv&auml;nds redan av %tdenna person%t
 
@@ -3385,7 +3385,7 @@ is: brжрra og systrabцrn
 it: nipoti
 nl: neven en nichten
 no: nev&oslash;er og nieser
-pt: sobrinos e sobrinas
+pt: sobrinhos e sobrinhas
 ru: племянники и племянницы
 se: nev&ouml;er och niecer
 
@@ -3757,7 +3757,7 @@ is: frб hvarfi
 it: della scomparsa
 nl: van het verdwijnen
 no: av forsvinningsnummeret
-pt: da dispari&ccedil;&atilde;o
+pt: da desapari&ccedil;&atilde;o
 ru: исчезновения
 se: av f&ouml;rsvinnandet
 
@@ -3865,7 +3865,7 @@ is: mбnaрar gamalt
 it: un mese
 nl: een maand oud
 no: en m&aring;ned gammel
-pt: um mes
+pt: um m&ecirc;s
 ru: месячный
 se: en m&aring;nad
 
@@ -3949,7 +3949,7 @@ fi: tai kдytд "luo" "liit&auml" -toiminnon sijaan
 fr: ou bien utilisez "relier" au lieu de "cr&eacute;er"
 nl: of gebruik "konnektie" inplaats van "maken"
 no: eller bruk "koble" istedet for "opprett"
-pt: o use "reunir" ao lugar de "crear"
+pt: ou use "reunir" em lugar de "criar"
 ru: или используйте "связать" вместо "создать"
 se: eller anv&auml;nd "l&auml;nk" ist&auml;llet f&ouml;r "skapa"
 
@@ -4223,7 +4223,7 @@ fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reco
 is: viрurkenndur faрir/viрurkennd mурir/viрurkennd foreldri
 no: bekreftet far/bekreftet mor/bekreftede foreldre
 nl: erkennende vader/erkennende moeder/erkennende ouders
-pt: pai que o reconhoceu/m&atilde;e que o reconhoceu/pais que o reconheceram
+pt: pai que o reconheceu/m&atilde;e que o reconheceu/pais que o reconheceram
 ru: признанный отец/признанная мать/признаный родитель
 se: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
 
@@ -4276,7 +4276,7 @@ is: reikna tengsl
 it: calcolo della parentela
 nl: verwantschap vaststellen
 no: slektskapsberegning
-pt: calc&uacute;lo de parentesco
+pt: c&aacute;lculo de parentesco
 ru: кому приходится
 se: sl&auml;ktskapsber&auml;kning
 
@@ -4478,7 +4478,7 @@ is: жtti aр vera kvenkyns
 it: dovrebbe essere di sesso femminile
 nl: moet vrouwelijk zijn
 no: kj&oslash;nn skulle v&aelig;rt kvinne
-pt: tendria que ser de sexo feminino
+pt: teria que ser de sexo feminino
 ru: должна быть женщиной
 se: borde vara kvinna
 
@@ -4496,7 +4496,7 @@ is: жtti aр vera karlkyns
 it: dovrebbe essere di sesso maschile
 nl: moet mannelijk zijn
 no: kj&oslash;nn skulle v&aelig;rt mann
-pt: tendria que ser de sexo masculino
+pt: teria que ser de sexo masculino
 ru: должен быть мужчиной
 se: borde vara man
 
@@ -4972,7 +4972,7 @@ is: skjaliр er lжst н augnablikinu, reyndu aftur
 it: l'archivio &egrave; temporaneamente locked: prego prova ancora. Se ancora non funziona, attendere un istante prima di provare ancora
 nl: de informatie is tijdelijk ontoegankelijk: probeer later
 no: filen er midlertidig stengt: vent og pr&oslash;v igjen
-pt: a base esta temporalmente inacessivel: por favor tente novamente. Se n&atilde;o funcionar, espere um momento
+pt: a base est&aacute; temporariamente inacess&iacute;vel: por favor tente novamente. Se n&atilde;o funcionar, espere um momento
 ru: файл временно заблокирован: пожалуйста попытайтесь снова
 se: filen &auml;r tempor&auml;rt l&aring;st: f&ouml;rs&ouml;k igen. Om det &auml;nd&aring; inte fungerar, v&auml;nta ett tag innan n&auml;sta f&ouml;rs&ouml;k
 
@@ -4990,7 +4990,7 @@ is: юessi bцrn %t og %t eru ekki н rцр
 it: i seguenti figli di %t and %t non sono in ordine d'et&agrave;
 nl: de volgende kinderen van %t en %t staan niet in volgorde
 no: f&oslash;lgende barn av %t og %t er ikke i kronologisk rekkef&oslash;lge
-pt: os seguintes filhos de %t e %t n&atilde;o estan presentados em orden
+pt: os seguintes filhos de %t e %t n&atilde;o est&atilde;o apresentados em ordem
 ru: следующие дети %t и %t - идут не по порядку
 se: de f&ouml;ljande barnen till %t och %t &auml;r inte i kronologiskordning
 
@@ -5026,7 +5026,7 @@ is: afi og amma
 it: i nonni
 nl: de grootouders
 no: besteforeldrene
-pt: os avos
+pt: os av&oacute;s
 ru: прародитель
 se: far(mor)f&ouml;r&auml;ldrarna
 
@@ -5062,7 +5062,7 @@ is: langafi og langamma
 it: i bisnonni
 nl: de overgrootouders
 no: oldeforeldrene
-pt: os bisavos
+pt: os bisav&oacute;s
 ru: прапрародитель
 se: gammel-far(mor)f&ouml;r&auml;ldrarna
 

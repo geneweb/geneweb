@@ -20,6 +20,8 @@ GeneWeb version 3.03
     private data is better protected).
 
 * Lexicon (lang/lexicon.txt)
+  - [26 Jan 00] Fixed several Portuguese translations (Jose Paulo Moitinho
+    de Almeida).
   - [21 Jan 00] Changed the English displaying of dates into "day month
     year", the displaying "month day year" being specific to the United
     States and not used in other English speaking countries. American
