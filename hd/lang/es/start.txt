@@ -67,11 +67,11 @@ por
 
 </ul>
 
-Los <a href="%sm=AN">cumplea&ntilde;os</a>.<br>%x
-Los <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>.<br>
-Las <a href="%sm=LD;k=10">reci&eacute;n muertes</a>.<br>%x
+Los <a href="%sm=AN">cumplea&ntilde;os</a>.<br>
 Los <a href="%sm=AD">aniversarios de las personas fallecidas</a>.<br>
-Los <a href="%sm=AM">aniversarios de casamiento</a>.
+Los <a href="%sm=AM">aniversarios de casamiento</a>.<br>%x
+Los <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>.<br>
+Las <a href="%sm=LD;k=10">reci&eacute;n muertes</a>.%x
 
 <p>
 

@@ -13,6 +13,10 @@ GeneWeb Version 2.01
   - [Mar 10, 99] Inlined "List.remove_assoc" in order to be compilable
     by Ocaml and Camlp4 2.01 as well.
 
+* Welcome pages (xx/start.txt)
+  - [Mar 20, 99] Changed order of links for displayed anniversaries and
+    latest births and deaths.
+
 GeneWeb Version 2.00
 --------------------
 
