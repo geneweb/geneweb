@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.206 2001-01-06 09:55:34 ddr Exp $
+# $Id: lexicon.txt,v 3.207 2001-01-07 19:48:01 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -4026,7 +4026,7 @@ se: namn
 
     name %s already used by %tthis person%t
 af: %s is reeds gebruik deur %t
-cs: jméno %s u¾ má tato %t osoba
+cs: jméno %s u¾ má tato %tosoba%t
 de: Name %s wird schon bei %tdieser Person%t benutzt
 dk: navn %s er allerede anvendt af %tdenne person%t
 en: name %s already used by %tthis person%t
@@ -4035,7 +4035,7 @@ es: nombre %s ya utilizado por %testa persona%t
 fi: nimi %s on jo k&auml;yt&ouml;ss&auml %tt&auml;ll&auml; henkil&ouml;ll&auml;%t
 fr: nom %s d&eacute;j&agrave; utilis&eacute; par %tcette personne%t
 he:  äùí %s áùéîåù ëáø ò"é %tàãí æä%t
-is: nafniğ %s er şegar í notkun af%t
+is: nafniğ %s er şegar í %tnotkun af%t
 it: nome %s gi&agrave; utilizzato da %tquesta persona%t
 lv: vârds - %s jau ir %tğai personai%t
 nl: naam %s is al gebruikt door %tdit persoon%t
