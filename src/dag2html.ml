@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.32 2000-09-03 16:11:26 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.33 2000-10-30 19:30:27 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -209,7 +209,9 @@ value print_html_table print print_indi phony border d t =
   let exist_several_branches i k =
     loop 0 where rec loop j =
       if j = Array.length t.table.(i) then False
+(*
       else if phony t.table.(k).(j).elem then loop (j + 1)
+*)
       else
         let x = t.table.(i).(j).span in
         let e = t.table.(k).(j).elem in
@@ -330,7 +332,8 @@ let next_l = min next_l next_j in
               do print_hbars i i; print_alone_bar i; return ()
             else ();
             if exist_several_branches i (i + 1)
-            && (i < Array.length t.table - 2 || not (all_empty (i + 1))) then
+            && (i < Array.length t.table - 2 || not (all_empty (i + 1)))
+            then
               do print_hbars i (i + 1); print_vbars (i + 1) (i + 1); return
               ()
             else ();
@@ -1188,7 +1191,7 @@ value fall2_right t =
         if j < 0 then loop_i (i - 1) t
         else
           match try_fall2_right t i j with
-          [ Some t -> loop_i i t
+          [ Some t -> loop_i (Array.length t.table - 1) t
           | None -> loop_j (j - 1) t ]
 ;
 
@@ -1200,7 +1203,7 @@ value fall2_left t =
         if j >= Array.length t.table.(i) then loop_i (i - 1) t
         else
           match try_fall2_left t i j with
-          [ Some t -> loop_i i t
+          [ Some t -> loop_i (Array.length t.table - 1) t
           | None -> loop_j (j + 1) t ]
 ;
 
