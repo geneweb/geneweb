@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.179 2000-11-07 14:55:56 ddr Exp $
+# $Id: lexicon.txt,v 3.180 2000-11-09 12:20:57 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -35,6 +35,7 @@ fi: af=afrikaani/cn=kiina/cs=tsekki/de=saksa/dk=tanska/en=englanti/eo=esperanto/
 fr: af=afrikaans/cn=chinois/cs=tch&egrave;que/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pt=portugais/ru=russe/se=su&eacute;dois
 lv: cn=Íînieğu/cs=Èehu/dk=Dâòu/nl=Holandieğu/en=Angïu/eo=Esperanto/fi=Somu/fr=Franèu/de=Vâcu/he=Ebreju/is=Islandieğû/it=Itâïu/lv=Latvieğu/no=Norvçìu/pt=Portugâïu/es=Spâòu/ru=Krievu/se=Zviedru
 nl: af=Afrikaans/cn=Chinees/cs=Tsjechisch/dk=Deens/nl=Nederlands/en=Engels/eo=Esperanto/fi=Fins/fr=Frans/de=Duits/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/no=Noors/pt=Portugees/es=Spaans/ru=Russisch/se=Zweeds
+no: af=afrikaans/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
 pt: af=Afrikaans/cn=Chin&ecirc;/cs=Checo/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;/en=Ingl&ecirc;/eo=Esperanto/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
 se: af=afrikaans/cn=kinesiska/cs=tjeckiska/dk=danska/en=engelska/eo=esperanto/fi=finska/fr=franska/de=tyska/he=hebreiska/is=isl&auml;ndska/it=italienska/lv=litauiska/nl=holl&auml;ndska/no=norska/pt=portugisiska/es=spanska/ru=ryska/se=svenska
 
@@ -325,6 +326,7 @@ dk: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;
 en: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
 eo: vendemjero/brumero/frimero/nivozo/pluvjozo/ventozo/germinalo/florealo/prerialo/mesidoro/termindoro/fructidoro/suplemento
 fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
+no: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 se: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/komplementär
 
     (hebrew month)
@@ -334,6 +336,7 @@ en: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/A
 eo: tisxrio/hesxvano/kislevo/teveto/sxevato/adaro 1/adaro 2/nisano/ijaro/sivano/tamuzo/avo/elulo
 fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 he: úùøé/ çùåï/ ëñìå/ èáú/ ùáè/ àãø à'/ àãø á'/ ğéñï/ àééø/ ñéåï/ úîåæ/ àá/ àìåì
+no: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 se: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 
     (month)
@@ -531,7 +534,7 @@ he:  æ/ğ
 is: KK/KvK
 it: M/F
 lv: M/F
-nl: M/F
+nl: M/V
 no: M/K
 pt: M/F
 ru: Ì/Æ
@@ -2065,7 +2068,7 @@ is: systkynabörn
 it: cugini
 lv: brâlçni/mâsîcas
 nl: neven en nichten
-no: s&oslash;skenbarn
+no: fettere og kusiner
 pt: primos
 ru: êóçåíû
 se: kusiner
@@ -3566,6 +3569,7 @@ dk: loop i databasen: %s er sin egen ane
 en: loop in data base: %s is his/her own ancestor
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 nl: loop in de data base: %s is zijn/haar eigen voorouder
+no: loop i databasen: %s er sin egen etterkommer
 se: loop i databasen: %s &auml;r sin egen ana
 
     main title
@@ -3789,6 +3793,7 @@ dk: meddelelse tilf&oslash;jet
 en: message added
 fr: message ajout&eacute;
 nl: bericht toegevoegd
+no: melding tilf&oslash;yet
 se: meddelande inlagt
 
     message/next message
@@ -3797,6 +3802,7 @@ dk: meddelelse/n&aelig;ste meddelelse
 en: message/next message
 fr: message/message suivant
 nl: bericht/volgend bericht
+no: melding/neste melding
 se: meddelande/n&auml;sta meddelande
 
     missing ancestors
@@ -5393,6 +5399,7 @@ dk: emne
 en: subject
 fr: sujet
 nl: onderwerp
+no: emne
 se: ämne
 
     surname alias
@@ -5601,7 +5608,7 @@ he:  äæ÷ï ä %d  ùàåìé òåã áçééí
 it: i%d più vecchi possono essere ancora viventi
 lv: %d visvecâkie iespçjams vçl ir dzîvi
 nl: de %d oudsten, mogelijk nog in leven
-no: dei %d eldste som muligens lever
+no: de %d eldste som muligens lever
 pt: os %d mais velhos talvez ainda vivos
 se: de %d &auml;ldsta som kanske lever
 
@@ -5637,7 +5644,7 @@ he:  ä %d áàøéëåú éîéí
 it: %d avendo visuto più a lungo
 lv: %d, kuri dzîvojuği visilgâk
 nl: de %d langst levende personen
-no: dei %d som har levd lengst
+no: de %d som har levd lengst
 pt: os %d que mais viveram 
 se: de %d som har levt l&auml;ngst
 
@@ -5994,7 +6001,7 @@ he:  %d äğéùåàéí äàçøåğéí
 it: gli ultimi %d matrimoni
 lv: pçdçjâs %d laulîbas
 nl: de %d laatste huwelijken
-no: dei %d siste gifte 
+no: de %d sist gifte 
 pt: os %d casamentos mais recentes
 se: de senaste %d äktenskapen
 

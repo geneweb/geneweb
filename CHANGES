@@ -2,6 +2,8 @@ GeneWeb version 3.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [09 Nov 00] Fixed bug: under Windows, the history of updates did not
+    work.
   - [08 Nov 00] Added the ability to have associated HTML pages and
     images. The request "base?m=SRC;v=xxx" displays the file
     "sources/base/xxx.txt" (interpreting the macros if any). The request
