@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.3 1999-11-10 21:57:56 ddr Exp $ *)
+(* $Id: perso.ml,v 3.4 1999-11-30 15:35:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1059,7 +1059,7 @@ value print_ancestors_descends_cousins conf base p a u =
   return ()
 ;
 
-value print conf base p =
+value print_ok conf base p =
   let title h =
     match (sou base p.public_name, p.nick_names) with
     [ (n, [nn :: _]) when n <> "" ->
@@ -1145,3 +1145,22 @@ value print conf base p =
      trailer conf;
   return ()
 ;
+
+value print conf base p =
+  let passwd =
+    if conf.wizard || conf.friend then None
+    else
+      let src =
+        match (aoi base p.cle_index).parents with
+        [ Some ifam -> sou base (foi base ifam).origin_file
+        | None -> "" ]
+      in
+      try Some (src, List.assoc ("passwd_" ^ src) conf.base_env)
+      with [ Not_found -> None ]
+  in
+  match passwd with
+  [ Some (src, passwd) when passwd <> conf.passwd -> Util.unauthorized conf src
+  | _ -> print_ok conf base p ]
+;
+
+

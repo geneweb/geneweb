@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.16 1999-11-26 21:54:09 ddr Exp $ *)
+(* $Id: util.ml,v 3.17 1999-11-30 15:35:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -36,6 +36,21 @@ value html conf =
        nl (); nl ();
     return ()
   else Wserver.html conf.charset
+;
+
+value unauthorized conf auth_type =
+  do if conf.cgi then
+       Wserver.wprint "Content-type: text/html; charset=%s" conf.charset
+     else
+       do Wserver.wprint "HTTP/1.0 401 Unauthorized"; nl ();
+          Wserver.wprint "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
+       return ();
+     nl (); nl ();
+     Wserver.wprint "<head><title>Access failed</title></head>\n";
+     Wserver.wprint "<body><h1>Access failed</h1>\n";
+     Wserver.wprint "<ul><li>%s</ul>\n" auth_type;
+     Wserver.wprint "</body>\n";
+  return ()
 ;
 
 value rec list_assoc_all x =

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.9 1999-11-24 16:29:37 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.10 1999-11-30 15:35:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -142,7 +142,7 @@ value only_log from cgi =
   return ()
 ;
 
-value refuse_auth from auth auth_type =
+value refuse_auth conf from auth auth_type =
   let oc = log_oc () in
   do let tm = Unix.localtime (Unix.time ()) in
      fprintf_date oc tm;
@@ -151,13 +151,7 @@ value refuse_auth from auth auth_type =
      Printf.fprintf oc "  Basic realm: %s\n" auth_type;
      Printf.fprintf oc "  Response: %s\n" auth;
      flush_log oc;
-     Wserver.wprint "HTTP/1.0 401 Unauthorized"; nl ();
-     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
-     nl (); nl ();
-     Wserver.wprint "<head><title>Access failed</title></head>\n";
-     Wserver.wprint "<body><h1>Access failed</h1>\n";
-     Wserver.wprint "<ul><li>%s</ul>\n" auth_type;
-     Wserver.wprint "</body>\n";
+     Util.unauthorized conf auth_type;
   return ()
 ;
 
@@ -508,14 +502,15 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
     try List.assoc "wizard_just_friend" base_env = "yes" with
     [ Not_found -> False ]
   in
+  let passwd1 =
+    let auth = Wserver.extract_param "authorization: " '\r' request in
+    if auth = "" then ""
+    else
+      let i = String.length "Basic " in
+      Base64.decode (String.sub auth i (String.length auth - i))
+  in
   let uauth =
-    if passwd = "w" || passwd = "f" then
-      let auth = Wserver.extract_param "authorization: " '\r' request in
-      if auth = "" then ""
-       else
-        let i = String.length "Basic " in
-        Base64.decode (String.sub auth i (String.length auth - i))
-     else ""
+    if passwd = "w" || passwd = "f" then passwd1 else ""
   in
   let (ok, wizard, friend, user) =
     if not cgi then
@@ -551,6 +546,11 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
         if s = wizard_passwd || s = friend_passwd then "" else s
     | None -> "" ]
   in
+  let passwd1 =
+    match lindex passwd1 ':' with
+    [ Some i -> String.sub passwd1 (i + 1) (String.length passwd1 - i - 1)
+    | None -> passwd ]
+  in
   let cancel_links =
     match Util.p_getenv env "cgl" with
     [ Some "on" -> True
@@ -561,6 +561,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      friend = friend || wizard_just_friend && wizard;
      just_friend_wizard = wizard && wizard_just_friend;
      user = user;
+     passwd = passwd1;
      cgi = cgi;
      command = command;
      indep_command = (if cgi then command else "geneweb") ^ "?";
@@ -685,7 +686,7 @@ value conf_and_connection cgi from (addr, request) str env =
         in
         if x = "" then "GeneWeb service" else "data base " ^ conf.bname
       in
-      refuse_auth from auth auth_type
+      refuse_auth conf from auth auth_type
   | (_, Some (passwd, uauth, base_file)) ->
       let tm = Unix.time () in
       do lock_wait Srcfile.adm_file "gwd.lck" with
