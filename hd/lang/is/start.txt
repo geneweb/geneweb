@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id -->
+  <!-- $Id: start.txt,v 3.8 1999-10-31 15:50:04 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Ættfræði - %t</title>
   <meta name="ROBOTS" content="NONE">
