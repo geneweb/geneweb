@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: family.ml,v 1.3 1998-11-20 19:11:10 ddr Exp $ *)
+(* $Id: family.ml,v 1.4 1998-11-21 09:55:54 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -188,7 +188,7 @@ value get_senv conf base =
   let get x = try Some (List.assoc x conf.env) with [ Not_found -> None ] in
   match (get "em", get "ei", get "ep", get "en", get "eoc") with
   [ (Some vm, Some vi, _, _, _) ->
-      do conf.senv := "e=" ^ code_varenv ("m=" ^ vm ^ ";i=" ^ vi); return
+      do conf.senv := code_varenv ("m=" ^ vm ^ ";i=" ^ vi); return
       [("m", vm); ("i", vi)]
   | (Some vm, None, Some vp, Some vn, voco) ->
       let voc =
@@ -201,7 +201,7 @@ value get_senv conf base =
         [ Not_found -> do incorrect_request conf; return raise Exit ]
       in
       let vi = string_of_int (Adef.int_of_iper ip) in
-      do conf.senv := "e=" ^ code_varenv ("m=" ^ vm ^ ";i=" ^ vi); return
+      do conf.senv := code_varenv ("m=" ^ vm ^ ";i=" ^ vi); return
       [("m", vm); ("i", vi)]
   | _ ->
       do conf.senv :=
