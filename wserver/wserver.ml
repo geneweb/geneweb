@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.17 2001-01-06 09:56:00 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.18 2001-01-11 21:50:45 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -523,8 +523,8 @@ value accept_connection tmout max_clients callback s =
        with
        [ Unix.Unix_error _ _ _ -> ()
        | exc -> do cleanup (); return raise exc ];
-      cleanup ();
-   return ()
+       cleanup ();
+    return ()
 ;
 
 value f addr_opt port tmout max_clients g =
