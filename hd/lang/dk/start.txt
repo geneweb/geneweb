@@ -27,7 +27,7 @@ height=108 src="%sm=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 Databasen <font color=#2f6400><b>"%t"</b></font> indeholder for
 &oslash;jeblikket %n personer.%o<br>
-(<a href="%sm=NOTES">[note/notes]1</a>)%o
+(<a href="%sm=NOTES">Noter</a>)%o
 
 %y<br><p>
 
@@ -59,7 +59,7 @@ Databasen <font color=#2f6400><b>"%t"</b></font> indeholder for
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-For at navigere i denne database, kan du søge:<br><br>
+For at navigere i denne database kan du søge:<br><br>
 
 <ul>
 
@@ -89,13 +89,13 @@ eller <em>Sosa-nummer</em>, refererende til %a%u
 %h<input type=hidden name=m value=TT>
 <font color=#2f6400><b>adelstitel</b></font>
 <input name=t size=14 maxlength=200>
-<font color=#2f6400><b>og/eller adelsnavn</b></font>
+og/eller <font color=#2f6400><b>adelsnavn</b></font>
 <input name=p size=25 maxlength=200>
 <input type=submit value="Ok">
 <br>
-Eks:
-<font color=#2f6400><b>adelstitel</b></font>: adelsmand, greve, konge...
-<font color=#2f6400><b>og/eller adelsnavn</b></font>: von Klingenberg,
+Eks.:
+<font color=#2f6400><b>"adelstitel"</b></font>: adelsmand, greve, konge...
+<font color=#2f6400><b>"adelsnavn"</b></font>: von Klingenberg,
 Griffenfeld, af Danmark...
 </form>
 
@@ -125,7 +125,7 @@ søgning</b></font></a>.
 
 %w<p>
 
-<center>Du kan<br><br>
+<center>Du kan:<br><br>
 
 <table border=0>
 <tr>
@@ -145,7 +145,7 @@ søgning</b></font></a>.
 <br>
 %w
 
-<center>Du kan også fremkalde<br><br>
+<center>Du kan også fremkalde:<br><br>
 
 <table border=0>
 <tr>
