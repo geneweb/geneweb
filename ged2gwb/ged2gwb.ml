@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.28 2002-02-26 04:58:11 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.29 2002-02-26 08:42:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1376,7 +1376,7 @@ value rec build_remain_tags =
 ;
 
 value add_indi gen r =
-  let i = per_index gen r.rval in
+  let ip = per_index gen r.rval in
   let name_sons = find_field "NAME" r.rsons in
   let givn =
     match name_sons with
@@ -1462,7 +1462,7 @@ value add_indi gen r =
               do { Hashtbl.add gen.g_hnam key r; r } ]
         in
         do { incr r; (f, s, r.val, pn, fal) }
-    | None -> ("?", "?", Adef.int_of_iper i, givn, []) ]
+    | None -> ("?", "?", Adef.int_of_iper ip, givn, []) ]
   in
   let qualifier =
     match name_sons with
@@ -1537,9 +1537,9 @@ value add_indi gen r =
     in
     List.map (fun r -> fam_index gen r) rvl
   in
+  let rasso = find_all_fields "ASSO" r.rsons in
   let rparents =
-    let rl = find_all_fields "ASSO" r.rsons in
-    let godparents = find_all_rela ["godf"; "godm"; "godp"] rl in
+    let godparents = find_all_rela ["godf"; "godm"; "godp"] rasso in
     let godparents =
       if godparents = [] then
         let ro =
@@ -1548,35 +1548,20 @@ value add_indi gen r =
           | x -> x ]
         in
         match ro with
-        [ Some r -> find_all_rela ["godf"; "godm"; "godp"] rl
+        [ Some r -> find_all_rela ["godf"; "godm"; "godp"] rasso
         | None -> [] ]
       else godparents
     in
-    let rec find_rela n f =
-      fun
-      [ [] -> None
-      | [r :: rl] ->
-          match find_field "RELA" r.rsons with
-          [ Some r1 ->
-              let len = String.length n in
-              if String.length r1.rval >= len &&
-                 String.lowercase (String.sub r1.rval 0 len) = n
-              then
-                Some (f gen i r.rval)
-              else find_rela n f rl
-          | None -> find_rela n f rl ] ]
-    in
-    let witn = find_rela "witness" forward_witn rl in
     loop godparents where rec loop rl =
       if rl <> [] then
         let (r_fath, rl) =
           match rl with
-          [ [("godf", r) :: rl] -> (Some (forward_godp gen i r), rl)
+          [ [("godf", r) :: rl] -> (Some (forward_godp gen ip r), rl)
           | _ -> (None, rl) ]
         in
         let (r_moth, rl) =
           match rl with
-          [ [("godm", r) :: rl] -> (Some (forward_godp gen i r), rl)
+          [ [("godm", r) :: rl] -> (Some (forward_godp gen ip r), rl)
           | _ -> (None, rl) ]
         in
         let (r_fath, r_moth, rl) =
@@ -1584,7 +1569,7 @@ value add_indi gen r =
           else
             let (r_fath, rl) =
               match rl with
-              [ [("godp", r) :: rl] -> (Some (forward_godp gen i r), rl)
+              [ [("godp", r) :: rl] -> (Some (forward_godp gen ip r), rl)
               | _ -> (None, rl) ]
             in
             (r_fath, None, rl)
@@ -1596,6 +1581,8 @@ value add_indi gen r =
         [r :: loop rl]
       else []
   in
+  let witn = find_all_rela ["witness"] rasso in
+  let _ = List.map (fun (n, rval) -> forward_witn gen ip rval) witn in
   let (birth, birth_place, (birth_src, birth_nt)) =
     match find_field "BIRT" r.rsons with
     [ Some r ->
@@ -1753,15 +1740,15 @@ value add_indi gen r =
      burial_place = add_string gen burial_place;
      burial_src = add_string gen burial_src;
      notes = add_string gen (notes ^ ext_notes);
-     psources = add_string gen psources; cle_index = i}
+     psources = add_string gen psources; cle_index = ip}
   and ascend = {parents = parents; consang = Adef.fix (-1)}
   and union = {family = Array.of_list family} in
   do {
-    gen.g_per.arr.(Adef.int_of_iper i) := Right3 person ascend union;
+    gen.g_per.arr.(Adef.int_of_iper ip) := Right3 person ascend union;
     match find_field "ADOP" r.rsons with
     [ Some r ->
         match find_field "FAMC" r.rsons with
-        [ Some r -> forward_adop gen i r.rval (find_field "ADOP" r.rsons)
+        [ Some r -> forward_adop gen ip r.rval (find_field "ADOP" r.rsons)
         | _ -> () ]
     | _ -> () ];
     r.rused := True
