@@ -5,6 +5,8 @@ GeneWeb Version 3.11
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [27 Dec 00] Fixed problem: age at death were sometimes not displayed when
+    it should have to be.
   - [19 Dec 00] Fixed several problems of declinations appearing in esperanto
     version (e.g. texts "parents", "notes").
 
