@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.8 2000-03-15 04:25:04 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.9 2000-03-19 19:21:37 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -333,8 +333,9 @@ value print_anniv conf base p level =
   let module S =
     Map.Make (struct type t = iper; value compare = compare; end)
   in
+  let s_mem x m = try let _ = S.find x m in True with [ Not_found -> False ] in
   let rec insert_desc set up_sosa down_br n ip =
-    if S.mem ip set then set
+    if s_mem ip set then set
     else
       let set = S.add ip (up_sosa, down_br) set in
       if n = 0 then set
