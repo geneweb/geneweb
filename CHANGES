@@ -2,6 +2,11 @@ GeneWeb version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [02 Oct 02] In displaying by surname, added ability to mask
+    children: the families are prefixed by a clickable "o": when clicked,
+    the same page is displayed but without the children of that family,
+    and a clickable "+" is displayed at the place of the "o".  Useful for
+    big families, when it is often not easy to see the siblings.
   - [12 Sep 02] Fixed bug: in relationship by "shortest path", the
     selection "include spouses" was not reported when trying the
     next path.
