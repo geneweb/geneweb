@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.23 1999-08-04 22:16:27 ddr Exp $ *)
+(* $Id: descend.ml,v 2.24 1999-08-05 06:22:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -105,14 +105,18 @@ value print_choice conf base p niveau_effectif =
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=L checked> %s\n"
         (capitale (transl conf "list"));
-      html_li conf;
-      Wserver.wprint "<input type=radio name=t value=T> %s\n"
-        (capitale (transl conf "tree"));
-      if niveau_effectif <= limit_by_tree then ()
+      if browser_doesnt_have_tables conf then ()
       else
-        do Wserver.wprint "(";
-           Wserver.wprint (ftransl conf "max %d generations") limit_by_tree;
-           Wserver.wprint ")\n";
+        do html_li conf;
+           Wserver.wprint "<input type=radio name=t value=T> %s\n"
+             (capitale (transl conf "tree"));
+           if niveau_effectif <= limit_by_tree then ()
+           else
+             do Wserver.wprint "(";
+                Wserver.wprint (ftransl conf "max %d generations")
+                  limit_by_tree;
+                Wserver.wprint ")\n";
+             return ();
         return ();
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=N> %s\n"

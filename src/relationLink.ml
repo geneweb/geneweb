@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.12 1999-08-04 04:24:56 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.13 1999-08-05 06:22:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -174,56 +174,6 @@ value find_prev_branch base dist ia sa ipl =
 ;
 
 (* Printing *)
-
-value has_no_tables conf =
-  let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
-  String.lowercase user_agent = "lynx"
-;
-
-value text_size txt =
-  let rec normal len i =
-    if i = String.length txt then len
-    else if txt.[i] = '<' then in_tag len (i + 1)
-    else if txt.[i] = '&' then in_char (len + 1) (i + 1)
-    else normal (len + 1) (i + 1)
-  and in_tag len i =
-    if i = String.length txt then len
-    else if txt.[i] = '>' then normal len (i + 1)
-    else in_tag len (i + 1)
-  and in_char len i =
-    if i = String.length txt then len
-    else if txt.[i] = ';' then normal len (i + 1)
-    else in_char len (i + 1)
-  in
-  normal 0 0
-;
-
-value print_pre_center sz txt =
-  do for i = 1 to (sz - text_size txt) / 2 do Wserver.wprint " "; done;
-     Wserver.wprint "%s\n" txt;
-  return ()
-;
-
-value print_pre_left sz txt =
-  let tsz = text_size txt in
-  do if tsz < sz / 2 - 1 then
-       for i = 2 to (sz / 2 - 1 - tsz) / 2 do Wserver.wprint " "; done
-     else ();
-     Wserver.wprint " %s\n" txt;
-  return ()
-;
-
-value print_pre_right sz txt =
-  let tsz = text_size txt in
-  do if tsz < sz / 2 - 1 then
-       do for i = 1 to sz / 2 do Wserver.wprint " "; done;
-          for i = 1 to (sz / 2 - 1 - tsz) / 2 do Wserver.wprint " "; done;
-       return ()
-     else
-       for i = 1 to sz - text_size txt - 1 do Wserver.wprint " "; done;
-     Wserver.wprint " %s\n" txt;
-  return ()
-;
 
 value someone_text conf base ip =
   let p = poi base ip in
@@ -572,7 +522,7 @@ value print_relation_path conf base info =
          return ()
        else ();
     return ()
-  else if has_no_tables conf then
+  else if browser_doesnt_have_tables conf then
     print_with_pre conf base info
   else
     print_with_table conf base info

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.44 1999-08-04 22:16:26 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.45 1999-08-05 06:22:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -94,10 +94,13 @@ value print_choice conf base p niveau_effectif =
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=T> %s\n"
         (capitale (transl conf "tree"));
-      if niveau_effectif <= limit_by_tree then ()
+      let limit =
+        if browser_doesnt_have_tables conf then 2 else limit_by_tree
+      in
+      if niveau_effectif <= limit then ()
       else
         do Wserver.wprint "(";
-           Wserver.wprint (ftransl conf "max %d generations") limit_by_tree;
+           Wserver.wprint (ftransl conf "max %d generations") limit;
            Wserver.wprint ")\n";
         return ();
       html_li conf;
@@ -1364,12 +1367,44 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
   return ()
 ;
 
-value print_tree conf base v p =
-  let title _ =
-    Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
-      (person_text_no_html conf base p)
+value tree_reference gv conf base p s =
+  if conf.cancel_links then s
+  else
+    "<a href=\"" ^ commd conf ^ "m=A;t=T;v=" ^ string_of_int gv ^ ";" ^
+    acces conf base p ^ "\">" ^ s ^ "</a>"
+;
+
+value someone_text conf base reference p =
+  reference conf base p (person_title_text conf base p) ^
+  Date.short_dates_text conf base p
+;
+
+value print_tree_with_pre conf base v p =
+  let sz = 79 in
+  let v = min 2 v in
+  let print_parents sz ifath imoth =
+    let fath = poi base ifath in
+    let moth = poi base imoth in
+    do print_pre_left sz (someone_text conf base (tree_reference v) fath);
+       print_pre_right sz (someone_text conf base (tree_reference v) moth);
+    return ()
   in
-  let v = min limit_by_tree v in
+  tag "pre" begin
+     match (aoi base p.cle_index).parents with
+     [ Some ifam ->
+         let cpl = coi base ifam in
+         do print_parents sz cpl.father cpl.mother;
+            print_pre_center sz ("|" ^ String.make (sz / 2) ' ' ^ "|");
+            print_pre_center sz (String.make (sz / 2) '_');
+            print_pre_center sz "|";
+         return ()
+     | None -> () ];
+     print_pre_center sz (someone_text conf base reference p);
+  end
+;
+
+value print_tree_with_table conf base gv p =
+  let gv = min limit_by_tree gv in
   let next_gen pol =
     List.fold_right
       (fun po list ->
@@ -1392,15 +1427,9 @@ value print_tree conf base v p =
       pol []
   in
   let gen =
-    loop (v - 1) [Some p] [] where rec loop i gen list =
+    loop (gv - 1) [Some p] [] where rec loop i gen list =
       if i == 0 then [gen :: list]
       else loop (i - 1) (next_gen gen) [gen :: list]
-  in
-  let tree_reference p s =
-    if conf.cancel_links then s
-    else
-      "<a href=\"" ^ commd conf ^ "m=A;t=T;v=" ^ string_of_int v ^ ";" ^
-      acces conf base p ^ "\">" ^ s ^ "</a>"
   in
   let down_reference p s =
     if conf.cancel_links then s
@@ -1422,7 +1451,7 @@ value print_tree conf base v p =
                let txt = person_title_text conf base p in
                let txt =
                  if List.length gen = 1 then down_reference p txt
-                 else tree_reference p txt
+                 else tree_reference gv conf base p txt
                in
                txt ^ Date.short_dates_text conf base p
            | _ -> "&nbsp;" ]
@@ -1453,32 +1482,41 @@ value print_tree conf base v p =
       if i < n then Wserver.wprint "<td>&nbsp;</td>\n" else ();
     done
   in
+  tag "table" "border=0 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
+    let _ =
+      List.fold_left
+        (fun cs gen ->
+           do if cs > 1 then
+                let n = List.length gen in
+                do tag "tr" begin print_vertical_bars (2 * n) (cs - 1); end;
+                   tag "tr" begin print_horizontal_line n (cs - 1); end;
+                   tag "tr" begin print_vertical_bars n (2 * cs - 1); end;
+                return ()
+              else ();
+              tag "tr" begin
+                let _ =
+                  List.fold_left
+                    (fun first po ->
+                       do print_ancestor gen (2 * cs - 1) first po;
+                       return False)
+                    True gen
+                in ();
+              end;
+           return 2 * cs)
+        1 gen
+    in
+    ();
+  end
+;
+
+value print_tree conf base v p =
+  let title _ =
+    Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
+      (person_text_no_html conf base p)
+  in
   do header_no_page_title conf title;
-     tag "table" "border=0 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
-       let _ =
-         List.fold_left
-           (fun cs gen ->
-              do if cs > 1 then
-                   let n = List.length gen in
-                   do tag "tr" begin print_vertical_bars (2 * n) (cs - 1); end;
-                      tag "tr" begin print_horizontal_line n (cs - 1); end;
-                      tag "tr" begin print_vertical_bars n (2 * cs - 1); end;
-                   return ()
-                 else ();
-                 tag "tr" begin
-                   let _ =
-                     List.fold_left
-                       (fun first po ->
-                          do print_ancestor gen (2 * cs - 1) first po;
-                          return False)
-                       True gen
-                   in ();
-                 end;
-              return 2 * cs)
-           1 gen
-       in
-       ();
-     end;
+     if browser_doesnt_have_tables conf then print_tree_with_pre conf base v p
+     else print_tree_with_table conf base v p;
      trailer conf;
   return ()
 ;

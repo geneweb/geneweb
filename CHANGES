@@ -26,7 +26,7 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Aug 5, 99] Added descendants displaying by tree.
+  - [Aug 5, 99] Added descendants displaying by tree (doesn't work with Lynx).
   - [Aug 3, 99] Added ancestors displaying (and navigating) by tree.
   - [Aug 3, 99] In relationship by branches, found a solution to
     display the vertical bars correctly aligned relative to the
