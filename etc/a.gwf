@@ -1,4 +1,4 @@
-# $Id: a.cnf,v 2.2 1999-03-30 10:46:00 ddr Exp $
+# $Id: a.gwf,v 1.1 1999-04-20 20:13:57 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"

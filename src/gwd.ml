@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.6 1999-03-30 10:46:11 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.7 1999-04-20 20:13:57 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -180,7 +180,20 @@ value rec cut_at_equal i s =
 ;
 
 value read_base_env bname =
-  let fname = Filename.concat Util.base_dir.val bname ^ ".cnf" in
+  let fname =
+    let f = Filename.concat Util.base_dir.val bname ^ ".gwf" in
+    if Sys.file_exists f then f
+    else
+      let f = Filename.concat Util.base_dir.val bname ^ ".cnf" in
+      do if Sys.file_exists f then
+           do Printf.eprintf "\
+*** Name for config file \"%s.cnf\" is deprecated; \
+rename it as \"%s.gwf\".\n" bname bname;
+              flush stderr;
+           return ()
+         else ();
+      return f
+  in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let env =
@@ -413,7 +426,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
            try
              let r = List.assoc "can_send_photo" base_env = "yes" in
              do Printf.eprintf "\
-*** File \"%s.cnf\": \"can_send_photo\" is deprecated; \
+*** Config file for \"%s\": \"can_send_photo\" is deprecated; \
 use \"can_send_image\".\n"
                   base_file;
                 flush stderr;

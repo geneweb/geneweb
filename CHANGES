@@ -6,6 +6,8 @@ GeneWeb Version 2.01
   - [Mar 30, 99] Changed term "photo" into "image".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Apr 20, 99] Changed suffix ".cnf" into ".gwf" for configuration files
+    (because of confusion with that predefined suffix in Windows).
   - [Apr 20, 99] In short dates (just year), if no birth date, baptism date
     is displayed.
   - [Apr 19, 99] In latest births and latest deaths displaying, the
