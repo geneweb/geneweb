@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: recover2.htm,v 1.2 2002-01-17 06:15:53 ddr Exp $ -->
+  <!-- $Id: recover2.htm,v 1.3 2002-03-06 04:08:48 ddr Exp $ -->
   <title>[
 de: Eine bestehende Datenbank &uuml;bernehmen - Phase 3
 en: Recover a database - Phase 3
@@ -118,20 +118,26 @@ es: Apoye en el bot&oacute;n siguiente para lanzar la operaci&oacute;n
 fr: Appuyez sur le bouton ci-dessous pour lancer l'op&eacute;ration
 lv: Nospiediet zemâk esoðo podziòu, lai uzsâktu datu bâzes atjauninâðanu
 sv: Tryck på knappen nedan för att starta operationen
-]$v{[
+]$v{<br><blink><font color=red>[
 de:  und die Datenbank "$o" im Zielverzeichnis zu l&ouml;schen
 en: , and overwrite the database "$o" of the destination directory
 es:  y destruir la "$o" de la carpeta final
 fr:  et &eacute;craser la base "$o" du r&eacute;pertoire d'arriv&eacute;e
 lv: , un pârrakstîtu datu bâzi "$o" mçría katalogâ
 sv:  och radera databasen "$o" i målkatalogen
-]}:
+]</font></blink>}:
 
 <p>
 
 <form method=POST action="recover_2">
 $h
-<dl><dt><dd><input type=submit value="Ok"></dl>
+<dl><dt><dd>
+<input type=submit value="Ok">
+<input type=submit name=cancel value="[
+en: Cancel
+fr: Annuler
+]">
+</dl>
 </form>
 
 <p>

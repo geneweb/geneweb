@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.34 2002-02-14 10:19:38 ddr Exp $ *)
+(* $Id: setup.ml,v 4.35 2002-03-06 04:08:48 ddr Exp $ *)
 
 open Printf;
 
@@ -102,6 +102,12 @@ value header_no_page_title title =
   }
 ;
 
+value abs_setup_dir () =
+  if Filename.is_relative setup_dir.val then
+    Filename.concat (Sys.getcwd ()) setup_dir.val
+  else setup_dir.val
+;
+
 value trailer conf =
   do {
     Wserver.wprint "<p>\n";
@@ -111,7 +117,7 @@ value trailer conf =
 <img src=\"file://%s/images/gwlogo.gif\"
  width=64 height=72 align=right>
 <br>
-" (slashify (Filename.concat (Sys.getcwd ()) setup_dir.val));
+" (slashify (abs_setup_dir ()));
     Wserver.wprint "
 <hr><font size=-1><em>(c) Copyright 2002 INRIA -
 GeneWeb %s</em></font>" Version.txt;
@@ -305,7 +311,7 @@ value macro conf =
   | 'a' -> strip_spaces (s_getenv conf.env "anon")
   | 'c' -> stringify (Filename.concat setup_dir.val conf.comm)
   | 'd' -> conf.comm
-  | 'f' -> slashify (Filename.concat (Sys.getcwd ()) setup_dir.val)
+  | 'f' -> slashify (abs_setup_dir ())
   | 'i' -> strip_spaces (s_getenv conf.env "i")
   | 'l' -> conf.lang
   | 'm' -> server_string conf
@@ -313,7 +319,7 @@ value macro conf =
   | 'o' -> strip_spaces (s_getenv conf.env "o")
   | 'p' -> parameters conf.env
   | 'q' -> Version.txt
-  | 'u' -> Filename.dirname (Filename.concat (Sys.getcwd ()) setup_dir.val)
+  | 'u' -> Filename.dirname (abs_setup_dir ())
   | 'x' -> setup_dir.val
   | 'w' -> slashify (Sys.getcwd ())
   | '$' -> "$"
@@ -1395,7 +1401,7 @@ value has_gwb_directories dh =
   [ End_of_file -> do { Unix.closedir dh; False } ]
 ;
 
-value setup_comm conf =
+value setup_comm_ok conf =
   fun
   [ "gwsetup" -> setup_gen conf
   | "simple" -> simple conf
@@ -1434,6 +1440,13 @@ value setup_comm conf =
   | "gwd" -> gwd conf
   | "gwd_1" -> gwd_1 conf
   | x -> error conf ("bad command: \"" ^ x ^ "\"") ]
+;
+
+value setup_comm conf comm =
+  match p_getenv conf.env "cancel" with
+  [ Some _ ->
+      setup_gen {(conf) with env = [("lang", conf.lang); ("v", "main.htm")]}
+  | None -> setup_comm_ok conf comm ]
 ;
 
 value string_of_sockaddr =

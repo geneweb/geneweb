@@ -1,6 +1,10 @@
 GeneWeb version 4.06
 --------------------
 
+* Installation
+  - [06 Mar 02] In Windows version with installer, it is now possible to
+    specify the database directory.
+
 * GeneWeb server or CGI (gwd)
   - [05 Mar 02] Fixed bug: the navigation supposed to avoid the
     "reloading" of pages (proposed in bottom of welcome pages) did not
@@ -23,6 +27,7 @@ GeneWeb version 4.06
     Victor-Hugo (first name "François", surname "Victor-Hugo").
 
 * Setup program (gwsetup)
+  - [06 Mar 02] Added "cancel" buttons close to some "ok" buttons.
   - [05 Mar 02] Updated German in templates (Thomas Omerzu).
 
 GeneWeb version 4.05
