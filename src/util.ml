@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.12 1999-04-17 14:18:05 ddr Exp $ *)
+(* $Id: util.ml,v 2.13 1999-04-17 18:17:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1038,9 +1038,9 @@ value afficher_prenom_de_personne_referencee conf base p =
 ;
 
 value afficher_personne_referencee conf base p =
-  Wserver.wprint "%s" (reference conf base p (person_text conf base p))
+  Wserver.wprint "\n%s" (reference conf base p (person_text conf base p))
 ;
 
 value afficher_personne_titre_referencee conf base p =
-  Wserver.wprint "%s" (referenced_person_title_text conf base p)
+  Wserver.wprint "\n%s" (referenced_person_title_text conf base p)
 ;
