@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.215 2004-12-22 09:29:36 ddr Exp $
+# $Id: lexicon.txt,v 4.216 2004-12-29 09:39:31 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !charset
@@ -1744,7 +1744,7 @@ sv: ocks&aring;
 
     an ancestor
 af: 'n voorsaat
-bg: прародител
+bg: един от предците
 br: un hendad/un henvamm
 ca: un avantpassat
 cs: pшedek
@@ -1826,7 +1826,7 @@ zh: ЧжПИ
 
     ancestors (some)
 af: voorsate
-bg: родители и прародители
+bg: предци
 br: hendadoщ
 ca: avantpassats
 cs: pшedkovй
@@ -5522,7 +5522,7 @@ sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande
 
     missing ancestors
 af: ontbrekende voorsate
-bg: липсващи прародители
+bg: липсващи предци
 br: lod eus e hendadoщ a vank
 ca: ascendents que falten
 cs: chybмjнcн pшedkovй
@@ -7780,6 +7780,7 @@ cs: %d nejstarЕЎГ­ch pГЎrЕЇ je zЕ™ejmД› stГЎle ЕѕijГ­cГ­ch a zadanГЅch
 da: og de %d &aelig;ldste par muligvis stadig i live og forlovede
 de: Die %d &auml;ltesten verlobten und m&ouml;glicherweise noch lebende Paare
 en: the %d oldest couples perhaps still alive and engaged
+fi: %d vanhinta mahdollisesti elossa olevaa kihlaparia
 fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacute;s
 nl: De %d langst paren die mogelijk nog steeds leven en getrouwd zijn
 pt: o %d mais velho casal talvez ainda vivo e noivado
@@ -9135,7 +9136,7 @@ sv: administrat&ouml;r/administrat&ouml;rer/v&auml;n/v&auml;n
 
     would be his/her own ancestor
 af: sal sy/haar eie voorganger wees
-bg: ще се окаже прародител/прародителка на себе си
+bg: ще се окаже един от собствените си предци
 br: a vefe e/he hendad
 ca: seria el seu propi avantpassat
 cs: byl by svщj vlastnн pшedek
