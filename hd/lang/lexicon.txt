@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.188 2004-02-04 12:17:31 ddr Exp $
+# $Id: lexicon.txt,v 4.189 2004-02-09 08:40:50 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -65,7 +65,7 @@ bg: af=áóğñêè/bg=áúëãàğñêè/ca=êàòàëîíñêè/cs=÷åøêè/da=äàòñêè/de=íåìñêè/en=àíãëèéñ
 br: af=afrikaaneg/bg=bulgareg/br=brezhoneg/ca=katalaneg/cs=tchekeg/da=daneg/de=alamaneg/en=saozneg/eo=esperanteg/es=spagnoleg/et=estonieg/fi=finneg/fr=galleg/he=hebreeg/is=islandeg/it=italianeg/lv=letoneg/nl=izelvroeg/no=norvegieg/pl=poloneg/pt=portugaleg/pt-br=portugaleg bro-Vrazil/ro=roumaneg/ru=rusianeg/sl=sloveneg/sv=svedeg/zh=sinaeg
 ca: af=africà/ca=català/cs=xec/da=danès/de=alemany/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/pl=polac/pt=portuguès/pt-br=brasiler/ru=rus/sl=eslovè/sv=suec/zh=Xinès
 cs: af=afrikán¹tina/bg=bulhar¹tina/cs=èe¹tina/da=dán¹tina/de=nìmèina/en=angliètina/eo=esperanto/es=¹panìl¹tina/fi=fin¹tina/fr=francouz¹tina/he=hebrej¹tina/is=island¹tina/it=ital¹tina/lv=loty¹¹tina/nl=holand¹tina/no=nor¹tina/pt=portugal¹tina/pt-br=brasil¹tina/ru=ru¹tina/sv=¹véd¹tina/zh=èín¹tina
-da: af=afrikaans/bg=bulgarsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ro=rum&aelig;nsk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
+da: af=afrikaans/bg=bulgarsk/br=bretonsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ro=rum&aelig;nsk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
 de: af=Afrikaans/bg=Bulgarish/ca=Katalanisch/cs=Tschechisch/da=D&auml;nisch/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/nl=Holl&auml;ndisch/no=Norwegisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ru=Russisch/sl=Slovenisch/sv=Schwedisch/zh=Chinesisch
 en: af=Afrikaans/bg=Bulgarian/br=Breton/ca=Catalan/cs=Czech/da=Danish/de=German/en=English/eo=Esperanto/es=Spanish/et=Estonian/fi=Finnish/fr=French/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/nl=Dutch/no=Norwegian/pl=Polish/pt=Portuguese/pt-br=Brazilian-Portuguese/ro=Romanian/ru=Russian/sl=Slovenian/sv=Swedish/zh=Chinese
 eo: bg=bulgara/en=anglo/eo=esperanto/fr=franco
@@ -78,7 +78,7 @@ is: af=afrikanska/cs=tékkneska/da=danska/de=şıska/en=enska/eo=esperanto/es=spæns
 it: af=afrikaans/bg=bulgaro/ca=catalano/cs=ceco/da=danese/de=tedesco/en=inglese/eo=esperanto/es=spagnolo/et=estone/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pl=polacco/pt=portoghese/pt-br=portoghese-brasiliano/ru=russo/sl=sloveno/sv=svedese/zh=cinese
 lv: cs=Èehu/da=Dâòu/de=Vâcu/en=Angïu/eo=Esperanto/es=Spâòu/fi=Somu/fr=Franèu/he=Ebreju/is=Islandieğû/it=Itâïu/lv=Latvieğu/nl=Holandieğu/no=Norvçìu/pt=Portugâïu/pt-br=Brasil-Portugâïu/ru=Krievu/sv=Zviedru/zh=Íînieğu
 nl: af=Afrikaans/cs=Tsjechisch/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/fi=Fins/fr=Frans/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/nl=Nederlands/no=Noors/pt=Portugees/pt-br=Brasil-Portugees/ru=Russisch/sv=Zweeds/zh=Chinees
-no: af=afrikaans/bg=bulgarsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=Brasil-portugisisk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
+no: af=afrikaans/bg=bulgarsk/br=bretonsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=Brasil-portugisisk/ro=rumensk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
 pl: af=afrikaans/bg=bu³garski/ca=kataloñski/cs=czeski/da=duñski/de=niemiecki/en=angielski/eo=esperanto/es=hiszpañski/et=estoñski/fi=fiñski/fr=francuski/he=hebrajski/is=islandzki/it=w³oski/lv=³otewski/nl=niderlandzki/no=norweski/pl=polski/pt=portugalski/pt-br=portugalski (Brazylia)/ru=rosyjski/sv=szwedzki/zh=chiñski
 pt: af=Afrikaans/ca=Catal&atilde;/cs=Checo/da=Dinamarqu&ecirc;s/de=Alem&atilde;o/en=Ingl&ecirc;s/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finland&ecirc;s/fr=Franc&ecirc;s/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/nl=Holand&ecirc;s/no=Noruegu&ecirc;s/pl=Polon&ecirc;s/pt=Portugu&ecirc;s/pt-br=Portugu&ecirc;s-do-Brasil/ru=Russo/sv=Sueco/zh=Chin&ecirc;s
 pt-br: af=Afrikaner/ca=Catal&atilde;o/cs=Checo/da=Dinamarqu&ecirc;s/de=Alem&atilde;o/en=Ingl&ecirc;s/eo=Esperanto/es=Espanhol/et=Estoniano/fi=Finland&ecirc;s/fr=Franc&ecirc;s/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/nl=Holand&ecirc;s/no=Noruegu&ecirc;s/pl=Polon&ecirc;s/pt=Portugu&ecirc;s/pt-br=Portugu&ecirc;s-do-Brasil/ru=Russo/sv=Sueco/zh=Chin&ecirc;s
@@ -2265,6 +2265,7 @@ zh:  ³öÉúÓÚ½ñÈÕµÄ¼ÇÂ¼
 
     border
 bg: ğàìêà
+br: bord 
 da: ramme
 de: Rand
 en: border
@@ -2742,6 +2743,7 @@ sv: klicka "%s"
 
     color
 bg: öâÿò
+br: liv
 da: farve
 de: Farbe
 en: colour
@@ -5889,12 +5891,14 @@ sv: inga tr&auml;ffar
 
     no mention
 bg: íå ñå ñïîìåíàâà
+br: meneg ebet
 da: andet
 de: nicht erv&auml;hnt
 en: no mention
 es: sin informaci&oacute;n
 fr: pas de mention
 it: senza menzione
+no: ukjent familieforhold
 pl: bez wzmianki
 pt: sem informa&ccedil;&atilde;o
 ru: íåò óïîìèíàíèé
@@ -6037,12 +6041,14 @@ sv: notering/noteringar
 zh: ±¸×¢
 
     notes modified
+br: notenno&ugrave; kemmet
 da: noter &aelig;ndret
 de: ge&auml;nderte Notizen
 en: notes modified
 es: notas modificadas
 fr: notes modifi&eacute;es
 it: note modificate
+no: notater er endret 
 pl: uwagi zmodyfikowane
 pt: notas modificadas
 ru: çàìåòêè èçìåíåíû
