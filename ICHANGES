@@ -4,6 +4,11 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.10
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [10 Nov 00] Fixed bug in titles tree: when the same person appeared
+    several times in the title list, the title tree showed his last order
+    number instead of his (more logicial) first order number. 
+
 GeneWeb Version 3.09
 --------------------
 
