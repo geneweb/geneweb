@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.27 2004-12-30 10:11:25 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.28 2005-01-18 10:47:00 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -76,6 +76,19 @@ value starting_char s =
   [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '0'..'9' -> True
   | '?' -> if s = "?" then True else False
   | _ -> False ]
+;
+
+value no_newlines s =
+  let s' = String.create (String.length s) in
+  do {
+    for i = 0 to String.length s - 1 do {
+      s'.[i] :=
+        match s.[i] with
+        [ '\n' | '\r' -> ' '
+        | _ -> s.[i] ]
+    };
+    s'
+  }
 ;
 
 value gen_correct_string no_colon s =
@@ -425,7 +438,7 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
     in
     match fam.comment with
     [ txt when sou base txt <> "" ->
-        fprintf oc "comm %s\n" (correct_string base txt)
+        fprintf oc "comm %s\n" (no_newlines (sou base txt))
     | _ -> () ];
     match Array.length m.m_chil with
     [ 0 -> ()
