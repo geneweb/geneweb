@@ -13,11 +13,6 @@ GeneWeb version 3.12
   - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
 
 * GeneWeb server or CGI (gwd)
-  - [01 Mar 01] In anniversaries pages, the phrase "today, weekday
-    date", has been replaced by "today, on weekday date" (added "on"). It
-    was necessary for some languages (Finnish, Estonian). It sounds
-    a little bit strange in French but acceptable. If it is not
-    acceptable in other languages, this system will be changed.
   - [28 Feb 01] In surname displaying, if several surnames match,
     everybody is displayed with his/her surname. Previously, the surname
     of the people having the first surname of the list was not displayed.
@@ -49,6 +44,8 @@ GeneWeb version 3.12
     %father_age_at_birth; and %mother_age_at_birth;
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
+  - [01 Mar 01] Added entry "on (weekday day month year)" for the
+    anniversary page sentence: "today, weekday day month year, etc".
   - [19 Feb 01] Updated several lexicon entries in Estonian (Hanno
     Kuus)
   - [16 Feb 01] In all welcome pages, suppressed the text "or surname" in

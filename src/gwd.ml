@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.77 2001-02-23 20:03:44 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.78 2001-03-01 12:52:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -191,7 +191,7 @@ value input_lexicon lang =
         (List.fold_right Filename.concat [Util.lang_dir.val; "lang"]
            "lexicon.txt")
     in
-    let pref = lang ^ ": " in
+    let pref = lang ^ ":" in
     try
       do try
            while True do
@@ -203,11 +203,14 @@ value input_lexicon lang =
                  else line
              in
              loop (input_line ic) where rec loop line =
-               if String.length line < 4 then ()
+               if String.length line < 3 then ()
                else
-                 do if String.sub line 0 4 = pref then
-                      Hashtbl.add t (String.sub k 4 (String.length k - 4))
-                        (String.sub line 4 (String.length line - 4))
+                 do if String.sub line 0 3 = pref then
+                      let v =
+                        if String.length line = 3 then ""
+                        else String.sub line 4 (String.length line - 4)
+                      in
+                      Hashtbl.add t (String.sub k 4 (String.length k - 4)) v
                     else ();
                  return loop (input_line ic);
            done

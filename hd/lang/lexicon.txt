@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.242 2001-03-01 08:21:25 ddr Exp $
+# $Id: lexicon.txt,v 3.243 2001-03-01 12:52:03 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -104,7 +104,7 @@ dk:  for at fors&oslash;ge igen med dette nummer
 en:  to try again with this number
 eo:  por reprovi kun cxi tiu numero
 es:  para ensayar de nuevo con este n&uacute;mero
-et: , proovi uuesti sama numbriga 
+et: , proovi uuesti sama numbriga
 fi:  yritt&auml;&auml;ksesi uudelleen t&auml;ll&auml numerolla
 fr:  pour r&eacute;essayer avec ce num&eacute;ro
 he:  ìğñåú ùåá òí äîñôø äæä
@@ -194,7 +194,7 @@ ct: cosins de %s grau
 de: Cousins %s Grades
 dk: f&aelig;tre og kusiner af %s grad
 en: %s cousins
-eo: %s gradaj  gekuzoj 
+eo: %s gradaj  gekuzoj
 es: primos de %s grado
 et: %s nõod
 fi: %s serkut
@@ -345,7 +345,7 @@ pt: o sexo de %t não é coerente com suas relações
 se: %ts kön stämmer inte överens med sina relationer
 
     (date)
-af: 1 %m %y/%d %m %y/%m %y/%y 
+af: 1 %m %y/%d %m %y/%m %y/%y
 cn: %yÄê%m1ÈÕ/%yÄê%m%dÈÕ/%yÄê%m/%yÄê
 cs: 1. %m %y/%d. %m %y/%m %y/%y
 ct: 1 d[e']%m de %y/%d d[e']%m de %y/%m de %y/%y
@@ -547,7 +547,7 @@ dk: , er det
 en: , it will be
 eo: , estos
 es: , ser&aacute;
-et: , on 
+et: , on
 fi: ,
 fr: , ce sera
 he:  , éäéä
@@ -1654,7 +1654,7 @@ ct: aniversaris de les persones difuntes
 de: Jahrestage der verstorbenen Personen
 dk: &aring;rsdage for d&oslash;de personer
 en: anniversaries of dead people
-eo: mortotagaj datrevenoj 
+eo: mortotagaj datrevenoj
 es: aniversarios de las personas fallecidas
 et: surnud inimeste mälestuspäevad
 fi: vainajien muistop&auml;ivi&auml
@@ -1797,7 +1797,7 @@ es: bautizado/bautizada/bautizado(a)
 et: ristitud
 fi: kastettu
 fr: baptis&eacute;/baptis&eacute;e/baptis&eacute;(e)
-he:  ìğöøåú / ğèáìä ìğöøåú   ğèáì  
+he:  ìğöøåú / ğèáìä ìğöøåú   ğèáì 
 is: skírğ(ur)
 it: battezzato/battezzata/battezzato(a)
 lv: baptized
@@ -2644,7 +2644,7 @@ dk: d&oslash;d
 en: died
 eo: mortinta
 es: fallecido/fallecida/fallecido(a)
-et: surnud 
+et: surnud
 fi: kuollut
 fr: d&eacute;c&eacute;d&eacute;/d&eacute;c&eacute;d&eacute;e/d&eacute;c&eacute;d&eacute;(e)
 he:   ğôèø/ ğôèøä
@@ -2984,7 +2984,7 @@ ct: família afegida
 de: Familie hinzugef&uuml;gt
 dk: familie tilf&oslash;jet
 en: family added
-eo: familio aldonita 
+eo: familio aldonita
 es: familia agregada
 et: pere lisatud		
 fi: perhe lis&auml;tty
@@ -3007,7 +3007,7 @@ ct: família esborrada
 de: Familie gel&ouml;scht
 dk: familie slettet
 en: family deleted
-eo: familio nuligita 
+eo: familio nuligita
 es: familia borrada
 et: pere kustutatud
 fi: perhe poistettu
@@ -3033,7 +3033,7 @@ en: family modified
 eo: familio modifita
 es: familia modificada
 et: pere muudetud
-fi: perhett&auml muutettu 
+fi: perhett&auml muutettu
 fr: famille modifi&eacute;e
 he:  îùôçä äòåãëğä
 is: fjölskyldu breytt
@@ -3267,7 +3267,7 @@ et: kasuisa/kasuema/kasuvanemad
 fi: kasvatusis&auml;/kasvatus&auml;iti/kasvatusvanhemmat
 fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
 he:   àá çåøâ/ àí çåøâú/ äåøéí çåøâéí
-is: fóstur foreldri 
+is: fóstur foreldri
 lv: audşu tçvs/mâte/vecâki
 nl: pleegvader/pleegmoeder/pleegouders
 no: fosterfar/fostermor/fosterforeldre
@@ -3412,7 +3412,7 @@ ru: ïğàïğàğîäèòåëè
 se: gammel-far(mor)f&ouml;r&auml;ldrar
 
     gregorian/julian/french/hebrew
-af: gregoriaans/juliaans/frans/hebreeus 
+af: gregoriaans/juliaans/frans/hebreeus
 cs: gregoriánskı/juliánskı/francouzskı/¾idovskı
 ct: gregorià/julià/francès/hebreu
 de: Gregorianisch/Julianisch/Franz&ouml;sisch/Hebr&auml;isch
@@ -3696,7 +3696,7 @@ en: in
 eo: en
 es: en
 et: :s:
-fi:  
+fi: 
 fr: en
 he:   á-
 is: í
@@ -3719,8 +3719,8 @@ dk: i
 en: in
 eo: en
 es: en
-et: 
-fi:    
+et:
+fi:   
 fr: en
 he:  á-
 is: &nbsp;
@@ -3731,7 +3731,7 @@ no: i
 pl: w roku
 pt: em
 ru: â
-se:  
+se: 
 
     include missing spouses
 af: ontbrekende ouers ingesluit
@@ -3852,7 +3852,7 @@ se: fel f&ouml;rfr&aring;gan
 af: inderdaad,
 cs: ve skuteènosti
 ct: en efecte
-de: weil 
+de: weil
 dk: faktisk,
 en: indeed,
 eo: ja,
@@ -3952,7 +3952,7 @@ es: es
 et: on
 fi: on
 fr: est
-he:  
+he: 
 is: er
 it: &egrave;
 lv: ir
@@ -3960,7 +3960,7 @@ nl: is
 no: er
 pl: jest
 pt: &eacute;
-ru:  
+ru: 
 se: &auml;r
 
     is a very young parent
@@ -4973,7 +4973,7 @@ he:  än/øàùåğä/ ùğéú/ ùìéùéú/ øáéòéú/ çîùéú/ ùéùéú/ ùáéòéú/ ùîéğéú/ úùéòéú/ òùéø
     nth (generation)
 af: n-te/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
 cs: n-tı/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
-ct: n-èssima/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/21a/22a/23a/24a/25a/26a/27a/28a/29a/30a/31a/32a/33a/34a/35a/36a/37a/38a/39a/40a/41a/42a/43a/44a/45a/46a/47a/48a/49a/50a/51a/52a/53a/54a/55a/56a/57a/58a/59a/60a/61a/62a/63a/64a/65a/66a/67a/68a/69a/70a/71a/72a/73a/74a/75a/76a/77a/78a/79a/80a/81a/82a/83a/84a/85a/86a/87a/88a/89a/90a/91a/92a/93a/94a/95a/96a/97a/98a/99a 
+ct: n-èssima/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/20a/21a/22a/23a/24a/25a/26a/27a/28a/29a/30a/31a/32a/33a/34a/35a/36a/37a/38a/39a/40a/41a/42a/43a/44a/45a/46a/47a/48a/49a/50a/51a/52a/53a/54a/55a/56a/57a/58a/59a/60a/61a/62a/63a/64a/65a/66a/67a/68a/69a/70a/71a/72a/73a/74a/75a/76a/77a/78a/79a/80a/81a/82a/83a/84a/85a/86a/87a/88a/89a/90a/91a/92a/93a/94a/95a/96a/97a/98a/99a
 de: n-ten/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 dk: nte/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 en: nth/1st/2nd/3rd/4th/5th/6th/7th/8th/9th/10th/11th/12th/13th/14th/15th/16th/17th/18th/19th/20th/21st/22nd/23rd/24th/25th/26th/27th/28th/29th/30th/31st/32nd/33rd/34th/35th/36th/37th/38th/39th/40th/41st/42nd/43rd/44th/45th/46th/47th/48th/49th/50th/51st/52nd/53rd/54th/55th/56th/57th/58th/59th/60th/61st/62nd/63rd/64th/65th/66th/67th/68th/69th/70th/71st/72nd/73rd/74th/75th/76th/77th/78th/79th/80th/81st/82nd/83rd/84th/85th/86th/87th/88th/89th/90th/91st/92nd/93rd/94th/95th/96th/97th/98th/99th
@@ -5240,10 +5240,34 @@ it: il
 lv: datums:
 nl: op
 no: den
-pl: 
+pl:
 pt: a
-ru: 
+ru:
 se: den
+
+    on (weekday day month year)
+af:
+cn:
+cs:
+ct:
+de:
+dk:
+en:
+eo:
+es:
+et: :i:
+fi: :e:
+fr:
+he:
+is:
+it:
+lv:
+nl:
+no:
+pl:
+pt:
+ru:
+se:
 
     one day old
 af: een dag oud
@@ -5707,7 +5731,7 @@ ru: ïğîçâèùå
 se: smeknamn
 
     recognized son/recognized daughter/recognized child
-af: aanvaarde seun/aanvaarde dogter/aanvaarde kind 
+af: aanvaarde seun/aanvaarde dogter/aanvaarde kind
 cs: uznanı syn/uznaná dcera/uznané dítì
 ct: fill reconegut/filla reconeguda/fills reconeguts
 de: anerkannter Sohn/anerkannte Tochter/anerkanntes Kind
@@ -6085,7 +6109,7 @@ es: atajo
 et: lühim tee
 fi: lyhin polku
 fr: chemin le plus court
-he:   ÷ùø äëé ÷øåá  
+he:   ÷ùø äëé ÷øåá 
 is: stysta leiğ
 it: legame più diretto
 lv: îsâkais ceïğ
@@ -6307,7 +6331,7 @@ se: som b&ouml;rjar med
     statistics
 cs: statistika
 ct: estadístiques
-de: Statistiken    
+de: Statistiken   
 dk: statistikker
 en: statistics
 eo: statistikoj
@@ -6576,7 +6600,7 @@ se: de %d f&ouml;rnamnen
     the %d oldest perhaps still alive
 cs: %d nejstar¹ích snad je¹tì ¾ijících osob
 ct: les %d persones més grans, potser encara vives
-de: die %d &auml;ltesten vermutlich noch lebenden Personen    
+de: die %d &auml;ltesten vermutlich noch lebenden Personen   
 dk: de %d &aelig;ldste af de muligt levende
 en: the %d oldest perhaps still alive
 eo: la %d plej maljunaj eble ankoraù vivantaj
@@ -6584,7 +6608,7 @@ es: los %s m&aacute;s viejos quiz&aacute;s todov&iacute;a vivo
 et: %d vanimat kes on võib-olla veel elus
 fi: %d vanhinta ehk&auml viel&auml el&auml;v&auml;&auml
 fr: les %d les plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
-he:  äæ÷ï ä %d  ùàåìé òåã áçééí 
+he:  äæ÷ï ä %d  ùàåìé òåã áçééí
 is: %d elsti sem kann ağ vera á lífi
 it: i%d più vecchi possono essere ancora viventi
 lv: %d visvecâkie iespçjams vçl ir dzîvi
@@ -6620,7 +6644,7 @@ se: de %d efternamnen
     the %d who lived the longest
 cs: %d osob které ¾ili nejdéle
 ct: les %d persones que han viscut més anys
-de: die %d Personen, die am l&auml;ngsten lebten   
+de: die %d Personen, die am l&auml;ngsten lebten  
 dk: de %d som har levet l&aelig;ngst
 en: the %d who lived the longest
 eo: la %d, kiuj vivis plejlonge
@@ -6628,14 +6652,14 @@ es: los %d que han vivido m&aacute;s mucho tiempo
 et: %d kes elasid kõige kauem
 fi: %d pisimpään elänyttä
 fr: les %d ayant v&eacute;cu le plus longtemps
-he:  ä %d áàøéëåú éîéí 
+he:  ä %d áàøéëåú éîéí
 is: %d sem lifği lengst
 it: %d avendo visuto più a lungo
 lv: %d, kuri dzîvojuği visilgâk
 nl: de %d langst levende personen
 no: de %d som har levd lengst
 pl: %d osób, które ¿y³y najd³u¿ej
-pt: os %d que mais viveram 
+pt: os %d que mais viveram
 se: de %d som har levt l&auml;ngst
 
     the %s generation
@@ -7047,7 +7071,7 @@ is: síğast giftist %d
 it: gli ultimi %d matrimoni
 lv: pçdçjâs %d laulîbas
 nl: de %d laatste huwelijken
-no: de %d sist gifte 
+no: de %d sist gifte
 pl: %d ostatnich œlubów
 pt: os %d casamentos mais recentes
 se: de senaste %d äktenskapen

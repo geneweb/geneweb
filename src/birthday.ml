@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.18 2001-03-01 08:21:26 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.19 2001-03-01 12:52:04 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -190,7 +190,7 @@ value print_birth_day conf base day_name verb wd dt list =
          Wserver.wprint "%s%s\n"
            (std_color conf
               ("<b>" ^
-               transl_decline conf "on (day month year)"
+               transl_decline conf "on (weekday day month year)"
                  (transl_nth conf "(week day)" wd ^ " " ^
                   Date.code_dmy conf dt) ^
                "</b>"))
@@ -240,7 +240,7 @@ value print_anniv conf base day_name verb wd dt list =
            (capitale day_name)
            (std_color conf
               ("<b>" ^
-               transl_decline conf "on (day month year)"
+               transl_decline conf "on (weekday day month year)"
                  (transl_nth conf "(week day)" wd ^ " " ^
                   Date.code_dmy conf dt) ^
               "</b>"))
@@ -336,7 +336,7 @@ value print_marriage_day conf base day_name verb wd dt list =
          Wserver.wprint "%s%s\n"
            (std_color conf
               ("<b>" ^
-               transl_decline conf "on (day month year)"
+               transl_decline conf "on (weekday day month year)"
                  (transl_nth conf "(week day)" wd ^ " " ^
                   Date.code_dmy conf dt) ^
                "</b>"))
