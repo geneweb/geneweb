@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 1.5 1998-12-16 06:04:50 ddr Exp $ *)
+(* $Id: check.ml,v 1.6 1998-12-16 17:36:24 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -191,16 +191,16 @@ value update_stats base current_year s p =
 
 value check_base base gen pr_stats =
   let s =
-    let y = (1000, base.persons.get 0) in
-    let o = (0, base.persons.get 0) in
+    let y = (1000, base.data.persons.get 0) in
+    let o = (0, base.data.persons.get 0) in
     {men = 0; women = 0; neutre = 0; noname = 0;
      oldest_father = o; oldest_mother = o; youngest_father = y;
      youngest_mother = y; oldest_dead = o; oldest_still_alive = o}
   in
   let current_year = (Unix.localtime (Unix.time ())).Unix.tm_year + 1900 in
   do Gutil.check_base base (set_error base gen) (set_warning base);
-     for i = 0 to base.persons.len - 1 do
-       let p = base.persons.get i in
+     for i = 0 to base.data.persons.len - 1 do
+       let p = base.data.persons.get i in
        do if not gen.g_def.(i) then
             Printf.printf "Undefined: %s%s %s\n"
               (sou base p.first_name)

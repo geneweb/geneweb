@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 1.8 1998-12-16 06:05:03 ddr Exp $ *)
+(* $Id: updateFam.ml,v 1.9 1998-12-16 17:36:44 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -397,7 +397,7 @@ value print_add conf base =
   let (fath, moth) =
     match p_getint conf.env "i" with
     [ Some i ->
-        let p = base.persons.get i in
+        let p = base.data.persons.get i in
         let fath =
           match p.sex with
           [ Masculine | Neuter -> person_key base p.cle_index
@@ -426,7 +426,7 @@ value print_add conf base =
 value print_add_parents conf base =
   match p_getint conf.env "i" with
   [ Some i ->
-      let p = base.persons.get i in
+      let p = base.data.persons.get i in
       let fam =
         {marriage = Adef.codate_None; marriage_place = "";
          marriage_src = "";
@@ -472,7 +472,7 @@ value rec find_families ifam =
 value print_swi conf base =
   match (p_getint conf.env "i", p_getint conf.env "f") with
   [ (Some ip, Some ifam)  ->
-      let p = base.persons.get ip in
+      let p = base.data.persons.get ip in
       match find_families (Adef.ifam_of_int ifam) (Array.to_list p.family) with
       [ Some (ifam1, ifam2) ->
           print_swi1 conf base p (foi base ifam1) (foi base ifam2)

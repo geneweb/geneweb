@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 1.5 1998-12-16 06:04:52 ddr Exp $ *)
+(* $Id: def.mli,v 1.6 1998-12-16 17:36:26 ddr Exp $ *)
 
 type iper = Adef.iper;
 type ifam = Adef.ifam;
@@ -116,14 +116,17 @@ type istr_iper_index =
     next : istr -> istr }
 ;
 
-type base =
+type base_data =
   { persons : cache base_person;
     ascends : cache base_ascend;
     families : cache base_family;
     couples : cache base_couple;
     strings : cache string;
-    has_family_patches : bool;
-    persons_of_name : string -> list iper;
+    has_family_patches : bool }
+;
+
+type base_func =
+  { persons_of_name : string -> list iper;
     strings_of_fsname : string -> list istr;
     index_of_string : string -> istr;
     persons_of_surname : istr_iper_index;
@@ -136,4 +139,9 @@ type base =
     patch_name : string -> iper -> unit;
     commit_patches : unit -> unit;
     cleanup : unit -> unit }
+;
+
+type base =
+  { data : base_data;
+    func : base_func }
 ;

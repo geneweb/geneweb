@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 1.3 1998-09-30 14:04:44 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 1.4 1998-12-16 17:36:34 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -75,8 +75,8 @@ value print_merge1 conf base fam fam2 digest =
 value print_merge conf base =
   match (p_getint conf.env "f1", p_getint conf.env "f2") with
   [ (Some f1, Some f2) ->
-      let fam1 = base.families.get f1 in
-      let fam2 = base.families.get f2 in
+      let fam1 = base.data.families.get f1 in
+      let fam2 = base.data.families.get f2 in
       let sfam = reconstitute conf base fam1 fam2 in
       let digest = Update.digest_family fam1 in
       print_merge1 conf base sfam fam2 digest
@@ -91,8 +91,8 @@ value print_mod_merge_ok conf base wl fam cpl =
      UpdateFamOk.print_family conf base wl fam cpl;
      match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
      [ (Some ini1, Some ini2) ->
-         let p1 = base.persons.get ini1 in
-         let p2 = base.persons.get ini2 in
+         let p1 = base.data.persons.get ini1 in
+         let p2 = base.data.persons.get ini2 in
          do Wserver.wprint "\n<p>\n";
             stag "a" "href=%sm=MRG_IND;i=%d;i2=%d" (commd conf) ini1 ini2
             begin
@@ -112,11 +112,11 @@ value print_mod_merge_ok conf base wl fam cpl =
 value effective_mod_merge conf base sfam scpl =
   match p_getint conf.env "i2" with
   [ Some i2 ->
-      let fam2 = base.families.get i2 in
+      let fam2 = base.data.families.get i2 in
       do UpdateFamOk.effective_del conf base fam2; return
       let (fam, cpl) = UpdateFamOk.effective_mod conf base sfam scpl in
       let wl = UpdateFamOk.all_checks_family conf base fam cpl in
-      do base.commit_patches ();
+      do base.func.commit_patches ();
          print_mod_merge_ok conf base wl fam cpl;
       return ()
   | None -> incorrect_request conf ]

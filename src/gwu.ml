@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 1.11 1998-12-16 06:04:57 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.12 1998-12-16 17:36:31 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -469,10 +469,10 @@ value gwu base out_dir src_oc_list anc desc =
     | None -> None ]
   in
   let ((per_sel, fam_sel) as sel) = Select.functions base anc desc in
-  let fam_done = Array.create (base.families.len) False in
-  for i = 0 to base.families.len - 1 do
-    let fam = base.families.get i in
-    let cpl = base.couples.get i in
+  let fam_done = Array.create (base.data.families.len) False in
+  for i = 0 to base.data.families.len - 1 do
+    let fam = base.data.families.get i in
+    let cpl = base.data.couples.get i in
     if is_deleted_family fam then ()
     else
       do if fam_done.(i) then ()
@@ -607,12 +607,12 @@ value main () =
   in
   let base = Iobase.input in_file.val in
   let src_oc_list = ref [] in
-  let _ = base.ascends.array () in
-  let _ = base.strings.array () in
+  let _ = base.data.ascends.array () in
+  let _ = base.data.strings.array () in
   do if not mem.val then
-       let _ = base.persons.array () in
-       let _ = base.families.array () in
-       let _ = base.couples.array () in
+       let _ = base.data.persons.array () in
+       let _ = base.data.families.array () in
+       let _ = base.data.couples.array () in
        ()
      else ();
   return

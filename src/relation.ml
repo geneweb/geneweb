@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: relation.ml,v 1.11 1998-12-16 06:05:00 ddr Exp $ *)
+(* $Id: relation.ml,v 1.12 1998-12-16 17:36:39 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -304,8 +304,8 @@ value print_main_relationship conf base p1 p2 =
        trailer conf;
     return ()
   else
-    let _ = base.ascends.array () in
-    let _ = base.couples.array () in
+    let _ = base.data.ascends.array () in
+    let _ = base.data.couples.array () in
     let tstab = Util.create_topological_sort conf base in
     let tab = Consang.make_relationship_table base tstab in
     let (relationship, ancestors) =
@@ -340,7 +340,7 @@ value print_main_relationship conf base p1 p2 =
         List.fold_left
           (fun rl i ->
              let u = tab.Consang.info.(i) in
-             let p = base.persons.get i in
+             let p = base.data.persons.get i in
              List.fold_left
                (fun rl (len1, n1) ->
                   List.fold_left
@@ -413,7 +413,7 @@ value print_base_loop conf base =
 value print conf base p =
   try
     match p_getint conf.senv "ei" with
-    [ Some i -> print_main_relationship conf base (base.persons.get i) p
+    [ Some i -> print_main_relationship conf base (base.data.persons.get i) p
     | _ ->
         match find_person_in_env conf base "1" with
         [ Some p1 -> print_main_relationship conf base p1 p

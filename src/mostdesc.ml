@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 1.2 1998-11-30 12:36:00 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 1.3 1998-12-16 17:36:36 ddr Exp $ *)
 
 open Gutil;
 open Def;
@@ -22,7 +22,7 @@ value print_result base tab =
          print_newline ();
          List.iter
            (fun i ->
-              let p = base.persons.get i in
+              let p = base.data.persons.get i in
               do Printf.printf "- %s.%d %s\n"
                    (Ansel.to_iso_8859_1 (sou base p.first_name)) p.occ
                    (Ansel.to_iso_8859_1 (sou base p.surname));
@@ -35,7 +35,7 @@ value print_result base tab =
 ;
 
 value most_desc base p =
-  let _ = base.ascends.array () in
+  let _ = base.data.ascends.array () in
   let id = Consang.topological_sort base in
   let module Pq =
     Pqueue.Make
@@ -44,10 +44,10 @@ value most_desc base p =
          value leq x y = id.(Adef.int_of_iper x) > id.(Adef.int_of_iper y);
        end)
   in
-  let _ = base.persons.array () in
-  let _ = base.families.array () in
-  let tab = Array.create base.persons.len Num.zero in
-  let entered = Array.create base.persons.len False in
+  let _ = base.data.persons.array () in
+  let _ = base.data.families.array () in
+  let tab = Array.create base.data.persons.len Num.zero in
+  let entered = Array.create base.data.persons.len False in
   let q = ref Pq.empty in
   do q.val := Pq.add p.cle_index q.val;
      tab.(Adef.int_of_iper p.cle_index) := Num.one;

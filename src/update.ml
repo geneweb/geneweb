@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 1.9 1998-12-16 06:05:02 ddr Exp $ *)
+(* $Id: update.ml,v 1.10 1998-12-16 17:36:43 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -60,10 +60,10 @@ value print_same_name conf base p =
 ;
 
 value insert_string conf base s =
-  try base.index_of_string s with
+  try base.func.index_of_string s with
   [ Not_found ->
-      let i = Adef.istr_of_int base.strings.len in
-      do base.patch_string i s; return i ]
+      let i = Adef.istr_of_int base.data.strings.len in
+      do base.func.patch_string i s; return i ]
 ;
 
 value update_misc_names_of_family base p =

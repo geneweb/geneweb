@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 1.2 1998-09-30 14:04:43 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 1.3 1998-12-16 17:36:34 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -85,8 +85,8 @@ value merge_fam conf base fam1 fam2 =
 value print conf base =
   match (p_getint conf.env "f1", p_getint conf.env "f2") with
   [ (Some f1, Some f2) ->
-      let fam1 = base.families.get f1 in
-      let fam2 = base.families.get f2 in
+      let fam1 = base.data.families.get f1 in
+      let fam2 = base.data.families.get f2 in
       merge_fam conf base fam1 fam2
   | _ -> incorrect_request conf ]
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 1.5 1998-12-16 06:04:53 ddr Exp $ *)
+(* $Id: descend.ml,v 1.6 1998-12-16 17:36:27 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -11,8 +11,8 @@ value limit_desc = 12;
 value infini = 10000;
 
 value make_level_table base niveau_max p =
-  let mark = Array.create (base.persons.len) False in
-  let levt = Array.create (base.persons.len) infini in
+  let mark = Array.create (base.data.persons.len) False in
+  let levt = Array.create (base.data.persons.len) infini in
   let rec fill p lev =
     if niveau_max == infini && mark.(Adef.int_of_iper p.cle_index) then ()
     else
@@ -679,8 +679,8 @@ value afficher_descendants_numerotation conf base niveau_max ancetre =
           (transl_concat conf "of" (person_text conf base ancetre));
       end
   in
-  let marks = Array.create (base.persons.len) False in
-  let paths = Array.create (base.persons.len) [] in
+  let marks = Array.create (base.data.persons.len) False in
+  let paths = Array.create (base.data.persons.len) [] in
   do header conf title;
      total.val := 0;
      Date.afficher_dates_courtes conf base ancetre;
@@ -835,15 +835,15 @@ value afficher_index_descendants conf base niveau_max ancetre =
     return ()
   in
   do header conf title; return
-  let marks = Array.create (base.persons.len) False in
-  let paths = Array.create (base.persons.len) [] in
+  let marks = Array.create (base.data.persons.len) False in
+  let paths = Array.create (base.data.persons.len) [] in
   do mark_descendants base marks niveau_max ancetre;
      label_descendants base marks paths niveau_max ancetre;
   return
   let liste = ref [] in
-  do for i = 0 to base.persons.len - 1 do
+  do for i = 0 to base.data.persons.len - 1 do
        if paths.(i) <> [] then
-         let p = base.persons.get i in
+         let p = base.data.persons.get i in
          if sou base p.first_name <> "?" && sou base p.surname <> "?" &&
             sou base p.first_name <> "x" then
            liste.val := [p.cle_index :: liste.val]
@@ -862,15 +862,15 @@ value afficher_index_conjoints conf base niveau_max ancetre =
       (capitale (transl conf "index of the spouses (non descendants)"))
   in
   do header conf title; return
-  let marks = Array.create (base.persons.len) False in
-  let paths = Array.create (base.persons.len) [] in
+  let marks = Array.create (base.data.persons.len) False in
+  let paths = Array.create (base.data.persons.len) [] in
   do mark_descendants base marks niveau_max ancetre;
      label_descendants base marks paths niveau_max ancetre;
   return
   let liste = ref [] in
-  do for i = 0 to base.persons.len - 1 do
+  do for i = 0 to base.data.persons.len - 1 do
        if paths.(i) <> [] then
-         let p = base.persons.get i in
+         let p = base.data.persons.get i in
          if sou base p.first_name <> "?" && sou base p.surname <> "?" &&
             sou base p.first_name <> "x" then
            Array.iter

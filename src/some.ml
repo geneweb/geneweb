@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 1.9 1998-12-16 06:05:01 ddr Exp $ *)
+(* $Id: some.ml,v 1.10 1998-12-16 17:36:41 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -23,7 +23,7 @@ value surname_not_found conf x =
 ;
 
 value persons_of_fsname base find proj x =
-  let istrl = base.strings_of_fsname x in
+  let istrl = base.func.strings_of_fsname x in
   let l =
     let x = Name.crush_lower x in
     List.fold_right
@@ -171,7 +171,7 @@ value rec merge_insert ((sstr, (strl, iperl)) as x) =
 
 value first_name_print conf base x =
   let (list, _) =
-    persons_of_fsname base base.persons_of_first_name.find
+    persons_of_fsname base base.func.persons_of_first_name.find
       (fun x -> x.first_name) x
   in
   let list =
@@ -385,7 +385,8 @@ value select_ancestors base name_inj ipl =
 
 value surname_print conf base x =
   let (l, name_inj) =
-    persons_of_fsname base base.persons_of_surname.find (fun x -> x.surname) x
+    persons_of_fsname base base.func.persons_of_surname.find
+      (fun x -> x.surname) x
   in
   let (iperl, strl) =
     List.fold_right

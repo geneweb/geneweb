@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 1.8 1998-12-09 10:51:24 ddr Exp $ *)
+(* $Id: title.ml,v 1.9 1998-12-16 17:36:42 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -155,8 +155,8 @@ value select_title_place conf base title place =
       return list.val := [(x, t) :: list.val]
     else ()
   in
-  do for i = 0 to base.persons.len - 1 do
-       let x = base.persons.get i in List.iter (select x) x.titles;
+  do for i = 0 to base.data.persons.len - 1 do
+       let x = base.data.persons.get i in List.iter (select x) x.titles;
      done;
   return (list.val, clean_title.val, clean_place.val)
 ;
@@ -171,8 +171,8 @@ value select_all_with_place conf base place =
       return list.val := [(x, t) :: list.val]
     else ()
   in
-  do for i = 0 to base.persons.len - 1 do
-       let x = base.persons.get i in List.iter (select x) x.titles;
+  do for i = 0 to base.data.persons.len - 1 do
+       let x = base.data.persons.get i in List.iter (select x) x.titles;
      done;
   return (list.val, clean_place.val)
 ;
@@ -191,8 +191,8 @@ value select_title base title =
       else ()
     else ()
   in
-  do for i = 0 to base.persons.len - 1 do
-       let x = base.persons.get i in List.iter add_place x.titles;
+  do for i = 0 to base.data.persons.len - 1 do
+       let x = base.data.persons.get i in List.iter add_place x.titles;
      done;
   return (list.val, clean_name.val)
 ;
@@ -211,8 +211,8 @@ value select_place base place =
       else ()
     else ()
   in
-  do for i = 0 to base.persons.len - 1 do
-       let x = base.persons.get i in List.iter add_title x.titles;
+  do for i = 0 to base.data.persons.len - 1 do
+       let x = base.data.persons.get i in List.iter add_title x.titles;
      done;
   return (list.val, clean_name.val)
 ;
@@ -223,8 +223,8 @@ value select_all_titles conf base =
     let tn = sou base t.t_title in
     if not (List.mem tn list.val) then list.val := [tn :: list.val] else ()
   in
-  do for i = 0 to base.persons.len - 1 do
-       let x = base.persons.get i in List.iter add_title x.titles;
+  do for i = 0 to base.data.persons.len - 1 do
+       let x = base.data.persons.get i in List.iter add_title x.titles;
      done;
   return list.val
 ;
@@ -237,8 +237,8 @@ value select_all_places conf base =
       list.val := [pl :: list.val]
     else ()
   in
-  do for i = 0 to base.persons.len - 1 do
-       let x = base.persons.get i in List.iter add_place x.titles;
+  do for i = 0 to base.data.persons.len - 1 do
+       let x = base.data.persons.get i in List.iter add_place x.titles;
      done;
   return list.val
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.11 1998-12-16 06:05:05 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.12 1998-12-16 17:36:47 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -352,7 +352,7 @@ value effective_mod conf base sp =
 ;
 
 value effective_add conf base sp =
-  let pi = Adef.iper_of_int (base.persons.len) in
+  let pi = Adef.iper_of_int (base.data.persons.len) in
   let key = sp.first_name ^ " " ^ sp.surname in
   let ipl = person_ht_find_all base key in
   do check_conflict conf base sp ipl;
@@ -361,8 +361,8 @@ value effective_add conf base sp =
   let np = map_person_strings (Update.insert_string conf base) sp in
   let na = {parents = None; consang = Adef.fix (-1)} in
   do np.cle_index := pi;
-     base.patch_person pi np;
-     base.patch_ascend pi na;
+     base.func.patch_person pi np;
+     base.func.patch_ascend pi na;
   return
   let np_misc_names = person_misc_names base np in
   do List.iter (fun key -> person_ht_add base key pi) np_misc_names; return
@@ -388,8 +388,8 @@ value effective_del conf base p =
          do fam.children := array_except p.cle_index fam.children;
             asc.parents := None;
             asc.consang := Adef.fix (-1);
-            base.patch_family ifam fam;
-            base.patch_ascend p.cle_index asc;
+            base.func.patch_family ifam fam;
+            base.func.patch_ascend p.cle_index asc;
          return ()
      | None -> () ];
      p.first_name := none;
@@ -418,7 +418,7 @@ value effective_del conf base p =
      p.burial_src := empty;
      p.notes := empty;
      p.psources := empty;
-     base.patch_person p.cle_index p;
+     base.func.patch_person p.cle_index p;
   return ()
 ;
 
@@ -447,7 +447,8 @@ value all_checks_person conf base p a =
        p.family;
      List.iter
        (fun
-        [ ChangedOrderOfChildren fam _ -> base.patch_family fam.fam_index fam
+        [ ChangedOrderOfChildren fam _ ->
+            base.func.patch_family fam.fam_index fam
         | _ -> () ])
        wl.val;
   return List.rev wl.val
@@ -487,7 +488,7 @@ value print_add conf base =
           | None ->
               let (p, a) = effective_add conf base p in
               let wl = all_checks_person conf base p a in
-              do base.commit_patches ();
+              do base.func.commit_patches ();
                  print_add_ok conf base wl p;
               return () ]
       with
@@ -501,9 +502,9 @@ value print_del conf base =
   [ Accept ->
       match p_getint conf.env "i" with
       [ Some i ->
-          let p = base.persons.get i in
+          let p = base.data.persons.get i in
           do effective_del conf base p;
-             base.commit_patches ();
+             base.func.commit_patches ();
              print_del_ok conf base [];
           return ()
       | _ -> incorrect_request conf ]
@@ -533,13 +534,13 @@ value print_mod_aux conf base callback =
 value print_mod conf base =
   let callback p =
     let p = effective_mod conf base p in
-    do base.patch_person p.cle_index p;
+    do base.func.patch_person p.cle_index p;
        Update.update_misc_names_of_family base p;
     return
     let wl =
       all_checks_person conf base p (aoi base p.cle_index)
     in
-    do base.commit_patches ();
+    do base.func.commit_patches ();
        print_mod_ok conf base wl p;
     return ()
   in

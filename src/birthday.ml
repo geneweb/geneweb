@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 1.4 1998-12-16 06:04:49 ddr Exp $ *)
+(* $Id: birthday.ml,v 1.5 1998-12-16 17:36:23 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -46,8 +46,8 @@ value gen_print conf base mois dead_people =
       (transl conf "in (month year)")
       (transl_nth conf "(month)" (mois - 1))
   in
-  do for i = 0 to base.persons.len - 1 do
-       let p = base.persons.get i in
+  do for i = 0 to base.data.persons.len - 1 do
+       let p = base.data.persons.get i in
        if not dead_people then
          match (Adef.od_of_codate p.birth, p.death) with
          [ (Some d, NotDead | DontKnowIfDead) ->
@@ -106,8 +106,8 @@ value gen_print conf base mois dead_people =
 
 value anniversaire_du conf base dead_people jj mm =
   let xx = ref [] in
-  do for i = 0 to base.persons.len - 1 do
-       let p = base.persons.get i in
+  do for i = 0 to base.data.persons.len - 1 do
+       let p = base.data.persons.get i in
        if not dead_people then
          match (Adef.od_of_codate p.birth, p.death) with
          [ (Some d, NotDead | DontKnowIfDead) ->
@@ -318,14 +318,14 @@ value print_marriage conf base month =
   in
   let tab = Array.create 31 [] in
   do header conf title;
-     for i = 0 to base.families.len - 1 do
-       let fam = base.families.get i in
+     for i = 0 to base.data.families.len - 1 do
+       let fam = base.data.families.get i in
        if is_deleted_family fam then ()
        else
          match Adef.od_of_codate fam.marriage with
          [ Some {day = d; month = m; year = y; prec = Sure} when
            d <> 0 && m <> 0 ->
-             let cpl = base.couples.get i in
+             let cpl = base.data.couples.get i in
              if m == month && age_autorise conf base (poi base cpl.father)
              && age_autorise conf base (poi base cpl.mother) then
                tab.(pred d) := [(cpl, y) :: tab.(pred d)]
@@ -362,14 +362,14 @@ value print_marriage conf base month =
 
 value anniversary_of_marriage_of_day conf base dd mm =
   let xx = ref [] in
-  do for i = 0 to base.families.len - 1 do
-       let fam = base.families.get i in
+  do for i = 0 to base.data.families.len - 1 do
+       let fam = base.data.families.get i in
        if is_deleted_family fam then ()
        else
          match Adef.od_of_codate fam.marriage with
          [ Some {day = d; month = m; year = y; prec = Sure} when
            d <> 0 && m <> 0 ->
-             let cpl = base.couples.get i in
+             let cpl = base.data.couples.get i in
              if age_autorise conf base (poi base cpl.father)
              && age_autorise conf base (poi base cpl.mother)
              && d == dd && m == mm then xx.val := [(cpl, y) :: xx.val]

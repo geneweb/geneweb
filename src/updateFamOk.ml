@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.10 1998-12-16 06:05:04 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.11 1998-12-16 17:36:45 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -164,7 +164,7 @@ value insert_person conf base (f, s, o, create) =
   [ UpdateFam.Create sex ->
       try
         if f = "?" || s = "?" then
-          if o <= 0 || o >= base.persons.len then raise Not_found
+          if o <= 0 || o >= base.data.persons.len then raise Not_found
           else
             let ip = Adef.iper_of_int o in
             let p = poi base ip in
@@ -177,7 +177,7 @@ value insert_person conf base (f, s, o, create) =
       with
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in
-          let ip = Adef.iper_of_int (base.persons.len) in
+          let ip = Adef.iper_of_int (base.data.persons.len) in
           let empty_string = Update.insert_string conf base "" in
           let p =
             {first_name = Update.insert_string conf base f;
@@ -204,8 +204,8 @@ value insert_person conf base (f, s, o, create) =
             {parents = None;
              consang = Adef.fix (-1)}
           in
-          do base.patch_person p.cle_index p;
-             base.patch_ascend p.cle_index a;
+          do base.func.patch_person p.cle_index p;
+             base.func.patch_ascend p.cle_index a;
              if f <> "?" && s <> "?" then
                do person_ht_add base (f ^ " " ^ s) ip;
                   new_persons.val := [p :: new_persons.val];
@@ -214,7 +214,7 @@ value insert_person conf base (f, s, o, create) =
           return ip ]
   | UpdateFam.Link ->
       if f = "?" || s = "?" then
-        if o < 0 || o >= base.persons.len then
+        if o < 0 || o >= base.data.persons.len then
           do print_err_unknown conf base (f, s, o); return
           raise Update.ModErr
         else
@@ -322,20 +322,20 @@ value effective_mod conf base sfam scpl =
      | _ -> nmoth.sex := Feminine ];
      nfam.origin_file := ofam.origin_file;
      nfam.fam_index := fi;
-     base.patch_family fi nfam;
-     base.patch_couple fi ncpl;
+     base.func.patch_family fi nfam;
+     base.func.patch_couple fi ncpl;
      if nfath.cle_index != ofath.cle_index then
        do ofath.family := family_exclude ofath.family ofam.fam_index;
           nfath.family := Array.append nfath.family [| fi |];
-          base.patch_person ofath.cle_index ofath;
-          base.patch_person nfath.cle_index nfath;
+          base.func.patch_person ofath.cle_index ofath;
+          base.func.patch_person nfath.cle_index nfath;
        return ()
      else ();
      if nmoth.cle_index != omoth.cle_index then
        do omoth.family := family_exclude omoth.family ofam.fam_index;
           nmoth.family := Array.append nmoth.family [| fi |];
-          base.patch_person omoth.cle_index omoth;
-          base.patch_person nmoth.cle_index nmoth;
+          base.func.patch_person omoth.cle_index omoth;
+          base.func.patch_person nmoth.cle_index nmoth;
        return ()
      else ();
   return
@@ -351,7 +351,7 @@ value effective_mod conf base sfam scpl =
        (fun ip ->
           let a = find_asc ip in
           do a.parents := None; return
-          if not (array_memq ip nfam.children) then base.patch_ascend ip a
+          if not (array_memq ip nfam.children) then base.func.patch_ascend ip a
           else ())
        ofam.children;
      Array.iter
@@ -364,7 +364,7 @@ value effective_mod conf base sfam scpl =
           | None ->
               do a.parents := Some fi; return
               if not (array_memq ip ofam.children) then
-                base.patch_ascend ip a
+                base.func.patch_ascend ip a
               else () ])
        nfam.children;
      add_misc_names_for_new_persons base;
@@ -373,7 +373,7 @@ value effective_mod conf base sfam scpl =
 ;
 
 value effective_add conf base sfam scpl =
-  let fi = Adef.ifam_of_int (base.families.len) in
+  let fi = Adef.ifam_of_int (base.data.families.len) in
   let nfam =
     map_family_ps (insert_person conf base) (Update.insert_string conf base)
       sfam
@@ -410,12 +410,12 @@ value effective_add conf base sfam scpl =
      | _ -> nmoth.sex := Feminine ];
      nfam.fam_index := fi;
      nfam.origin_file := origin_file;
-     base.patch_family fi nfam;
-     base.patch_couple fi ncpl;
+     base.func.patch_family fi nfam;
+     base.func.patch_couple fi ncpl;
      nfath.family := Array.append nfath.family [| fi |];
      nmoth.family := Array.append nmoth.family [| fi |];
-     base.patch_person nfath.cle_index nfath;
-     base.patch_person nmoth.cle_index nmoth;
+     base.func.patch_person nfath.cle_index nfath;
+     base.func.patch_person nmoth.cle_index nmoth;
      Array.iter
        (fun ip ->
           let a = aoi base ip in
@@ -424,7 +424,7 @@ value effective_add conf base sfam scpl =
           [ Some _ ->
               do print_err_parents conf base p; return raise Update.ModErr
           | None ->
-              do base.patch_ascend p.cle_index a;
+              do base.func.patch_ascend p.cle_index a;
                  a.parents := Some fi;
               return () ])
        nfam.children;
@@ -442,7 +442,7 @@ value effective_swi conf base p ifam =
     | _ -> do incorrect_request conf; return raise Update.ModErr ]
   in
   do p.family := Array.of_list (loop (Array.to_list p.family));
-     base.patch_person p.cle_index p;
+     base.func.patch_person p.cle_index p;
   return ()
 ;
 
@@ -455,14 +455,14 @@ value kill_family base fam ip =
       (Array.to_list p.family) []
   in
   do p.family := Array.of_list l;
-     base.patch_person ip p;
+     base.func.patch_person ip p;
   return ()
 ;
 
 value kill_parents base ip =
   let a = aoi base ip in
   do a.parents := None;
-     base.patch_ascend ip a;
+     base.func.patch_ascend ip a;
   return ()
 ;
 
@@ -477,8 +477,8 @@ value effective_del conf base fam =
      fam.children := [| |];
      fam.comment := Update.insert_string conf base "";
      fam.fam_index := Adef.ifam_of_int (-1);
-     base.patch_family ifam fam;
-     base.patch_couple ifam cpl;
+     base.func.patch_family ifam fam;
+     base.func.patch_couple ifam cpl;
   return ()
 ;
 
@@ -573,7 +573,7 @@ value print_add conf base =
           do strip_family sfam; return
           let (fam, cpl) = effective_add conf base sfam scpl in
           let wl = all_checks_family conf base fam cpl in
-          do base.commit_patches ();
+          do base.func.commit_patches ();
              delete_topological_sort conf base;
              print_add_ok conf base wl fam cpl;
           return ()
@@ -591,7 +591,7 @@ value print_del conf base =
           let fam = foi base (Adef.ifam_of_int i) in
           do if fam.fam_index <> Adef.ifam_of_int (-1) then
                do effective_del conf base fam;
-                  base.commit_patches ();
+                  base.func.commit_patches ();
                   delete_topological_sort conf base;
                return ()
              else ();
@@ -623,7 +623,7 @@ value print_mod conf base =
   let callback sfam scpl =
     let (fam, cpl) = effective_mod conf base sfam scpl in
     let wl = all_checks_family conf base fam cpl in
-    do base.commit_patches ();
+    do base.func.commit_patches ();
        delete_topological_sort conf base;
        print_mod_ok conf base wl fam cpl;
     return ()
@@ -637,10 +637,10 @@ value print_swi conf base =
   [ Accept ->
       match (p_getint conf.env "i", p_getint conf.env "f") with
       [ (Some ip, Some ifam)  ->
-          let p = base.persons.get ip in
+          let p = base.data.persons.get ip in
           try
             do effective_swi conf base p (Adef.ifam_of_int ifam);
-               base.commit_patches ();
+               base.func.commit_patches ();
                print_swi_ok conf base p;
             return ()
           with [ Update.ModErr -> () ]

@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 1.11 1998-12-12 10:56:50 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.12 1998-12-16 17:36:33 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -196,8 +196,8 @@ value compare_istr = ref (fun []);
 value compare_istr_fun base is1 is2 =
   if is1 == is2 then 0
   else
-    compare_names (base.strings.get (Adef.int_of_istr is1))
-      (base.strings.get (Adef.int_of_istr is2))
+    compare_names (base.data.strings.get (Adef.int_of_istr is1))
+      (base.data.strings.get (Adef.int_of_istr is2))
 ;
 module IstrTree =
   Btree.Make
@@ -582,16 +582,18 @@ value input bname =
     if List.memq ip ipl then ()
     else patches.p_name.val := [(i, [ip :: ipl]) :: name_patches_rest]
   in
-  let base =
+  let base_data =
     {persons = persons;
      ascends = ascends;
      families = families;
      couples = couples;
      strings = strings;
-     persons_of_name = persons_of_name bname patches.p_name;
-     strings_of_fsname = strings_of_fsname bname strings patches.p_person;
      has_family_patches =
-       patches.p_family.val <> [] || patches.p_couple.val <> [];
+       patches.p_family.val <> [] || patches.p_couple.val <> []}
+  in
+  let base_func =
+    {persons_of_name = persons_of_name bname patches.p_name;
+     strings_of_fsname = strings_of_fsname bname strings patches.p_person;
      index_of_string =
        index_of_string strings ic2 ic2_string_start_pos ic2_string_hash_len
          patches.p_string;
@@ -611,6 +613,7 @@ value input bname =
      patch_name = patch_name;
      commit_patches = commit_patches; cleanup = cleanup}
   in
+  let base = {data = base_data; func = base_func} in
   do compare_istr.val := compare_istr_fun base; return base
 ;
 
@@ -628,7 +631,7 @@ value rec prime_after n =
 ;
 
 value output_strings_hash oc2 base =
-  let strings_array = base.strings.array () in
+  let strings_array = base.data.strings.array () in
   let taba =
     Array.create (prime_after (max 2 (10 * Array.length strings_array))) (-1)
   in
@@ -655,8 +658,8 @@ value output_strings_hash oc2 base =
 value create_first_name_or_surname_index base proj =
   let bt = ref IstrTree.empty in
   do compare_istr.val := compare_istr_fun base;
-     for i = 0 to base.persons.len - 1 do
-       let p = base.persons.get i in
+     for i = 0 to base.data.persons.len - 1 do
+       let p = base.data.persons.get i in
        let a =
          try IstrTree.find (proj p) bt.val with
          [ Not_found -> [] ]
@@ -680,7 +683,7 @@ value output_first_name_index oc2 base =
 value table_size = 0x3fff;
 value make_name_index base =
   let t = Array.create table_size [| |] in
-  let a = base.persons.array () in
+  let a = base.data.persons.array () in
   let add_name key valu =
     let i = Hashtbl.hash (Name.crush (Name.abbrev key)) mod (Array.length t) in
     if array_memq valu t.(i) then ()
@@ -692,7 +695,7 @@ value make_name_index base =
     | [n :: nl] -> do add_name n ip; return add_names ip nl ]
   in
   do for i = 0 to Array.length a - 1 do
-       let p = base.persons.get i in
+       let p = base.data.persons.get i in
        let first_name = sou base p.first_name in
        let surname = sou base p.surname in
        if first_name <> "?" && surname <> "?" then
@@ -719,9 +722,9 @@ value add_name t key valu =
 
 value make_strings_of_fsname base =
   let t = Array.create table_size [||] in
-  let a = base.persons.array () in
+  let a = base.data.persons.array () in
   do for i = 0 to Array.length a - 1 do
-       let p = base.persons.get i in
+       let p = base.data.persons.get i in
        let first_name = sou base p.first_name in
        let surname = sou base p.surname in
        do if first_name <> "?" then add_name t first_name p.first_name
@@ -754,12 +757,12 @@ value output bname base =
   let tmp_fname_acc = Filename.concat bname "1base.acc" in
   let tmp_fname_inx = Filename.concat bname "1names.inx" in
   let tmp_fname_gw2 = Filename.concat bname "1strings.inx" in
-  let _ = base.persons.array () in
-  let _ = base.ascends.array () in
-  let _ = base.families.array () in
-  let _ = base.couples.array () in
-  let _ = base.strings.array () in
-  do base.cleanup (); return
+  let _ = base.data.persons.array () in
+  let _ = base.data.ascends.array () in
+  let _ = base.data.families.array () in
+  let _ = base.data.couples.array () in
+  let _ = base.data.strings.array () in
+  do base.func.cleanup (); return
   let oc = open_out_bin tmp_fname in
   let oc_acc = open_out_bin tmp_fname_acc in
   let oc_inx = open_out_bin tmp_fname_inx in
@@ -772,11 +775,11 @@ value output bname base =
   in
   try
     do output_string oc magic_gwb;
-       output_binary_int oc base.persons.len;
-       output_binary_int oc base.ascends.len;
-       output_binary_int oc base.families.len;
-       output_binary_int oc base.couples.len;
-       output_binary_int oc base.strings.len;
+       output_binary_int oc base.data.persons.len;
+       output_binary_int oc base.data.ascends.len;
+       output_binary_int oc base.data.families.len;
+       output_binary_int oc base.data.couples.len;
+       output_binary_int oc base.data.strings.len;
     return
     let array_start_indexes = pos_out oc in
     do output_binary_int oc 0;
@@ -786,15 +789,15 @@ value output bname base =
        output_binary_int oc 0;
     return
     let persons_array_pos = pos_out oc in
-    do output_array (base.persons.array ()); return
+    do output_array (base.data.persons.array ()); return
     let ascends_array_pos = pos_out oc in
-    do output_array (base.ascends.array ()); return
+    do output_array (base.data.ascends.array ()); return
     let families_array_pos = pos_out oc in
-    do output_array (base.families.array ()); return
+    do output_array (base.data.families.array ()); return
     let couples_array_pos = pos_out oc in
-    do output_array (base.couples.array ()); return
+    do output_array (base.data.couples.array ()); return
     let strings_array_pos = pos_out oc in
-    do output_array (base.strings.array ());
+    do output_array (base.data.strings.array ());
        seek_out oc array_start_indexes;
        output_binary_int oc persons_array_pos;
        output_binary_int oc ascends_array_pos;

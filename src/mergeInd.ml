@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 1.3 1998-12-16 06:04:57 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 1.4 1998-12-16 17:36:35 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -256,7 +256,7 @@ value rec propose_ancestors_merge conf base branches ip1 ip2 =
 value print conf base =
   let p1 =
     match p_getint conf.env "i" with
-    [ Some i1 -> Some (base.persons.get i1)
+    [ Some i1 -> Some (base.data.persons.get i1)
     | None -> None  ]
   in
   let p2 =
@@ -267,7 +267,7 @@ value print conf base =
         match ipl with
         [ [ip2] -> Some (poi base ip2)
         | _ -> None ]
-    | (_, Some i2) -> Some (base.persons.get i2)
+    | (_, Some i2) -> Some (base.data.persons.get i2)
     | _ -> None ]
   in
   match (p1, p2) with

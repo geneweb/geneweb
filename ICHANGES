@@ -5,6 +5,8 @@ GeneWeb Version 1.10
 --------------------
 
 * General
+  - [16/12/98] Separated "base" into "base_data" and "base_func" to prepare
+    code cleanup.
   - [16/12/98] Translated some program record fields and constructors in
     english.
 

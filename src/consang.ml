@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 1.6 1998-12-06 10:28:32 ddr Exp $ *)
+(* $Id: consang.ml,v 1.7 1998-12-16 17:36:25 ddr Exp $ *)
 
 (* Algorithm relationship and links from Didier Remy *)
 
@@ -33,12 +33,12 @@ exception TopologicalSortError;
 (* Return tab such as: i is an ancestor of j => tab.(i) > tab.(j) *)
 
 value topological_sort base =
-  let tab = Array.create base.persons.len 0 in
+  let tab = Array.create base.data.persons.len 0 in
   let todo = ref [] in
   let tval = ref 0 in
   let cnt = ref 0 in
-  do for i = 0 to base.persons.len - 1 do
-       let a = base.ascends.get i in
+  do for i = 0 to base.data.persons.len - 1 do
+       let a = base.data.ascends.get i in
        match a.parents with
        [ Some ifam ->
            let cpl = coi base ifam in
@@ -49,7 +49,7 @@ value topological_sort base =
            return ()
        | _ -> () ];
      done;
-     for i = 0 to base.persons.len - 1 do
+     for i = 0 to base.data.persons.len - 1 do
        if tab.(i) == 0 then todo.val := [i :: todo.val] else ();
      done;
      loop todo.val where rec loop list =
@@ -58,7 +58,7 @@ value topological_sort base =
          let new_list =
            List.fold_left
              (fun new_list i ->
-                let a = base.ascends.get i in
+                let a = base.data.ascends.get i in
                 do tab.(i) := tval.val;
                    incr cnt;
 (*
@@ -89,7 +89,7 @@ value topological_sort base =
          do incr tval; return
 (**)
          loop new_list;
-     if cnt.val <> base.persons.len then raise TopologicalSortError
+     if cnt.val <> base.data.persons.len then raise TopologicalSortError
      else ();
   return tab
 ;
@@ -99,7 +99,7 @@ value make_relationship_table base tstab =
     {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = []; lens2 = [];
      mark = 0; elim_ancestors = False}
   in
-  let tab = Array.create base.persons.len phony in
+  let tab = Array.create base.data.persons.len phony in
   {id = tstab; info = tab}
 ;
 
@@ -170,7 +170,7 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
          let (u, nq) = Pq.take q.val in
          do q.val := nq; return
          let tu = tab.(u) in
-         let a = base.ascends.get u in
+         let a = base.data.ascends.get u in
          let contribution =
            tu.weight1 *. tu.weight2 -.
            tu.relationship *. (1.0 +. consang_of a)
@@ -198,23 +198,23 @@ value relationship base tab ip1 ip2 =
 ;
 
 value compute_all_consang base from_scratch =
-  let _ = base.ascends.array () in
-  let _ = base.couples.array () in
-  let _ = base.families.array () in
+  let _ = base.data.ascends.array () in
+  let _ = base.data.couples.array () in
+  let _ = base.data.families.array () in
   do Printf.eprintf "Computing consanguinity..."; flush stderr; return
   let running = ref True in
   let tab = make_relationship_table base (topological_sort base) in
   let cnt = ref 0 in
   let most = ref None in
-  do for i = 0 to base.ascends.len - 1 do
-       let a = base.ascends.get i in
+  do for i = 0 to base.data.ascends.len - 1 do
+       let a = base.data.ascends.get i in
        do if from_scratch then a.consang := no_consang else (); return
        if a.consang == no_consang then incr cnt else ();
      done;
      while running.val do
        running.val := False;
-       for i = 0 to base.ascends.len - 1 do
-         let a = base.ascends.get i in
+       for i = 0 to base.data.ascends.len - 1 do
+         let a = base.data.ascends.get i in
          if a.consang == no_consang then
            match a.parents with
            [ Some ifam ->

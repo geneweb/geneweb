@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.28 1998-12-16 06:04:45 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.29 1998-12-16 17:36:17 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -1331,21 +1331,26 @@ value cache_of tab =
 ;
 
 value make_base (persons, ascends, families, couples, strings) =
-  {persons = cache_of persons;
-   ascends = cache_of ascends;
-   families = cache_of families;
-   couples = cache_of couples;
-   strings = cache_of strings;
-   has_family_patches = False;
-   persons_of_name = fun [];
-   strings_of_fsname = fun [];
-   index_of_string = fun [];
-   persons_of_surname = {find = fun []; cursor = fun []; next = fun []};
-   persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
-   patch_person = fun []; patch_ascend = fun [];
-   patch_family = fun []; patch_couple = fun [];
-   patch_string = fun []; patch_name = fun []; commit_patches = fun [];
-   cleanup = fun () -> ()}
+  let base_data =
+    {persons = cache_of persons;
+     ascends = cache_of ascends;
+     families = cache_of families;
+     couples = cache_of couples;
+     strings = cache_of strings;
+     has_family_patches = False}
+  in
+  let base_func =
+    {persons_of_name = fun [];
+     strings_of_fsname = fun [];
+     index_of_string = fun [];
+     persons_of_surname = {find = fun []; cursor = fun []; next = fun []};
+     persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
+     patch_person = fun []; patch_ascend = fun [];
+     patch_family = fun []; patch_couple = fun [];
+     patch_string = fun []; patch_name = fun []; commit_patches = fun [];
+     cleanup = fun () -> ()}
+  in
+  {data = base_data; func = base_func}
 ;
 
 value array_memq x a =
@@ -1357,15 +1362,15 @@ value array_memq x a =
 
 value check_parents_children base =
   let to_delete = ref [] in
-  do for i = 0 to base.persons.len - 1 do
-       let a = base.ascends.get i in
+  do for i = 0 to base.data.persons.len - 1 do
+       let a = base.data.ascends.get i in
        match a.parents with
        [ Some ifam ->
            let fam = foi base ifam in
            let cpl = coi base ifam in
            if array_memq (Adef.iper_of_int i) fam.children then ()
            else
-             let p = base.persons.get i in
+             let p = base.data.persons.get i in
              do Printf.printf "%s is not the child of his/her parents\n"
                   (denomination base p);
                 Printf.printf "- %s\n"
@@ -1379,10 +1384,10 @@ value check_parents_children base =
              return ()
        | None -> () ];
      done;
-     for i = 0 to base.families.len - 1 do
+     for i = 0 to base.data.families.len - 1 do
        to_delete.val := [];
-       let fam = base.families.get i in
-       let cpl = base.couples.get i in
+       let fam = base.data.families.get i in
+       let cpl = base.data.couples.get i in
        do for j = 0 to Array.length fam.children - 1 do
             let a = aoi base fam.children.(j) in
             let p = poi base fam.children.(j) in
@@ -1457,8 +1462,8 @@ value effective_del_fam base fam cpl =
 ;
 
 value check_parents_sex base =
-  for i = 0 to base.couples.len - 1 do
-    let cpl = base.couples.get i in
+  for i = 0 to base.data.couples.len - 1 do
+    let cpl = base.data.couples.get i in
     let fath = poi base cpl.father in
     let moth = poi base cpl.mother in
     if fath.sex <> Masculine || moth.sex <> Feminine then
@@ -1467,7 +1472,7 @@ value check_parents_sex base =
          Printf.printf "- mother: %s\n" (denomination base moth);
          Printf.printf "=> family deleted\n\n";
          flush stdout;
-         effective_del_fam base (base.families.get i) cpl;
+         effective_del_fam base (base.data.families.get i) cpl;
       return ()
     else ();
   done
@@ -1513,23 +1518,23 @@ value rec negative_date_ancestors base p =
 ;
 
 value negative_dates base =
-  for i = 0 to base.persons.len - 1 do
-    let p = base.persons.get i in
+  for i = 0 to base.data.persons.len - 1 do
+    let p = base.data.persons.get i in
     match (Adef.od_of_codate p.birth, p.death) with
     [ (Some d1, Death dr cd2) ->
         let d2 = Adef.date_of_cdate cd2 in
         if annee d1 > 0 && annee d2 > 0 && strictement_avant d2 d1 then
-          negative_date_ancestors base (base.persons.get i)
+          negative_date_ancestors base (base.data.persons.get i)
         else ()
     | _ -> () ];
   done
 ;
 
 value finish_base base =
-  let persons = base.persons.array () in
-  let ascends = base.ascends.array () in
-  let families = base.families.array () in
-  let strings = base.strings.array () in
+  let persons = base.data.persons.array () in
+  let ascends = base.data.ascends.array () in
+  let families = base.data.families.array () in
+  let strings = base.data.strings.array () in
   do for i = 0 to Array.length families - 1 do
        let fam = families.(i) in
        let children =
