@@ -6,6 +6,9 @@ GeneWeb Version 2.01
   - [Mar 30, 99] Changed term "photo" into "image".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Apr 13, 99] Fixed bug in personal pages: for people having public
+    names, the (small) links to the first name and surnames could work
+    bad in case of accents.
   - [Apr 6, 99] Fixed bug in personal pages, titles dates were sometimes
     displayed just as "...".
   - [Apr 2, 99] Fixed bug: in missing ancestors in alphabetic order, the
