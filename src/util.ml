@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.67 2002-12-19 22:54:31 ddr Exp $ *)
+(* $Id: util.ml,v 4.68 2002-12-23 13:37:52 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1205,7 +1205,7 @@ value email_addr s i =
 value good_tags_list =
   ["a"; "b"; "br"; "dd"; "div"; "dl"; "dt"; "em"; "font"; "hr"; "h1"; "h2";
    "h3"; "h4"; "i"; "img"; "li"; "ol"; "p"; "pre"; "strong"; "sup"; "table";
-   "td"; "tr"; "ul"]
+   "td"; "tr"; "u"; "ul"]
 ;
 
 value good_tag s i =
