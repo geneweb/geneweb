@@ -22,6 +22,10 @@ GeneWeb version 3.12
   - [10 Feb 01] For the perso.txt template file, added the macros
     %father_age_at_birth; and %mother_age_at_birth;
 
+* Templates files (etc/*.txt)
+  - [18 Feb 01] Added a template file for update person form, which is
+    now user-configurable.
+
 * Welcome pages (lang/*/start.txt)
   - [16 Feb 01] In all welcome pages, suppressed the text "or surname" in
     the first choice of the first case. But it goes on searching up by

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.40 2001-02-18 13:20:28 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.41 2001-02-18 15:44:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -894,7 +894,7 @@ value eval_base_env_variable conf v =
 
 value eval_string_env var env =
    match get_env var env with
-   [ Vstring x -> x
+   [ Vstring x -> quote_escaped x
    | _ -> "" ]
 ;
 
@@ -906,7 +906,8 @@ value eval_int_env var env =
 
 value try_eval_gen_variable conf base env p =
   fun
-  [ "bapt_place" -> quote_escaped p.baptism_place
+  [ "alias" -> eval_string_env "alias" env
+  | "bapt_place" -> quote_escaped p.baptism_place
   | "bapt_src" -> quote_escaped p.baptism_src
   | "birth_place" -> quote_escaped p.birth_place
   | "birth_src" -> quote_escaped p.birth_src
@@ -915,17 +916,19 @@ value try_eval_gen_variable conf base env p =
   | "death_place" -> quote_escaped p.death_place
   | "death_src" -> quote_escaped p.death_src
   | "cnt" -> eval_int_env "cnt" env
+  | "first_name_alias" -> eval_string_env "first_name_alias" env
   | "digest" -> eval_string_env "digest" env
   | "first_name" -> quote_escaped p.first_name
   | "image" -> quote_escaped p.image
   | "index" -> string_of_int (Adef.int_of_iper p.cle_index)
-  | "item" -> eval_string_env "item" env
   | "notes" -> quote_escaped p.notes
   | "occ" -> if p.occ <> 0 then string_of_int p.occ else ""
   | "occupation" -> quote_escaped p.occupation
   | "public_name" -> quote_escaped p.public_name
+  | "qualifier" -> eval_string_env "qualifier" env
   | "sources" -> quote_escaped p.psources
   | "surname" -> quote_escaped p.surname
+  | "surname_alias" -> eval_string_env "surname_alias" env
   | s ->
       let v = extract_var "evar_" s in
       if v <> "" then
@@ -1333,25 +1336,25 @@ and print_foreach conf base env p s sl al =
       return ()
   | VVcvar _ | VVdate _ _ | VVrelation _ _ | VVtitle _ _ | VVnone -> () ]
 and print_simple_foreach conf base env p al s =
-  let list =
-    match s with
-    [ "alias" -> Some p.aliases
-    | "first_name_alias" -> Some p.first_names_aliases
-    | "qualifier" -> Some p.qualifiers
-    | "surname_alias" -> Some p.surnames_aliases
-    | _ -> None ]
-  in
-  match list with
-  [ Some list -> print_foreach_string conf base env p al list
-  | None ->
-      match s with
-      [ "relation" -> print_foreach_relation conf base env p al p.rparents
-      | "title" -> print_foreach_title conf base env p al p.titles
-      | _ -> Wserver.wprint "foreach %s???" s ] ]
-and print_foreach_string conf base env p al list =
+  match s with
+  [ "alias" ->
+      print_foreach_string conf base env p al p.aliases s
+  | "first_name_alias" ->
+      print_foreach_string conf base env p al p.first_names_aliases s
+  | "qualifier" ->
+      print_foreach_string conf base env p al p.qualifiers s
+  | "surname_alias" ->
+      print_foreach_string conf base env p al p.surnames_aliases s
+  | "relation" ->
+      print_foreach_relation conf base env p al p.rparents
+  | "title" ->
+      print_foreach_title conf base env p al p.titles
+  | _ ->
+      Wserver.wprint "foreach %s???" s ]
+and print_foreach_string conf base env p al list lab =
   let _ = List.fold_left
     (fun cnt nn ->
-       let env = [("item", Vstring nn) :: env] in
+       let env = [(lab, Vstring nn) :: env] in
        let env = [("cnt", Vint cnt) :: env] in
        do List.iter (print_ast conf base env p) al; return cnt + 1)
     0 list
