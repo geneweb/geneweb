@@ -29,7 +29,7 @@ GeneWeb version 2.06
 * Base configuration files (base.gwf)
   - [Aug 20, 99] Added new variables "max_anc_level" and "max_desc_level"
     to specify the maximum level of generations that can be displayed in
-    ancestors and descendants displaying (default resp. 8 and 12).
+    ancestors and descendants displaying (default resp. 8 and 12 generations).
   - [Aug 18, 99] Added a new variable "auth_file" in data bases configuration
     files (files ending with ".gwf") overriding the possible authorization
     file set by option "-auth" of gwd. Therefore now, each data base can have

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.33 1999-08-18 17:55:19 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.34 1999-08-20 15:27:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -593,7 +593,10 @@ value conf_and_connection cgi from (addr, request) str env =
       return ()
   | _ ->
       do log_and_robot_check cgi auth from request str;
-         if conf.bname = "" then propose_base conf
+         if conf.bname = "" then
+           match Util.p_getenv conf.env "m" with
+           [ Some "DOC" -> Doc.print conf
+           | _ -> propose_base conf ]
          else
            match redirected_addr.val with
            [ Some addr -> print_redirected conf addr

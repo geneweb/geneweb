@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.25 1999-08-18 17:55:18 ddr Exp $ *)
+(* $Id: family.ml,v 2.26 1999-08-20 15:27:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -313,12 +313,7 @@ value family_m conf base =
   | Some "DEL_IMAGE_OK" when conf.wizard && conf.can_send_image ->
       SendImage.print_del_ok conf base
   | Some "DOC" ->
-      let v =
-        match p_getenv conf.env "v" with
-        [ Some f -> f
-        | None -> "" ]
-      in
-      Doc.print conf base v
+      Doc.print conf
   | Some "H" ->
       match p_getenv conf.env "v" with
       [ Some f -> Srcfile.print conf base f
