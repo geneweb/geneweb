@@ -42,6 +42,13 @@ personen är ättling till en person från den vänstra (resp. högra) grenen.
 blir oläslig. De är emellertid riktiga anlinjer och är medräknade i 
 blodsbandsberäkningen.
 
+<H4>I CGI mod får jag endast ett meddelande "Internal Server Error"</H4>
+Ett frekvent problem är åtkomsträttigheter. Webbservern kör ofta CGI:s som
+en användare (user) med väldigt få rättigheter (vanligast användare
+"nobody" under Unix). Den kanske inte går att köra "gwd" då. Kontrollera
+åtkomsträttigheterna för "gwd" och alla <FONT COLOR=#2f6400><B>GeneWeb</B>
+</FONT> filerna!
+
 <p><hr><br>
 <center>Tillbaka till <A href="diruse.htm">bruksanvisningen</A></center>
 
