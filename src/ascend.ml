@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.58 2005-03-17 10:36:18 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.59 2005-03-19 12:18:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1918,6 +1918,16 @@ value print_normal_tree conf base v p =
       (person_text_no_html conf base p)
   in
   do {
+    let conf =
+      (* changing doctype to transitional because use of
+         <hr width=... align=...> in print_tree_with_table *)
+      let doctype =
+        match p_getenv conf.base_env "doctype" with
+        [ Some ("html-4.01" | "html-4.01-trans") -> "html-4.01-trans"
+        | _ -> "xhtml-1.0-trans" ]
+      in
+      {(conf) with base_env = [("doctype", doctype) :: conf.base_env]}
+    in
     header_no_page_title conf title;
     Wserver.wprint "<div style=\"text-align:%s\"><a href=\"%s" conf.right
       (commd conf);
