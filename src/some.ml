@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.15 2002-10-02 15:12:57 ddr Exp $ *)
+(* $Id: some.ml,v 4.16 2002-10-03 03:32:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -198,7 +198,7 @@ value she_has_children_with_her_name conf base wife husband children =
 
 value max_lev = 3;
 
-value print_branch conf base is_first_lev psn lev name p =
+value print_branch conf base psn name =
   let image_sel_txt = "<tt>o</tt>" in
   let image_unsel_txt = "<tt>+</tt>" in
   let image_nosel_txt = "<tt>o</tt>" in
@@ -240,7 +240,7 @@ value print_branch conf base is_first_lev psn lev name p =
          [ Failure _ -> sl ])
       [] conf.env
   in
-  loop is_first_lev lev p where rec loop is_first_lev lev p =
+  loop True where rec loop is_first_lev lev p =
     do {
       let u = uget conf base p.cle_index in
       let family_list =
@@ -289,12 +289,12 @@ value print_branch conf base is_first_lev psn lev name p =
             (fun first (fam, des, c, select) ->
                do {
                  if not first then do {
-                   Wserver.wprint "</dd>\n<dd>\n";
+                   if lev == 0 then () else Wserver.wprint "</dd><dd>\n";
                    print_image_select conf select;
                    Wserver.wprint "<em>";
                    Wserver.wprint "%s"
                      (if conf.hide_names && not (fast_auth_age conf p) then "x"
-                      else if p_surname base p = name then
+                      else if not psn && p_surname base p = name then
                         person_text_without_surname conf base p
                       else person_text conf base p);
                    Wserver.wprint "</em>";
@@ -423,11 +423,13 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
                      Wserver.wprint "\n";
                      tag "dl" begin
                        tag "dt" begin
-                         print_branch conf base True psn 1 x p;
+                         print_branch conf base psn x 1 p;
                        end;
                      end;
                    }
-               | None -> print_branch conf base True psn 0 x p ]
+               | None ->
+                   print_branch conf base psn x
+                     (if len > 1 && br = None then 1 else 0) p ]
              else ();
              n + 1
            })
