@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.38 2002-03-07 09:12:25 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.39 2002-03-08 10:02:36 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -31,6 +31,7 @@ value auth_file = ref "";
 value daemon = ref False;
 value login_timeout = ref 1800;
 value conn_timeout = ref 120;
+value trace_failed_passwd = ref False;
 
 value log_oc () =
   if log_file.val <> "" then
@@ -115,7 +116,11 @@ value log_passwd_failed passwd uauth oc tm from request base_file =
     let tm = Unix.localtime tm in fprintf_date oc tm;
     fprintf oc " (%d)" (Unix.getpid ());
     fprintf oc " %s_%s" base_file passwd;
-    fprintf oc " => failed\n";
+    fprintf oc " => failed";
+    if trace_failed_passwd.val then
+      fprintf oc " (%s)" (String.escaped uauth)
+    else ();
+    fprintf oc "\n";
     fprintf oc "  From: %s\n" from;
     fprintf oc "  Agent: %s\n" user_agent;
     if referer <> "" then fprintf oc "  Referer: %s\n" referer else ();
@@ -1597,6 +1602,8 @@ value main () =
 s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
 <addr>
        Send a message to say that this service has been redirected to <addr>");
+       ("-trace_failed_passwd", Arg.Set trace_failed_passwd,
+        "\n       Print the failed passwords in log\n");
        ("-nolock", Arg.Set Lock.no_lock_flag,
         "\n       Do not lock files before writing.") ::
        ifdef UNIX then
