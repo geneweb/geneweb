@@ -2612,7 +2612,7 @@ pt: os %d nascimentos m&aacute;s recentes
 se: de senaste %d f&ouml;dslarna
 
     the latest %d deaths
-de: die letzen %d T&ouml;de
+de: die letzen %d Ableben
 en: the latest %d deaths
 eo: la finaj %d mortoj
 es: las %d muertes m&aacute;s recientes
