@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 2.8 1999-08-05 16:45:06 ddr Exp $ *)
+(* $Id: wserver.ml,v 2.9 1999-08-05 17:00:47 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value wserver_oc =
@@ -302,7 +302,7 @@ value is_robot robot_excluder addr =
             | [] -> (0, [], 0.0) ]
         in
         do who.val := W.add str [tm :: r] who.val; return
-do W.iter (fun k v -> Printf.eprintf "... address %s%s%d requests since %.0f seconds\n" k (String.make (20 - String.length k) ' ') (List.length v) (tm -. List.hd (List.rev [tm :: v]))) who.val; flush stderr; return
+do W.iter (fun k v -> Printf.eprintf "    address %s%s%d requests since %.0f seconds\n" k (String.make (20 - String.length k) ' ') (List.length v) (tm -. List.hd (List.rev [tm :: v]))) who.val; flush stderr; return
         if cnt > max_call then
           let str1 =
             match addr with
