@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.22 1999-08-08 06:37:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.23 1999-08-08 10:27:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -246,6 +246,10 @@ value print_renamed conf new_n =
      Wserver.wprint "The database \"%s\" has been renamed \"%s\".\n"
        conf.bname new_n;
      Wserver.wprint "Please use now:\n";
+     Util.html_br conf;
+     Wserver.wprint "The base de données \"%s\" est renommée \"%s\".\n"
+       conf.bname new_n;
+     Wserver.wprint "Utiliser maintenant:\n";
      Util.html_p conf;
      tag "ul" begin
        Util.html_li conf;
@@ -266,6 +270,9 @@ value print_redirected conf new_addr =
   do Util.header conf title;
      Wserver.wprint "The address of this service has changed.\n";
      Wserver.wprint "Please use now:\n";
+     Util.html_br conf;
+     Wserver.wprint "L'adresse du service a changé.\n";
+     Wserver.wprint "Utiliser maintenant:\n";
      Util.html_p conf;
      tag "ul" begin
        Util.html_li conf;
