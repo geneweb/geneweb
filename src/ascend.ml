@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.21 2002-03-11 18:36:05 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.22 2002-03-11 19:02:53 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1170,19 +1170,19 @@ value one_year base p =
   [ Some (Dgreg d _) -> Some d.year
   | _ ->
       match Adef.od_of_codate p.baptism with
-      [ Some (Dgreg d _) -> Some (annee d)
+      [ Some (Dgreg d _) -> Some (year_of d)
       | _ ->
           match date_of_death p.death with
-          [ Some (Dgreg d _) -> Some (annee d)
+          [ Some (Dgreg d _) -> Some (year_of d)
           | _ ->
               match p.burial with
               [ Buried cod ->
                   match Adef.od_of_codate cod with
-                  [ Some (Dgreg d _) -> Some (annee d)
+                  [ Some (Dgreg d _) -> Some (year_of d)
                   | _ -> None ]
               | Cremated cod ->
                   match Adef.od_of_codate cod with
-                  [ Some (Dgreg d _) -> Some (annee d)
+                  [ Some (Dgreg d _) -> Some (year_of d)
                   | _ -> None ]
               | UnknownBurial -> None ] ] ] ]
 ;
@@ -1329,7 +1329,7 @@ value compare base (mt1, p1) (mt2, p2) =
       if p1 == p2 then val_of_mt mt1 < val_of_mt mt2
       else
         match (Adef.od_of_codate p1.birth, Adef.od_of_codate p2.birth) with
-        [ (Some d1, Some d2) -> d1 strictement_avant d2
+        [ (Some d1, Some d2) -> d1 strictly_before d2
         | _ -> p1.occ < p2.occ ]
     else c < 0
   else c > 0
@@ -1484,7 +1484,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
     let initials =
       List.fold_left
         (fun l (n, _) ->
-           let i = n.[initiale n] in
+           let i = n.[initial n] in
            match l with
            [ [] -> [i]
            | [x :: l'] -> if x = i then l else [i :: l] ])
@@ -1524,7 +1524,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
       let _ =
         List.fold_left
           (fun prev_i ((n, _) as e) ->
-             let i = n.[initiale n] in
+             let i = n.[initial n] in
              do {
                if print_initials then
                  match prev_i with
@@ -1962,7 +1962,7 @@ value get_date_place conf base auth_for_all_anc p =
       else
         match d2 with
         [ Some (Dgreg d _)
-          when (temps_ecoule d conf.today).year > conf.private_years ->
+          when (time_gone_by d conf.today).year > conf.private_years ->
             True
         | _ -> False ]
     in

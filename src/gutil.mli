@@ -1,5 +1,5 @@
-(* $Id: gutil.mli,v 4.4 2002-03-11 18:36:08 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: gutil.mli,v 4.5 2002-03-11 19:02:59 ddr Exp $ *)
+(* Copyright (c) 2002 INRIA *)
 
 open Def;
 
@@ -29,17 +29,17 @@ value person_misc_names : base -> person -> list string;
 value find_same_name : base -> person -> list person;
 
 value leap_year : int -> bool;
-value nb_jours_dans_mois : int -> int -> int;
-value temps_ecoule : dmy -> dmy -> dmy;
-value annee : dmy -> int;
-value strictement_avant_dmy : dmy -> dmy -> bool;
-value strictement_apres_dmy : dmy -> dmy -> bool;
-value strictement_avant : date -> date -> bool;
-value strictement_apres : date -> date -> bool;
+value nb_days_in_month : int -> int -> int;
+value time_gone_by : dmy -> dmy -> dmy;
+value year_of : dmy -> int;
+value strictly_before_dmy : dmy -> dmy -> bool;
+value strictly_after_dmy : dmy -> dmy -> bool;
+value strictly_before : date -> date -> bool;
+value strictly_after : date -> date -> bool;
 value date_of_death : death -> option date;
 value roman_of_arabian : int -> string;
 
-value denomination : base -> person -> string;
+value designation : base -> person -> string;
 
 value map_title_strings : ('a -> 'b) -> gen_title 'a -> gen_title 'b;
 value map_relation_ps :
@@ -101,7 +101,7 @@ value check_base :
 value strip_controls_m : string -> string;
 value strip_spaces : string -> string;
 value alphabetic : string -> string -> int;
-value initiale : string -> int;
+value initial : string -> int;
 
 value rindex : string -> char -> option int;
 value lindex : string -> char -> option int;

@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.11 2002-01-12 14:20:56 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.12 2002-03-11 19:02:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -898,8 +898,8 @@ value mark_one_connex_component base mark ifam =
   else do {
     eprintf "%s: group of size %d not included\n" origin_file len;
     let cpl = coi base ifam in
-    eprintf "    %s + %s\n" (denomination base (poi base cpl.father))
-      (denomination base (poi base cpl.mother));
+    eprintf "    %s + %s\n" (designation base (poi base cpl.father))
+      (designation base (poi base cpl.mother));
     flush stderr;
     set_mark Scanned
   }

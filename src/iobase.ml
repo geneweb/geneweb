@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.13 2002-01-30 11:49:50 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.14 2002-03-11 19:03:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -147,7 +147,7 @@ value index_of_string strings ic start_pos hash_len string_patches s =
 (* Search index of a given surname or given first name in file strings.inx *)
 
 value name_key s =
-  let i = initiale s in
+  let i = Gutil.initial s in
   let s =
     if i == 0 then s
     else String.sub s i (String.length s - i) ^ " " ^ String.sub s 0 i

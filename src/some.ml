@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.11 2002-03-11 18:36:08 ddr Exp $ *)
+(* $Id: some.ml,v 4.12 2002-03-11 19:03:02 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -96,7 +96,7 @@ value first_name_print_list conf base xl liste =
                match
                  (Adef.od_of_codate x1.birth, Adef.od_of_codate x2.birth)
                with
-               [ (Some d1, Some d2) -> d1 strictement_apres d2
+               [ (Some d1, Some d2) -> d1 strictly_after d2
                | (Some d1, _) -> False
                | _ -> True ]
            | n -> n > 0 ])
@@ -119,7 +119,7 @@ value first_name_print_list conf base xl liste =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)
+    print_alphab_list conf (fun (p, _) -> String.sub p (initial p) 1)
       (print_elem conf base True) liste;
     trailer conf;
   }
@@ -196,10 +196,6 @@ value she_has_children_with_her_name conf base wife husband children =
       (Array.to_list children)
 ;
 
-value afficher_date_mariage conf base fam p c =
-  Wserver.wprint "%s" (Date.short_marriage_date_text conf base fam p c)
-;
-
 value max_lev = 3;
 
 value rec print_branch conf base first_lev psn lev name p =
@@ -241,7 +237,8 @@ value rec print_branch conf base first_lev psn lev name p =
                }
                else ();
                Wserver.wprint "  &amp;";
-               afficher_date_mariage conf base fam p c;
+               Wserver.wprint "%s"
+                 (Date.short_marriage_date_text conf base fam p c);
                Wserver.wprint " <strong>";
                Wserver.wprint "%s"
                  (reference conf base c
@@ -435,7 +432,7 @@ value print_family_alphabetic x conf base liste =
       do {
         header conf title;
         print_link_to_welcome conf True;
-        print_alphab_list conf (fun (p, _) -> String.sub p (initiale p) 1)
+        print_alphab_list conf (fun (p, _) -> String.sub p (initial p) 1)
           (print_elem conf base False) liste;
         trailer conf;
       } ]

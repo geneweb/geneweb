@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.7 2002-03-11 17:50:42 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.8 2002-03-11 19:02:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -9,7 +9,7 @@ open Gutil;
 
 type date_event = [ DeBirth | DeDeath of death_reason ];
 
-value afficher_anniversaires_jour conf base dead_people liste =
+value print_anniversary_day conf base dead_people liste =
   do {
     Wserver.wprint "<ul>\n";
     List.iter
@@ -110,7 +110,7 @@ value gen_print conf base mois f_scan dead_people =
           Sort.list (fun (p1, a1, _, _) (p2, a2, _, _) -> a1 <= a2)
             tab.(pred j)
         in
-        afficher_anniversaires_jour conf base dead_people liste;
+        print_anniversary_day conf base dead_people liste;
       }
       else ()
     };
@@ -119,7 +119,7 @@ value gen_print conf base mois f_scan dead_people =
   }
 ;
 
-value afficher_liste_anniversaires conf base dead_people dt liste =
+value print_anniversary_list conf base dead_people dt liste =
   let a_ref = dt.year in
   do {
     Wserver.wprint "<ul>\n";
@@ -203,7 +203,7 @@ value print_birth_day conf base day_name verb wd dt list =
           Wserver.wprint "%s\n"
             (transl_decline2 conf "%1 of %2" (transl conf "the birthday")
                "...");
-          afficher_liste_anniversaires conf base False dt list;
+          print_anniversary_list conf base False dt list;
         } ]
   }
 ;
@@ -227,7 +227,7 @@ value propose_months conf mode =
 
 value day_after d =
   let (day, r) =
-    if d.day >= nb_jours_dans_mois d.month d.year then (1, 1)
+    if d.day >= nb_days_in_month d.month d.year then (1, 1)
     else (succ d.day, 0)
   in
   let (month, r) = if d.month + r > 12 then (1, 1) else (d.month + r, 0) in
@@ -253,7 +253,7 @@ value print_anniv conf base day_name verb wd dt list =
                        Date.code_dmy conf dt) ^
                   "</b>"))
             verb (transl conf "the anniversary");
-          afficher_liste_anniversaires conf base True dt list;
+          print_anniversary_list conf base True dt list;
         } ]
   }
 ;

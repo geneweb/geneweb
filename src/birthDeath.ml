@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.6 2002-03-11 17:50:41 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.7 2002-03-11 19:02:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -133,7 +133,7 @@ value print_birth conf base =
              let d = {(d) with day = 0} in
              capitale (Date.string_of_date conf (Dgreg d cal))
            in
-           let future = strictement_apres_dmy d conf.today in
+           let future = strictly_after_dmy d conf.today in
            do {
              if not future && was_future then do {
                Wserver.wprint "</ul>\n</ul>\n<p>\n<ul>\n";
@@ -206,7 +206,7 @@ value print_death conf base =
              match Adef.od_of_codate p.birth with
              [ Some (Dgreg d1 _) ->
                  if sure d1 && sure d && d1 <> d then do {
-                   let a = temps_ecoule d1 d in
+                   let a = time_gone_by d1 d in
                    Wserver.wprint " <em>(";
                    Date.print_age conf a;
                    Wserver.wprint ")</em>";
@@ -258,7 +258,7 @@ value print_oldest_alive conf base =
              (transl_nth conf "born" (index_of_sex p.sex))
              (Date.string_of_ondate conf (Dgreg d cal));
            if p.death = NotDead && d.prec = Sure then do {
-             let a = temps_ecoule d conf.today in
+             let a = time_gone_by d conf.today in
              Wserver.wprint " <em>(";
              Date.print_age conf a;
              Wserver.wprint ")</em>";
@@ -278,7 +278,7 @@ value print_longest_lived conf base =
       match (Adef.od_of_codate p.birth, p.death) with
       [ (Some (Dgreg bd _), Death _ cd) ->
           match Adef.date_of_cdate cd with
-          [ Dgreg dd _ -> Some (Dgreg (temps_ecoule bd dd) Dgregorian)
+          [ Dgreg dd _ -> Some (Dgreg (time_gone_by bd dd) Dgregorian)
           | _ -> None ]
       | _ -> None ]
     else None
@@ -327,7 +327,7 @@ value print_marriage conf base =
              capitale (Date.string_of_date conf (Dgreg d cal))
            in
            let cpl = coi base fam.fam_index in
-           let future = strictement_apres_dmy d conf.today in
+           let future = strictly_after_dmy d conf.today in
            do {
              if not future && was_future then do {
                Wserver.wprint "</ul>\n</ul>\n<p>\n<ul>\n";

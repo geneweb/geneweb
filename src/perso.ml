@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.33 2002-03-11 17:56:58 ddr Exp $ *)
+(* $Id: perso.ml,v 4.34 2002-03-11 19:03:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -381,7 +381,7 @@ value print_age conf base env p p_auth =
   if p_auth then
     match (Adef.od_of_codate p.birth, p.death) with
     [ (Some (Dgreg d _), NotDead) ->
-        let a = temps_ecoule d conf.today in Date.print_age conf a
+        let a = time_gone_by d conf.today in Date.print_age conf a
     | _ -> () ]
   else ()
 ;
@@ -431,7 +431,7 @@ value print_death_age conf base env p p_auth =
     [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
        Some (Dgreg ({prec = Sure | About | Maybe} as d2) _), approx)
       when d1 <> d2 ->
-        let a = temps_ecoule d1 d2 in
+        let a = time_gone_by d1 d2 in
         do {
           if not approx && d1.prec = Sure && d2.prec = Sure then ()
           else
@@ -649,7 +649,7 @@ value print_parent_age conf base p a p_auth parent =
       if p_auth && authorized_age conf base pp then
         match (Adef.od_of_codate pp.birth, Adef.od_of_codate p.birth) with
         [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
-            Date.print_age conf (temps_ecoule d1 d2)
+            Date.print_age conf (time_gone_by d1 d2)
         | _ -> () ]
       else ()
   | None -> () ]
@@ -947,7 +947,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
         [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
            Some (Dgreg ({prec = Sure | About | Maybe} as d2) _), approx)
           when d1 <> d2 ->
-            let a = temps_ecoule d1 d2 in
+            let a = time_gone_by d1 d2 in
             a.year > 0 ||
             a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0)
         | _ -> False ]
@@ -1349,7 +1349,7 @@ and eval_foreach_related conf base env al (p, _, _, p_auth) =
            in
            match (d1, d2) with
            [ (Some d1, Some d2) ->
-               if strictement_avant d1 d2 then -1 else 1
+               if strictly_before d1 d2 then -1 else 1
            | _ -> -1 ])
       (List.rev list)
     in

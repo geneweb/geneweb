@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.9 2002-01-30 11:49:48 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.10 2002-03-11 19:02:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -404,10 +404,10 @@ I cannot add \"%s\", child of
 because this persons still exists as child of
     - \"%s\"
     - \"%s\".
-" (denomination gen.g_base x) (denomination gen.g_base pere)
-          (denomination gen.g_base mere)
-          (denomination gen.g_base (poi gen.g_base p))
-          (denomination gen.g_base (poi gen.g_base m));
+" (designation gen.g_base x) (designation gen.g_base pere)
+          (designation gen.g_base mere)
+          (designation gen.g_base (poi gen.g_base p))
+          (designation gen.g_base (poi gen.g_base m));
         flush stdout;
         x.birth := Adef.codate_None;
         x.death := DontKnowIfDead;

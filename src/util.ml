@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.44 2002-03-11 18:36:09 ddr Exp $ *)
+(* $Id: util.ml,v 4.45 2002-03-11 19:03:04 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -439,11 +439,11 @@ value authorized_age conf base p =
     with
     [ (_, _, NotDead, _) when conf.private_years > 0 -> False
     | (Some (Dgreg d _), _, _, _) ->
-        let a = temps_ecoule d conf.today in a.year > conf.private_years
+        let a = time_gone_by d conf.today in a.year > conf.private_years
     | (_, Some (Dgreg d _), _, _) ->
-        let a = temps_ecoule d conf.today in a.year > conf.private_years
+        let a = time_gone_by d conf.today in a.year > conf.private_years
     | (_, _, _, Some (Dgreg d _)) ->
-        let a = temps_ecoule d conf.today in a.year > conf.private_years
+        let a = time_gone_by d conf.today in a.year > conf.private_years
     | _ ->
         let u = uoi base p.cle_index in
         let rec loop i =
@@ -452,7 +452,7 @@ value authorized_age conf base p =
             let fam = foi base u.family.(i) in
             match Adef.od_of_codate fam.marriage with
             [ Some (Dgreg d _) ->
-                let a = temps_ecoule d conf.today in
+                let a = time_gone_by d conf.today in
                 a.year > conf.private_years
             | _ -> loop (i + 1) ]
         in
@@ -466,11 +466,11 @@ value is_old_person conf p =
   with
   [ (_, _, NotDead, _) when conf.private_years > 0 -> False
   | (Some (Dgreg d _), _, _, _) ->
-      let a = temps_ecoule d conf.today in a.year > conf.private_years
+      let a = time_gone_by d conf.today in a.year > conf.private_years
   | (_, Some (Dgreg d _), _, _) ->
-      let a = temps_ecoule d conf.today in a.year > conf.private_years
+      let a = time_gone_by d conf.today in a.year > conf.private_years
   | (_, _, _, Some (Dgreg d _)) ->
-      let a = temps_ecoule d conf.today in a.year > conf.private_years
+      let a = time_gone_by d conf.today in a.year > conf.private_years
   | _ -> False ]
 ;
 
@@ -641,16 +641,6 @@ value person_text_without_surname =
   gen_person_text_without_surname std_access
 ;
 
-value afficher_nom_titre_reference conf base p s =
-  match p.qualifiers with
-  [ [] ->
-      Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
-        (acces conf base p) s
-  | [nn :: _] ->
-      Wserver.wprint "<a href=\"%s%s\">%s <em>%s</em></a>" (commd conf)
-        (acces conf base p) s (sou base nn) ]
-;
-
 value main_title base p =
   let rec find_main =
     fun
@@ -765,7 +755,7 @@ value person_title conf base p =
 ;
 
 value surname_begin n =
-  let i = initiale n in
+  let i = initial n in
   if i == 0 then ""
   else
     let i =
@@ -776,7 +766,7 @@ value surname_begin n =
 ;
 
 value surname_end n =
-  let i = initiale n in
+  let i = initial n in
   if i == 0 then n else String.sub n i (String.length n - i)
 ;
 

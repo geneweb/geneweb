@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.21 2002-03-11 17:57:00 ddr Exp $ *)
+(* $Id: update.ml,v 4.22 2002-03-11 19:03:03 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -31,7 +31,7 @@ value has_children base u =
 value infer_death conf birth =
   match birth with
   [ Some (Dgreg d _) ->
-      let a = Gutil.annee (Gutil.temps_ecoule d conf.today) in
+      let a = Gutil.year_of (Gutil.time_gone_by d conf.today) in
       if a > 120 then DeadDontKnowWhen
       else if a <= 80 then NotDead
       else DontKnowIfDead
@@ -505,7 +505,7 @@ value reconstitute_date_dmy conf var =
 ;
 
 value check_greg_day conf d =
-  if d.day > nb_jours_dans_mois d.month d.year then bad_date conf d else ()
+  if d.day > nb_days_in_month d.month d.year then bad_date conf d else ()
 ;
 
 value reconstitute_date conf var =
