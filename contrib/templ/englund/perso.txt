@@ -1,0 +1,1039 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- $Id: perso.txt,v 1.1 2001-05-17 10:59:02 ddr Exp $ -->
+  <!-- copyright (c) INRIA -->
+  <meta name="ROBOTS" content="NONE">
+  <title>
+    %if;has_public_name;
+      %if;has_qualifiers;%public_name; %qualifier;
+      %else;%public_name; %surname;%end;
+    %else;
+      %if;has_qualifiers;%first_name; %qualifier;
+      %else;%first_name; %surname;%end;
+    %end;
+  </title>
+  
+<SCRIPT LANGUAGE="JScript">
+ function bluerule() { document.styleSheets.PedigreeStyle.addRule("table.pedigree","color:blue"); }
+ function blackrule() { document.styleSheets.PedigreeStyle.addRule("table.pedigree","color:black"); }
+ function blankbg() { 
+   document.styleSheets.PedigreeStyle.addRule("table.pedigree","color:black");
+   document.styleSheets.PedigreeStyle.addRule("BODY","BACKGROUND-COLOR:white");
+   document.styleSheets.PedigreeStyle.addRule("table","border-Color:white"); }
+function orginalview() { 
+   document.styleSheets.PedigreeStyle.addRule("table.pedigree","color:black");
+   document.styleSheets.PedigreeStyle.addRule("BODY","BACKGROUND-COLOR:#ffeecc;");
+   document.styleSheets.PedigreeStyle.addRule("table","border-Color:#ffeecc;"); }
+function Datetoday()
+{
+  var d, s = "- - - - -Today's date is: ";
+  d = new Date();
+  s += (d.getMonth() + 1) + "/";
+  s += d.getDate() + "/";
+  s += d.getYear();
+  return(s);
+}
+
+
+
+</SCRIPT>
+<STYLE ID="PedigreeStyle">
+<!--
+HTML {color:Black;FONT-FAMILY:Pepita MT; }
+HTML {color:Black;FONT-FAMILY:Rockwell; }
+-->
+HTML {color:Black;FONT-FAMILY:Times New Roman; }
+
+BODY      {  BACKGROUND-COLOR: #ffeecc; }
+
+A:link    { COLOR: black;   TEXT-DECORATION: none }
+A:hover   { COLOR: black;   TEXT-DECORATION: underline }
+A:active  { COLOR: black;   TEXT-DECORATION: none }
+A:visited { COLOR: black;   TEXT-DECORATION: none  }
+
+tr { BORDER-STYLE: solid; borders-width : 1px; PADDING: 3px; cellPadding: 0 px; }
+td {BORDER-STYLE: solid; borders-width : 1px; PADDING: 3px; }
+table {border:0px; border-Color: #ffeecc; }
+table.pedigree
+{ BORDER-STYLE: solid ; borders-width : 3px; PADDING: 3px; border-Color: black;
+   }
+  
+</STYLE>
+%base_header;
+</head>
+<body >
+<!--
+Try search for 
+<b> %first_name;  %surname; </b> 
+in database
+<a href="geneweb?b=Norrbotten;m=NG&n=%first_name; + %surname;"> <b> Norrbotten</b>  </a>,   
+<a href="geneweb?b=englund;m=NG&n=%first_name; + %surname;"> <b> englund </b>  </a>  or 
+<a href="geneweb?b=claeson;m=NG&n=%first_name; + %surname;"> <b> claeson </b>  </a> more information might be available.
+
+
+<script>document.write (Datetoday())</script>-
+
+-->
+<!-- Pedigree table -->
+<table class="pedigree" border="4" cellpadding="0" cellspacing="0">
+<!-- First row -->
+<tr > 
+<td align= center onclick="bluerule()">  I </td> 
+<td align= center onclick="blackrule()">  II </td> 
+<td align= center onclick="blankbg()">  III </td> 
+<td align= center onclick="orginalview()">  IV </td> 
+<td align= center >  V </td> 
+<td align= center>  VI </td>
+</tr>
+<!-- Start of pedigree table -->
+<tr>
+<td  rowspan="32">
+<!-- Gender symbol -->
+%if;is_male;
+<img src="%image_prefix;/male.gif" width=13 height=13
+ alt="[M/F]0" align=left>
+%elseif;is_female;
+<img src="%image_prefix;/female.gif" width=13 height=13
+ alt="[M/F]1" align=left>
+%end;
+<!-- Gender symbol end -->
+
+<!-- Public name -->
+<h2 align=center><font color=%highlight;>
+%if;has_public_name;
+  %if;has_qualifiers;%public_name; <em>%qualifier;</em>
+  %else;%public_name; %surname;%end;
+%else;
+  %if;has_qualifiers;%first_name; <em>%qualifier;</em>
+  %else;
+    %if;cancel_links;%first_name; %surname;
+    %else;
+      <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
+      <a href="%prefix;m=N;v=%surname_key;">%surname;</a>
+    %end;
+  %end;
+%end;
+</font></h2>
+<!-- Public name end -->
+
+<!-- Titlar aso -->
+%if;(has_sosa or has_qualifiers or has_aliases or has_nobility_titles or
+     has_public_name or has_surnames_aliases or has_first_names_aliases)
+  <center>
+  <table border=%border; cellspacing=1 cellpadding=1>
+  <tr><td>
+  %if;has_sosa;
+    <em>[*Sosa]:
+    %if;cancel_links;%sosa;
+    %else;<a href="%prefix;%sosa_link;">%sosa;</a>%end;
+    </em><br>
+  %end;
+  %foreach;qualifier;
+    %if;not is_first;
+      %if;has_public_name;%public_name; %qualifier;
+      %else;%first_name; %qualifier;%end;<br>
+    %end;
+  %end;
+  %foreach;alias;
+    <em><strong>%alias;</strong></em><br>
+  %end;
+  %if;has_nobility_titles;
+    <em>%nobility_titles;</em><br>
+  %end;
+  %if;(has_public_name or has_qualifiers)
+    <em>(%if;cancel_links;%first_name; %surname;
+         %else;
+           <a href="%prefix;m=P;v=%first_name_key;">%first_name;</a>
+           <a href="%prefix;m=N;v=%surname_key;">%surname;</a>
+         %end;)</em><br>
+  %end;
+  %foreach;surname_alias;
+    <em>(%first_name; %surname_alias;)</em><br>
+  %end;
+  %foreach;first_name_alias;
+    <em>(%first_name_alias;...)</em><br>
+  %end;
+  </td></tr>
+  </table>
+  </center><p>
+%end;
+<!-- Titlar aso end -->
+
+<!-- picture  -->
+%if;has_image;
+   <p align=center >  <a href="%image_url;"><img src="%image_url;"%image_size;   border=0 alt="[image/images]0"></a>
+  </p>
+%end;
+<!-- picture slut  -->
+
+
+<!-- Person data --> 
+%if;not cancel_links;
+%if;(has_occupation or has_birth_date or has_birth_place or
+     has_baptism_date or has_baptism_place or is_dead or is_buried or
+     is_cremated or has_consanguinity)
+    %if;has_occupation; <br>  %occupation;%end;
+    %if;has_birth_date; <br>      [*born]s :  %on_birth_date;
+      %if;birthday; ([happy birthday to you!])%end;
+      %if;has_birth_place;, %birth_place;%end;
+    %else;
+      %if;has_birth_place;<br>     [*born]s :  -&nbsp;%birth_place;%end;
+    %end;
+    %if;has_baptism_date;      <br>   [*baptized]s : &nbsp; %on_baptism_date;
+      %if;has_baptism_place;, %baptism_place;%end;
+    %else;
+      %if;has_baptism_place; <br>   [*baptized]s : &nbsp; -&nbsp;%baptism_place;%end;
+    %end;
+    %if;is_dead; 
+      <br>  %died;
+      %if;has_death_date;  %on_death_date;%end;
+      %if;has_death_place; -&nbsp;%death_place;%end;
+    %end;
+    %if;computable_age;
+     <br>   [*age]:  %age;
+    %end;
+    %if;is_buried;
+   <br>     [*buried]s : &nbsp;
+      %if;has_burial_date; : %on_burial_date;%end;
+      %if;has_burial_place; -&nbsp;%burial_place;%end;
+    %end;
+    %if;is_cremated;
+     <br>   [*cremated]s: &nbsp;
+      %if;has_cremation_date; %on_cremation_date;%end;
+      %if;has_cremation_place; -&nbsp;%cremation_place;%end;
+    %end;
+    %if;computable_death_age;
+    <br>    [*age at death:] %death_age;
+    %end;
+    %if;has_consanguinity;  <br>   [*consanguinity]: %consanguinity;  %end;
+     %end; 
+ <!-- Person data end -->
+
+<!-- Siblings  -->
+%if;has_parents;
+ <br><br>   <font color=%highlight;>[*siblings]</font>
+  <ol>
+ %foreach;father.child;
+   %if;is_self; <b> <li>** </b>%child_name;<b>**</b> %nl; 
+   %else;
+     <li>
+     %if;cancel_links; <b> %child.child_name;</b> 
+      %else; <a href="%prefix;%child.access;"> <b> %child.child_name;</b> </a> %end;
+     %if;child.has_birth_date; <br> 
+     [*born]s <em> %child.on_birth_date; %child.birth_place;( %child.dates; ) %nl;</em> %end; 
+   %end;
+ %end;
+ </ol>
+%end;
+<!-- Siblings end -->    
+
+<!-- Marriage and children -->
+%if;has_families;   &nbsp; 
+  <font color=%highlight;>[*marriage/marriages]1 [and]0%sp;
+  [child/children]1</font>
+    <ol>
+  %foreach;family;
+    <li> %married_to; %sp;
+     %if;cancel_links;<b>%spouse;</b>
+     %else;<a href="%prefix;%spouse.access"><b>%spouse;</b></a>%end;
+     %spouse.title; 
+     %if;spouse.has_birth_date; <br>   
+      [*born]s <em> %spouse.on_birth_date; %spouse.birth_place;</em> %end;  
+    %if;has_witnesses;
+     %sp;([witness/witnesses]w:
+     %foreach;witness;%if;not is_first;, %end;%witness;%end;
+     )%end;
+    %if;are_divorced;, [divorced] %divorce_date;%end;
+    %if;are_separated;, [separated]0%end;
+    %if;has_comment; (%comment;)%end;
+    %if;has_children; 
+      ,<br><b> [having as children]0 </b>:<br>
+      %foreach;child;
+       %if;cancel_links;<b>%child.child_name;</b><br>
+	    %else;
+	    <a href="%prefix;%child.access;"><b>%child.child_name;</b></a><br> 
+	    %end;
+       %if;child.has_birth_date;      
+        [*born]s <em> %child.on_birth_date; %child.birth_place;</em> ( %child.dates; ) %nl;
+        <br> %end; 
+      %end;
+    %end;
+   %origin_file;
+  %end;
+  </ol>
+%end;
+<!-- Marriage and children end -->
+
+</td>
+<!-- Here goes the ancestors -->
+    <td  rowspan="16">
+%if;has_parents;
+%if;cancel_links; <b>%father;</b>
+  %else;  <a href="%prefix;%father.access;"><b>%father;</b></a>%end;
+  %father.title;
+   %if; not cancel_links; <br>
+    %if;father.has_birth_date; [*born]s %father.on_birth_date; %father.birth_place; %end;
+    %if;father.is_dead; <br>%father.died; %father.on_death_date; <br> %father.death_place; %end;
+    %if;father.computable_death_age; <br> [*age at death:] %father.death_age;. %end;
+   %end;
+<b> <br> [*having as children]s :</b>
+<!-- father all childs  -->
+%foreach;father.family;
+  %foreach;child;
+  %if;cancel_links; <b><br> %child.child_name;</b> 
+      %else;<br> <a href="%prefix;%child.access;"> <b> %child.child_name;</b> </a> %end;
+     %if;child.has_birth_date; <em> ( %child.dates; ) %nl;</em> %end; 
+   %end;
+  %end;   
+  
+<!--  father marriages  -->
+ <br><br> %father.married_to;%sp;
+ %if;cancel_links;<b>father.%spouse;</b>
+  %else;<a href="%prefix;%father.spouse.access"><b>%father.spouse;</b></a> %end;
+<!-- end of father marriages  -->
+
+<!-- end of father all childs  -->
+%else f
+%end;
+
+%end;
+    </td>
+<td rowspan="8">  
+%if;father.has_parents;
+ <a href="%prefix;%father.father.access;"><b> %father.father;</b> <br> </a> 
+ %father.father.dates; <br>
+%if;father.father.has_birth_place;  %father.father.birth_place;%end;
+%else; ff
+%end;    
+    </td>
+<td rowspan="4">
+%if;father.father.has_parents;
+<a href="%prefix;%father.father.father.access;">
+<b>%father.father.father;</b><br>
+</a>%father.father.father.dates;<br>
+%if;father.father.father.has_birth_place;  %father.father.father.birth_place;%end;
+%else; fff
+%end;
+    </td>
+<td rowspan="2">    
+  %if;father.father.father.has_parents;
+<a href="%prefix;%father.father.father.father.access;">
+%father.father.father.father;<br>
+</a>%father.father.father.father.dates;
+%else; ffff
+%end;
+    
+    </td>
+    <td>    
+    %if;father.father.father.father.has_parents;
+<a href="%prefix;%father.father.father.father.father.access;">
+%father.father.father.father.father;
+</a> %father.father.father.father.father.dates;
+%else; fffff
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td>    
+    %if;father.father.father.father.has_parents;
+<a href="%prefix;%father.father.father.father.mother.access;">
+%father.father.father.father.mother;
+</a> %father.father.father.father.mother.dates;
+%else; ffffm
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td rowspan="2">    
+    %if;father.father.father.has_parents;
+<a href="%prefix;%father.father.father.mother.access;">
+%father.father.father.mother;
+</a> %father.father.father.mother.dates;
+%else; fffm
+%end;
+    
+    </td>
+    <td>    
+    %if;father.father.father.mother.has_parents;
+<a href="%prefix;%father.father.father.mother.father.access;">
+%father.father.father.mother.father;
+</a> %father.father.father.mother.father.dates;
+%else; fffmf
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td>    
+    %if;father.father.father.mother.has_parents;
+<a href="%prefix;%father.father.father.mother.mother.access;">
+%father.father.father.mother.mother;
+</a> %father.father.father.mother.mother.dates;
+%else; fffmm
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td rowspan="4">    
+    %if;father.father.has_parents;
+<a href="%prefix;%father.father.mother.access;">
+<b>%father.father.mother;</b><br>
+</a>%father.father.mother.dates;<br>
+%if;father.father.mother.has_birth_place;  %father.father.mother.birth_place;%end;
+%else; ffm
+%end;
+    
+    </td>
+    <td rowspan="2">    
+     %if;father.father.mother.has_parents;
+<a href="%prefix;%father.father.mother.father.access;">
+%father.father.mother.father;<br>
+</a>%father.father.mother.father.dates;
+%else; ffmf
+%end;
+    
+    </td>
+    <td>    
+    %if;father.father.mother.father.has_parents;
+<a href="%prefix;%father.father.mother.father.father.access;">
+%father.father.mother.father.father;
+</a> %father.father.mother.father.father.dates;
+%else; ffmff
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td>    
+    %if;father.father.mother.father.has_parents;
+<a href="%prefix;%father.father.mother.father.mother.access;">
+%father.father.mother.father.mother;
+</a> %father.father.mother.father.mother.dates;
+%else; ffmfm
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td rowspan="2">    
+    %if;father.father.mother.has_parents;
+<a href="%prefix;%father.father.mother.mother.access;">
+%father.father.mother.mother;
+</a>%father.father.mother.mother.dates;
+%else; ffmm
+%end;
+    
+    </td>
+    <td>
+%if;father.father.mother.mother.has_parents;
+<a href="%prefix;%father.father.mother.mother.father.access;">
+%father.father.mother.mother.father;
+</a> %father.father.mother.mother.father.dates;
+%else; ffmmf
+%end;
+
+</td>
+  </tr>
+  <tr>
+    <td>    
+    %if;father.father.mother.mother.has_parents;
+<a href="%prefix;%father.father.mother.mother.mother.access;">
+%father.father.mother.mother.mother;
+</a> %father.father.mother.mother.mother.dates;
+%else; ffmmm
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td rowspan="8">
+    %if;father.has_parents;
+<a href="%prefix;%father.mother.access;">
+<b>%father.mother;</b><br>
+</a>%father.mother.dates;<br>
+%if;father.mother.has_birth_place;  %father.mother.birth_place;%end;
+%else; fm
+%end;
+    
+    </td>
+    <td rowspan="4">    
+    %if;father.mother.has_parents;
+<a href="%prefix;%father.mother.father.access;">
+<b>%father.mother.father;</b><br>
+</a>%father.mother.father.dates;<br>
+%if;father.mother.father.has_birth_place;  %father.mother.father.birth_place;%end;
+%else; fmf 
+%end;
+    
+    </td>
+    <td rowspan="2">    
+    %if;father.mother.father.has_parents;
+<a href="%prefix;%father.mother.father.father.access;">
+%father.mother.father.father;<br>
+</a>%father.mother.father.father.dates;
+%else; fmff
+%end;
+    
+    </td>
+    <td>    
+    %if;father.mother.father.father.has_parents;
+<a href="%prefix;%father.mother.father.father.father.access;">
+%father.mother.father.father.father;
+</a> %father.mother.father.father.father.dates;
+%else; fmfff
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td>    
+    %if;father.mother.father.father.has_parents;
+<a href="%prefix;%father.mother.father.father.mother.access;">
+%father.mother.father.father.mother;
+</a> %father.mother.father.father.mother.dates;
+%else; fmffm
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td rowspan="2">    
+    %if;father.mother.father.has_parents;
+<a href="%prefix;%father.mother.father.mother.access;">
+%father.mother.father.mother;<br>
+</a>%father.mother.father.mother.dates;
+%else; fmfm
+%end;
+    
+    </td>
+    <td>    
+    %if;father.mother.father.mother.has_parents;
+<a href="%prefix;%father.mother.father.mother.father.access;">
+%father.mother.father.mother.father;
+</a> %father.mother.father.mother.father.dates;
+%else; fmfmf
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td>    
+    %if;father.mother.father.mother.has_parents;
+<a href="%prefix;%father.mother.father.mother.mother.access;">
+%father.mother.father.mother.mother;
+</a> %father.mother.father.mother.mother.dates;
+%else; fmfmm
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td rowspan="4">    
+    %if;father.mother.has_parents;
+<a href="%prefix;%father.mother.mother.access;">
+<b>%father.mother.mother;</b><br>
+</a>%father.mother.mother.dates;<br>
+%if;father.mother.mother.has_birth_place;  %father.mother.mother.birth_place;%end;
+%else; fmm
+%end;
+    
+    </td>
+    <td rowspan="2">    
+    %if;father.mother.mother.has_parents;
+<a href="%prefix;%father.mother.mother.father.access;">
+%father.mother.mother.father;<br>
+</a>%father.mother.mother.father.dates;
+%else; fmmf
+%end;
+    
+    </td>
+    <td>    
+    %if;father.mother.mother.father.has_parents;
+<a href="%prefix;%father.mother.mother.father.father.access;">
+%father.mother.mother.father.father;
+</a> %father.mother.mother.father.father.dates;
+%else; fmmff
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td>    
+    %if;father.mother.mother.father.has_parents;
+<a href="%prefix;%father.mother.mother.father.mother.access;">
+%father.mother.mother.father.mother;
+</a> %father.mother.mother.father.mother.dates;
+%else; fmmfm
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td rowspan="2">    
+    %if;father.mother.mother.has_parents;
+<a href="%prefix;%father.mother.mother.mother.access;">
+%father.mother.mother.mother;<br>
+</a>%father.mother.mother.mother.dates;
+%else; fmmm
+%end;
+    
+    </td>
+    <td>    
+    %if;father.mother.mother.mother.has_parents;
+<a href="%prefix;%father.mother.mother.mother.father.access;">
+%father.mother.mother.mother.father;
+</a>%father.mother.mother.mother.father.dates;
+%else; fmmmf
+%end;
+    
+    </td>
+  </tr>
+  <tr>
+    <td>    
+    %if;father.mother.mother.mother.has_parents;
+<a href="%prefix;%father.mother.mother.mother.mother.access;">
+%father.mother.mother.mother.mother;
+</a>%father.mother.mother.mother.mother.dates;
+%else; fmmmm
+%end;
+    </td>
+  </tr>
+  <tr>
+    <td rowspan="16">    
+%if;has_parents;
+%if;cancel_links; <b> %mother;</b>
+  %else;<a href="%prefix;%mother.access;"><b>%mother;</b></a>%end;
+  %mother.title;
+  %if; not cancel_links; <br>
+    %if;mother.has_birth_date; [*born]s %mother.on_birth_date; %mother.birth_place; %end;
+    %if;mother.is_dead;  <br>%mother.died;  %mother.on_death_date; <br> %mother.death_place; %end;
+    %if;mother.computable_death_age; <br> &nbsp;[*age at death:] %mother.death_age; %end;
+  %end;
+<b> <br> [*having as children]s :</b> 
+<!-- mother all childs  -->
+  %foreach;mother.family;
+  %foreach;child;
+   %if;cancel_links; <b><br> %child.child_name;</b> 
+      %else;<br> <a href="%prefix;%child.access;"> <b> %child.child_name;</b> </a> %end;
+     %if;child.has_birth_date; <em> ( %child.dates; ) %nl;</em> %end; 
+   %end;
+   %end;
+<!-- end of mother all childs  -->
+%else; m
+%end;
+    </td>
+<td rowspan="8">
+%if;mother.has_parents; 
+  <a href="%prefix;%mother.father.access;"> <b>%mother.father;</b><br> </a>
+  %mother.father.dates;<br>
+%if;mother.father.has_birth_place; %mother.father.birth_place;%end;
+%else;  mf
+%end;
+    </td>
+    
+<td rowspan="4">
+%if;mother.father.has_parents;
+  <a href="%prefix;%mother.father.father.access;"><b>%mother.father.father;</b><br></a>
+  %mother.father.father.dates;<br>
+  %if;mother.father.father.has_birth_place; %mother.father.father.birth_place;%end;
+%else;  mff
+%end;
+    </td>
+    
+<td rowspan="2">
+%if;mother.father.father.has_parents;
+  <a href="%prefix;%mother.father.father.father.access;">%mother.father.father.father;<br></a>
+  %mother.father.father.father.dates;
+%else;  mfff
+%end;
+   </td>
+
+<td>
+%if;mother.father.father.father.has_parents;
+  <a href="%prefix;%mother.father.father.father.father.access;">
+  %mother.father.father.father.father;</a>
+  %mother.father.father.father.father.dates;
+%else;  mffff
+%end;
+    </td>
+     </tr>
+<tr>
+<td>
+%if;mother.father.father.father.has_parents;
+  <a href="%prefix;%mother.father.father.father.mother.access;">
+  %mother.father.father.father.mother;</a>
+  %mother.father.father.father.mother.dates;
+%else;  mfffm
+%end;
+    
+   </td>
+  </tr>
+  <tr>
+<td rowspan="2">
+  %if;mother.father.father.has_parents;
+  <a href="%prefix;%mother.father.father.mother.access;">
+  %mother.father.father.mother;<br></a>
+  %mother.father.father.mother.dates;
+%else;  mffm
+%end;
+  </td>
+
+<td>
+%if;mother.father.father.mother.has_parents;
+  <a href="%prefix;%mother.father.father.mother.father.access;">
+  %mother.father.father.mother.father;</a>
+  %mother.father.father.mother.father.dates;
+%else;  mffmf
+%end;
+    </td>
+  </tr>
+<tr>
+<td>
+%if;mother.father.father.mother.has_parents;
+  <a href="%prefix;%mother.father.father.mother.mother.access;">
+  %mother.father.father.mother.mother;</a>
+  %mother.father.father.mother.mother.dates;
+%else;  mffmm
+%end;
+    </td>
+    </tr>
+<tr>
+<td rowspan="4">
+  %if;mother.father.has_parents;
+  <a href="%prefix;%mother.father.mother.access;">
+  <b>%mother.father.mother;</b><br></a>
+  %mother.father.mother.dates;<br>
+  %if;mother.father.mother.has_birth_place; %mother.father.mother.birth_place;%end;
+%else;  mfm
+%end;
+    </td>
+
+<td rowspan="2">
+%if;mother.father.mother.has_parents;
+  <a href="%prefix;%mother.father.mother.father.access;">
+%mother.father.mother.father;<br></a>
+%mother.father.mother.father.dates;
+%else;  mfmf
+%end;
+   </td>
+<td>
+%if;mother.father.mother.father.has_parents;
+  <a href="%prefix;%mother.father.mother.father.father.access;">
+  %mother.father.mother.father.father;</a> 
+  %mother.father.mother.father.father.dates;
+%else;  mfmff
+%end;
+    </td>
+  </tr>
+<tr>
+
+<td>
+%if;mother.father.mother.father.has_parents;
+  <a href="%prefix;%mother.father.mother.father.mother.access;">
+  %mother.father.mother.father.mother;</a> 
+  %mother.father.mother.father.mother.dates;
+%else;  mfmfm
+%end;
+    </td>
+  </tr>
+  <tr>
+
+<td rowspan="2">
+%if;mother.father.mother.has_parents;
+  <a href="%prefix;%mother.father.mother.mother.access;">
+  %mother.father.mother.mother;<br></a>
+  %mother.father.mother.mother.dates; 
+%else;  mfmm
+%end;
+  </td>
+
+<td>
+%if;mother.father.mother.mother.has_parents;
+  <a href="%prefix;%mother.father.mother.mother.father.access;">
+  %mother.father.mother.mother.father;</a> 
+  %mother.father.mother.mother.father.dates;
+%else;  mfmmf
+%end;
+    </td>
+  </tr>
+  <tr>
+
+<td>
+%if;mother.father.mother.mother.has_parents;
+  <a href="%prefix;%mother.father.mother.mother.mother.access;">
+  %mother.father.mother.mother.mother;</a> 
+  %mother.father.mother.mother.mother.dates;
+%else;  mfmmm
+%end;
+    </td>
+  </tr>
+  <tr>
+
+<td rowspan="8">
+%if;mother.has_parents;
+  <a href="%prefix;%mother.mother.access;">
+  <b>%mother.mother;</b><br></a>
+  %mother.mother.dates; <br>
+%if;mother.mother.has_birth_place; %mother.mother.birth_place;%end;
+%else;  mm
+%end;
+    </td>
+
+<td rowspan="4">
+%if;mother.mother.has_parents;
+  <a href="%prefix;%mother.mother.father.access;">
+  <b>%mother.mother.father;</b><br></a>
+  %mother.mother.father.dates; <br>
+%if;mother.mother.father.has_birth_place;  %mother.mother.father.birth_place;%end;
+%else;  mmf
+%end;
+  </td>
+
+<td rowspan="2">
+  %if;mother.mother.father.has_parents;
+  <a href="%prefix;%mother.mother.father.father.access;">
+  %mother.mother.father.father;<br></a>
+  %mother.mother.father.father.dates; 
+%else;  mmff
+%end;
+  </td>
+
+<td>
+%if;mother.mother.father.father.has_parents;
+  <a href="%prefix;%mother.mother.father.father.father.access;">
+  %mother.mother.father.father.father;</a> 
+  %mother.mother.father.father.father.dates;
+%else;  mmfff
+%end;
+    </td>
+  </tr>
+  <tr>
+
+<td>
+%if;mother.mother.father.father.has_parents;
+  <a href="%prefix;%mother.mother.father.father.mother.access;">
+  %mother.mother.father.father.mother;</a> 
+  %mother.mother.father.father.mother.dates;
+%else;  mmffm
+%end;
+    </td>
+  </tr>
+<tr>
+
+<td rowspan="2">
+%if;mother.mother.father.has_parents;
+  <a href="%prefix;%mother.mother.father.mother.access;">
+  %mother.mother.father.mother;<br></a>
+  %mother.mother.father.mother.dates;  
+%else;  mmfm
+%end;
+    </td>
+<td>
+%if;mother.mother.father.mother.has_parents;
+  <a href="%prefix;%mother.mother.father.mother.father.access;">
+  %mother.mother.father.mother.father;</a> 
+  %mother.mother.father.mother.father.dates;
+%else;  mmfmf
+%end;
+    </td>
+  </tr>
+  <tr>
+
+<td>
+%if;mother.mother.father.mother.has_parents;
+  <a href="%prefix;%mother.mother.father.mother.mother.access;">
+  %mother.mother.father.mother.mother;</a> 
+  %mother.mother.father.mother.mother.dates;
+%else;  mmfmm
+%end;
+    </td>
+  </tr>
+<tr>
+
+<td rowspan="4">
+%if;mother.mother.has_parents;
+  <a href="%prefix;%mother.mother.mother.access;">
+  <b>%mother.mother.mother;</b><br></a>
+  %mother.mother.mother.dates; <br>
+  %if;mother.mother.mother.has_birth_place; %mother.mother.mother.birth_place;%end; 
+%else;  mmm
+%end;
+    </td>
+
+<td rowspan="2">
+%if;mother.mother.mother.has_parents;
+  <a href="%prefix;%mother.mother.mother.father.access;">
+  %mother.mother.mother.father;<br></a>
+  %mother.mother.mother.father.dates; 
+%else;  mmmf
+%end;
+  </td>
+
+<td>
+%if;mother.mother.mother.father.has_parents;
+  <a href="%prefix;%mother.mother.mother.father.father.access;">
+  %mother.mother.mother.father.father;</a> 
+  %mother.mother.mother.father.father.dates;
+%else;  mmmff
+%end;
+    </td>
+  </tr>
+  <tr>
+
+<td>
+%if;mother.mother.mother.father.has_parents;
+  <a href="%prefix;%mother.mother.mother.father.mother.access;">
+  %mother.mother.mother.father.mother;</a> 
+  %mother.mother.mother.father.mother.dates;
+%else;  mmmfm
+%end;
+    </td>
+  </tr>
+  <tr>
+
+<td rowspan="2">
+%if;mother.mother.mother.has_parents;
+  <a href="%prefix;%mother.mother.mother.mother.access;">
+  %mother.mother.mother.mother;<br></a>
+  %mother.mother.mother.mother.dates; 
+%else;  mmmm
+%end;
+  </td>
+
+<td>
+%if;mother.mother.mother.mother.has_parents;
+  <a href="%prefix;%mother.mother.mother.mother.father.access;">
+  %mother.mother.mother.mother.father;</a> 
+  %mother.mother.mother.mother.father.dates;
+%else;  mmmmf
+%end;
+    </td>
+  </tr>
+  <tr>
+
+<td>
+%if;mother.mother.mother.mother.has_parents;
+  <a href="%prefix;%mother.mother.mother.mother.mother.access;">
+  %mother.mother.mother.mother.mother;</a> 
+  %mother.mother.mother.mother.mother.dates;
+%else;  mmmmm
+%end;
+    </td>
+  </tr>
+</table>
+
+<!-- Pedigree  end  -->
+
+<!-- Relationer -->
+%if;has_relations;
+  <h3><font color=%highlight;>[*relation/relations]1</font></h3>
+  <ol>
+    %foreach;relation;
+      <li>%relation_type;
+      %if;(has_relation_him and has_relation_her)
+        %nl;
+        <ol>
+	<li>%relation_him;%nl;
+	<li>%relation_her;%nl;
+        </ol>
+      %elseif;has_relation_him;: %relation_him;%nl;
+      %elseif;has_relation_her;: %relation_her;%nl;
+      %end;
+    %end;
+    %foreach;related;
+      <li>%related_type;: %related;%nl;
+    %end;
+    %foreach;witness_relation;
+      <li>%witness_relation;%nl;
+    %end;
+  </ol>
+%end;
+<!-- Relationer end -->
+
+
+<!-- Noteringar -->
+%if;has_notes;
+  <h3><font color=%highlight;>[*note/notes]1</font></h3>
+  %notes;
+%end;
+
+%if;has_sources;
+  <p>
+  <font size=-1><em>[*source/sources]1:
+  %foreach;source;
+    <br>- %source_type;: %source;
+  %end;
+  </em></font>
+  
+%end;
+<!-- Noteringar slut -->
+<hr>
+
+<!-- Link arrows -->
+%if;not cancel_links;
+  <table align=left  ><tr><td>
+    %if;has_referer;
+      <a href="%referer;"><img
+       src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"></a>
+    %end;
+    <a href="%prefix;"><img
+    src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"></a>
+  </td></tr></table>
+%end; 
+<!-- Link arrows slut slut -->
+
+
+<!-- Relationsberäkningar  -->
+%if;not cancel_links;
+  <a href="%prefix;m=R;%access;"><b><font color=%highlight;>*[*relationship computing]</font></b></a>
+      %if;has_parents; %sp;-%sp;
+         <a href="%prefix;m=A;%access;"><b><font color=%highlight;>[*ancestors]</font></b></a>
+      %end;
+      %if;has_children; %sp;-%sp; 
+        <a href="%prefix;m=D;%access;"><b><font color=%highlight;>[*descendants]</font></b></a>
+      %end;
+      %if;(father.has_parents or mother.has_parents) %sp;-%sp; 
+        <a href="%prefix;m=C;%access;"><b><font color=%highlight;>[*cousins (general term)]</font></b></a>
+      %else;
+        %if;has_nephews_or_nieces; %sp;-%sp; 
+         <a href="%prefix;m=C;v1=1;v2=2;%access;"><b><font color=%highlight;>[*nephews and nieces]</font></b></a>
+        %end;
+      %end;
+     
+<!-- Föregående o Nästa syskon -->
+      %foreach;father.child; 
+	%if;is_sibling_before; %sp;-%sp; 
+         <a href="%prefix;%child.access;"><b><font color=%highlight;>[*previous sibling]s</font></b></a>
+	%end;
+	%if;is_sibling_after; %sp;-%sp; 
+	 <a href="%prefix;%child.access;"><b><font color=%highlight;>[*next sibling]s</font></b></a>
+	%end;
+      %end;
+<!-- Föregående o Nästa syskon end -->
+
+<!-- Updateringslänk -->
+  %if;wizard; %sp;----%sp; 
+    <a href="%prefix;m=U;%access;"><b><font color=%highlight;>[*update]</font></b></a>
+  %end;
+<!-- Updateringslänk  end -->
+%end;
+
+
+<!--p
+<a href="%prefix_no_templ;;%access;;templ=">Standard display /
+Affichage standard</a>
+p-->
+
+<img src="%image_prefix;/gwlogo.gif"
+ alt=... width=64 height=72 align=right>
+<br>
+%copyright;
+%base_trailer;
+<font size=-1><em>
+Observe that there are no guarantee that data are correct or complete in every respect, and changes might be done without notis.
+Do you have additional data or suggest changes, then contact <a href="mailto:benglund@algonet.se"> me.</a>
+</em></font>
+</body>
