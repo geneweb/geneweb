@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.9 1999-05-23 09:51:59 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.10 1999-05-29 17:38:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -154,15 +154,15 @@ value print_err_unknown conf base (f, s, o) =
 
 value print_create_conflict conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let n =
+    Update.find_free_occ base (sou base p.first_name) (sou base p.surname) 0
+  in
   do header conf title;
      Update.print_error conf base (AlreadyDefined p);
      html_p conf;
      Wserver.wprint "<ul>\n";
      html_li conf;
-     Wserver.wprint "%s: %d\n"
-       (capitale (transl conf "first free number"))
-       (Update.find_free_occ base (sou base p.first_name) (sou base p.surname)
-          0);
+     Wserver.wprint "%s: %d\n" (capitale (transl conf "first free number")) n;
      html_li conf;
      Wserver.wprint "%s\n"
        (capitale (transl conf "or use \"link\" instead of \"create\""));
