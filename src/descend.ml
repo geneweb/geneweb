@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.19 1999-08-04 04:24:56 ddr Exp $ *)
+(* $Id: descend.ml,v 2.20 1999-08-04 04:54:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -931,14 +931,17 @@ value print_tree conf base v p =
   let print_person first v po =
     do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
        match po with
-       [ Some p ->
+       [ Some (p, auth) ->
            let ncol = nb_column 0 (v - 1) p in
            let txt =
              if v = 1 then person_text_without_surname conf base p
              else person_title_text conf base p
            in
            let txt = reference conf base p txt in
-           let txt = txt ^ Date.short_dates_text conf base p in
+           let txt =
+             if auth then txt ^ Date.short_dates_text conf base p
+             else txt
+           in
            stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
              Wserver.wprint "%s" txt;
            end
@@ -949,7 +952,7 @@ value print_tree conf base v p =
   let print_spouses first v po =
     do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
        match po with
-       [ Some p when Array.length p.family > 0 ->
+       [ Some (p, auth) when Array.length p.family > 0 ->
            let _ =
              List.fold_left
                (fun first ifam ->
@@ -961,10 +964,15 @@ value print_tree conf base v p =
                      let sp = poi base (spouse p (coi base ifam)) in
                      let txt = person_title_text conf base sp in
                      let txt = reference conf base sp txt in
-                     let txt = txt ^ Date.short_dates_text conf base sp in
+                     let txt =
+                       if auth then txt ^ Date.short_dates_text conf base sp
+                       else txt
+                     in
                      stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
                        Wserver.wprint "&amp;%s %s"
-                         (Date.short_marriage_date_text conf base fam p sp)
+                         (if auth then
+                            Date.short_marriage_date_text conf base fam p sp
+                          else "")
                          txt;
                      end;
                      Wserver.wprint "\n";
@@ -979,7 +987,7 @@ value print_tree conf base v p =
     List.fold_right
       (fun po gen ->
          match po with
-         [ Some p ->
+         [ Some (p, _) ->
              if Array.length p.family = 0 then [None :: gen]
              else
                List.fold_right
@@ -987,8 +995,14 @@ value print_tree conf base v p =
                     let fam = foi base ifam in
                     if Array.length fam.children = 0 then [None :: gen]
                     else
+                      let age_auth =
+                        List.for_all
+                          (fun ip -> age_autorise conf base (poi base ip))
+                          (Array.to_list fam.children)
+                      in
                       List.fold_right
-                        (fun iper gen -> [Some (poi base iper) :: gen])
+                        (fun iper gen ->
+                           [Some (poi base iper, age_auth) :: gen])
                         (Array.to_list fam.children) gen)
                  (Array.to_list p.family) gen
          | None -> [None :: gen] ])
@@ -996,24 +1010,25 @@ value print_tree conf base v p =
   in
   do header_no_page_title conf title;
      tag "table" "border=1 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
-       loop [Some p] (v + 1) where rec loop gen v =
-         if v == 0 then ()
-         else
+       loop [Some (p, True)] (v + 1) where rec loop gen v =
+         do tag "tr" begin
+              let _ =
+                List.fold_left
+                  (fun first po -> do print_person first v po; return False)
+                  True gen
+              in ();
+            end;
+         return
+         if v > 1 then
            do tag "tr" begin
-                let _ =
-                  List.fold_left
-                    (fun first po -> do print_person first v po; return False)
-                    True gen
-                in ();
-              end;
-              tag "tr" begin
                 let _ =
                   List.fold_left
                     (fun first po -> do print_spouses first v po; return False)
                     True gen
                 in ();
               end;
-           return loop (next_gen gen) (v - 1);
+           return loop (next_gen gen) (v - 1)
+         else ();
      end;
      trailer conf;
   return ()
