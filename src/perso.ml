@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 4.2 2001-03-18 06:32:39 ddr Exp $ *)
+(* $Id: perso.ml,v 4.3 2001-03-18 14:44:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -283,7 +283,7 @@ value extract_var sini s =
   else ""
 ;
 
-value eval_variable conf base env sl =
+value rec eval_variable conf base env sl =
   let ep =
     match (get_env "p" env, get_env "p_auth" env) with
     [ (Vind p a u, Vbool p_auth) -> (p, a, u, p_auth)
@@ -341,8 +341,14 @@ value eval_variable conf base env sl =
             let ep = (p, a, u, age_autorise conf base p) in
             loop ep efam sl
         | _ -> None ]
-    | [] -> Some ((p, a, u, p_auth), efam, "")
-    | [s] -> Some ((p, a, u, p_auth), efam, s)
+    | ["enclosing" :: sl] ->
+        loop env where rec loop =
+          fun
+          [ [("#loop", _) :: env] -> eval_variable conf base env sl
+          | [_ :: env] -> loop env
+          | [] -> None ]
+    | [] -> Some (env, (p, a, u, p_auth), efam, "")
+    | [s] -> Some (env, (p, a, u, p_auth), efam, s)
     | _ -> None ]
 ;
 
@@ -876,8 +882,8 @@ value print_simple_person_text conf base (p, _, _, p_auth) =
 
 value print_variable conf base env sl =
   match eval_variable conf base env sl with
-  [ Some (ep, efam, "") -> print_simple_person_text conf base ep
-  | Some (ep, efam, s) ->
+  [ Some (env, ep, efam, "") -> print_simple_person_text conf base ep
+  | Some (env, ep, efam, s) ->
       try print_simple_variable conf base env ep efam s with
       [ Not_found -> Templ.print_variable conf base s ]
   | None ->
@@ -1064,14 +1070,15 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
 
 value eval_bool_variable conf base env sl =
   match eval_variable conf base env sl with
-  [ Some (ep, efam, "") ->
+  [ Some (env, ep, efam, "") ->
       do list_iter_first
            (fun first s ->
               Wserver.wprint "%s%s" (if first then "" else ".") s)
            sl;
          Wserver.wprint "???";
       return False
-  | Some (ep, efam, s) -> eval_simple_bool_variable conf base env ep efam s
+  | Some (env, ep, efam, s) ->
+      eval_simple_bool_variable conf base env ep efam s
   | None -> False ]
 ;
 
@@ -1184,8 +1191,8 @@ and eval_foreach conf base env s sl al =
     (List.rev (List.tl sl), List.hd sl)
   in
   match eval_variable conf base env sl with
-  [ Some (ep, efam, "") -> eval_simple_foreach conf base env al ep efam s
-  | Some (ep, efam, _) ->
+  [ Some (env, ep, efam, "") -> eval_simple_foreach conf base env al ep efam s
+  | Some (env, ep, efam, _) ->
       do Wserver.wprint "foreach ";
          List.iter (fun s -> Wserver.wprint "%s." s) sl;
          Wserver.wprint "%s???" s;
@@ -1236,6 +1243,7 @@ and eval_foreach_child conf base env al =
            let p = poi base ip in
            let a = aoi base ip in
            let u = uoi base ip in
+           let env = [("#loop", Vint 0) :: env] in
            let env = [("child", Vind p a u) :: env] in
            let env = [("child_cnt", Vint (i + 1)) :: env] in
            let env =
@@ -1254,6 +1262,7 @@ and eval_foreach_family conf base env al (p, _, u, _) =
        let cpl = coi base ifam in
        let des = doi base ifam in
        let cpl = (p.cle_index, spouse p.cle_index cpl) in
+       let env = [("#loop", Vint 0) :: env] in
        let env = [("fam", Vfam fam cpl des) :: env] in
        let env = [("family_cnt", Vint (i + 1)) :: env] in
        List.iter (eval_ast conf base env) al)
