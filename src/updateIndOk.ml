@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.7 2000-04-14 13:20:48 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.8 2000-08-30 08:58:35 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -365,12 +365,12 @@ value print_cannot_change_sex conf base p =
 ;
 
 value check_conflict conf base sp ipl =
-  let name = Name.strip_lower (sp.first_name ^ " " ^ sp.surname) in
+  let name = Name.lower (sp.first_name ^ " " ^ sp.surname) in
   List.iter
     (fun ip ->
        let p1 = poi base ip in
        if p1.cle_index <> sp.cle_index
-       && Name.strip_lower (p_first_name base p1 ^ " " ^ p_surname base p1)
+       && Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1)
           = name
        && p1.occ = sp.occ then
          print_conflict conf base p1
@@ -464,8 +464,8 @@ value effective_mod conf base sp =
   let key = sp.first_name ^ " " ^ sp.surname in
   let ofn = p_first_name base op in
   let osn = p_surname base op in
-  do if Name.strip_lower ofn = Name.strip_lower sp.first_name
-     && Name.strip_lower osn = Name.strip_lower sp.surname
+  do if Name.lower ofn = Name.lower sp.first_name
+     && Name.lower osn = Name.lower sp.surname
      && op.occ == sp.occ then ()
      else
        let ipl = person_ht_find_all base key in

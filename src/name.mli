@@ -1,11 +1,13 @@
-(* $Id: name.mli,v 3.1 2000-01-10 02:14:40 ddr Exp $ *)
+(* $Id: name.mli,v 3.2 2000-08-30 08:58:35 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 value lower : string -> string;
   (* Name.lower:
      - uppercase -> lowercase
      - no accents
-     - chars no letters and no numbers (except '.') => spaces (stripped) *)
+     - chars no letters and no numbers (except '.') => spaces (stripped)
+     Key comparison (first name, surname, number) applies "lower" equality
+     on first names and surnames *)
 value abbrev : string -> string;
   (* Name.abbrev: suppress lowercase particles, shorten "saint" into "st" *)
 value strip : string -> string;

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.11 2000-08-07 14:32:14 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.12 2000-08-30 08:58:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -369,15 +369,15 @@ value person_ht_find_unique base first_name surname occ =
     let first_name = nominative first_name in
     let surname = nominative surname in
     let ipl = base.func.persons_of_name (first_name ^ " " ^ surname) in
-    let first_name = Name.strip_lower first_name in
-    let surname = Name.strip_lower surname in
+    let first_name = Name.lower first_name in
+    let surname = Name.lower surname in
     find ipl where rec find =
       fun
       [ [ip :: ipl] ->
           let p = poi base ip in
           if occ == p.occ
-          && first_name = Name.strip_lower (p_first_name base p)
-          && surname = Name.strip_lower (p_surname base p)
+          && first_name = Name.lower (p_first_name base p)
+          && surname = Name.lower (p_surname base p)
           then p.cle_index
           else find ipl
       | _ -> raise Not_found ]

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 3.4 2000-06-03 21:08:01 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 3.5 2000-08-30 08:58:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -189,12 +189,12 @@ value print_conflict conf base p =
 ;
 
 value check_conflict conf base p key new_occ ipl =
-  let name = Name.strip_lower key in
+  let name = Name.lower key in
   List.iter
     (fun ip ->
        let p1 = poi base ip in
        if p1.cle_index <> p.cle_index
-       && Name.strip_lower (p_first_name base p1 ^ " " ^ p_surname base p1)
+       && Name.lower (p_first_name base p1 ^ " " ^ p_surname base p1)
           = name
        && p1.occ = new_occ then
          do print_conflict conf base p1; return raise Update.ModErr
