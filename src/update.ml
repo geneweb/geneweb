@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.16 1999-07-28 13:08:30 ddr Exp $ *)
+(* $Id: update.ml,v 2.17 1999-07-28 15:49:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -552,7 +552,7 @@ value print_parent_person conf base var (first_name, surname, occ, create) =
             (if create = Link then " selected" else "")
             (capitale (transl conf "link"));
           Wserver.wprint "<option value=create%s>%s\n"
-            (match create with [ Create Neuter _ -> " selected" | _ -> "" ])
+            (match create with [ Create _ _ -> " selected" | _ -> "" ])
             (capitale (transl conf "create"));
         end;
       end;
