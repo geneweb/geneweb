@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.29 1999-08-02 16:08:27 ddr Exp $ *)
+(* $Id: relation.ml,v 2.30 1999-08-04 14:44:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -608,10 +608,16 @@ value known_spouses_list base p excl_p =
 
 value merge_relations rl1 rl2 =
   Sort.merge
-    (fun (_, _, (l11, l12, _)) (_, _, (l21, l22, _)) ->
+    (fun (po11, po12, (l11, l12, _)) (po21, po22, (l21, l22, _)) ->
        if l11 + l12 < l21 + l22 then True
        else if l11 + l12 > l21 + l22 then False
-       else l11 < l21)
+       else if l11 < l21 then True
+       else if l11 > l21 then False
+       else if po11 = None && po12 = None then True
+       else if po21 = None && po22 = None then False
+       else if po11 = None || po21 = None then True
+       else if po21 = None || po22 = None then False
+       else True)
     rl1 rl2
 ;
 

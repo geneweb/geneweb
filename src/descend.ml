@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.20 1999-08-04 04:54:05 ddr Exp $ *)
+(* $Id: descend.ml,v 2.21 1999-08-04 14:44:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -911,7 +911,14 @@ value afficher_descendants_table conf base max_lev a =
   return ()
 ;
 
-value print_tree conf base v p =
+value list_iter_first f l =
+  let _ =
+    List.fold_left (fun first x -> do f first x; return False) True l
+  in
+  ()
+;
+
+value print_tree conf base gv p =
   let title _ =
     Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
       (person_text_no_html conf base p)
@@ -928,7 +935,96 @@ value print_tree conf base v p =
     else List.fold_left (fun n iper -> nb_column n (v - 1) (poi base iper)) n
       (Array.to_list fam.children)
   in
-  let print_person first v po =
+  let print_vertical_bar v first po =
+    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
+       match po with
+       [ Some (p, _) ->
+           let ncol = nb_column 0 (v - 1) p in
+           stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
+             Wserver.wprint "|";
+           end
+       | None -> Wserver.wprint "<td>&nbsp;</td>" ];
+       Wserver.wprint "\n";
+    return ()
+  in
+  let children_vertical_bars v gen =
+    tag "tr" begin list_iter_first (print_vertical_bar v) gen; end
+  in
+  let print_spouses_vertical_bar v first po =
+    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
+       match po with
+       [ Some (p, _) when Array.length p.family > 0 ->
+           list_iter_first
+             (fun first ifam ->
+                do if not first then Wserver.wprint "<td>&nbsp;</td>\n"
+                   else ();
+                   let fam = foi base ifam in
+                   if Array.length fam.children = 0 then
+                     Wserver.wprint "<td>&nbsp;</td>"
+                   else
+                     let ncol = fam_nb_column 0 (v - 1) fam in
+                     stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
+                       Wserver.wprint "|";
+                     end;
+                   Wserver.wprint "\n";
+                return ())
+             (Array.to_list p.family)
+       | _ -> Wserver.wprint "<td>&nbsp;</td>\n" ];
+    return ()
+  in
+  let spouses_vertical_bar v gen =
+    tag "tr" begin list_iter_first (print_spouses_vertical_bar v) gen; end
+  in
+  let print_horizontal_bar v first po =
+    do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
+       match po with
+       [ Some (p, _) when Array.length p.family > 0 ->
+           list_iter_first
+             (fun first ifam ->
+                do if not first then Wserver.wprint "<td>&nbsp;</td>\n"
+                   else ();
+                   let fam = foi base ifam in
+                   if Array.length fam.children = 0 then
+                     Wserver.wprint "<td>&nbsp;</td>\n"
+                   else if Array.length fam.children = 1 then
+                     Wserver.wprint "<td align=center>.</td>\n"
+                   else
+                     Array.iteri
+                       (fun i iper ->
+                          let p = poi base iper in
+                          do if i > 0 then
+                               Wserver.wprint
+                                 "<td><hr noshade size=1></td>\n"
+                             else ();
+                             let ncol = nb_column 0 (v - 1) p in
+                             let align =
+                               if i == 0 then " align=right"
+                               else if i == Array.length fam.children - 1
+                               then " align=left"
+                               else ""
+                             in
+                             stag "td" "colspan=%d%s" (2 * ncol - 1) align
+                             begin
+                               Wserver.wprint "<hr noshade size=1%s%s>"
+                                 (if i = 0
+                                  || i == Array.length fam.children - 1 then
+                                    " width=50%"
+                                  else "")
+                                 align;
+                             end;
+                             Wserver.wprint "\n";
+                          return ())
+                       fam.children;
+                return ())
+             (Array.to_list p.family)
+       | _ -> Wserver.wprint "<td>&nbsp;</td>" ];
+       Wserver.wprint "\n";
+    return ()
+  in
+  let horizontal_bars v gen =
+    tag "tr" begin list_iter_first (print_horizontal_bar v) gen; end
+  in
+  let print_person v first po =
     do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
        match po with
        [ Some (p, auth) ->
@@ -949,18 +1045,20 @@ value print_tree conf base v p =
        Wserver.wprint "\n";
     return ()
   in
-  let print_spouses first v po =
+  let print_spouses v first po =
     do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
        match po with
        [ Some (p, auth) when Array.length p.family > 0 ->
-           let _ =
-             List.fold_left
-               (fun first ifam ->
-                  do if not first then
-                       Wserver.wprint "<td>&nbsp;&nbsp;</td>\n"
-                     else ();
-                     let fam = foi base ifam in
-                     let ncol = fam_nb_column 0 (v - 1) fam in
+           list_iter_first
+             (fun first ifam ->
+                do if not first then
+                     Wserver.wprint "<td>&nbsp;&nbsp;</td>\n"
+                   else ();
+                   let fam = foi base ifam in
+                   let ncol = fam_nb_column 0 (v - 1) fam in
+                   stag "td"
+                     "colspan=%d align=center valign=top" (2 * ncol - 1)
+                   begin
                      let sp = poi base (spouse p (coi base ifam)) in
                      let txt = person_title_text conf base sp in
                      let txt = reference conf base sp txt in
@@ -968,18 +1066,15 @@ value print_tree conf base v p =
                        if auth then txt ^ Date.short_dates_text conf base sp
                        else txt
                      in
-                     stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
-                       Wserver.wprint "&amp;%s %s"
-                         (if auth then
-                            Date.short_marriage_date_text conf base fam p sp
-                          else "")
-                         txt;
-                     end;
-                     Wserver.wprint "\n";
-                  return False)
-               True (Array.to_list p.family)
-           in
-           ()
+                     Wserver.wprint "&amp;%s %s"
+                       (if auth then
+                          Date.short_marriage_date_text conf base fam p sp
+                        else "")
+                       txt;
+                   end;
+                   Wserver.wprint "\n";
+                return ())
+             (Array.to_list p.family)
        | _ -> Wserver.wprint "<td>&nbsp;</td>\n" ];
     return ()
   in
@@ -1009,25 +1104,23 @@ value print_tree conf base v p =
       gen []
   in
   do header_no_page_title conf title;
-     tag "table" "border=1 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
-       loop [Some (p, True)] (v + 1) where rec loop gen v =
-         do tag "tr" begin
-              let _ =
-                List.fold_left
-                  (fun first po -> do print_person first v po; return False)
-                  True gen
-              in ();
+     tag "table" "border=0 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
+       loop [] [Some (p, True)] (gv + 1) where rec loop prev_gen gen v =
+         do if prev_gen <> [] then
+              do spouses_vertical_bar (v + 1) prev_gen;
+                 horizontal_bars v prev_gen;
+                 children_vertical_bars v gen;
+              return ()
+            else ();
+            tag "tr" begin
+              list_iter_first (print_person v) gen;
             end;
          return
          if v > 1 then
            do tag "tr" begin
-                let _ =
-                  List.fold_left
-                    (fun first po -> do print_spouses first v po; return False)
-                    True gen
-                in ();
+               list_iter_first (print_spouses v) gen;
               end;
-           return loop (next_gen gen) (v - 1)
+           return loop gen (next_gen gen) (v - 1)
          else ();
      end;
      trailer conf;
@@ -1038,10 +1131,10 @@ value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> afficher_descendants_jusqu_a conf base v p
   | (Some "S", Some v) -> afficher_descendants_niveau conf base v p
-  | (Some "T", Some v) -> afficher_descendants_table conf base v p
+  | (Some "H", Some v) -> afficher_descendants_table conf base v p
   | (Some "N", Some v) -> afficher_descendants_numerotation conf base v p
   | (Some "G", Some v) -> afficher_index_descendants conf base v p
   | (Some "C", Some v) -> afficher_index_spouses conf base v p
-  | (Some "R", Some v) -> print_tree conf base v p
+  | (Some "T", Some v) -> print_tree conf base v p
   | _ -> afficher_menu_descendants conf base p ]
 ;
