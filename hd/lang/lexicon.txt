@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.202 2000-12-26 16:19:23 ddr Exp $
+# $Id: lexicon.txt,v 3.203 2000-12-29 00:31:33 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -150,7 +150,7 @@ de: vor %d Jahren
 dk: for %d &aring;r siden
 en: %d years ago
 eo: antaש %d jaroj
-es: hace %d a&ntilde;s
+es: hace %d a&ntilde;os
 fi: %d vuotta sitten
 fr: il y a %d ans
 he:  לפני %d שנים
@@ -289,7 +289,7 @@ de: %t's Geschlecht stimmt nicht überein mit ihren/seinen Beziehungen
 dk: %t's k&oslash;n er ikke koh&aelig;rent med hans/hendes forbindelser
 en: %t's sex is not coherent with his/her relations
 eo: la sekso de %t ne koheras kun siaj rilatoj
-es: el gיnero de %t es incoherente con sus relaciones
+es: el g&eacute;nero de %t es incoherente con sus relaciones
 fi: henkil&ouml;n %t sukupuoli ja h&auml;nen suhteensa eiv&auml;t t&auml;sm&auml;&auml;
 fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
 he:  המין של %t לא מתאים ליחסיו/ליחסיה
@@ -308,7 +308,7 @@ de: 1. %m %y/%d. %m %y/%m %y/%y
 dk: 1. %m %y/%d. %m %y/%m %y/%y
 en: 1 %m %y/%d %m %y/%m %y/%y
 eo: 1an de %m %y/%da de %m %y/%m %y/%y
-es: 1ro %m %y/%d %m %y/%m %y/%y
+es: 1 de %m %y/%d de %m %y/%m %y/%y
 fi: 1. %mta %y/%d. %mta %y/%mssa %y/%y
 fr: 1er %m %y/%d %m %y/%m %y/%y
 he: 1 %m %y/%d %m %y/%m %y/%y
@@ -494,7 +494,7 @@ de: Cousins 2ten Grades
 dk: f&aelig;tre og kusiner af 2. grad
 en: 2nd cousins
 eo: rektaj geprakuzoj
-es: primos de 2ndo grado
+es: primos en segundo grado
 fi: pikkuserkut
 fr: cousins issus de germains
 he:   בני דודים שניים
@@ -514,7 +514,7 @@ de: Cousins 3ten Grades
 dk: f&aelig;tre og kusiner af 3. grad
 en: 3rd cousins
 eo: 3aj gradaj gekuzoj
-es: primos de 3er grado
+es: primos en tercer grado
 fi: kolmannet serkut
 fr: cousins issus d'issus de germains
 he:   בני דודים שלישיים
@@ -614,7 +614,7 @@ de: ein:d:+em Cousin %s Grades/eine Kusine %s Grades
 dk: en f&aelig;tter af %s grad/en kusine af %s grad
 en: a %s cousin
 eo: %s grada kuzo/%s grada kuzino/%s grada kuz(in)o
-es: un primo de %s grado/una prima de %s grado/un(a) primo(a) de %s grado
+es: un primo en %s grado/una prima en %s grado/un(a) primo(a) en %s grado
 fi: %s serkku:g:--un
 fr: un cousin au %s degr&eacute;/une cousine au %s degr&eacute;/un(e) cousin(e) au %s degr&eacute;
 he:  בן-דוד לדרגה  %s/ בת-דוד לדרגה  %s
@@ -2401,7 +2401,7 @@ de: unbekannt
 dk: ved ikke
 en: don't know
 eo: ne scias
-es: no se
+es: desconocido
 fi: ei tiedossa
 fr: ne sais pas
 he:   לא יודע
@@ -2818,7 +2818,7 @@ de: Pflegevater/Pflegemutter/Pflegeeltern
 dk: plejefader/plejemoder/plejefor&aelig;ldre
 en: foster father/foster mother/foster parents
 eo: nutrinta patro/nutrinta patrino/nutrintaj gepatroj
-es: padre adoptivo/madre adoptiva/padres adoptivos
+es: padre tutelar/madre tutelar/padres tutelares
 fi: kasvatusis&auml;/kasvatus&auml;iti/kasvatusvanhemmat
 fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
 he:   אב חורג/ אם חורגת/ הורים חורגים
@@ -2837,7 +2837,7 @@ de: Pflegesohn/Pflegetochter/Pflegekind
 dk: plejes&oslash;n/plejedatter/plejebarn
 en: foster son/foster daughter/foster child
 eo: nutrita filo/nutrita filino/nutrita ido
-es: hijo adoptivo/hija adoptiva
+es: hijo acogido/hija acogida/ni&ntilde;o(a) acogido(a)
 fi: kasvattipoika/kasvattityt&auml;r/kasvattilapsi
 fr: fils &eacute;lev&eacute;/fille &eacute;lev&eacute;e/enfant &eacute;lev&eacute;
 he:  בן חורג/ בת חורגת/ ילד חורג
@@ -2896,7 +2896,7 @@ de: Taufkind
 dk: guds&oslash;n/guddatter/gudbarn
 en: godson/goddaughter/godchild
 eo: baptofilo/baptofilino/baptofil(in)o
-es: fahijado/fahijada/fahihado(a)
+es: ahijado/ahijada/ahihado(a)
 fi: kummipoika/kummitytt&ouml;/kummilapsi
 fr: filleul/filleule/filleul(e)
 he:  בן סנדקאות/ בת סנדקאות/ ילד סנדקאות
@@ -2956,7 +2956,7 @@ de: Gregorianisch/Julianisch/Franz&ouml;sisch/Hebr&auml;isch
 dk: gregoriansk/juliansk/fransk rep./j&oslash;disk
 en: Gregorian/Julian/French/Hebrew
 eo: gregoriana/juliana/franca/hebra
-es: gregoriano/julian/franc&eacute;s/hebreo
+es: gregoriano/juliano/franc&eacute;s/hebreo
 fi: gregoriaaninen/juliaaninen/ranskalainen/heprealainen
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
 he:  גרגורי/ יוליאני/ צרפתי/ עברי
@@ -3017,7 +3017,7 @@ de: hier
 dk: her
 en: here
 eo: tie
-es: aqui
+es: aqu&iacute;
 fi: t&auml;ss&auml
 fr: ici
 he:   כאן
@@ -3057,7 +3057,7 @@ de: Chronik der Aktualisierungen
 dk: opdateringers historie
 en: history of updates
 eo: historio de la gxisdatigoj
-es: historia de las actualizaciones
+es: historia de las actualizaci&oacute;nes
 fi: p&auml;ivityshistoria
 fr: historique des mises-&agrave;-jour
 he:  רשימת העדכונים
@@ -3174,7 +3174,7 @@ de: Bild
 dk: billede/billeder
 en: image/images
 eo: bildo:a:+n/bildoj
-es: imagen
+es: imagen/imagenes
 fi: kuva
 fr: image/images
 he:  תמונה
@@ -3496,7 +3496,7 @@ de: Julianisch
 dk: juliansk dag
 en: Julian day
 eo: tago juliana
-es: dia julian
+es: d&iacute;a julian
 fi: juliaaninen p&auml;iv&auml;
 fr: jour julien
 he:  יום יוליאני
@@ -3515,7 +3515,7 @@ de: gefallen
 dk: faldet
 en: killed
 eo: mortigita
-es: muerto/muerta/muerto(a)
+es: ca&iacute;do/ca&iacute;da/ca&iacute;do(a)
 fi: kaatunut
 fr: tu&eacute;/tu&eacute;e/tu&eacute;(e)
 he:    נפל/ נפלה
@@ -3634,7 +3634,7 @@ de: Schleife in der Datenbank: %s ist sein/ihr eigener Vorfahr
 dk: loop i databasen: %s er sin egen ane
 en: loop in data base: %s is his/her own ancestor
 eo: estas masxo en la datenbazo: %s estas sia propra avo
-es: bucle en la base de datos: %s es su propio ancestro
+es: referencia circul&aacute;r en la base de datos: %s es su propio ancestro
 fi: silmukka tietokannassa: %s on oma esivanhempansa
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 he:  מעגל במאגר הנתונים: %s  צאצא(ה) לאצמו/לאצמה
@@ -4089,7 +4089,7 @@ de: folgende Geschwister
 dk: n&aelig;ste s&oslash;skende
 en: next sibling
 eo: sekvanta frato/sekvanta fratino/sekvanta frat(in)o
-es: hermano siguiente/hermana siguiente/hermano (a) siguiente
+es: hermano siguiente/hermana siguiente/hermano(a) siguiente
 fi: seuraava veli/seuraava sisar/seuraava sisaruksista
 fr: fr&egrave;re suivant/soeur suivante/fr&egrave;re ou soeur suivant
 he:  אח(ות) צעיר(ה)
@@ -4388,7 +4388,7 @@ de: der %s Generation
 dk: af den %s generation
 en: of the %s generation
 eo: el la %s generacio
-es: a la %s generaci&oacute;n
+es: de la %s generaci&oacute;n
 fi: %s sukupolvea
 fr: &agrave; la %s g&eacute;n&eacute;ration
 he:   לדור  %s
@@ -4468,7 +4468,7 @@ de: der Hinrichtung
 dk: for henrettelsen
 en: of the execution
 eo: de la ekzekuto
-es: del ejecuci&oacute;n
+es: de la ejecuci&oacute;n
 fi: teloituksen
 fr: de l'ex&eacute;cution
 he:   של ההוצאה להורג
@@ -4549,7 +4549,7 @@ de: einen Tag alt
 dk: en dag gammel
 en: one day old
 eo: unu tago
-es: un dia
+es: un d&iacute;a
 fi: p&auml;iv&auml;n ik&auml;isen&auml
 fr: un jour
 he:  בן/בת יום
@@ -4810,7 +4810,7 @@ de: vielleicht
 dk: m&aring;ske
 en: possibly
 eo: eble
-es: possiblemente
+es: posiblemente
 fi: ehk&auml;
 fr: peut-&ecirc;tre
 he:  אולי
@@ -4830,7 +4830,7 @@ de: Genauigkeit
 dk: pr&aelig;cisering
 en: precision
 eo: precizeco
-es: precisiףn
+es: precisi&oacute;n
 fi: tarkennus
 fr: pr&eacute;cision
 he:  דייוק
@@ -5091,7 +5091,7 @@ de: Heiratsbeziehungen
 dk: sl&aelig;gtskaber ved gifterm&aring;l
 en: relationships by marriage
 eo: ligoj per edzigxo
-es: parentesco pol&iacute;tico
+es: parentescos pol&iacute;tico
 fi: sukulaisuus avioliiton kautta
 fr: liens de parent&eacute; par alliance
 he:  קשרים דרך נשואין
@@ -5469,7 +5469,7 @@ de: Statistiken
 dk: statistikker
 en: statistics
 eo: statistikoj
-es: estadםsticas
+es: estad&iacute;sticas
 fi: tilastotietoja
 fr: statistiques
 he:  נתונים סטטיסטים
@@ -6420,7 +6420,7 @@ de: Baum
 dk: tr&aelig;
 en: tree
 eo: arbo
-es: בrbol
+es: &aacute;rbol
 fi: puu
 fr: arbre
 he:  אץ
@@ -6661,7 +6661,7 @@ de: Jahr/Monat/Tag
 dk: &aring;r/m&aring;ned/dag
 en: year/month/day
 eo: jaro/monato/tago
-es: a&ntilde;o/mes/dia
+es: a&ntilde;o/mes/d&iacute;a
 fi: vuosi/kuukausi/p&auml;iv&auml
 fr: ann&eacute;e/mois/jour
 he:  שנה/ חודש/ יום
