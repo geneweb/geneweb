@@ -8,6 +8,9 @@ GeneWeb version 2.04
     whiteyellow, black, bluegreen and brown (thanks to Hans Albeck)
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jun 28, 99] Due to optimization in consanguinity computing (see below),
+    the answer time of relationship computing for persons without relationship
+    links is generally faster (it answers: "no relationship links" faster).
   - [Jun 26, 99] Added the ability to access persons having composed surnames
     by subparts of their surname: e.g. "Josephine Tascher de La Pagerie" can
     now be found by typing just "Josephine Tascher" or "Josephine de La
