@@ -2,28 +2,30 @@ GeneWeb version 3.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
-   - [05 Sep 00] Fixed bug: in ancestors surnames list, under Lynx
-     (browser for alphanumeric terminals), sometimes displayed "incorrect
-     request" when clicking on certain surnames.
-   - [04 Sep 00] Fixed bug: in descendants with encoding, for children
-     married several times, could sometimes display the father's name
-     instead of a repetition of the child's name.
-   - [01 Sep 00] Fixed short dates: "between 1935 and 1938" is displayed
-     now "1935/1938" instead of "ca 1935/1938".
-   - [30 Aug 00] Fixed bug: sometimes accepted two persons with the same
-     key. E.g.: after having defined "Charles de Gaulle" and "Charles
-     Degaulle", when changing the second person' s surname into "de Gaulle",
-     did not display a name conflict error.
-   - [28 Aug 00] Added option "-wjf" (= wizard just friend) to permanently
-     prevent all wizards in all data bases to make changes.
-   - [26 Aug 00] In descendants page, added male line and female line.
-   - [25 Aug 00] In history, added the ability to see the changes only
-     by a given wizard.
-   - [24 Aug 00] Fixed bug: when entering Web addresses (http://...)
-     in notes, it generates enclosing HTML code to make links, but
-     sometimes it did it incorrectly. For example the image insertion
-     <img src=...>? did not work because the program changed it into
-     <img src=<a href=http://...>>
+  - [13 Sep 00] Fixed bug: problem of age at death in descendants page,
+    the same bug than for personal pages fixed 16 Aug (version 3.07).
+  - [05 Sep 00] Fixed bug: in ancestors surnames list, under Lynx
+    (browser for alphanumeric terminals), sometimes displayed "incorrect
+    request" when clicking on certain surnames.
+  - [04 Sep 00] Fixed bug: in descendants with encoding, for children
+    married several times, could sometimes display the father's name
+    instead of a repetition of the child's name.
+  - [01 Sep 00] Fixed short dates: "between 1935 and 1938" is displayed
+    now "1935/1938" instead of "ca 1935/1938".
+  - [30 Aug 00] Fixed bug: sometimes accepted two persons with the same
+    key. E.g.: after having defined "Charles de Gaulle" and "Charles
+    Degaulle", when changing the second person' s surname into "de Gaulle",
+    did not display a name conflict error.
+  - [28 Aug 00] Added option "-wjf" (= wizard just friend) to permanently
+    prevent all wizards in all data bases to make changes.
+  - [26 Aug 00] In descendants page, added male line and female line.
+  - [25 Aug 00] In history, added the ability to see the changes only
+    by a given wizard.
+  - [24 Aug 00] Fixed bug: when entering Web addresses (http://...)
+    in notes, it generates enclosing HTML code to make links, but
+    sometimes it did it incorrectly. For example the image insertion
+    <img src=...>? did not work because the program changed it into
+    <img src=<a href=http://...>>
 
 * Gedcom to GeneWeb (ged2gwb)
   - [26 Aug 00] If -epn (which is default) and -lf, tries now to lowercase
