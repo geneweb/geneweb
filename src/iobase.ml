@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.40 2005-02-11 21:32:19 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.41 2005-02-13 10:45:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -420,7 +420,7 @@ flush stderr;
   let cursor str =
     IstrTree.key_after
       (fun key ->
-	 compare_names base_data str (strings.get (Adef.int_of_istr key)))
+         compare_names base_data str (strings.get (Adef.int_of_istr key)))
       (bt None)
   in
   let next key = IstrTree.next key (bt None) in
@@ -1097,6 +1097,9 @@ value input bname =
       r.val
     }
   in
+  let is_patched_person ip =
+    Hashtbl.mem (snd patches.h_person) (Adef.int_of_iper ip)
+  in
   let patch_person i p =
     let i = Adef.int_of_iper i in
     do {
@@ -1218,7 +1221,9 @@ value input bname =
      patch_union = patch_union; patch_family = patch_family;
      patch_couple = patch_couple; patch_descend = patch_descend;
      patch_string = patch_string; patch_name = patch_name;
-     patched_ascends = patched_ascends; commit_patches = commit_patches;
+     commit_patches = commit_patches;
+     patched_ascends = patched_ascends;
+     is_patched_person = is_patched_person;
      commit_notes = commit_notes; cleanup = cleanup}
   in
   {data = base_data; func = base_func}

@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 4.7 2005-02-11 21:39:40 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.8 2005-02-13 10:45:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -208,8 +208,9 @@ value input bname =
      patch_person = fun []; patch_ascend = fun [];
      patch_union = fun []; patch_family = fun []; patch_couple = fun [];
      patch_descend = fun []; patch_string = fun []; patch_name = fun [];
-     patched_ascends = fun []; commit_patches = fun [];
-     commit_notes = commit_notes; cleanup = cleanup}
+     commit_patches = fun []; commit_notes = commit_notes;
+     patched_ascends = fun []; is_patched_person _ = False;
+     cleanup = cleanup}
   in
   {data = base_data; func = base_func}
 ;

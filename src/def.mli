@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 4.12 2005-02-11 21:32:19 ddr Exp $ *)
+(* $Id: def.mli,v 4.13 2005-02-13 10:45:51 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -213,6 +213,7 @@ type base_func =
     commit_patches : unit -> unit;
     commit_notes : string -> unit;
     patched_ascends : unit -> list iper;
+    is_patched_person : iper -> bool;
     cleanup : unit -> unit }
 ;
 
