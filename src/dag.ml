@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.2 1999-12-03 20:32:36 ddr Exp $ *)
+(* $Id: dag.ml,v 3.3 1999-12-04 05:10:45 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -26,44 +26,6 @@ value tag_dag d =
             else Char.chr (Char.code c.val + 1);
        return v)
     d
-;
-
-value print_table print_newline print_elem print_span t =
-  for i = 0 to Array.length t.table - 1 do
-    for j = 0 to Array.length t.table.(i) - 1 do
-      print_elem t.table.(i).(j).elem;
-    done;
-    print_newline ();
-    if i < Array.length t.table - 1 then
-      do for j = 0 to Array.length t.table.(i) - 1 do
-           print_span i j t.table.(i).(j).span;
-         done;
-         print_newline ();
-      return ()
-    else ();
-  done
-;
-
-value print_char_table d t =
-  let print_elem =
-    fun
-    [ Elem e -> eprintf "  %c" (d.dag.(int_of_idag e).valu)
-    | Ghost x -> eprintf "  |" (*int_of_ghost_id x*)
-    | Nothing -> eprintf "   " ]
-  in
-(*
-  let print_span i j r =
-    let n = int_of_span_id r in
-    let c = Char.chr (Char.code 'a' + n mod 26) in
-    eprintf "*%c" c
-  in
-*)
-  let print_span i j r =
-    if j > 0 && t.table.(i).(j-1).span = r then eprintf "---"
-    else eprintf "  -"
-  in
-(**)
-  print_table prerr_newline print_elem print_span t
 ;
 
 (* input dag *)
@@ -109,8 +71,8 @@ do Printf.eprintf "\no %s\n" (denomination base (poi base ip)); flush stderr; re
            match (aoi base ip).parents with
            [ Some ifam ->
                let c = coi base ifam in
-               let l = try [M.find c.father map] with [ Not_found -> [] ] in
-               try [M.find c.mother map :: l] with [ Not_found -> l ]
+               let l = try [M.find c.mother map] with [ Not_found -> [] ] in
+               try [M.find c.father map :: l] with [ Not_found -> l ]
            | None -> [] ]
          in
 (*
@@ -128,6 +90,7 @@ do List.iter (fun id -> Printf.eprintf "- %s\n" (denomination base (poi base nod
                   chil des.children)
              [] u.family
          in
+         let chil = List.rev chil in
 (*
 do Printf.eprintf "children\n"; flush stderr; return
 do List.iter (fun id -> Printf.eprintf "- %s\n" (denomination base (poi base nodes.(int_of_idag id)))) chil; flush stderr; return
