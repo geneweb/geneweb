@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.98 1999-08-03 09:53:58 ddr Exp $
+# $Id: lexicon.txt,v 2.99 1999-08-03 14:41:18 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -820,7 +820,7 @@ se: en ana
 de: ein Onkel (Ehemann der Tante)/eine Tante (Ehefrau des Onkels)
 en: an uncle (aunt's husband)/an aunt (uncle's wife)
 es: un t&iacute;o pol&iacute;tico/una t&iacute;a pol&iacute;tica
-fr: un oncle (&eacute;poux de la tante)/une tante (&eacute;pouse de l'oncle)
+fr: un oncle (&eacute;poux d'une tante)/une tante (&eacute;pouse d'un oncle)
 it: uno zio (marito della zia)/una zia (moglie dello zio)
 nl: een oom/een tante
 se: en farbror (fasters make)/en faster (farbrors maka)/en morbror (mosters make)/en moster (morbrors maka)
