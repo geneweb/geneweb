@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.17 2002-01-12 14:20:52 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.18 2002-01-13 20:31:03 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1310,7 +1310,7 @@ value add_indi gen r =
               try
                 let i = String.index f bb in
                 let j =
-                  if i + 2 == String.length f then raise Not_found
+                  if i + 2 >= String.length f then raise Not_found
                   else String.index_from f (i + 2) eb
                 in
                 let fn = String.sub f (i + 1) (j - i - 1) in
