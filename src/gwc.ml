@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.32 2005-02-13 13:35:46 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.33 2005-02-18 19:56:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -37,7 +37,7 @@ type gen =
     g_fcnt : mutable int;
     g_scnt : mutable int;
     g_base : cbase;
-    g_patch_p : mutable list (int * person);
+    g_patch_p : Hashtbl.t int person;
     g_def : mutable array bool;
     g_separate : mutable bool;
     g_shift : mutable int;
@@ -730,7 +730,7 @@ value persons_cache gen per_index_ic per_ic persons =
     }
   in
   let get_fun i =
-    try List.assoc i gen.g_patch_p with
+    try Hashtbl.find gen.g_patch_p i with
     [ Not_found -> read_person_in_temp_file i ]
   in
   {array = fun _ -> failwith "bug: accessing persons array";
@@ -849,7 +849,8 @@ value link gwo_list =
   let gen =
     {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
      g_local_names = Hashtbl.create 20011; g_pcnt = 0; g_fcnt = 0;
-     g_scnt = 0; g_base = empty_base; g_patch_p = []; g_def = [| |];
+     g_scnt = 0; g_base = empty_base; g_patch_p = Hashtbl.create 1009;
+     g_def = [| |];
      g_separate = False; g_shift = 0; g_errored = False;
      g_per_index = open_out_bin "gwc_per_index";
      g_per = open_out_bin "gwc_per";
@@ -878,8 +879,7 @@ value link gwo_list =
     let base = linked_base gen per_index_ic per_ic fam_index_ic fam_ic in
     let changed_p p =
       let i = Adef.int_of_iper p.cle_index in
-      let list = List.remove_assoc i gen.g_patch_p in
-      gen.g_patch_p := [(i, p) :: list]
+      Hashtbl.replace gen.g_patch_p i p
     in
     if do_check.val && gen.g_pcnt > 0 then do {
       Check.check_base base (set_error base gen) (set_warning base)
