@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.2 1999-11-10 08:44:29 ddr Exp $ *)
+(* $Id: perso.ml,v 3.3 1999-11-10 21:57:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -994,19 +994,23 @@ value print_photo_occupation_dates conf base p =
       tag "table" "border=%d width=\"95%%\"" conf.border begin
         tag "tr" begin
           let s = Unix.stat fname in
-          let b = Filename.basename fname in
+          let b = Util.code_varenv (Filename.basename fname) in
           tag "td" begin
-            Wserver.wprint
-              "<img src=\"%sm=IM;d=%d;v=/%s\" width=%d height=%d alt=\"%s\">"
+            Wserver.wprint "<a href=\"%sm=IM;v=/%s\">" (commd conf) b;
+            Wserver.wprint "\
+<img src=\"%sm=IM;d=%d;v=/%s\" width=%d height=%d border=0 alt=\"%s\">"
               (commd conf)
               (int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int)))
-              (Util.code_varenv b) width height image_txt;
+              b width height image_txt;
+            Wserver.wprint "</a>";
           end;
           print_occupation_dates conf base True p;
         end;
       end
   | Some (link, None) ->
-      do Wserver.wprint "<img src=\"%s\" alt=\"%s\">" link image_txt;
+      do Wserver.wprint "<a href=\"%s\">" link;
+         Wserver.wprint "<img src=\"%s\" border=0 alt=\"%s\">" link image_txt;
+         Wserver.wprint "</a>\n";
          html_p conf;
          print_occupation_dates conf base False p;
       return ()

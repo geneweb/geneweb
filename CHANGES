@@ -6,6 +6,7 @@ GeneWeb version 3.01
     not appear...
 
 * GeneWeb Service/CGI (gwd)
+  - [Nov 10, 99] Images are now clickable to get the whole picture.
   - [Nov 10, 99] Added relationship computing by shortest path (Louis
     Granboulan).
   - [Nov 10, 99] Added foster parents.
