@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 2.1 1999-08-18 17:55:17 ddr Exp $ *)
+(* $Id: doc.ml,v 2.2 1999-08-18 18:41:20 ddr Exp $ *)
 
 open Config;
 
@@ -34,9 +34,20 @@ value copy pref s =
       | _ -> do Wserver.wprint "%c" s.[i]; return loop (i + 1) ]
 ;
 
+value has_dotslash s =
+  loop 0 where rec loop i =
+    if i == String.length s then False
+    else if start_with s i "./" then True
+    else loop (i + 1)
+;
+
 value print conf base v =
   let v = if v = "" then "index.htm" else v in
-  if Filename.is_implicit v then
+  if Filename.is_implicit v && not (has_dotslash v) then
+    let v =
+      if Filename.check_suffix v ".htm" then v
+      else v ^ ".htm"
+    in 
     let fname = Filename.concat Util.doc_dir.val v in
     match try Some (open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
