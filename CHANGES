@@ -61,7 +61,8 @@ GeneWeb version 3.08
     GeneWeb" now points to a page which explains that you can start with
     the program gwsetup instead of typing interactive commands, which seemed
     not to be clear. Changed diruse.htm (link to "start"), added initial.htm,
-    added small paragraph in start.htm. French and English versions only.
+    added small paragraph in start.htm. Added also a paragraph in
+    recover.htm, merge.htm and maint.htm. French and English versions only.
   - [03 Sep 00] In FAQ, changed the text about the question of missing
     relationship links (French and English versions only).
   - Added entries in the FAQ (French and English versions) about:
