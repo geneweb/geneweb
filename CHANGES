@@ -2,8 +2,8 @@ GeneWeb version 3.02
 --------------------
 
 * GeneWeb Service/CGI (gwd)
-  - [Dec 10, 99] In graphs, added spouses when option is set (this was
-    missing).
+  - [Dec 10, 99] In tree displays with several branches, the option
+    "add spouses" did not work. Fixed.
 
 GeneWeb version 3.01
 --------------------
