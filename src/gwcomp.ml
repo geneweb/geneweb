@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.15 2005-02-04 20:18:59 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.16 2005-02-05 11:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -872,7 +872,7 @@ value comp_families x =
           [ F_some (family, line) ->
               do { output_value oc (family : syntax_o); loop line encoding }
           | F_enc_utf_8 ->
-	      loop (read_line (ic, E_utf_8)) E_utf_8
+              loop (read_line (ic, E_utf_8)) E_utf_8
           | F_none -> () ]
         in
         loop (read_line (ic, E_iso_8859_1)) E_iso_8859_1;

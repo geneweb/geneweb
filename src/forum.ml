@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.42 2005-02-05 06:34:39 ddr Exp $ *)
+(* $Id: forum.ml,v 4.43 2005-02-05 11:36:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -433,7 +433,7 @@ value print_one_forum_message conf m pos next_pos forum_length =
     else
       Wserver.wprint
         "<table cellspacing=\"0\" cellpadding=\"0\"><tr align=\"%s\"><td>\n"
-	conf.left;
+        conf.left;
     let mess =
       loop True 0 0 where rec loop last_was_eoln len i =
         if i = String.length m.m_mess then Buff.get len

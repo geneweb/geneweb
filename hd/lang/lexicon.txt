@@ -1,6 +1,6 @@
-# $Id: lexicon.txt,v 4.227 2005-02-05 11:18:20 ddr Exp $
+# $Id: lexicon.txt,v 4.228 2005-02-05 11:36:30 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
-# This file is kept by compatibility to allow the displaying of databases
+# This file is kept by compatibility to allow displaying databases
 # created before version 5.00. It does not change any more.
 
      !charset
