@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 3.0 1999-10-29 10:31:26 ddr Exp $ *)
+(* $Id: notes.ml,v 3.1 1999-11-05 15:24:52 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -33,7 +33,7 @@ value print_mod conf base =
      tag "form" "method=POST action=\"%s\"" conf.command begin
        Srcfile.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=MOD_NOTES_OK>\n";
-       stag "textarea" "name=notes rows=18 cols=70 wrap=virtual" begin
+       stag "textarea" "name=notes rows=30 cols=70 wrap=virtual" begin
          if s <> "" then
            Wserver.wprint "%s" (quote_escaped s)
          else ();
