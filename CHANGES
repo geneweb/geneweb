@@ -8,13 +8,15 @@ GeneWeb version 2.04
     whiteyellow, black, bluegreen and brown (thanks to Hans Albeck)
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jun 22, 99] Fixed bug: send image in CGI mode did not work.
   - [Jun 19, 99] Added in ancestors long display the ability to select
     and unselect the displaying of siblings and the displaying of notes.
   - [Jun 19, 99] Changed presentation of ancestors displaying main menu.
 
 * Gedcom to GeneWeb (ged2gwb)
   - [Jun 21, 99] Fixed bug: couples could sometimes be recorded as divorced,
-    even if not.
+    even if not (when there was a "1 DIV" field without DATE and PLAC in the
+    gedcom file).
   - [Jun 19, 99] Can now read MSDOS accentuated characters encoding. Added
     option "-charset" which can be followed by "ANSEL", "ASCII" or "MSDOS".
     Removed options "-ansel" and "-no_ansel".
