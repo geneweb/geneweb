@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.24 2002-02-02 15:27:31 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.25 2002-02-16 08:21:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1040,7 +1040,10 @@ value find_sources_record gen addr =
   [ Some i ->
       do {
         seek_in gen.g_ic i;
+(*
         try Some (get_lev0 (Stream.of_channel gen.g_ic)) with
+*)
+        try Some (get_lev '0' (Stream.of_channel gen.g_ic)) with
         [ Stream.Failure | Stream.Error _ -> None ]
       }
   | None -> None ]
@@ -1109,16 +1112,16 @@ value source gen r =
   [ Some r ->
       if String.length r.rval > 0 && r.rval.[0] = '@' then
         match find_sources_record gen r.rval with
-        [ Some v -> strip_spaces v.rcont
+        [ Some v -> (strip_spaces v.rcont, v.rsons)
         | None ->
             do {
               print_location r.rpos;
               fprintf log_oc.val "Source %s not found\n" r.rval;
               flush log_oc.val;
-              ""
+              ("", [])
             } ]
-      else strip_spaces r.rval
-  | _ -> "" ]
+      else (strip_spaces r.rval, r.rsons)
+  | _ -> ("", []) ]
 ;
 
 value p_index_from s i c =
@@ -1269,7 +1272,7 @@ value indi_lab =
       } ]
 ;
 
-value html_text_of_tags rl =
+value html_text_of_tags text rl =
   let rec tot len lev r =
     let len = Buff.mstore len (string_of_int lev) in
     let len = Buff.store len ' ' in
@@ -1288,9 +1291,13 @@ value html_text_of_tags rl =
          tot len lev r)
       len rl
   in
+  let title =
+    if text = "" then "-- GEDCOM --"
+    else "-- GEDCOM (" ^ text ^ ")"
+  in
   let len = 0 in
   let len = Buff.mstore len "<pre>\n" in
-  let len = Buff.mstore len "-- GEDCOM --" in
+  let len = Buff.mstore len title in
   let len = totl len 1 rl in
   let len = Buff.mstore len "\n</pre>" in
   Buff.get len
@@ -1519,7 +1526,7 @@ value add_indi gen r =
         [r :: loop rl]
       else []
   in
-  let (birth, birth_place, birth_src) =
+  let (birth, birth_place, (birth_src, birth_nt)) =
     match find_field "BIRT" r.rsons with
     [ Some r ->
         let d =
@@ -1533,9 +1540,9 @@ value add_indi gen r =
           | _ -> "" ]
         in
         (d, p, source gen r)
-    | None -> (None, "", "") ]
+    | None -> (None, "", ("", [])) ]
   in
-  let (bapt, bapt_place, bapt_src) =
+  let (bapt, bapt_place, (bapt_src, bapt_nt)) =
     let ro =
       match find_field "BAPM" r.rsons with
       [ None -> find_field "CHR" r.rsons
@@ -1554,14 +1561,14 @@ value add_indi gen r =
           | _ -> "" ]
         in
         (Adef.codate_of_od d, p, source gen r)
-    | None -> (Adef.codate_None, "", "") ]
+    | None -> (Adef.codate_None, "", ("", [])) ]
   in
-  let (death, death_place, death_src) =
+  let (death, death_place, (death_src, death_nt)) =
     match find_field "DEAT" r.rsons with
     [ Some r ->
         if r.rsons = [] then
-          if r.rval = "Y" then (DeadDontKnowWhen, "", "")
-          else (infer_death birth, "", "")
+          if r.rval = "Y" then (DeadDontKnowWhen, "", ("", []))
+          else (infer_death birth, "", ("", []))
         else
           let d =
             match find_field "DATE" r.rsons with
@@ -1577,15 +1584,15 @@ value add_indi gen r =
             | _ -> "" ]
           in
           (d, p, source gen r)
-    | None -> (infer_death birth, "", "") ]
+    | None -> (infer_death birth, "", ("", [])) ]
   in
-  let (burial, burial_place, burial_src) =
-    let (buri, buri_place, buri_src) =
+  let (burial, burial_place, (burial_src, burial_nt)) =
+    let (buri, buri_place, (buri_src, buri_nt)) =
       match find_field "BURI" r.rsons with
       [ Some r ->
           if r.rsons = [] then
-            if r.rval = "Y" then (Buried Adef.codate_None, "", "")
-            else (UnknownBurial, "", "")
+            if r.rval = "Y" then (Buried Adef.codate_None, "", ("", []))
+            else (UnknownBurial, "", ("", []))
           else
             let d =
               match find_field "DATE" r.rsons with
@@ -1598,14 +1605,14 @@ value add_indi gen r =
               | _ -> "" ]
             in
             (Buried (Adef.codate_of_od d), p, source gen r)
-      | None -> (UnknownBurial, "", "") ]
+      | None -> (UnknownBurial, "", ("", [])) ]
     in
-    let (crem, crem_place, crem_src) =
+    let (crem, crem_place, (crem_src, crem_nt)) =
       match find_field "CREM" r.rsons with
       [ Some r ->
           if r.rsons = [] then
-            if r.rval = "Y" then (Cremated Adef.codate_None, "", "")
-            else (UnknownBurial, "", "")
+            if r.rval = "Y" then (Cremated Adef.codate_None, "", ("", []))
+            else (UnknownBurial, "", ("", []))
           else
             let d =
               match find_field "DATE" r.rsons with
@@ -1618,16 +1625,16 @@ value add_indi gen r =
               | _ -> "" ]
             in
             (Cremated (Adef.codate_of_od d), p, source gen r)
-      | None -> (UnknownBurial, "", "") ]
+      | None -> (UnknownBurial, "", ("", [])) ]
     in
     match (buri, crem) with
-    [ (UnknownBurial, Cremated _) -> (crem, crem_place, crem_src)
-    | _ -> (buri, buri_place, buri_src) ]
+    [ (UnknownBurial, Cremated _) -> (crem, crem_place, (crem_src, crem_nt))
+    | _ -> (buri, buri_place, (buri_src, buri_nt)) ]
   in
   let birth = Adef.codate_of_od birth in
-  let psources =
-    let s = source gen r in
-    if s = "" then default_source.val else s
+  let (psources, psources_nt) =
+    let (s, s_nt) = source gen r in
+    if s = "" then (default_source.val, s_nt) else (s, s_nt)
   in
   let ext_notes =
     if untreated_in_notes.val then
@@ -1644,10 +1651,19 @@ value add_indi gen r =
                rest] ]
       in
       let remain_tags = build_remain_tags r.rsons in
-      if remain_tags = [] then ""
-      else
-        let s = if notes = "" then "" else "\n" in
-        s ^ html_text_of_tags (List.rev remain_tags)
+      let remain_tags_in_notes text init rtl =
+        if rtl = [] then init
+        else
+          let s = if init = "" && notes = "" then "" else "\n" in
+          init ^ s ^ html_text_of_tags text (List.rev rtl)
+      in
+      let nt = remain_tags_in_notes "" "" remain_tags in
+      let nt = remain_tags_in_notes "BIRT SOUR" nt birth_nt in
+      let nt = remain_tags_in_notes "BAPT SOUR" nt bapt_nt in
+      let nt = remain_tags_in_notes "DEAT SOUR" nt death_nt in
+      let nt = remain_tags_in_notes "BURI/CREM SOUR" nt burial_nt in
+      let nt = remain_tags_in_notes "SOUR SOUR" nt psources_nt in
+      nt  
     else ""
   in
   let person =
@@ -1731,7 +1747,7 @@ value add_fam_norm gen r adop_list =
            else [ip :: ipl])
         rl []
     in
-    let (relation, marr, marr_place, marr_src) =
+    let (relation, marr, marr_place, (marr_src, marr_nt)) =
       let (relation, sons) =
         match find_field "MARR" r.rsons with
         [ Some r -> (Married, Some r)
@@ -1764,7 +1780,7 @@ value add_fam_norm gen r adop_list =
               | _ -> None ]
           in
           (u, d, p, source gen r)
-      | None -> (relation, None, "", "") ]
+      | None -> (relation, None, "", ("", [])) ]
     in
     let div =
       match find_field "DIV" r.rsons with
@@ -1785,9 +1801,9 @@ value add_fam_norm gen r adop_list =
       [ Some r -> if r.rval <> "" && r.rval.[0] == '@' then "" else r.rval
       | None -> "" ]
     in
-    let fsources =
-      let s = source gen r in
-      if s = "" then default_source.val else s
+    let (fsources, fsources_nt) =
+      let (s, s_nt) = source gen r in
+      if s = "" then (default_source.val, s_nt) else (s, s_nt)
     in
     let fam =
       {marriage = Adef.codate_of_od marr;
