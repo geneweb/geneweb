@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 2.1 1999-03-08 11:18:29 ddr Exp $ *)
+(* $Id: consang.ml,v 2.2 1999-03-26 05:48:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -198,11 +198,28 @@ value relationship base tab ip1 ip2 =
   fst (relationship_and_links base tab False ip1 ip2)
 ;
 
-value compute_all_consang base from_scratch =
+value trace base quiet cnt =
+  do if quiet then
+       let cnt = base.data.persons.len - cnt in
+       let already_disp = cnt * 60 / base.data.persons.len in
+       let to_disp = (cnt + 1) * 60 / base.data.persons.len in
+       for i = already_disp + 1 to to_disp do Printf.eprintf "#"; done
+     else Printf.eprintf "%6d\008\008\008\008\008\008" cnt;
+     flush stderr;
+  return ()
+;
+
+value compute_all_consang base from_scratch quiet =
   let _ = base.data.ascends.array () in
   let _ = base.data.couples.array () in
   let _ = base.data.families.array () in
-  do Printf.eprintf "Computing consanguinity..."; flush stderr; return
+  do if quiet then
+       do for i = 1 to 60 do Printf.eprintf "."; done;
+          Printf.eprintf "\r";
+       return ()
+     else Printf.eprintf "Computing consanguinity...";
+     flush stderr;
+  return
   let running = ref True in
   let tab = make_relationship_table base (topological_sort base) in
   let cnt = ref 0 in
@@ -228,32 +245,33 @@ value compute_all_consang base from_scratch =
                  for i = 0 to Array.length fam.children - 1 do
                    let ip = fam.children.(i) in
                    let a = aoi base ip in
-                   do Printf.eprintf "%6d\008\008\008\008\008\008" cnt.val;
-                      flush stderr;
+                   do trace base quiet cnt.val;
                       decr cnt;
                       a.consang := Adef.fix_of_float consang;
-                      match most.val with
-                      [ Some m ->
-                          if a.consang > m.consang then
-                            do Printf.eprintf
-                                 "\nMax consanguinity %g for %s... "
-                                 consang (denomination base (poi base ip));
-                               flush stderr;
-                            return most.val := Some a
-                          else ()
-                      | None -> most.val := Some a ];
+                      if not quiet then
+                        match most.val with
+                        [ Some m ->
+                            if a.consang > m.consang then
+                              do Printf.eprintf
+                                   "\nMax consanguinity %g for %s... "
+                                   consang (denomination base (poi base ip));
+                                 flush stderr;
+                              return most.val := Some a
+                            else ()
+                        | None -> most.val := Some a ]
+                      else ();
                    return ();
                  done
                else running.val := True
            | None ->
-               do Printf.eprintf "%6d\008\008\008\008\008\008" cnt.val;
-                  flush stderr;
+               do trace base quiet cnt.val;
                   decr cnt;
                return a.consang := Adef.fix_of_float 0.0 ]
          else ();
        done;
      done;
-     Printf.eprintf " done   \n";
+     if quiet then () else Printf.eprintf " done   ";
+     Printf.eprintf "\n";
      flush stderr;
   return ()
 ;
