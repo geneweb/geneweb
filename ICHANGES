@@ -34,6 +34,9 @@ GeneWeb Version 1.09
   - Display message "Strange input" giving the line number instead of character
     number.
 
+* added tools/camlp4_depend.sh to compute dependencies with camlp4 .cmo files
+  in src directory.
+
 * added program "mostdesc" (not distributed in executable versions) computing
   the "most descendants from someone".
 

@@ -1,7 +1,9 @@
-(* $Id: gwb2ged.ml,v 1.9 1998-12-05 13:29:43 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.10 1998-12-08 10:59:49 ddr Exp $ *)
 
 open Def;
 open Gutil;
+
+value ascii = ref False;
 
 value ged_month =
   fun
@@ -50,8 +52,13 @@ value ged_header base oc ifile ofile =
      Printf.fprintf oc "1 GEDC\n";
      Printf.fprintf oc "2 VERS 5.5\n";
      Printf.fprintf oc "2 FORM LINEAGE-LINKED\n";
-     Printf.fprintf oc "1 CHAR ANSEL\n";
+     if ascii.val then Printf.fprintf oc "1 CHAR ASCII\n"
+     else Printf.fprintf oc "1 CHAR ANSEL\n";  
   return ()
+;
+
+value encode s =
+  if ascii.val then Ansel.to_iso_8859_1 s else s
 ;
 
 value ged_1st_name base p =
@@ -61,15 +68,15 @@ value ged_1st_name base p =
 ;
 
 value ged_name base oc per =
-  do Printf.fprintf oc "1 NAME %s/%s/\n" (ged_1st_name base per)
-       (sou base per.surname);
+  do Printf.fprintf oc "1 NAME %s/%s/\n" (encode (ged_1st_name base per))
+       (encode (sou base per.surname));
      let n = sou base per.public_name in
-     if n <> "" then Printf.fprintf oc "2 GIVN %s\n" n else ();
+     if n <> "" then Printf.fprintf oc "2 GIVN %s\n" (encode n) else ();
      match per.nick_names with
-     [ [nn :: _] -> Printf.fprintf oc "2 NICK %s\n" (sou base nn)
+     [ [nn :: _] -> Printf.fprintf oc "2 NICK %s\n" (encode (sou base nn))
      | [] -> () ];
      match per.surnames_aliases with
-     [ [n :: _] -> Printf.fprintf oc "2 SURN %s\n" (sou base n)
+     [ [n :: _] -> Printf.fprintf oc "2 SURN %s\n" (encode (sou base n))
      | [] -> () ];
   return ()
 ;
@@ -113,9 +120,9 @@ value ged_ev_detail oc n d pl src =
             Printf.fprintf oc "\n";
          return ()
      | None -> () ];
-     if pl <> "" then Printf.fprintf oc "%d PLAC %s\n" n pl
+     if pl <> "" then Printf.fprintf oc "%d PLAC %s\n" n (encode pl)
      else ();
-     if src <> "" then Printf.fprintf oc "%d SOUR %s\n" n src
+     if src <> "" then Printf.fprintf oc "%d SOUR %s\n" n (encode src)
      else ();
   return ()
 ;
@@ -171,10 +178,10 @@ value ged_ind_ev_str base oc per =
 
 value ged_title base oc per tit =
   do Printf.fprintf oc "1 TITL ";
-     Printf.fprintf oc "%s" (sou base tit.t_title);
+     Printf.fprintf oc "%s" (encode (sou base tit.t_title));
      match sou base tit.t_place with
      [ "" -> ()
-     | pl -> Printf.fprintf oc ", %s" pl ];
+     | pl -> Printf.fprintf oc ", %s" (encode pl) ];
      if tit.t_nth <> 0 then Printf.fprintf oc ", %d" tit.t_nth else ();
      Printf.fprintf oc "\n";
      match
@@ -200,8 +207,9 @@ value ged_title base oc per tit =
             Printf.fprintf oc "\n";
          return () ];
      match tit.t_name with
-     [ Tmain -> Printf.fprintf oc "2 NOTE %s\n" (sou base per.public_name)
-     | Tname n -> Printf.fprintf oc "2 NOTE %s\n" (sou base n)
+     [ Tmain ->
+         Printf.fprintf oc "2 NOTE %s\n" (encode (sou base per.public_name))
+     | Tname n -> Printf.fprintf oc "2 NOTE %s\n" (encode (sou base n))
      | Tnone -> () ];
   return ()
 ;
@@ -209,7 +217,7 @@ value ged_title base oc per tit =
 value ged_ind_attr_str base oc per =
   do match sou base per.occupation with
      [ "" -> ()
-     | occu -> Printf.fprintf oc "1 OCCU %s\n" occu ];
+     | occu -> Printf.fprintf oc "1 OCCU %s\n" (encode occu) ];
      List.iter (ged_title base oc per) per.titles;
   return ()
 ;
@@ -232,7 +240,7 @@ value ged_fams base (per_sel, fam_sel) oc ifam =
 value ged_psource base oc per =
   match sou base per.psources with
   [ "" -> ()
-  | s -> Printf.fprintf oc "1 SOUR %s\n" s ]
+  | s -> Printf.fprintf oc "1 SOUR %s\n" (encode s) ]
 ;
 
 value ged_multimedia_link base oc per =
@@ -271,7 +279,7 @@ value ged_note base oc per =
   [ "" -> ()
   | s ->
       do Printf.fprintf oc "1 NOTE ";
-         display_note oc s 0;
+         display_note oc (encode s) 0;
       return () ]
 ;
 
@@ -305,13 +313,13 @@ value ged_child base (per_sel, fam_sel) oc chil =
 value ged_fsource base oc fam =
   match sou base fam.fsources with
   [ "" -> ()
-  | s -> Printf.fprintf oc "1 SOUR %s\n" s ]
+  | s -> Printf.fprintf oc "1 SOUR %s\n" (encode s) ]
 ;
 
 value ged_comment base oc fam =
   match sou base fam.comment with
   [ "" -> ()
-  | s -> Printf.fprintf oc "1 NOTE %s\n" s ]
+  | s -> Printf.fprintf oc "1 NOTE %s\n" (encode s) ]
 ;
 
 value has_personal_infos base per asc =
@@ -436,7 +444,10 @@ If both options -a and -d are used, intersection is assumed.
 Options are:";
 
 value speclist =
-  [("-o",
+  [("-ascii",
+    Arg.Unit (fun () -> do ascii.val := True; return arg_state.val := ASnone),
+    ": ASCII output, instead of ANSEL");
+   ("-o",
     Arg.String (fun x -> do  ofile.val := x; return arg_state.val := ASnone),
     "<ged>: output file name (default: a.ged)");
    ("-a",

@@ -16,7 +16,10 @@ GeneWeb Version 1.09
   - Added option "-no_nd" (no negative dates), not to interpret years preceded
     by a minus sign as negative dates.
 
-* Gedcom from and to GeneWeb (ged2gwb, gwb2ged)
+* GeneWeb to Gedcom (gwb2ged)
+  - Added option "-ascii" to output in ASCII encoding instead of ANSEL.
+
+* Gedcom to GeneWeb and GeneWeb to Gedcom (ged2gwb, gwb2ged)
   - The <em>GeneWeb</em> fields "public name", "surname alias" and
     "photo" are now loaded from and saved to Gedcom resp. as: "2 GIVN",
     "2 SURN" and "1 OBJE (newline) 2 FILE".
