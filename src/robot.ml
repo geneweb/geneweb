@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.7 1999-08-08 05:07:28 ddr Exp $ *)
+(* $Id: robot.ml,v 1.8 1999-08-08 05:29:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -106,7 +106,7 @@ value check oc tm from max_call sec =
                 if tm -. tm1 < sec then (cnt + 1, [tm1 :: tml], tm1)
                 else (cnt, tml, tm1)
             | [tm1 :: tml1] ->
-                if tm -. tm1 < sec then count (cnt + 1) [tm :: tml] tml1
+                if tm -. tm1 < sec then count (cnt + 1) [tm1 :: tml] tml1
                 else (cnt, tml, tm1) ]
         in
         let r = List.rev tml in
