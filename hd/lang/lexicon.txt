@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.95 2002-04-25 08:23:28 ddr Exp $
+# $Id: lexicon.txt,v 4.96 2002-04-25 08:28:08 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -4842,7 +4842,7 @@ no: melding/forrige melding/forrige melding/neste melding
 pl: wiadomo¶æ/poprzednia wiadomo¶æ/poprzednia wiadomo¶æ/nastêpna wiadomo¶æ
 pt: mensagem/mensagem anterior/mensagem anterior/mensagem seguinte
 ru: õğğ÷üåïêå/òôåäıäèüåå õğğ÷üåïêå/òôåäıäèüåå õğğ÷üåïêå/õíåäèáüåå õğğ÷üåïêå
-sl: sporoèilo/prej¹nje sporoèilo/prej¹nja sporoèila/naslednje sporoèilo/
+sl: sporoèilo/prej¹nje sporoèilo/prej¹nja sporoèila/naslednje sporoèilo
 sv: meddelande/f&ouml;reg&aring;ende meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
 
     missing ancestors
