@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.24 2005-03-25 12:10:21 ddr Exp $
+# $Id: lex_utf8.txt,v 1.25 2005-03-29 09:20:55 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5598,9 +5598,11 @@ de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
 eo: ago de la luno/novluno/unua lunkvarono/plenluno/lasta lunkvarono
 fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
+nl: maansouderdom/nieuwemaan/eerste kwartier/vollemaan/laatste kwartier
 no: månefaser/nymåne/første kvarter/fullmåne/siste kvarter
 pl: faza księżyca/nów/pierwsza kwadra/pełnia/trzecia kwadra
 pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
+ro: etatea Lunii/Luna noua/primul patrar/Luna plina/ultimul patrar
 
     more than %d answers
 af: meer as %d antwoorde
