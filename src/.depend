@@ -139,15 +139,17 @@ mergeFamOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx merge.cmx \
     srcfile.cmx update.cmx updateFam.cmx updateFamOk.cmx util.cmx \
     ../wserver/wserver.cmx 
 mergeInd.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi merge.cmi \
-    mergeFam.cmo srcfile.cmi util.cmi ../wserver/wserver.cmi 
-mergeInd.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx merge.cmx \
-    mergeFam.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
-mergeIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi merge.cmi \
-    srcfile.cmi update.cmi updateInd.cmi updateIndOk.cmi util.cmi \
+    mergeFam.cmo srcfile.cmi updateFamOk.cmo updateIndOk.cmi util.cmi \
     ../wserver/wserver.cmi 
-mergeIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx merge.cmx \
-    srcfile.cmx update.cmx updateInd.cmx updateIndOk.cmx util.cmx \
+mergeInd.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx merge.cmx \
+    mergeFam.cmx srcfile.cmx updateFamOk.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx 
+mergeIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi history.cmi merge.cmi \
+    mergeInd.cmo srcfile.cmi update.cmi updateInd.cmi updateIndOk.cmi \
+    util.cmi ../wserver/wserver.cmi 
+mergeIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx merge.cmx \
+    mergeInd.cmx srcfile.cmx update.cmx updateInd.cmx updateIndOk.cmx \
+    util.cmx ../wserver/wserver.cmx 
 mk_consang.cmo: argl.cmo consang.cmi consangAll.cmo iobase.cmi lock.cmi 
 mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx iobase.cmx lock.cmx 
 mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi iobase.cmi \

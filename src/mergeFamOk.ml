@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 3.3 2000-05-14 19:59:36 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 3.4 2000-06-01 22:25:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -15,6 +15,10 @@ value cat_strings base is1 sep is2 =
   else n1 ^ sep ^ n2
 ;
 
+value merge_strings base is1 sep is2 =
+  if is1 = is2 then sou base is1 else cat_strings base is1 sep is2
+;
+
 value reconstitute conf base fam1 des1 fam2 des2 =
   let field name proj null =
     let x1 = proj fam1 in
@@ -28,13 +32,14 @@ value reconstitute conf base fam1 des1 fam2 des2 =
     {marriage = field "marriage" (fun f -> f.marriage) (\= Adef.codate_None);
      marriage_place =
        field "marriage_place" (fun f -> sou base f.marriage_place) (\= "");
-     marriage_src = cat_strings base fam1.marriage_src ", " fam2.marriage_src;
+     marriage_src =
+       merge_strings base fam1.marriage_src ", " fam2.marriage_src;
      witnesses = [| |];
      relation = field "relation" (fun f -> f.relation) (\= Married);
      divorce = field "divorce" (fun f -> f.divorce) (\= NotDivorced);
      comment = sou base fam1.comment;
      origin_file = sou base fam1.origin_file;
-     fsources = cat_strings base fam1.fsources ", " fam2.fsources;
+     fsources = merge_strings base fam1.fsources ", " fam2.fsources;
      fam_index = fam1.fam_index}
   in
   let des =
