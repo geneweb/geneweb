@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.6 2002-01-30 11:49:49 ddr Exp $ *)
+(* $Id: history.ml,v 4.7 2002-12-30 13:51:45 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -157,6 +157,8 @@ value print_history_line conf base line wiz k i =
           match po with
           [ Some p ->
               do {
+                Wserver.wprint "<!--%s/%s/%d-->" (p_first_name base p)
+                  (p_surname base p) p.occ;
                 Wserver.wprint "%s" (referenced_person_title_text conf base p);
                 Wserver.wprint "%s" (Date.short_dates_text conf base p);
               }

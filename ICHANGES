@@ -5,6 +5,8 @@ GeneWeb Version 4.09
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [30 Dec 02] In history of updates, added in HTML comments the person's
+    first name/surname/number.
   - [23 Dec 02] Now, gwd can definitively fail if errors Unix.EBADF or
     Unix.ENOTSOCK on "accept", because they make the server loop with the
     same error message. I don't know why it happens sometimes.
