@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 2.4 1999-07-15 08:52:52 ddr Exp $ *)
+(* $Id: name.ml,v 2.5 1999-10-13 15:30:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 (* Name.lower *)
@@ -8,7 +8,7 @@ value lower s =
     if i == String.length s then len
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '0'..'9' | '.' ->
+      [ 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '.' ->
           name_len 0 (i + 1) (len + special + 1)
       | _ ->
           if len == 0 then name_len 0 (i + 1) 0
@@ -19,7 +19,8 @@ value lower s =
     if i == String.length s then s'
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '0'..'9' | '.' as c ->
+      [ 'a'..'z' | 'A'..'Z' | 'à'..'ÿ' | 'À'..'Ý' | '0'..'9' | '.' as c
+        ->
           let i' =
             if special then do s'.[i'] := ' '; return i' + 1 else i'
           in
