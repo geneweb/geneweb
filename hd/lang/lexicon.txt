@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.49 2000-01-13 13:10:24 ddr Exp $
+# $Id: lexicon.txt,v 3.50 2000-01-14 14:25:37 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2846,7 +2846,7 @@ se: lista
 
     living
 de: nicht verstorben
-dk: ikke d&oslash;d
+dk: levende
 en: living
 eo: no morta
 es: no fallecido/no fallecida/no fallecido(a)
