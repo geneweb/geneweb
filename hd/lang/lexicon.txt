@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.77 1999-07-23 12:38:01 ddr Exp $
+# $Id: lexicon.txt,v 2.78 1999-07-23 12:45:58 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -216,7 +216,7 @@ se: januari/februari/mars/april/maj/juni/juli/augusti/september/oktober/november
 
     (thousand separator)
 cn: .
-cs:  
+cs: &nbsp;
 de: .
 dk: .
 en: ,
