@@ -1,7 +1,13 @@
 GeneWeb version 2.07
 --------------------
 
+* GeneWeb Service/CGI (gwd)
+  - [Sep 8, 99] In "DOC" links, at end of pages, the links with Email
+    addresses did not work correctly. Fixed.
+
 * Setup program (gwsetup)
+  - [Sep 8, 99] Fixed lot of typos and errors in English version
+    (thanks to Lars Gustavsson).
   - [Sep 6, 99] Fixed problem in Windows: if the user choosed a
     language by writing it in uppercase letters, some phrases where
     displayed in English language between brackets (no matter which

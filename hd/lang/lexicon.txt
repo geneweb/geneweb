@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.115 1999-08-31 07:56:11 ddr Exp $
+# $Id: lexicon.txt,v 2.116 1999-09-08 10:46:31 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -654,7 +654,7 @@ pt: acrescentar
 se: l&auml;gg till
 
     adoptive father/adoptive mother/adoptive parents
-de: Pflegevater/Pflegemutter/Wahletern
+de: Pflegevater/Pflegemutter/Adoptiveltern
 dk: adoptivfader/adoptivmoder/adoptivfor&aelig;ldre
 en: adoptive father/adoptive mother/adoptive parents
 es: padre adoptivo/madre adoptiva/padres adoptivos
