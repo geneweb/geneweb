@@ -1,4 +1,5 @@
 <a href="%gsuicide=x"> </a>
+</table>
 <table border=0>
 <tr>
 <td align=center>
