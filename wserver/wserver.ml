@@ -1,9 +1,7 @@
-(* $Id: wserver.ml,v 3.1 1999-12-19 09:14:15 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.2 2000-01-16 10:34:51 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
-ifdef WIN95 then
 value sock_in = ref "wserver.sin";
-ifdef WIN95 then
 value sock_out = ref "wserver.sou";
 
 value wserver_oc =
