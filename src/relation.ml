@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.28 1999-12-24 03:15:23 ddr Exp $ *)
+(* $Id: relation.ml,v 3.29 1999-12-29 18:12:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -370,8 +370,7 @@ value print_relation_path_table conf base path =
 
 open Dag2html;
 
-type sum 'a 'b = [ Left of 'a | Right of 'b ];
-
+(*
 value print_only_dag conf base d =
   let t = table_of_dag False d in
   let print_indi n =
@@ -391,6 +390,7 @@ value print_only_dag conf base d =
   print_html_table (fun x -> Wserver.wprint "%s" x) print_indi phony
     conf.border d t
 ;
+*)
 
 value print_relation_path_dag conf base path =
   let (nl, _) =
@@ -398,10 +398,10 @@ value print_relation_path_dag conf base path =
       (fun (nl, cnt) (ip, fl) ->
          match nl with
          [ [] ->
-             let n = {pare = []; valu = Left ip; chil = []} in
+             let n = {pare = []; valu = Dag.Left ip; chil = []} in
              ([n], cnt)
          | [n :: nl] ->
-             let n1 = {pare = []; valu = Left ip; chil = []} in
+             let n1 = {pare = []; valu = Dag.Left ip; chil = []} in
              match fl with
              [ Parent ->
                  do n.pare := [idag_of_int (cnt + 1) :: n.pare];
@@ -423,14 +423,14 @@ return ();
                  [ Some ifam ->
                      let cpl = coi base ifam in
                      let cpar = cpl.father in
-                     let nf = {pare = []; valu = Left cpar; chil = []} in
+                     let nf = {pare = []; valu = Dag.Left cpar; chil = []} in
                      do nf.chil := [idag_of_int cnt; idag_of_int (cnt + 2)];
                         n1.pare := [idag_of_int (cnt + 1)];
                         n.pare := n1.pare @ n.pare;
                      return ([n1; nf; n :: nl], cnt + 2)
                  | None -> ([n1; n :: nl], cnt + 1) ]
              | Mate ->
-                 let np = {pare = []; valu = Right cnt; chil = []} in
+                 let np = {pare = []; valu = Dag.Right cnt; chil = []} in
                  do n.chil := [idag_of_int (cnt + 1) :: n.chil];
                     n1.chil := [idag_of_int (cnt + 1)];
                     np.pare := [idag_of_int cnt; idag_of_int (cnt + 2)];
@@ -439,8 +439,18 @@ return ();
       ([], 0) (List.rev path)
   in
   let d = {dag = Array.of_list (List.rev nl)} in
+  let spouse_on =
+    match Util.p_getenv conf.env "spouse" with
+    [ Some "on" -> True
+    | _ -> False ]
+  in
+  let invert =
+    match Util.p_getenv conf.env "invert" with
+    [ Some "on" -> True
+    | _ -> False ]
+  in
   do Wserver.wprint "<p>\n";
-     print_only_dag conf base d;
+     Dag.print_only_dag conf base spouse_on invert Dag.Pset.empty [] d;
   return ()
 ;
 
