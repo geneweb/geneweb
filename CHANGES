@@ -2,7 +2,7 @@ GeneWeb version 3.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
-   - [01 Sep 00] Fixed short dates: between 1935 and 1938 is displayed
+   - [01 Sep 00] Fixed short dates: "between 1935 and 1938" is displayed
      now "1935/1938" instead of "ca 1935/1938".
    - [30 Aug 00] Fixed bug: sometimes accepted two persons with the same
      key. E.g.: after having defined "Charles de Gaulle" and "Charles
