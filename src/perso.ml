@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.33 2000-07-17 11:54:28 ddr Exp $ *)
+(* $Id: perso.ml,v 3.34 2000-07-18 07:45:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -84,10 +84,7 @@ value print_title conf base and_txt p (nth, name, title, places, dates) =
        "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
        code_varenv (sou base (List.hd places))
      in
-     let (tit, est) =
-       Lextitle.translate conf Util.base_dir.val
-         (sou base title, sou base (List.hd places))
-     in
+     let (tit, est) = (sou base title, sou base (List.hd places)) in
      let s = tit ^ " " ^ est in
      wprint_geneweb_link conf href s;
      let rec loop places =
@@ -102,9 +99,7 @@ value print_title conf base and_txt p (nth, name, title, places, dates) =
              "m=TT;sm=S;t=" ^ code_varenv (sou base title) ^ ";p=" ^
              code_varenv (sou base place)
            in
-           let (_, est) =
-             Lextitle.translate conf Util.base_dir.val ("", sou base place)
-           in
+           let est = sou base place in
            do wprint_geneweb_link conf href est;
            return loop places
        | _ -> () ]
