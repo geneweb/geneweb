@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.16 2000-05-03 09:50:37 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.17 2000-05-03 12:08:19 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -49,19 +49,19 @@ value print_location pos =
 ;
 
 value rec skip_eol =
-  parser [ [: `'\n' | '\r'; _ = skip_eol :] -> () | [: :] -> () ]
+  parser [ [: `'\010' | '\013'; _ = skip_eol :] -> () | [: :] -> () ]
 ;
 
 value rec get_to_eoln len =
   parser
-  [ [: `'\n' | '\r'; _ = skip_eol :] -> Buff.get len
+  [ [: `'\010' | '\013'; _ = skip_eol :] -> Buff.get len
   | [: `c; s :] -> get_to_eoln (Buff.store len c) s
   | [: :] -> Buff.get len ]
 ;
 
 value rec skip_to_eoln =
   parser
-  [ [: `'\n' | '\r'; _ = skip_eol :] -> ()
+  [ [: `'\010' | '\013'; _ = skip_eol :] -> ()
   | [: `_; s :] -> skip_to_eoln s
   | [: :] -> () ]
 ;
@@ -69,7 +69,7 @@ value rec skip_to_eoln =
 value rec get_ident len =
   parser
   [ [: `' ' :] -> Buff.get len
-  | [: `c when not (List.mem c ['\n'; '\r']); s :] ->
+  | [: `c when not (List.mem c ['\010'; '\013']); s :] ->
       get_ident (Buff.store len c) s
   | [: :] -> Buff.get len ]
 ;
@@ -226,7 +226,7 @@ value strip c str =
 ;
 
 value strip_spaces = strip ' ';
-value strip_newlines = strip '\n';
+value strip_newlines = strip '\010';
 
 value less_greater_escaped s =
   let rec need_code i =
@@ -292,7 +292,7 @@ value rec lexing =
   [ [: `('0'..'9' as c); n = number (Buff.store 0 c) :] -> ("INT", n)
   | [: `('A'..'Z' as c); i = ident (Buff.store 0 c) :] -> ("ID", i)
   | [: `'.' :] -> ("", ".")
-  | [: `' ' | '\r'; s :] -> lexing s
+  | [: `' ' | '\013'; s :] -> lexing s
   | [: _ = Stream.empty :] -> ("EOI", "")
   | [: `x :] -> ("", String.make 1 x) ]
 and number len =
