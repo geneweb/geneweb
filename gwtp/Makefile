@@ -1,10 +1,11 @@
-# $Id: Makefile,v 1.12 2000-08-18 15:15:25 ddr Exp $
+# $Id: Makefile,v 1.13 2000-08-18 18:40:07 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../src
-GWTP_OBJS=httpEnv.cmo iolight.cmo gwtp.cmo
 GWTP_OTHER=../src/buff.cmo ../src/name.cmo ../src/iovalue.cmo ../src/adef.cmo ../src/gutil.cmo ../src/btree.cmo ../src/iobase.cmo
+GWTP_OBJS=httpEnv.cmo iolight.cmo gwtp.cmo
+OBJS=$(GWTP_OTHER) $(GWTP_OBJS)
 
 all:: out
 
@@ -21,13 +22,13 @@ clean::
 	$(RM) gwtp
 
 gwtp.out: $(GWTP_OBJS)
-	$(OCAMLC) unix.cma $(GWTP_OTHER) $(GWTP_OBJS) -o gwtp.out
+	$(OCAMLC) -custom unix.cma $(OBJS) $(LIBUNIX) -o gwtp.out
 
 gwtp.opt: $(GWTP_OBJS:.cmo=.cmx)
-	$(OCAMLOPT) unix.cmxa $(GWTP_OTHER:.cmo=.cmx) $(GWTP_OBJS:.cmo=.cmx) -o gwtp.opt
+	$(OCAMLOPT) unix.cmxa $(OBJS:.cmo=.cmx) $(LIBUNIX) -o gwtp.opt
 
 depend:
-	../tools/camlp4_depend.sh $(OCAMLI) *.ml >> .depend.new
+	../tools/camlp4_depend.sh $(OCAMLI) *.ml > .depend.new
 	mv .depend.new .depend
 
 include .depend
