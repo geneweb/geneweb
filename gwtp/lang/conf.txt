@@ -1,6 +1,6 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: conf.txt,v 1.6 2002-11-12 12:32:36 ddr Exp $ -->
+  <!-- $Id: conf.txt,v 1.7 2002-11-13 12:29:28 ddr Exp $ -->
   <title>Gwtp - [
 en: configuration
 fr: configuration
@@ -287,6 +287,27 @@ fr: ne pas les générer
  value=no%cno_image_for_visitor=no;> [
 en: generate them
 fr: les générer
+]
+</dl>
+
+<p>
+
+<dl><dt>
+[
+en: In display places/surnames, links point to:
+fr: Dans l'affichage lieux/patronymes, les liens vont sur:
+]
+<dd>
+<input type=radio name=place_surname_link_to_ind
+ value=yes%cplace_surname_link_to_ind=yes;>[
+en: one individual concerned by the place
+fr: une des personnes concernée par le lieu
+]
+<dd>
+<input type=radio name=place_surname_link_to_ind
+ value=no%cplace_surname_link_to_ind=no;>[
+en: the whole surname
+fr: tout le patronyme
 ]
 </dl>
 

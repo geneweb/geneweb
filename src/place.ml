@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.14 2002-10-30 13:47:30 ddr Exp $ *)
+(* $Id: place.ml,v 4.15 2002-11-13 12:29:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -171,6 +171,11 @@ value print_place conf s =
 value max_len = ref 2000;
 
 value print_html_places_surnames conf base =
+  let link_to_ind =
+    match p_getenv conf.base_env "place_surname_link_to_ind" with
+    [ Some "yes" -> True
+    | _ -> False ]
+  in
   do {
     Wserver.wprint "<ul>\n";
     let print_li_place x =
@@ -241,7 +246,10 @@ value print_html_places_surnames conf base =
               (fun (len, p, sn) ->
                  do {
                    Wserver.wprint "<a href=\"%s" (commd conf);
-                   Wserver.wprint "m=N;v=%s" (code_varenv sn);
+                   if link_to_ind then
+                     Wserver.wprint "%s" (acces conf base p)
+                   else
+                     Wserver.wprint "m=N;v=%s" (code_varenv sn);
                    Wserver.wprint "\">%s</a> (%d),\n" sn len
                  })
               snl;
