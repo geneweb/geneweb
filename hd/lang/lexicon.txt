@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.236 2001-02-16 13:27:05 ddr Exp $
+# $Id: lexicon.txt,v 3.237 2001-02-17 09:46:40 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -4304,6 +4304,7 @@ es: mensaje/mansaje anterior/mensaje siguiente
 et: teade/eelmine teade/järgmine teade
 fi: viesti/edellinen viesti/seuraava viesti
 fr: message/message pr&eacute;c&eacute;dent/message suivant
+nl: bericht/vorig bericht/volgend bericht
 no: melding/forrige melding/neste melding
 pt: mensagem/mensagem anterior/mensagem seguinte
 se: meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
