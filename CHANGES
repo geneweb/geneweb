@@ -5,8 +5,6 @@ GeneWeb version 3.04
   - [06 Apr 00] Added Afrikaans (Louis Kruger).
 
 * GeneWeb Service/CGI (gwd)
-  - [05 Apr 00] In ancestor page, deleted displaying by "list", not really
-    interesting, replaced by the better "horizontal displaying".
   - [03 Apr 00] In ancestor page, added horizontal displaying.
   - [02 Apr 00] In surname page, added ability to click on a branch number
     to display only that one.
