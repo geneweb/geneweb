@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.8 2000-05-23 07:18:58 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.9 2000-05-25 11:46:31 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -377,20 +377,42 @@ value ged_godparent oc godp =
   fun
   [ Some ip ->
       do Printf.fprintf oc "1 ASSO @I%d@\n" (Adef.int_of_iper ip + 1);
+         Printf.fprintf oc "2 TYPE INDI\n";
          Printf.fprintf oc "2 RELA %s\n" godp;
       return ()
   | None -> () ]
 ;
 
+value ged_witness oc ifam =
+  do Printf.fprintf oc "1 ASSO @F%d@\n" (Adef.int_of_ifam ifam + 1);
+     Printf.fprintf oc "2 TYPE FAM\n";
+     Printf.fprintf oc "2 RELA witness\n";
+  return ()
+;
+
 value ged_asso base oc per =
-  List.iter
-    (fun r ->
-       if r.r_type = GodParent then
-         do ged_godparent oc "GODF" r.r_fath;
-            ged_godparent oc "GODM" r.r_moth;
-         return ()
-       else ())
-    per.rparents
+  do List.iter
+       (fun r ->
+          if r.r_type = GodParent then
+            do ged_godparent oc "GODF" r.r_fath;
+               ged_godparent oc "GODM" r.r_moth;
+            return ()
+          else ())
+       per.rparents;
+     List.iter
+       (fun ic ->
+          let c = poi base ic in
+          if c.sex = Male then
+            List.iter
+              (fun ifam ->
+                 let fam = foi base ifam in
+                 if array_memq per.cle_index fam.witnesses then
+                   ged_witness oc ifam
+                 else ())
+              (Array.to_list (uoi base ic).family)
+          else ())
+       per.related;
+  return ()
 ;
 
 value ged_psource base oc per =

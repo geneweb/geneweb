@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.20 2000-05-14 21:03:11 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.21 2000-05-25 11:46:28 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -581,7 +581,8 @@ type gen =
     g_hstr : Hashtbl.t string Adef.istr;
     g_hnam : Hashtbl.t string (ref int);
     g_adop : Hashtbl.t string (Adef.iper * string);
-    g_godp : mutable list (Adef.iper * Adef.iper) }
+    g_godp : mutable list (Adef.iper * Adef.iper);
+    g_witn : mutable list (Adef.ifam * Adef.iper) }
 ;
 
 value assume_tab name tab none =
@@ -988,8 +989,14 @@ value set_adop_fam gen ip which_parent fath moth =
       per.rparents := [r :: per.rparents] ]
 ;
 
-value forward_godp gen ip ipp =
-  gen.g_godp := [(ipp, ip) :: gen.g_godp]
+value forward_godp gen ip rval =
+  let ipp = per_index gen rval in
+  do gen.g_godp := [(ipp, ip) :: gen.g_godp]; return ipp
+;
+
+value forward_witn gen ip rval =
+  let ifam = fam_index gen rval in
+  do gen.g_witn := [(ifam, ip) :: gen.g_witn]; return ifam
 ;
 
 value glop = ref [];
@@ -1168,25 +1175,25 @@ value add_indi gen r =
     in
     List.map (fun r -> fam_index gen r) rvl
   in
-  let rparents = [] in
   let rparents =
+    let rparents = [] in
     let rl = find_all_fields "ASSO" r.rsons in
-    let rec find_rela n =
+    let rec find_rela n f =
       fun
       [ [] -> None
       | [r :: rl] ->
           match find_field "RELA" r.rsons with
           [ Some r1 ->
-              if String.length r1.rval >= 4
-              && String.lowercase (String.sub r1.rval 0 4) = n then
-                let ipp = per_index gen r.rval in
-                do forward_godp gen i ipp; return
-                Some ipp
-              else find_rela n rl
-          | None -> find_rela n rl ] ]
+              let len = String.length n in
+              if String.length r1.rval >= len
+              && String.lowercase (String.sub r1.rval 0 len) = n then
+                Some (f gen i r.rval)
+              else find_rela n f rl
+          | None -> find_rela n f rl ] ]
     in
-    let godf = find_rela "godf" r.rsons in
-    let godm = find_rela "godm" r.rsons in
+    let godf = find_rela "godf" forward_godp r.rsons in
+    let godm = find_rela "godm" forward_godp r.rsons in
+    let witn = find_rela "witness" forward_witn r.rsons in
     if godf <> None || godm <> None then
       let r =
         {r_type = GodParent; r_fath = godf; r_moth = godm;
@@ -1703,6 +1710,22 @@ value pass3 gen fname =
            | [: :] -> () ] ]
      in
      loop ();
+     List.iter
+       (fun (ifam, ip) ->
+          match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
+          [ Right3 fam cpl _ ->
+              match
+                (gen.g_per.arr.(Adef.int_of_iper cpl.father),
+                 gen.g_per.arr.(Adef.int_of_iper ip))
+              with
+              [ (Right3 pfath _ _, Right3 p _ _) ->
+                  do if List.memq cpl.father p.related then ()
+                     else p.related := [cpl.father :: p.related];
+                     fam.witnesses := Array.append fam.witnesses [| ip |];
+                  return ()
+              | _ -> () ]
+          | _ -> () ])
+       gen.g_witn;
      close_in ic;
   return ()
 ;
@@ -1742,7 +1765,7 @@ value make_arrays in_file =
      g_not = Hashtbl.create 3001; g_src = Hashtbl.create 3001;
      g_hper = Hashtbl.create 3001; g_hfam = Hashtbl.create 3001;
      g_hstr = Hashtbl.create 3001; g_hnam = Hashtbl.create 3001;
-     g_adop = Hashtbl.create 3001; g_godp = []}
+     g_adop = Hashtbl.create 3001; g_godp = []; g_witn = []}
   in
   do string_empty.val := add_string gen "";
      string_x.val := add_string gen "x";
