@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.21 2002-01-22 15:57:16 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.22 2002-01-23 18:30:01 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -489,6 +489,7 @@ type range 'a =
 value date_g = Grammar.create date_lexer;
 value date_value = Grammar.Entry.create date_g "date value";
 value date_interval = Grammar.Entry.create date_g "date interval";
+value date_value_recover = Grammar.Entry.create date_g "date value";
 
 value roman_int_decode s =
   let decode_digit one five ten r =
@@ -567,8 +568,22 @@ value make_date n1 n2 n3 =
   | _ -> raise (Stream.Error "bad date") ]
 ;
 
+value recover_date cal =
+  fun
+  [ Dgreg d Dgregorian ->
+      let d =
+        match cal with
+        [ Dgregorian -> d
+        | Djulian -> Calendar.gregorian_of_julian d
+        | Dfrench -> Calendar.gregorian_of_french d
+        | Dhebrew -> Calendar.gregorian_of_hebrew d ]
+      in
+      Dgreg d cal
+  | d -> d ]
+;
+
 EXTEND
-  GLOBAL: date_value date_interval;
+  GLOBAL: date_value date_interval date_value_recover;
   date_value:
     [ [ dr = date_range; EOI ->
           match dr with
@@ -578,6 +593,16 @@ EXTEND
               Dgreg {(d1) with prec = YearInt d2.year} cal ]
       | (d, cal) = date; EOI -> Dgreg d cal
       | s = TEXT -> Dtext s ] ]
+  ;
+  date_value_recover:
+    [ [ "@"; "#"; ID "DGREGORIAN"; "@"; d = date_value ->
+          recover_date Dgregorian d
+      | "@"; "#"; ID "DJULIAN"; "@"; d = date_value ->
+          recover_date Djulian d
+      | "@"; "#"; ID "DFRENCH"; ID "R"; "@"; d = date_value ->
+          recover_date Dfrench d
+      | "@"; "#"; ID "DHEBREW"; "@"; d = date_value ->
+          recover_date Dhebrew d ] ]
   ;
   date_interval:
     [ [ ID "BEF"; dt = date_or_text; EOI -> End dt
@@ -712,7 +737,10 @@ value date_of_field pos d =
     let s = Stream.of_string (String.uppercase d) in
     date_str.val := d;
     try Some (Grammar.Entry.parse date_value s) with
-    [ Stdpp.Exc_located loc (Stream.Error _) -> Some (Dtext d) ]
+    [ Stdpp.Exc_located loc (Stream.Error _) ->
+        let s = Stream.of_string (String.uppercase d) in
+        try Some (Grammar.Entry.parse date_value_recover s) with
+        [ Stdpp.Exc_located loc (Stream.Error _) -> Some (Dtext d) ] ]
   }
 ;
 

@@ -23,6 +23,9 @@ GeneWeb version 4.05
     (sometimes just one of them work and not the other).
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [23 Jan 02] Accept now some forms of incorrect dates which do not
+    respect the gedcom standard (e.g. @#DJULIAN@ BEF 1580, which should
+    be BEF @#DJULIAN@ 1580).
   - [22 Jan 02] Added a search for godparents inside the baptism entry:
     it is not gedcom standard, but some (other) genealogy software
     exported them that way.
