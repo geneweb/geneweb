@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.53 1999-10-05 17:04:25 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.54 1999-10-06 12:25:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1408,10 +1408,10 @@ value print_tree_with_pre conf base v p =
   let print_parents sz pf pm ifath imoth =
     let fath = poi base ifath in
     let moth = poi base imoth in
-    do print_centered_on sz pf
-         (someone_text conf base (tree_reference v) fath);
-       print_centered_on sz pm
+    do print_centered_on sz pm
          (someone_text conf base (tree_reference v) moth);
+       print_centered_on sz pf
+         (someone_text conf base (tree_reference v) fath);
     return ()
   in
   let str2 = String.make (sz / 2) in
@@ -1421,16 +1421,16 @@ value print_tree_with_pre conf base v p =
      [ Some ifam ->
          let cpl = coi base ifam in
           do if v >= 3 then
-              do match (aoi base cpl.father).parents with
-                 [ Some ifam ->
-                     let cpl = coi base ifam in
-                     print_parents sz (sz / 8) (3 * sz / 8)
-                       cpl.father cpl.mother
-                 | None -> () ];
-                 match (aoi base cpl.mother).parents with
+              do match (aoi base cpl.mother).parents with
                  [ Some ifam ->
                      let cpl = coi base ifam in
                      print_parents sz (5 * sz / 8) (7 * sz / 8)
+                       cpl.father cpl.mother
+                 | None -> () ];
+                 match (aoi base cpl.father).parents with
+                 [ Some ifam ->
+                     let cpl = coi base ifam in
+                     print_parents sz (sz / 8) (3 * sz / 8)
                        cpl.father cpl.mother
                  | None -> () ];
                  print_pre_center sz 
