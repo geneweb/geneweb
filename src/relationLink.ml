@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.13 1999-08-05 06:22:02 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.14 1999-08-06 03:56:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -295,7 +295,7 @@ value rec print_both_branches_pre conf base info sz pl1 pl2 =
               if s <> "" then print_pre_left sz ("&amp;" ^ d ^ " " ^ s)
               else ();
            return ()
-       | None -> () ];
+       | None -> Wserver.wprint "\n" ];
        match p2 with
        [ Some p2 ->
            do print_pre_right sz (someone_text conf base p2);
@@ -303,7 +303,7 @@ value rec print_both_branches_pre conf base info sz pl1 pl2 =
               if s <> "" then print_pre_right sz ("&amp;" ^ d ^ " " ^ s)
               else ();
            return ()
-       | None -> () ];
+       | None -> Wserver.wprint "\n" ];
     return print_both_branches_pre conf base info sz pl1 pl2
 ;
 

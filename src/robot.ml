@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.1 1999-08-06 02:35:39 ddr Exp $ *)
+(* $Id: robot.ml,v 1.2 1999-08-06 03:56:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -77,18 +77,19 @@ value check oc tm from max_call sec =
         return True
     | None ->
         do purge_who tm xcl sec; return
-        let (r, tm0, nb) =
+        let (r, _, _) =
           try W.find from xcl.who with [ Not_found -> ([], tm, 0) ]
         in
-        let (cnt, r, t) =
+        let (cnt, r, t, tm0, nb) =
           count r where rec count =
             fun
             [ [t :: tl] ->
                 if tm -. t < float sec then
-                  let (cnt, tl, t1) = count tl in
-                  (cnt + 1, [t :: tl], if t1 = 0.0 then t else t1)
-                else (1, [], t)
-            | [] -> (1, [], 0.0) ]
+                  let (cnt, tl, t1, tm0, nb) = count tl in
+                  (cnt + 1, [t :: tl], if t1 = 0.0 then t else t1,
+                   if tl = [] then t else tm0, nb + 1)
+                else (1, [], t, t, 0)
+            | [] -> (1, [], 0.0, tm, 0) ]
         in
         do xcl.who := W.add from ([tm :: r], tm0, nb + 1) xcl.who; return
         let refused =
