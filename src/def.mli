@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 4.11 2004-12-14 09:30:11 ddr Exp $ *)
+(* $Id: def.mli,v 4.12 2005-02-11 21:32:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -192,6 +192,7 @@ type base_data =
     couples : cache couple;
     descends : cache descend;
     strings : cache string;
+    particles : list string;
     bnotes : notes }
 ;
 

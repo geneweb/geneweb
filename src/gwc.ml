@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.27 2005-02-02 23:48:31 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.28 2005-02-11 21:32:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -733,6 +733,8 @@ value persons_cache per_index_ic per_ic persons =
    clear_array = fun _ -> ()}
 ;
 
+value part_file = ref "";
+
 value families_cache fam_index_ic fam_ic len =
   let get_fun i =
     do {
@@ -745,6 +747,15 @@ value families_cache fam_index_ic fam_ic len =
   in
   {array = fun _ -> failwith "bug: accessing family array";
    get = get_fun; len = len; clear_array = fun _ -> ()}
+;
+
+value input_particles part_file =
+  if part_file = "" then
+    ["af "; "d'"; "dal "; "de "; "di "; "du "; "van de "; "van ";
+     "von und zu "; "von "; "zu ";
+     "AF "; "D'"; "DAL "; "DE "; "DI "; "DU "; "VAN DE "; "VAN ";
+     "VON UND ZU "; "VON "; "ZU "]
+  else Iobase.input_particles part_file
 ;
 
 value empty_base : cbase =
@@ -805,6 +816,7 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
     let a = Array.sub gen.g_base.c_strings 0 gen.g_scnt in
     do { gen.g_base.c_strings := [| |]; a }
   in
+  let particles = input_particles part_file.val in
   let bnotes = gen.g_base.c_bnotes in
   let base_data =
     {persons = persons_cache per_index_ic per_ic persons;
@@ -813,7 +825,7 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
      families = families_cache fam_index_ic fam_ic gen.g_fcnt;
      visible = { v_write = fun []; v_get = fun [] };
      couples = cache_of couples; descends = cache_of descends;
-     strings = cache_of strings; bnotes = bnotes}
+     strings = cache_of strings; particles = particles; bnotes = bnotes}
   in
   let base_func =
     {persons_of_name = fun []; strings_of_fsname = fun [];
@@ -886,6 +898,17 @@ value output_command_line bname =
   }
 ;
 
+value output_particles_file bname particles =
+  let bdir =
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
+  in
+  let oc = open_out (Filename.concat bdir "particles.txt") in
+  do {
+    List.iter (fun s -> fprintf oc "%s\n" (Gutil.tr ' ' '_' s)) particles;
+    close_out oc;
+  }
+;
+
 value separate = ref False;
 value shift = ref 0;
 value files = ref [];
@@ -902,7 +925,9 @@ value speclist =
    ("-sh", Arg.Int (fun x -> shift.val := x),
     "<int> Shift all persons numbers in next files");
    ("-ds", Arg.String (fun s -> default_source.val := s), "\
-     set the source field for persons and families without source data");
+     <str> Set the source field for persons and families without source data");
+   ("-part", Arg.String (fun s -> part_file.val := s), "\
+     <file> Particles file (default = predefined particles)");
    ("-mem", Arg.Set Iobase.save_mem, " Save memory, but slower");
    ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.")]
 ;
@@ -961,15 +986,18 @@ The database \"%s\" already exists. Use option -f to overwrite it.
       lock (Iobase.lock_file out_file.val) with
       [ Accept ->
           let base = link (List.rev gwo.val) in
-          do { Gc.compact (); Iobase.output out_file.val base; }
+          do {
+            Gc.compact ();
+            Iobase.output out_file.val base;
+            output_command_line out_file.val;
+            output_particles_file out_file.val base.data.particles;
+          }
       | Refuse ->
           do {
             printf "Base is locked: cannot write it\n";
             flush stdout;
             exit 2
           } ];
-      output_command_line out_file.val;
-      ()
     }
     else ();
   }
