@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.51 2005-01-24 04:35:50 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.52 2005-02-05 03:51:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -234,7 +234,7 @@ and eval_key (fn, sn, oc, create, var) =
   | x ->
       match x with
       [ ["sex"] ->
-          obsolete "4.11" "sex" "create.sex"
+          obsolete "5.00" "sex" "create.sex"
             (str_val (eval_create create "sex"))
       | _ -> raise Not_found ] ]
 and eval_create c =

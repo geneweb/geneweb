@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.20 2005-01-24 04:35:50 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.21 2005-02-05 03:51:58 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -247,7 +247,7 @@ and eval_date_var_aux od =
             eval_is_prec (fun [ YearInt _ -> True | _ -> False ]) od
         | _ -> raise Not_found ]
       in
-      obsolete "4.11" x (if x.[0] = 'c' then "calendar" else "prec") r ]
+      obsolete "5.00" x (if x.[0] = 'c' then "calendar" else "prec") r ]
 and eval_date_field =
   fun
   [ Some d ->
