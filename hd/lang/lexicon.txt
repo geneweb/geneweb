@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.109 1999-08-07 09:11:51 ddr Exp $
+# $Id: lexicon.txt,v 2.110 1999-08-08 23:40:49 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1913,7 +1913,7 @@ de: Herzlichen Gl&uuml;ckwunsch zum Geburstag!
 dk: til lykke med f&oslash;dselsdagen!
 en: happy birthday to you!
 eo: felicxan datrevenon!
-es: &iexcl;feliz cumplea&ntilde;s!
+es: &iexcl;feliz cumplea&ntilde;os!
 fr: bon anniversaire!
 he:   יום הולדת שמח
 it: buon compleanno!
