@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.35 1999-12-16 17:07:38 ddr Exp $
+# $Id: lexicon.txt,v 3.36 1999-12-16 17:14:23 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -3484,7 +3484,7 @@ dk: af den %s generation
 en: of the %s generation
 eo: de la %s generacio
 es: a la %s generaci&oacute;n
-fi: %s. sukupolvea
+fi: %s sukupolvea
 fr: &agrave; la %s g&eacute;n&eacute;ration
 he:   ìãåø  %s
 is: af %s kynslóð
