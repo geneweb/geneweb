@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 4.4 2002-01-23 11:39:47 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 4.5 2002-03-11 17:50:40 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -209,7 +209,7 @@ value print_result conf base max_answers (list, len) =
         (fun p ->
            do {
              html_li conf;
-             afficher_personne_referencee conf base p;
+             Wserver.wprint "\n%s" (referenced_person_text conf base p);
              Date.afficher_dates_courtes conf base p;
            })
         list;

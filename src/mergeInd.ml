@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.16 2002-03-06 12:21:21 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.17 2002-03-11 17:50:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -246,11 +246,11 @@ value propose_merge_ind conf base branches p1 p2 =
              do {
                tag "tr" "align=left" begin
                  tag "td" begin
-                   afficher_personne_referencee conf base p1;
+                   Wserver.wprint "\n%s" (referenced_person_text conf base p1);
                    Date.afficher_dates_courtes conf base p1;
                  end;
                  tag "td" begin
-                   afficher_personne_referencee conf base p2;
+                   Wserver.wprint "\n%s" (referenced_person_text conf base p2);
                    Date.afficher_dates_courtes conf base p2;
                  end;
                end;
@@ -470,7 +470,7 @@ value print_merged conf base p =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    afficher_personne_referencee conf base p;
+    Wserver.wprint "\n%s" (referenced_person_text conf base p);
     Wserver.wprint "\n";
     trailer conf;
   }

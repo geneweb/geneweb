@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.7 2001-11-27 12:10:11 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.8 2002-03-11 17:50:45 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -162,7 +162,7 @@ value print_sent conf base p =
     header conf title;
     tag "ul" begin
       html_li conf;
-      afficher_personne_referencee conf base p;
+      Wserver.wprint "\n%s" (referenced_person_text conf base p);
       Wserver.wprint "\n";
     end;
     trailer conf
@@ -326,7 +326,7 @@ value print_deleted conf base p =
     header conf title;
     tag "ul" begin
       html_li conf;
-      afficher_personne_referencee conf base p;
+      Wserver.wprint "\n%s" (referenced_person_text conf base p);
       Wserver.wprint "\n";
     end;
     trailer conf

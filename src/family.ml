@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.20 2002-03-11 17:24:50 ddr Exp $ *)
+(* $Id: family.ml,v 4.21 2002-03-11 17:50:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -262,7 +262,8 @@ value precisez conf base n pl =
          do {
            html_li conf;
            match tl with
-           [ [] -> afficher_personne_titre_referencee conf base p
+           [ [] ->
+               Wserver.wprint "\n%s" (referenced_person_title_text conf base p)
            | [t :: _] ->
                do {
                  tag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)

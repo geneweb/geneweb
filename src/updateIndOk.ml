@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.10 2002-03-06 12:21:25 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.11 2002-03-11 17:50:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -364,7 +364,7 @@ value print_cannot_change_sex conf base p =
     Update.print_error conf base (BadSexOfMarriedPerson p);
     tag "ul" begin
       html_li conf;
-      afficher_personne_referencee conf base p;
+      Wserver.wprint "\n%s" (referenced_person_text conf base p);
       Wserver.wprint "\n";
     end;
     Update.print_return conf;
@@ -587,7 +587,7 @@ value print_mod_ok conf base wl p =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    afficher_personne_referencee conf base p;
+    Wserver.wprint "\n%s" (referenced_person_text conf base p);
     Wserver.wprint "\n";
     Update.print_warnings conf base wl;
     trailer conf;
@@ -650,7 +650,7 @@ value print_add_ok conf base wl p =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    afficher_personne_referencee conf base p;
+    Wserver.wprint "\n%s" (referenced_person_text conf base p);
     Wserver.wprint "\n";
     Update.print_warnings conf base wl;
     trailer conf;
