@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2001-06-03 14:33:50 ddr Exp $
+# $Id: Makefile,v 1.2 2001-10-03 08:56:06 ddr Exp $
 
 BINDIR=/usr/local/bin
 OCAMLC=ocamlc
@@ -23,12 +23,12 @@ clean:
 .SUFFIXES: .ml .mli .cmo .cmx .cmi
 
 .ml.cmo:
-	camlp4r $< -o $*.ppo -warn_seq
+	camlp4r $< -o $*.ppo
 	$(OCAMLC) $(OCARGS) -c -impl $*.ppo
 	rm -f $*.ppo
 
 .ml.cmx:
-	camlp4r $< -o $*.ppo -warn_seq
+	camlp4r $< -o $*.ppo
 	$(OCAMLOPT) $(OCARGS) -c -impl $*.ppo
 	rm -f $*.ppo
 
