@@ -184,10 +184,10 @@ some.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
 some.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
     ../wserver/wserver.cmx 
-srcfile.cmo: config.cmi date.cmi def.cmi gutil.cmi history.cmi lock.cmo \
-    num.cmi util.cmi version.cmo ../wserver/wserver.cmi srcfile.cmi 
-srcfile.cmx: config.cmi date.cmx def.cmi gutil.cmx history.cmx lock.cmx \
-    num.cmx util.cmx version.cmx ../wserver/wserver.cmx srcfile.cmi 
+srcfile.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi history.cmi \
+    lock.cmo num.cmi util.cmi version.cmo ../wserver/wserver.cmi srcfile.cmi 
+srcfile.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx history.cmx \
+    lock.cmx num.cmx util.cmx version.cmx ../wserver/wserver.cmx srcfile.cmi 
 title.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi name.cmi util.cmi \
     ../wserver/wserver.cmi 
 title.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx util.cmx \
