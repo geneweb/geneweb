@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.11 1999-05-04 05:00:45 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.12 1999-05-04 14:55:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -480,7 +480,7 @@ use \"can_send_image\".\n"
     match
       try Some (List.assoc "renamed" base_env) with [ Not_found -> None ]
     with
-    [ Some n -> print_renamed conf n
+    [ Some n when n <> "" -> print_renamed conf n
     | _ ->
         do start_with_base conf conf.bname;
            if sleep > 0 then Unix.sleep sleep else ();

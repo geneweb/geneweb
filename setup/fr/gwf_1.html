@@ -12,9 +12,8 @@
 
 <p>
 
-Configurez les <a
-href="file://$w/doc/$l/start.htm#Cnf">param&egrave;tres</a> de la base
-<a href="http://localhost:2317/$a">$a</a>:
+Configurez les param&egrave;tres de la base <a
+href="http://localhost:2317/$a">$a</a>:
 
 <p>
 
@@ -37,7 +36,7 @@ Quelques variables int&eacute;ressantes...
 <li>bgcolor: couleur de fond
 <li>text: couleur du texte
 <li>link: couleur des liens
-<li>vlink: couleur des liens d&eacute;j&agrave; cliqu&eacute;s
+<li>vlink: couleur des liens d&eacute;j&agrave; visit&eacute;s
 </ul>
 <p>
 Ceci s'applique non seulement à la page d'accueil mais à toutes les pages
@@ -69,12 +68,12 @@ qui sera prise.
 <td>
 <select name=default_lang>
 <option value=$L{}>-
-<option value=$L{cn}>Chinois
 <option value=$L{de}>Allemand
-<option value=$L{dk}>Danois
 <option value=$L{en}>Anglais
-<option value=$L{eo}>Esp&eacute;ranto
+<option value=$L{cn}>Chinois
+<option value=$L{dk}>Danois
 <option value=$L{es}>Espagnol
+<option value=$L{eo}>Esp&eacute;ranto
 <option value=$L{fr}>Fran&ccedil;ais
 <option value=$L{he}>H&eacute;breu
 <option value=$L{it}>Italien
@@ -96,12 +95,12 @@ qui sera prise.
 <td valign=top><strong>friend_passwd</strong></td>
 <td>Mot de passe "ami".
 <p>
-Les "amis" peuvent voir toutes les dates et autres informations des
+Les "amis" peuvent voir toutes les dates, notes et photos des
 personnes n&eacute;es depuis moins d'un si&egrave;cle. Ceux qui n'ont
 pas entr&eacute; le mot de passe ci-dessous ne verront pas ces
 informations.
 <p>
-S'il est vide, tout le monde est "ami".
+Si cette zone est vide, tout le monde est "ami".
 </td>
 </tr>
 
@@ -123,7 +122,7 @@ S'il est vide, tout le monde est "ami".
 Les "sorciers" peuvent en outre faire des modifications dans la base de
 donn&eacute;es.
 <p>
-S'il est vide, tout le monde est "sorcier".
+Si cette zone est vide, tout le monde est "sorcier".
 </td>
 </tr>
 
@@ -142,7 +141,12 @@ S'il est vide, tout le monde est "sorcier".
 <td valign=top><strong>can_send_image</strong></td>
 <td>Possibilit&eacute; d'envoyer des images.
 <p>
-Si oui, les "sorciers" ont l'autorisation d'envoyer des images.
+Si oui, les "sorciers" ont l'autorisation d'envoyer des images par
+le r&eacute;seau.
+<p>
+Peut &ecirc;tre utile en local pour pouvoir mettre une image &agrave; des
+gens, car la proc&eacute;dure installe automatiquement la photo au
+bon endroit avec le nom appropri&eacute;.
 </td>
 </tr>
 
@@ -152,6 +156,61 @@ Si oui, les "sorciers" ont l'autorisation d'envoyer des images.
 <input type=radio name=can_send_image value=$I[yes]>oui
 <input type=radio name=can_send_image value=$I[no]>non
 </td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>wizard_just_friend</strong></td>
+<td>Les "sorciers" deviennent de simples "amis".
+<p>
+Si oui, les "sorciers" perdent leur pouvoir de mise-&agrave;-jour.
+<p>
+Cela peut-&ecirc;tre utile, temporairement, quand on fait un nettoyage
+de la base, si elle est accessible sur Internet, pour &eacute;viter
+que des "sorciers" ne fassent des mises-&agrave;-jour qui seraient
+perdues pendant l'op&eacute;ration (penser alors &agrave; supprimer cette
+option apr&egrave;s nettoyage).
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<input type=radio name=wizard_just_friend value=$J[yes]>oui
+<input type=radio name=wizard_just_friend value=$J[no]>non
+</td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td valign=top><strong>renamed</strong></td>
+<td>Base renomm&eacute;e.
+<p>
+Si vous avez chang&eacute; le nom de votre base, mais que c'est une base
+qui existe depuis longtemps et que vous pensez que beaucoup de gens ont
+mis des liens dessus, conservez ce fichier de param&egrave;tres pour cette
+base et indiquez ci-dessous le nouveau nom de la base. Les gens qui
+consulteront la base avec l'ancien nom recevront une page qui leur indiquera
+le nouveau nom &agrave; utiliser avec leur m&ecirc;me requ&ecirc;te
+cliquable.
+<p>
+Si cette zone est vide, la base n'est pas renomm&eacute;e.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=renamed value="$R" size=30></td>
 </tr>
 
 </table></dl>

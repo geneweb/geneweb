@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.14 1999-04-21 09:41:19 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.15 1999-05-04 14:54:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -111,11 +111,18 @@ value print_choice conf base p niveau_effectif =
       Wserver.wprint "<input type=radio name=t value=A> %s (%s)\n"
         (capitale (transl conf "missing ancestors"))
         (transl conf "alphabetic order");
-      html_br conf;
-      Wserver.wprint "%s\n" (capitale (transl conf "after"));
-      Wserver.wprint "<input name=after size=5 maxlength=5>\n";
-      Wserver.wprint "%s\n" (capitale (transl conf "before"));
-      Wserver.wprint "<input name=before size=5 maxlength=5>\n";
+      tag "ul" begin
+        html_li conf;
+        Wserver.wprint "%s\n" (capitale (transl conf "after"));
+        Wserver.wprint "<input name=after size=5 maxlength=5>\n";
+        Wserver.wprint "%s\n" (capitale (transl conf "before"));
+        Wserver.wprint "<input name=before size=5 maxlength=5>\n";
+        html_li conf;
+        Wserver.wprint "%s\n"
+          (capitale (transl conf "include missing spouses"));
+        Wserver.wprint "<input type=checkbox name=ms value=on>\n";
+      end;
+      
     end;
     html_p conf;
     Wserver.wprint "<input type=submit value=\"Ok\">";

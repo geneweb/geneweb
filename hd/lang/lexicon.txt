@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.31 1999-04-30 08:53:05 ddr Exp $
+# $Id: lexicon.txt,v 2.32 1999-05-04 14:54:52 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1800,6 +1800,10 @@ nl: in
 no: i
 pt: em
 se: i
+
+    include missing spouses
+en: include missing spouses
+fr: inclure les conjoints manquants
 
     incompatible sexes
 de: unvertr&aml;gliche Geschlechter

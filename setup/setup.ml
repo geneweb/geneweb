@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.11 1999-05-04 05:00:44 ddr Exp $ *)
+(* $Id: setup.ml,v 1.12 1999-05-04 14:54:55 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -227,7 +227,7 @@ value rec copy_from_stream conf print strm =
                         return ())
                    conf.env;
               return ()
-          | 'g' -> print_log conf print strm
+          | 'g' -> print_specific_file conf print "comm.log" strm
           | 'h' ->
               do print "<input type=hidden name=lang value=";
                  print conf.lang;
@@ -250,6 +250,7 @@ value rec copy_from_stream conf print strm =
           | 'o' -> print (strip_spaces (s_getenv conf.env "o"))
           | 'p' -> print (parameters conf.env)
           | 'q' -> print Version.txt
+          | 'r' -> print_specific_file conf print "gwd.arg" strm
           | 'u' -> print (Filename.dirname (Sys.getcwd ()))
           | 'v' ->
               let out = strip_spaces (s_getenv conf.env "o") in
@@ -279,13 +280,12 @@ value rec copy_from_stream conf print strm =
     done
   with
   [ Stream.Failure -> () ]
-and print_log conf print strm =
+and print_specific_file conf print fname strm =
   match Stream.next strm with
   [ '{' ->
       let s = parse_upto '}' strm in
-      let comm_log = "comm.log" in
-      if Sys.file_exists comm_log then
-        let ic = open_in comm_log in
+      if Sys.file_exists fname then
+        let ic = open_in fname in
         do if in_channel_length ic = 0 then
              copy_from_stream conf print (Stream.of_string s)
            else copy_from_stream conf print (Stream.of_channel ic);
@@ -821,7 +821,8 @@ value gwf conf =
       {(conf) with env =
          [("B", get "body_prop"); ("L", get "default_lang");
           ("F", get "friend_passwd"); ("W", get "wizard_passwd");
-          ("I", get "can_send_image") :: conf.env]}
+          ("I", get "can_send_image"); ("J", get "wizard_just_friend");
+          ("R", get "renamed") :: conf.env]}
     in
     print_file conf "gwf_1.html"
 ;
@@ -842,8 +843,42 @@ value gwf_1 conf =
        (s_getenv conf.env "wizard_passwd");
      Printf.fprintf oc "can_send_image=%s\n"
        (s_getenv conf.env "can_send_image");
+     Printf.fprintf oc "wizard_just_friend=%s\n"
+       (s_getenv conf.env "wizard_just_friend");
+     Printf.fprintf oc "renamed=%s\n"
+       (s_getenv conf.env "renamed");
      close_out oc;
      print_file conf "gwf_ok.html";
+  return ()
+;
+
+value gwd conf =
+  let aenv = read_gwd_arg () in
+  let get v = try List.assoc v aenv with [ Not_found -> "" ] in
+  let conf =
+    {(conf) with env =
+       [("H", get "hd"); ("B", get "bd");
+        ("P", get "p"); ("W", get "wizard");
+        ("F", get "friend"); ("L", get "lang");
+        ("O", get "only"); ("A", get "auth");
+        ("T", get "log"); ("N", get "nolock");
+        ("M", get "max_clients"); ("U", get "setuid");
+        ("G", get "setgid") :: conf.env]}
+  in
+  print_file conf "gwd.html"
+;
+
+value gwd_1 conf =
+  let oc = open_out "gwd.arg" in
+  let print_param k =
+    match p_getenv conf.env k with
+    [ Some v when v <> "" -> Printf.fprintf oc "-%s\n%s\n" k v
+    | _ -> () ]
+  in
+  do print_param "hd";
+     print_param "bd";
+     close_out oc;
+     print_file conf "gwd_ok.html";
   return ()
 ;
 
@@ -916,6 +951,8 @@ value setup_comm conf =
       | _ -> exec_command_in conf "consang_ok.html" ]
   | "gwf" -> gwf conf
   | "gwf_1" -> gwf_1 conf
+  | "gwd" -> gwd conf
+  | "gwd_1" -> gwd_1 conf
   | x -> error ("bad command: \"" ^ x ^ "\"") ]
 ;
 
