@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.1 2001-02-14 19:48:48 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.2 2001-02-15 06:22:17 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -73,13 +73,13 @@
     <tr>
     <td>[*qualifier]0</td>
     <td>
-    <input name="qualifier%cnt;" size=30 value="%qualifier;">
+    <input name="qualifier%cnt;" size=30 value="%item;">
     <td>[*insert::qualifier]0</td>
     <td><input type=checkbox name="add_qualifier%cnt;" value=on></td>
     </tr>
   %end;
 %else;
-  %if;not (is_reset propose_qualifier);
+  %if;not (cvar_propose_qualifier = "no");
     <tr>
     <td>[*qualifier]0</td>
     <td>
@@ -94,13 +94,13 @@
     <tr>
     <td>[*alias]0</td>
     <td>
-    <input name="alias%cnt;" size=30 value="%alias;">
+    <input name="alias%cnt;" size=30 value="%item;">
     <td>[*insert::alias]0</td>
     <td><input type=checkbox name="add_alias%cnt;" value=on></td>
     </tr>
   %end;
 %else;
-  %if;not (is_reset propose_alias);
+  %if;not (cvar_propose_alias = "no");
     <tr>
     <td>[*alias]0</td>
     <td>
@@ -116,7 +116,7 @@
     <tr>
     <td>[*first name alias]0</td>
     <td>
-    <input name="first_name_alias%cnt;" size=30 value="%first_name_alias;">
+    <input name="first_name_alias%cnt;" size=30 value="%item;">
     <td>[*insert::first name alias]0</td>
     <td><input type=checkbox name="add_first_name_alias%cnt;" value=on></td>
     </tr>
@@ -135,7 +135,7 @@
     <tr>
     <td>[*surname alias]0</td>
     <td>
-    <input name="surname_alias%cnt;" size=30 value="%surname_alias;">
+    <input name="surname_alias%cnt;" size=30 value="%item;">
     <td>[*insert::first name alias]0</td>
     <td><input type=checkbox name="add_surname_alias%cnt;" value=on></td>
     </tr>

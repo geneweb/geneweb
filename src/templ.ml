@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 3.2 2001-02-14 15:26:42 ddr Exp $ *)
+(* $Id: templ.ml,v 3.3 2001-02-15 06:22:17 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -16,17 +16,27 @@ type ast =
 and ast_expr =
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
+  | Eequal of ast_expr and ast_expr
   | Enot of ast_expr
+  | Estr of string
   | Evar of string and list string ]
 ;
 
-type token = [ LPAREN | RPAREN | DOT | IDENT of string ];
+type token =
+  [ LPAREN | RPAREN | DOT | EQUAL | IDENT of string | STRING of string ]
+;
 
 value rec get_ident len =
   parser
   [ [: `('a'..'z' | 'A'..'Z' | '0'..'9' | '_' as c); strm :] ->
       get_ident (Buff.store len c) strm
   | [: :] -> Buff.get len ]
+;
+
+value rec get_string len =
+  parser
+  [ [: `'"' :] -> Buff.get len
+  | [: `c; strm :] -> get_string (Buff.store len c) strm ]
 ;
 
 value get_variable =
@@ -47,6 +57,8 @@ value rec get_token =
   | [: `'(' :] -> LPAREN
   | [: `')' :] -> RPAREN
   | [: `'.' :] -> DOT
+  | [: `'=' :] -> EQUAL
+  | [: `'"'; s = get_string 0 :] -> STRING s
   | [: s = get_ident 0 :] -> IDENT s ]
 ;
 
@@ -96,10 +108,18 @@ value parse_templ conf base strm =
              | [: :] -> e ] :] -> e ]
     and parse_3 =
       parser
+      [ [: e = parse_4;
+           e =
+             parser
+             [ [: `EQUAL; e2 = parse_4 :] -> Eequal e e2
+             | [: :] -> e ] :] -> e ]
+    and parse_4 =
+      parser
       [ [: `LPAREN; e = parse_1;
            _ = parser [ [: `RPAREN :] -> () | [: :] -> () ] :] -> e
-      | [: `IDENT "not"; e = parse_3 :] -> Enot e
+      | [: `IDENT "not"; e = parse_4 :] -> Enot e
       | [: `IDENT id; idl = ident_list :] -> Evar id idl
+      | [: `STRING s :] -> Estr s
       | [: :] -> Evar "bad_variable" [] ]
     and ident_list =
       parser
