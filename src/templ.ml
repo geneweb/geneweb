@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.34 2005-02-05 06:34:39 ddr Exp $ *)
+(* $Id: templ.ml,v 4.35 2005-02-06 10:17:35 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -18,6 +18,8 @@ type token =
   | INT of string
   | LEXICON of bool and string and string ]
 ;
+
+type loc_token = [ Tok of loc and token ];
 
 value rec get_ident len =
   parser
@@ -51,12 +53,12 @@ value get_variable =
     | [: `';' :] -> []
     | [: :] -> [] ]
   in
-  parser
-  [ [: `'%' :] -> ("%", [])
-  | [: `'/' :] -> ("/", [])
-  | [: `'[' :] -> ("[", [])
-  | [: `']' :] -> ("]", [])
-  | [: v = get_ident 0; vl = var_kont :] -> (v, vl) ]
+  parser bp
+  [ [: `'%' :] ep -> ((bp, ep), "%", [])
+  | [: `'/' :] ep -> ((bp, ep), "/", [])
+  | [: `'[' :] ep -> ((bp, ep), "[", [])
+  | [: `']' :] ep -> ((bp, ep), "]", [])
+  | [: v = get_ident 0; vl = var_kont :] ep -> ((bp, ep), v, vl) ]
 ;
 
 value rec transl_num_index =
@@ -83,18 +85,19 @@ value lexicon_word =
 ;
 
 value rec get_token =
-  parser
+  parser bp
   [ [: `' ' | '\t' | '\n' | '\r'; s :] -> get_token s
-  | [: `'(' :] -> LPAREN
-  | [: `')' :] -> RPAREN
-  | [: `',' :] -> COMMA
-  | [: `'.' :] -> DOT
-  | [: `'=' :] -> EQUAL
-  | [: `'!'; `'=' :] -> BANGEQUAL
-  | [: `'"'; s = get_string 0 :] -> STRING s
-  | [: `('0'..'9' as c); s = get_int (Buff.store 0 c) :] -> INT s
-  | [: `'['; (upp, s, n) = lexicon_word :] -> LEXICON upp s n
-  | [: s = get_ident 0 :] -> IDENT s ]
+  | [: `'(' :] ep -> Tok (bp, ep) LPAREN
+  | [: `')' :] ep -> Tok (bp, ep) RPAREN
+  | [: `',' :] ep -> Tok (bp, ep) COMMA
+  | [: `'.' :] ep -> Tok (bp, ep) DOT
+  | [: `'=' :] ep -> Tok (bp, ep) EQUAL
+  | [: `'!'; `'=' :] ep -> Tok (bp, ep) BANGEQUAL
+  | [: `'"'; s = get_string 0 :] ep -> Tok (bp, ep) (STRING s)
+  | [: `('0'..'9' as c); s = get_int (Buff.store 0 c) :] ep ->
+      Tok (bp, ep) (INT s)
+  | [: `'['; (upp, s, n) = lexicon_word :] ep -> Tok (bp, ep) (LEXICON upp s n)
+  | [: s = get_ident 0 :] ep -> Tok (bp, ep) (IDENT s) ]
 ;
 
 value buff = ref (String.create 80);
@@ -111,14 +114,19 @@ value buff_store len x =
 
 value buff_get len = String.sub buff.val 0 len;
 
-value rec parse_var = parser [: `IDENT id; idl = ident_list :] -> (id, idl)
-and ident_list =
+value rec parse_var =
   parser
-  [ [: `DOT;
-       id = parser [ [: `IDENT id :] -> id | [: `_ :] -> "parse_error" ];
-       idl = ident_list :] ->
-      [id :: idl]
-  | [: :] -> [] ]
+    [: `Tok loc (IDENT id); (loc, idl) = ident_list loc :] -> (loc, id, idl)
+and ident_list ((bp, _) as loc) =
+  parser
+  [ [: `Tok _ DOT;
+       (loc, id) =
+         parser
+         [ [: `Tok (_, ep) (IDENT id) :] -> ((bp, ep), id)
+         | [: `Tok loc _ :] -> (loc, "parse_error") ];
+       (loc, idl) = ident_list loc :] ->
+      (loc, [id :: idl])
+  | [: :] -> (loc, []) ]
 ;
 
 value rec parse_expr strm =
@@ -127,7 +135,7 @@ value rec parse_expr strm =
       [: e = parse_2;
          a =
            parser
-           [ [: `IDENT "or"; s :] -> Eor e (parse_1 s)
+           [ [: `Tok _ (IDENT "or"); s :] -> Eor e (parse_1 s)
            | [: :] -> e ] :] ->
         a
   and parse_2 =
@@ -135,7 +143,7 @@ value rec parse_expr strm =
       [: e = parse_3;
          a =
            parser
-           [ [: `IDENT "and"; s :] -> Eand e (parse_2 s)
+           [ [: `Tok _ (IDENT "and"); s :] -> Eand e (parse_2 s)
            | [: :] -> e ] :] ->
         a
   and parse_3 =
@@ -143,24 +151,24 @@ value rec parse_expr strm =
       [: e = parse_simple;
          a =
            parser
-           [ [: `EQUAL; e2 = parse_simple :] -> Eop "=" e e2
-           | [: `BANGEQUAL; e2 = parse_simple :] -> Eop "!=" e e2
+           [ [: `Tok _ EQUAL; e2 = parse_simple :] -> Eop "=" e e2
+           | [: `Tok _ BANGEQUAL; e2 = parse_simple :] -> Eop "!=" e e2
            | [: :] -> e ] :] ->
         a
   and parse_simple =
     parser
-    [ [: `LPAREN; e = parse_1;
+    [ [: `Tok _ LPAREN; e = parse_1;
          a =
            parser
-           [ [: `RPAREN :] -> e
-           | [: `_ :] -> Evar "parse_error" [] ] :] ->
+           [ [: `Tok _ RPAREN :] -> e
+           | [: `Tok loc _ :] -> Evar loc "parse_error" [] ] :] ->
         a
-    | [: `IDENT "not"; e = parse_simple :] -> Enot e
-    | [: `STRING s :] -> Estr s
-    | [: `INT s :] -> Eint s
-    | [: `LEXICON upp s n :] -> Etransl upp s n
-    | [: (id, idl) = parse_var :] -> Evar id idl
-    | [: `_ :] -> Evar "parse_error" [] ]
+    | [: `Tok _ (IDENT "not"); e = parse_simple :] -> Enot e
+    | [: `Tok _ (STRING s) :] -> Estr s
+    | [: `Tok _ (INT s) :] -> Eint s
+    | [: `Tok _ (LEXICON upp s n) :] -> Etransl upp s n
+    | [: (loc, id, idl) = parse_var :] -> Evar loc id idl
+    | [: `Tok loc _ :] -> Evar loc "parse_error" [] ]
   in
   let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
   let r = parse_simple (Stream.from f) in
@@ -170,26 +178,26 @@ value rec parse_expr strm =
 value parse_real_params strm =
   let expr =
     parser
-    [ [: `STRING s :] -> Estr s
-    | [: `LEXICON upp s n :] -> Etransl upp s n
-    | [: (id, idl) = parse_var :] -> Evar id idl ]
+    [ [: `Tok loc (STRING s) :] -> Estr s
+    | [: `Tok loc (LEXICON upp s n) :] -> Etransl upp s n
+    | [: (loc, id, idl) = parse_var :] -> Evar loc id idl ]
   in
   let rec parse_expr_list =
     parser
       [: x = expr;
          xl =
            parser
-           [ [: `COMMA; a = parse_expr_list :] -> a
+           [ [: `Tok _ COMMA; a = parse_expr_list :] -> a
            | [: :] -> [] ] :] ->
         [x :: xl]
   in
   let parse_tuple =
     parser
-      [: `LPAREN;
+      [: `Tok _ LPAREN;
          xl = parser [ [: a = parse_expr_list :] -> a | [: :] -> [] ];
          a =
            parser
-           [ [: `RPAREN :] -> xl
+           [ [: `Tok _ RPAREN :] -> xl
            | [: :] -> [Estr "parse_error"] ] :] ->
         a
   in
@@ -200,18 +208,21 @@ value parse_real_params strm =
 value parse_formal_params strm =
   let rec parse_ident_list =
     parser
-      [: `IDENT x;
+      [: `Tok _ (IDENT x);
          xl =
            parser
-           [ [: `COMMA; a = parse_ident_list :] -> a
+           [ [: `Tok _ COMMA; a = parse_ident_list :] -> a
            | [: :] -> [] ] :] ->
         [x :: xl]
   in
   let parse_tuple =
     parser
-      [: `LPAREN;
+      [: `Tok _ LPAREN;
          xl = parser [ [: a = parse_ident_list :] -> a | [: :] -> [] ];
-         a = parser [ [: `RPAREN :] -> xl | [: :] -> ["parse_error"] ] :] ->
+         a =
+           parser
+           [ [: `Tok _ RPAREN :] -> xl
+           | [: :] -> ["parse_error"] ] :] ->
         a
   in
   let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
@@ -220,22 +231,22 @@ value parse_formal_params strm =
 
 value parse_templ conf strm =
   let rec parse_astl astl bol len end_list strm =
-    match strm with parser
+    match strm with parser bp
     [ [: `'%' :] ->
         let astl = if len = 0 then astl else [Atext (buff_get len) :: astl] in
         match get_variable strm with
-        [ (("%" | "[" | "]" as c), []) ->
+        [ (_, ("%" | "[" | "]" as c), []) ->
             parse_astl [Atext c :: astl] False 0 end_list strm
-        | (v, []) when List.mem v end_list -> (List.rev astl, v)
-        | ("define", []) -> parse_define astl end_list strm
+        | (_, v, []) when List.mem v end_list -> (List.rev astl, v)
+        | (_, "define", []) -> parse_define astl end_list strm
         | x ->
             let ast =
               match x with
-              [ ("if", []) -> parse_if strm
-              | ("foreach", []) -> parse_foreach strm
-              | ("apply", []) -> parse_apply strm
-              | ("wid_hei", []) -> Awid_hei (get_value 0 strm)
-              | (v, vl) -> Avar v vl ]
+              [ (_, "if", []) -> parse_if strm
+              | (_, "foreach", []) -> parse_foreach strm
+              | (_, "apply", []) -> parse_apply strm
+              | (_, "wid_hei", []) -> Awid_hei (get_value 0 strm)
+              | ((_, ep), v, vl) -> Avar (bp, ep) v vl ]
             in
             parse_astl [ast :: astl] False 0 end_list strm ]
     | [: `'[' :] ->
@@ -298,9 +309,9 @@ value parse_templ conf strm =
     in
     Aif e al1 al2
   and parse_foreach strm =
-    let (v, vl) = get_variable strm in
+    let (loc, v, vl) = get_variable strm in
     let (astl, _) = parse_astl [] False 0 ["end"] strm in
-    Aforeach v vl astl
+    Aforeach (loc, v, vl) astl
   in
   fst (parse_astl [] True 0 [] strm)
 ;
@@ -332,10 +343,10 @@ value strip_newlines_after_variables =
         in
         [Atext s :: loop astl]
     | [Aif s alt ale :: astl] -> [Aif s (loop alt) (loop ale) :: loop astl]
-    | [Aforeach s sl al :: astl] -> [Aforeach s sl (loop al) :: loop astl]
+    | [Aforeach v al :: astl] -> [Aforeach v (loop al) :: loop astl]
     | [Adefine f x al alk :: astl] ->
         [Adefine f x (loop al) (loop alk) :: loop astl]
-    | [(Avar _ _ | Aapply _ _ as ast) :: astl] -> [ast :: loop astl]
+    | [(Avar _ _ _ | Aapply _ _ as ast) :: astl] -> [ast :: loop astl]
     | [(Atransl _ _ _ | Awid_hei _ as ast1); ast2 :: astl] ->
         [ast1; ast2 :: loop astl]
     | [ast] -> [ast]
@@ -406,11 +417,12 @@ value subst_text x v s =
 value rec subst sf =
   fun
   [ Atext s -> Atext (sf s)
-  | Avar s sl -> Avar (sf s) (List.map sf sl)
+  | Avar loc s sl -> Avar loc (sf s) (List.map sf sl)
   | Atransl b s c -> Atransl b (sf s) c
   | Awid_hei s -> Awid_hei (sf s)
   | Aif e alt ale -> Aif (subste sf e) (substl sf alt) (substl sf ale)
-  | Aforeach s sl al -> Aforeach (sf s) (List.map sf sl) (substl sf al)
+  | Aforeach (loc, s, sl) al ->
+      Aforeach (loc, sf s, List.map sf sl) (substl sf al)
   | Adefine f xl al alk ->
       Adefine (sf f) (List.map sf xl) (substl sf al) (substl sf alk)
   | Aapply f el -> Aapply (sf f) (substel sf el) ]
@@ -423,7 +435,7 @@ and subste sf =
   | Enot e -> Enot (subste sf e)
   | Estr s -> Estr (sf s)
   | Eint s -> Eint s
-  | Evar s sl -> Evar (sf s) (List.map sf sl)
+  | Evar loc s sl -> Evar loc (sf s) (List.map sf sl)
   | Etransl upp s c -> Etransl upp s c ]
 and substel sf el = List.map (subste sf) el;
 
@@ -470,7 +482,7 @@ value eval_variable conf =
 value eval_ast conf =
   fun
   [ Atext s -> s
-  | Avar s [] ->
+  | Avar _ s [] ->
       try eval_variable conf s with
       [ Not_found -> " %%" ^ s ^ "?" ]
   | x -> not_impl "eval_ast" x ]
@@ -619,9 +631,9 @@ value eval_bool_expr conf eval_var =
         | "!=" -> string_eval e1 <> string_eval e2
         | _ -> do { Wserver.wprint "op %s???" op; False } ]
     | Enot e -> not (bool_eval e)
-    | Evar s sl ->
+    | Evar loc s sl ->
         try
-          match eval_var [s :: sl] with
+          match eval_var loc [s :: sl] with
           [ VVbool x -> x
           | VVstring "" -> False
           | VVstring _ -> True ]
@@ -640,9 +652,9 @@ value eval_bool_expr conf eval_var =
     fun
     [ Estr s -> s
     | Eint s -> s
-    | Evar s sl ->
+    | Evar loc s sl ->
         try
-          match eval_var [s :: sl] with
+          match eval_var loc [s :: sl] with
           [ VVbool True -> "1"
           | VVbool False -> "0"
           | VVstring s -> s ]
@@ -663,9 +675,9 @@ value eval_bool_expr conf eval_var =
 value eval_expr conf eval_var =
   fun
   [ Estr s -> s
-  | Evar s sl ->
+  | Evar loc s sl ->
       try
-        match eval_var [s :: sl] with
+        match eval_var loc [s :: sl] with
         [ VVstring s -> s
         | VVbool True -> "1"
         | VVbool False -> "0" ]
