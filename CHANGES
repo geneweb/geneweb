@@ -45,7 +45,7 @@ GeneWeb version 3.02
     "add spouses" did not work. Fixed.
 
 * GeneWeb compiler (gwc)
-  - [Jan 15, 00] Fixed bug: did not recognize forster parents
+  - [Jan 15, 00] Fixed bug: did not recognize foster parents
 
 * GeneWeb uncompiler (gwu)
   - [Jan 15, 00] Fixed small bug: used to save notes for relations even
