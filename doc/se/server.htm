@@ -60,12 +60,41 @@ nummer med kommandot "ps" och d&ouml;da den med kommandot "kill". </UL>
 
 <UL>
 
-<LI>Om du k&ouml;r Windows NT, m&aring;ste du installera "gwd" i "service". Be din
-systemadministrat&ouml;r om det.
+<LI>Om du k&ouml;r Windows NT, m&aring;ste du installera "gwd" som en "service" genom att använda programmet "srvany.exe", du måste vara inloggad som
+Administrator. Från Windows NT Ressource Kit behöver du: "srvany.exe",
+"instsrv.exe", kanske "srvinstw.exe" och "delsrv.exe" också. Kopiera först
+"srvany.exe" till en katalog på din dator (t.ex. C:\GeneWeb) och installera
+det som en "service" (ett trevligare verktyg för det, är det grafiska
+programmet "srvinstw.exe"):
 
-</UL>
+<PRE>
+     instsrv GeneWebServer c:\GeneWeb\srvany.exe
+</PRE>
 
-<HR>
+
+I "Services" i "Control Panel", klicka "GeneWebServer" och klicka sedan
+"Startup" för att välja "Automatic" eller "Manual". I "Log On As" rutan,
+välj kontot där servicen ska starta, fylla i det rätta passordet (detta
+måste göras för att komma åt nätverket). <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> kommer att starta genom att specifiera de följande register värdena
+med "regedt32":
+
+<PRE>
+1. Under HKLM\System\CurrentControlSet\Services\GeneWebServer skapa
+   en nytt värde "Parameters"
+   
+2. Skapa där två nya Värden (skriv REG_SZ) Application and AppDirectory, t.ex.
+   Application: REG_SZ: C:\GeneWeb\gw\gwd.exe
+   AppDirectory: REG_SZ: C:\GeneWeb\gw
+</PRE>
+
+Nu kan du kontrollera <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> servicen
+i "Control Panel" -> "Services" -> "GeneWebServer" "Startup"/"Stop" eller genom
+att skriva "net start GeneWebServer" eller "net stop GeneWebServer" vid
+kommando prompten. För att ta bort GeneWebServer, stoppa den och skriv
+"delsrv GeneWebServer" eller "instsrv GeneWebServer remove".
+</ul>
+
+<hr>
 <H3><font color=#2f6400>Installation i "CGI" </font></H3>
 
 <P>I denna mod m&aring;ste en webbserver k&ouml;ras p&aring; din dator. "CGI"s &auml;r program som
