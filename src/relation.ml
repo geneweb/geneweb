@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.6 1999-11-23 12:25:09 ddr Exp $ *)
+(* $Id: relation.ml,v 3.7 1999-11-25 10:36:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -226,6 +226,7 @@ value print_relation_path_list conf base path =
 
 value print_relation_path_table_seprow conf base path i width =
   tag "tr" begin
+    Wserver.wprint "<td align=center width=30>&nbsp;</td>\n";
     for j = 0 to width do
       let (next_is_sibling, ip, iq) =
         try
@@ -240,72 +241,62 @@ value print_relation_path_table_seprow conf base path i width =
         [ Not_found -> (False, None, None) ]
       in
       if next_is_sibling then
-        tag "td" "align=center colspan=3" begin
-          match (ip, iq) with
-          [ (Some ip, Some iq) ->
-              let a = aoi base ip in
-              let b = aoi base iq in
-              match (a.parents, b.parents) with
-              [ (Some ifa, Some ifb) ->
-                  let ca = coi base ifa in
-                  let cb = coi base ifb in
-                  if ca.father = cb.father && ca.mother = cb.mother then
-                    let p = poi base ca.father in
-                    let q = poi base ca.mother in
-                    do afficher_personne_referencee conf base p;
-                       Wserver.wprint " &amp; ";
-                       afficher_personne_referencee conf base q;
-                    return ()
-                  else if ca.father = cb.father then
-                    let p = poi base ca.father in
-                    afficher_personne_referencee conf base p
-                  else
-                    let q = poi base ca.mother in
-                    afficher_personne_referencee conf base q
-              | (_, _) -> Wserver.wprint "[siblings, adoption]" ]
-          | (_, _) -> () ];
-        end
+        do Wserver.wprint "<td align=center>&nbsp;</td>\n";
+           tag "td align=center colspan=3" begin
+             match (ip, iq) with
+             [ (Some ip, Some iq) ->
+                 let a = aoi base ip in
+                 let b = aoi base iq in
+                 match (a.parents, b.parents) with
+                 [ (Some ifa, Some ifb) ->
+                     let ca = coi base ifa in
+                     let cb = coi base ifb in
+                     if ca.father = cb.father && ca.mother = cb.mother then
+                       let p = poi base ca.father in
+                       let q = poi base ca.mother in
+                       do afficher_personne_referencee conf base p;
+                          Wserver.wprint " &amp; ";
+                          afficher_personne_referencee conf base q;
+                       return ()
+                     else if ca.father = cb.father then
+                       let p = poi base ca.father in
+                       afficher_personne_referencee conf base p
+                     else
+                       let q = poi base ca.mother in
+                       afficher_personne_referencee conf base q
+                 | (_, _) -> Wserver.wprint "[siblings, adoption]" ]
+             | (_, _) -> () ];
+           end;
+        return ()
       else
-        let prev_is_sibling =
-          try
-            let (_, fl, _, _) =
-              List.find (fun (_, _, nx, ny) -> nx == j && ny == i) path
-            in
-            fl == Sibling || fl == HalfSibling
-          with
-          [ Not_found -> False ]
-        in
-        if prev_is_sibling then
-          if j == width then ()
-          else Wserver.wprint "<td>&nbsp;</td>\n"
-        else
-          do tag "td" "align=center" begin
-               let child =
-                 try
-                   let (_, fl, _, _) =
-                     List.find (fun (_, _, nx, ny) -> nx == j && ny == i)
-                       path
-                   in
-                   fl == Child
-                 with
-                 [ Not_found -> False ]
-               in
-               let parent =
-                 try
-                   let (_, fl, _, _) =
-                     List.find
-                       (fun (_, _, nx, ny) -> nx == j && ny == pred i) path
-                   in
-                   fl == Parent
-                 with
-                 [ Not_found -> False ]
-               in
-               if child || parent then Wserver.wprint "|"
-               else Wserver.wprint "&nbsp;";
-             end;
-             if j == width then ()
-             else Wserver.wprint "<td>&nbsp;</td>\n";
-          return ();
+        do tag "td" "align=center width=20" begin
+             let child =
+               try
+                 let (_, fl, _, _) =
+                   List.find (fun (_, _, nx, ny) -> nx == j && ny == i) path
+                 in
+                 fl == Child
+               with
+               [ Not_found -> False ]
+             in
+             let parent =
+               try
+                 let (_, fl, _, _) =
+                   List.find (fun (_, _, nx, ny) -> nx == j && ny == pred i)
+                     path
+                 in
+                 fl == Parent
+               with
+               [ Not_found -> False ]
+             in
+             if child || parent then Wserver.wprint "|"
+             else Wserver.wprint "&nbsp;";
+           end;
+           if j == width then
+             Wserver.wprint "<td align=center width=30>&nbsp;</td>\n"
+           else
+             Wserver.wprint "<td colspan=3 align=center>&nbsp;</td>\n";
+        return ();
     done;
   end
 ;
@@ -324,7 +315,7 @@ value print_relation_path_table_mainrow conf base path i width =
                if fl == Mate then Wserver.wprint "&amp;"
                else Wserver.wprint "&nbsp;";
              end;
-           tag "td" "align=center" begin  
+           tag "td" "colspan=3 align=center" begin
              afficher_personne_referencee conf base p;
              Date.afficher_dates_courtes conf base p;
              Wserver.wprint "\n";
@@ -334,7 +325,7 @@ value print_relation_path_table_mainrow conf base path i width =
       [ Not_found ->
           do if j == 0 then ()
              else Wserver.wprint "<td align=center>&nbsp;</td>\n";
-             Wserver.wprint "<td align=center>&nbsp;</td>\n";
+             Wserver.wprint "<td colspan=3 align=center>&nbsp;</td>\n";
           return () ];
     done;
   end
