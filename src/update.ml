@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.0 2001-03-16 19:35:04 ddr Exp $ *)
+(* $Id: update.ml,v 4.1 2001-04-03 20:21:48 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -39,25 +39,9 @@ value infer_death conf birth =
 ;
 
 value print_same_name conf base p =
-  let f = p_first_name base p in
-  let s = p_surname base p in
-  let ipl = Gutil.person_ht_find_all base (f ^ " " ^ s) in
-  let f = Name.strip_lower f in
-  let s = Name.strip_lower s in
-  let pl =
-    List.fold_left
-      (fun pl ip ->
-         let p = poi base ip in
-         if Name.strip_lower (p_first_name base p) = f
-         && Name.strip_lower (p_surname base p) = s then
-           [p :: pl]
-         else pl)
-      [] ipl
-  in
-  let pl = Sort.list (fun p1 p2 -> p1.occ < p2.occ) pl in
-  match pl with
+  match Gutil.find_same_name base p with
   [ [_] -> ()
-  | _ ->
+  | pl ->
       do html_p conf;
          Wserver.wprint "%s:\n"
            (capitale (transl conf "persons having the same name"));

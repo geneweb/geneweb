@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.2 2001-03-18 18:07:22 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.3 2001-04-03 20:21:48 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -507,14 +507,18 @@ value print conf base =
     | None -> None  ]
   in
   let p2 =
-    match (p_getenv conf.env "n", p_getint conf.env "i2") with
-    [ (Some n, _) ->
-        let ipl = Gutil.person_ht_find_all base n in
-        match ipl with
-        [ [ip2] -> Some (poi base ip2)
-        | _ -> None ]
-    | (_, Some i2) -> Some (base.data.persons.get i2)
-    | _ -> None ]
+    match p_getint conf.env "i2" with
+    [ Some i2 -> Some (base.data.persons.get i2)
+    | None ->
+        match (p_getenv conf.env "select", p_getenv conf.env "n") with
+        [ (Some "input", Some n) ->
+            let ipl = Gutil.person_ht_find_all base n in
+            match ipl with
+            [ [ip2] -> Some (poi base ip2)
+            | _ -> None ]
+        | (Some x, Some "" | None) ->
+            Some (base.data.persons.get (int_of_string x))
+        | _ -> None ] ]
   in
   match (p1, p2) with
   [ (Some p1, Some p2) ->
