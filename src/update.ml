@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.16 2001-12-20 19:58:17 ddr Exp $ *)
+(* $Id: update.ml,v 4.17 2002-01-15 16:48:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -207,7 +207,7 @@ value print_warning conf base =
              print_someone_strong conf base p;
              Date.afficher_dates_courtes conf base p
            })
-  | IncoherentSex p ->
+  | IncoherentSex p _ _ ->
       Wserver.wprint
         (fcapitale
            (ftransl conf "%t's sex is not coherent with his/her relations"))

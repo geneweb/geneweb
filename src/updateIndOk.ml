@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.5 2001-12-01 11:59:34 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.6 2002-01-15 16:48:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -608,12 +608,12 @@ value relation_sex_is_coherent base warning p =
          match r.r_fath with
          [ Some ip ->
              let p = poi base ip in
-             if p.sex <> Male then warning (IncoherentSex p) else ()
+             if p.sex <> Male then warning (IncoherentSex p 0 0) else ()
          | None -> () ];
          match r.r_moth with
          [ Some ip ->
              let p = poi base ip in
-             if p.sex <> Female then warning (IncoherentSex p) else ()
+             if p.sex <> Female then warning (IncoherentSex p 0 0) else ()
          | None -> () ];
        })
     p.rparents

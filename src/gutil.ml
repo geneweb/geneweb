@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.5 2002-01-10 20:01:08 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.6 2002-01-15 16:48:25 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -453,7 +453,7 @@ type base_error = error person;
 
 type warning 'person =
   [ BirthAfterDeath of 'person
-  | IncoherentSex of 'person
+  | IncoherentSex of 'person and int and int
   | ChangedOrderOfChildren of ifam and descend and array iper
   | ChildrenNotInOrder of ifam and descend and 'person and 'person
   | DeadTooEarlyToBeFather of 'person and 'person
@@ -652,6 +652,61 @@ value titles_after_birth base warning p t =
   }
 ;
 
+value try_to_fix_relation_sex base warning p_ref =
+  do {
+    let p_index = Some p_ref.cle_index in
+    let fixed = ref 0 in
+    let not_fixed = ref 0 in
+    List.iter
+      (fun ip ->
+        let p = poi base ip in
+        List.iter
+          (fun rel ->
+             match (p_index = rel.r_fath, p_index = rel.r_moth) with
+             [ (True, False) ->
+                 if p_ref.sex = Female then
+                   match rel.r_moth with
+                   [ Some ip ->
+                       let oth_p = poi base ip in
+                       if oth_p.sex = Male then do {
+                         rel.r_fath := rel.r_moth;
+                         rel.r_moth := p_index;
+                         incr fixed;
+                       }
+                       else incr not_fixed
+                   | None ->
+                       do {
+                         rel.r_fath := None;
+                         rel.r_moth := p_index;
+                         incr fixed;
+                       } ]
+                 else ()
+             | (False, True) ->
+                 if p_ref.sex = Male then
+                   match rel.r_fath with
+                   [ Some ip ->
+                       let oth_p = poi base ip in
+                       if oth_p.sex = Female then do {
+                         rel.r_moth := rel.r_fath;
+                         rel.r_fath := p_index;
+                         incr fixed;
+                       }
+                       else incr not_fixed
+                   | None ->
+                       do {
+                         rel.r_moth := None;
+                         rel.r_fath := p_index;
+                         incr fixed;
+                       } ]
+                  else ()
+              | (False, False) -> ()
+              | (True, True) -> incr not_fixed ])
+          p.rparents)
+      p_ref.related;
+    warning (IncoherentSex p_ref fixed.val not_fixed.val);
+  }
+;
+
 value related_sex_is_coherent base warning p_ref =
   let p_index = Some p_ref.cle_index in
   let merge_sex g1 g2 =
@@ -678,7 +733,7 @@ value related_sex_is_coherent base warning p_ref =
   in
   match new_sex with
   [ Some g -> if p_ref.sex != g then p_ref.sex := g else ()
-  | None -> warning (IncoherentSex p_ref) ]
+  | None -> try_to_fix_relation_sex base warning p_ref ]
 ;
 
 value check_normal_marriage_date_for_someone base error warning fam ip =

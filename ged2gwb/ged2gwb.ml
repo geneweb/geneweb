@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.19 2002-01-14 11:49:21 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.20 2002-01-15 16:48:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1854,9 +1854,19 @@ value print_base_warning base =
   [ BirthAfterDeath p ->
       fprintf log_oc.val "%s\n  born after his/her death\n"
         (denomination base p)
-  | IncoherentSex p ->
-      printf "%s\n  sex not coherent with relations\n"
-        (denomination base p)
+  | IncoherentSex p fixed not_fixed ->
+      do {
+        fprintf log_oc.val "%s\n  sex not coherent with relations"
+          (denomination base p);
+        if fixed > 0 then
+          if not_fixed > 0 then
+            fprintf log_oc.val " (fixed in %d of the %d cases)"
+              fixed (fixed + not_fixed)
+          else
+            fprintf log_oc.val " (fixed)"
+        else ();
+        fprintf log_oc.val "\n";
+      }
   | ChangedOrderOfChildren ifam des _ ->
       let cpl = coi base ifam in
       fprintf log_oc.val "Changed order of children of %s and %s\n"
