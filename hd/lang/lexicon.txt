@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.176 2004-01-05 14:38:07 ddr Exp $
+# $Id: lexicon.txt,v 4.177 2004-01-05 17:18:22 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -410,10 +410,10 @@ eo: 1an de %m %y/%da de %m %y/%m %y/%y
 es: 1 de %m %y/%d de %m %y/%m %y/%y
 et: 1. %m %y/%d. %m %y/%m %y/%y
 fi: 1. %mta %y/%d. %mta %y/%mssa %y/%y
-fr: 1er %m %y/%d %m %y/%m %y/%y
+fr: 1<sup>er</sup> %m %y/%d %m %y/%m %y/%y
 he: 1 %m %y/%d %m %y/%m %y/%y
 is: 1 %m %y/%d %m %y/%m %y/%y
-it: 1o %m %y/%d %m %y/%m %y/%y
+it: 1<sup>o</sup> %m %y/%d %m %y/%m %y/%y
 lv: 1. %m %y/%y.gada %d.%m/%y %m/%y
 nl: 1 %m %y/%d %m %y/%m %y/%y
 no: 1. %m %y/%d. %m %y/%m %y/%y
