@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.50 1999-09-28 09:48:15 ddr Exp $ *)
+(* $Id: util.ml,v 2.51 1999-10-18 19:31:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -965,19 +965,38 @@ value image_size fname =
   | None -> None ]
 ;
 
+value up_fname conf =
+  let s = Wserver.extract_param "accept: " '\n' conf.request in
+  let list =
+    let insert ibeg i list =
+      if i = ibeg then list
+      else
+        let s = strip_spaces (String.sub s ibeg (i - ibeg)) in
+        if s <> "" then [String.lowercase s :: list] else list
+    in
+    loop [] 0 0 where rec loop list ibeg i =
+      if i = String.length s then insert ibeg i list
+      else if s.[i] = ',' then loop (insert ibeg i list) (i + 1) (i + 1)
+      else loop list ibeg (i + 1)
+  in
+  if List.mem "image/png" list then "up.png" else "up.jpg"
+;
+
 value print_link_to_welcome conf right_aligned =
   if conf.cancel_links then ()
   else
+    let fname = up_fname conf in
     let dir = if conf.is_rtl then "left" else "right" in
     let wid_hei =
-      match image_size (image_file_name conf.bname "up.jpg") with
+      match image_size (image_file_name conf.bname fname) with
       [ Some (wid, hei) ->
           " width=" ^ string_of_int wid ^ " height=" ^ string_of_int hei
       | None -> "" ]
     in
     do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-       Wserver.wprint "<img src=\"%sm=IM;v=/up.jpg\"%s alt=\"^^\"%s>"
-         (commd conf) wid_hei (if right_aligned then " align=" ^ dir else "");
+       Wserver.wprint "<img src=\"%sm=IM;v=/%s\"%s alt=\"^^\"%s>"
+         (commd conf) fname wid_hei
+         (if right_aligned then " align=" ^ dir else "");
        Wserver.wprint "</a>\n";
     return ()
 ;
