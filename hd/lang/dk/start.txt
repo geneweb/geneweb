@@ -164,7 +164,7 @@ søgning</b></font></a>.
 <li><a href="%sm=LD;k=10">seneste d&oslash;dsfald</a>%x%j
 <li><a href="%sm=HIST;k=10">opdateringers historie</a>%j
 <li><a href="%sm=CAL">kalendere</a>
-<li><a href="%sm=FORUM">databasen forum</a>
+<li><a href="%sm=FORUM">database-forum</a>
 </ul>
 </td>
 </tr>

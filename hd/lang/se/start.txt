@@ -164,7 +164,7 @@ s&ouml;kning</b></font></a>.
 <li>de <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>%x%j
 <li><a href="%sm=HIST;k=10">uppdateringarnas historia</a>%j
 <li><a href="%sm=CAL">kalender</a>
-<li><a href="%sm=FORUM">databasen forum</a>
+<li><a href="%sm=FORUM">databas forum</a>
 </ul>
 </td>
 </tr>
