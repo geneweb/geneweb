@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.74 2001-01-29 16:57:24 ddr Exp $ *)
+(* $Id: perso.ml,v 3.75 2001-02-02 09:47:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1115,6 +1115,10 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
       [ Erel {r_fath = Some _} -> True
       | _ -> False ]
   | "has_relations" -> p_auth && (p.rparents <> [] || p.related <> [])
+  | "has_siblings" ->
+      match a.parents with
+      [ Some ifam -> Array.length (doi base ifam).children > 1
+      | None -> False ]
   | "has_sosa" ->
       match get_env "sosa" env with
       [ Esosa x -> Lazy.force x <> None

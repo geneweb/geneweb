@@ -55,6 +55,7 @@ GeneWeb version 3.11
     users are mistaken by thinking it was "add a child in a family".
 
 * Template (etc/perso.txt)
+  - [02 Feb 01] Added boolean value "has_siblings".
   - [20 Jan 01] In personal page template file (etc/perso.txt), the macro
     "%nobility_titles;" has been decomposed into "%foreach;nobility_title;"
     and "%nobility_title;", allowing to display the nobility titles
