@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.80 2003-12-23 11:56:05 ddr Exp $ *)
+(* $Id: util.ml,v 4.81 2004-01-08 11:56:07 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -138,7 +138,7 @@ value plus_decl s =
   | None -> None ]
 ;
 
-value gen_decline conf wt s =
+value gen_decline wt s =
   let s1 = if s = "" then "" else " " ^ s in
   let len = String.length wt in
   if rindex wt '/' <> None then
@@ -156,7 +156,7 @@ value gen_decline conf wt s =
     | _ -> wt ^ decline 'n' s1 ]
 ;
 
-value transl_decline conf w s = gen_decline conf (transl conf w) s;
+value transl_decline conf w s = gen_decline (transl conf w) s;
 
 value gen_decline2 wt s1 s2 =
   let string_of =
@@ -257,7 +257,7 @@ value ftransl_nth conf s p =
 ;
 
 value fdecline conf w s =
-  valid_format w (gen_decline conf (Obj.magic w : string) s)
+  valid_format w (gen_decline (Obj.magic w : string) s)
 ;
 
 (* *)

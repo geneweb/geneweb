@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.19 2003-09-25 11:23:02 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.20 2004-01-08 11:56:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -335,9 +335,13 @@ value src_translate conf base nomin strm =
   let c = Stream.next strm in
   if c = '\n' then
     let s =
-      loop 0 (Stream.next strm) where rec loop len c =
-        if c = ']' then Lbuff.get len
-        else loop (Lbuff.store len c) (Stream.next strm)
+      loop 0 0 (Stream.next strm) where rec loop lev len =
+        fun
+        [ '[' -> loop (lev + 1) (Lbuff.store len '[') (Stream.next strm)
+        | ']' ->
+	    if lev = 0 then Lbuff.get len
+	    else loop (lev - 1) (Lbuff.store len ']') (Stream.next strm)
+        | c -> loop lev (Lbuff.store len c) (Stream.next strm) ]
     in
     Translate.inline conf.lang '%' (macro conf base) s
   else lexicon_translate conf base nomin strm c
