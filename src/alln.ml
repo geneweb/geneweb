@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 2.8 1999-07-22 19:47:20 ddr Exp $ *)
+(* $Id: alln.ml,v 2.9 1999-09-29 04:53:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -242,26 +242,32 @@ value select_names conf base is_surnames ini =
         String.sub ini 0 (String.length ini - 1)
       else ini
     in
-    loop (iii.cursor (String.capitalize start_k)) [] where rec loop istr list =
-      let s = nominative (sou base istr) in
-      let k = Iobase.name_key s in
-      if string_start_with ini k then
-        let list =
-          if s <> "?" then
-            let cnt = List.length (iii.find istr) in
-            if cnt = 0 then list
-            else
-              match list with
-               [ [(k1, s1, cnt1) :: list1] ->
-                   if k = k1 then [(k1, s1, cnt1 + cnt) :: list1]
-                   else [(k, s, cnt) :: list]
-               | [] -> [(k, s, cnt)] ]
+    match
+      try Some (iii.cursor (String.capitalize start_k)) with
+      [ Not_found -> None ]
+    with
+    [ Some istr ->
+        loop istr [] where rec loop istr list =
+          let s = nominative (sou base istr) in
+          let k = Iobase.name_key s in
+          if string_start_with ini k then
+            let list =
+              if s <> "?" then
+                let cnt = List.length (iii.find istr) in
+                if cnt = 0 then list
+                else
+                  match list with
+                   [ [(k1, s1, cnt1) :: list1] ->
+                       if k = k1 then [(k1, s1, cnt1 + cnt) :: list1]
+                       else [(k, s, cnt) :: list]
+                   | [] -> [(k, s, cnt)] ]
+              else list
+            in
+            match try Some (iii.next istr) with [ Not_found -> None ] with
+            [ Some istr -> loop istr list
+            | None -> list ]
           else list
-        in
-        match try Some (iii.next istr) with [ Not_found -> None ] with
-        [ Some istr -> loop istr list
-        | None -> list ]
-      else list
+    | None -> [] ]
   in
   (List.rev list, True)
 ;

@@ -9,6 +9,8 @@ GeneWeb Version 2.07
     in the form, but present in the file.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Sep 29, 99] Errorred when clicking on surnames by alphabetic order
+    on empty data bases. Fixed.
   - [Sep 28, 99] Forgot sharp (#) as possible character in URLs. Fixed.
   - [Sep 26, 99] Fixed bug of ordering persons by dates in "specify" page.
 
