@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.10 1998-12-19 13:15:58 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.11 1999-01-11 14:36:02 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -152,35 +152,33 @@ value gen_print_ext_items conf base item i_proj =
   in ()
 ;
 
-value cons_update verb name = capitale verb;
+value cons_insert conf name = capitale (transl_concat conf "insert" name);
 
 value print_nick_names conf base p =
   gen_print_ext_items conf base
     {i_name = "nickname"; i_txt_name = transl conf "qualifier";
-     i_txt_add = cons_update (transl conf "insert") (transl conf "qualifier")}
+     i_txt_add = cons_insert conf (transl conf "qualifier")}
     p.nick_names
 ;
 
 value print_aliases conf base p =
   gen_print_ext_items conf base
     {i_name = "alias"; i_txt_name = transl conf "alias";
-     i_txt_add = cons_update (transl conf "insert") (transl conf "alias")}
+     i_txt_add = cons_insert conf (transl conf "alias")}
     p.aliases
 ;
 
 value print_first_names_aliases conf base p =
   gen_print_ext_items conf base
     {i_name = "first_name_alias"; i_txt_name = transl conf "first name alias";
-     i_txt_add =
-       cons_update (transl conf "insert") (transl conf "first name alias")}
+     i_txt_add = cons_insert conf (transl conf "first name alias")}
     p.first_names_aliases
 ;
 
 value print_surnames_aliases conf base p =
   gen_print_ext_items conf base
     {i_name = "surname_alias"; i_txt_name = transl conf "surname alias";
-     i_txt_add =
-       cons_update (transl conf "insert") (transl conf "surname alias")}
+     i_txt_add = cons_insert conf (transl conf "surname alias")}
     p.surnames_aliases
 ;
 
@@ -326,9 +324,9 @@ value print_add_title conf base cnt =
   do tag "table" "border=1" begin
        tag "tr" begin
          tag "td" begin
-           Wserver.wprint "%s / %s <input type=checkbox name=add_title%d>"
-             (capitale (transl conf "insert"))
-             (capitale (transl_nth conf "title/titles" 0)) cnt;
+           let s = transl_nth conf "title/titles" 0 in
+           Wserver.wprint "%s <input type=checkbox name=add_title%d>"
+             (capitale (transl_concat conf "insert" s)) cnt;
          end;
        end;
      end;
@@ -612,12 +610,12 @@ value print_mod1 conf base p digest =
   let title _ =
     match p_getenv conf.env "m" with
     [ Some "MRG_MOD_IND_OK" ->
-        Wserver.wprint "%s / %s # %d" (capitale (transl conf "merge"))
-          (capitale (transl_nth conf "person/persons" 1))
+        let s = transl_nth conf "person/persons" 1 in
+        Wserver.wprint "%s # %d" (capitale (transl_concat conf "merge" s))
           (Adef.int_of_iper p.cle_index)
     | _ ->
-        Wserver.wprint "%s / %s # %d" (capitale (transl conf "modify"))
-          (capitale (transl_nth conf "person/persons" 0))
+        let s = transl_nth conf "person/persons" 0 in
+        Wserver.wprint "%s # %d" (capitale (transl_concat conf "modify" s))
           (Adef.int_of_iper p.cle_index) ]
   in
   do header conf title;
@@ -642,8 +640,8 @@ value print_mod1 conf base p digest =
 
 value print_add1 conf base p =
   let title _ =
-    Wserver.wprint "%s / %s" (capitale (transl conf "add"))
-      (capitale (transl_nth conf "person/persons" 0))
+    let s = transl_nth conf "person/persons" 0 in
+    Wserver.wprint "%s" (capitale (transl_concat conf "add" s))
   in
   do header conf title;
      Wserver.wprint "\n";
@@ -661,8 +659,8 @@ value print_add1 conf base p =
 
 value print_del1 conf base p =
   let title _ =
-    Wserver.wprint "%s / %s" (capitale (transl conf "delete"))
-      (capitale (transl_nth conf "person/persons" 0))
+    let s= transl_nth conf "person/persons" 0 in
+    Wserver.wprint "%s" (capitale (transl_concat conf "delete" s))
   in
   do header conf title;
      Wserver.wprint "\n";

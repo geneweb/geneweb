@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.10 1998-12-16 17:36:21 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.11 1999-01-11 14:35:53 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -446,7 +446,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
                     (capitale
                        (transl_nth conf "husband/wife" parent_name_index));
                 end;
-                Wserver.wprint " %s\n" (transl_nth conf "of" 0);
+                Wserver.wprint " %s\n" (transl_concat conf "of" "");
                 afficher_personne_titre conf base (poi base conj);
                 Date.afficher_dates_courtes conf base (poi base conj);
              return ()
@@ -470,8 +470,8 @@ value print_generation_missing_persons conf base title sp_incl gp =
            Wserver.wprint "%d" (Num.modl n2 10);
            Wserver.wprint " -\n";
            if sp_incl then
-             Wserver.wprint "%s %s " (capitale (transl conf "parents"))
-               (transl_nth conf "of" 0)
+             Wserver.wprint "%s %s" (capitale (transl conf "parents"))
+               (transl_concat conf "of" "")
            else ();
            afficher_personne_titre_referencee conf base p;
            Date.afficher_dates_courtes conf base p;
@@ -567,7 +567,7 @@ value print_missing_ancestors conf base v spouses_included p =
      Wserver.wprint ".\n";
      if not spouses_included then
        Wserver.wprint "<br>\n%s %s:\n" (capitale (transl conf "parents"))
-         (transl_nth conf "of" 0)
+         (transl_concat conf "of" "")
      else ();  
      mark.(Adef.int_of_iper p.cle_index) := Num.one;
      tag "ul" begin
@@ -656,12 +656,12 @@ value print_missing_type conf =
   | A_surname_of_husband_of x ->
       Wserver.wprint "%s %s %s %s"
         (transl_nth conf "surname/surnames" 0)
-        (transl_nth conf "of" 0)
+        (transl_concat conf "of" "")
         (transl_nth conf "his wife/her husband" 1) x
   | A_surname_of_wife_of x ->
       Wserver.wprint "%s %s %s %s"
         (transl_nth conf "surname/surnames" 0)
-        (transl_nth conf "of" 0)
+        (transl_concat conf "of" "")
         (transl_nth conf "his wife/her husband" 0) x
   | A_husband_of ->
       Wserver.wprint "%s" (transl_nth conf "husband/wife" 0) 
@@ -840,7 +840,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
         Wserver.wprint ".\n";
         if not spouses_included then
           Wserver.wprint "<br>\n%s %s:\n" (capitale (transl conf "parents"))
-            (transl_nth conf "of" 0)
+            (transl_concat conf "of" "")
         else ();  
         tag "ul" begin
           let _ = List.fold_left

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 1.6 1998-12-16 17:36:35 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 1.7 1999-01-11 14:35:57 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -73,8 +73,8 @@ value reconstitute conf base p1 p2 =
 
 value print_merge1 conf base p p2 digest =
   let title _ =
-    Wserver.wprint "%s / %s # %d" (capitale (transl conf "merge"))
-      (capitale (transl_nth conf "person/persons" 0))
+    let s = transl_nth conf "person/persons" 0 in
+    Wserver.wprint "%s # %d" (capitale (transl_concat conf "merge" s))
       (Adef.int_of_iper p.cle_index)
   in
   do header conf title;

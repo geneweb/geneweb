@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 1.4 1998-12-16 17:36:35 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 1.5 1999-01-11 14:35:57 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -129,8 +129,8 @@ value print_differences conf base branches p1 p2 =
 
 value merge_ind conf base branches p1 p2 =
   let title h =
-    Wserver.wprint "%s / %s" (capitale (transl conf "merge"))
-      (capitale (transl_nth conf "person/persons" 1))
+    let s = transl_nth conf "person/persons" 1 in
+    Wserver.wprint "%s" (capitale (transl_concat conf "merge" s))
   in
   do header conf title;
      if branches <> [] then
@@ -182,8 +182,8 @@ value merge_ind conf base branches p1 p2 =
 
 value merge_fam_first conf base branches fam1 fam2 p1 p2 =
   let title h =
-    Wserver.wprint "%s / %s" (capitale (transl conf "merge"))
-      (capitale (transl_nth conf "family/families" 1))
+    let s = transl_nth conf "family/families" 1 in
+    Wserver.wprint "%s" (capitale (transl_concat conf "merge" s))
   in
   do header conf title;
      Wserver.wprint "%s:\n"

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.21 1999-01-09 09:21:09 ddr Exp $ *)
+(* $Id: util.ml,v 1.22 1999-01-11 14:36:02 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -437,11 +437,36 @@ value transl_nth conf w n =
   [ Not_found -> "[" ^ nth_field w n ^ "]" ]
 ;
 
+value accusative conf s =
+  try
+    let a = Hashtbl.find conf.lexicon " +acc" in
+    let (start, dest) =
+      let i = String.index a '=' in
+      (String.sub a 0 i, String.sub a (i + 1) (String.length a - i - 1))
+    in
+    let (w1, ws) =
+      try
+        let i = String.index s ' ' in
+        (String.sub s 0 i, String.sub s i (String.length s - i))
+      with
+      [ Not_found -> (s, "") ]
+    in
+    if w1 = start then dest ^ ws
+    else if start = "" && dest.[0] = '+' then
+      w1 ^ String.sub dest 1 (String.length dest - 1) ^ ws
+    else s
+  with [ Not_found -> s ]
+;
+
 value transl_concat conf w s =
   let wt = transl conf w in
   if wt.[String.length wt - 1] = ''' then
     if String.length s > 0 && start_with_vowel s then nth_field wt 1 ^ s
     else nth_field wt 0 ^ " " ^ s
+  else if String.length wt > 6
+  && String.sub wt (String.length wt - 5) 5 = " +acc" then
+    String.sub wt 0 (String.length wt - 5) ^
+      (if s = "" then "" else " " ^ accusative conf s)
   else wt ^ " " ^ s
 ;
 
