@@ -1,4 +1,4 @@
-(* $Id: calendar.ml,v 3.2 2000-07-28 14:49:22 ddr Exp $ *)
+(* $Id: calendar.ml,v 3.3 2000-12-03 22:33:55 ddr Exp $ *)
 
 (* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/;
    converted his C program into this OCaml program.
@@ -339,6 +339,7 @@ value hebrew_of_sdn prec sdn =
       let (metonicCycle, metonicYear, day, halakim) =
         findTishriMolad inputDay
       in
+      let init_day = day in
       let tishri1 = fTishri1 metonicYear day halakim in
       if inputDay >= tishri1 then
         let year = metonicCycle * 19 + metonicYear + 1 in
@@ -387,7 +388,7 @@ value hebrew_of_sdn prec sdn =
                   else
                     let tishri1After = tishri1 in
                     let (metonicCycle, metonicYear, day, halakim) =
-                      findTishriMolad (day - 365)
+                      findTishriMolad (init_day - 365)
                     in
                     let tishri1 = fTishri1 metonicYear day halakim in
                     let (month, day) = glop inputDay tishri1 tishri1After in
@@ -407,7 +408,7 @@ value hebrew_of_sdn prec sdn =
                 else
                   let tishri1After = tishri1 in
                   let (metonicCycle, metonicYear, day, halakim) =
-                    findTishriMolad (day - 365)
+                    findTishriMolad (init_day - 365)
                   in
                   let tishri1 = fTishri1 metonicYear day halakim in
                   let (month, day) = glop inputDay tishri1 tishri1After in
