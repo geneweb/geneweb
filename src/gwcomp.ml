@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 3.17 2001-02-11 21:22:23 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.18 2001-02-12 12:53:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000l";
+value magic_gwo = "GnWo000m";
 
 type key =
   { pk_first_name : string;
@@ -18,7 +18,7 @@ type somebody =
 ;
 
 type syntax_o =
-  [ Family of gen_couple somebody and list (somebody * sex) and
+  [ Family of gen_couple somebody and sex and sex and list (somebody * sex) and
       gen_family (gen_person iper string) string and
       gen_descend (gen_person iper string)
   | Notes of key and string
@@ -771,7 +771,7 @@ value read_family ic fname =
              fam_index = Adef.ifam_of_int (-1)}
           in
           let deo = {children = Array.of_list cles_enfants} in
-          Some (Family co witn fo deo, read_line ic)
+          Some (Family co fath_sex moth_sex witn fo deo, read_line ic)
       | line ->
           let fo =
             {marriage = marriage; marriage_place = marr_place;
@@ -782,7 +782,7 @@ value read_family ic fname =
              fam_index = Adef.ifam_of_int (-1)}
           in
           let deo = {children = [||]} in
-          Some (Family co witn fo deo, line) ]
+          Some (Family co fath_sex moth_sex witn fo deo, line) ]
   | Some (str, ["notes"]) ->
       let notes = read_notes ic in
       Some (Bnotes notes, read_line ic)
