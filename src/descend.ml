@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.14 2002-03-11 19:02:57 ddr Exp $ *)
+(* $Id: descend.ml,v 4.15 2002-03-21 23:16:15 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -782,7 +782,7 @@ value print_ref conf base paths p =
 value print_elem conf base paths precision (n, pll) =
   do {
     html_li conf;
-    match pll with
+    match List.rev pll with
     [ [[p]] ->
         do {
           Wserver.wprint "<strong>%s %s %s</strong>" (surname_end n)
@@ -792,7 +792,7 @@ value print_elem conf base paths precision (n, pll) =
           print_ref conf base paths p;
           Wserver.wprint "\n"
         }
-    | _ ->
+    | pll ->
         do {
           Wserver.wprint "<strong>%s%s</strong>\n" (surname_end n)
             (surname_begin n);
@@ -850,7 +850,7 @@ value sort_and_display conf base paths precision list =
     List.fold_left
       (fun npll p ->
          match npll with
-         [ [(n, pl) :: npll] when n == p_surname base p ->
+         [ [(n, pl) :: npll] when n = p_surname base p ->
              [(n, [p :: pl]) :: npll]
          | _ -> [(p_surname base p, [p]) :: npll] ])
       [] list

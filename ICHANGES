@@ -4,6 +4,10 @@ Internal, very small, undocumented, or invisible changes
 GeneWeb Version 4.07
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [22 Mar 02] Fixed bug in the index of the descendants: they were no
+    more displayed by families.
+
 * General
   - [11 Mar 02] Big cleanup of the code, changing French named identifiers
     into English.
