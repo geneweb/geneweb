@@ -42,6 +42,8 @@ GeneWeb Version 3.03
     instead of / in year-month-day.
 
 * GeneWeb uncompiler (gwu)
+  - [19 Mar 00] Convert newlines into spaces for fields supposed not to
+    contain newlines (e.g. sources).
   - [27 Feb 00] Deleted backward compatibility giving "main title" according
     to the title name.
 

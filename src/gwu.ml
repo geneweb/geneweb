@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.8 2000-02-27 18:53:22 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.9 2000-03-19 16:28:12 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -79,7 +79,7 @@ value gen_correct_string no_colon s =
         loop (i + 1) (Buff.store (Buff.store len '_') s.[0])
       else
         match s.[i] with
-        [ ' ' -> loop (i + 1) (Buff.store len '_')
+        [ ' ' | '\n' -> loop (i + 1) (Buff.store len '_')
         | '_' | '\\' ->
             loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
         | ':' when no_colon ->
