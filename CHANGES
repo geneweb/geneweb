@@ -2,6 +2,7 @@ GeneWeb version 2.04
 --------------------
 
 * Setup program
+  - [Jun 28, 99] Fixed bug: did not work for directories holding spaces.
   - [Jun 19, 99] Changed GEDCOM import menu to reflect new option "-charset"
     of "ged2gwb" (see below in section "Gedcom to GeneWeb").
   - [Jun 18, 99] Added a color combination in the provided palette

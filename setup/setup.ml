@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.30 1999-06-07 18:59:37 ddr Exp $ *)
+(* $Id: setup.ml,v 1.31 1999-06-28 19:55:20 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -162,6 +162,11 @@ value numbered_key k =
     | _ -> None ]
 ;
 
+value stringify s =
+  try let _ = String.index s ' ' in "\"" ^ s ^ "\"" with
+  [ Not_found -> s ]
+;
+
 value parameters =
   loop "" where rec loop comm =
     fun
@@ -170,7 +175,7 @@ value parameters =
         let s = strip_spaces (decode_varenv s) in
         if k = "" || s = "" then loop comm env
         else if k = "opt" then loop comm env
-        else if k = "anon" then loop (comm ^ " " ^ s) env
+        else if k = "anon" then loop (comm ^ " " ^ stringify s) env
         else
           match numbered_key k with
           [ Some (k, '1') ->
