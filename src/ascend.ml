@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.1 2001-03-30 12:54:21 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.2 2001-03-30 19:43:36 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -582,8 +582,7 @@ value print_other_marriages conf base ws all_gp auth ifamo p u =
 ;
 
 value print_notes_ref conf base p wn n child_n =
-  let only = p_getenv conf.env "only" = Some "on" in
-  if not only && wn && age_autorise conf base p && person_has_notes base p then
+  if wn && age_autorise conf base p && person_has_notes base p then
     do Wserver.wprint "[%s "
          (capitale (transl_nth conf "note/notes" 0));
        stag "strong" begin
@@ -944,11 +943,12 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
      if only then ()
      else Wserver.wprint "%s.\n" (capitale (text_to conf niveau_max));
      mark.(Adef.int_of_iper p.cle_index) := Num.one;
-     let gpll = get_generations 1 [] [GP_person Num.one p.cle_index None] in
-     let gpll = List.rev gpll in
+     let gpll1 = get_generations 1 [] [GP_person Num.one p.cle_index None] in
+     let gpll = List.rev gpll1 in
      let all_gp = List.flatten gpll in
      do generation 1 all_gp gpll;
-        if not only && wn && has_notes conf base all_gp then
+        let all_gp = if only then List.hd gpll1 else all_gp in
+        if wn && has_notes conf base all_gp then
           do Wserver.wprint "<p><hr><p>\n";
              Wserver.wprint "<h3>%s</h3>\n"
                (capitale (nominative (transl_nth conf "note/notes" 1)));
