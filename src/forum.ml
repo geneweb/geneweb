@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.25 2003-01-18 08:24:59 ddr Exp $ *)
+(* $Id: forum.ml,v 4.26 2003-01-19 05:07:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -179,6 +179,7 @@ value print_headers conf =
               }
               else
                 let (time, s) = get_var ic "Time:" s in
+                let (_, s) = get_var ic "From:" s in
                 let (ident, s) = get_var ic "Ident:" s in
                 let (wizard, s) = get_var ic "Wizard:" s in
                 let (_, s) = get_var ic "Email:" s in
@@ -289,6 +290,7 @@ value get_message conf pos =
             seek_in ic (ic_len - pos);
             let s = input_line ic in
             let (time, s) = get_var ic "Time:" s in
+            let (_, s) = get_var ic "From:" s in
             let (ident, s) = get_var ic "Ident:" s in
             let (wizard, s) = get_var ic "Wizard:" s in
             let (email, s) = get_var ic "Email:" s in
@@ -546,6 +548,7 @@ value forum_add conf base ident comm =
           do {
             fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
               conf.today.year conf.today.month conf.today.day hh mm ss;
+            fprintf oc "From: %s\n" conf.from;
             fprintf oc "Ident: %s\n" ident;
             if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
             then
