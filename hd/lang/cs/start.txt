@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- copyright (c) INRIA -->
+  <title>Genealogy - %t</title>
+</head>
+<body%b>
+<h1>Genealogie</h1>
+
+%rversion
+
+<p>
+
+Databáze nyní obsahuje %n osob.
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
+Hledat: <input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+<ul>
+<li> <input type=radio name=t value=PN checked>
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%u
+[or] <em>Sosa number</em> vzta¾ené k %a%u.
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
+</ul>
+</form>
+
+<li>
+
+<FORM method=GET action="%f">
+%h<input type=hidden name=m value=TT>
+Podle titulu <INPUT NAME=t size=14 maxlength=200>
+místa <INPUT NAME=p size=25 maxlength=200> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li>
+
+<FORM method=GET action="%f">
+%hV¹echna
+<SELECT NAME=m>
+   <OPTION VALUE="N" SELECTED> pøíjmení
+   <OPTION VALUE="P"> køestní jména
+</SELECT>
+seøazená podle
+<SELECT NAME=tri>
+   <OPTION VALUE="A" SELECTED> abecedy
+   <OPTION VALUE="F"> èetnosti
+</SELECT> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+
+%w<li> <a href="%sm=ADD_FAM">Pøidat rodinu</a>.
+%w
+
+</ul>
+
+<a href="%sm=AN">výroèí narozenin</a>.<br>
+<a href="%sm=AD">výroèí úmrtí</a>.<br>
+<a href="%sm=AM">výroèí sòatkù</a>.<br>%x
+<a href="%sm=LB;k=10">nedávná narození</a>.<br>
+<a href="%sm=LD;k=10">nedávná úmrtí</a>.%x
+<p>
+%q pøístupù, z toho %c na tuto stránku, od %d.
+
+%y<p>
+
+<ul>
+<li> <a href="%sw=w"><em>Wizard</em></a> access (password).
+%y%z<li> <a href="%sw=f"><em>Friend</em></a> access (password).
+%z%y</ul>
+
+%y%i<p>
+<form method=get action="%f">
+%h<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+%i<p>
+
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>
