@@ -1,11 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.26 2001-12-31 15:12:36 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.27 2002-01-16 12:07:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
 open Util;
 open Config;
+open TemplAst;
 
 value bogus_family_index = Adef.ifam_of_int (-1);
 
@@ -33,28 +34,6 @@ value string_family_of base fam cpl des =
 ;
 
 (* Interpretation of template file 'updfam.txt' *)
-
-type ast =
-  Templ.ast ==
-    [ Atext of string
-    | Avar of string and list string
-    | Atransl of bool and string and string
-    | Awid_hei of string
-    | Aif of ast_expr and list ast and list ast
-    | Aforeach of string and list string and list ast
-    | Adefine of string and list string and list ast and list ast
-    | Aapply of string and list ast_expr ]
-and ast_expr =
-  Templ.ast_expr ==
-    [ Eor of ast_expr and ast_expr
-    | Eand of ast_expr and ast_expr
-    | Eop of string and ast_expr and ast_expr
-    | Enot of ast_expr
-    | Estr of string
-    | Eint of string
-    | Evar of string and list string
-    | Etransl of bool and string and string ]
-;
 
 type env = 
   [ Vstring of string
@@ -259,7 +238,7 @@ value eval_expr conf base env p =
   | Evar s [] ->
       try try_eval_gen_variable conf base env p s with
       [ Not_found -> ">" ^ s ^ "???" ]
-  | Etransl upp s c -> Templ.eval_transl conf base env upp s c
+  | Etransl upp s c -> Templ.eval_transl conf upp s c
   | _ -> ">parse_error" ]
 ;
 
@@ -323,7 +302,7 @@ value eval_bool_value conf base env fcd =
           | VVnone -> do { Wserver.wprint ">%%%s???" s; "" } ]
         with
         [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
-    | Etransl upp s c -> Templ.eval_transl conf base env upp s c
+    | Etransl upp s c -> Templ.eval_transl conf upp s c
     | x -> do { Wserver.wprint "val???"; "" } ]
   in
   bool_eval
@@ -355,8 +334,7 @@ value print_variable conf base env fcd sl =
 value rec print_ast conf base env fcd =
   fun
   [ Atext s -> Wserver.wprint "%s" s
-  | Atransl upp s n ->
-      Wserver.wprint "%s" (Templ.eval_transl conf base env upp s n)
+  | Atransl upp s n -> Wserver.wprint "%s" (Templ.eval_transl conf upp s n)
   | Avar s sl -> print_variable conf base env fcd [s :: sl]
   | Aif e alt ale -> print_if conf base env fcd e alt ale
   | Aforeach s sl al -> print_foreach conf base env fcd s sl al
@@ -442,7 +420,7 @@ value print_update_fam conf base fcd digest =
   [ Some
       ("ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "MOD_FAM" | "MOD_FAM_OK" |
        "MRG_FAM" | "MRG_FAM_OK" | "MRG_MOD_FAM_OK") ->
-      let astl = Templ.input conf base "updfam" in
+      let astl = Templ.input conf "updfam" in
       do { html_no_cache conf; interp_templ conf base fcd digest astl }
   | _ -> incorrect_request conf ]
 ;

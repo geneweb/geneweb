@@ -1,11 +1,12 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.25 2002-01-16 11:51:52 ddr Exp $ *)
+(* $Id: perso.ml,v 4.26 2002-01-16 12:07:20 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Gutil;
 open Util;
 open Config;
+open TemplAst;
 
 value max_im_wid = 240;
 value max_im_hei = 240;
@@ -247,28 +248,6 @@ value find_sosa conf base a =
 ;
 
 (* Interpretation of template file 'perso.txt' *)
-
-type ast =
-  Templ.ast ==
-    [ Atext of string
-    | Avar of string and list string
-    | Atransl of bool and string and string
-    | Awid_hei of string
-    | Aif of ast_expr and list ast and list ast
-    | Aforeach of string and list string and list ast
-    | Adefine of string and list string and list ast and list ast
-    | Aapply of string and list ast_expr ]
-and ast_expr =
-  Templ.ast_expr ==
-    [ Eor of ast_expr and ast_expr
-    | Eand of ast_expr and ast_expr
-    | Eop of string and ast_expr and ast_expr
-    | Enot of ast_expr
-    | Estr of string
-    | Eint of string
-    | Evar of string and list string
-    | Etransl of bool and string and string ]
-;
 
 type env =
   [ Vind of person and ascend and union
@@ -1191,7 +1170,7 @@ value eval_bool_value conf base env =
           | _ -> raise Not_found ]
         with
         [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
-    | Etransl upp s c -> Templ.eval_transl conf base env upp s c
+    | Etransl upp s c -> Templ.eval_transl conf upp s c
     | x -> do { Wserver.wprint "val???"; "" } ]
   in
   bool_eval
@@ -1484,7 +1463,7 @@ value interp_templ conf base p astl =
 (* Main *)
 
 value print_ok conf base p =
-  let astl = Templ.input conf base "perso" in
+  let astl = Templ.input conf "perso" in
   do {
     html conf;
     interp_templ conf base p astl
