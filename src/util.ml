@@ -1,10 +1,10 @@
-(* $Id: util.ml,v 1.7 1998-09-30 14:04:49 ddr Exp $ *)
+(* $Id: util.ml,v 1.8 1998-10-03 16:54:10 ddr Exp $ *)
 
 open Def;
 open Config;
 open Gutil;
 
-value version = "1.07";
+value version = "1.08";
 
 value lang_dir = ref ".";
 value base_dir = ref ".";
@@ -213,13 +213,11 @@ value afficher_nom_titre_reference conf base p s =
   match p.nick_names with
   [ [] ->
       Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
-        (acces conf base p) s
+        (acces conf base p) (coa conf s)
   | [nn :: _] ->
       Wserver.wprint "<a href=\"%s%s\">%s <em>%s</em></a>" (commd conf)
-        (acces conf base p) s (sou base nn) ]
+        (acces conf base p) (coa conf s) (coa conf (sou base nn)) ]
 ;
-
-value afficher_nom_titre conf base p s = Wserver.wprint "%s" s;
 
 value afficher_prenom_de_personne_referencee conf base p =
   Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf) (acces conf base p)
@@ -289,16 +287,16 @@ value afficher_personne_titre_referencee conf base p =
 ;
 
 value afficher_personne_un_titre conf base p t =
-  do if t.t_place == p.surname then
+  do if t.t_place = p.surname then
        match t.t_name with
-       [ Tname n -> Wserver.wprint "%s" (sou base n)
+       [ Tname n -> Wserver.wprint "%s" (coa conf (sou base n))
        | _ -> afficher_prenom_de_personne conf base p ]
      else
        match t.t_name with
-       [ Tname s -> afficher_nom_titre conf base p (sou base s)
+       [ Tname s -> Wserver.wprint "%s" (coa conf (sou base s))
        | _ -> afficher_personne conf base p ];
-     Wserver.wprint ", <em>%s %s</em>" (sou base t.t_title)
-       (sou base t.t_place);
+     Wserver.wprint ", <em>%s %s</em>" (coa conf (sou base t.t_title))
+       (coa conf (sou base t.t_place));
   return ()
 ;
 
@@ -318,8 +316,9 @@ value afficher_personne_sans_titre conf base p =
          else
            match (t.t_name, p.nick_names) with
            [ (Tname s, [nn :: _]) ->
-               Wserver.wprint "%s <em>%s</em>" (sou base s) (sou base nn)
-           | (Tname s, _) -> Wserver.wprint "%s" (sou base s)
+               Wserver.wprint "%s <em>%s</em>" (coa conf (sou base s))
+                 (coa conf (sou base nn))
+           | (Tname s, _) -> Wserver.wprint "%s" (coa conf (sou base s))
            | _ -> afficher_personne conf base p ];
       return ()
   | None -> afficher_personne conf base p ]
@@ -327,8 +326,8 @@ value afficher_personne_sans_titre conf base p =
 
 value afficher_un_titre conf base p t =
   let place = sou base t.t_place in
-  do Wserver.wprint ", <em>%s" (sou base t.t_title);
-     if place = "" then () else Wserver.wprint " %s" place;
+  do Wserver.wprint ", <em>%s" (coa conf (sou base t.t_title));
+     if place = "" then () else Wserver.wprint " %s" (coa conf place);
      Wserver.wprint "</em>";
   return ()
 ;
@@ -596,7 +595,8 @@ value print_parent conf base p a =
   | _ ->
       Wserver.wprint "%s %s%s" (transl_nth conf "son/daughter/child" is)
         (transl_concat conf "of" (coa conf (sou base a.first_name)))
-        (if p.surname <> a.surname then sou base a.surname else "") ]
+        (if p.surname <> a.surname then coa conf (sou base a.surname)
+         else "") ]
 ;
 
 value conjoint p fam =
@@ -609,10 +609,13 @@ value preciser_homonyme conf base p =
   let is = index_of_sex p.sexe in
   match (p.public_name, p.nick_names) with
   [ (n, [nn :: _]) when sou base n <> ""->
-      Wserver.wprint "%s <em>%s</em>" (sou base n) (sou base nn)
+      Wserver.wprint "%s <em>%s</em>" (coa conf (sou base n))
+        (coa conf (sou base nn))
   | (_, [nn :: _]) ->
-      Wserver.wprint "%s <em>%s</em>" (sou base p.first_name) (sou base nn)
-  | (n, []) when sou base n <> "" -> Wserver.wprint "%s" (sou base n)
+      Wserver.wprint "%s <em>%s</em>" (coa conf (sou base p.first_name))
+        (coa conf (sou base nn))
+  | (n, []) when sou base n <> "" ->
+      Wserver.wprint "%s" (coa conf (sou base n))
   | (_, []) ->
       let a = aoi base p.cle_index in
       match a.parents with
