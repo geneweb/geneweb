@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.164 2003-12-07 20:07:39 ddr Exp $
+# $Id: lexicon.txt,v 4.165 2003-12-08 11:15:55 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2181,6 +2181,7 @@ sv: f&ouml;delsedagar
 zh:  出生于今日的记录
 
     border
+da: ramme
 en: border
 fr: bordure
 
@@ -2630,6 +2631,7 @@ sl: kliknite na "%s"
 sv: klicka "%s"
 
     color
+da: farve
 en: colour
 en-us: color
 fr: couleur
