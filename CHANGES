@@ -2,6 +2,8 @@ GeneWeb version 3.11
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [13 Jan 00] Fixed bug: when merging families, the marriage witnesses
+    disappeared.
   - [10 Jan 00] In relationship computing, changed translation of the
     phrase "of a cousin". Indeed, in the context, it should display "of a
     cousin(male) or a cousin(female)". In English there is just one word,
