@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.54 2000-10-17 21:18:54 ddr Exp $ *)
+(* $Id: perso.ml,v 3.55 2000-10-18 15:33:21 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1868,6 +1868,7 @@ value print_variable conf base env s sl =
             loop ep efam sl
         | None -> () ]
     | ["on_birth_date"] -> print_on_birth_date conf base env p p_auth
+    | ["self" :: sl] -> loop (p, a, u, p_auth) efam sl
     | ["spouse" :: sl] ->
         match efam with
         [ Efam fam cpl _ ->
