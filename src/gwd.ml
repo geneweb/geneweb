@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.74 2005-02-03 01:50:45 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.75 2005-02-03 16:19:37 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -211,9 +211,13 @@ value rec extract_assoc key =
 ;
 
 value input_lexicon lang =
-  let fname = Filename.concat "lang" "lexicon.txt" in
-  Gutil.input_lexicon lang
-    (fun () -> Secure.open_in (Util.search_in_lang_path fname))
+  let ht = Hashtbl.create 501 in
+  let fname = Filename.concat "lang" "lex_utf8.txt" in
+  do {
+    Gutil.input_lexicon lang ht
+      (fun () -> Secure.open_in (Util.search_in_lang_path fname));
+    ht
+  }
 ;
 
 value alias_lang lang =
@@ -920,9 +924,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
          match p_getenv  base_env "doctype" with
          [ Some "xhtml-1.1" -> " /"
          | _ -> "" ];
-       charset =
-         try Hashtbl.find lexicon " !charset" with
-         [ Not_found -> "iso-8859-1" ];
+       charset = "utf-8";
        is_rtl =
          try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ];
        auth_file =

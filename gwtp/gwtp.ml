@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.27 2005-02-03 01:50:45 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.28 2005-02-03 16:19:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Printf;
@@ -157,11 +157,15 @@ value lindex s c =
 ;
 
 value input_lexicon lang =
-  Gutil.input_lexicon lang
-    (fun () ->
-       open_in
-         (List.fold_right Filename.concat [gwtp_etc.val; "lang"]
-            "lexicon.txt"))
+  let ht = Hashtbl.create 501 in
+  do {
+    Gutil.input_lexicon lang ht
+      (fun () ->
+         open_in
+           (List.fold_right Filename.concat [gwtp_etc.val; "lang"]
+              "lexicon.txt"));
+    ht
+  }
 ;
 
 value unfreeze_lexicon =

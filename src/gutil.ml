@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.27 2005-02-03 01:50:45 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.28 2005-02-03 16:19:34 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -44,6 +44,11 @@ value string_sub s i len =
   let len = min (String.length s - i) (max 0 len) in String.sub s i len
 ;
 
+value utf_8_db = ref True;
+
+value utf_8_intern_byte c =
+  utf_8_db.val && Char.code c >= 0x80 && Char.code c < 0xC0;
+
 value decline_word case s ibeg iend =
   let i =
     loop ibeg where rec loop i =
@@ -70,10 +75,18 @@ value decline_word case s ibeg iend =
         if i == iend then i else if s.[i] == ':' then i else loop (i + 1)
     in
     let (i, cnt) =
-      loop (i + 1) 1 where rec loop i cnt =
-        if i < iend && s.[i] == '-' then loop (i + 1) (cnt + 1) else (i, cnt)
+      loop i 0 where rec loop i cnt =
+        if i < iend && s.[i] == '-' then
+          let cnt =
+            loop (cnt + 1) where rec loop cnt =
+              if k - cnt = ibeg then cnt
+              else if utf_8_intern_byte s.[k - cnt] then loop (cnt + 1)
+              else cnt
+          in
+          loop (i + 1) cnt
+        else (i, cnt)
     in
-    string_sub s ibeg (k - ibeg - cnt) ^ string_sub s i (j - i)
+    string_sub s ibeg (k - cnt - ibeg) ^ string_sub s i (j - i)
   else string_sub s i (j - i)
 ;
 
@@ -1127,8 +1140,7 @@ value find_free_occ base f s i =
     | [] -> cnt1 ]
 ;
 
-value input_lexicon lang open_fname =
-  let t = Hashtbl.create 501 in
+value input_lexicon lang ht open_fname =
   try
     let ic = open_fname () in
     let derived_lang =
@@ -1154,13 +1166,13 @@ value input_lexicon lang open_fname =
                   let line_lang = String.sub line 0 i in
                   do {
                     if line_lang = lang ||
-                       line_lang = derived_lang && not (Hashtbl.mem t k) then
+                       line_lang = derived_lang && not (Hashtbl.mem ht k) then
                       let v =
                         if i + 1 = String.length line then ""
                         else
                           String.sub line (i + 2) (String.length line - i - 2)
                       in
-                      Hashtbl.add t k v
+                      Hashtbl.add ht k v
                     else ();
                     loop (input_line ic)
                   }
@@ -1171,10 +1183,9 @@ value input_lexicon lang open_fname =
         with
         [ End_of_file -> () ];
         close_in ic;
-        t
       }
     with e ->
       do { close_in ic; raise e }
   with
-  [ Sys_error _ -> t ]
+  [ Sys_error _ -> () ]
 ;

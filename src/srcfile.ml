@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.29 2005-01-02 14:43:15 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.30 2005-02-03 16:19:44 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -525,6 +525,7 @@ value print_start conf base =
   let fname =
     if Sys.file_exists (lang_file_name conf conf.bname) then conf.bname
     else if Sys.file_exists (any_lang_file_name conf.bname) then conf.bname
+    else if Gutil.utf_8_db.val then "start_utf8"
     else "start"
   in
   gen_print False Lang conf base fname
@@ -532,7 +533,10 @@ value print_start conf base =
 
 value print_lexicon conf base =
   let title _ = Wserver.wprint "Lexicon" in
-  let fname = search_in_lang_path (Filename.concat "lang" "lexicon.txt") in
+  let fname =
+    let f = if Gutil.utf_8_db.val then "lex_utf8.txt" else "lexicon.txt" in
+    search_in_lang_path (Filename.concat "lang" f)
+  in
   do {
     Util.header conf title;
     match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with

@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.9 2005-02-01 21:15:33 ddr Exp $ *)
+(* $Id: name.ml,v 4.10 2005-02-03 16:19:41 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 module Buff =
@@ -28,7 +28,7 @@ module Buff =
   end
 ;
 
-value utf_8 = ref False;
+value utf_8 = ref True;
 
 (* Name.lower *)
 

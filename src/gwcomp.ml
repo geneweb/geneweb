@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 4.13 2004-12-14 09:30:12 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.14 2005-02-03 16:19:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000m";
+value magic_gwo = "GnWo000n";
 
 type key = { pk_first_name : string; pk_surname : string; pk_occ : int };
 
@@ -18,6 +18,8 @@ type syntax_o =
   | Relations of somebody and sex and list (gen_relation somebody string)
   | Bnotes of string ]
 ;
+
+type encoding = [ E_utf_8 | E_iso_8859_1 ];
 
 value copy_decode s i1 i2 =
   let len =
@@ -173,16 +175,37 @@ value rindex s c =
     if i < 0 then None else if s.[i] = c then Some i else pos (i - 1)
 ;
 
+value utf_8_of_iso_8859_1 str =
+  loop 0 0 where rec loop i len =
+    if i = String.length str then Buff.get len
+    else
+      let c = str.[i] in
+      if Char.code c < 0x80 then loop (i + 1) (Buff.store len c)
+      else if Char.code c < 0xC0 then
+        let len = Buff.store len (Char.chr 0xC2) in
+        loop (i + 1) (Buff.store len c)
+      else 
+        let len = Buff.store len (Char.chr 0xC3) in
+        loop (i + 1) (Buff.store len (Char.chr (Char.code c - 0x40)))
+;
+
 value line_cnt = ref 0;
 
-value input_a_line ic =
+value input_line0 ic =
   let line = input_line ic in
-  let line =
+  do {
+     incr line_cnt;
     if String.length line > 0 && line.[String.length line - 1] == '\r' then
       String.sub line 0 (String.length line - 1)
     else line
-  in
-  do { incr line_cnt; line }
+  }
+;
+
+value input_a_line (ic, encoding) =
+  let line = input_line0 ic in
+   match encoding with
+   [ E_utf_8 -> line
+   | E_iso_8859_1 -> utf_8_of_iso_8859_1 line ]
 ;
 
 value rec input_real_line ic =
@@ -703,9 +726,12 @@ value read_notes ic =
   strip_all_trailing_spaces notes
 ;
 
+type read_family 'a = [ F_some of 'a | F_enc_utf_8 | F_none ];
+
 value read_family ic fname =
   fun
-  [ Some (str, ["fam" :: l]) ->
+  [ Some (_, ["encoding:"; "utf-8"]) -> F_enc_utf_8
+  | Some (str, ["fam" :: l]) ->
       let (cle_pere, surname, l) = parse_parent str l in
       let (relation_ss, marriage, marr_place, marr_src, divorce, l) =
         get_mar_date str l
@@ -786,7 +812,7 @@ value read_family ic fname =
                fam_index = Adef.ifam_of_int (-1)}
             in
             let deo = {children = Array.of_list cles_enfants} in
-            Some (Family co fath_sex moth_sex witn fo deo, read_line ic)
+            F_some (Family co fath_sex moth_sex witn fo deo, read_line ic)
         | line ->
             let fo =
               {marriage = marriage; marriage_place = marr_place;
@@ -796,10 +822,10 @@ value read_family ic fname =
                fam_index = Adef.ifam_of_int (-1)}
             in
             let deo = {children = [| |]} in
-            Some (Family co fath_sex moth_sex witn fo deo, line) ]
+            F_some (Family co fath_sex moth_sex witn fo deo, line) ]
       }
   | Some (str, ["notes"]) ->
-      let notes = read_notes ic in Some (Bnotes notes, read_line ic)
+      let notes = read_notes ic in F_some (Bnotes notes, read_line ic)
   | Some (str, ["notes" :: l]) ->
       let (surname, l) = get_name str l in
       let (first_name, occ, l) = get_fst_name str l in
@@ -811,7 +837,7 @@ value read_family ic fname =
             let key =
               {pk_first_name = first_name; pk_surname = surname; pk_occ = occ}
             in
-            Some (Notes key notes, read_line ic)
+            F_some (Notes key notes, read_line ic)
         | Some (str, _) -> failwith str
         | None -> failwith "end of file" ]
   | Some (str, ["rel" :: l]) ->
@@ -838,11 +864,11 @@ value read_family ic fname =
               with
               [ End_of_file -> failwith "missing end rel" ]
             in
-            Some (Relations sb sex rl, read_line ic)
+            F_some (Relations sb sex rl, read_line ic)
         | Some (str, _) -> failwith str
         | None -> failwith "end of file" ]
-  | Some (str, _) -> failwith str
-  | None -> None ]
+  | Some (str, l) -> failwith str
+  | None -> F_none ]
 ;
 
 value comp_families x =
@@ -855,13 +881,15 @@ value comp_families x =
       do {
         output_string oc magic_gwo;
         output_value oc (x : string);
-        let rec loop line =
-          match read_family ic x line with
-          [ Some (family, line) ->
-              do { output_value oc (family : syntax_o); loop line }
-          | None -> () ]
+        let rec loop line encoding =
+          match read_family (ic, encoding) x line with
+          [ F_some (family, line) ->
+              do { output_value oc (family : syntax_o); loop line encoding }
+          | F_enc_utf_8 ->
+	      loop (read_line (ic, E_utf_8)) E_utf_8
+          | F_none -> () ]
         in
-        loop (read_line ic);
+        loop (read_line (ic, E_iso_8859_1)) E_iso_8859_1;
         close_in ic;
       }
     with e ->

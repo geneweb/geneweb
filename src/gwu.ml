@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.28 2005-01-18 10:47:00 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.29 2005-02-03 16:19:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -91,8 +91,23 @@ value no_newlines s =
   }
 ;
 
+value utf_8_of_iso_8859_1 str =
+  loop 0 0 where rec loop i len =
+    if i = String.length str then Buff.get len
+    else
+      let c = str.[i] in
+      if Char.code c < 0x80 then loop (i + 1) (Buff.store len c)
+      else if Char.code c < 0xC0 then
+        let len = Buff.store len (Char.chr 0xC2) in
+        loop (i + 1) (Buff.store len c)
+      else 
+        let len = Buff.store len (Char.chr 0xC3) in
+        loop (i + 1) (Buff.store len (Char.chr (Char.code c - 0x40)))
+;
+
 value gen_correct_string no_colon s =
   let s = strip_spaces s in
+  let s = if Gutil.utf_8_db.val then s else utf_8_of_iso_8859_1 s in
   loop 0 0 where rec loop i len =
     if i == String.length s then Buff.get len
     else if len == 0 && not (starting_char s) then
@@ -1002,7 +1017,10 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
       [ Not_found ->
           let oc = open_out (Filename.concat out_dir fname) in
           let x = (oc, ref True) in
-          do { src_oc_list.val := [(fname, x) :: src_oc_list.val]; x } ]
+          do {
+            fprintf oc "encoding: utf-8\n\n";
+            src_oc_list.val := [(fname, x) :: src_oc_list.val]; x
+          } ]
   in
   do {
     for i = 0 to base.data.families.len - 1 do {
@@ -1259,6 +1277,7 @@ value main () =
     let out_oc =
       if out_file.val = "" then stdout else open_out out_file.val
     in
+    fprintf out_oc "encoding: utf-8\n\n";
     gwu base out_dir.val out_oc src_oc_list anc desc ancdesc;
     List.iter (fun (src, (oc, _)) -> do { flush oc; close_out oc })
       src_oc_list.val;

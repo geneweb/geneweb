@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.111 2005-01-24 04:35:50 ddr Exp $ *)
+(* $Id: util.ml,v 4.112 2005-02-03 16:19:45 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -145,15 +145,16 @@ value gen_decline wt s =
     match rindex wt '/' with
     [ Some i ->
         if String.length s > 0 && start_with_vowel s then
-          nth_field wt 1 ^ decline 'n' s
-        else nth_field wt 0 ^ decline 'n' s1
-    | None -> wt ^ decline 'n' s1 ]
+          nth_field wt 1 ^ Gutil.decline 'n' s
+        else nth_field wt 0 ^ Gutil.decline 'n' s1
+    | None -> wt ^ Gutil.decline 'n' s1 ]
   else if len >= 3 && wt.[len - 3] == ':' && wt.[len - 1] == ':' then
-    let start = String.sub wt 0 (len - 3) in start ^ decline wt.[len - 2] s
+    let start = String.sub wt 0 (len - 3) in
+    start ^ Gutil.decline wt.[len - 2] s
   else
     match plus_decl wt with
     [ Some (start, " +before") -> if s = "" then start else s ^ " " ^ start
-    | _ -> wt ^ decline 'n' s1 ]
+    | _ -> wt ^ Gutil.decline 'n' s1 ]
 ;
 
 value transl_decline conf w s = gen_decline (transl conf w) s;
@@ -324,7 +325,7 @@ value string_of_ctime conf =
 ;
 
 value html conf =
-  let charset = if conf.charset = "" then "iso-8859-1" else conf.charset in
+  let charset = if conf.charset = "" then "utf-8" else conf.charset in
   do {
     if not conf.cgi then do {
       Wserver.http "";
@@ -1144,14 +1145,17 @@ value header_without_page_title conf title =
     Wserver.wprint "  <title>";
     title True;
     Wserver.wprint "</title>\n";
-    include_hed_trl conf None ".hed";
     Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\"%s>\n" conf.xhs;
+    Wserver.wprint "  <meta http-equiv=\"Content-Type\" \
+                      content=\"text/html; charset=%s\"%s>\n"
+      conf.charset conf.xhs;
     Wserver.wprint "  \
   <style type=\"text/css\"><!--
     .highlight { color: %s; font-weight: bold }
     hr { border: 0; margin: 0; border-bottom: 1px solid }
     a.date { text-decoration: none; color: black }
   --></style>\n" conf.highlight;
+    include_hed_trl conf None ".hed";
     Wserver.wprint "</head>\n";
     let s =
       try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
