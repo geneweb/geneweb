@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.215 2001-02-01 09:49:15 ddr Exp $
+# $Id: lexicon.txt,v 3.216 2001-02-02 07:57:25 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -43,7 +43,7 @@ lv: cn=Íînieðu/cs=Èehu/dk=Dâòu/nl=Holandieðu/en=Angïu/eo=Esperanto/fi=Somu/fr=Fr
 nl: af=Afrikaans/cn=Chinees/cs=Tsjechisch/dk=Deens/nl=Nederlands/en=Engels/eo=Esperanto/fi=Fins/fr=Frans/de=Duits/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/no=Noors/pt=Portugees/es=Spaans/ru=Russisch/se=Zweeds
 no: af=afrikaans/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
 pt: af=Afrikaans/cn=Chin&ecirc;/cs=Checo/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;/en=Ingl&ecirc;/eo=Esperanto/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
-se: af=afrikaans/cn=kinesiska/cs=tjeckiska/dk=danska/en=engelska/eo=esperanto/fi=finska/fr=franska/de=tyska/he=hebreiska/is=isl&auml;ndska/it=italienska/lv=litauiska/nl=holl&auml;ndska/no=norska/pt=portugisiska/es=spanska/ru=ryska/se=svenska
+se: af=afrikaans/dk=danska/en=engelska/eo=esperanto/et=estniska/fi=finska/fr=franska/he=hebreiska/nl=holländska/is=isländska/it=italienska/cn=kinesiska/lv=litauiska/no=norska/pt=portugisiska/ru=ryska/es=spanska/se=svenska/cs=tjeckiska/de=tyska
 
      to see the first branch
 af:  om die eerste staak te sien
@@ -2478,6 +2478,7 @@ se: f&ouml;rsvunnen
 de: Anzeige in Segmenten/Segmentbreite/&Uuml;berlappung/Gesamtbreite
 en: display by slices/slice width/overlap/total width
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
+se: visa genom att dela sidan/sidbredd/överlappning/global bredd
 
     divorce
 af: geskei
@@ -2524,6 +2525,7 @@ se: skilda
     don't group the common branches together
 en: don't group the common branches together
 fr: ne pas regrouper les branches communes
+se: gruppera inte ihop de gemensamma anlinjerna
 
     don't know
 af: onbekend
