@@ -33,6 +33,12 @@ GeneWeb Version 4.08
   - [22 Aug 02] Fixed bug with option -ls: when the surname held "ß" the
     following character was converted into uppercase.
 
+* Setup program (gwsetup)
+  - [03 Nov 02] Added macro "%Lxx;" replaced by the language whose id
+    is "xx" by its translation in the current language. Use it in template
+    files "gwd.htm" and "gwf_1.htm". Added in the gwsetup lexicon the
+    entry "!languages", the same than the one of the gwd lexicon.
+
 GeneWeb Version 4.07
 --------------------
 
