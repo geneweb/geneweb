@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 1.1.1.1 1998-09-01 14:32:07 ddr Exp $ *)
+(* $Id: some.ml,v 1.2 1998-09-28 09:26:02 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -249,7 +249,7 @@ value rec print_branch conf base lev name p =
          return
          let down =
            p.sexe = Masculin &&
-           (Name.strip_lower (sou base p.surname) = Name.strip_lower name
+           (Name.crush_lower (sou base p.surname) = Name.crush_lower name
             || lev == 0) &&
            Array.length el <> 0 ||
            p.sexe = Feminin && she_has_children_with_her_name base p c el
@@ -277,7 +277,9 @@ value rec print_by_branch x conf base (ipl, homonymes) =
   let len = List.length ancestors in
   if len == 0 then surname_not_found conf x
   else
+(*
     let x = List.hd homonymes in
+*)
     let title h =
       do Wserver.wprint "%s" (List.hd homonymes);
          List.iter (fun x -> Wserver.wprint ", %s" x) (List.tl homonymes);
