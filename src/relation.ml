@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.33 2002-11-28 10:06:40 ddr Exp $ *)
+(* $Id: relation.ml,v 4.34 2002-11-28 13:14:09 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1075,33 +1075,22 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
       [ [(a, _)] -> ancestor_label conf base info x a.sex
       | _ -> parents_label conf base info x ]
     in
+    let print pp p alab =
+      let s = gen_person_title_text no_reference raw_access conf base p in
+      let s =
+        if pp = None then s
+        else
+          transl_a_of_gr_eq_gen_lev conf
+            (transl_nth conf "the spouse" (1 - index_of_sex p.sex)) s
+      in
+      let s = transl_a_of_b conf alab s in
+      Wserver.wprint "%s\n" (nominative s)
+    in
     tag "ul" begin
       html_li conf;
-      let s = gen_person_title_text no_reference raw_access conf base p1 in
-      let s =
-        if pp1 = None then s
-        else
-          transl_a_of_gr_eq_gen_lev conf
-            (transl_nth conf "the spouse" (1 - index_of_sex p1.sex)) s
-      in
-      let s =
-        transl_a_of_b conf
-          (lab (fun r -> r.Consang.lens1) x1) s
-      in
-      Wserver.wprint "%s\n" (nominative s);
+      print pp1 p1 (lab (fun r -> r.Consang.lens1) x1);
       html_li conf;
-      let s = gen_person_title_text no_reference raw_access conf base p2 in
-      let s =
-        if pp2 = None then
-          transl_a_of_b conf (lab (fun r -> r.Consang.lens2) x2) s
-        else
-          transl_a_of_gr_eq_gen_lev conf
-            (transl_a_of_b conf
-               (lab (fun r -> r.Consang.lens2) x2)
-               (transl_nth conf "the spouse" (1 - index_of_sex p2.sex)))
-            s
-      in
-      Wserver.wprint "%s\n" (nominative s);
+      print pp2 p2 (lab (fun r -> r.Consang.lens2) x2);
     end;
     Wserver.wprint "</ul>\n"
   }

@@ -5,6 +5,9 @@ GeneWeb Version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [28 Nov 02] Fixed bug in displaying relationship by marriage: in
+    the text "are at the same time case1 case2" the "case2" where
+    sometimes false (problems of declinations, in particular).
   - [22 Nov 02] Added ability to add inline translations in template
     files (inline translations are parts of text starting with "["
     immediately followed by a newline, explicit translations in
