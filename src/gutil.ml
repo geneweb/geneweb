@@ -1,9 +1,9 @@
-(* $Id: gutil.ml,v 1.11 1999-02-02 10:24:09 ddr Exp $ *)
+(* $Id: gutil.ml,v 1.12 1999-02-06 07:08:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 
-value version = "1.11";
+value version = "1.12";
 
 value poi base i = base.data.persons.get (Adef.int_of_iper i);
 value aoi base i = base.data.ascends.get (Adef.int_of_iper i);
