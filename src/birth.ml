@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birth.ml,v 1.3 1998-11-27 20:09:38 ddr Exp $ *)
+(* $Id: birth.ml,v 1.4 1998-12-09 18:11:40 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -69,16 +69,14 @@ value print conf base =
      for i = 0 to Array.length tab - 1 do
        match tab.(i) with
        [ Some (p, d) ->
-           do if i > 0 then Wserver.wprint "<p>\n" else ();
-              tag "ul" begin
-                Wserver.wprint "<li><strong>\n";
-                afficher_personne_referencee conf base p;
-                Wserver.wprint "</strong>,\n";
-                Wserver.wprint "%s <em>%s</em>.\n"
-                  (transl_nth conf "born" (index_of_sex p.sexe))
-                  (Date.string_of_ondate conf d);
-              end;
-           return ()
+           tag "ul" begin
+             Wserver.wprint "<li><strong>\n";
+             afficher_personne_referencee conf base p;
+             Wserver.wprint "</strong>,\n";
+             Wserver.wprint "%s <em>%s</em>.\n"
+               (transl_nth conf "born" (index_of_sex p.sexe))
+               (Date.string_of_ondate conf d);
+           end
        | None -> () ];
      done;
      trailer conf;
