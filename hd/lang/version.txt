@@ -6,6 +6,7 @@
 <td><a href="%glang=eo"><img src="%gm=IM;v=l-eo.gif" alt=eo></a></td>
 <td><a href="%glang=es"><img src="%gm=IM;v=l-es.gif" alt=es></a></td>
 <td><a href="%glang=fr"><img src="%gm=IM;v=l-fr.gif" alt=fr></a></td>
+<td><a href="%glang=he"><img src="%gm=IM;v=l-he.gif" alt=he></a></td>
 <td><a href="%glang=it"><img src="%gm=IM;v=l-it.gif" alt=it></a></td>
 <td><a href="%glang=nl"><img src="%gm=IM;v=l-nl.gif" alt=nl></a></td>
 <td><a href="%glang=pt"><img src="%gm=IM;v=l-pt.gif" alt=pt></a></td>
@@ -18,6 +19,7 @@
 <td align=center><font size=-1>eo</font></td>
 <td align=center><font size=-1>es</font></td>
 <td align=center><font size=-1>fr</font></td>
+<td align=center><font size=-1>he</font></td>
 <td align=center><font size=-1>it</font></td>
 <td align=center><font size=-1>nl</font></td>
 <td align=center><font size=-1>pt</font></td>

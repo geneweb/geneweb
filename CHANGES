@@ -1,6 +1,9 @@
 GeneWeb Version 1.11
 --------------------
 
+* General
+  - [Jan 27, 99] Added Hebrew.
+
 * GeneWeb daemon/CGI (gwd)
   - [Jan 24, 99] Added default photo names: not necessary to specify a
     photo for someone, a default name is searched.
@@ -53,7 +56,7 @@ GeneWeb Version 1.11
   - [Jan 20, 99] Added documentation for:
       * how to put links to GeneWeb databases.
       * how to customize welcome pages.
-  -[Jan 11, 99] Started Swedish version (Lars Gustavsson).
+  - [Jan 11, 99] Swedish version (Lars Gustavsson).
 
 GeneWeb Version 1.10
 --------------------
