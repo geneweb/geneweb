@@ -3,7 +3,7 @@ GeneWeb version 3.09
 
 * GeneWeb server or CGI (gwd)
   - [20 Oct 00] In family updating, added a check that (created) persons
-    are born before their death. This check was missing.
+    are born before their death: this check was missing.
   - [11 Oct 00] Important improvement: added a system of template
     files for the personal pages. It is therefore possible to change the
     displaying of the personal pages, by editing the template. It is also
