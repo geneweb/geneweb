@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.12 2000-03-08 14:35:32 ddr Exp $ *)
+(* $Id: perso.ml,v 3.13 2000-03-10 17:12:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -861,7 +861,7 @@ value print_sub_titles conf base p =
        do open_area ();
           Wserver.wprint "<em>";
           print_titles conf base True (transl conf "and") p;
-          Wserver.wprint ".</em>\n";
+          Wserver.wprint "</em>\n";
           html_br conf;
        return ()
      else ();
