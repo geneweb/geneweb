@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.31 2003-02-04 13:21:14 ddr Exp $ *)
+(* $Id: family.ml,v 4.32 2003-03-19 13:00:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -581,27 +581,54 @@ value log_count conf (log_file, log_oc, flush_log) r =
     | None -> () ]
 ;
 
+value print_moved conf base s =
+  match Util.open_etc_file "moved" with
+  [ Some ic ->
+      let env = [('b', fun () -> conf.bname); ('t', fun () -> s)] in
+      do {
+        Util.html conf;
+        Util.nl ();
+        Util.copy_from_etc env conf.lang conf.indep_command ic;
+        Util.trailer conf;
+      }
+  | None ->
+      let title _ = Wserver.wprint "%s -&gt; %s" conf.bname s in
+      do {
+        Util.header_no_page_title conf title;
+        Wserver.wprint "The database %s has moved to:\n<dl><dt><dd>\n"
+          conf.bname;
+        stag "a" "href=\"%s\"" s begin Wserver.wprint "%s" s; end;
+        Wserver.wprint "\n</dd></dt></dl>\n";
+        Util.trailer conf;
+      } ]
+;
+
 value family conf base log =
   do {
-    match (p_getenv conf.env "opt", p_getenv conf.env "m") with
-    [ (Some "no_index", _) -> print_no_index conf base
-    | (_, Some "IM") -> Image.print conf base
-    | _ ->
-        do {
-          set_owner conf;
-          extract_henv conf base;
-          make_senv conf base;
-          if only_special_env conf.env then do {
-            let r = Srcfile.incr_welcome_counter conf in
-            log_count conf log r;
-            Srcfile.print_start conf base;
-          }
-          else do {
-            let r = Srcfile.incr_request_counter conf in
-            log_count conf log r;
-            family_m conf base;
-          };
-        } ];
+    match p_getenv conf.base_env "moved" with
+    [ Some s ->
+        print_moved conf base s
+    | None ->
+        match (p_getenv conf.env "opt", p_getenv conf.env "m") with
+        [ (Some "no_index", _) -> print_no_index conf base
+        | (_, Some "IM") -> Image.print conf base
+        | _ ->
+    
+            do {
+              set_owner conf;
+              extract_henv conf base;
+              make_senv conf base;
+              if only_special_env conf.env then do {
+                let r = Srcfile.incr_welcome_counter conf in
+                log_count conf log r;
+                Srcfile.print_start conf base;
+              }
+              else do {
+                let r = Srcfile.incr_request_counter conf in
+                log_count conf log r;
+                family_m conf base;
+              };
+            } ] ];
     Wserver.wflush ();
   }
 ;

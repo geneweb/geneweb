@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.20 2003-01-18 08:24:59 ddr Exp $
+# $Id: a.gwf,v 4.21 2003-03-19 13:00:07 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -175,6 +175,10 @@ places_inverted=no
 # Uncomment the following definition to specify that the present database has
 # been renamed:
 #renamed=newname
+
+# Uncomment the following definition to specify that the present database has
+# been moved to another site:
+#moved=http://newaddress/and-so-on/
 
 # Templates.
 #
