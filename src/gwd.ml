@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.42 2000-06-17 21:04:43 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.43 2000-06-20 14:30:30 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -382,8 +382,9 @@ value propose_base conf =
 value general_welcome conf =
   match Util.open_etc_file "index" with
   [ Some ic ->
+      let env = [('w', Util.link_to_referer conf)] in
       do Util.html conf;
-         Util.copy_from_etc [] conf.indep_command ic;
+         Util.copy_from_etc env conf.indep_command ic;
       return ()
   | None -> propose_base conf ]
 ;
