@@ -5,13 +5,21 @@ GeneWeb Version 3.09
 --------------------
 
 * General
-  - [30 Oct 00] In relation.ml changed the part computing the relationship
-    by shortest path to get a function returning the result instead of
-    displaying it and raising a "Found" exception.
   - [29 Oct 00] Added useful function list_iter_first. Deleted functions
     applied to list to accept old versions of OCaml: now, it is necessary
     to compile with at least version 3.00.
   - [12 Oct 00] Changed all "nick_name" into "qualifier" in all source files.
+
+* GeneWeb daemon/CGI (gwd)
+  - [31 Oct 00] Created the request "m=RLM" followed by the list of persons
+    to link two by two to create arbitrary dags (i1=...;i2=...;i3=... and so
+    on). Tested with persons having the same nobility title but... generally
+    the resulting dag is too complicated, resulting to a ugly display.
+    However, the new code for initializing dags seems to be less bugged,
+    giving better results for example in relationships by shortest path.
+  - [30 Oct 00] In relation.ml changed the part computing the relationship
+    by shortest path to get a function returning the result instead of
+    displaying it and raising a "Found" exception.
 
 * Consanguinity computing (consang)
   - [28 Oct 00] Put constants in progress bar (option -q) to have a more
