@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 3.9 2000-06-18 07:38:41 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.10 2000-09-18 12:07:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -144,10 +144,12 @@ value compatible_deaths d1 d2 =
   if d1 = d2 then True
   else
     match (d1, d2) with
-    [ (_, NotDead) -> False
-    | (Death dr1 cd1, Death dr2 cd2) ->
+    [ (Death dr1 cd1, Death dr2 cd2) ->
         compatible_death_reasons dr1 dr2 && compatible_cdates cd1 cd2
-    | _ -> True ]
+    | (Death _ _, NotDead) -> False
+    | (Death _ _, _) -> True
+    | (_, DontKnowIfDead) -> True
+    | _ -> False ]
 ;
 
 value compatible_burials b1 b2 =

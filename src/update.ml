@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.15 2000-09-14 14:04:01 ddr Exp $ *)
+(* $Id: update.ml,v 3.16 2000-09-18 12:07:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -745,7 +745,9 @@ value insert_person conf base src new_persons (f, s, o, create) =
              burial = UnknownBurial; burial_place = empty_string;
              burial_src = empty_string;
              notes = empty_string;
-             psources = insert_string conf base src;
+             psources =
+               if f = "?" || s = "?" then empty_string
+               else insert_string conf base src;
              cle_index = ip}
           and a =
             {parents = None;
