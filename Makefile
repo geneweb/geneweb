@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.5 2000-05-07 05:55:16 ddr Exp $
+# $Id: Makefile,v 3.6 2000-06-13 12:43:27 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -35,6 +35,7 @@ wrappers:
 	  echo 'cd gw; exec ./gwsetup' >> distribution/gwsetup; \
 	  chmod +x distribution/gwd distribution/gwsetup; \
 	fi
+	cp LICENSE distribution/LICENSE.txt
 
 new_distrib: classical_distrib
 	mkdir t
