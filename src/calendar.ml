@@ -1,4 +1,4 @@
-(* $Id: calendar.ml,v 2.6 1999-09-21 16:55:48 ddr Exp $ *)
+(* $Id: calendar.ml,v 2.7 1999-09-27 14:51:01 ddr Exp $ *)
 
 (* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/;
    converted his C program into this Ocaml program.
@@ -70,33 +70,77 @@ value julian_of_sdn prec sdn =
 ;
 
 (* french *)
+(* this code comes from Remy Pialat; thanks to him *)
 
-value sdn_offset = 2375474;
-value days_per_4_years = 1461;
-value days_per_month = 30;
+value modulo pAngle pVal =
+  let x = truncate (pAngle /. pVal) in
+  let y = float x *. pVal in
+  pAngle -. y
+;
 
-value sdn_of_french d =
-  let temp =
-    if d.year < 0 then - (- (d.year * days_per_4_years + 1) / 4) - 1
-    else (d.year * days_per_4_years) / 4
-  in
-  temp + (d.month - 1) * days_per_month + d.day + sdn_offset
+value degVersRad pAngle =
+  let a = modulo pAngle 360.0 in
+  a *. 3.141592653589793 /. 180.0
+;
+
+value sinDeg pAngle = sin (degVersRad pAngle);
+
+value modulo360 pAngle =
+  let angle = modulo pAngle 360.0 in
+  if angle < 0.0 then angle +. 360.0 else angle
+;
+
+value equinoxeAutomne pAnnee =
+  let f = 12.0 in
+  let q = 30.0 in
+  let i = 0 in
+  let k = 6.0 in
+  let jd = (float pAnnee +. k /. f) *. 365.2422 +. 1721141.3 in
+  loop i jd (-1.0) where rec loop i jd jdn =
+    if abs_float (jd -. jdn) > 1.0E-12 && i + 1 < 20 then
+      let i = i + 1 in
+      let jdn = jd in
+      let t = (jd -. 2415020.0) /. 36525.0 in
+      let t2 = t *. t in
+      let t3 = t2 *. t in
+      let l = 279.69688 +. 36000.76892 *. t +. 3.025E-4 *. t2 in
+      let m = 358.47583 +. 35999.04975 *. t -. 1.5E-4 *. t2 -. 3.3E-6 *. t3 in
+      let ll =
+        l +. (1.91946 -. 0.004789 *. t -. 1.4E-5 *. t2) *. sinDeg m +.
+        (0.020094 -. 1.0E-4 *. t) *. sinDeg (2.0 *. m) +.
+        0.00293 *. sinDeg (3.0 *. m)
+      in
+      let ll = ll -. 0.00569 -. 0.00479 *. sinDeg (259.18 -. 1934.142 *. t) in
+      let ll = modulo360 ll in
+      let ll = if ll > 350.0 then ll -. 360.0 else ll in
+      let jd = jd +. 1.014 *. (k *. q -. ll) in loop i jd jdn
+    else
+      let d = jd -. floor jd in
+      let j = truncate jd in
+      if d >= 0.5 then j + 1 else j
 ;
 
 value french_of_sdn prec sdn =
-  let temp = (sdn - sdn_offset) * 4 - 1 in
-  let year = temp / days_per_4_years in
-  let (year, temp) =
-    if temp < 0 then
-      (year - 1,
-       days_per_4_years - 1 -
-         (- temp + days_per_4_years - 1) mod days_per_4_years)
-     else (year, temp mod days_per_4_years)
+  let greg_date = gregorian_of_sdn prec sdn in
+  let fst_vend_sdn = equinoxeAutomne greg_date.year in
+  let (year, fst_vend_sdn) =
+    if sdn < fst_vend_sdn then
+      let fst_vend_sdn = equinoxeAutomne (greg_date.year - 1) in
+      let year = greg_date.year - 1792 in
+      (year, fst_vend_sdn)
+    else
+      let year = greg_date.year - 1791 in
+      (year, fst_vend_sdn)
   in
-  let dayOfYear = temp / 4 in
-  let month = dayOfYear / days_per_month + 1 in
-  let day = dayOfYear mod days_per_month + 1 in
+  let ndays = sdn - fst_vend_sdn in
+  let month = ndays / 30 + 1 in
+  let day = ndays mod 30 + 1 in
   {day = day; month = month; year = year; prec = prec; delta = 0}
+;
+
+value sdn_of_french d =
+  let greg_year = d.year + 1791 in
+  equinoxeAutomne greg_year + (d.month - 1) * 30 + d.day - 1
 ;
 
 (* hebrew *)

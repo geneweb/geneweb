@@ -33,7 +33,7 @@ GeneWeb version 2.07
     fixed.
   - [Sep 16, 99] Changed the order of dates in modifications forms into:
     year/month/day and these fields are now labelled.
-  - [Sep 15..21, 99] Added calendars for dates (Gregorian, Julian, French
+  - [Sep 15..27, 99] Added calendars for dates (Gregorian, Julian, French
     Republic, Hebrew).
   - [Sep 11..17, 99] Now, several users and passwords can be defined for
     "wizard" and "friend" access, by specifying authorization file names in

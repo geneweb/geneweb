@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 2.15 1999-09-23 14:24:55 ddr Exp $ *)
+(* $Id: date.ml,v 2.16 1999-09-27 14:51:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -397,6 +397,7 @@ value print_calendar conf base =
            hebrew_month_name 13 "h";
        end;
      end;
+(*
      if date.year < 1792 || date.year > 1806 then
        Wserver.wprint "\
 <p>
@@ -407,6 +408,7 @@ Attention: le calendrier r&eacute;publicain en dehors de l'intervalle des
 ann&eacute;es 1 &agrave; 14 (1792-1806) peut donner des r&eacute;sultats
 faux dans l'impl&eacute;mentation actuelle...\n"
      else ();
+*)
      trailer conf;
   return ()
 ;
