@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2001 INRIA - GeneWeb -->
-  <!-- $Id: cleanup1.htm,v 1.2 2002-06-18 08:03:03 ddr Exp $ -->
+  <!-- $Id: cleanup1.htm,v 1.3 2002-06-20 08:32:53 ddr Exp $ -->
   <title>[
 de: Aufr&auml;umen - Phase 2
 en: Clean up - Phase 2
@@ -14,7 +14,7 @@ sv: Rensa upp - fas 2
 ]</title>
 </head>
 
-<body background="file://$f/images/gwback.jpg">
+<body background="file://%f/images/gwback.jpg">
 
 <center><h1><font color=#2f6400>[
 de: Aufr&auml;umen
@@ -29,13 +29,13 @@ sv: Rensa upp
 <p>
 
 [
-de: Wir fahren nun mit dem Aufr&auml;umen der Datenbank "$a" fort.
-en: We are going to proceed to the cleaning up of the database "$a".
-es: Vamos a proceder a la limpieza de la base  "$a".
-fr: Nous allons proc&eacute;der au nettoyage de la base "$a".
-it: Ora procediamo alla pulizia della base "$a".
-lv: Datu bâzes "$a" sakopðanas proces tiks turpinâts.
-sv: Vi ska gå vidare med att rensa upp databasen "$a".
+de: Wir fahren nun mit dem Aufr&auml;umen der Datenbank "%a" fort.
+en: We are going to proceed to the cleaning up of the database "%a".
+es: Vamos a proceder a la limpieza de la base  "%a".
+fr: Nous allons proc&eacute;der au nettoyage de la base "%a".
+it: Ora procediamo alla pulizia della base "%a".
+lv: Datu bâzes "%a" sakopðanas proces tiks turpinâts.
+sv: Vi ska gå vidare med att rensa upp databasen "%a".
 ]
 
 <p>
@@ -72,7 +72,7 @@ sv: Tryck på knappen nedan för att starta operationen.
 <p>
 
 <form method=POST action="cleanup_1">
-$h
+%h
 <dl><dt><dd><input type=submit value="Ok"></dl>
 </form>
 
@@ -93,26 +93,26 @@ sv: Denna operation motsvarar de följande kommandona:
 ]
 
 <pre>
-     $$ cd $w
-     $$ $x$/gwu $a -o tmp.gw
-     $$ mkdir old
+     %% cd %w
+     %% %x%/gwu %a -o tmp.gw
+     %% mkdir old
      [
 de: Unter Unix:
 en: Under Unix:
 fr: Sous Unix:
 it: Sotto Unix:
 ]
-        $$ rm -rf old/$a.gwb
-        $$ mv $a.gwb old/.
+        %% rm -rf old/%a.gwb
+        %% mv %a.gwb old/.
      [
 de: Unter MSdos:
 en: Under MSdos:
 fr: Sous MSdos:
 it: Sotto MSdos
 ]
-        $$ del old\$a.gwb\*.*
-        $$ rmdir old\$a.gwb
-        $$ move $a.gwb old\.
-     $$ $x$/gwc tmp.gw -o $a > comm.log
+        %% del old\%a.gwb\*.*
+        %% rmdir old\%a.gwb
+        %% move %a.gwb old\.
+     %% %x%/gwc tmp.gw -o %a > comm.log
 </pre>
 

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.39 2002-06-18 10:50:00 ddr Exp $ *)
+(* $Id: setup.ml,v 4.40 2002-06-20 08:32:51 ddr Exp $ *)
 
 open Printf;
 
@@ -327,7 +327,7 @@ value macro conf =
   | 'u' -> Filename.dirname (abs_setup_dir ())
   | 'x' -> setup_dir.val
   | 'w' -> slashify (Sys.getcwd ())
-  | '$' -> "$"
+  | '%' -> "%"
   | c -> "BAD MACRO " ^ String.make 1 c ]
 ;
 
@@ -353,7 +353,7 @@ value variables bname =
   let (vlist, flist) =
     loop ([], []) where rec loop (vlist, flist) =
       match strm with parser
-      [ [: `'$' :] ->
+      [ [: `'%' :] ->
           let (vlist, flist) =
             match strm with parser
             [ [: `('E' | 'C') :] ->
@@ -388,10 +388,10 @@ value rec copy_from_stream conf print strm =
           match Stream.peek strm with
           [ Some '\n' ->
               let s = parse_upto ']' strm in
-              print (Translate.inline conf.lang '$' (macro conf) s)
+              print (Translate.inline conf.lang '%' (macro conf) s)
           | _ ->
               print "[" ]
-      | '$' ->
+      | '%' ->
           let c = Stream.next strm in
           match c with
           [ 'b' -> for_all conf print (all_db ".") strm

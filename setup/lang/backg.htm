@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: backg.htm,v 1.2 2002-06-18 07:27:02 ddr Exp $ -->
+  <!-- $Id: backg.htm,v 1.3 2002-06-20 08:32:51 ddr Exp $ -->
   <title>[
 de: Hintergrundbild
 en: Background image
@@ -13,7 +13,7 @@ lv: Fona attçls
 sv: Bakgrundsbild
 ]</title></head>
 
-<body background="file://$f/images/gwback.jpg">
+<body background="file://%f/images/gwback.jpg">
 
 <center><h1><font color=#2f6400>[
 de: Hintergrundbild
@@ -29,24 +29,24 @@ sv: Bakgrundsbild
 
 <li>
 [
-de: Um ein <b>Hintergrundbild</b> f&uuml;r die Datenbank "$o" anzugeben,
+de: Um ein <b>Hintergrundbild</b> f&uuml;r die Datenbank "%o" anzugeben,
     gib hier den Dateinamen des Bildes ein:
-en: To specify a background image for the database "$o", you have to
+en: To specify a background image for the database "%o", you have to
     write it:
-es: Para utilizar una imagen de fondo en la base "$o", hay que meterla 
+es: Para utilizar una imagen de fondo en la base "%o", hay que meterla 
     bajo la forma:
-fr: Pour <b>indiquer une image de fond</b> pour la base "$o", il faut la
+fr: Pour <b>indiquer une image de fond</b> pour la base "%o", il faut la
     mettre sous la forme suivante:
-it: Per <b>indicare un'immagine di fondo</b> per la base "$o",
+it: Per <b>indicare un'immagine di fondo</b> per la base "%o",
     bisogna farlo nella forma seguente:
-lv: Lai noteiktu fona attçlu datu bâzei "$o", jums jâuzraksta tas
+lv: Lai noteiktu fona attçlu datu bâzei "%o", jums jâuzraksta tas
     (aizvietojot "<tt>foo.jpg</tt>" jûsu attçla datnes reâlo nosaukumu):
-sv: För att specifiera en bakgrundsbild för databasen "$o", måste du
+sv: För att specifiera en bakgrundsbild för databasen "%o", måste du
     skriva (byt ut "<tt>foo.jpg</tt>" mot det riktiga namnet för bildfilen):
 ]
 
 <pre>
-     background="gwd$t{.exe}?m=IM;v=/[
+     background="gwd%t{.exe}?m=IM;v=/[
 de: bla.jpg
 en: foo.jpg
 es: toto.jpg
@@ -89,7 +89,7 @@ sv: Lägg bildfilen i katalogen
 ]
 
 <pre>
-     gw$/images
+     gw%/images
 </pre>
 
 </ul>
