@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.43 2005-02-05 06:34:39 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.44 2005-02-05 15:27:55 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -39,27 +39,35 @@ function checkCreate(create, redirect)
       <td>xlab</td>
       <td>
         %if;([ !dates order]0 = "ddmmyy");
-          [year/month/day]2
+	  <label>
+	  [year/month/day]2
           <input name="xvar_dd" size="2" maxlength="2" value="%xdate.day;"%/>
+	  </label><label>
           [year/month/day]1
           <input name="xvar_mm" size="2" maxlength="2" value="%xdate.month;"%/>
+	  </label><label>
           [year/month/day]0
           <input name="xvar_yyyy" size="6" maxlength="6"%sp;
            value="%xdate.year;"%/>
+	  </label>
         %else;
+	  <label>
           [year/month/day]0
           <input name="xvar_yyyy" size="6" maxlength="6"%sp;
            value="%xdate.year;"%/>
+	  </label><label>
           [year/month/day]1
           <input name="xvar_mm" size="2" maxlength="2" value="%xdate.month;"%/>
+	  </label><label>
           [year/month/day]2
           <input name="xvar_dd" size="2" maxlength="2" value="%xdate.day;"%/>
+	  </label>
         %end;
       </td>
       <td>
-        ...[or]0 [text]0
+        <label>...[or]0 [text]0
         <input name="xvar_text" size="15" maxlength="30"%sp;
-         value="%xdate.text;"%/>
+         value="%xdate.text;"%/></label>
       </td>
     </tr>
   </table>
@@ -106,9 +114,9 @@ function checkCreate(create, redirect)
 %define;source(xvar,xx)
   <table border="1">
     <tr>
-      <td>[*source/sources]0</td>
+      <td><label for="xvar_src">[*source/sources]0</label><td>
       <td><input name="xvar_src" size="40" maxlength="200"%sp;
-       value="%xx_src;"%/></td>
+       value="%xx_src;" id="xvar_src"%/></td>
     </tr>
   </table>
 %end;
@@ -131,10 +139,11 @@ function checkCreate(create, redirect)
        value="%xx.create.kind_day;"xp%/>
     %end;
   </td>
-  %if;("verbose" = "true")<td>[*place]</td>%end;%nl;
+  %if;("verbose" = "true")<td><label for="xvar_pl">[*place]</label>%nn;
+  </td>%end;%nl;
   <td colspan="2">
     <input name="xvar_pl" size="20" maxlength="200"%sp;
-     value="%xx.create.kind_place;"xp%/>
+     value="%xx.create.kind_place;"xp id="xvar_pl"%/>
   </td>
 %end;
 
@@ -151,14 +160,15 @@ function checkCreate(create, redirect)
 %define;parent(xcnt,xx)
   <table border="1">
     <tr>
-      <td>[*first name/first names]0</td>
+      <td><label for="paxcnt_fn">[*first name/first names]0</label></td>
       <td>
         <input name="paxcnt_fn" size="23" maxlength="200"%sp;
-         value="%xx.first_name;"%/>
+         value="%xx.first_name;" id="paxcnt_fn"%/>
       </td>
-      <td align="%right;">[*number]</td>
+      <td align="%right;"><label for="paxcnt_occ">[*number]</label></td>
       <td>
-        <input name="paxcnt_occ" size="5" maxlength="8" value="%xx.occ;"%/>
+        <input name="paxcnt_occ" size="5" maxlength="8" value="%xx.occ;"%sp;
+	 id="paxcnt_occ"%/>
       </td>
       <td>
         <select name="paxcnt_p">
@@ -170,10 +180,10 @@ function checkCreate(create, redirect)
       </td>
     </tr>
     <tr>
-      <td>[*surname/surnames]0</td>
+      <td><label for="paxcnt_sn">[*surname/surnames]0</label></td>
       <td colspan="4">
         <input name="paxcnt_sn" size="40" maxlength="200"%sp;
-         value="%xx.surname"%/>
+         value="%xx.surname" id="paxcnt_sn"%/>
       </td>
     </tr>
   </table>
@@ -245,23 +255,29 @@ function checkCreate(create, redirect)
 
 <h4>[*marriage/marriages]0</h4>
 <p>
+<label>
 <input type="radio" name="mrel" value="marr"%if;(mrel = "marr")
  checked="checked"%end;%/>[*married]
+</label><label>
 <input type="radio" name="mrel" value="not_marr"%if;(mrel = "not_marr")
  checked="checked"%end;%/>[*not married]
+</label><label>
 <input type="radio" name="mrel" value="engaged"%if;(mrel = "engaged")
  checked="checked"%end;%/>[*engaged]
+</label><label>
 <input type="radio" name="mrel" value="nsck"%if;(mrel = "nsck")
  checked="checked"%end;%/>[*no sexes check]<br%/>
+</label><label>
 <input type="radio" name="mrel" value="no_ment"%if;(mrel = "no_ment")
  checked="checked"%end;%/>[*no mention]
+</label>
 </p>
 <table border="1">
   <tr>
-    <td>[*place]</td>
+    <td><label for="marr_place">[*place]</label></td>
     <td>
       <input name="marr_place" size="40" maxlength="200"
-       value="%marriage_place;"%/>
+       value="%marriage_place;" id="marr_place"%/>
     </td>
   </tr>
 </table>
@@ -273,23 +289,23 @@ function checkCreate(create, redirect)
 
 <table border="1">
   <tr>
-    <td>[*insert::witness/witnesses]0
-      <input type="checkbox" name="ins_witn0" value="on"%/></td>
+    <td><label>[*insert::witness/witnesses]0
+      <input type="checkbox" name="ins_witn0" value="on"%/></label></td>
   </tr>
 </table>
 
 %foreach;witness;
   <table border="1">
     <tr>
-      <td>[*first name/first names]0</td>
+      <td><label for="witn%cnt;_fn">[*first name/first names]0</td>
       <td>
         <input name="witn%cnt;_fn" size="23" maxlength="200"%sp;
-         value="%witness.first_name;"%/>
+         value="%witness.first_name;" id="witn%cnt;_fn"%/>
       </td>
-      <td align="%right;">[*number]</td>
+      <td align="%right;"><label for="witn%cnt;_occ">[*number]</label></td>
       <td>
         <input name="witn%cnt;_occ" size="5" maxlength="8"%sp;
-         value="%witness.occ;"%/>
+         value="%witness.occ;" id="witn%cnt;_occ"%/>
       </td>
       <td>
         <select name="witn%cnt;_p">
@@ -301,46 +317,54 @@ function checkCreate(create, redirect)
       </td>
     </tr>
     <tr>
-      <td>[*surname/surnames]0</td>
+      <td><label for="witn%cnt;_sn">[*surname/surnames]0</label></td>
       <td colspan="3">
         <input name="witn%cnt;_sn" size="40" maxlength="200"%sp;
-         value="%witness.surname;"%/>
+         value="%witness.surname;" id="witn%cnt;_sn"%/>
       </td>
       <td>
+        <label>
         <input type="radio" name="witn%cnt;_sex" value="N"%nn;
          %if;(witness.create.sex = "neuter") checked="checked"%end;%/>?
+	</label><label>
         <input type="radio" name="witn%cnt;_sex" value="M"%nn;
          %if;(witness.create.sex = "male") checked="checked"%end;%/>[M/F]0
+	</label><label>
         <input type="radio" name="witn%cnt;_sex" value="F"%nn;
          %if;(witness.create.sex = "female") checked="checked"%end;%/>[M/F]1
+        </label>
       </td>
     </tr>
   </table>
   <table border="1">
     <tr>
-      <td>[*insert::witness/witnesses]0
-      <input type="checkbox" name="ins_witn%cnt;" value="on"%/></td>
+      <td><label>[*insert::witness/witnesses]0
+      <input type="checkbox" name="ins_witn%cnt;" value="on"%/></label></td>
     </tr>
   </table>
 %end;
 
 <h4>[*divorce]</h4>
 <p>
+<label>
 <input type="radio" name="div" value="not_divorced"%nn;
  %if;(divorce = "not_divorced") checked="checked"%end;%/>[*not divorced]
+</label><label>
 <input type="radio" name="div" value="divorced"%nn;
  %if;(divorce = "divorced") checked="checked"%end;%/>[*divorced]
+</label><label>
 <input type="radio" name="div" value="separated"%nn;
  %if;(divorce = "separated") checked="checked"%end;%/>[*separated]
+</label>
 </p>
 %apply;date([*date]0, "div", "divorce")
 
-<h4>[*comment]</h4>
+<h4><label for="comment">[*comment]</label></h4>
 
 <table border="1">
   <tr>
     <td><input name="comment" size="50" maxlength="200"%sp;
-     value="%comment;"%/></td>
+     value="%comment;" id="comment"%/></td>
   </tr>
 </table>
 
@@ -350,9 +374,9 @@ function checkCreate(create, redirect)
   <table border="1">
     <tr>
       <td>
-        [*insert::|<input name="ins_chxcnt_n" size="1" maxlength="1"%sp;
-         value="1"%/> | child/children]
-        <input type="checkbox" name="ins_chxcnt" value="on"%/>
+        <label>[*insert::|<input name="ins_chxcnt_n" size="1" maxlength="1"%sp;
+         value="1"%/></label><label> | child/children]
+        <input type="checkbox" name="ins_chxcnt" value="on"%/></label>
       </td>
     </tr>
   </table>
@@ -361,18 +385,19 @@ function checkCreate(create, redirect)
 %define;child(xcnt)
   <table border="1">
     <tr>
-      <td>[*first name/first names]0</td>
+      <td><label for="chxcnt_fn">[*first name/first names]0</label></td>
       <td colspan="2">
         <input name="chxcnt_fn" size="23" maxlength="200"%sp;
-         value="%child.first_name;"%/>
+         value="%child.first_name;" id="chxcnt_fn"%/>
       </td>
-      <td align="%right;">[*number]</td>
+      <td align="%right;"><label for="chxcnt_occ">[*number]</label></td>
       <td>
-        <input name="chxcnt_occ" size="5" maxlength="8" value="%child.occ;"%/>
+        <input name="chxcnt_occ" size="5" maxlength="8" value="%child.occ;"%sp;
+	 id="chxcnt_occ"%/>
       </td>
     </tr>
     <tr>
-      <td>[*surname/surnames]0</td>
+      <td><label for="chxcnt_sn">[*surname/surnames]0</label></td>
       <td colspan="4">
         <input name="chxcnt_sn" size="40" maxlength="200"%sp;
          value="%nn;
@@ -381,7 +406,7 @@ function checkCreate(create, redirect)
                evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK" or
                evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK") and
               child.surname = father.surname)
-           %else;%child.surname;%end;"%/>
+           %else;%child.surname;%end;" id="chxcnt_sn""%/>
       </td>
     </tr>
     <tr>
@@ -398,12 +423,16 @@ function checkCreate(create, redirect)
     </tr>
     <tr>
       <td>
+        <label>
         <input type="radio" name="chxcnt_sex" value="N"%nn;
          %if;(child.create.sex = "neuter") checked="checked"%end;%/>?
+        </label><label>
         <input type="radio" name="chxcnt_sex" value="M"%nn;
          %if;(child.create.sex = "male") checked="checked"%end;%/>[M/F]0
+        </label><label>
         <input type="radio" name="chxcnt_sex" value="F"%nn;
          %if;(child.create.sex = "female") checked="checked"%end;%/>[M/F]1
+        </label>
       </td>
       %apply;death("chxcnt", "child", "false",
                    " onfocus='checkCreate(chxcnt_p,chxcnt_fn)'")
@@ -429,16 +458,17 @@ function checkCreate(create, redirect)
 
 <table border="1">
   <tr>
-    <td>[*person/persons]1</td>
+    <td><label for="psrc">[*person/persons]1</label></td>
     <td>
       <input name="psrc" size="50" maxlength="200" value="%nn;
-       %if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;"%/>
+       %if;(evar_psrc != "")%evar_psrc;%else;%evar_dsrc;%end;" id="psrc"%/>
     </td>
   </tr>
   <tr>
-    <td>[*family/families]0</td>
+    <td><label for="src">[*family/families]0</label></td>
     <td>
-      <input name="src" size="50" maxlength="200" value="%fsources;"%/>
+      <input name="src" size="50" maxlength="200" value="%fsources;"%sp;
+       id="src"%/>
       <input type="checkbox" name="rdsrc" value="on"%sp;
        %if;(evar_rdsrc = "on") checked="checked"%end;%/>
     </td>
