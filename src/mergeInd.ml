@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 4.20 2002-04-23 07:25:57 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 4.21 2002-06-03 13:29:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -332,6 +332,9 @@ value effective_merge_ind conf base p1 p2 =
     else ();
     if p1.burial_src = Adef.istr_of_int 0 then
       p1.burial_src := p2.burial_src
+    else ();
+    if p1.occupation = Adef.istr_of_int 0 then
+      p1.occupation := p2.occupation
     else ();
     if p1.notes = Adef.istr_of_int 0 then p1.notes := p2.notes else ();
     UpdateIndOk.effective_del conf base p2;
