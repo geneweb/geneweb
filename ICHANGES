@@ -4,6 +4,9 @@ Internal Changes
 GeneWeb Version 1.09
 --------------------
 
+* gwc:
+  - Send error and warning messages on stdout, instead of stderr.
+
 GeneWeb Version 1.08
 --------------------
 
