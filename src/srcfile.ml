@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.31 2005-02-05 03:51:58 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.32 2005-02-05 06:34:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -233,11 +233,7 @@ value macro conf base =
   | 'i' -> conf.highlight
   | 'k' -> conf.indep_command
   | 'l' -> conf.lang
-  | 'L' ->
-      let s =
-        try Hashtbl.find conf.lexicon " !dir" with [ Not_found -> "" ]
-      in
-      if s = "rtl" then "right" else "left"
+  | 'L' -> conf.left
   | 'm' ->
       try
         let s = List.assoc "latest_event" conf.base_env in
@@ -252,11 +248,7 @@ value macro conf base =
       let r = count conf in
       string_of_num (transl conf "(thousand separator)")
         (Num.of_int (r.welcome_cnt + r.request_cnt))
-  | 'R' ->
-      let s =
-        try Hashtbl.find conf.lexicon " !dir" with [ Not_found -> "" ]
-      in
-      if s = "rtl" then "left" else "right"
+  | 'R' -> conf.right
   | 's' -> commd conf
   | 't' -> conf.bname
   | 'T' -> Util.doctype conf
@@ -542,7 +534,7 @@ value print_lexicon conf base =
     match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
     [ Some ic ->
         do {
-          Wserver.wprint "<pre>\n";
+          Wserver.wprint "<pre dir=\"ltr\">\n";
           try
             while True do {
               match input_char ic with

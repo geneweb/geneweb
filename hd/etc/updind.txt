@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.22 2005-02-03 09:59:13 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.23 2005-02-05 06:34:39 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -607,7 +607,7 @@ function changeDeath()
 </form>
 
 <div><a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
- alt="..." width="64" height="72" style="border:0;float:right"%/></a><br%/>
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a><br%/>
 </div>
 %copyright;
 %base_trailer;

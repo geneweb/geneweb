@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.29 2005-01-02 15:56:32 ddr Exp $ *)
+(* $Id: date.ml,v 4.30 2005-02-05 06:34:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -345,7 +345,7 @@ value short_dates_text conf base p =
       [ Some (Dgreg d _) -> s ^ year_text d
       | _ -> s ]
     in
-    if s <> "" then " <em>" ^ s ^ "</em>" else s
+    if s <> "" then " <em><bdo dir=\"ltr\">" ^ s ^ "</bdo></em>" else s
   else ""
 ;
 
@@ -543,7 +543,7 @@ value print_day conf date var =
 value print_some_calendar conf order date n month_name n_months var =
   do {
     Wserver.wprint "\n";
-    tag "tr" "align=\"left\"" begin
+    tag "tr" "align=\"%s\"" conf.left begin
       stag "th" begin
         Wserver.wprint "%s"
           (capitale (transl_nth conf "gregorian/julian/french/hebrew" n));
@@ -567,7 +567,7 @@ value print_some_calendar conf order date n month_name n_months var =
 ;
 
 value print_calendar_head conf order =
-  tag "tr" "align=\"left\"" begin
+  tag "tr" "align=\"%s\"" conf.left begin
     stag "td" begin Wserver.wprint "&nbsp;"; end;
     Wserver.wprint "\n";
     if order = "ddmmyy" then
@@ -663,7 +663,7 @@ value print_calendar conf base =
     tag "table" begin
       stag "tbody" begin
         stag "tr" begin
-          tag "td" "align=\"left\"" begin
+          tag "td" "align=\"%s\"" conf.left begin
             Wserver.wprint "- %s -"
               (capitale (nominative (transl_nth conf "(week day)" wday)));
             if date = conf.today then
@@ -674,7 +674,7 @@ value print_calendar conf base =
           end;
         end;
         stag "tr" begin
-          stag "td" "align=\"left\"" begin
+          stag "td" "align=\"%s\"" conf.left begin
             Wserver.wprint "&nbsp;";
           end;
         end;
@@ -708,7 +708,7 @@ value print_calendar conf base =
           end;
         end;
         stag "tr" begin
-          stag "td" "align=\"left\"" begin
+          stag "td" "align=\"%s\"" conf.left begin
             Wserver.wprint "&nbsp;";
           end;
         end;
