@@ -2,7 +2,7 @@ GeneWeb version 4.02
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [01 May 00] In personal pages, related persons (godchildren, adoptive
+  - [01 May 01] In personal pages, related persons (godchildren, adoptive
     children, etc) are displayed in their baptism or birth order.
   - [19 Apr 01] Improved the sending of images. Should work better,
     particularly for images sent from a MacIntosh.
