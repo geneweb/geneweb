@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.3 2001-12-20 19:58:16 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.4 2002-01-10 04:13:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -179,7 +179,7 @@ value find_prev_branch base dist ia sa ipl =
 (* Printing *)
 
 value someone_text conf base ip =
-  let p = poi base ip in
+  let p = pget conf base ip in
   referenced_person_title_text conf base p ^ Date.short_dates_text conf base p
 ;
 
@@ -193,8 +193,8 @@ value spouse_text conf base end_sp ip ipl =
           let fam = foi base ifam in
           let sp = if ip = c.father then c.mother else c.father in
           let d =
-            Date.short_marriage_date_text conf base fam (poi base c.father)
-              (poi base c.mother)
+            Date.short_marriage_date_text conf base fam (pget conf base c.father)
+              (pget conf base c.mother)
           in
           (someone_text conf base sp, d, Some sp)
       | _ -> ("", "", None) ]
@@ -208,7 +208,7 @@ value spouse_text conf base end_sp ip ipl =
 value print_someone conf base ip =
   do {
     Wserver.wprint "%s\n" (someone_text conf base ip);
-    Wserver.wprint "%s" (Dag.image_txt conf base (poi base ip))
+    Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
   }
 ;
 
@@ -219,7 +219,7 @@ value print_spouse conf base n ip ipl =
     html_br conf;
     Wserver.wprint "%s\n" s;
     match spo with
-    [ Some ip -> Wserver.wprint "%s" (Dag.image_txt conf base (poi base ip))
+    [ Some ip -> Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
     | _ -> () ]
   }
   else ()
@@ -352,8 +352,8 @@ value include_marr conf base n =
 
 value sign_text conf base sign info b1 b2 c1 c2 =
   "<a href=\"" ^ commd conf ^ "m=RL" ^ ";" ^
-    acces_n conf base "1" (poi base info.ip1) ^ ";" ^
-    acces_n conf base "2" (poi base info.ip2) ^ ";b1=" ^
+    acces_n conf base "1" (pget conf base info.ip1) ^ ";" ^
+    acces_n conf base "2" (pget conf base info.ip2) ^ ";b1=" ^
     Num.to_string (sosa_of_branch [(info.ip, info.sp) :: b1]) ^ ";b2=" ^
     Num.to_string (sosa_of_branch [(info.ip, info.sp) :: b2]) ^ ";c1=" ^
     string_of_int c1 ^ ";c2=" ^ string_of_int c2 ^
@@ -432,7 +432,7 @@ value other_parent_text_if_same conf base info =
           [ Some ip ->
               let d =
                 Date.short_marriage_date_text conf base (foi base ifam1)
-                  (poi base cpl1.father) (poi base cpl1.mother)
+                  (pget conf base cpl1.father) (pget conf base cpl1.mother)
               in
               Some ("&amp;" ^ d ^ " " ^ someone_text conf base ip, ip)
           | _ -> None ]
@@ -445,7 +445,7 @@ value print_other_parent_if_same conf base info =
   [ Some (s, ip) ->
       do {
         Wserver.wprint "%s" s;
-        Wserver.wprint "%s" (Dag.image_txt conf base (poi base ip))
+        Wserver.wprint "%s" (Dag.image_txt conf base (pget conf base ip))
       }
   | None -> () ]
 ;
@@ -588,14 +588,15 @@ value print_relation_no_dag conf base po ip1 ip2 =
         let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
         let b1 = find_first_branch base dist ip l1 ip1 Neuter in
         let b2 = find_first_branch base dist ip l2 ip2 Neuter in
-        Some (ip, (poi base ip).sex, dist, b1, b2, 1, 1)
+        Some (ip, (pget conf base ip).sex, dist, b1, b2, 1, 1)
     | _ ->
         match (p_getenv conf.env "b1", p_getenv conf.env "b2") with
         [ (Some b1str, Some b2str) ->
             let n1 = Num.of_string b1str in
             let n2 = Num.of_string b2str in
             match
-              (branch_of_sosa base ip1 n1, branch_of_sosa base ip2 n2)
+              (branch_of_sosa conf base ip1 n1,
+               branch_of_sosa conf base ip2 n2)
             with
             [ (Some [(ia1, sa1) :: b1], Some [(ia2, sa2) :: b2]) ->
                 if ia1 == ia2 then

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.6 2001-10-03 08:55:33 ddr Exp $ *)
+(* $Id: place.ml,v 4.7 2002-01-10 04:13:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -98,7 +98,7 @@ value get_all conf base =
       let rec loop i =
         if i = base.data.persons.len then ()
         else do {
-          let p = base.data.persons.get i in
+          let p = pget conf base (Adef.iper_of_int i) in
           let pl_bi = if add_birth then p.birth_place else empty in
           let pl_bp = if add_birth then p.baptism_place else empty in
           let pl_de = if add_death then p.death_place else empty in
@@ -129,8 +129,8 @@ value get_all conf base =
             let pl_ma = fam.marriage_place in
             if pl_ma <> empty then
               let cpl = coi base fam.fam_index in
-              let fath = poi base cpl.father in
-              let moth = poi base cpl.mother in
+              let fath = pget conf base cpl.father in
+              let moth = pget conf base cpl.mother in
               if fast_auth_age conf fath && fast_auth_age conf moth then do {
                 ht_add pl_ma fath; ht_add pl_ma moth
               }
@@ -198,7 +198,7 @@ value print_html_places_surnames conf base =
             let snl =
               List.map
                 (fun (len, ip) ->
-                   let p = poi base ip in
+                   let p = pget conf base ip in
                    let sn = p_surname base p in
                    (len, p, sn))
                 snl

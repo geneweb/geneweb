@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 4.1 2001-04-23 02:59:45 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 4.2 2002-01-10 04:13:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Gutil;
@@ -130,7 +130,7 @@ value main () =
     let ip =
       Gutil.person_ht_find_unique base p_fname.val p_sname.val p_num.val
     in
-    most_desc base (poi base ip)
+    most_desc base (pget conf base ip)
   }
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 4.1 2001-04-22 03:31:16 ddr Exp $ *)
+(* $Id: title.ml,v 4.2 2002-01-10 04:13:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -57,11 +57,11 @@ value date_interval conf base t x =
                    match Adef.od_of_codate md with
                    [ Some (Dgreg d _) -> set d
                    | _ -> () ];
-                   loop JustSelf (poi base conj);
+                   loop JustSelf (pget conf base conj);
                    match t with
                    [ AddChildren ->
                        let des = doi base ifam in
-                       Array.iter (fun e -> loop JustSelf (poi base e))
+                       Array.iter (fun e -> loop JustSelf (pget conf base e))
                          des.children
                    | _ -> () ];
                  })
@@ -175,7 +175,8 @@ value select_title_place conf base title place =
   in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let x = base.data.persons.get i in List.iter (select x) x.titles
+      let x = pget conf base (Adef.iper_of_int i) in
+      List.iter (select x) x.titles
     };
     (list.val, clean_title.val, clean_place.val)
   }
@@ -193,13 +194,14 @@ value select_all_with_place conf base place =
   in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let x = base.data.persons.get i in List.iter (select x) x.titles
+      let x = pget conf base (Adef.iper_of_int i) in
+      List.iter (select x) x.titles
     };
     (list.val, clean_place.val)
   }
 ;
 
-value select_title base title =
+value select_title conf base title =
   let list = ref [] in
   let clean_name = ref title in
   let title = strip_abbrev_lower title in
@@ -215,13 +217,14 @@ value select_title base title =
   in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let x = base.data.persons.get i in List.iter add_place x.titles
+      let x = pget conf base (Adef.iper_of_int i) in
+      List.iter add_place x.titles
     };
     (list.val, clean_name.val)
   }
 ;
 
-value select_place base place =
+value select_place conf base place =
   let list = ref [] in
   let clean_name = ref place in
   let place = strip_abbrev_lower place in
@@ -237,7 +240,8 @@ value select_place base place =
   in
   do {
     for i = 0 to base.data.persons.len - 1 do {
-      let x = base.data.persons.get i in List.iter add_title x.titles
+      let x = pget conf base (Adef.iper_of_int i) in
+      List.iter add_title x.titles
     };
     (list.val, clean_name.val)
   }
@@ -250,7 +254,7 @@ value select_all proj conf base =
     loop 0 S.empty where rec loop i s =
       if i = base.data.persons.len then s
       else
-        let x = base.data.persons.get i in
+        let x = pget conf base (Adef.iper_of_int i) in
         let s =
           List.fold_left (fun s t -> S.add (sou base (proj t)) s) s x.titles
         in
@@ -447,7 +451,7 @@ value print_places_list conf base t list =
 ;
 
 value print_places conf base t =
-  let (l, t) = select_title base t in
+  let (l, t) = select_title conf base t in
   let list = string_list_uniq (Sort.list compare_places l) in
   match list with
   [ [p] -> print_title_place conf base t p
@@ -455,7 +459,7 @@ value print_places conf base t =
 ;
 
 value print_titles conf base p =
-  let (l, p) = select_place base p in
+  let (l, p) = select_place conf base p in
   let list = string_list_uniq (Sort.list compare_titles l) in
   let title _ = Wserver.wprint "... %s" p in
   do {
