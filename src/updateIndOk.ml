@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.16 2000-10-29 15:02:19 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.17 2000-11-11 20:29:50 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -646,11 +646,29 @@ value print_mod_ok conf base wl p =
 ;
 *)
 
+value relation_sex_is_coherent base warning p =
+  List.iter
+    (fun r ->
+       do match r.r_fath with
+          [ Some ip ->
+              let p = poi base ip in
+              if p.sex <> Male then warning (IncoherentSex p) else ()
+          | None -> () ];
+          match r.r_moth with
+          [ Some ip ->
+              let p = poi base ip in
+              if p.sex <> Female then warning (IncoherentSex p) else ()
+          | None -> () ];
+       return ())
+    p.rparents
+;
+
 value all_checks_person conf base p a u =
   let wl = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
   do Gutil.check_person base error warning p;
+     relation_sex_is_coherent base warning p;
      match a.parents with
      [ Some ifam ->
          Gutil.check_family base error warning (foi base ifam)
