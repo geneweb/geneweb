@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.18 2002-11-18 12:36:27 ddr Exp $ *)
+(* $Id: descend.ml,v 4.19 2003-07-17 08:38:06 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -263,8 +263,11 @@ value display_descendants_upto conf base max_level p line =
   let levt = make_level_table conf base max_level p in
   let count = ref 0 in
   let always_surname =
-    try List.assoc "always_surname" conf.base_env = "yes" with
-    [ Not_found -> False ]
+    match p_getenv conf.env "alwsurn" with
+    [ Some x -> x = "yes"
+    | None ->
+        try List.assoc "always_surname" conf.base_env = "yes" with
+        [ Not_found -> False ] ]
   in
   let rec loop level p u =
     if level <= max_level then

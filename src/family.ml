@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.34 2003-07-15 11:17:54 ddr Exp $ *)
+(* $Id: family.ml,v 4.35 2003-07-17 08:38:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -554,6 +554,9 @@ value extract_henv conf base =
         let v = escache_value conf in
         conf.henv := conf.henv @ [("escache", v)]
     | None -> () ];
+    match p_getenv conf.env "alwsurn" with
+    [ Some x -> conf.henv := conf.henv @ [("alwsurn", x)]
+    | _ -> () ];
   }
 ;
 
