@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 1.2 1998-09-29 12:22:35 ddr Exp $ *)
+(* $Id: gutil.ml,v 1.3 1998-11-20 13:44:49 ddr Exp $ *)
 
 open Def;
 
@@ -116,10 +116,11 @@ value string_of_date =
 value denomination base p =
   let prenom = sou base p.first_name in
   let nom = sou base p.surname in
-  prenom ^
-    (if p.occ == 0 || prenom = "?" || nom = "?" then ""
-     else "." ^ string_of_int p.occ) ^
-    " " ^ nom
+  Ansel.to_iso_8859_1
+    (prenom ^
+      (if p.occ == 0 || prenom = "?" || nom = "?" then ""
+       else "." ^ string_of_int p.occ) ^
+      " " ^ nom)
 ;
 
 value person_misc_names base p =
