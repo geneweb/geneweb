@@ -83,7 +83,7 @@ eller <em>Sosa-nummer</em>, refererende til %a%u
 </ul>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -101,7 +101,7 @@ eller <em>Sosa-nummer</em>, refererende til %a%u
 <br>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h

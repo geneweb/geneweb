@@ -83,7 +83,7 @@ Para consultar esta base de dados, pode procurar:<br><br>
 </ul>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -100,7 +100,7 @@ Para consultar esta base de dados, pode procurar:<br><br>
 </td></tr></table>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h

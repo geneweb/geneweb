@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.0 1999-10-29 10:29:12 ddr Exp $
+# $Id: a.gwf,v 3.1 1999-10-29 18:04:13 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -76,6 +76,10 @@ auth_file=
 # "n=first+name;p=surname;oc=number" instead of (shorter) "i=integer"
 # in URLs.
 access_by_key=no
+
+# Set to no if you don't want that the search by (nobility) titles be
+# proposed in the welcome pages.
+propose_titles=yes
 
 # Maximum level when displaying ancestors
 max_anc_level=8

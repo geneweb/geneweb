@@ -86,7 +86,7 @@ For &aring; navigere i databasen, kan du s&oslash;ke:<br><br>
 </ul>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -103,7 +103,7 @@ For &aring; navigere i databasen, kan du s&oslash;ke:<br><br>
 </td></tr></table>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h

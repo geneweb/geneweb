@@ -49,7 +49,7 @@ or <em>Sosa number</em> relative to %a%u
 </ul>
 </form>
 
-<li>
+%T<li>
 
 <FORM method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -58,7 +58,7 @@ or <em>Sosa number</em> relative to %a%u
 <INPUT TYPE=submit VALUE="Ok">
 </FORM>
 
-<li>
+%T<li>
 
 <FORM method=GET action="%f">
 %h<table border=0>

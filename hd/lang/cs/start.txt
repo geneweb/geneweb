@@ -85,7 +85,7 @@ Databáze <font color=#2f6400><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
 </ul>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -102,7 +102,7 @@ Databáze <font color=#2f6400><b>"%t"</b></font> nyní obsahuje %n osob.%o<br>
 </td></tr></table>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h

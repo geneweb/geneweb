@@ -85,7 +85,7 @@ maxlength=200>
 </ul>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -102,7 +102,7 @@ maxlength=200>
 </table>
 </form>
 
-<li>
+%T<li>
 
 <form method=GET action="%f">
 %h
