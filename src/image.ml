@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 4.7 2003-07-15 11:17:54 ddr Exp $ *)
+(* $Id: image.ml,v 4.8 2003-07-15 11:39:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -83,9 +83,12 @@ value print conf base =
 ;
 
 value print_html conf base =
-  let title _ = Wserver.wprint "%s" (Util.transl_nth conf "image/images" 0) in
   do {
-    Util.header_no_page_title conf title;
+    Util.html1 conf;
+    Wserver.wprint "<html>\n<head>\n";
+    Wserver.wprint "  <title>%s</title>\n"
+      (Util.transl_nth conf "image/images" 0);
+    Wserver.wprint "</head>\n";
     Wserver.wprint "<img src=\"%s" (commd conf);
     Gutil.list_iter_first
       (fun first (k, v) ->
