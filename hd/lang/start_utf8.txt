@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.2 2005-02-03 16:21:43 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.3 2005-02-04 01:39:39 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -30,7 +30,7 @@ ru: Genealogy
 sl: Genealogija - Družinsko drevo
 sv: Genealogi
 ] - %t</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"%/>
+  <meta http-equiv="Content-Type" content="text/html; charset=%e"%/>
   <meta http-equiv="Content-Style-Type" content="text/css"%/>
   <meta name="ROBOTS" content="NONE"%/>
   <style type="text/css"><!--
@@ -128,9 +128,9 @@ sv: Du kan välja ett annat språk bland de följande:
 <p>[
 af: Die databasis <span class="highlight">"%t"</span> bevat tans %n persone.
 bg: Базата от данни <span class="highlight">"%t"</span> в момента съдържа
-    �������� �� %n ����.
+    сведения за %n души.
 br: Niver an dud a zo er bon roadoù <span class="highlight">"%t"</span>
-    brema� a zo : %n.
+    bremañ a zo : %n.
 ca: La base de dades <span class="highlight">"%t"</span> cont&eacute;
     actualment %n persones.
 cs: Databáze <span class="highlight">"%t"</span> obsahuje %n osob.
@@ -153,7 +153,7 @@ fr-cr: Ni atchuèlement %n nhon-m, fan-m, yiche adan chagement
        <span class="highlight">"%t"</span> ta-la
 he: במאגר המידע <span class="highlight">"%t"</span> יש %n אנשים.
 is: Gagnagrunnurinn <span class="highlight">"%t"</span> er nú með %n
-    einstaklinga skr��a.
+    einstaklinga skráða.
 it: La base di dati <span class="highlight">"%t"</span> contiene
     attualmente %n persone.
 lv: Datu bâze <span class="highlight">"%t"</span> patreiz satur %n personas.
@@ -187,7 +187,7 @@ af: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> toegang<br%/>
     (password)
 bg: Достъп като
     <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
-    (������)
+    (парола)
 br: mont e-barzh evel
     <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (ger-tremen)
@@ -195,7 +195,7 @@ ca: acc&eacute;s
     <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (clau)
 cs: <a href="%sw=w">{<em>"[wizard/wizards/friend/friends]0"</em></a>
-    p��stup<br%/> (heslo)
+    přístup<br%/> (heslo)
 da: <a href="%sw=w"><em>Opdateringsadgang</em></a><br%/> (adgangskode)
 de: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a>-Zugang<br%/>
     (Passwort)
@@ -224,7 +224,7 @@ nl: Toegang als
 no: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> adgang<br%/>
     (passord)
 pl: <a href="%sw=w"><em>"[wizard/wizards/friend/friends]0"</em></a> dostęp<br%/>
-    (has�o)
+    (hasło)
 pt: Entrada <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a><br%/>
     (palavra chave)
 ro: Acces pentru
@@ -270,7 +270,7 @@ sv: <a href="%sw=f"><em>V&auml;n</em></a> tilltr&auml;de<br%/> (passord)
 %h[
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
 bg: Парола за достъп като <em>приятел</em> или
-    <em>�������������</em>:
+    <em>администратор</em>:
 br: Ger-tremen evit mont e-barzh evel <em>mignon</em> pe <em>strobineller</em>:
 ca: Clau, per acc&eacute;s <em>amic</em> o <em>administrador</em>:
 cs: Heslo pro<em>"friend"</em> nebo <em>"wizard"</em> přístup:</em>:
@@ -668,20 +668,20 @@ af: <span class="highlight">deur 'n</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>detail
        navraag</b></font></a>.
 bg: <span class="highlight">чрез</span>
-       <a href="%sm=H;v=advanced"><font color="%i"><b>���������
-       �������</b></font></a>.
+       <a href="%sm=H;v=advanced"><font color="%i"><b>разширено
+       търсене</b></font></a>.
 br: <span class="highlight"> dre ar</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>klask
        a-raokaet</b></font></a>.
 ca: <span class="highlight">per la</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>consulta
-       avan�ada</b></font></a>.
+       avançada</b></font></a>.
 cs: <span class="highlight">lze také zadat</span>
-       <a href="%sm=H;v=advanced"><font color="%i"><b>roz���en�
+       <a href="%sm=H;v=advanced"><font color="%i"><b>rozšířený
        dotaz</b></font></a>.
 da: <span class="highlight">ved</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>avanceret
-       s�gning</b></font></a>.
+       søgning</b></font></a>.
 de: <span class="highlight">mit der</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>erweiterten
        Suche</b></font></a>.
@@ -695,18 +695,18 @@ es: <span class="highlight">mediante una</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>consulta
        avanzada</b></font></a>.
 et: <span class="highlight"></span>
-       <a href="%sm=H;v=advanced"><font color="%i"><b>t�psem 
-       p�ring</b></font></a>.
+       <a href="%sm=H;v=advanced"><font color="%i"><b>täpsem 
+       päring</b></font></a>.
 fi: <a href="%sm=H;v=advanced"><span class="highlight">erityishaulla</span></a>.
 fr: <span class="highlight"> par la</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>requ&ecirc;te
         &eacute;volu&eacute;e</b></font></a>.
 he: <span class="highlight">ע"י </span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>
-       ���� ������</b></font></a>.
+       בקשה מתקדמת</b></font></a>.
 is: <span class="highlight">eftir </span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>frekari
-       �skum</b></font></a>.
+       óskum</b></font></a>.
 it: <span class="highlight">per la</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>richiesta
        avanzata</b></font></a>.
@@ -729,8 +729,8 @@ ro: <span class="highlight">prin</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>specificare
        complexa</b></font></a>.
 ru: <span class="highlight">через</span>
-       <a href="%sm=H;v=advanced"><font color="%i"><b>�����������
-       ������</b></font></a>.
+       <a href="%sm=H;v=advanced"><font color="%i"><b>расширенный
+       запрос</b></font></a>.
 sl: <span class="highlight">s pomočjo</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>naprednega iskanja
        </b></font></a>.
@@ -918,7 +918,7 @@ he: היו %q כניסות, כולל %c כניסות לעמוד זה, מאז %d.
 is: Það hafa verið %q heimsóknir, %c af þeim á þessa síðu, síðan %d.
 it: Dal %d ci sono stati %q accessi, %c dei quali a questa pagina.
 lv: Kopð %D datu bâze ir apmeklçta %q reizes, %c no tiem ir bijuði ðinî
-    lappus�. 
+    lappusç. 
 nl: Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
     deze verwelkomingspagina.
 no: Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
@@ -941,16 +941,16 @@ af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a
     href="%sescache=0">link</a>.
 bg: Ако Вашият браузър не актуализира автоматично страниците, които
-    �� ������������ (������������� �� �� �� ������������ ���),
-    �������� �� �� �������� �� <a href="%sescache=0">����
-    ���������</a>.
+    са модифицирани (принуждавайки Ви да ги презареждате Вие),
+    опитайте се да тръгнете от <a href="%sescache=0">тази
+    препратка</a>.
 br: Ma ne nevesa ket ho merdeer ent-gefreek ar pajennoù kemmet (ha dre-se emañ ret deoc'h "nevesaat ar bajenn"), klakit merdeiñ gant al liamm-mañ.
 ca: Si el vostre navegador no actualitza autom&agrave;ticament les
     p&agrave;gines modificades (obligant-vos a fer actualitzar manualment
     la p&agrave;gina), proveu de navegar des d'<a href="%sescache=0">aquest
     altre lloc</a>.
 cs: Pokud Váš prohlížeč neprovádí automaticky obnovu upravených stránek
-    (mus�te pou��vat tla��tko "obnovit"), zkuste prohl��en� p�es <a
+    (musíte používat tlačítko "obnovit"), zkuste prohlížení přes <a
     href="%sescache=0">tento odkaz</a>.
 da: Hvis din browser ikke automatisk opdaterer &aelig;ndrede sider
     (n&oslash;dvendigg&oslash;r genindl&aelig;sning af det aktuelle
@@ -968,7 +968,7 @@ es: Si las p&aacute;ginas modificadas no ser&aacute;n actualizadas
     automaticamente, favor de usar esta conexi&oacute;n:
     <a href="%sescache=0">hier</a>.
 et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt 
-    (pead andma k�su "lae k�esolev dokument uuesti"), siis  proovi alustada
+    (pead andma käsu "lae käesolev dokument uuesti"), siis  proovi alustada
     navigeerimist <a href="%sescache=0">sellest viitest</a>.
 fi: Mik&auml;li selaimesi ei automaattisesti p&auml;ivit&auml; muutettuja
     sivuja (jolloin sinun t&auml;ytyy "ladata uudelleen nykyinen
@@ -978,22 +978,22 @@ fr: Si votre navigateur ne met pas &agrave; jour automatiquement les pages
     essayez la navigation &agrave; partir de <a href="%sescache=0">ce
     lien</a>.
 is: Ef vafrinn sem þú notar er í vandræðum með að uppfæra síðuna prófaðu
-    <a href="%sescache=0">�etta</a>.
+    <a href="%sescache=0">þetta</a>.
 it: Se il vostro navigatore non aggiorna automaticamente le pagine modificate
-    (obbligandovi a fare � aggiorna �), provate a partire da
+    (obbligandovi a fare « aggiorna »), provate a partire da
     <a href="%sescache=0">questo collegamento</a>.
 lv: Ja Jûsu Interneta caurlûkprogramma automâtiski nepârlâdç lappuses pçc
-    veiktaj�m izmai��m (t�d�j�di radot Jums nepiecie�am�bu "p�rl�d�t
-    teko�o dokumentu"), tad pam��iniet uzklik��in�t <a
-    href="%sescache=0">�eit</a>.
+    veiktajâm izmaiòâm (tâdçjâdi radot Jums nepiecieðamîbu "pârlâdçt
+    tekoðo dokumentu"), tad pamçìiniet uzklikðíinât <a
+    href="%sescache=0">ðeit</a>.
 nl: Indien Uw browser de gewijzigde pagina's niet automatisch toont (maar dit
     alleen doet na klikken op "Vernieuwen"), probeer het dan eens via
     <a href="%sescache=0">deze link</a>.
 no: Hvis din browser ikke automatisk oppdaterer endrede sider (krever 
-    oppfrisking av den aktuelle siden), pr�v da � navigere <a
+    oppfrisking av den aktuelle siden), prøv da å navigere <a
     href="%sescache=0">herfra</a>.
 pl: Jeżeli twoja przeglądarka nie odświeża automatycznie zmienionych stron 
-    (zmuszaj�c ci� do ich r�cznego od�wie�ania), kliknij <a
+    (zmuszając cię do ich ręcznego odświeżania), kliknij <a
     href="%sescache=0">tutaj</a>.
 pt: Se o seu <i>browser</i> n&atilde;o actualiza automaticamente as
     p&aacute;ginas modificadas (for&ccedil;ando a fazer
@@ -1010,8 +1010,8 @@ sl: Če vaš brskalnik ne more obnavljati strani avtomatično (morate
     "reload current document"), kliknite <a
     href="%sescache=0">tukaj</a>.
 sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
-    (vilket tvingar dig att uppdatera sidan hela tiden), f�rs�k d� att
-    navigera <a href="%sescache=0">h�rifr�n</a>.
+    (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
+    navigera <a href="%sescache=0">härifrån</a>.
 ]
 </td></tr></table>
 
