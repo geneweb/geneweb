@@ -19,12 +19,12 @@ GeneWeb version 3.12
   - [10 Feb 01] In family update form, added button "no sexes check"
     allowing 1/ to create gay marriages 2/ to fix parents sex inversion
     without having to delete the marriage.
-  - [10 Feb 01] For the perso.txt template file, added the macros
-    %father_age_at_birth; and %mother_age_at_birth;
 
 * Templates files (etc/*.txt)
-  - [18 Feb 01] Added a template file for update person form, which is
-    now user-configurable.
+  - [18 Feb 01] Added a template file for update person form (updind.txt),
+    which is now user-configurable.
+  - [10 Feb 01] For the perso.txt template file, added the macros
+    %father_age_at_birth; and %mother_age_at_birth;
 
 * Welcome pages (lang/*/start.txt)
   - [16 Feb 01] In all welcome pages, suppressed the text "or surname" in
