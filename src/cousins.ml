@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.9 2002-03-11 19:02:56 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.10 2002-08-31 08:58:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -7,12 +7,12 @@ open Gutil;
 open Util;
 open Config;
 
-value max_lev = 5;
-value max_cnt = 2000;
+value default_max_lev = 5;
+value default_max_cnt = 2000;
 
 (* Utilities *)
 
-value max_ancestor_level conf base ip =
+value max_ancestor_level conf base ip max_lev =
   let x = ref 0 in
   let mark = Array.create base.data.persons.len False in
   let rec loop niveau ip =
@@ -321,7 +321,7 @@ value print_cousins conf base p lev1 lev2 =
   in
   let max_cnt =
     try int_of_string (List.assoc "max_cousins" conf.base_env) with
-    [ Not_found | Failure _ -> max_cnt ]
+    [ Not_found | Failure _ -> default_max_cnt ]
   in
   do {
     header conf title;
@@ -502,6 +502,10 @@ value print_anniv conf base p level =
 ;
 
 value print conf base p =
+  let max_lev =
+    try int_of_string (List.assoc "max_cousins_level" conf.base_env) with
+    [ Not_found | Failure _ -> default_max_lev ]
+  in
   match (p_getint conf.env "v1", p_getenv conf.env "t") with
   [ (Some lev1, _) ->
       let lev1 = min (max 1 lev1) 10 in
@@ -514,7 +518,9 @@ value print conf base p =
   | (_, Some "AN") when conf.wizard || conf.friend ->
       print_anniv conf base p max_lev
   | _ ->
-      let effective_level = max_ancestor_level conf base p.cle_index + 1 in
+      let effective_level =
+        max_ancestor_level conf base p.cle_index max_lev + 1
+      in
       if effective_level == 2 then print_cousins conf base p 2 2
       else print_menu conf base p effective_level ]
 ;
