@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.16 1999-04-11 01:12:09 ddr Exp $ *)
+(* $Id: perso.ml,v 2.17 1999-04-13 08:59:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -866,12 +866,12 @@ value print conf base p =
      [ ("", []) -> ()
      | _ ->
          do Wserver.wprint "<em>(<a href=\"%sm=P;v=%s\">" (commd conf)
-              (code_varenv (sou base p.first_name));
+              (code_varenv (Name.lower (sou base p.first_name)));
             Wserver.wprint "%s" (coa conf (sou base p.first_name));
             Wserver.wprint "</a> ";
             Wserver.wprint " ";
             Wserver.wprint "<a href=\"%sm=N;v=%s\">" (commd conf)
-              (code_varenv (sou base p.surname));
+              (code_varenv (Name.lower (sou base p.surname)));
             Wserver.wprint "%s" (coa conf (sou base p.surname));
             Wserver.wprint "</a>)</em>\n";
             html_br conf;
