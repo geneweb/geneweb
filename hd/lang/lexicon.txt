@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.36 2001-08-26 09:08:19 ddr Exp $
+# $Id: lexicon.txt,v 4.37 2001-09-02 19:09:05 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -1889,7 +1889,7 @@ it: nascita
 lv: dzimрana
 nl: geboorte
 no: f&oslash;dt
-pl: urodziny
+pl: urodzenie
 pt: nascimento
 ru: рождение
 sv: f&ouml;delse
@@ -1937,7 +1937,7 @@ it: nato/nata/nato(a)
 lv: dzimрanas
 nl: geboren
 no: f&oslash;dt
-pl: urodziny
+pl: urodzony/urodzona/urodzone
 pt: nascido/nascida/nascido(a)
 ru: родился/родилась
 sv: f&ouml;dd
