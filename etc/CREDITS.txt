@@ -29,6 +29,9 @@ Documentation
 Setup program
 	Spanish		Luis Castro Guzman
 
+Linux rpm spec file created by
+		Dan Kegel
+
 Algorithm of consanguinity and relationship
 		Didier Rémy
 
