@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.7 2000-03-05 07:46:04 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.8 2000-03-15 04:25:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -357,17 +357,32 @@ value print_anniv conf base p level =
             loop set (i + 1)
   in
   let set =
-    loop S.empty 1 0 p.cle_index where rec loop set up_sosa n ip =
-      let set = insert_desc set up_sosa [] (n + 3) ip in
-      if n >= level then set
+    let module P =
+      Pqueue.Make
+        (struct
+           type t = (iper * int * int);
+           value leq (_, lev1, _) (_, lev2, _) = lev1 <= lev2;
+         end)
+    in
+    let a = P.add (p.cle_index, 0, 1) P.empty in
+    loop S.empty a where rec loop set a =
+      if P.is_empty a then set
       else
-        match (aoi base ip).parents with
-        [ Some ifam ->
-            let cpl = coi base ifam in
-            let n = n + 1 in
-            let up_sosa = 2 * up_sosa in
-            loop (loop set up_sosa n cpl.father) (up_sosa + 1) n cpl.mother
-        | None -> set ]
+        let ((ip, n, up_sosa), a) = P.take a in
+        let set = insert_desc set up_sosa [] (n + 3) ip in
+        if n >= level then set
+        else
+          let a =
+            match (aoi base ip).parents with
+            [ Some ifam ->
+                let cpl = coi base ifam in
+                let n = n + 1 in
+                let up_sosa = 2 * up_sosa in
+                let a = P.add (cpl.father, n, up_sosa) a in
+                P.add (cpl.mother, n, up_sosa + 1) a
+            | None -> a ]
+          in
+          loop set a
   in
   let set =
     S.fold
