@@ -1,11 +1,21 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.22 2002-12-31 08:38:07 ddr Exp $ *)
+(* $Id: forum.ml,v 4.23 2003-01-14 14:18:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
 open Config;
 open Def;
 open Printf;
+
+type message =
+  { m_time : string;
+    m_ident : string;
+    m_wizard : string;
+    m_email : string;
+    m_access : string;
+    m_subject : string;
+    m_mess : string }
+;
 
 value forum_file conf =
   Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum"
@@ -137,6 +147,7 @@ value print_headers conf =
                 let (ident, s) = get_var ic "Ident:" s in
                 let (wizard, s) = get_var ic "Wizard:" s in
                 let (_, s) = get_var ic "Email:" s in
+                let (access, s) = get_var ic "Access:" s in
                 let (subject, s) = get_var ic "Subject:" s in
                 let (_, s) = get_var ic "Text:" s in
                 let (text, s) =
@@ -182,13 +193,19 @@ value print_headers conf =
                   with
                   [ Failure _ | Invalid_argument _ -> Dtext date ]
                 in
-                let ndisp =
-                  if ident <> "" then
-                    let h = (date, hour, ident, subject, beg_mess) in
-                    print_one_header conf prec_date ndisp pos h
-                  else ndisp
+                let (nmess, date, ndisp) =
+                  if access = "priv" && not conf.wizard && not conf.friend then
+                    (nmess, prec_date, ndisp)
+                  else
+                    let ndisp =
+                      if ident <> "" then
+                        let h = (date, hour, ident, subject, beg_mess) in
+                        print_one_header conf prec_date ndisp pos h
+                      else ndisp
+                    in
+                    (nmess + 1, date, ndisp)
                 in
-                loop (nmess + 1) (date, ndisp)
+                loop nmess (date, ndisp)
           | None -> do { close_in ic; prec_date } ]
       in
       if last_date = Dtext "" then () else Wserver.wprint "</table>\n"
@@ -238,6 +255,7 @@ value get_message conf pos =
             let (ident, s) = get_var ic "Ident:" s in
             let (wizard, s) = get_var ic "Wizard:" s in
             let (email, s) = get_var ic "Email:" s in
+            let (access, s) = get_var ic "Access:" s in
             let (subject, s) = get_var ic "Subject:" s in
             let (_, s) = get_var ic "Text:" s in
             let (mess, s) =
@@ -249,9 +267,12 @@ value get_message conf pos =
                 else (Buff.get len, s)
             in
             if ident <> "" then
-              Some
-                (time, ident, wizard, email, subject, mess,
-                 ic_len - pos_in ic, ic_len)
+              let m =
+                {m_time = time; m_ident = ident; m_wizard = wizard;
+                 m_email = email; m_access = access; m_subject = subject;
+                 m_mess = mess}
+              in
+              Some (m, ic_len - pos_in ic, ic_len)
             else None
           }
         with
@@ -293,81 +314,103 @@ value passwd_in_file conf =
   | Some _ -> True ]
 ;
 
+value print_one_forum_message conf m pos next_pos forum_length =
+  let title _ =
+    let subject =
+      if m.m_subject = "" || m.m_subject = "-" then
+        capitale (transl conf "database forum")
+      else secure m.m_subject
+    in
+    Wserver.wprint "%s" subject
+  in
+  do {
+    header_no_page_title conf title;
+    print_link_to_welcome conf True;
+    tag "ul" begin
+      Wserver.wprint "<li><a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
+        (capitale (transl conf "database forum"));
+      Wserver.wprint "<li>";
+      loop pos where rec loop pos =
+        if pos = forum_length then Wserver.wprint "&nbsp;"
+        else
+          let back_pos = backward_pos conf pos in
+          match get_message conf back_pos with
+          [ Some (m, _, _) ->
+              if m.m_access = "priv" && not conf.wizard && not conf.friend then
+                loop back_pos
+              else
+                Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n"
+                  (commd conf) back_pos (capitale (message_txt conf 3))
+          | None -> Wserver.wprint "&nbsp;" ];
+      Wserver.wprint "<li>";
+      loop next_pos where rec loop next_pos =
+        if next_pos > 0 then
+          match get_message conf next_pos with
+          [ Some (m, next_next_pos, _) ->
+              if m.m_access = "priv" && not conf.wizard && not conf.friend then
+                loop next_next_pos
+              else
+                Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n"
+                  (commd conf) next_pos (capitale (message_txt conf 1))
+          | None -> Wserver.wprint "&nbsp;" ]
+        else Wserver.wprint "&nbsp;";
+    end;
+    Wserver.wprint "<p>\n";
+    Wserver.wprint "<strong>%s</strong>\n" (secure m.m_ident);
+    if m.m_email <> "" then
+      let email = secure m.m_email in
+      Wserver.wprint " <a href=\"mailto:%s\">%s</a>\n" email email
+    else ();
+    Wserver.wprint "<br>\n";
+    if m.m_subject <> "" then
+      Wserver.wprint "<b>%s: %s</b>\n<br>\n"
+        (capitale (header_txt conf 2)) (secure m.m_subject)
+    else ();
+    Wserver.wprint "<em>%s</em>\n" m.m_time;
+    Wserver.wprint "<dl><dt><dd>\n";
+    if browser_doesnt_have_tables conf then ()
+    else
+      Wserver.wprint
+        "<table cellspacing=0 cellpadding=0><tr align=left><td>\n";
+    let mess =
+      loop True 0 0 where rec loop last_was_eoln len i =
+        if i = String.length m.m_mess then Buff.get len
+        else if m.m_mess.[i] = '\n' && last_was_eoln then
+          loop False (Buff.mstore len "<p>\n") (i + 1)
+        else
+          loop (m.m_mess.[i] = '\n') (Buff.store len m.m_mess.[i]) (i + 1)
+    in
+    Wserver.wprint "%s\n" (string_with_macros conf True [] mess);
+    if browser_doesnt_have_tables conf then ()
+    else Wserver.wprint "</table>";
+    Wserver.wprint "</dl>\n";
+    if m.m_wizard <> "" && conf.wizard && conf.user = m.m_wizard &&
+      passwd_in_file conf
+    then
+      let s = message_txt conf 0 in
+      do {
+        Wserver.wprint "<p>\n";
+        tag "form" "method=post action=\"%s\"" conf.command begin
+          Util.hidden_env conf;
+          Wserver.wprint "<input type=hidden name=m value=FORUM_DEL>\n";
+          Wserver.wprint "<input type=hidden name=p value=%d>\n" pos;
+          Wserver.wprint "<input type=submit value=\"%s\">\n"
+            (capitale
+               (transl_decline conf "delete" (message_txt conf 0)));
+        end;
+      }
+    else ();
+    trailer conf;
+  }
+;
+
 value print_forum_message conf base pos =
   match get_message conf pos with
-  [ Some (time, ident, wizard, email, subject, mess, next_pos, forum_length) ->
-      let title _ =
-        let subject =
-          if subject = "" || subject = "-" then
-            capitale (transl conf "database forum")
-          else secure subject
-        in
-        Wserver.wprint "%s" subject
-      in
-      do {
-        header_no_page_title conf title;
-        print_link_to_welcome conf True;
-        tag "ul" begin
-          Wserver.wprint "<li><a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
-            (capitale (transl conf "database forum"));
-          Wserver.wprint "<li>";
-          if pos = forum_length then Wserver.wprint "&nbsp;"
-          else
-            let back_pos = backward_pos conf pos in
-            Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n"
-              (commd conf) back_pos (capitale (message_txt conf 3));
-          Wserver.wprint "<li>";
-          if next_pos > 0 then
-            Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n" (commd conf)
-              next_pos (capitale (message_txt conf 1))
-          else Wserver.wprint "&nbsp;";
-        end;
-        Wserver.wprint "<p>\n";
-        Wserver.wprint "<strong>%s</strong>\n" (secure ident);
-        if email <> "" then
-          let email = secure email in
-          Wserver.wprint " <a href=\"mailto:%s\">%s</a>\n" email email
-        else ();
-        Wserver.wprint "<br>\n";
-        if subject <> "" then
-          Wserver.wprint "<b>%s: %s</b>\n<br>\n"
-            (capitale (header_txt conf 2)) (secure subject)
-        else ();
-        Wserver.wprint "<em>%s</em>\n" time;
-        Wserver.wprint "<dl><dt><dd>\n";
-        if browser_doesnt_have_tables conf then ()
-        else
-          Wserver.wprint
-            "<table cellspacing=0 cellpadding=0><tr align=left><td>\n";
-        let mess =
-          loop True 0 0 where rec loop last_was_eoln len i =
-            if i = String.length mess then Buff.get len
-            else if mess.[i] = '\n' && last_was_eoln then
-              loop False (Buff.mstore len "<p>\n") (i + 1)
-            else loop (mess.[i] = '\n') (Buff.store len mess.[i]) (i + 1)
-        in
-        Wserver.wprint "%s\n" (string_with_macros conf True [] mess);
-        if browser_doesnt_have_tables conf then ()
-        else Wserver.wprint "</table>";
-        Wserver.wprint "</dl>\n";
-        if wizard <> "" && conf.wizard && conf.user = wizard &&
-          passwd_in_file conf
-        then
-          let s = message_txt conf 0 in
-          do {
-            Wserver.wprint "<p>\n";
-            tag "form" "method=post action=\"%s\"" conf.command begin
-              Util.hidden_env conf;
-              Wserver.wprint "<input type=hidden name=m value=FORUM_DEL>\n";
-              Wserver.wprint "<input type=hidden name=p value=%d>\n" pos;
-              Wserver.wprint "<input type=submit value=\"%s\">\n"
-                (capitale
-                   (transl_decline conf "delete" (message_txt conf 0)));
-            end;
-          }
-        else ();
-        trailer conf;
-      }
+  [ Some (m, next_pos, forum_length) ->
+      if m.m_access = "priv" && not conf.wizard && not conf.friend then
+        print_forum_headers conf base
+      else
+        print_one_forum_message conf m pos next_pos forum_length
   | None -> print_forum_headers conf base ]
 ;
 
@@ -411,6 +454,18 @@ value print_add conf base =
         print_var conf "Ident" (capitale (header_txt conf 0)) False conf.user;
         print_var conf "Email" (capitale (header_txt conf 1)) True "";
         print_var conf "Subject" (capitale (header_txt conf 2)) False "";
+        if conf.wizard || conf.friend then
+          tag "tr" "align=left colspan=2" begin
+            stag "td" begin
+              Wserver.wprint
+                "<input type=radio name=Access value=publ checked>%s\n"
+                (transl conf "public");
+              Wserver.wprint "<input type=radio name=Access value=priv>%s\n"
+                (transl conf "private");
+            end;
+            Wserver.wprint "\n";
+          end
+        else ();
       end;
       html_p conf;
       Wserver.wprint "%s<br>\n"
@@ -432,6 +487,11 @@ value get conf key =
 value forum_add conf base ident comm =
   let email = String.lowercase (Gutil.strip_spaces (get conf "Email")) in
   let subject = Gutil.strip_spaces (get conf "Subject") in
+  let access =
+    match p_getenv conf.env "Access" with
+    [ Some v -> v
+    | None -> "publ" ]
+  in
   let bfile = base_path [] (conf.bname ^ ".gwb") in
   if ident <> "" && comm <> "" then
     lock (Iobase.lock_file bfile) with
@@ -450,6 +510,7 @@ value forum_add conf base ident comm =
               fprintf oc "Wizard: %s\n" conf.user
             else ();
             if email <> "" then fprintf oc "Email: %s\n" email else ();
+            fprintf oc "Access: %s\n" access;
             let subject = if subject = "" then "-" else subject in
             fprintf oc "Subject: %s\n" subject;
             fprintf oc "Text:\n";
@@ -569,9 +630,8 @@ value delete_forum_message conf base pos =
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       match get_message conf pos with
-      [ Some
-        (time, ident, wizard, email, subject, mess, next_pos, forum_length) ->
-          if conf.wizard && conf.user <> "" && wizard = conf.user &&
+      [ Some (m, next_pos, forum_length) ->
+          if conf.wizard && conf.user <> "" && m.m_wizard = conf.user &&
             passwd_in_file conf
           then
             try
