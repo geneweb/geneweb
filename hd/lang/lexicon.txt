@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.53 1999-06-07 15:50:45 ddr Exp $
+# $Id: lexicon.txt,v 2.54 1999-06-07 16:57:14 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -588,7 +588,7 @@ es: agregar
 fr: ajouter
 he:   הוספה 
 it: aggiungere
-nl: invoeren
+nl: invoeren +before
 no: tilf&oslash;y
 pt: acrescentar
 se: l&auml;gg till
@@ -1305,7 +1305,7 @@ es: borrar
 fr: supprimer
 he:   מחיקה 
 it: cancellare
-nl: verwijder
+nl: verwijderen +before
 no: fjern
 pt: borrar
 se: ta bort
@@ -1809,7 +1809,7 @@ es: imagen recibida
 fr: image re&ccedil;ue
 he:  התמונה התקבלה
 it: immagine ricevuta
-nl: foto ontvangen
+nl: beeld ontvangen
 no: bildet er mottatt
 pt: imagem recebida
 se: foto mottaget
@@ -1948,7 +1948,7 @@ es: insertar
 he:  להכניס
 it: inserire
 fr: ins&eacute;rer
-nl: invoegen
+nl: invoegen +before
 no: skyt inn
 pt: inserir
 se: infoga
@@ -2260,7 +2260,7 @@ es: modificar
 fr: modifier
 he:  לשנות
 it: modificare
-nl: wijzig
+nl: wijzigen +before
 no: endre
 pt: modificar
 se: &auml;ndra
@@ -3080,7 +3080,7 @@ es: enviar
 fr: envoyer
 he:  שלח
 it: mandare
-nl: zenden
+nl: zenden +before
 no: send
 pt: enviar
 se: skicka
