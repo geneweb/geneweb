@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.19 1999-11-25 10:41:16 ddr Exp $
+# $Id: lexicon.txt,v 3.20 1999-11-25 12:17:49 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -267,7 +267,7 @@ dk: s&oslash;ndag/mandag/tirsdag/onsdag/torsdag/fredag/l&oslash;rdag
 en: Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday
 eo: dimancxo/lundo/mardo/merkredo/jauxdo/vendredo/sabato
 es: domingo/lunes/martes/mi&eacute;rcoles/jueves/viernes/s&aacute;bado
-fi: sunnuntai/maanantai/tiistai/keskiviikko/torstai/perjantai/lauantai
+fi: sunnuntai:e:+na/maanantai:e:+na/tiistai:e:+na/keskiviikko:e:+na/torstai:e:+na/perjantai:e:+na/lauantai:e:+na
 fr: dimanche/lundi/mardi/mercredi/jeudi/vendredi/samedi
 he:  éåí à'/ éåí á'/ éåí â'/ éåí ã'/ éåí ä'/ éåí å'/ ùáú 
 is: sunnudagur/mánudagur/şriğjudagur/miğvikudagur/fimmtudagur/föstudagur/laugardagur

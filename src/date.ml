@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.2 1999-11-13 18:58:36 ddr Exp $ *)
+(* $Id: date.ml,v 3.3 1999-11-25 12:17:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -548,7 +548,7 @@ value print_calendar conf base =
   do header conf title;
      print_link_to_welcome conf True;
      Wserver.wprint "- %s -\n"
-       (capitale (transl_nth conf "(week day)" wday));
+       (capitale (nominative (transl_nth conf "(week day)" wday)));
      html_p conf;
      tag "form" "method=GET action=\"%s\"" conf.command begin
        List.iter
