@@ -1,8 +1,14 @@
 GeneWeb version 4.05
 --------------------
 
+* GeneWeb server or CGI (gwd)
+  - [12 Jan 02] Fixed bug: when merging two persons, in case of fast
+    merge applied, the notes of the second person were lost.
+  - [11 Jan 02] Fixed bug: the macros in places were not expanded in the
+    places/surnames pages, in descendants and in ancestors pages.
+
 * Gedcom to GeneWeb (ged2gwb)
-  - [8 Jan 02] Fixed bug: the divorce dates were not imported
+  - [08 Jan 02] Fixed bug: the divorce dates were not imported
 
 GeneWeb version 4.04
 --------------------
