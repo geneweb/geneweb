@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 3.7 2000-05-03 14:37:03 ddr Exp $ *)
+(* $Id: doc.ml,v 3.8 2000-07-28 13:07:49 ddr Exp $ *)
 
 open Config;
 
@@ -81,7 +81,7 @@ value copy conf pref_doc pref_img s =
        let img = url_basename img in
        do Wserver.wprint "\"%s%s\"" pref_img img; return loop i
       else if last_is s i "<body>" then
-        do Wserver.wprint " %s>" (Util.body_prop conf); return loop (i + 1)
+        do Wserver.wprint "%s>" (Util.body_prop conf); return loop (i + 1)
       else do Wserver.wprint "%c" s.[i]; return loop (i + 1)
 ;
 

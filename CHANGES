@@ -25,6 +25,13 @@ GeneWeb version 3.07
   - [26 Jul 00] Added a lock to the data base before writing it (to avoid
     multiple accesses which risk to damage it).
 
+* Base configuration files (base.gwf)
+  - [28 Jul 00] Changed the behavior of the variable "body_prop" making
+    the difference between 1/ not defined and 2/ defined as an empty string.
+    In the first case, the default is assumed (i.e. GeneWeb's default
+    background), in the second case, nothing is added in the <body>
+    tag. This implies changes in programs "gwd" and "gwsetup".
+
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
   - [21 Jul 00] In lexicon: added the terms "Sosa"; changed "list" into
     "list/list (ancestors)" (specially for better translation in Swedish)
