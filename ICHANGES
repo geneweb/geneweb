@@ -5,6 +5,10 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [12 Jul 04] In families forms, added shortcut for created persons:
+    when the birth place starts with "b/", the date and place are set
+    to the baptism instead of birth. Added also "~year" as equivalent
+    to "/year/" to indicate "about date".
   - [01 Jul 04] Changed all gif files into png.
   - [22 Jun 04] Fixed slowness of "find_free_occ" if many many
     names in the list.
