@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.18 1999-07-17 20:30:51 ddr Exp $ *)
+(* $Id: relation.ml,v 2.19 1999-07-18 06:42:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -67,6 +67,9 @@ value print_menu conf base p =
                    else
                      Wserver.wprint "%s\n"
                        (transl_nth conf "his wife/her husband" is);
+                   Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n" (commd conf)
+                     (Adef.int_of_iper p.cle_index)
+                     (Adef.int_of_iper c.cle_index);
                    afficher_personne_sans_titre conf base c;
                    Wserver.wprint "</a>";
                    afficher_titre conf base c;
