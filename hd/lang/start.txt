@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.67 2004-12-31 10:22:42 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.68 2004-12-31 10:44:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -122,6 +122,9 @@ sv: Du kan välja ett annat språk bland de följande:
 
 %Vmotd;
 
+<table border="0" cellspacing="0" cellpadding="0" style="width: 100%%">
+<tr align="left"><td align="center">
+
 <p>[
 af: Die databasis <span class="highlight">"%t"</span> bevat tans %n persone.
 bg: Áàçàòà îò äàííè <span class="highlight">"%t"</span> â ìîìåíòà ñúäúğæà
@@ -174,7 +177,7 @@ zh: ÏÖÓĞ %n ÈËÔÚÊı¾İ¿âÖĞ¡£
 (<a href="%sm=WIZNOTES">[wizard/wizards/friend/friends]1/[note/notes]1</a>)%E
 %E</p>
 
-%I&NwNj<br%/><p>
+%I&NwNj
 
 %I&NcNa<table border="0" width="70%">
 <tr align="left">
@@ -297,11 +300,10 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
 </td></tr>
 </table>
 
-%E%E
+%E
+<br%/>
+%E
 
-<table border="0" cellspacing="0" cellpadding="0" style="width: 100%%">
-
-<tr align="left"><td align="center">
 <table border="0" cellspacing="0" cellpadding="0"><tr><td align="left">
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
