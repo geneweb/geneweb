@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.58 2000-07-12 17:40:57 ddr Exp $ *)
+(* $Id: util.ml,v 3.59 2000-07-12 18:35:51 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -758,11 +758,9 @@ value get_server_string_aux cgi request =
     else server_name ^ ":" ^ server_port
 ;
 
-value get_server_string conf = get_server_string_aux conf.cgi conf.request;
-
-value get_request_string conf =
-  if not conf.cgi then
-    Wserver.extract_param "GET " ' ' conf.request
+value get_request_string_aux cgi request =
+  if not cgi then
+    Wserver.extract_param "GET " ' ' request
   else
     let script_name =
       try Sys.getenv "SCRIPT_NAME" with
@@ -774,6 +772,9 @@ value get_request_string conf =
     in
     script_name ^ "?" ^ query_string
 ;
+
+value get_server_string conf = get_server_string_aux conf.cgi conf.request;
+value get_request_string conf = get_request_string_aux conf.cgi conf.request;
 
 value include_hed_trl conf suff =
   let hed_fname =

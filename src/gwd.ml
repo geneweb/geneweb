@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.44 2000-07-12 17:40:56 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.45 2000-07-12 18:35:51 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -524,18 +524,31 @@ value check_file_name cgi request s =
       match s.[i] with
       [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '-' -> loop (i + 1)
       | _ ->
-          let s = String.sub s 0 i in
-          let req =
-            "http://" ^ Util.get_server_string_aux cgi request ^ "/" ^ s ^ "?"
+          let url =
+            let serv =
+              "http://" ^ Util.get_server_string_aux cgi request
+            in
+            let req =
+              let bname = String.sub s 0 i in
+              let str = Util.get_request_string_aux cgi request in
+              if cgi then
+                let cginame = String.sub str 0 (String.index str '?') in
+                cginame ^ "?b=" ^ bname
+              else "/" ^ bname ^ "?"
+            in
+            serv ^ req
           in
-          do Wserver.html "";
+          do if not cgi then
+               do Wserver.wprint "HTTP/1.0 200 Ok"; Util.nl (); return ()
+             else ();
+             Wserver.wprint "Content-type: text/html"; Util.nl (); Util.nl ();
              Wserver.wprint "\
 <head>
 <meta http-equiv=\"REFRESH\"
  content=\"1;URL=%s\">
 </head>
 <body>
-<a href=\"%s\">%s</a>\n</body>\n" req req req;
+<a href=\"%s\">%s</a>\n</body>\n" url url url;
           return raise Exit ]
 ;
 
