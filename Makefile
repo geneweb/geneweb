@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.7 1999-04-30 14:24:51 ddr Exp $
+# $Id: Makefile,v 2.8 1999-05-03 07:10:47 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -20,11 +20,12 @@ opt::
 	cd doc; $(MAKE) opt
 	cd setup; $(MAKE) opt
 
-setup_distrib: distrib
+distrib_setup: distrib
 	mkdir t
 	mv distribution t/gw
 	mv t distribution
 	cp setup/setup distribution/setup$(EXE)
+	cp setup/gwd distribution/gwd$(EXE)
 	mkdir distribution/gw/setup
 	cp setup/intro.txt distribution/gw/setup/.
 	for i in fr; do \
@@ -70,6 +71,7 @@ clean::
 	cd ged2gwb; $(MAKE) clean
 	cd gwb2ged; $(MAKE) clean
 	cd doc; $(MAKE) clean
+	cd setup; $(MAKE) clean
 	$(RM) -rf distribution
 	$(RM) -f *~ .#*
 
@@ -78,3 +80,4 @@ depend:
 	cd src; $(MAKE) depend
 	cd ged2gwb; $(MAKE) depend
 	cd gwb2ged; $(MAKE) depend
+	cd setup; $(MAKE) depend

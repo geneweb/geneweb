@@ -31,6 +31,7 @@ GeneWeb Intermediate Version 2.01-2
     any more as a fatal error.
 
 * GeneWeb uncompiler (gwu)
+  - [May 3, 99] Added option "-o" for consistency with other commands.
   - [Apr 22, 99] Do not save notes any more for persons having "?" as
     first name or surname.
 

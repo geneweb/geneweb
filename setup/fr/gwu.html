@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>Extraction d'un source GeneWeb</title></head>
+
+<body>
+
+<h1>Extraction d'un fichier source GeneWeb</h1>
+
+<form mode=GET action="gwu">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+S&eacute;lectionnez votre base de donn&eacute;es:
+
+<p>
+
+<dl><dd><table border=1 cellspacing=0 cellpadding=1>
+
+$b{<tr><td><input type=radio name=anon
+value="$a">&nbsp;&nbsp;&nbsp;</td><td>$a</td></tr>|
+<tr><td>il n'y a aucune base de donn&eacute;es actuellement</tr></td>}
+
+</table></dl>
+
+<p>
+
+Entrez le nom que vous voulez donner &agrave; votre fichier source
+<em>GeneWeb</em>. Il doit se terminer par "<tt>.gw</tt>".  Si vous ne
+mettez rien, ce sera d&eacute;duit du nom de la base.
+
+<p>
+
+<dl><dd><input name=o size=30></dl>
+
+<p>
+
+S&eacute;lectionnez les options que vous d&eacute;sirez:
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td><input type=checkbox name=mem value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>&Eacute;conomiser l'espace m&eacute;moire pendant l'op&eacute;ration
+(mais ce sera plus lent).</td> </tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td>&nbsp;</td><td colspan=3>N'extraire que les anc&ecirc;tres
+de...</td></tr>
+
+<tr><td>Pr&eacute;nom</td><td><input name="a1" size=30
+maxlength=200></td><td>Num</td> <td><input name="a2" size=5
+maxlength=8></td></tr>
+
+<tr><td>Nom</td> <td colspan=3><input name="a3" size=40
+maxlength=200></td></tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td>&nbsp;</td><td colspan=3>... et/ou descendants de...
+</td></tr>
+
+<tr><td>Pr&eacute;nom</td><td><input name="d1" size=30
+maxlength=200></td><td>Num</td><td><input name="d2" size=5
+maxlength=8></td></tr>
+
+<tr><td>Nom</td> <td colspan=3><input name="d3" size=40
+maxlength=200></td></tr>
+
+</table></dl>
+
+<p>
+
+Puis appuyez sur ce bouton:
+
+<p>
+
+<dl><dd><input type=submit value="Extraire"></dl>
+
+</form>

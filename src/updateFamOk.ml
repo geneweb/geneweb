@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.6 1999-04-02 09:14:21 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.7 1999-05-03 07:10:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -325,6 +325,26 @@ value array_memq x a =
     else loop (i + 1)
 ;
 
+value infer_origin_file conf base ncpl nfam =
+  let afath = aoi base ncpl.father in
+  let amoth = aoi base ncpl.mother in
+  match (afath.parents, amoth.parents) with
+  [ (Some if1, _) when sou base (foi base if1).origin_file <> "" ->
+      (foi base if1).origin_file
+  | (_, Some if2) when sou base (foi base if2).origin_file <> "" ->
+      (foi base if2).origin_file
+  | _ ->
+      loop 0 where rec loop i =
+        if i == Array.length nfam.children then
+          Update.insert_string conf base ""
+        else
+          let cifams = (poi base nfam.children.(i)).family in
+          if Array.length cifams == 0 then loop (i + 1)
+          else if sou base (foi base cifams.(0)).origin_file <> "" then
+            (foi base cifams.(0)).origin_file
+          else loop (i + 1) ]
+;
+
 value effective_mod conf base sfam scpl =
   let fi = sfam.fam_index in
   let ofam = foi base fi in
@@ -346,7 +366,9 @@ value effective_mod conf base sfam scpl =
      [ Male ->
          do print_err_mother_sex conf base nmoth; return raise Update.ModErr
      | _ -> nmoth.sex := Female ];
-     nfam.origin_file := ofam.origin_file;
+     nfam.origin_file :=
+       if sou base ofam.origin_file <> "" then ofam.origin_file
+       else infer_origin_file conf base ncpl nfam;
      nfam.fam_index := fi;
      base.func.patch_family fi nfam;
      base.func.patch_couple fi ncpl;
@@ -405,25 +427,7 @@ value effective_add conf base sfam scpl =
       sfam
   in
   let ncpl = map_couple_p (insert_person conf base) scpl in
-  let origin_file =
-    let afath = aoi base ncpl.father in
-    let amoth = aoi base ncpl.mother in
-    match (afath.parents, amoth.parents) with
-    [ (Some if1, _) when sou base (foi base if1).origin_file <> "" ->
-        (foi base if1).origin_file
-    | (_, Some if2) when sou base (foi base if2).origin_file <> "" ->
-        (foi base if2).origin_file
-    | _ ->
-        loop 0 where rec loop i =
-          if i == Array.length nfam.children then
-            Update.insert_string conf base ""
-          else
-            let cifams = (poi base nfam.children.(i)).family in
-            if Array.length cifams == 0 then loop (i + 1)
-            else if sou base (foi base cifams.(0)).origin_file <> "" then
-              (foi base cifams.(0)).origin_file
-            else loop (i + 1) ]
-  in
+  let origin_file = infer_origin_file conf base ncpl nfam in
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
   do match nfath.sex with
