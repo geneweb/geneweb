@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.91 2004-10-04 11:18:04 ddr Exp $ *)
+(* $Id: util.ml,v 4.92 2004-11-06 16:58:44 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1800,6 +1800,23 @@ value find_person_in_env conf base suff =
       | _ -> None ] ]
 ;
 
+value find_sosa_ref conf base =
+  match find_person_in_env conf base "z" with
+  [ Some p -> Some p
+  | None ->
+      match p_getenv conf.base_env "var_author" with
+      [ Some n ->
+          if n = "" then None
+          else
+            match person_ht_find_all base n with
+            [ [ip] ->
+                let p = pget conf base ip in
+                if is_hidden p then None
+                else Some p
+            | _ -> None ]
+      | None -> None ] ]
+;
+
 value create_topological_sort conf base =
   match p_getenv conf.env "opt" with
   [ Some "no_tsfile" ->
@@ -2255,4 +2272,22 @@ value unselected_bullets conf =
        with
        [ Failure _ -> sl ])
     [] conf.env
+;
+
+value short_f_month m =
+  match m with
+  [ 1 -> "VD"
+  | 2 -> "BR"
+  | 3 -> "FM"
+  | 4 -> "NI"
+  | 5 -> "PL"
+  | 6 -> "VT"
+  | 7 -> "GE"
+  | 8 -> "FL"
+  | 9 -> "PR"
+  | 10 -> "ME"
+  | 11 -> "TH"
+  | 12 -> "FT"
+  | 13 -> "JC"
+  | _ -> "" ]
 ;

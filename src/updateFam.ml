@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.41 2004-09-09 08:40:21 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.42 2004-11-06 16:58:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -218,24 +218,6 @@ value add_precision s p =
   | _ -> s ]
 ;
 
-value short_f_month m =
-  match m with
-  [ 1 -> "VD"
-  | 2 -> "BR"
-  | 3 -> "FM"
-  | 4 -> "NI"
-  | 5 -> "PL"
-  | 6 -> "VT"
-  | 7 -> "GE"
-  | 8 -> "FL"
-  | 9 -> "PR"
-  | 10 -> "ME"
-  | 11 -> "TH"
-  | 12 -> "FT"
-  | 13 -> "JC"
-  | _ -> "" ]
-;
-  
 value eval_create_variable c =
   fun
   [ "birth_year" ->
