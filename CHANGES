@@ -2,13 +2,12 @@ GeneWeb version 2.06
 --------------------
 
 * GeneWeb Daemon/CGI (gwd)
-  - [Aug 13, 99] In notes of personal pages, URLs (starting with "http://")
-    are now cliquable.
-  - [Aug 13, 99] Added the ability to configurate the text of the pages
-    for address redirection (gwd new option '-redirect'), data base change
-    (gwf file field 'renamed') and exclusion of detected robot (when option
-    -robot_xcl has been set).
-  - [Aug 13, 99] Fixed bug: when merging persons, the other relations where
+  - [Aug 13, 99] In personal pages notes, URLs are now clickable.
+  - [Aug 13, 99] Added the ability to change the text of some pages:
+    1/ for site address redirection (gwd new option "-redirect", see below),
+    2/ for data base name change (gwf file field "renamed") and
+    3/ detected robot exclusion (when option -robot_xcl has been set).
+  - [Aug 13, 99] Fixed bug: when merging persons, the "other relations" where
     not included.
   - [Aug 8, 99] Added option "-redirect" to say to the users that the
     GeneWeb service has been redirected to some other address.
