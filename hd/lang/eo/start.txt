@@ -68,12 +68,12 @@ La <a href="%sm=AD">datrevenoj de la mortaj personoj</a>.
 <br>
 Kaj la <a href="%sm=AM">datrevenoj de edzigxo</a>.
 <p>
-Estis %q alirejoj kaj %c al cxi pagxo.
+Estis %q alirejoj kaj %c al cxi pagxo, ekde la %d.
 
 <p>
 
 <form method=get action="%f">%h
-<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:
+<font size=-1>Pasvorto, por aliro <em>amiko</em> a&ugrave; <em>sorcxisto</em>:
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
 </form>

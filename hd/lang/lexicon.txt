@@ -354,6 +354,7 @@ se: ca
 de: Zugriff
 en: access
 fr: acc&egrave;s
+it: accesso
 nl: toegang
 se: tilltr&auml;de
 
@@ -371,6 +372,7 @@ se: l&auml;gg till
 cn: 高级访问请求
 de: Erweiterte Suche
 en: advanced request
+eo: progresata rekesto
 fr: requ&ecirc;te &eacute;volu&eacute;e
 se: avancerad s&ouml;kning
 
@@ -1796,6 +1798,7 @@ de: Foto
 en: photo
 es: foto
 fr: photo
+it: foto
 nl: foto
 se: foto
 
