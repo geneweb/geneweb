@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.3 1999-03-26 05:48:04 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.4 1999-03-26 08:14:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -190,7 +190,7 @@ value insert_undefined_parent gen key =
   do if not gen.g_errored then
        if sou gen.g_base x.first_name <> key.pk_first_name ||
           sou gen.g_base x.surname <> key.pk_surname then
-         do Printf.printf "\nPersonne définie avec deux orthographes:\n";
+         do Printf.printf "\nPerson defined with two spellings:\n";
             Printf.printf "  \"%s%s %s\"\n" key.pk_first_name
               (match x.occ with
                [ 0 -> ""
@@ -315,10 +315,10 @@ value verif_parents_non_deja_definis gen x pere mere =
       let m = cpl.mother in
       do Printf.printf
            "
-Je ne peux pas ajouter \"%s\", enfant de
+I cannot add \"%s\", child of
     - \"%s\"
     - \"%s\",
-parce que cette personne existe deja en tant qu'enfant de
+because this persons still exists as child of
     - \"%s\"
     - \"%s\".
 " (denomination gen.g_base x) (denomination gen.g_base pere)

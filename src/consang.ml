@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 2.2 1999-03-26 05:48:01 ddr Exp $ *)
+(* $Id: consang.ml,v 2.3 1999-03-26 08:14:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -198,11 +198,11 @@ value relationship base tab ip1 ip2 =
   fst (relationship_and_links base tab False ip1 ip2)
 ;
 
-value trace base quiet cnt =
+value trace quiet cnt max_cnt =
   do if quiet then
-       let cnt = base.data.persons.len - cnt in
-       let already_disp = cnt * 60 / base.data.persons.len in
-       let to_disp = (cnt + 1) * 60 / base.data.persons.len in
+       let cnt = max_cnt - cnt in
+       let already_disp = cnt * 60 / max_cnt in
+       let to_disp = (cnt + 1) * 60 / max_cnt in
        for i = already_disp + 1 to to_disp do Printf.eprintf "#"; done
      else Printf.eprintf "%6d\008\008\008\008\008\008" cnt;
      flush stderr;
@@ -213,13 +213,6 @@ value compute_all_consang base from_scratch quiet =
   let _ = base.data.ascends.array () in
   let _ = base.data.couples.array () in
   let _ = base.data.families.array () in
-  do if quiet then
-       do for i = 1 to 60 do Printf.eprintf "."; done;
-          Printf.eprintf "\r";
-       return ()
-     else Printf.eprintf "Computing consanguinity...";
-     flush stderr;
-  return
   let running = ref True in
   let tab = make_relationship_table base (topological_sort base) in
   let cnt = ref 0 in
@@ -229,6 +222,15 @@ value compute_all_consang base from_scratch quiet =
        do if from_scratch then a.consang := no_consang else (); return
        if a.consang == no_consang then incr cnt else ();
      done;
+  return
+  let max_cnt = cnt.val in
+  do if quiet then
+       do Printf.eprintf "To do: %d persons\n" max_cnt;
+          for i = 1 to 60 do Printf.eprintf "."; done;
+          Printf.eprintf "\r";
+       return ()
+     else Printf.eprintf "Computing consanguinity...";
+     flush stderr;
      while running.val do
        running.val := False;
        for i = 0 to base.data.ascends.len - 1 do
@@ -245,7 +247,7 @@ value compute_all_consang base from_scratch quiet =
                  for i = 0 to Array.length fam.children - 1 do
                    let ip = fam.children.(i) in
                    let a = aoi base ip in
-                   do trace base quiet cnt.val;
+                   do trace quiet cnt.val max_cnt;
                       decr cnt;
                       a.consang := Adef.fix_of_float consang;
                       if not quiet then
@@ -264,7 +266,7 @@ value compute_all_consang base from_scratch quiet =
                  done
                else running.val := True
            | None ->
-               do trace base quiet cnt.val;
+               do trace quiet cnt.val max_cnt;
                   decr cnt;
                return a.consang := Adef.fix_of_float 0.0 ]
          else ();
