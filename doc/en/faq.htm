@@ -27,32 +27,32 @@ tell me.
 
 A frequent problem is that your Web browser, seeing that you entered a
 Web address (http://...), tries to connect to the network and if you
-disconnected you modem, it refuses. It is an error of Window, because
+disconnected you modem, it refuses. It is an error of Windows, because
 the address being "localhost", it should not try to connect:
 "localhost" means "your own computer".
 
 <p>
 
-It it due to the fact that your internet provider installed on your
-computer a program of automatic connection. This automatic connection
-is responsible to this phenomenon. A solution is therefore to
-disconnect it. Search in a menu which must be named "preferences" or
-"options" or "configuration" a tab in which you see the automatic
+It is due to the fact that your internet provider has installed a
+program of automatic connection on your computer. This automatic
+connection is responsible to this phenomenon. A solution is therefore
+to disconnect it. Search in a menu which must be named "preferences"
+or "options" or "configuration" a tab in which you see the automatic
 connection and disconnect it.
 
 <p>
 
-Another solution is to use another Web browser: if you internet
+Another solution is to use another Web browser: if your internet
 provider installed Internet Explorer in your computer, use
-Netscape. If it installed Netscape, use Internet Explorer.
+Netscape. If Nescape were installed, use Internet Explorer.
 
 <p>
 
 A third solution is to connect your modem, and wait for the
 connection. When it is done, does it work? If yes, then we are sure
-that it was the problem. Disconnecting then your modem, it often goes
-on working. Of course, it is not very satisfactory since you have to
-connect each time you want to use <font
+that it was the problem. Then disconnecting your modem, it often
+continue to work. Of course, it is not very satisfactory since you
+have to connect each time you want to use <font
 color=#2f6400><b>GeneWeb</b></font>, even if it is for only 10
 seconds.
 
@@ -66,7 +66,7 @@ Information from an user (Paul Laredo, thanks to him):
 
 <li>launch gwsetup (or gwd)
 
-<li>launch you Web browser
+<li>launch your Web browser
 
 <li>stop the automatic connection with the provider
 
@@ -130,8 +130,8 @@ CGIs as an user with very few rights (typically user "nobody" under
 Unix). It may not be able to run "gwd". Check the access rights of
 "gwd" and all the <font color=#2f6400><b>GeneWeb</b></font> files!
 
-<h4>Why the age of persons of more than 80 years old is not displayed? Why
-aren't they in the statistics of the oldest persons?</h4>
+<h4>Why is the age of persons of more than 80 years old not displayed?
+Why aren't they in the statistics of the oldest persons?</h4>
 
 In <font color=#2f6400><b>GeneWeb</b></font>, the indication of death
 has three states: "alive", "died" and "don't know". The age is
@@ -142,11 +142,11 @@ indication of date), or the indication is at "don't know".
 <p>
 
 If you added this person with <font
-color=#2f6400><b>GeneWeb</b></font> and that you did not specify if
-he/she is alive or dead, or if your data base comes from a GEDCOM file
-(the indication "still living person" being not planed in standard
-GEDCOM 5.5), <font color=#2f6400><b>GeneWeb</b></font> applies the
-following algorithm:
+color=#2f6400><b>GeneWeb</b></font> and you did not specify if he/she
+is alive or dead, or if your data base comes from a GEDCOM file (the
+indication "still living person" does not exist in standard GEDCOM
+5.5), <font color=#2f6400><b>GeneWeb</b></font> applies the following
+algorithm:
 
 <ul>
 
@@ -173,11 +173,11 @@ have parents.  And they cannot have associated notes.
 <p>
 
 Moreover, if they are spouses, they are not exported in the GEDCOM
-files and their personnal information (if any), is consequently lost.
+files and their personal information (if any), is consequently lost.
 
 <p>
 
-It is sometimes possible, by hacking, to manage to give them notes of
+It is sometimes possible, by hacking, to manage to give them notes
 to link them, but warning: at the first cleaning up of the data base,
 these notes and links are going to disappear: it is therefore advised
 against not doing that.
@@ -251,8 +251,8 @@ me. Thanks.
 <h4>Would it be possible that you add more information about persons in
 the "families" update forms, in order to go faster?</h4>
 
-It would certainly be nice, but I don't like adding things. The most I
-add, the most people ask me. In the beginning, I put only the person's
+It would certainly be nice, but I don't like adding things. The more I
+add, the more people ask me. In the beginning, I put only the person's
 name, then I was asked to add dates, I added dates, then places, I
 added places, then people ask me to add the dates precisions, the
 occupations, and so on. All these informations increase the size of
@@ -263,7 +263,7 @@ this "family" form which is already rather complicated.
 I know that it it tedious to have to return to the "person" form for
 each added person, but I am not sure that adding and adding things be
 the good solution. It is also an intrinsic problem of HTML, which is
-not very "dynamic". However, I am personnaly against solutions using
+not very "dynamic". However, I am personaly against solutions using
 Java (risks of security holes) and JavaScript (language actually
 destinated to be invaded by advertising, among other drawbacks). Other
 solutions are being studied, but not easy to implement.
@@ -271,7 +271,7 @@ solutions are being studied, but not easy to implement.
 <h4>In an update form, I filled some fields, but they disapear</h4>
 
 Some fields are taken into account only in certain circumstances. So,
-is a person is noticed "alive", the fields "date" and "place" of death
+if a person is noticed "alive", the fields "date" and "place" of death
 are ignored. If, in a "family" form, the field "separated" is selected,
 the field "divorce date" is ignored. If the indication of a person if
 "Link" (instead of "Create"), the fields about sex, date and place
@@ -287,7 +287,7 @@ principles (see the question about the the families update forms).
 
 <p>
 
-<h4>When I make a research by place/surname, if the result give several
+<h4>When I make a search by place/surname, if the result give several
 persons for a surname, only the first one is accessible</h4>
 
 Indeed. In a first version, I made a link to the surname itself, and
@@ -297,14 +297,14 @@ find them.
 
 <p>
 
-Give the first person is more "informative". Yes, it is incomplete, and
-the ideal would be to have the list of all the persons concerned by this
-place, but it supposed that I programmed several things more, and it
-has the drawback that the request uses much more memory space.
+To give the first person is more "informative". Yes, it is incomplete,
+and the ideal would be to have the list of all the persons concerned
+by this place, but it supposed that I programmed several things more,
+and it has the drawback that the request uses much more memory space.
 
 <p>
 
-You can access the list of all the persons of this surname by cliquing
+You can access the list of all the persons of this surname by clicking
 on the surname in the person's displayed page.
 
 <p>
