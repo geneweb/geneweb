@@ -2,6 +2,8 @@ GeneWeb version 4.02
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [02 Jun 01] Fixed bug: in family form, if surnames contained
+    double quotes, they were incorrectly displayed.
   - [29 May 01] Fixed problem with option -log (traces in a log file):
     if the log file was not writable, all requests failed (instead of
     ignoring it).

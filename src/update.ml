@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.5 2001-05-15 15:19:25 ddr Exp $ *)
+(* $Id: update.ml,v 4.6 2001-06-02 13:52:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -673,7 +673,7 @@ value
       end;
       tag "td" "colspan=4" begin
         Wserver.wprint "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
-          var surname;
+          var (quote_escaped surname);
       end;
     end;
   end
