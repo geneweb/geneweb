@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.63 2005-01-22 20:11:41 ddr Exp $ *)
+(* $Id: perso.ml,v 4.64 2005-01-22 20:30:38 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -383,7 +383,7 @@ and eval_simple_bool_var conf base env (_, _, _, p_auth) =
         let v = code_varenv v in
         let s = Srcfile.source_file_name conf v in
         Sys.file_exists s
-      else False
+      else raise Not_found
   | _ -> raise Not_found ]
 and eval_simple_str_var conf base env (_, _, _, p_auth) =
   fun
