@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.16 2000-03-12 20:23:44 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.17 2000-03-12 20:39:56 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1642,8 +1642,9 @@ value print_male_female_line male conf base v p =
          (fun first ip ->
             let p = poi base ip in
             do if not first then Wserver.wprint "|<br>\n" else ();
-               Wserver.wprint "%s<br>\n"
-                 (referenced_person_title_text conf base p);
+               Wserver.wprint "%s\n%s<br>\n"
+                 (referenced_person_title_text conf base p)
+                 (Date.short_dates_text conf base p);
                Dag.print_image conf base p;
             return False)
          True list
