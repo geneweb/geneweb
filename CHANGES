@@ -47,11 +47,8 @@ GeneWeb Intermediate version 2.02-1
     standard) adding CONC.
 
 * Consanguinity computing (consang)
-  - [May 22. 99] Added option "-fast" to apply consanguinity only on
-    descendants of modified families. Not 100% sure because the consanguinity
-    of the persons removed from their parent's family and without other parents
-    is not recomputed, neither their descendants' consanguinity (for other
-    persons, the computation is ok).
+  - [May 23, 99] Does not restart from scratch when changes: compute
+    only what's necessary.
 
 * Documentation
   - [May 13, 99] Updated Swedish documentation (Lars Gustavsson).

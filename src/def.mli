@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 2.6 1999-05-22 21:47:41 ddr Exp $ *)
+(* $Id: def.mli,v 2.7 1999-05-23 09:51:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = Adef.iper;
@@ -124,8 +124,7 @@ type base_data =
     ascends : cache ascend;
     families : cache family;
     couples : cache couple;
-    strings : cache string;
-    has_family_patches : bool }
+    strings : cache string }
 ;
 
 type base_func =
@@ -141,7 +140,7 @@ type base_func =
     patch_string : istr -> string -> unit;
     patch_name : string -> iper -> unit;
     commit_patches : unit -> unit;
-    patched_families : unit -> list ifam;
+    patched_ascends : unit -> list iper;
     cleanup : unit -> unit }
 ;
 

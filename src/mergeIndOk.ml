@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 2.3 1999-03-31 02:16:50 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 2.4 1999-05-23 09:51:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -149,16 +149,20 @@ value effective_mod_merge conf base p =
       do match (a1.parents, a2.parents) with
          [ (None, Some ifam) ->
              let fam = foi base ifam in
-             replace 0 where rec replace i =
-               if fam.children.(i) = p2.cle_index then
-                 do fam.children.(i) := p.cle_index;
-                    a1.parents := Some ifam;
-                    a2.parents := None;
-                    base.func.patch_ascend p.cle_index a1;
-                    base.func.patch_ascend p2.cle_index a2;
-                    base.func.patch_family ifam fam;
-                 return ()
-               else replace (i + 1)
+             do replace 0 where rec replace i =
+                  if fam.children.(i) = p2.cle_index then
+                    fam.children.(i) := p.cle_index
+                  else replace (i + 1);
+                a1.parents := Some ifam;
+                a1.consang := Adef.fix (-1);
+                base.func.patch_ascend p.cle_index a1;
+(* unuseful, if I understand my code... 'cause of effective_del below...
+                a2.parents := None;
+                a2.consang := Adef.fix (-1);
+                base.func.patch_ascend p2.cle_index a2;
+*)
+                base.func.patch_family ifam fam;
+             return ()
          | _ -> () ];
       return
       let p2_family = p2.family in
@@ -180,7 +184,10 @@ value effective_mod_merge conf base p =
            return ();
          done;
          p.family := Array.append p.family p2_family;
+(* unuseful, if I understand my code... already done above in the only
+   useful cases...
          base.func.patch_ascend p.cle_index a1;
+*)
          Update.update_misc_names_of_family base p;
          base.func.patch_person p.cle_index p;
          Gutil.check_noloop_for_person_list base (Update.error conf base)
