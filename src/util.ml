@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.23 1999-06-07 16:57:17 ddr Exp $ *)
+(* $Id: util.ml,v 2.24 1999-07-02 13:59:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -180,7 +180,8 @@ value connais base p =
 value acces_pur conf base x =
   let first_name = sou base x.first_name in
   let surname = sou base x.surname in
-  if conf.wizard && conf.friend && not (first_name = "?" || surname = "?") then
+  if conf.wizard && conf.friend && not (first_name = "?" || surname = "?")
+  || conf.access_by_key then
     "n=" ^ (code_varenv (Name.lower surname)) ^ ";p=" ^
     (code_varenv (Name.lower first_name)) ^
       (if x.occ > 0 then ";oc=" ^ string_of_int x.occ else "")

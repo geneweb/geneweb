@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.17 1999-06-22 08:07:00 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.18 1999-07-02 13:59:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -462,6 +462,9 @@ use \"can_send_image\".\n"
            with
            [ Not_found -> False ] ];
      cancel_links = cancel_links;
+     access_by_key =
+       try List.assoc "access_by_key" base_env = "yes" with
+       [ Not_found -> False ];
      bname = base_file;
      env = env;
      senv = [];

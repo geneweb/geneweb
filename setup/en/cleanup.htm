@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Clean up</title></head>
+
+<body>
+
+<h1>Cleaning up a data base</h1>
+
+If you made many modifications in your data base, or if you simply entered
+much data, it is advised to make a cleaning up, especially if you constate
+that the access to your data base has slowed down.
+
+<p>
+
+For a simple cleaning up, apply the <a
+href="setup?lang=$l;v=consang.htm">initialisation</a> of
+consanguinities.
+
+<p>
+
+<form mode=GET action="cleanup">
+<input type=hidden name=lang value=$l>
+
+For a radical cleaning up, select your data base by clicking on the
+associated button:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr>
+<td><input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+</tr>|
+<tr><td>- there is no data base at present</tr></td>}
+</table></dl>
+
+<p>
+
+Then push this button:
+
+<p>
+
+<input type=submit value="Cleanup">
+
+</form>

@@ -1,3 +1,12 @@
+GeneWeb version 2.05
+--------------------
+
+* Setup program
+  - [Jun 2, 99] Fixed bug: importing GeneWeb base from old version passing
+    by a GEDCOM file did not work if the current directory held spaces.
+  - [Jun 2, 99] Changed names of html files to hold 8 characters maximum
+    and 3 characters for the extension, to be unzippable by "pkunzip".
+
 GeneWeb version 2.04
 --------------------
 
