@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.2 2001-05-03 10:55:24 ddr Exp $ *)
+(* $Id: name.ml,v 4.3 2001-05-03 11:20:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 module Buff =
@@ -138,7 +138,14 @@ value crush s =
                 else len
               in
               copy (i + 1) len first_vowel
-          | 's' when i == String.length s - 1 || s.[i + 1] == ' ' ->
+          | 's' | 'z' when i == String.length s - 1 || s.[i + 1] == ' ' ->
+              let len =
+                loop (i - 1) (len - 1) where rec loop i len =
+                  if i > 0 && len > 0 && s.[i] = Buff.buff.val.[len] &&
+                    (s.[i] = 's' || s.[i] = 'z') then
+                    loop (i - 1) (len - 1)
+                  else len + 1
+              in
               copy (i + 1) len False          
           | c ->
               if i > 0 && s.[i-1] == c then copy (i + 1) len False
