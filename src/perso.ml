@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.34 2000-07-18 07:45:05 ddr Exp $ *)
+(* $Id: perso.ml,v 3.35 2000-07-20 10:29:00 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -774,7 +774,7 @@ value print_sosa conf base open_area a =
   fun
   [ Some (n, p) ->
       do open_area ();
-         Wserver.wprint "<em>Sosa:\n";
+         Wserver.wprint "<em>%s:\n" (capitale (transl conf "Sosa"));
          stag "a" "href=\"%sm=RL;i1=%d;i2=%d;b1=1;b2=%s\""
            (commd conf) (Adef.int_of_iper a.cle_index)
            (Adef.int_of_iper p.cle_index) (Num.to_string n)

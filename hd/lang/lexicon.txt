@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.141 2000-07-18 09:28:07 ddr Exp $
+# $Id: lexicon.txt,v 3.142 2000-07-20 10:28:49 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -531,6 +531,25 @@ no: M/K
 pt: M/F
 ru: Ì/Æ
 se: M/K
+
+    Sosa
+af: Sosa
+cs: Sosa
+de: Sosa
+dk: Sosa
+en: Sosa
+eo: Sosa
+es: Sosa
+fi: Sosa
+fr: Sosa
+he: Sosa
+is: Sosa
+lv: SOSA
+nl: Sosa
+no: Sosa
+pt: Sosa
+ru: Sosa
+se: annummer
 
     Y/N
 af: J/N
