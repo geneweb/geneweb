@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 3.6 2000-05-03 14:16:56 ddr Exp $ *)
+(* $Id: doc.ml,v 3.7 2000-05-03 14:37:03 ddr Exp $ *)
 
 open Config;
 
@@ -26,6 +26,29 @@ value last_is s i p =
 ;
 
 value http = "http://";
+
+value url_basename name =
+  try
+    let p = String.rindex name '/' + 1 in
+    String.sub name p (String.length name - p)
+  with [ Not_found -> name ]
+;
+
+value url_dirname name =
+  try
+    match String.rindex name '/' with
+    [ 0 -> "/"
+    | n -> String.sub name 0 n ]
+  with [ Not_found -> "." ]
+;
+
+value url_is_relative n = String.length n < 1 || n.[0] <> '/';
+
+value url_is_implicit n =
+  url_is_relative n
+  && (String.length n < 2 || String.sub n 0 2 <> "./")
+  && (String.length n < 3 || String.sub n 0 3 <> "../")
+;
 
 value copy conf pref_doc pref_img s =
   loop 0 where rec loop i =
@@ -55,27 +78,11 @@ value copy conf pref_doc pref_img s =
               else if s.[i] = '>' then (Buff.get len, i)
               else loop (i + 1) (Buff.store len s.[i])
        in
-       let img = Filename.basename img in
+       let img = url_basename img in
        do Wserver.wprint "\"%s%s\"" pref_img img; return loop i
       else if last_is s i "<body>" then
         do Wserver.wprint " %s>" (Util.body_prop conf); return loop (i + 1)
       else do Wserver.wprint "%c" s.[i]; return loop (i + 1)
-;
-
-value url_dirname name =
-  try
-    match String.rindex name '/' with
-    [ 0 -> "/"
-    | n -> String.sub name 0 n ]
-  with [ Not_found -> "." ]
-;
-
-value url_is_relative n = String.length n < 1 || n.[0] <> '/';
-
-value url_is_implicit n =
-  url_is_relative n
-  && (String.length n < 2 || String.sub n 0 2 <> "./")
-  && (String.length n < 3 || String.sub n 0 3 <> "../")
 ;
 
 value mac_name_of_url_name s =
