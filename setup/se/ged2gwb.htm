@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <!-- (c) Copyright INRIA 2000 - GeneWeb -->
 <head>
-  <!-- $Id: ged2gwb.htm,v 3.3 2000-01-10 02:14:35 ddr Exp $ -->
+  <!-- $Id: ged2gwb.htm,v 3.4 2000-02-07 10:24:12 ddr Exp $ -->
   <title>Importera en GEDCOM-fil</title>
 </head>
 
@@ -45,13 +45,13 @@ Välj de optioner du vill ha:
 
 <dl><dt><dd><table border=1>
 <tr><td><input type=checkbox name=lf value=on>&nbsp;&nbsp;&nbsp;</td>
-<td>Forcera gemena förnamn, bara deras initialer behålls som versaler.
+<td>Forcera gemena förnamn, bara initialer behålls som versaler.
 </td> </tr>
 </table></dl>
 
 <dl><dt><dd><table border=1>
 <tr><td><input type=checkbox name=ls value=on>&nbsp;&nbsp;&nbsp;</td>
-<td>Forcera gemena efternamn, bara deras initialer behålls som versaler.
+<td>Forcera gemena efternamn, bara initialer behålls som versaler.
 </td> </tr>
 </table></dl>
 
@@ -69,14 +69,14 @@ GEDCOM-filens kompletta förnamnsdel blir ett "förnnamns alias".</td>
 
 <dl><dt><dd><table border=1>
 <tr><td>&nbsp;</td><td>Denna option är förvald: när man skapar en person,
-om GEDCOM-filens förnamnsdel ser ut som ett publikt namn, dvs innehåller:
+om GEDCOM-filens förnamnsdel ser ut som ett officielltnamn, dvs innehåller:
 <ul>
 <li>Ett nummer eller ett romersktnummer, förmodas det vara ett nummer
-för en adels- eller kungligtitel (tex Gustaf V)
+för en kunglig- eller adelstitel (tex Gustaf V)
 <li>Ett av dessa ord: "der", "den", "die", "el", "le", "la", "the",
 förmodas vara en bestämmning till (tex William the Conqueror)
 </ul>
-då blir GEDCOM-filens förnamnsdel personens "publika namn"
+då blir GEDCOM-filens förnamnsdel personens "officiella namn"
 och första ordet dess "förnamn".
 <tr>
 <td><input type=checkbox name=no_epn value=on>&nbsp;&nbsp;&nbsp;</td>
@@ -101,7 +101,7 @@ ett negativt år.</td>
 
 <dl><dt><dd><table border=1>
 <tr><td>&nbsp;</td><td>En del GEDCOM-filer innehåller ibland datum med
-numrerade månader (från 1 till 12). GEDCOM-standard 5.5 kräver att
+numrerade månader (från 1 till 12). GEDCOM-standarden version 5.5 kräver att
 månaderna ska skrivas med identifierare (tex "MAY 1912" och inte
 "05/1912"). Notationen "02/05/1912" är tvetydig (den kan antingen betyda
 "May 2, 1912" eller "February 5, 1912" beroende på land).</td></tr>
@@ -138,15 +138,15 @@ specifierat i GEDCOM-huvudet.</td></tr>
 <td>De accentuerade tecknen är ASCII kodade.</td></tr>
 
 <tr><td><input type=radio name=charset value=MSDOS>&nbsp;&nbsp;&nbsp;</td>
-<td>De accentuerade tecknen är MSDOS kodade.</td></tr>
+<td>De accentuerade tecknen är MS-DOS kodade.</td></tr>
 </table></dl>
 
 <p>
 
-Klicka sedan på "Ok".
+Klicka sedan på "OK".
 
 <p>
 
-<dl><dt><dd><input type=submit value="Ok"></dl>
+<dl><dt><dd><input type=submit value="OK"></dl>
 
 </form>
