@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.18 2000-05-16 19:52:42 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.19 2000-05-17 03:32:19 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -724,7 +724,14 @@ value mark_someone base mark s =
       let p = poi base ip in
       let plist = find_ancestors base p.surname p [] in
       List.iter (mark_branch base mark p.surname) plist
-  | _ -> failwith s ]
+  | [] ->
+      do Printf.eprintf "Error: \"%s\" is not found\n" s;
+         flush stderr;
+      return exit 2
+  | _ ->
+      do Printf.eprintf "Error: several answers for \"%s\"\n" s;
+         flush stderr;
+      return exit 2 ]
 ;
 
 value sep_limit = ref 21;
@@ -829,22 +836,25 @@ value add_small_connex_components base mark =
 ;
 
 value separate base =
-  let list = List.rev separate_list.val in
-  let mark = Array.create base.data.families.len NotScanned in
-  do if list <> [] then
-       do List.iter (mark_someone base mark) list;
-          add_small_connex_components base mark;
-          let len =
-            loop 0 0 where rec loop len i =
-              if i = base.data.families.len then len
-              else if mark.(i) = ToSeparate then loop (len + 1) (i + 1)
-              else loop len (i + 1)
-          in
-          Printf.eprintf "*** extracted %d families\n" len;
-          flush stderr;
-       return ()
-     else ();
-  return mark
+  match List.rev separate_list.val with
+  [ [] -> fun _ -> False
+  | list ->
+      let mark = Array.create base.data.families.len NotScanned in
+      do if list <> [] then
+           do List.iter (mark_someone base mark) list;
+              add_small_connex_components base mark;
+              let len =
+                loop 0 0 where rec loop len i =
+                  if i = base.data.families.len then len
+                  else if mark.(i) = ToSeparate then loop (len + 1) (i + 1)
+                  else loop len (i + 1)
+              in
+              Printf.eprintf "*** extracted %d families\n" len;
+              flush stderr;
+           return ()
+         else ();
+      return
+      fun ifam -> mark.(Adef.int_of_ifam ifam) == ToSeparate ]
 ;
 
 (* Main *)
@@ -891,13 +901,7 @@ value gwu base out_dir out_oc src_oc_list anc desc =
             else if fam_sel fam.fam_index then
               let ifaml = connected_families base fam_sel fam cpl in
               let (oc, first) =
-                let sep =
-                  List.exists
-                    (fun ifam ->
-                       to_separate.(Adef.int_of_ifam ifam) = ToSeparate)
-                    ifaml
-                in
-                if sep then (out_oc, out_oc_first)
+                if to_separate fam.fam_index then (out_oc, out_oc_first)
                 else origin_file (sou base fam.origin_file)
               in
               let ml =
