@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.21 1999-10-28 04:33:57 ddr Exp $
+# $Id: geneweb.spec,v 1.22 1999-10-28 10:15:09 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -235,6 +235,13 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/fr/server.htm
 /home/geneweb/gw/gw/doc/fr/start.htm
 /home/geneweb/gw/gw/doc/fr/update.htm
+/home/geneweb/gw/gw/doc/images/gwback.jpg
+/home/geneweb/gw/gw/doc/images/gwlogo.gif
+/home/geneweb/gw/gw/doc/images/l-de.jpg
+/home/geneweb/gw/gw/doc/images/l-en.jpg
+/home/geneweb/gw/gw/doc/images/l-fr.jpg
+/home/geneweb/gw/gw/doc/images/l-nl.jpg
+/home/geneweb/gw/gw/doc/images/l-se.jpg
 /home/geneweb/gw/gw/doc/index.htm
 /home/geneweb/gw/gw/doc/nl/consang.htm
 /home/geneweb/gw/gw/doc/nl/diruse.htm
