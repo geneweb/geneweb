@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.8 2000-06-09 17:13:44 ddr Exp $
+# $Id: geneweb.spec,v 3.9 2000-07-12 12:56:15 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -188,6 +188,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %attr(755, root, root) /etc/rc.d/rc3.d/S99gwd
 %attr(755, root, root) /etc/rc.d/rc5.d/S99gwd
 %attr(755, root, root) /etc/rc.d/rc6.d/K01gwd
+/home/geneweb/gw/LICENSE.txt
 /home/geneweb/gw/LISEZMOI.txt
 /home/geneweb/gw/README.txt
 /home/geneweb/gw/gw/CHANGES.txt
@@ -196,6 +197,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/LISEZMOI.txt
 /home/geneweb/gw/gw/README.txt
 /home/geneweb/gw/gw/a.gwf
+/home/geneweb/gw/gw/consang
 /home/geneweb/gw/gw/doc/CREDITS.htm
 /home/geneweb/gw/gw/doc/LICENSE.htm
 /home/geneweb/gw/gw/doc/de/access.htm
@@ -299,11 +301,13 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/images/l-he.jpg
 /home/geneweb/gw/gw/images/l-is.jpg
 /home/geneweb/gw/gw/images/l-it.jpg
+/home/geneweb/gw/gw/images/l-lv.jpg
 /home/geneweb/gw/gw/images/l-nl.jpg
 /home/geneweb/gw/gw/images/l-no.jpg
 /home/geneweb/gw/gw/images/l-pt.jpg
 /home/geneweb/gw/gw/images/l-ru.jpg
 /home/geneweb/gw/gw/images/l-se.jpg
+/home/geneweb/gw/gw/images/left.jpg
 /home/geneweb/gw/gw/images/t-af.gif
 /home/geneweb/gw/gw/images/t-cn.gif
 /home/geneweb/gw/gw/images/t-cs.gif
@@ -317,6 +321,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/images/t-he.gif
 /home/geneweb/gw/gw/images/t-is.gif
 /home/geneweb/gw/gw/images/t-it.gif
+/home/geneweb/gw/gw/images/t-lv.gif
 /home/geneweb/gw/gw/images/t-nl.gif
 /home/geneweb/gw/gw/images/t-no.gif
 /home/geneweb/gw/gw/images/t-pt.gif
@@ -338,6 +343,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/lang/is/start.txt
 /home/geneweb/gw/gw/lang/it/start.txt
 /home/geneweb/gw/gw/lang/lexicon.txt
+/home/geneweb/gw/gw/lang/lv/start.txt
 /home/geneweb/gw/gw/lang/nl/start.txt
 /home/geneweb/gw/gw/lang/no/start.txt
 /home/geneweb/gw/gw/lang/pt/start.txt
@@ -542,6 +548,55 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/setup/fr/traces.htm
 /home/geneweb/gw/gw/setup/fr/welcome.htm
 /home/geneweb/gw/gw/setup/intro.txt
+/home/geneweb/gw/gw/setup/lv/backg.htm
+/home/geneweb/gw/gw/setup/lv/bsi.htm
+/home/geneweb/gw/gw/setup/lv/bsi_err.htm
+/home/geneweb/gw/gw/setup/lv/bso.htm
+/home/geneweb/gw/gw/setup/lv/bso_err.htm
+/home/geneweb/gw/gw/setup/lv/bso_ok.htm
+/home/geneweb/gw/gw/setup/lv/clean_ok.htm
+/home/geneweb/gw/gw/setup/lv/cleanup.htm
+/home/geneweb/gw/gw/setup/lv/cleanup1.htm
+/home/geneweb/gw/gw/setup/lv/consang.htm
+/home/geneweb/gw/gw/setup/lv/consg_ok.htm
+/home/geneweb/gw/gw/setup/lv/del_ok.htm
+/home/geneweb/gw/gw/setup/lv/delete.htm
+/home/geneweb/gw/gw/setup/lv/delete_1.htm
+/home/geneweb/gw/gw/setup/lv/err_acc.htm
+/home/geneweb/gw/gw/setup/lv/err_cnfl.htm
+/home/geneweb/gw/gw/setup/lv/err_miss.htm
+/home/geneweb/gw/gw/setup/lv/err_name.htm
+/home/geneweb/gw/gw/setup/lv/err_ndir.htm
+/home/geneweb/gw/gw/setup/lv/err_ngw.htm
+/home/geneweb/gw/gw/setup/lv/err_outd.htm
+/home/geneweb/gw/gw/setup/lv/err_reco.htm
+/home/geneweb/gw/gw/setup/lv/err_smdr.htm
+/home/geneweb/gw/gw/setup/lv/err_unkn.htm
+/home/geneweb/gw/gw/setup/lv/ged2gwb.htm
+/home/geneweb/gw/gw/setup/lv/gw2gd_ok.htm
+/home/geneweb/gw/gw/setup/lv/gwb2ged.htm
+/home/geneweb/gw/gw/setup/lv/gwc.htm
+/home/geneweb/gw/gw/setup/lv/gwd.htm
+/home/geneweb/gw/gw/setup/lv/gwd_info.htm
+/home/geneweb/gw/gw/setup/lv/gwd_ok.htm
+/home/geneweb/gw/gw/setup/lv/gwf.htm
+/home/geneweb/gw/gw/setup/lv/gwf_1.htm
+/home/geneweb/gw/gw/setup/lv/gwf_ok.htm
+/home/geneweb/gw/gw/setup/lv/gwu.htm
+/home/geneweb/gw/gw/setup/lv/gwu_ok.htm
+/home/geneweb/gw/gw/setup/lv/intro.txt
+/home/geneweb/gw/gw/setup/lv/list.htm
+/home/geneweb/gw/gw/setup/lv/main.htm
+/home/geneweb/gw/gw/setup/lv/note.htm
+/home/geneweb/gw/gw/setup/lv/recover.htm
+/home/geneweb/gw/gw/setup/lv/recover1.htm
+/home/geneweb/gw/gw/setup/lv/recover2.htm
+/home/geneweb/gw/gw/setup/lv/ren_ok.htm
+/home/geneweb/gw/gw/setup/lv/rename.htm
+/home/geneweb/gw/gw/setup/lv/save.htm
+/home/geneweb/gw/gw/setup/lv/simple.htm
+/home/geneweb/gw/gw/setup/lv/traces.htm
+/home/geneweb/gw/gw/setup/lv/welcome.htm
 /home/geneweb/gw/gw/setup/se/backg.htm
 /home/geneweb/gw/gw/setup/se/bsi.htm
 /home/geneweb/gw/gw/setup/se/bsi_err.htm
