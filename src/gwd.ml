@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.55 2003-01-08 12:48:56 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.56 2003-01-18 08:24:59 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -911,7 +911,8 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
       | _ -> False ]
     in
     let conf =
-      {wizard = wizard && not wizard_just_friend;
+      {from = from_addr;
+       wizard = wizard && not wizard_just_friend;
        friend = friend || wizard_just_friend && wizard;
        just_friend_wizard = wizard && wizard_just_friend; user = user;
        passwd = passwd1; cgi = cgi; command = command;

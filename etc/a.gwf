@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.19 2002-11-13 12:29:28 ddr Exp $
+# $Id: a.gwf,v 4.20 2003-01-18 08:24:59 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -50,6 +50,9 @@ wizard_passwd_file=
 # Wizard loosing his powers, becoming just a "friend"
 # Set it to "yes" or "no"
 wizard_just_friend=no
+
+# File recording a black list for the database forum.
+# forum_exclude_file=
 
 # Number of years for private access. Dates of persons whose age < this value
 # are not displayed (except for wizards, friends and public persons).

@@ -1,10 +1,11 @@
-(* $Id: config.mli,v 4.8 2002-10-22 13:18:23 ddr Exp $ *)
+(* $Id: config.mli,v 4.9 2003-01-18 08:24:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 
 type config =
-  { wizard : bool;
+  { from : string;
+    wizard : bool;
     friend : bool;
     just_friend_wizard : bool;
     user : string;
