@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.17 1999-11-24 10:45:39 ddr Exp $
+# $Id: lexicon.txt,v 3.18 1999-11-24 16:29:32 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -493,7 +493,7 @@ dk: en f&aelig;tter/en kusine
 en: a cousin
 eo: kuzo/kuzino
 es: un primo/una prima
-fi: serkku
+fi: serkku:g:--un
 fr: un cousin/une cousine
 he:  בן-דוד/ בת-דוד 
 is: systkynabarn

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 3.1 1999-11-19 10:02:29 ddr Exp $ *)
+(* $Id: robot.ml,v 3.2 1999-11-24 16:29:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -25,7 +25,7 @@ value robot_error cgi from cnt sec =
      nl ();
      let env = [('c', string_of_int cnt); ('s', string_of_int sec)] in
      match open_etc_file "robot" with
-     [ Some ic -> copy_from_channel env "geneweb" ic
+     [ Some ic -> copy_from_etc env "geneweb" ic
      | None ->
          let title _ = Wserver.wprint "Access refused" in
          do Wserver.wprint "<head><title>";

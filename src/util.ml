@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.13 1999-11-19 10:02:31 ddr Exp $ *)
+(* $Id: util.ml,v 3.14 1999-11-24 16:29:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -577,6 +577,23 @@ value rheader conf title =
   return ()
 ;
 
+value input_to_semi ic =
+  loop 0 where rec loop len =
+    let c = input_char ic in
+    if c = ';' then Buff.get len
+    else loop (Buff.store len c)
+;
+
+value base_len n =
+  let n = Filename.concat base_dir.val n in
+  match try Some (Iobase.input n) with [ Sys_error _ -> None ] with
+  [ Some base ->
+      let len = base.data.persons.len in
+      do base.func.cleanup (); return
+      string_of_int len
+  | _ -> "?" ]
+;
+
 value open_etc_file fname =
   let fname1 =
     List.fold_right Filename.concat [base_dir.val; "etc"]
@@ -592,26 +609,27 @@ value open_etc_file fname =
       [ Sys_error _ -> None ] ]
 ;
 
-value rec copy_from_channel env imcom ic =
+value rec copy_from_etc env imcom ic =
   try
     while True do
       match input_char ic with
       [ '%' ->
           let c = input_char ic in
-          match c with
-          [ '%' -> Wserver.wprint "%%"
-          | 'k' -> Wserver.wprint "%s" imcom
-          | 'r' ->
-              let name = input_line ic in
-              match open_etc_file name with
-              [ Some ic -> copy_from_channel env imcom ic
-              | None ->
-                  Wserver.wprint "<em>... file not found: \"%s.txt\"</em><br>"
-                    name ]
-          | 'v' -> Wserver.wprint "%s" Version.txt
-          | c ->
-              try Wserver.wprint "%s" (List.assoc c env) with
-              [ Not_found -> Wserver.wprint "%%%c" c ] ]
+          try Wserver.wprint "%s" (List.assoc c env) with
+          [ Not_found ->
+              match c with
+              [ '%' -> Wserver.wprint "%%"
+              | 'k' -> Wserver.wprint "%s" imcom
+              | 'n' -> Wserver.wprint "%s" (base_len (input_to_semi ic))
+              | 'r' ->
+                  let name = input_line ic in
+                  match open_etc_file name with
+                  [ Some ic -> copy_from_etc env imcom ic
+                  | None ->
+                      Wserver.wprint
+                        "<em>... file not found: \"%s.txt\"</em><br>" name ]
+              | 'v' -> Wserver.wprint "%s" Version.txt
+              | c -> Wserver.wprint "%%%c" c ] ]
       | c -> Wserver.wprint "%c" c ];
     done
   with
@@ -722,7 +740,7 @@ value gen_trailer with_logo conf =
 alt=GeneWeb width=64 height=72 align=right>\n<br>\n"
           conf.indep_command;
      match open_etc_file "copyr" with
-     [ Some ic -> copy_from_channel env conf.indep_command ic
+     [ Some ic -> copy_from_etc env conf.indep_command ic
      | None ->
          do html_p conf;
             Wserver.wprint "
@@ -735,13 +753,13 @@ GeneWeb %s</em></font>" Version.txt;
          (conf.bname ^ ".trl")
      in
      match try Some (open_in trl_fname) with [ Sys_error _ -> None ] with
-     [ Some ic -> copy_from_channel [] conf.indep_command ic
+     [ Some ic -> copy_from_etc [] conf.indep_command ic
      | None ->
          let trl_fname =
            List.fold_right Filename.concat [base_dir.val; "lang"]
              (conf.bname ^ ".trl")
          in
-         try copy_from_channel [] conf.indep_command (open_in trl_fname) with
+         try copy_from_etc [] conf.indep_command (open_in trl_fname) with
          [ Sys_error _ -> () ] ];
      Wserver.wprint "</body>\n";
   return ()
