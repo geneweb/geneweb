@@ -1041,9 +1041,9 @@ nl: gescheiden
 pt: divorceados
 se: skild
 
-    dont know
+    don't know
 de: unbekannt
-en: dont know
+en: don't know
 eo: ne scias
 es: no se
 fr: ne sais pas
