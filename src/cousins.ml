@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.6 2000-02-13 19:37:50 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.7 2000-03-05 07:46:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -321,17 +321,26 @@ value print_menu conf base p effective_level =
   return ()
 ;
 
+value sosa_of_persons base =
+  loop 1 where rec loop n =
+    fun
+    [ [] -> n
+    | [ip :: list] ->
+        loop (if (poi base ip).sex = Male then 2 * n else 2 * n + 1) list ]
+;
+
 value print_anniv conf base p level =
   let module S =
-    Set.Make (struct type t = iper; value compare = compare; end)
+    Map.Make (struct type t = iper; value compare = compare; end)
   in
-  let rec insert_desc set n ip =
+  let rec insert_desc set up_sosa down_br n ip =
     if S.mem ip set then set
     else
-      let set = S.add ip set in
+      let set = S.add ip (up_sosa, down_br) set in
       if n = 0 then set
       else
         let u = (uoi base ip).family in
+        let down_br = [ip :: down_br] in
         loop set 0 where rec loop set i =
           if i = Array.length u then set
           else
@@ -340,27 +349,31 @@ value print_anniv conf base p level =
               loop set 0 where rec loop set i =
                 if i = Array.length chil then set
                 else
-                  let set = insert_desc set (n - 1) chil.(i) in
+                  let set =
+                    insert_desc set up_sosa down_br (n - 1) chil.(i)
+                  in
                   loop set (i + 1)
             in
             loop set (i + 1)
   in
   let set =
-    loop S.empty 0 p.cle_index where rec loop set n ip =
-      if n >= level then insert_desc set (n + 3) ip
+    loop S.empty 1 0 p.cle_index where rec loop set up_sosa n ip =
+      let set = insert_desc set up_sosa [] (n + 3) ip in
+      if n >= level then set
       else
         match (aoi base ip).parents with
         [ Some ifam ->
             let cpl = coi base ifam in
             let n = n + 1 in
-            loop (loop set n cpl.mother) n cpl.father
-        | None -> insert_desc set (n + 3) ip ]
+            let up_sosa = 2 * up_sosa in
+            loop (loop set up_sosa n cpl.father) (up_sosa + 1) n cpl.mother
+        | None -> set ]
   in
   let set =
     S.fold
-      (fun ip set ->
+      (fun ip (up_sosa, down_br) set ->
          let u = (uoi base ip).family in
-         let set = S.add ip set in
+         let set = S.add ip (up_sosa, down_br, None) set in
          if Array.length u = 0 then set
          else
            loop set 0 where rec loop set i =
@@ -368,14 +381,24 @@ value print_anniv conf base p level =
              else
                let cpl = coi base u.(i) in
                let c = spouse ip cpl in
-               loop (S.add c set) (i + 1))
+               loop (S.add c (up_sosa, down_br, Some ip) set) (i + 1))
       set S.empty
   in
+  let txt_of (up_sosa, down_br, spouse) conf base c =
+    "<a href=\"" ^ commd conf ^ "m=RL;" ^ acces_n conf base "1" p ^
+    ";b1=" ^ string_of_int up_sosa ^ ";" ^
+    acces_n conf base "2"
+      (match spouse with [ Some ip -> poi base ip | _ -> c ]) ^
+    ";b2=" ^ string_of_int (sosa_of_persons base down_br) ^
+    (match spouse with [ Some _ -> ";" ^ acces_n conf base "4" c | _ -> "" ]) ^
+    ";spouse=on\">" ^
+    person_title_text conf base c ^ "</a>"
+  in
   let f_scan =
-    let list = ref (S.elements set) in
+    let list = ref (S.fold (fun ip b list -> [(ip, b) :: list]) set []) in
     fun () ->
       match list.val with
-      [ [x :: l] -> do list.val := l; return (poi base x)
+      [ [(x, b) :: l] -> do list.val := l; return (poi base x, txt_of b)
       | [] -> raise Not_found ]
   in
   let mode () =

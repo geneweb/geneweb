@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.10 2000-02-09 03:01:25 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.11 2000-03-05 07:46:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -12,10 +12,10 @@ type date_event = [ DeBirth | DeDeath of death_reason ];
 value afficher_anniversaires_jour conf base dead_people liste =
   do Wserver.wprint "<ul>\n";
      List.iter
-       (fun (p, a, date_event) ->
+       (fun (p, a, date_event, txt_of) ->
           let is = index_of_sex p.sex in
           do html_li conf;
-             afficher_personne_titre_referencee conf base p;
+             Wserver.wprint "%s\n" (txt_of conf base p);
              if not dead_people then Wserver.wprint " <em>%d</em>\n" a
              else
                let txt =
@@ -49,7 +49,7 @@ value gen_print conf base mois f_scan dead_people =
   in
   do try
        while True do
-         let p = f_scan () in
+         let (p, txt_of) = f_scan () in
          if not dead_people then
            match (Adef.od_of_codate p.birth, p.death) with
            [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
@@ -57,7 +57,8 @@ value gen_print conf base mois f_scan dead_people =
                && d.month = mois && d.delta = 0 then
                  if age_autorise conf base p then
                    let j = d.day in
-                   tab.(pred j) := [(p, d.year, DeBirth) :: tab.(pred j)]
+                   tab.(pred j) :=
+                     [(p, d.year, DeBirth, txt_of) :: tab.(pred j)]
                  else ()
                else ()
            | _ -> () ]
@@ -72,7 +73,7 @@ value gen_print conf base mois f_scan dead_people =
                         if age_autorise conf base p then
                           let j = dt.day in
                           tab.(pred j) :=
-                            [(p, dt.year, DeBirth) :: tab.(pred j)]
+                            [(p, dt.year, DeBirth, txt_of) :: tab.(pred j)]
                         else ()
                       else ()
                   | _ -> () ];
@@ -86,7 +87,7 @@ value gen_print conf base mois f_scan dead_people =
                               let j = dt.day in
                               let a = dt.year in
                               tab.(pred j) :=
-                                [(p, a, DeDeath dr) :: tab.(pred j)]
+                                [(p, a, DeDeath dr, txt_of) :: tab.(pred j)]
                             else ()
                           else ()
                       | _ -> () ]
@@ -102,7 +103,8 @@ value gen_print conf base mois f_scan dead_people =
          do html_li conf;
             Wserver.wprint "%d\n" j;
             let liste =
-              Sort.list (fun (p1, a1, _) (p2, a2, _) -> a1 <= a2) tab.(pred j)
+              Sort.list (fun (p1, a1, _, _) (p2, a2, _, _) -> a1 <= a2)
+                tab.(pred j)
             in
             afficher_anniversaires_jour conf base dead_people liste;
          return ()
@@ -117,7 +119,7 @@ value afficher_liste_anniversaires conf base dead_people dt liste =
   let a_ref = dt.year in
   do Wserver.wprint "<ul>\n";
      List.iter
-       (fun (p, a, date_event) ->
+       (fun (p, a, date_event, txt_of) ->
           do html_li conf;
              if dead_people then
                do Wserver.wprint "<em>";
@@ -135,7 +137,7 @@ value afficher_liste_anniversaires conf base dead_people dt liste =
                         (transl conf "of the disappearance") ];
                   Wserver.wprint "</em>\n";
                   Wserver.wprint "%s " (transl_decline conf "of" "");
-                  afficher_personne_titre_referencee conf base p;
+                  Wserver.wprint "%s" (txt_of conf base p);
                   Wserver.wprint "\n<em>%s %d" (transl conf "in (year)") a;
                   Wserver.wprint " (";
                   Wserver.wprint (ftransl conf "%d years ago")
@@ -143,7 +145,7 @@ value afficher_liste_anniversaires conf base dead_people dt liste =
                   Wserver.wprint ")</em>";
                return ()
              else
-               do afficher_personne_titre_referencee conf base p;
+               do Wserver.wprint "\n%s" (txt_of conf base p);
                   match p.death with
                   [ NotDead ->
                       do Wserver.wprint " <em>";
@@ -165,17 +167,18 @@ value afficher_liste_anniversaires conf base dead_people dt liste =
   return ()
 ;
 
-value f_scan base =
+value f_scan conf base =
   let i = ref (-1) in
   fun () ->
     do incr i; return
-    if i.val < base.data.persons.len then base.data.persons.get i.val
+    if i.val < base.data.persons.len then
+      (base.data.persons.get i.val, referenced_person_title_text)
     else raise Not_found
 ;
 value print_birth conf base mois =
-  gen_print conf base mois (f_scan base) False;
+  gen_print conf base mois (f_scan conf base) False;
 value print_dead conf base mois =
-  gen_print conf base mois (f_scan base) True;
+  gen_print conf base mois (f_scan conf base) True;
 
 value print_birth_day conf base day_name verb wd dt list =
   do Wserver.wprint "\n"; html_p conf; return
@@ -355,16 +358,16 @@ value gen_print_menu_birth conf base f_scan mode =
      print_link_to_welcome conf True;
      try
        while True do
-         let p = f_scan () in
+         let (p, txt_of) = f_scan () in
          match (Adef.od_of_codate p.birth, p.death) with
          [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
              if d.prec = Sure && d.day <> 0 && d.month <> 0 then
                if match_dates conf base p d conf.today then
-                 list_tod.val := [(p, d.year, DeBirth) :: list_tod.val]
+                 list_tod.val := [(p, d.year, DeBirth, txt_of) :: list_tod.val]
                else if match_dates conf base p d tom then
-                 list_tom.val := [(p, d.year, DeBirth) :: list_tom.val]
+                 list_tom.val := [(p, d.year, DeBirth, txt_of) :: list_tom.val]
                else if match_dates conf base p d aft then
-                 list_aft.val := [(p, d.year, DeBirth) :: list_aft.val]
+                 list_aft.val := [(p, d.year, DeBirth, txt_of) :: list_aft.val]
                else ()
              else ()
          | _ -> () ];
@@ -373,7 +376,8 @@ value gen_print_menu_birth conf base f_scan mode =
      [ Not_found -> () ];
      List.iter
        (fun xx ->
-          xx.val := Sort.list (fun (p1, a1, _) (p2, a2, _) -> a1 <= a2) xx.val)
+          xx.val :=
+            Sort.list (fun (p1, a1, _, _) (p2, a2, _, _) -> a1 <= a2) xx.val)
        [list_tod; list_tom; list_aft];
      print_birth_day conf base (transl conf "today") (transl conf ", it is")
        conf.today_wd conf.today list_tod.val;
@@ -398,7 +402,8 @@ value print_menu_birth conf base =
   let i = ref (-1) in
   let f_scan () =
     do incr i; return
-    if i.val < base.data.persons.len then base.data.persons.get i.val
+    if i.val < base.data.persons.len then
+      (base.data.persons.get i.val, referenced_person_title_text)
     else raise Not_found
   in
   let mode () =
@@ -430,11 +435,17 @@ value print_menu_dead conf base =
               [ Some (Dgreg d _) ->
                   if d.prec = Sure && d.day <> 0 && d.month <> 0 then
                     if match_dates conf base p d conf.today then
-                      list_tod.val := [(p, d.year, DeBirth) :: list_tod.val]
+                      list_tod.val :=
+                        [(p, d.year, DeBirth, referenced_person_title_text) ::
+                         list_tod.val]
                     else if match_dates conf base p d tom then
-                      list_tom.val := [(p, d.year, DeBirth) :: list_tom.val]
+                      list_tom.val :=
+                        [(p, d.year, DeBirth, referenced_person_title_text) ::
+                         list_tom.val]
                     else if match_dates conf base p d aft then
-                      list_aft.val := [(p, d.year, DeBirth) :: list_aft.val]
+                      list_aft.val :=
+                        [(p, d.year, DeBirth, referenced_person_title_text) ::
+                         list_aft.val]
                     else ()
                   else ()
               | _ -> () ];
@@ -445,13 +456,16 @@ value print_menu_dead conf base =
                       if d.prec = Sure && d.day <> 0 && d.month <> 0 then
                         if match_dates conf base p d conf.today then
                           list_tod.val :=
-                            [(p, d.year, DeDeath dr) :: list_tod.val]
+                            [(p, d.year, DeDeath dr,
+                              referenced_person_title_text) :: list_tod.val]
                         else if match_dates conf base p d tom then
                           list_tom.val :=
-                            [(p, d.year, DeDeath dr) :: list_tom.val]
+                            [(p, d.year, DeDeath dr,
+                              referenced_person_title_text) :: list_tom.val]
                         else if match_dates conf base p d aft then
                           list_aft.val :=
-                            [(p, d.year, DeDeath dr) :: list_aft.val]
+                            [(p, d.year, DeDeath dr,
+                              referenced_person_title_text) :: list_aft.val]
                         else ()
                       else ()
                   | _ -> () ]
@@ -460,7 +474,8 @@ value print_menu_dead conf base =
      done;
      List.iter
        (fun xx ->
-          xx.val := Sort.list (fun (p1, a1, _) (p2, a2, _) -> a1 <= a2) xx.val)
+          xx.val :=
+            Sort.list (fun (p1, a1, _, _) (p2, a2, _, _) -> a1 <= a2) xx.val)
        [list_tod; list_tom; list_aft];
      print_anniv conf base (transl conf "today") (transl conf ", it is")
        conf.today_wd conf.today list_tod.val;
