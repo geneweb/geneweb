@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.12 2001-07-14 09:05:24 ddr Exp $ *)
+(* $Id: update.ml,v 4.13 2001-09-13 08:04:45 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -495,7 +495,7 @@ value reconstitute_date conf var =
   [ Some d ->
       let (d, cal) =
         match p_getenv conf.env (var ^ "_cal") with
-        [ Some "G" -> do { check_greg_day conf d; (d, Dgregorian) }
+        [ Some "G" | None -> do { check_greg_day conf d; (d, Dgregorian) }
         | Some "J" -> (Calendar.gregorian_of_julian d, Djulian)
         | Some "F" -> (Calendar.gregorian_of_french d, Dfrench)
         | Some "H" -> (Calendar.gregorian_of_hebrew d, Dhebrew)
