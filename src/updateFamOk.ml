@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.21 1999-07-28 09:48:32 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.22 1999-07-28 13:08:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -124,99 +124,6 @@ value reconstitute_family conf =
   (fam, cpl, ext)
 ;
 
-value new_persons = ref [];
-
-value add_misc_names_for_new_persons base =
-  do List.iter
-       (fun p ->
-          List.iter (fun n -> person_ht_add base n p.cle_index)
-            (person_misc_names base p))
-       new_persons.val;
-     new_persons.val := [];
-  return ()
-;
-
-value print_create_conflict conf base p =
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
-  let n =
-    Update.find_free_occ base (p_first_name base p) (p_surname base p) 0
-  in
-  do header conf title;
-     Update.print_error conf base (AlreadyDefined p);
-     html_p conf;
-     Wserver.wprint "<ul>\n";
-     html_li conf;
-     Wserver.wprint "%s: %d\n" (capitale (transl conf "first free number")) n;
-     html_li conf;
-     Wserver.wprint "%s\n"
-       (capitale (transl conf "or use \"link\" instead of \"create\""));
-     Wserver.wprint "</ul>\n";
-     Update.print_same_name conf base p;
-     Update.print_return conf;
-     trailer conf;
-  return raise Update.ModErr
-;
-
-value insert_person conf base src (f, s, o, create) =
-  let f = if f = "" then "?" else f in
-  let s = if s = "" then "?" else s in
-  match create with
-  [ Update.Create sex birth ->
-      try
-        if f = "?" || s = "?" then
-          if o <= 0 || o >= base.data.persons.len then raise Not_found
-          else
-            let ip = Adef.iper_of_int o in
-            let p = poi base ip in
-            if p_first_name base p = f && p_surname base p = s then ip
-            else raise Not_found
-        else
-          let ip = person_ht_find_unique base f s o in
-          print_create_conflict conf base (poi base ip)
-      with
-      [ Not_found ->
-          let o = if f = "?" || s = "?" then 0 else o in
-          let ip = Adef.iper_of_int (base.data.persons.len) in
-          let death = Update.infer_death conf birth in
-          let empty_string = Update.insert_string conf base "" in
-          let p =
-            {first_name = Update.insert_string conf base f;
-             surname = Update.insert_string conf base s;
-             occ = o; image = empty_string;
-             first_names_aliases = []; surnames_aliases = [];
-             public_name = empty_string;
-             nick_names = []; aliases = []; titles = [];
-             rparents = []; rchildren = [];
-             occupation = empty_string;
-             sex = sex; access = IfTitles;
-             birth = Adef.codate_of_od birth; birth_place = empty_string;
-             birth_src = empty_string;
-             baptism = Adef.codate_None; baptism_place = empty_string;
-             baptism_src = empty_string;
-             death = death; death_place = empty_string;
-             death_src = empty_string;
-             burial = UnknownBurial; burial_place = empty_string;
-             burial_src = empty_string;
-             family = [| |];
-             notes = empty_string;
-             psources = Update.insert_string conf base src;
-             cle_index = ip}
-          and a =
-            {parents = None;
-             consang = Adef.fix (-1)}
-          in
-          do base.func.patch_person p.cle_index p;
-             base.func.patch_ascend p.cle_index a;
-             if f <> "?" && s <> "?" then
-               do person_ht_add base (nominative (f ^ " " ^ s)) ip;
-                  new_persons.val := [p :: new_persons.val];
-               return ()
-             else ();
-          return ip ]
-  | Update.Link ->
-      Update.link_person conf base (f, s, o) ]
-;
-
 value strip_children pl =
   let pl =
     List.fold_right
@@ -316,11 +223,14 @@ value effective_mod conf base sfam scpl =
   let fi = sfam.fam_index in
   let ofam = foi base fi in
   let ocpl = coi base fi in
+  let created_p = ref [] in
   let nfam =
-    map_family_ps (insert_person conf base sfam.fsources)
+    map_family_ps (Update.insert_person conf base sfam.fsources created_p)
       (Update.insert_string conf base) sfam
   in
-  let ncpl = map_couple_p (insert_person conf base sfam.fsources) scpl in
+  let ncpl =
+    map_couple_p (Update.insert_person conf base sfam.fsources created_p) scpl
+  in
   let ofath = poi base ocpl.father in
   let omoth = poi base ocpl.mother in
   let nfath = poi base ncpl.father in
@@ -394,18 +304,21 @@ value effective_mod conf base sfam scpl =
             base.func.patch_ascend ip (find_asc ip)
           else ())
        nfam.children;
-     add_misc_names_for_new_persons base;
+     Update.add_misc_names_for_new_persons base created_p.val;
      Update.update_misc_names_of_family base nfath;
   return (nfam, ncpl)
 ;
 
 value effective_add conf base sfam scpl =
   let fi = Adef.ifam_of_int (base.data.families.len) in
+  let created_p = ref [] in
   let nfam =
-    map_family_ps (insert_person conf base sfam.fsources)
+    map_family_ps (Update.insert_person conf base sfam.fsources created_p)
       (Update.insert_string conf base) sfam
   in
-  let ncpl = map_couple_p (insert_person conf base sfam.fsources) scpl in
+  let ncpl =
+    map_couple_p (Update.insert_person conf base sfam.fsources created_p) scpl
+  in
   let origin_file = infer_origin_file conf base ncpl nfam in
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
@@ -435,7 +348,7 @@ value effective_add conf base sfam scpl =
                  base.func.patch_ascend p.cle_index a;
               return () ])
        nfam.children;
-     add_misc_names_for_new_persons base;
+     Update.add_misc_names_for_new_persons base created_p.val;
      Update.update_misc_names_of_family base nfath;
   return (nfam, ncpl)
 ;

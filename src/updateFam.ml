@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.12 1999-07-28 09:48:30 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.13 1999-07-28 13:08:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -8,8 +8,6 @@ open Util;
 open Config;
 
 value bogus_family_index = Adef.ifam_of_int (-1);
-
-type str_indi = (string * string * int * Update.create);
 
 value person_key base ip =
   let p = poi base ip in

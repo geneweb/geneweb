@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.15 1999-07-28 09:48:29 ddr Exp $ *)
+(* $Id: update.ml,v 2.16 1999-07-28 13:08:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -8,8 +8,8 @@ open Gutil;
 open Util;
 
 exception ModErr;
-type key = (string * string * int);
 type create = [ Create of sex and option date | Link ];
+type key = (string * string * int * create);
 
 value rec find_free_occ base f s i =
   match
@@ -100,20 +100,6 @@ value print_err_unknown conf base (f, s, o) =
      print_return conf;
      trailer conf;
   return raise ModErr
-;
-
-value link_person conf base (f, s, o) =
-  if f = "?" || s = "?" then
-    if o < 0 || o >= base.data.persons.len then
-      print_err_unknown conf base (f, s, o)
-    else
-      let ip = Adef.iper_of_int o in
-      let p = poi base ip in
-      if p_first_name base p = f && p_surname base p = s then ip
-      else print_err_unknown conf base (f, s, o)
-  else
-    try person_ht_find_unique base f s o with
-    [ Not_found -> print_err_unknown conf base (f, s, o) ]
 ;
 
 value insert_string conf base s =
@@ -584,6 +570,105 @@ value print_parent_person conf base var (first_name, surname, occ, create) =
       end;
     end;
   end
+;
+
+value print_create_conflict conf base p =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let n =
+    find_free_occ base (p_first_name base p) (p_surname base p) 0
+  in
+  do header conf title;
+     print_error conf base (AlreadyDefined p);
+     html_p conf;
+     Wserver.wprint "<ul>\n";
+     html_li conf;
+     Wserver.wprint "%s: %d\n" (capitale (transl conf "first free number")) n;
+     html_li conf;
+     Wserver.wprint "%s\n"
+       (capitale (transl conf "or use \"link\" instead of \"create\""));
+     Wserver.wprint "</ul>\n";
+     print_same_name conf base p;
+     print_return conf;
+     trailer conf;
+  return raise ModErr
+;
+
+value add_misc_names_for_new_persons base new_persons =
+  List.iter
+    (fun p ->
+       List.iter (fun n -> person_ht_add base n p.cle_index)
+         (person_misc_names base p))
+    new_persons
+;
+
+value insert_person conf base src new_persons (f, s, o, create) =
+  let f = if f = "" then "?" else f in
+  let s = if s = "" then "?" else s in
+  match create with
+  [ Create sex birth ->
+      try
+        if f = "?" || s = "?" then
+          if o <= 0 || o >= base.data.persons.len then raise Not_found
+          else
+            let ip = Adef.iper_of_int o in
+            let p = poi base ip in
+            if p_first_name base p = f && p_surname base p = s then ip
+            else raise Not_found
+        else
+          let ip = person_ht_find_unique base f s o in
+          print_create_conflict conf base (poi base ip)
+      with
+      [ Not_found ->
+          let o = if f = "?" || s = "?" then 0 else o in
+          let ip = Adef.iper_of_int (base.data.persons.len) in
+          let death = infer_death conf birth in
+          let empty_string = insert_string conf base "" in
+          let p =
+            {first_name = insert_string conf base f;
+             surname = insert_string conf base s;
+             occ = o; image = empty_string;
+             first_names_aliases = []; surnames_aliases = [];
+             public_name = empty_string;
+             nick_names = []; aliases = []; titles = [];
+             rparents = []; rchildren = [];
+             occupation = empty_string;
+             sex = sex; access = IfTitles;
+             birth = Adef.codate_of_od birth; birth_place = empty_string;
+             birth_src = empty_string;
+             baptism = Adef.codate_None; baptism_place = empty_string;
+             baptism_src = empty_string;
+             death = death; death_place = empty_string;
+             death_src = empty_string;
+             burial = UnknownBurial; burial_place = empty_string;
+             burial_src = empty_string;
+             family = [| |];
+             notes = empty_string;
+             psources = insert_string conf base src;
+             cle_index = ip}
+          and a =
+            {parents = None;
+             consang = Adef.fix (-1)}
+          in
+          do base.func.patch_person p.cle_index p;
+             base.func.patch_ascend p.cle_index a;
+             if f <> "?" && s <> "?" then
+               do person_ht_add base (nominative (f ^ " " ^ s)) ip;
+                  new_persons.val := [p :: new_persons.val];
+               return ()
+             else ();
+          return ip ]
+  | Link ->
+      if f = "?" || s = "?" then
+        if o < 0 || o >= base.data.persons.len then
+          print_err_unknown conf base (f, s, o)
+        else
+          let ip = Adef.iper_of_int o in
+          let p = poi base ip in
+          if p_first_name base p = f && p_surname base p = s then ip
+          else print_err_unknown conf base (f, s, o)
+      else
+        try person_ht_find_unique base f s o with
+        [ Not_found -> print_err_unknown conf base (f, s, o) ] ]
 ;
 
 value print_someone conf base p =

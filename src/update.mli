@@ -1,19 +1,22 @@
-(* $Id: update.mli,v 2.7 1999-07-28 09:48:30 ddr Exp $ *)
+(* $Id: update.mli,v 2.8 1999-07-28 13:08:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Config;
 
 exception ModErr;
-type key = (string * string * int);
 type create = [ Create of sex and option date | Link ];
+type key = (string * string * int * create);
 
 value find_free_occ : base -> string -> string -> int -> int;
 value infer_death : config -> option date -> death;
 value print_same_name : config -> base -> person -> unit;
 
-value link_person : config -> base -> (string * string * int) -> Adef.iper;
+value insert_person :
+  config -> base -> string -> ref (list person) -> key -> Adef.iper
+;
 value insert_string : config -> base -> string -> Adef.istr;
+value add_misc_names_for_new_persons : base -> list person -> unit;
 value update_misc_names_of_family : base -> person -> unit;
 
 value print_return : config -> unit;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 2.14 1999-07-28 09:48:33 ddr Exp $ *)
+(* $Id: updateInd.ml,v 2.15 1999-07-28 13:08:35 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -29,7 +29,7 @@ value string_person_of base p =
   in
   let fp ip =
     let p = poi base ip in
-    (sou base p.first_name, sou base p.surname, p.occ)
+    (sou base p.first_name, sou base p.surname, p.occ, Update.Link)
   in
   Gutil.map_person_ps fp (sou base) p
 ;
@@ -493,7 +493,7 @@ value print_relation_person conf base r proj var =
     match r with
     [ Some r ->
         match proj r with
-        [ Some (fn, sn, oc) -> (fn, sn, oc, Update.Link)
+        [ Some x -> x
         | None -> ("", "", 0, Update.Link) ]
     | None -> ("", "", 0, Update.Link) ]
   in

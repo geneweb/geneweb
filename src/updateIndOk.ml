@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.22 1999-07-28 09:02:21 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.23 1999-07-28 13:08:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -97,28 +97,26 @@ value reconstitute_add_relation conf ext cnt rl =
   | _ -> (rl, ext) ]
 ;
 
+value reconstitute_relation_parent conf var key sex =
+  match (getn conf var (key ^ "_fn"), getn conf var (key ^ "_sn")) with
+  [ ("", _) | ("?", _) | (_, "?") -> None
+  | (fn, sn) ->
+      let occ =
+        try int_of_string (getn conf var (key ^ "_occ")) with
+        [ Failure _ -> 0 ]
+      in
+      let create =
+        match getn conf var (key ^ "_p") with
+        [ "create" -> Update.Create sex None
+        | _ -> Update.Link ]
+      in
+      Some (fn, sn, occ, create) ]
+;
+
 value reconstitute_relation conf var =
   try
-    let r_fath =
-      match (getn conf var "fath_fn", getn conf var "fath_sn") with
-      [ ("", _) | ("?", _) | (_, "?") -> None
-      | (fn, sn) ->
-          let occ =
-            try int_of_string (getn conf var "fath_occ") with
-            [ Failure _ -> 0 ]
-          in
-          Some (fn, sn, occ) ]
-    in
-    let r_moth =
-      match (getn conf var "moth_fn", getn conf var "moth_sn") with
-      [ ("", _) | ("?", _) | (_, "?") -> None
-      | (fn, sn) ->
-          let occ =
-            try int_of_string (getn conf var "moth_occ") with
-            [ Failure _ -> 0 ]
-          in
-          Some (fn, sn, occ) ]
-    in
+    let r_fath = reconstitute_relation_parent conf var "fath" Male in
+    let r_moth = reconstitute_relation_parent conf var "moth" Female in
     let r_type =
       match getn conf var "type"  with
       [ "Adoption" -> Adoption
@@ -446,8 +444,9 @@ value effective_mod conf base sp =
      else ();
      check_sex_married conf base sp op;
   return
+  let created_p = ref [] in
   let np =
-    map_person_ps (Update.link_person conf base)
+    map_person_ps (Update.insert_person conf base sp.psources created_p)
       (Update.insert_string conf base) sp
   in
   do np.family := op.family;
@@ -471,8 +470,9 @@ value effective_add conf base sp =
   do check_conflict conf base sp ipl;
      person_ht_add base key pi;
   return
+  let created_p = ref [] in
   let np =
-    map_person_ps (Update.link_person conf base)
+    map_person_ps (Update.insert_person conf base sp.psources created_p)
       (Update.insert_string conf base) sp
   in
   let na = {parents = None; consang = Adef.fix (-1)} in
