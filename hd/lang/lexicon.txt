@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.154 1999-10-27 21:17:37 ddr Exp $
+# $Id: lexicon.txt,v 2.155 1999-10-28 10:23:51 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2178,6 +2178,7 @@ fr: historique des mises-&agrave;-jour
 is: uppfærslusaga
 nl: lijst van wijzigingen
 no: oppdateringshistorie
+pt: historial das actualiza&ccedil;&aacute;o
 se: uppdateringarnas historia
 
     husband/wife
@@ -4396,7 +4397,7 @@ is: síðustu %d dauðsföll
 it: le ultime %d morto
 nl: de %d meest recente overlijdens
 no: de siste %d d&oslash;de
-pt: os %d mortes m&aacute;s recentes
+pt: as %d mortes m&aacute;s recentes
 se: de senaste %d d&ouml;dsfallen
 
     the parents
