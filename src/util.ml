@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.54 2002-10-22 13:18:25 ddr Exp $ *)
+(* $Id: util.ml,v 4.55 2002-10-26 01:22:43 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1217,17 +1217,18 @@ value expand_env =
    | _ -> s ]
 ;
 
-value copy_string_with_macros conf env s =
+value string_with_macros conf env s =
+  let buff = Buffer.create 1000 in
   loop Out 0 where rec loop tt i =
     if i < String.length s then
       if i + 1 < String.length s && s.[i] = '%' then
         let i =
           try
-            do { Wserver.wprint "%s" (List.assoc s.[i + 1] env ()); i + 2 }
+            do { Buffer.add_string buff (List.assoc s.[i + 1] env ()); i + 2 }
           with
           [ Not_found ->
               match s.[i + 1] with
-              [ 's' -> do { Wserver.wprint "%s" (commd conf); i + 2 }
+              [ 's' -> do { Buffer.add_string buff (commd conf); i + 2 }
               | 'v' ->
                   let (k, j) = get_variable s (i + 2) in
                   let (v, i) =
@@ -1242,33 +1243,33 @@ value copy_string_with_macros conf env s =
                     [ Some v -> (v, j)
                     | None -> ("%", i + 1) ]
                   in
-                  do { Wserver.wprint "%s" v; i }
-              | '%' -> do { Wserver.wprint "%%"; i + 2 }
-              | _ -> do { Wserver.wprint "%%"; i + 1 } ] ]
+                  do { Buffer.add_string buff v; i }
+              | '%' -> do { Buffer.add_string buff "%"; i + 2 }
+              | _ -> do { Buffer.add_string buff "%"; i + 1 } ] ]
         in
         loop tt i
       else if s.[i] = '<' && dangerous_tag s (i + 1) then do {
-        Wserver.wprint "..."; loop tt (i + 1)
+        Buffer.add_string buff "..."; loop tt (i + 1)
       }
       else
         match tt with
         [ In_a_href ->
             let tt = if start_with s i "</a>" then Out else In_a_href in
-            do { Wserver.wprint "%c" s.[i]; loop tt (i + 1) }
+            do { Buffer.add_char buff s.[i]; loop tt (i + 1) }
         | In_norm ->
             let tt = if s.[i] = '>' then Out else In_norm in
-            do { Wserver.wprint "%c" s.[i]; loop tt (i + 1) }
+            do { Buffer.add_char buff s.[i]; loop tt (i + 1) }
         | Out ->
             match http_string s i with
             [ Some j ->
                 let x = String.sub s i (j - i) in
-                do { Wserver.wprint "<a href=%s>%s</a>" x x; loop Out j }
+                do { Printf.bprintf buff "<a href=%s>%s</a>" x x; loop Out j }
             | None ->
                 match email_addr s i with
                 [ Some j ->
                     let x = String.sub s i (j - i) in
                     do {
-                      Wserver.wprint "<a href=\"mailto:%s\">%s</a>" x x;
+                      Printf.bprintf buff "<a href=\"mailto:%s\">%s</a>" x x;
                       loop Out j
                     }
                 | None ->
@@ -1279,8 +1280,8 @@ value copy_string_with_macros conf env s =
                       else if s.[i] = '<' then In_norm
                       else Out
                     in
-                    do { Wserver.wprint "%c" s.[i]; loop tt (i + 1) } ] ] ]
-    else ()
+                    do { Buffer.add_char buff s.[i]; loop tt (i + 1) } ] ] ]
+    else Buffer.contents buff
 ;
 
 value setup_link conf =

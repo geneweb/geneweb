@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 4.7 2002-03-11 19:02:54 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 4.8 2002-10-26 01:22:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -207,9 +207,8 @@ value print_death conf base =
              [ Some (Dgreg d1 _) ->
                  if sure d1 && sure d && d1 <> d then do {
                    let a = time_gone_by d1 d in
-                   Wserver.wprint " <em>(";
-                   Date.print_age conf a;
-                   Wserver.wprint ")</em>";
+                   Wserver.wprint " <em>(%s)</em>"
+                     (Date.string_of_age conf a);
                  }
                  else ()
              | _ -> () ];
@@ -259,9 +258,7 @@ value print_oldest_alive conf base =
              (Date.string_of_ondate conf (Dgreg d cal));
            if p.death = NotDead && d.prec = Sure then do {
              let a = time_gone_by d conf.today in
-             Wserver.wprint " <em>(";
-             Date.print_age conf a;
-             Wserver.wprint ")</em>";
+             Wserver.wprint " <em>(%s)</em>" (Date.string_of_age conf a);
            }
            else ();
            Wserver.wprint ".\n";

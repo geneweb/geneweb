@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.40 2002-10-25 13:14:28 ddr Exp $ *)
+(* $Id: perso.ml,v 4.41 2002-10-26 01:22:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -18,22 +18,17 @@ value has_children base u =
     (Array.to_list u.family)
 ;
 
-value print_marriage_text conf base fam =
+value string_of_marriage_text conf base fam =
   let marriage = Adef.od_of_codate fam.marriage in
   let marriage_place = sou base fam.marriage_place in
-  do {
+  let s =
     match marriage with
-    [ Some d -> Wserver.wprint " %s" (Date.string_of_ondate conf d)
-    | _ -> () ];
-    match marriage_place with
-    [ "" -> ()
-    | s ->
-        do {
-          Wserver.wprint ", ";
-          copy_string_with_macros conf [] s;
-          Wserver.wprint ","
-        } ];
-  }
+    [ Some d -> " " ^ Date.string_of_ondate conf d
+    | _ -> "" ]
+  in
+  match marriage_place with
+  [ "" -> s
+  | _ -> s ^ ", " ^ string_with_macros conf [] marriage_place ^ "," ]
 ;
 
 value print_title conf base and_txt p (nth, name, title, places, dates) =
@@ -368,43 +363,44 @@ value simple_person_text conf base p p_auth =
   else person_text conf base p
 ;
 
-value print_age conf base env p p_auth =
+value string_of_age conf base env p p_auth =
   if p_auth then
     match (Adef.od_of_codate p.birth, p.death) with
     [ (Some (Dgreg d _), NotDead) ->
-        let a = time_gone_by d conf.today in Date.print_age conf a
-    | _ -> () ]
-  else ()
+        let a = time_gone_by d conf.today in
+        Date.string_of_age conf a
+    | _ -> "" ]
+  else ""
 ;
 
-value print_alias conf base env =
+value string_of_alias conf base env =
   match get_env "alias" env with
-  [ Vstring s -> Wserver.wprint "%s" s
-  | _ -> () ]
+  [ Vstring s -> s
+  | _ -> "" ]
 ;
 
-value print_place conf base istr =
-  copy_string_with_macros conf [] (sou base istr)
+value string_of_place conf base istr =
+  string_with_macros conf [] (sou base istr)
 ;
 
-value print_baptism_place conf base env p p_auth =
-  if p_auth then print_place conf base p.baptism_place else ()
+value string_of_baptism_place conf base env p p_auth =
+  if p_auth then string_of_place conf base p.baptism_place else ""
 ;
 
-value print_birth_place conf base env p p_auth =
-  if p_auth then print_place conf base p.birth_place else ()
+value string_of_birth_place conf base env p p_auth =
+  if p_auth then string_of_place conf base p.birth_place else ""
 ;
 
-value print_burial_place conf base env p p_auth =
-  if p_auth then print_place conf base p.burial_place else ()
+value string_of_burial_place conf base env p p_auth =
+  if p_auth then string_of_place conf base p.burial_place else ""
 ;
 
-value print_comment conf base env p p_auth =
+value string_of_comment conf base env p p_auth =
   fun
   [ Vfam fam _ _ ->
-      if p_auth then copy_string_with_macros conf [] (sou base fam.comment)
-      else ()
-  | _ -> () ]
+      if p_auth then string_with_macros conf [] (sou base fam.comment)
+      else ""
+  | _ -> "" ]
 ;
 
 value print_consanguinity conf base env a p_auth =
@@ -427,17 +423,17 @@ value print_death_age conf base env p p_auth =
           if not approx && d1.prec = Sure && d2.prec = Sure then ()
           else
             Wserver.wprint "%s " (transl_decline conf "possibly (date)" "");
-          Date.print_age conf a
+          Wserver.wprint "%s" (Date.string_of_age conf a)
         }
     | _ -> () ]
   else ()
 ;
 
-value print_death_place conf base env p p_auth =
-  if p_auth then print_place conf base p.death_place else ()
+value string_of_death_place conf base env p p_auth =
+  if p_auth then string_of_place conf base p.death_place else ""
 ;
 
-value print_died conf base env p p_auth =
+value string_of_died conf base env p p_auth =
   if p_auth then
     let is = index_of_sex p.sex in
     match p.death with
@@ -450,16 +446,16 @@ value print_died conf base env p p_auth =
           | Executed -> transl_nth conf "executed (legally killed)" is
           | Disappeared -> transl_nth conf "disappeared" is ]
         in
-        Wserver.wprint "%s" (capitale dr_w)
+        capitale dr_w
     | DeadYoung ->
-        Wserver.wprint "%s" (capitale (transl_nth conf "died young" is))
+        capitale (transl_nth conf "died young" is)
     | DeadDontKnowWhen ->
-        Wserver.wprint "%s" (capitale (transl_nth conf "died" is))
-    | _ -> () ]
-  else ()
+        capitale (transl_nth conf "died" is)
+    | _ -> "" ]
+  else ""
 ;
 
-value print_divorce_date conf base env p p_auth =
+value string_of_divorce_date conf base env p p_auth =
   fun
   [ Vfam fam (_, isp) _ ->
       match fam.divorce with
@@ -471,20 +467,16 @@ value print_divorce_date conf base env p p_auth =
           in
           match d with
           [ Some d when auth ->
-              do {
-                Wserver.wprint " <em>";
-                Wserver.wprint "%s" (Date.string_of_ondate conf d);
-                Wserver.wprint "</em>"
-              }
-          | _ -> () ]
-      | _ -> () ]
-  | _ -> () ]
+              " <em>" ^ Date.string_of_ondate conf d ^ "</em>"
+          | _ -> "" ]
+      | _ -> "" ]
+  | _ -> "" ]
 ;
 
-value print_first_name_alias conf base env =
+value string_of_first_name_alias conf base env =
   match get_env "first_name_alias" env with
-  [ Vstring s -> Wserver.wprint "%s" s
-  | _ -> () ]
+  [ Vstring s -> s
+  | _ -> "" ]
 ;  
 
 value print_image_size conf base env p p_auth =
@@ -528,7 +520,10 @@ value print_married_to conf base env p p_auth =
      let auth = p_auth && authorized_age conf base spouse in
      let format = relation_txt conf p.sex fam in
      Wserver.wprint (fcapitale format)
-       (fun _ -> if auth then print_marriage_text conf base fam else ())
+       (fun _ ->
+          if auth then
+            Wserver.wprint "%s" (string_of_marriage_text conf base fam)
+          else ())
   | _ -> () ]
 ;
 
@@ -572,18 +567,16 @@ value obsolete var new_var =
 ;
 
 value print_nobility_titles conf base env p p_auth =
-  do {
-    obsolete "nobility_titles" "nobility_title";
-    if p_auth then print_titles conf base True (transl_nth conf "and" 0) p
-    else ()
-  }
+  let () = obsolete "nobility_titles" "nobility_title" in
+  if p_auth then print_titles conf base True (transl_nth conf "and" 0) p
+  else ()
 ;
 
-value print_notes conf base env p p_auth =
+value string_of_notes conf base env p p_auth =
   if p_auth then
     let env = [('i', fun () -> Util.default_image_name base p)] in
-    copy_string_with_macros conf env (sou base p.notes)
-  else ()
+    string_with_macros conf env (sou base p.notes)
+  else ""
 ;
 
 value print_occupation conf base env p p_auth =
@@ -647,7 +640,7 @@ value print_origin_file conf base env =
   else ()
 ;
 
-value print_parent_age conf base p a p_auth parent =
+value string_of_parent_age conf base p a p_auth parent =
   match a.parents with
   [ Some ifam ->
       let cpl = coi base ifam in
@@ -655,10 +648,10 @@ value print_parent_age conf base p a p_auth parent =
       if p_auth && authorized_age conf base pp then
         match (Adef.od_of_codate pp.birth, Adef.od_of_codate p.birth) with
         [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
-            Date.print_age conf (time_gone_by d1 d2)
-        | _ -> () ]
-      else ()
-  | None -> () ]
+            Date.string_of_age conf (time_gone_by d1 d2)
+        | _ -> "" ]
+      else ""
+  | None -> "" ]
 ;
 
 value print_prefix_no_templ conf base env =
@@ -738,12 +731,12 @@ value print_sosa_ref conf base env a a_auth =
   | _ -> () ]
 ;
 
-value print_source conf base env p =
+value string_of_source conf base env p =
   match get_env "src" env with
   [ Vstring s ->
       let env = [('i', fun () -> Util.default_image_name base p)] in
-      copy_string_with_macros conf env s
-  | _ -> () ]
+      string_with_macros conf env s
+  | _ -> "" ]
 ;
 
 value print_source_type conf base env =
@@ -776,32 +769,60 @@ value eval_int_env var env =
 
 value try_eval_gen_variable conf base env (p, a, u, p_auth) =
   fun
-  [ "child_cnt" -> eval_int_env "child_cnt" env
+  [ "alias" -> string_of_alias conf base env
+  | "access" -> acces conf base p
+  | "age" -> string_of_age conf base env p p_auth
+  | "baptism_place" -> string_of_baptism_place conf base env p p_auth
+  | "birth_place" -> string_of_birth_place conf base env p p_auth
+  | "burial_place" -> string_of_burial_place conf base env p p_auth
+  | "border" -> string_of_int conf.border
+  | "child_cnt" -> eval_int_env "child_cnt" env
+  | "child_name" ->
+      let force_surname =
+        match a.parents with
+        [ None -> False
+        | Some ifam ->
+            p_surname base (pget conf base (coi base ifam).father) <>
+              p_surname base p ]
+      in
+      if not p_auth && conf.hide_names then "x x"
+      else if force_surname then person_text conf base p
+      else person_text_without_surname conf base p
   | "count" ->
-      do { obsolete "count" "child_cnt"; eval_int_env "child_cnt" env }
+      let () = obsolete "count" "child_cnt" in
+      eval_int_env "child_cnt" env
+  | "cremation_place" -> string_of_burial_place conf base env p p_auth
+  | "dates" ->
+      if p_auth then Date.short_dates_text conf base p else ""
+  | "death_place" -> string_of_death_place conf base env p p_auth
+  | "died" -> string_of_died conf base env p p_auth
   | "family_cnt" -> eval_int_env "family_cnt" env
+  | "father_age_at_birth" ->
+      string_of_parent_age conf base p a p_auth (fun cpl -> cpl.father)
   | "first_name" ->
       if not p_auth && conf.hide_names then "x" else p_first_name base p
+  | "first_name_alias" -> string_of_first_name_alias conf base env
   | "first_name_key" ->
       if conf.hide_names && not p_auth then ""
       else code_varenv (Name.lower (p_first_name base p))
+  | "image_txt" -> default_image_name base p
   | "ind_access" -> "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
   | "key" ->
       if not p_auth && conf.hide_names then "x"
       else Util.default_image_name base p
   | "length" ->
-      do {
-        obsolete "length" "nb_children";
-        match get_env "fam" env with
-        [ Vfam _ _ des -> string_of_int (Array.length des.children)
-        | _ -> "" ]
-      }
+      let () = obsolete "length" "nb_children" in
+      match get_env "fam" env with
+      [ Vfam _ _ des -> string_of_int (Array.length des.children)
+      | _ -> "" ]
   | "marriage_place" ->
       if p_auth then
         match get_env "fam" env with
         [ Vfam fam _ _ -> sou base fam.marriage_place
         | _ -> "" ]
       else ""
+  | "mother_age_at_birth" ->
+      string_of_parent_age conf base p a p_auth (fun cpl -> cpl.mother)
   | "nb_children" ->
       match get_env "fam" env with
       [ Vfam _ _ des -> string_of_int (Array.length des.children)
@@ -813,6 +834,7 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) =
           match get_env "p" env with
           [ Vind _ _ u -> string_of_int (Array.length u.family)
           | _ -> "" ] ]
+  | "notes" -> string_of_notes conf base env p p_auth
   | "on_marriage_date" ->
       if p_auth then
         match get_env "fam" env with
@@ -822,11 +844,13 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) =
             | None -> "" ] 
         | _ -> "" ]
       else ""
+  | "source" -> string_of_source conf base env p
   | "surname" ->
       if not p_auth && conf.hide_names then "x" else p_surname base p
   | "surname_key" ->
       if conf.hide_names && not p_auth then ""
       else code_varenv (Name.lower (p_surname base p))
+  | "title" -> person_title conf base p
   | s ->
       let v = extract_var "evar_" s in
       if v <> "" then
@@ -838,58 +862,26 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) =
 
 value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
   fun
-  [ "access" -> Wserver.wprint "%s" (acces conf base p)
-  | "age" -> print_age conf base env p p_auth
-  | "alias" -> print_alias conf base env
-  | "baptism_place" -> print_baptism_place conf base env p p_auth
-  | "birth_place" -> print_birth_place conf base env p p_auth
-  | "border" -> Wserver.wprint "%d" conf.border
-  | "burial_place" -> print_burial_place conf base env p p_auth
-  | "child_name" ->
-      let force_surname =
-        match a.parents with
-        [ None -> False
-        | Some ifam ->
-            p_surname base (pget conf base (coi base ifam).father) <>
-              p_surname base p ]
-      in
-      Wserver.wprint "%s"
-        (if not p_auth && conf.hide_names then "x x"
-         else if force_surname then person_text conf base p
-         else person_text_without_surname conf base p)
-  | "cremation_place" -> print_burial_place conf base env p p_auth
-  | "comment" -> print_comment conf base env p p_auth efam
+  [ "comment" ->
+      Wserver.wprint "%s" (string_of_comment conf base env p p_auth efam)
   | "consanguinity" -> print_consanguinity conf base env a p_auth
   | "death_age" -> print_death_age conf base env p p_auth
-  | "death_place" -> print_death_place conf base env p p_auth
-  | "died" -> print_died conf base env p p_auth
-  | "divorce_date" -> print_divorce_date conf base env p p_auth efam
-  | "dates" ->
-      if p_auth then Wserver.wprint "%s" (Date.short_dates_text conf base p)
-      else ()
+  | "divorce_date" ->
+      Wserver.wprint "%s" (string_of_divorce_date conf base env p p_auth efam)
   | "fam_access" ->
       match efam with
       [ Vfam fam _ _ ->
           Wserver.wprint "i=%d;ip=%d" (Adef.int_of_ifam fam.fam_index)
             (Adef.int_of_iper p.cle_index)
       | _ -> () ]
-  | "father_age_at_birth" ->
-      print_parent_age conf base p a p_auth (fun cpl -> cpl.father)
-  | "first_name_alias" -> print_first_name_alias conf base env
   | "image_size" -> print_image_size conf base env p p_auth
-  | "image_txt" -> Wserver.wprint "%s" (default_image_name base p)
   | "image_url" -> print_image_url conf base env p p_auth
   | "married_to" ->
-      do {
-        obsolete "married_to" "";
-        print_married_to conf base env p p_auth efam
-      }
+      let () = obsolete "married_to" "" in
+      print_married_to conf base env p p_auth efam
   | "misc_names" -> print_misc_names conf base env p p_auth
-  | "mother_age_at_birth" ->
-      print_parent_age conf base p a p_auth (fun cpl -> cpl.mother)
   | "nobility_title" -> print_nobility_title conf base env p p_auth
   | "nobility_titles" -> print_nobility_titles conf base env p p_auth
-  | "notes" -> print_notes conf base env p p_auth
   | "occupation" -> print_occupation conf base env p p_auth
   | "on_baptism_date" -> print_on_baptism_date conf base env p p_auth
   | "on_birth_date" -> print_on_birth_date conf base env p p_auth
@@ -907,9 +899,7 @@ value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
   | "sosa_link" -> print_sosa_link conf base env p p_auth
   | "sosa_ref" -> print_sosa_ref conf base env p p_auth
   | "source_type" -> print_source_type conf base env
-  | "source" -> print_source conf base env p
   | "surname_alias" -> print_surname_alias conf base env
-  | "title" -> Wserver.wprint "%s" (person_title conf base p)
   | "witness_relation" -> print_witness_relation conf base env efam
   | s -> Wserver.wprint "%s" (try_eval_gen_variable conf base env ep s) ]
 ;
