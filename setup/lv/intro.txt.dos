@@ -2,7 +2,7 @@
 SveicinÆti GeneWeb $q ÖenealoÖijas datu bÆzñ
 
 Atveriet Interneta caurlİkprogramu un norÆdiet sekojoıu adresi:
-       http://localhost:$z/
+       http://127.0.0.1:$z/
 
 UzmanØbu: lai ıî programma darbotos Jİs nedrØgstat aizvñrt ıo logu!
 
