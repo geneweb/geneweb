@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.104 2002-09-26 09:38:42 ddr Exp $
+# $Id: lexicon.txt,v 4.105 2002-09-26 13:54:24 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -457,7 +457,7 @@ nl: vendйmiaire/brumaire/frimaire/nivфse/pluviфse/ventфse/germinal/florйal/prair
 no: vendйmiaire/brumaire/frimaire/nivфse/pluviфse/ventфse/germinal/florйal/prairial/messidor/thermidor/fructidor/complйmentaire
 pl: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
 pt: Vindimiбrio/Brumбrio/Frimбrio/Nevoso/Pluvioso/Ventoso/Germinal/Floreal/Pradial/Messidor/Termidor/Frutidor/Complementar
-ru: Вандемиер/Брюмэр/Фримэр/Нивоз/Плюви?з/Вантоз/Жерминаль/Флореаль/Прерияль/Мессидор/Тэрмидор/Фрюктидор
+ru: Вандемиер/Брюмэр/Фримэр/Нивоз/Плювиоз/Вантоз/Жерминаль/Флореаль/Прерияль/Мессидор/Тэрмидор/Фрюктидор
 sl: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
 sv: vendйmiaire/brumaire/frimaire/nivфse/pluviфse/ventфse/germinal/florйal/prairial/messidor/thermidor/fructidor/komplementдr
 
