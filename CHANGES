@@ -17,11 +17,15 @@ GeneWeb version 4.05
   - [13 Jan 02] Proposes now both addresses localhost and 127.0.0.1.
     (sometimes just one of them work and not the other).
 
-* Gedcom to GeneWeb (ged2gwb)
-  - [13 Jan 02] Fixed bug: failed under Windows if there was a first name
-    ending with a quote (this is a typical example of the bug, but it can
-    happen in other circumstances: the bug comes from the option -fne).
-  - [08 Jan 02] Fixed bug: the divorce dates were not imported
+* GeneWeb compiler (gwc) and Gedcom to GeneWeb (ged2gwb)
+  - [15 Jan 02] Can fix now some cases of "sex not coherent with
+    relations", e.g. when godfather and godmother are inverted.
+  - [13 Jan 02] Fixed bug (ged2gwb): failed under Windows if there was
+    a first name ending with a quote (this is a typical example of the
+    bug, but it can happen in other circumstances: the bug comes from the
+    option -fne).
+  - [08 Jan 02] Fixed bug (ged2gwb): the divorce dates were not
+    imported.
 
 GeneWeb version 4.04
 --------------------
