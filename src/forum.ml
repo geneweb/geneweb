@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 2.4 1999-10-08 19:13:06 ddr Exp $ *)
+(* $Id: forum.ml,v 2.5 1999-10-09 21:02:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -163,7 +163,7 @@ value forum_add conf base ident comm =
           do try close_out oc with _ -> ();
              try Sys.remove tmp_fname with [ Sys_error _ -> () ];
           return raise e
-    | Refuse -> Update.error_locked conf base ]
+    | Refuse -> do Update.error_locked conf base; return raise Update.ModErr ]
   else ()
 ;
 
@@ -175,12 +175,15 @@ value print_add_ok conf base =
     let title _ =
       Wserver.wprint "%s" (capitale (transl conf "comment added"))
     in
-    do header conf title;
-       forum_add conf base ident comm;
-       print_link_to_welcome conf True;
-       Wserver.wprint "<a href=\"%sm=FORUM\">%s</a>\n"
-         (commd conf) (capitale (transl conf "forum"));
-       trailer conf;
-    return ()
+    try
+      do forum_add conf base ident comm;
+         header conf title;
+         print_link_to_welcome conf True;
+         Wserver.wprint "<a href=\"%sm=FORUM\">%s</a>\n"
+           (commd conf) (capitale (transl conf "forum"));
+         trailer conf;
+      return ()
+    with
+    [ Update.ModErr -> () ]
 ;
 
