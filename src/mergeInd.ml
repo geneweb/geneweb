@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 3.10 2000-09-18 12:07:08 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.11 2000-10-12 07:42:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -190,7 +190,7 @@ value compatible_ind base p1 p2 =
   p1.first_name = p2.first_name && p1.surname = p2.surname &&
   compatible_strings p1.image p2.image &&
   compatible_strings p1.public_name p2.public_name &&
-  compatible_strings_lists p1.nick_names p2.nick_names &&
+  compatible_strings_lists p1.qualifiers p2.qualifiers &&
   compatible_strings_lists p1.aliases p2.aliases &&
   compatible_strings_lists p1.first_names_aliases p2.first_names_aliases &&
   compatible_strings_lists p1.surnames_aliases p2.surnames_aliases &&

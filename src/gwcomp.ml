@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.12 2000-09-08 11:58:20 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.13 2000-10-12 07:42:07 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -347,10 +347,10 @@ value rec get_surnames_aliases str l =
   | _ -> ([], l) ]
 ;
 
-value rec get_nick_names str l =
+value rec get_qualifiers str l =
   match l with
   [ ["#nick"; x :: l'] ->
-      let (nl, l) = get_nick_names str l' in ([cut_space x :: nl], l)
+      let (nl, l) = get_qualifiers str l' in ([cut_space x :: nl], l)
   | _ -> ([], l) ]
 ;
 
@@ -507,7 +507,7 @@ value read_line ic =
 
 value create_person () =
   {first_name = ""; surname = ""; occ = 0; image = "";
-   public_name = ""; nick_names = []; aliases = [];
+   public_name = ""; qualifiers = []; aliases = [];
    first_names_aliases = []; surnames_aliases = [];
    titles = []; rparents = []; related = [];
    occupation = ""; sex = Neuter; access = IfTitles;
@@ -529,8 +529,8 @@ value set_infos str u l =
   do u.public_name := n; return
   let (n, l) = get_image str l in
   do u.image := n; return
-  let (nl, l) = get_nick_names str l in
-  do u.nick_names := nl; return
+  let (nl, l) = get_qualifiers str l in
+  do u.qualifiers := nl; return
   let (nl, l) = get_aliases str l in
   do u.aliases := nl; return
   let (tl, l) = get_titles str l in

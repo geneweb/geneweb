@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.12 2000-09-21 11:11:16 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.13 2000-10-12 07:42:11 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -216,7 +216,7 @@ value reconstitute_person conf =
     reconstitute_string_list conf "surname_alias" ext 0
   in
   let public_name = only_printable (get conf "public_name") in
-  let (nicknames, ext) = reconstitute_string_list conf "nickname" ext 0 in
+  let (qualifiers, ext) = reconstitute_string_list conf "qualifier" ext 0 in
   let (aliases, ext) = reconstitute_string_list conf "alias" ext 0 in
   let (titles, ext) = reconstitute_titles conf ext 1 in
   let (titles, ext) = reconstitute_insert_title conf ext 0 titles in
@@ -265,7 +265,7 @@ value reconstitute_person conf =
      first_names_aliases = first_names_aliases;
      surnames_aliases = surnames_aliases;
      public_name = public_name;
-     nick_names = nicknames; aliases = aliases; titles = titles;
+     qualifiers = qualifiers; aliases = aliases; titles = titles;
      rparents = rparents; occupation = occupation;
      related = []; sex = sex; access = access;
      birth = Adef.codate_of_od birth; birth_place = birth_place;
@@ -303,7 +303,7 @@ value strip_list = list_filter (fun s -> s <> "");
 value strip_person p =
   do p.first_names_aliases := strip_list p.first_names_aliases;
      p.surnames_aliases := strip_list p.surnames_aliases;
-     p.nick_names := strip_list p.nick_names;
+     p.qualifiers := strip_list p.qualifiers;
      p.aliases := strip_list p.aliases;
      p.titles := list_filter (fun t -> t.t_ident <> "") p.titles;
      p.rparents :=
@@ -550,7 +550,7 @@ value effective_del conf base p =
      p.occ := 0;
      p.image := empty;
      p.public_name := empty;
-     p.nick_names := [];
+     p.qualifiers := [];
      p.aliases := [];
      p.first_names_aliases := [];
      p.surnames_aliases := [];

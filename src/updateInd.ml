@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.17 2000-07-07 19:43:33 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.18 2000-10-12 07:42:11 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -154,11 +154,11 @@ value gen_print_ext_items conf base item i_proj =
 
 value cons_insert conf name = capitale (transl_decline conf "insert" name);
 
-value print_nick_names conf base p =
+value print_qualifiers conf base p =
   gen_print_ext_items conf base
-    {i_name = "nickname"; i_txt_name = nominative (transl conf "qualifier");
+    {i_name = "qualifier"; i_txt_name = nominative (transl conf "qualifier");
      i_txt_add = cons_insert conf (transl conf "qualifier")}
-    p.nick_names
+    p.qualifiers
 ;
 
 value print_aliases conf base p =
@@ -613,7 +613,7 @@ value print_person conf base p =
      html_br conf;
      Wserver.wprint "\n";
      tag "table" "border=1" begin
-       print_nick_names conf base p;
+       print_qualifiers conf base p;
        Wserver.wprint "\n";
        print_aliases conf base p;
        Wserver.wprint "\n";
@@ -795,7 +795,7 @@ value print_add conf base =
   let p =
     {first_name = ""; surname = ""; occ = 0; image = "";
      first_names_aliases = []; surnames_aliases = [];
-     public_name = ""; nick_names = []; aliases = [];
+     public_name = ""; qualifiers = []; aliases = [];
      titles = []; rparents = []; related = []; occupation = "";
      sex = Neuter; access = IfTitles;
      birth = Adef.codate_None; birth_place = ""; birth_src = "";

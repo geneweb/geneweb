@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.32 2000-07-05 12:56:24 ddr Exp $ *)
+(* $Id: family.ml,v 3.33 2000-10-12 07:42:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -241,7 +241,7 @@ value precisez conf base n pl =
            let pn = sou base pn in
            if Name.crush_lower pn = n then add_tl t
            else
-             match p.nick_names with
+             match p.qualifiers with
              [ [nn :: _] ->
                  let nn = sou base nn in
                  if Name.crush_lower (pn ^ " " ^ nn) = n then add_tl t

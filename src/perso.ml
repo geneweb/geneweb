@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.45 2000-10-12 07:36:02 ddr Exp $ *)
+(* $Id: perso.ml,v 3.46 2000-10-12 07:42:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -842,7 +842,7 @@ value print_sub_titles conf base p =
        else ())
   in
   do print_sosa conf base open_area p (find_sosa conf base p);
-     match (p.public_name, p.nick_names) with
+     match (p.public_name, p.qualifiers) with
      [ (n, [_ :: nnl]) when sou base n <> "" ->
          let n = sou base n in
          List.iter
@@ -877,7 +877,7 @@ value print_sub_titles conf base p =
           html_br conf;
        return ()
      else ();
-     match (sou base p.public_name, p.nick_names) with
+     match (sou base p.public_name, p.qualifiers) with
      [ ("", []) -> ()
      | _ ->
          do open_area ();
@@ -1031,7 +1031,7 @@ value print_ancestors_descends_cousins conf base p a u =
 
 value print_ok conf base p =
   let title h =
-    match (sou base p.public_name, p.nick_names) with
+    match (sou base p.public_name, p.qualifiers) with
     [ (n, [nn :: _]) when n <> "" ->
         if h then Wserver.wprint "%s %s" n (sou base nn)
         else
@@ -1661,7 +1661,7 @@ value print_public_name conf base env p =
 ;
 
 value print_qualifier conf base env p =
-  match (get_env "qualifier" env, p.nick_names) with
+  match (get_env "qualifier" env, p.qualifiers) with
   [ (Estring nn, _) -> Wserver.wprint "%s" nn
   | (_, [nn :: _]) -> Wserver.wprint "%s" (sou base nn)
   | _ -> () ]
@@ -1997,7 +1997,7 @@ value eval_bool_variable conf base env p =
       [ Eind _ a _ -> a.parents <> None
       | _ -> False ]
   | "has_public_name" -> sou base p.public_name <> ""
-  | "has_qualifiers" -> p.nick_names <> []
+  | "has_qualifiers" -> p.qualifiers <> []
   | "has_referer" -> Wserver.extract_param "referer: " '\n' conf.request <> ""
   | "has_relation_her" ->
       match get_env "rel" env with
@@ -2197,7 +2197,7 @@ and eval_foreach_qualifier conf base env al =
            let env = [("qualifier", Estring (sou base nn)) :: env] in
            let env = [("first", Ebool first) :: env] in
            List.iter (eval_ast conf base env) al)
-        p.nick_names
+        p.qualifiers
   | _ -> () ]
 and eval_foreach_relation conf base env al =
   match get_env "p" env with

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.71 2000-09-20 20:02:52 ddr Exp $ *)
+(* $Id: util.ml,v 3.72 2000-10-12 07:42:12 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -288,7 +288,7 @@ value raw_access =
 
 value gen_person_text (p_first_name, p_surname) conf base p =
   let beg =
-    match (sou base p.public_name, p.nick_names) with
+    match (sou base p.public_name, p.qualifiers) with
     [ ("", [nn :: _]) ->
         p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
     | ("", []) -> p_first_name base p
@@ -300,7 +300,7 @@ value gen_person_text (p_first_name, p_surname) conf base p =
 
 value gen_person_text_no_html (p_first_name, p_surname) conf base p =
   let beg =
-    match (sou base p.public_name, p.nick_names) with
+    match (sou base p.public_name, p.qualifiers) with
     [ ("", [nn :: _]) -> p_first_name base p ^ " " ^ sou base nn
     | ("", []) -> p_first_name base p
     | (n, [nn :: _]) -> n ^ " " ^ sou base nn
@@ -310,7 +310,7 @@ value gen_person_text_no_html (p_first_name, p_surname) conf base p =
 ;
 
 value gen_person_text_without_surname (p_first_name, p_surname) conf base p =
-  match (sou base p.public_name, p.nick_names) with
+  match (sou base p.public_name, p.qualifiers) with
   [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
   | (n, []) when n <> "" -> n
   | (_, [nn :: _]) ->
@@ -323,7 +323,7 @@ value person_text_no_html = gen_person_text_no_html std_access;
 value person_text_without_surname = gen_person_text_without_surname std_access;
 
 value afficher_nom_titre_reference conf base p s =
-  match p.nick_names with
+  match p.qualifiers with
   [ [] ->
       Wserver.wprint "<a href=\"%s%s\">%s</a>" (commd conf)
         (acces conf base p) s
@@ -352,7 +352,7 @@ value titled_person_text conf base p t =
   if Name.strip_lower (sou base t.t_place) =
      Name.strip_lower (p_surname base p)
   then
-    match (t.t_name, p.nick_names) with
+    match (t.t_name, p.qualifiers) with
     [ (Tname n, []) -> sou base n
     | (Tname n, [nn :: _]) ->
         sou base n ^ " <em>" ^ sou base nn ^ "</em>"
@@ -361,7 +361,7 @@ value titled_person_text conf base p t =
     match t.t_name with
     [ Tname s ->
         let s = sou base s in
-        match p.nick_names with
+        match p.qualifiers with
         [ [] -> s
         | [nn :: _] -> s ^ " <em>" ^ sou base nn ^ "</em>" ]
     | _ -> person_text conf base p ]
@@ -418,7 +418,7 @@ value gen_person_text_without_title p_access conf base p =
       if t.t_place == p.surname then
         gen_person_text_without_surname p_access conf base p
       else
-        match (t.t_name, p.nick_names) with
+        match (t.t_name, p.qualifiers) with
         [ (Tname s, [nn :: _]) -> sou base s ^ " <em>" ^ sou base nn ^ "</em>"
         | (Tname s, _) -> sou base s
         | _ -> gen_person_text p_access conf base p ]
@@ -1083,7 +1083,7 @@ value print_parent conf base p fath moth =
 
 value preciser_homonyme conf base p =
   let is = index_of_sex p.sex in
-  match (p.public_name, p.nick_names) with
+  match (p.public_name, p.qualifiers) with
   [ (n, [nn :: _]) when sou base n <> ""->
       Wserver.wprint "%s <em>%s</em>" (sou base n)
         (sou base nn)

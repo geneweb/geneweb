@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.11 2000-10-04 00:24:17 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.12 2000-10-12 07:42:06 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -64,7 +64,7 @@ value make_person gen p n occ i =
     {first_name = unique_string gen p; surname = unique_string gen n;
      occ = occ; image = empty_string;
      first_names_aliases = []; surnames_aliases = [];
-     public_name = empty_string; nick_names = [];
+     public_name = empty_string; qualifiers = [];
      aliases = []; titles = []; rparents = []; related = [];
      occupation = empty_string;
      sex = Neuter; access = IfTitles;
@@ -367,7 +367,7 @@ value insert_person gen so =
             List.map (unique_string gen) so.surnames_aliases;
           x.public_name := unique_string gen so.public_name;
           x.image := unique_string gen so.image;
-          x.nick_names := List.map (unique_string gen) so.nick_names;
+          x.qualifiers := List.map (unique_string gen) so.qualifiers;
           x.aliases := List.map (unique_string gen) so.aliases;
           x.titles := List.map (title_unique_string gen) so.titles;
           x.access := so.access;
