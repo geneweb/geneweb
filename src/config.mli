@@ -1,4 +1,4 @@
-(* $Id: config.mli,v 4.3 2002-01-30 11:49:47 ddr Exp $ *)
+(* $Id: config.mli,v 4.4 2002-02-23 09:28:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -36,5 +36,6 @@ type config =
     border : int;
     today : dmy;
     today_wd : int;
-    time : (int * int * int) }
+    time : (int * int * int);
+    ctime : float }
 ;
