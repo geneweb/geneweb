@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.46 1999-09-02 13:06:00 ddr Exp $ *)
+(* $Id: setup.ml,v 1.47 1999-09-06 08:10:56 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -1315,7 +1315,7 @@ value intro () =
        else
          do copy_text "" "intro.txt"; return
          let (gwd_lang, setup_lang) =
-           let x = input_line stdin in
+           let x = String.lowercase (input_line stdin) in
            if x = "" then (default_gwd_lang, default_setup_lang)
            else (x, x)
          in
