@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.24 2001-11-16 13:38:53 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.25 2001-11-26 12:58:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -420,13 +420,30 @@ value interp_templ conf base fcd digest astl =
   List.iter (print_ast conf base env fcd) astl
 ;
 
+value html_no_cache conf =
+  let charset = if conf.charset = "" then "iso-8859-1" else conf.charset in
+  do {
+    if not conf.cgi then do {
+      Wserver.http "";
+      Wserver.wprint "Server: GeneWeb/%s" Version.txt;
+      nl ();
+    }
+    else ();
+    Wserver.wprint "Content-type: text/html; charset=%s" charset;
+    nl ();
+    Wserver.wprint "Pragma: no-cache";
+    nl ();
+    nl ();
+  }
+;
+
 value print_update_fam conf base fcd digest =
   match p_getenv conf.env "m" with
   [ Some
       ("ADD_FAM" | "ADD_FAM_OK" | "ADD_PAR" | "MOD_FAM" | "MOD_FAM_OK" |
        "MRG_FAM" | "MRG_FAM_OK" | "MRG_MOD_FAM_OK") ->
       let astl = Templ.input conf base "updfam" in
-      do { html conf; interp_templ conf base fcd digest astl }
+      do { html_no_cache conf; interp_templ conf base fcd digest astl }
   | _ -> incorrect_request conf ]
 ;
 
