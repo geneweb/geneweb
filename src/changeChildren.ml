@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.8 2004-01-06 17:24:49 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.9 2004-11-05 07:55:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -178,7 +178,7 @@ value print_conflict conf base p =
     Wserver.wprint "<ul>\n";
     html_li conf;
     Wserver.wprint "%s: %d\n" (capitale (transl conf "first free number"))
-      (Update.find_free_occ base (p_first_name base p) (p_surname base p) 0);
+      (Gutil.find_free_occ base (p_first_name base p) (p_surname base p) 0);
     Wserver.wprint "</ul>\n";
     Update.print_same_name conf base p;
     trailer conf;
