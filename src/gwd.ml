@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.41 2002-03-13 07:54:08 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.42 2002-03-13 12:06:19 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -488,12 +488,13 @@ value unauth_server conf passwd =
     in
     Wserver.wprint "\
 <head>
-<title>%s %s access failed</title>
-<meta http-equiv=\"REFRESH\" content=\"2;URL=%s\">
+<title>%s access failed for database %s</title>
 </head>
-" typ conf.bname url;
-    Wserver.wprint "<body><h1>%s %s access failed</h1></body>\n" typ
-      conf.bname;
+" typ conf.bname;
+    Wserver.wprint "<body><h1>%s access failed for database %s</h1>"
+      typ conf.bname;
+    Wserver.wprint "Return to <a href=\"%s\">welcome page</a>\n" url;
+    Wserver.wprint "</body>\n";
   }
 ;
 
