@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 1.1.1.1 1998-09-01 14:32:09 ddr Exp $ *)
+(* $Id: birthday.ml,v 1.2 1998-10-01 15:10:48 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -50,7 +50,7 @@ value gen_print conf base mois dead_people =
        let p = base.persons.get i in
        if not dead_people then
          match (Adef.od_of_codate p.birth, p.death) with
-         [ (Some d, NotDead) ->
+         [ (Some d, NotDead | DontKnowIfDead) ->
              match d with
              [ Djma j m a ->
                  if mois == m then
@@ -112,7 +112,7 @@ value anniversaire_du conf base dead_people jj mm =
        let p = base.persons.get i in
        if not dead_people then
          match (Adef.od_of_codate p.birth, p.death) with
-         [ (Some d, NotDead) ->
+         [ (Some d, NotDead | DontKnowIfDead) ->
              match d with
              [ Djma j m a ->
                  if j == jj && m == mm then
@@ -184,12 +184,19 @@ value afficher_liste_anniversaires conf base dead_people a_ref liste =
                return ()
              else
                do afficher_personne_titre_referencee conf base p;
-                  Wserver.wprint " <em>";
-                  match a_ref - a with
-                  [ 0 -> Wserver.wprint "%s" (transl conf "birth")
-                  | 1 -> Wserver.wprint "%s" (transl conf "one year old")
-                  | n -> Wserver.wprint "%d %s" n (transl conf "years old") ];
-                  Wserver.wprint "</em>";
+                  match p.death with
+                  [ NotDead ->
+                      do Wserver.wprint " <em>";
+                         match a_ref - a with
+                         [ 0 -> Wserver.wprint "%s" (transl conf "birth")
+                         | 1 ->
+                             Wserver.wprint "%s" (transl conf "one year old")
+                         | n ->
+                             Wserver.wprint "%d %s" n
+                               (transl conf "years old") ];
+                         Wserver.wprint "</em>";
+                      return ()
+                  | _ -> () ];
                return ();
              Wserver.wprint "\n";
           return ())

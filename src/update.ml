@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 1.4 1998-09-30 07:29:25 ddr Exp $ *)
+(* $Id: update.ml,v 1.5 1998-10-01 15:10:49 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -7,6 +7,11 @@ open Gutil;
 open Util;
 
 exception ModErr;
+
+value f_coa conf s =
+  if conf.charset = "iso-8859-1" then Ansel.to_iso_8859_1 s
+  else s
+;
 
 value rec find_free_occ base f s i =
   match
@@ -102,7 +107,8 @@ value print_src conf name field =
         Wserver.wprint "<input name=%s size=40 maxlength=200%s>\n"
           name
           (match field with
-           [ s when s <> "" -> " value=\"" ^ quote_escaped (coa conf s) ^ "\""
+           [ s when s <> "" ->
+               " value=\"" ^ quote_escaped (f_coa conf s) ^ "\""
            | _ -> "" ]);
       end;
     end;
