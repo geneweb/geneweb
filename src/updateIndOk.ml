@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.12 1999-07-15 08:53:02 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.13 1999-07-16 13:28:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -275,8 +275,9 @@ value print_conflict conf base p =
        print_try_again conf "occ" free_n;
      end;
      Update.print_same_name conf base p;
+     Update.print_return conf;
      trailer conf;
-  return ()
+  return raise Update.ModErr
 ;
 
 value print_cannot_change_sex conf base p =
@@ -288,8 +289,9 @@ value print_cannot_change_sex conf base p =
        afficher_personne_referencee conf base p;
        Wserver.wprint "\n";
      end;
+     Update.print_return conf;
      trailer conf;
-  return ()
+  return raise Update.ModErr
 ;
 
 value check_conflict conf base sp ipl =
@@ -301,15 +303,14 @@ value check_conflict conf base sp ipl =
        && Name.strip_lower (sou base p1.first_name ^ " " ^ sou base p1.surname)
           = name
        && p1.occ = sp.occ then
-         do print_conflict conf base p1; return raise Update.ModErr
+         print_conflict conf base p1
        else ())
     ipl
 ;
 
 value check_sex_married conf base sp op =
   if sp.sex <> op.sex then
-    if Array.length op.family != 0 then
-      do print_cannot_change_sex conf base op; return raise Update.ModErr
+    if Array.length op.family != 0 then print_cannot_change_sex conf base op
     else ()
   else ()
 ;
@@ -489,7 +490,12 @@ value print_add conf base =
   [ Accept ->
       try
         let (p, ext) = reconstitute_person conf in
-        if ext then UpdateInd.print_add1 conf base p
+        let redisp =
+          match p_getenv conf.env "return" with
+          [ Some "on" -> True
+          | _ -> False ]
+        in
+        if ext || redisp then UpdateInd.print_add1 conf base p
         else
           do strip_person p; return
           match check_person conf base p with
@@ -527,9 +533,14 @@ value print_mod_aux conf base callback =
   [ Accept ->
       try
         let (p, ext) = reconstitute_person conf in
+        let redisp =
+          match p_getenv conf.env "return" with
+          [ Some "on" -> True
+          | _ -> False ]
+        in
         let digest = Update.digest_person (poi base p.cle_index) in
         if digest = raw_get conf "digest" then
-          if ext then UpdateInd.print_mod1 conf base p digest
+          if ext || redisp then UpdateInd.print_mod1 conf base p digest
           else
             do strip_person p; return
             match check_person conf base p with

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.9 1999-07-15 08:52:58 ddr Exp $ *)
+(* $Id: update.ml,v 2.10 1999-07-16 13:28:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -341,11 +341,26 @@ value print_warnings conf base wl =
     return ()
 ;
 
+value print_return conf =
+  do html_p conf; return
+  tag "form" "method=POST action=\"%s\"" conf.command begin
+    List.iter
+      (fun (x, v) ->
+         Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x
+         (decode_varenv v))
+      conf.env;
+    Wserver.wprint "<input type=hidden name=return value=on>\n";
+    Wserver.wprint "<input type=submit value=\"%s\">\n"
+      (capitale (transl conf "back"));
+  end
+;
+
 value error conf base x =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do header conf title;
      print_error conf base x;
      Wserver.wprint "\n";
+     print_return conf;
      trailer conf;
   return raise ModErr
 ;
