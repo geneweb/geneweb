@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.40 1999-07-28 07:48:43 ddr Exp $ *)
+(* $Id: perso.ml,v 2.41 1999-08-13 16:26:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -7,16 +7,42 @@ open Gutil;
 open Util;
 open Config;
 
+value start_with s i p =
+  i + String.length p < String.length s
+  && String.lowercase (String.sub s i (String.length p)) = p
+;
+
+value http_string s i =
+  if start_with s i "http://" then
+    loop (i + String.length "http://") where rec loop j =
+      if j < String.length s then
+        match s.[j] with
+        [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '/' | ':' | '?' | '%' | ';' | '='
+        | '_' | '-' | '&' | '.' | '~' -> loop (j + 1)
+        | _ -> Some j ]
+      else Some j
+  else None
+;
+
 value copy_string_with_macros conf s =
-  loop 0 where rec loop i =
+  loop False 0 where rec loop in_atag i =
     if i < String.length s then
       if i + 1 < String.length s && s.[i] = '%' && s.[i+1] = 's' then
         do Wserver.wprint "%s?" conf.command;
            List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v)
              conf.henv;
-        return loop (i + 2)
+        return loop in_atag (i + 2)
+      else if in_atag then
+        let in_atag = not (start_with s i "</a>") in
+        do Wserver.wprint "%c" s.[i]; return loop in_atag (i + 1)
       else
-        do Wserver.wprint "%c" s.[i]; return loop (i + 1)
+        match http_string s i with
+        [ Some j ->
+            let x = String.sub s i (j - i) in
+            do Wserver.wprint "<a href=%s>%s</a>" x x; return loop False j
+        | None ->
+            let in_atag = start_with s i "<a href=" in
+            do Wserver.wprint "%c" s.[i]; return loop in_atag (i + 1) ]
     else ()
 ;
 
