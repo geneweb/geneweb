@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 4.0 2001-03-16 19:35:10 ddr Exp $ *)
+(* $Id: util.ml,v 4.1 2001-03-20 11:14:13 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -996,7 +996,7 @@ value http_string s i =
         if j < String.length s then
           match s.[j] with
           [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '/' | ':' | '?' | '%' | ';' | '='
-          | '_' | '-' | '&' | '.' | '~' | '#' -> loop (j + 1)
+          | '_' | '-' | '&' | '.' | '~' | '#' | '+' -> loop (j + 1)
           | _ -> j ]
         else j
     in
