@@ -1,6 +1,9 @@
 GeneWeb version 2.06
 --------------------
 
+* Installation
+  - [Sep 2, 99] Linux distribution will includes rpm packages.
+
 * Setup program
   - [Aug 16, 99] Renamed this program "gwsetup".
   - [Aug 16, 99] Fixed bug: sometimes tried to display a non-existent file

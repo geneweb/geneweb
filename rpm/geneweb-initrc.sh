@@ -15,14 +15,14 @@
 # See how we were called.
 case "$1" in
   start)
-	echo -n "Starting Geneweb Server: "
+	echo -n "Starting Geneweb Services: "
 	cd /home/geneweb/gw/gw
 	/home/geneweb/gw/gw/gwd -daemon
 	/home/geneweb/gw/gw/gwsetup -daemon
 	touch /var/lock/subsys/gwd
 	;;
   stop)
-	echo -n "Shutting down Geneweb Server: "
+	echo -n "Shutting down Geneweb Services: "
 	killproc gwd
 	killproc gwsetup
 	rm -f /var/lock/subsys/gwd
@@ -32,7 +32,7 @@ case "$1" in
 	status gwd
 	;;
   restart)
-	echo -n "Restarting Geneweb Server. "
+	echo -n "Restarting Geneweb Services. "
         killproc gwd 
 	cd /home/geneweb/gw/gw
 	/home/geneweb/gw/gw/gwd -daemon

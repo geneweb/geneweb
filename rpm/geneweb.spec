@@ -18,12 +18,12 @@
 
 Summary: Genealogy software with a Web interface
 Name: geneweb
-Version: 2.06
-Release: 2
+Version: VERSION
+Release: RELEASE
 Copyright: INRIA (GPL)
 Group: Applications
-Source: ftp://ftp.inria.fr/INRIA/Projects/cristal/geneweb/Src/geneweb-2.06.tar.gz
-Source1: geneweb-initrc-2.06.sh
+Source: ftp://ftp.inria.fr/INRIA/Projects/cristal/geneweb/Src/geneweb-VERSION.tar.gz
+Source1: geneweb-initrc-VERSION.sh
 URL: http://cristal.inria.fr/~ddr/GeneWeb/
 Packager: Daniel de Rauglaudre <daniel.de_rauglaudre@inria.fr>
 # Requires: ld-linux.so.2 libc.so.6 libm.so.6 libncurses.so.4 libm.so.6(GLIBC_2.1) libm.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1) libc.so.6(GLIBC_2.0)
@@ -55,7 +55,7 @@ consanguinité extrêmement efficaces.
 # Delete any stray CVS dirs that got included (they break 'make install')
 %prep
 rm -f /etc/rc.d/rc?.d/[KS]99gwd
-rm -rf /home/geneweb /usr/doc/geneweb-2.06
+rm -rf /home/geneweb/gw /usr/doc/geneweb-VERSION
 %setup
 find . -name CVS -print | /usr/bin/xargs /bin/rm -rf 
 
@@ -70,9 +70,9 @@ make distrib
 #  This sets up the same files 'by hand'; rpm will then archive them.
 #  The end user installs the copies from the .rpm archive.)
 %install
-mkdir /home/geneweb
+mkdir -p /home/geneweb
 cp -r distribution /home/geneweb/gw
-cp $RPM_SOURCE_DIR/geneweb-initrc-2.06.sh /etc/rc.d/init.d/gwd
+cp $RPM_SOURCE_DIR/geneweb-initrc-VERSION.sh /etc/rc.d/init.d/gwd
 ln -s ../init.d/gwd /etc/rc.d/rc0.d/K99gwd
 ln -s ../init.d/gwd /etc/rc.d/rc1.d/K99gwd
 ln -s ../init.d/gwd /etc/rc.d/rc2.d/S99gwd
@@ -85,7 +85,7 @@ ln -s ../init.d/gwd /etc/rc.d/rc6.d/K99gwd
 # can test the whole thing with 'rpm -i foo.rpm'.)
 %clean
 make clean
-rm -rf /home/geneweb /usr/doc/geneweb-2.06 /etc/rc.d/*/*gwd
+rm -rf /home/geneweb/gw /usr/doc/geneweb-VERSION /etc/rc.d/*/*gwd
 
 # *********** INSTALLING .RPM *************
 # This stuff only happens on the user's machine.
@@ -106,9 +106,41 @@ chown -R geneweb.geneweb /home/geneweb/gw
 # script.  I use them to stop the service & remove the pseudouser.
 %preun
 /etc/rc.d/init.d/gwd stop
+(
+  cd /home/geneweb/gw/gw
+  set *.gwb
+  if test -d "$1"; then
+    mkdir -p /home/geneweb/gw-VERSION
+    cp gwu gwb2ged /home/geneweb/gw-VERSION/.
+    for i in $*; do
+      rm -rf /home/geneweb/gw-VERSION/$i
+      mv $i /home/geneweb/gw-VERSION/.
+    done
+    echo
+    echo "Warning: the following data bases:"
+    for i in $*; do
+      echo -n "   "
+      echo $i
+    done
+    echo "have been moved to the directory:"
+    echo -n "   "
+    echo "/home/geneweb/gw-VERSION"
+    echo
+    echo "Remember this directory name for further possible recovering."
+    echo
+  fi
+)
 
 %postun
 /usr/sbin/userdel geneweb
+(rmdir /home/geneweb/gw/gw/doc/* >/dev/null 2>&1; exit 0)
+(rmdir /home/geneweb/gw/gw/doc >/dev/null 2>&1; exit 0)
+(rmdir /home/geneweb/gw/gw/etc >/dev/null 2>&1; exit 0)
+(rmdir /home/geneweb/gw/gw/images >/dev/null 2>&1; exit 0)
+(rmdir /home/geneweb/gw/gw/lang/* >/dev/null 2>&1; exit 0)
+(rmdir /home/geneweb/gw/gw/lang > /dev/null 2>&1; exit 0)
+(rmdir /home/geneweb/gw/gw/setup/* >/dev/null 2>&1; exit 0)
+(rmdir /home/geneweb/gw/gw/setup >/dev/null 2>&1; exit 0)
 
 # *********** THE FILES OWNED BY THIS .RPM *************
 # These are the files belonging to this package.  We have to list
@@ -116,7 +148,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 # (If a line starts with %doc, it means that file goes into 
 # /usr/doc/$packagename instead of ~geneweb.)
 # This package is not relocatable, which kinda sucks.
-# Note that gwd and setup (the main daemon and the setup daemon) are
+# Note that gwd and gwsetup (the main daemon and the gwsetup daemon) are
 # installed setuid, owned by geneweb, and can only be run by root.
 %files
 %defattr(-,geneweb,geneweb)
@@ -144,6 +176,19 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/CREDITS.txt
 /home/geneweb/gw/gw/doc/index.htm
 /home/geneweb/gw/gw/doc/LICENSE.htm
+/home/geneweb/gw/gw/doc/de/consang.htm
+/home/geneweb/gw/gw/doc/de/diruse.htm
+/home/geneweb/gw/gw/doc/de/faq.htm
+/home/geneweb/gw/gw/doc/de/links.htm
+/home/geneweb/gw/gw/doc/de/maint.htm
+/home/geneweb/gw/gw/doc/de/merge.htm
+/home/geneweb/gw/gw/doc/de/pcustom.htm
+/home/geneweb/gw/gw/doc/de/problem.htm
+/home/geneweb/gw/gw/doc/de/recover.htm
+/home/geneweb/gw/gw/doc/de/report.htm
+/home/geneweb/gw/gw/doc/de/server.htm
+/home/geneweb/gw/gw/doc/de/start.htm
+/home/geneweb/gw/gw/doc/de/update.htm
 /home/geneweb/gw/gw/doc/fr/access.htm
 /home/geneweb/gw/gw/doc/fr/consang.htm
 /home/geneweb/gw/gw/doc/fr/diruse.htm
