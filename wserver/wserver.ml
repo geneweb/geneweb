@@ -1,16 +1,51 @@
-(* $Id: wserver.ml,v 4.9 2001-11-28 14:57:28 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.10 2002-02-17 09:48:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
 value sock_out = ref "wserver.sou";
 value noproc = ref False;
+value bufferize = ref False;
 
 value wserver_oc =
   do { set_binary_mode_out stdout True; ref stdout }
 ;
 
-value wprint fmt = Printf.fprintf wserver_oc.val fmt;
-value wflush () = flush wserver_oc.val;
+value buffer = Buffer.create 211;
+
+value flush_buffer () =
+  if Buffer.length buffer > 0 then do {
+    Buffer.output_buffer wserver_oc.val buffer;
+    Buffer.clear buffer;
+  }
+  else ()
+;
+
+value buffer_contents () =
+  let r = Buffer.contents buffer in
+  do {
+    Buffer.clear buffer;
+    r
+  }
+;
+
+value wprint fmt =
+  do {
+    if not bufferize.val then flush_buffer () else ();
+    Printf.bprintf buffer fmt
+  }
+;
+
+value wflush () =
+  do {
+    if bufferize.val then do {
+      Printf.eprintf "buffer size %d\n" (Buffer.length buffer);
+      flush stderr;
+    }
+    else ();
+    flush_buffer ();
+    flush wserver_oc.val
+  }
+;
 
 value hexa_digit x =
   if x >= 10 then Char.chr (Char.code 'A' + x - 10)
@@ -119,14 +154,7 @@ value encode s =
   else s
 ;
 
-value nl () =
-  do {
-    wflush ();
-    let _ =
-      Unix.write (Unix.descr_of_out_channel wserver_oc.val) "\013\010" 0 2 in
-    ()
-  }
-;
+value nl () = wprint "\013\010";
 
 value http answer =
   let answer = if answer = "" then "200 OK" else answer in

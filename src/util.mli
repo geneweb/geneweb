@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.8 2002-02-14 10:19:43 ddr Exp $ *)
+(* $Id: util.mli,v 4.9 2002-02-17 09:48:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -16,6 +16,7 @@ value secure : string -> string;
 
 value nl : unit -> unit;
 value html : config -> unit;
+value html1 : config -> unit;
 value html_br : config -> unit;
 value html_p : config -> unit;
 value html_li : config -> unit;

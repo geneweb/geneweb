@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.32 2002-02-14 10:19:42 ddr Exp $ *)
+(* $Id: util.ml,v 4.33 2002-02-17 09:48:53 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -277,8 +277,15 @@ value html conf =
     else ();
     Wserver.wprint "Content-type: text/html; charset=%s" charset;
     nl ();
+  }
+;
+
+value html1 conf =
+  if Wserver.extract_param "POST /" ' ' conf.request = "" then do {
+    html conf;
     nl ();
   }
+  else Wserver.bufferize.val := True
 ;
 
 value unauthorized conf auth_type =
@@ -1040,7 +1047,7 @@ value message_to_wizard conf =
 
 value header_no_page_title conf title =
   do {
-    html conf;
+    html1 conf;
     Wserver.wprint "\
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \"http://www.w3.org/TR/REC-html40/loose.dtd\">
 ";

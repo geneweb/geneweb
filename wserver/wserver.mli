@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 4.2 2001-11-23 13:13:13 ddr Exp $ *)
+(* $Id: wserver.mli,v 4.3 2002-02-17 09:48:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -20,11 +20,17 @@ value f :
        If [maxc] is [Some n], maximum [n] clients can be treated at the
        same time; [None] means no limit. See the example below. *)
 
-value wprint : format 'a out_channel unit -> 'a;
+value wprint : format 'a Buffer.t unit -> 'a;
     (* To be called to print page contents. *)
 
 value wflush : unit -> unit;
     (* To flush page contents print. *)
+
+value bufferize : ref bool;
+    (* Bufferize the output; write done only when wflush is called *)
+
+value buffer_contents : unit -> string;
+    (* Return the buffer contents and clear it *)
 
 value http : string -> unit;
     (* [Wserver.http answer] sends the http header where [answer]
