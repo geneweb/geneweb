@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.28 1999-11-30 20:09:30 ddr Exp $
+# $Id: lexicon.txt,v 3.29 1999-11-30 20:34:25 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -227,10 +227,14 @@ se: ,
     (french month)
 en: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prairial/Messidor/Thermidor/Fructidor/Extra
 fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
+se: vendיmiaire/brumaire/frimaire/nivפse/pluviפse/ventפse/germinal/florיal/prairial/messidor/thermidor/fructidor/komplementהr
 
     (hebrew month)
 en: Tishri/Heshvan/Kislev/Tevet/Shevat/AdarI/AdarII/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
 fr: tishri/heshvan/kislev/tevet/shevat/adarI/adarII/nisan/iyyar/sivan/tammuz/av/elul
+he: תשרי/ חשון/ כסלו/ טבת/ שבט/ אדר א'/ אדר ב'/ ניסן/ אייר/ סיון/ תמוז/ אב/ אלול 
+se: tishri/heshvan/kislev/tevet/shevat/adarI/adarII/nisan/iyyar/sivan/tammuz/av
+/elul
 
     (month)
 cn: 1װֲ/2װֲ/3װֲ/4װֲ/5װֲ/6װֲ/7װֲ/8װֲ/9װֲ/10װֲ/11װֲ/12װֲ
@@ -2157,7 +2161,7 @@ eo: forumo
 es: foro
 fi: foorumi
 fr: forum
-he:  קבוצת דייון
+he:   דיון
 is: umrזנur
 it: tribuna
 nl: forum
@@ -3296,7 +3300,7 @@ eo: noto/notoj:a:+n
 es: nota/notas
 fi: lis&auml;tietoja
 fr: note/notes
-he:  הערות
+he:  הערה/ הערות
 is: athugasemd/athugasemdum
 it: nota/note
 nl: aantekening/aantekeningen
