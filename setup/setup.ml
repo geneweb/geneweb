@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.58 1999-10-27 21:07:53 ddr Exp $ *)
+(* $Id: setup.ml,v 1.59 1999-10-28 16:11:46 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -68,6 +68,13 @@ value rec list_assoc_all x =
       if a = x then [b :: list_assoc_all x l] else list_assoc_all x l ]
 ;
 
+type config =
+  { lang : string;
+    comm : string;
+    env : list (string * string);
+    request : list string }
+;
+
 value header_no_page_title title =
   do Wserver.html charset;
      Wserver.wprint "\
@@ -83,8 +90,14 @@ value header_no_page_title title =
   return ()
 ;
 
-value trailer () =
+value trailer conf =
   do Wserver.wprint "<p>\n";
+     if conf.comm = "" then ()
+     else
+       Wserver.wprint "
+<img src=\"file://%s/images/gwlogo.gif\"
+ width=64 height=72 align=right>\n<br>\n"
+         (Sys.getcwd ());
      Wserver.wprint "
 <hr><font size=-1><em>(c) Copyright INRIA 1999 -
 GeneWeb %s</em></font>" Version.txt;
@@ -210,13 +223,6 @@ value parameters =
                 loop (comm ^ " -" ^ s ^ k) env
               else loop (comm ^ " -" ^ k ^ " " ^ s) env ]
     | [] -> comm ]
-;
-
-type config =
-  { lang : string;
-    comm : string;
-    env : list (string * string);
-    request : list string }
 ;
 
 value rec list_replace k v =
@@ -389,7 +395,7 @@ value print_file conf fname =
          copy_from_stream conf (fun x -> Wserver.wprint "%s" x)
            (Stream.of_channel ic);
          close_in ic;
-         trailer ();
+         trailer conf;
       return ()
   | _ ->
       let title _ = Wserver.wprint "Error" in
@@ -397,14 +403,14 @@ value print_file conf fname =
          Wserver.wprint "<ul><li>\n";
          Wserver.wprint "Cannot access file \"%s\".\n" fname;
          Wserver.wprint "</ul>\n";
-         trailer ();
+         trailer conf;
       return raise Exit ]
 ;
 
-value error str =
+value error conf str =
   do header (fun _ -> Wserver.wprint "Incorrect request");
      Wserver.wprint "<em>%s</em>\n" (String.capitalize str);
-     trailer ();
+     trailer conf;
   return ()
 ;
 
@@ -444,7 +450,7 @@ value out_name_of_gw in_file =
 value setup_gen conf =
   match p_getenv conf.env "v" with
   [ Some fname -> print_file conf fname
-  | _ -> error "request needs \"v\" parameter" ]
+  | _ -> error conf "request needs \"v\" parameter" ]
 ;
 
 value simple conf =
@@ -1172,7 +1178,7 @@ value setup_comm conf =
   | "gwf_1" -> gwf_1 conf
   | "gwd" -> gwd conf
   | "gwd_1" -> gwd_1 conf
-  | x -> error ("bad command: \"" ^ x ^ "\"") ]
+  | x -> error conf ("bad command: \"" ^ x ^ "\"") ]
 ;
 
 value string_of_sockaddr =

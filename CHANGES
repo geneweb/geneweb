@@ -7,6 +7,9 @@ Thanks to Emmanuelle Visseaux.
 * Languages
   - [Oct 26, 99] Added Icelandic (Ólafur Sigurgeirsson).
 
+* Setup program (gwsetup)
+  - [Oct 28, 99] Added option -p to select another port number (defaut: 2316).
+
 * GeneWeb Service/CGI (gwd)
   - [Oct 24, 99] In display by surname, added a specific indication for
     the branches whose ancestor has parents with a different surname, in order
