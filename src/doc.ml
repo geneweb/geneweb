@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 3.5 2000-05-03 13:55:26 ddr Exp $ *)
+(* $Id: doc.ml,v 3.6 2000-05-03 14:16:56 ddr Exp $ *)
 
 open Config;
 
@@ -95,8 +95,8 @@ value print conf =
   if url_is_implicit v then
     let fname = if Sys.os_type = "MacOS" then mac_name_of_url_name v else v in
     let fname =
-      if Filename.check_suffix v ".htm" then v
-      else v ^ ".htm"
+      if Filename.check_suffix fname ".htm" then fname
+      else fname ^ ".htm"
     in 
     let fname = Filename.concat Util.doc_dir.val fname in
     match try Some (open_in fname) with [ Sys_error _ -> None ] with
