@@ -16,15 +16,14 @@ height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </font>
 <br><br>
 
-If you have received GEDCOM files from other researchers, or you want to keep your database divided in several
-different files, but you only want to access one database, <font color=#2f6400><b>GeneWeb</b></font> can do that for you.
+If you have received GEDCOM files or information from other researchers, or you want to keep
+your database divided in several different files, but you only want to access one database,
+<font color=#2f6400><b>GeneWeb</b></font> can do that for you.
 
 <p>
 
 <hr>
 <h3><font color=#2f6400>Merging the files into a database </font></h3>
-
-
 
 <ul>
 
@@ -37,8 +36,9 @@ Launch a window of interactive commands and type:
 </pre>
 
 
-It may happen that gwc displays errors, because persons are defined twice in "bar.gw" "smith.gw" and "foo.gw". To
-fix that, gwc has an option "-sh" to shift the numbers of the persons to avoid conflicts. Try:
+It may happen that gwc displays errors, because persons are defined twice in "bar.gw" "smith.gw"
+and "foo.gw". To fix that, gwc has an option "-sh" to shift the numbers of the persons to avoid
+conflicts. Try:
 
 <pre>
      gwc bar.gw -sh 10 smith.gw -sh 10 foo.gw -o mergedbase
@@ -53,21 +53,20 @@ See also <a href="merge.htm">Merging databases</a>.
 <p>
 
 <li>
-Now you can access and update the database "mergedbase". <font color=#2f6400><b>GeneWeb</b></font> will
-remember which files the data orginates from.
+Now you can access and update the database "mergedbase". <font color=#2f6400><b>GeneWeb</b></font>
+will remember which files the data originates from.
 
 <p>
 
 <li>
-Inside the database the sequence <TT>";opt=from"</TT> can be added to the address to see from which file
-the data orginates. For example:
-
+Inside the database the sequence <TT>";opt=from"</TT> can be added to the address to see from
+which file the data originates. For example:
 
 <pre>
      http://machine:2317/mergedbase?i=357;opt=from
 </pre>
 
-Note: It work only for persons with families.
+Note: It works only for persons with families.
 </ul>
 
 <hr>
@@ -76,7 +75,7 @@ Note: It work only for persons with families.
 <ul>
 
 <li>
-If the directory "outdir" doesn't exist, create it.
+If the directory "outdir" doesn't exist, create it (with the command "mkdir").
 
 <p>
 
@@ -112,6 +111,10 @@ To save also these new persons in the source file "new.gw", type:
 <pre>
      gwu mergedbase -odir outdir > new.gw
 </pre>
+
+<li>
+The content in "new.gw" can then be moved into one of the other source
+files with a text editor.
 
 </ul>
 
