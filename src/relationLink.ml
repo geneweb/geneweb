@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.1 1999-03-08 11:19:10 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.2 1999-03-31 02:16:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -84,9 +84,9 @@ value find_first_branch base (dmin, dmax) ia =
         match (aoi base ip).parents with
         [ Some ifam ->
             let cpl = coi base ifam in
-            match find [(ip, sp) :: br] (len - 1) cpl.father Masculine with
+            match find [(ip, sp) :: br] (len - 1) cpl.father Male with
             [ Some _ as r -> r
-            | None -> find [(ip, sp) :: br] (len - 1) cpl.mother Feminine ]
+            | None -> find [(ip, sp) :: br] (len - 1) cpl.mother Female ]
         | None -> None ]
 ;
 
@@ -96,14 +96,14 @@ value rec next_branch_same_len base dist backward missing ia sa ipl =
     [ [] -> None
     | [(ip, sp) :: ipl1] ->
         match sa with
-        [ Feminine ->
+        [ Female ->
             next_branch_same_len base dist True (missing + 1) ip sp ipl1
-        | Masculine ->
+        | Male ->
             match (aoi base ip).parents with
             [ Some ifam ->
                 let cpl = coi base ifam in
                 next_branch_same_len base dist False missing cpl.mother
-                  Feminine ipl
+                  Female ipl
             | _ -> failwith "next_branch_same_len" ]
         | Neuter -> assert False ] ]
   else if missing == 0 then Some (ia, sa, ipl)
@@ -113,7 +113,7 @@ value rec next_branch_same_len base dist backward missing ia sa ipl =
     match (aoi base ia).parents with
     [ Some ifam ->
         let cpl = coi base ifam in
-        next_branch_same_len base dist False (missing - 1) cpl.father Masculine
+        next_branch_same_len base dist False (missing - 1) cpl.father Male
           [(ia, sa) :: ipl]
     | None -> next_branch_same_len base dist True missing ia sa ipl ]
 ;
@@ -131,14 +131,14 @@ value rec prev_branch_same_len base dist backward missing ia sa ipl =
     [ [] -> None
     | [(ip, sp) :: ipl1] ->
         match sa with
-        [ Masculine ->
+        [ Male ->
             prev_branch_same_len base dist True (missing + 1) ip sp ipl1
-        | Feminine ->
+        | Female ->
             match (aoi base ip).parents with
             [ Some ifam ->
                 let cpl = coi base ifam in
                 prev_branch_same_len base dist False missing cpl.father
-                  Masculine ipl
+                  Male ipl
             | _ -> failwith "prev_branch_same_len" ]
         | Neuter -> assert False ] ]
   else if missing == 0 then Some (ia, sa, ipl)
@@ -148,7 +148,7 @@ value rec prev_branch_same_len base dist backward missing ia sa ipl =
     match (aoi base ia).parents with
     [ Some ifam ->
         let cpl = coi base ifam in
-        prev_branch_same_len base dist False (missing - 1) cpl.mother Feminine
+        prev_branch_same_len base dist False (missing - 1) cpl.mother Female
           [(ia, sa) :: ipl]
     | None -> prev_branch_same_len base dist True missing ia sa ipl ]
 ;

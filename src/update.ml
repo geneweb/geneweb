@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.3 1999-03-30 10:46:18 ddr Exp $ *)
+(* $Id: update.ml,v 2.4 1999-03-31 02:16:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -80,7 +80,7 @@ value insert_string conf base s =
 
 value update_misc_names_of_family base p =
   match p.sex with
-  [ Masculine ->
+  [ Male ->
       List.iter
         (fun ifam ->
            let fam = foi base ifam in

@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 2.3 1999-03-30 10:46:08 ddr Exp $ *)
+(* $Id: def.mli,v 2.4 1999-03-31 02:16:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = Adef.iper;
@@ -44,7 +44,7 @@ type title 'string =
     t_nth : mutable int }
 ;
 
-type sex = [ Masculine | Feminine | Neuter ];
+type sex = [ Male | Female | Neuter ];
 
 type person 'string =
   { first_name : mutable 'string;

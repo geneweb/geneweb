@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.9 1999-03-30 10:46:01 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.10 1999-03-31 02:16:48 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -512,8 +512,8 @@ value phony_per gen sex =
 
 value unknown_fam gen i =
   let empty = add_string gen "" in
-  let father = phony_per gen Masculine in
-  let mother = phony_per gen Feminine in
+  let father = phony_per gen Male in
+  let mother = phony_per gen Female in
   let f =
     {marriage = Adef.codate_None;
      marriage_place = empty;
@@ -873,8 +873,8 @@ value add_indi gen r =
   in
   let sex =
     match find_field "SEX" r.rsons with
-    [ Some {rval = "M"} -> Masculine
-    | Some {rval = "F"} -> Feminine
+    [ Some {rval = "M"} -> Male
+    | Some {rval = "F"} -> Female
     | _ -> Neuter ]
   in
   let image =
@@ -1079,12 +1079,12 @@ value add_fam gen r =
   let fath =
     match find_field "HUSB" r.rsons with
     [ Some r -> per_index gen r.rval
-    | None -> phony_per gen Masculine ]
+    | None -> phony_per gen Male ]
   in
   let moth =
     match find_field "WIFE" r.rsons with
     [ Some r -> per_index gen r.rval
-    | None -> phony_per gen Feminine ]
+    | None -> phony_per gen Female ]
   in
   do match gen.g_per.arr.(Adef.int_of_iper fath) with
      [ Left lab -> ()
@@ -1092,7 +1092,7 @@ value add_fam gen r =
          do if not (List.memq i (Array.to_list p.family)) then
               p.family := Array.append p.family [| i |]
             else ();
-            if p.sex = Neuter then p.sex := Masculine else ();
+            if p.sex = Neuter then p.sex := Male else ();
          return () ];
      match gen.g_per.arr.(Adef.int_of_iper moth) with
      [ Left lab -> ()
@@ -1100,7 +1100,7 @@ value add_fam gen r =
          do if not (List.memq i (Array.to_list p.family)) then
               p.family := Array.append p.family [| i |]
             else ();
-            if p.sex = Neuter then p.sex := Feminine else ();
+            if p.sex = Neuter then p.sex := Female else ();
          return () ];
   return
   let children =
@@ -1622,8 +1622,8 @@ value effective_del_fam base fam cpl =
 
 value string_of_sex =
   fun
-  [ Masculine -> "M"
-  | Feminine -> "F"
+  [ Male -> "M"
+  | Female -> "F"
   | Neuter -> "N" ]
 ;
 
@@ -1632,7 +1632,7 @@ value check_parents_sex base =
     let cpl = base.data.couples.get i in
     let fath = poi base cpl.father in
     let moth = poi base cpl.mother in
-    if fath.sex = Feminine || moth.sex = Masculine then
+    if fath.sex = Female || moth.sex = Male then
       do Printf.printf "Bad sex for parents\n";
          Printf.printf "- father: %s (sex: %s)\n" (denomination base fath)
            (string_of_sex fath.sex);
@@ -1643,7 +1643,7 @@ value check_parents_sex base =
          effective_del_fam base (base.data.families.get i) cpl;
       return ()
     else
-      do fath.sex := Masculine; moth.sex := Feminine; return ();
+      do fath.sex := Male; moth.sex := Female; return ();
   done
 ;
 

@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 2.3 1999-03-30 10:46:11 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.4 1999-03-31 02:16:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -251,8 +251,8 @@ value get_field lab l =
 
 value get_optional_sexe =
   fun
-  [ ["h" :: l] -> (Masculine, l)
-  | ["f" :: l] -> (Feminine, l)
+  [ ["h" :: l] -> (Male, l)
+  | ["f" :: l] -> (Female, l)
   | l -> (Neuter, l) ]
 ;
 

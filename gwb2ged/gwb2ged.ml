@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.3 1999-03-30 10:46:02 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.4 1999-03-31 02:16:48 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -93,8 +93,8 @@ value ged_name base oc per =
 
 value ged_sex base oc per =
   match per.sex with
-  [ Masculine -> Printf.fprintf oc "1 SEX M\n"
-  | Feminine -> Printf.fprintf oc "1 SEX F\n"
+  [ Male -> Printf.fprintf oc "1 SEX M\n"
+  | Female -> Printf.fprintf oc "1 SEX F\n"
   | Neuter -> () ]
 ;
 
