@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.15 2005-03-04 10:58:38 ddr Exp $
+# $Id: lex_utf8.txt,v 1.16 2005-03-08 12:41:47 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5591,6 +5591,7 @@ sv: m&aring;nader
 
     moon age/new moon/first quarter/full moon/last quarter
 ar: همت عمر/نو موون/فيرست قورتر/فولّ موون/لت قورتر
+cs: měsíční fáze/nov/první čtvrt'/úplněk/poslední čtvrt'
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
 fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
