@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.1 1999-11-10 08:44:18 ddr Exp $ *)
+(* $Id: descend.ml,v 3.2 1999-11-10 09:53:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -233,7 +233,7 @@ value print_child conf base levt boucle niveau_max niveau compte auth ix =
          in
          ()
        else ();
-    return boucle (succ niveau) ux
+    return boucle (succ niveau) x ux
   else Wserver.wprint "\n"
 ;
 
@@ -241,7 +241,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
   let niveau_max = min (limit_desc conf) niveau_max in
   let levt = make_level_table base niveau_max p in
   let compte = ref 0 in
-  let rec boucle niveau u =
+  let rec boucle niveau p u =
     if niveau <= niveau_max then
       let ifaml = Array.to_list u.family in
       let _ =
@@ -293,7 +293,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
      else ();
      Wserver.wprint ".";
      html_br conf;
-     boucle 1 (uoi base p.cle_index);
+     boucle 1 p (uoi base p.cle_index);
      html_p conf;
      Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) compte.val
        (transl_nth conf "person/persons" 1);
