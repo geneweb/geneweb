@@ -1,12 +1,90 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
-<head><title>GeneWeb</title></head>
-<body bgcolor="#d6bfaf">
+<html>
 
-<h1>Translation soon available</h1>
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="Template"
+content="D:\Program Files\Microsoft Office\Office\html.dot">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>GeneWeb - Problem</title>
+</head>
 
-<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
-GeneWeb</em></font><br>
+<body bgcolor="#D6BFAF" link="#0000FF" vlink="#800080">
 
+<h1>GeneWeb - Problem</h1>
+
+<p>Här är två frekvent återkommande problem med
+&quot;gwd&quot;: </p>
+
+<p>Du har startat <em>GeneWeb</em> demonen &quot;gwd&quot; och
+den svarar normalt enligt kapitlet &quot;Komma igång med
+GeneWeb&quot;, &quot;Kommandot <a href="start.htm#Gwd">gwd</a>&quot;.
+</p>
+
+<p>Då... </p>
+
+<h4>Försöker ansluta till nätverket</h4>
+
+<ul>
+    <li>När du skriver in adressen i din webbläsare, t.ex.:
+
+<pre>
+     http://localhost:2317/svensson</pre>
+
+     Svarar webbläsaren att du måste ansluta dig
+     till nätverket och att det inte går att arbeta
+     nedkopplad.
+
+<p>Detta problem inträffar med en
+     del versioner av Internet Explorer.
+
+</ul>
+
+<ul>
+    <li>Vi fick från <em>GeneWeb</em> användare (tack) dessa
+        lösningar:<p>
+        <ul><li>Under Internet Explorer, välj menyn
+                &quot;Display&quot;, &quot;Internet
+                options&quot;. Sedan, i menyn
+                &quot;Connection&quot;, klicka i &quot;do not use
+                proxy for local addresses&quot;. </ul>
+     <p><ul><li>[Version 3.02] Under Internet Explorer, välj
+                menyn &quot;Display&quot;, &quot;Options&quot;,
+                &quot;Connection&quot;. Gå sedan till
+                &quot;Proxyserver&quot; och välj
+                &quot;Setup&quot;, lägg till under
+                &quot;Exceptions&quot; och &quot;Proxyserver not
+                to be used for adresser beginning with&quot;
+                adresserna som ges när du startar gwd.exe. Till
+                exempel (notera semikolonen mellan namnen):
+<pre>
+     127.0.0.1;localhost;computer</pre>
+</ul>
+
+                Om det inte fungerar bättre, föreslår vi att
+                du använder en annan webbläsare, t.ex. Netscape
+                (som är gratis).
+</ul>
+
+<h4>Kan inte komma åt filen &quot;start.txt&quot;</h4>
+
+<ul>
+    <li>Ett annat frekvent problem är meddelandet: &quot;Cannot
+        access file start.txt&quot;. </ul><p>
+<ul><li>Om du använder <em>GeneWeb</em> under Windows, kanske du
+        packade upp arkivet med &quot;pkunzip&quot;. Det är
+        viktigt att göra det med optionerna &quot;-e -d&quot;
+
+<pre>
+     pkunzip -e -d geneweb.zip</pre>
+
+Om du inte packade upp med dessa optioner, gör
+om det med dem.</ul>
+
+<p>Tillbaka till <a href="diruse.htm">bruksanvisningen</a>. </p>
+
+<hr>
+
+<p><font size="2"><em>© Copyright INRIA 1999 - GeneWeb</em></font></p>
 </body>
-
+</html>
