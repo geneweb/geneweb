@@ -1,14 +1,15 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updfam.txt,v 4.7 2001-06-16 03:04:51 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.8 2001-06-18 07:06:00 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
-    %if;(evar_m = "ADD_FAM")[*add::family/families]0
+    %if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")[*add::family/families]0
     %elseif;(evar_m = "ADD_PAR")[*add::family/families]0
     %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
       [*modify::family/families]0 # %evar_i;
-    %elseif;(evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
+    %elseif;(evar_m = "MRG_FAM" or evar_m = "MRG_FAM_OK" or
+             evar_m = "MRG_MOD_FAM_OK")
       [*merge::family/families]1 # %evar_i;
     %end;
   </title>
@@ -143,31 +144,33 @@
 %end;
 
 <h1 align=center><font color=%highlight;>%nn;
-%if;(evar_m = "ADD_FAM")
+%if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
   [*add::family/families]0
 %elseif;(evar_m = "ADD_PAR")
   [*add::family/families]0
 %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
   [*modify::family/families]0 # %evar_i;
-%elseif;(evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
+%elseif;(evar_m = "MRG_FAM" or evar_m = "MRG_FAM_OK" or
+         evar_m = "MRG_MOD_FAM_OK")
   [*merge::family/families]1 # %evar_i;
 %end;
 </font></h1>
 
-<div align=right><em>(new version)</em></div>
+<div align=right><em>(new version 2)</em></div>
 
 <form method=POST action="%action;">
 %hidden;
 <input type=hidden name=digest value="%digest;">
 %if;(evar_ip != "")<input type=hidden name=ip value="%evar_ip;">%nl;%end;
-<input type=hidden name=i value="%evar_i;">
-%if;(evar_m = "ADD_FAM")
+%if;(evar_i != "")<input type=hidden name=i value="%evar_i;">%nl;%end;
+%if;(evar_m = "ADD_FAM" or evar_m = "ADD_FAM_OK")
   <input type=hidden name=m value=ADD_FAM_OK>%nl;
 %elseif;(evar_m = "ADD_PAR")
   <input type=hidden name=m value=ADD_FAM_OK>%nl;
 %elseif;(evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK")
   <input type=hidden name=m value=MOD_FAM_OK>%nl;
-%elseif;(evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK")
+%elseif;(evar_m = "MRG_FAM" or evar_m = "MRG_FAM_OK" or
+         evar_m = "MRG_MOD_FAM_OK")
   <input type=hidden name=i2 value="%evar_i2;">
   %if;(evar_ini1 != "" and evar_ini2 != "")
     <input type=hidden name=ini1 value="%evar_ini1;">
