@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.79 2000-03-22 13:05:00 ddr Exp $
+# $Id: lexicon.txt,v 3.80 2000-04-03 14:00:00 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2586,6 +2586,10 @@ no: oppdateringshistorie
 pt: historial das actualiza&ccedil;&otilde;es
 ru: история обновлений
 se: uppdateringarnas historia
+
+    horizontally
+en: horizontally
+fr: horizontalement
 
     husband/wife
 cs: manѕel/manѕelka
