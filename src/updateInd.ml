@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.6 2000-01-17 13:58:56 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.7 2000-01-21 12:01:22 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -251,7 +251,7 @@ value print_death_type conf base p =
     Wserver.wprint "%s...\n" (capitale (transl_nth conf "died" 2));
     Wserver.wprint "<option value=DeadYoung%s>"
       (match p.death with [ DeadYoung -> " selected" | _ -> "" ]);
-    Wserver.wprint "%s\n" (capitale (transl_nth conf "dead young" 2));
+    Wserver.wprint "%s\n" (capitale (transl_nth conf "died young" 2));
   end
 ;
 

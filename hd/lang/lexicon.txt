@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.56 2000-01-17 13:58:50 ddr Exp $
+# $Id: lexicon.txt,v 3.57 2000-01-21 12:01:13 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -228,7 +228,7 @@ cn: %yÄê%m1ÈÕ/%yÄê%m%dÈÕ/%yÄê%m/%yÄê
 cs: 1. %m %y/%d. %m %y/%m %y/%y
 de: 1. %m %y/%d. %m %y/%m %y/%y
 dk: 1. %m %y/%d. %m %y/%m %y/%y
-en: %m 1, %y/%m %d, %y/%m %y/%y
+en: 1 %m %y/%d %m %y/%m %y/%y
 eo: 1a de %m %y/%da de %m %y/%m %y/%y
 es: 1ro %m %y/%d %m %y/%m %y/%y
 fi: 1. %mta %y/%d. %mta %y/%mssa %y/%y
@@ -1124,11 +1124,11 @@ no: &aring;rsdager
 pt: anivers&aacute;rios
 se: &aring;rsdagar
 
-    anniversaries of dead
+    anniversaries of death
 cs: vıroèí úmrtí
 de: Jahrestage der verstorbenen Personen
 dk: &aring;rsdage for d&oslash;de personer
-en: anniversaries of dead
+en: anniversaries of death
 eo: datrevenoj de la mortaj personoj
 es: aniversarios de las personas fallecidas
 fi: vainajien muistop&auml;ivi&auml
@@ -1747,23 +1747,6 @@ no: dager gammel
 pt: dias
 se: dagar
 
-    dead young
-cs: zemøel mladı/zemøela mladá/zemøeli mladí
-de: jung gestorben
-dk: d&oslash;d som ung
-en: dead young
-eo: morta juna
-es: muerto joven/muerta joven/muerto(a) joven
-fi: kuollut nuorena 
-fr: mort jeune/morte jeune/mort(e) jeune
-he:    ğôèø áâéì öòéø/ ğôèøä áâéì öòéø 
-is: dó ung(ur)
-it: morto giovane
-nl: jong gestorven
-no: d&oslash;d ung
-pt: morreu jovem
-se: dog ung
-
     death
 cs: úmrtí
 de: Tod
@@ -1851,6 +1834,23 @@ nl: gestorven
 no: d&oslash;d
 pt: falecido/falecida/falecido(a)
 se: d&ouml;d
+
+    died young
+cs: zemøel mladı/zemøela mladá/zemøeli mladí
+de: jung gestorben
+dk: d&oslash;d som ung
+en: died young
+eo: morta juna
+es: muerto joven/muerta joven/muerto(a) joven
+fi: kuollut nuorena 
+fr: mort jeune/morte jeune/mort(e) jeune
+he:    ğôèø áâéì öòéø/ ğôèøä áâéì öòéø 
+is: dó ung(ur)
+it: morto giovane
+nl: jong gestorven
+no: d&oslash;d ung
+pt: morreu jovem
+se: dog ung
 
     disappeared
 cs: zmizel/zmizela/zmizeli
@@ -5074,7 +5074,7 @@ is: tré
 nl: boom
 no: tre
 pt: &aacute;rvore
-se: tr&auml;d
+se: anträd
 
     uncles and aunts
 de: Onkel und Tanten

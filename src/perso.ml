@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.6 2000-01-10 02:14:40 ddr Exp $ *)
+(* $Id: perso.ml,v 3.7 2000-01-21 12:01:19 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -288,7 +288,7 @@ value print_dates conf base open_area p =
             return ()
         | DeadYoung ->
             do Wserver.wprint "%s"
-                 (capitale (transl_nth conf "dead young" is));
+                 (capitale (transl_nth conf "died young" is));
                if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
             return ()
         | DeadDontKnowWhen ->
