@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.36 2002-03-22 13:09:57 ddr Exp $ *)
+(* $Id: setup.ml,v 4.37 2002-04-11 17:34:09 ddr Exp $ *)
 
 open Printf;
 
@@ -81,12 +81,18 @@ type config =
     request : list string }
 ;
 
+value setup_available_languages = ["de"; "en"; "es"; "fr"; "lv"; "sv"];
+
+value charset conf =
+  charset
+;
+
 value nl () = Wserver.wprint "\013\010";
 
-value header_no_page_title title =
+value header_no_page_title conf title =
   do {
     Wserver.http "";
-    Wserver.wprint "Content-type: text/html; charset=%s" charset;
+    Wserver.wprint "Content-type: text/html; charset=%s" (charset conf);
     nl (); nl ();
     Wserver.wprint "\
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
@@ -126,9 +132,9 @@ GeneWeb %s</em></font>" Version.txt;
   }
 ;
 
-value header title =
+value header conf title =
   do {
-    header_no_page_title title;
+    header_no_page_title conf title;
     Wserver.wprint "<h1>";
     title False;
     Wserver.wprint "</h1>\n"
@@ -617,7 +623,7 @@ value print_file conf bname =
   [ Some ic ->
       do {
         Wserver.http "";
-        Wserver.wprint "Content-type: text/html; charset=%s" charset;
+        Wserver.wprint "Content-type: text/html; charset=%s" (charset conf);
         nl (); nl ();
         copy_from_stream conf (fun x -> Wserver.wprint "%s" x)
           (Stream.of_channel ic);
@@ -627,7 +633,7 @@ value print_file conf bname =
   | None ->
       let title _ = Wserver.wprint "Error" in
       do {
-        header title;
+        header conf title;
         Wserver.wprint "<ul><li>\n";
         Wserver.wprint "Cannot access file \"%s\".\n" fname;
         Wserver.wprint "</ul>\n";
@@ -638,7 +644,7 @@ value print_file conf bname =
 
 value error conf str =
   do {
-    header (fun _ -> Wserver.wprint "Incorrect request");
+    header conf (fun _ -> Wserver.wprint "Incorrect request");
     Wserver.wprint "<em>%s</em>\n" (String.capitalize str);
     trailer conf
   }
@@ -1588,8 +1594,6 @@ value null_reopen flags fd =
   }
   else ()
 ;
-
-value setup_available_languages = ["de"; "en"; "es"; "fr"; "lv"; "sv"];
 
 value intro () =
   let (default_gwd_lang, default_setup_lang) =
