@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.41 1999-08-03 14:41:21 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.42 1999-08-04 04:24:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1176,11 +1176,8 @@ value print_spouses conf base p =
        let sp = poi base (spouse p cpl) in
        if p_first_name base sp = "?" && p_surname base sp = "?" then ()
        else
-         do Wserver.wprint "\n&amp;";
-            match Adef.od_of_codate fam.marriage with
-            [ Some d -> stag "font" "size=-2" begin Date.display_year d; end
-            | None -> () ];
-            Wserver.wprint "\n";
+         do Wserver.wprint "\n&amp;%s\n"
+              (Date.short_marriage_date_text conf base fam p sp);
             afficher_personne_titre conf base sp;
             Date.afficher_dates_courtes conf base sp;
          return ())

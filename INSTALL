@@ -1,5 +1,4 @@
 INSTALLATIONS INSTRUCTIONS IN UNIX MACHINES
-
 [For Windows machines, look at the end of this file]
 
 For the compilation, you need
@@ -24,8 +23,8 @@ They are freely distributed at addresses:
    This creates executables for the Objective Caml interpretor.
 
 3- If your platform is supported by the native-code Ocaml compiler, you
-   can build the native-code programs (this is recommended, executables
-   are much faster).
+   can build the native-code programs (this is highly recommended,
+   executables are much faster).
    Do:
       make opt
 

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.16 1999-08-04 01:37:48 ddr Exp $
+# $Id: Makefile,v 2.17 1999-08-04 04:24:55 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -34,8 +34,8 @@ distrib: classical_distrib
 	  cp setup/$$i/*.htm distribution/gw/setup/$$i; \
 	  cp setup/$$i/*.txt distribution/gw/setup/$$i; \
 	done
-	cp etc/ALIRE.distrib.txt distribution/README.txt
-	cp etc/README.distrib.txt distribution/ALIRE.txt
+	cp etc/README.distrib.txt distribution/README.txt
+	cp etc/LISEZMOI.distrib.txt distribution/LISEZMOI.txt
 	echo "127.0.0.1" > distribution/gw/only.txt
 
 classical_distrib:
@@ -48,7 +48,7 @@ classical_distrib:
 	cp src/gwu distribution/gwu$(EXE)
 	cp ged2gwb/ged2gwb distribution/ged2gwb$(EXE)
 	cp gwb2ged/gwb2ged distribution/gwb2ged$(EXE)
-	cp etc/ALIRE.txt distribution/.
+	cp etc/LISEZMOI.txt distribution/.
 	cp etc/README.txt distribution/.
 	cp etc/INSTALL.htm distribution/.
 	cp etc/a.gwf distribution/.
