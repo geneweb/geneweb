@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.22 2004-01-26 18:12:37 ddr Exp $ *)
+(* $Id: descend.ml,v 4.23 2004-07-16 16:17:54 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -184,10 +184,10 @@ value display_descendant_menu conf base p =
 
 value named_like_father conf base ip =
   let a = aget conf base ip in
-  match a.parents with
+  match parents a with
   [ Some ifam ->
       (pget conf base ip).surname =
-         (pget conf base (coi base ifam).father).surname
+         (pget conf base (father (coi base ifam))).surname
   | _ -> False ]
 ;
 
@@ -507,7 +507,7 @@ value labelled conf base marks max_lev lev ip =
   let a = aget conf base ip in
   let u = uget conf base ip in
   Array.length u.family <> 0 &&
-  (match a.parents with
+  (match parents a with
    [ Some ifam ->
        let cpl = coi base ifam in
        List.exists
@@ -520,7 +520,7 @@ value labelled conf base marks max_lev lev ip =
                  Array.length u.family <> 0 &&
                  not (close_to_end conf base marks max_lev lev e))
               (Array.to_list el))
-         (Array.to_list (uget conf base cpl.father).family)
+         (Array.to_list (uget conf base (father cpl)).family)
    | _ -> False ])
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.28 2004-07-16 15:19:33 ddr Exp $ *)
+(* $Id: update.ml,v 4.29 2004-07-16 16:17:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -139,7 +139,7 @@ value update_misc_names_of_family base p u =
                        person_ht_add base name ip
                      else ())
                   (person_misc_names base (poi base ip)))
-             [cpl.mother :: Array.to_list des.children])
+             [mother cpl :: Array.to_list des.children])
         (Array.to_list u.family)
   | _ -> () ]
 ;
@@ -257,8 +257,8 @@ value print_warning conf base =
         (fun _ -> print_someone_strong conf base p)
   | ChangedOrderOfChildren ifam des before ->
       let cpl = coi base ifam in
-      let fath = poi base cpl.father in
-      let moth = poi base cpl.mother in
+      let fath = poi base (father cpl) in
+      let moth = poi base (mother cpl) in
       do {
         Wserver.wprint "%s\n"
           (capitale (transl conf "changed order of children"));
@@ -309,8 +309,8 @@ value print_warning conf base =
           (fcapitale
              (ftransl conf
                 "the following children of %t and %t are not in order"))
-          (fun _ -> print_someone_strong conf base (poi base cpl.father))
-          (fun _ -> print_someone_strong conf base (poi base cpl.mother));
+          (fun _ -> print_someone_strong conf base (poi base (father cpl)))
+          (fun _ -> print_someone_strong conf base (poi base (mother cpl)));
         Wserver.wprint ":\n";
         Wserver.wprint "<ul>\n";
         html_li conf;
@@ -841,7 +841,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
                if f = "?" || s = "?" then empty_string
                else insert_string base src;
              cle_index = ip}
-          and a = {parents = None; consang = Adef.fix (-1)}
+          and a = no_parents ()
           and u = {family = [| |]} in
           do {
             base.func.patch_person p.cle_index p;
@@ -888,8 +888,8 @@ value print_family_stuff conf base p a u =
                    (Adef.int_of_ifam fi);
                  Wserver.wprint "%s</a><br>\n"
                    (capitale (transl_decline conf "invert" ""));
-                 if cpl1.father = cpl2.father &&
-                    cpl1.mother = cpl2.mother then
+                 if (father cpl1) = (father cpl2) &&
+                    (mother cpl1) = (mother cpl2) then
                     do {
                    stag "a" "href=\"%sm=MRG_FAM;i=%d;i2=%d;ip=%d\""
                      (commd conf) (Adef.int_of_ifam prev_fi)
@@ -929,7 +929,7 @@ value print_family_stuff conf base p a u =
     Wserver.wprint "<br>\n";
     let s = transl_nth conf "marriage/marriages" 0 in
     if (p_first_name base p = "?" || p_surname base p = "?") &&
-       (Array.length u.family <> 0 || a.parents <> None) then
+       (Array.length u.family <> 0 || parents a <> None) then
       ()
     else if p.sex = Neuter then do {
       Wserver.wprint "<a href=\"%sm=ADD_FAM;ip=%d;sex=M\">%s (%s)</a><br>\n"
@@ -1014,7 +1014,7 @@ value print conf base p =
             Wserver.wprint "%s" (capitale (transl_decline conf "merge" ""));
           end;
           Wserver.wprint "<br>\n";
-          match a.parents with
+          match parents a with
           [ Some _ -> ()
           | None ->
               if p_first_name base p = "?" || p_surname base p = "?" then ()

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.14 2003-12-10 12:19:11 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.15 2004-07-16 16:17:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -511,7 +511,7 @@ value effective_add conf base sp =
       map_person_ps (Update.insert_person conf base sp.psources created_p)
         (Update.insert_string base) sp
     in
-    let na = {parents = None; consang = Adef.fix (-1)} in
+    let na = no_parents () in
     let nu = {family = [| |]} in
     np.cle_index := pi;
     base.func.patch_person pi np;
@@ -537,12 +537,12 @@ value effective_del conf base p =
   let empty = Update.insert_string base "" in
   let asc = aoi base p.cle_index in
   do {
-    match asc.parents with
+    match parents asc with
     [ Some ifam ->
         let des = doi base ifam in
         do {
           des.children := array_except p.cle_index des.children;
-          asc.parents := None;
+          set_parents asc None;
           asc.consang := Adef.fix (-1);
           base.func.patch_descend ifam des;
           base.func.patch_ascend p.cle_index asc;
@@ -626,7 +626,7 @@ value all_checks_person conf base p a u =
   do {
     Gutil.check_person base error warning p;
     relation_sex_is_coherent base warning p;
-    match a.parents with
+    match parents a with
     [ Some ifam ->
         Gutil.check_family base error warning (foi base ifam) (coi base ifam)
           (doi base ifam)

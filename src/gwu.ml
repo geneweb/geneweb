@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.22 2004-05-04 17:14:38 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.23 2004-07-16 16:17:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -258,7 +258,7 @@ value print_infos oc base is_child csrc cbp p =
 value print_parent oc base mark fam_sel fam p =
   let a = aoi base p.cle_index in
   let has_printed_parents =
-    match a.parents with
+    match parents a with
     [ Some ifam -> fam_sel ifam
     | None -> False ]
   in
@@ -350,7 +350,7 @@ value print_witness oc base mark p notes_pl_p =
     fprintf oc "%s %s%s" (correct_string base p.surname)
       (correct_string base p.first_name)
       (if p.occ = 0 then "" else "." ^ string_of_int p.occ);
-    if Array.length u.family = 0 && a.parents = None &&
+    if Array.length u.family = 0 && parents a = None &&
        not mark.(Adef.int_of_iper p.cle_index)
     then do {
       mark.(Adef.int_of_iper p.cle_index) := True;
@@ -449,12 +449,12 @@ value get_persons_with_notes base m list =
   let fath = m.m_fath in
   let moth = m.m_moth in
   let list =
-    match (sou base fath.notes, (aoi base fath.cle_index).parents) with
+    match (sou base fath.notes, parents (aoi base fath.cle_index)) with
     [ ("", _) | (_, Some _) -> list
     | _ -> [fath :: list] ]
   in
   let list =
-    match (sou base moth.notes, (aoi base moth.cle_index).parents) with
+    match (sou base moth.notes, parents (aoi base moth.cle_index)) with
     [ ("", _) | (_, Some _) -> list
     | _ -> [moth :: list] ]
   in
@@ -503,13 +503,13 @@ value print_notes oc base ml per_sel pl =
 ;
 
 value is_isolated base p =
-  match (aoi base p.cle_index).parents with
+  match parents (aoi base p.cle_index) with
   [ Some _ -> False
   | None -> Array.length (uoi base p.cle_index).family = 0 ]
 ;
 
 value is_definition_for_parent base p =
-  match (aoi base p.cle_index).parents with
+  match parents (aoi base p.cle_index) with
   [ Some _ -> False
   | None -> True ]
 ;
@@ -550,12 +550,12 @@ value get_persons_with_relations base m list =
   let fath = m.m_fath in
   let moth = m.m_moth in
   let list =
-    match (fath.rparents, (aoi base fath.cle_index).parents) with
+    match (fath.rparents, parents (aoi base fath.cle_index)) with
     [ ([], _) | (_, Some _) -> list
     | _ -> [(fath, False) :: list] ]
   in
   let list =
-    match (moth.rparents, (aoi base moth.cle_index).parents) with
+    match (moth.rparents, parents (aoi base moth.cle_index)) with
     [ ([], _) | (_, Some _) -> list
     | _ -> [(moth, False) :: list] ]
   in
@@ -563,7 +563,7 @@ value get_persons_with_relations base m list =
     List.fold_right
       (fun ip list ->
          let p = poi base ip in
-         match (p.rparents, (aoi base p.cle_index).parents) with
+         match (p.rparents, parents (aoi base p.cle_index)) with
          [ ([], _) | (_, Some _) -> list
          | ([{r_fath = Some x} :: _], _) when x <> m.m_fath.cle_index -> list
          | _ -> [(p, False) :: list] ])
@@ -584,7 +584,7 @@ value print_relation_parent oc base mark defined_p p =
     fprintf oc "%s %s%s" (correct_string base p.surname)
       (correct_string base p.first_name)
       (if p.occ = 0 then "" else "." ^ string_of_int p.occ);
-    if Array.length u.family = 0 && a.parents = None &&
+    if Array.length u.family = 0 && parents a = None &&
        not mark.(Adef.int_of_iper p.cle_index)
     then do {
       mark.(Adef.int_of_iper p.cle_index) := True;
@@ -727,7 +727,7 @@ value rec filter f =
 ;
 
 value connected_families base fam_sel fam cpl =
-  loop [fam.fam_index] [] [cpl.father] where rec loop ifaml ipl_scanned =
+  loop [fam.fam_index] [] [(father cpl)] where rec loop ifaml ipl_scanned =
     fun
     [ [ip :: ipl] ->
         if List.memq ip ipl_scanned then loop ifaml ipl_scanned ipl
@@ -740,7 +740,7 @@ value connected_families base fam_sel fam cpl =
             List.fold_right
               (fun ifam ipl ->
                  let cpl = coi base ifam in
-                 [cpl.father; cpl.mother :: ipl])
+                 [(father cpl); (mother cpl) :: ipl])
               ifaml1 ipl
           in
           loop ifaml [ip :: ipl_scanned] ipl
@@ -768,11 +768,11 @@ type separate =
 ;
 
 value rec find_ancestors base surn p list =
-  match (aoi base p.cle_index).parents with
+  match parents (aoi base p.cle_index) with
   [ Some ifam ->
       let cpl = coi base ifam in
-      let fath = poi base cpl.father in
-      let moth = poi base cpl.mother in
+      let fath = poi base (father cpl) in
+      let moth = poi base (mother cpl) in
       if fath.surname <> surn && moth.surname <> surn then [p :: list]
       else
         let list =
@@ -845,21 +845,21 @@ value scan_connex_component base test_action len ifam =
       Array.fold_left
         (fun len ifam1 ->
            if ifam1 = ifam then len else test_action loop len ifam1)
-        len (uoi base cpl.father).family
+        len (uoi base (father cpl)).family
     in
     let len =
       Array.fold_left
         (fun len ifam1 ->
            if ifam1 = ifam then len else test_action loop len ifam1)
-        len (uoi base cpl.mother).family
+        len (uoi base (mother cpl)).family
     in
     let len =
-      match (aoi base cpl.father).parents with
+      match parents (aoi base (father cpl)) with
       [ Some ifam -> test_action loop len ifam
       | _ -> len ]
     in
     let len =
-      match (aoi base cpl.mother).parents with
+      match parents (aoi base (mother cpl)) with
       [ Some ifam -> test_action loop len ifam
       | _ -> len ]
     in
@@ -903,8 +903,8 @@ value mark_one_connex_component base mark ifam =
   else do {
     eprintf "%s: group of size %d not included\n" origin_file len;
     let cpl = coi base ifam in
-    eprintf "    %s + %s\n" (designation base (poi base cpl.father))
-      (designation base (poi base cpl.mother));
+    eprintf "    %s + %s\n" (designation base (poi base (father cpl)))
+      (designation base (poi base (mother cpl)));
     flush stderr;
     set_mark Scanned
   }
@@ -1010,8 +1010,8 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
                let cpl = coi base ifam in
                let des = doi base ifam in
                let m =
-                 {m_fam = fam; m_fath = poi base cpl.father;
-                  m_moth = poi base cpl.mother;
+                 {m_fam = fam; m_fath = poi base (father cpl);
+                  m_moth = poi base (mother cpl);
                   m_chil = Array.map (fun ip -> poi base ip) des.children}
                in
                if empty_family base m then do {

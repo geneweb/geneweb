@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 4.5 2002-01-23 14:22:32 ddr Exp $ *)
+(* $Id: consang.ml,v 4.6 2004-07-16 16:17:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -64,11 +64,11 @@ value topological_sort base aoi =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let a = aoi base (Adef.iper_of_int i) in
-      match a.parents with
+      match parents a with
       [ Some ifam ->
           let cpl = coi base ifam in
-          let ifath = Adef.int_of_iper cpl.father in
-          let imoth = Adef.int_of_iper cpl.mother in
+          let ifath = Adef.int_of_iper (father cpl) in
+          let imoth = Adef.int_of_iper (mother cpl) in
           do {
             tab.(ifath) := tab.(ifath) + 1; tab.(imoth) := tab.(imoth) + 1
           }
@@ -87,11 +87,11 @@ value topological_sort base aoi =
                do {
                  tab.(i) := tval;
                  incr cnt;
-                 match a.parents with
+                 match parents a with
                  [ Some ifam ->
                      let cpl = coi base ifam in
-                     let ifath = Adef.int_of_iper cpl.father in
-                     let imoth = Adef.int_of_iper cpl.mother in
+                     let ifath = Adef.int_of_iper (father cpl) in
+                     let imoth = Adef.int_of_iper (mother cpl) in
                      do {
                        tab.(ifath) := tab.(ifath) - 1;
                        tab.(imoth) := tab.(imoth) - 1;
@@ -248,14 +248,14 @@ value relationship_and_links base ri b ip1 ip2 =
           tops.val := [u :: tops.val]; tu.elim_ancestors := True
         }
         else ();
-        match a.parents with
+        match parents a with
         [ Some ifam ->
             let cpl = coi base ifam in
             do {
               treat_parent (Adef.iper_of_int u) tu
-                (Adef.int_of_iper cpl.father);
+                (Adef.int_of_iper (father cpl));
               treat_parent (Adef.iper_of_int u) tu
-                (Adef.int_of_iper cpl.mother)
+                (Adef.int_of_iper (mother cpl))
             }
         | _ -> () ]
       }

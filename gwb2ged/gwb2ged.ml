@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 4.9 2003-10-20 07:11:55 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 4.10 2004-07-16 16:17:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -394,7 +394,7 @@ value ged_ind_attr_str base oc per =
 ;
 
 value ged_famc base (per_sel, fam_sel) oc asc =
-  match asc.parents with
+  match parents asc with
   [ Some ifam ->
       if fam_sel ifam then
         fprintf oc "1 FAMC @F%d@\n" (Adef.int_of_ifam ifam + 1)
@@ -522,7 +522,7 @@ value ged_comment base oc fam =
 ;
 
 value has_personal_infos base per asc =
-  if asc.parents <> None then True
+  if parents asc <> None then True
   else if sou base per.first_name <> "?" then True
   else if sou base per.surname <> "?" then True
   else if per.birth <> Adef.codate_None then True
@@ -562,13 +562,13 @@ value ged_fam_record base ((per_sel, fam_sel) as sel) oc i =
     fprintf oc "0 @F%d@ FAM\n" (i + 1);
     ged_marriage base oc fam;
     ged_divorce base oc fam;
-    if has_personal_infos base (poi base cpl.father) (aoi base cpl.father) &&
-       per_sel cpl.father then
-      fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper cpl.father + 1)
+    if has_personal_infos base (poi base (father cpl)) (aoi base (father cpl)) &&
+       per_sel (father cpl) then
+      fprintf oc "1 HUSB @I%d@\n" (Adef.int_of_iper (father cpl) + 1)
     else ();
-    if has_personal_infos base (poi base cpl.mother) (aoi base cpl.mother) &&
-       per_sel cpl.mother then
-      fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper cpl.mother + 1)
+    if has_personal_infos base (poi base (mother cpl)) (aoi base (mother cpl)) &&
+       per_sel (mother cpl) then
+      fprintf oc "1 WIFE @I%d@\n" (Adef.int_of_iper (mother cpl) + 1)
     else ();
     Array.iter (ged_child base sel oc) des.children;
     ged_fsource base oc fam;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.11 2002-11-18 12:36:27 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.12 2004-07-16 16:17:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -22,11 +22,11 @@ value max_ancestor_level conf base ip max_lev =
       x.val := max x.val niveau;
       if x.val = max_lev then ()
       else
-        match (aget conf base ip).parents with
+        match parents (aget conf base ip) with
         [ Some ifam ->
             let cpl = coi base ifam in
             do {
-              loop (succ niveau) cpl.father; loop (succ niveau) cpl.mother
+              loop (succ niveau) (father cpl); loop (succ niveau) (mother cpl)
             }
         | _ -> () ]
     }
@@ -77,16 +77,16 @@ value merge_siblings l1 l2 =
 
 value siblings conf base p =
   let ip = p.cle_index in
-  match (aget conf base ip).parents with
+  match parents (aget conf base ip) with
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath_sib =
-        List.map (fun ip -> (ip, (cpl.father, Male)))
-          (siblings_by conf base cpl.father ip)
+        List.map (fun ip -> (ip, ((father cpl), Male)))
+          (siblings_by conf base (father cpl) ip)
       in
       let moth_sib =
-        List.map (fun ip -> (ip, (cpl.mother, Female)))
-          (siblings_by conf base cpl.mother ip)
+        List.map (fun ip -> (ip, ((mother cpl), Female)))
+          (siblings_by conf base (mother cpl) ip)
       in
       merge_siblings fath_sib moth_sib
   | None -> [] ]
@@ -186,8 +186,8 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
             (fun a ifam ->
                let cpl = coi base ifam in
                let sp =
-                 if p2.sex = Female then pget conf base cpl.father
-                 else pget conf base cpl.mother
+                 if p2.sex = Female then pget conf base (father cpl)
+                 else pget conf base (mother cpl)
                in
                let _ = print_spouse sp a in
                False)
@@ -437,13 +437,13 @@ value print_anniv conf base p level =
         if n >= level then set
         else
           let a =
-            match (aget conf base ip).parents with
+            match parents (aget conf base ip) with
             [ Some ifam ->
                 let cpl = coi base ifam in
                 let n = n + 1 in
                 let up_sosa = 2 * up_sosa in
-                let a = P.add (cpl.father, n, up_sosa) a in
-                P.add (cpl.mother, n, up_sosa + 1) a
+                let a = P.add ((father cpl), n, up_sosa) a in
+                P.add ((mother cpl), n, up_sosa + 1) a
             | None -> a ]
           in
           loop set a

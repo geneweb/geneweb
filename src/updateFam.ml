@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.37 2003-12-23 11:56:05 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.38 2004-07-16 16:17:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -79,10 +79,10 @@ value get_create (fn, sn, oc, create, var) = create;
 
 value rec eval_variable conf base env ((fam, cpl, des) as fcd) =
   fun
-  [ ["father"; s] -> VVind cpl.father s
-  | ["father"; "create"; s] -> VVcreate (get_create cpl.father) s
-  | ["mother"; s] -> VVind cpl.mother s
-  | ["mother"; "create"; s] -> VVcreate (get_create cpl.mother) s
+  [ ["father"; s] -> VVind (father cpl) s
+  | ["father"; "create"; s] -> VVcreate (get_create (father cpl)) s
+  | ["mother"; s] -> VVind (mother cpl) s
+  | ["mother"; "create"; s] -> VVcreate (get_create (mother cpl)) s
   | ["marriage"; s] -> VVdate (Adef.od_of_codate fam.marriage) s
   | ["divorce"; s] ->
       let d =
@@ -479,13 +479,13 @@ value print_inv1 conf base p fam1 fam2 =
       (capitale (transl conf "invert the order of the following families"));
     tag "ul" begin
       html_li conf;
-      Update.print_someone conf base (poi base cpl1.father);
+      Update.print_someone conf base (poi base (father cpl1));
       Wserver.wprint " %s " (transl_nth conf "and" 0);
-      Update.print_someone conf base (poi base cpl1.mother);
+      Update.print_someone conf base (poi base (mother cpl1));
       html_li conf;
-      Update.print_someone conf base (poi base cpl2.father);
+      Update.print_someone conf base (poi base (father cpl2));
       Wserver.wprint " %s " (transl_nth conf "and" 0);
-      Update.print_someone conf base (poi base cpl2.mother);
+      Update.print_someone conf base (poi base (mother cpl2));
     end;
     Wserver.wprint "\n";
     tag "form" "method=POST action=\"%s\"" conf.command begin
@@ -534,7 +534,7 @@ value print_add conf base =
      witnesses = [| |]; relation = Married; divorce = NotDivorced;
      comment = ""; origin_file = ""; fsources = default_source conf;
      fam_index = bogus_family_index}
-  and cpl = {father = fath; mother = moth}
+  and cpl = parent fath moth
   and des = {children = [| |]} in
   print_add1 conf base fam cpl des digest False
 ;
@@ -549,8 +549,9 @@ value print_add_parents conf base =
          comment = ""; origin_file = ""; fsources = default_source conf;
          fam_index = bogus_family_index}
       and cpl =
-        {father = ("", sou base p.surname, 0, Update.Create Neuter None, "");
-         mother = ("", "", 0, Update.Create Neuter None, "")}
+        parent
+          ("", sou base p.surname, 0, Update.Create Neuter None, "")
+          ("", "", 0, Update.Create Neuter None, "")
       and des =
         {children =
            [| (sou base p.first_name, sou base p.surname, p.occ, Update.Link,

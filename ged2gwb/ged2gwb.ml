@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.39 2003-10-20 07:11:54 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.40 2004-07-16 16:17:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -848,7 +848,7 @@ value unknown_per gen i =
      death = DontKnowIfDead; death_place = empty; death_src = empty;
      burial = UnknownBurial; burial_place = empty; burial_src = empty;
      notes = empty; psources = empty; cle_index = Adef.iper_of_int i}
-  and a = {parents = None; consang = Adef.fix (-1)}
+  and a = no_parents ()
   and u = {family = [| |]} in
   (p, a, u)
 ;
@@ -874,7 +874,7 @@ value unknown_fam gen i =
      marriage_src = empty; witnesses = [| |]; relation = Married;
      divorce = NotDivorced; comment = empty; origin_file = empty;
      fsources = empty; fam_index = Adef.ifam_of_int i}
-  and c = {father = father; mother = mother}
+  and c = parent father mother
   and d = {children = [| |]} in
   (f, c, d)
 ;
@@ -1747,9 +1747,10 @@ value add_indi gen r =
      burial_src = add_string gen burial_src;
      notes = add_string gen (notes ^ ext_notes);
      psources = add_string gen psources; cle_index = ip}
-  and ascend = {parents = parents; consang = Adef.fix (-1)}
+  and ascend = no_parents ()
   and union = {family = Array.of_list family} in
   do {
+    set_parents ascend parents;
     gen.g_per.arr.(Adef.int_of_iper ip) := Right3 person ascend union;
     match find_field "ADOP" r.rsons with
     [ Some r ->
@@ -1799,9 +1800,12 @@ value add_fam_norm gen r adop_list =
            let ip = per_index gen r.rval in
            if List.mem_assoc ip adop_list then
              match gen.g_per.arr.(Adef.int_of_iper ip) with
-             [ Right3 _ ({parents = Some ifam} as a) _ ->
-                 if ifam = i then do { a.parents := None; ipl }
-                 else [ip :: ipl]
+             [ Right3 _ a _ ->
+                 match parents a with
+                 [ Some ifam ->
+                     if ifam = i then do { set_parents a None; ipl }
+                     else [ip :: ipl]
+                 | None -> [ip :: ipl] ]
              | _ -> [ip :: ipl] ]
            else [ip :: ipl])
         rl []
@@ -1941,7 +1945,7 @@ value add_fam_norm gen r adop_list =
        relation = relation; divorce = div; comment = add_string gen comment;
        origin_file = string_empty; fsources = add_string gen fsources;
        fam_index = i}
-    and cpl = {father = fath; mother = moth}
+    and cpl = parent fath moth
     and des = {children = Array.of_list children} in
     gen.g_fam.arr.(Adef.int_of_ifam i) := Right3 fam cpl des
   }
@@ -2072,15 +2076,15 @@ value print_base_warning base =
   | ChangedOrderOfChildren ifam des _ ->
       let cpl = coi base ifam in
       fprintf log_oc.val "Changed order of children of %s and %s\n"
-        (designation base (poi base cpl.father))
-        (designation base (poi base cpl.mother))
+        (designation base (poi base (father cpl)))
+        (designation base (poi base (mother cpl)))
   | ChildrenNotInOrder ifam des elder x ->
       let cpl = coi base ifam in
       do {
         fprintf log_oc.val
           "The following children of\n  %s\nand\n  %s\nare not in order:\n"
-          (designation base (poi base cpl.father))
-          (designation base (poi base cpl.mother));
+          (designation base (poi base (father cpl)))
+          (designation base (poi base (mother cpl)));
         fprintf log_oc.val "- %s\n" (designation base elder);
         fprintf log_oc.val "- %s\n" (designation base x)
       }
@@ -2228,13 +2232,13 @@ value pass3 gen fname =
          match gen.g_fam.arr.(Adef.int_of_ifam ifam) with
          [ Right3 fam cpl _ ->
              match
-               (gen.g_per.arr.(Adef.int_of_iper cpl.father),
+               (gen.g_per.arr.(Adef.int_of_iper (father cpl)),
                 gen.g_per.arr.(Adef.int_of_iper ip))
              with
              [ (Right3 pfath _ _, Right3 p _ _) ->
                  do {
-                   if List.memq cpl.father p.related then ()
-                   else p.related := [cpl.father :: p.related];
+                   if List.memq (father cpl) p.related then ()
+                   else p.related := [(father cpl) :: p.related];
                    fam.witnesses := Array.append fam.witnesses [| ip |]
                  }
              | _ -> () ]
@@ -2273,7 +2277,7 @@ value add_parents_to_isolated gen =
   for i = 0 to gen.g_per.tlen - 1 do {
     match gen.g_per.arr.(i) with
     [ Right3 p a u ->
-        if a.parents = None && Array.length u.family = 0 && p.rparents = [] &&
+        if parents a = None && Array.length u.family = 0 && p.rparents = [] &&
            p.related = []
         then
           let fn = gen.g_str.arr.(Adef.int_of_istr p.first_name) in
@@ -2287,7 +2291,7 @@ value add_parents_to_isolated gen =
             [ Right3 fam cpl des ->
                 do {
                   des.children := [| p.cle_index |];
-                  a.parents := Some ifam;
+                  set_parents a (Some ifam);
                 }
             | _ -> () ];
           }
@@ -2406,10 +2410,10 @@ value check_parents_children base =
   do {
     for i = 0 to base.data.persons.len - 1 do {
       let a = base.data.ascends.get i in
-      match a.parents with
+      match parents a with
       [ Some ifam ->
           let fam = foi base ifam in
-          if fam.fam_index == Adef.ifam_of_int (-1) then a.parents := None
+          if fam.fam_index == Adef.ifam_of_int (-1) then set_parents a None
           else
             let cpl = coi base ifam in
             let des = doi base ifam in
@@ -2420,31 +2424,31 @@ value check_parents_children base =
                 "%s is not the child of his/her parents\n"
                 (designation base p);
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base cpl.father));
+                (designation base (poi base (father cpl)));
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base cpl.mother));
+                (designation base (poi base (mother cpl)));
               fprintf log_oc.val "=> no more parents for him/her\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
-              a.parents := None
+              set_parents a None
             }
       | None -> () ];
       fam_to_delete.val := [];
       let u = base.data.unions.get i in
       for j = 0 to Array.length u.family - 1 do {
         let cpl = coi base u.family.(j) in
-        if Adef.iper_of_int i <> cpl.father &&
-           Adef.iper_of_int i <> cpl.mother
+        if Adef.iper_of_int i <> (father cpl) &&
+           Adef.iper_of_int i <> (mother cpl)
         then do {
           fprintf log_oc.val
             "%s is spouse in this family but neither husband nor wife:\n"
             (designation base (base.data.persons.get i));
           fprintf log_oc.val "- %s\n"
-            (designation base (poi base cpl.father));
+            (designation base (poi base (father cpl)));
           fprintf log_oc.val "- %s\n"
-            (designation base (poi base cpl.mother));
-          let fath = poi base cpl.father in
-          let moth = poi base cpl.mother in
+            (designation base (poi base (mother cpl)));
+          let fath = poi base (father cpl) in
+          let moth = poi base (mother cpl) in
           let ffn = sou base fath.first_name in
           let fsn = sou base fath.surname in
           let mfn = sou base moth.first_name in
@@ -2452,14 +2456,14 @@ value check_parents_children base =
           if ffn = "?" && fsn = "?" && mfn <> "?" && msn <> "?" then do {
             fprintf log_oc.val
               "However, the husband is unknown, I set him as husband\n";
-            (uoi base cpl.father).family := [| |];
-            cpl.father := Adef.iper_of_int i;
+            (uoi base (father cpl)).family := [| |];
+            set_father cpl (Adef.iper_of_int i);
           }
           else if mfn = "?" && msn = "?" && ffn <> "?" && fsn <> "?" then do {
             fprintf log_oc.val
               "However, the wife is unknown, I set her as wife\n";
-            (uoi base cpl.mother).family := [| |];
-            cpl.mother := Adef.iper_of_int i;
+            (uoi base (mother cpl)).family := [| |];
+            set_mother cpl (Adef.iper_of_int i);
           }
           else do {
             fprintf log_oc.val "=> deleted this family for him/her\n";
@@ -2489,15 +2493,15 @@ value check_parents_children base =
       for j = 0 to Array.length des.children - 1 do {
         let a = aoi base des.children.(j) in
         let p = poi base des.children.(j) in
-        match a.parents with
+        match parents a with
         [ Some ifam ->
             if Adef.int_of_ifam ifam <> i then do {
               fprintf log_oc.val "Other parents for %s\n"
                 (designation base p);
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base cpl.father));
+                (designation base (poi base (father cpl)));
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base cpl.mother));
+                (designation base (poi base (mother cpl)));
               fprintf log_oc.val "=> deleted in this family\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
@@ -2510,13 +2514,13 @@ value check_parents_children base =
                 "%s has no parents but is the child of\n"
                 (designation base p);
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base cpl.father));
+                (designation base (poi base (father cpl)));
               fprintf log_oc.val "- %s\n"
-                (designation base (poi base cpl.mother));
+                (designation base (poi base (mother cpl)));
               fprintf log_oc.val "=> added parents\n";
               fprintf log_oc.val "\n";
               flush log_oc.val;
-              a.parents := Some fam.fam_index
+              set_parents a (Some fam.fam_index)
             } ]
       };
       if to_delete.val <> [] then
@@ -2544,17 +2548,17 @@ value kill_family base fam ip =
 
 value kill_parents base ip =
   let a = aoi base ip in
-  a.parents := None
+  set_parents a None
 ;
 
 value effective_del_fam base fam cpl des =
   let ifam = fam.fam_index in
   do {
-    kill_family base fam cpl.father;
-    kill_family base fam cpl.mother;
+    kill_family base fam (father cpl);
+    kill_family base fam (mother cpl);
     Array.iter (kill_parents base) des.children;
-    cpl.father := Adef.iper_of_int (-1);
-    cpl.mother := Adef.iper_of_int (-1);
+    set_father cpl (Adef.iper_of_int (-1));
+    set_mother cpl (Adef.iper_of_int (-1));
     des.children := [| |];
     fam.fam_index := Adef.ifam_of_int (-1)
   }
@@ -2571,8 +2575,8 @@ value check_parents_sex base =
   for i = 0 to base.data.couples.len - 1 do {
     let cpl = base.data.couples.get i in
     let fam = base.data.families.get i in
-    let fath = poi base cpl.father in
-    let moth = poi base cpl.mother in
+    let fath = poi base (father cpl) in
+    let moth = poi base (mother cpl) in
     if fam.relation = NoSexesCheck then ()
     else if fath.sex = Female || moth.sex = Male then do {
       if fath.sex = Female then
@@ -2628,12 +2632,12 @@ value rec negative_date_ancestors base p =
       | None -> () ]
     };
     let a = aoi base p.cle_index in
-    match a.parents with
+    match parents a with
     [ Some ifam ->
         let cpl = coi base ifam in
         do {
-          negative_date_ancestors base (poi base cpl.father);
-          negative_date_ancestors base (poi base cpl.mother)
+          negative_date_ancestors base (poi base (father cpl));
+          negative_date_ancestors base (poi base (mother cpl))
         }
     | _ -> () ]
   }
@@ -2682,7 +2686,7 @@ value finish_base base =
       let p = persons.(i) in
       let a = ascends.(i) in
       let u = unions.(i) in
-      if a.parents <> None && Array.length u.family != 0 ||
+      if parents a <> None && Array.length u.family != 0 ||
          p.notes <> string_empty
       then do {
         if sou base p.first_name = "?" then do {

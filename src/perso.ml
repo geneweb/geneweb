@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.53 2003-12-23 11:56:05 ddr Exp $ *)
+(* $Id: perso.ml,v 4.54 2004-07-16 16:17:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -182,13 +182,13 @@ value find_sosa_aux conf base a p =
             gene_find zil
           else
             let asc = aget conf base ip in
-            match asc.parents with
+            match parents asc with
             [ Some ifam ->
                 let cpl = coi base ifam in
                 let z = Num.twice z in
                 match gene_find zil with
                 [ Left zil ->
-                    Left [(z, cpl.father); (Num.inc z 1, cpl.mother) :: zil]
+                    Left [(z, (father cpl)); (Num.inc z 1, (mother cpl)) :: zil]
                 | Right z -> Right z ]
             | None -> gene_find zil ]
         } ]
@@ -214,9 +214,9 @@ value find_sosa_aux conf base a p =
       [ Some ifam ->
           let cpl = coi base ifam in
           let z = Num.twice z in
-          match find z cpl.father with
+          match find z (father cpl) with
           [ Some z -> Some z
-          | None -> find (Num.inc z 1) cpl.mother ]
+          | None -> find (Num.inc z 1) (mother cpl) ]
       | None -> None ]
     }
   in
@@ -295,20 +295,20 @@ value rec eval_variable conf base env sl =
             let ep = (p, a, u, auth) in loop ep Vnone sl
         | _ -> VVnone ]
     | ["father" :: sl] ->
-        match a.parents with
+        match parents a with
         [ Some ifam ->
             let cpl = coi base ifam in
-            let ep = make_ep cpl.father in
-            let cpl = (cpl.father, cpl.mother) in
+            let ep = make_ep (father cpl) in
+            let cpl = ((father cpl), (mother cpl)) in
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
         | None -> VVnone ]
     | ["mother" :: sl] ->
-        match a.parents with
+        match parents a with
         [ Some ifam ->
             let cpl = coi base ifam in
-            let ep = make_ep cpl.mother in
-            let cpl = (cpl.mother, cpl.father) in
+            let ep = make_ep (mother cpl) in
+            let cpl = ((mother cpl), (father cpl)) in
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
         | None -> VVnone ]
@@ -638,7 +638,7 @@ value string_of_origin_file conf base env =
 ;
 
 value string_of_parent_age conf base p a p_auth parent =
-  match a.parents with
+  match parents a with
   [ Some ifam ->
       let cpl = coi base ifam in
       let pp = pget conf base (parent cpl) in
@@ -774,10 +774,10 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) efam =
   | "child_cnt" -> eval_int_env "child_cnt" env
   | "child_name" ->
       let force_surname =
-        match a.parents with
+        match parents a with
         [ None -> False
         | Some ifam ->
-            p_surname base (pget conf base (coi base ifam).father) <>
+            p_surname base (pget conf base (father (coi base ifam))) <>
               p_surname base p ]
       in
       if not p_auth && conf.hide_names then "x x"
@@ -803,7 +803,7 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) efam =
       | _ -> "" ]
   | "family_cnt" -> eval_int_env "family_cnt" env
   | "father_age_at_birth" ->
-      string_of_parent_age conf base p a p_auth (fun cpl -> cpl.father)
+      string_of_parent_age conf base p a p_auth (fun cpl -> (father cpl))
   | "first_name" ->
       if not p_auth && conf.hide_names then "x" else p_first_name base p
   | "first_name_alias" -> string_of_first_name_alias conf base env
@@ -834,7 +834,7 @@ value try_eval_gen_variable conf base env (p, a, u, p_auth) efam =
       string_of_married_to conf base env p p_auth efam
   | "misc_names" -> string_of_misc_names conf base env p p_auth
   | "mother_age_at_birth" ->
-      string_of_parent_age conf base p a p_auth (fun cpl -> cpl.mother)
+      string_of_parent_age conf base p a p_auth (fun cpl -> (mother cpl))
   | "nb_children" ->
       match get_env "fam" env with
       [ Vfam _ _ des -> string_of_int (Array.length des.children)
@@ -1024,7 +1024,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
   | "has_nobility_titles" -> p_auth && p.titles <> []
   | "has_notes" -> p_auth && sou base p.notes <> ""
   | "has_occupation" -> p_auth && sou base p.occupation <> ""
-  | "has_parents" -> a.parents <> None
+  | "has_parents" -> parents a <> None
   | "has_public_name" -> sou base p.public_name <> ""
   | "has_qualifiers" -> p.qualifiers <> []
   | "has_referer" -> Wserver.extract_param "referer: " '\n' conf.request <> ""
@@ -1048,7 +1048,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
         (p.rparents <> [] || related <> [])
       else p_auth && (p.rparents <> [] || p.related <> [])
   | "has_siblings" ->
-      match a.parents with
+      match parents a with
       [ Some ifam -> Array.length (doi base ifam).children > 1
       | None -> False ]
   | "has_sosa" ->
@@ -1489,7 +1489,7 @@ and print_foreach_witness_relation conf base env al (p, _, _, _) =
               if array_memq p.cle_index fam.witnesses then
                 let cpl = coi base ifam in
                 let des = doi base ifam in
-                let cpl = (cpl.father, cpl.mother) in
+                let cpl = ((father cpl), (mother cpl)) in
                 let env = [("fam", Vfam fam cpl des) :: env] in
                 List.iter (print_ast conf base env) al
               else ())
@@ -1534,7 +1534,7 @@ value print conf base p =
     if conf.wizard || conf.friend then None
     else
       let src =
-        match (aget conf base p.cle_index).parents with
+        match parents (aget conf base p.cle_index) with
         [ Some ifam -> sou base (foi base ifam).origin_file
         | None -> "" ]
       in

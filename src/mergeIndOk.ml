@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 4.8 2002-03-11 17:50:44 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 4.9 2004-07-16 16:17:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -197,8 +197,8 @@ value effective_mod_merge conf base sp =
           let ifam = p2_family.(i) in
           let fam = foi base ifam in
           let cpl = coi base ifam in
-          if p2.cle_index = cpl.father then do {
-            cpl.father := p.cle_index;
+          if p2.cle_index = (father cpl) then do {
+            set_father cpl p.cle_index;
             Array.iter
               (fun ip ->
                  let w = poi base ip in
@@ -209,7 +209,7 @@ value effective_mod_merge conf base sp =
                  else ())
               fam.witnesses;
           }
-          else if p2.cle_index = cpl.mother then cpl.mother := p.cle_index
+          else if p2.cle_index = (mother cpl) then set_mother cpl p.cle_index
           else assert False;
           base.func.patch_couple ifam cpl;
         };

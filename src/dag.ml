@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.15 2004-02-16 10:52:04 ddr Exp $ *)
+(* $Id: dag.ml,v 4.16 2004-07-16 16:17:54 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -78,11 +78,11 @@ value make_dag conf base list =
     Array.map
       (fun ip ->
          let pare =
-           match (aget conf base ip).parents with
+           match parents (aget conf base ip) with
            [ Some ifam ->
                let c = coi base ifam in
-               let l = try [M.find c.mother map] with [ Not_found -> [] ] in
-               try [M.find c.father map :: l] with [ Not_found -> l ]
+               let l = try [M.find (mother c) map] with [ Not_found -> [] ] in
+               try [M.find (father c) map :: l] with [ Not_found -> l ]
            | None -> [] ]
          in
          let chil =
@@ -721,15 +721,15 @@ value make_tree_hts
                 (fun list id ->
                    match d.dag.(int_of_idag id).valu with
                    [ Left cip ->
-                       match (aget conf base cip).parents with
+                       match parents (aget conf base cip) with
                        [ Some ifam ->
                            let cpl = coi base ifam in
-                           if ip == cpl.father then
-                             if List.mem_assoc cpl.mother list then list
-                             else [(cpl.mother, Some ifam) :: list]
-                           else if ip == cpl.mother then
-                             if List.mem_assoc cpl.father list then list
-                             else [(cpl.father, Some ifam) :: list]
+                           if ip == (father cpl) then
+                             if List.mem_assoc (mother cpl) list then list
+                             else [((mother cpl), Some ifam) :: list]
+                           else if ip == (mother cpl) then
+                             if List.mem_assoc (father cpl) list then list
+                             else [((father cpl), Some ifam) :: list]
                            else list
                        | None -> list ]
                    | Right _ -> list ])

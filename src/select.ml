@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 4.8 2003-02-12 10:12:53 ddr Exp $ *)
+(* $Id: select.ml,v 4.9 2004-07-16 16:17:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -14,8 +14,8 @@ value is_censored_person threshold p =
 ;
 
 value is_censored_couple base threshold cpl =
-  let fath = poi base cpl.father in
-  let moth = poi base cpl.mother in
+  let fath = poi base (father cpl) in
+  let moth = poi base (mother cpl) in
   is_censored_person threshold fath || is_censored_person threshold moth
 ;
 
@@ -65,8 +65,8 @@ value rec censor_family base per_tab fam_tab flag threshold i no_check =
       let cpl = base.data.couples.get i in
       if no_check || is_censored_couple base threshold cpl then do {
         fam_tab.(i) := fam_tab.(i) lor flag;
-        censor_spouse cpl.father;
-        censor_spouse cpl.mother;
+        censor_spouse (father cpl);
+        censor_spouse (mother cpl);
         censor_descendants i
       }
       else ()
@@ -88,9 +88,9 @@ value flag_family base per_tab fam_tab flag ifam =
   let cpl = coi base ifam in
   do {
     fam_tab.(i) := fam_tab.(i) lor flag;
-    let i = Adef.int_of_iper cpl.father in
+    let i = Adef.int_of_iper (father cpl) in
     per_tab.(i) := per_tab.(i) lor flag;
-    let i = Adef.int_of_iper cpl.mother in
+    let i = Adef.int_of_iper (mother cpl) in
     per_tab.(i) := per_tab.(i) lor flag
   }
 ;
@@ -101,15 +101,15 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
     if per_tab.(i) land flag <> 0 then ()
     else do {
       per_tab.(i) := per_tab.(i) lor flag;
-      match (aoi base iper).parents with
+      match parents (aoi base iper) with
       [ Some ifam ->
           let i = Adef.int_of_ifam ifam in
           if fam_tab.(i) land flag <> 0 then ()
           else do {
             fam_tab.(i) := fam_tab.(i) lor flag;
             let cpl = coi base ifam in
-            add_ancestors cpl.father;
-            add_ancestors cpl.mother
+            add_ancestors (father cpl);
+            add_ancestors (mother cpl)
           }
       | None -> () ]
     }
@@ -118,7 +118,7 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
     add_ancestors iper;
     if with_siblings then do {
       let add_sibling_spouse_parents ip =
-        match (aoi base ip).parents with
+        match parents (aoi base ip) with
         [ Some ifam -> flag_family base per_tab fam_tab flag ifam
         | None -> () ]
       in
@@ -143,7 +143,7 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
                              add_sibling_spouse_parents ip;
                              ()
                            })
-                        [cpl.father; cpl.mother]
+                        [(father cpl); (mother cpl)]
                     })
                  (uoi base ip).family
              })
@@ -164,17 +164,17 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
         if per_tab.(i) land anc_flag <> 0 then ()
         else do {
           per_tab.(i) := per_tab.(i) lor anc_flag;
-          match (aoi base iper).parents with
+          match parents (aoi base iper) with
           [ Some ifam ->
               let i = Adef.int_of_ifam ifam in
               if fam_tab.(i) land anc_flag <> 0 then ()
               else do {
                 fam_tab.(i) := fam_tab.(i) lor anc_flag;
                 let cpl = coi base ifam in
-                add_siblings cpl.father;
-                add_siblings cpl.mother;
-                ancestors_loop cpl.father;
-                ancestors_loop cpl.mother
+                add_siblings (father cpl);
+                add_siblings (mother cpl);
+                ancestors_loop (father cpl);
+                ancestors_loop (mother cpl)
               }
           | None -> () ]
         }
@@ -183,14 +183,14 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
         let i = Adef.int_of_iper iper in
         if per_tab.(i) land anc_flag <> 0 then do {
           per_tab.(i) := per_tab.(i) land lnot anc_flag;
-          match (aoi base iper).parents with
+          match parents (aoi base iper) with
           [ Some ifam ->
               let i = Adef.int_of_ifam ifam in
               if fam_tab.(i) land anc_flag <> 0 then do {
                 fam_tab.(i) := fam_tab.(i) land lnot anc_flag;
                 let cpl = coi base ifam in
-                remove_anc_flag cpl.father;
-                remove_anc_flag cpl.mother
+                remove_anc_flag (father cpl);
+                remove_anc_flag (mother cpl)
               }
               else ()
           | None -> () ]
@@ -212,9 +212,9 @@ value select_descendants
     let i = Adef.int_of_ifam ifam in
     do {
       fam_tab.(i) := fam_tab.(i) lor flag;
-      let i = Adef.int_of_iper cpl.father in
+      let i = Adef.int_of_iper (father cpl) in
       per_tab.(i) := per_tab.(i) lor flag;
-      let i = Adef.int_of_iper cpl.mother in
+      let i = Adef.int_of_iper (mother cpl) in
       per_tab.(i) := per_tab.(i) lor flag
     }
   in
@@ -234,7 +234,7 @@ value select_descendants
                select_family ifam cpl;
                if not no_spouses_parents then
                  let sp = spouse iper cpl in
-                 match (aoi base sp).parents with
+                 match parents (aoi base sp) with
                  [ Some ifam -> select_family ifam (coi base ifam)
                  | None -> () ]
                else ();
@@ -255,11 +255,11 @@ value select_descendants_ancestors base per_tab fam_tab no_spouses_parents ip =
       if tab.(Adef.int_of_iper ip) = anc_mark then list
       else do {
         tab.(Adef.int_of_iper ip) := anc_mark;
-        match (aoi base ip).parents with
+        match parents (aoi base ip) with
         [ Some ifam ->
             let cpl = coi base ifam in
-            let list = loop list cpl.father in
-            loop list cpl.mother
+            let list = loop list (father cpl) in
+            loop list (mother cpl)
         | None ->
             [ip :: list] ]
       }
@@ -295,14 +295,14 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
     if is_deleted_family fam then ()
     else
       let des = base.data.descends.get i in
-      let fath = poi base cpl.father in
-      let moth = poi base cpl.mother in
+      let fath = poi base (father cpl) in
+      let moth = poi base (mother cpl) in
       if Name.strip_lower (sou base fath.surname) = surname ||
          Name.strip_lower (sou base moth.surname) = surname
       then do {
         fam_tab.(i) := True;
-        per_tab.(Adef.int_of_iper cpl.father) := True;
-        per_tab.(Adef.int_of_iper cpl.mother) := True;
+        per_tab.(Adef.int_of_iper (father cpl)) := True;
+        per_tab.(Adef.int_of_iper (mother cpl)) := True;
         Array.iter
           (fun ic ->
              let p = poi base ic in
@@ -316,16 +316,16 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
         else
           List.iter
             (fun x ->
-               match (aoi base x).parents with
+               match parents (aoi base x) with
                [ Some ifam when not fam_tab.(Adef.int_of_ifam ifam) ->
                    let cpl = coi base ifam in
                    do {
                      fam_tab.(Adef.int_of_ifam ifam) := True;
-                     per_tab.(Adef.int_of_iper cpl.father) := True;
-                     per_tab.(Adef.int_of_iper cpl.mother) := True
+                     per_tab.(Adef.int_of_iper (father cpl)) := True;
+                     per_tab.(Adef.int_of_iper (mother cpl)) := True
                    }
                | _ -> () ])
-            [cpl.father; cpl.mother]
+            [(father cpl); (mother cpl)]
       }
       else ()
   }

@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.10 2003-02-04 13:21:15 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.11 2004-07-16 16:17:54 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -117,3 +117,14 @@ value surnames_pieces : string -> list string;
 value arg_list_of_string : string -> list string;
 
 value sort_person_list : base -> list person -> list person;
+
+value father : gen_couple 'a -> 'a;
+value mother : gen_couple 'a -> 'a;
+value parent : 'a -> 'a -> gen_couple 'a;
+
+value set_father : gen_couple 'a -> 'a -> unit;
+value set_mother : gen_couple 'a -> 'a -> unit;
+
+value parents : gen_ascend 'a -> option 'a;
+value no_parents : unit -> gen_ascend 'a;
+value set_parents : gen_ascend 'a -> option 'a -> unit;

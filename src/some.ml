@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.23 2003-08-26 08:46:39 ddr Exp $ *)
+(* $Id: some.ml,v 4.24 2004-07-16 16:17:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -380,18 +380,18 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
              }
              else ();
              if br = None || br = Some n then
-               match (aget conf base p.cle_index).parents with
+               match parents (aget conf base p.cle_index) with
                [ Some ifam ->
                    let cpl = coi base ifam in
                    do {
-                     let pp = pget conf base cpl.father in
+                     let pp = pget conf base (father cpl) in
                      if is_hidden pp then
                        Wserver.wprint "&lt;&lt;"
                      else
                        let href = Util.acces conf base pp in
                        wprint_geneweb_link conf href "&lt;&lt;";
                      Wserver.wprint "\n&amp;\n";
-                     let pp = pget conf base cpl.mother in
+                     let pp = pget conf base (mother cpl) in
                      if is_hidden pp then
                        Wserver.wprint "&lt;&lt;"
                      else
@@ -486,19 +486,19 @@ value select_ancestors conf base name_inj ipl =
     (fun ipl ip ->
        let p = pget conf base ip in
        let a = aget conf base ip in
-       match a.parents with
+       match parents a with
        [ Some ifam ->
            let cpl = coi base ifam in
-           let fath = pget conf base cpl.father in
-           let moth = pget conf base cpl.mother in
+           let fath = pget conf base (father cpl) in
+           let moth = pget conf base (mother cpl) in
            let s = str_inj p.surname in
            if str_inj fath.surname <> s && str_inj moth.surname <> s &&
               not (List.memq ip ipl) then
-             if List.memq cpl.father ipl then ipl
+             if List.memq (father cpl) ipl then ipl
              else if not (is_hidden fath) &&
                has_at_least_2_children_with_surname conf base (doi base ifam)
                  p.surname then
-               [cpl.father :: ipl]
+               [(father cpl) :: ipl]
              else [ip :: ipl]
            else ipl
        | _ -> [ip :: ipl] ])

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 4.5 2002-11-18 12:36:28 ddr Exp $ *)
+(* $Id: merge.ml,v 4.6 2004-07-16 16:17:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -62,16 +62,16 @@ value print conf base p =
              match main_title base p with
              [ Some t -> Wserver.wprint "%s" (one_title_text conf base p t)
              | None -> () ];
-             match (aoi base p.cle_index).parents with
+             match parents (aoi base p.cle_index) with
              [ Some ifam ->
                  let cpl = coi base ifam in
                  Wserver.wprint ",\n%s"
                    (transl_a_of_b conf
                       (transl_nth conf "son/daughter/child"
                          (index_of_sex p.sex))
-                      (person_title_text conf base (poi base cpl.father) ^
+                      (person_title_text conf base (poi base (father cpl)) ^
                          " " ^ transl_nth conf "and" 0 ^ " " ^
-                         person_title_text conf base (poi base cpl.mother)))
+                         person_title_text conf base (poi base (mother cpl))))
              | None -> () ];
              Wserver.wprint "\n<br>\n";
            })

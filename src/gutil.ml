@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.15 2003-11-28 10:17:29 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.16 2004-07-16 16:17:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -211,9 +211,58 @@ value designation base p =
   let nom = p_surname base p in prenom ^ "." ^ string_of_int p.occ ^ " " ^ nom
 ;
 
+ifndef GDAGNET then
+declare
+  value father cpl = cpl.father;
+  value mother cpl = cpl.mother;
+  value parent father mother = {father = father; mother = mother};
+
+  value set_father cpl father = cpl.father := father;
+  value set_mother cpl mother = cpl.mother := mother;
+
+  value parents asc = asc.parents;
+  value no_parents () = {parents = None; consang = Adef.fix (-1)};
+  value set_parents asc =
+    fun
+    [ None -> asc.parents := None
+    | Some p -> asc.parents := Some p ]
+  ;
+end
+else
+declare
+  value father cpl =
+    if Array.length cpl.parent >= 1 then cpl.parent.(0)
+    else invalid_arg "father"
+  ;
+  value mother cpl =
+    if Array.length cpl.parent >= 2 then cpl.parent.(1)
+    else invalid_arg "mother"
+  ;
+  value parent father mother = {parent = [| father; mother |]};
+
+  value set_father cpl father =
+    if Array.length cpl.parent >= 1 then cpl.parent.(0) := father
+    else invalid_arg "set_father"
+  ;
+  value set_mother cpl mother =
+    if Array.length cpl.parent >= 2 then cpl.parent.(1) := mother
+    else invalid_arg "set_mother"
+  ;
+
+  value parents asc =
+    if Array.length asc.parents >= 1 then Some asc.parents.(0) else None
+  ; 
+  value no_parents () = {parents = [| |]; consang = Adef.fix (-1)};
+  value set_parents asc =
+    fun
+    [ None -> asc.parents := [| |]
+    | Some p -> asc.parents := [| p |] ]
+  ;
+end;
+
 value spouse ip cpl =
-  if ip == cpl.father then cpl.mother
-  else if ip == cpl.mother then cpl.father
+  if ip == father cpl then mother cpl
+  else if ip == mother cpl then father cpl
   else invalid_arg "spouse"
 ;
 
@@ -278,7 +327,7 @@ value person_misc_names base p =
         List.fold_left
           (fun list ifam ->
              let cpl = coi base ifam in
-             let husband = poi base cpl.father in
+             let husband = poi base (father cpl) in
              let husband_surname = p_surname base husband in
              let husband_surnames_aliases =
                List.map (sou base) husband.surnames_aliases
@@ -323,10 +372,10 @@ value person_misc_names base p =
         list p.titles
     in
     let list =
-      match (aoi base p.cle_index).parents with
+      match parents (aoi base p.cle_index) with
       [ Some ifam ->
           let cpl = coi base ifam in
-          let fath = poi base cpl.father in
+          let fath = poi base (father cpl) in
           let first_names =
             [first_name :: List.map (sou base) p.first_names_aliases]
           in
@@ -487,10 +536,10 @@ value check_noloop base error =
     match tab.(i) with
     [ NotVisited ->
         do {
-          match (base.data.ascends.get i).parents with
+          match parents (base.data.ascends.get i) with
           [ Some fam ->
-              let fath = (coi base fam).father in
-              let moth = (coi base fam).mother in
+              let fath = father (coi base fam) in
+              let moth = mother (coi base fam) in
               do {
                 tab.(i) := BeingVisited;
                 noloop (Adef.int_of_iper fath);
@@ -518,13 +567,13 @@ value check_noloop_for_person_list base error ipl =
     match tab.(i) with
     [ NotVisited ->
         do {
-          match (aoi base ip).parents with
+          match parents (aoi base ip) with
           [ Some ifam ->
               let cpl = coi base ifam in
               do {
                 tab.(i) := BeingVisited;
-                noloop cpl.father;
-                noloop cpl.mother;
+                noloop (father cpl);
+                noloop (mother cpl);
                 ()
               }
           | None -> () ];
@@ -788,8 +837,8 @@ value check_normal_marriage_date_for_someone base error warning fam ip =
 value check_normal_marriage_date base error warning fam =
   let cpl = coi base fam.fam_index in
   do {
-    check_normal_marriage_date_for_someone base error warning fam cpl.father;
-    check_normal_marriage_date_for_someone base error warning fam cpl.mother;
+    check_normal_marriage_date_for_someone base error warning fam (father cpl);
+    check_normal_marriage_date_for_someone base error warning fam (mother cpl);
   }
 ;
 
@@ -837,8 +886,8 @@ value sort_children base warning ifam des =
 
 value check_family base error warning fam cpl des =
   let ifam = fam.fam_index in
-  let fath = poi base cpl.father in
-  let moth = poi base cpl.mother in
+  let fath = poi base (father cpl) in
+  let moth = poi base (mother cpl) in
   do {
     match fath.sex with
     [ Male -> birth_before_death base warning fath
@@ -860,10 +909,10 @@ value check_family base error warning fam cpl des =
              birth_before_death base warning child;
              born_after_his_elder_sibling base error warning child np ifam
                des;
-             child_born_after_his_parent base error warning child cpl.father;
-             child_born_after_his_parent base error warning child cpl.mother;
-             child_born_before_mother_death base warning child cpl.mother;
-             possible_father base warning child cpl.father;
+             child_born_after_his_parent base error warning child (father cpl);
+             child_born_after_his_parent base error warning child (mother cpl);
+             child_born_before_mother_death base warning child (mother cpl);
+             possible_father base warning child (father cpl);
              child_has_sex warning child;
              match Adef.od_of_codate child.birth with
              [ Some d -> Some (child, d)
@@ -1049,7 +1098,7 @@ value map_family_ps fp fs fam =
    fam_index = fam.fam_index}
 ;
 
-value map_couple_p fp fam = {father = fp fam.father; mother = fp fam.mother};
+value map_couple_p fp fam = parent (fp (father fam)) (fp (mother fam));
 
 value map_descend_p fp des = {children = Array.map fp des.children};
 

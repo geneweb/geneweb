@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.88 2004-07-01 14:00:25 ddr Exp $ *)
+(* $Id: util.ml,v 4.89 2004-07-16 16:17:57 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -436,11 +436,11 @@ value p_getint env label =
 
 value parent_has_title base p =
   let a = aoi base p.cle_index in
-  match a.parents with
+  match parents a with
   [ Some ifam ->
       let cpl = coi base ifam in
-      let fath = poi base cpl.father in
-      let moth = poi base cpl.mother in
+      let fath = poi base (father cpl) in
+      let moth = poi base (mother cpl) in
       fath.access <> Private && fath.titles <> [] ||
       moth.access <> Private && moth.titles <> []
   | _ -> False ]
@@ -558,9 +558,7 @@ value pget (conf : config) base ip =
 ;
 
 value aget (conf : config) base ip =
-  if is_restricted conf base ip then
-    { parents = None;
-      consang = Adef.fix_of_float 0.0 }
+  if is_restricted conf base ip then no_parents ()
   else base.data.ascends.get (Adef.int_of_iper ip)
 ;
 
@@ -1003,13 +1001,13 @@ value url_no_index conf base =
           if is_deleted_family (base.data.families.get i) then None
           else
             let cpl = base.data.couples.get i in
-            let p = pget conf base cpl.father in
+            let p = pget conf base (father cpl) in
             let f = scratch p.first_name in
             let s = scratch p.surname in
             if f = "" || s = "" then None
             else
               let oc = string_of_int p.occ in
-              let u = uget conf base cpl.father in
+              let u = uget conf base (father cpl) in
               let n =
                 loop 0 where rec loop k =
                   if u.family.(k) == Adef.ifam_of_int i then string_of_int k
@@ -1513,15 +1511,15 @@ value specify_homonymous conf base p =
   | (_, []) ->
       let a = aget conf base p.cle_index in
       let ifam =
-        match a.parents with
+        match parents a with
         [ Some ifam ->
             let cpl = coi base ifam in
             let fath =
-              let fath = pget conf base cpl.father in
+              let fath = pget conf base (father cpl) in
               if p_first_name base fath = "?" then None else Some fath
             in
             let moth =
-              let moth = pget conf base cpl.mother in
+              let moth = pget conf base (mother cpl) in
               if p_first_name base moth = "?" then None else Some moth
             in
             Some (fath, moth)
@@ -1865,11 +1863,11 @@ value branch_of_sosa conf base ip n =
       fun
       [ [] -> Some [(ip, sp) :: ipl]
       | [goto_fath :: nl] ->
-          match (aget conf base ip).parents with
+          match parents (aget conf base ip) with
           [ Some ifam ->
               let cpl = coi base ifam in
-              if goto_fath then loop [(ip, sp) :: ipl] cpl.father Male nl
-              else loop [(ip, sp) :: ipl] cpl.mother Female nl
+              if goto_fath then loop [(ip, sp) :: ipl] (father cpl) Male nl
+              else loop [(ip, sp) :: ipl] (mother cpl) Female nl
           | _ -> None ] ]
     in
     loop [] ip (pget conf base ip).sex (expand [] n)
@@ -2035,7 +2033,7 @@ exception Ok;
 value has_nephews_or_nieces conf base p =
   try
     let a = aget conf base p.cle_index in
-    match a.parents with
+    match parents a with
     [ Some ifam ->
         let des = doi base ifam in
         do {
