@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.81 2001-03-14 18:01:12 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.82 2001-03-14 20:48:32 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -16,6 +16,7 @@ value wizard_just_friend = ref False;
 value only_address = ref "";
 value cgi = ref False;
 value default_lang = ref "fr";
+value choose_browser_lang = ref False;
 value images_dir = ref "";
 value log_file = ref "";
 value log_flags =
@@ -234,7 +235,7 @@ value input_lexicon lang =
 ;
 
 value alias_lang lang =
-  if String.length lang <> 2 then lang
+  if String.length lang < 2 then lang
   else
     let fname =
        List.fold_right Filename.concat [Util.lang_dir.val; "lang"]
@@ -245,10 +246,12 @@ value alias_lang lang =
         let lang =
           try
             loop (input_line ic) where rec loop line =
-              if String.length line >= 5 && line.[2] = '='
-              && line.[0] = lang.[0] && line.[1] = lang.[1] then
-                String.sub line 3 2
-              else loop (input_line ic)
+              match Gutil.lindex line '=' with
+              [ Some i ->
+                  if i + 3 = String.length line && lang = String.sub line 0 i
+                  then String.sub line (i + 1) 2
+                  else loop (input_line ic)
+              | None -> loop (input_line ic) ]
           with
           [ End_of_file -> lang ]
         in
@@ -621,6 +624,32 @@ value check_file_name cgi request s =
           return raise Exit ]
 ;
 
+value http_preferred_language request =
+  let v = Wserver.extract_param "accept-language: " '\n' request in
+  if v = "" then ""
+  else
+    let s = String.lowercase v in
+    let list =
+      loop [] 0 0 where rec loop list i len =
+        if i == String.length s then
+          List.rev [Buff.get len :: list]
+        else if s.[i] = ',' then
+          loop [Buff.get len :: list] (i + 1) 0
+        else
+          loop list (i + 1) (Buff.store len s.[i])
+    in
+    let list = List.map strip_spaces list in
+    loop list where rec loop =
+      fun
+      [ [lang :: list] ->
+          let lang = alias_lang lang in
+          let this_lang_dir =
+            List.fold_right Filename.concat [Util.lang_dir.val; "lang"] lang
+          in
+          if Sys.file_exists this_lang_dir then lang else loop list
+      | [] -> "" ]
+;
+
 value make_conf cgi from_addr (addr, request) script_name contents env =
   let utm = Unix.time () in
   let tm = Unix.localtime utm in
@@ -664,6 +693,11 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
     (command, base_file, passwd, env, access_type)
   in
   let (lang, env) = extract_assoc "lang" env in
+  let lang =
+    if lang = "" && choose_browser_lang.val then
+      http_preferred_language request
+    else lang
+  in
   let lang = alias_lang lang in
   let (from, env) =
     match extract_assoc "opt" env with
@@ -1351,6 +1385,9 @@ value main () =
      ("-lang", Arg.String (fun x -> default_lang.val := x),
       "<lang>
        Set a default language (default: fr).");
+     ("-blang", Arg.Set choose_browser_lang,
+      "
+       Select the user browser language if any.");
      ("-only", Arg.String (fun x -> only_address.val := x),
       "<address>
        Only inet address accepted.");

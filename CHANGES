@@ -5,6 +5,10 @@ GeneWeb version 4.01
   - [14 Mar 01] Added Brazilian Portuguese (Paulo Francisco Sedrez).
 
 * GeneWeb server or CGI (gwd)
+  - [14 Mar 01] Added option "-blang": if no language is specified in
+    the request (i.e. explicitely selected by a flag, for example), choose
+    preferably the user preferred language (the one of his browser) rather
+    than the default data base language.
   - [13 Mar 01] Fixed problem in displaying "anniversaries month"
     in Estonian: the month appeared with all its declinations.
 
