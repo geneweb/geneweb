@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.30 2003-11-09 01:40:13 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.31 2003-11-27 10:11:16 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -116,6 +116,9 @@ value print_choice conf base p effective_level =
           Wserver.wprint
             "- %s <input type=checkbox name=image value=on><br>\n"
             (capitale (transl_nth conf "image/images" 1));
+          Wserver.wprint
+            "- %s <input name=bd size=1 maxlength=2 value=0><br>\n"
+            (capitale (transl conf "border"));
         end;
         tag "td valign=top" begin
           Wserver.wprint "<input type=radio name=t value=L> %s\n"
@@ -1563,8 +1566,10 @@ value tree_reference gv conf base p s =
   if conf.cancel_links || is_hidden p then s
   else
     let im = p_getenv conf.env "image" = Some "on" in
+    let bd = match p_getint conf.env "bd" with [ Some x -> x | None -> 0 ] in
     "<a href=\"" ^ commd conf ^ "m=A;t=T;v=" ^ string_of_int gv ^ ";" ^
-      acces conf base p ^ (if im then ";image=on" else "") ^ "\">" ^ s ^
+      acces conf base p ^ (if im then ";image=on" else "") ^
+      (if bd > 0 then ";bd=" ^ string_of_int bd else "") ^ "\">" ^ s ^
       "</a>"
 ;
 
@@ -1680,6 +1685,11 @@ value print_tree_with_table conf base gv p =
     | Cell _ Left _ _ -> "align=right"
     | _ -> "" ]
   in
+  let bd =
+    match p_getint conf.env "bd" with
+    [ Some x -> x
+    | None -> 0 ]
+  in
   let print_ancestor_link gen first po =
     do {
       if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
@@ -1698,6 +1708,7 @@ value print_tree_with_table conf base gv p =
     do {
       if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
       stag "td" "align=center%s" (colspan po) begin
+        if bd > 0 then Wserver.wprint "<table border=%d><tr><td>" bd else ();
         let txt =
           match po with
           [ Empty -> "&nbsp;"
@@ -1710,6 +1721,7 @@ value print_tree_with_table conf base gv p =
         match po with
         [ Empty -> ()
         | Cell p _ _ _ -> Wserver.wprint "%s" (Dag.image_txt conf base p) ];
+        if bd > 0 then Wserver.wprint "</td></tr></table>" else ();
       end;
       Wserver.wprint "\n"
     }
