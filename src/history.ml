@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 2.3 1999-09-24 11:55:31 ddr Exp $ *)
+(* $Id: history.ml,v 2.4 1999-09-24 12:06:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -75,7 +75,7 @@ value action_text conf =
       let s = transl_nth conf "family/families" 0 in
       transl_decline conf "delete" s
   | "sf" ->
-      let s = transl_nth conf "family/families" 0 in
+      let s = transl_nth conf "family/families" 1 in
       transl_decline conf "switch" s
   | "ap" ->
       let s = transl_nth conf "person/persons" 0 in
