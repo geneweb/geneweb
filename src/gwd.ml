@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.16 1999-05-17 16:40:09 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.17 1999-06-22 08:07:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -785,6 +785,7 @@ value geneweb_cgi str addr =
   let request = [] in
   let request = add "user-agent" "HTTP_USER_AGENT" request in
   let request = add "referer" "HTTP_REFERER" request in
+  let request = add "content-type" "CONTENT_TYPE" request in
   connection True (Unix.ADDR_UNIX addr, request) str
 ;
 
