@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.11 1999-12-06 14:54:41 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.12 1999-12-06 20:54:13 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -426,15 +426,13 @@ value treat_new_row d t =
             let cnt = children_colspan / g in
             List.fold_left
               (fun (t, j) (_, c) ->
-                 if c <> max_parent_colspan then failwith "not impl"
-                 else
-                   let rec loop cc t j =
-                     if cc = 0 then (t, j)
-                     else
-                       let t = insert_columns t (cnt - 1) j in
-                       let j = j + cnt in loop (cc - 1) t j
-                   in
-                   loop c t j)
+                 let rec loop cc t j =
+                   if cc = 0 then (t, j)
+                   else
+                     let t = insert_columns t (cnt - 1) j in
+                     let j = j + cnt in loop (cc - 1) t j
+                 in
+                 loop c t j)
               (t, j) parents
           in
           let children =
@@ -515,7 +513,7 @@ value group_ghost t =
     for j = 1 to Array.length t.table.(0) - 1 do
       match (t.table.(i + 1).(j - 1).elem, t.table.(i + 1).(j).elem) with
       [ (Ghost x, Ghost _) ->
-          if t.table.(i).(j - 1).elem = t.table.(i).(j).elem then
+          if t.table.(i).(j - 1).span = t.table.(i).(j).span then
             t.table.(i + 1).(j) :=
               {elem = Ghost x; span = t.table.(i + 1).(j - 1).span}
           else ()
