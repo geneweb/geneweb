@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.72 1999-07-16 13:28:05 ddr Exp $
+# $Id: lexicon.txt,v 2.73 1999-07-17 04:21:07 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2950,7 +2950,7 @@ he:  שם בציבור
 it: appellativo pubblico
 nl: publieke naam
 no: offisielt navn
-pt: apelido
+pt: nome p&uacute;blico
 se: publikt namn
 
     qualifier
@@ -3261,7 +3261,7 @@ dk: efternavn mangler
 en: surname missing
 eo: familinomo maltrafanta
 es: falta apellido
-fr: nom manquant
+fr: patronyme manquant
 he:  שם משפחה חסר
 it: cognome mancante
 nl: familienaam ontbreekt
@@ -3275,7 +3275,7 @@ dk: efternavn ikke fundet
 en: surname not found
 eo: familinomo ne trovita
 es: apellido no encontrado
-fr: nom pas trouv&eacute;
+fr: patronyme pas trouv&eacute;
 he:  שם משפחה לא נמצא
 it: cognome non trovato
 nl: familienaam niet gevonden
@@ -3290,7 +3290,7 @@ dk: efternavn/efternavne
 en: surname/surnames
 eo: familinomo/familinomoj
 es: apellido/apellidos
-fr: nom/noms
+fr: patronyme/patronymes
 he:  שם משפחה/ שמות משפחה
 it: cognome/cognomi
 nl: familienaam/familienamen
@@ -3357,7 +3357,7 @@ dk: de %d efternavne
 en: the %d surnames
 eo: la %d familinomoj
 es: los %d apellidos
-fr: les %d noms
+fr: les %d patronymes
 he:  %d שמות המשפחה
 it: i %d cognomi
 nl: de %d familienamen

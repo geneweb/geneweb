@@ -22,17 +22,15 @@ La base contiene actualmente %n personas.
 Buscar: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
-Se trata:
 <ul>
 <li> <input type=radio name=t value=PN checked>
-De <em>un nombre</em> y de <em>un apellido</em>,
-o de <em>un nombre publico</em>,
-o de <em>un alias</em>%u,
-o de <em>n&uacute;mero Sosa</em> respecto a %a%u.
-<li> <input type=radio name=t value=P>
-De un <em>nombre</em>.
-<li> <input type=radio name=t value=N>
-De un <em>apellido</em>.
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%u
+[or] <em>n&uacute;mero Sosa</em> respecto a %a%u
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 

@@ -18,7 +18,8 @@ GeneWeb version 2.05
 
 * GeneWeb Daemon/CGI (gwd)
   - [Jul 17, 99] Added automatic search by surname in welcome page when
-    search by full name fails (no need to select "it is a surname").
+    search by full name fails (no need to select "it is a surname"). Same
+    automatic search in relationship computing.
   - [Jul 16, 99] Added a "back" button in case of update error (useful
     for browsers which loose the data in the forms when navigating).
   - [Jul 15, 99] Added ability to cancel GeneWeb links in relationship
@@ -46,6 +47,11 @@ GeneWeb version 2.05
   - [Jul 2, 99] Generate now dates of the form "FROM..TO.." for titles.
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
+  - [Jul 17, 99] In welcome pages, simplified the text "it is a first name and
+    surname and so on". Added case "surname" (see above "added automatic
+    search by surname" in section "GeneWeb daemon/CGI"). Changed also French
+    term for "surname" ("nom" changed into "patronyme" more common among French
+    genealogists)
   - [Jul 8, 99] Updated Swedish phrases (Stig Petersson)
   - [Jul 3, 99] Updated Danish phrases (Hans Albeck)
 

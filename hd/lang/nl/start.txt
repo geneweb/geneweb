@@ -19,14 +19,15 @@ Deze verzameling heeft nu %n personen.
 Zoek: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
-De keuze is:
 <ul>
 <li> <input type=radio name=t value=PN checked>
-Of <em>voornaam</em> en <em>familienaam</em>,
-of <em>publieke naam</em>, of <em>alias</em>%u,
-of %[<em>Sosa number</em> relative to %a%]%u.
-<li> <input type=radio name=t value=P> Een <em>voornaam</em>.
-<li> <input type=radio name=t value=N> Een <em>familienaam</em>.
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%u
+[or] <em>Sosa number</em> relative to %a%u
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.15 1999-07-15 22:22:44 ddr Exp $ *)
+(* $Id: relation.ml,v 2.16 1999-07-17 04:21:09 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -37,17 +37,19 @@ value print_menu conf base p =
        tag "ul" begin
          html_li conf;
          Wserver.wprint "<input type=radio name=t value=PN checked>\n";
-         Wserver.wprint "<em>%s %s</em> %s <em>%s</em> %s <em>%s</em>\n"
-           (capitale (transl_nth conf "first name/first names" 0))
+         Wserver.wprint
+           "<em>%s %s</em> %s <em>%s</em> %s <em>%s</em> %s <em>%s</em>\n"
+           (transl_nth conf "first name/first names" 0)
            (transl_nth conf "surname/surnames" 0)
            (transl conf "or") (transl conf "public name")
-           (transl conf "or") (transl conf "alias");
+           (transl conf "or") (nominative (transl conf "alias"))
+           (transl conf "or") (transl_nth conf "surname/surnames" 0);
          html_li conf;
          Wserver.wprint "<input type=radio name=t value=P> <em>%s</em>\n"
-           (capitale (transl_nth conf "first name/first names" 0));
+           (transl_nth conf "first name/first names" 0);
          html_li conf;
          Wserver.wprint "<input type=radio name=t value=N> <em>%s</em>\n"
-           (capitale (transl_nth conf "surname/surnames" 0));
+           (transl_nth conf "surname/surnames" 0);
        end;
        Wserver.wprint "%s\n" (capitale (transl conf "cancel GeneWeb links"));
        Wserver.wprint "<input type=checkbox name=cgl value=on>\n";

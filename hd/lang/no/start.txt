@@ -22,15 +22,15 @@ Databasen inneholder n&aring; %n personer.
 S&oslash;k: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
-Navnetype for s&oslash;ket:
 <ul>
 <li> <input type=radio name=t value=PN checked>
-Enten <em>fornavn</em> og <em>etternavn</em>,
-eller <em>offisielt navn</em>,
-eller <em>alias</em>%u,
-eller %[<em>Sosa number</em> relative to %a%]%u.
-<li> <input type=radio name=t value=P> <em>Fornavn</em>.
-<li> <input type=radio name=t value=N> <em>Etternavn</em>.
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%u
+[or] <em>Sosa number</em> relative to %a%u
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 

@@ -22,14 +22,15 @@ La base contient actuellement %n personnes.
 Chercher: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
-Il s'agit:
 <ul>
 <li> <input type=radio name=t value=PN checked>
-Soit de <em>pr&eacute;nom</em> et <em>nom</em>,
-soit de <em>nom public</em>, soit d'<em>alias</em>%u,
-soit d'un <em>num&eacute;ro Sosa</em> par rapport &agrave; %a%u.
-<li> <input type=radio name=t value=P> D'un <em>pr&eacute;nom</em>.
-<li> <input type=radio name=t value=N> D'un <em>nom</em>.
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%u
+[or] <em>num&eacute;ro Sosa</em> par rapport &agrave; %a%u
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
