@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.157 2000-09-04 13:32:46 ddr Exp $
+# $Id: lexicon.txt,v 3.158 2000-09-07 08:14:51 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -26,7 +26,7 @@ se: iso-8859-1
 he: rtl
 
      !languages
-de: cn=Chinesisch/dk=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/no=Norwegisch/pt=Portugiesisch/es=Spanisch/se=Schwedisch/cs=Tschechisch
+de: af=Afrikaans/cn=Chinesisch/dk=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/no=Norwegisch/pt=Portugiesisch/ru=Russisch/es=Spanisch/se=Schwedisch/cs=Tschechisch
 dk: af=afrikaans/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
 en: af=Afrikaans/cn=Chinese/cs=Czech/dk=Danish/nl=Dutch/en=English/eo=Esperanto/fi=Finnish/fr=French/de=German/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/no=Norwegian/pt=Portuguese/es=Spanish/ru=Russian/se=Swedish
 eo: en=anglo/eo=esperanto/fr=franco
@@ -5352,6 +5352,7 @@ ru: íà÷èíàþòñÿ ñ
 se: som b&ouml;rjar med
 
     statistics
+de: Statistiken    
 dk: statistikker
 en: statistics
 eo: statistikoj
@@ -5557,6 +5558,7 @@ ru: %d èì¸í
 se: de %d f&ouml;rnamnen
 
     the %d oldest perhaps still alive
+de: die %d &auml;ltesten vermutlich noch lebenden    
 dk: de %d &aelig;ldste af de muligt levende
 en: the %d oldest perhaps still alive
 eo: la %d plej maljunaj eble ankoraù vivantaj
@@ -5590,6 +5592,7 @@ ru: %d ôàìèëèé
 se: de %d efternamnen
 
     the %d who lived the longest
+de: die %d die am l&auml;ngsten lebten   
 dk: de %d som har levet l&aelig;ngst
 en: the %d who lived the longest
 eo: la %d, kiuj vivis plejlonge
@@ -5905,7 +5908,7 @@ se: den 4:e generationen
     the latest %d births
 af: die laaste %d geboortes
 cs: poslední %d narození
-de: die letzen %d Geburten
+de: die letzten %d Geburten
 dk: de seneste %d f&oslash;dsler
 en: the latest %d births
 eo: la lastaj %d naskigxoj
@@ -5925,7 +5928,7 @@ se: de senaste %d f&ouml;dslarna
     the latest %d deaths
 af: die laaste %d afsterwes
 cs: poslední %d úmrtí
-de: die letzen %d Ableben
+de: die letzten %d Ableben
 dk: de seneste %d d&oslash;dsfald
 en: the latest %d deaths
 eo: la lastaj %d mortoj
@@ -5944,7 +5947,7 @@ se: de senaste %d d&ouml;dsfallen
 
     the latest %d marriages
 af: die laaste %d huwelike
-de: die letzen %d Heiraten
+de: die letzten %d Heiraten
 dk: de seneste %d bryllupper
 en: the latest %d marriages
 eo: la lastaj %d edzigxoj
