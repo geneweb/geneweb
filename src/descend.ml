@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.21 2000-11-03 15:25:27 ddr Exp $ *)
+(* $Id: descend.ml,v 3.22 2000-11-13 20:48:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -156,9 +156,11 @@ value print_choice conf base p niveau_effectif =
 
 value descendants_title conf base p h =
   let txt_fun = if h then gen_person_text_no_html else gen_person_text in
-  Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
-    (transl_decline conf "of (same or greater generation level)"
-       (txt_fun raw_access conf base p))
+  let s =
+    transl_decline2 conf "%1 of (same or greater generation level) %2"
+       (transl conf "descendants") (txt_fun raw_access conf base p)
+  in
+  Wserver.wprint "%s" (capitale s)
 ;
 
 value afficher_menu_descendants conf base p =
@@ -706,9 +708,10 @@ value afficher_descendants_numerotation conf base niveau_max ancetre =
       wprint_geneweb_link conf
         ("m=D;i=" ^ string_of_int (Adef.int_of_iper ancetre.cle_index) ^
          ";v=" ^ string_of_int niveau_max ^ ";t=G")
-        (capitale (transl conf "descendants") ^ " " ^
-         transl_decline conf "of (same or greater generation level)"
-           (person_text conf base ancetre))
+        (capitale
+           (transl_decline2 conf "%1 of (same or greater generation level) %2"
+              (transl conf "descendants")
+              (person_text conf base ancetre)))
   in
   let marks = Array.create (base.data.persons.len) False in
   let paths = Array.create (base.data.persons.len) [] in

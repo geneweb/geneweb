@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.20 2000-11-11 20:29:50 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.21 2000-11-13 20:48:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -59,7 +59,8 @@ value decline_word case s ibeg iend =
       else if s.[i] == ':' && s.[i+2] == ':' then i
       else loop (i + 1)
   in
-  if s.[i] == '+' then
+  if i = ibeg then String.sub s ibeg (iend - ibeg)
+  else if s.[i] == '+' then
     let k =
       loop ibeg where rec loop i =
         if i == iend then i
