@@ -4,6 +4,10 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.08
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [22 Aug 00] Added test: no more display "age at death" if negative
+    (because of erroneous dates).
+
 GeneWeb Version 3.07
 --------------------
 
