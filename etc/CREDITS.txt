@@ -9,6 +9,7 @@
 				Wijnand J. Nijs
 		German		Markus Mottl
 				Falko Trojahn
+				Thomas Omerzu
 		Hebrew		Jonathan Marder
 				Ruth Marder
 		Italian		Raffaele Sena
