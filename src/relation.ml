@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.39 2003-11-27 14:29:03 ddr Exp $ *)
+(* $Id: relation.ml,v 4.40 2003-11-27 14:59:32 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -173,7 +173,16 @@ value print_menu conf base p =
             Wserver.wprint "<input name=bd size=1 maxlength=2 value=0><br>\n";
           end;
           tag "td" "align=right" begin
-            Wserver.wprint "&nbsp;";
+            Wserver.wprint "\
+<table><tr><td>%s</td>
+<td><input type=radio name=color value=\"\" checked></td>\n"
+              (capitale (transl conf "color"));
+            List.iter
+              (fun c ->
+                 Wserver.wprint "\
+<td bgcolor=%s><input type=radio name=color value=%s></td>\n" c c)
+              ["FFC0C0"; "FFFFCO"; "COFFC0"; "COFFFF"; "C0C0FF"; "FFC0FF"];
+            Wserver.wprint "</tr></table>\n";
           end;
         end;
         tag "tr" begin
@@ -1499,6 +1508,9 @@ value print_main_relationship conf base long p1 p2 rel =
     match p_getenv conf.env "bd" with
     [ None | Some ("0" | "") -> ()
     | Some x -> conf.senv := conf.senv @ [("bd", x)] ];
+    match p_getenv conf.env "color" with
+    [ None | Some "" -> ()
+    | Some x -> conf.senv := conf.senv @ [("color", x)] ];
     match rel with
     [ None ->
         if p1.cle_index == p2.cle_index then

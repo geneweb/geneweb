@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.161 2003-11-25 14:39:38 ddr Exp $
+# $Id: lexicon.txt,v 4.162 2003-11-27 14:59:31 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2628,6 +2628,10 @@ ro: clicheaza pe %s
 ru: םאזלטעו "%s"
 sl: kliknite na "%s"
 sv: klicka "%s"
+
+    color
+en: colour
+fr: couleur
 
     comment
 af: kommentaar

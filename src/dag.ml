@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.13 2003-11-09 01:40:13 ddr Exp $ *)
+(* $Id: dag.ml,v 4.14 2003-11-27 14:59:32 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -764,7 +764,10 @@ value make_tree_hts
   let td =
     match Util.p_getenv conf.env "td" with
     [ Some x -> " " ^ x
-    | _ -> "" ]
+    | _ ->
+        match Util.p_getenv conf.env "color" with
+	[ None | Some "" -> ""
+        | Some x -> " bgcolor=" ^ x ] ]
   in
   let indi_txt n =
     let (bd, td) =
