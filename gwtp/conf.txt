@@ -9,7 +9,30 @@
 
 Friend password: <input name=friend_passwd value="%vfriend_passwd;"><br>
 Wizard password: <input name=wizard_passwd value="%vwizard_passwd;"><br>
-Default language: <input name=default_lang value="%vdefault_lang;" size=2><br>
+Default language:
+<select name="default_lang">
+<option value=""%edefault_lang=;><tt>-</tt>
+<option value="af"%edefault_lang=af;>Afrikaans
+<option value="cn"%edefault_lang=cn;>Chinese
+<option value="cs"%edefault_lang=cs;>Czech
+<option value="dk"%edefault_lang=dk;>Danish
+<option value="nl"%edefault_lang=nl;>Dutch
+<option value="en"%edefault_lang=en;>English
+<option value="eo"%edefault_lang=eo;>Esperanto
+<option value="fi"%edefault_lang=fi;>Finnish
+<option value="fr"%edefault_lang=fr;>French
+<option value="de"%edefault_lang=de;>German
+<option value="he"%edefault_lang=he;>Hebrew
+<option value="is"%edefault_lang=is;>Icelandic
+<option value="it"%edefault_lang=it;>Italian
+<option value="lv"%edefault_lang=lv;>Latvian
+<option value="no"%edefault_lang=no;>Norwegian
+<option value="pt"%edefault_lang=pt;>Portuguese
+<option value="es"%edefault_lang=es;>Spanish
+<option value="ru"%edefault_lang=ru;>Russian
+<option value="se"%edefault_lang=se;>Swedish
+</select>
+<br>
 
 <p>
 
@@ -17,21 +40,22 @@ Advice:
 
 <ul>
 
-<li>You can choose an empty friend password: in this case, everybody
-is a "friend".
+<li>If you want that everybody be "friend", clear your friend password
 
-<li>Choose a non-empty and not too simple wizard password.
+<li>Keep an non-empty and not too simple wizard password.
 
 <li>This is not checked: you take your responsabilities.
+
+<li>If you don't know, keep the proposed passwords.
 
 </ul>
 
 <p>
 
-Other configuration parameters exist, but as they may have an
-influence on the performances of the server computer, ask the GeneWeb
-site administrator if you want to change them. Be aware of the fact
-that your resquest may not be accepted.
+Other configuration parameters exist, but they may have an influence
+on the performances of the server computer. Ask the GeneWeb site
+administrator if you want to change them. Be aware of the fact that
+your resquest may not be accepted.
 
 <p>
 <input type=submit value=Update>
