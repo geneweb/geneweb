@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.5 2000-04-09 01:17:34 ddr Exp $
+# $Id: geneweb.spec,v 3.6 2000-04-28 23:46:50 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -230,6 +230,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/fr/access.htm
 /home/geneweb/gw/gw/doc/fr/consang.htm
 /home/geneweb/gw/gw/doc/fr/diruse.htm
+/home/geneweb/gw/gw/doc/fr/divide.htm
 /home/geneweb/gw/gw/doc/fr/faq.htm
 /home/geneweb/gw/gw/doc/fr/links.htm
 /home/geneweb/gw/gw/doc/fr/maint.htm
@@ -284,6 +285,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/etc/robot.txt
 /home/geneweb/gw/gw/images/gwback.jpg
 /home/geneweb/gw/gw/images/gwlogo.gif
+/home/geneweb/gw/gw/images/l-af.jpg
 /home/geneweb/gw/gw/images/l-cn.jpg
 /home/geneweb/gw/gw/images/l-cs.jpg
 /home/geneweb/gw/gw/images/l-de.jpg
@@ -301,8 +303,27 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/images/l-pt.jpg
 /home/geneweb/gw/gw/images/l-ru.jpg
 /home/geneweb/gw/gw/images/l-se.jpg
+/home/geneweb/gw/gw/images/t-af.gif
+/home/geneweb/gw/gw/images/t-cn.gif
+/home/geneweb/gw/gw/images/t-cs.gif
+/home/geneweb/gw/gw/images/t-de.gif
+/home/geneweb/gw/gw/images/t-dk.gif
+/home/geneweb/gw/gw/images/t-en.gif
+/home/geneweb/gw/gw/images/t-eo.gif
+/home/geneweb/gw/gw/images/t-es.gif
+/home/geneweb/gw/gw/images/t-fi.gif
+/home/geneweb/gw/gw/images/t-fr.gif
+/home/geneweb/gw/gw/images/t-he.gif
+/home/geneweb/gw/gw/images/t-is.gif
+/home/geneweb/gw/gw/images/t-it.gif
+/home/geneweb/gw/gw/images/t-nl.gif
+/home/geneweb/gw/gw/images/t-no.gif
+/home/geneweb/gw/gw/images/t-pt.gif
+/home/geneweb/gw/gw/images/t-ru.gif
+/home/geneweb/gw/gw/images/t-se.gif
 /home/geneweb/gw/gw/images/up.jpg
 /home/geneweb/gw/gw/lang/advanced.txt
+/home/geneweb/gw/gw/lang/af/start.txt
 /home/geneweb/gw/gw/lang/cn/start.txt
 /home/geneweb/gw/gw/lang/cs/start.txt
 /home/geneweb/gw/gw/lang/de/start.txt
