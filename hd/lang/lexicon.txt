@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.238 2001-02-19 18:51:24 ddr Exp $
+# $Id: lexicon.txt,v 3.239 2001-02-21 12:28:19 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -4299,6 +4299,7 @@ se: meddelande inlagt
 
     message/previous message/next message
 ct: missatge/missate anterior/missate següent
+de: Nachricht/vorherige Nachricht/n&auml;chste Nachricht
 dk: meddelelse/foreg&aring;ende meddelelse/n&aelig;ste meddelelse
 en: message/previous message/next message
 eo: mesagxo:a:+n/antaùa mesagxo/sekvanta mesagxo
@@ -4625,6 +4626,7 @@ se: inga tr&auml;ffar
 
     no sexes check
 ct: no verificar els sexes
+de: keine Kontrolle des Geschlechts
 dk: ingen verificering af k&oslash;nnene
 en: no sexes check
 fr: pas de v&eacute;rification des sexes
