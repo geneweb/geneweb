@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.77 2000-03-15 09:49:05 ddr Exp $
+# $Id: lexicon.txt,v 3.78 2000-03-16 19:22:06 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3083,6 +3083,7 @@ se: huvudtitel
 dk: mandlige linie/kvindelige linie
 en: male line/female line
 fr: ligne agnatique/ligne cognatique
+se: manliga linjen/kvinnliga linjen
 
     marriage of %t after his/her death
 cs: sòatek s %t po své smrti
