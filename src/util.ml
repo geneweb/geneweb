@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.28 1999-02-12 12:37:17 ddr Exp $ *)
+(* $Id: util.ml,v 1.29 1999-02-12 14:55:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -9,12 +9,13 @@ open Gutil;
 value lang_dir = ref ".";
 value base_dir = ref ".";
 
+value is_rtl conf =
+  try Hashtbl.find conf.lexicon " !dir" = "rtl" with
+  [ Not_found -> False ]
+;
+
 value hack_for_hebrew conf =
-  try
-    if Hashtbl.find conf.lexicon " !dir" = "rtl" then Wserver.wprint "<!-- -->"
-    else ()
-  with
-  [ Not_found -> () ]
+  if is_rtl conf then Wserver.wprint "<!-- -->" else ()
 ;
 
 value html_br conf =
@@ -36,6 +37,15 @@ value html_li conf =
      hack_for_hebrew conf;
      Wserver.wprint "\n";
   return ()
+;
+
+value html_name_text conf s =
+  if is_rtl conf then "<span dir=ltr>" ^ s ^ "</span>" else s
+;
+
+value html_name conf s =
+  if is_rtl conf then Wserver.wprint "<span dir=ltr>%s</span>" s
+  else Wserver.wprint "%s" s
 ;
 
 value ansel_to_ascii s =
@@ -209,7 +219,7 @@ value person_text conf base p =
     | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
     | (n, []) -> n ]
   in
-  coa conf (beg ^ " " ^ sou base p.surname)
+  html_name_text conf (coa conf (beg ^ " " ^ sou base p.surname))
 ;
 
 value person_text_no_html conf base p =
@@ -232,7 +242,7 @@ value person_text_without_surname conf base p =
         sou base p.first_name ^ " <em>" ^ sou base nn ^ "</em>"
     | (_, []) -> sou base p.first_name ]
   in
-  coa conf s
+  html_name_text conf (coa conf s)
 ;
 
 value afficher_personne conf base p =
@@ -307,8 +317,11 @@ value afficher_personne_un_titre_referencee conf base p t =
        match t.t_name with
        [ Tname s -> afficher_nom_titre_reference conf base p (sou base s)
        | _ -> afficher_personne_referencee conf base p ];
-     Wserver.wprint ", <em>%s %s</em>" (coa conf (sou base t.t_title))
-       (coa conf (sou base t.t_place));
+     Wserver.wprint ", <em>";
+     html_name conf (coa conf (sou base t.t_title));
+     Wserver.wprint " ";
+     html_name conf (coa conf (sou base t.t_place));
+     Wserver.wprint "</em>";
   return ()
 ;
 
