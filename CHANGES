@@ -2,16 +2,11 @@ GeneWeb version 3.11
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [26 Jan 01] (a bit technical): for server mode (i.e. not CGI), added
-    option "-nofork" asking not to run a new process at each request.
-    This option was added because some users under Windows reported that
-    sometimes, the service gwd blocks after some requests and need to be
-    stopped and restarted. This option may resolve this problem (not sure).
-    Other advantage: may answer faster. Drawbacks: may stop gwd in case of
-    internal error (not supposed to happen, but...), possible risk of
-    memory leak. Not recommended under Unix because only one request is
-    treated at a time (in Windows version, it is always the case,
-    anyway).
+  - [26 Jan 01] Under Windows, added option "-noproc" asking not to run a
+    new process at each request. This option was added because some users
+    under Windows reported that sometimes, the service gwd blocks after some
+    requests and need to be stopped and restarted. This option may resolve
+    this problem (not sure).
   - [25 Jan 01] When searching somebody by a name, if there are several
     possible answers, also display now the first names aliases (if there
     are some).
