@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.25 2000-04-12 15:22:08 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.26 2000-05-02 02:38:21 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -15,8 +15,6 @@ value friend_passwd = ref "";
 value only_address = ref "";
 value cgi = ref False;
 value default_lang = ref "fr";
-value uid = ref None;
-value gid = ref None;
 value log_file = ref "";
 value log_flags =
   [Open_wronly; Open_append; Open_creat; Open_text; Open_nonblock]
@@ -1057,19 +1055,13 @@ Type control C to stop the service
               return ()
             else exit 0
           else ();
-          try
-            do Unix.mkdir (Filename.concat Util.cnt_dir.val "cnt") 0o755;
-               if uid.val <> None then
-                 Unix.chmod (Filename.concat Util.cnt_dir.val "cnt") 0o777
-               else ();
-            return ()
-          with [ Unix.Unix_error _ _ _ -> () ];
+          try Unix.mkdir (Filename.concat Util.cnt_dir.val "cnt") 0o777 with
+          [ Unix.Unix_error _ _ _ -> () ];
        return ()
      else ();
   return
   Wserver.f selected_addr.val selected_port.val tmout
-    (ifdef UNIX then max_clients.val else None) (uid.val, gid.val)
-    (connection False)
+    (ifdef UNIX then max_clients.val else None) (connection False)
 ;
 
 value geneweb_cgi str addr =
@@ -1244,12 +1236,6 @@ value main () =
          "<num>
        Max number of clients treated at the same time (default: no limit)
        (not cgi).");
-        ("-setuid", Arg.Int (fun x -> uid.val := Some x),
-         "<num>
-       Set user id, for example to use port < 1024 as simple user.");
-        ("-setgid", Arg.Int (fun x -> gid.val := Some x),
-         "<num>
-       Set group id.");
         ("-daemon", Arg.Set daemon,
          "
        Unix daemon mode.")]

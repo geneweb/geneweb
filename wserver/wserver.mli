@@ -1,13 +1,13 @@
-(* $Id: wserver.mli,v 3.2 2000-01-16 10:34:51 ddr Exp $ *)
+(* $Id: wserver.mli,v 3.3 2000-05-02 02:38:22 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 (* module [Wserver]: elementary web service *)
 
 value f :
-  option string -> int -> int -> option int -> (option int * option int) ->
+  option string -> int -> int -> option int ->
     ((Unix.sockaddr * list string) -> string -> unit) -> unit
 ;
-   (* [Wserver.f addr port tmout maxc (uid, gid) g] starts an elementary
+   (* [Wserver.f addr port tmout maxc g] starts an elementary
        httpd server at port [port] in the current machine. The variable
        [addr] is [Some the-address-to-use] or [None] for any of the
        available addresses of the present machine. The port number is
@@ -18,11 +18,7 @@ value f :
        the string request itself (extracted from [request]). The function
        [g] has [tmout] seconds to answer some text on standard output.
        If [maxc] is [Some n], maximum [n] clients can be treated at the
-       same time; [None] means no limit. See the example below.
-       If [uid] is [Some n] the user id is changed into [n] after the
-       socket bind to the port number, allowing to use e.g. 80 as port
-       (must be root to do that) but running the program as simple user.
-       If [gid] is [Some n] the group id is changed as well. *)
+       same time; [None] means no limit. See the example below. *)
 
 value wprint : format 'a out_channel unit -> 'a;
     (* To be called to print page contents. *)

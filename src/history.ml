@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 3.2 2000-03-08 14:35:30 ddr Exp $ *)
+(* $Id: history.ml,v 3.3 2000-05-02 02:38:21 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -31,13 +31,18 @@ value record conf base (fn, sn, occ) action =
   in
   if do_it then
     let fname = file_name conf in
-    let oc = open_out_gen ext_flags 0o644 fname in
-    let (hh, mm, ss) = conf.time in
-    do Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d [%s] %s %s.%d %s\n"
-	 conf.today.year conf.today.month conf.today.day hh mm ss conf.user
-         action fn occ sn;
-       close_out oc;
-    return ()
+    match
+      try Some (open_out_gen ext_flags 0o644 fname) with
+      [ Sys_error _ -> None ]
+    with
+    [ Some oc ->
+        let (hh, mm, ss) = conf.time in
+        do Printf.fprintf oc "%04d-%02d-%02d %02d:%02d:%02d [%s] %s %s.%d %s\n"
+	     conf.today.year conf.today.month conf.today.day hh mm ss conf.user
+             action fn occ sn;
+           close_out oc;
+        return ()
+    | None -> () ]
   else ()
 ;
 
