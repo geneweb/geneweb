@@ -7,6 +7,9 @@ GeneWeb version 4.08
   - [11 Sep 02] Added documentation in Italian (Latino Imparato).
 
 * GeneWeb server or CGI (gwd)
+  - [01 Dec 02] Added ability for named wizards (wizards defined in a
+    wizard password file) to remove the messages they posted.
+    messages in the database forum.
   - [14 Nov 02] Fixed bug: in database notes updates, there was no check
     that the update form was up to date: it was then possible to submit
     old versions, and there was no conflict access check (that two wizards

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.19 2002-11-27 20:13:02 ddr Exp $ *)
+(* $Id: forum.ml,v 4.20 2002-12-01 12:17:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -281,6 +281,12 @@ value backward_pos conf pos =
   | None -> pos ]
 ;
 
+value passwd_in_file conf =
+  match p_getenv conf.base_env "wizard_passwd_file" with
+  [ Some "" | None -> False
+  | Some _ -> True ]
+;
+
 value print_forum_message conf base pos =
   match get_message conf pos with
   [ Some (time, ident, wizard, email, subject, mess, next_pos, forum_length) ->
@@ -338,16 +344,22 @@ value print_forum_message conf base pos =
         if browser_doesnt_have_tables conf then ()
         else Wserver.wprint "</table>";
         Wserver.wprint "</dl>\n";
-(*
-        if wizard <> "" && conf.wizard && conf.user = wizard then
+        if wizard <> "" && conf.wizard && conf.user = wizard &&
+          passwd_in_file conf
+        then
           let s = message_txt conf 0 in
           do {
             Wserver.wprint "<p>\n";
-            Wserver.wprint "<a href=\"%sm=FORUM_DEL;p=%d\">%s</a>\n"
-              (commd conf) pos (transl_decline conf "delete" s)
+            tag "form" "method=post action=\"%s\"" conf.command begin
+              Util.hidden_env conf;
+              Wserver.wprint "<input type=hidden name=m value=FORUM_DEL>\n";
+              Wserver.wprint "<input type=hidden name=p value=%d>\n" pos;
+              Wserver.wprint "<input type=submit value=\"%s\">\n"
+                (capitale
+                   (transl_decline conf "delete" (message_txt conf 0)));
+            end;
           }
         else ();
-*)
         trailer conf;
       }
   | None -> print_forum_headers conf base ]
@@ -490,17 +502,78 @@ value print_add_ok conf base =
     [ Update.ModErr -> () ]
 ;
 
-value print_delete_forum_message conf base pos =
-  ()
+(* Deleting a message *)
+
+value internal_error conf base =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  do {
+    rheader conf title;
+    Wserver.wprint "<em>internal error</em>\n";
+    trailer conf;
+    raise Update.ModErr
+  }
+;
+
+value forum_del conf base pos next_pos =
+  let fname = forum_file conf in
+  let tmp_fname = fname ^ "~" in
+  match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let oc = open_out tmp_fname in
+      let len = in_channel_length ic in
+      let pos = len - pos in
+      let next_pos = len - next_pos in
+      do {
+        loop 0 where rec loop i =
+          if i = len then ()
+          else
+            let c = input_char ic in
+            do {
+              if i < pos || i >= next_pos then output_char oc c
+              else ();
+              loop (i + 1);
+            };
+        close_in ic;
+        close_out oc;
+        try Sys.remove fname with [ Sys_error _ -> () ];
+        Sys.rename tmp_fname fname;
+      }
+  | None -> internal_error conf base ]
+;
+
+value print_del_ok conf base =
+  let title _ =
+    Wserver.wprint "%s" (capitale (transl conf "message deleted"))
+  in
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "<a href=\"%sm=FORUM\">%s</a>\n" (commd conf)
+      (capitale (transl conf "database forum"));
+    trailer conf;
+  }
 ;
 
 value delete_forum_message conf base pos =
-  match get_message conf pos with
-  [ Some (time, ident, wizard, email, subject, mess, next_pos, forum_length) ->
-      if conf.wizard && conf.user <> "" && wizard = conf.user then
-        print_delete_forum_message conf base pos
-      else print_forum_headers conf base
-  | None -> print_forum_headers conf base ]
+  let bfile = base_path [] (conf.bname ^ ".gwb") in
+  lock (Iobase.lock_file bfile) with
+  [ Accept ->
+      match get_message conf pos with
+      [ Some
+        (time, ident, wizard, email, subject, mess, next_pos, forum_length) ->
+          if conf.wizard && conf.user <> "" && wizard = conf.user &&
+            passwd_in_file conf
+          then
+            try
+              do {
+                forum_del conf base pos next_pos;
+                print_del_ok conf base;
+              }
+            with
+            [ Update.ModErr -> () ]
+          else print_forum_headers conf base
+      | None -> print_forum_headers conf base ]
+  | Refuse -> Update.error_locked conf base ]
 ;
 
 value print_del conf base =
