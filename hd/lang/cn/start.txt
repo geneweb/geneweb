@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.9 2000-02-24 20:43:16 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.10 2000-03-17 19:34:05 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -106,9 +106,9 @@ or <em>Sosa number</em> relative to %a%E
 %INf<li> <a href="%sw=f"><em>Friend</em></a> access (password).
 %E</ul>
 
-%E%I|ca<form method=get action="%f">
+%E%I|ca<form method=POST action="%f">
 %h<font size=-1>授权用户(friend or wizard), 请输入密码：</font>
-<input name=w size=20 maxlength=200> =&gt;
+<input name=w type=password size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
 </form>
 
