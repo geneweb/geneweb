@@ -2,42 +2,78 @@
 <table border=0>
 <tr>
 <td align=center>
-<a href="%glang=af">
-<img src="%km=IM;v=/l-af.jpg" width=36 height=22 alt=af></a>
-<a href="%glang=cn">
-<img src="%km=IM;v=/l-cn.jpg" width=36 height=22 alt=cn></a>
-<a href="%glang=cs">
-<img src="%km=IM;v=/l-cs.jpg" width=36 height=22 alt=cs></a>
-<a href="%glang=de">
-<img src="%km=IM;v=/l-de.jpg" width=36 height=22 alt=de></a>
-<a href="%glang=dk">
-<img src="%km=IM;v=/l-dk.jpg" width=36 height=22 alt=dk></a>
-<a href="%glang=en">
-<img src="%km=IM;v=/l-en.jpg" width=36 height=22 alt=en></a>
-<a href="%glang=eo">
-<img src="%km=IM;v=/l-eo.jpg" width=36 height=22 alt=eo></a>
-<a href="%glang=es">
-<img src="%km=IM;v=/l-es.jpg" width=36 height=22 alt=es></a>
-<a href="%glang=fi">
-<img src="%km=IM;v=/l-fi.jpg" width=36 height=22 alt=fi></a>
-<a href="%glang=fr">
-<img src="%km=IM;v=/l-fr.jpg" width=36 height=22 alt=fr></a>
-<a href="%glang=he">
-<img src="%km=IM;v=/l-he.jpg" width=36 height=22 alt=he></a>
-<a href="%glang=is">
-<img src="%km=IM;v=/l-is.jpg" width=36 height=22 alt=is></a>
-<a href="%glang=it">
-<img src="%km=IM;v=/l-it.jpg" width=36 height=22 alt=it></a>
-<a href="%glang=nl">
-<img src="%km=IM;v=/l-nl.jpg" width=36 height=22 alt=nl></a>
-<a href="%glang=no">
-<img src="%km=IM;v=/l-no.jpg" width=36 height=22 alt=no></a>
-<a href="%glang=pt">
-<img src="%km=IM;v=/l-pt.jpg" width=36 height=22 alt=pt></a>
-<a href="%glang=ru">
-<img src="%km=IM;v=/l-ru.jpg" width=36 height=22 alt=ru></a>
-<a href="%glang=se">
-<img src="%km=IM;v=/l-se.jpg" width=36 height=22 alt=se></a>
+<a href="%glang=af"
+ onmouseover="iaf.src='%km=IM;v=/t-af.gif'"
+ onmouseout="iaf.src='%km=IM;v=/l-af.jpg'">
+<img src="%km=IM;v=/l-af.jpg" width=36 height=22 alt=af name=iaf border=0></a>
+<a href="%glang=cn"
+ onmouseover="icn.src='%km=IM;v=/t-cn.gif'"
+ onmouseout="icn.src='%km=IM;v=/l-cn.jpg'">
+<img src="%km=IM;v=/l-cn.jpg" width=36 height=22 alt=cn name=icn border=0></a>
+<a href="%glang=cs"
+ onmouseover="ics.src='%km=IM;v=/t-cs.gif'"
+ onmouseout="ics.src='%km=IM;v=/l-cs.jpg'">
+<img src="%km=IM;v=/l-cs.jpg" width=36 height=22 alt=cs name=ics border=0></a>
+<a href="%glang=de"
+ onmouseover="ide.src='%km=IM;v=/t-de.gif'"
+ onmouseout="ide.src='%km=IM;v=/l-de.jpg'">
+<img src="%km=IM;v=/l-de.jpg" width=36 height=22 alt=de name=ide border=0></a>
+<a href="%glang=dk"
+ onmouseover="idk.src='%km=IM;v=/t-dk.gif'"
+ onmouseout="idk.src='%km=IM;v=/l-dk.jpg'">
+<img src="%km=IM;v=/l-dk.jpg" width=36 height=22 alt=dk name=idk border=0></a>
+<a href="%glang=en"
+ onmouseover="ien.src='%km=IM;v=/t-en.gif'"
+ onmouseout="ien.src='%km=IM;v=/l-en.jpg'">
+<img src="%km=IM;v=/l-en.jpg" width=36 height=22 alt=en name=ien border=0></a>
+<a href="%glang=eo"
+ onmouseover="ieo.src='%km=IM;v=/t-eo.gif'"
+ onmouseout="ieo.src='%km=IM;v=/l-eo.jpg'">
+<img src="%km=IM;v=/l-eo.jpg" width=36 height=22 alt=eo name=ieo border=0></a>
+<a href="%glang=es"
+ onmouseover="ies.src='%km=IM;v=/t-es.gif'"
+ onmouseout="ies.src='%km=IM;v=/l-es.jpg'">
+<img src="%km=IM;v=/l-es.jpg" width=36 height=22 alt=es name=ies border=0></a>
+<a href="%glang=fi"
+ onmouseover="ifi.src='%km=IM;v=/t-fi.gif'"
+ onmouseout="ifi.src='%km=IM;v=/l-fi.jpg'">
+<img src="%km=IM;v=/l-fi.jpg" width=36 height=22 alt=fi name=ifi border=0></a>
+<a href="%glang=fr"
+ onmouseover="ifr.src='%km=IM;v=/t-fr.gif'"
+ onmouseout="ifr.src='%km=IM;v=/l-fr.jpg'">
+<img src="%km=IM;v=/l-fr.jpg" width=36 height=22 alt=fr name=ifr border=0></a>
+<a href="%glang=he"
+ onmouseover="ihe.src='%km=IM;v=/t-he.gif'"
+ onmouseout="ihe.src='%km=IM;v=/l-he.jpg'">
+<img src="%km=IM;v=/l-he.jpg" width=36 height=22 alt=he name=ihe border=0></a>
+<a href="%glang=is"
+ onmouseover="iis.src='%km=IM;v=/t-is.gif'"
+ onmouseout="iis.src='%km=IM;v=/l-is.jpg'">
+<img src="%km=IM;v=/l-is.jpg" width=36 height=22 alt=is name=iis border=0></a>
+<a href="%glang=it"
+ onmouseover="iit.src='%km=IM;v=/t-it.gif'"
+ onmouseout="iit.src='%km=IM;v=/l-it.jpg'">
+<img src="%km=IM;v=/l-it.jpg" width=36 height=22 alt=it name=iit border=0></a>
+<a href="%glang=nl"
+ onmouseover="inl.src='%km=IM;v=/t-nl.gif'"
+ onmouseout="inl.src='%km=IM;v=/l-nl.jpg'">
+<img src="%km=IM;v=/l-nl.jpg" width=36 height=22 alt=nl name=inl border=0></a>
+<a href="%glang=no"
+ onmouseover="ino.src='%km=IM;v=/t-no.gif'"
+ onmouseout="ino.src='%km=IM;v=/l-no.jpg'">
+<img src="%km=IM;v=/l-no.jpg" width=36 height=22 alt=no name=ino border=0></a>
+<a href="%glang=pt"
+ onmouseover="ipt.src='%km=IM;v=/t-pt.gif'"
+ onmouseout="ipt.src='%km=IM;v=/l-pt.jpg'">
+<img src="%km=IM;v=/l-pt.jpg" width=36 height=22 alt=pt name=ipt border=0></a>
+<a href="%glang=ru"
+ onmouseover="iru.src='%km=IM;v=/t-ru.gif'"
+ onmouseout="iru.src='%km=IM;v=/l-ru.jpg'">
+<img src="%km=IM;v=/l-ru.jpg" width=36 height=22 alt=ru name=iru border=0></a>
+<a href="%glang=se"
+ onmouseover="ise.src='%km=IM;v=/t-se.gif'"
+ onmouseout="ise.src='%km=IM;v=/l-se.jpg'">
+<img src="%km=IM;v=/l-se.jpg" width=36 height=22 alt=se name=ise border=0></a>
 </td>
 </tr>
 </table>%Ij
