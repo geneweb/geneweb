@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.30 1999-01-16 06:01:28 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.31 1999-01-18 16:01:49 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -777,6 +777,11 @@ value add_indi gen r =
         | None -> "" ]
     | None -> "" ]
   in
+  let aliases =
+    match find_all_fields "NAME" r.rsons with
+    [ [_ :: l] -> List.map (fun r -> r.rval) l
+    | _ -> [] ]
+  in
   let sex =
     match find_field "SEX" r.rsons with
     [ Some {rval = "M"} -> Masculine
@@ -951,7 +956,7 @@ value add_indi gen r =
      public_name = add_string gen public_name;
      photo = add_string gen photo;
      nick_names = if nick_name <> "" then [add_string gen nick_name] else [];
-     aliases = [];
+     aliases = List.map (add_string gen) aliases;
      first_names_aliases =
        if first_name_alias <> "" then [add_string gen first_name_alias]
        else [];

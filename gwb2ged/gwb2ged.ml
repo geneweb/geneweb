@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 1.12 1998-12-16 17:36:19 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.13 1999-01-18 16:01:50 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -78,6 +78,10 @@ value ged_name base oc per =
      match per.surnames_aliases with
      [ [n :: _] -> Printf.fprintf oc "2 SURN %s\n" (encode (sou base n))
      | [] -> () ];
+     List.iter
+       (fun s ->
+          Printf.fprintf oc "1 NAME %s\n" (encode (sou base s)))
+       per.aliases;
   return ()
 ;
 

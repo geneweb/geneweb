@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.20 1998-12-28 15:40:25 ddr Exp $ *)
+(* $Id: perso.ml,v 1.21 1999-01-18 16:01:51 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -396,9 +396,11 @@ value print_family conf base p a ifam =
             | _ -> () ];
          return ()
      | _ -> () ];
-     match sou base fam.comment with
-     [ "" -> ()
-     | str -> Wserver.wprint "\n(%s)" (coa conf str) ];
+     if age_autorise conf base p then
+       match sou base fam.comment with
+       [ "" -> ()
+       | str -> Wserver.wprint "\n(%s)" (coa conf str) ]
+     else ();
      if Array.length children == 0 then ()
      else
        let age_auth =
@@ -432,6 +434,19 @@ value print_families conf base p a =
       return () ]
 ;
 
+value copy_string_with_macros conf s =
+  loop 0 where rec loop i =
+    if i < String.length s then
+      if i + 1 < String.length s && s.[i] = '%' && s.[i+1] = 's' then
+        do Wserver.wprint "%s?" conf.command;
+           List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v)
+             conf.henv;
+        return loop (i + 2)
+      else
+        do Wserver.wprint "%c" s.[i]; return loop (i + 1)
+    else ()
+;
+
 value print_notes conf base p =
   match sou base p.notes with
   [ "" -> ()
@@ -440,7 +455,8 @@ value print_notes conf base p =
         do Wserver.wprint "<h3> %s </h3>\n\n"
              (capitale (transl_nth conf "note/notes" 1));
            Wserver.wprint "<ul><li>\n";
-           Wserver.wprint "%s\n" (coa conf notes);
+           copy_string_with_macros conf (coa conf notes);
+           Wserver.wprint "\n";
            Wserver.wprint "</ul>\n";
         return ()
       else () ]
@@ -458,8 +474,9 @@ value print_not_empty_src conf base first txt isrc =
        else ();
        Wserver.wprint "<br>-\n";
        first.val := False;
-       Wserver.wprint "<font size=-1><em>%s: %s</em></font>\n" (txt ())
-         (coa conf src);
+       Wserver.wprint "<font size=-1><em>%s: " (txt ());
+       copy_string_with_macros conf (coa conf src);
+       Wserver.wprint "</em></font>\n";
     return ()
 ;
 
