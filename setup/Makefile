@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.3 2001-09-08 19:03:58 ddr Exp $
+# $Id: Makefile,v 4.4 2002-01-13 03:05:37 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -24,15 +24,22 @@ test: test_dir wrappers
 
 wrappers:
 	if test "$(CAMLP4F)" = "-DWIN95"; then \
-	  echo 'cd gw; gwd' > test/gwd.bat; \
-	  echo 'cd gw; gwsetup' > test/gwsetup.bat; \
+	  echo 'cd gw' > test/gwd.bat; \
+	  echo 'gwd' >> test/gwd.bat; \
+	  echo 'cd gw' > test/gwsetup.bat; \
+	  echo 'gwsetup' >> test/gwsetup.bat; \
 	else \
-	  echo '#!/bin/sh' > test/gwd; \
-	  echo 'cd gw; exec ./gwd' >> test/gwd; \
-	  echo '#!/bin/sh' > test/gwsetup; \
-	  echo 'cd gw; exec ./gwsetup' >> test/gwsetup; \
+	  (echo '#!/bin/sh'; \
+	   echo 'mkdir -p bases'; \
+	   echo 'cd bases'; \
+	   echo 'exec ../gw/gwd -hd ../gw "$$@"') > test/gwd; \
+	  (echo '#!/bin/sh'; \
+	   echo 'mkdir -p bases'; \
+	   echo 'cd bases'; \
+	   echo 'exec ../gw/gwsetup -gd ../gw "$$@"') > test/gwsetup; \
 	  chmod +x test/gwd test/gwsetup; \
 	fi
+	cd test; ln -s ../../etc/START.htm .
 
 test_dir:
 	mkdir test
