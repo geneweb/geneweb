@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.45 2000-01-03 16:39:26 ddr Exp $
+# $Id: lexicon.txt,v 3.46 2000-01-03 21:23:05 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -267,7 +267,7 @@ se: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prair
     (hebrew month)
 dk: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 en: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
-fr: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
+fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 he: úùøé/ çùåï/ ëñìå/ èáú/ ùáè/ àãø à'/ àãø á'/ ğéñï/ àééø/ ñéåï/ úîåæ/ àá/ àìåì 
 se: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 
