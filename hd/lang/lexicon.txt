@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.124 1999-09-22 09:11:40 ddr Exp $
+# $Id: lexicon.txt,v 2.125 1999-09-22 09:26:57 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -556,7 +556,7 @@ pt: um irm&atilde;o/uma irm&atilde;/um(a) irm&atilde;o(&atilde;)
 se: en halvbror/en halvsyster/ett halvsyskon
 
     a nephew (spouse's nephew)/a niece (spouse's niece)
-de: ein Neffe (des Ehegattes)/eine Nichte (des Ehegattes)
+de: ein Neffe (des Ehegatten)/eine Nichte (des Ehegatten)
 dk: en nev&oslash; (&aelig;gtef&aelig;lles nev&oslash;)/en niece (&aelig;gtef&aelig;lles niece)
 en: a nephew (spouse's nephew)/a niece (spouse's niece)
 es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
@@ -1186,7 +1186,7 @@ pt: cancelar os links Geneweb
 se: utan GeneWeb l&auml;nkar
 
     candidate father/candidate mother/candidate parents
-de: m&ouml;gliches Vater/m&ouml;gliche Mutter/m&ouml;gliche Eltern
+de: m&ouml;glicher Vater/m&ouml;gliche Mutter/m&ouml;gliche Eltern
 dk: mulig fader/mulig moder/mulige for&aelig;ldre
 en: candidate father/candidate mother/candidate parents
 es: padre posible/madre posible/padres posibles
@@ -1198,7 +1198,7 @@ pt: suposto pai/suposta m&atilde;e/supostos pais
 se: m&ouml;jlig far/m&ouml;jlig mor/m&ouml;jliga f&ouml;r&auml;ldrar
 
     candidate son/candidate daughter/candidate child
-de: m&ouml;gliches Sohn/m&ouml;gliche Tochter/m&ouml;gliches Kind
+de: m&ouml;glicher Sohn/m&ouml;gliche Tochter/m&ouml;gliches Kind
 dk: mulig s&oslash;n/mulig datter/muligt barn
 en: candidate son/candidate daughter/candidate child
 es: hijo posible/hija posible/hijo(a) posible
@@ -2126,7 +2126,7 @@ se: inkludera makar
 
     incompatible sexes
 cs: nekompatibilní pohlaví
-de: unvertr&aml;gliche Geschlechter
+de: unvertr&auml;gliche Geschlechter
 dk: k&oslash;n inkompatible
 en: incompatible sexes
 es: sexos incompatibles
@@ -3910,7 +3910,7 @@ pt: depois de amanh&atilde;
 se: i &ouml;vermorgon
 
     the father-in-law/the mother-in-law
-de: der Schwiegervater/die Schwiegetmutter
+de: der Schwiegervater/die Schwiegermutter
 dk: svigerfaderen/svigermoderen
 en: the father-in-law/the mother-in-law
 es: el suegro/la suegra
@@ -4115,7 +4115,7 @@ pt: t&iacute;tulo/t&iacute;tulos
 se: titel/titlar
 
     to add a child to a family, use "%s"
-de: um ein Kind zu einer familie zu hinzuf&uuml;gen, benutzen Sie "%s"
+de: um ein Kind zu einer Familie zu hinzuzuf&uuml;gen, benutzen Sie "%s"
 dk: brug "%s" for at f&oslash;je et barn til en familie
 en: to add a child to a family, use "%s"
 es: para agregar un hijo a una familia, utiliza "%s"
