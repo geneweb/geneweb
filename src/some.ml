@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.22 2003-07-17 08:38:06 ddr Exp $ *)
+(* $Id: some.ml,v 4.23 2003-08-26 08:46:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -338,6 +338,7 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
         else geneweb_link conf ("m=N;v=" ^ code_varenv (Name.lower x)) x
       in
       do {
+        let homonymes = List.sort compare homonymes in
         Wserver.wprint "%s" (access (List.hd homonymes));
         List.iter (fun x -> Wserver.wprint ", %s" (access x))
           (List.tl homonymes);
