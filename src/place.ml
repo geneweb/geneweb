@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.8 2002-01-11 22:15:44 ddr Exp $ *)
+(* $Id: place.ml,v 4.9 2002-01-25 12:04:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -147,6 +147,7 @@ value get_all conf base =
       (fun (istr_pl, _) (cnt, ip) ->
          let s = fold_place inverted (sou base istr_pl) in
          if s <> [] && (ini = "" || List.hd s = ini) then do {
+           let s = List.sort compare s in
            list.val := [(s, cnt.val, ip) :: list.val]; incr len
          }
          else ())
