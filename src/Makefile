@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.6 2001-09-08 18:27:50 ddr Exp $
+# $Id: Makefile,v 4.7 2001-09-08 18:37:44 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -35,7 +35,7 @@ clean::
 	$(RM) gwc consang gwd gwu
 
 gwc.out: $(GWC_OBJS)
-	$(OCAMLC) -custom -ccopt -static unix.cma $(GWC_OBJS) $(LIBUNIX) -o gwc.out
+	$(OCAMLC) -ccopt -static unix.cma $(GWC_OBJS) $(LIBUNIX) -o gwc.out
 
 gwc.opt: $(GWC_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) -ccopt -static unix.cmxa $(GWC_OBJS:.cmo=.cmx) $(LIBUNIX) -o gwc.opt
