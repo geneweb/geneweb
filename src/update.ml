@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.9 2000-04-26 08:53:21 ddr Exp $ *)
+(* $Id: update.ml,v 3.10 2000-05-14 17:01:23 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -84,7 +84,7 @@ value print_return conf =
     List.iter
       (fun (x, v) ->
          Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x
-         (decode_varenv v))
+         (quote_escaped (decode_varenv v)))
       (conf.henv @ conf.env);
     Wserver.wprint "<input type=hidden name=return value=on>\n";
     Wserver.wprint "<input type=submit value=\"%s\">\n"
