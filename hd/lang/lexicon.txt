@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.251 2001-03-09 13:41:52 ddr Exp $
+# $Id: lexicon.txt,v 3.252 2001-03-09 16:01:48 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -514,7 +514,7 @@ it: nth (degree)
 lv: nth (degree)
 nl: n
 no: nth (degree)
-pl: n-ego
+pl: nth (degree)
 pt: nth
 ru: nth (degree)
 se: nth (degree)
@@ -721,7 +721,7 @@ it: un cugino di %s grado/una cugina di %s grado/un(a) cugino(a) di %s grado
 lv: %s brвlзns/mвsоca
 nl: een neef in de %s generatie/een nicht in de %s generatie
 no: %smenning
-pl: kuzyn/kuzynka w %s-tym stopniu
+pl: kuzyn w %s-tym stopniu/kuzynka w %s-tym stopniu
 pt: um primo %s/uma prima %s/um(a) primo(a) %s
 ru: %s-ий кузен/%s-я кузина
 se: %sm&auml;nning

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./q_codes.cmo *)
-(* $Id: perso.ml,v 3.94 2001-03-08 14:13:24 ddr Exp $ *)
+(* $Id: perso.ml,v 3.95 2001-03-09 16:01:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1301,7 +1301,7 @@ and eval_foreach_source conf base env al (p, _, u, p_auth) =
       in
       List.iter (eval_ast conf base env) al
   in
-  do print_src (transl_nth conf "person/persons" 0) p.psources;
+  do print_src (nominative (transl_nth conf "person/persons" 0)) p.psources;
      if p_auth then
        do print_src (transl_nth conf "birth" 0) p.birth_src;
           print_src (transl_nth conf "baptism" 0) p.baptism_src;
