@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.23 2000-08-08 13:23:41 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.24 2000-08-08 13:26:46 ddr Exp $ *)
 
 open Printf;
 
@@ -338,10 +338,13 @@ value send_file str env b tok f fname =
     do printf "content-type: text/html\r\n\r\n";
        printf "\
 <head><title>Error</title></head>\n<body>
-<h1><font color=red>Error</font></h1>
-You selected the file <b>%s</b> instead of <b>base</b>
-</body>
-" fname;
+<h1><font color=red>Error</font></h1>\n";
+       if fname = "" then
+         printf "You must select at least the <b>base</b> file\n"
+       else
+         printf "You selected the file <b>%s</b> instead of <b>base</b>\n"
+           fname;
+       printf "</body>\n";
        printf_link_to_main b tok;
     return ()
 ;
