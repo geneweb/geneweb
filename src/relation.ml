@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.6 2001-03-25 01:44:55 ddr Exp $ *)
+(* $Id: relation.ml,v 4.7 2001-03-25 13:06:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -761,14 +761,14 @@ value same_parents base p1 p2 =
   (aoi base p1.cle_index).parents = (aoi base p2.cle_index).parents
 ;
 
-value print_link conf base info n p1 p2 pp1 pp2 x1 x2 =
+value print_link_name conf base info n p1 p2 pp1 pp2 x1 x2 =
 (*
-  let (p1, pp1, x1, p2, pp2, x2) =
-    if p1.sex <> Neuter then (p1, pp1, x1, p2, pp2, x2)
-    else (p2, pp2, x2, p1, pp1, x1)
+  let (p2, pp2, x2, p1, pp1, x1) =
+    if p2.sex <> Neuter then (p2, pp2, x2, p1, pp1, x1)
+    else (p1, pp1, x1, p2, pp2, x2)
   in
 *)
-  do Wserver.wprint "%s" (person_title_text conf base p1);
+  do Wserver.wprint "%s" (person_title_text conf base p2);
      Wserver.wprint " %s" (transl conf "is");
      if n > 1 then Wserver.wprint " %s" (transl conf "also") else ();
      Wserver.wprint "\n";
@@ -778,43 +778,43 @@ value print_link conf base info n p1 p2 pp1 pp2 x1 x2 =
        let p2 = match pp2 with [ Some p2 -> p2 | _ -> p2 ] in
        let sp1 = pp1 <> None in
        let sp2 = pp2 <> None in
-       if x1 == 0 then
-         if sp2 && x2 == 1 then
-           (parent_in_law_label conf ini_p1.sex, sp1, False)
-         else (ancestor_label conf x2 p1.sex, sp1, sp2)
-       else if x2 == 0 then
+       if x2 == 0 then
          if sp1 && x1 == 1 then
-           (child_in_law_label conf ini_p1.sex, False, sp2)
+           (parent_in_law_label conf ini_p2.sex, False, sp2)
+         else (ancestor_label conf x1 p2.sex, sp1, sp2)
+       else if x1 == 0 then
+         if sp2 && x2 == 1 then
+           (child_in_law_label conf ini_p2.sex, sp1, False)
          else
-           (descendant_label conf base (info, x1) x1 p1, sp1, sp2)
-       else if x1 == x2 then
-         if x1 == 1 && not (same_parents base p1 p2) then
-           (half_brother_label conf p1.sex, sp1, sp2)
-         else if x1 == 1 && (sp1 || sp2) && p1.sex <> Neuter then
-           (brother_in_law_label conf ini_p1.sex, False, False)
-         else (brother_label conf x2 p1.sex, sp1, sp2)
-       else if x1 == 1 then
-         (uncle_label conf base (info, x2) (x2 - x1) p1, sp1, sp2)
+           (descendant_label conf base (info, x2) x2 p2, sp1, sp2)
+       else if x2 == x1 then
+         if x2 == 1 && not (same_parents base p2 p1) then
+           (half_brother_label conf p2.sex, sp1, sp2)
+         else if x2 == 1 && (sp2 || sp1) && p2.sex <> Neuter then
+           (brother_in_law_label conf ini_p2.sex, False, False)
+         else (brother_label conf x1 p2.sex, sp1, sp2)
        else if x2 == 1 then
-         (nephew_label conf (x1 - x2) p1, sp1, sp2)
-       else if x1 < x2 then
+         (uncle_label conf base (info, x1) (x1 - x2) p2, sp1, sp2)
+       else if x1 == 1 then
+         (nephew_label conf (x2 - x1) p2, sp1, sp2)
+       else if x2 < x1 then
          let s =
            transl_decline2 conf "%1 of (same or greater generation level) %2"
-             (brother_label conf x1 p1.sex)
-             (ancestor_label conf (x2 - x1) Neuter)
+             (brother_label conf x2 p2.sex)
+             (ancestor_label conf (x1 - x2) Neuter)
          in
          (s, sp1, sp2)
        else
          let s =
-           let sm = brother_label conf x2 Male in
-           let sf = brother_label conf x2 Female in
-           let d = descendant_label conf base (info, x1) (x1 - x2) p1 in
+           let sm = brother_label conf x1 Male in
+           let sf = brother_label conf x1 Female in
+           let d = descendant_label conf base (info, x2) (x2 - x1) p2 in
            let s =
              if sm = sf then sm
              else
-               let info = ((info, x1), fun r -> r.Consang.lens2) in
-               match get_piece_of_branch conf base info (x1 - x2, x1 - x2) with
-               [ [ip1] -> if (poi base ip1).sex = Male then sm else sf
+               let info = ((info, x2), fun r -> r.Consang.lens2) in
+               match get_piece_of_branch conf base info (x2 - x1, x2 - x1) with
+               [ [ip2] -> if (poi base ip2).sex = Male then sm else sf
                | _ -> (* must be a bug *) sm ]
            in
            transl_decline2 conf "%1 of (same or greater generation level) %2"
@@ -823,21 +823,21 @@ value print_link conf base info n p1 p2 pp1 pp2 x1 x2 =
          (s, sp1, sp2)
      in
      let s =
-       if sp1 then
+       if sp2 then
          transl_decline2 conf "%1 of (same or greater generation level) %2"
-           (transl_nth conf "the spouse" (index_of_sex p1.sex)) s
+           (transl_nth conf "the spouse" (index_of_sex p2.sex)) s
        else s
      in
      let s =
-       if sp2 then
+       if sp1 then
          transl_decline2 conf "%1 of (same or greater generation level) %2"
-           s (transl_nth conf "the spouse" (1 - index_of_sex p2.sex))
+           s (transl_nth conf "the spouse" (1 - index_of_sex p1.sex))
        else s
      in
      let s1 = "<strong>" ^ std_color conf s ^ "</strong>" in     
-     let s2 = gen_person_title_text no_reference raw_access conf base p2 in
+     let s2 = gen_person_title_text no_reference raw_access conf base p1 in
      let s =
-       if x1 < x2 then transl_decline2 conf "%1 of %2" s1 s2
+       if x2 < x1 then transl_decline2 conf "%1 of %2" s1 s2
        else
          transl_decline2 conf "%1 of (same or greater generation level) %2"
            s1 s2
@@ -992,7 +992,7 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
 ;
 
 value print_solution conf base reltab long n p1 p2 (pp1, pp2, (x1, x2, list)) =
-  do print_link conf base (reltab, list) n p2 p1 pp2 pp1 x2 x1;
+  do print_link_name conf base (reltab, list) n p1 p2 pp1 pp2 x1 x2;
      if x1 == 0 || x2 == 0 then
        print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list
      else print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list;
