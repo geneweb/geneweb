@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.21 2004-12-14 09:30:11 ddr Exp $ *)
+(* $Id: date.ml,v 4.22 2004-12-26 13:29:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -339,7 +339,8 @@ value short_dates_text conf base p =
 value short_marriage_date_text conf base fam p1 p2 =
   if authorized_age conf base p1 && authorized_age conf base p2 then
     match Adef.od_of_codate fam.marriage with
-    [ Some (Dgreg d _) -> "<font size=-2>" ^ year_text d ^ "</font>"
+    [ Some (Dgreg d _) ->
+        "<span style=\"font-size:60%\">" ^ year_text d ^ "</span>"
     | _ -> "" ]
   else ""
 ;

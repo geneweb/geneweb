@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.51 2004-12-26 10:00:14 ddr Exp $ *)
+(* $Id: relation.ml,v 4.52 2004-12-26 13:29:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -417,10 +417,10 @@ value next_relation_link_txt conf ip1 ip2 excl_faml =
       (fun (sl, i) ifam ->
          ([";ef"; string_of_int i; "=";
            string_of_int (Adef.int_of_ifam ifam) :: sl], i - 1))
-      (["\""], List.length excl_faml - 1) excl_faml
+      ([], List.length excl_faml - 1) excl_faml
   in
   let sl =
-    ["href=\""; commd conf; "em=R;ei=";
+    [commd conf; "em=R;ei=";
      string_of_int (Adef.int_of_iper ip1); ";i=";
      string_of_int (Adef.int_of_iper ip2);
      if p_getenv conf.env "spouse" = Some "on" then ";spouse=on" else "";
@@ -447,7 +447,7 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
     in
     Dag.print_html_table conf hts;
     Wserver.wprint "<p>\n";
-    Wserver.wprint "<a %s>&gt;&gt;</a>\n"
+    Wserver.wprint "<a href=\"%s\">&gt;&gt;</a>\n"
       (next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml])
   }
 ;
@@ -1151,6 +1151,7 @@ value print_solution_not_ancestor conf base long p1 p2 sol =
 value print_solution conf base long n p1 p2 sol =
   let (pp1, pp2, (x1, x2, list), reltab) = sol in
   do {
+    html_p conf;
     print_link_name conf base n p1 p2 sol;
     if x1 == 0 || x2 == 0 then
       print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list

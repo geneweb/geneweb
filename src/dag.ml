@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.17 2004-12-13 16:05:16 ddr Exp $ *)
+(* $Id: dag.ml,v 4.18 2004-12-26 13:29:23 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -160,7 +160,7 @@ value image_txt conf base p =
 
 value print_table conf hts =
   do {
-    Wserver.wprint "<center><table border=%d" conf.border;
+    Wserver.wprint "<table style=\"margin:auto\" border=%d" conf.border;
     Wserver.wprint " cellspacing=0 cellpadding=0>\n";
     for i = 0 to Array.length hts - 1 do {
       Wserver.wprint "<tr align=left>\n";
@@ -180,20 +180,22 @@ value print_table conf hts =
         [ TDstring s -> Wserver.wprint "%s" s
         | TDbar s ->
             if s = "" then Wserver.wprint "|"
-            else Wserver.wprint "<a %s>|</a>" s
+            else
+              Wserver.wprint
+                "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
         | TDhr align ->
             do {
-              Wserver.wprint "<hr noshade size=1";
+              Wserver.wprint "<hr style=\"";
               match align with
-              [ LeftA -> Wserver.wprint " width=\"50%%\" align=left"
-              | RightA -> Wserver.wprint " width=\"50%%\" align=right"
-              | _ -> Wserver.wprint " width=\"100%%\"" ];
-              Wserver.wprint ">"
+              [ LeftA -> Wserver.wprint "margin-right:50%%"
+              | RightA -> Wserver.wprint "margin-left:50%%"
+              | _ -> () ];
+              Wserver.wprint "\">"
             } ];
         Wserver.wprint "</td>\n"
       }
     };
-    Wserver.wprint "</table></center>\n"
+    Wserver.wprint "</table>\n"
   }
 ;
 
@@ -641,7 +643,9 @@ value print_table_pre conf hts =
                   String.make ((sz - len) / 2) ' ' ^ s ^
                     String.make (sz - (sz + len) / 2) ' '
               | TDbar s ->
-                  let s = if s = "" then "|" else "<a " ^ s ^ ">|</a>" in
+                  let s =
+                    if s = "" then "|" else "<a href=\"" ^ s ^ "\">|</a>"
+                  in
                   let len = displayed_length s in
                   String.make ((sz - len) / 2) ' ' ^ s ^
                     String.make (sz - (sz + len) / 2) ' '
@@ -689,10 +693,10 @@ value print_table_pre conf hts =
 value print_html_table conf hts =
   do {
     if Util.p_getenv conf.env "notab" <> Some "on" then do {
-      Wserver.wprint "<div align=right><a href=\"%s" (commd conf);
+      Wserver.wprint "<a style=\"float:right\" href=\"%s" (commd conf);
       List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
       Wserver.wprint "notab=on;slices=on";
-      Wserver.wprint "\"><tt>//</tt></a></div>\n"
+      Wserver.wprint "\"><tt>//</tt></a>\n"
     }
     else ();
     if Util.p_getenv conf.env "notab" = Some "on" ||
@@ -772,7 +776,7 @@ value make_tree_hts
     | _ ->
         match Util.p_getenv conf.env "color" with
 	[ None | Some "" -> ""
-        | Some x -> " bgcolor=" ^ x ] ]
+        | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
   in
   let indi_txt n =
     let (bd, td) =
@@ -880,6 +884,7 @@ value gen_print_dag conf base spouse_on invert set spl d =
       Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
     in
     Util.header_no_page_title conf title;
+    html_p conf;
     print_html_table conf hts;
     Util.trailer conf
   }

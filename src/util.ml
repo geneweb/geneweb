@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.98 2004-12-26 10:00:14 ddr Exp $ *)
+(* $Id: util.ml,v 4.99 2004-12-26 13:29:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1131,6 +1131,7 @@ value header_without_page_title conf title =
     Wserver.wprint "  \
   <style type=\"text/css\"><!--
     .highlight { color: %s; font-weight: bold }
+    hr { border: 0; margin: 0; border-bottom: 1px solid }
   --></style>\n" conf.highlight;
     Wserver.wprint "</head>\n";
     let s =
