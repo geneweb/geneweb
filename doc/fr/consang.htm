@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Consanguinit&eacute;</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Consanguinit&eacute;</h1>
+
+Cette partie explique les notions de "consanguinit&eacute;" et
+"parent&eacute;" utilis&eacute;es par <em>GeneWeb</em> et comment
+elles sont calcul&eacute;es.
+
+<h4>Consanguinit&eacute; et Parent&eacute;</h4>
+
+Le gen&ocirc;me d'un individu est constitu&eacute; d'un grand nombre
+de g&egrave;nes qui, si l'on ignore les mutations, se reproduisent de
+fa&ccedil;ons identiques. Les g&egrave;nes peuvent servir &agrave;
+mesurer l'identit&eacute; d'une personne.
+
+<p>
+
+Les g&egrave;nes sont dispos&eacute;s &agrave; des emplacements
+pr&eacute;cis appel&eacute;s "locus". Chaque individu poss&egrave;de
+pour chaque locus deux g&egrave;nes, l'un transmis par sa m&egrave;re,
+l'autre par son p&egrave;re,et transmet &agrave; ses enfants un copie
+de l'un de ses g&egrave;nes.
+
+<p>
+
+La <em>Consanguinit&eacute;</em> d'un individu <em>x</em> est la
+probabilit&eacute; <em>cg(x)</em> de trouver &agrave; un locus
+donn&eacute; deux g&egrave;nes identiques.
+
+<p>
+
+La <em>Parent&eacute;</em> de deux individus <em>x</em> et <em>y</em>
+est la probabilit&eacute; <em>pr(x,y)</em> de trouver &agrave; un
+m&ecirc;me locus deux g&egrave;nes identiques.
+
+<h4>Calculs</h4>
+
+Un calcul de probabilit&eacute; montre que:
+
+<ul><li>La consanguinit&eacute; <em>cg(x)</em> est &eacute;gale &agrave;
+la parent&eacute; <em>pr(px,mx)</em> des parents <em>px</em> et
+<em>mx</em> de <em>x</em>.</ul>
+
+<p>
+
+<ul><li>Si <em>x..a..y</em> est un lien de parent&eacute; minimal
+entre <em>x</em> et <em>y</em> (c'est-&agrave;-dire tel que les
+branches <em>x..a</em> et <em>a..y</em> n'ont que <em>a</em> comme
+personne commune), alors il contribue &agrave; la parent&eacute; de
+<em>x</em> et <em>y</em> d'un facteur:
+
+<pre>
+     1 / 2**(n+1) * (1 + cg(a))
+</pre>
+
+o&ugrave; <em>n</em> est la longueur (distance <em>x..a</em> +
+distance <em>a..y</em>) du lien de parent&eacute; <em>x..a..y</em>.
+
+<p>
+
+La parent&eacute; de <em>x</em> et <em>y</em> est la somme des
+contributions de tous leurs liens de parent&eacute; minimaux.
+
+</ul>
+
+<h4>GeneWeb</h4>
+
+<em>GeneWeb</em> affiche la consanguinit&eacute; et la parent&eacute;
+sous forme d'un pourcentage.
+
+<p>
+
+Statistiquement, sur le grand nombre de locus d'un individu, la
+consanguinit&eacute; correspond en gros au pourcentage de ses locus
+contenant des g&egrave;nes identiques.
+
+<p>
+
+Les algorithmes de consanguinit&eacute; et de parent&eacute; ont
+&eacute;t&eacute; &eacute;crits par Didier R&eacute;my, directeur
+de recherche &agrave; l'INRIA. Merci &agrave; lui.
+
+<h4>R&eacute;f&eacute;rences</h4>
+
+<ul><li>Albert Jacquard. <em> Structures G&eacute;n&eacute;tiques des
+Populations.</em> Masson & Cie, 1970.</ul>
+
+<p>
+
+Retour vers <a href="diruse.htm">Mode d'Emploi</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
+GeneWeb</em></font><br>
+
+</body>
