@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.112 1999-08-14 09:26:35 ddr Exp $
+# $Id: lexicon.txt,v 2.113 1999-08-29 14:20:13 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1863,7 +1863,7 @@ en: godfather/godmother/godparents
 es: padrino/madrina/padrino y padrina
 fr: parrain/marraine/parrain et marraine
 it: padrino/madrina/padrini
-nl: peter/meter
+nl: peter/meter/peetouders
 no: gudfar/gudmor/gudforeldre
 pt: padrinho/madrinha/padrinhos
 se: gudfar/gudmor/gudf&ouml;r&auml;ldrar
@@ -1875,6 +1875,7 @@ en: godson/goddaughter/godchild
 es: fahijado/fahijada/fahihado(a)
 fr: filleul/filleule/filleul(e)
 it: figlioccio/figlioccia/figlioccio
+nl: peetzoon/peetdochter/petekind
 no: guds&oslash;nn/guddatter/gudbarn
 pt: afilhado/afilhada/afilhados
 se: gudson/guddotter/gudbarn
@@ -2846,7 +2847,7 @@ es: n&uacute;mero
 fr: num&eacute;ro
 he:  מספר
 it: numero
-nl: aantal
+nl: nummer
 no: nummer
 pt: n&uacute;mero
 se: nummer
@@ -3746,7 +3747,7 @@ es: invertir el orden de las familias siguientes
 fr: intervertir l'ordre des familles suivantes
 he:  לשנות סדר המשפחות הבאות
 it: scambiare l'ordine delle famiglie seguenti
-nl: verander de volgorde van de volgende families
+nl: verwissel de volgorde van de volgende families
 no: bytt rekkef&oslash;lgen til f&oslash;lgende familier
 pt: inverter a ordem das familias seguintes
 se: &auml;ndra ordningen p&aring; de f&ouml;ljande familjerna
@@ -4097,7 +4098,7 @@ en: to add a child to a family, use "%s"
 es: para agregar un hijo a una familia, utiliza "%s"
 fr: pour ajouter un enfant &agrave; une famille, utiliser "%s"
 it: per aggiungere un figlio ad una famiglia, scegliere "%s"
-nl: gebruik "%s" om een familie toe te voegen
+nl: gebruik "%s" om een kind aan een familie toe te voegen
 no: for &aring; tilf&oslash;ye et barn til en familie, bruk "%s"
 pt: para acrescentar um filho a uma familia utilizar "%s"
 se: f&ouml;r att l&auml;gga till ett barn i en familj, anv&auml;nd "%s"
@@ -4343,7 +4344,7 @@ es: advertencias
 fr: remarques
 he:  אזהרות
 it: avvertenze
-nl: waarschuwen
+nl: waarschuwingen
 no: advarsler
 pt: advertencias
 se: varningar
