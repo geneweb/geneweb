@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.99 2000-05-15 15:01:51 ddr Exp $
+# $Id: lexicon.txt,v 3.100 2000-05-17 04:31:11 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2172,11 +2172,13 @@ se: slutar
 dk: forlovet
 en: engaged
 fr: fianc&eacute;/fianc&eacute;s
+se: f&ouml;rlovad
 
     engaged%t to
 dk: forlovet%t med
 en: engaged%t to
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
+se: f&ouml;rlovad%t med
 
     error
 af: fout
