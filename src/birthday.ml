@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.3 2002-01-10 04:13:30 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.4 2002-02-15 10:44:33 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -277,8 +277,11 @@ value print_marriage conf base month =
         [ Some (Dgreg {day = d; month = m; year = y; prec = Sure} _)
           when d <> 0 && m <> 0 ->
             let cpl = base.data.couples.get i in
-            if m == month && age_autorise conf base (pget conf base cpl.father) &&
-               age_autorise conf base (pget conf base cpl.mother) then
+            let father = pget conf base cpl.father in
+            let mother = pget conf base cpl.mother in
+            if m == month &&
+               age_autorise conf base father && not (is_hidden father) &&
+               age_autorise conf base mother && not (is_hidden mother) then
               tab.(pred d) := [(cpl, y) :: tab.(pred d)]
             else ()
         | _ -> () ]
@@ -551,14 +554,23 @@ value print_menu_marriage conf base =
       else
         match Adef.od_of_codate fam.marriage with
         [ Some (Dgreg d _) when d.day <> 0 && d.month <> 0 && d.prec = Sure ->
+            let update_list cpl =
+              if match_mar_dates conf base cpl d conf.today then
+                list_tod.val := [(cpl, d.year) :: list_tod.val]
+              else if match_mar_dates conf base cpl d tom then
+                list_tom.val := [(cpl, d.year) :: list_tom.val]
+              else if match_mar_dates conf base cpl d aft then
+                list_aft.val := [(cpl, d.year) :: list_aft.val]
+              else ()
+            in
             let cpl = base.data.couples.get i in
-            if match_mar_dates conf base cpl d conf.today then
-              list_tod.val := [(cpl, d.year) :: list_tod.val]
-            else if match_mar_dates conf base cpl d tom then
-              list_tom.val := [(cpl, d.year) :: list_tom.val]
-            else if match_mar_dates conf base cpl d aft then
-              list_aft.val := [(cpl, d.year) :: list_aft.val]
-            else ()
+            if conf.use_restrict then
+              let father = pget conf base cpl.father in
+              let mother = pget conf base cpl.mother in
+              if not (is_hidden father) && not (is_hidden mother) then
+                update_list cpl
+              else ()
+            else update_list cpl
         | _ -> () ]
     };
     List.iter
