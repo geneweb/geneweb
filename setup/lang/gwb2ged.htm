@@ -2,12 +2,13 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: gwb2ged.htm,v 1.6 2003-11-12 17:25:22 ddr Exp $ -->
+  <!-- $Id: gwb2ged.htm,v 1.7 2004-08-27 11:57:44 ddr Exp $ -->
   <title>
 [
 de: GEDCOM-Datei extrahieren
 en: Extract a GEDCOM file
 es: Extracci&oacute;n de un fichero GEDCOM
+fi: Vie GEDCOM tiedosto
 fr: Extraction d'un fichier GEDCOM
 it: Estrazione di un file GEDCOM
 lv: Izveidot GEDCOM datni
@@ -17,41 +18,44 @@ sv: Exportera en GEDCOM-fil
 
 <body background="images/gwback.jpg">
 
-<center><h1><font color=#2f6400>Gwb2ged:<br>[
+<center><h1><font color="#2f6400">Gwb2ged:<br />[
 de: GEDCOM-Datei extrahieren
 en: Extract a GEDCOM file
 es: Extracci&oacute;n de un fichero GEDCOM
+fi: Vie GEDCOM tiedosto
 fr: Extraction d'un fichier GEDCOM
 it: Estrazione di un file GEDCOM
 lv: Izveidot GEDCOM datni
 sv: Exportera en GEDCOM-fil
 ]</font></h1></center>
 
-<form method=GET action="gwb2ged">
-<input type=hidden name=opt value=check>
-<input type=hidden name=lang value=%l>
+<form method="get" action="gwb2ged">
+<input type="hidden" name="opt" value="check" />
+<input type="hidden" name="lang" value="%l" />
 
 [
 de: W&auml;hle deine Datenbank:
 en: Select your database:
 es: Seleccione Ud. su base de datos :
+fi: Valitse tietokanta:
 fr: S&eacute;lectionnez votre base de donn&eacute;es:
 it: Selezionate la vostra base di dati:
 lv: Izvçlieties datu bâzi:
 sv: Välj din databas:
 ]
 
-<p>
+<p />
 
-<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+<dl><dt><dd><table border="1" cellspacing="0" cellpadding="1">
 
-%b{<tr align=left>
-<td><input type=radio name=anon value="%a">&nbsp;&nbsp;&nbsp;</td>
+%b{<tr align="left">
+<td><input type="radio" name="anon" value="%a" />&nbsp;&nbsp;&nbsp;</td>
 <td>%a</td></tr>|
-<tr align=left><td>- [
+<tr align="left"><td>- [
 de: keine Datenbank vorhanden
 en: there is no database at present
 es: actualmente ninguna base de datos existente
+fi: ei tietokantaa saatavilla
 fr: il n'y a aucune base de donn&eacute;es actuellement
 it: attualmente non esiste nessuna base di dati
 lv: nav nevienas datu bâzes
@@ -60,7 +64,7 @@ sv: det finns ingen databas för tillfället
 
 </table></dl>
 
-<p>
+<p />
 
 [
 de: Gib den Namen ein, den du deiner GEDCOM-Datei geben m&ouml;chtest.
@@ -71,6 +75,8 @@ en: Enter the name you want to give to your GEDCOM file. If you write
 es: Entre Ud el nombre que desea dar a su fichero GEDCOM.
     Si Ud no mete nada, el nombre utilizado ser&aacute; el nombre de la
     base seguida del sufijo
+fi: Kirjoita nimi jonka haluat antaa GEDCOM tiedostolle. Jos et kirjoita
+    mitään, tiedoston nimi on tyhjä ja päättyy sanaan
 fr: Entrez le nom que vous voulez donner &agrave; votre fichier GEDCOM.
     Si vous ne mettez rien, ce sera le nom de la base suivi du suffixe
 it: Digitate il nome che volete attribuire al vostro file GEDCOM.
@@ -83,32 +89,34 @@ sv: Skriv namnet du vill kalla din GEDCOM-fil. Om du inte skriver
     någonting, kommer det att bli samma namn som databasen avslutat med
 ] "<tt>.ged</tt>".
 
-<p>
+<p />
 
-<dl><dt><dd><input name=o size=30></dl>
+<dl><dt><dd><input name="o" size="30" /></dl>
 
-<p>
+<p />
 
 [
 de: W&auml;hle die gew&uuml;nschten Optionen:
 en: Select the options you want:
 es: Seleccione Ud. las opciones deseadas:
+fi: Valitse asetukset jotka haluat:
 fr: S&eacute;lectionnez les options que vous d&eacute;sirez:
 if: Selezionate le opzioni desiderate:
 lv: Ivçlçties nepiecieðamos izveides parametrus:
 sv: Välj de optioner du vill ha:
 ]
 
-<p>
+<p />
 
-<dl><dt><dd><table border=1>
+<dl><dt><dd><table border="1">
 
-<tr align=left><td>
-<input type=radio name=charset value=ASCII checked>&nbsp;&nbsp;&nbsp;</td>
+<tr align="left"><td>
+<input type="radio" name="charset" value="ASCII" checked="checked" />&nbsp;&nbsp;&nbsp;</td>
 <td>[
 de: Kodiere die Zeichen in ASCII.
 en: Encode the characters in ASCII.
 es: Codificar los car&aacute;cteres en ASCII.
+fi: Koodaa merkit ASCII muodossa.
 fr: Coder les caract&egrave;res en ASCII.
 it: Codificare i caratteri in ASCII.
 lv: Burti ASCII kodçjumâ.
@@ -116,8 +124,8 @@ sv: Koda tecknen i ASCII.
 ]</td>
 </tr>
 
-<tr align=left><td>
-<input type=radio name=charset value=ANSEL>&nbsp;&nbsp;&nbsp;</td>
+<tr align="left"><td>
+<input type="radio" name="charset" value="ANSEL" />&nbsp;&nbsp;&nbsp;</td>
 <td>[
 de: Kodiere die Zeichen in ANSEL.
 en: Encode the characters in ANSEL.

@@ -2,11 +2,12 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: cleanup.htm,v 1.4 2003-11-12 17:25:20 ddr Exp $ -->
+  <!-- $Id: cleanup.htm,v 1.5 2004-08-27 11:57:42 ddr Exp $ -->
   <title>[
 de: Aufr&auml;umen
 en: Clean up
 es: Limpieza
+fi: Puhdista
 fr: Nettoyage
 it: Pulizia
 lv: Sakopðana
@@ -16,10 +17,11 @@ sv: Upprensning
 
 <body background="images/gwback.jpg">
 
-<center><h1><font color=#2f6400>[
+<center><h1><font color="#2f6400">[
 de: Eine Datenbank aufr&auml;umen
 en: Cleaning up a database
 es: Limpieza de una base de datos
+fi: Tietokannan puhdistus
 fr: Nettoyage d'une base de donn&eacute;es
 it: Pulizia di una base di dati
 lv: Datu bâzes sakopðana
@@ -38,6 +40,9 @@ es: Si Ud ha efectuado muchas modificaciones en su base de datos, o
     simplemente si Ud. a entrado muchos datos, es aconsejable de realizar 
     una limpieza, en particular si Ud constata que el acceso a su base de 
     datos comienza a ser mas lento que de costumbre.
+fi: Jos olet tehnyt muutoksia tietokantaan, tai olet syöttänyt paljon tietoa
+    on suositeltavaa että puhdistat sen, varsinkin jos huomaat että
+    tietokannan käyttö on hidastunut.
 fr: Si vous avez fait beaucoup de modifications dans votre base de
     donn&eacute;es, ou si vous avez simplement entr&eacute; beaucoup de
     donn&eacute;es, il est conseill&eacute; de faire un nettoyage, surtout
@@ -56,7 +61,7 @@ sv: Om du har gjort många modifieringar i din databas, eller om du helt
     går saktare.
 ]
 
-<p>
+<p />
 
 <ul>
 
@@ -71,6 +76,8 @@ en: For a simple cleaning up, apply the <a
 es: Para realizar una limpieza simple, aplique el <a
     href="gwsetup?lang=%l;v=consang.htm">programa de
     inicialisaci&oacute;n</a> de las consanguinidades.
+fi: Esimerkiksi puhdistaminen, sukulaisuuden<a
+    href="gwsetup?lang=%l;v=consang.htm">käyttöönotto</a>.
 fr: Pour un nettoyage simple, appliquez le <a
     href="gwsetup?lang=%l;v=consang.htm">programme d'initialisation</a> des
     consanguinités.
@@ -84,11 +91,11 @@ sv: För en enkel upprensning, använd <a
     blodsband.
 ]
 
-<p>
+<p />
 
 <li>
-<form method=GET action="cleanup">
-<input type=hidden name=lang value=%l>
+<form method="get" action="cleanup">
+<input type="hidden" name="lang" value="%l" />
 
 [
 de: Um radikal aufzur&auml;umen, w&auml;hle deine Datenbank aus, indem du 
@@ -97,6 +104,8 @@ en: For a radical cleaning up, select your database by clicking on the
     associated button:
 es: Para realizar una limplieza minuciosa, seleccione su base de datos
     cliqueando en el bot&oacute;n asociado:
+fi: Suorittaaksesi ison puhdistuksen, valitse tietokantasi painamalla
+    nappia alta:
 fr: Pour un nettoyage en profondeur, s&eacute;lectionnez votre base de
     donn&eacute;es en cliquant sur le bouton associ&eacute;:
 it: Per una pulizia profonda, selezionate la vostra base di dati
@@ -107,18 +116,19 @@ sv: För en radikal upprensning, välj din databas genom att klicka på
     motsvarande knapp:
 ]
 
-<p>
+<p />
 
-<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+<dl><dt><dd><table border="1" cellspacing="0" cellpadding="1">
 %b{
-<tr align=left>
-<td><input type=radio name=anon value="%a">&nbsp;&nbsp;&nbsp;</td>
+<tr align="left">
+<td><input type="radio" name="anon" value="%a" />&nbsp;&nbsp;&nbsp;</td>
 <td><a href="http://%m:2317/%a">%a</a></td>
 </tr>|
-<tr align=left><td>- [
+<tr align="left"><td>- [
 de: keine Datenbank vorhanden
 en: there is no database at present
 es: actualmente ninguna base de datos existe
+fi: ei tietokantaa saatavilla
 fr: il n'y a aucune base de donn&eacute;es actuellement
 it: attualmente non esiste nessuna base di dati
 lv: patreiz nav nekâdu datu
@@ -126,31 +136,32 @@ sv: det finns ingen databas för tillfället
 ]</tr></td>}
 </table></dl>
 
-<p>
+<p />
 
 [
 de: Dann dr&uuml;cke diesen Knopf:
 en: Then push this button:
 es: Y a continuaci&oacute;n apoye en el bot&oacute;n siguiente:
+fi: Sitten paina tätä nappia:
 fr: Puis appuyez sur ce bouton:
 it: E poi cliccate su questo bottone:
 lv: Pçc tam nospiediet ðo podziòu:
 sv: Tryck sedan på denna knapp:
 ]
 
-<p>
+<p />
 
-<input type=submit value="[
+<input type="submit" value="[
 de: Aufr&auml;umen
 en: Cleanup
 es: Limpieza
+fi: Puhdistus
 fr: Nettoyage
 it: Pulizia
 lv: Sakopt
 sv: Rensa upp
-]">
+]" />
 
 </form>
 
 </ul>
-

@@ -2,11 +2,12 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: bsi.htm,v 1.7 2003-11-12 17:25:20 ddr Exp $ -->
+  <!-- $Id: bsi.htm,v 1.8 2004-08-27 11:57:42 ddr Exp $ -->
   <title>[
 de: Funktion "%d" ausf&uuml;hren
 en: Application of "%d"
 es: Aplicaci&oacute;n de "%d"
+fi: "%d" ohjelma
 fr: Application de "%d"
 it: Applicazione di "%d"
 lv: "%d" lietoðana
@@ -20,6 +21,7 @@ sv: Applicering av "%d"
 de: Funktion "%d" ausf&uuml;hren
 en: Application of "%d"
 es: Aplicaci&oacute;n de "%d"
+fi: "%d" ohjelma
 fr: Application de "%d"
 it: Applicazione di "%d"
 lv: "%d" lietoðana
@@ -36,6 +38,8 @@ en: The operation "%d" will be applied on your database "%a". Warning: it
 es: La operaci&oacute;n "%d" va a aplicarse a su base "%a". 
     Atenci&oacute;n: la operaci&oacute;n puede durar algunos segundos o 
     algunos minutos, de acuerdo al caso. Sea paciente.
+fi: Toiminto "%d" hyväksytään tietokantaasi "%a". Varoitus: toiminto kestää
+    hetken. Ole kärsivällinen.
 fr: L'op&eacute;ration "%d" va &ecirc;tre appliqu&eacute;e sur votre base
     "%a". Attention: l'op&eacute;ration peut prendre quelques secondes ou
     quelques minutes, suivant les cas. Soyez patient.
@@ -48,23 +52,24 @@ sv: Operationen "%d" kommer att appliceras på din databas "%a". Varning: det
     kan ta några sekunder eller några minuter, beroende på fallet. Ha tålamod.
 ]
 
-<p>
+<p />
 
 [
 de: Dr&uuml;cke diesen Knopf um zu starten:
 en: Push the button below to start:
 es: Apoyar sobre el bot&oacute;n inferior para comenzar:
+fi: Paina alla olevaa nappia aloittaaksesi:
 fr: Appuyez sur le bouton ci-dessous pour d&eacute;marrer:
 it: Per iniziare, cliccate sul bottone qui sotto:
 lv: Nospiediet podziòu zemâk, lai sâktu:
 sv: Tryck på knappen nedan för att starta:
 ]
 
-<p>
+<p />
 
-<form method=POST action="%d">
+<form method="post" action="%d">
 %h
-<dl><dt><dd><input type=submit value="Ok"></dl>
+<dl><dt><dd><input type="submit" value="Ok" /></dl>
 </form>
 
 <p>
@@ -75,6 +80,7 @@ de: Zu deiner Information: Diese Funktion entspricht der Ausf&uuml;hrung
 en: For information, this operation corresponds to the following commands:
 es: Por informaci&oacute;n, esta operaci&oacute;n corresponde a los 
     comandos siguientes:
+fi: Tiedoksi, tämä toiminto vastaa seuraavia komentoja:
 fr: Pour information, cette op&eacute;ration correspond &agrave; la suite
     des commandes suivantes:
 it: Per informazione, questa operazione corrisponde ai seguenti comandi:

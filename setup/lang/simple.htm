@@ -2,11 +2,12 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head> 
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: simple.htm,v 1.8 2004-04-02 08:34:59 ddr Exp $ -->
+  <!-- $Id: simple.htm,v 1.9 2004-08-27 11:57:44 ddr Exp $ -->
   <title>[
 de: Einfache Methode
 en: Simple method
 es: M&eacute;todo simple
+fi: Yksinkertainen tapa
 fr: M&eacute;thode simple
 it: Metodo semplice
 lv: Vienkârðâ metode
@@ -20,14 +21,15 @@ sv: Enkel metod
 de: Einfache Methode
 en: Simple method
 es: M&eacute;todo simple
+fi: Yksinkertainen tapa
 fr: M&eacute;thode simple
 it: Metodo semplice
 lv: Vienkârðâ metode
 sv: Enkel metod
 ]</font></h1></center>
 
-<form method=GET action="simple">
-<input type=hidden name=lang value=%l>
+<form method="get" action="simple">
+<input type="hidden" name="lang" value="%l" />
 
 [
 de: Wenn du mit einer GEDCOM-Datei beginnen m&ouml;chtest, gib hier ihren
@@ -35,17 +37,18 @@ de: Wenn du mit einer GEDCOM-Datei beginnen m&ouml;chtest, gib hier ihren
 en: If you want to start with a GEDCOM file, select-it here:
 es: Si Ud desea comenzar con un fichero GEDCOM, introduzca el nombre del
     fichero aqu&iacute;:
+fi: Mikäli haluat aloittaa GEDCOM tiedoston kanssa, valitse se tähän:
 fr: Si vous voulez partir d'un fichier GEDCOM, selectionnez-le ici:
 it: Se volete partire da un file GEDCOM, selezionatelo qui:
 lv: Ja vçlaties sâkt ar GEDCOM datni (*.ged), ierakstiet tâ vârdu ðeit.
 sv: Om du vill starta från en GEDCOM-fil, skriv dess filnamn här.
 ]
 
-<p>
+<p />
 
 %j
 
-<p>
+<p />
 
 [
 de: Gib den Namen ein, den deine Datenbank tragen soll:
@@ -53,6 +56,8 @@ en: Write the name you want for your database (if you selected a GEDCOM
     file above, it will be created from this file, else it will be created
     empty):
 es: Escriba aqu&iacute; el nombre que Ud. desea dar a su base de datos:
+fi: Anna tietokannan nimi (mikäli  valitsit GEDCOM tiedoston yläpuolelta,
+    se luodaan tästä tiedostosta, muutoin tyhjä tiedosto luodaan):
 fr: Indiquez le nom que vous voulez donner &agrave; votre base de
     donn&eacute;es (si vous avez s&eacute;lectionn&eacute; un fichier
     GEDCOM ci-dessus, il sera cr&eacute;&eacute; &agrave; partir de ce
@@ -62,16 +67,17 @@ lv: Ierakstiet datu bâzes nosaukumu, kâdâ Jûs vçlaties lai tas bûtu:
 sv: Skriv in namnet du vill kalla din databas:
 ]
 
-<p>
+<p />
 
-<input name=o size=30 value="base">
+<input name="o" size="30" value="base" />
 
-<p>
+<p />
 
 [
 de: Dann dr&uuml;cke diesen Knopf:
 en: Then push this button:
 es: Apoye luego en este bot&oacute;n:
+fi: Sitten paina tätä nappia:
 fr: Puis appuyez sur ce bouton:
 it: Poi cliccate su questo bottone:
 lv: Tad nospiediet ðo podziòu:
@@ -80,13 +86,14 @@ sv: Tryck sedan på knappen:
 
 <p>
 
-<input type=submit value="[
+<input type="submit" value="[
 de: Anlegen
 en: Create
 es: Crear
+fi: Luo
 fr: Cr&eacute;er
 it: Creare
 lv: Izviedot
 sv: Skapa
-]">
+]" />
 </form>

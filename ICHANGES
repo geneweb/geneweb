@@ -11,6 +11,8 @@ GeneWeb Version 4.10
 * GeneWeb server or CGI (gwd)
   - [10 Aug 04] Automatic reordering of marriages from the weddings date
     in personal pages of witnesses.
+  - [30 Jul 04] When using CGI mode, added a way to delegate authentifi-
+    cation to the http server (apache).
   - [16 Jul 04] Added code to prepare a possible version allowing to
     manipulate any kinds of DAGs, not only the ones where people have
     only two parents, for genealogy of other kinds than humans and animals.

@@ -2,11 +2,12 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: delete_1.htm,v 1.6 2003-11-12 17:25:21 ddr Exp $ -->
+  <!-- $Id: delete_1.htm,v 1.7 2004-08-27 11:57:43 ddr Exp $ -->
   <title>[
 de: Datenbanken l&ouml;schen
 en: Deletion of databases
 es: Supresi&oacute;n de bases de datos
+fi: Tietokantojen poistaminen
 fr: Suppression de bases donn&eacute;es
 it: Cancellazione di basi di dati
 lv: Datu bâþu dzçðana
@@ -16,33 +17,35 @@ sv: Radering av databaser
 
 <body background="images/gwback.jpg">
 
-<center><h1><font color=#2f6400>[
+<center><h1><font color="#2f6400">[
 de: Datenbanken l&ouml;schen
 en: Deletion of databases
 es: Supresi&oacute;n de bases de datos
+fi: Tietokantojen poistaminen
 fr: Suppression de bases  de donn&eacute;es
 it: Cancellazione di basi di dati
 lv: Datu bâþu dzçðana
 sv: Radering av databaser
 ]</font></h1></center>
 
-<p>
+<p />
 
-<form method=POST action="delete_1">
-<input type=hidden name=lang value=%l>
-%k{<input type=hidden name="%a" value=del>|}
+<form method="post" action="delete_1">
+<input type="hidden" name="lang" value="%l" />
+%k{<input type="hidden" name="%a" value="del" />|}
 
 [
 de: Bist du sicher, da&szlig; du diese Datenbanken l&ouml;schen m&ouml;chtest?
 en: Are you sure you want to delete these databases?
 es: Esta Ud seguro de querer suprimir estas bases?
+fi: Oletko varma että haluat poistaa nämä tietokannat?
 fr: &Ecirc;tes-vous s&ucirc;r de vouloir supprimer ces bases?
 it: Siete sicuri di voler cancellare queste basi ?
 lv: Vai Jûs patieðâm vçlaties dzçst sekojoðas datu bâzes?
 sv: Är du säker att du vill radera dessa databaser?
 ]
 
-<p>
+<p />
 
 <ul>
 
@@ -51,6 +54,7 @@ sv: Är du säker att du vill radera dessa databaser?
 de: no selection
 en: no selection
 es: ninguna selecci&oacute;n
+fi: ei valintaa
 fr: pas de s&eacute;lection
 it: nessuna selezione
 lv: nav iezîmçtas
@@ -59,7 +63,7 @@ sv: inga val
 
 </ul>
 
-<p>
+<p />
 
 [
 de: Achtung: Diese Auswahl ist unwiderruflich! Zur Best&auml;tigung bitte
@@ -67,6 +71,7 @@ de: Achtung: Diese Auswahl ist unwiderruflich! Zur Best&auml;tigung bitte
 en: Warning: this suppression is definitive! To confirm, push this button.
 es: ¡Atenci&oacute;n, esta supresi&oacute;n es definitiva ! Para confirmar,
     apoye Ud en este bot&oacute;n: 
+fi: Varoitus: tämä poisto on lopullinen! Paina tätä nappia vahvistaaksesi.
 fr: Attention, cette suppression est d&eacute;finitive! Pour confirmer,
     appuyez sur ce bouton:
 it: Attenzione, questa azione &egrave; definitiva! Per confermare,
@@ -76,25 +81,27 @@ lv: Uzmanîbu: ðis brîdinâjums ir pçdçjais! Lai to apstiprinâtu, nospiediet
 sv: Varning: detta val är definitivt! För att bekräfta, tryck på denna knapp.
 ]
 
-<p>
+<p />
 
-<dl><dt><dd><input type=submit value="[
+<dl><dt><dd><input type="submit" value="[
 de: L&ouml;schen
 en: Delete
 es: Destruir
+fi: Poista
 fr: D&eacute;truire
 it: Cancellare
 lv: Izmest
 sv: Radera
-]"></dl>
+]" /></dl>
 
-<p>
+<p />
 
 [
 de: Zur&uuml;ck zum <a href="gwsetup?lang=%l;v=main.htm">Hauptmen&uuml;</a>.
 en: Or return to the <a href="gwsetup?lang=%l;v=main.htm">main menu</a>.
 es: O, regrese Ud. al <a href="gwsetup?lang=%l;v=main.htm">men&uacute;
     principal</a>.
+fi: tai palaa <a href="gwsetup?lang=%l;v=main.htm">päävalikkoon</a>.
 fr: Ou revenez au <a href="gwsetup?lang=%l;v=main.htm">menu
     principal</a>.
 it: O tornate al <a href="gwsetup?lang=%l;v=main.htm">menu

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.66 2004-07-18 14:26:38 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.67 2004-08-27 11:57:44 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -757,7 +757,17 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
         in
         let access_type =
           match passwd with
-          [ "" | "w" | "f" -> ATnone
+          [ "" ->
+             if not cgi then ATnone
+             else
+               let mode = try Sys.getenv "GW_MODE" with [ Not_found -> "" ] in
+               let r_user = try Sys.getenv "REMOTE_USER" with [ Not_found -> "" ] in
+               match (mode, r_user) with
+               [ (_, "") -> ATnone
+               | ("F", u) -> ATfriend u
+               | ("W", u) -> ATwizard u
+               | _ -> ATnone ]                  
+          | "w" | "f" -> ATnone
           | _ -> get_token True utm from_addr base_passwd ]
         in
         (passwd, env, access_type)
