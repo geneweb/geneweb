@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.63 2000-11-03 16:53:36 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.64 2000-11-04 09:46:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1112,10 +1112,14 @@ ifdef UNIX then
 else ()
 ;
 
+ifdef SYS_COMMAND then
 value wserver_auto_call = ref False;
 
 value geneweb_server () =
-  let auto_call = wserver_auto_call.val in
+  let auto_call =
+    ifdef SYS_COMMAND then wserver_auto_call.val
+    else try let _ = Sys.getenv "WSERVER" in True with [ Not_found -> False ]
+  in
   do if not auto_call then
        let hostn =
          match selected_addr.val with
@@ -1329,9 +1333,11 @@ value main () =
          "
        Unix daemon mode.")]
      else
-       [("-wserver", Arg.String (fun _ -> wserver_auto_call.val := True),
-      "
-       (internal feature)")]]
+       ifdef SYS_COMMAND then
+         [("-wserver", Arg.String (fun _ -> wserver_auto_call.val := True),
+        "
+       (internal feature)")]
+       else []]
   in
   let anonfun s = raise (Arg.Bad ("don't know what to do with " ^ s)) in
   do ifdef UNIX then

@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.15 2000-11-03 19:22:21 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.16 2000-11-04 09:46:04 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -475,17 +475,28 @@ value accept_connection tmout max_clients callback s =
           | exc -> do cleanup (); return raise exc ];
           cleanup ();
        return ();
+       ifdef SYS_COMMAND then
+         let comm =
+           let stringify_if_spaces s =
+             try let _ = String.index s ' ' in "\"" ^ s ^ "\"" with
+             [ Not_found -> s ]
+           in
+           List.fold_left (fun s a -> s ^ stringify_if_spaces a ^ " ") ""
+             (Array.to_list Sys.argv) ^
+           "-wserver " ^ string_of_sockaddr addr
+         in
+         let _ = Sys.command comm in ()
+       else
+         let pid =
+           let env =
+             Array.append (Unix.environment ())
+               [| "WSERVER=" ^ string_of_sockaddr addr |]
+           in
+           Unix.create_process_env Sys.argv.(0) Sys.argv env Unix.stdin
+             Unix.stdout Unix.stderr
+         in
+         let _ = Unix.waitpid [] pid in ();
     return
-    let comm =
-      let stringify_if_spaces s =
-        try let _ = String.index s ' ' in "\"" ^ s ^ "\"" with
-        [ Not_found -> s ]
-      in
-      List.fold_left (fun s a -> s ^ stringify_if_spaces a ^ " ") ""
-        (Array.to_list Sys.argv) ^
-      "-wserver " ^ string_of_sockaddr addr
-    in
-    let _ = Sys.command comm in
     let cleanup () =
       do try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
          try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
@@ -520,10 +531,13 @@ value f addr_opt port tmout max_clients g =
   match
     ifdef NOFORK then None
     else ifdef WIN95 then
-      let len = Array.length Sys.argv in
-      if len > 2 && Sys.argv.(len - 2) = "-wserver" then
-        Some Sys.argv.(len - 1)
-      else None
+      ifdef SYS_COMMAND then
+        let len = Array.length Sys.argv in
+        if len > 2 && Sys.argv.(len - 2) = "-wserver" then
+          Some Sys.argv.(len - 1)
+        else None
+      else
+        try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
     else None
   with
   [ Some s ->

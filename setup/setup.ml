@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.17 2000-11-03 17:04:35 ddr Exp $ *)
+(* $Id: setup.ml,v 3.18 2000-11-04 09:46:01 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1275,7 +1275,7 @@ value speclist =
        Select a port number (default = " ^
        string_of_int port.val ^
        "); > 1024 for normal users.") ::
-   ifdef WIN95 then
+   ifdef SYS_COMMAND then
      [("-wserver", Arg.String (fun _ -> ()), " (internal feature)")]
    else []]
 ;
@@ -1352,10 +1352,12 @@ value intro () =
 
 value main () =
   do ifdef UNIX then intro ()
-     else
+     else ifdef SYS_COMMAND then
        let len = Array.length Sys.argv in
        if len > 2 && Sys.argv.(len - 2) = "-wserver" then ()
-       else intro ();
+       else intro ()
+     else
+       try let _ = Sys.getenv "WSERVER" in () with [ Not_found -> intro () ];
      Wserver.f None port.val 0 None wrap_setup;
   return ()
 ;
