@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.46 1999-05-31 10:25:45 ddr Exp $
+# $Id: lexicon.txt,v 2.47 1999-06-02 11:59:26 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1319,7 +1319,7 @@ it: deceduto/deceduta/deceduto(a)
 nl: gestorven
 no: d&oslash;d
 pt: falecido/falecida/falecido(a)
-se: dog
+se: d&ouml;d
 
     disappeared
 de: verschollen
@@ -1814,7 +1814,7 @@ it: nel
 nl: in
 no: i
 pt: em
-se: i
+se: 
 
     include missing spouses
 dk: medtag ukendte &aelig;gtef&aelig;ller
