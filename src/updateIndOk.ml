@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.8 2000-08-30 08:58:35 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.9 2000-09-11 07:46:28 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -309,26 +309,6 @@ value strip_person p =
   return ()
 ;
 
-value print_try_again conf var n =
-  do Wserver.wprint "%s " (transl conf "click");
-     Wserver.wprint "<a href=\n\"%s" (commd conf);
-     let _ = List.fold_left
-       (fun first (v, x) ->
-          do Wserver.wprint "%s" (if first then "" else ";");
-             Wserver.wprint "%s=" v;
-             if v = var then Wserver.wprint "%d" n
-             else Wserver.wprint "%s" x;
-          return False)
-       True conf.env
-     in ();
-     Wserver.wprint "\">%s</a>" (transl conf "here");
-     Wserver.wprint "%s.\n"
-        (transl conf
-           " \
-to try again with this number, or do \"back\" and change it yourself");
-  return ()
-;
-
 value print_conflict conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   do rheader conf title;
@@ -342,7 +322,7 @@ value print_conflict conf base p =
        html_li conf;
        Wserver.wprint "%s: %d.\n"
          (capitale (transl conf "first free number")) free_n;
-       print_try_again conf "occ" free_n;
+       Update.print_try_again conf "occ" free_n;
      end;
      Update.print_same_name conf base p;
      Update.print_return conf;
@@ -458,6 +438,29 @@ value update_relation_parents base op np =
   List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
 ;
 
+value rec enrich_relation pos lrel =
+  let enrich_rel pos rel =
+    let r_fath_typ = Update.R_father pos in
+    let r_moth_typ = Update.R_mother pos in
+    { r_type = rel.r_type;
+      r_fath = match rel.r_fath with
+               [ Some key -> Some (r_fath_typ, key)
+               | None -> None ];
+      r_moth = match rel.r_moth with
+               [ Some key -> Some (r_moth_typ, key)
+               | None -> None ];
+      r_sources = rel.r_sources }
+  in
+  match lrel with
+  [ [] -> []
+  | [ head :: lrest ] ->
+      [ enrich_rel pos head :: enrich_relation (pos + 1) lrest ] ]
+;
+
+value enrich_person sp =
+  { (sp) with rparents = enrich_relation 1 sp.rparents }
+;
+
 value effective_mod conf base sp =
   let pi = sp.cle_index in
   let op = poi base pi in
@@ -482,7 +485,7 @@ value effective_mod conf base sp =
   let created_p = ref [] in
   let np =
     map_person_ps (Update.insert_person conf base sp.psources created_p)
-      (Update.insert_string conf base) sp
+      (Update.insert_string conf base) (enrich_person sp)
   in
   do np.related := op.related; return
   let op_misc_names = person_misc_names base op in
@@ -506,7 +509,7 @@ value effective_add conf base sp =
   let created_p = ref [] in
   let np =
     map_person_ps (Update.insert_person conf base sp.psources created_p)
-      (Update.insert_string conf base) sp
+      (Update.insert_string conf base) (enrich_person sp)
   in
   let na = {parents = None; consang = Adef.fix (-1)} in
   let nu = {family = [| |]} in
