@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 1.7 1998-11-28 14:08:14 ddr Exp $ *)
+(* $Id: family.ml,v 1.8 1998-11-28 18:54:02 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -374,12 +374,15 @@ value print_no_index conf base =
     in          
     loop conf.env
   in
-  let (addr, suff) =
-    let pref =
-      let s = Wserver.extract_param "GET " ' ' conf.request in
-      match rindex s '?' with
-      [ Some i -> String.sub s 0 i
-      | None -> s ]
+  let link =
+    let addr =
+      let pref =
+        let s = Util.get_request_string conf in
+        match rindex s '?' with
+        [ Some i -> String.sub s 0 i
+        | None -> s ]
+      in
+      Util.get_server_string conf ^ pref
     in
     let suff =
       List.fold_right
@@ -388,18 +391,18 @@ value print_no_index conf base =
            x ^ "=" ^ code_varenv v ^ sep ^ s)
         env ""
     in
-    (Wserver.extract_param "host: " '\r' conf.request ^ pref, suff)
+    let suff =
+      if conf.cgi then "b=" ^ conf.bname ^ ";" ^ suff else suff
+    in
+    "http://" ^ addr ^ "?" ^ suff
   in
   let title _ = Wserver.wprint "Link to use" in
   do header conf title;
      tag "ul" begin
        Wserver.wprint "<li>\n";
-       if not conf.cgi then
-         let link = "http://" ^ addr ^ "?" ^ suff in
-         tag "a" "href=\"%s\"" link begin
-           Wserver.wprint "%s" link;
-         end
-       else Wserver.wprint "%s\n" suff;
+       tag "a" "href=\"%s\"" link begin
+         Wserver.wprint "%s" link;
+       end;
      end;
      trailer conf;
   return ()

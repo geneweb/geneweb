@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 1.3 1998-11-25 09:32:58 ddr Exp $ *)
+(* $Id: util.mli,v 1.4 1998-11-28 18:54:02 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -83,3 +83,6 @@ value coa : config -> string -> string;
 
 value ansel_of_charset : config -> string -> string;
 value aoc : config -> string -> string;
+
+value get_server_string : config -> string;
+value get_request_string : config -> string;

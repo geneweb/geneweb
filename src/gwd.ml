@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.15 1998-11-28 14:08:15 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.16 1998-11-28 18:54:02 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -189,33 +189,28 @@ value print_renamed conf new_n =
     Wserver.wprint "%s -&gt; %s" conf.bname new_n
   in
   let link =
-    let req =
-      let s = Wserver.extract_param "GET " ' ' conf.request in
+    let req = Util.get_request_string conf in
+    let new_req =
       let len = String.length conf.bname in
       loop 0 where rec loop i =
-        if i > String.length s then ""
-        else if i >= len && String.sub s (i - len) len = conf.bname then
-          String.sub s 0 (i - len) ^ new_n ^
-          String.sub s i (String.length s - i)
+        if i > String.length req then ""
+        else if i >= len && String.sub req (i - len) len = conf.bname then
+          String.sub req 0 (i - len) ^ new_n ^
+          String.sub req i (String.length req - i)
         else loop (i + 1)
     in
-    "http://" ^
-    Wserver.extract_param "host: " '\r' conf.request ^
-    req
+    "http://" ^ Util.get_server_string conf ^ new_req
   in
   do Util.header conf title;
      Wserver.wprint "The database \"%s\" has been renamed \"%s\".\n"
        conf.bname new_n;
-     if not conf.cgi then
-       do Wserver.wprint "Please use now:\n<p>\n";
-          tag "ul" begin
-            Wserver.wprint "<li>\n";
-            tag "a" "href=\"%s\"" link begin
-              Wserver.wprint "%s" link;
-            end;
-          end;
-       return ()
-     else ();
+     Wserver.wprint "Please use now:\n<p>\n";
+     tag "ul" begin
+       Wserver.wprint "<li>\n";
+       tag "a" "href=\"%s\"" link begin
+         Wserver.wprint "%s" link;
+       end;
+     end;
      Util.trailer conf;
   return ()
 ;

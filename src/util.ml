@@ -1,4 +1,4 @@
-(* $Id: util.ml,v 1.13 1998-11-25 09:32:58 ddr Exp $ *)
+(* $Id: util.ml,v 1.14 1998-11-28 18:54:02 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -746,4 +746,35 @@ value quote_escaped s =
   if need_code 0 then
     let len = compute_len 0 0 in copy_code_in (String.create len) 0 0
   else s
+;
+
+value get_server_string conf =
+  if not conf.cgi then
+    Wserver.extract_param "host: " '\r' conf.request
+  else
+    let server_name =
+      try Sys.getenv "SERVER_NAME" with
+      [ Not_found -> "" ]
+    in
+    let server_port =
+      try Sys.getenv "SERVER_PORT" with
+      [ Not_found | Failure _ -> "80" ]
+    in
+    if server_port = "80" then server_name
+    else server_name ^ ":" ^ server_port
+;
+
+value get_request_string conf =
+  if not conf.cgi then
+    Wserver.extract_param "GET " ' ' conf.request
+  else
+    let script_name =
+      try Sys.getenv "SCRIPT_NAME" with
+      [ Not_found -> "" ]
+    in
+    let query_string =
+      try Sys.getenv "QUERY_STRING" with
+      [ Not_found -> "" ]
+    in
+    script_name ^ "?" ^ query_string
 ;
