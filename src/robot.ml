@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 4.1 2001-04-21 15:09:00 ddr Exp $ *)
+(* $Id: robot.ml,v 4.2 2001-04-21 15:35:35 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -142,13 +142,15 @@ value check oc tm from max_call sec cgi suicide =
            else ();
            let list =
              let list =
-               W.fold (fun k (_, tm, nb) list -> [(k, tm, nb) :: list])
+               W.fold
+                 (fun k (_, tm, nb) list ->
+                    if nb <= 5 then list else [(k, tm, nb) :: list])
                  xcl.who []
              in
              List.sort
                (fun (_, tm1, nb1) (_, tm2, nb2) ->
                   match compare nb2 nb1 with
-                  [ 0 -> compare tm1 tm2
+                  [ 0 -> compare tm2 tm1
                   | x -> x ])
                list
            in
