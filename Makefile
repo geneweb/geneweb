@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.4 2000-04-16 09:45:47 ddr Exp $
+# $Id: Makefile,v 3.5 2000-05-07 05:55:16 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -60,7 +60,8 @@ new_distrib: classical_distrib
 classical_distrib:
 	$(RM) -rf distribution
 	mkdir distribution
-	cp CHANGES LICENSE distribution/.
+	cp CHANGES distribution/CHANGES.txt
+	cp LICENSE distribution/LICENSE.txt
 	cp src/gwc distribution/gwc$(EXE)
 	cp src/consang distribution/consang$(EXE)
 	cp src/gwd distribution/gwd$(EXE)
