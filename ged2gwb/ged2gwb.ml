@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.23 1998-11-28 13:28:41 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.24 1998-12-01 08:42:24 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -210,12 +210,12 @@ value rec find_all_fields lab =
 
 value rec lexing =
   parser
-  [ [: `('0'..'9' as c); n = number (store 0 c) :] -> Token.Tint n
-  | [: `('A'..'Z' as c); i = ident (store 0 c) :] -> Token.Tlident i
-  | [: `'.' :] -> Token.Tterm "."
+  [ [: `('0'..'9' as c); n = number (store 0 c) :] -> ("INT", n)
+  | [: `('A'..'Z' as c); i = ident (store 0 c) :] -> ("LIDENT", i)
+  | [: `'.' :] -> ("", ".")
   | [: `' ' | '\r'; s :] -> lexing s
-  | [: _ = Stream.empty :] -> Token.Teoi
-  | [: `x :] -> Token.Tterm (String.make 1 x) ]
+  | [: _ = Stream.empty :] -> ("EOI", "")
+  | [: `x :] -> ("", String.make 1 x) ]
 and number len =
   parser
   [ [: `('0'..'9' as c); n = number (store len c) :] -> n
@@ -228,10 +228,16 @@ and ident len =
 
 value make_lexing s = Stream.from (fun _ -> Some (lexing s));
 
+value tparse (p_con, p_prm) =
+  if p_prm = "" then parser [: `(con, prm) when con = p_con :] -> prm
+  else parser [: `(con, prm) when con = p_con && prm = p_prm :] -> prm
+;
+
 value lexer =
   {Token.func = fun s -> (make_lexing s, fun _ -> (0, 0));
    Token.add_keyword = fun _ -> ();
    Token.remove_keyword = fun _ -> ();
+   Token.tparse = tparse;
    Token.text = fun _ -> "<tok>"}
 ;
 
@@ -243,10 +249,10 @@ value title_date = Grammar.Entry.create g "title_date";
 value find_year =
   let rec find strm =
     match strm with parser
-    [ [: `Token.Tint n :] ->
+    [ [: `("INT", n) :] ->
         let n = int_of_string n in
         if n >= 32 && n <= 2500 then n else find strm
-    | [: `Token.Teoi :] -> raise Not_found
+    | [: `("EOI", "") :] -> raise Not_found
     | [: `_ :] -> find strm ]
   in
   Grammar.Entry.of_parser g "find_year" find
