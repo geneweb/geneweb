@@ -1,15 +1,15 @@
 GeneWeb 2.04
 
 If you are under Windows NT/95/98:
-   Double-click on the file "index.htm" of the directory "doc" of the
-   distribution of GeneWeb, and follow the instructions.
+   Double-click on the file "index.htm" of the directory "doc",
+   and follow the instructions.
 
 If you are under Unix:
    Launch your Web navigator.
    If you installed GeneWeb, for example in
         /home/smith/geneweb
    open the location:
-        file:/home/smith/geneweb/doc/index.htm
+        file:/home/smith/geneweb/gw/doc/index.htm
    and follow the instructions.
 
      -----------------

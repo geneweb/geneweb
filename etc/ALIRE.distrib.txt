@@ -1,0 +1,13 @@
+Pour démarrer avec GeneWeb, il va vous falloir d'abord effectuer
+quelques commandes.
+
+Le plus simple est de lancer le programme "setup". Il vous permettra
+de démarrer en utilisant votre navigateur Web pour ces commandes de
+départ. Tout vous sera expliqué dans la navigation.
+
+   Sous Windows, double-cliquez sur "setup".
+   Sous Unix, lancez "setup" dans un xterm.
+
+Si vous êtes habitué aux commandes intéractives (MSdos, Xterm) et
+préférez connaître les commandes de base de GeneWeb, allez dans le
+répertoire "gw" et lisez le fichier ALIRE.txt.

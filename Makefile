@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.15 1999-07-22 22:30:54 ddr Exp $
+# $Id: Makefile,v 2.16 1999-08-04 01:37:48 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -34,8 +34,8 @@ distrib: classical_distrib
 	  cp setup/$$i/*.htm distribution/gw/setup/$$i; \
 	  cp setup/$$i/*.txt distribution/gw/setup/$$i; \
 	done
-	echo "Launch the program \"setup\"" > distribution/README.txt
-	echo "Lancez le programme \"setup\"" > distribution/ALIRE.txt
+	cp etc/ALIRE.distrib.txt distribution/README.txt
+	cp etc/README.distrib.txt distribution/ALIRE.txt
 	echo "127.0.0.1" > distribution/gw/only.txt
 
 classical_distrib:

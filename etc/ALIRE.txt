@@ -3,15 +3,15 @@ GeneWeb 2.04
 Pour demarrer avec GeneWeb, suivez les instructions suivantes:
 
 Si vous etes sous Windows NT/95/98:
-   Double-cliquez sur le fichier "index.htm" du repertoire "doc"
-   de la distribution de GeneWeb, et suivez les instructions.
+   Double-cliquez sur le fichier "index.htm" du repertoire "doc",
+   et suivez les instructions.
 
 Si vous etes sous Unix:
    Lancez votre navigateur Web.
    Si vous avez installe GeneWeb, par exemple dans
         /home/dupont/geneweb
    ouvrez la location:
-        file:/home/dupont/geneweb/doc/index.htm
+        file:/home/dupont/geneweb/gw/doc/index.htm
    et suivez les instructions.
 
      -----------------
