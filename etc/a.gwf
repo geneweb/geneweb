@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 4.22 2004-01-05 10:19:41 ddr Exp $
+# $Id: a.gwf,v 4.23 2004-01-05 14:21:37 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -118,6 +118,11 @@ propose_add_family=yes
 # Set to no if you don't want the request by place/surname to be
 # proposed in the welcome page.
 propose_place_surname=yes
+
+# Set to yes if you want that the access to surnames and first names by
+# alphabetic order be fast (interesting for very big databases). Drawback:
+# the first page does not display the number of surname or first names
+fast_alphabetic=no
 
 # Link in the display place/surname point to some individual concerned
 # by the place (yes) or to the whole surname (no)

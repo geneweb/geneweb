@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.4 2002-01-30 11:49:46 ddr Exp $ *)
+(* $Id: alln.ml,v 4.5 2004-01-05 14:21:11 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -321,8 +321,12 @@ value print_alphabetic conf base is_surnames =
     [ Some k -> String.lowercase k
     | _ -> "" ]
   in
+  let fast =
+    p_getenv conf.base_env "fast_alphabetic" = Some "yes" && ini = ""
+  in
   let _ =
-    if String.length ini < 2 then let _ = base.data.strings.array () in ()
+    if fast || String.length ini < 2 then
+      let _ = base.data.strings.array () in ()
     else ()
   in
   let all =
@@ -331,12 +335,23 @@ value print_alphabetic conf base is_surnames =
     | _ -> False ]
   in
   let list =
-    let (list, sorted) = select_names conf base is_surnames ini in
-    if sorted then list
-    else Sort.list (fun (k1, _, _) (k2, _, _) -> k1 <= k2) list
+    if fast then
+      let list =
+        loop [] 'Z' where rec loop list c =
+          let list = [(String.make 1 c, "", 1) :: list] in
+          if c = 'A' then list else loop list (Char.chr (Char.code c - 1))
+      in
+      list
+    else
+      let (list, sorted) = select_names conf base is_surnames ini in
+      if sorted then list
+      else Sort.list (fun (k1, _, _) (k2, _, _) -> k1 <= k2) list
   in
   let len = List.length list in
-  if len >= 50 then
+  if fast then
+    let list = List.map (fun (s, _, _) -> (s, 1)) list in
+    print_alphabetic_big conf base is_surnames ini list 1
+  else if len >= 50 then
     let list = combine_by_ini ini list in
     if all then print_alphabetic_all conf base is_surnames ini list len
     else print_alphabetic_big conf base is_surnames ini list len
