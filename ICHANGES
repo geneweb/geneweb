@@ -29,6 +29,10 @@ GeneWeb Version 3.03
   - [19 Jan 00] In traces, display dates in standard, i.e. using -
     instead of / in year-month-day.
 
+* GeneWeb uncompiler (gwu)
+  - [27 Feb 00] Deleted backward compatibility giving "main title" according
+    to the title name.
+
 * Gedcom to GeneWeb (ged2gwb)
   - [19 Feb 00] The option "-ds" applies now to families too.
 

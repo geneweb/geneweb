@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.7 2000-01-15 18:55:55 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.8 2000-02-27 18:53:22 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -179,7 +179,7 @@ value print_title oc base t =
 ;
 
 (* main_title = backward compatibility (installed version 2.01);
-   should be removed one day... *)
+   (removed version 3.03)...
 value main_title =
   let val =
     fun
@@ -207,6 +207,7 @@ value main_title =
     in
     loop None p.titles
 ;
+*)
 
 value print_infos oc base is_child print_sources p =
   do List.iter (print_first_name_alias oc base) p.first_names_aliases;
@@ -218,14 +219,14 @@ value print_infos oc base is_child print_sources p =
      print_if_no_empty oc base "#image" p.image;
      List.iter (print_nick_name oc base) p.nick_names;
      List.iter (print_alias oc base) p.aliases;
-(* backward compatibility (installed version 2.01) *)
+(* backward compatibility (installed version 2.01) (removed version 3.03)
      match p.titles with
      [ [_] | [] -> ()
      | [t0 :: _] ->
          match main_title base p with
          [ Some t -> if t = t0 then () else t.t_name := Tmain
          | _ -> () ] ];
-(**)
+*)
      List.iter (print_title oc base) p.titles;
      match p.access with
      [ IfTitles -> ()
