@@ -1,13 +1,11 @@
 INSTALLATIONS INSTRUCTIONS IN UNIX or MACOSX MACHINES
 [For Windows machines, look at the end of this file]
 
-For the compilation, you need
-   the Objective Caml compiler version 3.04
+For the compilation, you need the Objective Caml compiler version 3.04
 installed in your computer.
 
-They are freely distributed at addresses:
+It is freely distributed at address:
      http://caml.inria.fr/ocaml/
-     http://caml.inria.fr/camlp4/
 
 It may compile with other (older or newer) versions of OCaml and Camlp4,
 but no warranty: however, if you manage to compile, it has good chances

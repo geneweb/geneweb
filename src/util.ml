@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.20 2001-12-24 16:05:16 ddr Exp $ *)
+(* $Id: util.ml,v 4.21 2001-12-31 11:36:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -197,23 +197,26 @@ value age_autorise conf base p =
         loop 0 ]
 ;
 
+value is_old_person conf p =
+  match
+    (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism, p.death,
+     date_of_death p.death)
+  with
+  [ (_, _, NotDead, _) when conf.private_years > 0 -> False
+  | (Some (Dgreg d _), _, _, _) ->
+      let a = temps_ecoule d conf.today in a.year > conf.private_years
+  | (_, Some (Dgreg d _), _, _) ->
+      let a = temps_ecoule d conf.today in a.year > conf.private_years
+  | (_, _, _, Some (Dgreg d _)) ->
+      let a = temps_ecoule d conf.today in a.year > conf.private_years
+  | _ -> False ]
+;
+
 value fast_auth_age conf p =
   if p.access = Public || conf.friend || conf.wizard then True
   else if conf.public_if_titles && p.access = IfTitles && p.titles <> [] then
     True
-  else
-    match
-      (Adef.od_of_codate p.birth, Adef.od_of_codate p.baptism, p.death,
-       date_of_death p.death)
-    with
-    [ (_, _, NotDead, _) when conf.private_years > 0 -> False
-    | (Some (Dgreg d _), _, _, _) ->
-        let a = temps_ecoule d conf.today in a.year > conf.private_years
-    | (_, Some (Dgreg d _), _, _) ->
-        let a = temps_ecoule d conf.today in a.year > conf.private_years
-    | (_, _, _, Some (Dgreg d _)) ->
-        let a = temps_ecoule d conf.today in a.year > conf.private_years
-    | _ -> False ]
+  else is_old_person conf p
 ;
 
 (*
@@ -247,12 +250,18 @@ value connais base p =
   sou base p.first_name <> "?" || sou base p.surname <> "?"
 ;
 
+value is_public conf base p =
+  p.access = Public ||
+  conf.public_if_titles && p.access = IfTitles && p.titles <> [] ||
+  is_old_person conf p
+;
+
 value acces_n conf base n x =
   let first_name = p_first_name base x in
   let surname = p_surname base x in
   if (conf.wizard && conf.friend || conf.access_by_key)
-  && not conf.hide_names
-  && not (first_name = "?" || surname = "?") then
+  && not (first_name = "?" || surname = "?")
+  && (not conf.hide_names || is_public conf base x) then
     "p" ^ n ^ "=" ^ code_varenv (Name.lower first_name) ^ ";n" ^ n ^ "=" ^
       code_varenv (Name.lower surname) ^
       (if x.occ > 0 then ";oc" ^ n ^ "=" ^ string_of_int x.occ else "")
