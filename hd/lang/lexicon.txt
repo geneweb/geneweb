@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.120 2002-11-26 08:39:36 ddr Exp $
+# $Id: lexicon.txt,v 4.121 2002-11-26 15:24:11 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -5890,7 +5890,7 @@ nl: van de %s generatie
 no: av %s generasjon
 pl: w %s. pokoleniu
 pt: da %s gera&ccedil;&atilde;o
-ro: de generatia %
+ro: de generatia %s
 ru: %s поколения
 sl: %s generacije
 sv: av den %s generationen
