@@ -48,25 +48,6 @@ to be correct.
 
 INSTALLATIONS INSTRUCTIONS IN WINDOWS NT/95/98
 
-You need:
-
-- The Cygnus GNU-Win32 development tool, free, available at:
-	http://www.cygnus.com/misc/gnu-win32/
-
-- The Microsoft Visual C++ compiler.
-
-- The Microsoft Assembler masm.
-
-- The Objective Caml compiler (get the binaries, *not* the sources, which are
-  not compilable under Cygnus GUN-Win32).
-
-- The preprocessor Camlp4 (binaries are not distributed, you need to
-  download the sources and compile it).
-
-In directory tools, move the file Makefile.inc as another name, and
-move the file Makefile.inc.win as Makefile.inc. Edit it and possibly
-change "CAMLP4D" and "LIBUNIX" to point file where the corresponding
-OCaml and Camlp4 files or directories are installed.
-
-Then follow the same instructions above than for the Unix installation,
-starting at point 2.
+Forget it. It it complicated. I managed to compile with OCaml 3.00 and
+a version of Camlp4 3.01.7 patched to ensure the compatibility. Seems not
+to work properly when compiled with OCaml 3.01.
