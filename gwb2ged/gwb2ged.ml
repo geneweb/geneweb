@@ -1,10 +1,11 @@
-(* $Id: gwb2ged.ml,v 3.3 2000-03-22 04:14:55 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.4 2000-04-04 02:58:05 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
 open Gutil;
 
 value ascii = ref True;
+value no_notes = ref False;
 
 value month_txt =
   [| "JAN"; "FEB"; "MAR"; "APR"; "MAY"; "JUN";
@@ -118,8 +119,10 @@ value ged_header base oc ifile ofile =
      Printf.fprintf oc "2 FORM LINEAGE-LINKED\n";
      if ascii.val then Printf.fprintf oc "1 CHAR ASCII\n"
      else Printf.fprintf oc "1 CHAR ANSEL\n";
-     let s = base.data.bnotes.nread 0 in
-     if s = "" then () else display_note oc s;
+     if no_notes.val then ()
+     else
+       let s = base.data.bnotes.nread 0 in
+       if s = "" then () else display_note oc s;
   return ()
 ;
 
@@ -615,7 +618,9 @@ value speclist =
    ("-s", Arg.String (fun x -> surnames.val := [x :: surnames.val]),
     "\"<surname>\" : select this surname (option usable several times)");
    ("-nsp", Arg.Set no_spouses_parents,
-    ": no spouses' parents (for option -s)")]
+    ": no spouses' parents (for option -s)");
+   ("-nn", Arg.Set no_notes,
+    ": no (data base) notes")]
 ;
 
 value anon_fun s =

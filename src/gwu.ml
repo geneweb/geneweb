@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.12 2000-04-02 16:35:17 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.13 2000-04-04 02:58:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -661,6 +661,7 @@ value find_person base p1 po p2 =
 
 value surnames = ref [];
 value no_spouses_parents = ref False;
+value no_notes = ref False;
 
 value gwu base out_dir out_oc src_oc_list anc desc =
   let anc =
@@ -734,13 +735,14 @@ value gwu base out_dir out_oc src_oc_list anc desc =
      done;
      let s = base.data.bnotes.nread 0 in
      if s = "" then ()
-     else
+     else if not no_notes.val then
        let (oc, first) = origin_file base.data.bnotes.norigin_file in
        do if not first.val then Printf.fprintf oc "\n" else ();
           Printf.fprintf oc "notes\n";
           Printf.fprintf oc "%s\n" s;
           Printf.fprintf oc "end notes\n";
-       return ();
+       return ()
+     else ();
   return ()
 ;
 
@@ -778,7 +780,9 @@ value speclist =
    ("-s", Arg.String (fun x -> surnames.val := [x :: surnames.val]),
     "\"<surname>\" : select this surname (option usable several times)");
    ("-nsp", Arg.Set no_spouses_parents,
-    ": no spouses' parents (for option -s)")]
+    ": no spouses' parents (for option -s)");
+   ("-nn", Arg.Set no_notes,
+    ": no (data base) notes")]
 ;
 
 value anon_fun s =
