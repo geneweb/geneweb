@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.48 2005-02-11 21:38:15 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.49 2005-02-12 18:34:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -2633,7 +2633,7 @@ value finish_base base =
              Check.print_base_warning log_oc.val base x;
              fprintf log_oc.val "\n"
            } ])
-      (fun _ -> True) False;
+      (fun _ -> True) (fun _ -> ()) False;
     flush log_oc.val
   }
 ;

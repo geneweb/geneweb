@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 4.15 2004-12-14 09:30:11 ddr Exp $ *)
+(* $Id: check.ml,v 4.16 2005-02-12 18:34:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -181,13 +181,14 @@ value update_stats base current_year s p =
   }
 ;
 
-value check_base_aux base error warning =
+value check_base_aux base error warning changed_p =
   do {
     Printf.eprintf "check persons\n";
     ConsangAll.start_progr_bar ();
     for i = 0 to base.data.persons.len - 1 do {
       ConsangAll.run_progr_bar i base.data.persons.len;
-      let p = base.data.persons.get i in check_person base error warning p
+      let p = base.data.persons.get i in
+      if check_person base error warning p then changed_p p else ()
     };
     ConsangAll.finish_progr_bar ();
     Printf.eprintf "check families\n";
@@ -206,7 +207,7 @@ value check_base_aux base error warning =
   }
 ;
 
-value check_base base error warning def pr_stats =
+value check_base base error warning def changed_p pr_stats =
   let s =
     let y = (1000, base.data.persons.get 0) in
     let o = (0, base.data.persons.get 0) in
@@ -216,7 +217,7 @@ value check_base base error warning def pr_stats =
   in
   let current_year = (Unix.localtime (Unix.time ())).Unix.tm_year + 1900 in
   do {
-    check_base_aux base error warning;
+    check_base_aux base error warning changed_p;
     for i = 0 to base.data.persons.len - 1 do {
       let p = base.data.persons.get i in
       if not (def i) then
