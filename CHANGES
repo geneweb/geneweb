@@ -3,8 +3,8 @@ GeneWeb version 4.02
 
 * GeneWeb server or CGI (gwd)
   - [15 Jun 01] Fixed bug in merging families: if there were a key
-    conflict in somebody, the button "Create" proposing to select
-    a fresh key number did not work.
+    conflict in one person, the button "Create" proposing to select a
+    fresh key number did not work.
   - [12 Jun 01] In case of deleted families, the list of the latest
     marriages worked bad.
   - [07 Jun 01] (technical point) fixed problem: in case when the data
