@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.1 2001-04-09 04:19:15 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.2 2001-04-20 14:23:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -28,136 +28,138 @@ value person_key base ip =
 value string_family_of base fam cpl des =
   let sfam = Gutil.map_family_ps (person_key base) (sou base) fam in
   let scpl = Gutil.map_couple_p (person_key base) cpl in
-  let sdes = Gutil.map_descend_p (person_key base) des in
-  (sfam, scpl, sdes)
+  let sdes = Gutil.map_descend_p (person_key base) des in (sfam, scpl, sdes)
 ;
 
 value print_birth conf var create verbose =
-  do tag "td" begin
-       Wserver.wprint "%s" (capitale (transl conf "birth"));
-     end;
-     tag "td" begin
-       Wserver.wprint "<input name=%sb_yyyy size=5 maxlength=5%s>-\n" var
-         (match create with
-          [ Update.Create _ (Some (Some (Dgreg {year = y} _), _, _, _)) ->
-              " value=" ^ string_of_int y
-          | _ -> "" ]);
-       Wserver.wprint "<input name=%sb_mm size=2 maxlength=2%s>-\n" var
-         (match create with
-          [ Update.Create _ (Some (Some (Dgreg {month = m} _), _, _, _))
-            when m <> 0 ->
-              " value=" ^ string_of_int m
-          | _ -> "" ]);
-       Wserver.wprint "<input name=%sb_dd size=2 maxlength=2%s>\n" var
-         (match create with
-          [ Update.Create _ (Some (Some (Dgreg {day = d} _), _, _, _))
-            when d <> 0 ->
-              " value=" ^ string_of_int d
-          | _ -> "" ]);
-     end;
-     if verbose then
-       tag "td" begin Wserver.wprint "%s" (capitale (transl conf "place")); end
-     else ();
-     tag "td" "colspan=2" begin
-       Wserver.wprint "<input name=%sb_pl size=20 maxlength=200%s>\n" var
-         (match create with
-          [ Update.Create _ (Some (_, pl, _, _)) when pl <> "" ->
-              " value=\"" ^ quote_escaped pl ^ "\""
-          | _ -> "" ]);
-     end;
-  return ()
+  do {
+    tag "td" begin
+      Wserver.wprint "%s" (capitale (transl conf "birth"));
+    end;
+    tag "td" begin
+      Wserver.wprint "<input name=%sb_yyyy size=5 maxlength=5%s>-\n" var
+        (match create with
+         [ Update.Create _ (Some (Some (Dgreg {year = y} _), _, _, _)) ->
+             " value=" ^ string_of_int y
+         | _ -> "" ]);
+      Wserver.wprint "<input name=%sb_mm size=2 maxlength=2%s>-\n" var
+        (match create with
+         [ Update.Create _ (Some (Some (Dgreg {month = m} _), _, _, _))
+           when m <> 0 ->
+             " value=" ^ string_of_int m
+         | _ -> "" ]);
+      Wserver.wprint "<input name=%sb_dd size=2 maxlength=2%s>\n" var
+        (match create with
+         [ Update.Create _ (Some (Some (Dgreg {day = d} _), _, _, _))
+           when d <> 0 ->
+             " value=" ^ string_of_int d
+         | _ -> "" ]);
+    end;
+    if verbose then
+      tag "td" begin
+        Wserver.wprint "%s" (capitale (transl conf "place"));
+      end
+    else ();
+    tag "td" "colspan=2" begin
+      Wserver.wprint "<input name=%sb_pl size=20 maxlength=200%s>\n" var
+        (match create with
+         [ Update.Create _ (Some (_, pl, _, _)) when pl <> "" ->
+             " value=\"" ^ quote_escaped pl ^ "\""
+         | _ -> "" ]);
+    end;
+  }
 ;
 
 value print_death conf var create verbose =
-  do tag "td" begin
-       Wserver.wprint "%s" (capitale (transl conf "death"));
-     end;
-     tag "td" begin
-       Wserver.wprint "<input name=%sd_yyyy size=5 maxlength=5%s>-\n" var
-         (match create with
-          [ Update.Create _ (Some (_, _, Some (Dgreg {year = y} _), _)) ->
-              " value=" ^ string_of_int y
-          | _ -> "" ]);
-       Wserver.wprint "<input name=%sd_mm size=2 maxlength=2%s>-\n" var
-         (match create with
-          [ Update.Create _ (Some (_, _, Some (Dgreg {month = m} _), _))
-            when m <> 0 ->
-              " value=" ^ string_of_int m
-          | _ -> "" ]);
-       Wserver.wprint "<input name=%sd_dd size=2 maxlength=2%s>\n" var
-         (match create with
-          [ Update.Create _ (Some (_, _, Some (Dgreg {day = d} _), _))
-            when d <> 0 ->
-              " value=" ^ string_of_int d
-          | _ -> "" ]);
-     end;
-     if verbose then
-       tag "td" begin Wserver.wprint "%s" (capitale (transl conf "place")); end
-     else ();
-     tag "td" "colspan=2" begin
-       Wserver.wprint "<input name=%sd_pl size=20 maxlength=200%s>\n" var
-         (match create with
-          [ Update.Create _ (Some (_, _, _, pl)) when pl <> "" ->
-              " value=\"" ^ quote_escaped pl ^ "\""
-          | _ -> "" ]);
-     end;
-  return ()
+  do {
+    tag "td" begin
+      Wserver.wprint "%s" (capitale (transl conf "death"));
+    end;
+    tag "td" begin
+      Wserver.wprint "<input name=%sd_yyyy size=5 maxlength=5%s>-\n" var
+        (match create with
+         [ Update.Create _ (Some (_, _, Some (Dgreg {year = y} _), _)) ->
+             " value=" ^ string_of_int y
+         | _ -> "" ]);
+      Wserver.wprint "<input name=%sd_mm size=2 maxlength=2%s>-\n" var
+        (match create with
+         [ Update.Create _ (Some (_, _, Some (Dgreg {month = m} _), _))
+           when m <> 0 ->
+             " value=" ^ string_of_int m
+         | _ -> "" ]);
+      Wserver.wprint "<input name=%sd_dd size=2 maxlength=2%s>\n" var
+        (match create with
+         [ Update.Create _ (Some (_, _, Some (Dgreg {day = d} _), _))
+           when d <> 0 ->
+             " value=" ^ string_of_int d
+         | _ -> "" ]);
+    end;
+    if verbose then
+      tag "td" begin
+        Wserver.wprint "%s" (capitale (transl conf "place"));
+      end
+    else ();
+    tag "td" "colspan=2" begin
+      Wserver.wprint "<input name=%sd_pl size=20 maxlength=200%s>\n" var
+        (match create with
+         [ Update.Create _ (Some (_, _, _, pl)) when pl <> "" ->
+             " value=\"" ^ quote_escaped pl ^ "\""
+         | _ -> "" ]);
+    end;
+  }
 ;
 
-value print_parent_person conf base var (first_name, surname, occ, create, _) =
-  do tag "table" "border=1" begin
-       tag "tr" begin
-         tag "td" begin
-           Wserver.wprint "%s"
-             (capitale (transl_nth conf "first name/first names" 0));
-         end;
-         tag "td" begin
-           Wserver.wprint "<input name=%s_fn size=23 maxlength=200" var;
-           Wserver.wprint " value=\"%s\">"
-             (quote_escaped first_name);
-         end;
-         tag "td" "align=right" begin
-           let s = capitale (transl conf "number") in
-           Wserver.wprint "%s" s;
-         end;
-         tag "td" begin
-           Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
-             (if occ == 0 then "" else " value=" ^ string_of_int occ);
-         end;
-         tag "td" begin
-           tag "select" "name=%s_p" var begin
-             Wserver.wprint "<option value=link%s>%s\n"
-               (if create = Update.Link then " selected" else "")
-               (capitale (transl conf "link"));
-             Wserver.wprint "<option value=create%s>%s\n"
-               (match create with
-                [ Update.Create _ _ -> " selected" | _ -> "" ])
-               (capitale (transl conf "create"));
-           end;
-         end;
-       end;
-       Wserver.wprint "\n";
-       tag "tr" begin
-         tag "td" begin
-           Wserver.wprint "%s"
-             (capitale (transl_nth conf "surname/surnames" 0));
-         end;
-         tag "td" "colspan=4" begin
-           Wserver.wprint
-             "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
-             var surname;
-         end;
-       end;
-     end;
-     tag "table" "border=1" begin
-       tag "tr" begin
-         print_birth conf var create True;
-       end;
-       tag "tr" begin
-         print_death conf var create True;
-       end;
-     end;
-  return ()
+value
+  print_parent_person conf base var (first_name, surname, occ, create, _) =
+  do {
+    tag "table" "border=1" begin
+      tag "tr" begin
+        tag "td" begin
+          Wserver.wprint "%s"
+            (capitale (transl_nth conf "first name/first names" 0));
+        end;
+        tag "td" begin
+          Wserver.wprint "<input name=%s_fn size=23 maxlength=200" var;
+          Wserver.wprint " value=\"%s\">" (quote_escaped first_name);
+        end;
+        tag "td" "align=right" begin
+          let s = capitale (transl conf "number") in Wserver.wprint "%s" s;
+        end;
+        tag "td" begin
+          Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
+            (if occ == 0 then "" else " value=" ^ string_of_int occ);
+        end;
+        tag "td" begin
+          tag "select" "name=%s_p" var begin
+            Wserver.wprint "<option value=link%s>%s\n"
+              (if create = Update.Link then " selected" else "")
+              (capitale (transl conf "link"));
+            Wserver.wprint "<option value=create%s>%s\n"
+              (match create with
+               [ Update.Create _ _ -> " selected"
+               | _ -> "" ])
+              (capitale (transl conf "create"));
+          end;
+        end;
+      end;
+      Wserver.wprint "\n";
+      tag "tr" begin
+        tag "td" begin
+          Wserver.wprint "%s"
+            (capitale (transl_nth conf "surname/surnames" 0));
+        end;
+        tag "td" "colspan=4" begin
+          Wserver.wprint
+            "<input name=%s_sn size=40 maxlength=200 value=\"%s\">" var
+            surname;
+        end;
+      end;
+    end;
+    tag "table" "border=1" begin
+      tag "tr" begin print_birth conf var create True; end;
+      tag "tr" begin print_death conf var create True; end;
+    end;
+  }
 ;
 
 value print_child_person conf base var (first_name, surname, occ, create, _) =
@@ -169,12 +171,10 @@ value print_child_person conf base var (first_name, surname, occ, create, _) =
       end;
       tag "td" "colspan=2" begin
         Wserver.wprint "<input name=%s_fn size=23 maxlength=200" var;
-        Wserver.wprint " value=\"%s\">"
-          (quote_escaped first_name);
+        Wserver.wprint " value=\"%s\">" (quote_escaped first_name);
       end;
       tag "td" "align=right" begin
-        let s = capitale (transl conf "number") in
-        Wserver.wprint "%s" s;
+        let s = capitale (transl conf "number") in Wserver.wprint "%s" s;
       end;
       tag "td" begin
         Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
@@ -184,12 +184,10 @@ value print_child_person conf base var (first_name, surname, occ, create, _) =
     Wserver.wprint "\n";
     tag "tr" begin
       tag "td" begin
-        Wserver.wprint "%s"
-          (capitale (transl_nth conf "surname/surnames" 0));
+        Wserver.wprint "%s" (capitale (transl_nth conf "surname/surnames" 0));
       end;
       tag "td" "colspan=4" begin
-        Wserver.wprint
-          "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
+        Wserver.wprint "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
           var surname;
       end;
     end;
@@ -212,13 +210,17 @@ value print_child_person conf base var (first_name, surname, occ, create, _) =
       tag "td" begin
         Wserver.wprint "<input type=radio name=%s_sex value=N%s>?\n" var
           (match create with
-           [ Update.Create Neuter _ -> " checked" | _ -> "" ]);
+           [ Update.Create Neuter _ -> " checked"
+           | _ -> "" ]);
         Wserver.wprint "<input type=radio name=%s_sex value=M%s>%s\n" var
-          (match create with [ Update.Create Male _ -> " checked" | _ -> "" ])
+          (match create with
+           [ Update.Create Male _ -> " checked"
+           | _ -> "" ])
           (transl_nth conf "M/F" 0);
         Wserver.wprint "<input type=radio name=%s_sex value=F%s>%s\n" var
           (match create with
-           [ Update.Create Female _ -> " checked" | _ -> "" ])
+           [ Update.Create Female _ -> " checked"
+           | _ -> "" ])
           (transl_nth conf "M/F" 1);
       end;
       print_death conf var create False;
@@ -227,23 +229,25 @@ value print_child_person conf base var (first_name, surname, occ, create, _) =
 ;
 
 value print_father conf base cpl =
-  do stag "h4" begin
-       Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 0));
-     end;
-     Wserver.wprint "\n";
-     print_parent_person conf base "him" cpl.father;
-     Wserver.wprint "\n";
-  return ()
+  do {
+    stag "h4" begin
+      Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 0));
+    end;
+    Wserver.wprint "\n";
+    print_parent_person conf base "him" cpl.father;
+    Wserver.wprint "\n";
+  }
 ;
 
 value print_mother conf base cpl =
-  do stag "h4" begin
-       Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 1));
-     end;
-     Wserver.wprint "\n";
-     print_parent_person conf base "her" cpl.mother;
-     Wserver.wprint "\n";
-  return ()
+  do {
+    stag "h4" begin
+      Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 1));
+    end;
+    Wserver.wprint "\n";
+    print_parent_person conf base "her" cpl.mother;
+    Wserver.wprint "\n";
+  }
 ;
 
 value print_insert_witness conf base cnt =
@@ -253,8 +257,7 @@ value print_insert_witness conf base cnt =
       tag "td" begin
         let s = transl_nth conf "witness/witnesses" 0 in
         Wserver.wprint "%s <input type=checkbox name=%s value=on>"
-          (capitale (transl_decline conf "insert" s))
-          var;
+          (capitale (transl_decline conf "insert" s)) var;
       end;
     end;
   end
@@ -270,80 +273,98 @@ value print_witnesses conf base fam =
     [ [] -> let t = ("", "", 0, Update.Create Neuter None, "") in [t; t]
     | ipl -> ipl ]
   in
-  do tag "h4" begin
-       Wserver.wprint "%s"
-         (capitale (transl_nth conf "witness/witnesses" 1));
-     end;
-     Wserver.wprint "\n";
-     print_insert_witness conf base 0;
-     let _ = List.fold_left
-       (fun cnt n ->
-          do print_witness conf base ("witn" ^ string_of_int cnt) n;
+  do {
+    tag "h4" begin
+      Wserver.wprint "%s" (capitale (transl_nth conf "witness/witnesses" 1));
+    end;
+    Wserver.wprint "\n";
+    print_insert_witness conf base 0;
+    let _ =
+      List.fold_left
+        (fun cnt n ->
+           do {
+             print_witness conf base ("witn" ^ string_of_int cnt) n;
              print_insert_witness conf base cnt;
-          return cnt + 1)
-       1 witnesses
-    in ();
-  return ()
+             cnt + 1
+           })
+        1 witnesses
+    in
+    ();
+  }
 ;
 
 value print_marriage conf base fam =
-  do tag "h4" begin
-       Wserver.wprint "%s"
-         (capitale (nominative (transl_nth conf "marriage/marriages" 0)));
-     end;
-     Wserver.wprint "\n";
-     Wserver.wprint "<input type=radio name=mrel value=marr%s>"
-       (match fam.relation with [ Married -> " checked" | _ -> "" ]);
-     Wserver.wprint "%s\n" (capitale (transl conf "married"));
-     Wserver.wprint "<input type=radio name=mrel value=not_marr%s>"
-       (match fam.relation with [ NotMarried -> " checked" | _ -> "" ]);
-     Wserver.wprint "%s\n" (capitale (transl conf "not married"));
-     Wserver.wprint "<input type=radio name=mrel value=engaged%s>"
-       (match fam.relation with [ Engaged -> " checked" | _ -> "" ]);
-     Wserver.wprint "%s\n" (capitale (transl conf "engaged"));
-     Wserver.wprint "<input type=radio name=mrel value=nsck%s>"
-       (match fam.relation with [ NoSexesCheck -> " checked" | _ -> "" ]);
-     Wserver.wprint "%s\n" (capitale (transl conf "no sexes check"));
-     tag "table" "border=1" begin
-       tag "tr" begin
-         tag "td" begin
-           Wserver.wprint "%s\n" (capitale (transl conf "place"));
-         end;
-         tag "td" begin
-           Wserver.wprint
-             "<input name=marriage_place size=40 maxlength=200%s>\n"
-             (if fam.marriage_place = "" then ""
+  do {
+    tag "h4" begin
+      Wserver.wprint "%s"
+        (capitale (nominative (transl_nth conf "marriage/marriages" 0)));
+    end;
+    Wserver.wprint "\n";
+    Wserver.wprint "<input type=radio name=mrel value=marr%s>"
+      (match fam.relation with
+       [ Married -> " checked"
+       | _ -> "" ]);
+    Wserver.wprint "%s\n" (capitale (transl conf "married"));
+    Wserver.wprint "<input type=radio name=mrel value=not_marr%s>"
+      (match fam.relation with
+       [ NotMarried -> " checked"
+       | _ -> "" ]);
+    Wserver.wprint "%s\n" (capitale (transl conf "not married"));
+    Wserver.wprint "<input type=radio name=mrel value=engaged%s>"
+      (match fam.relation with
+       [ Engaged -> " checked"
+       | _ -> "" ]);
+    Wserver.wprint "%s\n" (capitale (transl conf "engaged"));
+    Wserver.wprint "<input type=radio name=mrel value=nsck%s>"
+      (match fam.relation with
+       [ NoSexesCheck -> " checked"
+       | _ -> "" ]);
+    Wserver.wprint "%s\n" (capitale (transl conf "no sexes check"));
+    tag "table" "border=1" begin
+      tag "tr" begin
+        tag "td" begin
+          Wserver.wprint "%s\n" (capitale (transl conf "place"));
+        end;
+        tag "td" begin
+          Wserver.wprint
+            "<input name=marriage_place size=40 maxlength=200%s>\n"
+            (if fam.marriage_place = "" then ""
              else " value=\"" ^ quote_escaped fam.marriage_place ^ "\"");
-         end;
-       end;
-     end;
-     Update.print_date conf base (capitale (transl conf "date")) "marriage"
-       (Adef.od_of_codate fam.marriage);
-     Update.print_src conf "marr_src" fam.marriage_src;
-  return ()
+        end;
+      end;
+    end;
+    Update.print_date conf base (capitale (transl conf "date")) "marriage"
+      (Adef.od_of_codate fam.marriage);
+    Update.print_src conf "marr_src" fam.marriage_src;
+  }
 ;
 
 value print_divorce conf base fam =
-  do stag "h4" begin
-       Wserver.wprint "%s" (capitale (transl_nth conf "divorce" 0));
-     end;
-     Wserver.wprint "\n";
-     Wserver.wprint
-       "<input type=radio name=divorce value=not_divorced%s>"
-       (match fam.divorce with [ NotDivorced -> " checked" | _ -> "" ]);
-     Wserver.wprint "%s\n" (capitale (transl conf "not divorced"));
-     Wserver.wprint "<input type=radio name=divorce value=divorced%s>"
-       (match fam.divorce with [ Divorced _ -> " checked" | _ -> "" ]);
-     Wserver.wprint "%s\n" (capitale (transl conf "divorced"));
-     Wserver.wprint
-       "<input type=radio name=divorce value=separated%s>"
-       (match fam.divorce with [ Separated -> " checked" | _ -> "" ]);
-     Wserver.wprint "%s\n" (capitale (transl conf "separated"));
-     Update.print_date conf base (capitale (transl conf "date")) "divorce"
-       (match fam.divorce with
-        [ Divorced d -> Adef.od_of_codate d
-        | _ -> None ]);
-  return ()
+  do {
+    stag "h4" begin
+      Wserver.wprint "%s" (capitale (transl_nth conf "divorce" 0));
+    end;
+    Wserver.wprint "\n";
+    Wserver.wprint "<input type=radio name=divorce value=not_divorced%s>"
+      (match fam.divorce with
+       [ NotDivorced -> " checked"
+       | _ -> "" ]);
+    Wserver.wprint "%s\n" (capitale (transl conf "not divorced"));
+    Wserver.wprint "<input type=radio name=divorce value=divorced%s>"
+      (match fam.divorce with
+       [ Divorced _ -> " checked"
+       | _ -> "" ]);
+    Wserver.wprint "%s\n" (capitale (transl conf "divorced"));
+    Wserver.wprint "<input type=radio name=divorce value=separated%s>"
+      (match fam.divorce with
+       [ Separated -> " checked"
+       | _ -> "" ]);
+    Wserver.wprint "%s\n" (capitale (transl conf "separated"));
+    Update.print_date conf base (capitale (transl conf "date")) "divorce"
+      (match fam.divorce with
+       [ Divorced d -> Adef.od_of_codate d
+       | _ -> None ]);
+  }
 ;
 
 value print_insert_child conf base cnt =
@@ -361,12 +382,13 @@ value print_insert_child conf base cnt =
 ;
 
 value print_child conf base cnt n =
-  do Wserver.wprint "\n";
-     html_li conf;
-     print_child_person conf base ("ch" ^ string_of_int cnt) n;
-     html_li conf;
-     print_insert_child conf base cnt;
-  return ()
+  do {
+    Wserver.wprint "\n";
+    html_li conf;
+    print_child_person conf base ("ch" ^ string_of_int cnt) n;
+    html_li conf;
+    print_insert_child conf base cnt;
+  }
 ;
 
 value print_children conf base des cpl force_children_surnames =
@@ -385,37 +407,41 @@ value print_children conf base des cpl force_children_surnames =
              (first_name, surname, occ, create, var))
           ipl ]
   in
-  do stag "h4" begin
-       Wserver.wprint "%s" (capitale (transl_nth conf "child/children" 1));
-     end;
-     Wserver.wprint "\n";
-     tag "ul" begin
-       html_li conf;
-       print_insert_child conf base 0;
-       let _ = List.fold_left
-          (fun cnt n -> do print_child conf base cnt n; return cnt + 1)
-          1 children
-       in ();
-     end;
-  return ()
+  do {
+    stag "h4" begin
+      Wserver.wprint "%s" (capitale (transl_nth conf "child/children" 1));
+    end;
+    Wserver.wprint "\n";
+    tag "ul" begin
+      html_li conf;
+      print_insert_child conf base 0;
+      let _ =
+        List.fold_left
+          (fun cnt n -> do { print_child conf base cnt n; cnt + 1 }) 1
+          children
+      in
+      ();
+    end;
+  }
 ;
 
 value print_comment conf base fam =
-  do stag "h4" begin
-       Wserver.wprint "%s" (capitale (nominative (transl conf "comment")));
-     end;
-     Wserver.wprint "\n";
-     tag "table" "border=1" begin
-       tag "tr" begin
-         tag "td" begin
-           Wserver.wprint "<input name=comment size=50 maxlength=200%s>\n"
-             (match fam.comment with
-              [ s when s <> "" -> " value=\"" ^ s ^ "\""
-              | _ -> "" ]);
-         end;
-       end;
-     end;
-  return ()
+  do {
+    stag "h4" begin
+      Wserver.wprint "%s" (capitale (nominative (transl conf "comment")));
+    end;
+    Wserver.wprint "\n";
+    tag "table" "border=1" begin
+      tag "tr" begin
+        tag "td" begin
+          Wserver.wprint "<input name=comment size=50 maxlength=200%s>\n"
+            (match fam.comment with
+             [ s when s <> "" -> " value=\"" ^ s ^ "\""
+             | _ -> "" ]);
+        end;
+      end;
+    end;
+  }
 ;
 
 value print_source conf base field =
@@ -424,71 +450,77 @@ value print_source conf base field =
     [ Some s -> s
     | None -> default_source conf ]
   in
-  do tag "h4" begin
-       Wserver.wprint "%s" (capitale (transl_nth conf "source/sources" 0));
-     end;
-     Wserver.wprint "\n";
-     tag "table" "border=1" begin
-       tag "tr" begin
-         tag "td" begin
-           Wserver.wprint "%s"
-             (nominative (capitale (transl_nth conf "person/persons" 1)));
-         end;
-         tag "td" begin
-           Wserver.wprint "<input name=psrc size=50 maxlength=200%s>\n"
-             (if p_field = "" then ""
-              else " value=\"" ^ quote_escaped p_field ^ "\"");
-         end;
-       end;
-       tag "tr" begin
-         tag "td" begin
-           Wserver.wprint "%s"
-             (capitale (nominative (transl_nth conf "family/families" 0)));
-         end;
-         tag "td" begin
-           Wserver.wprint "<input name=src size=50 maxlength=200%s>\n"
-             (if field = "" then ""
-              else " value=\"" ^ quote_escaped field ^ "\"");
-           Wserver.wprint "<input type=checkbox name=rdsrc value=on%s>\n"
-             (match p_getenv conf.env "rdsrc" with
-              [ Some "on" -> " checked" | _ -> "" ]);
-         end;
-       end;
-     end;
-  return ()
+  do {
+    tag "h4" begin
+      Wserver.wprint "%s" (capitale (transl_nth conf "source/sources" 0));
+    end;
+    Wserver.wprint "\n";
+    tag "table" "border=1" begin
+      tag "tr" begin
+        tag "td" begin
+          Wserver.wprint "%s"
+            (nominative (capitale (transl_nth conf "person/persons" 1)));
+        end;
+        tag "td" begin
+          Wserver.wprint "<input name=psrc size=50 maxlength=200%s>\n"
+            (if p_field = "" then ""
+             else " value=\"" ^ quote_escaped p_field ^ "\"");
+        end;
+      end;
+      tag "tr" begin
+        tag "td" begin
+          Wserver.wprint "%s"
+            (capitale (nominative (transl_nth conf "family/families" 0)));
+        end;
+        tag "td" begin
+          Wserver.wprint "<input name=src size=50 maxlength=200%s>\n"
+            (if field = "" then ""
+             else " value=\"" ^ quote_escaped field ^ "\"");
+          Wserver.wprint "<input type=checkbox name=rdsrc value=on%s>\n"
+            (match p_getenv conf.env "rdsrc" with
+             [ Some "on" -> " checked"
+             | _ -> "" ]);
+        end;
+      end;
+    end;
+  }
 ;
 
 value print_family conf base fam cpl des force_children_surnames =
-  do print_father conf base cpl;
-     Wserver.wprint "\n";
-     print_mother conf base cpl;
-     Wserver.wprint "\n";
-     print_marriage conf base fam;
-     Wserver.wprint "\n";
-     print_witnesses conf base fam;
-     Wserver.wprint "\n";
-     print_divorce conf base fam;
-     Wserver.wprint "\n";
-     print_comment conf base fam;
-     Wserver.wprint "\n";
-     print_children conf base des cpl force_children_surnames;
-     Wserver.wprint "\n";
-     print_source conf base fam.fsources;
-  return ()
+  do {
+    print_father conf base cpl;
+    Wserver.wprint "\n";
+    print_mother conf base cpl;
+    Wserver.wprint "\n";
+    print_marriage conf base fam;
+    Wserver.wprint "\n";
+    print_witnesses conf base fam;
+    Wserver.wprint "\n";
+    print_divorce conf base fam;
+    Wserver.wprint "\n";
+    print_comment conf base fam;
+    Wserver.wprint "\n";
+    print_children conf base des cpl force_children_surnames;
+    Wserver.wprint "\n";
+    print_source conf base fam.fsources;
+  }
 ;
 
 value merge_call conf =
-  do Wserver.wprint "<input type=hidden name=m value=MRG_MOD_FAM_OK>\n";
-     match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
-     [ (Some i1, Some i2) ->
-         do Wserver.wprint "<input type=hidden name=ini1 value=%d>\n" i1;
-            Wserver.wprint "<input type=hidden name=ini2 value=%d>\n" i2;
-         return ()
-     | _ -> () ];
-     match p_getint conf.env "i2" with
-     [ Some i2 -> Wserver.wprint "<input type=hidden name=i2 value=%d>\n" i2
-     | _ -> () ];
-  return ()
+  do {
+    Wserver.wprint "<input type=hidden name=m value=MRG_MOD_FAM_OK>\n";
+    match (p_getint conf.env "ini1", p_getint conf.env "ini2") with
+    [ (Some i1, Some i2) ->
+        do {
+          Wserver.wprint "<input type=hidden name=ini1 value=%d>\n" i1;
+          Wserver.wprint "<input type=hidden name=ini2 value=%d>\n" i2;
+          ()
+        }
+    | _ -> () ];
+    match p_getint conf.env "i2" with
+    [ Some i2 -> Wserver.wprint "<input type=hidden name=i2 value=%d>\n" i2
+    | _ -> () ];
+  }
 ;
 
 value print_mod1 conf base fam cpl des digest =
@@ -503,27 +535,28 @@ value print_mod1 conf base fam cpl des digest =
         Wserver.wprint "%s # %d" (capitale (transl_decline conf "modify" s))
           (Adef.int_of_ifam fam.fam_index) ]
   in
-  do header conf title;
-     Wserver.wprint "\n";
-     tag "form" "method=POST action=\"%s\"" conf.command begin
-       Util.hidden_env conf;
-       match p_getenv conf.env "m" with
-       [ Some "MRG_MOD_FAM_OK" -> merge_call conf
-       | _ -> Wserver.wprint "<input type=hidden name=m value=MOD_FAM_OK>\n" ];
-       Wserver.wprint "<input type=hidden name=i value=%d>\n"
-         (Adef.int_of_ifam fam.fam_index);
-       match p_getenv conf.env "ip" with
-       [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
-       | None -> () ];
-       Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
-       print_family conf base fam cpl des False;
-       Wserver.wprint "\n";
-       html_p conf;
-       Wserver.wprint "<input type=submit value=Ok>\n";
-     end;
-     Wserver.wprint "\n";
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    Wserver.wprint "\n";
+    tag "form" "method=POST action=\"%s\"" conf.command begin
+      Util.hidden_env conf;
+      match p_getenv conf.env "m" with
+      [ Some "MRG_MOD_FAM_OK" -> merge_call conf
+      | _ -> Wserver.wprint "<input type=hidden name=m value=MOD_FAM_OK>\n" ];
+      Wserver.wprint "<input type=hidden name=i value=%d>\n"
+        (Adef.int_of_ifam fam.fam_index);
+      match p_getenv conf.env "ip" with
+      [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
+      | None -> () ];
+      Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
+      print_family conf base fam cpl des False;
+      Wserver.wprint "\n";
+      html_p conf;
+      Wserver.wprint "<input type=submit value=Ok>\n";
+    end;
+    Wserver.wprint "\n";
+    trailer conf;
+  }
 ;
 
 value print_del1 conf base fam =
@@ -531,24 +564,25 @@ value print_del1 conf base fam =
     let s = transl_nth conf "family/families" 0 in
     Wserver.wprint "%s" (capitale (transl_decline conf "delete" s))
   in
-  do header conf title;
-     print_link_to_welcome conf True;
-     Wserver.wprint "\n";
-     tag "form" "method=POST action=\"%s\"" conf.command begin
-       Util.hidden_env conf;
-       Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
-         (Adef.int_of_ifam fam.fam_index);
-       match p_getenv conf.env "ip" with
-       [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
-       | None -> () ];
-       Wserver.wprint "<input type=hidden name=m value=DEL_FAM_OK>\n";
-       Wserver.wprint "\n";
-       html_p conf;
-       Wserver.wprint "<input type=submit value=Ok>\n";
-     end;
-     Wserver.wprint "\n";
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    print_link_to_welcome conf True;
+    Wserver.wprint "\n";
+    tag "form" "method=POST action=\"%s\"" conf.command begin
+      Util.hidden_env conf;
+      Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
+        (Adef.int_of_ifam fam.fam_index);
+      match p_getenv conf.env "ip" with
+      [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
+      | None -> () ];
+      Wserver.wprint "<input type=hidden name=m value=DEL_FAM_OK>\n";
+      Wserver.wprint "\n";
+      html_p conf;
+      Wserver.wprint "<input type=submit value=Ok>\n";
+    end;
+    Wserver.wprint "\n";
+    trailer conf;
+  }
 ;
 
 value print_swi1 conf base p fam1 fam2 =
@@ -557,34 +591,35 @@ value print_swi1 conf base p fam1 fam2 =
   in
   let cpl1 = coi base fam1.fam_index in
   let cpl2 = coi base fam2.fam_index in
-  do header conf title;
-     Wserver.wprint "%s:"
-       (capitale (transl conf "switch the order of the following families"));
-     tag "ul" begin
-       html_li conf;
-       Update.print_someone conf base (poi base cpl1.father);
-       Wserver.wprint " %s " (transl conf "and");
-       Update.print_someone conf base (poi base cpl1.mother);
-       html_li conf;
-       Update.print_someone conf base (poi base cpl2.father);
-       Wserver.wprint " %s " (transl conf "and");
-       Update.print_someone conf base (poi base cpl2.mother);
-     end;
-     Wserver.wprint "\n";
-     tag "form" "method=POST action=\"%s\"" conf.command begin
-       Util.hidden_env conf;
-       Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
-         (Adef.int_of_iper p.cle_index);
-       Wserver.wprint "<input type=hidden name=f value=%d>\n\n"
-         (Adef.int_of_ifam fam2.fam_index);
-       Wserver.wprint "<input type=hidden name=m value=SWI_FAM_OK>\n";
-       Wserver.wprint "\n";
-       html_p conf;
-       Wserver.wprint "<input type=submit value=Ok>\n";
-     end;
-     Wserver.wprint "\n";
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    Wserver.wprint "%s:"
+      (capitale (transl conf "switch the order of the following families"));
+    tag "ul" begin
+      html_li conf;
+      Update.print_someone conf base (poi base cpl1.father);
+      Wserver.wprint " %s " (transl conf "and");
+      Update.print_someone conf base (poi base cpl1.mother);
+      html_li conf;
+      Update.print_someone conf base (poi base cpl2.father);
+      Wserver.wprint " %s " (transl conf "and");
+      Update.print_someone conf base (poi base cpl2.mother);
+    end;
+    Wserver.wprint "\n";
+    tag "form" "method=POST action=\"%s\"" conf.command begin
+      Util.hidden_env conf;
+      Wserver.wprint "<input type=hidden name=i value=%d>\n\n"
+        (Adef.int_of_iper p.cle_index);
+      Wserver.wprint "<input type=hidden name=f value=%d>\n\n"
+        (Adef.int_of_ifam fam2.fam_index);
+      Wserver.wprint "<input type=hidden name=m value=SWI_FAM_OK>\n";
+      Wserver.wprint "\n";
+      html_p conf;
+      Wserver.wprint "<input type=submit value=Ok>\n";
+    end;
+    Wserver.wprint "\n";
+    trailer conf;
+  }
 ;
 
 value print_add1 conf base fam cpl des force_children_surnames =
@@ -592,22 +627,23 @@ value print_add1 conf base fam cpl des force_children_surnames =
     let s = transl_nth conf "family/families" 0 in
     Wserver.wprint "%s" (capitale (transl_decline conf "add" s))
   in
-  do header conf title;
-     Wserver.wprint "\n";
-     tag "form" "method=POST action=\"%s\"" conf.command begin
-       Util.hidden_env conf;
-       match p_getenv conf.env "i" with
-       [ Some ip -> Wserver.wprint "<input type=hidden name=i value=%s>\n" ip
-       | None -> () ];
-       Wserver.wprint "<input type=hidden name=m value=ADD_FAM_OK>\n";
-       print_family conf base fam cpl des force_children_surnames;
-       Wserver.wprint "\n";
-       html_p conf;
-       Wserver.wprint "<input type=submit value=Ok>\n";
-     end;
-     Wserver.wprint "\n";
-     trailer conf;
-  return ()
+  do {
+    header conf title;
+    Wserver.wprint "\n";
+    tag "form" "method=POST action=\"%s\"" conf.command begin
+      Util.hidden_env conf;
+      match p_getenv conf.env "i" with
+      [ Some ip -> Wserver.wprint "<input type=hidden name=i value=%s>\n" ip
+      | None -> () ];
+      Wserver.wprint "<input type=hidden name=m value=ADD_FAM_OK>\n";
+      print_family conf base fam cpl des force_children_surnames;
+      Wserver.wprint "\n";
+      html_p conf;
+      Wserver.wprint "<input type=submit value=Ok>\n";
+    end;
+    Wserver.wprint "\n";
+    trailer conf;
+  }
 ;
 
 value print_add conf base =
@@ -616,14 +652,14 @@ value print_add conf base =
     [ Some i ->
         let p = base.data.persons.get i in
         let fath =
-          if p.sex = Male
-          || p.sex = Neuter && p_getenv conf.env "sex" = Some "M" then
+          if p.sex = Male ||
+             p.sex = Neuter && p_getenv conf.env "sex" = Some "M" then
             person_key base p.cle_index
           else ("", "", 0, Update.Create Male None, "")
         in
         let moth =
-          if p.sex = Female
-          || p.sex = Neuter && p_getenv conf.env "sex" = Some "F" then
+          if p.sex = Female ||
+             p.sex = Neuter && p_getenv conf.env "sex" = Some "F" then
             person_key base p.cle_index
           else ("", "", 0, Update.Create Female None, "")
         in
@@ -633,16 +669,12 @@ value print_add conf base =
          ("", "", 0, Update.Create Female None, "")) ]
   in
   let fam =
-    {marriage = Adef.codate_None; marriage_place = "";
-     marriage_src = ""; witnesses = [| |]; relation = Married;
-     divorce = NotDivorced;
+    {marriage = Adef.codate_None; marriage_place = ""; marriage_src = "";
+     witnesses = [| |]; relation = Married; divorce = NotDivorced;
      comment = ""; origin_file = ""; fsources = default_source conf;
      fam_index = bogus_family_index}
-  and cpl =
-    {father = fath; mother = moth}
-  and des =
-    {children = [| |]}
-  in
+  and cpl = {father = fath; mother = moth}
+  and des = {children = [| |]} in
   print_add1 conf base fam cpl des False
 ;
 
@@ -651,9 +683,8 @@ value print_add_parents conf base =
   [ Some i ->
       let p = base.data.persons.get i in
       let fam =
-        {marriage = Adef.codate_None; marriage_place = "";
-         marriage_src = ""; witnesses = [| |]; relation = Married;
-         divorce = NotDivorced;
+        {marriage = Adef.codate_None; marriage_place = ""; marriage_src = "";
+         witnesses = [| |]; relation = Married; divorce = NotDivorced;
          comment = ""; origin_file = ""; fsources = default_source conf;
          fam_index = bogus_family_index}
       and cpl =
@@ -661,8 +692,8 @@ value print_add_parents conf base =
          mother = ("", "", 0, Update.Create Neuter None, "")}
       and des =
         {children =
-           [| (sou base p.first_name, sou base p.surname, p.occ,
-               Update.Link, "") |]}
+           [| (sou base p.first_name, sou base p.surname, p.occ, Update.Link,
+               "") |]}
       in
       print_add1 conf base fam cpl des True
   | _ -> incorrect_request conf ]
@@ -682,8 +713,7 @@ value print_mod conf base =
 value print_del conf base =
   match p_getint conf.env "i" with
   [ Some i ->
-      let fam = foi base (Adef.ifam_of_int i) in
-      print_del1 conf base fam
+      let fam = foi base (Adef.ifam_of_int i) in print_del1 conf base fam
   | _ -> incorrect_request conf ]
 ;
 
@@ -697,9 +727,11 @@ value rec find_families ifam =
 
 value print_swi conf base =
   match (p_getint conf.env "i", p_getint conf.env "f") with
-  [ (Some ip, Some ifam)  ->
+  [ (Some ip, Some ifam) ->
       let u = base.data.unions.get ip in
-      match find_families (Adef.ifam_of_int ifam) (Array.to_list u.family) with
+      match
+        find_families (Adef.ifam_of_int ifam) (Array.to_list u.family)
+      with
       [ Some (ifam1, ifam2) ->
           let p = base.data.persons.get ip in
           print_swi1 conf base p (foi base ifam1) (foi base ifam2)
