@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.15 1999-07-15 08:52:45 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.16 1999-07-17 21:27:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -122,7 +122,7 @@ value surnames_pieces surname =
   in
   let rec loop i0 iw i =
     if i == String.length surname then
-      if i0 == 0 then [] else flush i0 i
+      if i0 == 0 then [] else if i > i0 + 3 then flush i0 i else []
     else if surname.[i] == ' ' then
       if i > iw + 3 then
         let w = String.sub surname iw (i - iw) in
