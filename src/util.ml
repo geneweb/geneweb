@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.50 2002-10-10 14:51:55 ddr Exp $ *)
+(* $Id: util.ml,v 4.51 2002-10-14 04:23:13 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1485,8 +1485,13 @@ value specify_homonymous conf base p =
       | Some (fath, moth) -> print_parent conf base p fath moth ] ]
 ;
 
+(* fix system bug: string_of_float 17.97 = "17.969999999999" *)
+value my_string_of_float f =
+  Printf.sprintf "%.16g" f
+;
+
 value print_decimal_num conf f =
-  let s = string_of_float f in
+  let s = my_string_of_float f in
   let rec loop i =
     if i == String.length s then ()
     else do {
@@ -1509,7 +1514,6 @@ value source_image_file_name bname str =
   let fname1 =
     List.fold_right Filename.concat [base_path ["src"] bname; "images"] str
   in
-let _ = do { Printf.eprintf "fname1 %s\n" fname1; flush stderr; } in
   let fname2 =
     List.fold_right Filename.concat [base_dir.val; "src"; "images"] str
   in
@@ -2057,4 +2061,44 @@ value commit_patches conf base =
         conf.henv
     ;
   }
+;
+
+(* List selection bullets *)
+
+value bullet_sel_txt = "<tt>o</tt>";
+value bullet_unsel_txt = "<tt>+</tt>";
+value bullet_nosel_txt = "<tt>o</tt>";
+value print_selection_bullet conf =
+  fun
+  [ Some (txt, sel) ->
+      let req =
+        List.fold_left
+          (fun req (k, v) ->
+             if not sel && k = "u" && v = txt then req
+             else
+               let s = k ^ "=" ^ v in
+               if req = "" then s else req ^ ";" ^ s)
+          "" conf.env
+      in
+      do {
+        Wserver.wprint "<a name=%s><tt>" txt;
+        Wserver.wprint "<a href=\"%s%s%s%s\"" (commd conf) req
+          (if sel then ";u=" ^ txt else "")
+          (if sel || List.mem_assoc "u" conf.env then "#" ^ txt else "");
+        Wserver.wprint "%s"
+          (if sel then bullet_sel_txt else bullet_unsel_txt);
+        Wserver.wprint "</a></tt></a>\n";
+      }
+  | None -> Wserver.wprint "%s\n" bullet_nosel_txt ]
+;
+
+value unselected_bullets conf =
+  List.fold_left
+    (fun sl (k, v) ->
+       try
+         if k = "u" then [int_of_string v :: sl]
+         else sl
+       with
+       [ Failure _ -> sl ])
+    [] conf.env
 ;

@@ -5,6 +5,8 @@ GeneWeb Version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [14 Oct 02] Fixed problem of displaying consanguinities: sometimes
+    displayed a lot of digits (too much precision).
   - [04 Oct 02] When entering a complete name (first name + surname), if
     the spelling does not match, display now an intermediate page ("specify")
     even if there is only one matching person.
