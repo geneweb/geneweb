@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.84 2001-01-25 13:35:16 ddr Exp $ *)
+(* $Id: util.ml,v 3.85 2001-01-26 16:24:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -890,14 +890,23 @@ value include_hed_trl conf base_opt suff =
   match try Some (open_in hed_fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let url () =
-        let r =
-          match base_opt with
-          [ Some base -> url_no_index conf base
-          | None -> get_server_string conf ^ get_request_string conf ]
-        in
-        code_varenv r
+        match base_opt with
+        [ Some base -> url_no_index conf base
+        | None -> get_server_string conf ^ get_request_string conf ]
       in
-      copy_from_etc [('u', url)] conf.indep_command ic
+      let pref () =
+        let s = url () in
+        match rindex s '?' with
+        [ Some i -> String.sub s 0 (i + 1)
+        | None -> s ]
+      in
+      let suff () =
+        let s = url () in
+        match rindex s '?' with
+        [ Some i -> String.sub s (i + 1) (String.length s - i - 1)
+        | None -> "" ]
+      in
+      copy_from_etc [('p', pref); ('s', suff)] conf.indep_command ic
   | None -> () ]
 ;
 

@@ -11,9 +11,6 @@ GeneWeb Version 3.11
     links, intermediate pages to ask for confirmation, things like that.
   - [30 Dec 00] When option redirected used, the traces now display the
     referer.
-  - [29 Dec 00] The (undocumented) macro %u which is transformed into the
-    current URL in header of trailer file (base.hed, base.trl) gives now the
-    URL independent from the person index in personal pages (only).
   - [27 Dec 00] Fixed problem: age at death were sometimes not displayed when
     it should have to be.
   - [19 Dec 00] Fixed several problems of declinations appearing in esperanto
