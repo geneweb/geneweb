@@ -2,6 +2,8 @@ GeneWeb version 4.05
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [26 Feb 02] Fixed bug: when updating a person whose death date was
+    indicated as a "text", the death menu displayed "alive".
   - [24 Feb 02] Fixed problem of wizard and friend connections under
     CGI mode which sometimes did not work. Technical features: it was due
     to the fact that in kind of internet connections, the origin internet

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.6 2002-01-20 06:19:23 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.7 2002-02-26 11:57:41 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -271,8 +271,8 @@
   <option value=NotDead%if;not_dead; selected%end;>[*alive]2
   <option value=DontKnowIfDead%if;(dont_know_if_dead and has_birth_date);%sp;
    selected%end;>[*don't know]0%nl;
-  <option value=Death%if;(death.year != "" or dead_dont_know_when);%sp;
-   selected%end;>[*died]2...
+  <option value=Death%if;(death.year != "" or death.text != "" or
+   dead_dont_know_when); selected%end;>[*died]2...
   <option value=DeadYoung%if;died_young; selected%end;>[*died young]2
 </select>
 </td>
