@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.86 2000-04-17 18:50:44 ddr Exp $
+# $Id: lexicon.txt,v 3.87 2000-04-26 08:53:16 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -363,18 +363,18 @@ se: s&ouml;ndag/m&aring;ndag/tisdag/onsdag/torsdag/fredag/l&ouml;rdag
     *nth (cousin)*
 af: n
 cs: n
-de: nth (degre)
-dk: nth (degre)
+de: nth (degree)
+dk: nth (degree)
 en: nth
 eo: nth
 es: nth (feminine)
-fi: nth (degre)
-fr: nth (degre)
+fi: nth (degree)
+fr: nth (degree)
 he: nth (feminine)
 is: &nbsp;
-it: nth (degre)
+it: nth (degree)
 nl: n
-no: nth (degre)
+no: nth (degree)
 pt: nth
 ru: -ûé êóçåí
 se: nth
@@ -1009,6 +1009,26 @@ no: alder
 pt: idade
 ru: âîçğàñò
 se: &aring;lder
+
+    age at death:
+af: ouderdom by afsterwe:
+cn: ÏíÄê
+cs: vìk v dobì úmrtí
+de: Alter:
+dk: alder:
+en: death age:
+eo: agxo de morto:
+es: a la edad de
+fi: ik&auml kuollessa
+fr: &agrave; l'&acirc;ge de
+he:   âéì áîåúå/îåúä
+is: dánaraldur
+it: all'et&agrave; di
+nl: leeftijd bij overlijden:
+no: alder
+pt: com a idade de
+ru: â âîçğàñòå
+se: &aring;lder:
 
     alias
 af: alias
@@ -1973,26 +1993,6 @@ no: d&oslash;d
 pt: morte
 ru: ñìåğòü
 se: d&ouml;d
-
-    death age:
-af: ouderdom by afsterwe:
-cn: ÏíÄê
-cs: vìk v dobì úmrtí
-de: Alter:
-dk: alder:
-en: death age:
-eo: agxo de morto:
-es: a la edad de
-fi: ik&auml kuollessa
-fr: &agrave; l'&acirc;ge de
-he:   âéì áîåúå/îåúä
-is: dánaraldur
-it: all'et&agrave; di
-nl: leeftijd bij overlijden:
-no: alder
-pt: com a idade de
-ru: â âîçğàñòå
-se: &aring;lder:
 
     delete
 af: verwyder
@@ -3397,24 +3397,6 @@ pt: m&aacute;ximo
 ru: ìàêñèìàëüíî
 se: maximalt
 
-    maybe (date)
-af: miskien
-de: vielleicht
-dk: m&aring;ske
-en: maybe
-eo: eble
-es: possiblemente
-fi: ehk&auml;
-fr: peut-&ecirc;tre
-he:  àåìé
-is: kannski
-it: forse
-nl: waarschijnlijk
-no: ansl&aring;tt
-pt: possivelmente
-ru: âîçìîæíî
-se: kanske
-
     merge
 af: saamvoeg
 cs: spojit
@@ -3803,7 +3785,7 @@ pt: n-&eacute;simo/1ro/2ndo/3ro/4rto/5to/6to/7mo/8vo/9no/10mo/11mo/12mo/13mo/14m
 ru: 1-é/2-é/3-é/4-é/5-é/6-é/-7é/8-é/9-é/10-é/11-é/11-é/12-é/13-é/14-é/15-é/16-é/17-é/18-é/19-é/20-é
 se: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
 
-    nth (degre)
+    nth (degree)
 af: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
 de: n-ten/1sten/2ten/3ten/4ten/5ten/6ten/7ten/8ten/9ten/10ten/11ten/12ten/13ten/14ten/15ten/16ten/17ten/18ten/19ten/20ten/21ten/22ten/23ten/24ten/25ten/26ten/27ten/28ten/29ten/30ten/31ten/32ten/33ten/34ten/35ten/36ten/37ten/38ten/39ten/40ten/41ten/42ten/43ten/44ten/45ten/46ten/47ten/48ten/49ten/50ten/51ten/52ten/53ten/54ten/55ten/56ten/57ten/58ten/59ten/60ten/61ten/62ten/63ten/64ten/65ten/66ten/67ten/68ten/69ten/70ten/71ten/72ten/73ten/74ten/75ten/76ten/77ten/78ten/79ten/80ten/81ten/82ten/83ten/84ten/85ten/86ten/87ten/88ten/89ten/90ten/91ten/92ten/93ten/94ten/95ten/96ten/97ten/98ten/99ten
 dk: nte/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
@@ -4347,6 +4329,24 @@ no: sted
 pt: lugar
 ru: ìåñòî
 se: plats
+
+    possibly (date)
+af: miskien
+de: vielleicht
+dk: m&aring;ske
+en: possibly
+eo: eble
+es: possiblemente
+fi: ehk&auml;
+fr: peut-&ecirc;tre
+he:  àåìé
+is: kannski
+it: forse
+nl: waarschijnlijk
+no: ansl&aring;tt
+pt: possivelmente
+ru: âîçìîæíî
+se: kanske
 
     precision
 af: akkuraatheid

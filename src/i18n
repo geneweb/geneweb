@@ -51,6 +51,7 @@ advanced request
 after
 after (date)
 age
+age at death:
 alias
 alive
 all the estates
@@ -103,7 +104,6 @@ cremated
 date
 days old
 death
-death age:
 delete
 descendants
 died
@@ -181,7 +181,6 @@ married
 married at age %t
 married%t to
 maximum
-maybe (date)
 merge
 merge done
 missing ancestors
@@ -231,6 +230,7 @@ person modified
 person/persons
 persons having the same name
 place
+possibly (date)
 precision
 previous sibling
 private
