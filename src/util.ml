@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.86 2004-05-05 11:07:15 ddr Exp $ *)
+(* $Id: util.ml,v 4.87 2004-06-07 12:15:11 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -634,7 +634,12 @@ value gen_person_text (p_first_name, p_surname) conf base p =
       | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
       | (n, []) -> n ]
     in
-    beg ^ " " ^ p_surname base p
+    let ali =
+      match p.aliases with
+      [ [alias :: _] -> " (" ^ sou base alias ^ ")"
+      | _ -> "" ]
+    in
+    beg ^ " " ^ p_surname base p ^ ali
 ;
 
 value gen_person_text_no_html (p_first_name, p_surname) conf base p =
@@ -655,11 +660,19 @@ value gen_person_text_without_surname (p_first_name, p_surname) conf base p =
   if is_hidden p then restricted_txt conf
   else if conf.hide_names && not (fast_auth_age conf p) then "x x"
   else
-    match (sou base p.public_name, p.qualifiers) with
-    [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
-    | (n, []) when n <> "" -> n
-    | (_, [nn :: _]) -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
-    | (_, []) -> p_first_name base p ]
+    let s =
+      match (sou base p.public_name, p.qualifiers) with
+      [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
+      | (n, []) when n <> "" -> n
+      | (_, [nn :: _]) -> p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
+      | (_, []) -> p_first_name base p ]
+    in
+    let ali =
+      match p.aliases with
+      [ [alias :: _] -> " (" ^ sou base alias ^ ")"
+      | _ -> "" ]
+    in
+    s ^ ali
 ;
 
 value person_text = gen_person_text std_access;
