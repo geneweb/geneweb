@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.47 2000-09-14 18:16:08 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.48 2000-09-20 09:02:43 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -6,7 +6,7 @@ open Printf;
 value gwtp_tmp = ref (Filename.concat ".." "gwtp_tmp");
 value gwtp_dst = ref (Filename.concat ".." "gwtp_dst");
 value gw_site = ref "";
-value token_tmout = ref 900.0;
+value token_tmout = ref 900.0.;
 
 value filename_basename str =
   loop (String.length str - 1) where rec loop i =
@@ -398,15 +398,29 @@ value check_token fname from b tok =
   let tokens = read_tokens fname in
   let from_b = from ^ "/" ^ b in
   let tm = Unix.time () in
-  loop [] tokens where rec loop tokens_out =
+  loop tokens where rec loop =
     fun
     [ [(tm0, from_b0, tok0) :: tokens] ->
-        if tm < tm0 || tm -. tm0 > token_tmout.val then
-          loop tokens_out tokens
-        else if from_b = from_b0 && tok = tok0 then
-          (True, List.rev tokens_out @ [(tm, from_b, tok) :: tokens])
-        else loop [(tm0, from_b0, tok0) :: tokens_out] tokens
-    | [] -> (False, List.rev tokens_out) ]
+        if tm < tm0 || tm -. tm0 > token_tmout.val then loop tokens
+        else if from_b = from_b0 && tok = tok0 then True
+        else loop tokens
+    | [] -> False ]
+;
+
+value update_tokens fname from b tok =
+  let tokens = read_tokens fname in
+  let from_b = from ^ "/" ^ b in
+  let tm = Unix.time () in
+  let tokens =
+    List.fold_right
+      (fun ((tm0, from_b0, tok0) as token) tokens ->
+         if tm < tm0 || tm -. tm0 > token_tmout.val then tokens
+         else if from_b = from_b0 && tok = tok0 then tokens
+         else [token :: tokens])
+      tokens []
+  in
+  let tokens = [(tm, from_b, tok) :: tokens] in
+  write_tokens fname tokens
 ;
 
 value set_token from b tok =
@@ -724,12 +738,12 @@ value gwtp_check_login from str env gwtp_fun =
 value gwtp_logged from str env gwtp_fun =
   match (HttpEnv.getenv env "b", HttpEnv.getenv env "t") with
   [ (Some b, Some t) ->
-      let ok =
-        let fname = tokens_file_name () in
-        let (ok, tokens) = check_token fname from b t in
-        do write_tokens fname tokens; return ok
-      in
-      if ok then gwtp_fun str env b t
+      let fname = tokens_file_name () in
+      if check_token fname from b t then
+        do try gwtp_fun str env b t with e ->
+             do update_tokens fname from b t; return raise e;
+           update_tokens fname from b t;
+        return ()
       else gwtp_error "Login expired"
   | _ -> gwtp_invalid_request str env ]
 ;
