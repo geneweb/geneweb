@@ -1,4 +1,4 @@
-# $Id: Makefile.inc.win,v 1.1.1.1 1998-09-01 14:32:19 ddr Exp $
+# $Id: Makefile.inc.win,v 1.2 1998-09-02 10:09:13 ddr Exp $
 
 CAMLP4_COMM=../tools/camlp4_comm.sh pa_ifdef.cmo pa_ru.cmo
 CAMLP4F=-DWIN95
@@ -15,9 +15,6 @@ opt::
 
 clean::
 	$(RM) *.out *.opt *.cm[oixa] *.cmxa *.pp[oi] *.o *.obj *.lck *.bak *~ .#*
-
-depend:
-	ocamldep $(OCAMLI) *.ml* > .depend
 
 
 .SUFFIXES: .ml .cmo .mli .cmi .cmx
@@ -39,5 +36,3 @@ depend:
 	@$(CAMLP4_COMM) $(CAMLP4F) $< -o $*.ppo
 	$(OCAMLOPT) $(OCAMLI) -I $(CAMLP4D) -c -impl $*.ppo
 	$(RM) $*.ppo
-
-include .depend
