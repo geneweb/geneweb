@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.91 1999-08-01 10:40:05 ddr Exp $
+# $Id: lexicon.txt,v 2.92 1999-08-01 19:38:12 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -394,6 +394,7 @@ pt: um primo 3ro/uma prima 3ro/um(a) primo(a) 3ro
 se: en brylling
 
     a brother-in-law/a sister-in-law
+de: ein Schwager/eine Schw&agrave;gerin
 en: a brother-in-law/a sister-in-law
 es: un cu&ntilde;ado/una cu&ntilde;ada
 fr: un beau-fr&egrave;re/une belle-soeur
@@ -549,6 +550,7 @@ pt: um irm&atilde;o/uma irm&atilde;/um(a) irm&atilde;o(&atilde;)
 se: en halvbror/en halvsyster/ett halvsyskon
 
     a nephew (spouse's nephew)/a niece (spouse's niece)
+de: ein Neffe (des Ehegattes)/eine Nichte (des Ehegattes)
 en: a nephew (spouse's nephew)/a niece (spouse's niece)
 es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
 fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
@@ -569,6 +571,7 @@ pt: um sobrino/uma sobrina
 se: en nev&ouml;/en niece
 
     a son-in-law/a daughter-in-law
+de: ein Schwiegersohn/eine Schweigertochter
 en: a son-in-law/a daughter-in-law
 es: un yerno/una nuera
 fr: un beau-fils/une belle-fille
@@ -633,6 +636,7 @@ pt: acrescentar
 se: l&auml;gg till
 
     adoptive father/adoptive mother/adoptive parents
+de: Pflegevater/Pflegemutter/Wahletern
 dk: adoptivfader/adoptivmoder/adoptivfor&aelig;ldre
 en: adoptive father/adoptive mother/adoptive parents
 es: padre adoptivo/madre adoptiva/padres adoptivos
@@ -640,6 +644,7 @@ fr: p&egrave;re adoptif/m&egrave;re adoptive/parents adoptifs
 se: adoptivfar/adoptivmor/adoptivf&ouml;r&auml;ldrar
 
     adoptive son/adoptive daughter/adoptive child
+de: Adoptivsohn/Adoptivtochter/Adoptivkind
 dk: adoptivs&oslash;n/adoptivdatter/adoptivbarn
 en: adoptive son/adoptive daughter/adoptive child
 es: hijo adoptivo/hija adoptiva/hijo(a) adoptivo(a)
@@ -799,6 +804,7 @@ pt: um ancestro/uma ancestra
 se: en ana
 
     an uncle (aunt's husband)/an aunt (uncle's wife)
+de: ein Onkel (Ehemann der Tante)/eine Tante (Ehefrau des Onkels)
 en: an uncle (aunt's husband)/an aunt (uncle's wife)
 es: un t&iacute;o pol&iacute;tico/una t&iacute;a pol&iacute;tica
 fr: un oncle (&eacute;poux de la tante)/une tante (&eacute;pouse de l'oncle)
@@ -941,6 +947,7 @@ pt: ao mesmo tempo
 se: samtidigt
 
     back
+de: zur&uuml;ck
 en: back
 es: regreso
 fr: retour
@@ -1136,6 +1143,7 @@ pt: cancelar os links Geneweb
 se: utan GeneWeb l&auml;nkar
 
     candidate father/candidate mother/candidate parents
+de: m&ouml;gliches Vater/m&ouml;gliche Mutter/m&ouml;glichen Eltern
 dk: mulig fader/mulig moder/mulige for&aelig;ldre
 en: candidate father/candidate mother/candidate parents
 es: padre posible/madre posible/padres posibles
@@ -1143,6 +1151,7 @@ fr: p&egrave;re possible/m&egrave;re possible/parents possibles
 se: m&ouml;jlig far/m&ouml;jlig mor/m&ouml;jliga f&ouml;r&auml;ldrar
 
     candidate son/candidate daughter/candidate child
+de: m&ouml;gliches Sohn/m&ouml;gliche Tochter/m&ouml;gliches Kind
 dk: mulig s&oslash;n/mulig datter/muligt barn
 en: candidate son/candidate daughter/candidate child
 es: hijo posible/hija posible/hijo(a) posible
@@ -1803,6 +1812,7 @@ pt: gera&ccedil;&atilde;o
 se: generation
 
     godfather/godmother/godparents
+de: Taufzeuge/Taufzeugin/Taufzeuge und Taufzeugin
 dk: gudfader/gudmoder/gudfader og gudmoder
 en: godfather/godmother/godparents
 es: padrino/madrina/padrino y padrina
@@ -1810,6 +1820,7 @@ fr: parrain/marraine/parrain et marraine
 se: gudfar/gudmor/gudf&ouml;r&auml;ldrar
 
     godson/goddaughter/godchild
+de: Taufkind
 dk: guds&oslash;n/guddatter/gudbarn
 en: godson/goddaughter/godchild
 es: fahijado/fahijada/fahihado(a)
@@ -2572,6 +2583,7 @@ pt: navega&ccedil;a&atilde;o com o %t como a refer&ecirc;ncia Sosa
 se: navigering med %t som generationsnummer referens
 
     nephews and nieces
+de: Neffen und Nichten
 dk: nev&oslash;er og niecer
 en: nephews and nieces
 eo: nevoj kay nevinoj
@@ -3257,6 +3269,7 @@ fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reco
 se: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
 
     relation/relations
+de: Beziehung/Beziehungen
 dk: forbindelse/forbindelser
 en: relation/relations
 es: relaci&oacute;n/relaciones
@@ -3799,6 +3812,7 @@ pt: depois de amanh&atilde;
 se: i &ouml;vermorgon
 
     the father-in-law/the mother-in-law
+de: der Schwiegervater/die Schwiegetmutter
 en: the father-in-law/the mother-in-law
 es: el suegro/la suegra
 fr: le beau-p&egrave;re/la belle-m&egrave;re
@@ -3991,6 +4005,7 @@ pt: t&iacute;tulo/t&iacute;tulos
 se: titel/titlar
 
     to add a child to a family, use "%s"
+de: um ein Kind zu einer familie zu hinzuf&uuml;gen, benutzen Sie "%s"
 en: to add a child to a family, use "%s"
 es: para agregar un hijo a una familia, utiliza "%s"
 fr: pour ajouter un enfant &agrave; une famille, utiliser "%s"
@@ -4147,6 +4162,7 @@ pt: total
 se: totalt
 
     uncles and aunts
+de: Onkel und Tanten
 dk: onkler og tanter
 en: uncles and aunts
 eo: onkloj kaj onklinoj
