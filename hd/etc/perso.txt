@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.10 2000-10-21 12:24:20 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.11 2000-12-19 19:13:26 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -74,7 +74,7 @@
     <em>(%first_name; %surname_alias;)</em><br>
   %end;
   %foreach;first_name_alias;
-    <em>(%first_name_alias;...)</em><br>
+    <em>(%first_name_alias; %surname;)</em><br>
   %end;
   </td></tr>
   </table>
