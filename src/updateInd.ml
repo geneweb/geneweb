@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.37 2001-02-17 18:58:10 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.38 2001-02-17 22:44:12 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -804,7 +804,7 @@ type env =
 type variable_value =
   [ VVgen of string
   | VVdate of option date and string
-  | VVrelation of option (gen_relation Update.key string) and string
+  | VVrelation of option (gen_relation Update.key string) and list string
   | VVcvar of string
   | VVnone ]
 ;
@@ -837,14 +837,14 @@ value rec eval_variable conf base env p =
         | _ -> None ]
       in
       VVdate d s
-  | ["relation"; s] ->
+  | ["relation" :: sl] ->
       let r =
         match get_env "cnt" env with
         [ Vint i ->
             try Some (List.nth p.rparents (i - 1)) with [ Failure _ -> None ]
         | _ -> None ]
       in
-      VVrelation r s
+      VVrelation r sl
   | [] -> VVgen ""
   | [s] ->
       let v = extract_var "cvar_" s in
@@ -937,7 +937,29 @@ value eval_date_variable conf base env od =
       [ Some (Dgreg {prec = OrYear y} _) -> string_of_int y
       | Some (Dgreg {prec = YearInt y} _) -> string_of_int y
       | _ -> "" ]
-  | v -> "%" ^ v ^ ";" ]
+  | v -> ">%" ^ v ^ "???" ]
+;
+
+value eval_key_variable conf base env (fn, sn, oc, create, var) =
+  fun
+  [ "first_name" -> quote_escaped fn
+  | "occ" -> if oc = 0 then "" else string_of_int oc
+  | "surname" -> quote_escaped sn
+  | s -> ">%" ^ s ^ "???" ]
+;
+
+value eval_relation_variable conf base env p r =
+  fun
+  [ ["r_father"; s] ->
+      match r with
+      [ Some {r_fath = Some x} -> eval_key_variable conf base env x s
+      | _ -> "" ]
+  | ["r_mother"; s] ->
+      match r with
+      [ Some {r_moth = Some x} -> eval_key_variable conf base env x s
+      | _ -> "" ]
+  | [s :: _] -> ">%" ^ s ^ "???"
+  | _ -> ">???" ]
 ;
 
 (* bool values *)
@@ -1008,20 +1030,52 @@ value eval_date_bool_variable conf base env od =
   | s -> do Wserver.wprint ">%%%s???" s; return False ]
 ;
 
+value is_relation_type rt =
+  fun
+  [ Some {r_type = x} -> x = rt
+  | _ -> False ]
+;
+
+value eval_relation_person_bool_variable conf base env
+  (fn, sn, oc, create, var)
+=
+  fun
+  [ ["create"] -> match create with [ Update.Create _ _ -> True | _ -> False ]
+  | ["link"] -> create = Update.Link
+  | [s] -> do Wserver.wprint ">%%%s???" s; return False
+  | _ -> do Wserver.wprint ">???"; return False ]
+;
+
 value eval_relation_bool_variable conf base env r =
   fun
-  [ "rt_empty" ->
+  [ ["r_father" :: sl] ->
+      match r with
+      [ Some {r_fath = Some x} ->
+         eval_relation_person_bool_variable conf base env x sl
+      | _ -> False ]
+  | ["r_mother" :: sl] ->
+      match r with
+      [ Some {r_moth = Some x} ->
+         eval_relation_person_bool_variable conf base env x sl
+      | _ -> False ]
+  | ["rt_adoption"] -> is_relation_type Adoption r
+  | ["rt_candidate_parent"] -> is_relation_type CandidateParent r
+  | ["rt_empty"] ->
       match r with
       [ Some {r_fath = None; r_moth = None} | None -> True
       | _ -> False ]
-  | s -> do Wserver.wprint ">%%%s???" s; return False ]
+  | ["rt_foster_parent"] -> is_relation_type FosterParent r
+  | ["rt_godparent"] -> is_relation_type GodParent r
+  | ["rt_regognition"] -> is_relation_type Recognition r
+  | [s] -> do Wserver.wprint ">%%%s???" s; return False
+  | _ -> do Wserver.wprint ">???"; return False ]
 ;
 
 value eval_bool_variable conf base env p s sl =
   match eval_variable conf base env p [s :: sl] with
   [ VVgen s -> eval_gen_bool_variable conf base env p s
   | VVdate od s -> eval_date_bool_variable conf base env od s
-  | VVrelation r s -> eval_relation_bool_variable conf base env r s
+  | VVrelation r sl -> eval_relation_bool_variable conf base env r sl
   | VVcvar _ -> do Wserver.wprint ">%%%s???" s; return False
   | VVnone -> do Wserver.wprint ">%%%s???" s; return False ]
 ;
@@ -1048,7 +1102,7 @@ value eval_bool_value conf base env p =
           [ VVgen s -> try_eval_gen_variable conf base env p s
           | VVdate od s -> eval_date_variable conf base env od s
           | VVcvar s -> eval_base_env_variable conf s
-          | VVrelation _ s -> do Wserver.wprint ">%%%s???" s; return ""
+          | VVrelation _ _ -> do Wserver.wprint ">%%%s???" s; return ""
           | VVnone -> do Wserver.wprint ">%%%s???" s; return "" ]
         with
         [ Not_found -> do Wserver.wprint ">%%%s???" s; return "" ]
@@ -1068,7 +1122,8 @@ value print_variable conf base env p sl =
   | VVcvar s ->
       try Wserver.wprint "%s" (List.assoc s conf.base_env) with
       [ Not_found -> () ]
-  | VVrelation _ _
+  | VVrelation r sl ->
+      Wserver.wprint "%s" (eval_relation_variable conf base env p r sl)
   | VVnone ->
       do Wserver.wprint ">%%";
          list_iter_first
@@ -1105,17 +1160,19 @@ value print_transl conf base env upp s c =
 ;
 
 value subst_text x v s =
-  loop 0 0 0 where rec loop len i i_ok =
-    if i = String.length s then
-      if i_ok > 0 then loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
-      else Buff.get len
-    else if s.[i] = x.[i_ok] then
-      if i_ok = String.length x - 1 then
-        loop (Buff.mstore len v) (i + 1) 0
-      else loop len (i + 1) (i_ok + 1)
-    else if i_ok > 0 then
-      loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
-    else loop (Buff.store len s.[i]) (i + 1) 0
+  if String.length x = 0 then s
+  else
+    loop 0 0 0 where rec loop len i i_ok =
+      if i = String.length s then
+        if i_ok > 0 then loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
+        else Buff.get len
+      else if s.[i] = x.[i_ok] then
+        if i_ok = String.length x - 1 then
+          loop (Buff.mstore len v) (i + 1) 0
+        else loop len (i + 1) (i_ok + 1)
+      else if i_ok > 0 then
+        loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
+      else loop (Buff.store len s.[i]) (i + 1) 0
 ;
 
 value rec subst sf =
