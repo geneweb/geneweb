@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.32 2000-05-11 16:52:54 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.33 2000-05-14 19:59:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -510,13 +510,8 @@ value print_marriage_long conf base all_gp auth marr_nb p ifam =
   let ispouse = spouse p.cle_index (coi base ifam) in
   let spouse = poi base ispouse in
   let divorce = fam.divorce in
-  let is = index_of_sex p.sex in
   let auth = auth && age_autorise conf base spouse in
-  do let format =
-       if fam.not_married then ftransl conf "relationship%t to"
-       else ftransl_nth conf "married%t to" is
-     in
-     Wserver.wprint (fcapitale format)
+  do Wserver.wprint (fcapitale (relation_txt conf p.sex fam))
        (fun _ ->
           do match marr_nb with
              [ Some n -> Wserver.wprint " (%d)" n
@@ -667,11 +662,7 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
                  age_autorise conf base (poi base cpl.mother)
                in
                do Wserver.wprint "... ";
-                  let format =
-                    if fam.not_married then ftransl conf "relationship%t to"
-                    else ftransl_nth conf "married%t to" 0
-                  in
-                  Wserver.wprint format
+                  Wserver.wprint (relation_txt conf Male fam)
                     (fun _ ->
                        if auth then
                          Perso.print_marriage_text conf base False fam

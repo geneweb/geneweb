@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.7 2000-04-28 00:26:05 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.8 2000-05-14 19:59:35 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -479,10 +479,11 @@ value get_mar_date str =
              else Adef.codate_None, l)
         | _ -> failwith str ]
       in
-      let (not_marr, l) =
+      let (relation, l) =
         match l with
-        [ ["#nm" :: l] -> (True, l)
-        | _ -> (False, l) ]
+        [ ["#nm" :: l] -> (NotMarried, l)
+        | ["#eng" :: l] -> (Engaged, l)
+        | _ -> (Married, l) ]
       in
       let (place, l) = get_field "#mp" l in
       let (src, l) = get_field "#ms" l in
@@ -494,7 +495,7 @@ value get_mar_date str =
             else (Divorced Adef.codate_None, l)
         | _ -> (NotDivorced, l) ]
       in
-      (not_marr, mar, place, src, divorce, l)
+      (relation, mar, place, src, divorce, l)
   | [] -> failwith str ]
 ;
 
@@ -685,7 +686,7 @@ value read_family ic fname =
   fun
   [ Some (str, ["fam" :: l]) ->
       let (cle_pere, surname, l) = parse_parent str l in
-      let (not_marr, marriage, marr_place, marr_src, divorce, l) =
+      let (relation, marriage, marr_place, marr_src, divorce, l) =
         get_mar_date str l
       in
       let (cle_mere, _, l) = parse_parent str l in
@@ -753,7 +754,7 @@ value read_family ic fname =
           let fo =
             {marriage = marriage; marriage_place = marr_place;
              marriage_src = marr_src; witnesses = [| |];
-             not_married = not_marr;
+             relation = relation;
              divorce = divorce;
              comment = comm; origin_file = fname;
              fsources = fsrc;
@@ -765,7 +766,7 @@ value read_family ic fname =
           let fo =
             {marriage = marriage; marriage_place = marr_place;
              marriage_src = marr_src; witnesses = [| |];
-             not_married = not_marr;
+             relation = relation;
              divorce = divorce; comment = comm;
              origin_file = fname; fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.8 2000-05-14 17:01:23 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.9 2000-05-14 19:59:38 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -286,12 +286,15 @@ value print_marriage conf base fam =
          (capitale (transl_nth conf "marriage/marriages" 0));
      end;
      Wserver.wprint "\n";
-     Wserver.wprint "<input type=radio name=not_married value=false%s>"
-       (match fam.not_married with [ False -> " checked" | _ -> "" ]);
+     Wserver.wprint "<input type=radio name=mrel value=marr%s>"
+       (match fam.relation with [ Married -> " checked" | _ -> "" ]);
      Wserver.wprint "%s\n" (capitale (transl_nth conf "married" 1));
-     Wserver.wprint "<input type=radio name=not_married value=true%s>"
-       (match fam.not_married with [ True -> " checked" | _ -> "" ]);
+     Wserver.wprint "<input type=radio name=mrel value=not_marr%s>"
+       (match fam.relation with [ NotMarried -> " checked" | _ -> "" ]);
      Wserver.wprint "%s\n" (capitale (transl conf "not married"));
+     Wserver.wprint "<input type=radio name=mrel value=engaged%s>"
+       (match fam.relation with [ Engaged -> " checked" | _ -> "" ]);
+     Wserver.wprint "%s\n" (capitale (transl_nth conf "engaged" 1));
      tag "table" "border=1" begin
        tag "tr" begin
          tag "td" begin
@@ -612,7 +615,7 @@ value print_add conf base =
   in
   let fam =
     {marriage = Adef.codate_None; marriage_place = "";
-     marriage_src = ""; witnesses = [| |]; not_married = False;
+     marriage_src = ""; witnesses = [| |]; relation = Married;
      divorce = NotDivorced;
      comment = ""; origin_file = ""; fsources = "";
      fam_index = bogus_family_index}
@@ -630,7 +633,7 @@ value print_add_parents conf base =
       let p = base.data.persons.get i in
       let fam =
         {marriage = Adef.codate_None; marriage_place = "";
-         marriage_src = ""; witnesses = [| |]; not_married = False;
+         marriage_src = ""; witnesses = [| |]; relation = Married;
          divorce = NotDivorced;
          comment = ""; origin_file = ""; fsources = "";
          fam_index = bogus_family_index}

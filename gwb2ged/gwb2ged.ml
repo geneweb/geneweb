@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.5 2000-05-03 09:50:39 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.6 2000-05-14 19:59:31 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -420,7 +420,8 @@ value ged_marriage base oc fam =
   | (d, pl) ->
       do Printf.fprintf oc "1 MARR";
          ged_ev_detail oc 2 d pl (sou base fam.marriage_src);
-         if fam.not_married then Printf.fprintf oc "2 PLAC unmarried\n"
+         if fam.relation = NotMarried then
+           Printf.fprintf oc "2 PLAC unmarried\n"
          else ();
       return () ]
 ;

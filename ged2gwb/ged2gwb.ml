@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.18 2000-05-09 12:56:02 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.19 2000-05-14 19:59:30 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -673,7 +673,7 @@ value unknown_fam gen i =
   let mother = phony_per gen Female in
   let f =
     {marriage = Adef.codate_None; marriage_place = empty;
-     marriage_src = empty; witnesses = [| |]; not_married = False;
+     marriage_src = empty; witnesses = [| |]; relation = Married;
      divorce = NotDivorced;
      comment = empty; origin_file = empty; fsources = empty;
      fam_index = Adef.ifam_of_int i}
@@ -1399,25 +1399,25 @@ value add_fam_norm gen r adop_list =
          else [ip :: ipl])
       rl []
   in
-  let (not_married, marr, marr_place, marr_src) =
+  let (relation, marr, marr_place, marr_src) =
     match find_field "MARR" r.rsons with
     [ Some r ->
         let (u, p) =
           match find_field "PLAC" r.rsons with
           [ Some r ->
-              if String.uncapitalize r.rval = "unmarried" then (True, "")
-              else (False, r.rval)
-          | _ -> (False, "") ]
+              if String.uncapitalize r.rval = "unmarried" then (NotMarried, "")
+              else (Married, r.rval)
+          | _ -> (Married, "") ]
         in
         let d =
-          if u then None
+          if u = NotMarried then None
           else
             match find_field "DATE" r.rsons with
             [ Some r -> date_of_field r.rpos r.rval
             | _ -> None ]
         in
         (u, d, p, source gen r)
-    | None -> (False, None, "", "") ]
+    | None -> (Married, None, "", "") ]
   in
   let div =
     match find_field "DIV" r.rsons with
@@ -1447,7 +1447,7 @@ value add_fam_norm gen r adop_list =
      marriage_place = add_string gen marr_place;
      marriage_src = add_string gen marr_src;
      witnesses = [| |];
-     not_married = not_married;
+     relation = relation;
      divorce = div;
      comment = add_string gen comment; origin_file = empty;
      fsources = add_string gen fsources; fam_index = i}

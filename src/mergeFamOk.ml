@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 3.2 2000-01-10 02:14:39 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 3.3 2000-05-14 19:59:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -30,7 +30,7 @@ value reconstitute conf base fam1 des1 fam2 des2 =
        field "marriage_place" (fun f -> sou base f.marriage_place) (\= "");
      marriage_src = cat_strings base fam1.marriage_src ", " fam2.marriage_src;
      witnesses = [| |];
-     not_married = fam1.not_married || fam2.not_married;
+     relation = field "relation" (fun f -> f.relation) (\= Married);
      divorce = field "divorce" (fun f -> f.divorce) (\= NotDivorced);
      comment = sou base fam1.comment;
      origin_file = sou base fam1.origin_file;

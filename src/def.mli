@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 3.3 2000-01-10 02:14:38 ddr Exp $ *)
+(* $Id: def.mli,v 3.4 2000-05-14 19:59:33 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 type iper = Adef.iper;
@@ -24,6 +24,8 @@ and dmy = Adef.dmy ==
 and precision = Adef.precision ==
   [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
 ;
+
+type relation_kind = [ Married | NotMarried | Engaged ];
 
 type divorce = [ NotDivorced | Divorced of codate ];
 
@@ -116,7 +118,7 @@ type gen_family 'person 'string =
     marriage_place : mutable 'string;
     marriage_src : mutable 'string;
     witnesses : mutable array 'person;
-    not_married : mutable bool;
+    relation : mutable relation_kind;
     divorce : mutable divorce;
     comment : mutable 'string;
     origin_file : mutable 'string;

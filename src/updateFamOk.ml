@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.11 2000-05-03 19:37:47 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.12 2000-05-14 19:59:38 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -87,10 +87,11 @@ value reconstitute_family conf =
   let ext = False in
   let father = reconstitute_parent_or_child conf "him" "" in
   let mother = reconstitute_parent_or_child conf "her" "" in
-  let not_married =
-    match p_getenv conf.env "not_married" with
-    [ Some "true" -> True
-    | _ -> False ]
+  let relation =
+    match p_getenv conf.env "mrel" with
+    [ Some "not_marr" -> NotMarried
+    | Some "engaged" -> Engaged
+    | _ -> Married ]
   in
   let marriage = Update.reconstitute_date conf "marriage" in
   let marriage_place = only_printable (get conf "marriage_place") in
@@ -154,7 +155,7 @@ value reconstitute_family conf =
      marriage_place = marriage_place;
      marriage_src = strip_spaces (get conf "marr_src");
      witnesses = Array.of_list witnesses;
-     not_married = not_married; divorce = divorce;
+     relation = relation; divorce = divorce;
      comment = comment; origin_file = ""; fsources = fsources;
      fam_index = Adef.ifam_of_int fam_index}
   and cpl =
