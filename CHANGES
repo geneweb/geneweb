@@ -2,6 +2,12 @@ GeneWeb version 4.05
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [24 Feb 02] Fixed the problem of "disconnection" when (typically)
+    inserting children in a family. Seemed to happen more and more often
+    with recent versions of Windows Web navigators (symptoms: doing
+    "update", "modify family", clicking in an "insert child" button, and
+    doing "ok": then the browser says that the server has disconnected the
+    connection).
   - [14 Feb 02] Now the header and trailer files (base.hed and
     base.trl) can be in only one examplary for all languages in the
     directory lang (of databases directory) with the ability of inline
