@@ -21,7 +21,7 @@ GeneWeb version 2.05
     search by full name fails (no need to select "it is a surname"). Same
     automatic search in relationship computing.
   - [Jul 16, 99] Added a "back" button in case of update error (useful
-    for browsers which loose the data in the forms when navigating).
+    for browsers which loose the contents of the forms when navigating).
   - [Jul 15, 99] Added ability to cancel GeneWeb links in relationship
     computing. Added a long display too, to print in the same page the
     detail of each relationship link.
