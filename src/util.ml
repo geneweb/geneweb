@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.40 1999-08-05 06:22:02 ddr Exp $ *)
+(* $Id: util.ml,v 2.41 1999-08-05 14:26:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1154,7 +1154,7 @@ value browser_doesnt_have_tables conf =
 
 (* Printing for browsers without tables *)
 
-value text_size txt =
+value pre_text_size txt =
   let rec normal len i =
     if i = String.length txt then len
     else if txt.[i] = '<' then in_tag len (i + 1)
@@ -1173,13 +1173,13 @@ value text_size txt =
 ;
 
 value print_pre_center sz txt =
-  do for i = 1 to (sz - text_size txt) / 2 do Wserver.wprint " "; done;
+  do for i = 1 to (sz - pre_text_size txt) / 2 do Wserver.wprint " "; done;
      Wserver.wprint "%s\n" txt;
   return ()
 ;
 
 value print_pre_left sz txt =
-  let tsz = text_size txt in
+  let tsz = pre_text_size txt in
   do if tsz < sz / 2 - 1 then
        for i = 2 to (sz / 2 - 1 - tsz) / 2 do Wserver.wprint " "; done
      else ();
@@ -1188,13 +1188,13 @@ value print_pre_left sz txt =
 ;
 
 value print_pre_right sz txt =
-  let tsz = text_size txt in
+  let tsz = pre_text_size txt in
   do if tsz < sz / 2 - 1 then
        do for i = 1 to sz / 2 do Wserver.wprint " "; done;
           for i = 1 to (sz / 2 - 1 - tsz) / 2 do Wserver.wprint " "; done;
        return ()
      else
-       for i = 1 to sz - text_size txt - 1 do Wserver.wprint " "; done;
+       for i = 1 to sz - pre_text_size txt - 1 do Wserver.wprint " "; done;
      Wserver.wprint " %s\n" txt;
   return ()
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.45 1999-08-05 06:22:02 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.46 1999-08-05 14:26:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -95,7 +95,7 @@ value print_choice conf base p niveau_effectif =
       Wserver.wprint "<input type=radio name=t value=T> %s\n"
         (capitale (transl conf "tree"));
       let limit =
-        if browser_doesnt_have_tables conf then 2 else limit_by_tree
+        if browser_doesnt_have_tables conf then 3 else limit_by_tree
       in
       if niveau_effectif <= limit then ()
       else
@@ -1379,26 +1379,61 @@ value someone_text conf base reference p =
   Date.short_dates_text conf base p
 ;
 
+value print_centered_on sz pos s =
+  let len = pre_text_size s in
+  let sh =
+    if len / 2 < pos then
+      if pos + len / 2 < sz then pos - len / 2
+      else sz - 1 - len
+    else 1
+  in
+  Wserver.wprint "%s%s\n" (String.make sh ' ') s
+;
+
 value print_tree_with_pre conf base v p =
   let sz = 79 in
-  let v = min 2 v in
-  let print_parents sz ifath imoth =
+  let v = min 3 v in
+  let print_parents sz pf pm ifath imoth =
     let fath = poi base ifath in
     let moth = poi base imoth in
-    do print_pre_left sz (someone_text conf base (tree_reference v) fath);
-       print_pre_right sz (someone_text conf base (tree_reference v) moth);
+    do print_centered_on sz pf
+         (someone_text conf base (tree_reference v) fath);
+       print_centered_on sz pm
+         (someone_text conf base (tree_reference v) moth);
     return ()
   in
+  let str2 = String.make (sz / 2) in
+  let str4 = String.make (sz / 4) in
   tag "pre" begin
      match (aoi base p.cle_index).parents with
      [ Some ifam ->
          let cpl = coi base ifam in
-         do print_parents sz cpl.father cpl.mother;
-            print_pre_center sz ("|" ^ String.make (sz / 2) ' ' ^ "|");
-            print_pre_center sz (String.make (sz / 2) '_');
-            print_pre_center sz "|";
+          do if v >= 3 then
+              do match (aoi base cpl.father).parents with
+                 [ Some ifam ->
+                     let cpl = coi base ifam in
+                     print_parents sz (sz / 8) (3 * sz / 8)
+                       cpl.father cpl.mother
+                 | None -> () ];
+                 match (aoi base cpl.mother).parents with
+                 [ Some ifam ->
+                     let cpl = coi base ifam in
+                     print_parents sz (5 * sz / 8) (7 * sz / 8)
+                       cpl.father cpl.mother
+                 | None -> () ];
+                 print_pre_center sz 
+                   ("|" ^ str4 ' ' ^ "|" ^ str4 ' ' ^ "|" ^ str4 ' ' ^ "|");
+                 print_pre_center sz
+                   (str4 '_' ^ " " ^ str4 ' ' ^ " " ^ str4 '_');
+                 print_pre_center sz ("|" ^ str2 ' ' ^ "|");
+              return ()
+            else ();
+            print_parents sz (sz / 4) (3 * sz / 4) cpl.father cpl.mother;
          return ()
      | None -> () ];
+     print_pre_center sz ("|" ^ str2 ' ' ^ "|");
+     print_pre_center sz (str2 '_');
+     print_pre_center sz "|";
      print_pre_center sz (someone_text conf base reference p);
   end
 ;
