@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.9 2000-01-23 16:11:40 ddr Exp $ *)
+(* $Id: date.ml,v 3.10 2000-02-22 11:25:53 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -303,8 +303,7 @@ value short_dates_text conf base p =
       [ (Some _, Death _ _ | NotDead) -> s ^ "-"
       | (_, Death _ _) -> if s = "" then "+" else s ^ nbsp ^ "+"
       | (_, DeadDontKnowWhen | DeadYoung) ->
-          if of_course_died conf p then s
-          else if s = "" then "+" else s ^ nbsp ^ "+"
+          if s = "" then "+" else s ^ nbsp ^ "+"
       | _ -> s ]
     in
     let s =
