@@ -64,6 +64,10 @@ GeneWeb version 3.08
     Web site administrators.
 
 * Documentation:
+  - [20 Sep 00] Added another page (gwsetup.htm) to explain how to use
+    gwsetup (French and English versions). Added two paragraphs in a
+    FAQ, in the beginning of the section "it does not work at all under
+    windows", explaining not to delete the gwsetup window!
   - [09 Sep 00] Updated German version, particularly the FAQ (Falko Trojahn).
   - [07 Sep 00] In the directions for use, the entry "How to start with
     GeneWeb" now points to a page which explains that you can start with
