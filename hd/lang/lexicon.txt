@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.75 2000-03-13 14:29:07 ddr Exp $
+# $Id: lexicon.txt,v 3.76 2000-03-14 09:22:02 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -3935,6 +3935,7 @@ fi: valittavissa
 fr: facultatif
 he:  òì ôé áçéøä
 is: má velja
+it: opzionale
 nl: optioneel
 no: valgfritt
 pt: opcional
@@ -4111,6 +4112,7 @@ fi: tarkennus
 fr: pr&eacute;cision
 he:  ãééå÷
 is: nákvæmni
+it: precisione
 nl: precisie
 no: n&oslash;yaktighet
 pt: precis&atilde;o
@@ -4483,6 +4485,7 @@ dk: korteste vej
 en: shortest path
 fi: lyhin polku
 fr: chemin le plus court
+it: legame più diretto
 no: korteste gren
 ru: êğàò÷àéøèé ïóòü
 se: kortaste v&auml;gen
@@ -4780,6 +4783,7 @@ fi: teksti
 fr: texte
 he:  ëúåá
 is: texti
+it: testo
 nl: tekst
 no: tekst
 pt: texto
@@ -5132,6 +5136,7 @@ en: the latest %d marriages
 eo: la lastaj %d edzigxoj
 es: los %d casamientos m&aacute;s recientes
 fr: les %d derniers mariages
+it: gli ultimi %d matrimoni
 pt: os %d casamentos mais recentes
 se: de senaste %d äktenskapen
 
@@ -5410,6 +5415,7 @@ fi: puu
 fr: arbre
 he:  àõ
 is: tré
+it: albero
 nl: boom
 no: tre
 pt: &aacute;rvore
