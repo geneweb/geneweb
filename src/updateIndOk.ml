@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.14 2000-10-24 15:47:18 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.15 2000-10-28 21:52:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -326,15 +326,14 @@ value print_conflict conf base p =
          (capitale (transl conf "first free number")) free_n;
        Wserver.wprint "%s " (capitale (transl conf "click"));
        Wserver.wprint "<a href=\n\"%s" (commd conf);
-       let _ = List.fold_left
+       list_iter_first
          (fun first (v, x) ->
             do Wserver.wprint "%s" (if first then "" else ";");
                Wserver.wprint "%s=" v;
                if v = "occ" then Wserver.wprint "%d" free_n
                else Wserver.wprint "%s" x;
-            return False)
-         True conf.env
-       in ();
+            return ())
+         conf.env;
        Wserver.wprint "\">%s</a>" (transl conf "here");
        Wserver.wprint "%s.\n" (transl conf " to try again with this number");
        html_li conf;

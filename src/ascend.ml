@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.44 2000-10-28 08:49:09 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.45 2000-10-28 21:52:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1812,56 +1812,33 @@ value print_tree_with_table conf base gv p =
   tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
     conf.border
   begin
-    let _ =
-      List.fold_left
-        (fun firstline gen ->
-           do if not firstline then
-                tag "tr" begin
-                  let _ =
-                    List.fold_left 
-                      (fun first po ->
-                         do print_vertical_bars gen first po;
-                         return False)
-                      True gen
-                  in ();
-                end
-              else ();
+    list_iter_first
+      (fun firstline gen ->
+         do if not firstline then
               tag "tr" begin
-                let _ =
-                  List.fold_left 
-                    (fun first po ->
-                       do print_ancestor gen first po;
-                       return False)
-                    True gen
-                in ();
-              end;
-              match gen with
-              [ [ Cell _ Center _ _ :: _ ] -> ()
-              | _ ->
-                do tag "tr" begin
-                    let _ =
-                      List.fold_left 
-                        (fun first po ->
-                           do print_ancestor_link gen first po;
-                           return False)
-                        True gen
-                    in ();
-                  end;
-                  tag "tr" begin
-                    let _ =
-                      List.fold_left 
-                        (fun first po ->
-                           do print_horizontal_line gen first po;
-                           return False)
-                        True gen
-                    in ();
-                  end;
-                return ()
-              ];
-           return False)
-        True gen
-    in
-    ();
+                list_iter_first
+                  (fun first po -> print_vertical_bars gen first po) gen;
+              end
+            else ();
+            tag "tr" begin
+              list_iter_first (fun first po -> print_ancestor gen first po)
+                gen;
+            end;
+            match gen with
+            [ [ Cell _ Center _ _ :: _ ] -> ()
+            | _ ->
+              do tag "tr" begin
+                   list_iter_first
+                     (fun first po -> print_ancestor_link gen first po) gen;
+                 end;
+                 tag "tr" begin
+                   list_iter_first
+                      (fun first po -> print_horizontal_line gen first po) gen;
+                 end;
+              return ()
+            ];
+         return ())
+      gen;
   end
 ;
 
@@ -1957,13 +1934,9 @@ value print_tree_with_table_old conf base gv p =
                 return ()
               else ();
               tag "tr" begin
-                let _ =
-                  List.fold_left
-                    (fun first po ->
-                       do print_ancestor gen (2 * cs - 1) first po;
-                       return False)
-                    True gen
-                in ();
+                list_iter_first
+                  (fun first po -> print_ancestor gen (2 * cs - 1) first po)
+                  gen;
               end;
            return 2 * cs)
         1 gen
@@ -2090,7 +2063,7 @@ value print_male_female_line male conf base v p =
   in
   do header_no_page_title conf title;
      tag "center" begin
-       let _ = List.fold_left
+       list_iter_first
          (fun first ip ->
             let p = poi base ip in
             do if not first then Wserver.wprint "|<br>\n" else ();
@@ -2098,10 +2071,8 @@ value print_male_female_line male conf base v p =
                  (referenced_person_title_text conf base p)
                  (Date.short_dates_text conf base p);
                Dag.print_image conf base p;
-            return False)
-         True list
-       in
-       ();
+            return ())
+         list;
      end;
      trailer conf;
   return ()

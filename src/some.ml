@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 3.7 2000-08-10 23:04:28 ddr Exp $ *)
+(* $Id: some.ml,v 3.8 2000-10-28 21:52:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -82,24 +82,21 @@ value print_elem conf base is_surname (p, xl) =
          Date.afficher_dates_courtes conf base x;
       return ()
   | *) _ ->
-      let _ =
-        List.fold_left
-          (fun first x ->
-             do if not first then html_li conf else ();
-                Wserver.wprint "<a href=\"%s%s\">" (commd conf)
-                  (acces conf base x);
-                if is_surname then
-                  Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
-                else Wserver.wprint "%s" p;
-                Wserver.wprint "</a>";
-                Date.afficher_dates_courtes conf base x;
-                Wserver.wprint " <em>";
-                preciser_homonyme conf base x;
-                Wserver.wprint "</em>\n";
-             return False)
-          True xl
-      in
-      () ]
+      list_iter_first
+        (fun first x ->
+           do if not first then html_li conf else ();
+              Wserver.wprint "<a href=\"%s%s\">" (commd conf)
+                (acces conf base x);
+              if is_surname then
+                Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
+              else Wserver.wprint "%s" p;
+              Wserver.wprint "</a>";
+              Date.afficher_dates_courtes conf base x;
+              Wserver.wprint " <em>";
+              preciser_homonyme conf base x;
+              Wserver.wprint "</em>\n";
+           return ())
+          xl ]
 ;
 
 value first_name_print_list conf base xl liste =

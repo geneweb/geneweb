@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.19 2000-09-04 14:58:04 ddr Exp $ *)
+(* $Id: descend.ml,v 3.20 2000-10-28 21:52:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -232,22 +232,19 @@ value print_child conf base levt boucle niveau_max niveau compte auth x =
        if Array.length ux.family <> 0 then html_br conf
        else Wserver.wprint "\n";
        if niveau == niveau_max then
-         let _ =
-           List.fold_left
-             (fun first ifam ->
-                let fam = foi base ifam in
-                let c = spouse x.cle_index (coi base ifam) in
-                let c = poi base c in
-                do if connais base c then
-                     do afficher_marie conf base first fam x c;
-                        Wserver.wprint ".";
-                        html_br conf;
-                     return ()
-                   else ();
-                return False)
-             True (Array.to_list ux.family)
-         in
-         ()
+         list_iter_first
+           (fun first ifam ->
+              let fam = foi base ifam in
+              let c = spouse x.cle_index (coi base ifam) in
+              let c = poi base c in
+              do if connais base c then
+                   do afficher_marie conf base first fam x c;
+                      Wserver.wprint ".";
+                      html_br conf;
+                   return ()
+                 else ();
+              return ())
+           (Array.to_list ux.family)
        else ();
     return boucle (succ niveau) x ux
   else Wserver.wprint "\n"
@@ -260,50 +257,47 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
   let rec boucle niveau p u =
     if niveau <= niveau_max then
       let ifaml = Array.to_list u.family in
-      let _ =
-        List.fold_left
-          (fun first ifam ->
-             let fam = foi base ifam in
-             let cpl = coi base ifam in
-             let des = doi base ifam in
-             let conj = spouse p.cle_index cpl in
-             let conj = poi base conj in
-             let children =
-               let list = Array.to_list des.children in
-               List.fold_right
-                 (fun ip pl ->
-                   let p = poi base ip in
-                   if line = Neuter
-                   || line = Male && p.sex <> Female
-                   || line = Female && p.sex <> Male
-                   then [p :: pl]
-                   else pl)
-                 list []
-             in
-             do if connais base conj || List.length ifaml > 1 then
-                  do afficher_marie conf base first fam p conj;
-                     if children <> [] then
-                       Wserver.wprint ", <em>%s</em>"
-                         (transl conf "having as children")
-                     else Wserver.wprint ".";
-                     html_br conf;
-                  return ()
-                else ();
-                if children <> [] then
-                  let age_auth =
-                    List.for_all (fun p -> age_autorise conf base p) children
-                  in
-                  tag "ul" begin
-                    List.iter
-                      (print_child conf base levt boucle niveau_max niveau
-                         compte age_auth)
-                      children;
-                  end
-                else ();
-             return False)
-          True ifaml
-      in
-      ()
+      list_iter_first
+        (fun first ifam ->
+           let fam = foi base ifam in
+           let cpl = coi base ifam in
+           let des = doi base ifam in
+           let conj = spouse p.cle_index cpl in
+           let conj = poi base conj in
+           let children =
+             let list = Array.to_list des.children in
+             List.fold_right
+               (fun ip pl ->
+                 let p = poi base ip in
+                 if line = Neuter
+                 || line = Male && p.sex <> Female
+                 || line = Female && p.sex <> Male
+                 then [p :: pl]
+                 else pl)
+               list []
+           in
+           do if connais base conj || List.length ifaml > 1 then
+                do afficher_marie conf base first fam p conj;
+                   if children <> [] then
+                     Wserver.wprint ", <em>%s</em>"
+                       (transl conf "having as children")
+                   else Wserver.wprint ".";
+                   html_br conf;
+                return ()
+              else ();
+              if children <> [] then
+                let age_auth =
+                  List.for_all (fun p -> age_autorise conf base p) children
+                in
+                tag "ul" begin
+                  List.iter
+                    (print_child conf base levt boucle niveau_max niveau
+                       compte age_auth)
+                    children;
+                end
+              else ();
+           return ())
+        ifaml
     else ()
   in
   do header conf (descendants_title conf base p);
@@ -576,30 +570,27 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                             Wserver.wprint "\n";
                             incr total;
                             if succ lev == max_lev then
-                              let _ =
-                                List.fold_left
-                                  (fun first ifam ->
-                                     let fam = foi base ifam in
-                                     let des = doi base ifam in
-                                     let c1 = spouse ie (coi base ifam) in
-                                     let el = des.children in
-                                     let c1 = poi base c1 in
-                                     do if not first then
-                                          do html_br conf;
-                                             print_repeat_child conf base p c
-                                               e;
-                                          return ()
-                                        else ();
-                                        afficher_spouse conf base marks
-                                          paths fam e c1;
-                                        if Array.length el <> 0 then
-                                          Wserver.wprint "....."
-                                        else ();
-                                        Wserver.wprint "\n";
-                                     return False)
-                                  True (Array.to_list (uoi base ie).family)
-                              in
-                              ()
+                              list_iter_first
+                                (fun first ifam ->
+                                   let fam = foi base ifam in
+                                   let des = doi base ifam in
+                                   let c1 = spouse ie (coi base ifam) in
+                                   let el = des.children in
+                                   let c1 = poi base c1 in
+                                   do if not first then
+                                        do html_br conf;
+                                           print_repeat_child conf base p c
+                                             e;
+                                        return ()
+                                      else ();
+                                      afficher_spouse conf base marks
+                                        paths fam e c1;
+                                      if Array.length el <> 0 then
+                                        Wserver.wprint "....."
+                                      else ();
+                                      Wserver.wprint "\n";
+                                   return ())
+                                (Array.to_list (uoi base ie).family)
                             else loop (succ lev) e;
                          return ()
                        else ();
@@ -974,13 +965,6 @@ value afficher_descendants_table conf base max_lev a =
      print_table_person conf base max_lev a.cle_index;
      trailer conf;
   return ()
-;
-
-value list_iter_first f l =
-  let _ =
-    List.fold_left (fun first x -> do f first x; return False) True l
-  in
-  ()
 ;
 
 value no_spaces v s =

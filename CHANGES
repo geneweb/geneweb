@@ -3,8 +3,8 @@ GeneWeb version 3.09
 
 * GeneWeb server or CGI (gwd)
   - [28 Oct 00] Record now the last wizard accesses into the file
-    cnt/base_w.txt; applies only to wizards defined by "wizard_passwd_file"
-    of base.gwf. The idea is to know if there are wizards no more using
+    cnt/base_w.txt (applies only to wizards defined by "wizard_passwd_file"
+    of base.gwf). The idea is to know if there are wizards no more using
     their connection.
   - [26 Oct 00] In forum, added "<table>..</table>" around messages
     to prevent unterminated tags to perturbate the other messages.
