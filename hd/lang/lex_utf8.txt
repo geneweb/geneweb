@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.1 2005-02-03 16:20:07 ddr Exp $
+# $Id: lex_utf8.txt,v 1.2 2005-02-05 13:34:34 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -68,7 +68,7 @@ cs:  abyste viděli první
 da:  for at se den f&oslash;rste
 de: , um den ersten zu sehen
 en:  to see the first one
-eo:  por vidi la unuan brancxon
+eo:  por vidi la unuan branĉon
 es:  para ver la primera rama
 et:  esimese haru vaatamiseks
 fi:  n&auml;hd&auml;ksesi ensimm&auml;isen haaran
@@ -122,7 +122,7 @@ cs:  zkusit znovu s tímto číslem
 da:  for at fors&oslash;ge igen med dette nummer
 de: , um es mit dieser Nummer nochmals zu versuchen
 en:  to try again with this number
-eo:  por reprovi kun cxi tiu numero
+eo:  por reprovi kun ĉi tiu numero
 es:  para ensayar de nuevo con este n&uacute;mero
 et: , proovimaks uuesti selle numbriga
 fi:  yritt&auml;&auml;ksesi uudelleen t&auml;ll&auml; numerolla
@@ -258,7 +258,7 @@ cs: %t zemřel před svým narozením/zemřela před svým narozením
 da: %t er d&oslash;de f&oslash;r f&oslash;dslen
 de: %t ist vor der Geburt gestorben
 en: %t died before his/her birth
-eo: %t mortis antaù sia naskigxo
+eo: %t mortis antaù sia naskiĝo
 es: %t ha muerto antes de su nacimiento
 et: %t suri enne sündi
 fi: %t on kuollut ennen syntym&auml;&auml;ns&auml;
@@ -313,7 +313,7 @@ cs: %t narozen/narozena po smrti své matky %t
 da: %t er f&oslash;dt efter moderens d&oslash;d %t
 de: %t ist nach dem Tod der Mutter %t geboren
 en: %t is born after the death of his/her mother %t
-eo: %t naskigxis post la morto de sia patrino %t
+eo: %t naskiĝis post la morto de sia patrino %t
 es: %t ha nacido despu&eacute;s de la muerte de su madre %t
 et: %t on sündinud pärast oma ema %t surma
 fi: %t on syntynyt &auml;itins&auml; kuoleman j&auml;lkeen
@@ -340,7 +340,7 @@ cs: %t narozen/narozena více než dva roky po smrti svého otce: %t
 da: %t er f&oslash;dt senere end 2 &aring; efter faderens d&oslash;d %t
 de: %t ist mehr als 2 Jahre nach dem Tod des Vaters %t geboren
 en: %t is born more than 2 years after the death of his/her father %t
-eo: %t naskigxis pli ol 2 jaroj post la morto de sia patro %t
+eo: %t naskiĝis pli ol 2 jaroj post la morto de sia patro %t
 es: %t ha nacido m&aacute;s de 2 a&ntilde;os despu&eacute;s de la muerte de su padre %
 et: %t on sündinud rohkem kui 2 aastat pärast oma isa %t surma
 fi: %t on syntynyt yli 2 vuotta is&auml;ns&auml; kuoleman j&auml;lkeen
@@ -473,7 +473,7 @@ cs: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/A
 da: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 de: Tischri/Marcheschwan/Kislev/Tebet/Schebat/Adar/WeAdar/Nisan/Ijar/Siwan/Tammuz/Ab/Elul
 en: Tishri/Heshvan/Kislev/Tevet/Shevat/Adar I/Adar II/Nisan/Iyyar/Sivan/Tammuz/Av/Elul
-eo: tisxrio/hesxvano/kislevo/teveto/sxevato/adaro 1/adaro 2/nisano/ijaro/sivano/tamuzo/avo/elulo
+eo: tiŝrio/heŝvano/kislevo/teveto/ŝevato/adaro 1/adaro 2/nisano/ijaro/sivano/tamuzo/avo/elulo
 es: tishri/marjeshvan o jeshvan/kislev/tevet/shevat/adar /( + adar sheni, adar bet o ve-adar)/nisan/iyar/sivan/tamuz/av/elul
 et: tishrei/chesvan/kislev/tevet/shvat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 fi: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
@@ -499,7 +499,7 @@ cs: ledna/února/března/dubna/května/června/července/srpna/září/října/l
 da: januar/februar/marts/april/maj/juni/juli/august/september/oktober/november/december
 de: Januar/Februar/M&auml;rz/April/Mai/Juni/Juli/August/September/Oktober/November/Dezember
 en: January/February/March/April/May/June/July/August/September/October/November/December
-eo: januaro/februaro/marto/aprilo/majo/junio/julio/auxgusto/septembro/oktobro/novembro/decembro
+eo: januaro/februaro/marto/aprilo/majo/junio/julio/aŭgusto/septembro/oktobro/novembro/decembro
 es: enero/febrero/marzo/abril/mayo/junio/julio/agosto/septiembre/octubre/noviembre/diciembre
 et: jaanuar:i:+il:s:+is:p:+i/veebruar:i:+il:s:+is:p:+i/m&auml;rts:i:+il:s:+is:p:+i/aprill:i:+il:s:+is:p:+i/mai:i:+l:s:+s:p:+d/juuni:i:+l:s:+s:p:+t/juuli:i:+l:s:+s:p:+t/august:i:+il:s:+is:p:+it/september:i:--ril:s:--ris:p:--rit/oktoober:i:--ril:s:--ris:p:--rit/november:i:--ril:s:--ris:p:--rit/detsember:i:--ril:s:--ris:p:--rit
 fi: tammikuu/helmikuu/maaliskuu/huhtikuu/toukokuu/kes&auml;kuu/hein&auml;kuu/elokuu/syyskuu/lokakuu/marraskuu/joulukuu
@@ -555,7 +555,7 @@ cs: neděle/pondělí/úterý/středa/čtvrtek/pátek/sobota
 da: s&oslash;ndag/mandag/tirsdag/onsdag/torsdag/fredag/l&oslash;rdag
 de: Sonntag/Montag/Dienstag/Mittwoch/Donnerstag/Freitag/Samstag
 en: Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday
-eo: dimancxo/lundo/mardo/merkredo/jaùdo/vendredo/sabato
+eo: dimanĉo/lundo/mardo/merkredo/jaùdo/vendredo/sabato
 es: domingo/lunes/martes/mi&eacute;rcoles/jueves/viernes/s&aacute;bado
 et: pühapäev:e:+al/esmaspäev:e:+al/teisipäev:e:+al/kolmapäev:e:+al/neljapäev:e:+al/reede:e:+l/laupäev:e:+al
 fi: sunnuntai:e:+na/maanantai:e:+na/tiistai:e:+na/keskiviikko:e:+na/torstai:e:+na/perjantai:e:+na/lauantai:e:+na
@@ -1285,7 +1285,7 @@ cs: kolem
 da: omkring
 de: ca.
 en: about
-eo: cxirkaù
+eo: ĉirkaù
 es: alrededor de
 et: umbes :i:
 fi: noin
@@ -1422,7 +1422,7 @@ cs: rozšířený dotaz
 da: avanceret s&oslash;gning
 de: Erweiterte Suche
 en: advanced request
-eo: sercxo pli preciza
+eo: serĉo pli preciza
 es: consulta avanzada
 et: täpsem päring
 fi: erityishaku
@@ -1504,7 +1504,7 @@ cs: věk
 da: alder
 de: Alter
 en: age
-eo: agxo
+eo: aĝo
 es: edad
 et: vanus
 fi: ik&auml;
@@ -1532,7 +1532,7 @@ cs: věk v době úmrtí
 da: alder ved d&oslash;d:
 de: Alter:
 en: age at death:
-eo: mortagxo
+eo: mortaĝo
 es: a la edad de
 et: vanus surres
 fi: ik&auml; kuollessa
@@ -1615,7 +1615,7 @@ cs: všechna místa
 da: alle ophav
 de: alle Orte
 en: all the estates
-eo: cxiuj nobelbienoj
+eo: ĉiuj nobelbienoj
 es: todos los lugares
 et: kõik omandid
 fi: kaikki paikat
@@ -1642,7 +1642,7 @@ cs: všechny tituly
 da: alle titler
 de: alle Titel
 en: all the titles
-eo: cxiuj nobeltitoloj
+eo: ĉiuj nobeltitoloj
 es: todos los t&iacute;tulos
 et: kõik tiitlid
 fi: kaikki arvonimet
@@ -1915,7 +1915,7 @@ cs: výročí sňatků
 da: &aring;rsdage for bryllupper
 de: Hochzeitstage
 en: anniversaries of marriage
-eo: datrevenoj de edzigxo
+eo: datrevenoj de edziĝo
 es: aniversarios de casamiento
 et: pulma-aastapäevad
 fi: h&auml;&auml;p&auml;ivi&auml;
@@ -2188,7 +2188,7 @@ cs: narození
 da: f&oslash;dsel
 de: Geburt
 en: birth
-eo: naskigxo
+eo: naskiĝo
 es: nacimiento
 et: sünd
 fi: syntym&auml;
@@ -2215,7 +2215,7 @@ cs: narozeniny
 da: f&oslash;dselsdage
 de: Geburtstage
 en: birthdays
-eo: datrevenoj de naskigxo
+eo: datrevenoj de naskiĝo
 es: cumplea&ntilde;os
 et: sünnipäevad
 fi: syntym&auml;p&auml;ivi&auml;
@@ -2267,7 +2267,7 @@ cs: narozen/narozena
 da: f&oslash;dt
 de: geboren
 en: born
-eo: naskigxinta
+eo: naskiĝinta
 es: nacido/nacida/nacido(a)
 et: sündinud
 fi: syntynyt
@@ -2295,7 +2295,7 @@ cs: větev/větve
 da: gren/grene
 de: Ast/&Auml;ste
 en: branch/branches
-eo: brancxo/brancxoj
+eo: branĉo/branĉoj
 es: rama/ramas
 et: haru/harud
 fi: haara/haaraa
@@ -2512,7 +2512,7 @@ cs: nemohu změnit pohlaví ženatého muže/nemohu změnit pohlaví vdané žen
 da: kan ikke &aelig;ndre k&oslash;n for en gift person
 de: kann das Geschlecht einer verheirateten Person nicht &auml;ndern
 en: cannot change sex of a married person
-eo: ne eblas aliigi sekson de edzigxinta persono
+eo: ne eblas aliigi sekson de edziĝinta persono
 es: no puede modificarse el sexo de una persona casada
 et: ei saa muuta abiellunud inimese sugu
 fi: et voi vaihtaa naimisissa olevan henkil&ouml;n sukupuolta
@@ -2539,7 +2539,7 @@ cs: změnit jména dětí
 da: &aelig;ndre b&oslash;rns navne
 de: Namen der Kinder &auml;ndern
 en: change children's names
-eo: sxangxi nomojn de la idoj
+eo: ŝanĝi nomojn de la idoj
 es: cambiar los nombres de los hijos
 et: muuda laste nimed
 fi: muuta lasten nimi&auml;
@@ -2566,7 +2566,7 @@ cs: změnit číslo
 da: v&aelig;lg et andet
 de: &auml;ndere die Nummer selbst
 en: change it yourself
-eo: kaj sxangxu ion mem
+eo: kaj ŝanĝu ion mem
 es: escoja otro
 et: muuda seda ise
 fi: muuta se itse
@@ -2593,7 +2593,7 @@ cs: změnit pořadí dětí
 da: &aelig;ndret r&aelig;kkef&oslash;lge for b&oslash;rn
 de: Reihenfolge der Kinder gewechselt
 en: changed order of children
-eo: sxangxo de la ordo de la idoj
+eo: ŝanĝo de la ordo de la idoj
 es: cambio del orden de los hijos
 et: laste järjekord muudetud
 fi: lasten j&auml;rjestyst&auml; on muutettu
@@ -2648,7 +2648,7 @@ cs: jména dětí změněna
 da: b&oslash;rns navne &aelig;ndret
 de: Namen der Kinder ge&auml;ndert
 en: children's names changed
-eo: nomoj de la idoj sxangxitaj
+eo: nomoj de la idoj ŝanĝitaj
 es: nombres de los hijos cambiados
 et: lapse nimed muudetud
 fi: lasten nimi&auml; on muutettu
@@ -2807,7 +2807,7 @@ cs: pokračovat ve spojování
 da: forts&aelig;t sammenf&oslash;jning
 de: Zusammenf&uuml;hrung fortsetzen
 en: continue merging
-eo: daùrigu la kunigxon
+eo: daùrigu la kuniĝon
 es: continuar la fusi&oacute;n
 et: jätka ühendamist
 fi: jatka yhdist&auml;mist&auml;
@@ -3213,7 +3213,7 @@ cs: rozvod
 da: skilsmisse
 de: Scheidung
 en: divorce
-eo: eksedzigxo
+eo: eksedziĝo
 es: divorcio
 et: lahutus
 fi: avioero
@@ -3240,7 +3240,7 @@ cs: rozvedeni
 da: skilt
 de: geschieden
 en: divorced
-eo: eksedzigxintaj
+eo: eksedziĝintaj
 es: divorciados
 et: lahutatud
 fi: eronneet
@@ -3267,7 +3267,7 @@ cs: nespojovat spolecné vetve
 da: sl&aring; ikke f&aelig;lles anelinier sammen
 de: gemeinsame Zweige nicht zusammenfassen
 en: don't group the common branches together
-eo: ne grupigu la brancxojn komunajn
+eo: ne grupigu la branĉojn komunajn
 es: no agrupar las ramas comunes
 et: ära grupeeri ühiseid harusid
 fi: ei yhteisten sukuhaarojen ryhmittely&auml;
@@ -3348,7 +3348,7 @@ cs: snoubenci
 da: forlovet
 de: verlobt
 en: engaged
-eo: gefiancxigintaj
+eo: gefianĉigintaj
 es: comprometidos
 et: kihlatud
 fi: kihloissa
@@ -3375,7 +3375,7 @@ cs: zasnoubený s/zasnoubená s
 da: forlovet%t med
 de: verlobt%t mit
 en: engaged%t to
-eo: fiancxigita%t kun/fiancxinigita%t kun
+eo: fianĉigita%t kun/fianĉinigita%t kun
 es: comprometido%t con/comprometida%t con
 et: kihlatud%t
 fi: kihlattu%t
@@ -3513,7 +3513,7 @@ cs: rodiny s kódy
 da: familier med kodning
 de: Familien mit Kodierung
 en: families with encoding
-eo: familioj kun kodajxo
+eo: familioj kun kodaĵo
 es: familias con c&oacute;digo
 et: pered koos kodeeringuga
 fi: perheet koodeineen
@@ -4089,7 +4089,7 @@ cs: všechno nejlepší k narozeninám!
 da: til lykke med f&oslash;dselsdagen!
 de: Herzlichen Glückwunsch zum Geburtstag!
 en: happy birthday to you!
-eo: felicxan datrevenon!
+eo: feliĉan datrevenon!
 es: &iexcl;Feliz cumplea&ntilde;os!
 et: palju õnne sünnipäevaks!
 fi: hyv&auml;&auml; syntym&auml;p&auml;iv&auml;&auml;!
@@ -4171,7 +4171,7 @@ cs: on/ona
 da: han/hun
 de: er/sie
 en: him/her
-eo: li/sxi
+eo: li/ŝi
 es: &eacute;l/ella
 et: mees/naine
 fi: mies/nainen
@@ -4198,7 +4198,7 @@ cs: historie změn
 da: opdateringers historie
 de: Chronik der Aktualisierungen
 en: history of updates
-eo: historio de la gxisdatigoj
+eo: historio de la ĝisdatigoj
 es: historia de las actualizaciones
 et: muudatuste ajalugu
 fi: p&auml;ivityshistoria
@@ -4580,7 +4580,7 @@ cs: nesprávný požadavek
 da: forkert anmodning
 de: falsche Anfrage
 en: incorrect request
-eo: nekorekta sercxado
+eo: nekorekta serĉado
 es: consulta incorrecta
 et: vigane päring
 fi: v&auml;&auml;rin kysytty
@@ -4716,7 +4716,7 @@ cs: prohození dokončeno
 da: r&aelig;kkef&oslash;lge omvendt
 de: umgekehrt
 en: inversion done
-eo: intersxangxo farita
+eo: interŝanĝo farita
 es: inversi&oacute;n realizada
 et: vahetatud
 fi: vaihto tehty
@@ -4744,7 +4744,7 @@ cs: prohodit
 da: omvend r&aelig;kkef&oslash;lge
 de: umkehren
 en: invert
-eo: intersxangxi :a:
+eo: interŝanĝi :a:
 es: invertir
 et: vaheta
 fi: vaihda
@@ -4771,7 +4771,7 @@ cs: prohodit pořadí následujících rodin
 da: omvend r&aelig;kkef&oslash;lgen for de f&oslash;lgende familier
 de: die Reihenfolge der folgenden Familien umkehren
 en: invert the order of the following families
-eo: intersxangxi la ordon de la familioj sekvantaj
+eo: interŝanĝi la ordon de la familioj sekvantaj
 es: invertir el orden de las familias siguientes
 et: vaheta järgmiste perede järjekord
 fi: vaihda seuraavien perheiden j&auml;rjestyst&auml;
@@ -4853,7 +4853,7 @@ cs: se narodil až po svém dítěti/se narodila až po svém dítěti
 da: er f&oslash;dt efter hans/hendes barn
 de: ist nach seinem/ihrem Kind geboren
 en: is born after his/her child
-eo: naskigxis post sia infano
+eo: naskiĝis post sia infano
 es: ha nacido despu&eacute;s de su hijo(a)
 et: on sündinud oma lapsest hiljem
 fi: on syntynyt my&ouml;hemmin kuin lapsensa
@@ -5069,7 +5069,7 @@ cs: dlouhý seznam
 da: udvidet rapport
 de: Lange Ansicht
 en: long display
-eo: longa afisxado
+eo: longa afiŝado
 es: presentaci&oacute;n extensa
 et: põhjalik formaat
 fi: laaja raportti
@@ -5096,7 +5096,7 @@ cs: smyčka v databázi: %s je svůj předek
 da: loop i databasen: %s er sin egen ane
 de: Schleife in der Datenbank: %s ist sein/ihr eigener Vorfahr
 en: loop in database: %s is his/her own ancestor
-eo: estas masxo en la datenbazo: %s estas sia propra avo
+eo: estas maŝo en la datenbazo: %s estas sia propra avo
 es: referencia circul&aacute;r en la base de datos: %s es su propio ancestro
 et: silmus andmebaasis: %s on iseenda esivanem
 fi: silmukka tietokannassa: %s on oma esivanhempansa
@@ -5123,7 +5123,7 @@ cs: hlavní titul
 da: hovedtitel
 de: Haupttitel
 en: main title
-eo: cxefa nobeltitolo
+eo: ĉefa nobeltitolo
 es: t&iacute;tulo principal
 et: peamine tiitel
 fi: p&auml;&auml;arvonimi
@@ -5177,7 +5177,7 @@ cs: sňatek s %t po své smrti
 da: gifterm&aring;l af %t efter hans/hendes d&oslash;d
 de: Heirat von %t nach seinem/ihrem Tod
 en: marriage of %t after his/her death
-eo: edz(in)igxo de %t post sia morto
+eo: edz(in)iĝo de %t post sia morto
 es: casamiento de %t despu&eacute;s de su muerte
 et: %t abiellus pärast oma surma
 fi: %t olisi naitu vainajana
@@ -5204,7 +5204,7 @@ cs: sňatek s %t před svým narozením
 da: gifterm&aring;l af %t f&oslash;r hans/hendes f&oslash;dsel
 de: Heirat von %t vor seiner/ihrer Geburt
 en: marriage of %t before his/her birth
-eo: edz(in)igxo de %t antaù sia naskigxo
+eo: edz(in)iĝo de %t antaù sia naskiĝo
 es: casamiento de %t antes de su nacimiento
 et: %t abiellus enne oma sündi
 fi: %t olisi naitu ennen syntym&auml;&auml;
@@ -5231,7 +5231,7 @@ cs: manželství
 da: gifterm&aring;l/gifterm&aring;l
 de: Heirat/Heiraten
 en: marriage/marriages
-eo: edzigxo:a:+n/edzigxoj
+eo: edziĝo:a:+n/edziĝoj
 es: casamiento/casamientos
 et: abielu/abielud
 fi: avioliitto/avioliitot
@@ -5259,7 +5259,7 @@ cs: manželé
 da: gift
 de: verheiratet
 en: married
-eo: edzigxintaj
+eo: edziĝintaj
 es: casados
 et: abielus
 fi: vihitty
@@ -5286,7 +5286,7 @@ cs: oženil se ve věku %t/vdala se ve věku %t
 da: gift i alderen %t
 de: verheiratet mit %t Jahren
 en: married at age %t
-eo: edzigxinta je la agxo de %t jaroj
+eo: edziĝinta je la aĝo de %t jaroj
 es: casado a la edad de %t
 et: abiellunud %t aastasena
 fi: vihitty %t ik&auml;isen&auml;
@@ -5313,7 +5313,7 @@ cs: %t si vzal/%t si vzala
 da: gift%t med
 de: verheiratet%t mit
 en: married%t to
-eo: edzigxinta%t kun
+eo: edziĝinta%t kun
 es: casado%t con/casada%t con
 et: abielu%t
 fi: puoliso%t
@@ -5422,7 +5422,7 @@ cs: zpráva přidána
 da: meddelelse tilf&oslash;jet
 de: Nachricht hinzugef&uuml;gt
 en: message added
-eo: mesagxo almetita
+eo: mesaĝo almetita
 es: mensaje agregado
 et: teade lisatud
 fi: viesti lis&auml;tty
@@ -5448,7 +5448,7 @@ cs: zpráva smazána
 da: meddelelse slettet
 de: Nachricht gel&ouml;scht
 en: message deleted
-eo: mesagxo nuligita
+eo: mesaĝo nuligita
 es: mensaje borrado
 et: teade kustutatud
 fi: viesti poistettu
@@ -5474,7 +5474,7 @@ cs: zpráva:a:-u/předchozí zpráva/předchozí zprávy/následující zpráva
 da: meddelelse/foreg&aring;ende meddelelse/foreg&aring;ende meddelelse/n&aelig;ste meddelelse
 de: Nachricht/vorherige Nachricht/vorherige Nachricht/n&auml;chste Nachricht
 en: message/previous message/previous messages/next message
-eo: mesagxo:a:+n/antaùa mesagxo/antaùa mesagxo/sekvanta mesagxo
+eo: mesaĝo:a:+n/antaùa mesaĝo/antaùa mesaĝo/sekvanta mesaĝo
 es: mensaje/mansaje anterior/mansaje anterior/mensaje siguiente
 et: teade/eelmine teade/eelmine teade/järgmine teade
 fi: viesti/edellinen viesti/edellinen viesti/seuraava viesti
@@ -5803,7 +5803,7 @@ cs: žádné narozeniny
 da: ingen f&oslash;dselsdag
 de: kein Geburtstag
 en: no birthday
-eo: neniu naskigxtago
+eo: neniu naskiĝtago
 es: ning&uacute;n cumplea&ntilde;os
 et: pole ühtegi sünnipäeva
 fi: ei syntym&auml;p&auml;iv&auml;&auml;
@@ -5933,7 +5933,7 @@ cs: nerozvedeni
 da: ikke skilt
 de: nicht geschieden
 en: not divorced
-eo: ne eksedzigxintaj
+eo: ne eksedziĝintaj
 es: no divorciado
 et: pole lahutatud
 fi: eiv&auml;t eronneita
@@ -5987,7 +5987,7 @@ cs: svobodní
 da: ikke gift
 de: nicht verheiratet
 en: not married
-eo: ne edzigxintaj
+eo: ne edziĝintaj
 es: no casados
 et: pole abielus
 fi: eiv&auml;t naimisissa
@@ -6147,7 +6147,7 @@ cs: počet větví
 da: antal grene
 de: Anzahl der &Auml;ste
 en: number of branches
-eo: nombro da brancxoj
+eo: nombro da branĉoj
 es: n&uacute;mero de ramas
 et: harude arv
 fi: sukuhaarojen m&auml;&auml;r&auml;
@@ -7044,7 +7044,7 @@ cs: příbuzenské vztahy přes svatby
 da: sl&aelig;gtskaber ved gifterm&aring;l
 de: Heiratsbeziehungen
 en: relationships by marriage
-eo: ligoj per edzigxo
+eo: ligoj per edziĝo
 es: parentescos pol&iacute;ticos
 et: sugulus abielu kaudu
 fi: sukulaisuus avioliiton kautta
@@ -7098,7 +7098,7 @@ cs: viz výše
 da: se ovenfor
 de: siehe oben
 en: see above
-eo: vidu cxi-supre
+eo: vidu ĉi-supre
 es: ver m&aacute;s arriba
 et: vaata ülal
 fi: katso yll&auml;
@@ -7126,7 +7126,7 @@ cs: viz dále
 da: se nedenfor
 de: siehe unten
 en: see further
-eo: vidu cxi-malsupre
+eo: vidu ĉi-malsupre
 es: ver a continuaci&oacute;n
 et: vaata all
 fi: katso alla
@@ -7261,7 +7261,7 @@ cs: krátký výpis
 da: standardrapport
 de: kurze Ansicht
 en: short display
-eo: mallonga afisxado
+eo: mallonga afiŝado
 es: presentaci&oacute;n corta
 et: lühiformaat
 fi: lyhyt raportti
@@ -7906,7 +7906,7 @@ cs: výročí svatby
 da: bryllupsdagen
 de: der Hochzeitstag
 en: the anniversary of marriage
-eo: la datreveno de edzigxo
+eo: la datreveno de edziĝo
 es: el aniversario de casamiento
 et: pulma-aastapäev
 fi: h&auml;&auml;p&auml;iv&auml;
@@ -7933,7 +7933,7 @@ cs: databáze se změnila; vraťte se zpět (back), znovu načtěte stránku (re
 da: databasen er &aelig;ndret; g&aring; tilbage, klik for opdatering og udfyld formularen igen
 de: die Datenbank wurde ver&auml;ndert; dr&uuml;cke bitte "zur&uuml;ck (back)", "neu laden (reload)" und f&uuml;lle das Formular neu aus
 en: the base has changed; do "back", "reload", and refill the form
-eo: la bazo sxangis; faru "malantauxe", "resxargi", kaj replenigu la formularon
+eo: la bazo ŝangis; faru "malantaŭe", "reŝargi", kaj replenigu la formularon
 es: la base ha cambiado: hacer "back", "reload" y completar nuevamente el formulario
 et: andmebaas on mutunud, mine tagasi, uuenda pilti ja täida vorm uuesti
 fi: tietokanta on muuttunut; peruuta, lataa uudelleen ja t&auml;yt&auml; kaavake
@@ -7960,7 +7960,7 @@ cs: narozeniny
 da: f&oslash;dselsdagen
 de: der Geburtstag
 en: the birthday
-eo: la naskigxdatreveno
+eo: la naskiĝdatreveno
 es: el cumplea&ntilde;os
 et: sünnipäev
 fi: syntym&auml;p&auml;iv&auml;
@@ -8258,7 +8258,7 @@ cs: posledních %d narození
 da: de seneste %d f&oslash;dsler
 de: die letzten %d Geburten
 en: the latest %d births
-eo: la lastaj %d naskigxoj
+eo: la lastaj %d naskiĝoj
 es: los %d nacimientos m&aacute;s recientes
 et: viimased %d sündi
 fi: viimeiset %d syntym&auml;&auml;
@@ -8312,7 +8312,7 @@ cs: posledních %d svateb
 da: de seneste %d bryllupper
 de: die letzten %d Heiraten
 en: the latest %d marriages
-eo: la lastaj %d edzigxoj
+eo: la lastaj %d edziĝoj
 es: los %d casamientos m&aacute;s recientes
 et: viimased %d pulma
 fi: viime %d naimisiinmenoa
@@ -8474,7 +8474,7 @@ cs: až do %s generace
 da: til den %s generation
 de: bis zur %s Generation
 en: to the %s generation
-eo: gxis la %s generacio
+eo: ĝis la %s generacio
 es: hasta la %s generaci&oacute;n
 et: %s sugupõlveni
 fi: %s sukupolveen
@@ -8501,7 +8501,7 @@ cs: k dětem
 da: til b&oslash;rnene
 de: bis zu den Kindern
 en: to the children
-eo: gxis la idoj
+eo: ĝis la idoj
 es: hasta los hijos
 et: lasteni
 fi: lapsiin
@@ -8528,7 +8528,7 @@ cs: k vnoučatům
 da: til b&oslash;rneb&oslash;rnene
 de: bis zu den Enkeln
 en: to the grandchildren
-eo: gxis la genepoj
+eo: ĝis la genepoj
 es: hasta los nietos
 et: lastelasteni
 fi: lapsenlapsiin
@@ -8555,7 +8555,7 @@ cs: k prarodičům
 da: til bedstefor&aelig;ldrene
 de: bis zu den Gro&szlig;eltern
 en: to the grandparents
-eo: gxis la geavoj
+eo: ĝis la geavoj
 es: hasta los abuelos
 et: vanavanemateni
 fi: isovanhempiin
@@ -8582,7 +8582,7 @@ cs: k pravnoučatům
 da: til oldeb&oslash;rnene
 de: bis zu den Urenkeln
 en: to the great-grandchildren
-eo: gxis la gepranepoj
+eo: ĝis la gepranepoj
 es: hasta los bisnietos
 et: lastelastelasteni
 fi: lapsen-lapsenlapsiin
@@ -8609,7 +8609,7 @@ cs: k praprarodičům
 da: til oldefor&aelig;ldrene
 de: bis zu den Urgro&szlig;eltern
 en: to the great-grandparents
-eo: gxis la gepraavoj
+eo: ĝis la gepraavoj
 es: hasta los bisabuelos
 et: vana-vanavanemateni
 fi: iso-isovanhempiin
@@ -8636,7 +8636,7 @@ cs: k rodičům
 da: til for&aelig;ldrene
 de: bis zu den Eltern
 en: to the parents
-eo: gxis la gepatroj
+eo: ĝis la gepatroj
 es: hasta los padres
 et: vanemateni
 fi: vanhempiin
@@ -8879,7 +8879,7 @@ cs: až po :a:
 da: op til
 de: bis
 en: up to
-eo: gxis
+eo: ĝis
 es: hasta
 et: kuni
 fi: saakka
@@ -8906,7 +8906,7 @@ cs: upravit
 da: opdater
 de: Aktualisieren
 en: update
-eo: gxisdatigo
+eo: ĝisdatigo
 es: revisi&oacute;n
 et: täienda
 fi: p&auml;ivit&auml;
@@ -9036,7 +9036,7 @@ cs: svědek na svatbě: %s a %s
 da: vidne ved brylluppet mellem %s og %s
 de: Trauzeugen bei der Hochzeit von %s und %s
 en: witness at marriage of %s and %s
-eo: atestant(in)o pri la edzigxo de %s kaj %s
+eo: atestant(in)o pri la edziĝo de %s kaj %s
 es: testigo en el casamiento de %s y %s
 et: %s ja %s abielu tunnistaja
 fi: %s ja %s avioliiton todistaja
@@ -9090,7 +9090,7 @@ cs: wizard/wizards/friend/friends
 da: bidragyder/bidragydere/betroet/betroet
 de: Wizard/Wizard/Freund/Freund
 en: wizard/wizards/friend/friends
-eo: sorcxisto/sorcxistoj/amiko/amikoj
+eo: sorĉisto/sorĉistoj/amiko/amikoj
 es: brujo/brujos/amigo/amigos
 et: teadmamehena/teadmamehena/sõbrana/sõbrana
 fi: velho/velho/valittu/valittu

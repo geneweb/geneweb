@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.4 2005-02-05 06:34:39 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.5 2005-02-05 13:34:34 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -277,7 +277,7 @@ cs: Heslo pro<em>"friend"</em> nebo <em>"wizard"</em> přístup:</em>:
 da: Adgangskode, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
 de: Passwort für <em>Freund</em>- oder <em>Wizard</em>-Zugang</em>:
 en: Password, for <em>friend</em> or <em>wizard</em> access:
-eo: Pasvorto, por aliro <em>amiko</em> a&ugrave; <em>sorcxisto</em>:
+eo: Pasvorto, por aliro <em>amiko</em> a&ugrave; <em>sorĉisto</em>:
 es: Contrase&ntilde;a, para entrada <em>amigo</em> o <em>brujo</em>:
 et: Parool, <em>sõbrana</em> või <em>teadmamehena</em> ligipääsuks:
 fi: Salasana <em>Valittu</em> tai <em>Velho</em> kirjautumiseen:
@@ -314,7 +314,7 @@ cs: Databázi lze prohledávat:
 da: For at navigere i denne database kan du søge:
 de: Zum Benutzen dieser Datenbank kannst du hier suchen:
 en: To navigate in this database, you can do your search:
-eo: Por navigi en cxi tiu datenbazo, vi povas fari vian sercxon:
+eo: Por navigi en ĉi tiu datenbazo, vi povas fari vian serĉon:
 es: Para navegar en esta base de datos, puede hacer su búsqueda:
 et: Navigeeri andmebaasis:
 fi: Liikkuaksesi t&auml;ss&auml; tietokannassa voit etsi&auml;:
@@ -404,7 +404,7 @@ cs: podle titulu
 da: titel (nob.)
 de: nach einem Titel
 en: by title
-eo: laù la mosxto
+eo: laù la moŝto
 es: por t&iacute;tulo
 et: tiitel
 fi: arvonimen mukaan
@@ -450,7 +450,7 @@ cs: <span class="highlight">ze seznamu</span> všech
 da: <span class="highlight">i liste</span> over alle
 de: <span class="highlight">in der Liste</span> aller
 en: <span class="highlight">by the list</span> of all
-eo: <span class="highlight">per la listo</span> de cxiuj
+eo: <span class="highlight">per la listo</span> de ĉiuj
 es: <span class="highlight">por la lista</span> de todos los
 et: <span class="highlight">loendis</span> kõik
 fi: <span class="highlight">listasta</span> kaikki
@@ -690,7 +690,7 @@ en: <span class="highlight">by the</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>advanced
        request</b></font></a>.
 eo: <span class="highlight">per la</span>
-       <a href="%sm=H;v=advanced"><font color="%i"><b>sercxado
+       <a href="%sm=H;v=advanced"><font color="%i"><b>serĉado
        progresata</b></font></a>.
 es: <span class="highlight">mediante una</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>consulta
@@ -907,7 +907,7 @@ cs: %q přístupů, z toho %c na tuto stránku, od %d.
 da: Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
 de: Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.
 en: There have been %q accesses, %c of them to this page, since %d.
-eo: Estis %q alirejoj, el kiuj %c al cxi tiu pagxo, ekde la %d.
+eo: Estis %q alirejoj, el kiuj %c al ĉi tiu paĝo, ekde la %d.
 es: Ha habido %q consultas, de las cuales %c corresponden a esta
     p&aacute;gina, desde el %d.
 et: Alates andmebaasi loomise päevast (%d) on selle poole pöördutud %q korda, 
@@ -962,9 +962,9 @@ de: Wenn die ge&auml;nderten Seiten nicht automatisch aktualisiert werden
 en: If your browser does not automatically update the modified pages (forcing
     you to do "reload current document"), try navigating from <a
     href="%sescache=0">this link</a>.
-eo: Se via navigisto ne auxtomate gxisdatigas la modifigitajn pagxojn (se vi
-    devas fari "resxargxi kurantan dokumenton"), provu ekde <a
-    href="%sescache=0">cxi tiu legilo</a>.
+eo: Se via navigisto ne aŭtomate ĝisdatigas la modifigitajn paĝojn
+    (se vi devas fari "reŝarĝi kurantan dokumenton"), provu ekde <a
+    href="%sescache=0">ĉi tiu legilo</a>.
 es: Si las p&aacute;ginas modificadas no ser&aacute;n actualizadas
     automaticamente, favor de usar esta conexi&oacute;n:
     <a href="%sescache=0">hier</a>.
