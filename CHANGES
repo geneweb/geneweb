@@ -74,6 +74,7 @@ GeneWeb version 2.05
     "a.gwf".
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
+  - [Jul 23, 99] Added Czech (alpha test).
   - [Jul 17, 99] In welcome pages, simplified the text "it is a first
     name and surname or public name blah blah blah...".
   - [Jul 17, 99] Changed French term for "surname" ("nom" changed into
