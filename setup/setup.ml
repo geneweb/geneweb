@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.29 1999-06-07 01:23:44 ddr Exp $ *)
+(* $Id: setup.ml,v 1.30 1999-06-07 18:59:37 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -1174,6 +1174,10 @@ value setup (addr, req) str =
 ;
 
 value wrap_setup a b =
+  do ifdef WIN95 then
+       try default_lang.val := Sys.getenv "GWLANG" with [ Not_found -> () ]
+     else ();
+  return
   try setup a b with
   [ Exit -> () ]
 ;
@@ -1226,6 +1230,7 @@ value intro () =
      do copy_text lang (Filename.concat lang "intro.txt");
         set_gwd_default_language_if_absent lang;
         default_lang.val := lang;
+        ifdef WIN95 then Unix.putenv "GWLANG" lang else ();
      return ();
      Printf.printf "\n";
      flush stdout;
