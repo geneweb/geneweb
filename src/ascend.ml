@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.31 2000-05-08 11:58:55 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.32 2000-05-11 16:52:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1821,32 +1821,39 @@ value build_surnames_list conf base v p =
   let ht = Hashtbl.create 701 in
   let mark = Array.create base.data.persons.len 5 in
   let auth = conf.wizard || conf.friend in
+  let add_surname sosa p surn dp =
+    let r =
+      try Hashtbl.find ht surn with
+      [ Not_found ->
+          let r = ref ((fst dp, p), []) in
+          do Hashtbl.add ht surn r; return r ]
+    in
+    r.val := (fst r.val, [sosa :: snd r.val])
+  in
   do loop 0 (Num.one) p p.surname (get_date_place conf base auth p)
      where rec loop lev sosa p surn dp =
-       if lev = v then ()
-       else if mark.(Adef.int_of_iper p.cle_index) = 0 then ()
+       if mark.(Adef.int_of_iper p.cle_index) = 0 then ()
+       else if lev = v then add_surname sosa p surn dp
        else
          do mark.(Adef.int_of_iper p.cle_index) :=
               mark.(Adef.int_of_iper p.cle_index) - 1;
             match (aoi base p.cle_index).parents with
             [ Some ifam ->
                 let cpl = coi base ifam in
-                let sosa = Num.twice sosa in
                 let fath = poi base cpl.father in
+                let moth = poi base cpl.mother in
+                do if surn <> fath.surname && surn <> moth.surname then
+                     add_surname sosa p surn dp
+                   else ();
+                return
+                let sosa = Num.twice sosa in
                 let dp1 = merge_date_place conf base surn dp fath in
                 do loop (lev + 1) sosa fath fath.surname dp1; return
                 let sosa = Num.inc sosa 1 in
-                let moth = poi base cpl.mother in
                 let dp2 = merge_date_place conf base surn dp moth in
                 do loop (lev + 1) sosa moth moth.surname dp2; return ()
             | None ->
-                let r =
-                  try Hashtbl.find ht surn with
-                  [ Not_found ->
-                      let r = ref ((fst dp, p), []) in
-                      do Hashtbl.add ht surn r; return r ]
-                in
-                r.val := (fst r.val, [sosa :: snd r.val]) ];
+                add_surname sosa p surn dp ];
          return ();
   return
   let list = ref [] in
