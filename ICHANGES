@@ -13,6 +13,8 @@ GeneWeb Version 1.07
      "Marie Dorange", different in "gwd" but equal (beforewards) in "gwc".
    - Fixed bug: while decoding strings fields, forgot to skip the possible
      space (underscored).
+   - A file "command.txt" is created into the base, showing the command
+     line used like for the command "ged2gwb".
 
 * gwd:
   - Don't display person number any more in update form when holding ? in
