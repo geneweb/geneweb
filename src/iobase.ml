@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.13 1999-07-26 07:01:59 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.14 1999-08-14 09:26:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -583,12 +583,45 @@ value input bname =
     if List.memq ip ipl then ()
     else patches.p_name.val := [(i, [ip :: ipl]) :: name_patches_rest]
   in
+  let read_notes mlen =
+    match
+      try Some (open_in (Filename.concat bname "notes")) with
+      [ Sys_error _ -> None ]
+    with
+    [ Some ic ->
+        let len = ref 0 in
+        do try
+             while mlen = 0 || len.val < mlen do
+               len.val := Buff.store len.val (input_char ic);
+             done
+           with
+           [ End_of_file -> () ];
+           close_in ic;
+        return Buff.get len.val
+    | None -> "" ]
+  in
+  let commit_notes s =
+    let fname = Filename.concat bname "notes" in
+    do try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
+       try Sys.rename fname (fname ^ "~") with _ -> ();
+    return
+    if s = "" then ()
+    else
+      let oc = open_out fname in
+      do output_string oc s;
+         close_out oc;
+      return ()
+    
+  in
+  let norigin_file = "" in
+  let bnotes = {nread = read_notes; norigin_file = norigin_file} in
   let base_data =
     {persons = persons;
      ascends = ascends;
      families = families;
      couples = couples;
-     strings = strings}
+     strings = strings;
+     bnotes = bnotes}
   in
   let base_func =
     {persons_of_name = persons_of_name bname patches.p_name;
@@ -611,7 +644,9 @@ value input bname =
      patch_string = patch_string;
      patch_name = patch_name;
      patched_ascends = patched_ascends;
-     commit_patches = commit_patches; cleanup = cleanup}
+     commit_patches = commit_patches;
+     commit_notes = commit_notes;
+     cleanup = cleanup}
   in
   {data = base_data; func = base_func}
 ;
@@ -771,6 +806,7 @@ value output bname base =
   let tmp_fname_acc = Filename.concat bname "1base.acc" in
   let tmp_fname_inx = Filename.concat bname "1names.inx" in
   let tmp_fname_gw2 = Filename.concat bname "1strings.inx" in
+  let tmp_fname_not = Filename.concat bname "1notes" in
   let _ = base.data.persons.array () in
   let _ = base.data.ascends.array () in
   let _ = base.data.families.array () in
@@ -842,8 +878,15 @@ do Printf.eprintf "*** create first name index\n"; flush stderr; return
           output_binary_int oc2 surname_pos;
           output_binary_int oc2 first_name_pos;
        return ();
-do Printf.eprintf "*** ok\n"; flush stderr; return
+       let s = base.data.bnotes.nread 0 in
+       if s = "" then ()
+       else
+         let oc_not = open_out tmp_fname_not in
+         do output_string oc_not s;
+            close_out oc_not;
+         return ();
        close_out oc2;
+do Printf.eprintf "*** ok\n"; flush stderr; return
        remove_file (Filename.concat bname "base");
        Sys.rename tmp_fname (Filename.concat bname "base");
        remove_file (Filename.concat bname "base.acc");
@@ -852,6 +895,10 @@ do Printf.eprintf "*** ok\n"; flush stderr; return
        Sys.rename tmp_fname_inx (Filename.concat bname "names.inx");
        remove_file (Filename.concat bname "strings.inx");
        Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
+       remove_file (Filename.concat bname "notes");
+       if Sys.file_exists tmp_fname_not then
+         Sys.rename tmp_fname_not (Filename.concat bname "notes")
+       else ();
        remove_file (Filename.concat bname "patches");
        remove_file (Filename.concat bname "tstab");
     return ()

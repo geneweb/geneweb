@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.15 1999-07-28 13:08:29 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.16 1999-08-14 09:26:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -39,17 +39,6 @@ value print_date_option oc =
   | None -> () ]
 ;
 
-value buff = ref (String.create 80);
-value store len x =
-  do if len >= String.length buff.val then
-       buff.val := buff.val ^ String.create (String.length buff.val)
-     else ();
-     buff.val.[len] := x;
-  return succ len
-;
-
-value get_buff len = String.sub buff.val 0 len;
-
 value starting_char s =
   match s.[0] with
   [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | ' ' -> True
@@ -59,14 +48,14 @@ value starting_char s =
 
 value s_correct_string s =
   loop 0 0 where rec loop i len =
-    if i == String.length s then get_buff len
+    if i == String.length s then Buff.get len
     else
       if i == 0 && not (starting_char s) then
-        loop (i + 1) (store (store len '_') s.[0])
-      else if s.[i] == ' ' then loop (i + 1) (store len '_')
+        loop (i + 1) (Buff.store (Buff.store len '_') s.[0])
+      else if s.[i] == ' ' then loop (i + 1) (Buff.store len '_')
       else if s.[i] == '_' || s.[i] == '\\' then
-        loop (i + 1) (store (store len '\\') s.[i])
-      else loop (i + 1) (store len s.[i])
+        loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
+      else loop (i + 1) (Buff.store len s.[i])
 ;
 
 value correct_string base is = s_correct_string (sou base is);
@@ -626,52 +615,62 @@ value gwu base out_dir out_oc src_oc_list anc desc =
   let fam_done = Array.create (base.data.families.len) False in
   let mark = Array.create base.data.persons.len False in
   let out_oc_first = ref True in
-  for i = 0 to base.data.families.len - 1 do
-    let fam = base.data.families.get i in
-    let cpl = base.data.couples.get i in
-    if is_deleted_family fam then ()
+  let origin_file fname =
+    if out_dir = "" then (out_oc, out_oc_first)
+    else if fname = "" then (out_oc, out_oc_first)
     else
-      do if fam_done.(i) then ()
-         else if fam_sel fam.fam_index then
-           let (oc, first) =
-             let fname = sou base fam.origin_file in
-             if out_dir = "" then (out_oc, out_oc_first)
-             else if fname = "" then (out_oc, out_oc_first)
-             else
-               try List.assoc fam.origin_file src_oc_list.val with
-               [ Not_found ->
-                   let oc = open_out (Filename.concat out_dir fname) in
-                   let x = (oc, ref True) in
-                   do src_oc_list.val :=
-                        [(fam.origin_file, x) :: src_oc_list.val];
-                   return x ]
-           in
-           let ifaml = connected_families base fam_sel fam cpl in
-           let ml =
-             List.fold_right
-               (fun ifam ml ->
-                  let fam = foi base ifam in
-                  let cpl = coi base ifam in
-                  let m =
-                    {m_fam = fam;
-                     m_fath = poi base cpl.father;
-                     m_moth = poi base cpl.mother;
-                     m_chil = Array.map (fun ip -> poi base ip) fam.children}
-                  in
-                  if empty_family base m then ml else [m :: ml])
-               ifaml []
-           in
-           if ml <> [] then
-             do if not first.val then Printf.fprintf oc "\n" else ();
-                first.val := False;
-                List.iter (print_family oc base mark sel fam_done) ml;
-                print_notes oc base ml per_sel;
-                print_relations oc base mark per_sel ml;
-             return ()
-           else ()
-         else ();
-      return ();
-  done
+      try List.assoc fname src_oc_list.val with
+      [ Not_found ->
+          let oc = open_out (Filename.concat out_dir fname) in
+          let x = (oc, ref True) in
+          do src_oc_list.val := [(fname, x) :: src_oc_list.val];
+          return x ]
+  in
+  do for i = 0 to base.data.families.len - 1 do
+       let fam = base.data.families.get i in
+       let cpl = base.data.couples.get i in
+       if is_deleted_family fam then ()
+       else
+         do if fam_done.(i) then ()
+            else if fam_sel fam.fam_index then
+              let (oc, first) = origin_file (sou base fam.origin_file) in
+              let ifaml = connected_families base fam_sel fam cpl in
+              let ml =
+                List.fold_right
+                  (fun ifam ml ->
+                     let fam = foi base ifam in
+                     let cpl = coi base ifam in
+                     let m =
+                       {m_fam = fam;
+                        m_fath = poi base cpl.father;
+                        m_moth = poi base cpl.mother;
+                        m_chil =
+                          Array.map (fun ip -> poi base ip) fam.children}
+                     in
+                     if empty_family base m then ml else [m :: ml])
+                  ifaml []
+              in
+              if ml <> [] then
+                do if not first.val then Printf.fprintf oc "\n" else ();
+                   first.val := False;
+                   List.iter (print_family oc base mark sel fam_done) ml;
+                   print_notes oc base ml per_sel;
+                   print_relations oc base mark per_sel ml;
+                return ()
+              else ()
+            else ();
+         return ();
+     done;
+     let s = base.data.bnotes.nread 0 in
+     if s = "" then ()
+     else
+       let (oc, first) = origin_file base.data.bnotes.norigin_file in
+       do if not first.val then Printf.fprintf oc "\n" else ();
+          Printf.fprintf oc "notes\n";
+          Printf.fprintf oc "%s\n" s;
+          Printf.fprintf oc "end notes\n";
+       return ();
+  return ()
 ;
 
 value in_file = ref "";

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.42 1999-08-13 17:43:14 ddr Exp $ *)
+(* $Id: perso.ml,v 2.43 1999-08-14 09:26:39 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -577,7 +577,7 @@ value print_notes conf base p =
   | notes ->
       if age_autorise conf base p then
         do Wserver.wprint "<h3>%s</h3>\n\n"
-             (capitale (transl_nth conf "note/notes" 1));
+             (capitale (nominative (transl_nth conf "note/notes" 1)));
            tag "ul" begin
              html_li conf;
              copy_string_with_macros conf notes;
@@ -689,7 +689,7 @@ value print_not_empty_src conf base new_parag first txt isrc =
 value print_sources conf base new_parag p =
   let first = ref True in
   do print_not_empty_src conf base new_parag first
-       (fun () -> transl_nth conf "person/persons" 0)
+       (fun () -> nominative (transl_nth conf "person/persons" 0))
        p.psources;
      print_not_empty_src conf base new_parag first
        (fun () -> transl_nth conf "birth" 0)
@@ -713,7 +713,7 @@ value print_sources conf base new_parag p =
             fam.marriage_src;
           print_not_empty_src conf base new_parag first
             (fun () ->
-               transl_nth conf "family/families" 0 ^
+               nominative (transl_nth conf "family/families" 0) ^
                (if Array.length p.family == 1 then ""
                 else " " ^ string_of_int (i + 1)))
             fam.fsources;

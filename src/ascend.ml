@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.46 1999-08-05 14:26:47 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.47 1999-08-14 09:26:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -89,7 +89,7 @@ value print_choice conf base p niveau_effectif =
         html_li conf;
         Wserver.wprint
           "%s <input type=checkbox name=notes value=on checked>\n"
-          (capitale (transl_nth conf "note/notes" 1));
+          (capitale (nominative (transl_nth conf "note/notes" 1)));
       end;
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=T> %s\n"
@@ -776,7 +776,7 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
         if wn && has_notes conf base all_gp then
           do Wserver.wprint "<p><hr><p>\n";
              Wserver.wprint "<h3>%s</h3>\n"
-               (capitale (transl_nth conf "note/notes" 1));
+               (capitale (nominative (transl_nth conf "note/notes" 1)));
              tag "dl" begin
                List.iter (print_notes conf base) all_gp;
              end;

@@ -5,6 +5,9 @@ GeneWeb Version 2.06
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Aug 14, 99] In srcfile.ml, for start.txt files, added "o" macro
+    (print if notes) and ability to decline verb + noun ([verb][noun]
+    without space between 1st ] and snd [).
   - [Aug 8, 99] Improved -robot_xcl option (to exclude impolite robots).
   - [Aug 7, 99] Fixed bad behavior: in welcome pages, proposed "wizard" to
     to wizards when the flag "wizard_just_friend" was set.

@@ -11,7 +11,8 @@
 
 <p>
 
-现有 %n 人在数据库中。
+现有 %n 人在数据库中%o
+(<a href="%sm=NOTES">[note/notes]1</a>)%o。
 
 <ul>
 <li>
@@ -66,6 +67,7 @@ or <em>Sosa number</em> relative to %a%u
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
 
 %w<li> <a href="%sm=ADD_FAM">增加家庭记录</a>.
+<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
 %w
 
 </ul>

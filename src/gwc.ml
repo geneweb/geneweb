@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.22 1999-07-26 07:01:59 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.23 1999-08-14 09:26:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -417,6 +417,12 @@ value insert_notes fname gen key str =
       return () ]
 ;
 
+value insert_bnotes fname gen str =
+  do gen.g_base.data.bnotes.nread := fun _ -> str;
+     gen.g_base.data.bnotes.norigin_file := fname;
+  return ()
+;
+
 value map_option f =
   fun
   [ Some x -> Some (f x)
@@ -473,7 +479,8 @@ value insert_syntax fname gen =
   fun
   [ Family cpl fam -> insert_family gen cpl fam
   | Notes key str -> insert_notes fname gen key str
-  | Relations key rl -> insert_relations fname gen key rl ]
+  | Relations key rl -> insert_relations fname gen key rl
+  | Bnotes str -> insert_bnotes fname gen str ]
 ;
 
 value insert_comp_families gen (x, shift) =
@@ -511,7 +518,8 @@ value empty_base : Def.base =
      ascends = cache_of [| |];
      families = cache_of [| |];
      couples = cache_of [| |];
-     strings = cache_of [| |]}
+     strings = cache_of [| |];
+     bnotes = {nread = fun _ -> ""; norigin_file = ""}}
   in
   let base_func =
    {persons_of_name = fun [];
@@ -526,6 +534,7 @@ value empty_base : Def.base =
     patch_string = fun [];
     patch_name = fun [];
     commit_patches = fun [];
+    commit_notes = fun [];
     patched_ascends = fun [];
     cleanup = fun () -> ()}
   in
@@ -553,12 +562,14 @@ value linked_base gen : Def.base =
     let a = Array.sub (gen.g_base.data.strings.array ()) 0 gen.g_scnt in
     do gen.g_base.data.strings.array := fun _ -> [| |]; return a
   in
+  let bnotes = gen.g_base.data.bnotes in
   let base_data =
     {persons = cache_of persons;
      ascends = cache_of ascends;
      families = cache_of families;
      couples = cache_of couples;
-     strings = cache_of strings}
+     strings = cache_of strings;
+     bnotes = bnotes}
   in
   let base_func =
     {persons_of_name = fun [];
@@ -573,6 +584,7 @@ value linked_base gen : Def.base =
      patch_string = fun [];
      patch_name = fun [];
      commit_patches = fun [];
+     commit_notes = fun [];
      patched_ascends = fun [];
      cleanup = fun () -> ()}
   in

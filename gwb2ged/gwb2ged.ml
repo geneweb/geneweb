@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.14 1999-07-26 07:01:58 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.15 1999-08-14 09:26:35 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -21,6 +21,50 @@ value ged_month =
   | 11 -> "NOV"
   | 12 -> "DEC"
   | _ -> failwith "ged_month" ]
+;
+
+value encode s =
+  if ascii.val then s else Ansel.of_iso_8859_1 s
+;
+
+value next_space_overflows s len i =
+  if s.[i] = ' ' then
+    loop (len + 1) (i + 1) where rec loop len i =
+      if i >= String.length s then False
+      else if len >= 255 then True
+      else if s.[i] = ' ' then False
+      else loop (len + 1) (i + 1)
+  else False
+;
+
+value br = "<br>";
+
+value rec display_note_aux oc s len i =
+  if i == String.length s then Printf.fprintf oc "\n"
+  else
+    if i <= String.length s - String.length br
+    && String.lowercase (String.sub s i (String.length br)) = br then
+      do Printf.fprintf oc "\n2 CONT "; return
+      let i = i + String.length br in
+      let i =
+        if i < String.length s && s.[i] == '\n' then i + 1
+        else i
+      in
+      display_note_aux oc s (String.length "2 CONT ") i
+    else if s.[i] == '\n' || len = 255 || next_space_overflows s len i then
+      do Printf.fprintf oc "\n2 CONC ";
+         Printf.fprintf oc "%c" (if s.[i] == '\n' then ' ' else s.[i]);
+      return
+      display_note_aux oc s (String.length "2 CONC ") (i + 1)
+    else
+      do output_char oc s.[i]; return
+      display_note_aux oc s (len + 1) (i + 1)
+;
+
+value display_note oc s =
+  do Printf.fprintf oc "1 NOTE ";
+     display_note_aux oc (encode s) (String.length "1 NOTE ") 0;
+  return ()
 ;
 
 value ged_header base oc ifile ofile =
@@ -54,12 +98,10 @@ value ged_header base oc ifile ofile =
      Printf.fprintf oc "2 VERS 5.5\n";
      Printf.fprintf oc "2 FORM LINEAGE-LINKED\n";
      if ascii.val then Printf.fprintf oc "1 CHAR ASCII\n"
-     else Printf.fprintf oc "1 CHAR ANSEL\n";  
+     else Printf.fprintf oc "1 CHAR ANSEL\n";
+     let s = base.data.bnotes.nread 0 in
+     if s = "" then () else display_note oc s;
   return ()
-;
-
-value encode s =
-  if ascii.val then s else Ansel.of_iso_8859_1 s
 ;
 
 value ged_1st_name base p =
@@ -318,47 +360,10 @@ value ged_multimedia_link base oc per =
       return () ]
 ;
 
-value next_space_overflows s len i =
-  if s.[i] = ' ' then
-    loop (len + 1) (i + 1) where rec loop len i =
-      if i >= String.length s then False
-      else if len >= 255 then True
-      else if s.[i] = ' ' then False
-      else loop (len + 1) (i + 1)
-  else False
-;
-
-value br = "<br>";
-
-value rec display_note oc s len i =
-  if i == String.length s then Printf.fprintf oc "\n"
-  else
-    if i <= String.length s - String.length br
-    && String.lowercase (String.sub s i (String.length br)) = br then
-      do Printf.fprintf oc "\n2 CONT "; return
-      let i = i + String.length br in
-      let i =
-        if i < String.length s && s.[i] == '\n' then i + 1
-        else i
-      in
-      display_note oc s (String.length "2 CONT ") i
-    else if s.[i] == '\n' || len = 255 || next_space_overflows s len i then
-      do Printf.fprintf oc "\n2 CONC ";
-         Printf.fprintf oc "%c" (if s.[i] == '\n' then ' ' else s.[i]);
-      return
-      display_note oc s (String.length "2 CONC ") (i + 1)
-    else
-      do output_char oc s.[i]; return
-      display_note oc s (len + 1) (i + 1)
-;
-
 value ged_note base oc per =
   match sou base per.notes with
   [ "" -> ()
-  | s ->
-      do Printf.fprintf oc "1 NOTE ";
-         display_note oc (encode s) (String.length "1 NOTE ") 0;
-      return () ]
+  | s -> display_note oc s ]
 ;
 
 value ged_marriage base oc fam =

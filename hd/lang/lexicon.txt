@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.111 1999-08-10 08:24:35 ddr Exp $
+# $Id: lexicon.txt,v 2.112 1999-08-14 09:26:35 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -639,7 +639,7 @@ pt: acesso
 se: tilltr&auml;de
 
     add
-cs: pøidat
+cs: pøidat :a:
 de: hinzuf&uuml;gen +before
 dk: tilf&oslash;j
 en: add
@@ -2783,7 +2783,7 @@ cs: poznámka/poznámky
 de: Notiz/Notizen
 dk: note/noter
 en: note/notes
-eo: noto/notoj
+eo: noto/notoj:a:+n
 es: nota/notas
 fr: note/notes
 he:  äòøåú

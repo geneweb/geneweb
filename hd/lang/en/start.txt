@@ -11,7 +11,8 @@
 
 <p>
 
-The data base now holds %n persons.
+The data base now holds %n persons%o
+(<a href="%sm=NOTES">[note/notes]1</a>)%o.
 
 <ul>
 
@@ -61,7 +62,8 @@ by
 
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
 
-%w<li> <a href="%sm=ADD_FAM">Add a family</a>.
+%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
+<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
 %w
 
 </ul>

@@ -11,7 +11,8 @@
 
 <p>
 
-La base contient actuellement %n personnes.
+La base contient actuellement %n personnes%o
+(<a href="%sm=NOTES">[note/notes]1</a>)%o.
 
 <ul>
 
@@ -48,12 +49,12 @@ lieu <INPUT NAME=p size=25 maxlength=200> =&gt;
 <FORM method=GET action="%f">
 %hTous les
 <SELECT NAME=m>
-   <OPTION VALUE="N" SELECTED> Patronymes
+   <OPTION VALUE="N" SELECTED> [*surname/surnames]1
    <OPTION VALUE="P"> Pr&eacute;noms
 </SELECT>
 par
 <SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED> Ordre alphab&eacute;tique
+   <OPTION VALUE="A" SELECTED> [*alphabetic order]
    <OPTION VALUE="F"> Fr&eacute;quence
 </SELECT> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
@@ -61,7 +62,8 @@ par
 
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
 
-%w<li> <a href="%sm=ADD_FAM">Ajouter une famille</a>.
+%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
+<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
 %w
 
 </ul>

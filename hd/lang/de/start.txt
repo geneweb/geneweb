@@ -11,7 +11,8 @@
 
 <p>
 
-Die Datenbank enth&auml;lt z.Zt. %n Personen.
+Die Datenbank enth&auml;lt z.Zt. %n Personen%o
+(<a href="%sm=NOTES">[note/notes]1</a>)%o.
 
 <ul>
 
@@ -60,7 +61,8 @@ Platz <input name=p size=25 maxlength=200> =&gt
 
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
 
-%w<li> <a href="%sm=ADD_FAM">eine Familie hinzuf&uuml;gen</a>.
+%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
+<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
 %w
 
 </ul>

@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 2.10 1999-07-26 07:01:59 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.11 1999-08-14 09:26:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -21,7 +21,8 @@ type syntax_o =
   [ Family of gen_couple somebody and
       gen_family (gen_person iper string) string
   | Notes of key and string
-  | Relations of key and list (gen_relation somebody string) ]
+  | Relations of key and list (gen_relation somebody string)
+  | Bnotes of string ]
 ;
 
 value copy_decode s i1 i2 =
@@ -660,6 +661,19 @@ value get_relation str =
   | _ -> failwith str ]
 ;
 
+value read_notes ic =
+  let notes =
+    try
+      loop (input_a_line ic) where rec loop =
+        fun
+        [ "end notes" -> ""
+        | l -> l ^ "\n" ^ loop (input_a_line ic) ]
+    with
+    [ End_of_file -> failwith "end of file" ]
+  in
+  strip_spaces (strip_controls_m notes)
+;
+
 value read_family ic fname =
   fun
   [ Some (str, ["fam" :: l]) ->
@@ -725,6 +739,9 @@ value read_family ic fname =
              fam_index = Adef.ifam_of_int (-1)}
           in
           Some (Family co fo, line) ]
+  | Some (str, ["notes"]) ->
+      let notes = read_notes ic in
+      Some (Bnotes notes, read_line ic)
   | Some (str, ["notes" :: l]) ->
       let (surname, l) = get_name str l in
       let (first_name, occ, l) = get_fst_name str l in
@@ -732,22 +749,13 @@ value read_family ic fname =
       else
         match read_line ic with
         [ Some (_, ["beg"]) ->
-            let notes =
-              try
-                loop (input_a_line ic) where rec loop =
-                  fun
-                  [ "end notes" -> ""
-                  | l -> l ^ "\n" ^ loop (input_a_line ic) ]
-              with
-              [ End_of_file -> failwith "end of file" ]
-            in
+            let notes = read_notes ic in
             let key =
               {pk_first_name = first_name;
                pk_surname = surname;
                pk_occ = occ}
             in
-            let str = strip_spaces (strip_controls_m notes) in
-            Some (Notes key str, read_line ic)
+            Some (Notes key notes, read_line ic)
         | Some (str, _) -> failwith str
         | None -> failwith "end of file" ]
   | Some (str, ["rel" :: l]) ->
