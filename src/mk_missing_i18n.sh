@@ -2,6 +2,7 @@
 #cd (*
 exec ocaml $0
 *) ".";;
+(* $Id: mk_missing_i18n.sh,v 3.3 2000-11-06 19:52:00 ddr Exp $ *)
 
 open Printf
 
@@ -21,19 +22,25 @@ let rec get_all_versions ic =
     let transl = String.sub line 4 (String.length line - 4) in
     (lang, transl) :: get_all_versions ic
 
-let check lang =
+let compare_assoc (l1, _) (l2, _) = l1 <= l2
+
+let check first lang =
   let ic_lex = open_in "../hd/lang/lexicon.txt" in
   let ic_i18n = open_in "i18n" in
   printf "<h3><a name=%s>%s</h3>\n" lang lang;
   printf "<pre>\n";
-  try
+  begin try
     while true do
       let line = input_line ic_i18n in
       skip_to_same_line ic_lex ("    " ^ line);
       let list = get_all_versions ic_lex in
+      if first && Sort.list compare_assoc list <> list then begin
+	eprintf "Misordered for: \"%s\"\n" line;
+	flush stderr;
+      end;
       if not (List.mem_assoc lang list) then begin
         let list =
-	  Sort.list (fun (l1, _) (l2, _) -> l1 < l2)
+	  Sort.list compare_assoc
             [(lang, ""); ("en", List.assoc "en" list);
 	     ("fr", List.assoc "fr" list)]
 	in
@@ -43,8 +50,10 @@ let check lang =
 	printf "\n";
       end;
    done
-  with End_of_file -> ();
-  printf "</pre>\n"
+  with End_of_file -> ()
+  end;
+  printf "</pre>\n";
+  false
 
 let header lang =
   printf "<a href=#%s>%s</a>\n" lang lang
@@ -67,6 +76,6 @@ the given language if you know it. Thanks.
 ";
 List.iter header languages;
 printf "</tt>\n";
-List.iter check languages;
+let _ = List.fold_left check true languages in ();
 printf "</body>\n";
 flush stdout

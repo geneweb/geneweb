@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.176 2000-11-06 19:19:08 ddr Exp $
+# $Id: lexicon.txt,v 3.177 2000-11-06 19:50:37 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -165,8 +165,8 @@ dk: f&aelig;tre og kusiner af %s grad
 en: %s cousins
 eo: %s gradaj  gekuzoj 
 es: primos de %s grado
-fr: cousins au %s degr&eacute;
 fi: %s serkut
+fr: cousins au %s degr&eacute;
 he:    áğé ãåãéí ìãøâä ä%s
 is: skyld í %s liğ
 it: cugini di %s grado
@@ -861,8 +861,8 @@ eo: nevo (de edz(in)o)/nevino (de edz(in)o)
 es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
 fi: veljen tai sisaren poika (puolison veljen tai sisaren poika)/veljen tai sisaren tyt&auml;r (puolison veljen tai sisaren tyt&auml;r)
 fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
-is: frændi/frændi
 he:  àçééï (ùì áï åà áú äæåâ)/ àçééğéú (ùì áï åà áú äæåâ))
+is: frændi/frændi
 it: un nipote (dello sposo)/una nipote (dello sposo)
 lv: a nephew (spouse's nephew)/a niece (spouse's niece)
 nl: een neef (van de echtgenoot)/een nicht (van de echtgenoot)
@@ -1035,8 +1035,8 @@ cs: pokroèilı dotaz
 de: Erweiterte Suche
 dk: avanceret s&oslash;gning
 en: advanced request
-es: consulta avanzada
 eo: sercxo pli preciza
+es: consulta avanzada
 fi: erityishaku
 fr: requ&ecirc;te &eacute;volu&eacute;e
 he:   á÷ùä îú÷ãîú
@@ -1683,8 +1683,8 @@ fi: haara/haaraa
 fr: branche/branches
 he:   òğó/ òğôéí
 is: grein/greinar
-lv: zars/zari
 it: ramo/rami
+lv: zars/zari
 nl: tak/takken
 no: gren/grener
 pt: ramo/ramos
@@ -2748,8 +2748,8 @@ eo: por la propraj nomoj laù la alfabeta ordo
 es: por los nombres en orden alfab&eacute;tico
 fi: etunimien mukaan aakkosj&auml;rjestyksess&auml
 fr: pour les pr&eacute;noms par ordre alphab&eacute;tique
-is: fornöfn í stafrófsröğ
 he:  ìùîåú äôøèééí áñãø àìó-áú
+is: fornöfn í stafrófsröğ
 it: per il primo nome in ordine alfabetico
 lv: pa vârdiem alfabçtiskâ kârtîbâ
 nl: dit geeft de voornamen in alfabetische volgorde
@@ -2918,8 +2918,8 @@ fi: hyv&auml;&auml syntym&auml;p&auml;iv&auml;&auml;!
 fr: bon anniversaire!
 he:   éåí äåìãú ùîç
 is: til hamingju meğ afmæliğ !
-lv: Laimîgu dzimğanas dienu!
 it: buon compleanno!
+lv: Laimîgu dzimğanas dienu!
 nl: van harte gefeliciteerd!
 no: gratulerer med dagen!
 pt: feliz anivers&aacute;rio!
@@ -3668,8 +3668,8 @@ dk: gift
 en: married
 eo: edzigxintaj
 es: casados
-fr: mari&eacute;s
 fi: vihitty
+fr: mari&eacute;s
 he:  ğùåàéí
 is: gift
 it: sposati
@@ -3767,8 +3767,8 @@ dk: sammenl&aelig;gning udf&oslash;rt
 en: merge done
 eo: kunigo farita
 es: fusi&oacute;n terminada
-fr: fusion termin&eacute;e
 fi: yhdistetty
+fr: fusion termin&eacute;e
 he:  äàéçåã áåöò
 is: sameiningu lokiğ
 it: fusione terminata
@@ -3858,9 +3858,9 @@ dk: mere end %d svar
 en: more than %d answers
 eo: pli ol %d respondoj
 es: m&aacute;s de %d respuestas
-he:  éåúø î-%d úùåáåú
 fi: yli %d vastausta
 fr: plus de %d r&eacute;ponses
+he:  éåúø î-%d úùåáåú
 is: fleiri en %d svör
 it: pi&ugrave; di %d risposte
 lv: vairâk nekâ %d atbildes
@@ -4123,8 +4123,8 @@ is: ógift
 it: non sposati
 lv: nav precçjuğies
 nl: niet gehuwd
-pt: n&atilde;o casados
 no: ugift
+pt: n&atilde;o casados
 ru: íå â áğàêå
 se: ogifta
 
@@ -4532,12 +4532,12 @@ dk: kun den valgte generation
 en: only the selected generation
 eo: nur la elektita generacio
 es: solamente la generaci&oacute;n elegida
+fi: vain valittu sukupolvi
+fr: seulement la g&eacute;n&eacute;ration s&eacute;lectionn&eacute;e
 he:  ãåø äğáëø áìáã
 is: ağeins valda kynslóğin
 it: soltanto la generazione selezionata
 lv: tikai izvçlçtajai paaudzei
-fi: vain valittu sukupolvi
-fr: seulement la g&eacute;n&eacute;ration s&eacute;lectionn&eacute;e
 nl: alleen de geselecteerde generatie
 no: bare den valgte generasjonen
 pt: s&oacute; a gera&ccedil;&atilde;o selecionada
@@ -4806,8 +4806,8 @@ cs: veøejné
 de: &ouml;ffentlich
 dk: offentlig
 en: public
-es: p&uacute;blico
 eo: publika
+es: p&uacute;blico
 fi: julkinen
 fr: public
 he:  öéáåøé
@@ -4889,8 +4889,8 @@ he:   àá îëéø / àí îëéøä / äåøéí îëéøéí
 is: viğurkenndur fağir/viğurkennd móğir/viğurkennd foreldri
 it: padre avente riconosciuto/madre avente riconosciuta/genitori aventi riconusciuti
 lv: atzîts tçvs/mâte/vecâki (?)
-no: bekreftet far/bekreftet mor/bekreftede foreldre
 nl: erkennende vader/erkennende moeder/erkennende ouders
+no: bekreftet far/bekreftet mor/bekreftede foreldre
 pt: pai que o reconheceu/m&atilde;e que o reconheceu/pais que o reconheceram
 ru: ïğèçíàííûé îòåö/ïğèçíàííàÿ ìàòü/ïğèçíàíûé ğîäèòåëü
 se: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
@@ -5511,10 +5511,10 @@ dk: r&aelig;kkef&oslash;lge omvendt
 en: switch done
 eo: intersxangxo farita
 es: inversi&oacute;n realizada
-he:  ääçìôä áåöòä
-is: breyting gerğ
 fi: vaihto tehty
 fr: interversion effectu&eacute;e
+he:  ääçìôä áåöòä
+is: breyting gerğ
 it: scambio fatto
 lv: pârslçgğana izpildîta
 nl: veranderd
@@ -6416,11 +6416,11 @@ dk: anvend "forbind" i stedet for "opret"
 en: use "link" instead of "create"
 eo: uzu "bindi" anstataù ol "krei"
 es: utilise "reunir" en lugar de "crear"
+fi: käytä "luo" toiminnon "liit&auml" sijaan
+fr: utilisez "relier" au lieu de "cr&eacute;er"
 he:  ìäùúîù á-"÷ùø" áî÷åí "òùä"
 is: notağu "tengja" í stağ "búa til"
 it: usare "link" invece di "create"
-fi: käytä "luo" toiminnon "liit&auml" sijaan
-fr: utilisez "relier" au lieu de "cr&eacute;er"
 lv: "izveidot" vietâ lietojiet "saite"
 nl: gebruik "konnektie" inplaats van "maken"
 no: bruk "koble" istedet for "opprett"
