@@ -36,7 +36,7 @@ They are freely distributed at addresses:
 4- To use GeneWeb, move the directory "distribution" to another place, or
    rename it.
 
-   Go to this directory and launch the command "setup".
+   Go to this directory and launch the command "./gwsetup".
 
    The reason why it is better to move this directory is that "make clean"
    deletes it, and another "make distrib" scratches it. If you created
