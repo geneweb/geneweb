@@ -7,6 +7,11 @@ GeneWeb version 4.02
   - [11 Apr 01] The Gregorian and Julian calendars did not work for years
     less than 4800 BC. Fixed.
 
+* Templates files (etc/*.txt)
+  For programmers...
+  - [28 Apr 01] Added ability to use variable "cvar_x" in perso.txt, equal
+    to the base environment variable x.
+
 * Setup program (gwsetup)
   - [11 Apr 01] Fixed security hole: if the file only.txt was not
     accessible or corrupted for some reason (it should not but...), the

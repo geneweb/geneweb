@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.10 2001-04-28 18:37:43 ddr Exp $ *)
+(* $Id: perso.ml,v 4.11 2001-04-28 18:51:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -284,6 +284,7 @@ and title_item =
 type variable_value =
   [ VVsome of
       (list (string * env) * (person * ascend * union * bool) * env * string)
+  | VVcvar of string
   | VVnone ]
 ;
 
@@ -371,10 +372,16 @@ value rec eval_variable conf base env sl =
         in
         loop env
     | [] -> VVsome (env, (p, a, u, p_auth), efam, "")
-    | [s] -> VVsome (env, (p, a, u, p_auth), efam, s)
+    | [s] ->
+        let v = extract_var "cvar_" s in
+        if v <> "" then VVcvar v else VVsome (env, (p, a, u, p_auth), efam, s)
     | _ -> VVnone ]
   in
   loop ep efam sl
+;
+
+value eval_base_env_variable conf v =
+  try List.assoc v conf.base_env with [ Not_found -> "" ]
 ;
 
 value print_age conf base env p p_auth =
@@ -881,6 +888,8 @@ value print_variable conf base env sl =
   | VVsome (env, ep, efam, s) ->
       try print_simple_variable conf base env ep efam s with
       [ Not_found -> Templ.print_variable conf base s ]
+  | VVcvar s ->
+      Wserver.wprint "%s" (eval_base_env_variable conf s)
   | VVnone ->
       do {
         list_iter_first
@@ -1074,6 +1083,7 @@ value eval_bool_variable conf base env sl =
       }
   | VVsome (env, ep, efam, s) ->
       eval_simple_bool_variable conf base env ep efam s
+  | VVcvar s -> do { Wserver.wprint ">%%%s???" s; False }
   | VVnone -> False ]
 ;
 
@@ -1157,6 +1167,7 @@ value eval_bool_value conf base env =
           match eval_variable conf base env [s :: sl] with
           [ VVsome (env, ep, efam, s) when s <> "" ->
               try_eval_gen_variable conf base env s
+          | VVcvar s -> eval_base_env_variable conf s
           | _ -> raise Not_found ]
         with
         [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
@@ -1196,7 +1207,8 @@ and eval_foreach conf base env s sl al =
         List.iter (fun s -> Wserver.wprint "%s." s) sl;
         Wserver.wprint "%s???" s
       }
-  | VVnone -> () ]
+ | VVcvar s -> Wserver.wprint ">%%%s???" s
+ | VVnone -> () ]
 and eval_simple_foreach conf base env al ep efam =
   fun
   [ "alias" -> eval_foreach_alias conf base env al ep
