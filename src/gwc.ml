@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.13 1999-02-08 13:01:00 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.14 1999-02-19 16:54:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -560,12 +560,12 @@ value shift = ref 0;
 value main () =
   let files = ref [] in
   do Argl.parse
-       [("-cg", Arg.Set do_consang, "Compute consanguinity");
-        ("-c", Arg.Set just_comp, "Only compiling");
+       [("-c", Arg.Set just_comp, "Only compiling");
         ("-o", Arg.String (fun s -> out_file.val := s),
          "<file> Output data base (default: a.gwb)");
         ("-stats", Arg.Set pr_stats, "Print statistics");
         ("-nc", Arg.Clear do_check, "No consistency check");
+        ("-cg", Arg.Set do_consang, "Compute consanguinity");
         ("-sh", Arg.Int (fun x -> shift.val := x),
          "<int> Shift all persons numbers")]
        (fun x ->
