@@ -82,8 +82,10 @@ family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birthDeath.cmx \
     ../wserver/wserver.cmx family.cmi 
 fhashtbl.cmo: iovalue.cmi 
 fhashtbl.cmx: iovalue.cmx 
-forum.cmo: config.cmi util.cmi ../wserver/wserver.cmi 
-forum.cmx: config.cmi util.cmx ../wserver/wserver.cmx 
+forum.cmo: config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo srcfile.cmi \
+    update.cmi util.cmi ../wserver/wserver.cmi 
+forum.cmx: config.cmi def.cmi gutil.cmx iobase.cmx lock.cmx srcfile.cmx \
+    update.cmx util.cmx ../wserver/wserver.cmx 
 fpla.cmo: adef.cmi argl.cmo def.cmi gutil.cmi iobase.cmi 
 fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx iobase.cmx 
 gutil.cmo: adef.cmi def.cmi name.cmi gutil.cmi 
@@ -230,7 +232,7 @@ cousins.cmo cousins.cmx: pa_html.cmo
 date.cmo date.cmx: pa_html.cmo
 descend.cmo descend.cmx: pa_html.cmo
 family.cmo family.cmx: def.syn.cmo pa_html.cmo
-forum.cmo forum.cmx: pa_html.cmo
+forum.cmo forum.cmx: pa_lock.cmo pa_html.cmo
 gwc.cmo gwc.cmx: pa_lock.cmo
 gwd.cmo gwd.cmx: pa_html.cmo pa_lock.cmo
 history.cmo history.cmx: pa_html.cmo
