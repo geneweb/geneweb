@@ -26,7 +26,9 @@ Navnetype for s&oslash;ket:
 <ul>
 <li> <input type=radio name=t value=PN checked>
 Enten <em>fornavn</em> og <em>etternavn</em>,
-eller <em>offisielt navn</em>, eller <em>alias</em>.
+eller <em>offisielt navn</em>,
+eller <em>alias</em>%u,
+eller %[<em>Sosa number</em> relative to %a%]%u.
 <li> <input type=radio name=t value=P> <em>Fornavn</em>.
 <li> <input type=radio name=t value=N> <em>Etternavn</em>.
 </ul>

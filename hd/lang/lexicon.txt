@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.66 1999-06-30 11:44:51 ddr Exp $
+# $Id: lexicon.txt,v 2.67 1999-06-30 23:04:42 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2179,7 +2179,7 @@ se: gift%t med
 de: Maximal %d Generationen
 dk: maksimalt %d generationer
 en: max %d generations
-es: m&acute;ximo %d generaci&oacute;nes
+es: m&aacute;ximo %d generaci&oacute;nes
 he:  מקסימום %d דורות
 it: max %d generazioni
 fr: max %d g&eacute;n&eacute;rations
@@ -2260,8 +2260,8 @@ se: &auml;ndra
 de: Monate alt
 dk: m&aring;neder gammel
 en: months old
-eo: monato
-es: mes(es)
+eo: monatoj
+es: meses
 fr: mois
 he:  חודשים
 it: mesi
@@ -3874,7 +3874,7 @@ de: Jahre alt
 dk: &aring;r
 en: years old
 eo: jaroj
-es: a&ntilde;o(os)
+es: a&ntilde;os
 fr: ans
 he:  שנים 
 it: anni

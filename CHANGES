@@ -9,6 +9,11 @@ GeneWeb version 2.04
     whiteyellow, black, bluegreen and brown (thanks to Hans Albeck)
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jun 30, 99] Added the ability to enter a Sosa number in the welcome page
+    when navigating with someone as Sosa reference number (still available from
+    its "ancestors" page).
+  - [Jun 30, 99] In relationship links, display common ancestors in a more
+    canonical order.
   - [Jun 28, 99] Due to optimization in consanguinity computing (see below),
     the answer time of relationship computing for persons without relationship
     links is generally faster (it answers: "no relationship links" faster).

@@ -26,7 +26,8 @@ Estas:
 <ul>
 <li> <input type=radio name=t value=PN checked>
 Cxu <em>personnomo</em> kaj <em>familinomo</em>,
-cxu <em>publica nomo</em>, cxu <em>aliaso</em>.
+cxu <em>publica nomo</em>, cxu <em>aliaso</em>%u,
+cxu %[<em>Sosa number</em> relative to %a%]%u.
 <li> <input type=radio name=t value=P> <em>Personnomo</em>.
 <li> <input type=radio name=t value=N> <em>Familinomo</em>.
 </ul>

@@ -24,7 +24,8 @@ Se trata:
 <li> <input type=radio name=t value=PN checked>
 De <em>nome</em> e <em>apelido</em>,
 o de <em>nome p&uacute;blico</em>,
-o de <em>alias</em>.
+o de <em>alias</em>%u,
+o de %[<em>Sosa number</em> relative to %a%]%u.
 <li> <input type=radio name=t value=P>
 De um <em>nome</em>.
 <li> <input type=radio name=t value=N>
