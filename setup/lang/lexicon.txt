@@ -1,0 +1,10 @@
+# $Id: lexicon.txt,v 1.1 2002-04-13 09:22:31 ddr Exp $
+# Copyright (c) 2002 INRIA
+
+     !charset
+de: iso-8859-1
+en: iso-8859-1
+es: iso-8859-1
+fr: iso-8859-1
+lv: iso-8859-1
+sv: iso-8859-1

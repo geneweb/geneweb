@@ -5,6 +5,8 @@ GeneWeb Version 4.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [13 Apr 02] Fixed problem of displaying "ancestors of xx", "descendants
+    of xx" and "cousins of xx" when "xx" is a name with declinations.
   - [09 Apr 02] Does not index any more the "public name" when there is
     no title. Added display of misc names in personal page if opt=misc
     in the URL.
@@ -12,6 +14,12 @@ GeneWeb Version 4.07
     writable.
   - [22 Mar 02] Fixed bug in the index of the descendants: they were no
     more displayed by families.
+
+* Setup program (gwsetup)
+  - [13 Apr 02] Added a "lexicon.txt" file, in order to be able to
+    accept different languages with characters encodings different
+    from iso-8859-1 and for future possible use of translations common
+    to several template files.
 
 * General
   - [11 Mar 02] Big cleanup of the code, changing French named identifiers

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.12 2002-01-30 13:59:17 ddr Exp $
+# $Id: Makefile,v 4.13 2002-04-13 09:26:51 ddr Exp $
 
 DESTDIR=distribution
 
@@ -60,6 +60,7 @@ new_distrib: classical_distrib
 	  cp setup/lang/intro.txt $(DESTDIR)/gw/setup/lang/intro.txt; \
 	fi
 	cp setup/lang/*.htm $(DESTDIR)/gw/setup/lang/.
+	cp setup/lang/lexicon.txt $(DESTDIR)/gw/setup/lang/.
 	cp setup/gwsetup $(DESTDIR)/gw/gwsetup$(EXE)
 	for i in README LISEZMOI; do \
 	  cat etc/$$i.distrib.txt >> $(DESTDIR)/$$i.txt; \
