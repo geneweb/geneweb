@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.12 2000-05-23 06:48:54 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.13 2000-06-02 20:46:46 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -117,9 +117,13 @@ value print_birth conf base =
              Wserver.wprint "<strong>\n";
              afficher_personne_referencee conf base p;
              Wserver.wprint "</strong>,\n";
-             Wserver.wprint "%s <em>%s</em>.\n"
-               (transl_nth conf "born" (index_of_sex p.sex))
-               (Date.string_of_ondate conf (Dgreg d cal));
+             if future then
+               Wserver.wprint "<em>%s</em>.\n"
+                 (Date.string_of_date conf (Dgreg d cal))
+             else
+               Wserver.wprint "%s <em>%s</em>.\n"
+                 (transl_nth conf "born" (index_of_sex p.sex))
+                 (Date.string_of_ondate conf (Dgreg d cal));
           return (month_txt, future))
        ("", False) list
      in ();
@@ -218,12 +222,16 @@ value print_marriage conf base =
              Wserver.wprint "<strong>\n";
              afficher_personne_referencee conf base (poi base cpl.mother);
              Wserver.wprint "</strong>,\n";
-             Wserver.wprint "%s <em>%s</em>.\n"
-               (match fam.relation with
-                [ NotMarried -> transl_nth conf "relation/relations" 0
-                | Married -> transl conf "married"
-                | Engaged -> transl conf "engaged" ])
-               (Date.string_of_ondate conf (Dgreg d cal));
+             if future then
+               Wserver.wprint "<em>%s</em>.\n"
+                 (Date.string_of_date conf (Dgreg d cal))
+             else
+               Wserver.wprint "%s <em>%s</em>.\n"
+                 (match fam.relation with
+                  [ NotMarried -> transl_nth conf "relation/relations" 0
+                  | Married -> transl conf "married"
+                  | Engaged -> transl conf "engaged" ])
+                 (Date.string_of_ondate conf (Dgreg d cal));
           return (month_txt, future))
        ("", False) list
      in ();
