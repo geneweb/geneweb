@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.24 2002-03-11 19:02:57 ddr Exp $ *)
+(* $Id: family.ml,v 4.25 2002-10-04 13:22:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -476,7 +476,10 @@ value family_m conf base =
                       conf.cancel_links := False;
                       Some.surname_print conf base unknown n
                     }
-                | [p] -> person_selected conf base p
+                | [p] ->
+                    if person_is_std_key base p n then
+                      person_selected conf base p
+                    else specify conf base n pl
                 | pl -> specify conf base n pl ] ]
       | (_, Some i) ->
           relation_print conf base
