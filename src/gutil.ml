@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.7 2000-05-16 10:10:07 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.8 2000-05-16 17:21:13 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -208,6 +208,12 @@ value denomination base p =
   let prenom = p_first_name base p in
   let nom = p_surname base p in
   prenom ^ "." ^ string_of_int p.occ ^ " " ^ nom
+;
+
+value spouse ip cpl =
+  if ip == cpl.father then cpl.mother
+  else if ip == cpl.mother then cpl.father
+  else invalid_arg "spouse"
 ;
 
 value saints = ["saint"; "sainte"];
