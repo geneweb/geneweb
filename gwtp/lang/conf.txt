@@ -1,6 +1,6 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: conf.txt,v 1.9 2003-12-08 10:19:14 ddr Exp $ -->
+  <!-- $Id: conf.txt,v 1.10 2003-12-08 20:46:17 ddr Exp $ -->
   <title>Gwtp - [
 de: Konfiguration
 en: configuration
@@ -58,180 +58,32 @@ it: Lingua standard:
 ]
 <select name="default_lang">
 <option value=""%edefault_lang=;><tt>-</tt>
-<option value="af"%edefault_lang=af;>[
-de: Afrikaans
-en: Afrikaans
-es: Afrikaans
-fr: Afrikaans
-it: Afrikaans
-]
-<option value="bg"%edefault_lang=bg;>[
-de: Bulgarisch
-en: Bulgarian
-es: Búlgaro
-fr: Bulgare
-]
-<option value="ca"%edefault_lang=ca;>[
-de: Katalan
-en: Catalan
-es: Catalán
-fr: Catalan
-it: Catalano
-]
-<option value="cs"%edefault_lang=cs;>[
-de: Tschechisch
-en: Czech
-es: Checo
-fr: Tchèque
-it: Ceco
-]
-<option value="de"%edefault_lang=de;>[
-de: Deutsch
-en: German
-es: Alemán
-fr: Allemand
-it: Tedesco
-]
-<option value="da"%edefault_lang=da;>[
-de: Dänisch
-en: Danish
-es: Danés
-fr: Danois
-it: Danese
-]
-<option value="nl"%edefault_lang=nl;>[
-de: Holländisch
-en: Dutch
-es: Holandés
-fr: Néerlandais
-it: Olandese
-]
-<option value="en"%edefault_lang=en;>[
-de: Englisch
-en: English
-es: Ingles
-fr: Anglais
-it: Inglese
-]
-<option value="eo"%edefault_lang=eo;>[
-de: Esperanto
-en: Esperanto
-es: Esperanto
-fr: Espéranto
-it: Esperanto
-]
-<option value="et"%edefault_lang=et;>[
-de: Estnisch
-en: Estonian
-es: Estoniano
-fr: Estonien
-it: Estone
-]
-<option value="fi"%edefault_lang=fi;>[
-de: Finnisch
-en: Finnish
-es: Finlandes
-fr: Finnois
-it: Finlandese
-]
-<option value="fr"%edefault_lang=fr;>[
-de: Französisch
-en: French
-es: Frances
-fr: Français
-it: Francese
-]
-<option value="he"%edefault_lang=he;>[
-de: Hebräisch
-en: Hebrew
-es: Hebreo
-fr: Hébreu
-it: Ebraico
-]
-<option value="is"%edefault_lang=is;>[
-de: Isländisch
-en: Icelandic
-es: Islandes
-fr: Islandais
-it: Islandese
-]
-<option value="it"%edefault_lang=it;>[
-de: Italienisch
-en: Italian
-es: Italiano
-fr: Italien
-it: Italiano
-]
-<option value="lv"%edefault_lang=lv;>[
-de: Lettisch
-en: Latvian
-es: Litoniano
-fr: Letton
-it: Lettone
-]
-<option value="no"%edefault_lang=no;>[
-de: Norwegisch
-en: Norvégien
-es: Norues
-fr: Norwegian
-it: Norvegese
-]
-<option value="pl"%edefault_lang=pl;>[
-de: Polnisch
-en: Polish
-es: Polaco
-fr: Polonais
-it: Polacco
-]
-<option value="pt"%edefault_lang=pt;>[
-de: Portugiesisch
-en: Portuguese
-es: Portugues
-fr: Portugais
-it: Portoghese
-]
-<option value="pt-br"%edefault_lang=pt-br;>[
-de: Brasilianisch
-en: Brazilian
-es: Brasileño
-fr: Brésilien
-it: Portoghese-Brasiliano
-]
-<option value="es"%edefault_lang=es;>[
-de: Spanisch
-en: Spanish
-es: Español
-fr: Espagnol
-it: Spagnolo
-]
-<option value="ru"%edefault_lang=ru;>[
-de: Russisch
-en: Russian
-es: Ruso
-fr: Russe
-it: Russo
-]
-<option value="sl"%edefault_lang=sl;>[
-de: Slowenisch
-en: Slovenian
-es: Slóvano
-fr: Slovène
-it: Sloveno
-]
-<option value="sv"%edefault_lang=sv;>[
-de: Schwedisch
-en: Swedish
-es: Sueco
-fr: Suédois
-it: Svedese
-]
-<option value="zh"%edefault_lang=zh;>[
-de: Chinesisch
-en: Chinese
-es: Chino
-fr: Chinois
-it: Cinese
-]
+<option value="af"%edefault_lang=af;>%Laf;
+<option value="bg"%edefault_lang=bg;>%Lbg;
+<option value="ca"%edefault_lang=ca;>%Lca;
+<option value="cs"%edefault_lang=cs;>%Lcs;
+<option value="de"%edefault_lang=de;>%Lde;
+<option value="da"%edefault_lang=da;>%Lda;
+<option value="nl"%edefault_lang=nl;>%Lnl;
+<option value="en"%edefault_lang=en;>%Len;
+<option value="eo"%edefault_lang=eo;>%Leo;
+<option value="et"%edefault_lang=et;>%Let;
+<option value="fi"%edefault_lang=fi;>%Lfi;
+<option value="fr"%edefault_lang=fr;>%Lfr;
+<option value="he"%edefault_lang=he;>%Lhe;
+<option value="is"%edefault_lang=is;>%Lis;
+<option value="it"%edefault_lang=it;>%Lit;
+<option value="lv"%edefault_lang=lv;>%Llv;
+<option value="nl"%edefault_lang=nl;>%Lnl;
+<option value="no"%edefault_lang=no;>%Lno;
+<option value="pl"%edefault_lang=pl;>%Lpl;
+<option value="pt"%edefault_lang=pt;>%Lpt;
+<option value="pt-br"%edefault_lang=pt-br;>%Lpt-br;
+<option value="ro"%edefault_lang=ro;>%Lro;
+<option value="ru"%edefault_lang=ru;>%Lru;
+<option value="sl"%edefault_lang=sl;>%Lsl;
+<option value="sv"%edefault_lang=sv;>%Lsv;
+<option value="zh"%edefault_lang=zh;>%Lzh;
 </select>
 <br>
 
@@ -266,20 +118,8 @@ es: Proposición para búsqueda por títulos de nobleza in la página de bienvenida:
 fr: Propose la recherche par titres de noblesse dans la page d'accueil:
 it: Propone la ricerca per titoli di nobiltà nella pagina di benvenuto:
 ]
-<input type=radio name=propose_titles value=yes%cpropose_titles=yes;>[
-de: ja
-en: yes
-es: si
-fr: oui
-it: si
-]
-<input type=radio name=propose_titles value=no%cpropose_titles=no;>[
-de: nein
-en: no
-es: no
-fr: non
-it: no
-]
+<input type=radio name=propose_titles value=yes%cpropose_titles=yes;>[yes]
+<input type=radio name=propose_titles value=no%cpropose_titles=no;>[no]
 
 <p>
 
@@ -291,21 +131,9 @@ fr: Cacher les noms privés:
 it: Nascondere i nomi privati:
 ]
 <input type=radio name=hide_private_names
- value=yes%chide_private_names=yes;>[
-de: ja
-en: yes
-es: si
-fr: oui
-it: si
-]
+ value=yes%chide_private_names=yes;>[yes]
 <input type=radio name=hide_private_names
- value=no%chide_private_names=no;>[
-de: nein
-en: no
-es: no
-fr: non
-it: no
-]
+ value=no%chide_private_names=no;>[no]
 
 <p>
 
@@ -317,21 +145,9 @@ fr: Utiliser le system "accès restreint" (plus strict):
 it: Utilizzare il sistema "accesso limitato"(più rigoroso):
 ]
 <input type=radio name=use_restrict
- value=yes%cuse_restrict=yes;>[
-de: ja
-en: yes
-es: si
-fr: oui
-it: si
-]
+ value=yes%cuse_restrict=yes;>[yes]
 <input type=radio name=use_restrict
- value=no%cuse_restrict=no;>[
-de: nein
-en: no
-es: no
-fr: non
-it: no
-]
+ value=no%cuse_restrict=no;>[no]
 
 <p>
 
@@ -343,21 +159,9 @@ fr: Magiciens seulement amis (pour mises à jour temporaires):
 it: Wizard solo amico (per aggiornamenti temporanei):
 ]
 <input type=radio name=wizard_just_friend
- value=yes%cwizard_just_friend=yes;>[
-de: ja
-en: yes
-es: si
-fr: oui
-it: si
-]
+ value=yes%cwizard_just_friend=yes;>[yes]
 <input type=radio name=wizard_just_friend
- value=no%cwizard_just_friend=no;>[
-de: nein
-en: no
-es: no
-fr: non
-it: no
-]
+ value=no%cwizard_just_friend=no;>[no]
 
 <p>
 
@@ -421,7 +225,7 @@ en: Trailer text:
 es: Texto para el pie de la página:
 fr: Texte pour le bas des pages:
 it: Testo per il piede di pagina:
-]
+]<br>
 <textarea name=trl rows=5 cols=70 maxlength=50 wrap=virtual>%ftrl;</textarea>
 
 <p>

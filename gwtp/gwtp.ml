@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.20 2003-12-08 11:38:11 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.21 2003-12-08 20:46:17 ddr Exp $ *)
 (* (c) Copyright 2002 INRIA *)
 
 open Printf;
@@ -148,6 +148,87 @@ value template_fname env fname =
   List.fold_right Filename.concat [gwtp_etc.val; "lang"] (fname ^ ".txt")
 ;
 
+value lindex s c =
+  pos 0 where rec pos i =
+    if i == String.length s then None
+    else if s.[i] == c then Some i
+    else pos (i + 1)
+;
+
+value input_lexicon lang =
+  let t = Hashtbl.create 501 in
+  try
+    let ic =
+      open_in
+        (List.fold_right Filename.concat [gwtp_etc.val; "lang"]
+           "lexicon.txt")
+    in
+    let derived_lang =
+      match lindex lang '-' with
+      [ Some i -> String.sub lang 0 i
+      | _ -> "" ]
+    in
+    try
+      do {
+        try
+          while True do {
+            let k =
+              find_key (input_line ic) where rec find_key line =
+                if String.length line < 4 then find_key (input_line ic)
+                else if String.sub line 0 4 <> "    " then
+                  find_key (input_line ic)
+                else line
+            in
+            let k = String.sub k 4 (String.length k - 4) in
+            let rec loop line =
+              match lindex line ':' with
+              [ Some i ->
+                  let line_lang = String.sub line 0 i in
+                  do {
+                    if line_lang = lang ||
+                       line_lang = derived_lang && not (Hashtbl.mem t k) then
+                      let v =
+                        if i + 1 = String.length line then ""
+                        else
+                          String.sub line (i + 2) (String.length line - i - 2)
+                      in
+                      Hashtbl.add t k v
+                    else ();
+                    loop (input_line ic)
+                  }
+              | None -> () ]
+            in
+            loop (input_line ic)
+          }
+        with
+        [ End_of_file -> () ];
+        close_in ic;
+        t
+      }
+    with e ->
+      do { close_in ic; raise e }
+  with
+  [ Sys_error _ -> t ]
+;
+
+value unfreeze_lexicon =
+  let lexicon = ref None in
+  fun lang ->
+    match lexicon.val with
+    [ Some lex -> lex
+    | None ->
+        let lex = input_lexicon lang in
+        do {
+          lexicon.val := Some lex;
+          lex
+        } ]
+;
+
+value transl lang w =
+  let lexicon = unfreeze_lexicon lang in
+  try Hashtbl.find lexicon w with [ Not_found -> "[" ^ w ^ "]" ]
+;
+
 value copy_template genv (varenv, filenv) env fname =
   let lang =
     match HttpEnv.getenv genv "lang" with
@@ -177,20 +258,24 @@ value copy_template genv (varenv, filenv) env fname =
                 let v = get_variable ic in
                 try print_string (quote_escaped (List.assoc v filenv)) with
                 [ Not_found -> () ]
+            | 'L' ->
+                let v = get_variable ic in
+                let lang_def = transl lang " !languages" in
+                print_string (Translate.language_name v lang_def)
             | c ->
                 try print_string (List.assoc c env) with
                 [ Not_found -> do { print_char '%'; print_char c; } ] ]
         | '[' ->
             let s =
               let c = input_char ic in
-              if c = '\n' then
-                let s =
-                  loop 0 (input_char ic) where rec loop len c =
-                    if c = ']' then Buff.get len
-                    else loop (Buff.store len c) (input_char ic)
-                in
-                Translate.inline lang '%' (macro env) s
-              else "[" ^ String.make 1 c
+              let s =
+                loop 0 (if c = '\n' then input_char ic else c)
+                where rec loop len c =
+                  if c = ']' then Buff.get len
+                  else loop (Buff.store len c) (input_char ic)
+              in
+              if c = '\n' then Translate.inline lang '%' (macro env) s
+              else transl lang s
             in
             print_string s
         | c -> print_char c ]
