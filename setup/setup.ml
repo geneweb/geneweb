@@ -1,12 +1,11 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.37 2002-04-11 17:34:09 ddr Exp $ *)
+(* $Id: setup.ml,v 4.38 2002-04-13 09:22:31 ddr Exp $ *)
 
 open Printf;
 
 value port = ref 2316;
 value default_lang = ref "en";
 value setup_dir = ref ".";
-value charset = "iso-8859-1";
 value lang_param = ref "";
 
 value slashify s =
@@ -78,14 +77,14 @@ type config =
   { lang : string;
     comm : string;
     env : list (string * string);
-    request : list string }
+    request : list string;
+    lexicon : Hashtbl.t string string }
 ;
-
-value setup_available_languages = ["de"; "en"; "es"; "fr"; "lv"; "sv"];
 
 value charset conf =
-  charset
-;
+  try Hashtbl.find conf.lexicon " !charset" with
+  [ Not_found -> "iso-8859-1" ]
+;  
 
 value nl () = Wserver.wprint "\013\010";
 
@@ -137,7 +136,7 @@ value header conf title =
     header_no_page_title conf title;
     Wserver.wprint "<h1>";
     title False;
-    Wserver.wprint "</h1>\n"
+    Wserver.wprint "</h1>\n";
   }
 ;
 
@@ -724,7 +723,7 @@ value simple conf =
   let conf =
     {comm = if ged = "" then "gwc" else "ged2gwb";
      env = list_replace "o" out_file env; lang = conf.lang;
-     request = conf.request}
+     request = conf.request; lexicon = conf.lexicon}
   in
   if ged <> "" && not (Sys.file_exists ged) then
     print_file conf "err_unkn.htm"
@@ -1481,6 +1480,69 @@ value only_addr () =
   | None -> local_addr ]
 ;
 
+value lindex s c =
+  pos 0 where rec pos i =
+    if i == String.length s then None
+    else if s.[i] == c then Some i
+    else pos (i + 1)
+;
+
+value input_lexicon lang =
+  let t = Hashtbl.create 501 in
+  try
+    let ic =
+      open_in
+        (List.fold_right Filename.concat [setup_dir.val; "setup"; "lang"]
+           "lexicon.txt")
+    in
+    let derived_lang =
+      match lindex lang '-' with
+      [ Some i -> String.sub lang 0 i
+      | _ -> "" ]
+    in
+    try
+      do {
+        try
+          while True do {
+            let k =
+              find_key (input_line ic) where rec find_key line =
+                if String.length line < 4 then find_key (input_line ic)
+                else if String.sub line 0 4 <> "    " then
+                  find_key (input_line ic)
+                else line
+            in
+            let k = String.sub k 4 (String.length k - 4) in
+            let rec loop line =
+              match lindex line ':' with
+              [ Some i ->
+                  let line_lang = String.sub line 0 i in
+                  do {
+                    if line_lang = lang ||
+                       line_lang = derived_lang && not (Hashtbl.mem t k) then
+                      let v =
+                        if i + 1 = String.length line then ""
+                        else
+                          String.sub line (i + 2) (String.length line - i - 2)
+                      in
+                      Hashtbl.add t k v
+                    else ();
+                    loop (input_line ic)
+                  }
+              | None -> () ]
+            in
+            loop (input_line ic)
+          }
+        with
+        [ End_of_file -> () ];
+        close_in ic;
+        t
+      }
+    with e ->
+      do { close_in ic; raise e }
+  with
+  [ Sys_error _ -> t ]
+;
+
 value setup (addr, req) comm env_str =
   let conf =
     let env = create_env env_str in
@@ -1488,14 +1550,16 @@ value setup (addr, req) comm env_str =
       let lang =
         if comm = "" then default_lang.val else String.lowercase comm
       in
-      {lang = lang; comm = ""; env = env; request = req}
+      let lexicon = input_lexicon lang in
+      {lang = lang; comm = ""; env = env; request = req; lexicon = lexicon}
     else
       let (lang, env) =
         match p_getenv env "lang" with
         [ Some x -> (x, list_remove_assoc "lang" env)
         | _ -> (default_lang.val, env) ]
       in
-      {lang = lang; comm = comm; env = env; request = req}
+      let lexicon = input_lexicon lang in
+      {lang = lang; comm = comm; env = env; request = req; lexicon = lexicon}
   in
   let saddr = string_of_sockaddr addr in
   let s = only_addr () in
@@ -1529,7 +1593,10 @@ value copy_text lang fname =
   let fname = Filename.concat dir fname in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      let conf = {lang = lang; comm = ""; env = []; request = []} in
+      let conf =
+        {lang = lang; comm = ""; env = []; request = [];
+         lexicon = Hashtbl.create 1}
+      in
       do {
         copy_from_stream conf print_string (Stream.of_channel ic);
         flush stdout;
@@ -1594,6 +1661,8 @@ value null_reopen flags fd =
   }
   else ()
 ;
+
+value setup_available_languages = ["de"; "en"; "es"; "fr"; "lv"; "sv"];
 
 value intro () =
   let (default_gwd_lang, default_setup_lang) =
