@@ -8,12 +8,6 @@ GeneWeb Version 4.10
   - [05 Jan 04] Now, when database notes are modified, an intermediate
     page is displayed with a link to the "notes" page, instead of the
     "notes" page itself (to be consistent with other updates pages).
-  - [05 Jan 04] Added database configuration variable "show_consang":
-    when set to "no" the possible consanguinity is not displayed in
-    personal pages. Added also variable "fast_alphabetic": when set
-    to "yes", the alphabetic display of surnames or first names is fast
-    but the number of surnames of fist names is not displayed (interesting
-    for large databases).
   - [23 Dec 03] Nicer calendars page.
   - [23 Dec 03] Optimization: suppressed no-loop-check for added or
     modified marriages when it is not necessary (for big databases,
