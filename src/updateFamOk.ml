@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.3 1998-09-30 14:04:47 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.4 1998-10-14 17:03:50 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -96,8 +96,8 @@ value reconstitute_family conf =
     [ Some "on" -> ([("", "", 0, UpdateFam.Create Neutre) :: children], True)
     | _ -> (children, ext) ]
   in
-  let comment = get conf "comment" in
-  let fsources = get conf "src" in
+  let comment = strip_spaces (get conf "comment") in
+  let fsources = strip_spaces (get conf "src") in
   let fam_index =
     match p_getint conf.env "i" with
     [ Some i -> i
