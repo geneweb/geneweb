@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.34 2005-02-24 09:11:45 ddr Exp $ *)
+(* $Id: some.ml,v 4.35 2005-02-27 08:44:56 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -115,8 +115,8 @@ value first_name_print_list conf base x1 xl liste =
     else
       Gutil.list_iter_first
         (fun first x ->
-	   Wserver.wprint "%s<a href=\"%sm=P;v=%s;t=A\">%s</a>"
-	     (if first then "" else ", ") (commd conf) (code_varenv x) x)
+           Wserver.wprint "%s<a href=\"%sm=P;v=%s;t=A\">%s</a>"
+             (if first then "" else ", ") (commd conf) (code_varenv x) x)
       xl
   in
   do {
