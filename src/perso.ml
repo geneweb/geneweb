@@ -1,11 +1,24 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.34 1999-02-18 15:52:50 ddr Exp $ *)
+(* $Id: perso.ml,v 1.35 1999-02-19 13:32:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 open Util;
 open Config;
+
+value copy_string_with_macros conf s =
+  loop 0 where rec loop i =
+    if i < String.length s then
+      if i + 1 < String.length s && s.[i] = '%' && s.[i+1] = 's' then
+        do Wserver.wprint "%s?" conf.command;
+           List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v)
+             conf.henv;
+        return loop (i + 2)
+      else
+        do Wserver.wprint "%c" s.[i]; return loop (i + 1)
+    else ()
+;
 
 exception Ok;
 value grand_parent_connu base a =
@@ -443,7 +456,11 @@ value print_family conf base p a ifam =
      if age_autorise conf base p then
        match sou base fam.comment with
        [ "" -> ()
-       | str -> Wserver.wprint "\n(%s)" (coa conf str) ]
+       | str ->
+           do Wserver.wprint "\n(";
+              copy_string_with_macros conf (coa conf str);
+              Wserver.wprint ")";
+           return () ]
      else ();
      if Array.length children == 0 then ()
      else
@@ -477,19 +494,6 @@ value print_families conf base p a =
          List.iter (print_family conf base p a) faml;
          Wserver.wprint "</ul>\n";
       return () ]
-;
-
-value copy_string_with_macros conf s =
-  loop 0 where rec loop i =
-    if i < String.length s then
-      if i + 1 < String.length s && s.[i] = '%' && s.[i+1] = 's' then
-        do Wserver.wprint "%s?" conf.command;
-           List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v)
-             conf.henv;
-        return loop (i + 2)
-      else
-        do Wserver.wprint "%c" s.[i]; return loop (i + 1)
-    else ()
 ;
 
 value print_notes conf base p =
