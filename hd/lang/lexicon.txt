@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.121 2002-11-26 15:24:11 ddr Exp $
+# $Id: lexicon.txt,v 4.122 2002-11-27 09:11:59 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -57,10 +57,10 @@ he: rtl
 
      !languages
 af: af=Afrikaans/ca=Catalan/cs=Czeck/da=Deens/de=Duits/en=Engels/eo=Esperanto/es=Spaans/fi=Fins/fr=Frans/he=Hibreeus/is=Yslandies/it=Italiaans/nl=Nederlands/no=Noorweegs/pl=Pools/pt=Portugees/pt-br=Portugees-in-Braziliл/ru=Russies/sv=Sweeds/zh=Chinees
-bg: af=бурски/bg=български/ca=каталонски/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lv=латвийски/nl=холандски/no=норвежки/pl=полски/pt=португалски/pt-br=бразилско-португалски/ru=руски/sl=словенски/sv=шведски/zh=китайски
+bg: af=бурски/bg=български/ca=каталонски/cs=чешки/da=датски/de=немски/en=английски/eo=есперанто/es=испански/et=естонски/fi=финландски/fr=френски/he=иврит/is=исландски/it=италиански/lv=латвийски/nl=холандски/no=норвежки/pl=полски/pt=португалски/pt-br=бразилско-португалски/ro=румънски/ru=руски/sl=словенски/sv=шведски/zh=китайски
 ca: af=africа/ca=catalа/cs=xec/da=danиs/de=alemany/en=anglиs/eo=esperanto/es=castellа/et=estу/fi=finlandиs/fr=francиs/he=hebreu/is=islandиs/it=italiа/lv=letу/nl=holandиs/no=norueg/pl=polac/pt=portuguиs/pt-br=brasiler/ru=rus/sl=eslovи/sv=suec/zh=Xinиs
 cs: af=afrikбn№tina/bg=bulhar№tina/cs=иe№tina/da=dбn№tina/de=nмmиina/en=angliиtina/eo=esperanto/es=№panмl№tina/fi=fin№tina/fr=francouz№tina/he=hebrej№tina/is=island№tina/it=ital№tina/lv=loty№№tina/nl=holand№tina/no=nor№tina/pt=portugal№tina/pt-br=brasil№tina/ru=ru№tina/sv=№vйd№tina/zh=инn№tina
-da: af=afrikaans/bg=bulgarsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
+da: af=afrikaans/bg=bulgarsk/ca=katalansk/cs=tjekkisk/da=dansk/de=tysk/en=engelsk/eo=esperanto/es=spansk/et=estisk/fi=finsk/fr=fransk/he=hebraisk/is=islandsk/it=italiensk/lv=lettisk/nl=hollandsk/no=norsk/pl=polsk/pt=portugisisk/pt-br=brasiliansk-portugisisk/ro=rum&aelig;nsk/ru=russisk/sl=slovensk/sv=svensk/zh=kinesisk
 de: af=Afrikaans/bg=Bulgarish/ca=Katalanisch/cs=Tschechisch/da=D&auml;nisch/de=Deutsch/en=Englisch/eo=Esperanto/es=Spanisch/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/nl=Holl&auml;ndisch/no=Norwegisch/pl=Polnisch/pt=Portugiesisch/pt-br=Brasil-Portugiesisch/ru=Russisch/sl=Slovenisch/sv=Schwedisch/zh=Chinesisch
 en: af=Afrikaans/bg=Bulgarian/ca=Catalan/cs=Czech/da=Danish/de=German/en=English/eo=Esperanto/es=Spanish/et=Estonian/fi=Finnish/fr=French/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/nl=Dutch/no=Norwegian/pl=Polish/pt=Portuguese/pt-br=Brazilian-Portuguese/ro=Romanian/ru=Russian/sl=Slovenian/sv=Swedish/zh=Chinese
 eo: bg=bulgara/en=anglo/eo=esperanto/fr=franco
@@ -7655,7 +7655,7 @@ sv: i &ouml;vermorgon
 
     the father-in-law/the mother-in-law
 af: die skoonpa/die skoonma
-bg: свекърът:a:--а или тъстът:a:--а/свекървата или тъщата
+bg: тъстът:a:--а/тъщата/свекърът:a:--а/свекървата
 ca: el sogre/la sogra
 cs: tchбn/tchэnм
 da: svigerfaderen/svigermoderen
