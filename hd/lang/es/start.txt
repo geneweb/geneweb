@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.26 2000-04-05 12:16:36 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.27 2000-04-23 07:38:55 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogía - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -166,13 +166,13 @@ avanzada</b></font></a>.
 <li>los <a href="%sm=AN">cumplea&ntilde;os</a>
 <li>los <a href="%sm=AD">aniversarios de las personas fallecidas</a>
 <li>los <a href="%sm=AM">aniversarios de casamiento</a>%I|wf
-<li>los <a href="%sm=LB">reci&eacute;n nacidos</a>%E
+<li>los <a href="%sm=LB;k=%m">reci&eacute;n nacidos</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>las <a href="%sm=LD">muertes recientes</a>
-<li>los <a href="%sm=LM">casamientos más recientes</a>%E%Ih
+<li>las <a href="%sm=LD;k=%m">muertes recientes</a>
+<li>los <a href="%sm=LM;k=%m">casamientos más recientes</a>%E%Ih
 <li>la <a href="%sm=HIST;k=10">historia de las actualizaciones</a>%E
 <li>los <a href="%sm=CAL">calendarios</a>
 <li>el <a href="%sm=FORUM">foro de la base de datos</a>

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.9 2000-04-05 12:16:41 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.10 2000-04-23 07:38:58 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogy - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -165,13 +165,13 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <li><a href="%sm=AN">годовщины дней рождений</a>
 <li><a href="%sm=AD">годовщины смертей</a>
 <li><a href="%sm=AM">годовщины брака</a>%I|wf
-<li><a href="%sm=LB">самые последние рождения</a>%E
+<li><a href="%sm=LB;k=%m">самые последние рождения</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li><a href="%sm=LD">самые последние смерти</a>
-<li>{the <a href="%sm=LM">latest marriages</a>}%E%Ih
+<li><a href="%sm=LD;k=%m">самые последние смерти</a>
+<li>{the <a href="%sm=LM;k=%m">latest marriages</a>}%E%Ih
 <li><a href="%sm=HIST;k=10">история коррекций</a>%E
 <li><a href="%sm=CAL">календари</a>
 <li><a href="%sm=FORUM">форум базы данных</a>

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.18 2000-04-05 12:16:38 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.19 2000-04-23 07:38:56 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -163,13 +163,13 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 <li> <a href="%sm=AN"> ימי הולדת</a>
 <li> <a href="%sm=AD"> ימי פטירה</a>
 <li> <a href="%sm=AM"> ימי נישואין</a>%I|wf
-<li> <a href="%sm=LB"> לידות האחרונות </a>%E
+<li> <a href="%sm=LB;k=%m"> לידות האחרונות </a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li> <a href="%sm=LD"> מקרי מוות האחרונים </a>
-<li>{the <a href="%sm=LM">latest marriages</a>}%E%Ih
+<li> <a href="%sm=LD;k=%m"> מקרי מוות האחרונים </a>
+<li>{the <a href="%sm=LM;k=%m">latest marriages</a>}%E%Ih
 <li> <a href="%sm=HIST;k=10"> דיווח העדכונים </a>%E
 <li> <a href="%sm=CAL"> לוחות שנה </a>
 <li> <a href="%sm=FORUM"> דייון על מאגר המידה התולדותי

@@ -9,6 +9,12 @@ GeneWeb Version 3.04
     nor threads (ifdef NO_PROCESS). Can prepare a possible Macintosh
     version.
 
+* GeneWeb daemon/CGI (gwd) and welcome files (lang/*/start.txt)
+  - [23 Apr 00] Added macro %m = value of "latest_event" of base.gwb and
+    put links "m=LB;k=%m" "m=LD;k=%m" "m=LM;k=%m" in welcome pages, so
+    showing the default value and indicating (to smart people) the way to
+    change it in the URL.
+
 * GeneWeb compiler (gwc) and uncompiler (gwu)
   - [02 Apr 00] Fixed problem in gwu: families could be written several
     times if phony spouses with several marriages.

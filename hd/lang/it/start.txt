@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.24 2000-04-05 12:16:38 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.25 2000-04-23 07:38:57 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -166,13 +166,13 @@ avanzata</b></font></a>.
 <li>i <a href="%sm=AN">compleanni</a>
 <li>gli <a href="%sm=AD">anniversari delle persone decedute</a>
 <li>gli <a href="%sm=AM">anniversari di matrimonio</a>%I|wf
-<li>le <a href="%sm=LB">ultime nascite</a>%E
+<li>le <a href="%sm=LB;k=%m">ultime nascite</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>le <a href="%sm=LD">ultime nascite</a>
-<li>{the <a href="%sm=LM">latest marriages</a>}%E%Ih
+<li>le <a href="%sm=LD;k=%m">ultime nascite</a>
+<li>{the <a href="%sm=LM;k=%m">latest marriages</a>}%E%Ih
 <li>la <a href="%sm=HIST;k=10">storia degli aggiornamenti</a>%E
 <li>i <a href="%sm=CAL">calendarii</a>
 <li>la <a href="%sm=FORUM">tribuna della base di dati</a>

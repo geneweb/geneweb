@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.2 2000-04-06 08:24:56 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.3 2000-04-23 07:38:52 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogie/Familiekunde - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -170,13 +170,13 @@ navraag</b></font></a>.
 <li>die <a href="%sm=AN">verjaarsdae</a>
 <li>die <a href="%sm=AD">sterfdagherdenkinge</a>
 <li>die <a href="%sm=AM">huwelikherdenkinge</a>%I|wf
-<li>die <a href="%sm=LB">laaste geboortes</a>%E
+<li>die <a href="%sm=LB;k=%m">laaste geboortes</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>die <a href="%sm=LD">laaste sterftes</a>
-<li>die <a href="%sm=LM">laaste huwelike</a>%E%Ih
+<li>die <a href="%sm=LD;k=%m">laaste sterftes</a>
+<li>die <a href="%sm=LM;k=%m">laaste huwelike</a>%E%Ih
 <li>die <a href="%sm=HIST;k=10">bywerkingsverloop</a>%E
 <li>die <a href="%sm=CAL">kalenders</a>
 <li>die <a href="%sm=FORUM">databasis forum</a>

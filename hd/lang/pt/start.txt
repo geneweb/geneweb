@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.25 2000-04-05 12:16:41 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.26 2000-04-23 07:38:58 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -167,13 +167,13 @@ complexa</b></font></a>.
 <li>os <a href="%sm=AN">anivers&aacute;rios</a>
 <li>os <a href="%sm=AD">anivers&aacute;rios das pessoas falecidas</a>
 <li>os <a href="%sm=AM">anivers&aacute;rios de casamento</a>%I|wf
-<li>os <a href="%sm=LB">nascimentos mais recentes</a>%E
+<li>os <a href="%sm=LB;k=%m">nascimentos mais recentes</a>%E
 </ul>
 </td>
 <td valign=up>
 <ul>%I|wf
-<li>os <a href="%sm=LD">&oacute;bitos mais recentes</a>
-<li>os <a href="%sm=LM">casamentos mais recientes</a>%E%Ih
+<li>os <a href="%sm=LD;k=%m">&oacute;bitos mais recentes</a>
+<li>os <a href="%sm=LM;k=%m">casamentos mais recientes</a>%E%Ih
 <li>o <a href="%sm=HIST;k=10">historial das actualiza&ccedil;&otilde;es</a>%E
 <li>os <a href="%sm=CAL">calend&aacute;rios</a>
 <li>o <a href="%sm=FORUM">forum da base de dados</a>
