@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.187 2000-11-18 17:38:10 ddr Exp $
+# $Id: lexicon.txt,v 3.188 2000-11-21 15:58:15 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -283,6 +283,7 @@ se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
 de: %t's Geschlecht stimmt nicht überein mit ihren/seinen Beziehungen
 dk: %t's k&oslash;n er ikke koh&aelig;rent med hans/hendes forbindelser
 en: %t's sex is not coherent with his/her relations
+eo: la sekso de %t ne koheras kun siaj rilatoj
 fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
 pt: o sexo de %t não é coerente com suas relações
 se: %ts kön stämmer inte överens med sina relationer
@@ -2957,7 +2958,7 @@ it: da cui
 lv: bçrni:
 nl: hier uit
 no: barn
-pt: com
+pt: tiveram
 ru: èìåëè äåòåé
 se: barn
 
@@ -3575,6 +3576,7 @@ se: ut&ouml;kad rapport
 de: Schleife in der Datenbank: %s ist sein/ihr eigener Vorfahr
 dk: loop i databasen: %s er sin egen ane
 en: loop in data base: %s is his/her own ancestor
+eo: estas masxo en la datenbazo: %s estas sia propra avo
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
 nl: loop in de data base: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
@@ -3800,6 +3802,7 @@ se: sammanslagning klar
 de: Nachricht hinzugefügt
 dk: meddelelse tilf&oslash;jet
 en: message added
+eo: almetita mesagxo
 fr: message ajout&eacute;
 nl: bericht toegevoegd
 no: melding tilf&oslash;yet
@@ -3810,6 +3813,7 @@ se: meddelande inlagt
 de: Nachricht/nächste Nachricht
 dk: meddelelse/n&aelig;ste meddelelse
 en: message/next message
+eo: mesagxo/sekvanta mesagxo
 fr: message/message suivant
 nl: bericht/volgend bericht
 no: melding/neste melding
@@ -5368,6 +5372,7 @@ se: statistik
 de: Betreff
 dk: emne
 en: subject
+eo: objekto
 fr: sujet
 nl: onderwerp
 no: emne
