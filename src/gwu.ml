@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.14 2003-02-12 10:12:52 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.15 2003-02-12 10:23:33 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -80,27 +80,28 @@ value starting_char s =
 
 value gen_correct_string no_colon s =
   let s = strip_spaces s in
-  if s = "" then "_"
-  else
-    loop 0 0 where rec loop i len =
-      if i == String.length s then Buff.get len
-      else if len == 0 && not (starting_char s) then
-        loop i (Buff.store len '_')
-      else
-        match s.[i] with
-        [ ' ' | '\n' | '\t' ->
-            if i == String.length s - 1 then Buff.get len
-            else loop (i + 1) (Buff.store len '_')
-        | '_' | '\\' -> loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
-        | ':' when no_colon ->
-            let len = Buff.store len '\\' in
-            loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
-        | c ->
-            let c = if is_printable c then c else '_' in
-            loop (i + 1) (Buff.store len c) ]
+  loop 0 0 where rec loop i len =
+    if i == String.length s then Buff.get len
+    else if len == 0 && not (starting_char s) then
+      loop i (Buff.store len '_')
+    else
+      match s.[i] with
+      [ ' ' | '\n' | '\t' ->
+          if i == String.length s - 1 then Buff.get len
+          else loop (i + 1) (Buff.store len '_')
+      | '_' | '\\' -> loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
+      | ':' when no_colon ->
+          let len = Buff.store len '\\' in
+          loop (i + 1) (Buff.store (Buff.store len '\\') s.[i])
+      | c ->
+          let c = if is_printable c then c else '_' in
+          loop (i + 1) (Buff.store len c) ]
 ;
 
-value s_correct_string = gen_correct_string False;
+value s_correct_string s =
+  let s = gen_correct_string False s in
+  if s = "" then "_" else s
+;
 value correct_string base is = s_correct_string (sou base is);
 value correct_string_no_colon base is = gen_correct_string True (sou base is);
 
