@@ -17,6 +17,10 @@ function WorkOnBrowser() {
  onmouseover="if (WorkOnBrowser()) iaf.src='%o/t-af.gif'"
  onmouseout="iaf.src='%o/l-af.jpg'">
 <img src="%o/l-af.jpg" width=36 height=22 alt=%uaf name=iaf border=0></a>
+<a href="%glang=br"
+ onmouseover="if (WorkOnBrowser()) ibr.src='%o/t-br.gif'"
+ onmouseout="ibr.src='%o/l-br.jpg'">
+<img src="%o/l-br.jpg" width=36 height=22 alt=%ubr name=ibr border=0></a>
 <a href="%glang=cn"
  onmouseover="if (WorkOnBrowser()) icn.src='%o/t-cn.gif'"
  onmouseout="icn.src='%o/l-cn.jpg'">

@@ -1,9 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.48 2001-03-14 17:19:00 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.1 2001-03-14 17:19:00 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
-  <title>Genealogy - %t</title>
+  <title>Genealogia - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
   <meta name="ROBOTS" content="NONE">
 %j</head>
@@ -17,8 +17,8 @@
 height=108 src="%o/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=center>
-<table><tr><td align=center><h1><font color=%i>Genealogical<br>
-data base</font></h1></table>
+<table><tr><td align=center><h1><font color=%i>Base de Dados
+Geneal&oacute;gica</font></h1></td></tr></table>
 </td>
 <td align=right valign=top>%w</td>
 </tr>
@@ -26,17 +26,12 @@ data base</font></h1></table>
 
 <br>
 
-<font size=-1><em>You can select another displaying language among the
-following ones:</em></font>
-
-<br>
-
 %rversion
 
 <p>
 
-The data base <font color=%i><b>"%t"</b></font> now holds %n
-persons.%In<br>
+A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
+atualmente %n pessoas.%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 
 %I&NwNj<br><p>
@@ -44,16 +39,16 @@ persons.%In<br>
 %I&NcNa<table border=0 width="70%">
 <tr>
 
-<td align=center><a href="%sw=w"><em>Wizard</em></a> access<br>
-(password)<br></td>
+<td align=center>Entrada <a href="%sw=w"><em>feiticeiro</em></a><br>
+(palavra chave)<br></td>
 
-%INf<td align=center><a href="%sw=f"><em>Friend</em></a> access<br>
-(password)</td>
+%INf<td align=center>Entrada <a href="%sw=f"><em>amigo</em></a><br>
+(palavra chave)</td>
 
 %E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=POST action="%f">
-%hPassword, for <em>friend</em> or <em>wizard</em> access:
+%hPalavra chave para entrada <em>amigo</em> ou <em>feiticeiro</em>:
 <input name=w type=password size=10 maxlength=200>
 <input type=submit value="Ok">
 </form>
@@ -66,7 +61,7 @@ persons.%In<br>
 
 <tr><td>
 <center><table border=0 cellspacing=0 cellpadding=0><tr><td>
-To navigate in this data base, you can do your search:<br><p>
+Para consultar esta base de dados, pode procurar:<br><p>
 
 <ul>
 
@@ -74,18 +69,19 @@ To navigate in this data base, you can do your search:<br><p>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=%i><b>by person</b></font>
+<font color=%i><b>por pessoa</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
 <ul>
-<li> <input type=radio name=t value=PN checked>
+<li><input type=radio name=t value=PN checked>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
-[or] <em>[alias]</em>%Iz
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%Iz
 [or] [<em>Sosa number</em> relative to %t](%a)%E
-<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
-<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
+<li><input type=radio name=t value=P> <em>[first name/first names]</em>
+<li><input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
@@ -94,7 +90,7 @@ To navigate in this data base, you can do your search:<br><p>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=%i><b>by title</b></font>%INl<br>%E
+<font color=%i><b>por t&iacute;tulo</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
@@ -110,15 +106,15 @@ To navigate in this data base, you can do your search:<br><p>
 
 <form method=GET action="%f">
 %h
-<font color=%i><b>by the list</b></font> of all
+<font color=%i><b>pela lista</b></font> de todos os
 <select name=m>
-<option value="N" selected>surnames
-<option value="P">first names
+<option value="N" selected>sobrenomes
+<option value="P">prenomes
 </select>
-by
+por
 <select name=tri>
-<option value="A" selected>alphabetic order
-<option value="F">frequency
+<option value="A" selected>ordem alfab&eacute;tica
+<option value="F">frequ&ecirc;ncia
 </select>
 <input type=submit value="Ok">
 </form>
@@ -127,7 +123,7 @@ by
 
 <form method=GET action="%s">
 %h<input type=hidden name=m value=PS>
-<font color=%i><b>by [place] / [surname/surnames]0</b></font>
+<font color=%i><b>por [place] / [surname/surnames]0</b></font>
 - [birth] <input type=checkbox name=bi value=on checked>
 - [death] <input type=checkbox name=de value=on>
 - [marriage/marriages]0 <input type=checkbox name=ma value=on>
@@ -136,35 +132,36 @@ by
 
 %INshide_advanced_request;<li>
 
-<font color=%i><b>by the</b></font>
-<a href="%sm=H;v=advanced"><font color=%i><b>advanced
-request</b></font></a>.%E
+<font color=%i><b>por</b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>pesquisa
+complexa</b></font></a>.%E
 
 </ul>
 </td></tr></table></center>
 
 %Iw<p>
-<center>You can<br><p>
+<center>Pode<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
-%Ispropose_add_family;<li><a href="%sm=ADD_FAM">add a family</a>
+%Ispropose_add_family;<li><a href="%sm=ADD_FAM">acrescentar uma família</a>
 %INl</ul>
 </td>
 <td align=left>
 <ul>%E
-%E<li><a href="%sm=MOD_NOTES">modify the notes</a>
+%E<li><a href="%sm=MOD_NOTES">modificar as notas</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
+<br>
 
 %E<br><p>
 
-<center>You can also consult<br><p>
+<center>Tamb&eacute;m pode consultar<br><p>
 
 <table border=0>
 <tr>
@@ -189,14 +186,15 @@ request</b></font></a>.%E
 
 <p>
 
-There have been %q accesses, %c of them to this page, since %d.
+Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
 %Il<p>%E
 
 <p>
 
-If your browser does not automatically update the modified pages (forcing you
-to do "reload current document"), try navigating from <a
-href="%sescache=0">this link</a>.
+Se o seu <i>browser</i> n&atilde;o atualiza automaticamente as
+p&aacute;ginas modificadas (for&ccedil;ando a fazer
+"reload current document"), tente navegar desde <a
+href="%sescache=0">este link</a>.
 
 </td></tr>
 </table>
