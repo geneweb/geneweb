@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 4.12 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: merge.ml,v 4.13 2005-02-05 12:36:04 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -55,7 +55,7 @@ type=\"radio\" name=\"select\" value=\"input\" checked=\"checked\"";
       else ();
       List.iter
         (fun p ->
-           tag "tr" "align=\"left\"" begin
+           tag "tr" "align=\"%s\"" conf.left begin
              tag "td" "valign=\"top\"" begin
                xtag "input" "type=\"radio\" name=\"select\" value=\"%d\""
                  (Adef.int_of_iper p.cle_index);

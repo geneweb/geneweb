@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.26 2004-12-31 03:59:53 ddr Exp $ *)
+(* $Id: dag.ml,v 4.27 2005-02-05 12:36:04 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -176,10 +176,10 @@ value print_table conf hts =
             ()
           else Wserver.wprint " colspan=\"%d\"" colspan;
           match (align, td) with
-          [ (LeftA, TDhr LeftA) -> Wserver.wprint " align=\"left\""
+          [ (LeftA, TDhr LeftA) -> Wserver.wprint " align=\"%s\"" conf.left
           | (LeftA, _) -> ()
           | (CenterA, _) -> Wserver.wprint " align=\"center\""
-          | (RightA, _) -> Wserver.wprint " align=\"right\"" ];
+          | (RightA, _) -> Wserver.wprint " align=\"%s\"" conf.right ];
           Wserver.wprint ">";
           match td with
           [ TDstring s -> Wserver.wprint "%s" s
@@ -190,11 +190,12 @@ value print_table conf hts =
                   "<a style=\"text-decoration:none\" href=\"%s\">|</a>" s
           | TDhr align ->
               do {
-                Wserver.wprint "<hr style=\"";
+                Wserver.wprint "<hr";
                 match align with
-                [ LeftA | RightA -> Wserver.wprint "width:50%%"
+                [ LeftA | RightA ->
+                    Wserver.wprint " style=\"width:50%%\" dir=\"ltr\""
                 | _ -> () ];
-                Wserver.wprint "\"%s>" conf.xhs;
+                Wserver.wprint "%s>" conf.xhs;
               } ];
           Wserver.wprint "</td>\n"
         };
