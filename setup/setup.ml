@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.28 1999-06-02 02:59:47 ddr Exp $ *)
+(* $Id: setup.ml,v 1.29 1999-06-07 01:23:44 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -464,7 +464,7 @@ value simple conf =
   else print_file conf "base_out.html"
 ;
 
-value gwc_or_ged2gwb out_name_of_in_name apply conf =
+value gwc_or_ged2gwb out_name_of_in_name conf =
   let in_file =
     match p_getenv conf.env "anon" with
     [ Some f -> strip_spaces f
@@ -483,11 +483,11 @@ value gwc_or_ged2gwb out_name_of_in_name apply conf =
   else if not (Sys.file_exists in_file) then
     print_file conf "err_unknown.html"
   else if not (good_name out_file) then print_file conf "err_name.html"
-  else print_file conf apply
+  else print_file conf "base_out.html"
 ;
 
-value gwc = gwc_or_ged2gwb out_name_of_gw "gwc_1.html";
-value ged2gwb_check = gwc_or_ged2gwb out_name_of_ged "base_out.html";
+value gwc_check = gwc_or_ged2gwb out_name_of_gw;
+value ged2gwb_check = gwc_or_ged2gwb out_name_of_ged;
 
 ifdef WIN95 then
 value infer_rc conf rc =
@@ -499,7 +499,7 @@ value infer_rc conf rc =
     | _ -> 0 ]
 ;
 
-value gwc_1 conf =
+value gwc conf =
   let rc =
     exec_f (Filename.concat "." "gwc" ^ parameters conf.env)
   in
@@ -1094,8 +1094,10 @@ value setup_comm conf =
   | "rename" -> rename conf
   | "delete" -> delete conf
   | "delete_1" -> delete_1 conf
-  | "gwc" -> gwc conf
-  | "gwc_1" -> gwc_1 conf
+  | "gwc" ->
+      match p_getenv conf.env "opt" with
+      [ Some "check" -> gwc_check conf
+      | _ -> gwc conf ]
   | "gwu" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> gwu conf
