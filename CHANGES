@@ -5,6 +5,9 @@ GeneWeb Intermediate Version 2.01-2
   - [Apr 22, 99] Added Danish language (by Hans Albeck).
 
 * GeneWeb Daemon/CGI (gwd)
+  - [May 4, 99] Suppressed trace log count in CGI mode in not redirected
+    in a file (option "-log"). Seemed to be incorrectly displayed in the
+    HTML page in Windows.
   - [Apr 30, 99] Fixed another accent problem in displaying in clicking
     a first name for corresponding surnames starting with an accentuated
     letter.

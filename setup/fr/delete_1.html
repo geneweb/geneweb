@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>Suppression de bases donn&eacute;es</title></head>
+
+<body>
+
+<h1>Suppression de bases de donn&eacute;es</h1>
+
+<p>
+
+<form mode=GET action="delete_1">
+<input type=hidden name=lang value=$l>
+$k{<input type=hidden name="$a" value=del>|}
+
+&Ecirc;tes-vous s&ucirc;r de vouloir supprimer ces bases?
+
+<p>
+
+<ul>
+
+$k{<li><a href="http://localhost:2317/$a">$a</a>|
+<li>[pas de s&eacute;lection]}
+
+</ul>
+
+<p>
+
+Pour confirmer, appuyez sur ce bouton:
+
+<p>
+
+<dl><dd><input type=submit value="D&eacute;truire"></dl>
+
+<p>
+
+Ou revenez au <a href="setup?lang=$l;v=main.html">menu
+principal</a>.
