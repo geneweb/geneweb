@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 2.4 1999-09-24 12:06:12 ddr Exp $ *)
+(* $Id: history.ml,v 2.5 1999-09-24 18:20:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -157,7 +157,7 @@ value print_history conf base ic =
 
 value print conf base =
   let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "updates history"))
+    Wserver.wprint "%s" (capitale (transl conf "history of updates"))
   in
   do header conf title;
      let fname = file_name conf in

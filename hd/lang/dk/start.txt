@@ -70,7 +70,7 @@ sorteret efter
 <a href="%sm=AM">&Aring;rsdage for bryllupper</a>.<br>%x
 De <a href="%sm=LB;k=10">seneste f&oslash;dsler</a>.<br>
 De <a href="%sm=LD;k=10">seneste d&oslash;dsfald</a>.%x%j<br>
-<a href="%sm=HIST;k=10">[*updates history]</a>.%j<br>
+<a href="%sm=HIST;k=10">[*history of updates]</a>.%j<br>
 <a href="%sm=CAL">[*calendar/calendars]1</a>.
 <p>
 Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
