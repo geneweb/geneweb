@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.45 2000-05-15 05:40:41 ddr Exp $ *)
+(* $Id: util.ml,v 3.46 2000-05-16 17:21:15 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -968,12 +968,6 @@ value print_parent conf base p a =
          (p_first_name base a))
         (if p.surname <> a.surname then " " ^ p_surname base a
          else "") ]
-;
-
-value spouse ip cpl =
-  if ip == cpl.father then cpl.mother
-  else if ip == cpl.mother then cpl.father
-  else invalid_arg "spouse"
 ;
 
 value preciser_homonyme conf base p =

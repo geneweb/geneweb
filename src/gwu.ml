@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.16 2000-05-14 19:59:35 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.17 2000-05-16 17:21:14 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -664,11 +664,196 @@ value find_person base p1 po p2 =
       return exit 2 ]
 ;
 
+(* Separate option *)
+
+type separate = [ ToSeparate | NotScanned | BeingScanned | Scanned ];
+
+value rec find_ancestors base surn p list =
+  match (aoi base p.cle_index).parents with
+  [ Some ifam ->
+      let cpl = coi base ifam in
+      let fath = poi base cpl.father in
+      let moth = poi base cpl.mother in
+      if fath.surname <> surn && moth.surname <> surn then [p :: list]
+      else
+        let list =
+          if fath.surname = surn then find_ancestors base surn fath list
+          else list
+        in
+        let list =
+          if moth.surname = surn then find_ancestors base surn moth list
+          else list
+        in
+        list
+  | None -> [p :: list] ]
+;
+
+value alone_family base ifam p u =
+  let isp = spouse p.cle_index (coi base ifam) in
+  Array.length u.family = 1 &&
+  Array.length (uoi base isp).family = 1
+;
+
+value mark_branch base mark surn p =
+  loop p where rec loop p =
+    let u = uoi base p.cle_index in
+    for i = 0 to Array.length u.family - 1 do
+      let ifam = u.family.(i) in
+      match mark.(Adef.int_of_ifam ifam) with
+      [ NotScanned ->
+          let desc = doi base ifam in
+          let children =
+            Array.fold_left (fun list ip -> [poi base ip :: list])
+              [] desc.children
+          in
+          if alone_family base ifam p u && Array.length desc.children = 0
+          || List.exists (fun p -> p.surname = surn) children
+          then
+            do mark.(Adef.int_of_ifam ifam) := ToSeparate;
+               List.iter loop children;
+            return ()
+          else ()
+      | _ -> () ];
+    done
+;
+
+value mark_someone base mark s =
+  match Gutil.person_ht_find_all base s with
+  [ [ip] ->
+      let p = poi base ip in
+      let plist = find_ancestors base p.surname p [] in
+      List.iter (mark_branch base mark p.surname) plist
+  | _ -> failwith s ]
+;
+
+value sep_limit = ref 21;
+value separate_list = ref [];
+
+value scan_connex_component base test_action len ifam =
+  loop len ifam where rec loop len ifam =
+    let cpl = coi base ifam in
+(**)
+    let len =
+      Array.fold_left
+        (fun len ifam1 ->
+           if ifam1 = ifam then len else test_action loop len ifam1)
+        len (uoi base cpl.father).family
+    in
+    let len =
+      Array.fold_left
+        (fun len ifam1 ->
+           if ifam1 = ifam then len else test_action loop len ifam1)
+        len (uoi base cpl.mother).family
+    in
+(**)
+    let len =
+      match (aoi base cpl.father).parents with
+      [ Some ifam -> test_action loop len ifam
+      | _ -> len ]
+    in
+    let len =
+      match (aoi base cpl.mother).parents with
+      [ Some ifam -> test_action loop len ifam
+      | _ -> len ]
+    in
+    let children = (doi base ifam).children in
+    let len =
+      Array.fold_left
+        (fun len ip ->
+           Array.fold_left (test_action loop) len (uoi base ip).family)
+        len children
+    in
+    len
+;
+
+value mark_one_connex_component base mark ifam =
+  let origin_file = sou base (foi base ifam).origin_file in
+  let test_action loop len ifam =
+    if mark.(Adef.int_of_ifam ifam) == NotScanned
+    && sou base (foi base ifam).origin_file = origin_file then
+      do mark.(Adef.int_of_ifam ifam) := BeingScanned; return
+      loop (len + 1) ifam
+    else len
+  in
+  let _ = test_action (fun _ _ -> 1) 0 ifam in
+  let len = 1 + scan_connex_component base test_action 0 ifam in
+  let set_mark x =
+    let test_action loop () ifam =
+      if mark.(Adef.int_of_ifam ifam) == BeingScanned then
+        do mark.(Adef.int_of_ifam ifam) := x; return
+        loop () ifam
+      else ()
+    in
+    do test_action (fun _ _ -> ()) () ifam;
+       scan_connex_component base test_action () ifam;
+    return ()
+  in
+  if len <= sep_limit.val then set_mark ToSeparate
+  else
+    do Printf.eprintf "group of size %d not included\n" len;
+       let cpl = coi base ifam in
+       Printf.eprintf "    %s + %s\n"
+         (denomination base (poi base cpl.father))
+         (denomination base (poi base cpl.mother));
+       flush stderr;
+    return
+    set_mark Scanned
+;
+
+value mark_connex_components base mark fam =
+  let test_action loop len ifam =
+    if mark.(Adef.int_of_ifam ifam) == NotScanned then
+(*
+do Printf.eprintf "*** trying to include from this family:\n";
+       let cpl = coi base ifam in
+       Printf.eprintf "    %s + %s\n"
+         (denomination base (poi base cpl.father))
+         (denomination base (poi base cpl.mother));
+       flush stderr;
+return
+*)
+      do mark_one_connex_component base mark ifam; return ()
+    else ()
+  in
+  scan_connex_component base test_action () fam.fam_index
+;
+
+value add_small_connex_components base mark =
+  for i = 0 to base.data.families.len - 1 do
+    if mark.(i) = ToSeparate then
+      let fam = base.data.families.get i in
+      mark_connex_components base mark fam
+    else ();
+  done
+;
+
+value separate base =
+  let list = List.rev separate_list.val in
+  let mark = Array.create base.data.families.len NotScanned in
+  do if list <> [] then
+       do List.iter (mark_someone base mark) list;
+          add_small_connex_components base mark;
+          let len =
+            loop 0 0 where rec loop len i =
+              if i = base.data.families.len then len
+              else if mark.(i) = ToSeparate then loop (len + 1) (i + 1)
+              else loop len (i + 1)
+          in
+          Printf.eprintf "*** extracted %d families\n" len;
+          flush stderr;
+       return ()
+     else ();
+  return mark
+;
+
+(* Main *)
+
 value surnames = ref [];
 value no_spouses_parents = ref False;
 value no_notes = ref False;
 
 value gwu base out_dir out_oc src_oc_list anc desc =
+  let to_separate = separate base in
   let anc =
     match anc with
     [ Some (p1, po, p2) -> Some (find_person base p1 po p2)
@@ -703,8 +888,17 @@ value gwu base out_dir out_oc src_oc_list anc desc =
        else
          do if fam_done.(i) then ()
             else if fam_sel fam.fam_index then
-              let (oc, first) = origin_file (sou base fam.origin_file) in
               let ifaml = connected_families base fam_sel fam cpl in
+              let (oc, first) =
+                let sep =
+                  List.exists
+                    (fun ifam ->
+                       to_separate.(Adef.int_of_ifam ifam) = ToSeparate)
+                    ifaml
+                in
+                if sep then (out_oc, out_oc_first)
+                else origin_file (sou base fam.origin_file)
+              in
               let ml =
                 List.fold_right
                   (fun ifam ml ->
@@ -787,7 +981,21 @@ value speclist =
    ("-nsp", Arg.Set no_spouses_parents,
     ": no spouses' parents (for option -s)");
    ("-nn", Arg.Set no_notes,
-    ": no (data base) notes")]
+    ": no (data base) notes");
+   ("-sep",
+    Arg.String (fun s -> separate_list.val := [s :: separate_list.val]),
+    "\"1st_name.num surname\" :
+     To use together with the option \"-odir\": separate this person and
+     all his ancestors and descendants sharing the same surname. All the
+     concerned families are displayed on standard output instead of their
+     associated files. This option can be used several times.");
+   ("-sep_limit", Arg.Int (fun i -> sep_limit.val := i),
+    "<num> :
+     When using the option \"-sep\", groups of families can become isolated
+     in the files. Gwu reconnects them to the separated families (i.e.
+     displays them to standard output) if the size of these groups is less
+     than " ^ string_of_int sep_limit.val ^
+             ". The present option changes this limit.")]
 ;
 
 value anonfun s =
