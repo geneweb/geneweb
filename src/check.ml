@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 4.13 2004-08-09 11:34:59 ddr Exp $ *)
+(* $Id: check.ml,v 4.14 2004-08-20 08:52:07 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -186,14 +186,14 @@ value check_base_aux base error warning =
     Printf.eprintf "check persons\n";
     ConsangAll.start_progr_bar ();
     for i = 0 to base.data.persons.len - 1 do {
-      ConsangAll.run_progr_bar i (base.data.persons.len - 1);
+      ConsangAll.run_progr_bar i base.data.persons.len;
       let p = base.data.persons.get i in check_person base error warning p
     };
     ConsangAll.finish_progr_bar ();
     Printf.eprintf "check families\n";
     ConsangAll.start_progr_bar ();
     for i = 0 to base.data.families.len - 1 do {
-      ConsangAll.run_progr_bar i (base.data.families.len - 1);
+      ConsangAll.run_progr_bar i base.data.families.len;
       let fam = base.data.families.get i in
       if is_deleted_family fam then ()
       else
