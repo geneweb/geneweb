@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.47 1999-09-16 09:31:48 ddr Exp $ *)
+(* $Id: perso.ml,v 2.48 1999-09-17 18:15:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -613,15 +613,46 @@ value print_rchildren conf base p ic =
     c.rparents
 ;
 
+value print_fwitnesses conf base p nfam n ifam =
+  let fam = foi base ifam in
+  if Array.length fam.witnesses <> 0 then
+    do html_li conf;
+       Wserver.wprint "%s" (capitale (transl_nth conf "marriage/marriages" 0));
+       if nfam > 1 then Wserver.wprint " %d" (n + 1) else ();
+       Wserver.wprint "\n";
+       tag "ul" begin
+         Array.iter
+           (fun ip ->
+              let p = poi base ip in
+              do html_li conf;
+                 Wserver.wprint "%s:\n%s"
+                   (capitale (transl_nth conf "witness/witnesses" 0))
+                   (referenced_person_title_text conf base p);
+                 Date.afficher_dates_courtes conf base p;
+                 Wserver.wprint "\n";
+              return ())
+         fam.witnesses;
+       end;
+    return ()
+  else ()
+;
+
 value print_relations conf base p =
-  match (p.rparents, p.rchildren) with
-  [ ([], []) -> ()
-  | (rl, cl) ->
+  let has_marriage_witnesses =
+    List.exists
+      (fun ifam -> (foi base ifam).witnesses <> [| |])
+      (Array.to_list p.family)
+  in
+  match (p.rparents, p.rchildren, has_marriage_witnesses) with
+  [ ([], [], False) -> ()
+  | (rl, cl, _) ->
       do Wserver.wprint "<h3>%s</h3>\n"
            (capitale (transl_nth conf "relation/relations" 1));
          tag "ul" begin
            List.iter (print_relation conf base) rl;
            List.iter (print_rchildren conf base p) cl;
+           Array.iteri (print_fwitnesses conf base p (Array.length p.family))
+             p.family;
          end;
       return () ]
 ;

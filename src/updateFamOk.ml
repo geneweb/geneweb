@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.24 1999-09-16 09:31:52 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.25 1999-09-17 18:15:23 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -37,6 +37,8 @@ value reconstitute_parent conf var =
   (first_name, surname, occ, create)
 ;
 
+value reconstitute_witness = reconstitute_parent;
+
 value reconstitute_child conf var default_surname =
   let first_name = getn conf var "fn" in
   let surname =
@@ -70,6 +72,28 @@ value reconstitute_family conf =
   in
   let marriage = Update.reconstitute_date conf "marriage" in
   let marriage_place = only_printable (get conf "marriage_place") in
+  let (witnesses, ext) =
+    loop 1 ext where rec loop i ext =
+      match
+        try Some (reconstitute_witness conf ("witn" ^ string_of_int i)) with
+        [ Failure _ -> None ]
+      with
+      [ Some c ->
+          let (witnesses, ext) = loop (i + 1) ext in
+          match p_getenv conf.env ("ins_witn" ^ string_of_int i) with
+          [ Some "on" ->
+              let new_witn = ("", "", 0, Update.Create Neuter None) in
+              ([c; new_witn :: witnesses], True)
+          | _ -> ([c :: witnesses], ext) ]
+      | None -> ([], ext) ]
+  in
+  let (witnesses, ext) =
+    match p_getenv conf.env "ins_witn0" with
+    [ Some "on" ->
+        let new_witn = ("", "", 0, Update.Create Neuter None) in
+        ([new_witn :: witnesses], True)
+    | _ -> (witnesses, ext) ]
+  in
   let divorce =
     match p_getenv conf.env "divorce" with
     [ Some "not_divorced" -> NotDivorced
@@ -80,7 +104,7 @@ value reconstitute_family conf =
   in
   let surname = getn conf "his" "sn" in
   let (children, ext) =
-    loop 1 False where rec loop i ext =
+    loop 1 ext where rec loop i ext =
       match
         try
           Some (reconstitute_child conf ("child" ^ string_of_int i) surname)
@@ -93,7 +117,7 @@ value reconstitute_family conf =
           [ Some "on" ->
               let new_child = ("", "", 0, Update.Create Neuter None) in
               ([c; new_child :: children], True)
-          | _ -> ([c :: children ], ext) ]
+          | _ -> ([c :: children], ext) ]
       | None -> ([], ext) ]
   in
   let (children, ext) =
@@ -114,7 +138,7 @@ value reconstitute_family conf =
     {marriage = Adef.codate_of_od marriage;
      marriage_place = marriage_place;
      marriage_src = strip_spaces (get conf "marr_src");
-     witnesses = [| |];
+     witnesses = Array.of_list witnesses;
      not_married = not_married;
      divorce = divorce; children = Array.of_list children; comment = comment;
      origin_file = ""; fsources = fsources;
@@ -125,7 +149,7 @@ value reconstitute_family conf =
   (fam, cpl, ext)
 ;
 
-value strip_children pl =
+value strip_array_persons pl =
   let pl =
     List.fold_right
       (fun ((f, s, o, c) as p) pl -> if f = "" then pl else [p :: pl])
@@ -135,7 +159,9 @@ value strip_children pl =
 ;
 
 value strip_family fam =
-  fam.children := strip_children fam.children
+  do fam.children := strip_array_persons fam.children;
+     fam.witnesses := strip_array_persons fam.witnesses;
+  return ()
 ;
 
 value print_err_parents conf base p =
@@ -396,6 +422,7 @@ value effective_del conf base fam =
      Array.iter (kill_parents base) fam.children;
      cpl.father := Adef.iper_of_int (-1);
      cpl.mother := Adef.iper_of_int (-1);
+     fam.witnesses := [| |];
      fam.children := [| |];
      fam.comment := Update.insert_string conf base "";
      fam.fam_index := Adef.ifam_of_int (-1);

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.15 1999-09-16 15:01:16 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.16 1999-09-17 18:15:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -126,6 +126,46 @@ value print_mother conf base cpl =
      Wserver.wprint "\n";
      Update.print_parent_person conf base "her" cpl.mother;
      Wserver.wprint "\n";
+  return ()
+;
+
+value print_insert_witness conf base cnt =
+  tag "table" "border=1" begin
+    tag "tr" begin
+      let var = "ins_witn" ^ string_of_int cnt in
+      tag "td" begin
+        let s = transl_nth conf "witness/witnesses" 0 in
+        Wserver.wprint "%s <input type=checkbox name=%s value=on>"
+          (capitale (transl_decline conf "insert" s))
+          var;
+      end;
+    end;
+  end
+;
+
+value print_witness conf base var key =
+  Update.print_parent_person conf base var key
+;
+
+value print_witnesses conf base fam =
+  let witnesses =
+    match Array.to_list fam.witnesses with
+    [ [] -> let t = ("", "", 0, Update.Create Neuter None) in [t; t]
+    | ipl -> ipl ]
+  in
+  do tag "h4" begin
+       Wserver.wprint "%s"
+         (capitale (transl_nth conf "witness/witnesses" 1));
+     end;
+     Wserver.wprint "\n";
+     print_insert_witness conf base 0;
+     let _ = List.fold_left
+       (fun cnt n ->
+          do print_witness conf base ("witn" ^ string_of_int cnt) n;
+             print_insert_witness conf base cnt;
+          return cnt + 1)
+       1 witnesses
+    in ();
   return ()
 ;
 
@@ -276,6 +316,8 @@ value print_family conf base fam cpl force_children_surnames =
      print_mother conf base cpl;
      Wserver.wprint "\n";
      print_marriage conf base fam;
+     Wserver.wprint "\n";
+     print_witnesses conf base fam;
      Wserver.wprint "\n";
      print_divorce conf base fam;
      Wserver.wprint "\n";
