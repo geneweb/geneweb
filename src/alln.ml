@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.1 2001-04-22 17:50:34 ddr Exp $ *)
+(* $Id: alln.ml,v 4.2 2001-05-12 04:00:25 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -272,7 +272,18 @@ value select_names conf base is_surnames ini =
           else list
     | None -> [] ]
   in
-  (List.rev list, True)
+  let list =
+    let lim =
+      match p_getint conf.env "atleast" with
+      [ Some x -> x
+      | None -> 0 ]
+    in
+    List.fold_left
+      (fun list (k, s, cnt) ->
+         if cnt >= lim then [(k, s, cnt) :: list] else list)
+      [] list
+  in
+  (list, True)
 ;
 
 value print_frequency conf base is_surnames =
@@ -295,6 +306,10 @@ value print_alphabetic conf base is_surnames =
     match p_getenv conf.env "k" with
     [ Some k -> String.lowercase k
     | _ -> "" ]
+  in
+  let _ =
+    if String.length ini < 2 then let _ = base.data.strings.array () in ()
+    else ()
   in
   let all =
     match p_getenv conf.env "o" with
@@ -371,6 +386,10 @@ value print_short conf base is_surnames =
     match p_getenv conf.env "k" with
     [ Some k -> String.lowercase k
     | _ -> "" ]
+  in
+  let _ =
+    if String.length ini < 2 then let _ = base.data.strings.array () in ()
+    else ()
   in
   let all =
     match p_getenv conf.env "o" with
