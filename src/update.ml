@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.13 2000-09-11 07:46:27 ddr Exp $ *)
+(* $Id: update.ml,v 3.14 2000-09-12 23:35:13 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -11,14 +11,6 @@ exception ModErr;
 type create_info = (option date * string * option date * string);
 type create = [ Create of sex and option create_info | Link ];
 type key = (string * string * int * create);
-type person_type =
-  [ R_father of int
-  | R_mother of int
-  | Father
-  | Mother
-  | Witness of int
-  | Child of int ]
-;
 
 value rec find_free_occ base f s i =
   match
@@ -44,26 +36,6 @@ value infer_death conf birth =
       else if a <= 80 then NotDead
       else DontKnowIfDead
   | _ -> DontKnowIfDead ]
-;
-
-value print_try_again conf var n =
-  do Wserver.wprint "%s " (transl conf "click");
-     Wserver.wprint "<a href=\n\"%s" (commd conf);
-     let _ = List.fold_left
-       (fun first (v, x) ->
-          do Wserver.wprint "%s" (if first then "" else ";");
-             Wserver.wprint "%s=" v;
-             if v = var then Wserver.wprint "%d" n
-             else Wserver.wprint "%s" x;
-          return False)
-       True conf.env
-     in ();
-     Wserver.wprint "\">%s</a>" (transl conf "here");
-     Wserver.wprint "%s.\n"
-        (transl conf
-           " \
-to try again with this number, or do \"back\" and change it yourself");
-  return ()
 ;
 
 value print_same_name conf base p =
@@ -689,34 +661,21 @@ value print_simple_person conf base var (first_name, surname, occ, create) =
   end
 ;
 
-value field_of_ptyp ptyp =
-  match ptyp with
-  [ R_father pos -> "r" ^ string_of_int pos ^ "_fath_"
-  | R_mother pos -> "r" ^ string_of_int pos ^ "_moth_"
-  | Father -> "him_"
-  | Mother -> "her_"
-  | Witness pos -> "witn" ^ string_of_int pos ^ "_"
-  | Child pos -> "ch" ^ string_of_int pos ^ "_" ]
-;
-
-value print_create_conflict conf base p ptyp =
-  let var = (field_of_ptyp ptyp) ^ "occ" in
-  let title _ =
-    Wserver.wprint "%s" (capitale (transl conf "error"))
+value print_create_conflict conf base p =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  let n =
+    find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
   do rheader conf title;
      print_error conf base (AlreadyDefined p);
      html_p conf;
-  return
-  let free_n =
-    find_free_occ base (p_first_name base p) (p_surname base p) 0
-  in
-  do tag "ul" begin
-       html_li conf;
-       Wserver.wprint "%s: %d.\n"
-         (capitale (transl conf "first free number")) free_n;
-       print_try_again conf var free_n;
-     end;
+     Wserver.wprint "<ul>\n";
+     html_li conf;
+     Wserver.wprint "%s: %d\n" (capitale (transl conf "first free number")) n;
+     html_li conf;
+     Wserver.wprint "%s\n"
+       (capitale (transl conf "or use \"link\" instead of \"create\""));
+     Wserver.wprint "</ul>\n";
      print_same_name conf base p;
      print_return conf;
      trailer conf;
@@ -731,7 +690,7 @@ value add_misc_names_for_new_persons base new_persons =
     new_persons
 ;
 
-value insert_person conf base src new_persons (ptyp, (f, s, o, create)) =
+value insert_person conf base src new_persons (f, s, o, create) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in
   match create with
@@ -746,7 +705,7 @@ value insert_person conf base src new_persons (ptyp, (f, s, o, create)) =
             else raise Not_found
         else
           let ip = person_ht_find_unique base f s o in
-          print_create_conflict conf base (poi base ip) ptyp
+          print_create_conflict conf base (poi base ip)
       with
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in

@@ -2,9 +2,6 @@ GeneWeb version 3.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
-   - [10 Sep 00] In "update family", when key conflict, now proposes to
-     try again with the first free number, like in "update person" (code
-     from Ludovic Ledieu).
    - [05 Sep 00] Fixed bug: in ancestors surnames list, under Lynx
      (browser for alphanumeric terminals), sometimes displayed "incorrect
      request" when clicking on certain surnames.
