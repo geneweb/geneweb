@@ -1,4 +1,4 @@
-GeneWeb 1.06
+GeneWeb 1.07
 
 Pour demarrer avec GeneWeb, lancez votre navigateur Web.
 
