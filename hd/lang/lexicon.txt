@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.82 1999-07-27 09:18:10 ddr Exp $
+# $Id: lexicon.txt,v 2.83 1999-07-28 06:56:30 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1111,10 +1111,12 @@ pt: cancelar os links Geneweb
 se: utan GeneWeb l&auml;nkar
 
     candidate father/candidate mother/candidate parents
+dk: mulig fader/mulig moder/mulige for&aelig;ldre
 en: candidate father/candidate mother/candidate parents
 fr: p&egrave;re possible/m&egrave;re possible/parents possibles
 
     candidate son/candidate daughter/candidate child
+dk: mulig s&oslash;n/mulig datter/muligt barn
 en: candidate son/candidate daughter/candidate child
 fr: fils possible/fille possible/enfant possible
 
