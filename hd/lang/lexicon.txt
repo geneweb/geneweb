@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.152 2000-08-10 06:12:51 ddr Exp $
+# $Id: lexicon.txt,v 3.153 2000-08-10 06:20:38 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -26,15 +26,15 @@ se: iso-8859-1
 he: rtl
 
      !languages
-de: cn:Chinesisch/dk:D&auml;nish/de:Deutsch/en:Englisch/eo:Esperanto/fr:Franz&ouml;sisch/he:Hebr&auml;isch/nl:Holl&auml;ndisch/is:Isl&auml;ndisch/it:Italienisch/no:Norwegisch/pt:Portugiesisch/es:Spanisch/se:Schwedisch/cs:Tschechisch
-dk: af:afrikaans/cn:kinesisk/cs:tjekkisk/dk:dansk/en:engelsk/eo:esperanto/fi:finsk/fr:fransk/de:tysk/he:hebraisk/is:islandsk/it:italiensk/lv:litauisk/nl:hollandsk/no:norsk/pt:portugisisk/es:spansk/ru:russisk/se:svensk
-en: af:Afrikaans/cn:Chinese/cs:Czech/dk:Danish/nl:Dutch/en:English/eo:Esperanto/fi:Finnish/fr:French/de:German/he:Hebrew/is:Icelandic/it:Italian/lv:Latvian/no:Norwegian/pt:Portuguese/es:Spanish/ru:Russian/se:Swedish
-eo: en:anglo/eo:esperanto/fr:franco
-es: de:Alem&aacute;n/cs:Checo/cn:Chino/dk:Dan&eacute;s/es:Espa&ntilde;ol/eo:Esperanto/fr:Franc&eacute;s/he:Hebreo/en:Ingl&eacute;s/it:Italiano/nl:N&eacute;erlandes/no:Noruego/pt:Portug&eacute;s/se:Sueco
-fi: af:afrikaani/cn:kiina/cs:tsekki/de:saksa/dk:tanska/en:englanti/eo:esperanto/es:espanja/fi:suomi/fr:ranska/he:heprea/is:islanti/it:italia/lv:latvia/nl:hollanti/no:norja/pt:portugali/ru:ven&auml;j&auml;/se:ruotsi
-fr: af:afrikaans/cn:chinois/cs:tch&egrave;que/de:allemand/dk:danois/en:anglais/eo:esp&eacute;ranto/es:espagnol/fi:finlandais/fr:fran&ccedil;ais/he:h&eacute;breu/is:islandais/it:italien/lv:letton/nl:n&eacute;erlandais/no:norv&eacute;gien/pt:portugais/ru:russe/se:su&eacute;dois
-lv: cn:Íînieðu/cs:Èehu/dk:Dâòu/nl:Holandieðu/en:Angïu/eo:Esperanto/fi:Somu/fr:Franèu/de:Vâcu/he:Ebreju/is:Islandieðû/it:Itâïu/lv:Latvieðu/no:Norvçìu/pt:Portugâïu/es:Spâòu/ru:Krievu/se:Zviedru
-se: af:afrikaans/cn:kinesiska/cs:tjeckiska/dk:danska/en:engelska/eo:esperanto/fi:finska/fr:franska/de:tyska/he:hebreiska/is:isl&auml;ndska/it:italienska/lv:litauiska/nl:holl&auml;ndska/no:norska/pt:portugisiska/es:spanska/ru:ryska/se:svenska
+de: cn=Chinesisch/dk=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/no=Norwegisch/pt=Portugiesisch/es=Spanisch/se=Schwedisch/cs=Tschechisch
+dk: af=afrikaans/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
+en: af=Afrikaans/cn=Chinese/cs=Czech/dk=Danish/nl=Dutch/en=English/eo=Esperanto/fi=Finnish/fr=French/de=German/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/no=Norwegian/pt=Portuguese/es=Spanish/ru=Russian/se=Swedish
+eo: en=anglo/eo=esperanto/fr=franco
+es: de=Alem&aacute;n/cs=Checo/cn=Chino/dk=Dan&eacute;s/es=Espa&ntilde;ol/eo=Esperanto/fr=Franc&eacute;s/he=Hebreo/en=Ingl&eacute;s/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/se=Sueco
+fi: af=afrikaani/cn=kiina/cs=tsekki/de=saksa/dk=tanska/en=englanti/eo=esperanto/es=espanja/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/se=ruotsi
+fr: af=afrikaans/cn=chinois/cs=tch&egrave;que/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pt=portugais/ru=russe/se=su&eacute;dois
+lv: cn=Íînieðu/cs=Èehu/dk=Dâòu/nl=Holandieðu/en=Angïu/eo=Esperanto/fi=Somu/fr=Franèu/de=Vâcu/he=Ebreju/is=Islandieðû/it=Itâïu/lv=Latvieðu/no=Norvçìu/pt=Portugâïu/es=Spâòu/ru=Krievu/se=Zviedru
+se: af=afrikaans/cn=kinesiska/cs=tjeckiska/dk=danska/en=engelska/eo=esperanto/fi=finska/fr=franska/de=tyska/he=hebreiska/is=isl&auml;ndska/it=italienska/lv=litauiska/nl=holl&auml;ndska/no=norska/pt=portugisiska/es=spanska/ru=ryska/se=svenska
 
      to see the first branch
 af:  om die eerste staak te sien
