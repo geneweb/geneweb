@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.20 2001-02-14 15:26:41 ddr Exp $
+# $Id: Makefile,v 3.21 2001-03-04 14:13:09 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -12,6 +12,7 @@ GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo iob
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 MOSTDESC_OBJS=adef.cmo name.cmo buff.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
 FPLA_OBJS=argl.cmo adef.cmo name.cmo buff.cmo gutil.cmo btree.cmo iovalue.cmo iobase.cmo fpla.cmo
+RESTRICT_OBJS=argl.cmo adef.cmo name.cmo buff.cmo gutil.cmo btree.cmo iovalue.cmo iobase.cmo restrict.cmo
 
 all:: out
 
@@ -73,6 +74,9 @@ fpla.out: $(FPLA_OBJS)
 
 fpla.opt: $(FPLA_OBJS:.cmo=.cmx)
 	$(OCAMLOPT) unix.cmxa $(LIBUNIX) $(FPLA_OBJS:.cmo=.cmx) -o fpla.opt
+
+restrict.opt: $(RESTRICT_OBJS:.cmo=.cmx)
+	$(OCAMLOPT) unix.cmxa $(LIBUNIX) $(RESTRICT_OBJS:.cmo=.cmx) -o restrict.opt
 
 i18n_check.out: i18n_check.cmo
 	$(OCAMLC) i18n_check.cmo -o i18n_check.out
