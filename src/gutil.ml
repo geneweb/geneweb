@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.2 2001-04-18 12:36:34 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.3 2001-05-05 13:27:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -463,6 +463,7 @@ type warning 'person =
   | ParentBornAfterChild of 'person and 'person
   | ParentTooYoung of 'person and Def.dmy
   | TitleDatesError of 'person and title
+  | UndefinedSex of 'person
   | YoungForMarriage of 'person and Def.dmy ]
 ;
 type base_warning = warning person;
@@ -591,6 +592,11 @@ value child_born_before_mother_death base warning x imoth =
         warning (MotherDeadAfterChildBirth mother x)
       else ()
   | _ -> () ]
+;
+
+value child_has_sex warning child =
+  if child.sex = Neuter then warning (UndefinedSex child)
+  else ()
 ;
 
 value possible_father base warning x ifath =
@@ -775,6 +781,7 @@ value check_family base error warning fam cpl des =
              child_born_after_his_parent base error warning child cpl.mother;
              child_born_before_mother_death base warning child cpl.mother;
              possible_father base warning child cpl.father;
+             child_has_sex warning child;
              match Adef.od_of_codate child.birth with
              [ Some d -> Some (child, d)
              | _ -> np ]

@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 4.1 2001-04-19 12:34:55 ddr Exp $ *)
+(* $Id: check.ml,v 4.2 2001-05-05 13:27:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -91,6 +91,8 @@ value print_base_warning base =
         Printf.printf "has incorrect title dates as:\n";
         Printf.printf "  %s %s\n" (sou base t.t_ident) (sou base t.t_place);
       }
+  | UndefinedSex p ->
+      ()
   | YoungForMarriage p a ->
       Printf.printf "%s married at age %d\n" (denomination base p) (annee a) ]
 ;      
