@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 3.7 2000-04-04 12:19:49 ddr Exp $ *)
+(* $Id: place.ml,v 3.8 2000-04-05 12:16:42 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -50,6 +50,7 @@ value fold_place inverted s =
 value get_all conf base =
   let add_birth = p_getenv conf.env "bi" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
+  let add_marriage = p_getenv conf.env "ma" = Some "on" in
   let inverted =
     try List.assoc "places_inverted" conf.base_env = "yes" with
     [ Not_found -> False ]
@@ -68,33 +69,58 @@ value get_all conf base =
   let empty =
     try base.func.index_of_string "" with [ Not_found -> Adef.istr_of_int 0 ]
   in
-  loop 0 where rec loop i =
-    if i = base.data.persons.len then
-      let list = ref [] in
-      let len = ref 0 in
-      do Hashtbl.iter
-           (fun (istr_pl, _) (cnt, ip) ->
-              let s = fold_place inverted (sou base istr_pl) in
-              if s <> [] && (ini = "" || List.hd s = ini) then
-                do list.val := [(s, cnt.val, ip) :: list.val];
-                   incr len;
-                return ()
-              else ())
-           ht;
-      return
-      let list = Sort.list (fun (s1, _, _) (s2, _, _) -> s1 <= s2) list.val in
-      (list, len.val)
-    else
-      let p = base.data.persons.get i in
-      let pl_bi = if add_birth then p.birth_place else empty in
-      let pl_de = if add_death then p.death_place else empty in
-      do if pl_bi == empty && pl_de == empty || not (fast_auth_age conf p)
-         then ()
+  do if add_birth || add_death then
+       loop 0 where rec loop i =
+         if i = base.data.persons.len then ()
          else
-           do if pl_bi != empty then ht_add pl_bi p else ();
-              if pl_de != empty then ht_add pl_de p else ();
-           return ();
-      return loop (i + 1)
+           let p = base.data.persons.get i in
+           let pl_bi = if add_birth then p.birth_place else empty in
+           let pl_de = if add_death then p.death_place else empty in
+           do if pl_bi == empty && pl_de == empty || not (fast_auth_age conf p)
+              then ()
+              else
+                do if pl_bi != empty then ht_add pl_bi p else ();
+                   if pl_de != empty then ht_add pl_de p else ();
+                return ();
+           return loop (i + 1)
+     else ();
+     if add_marriage then
+       loop 0 where rec loop i =
+         if i = base.data.families.len then ()
+         else
+           let fam = base.data.families.get i in
+           do if is_deleted_family fam then ()
+              else
+                let pl_ma = fam.marriage_place in
+                if pl_ma <> empty then
+                  let cpl = coi base fam.fam_index in
+                  let fath = poi base cpl.father in
+                  let moth = poi base cpl.mother in
+                  if fast_auth_age conf fath && fast_auth_age conf moth then
+                    do ht_add pl_ma fath;
+                       ht_add pl_ma moth;
+                    return ()
+                  else ()
+                else ();
+           return loop (i + 1)
+     else ();
+  return
+  let list = ref [] in
+  let len = ref 0 in
+  do Hashtbl.iter
+       (fun (istr_pl, _) (cnt, ip) ->
+          let s = fold_place inverted (sou base istr_pl) in
+          if s <> [] && (ini = "" || List.hd s = ini) then
+            do list.val := [(s, cnt.val, ip) :: list.val];
+               incr len;
+            return ()
+          else ())
+       ht;
+  return
+  let list =
+    Sort.list (fun (s1, _, _) (s2, _, _) -> s1 <= s2) list.val
+  in
+  (list, len.val)
 ;
 
 value max_len = ref 2000;
@@ -165,9 +191,11 @@ value print_all_places_surnames_short conf list =
   in
   let add_birth = p_getenv conf.env "bi" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
+  let add_marriage = p_getenv conf.env "ma" = Some "on" in
   let opt =
     (if add_birth then ";bi=on" else "") ^
-    (if add_death then ";de=on" else "")
+    (if add_death then ";de=on" else "") ^
+    (if add_marriage then ";ma=on" else "")
   in
   do Util.header conf title;
      print_link_to_welcome conf True;
