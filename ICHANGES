@@ -5,6 +5,9 @@ GeneWeb Version 3.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Dec 2, 99] Added a system of "areas" in data bases protected by
+    a password, based on the name of the ".gw" files => works only
+    for data bases created with "gwc".
   - [Nov 23, 99] Fixed problem of selecting a first name: sometimes it
     did not work. Used "Name.lower" instead of "Name.strip_lower" for the
     list for a future selection.

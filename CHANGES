@@ -11,6 +11,10 @@ GeneWeb version 3.01
     not appear...
 
 * GeneWeb Service/CGI (gwd)
+  - [Dec 2, 99] Added display of the complete graph (all branches in one
+    page) indicated "tree" in the bottom of the page page after computation
+    of relationship links between someone and his ancestor (when there are no
+    two many branches).
   - [Nov 26, 99] Faster computation of list of all titles and all places
   - [Nov 26, 99] Fixed a problem of sometimes displaying of a message
     "document contains no data" from the browser when computing relationship.
