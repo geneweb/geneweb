@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 2.1 1999-03-08 11:19:44 ddr Exp $ *)
+(* $Id: wserver.ml,v 2.2 1999-03-22 17:03:25 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value wserver_oc =
@@ -70,7 +70,14 @@ value decode s =
   else s
 ;
 
-value special x = List.mem x ['='; '&'; ';'; '"'; '<'; '>'];
+value special =
+  fun
+  [ '\000'..'\031' | '\127'..'\255' | '<' | '>' | '"' | '#' | '%' |
+    '{' | '}' | '|' | '\\' | '^' | '~' | '[' | ']' | '`' | ';' | '/' | '?' |
+    ':' | '@' | '=' | '&' ->
+      True
+  | _ -> False ]
+;
 
 value encode s =
   let rec need_code i =

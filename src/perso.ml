@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.3 1999-03-18 18:06:41 ddr Exp $ *)
+(* $Id: perso.ml,v 2.4 1999-03-22 17:03:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -409,9 +409,30 @@ value print_child conf base age_auth ip =
   return ()
 ;
 
+value print_marriage_text conf base fam =
+  let marriage = Adef.od_of_codate fam.marriage in
+  let marriage_place = sou base fam.marriage_place in
+  do match (marriage, marriage_place) with
+     [ (None, "") -> ()
+     | _ -> Wserver.wprint "<em>" ];
+     match marriage with
+     [ Some d ->
+         Wserver.wprint "%s" (Date.string_of_ondate conf d)
+     | _ -> () ];
+     match marriage_place with
+     [ "" -> ()
+     | s ->
+         do if marriage <> None then Wserver.wprint ", " else ();
+            Wserver.wprint "%s," (coa conf s);
+         return () ];
+     match (marriage, marriage_place) with
+     [ (None, "") -> ()
+     | _ -> Wserver.wprint "</em>" ];
+  return ()
+;
+
 value print_family conf base p a ifam =
   let fam = foi base ifam in
-  let marriage = Adef.od_of_codate fam.marriage in
   let iconjoint = conjoint p (coi base ifam) in
   let conjoint = poi base iconjoint in
   let children = fam.children in
@@ -420,27 +441,11 @@ value print_family conf base p a ifam =
   do Wserver.wprint "\n";
      html_li conf;
      Wserver.wprint
-       (fcapitale
-          (ftransl_nth conf "allied%t (euphemism for married or... not) to"
-             is))
+       (fcapitale (ftransl_nth conf "allied%t to" is))
        (fun _ ->
           if age_autorise conf base p && age_autorise conf base conjoint then
-            let marriage_place = sou base fam.marriage_place in
-            do match (marriage, marriage_place) with
-               [ (None, "") -> ()
-               | _ -> Wserver.wprint "\n<em>" ];
-               match marriage with
-               [ Some d -> Wserver.wprint "%s" (Date.string_of_ondate conf d)
-               | _ -> () ];
-               match marriage_place with
-               [ "" -> ()
-               | s ->
-                   do Wserver.wprint " - ";
-                      Wserver.wprint "%s" (coa conf s);
-                   return () ];
-               match (marriage, marriage_place) with
-               [ (None, "") -> ()
-               | _ -> Wserver.wprint "</em>" ];
+            do Wserver.wprint "\n";
+               print_marriage_text conf base fam;
             return ()
           else ());
      Wserver.wprint "\n";

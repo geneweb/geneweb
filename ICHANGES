@@ -13,9 +13,17 @@ GeneWeb Version 2.01
   - [Mar 10, 99] Inlined "List.remove_assoc" in order to be compilable
     by Ocaml and Camlp4 2.01 as well.
 
-* Welcome pages (xx/start.txt)
+* Welcome pages (hd/lang/xx/start.txt)
   - [Mar 20, 99] Changed order of links for displayed anniversaries and
     latest births and deaths.
+
+* Lexicon (hd/lang/lexicon.txt)
+  - [Mar 22, 99] Changed "allied%t (euphemism for married or... not) to"
+    into "allied%d to". Changed French translation "allie" into "marie".
+
+* Wserver (../wserver/wserver.ml)
+  - [Mar 22, 99] Completed "special" list of characters that must be
+    encoded (according to Jean-Christophe Filliatre).
 
 GeneWeb Version 2.00
 --------------------

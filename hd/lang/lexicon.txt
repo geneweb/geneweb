@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.2 1999-03-11 12:56:52 ddr Exp $
+# $Id: lexicon.txt,v 2.3 1999-03-22 17:03:20 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -594,13 +594,13 @@ nl: alle titels
 pt: todos os t&iacute;tulos
 se: alla titlar
 
-    allied%t (euphemism for married or... not) to
+    allied%t to
 cn: %tֵהֵ¼Êַ
 de: verheiratet%t mit
-en: allied%t to
+en: married%t to
 eo: edzagxita%t kun
 es: unido%t con/unida%t con
-fr: alli&eacute;%t &agrave;/alli&eacute;e%t &agrave;
+fr: mari&eacute;%t avec/mari&eacute;e%t avec
 he:   בן זוג %t של/ בת זוג %t של
 it: sposato%t con/sposata%t con
 nl: verbonden%t met
