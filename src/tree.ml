@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: tree.ml,v 2.4 1999-08-21 19:40:44 ddr Exp $ *)
+(* $Id: tree.ml,v 2.5 1999-08-22 15:09:41 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -15,14 +15,23 @@ value rec tree_of_branch =
   | [x :: l] -> {node = x; sons = [tree_of_branch l]} ]
 ;
 
+value rec insert l tl =
+  match (l, tl) with
+  [ ([x :: l], [t :: tl]) ->
+      if x == t.node then
+        let t = {node = t.node; sons = insert l t.sons} in
+        [t :: tl]
+      else [t :: insert [x :: l] tl]
+  | (l, []) -> [tree_of_branch l]
+  | ([], _) -> tl ]
+;
+
 value append t =
   fun
   [ [] -> t
   | [x :: l] ->
       let rec app t =
-        if x == t.node then
-          let tl = if l = [] then t.sons else t.sons @ [tree_of_branch l] in
-          Some {node = t.node; sons = tl}
+        if x == t.node then Some {node = t.node; sons = insert l t.sons}
         else
           match app_rev_sons (List.rev t.sons) with
           [ Some rev_tl -> Some {node = t.node; sons = List.rev rev_tl}
