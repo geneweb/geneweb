@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.7 2001-03-26 03:39:16 ddr Exp $
+# $Id: lexicon.txt,v 4.8 2001-03-26 11:51:51 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -1616,6 +1616,7 @@ se: &aring;rsdagar
 
     anniversaries of dead people
 af: herdenkings van afsterwe
+cn:  ËÀÍöÓÚ½ñÈÕµÄ¼ÇÂ¼
 cs: vıroèí zemøelıch osob
 ct: aniversaris de les persones difuntes
 de: Jahrestage der verstorbenen Personen
@@ -1639,6 +1640,7 @@ se: &aring;rsdagar f&ouml;r avlidna personer
 
     anniversaries of marriage
 af: huweliksherdenkinge
+cn:  ½á»éÓÚ½ñÈÕµÄ¼ÇÂ¼
 cs: vıroèí sòatkù
 ct: aniversaris de casament
 de: Hochzeitstage
@@ -1895,6 +1897,7 @@ se: f&ouml;delse
     birthdays
 af: verjaarsdae
 br: anivers&aacute;rios de nascimento
+cn:  ³öÉúÓÚ½ñÈÕµÄ¼ÇÂ¼
 cs: narozeniny
 ct: aniversaris
 de: Geburtstage
@@ -2862,6 +2865,7 @@ se: fel
     estate
 af: landgoed
 br: localidade
+cn:  µØµã
 cs: místo
 ct: lloc
 de: Ort
