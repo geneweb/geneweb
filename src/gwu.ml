@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.34 2000-11-15 20:20:28 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.35 2000-11-16 04:45:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -461,6 +461,7 @@ value rec list_memf f x =
 ;
 
 value eq_key p1 p2 = p1.cle_index == p2.cle_index;
+value eq_key_fst (p1, _) (p2, _) = p1.cle_index == p2.cle_index;
 
 value print_notes oc base ml per_sel pl =
   let pl = List.fold_right (get_persons_with_notes base) ml pl in
@@ -474,18 +475,62 @@ value print_notes oc base ml per_sel pl =
     pl
 ;
 
+value is_isolated base p =
+  match (aoi base p.cle_index).parents with
+  [ Some _ -> False
+  | None -> Array.length (uoi base p.cle_index).family = 0 ]
+;
+
+value is_definition_for_parent base p =
+  match (aoi base p.cle_index).parents with
+  [ Some _ -> False
+  | None -> True ]
+;
+
+value get_isolated_related base m list =
+  let concat_isolated p_relation ip list =
+    let p = poi base ip in
+    if List.mem_assq p list then list
+    else if is_isolated base p then
+      match p.rparents with
+      [ [{r_fath = Some x} :: _] when x = p_relation.cle_index ->
+          [(p, True) :: list]
+      | [{r_fath = None; r_moth = Some x} :: _]
+        when x = p_relation.cle_index ->
+          [(p, True) :: list]
+      | _ -> list ]
+    else list
+  in
+  let list =
+    if is_definition_for_parent base m.m_fath then
+      List.fold_right (concat_isolated m.m_fath) m.m_fath.related list
+    else list
+  in
+  let list =
+    if is_definition_for_parent base m.m_moth then
+      List.fold_right (concat_isolated m.m_moth) m.m_moth.related list
+    else list
+  in
+  let list =
+    List.fold_right
+      (fun p list -> List.fold_right (concat_isolated p) p.related list)
+      (Array.to_list m.m_chil) list
+  in
+  list
+;
+
 value get_persons_with_relations base m list =
   let fath = m.m_fath in
   let moth = m.m_moth in
   let list =
     match (fath.rparents, (aoi base fath.cle_index).parents) with
     [ ([], _) | (_, Some _) -> list
-    | _ -> [fath :: list] ]
+    | _ -> [(fath, False) :: list] ]
   in
   let list =
     match (moth.rparents, (aoi base moth.cle_index).parents) with
     [ ([], _) | (_, Some _) -> list
-    | _ -> [moth :: list] ]
+    | _ -> [(moth, False) :: list] ]
   in
   let list =
     List.fold_right
@@ -493,14 +538,14 @@ value get_persons_with_relations base m list =
          let p = poi base ip in
          match (p.rparents, (aoi base p.cle_index).parents) with
          [ ([], _) | (_, Some _) -> list
-         | _ -> [p :: list] ])
+         | _ -> [(p, False) :: list] ])
       (Array.to_list m.m_fam.witnesses) list
   in
   List.fold_right
     (fun p list ->
        match p.rparents with
        [ [] -> list
-       | _ -> [p :: list] ])
+       | _ -> [(p, False) :: list] ])
     (Array.to_list m.m_chil) list
 ;
 
@@ -607,71 +652,24 @@ value print_relations_for_person oc base mark per_sel def_p is_definition p =
 
 value print_relations oc base mark per_sel ml =
   let pl = List.fold_right (get_persons_with_relations base) ml [] in
+  let pl = List.fold_right (get_isolated_related base) ml pl in
   let pl =
     List.fold_right
-      (fun p pl -> if list_memf eq_key p pl then pl else [p :: pl]) pl []
+      (fun p pl -> if list_memf eq_key_fst p pl then pl else [p :: pl]) pl []
   in
   let rec loop =
     fun
     [ [] -> ()
-    | [p :: pl] ->
+    | [(p, if_def) :: pl] ->
         let def_p = ref [] in
         do if p.rparents <> [] && per_sel p.cle_index then
-             do print_relations_for_person oc base mark per_sel def_p False p;
+             do print_relations_for_person oc base mark per_sel def_p if_def p;
                 List.iter (print_notes_for_person oc base) def_p.val;
              return ()
            else ();
-        return loop (pl @ def_p.val) ]
+        return loop (pl @ List.map (fun p -> (p, False)) def_p.val) ]
   in
   loop pl
-;
-
-value is_isolated base p =
-  match (aoi base p.cle_index).parents with
-  [ Some _ -> False
-  | None -> Array.length (uoi base p.cle_index).family = 0 ]
-;
-
-value is_definition_for_parent base p =
-  match (aoi base p.cle_index).parents with
-  [ Some _ -> False
-  | None -> True ]
-;
-
-value get_isolated_related base mark m list =
-  let concat_isolated p_relation ip list =
-    let p = poi base ip in
-    if List.memq p list then list
-    else if is_isolated base p then
-      match p.rparents with
-      [ [{r_fath = Some x} :: _] when x = p_relation.cle_index -> [p :: list]
-      | [{r_fath = None; r_moth = Some x} :: _]
-        when x = p_relation.cle_index ->
-          [p :: list]
-      | _ -> list ]
-    else list
-  in
-  let list =
-    if is_definition_for_parent base m.m_fath then
-      List.fold_right (concat_isolated m.m_fath) m.m_fath.related list
-    else list
-  in
-  let list =
-    if is_definition_for_parent base m.m_moth then
-      List.fold_right (concat_isolated m.m_moth) m.m_moth.related list
-    else list
-  in
-  let list =
-    List.fold_right
-      (fun p list -> List.fold_right (concat_isolated p) p.related list)
-      (Array.to_list m.m_chil) list
-  in
-  list
-;
-
-value print_isolated_related oc base mark per_sel ml =
-  let pl = List.fold_right (get_isolated_related base mark) ml [] in
-  List.iter (print_relations_for_person oc base mark per_sel (ref []) True) pl
 ;
 
 value rec merge_families ifaml1f ifaml2f =
@@ -980,7 +978,6 @@ value gwu base out_dir out_oc src_oc_list anc desc ancdesc =
                      (print_family oc base mark sel fam_done notes_pl_p) ml;
                    print_notes oc base ml per_sel notes_pl_p.val;
                    print_relations oc base mark per_sel ml;
-                   print_isolated_related oc base mark per_sel ml;
                 return ()
               else ()
             else ();

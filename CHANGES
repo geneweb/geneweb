@@ -21,6 +21,9 @@ GeneWeb version 3.10
     answer (infinite loop in gwd).
 
 * GeneWeb uncompiler (gwu)
+  - [16 Nov 00] Fixed bug: in some circumstances, relations could be
+    printed several times, resulting of several definitions and therefore
+    errors when using gwc.
   - [15 Nov 00] Filter the non printable characters if any: now converted
     into spaces.
 
