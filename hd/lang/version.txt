@@ -3,6 +3,8 @@
 <td align=center>
 <a href="%glang=cn">
 <img src="%gm=IM;v=/l-cn.gif" width=36 height=22 alt=cn></a>
+<a href="%glang=cs">
+<img src="%gm=IM;v=/l-cs.gif" width=36 height=22 alt=cs></a>
 <a href="%glang=de">
 <img src="%gm=IM;v=/l-de.gif" width=36 height=22 alt=de></a>
 <a href="%glang=dk">
