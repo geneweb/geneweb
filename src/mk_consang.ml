@@ -1,10 +1,10 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 2.2 1999-03-26 05:48:05 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 2.3 1999-03-26 08:14:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value fname = ref "";
 value scratch = ref False;
-value quiet = ref True;
+value quiet = ref False;
 
 value usage = "usage: " ^ Sys.argv.(0) ^ " [-scratch] <file_name>";
 value speclist =
