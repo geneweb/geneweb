@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 1.14 1999-10-09 16:50:05 ddr Exp $ *)
+(* $Id: robot.ml,v 1.15 1999-10-11 21:52:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -111,9 +111,13 @@ value check oc tm from max_call sec cgi suicide =
         let refused =
           if suicide || cnt > max_call then
             do Printf.fprintf oc "--- %s is a robot" from;
-               Printf.fprintf oc
-                 " (%d > %d connections in %g <= %d seconds)\n" cnt
-                 max_call (tm -. tm0) sec; flush Pervasives.stderr;
+               if suicide then
+                 Printf.fprintf oc " (called the hidden \"suicide\" request)\n"
+               else
+                 Printf.fprintf oc
+                   " (%d > %d connections in %g <= %d seconds)\n" cnt
+                   max_call (tm -. tm0) sec;
+               flush Pervasives.stderr;
                xcl.excl := [(from, ref 1) :: xcl.excl];
                xcl.who := W.remove from xcl.who;
                xcl.max_conn := (0, "");
