@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 4.10 2005-02-03 16:19:41 ddr Exp $ *)
+(* $Id: name.ml,v 4.11 2005-02-03 17:53:38 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 module Buff =
@@ -70,11 +70,17 @@ value lower s =
         else (* bad utf-8 *) 1
       in
       if i + nbc > String.length s then (* bad utf-8 *) Buff.get len
-      else if c = 0xC3 then
-        let c = Char.lowercase (Char.chr (Char.code s.[i+1] + 0x40)) in
-        copy False (i + 2) (Buff.store len (unaccent_iso_8859_1 c))
       else
-        copy False (i + nbc) (Buff.gstore len s i nbc)
+        let len = if special then Buff.store len ' ' else len in
+	match c with
+	[ 0xC2 ->
+            let c = Char.chr (Char.code s.[i+1]) in
+            copy False (i + 2) (Buff.store len (unaccent_iso_8859_1 c))
+        | 0xC3 ->
+            let c = Char.lowercase (Char.chr (Char.code s.[i+1] + 0x40)) in
+            copy False (i + 2) (Buff.store len (unaccent_iso_8859_1 c))
+	| c ->
+            copy False (i + nbc) (Buff.gstore len s i nbc) ]
 ;
 
 (* Name.abbrev *)
