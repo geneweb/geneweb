@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.31 2000-08-18 12:46:08 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.32 2000-08-18 13:04:22 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -224,13 +224,17 @@ value set_base_conf b (wizpw, fripw) =
   let fname_saved = fname ^ "~" in
   let ic = open_in fname in
   let oc = open_out fname_out in
+  let wizpw_ok = ref False in
+  let fripw_ok = ref False in
   do try
        while True do
          let line = input_line ic in
          let line_out =
            if lowercase_start_with line "wizard_passwd=" then
+             do wizpw_ok.val := True; return
              "wizard_passwd=" ^ wizpw
            else if lowercase_start_with line "friend_passwd=" then
+             do fripw_ok.val := True; return
              "friend_passwd=" ^ fripw
            else
              line
@@ -238,7 +242,10 @@ value set_base_conf b (wizpw, fripw) =
          fprintf oc "%s\n" line_out;
        done
      with
-     [ End_of_file -> do close_in ic; close_out oc; return () ];
+     [ End_of_file -> close_in ic ];
+     if not wizpw_ok.val then fprintf oc "wizard_passwd=%s" wizpw else ();
+     if not fripw_ok.val then fprintf oc "friend_passwd=%s" fripw else ();
+     close_out oc;
      try Sys.remove fname_saved with [ Sys_error _ -> () ];
      Sys.rename fname fname_saved;
      Sys.rename fname_out fname;
