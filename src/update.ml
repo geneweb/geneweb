@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.29 2004-07-16 16:17:57 ddr Exp $ *)
+(* $Id: update.ml,v 4.30 2004-07-17 09:16:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -841,7 +841,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
                if f = "?" || s = "?" then empty_string
                else insert_string base src;
              cle_index = ip}
-          and a = no_parents ()
+          and a = no_ascend ()
           and u = {family = [| |]} in
           do {
             base.func.patch_person p.cle_index p;

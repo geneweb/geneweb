@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.40 2004-07-16 16:17:52 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.41 2004-07-17 09:16:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -848,7 +848,7 @@ value unknown_per gen i =
      death = DontKnowIfDead; death_place = empty; death_src = empty;
      burial = UnknownBurial; burial_place = empty; burial_src = empty;
      notes = empty; psources = empty; cle_index = Adef.iper_of_int i}
-  and a = no_parents ()
+  and a = no_ascend ()
   and u = {family = [| |]} in
   (p, a, u)
 ;
@@ -1747,7 +1747,7 @@ value add_indi gen r =
      burial_src = add_string gen burial_src;
      notes = add_string gen (notes ^ ext_notes);
      psources = add_string gen psources; cle_index = ip}
-  and ascend = no_parents ()
+  and ascend = no_ascend ()
   and union = {family = Array.of_list family} in
   do {
     set_parents ascend parents;

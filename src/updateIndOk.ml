@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.15 2004-07-16 16:17:57 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.16 2004-07-17 09:14:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -511,7 +511,7 @@ value effective_add conf base sp =
       map_person_ps (Update.insert_person conf base sp.psources created_p)
         (Update.insert_string base) sp
     in
-    let na = no_parents () in
+    let na = no_ascend () in
     let nu = {family = [| |]} in
     np.cle_index := pi;
     base.func.patch_person pi np;
@@ -543,7 +543,7 @@ value effective_del conf base p =
         do {
           des.children := array_except p.cle_index des.children;
           set_parents asc None;
-          asc.consang := Adef.fix (-1);
+          set_consang asc (Adef.fix (-1));
           base.func.patch_descend ifam des;
           base.func.patch_ascend p.cle_index asc;
           ()

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.47 2004-07-16 16:17:57 ddr Exp $ *)
+(* $Id: relation.ml,v 4.48 2004-07-17 09:16:54 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -900,7 +900,7 @@ value nephew_label conf x p =
 ;
 
 value same_parents conf base p1 p2 =
-  (aget conf base p1.cle_index).parents = (aget conf base p2.cle_index).parents
+  parents (aget conf base p1.cle_index) = parents (aget conf base p2.cle_index)
 ;
 
 value print_link_name conf base n p1 p2 sol =
@@ -1582,8 +1582,8 @@ value print_main_relationship conf base long p1 p2 rel =
                (if Num.eq total Num.one then 0 else 1));
           if long then () else print_dag_links conf base p1 p2 rl;
           if not all_by_marr && authorized_age conf base p1 &&
-             authorized_age conf base p2 && a1.consang != Adef.fix (-1) &&
-             a2.consang != Adef.fix (-1)
+             authorized_age conf base p2 && (consang a1) != Adef.fix (-1) &&
+             consang a2 != Adef.fix (-1)
           then do {
             html_p conf;
             Wserver.wprint "<em>%s: " (capitale (transl conf "relationship"));

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.29 2004-07-16 16:17:57 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.30 2004-07-17 09:17:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -437,7 +437,7 @@ value effective_mod conf base sfam scpl sdes =
          do {
            set_parents a None;
            if not (array_memq ip ndes.children) then
-             a.consang := Adef.fix (-1)
+             set_consang a (Adef.fix (-1))
            else ()
          })
       odes.children;
@@ -450,7 +450,7 @@ value effective_mod conf base sfam scpl sdes =
              do {
                set_parents a (Some fi);
                if not (array_memq ip odes.children) || not same_parents then
-                 a.consang := Adef.fix (-1)
+                 set_consang a (Adef.fix (-1))
                else ()
              } ])
       ndes.children;
@@ -534,7 +534,7 @@ value effective_add conf base sfam scpl sdes =
          | None ->
              do {
                set_parents a (Some fi);
-               a.consang := Adef.fix (-1);
+               set_consang a (Adef.fix (-1));
                base.func.patch_ascend p.cle_index a
              } ])
       ndes.children;
@@ -573,7 +573,9 @@ value kill_family base fam ip =
 value kill_parents base ip =
   let a = aoi base ip in
   do {
-    set_parents a None; a.consang := Adef.fix (-1); base.func.patch_ascend ip a
+    set_parents a None;
+    set_consang a (Adef.fix (-1));
+    base.func.patch_ascend ip a
   }
 ;
 

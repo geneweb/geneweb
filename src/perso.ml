@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.54 2004-07-16 16:17:56 ddr Exp $ *)
+(* $Id: perso.ml,v 4.55 2004-07-17 09:16:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -408,7 +408,7 @@ value string_of_comment conf base env p p_auth =
 value string_of_consanguinity conf base env a p_auth =
   if p_auth then
     string_of_decimal_num conf
-      (round_2_dec (Adef.float_of_fix a.consang *. 100.0)) ^
+      (round_2_dec (Adef.float_of_fix (consang a) *. 100.0)) ^
     "%"
   else ""
 ;
@@ -1010,7 +1010,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
       [ Vfam fam _ _ -> p_auth && sou base fam.comment <> ""
       | _ -> False ]
   | "has_consanguinity" ->
-      p_auth && a.consang != Adef.fix (-1) && a.consang != Adef.fix 0
+      p_auth && consang a != Adef.fix (-1) && consang a != Adef.fix 0
   | "has_cremation_place" -> p_auth && sou base p.burial_place <> ""
   | "has_death_date" ->
       match p.death with

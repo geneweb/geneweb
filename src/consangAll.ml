@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 4.5 2004-07-16 16:17:54 ddr Exp $ *)
+(* $Id: consangAll.ml,v 4.6 2004-07-17 09:16:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -12,7 +12,7 @@ value rec clear_descend_consang base mark ifam =
     (fun ip ->
        if not mark.(Adef.int_of_iper ip) then do {
          let a = aoi base ip in
-         a.consang := no_consang;
+         set_consang a no_consang;
          mark.(Adef.int_of_iper ip) := True;
          let u = uoi base ip in
          Array.iter (clear_descend_consang base mark) u.family
@@ -85,12 +85,12 @@ value compute base from_scratch quiet =
     else ();
     for i = 0 to base.data.ascends.len - 1 do {
       let a = base.data.ascends.get i in
-      if from_scratch then a.consang := no_consang
+      if from_scratch then set_consang a no_consang
       else
         match parents a with
-        [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := a.consang
+        [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := consang a
         | None -> () ];
-      if a.consang == no_consang then incr cnt else ()
+      if consang a == no_consang then incr cnt else ()
     };
     let max_cnt = cnt.val in
     let most = ref None in
@@ -107,7 +107,7 @@ value compute base from_scratch quiet =
       running.val := False;
       for i = 0 to base.data.ascends.len - 1 do {
         let a = base.data.ascends.get i in
-        if a.consang == no_consang then
+        if consang a == no_consang then
           match parents a with
           [ Some ifam ->
               let pconsang = consang_tab.(Adef.int_of_ifam ifam) in
@@ -115,18 +115,20 @@ value compute base from_scratch quiet =
                 let cpl = coi base ifam in
                 let fath = aoi base (father cpl) in
                 let moth = aoi base (mother cpl) in
-                if fath.consang != no_consang &&
-                   moth.consang != no_consang then
+                if consang fath != no_consang &&
+                   consang moth != no_consang then
                    do {
-                  let consang = relationship base tab (father cpl) (mother cpl) in
+                  let consang =
+                    relationship base tab (father cpl) (mother cpl)
+                  in
                   trace quiet cnt.val max_cnt;
                   decr cnt;
-                  a.consang := Adef.fix_of_float consang;
-                  consang_tab.(Adef.int_of_ifam ifam) := a.consang;
+                  set_consang a (Adef.fix_of_float consang);
+                  consang_tab.(Adef.int_of_ifam ifam) := Gutil.consang a;
                   if not quiet then
                     let better =
                       match most.val with
-                      [ Some m -> a.consang > m.consang
+                      [ Some m -> Gutil.consang a > Gutil.consang m
                       | None -> True ]
                     in
                     if better then do {
@@ -140,13 +142,13 @@ value compute base from_scratch quiet =
                 }
                 else running.val := True
               else do {
-                trace quiet cnt.val max_cnt; decr cnt; a.consang := pconsang
+                trace quiet cnt.val max_cnt; decr cnt; set_consang a pconsang
               }
           | None ->
               do {
                 trace quiet cnt.val max_cnt;
                 decr cnt;
-                a.consang := Adef.fix_of_float 0.0
+                set_consang a (Adef.fix_of_float 0.0)
               } ]
         else ()
       }
