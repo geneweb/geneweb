@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.28 2002-12-26 14:26:18 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.29 2003-11-07 15:57:05 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1747,9 +1747,9 @@ value print_tree_with_table conf base gv p =
           match po with
           [ Empty -> "&nbsp;"
           | Cell _ Left _ _ ->
-              "<hr noshade size=1 width=\"50%%\" align=right>"
+              "<hr noshade size=1 width=\"50%\" align=right>"
           | Cell _ Right _ _ ->
-              "<hr noshade size=1 width=\"50%%\" align=left>"
+              "<hr noshade size=1 width=\"50%\" align=left>"
           | Cell _ Alone _ _ -> "|"
           | Cell _ Center _ _ -> "<hr noshade size=1>" ]
         in
