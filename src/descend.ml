@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.18 1999-08-03 05:14:05 ddr Exp $ *)
+(* $Id: descend.ml,v 2.19 1999-08-04 04:24:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -462,17 +462,13 @@ value print_repeat_child conf base p1 p2 e =
   end
 ;
 
-value afficher_date_mariage conf base p c dmar =
-  if age_autorise conf base p && age_autorise conf base c then
-    match dmar with
-    [ Some d -> Wserver.wprint "<font size=-2>%d</font>" (annee d)
-    | None -> () ]
-  else ()
+value afficher_date_mariage conf base fam p c =
+  Wserver.wprint "%s" (Date.short_marriage_date_text conf base fam p c)
 ;
 
-value afficher_spouse conf base marks paths p c dmar =
+value afficher_spouse conf base marks paths fam p c =
   do Wserver.wprint "\n&amp;";
-     afficher_date_mariage conf base p c dmar;
+     afficher_date_mariage conf base fam p c;
      Wserver.wprint " ";
      stag "strong" begin
        afficher_personne_referencee conf base c;
@@ -492,14 +488,13 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
         List.fold_left
           (fun (cnt, first, need_br) ifam ->
              let fam = foi base ifam in
-             let dmar = Adef.od_of_codate fam.marriage in
              let c = spouse p (coi base ifam) in
              let el = fam.children in
              let c = poi base c in
              do if need_br then html_br conf else ();
                 if not first then print_repeat_child conf base p1 c1 e
                 else ();
-                afficher_spouse conf base marks paths p c dmar;
+                afficher_spouse conf base marks paths fam p c;
                 Wserver.wprint "\n";
              return
              let print_children =
@@ -524,9 +519,6 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                 List.fold_left
                                   (fun first ifam ->
                                      let fam = foi base ifam in
-                                     let dm =
-                                       Adef.od_of_codate fam.marriage
-                                     in
                                      let c1 = spouse e (coi base ifam) in
                                      let el = fam.children in
                                      let c1 = poi base c1 in
@@ -537,7 +529,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                           return ()
                                         else ();
                                         afficher_spouse conf base marks
-                                          paths e c1 dm;
+                                          paths fam e c1;
                                         if Array.length el <> 0 then
                                           Wserver.wprint "....."
                                         else ();
@@ -577,14 +569,13 @@ value print_family conf base marks paths max_lev lev p =
     List.fold_left
       (fun cnt ifam ->
          let fam = foi base ifam in
-         let dmar = Adef.od_of_codate fam.marriage in
          let c = spouse p (coi base ifam) in
          let el = fam.children in
          let c = poi base c in
          do stag "strong" begin
               afficher_personne_referencee conf base p;
             end;
-            afficher_spouse conf base marks paths p c dmar;
+            afficher_spouse conf base marks paths fam p c;
             Wserver.wprint "<ol start=%d>\n" (succ cnt);
          return
          let cnt =
@@ -604,14 +595,11 @@ value print_family conf base marks paths max_lev lev p =
                           Array.iter
                             (fun ifam ->
                                let fam = foi base ifam in
-                               let dm =
-                                 Adef.od_of_codate fam.marriage
-                               in
                                let c = spouse e (coi base ifam) in
                                let el = fam.children in
                                let c = poi base c in
-                               do afficher_spouse conf base marks paths e c
-                                    dm;
+                               do afficher_spouse conf base marks paths fam e
+                                    c;
                                   if Array.length el <> 0 then
                                     Wserver.wprint "....."
                                   else ();
@@ -923,6 +911,114 @@ value afficher_descendants_table conf base max_lev a =
   return ()
 ;
 
+value print_tree conf base v p =
+  let title _ =
+    Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
+      (person_text_no_html conf base p)
+  in
+  let rec nb_column n v p =
+    if v == 0 then n + 1
+    else
+      if Array.length p.family = 0 then n + 1
+      else
+        List.fold_left (fun n ifam -> fam_nb_column n v (foi base ifam))
+          n (Array.to_list p.family)
+  and fam_nb_column n v fam =
+    if Array.length fam.children = 0 then n + 1
+    else List.fold_left (fun n iper -> nb_column n (v - 1) (poi base iper)) n
+      (Array.to_list fam.children)
+  in
+  let print_person first v po =
+    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
+       match po with
+       [ Some p ->
+           let ncol = nb_column 0 (v - 1) p in
+           let txt =
+             if v = 1 then person_text_without_surname conf base p
+             else person_title_text conf base p
+           in
+           let txt = reference conf base p txt in
+           let txt = txt ^ Date.short_dates_text conf base p in
+           stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
+             Wserver.wprint "%s" txt;
+           end
+       | None -> Wserver.wprint "<td>&nbsp;</td>" ];
+       Wserver.wprint "\n";
+    return ()
+  in
+  let print_spouses first v po =
+    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
+       match po with
+       [ Some p when Array.length p.family > 0 ->
+           let _ =
+             List.fold_left
+               (fun first ifam ->
+                  do if not first then
+                       Wserver.wprint "<td>&nbsp;&nbsp;</td>\n"
+                     else ();
+                     let fam = foi base ifam in
+                     let ncol = fam_nb_column 0 (v - 1) fam in
+                     let sp = poi base (spouse p (coi base ifam)) in
+                     let txt = person_title_text conf base sp in
+                     let txt = reference conf base sp txt in
+                     let txt = txt ^ Date.short_dates_text conf base sp in
+                     stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
+                       Wserver.wprint "&amp;%s %s"
+                         (Date.short_marriage_date_text conf base fam p sp)
+                         txt;
+                     end;
+                     Wserver.wprint "\n";
+                  return False)
+               True (Array.to_list p.family)
+           in
+           ()
+       | _ -> Wserver.wprint "<td>&nbsp;</td>\n" ];
+    return ()
+  in
+  let next_gen gen =
+    List.fold_right
+      (fun po gen ->
+         match po with
+         [ Some p ->
+             if Array.length p.family = 0 then [None :: gen]
+             else
+               List.fold_right
+                 (fun ifam gen ->
+                    let fam = foi base ifam in
+                    if Array.length fam.children = 0 then [None :: gen]
+                    else
+                      List.fold_right
+                        (fun iper gen -> [Some (poi base iper) :: gen])
+                        (Array.to_list fam.children) gen)
+                 (Array.to_list p.family) gen
+         | None -> [None :: gen] ])
+      gen []
+  in
+  do header_no_page_title conf title;
+     tag "table" "border=1 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
+       loop [Some p] (v + 1) where rec loop gen v =
+         if v == 0 then ()
+         else
+           do tag "tr" begin
+                let _ =
+                  List.fold_left
+                    (fun first po -> do print_person first v po; return False)
+                    True gen
+                in ();
+              end;
+              tag "tr" begin
+                let _ =
+                  List.fold_left
+                    (fun first po -> do print_spouses first v po; return False)
+                    True gen
+                in ();
+              end;
+           return loop (next_gen gen) (v - 1);
+     end;
+     trailer conf;
+  return ()
+;
+
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> afficher_descendants_jusqu_a conf base v p
@@ -931,5 +1027,6 @@ value print conf base p =
   | (Some "N", Some v) -> afficher_descendants_numerotation conf base v p
   | (Some "G", Some v) -> afficher_index_descendants conf base v p
   | (Some "C", Some v) -> afficher_index_spouses conf base v p
+  | (Some "R", Some v) -> print_tree conf base v p
   | _ -> afficher_menu_descendants conf base p ]
 ;

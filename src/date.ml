@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.8 1999-06-02 19:23:30 ddr Exp $ *)
+(* $Id: date.ml,v 2.9 1999-08-04 04:24:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -231,6 +231,14 @@ value short_dates_text conf base p =
       | _ -> s ]
     in
     if s <> "" then " <em>" ^ s ^ "</em>" else s
+  else ""
+;
+
+value short_marriage_date_text conf base fam p1 p2 =
+  if age_autorise conf base p1 && age_autorise conf base p2 then
+    match Adef.od_of_codate fam.marriage with
+    [ Some d -> "<font size=-2>" ^ year_text d ^ "</font>"
+    | None -> "" ]
   else ""
 ;
 

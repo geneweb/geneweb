@@ -2,8 +2,9 @@ GeneWeb version 2.05
 --------------------
 
 * General
-  - [Aug 4, 99] In the distribution main directory, files README.txt and
-    ALIRE.txt, added a few lines of explanations for starting with GeneWeb.
+  - [Aug 4, 99] In the distribution main directory, files README.txt (English)
+    and LISEZMOI.txt (French), added a few lines of explanations for starting
+    with GeneWeb.
   - [Jul 15, 99] Changed internal representation of strings in data bases.
     Should not make any differences while browsing. However, as it is a major
     internal change in the program, problems may appear (mainly in displaying

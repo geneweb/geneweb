@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.11 1999-08-03 05:14:06 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.12 1999-08-04 04:24:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -238,11 +238,11 @@ value spouse_text conf base end_sp ip ipl =
       match a.parents with
       [ Some ifam ->
           let c = coi base ifam in
+          let fam = foi base ifam in
           let sp = if ip = c.father then c.mother else c.father in
           let d =
-            match Adef.od_of_codate (foi base ifam).marriage with
-            [ Some d -> "<font size=-2>" ^ Date.year_text d ^ "</font>"
-            | None -> "" ]
+            Date.short_marriage_date_text conf base fam (poi base c.father)
+              (poi base c.mother)
           in
           (someone_text conf base sp, d)
       | _ -> ("", "") ]
@@ -463,9 +463,8 @@ value other_parent_text_if_same conf base info =
           match other_parent with
           [ Some ip ->
               let d =
-                match Adef.od_of_codate (foi base ifam1).marriage with
-                [ Some d -> "<font size=-2>" ^ Date.year_text d ^ "</font>"
-                | None -> "" ]
+                Date.short_marriage_date_text conf base (foi base ifam1)
+                  (poi base cpl1.father) (poi base cpl1.mother)
               in
               "&amp;" ^ d ^ " " ^ someone_text conf base ip
           | _ -> "" ]

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.12 1999-07-22 19:47:21 ddr Exp $ *)
+(* $Id: some.ml,v 2.13 1999-08-04 04:24:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -199,16 +199,8 @@ value she_has_children_with_her_name base wife husband children =
       (Array.to_list children)
 ;
 
-value afficher_date_mariage conf base p c dmar =
-  if age_autorise conf base p && age_autorise conf base c then
-    match dmar with
-    [ Some d ->
-        do Wserver.wprint "<font size=-2>";
-           Date.display_year d;
-           Wserver.wprint "</font>";
-        return ()
-    | None -> () ]
-  else ()
+value afficher_date_mariage conf base fam p c =
+  Wserver.wprint "%s" (Date.short_marriage_date_text conf base fam p c)
 ;
 
 value max_lev = 3;
@@ -228,7 +220,6 @@ value rec print_branch conf base lev name p =
     let _ = List.fold_left
       (fun (first, need_br) ifam ->
          let fam = foi base ifam in
-         let dmar = Adef.od_of_codate fam.marriage in
          let c = spouse p (coi base ifam) in
          let el = fam.children in
          let c = poi base c in
@@ -244,7 +235,7 @@ value rec print_branch conf base lev name p =
               return ()
             else ();
             Wserver.wprint "  &amp;";
-            afficher_date_mariage conf base p c dmar;
+            afficher_date_mariage conf base fam p c;
             Wserver.wprint " <strong>";
             afficher_personne_referencee conf base c;
             Wserver.wprint "</strong>";
