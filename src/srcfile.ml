@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.22 2004-02-02 11:47:54 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.23 2004-11-09 12:33:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -211,7 +211,7 @@ value string_of_num sep num =
 value macro conf base =
   fun
   [ 'a' ->
-      match Util.find_person_in_env conf base "z" with
+      match Util.find_sosa_ref conf base with
       [ Some ip -> referenced_person_title_text conf base ip
       | None -> "" ]
   | 'b' ->
@@ -379,7 +379,7 @@ value rec copy_from_stream conf base strm mode =
         | Some _ -> True ]
     | 's' -> p_getenv conf.base_env (get_variable strm) <> Some "no"
     | 'w' -> conf.wizard
-    | 'z' -> Util.find_person_in_env conf base "z" <> None
+    | 'z' -> Util.find_sosa_ref conf base <> None
     | '|' ->
         let a = if_expr (Stream.next strm) in
         let b = if_expr (Stream.next strm) in a || b

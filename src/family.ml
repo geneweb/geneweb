@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.43 2004-11-06 05:38:31 ddr Exp $ *)
+(* $Id: family.ml,v 4.44 2004-11-09 12:33:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -141,7 +141,7 @@ value name_with_roman_number str =
 ;
 
 value find_all conf base an =
-  let sosa_ref = Util.find_person_in_env conf base "z" in
+  let sosa_ref = Util.find_sosa_ref conf base in
   let sosa_nb = try Some (Num.of_string an) with [ Failure _ -> None ] in
   match (sosa_ref, sosa_nb) with
   [ (Some p, Some n) ->
@@ -534,7 +534,7 @@ value only_special_env = List.for_all (fun (x, _) -> List.mem x special_vars);
 
 value extract_henv conf base =
   do {
-    match find_person_in_env conf base "z" with
+    match find_sosa_ref conf base with
     [ Some p ->
         let x =
           let first_name = p_first_name base p in

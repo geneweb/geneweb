@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.92 2004-11-06 16:58:44 ddr Exp $ *)
+(* $Id: util.ml,v 4.93 2004-11-09 12:33:50 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1804,7 +1804,7 @@ value find_sosa_ref conf base =
   match find_person_in_env conf base "z" with
   [ Some p -> Some p
   | None ->
-      match p_getenv conf.base_env "var_author" with
+      match p_getenv conf.base_env "default_sosa_ref" with
       [ Some n ->
           if n = "" then None
           else
