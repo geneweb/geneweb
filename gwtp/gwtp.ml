@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.32 2000-08-18 13:04:22 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.33 2000-08-18 13:05:08 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -243,8 +243,8 @@ value set_base_conf b (wizpw, fripw) =
        done
      with
      [ End_of_file -> close_in ic ];
-     if not wizpw_ok.val then fprintf oc "wizard_passwd=%s" wizpw else ();
-     if not fripw_ok.val then fprintf oc "friend_passwd=%s" fripw else ();
+     if not wizpw_ok.val then fprintf oc "wizard_passwd=%s\n" wizpw else ();
+     if not fripw_ok.val then fprintf oc "friend_passwd=%s\n" fripw else ();
      close_out oc;
      try Sys.remove fname_saved with [ Sys_error _ -> () ];
      Sys.rename fname fname_saved;
