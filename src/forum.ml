@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.18 2002-11-14 02:43:12 ddr Exp $ *)
+(* $Id: forum.ml,v 4.19 2002-11-27 20:13:02 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -133,6 +133,7 @@ value print_headers conf =
               else
                 let (time, s) = get_var ic "Time:" s in
                 let (ident, s) = get_var ic "Ident:" s in
+                let (wizard, s) = get_var ic "Wizard:" s in
                 let (_, s) = get_var ic "Email:" s in
                 let (subject, s) = get_var ic "Subject:" s in
                 let (_, s) = get_var ic "Text:" s in
@@ -231,6 +232,7 @@ value get_message conf pos =
             let s = input_line ic in
             let (time, s) = get_var ic "Time:" s in
             let (ident, s) = get_var ic "Ident:" s in
+            let (wizard, s) = get_var ic "Wizard:" s in
             let (email, s) = get_var ic "Email:" s in
             let (subject, s) = get_var ic "Subject:" s in
             let (_, s) = get_var ic "Text:" s in
@@ -244,8 +246,8 @@ value get_message conf pos =
             in
             if ident <> "" then
               Some
-                (time, ident, email, subject, mess, ic_len - pos_in ic,
-                 ic_len)
+                (time, ident, wizard, email, subject, mess,
+                 ic_len - pos_in ic, ic_len)
             else None
           }
         with
@@ -281,7 +283,7 @@ value backward_pos conf pos =
 
 value print_forum_message conf base pos =
   match get_message conf pos with
-  [ Some (time, ident, email, subject, mess, next_pos, forum_length) ->
+  [ Some (time, ident, wizard, email, subject, mess, next_pos, forum_length) ->
       let title _ =
         let subject =
           if subject = "" || subject = "-" then
@@ -336,6 +338,16 @@ value print_forum_message conf base pos =
         if browser_doesnt_have_tables conf then ()
         else Wserver.wprint "</table>";
         Wserver.wprint "</dl>\n";
+(*
+        if wizard <> "" && conf.wizard && conf.user = wizard then
+          let s = message_txt conf 0 in
+          do {
+            Wserver.wprint "<p>\n";
+            Wserver.wprint "<a href=\"%sm=FORUM_DEL;p=%d\">%s</a>\n"
+              (commd conf) pos (transl_decline conf "delete" s)
+          }
+        else ();
+*)
         trailer conf;
       }
   | None -> print_forum_headers conf base ]
@@ -415,6 +427,10 @@ value forum_add conf base ident comm =
             fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
               conf.today.year conf.today.month conf.today.day hh mm ss;
             fprintf oc "Ident: %s\n" ident;
+            if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
+            then
+              fprintf oc "Wizard: %s\n" conf.user
+            else ();
             if email <> "" then fprintf oc "Email: %s\n" email else ();
             let subject = if subject = "" then "-" else subject in
             fprintf oc "Subject: %s\n" subject;
@@ -472,4 +488,23 @@ value print_add_ok conf base =
       }
     with
     [ Update.ModErr -> () ]
+;
+
+value print_delete_forum_message conf base pos =
+  ()
+;
+
+value delete_forum_message conf base pos =
+  match get_message conf pos with
+  [ Some (time, ident, wizard, email, subject, mess, next_pos, forum_length) ->
+      if conf.wizard && conf.user <> "" && wizard = conf.user then
+        print_delete_forum_message conf base pos
+      else print_forum_headers conf base
+  | None -> print_forum_headers conf base ]
+;
+
+value print_del conf base =
+  match p_getint conf.env "p" with
+  [ Some pos -> delete_forum_message conf base pos
+  | None -> print_forum_headers conf base ]
 ;
