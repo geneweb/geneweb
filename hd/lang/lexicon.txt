@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.158 2000-09-07 08:14:51 ddr Exp $
+# $Id: lexicon.txt,v 3.159 2000-09-14 00:29:32 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -85,7 +85,7 @@ en:  to try again with this number, or do "back" and change it yourself
 eo:  por reprovi kun cxi tiu numero, aù faru "malantauxe" kaj sxangxu ion mem
 es:  para ensayar de nuevo con este n&uacute;mero, o haga "back" y escoja otro
 fi:  yritt&auml;&auml;ksesi uudelleen t&auml;ll&auml numerolla,  tai peruuta ja muuta se itse
-fr:  pour r&eacute;essayer avec ce num&eacute;ro, ou bien faites "back" et choisissez-en un autre
+fr:  pour r&eacute;essayer avec ce num&eacute;ro, ou bien sur "retour" et choisissez-en un autre
 he:  ìğñåú ùåá òí äîñôø äæä, àå "çæøä" åìùğåú áòöîê
 is:  til ağ reyna şetta aftur meğ şessu númeri, eğa veldu "Til baka" og breyttu şví sjálf(ur)
 it:  per provare di nuovo con questo numero, oppure fate "back" e scieglietene un'altro
