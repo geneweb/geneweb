@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 3.7 2001-01-26 02:18:44 ddr Exp $ *)
+(* $Id: wserver.mli,v 3.8 2001-01-26 19:39:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -53,7 +53,7 @@ value get_request_and_content : Stream.t char -> (list string * string);
 
 value sock_in : ref string;
 value sock_out : ref string;
-value nofork : ref bool;
+value noproc : ref bool;
 
 (* Example:
 
