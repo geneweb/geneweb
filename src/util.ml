@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.9 1999-04-07 11:49:49 ddr Exp $ *)
+(* $Id: util.ml,v 2.10 1999-04-09 13:29:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -299,7 +299,7 @@ value afficher_personne_titre_referencee conf base p =
   if p.access <> Private || conf.friend || conf.wizard then
     match main_title base p with
     [ Some t ->
-        do tag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
+        do stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
              Wserver.wprint "%s" (titled_person_text conf base p t);
            end;
            afficher_un_titre conf base p t;
