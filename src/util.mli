@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 1.5 1998-12-05 13:29:54 ddr Exp $ *)
+(* $Id: util.mli,v 1.6 1998-12-09 15:13:43 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -20,7 +20,7 @@ value exit_nobr : unit -> unit;
 
 value connais : base -> base_person -> bool;
 value acces : config -> base -> base_person -> string;
-value calculer_age : config -> base_person -> option date;
+value calculer_age : config -> person 'a -> option date;
 value person_text : config -> base -> base_person -> string;
 value person_text_no_html : config -> base -> base_person -> string;
 value person_text_without_surname : config -> base -> base_person -> string;

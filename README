@@ -5,7 +5,8 @@ off-line or as a Web service.
 
 This is the version 1.09.
 
-To compile, you need the Objective Caml compiler, and the preprocessor Camlp4.
+To compile, you need the Objective Caml compiler, and the preprocessor
+Camlp4.
 
 Objective Caml can be found at address:
    http://caml.inria.fr/ocaml/

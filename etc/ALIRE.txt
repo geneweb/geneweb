@@ -8,7 +8,7 @@ Si vous avez installe GeneWeb, par exemple dans le repertoire
 ouvrez la location:
      file:/home/dupont/geneweb/doc/index.htm
 
-Une solution plus simple, sous Windows 95/NT, sans avoir besoin de
+Une solution plus simple, sous Windows 95/98/NT, sans avoir besoin de
 lancer préalablement le navigateur, est de double-cliquer sur le
 fichier "index.htm" du répertoire "doc".
 
@@ -28,4 +28,4 @@ Remarques, suggestions, questions, rapports d'anomalie a:
 	http://cristal.inria.fr/~ddr/
 
 Veuillez preciser le numero de version above et le systeme sur lequel
-vous tournez (Linux, Windows NT ou Windows 95).
+vous tournez (Linux, Windows NT ou Windows 95/98).
