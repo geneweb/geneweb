@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.104 2004-12-30 21:20:05 ddr Exp $ *)
+(* $Id: util.ml,v 4.105 2004-12-31 03:59:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -286,23 +286,13 @@ value secure s =
   else s
 ;
 
-(**)
-value xhs = "";
-value doctype = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\">";
-(*
-value xhs = " /";
-value doctype = "\
-<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" 
- \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">";
-*)
-
 value begin_centered conf =
   Wserver.wprint
     "<table border=\"%d\" width=\"100%%\"><tr><td align=\"center\">\n"
     conf.border;
 value end_centered _ = Wserver.wprint "</td></tr></table>\n";
 
-value html_br conf = do { Wserver.wprint "<br%s>" xhs; Wserver.wprint "\n"; };
+value html_br conf = Wserver.wprint "<br%s>\n" conf.xhs;
 
 value html_p conf = do { Wserver.wprint "<p>"; Wserver.wprint "\n"; };
 
@@ -433,7 +423,7 @@ value hidden_env conf =
   List.iter
     (fun (k, v) ->
        Wserver.wprint "<input type=\"hidden\" name=\"%s\" value=\"%s\"%s>\n" k
-         (quote_escaped (decode_varenv v)) xhs)
+         (quote_escaped (decode_varenv v)) conf.xhs)
     (conf.henv @ conf.senv)
 ;
 
@@ -1113,7 +1103,7 @@ value include_hed_trl conf base_opt suff =
       in
       copy_from_etc
         [('p', pref); ('s', suff); ('t', fun _ -> commd conf);
-          ('/', fun _ -> xhs)]
+          ('/', fun _ -> conf.xhs)]
         conf.lang conf.indep_command ic
   | None -> () ]
 ;
@@ -1137,16 +1127,25 @@ value message_to_wizard conf =
   else ()
 ;
 
+value doctype conf =
+  match p_getenv conf.base_env "doctype" with
+  [ Some "xhtml-1.1" -> "\
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" 
+ \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
+  | _ -> "\
+<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\">" ]
+;
+
 value header_without_page_title conf title =
   do {
     html1 conf;
-    Wserver.wprint "%s\n" doctype;
+    Wserver.wprint "%s\n" (doctype conf);
     Wserver.wprint "<html>\n<head>\n";
     Wserver.wprint "  <title>";
     title True;
     Wserver.wprint "</title>\n";
     include_hed_trl conf None ".hed";
-    Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\"%s>\n" xhs;
+    Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\"%s>\n" conf.xhs;
     Wserver.wprint "  \
   <style type=\"text/css\"><!--
     .highlight { color: %s; font-weight: bold }
@@ -1402,7 +1401,7 @@ value gen_trailer with_logo conf =
         in
         if not conf.setup_link then s
         else s ^ " - " ^ setup_link conf);
-     ('/', fun _ -> xhs)]
+     ('/', fun _ -> conf.xhs)]
   in
   do {
     if not with_logo then ()
@@ -1413,7 +1412,7 @@ value gen_trailer with_logo conf =
  alt=\"...\" width=\"64\" height=\"72\" style=\"border:0;float:right\"%s></a>
 <br%s>
 </div>
-" (commd conf) (image_prefix conf) xhs xhs;
+" (commd conf) (image_prefix conf) conf.xhs conf.xhs;
     match open_etc_file "copyr" with
     [ Some ic -> copy_from_etc env conf.lang conf.indep_command ic
     | None ->
@@ -1771,7 +1770,7 @@ value print_link_to_welcome conf right_aligned =
     if str = "" then () else Wserver.wprint "%s" str;
     Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
     Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\"%s>" (image_prefix conf)
-      fname wid_hei xhs;
+      fname wid_hei conf.xhs;
     Wserver.wprint "</a>\n";
     if right_aligned then Wserver.wprint "</td></tr></table>\n" else ();
   }
@@ -1781,7 +1780,13 @@ value incorrect_request conf =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "incorrect request"))
   in
-  do { header conf title; print_link_to_welcome conf False; trailer conf }
+  do {
+    header conf title;
+    Wserver.wprint "<p>\n";
+    print_link_to_welcome conf False;
+    Wserver.wprint "</p>\n";
+    trailer conf
+  }
 ;
 
 value find_person_in_env conf base suff =
@@ -2058,9 +2063,9 @@ value rchild_type_text conf t n =
       transl_nth conf "foster son/foster daughter/foster child" n ]
 ;
 
-value wprint_hidden pref name valu =
+value wprint_hidden conf pref name valu =
   Wserver.wprint "<input type=\"hidden\" name=\"%s%s\" value=\"%s\"%s>\n"
-    pref name (quote_escaped valu) xhs
+    pref name (quote_escaped valu) conf.xhs
 ;
 
 value wprint_hidden_person conf base pref p =
@@ -2069,11 +2074,13 @@ value wprint_hidden_person conf base pref p =
   if (conf.wizard && conf.friend || conf.access_by_key) &&
      not (first_name = "?" || surname = "?") then
      do {
-    wprint_hidden pref "p" (Name.lower first_name);
-    wprint_hidden pref "n" (Name.lower surname);
-    if p.occ > 0 then wprint_hidden pref "oc" (string_of_int p.occ) else ();
+    wprint_hidden conf pref "p" (Name.lower first_name);
+    wprint_hidden conf pref "n" (Name.lower surname);
+    if p.occ > 0 then wprint_hidden conf pref "oc" (string_of_int p.occ)
+     else ();
   }
-  else wprint_hidden pref "i" (string_of_int (Adef.int_of_iper p.cle_index))
+  else
+    wprint_hidden conf pref "i" (string_of_int (Adef.int_of_iper p.cle_index))
 ;
 
 exception Ok;

@@ -184,6 +184,7 @@ relationLink.cmo: adef.cmi config.cmi dag.cmi date.cmi def.cmi gutil.cmi \
     num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi relationLink.cmi 
 relationLink.cmx: adef.cmx config.cmi dag.cmx date.cmx def.cmi gutil.cmx \
     num.cmx pqueue.cmx util.cmx ../wserver/wserver.cmx relationLink.cmi 
+relationLink.cmi: config.cmi def.cmi 
 robot.cmo: secure.cmi srcfile.cmi util.cmi ../wserver/wserver.cmi 
 robot.cmx: secure.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
 secure.cmo: secure.cmi 

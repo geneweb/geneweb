@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.25 2004-12-30 21:20:05 ddr Exp $ *)
+(* $Id: dag.ml,v 4.26 2004-12-31 03:59:53 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -140,20 +140,20 @@ value image_txt conf base p =
   [ Some "on" ->
       match image_and_size conf base p (limited_image_size 100 75) with
       [ Some (True, f, Some (wid, hei)) ->
-          "<br" ^ xhs ^
+          "<br" ^ conf.xhs ^
            ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_normal_txt conf base p f wid hei ^ "</table></center>\n"
       | Some (True, f, None) ->
-          "<br" ^ xhs ^
+          "<br" ^ conf.xhs ^
           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_normal_txt conf base p f 100 0 ^ "</table></center>\n"
       | Some (False, url, Some (wid, hei)) ->
-          "<br" ^ xhs ^
+          "<br" ^ conf.xhs ^
           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_url_txt_with_size conf base url wid hei ^
             "</table></center>\n"
       | Some (False, url, None) ->
-          "<br" ^ xhs ^
+          "<br" ^ conf.xhs ^
           ">\n<center><table border=\"0\"><tr align=\"left\"><td>\n" ^
             image_url_txt conf base url 75 ^ "</table></center>\n"
       | _ -> "" ]
@@ -194,7 +194,7 @@ value print_table conf hts =
                 match align with
                 [ LeftA | RightA -> Wserver.wprint "width:50%%"
                 | _ -> () ];
-                Wserver.wprint "\"%s>" xhs;
+                Wserver.wprint "\"%s>" conf.xhs;
               } ];
           Wserver.wprint "</td>\n"
         };
@@ -764,7 +764,7 @@ value make_tree_hts
                          p ps
                    | None -> "" ]
                  in
-                 txt ^ "<br" ^ xhs ^ ">\n&amp;" ^ d ^ " " ^
+                 txt ^ "<br" ^ conf.xhs ^ ">\n&amp;" ^ d ^ " " ^
                    Util.referenced_person_title_text conf base ps ^
                    Date.short_dates_text conf base ps)
             txt spouses

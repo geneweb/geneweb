@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.47 2004-12-30 21:20:05 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.48 2004-12-31 03:59:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -699,8 +699,7 @@ value print_family_long conf base ws wn all_gp ifam nth moth_nb =
                 in
                 print_notes_ref conf base pc wn moth_nb child_n
               } ];
-          if i <> Array.length des.children - 1 then
-            Wserver.wprint "<br%s>&nbsp;\n" xhs
+          if i <> Array.length des.children - 1 then xtag "br"
           else ()
         }
         else ()
@@ -1991,7 +1990,7 @@ value print_male_female_line male conf base v p =
         (fun first ip ->
            let p = pget conf base ip in
            do {
-             if not first then Wserver.wprint "|<br%s>\n" xhs else ();
+             if not first then Wserver.wprint "|<br%s>\n" conf.xhs else ();
              Wserver.wprint "%s\n%s"
                (referenced_person_title_text conf base p)
                (Date.short_dates_text conf base p);
@@ -2144,7 +2143,8 @@ value build_surnames_list conf base v p =
 value print_surnames_list conf base v p =
   let title h =
     do {
-      if not h then Wserver.wprint "%s<br%s>" (person_text conf base p) xhs
+      if not h then
+        Wserver.wprint "%s<br%s>" (person_text conf base p) conf.xhs
       else ();
       Wserver.wprint "- %s -" (capitale (transl conf "surnames list"))
     }

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 4.12 2004-12-28 15:13:00 ddr Exp $ *)
+(* $Id: history.ml,v 4.13 2004-12-31 03:59:53 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -214,22 +214,17 @@ value print_history conf base ic =
       tag "form" "method=\"get\" action=\"%s\"" conf.command begin
         tag "p" begin
           Util.hidden_env conf;
-          Wserver.wprint
-            "<input type=\"hidden\" name=\"m\" value=\"HIST\"%s>\n" xhs;
-          Wserver.wprint
-            "<input name=\"k\" size=\"3\" value=\"%d\"%s>\n" k xhs;
-          Wserver.wprint
-            "<input type=\"hidden\" name=\"pos\" value=\"%d\"%s>\n" pos xhs;
+          xtag "input" "type=\"hidden\" name=\"m\" value=\"HIST\"";
+          xtag "input" "name=\"k\" size=\"3\" value=\"%d\"" k;
+          xtag "input" "type=\"hidden\" name=\"pos\" value=\"%d\"" pos;
           if wiz <> "" then do {
-            Wserver.wprint
-              "<input type=\"hidden\" name=\"wiz\" value=\"%s\"%s>\n" wiz xhs;
+            xtag "input" "type=\"hidden\" name=\"wiz\" value=\"%s\"" wiz;
             Wserver.wprint "(%s)\n" wiz;
           }
           else ();
-          Wserver.wprint "<input type=\"submit\" value=\"&gt;&gt;\"%s>\n" xhs;
+          xtag "input" "type=\"submit\" value=\"&gt;&gt;\"";
           if wiz <> "" then
-            Wserver.wprint
-              "<input type=\"submit\" name=\"n\" value=\"&gt;&gt;\"%s>\n" xhs
+            xtag "input" "type=\"submit\" name=\"n\" value=\"&gt;&gt;\""
           else ();
         end;
       end
