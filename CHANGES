@@ -5,7 +5,9 @@ GeneWeb version 4.06
   - [03 Mar 02] Fixed bug (introduced in version 4.05): in CGI mode,
     the images (logo, background, flags) did not appear, because they were
     incompletely sent (a solution to turn around this bug is to use the
-    option -images_url).
+    option -images_url). There is the same problem with the "DOC" link,
+    the same fix works also for it, but there is no way to turn around it
+    in version 4.05.
   - [02 Mar 02] Fixed bug: when clicking on somebody's link, could sometimes
     access the wrong person, typically when the two persons had the same
     combination "firstname surname" cut differently, e.g. François-Victor
