@@ -5,6 +5,8 @@ GeneWeb Version 3.07
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [12 Aug 00] For relationlinks by shortest path, if "cancel GeneWeb
+    links" is selected, now it is applied to all pages browsed by ">>".
   - [12 Aug 00] Added also check baptism date to determine public and
     private.
   - [09 Aug 00] Fixed a problem of missing space after "married to" in
