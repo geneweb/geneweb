@@ -1,8 +1,7 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.3 1999-04-30 14:24:52 ddr Exp $ *)
+(* $Id: setup.ml,v 1.4 1999-04-30 16:26:37 ddr Exp $ *)
 
 value default_lang = "en";
-value root_dir = ref "gw";
 value setup_dir = ref "setup";
 
 value buff = ref (String.create 80);
@@ -118,7 +117,6 @@ value parameters =
        let s = strip_spaces (decode_varenv s) in
        if k = "opt" then comm
        else if k = "anon" then comm ^ " " ^ s
-       else if k = "o" then comm ^ " -o " ^ Filename.concat root_dir.val s
        else if s = "on" then comm ^ " -" ^ k
        else if s = "" then comm
        else comm ^ " -" ^ k ^ " " ^ s)
@@ -150,7 +148,7 @@ value for_all_db conf ic =
           if c = '}' then get_buff len
           else loop (store len c)
       in
-      let dh = Unix.opendir root_dir.val in
+      let dh = Unix.opendir "." in
       try
         while True do
           let e = Unix.readdir dh in
@@ -174,7 +172,7 @@ value copy_from_channel conf ic =
           match c with
           [ 'a' -> Wserver.wprint "%s" (strip_spaces (getenv conf.env "anon"))
           | 'b' -> for_all_db conf ic
-          | 'c' -> Wserver.wprint "%s" (Filename.concat root_dir.val conf.comm)
+          | 'c' -> Wserver.wprint "%s" (Filename.concat "." conf.comm)
           | 'd' -> Wserver.wprint "%s" conf.comm
           | 'e' ->
               do Wserver.wprint "lang=%s" conf.lang;
@@ -198,7 +196,7 @@ value copy_from_channel conf ic =
 ;
 
 value print_file conf fname =
-  let dir = Filename.concat root_dir.val setup_dir.val in
+  let dir = setup_dir.val in
   let fname = Filename.concat (Filename.concat dir conf.lang) fname in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -249,8 +247,7 @@ value out_check conf =
   in
   if out = "" then print_file conf "missing.html"
   else if not (good_name out) then print_file conf "incorrect.html"
-  else if Sys.file_exists (Filename.concat root_dir.val (out ^ ".gwb")) then
-    print_file conf "conflict.html"
+  else if Sys.file_exists (out ^ ".gwb") then print_file conf "conflict.html"
   else print_file conf "create.html"
 ;
 
@@ -281,7 +278,7 @@ value exec_f comm =
 
 value exec_command conf =
   let rc =
-    exec_f (Filename.concat root_dir.val conf.comm ^ parameters conf.env)
+    exec_f (Filename.concat "." conf.comm ^ parameters conf.env)
   in
   if rc = 1 then print_file conf "warnings.html"
   else if rc > 1 then print_file conf "error.html"
@@ -310,7 +307,7 @@ value setup_comm conf =
       [ Some "check" -> ged2gwb_check conf
       | _ -> exec_command conf ]
   | "list" ->
-      let dh = Unix.opendir root_dir.val in
+      let dh = Unix.opendir "." in
       if has_gwb_directories dh then print_file conf "list.html"
       else print_file conf "nolist.html"
   | _ -> error () ]
@@ -348,7 +345,7 @@ value wrap_setup a b =
 ;
 
 value copy_text fname =
-  let dir = Filename.concat root_dir.val setup_dir.val in
+  let dir = setup_dir.val in
   let fname = Filename.concat dir fname in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -368,8 +365,11 @@ value copy_text fname =
       return () ]
 ;
 
+value root_dir = ref "gw";
+
 value intro () =
-  do copy_text "intro.txt";
+  do Sys.chdir root_dir.val;
+     copy_text "intro.txt";
      let lang =
        let x = input_line stdin in
        if x = "" then default_lang else x
