@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.23 1999-09-16 09:31:51 ddr Exp $ *)
+(* $Id: update.ml,v 2.24 1999-09-16 15:01:15 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -477,6 +477,7 @@ value reconstitute_date conf var =
         [ Some "G" -> (d, Dgregorian)
         | Some "J" -> (Calendar.gregorian_of_julian d, Djulian)
         | Some "F" -> (Calendar.gregorian_of_french d, Dfrench)
+        | Some "H" -> (Calendar.gregorian_of_hebrew d, Dhebrew)
         | _ -> (d, Dgregorian) ]
       in
       Some (Dgreg d cal)
@@ -497,25 +498,26 @@ value print_date conf base lab var d =
            [ Some (Dgreg d Dgregorian) -> Some d
            | Some (Dgreg d Djulian) -> Some (Calendar.julian_of_gregorian d)
            | Some (Dgreg d Dfrench) -> Some (Calendar.french_of_gregorian d)
+           | Some (Dgreg d Dhebrew) -> Some (Calendar.hebrew_of_gregorian d)
            | _ -> None ]
          in
          tag "td" begin
-           Wserver.wprint "%s\n" (transl_nth conf "day/month/year" 0);
-           Wserver.wprint "<input name=%s_dd size=2 maxlength=2%s>\n" var
+           Wserver.wprint "%s\n" (transl_nth conf "year/month/day" 0);
+           Wserver.wprint "<input name=%s_yyyy size=5 maxlength=5%s>\n" var
              (match d with
-              [ Some {day = d} when d <> 0 ->
-                  " value=" ^ string_of_int d
+              [ Some {year = y} -> " value=" ^ string_of_int y
               | _ -> "" ]);
-           Wserver.wprint "%s\n" (transl_nth conf "day/month/year" 1);
+           Wserver.wprint "%s\n" (transl_nth conf "year/month/day" 1);
            Wserver.wprint "<input name=%s_mm size=2 maxlength=2%s>\n" var
              (match d with
               [ Some {month = m} when m <> 0 ->
                   " value=" ^ string_of_int m
               | _ -> "" ]);
-           Wserver.wprint "%s\n" (transl_nth conf "day/month/year" 2);
-           Wserver.wprint "<input name=%s_yyyy size=5 maxlength=5%s>\n" var
+           Wserver.wprint "%s\n" (transl_nth conf "year/month/day" 2);
+           Wserver.wprint "<input name=%s_dd size=2 maxlength=2%s>\n" var
              (match d with
-              [ Some {year = y} -> " value=" ^ string_of_int y
+              [ Some {day = d} when d <> 0 ->
+                  " value=" ^ string_of_int d
               | _ -> "" ]);
          end;
          tag "td" begin
@@ -548,6 +550,11 @@ value print_date conf base lab var d =
                 [ Some (Dgreg _ Dfrench) -> " selected"
                 | _ -> "" ])
                (capitale (transl_nth conf "gregorian/julian/french/hebrew" 2));
+             Wserver.wprint "<option value=H%s>%s\n"
+               (match d with
+                [ Some (Dgreg _ Dhebrew) -> " selected"
+                | _ -> "" ])
+               (capitale (transl_nth conf "gregorian/julian/french/hebrew" 3));
            end;
          end;
          tag "td" begin

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.118 1999-09-14 22:33:36 ddr Exp $
+# $Id: lexicon.txt,v 2.119 1999-09-16 15:01:07 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1169,6 +1169,7 @@ se: begravd
     calendar
 en: calendar
 fr: calendrier
+se: kalender
 
     cancel GeneWeb links
 cs: zru¹it svazky GeneWebu
@@ -1422,10 +1423,6 @@ nl: datum
 no: dato
 pt: data
 se: datum
-
-    day/month/year
-en: day/month/year
-fr: jour/mois/ann&eacute;e
 
     days old
 cs: dnù starý/dnù stará
@@ -1921,6 +1918,7 @@ se: gammel-far(mor)f&ouml;r&auml;ldrar
     gregorian/julian/french/hebrew
 en: Gregorian/Julian/French/Hebrew
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
+se: gregoriansk/juliansk/fransk/hebreisk
 
     happy birthday to you!
 de: Herzlichen Gl&uuml;ckwunsch zum Geburstag!
@@ -3240,6 +3238,7 @@ se: plats
     precision
 en: precision
 fr: precision
+se: precision
 
     previous sibling
 cs: pøedchozí sourozenec
@@ -3771,6 +3770,7 @@ se: &auml;ndra ordningen p&aring; de f&ouml;ljande familjerna
     text
 en: text
 fr: texte
+se: text
 
     the %d first names
 cs: %d køestních jmen
@@ -4399,6 +4399,11 @@ nl: zou zijn/haar eigen voorouder zijn
 no: ville v&aelig;re sin egen etterkommer 
 pt: seria seu pr&oacute;pio ancestro
 se: skulle vara sin egen ana
+
+    year/month/day
+en: year/month/day
+fr: ann&eacute;e/mois/jour
+se: &aring;r/m&aring;nad/dag
 
     years old
 cn: Ëê

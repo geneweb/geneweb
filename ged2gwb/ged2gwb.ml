@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.34 1999-09-16 09:31:38 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.35 1999-09-16 15:01:03 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -422,6 +422,8 @@ EXTEND
           (Calendar.gregorian_of_julian d, Djulian)
       | "@"; "#"; ID "DFRENCH"; ID "R"; "@"; d = date_fren ->
           (Calendar.gregorian_of_french d, Dfrench)
+      | "@"; "#"; ID "DHEBREW"; "@"; d = date_hebr ->
+          (Calendar.gregorian_of_hebrew d, Dfrench)
       | d = date_greg -> (d, Dgregorian) ] ]
   ;
   date_greg:
@@ -433,6 +435,12 @@ EXTEND
   date_fren:
     [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." -> () | "/" -> () ];
         n2 = OPT gen_french; LIST0 [ "." -> () | "/" -> () ]; n3 = OPT int;
+        LIST0 "." ->
+          make_date n1 n2 n3 ] ]
+  ;
+  date_hebr:
+    [ [ LIST0 "."; n1 = OPT int; LIST0 [ "." -> () | "/" -> () ];
+        n2 = OPT gen_hebr; LIST0 [ "." -> () | "/" -> () ]; n3 = OPT int;
         LIST0 "." ->
           make_date n1 n2 n3 ] ]
   ;
@@ -471,6 +479,24 @@ EXTEND
       | ID "THER" -> 11
       | ID "FRUC" -> 12
       | ID "COMP" -> 13 ] ]
+  ;
+  gen_hebr:
+    [ [ m = hebr -> Right m ] ]
+  ;
+  hebr:
+    [ [ ID "TSH" -> 1
+      | ID "CSH" -> 2
+      | ID "KSL" -> 3
+      | ID "TVT" -> 4
+      | ID "SHV" -> 5
+      | ID "ADR" -> 6
+      | ID "ADS" -> 7
+      | ID "NSN" -> 8
+      | ID "IYR" -> 9
+      | ID "SVN" -> 10
+      | ID "TMZ" -> 11
+      | ID "AAV" -> 12
+      | ID "ELL" -> 13 ] ]
   ;
   int:
     [ [ i = INT -> int_of_string i | "-"; i = INT -> - int_of_string i ] ]

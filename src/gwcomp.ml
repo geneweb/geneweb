@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 2.14 1999-09-16 09:31:43 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.15 1999-09-16 15:01:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -143,6 +143,9 @@ value date_of_string s i =
           | 'F' ->
               let d = Calendar.gregorian_of_french d in
               Some (Dgreg d Dfrench, i + 1)
+          | 'H' ->
+              let d = Calendar.gregorian_of_hebrew d in
+              Some (Dgreg d Dhebrew, i + 1)
           | _ -> Some (Dgreg d Dgregorian, i) ]
     | d -> d ]
   in

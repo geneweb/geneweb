@@ -1,4 +1,4 @@
-(* $Id: calendar.ml,v 2.4 1999-09-16 12:17:24 ddr Exp $ *)
+(* $Id: calendar.ml,v 2.5 1999-09-16 15:01:11 ddr Exp $ *)
 
 (* Borrowed from Scott E. Lee http://genealogy.org/~scottlee/;
    converted his C program into this Ocaml program.
@@ -122,7 +122,7 @@ value yearOffset =
   [| 0; 12; 24; 37; 49; 61; 74; 86; 99; 111; 123;
      136; 148; 160; 173; 185; 197; 210; 222 |];
 
-value ftishri1 metonicYear moladDay moladHalakim =
+value fTishri1 metonicYear moladDay moladHalakim =
   let tishri1 = moladDay in
   let dow = tishri1 mod 7 in
   let leapYear =
@@ -180,7 +180,7 @@ value findStartOfYear year =
   in
   let pMoladDay = pMoladDay + pMoladHalakim / halakim_per_day in
   let pMoladHalakim = pMoladHalakim mod halakim_per_day in
-  let pTishri1 = ftishri1 pMetonicYear pMoladDay pMoladHalakim in
+  let pTishri1 = fTishri1 pMetonicYear pMoladDay pMoladHalakim in
   (pMetonicCycle, pMetonicYear, pMoladDay, pMoladHalakim, pTishri1)
 ;
 
@@ -202,7 +202,7 @@ value sdn_of_hebrew d =
         let moladDay = moladDay + moladHalakim / halakim_per_day in
         let moladHalakim = moladHalakim mod halakim_per_day in
         let tishri1After =
-          ftishri1 ((metonicYear + 1) mod 19) moladDay moladHalakim
+          fTishri1 ((metonicYear + 1) mod 19) moladDay moladHalakim
         in
         let yearLength = tishri1After - tishri1 in
         if yearLength == 355 || yearLength == 385 then tishri1 + d.day + 59
@@ -235,6 +235,129 @@ value sdn_of_hebrew d =
         | _ -> invalid_arg "sdn_of_hebrew" ] ]
   in
   sdn + sdn_offset
+;
+
+value findTishriMolad inputDay =
+  let metonicCycle = (inputDay + 310) / 6940 in
+  let (moladDay, moladHalakim) = moladOfMetonicCycle metonicCycle in
+  let (moladDay, moladHalakim, metonicCycle) =
+    loop moladDay moladHalakim metonicCycle
+    where rec loop moladDay moladHalakim metonicCycle =
+      if moladDay < inputDay - 6940 + 310 then
+        let metonicCycle = metonicCycle + 1 in
+        let moladHalakim = moladHalakim + halakim_per_metonic_cycle in
+        let moladDay = moladDay + moladHalakim / halakim_per_day in
+        let moladHalakim = moladHalakim mod halakim_per_day in
+        loop moladDay moladHalakim metonicCycle
+      else (moladDay, moladHalakim, metonicCycle)
+  in
+  let (metonicYear, moladDay, moladHalakim) =
+    loop 0 moladDay moladHalakim
+    where rec loop metonicYear moladDay moladHalakim =
+      if metonicYear < 18 then
+        if moladDay > inputDay - 74 then (metonicYear, moladDay, moladHalakim)
+        else
+          let moladHalakim =
+            moladHalakim +
+             halakim_per_lunar_cycle * monthsPerYear.(metonicYear)
+          in
+          let moladDay = moladDay + moladHalakim / halakim_per_day in
+          let moladHalakim = moladHalakim mod halakim_per_day in
+          loop (metonicYear + 1) moladDay moladHalakim
+      else (metonicYear, moladDay, moladHalakim)
+  in
+  (metonicCycle, metonicYear, moladDay, moladHalakim)
+;
+
+value glop inputDay tishri1 tishri1After =
+  let yearLength = tishri1After - tishri1 in
+  let day = inputDay - tishri1 - 29 in
+  if yearLength == 355 || yearLength == 385 then
+    if day <= 30 then (2, day)
+    else (3, day - 30)
+  else
+    if day <= 29 then (2, day)
+    else (3, day - 29)
+;
+
+value hebrew_of_sdn prec sdn =
+  let inputDay = sdn - sdn_offset in
+  let (metonicCycle, metonicYear, day, halakim) = findTishriMolad inputDay in
+  let tishri1 = fTishri1 metonicYear day halakim in
+  let (year, month, day) =
+    if inputDay >= tishri1 then
+      let year = metonicCycle * 19 + metonicYear + 1 in
+      if inputDay < tishri1 + 59 then
+        if inputDay < tishri1 + 30 then (year, 1, inputDay - tishri1 + 1)
+        else (year, 2, inputDay - tishri1 - 29)
+      else
+        let halakim =
+          halakim + halakim_per_lunar_cycle * monthsPerYear.(metonicYear)
+        in
+        let day = day + halakim / halakim_per_day in
+        let halakim = halakim mod halakim_per_day in
+        let tishri1After = fTishri1 ((metonicYear + 1) mod 19) day halakim in
+        let (month, day) = glop inputDay tishri1 tishri1After in
+        (year, month, day)
+    else
+      let year = metonicCycle * 19 + metonicYear in
+      if inputDay >= tishri1 - 177 then
+        let (month, day) =
+          if inputDay > tishri1 - 30 then (13, inputDay - tishri1 + 30)
+          else if inputDay > tishri1 - 60 then (12, inputDay - tishri1 + 60)
+          else if inputDay > tishri1 - 89 then (11, inputDay - tishri1 + 89)
+          else if inputDay > tishri1 - 119 then (10, inputDay - tishri1 + 119)
+          else if inputDay > tishri1 - 148 then (9, inputDay - tishri1 + 148)
+          else (8, inputDay - tishri1 + 178)
+        in
+        (year, month, day)
+      else
+        if monthsPerYear.((year - 1) mod 19) == 13 then
+          let month = 7 in
+          let day = inputDay - tishri1 + 207 in
+          if day > 0 then (year, month, day)
+          else
+            let month = month - 1 in
+            let day = day + 30 in
+            if day > 0 then (year, month, day)
+            else
+              let month = month - 1 in
+              let day = day + 30 in
+              if day > 0 then (year, month, day)
+              else
+                let month = month - 1 in
+                let day = day + 29 in
+                if day > 0 then (year, month, day)
+                else
+                  let tishri1After = tishri1 in
+                  let (metonicCycle, metonicYear, day, halakim) =
+                    findTishriMolad (day - 365)
+                  in
+                  let tishri1 = fTishri1 metonicYear day halakim in
+                  let (month, day) = glop inputDay tishri1 tishri1After in
+                  (year, month, day)
+        else
+          let month = 6 in
+          let day = inputDay - tishri1 + 207 in
+          if day > 0 then (year, month, day)
+          else
+            let month = month - 1 in
+            let day = day + 30 in
+	    if day > 0 then (year, month, day)
+            else
+              let month = month - 1 in
+              let day = day + 29 in
+              if day > 0 then (year, month, day)
+              else
+                let tishri1After = tishri1 in
+                let (metonicCycle, metonicYear, day, halakim) =
+                  findTishriMolad (day - 365)
+                in
+                let tishri1 = fTishri1 metonicYear day halakim in
+                let (month, day) = glop inputDay tishri1 tishri1After in
+                (year, month, day)
+  in
+  {day = day; month = month; year = year; prec = prec; delta = 0}
 ;
 
 (* from and to gregorian *)
@@ -275,3 +398,6 @@ value julian_of_gregorian = conv julian_of_sdn 12 sdn_of_gregorian 12;
 
 value gregorian_of_french = conv gregorian_of_sdn 12 sdn_of_french 13;
 value french_of_gregorian = conv french_of_sdn 13 sdn_of_gregorian 12;
+
+value gregorian_of_hebrew = conv gregorian_of_sdn 12 sdn_of_hebrew 13;
+value hebrew_of_gregorian = conv hebrew_of_sdn 13 sdn_of_gregorian 12;
