@@ -5,6 +5,7 @@ GeneWeb Version 3.11
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [31 Jan 01] Changed default mac_anc_tree to 7 (instead of 5)
   - [20 Jan 01] Added request "m=KILL_ANC" to kill someone's ancestors.
     Allowed only if variable "can_kill_ancestors" is set to "yes" in the
     configuration file. Not documented because need interface with buttons,
