@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.13 2004-12-26 10:00:14 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.14 2004-12-26 13:29:23 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -264,14 +264,14 @@ value rec print_both_branches conf base info pl1 pl2 =
       Wserver.wprint "\n";
     end;
     tag "tr" "align=left" begin
-      tag "td" "valign=top align=center width=\"50%%\"" begin
+      tag "td" "valign=\"top\" align=\"center\"" begin
         match p1 with
         [ Some p1 ->
             print_someone_and_spouse conf base info True p1 info.sp1 pl1
         | None -> Wserver.wprint "&nbsp;" ];
       end;
       tag "td" begin Wserver.wprint "&nbsp;"; end;
-      tag "td" "valign=top align=center width=\"50%%\"" begin
+      tag "td" "valign=\"top\" align=\"center\"" begin
         match p2 with
         [ Some p2 ->
             print_someone_and_spouse conf base info True p2 info.sp2 pl2
@@ -363,18 +363,20 @@ value prev_next_1_text conf base info pb nb =
     match pb with
     [ Some b1 ->
         let sign = "&lt;&lt;" in
-        sign_text conf base sign info b1 info.b2 (info.c1 - 1) info.c2 ^ " "
+        sign_text conf base sign info b1 info.b2 (info.c1 - 1) info.c2 ^ "\n"
     | _ -> "" ]
   in
   let s =
     match (pb, nb) with
     [ (None, None) -> s
-    | _ -> s ^ "<font size=-1>" ^ string_of_int info.c1 ^ "</font>" ]
+    | _ ->
+        s ^ "<span style=\"font-size:80%\">" ^ string_of_int info.c1 ^
+	"</span>" ]
   in
   match nb with
   [ Some b1 ->
       let sign = "&gt;&gt;" in
-      s ^ " " ^ sign_text conf base sign info b1 info.b2 (info.c1 + 1) info.c2
+      s ^ "\n" ^ sign_text conf base sign info b1 info.b2 (info.c1 + 1) info.c2
   | _ -> s ]
 ;
 
@@ -383,18 +385,20 @@ value prev_next_2_text conf base info pb nb =
     match pb with
     [ Some b2 ->
         let sign = "&lt;&lt;" in
-        sign_text conf base sign info info.b1 b2 info.c1 (info.c2 - 1) ^ " "
+        sign_text conf base sign info info.b1 b2 info.c1 (info.c2 - 1) ^ "\n"
     | _ -> "" ]
   in
   let s =
     match (pb, nb) with
     [ (None, None) -> s
-    | _ -> s ^ "<font size=-1>" ^ string_of_int info.c2 ^ "</font>" ]
+    | _ ->
+        s ^ "<span style=\"font-size:80%\">" ^ string_of_int info.c2 ^
+	"</span>" ]
   in
   match nb with
   [ Some b2 ->
       let sign = "&gt;&gt;" in
-      s ^ " " ^ sign_text conf base sign info info.b1 b2 info.c1 (info.c2 + 1)
+      s ^ "\n" ^ sign_text conf base sign info info.b1 b2 info.c1 (info.c2 + 1)
   | _ -> s ]
 ;
 
@@ -546,15 +550,15 @@ value print_two_branches_with_table conf base info =
     end;
     tag "tr" "align=left" begin
       stag "td" "align=right" begin
-        Wserver.wprint "<hr size=1 noshade width=\"50%%\" align=right>";
+        Wserver.wprint "<hr style=\"margin-left:50%%\">";
       end;
       Wserver.wprint "\n";
       stag "td" begin
-        Wserver.wprint "<hr size=1 noshade width=\"100%%\">";
+        Wserver.wprint "<hr>";
       end;
       Wserver.wprint "\n";
       stag "td" "align=left" begin
-        Wserver.wprint "<hr size=1 noshade width=\"50%%\" align=left>";
+        Wserver.wprint "<hr style=\"margin-right:50%%\">";
       end;
       Wserver.wprint "\n";
     end;
@@ -696,7 +700,7 @@ value print_relation_no_dag conf base po ip1 ip2 =
         | _ ->
             match Util.p_getenv conf.env "color" with
 	    [ None | Some "" -> ""
-            | Some x -> " bgcolor=" ^ x ] ]
+            | Some x -> " style=\"background:" ^ x ^ "\"" ] ]
       in
       let info =
         {ip = ip; sp = sp; ip1 = ip1; ip2 = ip2; b1 = b1; b2 = b2; c1 = c1;
