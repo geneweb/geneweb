@@ -46,7 +46,7 @@ replacing "base" by the name of the data base you want and "passwd" by
 a complicated enough password. Send these values to the data base owner.
 
 The data base owner can then access the CGI and log in. The first
-time, he has to configurate his data base parameters; once done, he
+time, he has to configure his data base parameters; once done, he
 can upload his data base. Later, using the same login, he can at any
 time change his configuration, or upload or download his GeneWeb
 data base.

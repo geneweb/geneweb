@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.0 2001-03-16 19:35:05 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.1 2001-04-09 04:19:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -37,12 +37,12 @@ value print_birth conf var create verbose =
        Wserver.wprint "%s" (capitale (transl conf "birth"));
      end;
      tag "td" begin
-       Wserver.wprint "<input name=%sb_yyyy size=5 maxlength=5%s>\n" var
+       Wserver.wprint "<input name=%sb_yyyy size=5 maxlength=5%s>-\n" var
          (match create with
           [ Update.Create _ (Some (Some (Dgreg {year = y} _), _, _, _)) ->
               " value=" ^ string_of_int y
           | _ -> "" ]);
-       Wserver.wprint "<input name=%sb_mm size=2 maxlength=2%s>\n" var
+       Wserver.wprint "<input name=%sb_mm size=2 maxlength=2%s>-\n" var
          (match create with
           [ Update.Create _ (Some (Some (Dgreg {month = m} _), _, _, _))
             when m <> 0 ->
@@ -73,12 +73,12 @@ value print_death conf var create verbose =
        Wserver.wprint "%s" (capitale (transl conf "death"));
      end;
      tag "td" begin
-       Wserver.wprint "<input name=%sd_yyyy size=5 maxlength=5%s>\n" var
+       Wserver.wprint "<input name=%sd_yyyy size=5 maxlength=5%s>-\n" var
          (match create with
           [ Update.Create _ (Some (_, _, Some (Dgreg {year = y} _), _)) ->
               " value=" ^ string_of_int y
           | _ -> "" ]);
-       Wserver.wprint "<input name=%sd_mm size=2 maxlength=2%s>\n" var
+       Wserver.wprint "<input name=%sd_mm size=2 maxlength=2%s>-\n" var
          (match create with
           [ Update.Create _ (Some (_, _, Some (Dgreg {month = m} _), _))
             when m <> 0 ->
