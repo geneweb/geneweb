@@ -13,7 +13,7 @@ fr: La base de données "%b" se trouve maintenant à l'adresse:
 <a href="%t">%t</a>
 </dd></dt></dl>
 <p>
-<img src="images/gwlogo.gif"
+<img src="images/gwlogo.png"
 alt=... width=64 height=72 align=right border=0>
 <br>
 

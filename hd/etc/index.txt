@@ -12,7 +12,7 @@
 <input type=submit value="Ok">
 </ul>
 <p>
-<img src="%km=IM;v=/gwlogo.gif"
+<img src="%km=IM;v=/gwlogo.png"
 alt=GeneWeb width=64 height=72 align=right>
 <br>
 

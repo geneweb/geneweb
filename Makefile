@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.17 2002-11-01 10:35:52 ddr Exp $
+# $Id: Makefile,v 4.18 2004-07-01 14:00:24 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
@@ -46,11 +46,11 @@ install:
 	  cp doc/$$i/*.htm $(DOCDIR)/$$i/.; \
 	done
 	mkdir -p $(DOCDIR)/images
-	cp doc/images/*.jpg doc/images/gwlogo.gif $(DOCDIR)/images/.
+	cp doc/images/*.jpg doc/images/gwlogo.png $(DOCDIR)/images/.
 	mkdir -p $(LANGDIR)/lang
 	cp hd/lang/*.txt $(LANGDIR)/lang/.
 	mkdir -p $(LANGDIR)/images
-	cp hd/images/*.jpg hd/images/*.gif $(LANGDIR)/images/.
+	cp hd/images/*.jpg hd/images/*.png $(LANGDIR)/images/.
 	mkdir -p $(LANGDIR)/etc
 	cp hd/etc/*.txt $(LANGDIR)/etc/.
 	mkdir -p $(MANDIR)
@@ -137,11 +137,11 @@ classical_distrib:
 	  cp doc/$$i/*.htm $(DESTDIR)/doc/$$i/.; \
 	done
 	mkdir $(DESTDIR)/doc/images
-	cp doc/images/*.jpg doc/images/gwlogo.gif $(DESTDIR)/doc/images/.
+	cp doc/images/*.jpg doc/images/gwlogo.png $(DESTDIR)/doc/images/.
 	mkdir $(DESTDIR)/lang
 	cp hd/lang/*.txt $(DESTDIR)/lang/.
 	mkdir $(DESTDIR)/images
-	cp hd/images/*.jpg hd/images/*.gif $(DESTDIR)/images/.
+	cp hd/images/*.jpg hd/images/*.png $(DESTDIR)/images/.
 	mkdir $(DESTDIR)/etc
 	cp hd/etc/*.txt $(DESTDIR)/etc/.
 
