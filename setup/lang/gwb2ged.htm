@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: gwb2ged.htm,v 1.1 2002-01-13 23:35:14 ddr Exp $ -->
+  <!-- $Id: gwb2ged.htm,v 1.2 2002-01-14 05:03:16 ddr Exp $ -->
   <title>
 [
 de: GEDCOM-Datei extrahieren
@@ -42,9 +42,10 @@ sv: Välj din databas:
 
 <dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
 
-$b{<tr><td><input type=radio name=anon
-value="$a">&nbsp;&nbsp;&nbsp;</td><td>$a</td></tr>|
-<tr><td>- [
+$b{<tr align=left>
+<td><input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
+<td>$a</td></tr>|
+<tr align=left><td>- [
 de: keine Datenbank vorhanden
 en: there is no database at present
 es: actualmente ninguna base de datos existente
@@ -94,7 +95,7 @@ sv: Välj de optioner du vill ha:
 
 <dl><dt><dd><table border=1>
 
-<tr><td>
+<tr align=left><td>
 <input type=radio name=charset value=ASCII checked>&nbsp;&nbsp;&nbsp;</td>
 <td>[
 de: Kodiere die Zeichen in ASCII.
@@ -106,7 +107,7 @@ sv: Koda tecknen i ASCII.
 ]</td>
 </tr>
 
-<tr><td>
+<tr align=left><td>
 <input type=radio name=charset value=ANSEL>&nbsp;&nbsp;&nbsp;</td>
 <td>[
 de: Kodiere die Zeichen in ANSEL.
@@ -121,7 +122,8 @@ sv: Koda tecknen i ANSEL.
 </table></dl>
 
 <dl><dt><dd><table border=1>
-<tr><td><input type=checkbox name=mem value=on>&nbsp;&nbsp;&nbsp;</td>
+<tr align=left>
+<td><input type=checkbox name=mem value=on>&nbsp;&nbsp;&nbsp;</td>
 <td>[
 de: W&auml;hrend der Operation sparsam mit dem Speicher umgehen
     (ist aber langsamer).
@@ -137,7 +139,8 @@ sv: Spara minne under operationen (men det kommer att gå saktare).
 </table></dl>
 
 <dl><dt><dd><table border=1>
-<tr><td>&nbsp;</td><td colspan=3>[
+<tr align=left><td>&nbsp;</td>
+<td colspan=3>[
 de: Nur die Vorfahren ausw&auml;hlen von...
 en: Extract only the ancestors of...
 es: Extraer solamente los antepasados de...
@@ -146,7 +149,7 @@ lv: Izmantot tikai...
 sv: Exportera endast anorna till...
 ]</td></tr>
 
-<tr><td>[
+<tr align=left><td>[
 de: Vorname
 en: First name
 es: Nombre
@@ -167,7 +170,7 @@ sv: ummer
 <td><input name="a2" size=5 maxlength=8></td>
 </tr>
 
-<tr><td>[
+<tr align=left><td>[
 de: Nachname
 en: Surname
 es: Apellido
@@ -183,12 +186,12 @@ de:
 en: 
 es: 
 fr: 
-lv: <tr><td>&nbsp;</td><td colspan=3>...vecâkus</td></tr>
+lv: <tr align=left><td>&nbsp;</td><td colspan=3>...vecâkus</td></tr>
 sv: 
 ]</table></dl>
 
 <dl><dt><dd><table border=1>
-<tr><td>&nbsp;</td><td colspan=3>[
+<tr align=left><td>&nbsp;</td><td colspan=3>[
 de: Nur die Nachkommen ausw&auml;hlen von...
 en: Extract only the descendants of...
 es: Extraer solamente los descendientes de...
@@ -197,7 +200,7 @@ lv: Izmantot tikai...
 ]</td>
 </tr>
 
-<tr><td>[
+<tr align=left><td>[
 de: Vorname
 en: First name
 es: Nombre
@@ -215,7 +218,7 @@ lv: Nr
 ]</td>
 <td><input name="d2" size=5 maxlength=8></td></tr>
 
-<tr><td>[
+<tr align=left><td>[
 de: Nachname
 en: Surname
 es: Apellido

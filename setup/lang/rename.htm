@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: rename.htm,v 1.1 2002-01-14 05:03:16 ddr Exp $ -->
+  <title>[
+de: Datenbank umbenennen
+en: Renaming
+es: Cambio de nombre
+fr: Renommage
+lv: Pârsaukðana
+sv: Döpa om
+]</title>
+</head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>[
+de: Datenbank umbenennen
+en: Renaming
+es: Cambio de nombre
+fr: Renommage
+lv: Pârsaukðana
+sv: Döpa om<
+]</font></h1></center>
+
+<form method=POST action="rename">
+<input type=hidden name=lang value=$l>
+
+[
+de: &Auml;ndere die Namen wie gew&uuml;nscht:
+en: Change the names you want:
+es: Chambie el o los nombres que Ud. desee:
+fr: Changez le ou les noms que vous d&eacute;sirez:
+lv: Izvçlieties nosaukumus, kurus Jûs vçlaties mainît:
+sv: Ändra de namn du vill:
+]
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr align=left>
+<td><a href="http://$m:2317/$a">$a</a></td>
+<td><input name="$a" value="$a" size=20></td>
+</tr>|
+<tr align=left><td>- [
+de: keine Datenbank vorhanden
+en: there is no database at present
+es: ninguna base de datos existe actualmente
+fr: il n'y a aucune base de donn&eacute;es actuellement
+lv: nav nevienas datu bâzes
+sv: det finns ingen databas för tillfället
+]</tr></td>}
+</table></dl>
+
+<p>
+
+[
+de: Dann dr&uuml;cke diesen Knopf:
+en: Then push this button:
+es: Apoye luego en este bot&oacute;n
+fr: Puis appuyez sur ce bouton:
+lv: Beigâs nospiediet sekojoðo podziòu:
+sv: Tryck sedan på denna knapp:
+]
+
+<p>
+
+<input type=submit value="[
+[
+de: Umbenennen
+en: Rename
+es: Cambio de nombre
+fr: Renommer
+lv: Pârsaukt
+sv: Döp om
+]">
+
+</form>
