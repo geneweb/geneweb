@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.4 1999-05-18 17:48:08 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.5 1999-06-29 22:24:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -154,9 +154,9 @@ value rec copy_from_channel conf base ic =
       | '%' ->
           let c = input_char ic in
           if not echo.val then
-            if c == 'w' || c == 'x' || c == 'y' || c == 'z' || c == 'i' then
-              echo.val := True
-            else ()
+            match c with
+            [ 'w' | 'x' | 'y' | 'z' | 'i' -> echo.val := True
+            | _ -> () ]
           else
             match c with
             [ '%' -> Wserver.wprint "%%"

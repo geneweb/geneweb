@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.11 1999-05-17 16:40:07 ddr Exp $ *)
+(* $Id: family.ml,v 2.12 1999-06-29 22:24:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -103,6 +103,21 @@ value compact_list conf base xl =
       pl []
   in
   pl
+;
+
+value find_all conf base an =
+  let sosa_ref = Util.find_person_in_env conf base "z" in
+  let sosa_nb = try Some (Num.of_string an) with [ Failure _ -> None ] in
+  match (sosa_ref, sosa_nb) with
+  [ (Some p, Some n) ->
+      match Util.branch_of_sosa base p.cle_index n with
+      [ Some [(ip, _) :: _] -> [poi base ip]
+      | _ -> [] ]
+  | _ ->
+      let pl = person_ht_find_all base an in
+      let pl = compact_list conf base pl in
+      let spl = select_std_eq base pl an in
+      if spl = [] then pl else spl ]
 ;
 
 value precisez conf base n pl =
@@ -330,12 +345,7 @@ value family_m conf base =
           [ Some "P" -> Some.first_name_print conf base an
           | Some "N" -> Some.surname_print conf base an
           | _ ->
-              let pl = person_ht_find_all base an in
-              let pl = compact_list conf base pl in
-              let pl =
-                let spl = select_std_eq base pl an in
-                if spl = [] then pl else spl
-              in
+              let pl = find_all conf base an in
               match pl with
               [ [] -> inconnu conf n
               | [p] -> person_selected conf base p
