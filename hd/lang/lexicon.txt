@@ -5,7 +5,7 @@ en: iso-8859-1
 eo: iso-8859-1
 es: iso-8859-1
 fr: iso-8859-1
-he: iso-8859-8
+he: iso-8859-8-i
 it: iso-8859-1
 nl: iso-8859-1
 pt: iso-8859-1
