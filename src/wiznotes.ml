@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.2 2002-12-10 05:14:10 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.3 2002-12-10 05:24:47 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -38,7 +38,7 @@ value read_wizard_notes fname =
       loop 0 where rec loop len =
         match try Some (input_char ic) with [ End_of_file -> None ] with
         [ Some c -> loop (Buff.store len c)
-        | None -> do { close_in ic; Buff.get len } ]
+        | None -> do { close_in ic; Buff.get (max 0 (len - 1)) } ]
   | None -> "" ]
 ;
 
@@ -136,9 +136,13 @@ value print_wizard_mod conf base wizfile wz nn =
   in
   if digest = Iovalue.digest on then
     do {
-      try Unix.mkdir wddir 0o755 with
-      [ Unix.Unix_error _ _ _ -> () ];
-      write_wizard_notes fname nn;
+      if nn <> on then
+        do {
+          try Unix.mkdir wddir 0o755 with
+          [ Unix.Unix_error _ _ _ -> () ];
+          write_wizard_notes fname nn;
+        }
+      else ();
       print_main conf base wizfile;
     }
   else try Update.error_digest conf base with [ Update.ModErr -> () ]
