@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.3 2001-06-03 14:21:54 ddr Exp $ *)
+(* $Id: dag.ml,v 4.4 2001-08-21 13:56:16 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -58,7 +58,10 @@ value get_dag_elems conf base =
     | _ -> set ]
 ;
 
-type sum 'a 'b = [ Left of 'a | Right of 'b ];
+type sum 'a 'b =
+  [ Left of 'a
+  | Right of 'b ]
+;
 
 value make_dag conf base list =
   let module O = struct type t = iper; value compare = compare; end in
@@ -666,24 +669,26 @@ value print_html_table conf hts =
     else ();
     if Util.p_getenv conf.env "notab" = Some "on" ||
        Util.p_getenv conf.env "pos2" <> None ||
-       browser_doesnt_have_tables conf then
+       browser_doesnt_have_tables conf
+    then
       print_table_pre conf hts
     else print_table conf hts
   }
 ;
 
-value html_table_of_dag indi_txt phony invert no_group d =
+value html_table_of_dag indi_txt vbar_txt phony invert no_group d =
   let t = Dag2html.table_of_dag phony False invert no_group d in
   if Array.length t.table = 0 then [| |]
-  else Dag2html.html_table_struct indi_txt phony d t
+  else Dag2html.html_table_struct indi_txt vbar_txt phony d t
 ;
 
-value make_tree_hts conf base elem_txt spouse_on invert no_group set spl d =
+value make_tree_hts
+  conf base elem_txt vbar_txt spouse_on invert no_group set spl d =
   let indi_txt n =
     match n.valu with
     [ Left ip ->
         let p = poi base ip in
-        let txt = elem_txt conf base p in
+        let txt = elem_txt p in
         let txt =
           let spouses =
             if (spouse_on && n.chil <> [] || n.pare = []) && not invert then
@@ -749,12 +754,17 @@ value make_tree_hts conf base elem_txt spouse_on invert no_group set spl d =
         (indi_txt n)
     else indi_txt n
   in
+  let vbar_txt n =
+    match n.valu with
+    [ Left ip -> vbar_txt ip
+    | _ -> "|" ]
+  in
   let phony n =
     match n.valu with
     [ Left _ -> False
     | Right _ -> True ]
   in
-  html_table_of_dag indi_txt phony invert no_group d
+  html_table_of_dag indi_txt vbar_txt phony invert no_group d
 ;
 
 value print_slices_menu conf base hts_opt =
@@ -821,13 +831,15 @@ value print_slices_menu conf base hts_opt =
 ;
 
 value gen_print_dag conf base spouse_on invert set spl d =
-  let dag_elem_txt conf base p =
+  let dag_elem_txt p =
     Util.referenced_person_title_text conf base p ^
       Date.short_dates_text conf base p
   in
+  let vbar_txt ip = "|" in
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let hts =
-    make_tree_hts conf base dag_elem_txt spouse_on invert no_group set spl d
+    make_tree_hts conf base dag_elem_txt vbar_txt spouse_on invert no_group
+      set spl d
   in
   if p_getenv conf.env "slices" = Some "on" then
     print_slices_menu conf base (Some hts)

@@ -1,4 +1,4 @@
-(* $Id: dag2html.mli,v 1.2 2001-06-07 08:40:18 ddr Exp $ *)
+(* $Id: dag2html.mli,v 1.3 2001-08-21 13:56:16 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -21,8 +21,8 @@ type table_data = [ TDstring of string | TDhr of align ];
 type html_table = array (array (int * align * table_data));
 
 value html_table_struct :
-  (node 'a -> string) -> (node 'a -> bool) -> dag 'a -> table idag ->
-    array (array (int * align * table_data));
+  (node 'a -> string) -> (node 'a -> string) -> (node 'a -> bool) ->
+    dag 'a -> table idag -> array (array (int * align * table_data));
 
 value table_of_dag :
   (node 'a -> bool) -> bool -> bool -> bool -> dag 'a -> table idag;
