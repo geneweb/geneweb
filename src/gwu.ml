@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.23 2000-06-29 11:38:24 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.24 2000-06-29 14:21:45 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -629,18 +629,26 @@ value is_isolated base p =
 ;
 
 value get_isolated_related base mark m list =
-  let concat_isolated ip list =
-    if mark.(Adef.int_of_iper ip) then list
-    else
-      let p = poi base ip in
-      if List.memq p list then list
-      else if is_isolated base p then [p :: list] else list
+  let concat_isolated p_relation ip list =
+    let p = poi base ip in
+    if List.memq p list then list
+    else if is_isolated base p then
+      match p.rparents with
+      [ [{r_fath = Some x} :: _] when x = p_relation.cle_index -> [p :: list]
+      | [{r_fath = None; r_moth = Some x} :: _]
+        when x = p_relation.cle_index -> [p :: list]
+      | _ -> list ]
+    else list
   in
-  let list = List.fold_right concat_isolated m.m_fath.related list in
-  let list = List.fold_right concat_isolated m.m_moth.related list in
+  let list =
+    List.fold_right (concat_isolated m.m_fath) m.m_fath.related list
+  in
+  let list =
+    List.fold_right (concat_isolated m.m_moth) m.m_moth.related list
+  in
   let list =
     List.fold_right
-      (fun p list -> List.fold_right concat_isolated p.related list)
+      (fun p list -> List.fold_right (concat_isolated p) p.related list)
       (Array.to_list m.m_chil) list
   in
   list
