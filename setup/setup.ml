@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.50 1999-09-13 10:27:50 ddr Exp $ *)
+(* $Id: setup.ml,v 1.51 1999-09-21 20:15:13 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -1123,6 +1123,7 @@ value has_gwb_directories dh =
 value setup_comm conf =
   fun
   [ "gwsetup" -> setup_gen conf
+  | "image" -> image conf
   | "simple" -> simple conf
   | "recover" -> recover conf
   | "recover_1" -> recover_1 conf
