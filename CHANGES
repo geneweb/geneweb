@@ -36,6 +36,9 @@ GeneWeb version 4.06
     Hugo (first name "François-Victor", surname "Hugo") and François
     Victor-Hugo (first name "François", surname "Victor-Hugo").
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [08 Mar 02] Fixed bug: added 5 empty lines after each person's notes.
+
 * Setup program (gwsetup)
   - [06 Mar 02] Added "cancel" buttons close to some "ok" buttons.
   - [05 Mar 02] Updated German in templates (Thomas Omerzu).
