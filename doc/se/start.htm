@@ -21,8 +21,7 @@ height=108 src="../images/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </FONT> med en 
 kortfattad beskrivning av kommandon och filer som behövs för att starta. </P>
 <UL>
-  <LI><A 
-  href="#Int">Introduktion</A> 
+  <LI><A href="#Int">Introduktion</A> 
   <LI><A href="#Gwc">Kommandot gwc</A>
   <LI><A href="#Ged">Kommandot ged2gwb</A> 
   <LI><A href="#Gee">Kommandot gwb2ged</A> 
@@ -43,19 +42,30 @@ fönster. Under Unix, starta ett xterm. Under Windows 95/98/NT, klicka på
 installerade <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>: </P>
 <UL>
   <LI>Under Unix, om du har installerat det till exempel i 
-  "/home/svensson/geneweb": </LI></UL><PRE>     	cd /home/svensson/geneweb
+  "/home/svensson/geneweb": </LI></UL>
+<PRE>
+     	cd /home/svensson/geneweb
 </PRE>
 <UL>
   <LI>Under Windows 95/98/NT, om du har installerat det i: "C:\program\geneweb": 
-  </LI></UL><PRE>     	cd c:\program\geneweb
-</PRE>Gå sedan till underkatalogen gw, genoim att skriva: <PRE>     	cd gw
+  </LI></UL>
+<PRE>
+     	cd c:\program\geneweb
+</PRE>
+Gå sedan till underkatalogen gw, genom att skriva:
+<PRE>
+     	cd gw
 </PRE>
 <P>Alla <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> kommandon kan startas med
 optionen -help som visar 
 olika möjliga optioner, med en kort förklaring.
 <P>
 
-Till exempel, om du skriver:<PRE>     gwd -help</PRE>
+Till exempel, om du skriver:
+<PRE>
+     gwd -help
+</PRE>
+
 <P>ska du se detta: 
 
 <PRE>
@@ -119,7 +129,10 @@ antingen med kommandot "gwc", eller med "ged2gwb", (se nedan). </P>
 <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>, som du kan fylla. </P>
 <P>Du måste ge ett namn till din databas. Använd helst inte mer än 8 tecken. 
 </P>
-<P>Till exempel, om du vill kalla den "svensson", skriv: </P><PRE>     gwc -o svensson</PRE>
+<P>Till exempel, om du vill kalla den "svensson", skriv: </P>
+<PRE>
+     gwc -o svensson
+</PRE>
 <HR>
 <H3><font color=#2f6400><A name=Ged>Kommandot ged2gwb</A> </font></H3>
 <P>Ett annat sätt att skapa en <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> databas är att starta från en 
@@ -130,7 +143,10 @@ GEDCOM-fil. </P>
 installerade <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>. Gör det på vanligt vis, antingen i ett DOS 
 fönster eller genom att flytta ikoner. </P>
 <P>Om din GEDCOM-fil har namn, till exempel, "foo.ged" och du vill skapa en 
-databas benämnd "svensson", skriv: </P><PRE>     ged2gwb foo.ged -o svensson</PRE>
+databas benämnd "svensson", skriv: </P>
+<PRE>
+     ged2gwb foo.ged -o svensson
+</PRE>
 <P>Kommandot visar till viss del vad den gör, speciellt om den upptäcker fel i 
 GEDCOM-filen. Ignorera dessa fel till att börja med: din databas kommer att 
 skapas ändå. Om allt är OK, ska kommandot avslutas med: </P>
@@ -146,7 +162,10 @@ kan man återuppbygga en GEDCOM-fil från en <FONT COLOR=#2f6400><B>GeneWeb</B></F
 <H3><font color=#2f6400><A name=Gwd>Kommandot gwd</A> </font></H3>
 <P>När du har skapat en databas, med en av kommandona "gwc" eller "ged2gwb", kan 
 du konsultera och utöka den. </P>
-<P>Alltid i DOS fönstret, skriv: </P><PRE>     gwd</PRE>
+<P>Alltid i DOS fönstret, skriv: </P>
+<PRE>
+     gwd
+</PRE>
 <P>Kommandot startar <FONT COLOR=#2f6400><B>GeneWeb</B></FONT> "demonen". Kommandot måste visa:
 </P>
 <PRE>
@@ -168,7 +187,10 @@ i DOS fönstret. </P>
 använder du en webbläsare. Starta ett nytt fönster i denna webbläsare och öppna 
 den följande adressen. Byt ut "svensson" mot namnet för din databas. Varning: 
 skriv inte in det kompletta namnet (som "c:\program\geneweb\svensson" eller 
-"/home/geneweb/svensson"), bara "svensson". </P><PRE>     http://localhost:2317/svensson</PRE>
+"/home/geneweb/svensson"), bara "svensson". </P>
+<PRE>
+     http://localhost:2317/svensson
+</PRE>
 <P>Du ska nu se <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>s välkomstsida på franska. </P>
 <P>[Om det inte fungerar, klicka <A 
 href="problem.htm">här</A>] </P>
@@ -214,7 +236,10 @@ görs när man konsulterar databasen, på personliga sidor och medan man beräknar
 släktskap. </P>
 <P>Men för att kunna visa det måste man beräkna de individuella blodsbanden för 
 personerna i databasen på förhand. Detta är vad "consang" gör. Om din databas 
-namn är "svensson", skriv: </P><PRE>     consang svensson</PRE>
+namn är "svensson", skriv: </P>
+<PRE>
+     consang svensson
+</PRE>
 <P>Programmet kommer att göra beräkningar som tar några sekunder eller minuter, 
 beroende på storleken av din databas och under tiden visa antalet återstående 
 personer att behandla. Till slut, återkommer markören igen i DOS fönstret och de 
@@ -233,7 +258,10 @@ ett antal uppdateringar. </P>
 <P>Detta kommando visar innehållet i databasen i textform. Omdirigering av 
 utmatningen till en fil, gör att man kan spara databasen. </P>
 <P>Om din databas heter "svensson", och du vill spara den i filen "foo.gw", 
-skriv: </P><PRE>     gwu svensson &gt; foo.gw</PRE>
+skriv: </P>
+<PRE>
+     gwu svensson &gt; foo.gw
+</PRE>
 <P>Genom lagring av databaser med olika versioner i olika filer, kan man se 
 olikheter genom att använda ett program för att jämföra textfiler. Detta är 
 speciellt intressant om någon har gjort modifieringar i din databas och du vill 
@@ -243,7 +271,10 @@ annan version av <FONT COLOR=#2f6400><B>GeneWeb</B></FONT>, i det fallet den inr
 databasen har ändrats. </P>
 <P>För att återskapa din databas, måste du använda kommandot "gwc". Den lagrade 
 filen måste ha filändelsen ".gw". För att skapa en databas benämnd "svensson" 
-från filen "foo.gw", skriv: </P><PRE>     gwc foo.gw -o svensson</PRE>
+från filen "foo.gw", skriv: </P>
+<PRE>
+     gwc foo.gw -o svensson
+</PRE>
 <HR>
 <H3><font color=#2f6400><A name=Cnf>Filen a.gwf</A> </font></H3>
 <P>Denna fil innehåller en konfigurations mall för en databas. Om din databas 
@@ -254,7 +285,9 @@ editera filen "svensson.gwf". </P>
   <LI>body_prop</STRONG> gör det möjligt att välja en bakgrunds färg eller ett 
   bakgrunds mönster och ändra texten och länk färgen. Dess syntax är HTML 
   syntaxen i taggen "&lt;body&gt;" före "&gt;". Se din HTML dokumentation (eller 
-  fråga en webbguru). Exempel: </LI></UL><PRE>     	body_prop=background=mybackg.jpg vlink=yellow
+  fråga en webbguru). Exempel: </LI></UL>
+<PRE>
+     	body_prop=background=mybackg.jpg vlink=yellow
 </PRE>
 <DIR>
 <P>Detta gäller inte bara för välkomstsidan men också på alla andra sidor för 
@@ -282,10 +315,10 @@ in passordet på välkomstsidan att ha behörighet att göra ändringar. </P></DIR>
   <P><STRONG></P>
   <LI>default_lang</STRONG> gör det möjligt att definiera ett språk
   för välkomstsidan.
-Utan specificering är språket franska. De möjliga värdena är: "cn" 
+Utan specificering är språket franska. De möjliga värdena är: "af" (afrikaans), "cn" 
   (kinesiska), "cs" (tjeckiska), "de" (tyska), "dk" (danska), "en" (engelska),
   "eo" (esperanto), "es" (spanska), "fi" (finska), "fr" (franska),
-  "he" (hebreiska), "is" (isländska), "it" (italienska), "nl" (holländska),
+  "he" (hebreiska), "is" (isländska), "it" (italienska), "lv" (litauiska), "nl" (holländska),
   "no" (norska), "pt" (portugisiska), "ru" (ryska) och "se" (svenska).
 </LI></UL>
 <DIR>
@@ -293,17 +326,17 @@ Utan specificering är språket franska. De möjliga värdena är: "cn"
 på välkomstsidan
 genom att klicka på flaggorna högst upp på sidan. </P></DIR>
 <UL><B>
-  <LI>can_send_image</B> gör det möjligt för "wizards" att skicka foton (och 
+  <LI>can_send_image</B> gör det möjligt för "wizards" att skicka bilder (och 
   radera). I detta fall i <A 
   href="update.htm#MAJ">uppdaterings</A> 
   processen, kan de klicka på en länk benämnd <A 
-  href="update.htm#SndP">skicka foto</A> 
+  href="update.htm#SndP">skicka bild</A> 
   (ibland även en benämnd <A 
   href="update.htm#DelPh">ta bort 
-  foto</A>). Det är förvalt "no" (ingen behörighet att skicka foton), för att 
+  bild</A>). Det är förvalt "no" (ingen behörighet att skicka bilder), för att 
   tillåta det skriv "yes". 
-  <P>Varning: fotona lagras på din dator och kan uppta mycket plats på 
-  hårddisken om många foton skickas. 
+  <P>Varning: bilderna lagras på din dator och kan uppta mycket plats på 
+  hårddisken om många bilder skickas. 
   <P><B></P>
   <LI>renamed</B> gör det möjligt att indikera att namnet för en databas har 
   ändrats. Om din sajt har konsulterats mycket och många har lagrat din databas 
