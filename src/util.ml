@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.69 2000-08-30 08:58:36 ddr Exp $ *)
+(* $Id: util.ml,v 3.70 2000-09-13 15:43:24 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -705,6 +705,7 @@ value open_etc_file fname =
 ;
 
 value rec copy_from_etc env imcom ic =
+  let cnt = ref 0 in
   try
     while True do
       match input_char ic with
@@ -714,6 +715,8 @@ value rec copy_from_etc env imcom ic =
           [ Not_found ->
               match c with
               [ '%' -> Wserver.wprint "%%"
+              | '+' -> incr cnt
+              | '#' -> Wserver.wprint "%d" cnt.val
               | 'k' -> Wserver.wprint "%s" imcom
               | 'n' -> Wserver.wprint "%s" (base_len (input_to_semi ic))
               | 'o' ->

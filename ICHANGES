@@ -9,6 +9,8 @@ GeneWeb Version 3.08
     (request from Debian packagers).
 
 * GeneWeb daemon/CGI (gwd)
+  - [13 Sep 00] For etc files (e.g. personal index.txt), added macros: %+
+    to increment a counter and %# to display it.
   - [12 Sep 00] In traces suspension points for long requests are applied
     in the middle instead of at end.
   - [25 Aug 00] Fixed option -redirect: did not apply to all requests
