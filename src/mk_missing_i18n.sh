@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: mk_missing_i18n.sh,v 4.2 2001-04-05 13:59:42 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 4.3 2001-07-11 13:46:08 ddr Exp $ *)
 
 open Printf
 
@@ -65,7 +65,9 @@ let check first lang =
 	     ("fr", List.assoc "fr" list)]
 	in
         printf "    %s\n" line;
-        List.iter (fun (lang, transl) -> printf "%s:%s\n" lang (if transl = "" then " " else transl))
+        List.iter
+          (fun (lang, transl) ->
+             printf "%s:%s\n" lang (if transl = "" then " " else transl))
 	  list;
 	printf "\n";
 	has_missing := true
@@ -80,6 +82,8 @@ let check first lang =
   end;
   if not !has_missing then printf "     - no missing phrases -\n";
   printf "</pre>\n";
+  close_in ic_lex;
+  close_in ic_i18n;
   false
 
 let header lang =
