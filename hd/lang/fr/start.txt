@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.10 1999-11-24 16:29:35 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.11 1999-11-25 11:21:10 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>G&eacute;n&eacute;alogie - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -88,12 +88,12 @@ maxlength=200>
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
 <font color=#2f6400><b>par titre</b></font>%INl<br>%E
-<input name=t size=13 maxlength=200>%INl<br>%E
-(ex: roi, duke...)<br>
+<input name=t size=14 maxlength=200>%INl<br>%E
+(<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
 <font color=#2f6400><b>lieu</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
-(ex: de France, of Sax...)
+(<a href="%sm=TT;p=*">[all the places]</a>)
 </td><td>
 <input type=submit value="Ok">
 </table>

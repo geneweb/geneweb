@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.8 1999-11-10 22:38:46 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.9 1999-11-25 11:21:07 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title> Genealogie - %t</title>
@@ -87,11 +87,11 @@ Zum Benutzen dieser Datenbank kannst du hier suchen:<br><p>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
 <font color=#2f6400><b>nach einem Titel</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
-(ex: roi, duke...)<br>
+(<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
 <font color=#2f6400><b>am Ort:</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
-(ex: de France, of Sax...)
+(<a href="%sm=TT;p=*">[all the places]</a>)
 </td><td>
 <input type=submit value="Ok">
 </table>
