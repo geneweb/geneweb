@@ -5,6 +5,7 @@ GeneWeb Intermediate Version 2.02-1
 -----------------------------------
 
 * Setup program
+  - [May 12, 99] Added "charset=iso-8859-1" in headers (undefined, before).
   - [May 11, 99] Give up the second command of base recovery when the first
     one returns an error code.
 

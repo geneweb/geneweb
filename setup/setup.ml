@@ -1,9 +1,10 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.24 1999-05-11 21:29:08 ddr Exp $ *)
+(* $Id: setup.ml,v 1.25 1999-05-13 08:23:11 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
 value setup_dir = "setup";
+value charset = "iso-8859-1";
 
 value buff = ref (String.create 80);
 value store len x =
@@ -61,7 +62,7 @@ value rec list_remove_assoc x =
 ;
 
 value header_no_page_title title =
-  do Wserver.html "";
+  do Wserver.html charset;
      Wserver.wprint "\
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
  \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n";
@@ -372,7 +373,7 @@ value print_file conf fname =
   let fname = Filename.concat (Filename.concat dir conf.lang) fname in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      do Wserver.html "";
+      do Wserver.html charset;
          copy_from_stream conf (fun x -> Wserver.wprint "%s" x)
            (Stream.of_channel ic);
          close_in ic;
