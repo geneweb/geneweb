@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.37 2004-12-28 15:13:03 ddr Exp $ *)
+(* $Id: update.ml,v 4.38 2004-12-30 10:11:26 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -824,7 +824,7 @@ value insert_person conf base src new_persons (f, s, o, create, var) =
              notes = empty_string;
              psources =
                if f = "?" || s = "?" then empty_string
-               else insert_string base src;
+               else insert_string base (only_printable src);
              cle_index = ip}
           and a = no_ascend ()
           and u = {family = [| |]} in
