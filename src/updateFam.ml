@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.10 1999-07-22 22:14:03 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.11 1999-07-28 07:55:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -36,7 +36,7 @@ value print_parent_person conf base var (first_name, surname, occ, create) =
           (capitale (transl_nth conf "first name/first names" 0));
       end;
       tag "td" begin
-        Wserver.wprint "<input name=%s_first_name size=23 maxlength=200" var;
+        Wserver.wprint "<input name=%s_fn size=23 maxlength=200" var;
         Wserver.wprint " value=\"%s\">"
           (quote_escaped first_name);
       end;
@@ -67,7 +67,7 @@ value print_parent_person conf base var (first_name, surname, occ, create) =
       end;
       tag "td" "colspan=4" begin
         Wserver.wprint
-          "<input name=%s_surname size=40 maxlength=200 value=\"%s\">"
+          "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
           var surname;
       end;
     end;
@@ -82,7 +82,7 @@ value print_child_person conf base var (first_name, surname, occ, create) =
           (capitale (transl_nth conf "first name/first names" 0));
       end;
       tag "td" "colspan=3" begin
-        Wserver.wprint "<input name=%s_first_name size=23 maxlength=200" var;
+        Wserver.wprint "<input name=%s_fn size=23 maxlength=200" var;
         Wserver.wprint " value=\"%s\">"
           (quote_escaped first_name);
       end;
@@ -103,7 +103,7 @@ value print_child_person conf base var (first_name, surname, occ, create) =
       end;
       tag "td" "colspan=5" begin
         Wserver.wprint
-          "<input name=%s_surname size=40 maxlength=200 value=\"%s\">"
+          "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
           var surname;
       end;
     end;
