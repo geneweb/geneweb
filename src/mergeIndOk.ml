@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 3.1 1999-11-10 08:44:27 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 3.2 1999-12-13 16:59:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -174,6 +174,7 @@ value effective_mod_merge conf base sp =
              return ()
          | _ -> () ];
       return
+      let rel_chil = p2.related in
       let p2_family = u2.family in
       let p2_sexe = p2.sex in
       do UpdateIndOk.effective_del conf base p2;
@@ -183,7 +184,31 @@ value effective_mod_merge conf base sp =
       return
       let p = UpdateIndOk.effective_mod conf base sp in
       let u = uoi base p.cle_index in
-      do for i = 0 to Array.length p2_family - 1 do
+      do List.iter
+           (fun ipc ->
+              let pc = poi base ipc in
+              do List.iter
+                   (fun r ->
+                      do match r.r_fath with
+                         [ Some ip when ip = p2.cle_index ->
+                             do r.r_fath := Some p.cle_index;
+                                if List.memq ipc p.related then ()
+                                else p.related := [ipc :: p.related];
+                             return ()
+                         | _ -> () ];
+                         match r.r_moth with
+                         [ Some ip when ip = p2.cle_index ->
+                             do r.r_moth := Some p.cle_index;
+                                if List.memq ipc p.related then ()
+                                else p.related := [ipc :: p.related];
+                             return ()
+                         | _ -> () ];
+                      return ())
+                   pc.rparents;
+                 base.func.patch_person ipc pc;
+              return ())
+           rel_chil;
+         for i = 0 to Array.length p2_family - 1 do
            let ifam = p2_family.(i) in
            let cpl = coi base ifam in
            do match p2_sexe with
