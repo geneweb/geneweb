@@ -184,13 +184,30 @@ this "family" form which is already rather complicated.
 
 <p>
 
-I know that it it tedious to have to return to the "person" form for each
-added person, but I am not sure that adding and adding things be the
-good solution. It is also an intrinsic problem of HTML, which is not
-very "dynamic". However, I am personnaly against solutions using Java
-(risks of security holes) and JavaScript (language actually destinated
-to be invaded by advertising). Other solutions are being studied, but
-not easy to implement.
+I know that it it tedious to have to return to the "person" form for
+each added person, but I am not sure that adding and adding things be
+the good solution. It is also an intrinsic problem of HTML, which is
+not very "dynamic". However, I am personnaly against solutions using
+Java (risks of security holes) and JavaScript (language actually
+destinated to be invaded by advertising, among other drawbacks). Other
+solutions are being studied, but not easy to implement.
+
+<h4>In an update form, I filled some fields, but they disapear</h4>
+
+Some fields are taken into account only in certain circumstances. So,
+is a person is noticed "alive", the fields "date" and "place" of death
+are ignored. If, in a "family" form, the field "separated" is selected,
+the field "divorce date" is ignored. If the indication of a person if
+"Link" (instead of "Create"), the fields about sex, date and place
+are ignored. And so on.
+
+<p>
+
+Generally, in such kind of forms, the choices are invalidated or validated
+back when one select such or such button. It is not possible to program
+that due to the fact that <font color=#2f6400><b>GeneWeb</b></font> is
+limitated to pure HTML: JavaScript should be used, which is against my
+principles (see the question about the the families update forms).
 
 <p>
 <hr>

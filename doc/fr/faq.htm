@@ -214,8 +214,31 @@ d'ajouter de plus en plus de choses soit la bonne solution. C'est
 aussi un problème intrinsèque au HTML qui n'est pas très "dynamique".
 Cependant, je suis personnellement contre les solutions à base de Java
 (risques de trous de sécurité) et de JavaScript (langage en réalité
-destiné à se faire envahir par les publicités). D'autres solutions
-sont étudiées, mais, bon, pas faciles à mettre en oeuvre.
+destiné à se faire envahir par les publicités, entre autres
+défauts). D'autres solutions sont étudiées, mais, bon, pas faciles à
+mettre en oeuvre.
+
+<p>
+
+<h4>Dans un formulaire de mise à jour, j'ai rempli certains champs
+mais ils disparaissent</h4>
+
+Certains champs ne sont pris en compte que dans certaines
+circonstances.  Ainsi si une personne est notée "vivante", les champs
+"date" et "lieu" de décès sont ignorés. Si, dans un formulaire
+"famille", le champ "séparé" est sélectionné, le champ "date de
+divorce" est ignoré. Si l'indication d'une personne est "Relier" (au
+lieu de "Créer"), les champs de sexe, de date et de lieu sont ignorés.
+Etc.
+
+<p>
+
+Généralement, dans des formulaires de ce genre, les choix sont
+automatiquement invalidés ou revalidés quand on sélectionne tel ou tel
+bouton. Il n'est pas possible de programmer cela du fait que <font
+color=#2f6400><b>GeneWeb</b></font> se limite au HTML pur: il faudrait
+pour cela utiliser du JavaScript ce qui est contraire à mes principes
+(voir la question sur les formulaires de mise à jour des familles).
 
 <p>
 <hr>
