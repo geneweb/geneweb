@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.12 1999-04-20 18:04:36 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.13 1999-04-20 19:48:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -297,9 +297,7 @@ value afficher_ascendants_numerotation conf base niveau_max p =
   let rec generation niveau gpl =
     if niveau <= niveau_max then
       do html_li conf;
-         Wserver.wprint "%s %s\n"
-           (transl_nth conf "nth (generation)" niveau)
-           (transl conf "generation");
+         Wserver.wprint "%s %d\n" (capitale (transl conf "generation")) niveau;
          tag "ul" begin
            List.iter (print_generation_person conf base) gpl;
          end;
@@ -734,9 +732,7 @@ value print_ancestors_same_time_descendants conf base p a =
   let rec generation niveau gpl =
     if List.exists will_print gpl then
       do html_li conf;
-         Wserver.wprint "%s %s\n"
-           (transl_nth conf "nth (generation)" niveau)
-           (transl conf "generation");
+         Wserver.wprint "%s %d\n" (capitale (transl conf "generation")) niveau;
          tag "ul" begin
            List.iter
               (fun gp ->
@@ -790,9 +786,8 @@ value afficher_ascendants_niveau conf base niveau_max p =
   in
   let title h =
     if h then
-      Wserver.wprint "%s %s\n"
-        (transl_nth conf "nth (generation)" niveau_max)
-        (transl conf "generation")
+      Wserver.wprint "%s %d\n" (capitale (transl conf "generation"))
+        niveau_max
     else
       Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
         (transl_decline conf "of" (person_text conf base p))
@@ -813,9 +808,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
     match title.val with
     [ Some level ->
        do html_li conf;
-          Wserver.wprint "%s %s\n"
-            (transl_nth conf "nth (generation)" level)
-            (transl conf "generation");
+          Wserver.wprint "%s %d\n" (capitale (transl conf "generation")) level;
           Wserver.wprint "<ul>\n";
           title.val := None;
        return ()

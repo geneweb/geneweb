@@ -9,6 +9,8 @@ GeneWeb Version 2.01
     names, cleaned up some code.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Apr 20, 99] Changed title text "nth generation" into "Generation n"
+    because of necessity in Swedish to add another translation.
   - [Apr 19, 99] Added "value=on" in checkboxes generated HTML code. Seemed
     to be the default in several browsers (Netscape, IE, Lynx) but not all of
     them (Kfm).
