@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.85 1999-07-29 17:02:48 ddr Exp $
+# $Id: lexicon.txt,v 2.86 1999-07-29 18:39:57 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1311,6 +1311,10 @@ nl: maken
 no: opprett
 pt: crear
 se: skapa
+
+    creation of a new family
+en: creation of a new family
+fr: cr&eacute;ation d'une nouvelle famille
 
     cremated
 cs: spálen/spálena

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.17 1999-07-28 15:49:36 ddr Exp $ *)
+(* $Id: update.ml,v 2.18 1999-07-29 18:39:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -679,7 +679,7 @@ value print_someone conf base p =
 
 value print_family_stuff conf base p a =
   tag "ul" begin
-   let _ = List.fold_left
+    let _ = List.fold_left
       (fun prev fi ->
          do match prev with
             [ Some prev_fi ->
@@ -740,6 +740,8 @@ value print_family_stuff conf base p a =
          Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d\">%s</a>\n"
            (commd conf) (Adef.int_of_iper p.cle_index)
            (capitale (transl_decline conf "add" s));
+         Wserver.wprint "<em>= %s</em>\n"
+           (transl conf "creation of a new family");
       return ();
   end
 ;
@@ -818,6 +820,8 @@ value print conf base p =
               Wserver.wprint "<a href=\"%sm=ADD_PAR;i=%d\">%s</a>\n"
                 (commd conf) (Adef.int_of_iper p.cle_index)
                 (capitale (transl_decline conf "add" s));
+              Wserver.wprint "<em>= %s</em>\n"
+                (transl conf "creation of a new family");
               Wserver.wprint "</ul>\n";
            return () ];
      Wserver.wprint "\n";
