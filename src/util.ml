@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.29 2000-01-25 03:18:02 ddr Exp $ *)
+(* $Id: util.ml,v 3.30 2000-02-03 01:37:25 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -795,17 +795,21 @@ value email_addr s i =
   | None -> None ]
 ;
 
+value dangerous_tags_list =
+  ["applet"; "embed"; "form"; "input"; "object"; "script"]
+;
+
 value dangerous_tag s i =
-  let d = "script" in
-  loop i 0 where rec loop i j =
-    if i = String.length s then False
-    else if j = String.length d then True
-    else
-      match s.[i] with
-      [ ' ' | '\n' | '\r' | '\t' | '/' -> loop (i + 1) j
-      | c ->
-          if Char.lowercase s.[i] = d.[j] then loop (i + 1) (j + 1)
-          else False ]
+  let tag_id =
+    loop i 0 where rec loop i len =
+      if i = String.length s then Buff.get len
+      else
+        match s.[i] with
+        [ 'a'..'z' | 'A'..'Z' as c ->
+            loop (i + 1) (Buff.store len (Char.lowercase s.[i]))
+        | _ -> if len = 0 then loop (i + 1) 0 else Buff.get len ]
+  in
+  List.mem tag_id dangerous_tags_list
 ;
 
 type tag_type = [ In_a_href | In_dang | In_norm | Out ];
