@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.4 1999-12-02 14:31:28 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.5 1999-12-03 03:25:19 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -34,10 +34,9 @@ value new_ghost_id =
 
 (* input dag *)
 
-value get_dag conf base =
+value get_dag_elems conf base =
   let module O = struct type t = iper; value compare = compare; end in
   let module S = Set.Make O in
-  let module M = Map.Make O in
   let set =
     loop S.empty 1 where rec loop set i =
       let s = string_of_int i in
@@ -54,7 +53,13 @@ value get_dag conf base =
           loop set (i + 1)
       | _ -> set ]
   in
-  let nodes = Array.of_list (S.elements set) in
+  S.elements set
+;
+
+value make_dag base list =
+  let module O = struct type t = iper; value compare = compare; end in
+  let module M = Map.Make O in
+  let nodes = Array.of_list list in
   let map =
     loop M.empty 0 where rec loop map i =
       if i = Array.length nodes then map
@@ -161,6 +166,18 @@ value print_html_table conf base print_indi short d t =
     in
     loop 0
   in
+  let exist_several_branches i k =
+    loop 0 where rec loop j =
+      if j = Array.length t.table.(i) then False
+      else
+        let x = t.table.(i).(j).span in
+        let e = t.table.(k).(j).elem in
+        loop1 (j + 1) where rec loop1 j =
+          if j = Array.length t.table.(i) then False
+          else if t.table.(i).(j).span <> x then loop j
+          else if t.table.(k).(j).elem <> e then True
+          else loop1 (j + 1)
+  in
   let print_hbars i k =
     do Wserver.wprint "<tr>\n"; return
     let rec loop j =
@@ -236,10 +253,17 @@ else (); return
        print_line_elem print_elem i i;
        if i < Array.length t.table - 1 then
          do if short then () else print_line_elem print_bar (i + 1) i;
-            print_hbars i i;
-            print_alone_bar i;
-            print_hbars i (i + 1);
-            if short then () else print_line_elem print_bar (i + 1) (i + 1);
+            if exist_several_branches i i then
+              do print_hbars i i;
+                 print_alone_bar i;
+              return ()
+            else ();
+            if exist_several_branches i (i + 1) then
+              do print_hbars i (i + 1);
+                 if short then ()
+                 else print_line_elem print_bar (i + 1) (i + 1);
+              return ()
+            else ();
          return ()
        else ();
      done;
@@ -869,11 +893,10 @@ value print_char_table d t =
 
 (* main *)
 
-value print conf base =
+value print_dag conf base d =
   let title _ =
     Wserver.wprint "%s" (Util.capitale (Util.transl conf "tree"))
   in
-  let d = get_dag conf base in
   let t = table_of_dag d in
   let print_indi ip =
     let p = poi base ip in
@@ -888,4 +911,9 @@ do let d = tag_dag d in print_char_table d (table_of_dag d); flush stderr; retur
      print_html_table conf base print_indi False d t;
      Util.trailer conf;
   return ()
+;
+
+value print conf base =
+  let d = make_dag base (get_dag_elems conf base) in
+  print_dag conf base d
 ;
