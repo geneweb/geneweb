@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.45 2005-02-05 18:47:12 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.46 2005-02-05 18:57:00 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -114,7 +114,7 @@ function checkCreate(create, redirect)
 %define;source(xvar,xx)
   <table border="1">
     <tr>
-      <td><label for="xvar_src">[*source/sources]0</label><td>
+      <td><label for="xvar_src">[*source/sources]0</label></td>
       <td><input name="xvar_src" size="40" maxlength="200"%sp;
        value="%xx_src;" id="xvar_src"%/></td>
     </tr>
@@ -297,7 +297,7 @@ function checkCreate(create, redirect)
 %foreach;witness;
   <table border="1">
     <tr>
-      <td><label for="witn%cnt;_fn">[*first name/first names]0</td>
+      <td><label for="witn%cnt;_fn">[*first name/first names]0</label></td>
       <td>
         <input name="witn%cnt;_fn" size="23" maxlength="200"%sp;
          value="%witness.first_name;" id="witn%cnt;_fn"%/>
@@ -406,7 +406,7 @@ function checkCreate(create, redirect)
                evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK" or
                evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK") and
               child.surname = father.surname)
-           %else;%child.surname;%end;" id="chxcnt_sn""%/>
+           %else;%child.surname;%end;" id="chxcnt_sn"%/>
       </td>
     </tr>
     <tr>
