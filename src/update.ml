@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.38 2004-12-30 10:11:26 ddr Exp $ *)
+(* $Id: update.ml,v 4.39 2005-02-05 06:34:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -959,21 +959,21 @@ value print conf base p =
     header conf title;
     print_link_to_welcome conf True;
     tag "table" "border=\"%d\" width=\"90%%\"" conf.border begin
-      tag "tr" "align=\"left\"" begin
-        tag "th" "align=\"left\"" begin
+      tag "tr" "align=\"%s\"" conf.left begin
+        tag "th" "align=\"%s\"" conf.left begin
           Wserver.wprint "%s"
             (std_color conf
                (capitale (nominative (transl_nth conf "person/persons" 0))));
           xtag "br";
         end;
-        tag "th" "align=\"left\"" begin
+        tag "th" "align=\"%s\"" conf.left begin
           Wserver.wprint "%s"
             (std_color conf
                (capitale (nominative (transl_nth conf "family/families" 1))));
           xtag "br";
         end;
       end;
-      tag "tr" "align=\"left\"" begin
+      tag "tr" "align=\"%s\"" conf.left begin
         tag "td" "valign=\"top\"" begin
           Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a>"
             (commd conf) (Adef.int_of_iper p.cle_index)

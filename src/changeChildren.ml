@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.14 2004-12-29 03:03:26 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.15 2005-02-05 06:34:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -13,7 +13,7 @@ value print_child_person conf base p =
   let occ = p.occ in
   let var = "c" ^ string_of_int (Adef.int_of_iper p.cle_index) in
   tag "table" "border=\"1\"" begin
-    tag "tr" "align=\"left\"" begin
+    tag "tr" "align=\"%s\"" conf.left begin
       tag "td" begin
         Wserver.wprint "%s"
           (capitale (transl_nth conf "first name/first names" 0));
@@ -23,7 +23,7 @@ value print_child_person conf base p =
           "name=\"%s_first_name\" size=\"23\" maxlength=\"200\" value=\"%s\""
           var (quote_escaped first_name);
       end;
-      tag "td" "align=\"right\"" begin
+      tag "td" "align=\"%s\"" conf.right begin
         let s = capitale (transl conf "number") in Wserver.wprint "%s" s;
       end;
       tag "td" begin
@@ -31,7 +31,7 @@ value print_child_person conf base p =
           (if occ == 0 then "" else " value=\"" ^ string_of_int occ ^ "\"");
       end;
     end;
-    tag "tr" "align=\"left\"" begin
+    tag "tr" "align=\"%s\"" conf.left begin
       tag "td" begin
         Wserver.wprint "%s" (capitale (transl_nth conf "surname/surnames" 0));
       end;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.30 2005-01-15 20:00:20 ddr Exp $ *)
+(* $Id: descend.ml,v 4.31 2005-02-05 06:34:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -107,7 +107,7 @@ value print_choice conf base p effective_level =
     end;
     tag "table" "border=\"%d\" width=\"100%%\"" conf.border begin
       tag "tr" begin
-        tag "td" "align=\"left\"" begin
+        tag "td" "align=\"%s\"" conf.left begin
           xtag "input"
             "type=\"radio\" name=\"t\" value=\"L\" checked=\"checked\"";
           Wserver.wprint "%s\n"
@@ -138,7 +138,7 @@ value print_choice conf base p effective_level =
           xtag "br";
           tag "table" "cellpadding=\"0\" cellspacing=\"0\"" begin
             tag "tr" begin
-              tag "td" "align=\"left\"" begin
+              tag "td" "align=\"%s\"" conf.left begin
                 Wserver.wprint "-&nbsp;%s" (capitale (transl conf "color"));
               end;
               tag "td" begin
@@ -155,7 +155,7 @@ type=\"radio\" name=\"color\" value=\"\" checked=\"checked\"";
             end;
           end;
         end;
-        tag "td" "align=\"left\"" begin
+        tag "td" "align=\"%s\"" conf.left begin
           xtag "input" "type=\"radio\" name=\"t\" value=\"S\"";
           Wserver.wprint "%s"
             (capitale (transl conf "only the generation selected"));
@@ -177,7 +177,7 @@ type=\"radio\" name=\"color\" value=\"\" checked=\"checked\"";
           xtag "br";
         end;
       end;
-      tag "tr" "align=\"left\"" begin
+      tag "tr" "align=\"%s\"" conf.left begin
         tag "td" "colspan=\"2\" align=\"center\"" begin
           xtag "br";
           Wserver.wprint "%s\n"
@@ -1021,7 +1021,7 @@ value rec print_table_person conf base max_lev ip =
   do {
     Wserver.wprint "\n";
     tag "table" "border=\"1\"" begin
-      Wserver.wprint "<tr align=\"left\">\n";
+      Wserver.wprint "<tr align=\"%s\">\n" conf.left;
       tag "td" "valign=\"top\"" begin
         print_someone conf base (pget conf base ip);
       end;

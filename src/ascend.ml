@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.49 2005-01-15 20:00:20 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.50 2005-02-05 06:34:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -93,7 +93,7 @@ value print_choice conf base p effective_level =
     end;
     tag "table" "border=\"%d\" width=\"100%%\"" conf.border begin
       tag "tr" begin
-        tag "td" "align=\"left\"" begin
+        tag "td" "align=\"%s\"" conf.left begin
           xtag "input"
             "type=\"radio\" name=\"t\" value=\"N\" checked=\"checked\"";
           Wserver.wprint " %s (*)" (capitale (transl conf "short display"));
@@ -137,10 +137,10 @@ type=\"checkbox\" name=\"notes\" value=\"on\" checked=\"checked\"";
             conf.border
           begin
             tag "tr" begin
-              stagn "td" "align=\"left\"" begin
+              stagn "td" "align=\"%s\"" conf.left begin
                 Wserver.wprint "-&nbsp;%s" (capitale (transl conf "color"));
               end;
-              stagn "td" "align=\"left\"" begin
+              stagn "td" "align=\"%s\"" conf.left begin
                 xtag "input" "\
 type=\"radio\" name=\"color\" value=\"\" checked=\"checked\"";
               end;
@@ -154,7 +154,7 @@ type=\"radio\" name=\"color\" value=\"\" checked=\"checked\"";
             end;
           end;
         end;
-        tag "td" "align=\"left\" valign=\"top\"" begin
+        tag "td" "align=\"%s\" valign=\"top\"" conf.left begin
           xtag "input" "type=\"radio\" name=\"t\" value=\"L\"";
           Wserver.wprint "%s"
             (capitale (transl_nth conf "list/list (ancestors)" 1));
@@ -1870,7 +1870,8 @@ value print_normal_tree conf base v p =
   in
   do {
     header_no_page_title conf title;
-    Wserver.wprint "<div style=\"text-align:right\"><a href=\"%s" (commd conf);
+    Wserver.wprint "<div style=\"text-align:%s\"><a href=\"%s" conf.right
+      (commd conf);
     List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v) conf.env;
     Wserver.wprint "dag=on;notab=on;slices=on";
     Wserver.wprint "\"><tt>//</tt></a></div>\n";

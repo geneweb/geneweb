@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.75 2005-02-03 16:19:37 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.76 2005-02-05 06:34:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -717,7 +717,9 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
              if not cgi then ATnone
              else
                let mode = try Sys.getenv "GW_MODE" with [ Not_found -> "" ] in
-               let r_user = try Sys.getenv "REMOTE_USER" with [ Not_found -> "" ] in
+               let r_user =
+                 try Sys.getenv "REMOTE_USER" with [ Not_found -> "" ]
+               in
                match (mode, r_user) with
                [ (_, "") -> ATnone
                | ("F", u) -> ATfriend u
@@ -864,6 +866,9 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
       [ Some "on" -> True
       | _ -> False ]
     in
+    let is_rtl =
+      try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ]
+    in
     let conf =
       {from = from_addr;
        wizard = wizard && not wizard_just_friend;
@@ -925,8 +930,9 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
          [ Some "xhtml-1.1" -> " /"
          | _ -> "" ];
        charset = "utf-8";
-       is_rtl =
-         try Hashtbl.find lexicon " !dir" = "rtl" with [ Not_found -> False ];
+       is_rtl = is_rtl;
+       left = if is_rtl then "right" else "left";
+       right = if is_rtl then "left" else "right";
        auth_file =
          try
            let x = List.assoc "auth_file" base_env in

@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.42 2005-02-03 09:59:13 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.43 2005-02-05 06:34:39 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -156,7 +156,7 @@ function checkCreate(create, redirect)
         <input name="paxcnt_fn" size="23" maxlength="200"%sp;
          value="%xx.first_name;"%/>
       </td>
-      <td align="right">[*number]</td>
+      <td align="%right;">[*number]</td>
       <td>
         <input name="paxcnt_occ" size="5" maxlength="8" value="%xx.occ;"%/>
       </td>
@@ -286,7 +286,7 @@ function checkCreate(create, redirect)
         <input name="witn%cnt;_fn" size="23" maxlength="200"%sp;
          value="%witness.first_name;"%/>
       </td>
-      <td align="right">[*number]</td>
+      <td align="%right;">[*number]</td>
       <td>
         <input name="witn%cnt;_occ" size="5" maxlength="8"%sp;
          value="%witness.occ;"%/>
@@ -366,7 +366,7 @@ function checkCreate(create, redirect)
         <input name="chxcnt_fn" size="23" maxlength="200"%sp;
          value="%child.first_name;"%/>
       </td>
-      <td align="right">[*number]</td>
+      <td align="%right;">[*number]</td>
       <td>
         <input name="chxcnt_occ" size="5" maxlength="8" value="%child.occ;"%/>
       </td>
@@ -411,7 +411,7 @@ function checkCreate(create, redirect)
   </table>
 %end;
 
-<ul>
+<ul style="list-style:inside">
 <li>
 %apply;insert_child("0")
 </li>
@@ -455,7 +455,7 @@ function checkCreate(create, redirect)
 </form>
 
 <div><a href="%prefix;"><img src="%image_prefix;/gwlogo.png"
- alt="..." width="64" height="72" style="border:0;float:right"%/></a><br%/>
+ alt="..." width="64" height="72" style="border:0;float:%right;"%/></a><br%/>
 </div>
 %copyright;
 %base_trailer;

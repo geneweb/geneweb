@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.41 2005-02-04 17:22:35 ddr Exp $ *)
+(* $Id: forum.ml,v 4.42 2005-02-05 06:34:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
@@ -93,7 +93,8 @@ value print_one_header conf prec_date ndisp pos h =
               if ndisp > 1 then do {
                 if d.month <> pd.month then
                   Wserver.wprint
-                    "<tr align=\"left\"><td colspan=\"4\">&nbsp;</td></tr>\n"
+                    "<tr align=\"%s\"><td colspan=\"4\">&nbsp;</td></tr>\n"
+                      conf.left
                 else ();
                 ndisp - 1
               }
@@ -107,8 +108,8 @@ value print_one_header conf prec_date ndisp pos h =
         | _ ->
             do { Wserver.wprint "<table border=\"%d\">\n" conf.border; ndisp } ]
       in
-      tag "tr" "align=\"left\"" begin
-        tag "td" "colspan=\"4\" align=\"left\"" begin
+      tag "tr" "align=\"%s\"" conf.left begin
+        tag "td" "colspan=\"4\" align=\"%s\"" conf.left begin
           Wserver.wprint "%s" (Date.string_of_date conf date);
         end;
       end;
@@ -117,7 +118,7 @@ value print_one_header conf prec_date ndisp pos h =
     else ndisp
   in
   do {
-    tag "tr" "align=\"left\"" begin
+    tag "tr" "align=\"%s\"" conf.left begin
       tag "td" begin
         Wserver.wprint "<tt>&nbsp;%s&nbsp;</tt>"
           (if access = "priv" then "*" else "&nbsp;");
@@ -166,8 +167,9 @@ value print_headers conf =
           [ Some s ->
               if nmess > max_header_mess then do {
                  Wserver.wprint
-                   "<tr align=\"left\"><td colspan=\"4\">&nbsp;</td></tr>\n";
-                 tag "tr" "align=\"left\"" begin
+                   "<tr align=\"%s\"><td colspan=\"4\">&nbsp;</td></tr>\n"
+                   conf.left;
+                 tag "tr" "align=\"%s\"" conf.left begin
                    tag "td" "colspan=\"4\"" begin
                      Wserver.wprint
                        "<a href=\"%sm=FORUM;len=%d;from=%d\">%s</a>\n"
@@ -430,7 +432,8 @@ value print_one_forum_message conf m pos next_pos forum_length =
     if browser_doesnt_have_tables conf then ()
     else
       Wserver.wprint
-        "<table cellspacing=\"0\" cellpadding=\"0\"><tr align=\"left\"><td>\n";
+        "<table cellspacing=\"0\" cellpadding=\"0\"><tr align=\"%s\"><td>\n"
+	conf.left;
     let mess =
       loop True 0 0 where rec loop last_was_eoln len i =
         if i = String.length m.m_mess then Buff.get len
@@ -484,7 +487,7 @@ value print conf base =
 (* Send a message *)
 
 value print_var conf var name opt def_value =
-  tag "tr" "align=\"left\"" begin
+  tag "tr" "align=\"%s\"" conf.left begin
     stag "td" begin
       Wserver.wprint "%s" name;
       if opt then Wserver.wprint " (%s)" (transl conf "optional") else ();

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.33 2005-02-05 03:51:58 ddr Exp $ *)
+(* $Id: templ.ml,v 4.34 2005-02-05 06:34:39 ddr Exp $ *)
 
 open Config;
 open TemplAst;
@@ -458,8 +458,10 @@ value not_impl func x =
 
 value eval_variable conf =
   fun 
-  [ "nl" -> "\n"
+  [ "left" -> conf.left
+  | "nl" -> "\n"
   | "nn" -> ""
+  | "right" -> conf.right
   | "sp" -> " "
   | "/" -> conf.xhs
   | _ -> raise Not_found ]

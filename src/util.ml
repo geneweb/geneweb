@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.114 2005-02-05 03:51:58 ddr Exp $ *)
+(* $Id: util.ml,v 4.115 2005-02-05 06:34:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -110,12 +110,13 @@ value nth_field w n =
 ;
 
 value transl conf w =
-  try Hashtbl.find conf.lexicon w with [ Not_found -> "[" ^ w ^ "]" ]
+  try Hashtbl.find conf.lexicon w with
+  [ Not_found -> "<bdo dir=\"ltr\">[" ^ w ^ "]</bdo>" ]
 ;
 
 value transl_nth conf w n =
   try nth_field (Hashtbl.find conf.lexicon w) n with
-  [ Not_found -> "[" ^ nth_field w n ^ "]" ]
+  [ Not_found -> "<bdo dir=\"ltr\">[" ^ nth_field w n ^ "]</bdo>" ]
 ;
 
 value transl_nth_def conf w n def_n =
@@ -124,7 +125,7 @@ value transl_nth_def conf w n def_n =
     let (i1, i2) = nth_field_abs w n in
     if i2 == i1 then nth_field w def_n else String.sub w i1 (i2 - i1)
   with
-  [ Not_found -> "[" ^ nth_field w def_n ^ "]" ]
+  [ Not_found -> "<bdo dir=\"ltr\">[" ^ nth_field w def_n ^ "]</bdo>" ]
 ;
 
 value plus_decl s =
@@ -209,7 +210,8 @@ value transl_a_of_gr_eq_gen_lev conf =
   gen_decline2 (transl_nth conf "%1 of %2" 1)
 ;
 
-value failed_format s : format 'a 'b 'c = Obj.magic ("[" ^ s ^ "]");
+value failed_format s : format 'a 'b 'c =
+  Obj.magic ("<bdo dir=\"ltr\">[" ^ s ^ "]</bdo>");
 
 value valid_format ini_fmt (r : string) =
   let s : string = Obj.magic (ini_fmt : format 'a 'b 'c) in
@@ -1427,10 +1429,11 @@ value gen_trailer with_logo conf =
       Wserver.wprint "\
 <div>
 <a href=\"%s\"><img src=\"%s/gwlogo.png\"
- alt=\"...\" width=\"64\" height=\"72\" style=\"border:0;float:right\"%s></a>
+ alt=\"...\" width=\"64\" height=\"72\" style=\"border:0;float:%s\"%s></a>
 <br%s>
 </div>
-" (commd conf) (image_prefix conf) conf.xhs conf.xhs;
+" (commd conf) (image_prefix conf) conf.right
+      conf.xhs conf.xhs;
     print_copyright conf;
     include_hed_trl conf None ".trl";
     Wserver.wprint "</body>\n</html>\n";
@@ -1779,7 +1782,6 @@ value print_link_to_welcome conf right_aligned =
   if conf.cancel_links then ()
   else do {
     let fname = up_fname conf in
-    let dir = if conf.is_rtl then "left" else "right" in
     let wid_hei =
       match image_size (image_file_name fname) with
       [ Some (wid, hei) ->
@@ -1788,7 +1790,7 @@ value print_link_to_welcome conf right_aligned =
       | None -> "" ]
     in
     if right_aligned then
-      Wserver.wprint "<table style=\"float:%s\"><tr><td>\n" dir
+      Wserver.wprint "<table style=\"float:%s\"><tr><td>\n" conf.right
     else Wserver.wprint "<p>\n";
     let str = link_to_referer conf in
     if str = "" then () else Wserver.wprint "%s" str;
