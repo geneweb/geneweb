@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.6 2001-06-30 11:20:34 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.7 2001-07-17 01:38:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -479,7 +479,8 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
       try Hashtbl.find patches i with
       [ Not_found ->
           if i < 0 || i >= len then
-            failwith ("access " ^ name ^ " out of bounds")
+            failwith
+              ("access " ^ name ^ " out of bounds; i = " ^ string_of_int i)
           else do {
             seek_in ic_acc (shift + Iovalue.sizeof_long * i);
             let pos = input_binary_int ic_acc in
