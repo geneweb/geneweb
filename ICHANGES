@@ -5,6 +5,7 @@ GeneWeb Intermediate Version 2.01-2
 -----------------------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Apr 1, 99] Fixed behavior in updating persons form for burial.
   - [Apr 28, 99] Fixed fragile part of code that reads the lexicon. Raised
     'Invalid_argument "String.sub"' if the lexicon held lines interpreted
     as keys but of string length < 4. The lexicon should not, but if it
