@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 1.3 2004-12-14 09:30:09 ddr Exp $
+# $Id: lexicon.txt,v 1.4 2005-01-09 01:41:29 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !languages
@@ -42,3 +42,23 @@ en: yes
 es: si
 fr: oui
 it: si
+
+    main page
+en: main page
+fr: page principale
+
+    Upload
+en: Upload
+fr: Envoyer
+
+    Upload from
+en: Upload from
+fr: Envoyer à partir de
+
+    database files
+en: database files
+fr: fichiers base
+
+    Download
+en: Download
+fr: Recevoir

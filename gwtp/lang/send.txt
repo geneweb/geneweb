@@ -1,14 +1,15 @@
 <head>
   <!-- Copyright (c) 1998-2005 INRIA - GeneWeb -->
-  <!-- $Id: send.txt,v 1.6 2004-12-14 09:53:17 ddr Exp $ -->
-  <title>Gwtp - upload %b</title>
+  <!-- $Id: send.txt,v 1.7 2005-01-09 01:41:29 ddr Exp $ -->
+  <title>Gwtp - [Upload] "%b"</title>
 </head>
 <body>
-<h1 align=center>Gwtp - upload %b</h1>
+<h1 align=center>Gwtp - [Upload] "%b"</h1>
 <form method=POST action="%s" enctype="multipart/form-data">
 <input type=hidden name=m value=SEND>
 <input type=hidden name=b value=%b>
 <input type=hidden name=t value=%t>
+<input type=hidden name=lang value=%l>
 
 <div align=right>
 <a href="%s?m=UPL;b=%b;t=%t;lang=de">Deutsch</a> /
@@ -91,3 +92,9 @@ es: Enviar
 fr: Envoyer
 ]">
 </form>
+
+<p><hr><div align=right>
+<a href="%s?m=MAIN;b=%b;t=%t;lang=%l">[main page]</a></div>
+
+</body>
+</html>
