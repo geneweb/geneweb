@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.38 2005-02-08 18:05:58 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.39 2005-02-10 05:20:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -239,7 +239,6 @@ value name_key s =
   Name.lower s
 ;
 
-(**)
 value initial s =
   loop 0 where rec loop i =
     if i == String.length s then 0
@@ -264,18 +263,13 @@ value unaccent =
   | c -> c ]
 ;
 
-value compare_names s1 s2 =
+value compare_names_1 s1 s2 =
   let compare_aux e1 e2 =
     loop where rec loop i1 i2 =
       if i1 == e1 && i2 == e2 then 0
       else if i1 == e1 then -1
       else if i2 == e2 then 1
       else
-(*
-        if s1.[i1] < s2.[i2] then -1
-        else if s1.[i1] > s2.[i2] then 1
-        else loop (i1 + 1) (i2 + 1)
-*)
         let c1 = unaccent (Char.lowercase s1.[i1]) in
         let c2 = unaccent (Char.lowercase s2.[i2]) in
         match (c1, c2) with
@@ -286,7 +280,6 @@ value compare_names s1 s2 =
         | ('a'..'z', _) -> 1
         | (_, 'a'..'z') -> -1
         | _ -> loop (i1 + 1) (i2 + 1) ]
-(**)
   in
   if s1 = s2 then 0
   else
@@ -296,9 +289,10 @@ value compare_names s1 s2 =
     [ 0 -> compare_aux i1 i2 0 0
     | x -> x ]
 ;
-(*
-value compare_names s1 s2 = compare (name_key s1) (name_key s2);
-*)
+
+value compare_names s1 s2 =
+  if utf_8_db.val then compare s1 s2 else compare_names_1 s1 s2
+;
 
 value compare_istr_fun base_data is1 is2 =
   if is1 == is2 then 0
