@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.14 2002-01-30 21:42:40 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.15 2002-01-30 21:52:33 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -2047,12 +2047,12 @@ value build_surnames_list conf base v p =
             if surn <> fath.surname && surn <> moth.surname then
               add_surname sosa p surn dp
             else ();
-            let sosa = Num.twice sosa;
+            let sosa = Num.twice sosa in
             if not (is_hidden fath) then
               let dp1 = merge_date_place conf base surn dp fath in
               loop (lev + 1) sosa fath fath.surname dp1
             else ();
-            let sosa = Num.inc sosa 1;
+            let sosa = Num.inc sosa 1 in
             if not (is_hidden moth) then
               let dp2 = merge_date_place conf base surn dp moth in
               loop (lev + 1) sosa moth moth.surname dp2
