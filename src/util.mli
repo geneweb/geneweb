@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.11 2002-03-05 16:29:59 ddr Exp $ *)
+(* $Id: util.mli,v 4.12 2002-03-11 17:24:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -31,15 +31,14 @@ value code_varenv : string -> string;
 value decode_varenv : string -> string;
 value hidden_env : config -> unit;
 
-value age_autorise : config -> base -> person -> bool;
+value authorized_age : config -> base -> person -> bool;
 value is_old_person : config -> person -> bool;
 value fast_auth_age : config -> person -> bool;
 
 value start_with_vowel : string -> bool;
-value connais : base -> person -> bool;
+value know : base -> person -> bool;
 value acces_n : config -> base -> string -> person -> string;
 value acces : config -> base -> person -> string;
-value calculer_age : config -> person -> option dmy;
 value wprint_hidden_person : config -> base -> string -> person -> unit;
 
 value geneweb_link : config -> string -> string -> string;

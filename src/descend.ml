@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.9 2002-01-30 11:49:48 ddr Exp $ *)
+(* $Id: descend.ml,v 4.10 2002-03-11 17:24:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -178,7 +178,7 @@ value s_appelle_comme_son_pere conf base ip =
 ;
 
 value afficher_marie conf base first fam p spouse =
-  let auth = age_autorise conf base p && age_autorise conf base spouse in
+  let auth = authorized_age conf base p && authorized_age conf base spouse in
   do {
     Wserver.wprint (fcapitale (relation_txt conf p.sex fam))
       (fun _ ->
@@ -240,7 +240,7 @@ value
              let fam = foi base ifam in
              let c = spouse x.cle_index (coi base ifam) in
              let c = pget conf base c in
-             if connais base c then do {
+             if know base c then do {
                afficher_marie conf base first fam x c;
                Wserver.wprint ".";
                html_br conf
@@ -284,7 +284,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
                list []
            in
            do {
-             if connais base conj || List.length ifaml > 1 then do {
+             if know base conj || List.length ifaml > 1 then do {
                afficher_marie conf base first fam p conj;
                if children <> [] then
                  Wserver.wprint ", <em>%s</em>"
@@ -295,7 +295,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
              else ();
              if children <> [] then do {
                let age_auth =
-                 List.for_all (fun p -> age_autorise conf base p) children
+                 List.for_all (fun p -> authorized_age conf base p) children
                in
                tag "ul" begin
                  List.iter
@@ -324,9 +324,9 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
               (if line = Male then 0 else 1)));
     html_p conf;
     stag "strong" begin afficher_personne_referencee conf base p; end;
-    if age_autorise conf base p then Date.print_dates conf base p else ();
+    if authorized_age conf base p then Date.print_dates conf base p else ();
     let occu = sou base p.occupation in
-    if age_autorise conf base p && occu <> "" then Wserver.wprint ", %s" occu
+    if authorized_age conf base p && occu <> "" then Wserver.wprint ", %s" occu
     else ();
     Wserver.wprint ".";
     html_br conf;
@@ -743,7 +743,7 @@ value afficher_descendants_numerotation conf base niveau_max ancetre =
     total.val := 0;
     Date.afficher_dates_courtes conf base ancetre;
     let p = ancetre in
-    if age_autorise conf base p then
+    if authorized_age conf base p then
       match (Adef.od_of_codate p.birth, p.death) with
       [ (Some _, _) | (_, Death _ _) -> html_br conf
       | _ -> () ]
@@ -1184,7 +1184,7 @@ value make_tree_hts conf base gv p =
                     else
                       let age_auth =
                         List.for_all
-                          (fun ip -> age_autorise conf base (pget conf base ip))
+                          (fun ip -> authorized_age conf base (pget conf base ip))
                           (Array.to_list des.children)
                       in
                       List.fold_right
@@ -1253,8 +1253,8 @@ value print_aboville conf base max_level p =
             let cpl = coi base u.family.(i) in
             let spouse = pget conf base (Gutil.spouse p.cle_index cpl) in
             let mdate =
-              if age_autorise conf base p &&
-                 age_autorise conf base spouse then
+              if authorized_age conf base p &&
+                 authorized_age conf base spouse then
                 let fam = foi base u.family.(i) in
                 match Adef.od_of_codate fam.marriage with
                 [ Some (Dgreg d _) ->

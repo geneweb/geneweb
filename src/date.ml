@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.8 2002-03-06 12:21:20 ddr Exp $ *)
+(* $Id: date.ml,v 4.9 2002-03-11 17:24:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -300,7 +300,7 @@ value get_birth_death_date p =
 ;
 
 value short_dates_text conf base p =
-  if age_autorise conf base p then
+  if authorized_age conf base p then
     let (birth_date, death_date, _) = get_birth_death_date p in
     let s = "" in
     let s =
@@ -328,7 +328,7 @@ value short_dates_text conf base p =
 ;
 
 value short_marriage_date_text conf base fam p1 p2 =
-  if age_autorise conf base p1 && age_autorise conf base p2 then
+  if authorized_age conf base p1 && authorized_age conf base p2 then
     match Adef.od_of_codate fam.marriage with
     [ Some (Dgreg d _) -> "<font size=-2>" ^ year_text d ^ "</font>"
     | _ -> "" ]
