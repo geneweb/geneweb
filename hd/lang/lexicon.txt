@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.197 2000-12-11 10:37:00 ddr Exp $
+# $Id: lexicon.txt,v 3.198 2000-12-13 01:09:01 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -291,6 +291,7 @@ es: el género de %t es incoherente con sus relaciones
 fi: henkil&ouml;n %t sukupuoli ja h&auml;nen suhteensa eiv&auml;t t&auml;sm&auml;&auml;
 fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
 it: il sesso di %t non e' coerente con le sue relazioni
+nl: het geslacht van %t is niet samenhangend met zijn/haar relaties
 no: %ts kjønn er uforenlig med forbindelsene hans/hennes
 pt: o sexo de %t não é coerente com suas relações
 se: %ts kön stämmer inte överens med sina relationer
@@ -343,6 +344,7 @@ en: Vendemiaire/Brumaire/Frimaire/Nivose/Pluviose/Ventose/Germinal/Floreal/Prair
 eo: vendemjero/brumero/frimero/nivozo/pluvjozo/ventozo/germinalo/florealo/prerialo/mesidoro/termindoro/fructidoro/suplemento
 fi: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 fr: vend&eacute;miaire/brumaire/frimaire/niv&ocirc;se/pluvi&ocirc;se/vent&ocirc;se/germinal/flor&eacute;al/prairial/messidor/thermidor/fructidor/compl&eacute;mentaire
+nl: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 no: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/complémentaire
 se: vendémiaire/brumaire/frimaire/nivôse/pluviôse/ventôse/germinal/floréal/prairial/messidor/thermidor/fructidor/komplementär
 
@@ -354,6 +356,7 @@ eo: tisxrio/hesxvano/kislevo/teveto/sxevato/adaro 1/adaro 2/nisano/ijaro/sivano/
 fi: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 fr: tichri/marhechvan/kislev/tevet/chevat/adar 1/adar 2/nissan/iyar/sivan/tamouz/av/eloul
 he: úùøé/ çùåï/ ëñìå/ èáú/ ùáè/ àãø à'/ àãø á'/ ğéñï/ àééø/ ñéåï/ úîåæ/ àá/ àìåì
+nl: Tishri/Marcheswan/Kislew/Tebeth/Shebat/Adar/Adar2/Niesan/Ijjar/Siwan/Tammuz/Ab/Elul
 no: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 se: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/av/elul
 
