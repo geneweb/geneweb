@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.65 2000-02-15 15:49:09 ddr Exp $
+# $Id: lexicon.txt,v 3.66 2000-02-16 17:10:22 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -36,7 +36,7 @@ is:  til aр sjб fyrstu grein
 it:  per vedere il primo
 nl:  om de eerste tak te zien
 no:  for &aring; se den f&oslash;rste
-pt:  para ver a primeira
+pt:  para ver o primeiro ramo
 ru:  чтобы увидеть первую ветку
 se:  f&ouml;r att se den f&ouml;rsta
 
@@ -53,7 +53,7 @@ is:  til aр sjб fyrstu tengsl
 it:  per vedere il primo
 nl:  om de eerste te zien
 no:  for &aring; se den f&oslash;rste
-pt:  para ver o primeiro
+pt:  para ver o primeiro link
 ru:  чтобы увидеть первую связь отношения
 se:  f&ouml;r att se den f&ouml;rsta
 
@@ -1694,7 +1694,7 @@ is: athugasemd
 it: commento
 nl: Kommentaar
 no: kommentar
-pt: comment&aacute;rio
+pt: coment&aacute;rio
 ru: комментарий
 se: kommentar
 
