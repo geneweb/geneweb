@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.11 2004-07-18 08:53:55 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.12 2004-07-18 14:26:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -751,7 +751,7 @@ value read_family ic fname =
           | Some (str, ["cbp" :: _]) -> failwith str
           | _ -> ("", line) ]
         in
-        let co = couple cle_pere cle_mere in
+        let co = couple False cle_pere cle_mere in
         let (comm, line) =
           match line with
           [ Some (str, ["comm" :: _]) ->

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.42 2004-07-18 09:02:01 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.43 2004-07-18 14:26:37 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -874,7 +874,7 @@ value unknown_fam gen i =
      marriage_src = empty; witnesses = [| |]; relation = Married;
      divorce = NotDivorced; comment = empty; origin_file = empty;
      fsources = empty; fam_index = Adef.ifam_of_int i}
-  and c = couple father mother
+  and c = couple False father mother
   and d = {children = [| |]} in
   (f, c, d)
 ;
@@ -1945,7 +1945,7 @@ value add_fam_norm gen r adop_list =
        relation = relation; divorce = div; comment = add_string gen comment;
        origin_file = string_empty; fsources = add_string gen fsources;
        fam_index = i}
-    and cpl = couple fath moth
+    and cpl = couple False fath moth
     and des = {children = Array.of_list children} in
     gen.g_fam.arr.(Adef.int_of_ifam i) := Right3 fam cpl des
   }

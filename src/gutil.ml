@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.18 2004-07-18 08:53:55 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.19 2004-07-18 14:26:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -213,9 +213,13 @@ value designation base p =
 
 value father = Adef.father;
 value mother = Adef.mother;
-value couple = Adef.couple;
+value couple multi fath moth =
+  if not multi then Adef.couple fath moth else Adef.multi_couple fath moth
+;
+value parent multi parent =
+  if not multi then Adef.parent parent else Adef.multi_parent parent
+;
 value parent_array = Adef.parent_array;
-value parent = Adef.parent;
 value set_father = Adef.set_father;
 value set_mother = Adef.set_mother;
 
@@ -1063,7 +1067,9 @@ value map_family_ps fp fs fam =
    fam_index = fam.fam_index}
 ;
 
-value map_couple_p fp cpl = parent (Array.map fp (parent_array cpl));
+value map_couple_p multi_parents fp cpl =
+  parent multi_parents (Array.map fp (parent_array cpl))
+;
 
 value map_descend_p fp des = {children = Array.map fp des.children};
 

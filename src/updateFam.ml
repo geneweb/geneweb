@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.39 2004-07-18 08:53:55 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.40 2004-07-18 14:26:39 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -26,9 +26,9 @@ value person_key base ip =
   (first_name, surname, occ, Update.Link, "")
 ;
 
-value string_family_of base fam cpl des =
+value string_family_of conf base fam cpl des =
   let sfam = Gutil.map_family_ps (person_key base) (sou base) fam in
-  let scpl = Gutil.map_couple_p (person_key base) cpl in
+  let scpl = Gutil.map_couple_p conf.multi_parents (person_key base) cpl in
   let sdes = Gutil.map_descend_p (person_key base) des in
   (sfam, scpl, sdes)
 ;
@@ -306,12 +306,23 @@ value eval_gen_bool_variable conf base env fcd =
       else do { Wserver.wprint ">%%%s???" s; False } ]
 ;
 
+value eval_base_bool_variable conf base env fcd =
+  fun
+  [ s ->
+      let v = extract_var "cvar_" s in
+      if v <> "" then
+        match p_getenv conf.base_env v with
+        [ Some "yes" -> True
+        | _ -> False ]
+      else do { Wserver.wprint ">%%%s???" s; False } ]
+;
+
 value eval_bool_variable conf base env fcd s sl =
   match eval_variable conf base env fcd [s :: sl] with
   [ VVgen s -> eval_gen_bool_variable conf base env fcd s
   | VVcreate _ _ -> do { Wserver.wprint ">%%%s???" s; False }
   | VVdate _ _ -> do { Wserver.wprint ">%%%s???" s; False }
-  | VVcvar _ -> do { Wserver.wprint ">%%%s???" s; False }
+  | VVcvar _ -> eval_base_bool_variable conf base env fcd s
   | VVind _ _ -> do { Wserver.wprint ">%%VVind???"; False }
   | VVnone -> do { Wserver.wprint ">%%%s???" s; False } ]
 ;
@@ -466,7 +477,10 @@ value print_mod1 conf base fam cpl des digest =
 ;
 
 value print_merge1 conf base fam des fam2 digest =
-  let cpl = Gutil.map_couple_p (person_key base) (coi base fam.fam_index) in
+  let cpl =
+    Gutil.map_couple_p conf.multi_parents (person_key base)
+      (coi base fam.fam_index)
+  in
   print_update_fam conf base (fam, cpl, des) digest
 ;
 
@@ -563,7 +577,7 @@ value print_add conf base =
      witnesses = [| |]; relation = Married; divorce = NotDivorced;
      comment = ""; origin_file = ""; fsources = default_source conf;
      fam_index = bogus_family_index}
-  and cpl = couple fath moth
+  and cpl = couple conf.multi_parents fath moth
   and des = {children = [| |]} in
   print_add1 conf base fam cpl des digest False
 ;
@@ -578,7 +592,7 @@ value print_add_parents conf base =
          comment = ""; origin_file = ""; fsources = default_source conf;
          fam_index = bogus_family_index}
       and cpl =
-        couple
+        couple conf.multi_parents
           ("", sou base p.surname, 0, Update.Create Neuter None, "")
           ("", "", 0, Update.Create Neuter None, "")
       and des =
@@ -596,7 +610,7 @@ value print_mod conf base =
       let fam = foi base (Adef.ifam_of_int i) in
       let cpl = coi base (Adef.ifam_of_int i) in
       let des = doi base (Adef.ifam_of_int i) in
-      let (sfam, scpl, sdes) = string_family_of base fam cpl des in
+      let (sfam, scpl, sdes) = string_family_of conf base fam cpl des in
       let digest = Update.digest_family fam cpl des in
       print_mod1 conf base sfam scpl sdes digest
   | _ -> incorrect_request conf ]

@@ -1,4 +1,4 @@
-(* $Id: adef.mli,v 4.2 2004-07-18 08:53:55 ddr Exp $ *)
+(* $Id: adef.mli,v 4.3 2004-07-18 14:26:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type iper = 'a;
@@ -56,3 +56,6 @@ value parent_array : gen_couple 'a -> array 'a;
 
 value set_father : gen_couple 'a -> 'a -> unit;
 value set_mother : gen_couple 'a -> 'a -> unit;
+
+value multi_couple : 'a -> 'a -> gen_couple 'a;
+value multi_parent : array 'a -> gen_couple 'a;

@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.13 2004-07-18 08:53:55 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.14 2004-07-18 14:26:38 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -55,7 +55,7 @@ value map_person_ps :
 value map_family_ps :
   ('a -> 'c) -> ('b -> 'd) -> gen_family 'a 'b -> gen_family 'c 'd
 ;
-value map_couple_p : ('a -> 'b) -> gen_couple 'a -> gen_couple 'b;
+value map_couple_p : bool -> ('a -> 'b) -> gen_couple 'a -> gen_couple 'b;
 value map_descend_p : ('a -> 'b) -> gen_descend 'a -> gen_descend 'b;
 
 (* check base *)
@@ -120,9 +120,9 @@ value sort_person_list : base -> list person -> list person;
 
 value father : gen_couple 'a -> 'a;
 value mother : gen_couple 'a -> 'a;
-value couple : 'a -> 'a -> gen_couple 'a;
+value couple : bool -> 'a -> 'a -> gen_couple 'a;
+value parent : bool -> array 'a -> gen_couple 'a;
 value parent_array : gen_couple 'a -> array 'a;
-value parent : array 'a -> gen_couple 'a;
 
 value set_father : gen_couple 'a -> 'a -> unit;
 value set_mother : gen_couple 'a -> 'a -> unit;

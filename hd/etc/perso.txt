@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.28 2004-07-01 14:00:24 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.29 2004-07-18 14:26:38 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -159,14 +159,12 @@
 %if;has_parents;
   <h3><font color=%highlight;>[*parents]</font></h3>
   <ul>
-  <li type=%if;father.has_parents;disc%else;circle%end;>
-  %if;(cancel_links or father.is_restricted);%father;
-  %else;<a href="%prefix;%father.access;">%father;</a>%end;
-  %father.title;%father.dates;%nl;
-  <li type=%if;mother.has_parents;disc%else;circle%end;>
-  %if;(cancel_links or mother.is_restricted);%mother;
-  %else;<a href="%prefix;%mother.access;">%mother;</a>%end;
-  %mother.title;%mother.dates;%nl;
+  %foreach;parent;
+    <li type=%if;parent.has_parents;disc%else;circle%end;>
+    %if;(cancel_links or parent.is_restricted);%parent;
+    %else;<a href="%prefix;%parent.access;">%parent;</a>%end;
+    %parent.title;%parent.dates;%nl;
+  %end;
   </ul>
 %end;
 
