@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.6 2002-12-26 14:26:26 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.7 2002-12-30 18:40:06 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -172,6 +172,7 @@ value print conf base =
   else
     match p_getenv conf.env "v" with
     [ Some wz ->
+        let wz = Filename.basename wz in
         match p_getenv conf.env "notes" with
         [ Some nn ->
             if conf.wizard && conf.user = wz then
