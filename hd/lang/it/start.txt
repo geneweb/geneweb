@@ -13,8 +13,8 @@ La base di dati contiene attualmente %n persone.
 
 <li>
 
-<form method=GET action="%f">%h
-<input type=hidden name=m value=NG>
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
 Ricerca: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -30,8 +30,8 @@ Per:
 
 <li>
 
-<FORM method=GET action="%f">%h
-<input type=hidden name=m value=TT>
+<FORM method=GET action="%f">
+%h<input type=hidden name=m value=TT>
 Per titolo <INPUT NAME=t size=14 maxlength=200>
 luogo <INPUT NAME=p size=25 maxlength=200> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
@@ -39,8 +39,8 @@ luogo <INPUT NAME=p size=25 maxlength=200> =&gt;
 
 <li>
 
-<FORM method=GET action="%f">%h
-Tutti i
+<FORM method=GET action="%f">
+%hTutti i
 <SELECT NAME=m>
    <OPTION VALUE="N" SELECTED> Cognomi
    <OPTION VALUE="P"> Nomi
@@ -71,8 +71,8 @@ Ci sono stati %c accessi a questa pagina.
 
 <p>
 
-<form method=get action="%f">%h
-<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:</font>
+<form method=get action="%f">
+%h<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:</font>
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
 </form>

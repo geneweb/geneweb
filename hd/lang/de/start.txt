@@ -13,8 +13,8 @@ Die Datenbank enth&auml;lt z.Zt. %n Personen.
 
 <li>
 
-<form method=GET action="%f">%h
-<input type=hidden name=m value=NG>
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
 Suchen: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -33,8 +33,8 @@ Um einen <em>Nachnamen</em>.
 
 <li>
 
-<form method=GET action="%f">%h
-<input type=hidden name=m value=TT>
+<form method=GET action="%f">
+%h<input type=hidden name=m value=TT>
 Bei Titel <input name=t size=14 maxlength=200>
 Platz <input name=p size=25 maxlength=200> =&gt
 <input type=submit VALUE="Ok">
@@ -42,8 +42,8 @@ Platz <input name=p size=25 maxlength=200> =&gt
 
 <li>
 
-<form method=GET action="%f">%h
-Alle
+<form method=GET action="%f">
+%hAlle
 <select name=m>
    <option value="N" selected> Nachnamen
    <option value="P"> Vornamen
@@ -73,8 +73,8 @@ Es hat %q Zugriffe mit %c auf diese Seite gegeben, seit %d.
 
 <p>
 
-<form method=get action="%f">%h
-<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:</font>
+<form method=get action="%f">
+%h<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:</font>
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
 </form>

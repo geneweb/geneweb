@@ -14,8 +14,8 @@ La base contiene actualmente %n personas.
 
 <li>
 
-<form method=GET action="%f">%h
-<input type=hidden name=m value=NG>
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
 Buscar: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -34,8 +34,8 @@ De un <em>apellido</em>.
 
 <li>
 
-<FORM method=GET action="%f">%h
-<input type=hidden name=m value=TT>
+<FORM method=GET action="%f">
+%h<input type=hidden name=m value=TT>
 Por título <INPUT NAME=t size=14 maxlength=200>
 lugar <INPUT NAME=p size=25 maxlength=200> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
@@ -43,8 +43,8 @@ lugar <INPUT NAME=p size=25 maxlength=200> =&gt;
 
 <li>
 
-<FORM method=GET action="%f">%h
-Todos los
+<FORM method=GET action="%f">
+%hTodos los
 <SELECT NAME=m>
    <OPTION VALUE="N" SELECTED> Apellidos
    <OPTION VALUE="P"> Nombres
@@ -77,8 +77,8 @@ Han habido %c consultas con %c a esta p&aacute;gina desde %d.
 
 <p>
 
-<form method=get action="%f">%h
-<font size=-1>Contrase&ntilde;a, para entrada <em>amigo</em> o
+<form method=get action="%f">
+%h<font size=-1>Contrase&ntilde;a, para entrada <em>amigo</em> o
 <em>brujo</em>:</font>
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">

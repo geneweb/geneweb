@@ -12,8 +12,8 @@
 
 <ul>
 <li>
-<form method=GET action="%f">%h
-<input type=hidden name=m value=NG>
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
 搜索：<input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -28,8 +28,8 @@
 
 <li>
 
-<FORM method=GET action="%f">%h
-<input type=hidden name=m value=TT>
+<FORM method=GET action="%f">
+%h<input type=hidden name=m value=TT>
 根据名衔<INPUT NAME=t size=12 maxlength=200>
 地点<INPUT NAME=p size=24 maxlength=200> 搜索 =&gt;
 <INPUT TYPE=submit VALUE="Ok">
@@ -37,8 +37,8 @@
 
 <li>
 
-<FORM method=GET action="%f">%h
-<table border=0>
+<FORM method=GET action="%f">
+%h<table border=0>
 <tr>
 <td valign=center>显示所的
 <td>
@@ -75,8 +75,8 @@
 
 <p>
 
-<form method=get action="%f">%h
-<font size=-1>授权用户(friend or wizard), 请输入密码：</font>
+<form method=get action="%f">
+%h<font size=-1>授权用户(friend or wizard), 请输入密码：</font>
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
 </form>

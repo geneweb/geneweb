@@ -14,8 +14,8 @@ The data base now holds %n persons.
 
 <li>
 
-<form method=GET action="%f">%h
-<input type=hidden name=m value=NG>
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
 Search: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -31,8 +31,8 @@ or <em>public name</em>, or <em>alias</em>.
 
 <li>
 
-<FORM method=GET action="%f">%h
-<input type=hidden name=m value=TT>
+<FORM method=GET action="%f">
+%h<input type=hidden name=m value=TT>
 By title <INPUT NAME=t size=14 maxlength=200>
 place <INPUT NAME=p size=25 maxlength=200> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
@@ -40,8 +40,8 @@ place <INPUT NAME=p size=25 maxlength=200> =&gt;
 
 <li>
 
-<FORM method=GET action="%f">%h
-All the
+<FORM method=GET action="%f">
+%hAll the
 <SELECT NAME=m>
    <OPTION VALUE="N" SELECTED> Surnames
    <OPTION VALUE="P"> First names
@@ -72,8 +72,8 @@ There has been %q accesses, %c of them to this page, since %d.
 
 <p>
 
-<form method=get action="%f">%h
-<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:</font>
+<form method=get action="%f">
+%h<font size=-1>Password, for <em>friend</em> or <em>wizard</em> access:</font>
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
 </form>
