@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.22 2001-03-10 18:07:54 ddr Exp $
+# $Id: geneweb.spec,v 4.0 2001-03-16 19:33:03 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #

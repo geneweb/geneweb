@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 3.6 2001-01-06 09:55:53 ddr Exp $ *)
+(* $Id: consangAll.ml,v 4.0 2001-03-16 19:34:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 3.13 2001-03-01 13:03:32 ddr Exp $ *)
+(* $Id: some.ml,v 4.0 2001-03-16 19:35:02 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;

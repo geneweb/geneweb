@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 3.13 2001-03-09 13:41:51 ddr Exp $ *)
+(* $Id: title.ml,v 4.0 2001-03-16 19:35:03 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;

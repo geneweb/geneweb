@@ -1,4 +1,4 @@
-(* $Id: dag.mli,v 3.5 2001-02-02 01:09:02 ddr Exp $ *)
+(* $Id: dag.mli,v 4.0 2001-03-16 19:34:32 ddr Exp $ *)
 
 open Config;
 open Def;

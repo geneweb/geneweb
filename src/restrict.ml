@@ -1,4 +1,4 @@
-(* $Id: restrict.ml,v 3.1 2001-03-04 14:13:09 ddr Exp $ *)
+(* $Id: restrict.ml,v 4.0 2001-03-16 19:35:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 (* Build restrict file marking persons of less than 100 years *)
 

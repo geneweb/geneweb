@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.39 2001-03-15 07:10:19 ddr Exp $ *)
+(* $Id: util.mli,v 4.0 2001-03-16 19:35:11 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 3.11 2001-03-15 13:55:30 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 4.0 2001-03-16 19:34:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;

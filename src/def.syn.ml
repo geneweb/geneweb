@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: def.syn.ml,v 3.2 2001-01-06 09:55:53 ddr Exp $ *)
+(* $Id: def.syn.ml,v 4.0 2001-03-16 19:34:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Pcaml;

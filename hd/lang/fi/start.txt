@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.50 2001-03-07 10:13:24 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.0 2001-03-16 19:32:56 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->

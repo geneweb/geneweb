@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 3.7 2001-03-01 19:42:45 ddr Exp $ *)
+(* $Id: alln.ml,v 4.0 2001-03-16 19:34:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
