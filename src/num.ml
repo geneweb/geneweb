@@ -1,4 +1,4 @@
-(* $Id: num.ml,v 3.3 2000-01-10 02:14:40 ddr Exp $ *)
+(* $Id: num.ml,v 3.4 2000-09-03 22:48:39 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 type t = array int;
@@ -100,7 +100,7 @@ value sub x y =
   in
   Array.of_list (normalize l)
 ;
-value mul x n =
+value mul0 x n =
   if n > max_mul_base then invalid_arg "Num.mul"
   else
     let l =
@@ -112,6 +112,15 @@ value mul x n =
           [d mod base :: loop (i + 1) (d / base)]
     in
     Array.of_list l
+;
+value mul x n =
+  if n < max_mul_base then mul0 x n
+  else
+    loop zero x n where rec loop r x n =
+      if n < max_mul_base then add r (mul0 x n)
+      else
+        loop (add r (mul0 x (n mod max_mul_base)))
+          (mul0 x max_mul_base) (n / max_mul_base)
 ;
 value div x n =
   if n > max_mul_base then invalid_arg "Num.div"
@@ -127,7 +136,7 @@ value div x n =
     Array.of_list (normalize l)
 ;    
 value modl x n =
-  let r = sub x (mul (div x n) n) in
+  let r = sub x (mul0 (div x n) n) in
   if Array.length r == 0 then 0 else r.(0)
 ;
 
@@ -175,6 +184,6 @@ value of_string s =
     else
       match s.[i] with
       [ '0'..'9' ->
-          loop (inc (mul n 10) (Char.code s.[i] - Char.code '0')) (i + 1)
+          loop (inc (mul0 n 10) (Char.code s.[i] - Char.code '0')) (i + 1)
       | _ -> failwith "Num.of_string" ]
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.51 2000-08-12 20:05:22 ddr Exp $ *)
+(* $Id: relation.ml,v 3.52 2000-09-03 22:48:39 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1008,12 +1008,13 @@ value compute_simple_relationship conf base tstab p1 p2 =
            let u = tab.Consang.info.(i) in
            List.fold_left
              (fun n (_, n1) ->
+                let n1 = Num.of_int n1 in
                 List.fold_left
-                  (fun n (_, n2) -> Num.add n (Num.of_int (n1 * n2))) n
+                  (fun n (_, n2) -> Num.add n (Num.mul n1 n2)) n
                   u.Consang.lens1)
              n u.Consang.lens2)
         Num.zero ancestors
-    in
+    in 
     let rl =
       List.fold_left
         (fun rl i ->
@@ -1032,7 +1033,7 @@ value compute_simple_relationship conf base tstab p1 p2 =
         (fun (len11, len12, _) (len21, len22, _) ->
            if len11 + len12 > len21 + len22 then True
            else if len11 + len12 < len21 + len22 then False
-           else len11 > len21)
+           else len11 >= len21)
         rl
     in
     let rl =
