@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.35 2002-11-26 08:39:39 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.36 2002-11-27 09:02:15 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -145,7 +145,7 @@ pt: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
     actualmente %n pessoas.
 pt-br: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
     atualmente %n pessoas.
-ro: basa de date contine <font color=%i><b>"%t"</b></font> contine %n persoane.
+ro: basa de date <font color=%i><b>"%t"</b></font> contine %n persoane.
 ru: Áàçà äàííûõ <font color=%i><b>"%t"</b></font> ñåé÷àñ ñîäåğæèò %n ÷åëîâåê.
 sl: Baza podatkov <font color=%i><b>"%t"</b></font> vsebuje %n oseb.
 sv: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
@@ -180,7 +180,7 @@ nl: Toegang als <a href="%sw=w"><em>tovenaar</em></a><br> (wachtwoord)
 no: <a href="%sw=w"><em>Oppdaterings</em></a> adgang<br> (passord)
 pl: <a href="%sw=w"><em>"Wizard"</em></a> dostêp<br> (has³o)
 pt: Entrada <a href="%sw=w"><em>feiticeiro</em></a><br> (palavra chave)
-ro: <a href="%sw=w"><em>magician</em></a> access<br> (parola)
+ro: Acces pentru <a href="%sw=w"><em>magician</em></a><br> (parola)
 sl: Urejanje kot <a href="%sw=w"><em>"èarovnik"</em></a> (geslo)
 sv: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
 ]<br></td>
@@ -206,7 +206,7 @@ nl: Toegang als <a href="%sw=f"><em>vriend</em></a><br> (wachtwoord)
 no: <a href="%sw=f"><em>Venners</em></a> adgang<br> (passord)
 pl: <a href="%sw=f"><em>"Friend"</em></a> dostêp<br> (has³o)
 pt: Entrada <a href="%sw=f"><em>amigo</em></a><br> (palavra chave)
-ro: <a href="%sw=f"><em>amic</em></a>-Zugang<br> (parola)
+ro: Acces pentru <a href="%sw=f"><em>amici</em></a><br> (parola)
 sl: Urejanje kot <a href="%sw=f"><em>prijatelj</em></a><br> (geslo)
 sv: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
 ]</td>
@@ -485,7 +485,7 @@ nl: volgens
 no: sortert
 pl: u³o¿onych
 pt: por
-ro: in ordine de
+ro: in
 ru: óïîğÿäî÷åííûõ
 sl: po
 sv: sorterade i
@@ -917,8 +917,9 @@ pt-br: Se o seu <i>browser</i> n&atilde;o atualiza automaticamente as
     p&aacute;ginas modificadas (for&ccedil;ando a fazer
     "reload current document"), tente navegar desde <a
     href="%sescache=0">este link</a>.
-ro: daca pagina modificata nu este actualizata in mod automat (trebue sa fortwezi
-    "reload current document") navigeaza cu acest <a href="%sescache=0">link</a>
+ro: daca pagina modificata nu este actualizata in mod automat (trebue sa
+    fortezi "reload current document") navigeaza cu acest
+    <a href="%sescache=0">link</a>
 sl: Èe va¹ brskalnik ne more obnavljati strani avtomatièno (morate
     "reload current document"), kliknite <a
     href="%sescache=0">tukaj</a>.
