@@ -10,6 +10,10 @@ GeneWeb Version 4.03
   - [11 Jul 01] Added trace of latest connected friends base_f.txt if there
     is a friend password file. (already exist for wizards)
 
+* GeneWeb data bases Transfer Program (gwtp)
+  - [13 Jul 01] Added "wizard_just_friend" which is now configurable under
+    gwtp.
+
 GeneWeb Version 4.02
 --------------------
 
