@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.40 2004-07-18 14:26:39 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.41 2004-09-09 08:40:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -209,29 +209,62 @@ value eval_key_variable conf env (fn, sn, oc, create, var) =
   | s -> ">%" ^ s ^ "???" ]
 ;
 
+value add_precision s p =
+  match p with
+  [ Maybe -> "?" ^ s
+  | Before -> "<" ^ s
+  | After -> ">" ^ s
+  | About -> "/" ^ s ^ "/"
+  | _ -> s ]
+;
+
+value short_f_month m =
+  match m with
+  [ 1 -> "VD"
+  | 2 -> "BR"
+  | 3 -> "FM"
+  | 4 -> "NI"
+  | 5 -> "PL"
+  | 6 -> "VT"
+  | 7 -> "GE"
+  | 8 -> "FL"
+  | 9 -> "PR"
+  | 10 -> "ME"
+  | 11 -> "TH"
+  | 12 -> "FT"
+  | 13 -> "JC"
+  | _ -> "" ]
+;
+  
 value eval_create_variable c =
   fun
   [ "birth_year" ->
       match c with
       [ Update.Create _
+        (Some (Some (Dgreg dmy Dfrench), _, _, _, _)) ->
+          let dmy = Calendar.french_of_gregorian dmy in
+          add_precision (string_of_int dmy.year) dmy.prec
+      | Update.Create _
         (Some (Some (Dgreg {year = y; prec = p} _), _, _, _, _)) ->
-          let s = string_of_int y in
-          match p with
-          [ Maybe -> "?" ^ s
-          | Before -> "<" ^ s
-          | After -> ">" ^ s
-          | About -> "/" ^ s ^ "/"
-          | _ -> s ]
+          add_precision (string_of_int y) p
       | _ -> "" ]
   | "birth_month" ->
       match c with
-      [ Update.Create _ (Some (Some (Dgreg {month = m} _), _, _, _, _))
+      [ Update.Create _ 
+        (Some (Some (Dgreg dmy Dfrench), _, _, _, _)) ->
+          let dmy = Calendar.french_of_gregorian dmy in
+          short_f_month dmy.month
+      | Update.Create _ (Some (Some (Dgreg {month = m} _), _, _, _, _))
         when m <> 0 ->
           string_of_int m
       | _ -> "" ]
   | "birth_day" ->
       match c with
-      [ Update.Create _ (Some (Some (Dgreg {day = d} _), _, _, _, _))
+      [ Update.Create _ 
+        (Some (Some (Dgreg dmy Dfrench), _, _, _, _)) ->
+          let dmy = Calendar.french_of_gregorian dmy in
+          if dmy.day <> 0 then string_of_int dmy.day else ""
+      | Update.Create _ (Some (Some (Dgreg {day = d} _), _, _, _, _))
         when d <> 0 ->
           string_of_int d
       | _ -> "" ]
@@ -242,14 +275,12 @@ value eval_create_variable c =
   | "death_year" ->
       match c with
       [ Update.Create _
+        (Some (_, _, _, Some (Dgreg dmy Dfrench), _)) ->
+          let dmy = Calendar.french_of_gregorian dmy in
+          add_precision (string_of_int dmy.year) dmy.prec
+      | Update.Create _
         (Some (_, _, _, Some (Dgreg {year = y; prec = p} _), _)) ->
-          let s = string_of_int y in
-          match p with
-          [ Maybe -> "?" ^ s
-          | Before -> "<" ^ s
-          | After -> ">" ^ s
-          | About -> "/" ^ s ^ "/"
-          | _ -> s ]
+          add_precision (string_of_int y) p
       | Update.Create _ (Some (_, _, death, None, _)) ->
           match death with
           [ DeadDontKnowWhen -> "+"
@@ -258,13 +289,21 @@ value eval_create_variable c =
       | _ -> "" ]
   | "death_month" ->
       match c with
-      [ Update.Create _ (Some (_, _, _, Some (Dgreg {month = m} _), _))
+      [ Update.Create _ 
+        (Some (_, _, _, Some (Dgreg dmy Dfrench), _)) ->
+          let dmy = Calendar.french_of_gregorian dmy in
+          short_f_month dmy.month
+      | Update.Create _ (Some (_, _, _, Some (Dgreg {month = m} _), _))
         when m <> 0 ->
           string_of_int m
       | _ -> "" ]
   | "death_day" ->
       match c with
-      [ Update.Create _ (Some (_, _, _, Some (Dgreg {day = d} _), _))
+      [ Update.Create _ 
+        (Some (_, _, _, Some (Dgreg dmy Dfrench), _)) ->
+          let dmy = Calendar.french_of_gregorian dmy in
+          if dmy.day <> 0 then string_of_int dmy.day else ""
+      | Update.Create _ (Some (_, _, _, Some (Dgreg {day = d} _), _))
         when d <> 0 ->
           string_of_int d
       | _ -> "" ]
