@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.52 2000-09-03 22:48:39 ddr Exp $ *)
+(* $Id: relation.ml,v 3.53 2000-10-30 10:51:15 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -296,9 +296,9 @@ value print_relation_path conf base ip1 ip2 path excl_faml =
 ;
 
 type node = [ NotVisited | Visited of (bool * iper * famlink) ];
-exception FoundLink;
+type choice 'a 'b = [ Left of 'a | Right of 'b ];
 
-value print_relation_with_alliance conf base ip1 ip2 excl_faml =
+value get_shortest_path_relation base ip1 ip2 excl_faml =
   let mark_per = Array.create base.data.persons.len NotVisited in
   let mark_fam = Array.create base.data.families.len False in
   do List.iter
@@ -390,67 +390,46 @@ value print_relation_with_alliance conf base ip1 ip2 excl_faml =
       List.rev p2
   in
   let one_step_further source queue =
-    List.fold_right
-      (fun vertex newvertexlist ->
-         List.fold_right
-           (fun (iper, fl, ifam) result ->
-              match mark_per.(Adef.int_of_iper iper) with
-              [ NotVisited ->
-                  do mark_per.(Adef.int_of_iper iper) :=
-                       Visited (source, vertex, fl);
-                  return [iper :: result]
-              | Visited (s, v, f) ->
-                  if s == source then result
-                  else
-                    let p1 = make_path [(iper, fl)] vertex in
-                    let p2 = make_path [(iper, f)] v in
-                    let path =
-                      if source then merge_path p2 p1 else merge_path p1 p2
-                    in
-                    let excl_faml = [ifam :: excl_faml] in
-                    do print_relation_path conf base ip1 ip2 path excl_faml;
-                    return raise FoundLink ])
-           (neighbours vertex) newvertexlist)
-      queue []
+    loop1 [] queue where rec loop1 newvertexlist =
+      fun
+      [ [vertex :: vertexlist] ->
+          loop2 newvertexlist (neighbours vertex)
+          where rec loop2 result =
+            fun
+            [ [(iper, fl, ifam) :: neighbourslist] ->
+                match mark_per.(Adef.int_of_iper iper) with
+                [ NotVisited ->
+                    do mark_per.(Adef.int_of_iper iper) :=
+                         Visited (source, vertex, fl);
+                    return loop2 [iper :: result] neighbourslist
+                | Visited (s, v, f) ->
+                    if s == source then loop2 result neighbourslist
+                    else
+                      let p1 = make_path [(iper, fl)] vertex in
+                      let p2 = make_path [(iper, f)] v in
+                      let path =
+                        if source then merge_path p2 p1 else merge_path p1 p2
+                      in
+                      Left (path, ifam) ]
+            | [] -> loop1 result vertexlist ]
+      | [] -> Right newvertexlist ]
   in
   let rec width_search queue1 visited1 queue2 visited2 =
-    if queue1 == [] || queue2 == [] then True
+    if queue1 == [] || queue2 == [] then None
     else if visited1 > visited2 then
       let visited2 = visited2 + List.length queue2 in
-      let queue2 = one_step_further False queue2 in
-      width_search queue1 visited1 queue2 visited2
+      match one_step_further False queue2 with
+      [ Left (path, ifam) -> Some (path, ifam)
+      | Right queue2 -> width_search queue1 visited1 queue2 visited2 ]
     else
       let visited1 = visited1 + List.length queue1 in
-      let queue1 = one_step_further True queue1 in
-      width_search queue1 visited1 queue2 visited2
+      match one_step_further True queue1 with
+      [ Left (path, ifam) -> Some (path, ifam)
+      | Right queue1 -> width_search queue1 visited1 queue2 visited2 ]
   in
-  let title _ = Wserver.wprint "%s" (capitale (transl conf "relationship")) in
-  do header_no_page_title conf title;
-     mark_per.(Adef.int_of_iper ip1) := Visited (True, ip1, Self);
+  do mark_per.(Adef.int_of_iper ip1) := Visited (True, ip1, Self);
      mark_per.(Adef.int_of_iper ip2) := Visited (False, ip2, Self);
-     if try width_search [ip1] 0 [ip2] 0 with [ FoundLink -> False ] then
-       let p1 = poi base ip1 in
-       let p2 = poi base ip2 in
-       let s1 = gen_referenced_person_title_text raw_access conf base p1 in
-       let s2 = gen_referenced_person_title_text raw_access conf base p2 in
-       if excl_faml = [] then
-         do Wserver.wprint "<center><h1><font color=%s>" conf.highlight;
-            title False;
-            Wserver.wprint "</font></h1></center>\n";
-            Util.print_link_to_welcome conf True;
-            Wserver.wprint "%s\n"
-              (capitale
-                 (cftransl conf "no known relationship link between %s and %s"
-                    [s1; s2]));
-         return ()
-       else
-         tag "ul" begin
-           Wserver.wprint "<li>%s\n" s1;
-           Wserver.wprint "<li>%s\n" s2;
-         end
-     else ();
-     trailer conf;
-  return ()
+  return width_search [ip1] 0 [ip2] 0
 ;
 
 value print_shortest_path conf base p1 p2 =
@@ -483,7 +462,37 @@ value print_shortest_path conf base p1 p2 =
                 loop [u.family.(n) :: list] (i + 1)
             | None -> list ] ]
     in
-    print_relation_with_alliance conf base p1.cle_index p2.cle_index excl_faml
+    let title _ =
+      Wserver.wprint "%s" (capitale (transl conf "relationship"))
+    in
+    let ip1 = p1.cle_index in
+    let ip2 = p2.cle_index in
+    do header_no_page_title conf title;
+       match get_shortest_path_relation base ip1 ip2 excl_faml with
+       [ Some (path, ifam) ->
+           let excl_faml = [ifam :: excl_faml] in
+           print_relation_path conf base ip1 ip2 path excl_faml
+       | None ->
+           let s1 = gen_referenced_person_title_text raw_access conf base p1 in
+           let s2 = gen_referenced_person_title_text raw_access conf base p2 in
+           if excl_faml = [] then
+             do Wserver.wprint "<center><h1><font color=%s>" conf.highlight;
+                title False;
+                Wserver.wprint "</font></h1></center>\n";
+                Util.print_link_to_welcome conf True;
+                Wserver.wprint "%s\n"
+                  (capitale
+                     (cftransl conf
+                        "no known relationship link between %s and %s"
+                        [s1; s2]));
+             return ()
+           else
+             tag "ul" begin
+               Wserver.wprint "<li>%s\n" s1;
+               Wserver.wprint "<li>%s\n" s2;
+             end ];
+       trailer conf;
+    return ()
 ;
 
 value parents_label conf =
