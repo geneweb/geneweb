@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.258 2001-03-14 21:49:47 ddr Exp $
+# $Id: lexicon.txt,v 3.259 2001-03-15 10:36:02 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -31,26 +31,26 @@ se: iso-8859-1
 he: rtl
 
      !languages
-br: af=Afrikaner/br=Portugu&ecirc;s&nbsp;do&nbsp;Brasil/cn=Chin&ecirc;s/cs=Checo/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;/en=Ingl&ecirc;/eo=Esperanto/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
+br: af=Afrikaner/br=Portugu&ecirc;s-do-Brasil/cn=Chin&ecirc;s/cs=Checo/ct=Catal&atilde;o/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;s/en=Ingl&ecirc;s/eo=Esperanto/et=Estoniano/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pl=Polon&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
 cs: af=afrikán¹tina/br=brasil¹tina/cn=èín¹tina/cs=èe¹tina/dk=dán¹tina/nl=holand¹tina/en=angliètina/eo=esperanto/fi=fin¹tina/fr=francouz¹tina/de=nìmèina/he=hebrej¹tina/is=island¹tina/it=ital¹tina/lv=loty¹¹tina/no=nor¹tina/pt=portugal¹tina/es=¹panìl¹tina/ru=ru¹tina/se=¹véd¹tina
 ct: af=africà/cn=Xinès/cs=xec/ct=català/de=alemany/dk=danès/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/pt=portuguès/ru=rus/se=suec
-de: af=Afrikaans/br=Brasil&nbsp;Portugiesisch/cn=Chinesisch/dk=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/no=Norwegisch/pl=Polnisch/pt=Portugiesisch/ru=Russisch/es=Spanisch/se=Schwedisch/cs=Tschechisch
-dk: af=afrikaans/br=Brasil&nbsp;portugisisk/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
-en: af=Afrikaans/br=Brazilian&nbsp;Portuguese/cn=Chinese/cs=Czech/ct=Catalan/dk=Danish/nl=Dutch/en=English/eo=Esperanto/et=Estonian/fi=Finnish/fr=French/de=German/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/no=Norwegian/pl=Polish/pt=Portuguese/es=Spanish/ru=Russian/se=Swedish
+de: af=Afrikaans/br=Brasil-Portugiesisch/cn=Chinesisch/dk=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/no=Norwegisch/pl=Polnisch/pt=Portugiesisch/ru=Russisch/es=Spanisch/se=Schwedisch/cs=Tschechisch
+dk: af=afrikaans/br=Brasil-portugisisk/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
+en: af=Afrikaans/br=Brazilian-Portuguese/cn=Chinese/cs=Czech/ct=Catalan/dk=Danish/nl=Dutch/en=English/eo=Esperanto/et=Estonian/fi=Finnish/fr=French/de=German/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/no=Norwegian/pl=Polish/pt=Portuguese/es=Spanish/ru=Russian/se=Swedish
 eo: en=anglo/eo=esperanto/fr=franco
-es: br=Brasil&nbsp;Portug&eacute;s/cs=Checo/cn=Chino/ct=Catalán/de=Alem&aacute;n/dk=Dan&eacute;s/es=Espa&ntilde;ol/eo=Esperanto/fr=Franc&eacute;s/he=Hebreo/en=Ingl&eacute;s/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/se=Sueco
+es: br=Portug&eacute;s-del-Brasil/cs=Checo/cn=Chino/ct=Catalán/de=Alem&aacute;n/dk=Dan&eacute;s/es=Espa&ntilde;ol/eo=Esperanto/fr=Franc&eacute;s/he=Hebreo/en=Ingl&eacute;s/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/se=Sueco
 et: af=afrikaani/cn=hiina/cs=t¨ehhi/ct=katalaani/de=saksa/dk=taani/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/pl=poola/pt=portugali/ru=vene/se=rootsi
-fi: af=afrikaani/br=Brasil&nbsp;portugali/cn=kiina/cs=tsekki/de=saksa/dk=tanska/en=englanti/eo=esperanto/es=espanja/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/se=ruotsi
-fr: af=afrikaans/br=portugais&nbsp;du&nbsp;Br&eacute;/cn=chinois/cs=tch&egrave;que/ct=catalan/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pl=polonais/pt=portugais/ru=russe/se=su&eacute;dois
+fi: af=afrikaani/br=Brasil-portugali/cn=kiina/cs=tsekki/de=saksa/dk=tanska/en=englanti/eo=esperanto/es=espanja/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/se=ruotsi
+fr: af=afrikaans/br=portugais-du-Br&eacute;sil/cn=chinois/cs=tch&egrave;que/ct=catalan/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pl=polonais/pt=portugais/ru=russe/se=su&eacute;dois
 he: af=àôøé÷àğñ /cn=ñéğéú /cs=ö'ëéú /de=âøîğéú /dk=ãğéú /en=àğâìéú /eo=àñôøğèå /es=ñôøãéú /fi=ôéğéú /fr=öøôúéú /he=òáøéú /is=àéñìğãéú /it=àéèì÷éú /lv=ìèååéú /no=ğåøáâéú /pt=ôåøèåâæéú /ru=øåñéú /se=ùååãéú
-is: af=afrikanska/br=Brasil&nbsp;portúgalska/cn=kínverska/cs=tékkneska/dk=danska/nl=hollenska/en=enska/eo=esperanto/fi=finnska/fr=franska/de=şıska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/no=norska/pt=portúgalska/es=spænska/ru=rússneska/se=sænska
-it: af=africano/br=portoghese&nbsp;brasiliano/cn=cinese/cs=ceco/de=tedesco/dk=danese/en=inglese/eo=esperanto/es=spagnolo/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pl=polonese/pt=portoghese/ru=russo/se=svedese
-lv: cn=Íînieğu/br=Brasil&nbsp;Portugâïu/cs=Èehu/dk=Dâòu/nl=Holandieğu/en=Angïu/eo=Esperanto/fi=Somu/fr=Franèu/de=Vâcu/he=Ebreju/is=Islandieğû/it=Itâïu/lv=Latvieğu/no=Norvçìu/pt=Portugâïu/es=Spâòu/ru=Krievu/se=Zviedru
-nl: af=Afrikaans/br=Brasil&nbsp;Portugees/cn=Chinees/cs=Tsjechisch/dk=Deens/nl=Nederlands/en=Engels/eo=Esperanto/fi=Fins/fr=Frans/de=Duits/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/no=Noors/pt=Portugees/es=Spaans/ru=Russisch/se=Zweeds
-no: af=afrikaans/br=Brasil&nbsp;portugisisk/cn=kinesisk/cs=tjekkisk/ct=katalansk/dk=dansk/en=engelsk/eo=esperanto/et=estisk/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
+is: af=afrikanska/br=Brasil-portúgalska/cn=kínverska/cs=tékkneska/dk=danska/nl=hollenska/en=enska/eo=esperanto/fi=finnska/fr=franska/de=şıska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/no=norska/pt=portúgalska/es=spænska/ru=rússneska/se=sænska
+it: af=africano/br=portoghese-brasiliano/cn=cinese/cs=ceco/de=tedesco/dk=danese/en=inglese/eo=esperanto/es=spagnolo/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pl=polonese/pt=portoghese/ru=russo/se=svedese
+lv: cn=Íînieğu/br=Brasil-Portugâïu/cs=Èehu/dk=Dâòu/nl=Holandieğu/en=Angïu/eo=Esperanto/fi=Somu/fr=Franèu/de=Vâcu/he=Ebreju/is=Islandieğû/it=Itâïu/lv=Latvieğu/no=Norvçìu/pt=Portugâïu/es=Spâòu/ru=Krievu/se=Zviedru
+nl: af=Afrikaans/br=Brasil-Portugees/cn=Chinees/cs=Tsjechisch/dk=Deens/nl=Nederlands/en=Engels/eo=Esperanto/fi=Fins/fr=Frans/de=Duits/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/no=Noors/pt=Portugees/es=Spaans/ru=Russisch/se=Zweeds
+no: af=afrikaans/br=Brasil-portugisisk/cn=kinesisk/cs=tjekkisk/ct=katalansk/dk=dansk/en=engelsk/eo=esperanto/et=estisk/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
 pl: af=afrikaans/cn=chiñski/cs=czeski/ct=kataloñski/dk=duñski/nl=niderlandzki/en=angielski/eo=esperanto/et=estoñski/fi=fiñski/fr=francuski/de=niemiecki/he=hebrajski/is=islandzki/it=w³oski/lv=³otewski/no=norweski/pl=polski/pt=portugalski/es=hiszpañski/ru=rosyjski/se=szwedzki
-pt: af=Afrikaans/br=Portugu&ecirc;s&nbsp;do&nbsp;Brasil/cn=Chin&ecirc;/cs=Checo/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;/en=Ingl&ecirc;/eo=Esperanto/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
-se: af=afrikaans/br=Brasil&nbsp;portugisiska/cn=kinesiska/cs=tjeckiska/ct=katalanska/de=tyska/dk=danska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/ru=ryska/se=svenska
+pt: af=Afrikaans/br=Portugu&ecirc;s-do-Brasil/cn=Chin&ecirc;s/cs=Checo/ct=Catal&atilde;/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;s/en=Ingl&ecirc;s/eo=Esperanto/et=Estoniano/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pl=Polon&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
+se: af=afrikaans/br=Brasil-portugisiska/cn=kinesiska/cs=tjeckiska/ct=katalanska/de=tyska/dk=danska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/ru=ryska/se=svenska
 
      to see the first branch
 af:  om die eerste staak te sien
