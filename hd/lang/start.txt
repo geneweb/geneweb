@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.36 2002-11-27 09:02:15 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.37 2002-12-09 22:42:42 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -153,6 +153,9 @@ sv: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
 zh: 现有 %n 人在数据库中。
 ]%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
+%I&|pwizard_passwd_file;pwizard_descr_file;|wo<br>
+(<a href="%sm=WIZNOTES">[wizard/friend]0/[note/notes]1</a>)%E
+%E
 
 %I&NwNj<br><p>
 
