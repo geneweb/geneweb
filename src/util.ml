@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.21 1999-12-16 22:12:10 ddr Exp $ *)
+(* $Id: util.ml,v 3.22 1999-12-16 23:01:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -767,34 +767,62 @@ value email_addr s i =
   | None -> None ]
 ;
 
+value dangerous_tag s i =
+  let d = "script" in
+  loop i 0 where rec loop i j =
+    if i = String.length s then False
+    else if j = String.length d then True
+    else
+      match s.[i] with
+      [ ' ' | '\n' | '\r' | '\t' | '/' -> loop (i + 1) j
+      | c ->
+          if Char.lowercase s.[i] = d.[j] then loop (i + 1) (j + 1)
+          else False ]
+;
+
+type tag_type = [ In_a_href | In_dang | In_norm | Out ];
+
 value copy_string_with_macros conf s =
-  loop False False 0 where rec loop in_tag in_atag i =
+  loop Out 0 where rec loop tt i =
     if i < String.length s then
       if i + 1 < String.length s && s.[i] = '%' && s.[i+1] = 's' then
-        do Wserver.wprint "%s" (commd conf); return loop in_tag in_atag (i + 2)
-      else if in_atag then
-        let in_atag = not (start_with s i "</a>") in
-        do Wserver.wprint "%c" s.[i]; return loop in_tag in_atag (i + 1)
-      else if in_tag then
-        let in_tag = not (start_with s i ">") in
-        do Wserver.wprint "%c" s.[i]; return loop in_tag in_atag (i + 1)
+        do Wserver.wprint "%s" (commd conf); return loop tt (i + 2)
       else
-        match http_string s i with
-        [ Some j ->
-            let x = String.sub s i (j - i) in
-            do Wserver.wprint "<a href=%s>%s</a>" x x; return
-            loop in_tag False j
-        | None ->
-            match email_addr s i with
+        match tt with
+        [ In_a_href ->
+            let tt = if start_with s i "</a>" then Out else In_a_href in
+            do Wserver.wprint "%c" s.[i]; return loop tt (i + 1)
+        | In_norm ->
+            let tt = if s.[i] = '>' then Out else In_norm in
+            do Wserver.wprint "%c" s.[i]; return loop tt (i + 1)
+        | In_dang ->
+            let tt = if s.[i] = '>' then Out else In_dang in
+            do if tt = Out then Wserver.wprint "&gt;"
+               else Wserver.wprint "%c" s.[i];
+            return loop tt (i + 1)
+        | Out ->
+            match http_string s i with
             [ Some j ->
                 let x = String.sub s i (j - i) in
-                do Wserver.wprint "<a href=\"mailto:%s\">%s</a>" x x; return
-                loop False False j
+                do Wserver.wprint "<a href=%s>%s</a>" x x; return
+                loop Out j
             | None ->
-                let in_atag = start_with s i "<a href=" in
-                let in_tag = start_with s i "<" in
-                do Wserver.wprint "%c" s.[i]; return
-                loop in_tag in_atag (i + 1) ] ]
+                match email_addr s i with
+                [ Some j ->
+                    let x = String.sub s i (j - i) in
+                    do Wserver.wprint "<a href=\"mailto:%s\">%s</a>" x x;
+                    return loop Out j
+                | None ->
+                    let tt =
+                      if start_with s i "<a href=" then In_a_href
+                      else if s.[i ] = '<' then
+                        if dangerous_tag s (i + 1) then In_dang
+                        else In_norm
+                      else Out
+                    in
+                    do if tt = In_dang then Wserver.wprint "&lt;"
+                       else Wserver.wprint "%c" s.[i];
+                    return loop tt (i + 1) ] ] ]
     else ()
 ;
 
