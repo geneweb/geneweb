@@ -14,6 +14,9 @@ GeneWeb version 3.01
   - [Nov 10, 99] Changed structure of data bases for internal optimizations.
 
 * Base configuration files (base.gwf)
+  - [Nov 15, 99] Added variables "max_anc_tree" (default = 5) and
+    "max_desc_tree" (default = 4) to set the maximum number of generations
+    that can be displayed by tree.
   - [Nov 13, 99] Fixed bug: when setting the variable "access_by_key" to
     "yes", links to persons holding "?" in their names did not work.
 

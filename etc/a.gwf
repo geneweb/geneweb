@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.3 1999-11-13 21:50:23 ddr Exp $
+# $Id: a.gwf,v 3.4 1999-11-15 12:40:59 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -75,8 +75,14 @@ propose_titles=yes
 # Maximum level when displaying ancestors
 max_anc_level=8
 
+# Maximum level when displaying ancestors by tree
+max_anc_tree=5
+
 # Maximum_level when displaying descendants
 max_desc_level=12
+
+# Maximum_level when displaying descendants by tree
+max_desc_tree=4
 
 # History: set it to yes to save update traces in data base (in file named
 # "history" in the data base directory "base.gwb"). When such a file exists,

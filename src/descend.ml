@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.2 1999-11-10 09:53:43 ddr Exp $ *)
+(* $Id: descend.ml,v 3.3 1999-11-15 12:41:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -12,7 +12,12 @@ value limit_desc conf =
   [ Some x -> max 1 x
   | None -> 12 ]
 ;
-value limit_by_tree = 4;
+
+value limit_by_tree conf =
+  match p_getint conf.base_env "max_desc_tree" with
+  [ Some x -> max 1 x
+  | None -> 4 ]
+;
 
 value infini = 10000;
 
@@ -104,11 +109,11 @@ value print_choice conf base p niveau_effectif =
           else
             Wserver.wprint "<input type=radio name=t value=T> %s\n"
               (capitale (transl conf "tree"));
-            if niveau_effectif <= limit_by_tree then ()
+            if niveau_effectif <= limit_by_tree conf then ()
             else
               do Wserver.wprint "(";
                  Wserver.wprint (ftransl conf "max %d generations")
-                   limit_by_tree;
+                   (limit_by_tree conf);
                  Wserver.wprint ")\n";
               return ();
           Wserver.wprint "<br>\n";
@@ -971,7 +976,7 @@ value print_tree conf base gv p =
     Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
       (person_text_no_html conf base p)
   in
-  let gv = min limit_by_tree gv in
+  let gv = min (limit_by_tree conf) gv in
   let rec nb_column n v u =
     if v == 0 then n + 1
     else
