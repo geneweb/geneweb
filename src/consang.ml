@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 2.5 1999-05-23 09:51:58 ddr Exp $ *)
+(* $Id: consang.ml,v 2.6 1999-06-28 19:04:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -7,6 +7,8 @@ open Check;
 open Def;
 open Gutil;
 
+type anc_stat = [ MaybeAnc | IsAnc ];
+
 type relationship =
   { weight1 : mutable float;
     weight2 : mutable float;
@@ -14,6 +16,8 @@ type relationship =
     lens1 : mutable list (int * int);
     lens2 : mutable list (int * int);
     elim_ancestors : mutable bool;
+    anc_stat1 : mutable anc_stat;
+    anc_stat2 : mutable anc_stat;
     mark : mutable int }
 ;
 
@@ -98,7 +102,8 @@ value topological_sort base =
 value make_relationship_table base tstab =
   let phony =
     {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = []; lens2 = [];
-     mark = 0; elim_ancestors = False}
+     mark = 0; elim_ancestors = False; anc_stat1 = MaybeAnc;
+     anc_stat2 = MaybeAnc}
   in
   let tab = Array.create base.data.persons.len phony in
   {id = tstab; info = tab}
@@ -135,7 +140,8 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
     let reset u mark =
       tab.(u) :=
         {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = [];
-         lens2 = []; mark = mark; elim_ancestors = False}
+         lens2 = []; mark = mark; elim_ancestors = False;
+         anc_stat1 = MaybeAnc; anc_stat2 = MaybeAnc}
     in
     let module Pq =
       Pqueue.Make (struct type t = int; value leq = tsort_leq id; end)
@@ -144,13 +150,27 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
     let inserted = new_mark () in
     let add u = do reset u inserted; q.val := Pq.add u q.val; return () in
     let relationship = ref 0.0 in
+    let nb_anc1 = ref 1 in
+    let nb_anc2 = ref 1 in
     let tops = ref [] in
     let treat u y =
       do if tab.(y).mark <> inserted then add y else (); return
       let ty = tab.(y) in
       let p1 = half u.weight1 in
       let p2 = half u.weight2 in
-      do ty.weight1 := ty.weight1 +. p1;
+      do if u.anc_stat1 = IsAnc
+         && ty.anc_stat1 <> IsAnc then
+           do ty.anc_stat1 := IsAnc;
+              incr nb_anc1;
+           return ()
+         else ();
+         if u.anc_stat2 = IsAnc
+         && ty.anc_stat2 <> IsAnc then
+           do ty.anc_stat2 := IsAnc;
+              incr nb_anc2;
+           return ()
+         else ();
+         ty.weight1 := ty.weight1 +. p1;
          ty.weight2 := ty.weight2 +. p2;
          ty.relationship := ty.relationship +. p1 *. p2;
          if u.elim_ancestors then ty.elim_ancestors := True else ();
@@ -167,8 +187,13 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
        tab.(i2).weight2 := 1.0;
        tab.(i1).lens1 := [(0, 1)];
        tab.(i2).lens2 := [(0, 1)];
-       while not (Pq.is_empty q.val) do
+       tab.(i1).anc_stat1 := IsAnc;
+       tab.(i2).anc_stat2 := IsAnc;
+       while not (Pq.is_empty q.val) && nb_anc1.val > 0 && nb_anc2.val > 0 do
          let (u, nq) = Pq.take q.val in
+(*
+do Printf.eprintf "take %s (%d)\n" (denomination base (base.data.persons.get u)) id.(u); flush stdout; return
+*)
          do q.val := nq; return
          let tu = tab.(u) in
          let a = base.data.ascends.get u in
@@ -176,7 +201,9 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
            tu.weight1 *. tu.weight2 -.
            tu.relationship *. (1.0 +. consang_of a)
          in
-         do relationship.val := relationship.val +. contribution;
+         do if tu.anc_stat1 == IsAnc then decr nb_anc1 else ();
+            if tu.anc_stat2 == IsAnc then decr nb_anc2 else ();
+            relationship.val := relationship.val +. contribution;
             if b && contribution <> 0.0 && not tu.elim_ancestors then
               do tops.val := [u :: tops.val];
                  tu.elim_ancestors := True;

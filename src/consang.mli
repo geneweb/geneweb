@@ -1,7 +1,9 @@
-(* $Id: consang.mli,v 2.3 1999-05-23 09:51:58 ddr Exp $ *)
+(* $Id: consang.mli,v 2.4 1999-06-28 19:04:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
+
+type anc_stat = 'a;
 
 type relationship =
   { weight1 : mutable float;
@@ -10,7 +12,9 @@ type relationship =
     lens1 : mutable list (int * int);
     lens2 : mutable list (int * int);
     elim_ancestors : mutable bool;
-    mark : mutable int }
+    anc_stat1 : mutable anc_stat;
+    anc_stat2 : mutable anc_stat;
+   mark : mutable int }
 and relationship_table = { id : array int; info : array relationship }
 ;
 

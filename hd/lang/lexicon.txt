@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.61 1999-06-28 15:14:20 ddr Exp $
+# $Id: lexicon.txt,v 2.62 1999-06-28 19:04:30 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -380,7 +380,7 @@ fr: un fr&egrave;re/une soeur/un fr&egrave;re ou une soeur
 he:   אח/ אחות 
 it: un fratello/una sorella/un fratello o una sorella
 nl: een broer/een zuster/een broer of een zuster
-no: bror/s&oslash;ster/s&oslash;sken	
+no: bror/s&oslash;ster/s&oslash;sken
 pt: um irm&atilde;o/uma irm&atilde;/um(a) irm&atilde;o(&atilde;)
 se: en bror/en syster/ett syskon
 
@@ -3141,6 +3141,7 @@ en: siblings
 eo: gefratoj
 es: hermanos y hermanas
 fr: fr&egrave;res et soeurs
+pt: irm&atilde;os e irm&atilde;s
 
     son/daughter/child
 de: Sohn/Tochter/Kind
