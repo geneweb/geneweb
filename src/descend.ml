@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.2 1999-03-22 17:03:22 ddr Exp $ *)
+(* $Id: descend.ml,v 2.3 1999-03-25 20:25:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -166,14 +166,18 @@ value print_marriage_text conf base fam =
 
 value afficher_marie conf base first fam p conjoint =
   let is = index_of_sex p.sex in
-  do Wserver.wprint
-       (fcapitale (ftransl_nth conf "allied%t to" is))
-       (fun _ ->
-          if age_autorise conf base p && age_autorise conf base conjoint then
-            do Wserver.wprint "\n";
-               print_marriage_text conf base fam;
-            return ()
-          else ());
+  let auth = age_autorise conf base p && age_autorise conf base conjoint in
+  do if fam.not_married && auth then
+       Wserver.wprint "%s" (capitale (transl conf "with"))
+     else
+       Wserver.wprint
+         (fcapitale (ftransl_nth conf "married%t to" is))
+         (fun _ ->
+            if auth then
+              do Wserver.wprint "\n";
+                 print_marriage_text conf base fam;
+              return ()
+            else ());
      stag "strong" begin
        afficher_personne_referencee conf base conjoint;
      end;

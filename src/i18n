@@ -45,7 +45,6 @@ age
 alias
 all the places
 all the titles
-allied%t to
 alphabetic order
 also
 an ancestor
@@ -143,6 +142,7 @@ marriage of %t after his/her death
 marriage of %t before his/her birth
 marriage/marriages
 married at age %t
+married%t to
 max %d generations
 maybe (date)
 merge

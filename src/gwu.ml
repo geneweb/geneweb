@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.1 1999-03-08 11:18:44 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.2 1999-03-25 20:25:38 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -310,6 +310,7 @@ value print_family oc base ml (per_sel, fam_sel) fam_done m =
      print_parent oc base ml fam_sel fam m.m_fath;
      Printf.fprintf oc " +";
      print_date_option oc (Adef.od_of_codate fam.marriage);
+     if fam.not_married then Printf.fprintf oc " #nm" else ();
      print_if_no_empty oc base "#mp" fam.marriage_place;
      print_if_no_empty oc base "#ms" fam.marriage_src;
      match fam.divorce with

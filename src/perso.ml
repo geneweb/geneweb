@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.4 1999-03-22 17:03:24 ddr Exp $ *)
+(* $Id: perso.ml,v 2.5 1999-03-25 20:25:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -421,10 +421,7 @@ value print_marriage_text conf base fam =
      | _ -> () ];
      match marriage_place with
      [ "" -> ()
-     | s ->
-         do if marriage <> None then Wserver.wprint ", " else ();
-            Wserver.wprint "%s," (coa conf s);
-         return () ];
+     | s -> Wserver.wprint ", %s," (coa conf s) ];
      match (marriage, marriage_place) with
      [ (None, "") -> ()
      | _ -> Wserver.wprint "</em>" ];
@@ -438,16 +435,20 @@ value print_family conf base p a ifam =
   let children = fam.children in
   let divorce = fam.divorce in
   let is = index_of_sex p.sex in
+  let auth = age_autorise conf base p && age_autorise conf base conjoint in
   do Wserver.wprint "\n";
      html_li conf;
-     Wserver.wprint
-       (fcapitale (ftransl_nth conf "allied%t to" is))
-       (fun _ ->
-          if age_autorise conf base p && age_autorise conf base conjoint then
-            do Wserver.wprint "\n";
-               print_marriage_text conf base fam;
-            return ()
-          else ());
+     if fam.not_married && auth then
+       Wserver.wprint "%s" (capitale (transl conf "with"))
+     else
+       Wserver.wprint
+         (fcapitale (ftransl_nth conf "married%t to" is))
+         (fun _ ->
+            if auth then
+              do Wserver.wprint "\n";
+                 print_marriage_text conf base fam;
+              return ()
+            else ());
      Wserver.wprint "\n";
      afficher_personne_titre_referencee conf base (poi base iconjoint);
      Date.afficher_dates_courtes conf base (poi base iconjoint);
@@ -456,9 +457,7 @@ value print_family conf base p a ifam =
          let d = Adef.od_of_codate d in
          do Wserver.wprint ",\n%s" (transl conf "divorced");
             match d with
-            [ Some d
-              when
-                age_autorise conf base p && age_autorise conf base conjoint ->
+            [ Some d when auth ->
                 do Wserver.wprint " <em>";
                    Wserver.wprint "%s" (Date.string_of_ondate conf d);
                    Wserver.wprint "</em>";

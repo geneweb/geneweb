@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 2.1 1999-03-08 11:18:41 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.2 1999-03-25 20:25:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000b";
+value magic_gwo = "GnWo000c";
 
 type key =
   { pk_first_name : string;
@@ -471,6 +471,11 @@ value get_mar_date str =
              else Adef.codate_None, l)
         | _ -> failwith str ]
       in
+      let (not_marr, l) =
+        match l with
+        [ ["#nm" :: l] -> (True, l)
+        | _ -> (False, l) ]
+      in
       let (place, l) = get_field "#mp" l in
       let (src, l) = get_field "#ms" l in
       let (divorce, l) =
@@ -481,7 +486,7 @@ value get_mar_date str =
             else (Divorced Adef.codate_None, l)
         | _ -> (NotDivorced, l) ]
       in
-      (mar, place, src, divorce, l)
+      (not_marr, mar, place, src, divorce, l)
   | [] -> failwith str ]
 ;
 
@@ -619,7 +624,9 @@ value lire_famille ic fname =
   fun
   [ Some (str, ["fam" :: l]) ->
       let (cle_pere, surname, l) = parse_parent str l in
-      let (marriage, marr_place, marr_src, divorce, l) = get_mar_date str l in
+      let (not_marr, marriage, marr_place, marr_src, divorce, l) =
+        get_mar_date str l
+      in
       let (cle_mere, _, l) = parse_parent str l in
       do if l <> [] then failwith str else (); return
       let ligne = lire_ligne ic in
@@ -662,7 +669,7 @@ value lire_famille ic fname =
           in
           let fo =
             {marriage = marriage; marriage_place = marr_place;
-             marriage_src = marr_src;
+             marriage_src = marr_src; not_married = not_marr;
              divorce = divorce; children = Array.of_list cles_enfants;
              comment = comm; origin_file = fname;
              fsources = fsrc;
@@ -672,7 +679,7 @@ value lire_famille ic fname =
       | ligne ->
           let fo =
             {marriage = marriage; marriage_place = marr_place;
-             marriage_src = marr_src;
+             marriage_src = marr_src; not_married = not_marr;
              divorce = divorce; children = [||]; comment = comm;
              origin_file = fname; fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}

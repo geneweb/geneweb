@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.3 1999-03-20 19:12:57 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.4 1999-03-25 20:25:34 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -699,7 +699,7 @@ value map_person_strings f p =
 
 value map_family_ps fp fs fam =
   {marriage = fam.marriage; marriage_place = fs fam.marriage_place;
-   marriage_src = fs fam.marriage_src;
+   marriage_src = fs fam.marriage_src; not_married = fam.not_married;
    divorce = fam.divorce;
    children = Array.map fp fam.children;
    comment = fs fam.comment;

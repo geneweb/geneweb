@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.3 1999-03-22 17:03:20 ddr Exp $
+# $Id: lexicon.txt,v 2.4 1999-03-25 20:25:32 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -593,19 +593,6 @@ it: tutti i titoli
 nl: alle titels
 pt: todos os t&iacute;tulos
 se: alla titlar
-
-    allied%t to
-cn: %tֵהֵ¼Êַ
-de: verheiratet%t mit
-en: married%t to
-eo: edzagxita%t kun
-es: unido%t con/unida%t con
-fr: mari&eacute;%t avec/mari&eacute;e%t avec
-he:   בן זוג %t של/ בת זוג %t של
-it: sposato%t con/sposata%t con
-nl: verbonden%t met
-pt: unido%t com/unida%t com
-se: gift%t med
 
     alphabetic order
 de: alphabetische Ordnung
@@ -1658,18 +1645,6 @@ nl: minder dan een maand oud
 pt: menos de um m&ecirc;s
 se: mindre &auml;n en m&aring;nad gammal
 
-    less than one year old
-de: weniger als ein Jahr alt
-en: less than one year old
-eo: malpli de un jaro
-es: menos de un a&ntilde;o
-fr: moins d'un an
-he:  פחות משנה בגיל
-it: meno di un anno
-nl: minder dan een jaar oud
-pt: menos de um ano
-se: mindre &auml;n ett &aring;r gammal
-
     link
 de: verbinden
 en: link
@@ -1749,6 +1724,15 @@ nl: huwelijk/huwelijken
 pt: casamento/casamentos
 se: gifterm&aring;l/gifterm&aring;l
 
+    married
+de: verheiratet
+en: married
+es: casados
+fr: mari&eacute;s
+nl: gehuwd
+pt: casados
+se: gift
+
     married at age %t
 de: verheiratet mit %t Jahren
 en: married at age %t
@@ -1758,6 +1742,19 @@ fr: mari&eacute;(e) &agrave; l'&agrave;ge de %t
 nl: gehuwd op de leeftijd van %t
 pt: casado com a idade de %t
 se: gift vid %t &aring;lder
+
+    married%t to
+cn: %tֵהֵ¼Êַ
+de: verheiratet%t mit
+en: married%t to
+eo: edzagxita%t kun
+es: casado%t con/casada%t con
+fr: mari&eacute;%t avec/mari&eacute;e%t avec
+he:   בן זוג %t של/ בת זוג %t של
+it: sposato%t con/sposata%t con
+nl: verbonden%t met
+pt: casado%t com/casada%t com
+se: gift%t med
 
     max %d generations
 de: Maximal %d Generationen
@@ -1989,6 +1986,15 @@ it: non trovato
 nl: niet gevonden
 pt: n&atilde;o encontrado
 se: hittar inte
+
+    not married
+de: nicht verheiratet
+en: not married
+es: no casados
+fr: non mari&eacute;s
+nl: niet gehuwd
+pt: n&atilde;o casados
+se: inte gift
 
     note/notes
 cn: ±¸׳¢
