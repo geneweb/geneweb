@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.31 2000-05-31 09:15:22 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.32 2000-09-03 16:11:26 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -254,12 +254,12 @@ value print_html_table print print_indi phony border d t =
                   loop (l + 1)
               | _ -> l + 1 ]
             in
-(*
+(* happens sometimes: should be debugged *)
 do if next_l > next_j then do Printf.eprintf "assert false i %d k %d l %d next_l %d next_j %d\n" i k l next_l next_j; flush stderr; return () else (); return
 let next_l = min next_l next_j in
-*)
+(*
             do assert (next_l <= next_j); return
-(**)
+*)
             let colspan = 3 * (next_l - l) - 2 in
             do match (t.table.(i).(l).elem, t.table.(i + 1).(l).elem) with
                [ (Nothing, _) | (_, Nothing) ->
