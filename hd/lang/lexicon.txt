@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.75 1999-07-22 22:30:23 ddr Exp $
+# $Id: lexicon.txt,v 2.76 1999-07-23 10:33:39 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2551,20 +2551,20 @@ no: ingen f&oslash;dselsdager
 pt: nenhum anivers&aacute;rio
 se: ingen f&ouml;delsedag
 
-    no known relationship link between %t and %t
-cs: ¾ádnı známı vztah mezi :i:%t a :i:%t
-de: %t und %t sind anscheinend nicht verwandt
-dk: intet kendt sl&aelig;gtskab mellem %t og %t
-en: no known relationship link between %t and %t
-eo: ne sciita cxenero de parenceco inter %t kaj %t
-es: ning&uacute;n grado de parentesco conocido entre %t y %t
-fr: pas de lien de parent&eacute; connu entre %t et %t
-he:  àéï ÷ùø ãí áéï %t  å-%t
-it: nessun legame di parentela conosciuto tra %t e %t
-nl: er is geen bekende verwantschap tussen %t en %t
-no: ikke kjent slektskap mellom %t og %t
-pt: nenhum grau de parentesco conhecido entre %t y %t
-se: ingen k&auml;nd sl&auml;ktskap emellan %t och %t
+    no known relationship link between %s and %s
+cs: ¾ádnı známı vztah mezi :i:%s a :i:%s
+de: %s und %s sind anscheinend nicht verwandt
+dk: intet kendt sl&aelig;gtskab mellem %s og %s
+en: no known relationship link between %s and %s
+eo: ne sciita cxenero de parenceco inter %s kaj %s
+es: ning&uacute;n grado de parentesco conocido entre %s y %s
+fr: pas de lien de parent&eacute; connu entre %s et %s
+he:  àéï ÷ùø ãí áéï %s  å-%s
+it: nessun legame di parentela conosciuto tra %s e %s
+nl: er is geen bekende verwantschap tussen %s en %s
+no: ikke kjent slektskap mellom %s og %s
+pt: nenhum grau de parentesco conhecido entre %s y %s
+se: ingen k&auml;nd sl&auml;ktskap emellan %s och %s
 
     no match
 de: keine passenden Eintr&auml;ge
