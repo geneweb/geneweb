@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
+  <!-- $Id -->
   <!-- copyright (c) INRIA -->
   <title>Ættfræği - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -27,7 +28,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <p>
 
 Gagnagrunnurinn <font color=#2f6400><b>"%t"</b></font> er nú meğ %n
-einstaklinga.%In<br>
+einstaklinga skráğa.%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 
 %I&NwNj<br><p>
@@ -55,7 +56,7 @@ einstaklinga.%In<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-Til ağ lóğsa şig í gegnum gagnagrunninn getur şú leitağ:<br><p>
+Í şessum gagnagrunni getur şú leitağ:<br><p>
 
 <ul>
 
@@ -142,14 +143,14 @@ eftir
 </center>
 %E
 
-<center>Şú getur líka athugağ<br><p>
+<center>Şú getur einnig athugağ<br><p>
 
 <table border=0>
 <tr>
 <td valign=up>
 <ul>
 <li><a href="%sm=AN">afmælisdaga</a>
-<li><a href="%sm=AD">dánarafmæli</a>
+<li><a href="%sm=AD">ártíğir</a>
 <li><a href="%sm=AM">brúğkaupsafmæli</a>%I|wf
 <li><a href="%sm=LB;k=10">síğustu fæğingar</a>%E
 </ul>
@@ -159,7 +160,7 @@ eftir
 <li><a href="%sm=LD;k=10">síğustu andlát</a>%E%Ih
 <li><a href="%sm=HIST;k=10">uppfærslusögu</a>%E
 <li><a href="%sm=CAL">dagatöl</a>
-<li><a href="%sm=FORUM">gagnagrunnurinn umræğur</a>
+<li><a href="%sm=FORUM">umræğur</a>
 </ul>
 </td>
 </tr>
