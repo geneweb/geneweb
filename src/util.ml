@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.25 2002-01-20 13:37:15 ddr Exp $ *)
+(* $Id: util.ml,v 4.26 2002-01-21 05:01:01 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1165,13 +1165,27 @@ value copy_string_with_macros conf env s =
     else ()
 ;
 
+value setup_link conf =
+  let s = Wserver.extract_param "host: " '\r' conf.request in
+  try
+    let i = String.rindex s ':' in
+    let s = "http://" ^ String.sub s 0 i ^ ":2316/" in
+    "<a href=\"" ^ s ^ "gwsetup?v=main.htm\">gwsetup</a>"
+  with
+  [ Not_found -> "" ]
+;
+
 value gen_trailer with_logo conf =
   let env =
     [('s', fun _ -> commd conf);
      ('d',
       fun _ ->
-        if conf.cancel_links then ""
-        else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>")]
+        let s =
+          if conf.cancel_links then ""
+          else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>"
+        in
+        if not conf.setup_link then s
+        else s ^ " - " ^ setup_link conf)]
   in
   do {
     if not with_logo then ()

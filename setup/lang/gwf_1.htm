@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: gwf_1.htm,v 1.6 2002-01-17 13:59:48 ddr Exp $ -->
+  <!-- $Id: gwf_1.htm,v 1.7 2002-01-21 05:01:01 ddr Exp $ -->
   <title>[
 de: Parameter "$a"
 en: Parameters "$a"
@@ -1004,6 +1004,36 @@ sv: kinesiska
 <p>
 
 <table border=1 width="100%" width="90%">
+<tr align=left><td><strong>- mac_anc_level -</strong></td></tr>
+<tr align=left>
+<td>[
+en: Maximum level when displaying ancestor.
+fr: Niveau maximum dans l'affichage des ascendants.
+]
+
+<p>
+
+[
+en: When ancestors are displayed, limit the number of displayed
+    generation. By default, it is 8 generations, but you can
+    indicate a different value here.
+fr: Quand on affiche les ascendants, limite le nombre de
+    g&eacute;n&eacute;rations affichables. C'est 8 par d&eacute;faut,
+    mais vous pouvez indiquer une valeur diff&eacute;rente ici.
+]
+</tr>
+
+</tr>
+<tr align=left>
+<td align=center><input name=max_anc_level value="$Vmax_anc_level;"
+size=5></td>
+</tr>
+
+</table>
+
+<p>
+
+<table border=1 width="100%" width="90%">
 <tr align=left><td><strong>- history -</strong></td></tr>
 <tr align=left>
 <td>[
@@ -1099,6 +1129,49 @@ size=50></td>
 
 </table>
 
+<p>
+
+<table border=1 width="100%">
+<tr align=left><td><strong>- hide_advanced_request -</strong></td></tr>
+<tr align=left>
+<td>[
+en: Hide advanced request.
+fr: Cacher la requête évoluée.
+]
+
+<p>
+
+[
+en: The advanced request allows to make researches in the data base.
+    As it is very incomplete, it is hidden by default. Select "no"
+    below to set it.
+fr: La requête évoluée permet de faire des recherches avec critères sur
+    la base. Comme elle est très incomplète, elle est cachée par
+    défaut. Sélectionnez "non" ci-dessous pour la remettre.
+]
+
+<tr align=left>
+<td align=center>
+<input type=radio name=hide_advanced_request
+value=yes$Chide_advanced_request=yes;>[
+de: Ja
+en: Yes
+es: si
+fr: oui
+lv: Yes
+sv: Yes
+]
+<input type=radio name=hide_advanced_request
+value=no$Chide_advanced_request=no;>[
+de: Nein
+en: No
+es: no
+fr: non
+lv: Nç
+sv: No 
+]
+</tr>
+</table>
 
 <p>
 

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.5 2002-01-13 04:19:01 ddr Exp $
+# $Id: Makefile,v 4.6 2002-01-21 05:01:00 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -47,7 +47,7 @@ test_dir:
 	cd test/gw; ln -s ../../gwsetup gwsetup
 	cd test/gw; ln -s ../.. setup
 	cd test/gw; ln -s ../../../doc .
-	cd test/gw; ln -s ../../../src/gwc .
+	cd test/gw; cp ../../../src/gwc .
 	cd test/gw; ln -s ../../../src/gwd .
 	cd test/gw; ln -s ../../../src/gwu .
 	cd test/gw; ln -s ../../../src/consang .
@@ -58,6 +58,7 @@ test_dir:
 	cd test/gw; ln -s ../../../gwb2ged/gwb2ged .
 	cd test/gw; ln -s ../../../etc/INSTALL.htm .
 	cd test/gw; echo "127.0.0.1" > only.txt
+	cd test/gw; echo "-setup_link" > gwd.arg
 
 setup.out: $(OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(OBJS) -o setup.out
