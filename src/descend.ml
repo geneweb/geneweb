@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.3 1999-11-15 12:41:02 ddr Exp $ *)
+(* $Id: descend.ml,v 3.4 1999-11-23 13:28:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -59,7 +59,8 @@ value level_max base p =
 
 value text_to conf =
   fun
-  [ 0 -> transl conf "specify" ^ " " ^ transl conf "generation"
+  [ 0 ->
+      transl conf "specify" ^ " " ^ transl_nth conf "generation/generations" 0
   | 1 -> transl conf "to the children"
   | 2 -> transl conf "to the grandchildren"
   | 3 -> transl conf "to the great-grandchildren"
@@ -70,7 +71,8 @@ value text_to conf =
 
 value text_level conf =
   fun
-  [ 0 -> transl conf "specify" ^ " " ^ transl conf "generation"
+  [ 0 ->
+      transl conf "specify" ^ " " ^ transl_nth conf "generation/generations" 0
   | 1 -> transl conf "the children"
   | 2 -> transl conf "the grandchildren"
   | 3 -> transl conf "the great-grandchildren"
@@ -111,11 +113,9 @@ value print_choice conf base p niveau_effectif =
               (capitale (transl conf "tree"));
             if niveau_effectif <= limit_by_tree conf then ()
             else
-              do Wserver.wprint "(";
-                 Wserver.wprint (ftransl conf "max %d generations")
-                   (limit_by_tree conf);
-                 Wserver.wprint ")\n";
-              return ();
+              Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
+                (limit_by_tree conf)
+                (transl_nth conf "generation/generations" 1);
           Wserver.wprint "<br>\n";
           Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
             (capitale (transl conf "only the generation selected"));
