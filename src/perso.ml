@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.34 2002-03-11 19:03:01 ddr Exp $ *)
+(* $Id: perso.ml,v 4.35 2002-04-09 00:13:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -545,6 +545,25 @@ value print_married_to conf base env p p_auth =
   | _ -> () ]
 ;
 
+value print_misc_names conf base env p p_auth =
+  if p_auth then
+    let list = Gutil.person_misc_names base p in
+    let list =
+      let first_name = p_first_name base p in
+      let surname = p_surname base p in
+      if first_name <> "?" && surname <> "?" then
+        [Name.lower (first_name ^ " " ^ surname) :: list]
+      else list
+    in
+    if list <> [] then do {
+      Wserver.wprint "<ul>\n";
+      List.iter (fun n -> Wserver.wprint "<li>%s\n" n) list;
+      Wserver.wprint "</ul>\n";
+    }
+    else ()
+  else ()
+;
+
 value print_nobility_title conf base env p p_auth =
   match get_env "nobility_title" env with
   [ Vtitle t when p_auth -> print_title conf base (transl_nth conf "and" 0) p t
@@ -857,6 +876,7 @@ value print_simple_variable conf base env ((p, a, u, p_auth) as ep) efam =
   | "image_url" -> print_image_url conf base env p p_auth
   | "ind_access" -> Wserver.wprint "i=%d" (Adef.int_of_iper p.cle_index)
   | "married_to" -> print_married_to conf base env p p_auth efam
+  | "misc_names" -> print_misc_names conf base env p p_auth
   | "mother_age_at_birth" ->
       print_parent_age conf base p a p_auth (fun cpl -> cpl.mother)
   | "nobility_title" -> print_nobility_title conf base env p p_auth
