@@ -13,6 +13,10 @@ GeneWeb version 3.12
   - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
 
 * GeneWeb server or CGI (gwd)
+  - [03 Feb 01] Removed the "advanced request". I received too much
+    messages about it, it works too bad and it make the server work too
+    much. Moreover it is a "data base feature" and I am not interested in
+    data bases.
   - [28 Feb 01] In surname displaying, if several surnames match,
     everybody is displayed with his/her surname. Previously, the surname
     of the people having the first surname of the list was not displayed.
