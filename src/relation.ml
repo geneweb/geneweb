@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.4 2001-03-24 22:54:47 ddr Exp $ *)
+(* $Id: relation.ml,v 4.5 2001-03-25 01:24:48 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -728,20 +728,31 @@ value brother_in_law_label conf sex =
   transl_nth conf "a brother-in-law/a sister-in-law" is
 ;
 
-(* uncle_label: should be changed to use get_piece_of_branch and not
-   this parameter 'side' (which is old method) *)
-
-value uncle_label conf x p side =
+value uncle_label conf base info x p =
   let is = index_of_sex p.sex in
   match x with
   [ 1 ->
       let txt = transl conf "an uncle/an aunt" in
-      let is = if nb_fields txt == 4 && side == Female then is + 2 else is in
+      let is =
+        if nb_fields txt == 4 then
+          let info = (info, fun r -> r.Consang.lens1) in
+          match get_piece_of_branch conf base info (1, 1) with
+          [ [ip1] -> if (poi base ip1).sex = Male then is else is + 2
+          | _ -> (* must be a bug *) is ]
+        else is
+      in
       nth_field txt is
   | 2 ->
       let txt = transl conf "a great-uncle/a great-aunt" in
-      let is = if nb_fields txt == 4 && side == Female then is + 2 else is in
-      nth_field txt is
+      let is =
+        if nb_fields txt == 4 then
+          let info = (info, fun r -> r.Consang.lens1) in
+          match get_piece_of_branch conf base info (2, 2) with
+          [ [ip1] -> if (poi base ip1).sex = Male then is else is + 2
+          | _ -> (* must be a bug *) is ]
+        else is
+      in
+      nth_field txt is     
   | n ->
       transl_nth conf "an uncle/an aunt" is ^ " " ^
         Printf.sprintf (ftransl conf "of the %s generation")
@@ -821,12 +832,12 @@ value print_link conf base info n p1 p2 pp1 pp2 x1 x2 =
            (brother_in_law_label conf ini_p1.sex, False, False)
          else (brother_label conf x2 p1.sex, sp1, sp2)
        else if x1 == 1 then
-         let side =
-           if x2 <= 3 then uncle_relation_side base p1 p2 x2 else Neuter
-         in
          if x2 == 2 && sp1 then
+           let side =
+             if x2 <= 3 then uncle_relation_side base p1 p2 x2 else Neuter
+           in
            (uncle_in_law_label conf ini_p1.sex side, False, sp2)
-         else (uncle_label conf (x2 - x1) p1 side, sp1, sp2)
+         else (uncle_label conf base (info, x2) (x2 - x1) p1, sp1, sp2)
        else if x2 == 1 then
          if x1 == 2 && x2 == 1 && sp2 then
            (nephew_in_law_label conf p1.sex, sp1, False)
