@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.41 1999-10-06 12:25:01 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.42 1999-10-13 15:30:05 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -34,6 +34,7 @@ value try_negative_dates = ref False;
 value no_negative_dates = ref False;
 value month_number_dates = ref NoMonthNumberDates;
 value no_public_if_titles = ref False;
+value first_names_brackets = ref None;
 value force = ref False;
 value conc_spc = ref False;
 
@@ -990,27 +991,49 @@ value add_indi gen r =
         | None -> "" ]
     | None -> "" ]
   in
-  let (first_name, surname, occ, public_name, first_name_alias) =
+  let (first_name, surname, occ, public_name, first_names_aliases) =
     match name_sons with
     [ Some n ->
         let (f, s) = parse_name (Stream.of_string n.rval) in
-        let (f, pn, fa) =
+        let (f, pn, fal) =
           if extract_public_names.val || extract_first_names.val then
             let i = next_word_pos f 0 in
             let j = next_sep_pos f i in
-            if j == String.length f then (f, public_name, "")
+            if j == String.length f then (f, public_name, [])
             else
               let fn = String.sub f i (j - i) in
               if public_name = "" && extract_public_names.val then
-                if is_a_public_name f j then (fn, f, "")
-                else if extract_first_names.val then (fn, "", f)
-                else (f, "", "")
-              else (fn, public_name, f)
-          else (f, public_name, "")
+                if is_a_public_name f j then (fn, f, [])
+                else if extract_first_names.val then (fn, "", [f])
+                else (f, "", [])
+              else (fn, public_name, [f])
+          else (f, public_name, [])
         in
         let f = if lowercase_first_names.val then lowercase_name f else f in
-        let fa =
-          if lowercase_first_names.val then lowercase_name fa else fa
+        let fal =
+          if lowercase_first_names.val then List.map lowercase_name fal
+          else fal
+        in
+        let (f, fal) =
+          match first_names_brackets.val with
+          [ Some (bb, eb) ->
+              try
+                let i = String.index f bb in
+                let j =
+                  if i + 2 == String.length f then raise Not_found
+                  else String.index_from f (i + 2) eb
+                in
+                if j > i then
+                  let fn = String.sub f (i + 1) (j - i - 1) in
+                  let fa =
+                    String.sub f 0 i ^ fn ^
+                    String.sub f (j + 1) (String.length f - j - 1)
+                  in
+                  if fn = fa then (fn, fal) else (fn, [fa :: fal])
+                else raise Not_found
+              with
+              [ Not_found -> (f, fal) ]
+          | None -> (f, fal) ]
         in
         let s = if lowercase_surnames.val then lowercase_name s else s in
         let r =
@@ -1019,8 +1042,8 @@ value add_indi gen r =
           [ Not_found ->
               let r = ref (-1) in do Hashtbl.add gen.g_hnam key r; return r ]
         in
-        do incr r; return (f, s, r.val, pn, fa)
-    | None -> ("?", "?", Adef.int_of_iper i, public_name, "") ]
+        do incr r; return (f, s, r.val, pn, fal)
+    | None -> ("?", "?", Adef.int_of_iper i, public_name, []) ]
   in
   let nick_name =
     match name_sons with
@@ -1236,9 +1259,7 @@ value add_indi gen r =
      image = add_string gen image;
      nick_names = if nick_name <> "" then [add_string gen nick_name] else [];
      aliases = List.map (add_string gen) aliases;
-     first_names_aliases =
-       if first_name_alias <> "" then [add_string gen first_name_alias]
-       else [];
+     first_names_aliases = List.map (add_string gen) first_names_aliases;
      surnames_aliases =
        if surname_alias <> "" then [add_string gen surname_alias] else [];
      titles = titles; rparents = rparents; related = [];
@@ -1995,6 +2016,21 @@ value speclist =
        Convert surnames to lowercase letters, with initials in
        uppercase. Try to keep lowercase particles."
       );
+   ("-fne",
+    Arg.String
+      (fun s ->
+         if String.length s = 2 then
+           first_names_brackets.val := Some (s.[0], s.[1])
+         else
+           raise
+             (Arg.Bad
+                "-fne option must be followed by a 2 characters string")),
+    "be \
+- First names enclosed -
+       When creating a person, if the GEDCOM first name part holds
+       a part between 'b' (any character) and 'e' (any character), it
+       is considered to be the usual first name: e.g. -fne '\"\"' or
+       -fne \"()\".");
    ("-efn", Arg.Set extract_first_names,
     "  \
 - Extract first names -

@@ -17,6 +17,15 @@ GeneWeb version 2.08
   - [Oct 10, 99] Fixed bug: dates represented as text where not extracted
     in the output file but on standard output.
 
+* Gedcom to GeneWeb (ged2gwb)
+  - [Oct 13, 99] Added option "-fne" (for "first names enclosed"): it is
+    possible to give two characters telling that the usual first name parts
+    is between those characters: e.g. if they are of the form:
+       Bernard Jean "Philippe"
+    use -fne '""' and if they are:
+       Bernard Jean (Philippe)
+    use -fne '()', and so on.
+
 * GeneWeb to Gedcom (gwb2ged)
   - [Oct 5, 99] Changed the way the lines of notes are cut (by tag CONC).
     The standard GEDCOM 5.5 tells that too long lines must be cut *inside*
