@@ -10,6 +10,6 @@ Web. Tout vous sera explique dans la navigation.
    Sous MacOS X, lancez "gwsetup" dans un Terminal.
 
 Mais si vous preferez connaitre les commandes de base de GeneWeb, et
-que vous etes un habitue des commandes interactives (MSdos, Xterm),
+que vous etes un habitue des commandes interactives (MSdos, shell),
 allez dans le repertoire "gw" et lisez le fichier LISEZMOI.txt. C'est
 une autre facon de demarrer.
