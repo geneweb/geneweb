@@ -1,10 +1,10 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//IW"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.5 1999-10-31 15:48:42 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.6 1999-11-23 14:38:20 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <META http-equiv="Content-Type" content="text/html; charset=iso-8859-8-i">
-  <title>Genealogy - %t</title>
+  <title>תולדות - %t</title>
   <meta name="ROBOTS" content="NONE">
 </head>
 <body%b>
@@ -14,10 +14,10 @@
 <tr>
 <td>
 <a href="http://cristal.inria.fr/~ddr/GeneWeb/"><img width=96
-height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
+height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 </td>
-<td align=left>
-<h1><font color=#2f6400>תולדות</font></h1>
+<td align=right>
+<h1><font color=#2f6400>מאגר מידע <br> תולדותי </font></h1>
 </td>
 </tr>
 </table>
@@ -25,86 +25,160 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <br>
 
 %rversion
-</center>
 
 <p>
-יש במאגר המידע %n אנשים %In
+
+במאגר המידע <font color=#2f6400><b>"%t"</b></font> יש %n אנשים.%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
+
+%I&NwNj<br><p>
+
+%I&NcNa<table border=0 width="70%">
+<tr>
+
+<td align=center>כניסה  <a href="%sw=w"><em> כגאון </em></a> </td>
+
+%INf<td align=center>כניסה<a href="%sw=f"><em> מיוחסת </em></a>
+</td>
+
+%E</tr></table>%E%I|ca<table border=0>
+<tr><td align=center>
+<form method=get action="%f">
+%hסיסמה לכניסה <em> מיוחסת  </em> או <em>כגאון</em>
+<input name=w size=10 maxlength=200>
+</form>
+</td></tr>
+</table>
+
+%E%E<br><p>
+
+<table border=0 cellspacing=0 cellpadding=0>
+
+<tr><td>
+נווט במאגר מידה על-ידי חיפוס:<br><p>
 
 <ul>
 
 <li>
 
-<form method=GET action="%f" >
+<form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-חיפוס: <input name=n size=40 maxlength=200> 
+<font color=#2f6400><b>לפי שם או זהות</b></font>
+<input name=n size=40 maxlength=200>
 <input type=submit value="חפס">
-<br><!-- -->
-זה:
+<br>
 <ul>
 <li> <input type=radio name=t value=PN checked>
-או  <em> שם פרטי + משפחה </em>
-או <em>שם ציבורי</em>, או <em>שם נוסף</em>.
-<li> <input type=radio name=t value=P> <em>שם פרטי</em>.
-<li> <input type=radio name=t value=N> <em>שם משפחה</em>.
+<em>[first name/first names]</em> <em>[surname/surnames]</em>
+[or] <em>[public name]</em>
+[or] <em>[alias]</em>
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em> מספר Sosa  ביחס ל-%a </em>%E
+<li> <input type=radio name=t value=P> <em>[first name/first names]</em>
+<li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
 %It<li>
 
-<FORM method=GET action="%f">
+<form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
-לפי תואר <INPUT NAME=t size=16 maxlength=200>
-מקום <INPUT NAME=p size=30 maxlength=200> =&gt;
-<INPUT TYPE=submit value="חפס">
-</FORM>
+<table dir=rtl border=0 cellpadding=0 cellspacing=0><tr><td>
+<font color=#2f6400><b>לפי תאר</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
+(למשל: רב, דיין, נסיך)<br>
+</td><td>...</td><td>
+<font color=#2f6400><b> לפי מקום</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
+(למשל: של ליטה)
+</td><td>
+<input type=submit value="חפס">
+</td></tr></table>
+</form>
 
 %E<li>
 
-<FORM method=GET action="%f">
-%h כל
-<SELECT NAME=m>
-   <OPTION VALUE="N" SELECTED>שמות משפחה
-   <OPTION VALUE="P">שמות פרטיים
-</SELECT>
-לפי
-<SELECT NAME=tri>
-   <OPTION VALUE="A" SELECTED>סדר אלף-בת
-   <OPTION VALUE="F">סדר הופעתם
-</SELECT> =&gt;
-<INPUT TYPE=submit value="בסדר">
-</FORM>
+<form method=GET action="%f" dir=rtl>
+%h
+<font color=#2f6400><b>רשימה</b></font> של כל שמות 
+<select name=m>
+<option value="N" selected>  המשפחה 
+<option value="P">  הפרטיים 
+</select>
+לפי   
+<select name=tri>
+<option value="A" selected> סדר האלף-בית  
+<option value="F"> השכיחות 
+</select>
+<input type=submit value="אשר">
+</form>
 
-<li> <a href="%sm=H;v=advanced">בקשה מתקדמת</a>.
+<li>
 
-%Iw<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
-<li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%E
+<font color=#2f6400><b>ע"י </b></font>
+<a href="%sm=H;v=advanced"><font color=#2f6400><b>
+בקשה מתקדמת</b></font></a>.
 
 </ul>
 
-<a href="%sm=AN">ימי הולדת</a>%I|wf
-ו- <a href="%sm=B;k=10">לידות לאחרונה</a>%E...
-<br><!-- -->
-<a href="%sm=AD">ימי השנה למתים</a>.
-<br><!-- -->
-ו- <a href="%sm=AM">ימי נישואין</a>.
+%Iw<p>
+
+<center> יש אפשרות <br><p>
+
+<table border=0>
+<tr>
+<td align=right>
+<ul>
+<li><a href="%sm=ADD_FAM"> להוסיף משפחה</a>
+%INl</ul>
+</td>
+<td align=left>
+<ul>%E
+<li><a href="%sm=MOD_NOTES"> לעדכן את ההערות </a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
+%E<br><p>
+
+<center>אפשר גם להראות<br><p>
+
+<table border=0>
+<tr>
+<td valign=up>
+<ul>
+<li> <a href="%sm=AN"> ימי הולדת</a>
+<li> <a href="%sm=AD"> ימי פטירה</a>
+<li> <a href="%sm=AM"> ימי נישואין</a>%I|wf
+<li> <a href="%sm=LB;k=10"> לידות האחרונות </a>%E
+</ul>
+</td>
+<td valign=up>
+<ul>%I|wf
+<li> <a href="%sm=LD;k=10"> מקרי מוות האחרונים </a>%E%Ih
+<li> <a href="%sm=HIST;k=10"> דיווח העדכונים </a>%E
+<li> <a href="%sm=CAL"> לוחות שנה </a>
+<li> <a href="%sm=FORUM"><font color=#2f6400><b> הידברות בפורום של
+{data base}</b></font></a>
+</ul>
+</td>
+</tr>
+</table>
+</center>
+
 <p>
-היו %q פנייות, מתוכם %c לעמוד זה, מתאריך %d.
 
-%I&NwNj<p>
+היו %q כניסות, כולל %c כניסות לעמוד זה, מאז %d.
+%Il<p>%E
 
-%I&NcNa<ul>
-<li> <a href="%sw=w">סיסמה לכניסה <em>כגאון</em>.
-%INf<li> <a href="%sw=f">סיסמה לכניסה <em>מיוחסת</em>
-%E</ul>
+</td></tr>
 
-%E%I|ca<form method=get action="%f">
-%h<font size=-1>סיסמה לכניסה <em>מיוחסת</em> או <em>כגאון</em></font>
-<input name=w size=20 maxlength=200> =&gt;
-<input type=submit value="Ok">
-</form>
+<tr>
+<td align=left><br><font size=-1><em><a
+href="%sm=LEX"> לקסיקון </a></em></font></td>
+</tr>
 
-%E%E<p>
-
-<font size=-1><a href="%glang=en;m=LEX">מילון</a></font>
+</table>
+</center>
