@@ -7,6 +7,9 @@ GeneWeb Version 2.02
 * Lexicon (lexicon.txt)
   - [Apr 23, 99] Some changes in Hebrew version (by Jonathan Marder).
 
+* GeneWeb Daemon/CGI (gwd)
+  - [Apr 25, 99] Added space before "+" in short dates.
+
 * GeneWeb compiler (gwc)
   - [Apr 22, 99] Do not consider the message "notes before definition"
     any more as a fatal error.

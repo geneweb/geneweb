@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.5 1999-04-25 16:32:18 ddr Exp $ *)
+(* $Id: date.ml,v 2.6 1999-04-25 22:10:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -219,9 +219,10 @@ value short_dates_text conf base p =
     let s =
       match (birth_date, p.death) with
       [ (Some _, Death _ _ | NotDead) -> s ^ "-"
-      | (_, Death _ _) -> s
+      | (_, Death _ _) -> if s = "" then "+" else s ^ "&nbsp;+"
       | (_, DeadDontKnowWhen | DeadYoung) ->
-          if of_course_died conf p then s else s ^ "+"
+          if of_course_died conf p then s
+          else if s = "" then "+" else s ^ "&nbsp;+"
       | _ -> s ]
     in
     let s =
