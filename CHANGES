@@ -1,6 +1,10 @@
 GeneWeb version 4.04
 --------------------
 
+* GeneWeb server or CGI (gwd)
+  - [13 Sep 01] Fixed bug: dates added in "family" forms were not
+    completely checked ("31th of September" was accepted, for example).
+
 * GeneWeb data bases Transfer Program (gwtp)
   - [06 Sep 01] Separated the option -tmp into -log (for the log),
     -etc (for passwd, default.gwf and lang directories) and -tmp (the
