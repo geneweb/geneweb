@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.19 2001-03-01 12:52:04 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.20 2001-03-13 21:22:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -44,7 +44,7 @@ value gen_print conf base mois f_scan dead_people =
       else transl conf "birthdays"
     in
     Wserver.wprint "%s %s" (capitale lab)
-      (transl_nth conf "(month)" (mois - 1))
+      (nominative (transl_nth conf "(month)" (mois - 1)))
   in
   do try
        while True do
