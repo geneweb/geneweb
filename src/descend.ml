@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.21 1999-08-04 14:44:15 ddr Exp $ *)
+(* $Id: descend.ml,v 2.22 1999-08-04 18:34:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -8,6 +8,7 @@ open Gutil;
 open Util;
 
 value limit_desc = 12;
+value limit_by_tree = 4;
 
 value infini = 10000;
 
@@ -102,6 +103,15 @@ value print_choice conf base p niveau_effectif =
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=L checked> %s\n"
         (capitale (transl conf "list"));
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=T> %s\n"
+        (capitale (transl conf "tree"));
+      if niveau_effectif <= limit_by_tree then ()
+      else
+        do Wserver.wprint "(";
+           Wserver.wprint (ftransl conf "max %d generations") limit_by_tree;
+           Wserver.wprint ")\n";
+        return ();
       html_li conf;
       Wserver.wprint "<input type=radio name=t value=N> %s\n"
         (capitale (transl conf "families with encoding"));
@@ -918,11 +928,29 @@ value list_iter_first f l =
   ()
 ;
 
+value no_spaces v s =
+  if v <= 1 then s
+  else
+    loop 0 where rec loop i =
+      if i == String.length s then ""
+      else
+        match s.[i] with
+        [ ' ' -> "&nbsp;" ^ loop (i + 1)
+        | x -> String.make 1 x ^ loop (i + 1) ]
+;
+
+value short_dates_text v conf base p =
+  let txt = Date.short_dates_text conf base p in
+  no_spaces v txt
+;
+
 value print_tree conf base gv p =
   let title _ =
     Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
       (person_text_no_html conf base p)
   in
+  let gv = min limit_by_tree gv in
+  let asc_v = p_getenv conf.env "k" in
   let rec nb_column n v p =
     if v == 0 then n + 1
     else
@@ -936,7 +964,7 @@ value print_tree conf base gv p =
       (Array.to_list fam.children)
   in
   let print_vertical_bar v first po =
-    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
+    do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
        match po with
        [ Some (p, _) ->
            let ncol = nb_column 0 (v - 1) p in
@@ -951,7 +979,7 @@ value print_tree conf base gv p =
     tag "tr" begin list_iter_first (print_vertical_bar v) gen; end
   in
   let print_spouses_vertical_bar v first po =
-    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
+    do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
        match po with
        [ Some (p, _) when Array.length p.family > 0 ->
            list_iter_first
@@ -987,7 +1015,10 @@ value print_tree conf base gv p =
                    if Array.length fam.children = 0 then
                      Wserver.wprint "<td>&nbsp;</td>\n"
                    else if Array.length fam.children = 1 then
-                     Wserver.wprint "<td align=center>.</td>\n"
+                     let p = poi base fam.children.(0) in
+                     let ncol = nb_column 0 (v - 1) p in
+                     Wserver.wprint "<td colspan=%d align=center>|</td>\n"
+                       (2 * ncol - 1)
                    else
                      Array.iteri
                        (fun i iper ->
@@ -1024,6 +1055,12 @@ value print_tree conf base gv p =
   let horizontal_bars v gen =
     tag "tr" begin list_iter_first (print_horizontal_bar v) gen; end
   in
+  let up_reference i p txt =
+    if conf.cancel_links then txt
+    else
+      "<a href=\"" ^ commd conf ^ "m=A;t=T;v=" ^ i ^ ";" ^
+      acces conf base p ^ "\">" ^ txt ^ "</a>"
+  in
   let print_person v first po =
     do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
        match po with
@@ -1033,12 +1070,19 @@ value print_tree conf base gv p =
              if v = 1 then person_text_without_surname conf base p
              else person_title_text conf base p
            in
-           let txt = reference conf base p txt in
+           let txt = no_spaces gv txt in
            let txt =
-             if auth then txt ^ Date.short_dates_text conf base p
+             match asc_v with
+             [ Some i when v = 1 -> up_reference i p txt
+             | _ -> reference conf base p txt ]
+           in
+           let txt =
+             if auth && v == 1 then txt ^ Date.short_dates_text conf base p
+             else if auth then txt ^ short_dates_text gv conf base p
              else txt
            in
-           stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
+           stag "td" "colspan=%d align=center valign=top" (2 * ncol - 1)
+           begin
              Wserver.wprint "%s" txt;
            end
        | None -> Wserver.wprint "<td>&nbsp;</td>" ];
@@ -1046,13 +1090,12 @@ value print_tree conf base gv p =
     return ()
   in
   let print_spouses v first po =
-    do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
+    do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
        match po with
        [ Some (p, auth) when Array.length p.family > 0 ->
-           list_iter_first
-             (fun first ifam ->
-                do if not first then
-                     Wserver.wprint "<td>&nbsp;&nbsp;</td>\n"
+           Array.iteri
+             (fun i ifam ->
+                do if i > 0 then Wserver.wprint "<td valign=top>...</td>\n"
                    else ();
                    let fam = foi base ifam in
                    let ncol = fam_nb_column 0 (v - 1) fam in
@@ -1061,12 +1104,13 @@ value print_tree conf base gv p =
                    begin
                      let sp = poi base (spouse p (coi base ifam)) in
                      let txt = person_title_text conf base sp in
+                     let txt = no_spaces gv txt in
                      let txt = reference conf base sp txt in
                      let txt =
-                       if auth then txt ^ Date.short_dates_text conf base sp
+                       if auth then txt ^ short_dates_text gv conf base sp
                        else txt
                      in
-                     Wserver.wprint "&amp;%s %s"
+                     Wserver.wprint "&amp;%s&nbsp;%s"
                        (if auth then
                           Date.short_marriage_date_text conf base fam p sp
                         else "")
@@ -1074,7 +1118,7 @@ value print_tree conf base gv p =
                    end;
                    Wserver.wprint "\n";
                 return ())
-             (Array.to_list p.family)
+             p.family
        | _ -> Wserver.wprint "<td>&nbsp;</td>\n" ];
     return ()
   in
