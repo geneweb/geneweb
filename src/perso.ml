@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.76 2005-03-01 05:50:43 ddr Exp $ *)
+(* $Id: perso.ml,v 4.77 2005-03-02 12:34:39 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -638,7 +638,7 @@ and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
               [ Not_found -> warning_not_impl loc ] ] ]
   | [] -> str_val (simple_person_text conf base p p_auth)
   | _ -> warning_not_impl loc ]
-and eval_bool_person_field conf base env ((p, a, u, p_auth) as ep) =
+and eval_bool_person_field conf base env (p, a, u, p_auth) =
   fun
   [ "birthday" ->
       match (p_auth, Adef.od_of_codate p.birth) with
@@ -1192,7 +1192,7 @@ and print_foreach_child conf base env al ep =
            List.iter (print_ast conf base env ep) al)
         des.children
   | _ -> () ]
-and print_foreach_family conf base env al ini_ep ((p, _, u, _) as ep) =
+and print_foreach_family conf base env al ini_ep (p, _, u, _) =
   Array.iteri
     (fun i ifam ->
        let fam = foi base ifam in
