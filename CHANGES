@@ -6,6 +6,9 @@ GeneWeb version 3.02
     another browser (see version 3.01).
 
 * GeneWeb Service/CGI (gwd)
+  - [Dec 26, 99] ability to add a file "foo.hed" for the base "foo", in lang
+    directory and in its subdirectories: the file is inserted in the header
+    of all pages (i.e. to add style sheets).
   - [Dec 21, 99] Changed display of relationship by shortest path.
   - [Dec 19, 99] Added option -wd to specify a (writable) directory for
     socket communication (required for Windows) and data bases access

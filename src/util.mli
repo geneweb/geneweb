@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.12 1999-12-19 09:14:15 ddr Exp $ *)
+(* $Id: util.mli,v 3.13 1999-12-26 13:30:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -77,6 +77,7 @@ value open_etc_file : string -> option in_channel;
 value copy_from_etc : list (char * string) -> string -> in_channel -> unit;
 value copy_string_with_macros : config -> string -> unit;
 value body_prop : config -> string;
+value include_hed_trl : config -> string -> unit;
 
 value print_alphab_list :
   config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.25 1999-12-19 09:14:15 ddr Exp $ *)
+(* $Id: util.ml,v 3.26 1999-12-26 13:30:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -604,59 +604,6 @@ value index_of_sex =
   | Neuter -> 2 ]
 ;
 
-value default_body_prop conf =
-  "background=\"" ^ conf.indep_command ^ "m=IM;v=/gwback.jpg\""
-;
-
-value body_prop conf =
-  try
-    match List.assoc "body_prop" conf.base_env with
-    [ "" -> default_body_prop conf
-    | s -> s ]
-  with
-  [ Not_found -> default_body_prop conf ]
-;
-
-value header_no_page_title conf title =
-  do html conf;
-     Wserver.wprint "\
-<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
- \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n";
-     Wserver.wprint "<head>\n";
-     Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\">\n";
-     Wserver.wprint "  \
-<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">\n"
-       conf.charset;
-     Wserver.wprint "  <title>";
-     title True;
-     Wserver.wprint "</title>\n";
-     Wserver.wprint "</head>\n";
-     let s =
-       try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
-       [ Not_found -> "" ]
-     in
-     let s = s ^ " " ^ body_prop conf in
-     Wserver.wprint "<body%s>" s;
-     Wserver.wprint "\n";
-  return ()
-;
-
-value header conf title =
-  do header_no_page_title conf title;
-     Wserver.wprint "<center><h1><font color=%s>" conf.highlight;
-     title False;
-     Wserver.wprint "</font></h1></center>\n";
-  return ()
-;
-
-value rheader conf title =
-  do header_no_page_title conf title;
-     Wserver.wprint "<center><h1><font color=%s>" red_color;
-     title False;
-     Wserver.wprint "</font></h1></center>\n";
-  return ()
-;
-
 value input_to_semi ic =
   loop 0 where rec loop len =
     let c = input_char ic in
@@ -714,6 +661,76 @@ value rec copy_from_etc env imcom ic =
     done
   with
   [ End_of_file -> close_in ic ]
+;
+
+value default_body_prop conf =
+  "background=\"" ^ conf.indep_command ^ "m=IM;v=/gwback.jpg\""
+;
+
+value body_prop conf =
+  try
+    match List.assoc "body_prop" conf.base_env with
+    [ "" -> default_body_prop conf
+    | s -> s ]
+  with
+  [ Not_found -> default_body_prop conf ]
+;
+
+value include_hed_trl conf suff =
+  let hed_fname =
+    let fname =
+      List.fold_right Filename.concat [base_dir.val; "lang"; conf.lang]
+        (conf.bname ^ suff)
+    in
+    if Sys.file_exists fname then fname
+    else
+      List.fold_right Filename.concat [base_dir.val; "lang"]
+        (conf.bname ^ suff)
+  in
+  match try Some (open_in hed_fname) with [ Sys_error _ -> None ] with
+  [ Some ic -> copy_from_etc [] conf.indep_command ic
+  | None -> () ]
+;
+
+value header_no_page_title conf title =
+  do html conf;
+     Wserver.wprint "\
+<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
+ \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n";
+     Wserver.wprint "<head>\n";
+     Wserver.wprint "  <meta name=\"ROBOTS\" content=\"NONE\">\n";
+     Wserver.wprint "  \
+<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">\n"
+       conf.charset;
+     Wserver.wprint "  <title>";
+     title True;
+     Wserver.wprint "</title>\n";
+     include_hed_trl conf ".hed";
+     Wserver.wprint "</head>\n";
+     let s =
+       try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
+       [ Not_found -> "" ]
+     in
+     let s = s ^ " " ^ body_prop conf in
+     Wserver.wprint "<body%s>" s;
+     Wserver.wprint "\n";
+  return ()
+;
+
+value header conf title =
+  do header_no_page_title conf title;
+     Wserver.wprint "<center><h1><font color=%s>" conf.highlight;
+     title False;
+     Wserver.wprint "</font></h1></center>\n";
+  return ()
+;
+
+value rheader conf title =
+  do header_no_page_title conf title;
+     Wserver.wprint "<center><h1><font color=%s>" red_color;
+     title False;
+     Wserver.wprint "</font></h1></center>\n";
+  return ()
 ;
 
 value start_with s i p =
@@ -853,19 +870,7 @@ alt=GeneWeb width=64 height=72 align=right>\n<br>\n"
 GeneWeb %s</em></font>" Version.txt;
             html_br conf;
          return () ];
-     let trl_fname =
-       List.fold_right Filename.concat [base_dir.val; "lang"; conf.lang]
-         (conf.bname ^ ".trl")
-     in
-     match try Some (open_in trl_fname) with [ Sys_error _ -> None ] with
-     [ Some ic -> copy_from_etc [] conf.indep_command ic
-     | None ->
-         let trl_fname =
-           List.fold_right Filename.concat [base_dir.val; "lang"]
-             (conf.bname ^ ".trl")
-         in
-         try copy_from_etc [] conf.indep_command (open_in trl_fname) with
-         [ Sys_error _ -> () ] ];
+     include_hed_trl conf ".trl";
      Wserver.wprint "</body>\n";
   return ()
 ;
