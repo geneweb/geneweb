@@ -1,4 +1,4 @@
-(* $Id: fpla.ml,v 4.3 2003-10-20 07:11:56 ddr Exp $ *)
+(* $Id: fpla.ml,v 4.4 2004-10-21 16:04:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 (* First Parentless Ancestor *)
 
@@ -21,8 +21,8 @@ value make_table base =
              [ Some ifam ->
                  let cpl = coi base ifam in
                  match
-                   (fpla.(Adef.int_of_iper cpl.father),
-                    fpla.(Adef.int_of_iper cpl.mother))
+                   (fpla.(Adef.int_of_iper (father cpl)),
+                    fpla.(Adef.int_of_iper (mother cpl)))
                  with
                  [ (Some (m, k), Some (n, l)) ->
                      do {
