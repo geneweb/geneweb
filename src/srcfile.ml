@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.15 2000-04-23 07:38:59 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.16 2000-05-12 14:35:26 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -131,12 +131,13 @@ value print_date conf =
 
 value rec src_translate conf nom ic =
   let (upp, s) =
-    loop "" (input_char ic) where rec loop s c =
+    loop 0 (input_char ic) where rec loop len c =
       if c = ']' then
-        if String.length s > 0 && s.[0] == '*' then
-          (True, String.sub s 1 (String.length s - 1))
+        let s = Buff.get len in
+        if len > 0 && s.[0] == '*' then
+          (True, String.sub s 1 (len - 1))
         else (False, s)
-      else loop (s ^ String.make 1 c) (input_char ic)
+      else loop (Buff.store len c) (input_char ic)
   in
   let (n, c) =
     match input_char ic with
