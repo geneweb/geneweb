@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.28 2000-06-20 07:06:39 ddr Exp $ *)
+(* $Id: perso.ml,v 3.29 2000-06-20 18:51:23 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -452,6 +452,23 @@ value print_family conf base p a ifam =
      Wserver.wprint (fcapitale (fdecline conf format txt))
        (fun _ -> if auth then print_marriage_text conf base True fam else ());
      Date.afficher_dates_courtes conf base (poi base ispouse);
+     if Array.length fam.witnesses > 0 then
+       do Wserver.wprint "\n(";
+          Wserver.wprint "%s"
+            (capitale
+               (nominative
+                 (transl_nth conf "witness/witnesses"
+                    (if Array.length fam.witnesses = 1 then 0 else 1))));
+          for i = 0 to Array.length fam.witnesses - 1 do
+            let p = poi base fam.witnesses.(i) in
+            do Wserver.wprint "%c " (if i = 0 then ':' else ',');
+               Wserver.wprint "%s" (referenced_person_title_text conf base p);
+               Date.afficher_dates_courtes conf base p;
+            return ();
+          done;
+          Wserver.wprint ")";
+       return ()
+     else ();
      match divorce with
      [ Divorced d ->
          let d = Adef.od_of_codate d in
@@ -588,71 +605,46 @@ value print_witness_at_marriage conf base cpl =
   return ()
 ;
 
-value print_related conf base p ic =
+value print_related_not_as_witness conf base p ic =
   let c = poi base ic in
-  do List.iter
-       (fun r ->
-          do match r.r_fath with
-             [ Some ip ->
-                 if ip = p.cle_index then print_rchild conf base c r else ()
-             | None -> () ];
-             match r.r_moth with
-             [ Some ip ->
-                 if ip = p.cle_index then print_rchild conf base c r else ()
-             | None -> () ];
-          return ())
-       c.rparents;
-     if c.sex = Male then
-       List.iter
-         (fun ifam ->
-            let fam = foi base ifam in
-            if array_memq p.cle_index fam.witnesses then
-              print_witness_at_marriage conf base (coi base ifam)
-            else ())
-         (Array.to_list (uoi base ic).family)
-     else ();
-  return ()
+  List.iter
+    (fun r ->
+       do match r.r_fath with
+          [ Some ip ->
+              if ip = p.cle_index then print_rchild conf base c r else ()
+          | None -> () ];
+          match r.r_moth with
+          [ Some ip ->
+              if ip = p.cle_index then print_rchild conf base c r else ()
+          | None -> () ];
+       return ())
+    c.rparents
 ;
 
-value print_fwitnesses conf base p nfam n ifam =
-  let fam = foi base ifam in
-  if Array.length fam.witnesses <> 0 then
-    Array.iter
-      (fun ip ->
-         let p = poi base ip in
-         do html_li conf;
-            Wserver.wprint "%s"
-              (capitale (nominative (transl_nth conf "witness/witnesses" 0)));
-            if nfam > 1 then
-              Wserver.wprint " (%s %d)"
-                (transl_nth conf "marriage/marriages" 0) (n + 1)
-            else ();
-            Wserver.wprint ":\n%s" (referenced_person_title_text conf base p);
-            Date.afficher_dates_courtes conf base p;
-            Wserver.wprint "\n";
-         return ())
-      fam.witnesses
+value print_related_as_witness conf base p ic =
+  let c = poi base ic in
+  if c.sex = Male then
+    List.iter
+      (fun ifam ->
+         let fam = foi base ifam in
+         if array_memq p.cle_index fam.witnesses then
+           print_witness_at_marriage conf base (coi base ifam)
+         else ())
+      (Array.to_list (uoi base ic).family)
   else ()
 ;
 
 value print_relations conf base p =
-  let u = uoi base p.cle_index in
-  let has_marriage_witnesses =
-    List.exists
-      (fun ifam -> (foi base ifam).witnesses <> [| |])
-      (Array.to_list u.family)
-  in
-  match (p.rparents, p.related, has_marriage_witnesses) with
-  [ ([], [], False) -> ()
-  | (rl, cl, _) ->
+  match (p.rparents, p.related) with
+  [ ([], []) -> ()
+  | (rl, cl) ->
       do Wserver.wprint "<h3>%s</h3>\n"
            (std_color conf
               (capitale (transl_nth conf "relation/relations" 1)));
          tag "ul" begin
            List.iter (print_relation conf base) rl;
-           List.iter (print_related conf base p) cl;
-           Array.iteri (print_fwitnesses conf base p (Array.length u.family))
-             u.family;
+           List.iter (print_related_not_as_witness conf base p) cl;
+           List.iter (print_related_as_witness conf base p) cl;
          end;
       return () ]
 ;
