@@ -8,6 +8,10 @@ GeneWeb version 4.07
     more (it is complicated to make both systems work: the code is too
     badly written).
 
+* GeneWeb compiler (gwc)
+  - [23 Mar 02] Fixed bug: failed at end of creation of database when
+    the target database (option -o) was indicated by an absolute path.
+
 GeneWeb version 4.06
 --------------------
 

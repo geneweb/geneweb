@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.10 2002-03-11 19:02:59 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.11 2002-03-23 05:48:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -707,7 +707,6 @@ value output_command_line bname =
   let bdir =
     if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
-  let bdir = Filename.concat Filename.current_dir_name bdir in
   let oc = open_out (Filename.concat bdir "command.txt") in
   do {
     fprintf oc "%s" Sys.argv.(0);
