@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.63 2004-03-03 10:41:29 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.64 2004-03-15 10:58:51 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1149,7 +1149,7 @@ value match_strings regexp s =
 
 value excluded from =
   let efname = chop_extension Sys.argv.(0) ^ ".xcl" in
-  match try Some (Secure.open_in efname) with [ Sys_error _ -> None ] with
+  match try Some (open_in efname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let rec loop () =
         match try Some (input_line ic) with [ End_of_file -> None ] with
