@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 2.13 1999-08-02 10:16:00 ddr Exp $ *)
+(* $Id: cousins.ml,v 2.14 1999-08-31 07:56:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -199,7 +199,7 @@ value print_cousins_side_of conf base a ini_p ini_br lev1 lev2 =
          do html_li conf;
             Wserver.wprint "%s:\n"
               (capitale
-                 (cftransl conf "of %s's side"
+                 (cftransl conf "on %s's side"
                     [gen_person_title_text raw_access conf base a]));
          return ()
        else ();

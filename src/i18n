@@ -193,7 +193,6 @@ number
 number of branches
 occupation
 of
-of %s's side
 of (same or greater generation level)
 of the %s generation
 of the birth
@@ -201,6 +200,7 @@ of the death
 of the disappearance
 of the execution
 of the murder
+on %s's side
 on (day month year)
 one day old
 one month old
