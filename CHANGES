@@ -2,6 +2,7 @@ GeneWeb version 3.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+   - [26 Aug 00] In descendants page, added male line and female line.
    - [25 Aug 00] In history, added the ability to see the changes only
      by a given wizard.
    - [24 Aug 00] Fixed bug: when entering Web addresses (http://...)

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.17 2000-08-09 11:19:48 ddr Exp $ *)
+(* $Id: descend.ml,v 3.18 2000-08-26 10:01:51 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -108,9 +108,16 @@ value print_choice conf base p niveau_effectif =
         tag "td" begin
           Wserver.wprint "<input type=radio name=t value=L checked> %s<br>\n"
             (capitale (transl_nth conf "list/list (ancestors)" 0));
+          Wserver.wprint "<input type=radio name=t value=M> %s\n"
+            (capitale (transl_nth conf "male line/female line" 0));
+          Wserver.wprint "<br>\n";
+          Wserver.wprint "<input type=radio name=t value=F> %s\n"
+            (capitale (transl_nth conf "male line/female line" 1));
+          Wserver.wprint "<br>\n";
           if browser_doesnt_have_tables conf then ()
           else
-            do Wserver.wprint "<input type=radio name=t value=T> %s\n"
+            do Wserver.wprint "<br>\n";
+               Wserver.wprint "<input type=radio name=t value=T> %s\n"
                  (capitale (transl conf "tree"));
                if niveau_effectif <= limit_by_tree conf then ()
                else
@@ -122,10 +129,10 @@ value print_choice conf base p niveau_effectif =
                  "- %s <input type=checkbox name=image value=on><br>\n"
                  (capitale (transl_nth conf "image/images" 1));
             return ();
-          Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
-            (capitale (transl conf "only the generation selected"));
         end;
         tag "td" begin
+          Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
+            (capitale (transl conf "only the generation selected"));
           Wserver.wprint "<input type=radio name=t value=N> %s<br>\n"
             (capitale (transl conf "families with encoding"));
           Wserver.wprint "<input type=radio name=t value=G> - %s<br>\n"
@@ -200,8 +207,8 @@ value afficher_marie conf base first fam p spouse =
   return ()
 ;
 
-value print_child conf base levt boucle niveau_max niveau compte auth ix =
-  let x = poi base ix in
+value print_child conf base levt boucle niveau_max niveau compte auth x =
+  let ix = x.cle_index in
   let ux = uoi base ix in
   do html_li conf;
      stag "strong" begin
@@ -246,7 +253,7 @@ value print_child conf base levt boucle niveau_max niveau compte auth ix =
   else Wserver.wprint "\n"
 ;
 
-value afficher_descendants_jusqu_a conf base niveau_max p =
+value afficher_descendants_jusqu_a conf base niveau_max p line =
   let niveau_max = min (limit_desc conf) niveau_max in
   let levt = make_level_table base niveau_max p in
   let compte = ref 0 in
@@ -261,26 +268,36 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
              let des = doi base ifam in
              let conj = spouse p.cle_index cpl in
              let conj = poi base conj in
+             let children =
+               let list = Array.to_list des.children in
+               List.fold_right
+                 (fun ip pl ->
+                   let p = poi base ip in
+                   if line = Neuter
+                   || line = Male && p.sex <> Female
+                   || line = Female && p.sex <> Male
+                   then [p :: pl]
+                   else pl)
+                 list []
+             in
              do if connais base conj || List.length ifaml > 1 then
                   do afficher_marie conf base first fam p conj;
-                     if Array.length des.children <> 0 then
+                     if children <> [] then
                        Wserver.wprint ", <em>%s</em>"
                          (transl conf "having as children")
                      else Wserver.wprint ".";
                      html_br conf;
                   return ()
                 else ();
-                if Array.length des.children <> 0 then
+                if children <> [] then
                   let age_auth =
-                    List.for_all
-                      (fun ip -> age_autorise conf base (poi base ip))
-                      (Array.to_list des.children)
+                    List.for_all (fun p -> age_autorise conf base p) children
                   in
                   tag "ul" begin
-                    Array.iter
+                    List.iter
                       (print_child conf base levt boucle niveau_max niveau
                          compte age_auth)
-                      des.children;
+                      children;
                   end
                 else ();
              return False)
@@ -294,7 +311,13 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
 (**)
      if niveau_max > 6 then enter_nobr () else ();
 (**)
-     Wserver.wprint "%s." (capitale (text_to conf niveau_max));
+     Wserver.wprint "%s.<br>\n" (capitale (text_to conf niveau_max));
+     if line = Neuter then ()
+     else
+       Wserver.wprint "%s.<br>\n"
+         (capitale
+            (transl_nth conf "male line/female line"
+               (if line = Male then 0 else 1)));
      html_p conf;
      stag "strong" begin
        afficher_personne_referencee conf base p;
@@ -1254,7 +1277,9 @@ value print_aboville conf base max_level p =
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "A", Some v) -> print_aboville conf base v p
-  | (Some "L", Some v) -> afficher_descendants_jusqu_a conf base v p
+  | (Some "L", Some v) -> afficher_descendants_jusqu_a conf base v p Neuter
+  | (Some "M", Some v) -> afficher_descendants_jusqu_a conf base v p Male
+  | (Some "F", Some v) -> afficher_descendants_jusqu_a conf base v p Female
   | (Some "S", Some v) -> afficher_descendants_niveau conf base v p
   | (Some "H", Some v) -> afficher_descendants_table conf base v p
   | (Some "N", Some v) -> afficher_descendants_numerotation conf base v p

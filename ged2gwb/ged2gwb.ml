@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.26 2000-08-09 09:16:16 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.27 2000-08-26 10:01:49 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -791,6 +791,26 @@ value rec is_a_public_name s i =
     else False
 ;
 
+value lowercase_public_name s =
+  loop 0 0 where rec loop len k =
+    let i = next_word_pos s k in
+    if i == String.length s then Buff.get len
+    else
+      let j = next_sep_pos s i in
+      if j > i then
+        let w = String.sub s i (j - i) in
+        let w =
+          if is_roman_int w || List.mem w public_name_word then w
+          else String.capitalize (String.lowercase w)
+        in
+        let len =
+          loop len k where rec loop len k =
+            if k = i then len else loop (Buff.store len s.[k]) (k + 1)
+        in
+        loop (Buff.mstore len w) j
+      else Buff.get len
+;
+
 value get_lev0 =
   parser
     [: _ = line_start '0'; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
@@ -1099,6 +1119,10 @@ value add_indi gen r =
           else fal
         in
         let pn = if lowercase_name pn = f then "" else pn in
+        let pn =
+          if lowercase_first_names.val then lowercase_public_name pn
+          else pn
+        in
         let fal =
           List.fold_right (fun fa fal -> if fa = pn then fal else [fa :: fal])
             fal []
