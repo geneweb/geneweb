@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.33 2003-03-19 13:39:43 ddr Exp $ *)
+(* $Id: family.ml,v 4.34 2003-07-15 11:17:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -391,6 +391,7 @@ value family_m conf base =
       [ Some f -> Srcfile.print conf base f
       | None -> Util.incorrect_request conf ]
   | Some "HIST" -> History.print conf base
+  | Some "IMH" -> Image.print_html conf base
   | Some "INV_FAM" when conf.wizard -> UpdateFam.print_inv conf base
   | Some "INV_FAM_OK" when conf.wizard -> UpdateFamOk.print_inv conf base
   | Some "KILL_ANC" when conf.wizard ->

@@ -5,6 +5,10 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [15 Jul 03] Changed the personal image URL: now displays an HTML
+    page with the image inside without width and height bounds (before,
+    the image URL displayed the image itself, but it does not work with
+    all browsers).
   - [07 Jul 03] Changed "wrap=virtual" into "wrap=soft" in textareas.
   - [31 May 03] Fixed little problem which can be dangerous: in case
     of empty line in wizard (or friend) authorization file, everybody

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: image.ml,v 4.6 2002-12-31 08:38:07 ddr Exp $ *)
+(* $Id: image.ml,v 4.7 2003-07-15 11:17:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -80,4 +80,18 @@ value print conf base =
       match find_person_in_env conf base "" with
       [ Some p -> print_personal_image conf base p
       | _ -> incorrect_request conf ] ]
+;
+
+value print_html conf base =
+  let title _ = Wserver.wprint "%s" (Util.transl_nth conf "image/images" 0) in
+  do {
+    Util.header_no_page_title conf title;
+    Wserver.wprint "<img src=\"%s" (commd conf);
+    Gutil.list_iter_first
+      (fun first (k, v) ->
+	 let v = if k = "m" then "IM" else v in
+	 Wserver.wprint "%s%s=%s" (if first then "" else ";") k v)
+      conf.env;
+    Wserver.wprint ">\n</body>\n</html>";
+  }
 ;

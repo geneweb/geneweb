@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.15 2002-12-31 08:38:06 ddr Exp $
+# $Id: Makefile,v 4.16 2003-07-15 11:17:54 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -11,6 +11,7 @@ GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo chan
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo buff.cmo gutil.cmo btree.cmo iobase.cmo select.cmo calendar.cmo gwu.cmo
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
+PROBOT_OBJS=probot.cmo
 MOSTDESC_OBJS=adef.cmo name.cmo buff.cmo gutil.cmo iovalue.cmo btree.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
 FPLA_OBJS=argl.cmo adef.cmo name.cmo buff.cmo gutil.cmo btree.cmo iovalue.cmo iobase.cmo fpla.cmo
 
@@ -72,6 +73,9 @@ gwu.opt: $(GWU_OBJS:.cmo=.cmx)
 
 phonygwd.out: $(PHONYGWD_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(PHONYGWD_OBJS) -o phonygwd.out
+
+probot.out: $(PROBOT_OBJS)
+	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(PROBOT_OBJS) -o probot.out
 
 mostdesc.out: $(MOSTDESC_OBJS)
 	$(OCAMLC) -custom $(STATIC) unix.cma $(LIBUNIX) $(MOSTDESC_OBJS) -o mostdesc.out
