@@ -33,6 +33,7 @@ GeneWeb version 3.01
     "yes", links to persons holding "?" in their names did not work.
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [Nov 28, 99] Deleted the too specific option -ta
   - [Nov 5, 99] Accept roman digits in years of French Republican dates.
 
 * GeneWeb to Gedcom (gwb2ged)

@@ -1,6 +1,6 @@
-ged2gwb.cmo: ../src/adef.cmi ../src/ansel.cmo ../src/argl.cmo aurejac.cmo \
+ged2gwb.cmo: ../src/adef.cmi ../src/ansel.cmo ../src/argl.cmo \
     ../src/calendar.cmo ../src/def.cmi ../src/gutil.cmi ../src/iobase.cmi \
     ../src/name.cmi 
-ged2gwb.cmx: ../src/adef.cmx ../src/ansel.cmx ../src/argl.cmx aurejac.cmx \
+ged2gwb.cmx: ../src/adef.cmx ../src/ansel.cmx ../src/argl.cmx \
     ../src/calendar.cmx ../src/def.cmi ../src/gutil.cmx ../src/iobase.cmx \
     ../src/name.cmx 
