@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.19 2000-04-03 14:00:04 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.20 2000-04-03 19:47:37 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1652,15 +1652,15 @@ value print_horizontally conf base max_level p =
       (transl_decline conf "of" (txt_fun raw_access conf base p))
   in
   let max_level = min (limit_by_list conf) max_level in
-  let space = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" in
-  let bar_space = "|&nbsp;&nbsp;&nbsp;&nbsp;" in
-  let ending = "&nbsp;--&nbsp;" in
+  let suff1 = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" in
+  let suff2 = "&nbsp;&nbsp;--&nbsp;" in
+  let suff3 = "&nbsp;|&nbsp;&nbsp;&nbsp;" in
   let rec loop level s1 s2 s3 ip =
     if level >= max_level then ()
     else
       do match (aoi base ip).parents with
          [ Some ifam ->
-             loop (level + 1) (s1 ^ space) (s1 ^ ending) (s1 ^ bar_space)
+             loop (level + 1) (s1 ^ suff1) (s1 ^ suff2) (s1 ^ suff3)
                (coi base ifam).father
          | None -> () ];
          Wserver.wprint "<tt>%s</tt>" s2;
@@ -1673,7 +1673,7 @@ value print_horizontally conf base max_level p =
            (no_spaces (Date.short_dates_text conf base p));
          match (aoi base ip).parents with
          [ Some ifam ->
-             loop (level + 1) (s3 ^ bar_space) (s3 ^ ending) (s3 ^ space)
+             loop (level + 1) (s3 ^ suff3) (s3 ^ suff2) (s3 ^ suff1)
                (coi base ifam).mother
          | None -> () ];
       return ()
@@ -1682,9 +1682,9 @@ value print_horizontally conf base max_level p =
      print_link_to_welcome conf True;
      Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
      Wserver.wprint "<p>\n";
-     let space1 = "&nbsp;&nbsp;&nbsp;&nbsp;" in
-     let ending1 = "--&nbsp;" in
-     loop 0 space1 ending1 space1 p.cle_index;
+     let suff13 = "&nbsp;&nbsp;&nbsp;" in
+     let suff2 = "--&nbsp;" in
+     loop 0 suff13 suff2 suff13 p.cle_index;
      trailer conf;
   return ()
 ;
