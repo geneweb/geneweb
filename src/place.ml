@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 3.3 2000-03-31 15:13:35 ddr Exp $ *)
+(* $Id: place.ml,v 3.4 2000-03-31 19:45:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -43,6 +43,10 @@ value get_list conf base =
 *)
   let add_birth = p_getenv conf.env "bi" = Some "on" in
   let add_death = p_getenv conf.env "de" = Some "on" in
+  let inverted =
+    try List.assoc "places_inverted" conf.base_env = "yes" with
+    [ Not_found -> False ]
+  in
   loop [] 0 where rec loop list i =
     if i = base.data.persons.len then list
     else
@@ -58,9 +62,14 @@ value get_list conf base =
         if (pl_bi = [] && pl_de = []) || not (age_autorise conf base p) then
           list
         else
-          let list = if pl_bi = [] then list else [(pl_bi, s, i) :: list] in
+          let list =
+            if pl_bi = [] then list
+            else if inverted then [(List.rev pl_bi, s, i) :: list]
+            else [(pl_bi, s, i) :: list]
+          in
           let list =
             if pl_de = [] || pl_de = pl_bi then list
+            else if inverted then [(List.rev pl_de, s, i) :: list]
             else [(pl_de, s, i) :: list]
           in
           list

@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.12 2000-03-07 18:05:19 ddr Exp $
+# $Id: a.gwf,v 3.13 2000-03-31 19:44:59 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -104,6 +104,12 @@ history=no
 # Consider persons having titles as public, i.e. even not friends can see
 # their dates; "yes" = consider; "no" = don't consider
 public_if_titles=no
+
+# Tell that in this data base the order of places are registered inverted
+# (being more general to less general), e.g. "USA, New York" instead of
+# "New York, USA". Set it to "yes" if it is the case. Important for display
+# by places/surnames.
+places_inverted=no
 
 # Uncomment the following definition to specify that the present database has
 # been renamed:
