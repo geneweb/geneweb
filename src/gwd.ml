@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.80 2001-03-05 14:12:21 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.81 2001-03-14 18:01:12 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -192,25 +192,36 @@ value input_lexicon lang =
            "lexicon.txt")
     in
     let pref = lang ^ ":" in
+    let derived_pref = ref "" in
     try
       do try
            while True do
              let k =
                find_key (input_line ic) where rec find_key line =
-                 if String.length line < 4 then find_key (input_line ic)
+                 if String.length line = 5 && line.[2] = '=' then
+                   let derived_lang = String.sub line 0 2 in
+                   do if derived_lang = lang then
+                        derived_pref.val := String.sub line 3 2 ^ ":"
+                      else ();
+                   return find_key (input_line ic)
+                 else if String.length line < 4 then find_key (input_line ic)
                  else if String.sub line 0 4 <> "    " then
                    find_key (input_line ic)
                  else line
              in
+             let k = String.sub k 4 (String.length k - 4) in
              loop (input_line ic) where rec loop line =
                if String.length line < 3 then ()
                else
-                 do if String.sub line 0 3 = pref then
+                 let line_pref = String.sub line 0 3 in
+                 do if line_pref = pref
+                    || line_pref = derived_pref.val && not (Hashtbl.mem t k)
+                    then
                       let v =
                         if String.length line = 3 then ""
                         else String.sub line 4 (String.length line - 4)
                       in
-                      Hashtbl.add t (String.sub k 4 (String.length k - 4)) v
+                      Hashtbl.add t k v
                     else ();
                  return loop (input_line ic);
            done

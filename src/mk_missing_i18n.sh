@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: mk_missing_i18n.sh,v 3.11 2001-03-14 17:19:02 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 3.12 2001-03-14 18:01:12 ddr Exp $ *)
 
 open Printf
 
@@ -11,12 +11,19 @@ let languages =
    "fr"; "he"; "is"; "it"; "lv"; "nl"; "no"; "pl"; "pt"; "ru"; "se"]
 
 let linenum = ref 0
-
 let input_line_cnt ic = incr linenum; input_line ic
+
+let derived = ref []
+let derive lang = try List.assoc lang !derived with Not_found -> ""
 
 let rec skip_to_same_line ic line_ref =
   let line = input_line_cnt ic in
-  if line = line_ref then () else skip_to_same_line ic line_ref
+  if line = line_ref then ()
+  else if String.length line = 5 && line.[2] = '=' then begin
+    derived := (String.sub line 0 2, String.sub line 3 2) :: !derived;
+    skip_to_same_line ic line_ref
+  end
+  else skip_to_same_line ic line_ref
 
 let rec get_all_versions ic =
   let line = input_line_cnt ic in
@@ -38,6 +45,7 @@ let compare_assoc (l1, _) (l2, _) = l1 <= l2
 
 let check first lang =
   linenum := 0;
+  derived := [];
   let ic_lex = open_in "../hd/lang/lexicon.txt" in
   let ic_i18n = open_in "i18n" in
   printf "<h3><a name=%s>%s</h3>\n" lang lang;
@@ -52,7 +60,8 @@ let check first lang =
 	eprintf "Misordered for: \"%s\"\n" line;
 	flush stderr;
       end;
-      if not (List.mem_assoc lang list) then begin
+      if not (List.mem_assoc lang list || List.mem_assoc (derive lang) list)
+      then begin
         let list =
 	  Sort.list compare_assoc
             [(lang, ""); ("en", List.assoc "en" list);
