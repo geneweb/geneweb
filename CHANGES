@@ -6,7 +6,7 @@ GeneWeb version 2.06
 
 * Setup program (setup) and GeneWeb Service (gwd)
   - [Sep 2, 99] Under Unix, find the default language in the environment
-    variable LC_CTYPE.
+    variables LANG or LC_CTYPE.
 
 * Setup program
   - [Aug 16, 99] Renamed this program "gwsetup".
