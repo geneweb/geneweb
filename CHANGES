@@ -2,6 +2,7 @@ GeneWeb version 2.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [Oct 19, 99] Added treatment of png files.
   - [Oct 10, 99] In update form, when name conflict, added the birth and
     death date in the list of persons having the same name.
   - [Oct 8, 99] Added forum.
