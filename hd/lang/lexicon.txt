@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.198 2000-12-13 01:09:01 ddr Exp $
+# $Id: lexicon.txt,v 3.199 2000-12-14 17:50:47 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -34,6 +34,7 @@ eo: en=anglo/eo=esperanto/fr=franco
 es: de=Alem&aacute;n/cs=Checo/cn=Chino/dk=Dan&eacute;s/es=Espa&ntilde;ol/eo=Esperanto/fr=Franc&eacute;s/he=Hebreo/en=Ingl&eacute;s/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/se=Sueco
 fi: af=afrikaani/cn=kiina/cs=tsekki/de=saksa/dk=tanska/en=englanti/eo=esperanto/es=espanja/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/se=ruotsi
 fr: af=afrikaans/cn=chinois/cs=tch&egrave;que/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pt=portugais/ru=russe/se=su&eacute;dois
+is: af=afrikanska/cn=kínverska/cs=tékkneska/dk=danska/nl=hollenska/en=enska/eo=esperanto/fi=finnska/fr=franska/de=şıska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/no=norska/pt=portúgalska/es=spænska/ru=rússneska/se=sænska
 it: af=africano/cn=cinese/cs=ceco/de=tedesco/dk=danese/en=inglese/eo=esperanto/es=spagnolo/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pt=portoghese/ru=russo/se=svedese
 lv: cn=Íînieğu/cs=Èehu/dk=Dâòu/nl=Holandieğu/en=Angïu/eo=Esperanto/fi=Somu/fr=Franèu/de=Vâcu/he=Ebreju/is=Islandieğû/it=Itâïu/lv=Latvieğu/no=Norvçìu/pt=Portugâïu/es=Spâòu/ru=Krievu/se=Zviedru
 nl: af=Afrikaans/cn=Chinees/cs=Tsjechisch/dk=Deens/nl=Nederlands/en=Engels/eo=Esperanto/fi=Fins/fr=Frans/de=Duits/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/no=Noors/pt=Portugees/es=Spaans/ru=Russisch/se=Zweeds
@@ -290,6 +291,7 @@ eo: la sekso de %t ne koheras kun siaj rilatoj
 es: el género de %t es incoherente con sus relaciones
 fi: henkil&ouml;n %t sukupuoli ja h&auml;nen suhteensa eiv&auml;t t&auml;sm&auml;&auml;
 fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
+is: kyn %t er ekki í samræmi viğ skyldleika
 it: il sesso di %t non e' coerente con le sue relazioni
 nl: het geslacht van %t is niet samenhangend met zijn/haar relaties
 no: %ts kjønn er uforenlig med forbindelsene hans/hennes
@@ -2439,6 +2441,7 @@ es: comprometidos
 fi: kihloissa
 fr: fianc&eacute;s
 he:  îàåøñéí
+is: trúlofuğ
 it: fidanzarsi
 lv: saderin&acirc;ti
 nl: verloofd
@@ -2456,6 +2459,7 @@ es: comprometido%t con/comprometida%t con
 fi: kihlattu%t
 fr: fianc&eacute;%t avec/fianc&eacute;e%t avec
 he:   äúàøñ  %t òí/ äúàøñä  %t òí
+is: trúlofağist%t
 it: fidanzato%t con/fidanzata%t con
 lv: saderin&acirc;ts%t ar
 nl: verloofd%t met
@@ -2815,6 +2819,7 @@ es: padre adoptivo/madre adoptiva/padres adoptivos
 fi: kasvatusis&auml;/kasvatus&auml;iti/kasvatusvanhemmat
 fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
 he:   àá çåøâ/ àí çåøâú/ äåøéí çåøâéí
+is: fóstur foreldri 
 lv: audşu tçvs/mâte/vecâki
 nl: pleegvader/pleegmoeder/pleegouders
 no: fosterfar/fostermor/fosterforeldre
@@ -2833,6 +2838,7 @@ es: hijo adoptivo/hija adoptiva
 fi: kasvattipoika/kasvattityt&auml;r/kasvattilapsi
 fr: fils &eacute;lev&eacute;/fille &eacute;lev&eacute;e/enfant &eacute;lev&eacute;
 he:  áï çåøâ/ áú çåøâú/ éìã çåøâ
+is: fóstur sonur/dóttir fóstur barn
 lv: audşu dçls/meita/bçrns
 nl: pleegzoon/pleegdochter/pleegkind
 no: fosters&oslash;nn/fosterdatter/fosterbarn
@@ -3071,6 +3077,7 @@ es: horizontal
 fi: vaakasuoraan
 fr: horizontalement
 he:  àåô÷é
+is: lárétt
 it: orizzontalmente
 lv: horizont&acirc;li
 nl: horizontaal
@@ -3663,6 +3670,7 @@ es: línea masculina/linea femenina
 fi: miehen puoleinen linja/naisen puoleinen linja
 fr: lign&eacute;e agnatique/lign&eacute;e cognatique
 he:  ÷å æëøé / ÷å ğ÷áé
+is: karllegg/kvenlegg
 it: linea agnatizia/linea cognatizia
 lv: tçva lînija/mâtes lînija
 nl: mannelijke lijn/vrouwelijke lijn
@@ -3861,6 +3869,7 @@ eo: almetita mesagxo
 es: mensaje agregado
 fi: viesti lis&auml;tty
 fr: message ajout&eacute;
+is: skilaboğum bætt viğ
 it: messaggio aggiunto
 nl: bericht toegevoegd
 no: melding tilf&oslash;yet
@@ -3876,6 +3885,7 @@ eo: mesagxo/sekvanta mesagxo
 es: mensaje/siguiente mensaje
 fi: viesti/seuraava viesti
 fr: message/message suivant
+is: skilaboğ/næstu skilaboğ
 it: messaggio/prossimo messaggio
 nl: bericht/volgend bericht
 no: melding/neste melding
@@ -5178,6 +5188,7 @@ es: separados
 fi: asumuserossa
 fr: s&eacute;par&eacute;s
 he:  ğôøãå
+is: skilin
 it: separati
 lv: nedzîvo kop&acirc;
 nl: gescheiden
@@ -5256,6 +5267,7 @@ es: atajo
 fi: lyhin polku
 fr: chemin le plus court
 he:   ÷ùø äëé ÷øåá  
+is: stysta leiğ
 it: legame più diretto
 lv: îsâkais ceïğ
 nl: kortste weg
@@ -5455,6 +5467,7 @@ es: estadísticas
 fi: tilastotietoja
 fr: statistiques
 he:  ğúåğéí ñèèéñèéí
+is: stağa
 it: statistica
 lv: statistika
 nl: statistieken
@@ -5471,6 +5484,7 @@ eo: objekto
 es: asunto
 fi: kohde
 fr: sujet
+is: um
 it: oggetto
 nl: onderwerp
 no: emne
@@ -5568,6 +5582,7 @@ es: lista de apellidos
 fi: sukunimiluettelo
 fr: liste &eacute;clair
 he:  øùéîú ùîåú îùôçä
+is: eftirnafna listi
 it: lista dei cognomi
 lv: uzv&acirc;rdu saraksts
 nl: bijnamen lijst
@@ -5685,6 +5700,7 @@ es: los %s m&aacute;s viejos quiz&aacute;s todov&iacute;a vivo
 fi: %d vanhinta ehk&auml viel&auml el&auml;v&auml;&auml
 fr: les %d les plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
 he:  äæ÷ï ä %d  ùàåìé òåã áçééí 
+is: %d elsti sem kann ağ vera á lífi
 it: i%d più vecchi possono essere ancora viventi
 lv: %d visvecâkie iespçjams vçl ir dzîvi
 nl: de %d oudsten, mogelijk nog in leven
@@ -5722,6 +5738,7 @@ es: los %d que han vivido m&aacute;s mucho tiempo
 fi: %d pisimpään elänyttä
 fr: les %d ayant v&eacute;cu le plus longtemps
 he:  ä %d áàøéëåú éîéí 
+is: %d sem lifği lengst
 it: %d avendo visuto più a lungo
 lv: %d, kuri dzîvojuği visilgâk
 nl: de %d langst levende personen
@@ -6081,6 +6098,7 @@ es: los %d casamientos m&aacute;s recientes
 fi: viime %d naimisiinmenoa
 fr: les %d derniers mariages
 he:  %d äğéùåàéí äàçøåğéí
+is: síğast giftist %d
 it: gli ultimi %d matrimoni
 lv: pçdçjâs %d laulîbas
 nl: de %d laatste huwelijken
