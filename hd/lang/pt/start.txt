@@ -61,8 +61,7 @@ por
 
 %w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
 <li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w%x<li><a href="%sm=FORUM">[*forum]</a>
-%x
+%w
 
 </ul>
 
@@ -72,7 +71,8 @@ Os <a href="%sm=AM">anivers&aacute;rios de casamento</a>.<br>%x
 Os <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>.<br>
 Os <a href="%sm=LD;k=10">reci&eacute;n mortes</a>.<br>%x%j
 <a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.
+<a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
+<a href="%sm=FORUM">[*forum]</a>.
 
 <p>
 

@@ -63,8 +63,7 @@ Platz <input name=p size=25 maxlength=200> =&gt
 
 %w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
 <li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w%x<li><a href="%sm=FORUM">[*forum]</a>
-%x
+%w
 
 </ul>
 
@@ -74,8 +73,8 @@ Die <a href="%sm=AM">Hochzeitstage</a>.<br>%x
 Die <a href="%sm=LB;k=10">letzten Geburten</a>.<br>
 Die <a href="%sm=LD;k=10">letzten Ableben</a>.<br>%x%j
 <a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.
-
+<a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
+<a href="%sm=FORUM">[*forum]</a>
 <p>
 
 Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.

@@ -64,8 +64,7 @@ seøazená podle
 
 %w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
 <li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w%x<li><a href="%sm=FORUM">[*forum]</a>
-%x
+%w
 
 </ul>
 
@@ -75,7 +74,8 @@ seøazená podle
 <a href="%sm=LB;k=10">nedávná narození</a>.<br>
 <a href="%sm=LD;k=10">nedávná úmrtí</a>.<br>%x%j
 <a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
-<a href="%sm=CAL">[*calendar/calendars]1</a>.
+<a href="%sm=CAL">[*calendar/calendars]1</a>.<br>
+<a href="%sm=FORUM">[*forum]</a>
 <p>
 %q pøístupù, z toho %c na tuto stránku, od %d.
 
