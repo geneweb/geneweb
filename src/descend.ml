@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.33 2005-02-08 18:05:58 ddr Exp $ *)
+(* $Id: descend.ml,v 4.34 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -452,15 +452,15 @@ value display_descendants_level conf base max_level ancestor =
   let len = ref 0 in
   let list = get_level 1 (uget conf base ancestor.cle_index) [] in
   let list =
-    Sort.list
+    List.sort
       (fun p1 p2 ->
-         let c = alphabetic (p_surname base p1) (p_surname base p2) in
+         let c = alphabetic (p_surname base p2) (p_surname base p1) in
          if c == 0 then
            let c =
-             alphabetic (p_first_name base p1) (p_first_name base p2)
+             alphabetic (p_first_name base p2) (p_first_name base p1)
            in
-           if c == 0 then p1.occ > p2.occ else c > 0
-         else c > 0)
+           if c == 0 then compare p2.occ p1.occ else c
+         else c)
       list
   in
   let list =
@@ -916,15 +916,12 @@ value print_elem conf base paths precision (n, pll) =
 value sort_and_display conf base paths precision list =
   let list = List.map (pget conf base) list in
   let list =
-    Sort.list
+    List.sort
       (fun p1 p2 ->
-         let c = alphabetic (p_surname base p1) (p_surname base p2) in
+         let c = alphabetic (p_surname base p2) (p_surname base p1) in
          if c == 0 then
-           let c =
-             alphabetic (p_first_name base p1) (p_first_name base p2)
-           in
-           c > 0
-         else c > 0)
+           alphabetic (p_first_name base p2) (p_first_name base p1)
+         else c)
       list
   in
   let list =

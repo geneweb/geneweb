@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 4.6 2004-12-14 09:30:14 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 4.7 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Gutil;
@@ -26,14 +26,14 @@ value print_result base tab =
             let p2 = base.data.persons.get i2 in
             let s1 = Name.abbrev (Name.lower (p_surname base p1)) in
             let s2 = Name.abbrev (Name.lower (p_surname base p2)) in
-            if s1 < s2 then True
-            else if s1 > s2 then False
+            if s1 < s2 then -1
+            else if s1 > s2 then 1
             else
               let f1 = Name.abbrev (Name.lower (p_first_name base p1)) in
               let f2 = Name.abbrev (Name.lower (p_first_name base p2)) in
-              f1 <= f2
+              compare f1 f2
           in
-          Sort.list f m_list.val;
+          List.sort f m_list.val;
         Num.print print_string "." m_val.val;
         print_newline ();
         List.iter

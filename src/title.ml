@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 4.8 2005-01-04 00:42:46 ddr Exp $ *)
+(* $Id: title.ml,v 4.9 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -81,58 +81,58 @@ value compare_title_dates conf base (x1, t1) (x2, t2) =
       Adef.od_of_codate t2.t_date_end, x2.death))
   with
   [ ((_, Some (Dgreg d1 _), _, _), (_, Some (Dgreg d2 _), _, _)) ->
-      if strictly_before_dmy d1 d2 then True
+      if strictly_before_dmy d1 d2 then -1
       else if year_of d1 == year_of d2 then
         match
           (Adef.od_of_codate t1.t_date_end, Adef.od_of_codate t2.t_date_end)
         with
-        [ (Some d1, Some d2) -> d1 avant d2
-        | _ -> True ]
-      else False
-  | ((_, _, Some d1, _), (_, _, Some d2, _)) -> d2 apres d1
+        [ (Some d1, Some d2) -> if d1 avant d2 then -1 else 1
+        | _ -> -1 ]
+      else 1
+  | ((_, _, Some d1, _), (_, _, Some d2, _)) -> if d2 apres d1 then -1 else 1
   | ((_, _, _, Death _ d1), (_, Some d2, _, _))
     when not (d2 strictly_before Adef.date_of_cdate d1) ->
-      True
+      -1
   | ((_, Some d1, _, _), (_, _, _, Death _ d2))
     when not (d1 strictly_before Adef.date_of_cdate d2) ->
-      False
+      1
   | _ ->
       match
         (date_interval conf base JustSelf x1,
          date_interval conf base JustSelf x2)
       with
       [ (Some (d11, d12), Some (d21, d22)) ->
-          if not (strictly_before_dmy d21 d12) then True
-          else if not (strictly_before_dmy d11 d22) then False
-          else if strictly_after_dmy d21 d11 then True
-          else strictly_after_dmy d22 d12
+          if not (strictly_before_dmy d21 d12) then -1
+          else if not (strictly_before_dmy d11 d22) then 1
+          else if strictly_after_dmy d21 d11 then -1
+          else if strictly_after_dmy d22 d12 then -1 else 1
       | _ ->
           match
             (date_interval conf base AddSpouse x1,
              date_interval conf base AddSpouse x2)
           with
           [ (Some (d11, d12), Some (d21, d22)) ->
-              if not (strictly_before_dmy d21 d12) then True
-              else if not (strictly_before_dmy d11 d22) then False
-              else not (strictly_before_dmy d22 d12)
+              if not (strictly_before_dmy d21 d12) then -1
+              else if not (strictly_before_dmy d11 d22) then 1
+              else if not (strictly_before_dmy d22 d12) then -1 else 1
           | _ ->
               match
                 (date_interval conf base AddChildren x1,
                  date_interval conf base AddChildren x2)
               with
               [ (Some (d11, d12), Some (d21, d22)) ->
-                  if not (strictly_before_dmy d21 d12) then True
-                  else if not (strictly_before_dmy d11 d22) then False
-                  else not (strictly_before_dmy d22 d12)
-              | (Some _, None) -> True
-              | (None, Some _) -> False
-              | (None, None) -> True ] ] ] ]
+                  if not (strictly_before_dmy d21 d12) then -1
+                  else if not (strictly_before_dmy d11 d22) then 1
+                  else if not (strictly_before_dmy d22 d12) then -1 else 1
+              | (Some _, None) -> -1
+              | (None, Some _) -> 1
+              | (None, None) -> -1 ] ] ] ]
 ;
 
 value compare_title_order conf base (x1, t1) (x2, t2) =
   if t1.t_nth == 0 || t2.t_nth == 0 || t1.t_nth = t2.t_nth then
     compare_title_dates conf base (x1, t1) (x2, t2)
-  else t1.t_nth <= t2.t_nth
+  else compare t1.t_nth t2.t_nth
 ;
 
 value my_alphabetic n1 n2 =
@@ -151,9 +151,9 @@ value string_list_uniq l =
   List.rev l
 ;
 
-value compare_places p1 p2 = compare (Name.lower p1) (Name.lower p2) <= 0;
+value compare_places p1 p2 = compare (Name.lower p1) (Name.lower p2);
 
-value compare_titles t1 t2 = my_alphabetic t1 t2 <= 0;
+value compare_titles t1 t2 = my_alphabetic t1 t2;
 
 value strip_abbrev_lower s = Name.strip (Name.abbrev (Name.lower s));
 
@@ -423,13 +423,13 @@ value print_all_with_place_list conf base p list =
 
 value print_title_place conf base t p =
   let (l, t, p) = select_title_place conf base t p in
-  let list = Sort.list (compare_title_order conf base) l in
+  let list = List.sort (compare_title_order conf base) l in
   print_title_place_list conf base t p list
 ;
 
 value print_all_with_place conf base p =
   let (l, p) = select_all_with_place conf base p in
-  let list = Sort.list (compare_title_dates conf base) l in
+  let list = List.sort (compare_title_dates conf base) l in
   print_all_with_place_list conf base p list
 ;
 
@@ -448,7 +448,7 @@ value print_places_list conf base t list =
 
 value print_places conf base t =
   let (l, t) = select_title conf base t in
-  let list = string_list_uniq (Sort.list compare_places l) in
+  let list = string_list_uniq (List.sort compare_places l) in
   match list with
   [ [p] -> print_title_place conf base t p
   | _ -> print_places_list conf base t list ]
@@ -456,7 +456,7 @@ value print_places conf base t =
 
 value print_titles conf base p =
   let (l, p) = select_place conf base p in
-  let list = string_list_uniq (Sort.list compare_titles l) in
+  let list = string_list_uniq (List.sort compare_titles l) in
   let title _ = Wserver.wprint "... %s" p in
   do {
     header conf title;
@@ -479,7 +479,7 @@ value print_all_titles conf base =
   in
   let list =
     let l = select_all_titles conf base in
-    string_list_uniq (Sort.list compare_titles l)
+    string_list_uniq (List.sort compare_titles l)
   in
   do {
     header conf title;
@@ -497,7 +497,7 @@ value print_all_places conf base =
   in
   let list =
     let l = select_all_places conf base in
-    string_list_uniq (Sort.list compare_places l)
+    string_list_uniq (List.sort compare_places l)
   in
   do {
     header conf title;

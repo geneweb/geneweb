@@ -1,4 +1,4 @@
-(* $Id: argl.ml,v 4.7 2004-12-14 09:30:10 ddr Exp $ *)
+(* $Id: argl.ml,v 4.8 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Printf;
@@ -98,7 +98,7 @@ value rec parse_aux spec_list anon_fun =
 
 value parse_arg_list spec_list anon_fun remaining_args =
   let spec_list =
-    Sort.list (fun (k1, _, _) (k2, _, _) -> k1 >= k2) spec_list
+    List.sort (fun (k1, _, _) (k2, _, _) -> compare k2 k1) spec_list
   in
   try parse_aux spec_list anon_fun remaining_args with
   [ Arg.Bad s ->

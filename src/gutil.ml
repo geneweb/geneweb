@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.31 2005-02-12 18:34:29 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.32 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -510,7 +510,7 @@ value find_same_name base p =
          else pl)
       [] ipl
   in
-  Sort.list (fun p1 p2 -> p1.occ < p2.occ) pl
+  List.sort (fun p1 p2 -> compare p1.occ p2.occ) pl
 ;
 
 (* check base *)
@@ -1115,31 +1115,33 @@ value arg_list_of_string line =
 ;
 
 value sort_person_list base pl =
-  Sort.list
+  List.sort
     (fun p1 p2 ->
        match
          (Adef.od_of_codate p1.birth, p1.death, Adef.od_of_codate p2.birth,
           p2.death)
        with
-       [ (Some d1, _, Some d2, _) -> strictly_before d1 d2
+       [ (Some d1, _, Some d2, _) -> if strictly_before d1 d2 then -1 else 1
        | (Some d1, _, _, Death _ d2) ->
-           strictly_before d1 (Adef.date_of_cdate d2)
+           if strictly_before d1 (Adef.date_of_cdate d2) then -1 else 1
        | (_, Death _ d1, Some d2, _) ->
-           strictly_before (Adef.date_of_cdate d1) d2
+           if strictly_before (Adef.date_of_cdate d1) d2 then -1 else 1
        | (_, Death _ d1, _, Death _ d2) ->
-           strictly_before (Adef.date_of_cdate d1) (Adef.date_of_cdate d2)
-       | (Some _, _, _, _) -> False
-       | (_, Death _ _, _, _) -> False
-       | (_, _, Some _, _) -> True
-       | (_, _, _, Death _ _) -> True
+           if strictly_before (Adef.date_of_cdate d1) (Adef.date_of_cdate d2)
+           then -1
+           else 1
+       | (Some _, _, _, _) -> 1
+       | (_, Death _ _, _, _) -> 1
+       | (_, _, Some _, _) -> -1
+       | (_, _, _, Death _ _) -> -1
        | _ ->
            let c = alphabetic (p_surname base p1) (p_surname base p2) in
            if c == 0 then
              let c =
                alphabetic (p_first_name base p1) (p_first_name base p2)
              in
-             if c == 0 then p1.occ > p2.occ else c > 0
-           else c > 0 ])
+             if c == 0 then compare p1.occ p2.occ else c
+           else c ])
     pl
 ;
 

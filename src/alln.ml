@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.15 2005-02-13 21:07:38 ddr Exp $ *)
+(* $Id: alln.ml,v 4.16 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -389,7 +389,7 @@ value select_names conf base is_surnames ini =
          if cnt >= lim then [(k, s, cnt) :: list] else list)
       [] list
   in
-  (list, True)
+  (list, False)
 ;
 
 value print_frequency conf base is_surnames =
@@ -440,7 +440,7 @@ value print_alphabetic conf base is_surnames =
     else
       let (list, sorted) = select_names conf base is_surnames ini in
       if sorted then list
-      else Sort.list (fun (k1, _, _) (k2, _, _) -> k1 <= k2) list
+      else List.sort (fun (k1, _, _) (k2, _, _) -> compare k1 k2) list
   in
   let len = List.length list in
   if fast then
@@ -523,7 +523,7 @@ value print_short conf base is_surnames =
   let list =
     let (list, sorted) = select_names conf base is_surnames ini in
     if sorted then list
-    else Sort.list (fun (k1, _, _) (k2, _, _) -> k1 <= k2) list
+    else List.sort (fun (k1, _, _) (k2, _, _) -> compare k1 k2) list
   in
   let len = List.length list in
   let list = combine_by_ini ini list in

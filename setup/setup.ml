@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.55 2005-02-13 17:05:31 ddr Exp $ *)
+(* $Id: setup.ml,v 4.56 2005-02-13 23:08:52 ddr Exp $ *)
 
 open Printf;
 
@@ -281,7 +281,7 @@ value all_db dir =
     with
     [ End_of_file -> () ];
     Unix.closedir dh;
-    list.val := Sort.list  \<= list.val;
+    list.val := List.sort compare list.val;
     list.val
   }
 ;
@@ -547,9 +547,9 @@ and print_selector conf print =
   let list =
     let sel =
       ifdef WIN95 then
-	if String.length sel = 3 && sel.[1] == ':' && sel.[2] == '\\' then
-	  sel ^ "."
-	else sel
+        if String.length sel = 3 && sel.[1] == ':' && sel.[2] == '\\' then
+          sel ^ "."
+        else sel
       else sel
     in
     try
@@ -580,11 +580,11 @@ and print_selector conf print =
         (fun x ->
            let d =
              if x = ".." then
-	       ifdef WIN95 then
-	         if sel.[String.length sel - 1] <> '\\' then
-		   Filename.dirname sel ^ "\\"
-		 else Filename.dirname sel
-	       else Filename.dirname sel
+               ifdef WIN95 then
+                 if sel.[String.length sel - 1] <> '\\' then
+                   Filename.dirname sel ^ "\\"
+                 else Filename.dirname sel
+               else Filename.dirname sel
              else Filename.concat sel x
            in
            let x = if is_directory d then Filename.concat x "" else x in
@@ -1491,7 +1491,7 @@ value print_typed_file conf typ fname =
         nl ();
         Wserver.wprint "Content-length: %d" (in_channel_length ic);
         nl (); nl ();
-	try
+        try
           while True do {
             let c = input_char ic in
             Wserver.wprint "%c" c

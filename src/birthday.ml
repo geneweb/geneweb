@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.17 2005-01-02 21:27:17 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.18 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -104,7 +104,7 @@ value gen_print conf base mois f_scan dead_people =
         tag "li" begin
           Wserver.wprint "%d\n" j;
           let liste =
-            Sort.list (fun (p1, a1, _, _) (p2, a2, _, _) -> a1 <= a2)
+            List.sort (fun (p1, a1, _, _) (p2, a2, _, _) -> compare a1 a2)
               tab.(pred j)
           in
           print_anniversary_day conf base dead_people liste;
@@ -299,7 +299,7 @@ value print_marriage conf base month =
       match tab.(i - 1) with
       [ [] -> ()
       | l ->
-          let l = Sort.list (fun (fam1, y1) (fam2, y2) -> y1 < y2) l in
+          let l = List.sort (fun (fam1, y1) (fam2, y2) -> compare y1 y2) l in
           do {
             Wserver.wprint "\n";
             html_li conf;
@@ -415,7 +415,8 @@ value gen_print_menu_birth conf base f_scan mode =
     List.iter
       (fun xx ->
          xx.val :=
-           Sort.list (fun (p1, a1, _, _) (p2, a2, _, _) -> a1 <= a2) xx.val)
+           List.sort (fun (p1, a1, _, _) (p2, a2, _, _) -> compare a1 a2)
+             xx.val)
       [list_tod; list_tom; list_aft];
     print_birth_day conf base (transl conf "today") (transl conf ", it is")
       conf.today_wd conf.today list_tod.val;
@@ -513,7 +514,8 @@ value print_menu_dead conf base =
     List.iter
       (fun xx ->
          xx.val :=
-           Sort.list (fun (p1, a1, _, _) (p2, a2, _, _) -> a1 <= a2) xx.val)
+           List.sort (fun (p1, a1, _, _) (p2, a2, _, _) -> compare a1 a2)
+             xx.val)
       [list_tod; list_tom; list_aft];
     print_anniv conf base (transl conf "today") (transl conf ", it is")
       conf.today_wd conf.today list_tod.val;
@@ -581,7 +583,8 @@ value print_menu_marriage conf base =
         | _ -> () ]
     };
     List.iter
-      (fun xx -> xx.val := Sort.list (fun (_, y1) (_, y2) -> y1 <= y2) xx.val)
+      (fun xx ->
+         xx.val := List.sort (fun (_, y1) (_, y2) -> compare y1 y2) xx.val)
       [list_tod; list_tom; list_aft];
     print_marriage_day conf base (transl conf "today") (transl conf ", it is")
       conf.today_wd conf.today list_tod.val;

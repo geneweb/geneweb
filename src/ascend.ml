@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.52 2005-02-08 18:05:58 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.53 2005-02-13 23:08:52 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1427,13 +1427,13 @@ value compare base (mt1, p1) (mt2, p2) =
   if c == 0 then
     let c = alphabetic (p_first_name base p1) (p_first_name base p2) in
     if c == 0 then
-      if p1 == p2 then val_of_mt mt1 < val_of_mt mt2
+      if p1 == p2 then compare (val_of_mt mt1) (val_of_mt mt2)
       else
         match (Adef.od_of_codate p1.birth, Adef.od_of_codate p2.birth) with
-        [ (Some d1, Some d2) -> d1 strictly_before d2
-        | _ -> p1.occ < p2.occ ]
-    else c < 0
-  else c > 0
+        [ (Some d1, Some d2) -> if d1 strictly_before d2 then -1 else 1
+        | _ -> compare p1.occ p2.occ ]
+    else c
+  else c
 ;
 
 value print_missing_type conf =
@@ -1559,7 +1559,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
            | (None, None) -> [(n, p) :: npl] ])
         [] list
     in
-    let list = Sort.list (compare base) list in
+    let list = List.sort (fun x y -> compare base y x) list in
     let list =
       List.fold_left
         (fun nell ((_, p) as elm) ->
@@ -2186,7 +2186,7 @@ value build_surnames_list conf base v p =
          let surn = sou base i in
          if surn <> "?" then list.val := [(surn, dp.val) :: list.val] else ())
       ht;
-    Sort.list (fun (s1, _) (s2, _) -> Gutil.alphabetic s1 s2 <= 0) list.val
+    List.sort (fun (s1, _) (s2, _) -> Gutil.alphabetic s1 s2) list.val
   }
 ;
 
