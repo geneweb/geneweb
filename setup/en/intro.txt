@@ -2,7 +2,7 @@
 Welcome to GeneWeb $q
 
 Go to your Web browser and open the address:
-       http://localhost:$z/en
+       http://localhost:$z/
 
 If it does not work, you may have to configurate, in your browser,
 options like "work off-line" or "do not use the proxy for local

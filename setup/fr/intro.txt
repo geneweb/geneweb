@@ -2,7 +2,7 @@
 Bienvenue dans GeneWeb $q
 
 Allez dans votre navigateur Web et ouvrez l'adresse:
-       http://localhost:$z/fr
+       http://localhost:$z/
 
 Si cela ne fonctionne pas, il se peut que vous ayez a configurer dans
 votre navigateur des options du genre "travailler hors connexion" ou
