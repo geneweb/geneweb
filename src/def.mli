@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 4.1 2001-12-27 14:38:17 ddr Exp $ *)
+(* $Id: def.mli,v 4.2 2002-01-12 12:06:20 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -185,7 +185,6 @@ type base_func =
     index_of_string : string -> istr;
     persons_of_surname : istr_iper_index;
     persons_of_first_name : istr_iper_index;
-    is_restricted : iper -> choice bool bool;
     patch_person : iper -> person -> unit;
     patch_ascend : iper -> ascend -> unit;
     patch_union : iper -> union -> unit;

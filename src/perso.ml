@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.23 2002-01-10 04:13:31 ddr Exp $ *)
+(* $Id: perso.ml,v 4.24 2002-01-12 12:06:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -917,16 +917,6 @@ value print_variable conf base env sl =
       } ]
 ;
 
-value is_restricted conf base p =
-  match base.func.is_restricted p.cle_index with
-  [ Left x -> x
-  | Right False -> False
-  | Right True ->
-      match Adef.od_of_codate p.birth with
-      [ Some (Dgreg d _) -> (temps_ecoule d conf.today).year <= 100
-      | _ -> True ] ]
-;
-
 value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
   fun
   [ "are_divorced" ->
@@ -1487,15 +1477,10 @@ value interp_templ conf base p astl =
 (* Main *)
 
 value print_ok conf base p =
-  if conf.wizard || conf.friend || not (is_restricted conf base p) then do {
-    let astl = Templ.input conf base "perso" in
+  let astl = Templ.input conf base "perso" in
+  do {
     html conf;
     interp_templ conf base p astl
-  }
-  else do {
-    Util.header conf (fun _ -> Wserver.wprint "Restricted");
-    Util.print_link_to_welcome conf True;
-    Util.trailer conf
   }
 ;
 
