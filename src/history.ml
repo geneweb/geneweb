@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 2.5 1999-09-24 18:20:25 ddr Exp $ *)
+(* $Id: history.ml,v 2.6 1999-09-24 19:37:39 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -65,27 +65,15 @@ value rev_input_line ic pos =
 
 value action_text conf =
   fun
-  [ "af" ->
-      let s = transl_nth conf "family/families" 0 in
-      transl_decline conf "add" s
-  | "mf" ->
-      let s = transl_nth conf "family/families" 0 in
-      transl_decline conf "modify" s
-  | "df" ->
-      let s = transl_nth conf "family/families" 0 in
-      transl_decline conf "delete" s
-  | "sf" ->
-      let s = transl_nth conf "family/families" 1 in
-      transl_decline conf "switch" s
-  | "ap" ->
-      let s = transl_nth conf "person/persons" 0 in
-      transl_decline conf "add" s
-  | "mp" ->
-      let s = transl_nth conf "person/persons" 0 in
-      transl_decline conf "modify" s
-  | "dp" ->
-      let s = transl_nth conf "person/persons" 0 in
-      transl_decline conf "delete" s
+  [ "af" -> transl_decline conf "add" (transl_nth conf "family/families" 0)
+  | "mf" -> transl_decline conf "modify" (transl_nth conf "family/families" 0)
+  | "df" -> transl_decline conf "delete" (transl_nth conf "family/families" 0)
+  | "sf" -> transl_decline conf "switch" (transl_nth conf "family/families" 1)
+  | "si" -> transl_decline conf "send" (transl conf "image")
+  | "di" -> transl_decline conf "delete" (transl conf "image")
+  | "ap" -> transl_decline conf "add" (transl_nth conf "person/persons" 0)
+  | "mp" -> transl_decline conf "modify" (transl_nth conf "person/persons" 0)
+  | "dp" -> transl_decline conf "delete" (transl_nth conf "person/persons" 0)
   | x -> x ]
 ;
 

@@ -72,8 +72,8 @@ Los <a href="%sm=AN">cumplea&ntilde;os</a>.<br>
 Los <a href="%sm=AD">aniversarios de las personas fallecidas</a>.<br>
 Los <a href="%sm=AM">aniversarios de casamiento</a>.<br>%x
 Los <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>.<br>
-Las <a href="%sm=LD;k=10">muertes recientes</a>.%x%j<br>
-<a href="%sm=HIST;k=10">[*history of updates]</a>.%j<br>
+Las <a href="%sm=LD;k=10">muertes recientes</a>.<br>%x%j
+<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
 <a href="%sm=CAL">[*calendar/calendars]1</a>.
 
 <p>

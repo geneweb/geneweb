@@ -70,8 +70,8 @@ De <a href="%sm=AN">verjaardagen</a>.<br>
 De <a href="%sm=AD">verjaardagen van overleden mensen</a>.<br>
 De <a href="%sm=AM">verjaardagen van huwelijken</a>.<br>%x
 De <a href="%sm=LB;k=10">laatste geboorten</a>.<br>
-De <a href="%sm=LD;k=10">laatste overlijden</a>.%x%j<br>
-<a href="%sm=HIST;k=10">[*history of updates]</a>.%j<br>
+De <a href="%sm=LD;k=10">laatste overlijden</a>.<br>%x%j
+<a href="%sm=HIST;k=10">[*history of updates]</a>.<br>%j
 <a href="%sm=CAL">[*calendar/calendars]1</a>.
 <p>
 Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal

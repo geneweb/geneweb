@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 2.5 1999-08-14 09:26:39 ddr Exp $ *)
+(* $Id: sendImage.ml,v 2.6 1999-09-24 19:37:39 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -190,6 +190,8 @@ value effective_send_ok conf base p file =
           with [ Unix.Unix_error _ _ _ -> () ];
        return ();
      write_file (fname ^ typ) content;
+     let key = (sou base p.first_name, sou base p.surname, p.occ) in
+     History.record conf base key "si";
      print_sent conf base p;
   return ()
 ;
@@ -242,6 +244,8 @@ value effective_delete_ok conf base p =
      else if Sys.file_exists (fname ^ ".jpg") then
        move_file_to_old conf ".jpg" fname bfname
      else incorrect conf;
+     let key = (sou base p.first_name, sou base p.surname, p.occ) in
+     History.record conf base key "di";
      print_deleted conf base p;
   return ()
 ;
