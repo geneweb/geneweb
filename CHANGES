@@ -2,7 +2,7 @@ GeneWeb version 2.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
-  - [Oct 19, 99] Added treatment of png files.
+  - [Oct 19, 99] Added treatment of png images files.
   - [Oct 10, 99] In update form, when name conflict, added the birth and
     death date in the list of persons having the same name.
   - [Oct 8, 99] Added forum.
@@ -15,6 +15,7 @@ GeneWeb version 2.08
   - [Oct 3, 99] Added week day in "calendars" page.
 
 * GeneWeb uncompiler (gwu)
+  - [Oct 19, 99] Fixed bug: notes sometimes disappeared for godparents and co.
   - [Oct 10, 99] Fixed bug: dates represented as text where not extracted
     in the output file but on standard output.
 

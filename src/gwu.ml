@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.22 1999-10-10 20:30:04 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.23 1999-10-19 19:29:03 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -530,8 +530,7 @@ value print_relation_parent oc base mark defined_p p =
        do mark.(Adef.int_of_iper p.cle_index) := True;
           if has_infos base p then print_infos oc base False True p
           else Printf.fprintf oc " 0";
-          if p.rparents <> [] then defined_p.val := [p :: defined_p.val]
-          else ();
+          defined_p.val := [p :: defined_p.val];
        return ()
      else ();
   return ()
@@ -607,8 +606,10 @@ value print_relations oc base mark per_sel ml =
     [ [] -> ()
     | [p :: pl] ->
          let def_p = ref [] in
-         do if per_sel p.cle_index then
-              print_relations_for_person oc base mark def_p p
+         do if p.rparents <> [] && per_sel p.cle_index then
+              do print_relations_for_person oc base mark def_p p;
+                 List.iter (print_notes_for_person oc base) def_p.val;
+              return ()
             else ();
          return loop (pl @ def_p.val) ]
 ;
