@@ -1,4 +1,5 @@
-(* $Id: gwtp.ml,v 1.53 2000-10-06 20:17:39 ddr Exp $ *)
+(* camlp4r ../src/pa_lock.cmo *)
+(* $Id: gwtp.ml,v 1.54 2000-10-29 21:21:29 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -580,6 +581,7 @@ value printf_link_to_main b tok =
 
 value send_file str env b tok f fname =
   let fname = filename_basename fname in
+  let lockf = Filename.concat gwtp_tmp.val (b ^ ".lck") in
   if fname = "base" then
     do printf "content-type: text/html"; crlf (); crlf ();
        printf "\
@@ -587,11 +589,18 @@ value send_file str env b tok f fname =
 <h1 align=center>Gwtp...</h1>
 <pre>\n";
        flush stdout;
-       make_temp env b;
-       printf "\nTemporary data base created.\n";
-       flush stdout;
-       copy_temp b;
-       printf "Data base \"%s\" updated.\n" b;
+       lock lockf with
+       [ Accept ->
+           do make_temp env b;
+              printf "\nTemporary data base created.\n";
+              flush stdout;
+              copy_temp b;
+              printf "Data base \"%s\" updated.\n" b;
+           return ()
+       | Refuse ->
+           do printf "Data base is already being transfered.<br>\n";
+              printf "Please try again later.\n";
+           return () ];
        flush stdout;
        printf "</pre>\n";
        printf_link_to_main b tok;

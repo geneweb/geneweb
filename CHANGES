@@ -42,6 +42,9 @@ GeneWeb version 3.09
     Ledieu).
 
 * GeneWeb data bases Transfer Program (gwtp)
+  - [29 Oct 00] Fixed bug: if one tried to send a data base several
+    times at the same time (by several requests), it could create a
+    corrupted data base or it could make the program fail.
   - [06 Oct 00] Added ability to put a trailer text.
 
 * Setup program (gwsetup)
