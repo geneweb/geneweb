@@ -56,7 +56,7 @@ por
 
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
 
-%w<li> <a href="%sm=ADD_FAM">Aldoni famiglion</a>.
+%w<li> <a href="%sm=ADD_FAM">Aldoni familion</a>.
 %w
 
 </ul>
