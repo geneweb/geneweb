@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.1 1999-12-03 16:56:40 ddr Exp $ *)
+(* $Id: dag.ml,v 3.2 1999-12-03 20:32:36 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -156,7 +156,7 @@ do let d = tag_dag d in print_char_table d (table_of_dag d); flush stderr; retur
 *)
   do Util.header_no_page_title conf title;
      print_html_table (fun x -> Wserver.wprint "%s" x) print_indi conf.border
-       False d t;
+       d t;
      Util.trailer conf;
   return ()
 ;

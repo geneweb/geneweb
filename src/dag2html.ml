@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.6 1999-12-03 16:56:40 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.7 1999-12-03 20:32:36 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -31,7 +31,7 @@ value new_ghost_id =
 
 (* print *)
 
-value print_html_table print print_indi border short d t =
+value print_html_table print print_indi border d t =
   let jlast = Array.length t.table.(0) - 1 in
   let print_elem =
     fun
@@ -196,14 +196,13 @@ value print_html_table print print_indi border short d t =
      for i = 0 to Array.length t.table - 1 do
        print_line_elem print_elem i i;
        if i < Array.length t.table - 1 then
-         do if short then () else print_line_elem print_bar (i + 1) i;
+         do print_line_elem print_bar (i + 1) i;
             if exist_several_branches i i then
               do print_hbars i i; print_alone_bar i; return ()
             else ();
             if exist_several_branches i (i + 1) then
               do print_hbars i (i + 1);
-                 if short then ()
-                 else print_line_elem print_bar (i + 1) (i + 1);
+                 print_line_elem print_bar (i + 1) (i + 1);
               return ()
             else ();
          return ()
@@ -730,14 +729,12 @@ value table_of_dag no_optim d =
     else
       let t = {table = Array.append t.table [| Array.of_list new_row |]} in
       let t =
-        if no_optim then t
-        else
-          let _ = equilibrate t in
-          let _ = group_elem t in
-          let _ = group_ghost t in
-          let _ = group_children t in
-          let _ = group_span_by_common_children d t in
-          treat_gaps d t
+        let _ = if no_optim then () else equilibrate t in
+        let _ = group_elem t in
+        let _ = group_ghost t in
+        let _ = group_children t in
+        let _ = group_span_by_common_children d t in
+        if no_optim then t else treat_gaps d t
       in
       loop t
   in
