@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.18 2004-02-02 11:47:54 ddr Exp $ *)
+(* $Id: templ.ml,v 4.19 2004-09-30 12:15:06 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -452,30 +452,48 @@ value rec skip_spaces_and_newlines s i =
 
 value eval_transl_lexicon conf upp s c =
   let r =
-    match try Some (int_of_string c) with [ Failure _ -> None ] with
-    [ Some n ->
-        match split_at_coloncolon s with
-        [ None -> Gutil.nominative (Util.transl_nth conf s n)
-        | Some (s1, s2) ->
-            try
-              if String.length s2 > 0 && s2.[0] = '|' then
-                let i = 1 in
-                let j = String.rindex s2 '|' in
-                let k = skip_spaces_and_newlines s2 (j + 1) in
-                let s3 = String.sub s2 i (j - i) in
-                let s4 = String.sub s2 k (String.length s2 - k) in
-                let s2 = s3 ^ Util.transl_nth conf s4 n in
-                Util.transl_decline conf s1 s2
-              else if String.length s2 > 0 && s2.[0] = ':' then
-                let s2 = String.sub s2 1 (String.length s2 - 1) in
-                Printf.sprintf
-                  (Util.ftransl_nth conf (Util.valid_format "%t" s1) n)
-                     (fun _ -> s2)
-              else raise Not_found
-            with
-            [ Not_found ->
-                Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ] ]
-    | None -> Gutil.nominative (Util.transl conf s) ^ c ]
+    let nth = try Some (int_of_string c) with [ Failure _ -> None ] in
+    match split_at_coloncolon s with
+    [ None ->
+        let s2 =
+          match nth with
+          [ Some n -> Util.transl_nth conf s n
+          | None -> Util.transl conf s ]
+        in
+        Gutil.nominative s2
+    | Some (s1, s2) ->
+        try
+          if String.length s2 > 0 && s2.[0] = '|' then
+            let i = 1 in
+            let j = String.rindex s2 '|' in
+            let k = skip_spaces_and_newlines s2 (j + 1) in
+            let s3 = String.sub s2 i (j - i) in
+            let s4 = String.sub s2 k (String.length s2 - k) in
+            let s5 =
+              match nth with
+              [ Some n -> Util.transl_nth conf s4 n
+              | None -> Util.transl conf s4 ]
+            in
+            let s2 = s3 ^ s5 in
+            Util.transl_decline conf s1 s2
+          else if String.length s2 > 0 && s2.[0] = ':' then
+            let s2 = String.sub s2 1 (String.length s2 - 1) in
+            let s3 = Util.valid_format "%t" s1 in
+            let s4 =
+              match nth with
+              [ Some n -> Util.ftransl_nth conf s3 n
+              | None -> Util.ftransl conf s3 ]
+            in
+            Printf.sprintf s4 (fun _ -> s2)
+          else raise Not_found
+        with
+        [ Not_found ->
+            let s3 =
+              match nth with
+              [ Some n -> Util.transl_nth conf s2 n
+              | None -> Util.transl conf s2 ]
+            in
+            Util.transl_decline conf s1 s3 ] ]
   in
   if upp then capitale r else r
 ;

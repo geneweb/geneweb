@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.201 2004-09-30 09:41:46 ddr Exp $
+# $Id: lexicon.txt,v 4.202 2004-09-30 12:15:03 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -1588,7 +1588,7 @@ cs: alias
 da: alias
 de: Alias
 en: alias
-eo: aliasa
+eo: aliasa:a:+n
 es: alias
 et: hüüdnimi
 fi: kutsumanimi
@@ -2645,7 +2645,7 @@ cs: dítì/dìti
 da: barn/b&oslash;rn
 de: Kind/Kinder
 en: child/children
-eo: ido:a:+n/idoj
+eo: ido:a:+n/idoj:a:+n
 es: hijo/hijos
 et: laps/lapsed
 fi: lapsi/lapset
@@ -8421,7 +8421,7 @@ cs: titul/tituly
 da: titel/titler (nob.)
 de: Titel/Titel
 en: title/titles
-eo: nobeltitolo:a:+n/nobeltitoloj
+eo: nobeltitolo:a:+n/nobeltitoloj:a:+n
 es: t&iacute;tulo/t&iacute;tulos
 et: tiitel/tiitlid
 fi: arvo/arvot

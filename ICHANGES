@@ -9,6 +9,10 @@ GeneWeb Version 4.10
     ocaml, version 3.08.
 
 * GeneWeb server or CGI (gwd)
+  - [30 Sep 04] Changed decline system and updfam.txt and updind.txt to
+    allow sentences like "insert child/children", particularly in languages
+    with accusative form, like Esperanto (the translation correct being
+    "enmeti idon/idojn", "n" being added to "ido" and to "idoj")
   - [10 Aug 04] Automatic reordering of marriages from the weddings date
     in personal pages of witnesses.
   - [30 Jul 04] When using CGI mode, added a way to delegate authentifi-

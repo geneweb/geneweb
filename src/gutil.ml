@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.23 2004-08-09 11:34:59 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.24 2004-09-30 12:15:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -83,7 +83,7 @@ value decline case s =
       if i == ibeg then "" else decline_word case s ibeg i
     else
       match s.[i] with
-      [ ' ' | '<' as sep ->
+      [ ' ' | '<' | '/' as sep ->
           decline_word case s ibeg i ^ String.make 1 sep ^
             loop (i + 1) (i + 1)
       | '>' -> String.sub s ibeg (i + 1 - ibeg) ^ loop (i + 1) (i + 1)

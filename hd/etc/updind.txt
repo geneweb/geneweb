@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updind.txt,v 4.12 2004-07-01 14:00:25 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 4.13 2004-09-30 12:15:03 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -189,7 +189,7 @@ function changeDeath()
     <td>[*qualifier]0</td>
     <td>
     <input name="qualifier%cnt;" size=30 value="%qualifier;">
-    <td>[*insert::qualifier]0</td>
+    <td>[*insert::qualifier]</td>
     <td><input type=checkbox name="add_qualifier%cnt;" value=on></td>
     </tr>
   %end;
@@ -198,7 +198,7 @@ function changeDeath()
   <td>[*qualifier]0</td>
   <td>
   <input name="qualifier0" size=30 value="">
-  <td>[*insert::qualifier]0</td>
+  <td>[*insert::qualifier]</td>
   <td><input type=checkbox name="add_qualifier0" value=on></td>
   </tr>
 %end;
@@ -208,7 +208,7 @@ function changeDeath()
     <td>[*alias]0</td>
     <td>
     <input name="alias%cnt;" size=30 value="%alias;">
-    <td>[*insert::alias]0</td>
+    <td>[*insert::alias]</td>
     <td><input type=checkbox name="add_alias%cnt;" value=on></td>
     </tr>
   %end;
@@ -217,7 +217,7 @@ function changeDeath()
   <td>[*alias]0</td>
   <td>
   <input name="alias0" size=30 value="">
-  <td>[*insert::alias]0</td>
+  <td>[*insert::alias]</td>
   <td><input type=checkbox name="add_alias0" value=on></td>
   </tr>
 %end;
@@ -228,7 +228,7 @@ function changeDeath()
     <td>[*first name alias]0</td>
     <td>
     <input name="first_name_alias%cnt;" size=30 value="%first_name_alias;">
-    <td>[*insert::first name alias]0</td>
+    <td>[*insert::first name alias]</td>
     <td><input type=checkbox name="add_first_name_alias%cnt;" value=on></td>
     </tr>
   %end;
@@ -237,7 +237,7 @@ function changeDeath()
   <td>[*first name alias]0</td>
   <td>
   <input name="first_name_alias0" size=30 value="">
-  <td>[*insert::first name alias]0</td>
+  <td>[*insert::first name alias]</td>
   <td><input type=checkbox name="add_first_name_alias0" value=on></td>
   </tr>
 %end;
@@ -247,7 +247,7 @@ function changeDeath()
     <td>[*surname alias]0</td>
     <td>
     <input name="surname_alias%cnt;" size=30 value="%surname_alias;">
-    <td>[*insert::surname alias]0</td>
+    <td>[*insert::surname alias]</td>
     <td><input type=checkbox name="add_surname_alias%cnt;" value=on></td>
     </tr>
   %end;
@@ -256,7 +256,7 @@ function changeDeath()
   <td>[*surname alias]0</td>
   <td>
   <input name="surname_alias0" size=30 value="">
-  <td>[*insert::surname alias]0</td>
+  <td>[*insert::surname alias]</td>
   <td><input type=checkbox name="add_surname_alias0" value=on></td>
   </tr>
 %end;
@@ -467,9 +467,8 @@ function changeDeath()
   <table border=1>
   <tr>
   <td>
-  [*insert]0
-  <input name=ins_titlexx_n size=1 maxlength=1 value=1>
-  [title/titles]0
+  [*insert::|<input name=ins_titlexx_n size=1 maxlength=1 value=1> |
+  title/titles]
   <input type=checkbox name=ins_titlexx value=on>
   </td>
   </tr>
