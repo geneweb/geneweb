@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: translate.ml,v 4.1 2002-02-14 10:19:41 ddr Exp $ *)
+(* $Id: translate.ml,v 4.2 2002-11-03 20:16:09 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 module Buff =
@@ -86,4 +86,20 @@ value inline lang macro_char macro s =
     else loop alt_version (s.[i] = '\n') (i + 1)
   in
   loop None True 0
+;
+
+value language_name lang lang_def =
+  let str = lang_def in
+  let len = String.length lang in
+  let rec loop beg i =
+    if i == String.length str && i == beg then lang
+    else if i == String.length str || str.[i] == '/' then
+      if i > beg + len + 1 && str.[beg + len] = '=' &&
+         String.sub str beg len = lang then
+        String.sub str (beg + len + 1) (i - beg - len - 1)
+      else if i == String.length str then lang
+      else loop (i + 1) (i + 1)
+    else loop beg (i + 1)
+  in
+  loop 0 0
 ;

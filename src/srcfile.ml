@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.12 2002-10-31 14:48:37 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.13 2002-11-03 20:16:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -389,22 +389,6 @@ value src_translate conf base nomin ic =
   else lexicon_translate conf base nomin ic c
 ;
 
-value language_name conf lang =
-  let str = transl conf " !languages" in
-  let len = String.length lang in
-  let rec loop beg i =
-    if i == String.length str && i == beg then lang
-    else if i == String.length str || str.[i] == '/' then
-      if i > beg + len + 1 && str.[beg + len] = '=' &&
-         String.sub str beg len = lang then
-        String.sub str (beg + len + 1) (i - beg - len - 1)
-      else if i == String.length str then lang
-      else loop (i + 1) (i + 1)
-    else loop beg (i + 1)
-  in
-  loop 0 0
-;
-
 value browser_cannot_handle_passwords conf =
   let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
   String.lowercase user_agent = "konqueror"
@@ -494,7 +478,8 @@ value rec copy_from_channel conf base ic mode =
                   let c = input_char ic in
                   if c = ';' then Buff.get len else loop (Buff.store len c)
               in
-              Wserver.wprint "%s" (language_name conf lang)
+              let lang_def = transl conf " !languages" in
+              Wserver.wprint "%s" (Translate.language_name lang lang_def)
           | 'V' ->
               match p_getenv conf.base_env (get_variable ic) with
               [ Some txt -> Wserver.wprint "%s" txt

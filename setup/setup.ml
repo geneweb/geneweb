@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.40 2002-06-20 08:32:51 ddr Exp $ *)
+(* $Id: setup.ml,v 4.41 2002-11-03 20:16:09 ddr Exp $ *)
 
 open Printf;
 
@@ -81,10 +81,14 @@ type config =
     lexicon : Hashtbl.t string string }
 ;
 
+value transl conf w =
+  try Hashtbl.find conf.lexicon w with [ Not_found -> "[" ^ w ^ "]" ]
+;
+
 value charset conf =
   try Hashtbl.find conf.lexicon " !charset" with
   [ Not_found -> "iso-8859-1" ]
-;  
+;
 
 value nl () = Wserver.wprint "\013\010";
 
@@ -446,6 +450,10 @@ value rec copy_from_stream conf print strm =
                         print (if c = 'C' then " checked" else " selected")
                       else ()
                   | None -> () ]
+              | 'L' ->
+                  let lang = get_variable strm in
+                  let lang_def = transl conf " !languages" in
+                  print (Translate.language_name lang lang_def)
               | 'V' | 'F' ->
                   let k = get_variable strm in
                   match p_getenv conf.env k with

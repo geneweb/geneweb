@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.21 2002-10-31 14:48:39 ddr Exp $ *)
+(* $Id: util.mli,v 4.22 2002-11-03 20:16:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -149,7 +149,7 @@ value index_of_sex : sex -> int;
 
 ifdef OCAML_307 then
 value relation_txt :
-  config -> sex -> family -> format (('a -> 'b) -> 'b) 'a 'd 'b
+  config -> sex -> family -> format (('a -> 'b) -> 'b) 'a 'b 'b
 else
 value relation_txt :
   config -> sex -> family -> format (('a -> 'b) -> 'b) 'a 'b;
