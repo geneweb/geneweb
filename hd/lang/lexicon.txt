@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.192 2000-11-27 10:56:15 ddr Exp $
+# $Id: lexicon.txt,v 3.193 2000-11-28 09:07:52 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -33,6 +33,7 @@ eo: en=anglo/eo=esperanto/fr=franco
 es: de=Alem&aacute;n/cs=Checo/cn=Chino/dk=Dan&eacute;s/es=Espa&ntilde;ol/eo=Esperanto/fr=Franc&eacute;s/he=Hebreo/en=Ingl&eacute;s/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/se=Sueco
 fi: af=afrikaani/cn=kiina/cs=tsekki/de=saksa/dk=tanska/en=englanti/eo=esperanto/es=espanja/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/se=ruotsi
 fr: af=afrikaans/cn=chinois/cs=tch&egrave;que/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pt=portugais/ru=russe/se=su&eacute;dois
+it: af=africano/cn=cinese/cs=ceco/de=tedesco/dk=danese/en=inglese/eo=esperanto/es=spagnolo/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pt=portoghese/ru=russo/se=svedese
 lv: cn=Íînieðu/cs=Èehu/dk=Dâòu/nl=Holandieðu/en=Angïu/eo=Esperanto/fi=Somu/fr=Franèu/de=Vâcu/he=Ebreju/is=Islandieðû/it=Itâïu/lv=Latvieðu/no=Norvçìu/pt=Portugâïu/es=Spâòu/ru=Krievu/se=Zviedru
 nl: af=Afrikaans/cn=Chinees/cs=Tsjechisch/dk=Deens/nl=Nederlands/en=Engels/eo=Esperanto/fi=Fins/fr=Frans/de=Duits/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/no=Noors/pt=Portugees/es=Spaans/ru=Russisch/se=Zweeds
 no: af=afrikaans/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
@@ -286,6 +287,7 @@ en: %t's sex is not coherent with his/her relations
 eo: la sekso de %t ne koheras kun siaj rilatoj
 es: el género de %t es incoherente con sus relaciones
 fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
+it: il sesso di %t non e' coerente con le sue relazioni
 no: %ts kjønn er uforenlig med forbindelsene hans/hennes
 pt: o sexo de %t não é coerente com suas relações
 se: %ts kön stämmer inte överens med sina relationer
@@ -524,6 +526,7 @@ fi: <em>Sosa-numero</em> henkil&ouml;n&auml %t
 fr: <em>num&eacute;ro Sosa</em> par rapport &agrave; %t
 he: <em> îñôø Sosa </em> áéçñ ì- %t
 is: <em>Sosa númer</em> tengt %t
+it: <em>Numero Sosa</em> relativo a %t
 lv: <em>SOSA pakâpe</em> attiecîbâ pret %t
 nl: <em>Sosa nummer</em> ten opzichte van %t
 no: <em>Sosa nummer</em> i forhold til %t
@@ -563,6 +566,7 @@ fi: Sosa
 fr: Sosa
 he: Sosa
 is: Sosa
+it: Sosa
 lv: SOSA
 nl: Sosa
 no: Sosa
@@ -3611,6 +3615,7 @@ en: loop in data base: %s is his/her own ancestor
 eo: estas masxo en la datenbazo: %s estas sia propra avo
 es: bucle en la base de datos: %s es su propio ancestro
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
+it: loop nel data-base: %s e' antenato di se stesso
 nl: loop in de data base: %s is zijn/haar eigen voorouder
 no: loop i databasen: %s er sin egen etterkommer
 pt: referência circular no banco de dados: %s é seu próprio ancestral
@@ -3843,6 +3848,7 @@ en: message added
 eo: almetita mesagxo
 es: mensaje agregado
 fr: message ajout&eacute;
+it: messaggio aggiunto
 nl: bericht toegevoegd
 no: melding tilf&oslash;yet
 pt: mensagem adicionada
@@ -3855,6 +3861,7 @@ en: message/next message
 eo: mesagxo/sekvanta mesagxo
 es: mensaje/siguiente mensaje
 fr: message/message suivant
+it: messaggio/prossimo messaggio
 nl: bericht/volgend bericht
 no: melding/neste melding
 pt: mensagem/próxima mensagem
@@ -5448,6 +5455,7 @@ en: subject
 eo: objekto
 es: asunto
 fr: sujet
+it: oggetto
 nl: onderwerp
 no: emne
 pt: assunto
@@ -5544,6 +5552,7 @@ es: lista de apellidos
 fi: sukunimiluettelo
 fr: liste &eacute;clair
 he:  øùéîú ùîåú îùôçä
+it: lista dei cognomi
 lv: uzv&acirc;rdu saraksts
 nl: bijnamen lijst
 no: liste over etternavn
@@ -6556,6 +6565,7 @@ fi: %s ja %s avioliiton todistaja
 fr: t&eacute;moin au mariage de %s et de %s
 he:  àãéí áçúåðä ùì %s å-%s
 is: vitni að giftingu %s og %s
+it: testimone al matrimonio di %s e %s
 lv: liecinieks %s un %s laulîbâs
 nl: getuige bij het huwelijk van %s en %s
 no: forlover ved ekteskap mellom %s og %s
