@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.17 2000-03-12 20:39:56 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.18 2000-04-03 04:45:36 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -191,7 +191,7 @@ value afficher_menu_ascendants conf base p =
   return ()
 ;
 
-value afficher_ancetre conf base x p =
+value afficher_ancetre conf base p =
   do afficher_personne_referencee conf base p;
      Date.afficher_dates_courtes conf base p;
   return ()
@@ -213,13 +213,13 @@ value afficher_ascendants_jusqu_a conf base niveau_max p =
             tag "ul" begin
               if know_fath then
                 do Wserver.wprint "<li type=square> ";
-                   afficher_ancetre conf base p pere;
+                   afficher_ancetre conf base pere;
                    Wserver.wprint "\n";
                 return boucle (succ niveau) cpl.father
               else ();
               if know_moth then
                 do Wserver.wprint "<li type=circle> ";
-                   afficher_ancetre conf base p mere;
+                   afficher_ancetre conf base mere;
                    Wserver.wprint "\n";
                 return boucle (succ niveau) cpl.mother
               else ();
@@ -1618,6 +1618,52 @@ value print_tree conf base v p =
   | _ -> print_normal_tree conf base v p ]
 ;
 
+value no_spaces s =
+  loop 0 0 where rec loop len i =
+    if i == String.length s then Buff.get len
+    else
+      let len =
+        match s.[i] with
+        [ ' ' -> Buff.mstore len "&nbsp;"
+        | x -> Buff.store len s.[i] ]
+      in
+      loop len (i + 1)
+;
+
+value print_horizontally conf base max_level p =
+  let title h =
+    let txt_fun = if h then gen_person_text_no_html else gen_person_text in
+    Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
+      (transl_decline conf "of" (txt_fun raw_access conf base p))
+  in
+  let rec loop level ip =
+    if level >= max_level then ()
+    else
+      do match (aoi base ip).parents with
+         [ Some ifam -> loop (level + 1) (coi base ifam).father
+         | None -> () ];
+         stag "tt" begin
+           for i = 1 to level * 5 do Wserver.wprint "."; done;
+           Wserver.wprint "--.";
+         end;
+         let p = poi base ip in
+         Wserver.wprint "%s%s<br>\n"
+           (reference conf base p (no_spaces (person_text conf base p)))
+           (no_spaces (Date.short_dates_text conf base p));
+         match (aoi base ip).parents with
+         [ Some ifam -> loop (level + 1) (coi base ifam).mother
+         | None -> () ];
+      return ()
+  in
+  do header conf title;
+     print_link_to_welcome conf True;
+     Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
+     Wserver.wprint "<p>\n";
+     loop 0 p.cle_index;
+     trailer conf;
+  return ()
+;
+
 value print_male_female_line male conf base v p =
   let list =
     loop [] v p.cle_index where rec loop list lev ip =
@@ -1689,6 +1735,7 @@ value print conf base p =
       if al then print_missing_ancestors_alphabetically conf base v si p
       else print_missing_ancestors conf base v si p
   | (Some "T", Some v) -> print_tree conf base v p
+  | (Some "H", Some v) -> print_horizontally conf base v p
   | (Some "A", Some v) -> print_male_line conf base v p
   | (Some "C", Some v) -> print_female_line conf base v p
   | (Some "D", x) ->
