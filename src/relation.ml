@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.57 2004-12-29 21:03:34 ddr Exp $ *)
+(* $Id: relation.ml,v 4.58 2004-12-30 18:50:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1500,9 +1500,9 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
   in
   let ip1 = p1.cle_index in
   let ip2 = p2.cle_index in
-  let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
-  let b1 = find_first_branch conf base dist ip l1 ip1 Neuter in
-  let b2 = find_first_branch conf base dist ip l2 ip2 Neuter in
+  let dist = RelationLink.make_dist_tab conf base ip (max l1 l2 + 1) in
+  let b1 = RelationLink.find_first_branch conf base dist ip l1 ip1 Neuter in
+  let b2 = RelationLink.find_first_branch conf base dist ip l2 ip2 Neuter in
   match (b1, b2) with
   [ (Some b1, Some b2) ->
       let bd = match p_getint conf.env "bd" with [ Some x -> x | None -> 0 ] in
