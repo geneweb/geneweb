@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 1.6 1998-11-30 12:35:59 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.7 1998-11-30 20:26:30 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -138,7 +138,12 @@ value index_of_string strings ic start_pos hash_len string_patches s =
 
 (* Search index of a given surname or given first name in file strings.inx *)
 
-value compare_names = Gutil.alphabetique;
+value name_key s =
+  let i = initiale s in
+  Name.lower (if i == 0 then s else String.sub s i (String.length s - i))
+;
+
+value compare_names s1 s2 = compare (name_key s1) (name_key s2);
 value compare_istr = ref (fun []);
 value compare_istr_fun base is1 is2 =
   if is1 == is2 then 0
@@ -153,9 +158,15 @@ module IstrTree =
 
 type first_name_or_surname_index = IstrTree.t (list iper);
 
+value rec list_remove_elemq x =
+  fun
+  [ [y :: l] -> if x == y then l else [y :: list_remove_elemq x l]
+  | [] -> [] ]
+;
+
 value persons_of_first_name_or_surname strings params =
+  let (ic2, start_pos, proj, person_patches, tree_name) = params in
   let bt =
-    let (ic2, start_pos, proj, person_patches, tree_name) = params in
     let btr = ref None in
     fun () ->
       match btr.val with
@@ -172,13 +183,26 @@ value persons_of_first_name_or_surname strings params =
                    [ Not_found -> [] ]
                  in
                  if List.memq p.cle_index ipera then bt
-                 else
-                   IstrTree.add istr [p.cle_index :: ipera] bt)
+                 else IstrTree.add istr [p.cle_index :: ipera] bt)
               bt person_patches.val
           in
           do btr.val := Some bt; return bt ]
   in
-  let find istr = try IstrTree.find istr (bt ()) with [ Not_found -> [] ] in
+  let check_patches istr ipl =
+    List.fold_left
+      (fun ipl (i, p) ->
+         if List.memq (Adef.iper_of_int i) ipl then
+           if compare_istr.val istr p.first_name == 0
+           || compare_istr.val istr p.surname == 0
+           then ipl
+           else list_remove_elemq (Adef.iper_of_int i) ipl
+         else ipl)
+      ipl person_patches.val
+  in
+  let find istr =
+    try check_patches istr (IstrTree.find istr (bt ())) with
+    [ Not_found -> [] ]
+  in
   let cursor str =
     IstrTree.key_after
       (fun key -> compare_names str (strings.get (Adef.int_of_istr key)))
