@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.60 2002-11-08 16:34:38 ddr Exp $ *)
+(* $Id: util.ml,v 4.61 2002-11-09 06:30:43 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1281,6 +1281,9 @@ value string_with_macros conf env s =
               | _ -> do { Buffer.add_string buff "%"; i + 1 } ] ]
         in
         loop tt i
+      else if s.[i] = '<' && i + 1 < String.length s && s.[i+1] = '%' then do {
+        Buffer.add_string buff "<"; loop tt (i + 1)
+      }
       else if s.[i] = '<' && not (good_tag s (i + 1)) then do {
         Buffer.add_string buff "&lt;"; loop tt (i + 1)
       }
