@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.49 2000-06-13 10:06:56 ddr Exp $ *)
+(* $Id: util.ml,v 3.50 2000-06-19 23:34:45 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1178,11 +1178,21 @@ value print_link_to_welcome conf right_aligned =
           " width=" ^ string_of_int wid ^ " height=" ^ string_of_int hei
       | None -> "" ]
     in
-    do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-       Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\"%s>"
-         (image_prefix conf) fname wid_hei
-         (if right_aligned then " align=" ^ dir else "");
+    let referer = Wserver.extract_param "referer: " '\n' conf.request in
+    do if right_aligned then Wserver.wprint "<div align=%s><tr>\n" dir
+       else ();
+       if referer <> "" then
+         do Wserver.wprint "<a href=\"%s\">" referer;
+            Wserver.wprint "<img src=\"%s/%s\"%s alt=\"&lt;&lt;\">"
+              (image_prefix conf) "left.jpg" wid_hei;
+            Wserver.wprint "</a>\n";
+         return ()
+       else ();
+       Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
+       Wserver.wprint "<img src=\"%s/%s\"%s alt=\"^^\">"
+         (image_prefix conf) fname wid_hei;
        Wserver.wprint "</a>\n";
+       if right_aligned then Wserver.wprint "</div>\n" else ();
     return ()
 ;
 
