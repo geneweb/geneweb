@@ -1,86 +1,12 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.11 1998-12-18 15:44:34 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.12 1998-12-19 12:36:05 roglo Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
 
-value has_td_width_percent conf =
-  let user_agent = Wserver.extract_param "user-agent: " '.' conf.request in
-  String.lowercase user_agent <> "mozilla/1"
-;
-
-value print_someone conf base ip =
-  let p = poi base ip in
-  do afficher_personne_titre_referencee conf base p;
-     Date.afficher_dates_courtes conf base p;
-     Wserver.wprint "\n";
-  return ()
-;
-
-value rec print_both_branches conf base pl1 pl2 =
-  if pl1 = [] && pl2 = [] then ()
-  else
-    let (p1, pl1) =
-      match pl1 with
-      [ [(p1, _) :: pl1] -> (Some p1, pl1)
-      | [] -> (None, []) ]
-    in
-    let (p2, pl2) =
-      match pl2 with
-      [ [(p2, _) :: pl2] -> (Some p2, pl2)
-      | [] -> (None, []) ]
-    in
-    do tag "tr" begin
-         stag "td" "align=center" begin
-           match p1 with
-           [ Some p1 -> Wserver.wprint "|"
-           | None -> () ];
-         end;
-         stag "td" "align=center" begin
-           match p2 with
-           [ Some p2 -> Wserver.wprint "|"
-           | None -> () ];
-         end;
-         Wserver.wprint "\n";
-       end;
-       tag "tr" begin
-         tag "td" "valign=top align=center%s"
-           (if has_td_width_percent conf then " width=\"50%\"" else "")
-         begin
-           match p1 with
-           [ Some p1 -> print_someone conf base p1
-           | None -> () ];
-         end;
-         tag "td" "valign=top align=center%s"
-           (if has_td_width_percent conf then " width=\"50%\"" else "")
-         begin
-           match p2 with
-           [ Some p2 -> print_someone conf base p2
-           | None -> () ];
-         end;
-       end;
-    return print_both_branches conf base pl1 pl2
-;
-
-value rec print_one_branch conf base ipl1 =
-  if ipl1 = [] then ()
-  else
-    let (ip1, ipl1) =
-      match ipl1 with
-      [ [(ip1, _) :: ipl1] -> (Some ip1, ipl1)
-      | [] -> (None, []) ]
-    in
-    do match ip1 with
-       [ Some ip1 -> Wserver.wprint "|<br>\n"
-       | None -> () ];
-       match ip1 with
-       [ Some ip1 ->
-           do print_someone conf base ip1; Wserver.wprint "<br>\n"; return ()
-       | None -> () ];
-    return print_one_branch conf base ipl1
-;
+(* Algorithm *)
 
 type dist =
   { dmin : mutable int;
@@ -163,37 +89,6 @@ value find_first_branch base (dmin, dmax) ia =
         | None -> None ]
 ;
 
-value branch_of_sosa base ip n =
-  let rec expand bl n =
-    if Num.eq n Num.one then bl else expand [Num.even n :: bl] (Num.half n)
-  in
-  let rec loop ipl ip sp =
-    fun
-    [ [] -> Some [(ip, sp) :: ipl]
-    | [goto_fath :: nl] ->
-        match (aoi base ip).parents with
-        [ Some ifam ->
-            let cpl = coi base ifam in
-            if goto_fath then loop [(ip, sp) :: ipl] cpl.father Masculine nl
-            else loop [(ip, sp) :: ipl] cpl.mother Feminine nl
-        | _ -> None ] ]
-  in
-  loop [] ip (poi base ip).sex (expand [] n)
-;
-
-value sosa_of_branch ipl =
-  do if ipl = [] then failwith "sosa_of_branch" else (); return
-  let ipl = List.tl (List.rev ipl) in
-  List.fold_left
-    (fun b (ip, sp) ->
-       let b = Num.twice b in
-       match sp with
-       [ Masculine -> b
-       | Feminine -> Num.inc b 1
-       | Neuter -> assert False ])
-    Num.one ipl
-;
-
 value rec next_branch_same_len base dist backward missing ia sa ipl =
   if backward then
     match ipl with
@@ -264,6 +159,115 @@ value find_prev_branch base dist ia sa ipl =
     | _ -> None ]
 ;
 
+(* Printing *)
+
+value has_td_width_percent conf =
+  let user_agent = Wserver.extract_param "user-agent: " '.' conf.request in
+  String.lowercase user_agent <> "mozilla/1"
+;
+
+value has_tables conf =
+  let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
+  String.lowercase user_agent <> "lynx"
+;
+
+value print_someone conf base ip =
+  let p = poi base ip in
+  do afficher_personne_titre_referencee conf base p;
+     Date.afficher_dates_courtes conf base p;
+     Wserver.wprint "\n";
+  return ()
+;
+
+value rec print_both_branches_no_tables conf base pl1 pl2 =
+  if pl1 = [] && pl2 = [] then ()
+  else
+    let (p1, pl1) =
+      match pl1 with
+      [ [(p1, _) :: pl1] -> (Some p1, pl1)
+      | [] -> (None, []) ]
+    in
+    let (p2, pl2) =
+      match pl2 with
+      [ [(p2, _) :: pl2] -> (Some p2, pl2)
+      | [] -> (None, []) ]
+    in
+    do Wserver.wprint "<li value=1>\n";
+       match p1 with
+       [ Some p1 -> print_someone conf base p1
+       | None -> Wserver.wprint "&nbsp;\n" ];
+       tag "ol" begin
+         Wserver.wprint "<li value=2>\n";
+         match p2 with
+         [ Some p2 -> print_someone conf base p2
+         | None -> Wserver.wprint "&nbsp;\n" ];
+       end;
+    return print_both_branches_no_tables conf base pl1 pl2
+;
+
+value rec print_both_branches conf base pl1 pl2 =
+  if pl1 = [] && pl2 = [] then ()
+  else
+    let (p1, pl1) =
+      match pl1 with
+      [ [(p1, _) :: pl1] -> (Some p1, pl1)
+      | [] -> (None, []) ]
+    in
+    let (p2, pl2) =
+      match pl2 with
+      [ [(p2, _) :: pl2] -> (Some p2, pl2)
+      | [] -> (None, []) ]
+    in
+    do tag "tr" begin
+         stag "td" "align=center" begin
+           match p1 with
+           [ Some p1 -> Wserver.wprint "|"
+           | None -> () ];
+         end;
+         stag "td" "align=center" begin
+           match p2 with
+           [ Some p2 -> Wserver.wprint "|"
+           | None -> () ];
+         end;
+         Wserver.wprint "\n";
+       end;
+       tag "tr" begin
+         tag "td" "valign=top align=center%s"
+           (if has_td_width_percent conf then " width=\"50%\"" else "")
+         begin
+           match p1 with
+           [ Some p1 -> print_someone conf base p1
+           | None -> () ];
+         end;
+         tag "td" "valign=top align=center%s"
+           (if has_td_width_percent conf then " width=\"50%\"" else "")
+         begin
+           match p2 with
+           [ Some p2 -> print_someone conf base p2
+           | None -> () ];
+         end;
+       end;
+    return print_both_branches conf base pl1 pl2
+;
+
+value rec print_one_branch conf base ipl1 =
+  if ipl1 = [] then ()
+  else
+    let (ip1, ipl1) =
+      match ipl1 with
+      [ [(ip1, _) :: ipl1] -> (Some ip1, ipl1)
+      | [] -> (None, []) ]
+    in
+    do match ip1 with
+       [ Some ip1 -> Wserver.wprint "|<br>\n"
+       | None -> () ];
+       match ip1 with
+       [ Some ip1 ->
+           do print_someone conf base ip1; Wserver.wprint "<br>\n"; return ()
+       | None -> () ];
+    return print_one_branch conf base ipl1
+;
+
 value print_sign conf sign ip sp i1 i2 b1 b2 c1 c2 =
   do Wserver.wprint "<a href=\"%sm=RL;i1=%d;i2=%d" (commd conf)
        (Adef.int_of_iper i1) (Adef.int_of_iper i2);
@@ -276,8 +280,7 @@ value print_sign conf sign ip sp i1 i2 b1 b2 c1 c2 =
 ;
 
 value print_prev_next_1 conf base ip sp i1 i2 b1 b2 c1 c2 pb nb =
-  do Wserver.wprint "<br>\n";
-     match pb with
+  do match pb with
      [ Some b1 ->
          let sign = "&lt;&lt;" in
          print_sign conf sign ip sp i1 i2 b1 b2 (c1 - 1) c2
@@ -294,8 +297,7 @@ value print_prev_next_1 conf base ip sp i1 i2 b1 b2 c1 c2 pb nb =
 ;
 
 value print_prev_next_2 conf base ip sp i1 i2 b1 b2 c1 c2 pb nb =
-  do Wserver.wprint "<br>\n";
-     match pb with
+  do match pb with
      [ Some b2 ->
          let sign = "&lt;&lt;" in
          print_sign conf sign ip sp i1 i2 b1 b2 c1 (c2 - 1)
@@ -334,6 +336,102 @@ value print_other_parent_if_same conf base ip b1 b2 =
           | _ -> () ]
       | _ -> () ]
   | _ -> () ]
+;
+
+value print_relation_ok conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
+  let title _ =
+    do Wserver.wprint "%s"
+         (capitale
+            (transl_nth conf "relationship link/relationship links" 0));
+       match (pb1, nb1) with
+       [ (None, None) -> ()
+       | _ -> Wserver.wprint " %d" c1 ];
+       match (pb2, nb2) with
+       [ (None, None) -> ()
+       | _ -> Wserver.wprint " %d" c2 ];
+    return ()
+  in
+  do header_no_page_title conf title;
+     if b1 = [] || b2 = [] then
+       let b = if b1 = [] then b2 else b1 in
+       do tag "center" begin
+            print_someone conf base ip;
+            Wserver.wprint "<br>\n";
+            print_one_branch conf base b;
+          end;
+          Wserver.wprint "<br>\n";
+          if b1 <> [] then
+            print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 nb1
+          else
+            print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2 pb2 nb2;
+       return ()
+     else if not (has_tables conf) then
+       do print_someone conf base ip;
+          print_other_parent_if_same conf base ip b1 b2;
+          Wserver.wprint "<p>\n";
+          tag "ol" begin
+            print_both_branches_no_tables conf base b1 b2;
+          end;
+          if pb1 <> None || pb2 <> None || nb1 <> None || nb2 <> None then
+            do Wserver.wprint "<p>\n";
+               tag "ol" begin
+                 Wserver.wprint "<li value=1>\n";
+                 if b1 <> [] then
+                   print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2
+                     pb1 nb1
+                 else Wserver.wprint "&nbsp;\n";
+                 tag "ol" begin
+                   Wserver.wprint "<li value=2>\n";
+                   if b2 <> [] then
+                     print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2
+                       pb2 nb2
+                   else Wserver.wprint "&nbsp;\n";
+                 end;
+               end;
+            return ()
+          else ();
+       return ()
+     else
+       tag "table" "cellspacing=0 cellpadding=0 width=\"100%%\"" begin
+         do tag "tr" begin
+              stag "td" "colspan=2 align=center" begin
+                print_someone conf base ip;
+                print_other_parent_if_same conf base ip b1 b2;
+              end;
+            end;
+            tag "tr" begin
+              stag "td" "colspan=2 align=center" begin
+                Wserver.wprint "|";
+              end;
+            end;
+            tag "tr" begin
+              stag "td" "colspan=2 align=center" begin
+                Wserver.wprint "<hr size=1 noshade%s>"
+                  (if has_td_width_percent conf then " width=\"50%\""
+                   else "");
+              end;
+            end;
+            print_both_branches conf base b1 b2;
+         return ();
+         tag "tr" begin
+           if b1 <> [] then
+             tag "td" begin
+               do Wserver.wprint "<br>\n"; return
+               print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2
+                 pb1 nb1;
+             end
+           else ();
+           if b2 <> [] then
+             tag "td" begin
+               do Wserver.wprint "<br>\n"; return
+               print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2
+                 pb2 nb2;
+             end
+           else ();
+         end;
+       end;
+     trailer conf;
+  return ()
 ;
 
 value print_relation conf base ip1 ip2 =
@@ -389,70 +487,7 @@ value print_relation conf base ip1 ip2 =
       let nb2 =
         if c2 == 0 then None else find_next_branch base dist ip sp b2
       in
-      let title _ =
-        do Wserver.wprint "%s"
-             (capitale
-                (transl_nth conf "relationship link/relationship links" 0));
-           match (pb1, nb1) with
-           [ (None, None) -> ()
-           | _ -> Wserver.wprint " %d" c1 ];
-           match (pb2, nb2) with
-           [ (None, None) -> ()
-           | _ -> Wserver.wprint " %d" c2 ];
-        return ()
-      in
-      do header_no_page_title conf title;
-         if b1 = [] || b2 = [] then
-           let b = if b1 = [] then b2 else b1 in
-           do tag "center" begin
-                print_someone conf base ip;
-                Wserver.wprint "<br>\n";
-                print_one_branch conf base b;
-              end;
-              if b1 <> [] then
-                print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 nb1
-              else
-                print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2 pb2 nb2;
-           return ()
-         else
-           tag "table" "cellspacing=0 cellpadding=0 width=\"100%%\"" begin
-             do tag "tr" begin
-                  stag "td" "colspan=2 align=center" begin
-                    print_someone conf base ip;
-                    print_other_parent_if_same conf base ip b1 b2;
-                  end;
-                end;
-                tag "tr" begin
-                  stag "td" "colspan=2 align=center" begin
-                    Wserver.wprint "|";
-                  end;
-                end;
-                tag "tr" begin
-                  stag "td" "colspan=2 align=center" begin
-                    Wserver.wprint "<hr size=1 noshade%s>"
-                      (if has_td_width_percent conf then " width=\"50%\""
-                       else "");
-                  end;
-                end;
-                print_both_branches conf base b1 b2;
-             return ();
-             tag "tr" begin
-               if b1 <> [] then
-                 tag "td" begin
-                   print_prev_next_1 conf base ip sp ip1 ip2 b1 b2 c1 c2
-                     pb1 nb1;
-                 end
-               else ();
-               if b2 <> [] then
-                 tag "td" begin
-                   print_prev_next_2 conf base ip sp ip1 ip2 b1 b2 c1 c2
-                     pb2 nb2;
-                 end
-               else ();
-             end;
-           end;
-         trailer conf;
-      return ()
+      print_relation_ok conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2
   | _ ->
       let title _ = Wserver.wprint "Param&egrave;tres erron&eacute;s" in
       do header conf title;

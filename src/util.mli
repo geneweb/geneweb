@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 1.8 1998-12-16 06:05:07 ddr Exp $ *)
+(* $Id: util.mli,v 1.9 1998-12-19 12:36:11 roglo Exp $ *)
 
 open Def;
 open Config;
@@ -87,3 +87,6 @@ value get_server_string : config -> string;
 value get_request_string : config -> string;
 
 value create_topological_sort : config -> base -> array int;
+
+value branch_of_sosa : base -> iper -> Num.t -> option (list (iper * sex));
+value sosa_of_branch : list (iper * sex) -> Num.t;
