@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.16 1999-07-22 14:34:04 ddr Exp $ *)
+(* $Id: descend.ml,v 2.17 1999-07-22 22:30:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -125,19 +125,16 @@ value print_choice conf base p niveau_effectif =
   end
 ;
 
+value descendants_title conf base p h =
+  let txt_fun = if h then gen_person_text_no_html else gen_person_text in
+  Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
+    (transl_decline conf "of (same or greater generation level)"
+       (txt_fun raw_access conf base p))
+;
+
 value afficher_menu_descendants conf base p =
   let niveau_effectif = min limit_desc (level_max base p) in
-  let title h =
-    if h then
-      Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
-        (transl_decline conf "of (same or greater generation level)"
-        (person_text_no_html conf base p))
-    else
-      Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
-        (transl_decline conf "of (same or greater generation level)"
-        (person_text conf base p))
-  in
-  do header conf title;
+  do header conf (descendants_title conf base p);
      print_choice conf base p niveau_effectif;
      trailer conf;
   return ()
@@ -265,17 +262,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
       ()
     else ()
   in
-  let title h =
-    if h then
-      Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
-        (transl_decline conf "of (same or greater generation level)"
-        (person_text_no_html conf base p))
-    else
-      Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
-        (transl_decline conf "of (same or greater generation level)"
-        (person_text conf base p))
-  in
-  do header conf title;
+  do header conf (descendants_title conf base p);
 (**)
      if niveau_max > 6 then enter_nobr () else ();
 (**)
@@ -323,16 +310,6 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
            list (Array.to_list enfants))
       list (Array.to_list p.family)
   in
-  let title h =
-    if h then
-      Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
-        (transl_decline conf "of (same or greater generation level)"
-        (person_text_no_html conf base ancetre))
-    else
-      Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
-        (transl_decline conf "of (same or greater generation level)"
-        (person_text conf base ancetre))
-  in
   let len = ref 0 in
   let liste = get_level 1 ancetre [] in
   let liste =
@@ -356,7 +333,7 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
          | _ -> do incr len; return [(p, 1) :: pl] ])
       [] liste
   in
-  do header conf title;
+  do header conf (descendants_title conf base ancetre);
      Wserver.wprint "%s" (capitale (text_level conf niveau_max));
      if len.val > 1 then
        Wserver.wprint " (%d %s)" len.val (transl_nth conf "person/persons" 1)
@@ -681,10 +658,7 @@ value print_families conf base marks paths max_lev =
 value afficher_descendants_numerotation conf base niveau_max ancetre =
   let niveau_max = min limit_desc niveau_max in
   let title h =
-    if h then
-      Wserver.wprint "%s %s" (capitale (transl conf "descendants"))
-        (transl_decline conf "of (same or greater generation level)"
-        (person_text_no_html conf base ancetre))
+    if h then descendants_title conf base ancetre h
     else
       wprint_geneweb_link conf
         ("m=D;i=" ^ string_of_int (Adef.int_of_iper ancetre.cle_index) ^
