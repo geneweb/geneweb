@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.15 2000-04-11 12:32:08 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.16 2000-11-10 21:13:53 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -429,22 +429,28 @@ value other_parent_text_if_same conf base info =
                 Date.short_marriage_date_text conf base (foi base ifam1)
                   (poi base cpl1.father) (poi base cpl1.mother)
               in
-              "&amp;" ^ d ^ " " ^ someone_text conf base ip
-          | _ -> "" ]
-      | _ -> "" ]
-  | _ -> "" ]
+              Some ("&amp;" ^ d ^ " " ^ someone_text conf base ip, ip)
+          | _ -> None ]
+      | _ -> None ]
+  | _ -> None ]
 ;
 
 value print_other_parent_if_same conf base info =
-  Wserver.wprint "%s" (other_parent_text_if_same conf base info)
+  match other_parent_text_if_same conf base info with
+  [ Some (s, ip) ->
+      do Wserver.wprint "%s" s;
+         Dag.print_image conf base (poi base ip);
+      return ()
+  | None -> () ]
 ;
 
 value print_with_pre conf base info =
   let sz = 79 in
   tag "pre" begin
     print_pre_center sz (someone_text conf base info.ip);
-    let s = other_parent_text_if_same conf base info in
-    if s <> "" then print_pre_center sz s else ();
+    match other_parent_text_if_same conf base info with
+    [ Some (s, ip) -> print_pre_center sz s
+    | None -> () ];
     print_pre_center sz "|";
     print_pre_center sz (String.make (sz / 2) '_');
     print_both_branches_pre conf base info sz info.b1 info.b2;
