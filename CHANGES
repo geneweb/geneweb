@@ -12,6 +12,7 @@ GeneWeb Version 1.07
   - fixed bug, missing persons when displaying close names
   - used flags for languages selection instead of tables
   - better displaying of dates for the miscellaneous languages
+  - display birthdays of persons with death "don't know" (but without age)
 
 * ged2gwb:
   - does not stop any more when bad GEDCOM line found => warning and goes on.
