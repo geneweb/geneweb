@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.4 1999-11-02 10:28:33 ddr Exp $
+# $Id: lexicon.txt,v 3.5 1999-11-02 12:36:42 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2179,7 +2179,7 @@ de: Chronik der Aktualisierungen
 dk: opdateringers historie
 en: history of updates
 eo: historio de la gxisdatigoj
-es: historia de actualizaciones
+es: historia de las actualizaciones
 fr: historique des mises-&agrave;-jour
 is: uppfærslusaga
 it: storia degli aggiornamenti
