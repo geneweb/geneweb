@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.29 2002-04-22 16:06:17 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.30 2002-04-22 17:14:43 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -25,7 +25,7 @@ no: Genealogi
 pl: Genealogia
 pt: Genealogia
 ru: Genealogy
-sl: Genealogija - Drevo ¾ivljenja
+sl: Genealogija - Dru¾insko drevo
 sv: Genealogi
 ] - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
