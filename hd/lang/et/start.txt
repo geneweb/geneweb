@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.2 2001-02-16 05:36:49 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.3 2001-02-28 18:02:49 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealoogia - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -66,7 +66,7 @@ isiku kohta.%In<br>
 
 <tr><td>
 <center><table border=0 cellspacing=0 cellpadding=0><tr><td>
-Andmebaasis navigeerimiseks võid kasutada otsingut:<br><p>
+Navigeeri andmebaasis:<br><p>
 
 <ul>
 
@@ -145,18 +145,18 @@ päring</b></font></a>.
 </td></tr></table></center>
 
 %Iw<p>
-<center>Võid ka<br><p>
+<center>Täiendamine:<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
-%Ispropose_add_family;<li><a href="%sm=ADD_FAM">lisada pere</a>
+%Ispropose_add_family;<li><a href="%sm=ADD_FAM">lisa pere</a>
 %INl</ul>
 </td>
 <td align=left>
 <ul>%E
-%E<li><a href="%sm=MOD_NOTES">muuta märkusi andmebaasi kohta</a>
+%E<li><a href="%sm=MOD_NOTES">muuda märkusi andmebaasi kohta</a>
 </ul>
 </td>
 </tr>
@@ -165,7 +165,7 @@ päring</b></font></a>.
 
 %E<br><p>
 
-<center>Vaata lisaks<br><p>
+<center>Vaata lisaks:<br><p>
 
 <table border=0>
 <tr>
@@ -190,7 +190,7 @@ päring</b></font></a>.
 
 <p>
 
-Alates andmebaasi loomisest %d on selle poole pöördutud %q korda, 
+Alates andmebaasi loomise päevast (%d) on selle poole pöördutud %q korda, 
 neist %c korda sellele lehele.
 %Il<p>%E
 
@@ -198,6 +198,7 @@ neist %c korda sellele lehele.
 
 Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt 
 (pead andma käsu "lae käesolev dokument uuesti"), siis  proovi alustada
+navigeerimist
 <a href="%sescache=0">sellest viitest</a>.
 
 </td></tr>
