@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.13 2001-11-23 13:13:11 ddr Exp $ *)
+(* $Id: setup.ml,v 4.14 2002-01-10 14:53:27 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1462,13 +1462,13 @@ value daemon = ref False;
 value usage = "Usage: " ^ Sys.argv.(0) ^ " [options] where options are:";
 value speclist =
   [("-lang", Arg.String (fun x -> lang_param.val := x),
-    "<string> default lang");
-   ("-daemon", Arg.Set daemon, "Unix daemon mode.");
+    "<string>: default lang");
+   ("-daemon", Arg.Set daemon, ": Unix daemon mode.");
    ("-p", Arg.Int (fun x -> port.val := x),
-    "<number>\n       Select a port number (default = " ^
+    "<number>:\n       Select a port number (default = " ^
       string_of_int port.val ^ "); > 1024 for normal users.");
    ("-gd", Arg.String (fun x -> setup_dir.val := x),
-    "<string> gwsetup directory") ::
+    "<string>: gwsetup directory") ::
    ifdef SYS_COMMAND then
      [("-wserver", Arg.String (fun _ -> ()), " (internal feature)")]
    else []]
