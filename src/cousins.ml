@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.1 2001-04-22 14:37:59 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.2 2001-09-29 12:47:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -15,27 +15,23 @@ value max_cnt = 2000;
 value niveau_max_ascendance base ip =
   let x = ref 0 in
   let mark = Array.create base.data.persons.len False in
-  do {
-    let rec loop niveau ip =
-      if mark.(Adef.int_of_iper ip) then ()
-      else do {
-        mark.(Adef.int_of_iper ip) := True;
-        x.val := max x.val niveau;
-        if x.val = max_lev then ()
-        else
-          match (aoi base ip).parents with
-          [ Some ifam ->
-              let cpl = coi base ifam in
-              do {
-                loop (succ niveau) cpl.father;
-                loop (succ niveau) cpl.mother;
-              }
-          | _ -> () ]
-      }
-    in
-    loop 0 ip;
-    x.val
-  }
+  let rec loop niveau ip =
+    if mark.(Adef.int_of_iper ip) then ()
+    else do {
+      mark.(Adef.int_of_iper ip) := True;
+      x.val := max x.val niveau;
+      if x.val = max_lev then ()
+      else
+        match (aoi base ip).parents with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            do {
+              loop (succ niveau) cpl.father; loop (succ niveau) cpl.mother
+            }
+        | _ -> () ]
+    }
+  in
+  do { loop 0 ip; x.val }
 ;
 
 value brother_label conf x =
@@ -58,12 +54,14 @@ value rec except x =
 value children_of base u =
   List.fold_right
     (fun ifam list ->
-       let des = doi base ifam in Array.to_list des.children @ list)
+       let des = doi base ifam in
+       Array.to_list des.children @ list)
     (Array.to_list u.family) []
 ;
 
 value siblings_by base iparent ip =
-  let list = children_of base (uoi base iparent) in except ip list
+  let list = children_of base (uoi base iparent) in
+  except ip list
 ;
 
 value merge_siblings l1 l2 =
@@ -145,7 +143,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
   do {
     Wserver.wprint "%s"
       (gen_person_title_text reference std_access conf base p2);
-    Date.afficher_dates_courtes conf base p2;
+    Date.afficher_dates_courtes conf base p2
   }
 ;
 
@@ -158,12 +156,12 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
          let u = uoi base ip in
          let br = List.rev [(ip, p.sex) :: rev_br] in
          let is_valid_rel = br_inter_is_empty ini_br br in
-         if is_valid_rel && cnt.val < max_cnt && has_desc_lev base lev u then
-            do {
+         if is_valid_rel && cnt.val < max_cnt && has_desc_lev base lev u
+         then do {
            if lev <= 2 then do {
              html_li conf;
              if lev = 1 then do {
-               give_access conf base ia_asex ini_p ini_br p br; incr cnt;
+               give_access conf base ia_asex ini_p ini_br p br; incr cnt
              }
              else do {
                let s =
@@ -173,9 +171,9 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                    (person_title_text conf base p)
                in
                Wserver.wprint "%s" (capitale s);
-               Wserver.wprint ":";
+               Wserver.wprint ":"
              };
-             Wserver.wprint "\n";
+             Wserver.wprint "\n"
            }
            else ();
            let children =
@@ -184,11 +182,11 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
                (children_of base u)
            in
            print_descend_upto conf base max_cnt ini_p ini_br (lev - 1)
-             children;
+             children
          }
          else ())
       children;
-    if lev <= 2 then Wserver.wprint "</ul>\n" else ();
+    if lev <= 2 then Wserver.wprint "</ul>\n" else ()
   }
   else ()
 ;
@@ -205,7 +203,7 @@ value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
       Wserver.wprint "%s:\n"
         (capitale
            (cftransl conf "on %s's side"
-              [gen_person_title_text no_reference raw_access conf base a]));
+              [gen_person_title_text no_reference raw_access conf base a]))
     }
     else ();
     let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
@@ -241,7 +239,7 @@ value print_cousins_lev conf base max_cnt p lev1 lev2 =
     else do {
       html_li conf; Wserver.wprint "%s\n" (capitale (transl conf "no match"))
     };
-    if lev1 > 1 then Wserver.wprint "</ul>\n" else ();
+    if lev1 > 1 then Wserver.wprint "</ul>\n" else ()
   }
 ;
 
@@ -285,7 +283,7 @@ value print_cousins conf base p lev1 lev2 =
       Wserver.wprint "%s: %d %s.\n" (capitale (transl conf "total")) cnt.val
         (nominative (transl_nth_def conf "person/persons" 2 1))
     else ();
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -310,7 +308,7 @@ value print_menu conf base p effective_level =
       if has_nephews_or_nieces base p then do {
         html_li conf;
         Wserver.wprint "<a href=\"%s%s;m=C;v1=1;v2=2\">%s</a>\n" (commd conf)
-          (acces conf base p) (capitale (transl conf "nephews and nieces"));
+          (acces conf base p) (capitale (transl conf "nephews and nieces"))
       }
       else ();
     end;
@@ -323,10 +321,10 @@ value print_menu conf base p effective_level =
             Wserver.wprint "<a href=\"%s%s;m=C;t=AN" (commd conf)
               (acces conf base p);
             Wserver.wprint "\">%s</a>\n" (capitale (transl conf "birthdays"));
-          end;
+          end
         }
     | _ -> () ];
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -342,7 +340,11 @@ value print_anniv conf base p level =
   let module S = Map.Make (struct type t = iper; value compare = compare; end)
   in
   let s_mem x m =
-    try let _ = S.find x m in True with [ Not_found -> False ]
+    try
+      let _ = S.find x m in
+      True
+    with
+    [ Not_found -> False ]
   in
   let rec insert_desc set up_sosa down_br n ip =
     if s_mem ip set then set
@@ -375,8 +377,7 @@ value print_anniv conf base p level =
         (struct
            type t = (iper * int * int);
            value leq (_, lev1, _) (_, lev2, _) = lev1 <= lev2;
-         end
-         )
+         end)
     in
     let a = P.add (p.cle_index, 0, 1) P.empty in
     let rec loop set a =
@@ -442,7 +443,7 @@ value print_anniv conf base p level =
       Wserver.wprint "<input type=hidden name=m value=C>\n";
       Wserver.wprint "<input type=hidden name=i value=%d>\n"
         (Adef.int_of_iper p.cle_index);
-      Wserver.wprint "<input type=hidden name=t value=AN>\n";
+      Wserver.wprint "<input type=hidden name=t value=AN>\n"
     }
   in
   match p_getint conf.env "v" with
