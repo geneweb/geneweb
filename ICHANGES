@@ -9,6 +9,9 @@ GeneWeb Version 4.08
     ocamlopt.
 
 * GeneWeb server or CGI (gwd)
+  - [09 Dec 02] Added code in some.ml in order that, in the display by
+    surname, the order is by birth date if "order=d" is added in the URL
+    (code by Ludovic Ledieu).
   - [28 Nov 02] Fixed bug in displaying relationship by marriage: in
     the text "are at the same time case1 case2" the "case2" where
     sometimes false (problems of declinations, in particular).
