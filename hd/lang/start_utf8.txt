@@ -1,7 +1,7 @@
 %T
 <html>
 <head>
-  <!-- $Id: start_utf8.txt,v 1.8 2005-03-03 12:29:05 ddr Exp $ -->
+  <!-- $Id: start_utf8.txt,v 1.9 2005-03-04 10:16:19 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -91,6 +91,7 @@ zh: 网络家谱
 
 <span style="font-size: 80%%"><em>[
 af: Taalvoorkeur/Language preference:
+ar: بإمكانك إختيار لغة أخرى من بين اللغات التالية:
 bg: Можете да изберете друг език за съобщения измежду следните:
 br: Dibab a c'hellit ur yezh all etre ar re-mañ:
 ca: Podeu seleccionar una altre llengua, hi ha disponibles les seg&uuml;ents:
@@ -309,7 +310,7 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
 <table border="0" cellspacing="0" cellpadding="0"><tr><td align="%L">
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
-ar: بإمكانك البحث في هذه القاعدة
+ar: بإمكانك البحث في هذه القاعدة:
 bg: Можете да използвате тази база от данни за търсене:
 br: Evit merdeiñ er bon roadoù-mañ e c'hellit klask:
 ca: Per navegar en aquesta base, podeu fer la vostra recerca:

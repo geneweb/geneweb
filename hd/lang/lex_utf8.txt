@@ -1,8 +1,9 @@
-# $Id: lex_utf8.txt,v 1.12 2005-03-03 12:29:05 ddr Exp $
+# $Id: lex_utf8.txt,v 1.13 2005-03-04 10:16:19 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
 af: yymmdd
+ar: ddmmyy
 bg: ddmmyy
 br: ddmmyy
 ca: ddmmyy
@@ -388,6 +389,7 @@ sv: %ts kön stämmer inte överens med sina relationer
 
     (date)
 af: 1 %m %y/%d %m %y/%m %y/%y
+ar: 1 %m %y/%d %m %y/%m %y/%y
 bg: 1 %m %y/%d %m %y/%m %y/%y
 br: 1añ %m %y/%d %m %y/%m %y/%y
 ca: 1 d[e']%m de %y/%d d[e']%m de %y/%m de %y/%y
@@ -493,6 +495,7 @@ sv: tishri/heshvan/kislev/tevet/shevat/adar I/adar II/nisan/iyyar/sivan/tammuz/a
 
     (month)
 af: Januarie/Februarie/Maart/April/Mei/Junie/Julie/Augustus/September/Oktober/November/Desember
+ar: جانفي/فيفري/مارس/أفريل/ماي/جوان/جويلية/أوت/سبتمبر/أكتوبر/نوفمبر/ديسمبر
 bg: януари/февруари/март/април/май/юни/юли/август/септември/октомври/ноември/декември
 br: genver/c'hwevrer/meurzh/ebrel/mae/mezheven/gouere/eost/gwengolo/here/du/kerzu
 ca: gener/febrer/març/abril/maig/juny/juliol/agost/setembre/octubre/novembre/desembre
