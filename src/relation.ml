@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.19 1999-12-14 18:47:27 ddr Exp $ *)
+(* $Id: relation.ml,v 3.20 1999-12-15 19:58:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -713,10 +713,12 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
            (nephew_in_law_label conf p1.sex, sp1, False)
          else (nephew_label conf (x1 - x2) p1, sp1, sp2)
        else if x1 < x2 then
-         (nominative (brother_label conf x1 p1.sex) ^ " " ^
-            transl_decline conf "of (same or greater generation level)"
-              (ancestor_label conf (x2 - x1) Neuter),
-          sp1, sp2)
+         let s =
+           transl_decline2 conf "%1 of (same or greater generation level) %2"
+             (brother_label conf x1 p1.sex)
+             (ancestor_label conf (x2 - x1) Neuter)
+         in
+         (s, sp1, sp2)
        else
          (descendant_label conf (x1 - x2) p1 ^ " " ^
             transl_decline conf "of (same or greater generation level)"
@@ -725,29 +727,25 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
      in
      let s =
        if sp1 then
-         transl_nth conf "the spouse" (index_of_sex p1.sex) ^ " " ^
-           transl_decline conf "of (same or greater generation level)" s
+         transl_decline2 conf "%1 of (same or greater generation level) %2"
+           (transl_nth conf "the spouse" (index_of_sex p1.sex)) s
        else s
      in
      let s =
        if sp2 then
-         s ^ " " ^
-           transl_decline conf "of (same or greater generation level)"
-             (transl_nth conf "the spouse" (1 - index_of_sex p2.sex))
+         transl_decline2 conf "%1 of (same or greater generation level) %2"
+           s (transl_nth conf "the spouse" (1 - index_of_sex p2.sex))
        else s
      in
-     stag "strong" begin
-       Wserver.wprint "%s" (std_color s);
-     end;
-     Wserver.wprint "\n";
-     let s = gen_person_text_without_title raw_access conf base p2 in
+     let s1 = "<strong>" ^ std_color s ^ "</strong>" in     
+     let s2 = gen_person_title_text raw_access conf base p2 in
      let s =
-       if x1 < x2 then transl_decline conf "of" s
-       else transl_decline conf "of (same or greater generation level)" s
+       if x1 < x2 then transl_decline2 conf "%1 of %2" s1 s2
+       else
+         transl_decline2 conf "%1 of (same or greater generation level) %2"
+           s1 s2
      in
-     Wserver.wprint "%s" s;
-     afficher_titre conf base p2;
-     Wserver.wprint ".\n";
+     Wserver.wprint "%s.\n" (nominative s);
   return ()
 ;
 
