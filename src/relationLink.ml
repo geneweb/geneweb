@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.3 1998-12-02 15:46:36 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.4 1998-12-05 13:29:50 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -107,13 +107,13 @@ module Pq =
 
 value phony_dist_tab = (fun _ -> 0, fun _ -> infinity);
 
-value make_dist_tab base ia maxlev =
+value make_dist_tab conf base ia maxlev =
   if maxlev <= threshold.val then
     (fun _ -> 0, fun _ -> infinity)
   else
     let _ = base.ascends.array () in
     let _ = base.couples.array () in
-    let id = Consang.topological_sort base in
+    let id = Util.create_topological_sort conf base in
     let default = {dmin = infinity; dmax = 0; mark = False} in
     let dist = Array.create base.persons.len default in
     do leq.val := fun x y -> id.(x) > id.(y); return
@@ -336,7 +336,7 @@ value print_relation conf base ip1 ip2 =
     match (po, p_getint conf.env "l1", p_getint conf.env "l2") with
     [ (Some p, Some l1, Some l2) ->
         let ip = p.cle_index in        
-        let dist = make_dist_tab base ip (max l1 l2 + 1) in
+        let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
         let b1 = find_first_branch base dist ip l1 ip1 Neutre in
         let b2 = find_first_branch base dist ip l2 ip2 Neutre in
         Some (ip, (poi base ip).sexe, dist, b1, b2, 1, 1)
@@ -361,7 +361,7 @@ value print_relation conf base ip1 ip2 =
                   let dist =
                     if c1 > 0 || c2 > 0 then
                       let maxlev = max (List.length b1) (List.length b2) + 1 in
-                      make_dist_tab base ia1 maxlev
+                      make_dist_tab conf base ia1 maxlev
                     else phony_dist_tab
                   in
                   Some (ia1, sa1, dist, Some b1, Some b2, c1, c2)

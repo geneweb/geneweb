@@ -1,6 +1,8 @@
-(* $Id: gutil.mli,v 1.4 1998-11-29 13:40:44 ddr Exp $ *)
+(* $Id: gutil.mli,v 1.5 1998-12-05 13:29:45 ddr Exp $ *)
 
 open Def;
+
+value version : string;
 
 value poi : base -> iper -> base_person;
 value aoi : base -> iper -> base_ascend;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: relation.ml,v 1.8 1998-12-05 12:01:33 ddr Exp $ *)
+(* $Id: relation.ml,v 1.9 1998-12-05 13:29:49 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -306,7 +306,7 @@ value print_main_relationship conf base p1 p2 =
   else
     let _ = base.ascends.array () in
     let _ = base.couples.array () in
-    let tstab = topological_sort conf base in
+    let tstab = Util.create_topological_sort conf base in
     let tab = Consang.make_relationship_table base tstab in
     let (relationship, ancestors) =
       Consang.relationship_and_links base tab True p1.cle_index p2.cle_index

@@ -5,6 +5,8 @@ GeneWeb Version 1.09
 --------------------
 
 * gwc:
+  - Added lazy building of topological sort file inside bases (accelerate
+    Sosa number computing in personal pages and relationship links).
   - Send error and warning messages on stdout, instead of stderr.
   - Delete non printable characters (e.g. newlines) in strings (first names,
     etc.) coming from forms.

@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.10 1998-11-28 13:28:46 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.11 1998-12-05 13:29:45 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -713,7 +713,7 @@ value comp_familles x =
        return ()
      with e ->
        do close_out oc;
-          try Sys.remove out_file with _ -> ();
+          try Sys.remove out_file with [ Sys_error _ -> () ];
        return raise e;
      close_out oc;
   return ()

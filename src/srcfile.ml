@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.6 1998-11-30 20:52:54 ddr Exp $ *)
+(* $Id: srcfile.ml,v 1.7 1998-12-05 13:29:50 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -186,7 +186,7 @@ value rec copy_from_channel conf base ic =
                      conf.henv;
                 return ()
             | 't' -> Wserver.wprint "%s" conf.bname
-            | 'v' -> Wserver.wprint "%s" Util.version
+            | 'v' -> Wserver.wprint "%s" Gutil.version
             | 'w' -> if not conf.wizard then echo.val := False else ()
             | 'x' ->
                 if not (conf.wizard || conf.friend) then echo.val := False

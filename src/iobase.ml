@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 1.8 1998-12-01 23:03:46 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.9 1998-12-05 13:29:47 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -70,6 +70,8 @@ value magic_gwb = "GnWb001r";
        is written and rewritten. It holds a record of type "patches", composed
        of association lists "index" - "new value".
 *)
+
+value remove_file f = try Sys.remove f with [ Sys_error _ -> () ];
 
 value output_value_header_size = 20;
 value output_value_no_sharing oc v =
@@ -509,7 +511,7 @@ value input bname =
   in
   let commit_patches () =
     let fname = Filename.concat bname "patches" in
-    do try Sys.remove (fname ^ "~") with _ -> ();
+    do try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
        try Sys.rename fname (fname ^ "~") with _ -> ();
     return
     let oc9 = open_out_bin fname in
@@ -812,27 +814,24 @@ do Printf.eprintf "*** create first name index\n"; flush stderr; return
        return ();
 do Printf.eprintf "*** ok\n"; flush stderr; return
        close_out oc2;
-       try Sys.remove (Filename.concat bname "base") with _ -> ();
+       remove_file (Filename.concat bname "base");
        Sys.rename tmp_fname (Filename.concat bname "base");
-       try Sys.remove (Filename.concat bname "base.acc") with _ -> ();
+       remove_file (Filename.concat bname "base.acc");
        Sys.rename tmp_fname_acc (Filename.concat bname "base.acc");
-       try Sys.remove (Filename.concat bname "names.inx") with _ -> ();
+       remove_file (Filename.concat bname "names.inx");
        Sys.rename tmp_fname_inx (Filename.concat bname "names.inx");
-       try Sys.remove (Filename.concat bname "strings.inx") with _ -> ();
+       remove_file (Filename.concat bname "strings.inx");
        Sys.rename tmp_fname_gw2 (Filename.concat bname "strings.inx");
-       try Sys.remove (Filename.concat bname "patches") with _ -> ();
+       remove_file (Filename.concat bname "patches");
     return ()
   with e ->
     do try close_out oc with _ -> ();
        try close_out oc_acc with _ -> ();
        try close_out oc_inx with _ -> ();
        try close_out oc2 with _ -> ();
-       try
-         do Sys.remove tmp_fname;
-            Sys.remove tmp_fname_acc;
-            Sys.remove tmp_fname_inx;
-            Sys.remove tmp_fname_gw2;
-         return ()
-       with _ -> ();
+       remove_file tmp_fname;
+       remove_file tmp_fname_acc;
+       remove_file tmp_fname_inx;
+       remove_file tmp_fname_gw2;
     return raise e
 ;
