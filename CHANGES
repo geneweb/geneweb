@@ -18,6 +18,9 @@ GeneWeb version 4.04
     completely checked ("31th of September" was accepted, for example).
 
 * GeneWeb data bases Transfer Program (gwtp)
+  - [27 Oct 01] In the executable "ged2gwb" is installed in the
+    directory corresponding to the option -etc of gwtp, the users can
+    upload gedcom files to update their data bases.
   - [06 Sep 01] Separated the option -tmp into -log (for the log),
     -etc (for passwd, default.gwf and lang directories) and -tmp (the
     rest). Code written by Christian Perrier.
