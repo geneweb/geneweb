@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.50 2002-10-31 14:48:36 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.51 2002-12-01 11:59:01 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -1474,11 +1474,6 @@ value make_cnt_dir x =
   }
 ;
 
-value available_languages =
-  ["cn"; "cs"; "de"; "dk"; "en"; "es"; "eo"; "fr"; "he"; "it"; "nl"; "no";
-   "pt"; "se"]
-;
-
 value main () =
   do {
     ifdef WIN95 then do {
@@ -1568,12 +1563,12 @@ s)"); ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x), "\
     ifdef UNIX then
       default_lang.val :=
         let s = try Sys.getenv "LANG" with [ Not_found -> "" ] in
-        if List.mem s available_languages then s
+        if List.mem s Version.available_languages then s
         else
           let s = try Sys.getenv "LC_CTYPE" with [ Not_found -> "" ] in
           if String.length s >= 2 then
             let s = String.sub s 0 2 in
-            if List.mem s available_languages then s else "en"
+            if List.mem s Version.available_languages then s else "en"
           else "en"
     else ();
     arg_parse_in_file (chop_extension Sys.argv.(0) ^ ".arg") speclist anonfun
