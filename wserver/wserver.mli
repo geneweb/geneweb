@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 4.6 2002-02-24 12:43:42 ddr Exp $ *)
+(* $Id: wserver.mli,v 4.7 2002-03-05 16:16:26 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -20,7 +20,7 @@ value f :
        If [maxc] is [Some n], maximum [n] clients can be treated at the
        same time; [None] means no limit. See the example below. *)
 
-value wprint : format 'a Buffer.t unit -> 'a;
+value wprint : format 'a out_channel unit -> 'a;
     (* To be called to print page contents. *)
 
 value wflush : unit -> unit;
@@ -53,31 +53,6 @@ value get_request_and_content : Stream.t char -> (list string * string);
 value sock_in : ref string;
 value sock_out : ref string;
 value noproc : ref bool;
-
-value bufferize : ref bool;
-    (* Bufferize the wprints; write done only when wflush is called *)
-value buffer_contents : unit -> string;
-    (* Return the buffer contents and clear it *)
-value keep_alive_condition : list string -> bool;
-    (* This function is a hack added because of a problem in clients
-       which seem to fail when there is a disconnection from the server
-       even if the answer header contains the "connection: close".
-         The problem seems to happen for the requests sent by some clients
-       (Web navigators) with the method POST. After the answer, the client
-       sends two more bytes probably to say "OK, you don't want any more
-       requests" (I have not checked the HTTP manual). Some clients under
-       Windows fail when the server (me) does not read these two extra
-       bytes.
-         In this situation, the client must know the end of the answer. For
-       that, the server must give the size of the sent HTML in its header.
-       In HTTP/1.1, it may be possible to make it work using the [chunked]
-       transfer encoding which has also its way to specify the end of the
-       answer: this may be implemented one day in the present library module.
-         Call [keep_alive_condition request] to see if the request is in
-       this case, and if yes, bufferize your HTML output and mandatorily
-       send the content-length field in the header. You can use the above
-       variable [bufferize] and function [buffer_contents] for this
-       bufferization. *)
 
 (* Example:
 

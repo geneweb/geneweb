@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.38 2002-03-04 18:01:34 ddr Exp $ *)
+(* $Id: util.ml,v 4.39 2002-03-05 16:16:25 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -303,14 +303,8 @@ value html conf =
     Wserver.wprint "Content-type: text/html; charset=%s" charset; nl ();
     match conf.set_cookie with
     [ Some (k, v) ->
-        let path =
-          if conf.cgi then
-            try Sys.getenv "SCRIPT_URL" with
-            [ Not_found -> "/" ]
-          else "/"
-        in
         do {
-          Wserver.wprint "Set-cookie: %s=%s; path=%s" k v path;
+          Wserver.wprint "Set-cookie: %s=%s" k v;
           nl ()
         }
     | None -> () ];
@@ -318,11 +312,10 @@ value html conf =
 ;
 
 value html1 conf =
-  if conf.cgi || not (Wserver.keep_alive_condition conf.request) then do {
+  do {
     html conf;
     nl ();
   }
-  else Wserver.bufferize.val := True
 ;
 
 value unauthorized conf auth_type =
