@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.5 2001-11-23 12:24:16 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.6 2001-11-23 13:13:13 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -128,12 +128,11 @@ value nl () =
   }
 ;
 
-value html charset =
-  let charset = if charset = "" then "iso-8859-1" else charset in
+value http answer =
+  let answer = if answer = "" then "200 OK" else answer in
   do {
-    wprint "HTTP/1.0 200 OK"; nl ();
+    wprint "HTTP/1.0 %s" answer; nl ();
     wprint "Connection: close"; nl ();
-    wprint "Content-type: text/html; charset=%s" charset; nl (); nl ();
   }
 ;
 
@@ -249,7 +248,8 @@ ifdef UNIX then
 value timeout tmout spid _ =
   do {
     Unix.kill spid Sys.sigkill;
-    html "";
+    http "";
+    wprint "Content-type: text/html; charset=iso-8859-1"; nl (); nl ();
     wprint "<head><title>Time out</title></head>\n";
     wprint "<body><h1>Time out</h1>\n";
     wprint "Computation time > %d second(s)\n" tmout;
@@ -326,8 +326,7 @@ value treat_connection tmout callback addr ic =
       (request, script_name, contents)
     in
     if script_name = "robots.txt" then do {
-      wprint "HTTP/1.0 200 OK"; nl ();
-      wprint "Connection: close"; nl ();
+      http "";
       wprint "Content-type: text/plain"; nl (); nl ();
       wprint "User-Agent: *"; nl ();
       wprint "Disallow: /"; nl ();

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.14 2001-11-22 19:06:18 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.15 2001-11-23 13:13:11 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -133,6 +133,13 @@ value copy_file fname =
   | None -> () ]
 ;
 
+value http answer =
+  do {
+    Wserver.http answer;
+    Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
+  }
+;
+
 value refuse_log from cgi =
   let oc = open_out_gen log_flags 0o644 "refuse_log" in
   do {
@@ -140,11 +147,7 @@ value refuse_log from cgi =
     fprintf_date oc tm;
     Printf.fprintf oc " excluded: %s\n" from;
     close_out oc;
-    if not cgi then do {
-      Wserver.wprint "HTTP/1.0 403 Forbidden"; Util.nl ();
-      Wserver.wprint "Connection: close"; Util.nl ();
-    }
-    else ();
+    if not cgi then http "403 Forbidden" else ();
     Wserver.wprint "Content-type: text/html";
     Util.nl ();
     Util.nl ();
@@ -161,12 +164,10 @@ value only_log from cgi =
     Printf.fprintf oc " Connection refused from %s (only %s)\n" from
       only_address.val;
     flush_log oc;
-    if cgi then do {
-      Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
-      Util.nl ();
-      Util.nl ();
-    }
-    else Wserver.html "";
+    if not cgi then http "" else ();
+    Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
+    Util.nl ();
+    Util.nl ();
     Wserver.wprint "<head><title>Invalid access</title></head>\n";
     Wserver.wprint "<body><h1>Invalid access</h1></body>\n";
   }
@@ -459,10 +460,7 @@ value general_welcome conf =
 
 value unauth conf typ =
   do {
-    Wserver.wprint "HTTP/1.0 401 Unauthorized";
-    Util.nl ();
-    Wserver.wprint "Connection: close";
-    Util.nl ();
+    http "401 Unauthorized";
     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
     Util.nl ();
     Util.nl ();
@@ -641,11 +639,7 @@ value index_not_name s =
 
 value print_request_failure cgi msg =
   do {
-    if not cgi then do {
-      Wserver.wprint "HTTP/1.0 200 Ok"; Util.nl ();
-      Wserver.wprint "Connection: close"; Util.nl ();
-    }
-    else ();
+    if not cgi then http "" else ();
     Wserver.wprint "Content-type: text/html";
     Util.nl (); Util.nl ();
     Wserver.wprint "<head><title>Request failure</title></head>\n";
@@ -673,11 +667,7 @@ value refresh_url cgi request s i =
     serv ^ req
   in
   do {
-    if not cgi then do {
-      Wserver.wprint "HTTP/1.0 200 Ok"; Util.nl ();
-      Wserver.wprint "Connection: close"; Util.nl ();
-    }
-    else ();
+    if not cgi then http "" else ();
     Wserver.wprint "Content-type: text/html";
     Util.nl ();
     Util.nl ();

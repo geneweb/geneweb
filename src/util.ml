@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.13 2001-11-22 19:06:19 ddr Exp $ *)
+(* $Id: util.ml,v 4.14 2001-11-23 13:13:12 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -48,11 +48,8 @@ value html conf =
   let charset = if conf.charset = "" then "iso-8859-1" else conf.charset in
   do {
     if not conf.cgi then do {
-      Wserver.wprint "HTTP/1.0 200 OK";
-      nl ();
+      Wserver.http "";
       Wserver.wprint "Server: GeneWeb/%s" Version.txt;
-      nl ();
-      Wserver.wprint "Connection: close";
       nl ();
     }
     else ();
@@ -64,15 +61,12 @@ value html conf =
 
 value unauthorized conf auth_type =
   do {
-    if conf.cgi then ()
-    else do {
-      Wserver.wprint "HTTP/1.0 401 Unauthorized";
-      nl ();
-      Wserver.wprint "Connection: close";
-      nl ();
+    if not conf.cgi then do {
+      Wserver.http "401 Unauthorized";
       Wserver.wprint "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
       nl ()
-    };
+    }
+    else ();
     Wserver.wprint "Content-type: text/html; charset=%s" conf.charset;
     nl ();
     nl ();

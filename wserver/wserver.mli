@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 4.1 2001-05-07 07:50:23 ddr Exp $ *)
+(* $Id: wserver.mli,v 4.2 2001-11-23 13:13:13 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -26,10 +26,9 @@ value wprint : format 'a out_channel unit -> 'a;
 value wflush : unit -> unit;
     (* To flush page contents print. *)
 
-value html : string -> unit;
-    (* [Wserver.html charset] specifies that the text will be HTML.
-       where [charset] represents the character set. If empty string,
-       iso-8859-1 is assumed. *)
+value http : string -> unit;
+    (* [Wserver.http answer] sends the http header where [answer]
+       represents the answer status. If empty string, "200 OK" is assumed. *)
 
 value encode : string -> string;
     (* [Wserver.encode s] encodes the string [s] in another string

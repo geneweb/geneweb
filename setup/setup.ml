@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.12 2001-11-21 14:36:04 ddr Exp $ *)
+(* $Id: setup.ml,v 4.13 2001-11-23 13:13:11 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -91,9 +91,13 @@ type config =
     request : list string }
 ;
 
+value nl () = Wserver.wprint "\013\010";
+
 value header_no_page_title title =
   do {
-    Wserver.html charset;
+    Wserver.http "";
+    Wserver.wprint "Content-type: text/html; charset=%s" charset;
+    nl (); nl ();
     Wserver.wprint "\
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" \
 \"http://www.w3.org/TR/REC-html40/loose.dtd\">
@@ -493,7 +497,9 @@ value print_file conf fname =
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       do {
-        Wserver.html charset;
+        Wserver.http "";
+        Wserver.wprint "Content-type: text/html; charset=%s" charset;
+        nl (); nl ();
         copy_from_stream conf (fun x -> Wserver.wprint "%s" x)
           (Stream.of_channel ic);
         close_in ic;
