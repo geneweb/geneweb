@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.173 2000-11-06 10:36:57 ddr Exp $
+# $Id: lexicon.txt,v 3.174 2000-11-06 15:58:58 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -1408,7 +1408,7 @@ nl: verjaardag van overleden mensen
 no: &aring;rsdager for avd&oslash;de personer
 pt: anivers&aacute;rios das pessoas falecidas
 ru: годовщины смерти
-se: &aring;rsdagar f&ouml;r d&ouml;da personer
+se: &aring;rsdagar f&ouml;r avlidna personer
 
     anniversaries of marriage
 af: huweliksherdenkinge
@@ -3559,6 +3559,7 @@ se: ut&ouml;kad rapport
     loop in data base: %s is his/her own ancestor
 en: loop in data base: %s is his/her own ancestor
 fr: boucle dans la base de donn&eacute;es: %s est son propre anc&ecirc;tre
+se: loop i databasen: %s &auml;r sin egen ana
 
     main title
 af: hooftitel
@@ -3779,11 +3780,13 @@ se: sammanslagning klar
 dk: meddelelse tilf&oslash;jet
 en: message added
 fr: message ajout&eacute;
+se: meddelande inlagt
 
     message/next message
 dk: meddelelse/n&aelig;ste meddelelse
 en: message/next message
 fr: message/message suivant
+se: meddelande/n&auml;sta meddelande
 
     missing ancestors
 af: ontbrekende voorsate
