@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 3.4 2000-10-28 18:07:12 ddr Exp $ *)
+(* $Id: consangAll.ml,v 3.5 2000-11-22 03:01:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -57,7 +57,7 @@ value compute base from_scratch quiet =
   let _ = base.data.ascends.array () in
   let _ = base.data.couples.array () in
   let tab =
-    Consang.make_relationship_table base (Consang.topological_sort base)
+    Consang.make_relationship_info base (Consang.topological_sort base)
   in
   let consang_tab = Array.create base.data.families.len no_consang in
   let cnt = ref 0 in
