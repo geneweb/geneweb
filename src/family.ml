@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.20 1999-07-29 16:02:55 ddr Exp $ *)
+(* $Id: family.ml,v 2.21 1999-07-30 07:23:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -426,17 +426,16 @@ value print_no_index conf base =
       [ [] -> []
       | [("opt", "no_index") :: l] -> loop l
       | [("i", v) :: l] -> new_env "i" v (fun x -> x) l
-      | [("i1", v) :: l] -> new_env "i1" v (fun x -> x ^ "1") l
-      | [("i2", v) :: l] -> new_env "i1" v (fun x -> x ^ "2") l
       | [("ei", v) :: l] -> new_env "ei" v (fun x -> "e" ^ x) l
-      | [("iz", v) :: l] -> new_env "iz" v (fun x -> x ^ "z") l
-      | [xv :: l] -> [xv :: loop l] ]
-    and new_env x v c l =
+      | [(k, v) :: l] when String.length k == 2 && k.[0] == 'i' ->
+          let c = String.make 1 k.[1] in new_env k v (fun x -> x ^ c) l
+      | [kv :: l] -> [kv :: loop l] ]
+    and new_env k v c l =
       match get_person v with
       [ Some (f, s, oc) ->
           if oc = "0" then [(c "p", f); (c "n", s) :: loop l]
           else [(c "p", f); (c "n", s); (c "oc", oc) :: loop l]
-      | None -> [(x, v) :: loop l] ]
+      | None -> [(k, v) :: loop l] ]
     in          
     loop conf.env
   in
