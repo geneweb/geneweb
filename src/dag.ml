@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.37 2001-01-10 15:24:50 ddr Exp $ *)
+(* $Id: dag.ml,v 3.38 2001-01-10 20:30:50 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -504,7 +504,9 @@ do for i = 0 to ncol - 1 do
    Wserver.wprint " = %d(%d) -> %d<br>\n" tcol tmincol dcol;
 return
 *)
-  do Wserver.wprint "<center><pre>\n";
+  let pos1 = p_getint conf.env "pos1" in
+  let pos2 = p_getint conf.env "pos2" in
+  do Wserver.wprint "<pre>\n";
      for i = 0 to Array.length hts - 1 do
        let (stra, max_row) =
          let (stral, max_row) =
@@ -529,7 +531,7 @@ return
          (Array.of_list (List.rev stral), max_row)
        in
        for row = 0 to max_row - 1 do
-         loop 0 0 where rec loop col j =
+         loop 0 0 0 where rec loop pos col j =
            if j = Array.length hts.(i) then Wserver.wprint "\n"
            else
              let (colspan, align, td) = hts.(i).(j) in
@@ -538,48 +540,58 @@ return
                  if k = 0 then sz
                  else loop (sz + colsz.(col + k - 1)) (k - 1)
              in
-             do match td with
-                [ TDstring s ->
-                    let s =
-                      let k =
-                        let dk = (max_row - Array.length stra.(j)) / 2 in
-                        row - dk
-                      in
-                      if k >= 0 && k < Array.length stra.(j) then stra.(j).(k)
-                      else if s = "|" then s
-                      else try_add_vbar k (Array.length stra.(j)) hts i col
-                    in
-                    let len = displayed_length s in
-                    do for i = 1 to (sz - len) / 2 do
-                         Wserver.wprint " ";
-                       done;
-                       loop 0 where rec loop i =
-                         if i == String.length s then ()
-                         else
-                           do Wserver.wprint "%c" s.[i]; return
-                           loop (i + 1);
-                       for i = (sz + len) / 2 + 1 to sz do
-                         Wserver.wprint " ";
-                       done;
-                    return ()
-                | TDhr LeftA ->
-                    let len = (sz + 1) / 2 in
-                    do for i = 1 to len do Wserver.wprint "-"; done;
-                       for i = len + 1 to sz do Wserver.wprint " "; done;
-                    return ()
-                | TDhr RightA ->
-                    let len = sz / 2 in
-                    do for i = 1 to sz - len - 1 do
-                         Wserver.wprint " ";
-                       done;
-                       for i = sz - len to sz do Wserver.wprint "-"; done;
-                    return ()
-                | TDhr CenterA ->
-                    for i = 1 to sz do Wserver.wprint "-"; done ];
-             return loop (col + colspan) (j + 1);
+             let outs =
+               match td with
+               [ TDstring s ->
+                   let s =
+                     let k =
+                       let dk = (max_row - Array.length stra.(j)) / 2 in
+                       row - dk
+                     in
+                     if k >= 0 && k < Array.length stra.(j) then stra.(j).(k)
+                     else if s = "|" then s
+                     else try_add_vbar k (Array.length stra.(j)) hts i col
+                   in
+                   let s = if s = "&nbsp;" then " " else s in
+                   let len = displayed_length s in
+                   String.make ((sz - len) / 2) ' ' ^ s ^
+                   String.make (sz - (sz + len) / 2) ' '
+               | TDhr LeftA ->
+                   let len = (sz + 1) / 2 in
+                   String.make len '-' ^ String.make (sz - len) ' '
+               | TDhr RightA ->
+                   let len = sz / 2 in
+                   String.make (sz - len - 1) ' ' ^ String.make (len + 1) '-'
+               | TDhr CenterA ->
+                   String.make sz '-' ]
+             in
+             let clipped_outs =
+               if pos1 = None && pos2 = None then outs
+               else
+                 let pos1 =
+                   match pos1 with
+                   [ Some pos1 -> pos1
+                   | None -> pos ]
+                 in
+                 let pos2 =
+                   match pos2 with
+                   [ Some pos2 -> pos2
+                   | None -> pos + sz ]
+                 in
+                 if pos + sz <= pos1 then ""
+                 else if pos > pos2 then ""
+                 else if pos2 >= pos + sz then
+                   displayed_sub outs (pos1 - pos) (pos + sz - pos1)
+                 else if pos1 < pos then
+                   displayed_sub outs 0 (pos2 - pos)
+                 else
+                   displayed_sub outs (pos1 - pos) (pos2 - pos1)
+             in
+             do Wserver.wprint "%s" clipped_outs; return
+             loop (pos + sz) (col + colspan) (j + 1);
        done;
      done;
-     Wserver.wprint "</pre></center>\n";
+     Wserver.wprint "</pre>\n";
   return () 
 ;
 
