@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.9 1999-07-15 10:13:12 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.10 1999-07-21 12:35:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -394,17 +394,16 @@ value check_magic =
 
 value make_cache ic ic_acc shift array_pos patches len name =
   let tab = ref None in
-  let plen = patch_len len patches.val in
+  let r = {array = fun []; get = fun []; len = patch_len len patches.val} in
   let array () =
     match tab.val with
     [ Some x -> x
     | None ->
 do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush stderr; return () else (); return
         do seek_in ic array_pos; return
-        let t = apply_patches (input_value ic) patches.val plen in
+        let t = apply_patches (input_value ic) patches.val r.len in
         do tab.val := Some t; return t ]
   in
-  let r = {array = array; get = fun []; len = plen} in
   let gen_get i =
     if tab.val <> None then (r.array ()).(i)
     else
@@ -418,22 +417,21 @@ do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush stderr; return 
             do seek_in ic pos; return
             Iovalue.input ic ]
   in
-  do r.get := gen_get; return r
+  do r.array := array; r.get := gen_get; return r
 ;
 
 value make_cached ic ic_acc shift array_pos patches len cache_htab name =
   let tab = ref None in
-  let plen = patch_len len patches.val in
+  let r = {array = fun []; get = fun []; len = patch_len len patches.val} in
   let array () =
     match tab.val with
     [ Some x -> x
     | None ->
 do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush stderr; return () else (); return
         do seek_in ic array_pos; return
-        let t = apply_patches (input_value ic) patches.val plen in
+        let t = apply_patches (input_value ic) patches.val r.len in
         do tab.val := Some t; return t ]
   in
-  let r = {array = array; get = fun []; len = plen} in
   let gen_get i =
     if tab.val <> None then (r.array ()).(i)
     else
@@ -452,7 +450,7 @@ do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush stderr; return 
           in
           do Hashtbl.add cache_htab i r; return r ]
   in
-  do r.get := gen_get; return r
+  do r.array := array; r.get := gen_get; return r
 ;
 
 value input bname =
