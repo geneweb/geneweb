@@ -5,6 +5,8 @@ GeneWeb version 3.04
   - [06 Apr 00] Added Afrikaans (Louis Kruger).
 
 * GeneWeb Service/CGI (gwd)
+  - [13 Apr 00] Added pretty display of language code when mouse over the
+    flag (Emmanuelle Visseaux's code).
   - [11 Aor 00] Added optional displaying of images in descendants by tree
     and in relationship trees.
   - [03 Apr 00] In ancestor page, added horizontal displaying.
