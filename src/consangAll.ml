@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 3.3 2000-03-22 04:14:55 ddr Exp $ *)
+(* $Id: consangAll.ml,v 3.4 2000-10-28 18:07:12 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -23,22 +23,29 @@ value relationship base tab ip1 ip2 =
   fst (Consang.relationship_and_links base tab False ip1 ip2)
 ;
 
+value progr_bar_size = 60;
+value progr_bar_draw_rep = 5;
+value progr_bar_draw = "|/-\\";
+value progr_bar_empty = '.';
+value progr_bar_full = '#';
+
+value progr_bar_draw_len = String.length progr_bar_draw;
+value progr_bar_cnt = progr_bar_size * progr_bar_draw_rep * progr_bar_draw_len;
+
 value trace quiet cnt max_cnt =
   do if quiet then
        let x = max_cnt - cnt in
-       let already_disp = x * 60 / max_cnt in
-       let to_disp = (x + 1) * 60 / max_cnt in
-       do for i = already_disp + 1 to to_disp do Printf.eprintf "#"; done;
-          let already_disp = x * 1200 / max_cnt in
-          let to_disp = (x + 1) * 1200 / max_cnt in
+       let already_disp = x * progr_bar_size / max_cnt in
+       let to_disp = (x + 1) * progr_bar_size / max_cnt in
+       do for i = already_disp + 1 to to_disp do
+            Printf.eprintf "%c" progr_bar_full;
+          done;
+          let already_disp = x * progr_bar_cnt / max_cnt in
+          let to_disp = (x + 1) * progr_bar_cnt / max_cnt in
           if cnt = 1 then Printf.eprintf " \008"
           else if to_disp > already_disp then
-            match to_disp mod 4 with
-            [ 0 -> Printf.eprintf "|\008"
-            | 1 -> Printf.eprintf "/\008"
-            | 2 -> Printf.eprintf "-\008"
-            | 3 -> Printf.eprintf "\\\008"
-            | x -> failwith (string_of_int x) ]
+            let k = to_disp mod progr_bar_draw_len in
+            Printf.eprintf "%c\008" progr_bar_draw.[k]
           else ();
        return ()
      else Printf.eprintf "%6d\008\008\008\008\008\008" cnt;
@@ -84,7 +91,9 @@ value compute base from_scratch quiet =
   do Printf.eprintf "To do: %d persons\n" max_cnt;
      if max_cnt = 0 then ()
      else if quiet then
-       do for i = 1 to 60 do Printf.eprintf "."; done;
+       do for i = 1 to progr_bar_size do
+            Printf.eprintf "%c" progr_bar_empty;
+          done;
           Printf.eprintf "\r";
        return ()
      else Printf.eprintf "Computing consanguinity...";
