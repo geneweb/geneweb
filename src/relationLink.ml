@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 2.8 1999-08-02 10:16:03 ddr Exp $ *)
+(* $Id: relationLink.ml,v 2.9 1999-08-02 21:47:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -513,7 +513,7 @@ value print_with_pre conf base info =
 ;
 
 value print_with_table conf base info =
-  tag "table" "cellspacing=0 cellpadding=0 width=\"100%%\"" begin
+  tag "table" "border=0 cellspacing=0 cellpadding=0 width=\"100%%\"" begin
     tag "tr" begin
       stag "td" "colspan=2 align=center" begin
         print_someone conf base info.ip;
@@ -526,11 +526,14 @@ value print_with_table conf base info =
       end;
     end;
     tag "tr" begin
-      stag "td" "colspan=2 align=center" begin
-        Wserver.wprint "<hr size=1 noshade%s>"
-          (if has_td_width_percent conf then " width=\"50%\""
-           else "");
+      stag "td" begin
+        Wserver.wprint "<hr size=1 noshade width=\"50%%\" align=right>";
       end;
+      Wserver.wprint "\n";
+      stag "td" begin
+        Wserver.wprint "<hr size=1 noshade width=\"50%%\" align=left>";
+      end;
+      Wserver.wprint "\n";
     end;
     print_both_branches conf base info info.b1 info.b2;
     if not conf.cancel_links &&
