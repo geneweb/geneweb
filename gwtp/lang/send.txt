@@ -1,6 +1,6 @@
 <head>
   <!-- Copyright (c) 1998-2005 INRIA - GeneWeb -->
-  <!-- $Id: send.txt,v 1.7 2005-01-09 01:41:29 ddr Exp $ -->
+  <!-- $Id: send.txt,v 1.8 2005-02-14 18:19:23 ddr Exp $ -->
   <title>Gwtp - [Upload] "%b"</title>
 </head>
 <body>
@@ -67,6 +67,18 @@ it: selezionate il file chiamato <b>patches</b>, se esiste:
 ]
 </ul>
 <input type=file name=patches size=60><br><p>
+
+<ul>
+<li>
+[
+de: wähle die Datei <b>particles.txt</b>, wenn diese existiert:
+en: select the file named <b>particles.txt</b>, if it exists:
+es: seleccionar el archivo llamado <b>particles.txt</b>, si existe:
+fr: sélectionnez le fichier nommé <b>particles.txt</b>, s'il existe:
+it: selezionate il file chiamato <b>particles.txt</b>, se esiste:
+]
+</ul>
+<input type="file" name="particles.txt" size="60"><br><p>
 
 <table border=1><tr><td>
 [
