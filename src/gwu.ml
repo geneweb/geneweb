@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.2 2001-04-23 03:02:38 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.3 2001-10-19 09:10:53 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -920,19 +920,16 @@ value separate base =
   | list ->
       let mark = Array.create base.data.families.len NotScanned in
       do {
-        if list <> [] then do {
-          List.iter (mark_someone base mark) list;
-          add_small_connex_components base mark;
-          let len =
-            loop 0 0 where rec loop len i =
-              if i = base.data.families.len then len
-              else if mark.(i) = ToSeparate then loop (len + 1) (i + 1)
-              else loop len (i + 1)
-          in
-          Printf.eprintf "*** extracted %d families\n" len;
-          flush stderr;
-        }
-        else ();
+        List.iter (mark_someone base mark) list;
+        add_small_connex_components base mark;
+        let len =
+          loop 0 0 where rec loop len i =
+            if i = base.data.families.len then len
+            else if mark.(i) = ToSeparate then loop (len + 1) (i + 1)
+            else loop len (i + 1)
+        in
+        Printf.eprintf "*** extracted %d families\n" len;
+        flush stderr;
         fun ifam -> mark.(Adef.int_of_ifam ifam) == ToSeparate
       } ]
 ;
