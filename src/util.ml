@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.20 1998-12-28 15:40:26 ddr Exp $ *)
+(* $Id: util.ml,v 1.21 1999-01-09 09:21:09 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -513,7 +513,7 @@ value copy_from_file fname =
 value trailer conf =
   do try copy_from_file "copyr" with _ ->
        Wserver.wprint "
-<p><hr><font size=-1><em>(c) Copyright INRIA 1998 -
+<p><hr><font size=-1><em>(c) Copyright INRIA 1999 -
 GeneWeb %s</em></font><br>\n" version;
      let trl_fname =
        List.fold_right Filename.concat [base_dir.val; "lang"; conf.lang]

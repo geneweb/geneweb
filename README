@@ -3,7 +3,7 @@ OVERVIEW:
 GeneWeb is a genealogy software with a Web interface. It can be used
 off-line or as a Web service.
 
-This is the version 1.09.
+This is the version 1.10.
 
 To compile, you need the Objective Caml compiler, and the preprocessor
 Camlp4.
@@ -33,7 +33,7 @@ CONTENTS:
 
 COPYRIGHT:
 
-All files marked in this distribution are copyright 1998 Institut
+All files marked in this distribution are copyright 1998-1999 Institut
 National de Recherche en Informatique et Automatique (INRIA) and
 distributed under the conditions stated in file LICENCE. They can be
 freely redistributed for non-commercial purposes, provided the
