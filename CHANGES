@@ -11,8 +11,7 @@ GeneWeb version 3.09
     were defined).
 
 * GeneWeb data bases Transfer Program (gwtp)
-  - [06 Oct 00] Added ability to put a trailer text. HTML tags allowed
-    only if not dangerous (from the security point of view).
+  - [06 Oct 00] Added ability to put a trailer text.
 
 GeneWeb version 3.08
 --------------------
