@@ -1,10 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 4.5 2001-03-26 16:35:54 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.6 2001-03-26 16:56:01 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
+br: Genealogia
 cs: Genealogy
 ct: Genealogia
 de: Genealogie
@@ -23,6 +24,7 @@ nl: Genealogie
 no: Genealogi
 pl: Genealogia
 pt: Genealogia
+ru: Genealogy
 se: Genealogi
 ] - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -40,6 +42,7 @@ height=108 src="%o/gwlogo.gif" align=%L border=0 alt=GeneWeb></a>
 <td align=%L>
 <table><tr><td align=center><h1><font color=%i>[
 af: Genealogiese<br>databasis
+br: Base de Dados Geneal&oacute;gica
 cn: ÍøÂç¼ÒÆ×
 cs: Genealogická databáze
 ct: Base de dades<br>geneal&ograve;gica
@@ -59,6 +62,7 @@ nl: Genealogische<br>databank
 no: Genealogisk<br>database
 pl: Genealogiczna<br>baza danych
 pt: Base de Dados<br>Geneal&oacute;gica
+ru: Ãåíåaëîãè÷åñêàÿ<br>áàçà äàííûõ
 se: Genealogisk<br>databas
 ]</font></h1></table>
 </td>
@@ -93,6 +97,8 @@ se: Du kan välja ett annat språk bland de följande:
 
 [
 af: Die databasis <font color=%i><b>"%t"</b></font> bevat tans %n persone.
+br: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
+    atualmente %n pessoas.
 cn: ÏÖÓĞ %n ÈËÔÚÊı¾İ¿âÖĞ¡£
 cs: Databáze <font color=%i><b>"%t"</b></font> obsahuje %n osob.
 ct: La base de dades <font color=%i><b>"%t"</b></font> cont&eacute;
@@ -124,6 +130,7 @@ no: Databasen <font color=%i><b>"%t"</b></font> inneholder n&aring; %n
 pl: Baza danych <font color=%i><b>"%t"</b></font> zawiera obecnie osób:%n.
 pt: A base de dados <font color=%i><b>"%t"</b></font> cont&eacute;m
     actualmente %n pessoas.
+ru: Áàçà äàííûõ <font color=%i><b>"%t"</b></font> ñåé÷àñ ñîäåğæèò %n ÷åëîâåê.
 se: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
     %n personer.
 ]%In<br>
@@ -136,6 +143,7 @@ se: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
 
 <td align=center>[
 af: <a href="%sw=w"><em>Medewerkers</em></a> toegang<br> (password)
+br: Entrada <a href="%sw=w"><em>feiticeiro</em></a><br> (palavra chave)
 cs: <a href="%sw=w">{<em>"Wizard"</em></a> pøístup<br> (heslo)
 ct: acc&eacute;s <a href="%sw=w"><em>administrador</em></a><br> (clau)
 de: <a href="%sw=w"><em>Wizard</em></a>-Zugang<br> (Passwort)
@@ -159,6 +167,7 @@ se: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
 
 %INf<td align=center>[
 af: <a href="%sw=f"><em>Vriend</em></a> toegang<br> (password)
+br: Entrada <a href="%sw=f"><em>amigo</em></a><br> (palavra chave)
 cs: <a href="%sw=f">{<em>"Friend"</em></a> pøístup<br> (heslo)
 ct: acc&eacute;s <a href="%sw=f"><em>amic</em></a><br> (clau)
 de: <a href="%sw=f"><em>Freund</em></a>-Zugang<br> (Passwort)
@@ -185,6 +194,7 @@ se: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
 <form method=POST action="%f">
 %h[
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
+br: Palavra chave para entrada <em>amigo</em> ou <em>feiticeiro</em>:
 cs: Heslo pro<em>"friend"</em> nebo <em>"wizard"</em> pøístup:</em>:
 ct: Clau, per acc&eacute;s <em>amic</em> o <em>administrador</em>:
 de: Passwort für <em>Freund</em>- oder <em>Wizard</em>-Zugang</em>:
@@ -221,6 +231,7 @@ se: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
 <center><table border=0 cellspacing=0 cellpadding=0><tr><td>
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
+br: Para consultar esta base de dados, pode procurar:
 cn:
 cs: Databázi lze prohledávat:
 ct: Per navegar en aquesta base, podeu fer la vostra recerca:
@@ -241,6 +252,7 @@ nl: Om deze databank te consulteren, kan u een opzoeking doen:
 no: For &aring; navigere i databasen, kan du s&oslash;ke:
 pl: Aby poruszaæ siê po bazie, mo¿esz:
 pt: Para consultar esta base de dados, pode procurar:
+ru: ×òîáû íàéòè â ıòîé áàçå äàííûõ, Âû ìîæåòå èñêàòü:
 se: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
 ]<br><p>
 
@@ -252,6 +264,7 @@ se: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
 %h<input type=hidden name=m value=NG>
 <font color=%i><b>[
 af: per persoon
+br: por pessoa
 cn: ËÑË÷£º
 cs: Podle osob
 ct: per persona
@@ -271,6 +284,7 @@ nl: op naam
 no: etter person
 pl: znaleŸæ osobê
 pt: por pessoa
+ru: ïî ÷åëîâåêó
 se: efter person
 ]</b></font>
 <input name=n size=40 maxlength=200>
@@ -294,6 +308,7 @@ se: efter person
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
 <font color=%i><b>[
 af: by title
+br: por t&iacute;tulo
 cn: ¸ù¾İÃûÏÎ
 cs: podle titulu
 ct: per títol
@@ -313,6 +328,7 @@ nl: op titel
 no: etter titel
 pl: znaleŸæ:
 pt: por t&iacute;tulo
+ru: ïî òèòóëó
 se: efter titel
 ]</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
@@ -332,6 +348,7 @@ se: efter titel
 %h
 [
 af: <font color=%i><b>in die lys </b></font>van alle
+br: <font color=%i><b>pela lista</b></font> de todos os
 cn: ÏÔÊ¾ËùµÄ
 cs: <font color=%i><b>ze seznamu</b></font> v¹ech
 ct: <font color=%i><b>pel llistat</b></font> de tots els
@@ -351,11 +368,13 @@ nl: <font color=%i><b>via de lijst</b></font> van alle
 no: <font color=%i><b>med liste</b></font> over alle
 pl: <font color=%i><b>przejrzeæ listê</b></font> wszystkich
 pt: <font color=%i><b>pela lista</b></font> de todos os
+ru: <font color=%i><b>ïî ñïèñêó</b></font>  âñåõ
 se: <font color=%i><b>efter listan</b></font> av alla
 ]
 <select name=m>
 <option value="N" selected>[
 af: vanne
+br: sobrenomes
 cn: ĞÕ
 cs: pøíjmení
 ct: cognoms
@@ -375,10 +394,12 @@ nl: familienamen
 no: etternavn
 pl: nazwisk
 pt: apelidos
+ru: ôàìèëèé
 se: efternamn
 ]
 <option value="P">[
 af: voorname
+br: prenomes
 cn: Ãû
 cs: køestní jméno
 ct: noms
@@ -398,11 +419,13 @@ nl: voornamen
 no: fornavn
 pl: imion
 pt: nomes pr&oacute;prios
+ru: èì¸í
 se: f&ouml;rnamn
 ]
 </select>
 [
 af: volgens
+br: por
 cn: ¸ù¾İ
 cs: seøazená podle
 ct: per
@@ -422,11 +445,13 @@ nl: volgens
 no: sortert
 pl: u³o¿onych
 pt: por
+ru: óïîğÿäî÷åííûõ
 se: sorterade i
 ]
 <select name=tri>
 <option value="A" selected>[
 af: alfabeties volgorde
+br: ordem alfab&eacute;tica
 cn: ×ÖÄ¸Ğò
 cs: abecedy
 ct: ordre alfab&egrave;tic
@@ -446,10 +471,12 @@ nl: alfabet
 no: alfabetisk
 pl: w porz¹dku alfabetycznym
 pt: ordem alfab&eacute;tica
+ru: ïî àëôàâèòó
 se: bokstavsordning
 ]
 <option value="F">[
 af: frekwensie
+br: frequ&ecirc;ncia
 cn: ·ÃÎÊ´ÎÊı
 cs: èetnosti
 ct: freq&uuml&egrave;ncia
@@ -469,6 +496,7 @@ nl: aantal
 no: etter frekvens
 pl: wed³ug czêstoœci wystêpowania
 pt: frequ&ecirc;ncia
+ru: ïî ÷àñòîòå
 se: frekvensordning
 ]
 </select>
@@ -485,6 +513,7 @@ et: järgi
 %h<input type=hidden name=m value=PS>
 <font color=%i><b>[
 af: by
+br: por
 cs: podle
 ct: per
 de: mit
@@ -516,6 +545,9 @@ se: efter
 af: <font color=%i><b>deur 'n</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>detail
        navraag</b></font></a>.
+br: <font color=%i><b>por</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>pesquisa
+       complexa</b></font></a>.
 cs: <font color=%i><b>lze také zadat</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>roz¹íøenı
        dotaz</b></font></a>.
@@ -568,6 +600,9 @@ pl: <font color=%i><b>skorzystaæ z</b></font>
 pt: <font color=%i><b>por</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>pesquisa
        complexa</b></font></a>.
+ru: <font color=%i><b>÷åğåç</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>ğàñøèğåííûé
+       çàïğîñ</b></font></a>.
 se: <font color=%i><b>genom</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>avancerad
        s&ouml;kning</b></font></a>.
@@ -579,6 +614,7 @@ se: <font color=%i><b>genom</b></font>
 %Iw<p>
 <center>[
 af: Jy kan
+br: Pode
 cn:
 cs: Zde mù¾ete
 ct: Podeu
@@ -598,6 +634,7 @@ nl: U kan:
 no: Du kan
 pl: Mo¿esz
 pt: Pode
+ru: Âû ìîæåòå
 se: Du kan
 ]<br><p>
 
@@ -607,6 +644,7 @@ se: Du kan
 <ul>
 %Ispropose_add_family;<li><a href="%sm=ADD_FAM">[
 af: 'n familie byvoeg
+br: acrescentar uma família
 cn: Ôö¼Ó¼ÒÍ¥¼ÇÂ¼
 cs: pøidat novou rodinu
 ct: afegir una fam&iacute;lia
@@ -626,6 +664,7 @@ nl: een familie toevoegen
 no: legge til en familie
 pl: dodaæ rodzinê (parê)
 pt: acrescentar uma família
+ru: äîáàâèòü ñåìüş
 se: l&auml;gga till en familj
 ]</a>
 %INl</ul>
@@ -634,6 +673,7 @@ se: l&auml;gga till en familj
 <ul>%E
 %E<li><a href="%sm=MOD_NOTES">[
 af: die notas wysig
+br: modificar as notas
 cs: upravit poznámky
 ct: modificar les notes
 de: die Notizen &auml;ndern
@@ -652,6 +692,7 @@ nl: de nota's wijzigen
 no: endre notater
 pl: zmodyfikowaæ uwagi
 pt: modificar as notas
+ru: èçìåíèòü çàìåòêó
 se: &auml;ndra noteringar
 ]</a>
 </ul>
@@ -664,6 +705,7 @@ se: &auml;ndra noteringar
 
 <center>[
 af: Jy kan ook kyk na
+br: Tamb&eacute;m pode consultar
 cn:
 cs: Lze také zobrazit
 ct: Tamb&eacute; podeu consultar
@@ -683,6 +725,7 @@ nl: U kan de volgende zaken bekijken:
 no: Du kan ogs&aring; sl&aring; opp
 pl: Mo¿esz tak¿e obejrzeæ
 pt: Tamb&eacute;m pode consultar
+ru: Âû ìîæåòå òàêæå îáğàòèòüñÿ ê
 se: Du kan ocks&aring; konsultera
 ]<br><p>
 
@@ -711,6 +754,7 @@ se: Du kan ocks&aring; konsultera
 
 [
 af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
+br: Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
 cn: ÒÑ¾­ÓĞ %q ´Î·ÃÎÊÊı¾İ¿â£¬ÆäÖĞ %c ´Î·ÃÎÊ±¾Ö÷Ò³£¬ ×Ô´Ó %d¡£
 cs: %q pøístupù, z toho %c na tuto stránku, od %d.
 ct: Hi ha hagut %q consultes, de les quals %c en aquesta p&agrave;gina, des
@@ -736,6 +780,7 @@ nl: Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
 no: Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
 pl: Baza zosta³a od %d odwiedzona %q razy (w tym %c razy strona tytu³owa).
 pt: Houve %q consultas, das quais %c foram a esta p&aacute;gina, desde %d.
+ru: Âñåãî áûëî %q îáğàùåíèé, èç íèõ %c ê ıòîé ñòğàíèöå, íà÷èíàÿ ñ %d.
 se: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
     sedan %d.
 ]
@@ -744,6 +789,10 @@ se: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
 <p>
 
 [
+br: Se o seu <i>browser</i> n&atilde;o atualiza automaticamente as
+    p&aacute;ginas modificadas (for&ccedil;ando a fazer
+    "reload current document"), tente navegar desde <a
+    href="%sescache=0">este link</a>.
 cs: Pokud Vá¹ prohlí¾eè neprovádí automaticky obnovu upravenıch stránek
     (musíte pou¾ívat tlaèítko "obnovit"), zkuste prohlí¾ení pøes <a
     href="%sescache=0">tento odkaz</a>.
