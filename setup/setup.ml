@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.18 1999-05-07 07:52:34 ddr Exp $ *)
+(* $Id: setup.ml,v 1.19 1999-05-07 19:17:47 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -722,7 +722,7 @@ value rm_base dir =
          Unix.closedir dh;
          List.iter (fun file -> Unix.unlink (Filename.concat dir file))
            list.val;
-         Unix.rmdir dir;
+         try Unix.rmdir dir with [ Unix.Unix_error _ _ _ -> () ];
       return ()
   | _ -> () ]
 ;
