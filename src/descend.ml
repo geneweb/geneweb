@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 1.4 1998-12-06 11:37:28 ddr Exp $ *)
+(* $Id: descend.ml,v 1.5 1998-12-16 06:04:53 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -136,7 +136,7 @@ value s_appelle_comme_son_pere base ip =
 ;
 
 value afficher_marie conf base first fam p conjoint =
-  let is = index_of_sex p.sexe in
+  let is = index_of_sex p.sex in
   do stag "em" begin
        Wserver.wprint
          (ftransl_nth conf "allied%t (euphemism for married or... not) to" is)
@@ -391,7 +391,7 @@ value label_descendants base marks paths max_lev =
              let el = fam.children in
              List.fold_left
                (fun cnt e ->
-                  do if p.sexe == Masculin ||
+                  do if p.sex == Masculine ||
                         not marks.(Adef.int_of_iper c) then
                        let path = [Char.chr (Char.code 'A' + cnt) :: path] in
                        do paths.(Adef.int_of_iper e) := path;
@@ -417,7 +417,7 @@ value close_to_end base marks max_lev lev p =
            let fam = foi base ifam in
            let c = conjoint p (coi base ifam) in
            let el = fam.children in
-           if p.sexe == Masculin || not marks.(Adef.int_of_iper c) then
+           if p.sex == Masculine || not marks.(Adef.int_of_iper c) then
              if dlev == close_lev then Array.length el = 0
              else
                List.for_all (fun e -> short (succ dlev) (poi base e))
@@ -456,8 +456,8 @@ value label_of_path paths p =
 
 value print_child conf base p1 p2 e =
   do stag "strong" begin
-       if p1.sexe == Masculin && e.surname == p1.surname ||
-          p2.sexe == Masculin && e.surname == p2.surname then
+       if p1.sex == Masculine && e.surname == p1.surname ||
+          p2.sex == Masculine && e.surname == p2.surname then
          afficher_prenom_de_personne_referencee conf base e
        else afficher_personne_referencee conf base e;
      end;
@@ -467,8 +467,8 @@ value print_child conf base p1 p2 e =
 
 value print_repeat_child conf base p1 p2 e =
   stag "em" begin
-    if p1.sexe == Masculin && e.surname == p1.surname ||
-       p2.sexe == Masculin && e.surname == p2.surname then
+    if p1.sex == Masculine && e.surname == p1.surname ||
+       p2.sex == Masculine && e.surname == p2.surname then
       afficher_prenom_de_personne conf base e
     else afficher_personne conf base e;
   end
@@ -515,7 +515,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                 Wserver.wprint "\n";
              return
              let print_children =
-               p.sexe == Masculin ||
+               p.sex == Masculine ||
                not marks.(Adef.int_of_iper c.cle_index)
              in
              do if print_children then
@@ -601,7 +601,7 @@ value print_family conf base marks paths max_lev lev p =
            List.fold_left
              (fun cnt e ->
                 let e = poi base e in
-                do if p.sexe == Masculin ||
+                do if p.sex == Masculine ||
                       not marks.(Adef.int_of_iper c.cle_index) then
                      do Wserver.wprint "<li type=A>";
                         print_child conf base p c e;
@@ -652,7 +652,7 @@ value print_families conf base marks paths max_lev =
            let c = conjoint p (coi base ifam) in
            let el = fam.children in
            let c = poi base c in
-           if p.sexe == Masculin ||
+           if p.sex == Masculine ||
               not marks.(Adef.int_of_iper c.cle_index) then
              Array.iter
                (fun e ->

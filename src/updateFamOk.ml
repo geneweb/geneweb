@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.9 1998-12-14 12:43:20 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.10 1998-12-16 06:05:04 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -35,9 +35,9 @@ value reconstitute_person conf var =
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
   let create =
     match getn conf var "p" with
-    [ "create" -> UpdateFam.Create Neutre
-    | "create_M" -> UpdateFam.Create Masculin
-    | "create_F" -> UpdateFam.Create Feminin
+    [ "create" -> UpdateFam.Create Neuter
+    | "create_M" -> UpdateFam.Create Masculine
+    | "create_F" -> UpdateFam.Create Feminine
     | _ -> UpdateFam.Link ]
   in
   (first_name, surname, occ, create)
@@ -52,9 +52,9 @@ value reconstitute_child conf var default_surname =
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
   let create =
     match getn conf var "p" with
-    [ "create" -> UpdateFam.Create Neutre
-    | "create_M" -> UpdateFam.Create Masculin
-    | "create_F" -> UpdateFam.Create Feminin
+    [ "create" -> UpdateFam.Create Neuter
+    | "create_M" -> UpdateFam.Create Masculine
+    | "create_F" -> UpdateFam.Create Feminine
     | _ -> UpdateFam.Link ]
   in
   (first_name, surname, occ, create)
@@ -87,13 +87,13 @@ value reconstitute_family conf =
           let (children, ext) = loop (i + 1) ext in
           match p_getenv conf.env ("add_child" ^ string_of_int i) with
           [ Some "on" ->
-              ([c; ("", "", 0, UpdateFam.Create Neutre) :: children], True)
+              ([c; ("", "", 0, UpdateFam.Create Neuter) :: children], True)
           | _ -> ([c :: children ], ext) ]
       | None -> ([], ext) ]
   in
   let (children, ext) =
     match p_getenv conf.env "add_child0" with
-    [ Some "on" -> ([("", "", 0, UpdateFam.Create Neutre) :: children], True)
+    [ Some "on" -> ([("", "", 0, UpdateFam.Create Neuter) :: children], True)
     | _ -> (children, ext) ]
   in
   let comment = strip_spaces (get conf "comment") in
@@ -161,7 +161,7 @@ value insert_person conf base (f, s, o, create) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in
   match create with
-  [ UpdateFam.Create sexe ->
+  [ UpdateFam.Create sex ->
       try
         if f = "?" || s = "?" then
           if o <= 0 || o >= base.persons.len then raise Not_found
@@ -187,7 +187,7 @@ value insert_person conf base (f, s, o, create) =
              public_name = empty_string;
              nick_names = []; aliases = []; titles = [];
              occupation = empty_string;
-             sexe = sexe; access = IfTitles;
+             sex = sex; access = IfTitles;
              birth = Adef.codate_None; birth_place = empty_string;
              birth_src = empty_string;
              baptism = Adef.codate_None; baptism_place = empty_string;
@@ -312,14 +312,14 @@ value effective_mod conf base sfam scpl =
   let omoth = poi base ocpl.mother in
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
-  do match nfath.sexe with
-     [ Feminin ->
+  do match nfath.sex with
+     [ Feminine ->
          do print_err_father_sex conf base nfath; return raise Update.ModErr
-     | _ -> nfath.sexe := Masculin ];
-     match nmoth.sexe with
-     [ Masculin ->
+     | _ -> nfath.sex := Masculine ];
+     match nmoth.sex with
+     [ Masculine ->
          do print_err_mother_sex conf base nmoth; return raise Update.ModErr
-     | _ -> nmoth.sexe := Feminin ];
+     | _ -> nmoth.sex := Feminine ];
      nfam.origin_file := ofam.origin_file;
      nfam.fam_index := fi;
      base.patch_family fi nfam;
@@ -400,14 +400,14 @@ value effective_add conf base sfam scpl =
   in
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
-  do match nfath.sexe with
-     [ Feminin ->
+  do match nfath.sex with
+     [ Feminine ->
          do print_err_father_sex conf base nfath; return raise Update.ModErr
-     | _ -> nfath.sexe := Masculin ];
-     match nmoth.sexe with
-     [ Masculin ->
+     | _ -> nfath.sex := Masculine ];
+     match nmoth.sex with
+     [ Masculine ->
          do print_err_mother_sex conf base nmoth; return raise Update.ModErr
-     | _ -> nmoth.sexe := Feminin ];
+     | _ -> nmoth.sex := Feminine ];
      nfam.fam_index := fi;
      nfam.origin_file := origin_file;
      base.patch_family fi nfam;

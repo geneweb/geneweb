@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.11 1998-12-05 13:29:45 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.12 1998-12-16 06:04:55 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -237,9 +237,9 @@ value get_field lab l =
 
 value get_optional_sexe =
   fun
-  [ ["h" :: l] -> (Masculin, l)
-  | ["f" :: l] -> (Feminin, l)
-  | l -> (Neutre, l) ]
+  [ ["h" :: l] -> (Masculine, l)
+  | ["f" :: l] -> (Feminine, l)
+  | l -> (Neuter, l) ]
 ;
 
 value make_int str x =
@@ -480,7 +480,7 @@ value create_person () =
   {first_name = ""; surname = ""; occ = 0; photo = "";
    public_name = ""; nick_names = []; aliases = [];
    first_names_aliases = []; surnames_aliases = [];
-   titles = []; occupation = ""; sexe = Neutre; access = IfTitles;
+   titles = []; occupation = ""; sex = Neuter; access = IfTitles;
    birth = Adef.codate_None; birth_place = ""; birth_src = "";
    baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
    death = DontKnowIfDead; death_place = ""; death_src = "";
@@ -635,9 +635,9 @@ value lire_famille ic fname =
             let rec loop children =
               match lire_ligne ic with
               [ Some (str, ["-" :: l]) ->
-                  let (sexe, l) = get_optional_sexe l in
+                  let (sex, l) = get_optional_sexe l in
                   let (child, l) = parse_child str surname csrc l in
-                  do child.sexe := sexe; return
+                  do child.sex := sex; return
                   if l <> [] then failwith str
                   else loop [child :: children]
               | Some (str, ["end"]) -> children

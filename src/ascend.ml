@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.8 1998-12-12 17:26:25 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.9 1998-12-16 06:04:48 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -437,8 +437,8 @@ value print_generation_missing_persons conf base title sp_incl gp =
            if Array.length p.family > 0 then
              let cpl = coi base p.family.(0) in
              let (parent_name_index, conj) =
-               match p.sexe with
-               [ Masculin -> (0, cpl.mother)
+               match p.sex with
+               [ Masculine -> (0, cpl.mother)
                | _ -> (1, cpl.father) ]
              in
              do stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
@@ -595,8 +595,8 @@ value add_missing conf base spouses_included list =
         if Array.length p.family > 0 then
           let cpl = coi base p.family.(0) in
           let (a, p) =
-            match p.sexe with
-            [ Masculin -> (A_husband_of, poi base cpl.mother)
+            match p.sex with
+            [ Masculine -> (A_husband_of, poi base cpl.mother)
             | _ -> (A_wife_of, poi base cpl.father) ]
           in
           [(a, p) :: list]
@@ -612,8 +612,8 @@ value add_missing conf base spouses_included list =
             let n = person_text_without_surname conf base p in
             let cpl = coi base p.family.(0) in
             let (a, p) =
-              match p.sexe with
-              [ Masculin -> (A_surname_of_husband_of n, poi base cpl.mother)
+              match p.sex with
+              [ Masculine -> (A_surname_of_husband_of n, poi base cpl.mother)
               | _ -> (A_surname_of_wife_of n, poi base cpl.father) ]
             in
             if sou base p.surname = "?" then list else [(a, p) :: list]

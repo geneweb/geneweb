@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 1.8 1998-11-30 12:35:58 ddr Exp $ *)
+(* $Id: gwc.ml,v 1.9 1998-12-16 06:04:55 ddr Exp $ *)
 
 open Def;
 open Check;
@@ -64,7 +64,7 @@ value faire_personne gen p n occ i =
      first_names_aliases = []; surnames_aliases = [];
      public_name = empty_string; nick_names = [];
      aliases = []; titles = []; occupation = empty_string;
-     sexe = Neutre; access = IfTitles;
+     sex = Neuter; access = IfTitles;
      birth = Adef.codate_None; birth_place = empty_string;
      birth_src = empty_string;
      baptism = Adef.codate_None; baptism_place = empty_string;
@@ -332,8 +332,8 @@ parce que cette personne existe deja en tant qu'enfant de
 ;
 
 value noter_sexe gen p s =
-  if p.sexe == Neutre then p.sexe := s
-  else if p.sexe == s || s == Neutre then ()
+  if p.sex == Neuter then p.sex := s
+  else if p.sex == s || s == Neuter then ()
   else
     do Printf.printf "\nInconcistency about the sex of\n  %s %s\n"
          (sou gen.g_base p.first_name) (sou gen.g_base p.surname);
@@ -347,7 +347,7 @@ value insere_famille gen co fo =
     Array.map
       (fun cle ->
          let e = insert_person gen cle in
-         do noter_sexe gen e cle.sexe; return e.cle_index)
+         do noter_sexe gen e cle.sex; return e.cle_index)
       fo.children
   in
   let comment = unique_string gen fo.comment in
@@ -368,8 +368,8 @@ value insere_famille gen co fo =
      gen.g_fcnt := gen.g_fcnt + 1;
      pere.family := Array.append pere.family [| fam.fam_index |];
      mere.family := Array.append mere.family [| fam.fam_index |];
-     noter_sexe gen pere Masculin;
-     noter_sexe gen mere Feminin;
+     noter_sexe gen pere Masculine;
+     noter_sexe gen mere Feminine;
      Array.iter
        (fun ix ->
           let x = poi gen.g_base ix in

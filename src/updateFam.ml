@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 1.7 1998-12-07 11:20:58 ddr Exp $ *)
+(* $Id: updateFam.ml,v 1.8 1998-12-16 06:05:03 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -13,7 +13,7 @@ value f_coa conf s =
   else s
 ;
 
-type create = [ Create of sexe | Link ];
+type create = [ Create of sex | Link ];
 type str_indi = (string * string * int * create);
 
 value person_key base ip =
@@ -61,17 +61,17 @@ value print_person conf base var fmem (first_name, surname, occ, create) =
             (if create = Link then " selected" else "")
             (capitale (transl conf "link"));
           Wserver.wprint "<option value=create%s>%s\n"
-            (match create with [ Create Neutre -> " selected" | _ -> "" ])
+            (match create with [ Create Neuter -> " selected" | _ -> "" ])
             (capitale (transl conf "create"));
           if fmem = Child then
             do Wserver.wprint "<option value=create_M%s>%s %s\n"
                  (match create with
-                  [ Create Masculin -> " selected" | _ -> "" ])
+                  [ Create Masculine -> " selected" | _ -> "" ])
                  (capitale (transl conf "create"))
                  (transl_nth conf "M/F" 0);
                Wserver.wprint "<option value=create_F%s>%s %s\n"
                  (match create with
-                  [ Create Feminin -> " selected" | _ -> "" ])
+                  [ Create Feminine -> " selected" | _ -> "" ])
                  (capitale (transl conf "create"))
                  (transl_nth conf "M/F" 1);
             return ()
@@ -191,7 +191,7 @@ value print_child conf base cnt n =
 value print_children conf base fam cpl force_children_surnames =
   let children =
     match Array.to_list fam.children with
-    [ [] -> [("", "", 0, Create Neutre)]
+    [ [] -> [("", "", 0, Create Neuter)]
     | ipl ->
         let (_, father_surname, _, _) = cpl.father in
         List.map
@@ -399,17 +399,17 @@ value print_add conf base =
     [ Some i ->
         let p = base.persons.get i in
         let fath =
-          match p.sexe with
-          [ Masculin | Neutre -> person_key base p.cle_index
-          | Feminin -> ("", "", 0, Create Neutre) ]
+          match p.sex with
+          [ Masculine | Neuter -> person_key base p.cle_index
+          | Feminine -> ("", "", 0, Create Neuter) ]
         in
         let moth =
-          match p.sexe with
-          [ Feminin -> person_key base p.cle_index
-          | Masculin | Neutre -> ("", "", 0, Create Neutre) ]
+          match p.sex with
+          [ Feminine -> person_key base p.cle_index
+          | Masculine | Neuter -> ("", "", 0, Create Neuter) ]
         in
         (fath, moth)
-    | None -> (("", "", 0, Create Neutre), ("", "", 0, Create Neutre)) ]
+    | None -> (("", "", 0, Create Neuter), ("", "", 0, Create Neuter)) ]
   in
   let fam =
     {marriage = Adef.codate_None; marriage_place = "";
@@ -436,8 +436,8 @@ value print_add_parents conf base =
          comment = ""; origin_file = ""; fsources = "";
          fam_index = bogus_family_index}
       and cpl =
-        {father = ("", sou base p.surname, 0, Create Neutre);
-         mother = ("", "", 0, Create Neutre)}
+        {father = ("", sou base p.surname, 0, Create Neuter);
+         mother = ("", "", 0, Create Neuter)}
       in
       print_add1 conf base fam cpl True
   | _ -> incorrect_request conf ]

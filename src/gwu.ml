@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 1.10 1998-12-12 10:56:49 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.11 1998-12-16 06:04:57 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -258,9 +258,9 @@ value print_parent oc base ml fam_sel fam p =
 
 value print_child oc base fam_surname print_sources p =
   do Printf.fprintf oc "-";
-     match p.sexe with
-     [ Masculin -> Printf.fprintf oc " h"
-     | Feminin -> Printf.fprintf oc " f"
+     match p.sex with
+     [ Masculine -> Printf.fprintf oc " h"
+     | Feminine -> Printf.fprintf oc " f"
      | _ -> () ];
      Printf.fprintf oc " %s" (correct_string base p.first_name);
      if p.occ == 0 || sou base p.first_name = "?" || sou base p.surname = "?"

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.16 1998-12-12 17:26:28 ddr Exp $ *)
+(* $Id: perso.ml,v 1.17 1998-12-16 06:04:59 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -157,7 +157,7 @@ value print_titles conf base and_txt p a =
 ;
 
 value print_dates conf base p =
-  let is = index_of_sex p.sexe in
+  let is = index_of_sex p.sex in
   do if age_autorise conf base p then
        let birth_place = sou base p.birth_place in
        do match (Adef.od_of_codate p.birth, birth_place) with
@@ -355,7 +355,7 @@ value print_family conf base p a ifam =
   let conjoint = poi base iconjoint in
   let children = fam.children in
   let divorce = fam.divorce in
-  let is = index_of_sex p.sexe in
+  let is = index_of_sex p.sex in
   do Wserver.wprint "\n<li>\n";
      Wserver.wprint
        (fcapitale
@@ -717,7 +717,7 @@ value print conf base p =
                 (coa conf (sou base nn)))
            nnl
      | _ -> () ];
-     let is = index_of_sex p.sexe in
+     let is = index_of_sex p.sex in
      List.iter
        (fun a ->
           Wserver.wprint "%s <em><strong>%s</strong></em><br>\n"

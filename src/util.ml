@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.16 1998-12-15 22:04:44 ddr Exp $ *)
+(* $Id: util.ml,v 1.17 1998-12-16 06:05:06 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -454,9 +454,9 @@ value ftransl_nth conf (s : format 'a 'b 'c) p : format 'a 'b 'c =
 
 value index_of_sex =
   fun
-  [ Masculin -> 0
-  | Feminin -> 1
-  | Neutre -> 2 ]
+  [ Masculine -> 0
+  | Feminine -> 1
+  | Neuter -> 2 ]
 ;
 
 value header_no_page_title conf title =
@@ -593,7 +593,7 @@ value print_alphab_list crit print_elem liste =
 ;
 
 value print_parent conf base p a =
-  let is = index_of_sex p.sexe in
+  let is = index_of_sex p.sex in
   match p.public_name with
   [ n when sou base n <> "" ->
       let n = sou base n in
@@ -615,7 +615,7 @@ value conjoint p fam =
 ;
 
 value preciser_homonyme conf base p =
-  let is = index_of_sex p.sexe in
+  let is = index_of_sex p.sex in
   match (p.public_name, p.nick_names) with
   [ (n, [nn :: _]) when sou base n <> ""->
       Wserver.wprint "%s <em>%s</em>" (coa conf (sou base n))

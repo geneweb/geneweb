@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 1.4 1998-12-15 21:45:19 ddr Exp $ *)
+(* $Id: cousins.ml,v 1.5 1998-12-16 06:04:51 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -81,11 +81,11 @@ value siblings base p =
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath_sib =
-        List.map (fun ip -> (ip, (cpl.father, Masculin)))
+        List.map (fun ip -> (ip, (cpl.father, Masculine)))
           (siblings_by base cpl.father ip)
       in
       let moth_sib =
-        List.map (fun ip -> (ip, (cpl.mother, Feminin)))
+        List.map (fun ip -> (ip, (cpl.mother, Feminine)))
           (siblings_by base cpl.mother ip)
       in
       merge_siblings fath_sib moth_sib
@@ -153,7 +153,7 @@ value rec print_descend_upto conf base ini_p ini_br lev children =
        List.iter
          (fun (ip, ia_asex, rev_br) ->
             let p = poi base ip in
-            let br = List.rev [(ip, p.sexe) :: rev_br] in
+            let br = List.rev [(ip, p.sex) :: rev_br] in
             let is_valid_rel = br_inter_is_empty ini_br br in
             if is_valid_rel && cnt.val < max_cnt && has_desc_lev base lev p
             then
@@ -176,7 +176,7 @@ value rec print_descend_upto conf base ini_p ini_br lev children =
                  let children =
                    List.map
                      (fun ip ->
-                        (ip, ia_asex, [(p.cle_index, p.sexe) :: rev_br]))
+                        (ip, ia_asex, [(p.cle_index, p.sex) :: rev_br]))
                    (children_of base p)
                  in
                  print_descend_upto conf base ini_p ini_br (lev - 1) children;

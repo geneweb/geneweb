@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 1.4 1998-11-27 20:09:39 ddr Exp $ *)
+(* $Id: check.ml,v 1.5 1998-12-16 06:04:50 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -19,9 +19,9 @@ value error gen = gen.g_errored := True;
 
 value feminin =
   fun
-  [ Masculin -> ""
-  | Feminin -> "e"
-  | Neutre -> "(e)" ]
+  [ Masculine -> ""
+  | Feminine -> "e"
+  | Neuter -> "(e)" ]
 ;
 
 value glop x =
@@ -138,10 +138,10 @@ value death_year current_year p =
 ;
 
 value update_stats base current_year s p =
-  do match p.sexe with
-     [ Masculin -> s.men := s.men + 1
-     | Feminin -> s.women := s.women + 1
-     | Neutre -> s.neutre := s.neutre + 1 ];
+  do match p.sex with
+     [ Masculine -> s.men := s.men + 1
+     | Feminine -> s.women := s.women + 1
+     | Neuter -> s.neutre := s.neutre + 1 ];
      if sou base p.first_name = "?" && sou base p.surname = "?" then
        s.noname := s.noname + 1
      else ();
