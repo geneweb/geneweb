@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.12 2000-07-26 04:42:33 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.13 2000-07-29 14:22:39 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -449,7 +449,10 @@ value accept_connection tmout max_clients callback s =
                 Unix.close s;
                 Unix.dup2 t Unix.stdout;
                 Unix.dup2 t Unix.stdin;
+(*
+  j'ai l'impression que cette fermeture fait parfois bloquer le serveur...
                 try Unix.close t with _ -> ();
+*)
                 treat_connection tmout callback addr stdin;
              return ()
            with exc ->
