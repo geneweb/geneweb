@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.7 1999-10-31 15:48:40 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.8 1999-11-09 08:13:03 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogy - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -168,7 +168,7 @@ request</b></font></a>.
 
 <p>
 
-There has been %q accesses, %c of them to this page, since %d.
+There have been %q accesses, %c of them to this page, since %d.
 %Il<p>%E
 
 </td></tr>
