@@ -37,6 +37,11 @@ GeneWeb version 4.01
     was "indirect", looking for another entry in the lexicon, which was
     complicated to understand, for the GeneWeb translators.
 
+* Templates files (etc/*.txt)
+  For programmers...
+  - [17 Mar 01] File perso.txt: added variables %nb_families, %family_cnt,
+    %nb_children, %child_cnt; the variables %count and %length are removed.
+
 GeneWeb version 4.00
 --------------------
 
