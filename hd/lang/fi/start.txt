@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.23 2000-04-04 18:59:22 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.24 2000-04-05 06:26:43 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogia - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -160,9 +160,9 @@ color=%i><b>erityishaulla</b></font></a>.
 <tr>
 <td valign=up>
 <ul>
-<li><a href="%sm=AN">syntym&auml;p&auml;iv&auml;t</a>
+<li><a href="%sm=AN">syntym‰p‰ivi‰</a>
 <li><a href="%sm=AD">vainajien muistop&auml;ivi&auml</a>
-<li><a href="%sm=AM">h&auml;&auml;p&auml;iv&auml;t</a>%I|wf
+<li><a href="%sm=AM">h‰‰p‰ivi‰</a>%I|wf
 <li><a href="%sm=LB">viime syntym&auml;t</a>%E
 </ul>
 </td>
