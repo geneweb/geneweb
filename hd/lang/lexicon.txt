@@ -410,7 +410,7 @@ he:   נין/ נינה
 it: un pronipote/una pronipote/un(a) pronipote
 nl: een achter-kleinzoon/een achter-kleindochter/een achter-kleinkind
 pt: um bisneto/uma bisneta/um(a) bisneto(a)
-se: en son(dotter)-son(dotter)-son/en son(dotter)-son(dotter)-dotter/ett barnbarnsbarn
+se: en son(dotter)-son(dotter) son/en son(dotter)-son(dotter) dotter/ett barnbarns barn
 
     a great-nephew/a great-niece
 de: ein Gro&szlig;neffe/eine Gro&szlig;nichte
@@ -422,7 +422,7 @@ he:   בן האחיין/ בת האחיין
 it: un pronipote/una pronipote
 nl: een achter-neef/een achter-nicht
 pt: um bissobrino/uma bissobrina
-se: en gammel-bror(syster)son/en gammel-syskondotter
+se: en gammel-syskonson/en gammel-syskondotter
 
     a great-uncle/a great-aunt
 de: ein Gro&szlig;onkel/eine Gro&szlig;tante
@@ -958,7 +958,7 @@ he:   קוסנגוויניות
 it: consanguineit&agrave;
 nl: bloed verwantschap
 pt: consanguinidade
-se: sl&auml;ktskap
+se: blodsband
 
     continue merging
 de: Zusammenf&uuml;hrung fortsetzen
@@ -1495,7 +1495,7 @@ es: sexos incompatibles
 fr: sexes incompatibles
 nl: geslacht komt niet overeen
 pt: sexos incompativeis
-se: inkompatibla k&ouml;n
+se: of&ouml;renliga k&ouml;n
 
     incorrect date
 de: falsches Datum
@@ -1876,7 +1876,7 @@ he:  ניוות עם %t כאזכור Sosa
 it: percorso con %t come riferimento Sosa
 nl: navigatie met %t als proband
 pt: navega&ccedil;a&atilde;o com o %t como a refer&ecirc;ncia Sosa
-se: navigering med %t som Sosa referens
+se: navigering med %t som generationsnummer referens
 
     next sibling
 de: folgende Geschwister 
@@ -1983,7 +1983,7 @@ he:  הערות
 it: nota/note
 nl: aantekening/aantekeningen
 pt: nota/notas
-se: anteckning/anteckningar
+se: notering/noteringarXS
 
     nth
 de: n-ten/1sten/2ten/3ten/4ten/5ten/6ten/7ten/8ten/9ten/10ten/11ten/12ten/13ten/14ten/15ten/16ten/17ten/18ten/19ten/20ten/21ten/22ten/23ten/24ten/25ten/26ten/27ten/28ten/29ten/30ten/31ten/32ten/33ten/34ten/35ten/36ten/37ten/38ten/39ten/40ten/41ten/42ten/43ten/44ten/45ten/46ten/47ten/48ten/49ten/50ten/51ten/52ten/53ten/54ten/55ten/56ten/57ten/58ten/59ten/60ten/61ten/62ten/63ten/64ten/65ten/66ten/67ten/68ten/69ten/70ten/71ten/72ten/73ten/74ten/75ten/76ten/77ten/78ten/79ten/80ten/81ten/82ten/83ten/84ten/85ten/86ten/87ten/88ten/89ten/90ten/91ten/92ten/93ten/94ten/95ten/96ten/97ten/98ten/99ten
@@ -2357,7 +2357,8 @@ he: "לולאה" במאגרי מידע  לפה"נ
 it: ciclo probabile nella base di dati: qualcuno &egrave; il suo proprio antenato
 nl: waarschijnlijk een lus in de databank
 pt: la&ccedil;o prov&aacute;vel na base de dados: algu&eacute;m &eacute; his/her pr&oacute;prio antepassado
-se: trolig rundg&aring;ng i databasen: n&aring;gon &auml;r hans/hennes egen sl&auml;kting
+se: trolig rundg&aring;ng i databasen: n&aring;gon &auml;r hans/hennes
+egen stamfader
 
     public
 de: &ouml;ffentlich
@@ -2524,7 +2525,7 @@ he:  מקור/ מקורות
 it: sorgente/sorgenti
 nl: bron/bronnen
 pt: fonte/fontes
-se: k&auml;llor
+se: k&auml;lla/k&auml;llor
 
     specify
 cn: ´׃ֱֲֿ׀ׁ¡ָ¡
@@ -2561,7 +2562,7 @@ he:  לא כולל בני זוג
 it: coniugi esclusi
 nl: echtgenoten weggelaten
 pt: c&ocirc;njuges n&atilde;o inclu&iacute;dos
-se: makar inte inkluderade
+se: xklusive gem&aring;ler
 
     starting with
 de: beginnend mit
@@ -2786,7 +2787,7 @@ se: filen &auml;r tempor&auml;rt l&aring;st: f&ouml;rs&ouml;k igen. Om det &auml
 
     the following children of %t and %t are not in order
 de: die folgenden Kinder von %t und %t sind nicht geordnet
-en: the following children of %t and %t are not in order
+en: the following children of %t and %t are not in chronological order
 eo: la malantauxa infanoj de %t kaj %t ne estas orde
 es: los seguientes hijos de %t y %t no est&aacute;n presentados en orden
 fr: les enfants suivants de %t et de %t ne sont pas dans l'ordre
@@ -2830,7 +2831,7 @@ he:  הנינים
 it: i pronipoti
 nl: de achterkleinkinderen
 pt: os bisnetos
-se: barnbarnsbarnen
+se: barnbarns barnen
 
     the great-grandparents
 de: die Urgro&szlig;eltern
@@ -2962,7 +2963,7 @@ he:  עד הנינים
 it: fino ai bisnonni
 nl: tot de achterkleinkinderen
 pt: at&eacute; os bisnetos
-se: till barnbarnsbarnen
+se: till barnbarns barnen
 
     to the great-grandparents
 de: bis zu den Urgro&szlig;eltern

@@ -42,6 +42,7 @@ GeneWeb Version 1.11
     gwb2ged).
 
 * Lexicon file (lexicon.txt)
+  - [Feb 3, 99] Some changes in Swedish translation (Lars Gustavsson).
   - [Jan 28, 99] Added section "!dir" for languages written right to left.
   - [Jan 28, 99] [minor] Portuguese translation now in pure ascii using
     HTML "&" macros instead of accents (no changes in Portuguese displaying)
@@ -54,10 +55,12 @@ GeneWeb Version 1.11
   - [Jan 30, 99] (en) Some changes in terms used (anniversaries).
 
 * Documentation
+  - [Feb 3, 99] Added a paragraph (Message "socket failed") in "problems".
   - [Feb 1, 99] Updated Dutch version (Joris Esch).
   - [Jan 29, 99] Added remark at end of introduction for how to redirect
     the command displaying in a file.
-  - [Jan 26, 99] Fixed many typos in english version (Lars Gustavsson).
+  - [Jan 26, 99..Feb 3, 99] Fixed many typos in english version (Lars
+    Gustavsson).
   - [Jan 25, 99] Added doc explaining consanguinity: new link in "directions
     for use".
   - [Jan 24, 99] Added doc for default photo name (new feature) in "directions
