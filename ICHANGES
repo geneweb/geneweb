@@ -5,6 +5,10 @@ GeneWeb Version 3.03
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [23 Feb 00] Fixed bug: in notes, when "<a" and "href" were separated
+    by a newline instead of space, it was not considered to be in the
+    tag "a href" and if followed by "http://" could erroneously generate a
+    link.
   - [21 Feb 00] Add a + for dead people without date, even if their
     birth date clearly shows that they must be dead.
   - [09 Feb 00] Added link to welcome in anniversaries pages.
