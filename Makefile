@@ -1,9 +1,11 @@
-# $Id: Makefile,v 4.16 2002-10-31 14:48:35 ddr Exp $
+# $Id: Makefile,v 4.17 2002-11-01 10:35:52 ddr Exp $
 
 PREFIX=/usr
 LANGDIR=$(PREFIX)/share/geneweb
 DOCDIR=$(PREFIX)/share/geneweb/doc
+MANDIR=$(PREFIX)/man/man1
 DESTDIR=distribution
+MANPAGES=ged2gwb.1 gwb2ged.1 gwc.1 gwu.1
 
 include tools/Makefile.inc
 
@@ -51,6 +53,8 @@ install:
 	cp hd/images/*.jpg hd/images/*.gif $(LANGDIR)/images/.
 	mkdir -p $(LANGDIR)/etc
 	cp hd/etc/*.txt $(LANGDIR)/etc/.
+	mkdir -p $(MANDIR)
+	cd man; cp $(MANPAGES) $(MANDIR)/.
 
 uninstall:
 	rm -f $(PREFIX)/bin/gwc$(EXE)
@@ -60,6 +64,7 @@ uninstall:
 	rm -f $(PREFIX)/bin/ged2gwb$(EXE)
 	rm -f $(PREFIX)/bin/gwb2ged$(EXE)
 	rm -rf $(PREFIX)/share/geneweb
+	cd $(MANDIR); rm -f $(MANPAGES)
 
 distrib: new_distrib wrappers
 

@@ -50,6 +50,8 @@ GeneWeb version 4.08
     with an underscore at the beginning (eg. _123abc.jpg).
 
 * Installation
+  - [01 Nov 02] Added (Unix) "man" pages (installed by "make install");
+    built by Christan Perrier (thanks to him!).
   - [31 Oct 02] When building GeneWeb from source files: added a "make
     install" which installs the executables in /usr/bin and the system
     files in /usr/share/geneweb. Added also "make uninstall" which undoes
