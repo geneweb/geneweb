@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2000-07-27 03:32:40 ddr Exp $
+# $Id: Makefile,v 1.8 2000-08-05 09:44:53 ddr Exp $
 
 CAMLP4=camlp4r
 OCAMLC=ocamlc.opt
@@ -35,12 +35,12 @@ depend:
 .SUFFIXES: .ml .cmo .cmx
 
 .ml.cmo:
-	$(CAMLP4) $< -o $*.ppo
+	$(CAMLP4) pa_ru.cmo $< -o $*.ppo
 	$(OCAMLC) $(OCOPT) -c -impl $*.ppo
 	$(RM) $*.ppo
 
 .ml.cmx:
-	$(CAMLP4) $< -o $*.ppo
+	$(CAMLP4) pa_ru.cmo $< -o $*.ppo
 	$(OCAMLOPT) $(OCOPT) -c -impl $*.ppo
 	$(RM) $*.ppo
 

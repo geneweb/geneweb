@@ -1,8 +1,9 @@
-<head><title>Directory %b.gwb</title></head>
+<head><title>Gwtp - download %b</title></head>
 <body>
-<h1>Directory %b.gwb</h1>
+<h1 align=center>Gwtp - download %b</h1>
 
-Create first a new directory named <em>%b.gwb</em>, or any other name
-ending with <em>.gwb</em>, on your disk and download these files into.
+On your computer, create first a new directory named <em>%b.gwb</em>,
+or any other name ending with <em>.gwb</em>, on your disk and download
+these files into.
 
 
