@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.190 2004-02-23 09:10:31 ddr Exp $
+# $Id: lexicon.txt,v 4.191 2004-02-23 09:53:50 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -7472,33 +7472,6 @@ sl: doloиi
 sv: v&auml;lj
 zh: ґУПВБРСЎИЎ
 
-    spouse
-af: eggenoot/eggenote
-bg: съпруг/съпруга
-br: pried
-ca: marit/muller
-cs: manѕel/cho»
-da: &aelig;gtef&aelig;lle
-de: Ehemann/Ehefrau
-en: spouse
-eo: edzo/edzino
-es: esposo/esposa
-et: abikaasa
-fi: puoliso
-fr: &eacute;poux/&eacute;pouse
-he:   бп-жев/ бъ-жев
-is: maki
-it: coniuge
-lv: laulвtais
-nl: echtgenoot/echtgenote
-no: make
-pl: maіїonek/maіїonka
-pt: marido/esposa
-ro: sot/sotie
-ru: супруг
-sl: moѕ/ѕena
-sv: make/maka
-
     spouses not included
 af: eggenote weggelaat
 bg: без да се включват съпрузите/съпругите
@@ -9096,32 +9069,32 @@ ru: свидетель:g:-я:a:-я/свидетели
 sl: priиa/priиe
 sv: vittne/vittnen
 
-    wizard/wizards/friend
-af: Medewerkers/Medewerkers/vriend
-bg: администратор/администратори/приятел
-br: strobineller/strobinellerien/mignon
-ca: administrador/administrador/amic
-cs: wizard/wizards/friend
-da: bidragyder/bidragydere/betroet
-de: Wizard/Wizard/Freund
-en: wizard/wizards/friend
-eo: sorcxisto/sorcxistoj/amiko
-es: brujo/brujos/amigo
-et: teadmamehena/teadmamehena/sхbrana
-fi: velho/velho/valittu
-fr: magicien/magiciens/ami
-he:  лваеп / лваеп / ойезсъ 
-is: uppfжra/uppfжra/vinur
-it: wizard/wizard/amico
-lv: wizard/wizard/friend
-nl: tovenaar/tovenaar/vriend
-no: Oppdaterings/Oppdaterings/venner
-pl: wizard/wizard/friend
-pt: feiticeiro/feiticeiros/amigo
-ro: magician/magician/amic
-ru: wizard/wizard/друг
-sl: иarovnik/иarovnik/prijatelj
-sv: administrat&ouml;r/administrat&ouml;rer/v&auml;n
+    wizard/wizards/friend/friends
+af: Medewerkers/Medewerkers/vriend/vriend
+bg: администратор/администратори/приятел/приятел
+br: strobineller/strobinellerien/mignon/mignon
+ca: administrador/administrador/amic/amic
+cs: wizard/wizards/friend/friends
+da: bidragyder/bidragydere/betroet/betroet
+de: Wizard/Wizard/Freund/Freund
+en: wizard/wizards/friend/friends
+eo: sorcxisto/sorcxistoj/amiko/amikoj
+es: brujo/brujos/amigo/amigos
+et: teadmamehena/teadmamehena/sхbrana/sхbrana
+fi: velho/velho/valittu/valittu
+fr: magicien/magiciens/ami/amis
+he:  лваеп / лваеп / ойезсъ / ойезсъ 
+is: uppfжra/uppfжra/vinur/vinur
+it: wizard/wizard/amico/amico
+lv: wizard/wizard/friend/friends
+nl: tovenaar/tovenaar/vriend/vriend
+no: Oppdaterings/Oppdaterings/venner/venner
+pl: wizard/wizard/friend/friends
+pt: feiticeiro/feiticeiros/amigo/amigos
+ro: magician/magician/amic/amic
+ru: wizard/wizard/друг/друг
+sl: иarovnik/иarovnik/prijatelj/prijatelj
+sv: administrat&ouml;r/administrat&ouml;rer/v&auml;n/v&auml;n
 
     would be his/her own ancestor
 af: sal sy/haar eie voorganger wees

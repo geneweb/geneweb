@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.32 2003-12-10 12:19:10 ddr Exp $ *)
+(* $Id: forum.ml,v 4.33 2004-02-23 09:53:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -497,25 +497,20 @@ value print_add conf base =
         print_var conf "Ident" (capitale (header_txt conf 0)) False conf.user;
         print_var conf "Email" (capitale (header_txt conf 1)) True "";
         print_var conf "Subject" (capitale (header_txt conf 2)) False "";
-        if conf.wizard || conf.friend then
-          tag "tr" "align=left colspan=2" begin
-            stag "td" begin
-              Wserver.wprint "<input type=radio name=Access value=publ>%s\n"
-                (transl conf "public");
-              Wserver.wprint
-                "<input type=radio name=Access value=priv checked>%s\n"
-                (transl conf "private");
-            end;
-            Wserver.wprint "\n";
-          end
-        else ();
       end;
       html_p conf;
       Wserver.wprint "%s<br>\n"
         (capitale (Gutil.nominative (message_txt conf 0)));
       stag "textarea" "name=Text rows=15 cols=70 wrap=soft" begin end;
       Wserver.wprint "\n<br>\n";
-      Wserver.wprint "<input type=submit value=Ok>\n";
+      if conf.wizard || conf.friend then
+	do {
+          Wserver.wprint "<input type=submit name=publ_acc value=\"%s\">\n"
+	    (transl conf "public");
+          Wserver.wprint "<input type=submit name=priv_acc value=\"%s\">\n"
+            (transl conf "private");
+        }
+      else Wserver.wprint "<input type=submit value=Ok>\n";
     end;
     trailer conf;
   }
@@ -532,9 +527,11 @@ value forum_add conf base ident comm =
   let email = String.lowercase (Gutil.strip_spaces (get conf "Email")) in
   let subject = Gutil.strip_spaces (get conf "Subject") in
   let access =
-    match p_getenv conf.env "Access" with
-    [ Some v -> v
-    | None -> "publ" ]
+    if conf.wizard || conf.friend then
+      match p_getenv conf.env "priv_acc" with
+      [ Some _ -> "priv"
+      | None -> "publ" ]
+    else "publ"
   in
   if ident <> "" && comm <> "" then
     let fname = forum_file conf in
