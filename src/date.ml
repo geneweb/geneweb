@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.19 2003-12-23 19:21:50 ddr Exp $ *)
+(* $Id: date.ml,v 4.20 2003-12-24 00:21:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -641,39 +641,67 @@ value print_calendar conf base =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    Wserver.wprint "- %s -"
-      (capitale (nominative (transl_nth conf "(week day)" wday)));
-    if date = conf.today then
-      let (hh, mm, ss) = conf.time in
-      Wserver.wprint " <tt>%02d:%02d:%02d</tt>" hh mm ss
-    else ();
-    Wserver.wprint "\n";
-    html_p conf;
-    tag "form" "method=GET action=\"%s\"" conf.command begin
-      List.iter
-        (fun (k, v) ->
-           Wserver.wprint "<input type=hidden name=%s value=%s>\n" k
-             (quote_escaped (decode_varenv v)))
-        conf.henv;
-      Wserver.wprint "<input type=hidden name=m value=CAL>\n\n";
-      let order = transl conf " !dates order" in
-      tag "table" "border=1" begin
-        print_calendar_head conf order;
-        print_some_calendar conf order date 0 gregorian_month_name 12 "g";
-        print_some_calendar conf order (Calendar.julian_of_gregorian date) 1
-          julian_month_name 12 "j";
-        print_some_calendar conf order (Calendar.french_of_gregorian date) 2
-          french_month_name 13 "f";
-        print_some_calendar conf order (Calendar.hebrew_of_gregorian date) 3
-          hebrew_month_name 13 "h";
+    tag "table" "align=center" begin
+      stag "tbody" begin
+        stag "tr" begin
+          tag "td" "align=left" begin
+            Wserver.wprint "- %s -"
+              (capitale (nominative (transl_nth conf "(week day)" wday)));
+            if date = conf.today then
+              let (hh, mm, ss) = conf.time in
+              Wserver.wprint " <tt>%02d:%02d:%02d</tt>" hh mm ss
+            else ();
+            Wserver.wprint "\n";
+          end;
+        end;
+        stag "tr" begin
+          stag "td" "align=left" begin
+            Wserver.wprint "&nbsp;";
+          end;
+        end;
+        stag "tr" begin
+          tag "td" "align=center" begin
+            tag "form" "method=GET action=\"%s\"" conf.command begin
+              List.iter
+                (fun (k, v) ->
+                   Wserver.wprint "<input type=hidden name=%s value=%s>\n" k
+                     (quote_escaped (decode_varenv v)))
+                conf.henv;
+              Wserver.wprint "<input type=hidden name=m value=CAL>\n\n";
+              let order = transl conf " !dates order" in
+              tag "table" "border=1" begin
+                print_calendar_head conf order;
+                print_some_calendar conf order date 0 gregorian_month_name
+                  12 "g";
+                print_some_calendar conf order
+                  (Calendar.julian_of_gregorian date) 1 julian_month_name
+                  12 "j";
+                print_some_calendar conf order
+                  (Calendar.french_of_gregorian date) 2 french_month_name
+                  13 "f";
+                print_some_calendar conf order
+                  (Calendar.hebrew_of_gregorian date) 3 hebrew_month_name
+                  13 "h";
+              end;
+            end;
+          end;
+        end;
+        stag "tr" begin
+          stag "td" "align=left" begin
+            Wserver.wprint "&nbsp;";
+          end;
+        end;
+        stag "tr" begin
+          tag "td" "align=center" begin
+            Wserver.wprint "%s: " (capitale (transl conf "julian day"));
+            let jd = Calendar.sdn_of_gregorian date in
+            if jd < 0 then Wserver.wprint "%d" jd
+            else
+              Num.print (fun x -> Wserver.wprint "%s" x)
+                (transl conf "(thousand separator)") (Num.of_int jd);
+          end;
+        end;
       end;
-      Wserver.wprint "<br><p>%s: " (capitale (transl conf "julian day"));
-      let jd = Calendar.sdn_of_gregorian date in
-      if jd < 0 then Wserver.wprint "%d" jd
-      else
-        Num.print (fun x -> Wserver.wprint "%s" x)
-          (transl conf "(thousand separator)") (Num.of_int jd);
-      Wserver.wprint "\n";
     end;
     trailer conf;
   }
