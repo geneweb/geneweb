@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 4.6 2001-12-19 00:42:12 ddr Exp $ *)
+(* $Id: select.ml,v 4.7 2001-12-20 19:58:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -242,18 +242,6 @@ value select_descendants base per_tab fam_tab no_spouses_parents flag iper =
   loop iper
 ;
 
-(*
-value select_descendants_all
-  base per_tab fam_tab no_spouses_parents aflag dflag =
-  for i = 0 to base.data.persons.len - 1 do {
-    if per_tab.(i) land aflag <> 0 then
-      select_descendants base per_tab fam_tab no_spouses_parents dflag
-        (Adef.iper_of_int i)
-    else ()
-  }
-;
-*)
-
 value select_descendants_ancestors base per_tab fam_tab no_spouses_parents ip =
   let new_mark = let r = ref 0 in fun () -> do { incr r; r.val } in
   let tab = Array.create base.data.persons.len (new_mark ()) in
@@ -360,13 +348,8 @@ value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
         else ()
       in
       do {
-(*
-        select_ancestors base per_tab fam_tab False 1 iadper;
-        select_descendants_all base per_tab fam_tab no_spouses_parents 1 2;
-*)
         select_descendants_ancestors base per_tab fam_tab no_spouses_parents
           iadper;
-(**)
         (fun i ->
            let fl = per_tab.(Adef.int_of_iper i) in
            fl < 4 && fl > 0,

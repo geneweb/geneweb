@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.15 2001-11-16 13:38:53 ddr Exp $ *)
+(* $Id: update.ml,v 4.16 2001-12-20 19:58:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -146,7 +146,7 @@ value print_first_name_strong conf base p =
 
 value print_src conf name field =
   tag "table" "border=1" begin
-    tag "tr" begin
+    tag "tr" "align=left" begin
       tag "td" begin
         Wserver.wprint "%s" (capitale (transl_nth conf "source/sources" 0));
       end;
@@ -514,7 +514,7 @@ value reconstitute_date conf var =
 value print_date conf base lab var d =
   do {
     tag "table" "border=1" begin
-      tag "tr" begin
+      tag "tr" "align=left" begin
         stag "td" begin Wserver.wprint "%s" lab; end;
         let d =
           match d with
@@ -552,7 +552,7 @@ value print_date conf base lab var d =
       end;
     end;
     tag "table" "border=1" begin
-      tag "tr" begin
+      tag "tr" "align=left" begin
         tag "td" begin
           Wserver.wprint "%s\n"
             (capitale (transl_nth conf "calendar/calendars" 0));
@@ -901,7 +901,7 @@ value print conf base p =
     header conf title;
     print_link_to_welcome conf True;
     tag "table" "border=%d width=\"90%%\"" conf.border begin
-      tag "tr" begin
+      tag "tr" "align=left" begin
         tag "th" "align=left" begin
           Wserver.wprint "%s<br>&nbsp;\n"
             (std_color conf
@@ -913,7 +913,7 @@ value print conf base p =
                (capitale (nominative (transl_nth conf "family/families" 1))));
         end;
       end;
-      tag "tr" begin
+      tag "tr" "align=left" begin
         tag "td" "valign=top" begin
           Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a><br>\n"
             (commd conf) (Adef.int_of_iper p.cle_index)

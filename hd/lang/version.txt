@@ -11,7 +11,7 @@ function WorkOnBrowser() {
 // --></script>
 
 <table border=0>
-<tr>
+<tr align=left>
 <td align=center>
 <a href="%glang=af"
  onmouseover="if (WorkOnBrowser()) iaf.src='%o/t-af.gif'"

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 4.2 2001-04-21 01:48:28 ddr Exp $ *)
+(* $Id: merge.ml,v 4.3 2001-12-20 19:58:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -50,7 +50,7 @@ value print conf base p =
       List.iter
         (fun p ->
            do {
-             Wserver.wprint "<tr><td valign=top>\n";
+             Wserver.wprint "<tr align=left><td valign=top>\n";
              Wserver.wprint "<input type=radio name=select value=%d>\n"
                (Adef.int_of_iper p.cle_index);
              Wserver.wprint "<td>\n";

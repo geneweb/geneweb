@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.3 2001-06-13 08:00:35 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 4.4 2001-12-20 19:58:13 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -13,7 +13,7 @@ value print_child_person conf base p =
   let occ = p.occ in
   let var = "c" ^ string_of_int (Adef.int_of_iper p.cle_index) in
   tag "table" "border=1" begin
-    tag "tr" begin
+    tag "tr" "align=left" begin
       tag "td" begin
         Wserver.wprint "%s"
           (capitale (transl_nth conf "first name/first names" 0));
@@ -31,7 +31,7 @@ value print_child_person conf base p =
       end;
     end;
     Wserver.wprint "\n";
-    tag "tr" begin
+    tag "tr" "align=left" begin
       tag "td" begin
         Wserver.wprint "%s" (capitale (transl_nth conf "surname/surnames" 0));
       end;

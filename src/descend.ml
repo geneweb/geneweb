@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 4.5 2001-08-06 08:50:12 ddr Exp $ *)
+(* $Id: descend.ml,v 4.6 2001-12-20 19:58:14 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -104,7 +104,7 @@ value print_choice conf base p niveau_effectif =
     Wserver.wprint "<input type=submit value=\"Ok\">\n";
     html_p conf;
     tag "table" "border=%d width=\"90%%\"" conf.border begin
-      tag "tr" begin
+      tag "tr" "align=left" begin
         tag "td" begin
           Wserver.wprint "<input type=radio name=t value=L checked> %s<br>\n"
             (capitale (transl_nth conf "list/list (ancestors)" 0));
@@ -139,7 +139,7 @@ value print_choice conf base p niveau_effectif =
           Wserver.wprint "<input type=radio name=t value=A> d'Aboville<br>\n";
         end;
       end;
-      tag "tr" begin
+      tag "tr" "align=left" begin
         tag "td" "colspan=2 align=center" begin
           Wserver.wprint "<br>\n%s\n"
             (capitale (transl conf "cancel GeneWeb links"));
@@ -968,7 +968,7 @@ value rec print_table_person conf base max_lev ip =
   do {
     Wserver.wprint "\n";
     tag "table" "border=1" begin
-      Wserver.wprint "<tr>\n";
+      Wserver.wprint "<tr align=left>\n";
       tag "td" "valign=top" begin print_someone conf base (poi base ip); end;
       if max_lev > 0 then
         match children_of base ip with
