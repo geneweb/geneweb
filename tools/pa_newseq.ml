@@ -1,4 +1,4 @@
-(* $Id: pa_newseq.ml,v 4.2 2001-04-17 21:29:21 ddr Exp $ *)
+(* $Id: pa_newseq.ml,v 4.3 2001-04-17 22:41:57 ddr Exp $ *)
 
 ifndef NEWSEQ then
 
@@ -26,7 +26,7 @@ declare
             mkseq loc seq
         | "for"; i = LIDENT; "="; e1 = SELF; df = direction_flag; e2 = SELF;
           "do"; "{"; el = sequence; "}" ->
-            MLast.ExFor loc i e1 df e2 el
+            MLast.ExFor loc i e1 e2 df el
         | "while"; e = SELF; "do"; "{"; el = sequence; "}" ->
             MLast.ExWhi loc e el ] ]
     ;
