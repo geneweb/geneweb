@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.83 1999-07-28 06:56:30 ddr Exp $
+# $Id: lexicon.txt,v 2.84 1999-07-28 09:09:30 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -621,11 +621,13 @@ se: l&auml;gg till
 dk: adoptivfader/adoptivmoder/adoptivfor&aelig;ldre
 en: adoptive father/adoptive mother/adoptive parents
 fr: p&egrave;re adoptif/m&egrave;re adoptive/parents adoptifs
+se: adoptivfar/adoptivmor/adoptivf&ouml;r&auml;ldrar
 
     adoptive son/adoptive daughter/adoptive child
 dk: adoptivs&oslash;n/adoptivdatter/adoptivbarn
 en: adoptive son/adoptive daughter/adoptive child
 fr: fils adoptif/fille adoptive/enfant adoptif
+se: adoptivson/adoptivdotter/adoptivbarn
 
     advanced request
 cn: ¸ß¼¶·ÃÎÊÇëÇó
@@ -1114,11 +1116,13 @@ se: utan GeneWeb l&auml;nkar
 dk: mulig fader/mulig moder/mulige for&aelig;ldre
 en: candidate father/candidate mother/candidate parents
 fr: p&egrave;re possible/m&egrave;re possible/parents possibles
+se: m&ouml;jlig far/m&ouml;jlig mor/m&ouml;jliga f&ouml;r&auml;ldrar
 
     candidate son/candidate daughter/candidate child
 dk: mulig s&oslash;n/mulig datter/muligt barn
 en: candidate son/candidate daughter/candidate child
 fr: fils possible/fille possible/enfant possible
+se: m&ouml;jlig son/m&ouml;jlig dotter/m&ouml;jliga barn
 
     cannot access base
 cs: databáze je nepøístupná
@@ -1777,11 +1781,13 @@ se: generation
 dk: gudfader/gudmoder/gudfader og gudmoder
 en: godfather/godmother/godparents
 fr: parrain/marraine/parrain et marraine
+se: gudfar/gudmor/gudf&ouml;r&auml;ldrar
 
     godson/goddaughter/godchild
 dk: guds&oslash;n/guddatter/gudbarn
 en: godson/goddaughter/godchild
 fr: filleul/filleule/filleul(e)
+se: gudson/guddotter/gudbarn
 
     grand-parents
 cs: prarodièe
@@ -2545,6 +2551,7 @@ eo: nevoj kay nevinoj
 es: sobrinos y sobrinas
 fr: neveux et ni&egrave;ces
 pt: sobrinos e sobrinas
+se: nev&ouml;er och niecer
 
     next sibling
 cs: následující sourozenec
@@ -3214,16 +3221,19 @@ se: smeknamn
 dk: anerkendt s&oslash;n/anerkendt datter/anerkendt barn
 en: recognized son/recognized daughter/recognized child
 fr: fils reconnu/fille reconnue/enfant reconnu
+se: erk&auml;nd son/erk&auml;nd dotter/erk&auml;nt barn
 
     recognizing father/recognizing mother/recognizing parents
 dk: sig vedkendende fader/sig vedkendende moder/sig vedkendende for&aelig;ldre
 en: recognizing father/recognizing mother/recognizing parents
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
+se: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
 
     relation/relations
 dk: forbindelse/forbindelser
 en: relation/relations
 fr: relation/relations
+se: relation/relationer
 
     relationship
 cs: vztah
@@ -4092,6 +4102,7 @@ eo: onkloj kaj onklinoj
 es: t&iacute;os y t&iacute;as
 fr: oncles et tantes
 pt: tios e tias
+se: farbr&ouml;der-morbr&ouml;der och fastrar-mostrar
 
     unknown person
 cs: neznámá osoba
