@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.1 2002-12-09 22:42:42 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.2 2002-12-10 05:14:10 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -72,8 +72,19 @@ value print_main conf base wizfile =
              if (conf.wizard && conf.user = wz) ||
                  Sys.file_exists (wzfile wddir wz)
              then
-               Wserver.wprint "<a href=\"%sm=WIZNOTES;v=%s\">%s</a>"
-                 (commd conf) (Util.code_varenv wz) wz
+               Wserver.wprint "<a href=\"%sm=WIZNOTES;v=%s%t\">%s</a>"
+                 (commd conf) (Util.code_varenv wz)
+                 (fun _ ->
+                    try
+                      let s = Unix.stat (wzfile wddir wz) in
+                      let tm = Unix.localtime s.Unix.st_mtime in
+                      Wserver.wprint ";d=%d-%02d-%02d,%02d:%02d:%02d"
+                        (tm.Unix.tm_year + 1900) (tm.Unix.tm_mon + 1)
+                        tm.Unix.tm_mday tm.Unix.tm_hour tm.Unix.tm_min
+                        tm.Unix.tm_sec
+                    with
+                    [ Unix.Unix_error _ _ _ -> () ])
+                 wz
              else
                Wserver.wprint "%s" wz))
      wizdata;
