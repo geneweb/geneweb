@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: tree.ml,v 2.7 1999-09-21 16:55:52 ddr Exp $ *)
+(* $Id: tree.ml,v 2.8 1999-10-08 10:19:55 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -159,12 +159,8 @@ value print_tree conf base with_spouses one_branch t =
       else ();
     end
   in
-  let border =
-    match p_getint conf.env "border" with
-    [ Some x -> x
-    | None -> 0 ]
-  in
-  tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\"" border
+  tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
+    conf.border
   begin
     loop True [(t.node, t)] where rec loop first tl =
       do if not first && not one_branch then

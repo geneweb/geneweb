@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.141 1999-10-08 07:15:43 ddr Exp $
+# $Id: lexicon.txt,v 2.142 1999-10-08 10:19:41 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1326,6 +1326,10 @@ no: kommentar
 pt: commentario
 se: kommentar
 
+    comment added
+en: comment added
+fr: commentaire ajout&eacute;
+
     consanguinity
 cs: pokrevenství
 de: Blutsverwandtschaft
@@ -1854,8 +1858,15 @@ en: forum
 fr: forum
 
     friend
+dk: betroet
 en: friend
+eo: amiko
+es: amigo
 fr: ami
+nl: vriend
+no: venner
+pt: amigo
+se: v&auml;nner
 
     generation
 cs: generace
@@ -3119,6 +3130,10 @@ nl: alleen de geselecteerde generatie
 no: bare den valgte generasjonen
 pt: s&oacute; a gera&ccedil;&atilde;o selecionada
 se: endast den valda generationen
+
+    optional
+en: optional
+fr: facultatif
 
     or
 cs: nebo
@@ -4425,8 +4440,15 @@ nl: getuige/getuigen
 se: vittne/vittnen
 
     wizard
+dk: opdaterings
 en: wizard
+eo: sorcxisto
+es: brujo
 fr: sorcier
+nl: wijzigen
+no: oppdaterings
+pt: bruxo
+se: uppdaterings
 
     would be his/her own ancestor
 cs: byl by svùj vlastní pøedek

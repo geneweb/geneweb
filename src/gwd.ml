@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 2.47 1999-09-30 13:13:12 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.48 1999-10-08 10:19:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -572,6 +572,10 @@ use \"can_send_image\".\n"
          else Filename.concat Util.base_dir.val x
        with 
        [ Not_found -> auth_file.val ];
+     border =
+       match Util.p_getint env "border" with
+       [ Some i -> i
+       | None -> 0 ];
      today =
        {day = tm.Unix.tm_mday;
         month = succ tm.Unix.tm_mon;

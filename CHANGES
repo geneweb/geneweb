@@ -2,6 +2,7 @@ GeneWeb version 2.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [Oct 8, 99] Added a forum for "wizards" and "friends".
   - [Oct 5, 99] Fixed links problems in some pages from the DOC
     link (some problems found in the Swedish version).
   - [Oct 5, 99] Added displaying of number of persons in ascends (short

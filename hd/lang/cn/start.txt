@@ -68,7 +68,9 @@ or <em>Sosa number</em> relative to %a%u
 
 %w<li> <a href="%sm=ADD_FAM">增加家庭记录</a>.
 <li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w
+<li><a href="%sm=FORUM;t=w">[*forum] - <em>[wizard]</em></a>
+%w%e<li><a href="%sm=FORUM;t=f">[*forum] - <em>[friend]</em></a>
+%e
 
 </ul>
 

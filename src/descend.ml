@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.30 1999-09-23 08:32:48 ddr Exp $ *)
+(* $Id: descend.ml,v 2.31 1999-10-08 10:19:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1142,12 +1142,8 @@ value print_tree conf base gv p =
       gen []
   in
   do header_no_page_title conf title;
-     let border =
-       match p_getint conf.env "border" with
-       [ Some i -> i
-       | None -> 0 ]
-     in
-     tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\"" border
+     tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
+       conf.border
      begin
        loop [] [Some (p, True)] (gv + 1) where rec loop prev_gen gen v =
          do if prev_gen <> [] then
