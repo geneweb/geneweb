@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.25 1999-05-10 15:46:01 ddr Exp $ *)
+(* $Id: perso.ml,v 2.26 1999-05-14 11:39:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -284,7 +284,8 @@ value print_dates conf base in_perso p =
        match (p.death, death_place, p.burial) with
        [ (DontKnowIfDead | NotDead, "", _) -> False
        | (DeadDontKnowWhen, "", Buried _ | Cremated _) -> False
-       | (DeadDontKnowWhen, _, _) -> not (of_course_died conf p)
+       | (DeadDontKnowWhen, _, _) ->
+           death_place <> "" || not (of_course_died conf p)
        | _ -> True ]
      in
      do if something && in_perso then Wserver.wprint "<em>\n" else ();
@@ -311,7 +312,7 @@ value print_dates conf base in_perso p =
             match (death_place, p.burial) with
             [ ("", Buried _ | Cremated _) -> ()
             | _ ->
-                if not (of_course_died conf p) then
+                if death_place <> "" || not (of_course_died conf p) then
                   do Wserver.wprint "%s" (cap (transl_nth conf "died" is));
                      if death_place <> "" then Wserver.wprint "\n-&nbsp;"
                      else ();

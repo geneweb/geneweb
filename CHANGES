@@ -12,8 +12,11 @@ GeneWeb Intermediate version 2.02-1
   - [May 7, 99] Fixed bug: "cleanup" under Windows did not work.
 
 * GeneWeb Daemon/CGI (gwd)
+  - [May 14, 99] Fixed bug: in personal pages, the term "died" was sometimes
+    missing when there was only a death place but no death date. Happened
+    for persons born more than 120 years ago.
   - [May 12, 99] Fixed problem in CGI mode under Windows: sometimes displayed
-    warning texts on the browser window.
+    warning texts on the page.
   - [May 11, 99] Fixed bug: advanced search worked bad when neither "wizard"
     nor "friend": did not work when only specifying e.g. a first name
     or a surname of an existing (non "public") person.
