@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 2.10 1999-05-18 23:34:23 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 2.11 1999-05-19 10:19:16 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -262,6 +262,16 @@ value ged_multimedia_link base oc per =
       return () ]
 ;
 
+value next_space_overflows s len i =
+  if s.[i] = ' ' then
+    loop (len + 1) (i + 1) where rec loop len i =
+      if i >= String.length s then False
+      else if len >= 255 then True
+      else if s.[i] = ' ' then False
+      else loop (len + 1) (i + 1)
+  else False
+;
+
 value br = "<br>";
 
 value rec display_note oc s len i =
@@ -276,7 +286,7 @@ value rec display_note oc s len i =
         else i
       in
       display_note oc s (String.length "2 CONT ") i
-    else if s.[i] == '\n' || len = 255 then
+    else if s.[i] == '\n' || len = 255 || next_space_overflows s len i then
       do Printf.fprintf oc "\n2 CONC ";
          Printf.fprintf oc "%c" (if s.[i] == '\n' then ' ' else s.[i]);
       return

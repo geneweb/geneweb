@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.16 1999-05-18 23:34:21 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.17 1999-05-19 10:19:14 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -84,19 +84,26 @@ value rec line_start num =
 
 value rec get_lev n =
   parser
-    [: _ = line_start n; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
-       r3 = get_to_eoln 0 ? "get to eoln";
-       l = get_lev_list [] (Char.chr (Char.code n + 1)) ? "get lev list" :] ->
-      let (rlab, rval, rcont) =
-        if String.length r1 > 0 && r1.[0] = '@' then (r2, r1, r3)
-        else
-          let rval = if r3 = "" then r2 else r2 ^ " " ^ r3 in (r1, rval, "")
+    [: _ = line_start n; _ = skip_space; r1 = get_ident 0; strm :] ->
+      let (rlab, rval, rcont, l) =
+        if String.length r1 > 0 && r1.[0] = '@' then parse_address n r1 strm
+        else parse_text n r1 strm
       in
       {rlab = rlab;
        rval = if ansel_characters.val then rval else Ansel.of_iso_8859_1 rval;
        rcont =
          if ansel_characters.val then rcont else Ansel.of_iso_8859_1 rcont;
        rsons = List.rev l; rpos = line_cnt.val}
+and parse_address n r1 =
+  parser
+  [ [: r2 = get_ident 0; r3 = get_to_eoln 0 ? "get to eoln";
+       l = get_lev_list [] (Char.chr (Char.code n + 1)) ? "get lev list" :] ->
+      (r2, r1, r3, l) ]
+and parse_text n r1 =
+  parser
+  [ [: r2 = get_to_eoln 0;
+       l = get_lev_list [] (Char.chr (Char.code n + 1)) ? "get lev list" :] ->
+      (r1, r2, "", l) ]
 and get_lev_list l n =
   parser [ [: x = get_lev n; s :] -> get_lev_list [x :: l] n s | [: :] -> l ]
 ;
@@ -707,11 +714,14 @@ value treat_indi_notes gen rl =
     List.fold_left
       (fun s (lab, n) ->
          let spc = String.length n > 0 && n.[0] == ' ' in
+         let end_spc = String.length n > 1 && n.[String.length n - 1] == ' ' in
          let n = strip_spaces n in
-         if s = "" then n
-         else if lab = "CONT" || lab = "NOTE" then s ^ "<br>\n" ^ n
+         if s = "" then n ^ (if end_spc then " " else "")
+         else if lab = "CONT" || lab = "NOTE" then
+           s ^ "<br>\n" ^ n ^ (if end_spc then " " else "")
          else if n = "" then s
-         else s ^ (if spc then "\n" else "") ^ n)
+         else
+           s ^ (if spc then "\n" else "") ^ n ^ (if end_spc then " " else ""))
       "" lines
   in
   add_string gen (strip_newlines notes)
