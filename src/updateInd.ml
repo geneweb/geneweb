@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 4.5 2001-10-20 10:59:01 ddr Exp $ *)
+(* $Id: updateInd.ml,v 4.6 2001-12-31 15:12:37 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -29,7 +29,7 @@ type ast =
   Templ.ast ==
     [ Atext of string
     | Avar of string and list string
-    | Atransl of bool and string and char
+    | Atransl of bool and string and string
     | Awid_hei of string
     | Aif of ast_expr and list ast and list ast
     | Aforeach of string and list string and list ast
@@ -44,7 +44,7 @@ and ast_expr =
     | Estr of string
     | Eint of string
     | Evar of string and list string
-    | Etransl of bool and string and char ]
+    | Etransl of bool and string and string ]
 ;
 
 type env =

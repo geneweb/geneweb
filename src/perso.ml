@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.21 2001-11-06 12:03:22 ddr Exp $ *)
+(* $Id: perso.ml,v 4.22 2001-12-31 15:12:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -252,7 +252,7 @@ type ast =
   Templ.ast ==
     [ Atext of string
     | Avar of string and list string
-    | Atransl of bool and string and char
+    | Atransl of bool and string and string
     | Awid_hei of string
     | Aif of ast_expr and list ast and list ast
     | Aforeach of string and list string and list ast
@@ -267,7 +267,7 @@ and ast_expr =
     | Estr of string
     | Eint of string
     | Evar of string and list string
-    | Etransl of bool and string and char ]
+    | Etransl of bool and string and string ]
 ;
 
 type env =
@@ -1121,20 +1121,14 @@ value split_at_coloncolon s =
 value print_transl conf base env upp s c =
   let r =
     match c with
-    [ '0'..'9' ->
-        let n = Char.code c - Char.code '0' in
-        match split_at_coloncolon s with
-        [ None -> nominative (Util.transl_nth conf s n)
-        | Some (s1, s2) ->
-            Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
-    | 'n' ->
+    [ "n" ->
         let n =
           match get_env "p" env with
           [ Vind p _ _ -> 1 - index_of_sex p.sex
           | _ -> 2 ]
         in
         Util.transl_nth conf s n
-    | 's' ->
+    | "s" ->
         let n =
           match get_env "child" env with
           [ Vind p _ _ -> index_of_sex p.sex
@@ -1144,14 +1138,21 @@ value print_transl conf base env upp s c =
               | _ -> 2 ] ]
         in
         Util.transl_nth conf s n
-    | 'w' ->
+    | "w" ->
         let n =
           match get_env "fam" env with
           [ Vfam fam _ _ -> if Array.length fam.witnesses = 1 then 0 else 1
           | _ -> 0 ]
         in
         Util.transl_nth conf s n
-    | _ -> nominative (Util.transl conf s) ^ String.make 1 c ]
+    | _ ->
+        match try Some (int_of_string c) with [ Failure _ -> None ] with
+        [ Some n ->
+            match split_at_coloncolon s with
+            [ None -> nominative (Util.transl_nth conf s n)
+            | Some (s1, s2) ->
+                Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
+        | None -> nominative (Util.transl conf s) ^ c ] ]
   in
   Wserver.wprint "%s" (if upp then capitale r else r)
 ;
