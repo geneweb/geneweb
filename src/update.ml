@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.20 1999-08-06 10:22:49 ddr Exp $ *)
+(* $Id: update.ml,v 2.21 1999-08-19 17:39:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -83,7 +83,7 @@ value print_return conf =
       (fun (x, v) ->
          Wserver.wprint "<input type=hidden name=%s value=\"%s\">\n" x
          (decode_varenv v))
-      conf.env;
+      (conf.henv @ conf.env);
     Wserver.wprint "<input type=hidden name=return value=on>\n";
     Wserver.wprint "<input type=submit value=\"%s\">\n"
       (capitale (transl conf "back"));
