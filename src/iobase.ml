@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.18 2004-01-24 07:39:18 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.19 2004-01-25 17:19:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1295,6 +1295,7 @@ value gen_output no_patches bname base =
               seek_out oc_inx 0;
               output_binary_int oc_inx surname_or_first_name_pos;
               close_out oc_inx;
+              close_out oc_inx_acc;
               if save_mem.val then do { trace "compacting"; Gc.compact () }
               else ();
               trace "create string index";
@@ -1326,6 +1327,7 @@ value gen_output no_patches bname base =
           with e ->
             do {
               try close_out oc_inx with _ -> ();
+              try close_out oc_inx_acc with _ -> ();
               try close_out oc2 with _ -> ();
               raise e
             }
