@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.195 2000-12-03 22:37:12 ddr Exp $
+# $Id: lexicon.txt,v 3.196 2000-12-04 12:20:19 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -26,6 +26,7 @@ se: iso-8859-1
 he: rtl
 
      !languages
+cs: af=afrikán¹tina/cn=èín¹tina/cs=èe¹tina/dk=dán¹tina/nl=holand¹tina/en=angliètina/eo=esperanto/fi=fin¹tina/fr=francouz¹tina/de=nìmèina/he=hebrej¹tina/is=island¹tina/it=ital¹tina/lv=loty¹¹tina/no=nor¹tina/pt=portugal¹tina/es=¹panìl¹tina/ru=ru¹tina/se=¹véd¹tina
 de: af=Afrikaans/cn=Chinesisch/dk=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/no=Norwegisch/pt=Portugiesisch/ru=Russisch/es=Spanisch/se=Schwedisch/cs=Tschechisch
 dk: af=afrikaans/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
 en: af=Afrikaans/cn=Chinese/cs=Czech/dk=Danish/nl=Dutch/en=English/eo=Esperanto/fi=Finnish/fr=French/de=German/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/no=Norwegian/pt=Portuguese/es=Spanish/ru=Russian/se=Swedish
@@ -281,6 +282,7 @@ ru: %t ğîäèëñÿ áîëåå, ÷åì ÷åğåç 2 ãîäà ïîñëå ñìåğòè åãî/åå îòöà %t
 se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
 
     %t's sex is not coherent with his/her relations
+cs: pohlaví %t se neshoduje s jeho/jejími vztahy
 de: %t's Geschlecht stimmt nicht überein mit ihren/seinen Beziehungen
 dk: %t's k&oslash;n er ikke koh&aelig;rent med hans/hendes forbindelser
 en: %t's sex is not coherent with his/her relations
@@ -879,6 +881,7 @@ se: en halvbror/en halvsyster/ett halvsyskon
 
     a nephew (spouse's nephew)/a niece (spouse's niece)
 af: 'n neef van die eggenoot/'n niggie van die eggenoot
+cs: synovec (parnerùv synovec)/neteø (partnerova neteø)
 de: ein Neffe (des Ehegatten)/eine Nichte (des Ehegatten)
 dk: en nev&oslash; (&aelig;gtef&aelig;lles nev&oslash;)/en niece (&aelig;gtef&aelig;lles niece)
 en: a nephew (spouse's nephew)/a niece (spouse's niece)
@@ -1804,6 +1807,7 @@ se: inga GeneWeb l&auml;nkar
 
     candidate father/candidate mother/candidate parents
 af: moontlike vader/moontlike moeder/moontlike ouers
+cs: pravdìpodobnı otec/pravdìpodobná matka/pravdìpodobní rodièe
 de: m&ouml;glicher Vater/m&ouml;gliche Mutter/m&ouml;gliche Eltern
 dk: mulig fader/mulig moder/mulige for&aelig;ldre
 en: candidate father/candidate mother/candidate parents
@@ -1822,6 +1826,7 @@ se: m&ouml;jlig far/m&ouml;jlig mor/m&ouml;jliga f&ouml;r&auml;ldrar
 
     candidate son/candidate daughter/candidate child
 af: moontlike seun/moontlike dogter/moontlike kind
+cs: pravdìpodobnı syn/pravdìpodobná dcera/pravdìpodobné dítì
 de: m&ouml;glicher Sohn/m&ouml;gliche Tochter/m&ouml;gliches Kind
 dk: mulig s&oslash;n/mulig datter/muligt barn
 en: candidate son/candidate daughter/candidate child
@@ -3860,6 +3865,7 @@ pt: mensagem adicionada
 se: meddelande inlagt
 
     message/next message
+cs: zpráva/dal¹í zpráva
 de: Nachricht/nächste Nachricht
 dk: meddelelse/n&aelig;ste meddelelse
 en: message/next message
