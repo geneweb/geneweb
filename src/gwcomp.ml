@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.10 2000-06-29 11:38:24 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.11 2000-08-27 15:43:51 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -133,6 +133,20 @@ value date_of_string s i =
   in
   let date =
     match date with
+    [ Some ((Dgreg d cal as dt), i) ->
+        if i == String.length s then Some (dt, i)
+        else if s.[i] == '|' then
+          let (y2, i) = champ (succ i) in
+          Some (Dgreg {(d) with prec = OrYear y2} cal, i)
+        else if i + 1 < String.length s && s.[i] == '.' && s.[i+1] == '.' then
+          let (y2, i) = champ (i + 2) in
+          Some (Dgreg {(d) with prec = YearInt y2} cal, i)
+        else Some (dt, i)
+    | Some ((Dtext _ as dt), i) -> Some (dt, i)
+    | None -> None ]
+  in
+  let date =
+    match date with
     [ Some (Dgreg d _, i) ->
         if i == String.length s then Some (Dgreg d Dgregorian, i)
         else
@@ -151,20 +165,7 @@ value date_of_string s i =
     | d -> d ]
   in
   match date with
-  [ Some ((Dgreg d cal as dt), i) ->
-      if i == String.length s then Some dt
-      else if s.[i] == '|' then
-        let (y2, i) = champ (succ i) in
-        if i == String.length s then
-          Some (Dgreg {(d) with prec = OrYear y2} cal)
-        else error ()
-      else if i + 1 < String.length s && s.[i] == '.' && s.[i+1] == '.' then
-        let (y2, i) = champ (i + 2) in
-        if i == String.length s then
-          Some (Dgreg {(d) with prec = YearInt y2} cal)
-        else  error ()
-      else error ()
-  | Some ((Dtext _ as dt), i) -> Some dt
+  [ Some (dt, i) -> if i == String.length s then Some dt else error ()
   | None -> None ]
 ;
 
