@@ -1,6 +1,12 @@
 Internal, very small, undocumented, or not visible changes
 **********************************************************
 
+GeneWeb Version 3.01
+--------------------
+
+* GeneWeb daemon/CGI (gwd)
+  - [Nov 5, 99] Lengthened the height of the data base notes area.
+
 GeneWeb Version 3.00
 --------------------
 
