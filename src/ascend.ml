@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.32 2003-11-27 10:20:22 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.33 2003-11-27 11:40:51 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -116,6 +116,9 @@ value print_choice conf base p effective_level =
           Wserver.wprint
             "- %s <input type=checkbox name=image value=on><br>\n"
             (capitale (transl_nth conf "image/images" 1));
+          Wserver.wprint
+            "- %s <input name=bd size=1 maxlength=2 value=0><br>\n"
+            (capitale (transl conf "border"));
         end;
         tag "td valign=top" begin
           Wserver.wprint "<input type=radio name=t value=L> %s\n"
@@ -1559,12 +1562,13 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
   }
 ;
 
-value tree_reference gv conf base p s =
+value tree_reference gv bd conf base p s =
   if conf.cancel_links || is_hidden p then s
   else
     let im = p_getenv conf.env "image" = Some "on" in
     "<a href=\"" ^ commd conf ^ "m=A;t=T;v=" ^ string_of_int gv ^ ";" ^
-      acces conf base p ^ (if im then ";image=on" else "") ^ "\">" ^ s ^
+      acces conf base p ^ (if im then ";image=on" else "") ^
+      (if bd > 0 then ";bd=" ^ string_of_int bd else "") ^ "\">" ^ s ^
       "</a>"
 ;
 
@@ -1634,6 +1638,7 @@ value rec enrich_tree lst =
     p: person *)
 value print_tree_with_table conf base gv p =
   let gv = min (limit_by_tree conf) gv in
+  let bd = match p_getint conf.env "bd" with [ Some x -> x | None -> 0 ] in
   let next_gen pol =
     List.fold_right
       (fun po list ->
@@ -1687,7 +1692,7 @@ value print_tree_with_table conf base gv p =
         let txt =
           match po with
           [ Empty -> "&nbsp;"
-          | Cell p _ _ _ -> tree_reference gv conf base p "|" ]
+          | Cell p _ _ _ -> tree_reference gv bd conf base p "|" ]
         in
         Wserver.wprint "%s" txt;
       end;
@@ -1704,12 +1709,17 @@ value print_tree_with_table conf base gv p =
           | Cell p _ _ _ ->
               let txt = person_title_text conf base p in
               let txt = down_reference p txt in
-              txt ^ Date.short_dates_text conf base p ]
+              let txt = txt ^ Date.short_dates_text conf base p in
+              let txt =
+                if bd > 0 then
+                  Printf.sprintf
+                    "<table border=%d><tr><td>%s</td></tr></table>"
+                    bd txt
+                else txt
+              in
+              txt ^ Dag.image_txt conf base p ]
         in
         Wserver.wprint "%s" txt;
-        match po with
-        [ Empty -> ()
-        | Cell p _ _ _ -> Wserver.wprint "%s" (Dag.image_txt conf base p) ];
       end;
       Wserver.wprint "\n"
     }
