@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.10 2000-07-12 14:26:46 ddr Exp $
+# $Id: geneweb.spec,v 3.11 2000-08-19 07:23:05 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -181,6 +181,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwc
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwu
 %attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/consang
+%attr(6750, geneweb, geneweb) /home/geneweb/gw/gw/gwtp
 %attr(755, root, root) /etc/rc.d/init.d/gwd
 %attr(755, root, root) /etc/rc.d/rc0.d/K01gwd
 %attr(755, root, root) /etc/rc.d/rc1.d/K01gwd
@@ -189,8 +190,8 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %attr(755, root, root) /etc/rc.d/rc5.d/S99gwd
 %attr(755, root, root) /etc/rc.d/rc6.d/K01gwd
 /home/geneweb/gw/LICENSE.txt
-/home/geneweb/gw/LISEZMOI.txt
-/home/geneweb/gw/README.txt
+/home/geneweb/gw/LISEZMOI.htm
+/home/geneweb/gw/README.htm
 /home/geneweb/gw/gw/CHANGES.txt
 /home/geneweb/gw/gw/INSTALL.htm
 /home/geneweb/gw/gw/LICENSE.txt
@@ -285,6 +286,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/etc/redirect.txt
 /home/geneweb/gw/gw/etc/renamed.txt
 /home/geneweb/gw/gw/etc/robot.txt
+/home/geneweb/gw/gw/images/female.gif
 /home/geneweb/gw/gw/images/gwback.jpg
 /home/geneweb/gw/gw/images/gwlogo.gif
 /home/geneweb/gw/gw/images/l-af.jpg
@@ -307,6 +309,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/images/l-ru.jpg
 /home/geneweb/gw/gw/images/l-se.jpg
 /home/geneweb/gw/gw/images/left.jpg
+/home/geneweb/gw/gw/images/male.gif
 /home/geneweb/gw/gw/images/t-af.gif
 /home/geneweb/gw/gw/images/t-cn.gif
 /home/geneweb/gw/gw/images/t-cs.gif
