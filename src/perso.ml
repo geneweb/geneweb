@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.11 2001-04-28 18:51:53 ddr Exp $ *)
+(* $Id: perso.ml,v 4.12 2001-05-01 18:39:11 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -871,11 +871,14 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
 ;
 
 value simple_person_text conf base p p_auth =
+  person_text conf base p
+(*
   if p_auth then
     match main_title base p with
     [ Some t -> titled_person_text conf base p t
     | None -> person_text conf base p ]
   else person_text conf base p
+*)
 ;
 
 value print_simple_person_text conf base (p, _, _, p_auth) =
@@ -1315,32 +1318,48 @@ and eval_foreach_relation conf base env al (p, _, _, p_auth) =
   else ()
 and eval_foreach_related conf base env al (p, _, _, p_auth) =
   if p_auth then
+    let list =
+      List.fold_left
+        (fun list ic ->
+           let c = poi base ic in
+           loop c.rparents where rec loop =
+             fun
+             [ [r :: rl] ->
+                 match r.r_fath with
+                 [ Some ip when ip = p.cle_index -> [(c, r) :: list]
+                 | _ ->
+                     match r.r_moth with
+                     [ Some ip when ip = p.cle_index -> [(c, r) :: list]
+                     | _ -> loop rl ] ]
+             | [] -> list ])
+        [] p.related
+    in
+    let list =
+      List.sort
+        (fun (c1, _) (c2, _) ->
+           let d1 =
+             match Adef.od_of_codate c1.baptism with
+             [ None -> Adef.od_of_codate c1.birth
+             | x -> x ]
+           in
+           let d2 =
+             match Adef.od_of_codate c2.baptism with
+             [ None -> Adef.od_of_codate c2.birth
+             | x -> x ]
+           in
+           match (d1, d2) with
+           [ (Some d1, Some d2) ->
+               if strictement_avant d1 d2 then -1 else 1
+           | _ -> -1 ])
+      (List.rev list)
+    in
     List.iter
-      (fun ic ->
-         let c = poi base ic in
-         let a = aoi base ic in
-         let u = uoi base ic in
-         let env = [("c", Vind c a u) :: env] in
-         List.iter
-           (fun r ->
-              do {
-                match r.r_fath with
-                [ Some ip ->
-                    if ip = p.cle_index then
-                      let env = [("rel", Vrel r) :: env] in
-                      List.iter (eval_ast conf base env) al
-                    else ()
-                | None -> () ];
-                match r.r_moth with
-                [ Some ip ->
-                    if ip = p.cle_index then
-                      let env = [("rel", Vrel r) :: env] in
-                      List.iter (eval_ast conf base env) al
-                    else ()
-                | None -> () ]
-              })
-           c.rparents)
-      p.related
+      (fun (c, r) ->
+         let a = aoi base c.cle_index in
+         let u = uoi base c.cle_index in
+         let env = [("c", Vind c a u); ("rel", Vrel r) :: env] in
+         List.iter (eval_ast conf base env) al)
+      list
   else ()
 and eval_foreach_source conf base env al (p, _, u, p_auth) =
   let rec insert_loop typ src =
