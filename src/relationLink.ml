@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.6 1999-12-06 15:06:41 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.7 1999-12-10 02:35:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -618,8 +618,6 @@ value print_relation_no_dag conf base po ip1 ip2 =
 ;
 
 value print_relation_dag conf base a p1 p2 l1 l2 =
-  let module O = struct type t = iper; value compare = compare; end in
-  let module S = Set.Make O in
   let ia = a.cle_index in
   let add_branches dist set n ip l =
     let b = find_first_branch base dist ia l ip Neuter in
@@ -629,7 +627,7 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
         match b with
         [ Some b ->
             let set =
-              List.fold_left (fun set (ip, _) -> S.add ip set) set b
+              List.fold_left (fun set (ip, _) -> Dag.Pset.add ip set) set b
             in
             loop set (n + 1) (find_next_branch base dist ia a.sex b)
         | None -> (set, n) ]
@@ -645,11 +643,11 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
                 let (set, n) = add_branches dist set n p2.cle_index l2 in
                 set)
              set l2)
-        (S.add ia S.empty) l1
+        (Dag.Pset.add ia Dag.Pset.empty) l1
     in
-    let list = S.elements set in
+    let list = Dag.Pset.elements set in
     let d = Dag.make_dag base list in
-    Dag.print_dag conf base d
+    Dag.print_dag conf base set d
   with
   [ Exit -> Util.incorrect_request conf ]
 ;
