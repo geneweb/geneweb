@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.71 2005-02-06 10:17:35 ddr Exp $ *)
+(* $Id: perso.ml,v 4.72 2005-02-07 10:43:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -276,11 +276,11 @@ value warning_use_has_parents_before_parent (bp, ep) var =
 
 value obsolete_list = ref [];
 
-value obsolete version var new_var r =
+value obsolete (bp, ep) version var new_var r =
   if List.mem var obsolete_list.val then r
   else ifdef UNIX then do {
-    Printf.eprintf "*** <W> perso.txt: \"%s\" obsolete since v%s%s\n"
-      var version
+    Printf.eprintf "*** <W> perso.txt, chars %d-%d:" bp ep;
+    Printf.eprintf " \"%s\" obsolete since v%s%s\n" var version
       (if new_var = "" then "" else "; rather use \"" ^ new_var ^ "\"");
     flush stderr;
     obsolete_list.val := [var :: obsolete_list.val];
@@ -598,7 +598,7 @@ and eval_person_var conf base env ((_, a, _, _) as ep) loc =
       try bool_val (eval_bool_person_field conf base env ep sl) with
       [ Not_found ->
           try str_val (eval_str_person_field conf base env ep sl) with
-          [ Not_found -> obsolete_eval conf base env ep sl ] ] ]
+          [ Not_found -> obsolete_eval conf base env ep loc sl ] ] ]
 and eval_bool_person_field conf base env ((p, a, u, p_auth) as ep) =
   fun
   [ ["birthday"] ->
@@ -964,7 +964,7 @@ and string_of_int_env var env =
   match get_env var env with
   [ Vint x -> string_of_int x
   | _ -> raise Not_found ]
-and obsolete_eval conf base env (p, a, u, p_auth) =
+and obsolete_eval conf base env (p, a, u, p_auth) loc =
   fun
   [ ["married_to"] ->
       let s =
@@ -978,7 +978,7 @@ and obsolete_eval conf base env (p, a, u, p_auth) =
                 if auth then string_of_marriage_text conf base fam else "")
         | _ -> raise Not_found ]
       in
-      obsolete "4.08" "married_to" "" (str_val s)
+      obsolete loc "4.08" "married_to" "" (str_val s)
   | _ -> raise Not_found ]
 ;
 
