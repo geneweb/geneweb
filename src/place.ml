@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: place.ml,v 4.18 2004-12-14 09:30:15 ddr Exp $ *)
+(* $Id: place.ml,v 4.19 2004-12-20 13:32:03 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -145,7 +145,8 @@ value get_all conf base =
     let len = ref 0 in
     Hashtbl.iter
       (fun (istr_pl, _) (cnt, ip) ->
-         let s = fold_place inverted (sou base istr_pl) in
+         let s = Util.string_with_macros conf False [] (sou base istr_pl) in
+         let s = fold_place inverted s in
          if s <> [] && (ini = "" || List.hd s = ini) then do {
            list.val := [(s, cnt.val, ip) :: list.val]; incr len
          }
@@ -164,10 +165,6 @@ value get_all conf base =
   }
 ;
 
-value print_place conf s =
-  Wserver.wprint "%s" (Util.string_with_macros conf False [] s)
-;
-
 value max_len = ref 2000;
 
 value print_html_places_surnames conf base =
@@ -178,13 +175,7 @@ value print_html_places_surnames conf base =
   in
   do {
     Wserver.wprint "<ul>\n";
-    let print_li_place x =
-      do {
-        Wserver.wprint "<li>";
-        print_place conf x;
-        Wserver.wprint "\n";
-      }
-    in
+    let print_li_place x = Wserver.wprint "<li>%s\n" x in
     let print_ul_li_place x =
       do {
         Wserver.wprint "<ul>\n";
@@ -309,8 +300,7 @@ value print_all_places_surnames_short conf list =
          do {
            Wserver.wprint "<a href=\"%sm=PS%s;k=%s\">" (commd conf) opt
              (Util.code_varenv s);
-           print_place conf s;
-           Wserver.wprint "</a> (%d),\n" len;
+           Wserver.wprint "%s</a> (%d),\n" s len;
          })
       list;
     Util.trailer conf
