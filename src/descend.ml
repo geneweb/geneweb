@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.27 2001-01-13 22:13:53 ddr Exp $ *)
+(* $Id: descend.ml,v 3.28 2001-01-14 15:21:33 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -974,26 +974,6 @@ value afficher_descendants_table conf base max_lev a =
   return ()
 ;
 
-value no_spaces v s =
-  if v <= 1 then s
-  else
-    loop 0 where rec loop i =
-      if i == String.length s then ""
-      else
-        match s.[i] with
-        [ ' ' -> "&nbsp;" ^ loop (i + 1)
-        | x -> String.make 1 x ^ loop (i + 1) ]
-;
-
-value short_dates_text v conf base p =
-  let txt = Date.short_dates_text conf base p in
-  no_spaces v txt
-;
-
-value short_marriage_date_text v conf base fam p sp =
-  Date.short_marriage_date_text conf base fam p sp
-;
-
 value print_tree conf base gv p =
   let title _ =
     Wserver.wprint "%s: %s" (capitale (transl conf "tree"))
@@ -1125,12 +1105,9 @@ value print_tree conf base gv p =
             if v = 1 then person_text_without_surname conf base p
             else person_title_text conf base p
           in
-          let txt = no_spaces gv txt in
           let txt = reference conf base p txt in
           let txt =
-            if auth && v == 1 then txt ^ Date.short_dates_text conf base p
-            else if auth then txt ^ short_dates_text gv conf base p
-            else txt
+            if auth then txt ^ Date.short_dates_text conf base p else txt
           in
           (2 * ncol - 1, CenterA,
            TDstring (txt ^ Dag.image_txt conf base p))
@@ -1158,14 +1135,13 @@ value print_tree conf base gv p =
               let s =
                 let sp = poi base (spouse p.cle_index (coi base ifam)) in
                 let txt = person_title_text conf base sp in
-                let txt = no_spaces gv txt in
                 let txt = reference conf base sp txt in
                 let txt =
-                  if auth then txt ^ short_dates_text gv conf base sp
+                  if auth then txt ^ Date.short_dates_text conf base sp
                   else txt
                 in
                 "&amp;" ^
-                (if auth then short_marriage_date_text gv conf base fam p sp
+                (if auth then Date.short_marriage_date_text conf base fam p sp
                  else "") ^
                 "&nbsp;" ^ txt ^ Dag.image_txt conf base sp
               in
