@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 3.2 1999-12-04 06:10:00 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 3.3 1999-12-04 11:51:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Gutil;
@@ -51,6 +51,7 @@ value print_result base tab =
 
 value most_desc base p =
   let _ = base.data.ascends.array () in
+  let _ = base.data.couples.array () in
   let id = Consang.topological_sort base in
   let module Pq =
     Pqueue.Make
