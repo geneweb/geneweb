@@ -19,6 +19,12 @@ GeneWeb version 4.04
   - [13 Sep 01] Fixed bug: dates added in "family" forms were not
     completely checked ("31th of September" was accepted, for example).
 
+* GeneWeb to Gedcom (gwb2ged)
+  - [09 Nov 01] If a person has a "first name alias" containing the
+    "first name", he is exported in the gedcom as the first name alias
+    in the first name field, with the real first name part enclosed with
+    double quotes.
+
 * GeneWeb data bases Transfer Program (gwtp)
   - [27 Oct 01] In the executable "ged2gwb" is installed in the
     directory corresponding to the option -etc of gwtp, the users can

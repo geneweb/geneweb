@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.10 2001-07-23 09:20:16 ddr Exp $ *)
+(* $Id: setup.ml,v 4.11 2001-11-09 10:55:47 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1265,7 +1265,9 @@ value gwd_1 conf =
 
 value ged2gwb conf =
   let rc =
-    exec_f (Filename.concat setup_dir.val conf.comm ^ parameters conf.env)
+    exec_f
+      (Filename.concat setup_dir.val conf.comm ^ " -fne '\"\"'" ^
+       parameters conf.env)
   in
   let rc = ifdef WIN95 then infer_rc conf rc else rc in
   do {
