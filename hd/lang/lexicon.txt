@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.249 2001-03-08 22:50:11 ddr Exp $
+# $Id: lexicon.txt,v 3.250 2001-03-09 11:35:02 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -31,21 +31,21 @@ he: rtl
      !languages
 cs: af=afrikán¹tina/cn=èín¹tina/cs=èe¹tina/dk=dán¹tina/nl=holand¹tina/en=angliètina/eo=esperanto/fi=fin¹tina/fr=francouz¹tina/de=nìmèina/he=hebrej¹tina/is=island¹tina/it=ital¹tina/lv=loty¹¹tina/no=nor¹tina/pt=portugal¹tina/es=¹panìl¹tina/ru=ru¹tina/se=¹véd¹tina
 ct: af=africà/cn=Xinès/cs=xec/ct=català/de=alemany/dk=danès/en=anglès/eo=esperanto/es=castellà/et=estó/fi=finlandès/fr=francès/he=hebreu/is=islandès/it=italià/lv=letó/nl=holandès/no=norueg/pt=portuguès/ru=rus/se=suec
-de: af=Afrikaans/cn=Chinesisch/dk=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/no=Norwegisch/pt=Portugiesisch/ru=Russisch/es=Spanisch/se=Schwedisch/cs=Tschechisch
+de: af=Afrikaans/cn=Chinesisch/dk=D&auml;nish/de=Deutsch/en=Englisch/eo=Esperanto/et=Estnisch/fi=Finnisch/fr=Franz&ouml;sisch/he=Hebr&auml;isch/nl=Holl&auml;ndisch/is=Isl&auml;ndisch/it=Italienisch/lv=Litauisch/no=Norwegisch/pl=Polnisch/pt=Portugiesisch/ru=Russisch/es=Spanisch/se=Schwedisch/cs=Tschechisch
 dk: af=afrikaans/cn=kinesisk/cs=tjekkisk/dk=dansk/en=engelsk/eo=esperanto/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
-en: af=Afrikaans/cn=Chinese/cs=Czech/ct=Catalan/dk=Danish/nl=Dutch/en=English/eo=Esperanto/et=Estonian/fi=Finnish/fr=French/de=German/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/no=Norwegian/pt=Portuguese/es=Spanish/ru=Russian/se=Swedish
+en: af=Afrikaans/cn=Chinese/cs=Czech/ct=Catalan/dk=Danish/nl=Dutch/en=English/eo=Esperanto/et=Estonian/fi=Finnish/fr=French/de=German/he=Hebrew/is=Icelandic/it=Italian/lv=Latvian/no=Norwegian/pl=Polish/pt=Portuguese/es=Spanish/ru=Russian/se=Swedish
 eo: en=anglo/eo=esperanto/fr=franco
 es: cs=Checo/cn=Chino/ct=Catalán/de=Alem&aacute;n/dk=Dan&eacute;s/es=Espa&ntilde;ol/eo=Esperanto/fr=Franc&eacute;s/he=Hebreo/en=Ingl&eacute;s/it=Italiano/nl=N&eacute;erlandes/no=Noruego/pt=Portug&eacute;s/se=Sueco
 et: af=afrikaani/cn=hiina/cs=t¨ehhi/ct=katalaani/de=saksa/dk=taani/en=inglise/eo=esperanto/es=hispaania/et=eesti/fi=soome/fr=prantsuse/he=heebrea/is=islandi/it=itaalia/lv=läti/nl=hollandi/no=norra/pl=poola/pt=portugali/ru=vene/se=rootsi
 fi: af=afrikaani/cn=kiina/cs=tsekki/de=saksa/dk=tanska/en=englanti/eo=esperanto/es=espanja/fi=suomi/fr=ranska/he=heprea/is=islanti/it=italia/lv=latvia/nl=hollanti/no=norja/pt=portugali/ru=ven&auml;j&auml;/se=ruotsi
-fr: af=afrikaans/cn=chinois/cs=tch&egrave;que/ct=catalan/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pt=portugais/ru=russe/se=su&eacute;dois
+fr: af=afrikaans/cn=chinois/cs=tch&egrave;que/ct=catalan/de=allemand/dk=danois/en=anglais/eo=esp&eacute;ranto/es=espagnol/et=estonien/fi=finlandais/fr=fran&ccedil;ais/he=h&eacute;breu/is=islandais/it=italien/lv=letton/nl=n&eacute;erlandais/no=norv&eacute;gien/pl=polonais/pt=portugais/ru=russe/se=su&eacute;dois
 he: af=àôøé÷àğñ /cn=ñéğéú /cs=ö'ëéú /de=âøîğéú /dk=ãğéú /en=àğâìéú /eo=àñôøğèå /es=ñôøãéú /fi=ôéğéú /fr=öøôúéú /he=òáøéú /is=àéñìğãéú /it=àéèì÷éú /lv=ìèååéú /no=ğåøáâéú /pt=ôåøèåâæéú /ru=øåñéú /se=ùååãéú
 is: af=afrikanska/cn=kínverska/cs=tékkneska/dk=danska/nl=hollenska/en=enska/eo=esperanto/fi=finnska/fr=franska/de=şıska/he=hebraska/is=íslenska/it=ítalska/lv=lettneska/no=norska/pt=portúgalska/es=spænska/ru=rússneska/se=sænska
-it: af=africano/cn=cinese/cs=ceco/de=tedesco/dk=danese/en=inglese/eo=esperanto/es=spagnolo/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pt=portoghese/ru=russo/se=svedese
+it: af=africano/cn=cinese/cs=ceco/de=tedesco/dk=danese/en=inglese/eo=esperanto/es=spagnolo/fi=finlandese/fr=francese/he=ebraico/is=islandese/it=italiano/lv=lettone/nl=olandese/no=norvegese/pl=polonese/pt=portoghese/ru=russo/se=svedese
 lv: cn=Íînieğu/cs=Èehu/dk=Dâòu/nl=Holandieğu/en=Angïu/eo=Esperanto/fi=Somu/fr=Franèu/de=Vâcu/he=Ebreju/is=Islandieğû/it=Itâïu/lv=Latvieğu/no=Norvçìu/pt=Portugâïu/es=Spâòu/ru=Krievu/se=Zviedru
 nl: af=Afrikaans/cn=Chinees/cs=Tsjechisch/dk=Deens/nl=Nederlands/en=Engels/eo=Esperanto/fi=Fins/fr=Frans/de=Duits/he=Hebreeuws/is=IJslands/it=Italiaans/lv=Litouws/no=Noors/pt=Portugees/es=Spaans/ru=Russisch/se=Zweeds
 no: af=afrikaans/cn=kinesisk/cs=tjekkisk/ct=katalansk/dk=dansk/en=engelsk/eo=esperanto/et=estisk/fi=finsk/fr=fransk/de=tysk/he=hebraisk/is=islandsk/it=italiensk/lv=litauisk/nl=hollandsk/no=norsk/pt=portugisisk/es=spansk/ru=russisk/se=svensk
-pl: af=afrikaans/cn=chiñski/cs=czeski/dk=duñski/nl=niderlandzki/en=angielski/eo=esperanto/fi=fiñski/fr=francuski/de=niemiecki/he=hebrajski/is=islandzki/it=w³oski/lv=³otewski/no=norweski/pl=polski/pt=portugalski/es=hiszpañski/ru=rosyjski/se=szwedzki
+pl: af=afrikaans/cn=chiñski/cs=czeski/ct=kataloñski/dk=duñski/nl=niderlandzki/en=angielski/eo=esperanto/et=estoñski/fi=fiñski/fr=francuski/de=niemiecki/he=hebrajski/is=islandzki/it=w³oski/lv=³otewski/no=norweski/pl=polski/pt=portugalski/es=hiszpañski/ru=rosyjski/se=szwedzki
 pt: af=Afrikaans/cn=Chin&ecirc;/cs=Checo/dk=Dinamarqu&ecirc;s/nl=Holand&ecirc;/en=Ingl&ecirc;/eo=Esperanto/fi=Finland&ecirc;s/fr=Franc&ecirc;s/de=Alem&atilde;o/he=Hebreu/is=Island&ecirc;s/it=Italiano/lv=Lituano/no=Noruegu&ecirc;s/pt=Portugu&ecirc;s/es=Espanhol/ru=Russo/se=Sueco
 se: af=afrikaans/cn=kinesiska/cs=tjeckiska/ct=katalanska/de=tyska/dk=danska/en=engelska/eo=esperanto/es=spanska/et=estniska/fi=finska/fr=franska/he=hebreiska/is=isländska/it=italienska/lv=litauiska/nl=holländska/no=norska/pl=polska/pt=portugisiska/ru=ryska/se=svenska
 
@@ -67,7 +67,7 @@ it:  per vedere il primo
 lv:  skatît pirmo zaru
 nl:  om de eerste tak te zien
 no:  for &aring; se den f&oslash;rste
-pl:  aby zobaczyæ pierwsz¹ liniê
+pl:  aby zobaczyæ pierwsz¹ liniê (ga³¹Ÿ)
 pt:  para ver o primeiro ramo
 ru:  ÷òîáû óâèäåòü ïåğâóş âåòêó
 se:  f&ouml;r att se den f&ouml;rsta
@@ -136,7 +136,7 @@ it: %1 d[i']%2
 lv: %1 -&gt; %2
 nl: %1 van %2
 no: %1 til %2
-pl: %1 z %2
+pl: %1 :g: %2
 pt: %1 de %2
 ru: %1 :g:%2
 se: %1 till %2
@@ -159,7 +159,7 @@ it: %1 d[i']%2
 lv: %1 -&gt; %2
 nl: %1 van %2
 no: %1 av %2
-pl: %1 z %2
+pl: %1 :g: %2
 pt: %1 de %2
 ru: %1 :g:%2
 se: %1 till %2
@@ -297,7 +297,7 @@ it: %t sarebbe nato dopo la morte di sua madre %t
 lv: %t dzimis pçc viòa/viòas mâtes nâves %t
 nl: %t zou geboren zijn na de dood van zijn/haar moeder %t
 no: %t er f&oslash;dt etter sin mors d&oslash;d %t
-pl: %t urodzi³/urodzi³a siê po œmierci swojej matki: %t
+pl: %t urodzi³ siê/urodzi³a siê po œmierci swojej matki: %t
 pt: $t nasceu depois do &oacute;bito da m&atilde;e
 ru: %t ğîäèëñÿ ïîñëå ñìåğòè åãî/åå ìàòåğè %t
 se: %t &auml;r f&ouml;dd efter att sin egen mor dog %t
@@ -320,7 +320,7 @@ it: %t sarebbe nato pi&ugrave; di 2 anni dopo la morte di suo padre %t
 lv: %t ir dzimis vairâk kâ 2 gadus pçc sava tçva nâves %t
 nl: %t is geboren meer dan twee jaar na de dood van zijn/haar vader
 no: %t er f&oslash;dt mer enn 2 &aring;r etter sin fars d&oslash;d %t
-pl: %t urodzi³/urodzi³a siê ponad 2 lata po œmierci swojego ojca: %t
+pl: %t urodzi³ siê/urodzi³a siê ponad 2 lata po œmierci swojego ojca: %t
 pt: %t nasceu mais de 2 anos depois do &oacute;bito do pai
 ru: %t ğîäèëñÿ áîëåå, ÷åì ÷åğåç 2 ãîäà ïîñëå ñìåğòè åãî/åå îòöà %t
 se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
@@ -341,6 +341,7 @@ is: kyn %t er ekki í samræmi viğ skyldleika
 it: il sesso di %t non e' coerente con le sue relazioni
 nl: het geslacht van %t is niet samenhangend met zijn/haar relaties
 no: %ts kjønn er uforenlig med forbindelsene hans/hennes
+pl: %t: jego/jej p³eæ nie odpowiada jego/jej zwi¹zkom
 pt: o sexo de %t não é coerente com suas relações
 se: %ts kön stämmer inte överens med sina relationer
 
@@ -363,7 +364,7 @@ it: 1o %m %y/%d %m %y/%m %y/%y
 lv: 1. %m %y/%y.gada %d.%m/%y %m/%y
 nl: 1 %m %y/%d %m %y/%m %y/%y
 no: 1. %m %y/%d. %m %y/%m %y/%y
-pl: 1. %m %y/%d. %m %y/%m %y/%y
+pl: 1 %m %y/%d %m %y/%m %y/%y
 pt: 1 de %m de %y/%d de %m de %y/%m %y/%y
 ru: 1 %m %y/%d %m %y/%m %y/%y
 se: 1 %m %y/%d %m %y/%m %y/%y
@@ -490,7 +491,7 @@ it: domenica/luned&igrave;/marted&igrave;/mercoled&igrave;/gioved&igrave;/venerd
 lv: svçtdiena/pirmdiena/otrdiena/treğdiena/ceturdiena/piekdiena/sesdiena
 nl: Zondag/Maandag/Dinsdag/Woensdag/Donderdag/Vrijdag/Zaterdag
 no: s&oslash;ndag/mandag/tirsdag/onsdag/torsdag/fredag/l&oslash;rdag
-pl: niedziela/poniedzia³ek/wtorek/œroda/czwartek/pi¹tek/sobota
+pl: niedziela:a:-ê/poniedzia³ek/wtorek/œroda:a:-ê/czwartek/pi¹tek/sobota:a:-ê
 pt: domingo/segunda-feira/ter&ccedil;a-feira/quarta-feira/quinta-feira/sexta-feira/s&aacute;bado
 ru: âîñêğåñåíüå/ïîíåäåëüíèê/âòîğíèê/ñğåäà/÷åòâåğã/ïÿòíèöà
 se: s&ouml;ndag/m&aring;ndag/tisdag/onsdag/torsdag/fredag/l&ouml;rdag
@@ -513,6 +514,7 @@ it: nth (degree)
 lv: nth (degree)
 nl: n
 no: nth (degree)
+pl: n-ego
 pt: nth
 ru: nth (degree)
 se: nth (degree)
@@ -535,7 +537,7 @@ it: , &egrave;
 lv: , tas ir
 nl:  is het
 no: , er det
-pl: , to jest
+pl: , jest
 pt: , &eacute;
 ru: , ıòî
 se: , &auml;r det
@@ -627,7 +629,7 @@ it: <em>Numero Sosa</em> relativo a %t
 lv: <em>SOSA pakâpe</em> attiecîbâ pret %t
 nl: <em>Sosa nummer</em> ten opzichte van %t
 no: <em>Sosa nummer</em> i forhold til %t
-pl: <em>numer "Sosa"</em>, odnosz¹cy siê do %t
+pl: <em>numer "Sosa"</em>, odnosz¹cy siê do: %t
 pt: <em>n&uacute;mero Sosa</em> em rela&ccedil;&atilde;o a %t
 ru: <em>Sosa íîìåğ</em> îòíîñèòåëüíî %t
 se: <em>annummer</em> med %t som proband (Kekules system)
@@ -719,7 +721,7 @@ it: un cugino di %s grado/una cugina di %s grado/un(a) cugino(a) di %s grado
 lv: %s brâlçns/mâsîca
 nl: een neef in de %s generatie/een nicht in de %s generatie
 no: %smenning
-pl: kuzyn/kuzynka %s-tego stopnia
+pl: kuzyn/kuzynka w %s-tym stopniu
 pt: um primo %s/uma prima %s/um(a) primo(a) %s
 ru: %s-èé êóçåí/%s-ÿ êóçèíà
 se: %sm&auml;nning
@@ -742,7 +744,7 @@ it: un cugino di 2o grado/una cugina di 2o grado/un(a) cugino(a) di 2o grado
 lv: otrais brâlçns/mâsîca
 nl: een neef in de tweede generatie/een nicht in de tweede generatie
 no: tremenning	
-pl: kuzyn/kuzynka drugiego stopnia
+pl: kuzyn/kuzynka w drugim stopniu
 pt: um primo 2ndo/uma prima 2ndo/um(a) primo(a) 2ndo
 ru: òğîşğîäíûé áğàò/òğîşğîäíàÿ ñåñòğà
 se: en syssling
@@ -765,7 +767,7 @@ it: un cugino di 3o grado/una cugina di 3o grado/un(a) cugino(a) di 3o grado
 lv: treğais brâlçns/mâsîca
 nl: een neef in de derde generatie/een nicht in de derde generatie
 no: firmenning
-pl: kuzyn/kuzynka trzeciego stopnia
+pl: kuzyn/kuzynka w trzecim stopniu
 pt: um primo 3ro/uma prima 3ro/um(a) primo(a) 3ro
 ru: òğîşğîäíûé êóçåí/òğîşğîäíàÿ êóçèíà
 se: en brylling
@@ -1179,7 +1181,7 @@ it: aggiungere
 lv: pievienot
 nl: invoeren +before
 no: tilf&oslash;y
-pl: dodaj
+pl: dodaj :a:
 pt: acrescentar
 ru: äîáàâèòü :a:
 se: l&auml;gg till
@@ -1295,7 +1297,7 @@ it: dopo
 lv: pçc
 nl: na
 no: etter
-pl: po
+pl: po up³ywie
 pt: depois de
 ru: ïîñëå
 se: efter
@@ -1343,7 +1345,7 @@ it: all'et&agrave; di
 lv: mirğanas vecums:
 nl: leeftijd bij overlijden:
 no: alder
-pl: osi¹gniêty wiek
+pl: wiek:
 pt: com a idade de
 ru: â âîçğàñòå
 se: livsl&auml;ngd:
@@ -1389,7 +1391,7 @@ it: non deceduto/non deceduta/non deceduto(a)
 lv: dzîvs
 nl: niet overleden
 no: ikke d&oslash;d
-pl: ¿yj¹cy/¿yj¹ca
+pl: osoba ¿yj¹ca
 pt: n&atilde;o falecido/n&atilde;o falecida/n&atilde;o falecido(a)
 ru: æèâîé
 se: lever
@@ -1713,7 +1715,7 @@ it: sono
 lv: ir
 nl: zijn
 no: er
-pl: s¹
+pl: to
 pt: s&atilde;o
 ru: åñòü
 se: &auml;r
@@ -1805,7 +1807,7 @@ it: battezzato/battezzata/battezzato(a)
 lv: baptized
 nl: gedoopt
 no: d&oslash;pt
-pl: ochrzczony/ochrzczona/ochrzczone
+pl: chrzest
 pt: baptizado/baptizada/baptizado(a)
 ru: êğåùåíûé
 se: d&ouml;pt
@@ -1851,7 +1853,7 @@ it: prima del
 lv: pirms
 nl: voor
 no: f&oslash;r
-pl: przed
+pl: przed up³ywem
 pt: antes de
 ru: äî
 se: f&ouml;re
@@ -1874,7 +1876,7 @@ it: inizio
 lv: sâkums (begin)
 nl: begin
 no: start
-pl: zacznij
+pl: pocz¹tek
 pt: come&ccedil;o
 ru: íà÷èíàÿ ñ
 se: b&ouml;rjar
@@ -1967,7 +1969,7 @@ it: nato/nata/nato(a)
 lv: dzimğanas
 nl: geboren
 no: f&oslash;dt
-pl: urodzony/urodzona/urodzone
+pl: urodziny
 pt: nascido/nascida/nascido(a)
 ru: ğîäèëñÿ/ğîäèëàñü
 se: f&ouml;dd
@@ -2036,7 +2038,7 @@ it: sepolto/sepolta/sepolto(a)
 lv: apbedîts
 nl: begraven
 no: begravet
-pl: pochowany/pochowana/pochowane
+pl: pochówek
 pt: enterrado/enterrada/enterrado(a)
 ru: ïîõîğîíåí/ïîõîğîíåíà
 se: begravd
@@ -2082,7 +2084,7 @@ it: annullare i links
 lv: nerâdît GeneWeb saites
 nl: geen GeneWeb links
 no: uten GeneWeb koblinger
-pl: bez ³¹czy GeneWeb
+pl: pomiñ ³¹cza GeneWeb
 pt: cancelar os links Geneweb
 ru: áåç GeneWeb ññûëîê
 se: inga GeneWeb l&auml;nkar
@@ -2493,7 +2495,7 @@ it: cremato/cremata/cremato(a)
 lv: kremçts(a)
 nl: gecremeerd
 no: kremert
-pl: skremowany/skremowana
+pl: kremacja
 pt: cremado/cremada/cremado(a)
 ru: êğåìèğîâàí/êğåìèğîâàíà
 se: kremerad
@@ -2516,6 +2518,7 @@ it: tribuna della base di dati
 lv: datu bâzes "ziòojumu dçlis"
 nl: databank forum
 no: database forum
+pl: forum bazy
 pt: forum da base de dados
 ru: ôîğóì áàçû äàííûõ
 se: databas forum
@@ -2584,7 +2587,7 @@ it: morto
 lv: nâve
 nl: overlijden
 no: d&oslash;d
-pl: œmierci
+pl: zgon
 pt: morte
 ru: ñìåğòü
 se: d&ouml;d
@@ -2607,7 +2610,7 @@ it: cancellare
 lv: izmest :a:
 nl: verwijderen +before
 no: fjern
-pl: usuñ
+pl: usuñ :a:
 pt: apagar
 ru: óäàëèòü :a:
 se: ta bort
@@ -2655,7 +2658,7 @@ it: deceduto/deceduta/deceduto(a)
 lv: mirğanas
 nl: gestorven
 no: d&oslash;d
-pl: zmar³/zmar³a/zmar³o
+pl: zgon
 pt: falecido/falecida/falecido(a)
 ru: óìåğ/óìåğëà
 se: d&ouml;d
@@ -2678,7 +2681,7 @@ it: morto giovane
 lv: miris jauns
 nl: jong gestorven
 no: d&oslash;d ung
-pl: zmar³ m³odo/zmar³a m³odo/zmar³o m³odo
+pl: zm. m³odo
 pt: morreu jovem
 ru: óìåğ â äåòñòâå
 se: dog ung
@@ -2701,7 +2704,7 @@ it: scomparso/scomparsa/scomparso(a)
 lv: pazudis(usi) bez vçsts
 nl: verdwenen
 no: forsvunnet
-pl: zagin¹³
+pl: zaginiêcie
 pt: desaparecido/desaparecida/desaparecido(a)
 ru: èñ÷åç/èñ÷åçëà
 se: f&ouml;rsvunnen
@@ -2759,7 +2762,7 @@ it: divorziati
 lv: ğíîruğies
 nl: gescheiden
 no: skilt
-pl: rozwiedziony/rozwiedziona
+pl: rozwiedzeni
 pt: divorciados
 ru: â ğàçâîäå
 se: skilda
@@ -2794,7 +2797,7 @@ it: non si sa
 lv: nav zinâms
 nl: onbekend
 no: ukjent
-pl: nieznane
+pl: nie wiadomo
 pt: n&atilde;o sei
 ru: íå èçâåñòåí
 se: vet ej
@@ -2839,7 +2842,7 @@ it: fidanzarsi
 lv: saderin&acirc;ti
 nl: verloofd
 no: forlovet
-pl: zarêczony/zarêczona
+pl: zarêczyny
 pt: Noivos
 se: f&ouml;rlovad
 
@@ -2860,7 +2863,7 @@ it: fidanzato%t con/fidanzata%t con
 lv: saderin&acirc;ts%t ar
 nl: verloofd%t met
 no: forlovet%t med
-pl: zarêczony%t z:
+pl: zarêczony%t z:/zarêczona%t z:
 pt: noivo%t de/noiva%t de
 se: f&ouml;rlovad%t med
 
@@ -2951,7 +2954,7 @@ it: giustiziato/giustiziato/giustiziato(a)
 lv: sodîts(a) ar nâvi
 nl: ge-exekuteerd
 no: henrettet
-pl: stracony/stracona
+pl: egzekucja
 pt: executado/executada/executado(a)
 ru: êàçíåí/êàçíåíà
 se: avr&auml;ttad
@@ -3043,7 +3046,7 @@ it: famiglia modificata
 lv: ìimene labota
 nl: familie veranderd
 no: familie endret
-pl: rodzina zosta³a zmieniona
+pl: rodzina zosta³a zmodyfikowana
 pt: fam&iacute;lia modificada
 ru: cåìüÿ èçìåíåíà
 se: familj &auml;ndrad
@@ -3066,7 +3069,7 @@ it: famiglia/famiglia
 lv: ìimeni/ìimenes
 nl: familie/families
 no: familie/familier
-pl: rodzina/rodziny
+pl: rodzina:a:-ê/rodziny
 pt: fam&iacute;lia/fam&iacute;lias
 ru: ñåìüÿ:a:-ş:g:-è/ñåìüè
 se: familj/familjer
@@ -3478,7 +3481,7 @@ it: da cui
 lv: bçrni:
 nl: hier uit
 no: barn
-pl: , maj¹c dzieci:
+pl: dzieci:
 pt: tiveram
 ru: èìåëè äåòåé
 se: barn
@@ -3569,7 +3572,7 @@ it: orizzontalmente
 lv: horizont&acirc;li
 nl: horizontaal
 no: horisontal
-pl: poziomo
+pl: w poziomie
 pt: horizontalmente
 se: horisontellt
 
@@ -3682,7 +3685,7 @@ it: immagine
 lv: attçli
 nl: beeld
 no: bilde
-pl: ilustracja/ilustracje
+pl: ilustracja:a:-ê/ilustracje
 pt: imagem/imagens
 ru: êàğòèíêó
 se: bild/bilder
@@ -3706,7 +3709,7 @@ it: in
 lv: mçnesî
 nl: in
 no: i
-pl: w
+pl: w ci¹gu miesi¹ca
 pt: em
 ru: â
 se: i
@@ -3868,7 +3871,7 @@ it: infatti,
 lv: patieğâm,
 nl: inderdaad:
 no: felles forfedre,
-pl: œciœle bior¹c,
+pl: œciœlej bior¹c,
 pt: com efeito,
 ru: íà ñàìîì äåëå,
 se: faktiskt,
@@ -3937,7 +3940,7 @@ it: inserire
 lv: pievienot :a:
 nl: invoegen +before
 no: skyt inn
-pl: dodaj
+pl: dodaj :a:
 pt: inserir
 ru: âñòàâèòü :a:
 se: infoga
@@ -3960,7 +3963,7 @@ it: &egrave;
 lv: ir
 nl: is
 no: er
-pl: jest
+pl: to
 pt: &eacute;
 ru: 
 se: &auml;r
@@ -4006,7 +4009,7 @@ it: sarebbe nato/a dopo i suoi figli
 lv: ir dzimis(usi) pçc saviem bçrniem
 nl: zal geboren worden na zijn/haar kind
 no: er f&oslash;dt etter sitt barn
-pl: jest urodzony póŸniej ni¿ swoje dziecko
+pl: jest urodzony/urodzona póŸniej ni¿ swoje dziecko
 pt: nasceu depois do seu filho
 ru: ğîæäåí ïîñëå åãî/åå ğåáåíêà
 se: &auml;r f&ouml;dd efter sitt barn
@@ -4051,6 +4054,7 @@ is: julian dagur
 it: giorno julian
 nl: juliaans dag
 no: juliansk dag
+pl: dzieñ w kalendarzu juliañskim
 pt: dia juliano
 ru: şëèàíñêèé äåíü
 se: julianskdag
@@ -4119,6 +4123,7 @@ it: link
 lv: saite
 nl: konnektie
 no: koble
+pl: link
 pt: ligar
 ru: ñâÿçàòü
 se: l&auml;nk
@@ -4141,7 +4146,7 @@ it: legame tra
 lv: saite starp
 nl: konnektie tussen
 no: slektskap mellom
-pl: po³¹czenie pomiêdzy
+pl: wiêzy pokrewieñstwa pomiêdzy
 pt: rela&ccedil;&atilde;o entre
 ru: ñâÿçü ìåæäó
 se: sl&auml;ktskap emellan
@@ -4343,7 +4348,7 @@ it: sposati
 lv: precîbu
 nl: gehuwd
 no: gift
-pl: ¿onaty/zamê¿na
+pl: ma³¿eñstwo
 pt: casados
 ru: â áğàêå
 se: gift
@@ -4390,7 +4395,7 @@ it: sposato%t con/sposata%t con
 lv: precîbu %t precçjies ar /precîbu %t precçjusies ar
 nl: gehuwd%t met
 no: gift%t med
-pl: œlub z:
+pl: ¿ona (œlub: %t):/m¹¿ (œlub: %t):
 pt: casado%t com/casada%t com
 ru: â áğàêå ñ%t
 se: gift%t med
@@ -4480,6 +4485,7 @@ is: skilaboğum bætt viğ
 it: messaggio aggiunto
 nl: bericht toegevoegd
 no: melding tilf&oslash;yet
+pl: wiadomoœæ zosta³a dodana
 pt: mensagem adicionada
 se: meddelande inlagt
 
@@ -4495,6 +4501,7 @@ fi: viesti/edellinen viesti/seuraava viesti
 fr: message/message pr&eacute;c&eacute;dent/message suivant
 nl: bericht/vorig bericht/volgend bericht
 no: melding/forrige melding/neste melding
+pl: wiadomoœæ/poprzednia wiadomoœæ/nastêpna wiadomoœæ
 pt: mensagem/mensagem anterior/mensagem seguinte
 se: meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
 
@@ -4539,7 +4546,7 @@ it: modificare
 lv: izmainît
 nl: wijzigen +before
 no: endre
-pl: zaktualizuj
+pl: zaktualizuj :a:
 pt: modificar
 ru: èçìåíèòü :a:
 se: &auml;ndra
@@ -4562,6 +4569,7 @@ it: mesi
 lv: mçneğus vecs
 nl: maanden oud
 no: m&aring;neder gammel
+pl: miesiêcy
 pt: meses
 ru: ìåñÿöû
 se: m&aring;nader
@@ -4607,7 +4615,7 @@ it: assassinato/assassinata/assassinato(a)
 lv: noslepkavots
 nl: vermoord
 no: myrdet
-pl: zamordowany/zamordowana/zamordowane
+pl: morderstwo
 pt: assassinado/assassinada/assassinado(a)
 ru: óáèò/óáèòà
 se: m&ouml;rdad
@@ -4681,7 +4689,7 @@ it: percorso con %t come riferimento Sosa
 lv: meklçt senèus -&gt; %t pçc Sosa pakâpes
 nl: navigatie met %t als proband
 no: navigering med %t som Sosa referanse
-pl: nawigacja z %t jako numerem "Sosa"
+pl: nawigacja z numerami "Sosa" odnosz¹cymi siê do osoby: %t
 pt: navega&ccedil;a&atilde;o com %t como a refer&ecirc;ncia Sosa
 ru: íàâèãàöèÿ ñ %t êàê ññûëêà Sosa
 se: navigering med %t som proband (Kekules system)
@@ -4796,7 +4804,7 @@ it: nessun legame di parentela conosciuto tra %s e %s
 lv: nav radniecîbas saiğu starp %s un %s
 nl: er is geen bekende verwantschap tussen %s en %s
 no: ikke kjent slektskap mellom %s og %s
-pl: nie s¹ znane ¿adne wiêzy pokrewieñstwa pomiêdzy %s a %s
+pl: nie s¹ znane ¿adne wiêzy pokrewieñstwa pomiêdzy osobami: %s i %s
 pt: nenhum grau de parentesco conhecido entre %s e %s
 ru: íåèçâåñòíî î ğîäñòâåííûõ ñâÿçÿõ ìåæäó %s è %s
 se: ingen k&auml;nd sl&auml;ktskap emellan %s och %s
@@ -4947,7 +4955,7 @@ it: n-esimo/1o/2o/3o/4o/5o/6o/7o/8o/9o/10o/11o/12o/13o/14o/15o/16o/17o/18o/19o/2
 lv: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 nl: n-de/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
 no: n./f&oslash;rste/andre/tredje/fjerde/femte/sjette/syvende/&aring;ttende/niende/tiende/ellevte/tolvte/trettende/fjortende/femtende/sekstende/s&oslash;ttende/attende/nittende/tyvende/21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99./100./101./102./103./104./105./106./107./108./109./110./111./112./113./114./115./116./117./118./119./120./121./122./123./124./125./126./127./128./129./130.
-pl: n-ty/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
+pl: n./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 pt: n-&eacute;simo/1ro/2ndo/3ro/4rto/5to/6to/7mo/8vo/9no/10mo/11ro/12ndo/13ro/14rto/15to/16to/17mo/18vo/19no/20mo/21ro/22ndo/23ro/24rto/25to/26to/27mo/28vo/29no/30mo/31ro/32ndo/33ro/34rto/35to/36to/37mo/38vo/39no/40mo/41ro/42ndo/43ro/44rto/45to/46to/47mo/48vo/49no/50mo/51ro/52ndo/53ro/54rto/55to/56to/57mo/58vo/59no/60mo/61ro/62ndo/63ro/64rto/65to/66to/67mo/68vo/69no/70mo/71ro/72ndo/73ro/74rto/75to/76to/77mo/78vo/79no/80mo/81ro/82ndo/83ro/84rto/85to/86to/87mo/88vo/89no/90mo/91ro/92ndo/93ro/94rto/95to/96to/97mo/98vo/99no
 ru: ıííûé/1-é/2-é/3-é/4-é/5-é/6-é/-7é/8-é/9-é/10-é/11-é/11-é/12-é/13-é/14-é/15-é/16-é/17-é/18-é/19-é/20-é
 se: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
@@ -4991,6 +4999,7 @@ it: n-esima/1a/2a/3a/4a/5a/6a/7a/8a/9a/10a/11a/12a/13a/14a/15a/16a/17a/18a/19a/2
 lv: /1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 nl: n-te/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
 no: n./f&oslash;rste/andre/tredje/fjerde/femte/sjette/syvende/&aring;ttende/niende/tiende/ellevte/tolvte/trettende/fjortende/femtende/sekstende/s&oslash;ttende/attende/nittende/tyvende/21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99./100./101./102./103./104./105./106./107./108./109./110./111./112./113./114./115./116./117./118./119./120./121./122./123./124./125./126./127./128./129./130.
+pl: n/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
 pt: n-&eacute;sima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
 ru: ıííîãî/1-ãî/2-ãî/3-ãî/4-ãî/5-ãî/6-ãî/7-ãî/8-ãî/9-ãî/10-ãî/11-ãî/12-ãî/13-ãî/14-ãî/15-ãî/16-ãî/17-ãî/18-ãî/19-ãî/20-ãî/10-ãî/11-ãî/12-ãî/13-ãî/14-ãî/15-ãî/16-ãî/17-ãî/18-ãî/19-ãî/10-ãî/21-ãî/22-ãî/23-ãî/24-ãî/25-ãî/26-ãî/27-ãî/28-ãî/29-ãî/30-ãî/31-ãî/32-ãî/33-ãî/34-ãî/35-ãî/36-ãî/37-ãî/38-ãî/39-ãî/40-ãî/41-ãî/42-ãî/43-ãî/44-ãî/45-ãî/46-ãî/47-ãî/48-ãî/49-ãî/50-ãî/51-ãî/52-ãî/53-ãî/54-ãî/55-ãî/56-ãî/57-ãî/58-ãî/59-ãî/60-ãî/61-ãî/62-ãî/63-ãî/64-ãî/65-ãî/66-ãî/67-ãî/68-ãî/69-ãî/70-ãî/71-ãî/72-ãî/73-ãî/74-ãî/75-ãî/76-ãî/77-ãî/78-ãî/79-ãî/80-ãî/81-ãî/82-ãî/83-ãî/84-ãî/85-ãî/86-ãî/87-ãî/88-ãî/89-ãî/90-ãî/91-ãî/92-ãî/93-ãî/94-ãî/95-ãî/96-ãî/97-ãî/98-ãî/99-ãî
 se: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
@@ -5036,7 +5045,7 @@ it: numero di ramo
 lv: zaru skaits
 nl: aantal takken
 no: antall slektsgrener
-pl: numer linii (ga³êzi)
+pl: liczba linii (ga³êzi)
 pt: n&uacute;mero de ramos
 ru: ÷èñëî âåòâåé
 se: antal grenar
@@ -5220,6 +5229,7 @@ it: dalla parte di %s
 lv: %s-jâ pusç
 nl: langs de zijde van %s
 no: fra %ss slektside
+pl: ze strony osoby: %s
 pt: pelo lado de %s
 ru: ñî ñòîğîíû %s
 se: fr&aring;n %ss sl&auml;ktsida
@@ -5243,7 +5253,7 @@ it: il
 lv: datums:
 nl: op
 no: den
-pl:
+pl: dnia
 pt: a
 ru:
 se: den
@@ -5267,7 +5277,7 @@ it:
 lv:
 nl:
 no:
-pl:
+pl: w :a:
 pt:
 ru:
 se:
@@ -5429,7 +5439,7 @@ it: genitori
 lv: vecâki
 nl: ouders
 no: foreldre
-pl: rodzice
+pl: rodzice:a:-ów
 pt: pais
 ru: ğîäèòåëè
 se: f&ouml;r&auml;ldrar
@@ -5498,7 +5508,7 @@ it: persona modificata
 lv: personas dati mainîti
 nl: persoon veranderd
 no: personen er endret
-pl: dane osoby zosta³y zaktualizowane
+pl: dane poni¿szej osoby zosta³y zaktualizowane
 pt: pessoa modificada
 ru: ÷åëîâåê èçìåíåí
 se: person &auml;ndrad
@@ -5521,7 +5531,7 @@ it: persona/persone
 lv: persona(s)
 nl: persoon/personen
 no: person/personer
-pl: osoba/osoby
+pl: osoba:a:-ê/osoby
 pt: pessoa/pessoas
 ru: ×åëîâåêà/×åëîâåê
 se: person/personer
@@ -5659,7 +5669,7 @@ it: riservato
 lv: privâts
 nl: priv&eacute;
 no: privat
-pl: ochrona danych osobowych
+pl: bez danych osobowych
 pt: privado
 ru: ×àñòíûé
 se: privat
@@ -5797,7 +5807,7 @@ it: parentela
 lv: saistîba/saistîbas
 nl: relatie/relaties
 no: forbindelse/forbindelser
-pl: zwi¹zek/zwi¹zki
+pl: inne wiêzy
 pt: rela&ccedil;&atilde;o/rela&ccedil;&otilde;es
 ru: îòíîøåíèÿ/îòíîøåíèÿ
 se: relation/relationer
@@ -5844,7 +5854,7 @@ it: calcolo della parentela
 lv: radniecîbas aprçíinâğana
 nl: verwantschap vaststellen
 no: slektskapsberegning
-pl: znajdowanie wiêzów pokrewieñstwa
+pl: szukanie pokrewieñstwa
 pt: c&aacute;lculo de parentesco
 ru: êîìó ïğèõîäèòñÿ
 se: sl&auml;ktskapsber&auml;kning
@@ -5913,7 +5923,7 @@ it: parentele per matrimonio
 lv: precîbu saites
 nl: verwant door huwelijk
 no: slektskap gjennom gifte
-pl: wiêzy poprzez ma³¿eñstwo
+pl: powinowactwo
 pt: rela&ccedil;&otilde;es por casamento
 ru: ñâÿçü áğàêîì
 se: sl&auml;ktskap genom &auml;ktenskap
@@ -6005,7 +6015,7 @@ it: mandare
 lv: sûtît
 nl: zenden +before
 no: send
-pl: wyœlij
+pl: wyœlij :a:
 pt: enviar
 ru: ïîñëàòü
 se: skicka
@@ -6303,7 +6313,7 @@ it: coniugi esclusi
 lv: laulâtie nav ietverti
 nl: echtgenoten weggelaten
 no: maker er utelatt
-pl: ma³¿onkowie nie uwzglêdnieni
+pl: bez wliczania ma³¿onków
 pt: c&ocirc;njuges n&atilde;o inclu&iacute;dos
 ru: ñóïğóãîâ íå âêëş÷àòü
 se: exklusive makar
@@ -6368,6 +6378,7 @@ is: um
 it: oggetto
 nl: onderwerp
 no: emne
+pl: temat
 pt: assunto
 se: ämne
 
@@ -6683,7 +6694,7 @@ it: la %s generazione
 lv: %s. paaudze
 nl: de %s generatie
 no: %s generasjon
-pl: %s. pokolenie
+pl: %s pokolenie
 pt: a %s gera&ccedil;&atilde;o
 ru: %s-å ïîêîëåíèå
 se: den %s generationen
@@ -6868,7 +6879,7 @@ it: il padre/la madre/un genitore
 lv: tçvs/mâte/vecâks
 nl: de vader/de moeder/een ouder
 no: faren/moren/en av foreldrene
-pl: ojciec/matka/dziecko
+pl: ojciec/matka/rodzic
 pt: o pai/a m&atilde;e/um pai
 ru: ìàòü/îòåö/ğîäèòåëè
 se: fadern/modern/en f&ouml;r&auml;lder
@@ -7534,7 +7545,7 @@ it: fino
 lv: lîdz
 nl: tot
 no: opp til
-pl: a¿ do
+pl: do
 pt: at&eacute;
 ru: âïëîòü äî
 se: upp till
@@ -7581,7 +7592,7 @@ it: usare "link" invece di "create"
 lv: "izveidot" vietâ lietojiet "saite"
 nl: gebruik "konnektie" inplaats van "maken"
 no: bruk "koble" istedet for "opprett"
-pl: u¿yj "³¹cze" zamiast "utwórz"
+pl: u¿yj "link" zamiast "utwórz"
 pt: use "reunir" em lugar de "criar"
 ru: èñïîëüçóéòå "ñâÿçàòü" âìåñòî "ñîçäàòü"
 se: anv&auml;nd "l&auml;nk" ist&auml;llet f&ouml;r "skapa"
@@ -7627,7 +7638,7 @@ it: con
 lv: ar
 nl: met
 no: med
-pl: , dzieci:
+pl: z:
 pt: com
 ru: ñ
 se: med
@@ -7650,7 +7661,7 @@ it: testimone al matrimonio di %s e %s
 lv: liecinieks %s un %s laulîbâs
 nl: getuige bij het huwelijk van %s en %s
 no: forlover ved ekteskap mellom %s og %s
-pl: œwiadek ma³¿eñstwa pomiêdzy %s i %s
+pl: œwiadek ma³¿eñstwa pomiêdzy osobami: %s i %s
 pt: testemunha do casamento de %s e %s
 ru: ñâèäåòåëü â áğàêå %s è %s
 se: vittne vid &auml;ktenskap mellan %s och %s
@@ -7673,7 +7684,7 @@ it: testimone/testimone
 lv: liecinieks:a:-u/liecinieki
 nl: getuige/getuigen
 no: forlover/forlovere
-pl: œwiadek/œwiadkowie
+pl: œwiadek:a:--ka/œwiadkowie
 pt: testemunha/testemunhas
 ru: ñâèäåòåëü:g:-ÿ:a:-ÿ/ñâèäåòåëè
 se: vittne/vittnen
