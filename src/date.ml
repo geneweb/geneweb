@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.0 1999-10-29 10:31:05 ddr Exp $ *)
+(* $Id: date.ml,v 3.1 1999-10-29 10:46:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -546,6 +546,7 @@ value print_calendar conf base =
     if x < 0 then 6 + (x + 1) mod 7 else x mod 7
   in
   do header conf title;
+     print_link_to_welcome conf True;
      Wserver.wprint "- %s -\n"
        (capitale (transl_nth conf "(week day)" wday));
      html_p conf;

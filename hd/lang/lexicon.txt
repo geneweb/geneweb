@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.0 1999-10-29 10:29:30 ddr Exp $
+# $Id: lexicon.txt,v 3.1 1999-10-29 10:46:30 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -192,7 +192,7 @@ is: 1 %m %y/%d %m %y/%m %y/%y
 it: 1o %m %y/%d %m %y/%m %y/%y
 nl: 1 %m %y/%d %m %y/%m %y/%y
 no: 1. %m %y/%d. %m %y/%m %y/%y
-pt: 1a de %m %y/%da de %m %y/%m %y/%y
+pt: 1 de %m %y/%d de %m %y/%m %y/%y
 se: 1 %m %y/%d %m %y/%m %y/%y
 
     (decimal separator)
@@ -2178,7 +2178,7 @@ fr: historique des mises-&agrave;-jour
 is: uppfærslusaga
 nl: lijst van wijzigingen
 no: oppdateringshistorie
-pt: historial das actualiza&ccedil;&aacute;o
+pt: historial das actualiza&ccedil;&otilde;es
 se: uppdateringarnas historia
 
     husband/wife
@@ -3384,7 +3384,7 @@ is: eða
 it: o
 nl: of
 no: eller
-pt: o
+pt: ou
 se: eller
 
     or use "link" instead of "create"
