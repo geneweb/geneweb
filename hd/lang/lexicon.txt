@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.58 2000-01-23 10:28:53 ddr Exp $
+# $Id: lexicon.txt,v 3.59 2000-01-25 09:39:46 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5381,7 +5381,7 @@ nl: boom
 no: tre
 pt: &aacute;rvore
 ru: ‰ÂÂ‚Ó
-se: antr‰d
+se: tr‰d
 
     uncles and aunts
 de: Onkel und Tanten
