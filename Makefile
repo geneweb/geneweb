@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.13 2000-08-29 07:03:04 ddr Exp $
+# $Id: Makefile,v 3.14 2000-09-03 16:11:25 ddr Exp $
 
 DESTDIR=distribution
 
@@ -76,7 +76,7 @@ classical_distrib:
 	cp src/gwu $(DESTDIR)/gwu$(EXE)
 	cp ged2gwb/ged2gwb $(DESTDIR)/ged2gwb$(EXE)
 	cp gwb2ged/gwb2ged $(DESTDIR)/gwb2ged$(EXE)
-	cp gwtp/gwtp.opt $(DESTDIR)/gwtp$(EXE)
+	cp gwtp/gwtp $(DESTDIR)/gwtp$(EXE)
 	mkdir $(DESTDIR)/gwtp_tmp
 	cp gwtp/*.txt $(DESTDIR)/gwtp_tmp/.
 	cp etc/LISEZMOI.txt $(DESTDIR)/.
