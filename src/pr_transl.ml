@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 4.4 2001-06-25 14:59:47 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 4.5 2002-03-04 18:08:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open MLast;
@@ -21,6 +21,8 @@ value trace =
 value rec expr e =
   match e with
   [ <:expr< $lid:f$ $_$ $str:s$ >> when List.mem f trace ->
+      Printf.printf "%s\n" (Token.eval_string s)
+  | <:expr< Util.$lid:f$ $_$ $str:s$ >> when List.mem f trace ->
       Printf.printf "%s\n" (Token.eval_string s)
   | <:expr< $lid:f$ $_$ ($lid:g$ $_$ $str:s$ $_$) >>
     when List.mem f trace && List.mem g trace ->

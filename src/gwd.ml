@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.34 2002-03-04 18:01:33 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.35 2002-03-04 18:08:37 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -496,9 +496,9 @@ value unauth_cgi conf passwd =
   let title _ =
     let i = if passwd = "w" then 0 else 1 in
     Wserver.wprint "%s / %s"
-      (Util.capitale (transl_nth conf "wizard/friend" i)) conf.bname
+      (Util.capitale (Util.transl_nth conf "wizard/friend" i)) conf.bname
   in
-  let message_txt i = transl_nth conf "user/password/cancel" i in
+  let message_txt i = Util.transl_nth conf "user/password/cancel" i in
   do {
     conf.set_cookie := Some (conf.bname ^ "_" ^ passwd, "");
     Util.header conf title;
