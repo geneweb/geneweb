@@ -2,6 +2,11 @@ GeneWeb version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [18 Jan 03] Added a system of black list for the database forum;
+    the environment variable "forum_exclude_file" can be set to a
+    file name containing a list of excluded IP addresses which cannot
+    post. In the lines of this file, the joker character "*" can be
+    used to specify any string (e.g. "*" exclude everybody).
   - [14 Jan 03] In form to add message in the database forum, added
     buttons "private/public": only "wizards" and "friend" can see
     "private" messages.

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.24 2003-01-14 14:38:54 ddr Exp $ *)
+(* $Id: forum.ml,v 4.25 2003-01-18 08:24:59 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -19,6 +19,38 @@ type message =
 
 value forum_file conf =
   Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum"
+;
+
+(* Black list *)
+
+value match_strings regexp s =
+  loop 0 0 where rec loop i j =
+    if i == String.length regexp && j == String.length s then True
+    else if i == String.length regexp then False
+    else if j == String.length s then False
+    else if regexp.[i] = s.[j] then loop (i + 1) (j + 1)
+    else if regexp.[i] = '*' then
+      if i + 1 == String.length regexp then True
+      else if regexp.[i + 1] = s.[j] then loop (i + 2) (j + 1)
+      else loop i (j + 1)
+    else False
+;
+
+value can_post conf =
+  try
+    let fname = List.assoc "forum_exclude_file" conf.base_env in
+    let fname = Util.base_path [] fname in
+    let ic = open_in fname in
+    let rec loop () =
+      match try Some (input_line ic) with [ End_of_file -> None ] with
+      [ Some line ->
+          if match_strings line conf.from then do { close_in ic; False }
+          else loop ()
+      | None -> do { close_in ic; True } ]
+    in
+    loop ()
+  with
+  [ Not_found | Sys_error _ -> True ]
 ;
 
 (* Print headers *)
@@ -235,7 +267,7 @@ value print_forum_headers conf base =
   do {
     header conf title;
     print_link_to_welcome conf True;
-    print_add_message conf;
+    if can_post conf then print_add_message conf else ();
     Wserver.wprint "\n";
     print_headers conf;
     trailer conf;
@@ -453,7 +485,7 @@ value print_add conf base =
     Wserver.wprint "%s"
       (capitale (transl_decline conf "add" (message_txt conf 0)))
   in
-  do {
+  if can_post conf then do {
     header conf title;
     print_link_to_welcome conf True;
     tag "form" "method=post action=\"%s\"" conf.command begin
@@ -485,6 +517,7 @@ value print_add conf base =
     end;
     trailer conf;
   }
+  else incorrect_request conf
 ;
 
 value get conf key =
@@ -562,7 +595,8 @@ value forum_add conf base ident comm =
 value print_add_ok conf base =
   let ident = Gutil.strip_spaces (get conf "Ident") in
   let comm = Gutil.strip_spaces (get conf "Text") in
-  if ident = "" || comm = "" then print conf base
+  if not (can_post conf) then incorrect_request conf
+  else if ident = "" || comm = "" then print conf base
   else
     let title _ =
       Wserver.wprint "%s" (capitale (transl conf "message added"))
