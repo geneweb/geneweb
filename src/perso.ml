@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.9 1999-03-31 02:16:50 ddr Exp $ *)
+(* $Id: perso.ml,v 2.10 1999-04-03 08:59:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -54,6 +54,12 @@ value a_des_petits_enfants base p =
     return False
   with
   [ Ok -> True ]
+;
+
+value of_course_died conf p =
+  match Adef.od_of_codate p.birth with
+  [ Some d -> conf.today.year - d.year > 120
+  | None -> False ]
 ;
 
 value prev_sibling base p a =
@@ -274,6 +280,7 @@ value print_dates conf base p =
          match (p.death, death_place, p.burial) with
          [ (DontKnowIfDead | NotDead, "", _) -> False
          | (DeadDontKnowWhen, "", Buried _ | Cremated _) -> False
+         | (DeadDontKnowWhen, _, _) -> not (of_course_died conf p)
          | _ -> True ]
        in
        do if something then Wserver.wprint "<em>\n" else ();
@@ -297,7 +304,9 @@ value print_dates conf base p =
               match (death_place, p.burial) with
               [ ("", Buried _ | Cremated _) -> ()
               | _ ->
-                  Wserver.wprint "%s" (capitale (transl_nth conf "died" is)) ]
+                  if not (of_course_died conf p) then
+                    Wserver.wprint "%s" (capitale (transl_nth conf "died" is))
+                  else () ]
           | DontKnowIfDead | NotDead -> () ];
           if death_place <> "" then
             Wserver.wprint " - %s" (coa conf death_place)
