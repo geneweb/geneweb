@@ -73,7 +73,7 @@ E os <a href="%sm=AM">anivers&aacute;rios de casamento</a>.
 
 <p>
 
-Houve %c consultas com %c a esta p&aacute;gina desde %d.
+Houve %q consultas com %c a esta p&aacute;gina desde %d.
 
 <p>
 

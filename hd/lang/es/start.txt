@@ -73,7 +73,7 @@ Y los <a href="%sm=AM">aniversarios de casamiento</a>.
 
 <p>
 
-Han habido %c consultas con %c a esta p&aacute;gina desde %d.
+Han habido %q consultas con %c a esta p&aacute;gina desde %d.
 
 <p>
 

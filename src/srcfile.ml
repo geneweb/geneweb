@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.5 1998-11-27 20:09:48 ddr Exp $ *)
+(* $Id: srcfile.ml,v 1.6 1998-11-30 20:52:54 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -162,7 +162,9 @@ value rec copy_from_channel conf base ic =
                 with [ Not_found -> () ]
             | 'c' ->
                 let (wc, rc, d) = count conf in
-                Wserver.wprint "%d" wc
+                Num.print (fun x -> Wserver.wprint "%s" x)
+                  (transl conf "(thousand separator)")
+                  (Num.of_int wc)
             | 'd' -> print_date conf
             | 'f' -> Wserver.wprint "%s" conf.command
             | 'g' ->
@@ -174,7 +176,9 @@ value rec copy_from_channel conf base ic =
             | 'n' -> Wserver.wprint "%d" (base.persons.len)
             | 'q' ->
                 let (wc, rc, d) = count conf in
-                Wserver.wprint "%d" (wc + rc)
+                Num.print (fun x -> Wserver.wprint "%s" x)
+                  (transl conf "(thousand separator)")
+                  (Num.of_int (wc + rc))
             | 'r' -> copy_from_file conf base (input_line ic)
             | 's' ->
                 do Wserver.wprint "%s?" conf.command;

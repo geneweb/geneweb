@@ -24,7 +24,7 @@ GeneWeb Version 1.09
 * GeneWeb daemon/CGI (gwd)
   - Fixed bug of bad alphabetic order when first names and surnames with
     accents. Restructuration of displaying of surnames and first names
-    by alphabetic order and frequency.
+    by alphabetic order and frequency. Access in indexes faster.
   - Added error message in relationship computing when loop in
     database (someone being his/her own ancestor).
   - In "search", added ability to write "I" instead of "Ier" (french form).
@@ -44,6 +44,11 @@ GeneWeb Version 1.09
 
 * GeneWeb compiler and Consanguinity computing (gwc, consang)
   - Fixed accents displaying in traces and error messages.
+
+* Welcome pages (start.txt)
+  - Fixed wrong displaying of number of accesses in spanish (es) and
+    portuguese (pt) versions.
+  - Display thousand separators in numbers of accesses.
 
 * Documentation (directory doc)
   - Added 2 cases in FAQ.
