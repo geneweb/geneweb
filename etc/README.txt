@@ -7,9 +7,9 @@ If you installed GeneWeb, e.g. in the directory:
 open the location:
      file:/home/smith/geneweb/doc/index.htm
 
-A simpler solution, under Windows 95/NT, without having to launch the
-Web browser before, is to double-click on the file "index.htm" of the
-directory "doc".
+A simpler solution, under Windows 95/98/NT, without having to launch
+the Web browser before, is to double-click on the file "index.htm" of
+the directory "doc".
 
 Follow the instructions.
 
@@ -27,4 +27,4 @@ Remarks, suggestions, questions, bug reports to:
 	http://cristal.inria.fr/~ddr/
 
 Please specify the version number above and the system you use (Linux,
-Windows NT, Windows 95).
+Windows NT, Windows 95/98).
