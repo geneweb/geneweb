@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 4.6 2003-04-10 20:09:17 ddr Exp $
+# $Id: geneweb.spec,v 4.7 2004-12-23 12:30:47 ddr Exp $
 
 Summary: Genealogy software with a Web interface
 Name: geneweb
@@ -8,7 +8,7 @@ Copyright: GPL
 Vendor: INRIA
 Group: Applications
 Source: ftp://ftp.inria.fr/INRIA/Projects/cristal/geneweb/Src/geneweb-%{version}.tar.gz
-URL: http://pauillac.inria.fr/~ddr/GeneWeb/
+URL: http://www.geneweb.org/
 Packager: Daniel de Rauglaudre <daniel.de_rauglaudre@inria.fr>
 # Requires: ld-linux.so.2 libc.so.6 libm.so.6 libm.so.6(GLIBC_2.1) libm.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1) libc.so.6(GLIBC_2.0)
 BuildRoot: /tmp/%{name}-%{version}
