@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 2.14 1999-05-13 12:05:27 ddr Exp $ *)
+(* $Id: gwd.ml,v 2.15 1999-05-15 11:08:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -341,7 +341,8 @@ value connection_accepted cgi (addr, request) str env =
   let (command, base_file, passwd, env) =
     let (base_passwd, env) =
       let (x, env) = extract_assoc "b" env in
-      if x <> "" || cgi then (x, env) else (String.sub str 0 iq, env)
+      if x <> "" || cgi then (x, env)
+      else (String.sub str 0 iq, env)
     in
     let ip = index '_' base_passwd in
     let base_file = String.sub base_passwd 0 ip in

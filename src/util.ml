@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.17 1999-05-07 21:20:04 ddr Exp $ *)
+(* $Id: util.ml,v 2.18 1999-05-15 11:08:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -84,6 +84,15 @@ value commd conf =
   List.fold_left
     (fun c (k, v) -> c ^ k ^ (if v = "" then "" else "=" ^ v) ^ ";") c
     (conf.henv @ conf.senv)
+;
+
+value commd_no_params conf =
+  conf.command ^ "?" ^
+  List.fold_left
+    (fun c (k, v) ->
+       c ^ (if c = "" then "" else ";") ^ k ^
+       (if v = "" then "" else "=" ^ v))
+    "" conf.henv
 ;
 
 value code_varenv = Wserver.encode;
@@ -727,15 +736,6 @@ value print_decimal_num conf f =
          [ '.' -> Wserver.wprint "%s" (transl conf "(decimal separator)")
          | x -> Wserver.wprint "%c" x ];
       return loop (i + 1)
-;
-
-value commd_no_params conf =
-  conf.command ^
-  List.fold_left
-    (fun c (k, v) ->
-       c ^ (if c = "" then "?" else ";") ^ k ^
-       (if v = "" then "" else "=" ^ v))
-    "" conf.henv
 ;
 
 value image_file_name bname str =

@@ -2,6 +2,7 @@ GeneWeb Intermediate version 2.02-1
 -----------------------------------
 
 * Setup program
+  - [May 15, 99] Added deletion of ".gwo" file after "gwc".
   - [May 9, 99] Added predefined palette combination in "data base parameters";
     changed presentation of all page.
   - [May 9, 99] Added system to forbid non local accesses.
@@ -12,6 +13,10 @@ GeneWeb Intermediate version 2.02-1
   - [May 7, 99] Fixed bug: "cleanup" under Windows did not work.
 
 * GeneWeb Daemon/CGI (gwd)
+  - [May 15, 99] Added a "?" at end of empty requests (with just the base
+    name) because of too smart browsers which automatically add a "/" at end
+    of the address in this case (transforming e.g. "http://host/base" into
+    "http://host/base/"), what prevented the request from working.
   - [May 14, 99] Fixed bug: in personal pages, the term "died" was sometimes
     missing when there was only a death place but no death date. Happened
     for persons born more than 120 years ago.
