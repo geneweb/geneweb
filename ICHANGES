@@ -4,6 +4,11 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 4.02
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [08 Apr 01] In forum headers displaying, put one table for each date,
+    in order that we don't have to wait the end of the table to see the
+    first messages
+
 * Setup program (gwsetup)
   - [08 Apr 01] fr/gw2gd.htm: fixed errored message
 

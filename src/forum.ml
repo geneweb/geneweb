@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.5 2001-04-01 21:01:09 ddr Exp $ *)
+(* $Id: forum.ml,v 4.6 2001-04-08 12:07:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -49,11 +49,14 @@ value print_one_header conf prec_date pos h =
          with
          [ Failure _ -> Dtext date ]
        in
-       tag "tr" begin
-         tag "td" "colspan=4 align=left" begin
-           Wserver.wprint "%s" (Date.string_of_date conf d);
-         end;
-       end
+       do if prec_date <> "" then Wserver.wprint "</table>\n" else ();
+          Wserver.wprint "<table border=%d>\n" conf.border;
+          tag "tr" begin
+            tag "td" "colspan=4 align=left" begin
+              Wserver.wprint "%s" (Date.string_of_date conf d);
+            end;
+          end;
+       return ()
      else ();
      tag "tr" begin
        tag "td" begin
@@ -80,49 +83,50 @@ value print_headers conf =
   match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let ic_len = in_channel_length ic in
-      tag "table" "border=%d" conf.border begin
-      loop "" where rec loop prec_date =
-        let pos = ic_len - pos_in ic in
-        match try Some (input_line ic) with [ End_of_file -> None ] with
-        [ Some s ->
-            let (time, s) = get_var ic "Time:" s in
-            let (ident, s) = get_var ic "Ident:" s in
-            let (_, s) = get_var ic "Email:" s in
-            let (subject, s) = get_var ic "Subject:" s in
-            let (_, s) = get_var ic "Text:" s in
-            let (text, s) =
-              if subject = "" || subject = "-" then
-                get_mess [] s where rec get_mess sl s =
-                  if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
-                    let s = String.sub s 2 (String.length s - 2) in
-                    get_mess [s :: sl] (input_line ic)
-                  else (List.rev sl, s)
-              else
-                skip_mess s where rec skip_mess s =
-                  if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
-                    skip_mess (input_line ic)
-                  else ([], s)
-            in
-            let (date, hour) =
-              try
-                let i = String.index time ' ' in
-                (String.sub time 0 i,
-                 String.sub time (i + 1) (String.length time - i - 1))
-              with
-              [ Not_found -> ("", time) ]
-            in
-            let beg_mess =
-              match text with
-              [ [x :: _] -> x
-              | _ -> "" ]
-            in
-            do if ident <> "" then
-                 let h = (date, hour, ident, subject, beg_mess) in
-                 print_one_header conf prec_date pos h
-               else ();
-            return loop date
-        | None -> close_in ic ];
-      end
+      let last_date =
+        loop "" where rec loop prec_date =
+          let pos = ic_len - pos_in ic in
+          match try Some (input_line ic) with [ End_of_file -> None ] with
+          [ Some s ->
+              let (time, s) = get_var ic "Time:" s in
+              let (ident, s) = get_var ic "Ident:" s in
+              let (_, s) = get_var ic "Email:" s in
+              let (subject, s) = get_var ic "Subject:" s in
+              let (_, s) = get_var ic "Text:" s in
+              let (text, s) =
+                if subject = "" || subject = "-" then
+                  get_mess [] s where rec get_mess sl s =
+                    if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
+                      let s = String.sub s 2 (String.length s - 2) in
+                      get_mess [s :: sl] (input_line ic)
+                    else (List.rev sl, s)
+                else
+                  skip_mess s where rec skip_mess s =
+                    if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
+                      skip_mess (input_line ic)
+                    else ([], s)
+              in
+              let (date, hour) =
+                try
+                  let i = String.index time ' ' in
+                  (String.sub time 0 i,
+                   String.sub time (i + 1) (String.length time - i - 1))
+                with
+                [ Not_found -> ("", time) ]
+              in
+              let beg_mess =
+                match text with
+                [ [x :: _] -> x
+                | _ -> "" ]
+              in
+              do if ident <> "" then
+                   let h = (date, hour, ident, subject, beg_mess) in
+                   print_one_header conf prec_date pos h
+                 else ();
+              return loop date
+          | None -> do close_in ic; return prec_date ]
+      in
+      if last_date = "" then () else Wserver.wprint "</table>\n"
   | None -> () ]
 ;
 
