@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.1 1999-11-01 14:45:35 ddr Exp $ *)
+(* $Id: perso.ml,v 3.2 1999-11-10 08:44:29 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -24,20 +24,20 @@ value has_grand_parents base p =
   try do loop 0 (aoi base p.cle_index); return False with [ Ok -> True ]
 ;
 
-value has_grand_children base p =
+value has_grand_children base u =
   try
     do Array.iter
          (fun fi ->
-            let el = (foi base fi).children in
+            let el = (doi base fi).children in
             Array.iter
               (fun e ->
                  Array.iter
                    (fun fi ->
-                      let eel = (foi base fi).children in
+                      let eel = (doi base fi).children in
                       Array.iter (fun _ -> raise Ok) eel)
-                   (poi base e).family)
+                   (uoi base e).family)
               el)
-         p.family;
+         u.family;
     return False
   with
   [ Ok -> True ]
@@ -46,11 +46,11 @@ value has_grand_children base p =
 value prev_sibling base p a =
   match a.parents with
   [ Some ifam ->
-      let fam = foi base ifam in
+      let des = doi base ifam in
       loop 0 where rec loop i =
-        if i == Array.length fam.children then None
-        else if fam.children.(i) = p.cle_index then
-          if i == 0 then None else Some (poi base fam.children.(i-1))
+        if i == Array.length des.children then None
+        else if des.children.(i) = p.cle_index then
+          if i == 0 then None else Some (poi base des.children.(i-1))
         else loop (i + 1)
   | None -> None ]
 ;
@@ -58,12 +58,12 @@ value prev_sibling base p a =
 value next_sibling base p a =
   match a.parents with
   [ Some ifam ->
-      let fam = foi base ifam in
+      let des = doi base ifam in
       loop 0 where rec loop i =
-        if i == Array.length fam.children then None
-        else if fam.children.(i) = p.cle_index then
-          if i == Array.length fam.children - 1 then None
-          else Some (poi base fam.children.(i+1))
+        if i == Array.length des.children then None
+        else if des.children.(i) = p.cle_index then
+          if i == Array.length des.children - 1 then None
+          else Some (poi base des.children.(i+1))
         else loop (i + 1)
   | None -> None ]
 ;
@@ -425,9 +425,10 @@ value print_marriage_text conf base in_perso fam =
 
 value print_family conf base p a ifam =
   let fam = foi base ifam in
-  let ispouse = spouse p (coi base ifam) in
+  let des = doi base ifam in
+  let ispouse = spouse p.cle_index (coi base ifam) in
   let spouse = poi base ispouse in
-  let children = fam.children in
+  let children = des.children in
   let divorce = fam.divorce in
   let is = index_of_sex p.sex in
   let auth = age_autorise conf base p && age_autorise conf base spouse in
@@ -489,8 +490,8 @@ value print_family conf base p a ifam =
   return ()
 ;
 
-value print_families conf base p a =
-  match Array.to_list p.family with
+value print_families conf base p a u =
+  match Array.to_list u.family with
   [ [] -> ()
   | faml ->
       do Wserver.wprint "<h3>%s</h3>\n<ul>"
@@ -599,7 +600,7 @@ value print_related conf base p ic =
             if array_memq p.cle_index fam.witnesses then
               print_witness_at_marriage conf base (coi base ifam)
             else ())
-         (Array.to_list c.family)
+         (Array.to_list (uoi base ic).family)
      else ();
   return ()
 ;
@@ -626,10 +627,11 @@ value print_fwitnesses conf base p nfam n ifam =
 ;
 
 value print_relations conf base p =
+  let u = uoi base p.cle_index in
   let has_marriage_witnesses =
     List.exists
       (fun ifam -> (foi base ifam).witnesses <> [| |])
-      (Array.to_list p.family)
+      (Array.to_list u.family)
   in
   match (p.rparents, p.related, has_marriage_witnesses) with
   [ ([], [], False) -> ()
@@ -639,8 +641,8 @@ value print_relations conf base p =
          tag "ul" begin
            List.iter (print_relation conf base) rl;
            List.iter (print_related conf base p) cl;
-           Array.iteri (print_fwitnesses conf base p (Array.length p.family))
-             p.family;
+           Array.iteri (print_fwitnesses conf base p (Array.length u.family))
+             u.family;
          end;
       return () ]
 ;
@@ -665,6 +667,7 @@ value print_not_empty_src conf base new_parag first txt isrc =
 ;
 
 value print_sources conf base new_parag p =
+  let u = uoi base p.cle_index in
   let first = ref True in
   do print_not_empty_src conf base new_parag first
        (fun () -> nominative (transl_nth conf "person/persons" 0))
@@ -681,18 +684,18 @@ value print_sources conf base new_parag p =
      print_not_empty_src conf base new_parag first
        (fun () -> transl_nth conf "burial" 0)
        p.burial_src;
-     for i = 0 to Array.length p.family - 1 do
-       let fam = foi base p.family.(i) in
+     for i = 0 to Array.length u.family - 1 do
+       let fam = foi base u.family.(i) in
        do print_not_empty_src conf base new_parag first
             (fun () ->
                transl_nth conf "marriage/marriages" 0 ^
-               (if Array.length p.family == 1 then ""
+               (if Array.length u.family == 1 then ""
                 else " " ^ string_of_int (i + 1)))
             fam.marriage_src;
           print_not_empty_src conf base new_parag first
             (fun () ->
                nominative (transl_nth conf "family/families" 0) ^
-               (if Array.length p.family == 1 then ""
+               (if Array.length u.family == 1 then ""
                 else " " ^ string_of_int (i + 1)))
             fam.fsources;
        return ();
@@ -762,12 +765,13 @@ value find_sosa conf base a =
   [ Some p ->
       if a.cle_index = p.cle_index then Some (Num.one, p)
       else
+        let au = uoi base a.cle_index in
 	let has_children =
 	  List.exists
 	    (fun ifam ->
-	       let fam = foi base ifam in
-	       Array.length fam.children > 0)
-	    (Array.to_list a.family)
+	       let des = doi base ifam in
+	       Array.length des.children > 0)
+	    (Array.to_list au.family)
 	in
 	if has_children then find_sosa_aux conf base a p
 	else None
@@ -1010,7 +1014,7 @@ value print_photo_occupation_dates conf base p =
       print_occupation_dates conf base False p ]
 ;
 
-value print_ancestors_descends_cousins conf base p a =
+value print_ancestors_descends_cousins conf base p a u =
   let (open_area, close_area) =
     let opened = ref False in
     (fun () ->
@@ -1032,7 +1036,7 @@ value print_ancestors_descends_cousins conf base p a =
   let has_grand_parents = has_grand_parents base p in
   do if has_grand_parents then print p "A" (transl conf "ancestors")
      else ();
-     if has_grand_children base p then print p "D" (transl conf "descendants")
+     if has_grand_children base u then print p "D" (transl conf "descendants")
      else ();
      if has_grand_parents then
        print p "C" (transl conf "cousins (general term)")
@@ -1077,12 +1081,13 @@ value print conf base p =
         else print_linked_first_name_and_surname conf base p ]
   in
   let a = aoi base p.cle_index in
+  let u = uoi base p.cle_index in
   do header conf title;
      print_sub_titles conf base p;
      print_link_to_welcome conf True;
      print_photo_occupation_dates conf base p;
      print_parents conf base a;
-     print_families conf base p a;
+     print_families conf base p a u;
      if age_autorise conf base p then
        do print_notes conf base p;
           print_relations conf base p;
@@ -1098,7 +1103,7 @@ value print conf base p =
                   (transl conf "relationship computing");
                 Wserver.wprint "\n";
               end;
-              print_ancestors_descends_cousins conf base p a;
+              print_ancestors_descends_cousins conf base p a u;
               if conf.wizard then
                 do stag "td" "align=center" begin
                      print_compute_link conf base p "U" (transl conf "update");

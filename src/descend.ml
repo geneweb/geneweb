@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.0 1999-10-29 10:31:08 ddr Exp $ *)
+(* $Id: descend.ml,v 3.1 1999-11-10 08:44:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -19,29 +19,29 @@ value infini = 10000;
 value make_level_table base niveau_max p =
   let mark = Array.create (base.data.persons.len) False in
   let levt = Array.create (base.data.persons.len) infini in
-  let rec fill p lev =
-    if niveau_max == infini && mark.(Adef.int_of_iper p.cle_index) then ()
+  let rec fill ip u lev =
+    if niveau_max == infini && mark.(Adef.int_of_iper ip) then ()
     else
-      do mark.(Adef.int_of_iper p.cle_index) := True; return
+      do mark.(Adef.int_of_iper ip) := True; return
       if lev <= niveau_max then
-        do if lev < levt.(Adef.int_of_iper p.cle_index) then
-             levt.(Adef.int_of_iper p.cle_index) := lev
+        do if lev < levt.(Adef.int_of_iper ip) then
+             levt.(Adef.int_of_iper ip) := lev
            else ();
         return
         Array.iter
           (fun ifam ->
-             let pl = (foi base ifam).children in
-             Array.iter (fun p -> fill (poi base p) (succ lev)) pl)
-          p.family
+             let ipl = (doi base ifam).children in
+             Array.iter (fun ip -> fill ip (uoi base ip) (succ lev)) ipl)
+          u.family
       else ()
   in
-  do fill p 0; return levt
+  do fill p.cle_index (uoi base p.cle_index) 0; return levt
 ;
 
 value level_max base p =
 (*
-  let _ = base.data.persons.array () in
-  let _ = base.data.families.array () in
+  let _ = base.data.unions.array () in
+  let _ = base.data.descends.array () in
 *)
   let levt = make_level_table base infini p in
   let x = ref 0 in
@@ -193,6 +193,7 @@ value afficher_marie conf base first fam p spouse =
 
 value print_child conf base levt boucle niveau_max niveau compte auth ix =
   let x = poi base ix in
+  let ux = uoi base ix in
   do html_li conf;
      stag "strong" begin
        if s_appelle_comme_son_pere base ix then
@@ -212,14 +213,14 @@ value print_child conf base levt boucle niveau_max niveau compte auth ix =
   return
   if levt.(Adef.int_of_iper x.cle_index) == niveau then
     do levt.(Adef.int_of_iper x.cle_index) := infini;
-       if Array.length x.family <> 0 then html_br conf
+       if Array.length ux.family <> 0 then html_br conf
        else Wserver.wprint "\n";
        if niveau == niveau_max then
          let _ =
            List.fold_left
              (fun first ifam ->
                 let fam = foi base ifam in
-                let c = spouse x (coi base ifam) in
+                let c = spouse x.cle_index (coi base ifam) in
                 let c = poi base c in
                 do if connais base c then
                      do afficher_marie conf base first fam x c;
@@ -228,11 +229,11 @@ value print_child conf base levt boucle niveau_max niveau compte auth ix =
                      return ()
                    else ();
                 return False)
-             True (Array.to_list x.family)
+             True (Array.to_list ux.family)
          in
          ()
        else ();
-    return boucle (succ niveau) x
+    return boucle (succ niveau) ux
   else Wserver.wprint "\n"
 ;
 
@@ -240,36 +241,37 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
   let niveau_max = min (limit_desc conf) niveau_max in
   let levt = make_level_table base niveau_max p in
   let compte = ref 0 in
-  let rec boucle niveau p =
+  let rec boucle niveau u =
     if niveau <= niveau_max then
-      let ifaml = Array.to_list p.family in
+      let ifaml = Array.to_list u.family in
       let _ =
         List.fold_left
           (fun first ifam ->
              let fam = foi base ifam in
              let cpl = coi base ifam in
-             let conj = spouse p cpl in
+             let des = doi base ifam in
+             let conj = spouse p.cle_index cpl in
              let conj = poi base conj in
              do if connais base conj || List.length ifaml > 1 then
                   do afficher_marie conf base first fam p conj;
-                     if Array.length fam.children <> 0 then
+                     if Array.length des.children <> 0 then
                        Wserver.wprint ", <em>%s</em>"
                          (transl conf "having as children")
                      else Wserver.wprint ".";
                      html_br conf;
                   return ()
                 else ();
-                if Array.length fam.children <> 0 then
+                if Array.length des.children <> 0 then
                   let age_auth =
                     List.for_all
                       (fun ip -> age_autorise conf base (poi base ip))
-                      (Array.to_list fam.children)
+                      (Array.to_list des.children)
                   in
                   tag "ul" begin
                     Array.iter
                       (print_child conf base levt boucle niveau_max niveau
                          compte age_auth)
-                      fam.children;
+                      des.children;
                   end
                 else ();
              return False)
@@ -291,7 +293,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
      else ();
      Wserver.wprint ".";
      html_br conf;
-     boucle 1 p;
+     boucle 1 (uoi base p.cle_index);
      html_p conf;
      Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) compte.val
        (transl_nth conf "person/persons" 1);
@@ -309,26 +311,27 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
 value afficher_descendants_niveau conf base niveau_max ancetre =
   let niveau_max = min (limit_desc conf) niveau_max in
   let levt = make_level_table base niveau_max ancetre in
-  let rec get_level niveau p list =
+  let rec get_level niveau u list =
     List.fold_left
       (fun list ifam ->
-         let fam = foi base ifam in
-         let enfants = fam.children in
+         let des = doi base ifam in
+         let enfants = des.children in
          List.fold_left
-           (fun list x ->
-              let x = poi base x in
+           (fun list ix ->
+              let x = poi base ix in
               if niveau == niveau_max then
                 if p_first_name base x = "x" ||
                    levt.(Adef.int_of_iper x.cle_index) != niveau then
                   list
                 else [x :: list]
-              else if niveau < niveau_max then get_level (succ niveau) x list
+              else if niveau < niveau_max then
+                get_level (succ niveau) (uoi base ix) list
               else list)
            list (Array.to_list enfants))
-      list (Array.to_list p.family)
+      list (Array.to_list u.family)
   in
   let len = ref 0 in
-  let liste = get_level 1 ancetre [] in
+  let liste = get_level 1 (uoi base ancetre.cle_index) [] in
   let liste =
     Sort.list
       (fun p1 p2 ->
@@ -373,27 +376,28 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
 
 (* Avec numerotation *)
 
-value mark_descendants base marks max_lev =
-  loop 0 where rec loop lev p =
+value mark_descendants base marks max_lev p =
+  loop 0 p.cle_index (uoi base p.cle_index) where rec loop lev ip u =
     if lev <= max_lev then
-      do marks.(Adef.int_of_iper p.cle_index) := True; return
+      do marks.(Adef.int_of_iper ip) := True; return
       Array.iter
         (fun ifam ->
-           let el = (foi base ifam).children in
-           Array.iter (fun e -> loop (succ lev) (poi base e)) el)
-        p.family
+           let el = (doi base ifam).children in
+           Array.iter (fun e -> loop (succ lev) e (uoi base e)) el)
+        u.family
     else ()
 ;
 
 value label_descendants base marks paths max_lev =
   loop [] 0 where rec loop path lev p =
     if lev < max_lev then
+      let u = uoi base p.cle_index in
       let _ =
         List.fold_left
           (fun cnt ifam ->
-             let fam = foi base ifam in
-             let c = spouse p (coi base ifam) in
-             let el = fam.children in
+             let des = doi base ifam in
+             let c = spouse p.cle_index (coi base ifam) in
+             let el = des.children in
              List.fold_left
                (fun cnt e ->
                   do if p.sex == Male ||
@@ -405,7 +409,7 @@ value label_descendants base marks paths max_lev =
                      else ();
                   return succ cnt)
                cnt (Array.to_list el))
-          0 (Array.to_list p.family)
+          0 (Array.to_list u.family)
       in
       ()
     else ()
@@ -417,38 +421,41 @@ value close_to_end base marks max_lev lev p =
   if lev + close_lev >= max_lev then True
   else
     let rec short dlev p =
+      let u = uoi base p.cle_index in
       List.for_all
         (fun ifam ->
-           let fam = foi base ifam in
-           let c = spouse p (coi base ifam) in
-           let el = fam.children in
+           let des = doi base ifam in
+           let c = spouse p.cle_index (coi base ifam) in
+           let el = des.children in
            if p.sex == Male || not marks.(Adef.int_of_iper c) then
              if dlev == close_lev then Array.length el = 0
              else
                List.for_all (fun e -> short (succ dlev) (poi base e))
                  (Array.to_list el)
            else True)
-        (Array.to_list p.family)
+        (Array.to_list u.family)
     in
     short 1 p
 ;
 
-value labelled base marks max_lev lev p =
-  let a = aoi base p.cle_index in
-  Array.length p.family <> 0 &&
+value labelled base marks max_lev lev ip =
+  let a = aoi base ip in
+  let u = uoi base ip in
+  Array.length u.family <> 0 &&
   (match a.parents with
    [ Some ifam ->
        let cpl = coi base ifam in
        List.exists
          (fun ifam ->
-            let el = (foi base ifam).children in
+            let el = (doi base ifam).children in
             List.exists
-              (fun e ->
-                 let e = poi base e in
-                 Array.length e.family <> 0 &&
+              (fun ie ->
+                 let e = poi base ie in
+                 let u = uoi base ie in
+                 Array.length u.family <> 0 &&
                  not (close_to_end base marks max_lev lev e))
               (Array.to_list el))
-         (Array.to_list (poi base cpl.father).family)
+         (Array.to_list (uoi base cpl.father).family)
    | _ -> False ])
 ;
 
@@ -505,8 +512,9 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
         List.fold_left
           (fun (cnt, first, need_br) ifam ->
              let fam = foi base ifam in
-             let c = spouse p (coi base ifam) in
-             let el = fam.children in
+             let des = doi base ifam in
+             let c = spouse p.cle_index (coi base ifam) in
+             let el = des.children in
              let c = poi base c in
              do if need_br then html_br conf else ();
                 if not first then print_repeat_child conf base p1 c1 e
@@ -524,8 +532,8 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
              return
              let cnt =
                List.fold_left
-                 (fun cnt e ->
-                    let e = poi base e in
+                 (fun cnt ie ->
+                    let e = poi base ie in
                     do if print_children then
                          do Wserver.wprint "<li type=A> ";
                             print_child conf base p c e;
@@ -535,9 +543,9 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                               let _ =
                                 List.fold_left
                                   (fun first ifam ->
-                                     let fam = foi base ifam in
-                                     let c1 = spouse e (coi base ifam) in
-                                     let el = fam.children in
+                                     let des = doi base ifam in
+                                     let c1 = spouse ie (coi base ifam) in
+                                     let el = des.children in
                                      let c1 = poi base c1 in
                                      do if not first then
                                           do html_br conf;
@@ -552,7 +560,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                         else ();
                                         Wserver.wprint "\n";
                                      return False)
-                                  True (Array.to_list e.family)
+                                  True (Array.to_list (uoi base ie).family)
                               in
                               ()
                             else loop (succ lev) e;
@@ -563,7 +571,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
              in
              do if print_children then Wserver.wprint "</ol>\n" else (); return
              (cnt, False, not print_children))
-          (0, True, False) (Array.to_list p.family)
+          (0, True, False) (Array.to_list (uoi base p.cle_index).family)
       in
       ()
     else ()
@@ -586,8 +594,9 @@ value print_family conf base marks paths max_lev lev p =
     List.fold_left
       (fun cnt ifam ->
          let fam = foi base ifam in
-         let c = spouse p (coi base ifam) in
-         let el = fam.children in
+         let des = doi base ifam in
+         let c = spouse p.cle_index (coi base ifam) in
+         let el = des.children in
          let c = poi base c in
          do stag "strong" begin
               afficher_personne_referencee conf base p;
@@ -597,23 +606,24 @@ value print_family conf base marks paths max_lev lev p =
          return
          let cnt =
            List.fold_left
-             (fun cnt e ->
-                let e = poi base e in
+             (fun cnt ie ->
+                let e = poi base ie in
                 do if p.sex == Male ||
                       not marks.(Adef.int_of_iper c.cle_index) then
                      do Wserver.wprint "<li type=A>";
                         print_child conf base p c e;
                         incr total;
                         Wserver.wprint "\n";
-                        if labelled base marks max_lev lev e then
+                        if labelled base marks max_lev lev ie then
                           Wserver.wprint " => <tt><b>%s</b></tt>\n"
                             (label_of_path paths e)
                         else if succ lev == max_lev then
                           Array.iter
                             (fun ifam ->
                                let fam = foi base ifam in
-                               let c = spouse e (coi base ifam) in
-                               let el = fam.children in
+                               let des = doi base ifam in
+                               let c = spouse ie (coi base ifam) in
+                               let el = des.children in
                                let c = poi base c in
                                do afficher_spouse conf base marks paths fam e
                                     c;
@@ -622,7 +632,7 @@ value print_family conf base marks paths max_lev lev p =
                                   else ();
                                   Wserver.wprint "\n";
                                return ())
-                            e.family
+                            (uoi base ie).family
                         else
                           print_family_locally conf base marks paths max_lev
                             (succ lev) p c e;
@@ -632,7 +642,7 @@ value print_family conf base marks paths max_lev lev p =
              cnt (Array.to_list el)
          in
          do Wserver.wprint "</ol>\n"; return cnt)
-      0 (Array.to_list p.family)
+      0 (Array.to_list (uoi base p.cle_index).family)
   in
   ()
 ;
@@ -643,20 +653,20 @@ value print_families conf base marks paths max_lev =
       do print_family conf base marks paths max_lev lev p; return
       Array.iter
         (fun ifam ->
-           let fam = foi base ifam in
-           let c = spouse p (coi base ifam) in
-           let el = fam.children in
+           let des = doi base ifam in
+           let c = spouse p.cle_index (coi base ifam) in
+           let el = des.children in
            let c = poi base c in
            if p.sex == Male ||
               not marks.(Adef.int_of_iper c.cle_index) then
              Array.iter
-               (fun e ->
-                  let e = poi base e in
-                  if labelled base marks max_lev lev e then loop (succ lev) e
+               (fun ie ->
+                  let e = poi base ie in
+                  if labelled base marks max_lev lev ie then loop (succ lev) e
                   else ())
                el
            else ())
-        p.family
+        (uoi base p.cle_index).family
     else ()
 ;
 
@@ -708,7 +718,7 @@ value print_ref conf base paths p =
   else
     Array.iter
       (fun ifam ->
-         let c = spouse p (coi base ifam) in
+         let c = spouse p.cle_index (coi base ifam) in
          if paths.(Adef.int_of_iper c) <> [] then
            let c = poi base c in
            Wserver.wprint " => %s %s <tt><b>%s</b></tt>"
@@ -716,7 +726,7 @@ value print_ref conf base paths p =
              (p_surname base c)
              (label_of_path paths c)
          else ())
-      p.family
+      (uoi base p.cle_index).family
 ;
 
 value print_elem conf base paths precision (n, pll) =
@@ -863,11 +873,12 @@ value afficher_index_spouses conf base niveau_max ancetre =
   do for i = 0 to base.data.persons.len - 1 do
        if paths.(i) <> [] then
          let p = base.data.persons.get i in
+         let u = base.data.unions.get i in
          if p_first_name base p <> "?" && p_surname base p <> "?" &&
             p_first_name base p <> "x" then
            Array.iter
              (fun ifam ->
-                let c = spouse p (coi base ifam) in
+                let c = spouse p.cle_index (coi base ifam) in
                 if paths.(Adef.int_of_iper c) = [] then
                   let c = poi base c in
                   if p_first_name base c <> "?" &&
@@ -877,7 +888,7 @@ value afficher_index_spouses conf base niveau_max ancetre =
                     liste.val := [c.cle_index :: liste.val]
                   else ()
                 else ())
-             p.family
+             u.family
          else ()
        else ();
      done;
@@ -895,8 +906,8 @@ value print_someone conf base p =
 
 value children_of base ip =
   List.fold_right
-    (fun ifam children -> Array.to_list (foi base ifam).children @ children)
-    (Array.to_list (poi base ip).family) []
+    (fun ifam children -> Array.to_list (doi base ifam).children @ children)
+    (Array.to_list (uoi base ip).family) []
 ;
 
 value rec print_table_person conf base max_lev ip =
@@ -961,23 +972,24 @@ value print_tree conf base gv p =
       (person_text_no_html conf base p)
   in
   let gv = min limit_by_tree gv in
-  let rec nb_column n v p =
+  let rec nb_column n v u =
     if v == 0 then n + 1
     else
-      if Array.length p.family = 0 then n + 1
+      if Array.length u.family = 0 then n + 1
       else
-        List.fold_left (fun n ifam -> fam_nb_column n v (foi base ifam))
-          n (Array.to_list p.family)
-  and fam_nb_column n v fam =
-    if Array.length fam.children = 0 then n + 1
-    else List.fold_left (fun n iper -> nb_column n (v - 1) (poi base iper)) n
-      (Array.to_list fam.children)
+        List.fold_left (fun n ifam -> fam_nb_column n v (doi base ifam))
+          n (Array.to_list u.family)
+  and fam_nb_column n v des =
+    if Array.length des.children = 0 then n + 1
+    else
+      List.fold_left (fun n iper -> nb_column n (v - 1) (uoi base iper)) n
+        (Array.to_list des.children)
   in
   let print_vertical_bar v first po =
     do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
        match po with
-       [ Some (p, _) ->
-           let ncol = nb_column 0 (v - 1) p in
+       [ Some (_, u, _) ->
+           let ncol = nb_column 0 (v - 1) u in
            stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
              Wserver.wprint "|";
            end
@@ -991,22 +1003,22 @@ value print_tree conf base gv p =
   let print_spouses_vertical_bar v first po =
     do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
        match po with
-       [ Some (p, _) when Array.length p.family > 0 ->
+       [ Some (p, u, _) when Array.length u.family > 0 ->
            list_iter_first
              (fun first ifam ->
                 do if not first then Wserver.wprint "<td>&nbsp;</td>\n"
                    else ();
-                   let fam = foi base ifam in
-                   if Array.length fam.children = 0 then
+                   let des = doi base ifam in
+                   if Array.length des.children = 0 then
                      Wserver.wprint "<td>&nbsp;</td>"
                    else
-                     let ncol = fam_nb_column 0 (v - 1) fam in
+                     let ncol = fam_nb_column 0 (v - 1) des in
                      stag "td" "colspan=%d align=center" (2 * ncol - 1) begin
                        Wserver.wprint "|";
                      end;
                    Wserver.wprint "\n";
                 return ())
-             (Array.to_list p.family)
+             (Array.to_list u.family)
        | _ -> Wserver.wprint "<td>&nbsp;</td>\n" ];
     return ()
   in
@@ -1016,31 +1028,31 @@ value print_tree conf base gv p =
   let print_horizontal_bar v first po =
     do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
        match po with
-       [ Some (p, _) when Array.length p.family > 0 ->
+       [ Some (p, u, _) when Array.length u.family > 0 ->
            list_iter_first
              (fun first ifam ->
                 do if not first then Wserver.wprint "<td>&nbsp;</td>\n"
                    else ();
-                   let fam = foi base ifam in
-                   if Array.length fam.children = 0 then
+                   let des = doi base ifam in
+                   if Array.length des.children = 0 then
                      Wserver.wprint "<td>&nbsp;</td>\n"
-                   else if Array.length fam.children = 1 then
-                     let p = poi base fam.children.(0) in
-                     let ncol = nb_column 0 (v - 1) p in
+                   else if Array.length des.children = 1 then
+                     let u = uoi base des.children.(0) in
+                     let ncol = nb_column 0 (v - 1) u in
                      Wserver.wprint "<td colspan=%d align=center>|</td>\n"
                        (2 * ncol - 1)
                    else
                      Array.iteri
                        (fun i iper ->
-                          let p = poi base iper in
+                          let u = uoi base iper in
                           do if i > 0 then
                                Wserver.wprint
                                  "<td><hr noshade size=1></td>\n"
                              else ();
-                             let ncol = nb_column 0 (v - 1) p in
+                             let ncol = nb_column 0 (v - 1) u in
                              let align =
                                if i == 0 then " align=right"
-                               else if i == Array.length fam.children - 1
+                               else if i == Array.length des.children - 1
                                then " align=left"
                                else ""
                              in
@@ -1048,16 +1060,16 @@ value print_tree conf base gv p =
                              begin
                                Wserver.wprint "<hr noshade size=1%s%s>"
                                  (if i = 0
-                                  || i == Array.length fam.children - 1 then
+                                  || i == Array.length des.children - 1 then
                                     " width=50%"
                                   else "")
                                  align;
                              end;
                              Wserver.wprint "\n";
                           return ())
-                       fam.children;
+                       des.children;
                 return ())
-             (Array.to_list p.family)
+             (Array.to_list u.family)
        | _ -> Wserver.wprint "<td>&nbsp;</td>\n" ];
     return ()
   in
@@ -1067,8 +1079,8 @@ value print_tree conf base gv p =
   let print_person v first po =
     do if not first then Wserver.wprint "<td>&nbsp;&nbsp;</td>\n" else ();
        match po with
-       [ Some (p, auth) ->
-           let ncol = nb_column 0 (v - 1) p in
+       [ Some (p, u, auth) ->
+           let ncol = nb_column 0 (v - 1) u in
            let txt =
              if v = 1 then person_text_without_surname conf base p
              else person_title_text conf base p
@@ -1091,17 +1103,18 @@ value print_tree conf base gv p =
   let print_spouses v first po =
     do if not first then Wserver.wprint "<td>&nbsp;</td>\n" else ();
        match po with
-       [ Some (p, auth) when Array.length p.family > 0 ->
+       [ Some (p, u, auth) when Array.length u.family > 0 ->
            Array.iteri
              (fun i ifam ->
                 do if i > 0 then Wserver.wprint "<td valign=top>...</td>\n"
                    else ();
                    let fam = foi base ifam in
-                   let ncol = fam_nb_column 0 (v - 1) fam in
+                   let des = doi base ifam in
+                   let ncol = fam_nb_column 0 (v - 1) des in
                    stag "td"
                      "colspan=%d align=center valign=top" (2 * ncol - 1)
                    begin
-                     let sp = poi base (spouse p (coi base ifam)) in
+                     let sp = poi base (spouse p.cle_index (coi base ifam)) in
                      let txt = person_title_text conf base sp in
                      let txt = no_spaces gv txt in
                      let txt = reference conf base sp txt in
@@ -1117,7 +1130,7 @@ value print_tree conf base gv p =
                    end;
                    Wserver.wprint "\n";
                 return ())
-             p.family
+             u.family
        | _ -> Wserver.wprint "<td>&nbsp;</td>\n" ];
     return ()
   in
@@ -1125,24 +1138,25 @@ value print_tree conf base gv p =
     List.fold_right
       (fun po gen ->
          match po with
-         [ Some (p, _) ->
-             if Array.length p.family = 0 then [None :: gen]
+         [ Some (p, u, _) ->
+             if Array.length u.family = 0 then [None :: gen]
              else
                List.fold_right
                  (fun ifam gen ->
-                    let fam = foi base ifam in
-                    if Array.length fam.children = 0 then [None :: gen]
+                    let des = doi base ifam in
+                    if Array.length des.children = 0 then [None :: gen]
                     else
                       let age_auth =
                         List.for_all
                           (fun ip -> age_autorise conf base (poi base ip))
-                          (Array.to_list fam.children)
+                          (Array.to_list des.children)
                       in
                       List.fold_right
                         (fun iper gen ->
-                           [Some (poi base iper, age_auth) :: gen])
-                        (Array.to_list fam.children) gen)
-                 (Array.to_list p.family) gen
+                           let g = (poi base iper, uoi base iper, age_auth) in
+                           [Some g :: gen])
+                        (Array.to_list des.children) gen)
+                 (Array.to_list u.family) gen
          | None -> [None :: gen] ])
       gen []
   in
@@ -1150,7 +1164,8 @@ value print_tree conf base gv p =
      tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
        conf.border
      begin
-       loop [] [Some (p, True)] (gv + 1) where rec loop prev_gen gen v =
+       loop [] [Some (p, uoi base p.cle_index, True)] (gv + 1)
+       where rec loop prev_gen gen v =
          do if prev_gen <> [] then
               do spouses_vertical_bar (v + 1) prev_gen;
                  horizontal_bars v prev_gen;

@@ -1,4 +1,4 @@
-(* $Id: updateFam.mli,v 3.0 1999-10-29 10:31:42 ddr Exp $ *)
+(* $Id: updateFam.mli,v 3.1 1999-11-10 08:44:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -6,14 +6,14 @@ open Config;
 
 value print_add1 :
   config -> base -> gen_family Update.key string ->
-    gen_couple Update.key -> bool -> unit;
+    gen_couple Update.key -> gen_descend Update.key -> bool -> unit;
 value print_mod1 :
   config -> base -> gen_family Update.key string ->
-    gen_couple Update.key -> string -> unit;
+    gen_couple Update.key -> gen_descend Update.key -> string -> unit;
 value person_key : base -> iper -> Update.key;
 value print_family :
   config -> base -> gen_family Update.key string ->
-    gen_couple Update.key -> bool -> unit;
+    gen_couple Update.key -> gen_descend Update.key -> bool -> unit;
 
 value print_add : config -> base -> unit;
 value print_mod : config -> base -> unit;

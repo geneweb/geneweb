@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: tree.ml,v 3.0 1999-10-29 10:31:38 ddr Exp $ *)
+(* $Id: tree.ml,v 3.1 1999-11-10 08:44:34 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -93,7 +93,7 @@ value print_tree conf base with_spouses one_branch t =
          [ [{node = (ip, _, _)} :: _] ->
              match (aoi base ip).parents with
              [ Some ifam ->
-                 let sp = poi base (spouse p (coi base ifam)) in
+                 let sp = poi base (spouse p.cle_index (coi base ifam)) in
                  do Wserver.wprint "\n&amp;%s\n"
                       (Date.short_marriage_date_text conf base (foi base ifam)
                          p sp);

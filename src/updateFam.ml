@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.0 1999-10-29 10:31:41 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.1 1999-11-10 08:44:37 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -19,10 +19,11 @@ value person_key base ip =
   (first_name, surname, occ, Update.Link)
 ;
 
-value string_family_of base fam cpl =
+value string_family_of base fam cpl des =
   let sfam = Gutil.map_family_ps (person_key base) (sou base) fam in
   let scpl = Gutil.map_couple_p (person_key base) cpl in
-  (sfam, scpl)
+  let sdes = Gutil.map_descend_p (person_key base) des in
+  (sfam, scpl, sdes)
 ;
 
 value print_child_person conf base var (first_name, surname, occ, create) =
@@ -242,9 +243,9 @@ value print_child conf base cnt n =
   return ()
 ;
 
-value print_children conf base fam cpl force_children_surnames =
+value print_children conf base des cpl force_children_surnames =
   let children =
-    match Array.to_list fam.children with
+    match Array.to_list des.children with
     [ [] -> [("", "", 0, Update.Create Neuter None)]
     | ipl ->
         let (_, father_surname, _, _) = cpl.father in
@@ -310,7 +311,7 @@ value print_source conf base field =
   return ()
 ;
 
-value print_family conf base fam cpl force_children_surnames =
+value print_family conf base fam cpl des force_children_surnames =
   do print_father conf base cpl;
      Wserver.wprint "\n";
      print_mother conf base cpl;
@@ -323,7 +324,7 @@ value print_family conf base fam cpl force_children_surnames =
      Wserver.wprint "\n";
      print_comment conf base fam;
      Wserver.wprint "\n";
-     print_children conf base fam cpl force_children_surnames;
+     print_children conf base des cpl force_children_surnames;
      Wserver.wprint "\n";
      print_source conf base fam.fsources;
   return ()
@@ -343,7 +344,7 @@ value merge_call conf =
   return ()
 ;
 
-value print_mod1 conf base fam cpl digest =
+value print_mod1 conf base fam cpl des digest =
   let title _ =
     match p_getenv conf.env "m" with
     [ Some "MRG_MOD_FAM_OK" ->
@@ -368,7 +369,7 @@ value print_mod1 conf base fam cpl digest =
        [ Some ip -> Wserver.wprint "<input type=hidden name=ip value=%s>\n" ip
        | None -> () ];
        Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
-       print_family conf base fam cpl False;
+       print_family conf base fam cpl des False;
        Wserver.wprint "\n";
        html_p conf;
        Wserver.wprint "<input type=submit value=Ok>\n";
@@ -438,7 +439,7 @@ value print_swi1 conf base p fam1 fam2 =
   return ()
 ;
 
-value print_add1 conf base fam cpl force_children_surnames =
+value print_add1 conf base fam cpl des force_children_surnames =
   let title _ =
     let s = transl_nth conf "family/families" 0 in
     Wserver.wprint "%s" (capitale (transl_decline conf "add" s))
@@ -451,7 +452,7 @@ value print_add1 conf base fam cpl force_children_surnames =
        [ Some ip -> Wserver.wprint "<input type=hidden name=i value=%s>\n" ip
        | None -> () ];
        Wserver.wprint "<input type=hidden name=m value=ADD_FAM_OK>\n";
-       print_family conf base fam cpl force_children_surnames;
+       print_family conf base fam cpl des force_children_surnames;
        Wserver.wprint "\n";
        html_p conf;
        Wserver.wprint "<input type=submit value=Ok>\n";
@@ -484,13 +485,15 @@ value print_add conf base =
   let fam =
     {marriage = Adef.codate_None; marriage_place = "";
      marriage_src = ""; witnesses = [| |]; not_married = False;
-     divorce = NotDivorced; children = [| |];
+     divorce = NotDivorced;
      comment = ""; origin_file = ""; fsources = "";
      fam_index = bogus_family_index}
   and cpl =
     {father = fath; mother = moth}
+  and des =
+    {children = [| |]}
   in
-  print_add1 conf base fam cpl False
+  print_add1 conf base fam cpl des False
 ;
 
 value print_add_parents conf base =
@@ -501,16 +504,17 @@ value print_add_parents conf base =
         {marriage = Adef.codate_None; marriage_place = "";
          marriage_src = ""; witnesses = [| |]; not_married = False;
          divorce = NotDivorced;
-         children =
-           [| (sou base p.first_name, sou base p.surname, p.occ,
-               Update.Link) |];
          comment = ""; origin_file = ""; fsources = "";
          fam_index = bogus_family_index}
       and cpl =
         {father = ("", sou base p.surname, 0, Update.Create Neuter None);
          mother = ("", "", 0, Update.Create Neuter None)}
+      and des =
+        {children =
+           [| (sou base p.first_name, sou base p.surname, p.occ,
+               Update.Link) |]}
       in
-      print_add1 conf base fam cpl True
+      print_add1 conf base fam cpl des True
   | _ -> incorrect_request conf ]
 ;
 
@@ -519,8 +523,9 @@ value print_mod conf base =
   [ Some i ->
       let fam = foi base (Adef.ifam_of_int i) in
       let cpl = coi base (Adef.ifam_of_int i) in
-      let (sfam, scpl) = string_family_of base fam cpl in
-      print_mod1 conf base sfam scpl (Update.digest_family fam)
+      let des = doi base (Adef.ifam_of_int i) in
+      let (sfam, scpl, sdes) = string_family_of base fam cpl des in
+      print_mod1 conf base sfam scpl sdes (Update.digest_family fam cpl des)
   | _ -> incorrect_request conf ]
 ;
 
@@ -543,9 +548,10 @@ value rec find_families ifam =
 value print_swi conf base =
   match (p_getint conf.env "i", p_getint conf.env "f") with
   [ (Some ip, Some ifam)  ->
-      let p = base.data.persons.get ip in
-      match find_families (Adef.ifam_of_int ifam) (Array.to_list p.family) with
+      let u = base.data.unions.get ip in
+      match find_families (Adef.ifam_of_int ifam) (Array.to_list u.family) with
       [ Some (ifam1, ifam2) ->
+          let p = base.data.persons.get ip in
           print_swi1 conf base p (foi base ifam1) (foi base ifam2)
       | _ -> incorrect_request conf ]
   | _ -> incorrect_request conf ]

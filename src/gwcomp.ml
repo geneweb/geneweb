@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 3.1 1999-11-09 22:03:18 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.2 1999-11-10 08:44:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000g";
+value magic_gwo = "GnWo000h";
 
 type key =
   { pk_first_name : string;
@@ -19,7 +19,8 @@ type somebody =
 
 type syntax_o =
   [ Family of gen_couple somebody and list (somebody * sex) and
-      gen_family (gen_person iper string) string
+      gen_family (gen_person iper string) string and
+      gen_descend (gen_person iper string)
   | Notes of key and string
   | Relations of key and list (gen_relation somebody string)
   | Bnotes of string ]
@@ -508,8 +509,7 @@ value create_person () =
    baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
    death = DontKnowIfDead; death_place = ""; death_src = "";
    burial = UnknownBurial; burial_place = ""; burial_src = "";
-   family = [| |]; notes = ""; psources = "";
-   cle_index = Adef.iper_of_int (-1)}
+   notes = ""; psources = ""; cle_index = Adef.iper_of_int (-1)}
 ;
 
 value bogus_def p n o = p = "?" || n = "?";
@@ -742,22 +742,24 @@ value read_family ic fname =
             {marriage = marriage; marriage_place = marr_place;
              marriage_src = marr_src; witnesses = [| |];
              not_married = not_marr;
-             divorce = divorce; children = Array.of_list cles_enfants;
+             divorce = divorce;
              comment = comm; origin_file = fname;
              fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}
           in
-          Some (Family co witn fo, read_line ic)
+          let deo = {children = Array.of_list cles_enfants} in
+          Some (Family co witn fo deo, read_line ic)
       | line ->
           let fo =
             {marriage = marriage; marriage_place = marr_place;
              marriage_src = marr_src; witnesses = [| |];
              not_married = not_marr;
-             divorce = divorce; children = [||]; comment = comm;
+             divorce = divorce; comment = comm;
              origin_file = fname; fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}
           in
-          Some (Family co witn fo, line) ]
+          let deo = {children = [||]} in
+          Some (Family co witn fo deo, line) ]
   | Some (str, ["notes"]) ->
       let notes = read_notes ic in
       Some (Bnotes notes, read_line ic)

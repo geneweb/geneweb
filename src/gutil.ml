@@ -1,12 +1,16 @@
-(* $Id: gutil.ml,v 3.0 1999-10-29 10:31:12 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.1 1999-11-10 08:44:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 
 value poi base i = base.data.persons.get (Adef.int_of_iper i);
 value aoi base i = base.data.ascends.get (Adef.int_of_iper i);
+value uoi base i = base.data.unions.get (Adef.int_of_iper i);
+
 value foi base i = base.data.families.get (Adef.int_of_ifam i);
 value coi base i = base.data.couples.get (Adef.int_of_ifam i);
+value doi base i = base.data.descends.get (Adef.int_of_ifam i);
+
 value sou base i = base.data.strings.get (Adef.int_of_istr i);
 
 value rindex s c =
@@ -259,6 +263,7 @@ value person_misc_names base p =
   in
   let surnames =
     if p.sex == Female then
+      let u = uoi base p.cle_index in
       List.fold_left
         (fun list ifam ->
            let cpl = coi base ifam in
@@ -273,7 +278,7 @@ value person_misc_names base p =
              [husband_surname ::
                 surnames_pieces husband_surname @ husband_surnames_aliases @
                 list])
-        surnames (Array.to_list p.family)
+        surnames (Array.to_list u.family)
     else surnames
   in
   let list = [] in
@@ -419,8 +424,8 @@ type base_error = error person;
 
 type warning 'person =
   [ BirthAfterDeath of 'person
-  | ChangedOrderOfChildren of family and array iper
-  | ChildrenNotInOrder of family and 'person and 'person
+  | ChangedOrderOfChildren of ifam and descend and array iper
+  | ChildrenNotInOrder of ifam and descend and 'person and 'person
   | DeadTooEarlyToBeFather of 'person and 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
@@ -510,15 +515,17 @@ value child_born_after_his_parent base error warning x iparent =
   | _ -> () ]
 ;
 
-value born_after_his_elder_sibling base error warning x np fam =
+value born_after_his_elder_sibling base error warning x np ifam des =
   match (np, Adef.od_of_codate x.birth, x.death) with
   [ (None, _, _) -> ()
   | (Some (elder, d1), Some d2, _) ->
-      if strictement_apres d1 d2 then warning (ChildrenNotInOrder fam elder x)
+      if strictement_apres d1 d2 then
+        warning (ChildrenNotInOrder ifam des elder x)
       else ()
   | (Some (elder, d1), _, Death _ d2) ->
       let d2 = Adef.date_of_cdate d2 in
-      if strictement_apres d1 d2 then warning (ChildrenNotInOrder fam elder x)
+      if strictement_apres d1 d2 then
+        warning (ChildrenNotInOrder ifam des elder x)
       else ()
   | _ -> () ]
 ;
@@ -638,9 +645,9 @@ value check_normal_marriage_date base error warning fam =
   return ()
 ;
 
-value sort_children base warning fam =
+value sort_children base warning ifam des =
   let before = ref None in
-  let a = fam.children in
+  let a = des.children in
   do for i = 1 to Array.length a - 1 do
        loop (i-1) where rec loop j =
          if j >= 0 then
@@ -662,12 +669,12 @@ value sort_children base warning fam =
      done;
      match before.val with
      [ None -> ()
-     | Some a -> warning (ChangedOrderOfChildren fam a) ];
+     | Some a -> warning (ChangedOrderOfChildren ifam des a) ];
   return ()
 ;
 
-value check_family base error warning fam =
-  let cpl = coi base fam.fam_index in
+value check_family base error warning fam cpl des =
+  let ifam = fam.fam_index in
   do match (poi base cpl.father).sex with
      [ Male -> ()
      | _ -> error (BadSexOfMarriedPerson (poi base cpl.father)) ];
@@ -675,12 +682,13 @@ value check_family base error warning fam =
      [ Female -> ()
      | _ -> error (BadSexOfMarriedPerson (poi base cpl.mother)) ];
      check_normal_marriage_date base error warning fam;
-     sort_children base warning fam;
+     sort_children base warning ifam des;
      let _ =
        List.fold_left
          (fun np child ->
             let child = poi base child in
-            do born_after_his_elder_sibling base error warning child np fam;
+            do born_after_his_elder_sibling base error warning child np ifam
+                 des;
                child_born_after_his_parent base error warning child cpl.father;
                child_born_after_his_parent base error warning child cpl.mother;
                child_born_before_mother_death base warning child cpl.mother;
@@ -689,7 +697,7 @@ value check_family base error warning fam =
             match Adef.od_of_codate child.birth with
             [ Some d -> Some (child, d)
             | _ -> np ])
-         None (Array.to_list fam.children)
+         None (Array.to_list des.children)
      in
      ();
   return ()
@@ -711,7 +719,10 @@ value check_base base error warning =
      for i = 0 to base.data.families.len - 1 do
        let fam = base.data.families.get i in
        if is_deleted_family fam then ()
-       else check_family base error warning fam;
+       else
+         let cpl = base.data.couples.get i in
+         let des = base.data.descends.get i in
+         check_family base error warning fam cpl des;
      done;
      check_noloop base error;
   return ()
@@ -841,7 +852,7 @@ value map_person_ps fp fs p =
    death_src = fs p.death_src;
    burial = p.burial; burial_place = fs p.burial_place;
    burial_src = fs p.burial_src;
-   family = p.family; notes = fs p.notes; psources = fs p.psources;
+   notes = fs p.notes; psources = fs p.psources;
    cle_index = p.cle_index}
 ;
 
@@ -849,7 +860,6 @@ value map_family_ps fp fs fam =
   {marriage = fam.marriage; marriage_place = fs fam.marriage_place;
    marriage_src = fs fam.marriage_src; witnesses = Array.map fp fam.witnesses;
    not_married = fam.not_married; divorce = fam.divorce;
-   children = Array.map fp fam.children;
    comment = fs fam.comment;
    origin_file = fs fam.origin_file;
    fsources = fs fam.fsources;
@@ -858,6 +868,10 @@ value map_family_ps fp fs fam =
 
 value map_couple_p fp fam =
   {father = fp fam.father; mother = fp fam.mother}
+;
+
+value map_descend_p fp des =
+  {children = Array.map fp des.children}
 ;
 
 (*

@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 3.0 1999-10-29 10:31:04 ddr Exp $ *)
+(* $Id: consangAll.ml,v 3.1 1999-11-10 08:44:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -7,16 +7,16 @@ open Gutil;
 value no_consang = Adef.fix (-1);
 
 value rec clear_descend_consang base mark ifam =
-  let fam = foi base ifam in
+  let des = doi base ifam in
   Array.iter
     (fun ip ->
        if not mark.(Adef.int_of_iper ip) then
          let a = aoi base ip in
          do a.consang := no_consang; mark.(Adef.int_of_iper ip) := True; return
-         let p = poi base ip in
-         Array.iter (clear_descend_consang base mark) p.family
+         let u = uoi base ip in
+         Array.iter (clear_descend_consang base mark) u.family
        else ())
-    fam.children
+    des.children
 ;
 
 value relationship base tab ip1 ip2 =
@@ -50,8 +50,8 @@ value compute base from_scratch quiet =
            let _ = base.data.families.array () in
            do List.iter
                 (fun ip ->
-                   let p = poi base ip in
-                   Array.iter (clear_descend_consang base mark) p.family)
+                   let u = uoi base ip in
+                   Array.iter (clear_descend_consang base mark) u.family)
                 list;
               base.data.families.clear_array ();
            return () ]

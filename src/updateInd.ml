@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.0 1999-10-29 10:31:43 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.1 1999-11-10 08:44:39 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -794,7 +794,6 @@ value print_add conf base =
      baptism = Adef.codate_None; baptism_place = ""; baptism_src = "";
      death = DontKnowIfDead; death_place = ""; death_src = "";
      burial = UnknownBurial; burial_place = ""; burial_src = "";
-     family = [| |];
      notes = ""; psources = "";
      cle_index = bogus_person_index}
   in

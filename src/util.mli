@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.2 1999-11-01 23:19:45 ddr Exp $ *)
+(* $Id: util.mli,v 3.3 1999-11-10 08:44:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -98,7 +98,7 @@ value cftransl : config -> string -> list string -> string;
 value std_color : string -> string;
 
 value index_of_sex : sex -> int;
-value spouse : person -> couple -> iper;
+value spouse : iper -> couple -> iper;
 
 value incorrect_request : config -> unit;
 

@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 3.0 1999-10-29 10:31:07 ddr Exp $ *)
+(* $Id: def.mli,v 3.1 1999-11-10 08:44:17 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = Adef.iper;
@@ -93,7 +93,6 @@ type gen_person 'person 'string =
     burial : mutable burial;
     burial_place : mutable 'string;
     burial_src : mutable 'string;
-    family : mutable array ifam;
     notes : mutable 'string;
     psources : mutable 'string;
     cle_index : mutable iper }
@@ -102,6 +101,10 @@ type gen_person 'person 'string =
 type gen_ascend =
   { parents : mutable option ifam;
     consang : mutable Adef.fix }
+;
+
+type gen_union =
+  { family : mutable array ifam }
 ;
 
 (* family *)
@@ -113,7 +116,6 @@ type gen_family 'person 'string =
     witnesses : mutable array 'person;
     not_married : mutable bool;
     divorce : mutable divorce;
-    children : mutable array 'person;
     comment : mutable 'string;
     origin_file : mutable 'string;
     fsources : mutable 'string;
@@ -125,10 +127,20 @@ type gen_couple 'person =
     mother : mutable 'person }
 ;
 
+type gen_descend 'person =
+  { children : mutable array 'person }
+;
+
+(* data base *)
+
 type person = gen_person iper istr;
 type ascend = gen_ascend;
+type union = gen_union;
+
 type family = gen_family iper istr;
 type couple = gen_couple iper;
+type descend = gen_descend iper;
+
 type relation = gen_relation iper istr;
 type title = gen_title istr;
 
@@ -153,8 +165,10 @@ type istr_iper_index =
 type base_data =
   { persons : cache person;
     ascends : cache ascend;
+    unions : cache union;
     families : cache family;
     couples : cache couple;
+    descends : cache descend;
     strings : cache string;
     bnotes : notes }
 ;
@@ -167,8 +181,10 @@ type base_func =
     persons_of_first_name : istr_iper_index;
     patch_person : iper -> person -> unit;
     patch_ascend : iper -> ascend -> unit;
+    patch_union : iper -> union -> unit;
     patch_family : ifam -> family -> unit;
     patch_couple : ifam -> couple -> unit;
+    patch_descend : ifam -> descend -> unit;
     patch_string : istr -> string -> unit;
     patch_name : string -> iper -> unit;
     commit_patches : unit -> unit;

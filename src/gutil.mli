@@ -1,12 +1,16 @@
-(* $Id: gutil.mli,v 3.0 1999-10-29 10:31:13 ddr Exp $ *)
+(* $Id: gutil.mli,v 3.1 1999-11-10 08:44:20 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 
 value poi : base -> iper -> person;
 value aoi : base -> iper -> ascend;
+value uoi : base -> iper -> union;
+
 value foi : base -> ifam -> family;
 value coi : base -> ifam -> couple;
+value doi : base -> ifam -> descend;
+
 value sou : base -> istr -> string;
 
 value decline : char -> string -> string;
@@ -45,6 +49,7 @@ value map_family_ps :
   ('a -> 'c) -> ('b -> 'd) -> gen_family 'a 'b -> gen_family 'c 'd
 ;
 value map_couple_p : ('a -> 'b) -> gen_couple 'a -> gen_couple 'b;
+value map_descend_p : ('a -> 'b) -> gen_descend 'a -> gen_descend 'b;
 
 (* check base *)
 
@@ -57,8 +62,8 @@ type base_error = error person;
 
 type warning 'person =
   [ BirthAfterDeath of 'person
-  | ChangedOrderOfChildren of family and array iper
-  | ChildrenNotInOrder of family and 'person and 'person
+  | ChangedOrderOfChildren of ifam and descend and array iper
+  | ChildrenNotInOrder of ifam and descend and 'person and 'person
   | DeadTooEarlyToBeFather of 'person and 'person
   | MarriageDateAfterDeath of 'person
   | MarriageDateBeforeBirth of 'person
@@ -76,7 +81,7 @@ value check_person :
 
 value check_family :
   base -> (base_error -> unit) -> (base_warning -> unit) -> family ->
-    unit
+    couple -> descend -> unit
 ;
 
 value check_noloop_for_person_list :

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.0 1999-10-29 10:31:04 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.1 1999-11-10 08:44:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -52,16 +52,16 @@ value rec except x =
   | [y :: l] -> if x = y then l else [y :: except x l] ]
 ;
 
-value children_of base p =
+value children_of base u =
   List.fold_right
     (fun ifam list ->
-       let fam = foi base ifam in
-       Array.to_list fam.children @ list)
-    (Array.to_list p.family) []
+       let des = doi base ifam in
+       Array.to_list des.children @ list)
+    (Array.to_list u.family) []
 ;
 
 value siblings_by base iparent ip =
-  let list = children_of base (poi base iparent) in
+  let list = children_of base (uoi base iparent) in
   except ip list
 ;
 
@@ -93,15 +93,15 @@ value siblings base p =
   | None -> [] ]
 ;
 
-value rec has_desc_lev base lev p =
+value rec has_desc_lev base lev u =
   if lev <= 1 then True
   else
     List.exists
       (fun ifam ->
-         let fam = foi base ifam in
-         List.exists (fun ip -> has_desc_lev base (lev - 1) (poi base ip))
-           (Array.to_list fam.children))
-      (Array.to_list p.family)
+         let des = doi base ifam in
+         List.exists (fun ip -> has_desc_lev base (lev - 1) (uoi base ip))
+           (Array.to_list des.children))
+      (Array.to_list u.family)
 ;
 
 value br_inter_is_empty b1 b2 =
@@ -152,9 +152,10 @@ value rec print_descend_upto conf base ini_p ini_br lev children =
        List.iter
          (fun (ip, ia_asex, rev_br) ->
             let p = poi base ip in
+            let u = uoi base ip in
             let br = List.rev [(ip, p.sex) :: rev_br] in
             let is_valid_rel = br_inter_is_empty ini_br br in
-            if is_valid_rel && cnt.val < max_cnt && has_desc_lev base lev p
+            if is_valid_rel && cnt.val < max_cnt && has_desc_lev base lev u
             then
               do if lev <= 2 then
                    do html_li conf;
@@ -177,7 +178,7 @@ value rec print_descend_upto conf base ini_p ini_br lev children =
                    List.map
                      (fun ip ->
                         (ip, ia_asex, [(p.cle_index, p.sex) :: rev_br]))
-                   (children_of base p)
+                   (children_of base u)
                  in
                  print_descend_upto conf base ini_p ini_br (lev - 1) children;
               return ()
@@ -189,7 +190,7 @@ value rec print_descend_upto conf base ini_p ini_br lev children =
 ;
 
 value sibling_has_desc_lev base lev (ip, _) =
-  has_desc_lev base lev (poi base ip)
+  has_desc_lev base lev (uoi base ip)
 ;
 
 value print_cousins_side_of conf base a ini_p ini_br lev1 lev2 =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.0 1999-10-29 10:31:34 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.1 1999-11-10 08:44:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -37,8 +37,12 @@ value tsort_leq tstab x y =
 value make_dist_tab conf base ia maxlev =
   if maxlev <= threshold.val then phony_dist_tab
   else
+(**)
     let _ = base.data.ascends.array () in
     let _ = base.data.couples.array () in
+    let _ = base.data.unions.array () in
+    let _ = base.data.descends.array () in
+(**)
     let tstab = Util.create_topological_sort conf base in
     let module Pq =
       Pqueue.Make
@@ -51,11 +55,11 @@ value make_dist_tab conf base ia maxlev =
     let dist = Array.create base.data.persons.len default in
     let q = ref Pq.empty in
     let add_children ip =
-      let p = poi base ip in
-      for i = 0 to Array.length p.family - 1 do
-        let fam = foi base p.family.(i) in
-        for j = 0 to Array.length fam.children - 1 do
-          let k = Adef.int_of_iper fam.children.(j) in
+      let u = uoi base ip in
+      for i = 0 to Array.length u.family - 1 do
+        let des = doi base u.family.(i) in
+        for j = 0 to Array.length des.children - 1 do
+          let k = Adef.int_of_iper des.children.(j) in
           let d = dist.(k) in
           if not d.mark then
             do dist.(k) := {dmin = infinity; dmax = 0; mark = True};
