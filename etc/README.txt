@@ -23,7 +23,7 @@ GeneWeb is copyright INRIA 2003.
 
 Remarks, suggestions, questions, bug reports to:
 	daniel.de_rauglaudre@inria.fr
-	http://cristal.inria.fr/~ddr/
+	http://pauillac.inria.fr/~ddr/
 
 Please specify the version number above and the system you use (Unix,
 Windows, Mac)

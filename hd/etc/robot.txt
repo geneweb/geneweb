@@ -13,6 +13,6 @@ been automatically disconnected.
 Contact the site administrator to restore it.
 
 <p><hr><font size=-1><em>(c) Copyright 2001 INRIA -
-<a href="http://cristal.inria.fr/~ddr/GeneWeb/">
+<a href="http://pauillac.inria.fr/~ddr/GeneWeb/">
 GeneWeb %v</a></em></font><br>
 </body>
