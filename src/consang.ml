@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 2.3 1999-03-26 08:14:10 ddr Exp $ *)
+(* $Id: consang.ml,v 2.4 1999-05-22 21:47:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -194,6 +194,19 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
     return (half relationship.val, tops.val)
 ;
 
+value rec clear_descend_consang base mark ifam =
+  let fam = foi base ifam in
+  Array.iter
+    (fun ip ->
+       if not mark.(Adef.int_of_iper ip) then
+         let a = aoi base ip in
+         do a.consang := no_consang; mark.(Adef.int_of_iper ip) := True; return
+         let p = poi base ip in
+         Array.iter (clear_descend_consang base mark) p.family
+       else ())
+    fam.children
+;
+
 value relationship base tab ip1 ip2 =
   fst (relationship_and_links base tab False ip1 ip2)
 ;
@@ -217,16 +230,22 @@ value compute_all_consang base from_scratch quiet =
   let tab = make_relationship_table base (topological_sort base) in
   let cnt = ref 0 in
   let most = ref None in
-  do for i = 0 to base.data.ascends.len - 1 do
+  do if not from_scratch then
+       let mark = Array.create base.data.persons.len False in
+       List.iter
+         (fun ifam -> clear_descend_consang base mark ifam)
+         (base.func.patched_families ())
+     else ();
+     for i = 0 to base.data.ascends.len - 1 do
        let a = base.data.ascends.get i in
        do if from_scratch then a.consang := no_consang else (); return
        if a.consang == no_consang then incr cnt else ();
      done;
   return
   let max_cnt = cnt.val in
-  do if quiet then
-       do Printf.eprintf "To do: %d persons\n" max_cnt;
-          for i = 1 to 60 do Printf.eprintf "."; done;
+  do Printf.eprintf "To do: %d persons\n" max_cnt;
+     if quiet then
+       do for i = 1 to 60 do Printf.eprintf "."; done;
           Printf.eprintf "\r";
        return ()
      else Printf.eprintf "Computing consanguinity...";

@@ -1,14 +1,17 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 2.4 1999-05-03 07:10:48 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 2.5 1999-05-22 21:47:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value fname = ref "";
 value scratch = ref False;
+value fast = ref False;
 value quiet = ref False;
 
 value usage = "usage: " ^ Sys.argv.(0) ^ " [-scratch] <file_name>";
 value speclist =
-  [("-q", Arg.Set quiet, ": quiet mode"); ("-scratch", Arg.Set scratch, ": from scratch")]
+  [("-q", Arg.Set quiet, ": quiet mode");
+   ("-scratch", Arg.Set scratch, ": from scratch");
+   ("-fast", Arg.Set fast, ": fast, just re-computing what's necessary")]
 ;
 
 value main () =
@@ -23,7 +26,8 @@ value main () =
   let f () =
     let base = Iobase.input fname.val in
     try
-      do if base.Def.data.Def.has_family_patches then scratch.val := True
+      do if not fast.val && base.Def.data.Def.has_family_patches then
+           scratch.val := True
          else ();
          Sys.catch_break True;
          try Consang.compute_all_consang base scratch.val quiet.val with

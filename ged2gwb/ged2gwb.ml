@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.17 1999-05-19 10:19:14 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.18 1999-05-22 21:47:41 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1468,7 +1468,8 @@ value make_base (persons, ascends, families, couples, strings) =
      persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
      patch_person = fun []; patch_ascend = fun []; patch_family = fun [];
      patch_couple = fun []; patch_string = fun []; patch_name = fun [];
-     commit_patches = fun []; cleanup = fun () -> ()}
+     commit_patches = fun []; patched_families = fun [];
+     cleanup = fun () -> ()}
   in
   {data = base_data; func = base_func}
 ;
