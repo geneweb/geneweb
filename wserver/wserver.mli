@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 4.4 2002-02-23 15:39:22 ddr Exp $ *)
+(* $Id: wserver.mli,v 4.5 2002-02-23 20:10:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -26,12 +26,6 @@ value wprint : format 'a Buffer.t unit -> 'a;
 value wflush : unit -> unit;
     (* To flush page contents print. *)
 
-value bufferize : ref bool;
-    (* Bufferize the output; write done only when wflush is called *)
-
-value buffer_contents : unit -> string;
-    (* Return the buffer contents and clear it *)
-
 value http : string -> unit;
     (* [Wserver.http answer] sends the http header where [answer]
        represents the answer status. If empty string, "200 OK" is assumed. *)
@@ -56,10 +50,29 @@ value extract_param : string -> char -> list string -> string;
 
 value get_request_and_content : Stream.t char -> (list string * string);
 
-value wserver_ic : ref in_channel;
 value sock_in : ref string;
 value sock_out : ref string;
 value noproc : ref bool;
+
+value bufferize : ref bool;
+    (* Bufferize the output; write done only when wflush is called *)
+value buffer_contents : unit -> string;
+    (* Return the buffer contents and clear it *)
+value keep_alive_condition : list string -> bool;
+    (* This function is a hack added because of a bug in windows clients
+       which seem to fail when there is a disconnection from the server (me)
+       even if the answer header contains the "connection: close".
+       Seem to happen for requests sent with the method POST. If
+       [keep_alive_condition request] answers True (i.e. the method is
+       POST and the client has a "keep-alive" in its header, the returned
+       header MUST contain the "content-length" field (else the client and
+       server would wait each other).
+       To be able to compute the body size, don't send the header, set
+       the above [bufferize], get the contents by [buffer_contents], reset
+       the [bufferize], send the header, with a content-length field, and
+       send the contents. *)
+value fucking_timeout : ref float;
+    (* Timeout of the final read due to the above bug. *)
 
 (* Example:
 

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.13 2002-02-23 15:39:20 ddr Exp $ *)
+(* $Id: family.ml,v 4.14 2002-02-23 20:10:06 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -630,25 +630,13 @@ value family conf base log =
         } ];
     if Wserver.bufferize.val then do {
       let out = Wserver.buffer_contents () in
+let _ = do { Printf.eprintf "buffer length %d\n" (String.length out); flush stderr; } in
       Wserver.bufferize.val := False;
       Util.html conf;
       Wserver.wprint "Content-length: %d" (String.length out); nl ();
       nl ();
       Wserver.wprint "%s" out;
       nl ();
-      Wserver.wflush ();
-      let fd = Unix.descr_of_in_channel Wserver.wserver_ic.val in
-      match Unix.select [fd] [] [] 10.0 with
-      [ ([_], [], []) ->
-          let b = String.create 50 in
-          loop () where rec loop () =
-            let len = input Wserver.wserver_ic.val b 0 (String.length b) in
-            do {
-              Printf.eprintf "connection: read %d chars after end\n" len;
-              if len = 0 then () else loop ()
-            }
-      | _ -> Printf.eprintf "connection: timeout 10s happened\n" ];
-      flush stderr;
     }
     else ();
     Wserver.wflush ();
