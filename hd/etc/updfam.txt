@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.29 2004-07-01 14:00:24 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.30 2004-07-18 08:53:54 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -131,19 +131,19 @@ function checkCreate(create, redirect)
   %apply;small_date("death","xvard","xx","verbose","xp")
 %end;
 
-%define;parent(xvar,xx)
+%define;parent(xcnt,xx)
   <table border=1>
     <tr>
       <td>[*first name/first names]0</td>
       <td>
-        <input name=xvar_fn size=23 maxlength=200 value="%xx.first_name;">
+        <input name=paxcnt_fn size=23 maxlength=200 value="%xx.first_name;">
       </td>
       <td align=right>[*number]</td>
       <td>
-        <input name=xvar_occ size=5 maxlength=8 value="%xx.occ;">
+        <input name=paxcnt_occ size=5 maxlength=8 value="%xx.occ;">
       </td>
       <td>
-        <select name=xvar_p>
+        <select name=paxcnt_p>
         <option value=create%if;(xx.create = "create") selected%end;
 	>[*create]0
         <option value=link%if;(xx.create = "link") selected%end;%sp;
@@ -154,16 +154,30 @@ function checkCreate(create, redirect)
     <tr>
       <td>[*surname/surnames]0</td>
       <td colspan=4>
-        <input name=xvar_sn size=40 maxlength=200 value="%xx.surname">
+        <input name=paxcnt_sn size=40 maxlength=200 value="%xx.surname">
       </td>
     </tr>
   </table>
   <table border=1>
     <tr>
-      %apply;birth("xvar","xx","true"," onFocus=checkCreate(xvar_p,xvar_fn)")
+      %apply;birth("paxcnt","xx","true",
+                   " onFocus=checkCreate(paxcnt_p,paxcnt_fn)")
     </tr>
     <tr>
-      %apply;death("xvar","xx","true"," onFocus=checkCreate(xvar_p,xvar_fn)")
+      %apply;death("paxcnt","xx","true",
+                   " onFocus=checkCreate(paxcnt_p,paxcnt_fn)")
+    </tr>
+  </table>
+%end;
+
+%define;insert_parent(xcnt)
+  <table border=1>
+    <tr>
+      <td>
+        [*insert::|<input name=ins_paxcnt_n size=1 maxlength=1 value=1> |
+        parents]0
+        <input type=checkbox name=ins_paxcnt value=on>
+      </td>
     </tr>
   </table>
 %end;
@@ -202,11 +216,11 @@ function checkCreate(create, redirect)
   <input type=hidden name=m value=MRG_MOD_FAM_OK>%nl;
 %end;
 
-<h4>[*him/her]0</h4>
-%apply;parent("him", "father")
-
-<h4>[*him/her]1</h4>
-%apply;parent("her", "mother")
+%foreach;parent;
+<h4>%parent.himher;</h4>
+%apply;parent(cnt, "parent")
+<!-- %apply;insert_parent(cnt) -->
+%end;
 
 <h4>[*marriage/marriages]0</h4>
 <input type=radio name=mrel value=marr%if;(mrel = "marr") checked%end;

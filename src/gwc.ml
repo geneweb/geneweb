@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.14 2004-07-17 09:16:54 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.15 2004-07-18 08:53:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -57,7 +57,7 @@ value no_family gen =
      marriage_src = empty; witnesses = [| |]; relation = Married;
      divorce = NotDivorced; comment = empty; origin_file = empty;
      fsources = empty; fam_index = Adef.ifam_of_int 0}
-  and cpl = parent (Adef.iper_of_int 0) (Adef.iper_of_int 0)
+  and cpl = couple (Adef.iper_of_int 0) (Adef.iper_of_int 0)
   and des = {children = [| |]} in
   (fam, cpl, des)
 ;
@@ -464,7 +464,7 @@ value insert_family gen co fath_sex moth_sex witl fo deo =
        divorce = fo.divorce; comment = comment;
        origin_file = unique_string gen fo.origin_file; fsources = fsources;
        fam_index = Adef.ifam_of_int gen.g_fcnt}
-    and cpl = parent pere.cle_index mere.cle_index
+    and cpl = couple pere.cle_index mere.cle_index
     and des = {children = children} in
     let fath_uni = uoi gen.g_base pere.cle_index in
     let moth_uni = uoi gen.g_base mere.cle_index in

@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 4.9 2004-07-17 09:16:53 ddr Exp $ *)
+(* $Id: def.mli,v 4.10 2004-07-18 08:53:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
@@ -141,14 +141,7 @@ type gen_family 'person 'string =
     fam_index : mutable ifam }
 ;
 
-ifndef GDAGNET then
-type gen_couple 'person =
-  { father : mutable 'person;
-    mother : mutable 'person }
-else
-type gen_couple 'person =
-  { parent : mutable array 'person }
-;
+type gen_couple 'person = Adef.gen_couple 'person;
 
 type gen_descend 'person =
   { children : mutable array 'person }

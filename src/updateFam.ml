@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.38 2004-07-16 16:17:57 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.39 2004-07-18 08:53:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -117,6 +117,23 @@ value rec eval_variable conf base env ((fam, cpl, des) as fcd) =
         [ (Some ind, [s]) -> VVind ind s
         | (Some ind, ["create"; s]) -> VVcreate (get_create ind) s
         | _ -> VVnone ]
+  | ["parent" :: sl] ->
+        let r =
+          match get_env "cnt" env with
+          [ Vint i ->
+              let arr = parent_array cpl in
+              let i = i - 1 in
+              if i >= 0 && i < Array.length arr  then
+                Some arr.(i)
+              else if i >= 0 && i < 1 && Array.length arr = 0 then
+                Some ("", "", 0, Update.Create Neuter None, "")
+              else None
+          | _ -> None ]
+        in
+        match (r, sl) with
+        [ (Some ind, [s]) -> VVind ind s
+        | (Some ind, ["create"; s]) -> VVcreate (get_create ind) s
+        | _ -> VVnone ]
   | [] -> VVgen ""
   | [s] ->
       let v = extract_var "cvar_" s in if v <> "" then VVcvar v else VVgen s
@@ -171,7 +188,7 @@ value try_eval_gen_variable conf base env ((fam, cpl, des) as fcd) =
       else raise Not_found ]
 ;
 
-value eval_key_variable (fn, sn, oc, create, var) =
+value eval_key_variable conf env (fn, sn, oc, create, var) =
   fun
   [ "first_name" -> quote_escaped fn
   | "occ" -> if oc = 0 then "" else string_of_int oc
@@ -183,6 +200,12 @@ value eval_key_variable (fn, sn, oc, create, var) =
       | Update.Create Female _ -> "female"
       | Update.Create Neuter _ -> "neuter"
       | _ -> "" ]
+  | "himher" ->
+      match get_env "cnt" env with
+      [ Vint 1 -> capitale (transl_nth conf "him/her" 0)
+      | Vint 2 -> capitale (transl_nth conf "him/her" 1)
+      | Vint n -> transl conf "him/her"
+      | _ -> "???" ]
   | s -> ">%" ^ s ^ "???" ]
 ;
 
@@ -318,7 +341,7 @@ value eval_bool_value conf base env fcd =
           | VVcreate c s -> do { Wserver.wprint ">%%%s???" s; "" }
           | VVdate od s -> Templ.eval_date_variable od s
           | VVcvar s -> eval_base_env_variable conf s
-          | VVind pk s -> eval_key_variable pk s
+          | VVind pk s -> eval_key_variable conf env pk s
           | VVnone -> do { Wserver.wprint ">%%%s???" s; "" } ]
         with
         [ Not_found -> do { Wserver.wprint ">%%%s???" s; "" } ]
@@ -340,7 +363,7 @@ value print_variable conf base env fcd sl =
   | VVcvar s ->
       try Wserver.wprint "%s" (List.assoc s conf.base_env) with
       [ Not_found -> () ]
-  | VVind pk s -> Wserver.wprint "%s" (eval_key_variable pk s)
+  | VVind pk s -> Wserver.wprint "%s" (eval_key_variable conf env pk s)
   | VVnone ->
       do {
         Wserver.wprint ">%%";
@@ -400,6 +423,7 @@ and print_simple_foreach conf base env ((fam, cpl, des) as fcd) al s =
   match s with
   [ "child" -> print_foreach_child conf base env fcd al des.children s
   | "witness" -> print_foreach_witness conf base env fcd al fam.witnesses s
+  | "parent" -> print_foreach_parent conf base env fcd al (parent_array cpl) s
   | _ -> Wserver.wprint "foreach %s???" s ]
 and print_foreach_child conf base env fcd al arr lab =
   for i = 0 to max 1 (Array.length arr) - 1 do {
@@ -408,6 +432,11 @@ and print_foreach_child conf base env fcd al arr lab =
   }
 and print_foreach_witness conf base env fcd al arr lab =
   for i = 0 to max 2 (Array.length arr) - 1 do {
+    let env = [("cnt", Vint (i + 1)) :: env] in
+    List.iter (print_ast conf base env fcd) al
+  }
+and print_foreach_parent conf base env fcd al arr lab =
+  for i = 0 to Array.length arr - 1 do {
     let env = [("cnt", Vint (i + 1)) :: env] in
     List.iter (print_ast conf base env fcd) al
   }
@@ -534,7 +563,7 @@ value print_add conf base =
      witnesses = [| |]; relation = Married; divorce = NotDivorced;
      comment = ""; origin_file = ""; fsources = default_source conf;
      fam_index = bogus_family_index}
-  and cpl = parent fath moth
+  and cpl = couple fath moth
   and des = {children = [| |]} in
   print_add1 conf base fam cpl des digest False
 ;
@@ -549,7 +578,7 @@ value print_add_parents conf base =
          comment = ""; origin_file = ""; fsources = default_source conf;
          fam_index = bogus_family_index}
       and cpl =
-        parent
+        couple
           ("", sou base p.surname, 0, Update.Create Neuter None, "")
           ("", "", 0, Update.Create Neuter None, "")
       and des =

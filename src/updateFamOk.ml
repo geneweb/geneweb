@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.30 2004-07-17 09:17:52 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.31 2004-07-18 08:53:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -95,10 +95,26 @@ value insert_child conf (children, ext) i =
   | _ -> (children, ext) ]
 ;
 
+value insert_parent conf (parents, ext) i =
+  let var = "ins_pa" ^ string_of_int i in
+  match (p_getenv conf.env var, p_getint conf.env (var ^ "_n")) with
+  [ (_, Some n) when n > 1 ->
+      let parents =
+        loop parents n where rec loop parents n =
+          if n > 0 then
+            let new_parent = ("", "", 0, Update.Create Neuter None, "") in
+            loop [new_parent :: parents] (n - 1)
+          else parents
+      in
+      (parents, True)
+  | (Some "on", _) ->
+      let new_parent = ("", "", 0, Update.Create Neuter None, "") in
+      ([new_parent :: parents], True)
+  | _ -> (parents, ext) ]
+;
+
 value reconstitute_family conf =
   let ext = False in
-  let father = reconstitute_parent_or_child conf "him" "" in
-  let mother = reconstitute_parent_or_child conf "her" "" in
   let relation =
     match p_getenv conf.env "mrel" with
     [ Some "not_marr" -> NotMarried
@@ -138,7 +154,7 @@ value reconstitute_family conf =
     | _ ->
         Divorced (Adef.codate_of_od (Update.reconstitute_date conf "div")) ]
   in
-  let surname = getn conf "him" "sn" in
+  let surname = getn conf "pa1" "sn" in
   let (children, ext) =
     loop 1 ext where rec loop i ext =
       match
@@ -156,6 +172,22 @@ value reconstitute_family conf =
       | None -> ([], ext) ]
   in
   let (children, ext) = insert_child conf (children, ext) 0 in
+  let (parents, ext) =
+    loop 1 ext where rec loop i ext =
+      match
+        try
+          Some
+            (reconstitute_parent_or_child conf ("pa" ^ string_of_int i)
+               surname)
+        with
+        [ Failure _ -> None ]
+      with
+      [ Some c ->
+          let (parents, ext) = loop (i + 1) ext in
+          let (parents, ext) = insert_parent conf (parents, ext) i in
+          ([c :: parents], ext)
+      | None -> ([], ext) ]
+  in
   let comment = strip_spaces (get conf "comment") in
   let fsources = strip_spaces (get conf "src") in
   let origin_file =
@@ -174,7 +206,7 @@ value reconstitute_family conf =
      witnesses = Array.of_list witnesses; relation = relation;
      divorce = divorce; comment = comment; origin_file = origin_file;
      fsources = fsources; fam_index = Adef.ifam_of_int fam_index}
-  and cpl = parent father mother
+  and cpl = parent (Array.of_list parents)
   and des = {children = Array.of_list children} in
   (fam, cpl, des, ext)
 ;

@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 4.12 2004-07-17 09:16:54 ddr Exp $ *)
+(* $Id: gutil.mli,v 4.13 2004-07-18 08:53:55 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -120,8 +120,9 @@ value sort_person_list : base -> list person -> list person;
 
 value father : gen_couple 'a -> 'a;
 value mother : gen_couple 'a -> 'a;
-value parent : 'a -> 'a -> gen_couple 'a;
+value couple : 'a -> 'a -> gen_couple 'a;
 value parent_array : gen_couple 'a -> array 'a;
+value parent : array 'a -> gen_couple 'a;
 
 value set_father : gen_couple 'a -> 'a -> unit;
 value set_mother : gen_couple 'a -> 'a -> unit;
