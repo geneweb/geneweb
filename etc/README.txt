@@ -19,11 +19,11 @@ the previous versions.
 
      -----------------
 
-GeneWeb is copyright INRIA 1998,1999,2000.
+GeneWeb is copyright INRIA 2001.
 
 Remarks, suggestions, questions, bug reports to:
 	daniel.de_rauglaudre@inria.fr
 	http://cristal.inria.fr/~ddr/
 
 Please specify the version number above and the system you use (Unix,
-Windows NT, Windows 95/98).
+Windows NT, Windows 95/98/2000).

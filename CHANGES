@@ -1,6 +1,9 @@
 GeneWeb version 3.11
 --------------------
 
+* Languages
+  - [31 Jan 01] Added Estonian (Hanno Kuus)
+
 * GeneWeb server or CGI (gwd)
   - [30 Jan 01] Added a way to be able to print trees which are too
     wide for printers. In tree displaying, a link is proposed in the upper

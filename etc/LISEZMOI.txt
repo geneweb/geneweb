@@ -21,11 +21,11 @@ changements par rapport aux versions precedentes.
 
      -----------------
 
-GeneWeb est copyright INRIA 1998,1999,2000.
+GeneWeb est copyright INRIA 2001.
 
 Remarques, suggestions, questions, rapports d'anomalie a:
 	daniel.de_rauglaudre@inria.fr
 	http://cristal.inria.fr/~ddr/
 
 Veuillez preciser le numero de version ci-dessus et le systeme sur lequel
-vous tournez (Unix, Windows NT ou Windows 95/98).
+vous tournez (Unix, Windows NT ou Windows 95/98/2000).
