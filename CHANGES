@@ -31,6 +31,12 @@ GeneWeb Version 2.01
     for the "death state" (see above), file "update.htm", section 5.4 "modify
     a person", paragraph "Death".
 
+* Internal
+  - [Mar 24, 99] (working Unix only) Added options "-setuid" and "-setgid"
+    to "gwd" to change the user or group id after socket bind. This allows
+    for example to use the port 80 (root needed) but accessing data as
+    normal user.
+
 GeneWeb Version 2.00
 --------------------
 

@@ -1,13 +1,13 @@
-(* $Id: wserver.mli,v 2.1 1999-03-08 11:19:45 ddr Exp $ *)
+(* $Id: wserver.mli,v 2.2 1999-03-24 16:31:13 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 (* module [Wserver]: elementary web service *)
 
 value f :
-  int -> int -> option int ->
+  int -> int -> option int -> (option int * option int) ->
     ((Unix.sockaddr * list string) -> string -> unit) -> unit
 ;
-   (* [Wserver.f port tmout maxc g] starts an elementary httpd
+   (* [Wserver.f port tmout maxc (uid, gid) g] starts an elementary httpd
        server at port [port] in the current machine. The port number is any
        number greater than 1024 (to create a client < 1024, you must be
        root). At each connection, the function [g] is called:
@@ -16,7 +16,11 @@ value f :
        the string request itself (extracted from [request]). The function
        [g] has [tmout] seconds to answer some text on standard output.
        If [maxc] is [Some n], maximum [n] clients can be treated at the
-       same time; [None] means no limit. See the example below. *)
+       same time; [None] means no limit. See the example below.
+       If [uid] is [Some n] the user id is changed into [n] after the
+       socket bind to the port number, allowing to use e.g. 80 as port
+       (must be root to do that) but running the program as simple user.
+       If [gid] is [Some n] the group id is changed as well. *)
 
 value wprint : format 'a out_channel unit -> 'a;
     (* To be called to print page contents. *)
@@ -52,7 +56,7 @@ value get_request_and_content : Stream.t char -> (list string * string);
 (* Example:
 
    - Source program "foo.ml":
-        Wserver.f 2368 60 0
+        Wserver.f 2368 60 None (None, None)
            (fun _ s -> Wserver.html (); Printf.printf "You said: %s...\n" s);;
    - Compilation:
         ocamlc -custom unix.cma -cclib -lunix wserver.cmo foo.ml
