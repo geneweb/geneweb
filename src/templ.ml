@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 3.6 2001-02-16 16:17:26 ddr Exp $ *)
+(* $Id: templ.ml,v 3.7 2001-02-17 03:51:15 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -14,7 +14,8 @@ type ast =
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
   | Adefine of string and string and list ast and list ast
-  | Aapply of string and ast_expr ]
+  | Aapply of string and ast_expr
+  | Aeval of ast_expr ]
 and ast_expr =
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
@@ -25,7 +26,7 @@ and ast_expr =
 ;
 
 type token =
-  [ LPAREN | RPAREN | DOT | BANGEQUAL | EQUAL
+  [ BANGEQUAL | CARET | DOT | EQUAL | LPAREN | RPAREN
   | IDENT of string | STRING of string ]
 ;
 
@@ -60,6 +61,7 @@ value rec get_token =
   | [: `'(' :] -> LPAREN
   | [: `')' :] -> RPAREN
   | [: `'.' :] -> DOT
+  | [: `'^' :] -> CARET
   | [: `'=' :] -> EQUAL
   | [: `'!'; `'=' :] -> BANGEQUAL
   | [: `'"'; s = get_string 0 :] -> STRING s
@@ -112,11 +114,18 @@ value parse_templ conf base strm =
              | [: :] -> e ] :] -> e ]
     and parse_3 =
       parser
+      [ [: e = parse_4;
+           e =
+             parser
+             [ [: `EQUAL; e2 = parse_4 :] -> Eop "=" e e2
+             | [: `BANGEQUAL; e2 = parse_4 :] -> Eop "!=" e e2
+             | [: :] -> e ] :] -> e ]
+    and parse_4 =
+      parser
       [ [: e = parse_simple;
            e =
              parser
-             [ [: `EQUAL; e2 = parse_simple :] -> Eop "=" e e2
-             | [: `BANGEQUAL; e2 = parse_simple :] -> Eop "!=" e e2
+             [ [: `CARET; strm :] -> Eop "^" e (parse_4 strm)
              | [: :] -> e ] :] -> e ]
     and parse_simple =
       parser
@@ -130,7 +139,12 @@ value parse_templ conf base strm =
       | [: `_ :] -> Evar "parse_error" [] ]
     and ident_list =
       parser
-      [ [: `DOT; `IDENT id; idl = ident_list :] -> [id :: idl]
+      [ [: `DOT;
+           id =
+             parser
+             [ [: `IDENT id :] -> id
+             | [: `_ :] -> "parse_error" ];
+           idl = ident_list :] -> [id :: idl]
       | [: :] -> [] ]
     in
     let f _ = try Some (get_token strm) with [ Stream.Failure -> None ] in
@@ -153,6 +167,7 @@ value parse_templ conf base strm =
               [ ("if", []) -> parse_if strm
               | ("foreach", []) -> parse_foreach strm
               | ("apply", []) -> parse_apply strm
+              | ("eval", []) -> Aeval (parse_expr ())
               | ("wid_hei", []) -> Awid_hei (get_ident 0 strm)
               | (v, vl) -> Avar v vl ]
             in
@@ -236,7 +251,7 @@ value strip_newlines_after_variables =
     | [Aforeach s sl al :: astl] -> [Aforeach s sl (loop al) :: loop astl]
     | [Adefine f x al alk :: astl] ->
         [Adefine f x (loop al) (loop alk) :: loop astl]
-    | [(Avar _ _ | Aapply _ _ as ast) :: astl] -> [ast :: loop astl]
+    | [(Avar _ _ | Aapply _ _ | Aeval _ as ast) :: astl] -> [ast :: loop astl]
     | [(Atransl _ _ _ | Awid_hei _ as ast1); ast2 :: astl] ->
         [ast1; ast2 :: loop astl]
     | [ast] -> [ast]
@@ -305,5 +320,5 @@ value print_variable conf base =
   | "highlight" -> Wserver.wprint "%s" conf.highlight
   | "nl" -> Wserver.wprint "\n"
   | "sp" -> Wserver.wprint " "
-  | s -> Wserver.wprint "%%%s;" s ]
+  | s -> Wserver.wprint ">%%%s???" s ]
 ;

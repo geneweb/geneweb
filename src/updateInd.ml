@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.34 2001-02-16 16:17:26 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.35 2001-02-17 03:51:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -784,7 +784,8 @@ type ast = Templ.ast ==
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
   | Adefine of string and string and list ast and list ast
-  | Aapply of string and ast_expr ]
+  | Aapply of string and ast_expr
+  | Aeval of ast_expr ]
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
@@ -795,10 +796,10 @@ and ast_expr = Templ.ast_expr ==
 ;
 
 type env =
-  [ Estring of string
-  | Efun of string and list ast
-  | Eval of ast_expr
-  | Enone ]
+  [ Vstring of string
+  | Vfun of string and list ast
+  | Vval of ast_expr
+  | Vnone ]
 ;
 
 type variable_value =
@@ -808,7 +809,7 @@ type variable_value =
   | VVnone ]
 ;
 
-value get_env v env = try List.assoc v env with [ Not_found -> Enone ];
+value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
 
 value extract_var sini s =
   let len = String.length sini in
@@ -842,7 +843,7 @@ value rec eval_variable conf base env p =
       if v <> "" then VVcvar v else VVgen s
   | [s :: sl] ->
       match get_env s env with
-      [ Eval (Evar s []) -> eval_variable conf base env p [s :: sl]
+      [ Vval (Evar s []) -> eval_variable conf base env p [s :: sl]
       | _ -> VVnone ] ]
 ;
 
@@ -854,7 +855,7 @@ value eval_base_env_variable conf v =
 
 value eval_string_env var env =
    match get_env var env with
-   [ Estring x -> x
+   [ Vstring x -> x
    | _ -> "" ]
 ;
 
@@ -884,7 +885,10 @@ value eval_gen_variable conf base env p =
         match p_getenv (conf.env @ conf.henv) v with
         [ Some vv -> quote_escaped vv
         | _ -> "" ]
-     else raise Not_found ]
+      else
+        match get_env s env with
+        [ Vval (Evar s []) -> s
+        | _ -> raise Not_found ] ]
 ;
 
 value eval_date_field =
@@ -1053,6 +1057,26 @@ value print_variable conf base env p sl =
       return () ]
 ;
 
+value print_eval conf base env p a =
+  let (s, sl) =
+    let rec eval =
+      fun
+      [ Eop "^" a1 a2 ->
+          let (s1, sl1) = eval a1 in
+          let (s2, sl2) = eval a2 in
+          if sl1 = [] then (s1 ^ s2, sl2) else ("???", [])
+      | Estr s -> (s, [])
+      | Evar s sl ->
+          match get_env s env with
+          [ Vval (Evar s []) -> (s, sl)
+          | _ -> ("???", []) ]
+      | _ -> ("???", []) ]
+    in
+    eval a
+  in
+  print_variable conf base env p [s :: sl]
+;
+
 value split_at_coloncolon s =
   loop 0 where rec loop i =
     if i >= String.length s - 1 then None
@@ -1079,39 +1103,40 @@ value print_transl conf base env upp s c =
   Wserver.wprint "%s" (if upp then capitale r else r)
 ;
 
-value rec eval_ast conf base env p =
+value rec print_ast conf base env p =
   fun
   [ Atext s -> Wserver.wprint "%s" s
   | Atransl upp s n -> print_transl conf base env upp s n
   | Avar s sl -> print_variable conf base env p [s :: sl]
   | Awid_hei s -> Wserver.wprint "Awid_hei"
-  | Aif e alt ale -> eval_if conf base env p e alt ale
-  | Aforeach s sl al -> eval_foreach conf base env p s sl al
-  | Adefine f x al alk -> eval_define conf base env p f x al alk
-  | Aapply f v -> eval_apply conf base env p f v ]
-and eval_define conf base env p f x al alk =
-  List.iter (eval_ast conf base [(f, Efun x al) :: env] p) alk
-and eval_apply conf base env p f v =
+  | Aif e alt ale -> print_if conf base env p e alt ale
+  | Aforeach s sl al -> print_foreach conf base env p s sl al
+  | Adefine f x al alk -> print_define conf base env p f x al alk
+  | Aapply f v -> print_apply conf base env p f v
+  | Aeval a -> print_eval conf base env p a ]
+and print_define conf base env p f x al alk =
+  List.iter (print_ast conf base [(f, Vfun x al) :: env] p) alk
+and print_apply conf base env p f v =
   match get_env f env with
-  [ Efun x al -> List.iter (eval_ast conf base [(x, Eval v) :: env] p) al
+  [ Vfun x al -> List.iter (print_ast conf base [(x, Vval v) :: env] p) al
   | _ -> Wserver.wprint ">%%%s???" f ]
-and eval_if conf base env p e alt ale =
+and print_if conf base env p e alt ale =
   let al = if eval_bool_value conf base env p e then alt else ale in
-  List.iter (eval_ast conf base env p) al
-and eval_foreach conf base env p s sl al =
+  List.iter (print_ast conf base env p) al
+and print_foreach conf base env p s sl al =
   let (sl, s) =
     let sl = List.rev [s :: sl] in
     (List.rev (List.tl sl), List.hd sl)
   in
   match eval_variable conf base env p sl with
-  [ VVgen "" -> eval_simple_foreach conf base env p al s
+  [ VVgen "" -> print_simple_foreach conf base env p al s
   | VVgen _ ->
       do Wserver.wprint "foreach ";
          List.iter (fun s -> Wserver.wprint "%s." s) sl;
          Wserver.wprint "%s???" s;
       return ()
   | VVcvar _ | VVdate _ _ | VVnone -> () ]
-and eval_simple_foreach conf base env p al s =
+and print_simple_foreach conf base env p al s =
   let list =
     match s with
     [ "alias" -> Some p.aliases
@@ -1121,21 +1146,21 @@ and eval_simple_foreach conf base env p al s =
     | _ -> None ]
   in
   match list with
-  [ Some list -> eval_foreach_string conf base env p al list
+  [ Some list -> print_foreach_string conf base env p al list
   | None -> Wserver.wprint "foreach %s???" s ]
-and eval_foreach_string conf base env p al list =
+and print_foreach_string conf base env p al list =
   let _ = List.fold_left
     (fun cnt nn ->
-       let env = [("item", Estring nn) :: env] in
-       let env = [("cnt", Estring (string_of_int cnt)) :: env] in
-       do List.iter (eval_ast conf base env p) al; return cnt + 1)
+       let env = [("item", Vstring nn) :: env] in
+       let env = [("cnt", Vstring (string_of_int cnt)) :: env] in
+       do List.iter (print_ast conf base env p) al; return cnt + 1)
     0 list
   in ()
 ;
 
 value interp_templ conf base p digest astl =
-  let env = [("digest", Estring digest)] in
-  List.iter (eval_ast conf base env p) astl
+  let env = [("digest", Vstring digest)] in
+  List.iter (print_ast conf base env p) astl
 ;
 
 value print_update_ind conf base p digest =
