@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.25 2002-02-16 08:21:41 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.26 2002-02-16 18:49:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -431,6 +431,15 @@ value rec find_all_fields lab =
       }
       else find_all_fields lab rl
   | [] -> [] ]
+;
+
+value rec find_field_with_value lab v =
+  fun
+  [ [r :: rl] ->
+      if r.rlab = lab && r.rval = v then
+        do { r.rused := True; True }
+      else find_field_with_value lab v rl
+  | [] -> False ]
 ;
 
 value rec lexing_date =
@@ -1040,9 +1049,6 @@ value find_sources_record gen addr =
   [ Some i ->
       do {
         seek_in gen.g_ic i;
-(*
-        try Some (get_lev0 (Stream.of_channel gen.g_ic)) with
-*)
         try Some (get_lev '0' (Stream.of_channel gen.g_ic)) with
         [ Stream.Failure | Stream.Error _ -> None ]
       }
@@ -1084,6 +1090,44 @@ value extract_notes gen rl =
             })
          [r :: r.rsons] lines)
     rl []
+;
+
+value rebuild_text r =
+  let s = strip_spaces r.rval in
+  List.fold_left
+    (fun s e ->
+       let _ = do { e.rused := True } in
+       let n = e.rval in
+       let end_spc =
+         if String.length n > 1 && n.[String.length n - 1] == ' ' then " "
+         else ""
+       in
+       let n = strip_spaces n in
+       match e.rlab with
+       [ "CONC" -> s ^ n ^ end_spc
+       | "CONT" -> s ^ "<br>\n" ^ n ^ end_spc
+       | _ -> s ])
+    s r.rsons
+;
+
+value notes_from_source_record rl =
+  let title =
+    match find_field "TITL" rl with
+    [ Some l ->
+        let s = rebuild_text l in
+        if s = "" then ""
+        else "<b>" ^ s ^"</b>"
+    | None -> "" ]
+  in
+  let text =
+    match find_field "TEXT" rl with
+    [ Some l ->
+        let s = rebuild_text l in
+        if title = "" then s
+        else "<br>\n" ^ s
+    | None -> "" ]
+  in
+  title ^ text
 ;
 
 value treat_notes gen rl =
@@ -1293,13 +1337,11 @@ value html_text_of_tags text rl =
   in
   let title =
     if text = "" then "-- GEDCOM --"
-    else "-- GEDCOM (" ^ text ^ ")"
+    else "-- GEDCOM (" ^ text ^ ") --"
   in
   let len = 0 in
-  let len = Buff.mstore len "<pre>\n" in
   let len = Buff.mstore len title in
   let len = totl len 1 rl in
-  let len = Buff.mstore len "\n</pre>" in
   Buff.get len
 ;
 
@@ -1319,6 +1361,19 @@ value rec find_all_rela nl =
                 else loop nl1
             | [] -> find_all_rela nl rl ]
       | None -> find_all_rela nl rl ] ]
+;
+
+value rec build_remain_tags =
+  fun
+  [ [] -> []
+  | [r :: rest] ->
+      let rsons = build_remain_tags r.rsons in
+      let rest = build_remain_tags rest in
+      if r.rused = True && rsons = [] then rest
+      else
+        [{rlab = r.rlab; rval = r.rval; rcont = r.rcont; rsons = rsons;
+          rpos = r.rpos; rused = r.rused} ::
+          rest] ]
 ;
 
 value add_indi gen r =
@@ -1637,34 +1692,30 @@ value add_indi gen r =
     if s = "" then (default_source.val, s_nt) else (s, s_nt)
   in
   let ext_notes =
+    let concat_text s1 s2 s_sep =
+      let s = if s1 = "" && notes = "" then "" else s_sep in
+      s1 ^ s ^ s2
+    in
+    let text = concat_text "" (notes_from_source_record birth_nt) "<br>\n" in
+    let text = concat_text text (notes_from_source_record bapt_nt) "<br>\n" in
+    let text = concat_text text (notes_from_source_record death_nt) "<br>\n" in
+    let text = concat_text text (notes_from_source_record burial_nt) "<br>\n" in
+    let text = concat_text text (notes_from_source_record psources_nt) "<br>\n" in
     if untreated_in_notes.val then
-      let rec build_remain_tags r_list =
-        match r_list with
-        [ [] -> []
-        | [r :: rest] ->
-            let rsons = build_remain_tags r.rsons in
-            let rest = build_remain_tags rest in
-            if r.rused = True && rsons = [] then rest
-            else
-              [{rlab = r.rlab; rval = r.rval; rcont = r.rcont; rsons = rsons;
-                rpos = r.rpos; rused = r.rused} ::
-               rest] ]
-      in
-      let remain_tags = build_remain_tags r.rsons in
       let remain_tags_in_notes text init rtl =
+        let rtl = build_remain_tags rtl in
         if rtl = [] then init
-        else
-          let s = if init = "" && notes = "" then "" else "\n" in
-          init ^ s ^ html_text_of_tags text (List.rev rtl)
+        else concat_text init (html_text_of_tags text rtl) "\n"
       in
-      let nt = remain_tags_in_notes "" "" remain_tags in
+      let nt = remain_tags_in_notes "INDI" "" r.rsons in
       let nt = remain_tags_in_notes "BIRT SOUR" nt birth_nt in
       let nt = remain_tags_in_notes "BAPT SOUR" nt bapt_nt in
       let nt = remain_tags_in_notes "DEAT SOUR" nt death_nt in
       let nt = remain_tags_in_notes "BURI/CREM SOUR" nt burial_nt in
       let nt = remain_tags_in_notes "SOUR SOUR" nt psources_nt in
-      nt  
-    else ""
+      if nt = "" then text
+      else text ^ "<pre>\n" ^ nt ^ "\n</pre>"
+    else text
   in
   let person =
     {first_name = add_string gen first_name; surname = add_string gen surname;
@@ -1747,7 +1798,7 @@ value add_fam_norm gen r adop_list =
            else [ip :: ipl])
         rl []
     in
-    let (relation, marr, marr_place, (marr_src, marr_nt)) =
+    let (relation, marr, marr_place, (marr_src, marr_nt), witnesses) =
       let (relation, sons) =
         match find_field "MARR" r.rsons with
         [ Some r -> (Married, Some r)
@@ -1779,9 +1830,28 @@ value add_fam_norm gen r adop_list =
               [ Some r -> date_of_field r.rpos r.rval
               | _ -> None ]
           in
-          (u, d, p, source gen r)
-      | None -> (relation, None, "", ("", [])) ]
+          let rec heredis_witnesses =
+            fun
+            [ [] -> []
+            | [ r :: asso_l ] ->
+                if find_field_with_value "RELA" "Witness" r.rsons && 
+                   find_field_with_value "TYPE" "INDI" r.rsons then
+                  let witness = per_index gen r.rval in
+                  [ witness :: heredis_witnesses asso_l ]
+                else do {
+                  r.rused := False;
+                  heredis_witnesses asso_l
+                } ]
+          in
+          let witnesses =
+            match find_all_fields "ASSO" r.rsons with
+            [ [] -> []
+            | wl -> heredis_witnesses wl ]
+          in
+          (u, d, p, source gen r, witnesses)
+      | None -> (relation, None, "", ("", []), []) ]
     in
+    let witnesses = Array.of_list witnesses in
     let div =
       match find_field "DIV" r.rsons with
       [ Some r ->
@@ -1805,10 +1875,55 @@ value add_fam_norm gen r adop_list =
       let (s, s_nt) = source gen r in
       if s = "" then (default_source.val, s_nt) else (s, s_nt)
     in
+    let concat_text s1 s2 s_sep =
+      let s = if s1 = "" then "" else s_sep in
+      s1 ^ s ^ s2
+    in
+    let ext_sources =
+      let text = concat_text "" (notes_from_source_record marr_nt) "<br>\n" in
+      concat_text text (notes_from_source_record fsources_nt) "<br>\n"
+    in
+    let ext_notes =
+      if untreated_in_notes.val then
+        let remain_tags_in_notes text init rtl =
+          let rtl = build_remain_tags rtl in
+          if rtl = [] then init
+          else concat_text init (html_text_of_tags text rtl) "\n"
+        in
+        let nt = remain_tags_in_notes "FAM" "" r.rsons in
+        let nt = remain_tags_in_notes "MARR SOUR" nt marr_nt in
+        let nt = remain_tags_in_notes "SOUR SOUR" nt fsources_nt in
+        if nt = "" then ""
+        else "<pre>\n" ^ nt ^ "\n</pre>"
+      else ""
+    in
+    let add_in_person_notes iper =
+      match gen.g_per.arr.(Adef.int_of_iper iper) with
+      [ Left3 _ -> ()
+      | Right3 p a u ->
+          let notes = gen.g_str.arr.(Adef.int_of_istr p.notes) in
+          let notes =
+            if notes = "" then ext_sources ^ ext_notes 
+            else if ext_sources = "" then notes ^ "\n" ^ ext_notes
+            else notes ^ "<br>\n" ^ ext_sources ^ ext_notes
+          in
+          let new_notes = add_string gen notes in
+          do {
+            p.notes := new_notes;
+            gen.g_per.arr.(Adef.int_of_iper iper) := Right3 p a u
+          } ]
+    in
+    let _ =
+      if ext_notes = "" then ()
+      else do {
+        add_in_person_notes fath;
+        add_in_person_notes moth;
+      }
+    in
     let fam =
       {marriage = Adef.codate_of_od marr;
        marriage_place = add_string gen marr_place;
-       marriage_src = add_string gen marr_src; witnesses = [| |];
+       marriage_src = add_string gen marr_src; witnesses = witnesses;
        relation = relation; divorce = div; comment = add_string gen comment;
        origin_file = string_empty; fsources = add_string gen fsources;
        fam_index = i}
