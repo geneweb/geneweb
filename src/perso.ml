@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.76 2001-02-04 07:21:41 ddr Exp $ *)
+(* $Id: perso.ml,v 3.77 2001-02-10 08:40:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -769,6 +769,20 @@ value print_origin_file conf base env =
   else ()
 ;
 
+value print_parent_age conf base p a p_auth parent =
+  match a.parents with
+  [ Some ifam ->
+      let cpl = coi base ifam in
+      let pp = poi base (parent cpl) in
+      if p_auth && age_autorise conf base pp then
+        match (Adef.od_of_codate pp.birth, Adef.od_of_codate p.birth) with
+        [ (Some (Dgreg d1 _), Some (Dgreg d2 _)) ->
+            Date.print_age conf (temps_ecoule d1 d2)
+        | _ -> () ]
+      else ()
+  | None -> () ]
+;
+
 value print_prefix_no_templ conf base env =
   let henv =
     List.fold_right
@@ -939,6 +953,8 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
           Wserver.wprint "i=%d;ip=%d" (Adef.int_of_ifam fam.fam_index)
             (Adef.int_of_iper p.cle_index)
       | _ -> () ]
+  | "father_age_at_birth" ->
+      print_parent_age conf base p a p_auth (fun cpl -> cpl.father)
   | "first_name" -> Wserver.wprint "%s" (p_first_name base p)
   | "first_name_alias" -> print_first_name_alias conf base env
   | "first_name_key" -> print_first_name_key conf base env p p_auth
@@ -948,6 +964,8 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "image_url" -> print_image_url conf base env p p_auth
   | "ind_access" -> Wserver.wprint "i=%d" (Adef.int_of_iper p.cle_index)
   | "married_to" -> print_married_to conf base env p p_auth efam
+  | "mother_age_at_birth" ->
+      print_parent_age conf base p a p_auth (fun cpl -> cpl.mother)
   | "nl" -> Wserver.wprint "\n"
   | "nobility_title" -> print_nobility_title conf base env p p_auth
   | "nobility_titles" -> print_nobility_titles conf base env p p_auth
