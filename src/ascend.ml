@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.10 2000-03-05 17:15:06 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.11 2000-03-05 22:55:59 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1538,7 +1538,7 @@ value print_tree_with_table conf base gv p =
          Wserver.wprint "%s" txt;
          match (po, p_getenv conf.env "image") with
          [ (Some p, Some "on") ->
-             match image_and_size conf base p (limited_image_size 100 100) with
+             match image_and_size conf base p (limited_image_size 75 75) with
              [ Some (f, Some (wid, hei)) ->
                  do Wserver.wprint "<br>\n";
                     Wserver.wprint "<center><table border=0><tr><td>\n";
