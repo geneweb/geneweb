@@ -26,9 +26,9 @@ GeneWeb Version 1.09
     database (someone being his/her own ancestor).
   - In "search", added ability to write "I" instead of "Ier" (french form).
     Ex: "Charles I" or "Charles Ier" are both accepted.
-  - Added ability to add ";opt=no_index" at end of requests to get an
-    equivalent link independant from the persons' index number (useful to
-    put direct links in Web pages).
+  - Added ability to add ";opt=no_index" (except in CGI mode) at end of
+    requests to get an equivalent link independant from the persons'
+    index number (useful to put direct links in Web pages).
   - Added text "Parents of" in top of pages of missing ancestors.
   - Fixed still several bugs (accents) due to new ANSEL encoding.
 
@@ -37,7 +37,8 @@ GeneWeb Version 1.09
     "wizards" (e.g. for maintenance): when set to "yes", they become
     simple "friends" (default: "no").
   - Variable "renamed" can be used to specify that a database has been
-    renamed. Generates a page giving the good URL to use.
+    renamed. Generates a page giving the good URL to use (except
+    in CGI mode).
 
 * GeneWeb compiler and Consanguinity computing (gwc, consang)
   - Fixed accents displaying in traces and error messages.
