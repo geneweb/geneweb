@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 3.5 2000-10-12 07:42:10 ddr Exp $ *)
+(* $Id: title.ml,v 3.6 2000-10-31 17:43:45 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -344,6 +344,21 @@ value print_title_place_list conf base t p list =
        [] list
      in ();
      Wserver.wprint "</ul>\n";
+(* Link to a tree display of all persons sharing the same nobility title,
+   but... generally too complicated for GeneWeb dag display system... :-(
+     match list with
+     [ [_; _ :: _] ->
+         do Wserver.wprint "<p>\n<a href=\"%sm=RLM" (commd conf);
+            let _ = List.fold_left
+              (fun i (p, _) ->
+                 do Wserver.wprint ";i%d=%d" i (Adef.int_of_iper p.cle_index);
+                 return i + 1)
+              1 list
+            in ();
+            Wserver.wprint "\">%s</a>\n" (capitale (transl conf "tree"));
+         return ()
+     | _ -> () ];
+*)
      trailer conf;
   return ()
 ;

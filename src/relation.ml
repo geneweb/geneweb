@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.55 2000-10-30 19:30:27 ddr Exp $ *)
+(* $Id: relation.ml,v 3.56 2000-10-31 17:43:43 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -190,45 +190,131 @@ type famlink = [ Self | Parent | Sibling | HalfSibling | Mate | Child ];
 
 open Dag2html;
 
-value print_relation_path_dag conf base path =
-  let (nl, _) =
+type dag_ind 'a =
+  { di_val : 'a;
+    di_famc : mutable dag_fam 'a;
+    di_fams : mutable dag_fam 'a }
+and dag_fam 'a =
+  { df_pare : list (dag_ind 'a);
+    df_chil : list (dag_ind 'a) }
+;
+
+value dag_ind_list_of_path path =
+  let (indl, _) =
+    let merge l1 l2 = if l1 == l2 then l1 else l1 @ l2 in
     List.fold_left
-      (fun (nl, cnt) (ip, fl) ->
-         match nl with
-         [ [] ->
-             let n = {pare = []; valu = Dag.Left ip; chil = []} in
-             ([n], cnt)
-         | [n :: nl] ->
-             let n1 = {pare = []; valu = Dag.Left ip; chil = []} in
-             match fl with
-             [ Parent ->
-                 do n.pare := [idag_of_int (cnt + 1) :: n.pare];
-                    n1.chil := [idag_of_int cnt];
-                 return ([n1; n :: nl], cnt + 1)
-             | Child ->
-                 do n.chil := [idag_of_int (cnt + 1) :: n.chil];
-                    n1.pare := [idag_of_int cnt];
-                 return ([n1; n :: nl], cnt + 1)
-             | Sibling | HalfSibling ->
-                 match (aoi base ip).parents with
-                 [ Some ifam ->
-                     let cpl = coi base ifam in
-                     let cpar = cpl.father in
-                     let nf = {pare = []; valu = Dag.Left cpar; chil = []} in
-                     do nf.chil := [idag_of_int cnt; idag_of_int (cnt + 2)];
-                        n1.pare := [idag_of_int (cnt + 1)];
-                        n.pare := n1.pare @ n.pare;
-                     return ([n1; nf; n :: nl], cnt + 2)
-                 | None -> ([n1; n :: nl], cnt + 1) ]
-             | Mate ->
-                 let np = {pare = []; valu = Dag.Right cnt; chil = []} in
-                 do n.chil := [idag_of_int (cnt + 1) :: n.chil];
-                    n1.chil := [idag_of_int (cnt + 1)];
-                    np.pare := [idag_of_int cnt; idag_of_int (cnt + 2)];
-                 return ([n1; np; n :: nl], cnt + 2)
-             | _ -> ([n1; n :: nl], cnt + 1) ] ])
-      ([], 0) (List.rev path)
+      (fun (indl, prev_ind) (ip, fl) ->
+         let (ind, indl) =
+           try (List.find (fun di -> di.di_val = Some ip) indl, indl) with
+           [ Not_found ->
+               let rec ind = {di_val = Some ip; di_famc = famc; di_fams = fams}
+               and famc = {df_pare = []; df_chil = [ind]}
+               and fams = {df_pare = [ind]; df_chil = []} in
+               (ind, [ind :: indl]) ]
+         in
+         let fam =
+           match prev_ind with
+           [ None -> {df_pare = []; df_chil = []}
+           | Some p_ind ->
+               match fl with
+               [ Parent ->
+                   {df_pare = merge p_ind.di_famc.df_pare ind.di_fams.df_pare;
+                    df_chil = merge p_ind.di_famc.df_chil ind.di_fams.df_chil}
+               | Child ->
+                   {df_pare = merge p_ind.di_fams.df_pare ind.di_famc.df_pare;
+                    df_chil = merge p_ind.di_fams.df_chil ind.di_famc.df_chil}
+               | Sibling | HalfSibling ->
+                   {df_pare = merge p_ind.di_famc.df_pare ind.di_famc.df_pare;
+                    df_chil = merge p_ind.di_famc.df_chil ind.di_famc.df_chil}
+               | Mate ->
+                   {df_pare = merge p_ind.di_fams.df_pare ind.di_fams.df_pare;
+                    df_chil = merge p_ind.di_fams.df_chil ind.di_fams.df_chil}
+               | Self -> {df_pare = []; df_chil = []} ] ]
+         in
+         do List.iter (fun ind -> ind.di_famc := fam) fam.df_chil;
+            List.iter (fun ind -> ind.di_fams := fam) fam.df_pare;
+         return (indl, Some ind))
+      ([], None) (List.rev path)
   in
+  indl
+;
+
+value add_missing_parents_of_siblings base indl =
+  List.fold_right
+    (fun ind indl ->
+       let indl =
+         match ind.di_famc with
+         [ {df_pare = []; df_chil = [_]} -> indl
+         | {df_pare = []; df_chil = children} ->
+             let ip =
+               match ind.di_val with
+               [ Some ip ->
+                   match (aoi base ip).parents with
+                   [ Some ifam -> (coi base ifam).father
+                   | None -> assert False ]
+               | _ -> assert False ]
+             in
+             let rec indp =
+               {di_val = Some ip; di_famc = famc; di_fams = fams}
+             and famc = {df_pare = []; df_chil = [indp]}
+             and fams = {df_pare = [indp]; df_chil = children} in
+             do List.iter (fun ind -> ind.di_famc := fams) children;
+             return
+             [indp :: indl]
+         | _ -> indl ]
+       in
+       [ind :: indl])
+    indl []
+;
+
+value dag_fam_list_of_ind_list indl =
+  List.fold_left
+    (fun faml ind ->
+       let faml =
+         if List.memq ind.di_famc faml then faml else [ind.di_famc :: faml]
+       in
+       if List.memq ind.di_fams faml then faml else [ind.di_fams :: faml])
+    [] indl
+;
+
+value add_phony_children indl faml =
+  List.fold_right
+    (fun fam (indl, faml) ->
+       match fam with
+       [ {df_pare = [_]; df_chil = []} -> (indl, [fam :: faml])
+       | {df_pare = pare; df_chil = []} ->
+           let rec ind = {di_val = None; di_famc = famc; di_fams = fams}
+           and famc = {df_pare = pare; df_chil = [ind]}
+           and fams = {df_pare = [ind]; df_chil = []} in
+           do List.iter (fun ind -> ind.di_fams := famc) pare; return
+           ([ind :: indl], [famc; fams :: faml])
+       | _ -> (indl, [fam :: faml]) ])
+    faml (indl, [])
+;
+
+value dag_of_ind_dag_list indl =
+  let (indl, _) =
+    List.fold_right (fun ind (indl, cnt) -> ([(ind, cnt) :: indl], cnt + 1))
+      indl ([], 0)
+  in
+  let idag_of_di_ind ind = idag_of_int (List.assq ind indl) in
+  List.map
+    (fun (ind, cnt) ->
+       {pare = List.map idag_of_di_ind ind.di_famc.df_pare;
+        valu =
+          match ind.di_val with
+          [ Some ic -> Dag.Left ic
+          | None -> Dag.Right cnt ];
+        chil = List.map idag_of_di_ind ind.di_fams.df_chil})
+    indl
+;
+
+value print_relation_path_dag conf base path =
+  let indl = dag_ind_list_of_path path in
+  let indl = add_missing_parents_of_siblings base indl in
+  let faml = dag_fam_list_of_ind_list indl in
+  let (indl, faml) = add_phony_children indl faml in
+  let nl = dag_of_ind_dag_list indl in
   let d = {dag = Array.of_list (List.rev nl)} in
 (*
   do Array.iter
@@ -1269,25 +1355,6 @@ value print_multi_relation conf base pl =
           let ip2 = p2.cle_index in
           match get_shortest_path_relation base ip1 ip2 [] with
           [ Some (path1, _) ->
-(*
-let string_of_famlink =
-  fun
-  [ Self -> "self"
-  | Parent -> "parent"
-  | Sibling -> "sibling"
-  | HalfSibling -> "halfsibling"
-  | Mate -> "mate"
-  | Child -> "child" ]
-in
-do Printf.eprintf "ip1 %d ip2 %d\n" (Adef.int_of_iper ip1) (Adef.int_of_iper ip2);
-   List.iter
-     (fun (ip, fl) -> Printf.eprintf "ip=%d; %s\n" (Adef.int_of_iper ip)
-        (string_of_famlink fl))
-     path1;
-   Printf.eprintf "\n";
-   flush stderr;
-return
-*)
               let path =
                 match path with
                 [ [] -> path1
@@ -1296,16 +1363,6 @@ return
                     [ [_ :: path1] -> List.rev path1 @ path
                     | [] -> path ] ]
               in
-(*
-do Printf.eprintf "result\n";
-   List.iter
-     (fun (ip, fl) -> Printf.eprintf "ip=%d; %s\n" (Adef.int_of_iper ip)
-        (string_of_famlink fl))
-     path;
-   Printf.eprintf "\n";
-   flush stderr;
-return
-*)
               loop path pl
           | None -> path ]
       | [_] | [] -> path ]
