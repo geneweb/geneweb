@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.5 1999-04-07 11:31:54 ddr Exp $ *)
+(* $Id: relation.ml,v 2.6 1999-04-07 11:49:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -53,7 +53,7 @@ value print_menu conf base p =
      Array.iter
        (fun ifam ->
           let cpl = coi base ifam in
-          let c = conjoint p cpl in
+          let c = spouse p cpl in
           let c = poi base c in
           if sou base c.first_name <> "?" || sou base c.surname <> "?" then
             do html_li conf;

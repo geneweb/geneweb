@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.4 1999-04-02 07:02:23 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.5 1999-04-07 11:49:40 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -695,7 +695,7 @@ value print_spouses conf base p =
     (fun ifam ->
        let fam = foi base ifam in
        let cpl = coi base ifam in
-       let sp = poi base (conjoint p cpl) in
+       let sp = poi base (spouse p cpl) in
        if sou base sp.first_name = "?" && sou base sp.surname = "?" then ()
        else
          do Wserver.wprint "\n&amp;";

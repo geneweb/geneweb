@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.5 1999-03-31 02:16:49 ddr Exp $ *)
+(* $Id: descend.ml,v 2.6 1999-04-07 11:49:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -164,9 +164,9 @@ value print_marriage_text conf base fam =
   return ()
 ;
 
-value afficher_marie conf base first fam p conjoint =
+value afficher_marie conf base first fam p spouse =
   let is = index_of_sex p.sex in
-  let auth = age_autorise conf base p && age_autorise conf base conjoint in
+  let auth = age_autorise conf base p && age_autorise conf base spouse in
   do if fam.not_married && auth then
        Wserver.wprint "%s" (capitale (transl conf "with"))
      else
@@ -179,10 +179,10 @@ value afficher_marie conf base first fam p conjoint =
               return ()
             else ());
      stag "strong" begin
-       afficher_personne_referencee conf base conjoint;
+       afficher_personne_referencee conf base spouse;
      end;
-     Date.afficher_dates conf base conjoint;
-     if age_autorise conf base p && age_autorise conf base conjoint then
+     Date.afficher_dates conf base spouse;
+     if age_autorise conf base p && age_autorise conf base spouse then
        match fam.divorce with
        [ NotDivorced -> ()
        | Divorced cod ->
@@ -226,7 +226,7 @@ value print_child conf base levt boucle niveau_max niveau compte ix =
            List.fold_left
              (fun first ifam ->
                 let fam = foi base ifam in
-                let c = conjoint x (coi base ifam) in
+                let c = spouse x (coi base ifam) in
                 let c = poi base c in
                 do if connais base c then
                      do afficher_marie conf base first fam x
@@ -255,7 +255,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p =
           (fun first ifam ->
              let fam = foi base ifam in
              let cpl = coi base ifam in
-             let conj = conjoint p cpl in
+             let conj = spouse p cpl in
              let enfants = fam.children in
              let conj = poi base conj in
              do if connais base conj then
@@ -416,7 +416,7 @@ value label_descendants base marks paths max_lev =
         List.fold_left
           (fun cnt ifam ->
              let fam = foi base ifam in
-             let c = conjoint p (coi base ifam) in
+             let c = spouse p (coi base ifam) in
              let el = fam.children in
              List.fold_left
                (fun cnt e ->
@@ -444,7 +444,7 @@ value close_to_end base marks max_lev lev p =
       List.for_all
         (fun ifam ->
            let fam = foi base ifam in
-           let c = conjoint p (coi base ifam) in
+           let c = spouse p (coi base ifam) in
            let el = fam.children in
            if p.sex == Male || not marks.(Adef.int_of_iper c) then
              if dlev == close_lev then Array.length el = 0
@@ -511,7 +511,7 @@ value afficher_date_mariage conf base p c dmar =
   else ()
 ;
 
-value afficher_conjoint conf base marks paths p c dmar =
+value afficher_spouse conf base marks paths p c dmar =
   do Wserver.wprint "\n&amp;";
      afficher_date_mariage conf base p c dmar;
      Wserver.wprint " ";
@@ -534,13 +534,13 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
           (fun (cnt, first, need_br) ifam ->
              let fam = foi base ifam in
              let dmar = Adef.od_of_codate fam.marriage in
-             let c = conjoint p (coi base ifam) in
+             let c = spouse p (coi base ifam) in
              let el = fam.children in
              let c = poi base c in
              do if need_br then html_br conf else ();
                 if not first then print_repeat_child conf base p1 c1 e
                 else ();
-                afficher_conjoint conf base marks paths p c dmar;
+                afficher_spouse conf base marks paths p c dmar;
                 Wserver.wprint "\n";
              return
              let print_children =
@@ -568,7 +568,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                      let dm =
                                        Adef.od_of_codate fam.marriage
                                      in
-                                     let c1 = conjoint e (coi base ifam) in
+                                     let c1 = spouse e (coi base ifam) in
                                      let el = fam.children in
                                      let c1 = poi base c1 in
                                      do if not first then
@@ -577,7 +577,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
                                                e;
                                           return ()
                                         else ();
-                                        afficher_conjoint conf base marks
+                                        afficher_spouse conf base marks
                                           paths e c1 dm;
                                         if Array.length el <> 0 then
                                           Wserver.wprint "....."
@@ -619,13 +619,13 @@ value print_family conf base marks paths max_lev lev p =
       (fun cnt ifam ->
          let fam = foi base ifam in
          let dmar = Adef.od_of_codate fam.marriage in
-         let c = conjoint p (coi base ifam) in
+         let c = spouse p (coi base ifam) in
          let el = fam.children in
          let c = poi base c in
          do stag "strong" begin
               afficher_personne_referencee conf base p;
             end;
-            afficher_conjoint conf base marks paths p c dmar;
+            afficher_spouse conf base marks paths p c dmar;
             Wserver.wprint "<ol start=%d>\n" (succ cnt);
          return
          let cnt =
@@ -648,10 +648,10 @@ value print_family conf base marks paths max_lev lev p =
                                let dm =
                                  Adef.od_of_codate fam.marriage
                                in
-                               let c = conjoint e (coi base ifam) in
+                               let c = spouse e (coi base ifam) in
                                let el = fam.children in
                                let c = poi base c in
-                               do afficher_conjoint conf base marks paths e c
+                               do afficher_spouse conf base marks paths e c
                                     dm;
                                   if Array.length el <> 0 then
                                     Wserver.wprint "....."
@@ -680,7 +680,7 @@ value print_families conf base marks paths max_lev =
       Array.iter
         (fun ifam ->
            let fam = foi base ifam in
-           let c = conjoint p (coi base ifam) in
+           let c = spouse p (coi base ifam) in
            let el = fam.children in
            let c = poi base c in
            if p.sex == Male ||
@@ -746,7 +746,7 @@ value print_ref conf base paths p =
   else
     Array.iter
       (fun ifam ->
-         let c = conjoint p (coi base ifam) in
+         let c = spouse p (coi base ifam) in
          if paths.(Adef.int_of_iper c) <> [] then
            let c = poi base c in
            Wserver.wprint " => %s %s <tt><b>%s</b></tt>"
@@ -888,7 +888,7 @@ value afficher_index_descendants conf base niveau_max ancetre =
   return ()
 ;
 
-value afficher_index_conjoints conf base niveau_max ancetre =
+value afficher_index_spouses conf base niveau_max ancetre =
   let niveau_max = min limit_desc niveau_max in
   let title _ =
     Wserver.wprint "%s"
@@ -908,7 +908,7 @@ value afficher_index_conjoints conf base niveau_max ancetre =
             sou base p.first_name <> "x" then
            Array.iter
              (fun ifam ->
-                let c = conjoint p (coi base ifam) in
+                let c = spouse p (coi base ifam) in
                 if paths.(Adef.int_of_iper c) = [] then
                   let c = poi base c in
                   if sou base c.first_name <> "?" &&
@@ -976,6 +976,6 @@ value print conf base p =
   | (Some "T", Some v) -> afficher_descendants_table conf base v p
   | (Some "N", Some v) -> afficher_descendants_numerotation conf base v p
   | (Some "G", Some v) -> afficher_index_descendants conf base v p
-  | (Some "C", Some v) -> afficher_index_conjoints conf base v p
+  | (Some "C", Some v) -> afficher_index_spouses conf base v p
   | _ -> afficher_menu_descendants conf base p ]
 ;

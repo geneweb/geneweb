@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.8 1999-04-06 09:35:08 ddr Exp $ *)
+(* $Id: util.ml,v 2.9 1999-04-07 11:49:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -672,10 +672,10 @@ value print_parent conf base p a =
          else "") ]
 ;
 
-value conjoint p fam =
+value spouse p fam =
   if p.cle_index == fam.father then fam.mother
   else if p.cle_index == fam.mother then fam.father
-  else invalid_arg "conjoint"
+  else invalid_arg "spouse"
 ;
 
 value preciser_homonyme conf base p =
@@ -702,7 +702,7 @@ value preciser_homonyme conf base p =
           let rec loop i =
             if i < Array.length p.family then
               let fam = foi base p.family.(i) in
-              let conjoint = conjoint p (coi base p.family.(i)) in
+              let conjoint = spouse p (coi base p.family.(i)) in
               let ct = fam.children in
               if Array.length ct > 0 then
                 let enfant = poi base ct.(0) in

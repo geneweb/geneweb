@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.13 1999-04-06 07:22:35 ddr Exp $ *)
+(* $Id: perso.ml,v 2.14 1999-04-07 11:49:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -427,12 +427,12 @@ value print_marriage_text conf base fam =
 
 value print_family conf base p a ifam =
   let fam = foi base ifam in
-  let iconjoint = conjoint p (coi base ifam) in
-  let conjoint = poi base iconjoint in
+  let ispouse = spouse p (coi base ifam) in
+  let spouse = poi base ispouse in
   let children = fam.children in
   let divorce = fam.divorce in
   let is = index_of_sex p.sex in
-  let auth = age_autorise conf base p && age_autorise conf base conjoint in
+  let auth = age_autorise conf base p && age_autorise conf base spouse in
   do Wserver.wprint "\n";
      html_li conf;
      if fam.not_married && auth then
@@ -447,8 +447,8 @@ value print_family conf base p a ifam =
               return ()
             else ());
      Wserver.wprint "\n";
-     afficher_personne_titre_referencee conf base (poi base iconjoint);
-     Date.afficher_dates_courtes conf base (poi base iconjoint);
+     afficher_personne_titre_referencee conf base (poi base ispouse);
+     Date.afficher_dates_courtes conf base (poi base ispouse);
      match divorce with
      [ Divorced d ->
          let d = Adef.od_of_codate d in
