@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.20 2004-01-08 11:56:07 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.21 2004-01-08 13:30:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -331,22 +331,6 @@ value rec lexicon_translate conf base nomin strm first_c =
   if upp then capitale r else r
 ;
 
-value src_translate conf base nomin strm =
-  let c = Stream.next strm in
-  if c = '\n' then
-    let s =
-      loop 0 0 (Stream.next strm) where rec loop lev len =
-        fun
-        [ '[' -> loop (lev + 1) (Lbuff.store len '[') (Stream.next strm)
-        | ']' ->
-	    if lev = 0 then Lbuff.get len
-	    else loop (lev - 1) (Lbuff.store len ']') (Stream.next strm)
-        | c -> loop lev (Lbuff.store len c) (Stream.next strm) ]
-    in
-    Translate.inline conf.lang '%' (macro conf base) s
-  else lexicon_translate conf base nomin strm c
-;
-
 value browser_cannot_handle_passwords conf =
   let user_agent = Wserver.extract_param "user-agent: " '/' conf.request in
   String.lowercase user_agent = "konqueror"
@@ -407,9 +391,7 @@ value rec copy_from_stream conf base strm mode =
   try
     while True do {
       match Stream.next strm with
-      [ '[' ->
-          let s = src_translate conf base True strm in
-          if not echo.val then () else Wserver.wprint "%s" s
+      [ '[' -> src_translate conf base True strm echo mode
       | '<' when no_tables && echo.val ->
           let c = Stream.next strm in
           let (slash, c) =
@@ -460,6 +442,24 @@ value rec copy_from_stream conf base strm mode =
     }
   with
   [ Stream.Failure -> () ]
+and src_translate conf base nomin strm echo mode =
+  let c = Stream.next strm in
+  if c = '\n' then
+    let s =
+      loop 0 0 (Stream.next strm) where rec loop lev len =
+        fun
+        [ '[' -> loop (lev + 1) (Lbuff.store len '[') (Stream.next strm)
+        | ']' ->
+  	    if lev = 0 then Lbuff.get len
+  	    else loop (lev - 1) (Lbuff.store len ']') (Stream.next strm)
+        | c -> loop lev (Lbuff.store len c) (Stream.next strm) ]
+    in
+    let s = Translate.inline conf.lang '%' (macro conf base) s in
+    if not echo.val then ()
+    else copy_from_stream conf base (Stream.of_string s) mode
+  else
+    let s = lexicon_translate conf base nomin strm c in
+    if not echo.val then () else Wserver.wprint "%s" s
 and copy_from_file conf base name mode =
   let fname =
     match mode with
