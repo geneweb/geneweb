@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 3.12 2000-11-05 10:17:26 ddr Exp $ *)
+(* $Id: history.ml,v 3.13 2000-11-09 12:05:57 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -223,7 +223,7 @@ value print conf base =
   do header conf title;
      print_link_to_welcome conf True;
      let fname = file_name conf in
-     match try Some (open_in fname) with [ Sys_error _ -> None ] with
+     match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
      [ Some ic ->
          do print_history conf base ic;
             close_in ic;
