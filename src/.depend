@@ -54,10 +54,12 @@ cousins.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi num.cmi \
     srcfile.cmi util.cmi ../wserver/wserver.cmi 
 cousins.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
     srcfile.cmx util.cmx ../wserver/wserver.cmx 
-dag.cmo: config.cmi dag2html.cmo date.cmi def.cmi gutil.cmi num.cmi util.cmi \
+dag.cmo: config.cmi dag2html.cmi date.cmi def.cmi gutil.cmi num.cmi util.cmi \
     ../wserver/wserver.cmi 
 dag.cmx: config.cmi dag2html.cmx date.cmx def.cmi gutil.cmx num.cmx util.cmx \
     ../wserver/wserver.cmx 
+dag2html.cmo: dag2html.cmi 
+dag2html.cmx: dag2html.cmi 
 date.cmo: adef.cmi calendar.cmo config.cmi def.cmi gutil.cmi util.cmi \
     ../wserver/wserver.cmi date.cmi 
 date.cmx: adef.cmx calendar.cmx config.cmi def.cmi gutil.cmx util.cmx \
@@ -82,8 +84,6 @@ family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birthDeath.cmx \
     notes.cmx num.cmx perso.cmx relation.cmx relationLink.cmx sendImage.cmx \
     some.cmx srcfile.cmx title.cmx update.cmx updateFam.cmx updateFamOk.cmx \
     updateInd.cmx updateIndOk.cmx util.cmx ../wserver/wserver.cmx family.cmi 
-fhashtbl.cmo: iovalue.cmi 
-fhashtbl.cmx: iovalue.cmx 
 forum.cmo: config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo srcfile.cmi \
     update.cmi util.cmi ../wserver/wserver.cmi 
 forum.cmx: config.cmi def.cmi gutil.cmx iobase.cmx lock.cmx srcfile.cmx \
@@ -164,10 +164,12 @@ phonygwd.cmo: argl.cmo ../wserver/wserver.cmi
 phonygwd.cmx: argl.cmx ../wserver/wserver.cmx 
 pqueue.cmo: pqueue.cmi 
 pqueue.cmx: pqueue.cmi 
-relation.cmo: adef.cmi config.cmi consang.cmi date.cmi def.cmi gutil.cmi \
-    num.cmi relationLink.cmo srcfile.cmi util.cmi ../wserver/wserver.cmi 
-relation.cmx: adef.cmx config.cmi consang.cmx date.cmx def.cmi gutil.cmx \
-    num.cmx relationLink.cmx srcfile.cmx util.cmx ../wserver/wserver.cmx 
+relation.cmo: adef.cmi config.cmi consang.cmi dag2html.cmi date.cmi def.cmi \
+    gutil.cmi num.cmi relationLink.cmo srcfile.cmi util.cmi \
+    ../wserver/wserver.cmi 
+relation.cmx: adef.cmx config.cmi consang.cmx dag2html.cmx date.cmx def.cmi \
+    gutil.cmx num.cmx relationLink.cmx srcfile.cmx util.cmx \
+    ../wserver/wserver.cmx 
 relationLink.cmo: adef.cmi config.cmi dag.cmo date.cmi def.cmi gutil.cmi \
     num.cmi pqueue.cmi util.cmi ../wserver/wserver.cmi 
 relationLink.cmx: adef.cmx config.cmi dag.cmx date.cmx def.cmi gutil.cmx \

@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.15 1999-12-20 16:59:03 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.16 1999-12-21 13:14:08 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -196,9 +196,12 @@ value print_html_table print print_indi phony border d t =
       if j = Array.length t.table.(i) then ()
       else
         let next_j =
+          let e = t.table.(i).(j).elem in
           let x = t.table.(i).(j).span in
           let rec loop j =
             if j = Array.length t.table.(i) then j
+            else if e = Nothing && t.table.(i).(j).elem = Nothing then
+              loop (j + 1)
             else if t.table.(i).(j).span = x then loop (j + 1)
             else j
           in
@@ -219,7 +222,12 @@ value print_html_table print print_indi phony border d t =
                   loop (l + 1)
               | _ -> l + 1 ]
             in
+(*
+do if next_l > next_j then do Printf.eprintf "assert false i %d k %d l %d next_l %d next_j %d\n" i k l next_l next_j; flush stderr; return () else (); return
+let next_l = min next_l next_j in
+*)
             do assert (next_l <= next_j); return
+(**)
             let colspan = 3 * (next_l - l) - 2 in
             do match (t.table.(i).(l).elem, t.table.(i + 1).(l).elem) with
                [ (Nothing, _) | (_, Nothing) ->
@@ -924,8 +932,210 @@ value fall d t =
   done
 ;
 
+value fall2_cool_right t i1 i2 j i3 =
+  let span = t.table.(i2 - 1).(j).span in
+  do for i = i2 - 1 downto 0 do
+       t.table.(i).(j) :=
+         if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
+         else {elem = Nothing; span = new_span_id ()};
+     done;
+     for i = Array.length t.table - 1 downto 0 do
+       for j = j + 1 to Array.length t.table.(i) - 1 do
+         t.table.(i).(j) :=
+           if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
+           else {elem = Nothing; span = new_span_id ()};
+       done;
+     done;
+     let old_span = t.table.(i2 - 1).(j).span in
+(*
+do Printf.eprintf "fall2_coll_right i1 %d i2 %d j %d i3 %d span %d old_span %d\n" i1 i2 j i3 (int_of_span_id span) (int_of_span_id old_span); flush stderr; return
+*)
+     loop j where rec loop j =
+       if j = Array.length t.table.(i2 - 1) then ()
+       else if t.table.(i2 - 1).(j).span = old_span then
+         do t.table.(i2 - 1).(j).span := span; return loop (j + 1)
+       else ();
+  return ()  
+;
+
+value fall2_cool_left t i1 i2 j i3 =
+  let span = t.table.(i2 - 1).(j).span in
+  do for i = i2 - 1 downto 0 do
+       t.table.(i).(j) :=
+         if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
+         else {elem = Nothing; span = new_span_id ()};
+     done;
+     for i = Array.length t.table - 1 downto 0 do
+       for j = j - 1 downto 0 do
+         t.table.(i).(j) :=
+           if i - i2 + i1 >= 0 then t.table.(i - i2 + i1).(j)
+           else {elem = Nothing; span = new_span_id ()};
+       done;
+     done;
+     let old_span = t.table.(i2 - 1).(j).span in
+     loop j where rec loop j =
+       if j < 0 then ()
+       else if t.table.(i2 - 1).(j).span = old_span then
+         do t.table.(i2 - 1).(j).span := span; return loop (j - 1)
+       else ();
+  return ()  
+;
+
+value do_fall2_right t i1 i2 j =
+  let i3 =
+    loop_i (Array.length t.table - 1) where rec loop_i i =
+      if i < 0 then 0
+      else
+        loop_j (j + 1) where rec loop_j j =
+          if j = Array.length t.table.(i) then loop_i (i - 1)
+          else
+            match t.table.(i).(j).elem with
+            [ Nothing -> loop_j (j + 1)
+            | _ -> i + 1 ]
+  in
+  let new_height = i3 + i2 - i1 in
+  let t =
+    if new_height > Array.length t.table then
+      loop (new_height - Array.length t.table) t where rec loop cnt t =
+        if cnt = 0 then t
+        else
+          let new_line =
+            Array.init (Array.length t.table.(0))
+              (fun i -> {elem = Nothing; span = new_span_id ()})
+          in
+          let t = {table = Array.append t.table [| new_line |]} in
+          loop (cnt - 1) t
+    else t
+  in
+  do fall2_cool_right t i1 i2 j i3; return t
+;
+
+value do_fall2_left t i1 i2 j =
+  let i3 =
+    loop_i (Array.length t.table - 1) where rec loop_i i =
+      if i < 0 then 0
+      else
+        loop_j (j - 1) where rec loop_j j =
+          if j < 0 then loop_i (i - 1)
+          else
+            match t.table.(i).(j).elem with
+            [ Nothing -> loop_j (j - 1)
+            | _ -> i + 1 ]
+  in
+  let new_height = i3 + i2 - i1 in
+  let t =
+    if new_height > Array.length t.table then
+      loop (new_height - Array.length t.table) t where rec loop cnt t =
+        if cnt = 0 then t
+        else
+          let new_line =
+            Array.init (Array.length t.table.(0))
+              (fun i -> {elem = Nothing; span = new_span_id ()})
+          in
+          let t = {table = Array.append t.table [| new_line |]} in
+          loop (cnt - 1) t
+    else t
+  in
+  do fall2_cool_left t i1 i2 j i3; return t
+;
+
+value try_fall2_right t i j =
+  match t.table.(i).(j).elem with
+  [ Ghost _ ->
+      let i1 =
+        loop (i - 1) where rec loop i =
+          if i < 0 then 0
+          else
+            match t.table.(i).(j).elem with
+            [ Ghost _ -> loop (i - 1)
+            | _ -> i + 1 ]
+      in
+      let separated =
+        loop (i1 - 1) where rec loop i =
+          if i < 0 then True
+          else if t.table.(i).(j - 1).span = t.table.(i).(j).span then False
+          else loop (i - 1)
+      in
+      if not separated then t
+      else do_fall2_right t i1 (i + 1) j
+  | _ -> t ]
+;
+
+value try_fall2_left t i j =
+  match t.table.(i).(j).elem with
+  [ Ghost _ ->
+      let i1 =
+        loop (i - 1) where rec loop i =
+          if i < 0 then 0
+          else
+            match t.table.(i).(j).elem with
+            [ Ghost _ -> loop (i - 1)
+            | _ -> i + 1 ]
+      in
+      let separated =
+        loop (i1 - 1) where rec loop i =
+          if i < 0 then True
+          else if t.table.(i).(j).span = t.table.(i).(j + 1).span then False
+          else loop (i - 1)
+      in
+      if not separated then t
+      else do_fall2_left t i1 (i + 1) j
+  | _ -> t ]
+;
+
+value fall2_right t =
+  loop_i (Array.length t.table - 1) t where rec loop_i i t =
+    if i <= 0 then t
+    else
+      loop_j 0 t where rec loop_j j t =
+        if j >= Array.length t.table.(i) - 1 then loop_i (i - 1) t
+        else
+          let t = try_fall2_right t i j in
+          loop_j (j + 1) t
+;
+
+value fall2_left t =
+  loop_i (Array.length t.table - 1) t where rec loop_i i t =
+    if i <= 0 then t
+    else
+      loop_j 1 t where rec loop_j j t =
+        if j >= Array.length t.table.(i) then loop_i (i - 1) t
+        else
+          let t = try_fall2_left t i j in
+          loop_j (j + 1) t
+;
+
+(*
+value map_dag f d =
+  let a =
+    Array.map (fun d -> {pare = d.pare; valu = f d.valu; chil = d.chil}) d.dag
+  in
+  {dag = a}
+;
+
+value tag_dag d =
+  let c = ref 'A' in
+  map_dag
+    (fun v ->
+       let v = c.val in
+       do c.val :=
+            if c.val = 'Z' then 'a'
+            else if c.val = 'z' then '1'
+            else Char.chr (Char.code c.val + 1);
+       return String.make 1 v)
+    d
+;
+*)
+
 value table_of_dag no_optim d =
-  let t = tablify no_optim d in let _ = fall d t in t
+  let t = tablify no_optim d in
+  let _ = fall d t in
+  let t = fall2_right t in
+  let t = fall2_left t in
+(*
+do print_char_table (tag_dag d) t; flush stderr; return
+*)
+  t
 ;
 
 (* invert *)
