@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 3.7 2000-01-15 18:55:52 ddr Exp $ *)
+(* $Id: date.ml,v 3.8 2000-01-21 12:01:16 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -375,7 +375,7 @@ value print_dates conf base p =
                if death_place <> "" then Wserver.wprint ",\n" else ();
             return ()
         | DeadYoung ->
-            do Wserver.wprint "%s" (cap (transl_nth conf "dead young" is));
+            do Wserver.wprint "%s" (cap (transl_nth conf "died young" is));
                if death_place <> "" then Wserver.wprint "\n-&nbsp;" else ();
             return ()
         | DeadDontKnowWhen ->

@@ -2,11 +2,18 @@ GeneWeb version 3.03
 --------------------
 
 * GeneWeb Service/CGI (gwd)
-  - [Jan 20, 00] When sorting the children, use now the baptism date
+  - [20 Jan 00] When sorting the children, use now the baptism date
     when there is no birth date.
-  - [Jan 18, 00] Fixed bug: when selecting no data base, the default page
+  - [18 Jan 00] Fixed bug: when selecting no data base, the default page
     asks for a data base name, but in CGI mode when entering a data base,
     it did not work (incorrect URL).
+
+* Lexicon (lang/lexicon.txt)
+  - [21 Jan 00] Changed the English displaying of dates into "day month
+    year", the displaying "month day year" being specific to the United
+    States and not used in other English speaking countries. American
+    users are invited to change the lexicon line for (date) if they
+    want an American display.    
 
 GeneWeb version 3.02
 --------------------

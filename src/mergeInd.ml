@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 3.4 2000-01-17 13:58:55 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.5 2000-01-21 12:01:18 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -101,7 +101,7 @@ value print_differences conf base branches p1 p2 =
                | Unspecified -> transl_nth conf "died" is ]
              in
              s ^ " " ^ Date.string_of_ondate conf (Adef.date_of_cdate cd)
-         | DeadYoung -> transl_nth conf "dead young" is
+         | DeadYoung -> transl_nth conf "died young" is
          | DeadDontKnowWhen -> transl_nth conf "died" is
          | DontKnowIfDead -> "" ]);
     string_field True (transl conf "death" ^ " / " ^ transl conf "place")
