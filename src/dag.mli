@@ -1,4 +1,4 @@
-(* $Id: dag.mli,v 3.2 2001-01-11 02:13:30 ddr Exp $ *)
+(* $Id: dag.mli,v 3.3 2001-01-30 16:53:23 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -33,3 +33,5 @@ value print_dag :
   config -> base -> Pset.t -> list (iper * (iper * option ifam)) ->
     Dag2html.dag (sum iper 'a) -> unit;
 value print : config -> base -> unit;
+
+value print_slices_menu : config -> base -> unit;
