@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.1.1.1 1998-09-01 14:32:08 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.2 1998-09-07 11:36:18 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -522,6 +522,7 @@ value print_missing_ancestors conf base v spouses_included p =
              | (None, None) -> [gp :: gpl] ])
           [] gpl
       in
+      let gpl_to_print = List.rev gpl_to_print in
       do List.iter
            (print_generation_missing_persons conf base title spouses_included)
            gpl_to_print;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.2 1998-09-02 17:54:19 ddr Exp $ *)
+(* $Id: srcfile.ml,v 1.3 1998-09-07 11:36:20 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -77,7 +77,7 @@ value lang_file_name conf fname =
     List.fold_right Filename.concat [Util.base_dir.val; "lang"; conf.lang]
       (Filename.basename fname ^ ".txt")
   in
-  if Sys.file_exists fname then fname1
+  if Sys.file_exists fname1 then fname1
   else
     List.fold_right Filename.concat [Util.lang_dir.val; "lang"; conf.lang]
       (Filename.basename fname ^ ".txt")

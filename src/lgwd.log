@@ -1,8 +1,0 @@
-GeneWeb 1.05+1 - Copyright (c) INRIA 1998
-Possible addresses:
-   http://localhost:3219/base
-   http://127.0.0.1:3219/base
-   http://jaune:3219/base
-where "base" is the name of the data base
-Type control C to stop the service
-Ready 01/09/1998 14:15 port 3219...

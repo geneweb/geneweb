@@ -2,6 +2,7 @@ GeneWeb Version 1.07
 --------------------
 
 * gwd:
+  - fixed bug, missing ancestors were printed in reverse order
   - fixed bug, could not find file "start.txt" in -hd directory.
 
 * ged2gwb:

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 1.1.1.1 1998-09-01 14:32:09 ddr Exp $ *)
+(* $Id: updateInd.ml,v 1.2 1998-09-07 11:36:21 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -31,7 +31,8 @@ value string_person_of base p =
 
 value print_first_name conf base p =
   let occ =
-    if p.first_name = "?" || p.surname = "?" then Adef.int_of_iper p.cle_index
+    if p.first_name = "?" || p.surname = "?" then
+      (* Adef.int_of_iper p.cle_index *) 0
     else p.occ
   in
   tag "tr" begin

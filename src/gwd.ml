@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: gwd.ml,v 1.1.1.1 1998-09-01 14:32:11 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.2 1998-09-07 11:36:19 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -58,7 +58,7 @@ value refuse_log from cgi =
        tm.Unix.tm_min tm.Unix.tm_sec;
       Printf.fprintf oc " excluded: %s\n" from;
      close_out oc;
-     if cgi then
+     if not cgi then
        do Wserver.wprint "HTTP/1.0 403 Forbidden"; nl (); nl (); return ()
      else ();
      Wserver.wprint "Your access has been disconnected by administrator.\n";
