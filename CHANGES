@@ -1,6 +1,10 @@
 GeneWeb version 4.08
 --------------------
 
+* Languages
+  - [12 Nov 02] Added Bulgarian (Dimiter Skordev).
+  - [11 Sep 02] Added documentation in Italian (Latino Imparato).
+
 * GeneWeb server or CGI (gwd)
   - [08 Nov 02] Fixed bad (strange) displaying of French Republican
     and Hebrew dates when the precision is not "Sure".
@@ -40,9 +44,6 @@ GeneWeb version 4.08
   - [19 Sep 02] Changed the template file "perso.txt" to decompose the
     macro "married_to" into the different parts of this text, allowing
     to present it differently.
-
-* Languages
-  - [11 Sep 02] Added documentation in Italian (Latino Imparato).
 
 * Base configuration files (base.gwf)
   - [22 Oct 02] Added configuration variable public_if_no_date: all

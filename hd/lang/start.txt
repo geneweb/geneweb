@@ -2,10 +2,11 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.33 2002-10-22 03:31:33 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.34 2002-11-12 12:32:39 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
+bg: Genealogy
 ca: Genealogia
 cs: Genealogy
 da: Genealogi
@@ -43,6 +44,7 @@ height=108 src="%o/gwlogo.gif" align=%L border=0 alt=GeneWeb></a>
 <td align=%L>
 <table><tr align=left><td align=center><h1><font color=%i>[
 af: Genealogiese<br>databasis
+bg: Родословна<br>база от данни
 ca: Base de dades<br>geneal&ograve;gica
 cs: Genealogickб databбze
 da: Genealogisk<br>database
@@ -77,6 +79,7 @@ zh: НшВзјТЖЧ
 
 <font size=-1><em>[
 af: Taalvoorkeur/Language preference:
+bg: Можете да изберете друг език за съобщения измежду следните:
 ca: Podeu seleccionar una altre llengua, hi ha disponibles les seg&uuml;ents:
 cs: Zvolte jazyk pro prohlнѕenн databбze:
 da: Du kan v&aelig;lge fremstilling p&aring; et andet sprog blandt de
@@ -106,6 +109,7 @@ sv: Du kan vдlja ett annat sprеk bland de fцljande:
 
 [
 af: Die databasis <font color=%i><b>"%t"</b></font> bevat tans %n persone.
+bg: Базата от данни <font color=%i><b>"%t"</b></font> в момента съдържа сведения за %n души.
 ca: La base de dades <font color=%i><b>"%t"</b></font> cont&eacute;
     actualment %n persones.
 cs: Databбze <font color=%i><b>"%t"</b></font> obsahuje %n osob.
@@ -153,6 +157,7 @@ zh: ПЦУР %n ИЛФЪКэѕЭївЦРЎЈ
 
 <td align=center>[
 af: <a href="%sw=w"><em>Medewerkers</em></a> toegang<br> (password)
+bg: Достъп като <a href="%sw=w"><em>администратор</em></a><br> (парола)
 ca: acc&eacute;s <a href="%sw=w"><em>administrador</em></a><br> (clau)
 cs: <a href="%sw=w">{<em>"Wizard"</em></a> pшнstup<br> (heslo)
 da: <a href="%sw=w"><em>Opdateringsadgang</em></a><br> (adgangskode)
@@ -177,6 +182,7 @@ sv: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
 
 %INf<td align=center>[
 af: <a href="%sw=f"><em>Vriend</em></a> toegang<br> (password)
+bg: Достъп като <a href="%sw=f"><em>приятел</em></a><br> (парола)
 ca: acc&eacute;s <a href="%sw=f"><em>amic</em></a><br> (clau)
 cs: <a href="%sw=f">{<em>"Friend"</em></a> pшнstup<br> (heslo)
 da: <a href="%sw=f"><em>Betroet adgang</em></a><br> (adgangskode)
@@ -204,6 +210,8 @@ sv: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
 <form method=POST action="%f">
 %h[
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
+bg: Парола за достъп като <em>приятел</em> или
+    <em>администратор</em>:
 ca: Clau, per acc&eacute;s <em>amic</em> o <em>administrador</em>:
 cs: Heslo pro<em>"friend"</em> nebo <em>"wizard"</em> pшнstup:</em>:
 da: Adgangskode, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
@@ -240,6 +248,7 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
 <center><table border=0 cellspacing=0 cellpadding=0><tr align=left><td>
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
+bg: Можете да използвате тази база от данни за търсене:
 ca: Per navegar en aquesta base, podeu fer la vostra recerca:
 cs: Databбzi lze prohledбvat:
 da: For at navigere i denne database kan du sшge:
@@ -273,6 +282,7 @@ zh:
 %h<input type=hidden name=m value=NG>
 <font color=%i><b>[
 af: per persoon
+bg: по име на човек
 ca: per persona
 cs: Podle osob
 da: personnavn
@@ -317,6 +327,7 @@ zh: ЛСЛчЈє
 <table border=0 cellpadding=0 cellspacing=0><tr align=left><td>
 <font color=%i><b>[
 af: by title
+bg: по титла
 ca: per tнtol
 cs: podle titulu
 da: titel (nob.)
@@ -360,6 +371,7 @@ en:
 %h
 [
 af: <font color=%i><b>in die lys </b></font>van alle
+bg: <font color=%i><b>в списъка</b></font> на всички
 ca: <font color=%i><b>pel llistat</b></font> de tots els
 cs: <font color=%i><b>ze seznamu</b></font> v№ech
 da: <font color=%i><b>i liste</b></font> over alle
@@ -386,6 +398,7 @@ zh: ПФКѕЛщµД
 <select name=m>
 <option value="N" selected>[
 af: vanne
+bg: фамилни имена
 ca: cognoms
 cs: pшнjmenн
 da: efternavne
@@ -412,6 +425,7 @@ zh: РХ
 ]
 <option value="P">[
 af: voorname
+bg: собствени имена
 ca: noms
 cs: kшestnн jmйno
 da: fornavne
@@ -439,6 +453,7 @@ zh: Гы
 </select>
 [
 af: volgens
+bg: ,&nbsp; подредени по
 ca: per
 cs: seшazenб podle
 da: sorteret efter
@@ -465,6 +480,7 @@ zh: ёщѕЭ
 <select name=tri>
 <option value="A" selected>[
 af: alfabeties volgorde
+bg: азбучен ред
 ca: ordre alfab&egrave;tic
 cs: abecedy
 da: alfabetisk orden
@@ -490,6 +506,7 @@ zh: ЧЦДёРт
 ]
 <option value="F">[
 af: frekwensie
+bg: честота на срещане
 ca: freq&uuml&egrave;ncia
 cs: иetnosti
 da: hyppighed
@@ -527,6 +544,7 @@ et: jдrgi
 %h<input type=hidden name=m value=PS>
 <font color=%i><b>[
 af: by
+bg: по
 ca: per
 cs: podle
 da: ved
@@ -559,6 +577,9 @@ sv: efter
 af: <font color=%i><b>deur 'n</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>detail
        navraag</b></font></a>.
+bg: <font color=%i><b>чрез</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>разширено
+       търсене</b></font></a>.
 ca: <font color=%i><b>per la</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>consulta
        avanзada</b></font></a>.
@@ -628,6 +649,7 @@ sv: <font color=%i><b>genom</b></font>
 %Iw<p>
 <center>[
 af: Jy kan
+bg: Можете още
 ca: Podeu
 cs: Zde mщѕete
 da: Du kan:
@@ -658,6 +680,7 @@ zh:
 <ul>
 %Ispropose_add_family;<li><a href="%sm=ADD_FAM">[
 af: 'n familie byvoeg
+bg: да добавите семейство
 ca: afegir una fam&iacute;lia
 cs: pшidat novou rodinu
 da: tilfшje en familie
@@ -687,6 +710,7 @@ zh: ФцјУјТНҐјЗВј
 <ul>%E
 %E<li><a href="%sm=MOD_NOTES">[
 af: die notas wysig
+bg: да промените бележките
 ca: modificar les notes
 cs: upravit poznбmky
 da: жndre noterne
@@ -719,6 +743,7 @@ sv: &auml;ndra noteringar
 
 <center>[
 af: Jy kan ook kyk na
+bg: Можете също да се насочите към
 ca: Tamb&eacute; podeu consultar
 cs: Lze takй zobrazit
 da: Du kan ogsе fremkalde:
@@ -767,6 +792,7 @@ zh:
 
 [
 af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
+bg: От %d насам е имало %q посещения, от които %c са на настоящата страница.
 ca: Hi ha hagut %q consultes, de les quals %c en aquesta p&agrave;gina, des
     del %d.
 cs: %q pшнstupщ, z toho %c na tuto strбnku, od %d.
@@ -807,6 +833,10 @@ zh: ТСѕ­УР %q ґО·ГОККэѕЭївЈ¬ЖдЦР %c ґО·ГОК±ѕЦчТіЈ¬ ЧФґУ %dЎЈ
 af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a
     href="%sescache=0">link</a>.
+bg: Ако Вашият браузър не актуализира автоматично страниците, които
+    са модифицирани (принуждавайки Ви да ги презареждате Вие),
+    опитайте се да тръгнете от <a href="%sescache=0">тази
+    препратка</a>.
 ca: Si el vostre navegador no actualitza autom&agrave;ticament les
     p&agrave;gines modificades (obligant-vos a fer actualitzar manualment
     la p&agrave;gina), proveu de navegar des d'<a href="%sescache=0">aquest
@@ -876,6 +906,7 @@ sv: Om din webblдsare inte automatiskt uppdaterar de modifierade sidorna
 <br>
 
 <p align=right><font size=-1><em><a href="%sm=LEX">[
+bg: лексикон
 ca: L&egrave;xic
 cs: lexikon
 da: leksikon
