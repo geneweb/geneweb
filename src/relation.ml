@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.73 2001-02-16 05:36:50 ddr Exp $ *)
+(* $Id: relation.ml,v 3.74 2001-02-16 08:59:34 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -84,7 +84,7 @@ value print_menu conf base p =
            html_li conf;
            Wserver.wprint "<input type=radio name=t value=PN checked>\n";
            Wserver.wprint "\
-<em>%s %s</em> %s <em>%s</em> %s <em>%s</em> %s <em>%s</em>
+<em>%s %s</em> %s <em>%s</em> %s <em>%s</em>
 " (transl_nth conf "first name/first names" 0)
              (transl_nth conf "surname/surnames" 0) (transl conf "or")
              (transl conf "public name") (transl conf "or")
@@ -1394,6 +1394,20 @@ value print_multi_relation_html_table conf hts pl2 lim assoc_txt =
   return ()
 ;
 
+value print_no_relationship conf base pl =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "tree")) in
+  do header conf title;
+     tag "ul" begin
+       List.iter
+         (fun p ->
+            Wserver.wprint "<li>%s\n"
+              (referenced_person_title_text conf base p))
+         pl;
+     end;
+     trailer conf;
+  return ()
+;
+
 value print_multi_relation conf base pl lim assoc_txt =
   let (pl1, pl2) =
     if lim <= 0 then (pl, [])
@@ -1424,7 +1438,7 @@ value print_multi_relation conf base pl lim assoc_txt =
                     | [] -> path ] ]
               in
               loop path pl
-          | None -> path ]
+          | None -> loop path pl ]
       | [_] | [] -> path ]
   in
   let elem_txt conf base p =
@@ -1438,11 +1452,14 @@ value print_multi_relation conf base pl lim assoc_txt =
      with
      [ Not_found -> txt ]
   in
-  let hts = html_table_of_relation_path_dag conf base elem_txt path in
-  if p_getenv conf.env "slices" = Some "on" then
-    Dag.print_slices_menu conf base (Some hts)
+  if path = [] then
+    print_no_relationship conf base pl
   else
-    print_multi_relation_html_table conf hts pl2 lim assoc_txt
+    let hts = html_table_of_relation_path_dag conf base elem_txt path in
+    if p_getenv conf.env "slices" = Some "on" then
+      Dag.print_slices_menu conf base (Some hts)
+    else
+      print_multi_relation_html_table conf hts pl2 lim assoc_txt
 ;
 
 value print_base_loop conf base p =

@@ -5,6 +5,9 @@ GeneWeb version 3.12
   - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
 
 * GeneWeb server or CGI (gwd)
+  - [16 Feb 01] Fixed bug: when displaying the tree of all persons sharing
+    the same nobility title, if there were no relationship between them,
+    the request failed.
   - [15 Feb 01] In forum, propose now "previous message" and "next message",
     instead of just "next message".
   - [11 Feb 01] Fixed a (small) bug: in the ancestors page, if the maximum
@@ -18,8 +21,8 @@ GeneWeb version 3.12
 
 * Welcome pages (lang/*/start.txt)
   - [16 Feb 01] In all welcome pages, suppressed the text "or surname" in
-    the first choice. It goes on searching up by surname, if no complete name
-    is found, but without saying it.
+    the first choice. It goes on searching up by surname, if no complete
+    name is found, but without saying it.
 
 GeneWeb version 3.11
 --------------------
