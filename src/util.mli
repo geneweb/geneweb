@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.25 2000-07-12 18:35:52 ddr Exp $ *)
+(* $Id: util.mli,v 3.26 2000-07-28 08:53:43 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -144,7 +144,7 @@ value image_size : string -> option (int * int);
 value limited_image_size : int -> int -> string -> option (int * int);
 value image_and_size :
   config -> base -> person -> (string -> option (int * int)) ->
-    option (string * option (int * int));
+    option (string * option (option (int * int)));
 
 value default_image_name_of_key : string -> string -> int -> string;
 value default_image_name : base -> person -> string;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.62 2000-07-26 13:32:34 ddr Exp $ *)
+(* $Id: util.ml,v 3.63 2000-07-28 08:53:42 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1452,7 +1452,7 @@ value image_and_size conf base p image_size =
     match sou base p.image with
     [ "" ->
         match auto_image_file conf base p with
-        [ Some f -> Some (f, image_size f)
+        [ Some f -> Some (f, Some (image_size f))
         | None -> None ]
     | s ->
         let http = "http://" in
@@ -1460,16 +1460,16 @@ value image_and_size conf base p image_size =
            String.sub s 0 (String.length http) = http then
           Some (s, None)
         else if Filename.is_implicit s then
-          let fname = personal_image_file_name conf.bname s in
-          if Sys.file_exists fname then
-            Some (fname, image_size fname)
-          else
-            match
-              try Some (List.assoc "images_path" conf.base_env) with
-              [ Not_found -> None ]
-            with
-            [ Some p when p <> "" -> Some (p ^ s, None)
-            | _ -> None ]
+          match
+            try Some (List.assoc "images_path" conf.base_env) with
+            [ Not_found -> None ]
+          with
+          [ Some p when p <> "" -> Some (p ^ s, None)
+          | _ ->
+              let fname = personal_image_file_name conf.bname s in
+              if Sys.file_exists fname then
+                Some (fname, Some (image_size fname))
+              else None ]
         else None ]
   else None
 ;

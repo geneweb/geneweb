@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.20 2000-05-07 12:33:33 ddr Exp $ *)
+(* $Id: dag.ml,v 3.21 2000-07-28 08:53:41 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -136,7 +136,7 @@ value print_image conf base p =
   match p_getenv conf.env "image" with
   [ Some "on" ->
       match image_and_size conf base p (limited_image_size 100 75) with
-      [ Some (f, Some (wid, hei)) ->
+      [ Some (f, Some (Some (wid, hei))) ->
           do Wserver.wprint "<br>\n";
              Wserver.wprint "<center><table border=0><tr><td>\n";
              print_image_normal conf base p f wid hei;
