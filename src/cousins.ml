@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 1.3 1998-12-15 09:24:59 ddr Exp $ *)
+(* $Id: cousins.ml,v 1.4 1998-12-15 21:45:19 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -197,8 +197,7 @@ value print_cousins_side_of conf base a ini_p ini_br lev =
   if List.exists (sibling_has_desc_lev base lev) sib then
     do Wserver.wprint "<li>\n";
        Wserver.wprint (fcapitale (ftransl conf "of %t's side"))
-         (fun _ -> afficher_personne_sans_titre conf base a);
-       afficher_titre conf base a;
+         (fun _ -> afficher_personne_titre conf base a);
        Wserver.wprint ":\n";
        let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
        print_descend_upto conf base ini_p ini_br lev sib;
