@@ -1,4 +1,68 @@
-(* $Id: iobase.ml,v 1.1.1.1 1998-09-01 14:32:04 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.2 1998-09-15 11:16:55 ddr Exp $ *)
+(*
+ Files in base (directory .gwb)
+
+    gwb - the base itself
+       magic number (magic_gwb)                 : string of len 8
+       number of persons                        : binary_int
+       number of ascends (= number of persons)  : binary_int
+       number of families                       : binary_int
+       number of couples (= number of families) : binary_int
+       number of strings                        : binary_int
+       persons array offset in file             : binary_int
+       ascends array offset in file             : binary_int
+       families array offset in file            : binary_int
+       couples array offset in file             : binary_int
+       strings array offset in file             : binary_int
+       persons array                            : value
+       ascends array                            : value
+       families array                           : value
+       couples array                            : value
+       strings array                            : value
+
+    acc - direct accesses to arrays inside gwb
+       persons offsets   : array of binary_ints
+       ascends offsets   : array of binary_ints
+       families offsets  : array of binary_ints
+       couples offsets   : array of binary_ints
+
+    inx - index for names + index for strings of first names and surnames
+       2nd index offset : binary_int
+       1st index (names) : value
+         array, len = "table_size", associating:
+          - a hash value of a "crushed" (see module "Name") name (modulo len)
+          - to the array of indexes of the corresponding persons
+       2nd index (first names and surnames strings) : value
+         array, len = "table_size", associating:
+          - a hash value of the "crushed" (see module "Name") first name or
+            surname (modulo len)
+          - to the array of the corresponding string indexes
+
+    gw2 - index for strings, surnames, first names
+       length of the strings offset array : binary_int
+       offset of surnames index           : binary_int
+       offset of first names index        : binary_int
+       strings hash table index           : 2 arrays of binary_ints
+         strings offset array (len = prime after 10 * strings array length)
+           - associating a hash value of the string modulo len
+           - to his index in the string array
+         strings list array (len = string array length)
+           - associating a string index
+           - to the index of the next index holding the same hash value
+       surnames index                     : value
+         binary tree
+          - associating the string index of a surname
+          - to the corresponding list of persons holding this surname
+       first_names index                  : value
+         binary tree
+          - associating the string index of a first name
+          - to the corresponding list of persons holding this first name
+
+    gw9 - patches
+       When updated, none of the previous files are modified. Only this one
+       is written and rewritten. It holds a record of type "patches", composed
+       of association lists "index" - "new value".
+*)
 
 open Def;
 open Gutil;

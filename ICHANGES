@@ -4,10 +4,14 @@ Internal Changes
 GeneWeb Version 1.07
 --------------------
 
+* Documented structure of bases (file iobase.ml).
+
 * gwc:
-   - fix bug: hash table now with "crush_lower" names, not "strip_lower"
+   - Fixed bug: hash table now with "crush_lower" names, not "strip_lower"
      because error while compiling base with names "Marie d'Orange" and
      "Marie Dorange", different in "gwd" but equal (beforewards) in "gwc".
+   - Fixed bug: while decoding strings fields, forgot to skip the possible
+     space (underscored).
 
 * gwd:
   - Don't display person number any more in update form when holding ? in

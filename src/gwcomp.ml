@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.1.1.1 1998-09-01 14:32:03 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.2 1998-09-15 11:16:54 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -34,6 +34,7 @@ value copy_decode s i1 i2 =
       do t.[j] := c; return loop_copy t (succ i) (succ j)
     else t
   in
+  let i1 = if i1 < i2 && s.[i1] == '_' then i1 + 1 else i1 in
   loop_copy (String.create (i2 - i1)) i1 0
 ;
 
