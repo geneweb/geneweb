@@ -13,8 +13,8 @@ Deze verzameling heeft nu %n personen.
 
 <li>
 
-<form method=GET action="%f">%h
-<input type=hidden name=m value=NG>
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
 Zoek: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -31,8 +31,8 @@ of <em>publieke naam</em>, of <em>alias</em>.
 
 <li>
 
-<FORM method=GET action="%f">%h
-<input type=hidden name=m value=TT>
+<FORM method=GET action="%f">
+%h<input type=hidden name=m value=TT>
 Op titel <INPUT NAME=t size=14 maxlength=200>
 plaats <INPUT NAME=p size=25 maxlength=200> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
@@ -40,8 +40,8 @@ plaats <INPUT NAME=p size=25 maxlength=200> =&gt;
 
 <li>
 
-<FORM method=GET action="%f">%h
-Alle
+<FORM method=GET action="%f">
+%hAlle
 <SELECT NAME=m>
    <OPTION VALUE="N" SELECTED> Familienamen
    <OPTION VALUE="P"> Voornamen
@@ -72,8 +72,8 @@ Deze paginas zijn %c maal bezocht.
 
 <p>
 
-<form method=get action="%f">%h
-<font size=-1>Wachtwoord, voor <em>vriend</em> of <em>wijzigen</em> toegang:
+<form method=get action="%f">
+%h<font size=-1>Wachtwoord, voor <em>vriend</em> of <em>wijzigen</em> toegang:
 </font>
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">

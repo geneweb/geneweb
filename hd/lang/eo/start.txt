@@ -14,8 +14,8 @@ La datenbazo enhavas nune %n personojn.
 
 <li>
 
-<form method=GET action="%f">%h
-<input type=hidden name=m value=NG>
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
 Sercxu: <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -31,8 +31,8 @@ cxu <em>publica nomo</em>, cxu <em>aliaso</em>.
 
 <li>
 
-<FORM method=GET action="%f">%h
-<input type=hidden name=m value=TT>
+<FORM method=GET action="%f">
+%h<input type=hidden name=m value=TT>
 Por mosxto <INPUT NAME=t size=14 maxlength=200>
 loko <INPUT NAME=p size=25 maxlength=200> =&gt;
 <INPUT TYPE=submit VALUE="Ok">
@@ -40,8 +40,8 @@ loko <INPUT NAME=p size=25 maxlength=200> =&gt;
 
 <li>
 
-<form method=GET action="%f">%h
-Cxiuj
+<form method=GET action="%f">
+%hCxiuj
 <select name=m>
    <option value="N" selected> Familinomoj
    <option value="P"> Personnomoj
@@ -72,8 +72,9 @@ Estis %q alirejoj kaj %c al cxi pagxo, ekde la %d.
 
 <p>
 
-<form method=get action="%f">%h
-<font size=-1>Pasvorto, por aliro <em>amiko</em> a&ugrave; <em>sorcxisto</em>:
+<form method=get action="%f">
+%h<font size=-1>Pasvorto, por aliro <em>amiko</em> a&ugrave;
+<em>sorcxisto</em>:
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
 </form>
