@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.25 1999-11-26 12:38:38 ddr Exp $
+# $Id: lexicon.txt,v 3.26 1999-11-30 09:54:41 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2146,7 +2146,7 @@ de: Forum
 dk: forum
 en: forum
 eo: forumo
-es: forum
+es: foro
 fi: foorumi
 fr: forum
 he:  קבוצת דייון
