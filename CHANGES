@@ -14,7 +14,7 @@ GeneWeb Intermediate version 2.02-1
 
 * GeneWeb Daemon/CGI (gwd)
   - [May 31, 99] In ancestors only selected generation, added displaying
-    of Sosa intervals ("..." is displayed for non-contiguous intervals).
+    of Sosa intervals (and "..." is displayed for non-contiguous intervals).
   - [May 18, 99] Added, in ancestors and descendants displaying, the ability
     to cancel GeneWeb links. Useful to extract a Web page for a site without
     GeneWeb server.
