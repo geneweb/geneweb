@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 4.12 2001-05-31 12:45:30 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.13 2001-09-09 07:11:34 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -329,7 +329,10 @@ zh: ¸ù¾İÃûÏÎ
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
-<font color=%i><b>[estate]</b></font>%INl<br>%E
+<font color=%i><b>[estate]0[
+en:
+da:  (dom&aelig;ne, sl&aelig;gt)
+]</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;p=*">[all the estates]</a>)
 </td><td>
