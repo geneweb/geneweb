@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.30 1999-09-24 05:59:31 ddr Exp $ *)
+(* $Id: family.ml,v 2.31 1999-09-26 10:28:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -87,7 +87,7 @@ value compact_list conf base xl =
                in
                if c == 0 then p1.occ > p2.occ else c > 0
              else c > 0 ])
-     (List.map (poi base) xl)
+     xl
   in
   let pl =
     List.fold_right
@@ -146,12 +146,15 @@ value find_all conf base an =
       [ Some [(ip, _) :: _] -> [poi base ip]
       | _ -> [] ]
   | _ ->
-      let pl = person_ht_find_all base an in
-      let pl = compact_list conf base pl in
+      let ipl = person_ht_find_all base an in
+      let pl = List.map (poi base) ipl in
       let spl = select_std_eq base pl an in
-      if spl = [] then
-        if pl = [] then try_find_with_one_first_name conf base an else pl
-      else spl ]
+      let pl =
+        if spl = [] then
+          if pl = [] then try_find_with_one_first_name conf base an else pl
+        else spl
+      in
+      compact_list conf base pl ]
 ;
 
 value precisez conf base n pl =

@@ -4,6 +4,13 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 2.07
 --------------------
 
+* Gwsetup program
+  - [Sep 25, 99] While saving a ".gwf" file, add the variables not treated
+    in the form, but present in the file.
+
+* GeneWeb daemon/CGI (gwd)
+  - [Sep 26, 99] Fixed bug of ordering persons by dates in "specify" page.
+
 GeneWeb Version 2.06
 --------------------
 
