@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.14 2000-07-08 03:17:08 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.15 2000-09-14 14:04:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -612,19 +612,21 @@ value print_add conf base =
     [ Some i ->
         let p = base.data.persons.get i in
         let fath =
-          match p.sex with
-          [ Male | Neuter -> person_key base p.cle_index
-          | Female -> ("", "", 0, Update.Create Neuter None) ]
+          if p.sex = Male
+          || p.sex = Neuter && p_getenv conf.env "sex" = Some "M" then
+            person_key base p.cle_index
+          else ("", "", 0, Update.Create Male None)
         in
         let moth =
-          match p.sex with
-          [ Female -> person_key base p.cle_index
-          | Male | Neuter -> ("", "", 0, Update.Create Neuter None) ]
+          if p.sex = Female
+          || p.sex = Neuter && p_getenv conf.env "sex" = Some "F" then
+            person_key base p.cle_index
+          else ("", "", 0, Update.Create Female None)
         in
         (fath, moth)
     | None ->
-        (("", "", 0, Update.Create Neuter None),
-         ("", "", 0, Update.Create Neuter None)) ]
+        (("", "", 0, Update.Create Male None),
+         ("", "", 0, Update.Create Female None)) ]
   in
   let fam =
     {marriage = Adef.codate_None; marriage_place = "";
