@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.8 1999-07-15 08:52:50 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.9 1999-07-15 10:13:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -156,8 +156,23 @@ value initial s =
     if i == String.length s then 0
     else
       match s.[i] with
-      [ 'A'..'Z' -> i
+      [ 'A'..'Z' | 'À'.. 'Ý' -> i
       | _ -> loop (succ i) ]
+;
+
+value unaccent =
+  fun
+  [ 'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'æ' -> 'a'
+  | 'ç' -> 'c'
+  | 'è' | 'é' | 'ê' | 'ë' -> 'e'
+  | 'ì' | 'í' | 'î' | 'ï' -> 'i'
+  | 'ð' -> 'd'
+  | 'ñ' -> 'n'
+  | 'ò' | 'ó' | 'ô' | 'õ' | 'ö' | 'ø' -> 'o'
+  | 'ù' | 'ú' | 'û' | 'ü' -> 'u'
+  | 'ý' | 'ÿ' -> 'y'
+  | 'þ' -> 'p'
+  | c -> c ]
 ;
 
 value compare_names s1 s2 =
@@ -167,11 +182,13 @@ value compare_names s1 s2 =
       else if i1 == e1 then -1
       else if i2 == e2 then 1
       else
-        let c1 = Char.lowercase s1.[i1] in
-        let c2 = Char.lowercase s2.[i2] in
+        let c1 = unaccent (Char.lowercase s1.[i1]) in
+        let c2 = unaccent (Char.lowercase s2.[i2]) in
+(*
         if Char.code c1 > 127 then loop (i1 + 1) i2
         else if Char.code c2 > 127 then loop i1 (i2 + 1)
         else
+*)
           match (c1, c2) with
           [ ('a'..'z', 'a'..'z') ->
               if c1 < c2 then -1
