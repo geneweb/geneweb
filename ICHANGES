@@ -7,6 +7,10 @@ GeneWeb Version 3.05
 * Distribution
   - [07 May 00] The files CHANGES and LICENSE now end with .txt.
 
+* Gwsetup program
+  - [06 Jun 00] Hacked to fix a problem in clean up: the file cleanup_err.htm
+    is missing in all languages! Used "bsi_err.htm" instead.
+
 * GeneWeb daemon/CGI (gwd)
   - [04 Jun 00] Check about titles dates no more done agains the death date,
     since titles can be given after death.
