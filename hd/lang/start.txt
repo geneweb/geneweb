@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 4.15 2001-10-01 12:53:22 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.16 2001-10-16 11:53:37 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -79,6 +79,7 @@ da: Du kan v&aelig;lge fremstilling p&aring; et andet sprog blandt de
 de: Du kannst eine der folgenden Sprachen f&uuml;r die Anzeige ausw&auml;hlen:
 en: You can select another displaying language among the following ones:
 eo: Vi povas elekti alian lingvon inter la sekvantajn:
+es: Puede seleccionar uno de los idiomas siguientes:
 et: Võid valida ka mõne muu keele järgnevatest:
 fr: Vous pouvez sélectionner une autre langue d'affichage
     parmi les suivantes:
@@ -793,6 +794,8 @@ en: If your browser does not automatically update the modified pages (forcing
 eo: Se via navigisto ne auxtomate gxisdatigas la modifigitajn pagxojn (se vi
     devas fari "resxargxi kurantan dokumenton"), provu ekde <a
     href="%sescache=0">cxi tiu legilo</a>.
+es: Si las p&aacute;ginas modificadas no ser&aacute;n actualizadas automaticamente,
+    favor de usar esta conexi&oacute;n: <a href="%sescache=0">hier</a>.
 et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt 
     (pead andma käsu "lae käesolev dokument uuesti"), siis  proovi alustada
     navigeerimist <a href="%sescache=0">sellest viitest</a>.
@@ -841,6 +844,7 @@ da: leksikon
 de: Lexikon
 en: lexicon
 eo: leksikono
+es: diccionario
 fi: Sanasto
 fr: lexique
 he: ì÷ñé÷åï 
