@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.7 2001-11-23 19:31:14 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.8 2001-11-24 17:58:45 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -131,8 +131,7 @@ value nl () =
 value http answer =
   let answer = if answer = "" then "200 OK" else answer in
   do {
-    wprint "HTTP/1.1 %s" answer; nl ();
-    wprint "Connection: close"; nl ();
+    wprint "HTTP/1.0 %s" answer; nl ();
   }
 ;
 

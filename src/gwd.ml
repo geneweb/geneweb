@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.16 2001-11-24 11:12:44 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.17 2001-11-24 17:58:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -460,7 +460,7 @@ value general_welcome conf =
 
 value unauth conf typ =
   do {
-    Wserver.wprint "HTTP/1.1 401 Unauthorized"; Util.nl ();
+    Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
     Util.nl ();
     Util.nl ();
