@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 4.0 2001-03-16 19:35:00 ddr Exp $ *)
+(* $Id: select.ml,v 4.1 2001-04-04 14:37:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -192,6 +192,7 @@ value select_ancestors base per_tab fam_tab with_siblings flag iper =
 ;
 
 value select_descendants base per_tab fam_tab no_spouses_parents flag iper =
+  let mark = Array.create base.data.families.len False in
   let select_family ifam cpl =
     do let i = Adef.int_of_ifam ifam in fam_tab.(i) := fam_tab.(i) lor flag;
        let i = Adef.int_of_iper cpl.father in
@@ -202,24 +203,23 @@ value select_descendants base per_tab fam_tab no_spouses_parents flag iper =
   in
   let rec loop iper =
     let i = Adef.int_of_iper iper in
-    if per_tab.(i) land flag <> 0 then ()
-    else
-      do per_tab.(i) := per_tab.(i) lor flag; return
-      Array.iter
-        (fun ifam ->
-           let i = Adef.int_of_ifam ifam in
-           if fam_tab.(i) land flag <> 0 then ()
-           else
-             let cpl = coi base ifam in
-             do select_family ifam cpl;
-                if not no_spouses_parents then
-                  let sp = spouse iper cpl in
-                  match (aoi base sp).parents with
-                  [ Some ifam -> select_family ifam (coi base ifam)
-                  | None -> () ]
-                else ();
-             return Array.iter loop (doi base ifam).children)
-        (uoi base iper).family
+    do per_tab.(i) := per_tab.(i) lor flag; return
+    Array.iter
+      (fun ifam ->
+         let i = Adef.int_of_ifam ifam in
+         if mark.(i) then ()
+         else
+           let cpl = coi base ifam in
+           do mark.(i) := True;
+              select_family ifam cpl;
+              if not no_spouses_parents then
+                let sp = spouse iper cpl in
+                match (aoi base sp).parents with
+                [ Some ifam -> select_family ifam (coi base ifam)
+                | None -> () ]
+              else ();
+           return Array.iter loop (doi base ifam).children)
+      (uoi base iper).family
   in
   loop iper
 ;
