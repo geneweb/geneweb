@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.45 2002-12-26 14:26:22 ddr Exp $ *)
+(* $Id: perso.ml,v 4.46 2003-01-28 10:47:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1098,6 +1098,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
   | "is_restricted" -> is_hidden p
   | "is_self" -> get_env "pos" env = Vstring "self"
   | "wizard" -> conf.wizard
+  | "friend" -> conf.friend
   | v ->
       let v = extract_var "file_exists_" v in
       if v <> "" then
