@@ -75,11 +75,11 @@ gwc.cmx: adef.cmx argl.cmx check.cmx consangAll.cmx def.cmi gutil.cmx \
 gwcomp.cmo: adef.cmi def.cmi gutil.cmi 
 gwcomp.cmx: adef.cmx def.cmi gutil.cmx 
 gwd.cmo: argl.cmo base64.cmo config.cmi def.cmi family.cmi gutil.cmi \
-    iobase.cmi lock.cmo relationLink.cmo robot.cmo util.cmi version.cmo \
-    ../wserver/wserver.cmi 
+    iobase.cmi lock.cmo relationLink.cmo robot.cmo srcfile.cmi util.cmi \
+    version.cmo ../wserver/wserver.cmi 
 gwd.cmx: argl.cmx base64.cmx config.cmi def.cmi family.cmx gutil.cmx \
-    iobase.cmx lock.cmx relationLink.cmx robot.cmx util.cmx version.cmx \
-    ../wserver/wserver.cmx 
+    iobase.cmx lock.cmx relationLink.cmx robot.cmx srcfile.cmx util.cmx \
+    version.cmx ../wserver/wserver.cmx 
 gwu.cmo: adef.cmi argl.cmo def.cmi gutil.cmi iobase.cmi select.cmo 
 gwu.cmx: adef.cmx argl.cmx def.cmi gutil.cmx iobase.cmx select.cmx 
 iobase.cmo: adef.cmi btree.cmo def.cmi gutil.cmi iovalue.cmi name.cmi \
@@ -137,8 +137,8 @@ relationLink.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi num.cmi \
     pqueue.cmi util.cmi ../wserver/wserver.cmi 
 relationLink.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
     pqueue.cmx util.cmx ../wserver/wserver.cmx 
-robot.cmo: util.cmi ../wserver/wserver.cmi 
-robot.cmx: util.cmx ../wserver/wserver.cmx 
+robot.cmo: srcfile.cmi util.cmi ../wserver/wserver.cmi 
+robot.cmx: srcfile.cmx util.cmx ../wserver/wserver.cmx 
 select.cmo: adef.cmi def.cmi gutil.cmi 
 select.cmx: adef.cmx def.cmi gutil.cmx 
 sendImage.cmo: adef.cmi config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo \
@@ -197,11 +197,9 @@ birthday.cmo birthday.cmx: pa_html.cmo
 changeChildren.cmo changeChildren.cmx: pa_lock.cmo pa_html.cmo
 cousins.cmo cousins.cmx: pa_html.cmo
 descend.cmo descend.cmx: pa_html.cmo
-descend.ml.ini.cmo descend.ml.ini.cmx: pa_html.cmo
 family.cmo family.cmx: def.syn.cmo pa_html.cmo
 gwc.cmo gwc.cmx: pa_lock.cmo
 gwd.cmo gwd.cmx: pa_html.cmo pa_lock.cmo
-gwd.ml.ini.cmo gwd.ml.ini.cmx: pa_html.cmo
 iovalue.cmo iovalue.cmx: q_codes.cmo
 merge.cmo merge.cmx: pa_html.cmo
 mergeFam.cmo mergeFam.cmx: pa_html.cmo
