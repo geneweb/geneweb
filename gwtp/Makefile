@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2000-07-25 16:35:42 ddr Exp $
+# $Id: Makefile,v 1.4 2000-07-25 17:31:12 ddr Exp $
 
 CAMLP4=camlp4r
 OCAMLC=ocamlc.opt
@@ -17,7 +17,7 @@ gwtp.out: $(GWTP_OBJS)
 	$(OCAMLC) $(GWTP_OTHER) $(GWTP_OBJS) -o gwtp.out
 
 clean:
-	$(RM) *.cm[oix] *.out *.opt
+	$(RM) *.cm[oix] *.o *.out *.opt
 
 depend:
 	> .depend.new
