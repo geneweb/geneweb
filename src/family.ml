@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.42 2004-01-26 18:20:03 ddr Exp $ *)
+(* $Id: family.ml,v 4.43 2004-11-06 05:38:31 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -467,6 +467,8 @@ value family_m conf base =
   | Some "NOTES" -> Notes.print conf base
   | Some "OA" when conf.wizard || conf.friend ->
       BirthDeath.print_oldest_alive conf base
+  | Some "OE" when conf.wizard || conf.friend ->
+      BirthDeath.print_oldest_engagements conf base
   | Some "P" ->
       match p_getenv conf.env "v" with
       [ Some v -> Some.first_name_print conf base v
