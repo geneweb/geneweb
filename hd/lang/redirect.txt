@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <meta name="ROBOTS" content="NONE">
+  <title>Address changed</title>
+</head>
+<body>
+<h1>Address changed</h1>
+
+The address of this service has changed.
+Please use now:
+<br>
+L'adresse du service a changé.
+Utiliser maintenant:
+<p>
+<ul>
+<li>
+<a href="%l">%l</a>
+</ul>
+
+<p><hr><font size=-1><em>(c) Copyright INRIA 1999 -
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/">
+GeneWeb %v</a></em></font><br>
+</body>
