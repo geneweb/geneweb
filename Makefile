@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.21 1999-08-16 00:45:57 ddr Exp $
+# $Id: Makefile,v 2.22 1999-08-16 08:03:01 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -29,9 +29,9 @@ wrappers:
 	else \
 	  echo '#!/bin/sh' > distribution/gwd; \
 	  echo 'cd gw; exec ./gwd' >> distribution/gwd; \
-	  echo '#!/bin/sh' > distribution/setup; \
-	  echo 'cd gw; exec ./gwsetup' >> distribution/setup; \
-	  chmod +x distribution/gwd distribution/setup; \
+	  echo '#!/bin/sh' > distribution/gwsetup; \
+	  echo 'cd gw; exec ./gwsetup' >> distribution/gwsetup; \
+	  chmod +x distribution/gwd distribution/gwsetup; \
 	fi
 
 new_distrib: classical_distrib
@@ -46,7 +46,7 @@ new_distrib: classical_distrib
 	  cp setup/$$i/*.htm distribution/gw/setup/$$i; \
 	  cp setup/$$i/*.txt distribution/gw/setup/$$i; \
 	done
-	cp setup/setup distribution/gw/gwsetup$(EXE)
+	cp setup/gwsetup distribution/gw/gwsetup$(EXE)
 	cp etc/README.distrib.txt distribution/README.txt
 	cp etc/LISEZMOI.distrib.txt distribution/LISEZMOI.txt
 	echo "127.0.0.1" > distribution/gw/only.txt

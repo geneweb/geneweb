@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.8 1999-08-16 00:45:57 ddr Exp $
+# $Id: Makefile,v 1.9 1999-08-16 08:03:01 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -6,15 +6,15 @@ OCAMLI=-I ../wserver -I ../src
 OBJS=../wserver/wserver.cmo ../src/version.cmo setup.cmo
 
 all:: setup.out
-	$(RM) setup
-	cp setup.out setup
+	$(RM) gwsetup
+	cp setup.out gwsetup
 
 opt:: setup.opt
-	$(RM) setup
-	cp setup.opt setup
+	$(RM) gwsetup
+	cp setup.opt gwsetup
 
 clean::
-	$(RM) setup
+	$(RM) gwsetup
 	$(RM) -rf test
 
 test: test_dir wrappers
@@ -26,16 +26,16 @@ wrappers:
 	else \
 	  echo '#!/bin/sh' > test/gwd; \
 	  echo 'cd gw; exec ./gwd' >> test/gwd; \
-	  echo '#!/bin/sh' > test/setup; \
-	  echo 'cd gw; exec ./gwsetup' >> test/setup; \
-	  chmod +x test/gwd test/setup; \
+	  echo '#!/bin/sh' > test/gwsetup; \
+	  echo 'cd gw; exec ./gwsetup' >> test/gwsetup; \
+	  chmod +x test/gwd test/gwsetup; \
 	fi
 
 test_dir:
 	mkdir test
 	mkdir test/gw
 	mkdir test/gw/old
-	cd test/gw; ln -s ../../setup gwsetup
+	cd test/gw; ln -s ../../gwsetup gwsetup
 	cd test/gw; ln -s ../.. setup
 	cd test/gw; ln -s ../../../doc .
 	cd test/gw; ln -s ../../../src/gwc .
