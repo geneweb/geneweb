@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.18 2000-10-28 09:12:25 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.19 2000-11-04 21:22:48 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -572,7 +572,7 @@ value gwb2ged base ifile ofile anc desc mem =
   return
   let oc = if ofile = "" then stdout else open_out ofile in
   let ((per_sel, fam_sel) as sel) =
-    Select.functions base anc desc surnames.val no_spouses_parents.val
+    Select.functions base anc desc surnames.val None no_spouses_parents.val
       censor.val
   in
   do ged_header base oc ifile ofile;

@@ -47,6 +47,11 @@ GeneWeb version 3.09
   - [17 Oct 00] Fixed bug: problem of accessing persons with the same
     names when they contained declinations (Czech names, for example).
 
+* GeneWeb uncompiler (gwu)
+  - [04 Nov 00] Added option "-ad" to select all ancestors of somebody
+    and all descendants of his/her ancestors (code written by Ludovic
+    Ledieu).
+
 * GeneWeb uncompiler (gwu) and GeneWeb to Gedcom (gwb2ged)
   - [28 Oct 00] Added option "-c <num>" not to export people born since
     less than <num> years nor their descendants (code written by Ludovic
