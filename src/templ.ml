@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 3.7 2001-02-17 03:51:15 ddr Exp $ *)
+(* $Id: templ.ml,v 3.8 2001-02-17 12:45:44 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -14,8 +14,7 @@ type ast =
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
   | Adefine of string and string and list ast and list ast
-  | Aapply of string and ast_expr
-  | Aeval of ast_expr ]
+  | Aapply of string and string ]
 and ast_expr =
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
@@ -26,7 +25,7 @@ and ast_expr =
 ;
 
 type token =
-  [ BANGEQUAL | CARET | DOT | EQUAL | LPAREN | RPAREN
+  [ BANGEQUAL | DOT | EQUAL | LPAREN | RPAREN
   | IDENT of string | STRING of string ]
 ;
 
@@ -61,7 +60,6 @@ value rec get_token =
   | [: `'(' :] -> LPAREN
   | [: `')' :] -> RPAREN
   | [: `'.' :] -> DOT
-  | [: `'^' :] -> CARET
   | [: `'=' :] -> EQUAL
   | [: `'!'; `'=' :] -> BANGEQUAL
   | [: `'"'; s = get_string 0 :] -> STRING s
@@ -114,18 +112,11 @@ value parse_templ conf base strm =
              | [: :] -> e ] :] -> e ]
     and parse_3 =
       parser
-      [ [: e = parse_4;
-           e =
-             parser
-             [ [: `EQUAL; e2 = parse_4 :] -> Eop "=" e e2
-             | [: `BANGEQUAL; e2 = parse_4 :] -> Eop "!=" e e2
-             | [: :] -> e ] :] -> e ]
-    and parse_4 =
-      parser
       [ [: e = parse_simple;
            e =
              parser
-             [ [: `CARET; strm :] -> Eop "^" e (parse_4 strm)
+             [ [: `EQUAL; e2 = parse_simple :] -> Eop "=" e e2
+             | [: `BANGEQUAL; e2 = parse_simple :] -> Eop "!=" e e2
              | [: :] -> e ] :] -> e ]
     and parse_simple =
       parser
@@ -167,7 +158,6 @@ value parse_templ conf base strm =
               [ ("if", []) -> parse_if strm
               | ("foreach", []) -> parse_foreach strm
               | ("apply", []) -> parse_apply strm
-              | ("eval", []) -> Aeval (parse_expr ())
               | ("wid_hei", []) -> Awid_hei (get_ident 0 strm)
               | (v, vl) -> Avar v vl ]
             in
@@ -196,7 +186,7 @@ value parse_templ conf base strm =
     (List.rev [Adefine f x al alk :: astl], v)
   and parse_apply strm =
     let (f, _) = get_variable strm in
-    let x = parse_expr () in
+    let (x, _) = get_variable strm in
     Aapply f x
   and parse_if strm =
     let e = parse_expr () in
@@ -251,7 +241,7 @@ value strip_newlines_after_variables =
     | [Aforeach s sl al :: astl] -> [Aforeach s sl (loop al) :: loop astl]
     | [Adefine f x al alk :: astl] ->
         [Adefine f x (loop al) (loop alk) :: loop astl]
-    | [(Avar _ _ | Aapply _ _ | Aeval _ as ast) :: astl] -> [ast :: loop astl]
+    | [(Avar _ _ | Aapply _ _ as ast) :: astl] -> [ast :: loop astl]
     | [(Atransl _ _ _ | Awid_hei _ as ast1); ast2 :: astl] ->
         [ast1; ast2 :: loop astl]
     | [ast] -> [ast]

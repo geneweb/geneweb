@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updind.txt,v 3.5 2001-02-17 03:51:14 ddr Exp $ -->
+  <!-- $Id: updind.txt,v 3.6 2001-02-17 12:45:42 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -20,21 +20,21 @@
   <td>[*date]0</td>
   <td>
   [year/month/day]0
-  <input name=%xx;_yyyy size=5 maxlength=5 value="%xx.year;">
+  <input name=xx_yyyy size=5 maxlength=5 value="%xx.year;">
   [year/month/day]1
-  <input name=%xx;_mm size=2 maxlength=2 value="%xx.month;">
+  <input name=xx_mm size=2 maxlength=2 value="%xx.month;">
   [year/month/day]2
-  <input name=%xx;_mm size=2 maxlength=2 value="%xx.day;">
+  <input name=xx_mm size=2 maxlength=2 value="%xx.day;">
   </td>
   <td>
   ...[or]0 [text]0
-  <input name=%xx;_text size=15 maxlength=30 value="%xx.text;">
+  <input name=xx_text size=15 maxlength=30 value="%xx.text;">
   </td>
   </table>
   <table border=1>
   <tr>
   <td>[*calendar/calendars]0
-  <select name=%xx;_cal>
+  <select name=xx_cal>
   <option value=G%if;xx.cal_gregorian; selected%end;
   >[*gregorian/julian/french/hebrew]0
   <option value=J%if;xx.cal_julian; selected%end;
@@ -46,7 +46,7 @@
   </select>
   </td>
   <td>[*precision]0
-  <select name=%xx;_prec>
+  <select name=xx_prec>
   <option%if;xx.prec_no; selected%end;>-
   <option value=sure%if;xx.prec_sure; selected%end;>[*exact]0
   <option value=about%if;xx.prec_about; selected%end;>[*about (date)]0
@@ -58,7 +58,7 @@
   <option value=yearint%if;xx.prec_yearint; selected%end;
       >&lt;- [*between (date)] -&gt;
   </select>
-  <input name=%xx;_oryear size=5 maxlength=5 value="%xx.oryear;">
+  <input name=xx_oryear size=5 maxlength=5 value="%xx.oryear;">
   </td>
   </tr>
   </table>
@@ -68,7 +68,7 @@
   <tr>
   <td>[*source/sources]0</td>
   <td>
-  <input name=%xx;_src size=40 maxlength=200 value="%eval;(xx ^ "_src");">
+  <input name=xx_src size=40 maxlength=200 value="%xx_src");">
   </td>
   </tr>
   </table>

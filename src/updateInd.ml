@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.35 2001-02-17 03:51:15 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.36 2001-02-17 12:45:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -784,8 +784,7 @@ type ast = Templ.ast ==
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
   | Adefine of string and string and list ast and list ast
-  | Aapply of string and ast_expr
-  | Aeval of ast_expr ]
+  | Aapply of string and string ]
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
@@ -798,7 +797,6 @@ and ast_expr = Templ.ast_expr ==
 type env =
   [ Vstring of string
   | Vfun of string and list ast
-  | Vval of ast_expr
   | Vnone ]
 ;
 
@@ -841,10 +839,7 @@ value rec eval_variable conf base env p =
   | [s] ->
       let v = extract_var "cvar_" s in
       if v <> "" then VVcvar v else VVgen s
-  | [s :: sl] ->
-      match get_env s env with
-      [ Vval (Evar s []) -> eval_variable conf base env p [s :: sl]
-      | _ -> VVnone ] ]
+  | [s :: sl] -> VVnone ]
 ;
 
 (* string values *)
@@ -885,10 +880,7 @@ value eval_gen_variable conf base env p =
         match p_getenv (conf.env @ conf.henv) v with
         [ Some vv -> quote_escaped vv
         | _ -> "" ]
-      else
-        match get_env s env with
-        [ Vval (Evar s []) -> s
-        | _ -> raise Not_found ] ]
+      else raise Not_found ]
 ;
 
 value eval_date_field =
@@ -1057,26 +1049,6 @@ value print_variable conf base env p sl =
       return () ]
 ;
 
-value print_eval conf base env p a =
-  let (s, sl) =
-    let rec eval =
-      fun
-      [ Eop "^" a1 a2 ->
-          let (s1, sl1) = eval a1 in
-          let (s2, sl2) = eval a2 in
-          if sl1 = [] then (s1 ^ s2, sl2) else ("???", [])
-      | Estr s -> (s, [])
-      | Evar s sl ->
-          match get_env s env with
-          [ Vval (Evar s []) -> (s, sl)
-          | _ -> ("???", []) ]
-      | _ -> ("???", []) ]
-    in
-    eval a
-  in
-  print_variable conf base env p [s :: sl]
-;
-
 value split_at_coloncolon s =
   loop 0 where rec loop i =
     if i >= String.length s - 1 then None
@@ -1103,6 +1075,42 @@ value print_transl conf base env upp s c =
   Wserver.wprint "%s" (if upp then capitale r else r)
 ;
 
+value subst_text x v s =
+  loop 0 0 0 where rec loop len i i_ok =
+    if i = String.length s then
+      if i_ok > 0 then loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
+      else Buff.get len
+    else if s.[i] = x.[i_ok] then
+      if i_ok = String.length x - 1 then
+        loop (Buff.mstore len v) (i + 1) 0
+      else loop len (i + 1) (i_ok + 1)
+    else if i_ok > 0 then
+      loop (Buff.store len s.[i - i_ok]) (i - i_ok + 1) 0
+    else loop (Buff.store len s.[i]) (i + 1) 0
+;
+
+value rec subst sf =
+  fun
+  [ Atext s -> Atext (sf s)
+  | Avar s sl -> Avar (sf s) (List.map sf sl)
+  | Atransl b s c -> Atransl b (sf s) c
+  | Awid_hei s -> Awid_hei (sf s)
+  | Aif e alt ale -> Aif (subste sf e) (substl sf alt) (substl sf ale)
+  | Aforeach s sl al -> Aforeach (sf s) (List.map sf sl) (substl sf al)
+  | Adefine f x al alk -> Adefine (sf f) (sf x) (substl sf al) (substl sf alk)
+  | Aapply f x -> Aapply (sf f) (sf x) ]
+and substl sf al =
+  List.map (subst sf) al
+and subste sf =
+  fun
+  [ Eor e1 e2 -> Eor (subste sf e1) (subste sf e2)
+  | Eand e1 e2 -> Eand (subste sf e1) (subste sf e2)
+  | Eop op e1 e2 -> Eop (sf op) (subste sf e1) (subste sf e2)
+  | Enot e -> Enot (subste sf e)
+  | Estr s -> Estr (sf s)
+  | Evar s sl -> Evar (sf s) (List.map sf sl) ]
+;
+
 value rec print_ast conf base env p =
   fun
   [ Atext s -> Wserver.wprint "%s" s
@@ -1112,13 +1120,14 @@ value rec print_ast conf base env p =
   | Aif e alt ale -> print_if conf base env p e alt ale
   | Aforeach s sl al -> print_foreach conf base env p s sl al
   | Adefine f x al alk -> print_define conf base env p f x al alk
-  | Aapply f v -> print_apply conf base env p f v
-  | Aeval a -> print_eval conf base env p a ]
+  | Aapply f v -> print_apply conf base env p f v ]
 and print_define conf base env p f x al alk =
   List.iter (print_ast conf base [(f, Vfun x al) :: env] p) alk
 and print_apply conf base env p f v =
   match get_env f env with
-  [ Vfun x al -> List.iter (print_ast conf base [(x, Vval v) :: env] p) al
+  [ Vfun x al ->
+      let sf = subst_text x v in
+      List.iter (fun a -> print_ast conf base env p (subst sf a)) al
   | _ -> Wserver.wprint ">%%%s???" f ]
 and print_if conf base env p e alt ale =
   let al = if eval_bool_value conf base env p e then alt else ale in
@@ -1168,12 +1177,11 @@ value print_update_ind conf base p digest =
   [ Some ("MRG_IND_OK" | "MRG_MOD_IND_OK")
   | Some ("MOD_IND" | "MOD_IND_OK")
   | Some ("ADD_IND" | "ADD_IND_OK") ->
-      do if p_getenv conf.env "opt" = Some "new" then
-           let astl = Templ.input conf base "updind" in
-           do html conf; interp_templ conf base p digest astl; return ()
-         else ();
-      return
-      print_update_ind_aux conf base p digest
+      if p_getenv conf.env "opt" = Some "new" then
+        let astl = Templ.input conf base "updind" in
+        do html conf; interp_templ conf base p digest astl; return ()
+      else
+        print_update_ind_aux conf base p digest
   | _ -> incorrect_request conf ]
 ;
 
