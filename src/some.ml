@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.20 2002-11-14 02:43:13 ddr Exp $ *)
+(* $Id: some.ml,v 4.21 2002-12-09 12:16:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -296,10 +296,22 @@ value print_branch conf base psn name =
 
 value print_by_branch x conf base not_found_fun (pl, homonymes) =
   let ancestors =
-    Sort.list
-      (fun p1 p2 ->
-         alphabetic (p_first_name base p1) (p_first_name base p2) <= 0)
-      pl
+    match p_getenv conf.env "order" with
+    [ Some "d" ->
+        let born_before p1 p2 =
+          match (Adef.od_of_codate p1.birth,
+                 Adef.od_of_codate p2.birth) with
+          [ (Some d1, Some d2) ->
+              d2 strictly_after d1
+          | (_, None) -> True
+          | (None, _) -> False ]
+        in
+        Sort.list born_before pl
+    | _ ->
+        Sort.list
+        (fun p1 p2 ->
+           alphabetic (p_first_name base p1) (p_first_name base p2) <= 0)
+        pl ]
   in
   let len = List.length ancestors in
   if len == 0 then not_found_fun conf x
