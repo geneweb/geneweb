@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.2 2001-04-20 15:25:51 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.3 2001-05-15 19:41:05 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -48,7 +48,8 @@ value reconstitute_parent_or_child conf var default_surname =
     let b = Update.reconstitute_date conf (var ^ "b") in
     let bpl = getn conf (var ^ "b") "pl" in
     let d = Update.reconstitute_date conf (var ^ "d") in
-    let dpl = getn conf (var ^ "d") "pl" in (b, bpl, d, dpl)
+    let dpl = getn conf (var ^ "d") "pl" in
+    (b, bpl, d, dpl)
   in
   let sex =
     match p_getenv conf.env (var ^ "_sex") with
@@ -173,7 +174,7 @@ value strip_array_persons pl =
 value strip_family fam des =
   do {
     des.children := strip_array_persons des.children;
-    fam.witnesses := strip_array_persons fam.witnesses;
+    fam.witnesses := strip_array_persons fam.witnesses
   }
 ;
 
@@ -365,7 +366,7 @@ value effective_mod conf base sfam scpl sdes =
       | _ -> nfath.sex := Male ];
       match nmoth.sex with
       [ Male -> print_err_mother_sex conf base nmoth
-      | _ -> nmoth.sex := Female ];
+      | _ -> nmoth.sex := Female ]
     }
     else if ncpl.father == ncpl.mother then print_err conf base
     else ();
@@ -381,7 +382,7 @@ value effective_mod conf base sfam scpl sdes =
       ofath_u.family := family_exclude ofath_u.family ofam.fam_index;
       nfath_u.family := Array.append nfath_u.family [| fi |];
       base.func.patch_union ocpl.father ofath_u;
-      base.func.patch_union ncpl.father nfath_u;
+      base.func.patch_union ncpl.father nfath_u
     }
     else ();
     if ncpl.mother != ocpl.mother && ncpl.mother != ocpl.father then do {
@@ -389,7 +390,7 @@ value effective_mod conf base sfam scpl sdes =
       omoth_u.family := family_exclude omoth_u.family ofam.fam_index;
       nmoth_u.family := Array.append nmoth_u.family [| fi |];
       base.func.patch_union ocpl.mother omoth_u;
-      base.func.patch_union ncpl.mother nmoth_u;
+      base.func.patch_union ncpl.mother nmoth_u
     }
     else ();
     let find_asc =
@@ -397,7 +398,8 @@ value effective_mod conf base sfam scpl sdes =
       fun ip ->
         try Hashtbl.find cache ip with
         [ Not_found ->
-            let a = aoi base ip in do { Hashtbl.add cache ip a; a } ]
+            let a = aoi base ip in
+            do { Hashtbl.add cache ip a; a } ]
     in
     let same_parents =
       ncpl.father = ocpl.father && ncpl.mother = ocpl.mother
@@ -475,17 +477,15 @@ value effective_add conf base sfam scpl sdes =
       | Male -> ()
       | _ ->
           do {
-            nfath_p.sex := Male;
-            base.func.patch_person ncpl.father nfath_p;
+            nfath_p.sex := Male; base.func.patch_person ncpl.father nfath_p
           } ];
       match nmoth_p.sex with
       [ Male -> print_err_mother_sex conf base nmoth_p
       | Female -> ()
       | _ ->
           do {
-            nmoth_p.sex := Female;
-            base.func.patch_person ncpl.mother nmoth_p;
-          } ];
+            nmoth_p.sex := Female; base.func.patch_person ncpl.mother nmoth_p
+          } ]
     }
     else if ncpl.father == ncpl.mother then print_err conf base
     else ();
@@ -508,7 +508,7 @@ value effective_add conf base sfam scpl sdes =
              do {
                a.parents := Some fi;
                a.consang := Adef.fix (-1);
-               base.func.patch_ascend p.cle_index a;
+               base.func.patch_ascend p.cle_index a
              } ])
       ndes.children;
     Update.add_misc_names_for_new_persons base created_p.val;
@@ -528,7 +528,7 @@ value effective_swi conf base ip u ifam =
   in
   do {
     u.family := Array.of_list (loop (Array.to_list u.family));
-    base.func.patch_union ip u;
+    base.func.patch_union ip u
   }
 ;
 
@@ -540,15 +540,13 @@ value kill_family base fam ip =
          if ifam == fam.fam_index then ifaml else [ifam :: ifaml])
       (Array.to_list u.family) []
   in
-  do { u.family := Array.of_list l; base.func.patch_union ip u; }
+  do { u.family := Array.of_list l; base.func.patch_union ip u }
 ;
 
 value kill_parents base ip =
   let a = aoi base ip in
   do {
-    a.parents := None;
-    a.consang := Adef.fix (-1);
-    base.func.patch_ascend ip a;
+    a.parents := None; a.consang := Adef.fix (-1); base.func.patch_ascend ip a
   }
 ;
 
@@ -568,7 +566,7 @@ value effective_del conf base fam =
     fam.fam_index := Adef.ifam_of_int (-1);
     base.func.patch_family ifam fam;
     base.func.patch_couple ifam cpl;
-    base.func.patch_descend ifam des;
+    base.func.patch_descend ifam des
   }
 ;
 
@@ -595,7 +593,7 @@ value print_family conf base wl cpl des =
         do {
           conf.henv := List.remove_assoc "dsrc" conf.henv;
           if x <> "" then conf.henv := [("dsrc", code_varenv x) :: conf.henv]
-          else ();
+          else ()
         }
     | None -> () ];
     Wserver.wprint "<ul>\n";
@@ -613,13 +611,13 @@ value print_family conf base wl cpl des =
            do {
              html_li conf;
              afficher_personne_referencee conf base (poi base ip);
-             Wserver.wprint "\n";
+             Wserver.wprint "\n"
            })
         des.children;
-      Wserver.wprint "</ul>\n";
+      Wserver.wprint "</ul>\n"
     }
     else ();
-    Update.print_warnings conf base wl;
+    Update.print_warnings conf base wl
   }
 ;
 
@@ -631,7 +629,7 @@ value print_mod_ok conf base wl cpl des =
     header conf title;
     print_link_to_welcome conf True;
     print_family conf base wl cpl des;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -641,7 +639,7 @@ value print_add_ok conf base wl cpl des =
     header conf title;
     print_link_to_welcome conf True;
     print_family conf base wl cpl des;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -662,7 +660,7 @@ value print_del_ok conf base wl =
         end
     | _ -> () ];
     Update.print_warnings conf base wl;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -673,7 +671,7 @@ value print_swi_ok conf base p =
     print_link_to_welcome conf True;
     afficher_personne_referencee conf base p;
     Wserver.wprint "\n";
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -703,7 +701,7 @@ value forbidden_deconnected conf sfam scpl sdes =
 value print_add o_conf base =
   let conf = Update.update_conf o_conf in
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock (Iobase.lock_file bfile) with
+  lock Iobase.lock_file bfile with
   [ Accept ->
       try
         let (sfam, scpl, sdes, ext) = reconstitute_family conf in
@@ -740,7 +738,7 @@ value print_add o_conf base =
           base.func.commit_patches ();
           History.record conf base (fn, sn, occ) act;
           delete_topological_sort conf base;
-          print_add_ok conf base wl cpl des;
+          print_add_ok conf base wl cpl des
         }
       with
       [ Update.ModErr -> () ]
@@ -749,7 +747,7 @@ value print_add o_conf base =
 
 value print_del conf base =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock (Iobase.lock_file bfile) with
+  lock Iobase.lock_file bfile with
   [ Accept ->
       match p_getint conf.env "i" with
       [ Some i ->
@@ -769,10 +767,10 @@ value print_del conf base =
               effective_del conf base fam;
               base.func.commit_patches ();
               History.record conf base k "df";
-              delete_topological_sort conf base;
+              delete_topological_sort conf base
             }
             else ();
-            print_del_ok conf base [];
+            print_del_ok conf base []
           }
       | _ -> incorrect_request conf ]
   | Refuse -> Update.error_locked conf base ]
@@ -780,7 +778,7 @@ value print_del conf base =
 
 value print_mod_aux conf base callback =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock (Iobase.lock_file bfile) with
+  lock Iobase.lock_file bfile with
   [ Accept ->
       try
         let (sfam, scpl, sdes, ext) = reconstitute_family conf in
@@ -817,7 +815,7 @@ value print_mod o_conf base =
       base.func.commit_patches ();
       History.record conf base (fn, sn, occ) "mf";
       delete_topological_sort conf base;
-      print_mod_ok conf base wl cpl des;
+      print_mod_ok conf base wl cpl des
     }
   in
   print_mod_aux conf base callback
@@ -825,7 +823,7 @@ value print_mod o_conf base =
 
 value print_swi conf base =
   let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock (Iobase.lock_file bfile) with
+  lock Iobase.lock_file bfile with
   [ Accept ->
       match (p_getint conf.env "i", p_getint conf.env "f") with
       [ (Some ip, Some ifam) ->
@@ -837,7 +835,7 @@ value print_swi conf base =
               effective_swi conf base p.cle_index u (Adef.ifam_of_int ifam);
               base.func.commit_patches ();
               History.record conf base k "sf";
-              print_swi_ok conf base p;
+              print_swi_ok conf base p
             }
           with
           [ Update.ModErr -> () ]
