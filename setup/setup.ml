@@ -1,6 +1,7 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.5 1999-04-30 17:23:21 ddr Exp $ *)
+(* $Id: setup.ml,v 1.6 1999-05-01 09:35:05 ddr Exp $ *)
 
+value port = 2316;
 value default_lang = "en";
 value setup_dir = ref "setup";
 
@@ -87,6 +88,10 @@ value p_getenv env label =
   try Some (getenv env label) with [ Not_found -> None ]
 ;
 
+value s_getenv env label =
+  try getenv env label with [ Not_found -> "" ]
+;
+
 value rec skip_spaces s i =
   if i < String.length s && s.[i] == ' ' then skip_spaces s (i + 1)
   else i
@@ -135,6 +140,7 @@ type config =
     env : list (string * string) }
 ;
 
+(*
 value apply s db =
   loop 0 where rec loop i =
     if i == String.length s then ()
@@ -144,15 +150,69 @@ value apply s db =
       else
         do Wserver.wprint "%c" s.[i]; return loop (i + 1)
 ;
+*)
 
-value for_all_db conf ic =
-  match input_char ic with
+value rec copy_from_stream conf print strm =
+  try
+    while True do
+      match Stream.next strm with
+      [ '$' ->
+          let c = Stream.next strm in
+          match c with
+          [ 'a' -> print (strip_spaces (s_getenv conf.env "anon"))
+          | 'b' -> for_all_db conf print strm
+          | 'c' -> print (Filename.concat "." conf.comm)
+          | 'd' -> print conf.comm
+          | 'e' ->
+              do print "lang=";
+                 print conf.lang;
+                 List.iter
+                   (fun (k, s) ->
+                      if k = "opt" then ()
+                      else
+                        do print ";";
+                           print k;
+                           print "=";
+                           print s;
+                        return ())
+                   conf.env;
+              return ()
+          | 'g' -> print (Filename.concat "." "gwd")
+          | 'h' ->
+              do print "<input type=hidden name=lang value=";
+                 print conf.lang;
+                 print ">\n";
+                 List.iter
+                   (fun (k, s) ->
+                      if k = "opt" then ()
+                      else
+                        do print "<input type=hidden name=";
+                           print k;
+                           print " value=\"";
+                           print (decode_varenv s);
+                           print "\">\n";
+                        return ())
+                   conf.env;
+              return ()
+          | 'l' -> print conf.lang
+          | 'o' -> print (strip_spaces (s_getenv conf.env "o"))
+          | 'p' -> print (parameters conf.env)
+          | 'w' -> print (Sys.getcwd ())
+          | 'z' -> print (string_of_int port)
+          | '$' -> print "$"
+          | c -> do print "BAD MACRO "; print (String.make 1 c); return () ]
+      | c -> print (String.make 1 c) ];
+    done
+  with
+  [ Stream.Failure -> () ]
+and for_all_db conf print strm =
+  match Stream.next strm with
   [ '{' ->
       let s =
         loop 0 where rec loop len =
-          let c = input_char ic in
-          if c = '}' then get_buff len
-          else loop (store len c)
+          match Stream.next strm with
+          [ '}' -> get_buff len
+          | c -> loop (store len c) ]
       in
       let dh = Unix.opendir "." in
       try
@@ -160,45 +220,14 @@ value for_all_db conf ic =
           let e = Unix.readdir dh in
           if Filename.check_suffix e ".gwb" then
             let db = Filename.chop_suffix e ".gwb" in
-            do apply s db;
-               Wserver.wprint "\n";
+            let conf = {(conf) with env = [("anon", db) :: conf.env]} in
+            do copy_from_stream conf print (Stream.of_string s);
+               print "\n";
             return ()
           else ();
         done
       with [ End_of_file -> Unix.closedir dh ]
   | _ -> () ]
-;
-
-value copy_from_channel conf ic =
-  try
-    while True do
-      match input_char ic with
-      [ '$' ->
-          let c = input_char ic in
-          match c with
-          [ 'a' -> Wserver.wprint "%s" (strip_spaces (getenv conf.env "anon"))
-          | 'b' -> for_all_db conf ic
-          | 'c' -> Wserver.wprint "%s" (Filename.concat "." conf.comm)
-          | 'd' -> Wserver.wprint "%s" conf.comm
-          | 'e' ->
-              do Wserver.wprint "lang=%s" conf.lang;
-                 List.iter
-                   (fun (k, s) ->
-                      if k = "opt" then ()
-                      else Wserver.wprint ";%s=%s" k s)
-                   conf.env;
-              return ()
-          | 'g' -> Wserver.wprint "%s" (Filename.concat "." "gwd")
-          | 'l' -> Wserver.wprint "%s" conf.lang
-          | 'o' -> Wserver.wprint "%s" (strip_spaces (getenv conf.env "o"))
-          | 'p' -> Wserver.wprint "%s" (parameters conf.env)
-          | 's' -> Wserver.wprint "setup?lang=%s;" conf.lang
-          | 'w' -> Wserver.wprint "%s" (Sys.getcwd ())
-          | c -> Wserver.wprint "$%c" c ]
-    | c -> Wserver.wprint "%c" c ];
-    done
-  with
-  [ End_of_file -> close_in ic ]
 ;
 
 value print_file conf fname =
@@ -207,7 +236,9 @@ value print_file conf fname =
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       do Wserver.html "";
-         copy_from_channel conf ic;
+         copy_from_stream conf (fun x -> Wserver.wprint "%s" x)
+           (Stream.of_channel ic);
+         close_in ic;
          trailer ();
       return ()
   | _ ->
@@ -220,9 +251,9 @@ value print_file conf fname =
       return raise Exit ]
 ;
 
-value error () =
-  do header (fun _ -> Wserver.wprint "Internal error");
-     Wserver.wprint "Please report.\n";
+value error str =
+  do header (fun _ -> Wserver.wprint "Incorrect request");
+     Wserver.wprint "<em>%s</em>\n" (String.capitalize str);
      trailer ();
   return ()
 ;
@@ -241,8 +272,8 @@ value setup_gen conf =
   [ Some "H" ->
       match p_getenv conf.env "v" with
       [ Some fname -> print_file conf fname
-      | _ -> error () ]
-  | _ -> error () ]
+      | _ -> error "request needs \"v\" parameter" ]
+  | _ -> error "unknown mode" ]
 ;
 
 value out_check conf =
@@ -252,6 +283,28 @@ value out_check conf =
     | _ -> "" ]
   in
   if out = "" then print_file conf "missing.html"
+  else if not (good_name out) then print_file conf "incorrect.html"
+  else if Sys.file_exists (out ^ ".gwb") then print_file conf "conflict.html"
+  else print_file conf "create.html"
+;
+
+value start_check conf =
+  let ged =
+    match p_getenv conf.env "anon" with
+    [ Some f -> strip_spaces f
+    | None -> "" ]
+  in
+  let out =
+    match p_getenv conf.env "o" with
+    [ Some f -> strip_spaces f
+    | _ -> "" ]
+  in
+  let conf =
+    if ged = "" then {(conf) with comm = "gwc"}
+     else {(conf) with comm = "ged2gwb"}
+  in
+  if ged <> "" && not (Sys.file_exists ged) then print_file conf "unknown.html"
+  else if out = "" then print_file conf "missing.html"
   else if not (good_name out) then print_file conf "incorrect.html"
   else if Sys.file_exists (out ^ ".gwb") then print_file conf "conflict.html"
   else print_file conf "create.html"
@@ -272,6 +325,16 @@ value ged2gwb_check conf =
   else out_check conf
 ;
 
+value consang_check conf =
+  let in_f =
+    match p_getenv conf.env "anon" with
+    [ Some f -> strip_spaces f
+    | None -> "" ]
+  in
+  if in_f = "" then print_file conf "missing_gwb.html"
+  else print_file conf "input.html"
+;
+
 value exec_f comm =
   let s = comm ^ " > comm.log" in
   do Printf.eprintf "> cd %s\n" (Sys.getcwd ());
@@ -282,13 +345,22 @@ value exec_f comm =
   Sys.command s
 ;
 
-value exec_command conf =
+value exec_command_out conf =
   let rc =
     exec_f (Filename.concat "." conf.comm ^ parameters conf.env)
   in
   if rc = 1 then print_file conf "warnings.html"
   else if rc > 1 then print_file conf "error.html"
   else print_file conf "created.html"
+;
+
+value exec_command_in conf =
+  let rc =
+    exec_f (Filename.concat "." conf.comm ^ parameters conf.env)
+  in
+  if rc = 1 then print_file conf "warnings.html"
+  else if rc > 1 then print_file conf "error.html"
+  else print_file conf "input_ok.html"
 ;
 
 value has_gwb_directories dh =
@@ -304,19 +376,24 @@ value has_gwb_directories dh =
 value setup_comm conf =
   fun
   [ "setup" -> setup_gen conf
+  | "start" -> start_check conf
   | "gwc" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> gwc_check conf
-      | _ -> exec_command conf ]
+      | _ -> exec_command_out conf ]
   | "ged2gwb" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> ged2gwb_check conf
-      | _ -> exec_command conf ]
+      | _ -> exec_command_out conf ]
+  | "consang" ->
+      match p_getenv conf.env "opt" with
+      [ Some "check" -> consang_check conf
+      | _ -> exec_command_in conf ]
   | "list" ->
       let dh = Unix.opendir "." in
       if has_gwb_directories dh then print_file conf "list.html"
       else print_file conf "nolist.html"
-  | _ -> error () ]
+  | x -> error ("bad command: \"" ^ x ^ "\"") ]
 ;
 
 value setup (addr, req) str =
@@ -329,12 +406,10 @@ value setup (addr, req) str =
     [ Not_found -> (str, "") ]
   in
   let env = create_env env_str in
-  if env = [] then
+  if env = [] && (comm = "" || String.length comm = 2) then
     let lang = if comm = "" then default_lang else String.uncapitalize comm in
-    if String.length lang = 2 then
-      let conf = {lang = lang; comm = ""; env = env} in
-      print_file conf "index.html"
-    else error ()
+    let conf = {lang = lang; comm = ""; env = env} in
+    print_file conf "index.html"
   else
     let (lang, env) =
       match p_getenv env "lang" with
@@ -350,18 +425,16 @@ value wrap_setup a b =
   [ Exit -> () ]
 ;
 
-value copy_text fname =
+value copy_text lang fname =
   let dir = setup_dir.val in
   let fname = Filename.concat dir fname in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
-      try
-        while True do
-          let c = input_char ic in
-          Printf.printf "%c" c;
-        done
-      with
-      [ End_of_file -> do flush stdout; return close_in ic ]
+      let conf = {lang = lang; comm = ""; env = []} in
+      do copy_from_stream conf print_string (Stream.of_channel ic);
+         flush stdout;
+         close_in ic;
+      return ()
   | _ ->
       do Printf.printf "\nCannot access file \"%s\".\n" fname;
          Printf.printf "Type \"Enter\" to exit\n? ";
@@ -375,12 +448,12 @@ value root_dir = ref "gw";
 
 value intro () =
   do Sys.chdir root_dir.val;
-     copy_text "intro.txt";
+     copy_text "" "intro.txt";
      let lang =
        let x = input_line stdin in
        if x = "" then default_lang else x
      in
-     copy_text (Filename.concat lang "intro.txt");
+     copy_text lang (Filename.concat lang "intro.txt");
   return ()
 ;
 
@@ -388,7 +461,7 @@ value main () =
   do ifdef UNIX then intro ()
      else
        try let _ = Sys.getenv "WSERVER" in () with [ Not_found -> intro () ];
-     Wserver.f 2318 0 None (None, None) wrap_setup;
+     Wserver.f 2316 0 None (None, None) wrap_setup;
   return ()
 ;
 

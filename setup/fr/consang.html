@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>Calcul de consanguinit&eacute;</title></head>
+
+<body>
+
+<h1>Calcul de consanguinit&eacute;</h1>
+
+<form mode=GET action="consang">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+<input type=hidden name=q value=on>
+
+S&eacute;lectionnez votre base de donn&eacute;es:
+
+<p>
+
+<dl><dd><table border=1>
+
+$b{<tr><td><input type=radio name=anon value="$a"></td><td> $a </td></tr>}
+
+</table></dl>
+
+<p>
+
+Puis appuyez sur ce bouton:
+
+<p>
+
+<dl><dd><input type=submit value="Consang"></dl>
+
+</form>
