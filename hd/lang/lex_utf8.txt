@@ -1,4 +1,4 @@
-# $Id: lex_utf8.txt,v 1.16 2005-03-08 12:41:47 ddr Exp $
+# $Id: lex_utf8.txt,v 1.17 2005-03-14 10:59:49 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !dates order
@@ -5595,6 +5595,7 @@ cs: měsíční fáze/nov/první čtvrt'/úplněk/poslední čtvrt'
 de: Mondalter/Neumond/erstes Viertel/Vollmond/letztes Viertel
 en: moon age/new moon/first quarter/full moon/last quarter
 fr: &acirc;ge de la lune/nouvelle lune/premier quartier/pleine lune/dernier quartier
+pt-br: idade lunar/lua nova/lua crescente/lua cheia/lua minguante
 
     more than %d answers
 af: meer as %d antwoorde
@@ -7789,6 +7790,7 @@ fr: les %d couples les plus anciens peut-&ecirc;tre encore vivants et fianc&eacu
 nl: De %d langst paren die mogelijk nog steeds leven en getrouwd zijn
 pl: %d najstarsza para prawdopodobnie jeszcze zyje i pozostaje zareczona
 pt: o %d mais velho casal talvez ainda vivo e noivado
+pt-br: os %d mais velhos casais talvez ainda vivos
 ro: Cei %d mai virstnici perechi logoditi probabil inca in viata
 sv: de %d &auml;ldsta nu levande paren som kanske fortfarande &auml;r f&ouml;rlovade
 
