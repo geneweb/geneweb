@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.21 2001-02-10 11:33:05 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.22 2001-02-10 22:05:37 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -301,9 +301,9 @@ value print_marriage conf base fam =
      Wserver.wprint "<input type=radio name=mrel value=engaged%s>"
        (match fam.relation with [ Engaged -> " checked" | _ -> "" ]);
      Wserver.wprint "%s\n" (capitale (transl conf "engaged"));
-     Wserver.wprint "<input type=radio name=mrel value=gay%s>"
-       (match fam.relation with [ Gay -> " checked" | _ -> "" ]);
-     Wserver.wprint "%s\n" (capitale (transl conf "gay"));
+     Wserver.wprint "<input type=radio name=mrel value=nsck%s>"
+       (match fam.relation with [ NoSexesCheck -> " checked" | _ -> "" ]);
+     Wserver.wprint "%s\n" (capitale (transl conf "no sexes check"));
      tag "table" "border=1" begin
        tag "tr" begin
          tag "td" begin

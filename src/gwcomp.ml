@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.15 2001-02-10 11:04:58 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.16 2001-02-10 22:05:37 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -483,14 +483,14 @@ value get_mar_date str =
         match l with
         [ ["#nm" :: l] -> ((NotMarried, Male, Female), l)
         | ["#eng" :: l] -> ((Engaged, Male, Female), l)
-        | ["#gay"; c :: l] when String.length c = 2 ->
+        | ["#sex"; c :: l] when String.length c = 2 ->
             let decode_sex i =
               match c.[i] with
               [ 'm' -> Male
               | 'f' -> Female
               | _ -> Neuter ]
             in
-            ((Gay, decode_sex 0, decode_sex 1), l)
+            ((NoSexesCheck, decode_sex 0, decode_sex 1), l)
         | _ -> ((Married, Male, Female), l) ]
       in
       let (place, l) = get_field "#mp" l in

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.39 2001-02-10 11:04:54 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.40 2001-02-10 22:05:35 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1518,7 +1518,7 @@ value add_fam_norm gen r adop_list =
         let u =
           match find_field "TYPE" r.rsons with
           [ Some r ->
-              if String.uncapitalize r.rval = "gay" then Gay else u
+              if String.uncapitalize r.rval = "gay" then NoSexesCheck else u
           | None -> u ]
         in
         let d =
@@ -2111,7 +2111,7 @@ value check_parents_sex base =
     let fam = base.data.families.get i in
     let fath = poi base cpl.father in
     let moth = poi base cpl.mother in
-    if fam.relation = Gay then ()
+    if fam.relation = NoSexesCheck then ()
     else if fath.sex = Female || moth.sex = Male then
       do Printf.fprintf log_oc.val "Bad sex for parents\n";
          Printf.fprintf log_oc.val "- father: %s (sex: %s)\n"

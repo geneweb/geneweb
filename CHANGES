@@ -2,8 +2,9 @@ GeneWeb version 3.12
 --------------------
 
 * GeneWeb server or CGI (gwd)
-  - [10 Feb 01] Added gay marriage: in this case, parents sexes are not
-    checked.
+  - [10 Feb 01] In family update form, added button "no sexes check"
+    allowing 1/ to create gay marriages 2/ to fix parents sex inversion
+    without having to delete the marriage.
   - [10 Feb 01] For the perso.txt template file, added the macros
     %father_age_at_birth; and %mother_age_at_birth;
 
