@@ -11,6 +11,7 @@
 %t has incorrect title dates: %t
 %t is born after the death of his/her mother %t
 %t is born more than 2 years after the death of his/her father %t
+%t's sex is not coherent with his/her relations
 (date)
 (decimal separator)
 (french month)

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.17 2000-11-05 10:17:24 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.18 2000-11-11 12:50:48 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -436,6 +436,7 @@ type base_error = error person;
 
 type warning 'person =
   [ BirthAfterDeath of 'person
+  | IncoherentSex of 'person
   | ChangedOrderOfChildren of ifam and descend and array iper
   | ChildrenNotInOrder of ifam and descend and 'person and 'person
   | DeadTooEarlyToBeFather of 'person and 'person
@@ -627,6 +628,38 @@ value titles_after_birth base warning p t =
   return ()
 ;
 
+value sex_is_coherent base warning p_ref =
+  let p_index = Some p_ref.cle_index in
+  let merge_sex g1 g2 =
+    match (g1, g2) with
+    [ (Some Male, Some Male) -> Some Male
+    | (Some Female, Some Female) -> Some Female
+    | (Some Neuter, Some g) -> Some g
+    | (Some g, Some Neuter) -> Some g
+    | _ -> None ]
+  in
+  let check_sex sex rparents =
+    List.fold_left
+      (fun g rel ->
+         match (p_index = rel.r_fath, p_index = rel.r_moth) with
+         [ (True, False) -> merge_sex g (Some Male)
+         | (False, True) -> merge_sex g (Some Female)
+         | (False, False) -> g
+         | (True, True) -> None ])
+      sex rparents
+  in
+  let new_sex =
+    List.fold_left
+      (fun g ip ->
+         let p = poi base ip in
+         check_sex g p.rparents )
+      (Some p_ref.sex) p_ref.related
+  in
+  match new_sex with
+  [ Some g -> if p_ref.sex != g then p_ref.sex := g else () 
+  | None -> warning (IncoherentSex p_ref) ]
+;
+
 value check_normal_marriage_date_for_someone base error warning fam ip =
   let p = poi base ip in
   match Adef.od_of_codate fam.marriage with
@@ -734,6 +767,7 @@ value check_family base error warning fam cpl des =
 value check_person base error warning p =
   do birth_before_death base warning p;
      List.iter (titles_after_birth base warning p) p.titles;
+     sex_is_coherent base warning p;
   return ()
 ;
 

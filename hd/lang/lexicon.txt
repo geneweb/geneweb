@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.180 2000-11-09 12:20:57 ddr Exp $
+# $Id: lexicon.txt,v 3.181 2000-11-11 12:50:44 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -278,6 +278,10 @@ no: %t er f&oslash;dt mer enn 2 &aring;r etter sin fars d&oslash;d %t
 pt: %t nasceu mais de 2 anos depois do &oacute;bito do pai
 ru: %t נמהטכסÿ במכוו, קול קונוח 2 דמהא ןמסכו סלונעט ודמ/וו מעצא %t
 se: %t &auml;r f&ouml;dd mer &auml;n 2 &aring;r efter att sin egen far dog %t
+
+    %t's sex is not coherent with his/her relations
+en: %t's sex is not coherent with his/her relations
+fr: le sexe de %t n'est pas coh&eacute;rent avec ses relations
 
     (date)
 af: 1 %m %y/%d %m %y/%m %y/%y 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.18 2000-10-24 15:47:16 ddr Exp $ *)
+(* $Id: update.ml,v 3.19 2000-11-11 12:50:49 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -221,6 +221,10 @@ value print_warning conf base =
            do print_someone_strong conf base p;
               Date.afficher_dates_courtes conf base p;
            return ())
+  | IncoherentSex p ->
+      Wserver.wprint
+        (ftransl conf "%t's sex is not coherent with his/her relations")
+        (fun _ -> print_someone_strong conf base p)
   | ChangedOrderOfChildren ifam des before ->
       let cpl = coi base ifam in
       let fath = poi base cpl.father in
