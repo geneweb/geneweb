@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 4.2 2001-04-08 03:54:25 ddr Exp $
+# $Id: geneweb.spec,v 4.3 2002-02-04 18:36:37 ddr Exp $
 
 Summary: Genealogy software with a Web interface
 Name: geneweb
@@ -10,6 +10,7 @@ Group: Applications
 Source: ftp://ftp.inria.fr/INRIA/Projects/cristal/geneweb/Src/geneweb-%{version}.tar.gz
 URL: http://cristal.inria.fr/~ddr/GeneWeb/
 Packager: Daniel de Rauglaudre <daniel.de_rauglaudre@inria.fr>
+Prereq: ocaml => 3.04
 # Requires: ld-linux.so.2 libc.so.6 libm.so.6 libm.so.6(GLIBC_2.1) libm.so.6(GLIBC_2.0) libc.so.6(GLIBC_2.1) libc.so.6(GLIBC_2.0)
 BuildRoot: /tmp/%{name}-%{version}
 

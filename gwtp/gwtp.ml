@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.15 2002-01-30 13:59:18 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.16 2002-02-04 18:36:59 ddr Exp $ *)
 (* (c) Copyright 2002 INRIA *)
 
 open Printf;
@@ -803,6 +803,52 @@ value gwtp_print_log str env b tok =
   }  
 ;
 
+value gwtp_print_accesses of_wizards str env b tok =
+  do {
+    printf "content-type: text/html";
+    crlf ();
+    crlf ();
+    printf "\
+<head><title>Gwtp - %s</title></head>
+<body>
+<h1 align=center>Gwtp - %s</h1>
+" b b;
+    let (varenv, filenv) = get_base_conf env b in
+    let fname =
+      try
+        List.assoc
+          (if of_wizards then "wizard_passwd_file" else "friend_passwd_file")
+          varenv
+      with [ Not_found -> "" ]
+    in
+    let fname =
+      if fname <> "" then ""
+      else
+        List.fold_right Filename.concat [gwtp_dst.val; "cnt"]
+          (b ^ (if of_wizards then "_w.txt" else "_f.txt"))
+    in
+    printf "<pre>\n";
+    if fname = "" then printf "[no password file]\n"
+    else
+      try
+        do {
+          let ic = open_in fname in
+          try
+            while True do {
+              output_char stdout (input_char ic);
+            }
+          with
+          [ End_of_file -> () ];
+          close_in ic;
+        }
+      with
+      [ Sys_error _ -> printf "[nothing]\n" ];
+    printf "</pre>\n";
+    printf_link_to_main b tok;
+    printf "</body>\n";
+  }  
+;
+
 (* Actions *)
 
 value send_file str env b tok f fname =
@@ -1167,6 +1213,8 @@ value gwtp () =
     | Some "RECV" -> gwtp_logged from str env gwtp_receive
     | Some "SCNF" -> gwtp_logged from str env gwtp_setconf
     | Some "LOG" -> gwtp_logged from str env gwtp_print_log
+    | Some "ACCW" -> gwtp_logged from str env (gwtp_print_accesses True)
+    | Some "ACCF" -> gwtp_logged from str env (gwtp_print_accesses False)
     | Some _ -> gwtp_invalid_request str env
     | None -> gwtp_login str env ];
     flush stdout;
