@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.21 2001-03-03 20:59:19 ddr Exp $
+# $Id: geneweb.spec,v 3.22 2001-03-10 18:07:54 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -144,8 +144,8 @@ rm -rf doc etc images lang setup gwtp_tmp
 %attr(755, root, root) /etc/rc.d/init.d/gwd
 %attr(644, root, root) /etc/logrotate.d/gwd
 /home/geneweb/gw/LICENSE.txt
-/home/geneweb/gw/LISEZMOI.htm
-/home/geneweb/gw/README.htm
+/home/geneweb/gw/LISEZMOI.txt
+/home/geneweb/gw/README.txt
 /home/geneweb/gw/gw/CHANGES.txt
 /home/geneweb/gw/gw/INSTALL.htm
 /home/geneweb/gw/gw/LICENSE.txt
