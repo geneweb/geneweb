@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 3.3 2000-09-25 15:50:04 ddr Exp $ *)
+(* $Id: check.ml,v 3.4 2000-11-11 12:50:48 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -40,6 +40,9 @@ value print_base_warning base =
   fun
   [ BirthAfterDeath p ->
       Printf.printf "%s\n  born after his/her death\n" (denomination base p)
+  | IncoherentSex p ->
+      Printf.printf "%s\n  sex not coherent with relations\n"
+        (denomination base p)
   | ChangedOrderOfChildren ifam des _ ->
       let cpl = coi base ifam in
       Printf.printf "changed order of children of %s and %s\n"

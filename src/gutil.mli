@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 3.8 2000-11-05 10:17:25 ddr Exp $ *)
+(* $Id: gutil.mli,v 3.9 2000-11-11 12:50:49 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -66,6 +66,7 @@ type base_error = error person;
 
 type warning 'person =
   [ BirthAfterDeath of 'person
+  | IncoherentSex of 'person
   | ChangedOrderOfChildren of ifam and descend and array iper
   | ChildrenNotInOrder of ifam and descend and 'person and 'person
   | DeadTooEarlyToBeFather of 'person and 'person

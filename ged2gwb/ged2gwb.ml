@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.34 2000-11-05 10:17:16 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.35 2000-11-11 12:50:42 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1646,6 +1646,9 @@ value print_base_warning base =
   fun
   [ BirthAfterDeath p ->
       Printf.fprintf log_oc.val "%s\n  born after his/her death\n"
+        (denomination base p)
+  | IncoherentSex p ->
+      Printf.printf "%s\n  sex not coherent with relations\n"
         (denomination base p)
   | ChangedOrderOfChildren ifam des _ ->
       let cpl = coi base ifam in
