@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 1.3 1998-12-16 17:36:36 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 1.4 1998-12-30 08:41:54 ddr Exp $ *)
 
 open Gutil;
 open Def;
@@ -18,7 +18,14 @@ value print_result base tab =
        done;
     return
     if m_list.val <> [] then
-      do Num.print print_string "." m_val.val;
+      do m_list.val :=
+           let f i =
+             let p = base.data.persons.get i in
+             Name.abbrev
+               (Name.lower (sou base p.surname ^ " " ^ sou base p.first_name))
+           in
+           Sort.list (fun i1 i2 -> f i1 <= f i2) m_list.val;
+         Num.print print_string "." m_val.val;
          print_newline ();
          List.iter
            (fun i ->
