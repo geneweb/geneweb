@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.8 2005-01-04 00:42:46 ddr Exp $ *)
+(* $Id: alln.ml,v 4.9 2005-02-10 05:20:18 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -69,7 +69,9 @@ value combine_by_count list =
 ;
 
 value alphab_string conf is_surname s =
-  if is_surname then surname_end s ^ surname_begin s else s
+  if Gutil.utf_8_db.val then s
+  else if is_surname then surname_end s ^ surname_begin s
+  else s
 ;
 
 (* print *)
@@ -94,6 +96,28 @@ value print_title conf base is_surnames ini len =
   }
 ;
 
+value displayify s =
+  if Gutil.utf_8_db.val then
+    loop 0 0 where rec loop i len =
+      if i = String.length s then Buff.get len
+      else
+        let c = Char.code s.[i] in
+        let nbc =
+          if c < 0b10000000 then 1
+          else if c < 0b10000000 then -1
+          else if c < 0b11100000 then 2
+          else if c < 0b11110000 then 3
+          else if c < 0b11111000 then 4
+          else if c < 0b11111100 then 5
+          else if c < 0b11111110 then 6
+          else -1
+        in
+        if nbc < 0 || i + nbc > String.length s then
+          Buff.get (Buff.mstore len "...")
+        else loop (i + nbc) (Buff.gstore len s i nbc)
+  else String.capitalize s
+;
+
 value print_alphabetic_big conf base is_surnames ini list len =
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
@@ -102,8 +126,10 @@ value print_alphabetic_big conf base is_surnames ini list len =
     tag "p" begin
       List.iter
         (fun (ini_k, _) ->
-           stagn "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode ini_k begin
-             Wserver.wprint "%s" (String.capitalize ini_k);
+           stagn "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode
+	     (Util.code_varenv ini_k)
+	   begin
+             Wserver.wprint "%s" (displayify ini_k);
            end)
         list;
     end;
@@ -173,6 +199,22 @@ value print_alphabetic_all conf base is_surnames ini list len =
   }
 ;
 
+value lower_if_not_utf8 s =
+  if Gutil.utf_8_db.val then s else Name.lower s
+;
+
+value capitalize_if_not_utf8 s =
+  if Gutil.utf_8_db.val then s else String.capitalize s
+;
+
+value lowercase_if_not_utf8 s =
+  if Gutil.utf_8_db.val then s else String.lowercase s
+;
+
+value name_key_if_not_utf8 s =
+  if Gutil.utf_8_db.val then s else Iobase.name_key s
+;
+
 value print_alphabetic_small conf base is_surnames ini list len =
   let title _ = print_title conf base is_surnames ini len in
   let mode = if is_surnames then "N" else "P" in
@@ -185,7 +227,7 @@ value print_alphabetic_small conf base is_surnames ini list len =
           (fun (_, s, cnt) ->
              stagn "li" begin
                stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
-                   (code_varenv (Name.lower s))
+                 (code_varenv (lower_if_not_utf8 s))
                begin
                  Wserver.wprint "%s" (alphab_string conf is_surnames s);
                end;
@@ -241,13 +283,13 @@ value select_names conf base is_surnames ini =
       else ini
     in
     match
-      try Some (iii.cursor (String.capitalize start_k)) with
+      try Some (iii.cursor (capitalize_if_not_utf8 start_k)) with
       [ Not_found -> None ]
     with
     [ Some istr ->
         loop istr [] where rec loop istr list =
           let s = nominative (sou base istr) in
-          let k = Iobase.name_key s in
+          let k = name_key_if_not_utf8 s in
           if string_start_with ini k then
             let list =
               if s <> "?" then
@@ -313,7 +355,7 @@ value print_frequency conf base is_surnames =
 value print_alphabetic conf base is_surnames =
   let ini =
     match p_getenv conf.env "k" with
-    [ Some k -> String.lowercase k
+    [ Some k -> lowercase_if_not_utf8 k
     | _ -> "" ]
   in
   let fast =
