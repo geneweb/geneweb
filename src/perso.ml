@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.14 1998-12-05 13:29:48 ddr Exp $ *)
+(* $Id: perso.ml,v 1.15 1998-12-06 10:28:33 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -513,8 +513,9 @@ value find_sosa conf base a p =
         else if mark.(Adef.int_of_iper ip) then gene_find zil
         else
           do mark.(Adef.int_of_iper ip) := True; return
-          if tstab.(Adef.int_of_iper ip) > tstab.(Adef.int_of_iper a.cle_index)
-          then gene_find zil
+          if tstab.(Adef.int_of_iper a.cle_index) <=
+               tstab.(Adef.int_of_iper ip) then
+            gene_find zil
           else
             let asc = aoi base ip in
             match asc.parents with
@@ -766,6 +767,10 @@ value print conf base p =
               (Gutil.person_misc_names base p);
             Wserver.wprint "</ol>\n";
          return ()
+     | Some "tstab_val" ->
+         let tstab = Util.create_topological_sort conf base in
+         Wserver.wprint "<p>Tstab val = %d\n"
+           tstab.(Adef.int_of_iper p.cle_index)
      | _ -> () ];
      trailer conf;
   return ()
