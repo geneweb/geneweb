@@ -44,6 +44,7 @@ GeneWeb version 3.03
     private data is better protected).
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
+  - [10 Mar 00] Changed some Finnish translations (Antti Alfthan)
   - [14 Feb 00] Changed the term "place" of nobility titles into "estate"
     ("domaine" in French), to avoid the confusion with the "place" of
     "birth", "death", and so on. Changed also "all the places" into
