@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1.1.1 1998-09-01 14:32:01 ddr Exp $
+# $Id: Makefile,v 1.2 1998-09-02 11:58:55 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -20,12 +20,12 @@ distrib:
 	$(RM) -rf distribution
 	mkdir distribution
 	cp CHANGES LICENCE distribution/.
-	cp src/gwc.opt distribution/gwc$(EXE)
-	cp src/consang.opt distribution/consang$(EXE)
+	cp src/lgwc distribution/gwc$(EXE)
+	cp src/lconsang distribution/consang$(EXE)
 	cp src/lgwd distribution/gwd$(EXE)
-	cp src/gwu.opt distribution/gwu$(EXE)
-	cp ged2gwb/ged2gwb.opt distribution/ged2gwb$(EXE)
-	cp gwb2ged/gwb2ged.opt distribution/gwb2ged$(EXE)
+	cp src/lgwu distribution/gwu$(EXE)
+	cp ged2gwb/lged2gwb distribution/ged2gwb$(EXE)
+	cp gwb2ged/lgwb2ged distribution/gwb2ged$(EXE)
 	cp etc/ALIRE.txt distribution/.
 	cp etc/README.txt distribution/.
 	mkdir distribution/doc
