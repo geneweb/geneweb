@@ -5,16 +5,16 @@ GeneWeb Version 1.09
   - Added error message in relationship computing when loop in database.
   - Fixed still several bugs (accents) due to new ANSEL encoding
   - [detail] Added text "Parents of" in displaying missing ancestors.
-  - Added ability to write "I" instead of "Ier" (french form).
+  - In "search", added ability to write "I" instead of "Ier" (french form).
     Ex: "Charles I" or "Charles Ier" are both accepted.
+  - Added ability to add ";opt=no_index" at end of requests to get an
+    equivalent link independant from the persons' index number.
 
 * a.cnf:
   - Added "wizard_just_friend" in .cnf files to suspend the powers of wizards.
 
 * gwc, consang:
   - Fixed accents displaying in traces and error messages.
-  - Added ability to add ";opt=no_index" at end of requests to get an
-    equivalent link independant from the persons' index number.
 
 * ged2gwb, gwb2ged:
   - Added save and restore of the GeneWeb fields
@@ -29,12 +29,11 @@ GeneWeb Version 1.09
 
 * ged2gwb:
   - Delete of duplicated FAMS which sometimes happen in erroneous Gedcoms.
-  - Delete families from GEDCOM when parents dont have the good sex..
-  - Added displaying of line number (approximative) when unrecognized dates
+  - Delete families from GEDCOM when parents dont have the good sex.
+  - Added displaying of line number when syntax errors and unrecognized dates
   - Get sources if pointer (but just the 1st line)
-  - Syntax error messages give the source line input
   - Added option "-no_nd" (no negative dates), not to interpret years preceded
-    by a minus sign as a negative date
+    by a minus sign as negative dates
 
 GeneWeb Version 1.08
 --------------------
