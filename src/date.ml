@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 1.5 1998-11-27 20:09:40 ddr Exp $ *)
+(* $Id: date.ml,v 1.6 1998-11-27 23:10:02 ddr Exp $ *)
 
 open Def;
 open Util;
@@ -45,11 +45,7 @@ value string_of_ondate conf d =
       else if d.day = 0 then transl conf "in (month year)" ^ nbsp ^ sy
       else transl conf "on (day month year)" ^ nbsp ^ sy
   | About | Before | After ->
-      let s =
-        if d.day = 0 && d.month = 0 then sy
-        else if d.day = 0 then sy
-        else transl conf "on (day month year)" ^ nbsp ^ sy
-      in
+      let s = sy in
       if d.prec = About then transl conf "about (date)" ^ nbsp ^ s
       else if d.prec = Before then transl conf "before (date)" ^ nbsp ^ s
       else transl conf "after (date)" ^ nbsp ^ s
