@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.44 2000-05-14 19:59:39 ddr Exp $ *)
+(* $Id: util.ml,v 3.45 2000-05-15 05:40:41 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1584,7 +1584,7 @@ value relation_txt conf sex fam =
   match fam.relation with
   [ NotMarried -> ftransl conf "relationship%t to"
   | Married -> ftransl_nth conf "married%t to" is
-  | Engaged -> ftransl_nth conf "engaged%t with" is ]
+  | Engaged -> ftransl_nth conf "engaged%t to" is ]
 ;
 
 (* Deprecated *)
