@@ -1,9 +1,9 @@
-(* $Id: main.ml,v 1.1 2001-06-03 14:33:51 ddr Exp $ *)
+(* $Id: main.ml,v 1.2 2001-06-07 11:51:36 ddr Exp $ *)
 
 open Dag2html;
 open Printf;
 
-value version = "1.01";
+value version = "1.02-exp";
 
 (* input dag *)
 

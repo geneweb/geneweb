@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 1.1 2001-06-03 14:33:50 ddr Exp $ *)
+(* $Id: dag2html.ml,v 1.2 2001-06-07 11:51:36 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -529,6 +529,7 @@ value equilibrate t =
 value group_elem t =
   for i = 0 to Array.length t.table - 2 do {
     for j = 1 to Array.length t.table.(0) - 1 do {
+(*
       let x =
         match t.table.(i + 1).(j - 1).elem with
         [ Elem x -> Some x
@@ -539,8 +540,9 @@ value group_elem t =
         [ Elem x -> Some x
         | _ -> None ]
       in
-      match (x, y) with
-      [ (Some x, Some y) when x = y ->
+*)
+      match (t.table.(i + 1).(j - 1).elem, t.table.(i + 1).(j).elem) with
+      [ (Elem x, Elem y) when x = y ->
           t.table.(i).(j).span := t.table.(i).(j - 1).span
       | _ -> () ]
     }
@@ -564,9 +566,13 @@ value group_ghost t =
       | _ -> () ];
       match (t.table.(i).(j - 1).elem, t.table.(i).(j).elem) with
       [ (Ghost x, Ghost _) ->
-          if t.table.(i + 1).(j - 1).elem = t.table.(i + 1).(j).elem then
+          if t.table.(i + 1).(j - 1).elem = t.table.(i + 1).(j).elem then do {
             t.table.(i).(j) :=
-              {elem = Ghost x; span = t.table.(i).(j - 1).span}
+              {elem = Ghost x; span = t.table.(i).(j - 1).span};
+            if i > 0 then
+              t.table.(i - 1).(j).span := t.table.(i - 1).(j - 1).span
+            else ()
+          }
           else ()
       | _ -> () ]
     }
