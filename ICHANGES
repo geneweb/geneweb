@@ -16,6 +16,11 @@ GeneWeb Version 2.03
     one returns an error code.
 
 * GeneWeb daemon/CGI (gwd)
+  - [Jun 2, 99] Deleted the "&nbsp;" added between "on" (or any preposition
+    before a date) and a date. Reasons: 1/ it was not absolutely necessary,
+    2/ there was a problem with the empty Swedish translation of "on (year)"
+    the translation of "dead on 1953" was "död &nbsp;1953" resulting on the
+    displaying of two spaces.
   - [May 23, 99] Deleted supposed unuseful code, particularly in MergeIndOk,
     to make code cleaner, hopefully not introducing bugs.
   - [May 23, 99] Added renitialization of field "consang" when modifying
