@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 3.4 1999-11-15 12:40:59 ddr Exp $
+# $Id: a.gwf,v 3.5 1999-12-17 00:19:24 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -25,6 +25,9 @@
 # body_prop=background="geneweb?m=IM;b=base;v=/foo.jpg"
 #   the file foo.jpg must be in the directory "images/base"
 #   "base" is the base's name
+
+# Highlight color
+highlight_color=#2f6400
 
 # Friend can see all dates
 # Choose a password or leave it empty

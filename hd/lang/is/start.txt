@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.11 1999-12-16 23:45:57 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.12 1999-12-17 00:19:30 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -17,7 +17,7 @@
 height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>Ættfræði <br>gagnagrunnur</font></h1>
+<h1><font color=%i>Ættfræði <br>gagnagrunnur</font></h1>
 </td>
 </tr>
 </table>
@@ -28,7 +28,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-Gagnagrunnurinn <font color=#2f6400><b>"%t"</b></font> er nú með %n
+Gagnagrunnurinn <font color=%i><b>"%t"</b></font> er nú með %n
 einstaklinga skráða.%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 
@@ -65,7 +65,7 @@ einstaklinga skráða.%In<br>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=#2f6400><b>eftir nafni</b></font>
+<font color=%i><b>eftir nafni</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -86,11 +86,11 @@ einstaklinga skráða.%In<br>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>eftir titli</b></font>%INl<br>%E
+<font color=%i><b>eftir titli</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>stað</b></font>%INl<br>%E
+<font color=%i><b>stað</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;p=*">[all the places]</a>)
 </td><td>
@@ -102,7 +102,7 @@ einstaklinga skráða.%In<br>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>eftir lista</b></font> yfir öll
+<font color=%i><b>eftir lista</b></font> yfir öll
 <select name=m>
 <option value="N" selected>eftirnöfn
 <option value="P">fornöfn
@@ -117,8 +117,8 @@ eftir
 
 <li>
 
-<font color=#2f6400><b>eftir </b></font>
-<a href="%sm=H;v=advanced"><font color=#2f6400><b>frekari
+<font color=%i><b>eftir </b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>frekari
 óskum</b></font></a>.
 
 </ul>

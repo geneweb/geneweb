@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.9 1999-12-16 23:45:56 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.10 1999-12-17 00:19:30 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -17,7 +17,7 @@
 height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 </td>
 <td align=right>
-<h1><font color=#2f6400>מאגר מידע <br> תולדותי </font></h1>
+<h1><font color=%i>מאגר מידע <br> תולדותי </font></h1>
 </td>
 </tr>
 </table>
@@ -28,7 +28,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 
 <p>
 
-במאגר המידע <font color=#2f6400><b>"%t"</b></font> יש %n אנשים.%In<br>
+במאגר המידע <font color=%i><b>"%t"</b></font> יש %n אנשים.%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 
 %I&NwNj<br><p>
@@ -63,7 +63,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=#2f6400><b>לפי שם או זהות</b></font>
+<font color=%i><b>לפי שם או זהות</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="חפס">
 <br>
@@ -84,11 +84,11 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>לפי תאר</b></font>%INl<br>%E
+<font color=%i><b>לפי תאר</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b> לפי מקום</b></font>%INl<br>%E
+<font color=%i><b> לפי מקום</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;p=*">[all the places]</a>)
 </td><td>
@@ -100,7 +100,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 
 <form method=GET action="%f" dir=rtl>
 %h
-<font color=#2f6400><b>רשימה</b></font> של כל שמות
+<font color=%i><b>רשימה</b></font> של כל שמות
 <select name=m>
 <option value="N" selected>  המשפחה
 <option value="P">  הפרטיים
@@ -115,8 +115,8 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 
 <li>
 
-<font color=#2f6400><b>ע"י </b></font>
-<a href="%sm=H;v=advanced"><font color=#2f6400><b>
+<font color=%i><b>ע"י </b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>
 בקשה מתקדמת</b></font></a>.
 
 </ul>
@@ -161,7 +161,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=right border=0 alt=GeneWeb></a>
 <li> <a href="%sm=HIST;k=10"> דיווח העדכונים </a>%E
 <li> <a href="%sm=CAL"> לוחות שנה </a>
 <li> <a href="%sm=FORUM"> דייון על מאגר המידה התולדותי
-<font color=#2f6400><b> %t </b></font></a>
+<font color=%i><b> %t </b></font></a>
 </ul>
 </td>
 </tr>

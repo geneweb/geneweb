@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.10 1999-12-16 23:45:53 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.11 1999-12-17 00:19:28 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title> Genealogio - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -17,7 +17,7 @@
 height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>Datenbazo<br>genealogia</font></h1>
+<h1><font color=%i>Datenbazo<br>genealogia</font></h1>
 </td>
 </tr>
 </table>
@@ -26,7 +26,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-La datenbazo <font color=#2f6400><b>"%t"</b></font> enhavas nune %n
+La datenbazo <font color=%i><b>"%t"</b></font> enhavas nune %n
 personojn.%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 
@@ -64,7 +64,7 @@ Por navigi en cxi datenbazo, vi povas fari via sercxo:<br><p>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=#2f6400><b>per persono</b></font>
+<font color=%i><b>per persono</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -85,11 +85,11 @@ or <em>Sosa number</em> relative to %a%E
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>per mosxto</b></font>%INl<br>%E
+<font color=%i><b>per mosxto</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>loko</b></font>%INl<br>%E
+<font color=%i><b>loko</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;p=*">[all the places]</a>)
 </td><td>
@@ -101,7 +101,7 @@ or <em>Sosa number</em> relative to %a%E
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>per la listo</b></font> de cxiuj
+<font color=%i><b>per la listo</b></font> de cxiuj
 <select name=m>
 <option value="N" selected>familinomoj
 <option value="P">personnomoj
@@ -116,8 +116,8 @@ per
 
 <li>
 
-<font color=#2f6400><b>per la</b></font>
-<a href="%sm=H;v=advanced"><font color=#2f6400><b>rekesto
+<font color=%i><b>per la</b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>rekesto
 progresata</b></font></a>.
 
 </ul>

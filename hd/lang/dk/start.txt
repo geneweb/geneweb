@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.13 1999-12-16 23:45:52 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.14 1999-12-17 00:19:26 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogi - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -17,7 +17,7 @@
 height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>Genealogisk<br>database</font></h1>
+<h1><font color=%i>Genealogisk<br>database</font></h1>
 </td>
 </tr>
 </table>
@@ -28,7 +28,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-Databasen <font color=#2f6400><b>"%t"</b></font> indeholder for
+Databasen <font color=%i><b>"%t"</b></font> indeholder for
 &oslash;jeblikket %n personer.%In<br>
 (<a href="%sm=NOTES">Noter</a>)%E
 
@@ -65,7 +65,7 @@ For at navigere i denne database kan du søge:<br><p>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=#2f6400><b>personnavn</b></font>
+<font color=%i><b>personnavn</b></font>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -86,11 +86,11 @@ eller <em>Sosa-nummer</em>, refererende til %a%E
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>titel (nob.)</b></font>%INl<br>%E
+<font color=%i><b>titel (nob.)</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>navn (nob.)</b></font>%INl<br>%E
+<font color=%i><b>navn (nob.)</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;p=*">[all the places]</a>)
 </td><td>
@@ -103,7 +103,7 @@ eller <em>Sosa-nummer</em>, refererende til %a%E
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>i liste</b></font> over alle
+<font color=%i><b>i liste</b></font> over alle
 <select name=m>
 <option value="N" selected>efternavne
 <option value="P">fornavne
@@ -117,8 +117,8 @@ sorteret efter
 </form>
 
 <li>
-<font color=#2f6400><b>ved</b></font>
-<a href="%sm=H;v=advanced"><font color=#2f6400><b>avanceret
+<font color=%i><b>ved</b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>avanceret
 søgning</b></font></a>.
 
 </ul>

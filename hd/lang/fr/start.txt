@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.12 1999-12-16 23:45:56 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.13 1999-12-17 00:19:29 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>G&eacute;n&eacute;alogie - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -17,7 +17,7 @@
 height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </td>
 <td align=left>
-<h1><font color=#2f6400>Base de
+<h1><font color=%i>Base de
 données<br>g&eacute;n&eacute;alogique</font></h1>
 </td>
 </tr>
@@ -29,7 +29,7 @@ données<br>g&eacute;n&eacute;alogique</font></h1>
 
 <p>
 
-La base de donn&eacute;es <font color=#2f6400><b>"%t"</b></font> contient
+La base de donn&eacute;es <font color=%i><b>"%t"</b></font> contient
 actuellement %n personnes.%In<br>
 (<a href="%sm=NOTES">[note/notes]1</a>)%E
 
@@ -67,7 +67,7 @@ votre recherche:<br><p>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
-<font color=#2f6400><b>par personne</b></font> <input name=n size=40
+<font color=%i><b>par personne</b></font> <input name=n size=40
 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -88,11 +88,11 @@ maxlength=200>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>par titre</b></font>%INl<br>%E
+<font color=%i><b>par titre</b></font>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>lieu</b></font>%INl<br>%E
+<font color=%i><b>lieu</b></font>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;p=*">[all the places]</a>)
 </td><td>
@@ -104,7 +104,7 @@ maxlength=200>
 
 <form method=GET action="%f">
 %h
-<font color=#2f6400><b>par la liste</b></font> de tous les
+<font color=%i><b>par la liste</b></font> de tous les
 <select name=m>
 <option value="N" selected> patronymes
 <option value="P"> pr&eacute;noms
@@ -119,8 +119,8 @@ par
 
 <li>
 
-<font color=#2f6400><b>par la</b></font>
-<a href="%sm=H;v=advanced"><font color=#2f6400><b>requ&ecirc;te
+<font color=%i><b>par la</b></font>
+<a href="%sm=H;v=advanced"><font color=%i><b>requ&ecirc;te
 &eacute;volu&eacute;e</b></font></a>.
 
 </ul>

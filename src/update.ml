@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.2 1999-11-10 08:44:35 ddr Exp $ *)
+(* $Id: update.ml,v 3.3 1999-12-17 00:19:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -849,11 +849,11 @@ value print conf base p =
        tag "tr" begin
          tag "th" "align=left" begin
            Wserver.wprint "%s<br>&nbsp;\n"
-             (std_color (capitale (transl_nth conf "person/persons" 0)));
+             (std_color conf (capitale (transl_nth conf "person/persons" 0)));
          end;
          tag "th" "align=left" begin
            Wserver.wprint "%s<br>&nbsp;\n"
-             (std_color (capitale (transl_nth conf "family/families" 1)));
+             (std_color conf (capitale (transl_nth conf "family/families" 1)));
          end;
        end;
        tag "tr" begin
