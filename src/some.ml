@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.17 2002-10-12 17:26:01 ddr Exp $ *)
+(* $Id: some.ml,v 4.18 2002-10-14 04:23:13 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -198,51 +198,8 @@ value she_has_children_with_her_name conf base wife husband children =
 
 value max_lev = 3;
 
-value bullet_sel_txt = "<tt>o</tt>";
-value bullet_unsel_txt = "<tt>+</tt>";
-value bullet_nosel_txt = "<tt>o</tt>";
-value print_select_bullet conf =
-  fun
-  [ Some (txt, sel) ->
-      let req =
-        List.fold_left
-          (fun req (k, v) ->
-             if not sel && k = "u" && v = txt then req
-             else
-               let s = k ^ "=" ^ v in
-               if req = "" then s else req ^ ";" ^ s)
-          "" conf.env
-      in
-      do {
-        stag "a" "name=%s" txt begin
-          stag "a"
-            "href=\"%s%s%s%s\"" (commd conf) req
-              (if sel then ";u=" ^ txt else "")
-              (if sel || List.mem_assoc "u" conf.env then "#" ^ txt
-               else "")
-          begin
-            Wserver.wprint "%s"
-              (if sel then bullet_sel_txt else bullet_unsel_txt);
-          end;
-        end;
-        Wserver.wprint "\n";
-      }
-  | None -> Wserver.wprint "%s\n" bullet_nosel_txt ]
-;
-
-value unsel_list conf =
-  List.fold_left
-    (fun sl (k, v) ->
-       try
-         if k = "u" then [int_of_string v :: sl]
-         else sl
-       with
-       [ Failure _ -> sl ])
-    [] conf.env
-;
-
 value print_branch conf base psn name =
-  let unsel_list = unsel_list conf in
+  let unsel_list = Util.unselected_bullets conf in
   loop True where rec loop is_first_lev lev p =
     do {
       let u = uget conf base p.cle_index in
@@ -274,7 +231,7 @@ value print_branch conf base psn name =
         | _ -> None ]
       in
       if lev == 0 then () else Wserver.wprint "<dd>\n";
-      print_select_bullet conf select;
+      Util.print_selection_bullet conf select;
       Wserver.wprint "<strong>";
       Wserver.wprint "%s"
         (Util.reference conf base p
@@ -293,7 +250,7 @@ value print_branch conf base psn name =
                do {
                  if not first then do {
                    if lev == 0 then () else Wserver.wprint "</dd><dd>\n";
-                   print_select_bullet conf select;
+                   Util.print_selection_bullet conf select;
                    Wserver.wprint "<em>";
                    Wserver.wprint "%s"
                      (if conf.hide_names && not (fast_auth_age conf p) then "x"

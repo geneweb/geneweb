@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.16 2002-09-19 15:13:51 ddr Exp $ *)
+(* $Id: util.mli,v 4.17 2002-10-14 04:23:12 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -190,3 +190,8 @@ value pre_text_size : string -> int;
 value print_pre_center : int -> string -> unit;
 value print_pre_left : int -> string -> unit;
 value print_pre_right : int -> string -> unit;
+
+(* List selection bullets *)
+
+value print_selection_bullet : config -> option (string * bool) -> unit;
+value unselected_bullets : config -> list int;

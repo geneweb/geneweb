@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.9 2002-07-15 08:34:23 ddr Exp $ *)
+(* $Id: dag.ml,v 4.10 2002-10-14 04:23:12 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -142,7 +142,8 @@ value image_txt conf base p =
             image_normal_txt conf base p f wid hei ^ "</table></center>\n"
       | Some (False, url, Some (wid, hei)) ->
           "<br>\n<center><table border=0><tr align=left><td>\n" ^
-            image_url_txt_with_size conf base url wid hei ^ "</table></center>\n"
+            image_url_txt_with_size conf base url wid hei ^
+            "</table></center>\n"
       | Some (False, url, None) ->
           "<br>\n<center><table border=0><tr align=left><td>\n" ^
             image_url_txt conf base url 75 ^ "</table></center>\n"
