@@ -1,9 +1,10 @@
-(* $Id: date.mli,v 3.3 2001-01-06 09:55:53 ddr Exp $ *)
+(* $Id: date.mli,v 3.4 2001-03-01 08:21:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
 open Config;
 
+value code_dmy : config -> dmy -> string;
 value string_of_ondate : config -> date -> string;
 value string_of_date : config -> date -> string;
 value print_age : config -> dmy -> unit;
