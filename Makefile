@@ -1,4 +1,6 @@
-# $Id: Makefile,v 3.12 2000-08-22 12:09:31 ddr Exp $
+# $Id: Makefile,v 3.13 2000-08-29 07:03:04 ddr Exp $
+
+DESTDIR=distribution
 
 include tools/Makefile.inc
 
@@ -26,80 +28,80 @@ distrib: new_distrib wrappers
 
 wrappers:
 	if test "$(CAMLP4F)" = "-DWIN95"; then \
-	  echo 'cd gw' > distribution/gwd.bat; \
-	  echo 'gwd' >> distribution/gwd.bat; \
-	  echo 'cd gw' > distribution/gwsetup.bat; \
-	  echo 'gwsetup' >> distribution/gwsetup.bat; \
+	  echo 'cd gw' > $(DESTDIR)/gwd.bat; \
+	  echo 'gwd' >> $(DESTDIR)/gwd.bat; \
+	  echo 'cd gw' > $(DESTDIR)/gwsetup.bat; \
+	  echo 'gwsetup' >> $(DESTDIR)/gwsetup.bat; \
 	else \
-	  echo '#!/bin/sh' > distribution/gwd; \
-	  echo 'cd gw; exec ./gwd' >> distribution/gwd; \
-	  echo '#!/bin/sh' > distribution/gwsetup; \
-	  echo 'cd gw; exec ./gwsetup' >> distribution/gwsetup; \
-	  chmod +x distribution/gwd distribution/gwsetup; \
+	  echo '#!/bin/sh' > $(DESTDIR)/gwd; \
+	  echo 'cd gw; exec ./gwd' >> $(DESTDIR)/gwd; \
+	  echo '#!/bin/sh' > $(DESTDIR)/gwsetup; \
+	  echo 'cd gw; exec ./gwsetup' >> $(DESTDIR)/gwsetup; \
+	  chmod +x $(DESTDIR)/gwd $(DESTDIR)/gwsetup; \
 	fi
 
 new_distrib: classical_distrib
 	mkdir t
-	mv distribution t/gw
-	mv t distribution
-	mkdir distribution/gw/old
-	mkdir distribution/gw/setup
-	cp setup/intro.txt distribution/gw/setup/.
+	mv $(DESTDIR) t/gw
+	mv t $(DESTDIR)
+	mkdir $(DESTDIR)/gw/old
+	mkdir $(DESTDIR)/gw/setup
+	cp setup/intro.txt $(DESTDIR)/gw/setup/.
 	for i in de en es fr lv se; do \
-	  mkdir distribution/gw/setup/$$i; \
-	  cp setup/$$i/*.htm distribution/gw/setup/$$i; \
+	  mkdir $(DESTDIR)/gw/setup/$$i; \
+	  cp setup/$$i/*.htm $(DESTDIR)/gw/setup/$$i; \
 	  if test "$(CAMLP4F)" = "-DWIN95"; then \
-	    cp setup/$$i/intro.txt.dos distribution/gw/setup/$$i/intro.txt; \
+	    cp setup/$$i/intro.txt.dos $(DESTDIR)/gw/setup/$$i/intro.txt; \
 	  else \
-	    cp setup/$$i/intro.txt distribution/gw/setup/$$i/intro.txt; \
+	    cp setup/$$i/intro.txt $(DESTDIR)/gw/setup/$$i/intro.txt; \
 	  fi; \
 	done
-	cp setup/gwsetup distribution/gw/gwsetup$(EXE)
+	cp setup/gwsetup $(DESTDIR)/gw/gwsetup$(EXE)
 	for i in README LISEZMOI; do \
-	  echo "<pre>" > distribution/$$i.htm; \
-	  cat etc/$$i.distrib.txt >> distribution/$$i.htm; \
-	  echo "</pre>" >> distribution/$$i.htm; \
+	  echo "<pre>" > $(DESTDIR)/$$i.htm; \
+	  cat etc/$$i.distrib.txt >> $(DESTDIR)/$$i.htm; \
+	  echo "</pre>" >> $(DESTDIR)/$$i.htm; \
 	done
-	cp LICENSE distribution/LICENSE.txt
-	echo "127.0.0.1" > distribution/gw/only.txt
+	cp LICENSE $(DESTDIR)/LICENSE.txt
+	echo "127.0.0.1" > $(DESTDIR)/gw/only.txt
 
 classical_distrib:
-	$(RM) -rf distribution
-	mkdir distribution
-	cp CHANGES distribution/CHANGES.txt
-	cp LICENSE distribution/LICENSE.txt
-	cp src/gwc distribution/gwc$(EXE)
-	cp src/consang distribution/consang$(EXE)
-	cp src/gwd distribution/gwd$(EXE)
-	cp src/gwu distribution/gwu$(EXE)
-	cp ged2gwb/ged2gwb distribution/ged2gwb$(EXE)
-	cp gwb2ged/gwb2ged distribution/gwb2ged$(EXE)
-	cp gwtp/gwtp.opt distribution/gwtp$(EXE)
-	mkdir distribution/gwtp_tmp
-	cp gwtp/*.txt distribution/gwtp_tmp/.
-	cp etc/LISEZMOI.txt distribution/.
-	cp etc/README.txt distribution/.
-	cp etc/INSTALL.htm distribution/.
-	cp etc/a.gwf distribution/.
-	mkdir distribution/doc
-	cp doc/*.htm distribution/doc/.
+	$(RM) -rf $(DESTDIR)
+	mkdir $(DESTDIR)
+	cp CHANGES $(DESTDIR)/CHANGES.txt
+	cp LICENSE $(DESTDIR)/LICENSE.txt
+	cp src/gwc $(DESTDIR)/gwc$(EXE)
+	cp src/consang $(DESTDIR)/consang$(EXE)
+	cp src/gwd $(DESTDIR)/gwd$(EXE)
+	cp src/gwu $(DESTDIR)/gwu$(EXE)
+	cp ged2gwb/ged2gwb $(DESTDIR)/ged2gwb$(EXE)
+	cp gwb2ged/gwb2ged $(DESTDIR)/gwb2ged$(EXE)
+	cp gwtp/gwtp.opt $(DESTDIR)/gwtp$(EXE)
+	mkdir $(DESTDIR)/gwtp_tmp
+	cp gwtp/*.txt $(DESTDIR)/gwtp_tmp/.
+	cp etc/LISEZMOI.txt $(DESTDIR)/.
+	cp etc/README.txt $(DESTDIR)/.
+	cp etc/INSTALL.htm $(DESTDIR)/.
+	cp etc/a.gwf $(DESTDIR)/.
+	mkdir $(DESTDIR)/doc
+	cp doc/*.htm $(DESTDIR)/doc/.
 	for i in de fr en nl se; do \
-	  mkdir distribution/doc/$$i; \
-	  cp doc/$$i/*.htm distribution/doc/$$i/.; \
+	  mkdir $(DESTDIR)/doc/$$i; \
+	  cp doc/$$i/*.htm $(DESTDIR)/doc/$$i/.; \
 	done
-	mkdir distribution/doc/images
-	cp doc/images/*.jpg doc/images/gwlogo.gif distribution/doc/images/.
-	mkdir distribution/lang
-	cp hd/lang/*.txt distribution/lang/.
+	mkdir $(DESTDIR)/doc/images
+	cp doc/images/*.jpg doc/images/gwlogo.gif $(DESTDIR)/doc/images/.
+	mkdir $(DESTDIR)/lang
+	cp hd/lang/*.txt $(DESTDIR)/lang/.
 	for dir in af cn cs de dk en eo es fi fr he is it lv nl no pt ru se;\
 	do \
-		mkdir distribution/lang/$$dir; \
-		cp hd/lang/$$dir/start.txt distribution/lang/$$dir/.; \
+		mkdir $(DESTDIR)/lang/$$dir; \
+		cp hd/lang/$$dir/start.txt $(DESTDIR)/lang/$$dir/.; \
 	done
-	mkdir distribution/images
-	cp hd/images/*.jpg hd/images/*.gif distribution/images/.
-	mkdir distribution/etc
-	cp hd/etc/*.txt distribution/etc/.
+	mkdir $(DESTDIR)/images
+	cp hd/images/*.jpg hd/images/*.gif $(DESTDIR)/images/.
+	mkdir $(DESTDIR)/etc
+	cp hd/etc/*.txt $(DESTDIR)/etc/.
 
 clean::
 	cd wserver; $(MAKE) clean
@@ -109,7 +111,7 @@ clean::
 	cd doc; $(MAKE) clean
 	cd setup; $(MAKE) clean
 	cd gwtp; $(MAKE) clean
-	$(RM) -rf distribution
+	$(RM) -rf $(DESTDIR)
 	$(RM) -f *~ .#*
 
 depend:
