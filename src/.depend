@@ -79,8 +79,8 @@ forum.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi iobase.cmi lock.cmi \
     secure.cmi update.cmi util.cmi ../wserver/wserver.cmi 
 forum.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx iobase.cmx lock.cmx \
     secure.cmx update.cmx util.cmx ../wserver/wserver.cmx 
-fpla.cmo: adef.cmi argl.cmo def.cmi gutil.cmi iobase.cmi 
-fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx iobase.cmx 
+fpla.cmo: adef.cmi argl.cmo def.cmi gutil.cmi iobase.cmi secure.cmi 
+fpla.cmx: adef.cmx argl.cmx def.cmi gutil.cmx iobase.cmx secure.cmx 
 gutil.cmo: adef.cmi buff.cmo def.cmi name.cmi gutil.cmi 
 gutil.cmx: adef.cmx buff.cmx def.cmi name.cmx gutil.cmi 
 gutil.cmi: def.cmi 
@@ -99,25 +99,23 @@ gwd.cmx: adef.cmx argl.cmx base64.cmx buff.cmx config.cmi def.cmi doc.cmx \
     robot.cmx secure.cmx srcfile.cmx util.cmx version.cmx \
     ../wserver/wserver.cmx 
 gwu.cmo: adef.cmi argl.cmo buff.cmo calendar.cmi def.cmi gutil.cmi iobase.cmi \
-    select.cmo 
+    secure.cmi select.cmo 
 gwu.cmx: adef.cmx argl.cmx buff.cmx calendar.cmx def.cmi gutil.cmx iobase.cmx \
-    select.cmx 
+    secure.cmx select.cmx 
 history.cmo: buff.cmo config.cmi date.cmi def.cmi gutil.cmi secure.cmi \
     util.cmi ../wserver/wserver.cmi history.cmi 
 history.cmx: buff.cmx config.cmi date.cmx def.cmi gutil.cmx secure.cmx \
     util.cmx ../wserver/wserver.cmx history.cmi 
 history.cmi: config.cmi def.cmi 
-image.cmo: config.cmi secure.cmi util.cmi ../wserver/wserver.cmi 
-image.cmx: config.cmi secure.cmx util.cmx ../wserver/wserver.cmx 
+image.cmo: config.cmi gutil.cmi secure.cmi util.cmi ../wserver/wserver.cmi 
+image.cmx: config.cmi gutil.cmx secure.cmx util.cmx ../wserver/wserver.cmx 
 iobase.cmo: adef.cmi btree.cmo buff.cmo def.cmi gutil.cmi iovalue.cmi \
-    name.cmi iobase.cmi 
+    name.cmi secure.cmi iobase.cmi 
 iobase.cmx: adef.cmx btree.cmx buff.cmx def.cmi gutil.cmx iovalue.cmx \
-    name.cmx iobase.cmi 
+    name.cmx secure.cmx iobase.cmi 
 iobase.cmi: def.cmi 
 iovalue.cmo: iovalue.cmi 
 iovalue.cmx: iovalue.cmi 
-lextitle.cmo: config.cmi secure.cmi 
-lextitle.cmx: config.cmi secure.cmx 
 lock.cmo: lock.cmi 
 lock.cmx: lock.cmi 
 merge.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi util.cmi \
@@ -146,13 +144,13 @@ mergeIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx history.cmx merge.cmx \
     mergeInd.cmx update.cmx updateInd.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx 
 mk_consang.cmo: argl.cmo consang.cmi consangAll.cmo gutil.cmi iobase.cmi \
-    lock.cmi 
+    lock.cmi secure.cmi 
 mk_consang.cmx: argl.cmx consang.cmx consangAll.cmx gutil.cmx iobase.cmx \
-    lock.cmx 
+    lock.cmx secure.cmx 
 mostdesc.cmo: adef.cmi argl.cmo consang.cmi def.cmi gutil.cmi iobase.cmi \
-    name.cmi num.cmi pqueue.cmi 
+    name.cmi num.cmi pqueue.cmi secure.cmi 
 mostdesc.cmx: adef.cmx argl.cmx consang.cmx def.cmi gutil.cmx iobase.cmx \
-    name.cmx num.cmx pqueue.cmx 
+    name.cmx num.cmx pqueue.cmx secure.cmx 
 name.cmo: buff.cmo name.cmi 
 name.cmx: buff.cmx name.cmi 
 notes.cmo: config.cmi def.cmi gutil.cmi iovalue.cmi update.cmi util.cmi \

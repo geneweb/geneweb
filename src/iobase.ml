@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.15 2002-03-15 19:18:51 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.16 2003-10-20 07:11:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -299,7 +299,9 @@ value persons_of_name bname patches =
       match t.val with
       [ Some a -> a
       | None ->
-          let ic_inx = open_in_bin (Filename.concat bname "names.inx") in
+          let ic_inx =
+            Secure.open_in_bin (Filename.concat bname "names.inx")
+          in
           do {
             seek_in ic_inx int_size;
             let a : name_index_data = input_value ic_inx in
@@ -326,7 +328,9 @@ value strings_of_fsname bname strings (_, person_patches) =
       match t.val with
       [ Some a -> a
       | None ->
-          let ic_inx = open_in_bin (Filename.concat bname "names.inx") in
+          let ic_inx =
+            Secure.open_in_bin (Filename.concat bname "names.inx")
+          in
           let pos = input_binary_int ic_inx in
           do {
             seek_in ic_inx pos;
@@ -382,7 +386,7 @@ value make_visible_cache bname persons =
   let r = { v_write = fun []; v_get = fun [] } in
   let read_or_create_visible () =
     let visible =
-      match try Some (open_in fname) with [ Sys_error _ -> None ] with
+      match try Some (Secure.open_in fname) with [ Sys_error _ -> None ] with
       [ Some ic ->
           do {
             ifdef UNIX then
@@ -404,7 +408,7 @@ value make_visible_cache bname persons =
     match visible_ref.val with
     [ Some visible ->
         try do {
-          let oc = open_out fname;
+          let oc = Secure.open_out fname;
           ifdef UNIX then
             if verbose.val then do {
               Printf.eprintf "*** write restrict file\n";
@@ -643,7 +647,9 @@ value make_cache ic ic_acc shift array_pos (plenr, patches) len name =
 value input_patches bname =
   let patches =
     match
-      try Some (open_in_bin (Filename.concat bname "patches")) with _ -> None
+      try
+        Some (Secure.open_in_bin (Filename.concat bname "patches"))
+      with _ -> None
     with
     [ Some ic -> let p = input_value ic in do { close_in ic; p }
     | None ->
@@ -711,7 +717,7 @@ value input bname =
   in
   let patches = input_patches bname in
   let ic =
-    let ic = open_in_bin (Filename.concat bname "base") in
+    let ic = Secure.open_in_bin (Filename.concat bname "base") in
     do { check_magic ic; ic }
   in
   let persons_len = input_binary_int ic in
@@ -725,8 +731,8 @@ value input bname =
   let descends_array_pos = input_binary_int ic in
   let strings_array_pos = input_binary_int ic in
   let norigin_file = input_value ic in
-  let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
-  let ic2 = open_in_bin (Filename.concat bname "strings.inx") in
+  let ic_acc = Secure.open_in_bin (Filename.concat bname "base.acc") in
+  let ic2 = Secure.open_in_bin (Filename.concat bname "strings.inx") in
   let ic2_string_start_pos = 3 * int_size in
   let ic2_string_hash_len = input_binary_int ic2 in
   let ic2_surname_start_pos = input_binary_int ic2 in
@@ -776,7 +782,7 @@ value input bname =
       try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
       try Sys.rename fname (fname ^ "~") with [ Sys_error _ -> () ];
       let oc9 =
-        try open_out_bin fname with
+        try Secure.open_out_bin fname with
         [ Sys_error _ ->
             raise (Adef.Request_failure "the database is not writable") ]
       in
@@ -861,7 +867,7 @@ value input bname =
   in
   let read_notes mlen =
     match
-      try Some (open_in (Filename.concat bname "notes")) with
+      try Some (Secure.open_in (Filename.concat bname "notes")) with
       [ Sys_error _ -> None ]
     with
     [ Some ic ->
@@ -885,7 +891,7 @@ value input bname =
       try Sys.rename fname (fname ^ "~") with _ -> ();
       if s = "" then ()
       else do {
-        let oc = open_out fname in output_string oc s; close_out oc; ()
+        let oc = Secure.open_out fname in output_string oc s; close_out oc; ()
       }
     }
   in
@@ -1069,10 +1075,10 @@ value just_copy bname what oc oc_acc =
     Printf.eprintf "*** copying %s\n" what;
     flush stderr;
     let ic =
-      let ic = open_in_bin (Filename.concat bname "base") in
+      let ic = Secure.open_in_bin (Filename.concat bname "base") in
       do { check_magic ic; ic }
     in
-    let ic_acc = open_in_bin (Filename.concat bname "base.acc") in
+    let ic_acc = Secure.open_in_bin (Filename.concat bname "base.acc") in
     let persons_len = input_binary_int ic in
     let families_len = input_binary_int ic in
     let strings_len = input_binary_int ic in
@@ -1155,8 +1161,8 @@ value gen_output no_patches bname base =
       let _ = base.data.strings.array () in ()
     else ();
     base.func.cleanup ();
-    let oc = open_out_bin tmp_fname in
-    let oc_acc = open_out_bin tmp_fname_acc in
+    let oc = Secure.open_out_bin tmp_fname in
+    let oc_acc = Secure.open_out_bin tmp_fname_acc in
     let output_array arr =
       let bpos = pos_out oc in
       do {
@@ -1214,8 +1220,8 @@ value gen_output no_patches bname base =
         close_out oc;
         close_out oc_acc;
         if not no_patches then
-          let oc_inx = open_out_bin tmp_fname_inx in
-          let oc2 = open_out_bin tmp_fname_gw2 in
+          let oc_inx = Secure.open_out_bin tmp_fname_inx in
+          let oc2 = Secure.open_out_bin tmp_fname_gw2 in
           try
             do {
               trace "create name index";
@@ -1254,7 +1260,7 @@ value gen_output no_patches bname base =
               let s = base.data.bnotes.nread 0 in
               if s = "" then ()
               else do {
-                let oc_not = open_out tmp_fname_not in
+                let oc_not = Secure.open_out tmp_fname_not in
                 output_string oc_not s;
                 close_out oc_not;
               };

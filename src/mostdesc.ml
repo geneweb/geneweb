@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 4.3 2002-03-09 16:48:49 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 4.4 2003-10-20 07:11:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Gutil;
@@ -125,6 +125,7 @@ value main () =
       exit 2
     }
     else ();
+    Secure.set_base_dir (Filename.dirname bname.val);
     let base = Iobase.input bname.val in
     let ip =
       Gutil.person_ht_find_unique base p_fname.val p_sname.val p_num.val

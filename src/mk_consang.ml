@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 4.4 2002-03-11 19:03:01 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 4.5 2003-10-20 07:11:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value fname = ref "";
@@ -40,6 +40,7 @@ value main () =
       flush stderr;
     }
     else ();
+    Secure.set_base_dir (Filename.dirname fname.val);
     let f () =
       let base = Iobase.input fname.val in
       try

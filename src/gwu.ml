@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.15 2003-02-12 10:23:33 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.16 2003-10-20 07:11:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1188,6 +1188,7 @@ value main () =
       exit 2
     }
     else ();
+    Secure.set_base_dir (Filename.dirname in_file.val);
     let anc =
       if anc_1st.val <> "" then
         if anc_2nd.val = "" then do {

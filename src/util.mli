@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.28 2003-01-05 17:42:18 ddr Exp $ *)
+(* $Id: util.mli,v 4.29 2003-10-20 07:11:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -6,7 +6,7 @@ open Config;
 
 value add_lang_path : string -> unit;
 value add_doc_path : string -> unit;
-value base_dir : ref string;
+value set_base_dir : string -> unit;
 value cnt_dir : ref string;
 value images_url : ref string;
 value image_prefix : config -> string;

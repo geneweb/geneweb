@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.38 2003-02-12 10:12:49 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.39 2003-10-20 07:11:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -2851,6 +2851,7 @@ value errmsg = "Usage: ged2gwb [<ged>] [options] where options are:";
 value main () =
   do {
     Argl.parse speclist anonfun errmsg;
+    Secure.set_base_dir (Filename.dirname out_file.val);
     let bdir =
       if Filename.check_suffix out_file.val ".gwb" then out_file.val
       else out_file.val ^ ".gwb"
