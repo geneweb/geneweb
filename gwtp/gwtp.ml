@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.44 2000-09-08 11:58:18 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.45 2000-09-13 08:27:15 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -146,10 +146,11 @@ value copy_template varenv env fname =
          match input_char ic with
          [ '%' ->
              match input_char ic with
-             [ 'e' ->
+             [ 'c' | 'e' as x ->
                  let (v, k) = get_binding ic in
                  try
-                   if k = List.assoc v varenv then print_string " selected"
+                   if k = List.assoc v varenv then
+                     print_string (if x = 'c' then " checked" else " selected")
                    else ()
                  with [ Not_found -> () ]
              | 'v' ->
@@ -174,7 +175,7 @@ value variables () =
          match input_char ic with
          [ '%' ->
              match input_char ic with
-             [ 'e' ->
+             [ 'e' | 'c' ->
                  let (v, _) = get_binding ic in
                  if not (List.mem v list.val) then list.val := [v :: list.val]
                  else ()
