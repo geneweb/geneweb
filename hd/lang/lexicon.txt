@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.211 2004-12-14 09:30:09 ddr Exp $
+# $Id: lexicon.txt,v 4.212 2004-12-15 12:18:23 ddr Exp $
 # Copyright (c) 1998-2005 INRIA
 
      !charset
@@ -2280,6 +2280,7 @@ nl: omranding
 no: ramme         
 pl: granica 
 pt: borda
+ro: bordura
 ru: рамка
 sl: okvir
 sv: kantlinje
@@ -2764,6 +2765,7 @@ nl: kleur
 no: farge         
 pl: kolor
 pt: cфr
+ro: culoare
 ru: цвет
 sl: barva
 sv: f&auml;rg
@@ -5915,6 +5917,7 @@ nl: geen vermelding
 no: ukjent familieforhold
 pl: bez wzmianki
 pt: sem informa&ccedil;&atilde;o
+ro: nementionat
 ru: нет упоминаний
 sl: ni omembe
 sv: inte n&auml;mnd
@@ -6071,6 +6074,7 @@ nl: notitities veranderd
 no: notater er endret 
 pl: uwagi zmodyfikowane
 pt: notas modificadas
+ro: nota modificata
 ru: заметки изменены
 sl: zaznamek spremenjen
 sv: noteringar modifierade
