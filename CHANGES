@@ -21,6 +21,7 @@ GeneWeb Version 1.07
 * gwb2ged:
   - start now pointers with 1 instead of 0 because some softwares seem not
     to accept @I0@ and @F0@.
+  - generate always ANSEL encoding
 
 * gwu:
   - added option -d to select descendants like in gwb2ged

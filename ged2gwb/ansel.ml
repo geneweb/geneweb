@@ -1,19 +1,100 @@
-(* $Id: ansel.ml,v 1.1.1.1 1998-09-01 14:32:13 ddr Exp $ *)
+(* $Id: ansel.ml,v 1.2 1998-09-29 13:10:41 ddr Exp $ *)
 
-value acute =
+value no_accent =
   fun
-  [ 'a' -> 'á'
-  | 'e' -> 'é'
-  | 'i' -> 'í'
-  | 'E' -> 'É'
-  | x -> x ]
+  [ 'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' -> 'a'
+  | 'ç' -> 'c'
+  | 'è' | 'é' | 'ê' | 'ë' -> 'e'
+  | 'ì' | 'ì' | 'î' | 'ï' -> 'i'
+  | 'ñ' -> 'n'
+  | 'ò' | 'ó' | 'ô' | 'õ' | 'ö' | 'ø' -> 'o'
+  | 'ù' | 'ú' | 'û' | 'ü' -> 'u'
+  | 'ı' | 'ÿ' -> 'y'
+  | 'À' | 'Á' | 'Â' | 'Ã' | 'Ä' | 'Å' -> 'A'
+  | 'Ç' -> 'C'
+  | 'È' | 'É' | 'Ê' | 'Ë' -> 'E'
+  | 'Ì' | 'Ì' | 'Î' | 'Ï' -> 'I'
+  | 'Ñ' -> 'N'
+  | 'Ò' | 'Ó' | 'Ô' | 'Õ' | 'Ö' | 'Ø' -> 'O'
+  | 'Ù' | 'Ú' | 'Û' | 'Ü' -> 'U'
+  | 'İ' -> 'Y'
+  | c -> c ]
+;
+
+value encode s =
+  let len =
+    loop 0 0 where rec loop i len =
+      if i == String.length s then len
+      else
+        match s.[i] with
+        [ 'À'..'Å' | 'Ç'.. 'Ï' | 'Ñ'..'Ö' | 'Ù'..'İ'
+        | 'à'..'å' | 'ç'.. 'ï' | 'ñ'..'ö' | 'ù'..'ı' -> loop (i + 1) (len + 2)
+        | _ -> loop (i + 1) (len + 1) ]
+  in
+  if len == String.length s then s
+  else
+    let s' = String.create len in
+    loop 0 0 where rec loop i i' =
+      if i == String.length s then s'
+      else
+        let i' =
+          match s.[i] with
+          [ 'À' | 'È' | 'Ì' | 'Ò' | 'Ù'
+          | 'à' | 'è' | 'ì' | 'ò' | 'ù' ->
+              do s'.[i'] := Char.chr 225; s'.[i'+1] := no_accent s.[i];
+              return i' + 1
+          | 'Á' | 'É' | 'Í' | 'ó' | 'Ú' | 'İ'
+          | 'á' | 'é' | 'í' | 'ó' | 'ú' | 'ı' ->
+              do s'.[i'] := Char.chr 226; s'.[i'+1] := no_accent s.[i];
+              return i' + 1
+          | 'Â' | 'Ê' | 'Î' | 'Ô' | 'Û'
+          | 'â' | 'ê' | 'î' | 'ô' | 'û' ->
+              do s'.[i'] := Char.chr 227; s'.[i'+1] := no_accent s.[i];
+              return i' + 1
+          | 'Ã' | 'Ñ' | 'Õ' | 'ã' | 'ñ' | 'õ' ->
+              do s'.[i'] := Char.chr 228; s'.[i'+1] := no_accent s.[i];
+              return i' + 1
+          | 'Ä' | 'Ë' | 'Ï' | 'Ö' | 'Ü'
+          | 'ä' | 'ë' | 'ï' | 'ö' | 'ü' | 'ÿ' ->
+              do s'.[i'] := Char.chr 232; s'.[i'+1] := no_accent s.[i];
+              return i' + 1
+          | 'Ç' | 'ç' ->
+              do s'.[i'] := Char.chr 240; s'.[i'+1] := no_accent s.[i];
+              return i' + 1
+          | c -> do s'.[i'] := c; return i' ]
+        in
+        loop (i + 1) (i' + 1)
 ;
 
 value grave =
   fun
   [ 'a' -> 'à'
   | 'e' -> 'è'
+  | 'i' -> 'ì'
+  | 'o' -> 'ò'
   | 'u' -> 'ù'
+  | 'A' -> 'À'
+  | 'E' -> 'È'
+  | 'I' -> 'Ì'
+  | 'O' -> 'Ò'
+  | 'U' -> 'Ù'
+  | x -> x ]
+;
+
+value acute =
+  fun
+  [ 'a' -> 'á'
+  | 'e' -> 'é'
+  | 'i' -> 'í'
+  | 'o' -> 'ó'
+  | 'u' -> 'ú'
+  | 'y' -> 'ı'
+  | 'A' -> 'Á'
+  | 'E' -> 'É'
+  | 'I' -> 'Í'
+  | 'O' -> 'Ó'
+  | 'U' -> 'Ú'
+  | 'Y' -> 'İ'
   | x -> x ]
 ;
 
@@ -23,6 +104,12 @@ value circ =
   | 'e' -> 'ê'
   | 'i' -> 'î'
   | 'o' -> 'ô'
+  | 'u' -> 'û'
+  | 'A' -> 'Â'
+  | 'E' -> 'Ê'
+  | 'I' -> 'Î'
+  | 'O' -> 'Ô'
+  | 'U' -> 'Û'
   | x -> x ]
 ;
 
@@ -32,24 +119,41 @@ value uml =
   | 'e' -> 'ë'
   | 'i' -> 'ï'
   | 'o' -> 'ö'
+  | 'u' -> 'ü'
+  | 'A' -> 'Ä'
+  | 'E' -> 'Ë'
+  | 'I' -> 'Ï'
   | 'O' -> 'Ö'
+  | 'U' -> 'Ü'
+  | x -> x ]
+;
+
+value tilde =
+  fun
+  [ 'a' -> 'ã'
+  | 'n' -> 'ñ'
+  | 'o' -> 'õ'
+  | 'A' -> 'Ã'
+  | 'N' -> 'Ñ'
+  | 'O' -> 'Õ'
   | x -> x ]
 ;
 
 value cedil =
   fun
   [ 'c' -> 'ç'
+  | 'C' -> 'Ç'
   | x -> x ]
 ;
 
-value translate s =
+value decode s =
   let len =
     loop 0 0 where rec loop i len =
       if i == String.length s then len
       else if i == String.length s - 1 then len + 1
       else
         match Char.code s.[i] with
-        [ 225 | 226 | 227 | 232 | 240 -> loop (i + 1) len
+        [ 225 | 226 | 227 | 228 | 232 | 240 -> loop (i + 1) len
         | _ -> loop (i + 1) (len + 1) ]
   in
   if len == String.length s then s
@@ -65,6 +169,7 @@ value translate s =
           [ 225 -> do s'.[i'] := grave s.[i+1]; return i + 1
           | 226 -> do s'.[i'] := acute s.[i+1]; return i + 1
           | 227 -> do s'.[i'] := circ s.[i+1]; return i + 1
+          | 228 -> do s'.[i'] := tilde s.[i+1]; return i + 1
           | 232 -> do s'.[i'] := uml s.[i+1]; return i + 1
           | 240 -> do s'.[i'] := cedil s.[i+1]; return i + 1
           | _ -> do s'.[i'] := s.[i]; return i ]

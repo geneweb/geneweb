@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.5 1998-09-29 12:22:30 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.6 1998-09-29 13:10:42 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -72,10 +72,10 @@ value rec get_lev n =
       in
       {rlab = rlab;
        rval =
-         if ansel_characters.val then Ansel.translate rval
+         if ansel_characters.val then Ansel.decode rval
          else rval;
        rcont =
-         if ansel_characters.val then Ansel.translate rcont
+         if ansel_characters.val then Ansel.decode rcont
          else rcont;
        rsons = List.rev l} ]
 and get_lev_list l n =
@@ -1090,11 +1090,11 @@ value get_lev0 =
        l = get_lev_list [] '1' ? "get lev list" :] ->
       let (rlab, rval) = if r2 = "" then (r1, "") else (r2, r1) in
       let rval =
-        if ansel_characters.val then Ansel.translate rval
+        if ansel_characters.val then Ansel.decode rval
         else rval
       in
       let rcont =
-        if ansel_characters.val then Ansel.translate r3
+        if ansel_characters.val then Ansel.decode r3
         else r3
       in
       {rlab = rlab; rval = rval; rcont = rcont; rsons = List.rev l} ]
