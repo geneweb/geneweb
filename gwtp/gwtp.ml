@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.7 2001-10-29 08:39:10 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.8 2001-10-30 19:40:22 ddr Exp $ *)
 (* (c) Copyright 2001 INRIA *)
 
 open Printf;
@@ -629,8 +629,9 @@ value ged2gwb b =
 
 value send_gedcom_file str env b tok f fname =
   let fname = filename_basename fname in
-  let lockf = Filename.concat gwtp_tmp.val (b ^ ".lck") in
-  do {
+  if Filename.check_suffix fname ".ged" || Filename.check_suffix fname ".GED"
+  then do {
+    let lockf = Filename.concat gwtp_tmp.val (b ^ ".lck") in
     printf "content-type: text/html";
     crlf ();
     crlf ();
@@ -663,6 +664,7 @@ value send_gedcom_file str env b tok f fname =
     printf "</body>\n";
     flush stdout;
   }
+  else gwtp_error "This is not a gedcom file (not ending with .GED)"
 ;
 
 value gwtp_send_gedcom str env b t =
