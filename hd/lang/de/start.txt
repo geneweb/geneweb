@@ -3,6 +3,8 @@
 <head><title> Genealogie - %t</title></head>
 <body%b><h1> Genealogie </h1>
 
+%rversion
+
 <p>
 
 Die Datenbank enth&auml;lt z.Zt. %n Personen.
@@ -79,4 +81,4 @@ Es hat %q Zugriffe mit %c auf diese Seite gegeben, seit %d.
 
 <p>
 
-%rversion
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>

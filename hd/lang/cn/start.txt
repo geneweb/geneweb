@@ -4,12 +4,14 @@
 <body%b>
 <h1>家谱</h1>
 
+%rversion
+
+<p>
 
 现有 %n 人在数据库中。
+
 <ul>
-
 <li>
-
 <form method=GET action="%f">%h
 <input type=hidden name=m value=NG>
 搜索：<input name=n size=40 maxlength=200>
@@ -76,4 +78,4 @@
 
 <p>
 
-%rversion
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>

@@ -4,6 +4,10 @@
 <body%b>
 <h1>Genealogy</h1>
 
+%rversion
+
+<p>
+
 The data base now holds %n persons.
 
 <ul>
@@ -76,4 +80,4 @@ There has been %q accesses, %c of them to this page, since %d.
 
 <p>
 
-%rversion
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>

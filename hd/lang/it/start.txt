@@ -3,6 +3,8 @@
 <head><title>Genealogia - %t</title></head>
 <body%b><h1>Genealogia</h1>
 
+%rversion
+
 <p>
 
 La base di dati contiene attualmente %n persone.
@@ -77,4 +79,4 @@ Ci sono stati %c accessi a questa pagina.
 
 <p>
 
-%rversion
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>

@@ -4,6 +4,8 @@
 <body%b>
 <h1> Genealogio </h1>
 
+%rversion
+
 <p>
 
 La datenbazo enhavas nune %n personojn.
@@ -78,4 +80,4 @@ Estis %q alirejoj kaj %c al cxi pagxo.
 
 <p>
 
-%rversion
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>

@@ -4,6 +4,10 @@
 <body%b>
 <h1> Genealogía </h1>
 
+%rversion
+
+<p>
+
 La base contiene actualmente %n personas.
 
 <ul>
@@ -82,4 +86,4 @@ Han habido %c consultas con %c a esta p&aacute;gina desde %d.
 
 <p>
 
-%rversion
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>
