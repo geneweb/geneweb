@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.35 2000-06-18 16:19:38 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.36 2000-06-18 17:17:07 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>G&eacute;n&eacute;alogie - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -64,6 +64,7 @@ actuellement %n personnes.%In<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
+<center><table border=0 cellspacing=0 cellpadding=0><tr><td>
 Pour naviguer dans cette base de donn&eacute;es, vous pouvez effectuer
 votre recherche:<br><p>
 
@@ -141,6 +142,7 @@ par
 &eacute;volu&eacute;e</b></font></a>.
 
 </ul>
+</td></tr></table></center>
 
 %Iw<p>
 
