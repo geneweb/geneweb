@@ -35,6 +35,10 @@ GeneWeb Version 2.06
   - [Aug 7, 99] Fixed bad behavior: in welcome pages, proposed "wizard" to
     to wizards when the flag "wizard_just_friend" was set.
 
+* GeneWeb to Gedcom (gwb2ged)
+  - [Aug 31, 99] For adoptive parents, does not generate a CHIL field any
+    more in adoptive parents family.
+
 GeneWeb Version 2.05
 --------------------
 
