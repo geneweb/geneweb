@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 1.9 1998-12-11 15:11:46 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.10 1998-12-12 10:56:49 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -531,13 +531,13 @@ type arg_state =
   [ ASnone | ASwaitAncOcc | ASwaitAncSurn | ASwaitDescOcc | ASwaitDescSurn ]
 ;
 value arg_state = ref ASnone;
-value fast = ref False;
+value mem = ref False;
 
 value speclist =
   [("-odir", Arg.String (fun s -> out_dir.val := s),
    "<dir>   create files in this directories (else all on stdout)");
-   ("-fast", Arg.Set fast,
-   "        faster, but can alloc much more memory");
+   ("-mem", Arg.Set mem,
+   "        save memory space, but slower");
    ("-a",
     Arg.String
       (fun s -> do anc_1st.val := s; return arg_state.val := ASwaitAncOcc),
@@ -609,7 +609,7 @@ value main () =
   let src_oc_list = ref [] in
   let _ = base.ascends.array () in
   let _ = base.strings.array () in
-  do if fast.val then
+  do if not mem.val then
        let _ = base.persons.array () in
        let _ = base.families.array () in
        let _ = base.couples.array () in

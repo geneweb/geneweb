@@ -11,8 +11,7 @@ GeneWeb Version 1.10
   - [11/12/98] Fixed and completed (thanks to Joris Esch).
 
 * GeneWeb uncompiler (gwu)
-  - [11/12/98] Save memory consummation + added option "-fast" to run faster
-    but necessiting much more memory.
+  - [12/12/98] Added option "-mem" to save memory space, but slower.
 
 GeneWeb Version 1.09
 --------------------
