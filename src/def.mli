@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 3.4 2000-05-14 19:59:33 ddr Exp $ *)
+(* $Id: def.mli,v 3.5 2000-05-23 07:19:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 type iper = Adef.iper;
@@ -27,7 +27,7 @@ and precision = Adef.precision ==
 
 type relation_kind = [ Married | NotMarried | Engaged ];
 
-type divorce = [ NotDivorced | Divorced of codate ];
+type divorce = [ NotDivorced | Divorced of codate | Separated ];
 
 type death_reason =
   [ Killed | Murdered | Executed | Disappeared | Unspecified ]

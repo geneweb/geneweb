@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 3.2 2000-05-23 06:48:55 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 3.3 2000-05-23 07:19:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -28,11 +28,12 @@ value need_differences_selection conf base fam1 fam2 =
   || need_selection
        (fun fam ->
           match fam.divorce with
-          [ NotDivorced -> ""
+          [ NotDivorced -> "not divorced"
+          | Separated -> "separated"
           | Divorced cod ->
               match Adef.od_of_codate cod with
               [ Some d -> Date.string_of_ondate conf d
-              | None -> "" ] ])
+              | None -> "divorced" ] ])
 ;
 
 value print_differences conf base branches fam1 fam2 =
@@ -91,11 +92,15 @@ value print_differences conf base branches fam1 fam2 =
     string_field (transl conf "divorce") "divorce"
       (fun fam ->
          match fam.divorce with
-         [ NotDivorced -> ""
+         [ NotDivorced -> transl conf "not divorced"
+         | Separated -> transl conf "separated"
          | Divorced cod ->
-             match Adef.od_of_codate cod with
-             [ Some d -> Date.string_of_ondate conf d
-             | None -> "" ] ]);
+             let ds =
+               match Adef.od_of_codate cod with
+               [ Some d -> " " ^ Date.string_of_ondate conf d
+               | None -> "" ]
+             in
+             transl conf "divorced" ^ ds ]);
     html_p conf;
     Wserver.wprint "<input type=submit value=Ok>\n";
   end

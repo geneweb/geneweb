@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.8 2000-05-14 19:59:35 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.9 2000-05-23 07:19:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -493,6 +493,7 @@ value get_mar_date str =
             if String.length x > 1 then
               (Divorced (Adef.codate_of_od (date_of_string x 1)), l)
             else (Divorced Adef.codate_None, l)
+        | ["#sep" :: l] -> (Separated, l)
         | _ -> (NotDivorced, l) ]
       in
       (relation, mar, place, src, divorce, l)

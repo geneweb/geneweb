@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.10 2000-05-23 06:48:55 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.11 2000-05-23 07:19:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -326,6 +326,10 @@ value print_divorce conf base fam =
      Wserver.wprint "<input type=radio name=divorce value=divorced%s>"
        (match fam.divorce with [ Divorced _ -> " checked" | _ -> "" ]);
      Wserver.wprint "%s\n" (capitale (transl conf "divorced"));
+     Wserver.wprint
+       "<input type=radio name=divorce value=separated%s>"
+       (match fam.divorce with [ Separated -> " checked" | _ -> "" ]);
+     Wserver.wprint "%s\n" (capitale (transl conf "separated"));
      Update.print_date conf base (capitale (transl conf "date")) "divorce"
        (match fam.divorce with
         [ Divorced d -> Adef.od_of_codate d

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.12 2000-05-14 19:59:38 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.13 2000-05-23 07:19:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -120,6 +120,7 @@ value reconstitute_family conf =
   let divorce =
     match p_getenv conf.env "divorce" with
     [ Some "not_divorced" -> NotDivorced
+    | Some "separated" -> Separated
     | _ ->
         Divorced
           (Adef.codate_of_od

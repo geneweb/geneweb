@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 3.19 2000-05-17 03:32:19 ddr Exp $ *)
+(* $Id: gwu.ml,v 3.20 2000-05-23 07:19:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -371,6 +371,7 @@ value print_family oc base mark (per_sel, fam_sel) fam_done notes_pl_p m =
      print_if_no_empty oc base "#ms" fam.marriage_src;
      match fam.divorce with
      [ NotDivorced -> ()
+     | Separated -> Printf.fprintf oc " #sep"
      | Divorced d ->
          let d = Adef.od_of_codate d in
          do Printf.fprintf oc " -"; print_date_option oc d; return () ];
