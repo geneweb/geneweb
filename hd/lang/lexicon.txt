@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.51 2000-01-14 14:43:34 ddr Exp $
+# $Id: lexicon.txt,v 3.52 2000-01-15 18:55:47 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -2325,7 +2325,7 @@ it: gregorian/julian/francese/ebraico
 nl: gregoriaans/juliaans/frans/hebreeuws
 no: gregoriansk/juliansk/fransk rep./j&oslash;disk
 pt: gregoriano/juliano/franc&ecirc;s/hebraico
-se: gregoriansk/juliansk/fransk/hebreisk
+se: gregoriansk/juliansk/franska rep./hebreisk
 
     happy birthday to you!
 de: Herzlichen Gl&uuml;ckwunsch zum Geburstag!
@@ -2394,22 +2394,6 @@ nl: zijn/haar
 no: han/henne
 pt: ele/ela
 se: honom/henne
-
-    his wife/her husband
-de: seine Ehefrau/ihr Ehemann
-dk: hans hustru/hendes mand
-en: his wife/her husband
-eo: lia edzino/sxia edzo
-es: su esposa/su esposo
-fi: vaimonsa/miehens&auml
-fr: son &eacute;pouse/son &eacute;poux
-he:   àùúå/ áòìä 
-is: kona hans/mağur hennar
-it: sua moglie/suo marito
-nl: zijn vrouw/haar echtgenoot
-no: hans hustru/hennes mann
-pt: sua esposa/seu marido
-se: hans maka/hennes make
 
     history of updates
 de: Chronik der Aktualisierungen
@@ -2760,6 +2744,10 @@ nl: het is dezelfde persoon!
 no: det er samme person!
 pt: &eacute; a mesma pessoa !
 se: det &auml;r samma person!
+
+    julian day
+en: Julian day
+fr: jour julien
 
     killed (in action)
 cs: zabit/zabita/zabiti
