@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: mk_missing_i18n.sh,v 4.0 2001-03-16 19:34:51 ddr Exp $ *)
+(* $Id: mk_missing_i18n.sh,v 4.1 2001-03-26 03:39:16 ddr Exp $ *)
 
 open Printf
 
@@ -57,7 +57,7 @@ let check first lang =
       skip_to_same_line ic_lex ("    " ^ line);
       let list = get_all_versions ic_lex in
       if first && Sort.list compare_assoc list <> list then begin
-	eprintf "Misordered for: \"%s\"\n" line;
+	eprintf "Misordered for:\n   \"%s\"\n" line;
 	flush stderr;
       end;
       if not (List.mem_assoc lang list || List.mem_assoc (derive lang) list)
@@ -72,6 +72,11 @@ let check first lang =
 	  list;
 	printf "\n";
 	has_missing := true
+      end
+      else if List.length (List.find_all (fun (l, _) -> l = lang) list) >= 2
+      then begin
+        eprintf "Several translations in %s for:\n   \"%s\"\n" lang line;
+        flush stderr;
       end;
    done
   with End_of_file -> ()
