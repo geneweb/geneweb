@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 1.2 1998-09-28 09:26:02 ddr Exp $ *)
+(* $Id: some.ml,v 1.3 1998-09-29 08:38:48 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -277,9 +277,11 @@ value rec print_by_branch x conf base (ipl, homonymes) =
   let len = List.length ancestors in
   if len == 0 then surname_not_found conf x
   else
-(*
-    let x = List.hd homonymes in
-*)
+    let x =
+      match homonymes with
+      [ [x :: _] -> x
+      | _ -> x ]
+    in
     let title h =
       do Wserver.wprint "%s" (List.hd homonymes);
          List.iter (fun x -> Wserver.wprint ", %s" x) (List.tl homonymes);
