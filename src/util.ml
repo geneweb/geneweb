@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.25 1999-01-28 14:53:11 ddr Exp $ *)
+(* $Id: util.ml,v 1.26 1999-01-30 16:41:35 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -722,6 +722,29 @@ value print_decimal_num conf f =
          [ '.' -> Wserver.wprint "%s" (transl conf "(decimal separator)")
          | x -> Wserver.wprint "%c" x ];
       return loop (i + 1)
+;
+
+value commd_no_params conf =
+  conf.command ^
+  List.fold_left
+    (fun c (k, v) ->
+       c ^ (if c = "" then "?" else ";") ^ k ^
+       (if v = "" then "" else "=" ^ v))
+    "" conf.henv
+;
+
+value print_link_to_welcome conf right_aligned =
+  let dir =
+    try
+      if Hashtbl.find conf.lexicon " !dir" = "rtl" then "left"
+      else "right" with
+    [ Not_found -> "right" ]
+  in
+  do Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
+     Wserver.wprint "<img src=\"%sm=IM;v=up.gif\" alt=\"^^\"%s>"
+       (commd conf) (if right_aligned then " align=" ^ dir else "");
+     Wserver.wprint "</a>\n";
+  return ()
 ;
 
 value list_find f =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 1.8 1999-01-11 15:05:28 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 1.9 1999-01-30 16:41:32 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -113,6 +113,7 @@ value print_mod_merge_ok conf base wl p =
     Wserver.wprint "%s" (capitale (transl conf "merge done"))
   in
   do header conf title;
+     print_link_to_welcome conf True;
      afficher_personne_referencee conf base p;
      Wserver.wprint "\n";
      Update.print_warnings conf base wl;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 1.1 1999-01-20 09:26:55 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 1.2 1999-01-30 16:41:30 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -106,9 +106,21 @@ value print_death conf base =
              Wserver.wprint "<li><strong>\n";
              afficher_personne_referencee conf base p;
              Wserver.wprint "</strong>,\n";
-             Wserver.wprint "%s <em>%s</em>.\n"
+             Wserver.wprint "%s <em>%s</em>"
                (transl_nth conf "died" (index_of_sex p.sex))
                (Date.string_of_ondate conf d);
+             let sure d = d.prec = Sure in
+             match Adef.od_of_codate p.birth with
+             [ Some d1 ->
+                 if sure d1 && sure d && d1 <> d then
+                   let a = temps_ecoule d1 d in
+                   do Wserver.wprint " <em>(";
+                      Date.print_age conf a;
+                      Wserver.wprint ")</em>";
+                   return ()
+                 else ()
+             | _ -> () ];
+             Wserver.wprint ".\n";
            end
        | None -> () ];
      done;

@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 1.10 1999-01-11 15:05:33 ddr Exp $ *)
+(* $Id: util.mli,v 1.11 1999-01-30 16:41:36 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -90,3 +90,5 @@ value create_topological_sort : config -> base -> array int;
 
 value branch_of_sosa : base -> iper -> Num.t -> option (list (iper * sex));
 value sosa_of_branch : list (iper * sex) -> Num.t;
+
+value print_link_to_welcome : config -> bool -> unit;
