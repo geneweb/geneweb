@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.2 1999-03-31 02:16:50 ddr Exp $ *)
+(* $Id: some.ml,v 2.3 1999-04-07 11:49:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -229,7 +229,7 @@ value rec print_branch conf base lev name p =
       (fun (first, need_br) ifam ->
          let fam = foi base ifam in
          let dmar = Adef.od_of_codate fam.marriage in
-         let c = conjoint p (coi base ifam) in
+         let c = spouse p (coi base ifam) in
          let el = fam.children in
          let c = poi base c in
          do if need_br then html_br conf else ();

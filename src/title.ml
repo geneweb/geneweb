@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 2.2 1999-04-05 23:42:29 ddr Exp $ *)
+(* $Id: title.ml,v 2.3 1999-04-07 11:49:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -46,7 +46,7 @@ value date_interval conf base t x =
                 (fun ifam ->
                    let fam = foi base ifam in
                    let md = fam.marriage in
-                   let conj = conjoint x (coi base ifam) in
+                   let conj = spouse x (coi base ifam) in
                    do match Adef.od_of_codate md with
                       [ Some d -> set d
                       | None -> () ];

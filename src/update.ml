@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 2.6 1999-04-05 23:42:29 ddr Exp $ *)
+(* $Id: update.ml,v 2.7 1999-04-07 11:49:47 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -524,7 +524,7 @@ value print_family_stuff conf base p a =
                 return ()
             | None -> () ];
          return
-         let c = conjoint p (coi base fi) in
+         let c = spouse p (coi base fi) in
          do Wserver.wprint "\n";
             html_li conf;
             Wserver.wprint "<a href=\"%sm=MOD_FAM;i=%d\">" (commd conf)
