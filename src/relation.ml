@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.7 1999-11-25 10:36:25 ddr Exp $ *)
+(* $Id: relation.ml,v 3.8 1999-11-28 03:06:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -197,29 +197,35 @@ type famlink = [ Self | Parent | Sibling | HalfSibling | Mate | Child ];
 value print_relation_path_list conf base path =
   do Wserver.wprint "<p>%s :\n" (capitale (transl conf "shortest path"));
      tag "ol" begin
-       List.iter
-         (fun (ip, fl) ->
-            let p = poi base ip in
-            let is = index_of_sex p.sex in
-            let link =
-              match fl with
-              [ Self -> ""
-              | Parent -> transl_nth conf "the father/the mother/a parent" is
-              | Sibling -> transl_nth conf "a brother/a sister/a sibling" is
-              | HalfSibling ->
-                  transl_nth conf "a half-brother/a half-sister/a half-sibling"
-                    is
-              | Mate -> transl_nth conf "the spouse" is
-              | Child -> transl_nth conf "a son/a daughter/a child" is ]
-            in
-            do html_li conf;
-               afficher_personne_sans_titre conf base p;
-               if link = "" then ()
+       loop path where rec loop =
+         fun
+         [ [(ip, fl) :: ([(ip1, _) :: _] as path)] ->
+             let p = poi base ip in
+             let is = index_of_sex p.sex in
+             let link =
+               match fl with
+               [ Self -> ""
+               | Parent -> transl_nth conf "the father/the mother/a parent" is
+               | Sibling -> transl_nth conf "a brother/a sister/a sibling" is
+               | HalfSibling ->
+                   transl_nth conf
+                     "a half-brother/a half-sister/a half-sibling" is
+               | Mate -> transl_nth conf "the spouse" is
+               | Child -> transl_nth conf "a son/a daughter/a child" is ]
+             in
+             let of_txt =
+               if fl = Child then transl_decline conf "of" ""
                else
-                 Wserver.wprint " <em>%s %s %s</em>" (transl conf "is") link
-                   (transl_nth conf "of" 0);
-            return ())
-         path;
+                 transl_decline conf "of (same or greater generation level)" ""
+             in
+             do html_li conf;
+                afficher_personne_sans_titre conf base p;
+                Wserver.wprint " <em>%s %s %s</em>\n" (transl conf "is") link
+                  of_txt;
+                afficher_personne_sans_titre conf base (poi base ip1);
+                Wserver.wprint "\n";
+             return loop path
+         | _ -> () ];
      end;
   return ()
 ;
