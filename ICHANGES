@@ -5,6 +5,7 @@ GeneWeb Version 1.07
 --------------------
 
 * Documented structure of bases (file iobase.ml).
+* ANSEL encoding in base
 
 * gwc:
    - Fixed bug: hash table now with "crush_lower" names, not "strip_lower"

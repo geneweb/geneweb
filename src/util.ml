@@ -1,4 +1,4 @@
-(* $Id: util.ml,v 1.4 1998-09-24 12:57:31 ddr Exp $ *)
+(* $Id: util.ml,v 1.5 1998-09-29 16:12:26 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -8,6 +8,37 @@ value version = "1.07";
 
 value lang_dir = ref ".";
 value base_dir = ref ".";
+
+value ansel_to_ascii s =
+  let len =
+    loop 0 0 where rec loop i len =
+      if i == String.length s then len
+      else
+        if Char.code s.[i] >= 128 then loop (i + 1) len
+        else loop (i + 1) (len + 1)
+  in
+  if len == String.length s then s
+  else
+    let s' = String.create len in
+    loop 0 0 where rec loop i i' =
+      if i == String.length s then s'
+      else
+        if Char.code s.[i] >= 128 then loop (i + 1) i'
+        else do s'.[i'] := s.[i]; return loop (i + 1) (i' + 1)
+;
+
+value charset_of_ansel conf s =
+  if conf.charset = "iso-8859-1" then Ansel.to_iso_8859_1 s
+  else if s = "" then s
+  else if String.length s = 2 then
+    if Char.code s.[0] >= 128 then s else ansel_to_ascii s
+  else if String.length s >= 4 then
+    if Char.code s.[0] >= 128 && Char.code s.[2] >= 128 then s
+    else ansel_to_ascii s
+  else ansel_to_ascii s
+;
+
+value coa = charset_of_ansel;
 
 value nl () = Wserver.wprint "\r\n";
 
@@ -147,7 +178,7 @@ value person_text conf base p =
     | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
     | (n, []) -> n ]
   in
-  beg ^ " " ^ sou base p.surname
+  coa conf (beg ^ " " ^ sou base p.surname)
 ;
 
 value person_text_no_html conf base p =
@@ -162,12 +193,15 @@ value person_text_no_html conf base p =
 ;
 
 value person_text_without_surname conf base p =
-  match (sou base p.public_name, p.nick_names) with
-  [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
-  | (n, []) when n <> "" -> n
-  | (_, [nn :: _]) ->
-      sou base p.first_name ^ " <em>" ^ sou base nn ^ "</em>"
-  | (_, []) -> sou base p.first_name ]
+  let s =
+    match (sou base p.public_name, p.nick_names) with
+    [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
+    | (n, []) when n <> "" -> n
+    | (_, [nn :: _]) ->
+        sou base p.first_name ^ " <em>" ^ sou base nn ^ "</em>"
+    | (_, []) -> sou base p.first_name ]
+  in
+  coa conf s
 ;
 
 value afficher_personne conf base p =
@@ -564,8 +598,8 @@ value print_parent conf base p a =
       return ()
   | _ ->
       Wserver.wprint "%s %s%s" (transl_nth conf "son/daughter/child" is)
-        (transl_concat conf "of" (sou base a.first_name))
-        (if p.surname <> a.surname then " " ^ sou base a.surname else "") ]
+        (transl_concat conf "of" (coa conf (sou base a.first_name)))
+        (if p.surname <> a.surname then sou base a.surname else "") ]
 ;
 
 value conjoint p fam =

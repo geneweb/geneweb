@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 1.4 1998-09-29 13:10:44 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 1.5 1998-09-29 16:12:12 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -61,12 +61,10 @@ value ged_1st_name base p =
 ;
 
 value ged_name base oc per =
-  do Printf.fprintf oc "1 NAME %s/%s/\n"
-       (Ansel.encode (ged_1st_name base per))
-       (Ansel.encode (sou base per.surname));
+  do Printf.fprintf oc "1 NAME %s/%s/\n" (ged_1st_name base per)
+       (sou base per.surname);
      match per.nick_names with
-     [ [nn :: _] ->
-          Printf.fprintf oc "2 NICK %s\n" (Ansel.encode (sou base nn))
+     [ [nn :: _] -> Printf.fprintf oc "2 NICK %s\n" (sou base nn)
      | [] -> () ];
   return ()
 ;
@@ -109,9 +107,9 @@ value ged_ev_detail oc n d pl src =
             Printf.fprintf oc "\n";
          return ()
      | None -> () ];
-     if pl <> "" then Printf.fprintf oc "%d PLAC %s\n" n (Ansel.encode pl)
+     if pl <> "" then Printf.fprintf oc "%d PLAC %s\n" n pl
      else ();
-     if src <> "" then Printf.fprintf oc "%d SOUR %s\n" n (Ansel.encode src)
+     if src <> "" then Printf.fprintf oc "%d SOUR %s\n" n src
      else ();
   return ()
 ;
@@ -167,10 +165,10 @@ value ged_ind_ev_str base oc per =
 
 value ged_title base oc per tit =
   do Printf.fprintf oc "1 TITL ";
-     Printf.fprintf oc "%s" (Ansel.encode (sou base tit.t_title));
+     Printf.fprintf oc "%s" (sou base tit.t_title);
      match sou base tit.t_place with
      [ "" -> ()
-     | pl -> Printf.fprintf oc ", %s" (Ansel.encode pl) ];
+     | pl -> Printf.fprintf oc ", %s" pl ];
      if tit.t_nth <> 0 then Printf.fprintf oc ", %d" tit.t_nth else ();
      Printf.fprintf oc "\n";
      match
@@ -196,11 +194,8 @@ value ged_title base oc per tit =
             Printf.fprintf oc "\n";
          return () ];
      match tit.t_name with
-     [ Tmain ->
-         Printf.fprintf oc "2 NOTE %s\n"
-           (Ansel.encode (sou base per.public_name))
-     | Tname n ->
-         Printf.fprintf oc "2 NOTE %s\n" (Ansel.encode (sou base n))
+     [ Tmain -> Printf.fprintf oc "2 NOTE %s\n" (sou base per.public_name)
+     | Tname n -> Printf.fprintf oc "2 NOTE %s\n" (sou base n)
      | Tnone -> () ];
   return ()
 ;
@@ -208,7 +203,7 @@ value ged_title base oc per tit =
 value ged_ind_attr_str base oc per =
   do match sou base per.occupation with
      [ "" -> ()
-     | occu -> Printf.fprintf oc "1 OCCU %s\n" (Ansel.encode occu) ];
+     | occu -> Printf.fprintf oc "1 OCCU %s\n" occu ];
      List.iter (ged_title base oc per) per.titles;
   return ()
 ;
@@ -231,7 +226,7 @@ value ged_fams base (per_sel, fam_sel) oc ifam =
 value ged_psource base oc per =
   match sou base per.psources with
   [ "" -> ()
-  | s -> Printf.fprintf oc "1 SOUR %s\n" (Ansel.encode s) ]
+  | s -> Printf.fprintf oc "1 SOUR %s\n" s ]
 ;
 
 value br = "<br>";
@@ -295,13 +290,13 @@ value ged_child base (per_sel, fam_sel) oc chil =
 value ged_fsource base oc fam =
   match sou base fam.fsources with
   [ "" -> ()
-  | s -> Printf.fprintf oc "1 SOUR %s\n" (Ansel.encode s) ]
+  | s -> Printf.fprintf oc "1 SOUR %s\n" s ]
 ;
 
 value ged_comment base oc fam =
   match sou base fam.comment with
   [ "" -> ()
-  | s -> Printf.fprintf oc "1 NOTE %s\n" (Ansel.encode s) ]
+  | s -> Printf.fprintf oc "1 NOTE %s\n" s ]
 ;
 
 value has_personal_infos base per asc =

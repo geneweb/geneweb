@@ -1,10 +1,15 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 1.4 1998-09-29 12:22:47 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 1.5 1998-09-29 16:12:25 ddr Exp $ *)
 
 open Config;
 open Def;
 open Gutil;
 open Util;
+
+value f_aoc conf s =
+  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
+  else s
+;
 
 value get env key =
   match p_getenv env key with
@@ -109,7 +114,7 @@ value reconstitute_person conf =
     [ Some s -> try int_of_string (strip_spaces s) with [ Failure _ -> -1 ]
     | _ -> -1 ]
   in
-  let first_name = strip_spaces (get conf.env "first_name") in
+  let first_name = f_aoc conf (strip_spaces (get conf.env "first_name")) in
   let surname = strip_spaces (get conf.env "surname") in
   let occ =
 (*

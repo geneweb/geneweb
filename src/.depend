@@ -53,8 +53,8 @@ gwc.cmo: adef.cmi argl.cmo check.cmo consang.cmo def.cmi gutil.cmi gwcomp.cmo \
     iobase.cmi mhashtbl.cmo name.cmi 
 gwc.cmx: adef.cmx argl.cmx check.cmx consang.cmx def.cmi gutil.cmx gwcomp.cmx \
     iobase.cmx mhashtbl.cmx name.cmx 
-gwcomp.cmo: adef.cmi def.cmi gutil.cmi 
-gwcomp.cmx: adef.cmx def.cmi gutil.cmx 
+gwcomp.cmo: adef.cmi ansel.cmo def.cmi gutil.cmi 
+gwcomp.cmx: adef.cmx ansel.cmx def.cmi gutil.cmx 
 gwd.cmo: argl.cmo base64.cmo config.cmi def.cmi family.cmi gutil.cmi \
     iobase.cmi lock.cmo relationLink.cmo util.cmi ../wserver/wserver.cmi 
 gwd.cmx: argl.cmx base64.cmx config.cmi def.cmi family.cmx gutil.cmx \
@@ -155,8 +155,8 @@ updateIndOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi iobase.cmi name.cmi \
 updateIndOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx iobase.cmx name.cmx \
     update.cmx updateInd.cmx util.cmx ../wserver/wserver.cmx updateIndOk.cmi 
 updateIndOk.cmi: config.cmi def.cmi gutil.cmi 
-util.cmo: adef.cmi config.cmi def.cmi gutil.cmi name.cmi \
+util.cmo: adef.cmi ansel.cmo config.cmi def.cmi gutil.cmi name.cmi \
     ../wserver/wserver.cmi util.cmi 
-util.cmx: adef.cmx config.cmi def.cmi gutil.cmx name.cmx \
+util.cmx: adef.cmx ansel.cmx config.cmi def.cmi gutil.cmx name.cmx \
     ../wserver/wserver.cmx util.cmi 
 util.cmi: config.cmi def.cmi 

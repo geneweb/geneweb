@@ -1,10 +1,12 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 1.3 1998-09-29 08:38:48 ddr Exp $ *)
+(* $Id: some.ml,v 1.4 1998-09-29 16:12:21 ddr Exp $ *)
 
 open Def;
 open Gutil;
 open Config;
 open Util;
+
+value coa = Util.charset_of_ansel;
 
 value first_name_not_found conf x =
   let title _ =
@@ -71,7 +73,8 @@ value print_elem conf base is_surname (p, xl) =
   [ [x] ->
       do Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
          if is_surname then
-           Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
+           Wserver.wprint "%s%s" (coa conf (surname_end p))
+             (coa conf (surname_begin p))
          else Wserver.wprint "%s" p;
          Wserver.wprint "</a>\n";
          Date.afficher_dates_courtes conf base x;
@@ -84,7 +87,8 @@ value print_elem conf base is_surname (p, xl) =
                 Wserver.wprint "<a href=\"%s%s\">" (commd conf)
                   (acces conf base x);
                 if is_surname then
-                  Wserver.wprint "%s%s" (surname_end p) (surname_begin p)
+                  Wserver.wprint "%s%s" (coa conf (surname_end p))
+                    (coa conf (surname_begin p))
                 else Wserver.wprint "%s" p;
                 Wserver.wprint "</a>";
                 Date.afficher_dates_courtes conf base x;
@@ -122,8 +126,8 @@ value first_name_print_list conf base xl liste =
       [] l
   in
   let title _ =
-    do Wserver.wprint "%s" (List.hd xl);
-       List.iter (fun x -> Wserver.wprint ", %s" x) (List.tl xl);
+    do Wserver.wprint "%s" (coa conf (List.hd xl));
+       List.iter (fun x -> Wserver.wprint ", %s" (coa conf x)) (List.tl xl);
     return ()
   in
   do header conf title;
@@ -283,8 +287,9 @@ value rec print_by_branch x conf base (ipl, homonymes) =
       | _ -> x ]
     in
     let title h =
-      do Wserver.wprint "%s" (List.hd homonymes);
-         List.iter (fun x -> Wserver.wprint ", %s" x) (List.tl homonymes);
+      do Wserver.wprint "%s" (coa conf (List.hd homonymes));
+         List.iter (fun x -> Wserver.wprint ", %s" (coa conf x))
+           (List.tl homonymes);
       return ()
     in
     do header conf title;
@@ -401,47 +406,4 @@ value surname_print conf base x =
   | _ ->
       let iperl = select_ancestors base name_inj iperl in
       print_by_branch x conf base (iperl, strl) ]
-;
-
-value name_print conf base p k =
-  let liste =
-    Sort.list
-      (fun ip1 ip2 ->
-         let p1 = poi base ip1 in
-         let p2 = poi base ip2 in
-         match (Adef.od_of_codate p1.birth, Adef.od_of_codate p2.birth) with
-         [ (Some d1, Some d2) -> d1 strictement_avant d2
-         | (Some d1, _) -> False
-         | _ -> True ])
-      (List.fold_right
-         (fun ip ipl ->
-            if not (List.memq ip ipl) then [ip :: ipl] else ipl)
-         (person_ht_find_all base
-            (sou base p.first_name ^ " " ^ sou base p.surname))
-         [])
-  in
-  match liste with
-  [ [p] -> k p
-  | liste ->
-      let title _ =
-        Wserver.wprint "%s %s : pr&eacute;cisez" (sou base p.first_name)
-          (sou base p.surname)
-      in
-      do header conf title;
-         Wserver.wprint "<ul>\n";
-         List.iter
-           (fun ip ->
-              let p = poi base ip in
-              do Wserver.wprint "<li> ";
-                 Wserver.wprint "<a href=\"%s%s\">" (commd conf)
-                   (acces conf base p);
-                 preciser_homonyme conf base p;
-                 Wserver.wprint "</a>";
-                 afficher_titre conf base p;
-                 Wserver.wprint "\n";
-              return ())
-           liste;
-         Wserver.wprint "</ul>\n";
-         trailer conf;
-      return () ]
 ;

@@ -1,4 +1,4 @@
-(* $Id: name.ml,v 1.1.1.1 1998-09-01 14:32:03 ddr Exp $ *)
+(* $Id: name.ml,v 1.2 1998-09-29 16:12:19 ddr Exp $ *)
 
 (* Name.lower *)
 
@@ -7,8 +7,10 @@ value lower s =
     if i == String.length s then len
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '0'..'9' | '.' ->
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '.' ->
           name_len 0 (i + 1) (len + special + 1)
+      | 'à'..'ý' | 'À'..'Ý' ->
+          name_len 0 (i + 1) (len + special)
       | _ ->
          if len == 0 then name_len 0 (i + 1) 0
          else name_len 1 (i + 1) len ]
@@ -18,23 +20,19 @@ value lower s =
     if i == String.length s then s'
     else
       match s.[i] with
-      [ 'a'..'z' | 'A'..'Z' | 'à'..'ý' | 'À'..'Ý' | '0'..'9' | '.' as c ->
+      [ 'a'..'z'  | '0'..'9' | '.' as c ->
           let i' =
             if special then do s'.[i'] := ' '; return i' + 1 else i'
           in
-          let c =
-            match Char.lowercase c with
-            [ 'à' | 'á' | 'â' | 'ã' | 'ä' | 'å' | 'æ' -> 'a'
-            | 'ç' -> 'c'
-            | 'è' | 'é' | 'ê' | 'ë' -> 'e'
-            | 'ì' | 'í' | 'î' | 'ï' -> 'i'
-            | 'ñ' -> 'n'
-            | 'ò' | 'ó' | 'ô' | 'õ' | 'ö' -> 'o'
-            | 'ù' | 'ú' | 'û' | 'ü' -> 'u'
-            | 'ý' | 'ÿ' -> 'y'
-            | c -> c ]
-          in
+          let c = s.[i] in
           do s'.[i'] := c; return copy False (i + 1) (i' + 1)
+      | 'A'..'Z' | '0'..'9' | '.' as c ->
+          let i' =
+            if special then do s'.[i'] := ' '; return i' + 1 else i'
+          in
+          let c = Char.lowercase s.[i] in
+          do s'.[i'] := c; return copy False (i + 1) (i' + 1)
+      | 'à'..'ý' | 'À'..'Ý' -> copy special (i + 1) i'
       | c ->
           if i' == 0 then copy False (i + 1) 0
           else copy True (i + 1) i' ]

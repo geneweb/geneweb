@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 1.1.1.1 1998-09-01 14:32:10 ddr Exp $ *)
+(* $Id: descend.ml,v 1.2 1998-09-29 16:12:16 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -9,6 +9,8 @@ open Util;
 value limit_by_list = 8;
 
 value infini = 10000;
+
+value coa = Util.charset_of_ansel;
 
 value make_level_table base niveau_max p =
   let mark = Array.create (base.persons.len) False in
@@ -490,7 +492,7 @@ value afficher_date_mariage conf base p c dmar =
 ;
 
 value afficher_conjoint conf base marks paths p c dmar =
-  do Wserver.wprint "&amp;";
+  do Wserver.wprint "\n&amp;";
      afficher_date_mariage conf base p c dmar;
      Wserver.wprint " ";
      stag "strong" begin
@@ -713,7 +715,7 @@ value afficher_descendants_numerotation conf base niveau_max ancetre =
   return ()
 ;
 
-value print_ref base paths p =
+value print_ref conf base paths p =
   if paths.(Adef.int_of_iper p.cle_index) <> [] then
     Wserver.wprint " => <tt><b>%s</b></tt>" (label_of_path paths p)
   else
@@ -723,7 +725,8 @@ value print_ref base paths p =
          if paths.(Adef.int_of_iper c) <> [] then
            let c = poi base c in
            Wserver.wprint " => %s %s <tt><b>%s</b></tt>"
-             (sou base c.first_name) (sou base c.surname)
+             (coa conf (sou base c.first_name))
+             (coa conf (sou base c.surname))
              (label_of_path paths c)
          else ())
       p.family
@@ -733,18 +736,18 @@ value print_elem conf base paths precision (n, pll) =
   do Wserver.wprint "<li> ";
      match pll with
      [ [[p]] ->
-         do Wserver.wprint "<strong>%s " (surname_end n);
+         do Wserver.wprint "<strong>%s " (coa conf (surname_end n));
             Wserver.wprint "<a href=\"%si=%d\">" (commd conf)
               (Adef.int_of_iper p.cle_index);
-            Wserver.wprint "%s</a>" (sou base p.first_name);
-            Wserver.wprint "%s</strong>" (surname_begin n);
+            Wserver.wprint "%s</a>" (coa conf (sou base p.first_name));
+            Wserver.wprint "%s</strong>" (coa conf (surname_begin n));
             Date.afficher_dates_courtes conf base p;
-            print_ref base paths p;
+            print_ref conf base paths p;
             Wserver.wprint "\n";
          return ()
      | _ ->
-         do Wserver.wprint "<strong>%s%s</strong>\n" (surname_end n)
-              (surname_begin n);
+         do Wserver.wprint "<strong>%s%s</strong>\n"
+              (coa conf (surname_end n)) (coa conf (surname_begin n));
             tag "ul" begin
               List.iter
                 (fun pl ->
@@ -762,7 +765,7 @@ value print_elem conf base paths precision (n, pll) =
                                (Adef.int_of_iper p.cle_index)
                              begin
                                Wserver.wprint "%s"
-                                 (sou base p.first_name);
+                                 (coa conf (sou base p.first_name));
                              end;
                            end;
                            if several && precision then
@@ -772,7 +775,7 @@ value print_elem conf base paths precision (n, pll) =
                              return ()
                            else ();
                            Date.afficher_dates_courtes conf base p;
-                           print_ref base paths p;
+                           print_ref conf base paths p;
                            Wserver.wprint "\n";
                         return ())
                      pl)

@@ -1,4 +1,4 @@
-(* $Id: perso.ml,v 1.4 1998-09-29 12:22:41 ddr Exp $ *)
+(* $Id: perso.ml,v 1.5 1998-09-29 16:12:21 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -183,7 +183,8 @@ value print_dates conf base p =
               if birth_place <> "" then
                 Wserver.wprint "%s\n" (capitale (transl_nth conf "born" is))
               else () ];
-          if birth_place <> "" then Wserver.wprint " - %s" birth_place
+          if birth_place <> "" then
+            Wserver.wprint " - %s" (coa conf birth_place)
           else ();
           match (Adef.od_of_codate p.birth, birth_place) with
           [ (None, "") -> ()
@@ -207,7 +208,8 @@ value print_dates conf base p =
                 Wserver.wprint "%s\n"
                   (capitale (transl_nth conf "baptized" is))
               else () ];
-          if baptism_place <> "" then Wserver.wprint " - %s" baptism_place
+          if baptism_place <> "" then
+            Wserver.wprint " - %s" (coa conf baptism_place)
           else ();
           match (baptism, baptism_place) with
           [ (None, "") -> ()
@@ -245,7 +247,8 @@ value print_dates conf base p =
               | _ ->
                   Wserver.wprint "%s" (capitale (transl_nth conf "died" is)) ]
           | DontKnowIfDead | NotDead -> () ];
-          if death_place <> "" then Wserver.wprint " - %s" death_place
+          if death_place <> "" then
+            Wserver.wprint " - %s" (coa conf death_place)
           else ();
           if something then Wserver.wprint ".</em><br>\n" else ();
        return ()
@@ -293,7 +296,8 @@ value print_dates conf base p =
          do match Adef.od_of_codate cod with
             [ Some d -> Wserver.wprint " %s" (Date.string_of_ondate conf d)
             | None -> () ];
-            if place <> "" then Wserver.wprint " - %s" place else ();
+            if place <> "" then Wserver.wprint " - %s" (coa conf place)
+            else ();
          return ()
        in
        do if something then Wserver.wprint "<em>\n" else ();
@@ -375,7 +379,7 @@ value print_family conf base p a ifam =
                | _ -> () ];
                match marriage_place with
                [ "" -> ()
-               | s -> Wserver.wprint " - %s, " s ];
+               | s -> Wserver.wprint " - %s, " (coa conf s) ];
                match (marriage, marriage_place) with
                [ (None, "") -> ()
                | _ -> Wserver.wprint "</em>" ];
@@ -401,7 +405,7 @@ value print_family conf base p a ifam =
      | _ -> () ];
      match sou base fam.comment with
      [ "" -> ()
-     | str -> Wserver.wprint "\n(%s)" str ];
+     | str -> Wserver.wprint "\n(%s)" (coa conf str) ];
      if Array.length children == 0 then ()
      else
        let age_auth =
@@ -443,7 +447,7 @@ value print_notes conf base p =
         do Wserver.wprint "<h3> %s </h3>\n\n"
              (capitale (transl_nth conf "note/notes" 1));
            Wserver.wprint "<ul><li>\n";
-           Wserver.wprint "%s\n" notes;
+           Wserver.wprint "%s\n" (coa conf notes);
            Wserver.wprint "</ul>\n";
         return ()
       else () ]
@@ -526,13 +530,17 @@ value print conf base p =
             (sou base nn)
     | (_, []) ->
         if h then
-          Wserver.wprint "%s %s" (sou base p.first_name) (sou base p.surname)
+          Wserver.wprint "%s %s"
+            (coa conf (sou base p.first_name))
+            (coa conf (sou base p.surname))
         else
           do Wserver.wprint "<a href=\"%sm=P;v=%s\">%s</a>" (commd conf)
-               (code_varenv (sou base p.first_name)) (sou base p.first_name);
+               (code_varenv (sou base p.first_name))
+               (coa conf (sou base p.first_name));
              Wserver.wprint " ";
              Wserver.wprint "<a href=\"%sm=N;v=%s\">%s</a>" (commd conf)
-               (code_varenv (sou base p.surname)) (sou base p.surname);
+               (code_varenv (sou base p.surname))
+               (coa conf (sou base p.surname));
           return () ]
   in
   let a = aoi base p.cle_index in
@@ -588,11 +596,12 @@ value print conf base p =
      [ ("", []) -> ()
      | _ ->
          do Wserver.wprint "<em>(<a href=\"%sm=P;v=%s\">%s</a>" (commd conf)
-              (code_varenv (sou base p.first_name)) (sou base p.first_name);
+              (code_varenv (sou base p.first_name))
+              (coa conf (sou base p.first_name));
             Wserver.wprint " ";
             Wserver.wprint "<a href=\"%sm=N;v=%s\">%s</a>)</em>\n<br>\n"
               (commd conf) (code_varenv (sou base p.surname))
-              (sou base p.surname);
+              (coa conf (sou base p.surname));
          return () ];
      List.iter
        (fun n ->
@@ -602,8 +611,8 @@ value print conf base p =
      if age_autorise conf base p then
        List.iter
          (fun n ->
-            Wserver.wprint "<em>(%s %s)</em>\n<br>\n" (sou base n)
-              (sou base p.surname))
+            Wserver.wprint "<em>(%s %s)</em>\n<br>\n" (coa conf (sou base n))
+              (coa conf (sou base p.surname)))
          p.first_names_aliases
      else ();
      match

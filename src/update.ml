@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 1.2 1998-09-29 12:22:43 ddr Exp $ *)
+(* $Id: update.ml,v 1.3 1998-09-29 16:12:22 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -518,7 +518,7 @@ value print conf base p =
            else p.occ
          in
          do Wserver.wprint ": ";
-            Wserver.wprint "%s.%d %s" fn occ sn;
+            Wserver.wprint "%s.%d %s" (coa conf fn) occ (coa conf sn);
          return ();
     return ()
   in
