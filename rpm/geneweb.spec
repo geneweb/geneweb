@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.3 1999-12-07 13:44:36 ddr Exp $
+# $Id: geneweb.spec,v 3.4 2000-03-22 10:51:18 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -211,6 +211,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/en/access.htm
 /home/geneweb/gw/gw/doc/en/consang.htm
 /home/geneweb/gw/gw/doc/en/diruse.htm
+/home/geneweb/gw/gw/doc/en/divide.htm
 /home/geneweb/gw/gw/doc/en/faq.htm
 /home/geneweb/gw/gw/doc/en/links.htm
 /home/geneweb/gw/gw/doc/en/maint.htm
@@ -260,6 +261,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/se/access.htm
 /home/geneweb/gw/gw/doc/se/consang.htm
 /home/geneweb/gw/gw/doc/se/diruse.htm
+/home/geneweb/gw/gw/doc/se/divide.htm
 /home/geneweb/gw/gw/doc/se/faq.htm
 /home/geneweb/gw/gw/doc/se/links.htm
 /home/geneweb/gw/gw/doc/se/maint.htm
@@ -297,6 +299,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/images/l-nl.jpg
 /home/geneweb/gw/gw/images/l-no.jpg
 /home/geneweb/gw/gw/images/l-pt.jpg
+/home/geneweb/gw/gw/images/l-ru.jpg
 /home/geneweb/gw/gw/images/l-se.jpg
 /home/geneweb/gw/gw/images/up.jpg
 /home/geneweb/gw/gw/lang/advanced.txt
@@ -316,6 +319,7 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/lang/nl/start.txt
 /home/geneweb/gw/gw/lang/no/start.txt
 /home/geneweb/gw/gw/lang/pt/start.txt
+/home/geneweb/gw/gw/lang/ru/start.txt
 /home/geneweb/gw/gw/lang/se/start.txt
 /home/geneweb/gw/gw/lang/version.txt
 /home/geneweb/gw/gw/only.txt
