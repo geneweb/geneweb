@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.14 2002-04-13 17:25:28 ddr Exp $
+# $Id: Makefile,v 4.15 2002-09-11 08:24:53 ddr Exp $
 
 DESTDIR=distribution
 
@@ -92,7 +92,7 @@ classical_distrib:
 	cp etc/a.gwf $(DESTDIR)/.
 	mkdir $(DESTDIR)/doc
 	cp doc/*.htm $(DESTDIR)/doc/.
-	for i in de fr en nl sv; do \
+	for i in de en fr it nl sv; do \
 	  mkdir $(DESTDIR)/doc/$$i; \
 	  cp doc/$$i/*.htm $(DESTDIR)/doc/$$i/.; \
 	done
