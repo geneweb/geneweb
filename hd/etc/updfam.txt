@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updfam.txt,v 4.9 2001-06-19 08:00:04 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.10 2001-06-23 10:26:56 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -155,8 +155,6 @@
   [*merge::family/families]1 # %evar_i;
 %end;
 </font></h1>
-
-<div align=right><em>(new version 3)</em></div>
 
 <form method=POST action="%action;">
 %hidden;

@@ -1,4 +1,4 @@
-GeneWeb 4.01
+GeneWeb 4.02
 
 Pour demarrer avec GeneWeb, suivez les instructions suivantes:
 
@@ -6,7 +6,7 @@ Si vous etes sous Windows:
    Double-cliquez sur le fichier "index.htm" du repertoire "doc",
    et suivez les instructions.
 
-Si vous etes sous Unix:
+Si vous etes sous Unix ou Mac:
    Lancez votre navigateur Web.
    Si vous avez installe GeneWeb, par exemple dans
         /home/dupont/geneweb
@@ -28,4 +28,4 @@ Remarques, suggestions, questions, rapports d'anomalie a:
 	http://cristal.inria.fr/~ddr/
 
 Veuillez preciser le numero de version ci-dessus et le systeme sur lequel
-vous tournez (Unix, Windows NT ou Windows 95/98/2000).
+vous tournez (Unix, Windows, Mac).
