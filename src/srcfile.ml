@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.13 1999-08-14 09:26:39 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.14 1999-08-14 23:47:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -207,8 +207,8 @@ value rec copy_from_channel conf base ic =
                   (transl conf "(thousand separator)")
                   (Num.of_int base.data.persons.len)
             | 'o' ->
-                if conf.lang <> conf.default_lang
-                || base.data.bnotes.nread 1 = "" then echo.val := False
+                if (* conf.lang <> conf.default_lang
+                || *) base.data.bnotes.nread 1 = "" then echo.val := False
                 else ()
             | 'q' ->
                 let (wc, rc, d) = count conf in
