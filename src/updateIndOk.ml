@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.15 2000-10-28 21:52:32 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.16 2000-10-29 15:02:19 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -298,16 +298,16 @@ value error_person conf base p err =
   return ()
 ;
 
-value strip_list = list_filter (fun s -> s <> "");
+value strip_list = List.filter (fun s -> s <> "");
 
 value strip_person p =
   do p.first_names_aliases := strip_list p.first_names_aliases;
      p.surnames_aliases := strip_list p.surnames_aliases;
      p.qualifiers := strip_list p.qualifiers;
      p.aliases := strip_list p.aliases;
-     p.titles := list_filter (fun t -> t.t_ident <> "") p.titles;
+     p.titles := List.filter (fun t -> t.t_ident <> "") p.titles;
      p.rparents :=
-       list_filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents;
+       List.filter (fun r -> r.r_fath <> None || r.r_moth <> None) p.rparents;
   return ()
 ;
 
@@ -448,7 +448,7 @@ value update_relation_parents base op np =
            ippl
          else
            if List.mem pi p.related then
-             do p.related := list_filter (\<> pi) p.related; return
+             do p.related := List.filter (\<> pi) p.related; return
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
       mod_ippl op_rparents

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.73 2000-10-28 21:52:32 ddr Exp $ *)
+(* $Id: util.ml,v 3.74 2000-10-29 15:02:20 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -79,13 +79,6 @@ value unauthorized conf auth_type =
      Wserver.wprint "<ul><li>%s</ul>\n" auth_type;
      Wserver.wprint "</body>\n";
   return ()
-;
-
-value list_iter_first f al =
-  let _ = List.fold_left
-    (fun first a -> let () = f first a in False)
-    True al
-  in ()
 ;
 
 value commd conf =
@@ -1331,20 +1324,6 @@ value incorrect_request conf =
   return ()
 ;
 
-value list_find f =
-  loop where rec loop =
-    fun
-    [ [] -> raise Not_found
-    | [x :: l] -> if f x then x else loop l ]
-;
-
-value list_filter p =
-  find [] where rec find accu =
-    fun
-    [ [] -> List.rev accu
-    | [x :: l] -> if p x then find [x :: accu] l else find accu l ]
-;
-
 value find_person_in_env conf base suff =
   match p_getint conf.env ("i" ^ suff) with
   [ Some i ->
@@ -1366,7 +1345,7 @@ value find_person_in_env conf base suff =
           let k = Name.lower k in
           try
             let r =
-              list_find
+              List.find
                 (fun x ->
                    Name.lower
                      (p_first_name base x ^ " " ^ p_surname base x)

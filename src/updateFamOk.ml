@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.19 2000-10-24 15:47:18 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.20 2000-10-29 15:02:19 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -282,13 +282,6 @@ value infer_origin_file conf base ifam ncpl ndes =
       | Some r -> r ] ]
 ;
 
-value list_filter p =
-  find [] where rec find accu =
-    fun
-    [ [] -> List.rev accu
-    | [x :: l] -> if p x then find [x :: accu] l else find accu l ]
-;
-
 value update_related_witnesses base ofam_witn nfam_witn ncpl =
   let mod_ippl = [] in
   let mod_ippl =
@@ -310,7 +303,7 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
          else
            let p = poi base ip in
            if List.mem ncpl.father p.related then
-             do p.related := list_filter (\<> ncpl.father) p.related; return
+             do p.related := List.filter (\<> ncpl.father) p.related; return
              if List.mem_assoc ip ippl then ippl else [(ip, p) :: ippl]
            else ippl)
       mod_ippl ofam_witn
@@ -589,7 +582,7 @@ value print_family conf base wl cpl des =
   in
   do match rdsrc with
      [ Some x ->
-         do conf.henv := list_remove_assoc "dsrc" conf.henv;
+         do conf.henv := List.remove_assoc "dsrc" conf.henv;
             if x <> "" then conf.henv := [("dsrc", code_varenv x) :: conf.henv]
             else ();
          return ()
