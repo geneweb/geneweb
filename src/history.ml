@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 3.9 2000-06-18 14:13:10 ddr Exp $ *)
+(* $Id: history.ml,v 3.10 2000-08-25 13:51:12 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -56,14 +56,38 @@ value buff_get_rev len =
   return s
 ;
 
-value rev_input_line ic pos =
+value rev_input_char ic (rbuff, rpos) pos =
+  do if rpos.val == 0 then
+       do if String.length rbuff.val < 65536 then
+            let len =
+              if rbuff.val = "" then 1024 else 2 * String.length rbuff.val
+            in
+            rbuff.val := String.create len
+          else ();
+       return
+       let ppos = max (pos - String.length rbuff.val) 0 in
+(*
+do Printf.eprintf "rev_input_char pos %d reading %d chars..." pos (pos - ppos); flush stderr; return
+*)
+       do seek_in ic ppos;
+          really_input ic rbuff.val 0 (pos - ppos);
+(*
+do Printf.eprintf " ok\n"; flush stderr; return
+*)
+          rpos.val := pos - ppos;
+       return ()
+     else ();
+     decr rpos;
+  return rbuff.val.[rpos.val]
+;
+
+value rev_input_line ic pos (rbuff, rpos) =
   if pos <= 0 then raise Begin_of_file
   else
     loop 0 (pos - 1) where rec loop len pos =
-      if pos < 0 then (buff_get_rev len, pos)
+      if pos <= 0 then (buff_get_rev len, pos)
       else
-        do seek_in ic pos; return
-        match input_char ic with
+        match rev_input_char ic (rbuff, rpos) pos with
         [ '\n' -> (buff_get_rev len, pos)
         | c -> loop (Buff.store len c) (pos - 1) ]
 ;
@@ -109,23 +133,35 @@ value line_fields conf base line =
   else None
 ;
 
-value print_history_line conf base line i =
+value print_history_line conf base line wiz k i =
   match line_fields conf base line with
   [ Some (time, user, action, p) ->
-      do if i = 0 then Wserver.wprint "<dl>\n" else ();
-         Wserver.wprint "<dt><tt><b>*</b> %s</tt>\n" time;
-         Wserver.wprint "(%s)\n" action;
-         if user <> "" then Wserver.wprint "<em>%s</em>" user else ();
-         Wserver.wprint " :\n<dd>";
-         match p with
-         [ Left key -> Wserver.wprint "%s" key
-         | Right p ->
-             do Wserver.wprint "%s"
-                  (referenced_person_title_text conf base p);
-                Wserver.wprint "%s" (Date.short_dates_text conf base p);
-             return () ];
-         Wserver.wprint "\n";
-      return i + 1
+      if wiz = "" || user = wiz then
+        do if i = 0 then Wserver.wprint "<dl>\n" else ();
+           Wserver.wprint "<dt><tt><b>*</b> %s</tt>\n" time;
+           Wserver.wprint "(%s)\n" action;
+           if user <> "" then
+             do Wserver.wprint "<em>";
+                if wiz = "" then
+                  Wserver.wprint "<a href=\"%sm=HIST;k=%d;wiz=%s\">"
+                    (commd conf) k (Util.code_varenv user)
+                else ();
+                Wserver.wprint "%s" user;
+                if wiz = "" then Wserver.wprint "</a>" else ();
+                Wserver.wprint "</em>";
+             return ()
+           else ();
+           Wserver.wprint " :\n<dd>";
+           match p with
+           [ Left key -> Wserver.wprint "%s" key
+           | Right p ->
+               do Wserver.wprint "%s"
+                    (referenced_person_title_text conf base p);
+                  Wserver.wprint "%s" (Date.short_dates_text conf base p);
+               return () ];
+           Wserver.wprint "\n";
+        return i + 1
+      else i
   | None -> i ]
 ;
 
@@ -138,17 +174,23 @@ value print_history conf base ic =
   let pos =
     match p_getint conf.env "pos" with
     [ Some x -> x
-    | _ -> in_channel_length ic - 1 ]
+    | _ -> in_channel_length ic ]
+  in
+  let wiz =
+    match p_getenv conf.env "wiz" with
+    [ Some x -> x
+    | _ -> "" ]
   in
   let (pos, n) =
+    let vv = (ref (""), ref 0) in
     loop pos 0 where rec loop pos i =
       if i >= k then (pos, i)
       else
 	match
-          try Some (rev_input_line ic pos) with [ Begin_of_file -> None ]
+          try Some (rev_input_line ic pos vv) with [ Begin_of_file -> None ]
         with
 	[ Some (line, pos) ->
-            let i = print_history_line conf base line i in
+            let i = print_history_line conf base line wiz k i in
             loop pos i
 	| _ -> (pos, i) ]
   in
@@ -159,6 +201,11 @@ value print_history conf base ic =
          Wserver.wprint "<input type=hidden name=m value=HIST>\n";
          Wserver.wprint "<input name=k size=3 value=%d>\n" k;
          Wserver.wprint "<input type=hidden name=pos value=%d>\n" pos;
+         if wiz <> "" then
+           do Wserver.wprint "<input type=hidden name=wiz value=\"%s\">\n" wiz;
+              Wserver.wprint "(%s)\n" wiz;
+           return ()
+         else ();
          Wserver.wprint "<input type=submit value=\"&gt;&gt;\">\n";
        end
      else ();
