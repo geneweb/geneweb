@@ -5,6 +5,8 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [14 Nov 03] Improved speed of displaying by first name or by surname
+    when many changes have been done (file "patches" is big).
   - [25 Sep 03] Added ability to put macros of start.txt in "motd"
     (in general macros in variables defined by macro %V); useful for
     example to put a "motd" for only wizards.
