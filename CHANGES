@@ -13,6 +13,11 @@ GeneWeb version 3.11
     marriage" because, despite the warning at end of this page, many
     people are mistaken by thinking it was "add a child in a family".
 
+* Bases configuration files (base.gwf)
+  - [29 Dec 00] Added variable "always_surname" telling to always print
+    the children surnames in descendant display, even if same than the
+    father's (default = no).
+
 * Lexicon (lang/lexicon.txt)
   - [29 Dec 00] Fixed some Spanish translations (Frank Komarek)
 

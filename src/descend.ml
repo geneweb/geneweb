@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.22 2000-11-13 20:48:25 ddr Exp $ *)
+(* $Id: descend.ml,v 3.23 2000-12-29 10:02:45 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -209,12 +209,14 @@ value afficher_marie conf base first fam p spouse =
   return ()
 ;
 
-value print_child conf base levt boucle niveau_max niveau compte auth x =
+value print_child
+  conf base levt boucle niveau_max niveau compte auth always_surname x
+=
   let ix = x.cle_index in
   let ux = uoi base ix in
   do html_li conf;
      stag "strong" begin
-       if s_appelle_comme_son_pere base ix then
+       if not always_surname && s_appelle_comme_son_pere base ix then
          afficher_prenom_de_personne_referencee conf base x
        else afficher_personne_referencee conf base x;
      end;
@@ -256,6 +258,10 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
   let niveau_max = min (limit_desc conf) niveau_max in
   let levt = make_level_table base niveau_max p in
   let compte = ref 0 in
+  let always_surname =
+    try List.assoc "always_surname" conf.base_env = "yes" with
+    [ Not_found -> False ]
+  in
   let rec boucle niveau p u =
     if niveau <= niveau_max then
       let ifaml = Array.to_list u.family in
@@ -294,7 +300,7 @@ value afficher_descendants_jusqu_a conf base niveau_max p line =
                 tag "ul" begin
                   List.iter
                     (print_child conf base levt boucle niveau_max niveau
-                       compte age_auth)
+                       compte age_auth always_surname)
                     children;
                 end
               else ();
