@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- copyright (c) INRIA -->
+  <title>Genealogi - %t</title>
+</head>
+<body%b>
+<h1>Genealogi</h1>
+
+%rversion
+
+<p>
+
+Databasen inneholder n&aring; %n personer.
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
+S&oslash;k: <input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+Navnetype for s&oslash;ket:
+<ul>
+<li> <input type=radio name=t value=PN checked>
+Enten <em>fornavn</em> og <em>etternavn</em>,
+eller <em>offisielt navn</em>, eller <em>alias</em>.
+<li> <input type=radio name=t value=P> <em>Fornavn</em>.
+<li> <input type=radio name=t value=N> <em>Etternavn</em>.
+</ul>
+</form>
+
+<li>
+
+<FORM method=GET action="%f">
+%h<input type=hidden name=m value=TT>
+Etter titel <INPUT NAME=t size=14 maxlength=200>
+sted<INPUT NAME=p size=25 maxlength=200> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li>
+
+<FORM method=GET action="%f">
+%hAlle
+<SELECT NAME=m>
+   <OPTION VALUE="N" SELECTED> Etternavn
+   <OPTION VALUE="P"> Fornavn
+</SELECT>
+sortert
+<SELECT NAME=tri>
+   <OPTION VALUE="A" SELECTED> alfabetisk
+   <OPTION VALUE="F"> etter frekvens
+</SELECT> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+
+%w<li> <a href="%sm=ADD_FAM">Registrer ny familie</a>.
+%w
+
+</ul>
+
+<a href="%sm=AN">F&oslash;dselsdager</a>.<br>%x
+<a href="%sm=LB;k=10">Sist f&oslash;dte</a>.<br>
+<a href="%sm=LD;k=10">Sist d&oslash;de</a>.<br>%x
+<a href="%sm=AD">&Aring;rsdager for d&oslash;de personer</a>.<br>
+<a href="%sm=AM">Bryllupsdager</a>.
+<p>
+Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
+
+%y<p>
+
+<ul>
+<li> <a href="%sw=w"><em>Oppdaterings</em></a> adgang (passord).
+%y%z<li> <a href="%sw=f"><em>Venners</em></a> adgang (passord).
+%z%y</ul>
+
+%y%i<p>
+<form method=get action="%f">
+%h<font size=-1>Passord, for <em>venner</em> eller
+<em>oppdaterings</em> adgang:</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+%i<p>
+
+<font size=-1><a href="%sm=LEX">Leksikon</a></font>
