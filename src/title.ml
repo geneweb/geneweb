@@ -1,5 +1,5 @@
-(* camlp4r ./def.syn.cmo *)
-(* $Id: title.ml,v 1.7 1998-11-29 13:40:45 ddr Exp $ *)
+(* camlp4r ./def.syn.cmo ./pa_html.cmo *)
+(* $Id: title.ml,v 1.8 1998-12-09 10:51:24 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -161,6 +161,22 @@ value select_title_place conf base title place =
   return (list.val, clean_title.val, clean_place.val)
 ;
 
+value select_all_with_place conf base place =
+  let list = ref [] in
+  let clean_place = ref place in
+  let place = strip_abbrev_lower place in
+  let select x t =
+    if strip_abbrev_lower (sou base t.t_place) = place then
+      do clean_place.val := sou base t.t_place;
+      return list.val := [(x, t) :: list.val]
+    else ()
+  in
+  do for i = 0 to base.persons.len - 1 do
+       let x = base.persons.get i in List.iter (select x) x.titles;
+     done;
+  return (list.val, clean_place.val)
+;
+
 value select_title base title =
   let list = ref [] in
   let clean_name = ref title in
@@ -265,8 +281,8 @@ value give_access_someone conf base (x, t) list =
      if t.t_nth <> 0 then
        Wserver.wprint " (%s)" (transl_nth conf "nth" t.t_nth)
      else ();
-     if List.memq x list then Wserver.wprint "</em>" else Wserver.wprint "</a>";
-     Wserver.wprint "\n";
+     if List.memq x list then Wserver.wprint "</em>"
+     else Wserver.wprint "</a>";
   return ()
 ;
 
@@ -321,6 +337,25 @@ value print_title_place_list conf base t p list =
        (fun list x ->
           do Wserver.wprint "<li> ";
              give_access_someone conf base x list;
+             Wserver.wprint "\n";
+          return [fst x :: list])
+       [] list
+     in ();
+     Wserver.wprint "</ul>\n";
+     trailer conf;
+  return ()
+;
+
+value print_all_with_place_list conf base p list =
+  let title _ = Wserver.wprint "... %s\n" (coa conf p) in
+  do header conf title;
+     Wserver.wprint "<ul>\n";
+     let _ = List.fold_left
+       (fun list ((p, t) as x) ->
+          do Wserver.wprint "<li> ";
+             give_access_someone conf base x [];
+             Wserver.wprint ", %s\n" (coa conf (sou base t.t_title));
+             Wserver.wprint "\n";
           return [fst x :: list])
        [] list
      in ();
@@ -333,6 +368,12 @@ value print_title_place conf base t p =
   let (l, t, p) = select_title_place conf base t p in
   let list = Sort.list (compare_title_dates conf base) l in
   print_title_place_list conf base t p list
+;
+
+value print_all_with_place conf base p =
+  let (l, p) = select_all_with_place conf base p in
+  let list = Sort.list (compare_title_dates conf base) l in
+  print_all_with_place_list conf base p list
 ;
 
 value print_places_list conf base t list =
@@ -368,6 +409,14 @@ value print_titles conf base p =
           do Wserver.wprint "<li> "; give_access_title conf t p; return ())
        list;
      Wserver.wprint "</ul>\n";
+     if List.length list > 1 then
+       do stag "a" "href=\"%sm=TT;sm=A;p=%s\"" (commd conf) (code_varenv p)
+          begin
+            Wserver.wprint "%s" (capitale (transl conf "the whole list"));
+          end;
+          Wserver.wprint "\n";
+       return ()
+     else ();
      trailer conf;
   return ()
 ;
@@ -414,9 +463,10 @@ value print conf base =
   match
     (p_getenv conf.env "sm", p_getenv conf.env "t", p_getenv conf.env "p")
   with
-  [ (Some _, Some t, Some p) -> print_title_place conf base t p
-  | (Some _, Some t, None) -> print_places conf base t
-  | (Some _, None, Some p) -> print_titles conf base p
+  [ (Some "S", Some t, Some p) -> print_title_place conf base t p
+  | (Some "S", Some t, None) -> print_places conf base t
+  | (Some "S", None, Some p) -> print_titles conf base p
+  | (Some "A", None, Some p) -> print_all_with_place conf base p
   | (_, Some "" | None, Some "" | None) -> print_all_titles conf base
   | (_, Some "" | None, Some "*") -> print_all_places conf base
   | (_, Some "" | None, Some p) -> print_titles conf base (aoc conf p)
