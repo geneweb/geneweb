@@ -2,9 +2,9 @@ GeneWeb version 3.05
 --------------------
 
 * GeneWeb Service/CGI (gwd)
-  - [14 May 00] Added option "-images_url" to give an URL for GeneWeb
-    images (flags, logo, background, up arrow). Can be useful for cgi
-    mode if the associated Web server answer faster than GeneWeb. By
+  - [14 May 00] Added option "-images_url" to give an URL to GeneWeb
+    images (flags, logo, background, up arrow). Can be useful e.g. in
+    cgi mode if the associated Web server answers faster than gwd. By
     default, the GeneWeb images are sent by gwd.
   - [14 May 00] Fixed bug in update forms (person or family): in case of
     name conflict (name already used by another person), when clicking on
