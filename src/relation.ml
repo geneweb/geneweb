@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.75 2001-03-14 16:34:20 ddr Exp $ *)
+(* $Id: relation.ml,v 3.76 2001-03-15 07:10:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -17,9 +17,7 @@ value print_with_relation text conf base p r is =
          Wserver.wprint "<input type=radio name=select value=%d>\n"
            (Adef.int_of_iper ic);
          Wserver.wprint "(%s)\n" (text conf r.r_type is);
-         afficher_personne_sans_titre conf base c;
-         afficher_titre conf base c;
-         Wserver.wprint "\n";
+         Wserver.wprint "%s\n" (person_title_text conf base c);
       return ()
   | None -> () ]
 ;
@@ -49,9 +47,7 @@ value print_with_witness conf base p fam ip =
        (Adef.int_of_iper ip);
      Wserver.wprint "(%s)\n"
        (nominative (transl_nth conf "witness/witnesses" 0));
-     afficher_personne_sans_titre conf base w;
-     afficher_titre conf base w;
-     Wserver.wprint "\n";
+     Wserver.wprint "%s\n" (person_title_text conf base w);
   return ()
 ;
 
@@ -117,9 +113,7 @@ value print_menu conf base p =
                 do html_li conf;
                    Wserver.wprint "<input type=radio name=select value=%d>\n"
                      (Adef.int_of_iper c.cle_index);
-                   afficher_personne_sans_titre conf base c;
-                   afficher_titre conf base c;
-                   Wserver.wprint "\n";
+                   Wserver.wprint "%s\n" (person_title_text conf base c);
                 return ()
               else ())
            u.family;
@@ -567,8 +561,8 @@ value print_shortest_path conf base p1 p2 =
              trailer conf;
           return ()
     | None ->
-        let s1 = gen_referenced_person_title_text raw_access conf base p1 in
-        let s2 = gen_referenced_person_title_text raw_access conf base p2 in
+        let s1 = gen_person_title_text reference raw_access conf base p1 in
+        let s2 = gen_person_title_text reference raw_access conf base p2 in
         do header_no_page_title conf title;
            if excl_faml = [] then
              do Wserver.wprint "<center><h1><font color=%s>" conf.highlight;
@@ -743,8 +737,7 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
     if p1.sex <> Neuter then (p1, pp1, x1, p2, pp2, x2)
     else (p2, pp2, x2, p1, pp1, x1)
   in
-  do afficher_personne_sans_titre conf base p1;
-     afficher_titre conf base p1;
+  do Wserver.wprint "%s" (person_title_text conf base p1);
      Wserver.wprint " %s" (transl conf "is");
      if n > 1 then Wserver.wprint " %s" (transl conf "also") else ();
      Wserver.wprint "\n";
@@ -816,7 +809,7 @@ value print_link conf base n p1 p2 pp1 pp2 x1 x2 =
        else s
      in
      let s1 = "<strong>" ^ std_color conf s ^ "</strong>" in     
-     let s2 = gen_person_title_text raw_access conf base p2 in
+     let s2 = gen_person_title_text no_reference raw_access conf base p2 in
      let s =
        if x1 < x2 then transl_decline2 conf "%1 of %2" s1 s2
        else
@@ -899,8 +892,7 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
        List.iter
          (fun (a, n) ->
             do html_li conf;
-               afficher_personne_sans_titre conf base a;
-               afficher_titre conf base a;
+               Wserver.wprint "%s" (person_title_text conf base a);
                Wserver.wprint "\n<em>(";
                Wserver.wprint "%d %s" n
                  (transl_nth conf "relationship link/relationship links"
@@ -949,7 +941,7 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
   in
   do tag "ul" begin
        html_li conf;
-       let s = gen_person_title_text raw_access conf base p1 in
+       let s = gen_person_title_text no_reference raw_access conf base p1 in
        let s =
          if pp1 = None then s
          else
@@ -959,7 +951,7 @@ value print_solution_not_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
        let s = transl_decline2 conf "%1 of %2" (lab x1) s in
        Wserver.wprint "%s\n" (nominative s);
        html_li conf;
-       let s = gen_person_title_text raw_access conf base p2 in
+       let s = gen_person_title_text no_reference raw_access conf base p2 in
        let s =
          if pp2 = None then s
          else
@@ -1027,10 +1019,7 @@ value print_dag_links conf base p1 p2 rl =
               let a = poi base ip in
               do if is_anc then () else html_li conf;
                  if not is_anc then
-                   do afficher_personne_sans_titre conf base a;
-                      afficher_titre conf base a;
-                      Wserver.wprint ":\n";
-                   return ()
+                   Wserver.wprint "%s:\n" (person_title_text conf base a)
                  else ();
                  Wserver.wprint "<a href=\"%sm=RL" (commd conf);
                  Wserver.wprint ";%s" (acces conf base a);
@@ -1318,8 +1307,8 @@ value print_main_relationship conf base long p1 p2 rel =
            Wserver.wprint "%s\n"
              (capitale
                 (cftransl conf "no known relationship link between %s and %s"
-                   [gen_referenced_person_title_text raw_access conf base p1;
-                    gen_referenced_person_title_text raw_access conf base p2]))
+                   [gen_person_title_text reference raw_access conf base p1;
+                    gen_person_title_text reference raw_access conf base p2]))
      | Some (rl, total, relationship) ->
          let a1 = aoi base p1.cle_index in
          let a2 = aoi base p2.cle_index in

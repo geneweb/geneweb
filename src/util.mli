@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.38 2001-03-08 14:13:25 ddr Exp $ *)
+(* $Id: util.mli,v 3.39 2001-03-15 07:10:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -51,12 +51,13 @@ value gen_person_text_no_html : p_access -> config -> base -> person -> string;
 value gen_person_text_without_title :
   p_access -> config -> base -> person -> string
 ;
-value gen_person_title_text : p_access -> config -> base -> person -> string;
-value gen_referenced_person_title_text :
-  p_access -> config -> base -> person -> string
+value gen_person_title_text :
+  (config -> base -> person -> string -> string) ->
+    p_access -> config -> base -> person -> string
 ;
 
 value reference : config -> base -> person -> string -> string;
+value no_reference : config -> base -> person -> string -> string;
 value person_text : config -> base -> person -> string;
 value person_text_no_html : config -> base -> person -> string;
 value person_text_without_surname : config -> base -> person -> string;
@@ -180,6 +181,4 @@ value afficher_prenom_de_personne_referencee :
 value afficher_personne_referencee : config -> base -> person -> unit;
 value afficher_personne_titre : config -> base -> person -> unit;
 value afficher_personne_titre_referencee : config -> base -> person -> unit;
-value afficher_personne_sans_titre : config -> base -> person -> unit;
-value afficher_titre : config -> base -> person -> unit;
 (**)
