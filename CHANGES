@@ -7,7 +7,7 @@ GeneWeb version 3.01
 
 * GeneWeb Service/CGI (gwd)
   - [Nov 19, 99] Added ability of customization of the page displayed when
-    no data base is given (etc/index.txt).
+    no data base is given (must make a file etc/index.txt).
   - [Nov 16, 99] Fixed bug: some old dates failed the calendars page
   - [Nov 13, 99] In calendars, display the number of days since ...
   - [Nov 10, 99] Images are now clickable to see them in their true size
