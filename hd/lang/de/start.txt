@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.45 2001-03-03 18:50:14 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.46 2001-03-07 10:13:21 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -132,10 +132,10 @@ Zum Benutzen dieser Datenbank kannst du hier suchen:<br><p>
 - <input type=submit value="Ok">
 </form>
 
-<!--<li>
+%INshide_advanced_request;<li>
 <font color=%i><b>mit der</b></font>
 <a href="%sm=H;v=advanced"><font color=%i><b>erweiterten
-Suche</b></font></a>.-->
+Suche</b></font></a>.%E
 
 </ul>
 </td></tr></table></center>
