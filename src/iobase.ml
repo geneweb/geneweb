@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.3 1999-04-05 23:42:28 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.4 1999-05-03 17:35:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -27,7 +27,7 @@ value magic_gwb = "GnWb001s";
        couples array                            : value
        strings array                            : value
 
-    base.acc - direct accesses to arrays inside gwb
+    base.acc - direct accesses to arrays inside base
        persons offsets   : array of binary_ints
        ascends offsets   : array of binary_ints
        families offsets  : array of binary_ints

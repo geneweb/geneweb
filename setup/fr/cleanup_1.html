@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>Nettoyage</title></head>
+
+<body>
+
+<h1>Nettoyage</h1>
+
+<p>
+
+Nous allons proc&eacute;der au nettoyage de la base "$a".
+
+<p>
+
+Attention: l'op&eacute;ration peut prendre quelques secondes ou
+quelques minutes, suivant les cas. Soyez patient.
+
+<p>
+
+Appuyez sur le bouton ci-dessous pour lancer l'op&eacute;ration.
+
+<p>
+
+<form mode=GET action="cleanup_1">
+$h
+<dl><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+Pour information, cette op&eacute;ration correspond &agrave; la suite
+des op&eacute;rations suivantes:
+
+<pre>
+     $$ cd $w
+     $$ .$/gwu $a -o tmp.gw
+     $$ mkdir old
+     Sous Unix:
+       $$ rm -rf old/$a.gwb
+       $$ mv $a.gwb old/.
+     Sous MSdos:
+       $$ del old\$a.gwb\*.*
+       $$ rmdir old\$a.gwb
+       $$ move $a.gwb old\.
+     $$ .$/gwc tmp.gw -o $a > comm.log
+</pre>

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.8 1999-05-03 07:10:47 ddr Exp $
+# $Id: Makefile,v 2.9 1999-05-03 17:35:23 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -26,6 +26,7 @@ distrib_setup: distrib
 	mv t distribution
 	cp setup/setup distribution/setup$(EXE)
 	cp setup/gwd distribution/gwd$(EXE)
+	mkdir distribution/gw/old
 	mkdir distribution/gw/setup
 	cp setup/intro.txt distribution/gw/setup/.
 	for i in fr; do \
