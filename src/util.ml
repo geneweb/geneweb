@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.39 2000-04-03 04:45:36 ddr Exp $ *)
+(* $Id: util.ml,v 3.40 2000-04-12 15:22:09 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -665,8 +665,9 @@ value rec copy_from_etc env imcom ic =
               | c -> Wserver.wprint "%%%c" c ] ]
       | c -> Wserver.wprint "%c" c ];
     done
-  with
-  [ End_of_file -> close_in ic ]
+  with exc ->
+    do close_in ic; return
+    match exc with [ End_of_file -> () | exc -> raise exc ]
 ;
 
 value default_body_prop conf =
