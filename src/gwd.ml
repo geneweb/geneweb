@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.39 2000-05-17 21:36:43 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.40 2000-05-31 09:15:22 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1005,13 +1005,13 @@ value extract_multipart boundary str =
 ;
 
 value build_env request str =
-  let iq = index '?' str in
   let content_type = Wserver.extract_param "content-type: " '\n' request in
   if is_multipart_form content_type then
     let boundary = extract_boundary content_type in
     let (str, env) = extract_multipart boundary str in
     (str, env)
   else
+    let iq = index '?' str in
     let query_string =
       if iq == String.length str then ""
       else String.sub str (iq + 1) (String.length str - iq - 1)
