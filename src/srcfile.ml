@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.29 2000-10-29 08:27:50 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.30 2000-11-08 21:36:52 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -183,6 +183,19 @@ value any_lang_file_name fname =
       (Filename.basename fname ^ ".txt")
 ;
 
+value source_file_name conf fname =
+  let bname = conf.bname in
+  let lang = conf.lang in
+  let fname1 =
+    List.fold_right Filename.concat [Util.base_dir.val; "sources"; bname; lang]
+      (Filename.basename fname ^ ".txt")
+  in
+  if Sys.file_exists fname1 then fname1
+  else
+    List.fold_right Filename.concat [Util.base_dir.val; "sources"; bname]
+      (Filename.basename fname ^ ".txt")
+;
+
 value digit =
   fun
   [ '0'..'9' as c -> Char.code c - Char.code '0'
@@ -334,7 +347,9 @@ value get_variable ic =
     | c -> loop (Buff.store len c) ]
 ;
 
-value rec copy_from_channel conf base ic =
+type src_mode = [ Lang | Source ];
+
+value rec copy_from_channel conf base ic mode =
   let echo = ref True in
   let no_tables = browser_doesnt_have_tables conf in
   let (push_echo, pop_echo) =
@@ -409,7 +424,7 @@ value rec copy_from_channel conf base ic =
           | '[' | ']' -> Wserver.wprint "%c" c
           | 'h' -> hidden_env conf
           | 'j' -> include_hed_trl conf ".hed"
-          | 'r' -> copy_from_file conf base (input_line ic)
+          | 'r' -> copy_from_file conf base (input_line ic) mode
           | 'u' ->
               let lang =
                 let c = String.create 2 in
@@ -423,26 +438,36 @@ value rec copy_from_channel conf base ic =
     done
   with
   [ End_of_file -> close_in ic ]
-and copy_from_file conf base name =
-  let fname = any_lang_file_name name in
+and copy_from_file conf base name mode =
+  let fname = 
+    match mode with
+    [ Lang -> any_lang_file_name name
+    | Source -> source_file_name conf name ]
+  in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
-  [ Some ic -> copy_from_channel conf base ic
+  [ Some ic -> copy_from_channel conf base ic mode
   | None ->
       do Wserver.wprint "<em>... file not found: \"%s.txt\"</em>" name;
          html_br conf;
       return () ]
 ;
 
-value gen_print with_logo conf base fname =
-  match
-    try Some (open_in (lang_file_name conf fname)) with
-    [ Sys_error _ ->
-        try Some (open_in (any_lang_file_name fname)) with
+value gen_print with_logo mode conf base fname =
+  let channel =
+    match mode with
+    [ Lang ->
+        try Some (open_in (lang_file_name conf fname)) with
+        [ Sys_error _ ->
+            try Some (open_in (any_lang_file_name fname)) with
+            [ Sys_error _ -> None ] ]
+    | Source ->
+        try Some (open_in (source_file_name conf fname)) with
         [ Sys_error _ -> None ] ]
-  with
+  in
+  match channel with
   [ Some ic ->
       do Util.html conf;
-         copy_from_channel conf base ic;
+         copy_from_channel conf base ic mode;
          Util.gen_trailer with_logo conf;
       return ()
   | _ ->
@@ -456,7 +481,9 @@ value gen_print with_logo conf base fname =
       return raise Exit ]
 ;
 
-value print = gen_print True;
+value print = gen_print True Lang;
+
+value print_source = gen_print True Source;
 
 value print_start conf base =
   let fname =
@@ -464,7 +491,7 @@ value print_start conf base =
     else if Sys.file_exists (any_lang_file_name conf.bname) then conf.bname
     else "start"
   in
-  gen_print False conf base fname
+  gen_print False Lang conf base fname
 ;
 
 value print_lexicon conf base =

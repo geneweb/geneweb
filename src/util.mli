@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.29 2000-10-29 15:02:21 ddr Exp $ *)
+(* $Id: util.mli,v 3.30 2000-11-08 21:36:54 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -137,6 +137,7 @@ value link_to_referer : config -> string;
 value print_link_to_welcome : config -> bool -> unit;
 
 value image_file_name : string -> string;
+value source_image_file_name : string -> string -> string;
 
 value image_size : string -> option (int * int);
 value limited_image_size : int -> int -> string -> option (int * int);

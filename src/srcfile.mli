@@ -1,10 +1,11 @@
-(* $Id: srcfile.mli,v 3.4 2000-10-11 14:40:59 ddr Exp $ *)
+(* $Id: srcfile.mli,v 3.5 2000-11-08 21:36:53 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
 open Config;
 
 value print : config -> base -> string -> unit;
+value print_source : config -> base -> string -> unit;
 value print_start : config -> base -> unit;
 value incr_welcome_counter : config -> option (int * int * string);
 value incr_request_counter : config -> option (int * int * string);
