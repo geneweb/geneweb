@@ -2,6 +2,10 @@ GeneWeb version 3.05
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [14 May 00] Fixed bug in update forms (person or family): in case of
+    name conflict (name already used by another person), when clicking on
+    the "return" button, the fields containing quotes ("), less (<) or
+    greater (>) characters were truncated.
   - [12 May 00] In short dates (just year), if no death date, burial date
     is now displayed. And in pages displaying the ages at death, take now the
     baptism date if no birth date and the burial date if no death date to
