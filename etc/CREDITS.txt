@@ -27,6 +27,7 @@ Documentation
 	Swedish		Lars Gustavsson
 
 Setup program
+	German		Thomas Omerzu
 	Spanish		Luis Castro Guzman
 	Swedish		Lars Gustavsson
 

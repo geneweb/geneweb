@@ -1,5 +1,6 @@
-* Version francaise: tapez "fr"
+* Deutsche Version: "de" eingeben
 * English version: type "en"
 * Version espanola: escribir en el teclado "es"
+* Version francaise: tapez "fr"
 * Svensk version: skriv "se"
 ? 

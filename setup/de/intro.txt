@@ -1,0 +1,17 @@
+
+Willkommen zu GeneWeb $q
+
+Greife mit deinem Webbrowser auf folgende Adresse zu:
+       http://localhost:$z/
+
+Falls das nicht funktioniert, musst du eventuell in deinem Webbrowser
+einige Optionen aendern, wie zum Beispiel "Offline arbeiten" oder
+"Fuer lokale Adressen keinen Proxy benutzen" oder "Fuer die Adresse
+'localhost' nicht mit dem Internet verbinden".
+
+Wenn du trotz all dieser Anstrengungen keinen Zugriff bekommst, 
+versuche es mit der klassischen Methode, die Dokumentation 
+anzuschauen. Dazu beende dieses Programm, indem du Control-C 
+(bzw. Strg-C) in diesem Fenster drueckst, dann in das Verzeichnis
+"gw" wechselst und die folgende Datei oeffnest:
+   INSTALL.htm

@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Blutsverwandtschaften</title></head>
+
+<body>
+
+<h1>Blutsverwandtschaften</h1>
+
+Die Initialisierung der Blutsverwandtschaften ist notwendig, damit
+sie beim Abrufen der Datenbank angezeigt werden k&ouml;nnen.
+
+<p>
+
+<form mode=GET action="consang">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+<input type=hidden name=q value=on>
+
+W&auml;hle deine Datenbank mit dem zugeh&ouml;rigen Schalter.
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr>
+<td>
+<input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+</tr>|
+<tr><td>- keine Datenbank vorhanden</tr></td>}
+</table></dl>
+
+<p>
+
+Falls gew&uuml;nscht, w&auml;hle die folgende Option:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=scratch value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Komplett neu berechnen.</td> </tr>
+</table></dl>
+
+<p>
+
+Dann dr&uuml;cke diesen Knopf:
+
+<p>
+
+<input type=submit value="Initialisieren">
+
+</form>

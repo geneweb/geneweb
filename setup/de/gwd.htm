@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Parameter f&uuml;r "gwd"</title></head>
+
+<body>
+
+<h1>Parameter f&uuml;r "gwd"</h1>
+
+<form mode=GET action="gwd_1">
+<input type=hidden name=lang value=$l>
+
+<p>
+
+Hier sind die Parameter f&uuml;r das Kommando "gwd". &Auml;ndere die, 
+die du f&uuml;r erforderlich h&auml;ltst:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-lang</strong></td>
+<td>Standardsprache.
+<p>
+Standardm&auml;&szlig;ig werden alle Seiten der Datenbank in dieser Sprache
+dargestellt. W&auml;hle deine bevorzugte Sprache.
+<p>
+Bei einer gegebenen Datenbank kann diese Auswahl immer noch &uuml;ber
+den speziellen Aufrufparameter ge&auml;ndert werden. Ebenso kann auf der
+Willkommensseite durch Anklicken einer Fahne immer noch eine andere
+Sprache gew&auml;hlt werden. Insofern kann man diese Auswahl hier als
+"Standard-Standardsprache" betrachten.
+<p>
+<p>
+Falls "-" gew&auml;hlt ist, gilt Franz&ouml;sisch als Standardsprache.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<select name=default_lang>
+<option value=$L{}>-
+<option value=$L{cn}>Chinesisch
+<option value=$L{dk}>D&auml;nisch
+<option value=$L{de}>Deutsch
+<option value=$L{en}>Englisch
+<option value=$L{eo}>Esperanto
+<option value=$L{fr}>Franz&ouml;sisch
+<option value=$L{he}>Hebr&auml;isch
+<option value=$L{nl}>Holl&auml;ndisch
+<option value=$L{it}>Italienisch
+<option value=$L{no}>Norwegisch
+<option value=$L{pt}>Portugiesisch
+<option value=$L{es}>Spanisch
+<option value=$L{se}>Schwedisch
+<option value=$L{cs}>Tschechisch
+</select>
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-only</strong></td>
+<td>
+Nur berechtigte Adressen.
+<p>
+Befehle werden nur von dieser Internet-Adresse akzeptiert.
+<p>
+Um herauszufinden, welchen Wert du hier f&uuml;r deinen Rechner einsetzen
+mu&szlig;t, schaue dir die Trace-Ausgaben des Kommandos "gwd" an, die jedesmal
+ausgegeben werden, wenn du eine Abfrage an deine Datenbanken machst.
+Du mu&szlig;t das eintragen, was dort hinter "From:" ausgegeben wird.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=only value="$O" size=40>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-log</strong></td>
+<td>
+Protokolldatei f&uuml;r Verbindungen.
+<p>
+Standardm&auml;&szlig;ig werden die Verbindungs-Trace-Ausgaben in dem Fenster
+ausgegeben, in dem "gwd" l&auml;uft. Jedesmal, wenn du oder jemand anders auf
+eine deiner Datenbanken zugreift, werden dort vier oder f&uuml;nf Zeilen
+ausgegeben.
+<p>
+Wenn du m&ouml;chtest, da&szlig; diese Daten stattdessen in einer Datei
+protokolliert werden, gib hier den gew&uuml;nschten Dateinamen an.
+Die Datei wird im <em>GeneWeb</em>-Hauptverzeichnis angelegt (dort wo
+die Kommandos "gwsetup" und "gwd" stehen), falls sie nicht existiert.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=log value="$T" size=40>
+</tr>
+</table></dl>
+
+<dl><dt><dd>Es gibt noch weitere Parameter f&uuml;r das Kommando "gwd",
+aber diese sind hier nicht konfigurierbar, weil sie die
+Ausf&uuml;hrung des "gwsetup" beeintr&auml;chtigen k&ouml;nnen.
+</dl>
+
+<dl><dt><dd>In der Tat ist die Navigation mittels des
+"gwsetup" dazu gedacht, die Benutzung von 
+<em>GeneWeb</em> einfacher zu machen, nicht um alle M&ouml;glichkeiten
+auszuprobieren.
+Zur Nutzung der &uuml;brigen Parameter ist ein wenig "Hackerwissen"
+erforderlich. Einige Informationen finden sich in der Dokumentation.</dl>
+
+<p>
+
+Dann dr&uuml;cke diesen Knopf:
+
+<p>
+
+<input type=submit value="Konfigurieren">
+
+</form>

@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Simple method</title></head>
+
+<body>
+
+<h1>Einfache Methode</h1>
+
+<form mode=GET action="simple">
+<input type=hidden name=lang value=$l>
+
+Wenn du mit einer GEDCOM-Datei beginnen m&ouml;chtest, gib hier
+ihren Dateinamen ein. Anderfalls lasse dieses Feld leer.
+
+<p>
+
+<input name=anon $n{type=file} size=55>
+
+<p>
+
+Gib den Namen ein, den deine Datenbank tragen soll:
+
+<p>
+
+<input name=o size=30 value="base">
+
+<p>
+
+Dann dr&uuml;cke diesen Knopf:
+
+<p>
+
+<input type=submit value="Anlegen">
+</form>

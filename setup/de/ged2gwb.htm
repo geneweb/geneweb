@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GEDCOM-Datei importieren</title></head>
+
+<body>
+
+<h1>GEDCOM-Datei importieren</h1>
+
+<form mode=GET action="ged2gwb">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Bitte eingeben:
+
+<p>
+
+<ul><li>Vollst&auml;ndiger Name deiner GEDCOM-Datei.
+
+<p>
+
+<input name=anon $n{type=file} size=55>
+
+</ul>
+
+<p>
+
+<ul><li>Name, den du deiner <em>GeneWeb</em>-Datenbank geben m&ouml;chtest.
+Wenn du hier nichts eingibst, wird der Datenbankname aus dem Namen der 
+GEDCOM-Datei abgeleitet.
+
+<p>
+
+<input name=o size=30>
+
+</ul>
+
+<p>
+
+Sofern gew&uuml;nscht, w&auml;hle bitte aus den folgenden Optionen:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=lf value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Vornamen in Kleinbuchstaben wandeln, nur Anfangsbuchstaben in
+gro&szlig;.</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=ls value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Nachnamen in Kleinbuchstaben wandeln, nur Anfangsbuchstaben in
+gro&szlig;. Kleinschreibung von Partikeln m&ouml;glichst beibehalten.</td></tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Wenn der GEDCOM-Vorname mehrere, durch Kommata
+getrennte Namen enth&auml;lt, soll beim Anlegen einer Person der erste
+dieser Namen der "Vorname" werden, w&auml;hrend der vollst&auml;ndige GEDCOM-Vorname
+als "Vornamen-Alias" eingetragen wird.</td>
+
+<tr>
+<td><input type=checkbox name=efn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Diese Option aktivieren.</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Normalerweise wird beim Anlegen einer Person, 
+deren GEDCOM-Vorname wie ein &ouml;ffentlicher Name aussieht, d.h. falls er
+folgendes beinhaltet:
+<ul>
+<li>Eine Zahl oder eine eine r&ouml;mische Zahl, von der angenommen wird, 
+da&szlig; es sich um die Nummer eines Adelstitels handelt 
+(z.&nbsp;B. George V)
+<li>Eines der W&ouml;rter: "der", "die", "el", "le", "la", "the",
+von dem angenommen wird, da&szlig; es sich um den Beginn eines Beinamens
+handelt (z.&nbsp;B. William der Eroberer)
+</ul>
+dann wird der GEDCOM-Vorname der "&Ouml;ffentliche Name" der Person
+und das erste Wort des GEDCOM-Vornamens wird ihr "Vorname".
+<tr>
+<td><input type=checkbox name=no_epn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Diese Option abschalten.</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><input type=checkbox name=tnd value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Negative Datumsangaben erzeugen, falls Inkonsistenzen erkannt
+werden (z.&nbsp;B. Geburt nach Tod).</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><input type=checkbox name=no_nd value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Keine negativen Datumsangaben: Ein Jahr mit vorangestelltem
+Minuszeichen soll nicht als negative Jahresangabe interpretiert werden.
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>GEDCOM-Dateien enthalten manchmal
+numerische Monatsangaben (von 1 bis 12). Der GEDCOM-Standard 5.5 
+schreibt aber vor, da&szlig; Monate durch K&uuml;rzel dargestellt werden
+(z.&nbsp;B. "MAY 1912" und nicht
+"05/1912"). Die Angabe "02/05/1912" ist mehrdeutig (bedeutet je nach
+Land "2. Mai 1912" oder "5. Februar 1912").</td></tr>
+
+<tr>
+<td><input type=radio name=dates value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>Aus solchen Daten soll nur die Jahreszahl verwendet werden.</td>
+</tr>
+
+<tr>
+<td><input type=radio name=dates value="_dm">&nbsp;&nbsp;&nbsp;</td>
+<td>Interpretiere solche Daten als "Tag/Monat/Jahr".</td>
+</tr>
+
+<tr>
+<td><input type=radio name=dates value="_md">&nbsp;&nbsp;&nbsp;</td>
+<td>Interpretiere solche Daten als "Monat/Tag/Jahr".</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Die Kodierung f&uuml;r Sonderzeichen ist
+normalerweise im Kopf der GEDCOM-Datei angegeben.</td></tr>
+
+<tr><td>
+<input type=radio name=charset value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>Beachte die Hinweise aus der GEDCOM-Datei.</td>
+</tr>
+
+<tr><td><input type=radio name=charset value=ANSEL>&nbsp;&nbsp;&nbsp;</td>
+<td>Die Sonderzeichen folgen der ANSEL-Kodierung.</td></tr>
+
+<tr><td><input type=radio name=charset value=ASCII>&nbsp;&nbsp;&nbsp;</td>
+<td>Die Sonderzeichen folgen der ASCII-Kodierung .</td></tr>
+
+<tr><td><input type=radio name=charset value=MSDOS>&nbsp;&nbsp;&nbsp;</td>
+<td>Die Sonderzeichen folgen der MSDOS-Kodierung.</td></tr>
+</table></dl>
+
+<p>
+
+Dann dr&uuml;cke auf "Ok".
+
+<p>
+
+<dl><dt><dd><input type=submit value="Ok"></dl>
+
+</form>

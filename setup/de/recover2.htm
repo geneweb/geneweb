@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Eine bestehende Datenbank &uuml;bernehmen - Phase 3</title></head>
+
+<body>
+
+<h1>Eine bestehende Datenbank &uuml;bernehmen</h1>
+
+$v{Warnung: Im <a href="gwsetup?lang=$l;v=list.htm">Zielverzeichnis</a>
+existiert bereits eine Datenbank mit dem Namen "$o".
+Wenn du den "Ok"-Knopf dr&uuml;ckst, wird sie gel&ouml;scht.<p>
+
+Falls du diese Funktion gerade schonmal ausgef&uuml;hrt hattest, dann
+war diese Datenbank wahrscheinlich das Ergebnis und daher kann dieser
+Fehler hier ignoriert werden. Andernfalls kehre auf die vorherige Seite
+zur&uuml;ck und w&auml;hle einen anderen Namen f&uuml;r deine Datenbank.<p>}
+
+
+Startverzeichnis und Datenbank:
+
+<pre>
+  $a
+  $i
+</pre>
+
+Zielverzeichnis und Datenbank:
+
+<pre>
+  $w
+  $o
+</pre>
+
+<p>
+
+Warnung: Je nach Fall kann diese Operation 
+einige Sekunden oder Minuten ben&ouml;tigen. Bitte habe Geduld.
+
+<p>
+
+Dr&uuml;cke den Knopf, um die Operation zu starten$v{ und die Datenbank
+"$o" im Zielverzeichnis zu l&ouml;schen}:
+
+<p>
+
+<form mode=GET action="recover_2">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+Zu deiner Information: Diese Funktion entspricht der Ausf&uuml;hrung
+der folgenden Kommandos:
+
+<pre>
+     $$ cd $a
+     $$ .$/$U $i $O $w$/$T
+     $$ cd $w
+     $$ .$/$C $T -o $o > comm.log
+</pre>
+
