@@ -23,7 +23,8 @@ They are freely distributed at addresses:
 
 3- If your platform is supported by the native-code Ocaml compiler, you
    can build the native-code programs (this is recommended, executables
-   are much faster). Do:
+   are much faster).
+   Do:
       make opt
 
 4- Do:
