@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.44 1999-08-18 17:55:21 ddr Exp $ *)
+(* $Id: util.ml,v 2.45 1999-08-21 11:45:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -602,6 +602,90 @@ value copy_etc_file env fname =
   in
   let ic = open_in fname in
   copy_from_channel env ic
+;
+
+value start_with s i p =
+  i + String.length p < String.length s
+  && String.lowercase (String.sub s i (String.length p)) = p
+;
+
+value http_string s i =
+  if start_with s i "http://" then
+    let j =
+      loop (i + String.length "http://") where rec loop j =
+        if j < String.length s then
+          match s.[j] with
+          [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '/' | ':' | '?' | '%' | ';' | '='
+          | '_' | '-' | '&' | '.' | '~' -> loop (j + 1)
+          | _ -> j ]
+        else j
+    in
+    match s.[j-1] with
+    [ ':' | ';' | '.' -> Some (j - 1)
+    | _ -> Some j ]
+  else None
+;
+
+value email_addr s i =
+  let rec before_at empty i =
+    if i = String.length s then None
+    else
+      match s.[i] with
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_' | '.' ->
+          before_at False (i + 1)
+      | '@' -> if empty then None else after_at True (i + 1)
+      | _ -> None ]
+  and after_at empty i =
+    if i = String.length s then None
+    else
+      match s.[i] with
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_' ->
+          after_at False (i + 1)
+      | '.' -> if empty then None else after_dot 0 (i + 1)
+      | _ -> None ]
+  and after_dot len i =
+    if i = String.length s then Some (len, i)
+    else
+      match s.[i] with
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' | '-' | '_' | '.' ->
+          after_dot (len + 1) (i + 1)
+      | _ -> Some (len, i) ]
+  in
+  match before_at True i with
+  [ Some (len, i) ->
+      let (len, i) =
+        if len > 0 && s.[i-1] = '.' then (len - 1, i - 1) else (len, i)
+      in
+      if len = 0 then None else Some i
+  | None -> None ]
+;
+
+value copy_string_with_macros conf s =
+  loop False 0 where rec loop in_atag i =
+    if i < String.length s then
+      if i + 1 < String.length s && s.[i] = '%' && s.[i+1] = 's' then
+        do Wserver.wprint "%s?" conf.command;
+           List.iter (fun (k, v) -> Wserver.wprint "%s=%s;" k v)
+             conf.henv;
+        return loop in_atag (i + 2)
+      else if in_atag then
+        let in_atag = not (start_with s i "</a>") in
+        do Wserver.wprint "%c" s.[i]; return loop in_atag (i + 1)
+      else
+        match http_string s i with
+        [ Some j ->
+            let x = String.sub s i (j - i) in
+            do Wserver.wprint "<a href=%s>%s</a>" x x; return loop False j
+        | None ->
+            match email_addr s i with
+            [ Some j ->
+                let x = String.sub s i (j - i) in
+                do Wserver.wprint "<a href=\"mailto:%s\">%s</a>" x x; return
+                loop False j
+            | None ->
+                let in_atag = start_with s i "<a href=" in
+                do Wserver.wprint "%c" s.[i]; return loop in_atag (i + 1) ] ]
+    else ()
 ;
 
 value trailer conf =

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.49 1999-08-20 13:06:30 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.50 1999-08-21 11:45:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -731,7 +731,7 @@ value print_notes conf base =
              end;
            end;
            Wserver.wprint ": \n<dd>\n";
-           Perso.copy_string_with_macros conf notes;
+           copy_string_with_macros conf notes;
            Perso.print_sources conf base (notes <> "") p;
            Wserver.wprint "<p>\n";
         return ()
