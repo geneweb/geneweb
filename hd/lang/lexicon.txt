@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.52 1999-06-04 08:39:40 ddr Exp $
+# $Id: lexicon.txt,v 2.53 1999-06-07 15:50:45 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1036,6 +1036,7 @@ fr: annuler les liens GeneWeb
 it: annullare i links
 nl: geen GeneWeb links
 no: undertrykk GeneWeb koblinger
+pt: cancelar os links Geneweb
 se: utan GeneWeb l&auml;nkar
 
     cannot access base
@@ -1074,6 +1075,7 @@ fr: changer noms des enfants
 it: cambiare i nomi dei figli
 nl: namen van kinderen wijzigen
 no: endre barnas navn
+pt: alterar os nomes das crianחas
 se: &auml;ndra barnens namn
 
     changed order of children
@@ -1113,6 +1115,7 @@ fr: noms des enfants chang&eacute;s
 it: nomi dei figli cambiati
 nl: namen van kinderen gewijzigd
 no: barnas navn er endret
+pt: nomes das crianחas alterados
 se: barnens namn &auml;ndrade
 
     click
@@ -1543,6 +1546,7 @@ he:  קובץ
 it: file
 nl: bestand
 no: fil
+pt: ficheiro
 se: fil
 
     first free number
@@ -1780,7 +1784,7 @@ he:  תמונה
 it: immagine
 nl: beeld
 no: bilde
-pt: foto
+pt: imagem
 se: foto
 
     image deleted
@@ -1794,7 +1798,7 @@ he:  תמונה נמחקה
 it: immagine cancellata
 nl: beeld verwijderd
 no: bildet er fjernet
-pt: foto suprimida
+pt: imagem suprimida
 se: foto borttaget
 
     image received
@@ -1807,6 +1811,7 @@ he:  התמונה התקבלה
 it: immagine ricevuta
 nl: foto ontvangen
 no: bildet er mottatt
+pt: imagem recebida
 se: foto mottaget
 
     in (month year)
@@ -1848,6 +1853,7 @@ fr: inclure les conjoints manquants
 it: includere i coniugi mancanti
 nl: ontbrekende echtgenoten tonen
 no: inkluder manglende (ekte)feller
+pt: incluir os c&ocirc;njugues que faltam
 se: inkludera gem&aring;ler som saknas
 
     incompatible sexes
@@ -2081,6 +2087,7 @@ fr: affichage long
 he:  תצוגה ארוכה
 nl: kwartierstaat
 no: utvidet rapport
+pt: long display
 se: utvidgad rapport
 
     main title
@@ -3020,6 +3027,7 @@ fr: relation%t avec
 it: legame%t con
 nl: verbonden%t met
 no: frilleforhold%t med
+pt: relacionado%t com
 se: f&ouml;rh&aring;llande%t med
 
     see
@@ -3074,6 +3082,7 @@ he:  שלח
 it: mandare
 nl: zenden
 no: send
+pt: enviar
 se: skicka
 
     several answers
