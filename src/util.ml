@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.124 2005-03-13 10:49:10 ddr Exp $ *)
+(* $Id: util.ml,v 4.125 2005-03-19 12:18:19 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1156,8 +1156,15 @@ value message_to_wizard conf =
 
 value doctype conf =
   match p_getenv conf.base_env "doctype" with
-  [ Some "html-4.01" -> "\
-<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\">"
+  [ Some "html-4.01-trans" -> "\
+<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"
+ \"http://www.w3.org/TR/html4/loose.dtd\">"
+  | Some "html-4.01" -> "\
+<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"
+ \"http://www.w3.org/TR/html4/strict.dtd\">"
+  | Some "xhtml-1.0-trans" -> "\
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
+ \"http://www.w3.org/TR/xhtml10/DTD/loose.dtd\">"
   | _ -> "\
 <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" 
  \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" ]
