@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.21 2005-01-20 12:43:29 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.22 2005-02-04 17:13:28 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -190,16 +190,18 @@ value reconstitute_burial conf burial_place =
 
 value only_printable_or_nl s =
   let s = strip_spaces s in
-  let s' = String.create (String.length s) in
-  do {
-    for i = 0 to String.length s - 1 do {
-      s'.[i] :=
-        match s.[i] with
-        [ ' '..'~' | '\160'..'\255' | '\n' -> s.[i]
-        | _ -> ' ' ]
-    };
-    s'
-  }
+  if Gutil.utf_8_db.val then s
+  else
+    let s' = String.create (String.length s) in
+    do {
+      for i = 0 to String.length s - 1 do {
+        s'.[i] :=
+          match s.[i] with
+          [ ' '..'~' | '\160'..'\255' | '\n' -> s.[i]
+          | _ -> ' ' ]
+      };
+      s'
+    }
 ;
 
 value reconstitute_person conf =
