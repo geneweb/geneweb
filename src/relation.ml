@@ -1,4 +1,4 @@
-(* $Id: relation.ml,v 1.1.1.1 1998-09-01 14:32:07 ddr Exp $ *)
+(* $Id: relation.ml,v 1.2 1998-10-03 16:54:09 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -11,7 +11,8 @@ value print_menu conf base p =
        if h then
          match sou base p.public_name with
          [ "" ->
-             Wserver.wprint "%s %s" (sou base p.first_name) (sou base p.surname)
+             Wserver.wprint "%s %s" (coa conf (sou base p.first_name))
+               (coa conf (sou base p.surname))
          | n -> Wserver.wprint "%s" n ]
        else Wserver.wprint "%s" (person_text conf base p);
        Wserver.wprint " %s..." (transl conf "and");
@@ -62,10 +63,6 @@ value print_menu conf base p =
           else ())
        p.family;
      Wserver.wprint "</ul>\n";
-(*
-     Wserver.wprint "<a href=%sm=H;v=liensang>%s</a><br>\n" (commd conf)
-       (capitale (transl_nth conf "note/notes" 0));
-*)
      trailer conf;
   return ()
 ;
