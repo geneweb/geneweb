@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.43 1999-08-04 18:34:16 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.44 1999-08-04 22:16:26 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1404,10 +1404,12 @@ value print_tree conf base v p =
   in
   let down_reference p s =
     if conf.cancel_links then s
-    else if Array.length p.family = 0 then reference conf base p s
-    else
+(*
+    else if Array.length p.family > 0 then
       "<a href=\"" ^ commd conf ^ "m=D;t=T;v=1;k=" ^ string_of_int v ^ ";" ^
       acces conf base p ^ "\">" ^ s ^ "</a>"
+*)
+    else reference conf base p s
   in
   let colspan = fun [ 1 -> "" | n -> " colspan=" ^ string_of_int n ] in
   let print_ancestor gen n first po =

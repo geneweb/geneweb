@@ -17,7 +17,8 @@ GeneWeb Version 2.05
 
 * GeneWeb daemon/CGI (gwd)
   - [Aug 3, 99] Increased speed of clicking on "ancestors" by pre-loading the
-    arrays "ascends" and "couples".
+    arrays "ascends" and "couples". [Aug 5, 99] Idem with "descendants" by
+    pre-loading "persons" and "families".
   - [Aug 3, 99] In ancestors and descendants pages moved the "Ok" near the
     selection popup menu.
   - [Jul 28, 99] In update family forms, shortened the names of the variables
