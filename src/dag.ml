@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.28 2001-01-07 21:01:55 ddr Exp $ *)
+(* $Id: dag.ml,v 3.29 2001-01-08 12:36:26 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -188,88 +188,60 @@ else Wserver.wprint " colspan=%d" colspan;
 
 (* Print without HTML table tags: using <pre> *)
 
-value displayed_length s =
-  loop 0 0 where rec loop len i =
-    if i = String.length s then len
+value displayed_next_char s i =
+  loop i where rec loop i =
+    if i >= String.length s then None
     else
       match s.[i] with
       [ '<' ->
           loop1 (i + 1) where rec loop1 i =
-            if i = String.length s then len
-            else if s.[i] = '>' then loop len (i + 1)
+            if i = String.length s then None
+            else if s.[i] = '>' then loop (i + 1)
             else loop1 (i + 1)
       | '&' ->
-          let len = len + 1 in
-          loop1 (i + 1) where rec loop1 i =
-            if i = String.length s then len
+          loop1 (i + 1) where rec loop1 j =
+            if j = String.length s then Some (i, j)
             else
-              match s.[i] with
-              [ 'a'..'z' | 'A'..'Z' -> loop1 (i + 1)
-              | ';' -> loop len (i + 1)
-              | _ -> loop len i ]
-      | '\n' | '\r' -> len
-      | _ -> loop (len + 1) (i + 1) ]
+              match s.[j] with
+              [ 'a'..'z' | 'A'..'Z' -> loop1 (j + 1)
+              | ';' -> Some (i, j + 1)
+              | _ -> Some (i, j) ]
+      | _ -> Some (i, i + 1) ]
+;
+
+value displayed_length s =
+  loop 0 0 where rec loop len i =
+    match displayed_next_char s i with
+    [ Some (i, j) ->
+        if s.[i] = '\n' || s.[i] = '\r' then len else loop (len + 1) j
+    | None -> len ]
+;
+
+value buff_store_int s blen i j =
+  loop blen i where rec loop blen i =
+    if i = j then blen else loop (Buff.store blen s.[i]) (i + 1)
 ;
 
 value displayed_sub s max_len =
-  loop 0 0 0 where rec loop len dlen i =
-    if i = String.length s then Buff.get len
-    else
-      match s.[i] with
-      [ '<' ->
-          let is_a =
-            if i < String.length s - 1 then
-              match (s.[i + 1], s.[i + 2]) with
-              [ ('a' | 'A', ' ' | '\n' | '\r') | ('/', 'a' | 'A') -> True
-              | _ -> False ]
-            else False
-          in
-          let astore len c = if is_a then Buff.store len c else len in
-          loop1 (astore len '<') (i + 1)
-          where rec loop1 len i =
-            if i = String.length s then Buff.get len
-            else if s.[i] = '>' then loop (astore len '>') dlen (i + 1)
-            else loop1 (astore len s.[i]) (i + 1)
-      | '&' ->
-          if dlen < max_len then
-            let dlen = dlen + 1 in
-            loop1 (Buff.store len '&') (i + 1)
-            where rec loop1 len i =
-              if i = String.length s then Buff.get len
-              else
-                match s.[i] with
-                [ 'a'..'z' | 'A'..'Z' -> loop1 (Buff.store len s.[i]) (i + 1)
-                | ';' -> loop (Buff.store len ';') dlen (i + 1)
-                | _ -> loop len dlen i ]
-          else loop len dlen (i + 1)
-      | '\n' | '\r' -> loop len max_len (i + 1)
-      | c ->
-          if dlen < max_len then loop (Buff.store len c) (dlen + 1) (i + 1)
-          else loop len dlen (i + 1) ]
+  loop 0 0 0 where rec loop blen dlen i =
+    match displayed_next_char s i with
+    [ Some (j, k) ->
+        let blen = buff_store_int s blen i j in
+        let blen =
+          if dlen < max_len then buff_store_int s blen j k else blen
+        in
+        loop blen (dlen + 1) k
+   | None ->
+        Buff.get (buff_store_int s blen i (String.length s)) ]
 ;
 
 value longuest_word_length s =
   loop 0 0 0 where rec loop maxlen len i =
-    if i = String.length s then max maxlen len
-    else
-      match s.[i] with
-      [ '<' ->
-          loop1 (i + 1) where rec loop1 i =
-            if i = String.length s then max maxlen len
-            else if s.[i] = '>' then loop maxlen len (i + 1)
-            else loop1 (i + 1)
-      | '&' ->
-          let len = len + 1 in
-          loop1 (i + 1) where rec loop1 i =
-            if i = String.length s then max maxlen len
-            else
-              match s.[i] with
-              [ 'a'..'z' | 'A'..'Z' -> loop1 (i + 1)
-              | ';' -> loop maxlen len (i + 1)
-              | _ -> loop maxlen len i ]
-      | '\n' | '\r' -> max maxlen len
-      | ' ' -> loop (max maxlen len) 0 (i + 1)
-      | _ -> loop maxlen (len + 1) (i + 1) ]
+    match displayed_next_char s i with
+    [ Some (j, k) ->
+        if s.[j] = ' ' then loop (max maxlen len) 0 k
+        else loop maxlen (len + 1) k
+    | None -> max maxlen len ]
 ;
 
 value gen_compute_columns_sizes length hts ncol =
@@ -343,27 +315,27 @@ value print_table_pre conf hts =
     in
     max tmincol (min dcol tcol)
   in
-(**)
+(*
 do for i = 0 to ncol - 1 do
      Wserver.wprint " %d(%d)" colsz.(i) colminsz.(i);
    done;
    Wserver.wprint " = %d(%d) -> %d<br>\n" tcol tmincol dcol;
 return
-(**)
+*)
   do for i = 0 to ncol - 1 do
        colsz.(i) :=
          colminsz.(i)
          + (colsz.(i) - colminsz.(i)) * (dcol - tmincol) / (tcol - tmincol);
      done;
   return
-(**)
+(*
 do for i = 0 to ncol - 1 do
      Wserver.wprint " %d(%d)" colsz.(i) colminsz.(i);
    done;
    let tcol = Array.fold_left \+ 0 colsz in
    Wserver.wprint " = %d(%d) -> %d<br>\n" tcol tmincol dcol;
 return
-(**)
+*)
   do Wserver.wprint "<pre>\n";
      for i = 0 to Array.length hts - 1 do
        loop 0 0 where rec loop col j =
