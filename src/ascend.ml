@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.13 1999-02-02 10:23:58 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.14 1999-02-12 12:36:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -81,9 +81,11 @@ value print_choice conf base p niveau_effectif =
       boucle 1;
     end;
     tag "ul" begin
-      Wserver.wprint "<li> <input type=radio name=t value=N checked> %s\n"
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=N checked> %s\n"
         (capitale (transl conf "Sosa numbers"));
-      Wserver.wprint "<li> <input type=radio name=t value=L> %s%t\n"
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=L> %s%t\n"
         (capitale (transl conf "list"))
         (fun oc ->
           if niveau_effectif <= limit_by_list then ()
@@ -93,24 +95,28 @@ value print_choice conf base p niveau_effectif =
                  limit_by_list;
                Printf.fprintf oc ")";
             return ());
-      Wserver.wprint "<li> <input type=radio name=t value=S> %s\n"
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=S> %s\n"
         (capitale (transl conf "only the generation selected"));
    end;
-   Wserver.wprint "<p>\n";
+   html_p conf;
    tag "ul" begin
-      Wserver.wprint "<li> <input type=radio name=t value=M> %s\n"
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=M> %s\n"
         (capitale (transl conf "missing ancestors"));
-      Wserver.wprint "<li> <input type=radio name=t value=A> %s (%s)\n"
+      html_li conf;
+      Wserver.wprint "<input type=radio name=t value=A> %s (%s)\n"
         (capitale (transl conf "missing ancestors"))
         (transl conf "alphabetic order");
-      Wserver.wprint "<br>\n";
+      html_br conf;
       Wserver.wprint "%s\n" (capitale (transl conf "after"));
       Wserver.wprint "<input name=after size=5 maxlength=5>\n";
       Wserver.wprint "%s\n" (capitale (transl conf "before"));
       Wserver.wprint "<input name=before size=5 maxlength=5>\n";
     end;
-    Wserver.wprint "<p>\n";
-    Wserver.wprint "<input type=submit value=\"Ok\"><br>\n";
+    html_p conf;
+    Wserver.wprint "<input type=submit value=\"Ok\">";
+    html_br conf;
   end
 ;
 
@@ -126,7 +132,7 @@ value afficher_menu_ascendants conf base p =
   in
   do header conf title;
      print_choice conf base p niveau_effectif;
-     Wserver.wprint "<p>\n";
+     html_p conf;
      Wserver.wprint
        (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
        (fun _ ->
@@ -248,7 +254,7 @@ value print_generation_person conf base gp =
   match gp with
   [ GP_person n ip ->
       let p = poi base ip in
-      do Wserver.wprint "<li> ";
+      do html_li conf;
          Num.print wpr (transl conf "(thousand separator)") n;
          Wserver.wprint " -\n";
          afficher_personne_titre_referencee conf base p;
@@ -257,7 +263,7 @@ value print_generation_person conf base gp =
       return ()
   | GP_same n1 n2 ip ->
       let p = poi base ip in
-      do Wserver.wprint "<li> ";
+      do html_li conf;
          Num.print wpr (transl conf "(thousand separator)") n1;
          Wserver.wprint " =&gt; ";
          stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p) begin
@@ -279,7 +285,8 @@ value afficher_ascendants_numerotation conf base niveau_max p =
   let mark = Array.create (base.data.persons.len) Num.zero in
   let rec generation niveau gpl =
     if niveau <= niveau_max then
-      do Wserver.wprint "<li>%s %s\n"
+      do html_li conf;
+         Wserver.wprint "%s %s\n"
            (transl_nth conf "nth (generation)" niveau)
            (transl conf "generation");
          tag "ul" begin
@@ -341,7 +348,8 @@ value print_ancestors_same_time_descendants conf base p a =
   let mark = Array.create (base.data.persons.len) Num.zero in
   let rec generation niveau gpl =
     if List.exists will_print gpl then
-      do Wserver.wprint "<li>%s %s\n"
+      do html_li conf;
+         Wserver.wprint "%s %s\n"
            (transl_nth conf "nth (generation)" niveau)
            (transl conf "generation");
          tag "ul" begin
@@ -388,7 +396,8 @@ value afficher_ascendants_niveau conf base niveau_max p =
     if niveau < niveau_max then
       generation (niveau + 1) (next_generation base mark gpl)
     else
-      do Wserver.wprint "<li>%s\n" (capitale (text_level conf niveau_max));
+      do html_li conf;
+         Wserver.wprint "%s\n" (capitale (text_level conf niveau_max));
          tag "ul" begin
            List.iter (print_generation_person conf base) gpl;
          end;
@@ -418,7 +427,8 @@ value print_generation_missing_persons conf base title sp_incl gp =
   let print_title () =        
     match title.val with
     [ Some level ->
-       do Wserver.wprint "<li>%s %s\n"
+       do html_li conf;
+          Wserver.wprint "%s %s\n"
             (transl_nth conf "nth (generation)" level)
             (transl conf "generation");
           Wserver.wprint "<ul>\n";
@@ -432,7 +442,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
       if sp_incl &&
       sou base p.first_name = "?" && sou base p.surname = "?" then
         do print_title ();
-           Wserver.wprint "<li> ";
+           html_li conf;
            Num.print wpr (transl conf "(thousand separator)") n;
            Wserver.wprint " -\n";
            if Array.length p.family > 0 then
@@ -465,7 +475,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
         let n1 = Num.twice n in
         let n2 = Num.inc n1 1 in
         do print_title ();
-           Wserver.wprint "<li> ";
+           html_li conf;
            Num.print wpr (transl conf "(thousand separator)") n1;
            Wserver.wprint "-";
            Wserver.wprint "%d" (Num.modl n2 10);
@@ -567,7 +577,8 @@ value print_missing_ancestors conf base v spouses_included p =
      | None -> () ];
      Wserver.wprint ".\n";
      if not spouses_included then
-       Wserver.wprint "<br>\n%s %s:\n" (capitale (transl conf "parents"))
+       do html_br conf; return
+       Wserver.wprint "%s %s:\n" (capitale (transl conf "parents"))
          (transl_decline conf "of" "")
      else ();  
      mark.(Adef.int_of_iper p.cle_index) := Num.one;
@@ -680,8 +691,7 @@ value print_spouses conf base p =
        let sp = poi base (conjoint p cpl) in
        if sou base sp.first_name = "?" && sou base sp.surname = "?" then ()
        else
-         do (*Wserver.wprint "<br>\n&nbsp;&nbsp;&nbsp;&nbsp;";*)
-            Wserver.wprint "\n&amp;";
+         do Wserver.wprint "\n&amp;";
             match Adef.od_of_codate fam.marriage with
             [ Some d -> stag "font" "size=-2" begin Date.display_year d; end
             | None -> () ];
@@ -726,7 +736,7 @@ value print_alphabetic_missing conf base spouses_included (surname, list) =
            tag "ul" begin
              List.iter
                (fun e ->
-                  do Wserver.wprint "<li> ";
+                  do html_li conf;
                      print_someone_missing conf base "" spouses_included e;
                      Wserver.wprint "\n";
                   return ())
@@ -819,7 +829,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
        List.length initials > 3 && List.length list > 100
      in
      do if print_initials then
-          do Wserver.wprint "<p>\n";
+          do html_p conf;
              List.iter
                 (fun i ->
                    do stag "a" "href=\"#%c\"" i begin
@@ -828,7 +838,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
                       Wserver.wprint "\n";
                    return ())
                 (List.rev initials);
-             Wserver.wprint "<p>\n";
+             html_p conf;
           return ()
         else ();
         Wserver.wprint "%s" (capitale (text_to conf v));
@@ -840,7 +850,8 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
         | None -> () ];
         Wserver.wprint ".\n";
         if not spouses_included then
-          Wserver.wprint "<br>\n%s %s:\n" (capitale (transl conf "parents"))
+          do html_br conf; return
+          Wserver.wprint "%s %s:\n" (capitale (transl conf "parents"))
             (transl_decline conf "of" "")
         else ();  
         tag "ul" begin
@@ -852,16 +863,18 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
                     [ Some pi ->
                         if i <> pi then
                           do Wserver.wprint "</ul>\n";
-                             Wserver.wprint "<li> <a name=\"%c\">%c</a>\n" i i;
+                             html_li conf;
+                             Wserver.wprint "<a name=\"%c\">%c</a>\n" i i;
                              Wserver.wprint "<ul>\n";
                           return ()
                         else ()
                     | None ->
-                        do Wserver.wprint "<li> <a name=\"%c\">%c</a>\n" i i;
+                        do html_li conf;
+                           Wserver.wprint "<a name=\"%c\">%c</a>\n" i i;
                            Wserver.wprint "<ul>\n";
                         return () ]
                   else ();
-                  Wserver.wprint "<li> ";
+                  html_li conf;
                   print_alphabetic_missing conf base spouses_included e;
                   Wserver.wprint "\n";
                return Some i)

@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo *)
-(* $Id: relation.ml,v 1.17 1999-02-02 10:24:28 ddr Exp $ *)
+(* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
+(* $Id: relation.ml,v 1.18 1999-02-12 12:37:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -25,7 +25,8 @@ value print_menu conf base p =
   let is = index_of_sex p.sex in
   do header conf title;
      Wserver.wprint "<ul>\n";
-     Wserver.wprint "<li>\n<form method=get action=\"%s\">" conf.command;
+     html_li conf;
+     Wserver.wprint "<form method=get action=\"%s\">" conf.command;
      Srcfile.hidden_env conf;
      Wserver.wprint
        "
@@ -35,17 +36,22 @@ value print_menu conf base p =
 <input name=n size=40 maxlength=200> =>
 <input type=submit VALUE=\"Ok\">
 <ul>
-<li> <input type=radio name=t value=PN checked>
+" (Adef.int_of_iper p.cle_index);
+     html_li conf;
+     Wserver.wprint "
+<input type=radio name=t value=PN checked>
 <em>%s %s</em> %s <em>%s</em> %s <em>%s</em>
-<li> <input type=radio name=t value=P> <em>%s</em>
-<li> <input type=radio name=t value=N> <em>%s</em>
-" (Adef.int_of_iper p.cle_index)
+"
   (capitale (transl_nth conf "first name/first names" 0))
   (transl_nth conf "surname/surnames" 0)
   (transl conf "or") (transl conf "public name")
-  (transl conf "or") (transl conf "alias")
-  (capitale (transl_nth conf "first name/first names" 0))
-  (capitale (transl_nth conf "surname/surnames" 0));
+  (transl conf "or") (transl conf "alias");
+     html_li conf;
+     Wserver.wprint "<input type=radio name=t value=P> <em>%s</em>\n"
+      (capitale (transl_nth conf "first name/first names" 0));
+     html_li conf;
+     Wserver.wprint "<input type=radio name=t value=N> <em>%s</em>\n"
+       (capitale (transl_nth conf "surname/surnames" 0));
      Wserver.wprint "</ul>\n</form>\n";
      Array.iter
        (fun ifam ->
@@ -53,7 +59,8 @@ value print_menu conf base p =
           let c = conjoint p cpl in
           let c = poi base c in
           if sou base c.first_name <> "?" || sou base c.surname <> "?" then
-            do Wserver.wprint "<li>\n%s\n"
+            do html_li conf;
+               Wserver.wprint "%s\n"
                  (capitale (transl_nth conf "his wife/her husband" is));
                Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n" (commd conf)
                  (Adef.int_of_iper p.cle_index)
@@ -194,7 +201,7 @@ value print_solution_ancestor conf p1 p2 x1 x2 list =
   do Wserver.wprint "<ul>\n";
      List.iter
        (fun (a, n) ->
-          do Wserver.wprint "<li>\n";
+          do html_li conf;
              Wserver.wprint "<em>%s %s:\n" (string_of_big_int conf n)
                (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
              Wserver.wprint "%s " (transl conf "click");
@@ -215,32 +222,34 @@ value print_solution_ancestor conf p1 p2 x1 x2 list =
 ;
 
 value print_solution_not_ancestor conf base p1 p2 x1 x2 list =
-  do Wserver.wprint "<ul><li>\n";
+  do Wserver.wprint "<ul>";
+     html_li conf;
      Wserver.wprint "%s\n" (capitale (transl conf "indeed,"));
-     Wserver.wprint "<ul>\n";
-     List.iter
-       (fun (a, n) ->
-          do Wserver.wprint "<li> ";
-             afficher_personne_sans_titre conf base a;
-             afficher_titre conf base a;
-             Wserver.wprint "\n<em>(";
-             Wserver.wprint "%d %s:\n" n
-               (transl_nth conf "relationship link/relationship links"
-                  (if n = 1 then 0 else 1));
-             Wserver.wprint "%s" (transl conf "click");
-             Wserver.wprint " <a href=\"%sm=RL;i=%d;l1=%d;i1=%d;l2=%d;i2=%d\">"
-               (commd conf) (Adef.int_of_iper a.cle_index) x1
-               (Adef.int_of_iper p1.cle_index) x2
-               (Adef.int_of_iper p2.cle_index);
-             Wserver.wprint "%s</a>" (transl conf "here");
-             if n > 1 then
-               Wserver.wprint "%s"
-                 (transl conf " to see the first relationship link")
-             else ();
-             Wserver.wprint "</em>).\n";
-          return ())
-       list;
-     Wserver.wprint "</ul>\n";
+     tag "ul" begin
+       List.iter
+         (fun (a, n) ->
+            do html_li conf;
+               afficher_personne_sans_titre conf base a;
+               afficher_titre conf base a;
+               Wserver.wprint "\n<em>(";
+               Wserver.wprint "%d %s:\n" n
+                 (transl_nth conf "relationship link/relationship links"
+                    (if n = 1 then 0 else 1));
+               Wserver.wprint "%s" (transl conf "click");
+               Wserver.wprint
+                 " <a href=\"%sm=RL;i=%d;l1=%d;i1=%d;l2=%d;i2=%d\">"
+                 (commd conf) (Adef.int_of_iper a.cle_index) x1
+                 (Adef.int_of_iper p1.cle_index) x2
+                 (Adef.int_of_iper p2.cle_index);
+               Wserver.wprint "%s</a>" (transl conf "here");
+               if n > 1 then
+                 Wserver.wprint "%s"
+                   (transl conf " to see the first relationship link")
+               else ();
+               Wserver.wprint "</em>).\n";
+            return ())
+         list;
+     end;
      let is_are =
        match list with
        [ [_] -> transl conf "is"
@@ -253,16 +262,18 @@ value print_solution_not_ancestor conf base p1 p2 x1 x2 list =
     [ [(a, _)] -> ancestor_label conf x a.sex
     | _ -> parents_label conf x ]
   in
-  do Wserver.wprint "<ul>\n";
-     Wserver.wprint "<li> %s %s\n" (lab x1) (transl_decline conf "of" "");
-     afficher_personne_sans_titre conf base p1;
-     afficher_titre conf base p1;
-     Wserver.wprint "\n";
-     Wserver.wprint "<li> %s %s\n" (lab x2) (transl_decline conf "of" "");
-     afficher_personne_sans_titre conf base p2;
-     afficher_titre conf base p2;
-     Wserver.wprint "\n";
-     Wserver.wprint "</ul>\n";
+  do tag "ul" begin
+       html_li conf;
+       Wserver.wprint "%s %s\n" (lab x1) (transl_decline conf "of" "");
+       afficher_personne_sans_titre conf base p1;
+       afficher_titre conf base p1;
+       Wserver.wprint "\n";
+       html_li conf;
+       Wserver.wprint "%s %s\n" (lab x2) (transl_decline conf "of" "");
+       afficher_personne_sans_titre conf base p2;
+       afficher_titre conf base p2;
+       Wserver.wprint "\n";
+     end;
      Wserver.wprint "</ul>\n";
   return ()
 ;
@@ -281,7 +292,8 @@ value print_propose_upto conf base p1 p2 rl =
           rl 0
       in
       let (p, a) = if x1 == 0 then (p2, p1) else (p1, p2) in
-      do Wserver.wprint "<p>\n<font size=-1><em>%s %s</em>\n"
+      do html_p conf;
+         Wserver.wprint "<font size=-1><em>%s %s</em>\n"
            (capitale (transl conf "ancestors"))
            (transl_decline conf "of" "");
          afficher_personne_titre conf base p;
@@ -379,7 +391,7 @@ value print_main_relationship conf base p1 p2 =
          in
          ();
          Wserver.wprint "\n";
-         Wserver.wprint "<p>\n";
+         html_p conf;
          Wserver.wprint "%s: <em>" (capitale (transl conf "total"));
          wprint_num conf total;
          Wserver.wprint "</em> %s\n"
@@ -389,13 +401,15 @@ value print_main_relationship conf base p1 p2 =
            age_autorise conf base p1 && age_autorise conf base p2 &&
            a1.consang != Adef.fix (-1) && a2.consang != Adef.fix (-1)
          then
-           do Wserver.wprint "<p>\n<em>%s: "
+           do html_p conf;
+              Wserver.wprint "<em>%s: "
                 (capitale (transl conf "relationship"));
               print_decimal_num conf
                 (round_2_dec
                    (Adef.float_of_fix
                       (Adef.fix_of_float relationship) *. 100.0));
-              Wserver.wprint "%%</em><p>\n";
+              Wserver.wprint "%%</em>";
+              html_p conf;
            return ()
          else ();
          print_propose_upto conf base p1 p2 rl;

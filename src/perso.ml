@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.27 1999-02-02 10:24:24 ddr Exp $ *)
+(* $Id: perso.ml,v 1.28 1999-02-12 12:37:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -229,7 +229,7 @@ value print_dates conf base p =
           else ();
           match (Adef.od_of_codate p.birth, birth_place) with
           [ (None, "") -> ()
-          | _ -> Wserver.wprint ".</em><br>\n" ];
+          | _ -> do Wserver.wprint ".</em>"; html_br conf; return () ];
        return ()
      else ();
      if age_autorise conf base p then
@@ -254,7 +254,7 @@ value print_dates conf base p =
           else ();
           match (baptism, baptism_place) with
           [ (None, "") -> ()
-          | _ -> Wserver.wprint ".</em><br>\n" ];
+          | _ -> do Wserver.wprint ".</em>"; html_br conf; return () ];
        return ()
      else ();
      if age_autorise conf base p then
@@ -291,7 +291,8 @@ value print_dates conf base p =
           if death_place <> "" then
             Wserver.wprint " - %s" (coa conf death_place)
           else ();
-          if something then Wserver.wprint ".</em><br>\n" else ();
+          if something then do Wserver.wprint ".</em>"; html_br conf; return ()
+          else ();
        return ()
      else ();
      if age_autorise conf base p then
@@ -302,7 +303,8 @@ value print_dates conf base p =
              let a = temps_ecoule d conf.today in
              do Wserver.wprint "<em>%s: " (capitale (transl conf "age"));
                 Date.print_age conf a;
-                Wserver.wprint ".</em><br>\n";
+                Wserver.wprint ".</em>";
+                html_br conf;
              return ()
        | _ -> () ]
      else ();
@@ -316,7 +318,8 @@ value print_dates conf base p =
              do Wserver.wprint "<em>%s "
                   (capitale (transl conf "death age:"));
                 Date.print_age conf a;
-                Wserver.wprint ".</em><br>\n";
+                Wserver.wprint ".</em>";
+                html_br conf;
              return ()
            else ()
        | _ -> () ]
@@ -348,7 +351,8 @@ value print_dates conf base p =
                  burial_date_place cod;
               return ()
           | UnknownBurial -> () ];
-          if something then Wserver.wprint ".</em><br>\n" else ();
+          if something then do Wserver.wprint ".</em>"; html_br conf; return ()
+          else ();
        return ()
      else ();
   return ()
@@ -361,11 +365,13 @@ value print_parents conf base p =
       let imoth = (coi base ifam).mother in
       let fath = poi base ifath in
       let moth = poi base imoth in
-      do Wserver.wprint "<h3> %s </h3>\n\n<ul>\n<li>\n"
+      do Wserver.wprint "<h3> %s </h3>\n\n<ul>\n"
            (capitale (transl conf "parents"));
+         html_li conf;
          afficher_personne_titre_referencee conf base fath;
          Date.afficher_dates_courtes conf base fath;
-         Wserver.wprint "\n<li>\n";
+         Wserver.wprint "\n";
+         html_li conf;
          afficher_personne_titre_referencee conf base moth;
          Date.afficher_dates_courtes conf base moth;
          Wserver.wprint "\n</ul>\n\n";
@@ -383,7 +389,8 @@ value print_child conf base age_auth ip =
         sou base (poi base (coi base ifam).father).surname <>
           sou base p.surname ]
   in
-  do Wserver.wprint "\n<li>\n";
+  do Wserver.wprint "\n";
+     html_li conf;
      if force_surname then afficher_personne_referencee conf base p
      else afficher_prenom_de_personne_referencee conf base p;
      if age_auth then Date.afficher_dates_courtes conf base p else ();
@@ -399,7 +406,8 @@ value print_family conf base p a ifam =
   let children = fam.children in
   let divorce = fam.divorce in
   let is = index_of_sex p.sex in
-  do Wserver.wprint "\n<li>\n";
+  do Wserver.wprint "\n";
+     html_li conf;
      Wserver.wprint
        (fcapitale
           (ftransl_nth conf "allied%t (euphemism for married or... not) to"
@@ -459,7 +467,8 @@ value print_family conf base p a ifam =
        match p_getenv conf.henv "opt" with
        [ Some "from" ->
            let n = sou base fam.origin_file in
-           if n = "" then () else Wserver.wprint "<em>(%s)</em><br>\n" n
+           if n = "" then ()
+           else do Wserver.wprint "<em>(%s)</em>" n; html_br conf; return ()
        | _ -> () ]
      else ();
   return ()
@@ -497,10 +506,11 @@ value print_notes conf base p =
       if age_autorise conf base p then
         do Wserver.wprint "<h3> %s </h3>\n\n"
              (capitale (transl_nth conf "note/notes" 1));
-           Wserver.wprint "<ul><li>\n";
-           copy_string_with_macros conf (coa conf notes);
-           Wserver.wprint "\n";
-           Wserver.wprint "</ul>\n";
+           tag "ul" begin
+             html_li conf;
+             copy_string_with_macros conf (coa conf notes);
+             Wserver.wprint "\n";
+           end;
         return ()
       else () ]
 ;
@@ -510,12 +520,13 @@ value print_not_empty_src conf base first txt isrc =
   if src = "" then ()
   else
     do if first.val then
-         do Wserver.wprint "<p>\n";
+         do html_p conf;
             Wserver.wprint "<font size=-1><em>%s:</em></font>\n"
               (capitale (transl_nth conf "source/sources" 1));
          return ()
        else ();
-       Wserver.wprint "<br>-\n";
+       html_br conf;
+       Wserver.wprint "-\n";
        first.val := False;
        Wserver.wprint "<font size=-1><em>%s: " (txt ());
        copy_string_with_macros conf (coa conf src);
@@ -641,7 +652,8 @@ value print_sosa conf base a p =
            Num.print (fun x -> Wserver.wprint "%s" x)
              (transl conf "(thousand separator)") n;
          end;
-         Wserver.wprint "</em><p>\n";
+         Wserver.wprint "</em>";
+         html_p conf;
       return ()
   | None -> () ]
 ;
@@ -767,14 +779,18 @@ value print conf base p =
            in
            match f with
            [ Some f ->
-               Wserver.wprint "<img src=\"%sm=IM;v=%s\" alt=\"%s\"><p>\n"
-                 (commd conf) (Util.code_varenv f) photo_txt
+               do Wserver.wprint "<img src=\"%sm=IM;v=%s\" alt=\"%s\">"
+                    (commd conf) (Util.code_varenv f) photo_txt;
+                  html_p conf;
+               return ()
            | None -> () ]
        | s ->
            let http = "http://" in
            if String.length s > String.length http &&
               String.sub s 0 (String.length http) = http then
-             Wserver.wprint "<img src=\"%s\" alt=\"%s\"><p>\n" s photo_txt
+             do Wserver.wprint "<img src=\"%s\" alt=\"%s\">" s photo_txt;
+                html_p conf;
+             return ()
            else if Filename.is_implicit s then
              let fname1 =
                List.fold_right Filename.concat
@@ -784,8 +800,10 @@ value print conf base p =
                List.fold_right Filename.concat [Util.base_dir.val; "images"] s
              in
              if Sys.file_exists fname1 || Sys.file_exists fname2 then
-               Wserver.wprint "<img src=\"%sm=IM;v=%s\" alt=\"%s\"><p>\n"
-                 (commd conf) s photo_txt
+               do Wserver.wprint "<img src=\"%sm=IM;v=%s\" alt=\"%s\">"
+                    (commd conf) s photo_txt;
+                  html_p conf;
+               return ()
              else ()
            else () ]
      else ();
@@ -794,28 +812,35 @@ value print conf base p =
          let n = sou base n in
          List.iter
            (fun nn ->
-              Wserver.wprint "%s <em>%s</em><br>\n" (coa conf n)
-                (coa conf (sou base nn)))
+              do Wserver.wprint "%s <em>%s</em>" (coa conf n)
+                   (coa conf (sou base nn));
+                 html_br conf;
+              return ())
            nnl
      | (_, [_ :: nnl]) ->
          let n = sou base p.first_name in
          List.iter
            (fun nn ->
-              Wserver.wprint "%s <em>%s</em><br>\n" (coa conf n)
-                (coa conf (sou base nn)))
+              do Wserver.wprint "%s <em>%s</em>" (coa conf n)
+                   (coa conf (sou base nn));
+                 html_br conf;
+              return ())
            nnl
      | _ -> () ];
      let is = index_of_sex p.sex in
      List.iter
        (fun a ->
-          Wserver.wprint "%s <em><strong>%s</strong></em><br>\n"
-            (capitale (transl conf "alias")) (coa conf (sou base a)))
+          do Wserver.wprint "%s <em><strong>%s</strong></em>"
+               (capitale (transl conf "alias")) (coa conf (sou base a));
+             html_br conf;
+          return ())
        p.aliases;
      if List.length p.titles > 0 &&
         (p.access <> Private || conf.friend || conf.wizard) then
        do Wserver.wprint "<em>";
           print_titles conf base (transl conf "and") p a;
-          Wserver.wprint ".</em><br>\n";
+          Wserver.wprint ".</em>";
+          html_br conf;
        return ()
      else ();
      match (sou base p.public_name, p.nick_names) with
@@ -825,35 +850,41 @@ value print conf base p =
               (code_varenv (sou base p.first_name))
               (coa conf (sou base p.first_name));
             Wserver.wprint " ";
-            Wserver.wprint "<a href=\"%sm=N;v=%s\">%s</a>)</em>\n<br>\n"
+            Wserver.wprint "<a href=\"%sm=N;v=%s\">%s</a>)</em>\n"
               (commd conf) (code_varenv (sou base p.surname))
               (coa conf (sou base p.surname));
+            html_br conf;
          return () ];
      List.iter
        (fun n ->
-          Wserver.wprint "<em>(%s %s)</em>\n<br>\n"
-            (coa conf (sou base p.first_name))
-            (coa conf (sou base n)))
+          do Wserver.wprint "<em>(%s %s)</em>\n"
+               (coa conf (sou base p.first_name))
+               (coa conf (sou base n));
+             html_br conf;
+          return ())
        p.surnames_aliases;
      if age_autorise conf base p then
        List.iter
          (fun n ->
-            Wserver.wprint "<em>(%s %s)</em>\n<br>\n" (coa conf (sou base n))
-              (coa conf (sou base p.surname)))
+            do Wserver.wprint "<em>(%s %s)</em>\n" (coa conf (sou base n))
+                 (coa conf (sou base p.surname));
+               html_br conf;
+            return ())
          p.first_names_aliases
      else ();
      match
        (sou base p.public_name, p.nick_names, p.aliases,
         List.length p.titles <> 0)
      with
-     [ ("", [], _, _) | (_, _, [_ :: _], _) | (_, _, _, True) ->
-         Wserver.wprint "<p>\n"
+     [ ("", [], _, _) | (_, _, [_ :: _], _) | (_, _, _, True) -> html_p conf
      | _ -> () ];
      match sou base p.occupation with
      [ "" -> ()
      | s ->
          if age_autorise conf base p then
-           Wserver.wprint "<em>%s</em>\n<br>\n" (capitale (coa conf s))
+           do Wserver.wprint "<em>%s</em>\n" (capitale (coa conf s));
+              html_br conf;
+           return ()
          else () ];
      print_dates conf base p;
      if age_autorise conf base p && a.consang != Adef.fix (-1) &&
@@ -861,7 +892,8 @@ value print conf base p =
        do Wserver.wprint "<em>%s: " (capitale (transl conf "consanguinity"));
           print_decimal_num conf
             (round_2_dec (Adef.float_of_fix a.consang *. 100.0));
-          Wserver.wprint "%%</em><br>\n";
+          Wserver.wprint "%%</em>";
+          html_br conf;
        return ()
      else ();
      print_parents conf base a;
@@ -878,19 +910,26 @@ value print conf base p =
      if age_autorise conf base p then print_sources conf base p else ();
      match p_getenv conf.env "opt" with
      [ Some "misc" ->
-         do Wserver.wprint "<ol>";
-            Wserver.wprint "\n<li>%s\n"
-              (Name.lower (sou base p.first_name ^ " " ^ sou base p.surname));
-            List.iter (fun x -> Wserver.wprint "\n<li>%s\n" x)
-              (Gutil.person_misc_names base p);
-            Wserver.wprint "</ol>\n";
-         return ()
+         tag "ol" begin
+           html_li conf;
+           Wserver.wprint "%s\n"
+             (Name.lower (sou base p.first_name ^ " " ^ sou base p.surname));
+           List.iter
+             (fun x ->
+                do Wserver.wprint "\n";
+                   html_li conf;
+                   Wserver.wprint "%s\n" x;
+                return ())
+             (Gutil.person_misc_names base p);
+         end
      | Some "photo" ->
-         Wserver.wprint "<p>Default photo name = \"%s\"\n"
+         do html_p conf; return
+         Wserver.wprint "Default photo name = \"%s\"\n"
            (default_photo_name base p)
      | Some "tstab_val" ->
          let tstab = Util.create_topological_sort conf base in
-         Wserver.wprint "<p>Tstab val = %d\n"
+         do html_p conf; return
+         Wserver.wprint "Tstab val = %d\n"
            tstab.(Adef.int_of_iper p.cle_index)
      | _ -> () ];
      trailer conf;

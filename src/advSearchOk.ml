@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 1.5 1999-02-02 10:23:55 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 1.6 1999-02-12 12:36:57 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -192,7 +192,8 @@ value print_result conf base max_answers (list, len) =
   if len > max_answers then
     do Wserver.wprint (fcapitale (ftransl conf "more than %d answers"))
          max_answers;
-       Wserver.wprint "\n<p>\n";
+       Wserver.wprint "\n";
+       html_p conf;
     return ()
   else if len == 0 then
     Wserver.wprint "%s\n" (capitale (transl conf "no match"))
@@ -200,12 +201,14 @@ value print_result conf base max_answers (list, len) =
     tag "ul" begin
       List.iter
         (fun p ->
-           do Wserver.wprint "<li>\n";
+           do html_li conf;
               afficher_personne_referencee conf base p;
               Date.afficher_dates_courtes conf base p;
            return ())
         list;
-      if len > max_answers then Wserver.wprint "<li>\n...\n" else ();
+      if len > max_answers then
+        do html_li conf; Wserver.wprint "...\n"; return ()
+      else ();
     end
 ;
 

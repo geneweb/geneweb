@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 1.12 1999-02-02 10:24:41 ddr Exp $ *)
+(* $Id: util.mli,v 1.13 1999-02-12 12:37:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -8,6 +8,9 @@ value lang_dir : ref string;
 value base_dir : ref string;
 
 value html : config -> unit;
+value html_br : config -> unit;
+value html_p : config -> unit;
+value html_li : config -> unit;
 
 value commd : config -> string;
 value code_varenv : string -> string;
@@ -49,7 +52,8 @@ value header_no_page_title : config -> (bool -> unit) -> unit;
 value header : config -> (bool -> unit) -> unit;
 value trailer : config -> unit;
 
-value print_alphab_list : ('a -> string) -> ('a -> unit) -> list 'a -> unit;
+value print_alphab_list :
+  config -> ('a -> string) -> ('a -> unit) -> list 'a -> unit;
 
 value surname_begin : string -> string;
 value surname_end : string -> string;

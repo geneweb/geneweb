@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 1.11 1999-02-02 10:23:56 ddr Exp $ *)
+(* $Id: alln.ml,v 1.12 1999-02-12 12:36:57 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -113,7 +113,7 @@ value print_alphabetic_big conf base is_surnames ini list len =
              Wserver.wprint "\n";
           return ())
        list;
-     Wserver.wprint "<p>";
+     html_p conf;
      stag "a" "href=\"%sm=%s;tri=A;o=A;k=%s\"" (commd conf) mode ini begin
        Wserver.wprint "%s" (capitale (transl conf "the whole list"));
      end;
@@ -136,7 +136,7 @@ value print_alphabetic_all conf base is_surnames ini list len =
      tag "ul" begin
        List.iter
          (fun (ini_k, l) ->
-            do Wserver.wprint "<li>";
+            do html_li conf;
                stag "a" "name=\"%s\"" ini_k begin
                  Wserver.wprint "%s" (String.capitalize ini_k);
                end;
@@ -144,7 +144,7 @@ value print_alphabetic_all conf base is_surnames ini list len =
                tag "ul" begin
                  List.iter
                    (fun (s, cnt) ->
-                      do Wserver.wprint "<li>";
+                      do html_li conf;
                          stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
                            (code_varenv (Name.lower s))
                          begin
@@ -169,7 +169,7 @@ value print_alphabetic_small conf base is_surnames ini list len =
      tag "ul" begin
        List.iter
          (fun (_, s, cnt) ->
-            do Wserver.wprint "<li>\n";
+            do html_li conf;
                stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
                  (code_varenv (Name.lower s))
                begin
@@ -190,11 +190,12 @@ value print_frequency_any conf base is_surnames list len =
      tag "ul" begin
        List.iter
          (fun (cnt, l) ->
-            do Wserver.wprint "<li>%d\n" cnt;
+            do html_li conf;
+               Wserver.wprint "%d\n" cnt;
                tag "ul" begin
                  List.iter
                    (fun s ->
-                      do Wserver.wprint "<li>";
+                      do html_li conf;
                          stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
                            (code_varenv (Name.lower s))
                          begin

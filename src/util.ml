@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 1.27 1999-02-02 10:24:39 ddr Exp $ *)
+(* $Id: util.ml,v 1.28 1999-02-12 12:37:17 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -8,6 +8,35 @@ open Gutil;
 
 value lang_dir = ref ".";
 value base_dir = ref ".";
+
+value hack_for_hebrew conf =
+  try
+    if Hashtbl.find conf.lexicon " !dir" = "rtl" then Wserver.wprint "<!-- -->"
+    else ()
+  with
+  [ Not_found -> () ]
+;
+
+value html_br conf =
+  do Wserver.wprint "<br>";
+     hack_for_hebrew conf;
+     Wserver.wprint "\n";
+  return ()
+;
+
+value html_p conf =
+  do Wserver.wprint "<p>";
+     hack_for_hebrew conf;
+     Wserver.wprint "\n";
+  return ()
+;
+
+value html_li conf =
+  do Wserver.wprint "<li>";
+     hack_for_hebrew conf;
+     Wserver.wprint "\n";
+  return ()
+;
 
 value ansel_to_ascii s =
   let len =
@@ -555,9 +584,12 @@ value copy_from_file fname =
 
 value trailer conf =
   do try copy_from_file "copyr" with _ ->
-       Wserver.wprint "
-<p><hr><font size=-1><em>(c) Copyright INRIA 1999 -
-GeneWeb %s</em></font><br>\n" version;
+       do html_p conf;
+          Wserver.wprint "
+<hr><font size=-1><em>(c) Copyright INRIA 1999 -
+GeneWeb %s</em></font>" version;
+          html_br conf;
+       return ();
      let trl_fname =
        List.fold_right Filename.concat [base_dir.val; "lang"; conf.lang]
          (conf.bname ^ ".trl")
@@ -582,7 +614,7 @@ value is_number t =
   | _ -> False ]
 ;
 
-value print_alphab_list crit print_elem liste =
+value print_alphab_list conf crit print_elem liste =
   let len = List.length liste in
   do if len > menu_threshold then
        let _ =
@@ -619,13 +651,14 @@ value print_alphab_list crit print_elem liste =
                         else ()
                     | _ -> () ];
                     if not same_than_last then
-                      do Wserver.wprint "<li> <a name=\"%s\">%s</a>\n" t t;
+                      do html_li conf;
+                         Wserver.wprint "<a name=\"%s\">%s</a>\n" t t;
                          Wserver.wprint "  <ul>\n";
                       return ()
                     else ();
                  return ()
                else ();
-               Wserver.wprint "  <li> ";
+               html_li conf;
                print_elem e;
             return Some t)
          None liste

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 1.3 1999-02-02 10:23:59 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 1.4 1999-02-12 12:36:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -75,7 +75,8 @@ value print_birth conf base =
        match tab.(i) with
        [ Some (p, d) ->
            tag "ul" begin
-             Wserver.wprint "<li><strong>\n";
+             html_li conf;
+             Wserver.wprint "<strong>\n";
              afficher_personne_referencee conf base p;
              Wserver.wprint "</strong>,\n";
              Wserver.wprint "%s <em>%s</em>.\n"
@@ -104,7 +105,8 @@ value print_death conf base =
        match tab.(i) with
        [ Some (p, d) ->
            tag "ul" begin
-             Wserver.wprint "<li><strong>\n";
+             html_li conf;
+             Wserver.wprint "<strong>\n";
              afficher_personne_referencee conf base p;
              Wserver.wprint "</strong>,\n";
              Wserver.wprint "%s <em>%s</em>"

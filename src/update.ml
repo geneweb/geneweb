@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 1.13 1999-02-02 10:24:34 ddr Exp $ *)
+(* $Id: update.ml,v 1.14 1999-02-12 12:37:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -42,12 +42,13 @@ value print_same_name conf base p =
   match pl with
   [ [_] -> ()
   | _ ->
-      do Wserver.wprint "<p>%s:\n"
+      do html_p conf;
+         Wserver.wprint "%s:\n"
            (capitale (transl conf "persons having the same name"));
          tag "ul" begin
            List.iter
              (fun p ->
-                do Wserver.wprint "<li>\n";
+                do html_li conf;
                    stag "a" "href=\"%s%s\"" (commd conf) (acces conf base p)
                    begin
                      Wserver.wprint "%s.%d %s"
@@ -181,14 +182,15 @@ value print_warning conf base =
          print_someone_ref conf base fath;
          Wserver.wprint "\n%s\n" (transl conf "and");
          print_someone_ref conf base moth;
-         Wserver.wprint "\n<ul>";
-         Wserver.wprint "\n<li> %s:\n" (capitale (transl conf "before"));
+         Wserver.wprint "\n<ul>\n";
+         html_li conf;
+         Wserver.wprint "%s:\n" (capitale (transl conf "before"));
          Wserver.wprint "\n";
          tag "ul" begin
            Array.iter
              (fun ip ->
                 let p = poi base ip in
-                do Wserver.wprint "<li>\n";
+                do html_li conf;
                    if p.surname = fath.surname then
                      print_first_name conf base p
                    else print_someone conf base p;
@@ -197,13 +199,14 @@ value print_warning conf base =
                 return ())
              before;
          end;
-         Wserver.wprint "\n<li> %s:\n" (capitale (transl conf "after"));
+         html_li conf;
+         Wserver.wprint "%s:\n" (capitale (transl conf "after"));
          Wserver.wprint "\n";
          tag "ul" begin
            Array.iter
              (fun ip ->
                 let p = poi base ip in
-                do Wserver.wprint "<li>\n";
+                do html_li conf;
                    if p.surname = fath.surname then
                      print_first_name_ref conf base p
                    else print_someone_ref conf base p;
@@ -223,11 +226,12 @@ value print_warning conf base =
            (fun _ -> print_someone_strong conf base (poi base cpl.father))
            (fun _ -> print_someone_strong conf base (poi base cpl.mother));
          Wserver.wprint ":\n";
-         Wserver.wprint "<ul>";
-         Wserver.wprint "\n<li>\n";
+         Wserver.wprint "<ul>\n";
+         html_li conf;
          print_first_name_strong conf base elder;
          Date.afficher_dates_courtes conf base elder;
-         Wserver.wprint "\n<li>\n";
+         Wserver.wprint "\n";
+         html_li conf;
          print_first_name_strong conf base x;
          Date.afficher_dates_courtes conf base x;
          Wserver.wprint "</ul>";
@@ -310,11 +314,12 @@ value print_warning conf base =
 value print_warnings conf base wl =
   if wl = [] then ()
   else
-    do Wserver.wprint "<p>%s\n" (capitale (transl conf "warnings"));
+    do html_p conf;
+       Wserver.wprint "%s\n" (capitale (transl conf "warnings"));
        tag "ul" begin
          List.iter
            (fun w ->
-              do Wserver.wprint "<li>\n";
+              do html_li conf;
                  print_warning conf base w;
                  Wserver.wprint "\n";
               return ())
@@ -487,14 +492,15 @@ value print_family_stuff conf base p a =
             [ Some prev_fi ->
                 let cpl1 = coi base prev_fi in
                 let cpl2 = coi base fi in
-                do Wserver.wprint "\n<li>\n";
+                do Wserver.wprint "\n";
+                   html_li conf;
                    Wserver.wprint "<a href=\"%sm=SWI_FAM;i=%d;f=%d\">"
                      (commd conf) (Adef.int_of_iper p.cle_index)
                      (Adef.int_of_ifam fi);
                    Wserver.wprint "%s</a>\n" (capitale (transl conf "switch"));
                    if cpl1.father = cpl2.father && cpl1.mother = cpl2.mother
                    then
-                     do Wserver.wprint "<li>\n";
+                     do html_li conf;
                         stag "a" "href=\"%sm=MRG_FAM;f1=%d;f2=%d\""
                           (commd conf) (Adef.int_of_ifam prev_fi)
                           (Adef.int_of_ifam fi)
@@ -509,7 +515,8 @@ value print_family_stuff conf base p a =
             | None -> () ];
          return
          let c = conjoint p (coi base fi) in
-         do Wserver.wprint "\n<li>\n";
+         do Wserver.wprint "\n";
+            html_li conf;
             Wserver.wprint "<a href=\"%sm=MOD_FAM;i=%d\">" (commd conf)
               (Adef.int_of_ifam fi);
             let s = transl_nth conf "family/families" 0 in
@@ -517,7 +524,8 @@ value print_family_stuff conf base p a =
               (capitale (transl_decline conf "modify" s));
             Wserver.wprint "\n<em>%s</em>\n" (transl conf "with");
             print_someone conf base (poi base c);
-            Wserver.wprint "\n<li>\n";
+            Wserver.wprint "\n";
+            html_li conf;
             Wserver.wprint "<a href=\"%sm=DEL_FAM;i=%d\">" (commd conf)
               (Adef.int_of_ifam fi);
             let s = transl_nth conf "family/families" 0 in
@@ -532,7 +540,8 @@ value print_family_stuff conf base p a =
     && (Array.length p.family <> 0 || a.parents <> None) then ()
     else
       let s = transl_nth conf "family/families" 0 in
-      do Wserver.wprint "\n<li>\n";
+      do Wserver.wprint "\n";
+         html_li conf;
          Wserver.wprint "<a href=\"%sm=ADD_FAM;i=%d\">%s</a>\n"
            (commd conf) (Adef.int_of_iper p.cle_index)
            (capitale (transl_decline conf "add" s));
@@ -558,12 +567,13 @@ value print conf base p =
   in
   let a = aoi base p.cle_index in
   do header conf title;
-     Wserver.wprint "<ul>";
-     Wserver.wprint "\n<li>\n";
+     Wserver.wprint "<ul>\n";
+     html_li conf;
      Wserver.wprint "<a href=\"%sm=MOD_IND;i=%d\">%s</a>\n" (commd conf)
        (Adef.int_of_iper p.cle_index)
        (capitale (transl_decline conf "modify" ""));
-     Wserver.wprint "\n<li>\n";
+     Wserver.wprint "\n";
+     html_li conf;
      Wserver.wprint "<a href=\"%sm=DEL_IND;i=%d\">%s</a>\n"
        (commd conf) (Adef.int_of_iper p.cle_index)
        (capitale (transl_decline conf "delete" ""));
@@ -575,8 +585,8 @@ value print conf base p =
      | None ->
          if sou base p.first_name = "?" || sou base p.surname = "?" then ()
          else
-           do Wserver.wprint "<ul>";
-              Wserver.wprint "\n<li>\n";
+           do Wserver.wprint "<ul>\n";
+              html_li conf;
               let s = transl conf "parents" in              
               Wserver.wprint "<a href=\"%sm=ADD_PAR;i=%d\">%s</a>\n"
                 (commd conf) (Adef.int_of_iper p.cle_index)
@@ -584,9 +594,9 @@ value print conf base p =
               Wserver.wprint "</ul>\n";
            return () ];
      Wserver.wprint "\n";
-     Wserver.wprint "<p>\n";
+     html_p conf;
      tag "ul" begin
-       Wserver.wprint "<li>\n";
+       html_li conf;
        stag "a" "href=\"%sm=MRG;i=%d\"" (commd conf)
          (Adef.int_of_iper p.cle_index)
        begin

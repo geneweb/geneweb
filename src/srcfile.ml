@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 1.16 1999-02-02 10:24:31 ddr Exp $ *)
+(* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
+(* $Id: srcfile.ml,v 1.17 1999-02-12 12:37:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -216,7 +216,9 @@ and copy_from_file conf base name =
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic -> copy_from_channel conf base ic
   | None ->
-      Wserver.wprint "<em>... file not found: \"%s.txt\"</em><br>\n" name ]
+      do Wserver.wprint "<em>... file not found: \"%s.txt\"</em>" name;
+         html_br conf;
+      return () ]
 ;
 
 value print conf base fname =
@@ -234,9 +236,10 @@ value print conf base fname =
   | _ ->
       let title _ = Wserver.wprint "Error" in
       do Util.header conf title;
-         Wserver.wprint "<ul><li>\n";
-         Wserver.wprint "Cannot access file \"%s.txt\".\n" fname;
-         Wserver.wprint "</ul>\n";
+         tag "ul" begin
+           html_li conf;
+           Wserver.wprint "Cannot access file \"%s.txt\".\n" fname;
+         end;
          Util.trailer conf;
       return raise Exit ]
 ;
@@ -265,8 +268,10 @@ value print_lexicon conf base =
             close_in ic;
          return ()
      | None ->
-         Wserver.wprint "<em>... file not found: \"%s.txt\"</em><br>\n"
-           "lexicon" ];
+         do Wserver.wprint "<em>... file not found: \"%s.txt\"</em>"
+              "lexicon";
+            html_br conf;
+         return () ];
      Util.trailer conf;
   return ()
 ;

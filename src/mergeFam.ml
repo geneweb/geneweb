@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFam.ml,v 1.6 1999-02-02 10:24:18 ddr Exp $ *)
+(* $Id: mergeFam.ml,v 1.7 1999-02-12 12:37:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -14,11 +14,11 @@ value print_differences conf base branches fam1 fam2 =
     if x1 <> "" && x2 <> "" && x1 <> x2 then
       do Wserver.wprint "<h4>%s</h4>\n" (capitale title);
          tag "ul" begin
-           Wserver.wprint "<li>\n";
+           html_li conf;
            Wserver.wprint "<input type=radio name=\"%s\" value=1 checked>\n"
              name;
            Wserver.wprint "%s\n" (if str_orig then coa conf x1 else x1);
-           Wserver.wprint "<li>\n";
+           html_li conf;
            Wserver.wprint "<input type=radio name=\"%s\" value=2>\n" name;
            Wserver.wprint "%s\n" (if str_orig then coa conf x2 else x2);
          end;
@@ -42,7 +42,7 @@ value print_differences conf base branches fam1 fam2 =
           return ()
       | [_ :: branches] -> loop branches
       | _ -> () ];
-    Wserver.wprint "<p>\n";
+    html_p conf;
     string_field False (transl_nth conf "marriage/marriages" 0) "marriage"
       (fun fam ->
          match Adef.od_of_codate fam.marriage with
@@ -59,7 +59,7 @@ value print_differences conf base branches fam1 fam2 =
              match Adef.od_of_codate cod with
              [ Some d -> Date.string_of_ondate conf d
              | None -> "" ] ]);
-    Wserver.wprint "<p>\n";
+    html_p conf;
     Wserver.wprint "<input type=submit value=Ok>\n";
   end
 ;

@@ -21,7 +21,7 @@
 %h<input type=hidden name=m value=NG>
 חיפוס: <input name=n size=40 maxlength=200> 
 <input type=submit value="חפס">
-<br>
+<br><!-- -->
 זה:
 <ul>
 <li> <input type=radio name=t value=PN checked>
@@ -66,9 +66,9 @@
 
 <a href="%sm=AN">ימי הולדת</a>%x
 ו- <a href="%sm=B;k=10">לידות לאחרונה</a>%x...
-<br>
+<br><!-- -->
 <a href="%sm=AD">ימי השנה למתים</a>.
-<br>
+<br><!-- -->
 ו- <a href="%sm=AM">ימי נישואין</a>.
 <p>
 היו %q פנייות, מתוכם %c לעמוד זה, מתאריך %d.

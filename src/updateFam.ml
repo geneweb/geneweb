@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 1.12 1999-02-02 10:24:35 ddr Exp $ *)
+(* $Id: updateFam.ml,v 1.13 1999-02-12 12:37:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -168,7 +168,7 @@ value print_divorce conf base fam =
 ;
 
 value print_add_child conf base cnt =
-  do Wserver.wprint "<li>\n"; return
+  do html_li conf; return
   tag "table" "border=1" begin
     tag "tr" begin
       let var = "add_child" ^ string_of_int cnt in
@@ -183,7 +183,8 @@ value print_add_child conf base cnt =
 ;
 
 value print_child conf base cnt n =
-  do Wserver.wprint "\n<li>\n";
+  do Wserver.wprint "\n";
+     html_li conf;
      print_person conf base ("child" ^ string_of_int cnt) Child n;
      print_add_child conf base cnt;
   return ()
@@ -310,7 +311,8 @@ value print_mod1 conf base fam cpl digest =
          (Adef.int_of_ifam fam.fam_index);
        Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n" digest;
        print_family conf base fam cpl False;
-       Wserver.wprint "\n<p>\n";
+       Wserver.wprint "\n";
+       html_p conf;
        Wserver.wprint "<input type=submit value=Ok>\n";
      end;
      Wserver.wprint "\n";
@@ -331,7 +333,7 @@ value print_del1 conf base fam =
          (Adef.int_of_ifam fam.fam_index);
        Wserver.wprint "<input type=hidden name=m value=DEL_FAM_OK>\n";
        Wserver.wprint "\n";
-       Wserver.wprint "\n<p>\n";
+       html_p conf;
        Wserver.wprint "<input type=submit value=Ok>\n";
      end;
      Wserver.wprint "\n";
@@ -349,11 +351,11 @@ value print_swi1 conf base p fam1 fam2 =
      Wserver.wprint "%s:"
        (capitale (transl conf "switch the order of the following families"));
      tag "ul" begin
-       Wserver.wprint "<li>\n";
+       html_li conf;
        Update.print_someone conf base (poi base cpl1.father);
        Wserver.wprint " %s " (transl conf "and");
        Update.print_someone conf base (poi base cpl1.mother);
-       Wserver.wprint "<li>\n";
+       html_li conf;
        Update.print_someone conf base (poi base cpl2.father);
        Wserver.wprint " %s " (transl conf "and");
        Update.print_someone conf base (poi base cpl2.mother);
@@ -367,7 +369,7 @@ value print_swi1 conf base p fam1 fam2 =
          (Adef.int_of_ifam fam2.fam_index);
        Wserver.wprint "<input type=hidden name=m value=SWI_FAM_OK>\n";
        Wserver.wprint "\n";
-       Wserver.wprint "\n<p>\n";
+       html_p conf;
        Wserver.wprint "<input type=submit value=Ok>\n";
      end;
      Wserver.wprint "\n";
@@ -386,7 +388,8 @@ value print_add1 conf base fam cpl force_children_surnames =
        Srcfile.hidden_env conf;
        Wserver.wprint "<input type=hidden name=m value=ADD_FAM_OK>\n";
        print_family conf base fam cpl force_children_surnames;
-       Wserver.wprint "\n<p>\n";
+       Wserver.wprint "\n";
+       html_p conf;
        Wserver.wprint "<input type=submit value=Ok>\n";
      end;
      Wserver.wprint "\n";

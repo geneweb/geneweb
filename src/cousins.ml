@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 1.10 1999-02-02 10:24:03 ddr Exp $ *)
+(* $Id: cousins.ml,v 1.11 1999-02-12 12:37:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -127,8 +127,9 @@ value print_choice conf base p niveau_effectif =
       in
       boucle 2;
     end;
-    Wserver.wprint "<p>\n";
-    Wserver.wprint "<input type=submit value=\"Ok\"><br>\n";
+    html_p conf;
+    Wserver.wprint "<input type=submit value=\"Ok\">";
+    html_br conf;
   end
 ;
 
@@ -159,7 +160,7 @@ value rec print_descend_upto conf base ini_p ini_br lev children =
             if is_valid_rel && cnt.val < max_cnt && has_desc_lev base lev p
             then
               do if lev <= 2 then
-                   do Wserver.wprint "<li>\n";
+                   do html_li conf;
                       if lev = 1 then
                         do give_access conf base ia_asex ini_p ini_br p br;
                            incr cnt;
@@ -196,7 +197,7 @@ value sibling_has_desc_lev base lev (ip, _) =
 value print_cousins_side_of conf base a ini_p ini_br lev =
   let sib = siblings base a in
   if List.exists (sibling_has_desc_lev base lev) sib then
-    do Wserver.wprint "<li>\n";
+    do html_li conf;
        Wserver.wprint (fcapitale (ftransl conf "of %t's side"))
          (fun _ -> afficher_personne_titre conf base a);
        Wserver.wprint ":\n";
@@ -228,7 +229,9 @@ value print_cousins_lev conf base p lev =
         else some
     in
     if some then ()
-    else Wserver.wprint "<li>%s\n" (capitale (transl conf "no match"));
+    else
+      do html_li conf; return
+      Wserver.wprint "%s\n" (capitale (transl conf "no match"));
   end
 ;
 
