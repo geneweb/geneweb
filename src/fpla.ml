@@ -1,4 +1,4 @@
-(* $Id: fpla.ml,v 3.1 2000-01-10 02:14:38 ddr Exp $ *)
+(* $Id: fpla.ml,v 3.2 2000-12-18 15:28:18 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 (* First Parentless Ancestor *)
 
@@ -61,7 +61,7 @@ value make_table base =
 
 value first_parentless_ancestor base =
   let tab = make_table base in
-  do Sort.array (fun (_, s1) (_, s2) -> s1 >= s2) tab;
+  do Array.sort (fun (_, s1) (_, s2) -> compare s2 s1) tab;
      Printf.printf "First parentless ancestor\n\n";
      Array.iter
        (fun (i, s) ->
