@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.20 1999-09-29 13:58:34 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.21 1999-10-05 11:59:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -54,7 +54,7 @@ value magic_gwb = "GnWb001x";
        strings hash table index           : 2 arrays of binary_ints
          strings offset array (length = prime after 10 * strings array length)
            - associating a hash value of the string modulo length
-           - to his index in the string array
+           - to its index in the string array
          strings list array (length = string array length)
            - associating a string index
            - to the index of the next index holding the same hash value
