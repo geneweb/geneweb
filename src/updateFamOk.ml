@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.14 2000-06-17 14:51:31 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.15 2000-07-12 13:21:47 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -559,7 +559,7 @@ value print_family conf base wl cpl des =
   in
   do match rdsrc with
      [ Some x ->
-         do conf.henv := List.remove_assoc "dsrc" conf.henv;
+         do conf.henv := list_remove_assoc "dsrc" conf.henv;
             if x <> "" then conf.henv := [("dsrc", code_varenv x) :: conf.henv]
             else ();
          return ()

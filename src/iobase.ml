@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 3.5 2000-05-02 17:15:45 doligez Exp $ *)
+(* $Id: iobase.ml,v 3.6 2000-07-12 13:21:47 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -96,13 +96,6 @@ value output_array_access oc arr pos =
       loop (pos + Iovalue.size arr.(i)) (i + 1)
   in
   loop (pos + output_value_header_size + array_header_size arr) 0
-;
-
-value rec list_remove_assoc x =
-  fun
-  [ [(x1, y1) :: l] ->
-      if x = x1 then l else [(x1, y1) :: list_remove_assoc x l]
-  | [] -> [] ]
 ;
 
 (* Search index of a given string in file strings.inx *)

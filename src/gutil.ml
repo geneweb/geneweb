@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.9 2000-06-05 09:47:37 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.10 2000-07-12 13:21:46 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -22,6 +22,13 @@ value lindex s c =
   pos 0 where rec pos i =
     if i == String.length s then None
     else if s.[i] == c then Some i else pos (i + 1)
+;
+
+value rec list_remove_assoc x =
+  fun
+  [ [] -> []
+  | [((a, b) as pair) :: l] ->
+      if a = x then l else [pair :: list_remove_assoc x l] ]
 ;
 
 value array_memq x a =
