@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.19 1999-05-18 22:34:58 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.20 1999-05-20 17:21:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -59,9 +59,9 @@ value print_choice conf base p niveau_effectif =
     Wserver.wprint "<input type=hidden name=m value=A>\n";
     if conf.wizard && conf.friend then
       do Wserver.wprint "<input type=hidden name=n value=\"%s\">\n"
-           (sou base p.surname);
+           (quote_escaped (sou base p.surname));
          Wserver.wprint "<input type=hidden name=p value=\"%s\">\n"
-           (sou base p.first_name);
+           (quote_escaped (sou base p.first_name));
          if p.occ > 0 then
            Wserver.wprint "<input type=hidden name=oc value=\"%d\">\n" p.occ
          else ();
