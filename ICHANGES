@@ -5,19 +5,20 @@ GeneWeb Version 1.11
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [12/01/99] Changed test in input_lexicon (gwd.ml): length of line < 4
+  - [Jan 12, 99] Changed test in input_lexicon (gwd.ml): length of line < 4
     instead of line = "": better test to avoid failures when bad lexicon
     files.
 
 * Gedcom to GeneWeb (ged2gwb)
-  - [16/01/99] Ignore abnormal errors (displaying "uncaught exception:
+  - [Jan 16, 99] Ignore abnormal errors (displaying "uncaught exception:
     Stream.Failure").
 
 * GeneWeb compiler (gwc)
-  - [12/01/99] Failure error now displayed in stdout instead of stderr.
+  - [Jan 23, 99] Forgot to skip tabulations while reading lines in ".gw" files
+  - [Jan 12, 99] Failure error now displayed in stdout instead of stderr.
 
 * Most descendants computation (mostdesc)
-  - [16/01/99] Added mostdesc.opt in Makefile.
+  - [Jan 16, 99] Added mostdesc.opt in Makefile.
 
 GeneWeb Version 1.10
 --------------------

@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 1.13 1999-01-18 14:14:09 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 1.14 1999-01-23 03:15:23 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -45,10 +45,11 @@ value copy_decode s i1 i2 =
 value fields str =
   loop 0 0 where rec loop beg i =
     if i < String.length str then
-      if str.[i] == ' ' then
-        if beg == i then loop (succ beg) (succ i)
-        else [copy_decode str beg i :: loop (succ i) (succ i)]
-      else loop beg (succ i)
+      match str.[i] with
+      [ ' ' | '\t' ->
+          if beg == i then loop (succ beg) (succ i)
+          else [copy_decode str beg i :: loop (succ i) (succ i)]
+      | _ -> loop beg (succ i) ]
     else if beg == i then []
     else [copy_decode str beg i]
 ;
