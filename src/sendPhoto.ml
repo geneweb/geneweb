@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendPhoto.ml,v 1.1 1999-02-13 21:55:07 ddr Exp $ *)
+(* $Id: sendPhoto.ml,v 1.2 1999-02-13 23:43:19 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -105,14 +105,29 @@ value move_file_to_old conf typ fname bfname =
     return ()
 ;
 
+value buff = ref (String.create 80);
+value store len x =
+  do if len >= String.length buff.val then
+       buff.val := buff.val ^ String.create (String.length buff.val)
+     else ();
+     buff.val.[len] := x;
+  return succ len
+;
+value get_buff len = String.sub buff.val 0 len;
+
 value effective_send_ok conf base p file =
   let strm = Stream.of_string file in
   let (request, content) =
     Wserver.get_request_and_content strm
   in
   let content =
-    let i = let _ = Stream.peek strm in Stream.count strm in
-    content ^ String.sub file i (String.length file - i)
+    let s =
+      loop 0 strm where rec loop len =
+        parser
+        [ [: `x :] -> loop (store len x) strm
+        | [: :] -> get_buff len ]
+    in
+    content ^ s
   in
   let content_type = Wserver.extract_param "content-type: " '\n' request in
   let typ =
