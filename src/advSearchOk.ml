@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 2.8 1999-09-16 09:31:40 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 2.9 1999-09-16 17:50:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -142,9 +142,9 @@ value advanced_search conf base max_answers =
     && test_auth p "birth_place"
          (fun x -> name_incl x (sou base p.birth_place))
     && test_date p "birth" (fun () -> Adef.od_of_codate p.birth)
-    && test_auth p "baptism_place"
+    && test_auth p "bapt_place"
          (fun x -> name_incl x (sou base p.baptism_place))
-    && test_date p "baptism" (fun () -> Adef.od_of_codate p.baptism)
+    && test_date p "bapt" (fun () -> Adef.od_of_codate p.baptism)
     && test_auth p "death"
          (fun d ->
             match (d, p.death) with

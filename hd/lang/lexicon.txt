@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.119 1999-09-16 15:01:07 ddr Exp $
+# $Id: lexicon.txt,v 2.120 1999-09-16 17:50:52 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1167,6 +1167,7 @@ pt: enterrado/enterrada/enterrado(a)
 se: begravd
 
     calendar
+de: Kalender
 en: calendar
 fr: calendrier
 se: kalender
@@ -1916,6 +1917,7 @@ pt: bisavos
 se: gammel-far(mor)f&ouml;r&auml;ldrar
 
     gregorian/julian/french/hebrew
+de: Gregorianisch/Julianisch/Franz&ouml;sisch/Hebr&auml;isch
 en: Gregorian/Julian/French/Hebrew
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
 se: gregoriansk/juliansk/fransk/hebreisk
@@ -3768,6 +3770,7 @@ pt: inverter a ordem das familias seguintes
 se: &auml;ndra ordningen p&aring; de f&ouml;ljande familjerna
 
     text
+de: Text
 en: text
 fr: texte
 se: text
@@ -4401,6 +4404,7 @@ pt: seria seu pr&oacute;pio ancestro
 se: skulle vara sin egen ana
 
     year/month/day
+de: Jahr/Monat/Tag
 en: year/month/day
 fr: ann&eacute;e/mois/jour
 se: &aring;r/m&aring;nad/dag
