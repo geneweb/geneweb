@@ -13,6 +13,10 @@ GeneWeb Version 4.04
     with internet explorer.
   - [19 Sep 01] Trace: too big texts in referer now cut.
 
+* GeneWeb data bases Transfer Program (gwtp)
+  - [05 Oct 01] Added other acceptable tags in trl files: ul, ol, li, table,
+    tr, td.
+
 * Compilation
   - [07 Sep 01] All executables are now compiled static (no dynamic library)
 
