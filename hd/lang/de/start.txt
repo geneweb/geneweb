@@ -69,8 +69,8 @@ Platz <input name=p size=25 maxlength=200> =&gt
 Die <a href="%sm=AN">Geburtstage</a>.<br>
 Die <a href="%sm=AD">Jahrestage der verstorbenen Personen</a>.<br>
 Die <a href="%sm=AM">Hochzeitstage</a>.<br>%x
-Die <a href="%sm=LB;k=10">letzen Geburten</a>.<br>
-Die <a href="%sm=LD;k=10">letzen Ableben</a>.%x
+Die <a href="%sm=LB;k=10">letzten Geburten</a>.<br>
+Die <a href="%sm=LD;k=10">letzten Ableben</a>.%x
 
 <p>
 
