@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.26 1999-08-14 09:26:35 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.27 1999-08-19 17:38:56 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -17,7 +17,8 @@ type record =
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
 type month_number_dates =
-  [ MonthDayDates | DayMonthDates | NoMonthNumberDates | MonthNumberHappened ]
+  [ MonthDayDates | DayMonthDates | NoMonthNumberDates
+  | MonthNumberHappened of string ]
 ;
 
 type charset = [ Ansel | Ascii | Msdos ];
@@ -181,10 +182,11 @@ value check_month m =
 ;
 
 value warning_month_number_dates () =
-  if month_number_dates.val = MonthNumberHappened then
-    do flush log_oc.val;
-       Printf.eprintf
-         "
+  match month_number_dates.val with
+  [ MonthNumberHappened s ->
+      do flush log_oc.val;
+         Printf.eprintf
+           "
   Warning: the file holds dates with numbered months (like: 12/05/1912).
 
   GEDCOM standard *requires* that months in dates be identifiers. The
@@ -193,11 +195,11 @@ value warning_month_number_dates () =
   Consider restarting with option \"-dates_dm\" or \"-dates_md\".
   Use option -help to see what they do.
 
-"
-           ;
-       flush stderr;
-    return ()
-  else ()
+  (example found in gedcom: \"%s\")
+" s;
+         flush stderr;
+      return ()
+  | _ -> () ]
 ;
 
 (* Decoding fields *)
@@ -361,6 +363,8 @@ value date_period d1 d2 =
   | (None, None) -> None ]
 ;
 
+value date_str = ref "";
+
 EXTEND
   GLOBAL: date;
   date:
@@ -399,8 +403,15 @@ EXTEND
                     [ DayMonthDates -> do check_month m; return (d, m)
                     | MonthDayDates -> do check_month d; return (m, d)
                     | _ ->
-                        do month_number_dates.val := MonthNumberHappened;
-                        return (0, 0) ] ]
+                        if d >= 1 && m >= 1 && d <= 31 && m <= 31 then
+                          if d > 12 && m <= 12 then (d, m)
+                          else if m > 12 && d <= 12 then (m, d)
+                          else if d > 12 && m > 12 then (0, 0)
+                          else
+                            do month_number_dates.val :=
+                                 MonthNumberHappened date_str.val;
+                            return (0, 0)
+                        else (0, 0) ] ]
               in
               let (d, m) = if m < 1 || m > 12 then (0, 0) else (d, m) in
               Some {day = d; month = m; year = y; prec = Sure}
@@ -452,6 +463,7 @@ value date_of_field pos d =
   else
     let s = Stream.of_string (String.uppercase d) in
     let r =
+      do date_str.val := d; return
       try Grammar.Entry.parse date s with [ Stdpp.Exc_located loc e -> None ]
     in
     match r with

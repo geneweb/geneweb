@@ -7,6 +7,8 @@ GeneWeb version 2.06
     "warnings.htm".
 
 * GeneWeb Service/CGI (gwd)
+  - [Aug 19, 99] Fixed bug: the "back" button which appears after error
+    in update used to forget the language.
   - [Aug 19, 99] Added more informations (places) in descendants display
     by list.
   - [Aug 18, 99] Added a link to the documentation (close to the copyright).
