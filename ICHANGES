@@ -5,10 +5,6 @@ GeneWeb Version 4.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
-  - [25 Mar 01] The relationship computing internally now can reconstitute
-    the paths, allowing to display correctly in French and Swedish phrases
-    like "xxx is a grandchild of a cousin of yyy" (we need to know the
-    intermediate child's sex (Swedish) and the cousin's sex (French)).
   - [23 Mar 01] The log count is now displayed in the traces before the
     traitment.
   - [20 Mar 01] Added + as possible character in an URL.
