@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.43 2000-09-08 03:03:32 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.44 2000-09-08 11:58:18 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -13,7 +13,7 @@ value filename_basename str =
     if i < 0 then str
     else
       match str.[i] with
-      [ 'A'..'Z' | 'a'..'z' | '-' | '~' | '.' -> loop (i - 1)
+      [ 'A'..'Z' | 'a'..'z' | '0'..'9' | '-' | '~' | '.' -> loop (i - 1)
       | _ -> String.sub str (i + 1) (String.length str - i - 1) ]
 ;
 
