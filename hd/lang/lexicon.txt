@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.125 2000-07-05 09:00:14 ddr Exp $
+# $Id: lexicon.txt,v 3.126 2000-07-05 09:29:15 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5804,7 +5804,7 @@ fi: viime %d naimisiinmenoa
 fr: les %d derniers mariages
 it: gli ultimi %d matrimoni
 lv: pçdçjâs %d laulîbas
-nl: de laatste %d huwelijken
+nl: de %d laatste huwelijken
 pt: os %d casamentos mais recentes
 se: de senaste %d äktenskapen
 
