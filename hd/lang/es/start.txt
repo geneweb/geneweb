@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.45 2000-07-07 12:11:08 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.46 2000-09-14 02:22:55 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogía - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -85,7 +85,7 @@ Para navegar en esta base de datos, puede hacer su búsqueda:<br><p>
 </ul>
 </form>
 
-%It<li>
+%Ispropose_titles;<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -146,7 +146,7 @@ avanzada</b></font></a>.
 <tr>
 <td align=right>
 <ul>
-%Id<li><a href="%sm=ADD_FAM">agregar una familia</a>
+%Ispropose_add_family;<li><a href="%sm=ADD_FAM">agregar una familia</a>
 %INl</ul>%E
 </td>
 <td align=left>

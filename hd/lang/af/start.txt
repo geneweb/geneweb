@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 1.21 2000-07-07 12:11:05 ddr Exp $ -->
+  <!-- $Id: start.txt,v 1.22 2000-09-14 02:22:54 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogie/Familiekunde - %t</title>
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -89,7 +89,7 @@ Om in die databasis rond te blaai, kan jy die volgende soektogte loods:<br><p>
 </ul>
 </form>
 
-%It<li>
+%Ispropose_titles;<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -150,7 +150,7 @@ navraag</b></font></a>.
 <tr>
 <td align=right>
 <ul>
-%Id<li><a href="%sm=ADD_FAM">'n familie byvoeg</a>
+%Ispropose_add_family;<li><a href="%sm=ADD_FAM">'n familie byvoeg</a>
 %INl</ul>
 </td>
 <td align=left>

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.39 2000-07-07 12:11:06 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.40 2000-09-14 02:22:55 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -85,7 +85,7 @@ Zum Benutzen dieser Datenbank kannst du hier suchen:<br><p>
 </ul>
 </form>
 
-%It<li>
+%Ispropose_titles;<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -144,7 +144,8 @@ Suche</b></font></a>.
 <tr>
 <td align=right>
 <ul>
-%Id<li><a href="%sm=ADD_FAM">eine Familie hinzuf&uuml;gen</a>
+%Ispropose_add_family;<li><a href="%sm=ADD_FAM">eine Familie
+hinzuf&uuml;gen</a>
 %INl</ul>
 </td>
 <td align=left>

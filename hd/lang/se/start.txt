@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.47 2000-07-23 18:55:51 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.48 2000-09-14 02:22:56 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -90,7 +90,7 @@ F&ouml;r att navigera i denna databas, kan du s&ouml;ka:<br><p>
 </ul>
 </form>
 
-%It<li>
+%Ispropose_titles;<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -151,7 +151,7 @@ s&ouml;kning</b></font></a>.
 <tr>
 <td align=right>
 <ul>
-%Id<li><a href="%sm=ADD_FAM">l&auml;gga till en familj</a>
+%Ispropose_add_family;<li><a href="%sm=ADD_FAM">l&auml;gga till en familj</a>
 %INl</ul>
 </td>
 <td align=left>

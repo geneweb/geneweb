@@ -9,6 +9,9 @@ GeneWeb Version 3.08
     (request from Debian packagers).
 
 * GeneWeb daemon/CGI (gwd)
+  - [14 Sep 00] Replaced srcfile.ml macros %d and %t by %s followed by the
+    configuration variable and semicolon: resp. %spropose_add_family; and
+    %spropose_titles;. Same change in start.txt files.
   - [13 Sep 00] For etc files (e.g. personal index.txt), added macros: %+
     to increment a counter and %# to display it.
   - [12 Sep 00] In traces suspension points for long requests are applied
