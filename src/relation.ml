@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.10 2001-03-27 04:43:01 ddr Exp $ *)
+(* $Id: relation.ml,v 4.11 2001-04-15 05:40:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -909,12 +909,11 @@ value print_solution_ancestor conf base long p1 p2 pp1 pp2 x1 x2 list =
     List.iter
       (fun (a, n) ->
          do html_li conf;
-            Wserver.wprint "<em>%s %s" (string_of_big_int conf n)
+            Wserver.wprint "<em>%s %s"
+              (if n < 0 then "***" else string_of_big_int conf n)
               (transl_nth conf "branch/branches" (if n = 1 then 0 else 1));
             if not long then
-              let propose_dag =
-                n > 1 && n <= 10 (* && not (browser_doesnt_have_tables conf) *)
-              in
+              let propose_dag = n > 1 && n <= 10 in
               do Wserver.wprint ":\n%s " (transl conf "click");
                  let dp1 = match pp1 with [ Some p -> p | _ -> p1 ] in
                  let dp2 = match pp2 with [ Some p -> p | _ -> p2 ] in
@@ -1177,17 +1176,20 @@ value compute_simple_relationship conf base tstab p1 p2 =
   if ancestors = [] then None
   else
     let total =
-      List.fold_left
-        (fun n i ->
-           let u = tab.Consang.reltab.(i) in
-           List.fold_left
-             (fun n (_, n1, _) ->
-                let n1 = Num.of_int n1 in
-                List.fold_left
-                  (fun n (_, n2, _) -> Num.add n (Num.mul n1 n2)) n
-                  u.Consang.lens1)
-             n u.Consang.lens2)
-        Num.zero ancestors
+      try
+        List.fold_left
+          (fun n i ->
+             let u = tab.Consang.reltab.(i) in
+             List.fold_left
+               (fun n (_, n1, _) ->
+                  let n1 = if n1 < 0 then raise Exit else Num.of_int n1 in
+                  List.fold_left
+                    (fun n (_, n2, _) -> Num.add n (Num.mul n1 n2)) n
+                    u.Consang.lens1)
+               n u.Consang.lens2)
+          Num.zero ancestors
+       with
+       [ Exit -> Num.zero ]
     in 
     let rl =
       List.fold_left
@@ -1198,7 +1200,9 @@ value compute_simple_relationship conf base tstab p1 p2 =
              (fun rl (len1, n1, _) ->
                 List.fold_left
                   (fun rl (len2, n2, _) ->
-                     [(len1, len2, (p, n1 * n2)) :: rl])
+                     let n = n1 * n2 in
+                     let n = if n1 < 0 || n2 < 0 || n < 0 then -1 else n in
+                     [(len1, len2, (p, n)) :: rl])
                   rl u.Consang.lens2)
              rl u.Consang.lens1)
         [] ancestors
@@ -1250,7 +1254,7 @@ value merge_relations rl1 rl2 =
     rl1 rl2
 ;
 
-value combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 =
+value combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 sl =
   List.fold_right
     (fun p1 sl ->
        List.fold_right
@@ -1262,7 +1266,7 @@ value combine_relationship conf base tstab pl1 pl2 f_sp1 f_sp2 =
                 [(s, total, reltab) :: sl]
             | None -> sl ])
          pl2 sl)
-    pl1
+    pl1 sl
 ;
 
 value sp p = Some p;
@@ -1404,7 +1408,8 @@ value print_main_relationship conf base long p1 p2 rel =
             Wserver.wprint "\n";
             html_p conf;
             Wserver.wprint "%s: <em>" (capitale (transl conf "total"));
-            wprint_num conf total;
+            if Num.eq total Num.zero then Wserver.wprint "***"
+            else wprint_num conf total;
             Wserver.wprint "</em> %s\n"
               (transl_nth conf "relationship link/relationship links"
                  (if Num.eq total Num.one then 0 else 1));

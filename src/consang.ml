@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 4.1 2001-03-24 22:54:47 ddr Exp $ *)
+(* $Id: consang.ml,v 4.2 2001-04-15 05:40:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -131,11 +131,14 @@ value rec insert_branch_len_rec ((len, n, ip) as x) =
   fun
   [ [] -> [(len, n, [ip])]
   | [((len1, n1, ipl1) as y) :: lens] ->
-      if len == len1 then [(len1, n + n1, [ip :: ipl1]) :: lens]
+      if len == len1 then
+        let n2 = n + n1 in
+        let n2 = if n < 0 || n1 < 0 || n2 < 0 then -1 else n2 in
+        [(len1, n2, [ip :: ipl1]) :: lens]
       else [y :: insert_branch_len_rec x lens] ]
 ;
 
-value rec insert_branch_len ip lens (len, n, ipl) =
+value insert_branch_len ip lens (len, n, ipl) =
   insert_branch_len_rec (succ len, n, ip) lens
 ;
 

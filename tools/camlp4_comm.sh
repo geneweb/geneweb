@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: camlp4_comm.sh,v 4.1 2001-04-13 17:55:09 ddr Exp $
+# $Id: camlp4_comm.sh,v 4.2 2001-04-15 05:40:56 ddr Exp $
 
 ARGS1=
 FILE=
@@ -21,6 +21,10 @@ if test "$2" = "camlp4r" -o "$2" = "camlp4o" -o "$2" = "camlp4"; then
 else
 	COMM=camlp4r
 	ARGS2=
+fi
+
+if test "$COMM" = "camlp4r"; then
+    ARGS2="$ARGS2 ../tools/pa_newseq.cmo"
 fi
 
 echo $COMM $ARGS2 $ARGS1 $FILE 1>&2
