@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 4.2 2001-06-03 06:17:25 ddr Exp $ *)
+(* $Id: dag2html.ml,v 4.3 2001-06-03 14:16:54 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -107,7 +107,8 @@ value html_table_struct indi_txt phony d t =
           let les =
             let s =
               if k > 0 && t.table.(k - 1).(j).elem = Nothing ||
-                 t.table.(k).(j).elem = Nothing then
+                 t.table.(k).(j).elem = Nothing
+              then
                 "&nbsp;"
               else if phony t.table.(i).(j).elem then "&nbsp;"
               else bar_txt t.table.(i).(j).elem
@@ -137,7 +138,8 @@ value html_table_struct indi_txt phony d t =
           let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
           let les =
             if t.table.(i).(j).elem = Nothing ||
-               t.table.(i + 1).(j).elem = Nothing then
+               t.table.(i + 1).(j).elem = Nothing
+            then
               [(colspan, LeftA, TDstring "&nbsp;") :: les]
             else
               let s =
@@ -268,8 +270,8 @@ value html_table_struct indi_txt phony d t =
             in
             let hts =
               if exist_several_branches i (i + 1) &&
-                 (i < Array.length t.table - 2 ||
-                  not (all_empty (i + 1))) then
+                 (i < Array.length t.table - 2 || not (all_empty (i + 1)))
+              then
                 [vbars_txt (i + 1) (i + 1); hbars_txt i (i + 1) :: hts]
               else hts
             in
@@ -717,8 +719,8 @@ value find_block_with_parents t i jj1 jj2 jj3 jj4 =
     let (nii, njj1, njj2, njj3, njj4) =
       find_same_parents t i jj1 jj2 jj3 jj4
     in
-    if nii <> ii || njj1 <> jj1 || njj2 <> jj2 || njj3 <> jj3 ||
-       njj4 <> jj4 then
+    if nii <> ii || njj1 <> jj1 || njj2 <> jj2 || njj3 <> jj3 || njj4 <> jj4
+    then
       let nii = min ii nii in
       let (jj1, jj2, jj3, jj4) =
         find_linked_children t nii njj1 njj2 njj3 njj4
@@ -838,7 +840,8 @@ value fill_gap d t i j1 j2 =
     let y = line.(j2).span in
     let rec loop y j =
       if j >= Array.length line then ()
-      else if line.(j).span = y || t1.(i).(j).elem = t1.(i).(j - 1).elem
+      else if
+        line.(j).span = y || t1.(i).(j).elem = t1.(i).(j - 1).elem
       then do {
         let y = line.(j).span in
         line.(j).span := x;
@@ -954,7 +957,8 @@ value fall d t =
                   let line = t.table.(i) in
                   if (j = 0 || line.(j - 1).span <> line.(j).span) &&
                      (j2 = Array.length line - 1 ||
-                      line.(j2 + 1).span <> line.(j2).span) then
+                      line.(j2 + 1).span <> line.(j2).span)
+                  then
                     loop (i - 1)
                   else i + 1
             in
@@ -981,7 +985,8 @@ value fall d t =
                     t.table.(i1).(l) :=
                       if l = j ||
                          t.table.(i1 - 1).(l - 1).span <>
-                           t.table.(i1 - 1).(l).span then
+                           t.table.(i1 - 1).(l).span
+                      then
                         {elem = Ghost (new_ghost_id ());
                          span = new_span_id ()}
                       else copy_data t.table.(i1).(l - 1)
@@ -1148,7 +1153,8 @@ value try_fall2_right t i j =
         loop (i1 - 1) where rec loop i =
           if i < 0 then True
           else if
-            j > 0 && t.table.(i).(j - 1).span = t.table.(i).(j).span then
+            j > 0 && t.table.(i).(j - 1).span = t.table.(i).(j).span
+          then
             False
           else loop (i - 1)
       in
@@ -1191,7 +1197,8 @@ value try_fall2_left t i j =
           if i < 0 then True
           else if
             j < Array.length t.table.(i) - 1 &&
-            t.table.(i).(j).span = t.table.(i).(j + 1).span then
+            t.table.(i).(j).span = t.table.(i).(j + 1).span
+          then
             False
           else loop (i - 1)
       in
@@ -1252,7 +1259,8 @@ value try_shorten_too_long t i j =
         loop i where rec loop i =
           if i = i2 then True
           else if
-            j > 0 && t.table.(i).(j).span = t.table.(i).(j - 1).span then
+            j > 0 && t.table.(i).(j).span = t.table.(i).(j - 1).span
+          then
             False
           else loop (i + 1)
       in
@@ -1261,7 +1269,8 @@ value try_shorten_too_long t i j =
           if i = i2 then True
           else if
             j2 < Array.length t.table.(i) &&
-            t.table.(i).(j2 - 1).span = t.table.(i).(j2).span then
+            t.table.(i).(j2 - 1).span = t.table.(i).(j2).span
+          then
             False
           else loop (i + 1)
       in

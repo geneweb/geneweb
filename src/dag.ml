@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.2 2001-05-15 15:26:51 ddr Exp $ *)
+(* $Id: dag.ml,v 4.3 2001-06-03 14:21:54 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -672,6 +672,12 @@ value print_html_table conf hts =
   }
 ;
 
+value html_table_of_dag indi_txt phony invert no_group d =
+  let t = Dag2html.table_of_dag phony False invert no_group d in
+  if Array.length t.table = 0 then [| |]
+  else Dag2html.html_table_struct indi_txt phony d t
+;
+
 value make_tree_hts conf base elem_txt spouse_on invert no_group set spl d =
   let indi_txt n =
     match n.valu with
@@ -748,7 +754,7 @@ value make_tree_hts conf base elem_txt spouse_on invert no_group set spl d =
     [ Left _ -> False
     | Right _ -> True ]
   in
-  Dag2html.html_table_of_dag indi_txt phony invert no_group d
+  html_table_of_dag indi_txt phony invert no_group d
 ;
 
 value print_slices_menu conf base hts_opt =
