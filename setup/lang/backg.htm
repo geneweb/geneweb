@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: backg.htm,v 1.1 2002-01-14 12:29:29 ddr Exp $ -->
+  <title>[
+de: Hintergrundbild
+en: Background image
+es: Imagen de fondo
+fr: Image de fond
+lv: Fona attçls
+sv: Bakgrundsbild
+]</title></head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>[
+de: Hintergrundbild
+en: Background image
+es: Imagen de fondo
+fr: Fond d'&eacute;cran
+lv: Fona attçls
+sv: Bakgrundsbild
+]</font></h1></center>
+
+<ul>
+
+<li>
+[
+de: Um ein <b>Hintergrundbild</b> f&uuml;r die Datenbank "$o" anzugeben,
+    gib hier den Dateinamen des Bildes ein:
+en: To specify a background image for the database "$o", you have to
+    write it:
+es: Para utilizar una imagen de fondo en la base "$o", hay que meterla 
+    bajo la forma:
+fr: Pour <b>indiquer une image de fond</b> pour la base "$o", il faut la
+    mettre sous la forme suivante: 
+lv: Lai noteiktu fona attçlu datu bâzei "$o", jums jâuzraksta tas
+    (aizvietojot "<tt>foo.jpg</tt>" jûsu attçla datnes reâlo nosaukumu):
+sv: För att specifiera en bakgrundsbild för databasen "$o", måste du
+    skriva (byt ut "<tt>foo.jpg</tt>" mot det riktiga namnet för bildfilen):
+]
+
+<pre>
+     background="gwd$t{.exe}?m=IM;v=/[
+de: bla.jpg
+en: foo.jpg
+es: toto.jpg
+fr: toto.jpg
+lv: foo.jpg
+sv: foo.jpg
+]"
+</pre>
+
+<p>
+
+[
+de: Ersetze dabei "<tt>bla.jpg</tt>" durch den echten Bildnamen.
+en: replacing "<tt>foo.jpg</tt>" by the real name of your image file.
+es: remplazando para ello "<tt>toto.jpg</tt>" por el  
+    verdadero nombre de la imagen.
+fr: en rempla&ccedil;ant "<tt>toto.jpg</tt>" par le vrai
+    nom de votre fichier image.
+]
+
+<p>
+
+<li>
+[
+de: Lege die Bilddatei in folgendem Verzeichnis ab
+    (Gegebenenfalls lege das Verzeichnis vorher an):
+en: Put the image file in the directory
+    (possibly create it before):
+es: Meta ese fichero imagen en la carpeta
+    (que Ud. crear&aacute; eventualmente):
+fr: Mettez ce fichier image dans le r&eacute;pertoire
+    (que vous devrez &eacute;ventuellement cr&eacute;er):
+lv: Ielieciet attçla datni katalogâ
+    (iespçjams to pirms tam izveidojot):
+sv: Lägg bildfilen i katalogen
+    (om den inte finns skapa den först):
+]
+
+<pre>
+     gw$/images
+</pre>
+
+</ul>
