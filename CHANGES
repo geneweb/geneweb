@@ -16,7 +16,7 @@ GeneWeb version 2.07
     in the lexicon.
 
 * GeneWeb Service/CGI (gwd)
-  - [Sep 24, 99] Added history for updates.
+  - [Sep 24, 99] Added history for updates (option to be set in file base.gwf).
   - [Sep 23, 99] Added witnesses for marriages.
   - [Sep 22, 99] Fixed bug: bad display of "nth cousin" in Swedish (due
     to problems with the character ":" in the translation).

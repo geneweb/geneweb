@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 1.8 1999-09-24 05:59:26 ddr Exp $
+# $Id: a.gwf,v 1.9 1999-09-24 20:31:20 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -84,7 +84,11 @@ max_anc_level=8
 max_desc_level=12
 
 # History: set it to yes to save update traces in data base (in file named
-# "history"):
+# "history" in the data base directory "base.gwb"). When such a file exists,
+# a link is displayed in the welcome page.
+# Warning: this text file grows indefinitively... you can edit it to remove
+# the old information if you want (oldest = begin of file) or you can remove
+# it when it is too large, if you prefer.
 history=no
 
 # Uncomment the following definition to specify that the present database has
