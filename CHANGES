@@ -6,6 +6,9 @@ GeneWeb version 3.02
     another browser (see version 3.01).
 
 * GeneWeb Service/CGI (gwd)
+  - [Dec 14, 99] In relationship links with option "by marriage" does not
+    display the consanguinity (0%) any more if all relations found are by
+    marriage.
   - [Dec 14, 99] Fixed bug: in relationship links, with option
     "relationship by marriage", when several branches, sometimes did not
     display the persons (sometimes only the spouses, sometimes branches

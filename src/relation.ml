@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.18 1999-12-14 15:22:10 ddr Exp $ *)
+(* $Id: relation.ml,v 3.19 1999-12-14 18:47:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -1242,6 +1242,13 @@ value print_main_relationship conf base long p1 p2 rel =
      | Some (rl, total, relationship) ->
          let a1 = aoi base p1.cle_index in
          let a2 = aoi base p2.cle_index in
+         let all_by_marr =
+           List.for_all
+             (fun
+              [ (Some _, _, _) | (_, Some _, _) -> True
+              | _ -> False ])
+             rl
+         in
          do let _ =
               List.fold_left
                 (fun i sol ->
@@ -1260,7 +1267,8 @@ value print_main_relationship conf base long p1 p2 rel =
                  (if Num.eq total Num.one then 0 else 1));
             if long || browser_doesnt_have_tables conf then ()
             else print_dag_links conf base p1 p2 rl;
-            if age_autorise conf base p1 && age_autorise conf base p2 &&
+            if not all_by_marr &&
+               age_autorise conf base p1 && age_autorise conf base p2 &&
                a1.consang != Adef.fix (-1) && a2.consang != Adef.fix (-1) then
               do html_p conf;
                  Wserver.wprint "<em>%s: "
