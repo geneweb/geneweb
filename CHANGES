@@ -29,8 +29,6 @@ GeneWeb version 2.05
     when several marriages and one of them with an unknown ("? ?") person.
   - [Jul 18, 99] When updating families, the "sources" field is propagated
     into the created persons.
-  - [Jul 18, 99] After a successful update, direct print a personal page
-    (display intermediate page only on case of warnings).
   - [Jul 18, 99] Fixed small bug for the access by subparts of surnames
     (it sometimes accepted too small subparts: then the "search" could
     give weird results).
