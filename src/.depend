@@ -80,10 +80,10 @@ merge.cmo: adef.cmi config.cmi def.cmi gutil.cmi srcfile.cmi util.cmi \
 merge.cmx: adef.cmx config.cmi def.cmi gutil.cmx srcfile.cmx util.cmx \
     ../wserver/wserver.cmx merge.cmi 
 merge.cmi: config.cmi def.cmi 
-mergeFam.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi srcfile.cmi \
-    util.cmi ../wserver/wserver.cmi 
-mergeFam.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx srcfile.cmx \
-    util.cmx ../wserver/wserver.cmx 
+mergeFam.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi mergeFamOk.cmo \
+    srcfile.cmi util.cmi ../wserver/wserver.cmi 
+mergeFam.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx mergeFamOk.cmx \
+    srcfile.cmx util.cmx ../wserver/wserver.cmx 
 mergeFamOk.cmo: adef.cmi config.cmi def.cmi gutil.cmi merge.cmi srcfile.cmi \
     update.cmi updateFam.cmi updateFamOk.cmo util.cmi ../wserver/wserver.cmi 
 mergeFamOk.cmx: adef.cmx config.cmi def.cmi gutil.cmx merge.cmx srcfile.cmx \
