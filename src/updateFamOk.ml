@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.16 2000-09-11 07:46:28 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.17 2000-09-12 23:35:13 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -318,36 +318,6 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
   List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
 ;
 
-value enrich_witness i key =
-  (Update.Witness (i + 1), key) 
-;
-
-value enrich_family sfam =
-  { marriage = sfam.marriage;
-    marriage_place = sfam.marriage_place;
-    marriage_src = sfam.marriage_src;
-    witnesses = Array.mapi enrich_witness sfam.witnesses;
-    relation = sfam.relation;
-    divorce = sfam.divorce;
-    comment = sfam.comment;
-    origin_file = sfam.origin_file;
-    fsources = sfam.fsources;
-    fam_index = sfam.fam_index }
-;
-
-value enrich_couple scpl =
-  { father = (Update.Father, scpl.father);
-    mother = (Update.Mother, scpl.mother) }
-;
-
-value enrich_child i key =
-  (Update.Child (i + 1), key) 
-;
-
-value enrich_descend sdes =
-  { children = Array.mapi enrich_child sdes.children }
-;
-
 value effective_mod conf base sfam scpl sdes =
   let fi = sfam.fam_index in
   let ofam = foi base fi in
@@ -361,15 +331,13 @@ value effective_mod conf base sfam scpl sdes =
   in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)
-      (Update.insert_string conf base) (enrich_family sfam)
+      (Update.insert_string conf base) sfam
   in
   let ncpl =
-    map_couple_p (Update.insert_person conf base psrc created_p)
-      (enrich_couple scpl)
+    map_couple_p (Update.insert_person conf base psrc created_p) scpl
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base psrc created_p)
-      (enrich_descend sdes)
+    map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
 (*
   let ofath = poi base ocpl.father in
@@ -467,15 +435,13 @@ value effective_add conf base sfam scpl sdes =
   in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)
-      (Update.insert_string conf base) (enrich_family sfam)
+      (Update.insert_string conf base) sfam
   in
   let ncpl =
-    map_couple_p (Update.insert_person conf base psrc created_p)
-      (enrich_couple scpl)
+    map_couple_p (Update.insert_person conf base psrc created_p) scpl
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base psrc created_p)
-      (enrich_descend sdes)
+    map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
   let origin_file = infer_origin_file conf base fi ncpl ndes in
   let nfath_p = poi base ncpl.father in
