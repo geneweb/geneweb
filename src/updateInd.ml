@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.36 2001-02-17 12:45:44 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.37 2001-02-17 18:58:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -784,7 +784,7 @@ type ast = Templ.ast ==
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
   | Adefine of string and string and list ast and list ast
-  | Aapply of string and string ]
+  | Aapply of string and ast_expr ]
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
@@ -797,12 +797,14 @@ and ast_expr = Templ.ast_expr ==
 type env =
   [ Vstring of string
   | Vfun of string and list ast
+  | Vint of int
   | Vnone ]
 ;
 
 type variable_value =
   [ VVgen of string
   | VVdate of option date and string
+  | VVrelation of option (gen_relation Update.key string) and string
   | VVcvar of string
   | VVnone ]
 ;
@@ -835,6 +837,14 @@ value rec eval_variable conf base env p =
         | _ -> None ]
       in
       VVdate d s
+  | ["relation"; s] ->
+      let r =
+        match get_env "cnt" env with
+        [ Vint i ->
+            try Some (List.nth p.rparents (i - 1)) with [ Failure _ -> None ]
+        | _ -> None ]
+      in
+      VVrelation r s
   | [] -> VVgen ""
   | [s] ->
       let v = extract_var "cvar_" s in
@@ -854,7 +864,13 @@ value eval_string_env var env =
    | _ -> "" ]
 ;
 
-value eval_gen_variable conf base env p =
+value eval_int_env var env =
+   match get_env var env with
+   [ Vint x -> string_of_int x
+   | _ -> "" ]
+;
+
+value try_eval_gen_variable conf base env p =
   fun
   [ "bapt_place" -> quote_escaped p.baptism_place
   | "bapt_src" -> quote_escaped p.baptism_src
@@ -864,7 +880,7 @@ value eval_gen_variable conf base env p =
   | "burial_src" -> quote_escaped p.burial_src
   | "death_place" -> quote_escaped p.death_place
   | "death_src" -> quote_escaped p.death_src
-  | "cnt" -> eval_string_env "cnt" env
+  | "cnt" -> eval_int_env "cnt" env
   | "digest" -> eval_string_env "digest" env
   | "first_name" -> quote_escaped p.first_name
   | "image" -> quote_escaped p.image
@@ -949,6 +965,7 @@ value eval_gen_bool_variable conf base env p =
   | "has_birth_date" -> Adef.od_of_codate p.birth <> None
   | "has_first_names_aliases" -> p.first_names_aliases <> []
   | "has_qualifiers" -> p.qualifiers <> []
+  | "has_relations" -> p.rparents <> []
   | "has_surnames_aliases" -> p.surnames_aliases <> []
   | "is_female" -> p.sex = Female
   | "is_male" -> p.sex = Male
@@ -991,10 +1008,20 @@ value eval_date_bool_variable conf base env od =
   | s -> do Wserver.wprint ">%%%s???" s; return False ]
 ;
 
+value eval_relation_bool_variable conf base env r =
+  fun
+  [ "rt_empty" ->
+      match r with
+      [ Some {r_fath = None; r_moth = None} | None -> True
+      | _ -> False ]
+  | s -> do Wserver.wprint ">%%%s???" s; return False ]
+;
+
 value eval_bool_variable conf base env p s sl =
   match eval_variable conf base env p [s :: sl] with
   [ VVgen s -> eval_gen_bool_variable conf base env p s
   | VVdate od s -> eval_date_bool_variable conf base env od s
+  | VVrelation r s -> eval_relation_bool_variable conf base env r s
   | VVcvar _ -> do Wserver.wprint ">%%%s???" s; return False
   | VVnone -> do Wserver.wprint ">%%%s???" s; return False ]
 ;
@@ -1018,9 +1045,10 @@ value eval_bool_value conf base env p =
     | Evar s sl ->
         try
           match eval_variable conf base env p [s :: sl] with
-          [ VVgen s -> eval_gen_variable conf base env p s
+          [ VVgen s -> try_eval_gen_variable conf base env p s
           | VVdate od s -> eval_date_variable conf base env od s
           | VVcvar s -> eval_base_env_variable conf s
+          | VVrelation _ s -> do Wserver.wprint ">%%%s???" s; return ""
           | VVnone -> do Wserver.wprint ">%%%s???" s; return "" ]
         with
         [ Not_found -> do Wserver.wprint ">%%%s???" s; return "" ]
@@ -1034,12 +1062,13 @@ value eval_bool_value conf base env p =
 value print_variable conf base env p sl =
   match eval_variable conf base env p sl with
   [ VVgen s ->
-      try Wserver.wprint "%s" (eval_gen_variable conf base env p s) with
+      try Wserver.wprint "%s" (try_eval_gen_variable conf base env p s) with
       [ Not_found -> Templ.print_variable conf base s ]
   | VVdate od s -> Wserver.wprint "%s" (eval_date_variable conf base env od s)
   | VVcvar s ->
       try Wserver.wprint "%s" (List.assoc s conf.base_env) with
       [ Not_found -> () ]
+  | VVrelation _ _
   | VVnone ->
       do Wserver.wprint ">%%";
          list_iter_first
@@ -1098,7 +1127,7 @@ value rec subst sf =
   | Aif e alt ale -> Aif (subste sf e) (substl sf alt) (substl sf ale)
   | Aforeach s sl al -> Aforeach (sf s) (List.map sf sl) (substl sf al)
   | Adefine f x al alk -> Adefine (sf f) (sf x) (substl sf al) (substl sf alk)
-  | Aapply f x -> Aapply (sf f) (sf x) ]
+  | Aapply f x -> Aapply (sf f) (subste sf x) ]
 and substl sf al =
   List.map (subst sf) al
 and subste sf =
@@ -1120,12 +1149,20 @@ value rec print_ast conf base env p =
   | Aif e alt ale -> print_if conf base env p e alt ale
   | Aforeach s sl al -> print_foreach conf base env p s sl al
   | Adefine f x al alk -> print_define conf base env p f x al alk
-  | Aapply f v -> print_apply conf base env p f v ]
+  | Aapply f e -> print_apply conf base env p f e ]
 and print_define conf base env p f x al alk =
   List.iter (print_ast conf base [(f, Vfun x al) :: env] p) alk
-and print_apply conf base env p f v =
+and print_apply conf base env p f e =
   match get_env f env with
   [ Vfun x al ->
+      let v =
+        match e with
+        [ Estr s -> s
+        | Evar s [] ->
+            try try_eval_gen_variable conf base env p s with
+            [ Not_found -> ">" ^ s ^ "???" ]
+        | _ -> "parse_error" ]
+      in
       let sf = subst_text x v in
       List.iter (fun a -> print_ast conf base env p (subst sf a)) al
   | _ -> Wserver.wprint ">%%%s???" f ]
@@ -1144,7 +1181,7 @@ and print_foreach conf base env p s sl al =
          List.iter (fun s -> Wserver.wprint "%s." s) sl;
          Wserver.wprint "%s???" s;
       return ()
-  | VVcvar _ | VVdate _ _ | VVnone -> () ]
+  | VVcvar _ | VVdate _ _ | VVrelation _ _ | VVnone -> () ]
 and print_simple_foreach conf base env p al s =
   let list =
     match s with
@@ -1156,14 +1193,24 @@ and print_simple_foreach conf base env p al s =
   in
   match list with
   [ Some list -> print_foreach_string conf base env p al list
-  | None -> Wserver.wprint "foreach %s???" s ]
+  | None ->
+      match s with
+      [ "relation" -> print_foreach_relation conf base env p al p.rparents
+      | _ -> Wserver.wprint "foreach %s???" s ] ]
 and print_foreach_string conf base env p al list =
   let _ = List.fold_left
     (fun cnt nn ->
        let env = [("item", Vstring nn) :: env] in
-       let env = [("cnt", Vstring (string_of_int cnt)) :: env] in
+       let env = [("cnt", Vint cnt) :: env] in
        do List.iter (print_ast conf base env p) al; return cnt + 1)
     0 list
+  in ()
+and print_foreach_relation conf base env p al list =
+  let _ = List.fold_left
+    (fun cnt nn ->
+       let env = [("cnt", Vint cnt) :: env] in
+       do List.iter (print_ast conf base env p) al; return cnt + 1)
+    1 list
   in ()
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 3.8 2001-02-17 12:45:44 ddr Exp $ *)
+(* $Id: templ.ml,v 3.9 2001-02-17 18:58:10 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -14,7 +14,7 @@ type ast =
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
   | Adefine of string and string and list ast and list ast
-  | Aapply of string and string ]
+  | Aapply of string and ast_expr ]
 and ast_expr =
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
@@ -186,7 +186,7 @@ value parse_templ conf base strm =
     (List.rev [Adefine f x al alk :: astl], v)
   and parse_apply strm =
     let (f, _) = get_variable strm in
-    let (x, _) = get_variable strm in
+    let x = parse_expr () in
     Aapply f x
   and parse_if strm =
     let e = parse_expr () in
@@ -300,14 +300,35 @@ value print_body_prop conf base =
   Wserver.wprint "%s" s
 ;
 
+value print_copyright conf base =
+  let env =
+    [('s', fun _ -> commd conf);
+     ('d',
+      fun _ ->
+        if conf.cancel_links then ""
+        else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>")]
+  in
+  match open_etc_file "copyr" with
+  [ Some ic -> copy_from_etc env conf.indep_command ic
+  | None ->
+      do html_p conf;
+         Wserver.wprint "
+<hr><font size=-1><em>(c) Copyright 2001 INRIA -
+GeneWeb %s</em></font>" Version.txt;
+         html_br conf;
+      return () ]
+;
+
 value print_variable conf base =
   fun
   [ "action" -> Wserver.wprint "%s" conf.command
   | "base_header" -> include_hed_trl conf (Some base) ".hed"
   | "base_trailer" -> include_hed_trl conf (Some base) ".trl"
   | "body_prop" -> print_body_prop conf base
+  | "copyright" -> print_copyright conf base
   | "hidden" -> Util.hidden_env conf
   | "highlight" -> Wserver.wprint "%s" conf.highlight
+  | "image_prefix" -> Wserver.wprint "%s" (image_prefix conf)
   | "nl" -> Wserver.wprint "\n"
   | "sp" -> Wserver.wprint " "
   | s -> Wserver.wprint ">%%%s???" s ]

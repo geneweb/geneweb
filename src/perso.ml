@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.86 2001-02-17 12:45:42 ddr Exp $ *)
+(* $Id: perso.ml,v 3.87 2001-02-17 18:58:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -246,7 +246,7 @@ type ast = Templ.ast ==
   | Aif of ast_expr and list ast and list ast
   | Aforeach of string and list string and list ast
   | Adefine of string and string and list ast and list ast
-  | Aapply of string and string ]
+  | Aapply of string and ast_expr ]
 and ast_expr = Templ.ast_expr ==
   [ Eor of ast_expr and ast_expr
   | Eand of ast_expr and ast_expr
@@ -385,25 +385,6 @@ value print_consanguinity conf base env a p_auth =
        Wserver.wprint "%%";
     return ()
   else ()
-;
-
-value print_copyright conf base env =
-  let env =
-    [('s', fun _ -> commd conf);
-     ('d',
-      fun _ ->
-        if conf.cancel_links then ""
-        else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>")]
-  in
-  match open_etc_file "copyr" with
-  [ Some ic -> copy_from_etc env conf.indep_command ic
-  | None ->
-      do html_p conf;
-         Wserver.wprint "
-<hr><font size=-1><em>(c) Copyright 2001 INRIA -
-GeneWeb %s</em></font>" Version.txt;
-         html_br conf;
-      return () ]
 ;
 
 value print_death_age conf base env p p_auth =
@@ -787,7 +768,6 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "cremation_place" -> print_burial_place conf base env p p_auth
   | "comment" -> print_comment conf base env p p_auth efam
   | "consanguinity" -> print_consanguinity conf base env a p_auth
-  | "copyright" -> print_copyright conf base env
   | "death_age" -> print_death_age conf base env p p_auth
   | "death_place" -> print_death_place conf base env p p_auth
   | "died" -> print_died conf base env p p_auth
@@ -804,7 +784,6 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "first_name" -> Wserver.wprint "%s" (p_first_name base p)
   | "first_name_alias" -> print_first_name_alias conf base env
   | "first_name_key" -> print_first_name_key conf base env p p_auth
-  | "image_prefix" -> Wserver.wprint "%s" (image_prefix conf)
   | "image_size" -> print_image_size conf base env p p_auth
   | "image_url" -> print_image_url conf base env p p_auth
   | "ind_access" -> Wserver.wprint "i=%d" (Adef.int_of_iper p.cle_index)
