@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.9 1999-04-22 19:23:23 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.10 1999-04-29 21:01:28 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -242,7 +242,7 @@ value insert_person gen so =
             (Ansel.to_iso_8859_1 so.surname);
           if sou gen.g_base x.first_name <> so.first_name ||
              sou gen.g_base x.surname <> so.surname then
-            Printf.printf "sous le nom: \"%s%s %s\"\n"
+            Printf.printf "as name: \"%s%s %s\"\n"
               (sou gen.g_base x.first_name)
               (match occ with
                [ 0 -> ""

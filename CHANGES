@@ -5,6 +5,15 @@ GeneWeb Intermediate Version 2.01-2
   - [Apr 22, 99] Added Danish language (by Hans Albeck).
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Apr 29, 99] Accept now files in image field ending with ".jpeg" and
+    ".JPEG" (accepted before only with ".jpg" and ".JPG").
+  - [Apr 29, 99] Fixed bug: when a persons first name, last name and number
+    is the same as another person, GeneWeb shows a warning and suggests a new
+    number. If the new number is selected, all special signs were
+    transformed into codes.
+  - [Apr 29, 99] Fixed small uncomfortable feature: when trying to save an
+    image from a GeneWeb page, the browsers did not propose a correct file
+    name to save this image (due to request syntax).
   - [Apr 29, 99] Added ability to change the first name and the surname
     of all children of a person in one only form. See new doc.
   - [Apr 26, 99] Fixed upload of "jpeg" files which sometimes did not work

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.7 1999-04-29 19:55:58 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.8 1999-04-29 21:01:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -253,7 +253,7 @@ value print_try_again conf var n =
           do Wserver.wprint "%s" (if first then "" else ";");
              Wserver.wprint "%s=" v;
              if v = var then Wserver.wprint "%d" n
-             else Wserver.wprint "%s" (code_varenv x);
+             else Wserver.wprint "%s" x;
           return False)
        True conf.env
      in ();
