@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.23 2002-01-30 03:04:43 ddr Exp $ *)
+(* $Id: relation.ml,v 4.24 2002-02-03 19:05:16 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -13,7 +13,8 @@ value print_with_relation text conf base p r is =
   fun
   [ Some ic ->
       let c = pget conf base ic in
-      do {
+      if is_hidden c then ()
+      else do {
         html_li conf;
         Wserver.wprint "<input type=radio name=select value=%d>\n"
           (Adef.int_of_iper ic);
@@ -25,7 +26,8 @@ value print_with_relation text conf base p r is =
 
 value print_with_related conf base p ip =
   let c = pget conf base ip in
-  List.iter
+  if is_hidden c then ()
+  else List.iter
     (fun r ->
        do {
          match r.r_fath with
@@ -44,7 +46,8 @@ value print_with_related conf base p ip =
 
 value print_with_witness conf base p fam ip =
   let w = pget conf base ip in
-  do {
+  if is_hidden w then ()
+  else do {
     html_li conf;
     Wserver.wprint "<input type=radio name=select value=%d>\n"
       (Adef.int_of_iper ip);
@@ -115,7 +118,8 @@ value print_menu conf base p =
              let cpl = coi base ifam in
              let c = spouse p.cle_index cpl in
              let c = pget conf base c in
-             if p_first_name base c <> "?" || p_surname base c <> "?"
+             if (p_first_name base c <> "?" || p_surname base c <> "?")
+                && not (is_hidden c)
              then do {
                html_li conf;
                Wserver.wprint "<input type=radio name=select value=%d>\n"

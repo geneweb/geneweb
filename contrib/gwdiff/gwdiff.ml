@@ -1,11 +1,10 @@
-(* $Id: gwdiff.ml,v 1.3 2001-12-27 14:38:10 ddr Exp $ *)
+(* $Id: gwdiff.ml,v 1.4 2002-02-03 19:02:48 ddr Exp $ *)
 (* Copyright (c) 2001 Ludovic LEDIEU *)
 
 open Def;
 open Gutil;
 
 (*= TODO =====================================================================
-  - About / About => test has to be improved.
   - Improve the way not to check several time the same persons.
 =========================================================================== *)
 
@@ -54,46 +53,47 @@ value person_link bname base iper target =
 
 value print_message base1 base2 msg =
   do {
+    Printf.printf " ";
     match msg with
     [ MsgBadChild iper1 ->
-        Printf.printf " can not isolate one child match: %s"
+        Printf.printf "can not isolate one child match: %s"
           (person_link in_file1.val base1 iper1 "base1")
     | MsgBirthDate ->
-        Printf.printf " birth date"
+        Printf.printf "birth date"
     | MsgBirthPlace ->
-        Printf.printf " birth place"
+        Printf.printf "birth place"
     | MsgChildMissing iper1 ->
-        Printf.printf " child missing: %s"
+        Printf.printf "child missing: %s"
           (person_link in_file1.val base1 iper1 "base1")
     | MsgChildren iper1 ->
-        Printf.printf " more than one child match: %s"
+        Printf.printf "more than one child match: %s"
           (person_link in_file1.val base1 iper1 "base1")
     | MsgDeathDate ->
-        Printf.printf " death (status or date)"
+        Printf.printf "death (status or date)"
     | MsgDeathPlace ->
-        Printf.printf " death place"
+        Printf.printf "death place"
     | MsgDivorce ->
-        Printf.printf " divorce"
+        Printf.printf "divorce"
     | MsgFirstName ->
-        Printf.printf " first name"
+        Printf.printf "first name"
     | MsgOccupation ->
-        Printf.printf " occupation"
+        Printf.printf "occupation"
     | MsgParentsMissing ->
-        Printf.printf " parents missing"
+        Printf.printf "parents missing"
     | MsgMarriageDate ->
-        Printf.printf " marriage date"
+        Printf.printf "marriage date"
     | MsgMarriagePlace ->
-        Printf.printf " marriage place"
+        Printf.printf "marriage place"
     | MsgSex ->
-        Printf.printf " sex"
+        Printf.printf "sex"
     | MsgSpouseMissing iper1 ->
-        Printf.printf " spouse missing: %s"
+        Printf.printf "spouse missing: %s"
           (person_link in_file1.val base1 iper1 "base1")
     | MsgSpouses iper1 ->
-        Printf.printf " more than one spouse match: %s"
+        Printf.printf "more than one spouse match: %s"
           (person_link in_file1.val base1 iper1 "base1")
     | MsgSurname ->
-        Printf.printf " surname" ];
+        Printf.printf "surname" ];
     Printf.printf "%s" cr.val
   }
 ;
@@ -133,7 +133,7 @@ value compatible_str_field istr1 istr2 =
   (Adef.int_of_istr istr1 = 0) || (Adef.int_of_istr istr2 != 0)
 ;
 
-value dmy_to_sdn_range dmy =
+value dmy_to_sdn_range_l dmy =
   let sdn_of_dmy dmy =
     let sdn = Calendar.sdn_of_gregorian dmy in
     let sdn =
@@ -162,21 +162,23 @@ value dmy_to_sdn_range dmy =
   (sdn, sdn2)
   in
   match dmy.prec with
-  [ Sure
+  [ Sure ->
+      let (sdn1, sdn2) = sdn_of_dmy dmy in
+      [ (Some sdn1, Some sdn2) ]
   | Maybe ->
       let (sdn1, sdn2) = sdn_of_dmy dmy in
-      (Some sdn1, Some sdn2)
+      [ (Some sdn1, Some sdn2) ; (None, None) ]
   | About ->
       let (sdn1, sdn2) = sdn_of_dmy dmy in
-      (* +/- 5 years *)
-      (Some (sdn1 - 2000), Some (sdn2 + 2000))
+      let delta = (sdn2 - sdn1 + 1) * 5 in
+      [ (Some (sdn1 - delta), Some (sdn2 + delta)) ]
   | Before ->
       let (sdn1, sdn2) = sdn_of_dmy dmy in
-      (None, Some sdn2)
+      [ (None, Some sdn2) ]
   | After ->
       let (sdn1, sdn2) = sdn_of_dmy dmy in
-      (Some sdn1, None)
-  | OrYear y -> (* FIXME: better result waited *)
+      [ (Some sdn1, None) ]
+  | OrYear y ->
       let dmy2 =
         { year = y + 1;
           month = 0;
@@ -186,7 +188,7 @@ value dmy_to_sdn_range dmy =
       in
       let (sdn11, sdn12) = sdn_of_dmy dmy in
       let (sdn21, sdn22) = sdn_of_dmy dmy2 in
-      (Some sdn11, Some sdn22)
+      [ (Some sdn11, Some sdn12) ; (Some sdn21, Some sdn22) ]
   | YearInt y ->
       let dmy2 =
         { year = y + 1;
@@ -197,25 +199,39 @@ value dmy_to_sdn_range dmy =
       in
       let (sdn11, sdn12) = sdn_of_dmy dmy in
       let (sdn21, sdn22) = sdn_of_dmy dmy2 in
-      (Some sdn11, Some sdn22) ]
+      [ (Some sdn11, Some sdn22) ] ]
+;
+
+value compatible_sdn (sdn11, sdn12) (sdn21, sdn22) =
+  if (sdn21, sdn22) = (None, None) then True
+  else
+    let bool1 =
+      match (sdn11, sdn21) with
+      [ (Some sdn1, Some sdn2) -> sdn1 <= sdn2
+      | (None, _) -> True
+      | (Some _, None) -> False ]
+    in
+    let bool2 =
+      match (sdn12, sdn22) with
+      [ (Some sdn1, Some sdn2) -> sdn1 >= sdn2
+      | (None, _) -> True
+      | (Some _, None) -> False ]
+    in
+    bool1 && bool2
+;
+
+value compatible_sdn_l sdn1_l sdn2 =
+  List.fold_left (fun r sdn1 -> r || (compatible_sdn sdn1 sdn2))
+    False sdn1_l
+;
+
+value compatible_sdn_ll sdn1_l sdn2_l =
+  List.fold_left (fun r sdn2 -> r && (compatible_sdn_l sdn1_l sdn2))
+    True sdn2_l
 ;
 
 value compatible_dmys dmy1 dmy2 =
-  let (sdn11, sdn12) = dmy_to_sdn_range dmy1 in
-  let (sdn21, sdn22) = dmy_to_sdn_range dmy2 in
-  let bool1 =
-    match (sdn11, sdn21) with
-    [ (Some sdn1, Some sdn2) -> sdn1 <= sdn2
-    | (None, _) -> True
-    | (Some _, None) -> False ]
-  in
-  let bool2 =
-    match (sdn12, sdn22) with
-    [ (Some sdn1, Some sdn2) -> sdn1 >= sdn2
-    | (None, _) -> True
-    | (Some _, None) -> False ]
-  in
-  bool1 && bool2
+  compatible_sdn_ll (dmy_to_sdn_range_l dmy1) (dmy_to_sdn_range_l dmy2)
 ;
 
 value compatible_dates date1 date2 =
@@ -596,7 +612,7 @@ value check_args () =
     Argl.parse speclist anonfun errmsg;
     if in_file1.val = "" then
       do {
-        Printf.printf "Missing reference database\n";
+        Printf.printf "Missing reference data base\n";
         Printf.printf "Use option -help for usage\n";
         flush stdout;
         exit 2
@@ -604,7 +620,7 @@ value check_args () =
     else ();
     if in_file2.val = "" then
       do {
-        Printf.printf "Missing destination database\n";
+        Printf.printf "Missing destination data base\n";
         Printf.printf "Use option -help for usage\n";
         flush stdout;
         exit 2
