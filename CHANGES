@@ -2,6 +2,8 @@ GeneWeb version 3.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+   - [25 Aug 00] In history, added the ability to see the changes only
+     by a given wizard.
    - [24 Aug 00] Fixed bug: when entering Web addresses (http://...)
      in notes, it generates enclosing HTML code to make links, but
      sometimes it did it incorrectly. For example the image insertion
