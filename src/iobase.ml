@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.11 2002-01-12 14:09:33 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.12 2002-01-13 01:17:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1131,7 +1131,6 @@ value gen_output no_patches bname base =
         else ();
         raise e
       };
-    remove_file (Filename.concat bname "restrict");
     remove_file (Filename.concat bname "base");
     Sys.rename tmp_fname (Filename.concat bname "base");
     remove_file (Filename.concat bname "base.acc");
