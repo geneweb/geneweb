@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.14 1998-11-28 13:28:47 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.15 1998-11-28 14:08:15 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -206,13 +206,16 @@ value print_renamed conf new_n =
   do Util.header conf title;
      Wserver.wprint "The database \"%s\" has been renamed \"%s\".\n"
        conf.bname new_n;
-     Wserver.wprint "Please use now:\n<p>\n";
-     tag "ul" begin
-       Wserver.wprint "<li>\n";
-       tag "a" "href=\"%s\"" link begin
-         Wserver.wprint "%s" link;
-       end;
-     end;
+     if not conf.cgi then
+       do Wserver.wprint "Please use now:\n<p>\n";
+          tag "ul" begin
+            Wserver.wprint "<li>\n";
+            tag "a" "href=\"%s\"" link begin
+              Wserver.wprint "%s" link;
+            end;
+          end;
+       return ()
+     else ();
      Util.trailer conf;
   return ()
 ;
@@ -404,7 +407,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
       try Some (List.assoc "renamed" base_env) with [ Not_found -> None ]
     with
     [ Some n -> print_renamed conf n
-    | None ->
+    | _ ->
         do start_with_base conf conf.bname;
            if sleep > 0 then Unix.sleep sleep else ();
         return () ]
