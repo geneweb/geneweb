@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.37 1999-09-16 17:50:48 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.38 1999-09-23 19:39:35 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -343,7 +343,7 @@ type range 'a =
 
 value g = Grammar.create lexer;
 value date_value = Grammar.Entry.create g "date value";
-value date_range = Grammar.Entry.create g "date range";
+value date_interval = Grammar.Entry.create g "date interval";
 
 value date_str = ref "";
 
@@ -392,31 +392,37 @@ value make_date n1 n2 n3 =
 ;
 
 EXTEND
-  GLOBAL: date_value date_range;
+  GLOBAL: date_value date_interval;
   date_value:
-    [ [ dr = date_range ->
+    [ [ dr = date_range; EOI ->
           match dr with
           [ Begin (d, cal) -> Dgreg {(d) with prec = After} cal
           | End (d, cal) -> Dgreg {(d) with prec = Before} cal
           | BeginEnd (d1, cal) (d2, _) ->
               Dgreg {(d1) with prec = YearInt d2.year} cal ]
-      | d = date_approximated; EOI -> d
       | (d, cal) = date; EOI -> Dgreg d cal ] ]
   ;
-  date_range:
-    [ [ ID "BEF"; dt = date; EOI -> End dt
-      | ID "AFT"; dt = date; EOI -> Begin dt
-      | ID "BET"; dt = date; ID "AND"; dt1 = date; EOI -> BeginEnd dt dt1
-      | ID "TO"; dt = date; EOI -> End dt
-      | ID "FROM"; dt = date; EOI -> Begin dt
-      | ID "FROM"; dt = date; ID "TO"; dt1 = date; EOI -> BeginEnd dt dt1 ] ]
+  date_interval:
+    [ [ dr = date_range; EOI -> dr
+      | (d, cal) = date; EOI -> Begin (d, cal) ] ]
   ;
-  date_approximated:
-    [ [ ID "ABT" ; (d, cal) = date -> Dgreg {(d) with prec = About} cal
-      | ID "ENV"; (d, cal) = date -> Dgreg {(d) with prec = About} cal
-      | ID "EST"; (d, cal) = date -> Dgreg {(d) with prec = Maybe} cal ] ]
+  date_range:
+    [ [ ID "BEF"; dt = date -> End dt
+      | ID "AFT"; dt = date -> Begin dt
+      | ID "BET"; dt = date; ID "AND"; dt1 = date -> BeginEnd dt dt1
+      | ID "TO"; dt = date -> End dt
+      | ID "FROM"; dt = date -> Begin dt
+      | ID "FROM"; dt = date; ID "TO"; dt1 = date -> BeginEnd dt dt1 ] ]
   ;
   date:
+    [ [ ID "ABT" ; (d, cal) = date_calendar -> ({(d) with prec = About}, cal)
+      | ID "ENV"; (d, cal) = date_calendar -> ({(d) with prec = About}, cal)
+      | ID "EST"; (d, cal) = date_calendar -> ({(d) with prec = Maybe}, cal)
+      | ID "AFT"; (d, cal) = date_calendar -> ({(d) with prec = Before}, cal)
+      | ID "BEF"; (d, cal) = date_calendar -> ({(d) with prec = After}, cal)
+      | (d, cal) = date_calendar -> (d, cal) ] ]
+  ;
+  date_calendar:
     [ [ "@"; "#"; ID "DGREGORIAN"; "@"; d = date_greg -> (d, Dgregorian)
       | "@"; "#"; ID "DJULIAN"; "@"; d = date_greg ->
           (Calendar.gregorian_of_julian d, Djulian)
@@ -898,7 +904,7 @@ value decode_title s =
 value decode_date_interval pos s =
   let strm = Stream.of_string s in
   try
-    match Grammar.Entry.parse date_range strm with
+    match Grammar.Entry.parse date_interval strm with
     [ BeginEnd (d1, cal1) (d2, cal2) ->
         (Some (Dgreg d1 cal1), Some (Dgreg d2 cal2))
     | Begin (d, cal) -> (Some (Dgreg d cal), None)

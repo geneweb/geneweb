@@ -16,6 +16,7 @@ GeneWeb version 2.07
     in the lexicon.
 
 * GeneWeb Service/CGI (gwd)
+  - [Sep 23, 99] Added witnesses for marriages.
   - [Sep 22, 99] Fixed bug: bad display of "nth cousin" in Swedish (due
     to problems with the character ":" in the translation).
   - [Sep 21, 99] Fixed bug: the "DOC" link did not work in CGI mode.
