@@ -1,6 +1,6 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_html.ml,v 3.1 1999-10-30 19:50:25 ddr Exp $ *)
-(* Copyright (c) 1999 INRIA *)
+(* $Id: pa_html.ml,v 3.2 2000-01-10 02:14:40 ddr Exp $ *)
+(* Copyright (c) 2000 INRIA *)
 
 open Pcaml;
 

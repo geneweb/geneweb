@@ -10,8 +10,8 @@
 (*                                                                     *)
 (***********************************************************************)
 
-(* $Id: mhashtbl.ml,v 3.0 1999-10-29 10:31:24 ddr Exp $ *)
-(* Copyright (c) 1999 INRIA *)
+(* $Id: mhashtbl.ml,v 3.1 2000-01-10 02:14:40 ddr Exp $ *)
+(* Copyright (c) 2000 INRIA *)
 
 (* Hash tables *)
 

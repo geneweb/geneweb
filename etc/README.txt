@@ -19,7 +19,7 @@ the previous versions.
 
      -----------------
 
-GeneWeb is copyright INRIA 1998-1999.
+GeneWeb is copyright INRIA 1998,1999,2000.
 
 Remarks, suggestions, questions, bug reports to:
 	daniel.de_rauglaudre@inria.fr

@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 3.1 1999-11-10 08:44:13 ddr Exp $ *)
-(* Copyright (c) 1999 INRIA *)
+(* $Id: advSearchOk.ml,v 3.2 2000-01-10 02:14:36 ddr Exp $ *)
+(* Copyright (c) 2000 INRIA *)
 
 open Config;
 open Def;

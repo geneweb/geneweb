@@ -1,5 +1,5 @@
-(* $Id: consang.mli,v 3.0 1999-10-29 10:31:04 ddr Exp $ *)
-(* Copyright (c) 1999 INRIA *)
+(* $Id: consang.mli,v 3.1 2000-01-10 02:14:37 ddr Exp $ *)
+(* Copyright (c) 2000 INRIA *)
 
 open Def;
 
