@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.14 2000-04-02 15:58:47 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.15 2000-04-21 12:03:57 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -589,7 +589,7 @@ value print_access conf base p =
 ;
 
 value print_notes conf base p =
-  do stag "textarea" "name=notes rows=6 cols=70" begin
+  do stag "textarea" "name=notes rows=6 cols=70 wrap=virtual" begin
        if p.notes <> "" then
          Wserver.wprint "%s" (quote_escaped p.notes)
        else ();
