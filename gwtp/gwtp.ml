@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.34 2000-08-18 13:08:50 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.35 2000-08-18 13:18:25 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -513,14 +513,16 @@ value gwtp_download str env b tok =
           printf "<ul>\n";
           try
             while True do
-              match Unix.readdir dh with
-              [ "." | ".." | "" -> ()
-              | f ->
-                  if f.[String.length f - 1] = '~' then ()
-                  else
-                    printf
-                      "<li><a href=\"gwtp?m=RECV;b=%s;t=%s;f=/%s\">%s</a>\n"
-                      b tok f f ];
+              let f = Unix.readdir dh in
+              let st = Unix.stat (Filename.concat bdir f) in
+              if st.Unix.st_kind == Unix.S_REG
+              && f.[String.length f - 1] <> '~' then
+                do printf
+                     "<li><a href=\"gwtp?m=RECV;b=%s;t=%s;f=/%s\">%s</a>"
+                     b tok f f;
+                   printf " - %d bytes\n" st.Unix.st_size;
+                return ()
+              else ();
             done
           with
           [ End_of_file -> Unix.closedir dh ];
