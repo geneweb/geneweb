@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.34 2003-11-28 20:22:48 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.35 2003-12-03 09:08:27 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -120,7 +120,7 @@ value print_choice conf base p effective_level =
             "- %s <input name=bd size=1 maxlength=2 value=0><br>\n"
             (capitale (transl conf "border"));
           Wserver.wprint "\
-<table><tr><td>- %s</td>
+<table><tr><td>-&nbsp;%s</td>
 <td><input type=radio name=color value=\"\" checked></td>\n"
               (capitale (transl conf "color"));
           List.iter
