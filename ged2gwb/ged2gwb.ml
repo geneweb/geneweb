@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 3.13 2000-03-31 15:13:26 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.14 2000-04-10 17:08:09 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1030,25 +1030,7 @@ value add_indi gen r =
     match name_sons with
     [ Some n ->
         let (f, s) = parse_name (Stream.of_string n.rval) in
-        let (f, pn, fal) =
-          if extract_public_names.val || extract_first_names.val then
-            let i = next_word_pos f 0 in
-            let j = next_sep_pos f i in
-            if j == String.length f then (f, public_name, [])
-            else
-              let fn = String.sub f i (j - i) in
-              if public_name = "" && extract_public_names.val then
-                if is_a_public_name f j then (fn, f, [])
-                else if extract_first_names.val then (fn, "", [f])
-                else (f, "", [])
-              else (fn, public_name, [f])
-          else (f, public_name, [])
-        in
-        let f = if lowercase_first_names.val then lowercase_name f else f in
-        let fal =
-          if lowercase_first_names.val then List.map lowercase_name fal
-          else fal
-        in
+        let fal = [] in
         let (f, fal) =
           match first_names_brackets.val with
           [ Some (bb, eb) ->
@@ -1069,6 +1051,25 @@ value add_indi gen r =
               with
               [ Not_found -> (f, fal) ]
           | None -> (f, fal) ]
+        in
+        let (f, pn, fal) =
+          if extract_public_names.val || extract_first_names.val then
+            let i = next_word_pos f 0 in
+            let j = next_sep_pos f i in
+            if j == String.length f then (f, public_name, fal)
+            else
+              let fn = String.sub f i (j - i) in
+              if public_name = "" && extract_public_names.val then
+                if is_a_public_name f j then (fn, f, fal)
+                else if extract_first_names.val then (fn, "", [f :: fal])
+                else (f, "", fal)
+              else (fn, public_name, [f :: fal])
+          else (f, public_name, fal)
+        in
+        let f = if lowercase_first_names.val then lowercase_name f else f in
+        let fal =
+          if lowercase_first_names.val then List.map lowercase_name fal
+          else fal
         in
         let pn = if lowercase_name pn = f then "" else pn in
         let fal =
