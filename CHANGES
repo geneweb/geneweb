@@ -2,6 +2,9 @@ GeneWeb version 3.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+   - [04 Sep 00] Fixed bug: in descendants with encoding, for children
+     married several times, could sometimes display the father's name
+     instead of a repetition of the child's name.
    - [01 Sep 00] Fixed short dates: "between 1935 and 1938" is displayed
      now "1935/1938" instead of "ca 1935/1938".
    - [30 Aug 00] Fixed bug: sometimes accepted two persons with the same

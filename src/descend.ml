@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 3.18 2000-08-26 10:01:51 ddr Exp $ *)
+(* $Id: descend.ml,v 3.19 2000-09-04 14:58:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -553,7 +553,7 @@ value print_family_locally conf base marks paths max_lev lev p1 c1 e =
              let el = des.children in
              let c = poi base c in
              do if need_br then html_br conf else ();
-                if not first then print_repeat_child conf base p1 c1 e
+                if not first then print_repeat_child conf base p1 c1 p
                 else ();
                 afficher_spouse conf base marks paths fam p c;
                 Wserver.wprint "\n";
