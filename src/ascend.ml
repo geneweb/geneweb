@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.25 1999-06-15 08:42:47 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.26 1999-06-16 11:51:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -1020,7 +1020,7 @@ value print_missing_ancestors conf base v spouses_included p =
   let before = p_getint conf.env "before" in
   let mark = Array.create (base.data.persons.len) Num.zero in
   let rec generation niveau gpl =
-    if niveau > v then ()
+    if niveau > v + 1 then ()
     else if gpl <> [] then
       let title = ref (Some niveau) in
       let gpl_to_print =
