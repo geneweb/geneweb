@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.18 1998-11-25 20:31:49 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.19 1998-11-26 11:23:27 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -53,11 +53,17 @@ value rec get_to_eoln len =
   | [: :] -> get_buff len ]
 ;
 
+value rec skip_to_eoln =
+  parser
+  [ [: `'\n' | '\r'; _ = skip_eol :] -> ()
+  | [: `_; s :] -> skip_to_eoln s
+  | [: :] -> () ]
+;
+
 value rec get_ident len =
   parser
   [ [: `' ' :] -> get_buff len
-  | [: `c when not (List.mem c ['\n'; '\r']); s :] ->
-      get_ident (store len c) s
+  | [: `c when not (List.mem c ['\n'; '\r']); s :] -> get_ident (store len c) s
   | [: :] -> get_buff len ]
 ;
 
@@ -293,6 +299,7 @@ type gen =
    g_fam : tab (choice string base_family);
    g_cpl : tab (choice string base_couple);
    g_str : tab string;
+   g_not : Hashtbl.t string int;
    g_hper : Hashtbl.t string Adef.iper;
    g_hfam : Hashtbl.t string Adef.ifam;
    g_hstr : Hashtbl.t string Adef.istr;
@@ -1108,10 +1115,31 @@ value print_base_warning base =
       return ()
   | YoungForMarriage p a ->
       Printf.printf "%s married at age %d\n" (denomination base p) (annee a) ]
-;      
+;
+
+value find_lev0 =
+  parser bp
+  [ [: `'0'; _ = skip_space; r1 = get_ident 0; r2 = get_ident 0;
+       _ = skip_to_eoln :] ->
+      (bp, r1, r2) ]
+;
 
 value pass1 gen fname =
-  ()
+  let ic = open_in fname in
+  let strm = Stream.of_channel ic in
+  do loop () where rec loop () =
+       match try Some (find_lev0 strm) with [ Stream.Failure -> None ] with
+       [ Some (bp, r1, r2) ->
+           do match r2 with
+              [ "NOTE" -> Hashtbl.add gen.g_not r1 bp
+              | _ -> () ];
+           return loop ()
+       | None ->
+           match strm with parser
+           [ [: `_ :] -> do skip_to_eoln strm; return loop ()
+           | [: :] -> () ] ];
+     close_in ic;
+  return ()
 ;
 
 value get_lev0 =
@@ -1151,14 +1179,14 @@ value pass2 gen fname =
        | None ->
            match strm with parser
            [ [: `'1'..'9' :] ->
-                  do let _ : string = get_to_eoln 0 strm in (); return
-                  loop ()
+               do let _ : string = get_to_eoln 0 strm in (); return
+               loop ()
            | [: `_ :] ->
-                 do print_location ();
-                    Printf.printf "Strange input.\n";
-                    flush stdout;
-                    let _ : string = get_to_eoln 0 strm in ();
-                 return loop ()
+               do print_location ();
+                  Printf.printf "Strange input.\n";
+                  flush stdout;
+                  let _ : string = get_to_eoln 0 strm in ();
+               return loop ()
            | [: :] -> () ] ];
      close_in ic;
      let nf n =
@@ -1199,6 +1227,7 @@ value make_arrays in_file =
      g_fam = {arr = [| |]; tlen = 0};
      g_cpl = {arr = [| |]; tlen = 0};
      g_str = {arr = [| |]; tlen = 0};
+     g_not = Hashtbl.create 3001;
      g_hper = Hashtbl.create 3001;
      g_hfam = Hashtbl.create 3001;
      g_hstr = Hashtbl.create 3001;
@@ -1210,7 +1239,9 @@ value make_arrays in_file =
     if Filename.check_suffix in_file ".ged" then in_file
     else in_file ^ ".ged"
   in
-  do pass1 gen fname;
+  do Printf.eprintf "*** pass 1\n"; flush stderr;
+     pass1 gen fname;
+     Printf.eprintf "*** pass 2\n"; flush stderr;
      pass2 gen fname;
   return
   (gen.g_per, gen.g_asc, gen.g_fam, gen.g_cpl, gen.g_str)
