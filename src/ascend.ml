@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.6 2001-04-22 17:50:34 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.7 2001-05-15 13:56:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -24,25 +24,19 @@ value niveau_max_ascendance base ip =
   let _ = base.data.couples.array () in
   let x = ref 0 in
   let mark = Array.create base.data.persons.len False in
-  do {
-    let rec loop niveau ip =
-      if mark.(Adef.int_of_iper ip) then ()
-      else do {
-        mark.(Adef.int_of_iper ip) := True;
-        x.val := max x.val niveau;
-        match (aoi base ip).parents with
-        [ Some ifam ->
-            let cpl = coi base ifam in
-            do {
-              loop (succ niveau) cpl.father;
-              loop (succ niveau) cpl.mother;
-            }
-        | _ -> () ]
-      }
-    in
-    loop 0 ip;
-    x.val
-  }
+  let rec loop niveau ip =
+    if mark.(Adef.int_of_iper ip) then ()
+    else do {
+      mark.(Adef.int_of_iper ip) := True;
+      x.val := max x.val niveau;
+      match (aoi base ip).parents with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          do { loop (succ niveau) cpl.father; loop (succ niveau) cpl.mother }
+      | _ -> () ]
+    }
+  in
+  do { loop 0 ip; x.val }
 ;
 
 value text_to conf =
@@ -199,19 +193,19 @@ value afficher_menu_ascendants conf base p =
                  "</a>"
              in
              Wserver.wprint "%s"
-               (gen_person_title_text reference std_access conf base p);
+               (gen_person_title_text reference std_access conf base p)
            });
       Wserver.wprint ".\n";
     end;
     Wserver.wprint "<br>\n";
-    trailer conf;
+    trailer conf
   }
 ;
 
 value afficher_ancetre conf base p =
   do {
     afficher_personne_referencee conf base p;
-    Date.afficher_dates_courtes conf base p;
+    Date.afficher_dates_courtes conf base p
   }
 ;
 
@@ -261,7 +255,7 @@ value afficher_ascendants_jusqu_a conf base niveau_max p =
       Wserver.wprint "%s.\n" (capitale (text_to conf niveau_max));
       boucle 1 p.cle_index;
     end;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -332,7 +326,7 @@ value print_generation_person conf base cnt gp =
         afficher_personne_titre_referencee conf base p;
         Date.afficher_dates_courtes conf base p;
         Wserver.wprint "\n";
-        incr cnt;
+        incr cnt
       }
   | GP_same n1 n2 ip ->
       let p = poi base ip in
@@ -349,9 +343,9 @@ value print_generation_person conf base cnt gp =
           }
         in
         Wserver.wprint "%s" (reference conf base p s);
-        Wserver.wprint "\n\n";
+        Wserver.wprint "\n\n"
       }
-  | GP_interv None -> do { html_li conf; Wserver.wprint "...\n\n"; }
+  | GP_interv None -> do { html_li conf; Wserver.wprint "...\n\n" }
   | GP_interv (Some (n1, n2, x)) ->
       do {
         html_li conf;
@@ -366,10 +360,10 @@ value print_generation_person conf base cnt gp =
               Num.print wpr (transl conf "(thousand separator)") m1;
               Wserver.wprint "-";
               Num.print wpr (transl conf "(thousand separator)")
-                (Num.sub m2 Num.one);
+                (Num.sub m2 Num.one)
             }
         | None -> Wserver.wprint "..." ];
-        Wserver.wprint "\n\n";
+        Wserver.wprint "\n\n"
       }
   | _ -> () ]
 ;
@@ -415,10 +409,10 @@ value afficher_ascendants_numerotation conf base niveau_max p =
     if cnt.val > 1 then do {
       html_p conf;
       Wserver.wprint "%s: %d %s\n" (capitale (transl conf "total")) cnt.val
-        (nominative (transl_nth_def conf "person/persons" 2 1));
+        (nominative (transl_nth_def conf "person/persons" 2 1))
     }
     else ();
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -445,7 +439,7 @@ value print_person_long_info conf base auth link p =
        do {
       Wserver.wprint ", <em>";
       Perso.print_titles conf base False (transl conf "and") p;
-      Wserver.wprint "</em>";
+      Wserver.wprint "</em>"
     }
     else ();
     if auth then Date.print_dates conf base p else ();
@@ -457,9 +451,9 @@ value print_person_long_info conf base auth link p =
         if p_getenv conf.env "only" = Some "on" then ()
         else do {
           Wserver.wprint ".\n %s " (capitale (transl conf "see"));
-          print_link_long conf n;
+          print_link_long conf n
         }
-    | None -> () ];
+    | None -> () ]
   }
 ;
 
@@ -531,7 +525,7 @@ value print_marriage_long conf base all_gp auth marr_nb p ifam =
            match marr_nb with
            [ Some n -> Wserver.wprint " (%d)" n
            | None -> () ];
-           if auth then Perso.print_marriage_text conf base False fam else ();
+           if auth then Perso.print_marriage_text conf base False fam else ()
          });
     Wserver.wprint "\n";
     stag "strong" begin
@@ -550,9 +544,9 @@ value print_marriage_long conf base all_gp auth marr_nb p ifam =
           [ Some d when auth ->
               Wserver.wprint " %s" (Date.string_of_ondate conf d)
           | _ -> () ];
-          Wserver.wprint ".\n";
+          Wserver.wprint ".\n"
         }
-    | _ -> () ];
+    | _ -> () ]
   }
 ;
 
@@ -560,12 +554,11 @@ value person_has_notes base p =
   sou base p.notes <> "" || sou base p.psources <> "" ||
   sou base p.birth_src <> "" || sou base p.baptism_src <> "" ||
   sou base p.death_src <> "" || sou base p.burial_src <> "" ||
-  let u = uoi base p.cle_index in
   List.exists
     (fun ifam ->
        let fam = foi base ifam in
        sou base fam.marriage_src <> "" || sou base fam.marriage_src <> "")
-    (Array.to_list u.family)
+    (Array.to_list (uoi base p.cle_index).family)
 ;
  
 value has_notes conf base =
@@ -578,14 +571,13 @@ value has_notes conf base =
 ;
 
 value print_other_marriages conf base ws all_gp auth ifamo p u =
-  if ws && (ifamo = None || Array.length u.family >= 2) then do {
+  if ws && (ifamo = None || Array.length u.family >= 2) then
     for i = 0 to Array.length u.family - 1 do {
       if ifamo = None || ifamo <> Some u.family.(i) then
         let marr_nb = if ifamo = None then None else Some (i + 1) in
         print_marriage_long conf base all_gp auth marr_nb p u.family.(i)
       else ()
-    };
-  }
+    }
   else ()
 ;
 
@@ -598,7 +590,7 @@ value print_notes_ref conf base p wn n child_n =
         Wserver.wprint "%s" child_n;
       end;
     end;
-    Wserver.wprint "].\n";
+    Wserver.wprint "].\n"
   }
   else ()
 ;
@@ -618,7 +610,7 @@ value print_family_long conf base ws wn all_gp ifam nth moth_nb =
         do {
           Wserver.wprint " ";
           print_link_long conf n;
-          Wserver.wprint "-(X%d)" i;
+          Wserver.wprint "-(X%d)" i
         }
     | None -> () ];
     Wserver.wprint ":\n<p>\n";
@@ -655,15 +647,15 @@ value print_family_long conf base ws wn all_gp ifam nth moth_nb =
                   [ Some (_, i) -> "-" ^ string_of_int i ^ s
                   | None -> s ]
                 in
-                print_notes_ref conf base pc wn moth_nb child_n;
+                print_notes_ref conf base pc wn moth_nb child_n
               } ];
           if i <> Array.length des.children - 1 then
             Wserver.wprint "<br>&nbsp;\n"
-          else ();
+          else ()
         }
         else ()
       };
-    end;
+    end
   }
 ;
 
@@ -679,9 +671,7 @@ value print_other_families conf base wn all_gp excl_ifam moth_nb =
     }
   in
   let cpl = coi base excl_ifam in
-  do {
-    print cpl.father (Num.sub moth_nb Num.one); print cpl.mother moth_nb;
-  }
+  do { print cpl.father (Num.sub moth_nb Num.one); print cpl.mother moth_nb }
 ;
 
 value print_generation_person_long conf base ws wn all_gp last_gen gp =
@@ -705,7 +695,7 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
                 (fun _ ->
                    if auth then Perso.print_marriage_text conf base False fam
                    else ());
-              Wserver.wprint "...\n<p>\n";
+              Wserver.wprint "...\n<p>\n"
             }
             else ()
         | _ -> () ];
@@ -724,7 +714,9 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
             let prec =
               if last_gen then
                 (get_link all_gp cpl.father, get_link all_gp cpl.mother)
-              else let n1 = Num.twice n in (Some n1, Some (Num.inc n1 1))
+              else
+                let n1 = Num.twice n in
+                (Some n1, Some (Num.inc n1 1))
             in
             match prec with
             [ (Some n1, Some n2) ->
@@ -734,7 +726,7 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
                   print_link_long conf n1;
                   Wserver.wprint " %s " (transl conf "and");
                   print_link_long conf n2;
-                  Wserver.wprint ".\n";
+                  Wserver.wprint ".\n"
                 }
             | _ -> () ]
         | None -> () ];
@@ -746,10 +738,10 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
             if not (Num.even n) then do {
               print_family_long conf base ws wn all_gp ifam None n;
               if ws then print_other_families conf base wn all_gp ifam n
-              else ();
+              else ()
             }
             else ()
-        | _ -> () ];
+        | _ -> () ]
       }
   | GP_same n1 n2 ip ->
       let p = poi base ip in
@@ -762,7 +754,7 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
         end;
         Wserver.wprint ": %s " (transl conf "see");
         print_link_long conf n2;
-        Wserver.wprint ".\n\n";
+        Wserver.wprint ".\n\n"
       }
   | _ -> () ]
 ;
@@ -774,7 +766,7 @@ value print_not_empty_src conf base new_parag first txt isrc =
     if first.val then do {
       if new_parag then html_p conf else ();
       Wserver.wprint "<font size=-1><em>%s:</em></font>\n"
-        (capitale (transl_nth conf "source/sources" 1));
+        (capitale (transl_nth conf "source/sources" 1))
     }
     else ();
     html_br conf;
@@ -782,7 +774,7 @@ value print_not_empty_src conf base new_parag first txt isrc =
     first.val := False;
     Wserver.wprint "<font size=-1><em>%s: " (txt ());
     copy_string_with_macros conf [] src;
-    Wserver.wprint "</em></font>\n";
+    Wserver.wprint "</em></font>\n"
   }
 ;
 
@@ -801,7 +793,7 @@ value print_sources conf base new_parag p =
       print_not_empty_src conf base new_parag first
         (fun () -> transl_nth conf "death" 0) p.death_src;
       print_not_empty_src conf base new_parag first
-        (fun () -> transl_nth conf "burial" 0) p.burial_src;
+        (fun () -> transl_nth conf "burial" 0) p.burial_src
     }
     else ();
     for i = 0 to Array.length u.family - 1 do {
@@ -819,8 +811,8 @@ value print_sources conf base new_parag p =
            nominative (transl_nth conf "family/families" 0) ^
              (if Array.length u.family == 1 then ""
               else " " ^ string_of_int (i + 1)))
-        fam.fsources;
-    };
+        fam.fsources
+    }
   }
 ;
 
@@ -839,7 +831,7 @@ value print_notes_for_someone conf base p n child_n =
     Wserver.wprint ": \n<dd>\n";
     copy_string_with_macros conf [] notes;
     print_sources conf base (notes <> "") p;
-    Wserver.wprint "<p>\n";
+    Wserver.wprint "<p>\n"
   }
   else ()
 ;
@@ -874,9 +866,7 @@ value print_notes_for_other_families conf base all_gp excl_ifam moth_nb =
     }
   in
   let cpl = coi base excl_ifam in
-  do {
-    print cpl.father (Num.sub moth_nb Num.one); print cpl.mother moth_nb;
-  }
+  do { print cpl.father (Num.sub moth_nb Num.one); print cpl.mother moth_nb }
 ;
 
 value print_notes conf base all_gp ws =
@@ -888,10 +878,10 @@ value print_notes conf base all_gp ws =
         [ Some ifam ->
             if not (Num.even n) && ws then do {
               print_notes_for_family conf base all_gp ifam None n;
-              print_notes_for_other_families conf base all_gp ifam n;
+              print_notes_for_other_families conf base all_gp ifam n
             }
             else ()
-        | _ -> () ];
+        | _ -> () ]
       }
   | _ -> () ]
 ;
@@ -923,7 +913,7 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
                  (gpll = []))
               gpl;
             Wserver.wprint "<p>";
-            html_br conf;
+            html_br conf
           }
           else ();
           generation (niveau + 1) all_gp gpll
@@ -951,12 +941,10 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
       Wserver.wprint "<p><hr><p>\n";
       Wserver.wprint "<h3>%s</h3>\n"
         (capitale (nominative (transl_nth conf "note/notes" 1)));
-      tag "dl" begin
-        List.iter (print_notes conf base all_gp ws) all_gp;
-      end;
+      tag "dl" begin List.iter (print_notes conf base all_gp ws) all_gp; end
     }
     else ();
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -1020,7 +1008,7 @@ value print_ancestors_same_time_descendants conf base p a =
            (transl_decline2 conf "%1 of %2" (transl conf "ancestors")
               (gen_person_text raw_access conf base p)));
       Wserver.wprint "%s"
-        (transl_decline conf "up to" (person_text conf base a));
+        (transl_decline conf "up to" (person_text conf base a))
     }
   in
   do {
@@ -1030,7 +1018,7 @@ value print_ancestors_same_time_descendants conf base p a =
       mark.(Adef.int_of_iper p.cle_index) := Num.one;
       generation 1 [GP_person Num.one p.cle_index None];
     end;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -1078,7 +1066,7 @@ value afficher_ascendants_niveau conf base niveau_max p =
         Wserver.wprint "%s\n" (capitale (text_level conf niveau_max));
         tag "ul" begin
           List.iter (print_generation_person conf base cnt) gpl;
-        end;
+        end
       }
     }
   in
@@ -1101,10 +1089,10 @@ value afficher_ascendants_niveau conf base niveau_max p =
     if cnt.val > 1 then do {
       html_p conf;
       Wserver.wprint "%s: %d %s\n" (capitale (transl conf "total")) cnt.val
-        (nominative (transl_nth_def conf "person/persons" 2 1));
+        (nominative (transl_nth_def conf "person/persons" 2 1))
     }
     else ();
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -1117,7 +1105,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
           Wserver.wprint "%s %d\n"
             (capitale (transl_nth conf "generation/generations" 0)) level;
           Wserver.wprint "<ul>\n";
-          title.val := None;
+          title.val := None
         }
     | _ -> () ]
   in
@@ -1146,9 +1134,9 @@ value print_generation_missing_persons conf base title sp_incl gp =
                   Date.short_dates_text conf base (poi base conj)))
         else do {
           afficher_personne_titre_referencee conf base p;
-          Date.afficher_dates_courtes conf base p;
+          Date.afficher_dates_courtes conf base p
         };
-        Wserver.wprint "\n";
+        Wserver.wprint "\n"
       }
       else ()
   | GP_missing n ip ->
@@ -1171,7 +1159,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
           (if sp_incl then
              transl_decline2 conf "%1 of %2"
                (nominative (transl conf "parents")) s
-           else s);
+           else s)
       }
   | _ -> () ]
 ;
@@ -1271,7 +1259,7 @@ value print_missing_ancestors conf base v spouses_included p =
     else ();
     mark.(Adef.int_of_iper p.cle_index) := Num.one;
     tag "ul" begin generation 1 [GP_person Num.one p.cle_index None]; end;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -1377,15 +1365,15 @@ value print_spouses conf base p u =
          Wserver.wprint "\n&amp;%s\n"
            (Date.short_marriage_date_text conf base fam p sp);
          afficher_personne_titre conf base sp;
-         Date.afficher_dates_courtes conf base sp;
+         Date.afficher_dates_courtes conf base sp
        })
     u.family
 ;
 
 value
   print_someone_missing conf base begin_surname spouses_incl (mt, mtl, p) =
+  let href = "i=" ^ string_of_int (Adef.int_of_iper p.cle_index) in
   do {
-    let href = "i=" ^ string_of_int (Adef.int_of_iper p.cle_index) in
     wprint_geneweb_link conf href (person_text_without_surname conf base p);
     Wserver.wprint "%s %s" begin_surname (person_title_text conf base p);
     Date.afficher_dates_courtes conf base p;
@@ -1394,9 +1382,9 @@ value
       print_missing_type conf mt;
       List.iter
         (fun mt -> do { Wserver.wprint ", "; print_missing_type conf mt; () })
-        mtl;
+        mtl
     }
-    else print_spouses conf base p (uoi base p.cle_index);
+    else print_spouses conf base p (uoi base p.cle_index)
   }
 ;
 
@@ -1416,11 +1404,11 @@ value print_alphabetic_missing conf base spouses_included (surname, list) =
                  do {
                    html_li conf;
                    print_someone_missing conf base "" spouses_included e;
-                   Wserver.wprint "\n";
+                   Wserver.wprint "\n"
                  })
               list;
-          end;
-        } ];
+          end
+        } ]
   }
 ;
 
@@ -1454,8 +1442,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
            match (after, before) with
            [ (Some a1, Some a2) ->
                match one_year base p with
-               [ Some a ->
-                   if a >= a1 && a <= a2 then [(n, p) :: npl] else npl
+               [ Some a -> if a >= a1 && a <= a2 then [(n, p) :: npl] else npl
                | None -> npl ]
            | (Some a1, None) ->
                match one_year base p with
@@ -1502,19 +1489,17 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
            | [x :: l'] -> if x = i then l else [i :: l] ])
         [] list
     in
-    let print_initials =
-      List.length initials > 3 && List.length list > 100
-    in
+    let print_initials = List.length initials > 3 && List.length list > 100 in
     if print_initials then do {
       html_p conf;
       List.iter
         (fun i ->
            do {
              stag "a" "href=\"#%c\"" i begin Wserver.wprint "%c" i; end;
-             Wserver.wprint "\n";
+             Wserver.wprint "\n"
            })
         (List.rev initials);
-      html_p conf;
+      html_p conf
     }
     else ();
     Wserver.wprint "%s" (capitale (text_to conf v));
@@ -1547,14 +1532,14 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
                        Wserver.wprint "</ul>\n";
                        html_li conf;
                        Wserver.wprint "<a name=\"%c\">%c</a>\n" i i;
-                       Wserver.wprint "<ul>\n";
+                       Wserver.wprint "<ul>\n"
                      }
                      else ()
                  | None ->
                      do {
                        html_li conf;
                        Wserver.wprint "<a name=\"%c\">%c</a>\n" i i;
-                       Wserver.wprint "<ul>\n";
+                       Wserver.wprint "<ul>\n"
                      } ]
                else ();
                html_li conf;
@@ -1566,7 +1551,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
       in
       if print_initials then Wserver.wprint "</ul>\n" else ();
     end;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -1702,7 +1687,7 @@ value print_tree_with_table conf base gv p =
         in
         Wserver.wprint "%s" txt;
       end;
-      Wserver.wprint "\n";
+      Wserver.wprint "\n"
     }
   in
   let print_ancestor gen first po =
@@ -1722,7 +1707,7 @@ value print_tree_with_table conf base gv p =
         [ Empty -> ()
         | Cell p _ _ _ -> Wserver.wprint "%s" (Dag.image_txt conf base p) ];
       end;
-      Wserver.wprint "\n";
+      Wserver.wprint "\n"
     }
   in
   let print_vertical_bars gen first po =
@@ -1736,7 +1721,7 @@ value print_tree_with_table conf base gv p =
         in
         Wserver.wprint "%s" txt;
       end;
-      Wserver.wprint "\n";
+      Wserver.wprint "\n"
     }
   in
   let print_horizontal_line gen first po =
@@ -1750,7 +1735,7 @@ value print_tree_with_table conf base gv p =
           in
           Wserver.wprint "%s" txt;
         end;
-        Wserver.wprint "\n";
+        Wserver.wprint "\n"
       }
       else ();
       stag "td" "%s%s" (align po) (colspan po) begin
@@ -1766,11 +1751,12 @@ value print_tree_with_table conf base gv p =
         in
         Wserver.wprint "%s" txt;
       end;
-      Wserver.wprint "\n";
+      Wserver.wprint "\n"
     }
   in
   tag "table" "border=%d cellspacing=0 cellpadding=0 width=\"100%%\""
-      conf.border begin
+    conf.border
+  begin
     list_iter_first
       (fun firstline gen ->
          do {
@@ -1795,8 +1781,8 @@ value print_tree_with_table conf base gv p =
                  tag "tr" begin
                    list_iter_first
                      (fun first po -> print_horizontal_line gen first po) gen;
-                 end;
-               } ];
+                 end
+               } ]
          })
       gen;
   end
@@ -1814,7 +1800,7 @@ value print_normal_tree conf base v p =
     Wserver.wprint "dag=on;notab=on;slices=on";
     Wserver.wprint "\"><tt>//</tt></a></div>\n";
     print_tree_with_table conf base v p;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -1888,7 +1874,7 @@ value print_horizontally conf base max_level p =
       [ Some ifam ->
           loop (level + 1) (s3 ^ suff3) (s3 ^ suff2) (s3 ^ suff1)
             (coi base ifam).mother
-      | None -> () ];
+      | None -> () ]
     }
   in
   do {
@@ -1898,9 +1884,10 @@ value print_horizontally conf base max_level p =
     Wserver.wprint "<p>\n";
     tag "nobr" begin
       let suff13 = "&nbsp;&nbsp;&nbsp;" in
-      let suff2 = "--&nbsp;" in loop 0 suff13 suff2 suff13 p.cle_index;
+      let suff2 = "--&nbsp;" in
+      loop 0 suff13 suff2 suff13 p.cle_index;
     end;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -1933,11 +1920,11 @@ value print_male_female_line male conf base v p =
              Wserver.wprint "%s\n%s<br>\n"
                (referenced_person_title_text conf base p)
                (Date.short_dates_text conf base p);
-             Wserver.wprint "%s" (Dag.image_txt conf base p);
+             Wserver.wprint "%s" (Dag.image_txt conf base p)
            })
         list;
     end;
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -2030,36 +2017,37 @@ value build_surnames_list conf base v p =
     let r =
       try Hashtbl.find ht surn with
       [ Not_found ->
-          let r = ref ((fst dp, p), []) in do { Hashtbl.add ht surn r; r } ]
+          let r = ref ((fst dp, p), []) in
+          do { Hashtbl.add ht surn r; r } ]
     in
     r.val := (fst r.val, [sosa :: snd r.val])
   in
+  let rec loop lev sosa p surn dp =
+    if mark.(Adef.int_of_iper p.cle_index) = 0 then ()
+    else if lev = v then add_surname sosa p surn dp
+    else do {
+      mark.(Adef.int_of_iper p.cle_index) :=
+        mark.(Adef.int_of_iper p.cle_index) - 1;
+      match (aoi base p.cle_index).parents with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          let fath = poi base cpl.father in
+          let moth = poi base cpl.mother in
+          do {
+            if surn <> fath.surname && surn <> moth.surname then
+              add_surname sosa p surn dp
+            else ();
+            let sosa = Num.twice sosa in
+            let dp1 = merge_date_place conf base surn dp fath in
+            loop (lev + 1) sosa fath fath.surname dp1;
+            let sosa = Num.inc sosa 1 in
+            let dp2 = merge_date_place conf base surn dp moth in
+            loop (lev + 1) sosa moth moth.surname dp2
+          }
+      | None -> add_surname sosa p surn dp ]
+    }
+  in
   do {
-    let rec loop lev sosa p surn dp =
-      if mark.(Adef.int_of_iper p.cle_index) = 0 then ()
-      else if lev = v then add_surname sosa p surn dp
-      else do {
-        mark.(Adef.int_of_iper p.cle_index) :=
-          mark.(Adef.int_of_iper p.cle_index) - 1;
-        match (aoi base p.cle_index).parents with
-        [ Some ifam ->
-            let cpl = coi base ifam in
-            let fath = poi base cpl.father in
-            let moth = poi base cpl.mother in
-            do {
-              if surn <> fath.surname && surn <> moth.surname then
-                add_surname sosa p surn dp
-              else ();
-              let sosa = Num.twice sosa in
-              let dp1 = merge_date_place conf base surn dp fath in
-              loop (lev + 1) sosa fath fath.surname dp1;
-              let sosa = Num.inc sosa 1 in
-              let dp2 = merge_date_place conf base surn dp moth in
-              loop (lev + 1) sosa moth moth.surname dp2;
-            }
-        | None -> add_surname sosa p surn dp ];
-      }
-    in
     loop 0 Num.one p p.surname (get_date_place conf base auth p);
     let list = ref [] in
     Hashtbl.iter
@@ -2075,7 +2063,7 @@ value print_surnames_list conf base v p =
   let title h =
     do {
       if not h then Wserver.wprint "%s<br>" (person_text conf base p) else ();
-      Wserver.wprint "- %s -" (capitale (transl conf "surnames list"));
+      Wserver.wprint "- %s -" (capitale (transl conf "surnames list"))
     }
   in
   let list = build_surnames_list conf base v p in
@@ -2134,11 +2122,11 @@ value print_surnames_list conf base v p =
            [ Some (Dgreg d _) -> Wserver.wprint "%d" d.year
            | Some (Dtext s) -> Wserver.wprint "%s" s
            | None -> () ];
-           Wserver.wprint "\n";
+           Wserver.wprint "\n"
          })
       list;
     Wserver.wprint "</%s>\n" (if with_tab then "table" else "ul");
-    Util.trailer conf;
+    Util.trailer conf
   }
 ;
 
