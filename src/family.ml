@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 1.18 1999-02-13 21:55:04 ddr Exp $ *)
+(* $Id: family.ml,v 1.19 1999-02-18 15:52:49 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -259,6 +259,10 @@ value family_m conf base =
       UpdateInd.print_del conf base
   | Some "DEL_IND_OK" when conf.wizard ->
       UpdateIndOk.print_del conf base
+  | Some "DEL_PHOTO" when conf.wizard && conf.can_send_photo ->
+      SendPhoto.print_del conf base
+  | Some "DEL_PHOTO_OK" when conf.wizard && conf.can_send_photo ->
+      SendPhoto.print_del_ok conf base
   | Some "H" ->
       match p_getenv conf.env "v" with
       [ Some f -> Srcfile.print conf base f

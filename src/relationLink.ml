@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 1.15 1999-02-12 12:37:09 ddr Exp $ *)
+(* $Id: relationLink.ml,v 1.16 1999-02-18 15:52:52 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -175,30 +175,24 @@ value print_someone conf base ip =
   return ()
 ;
 
-value rec print_both_branches_no_tables conf base pl1 pl2 =
-  if pl1 = [] && pl2 = [] then ()
-  else
-    let (p1, pl1) =
-      match pl1 with
-      [ [(p1, _) :: pl1] -> (Some p1, pl1)
-      | [] -> (None, []) ]
-    in
-    let (p2, pl2) =
-      match pl2 with
-      [ [(p2, _) :: pl2] -> (Some p2, pl2)
-      | [] -> (None, []) ]
-    in
-    do Wserver.wprint "<li value=1>\n";
-       match p1 with
-       [ Some p1 -> print_someone conf base p1
-       | None -> Wserver.wprint "&nbsp;\n" ];
-       tag "ol" begin
-         Wserver.wprint "<li value=2>\n";
-         match p2 with
-         [ Some p2 -> print_someone conf base p2
-         | None -> Wserver.wprint "&nbsp;\n" ];
-       end;
-    return print_both_branches_no_tables conf base pl1 pl2
+value print_spouse conf base ip ipl =
+  match (ipl, p_getenv conf.env "opt") with
+  [ ([(ips, _) :: _], Some "spouse") ->
+      let a = aoi base ips in
+      match a.parents with
+      [ Some ifam ->
+          let c = coi base ifam in
+          let sp =
+            if ip = c.father then c.mother
+            else c.father
+          in
+          do Wserver.wprint "&amp;";
+             html_br conf;
+             afficher_personne_titre_referencee conf base (poi base sp);
+             Wserver.wprint "\n";
+          return ()
+      | _ -> () ]
+  | _ -> () ]
 ;
 
 value rec print_both_branches conf base pl1 pl2 =
@@ -232,14 +226,20 @@ value rec print_both_branches conf base pl1 pl2 =
            (if has_td_width_percent conf then " width=\"50%\"" else "")
          begin
            match p1 with
-           [ Some p1 -> print_someone conf base p1
+           [ Some p1 ->
+               do print_someone conf base p1;
+                  print_spouse conf base p1 pl1;
+               return ()
            | None -> () ];
          end;
          tag "td" "valign=top align=center%s"
            (if has_td_width_percent conf then " width=\"50%\"" else "")
          begin
            match p2 with
-           [ Some p2 -> print_someone conf base p2
+           [ Some p2 ->
+               do print_someone conf base p2;
+                  print_spouse conf base p2 pl2;
+               return ()
            | None -> () ];
          end;
        end;
@@ -259,7 +259,10 @@ value rec print_one_branch conf base ipl1 =
        | None -> () ];
        match ip1 with
        [ Some ip1 ->
-           do print_someone conf base ip1; html_br conf; return ()
+           do print_someone conf base ip1;
+              print_spouse conf base ip1 ipl1;
+              html_br conf;
+           return ()
        | None -> () ];
     return print_one_branch conf base ipl1
 ;
@@ -352,6 +355,7 @@ value print_relation_ok conf base ip sp ip1 ip2 b1 b2 c1 c2 pb1 pb2 nb1 nb2 =
        let b = if b1 = [] then b2 else b1 in
        do tag "center" begin
             print_someone conf base ip;
+            print_spouse conf base ip b;
             html_br conf;
             print_one_branch conf base b;
           end;

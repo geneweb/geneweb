@@ -4,6 +4,10 @@ Internal Changes
 GeneWeb Version 2.00
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [Feb 18. 99] Added (undocumented) feature: adding ";opt=spouse" to an
+    URL of relationship link (m=RL), the spouses are displayed.
+
 GeneWeb Version 1.11
 --------------------
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.33 1999-02-15 13:28:29 ddr Exp $ *)
+(* $Id: perso.ml,v 1.34 1999-02-18 15:52:50 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -768,22 +768,12 @@ value print conf base p =
        let photo_txt = capitale (transl conf "photo") in
        match sou base p.photo with
        [ "" ->
-           let s = default_photo_name base p in
-           let f =
-             let f =
-               List.fold_right Filename.concat
-                 [Util.base_dir.val; "images"; conf.bname] s
-             in
-             if Sys.file_exists (f ^ ".gif") then
-               Some (s ^ ".gif", Unix.stat (f ^ ".gif"))
-             else if Sys.file_exists (f ^ ".jpg") then
-               Some (s ^ ".jpg", Unix.stat (f ^ ".jpg"))
-             else None
-           in
-           match f with
-           [ Some (f, s) ->
+           match auto_photo_file conf base p with
+           [ Some f ->
+               let s = Unix.stat f in
+               let b = Filename.basename f in
                do Wserver.wprint "<img src=\"%sm=IM;v=%s;d=%d\" alt=\"%s\">"
-                    (commd conf) (Util.code_varenv f)
+                    (commd conf) (Util.code_varenv b)
                     (int_of_float
                        (mod_float s.Unix.st_mtime (float_of_int max_int)))
                     photo_txt;
