@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.10 2002-10-14 04:23:12 ddr Exp $ *)
+(* $Id: dag.ml,v 4.11 2003-02-06 11:20:33 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -806,8 +806,8 @@ value print_slices_menu conf base hts_opt =
         (fun (k, v) ->
            if k = "slices" then ()
            else
-             Wserver.wprint "<input type=hidden name=%s value=%s>\n"
-               (code_varenv k) (code_varenv v))
+             Wserver.wprint "<input type=hidden name=\"%s\" value=\"%s\">\n"
+               (decode_varenv k) (decode_varenv v))
         conf.env;
       tag "table" begin
         tag "tr" "align=left" begin

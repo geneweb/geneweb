@@ -5,6 +5,9 @@ GeneWeb Version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [06 Feb 03] Fixed bug: in displaying by slices, if the person's name
+    contained quotes (for example), the coding/decoding did not work
+    correctly and the button "OK" resulted in bad request.
   - [30 Jan 03] Added option -min_disp_req
 
 GeneWeb Version 4.09
