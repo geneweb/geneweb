@@ -5,9 +5,11 @@ GeneWeb version 3.06
   - [19 Jun 00] Changed page design of relationship computing.
   - [19 Jun 00] In latest marriages, display now only marriages (i.e. not
     "relations" nor "engagements").
-  - [18 Jun 00] Added link in bottom of welcome pages to be used if you have a
-    browser which does not automatically update the modified pages (and you
-    need to click each time on "reload current document").
+  - [18 Jun 00] Added a link in bottom of welcome pages, useful if you
+    have got a browser which does not automatically update the modified
+    pages (forcing you to do "reload current document"). When clicking on
+    it, you browse without this problem: no more need to reload the pages,
+    they are displayed with their changes if there are some.
   - [18 Jun 00] Fixed little problem: the (new) fast merges of persons did not
     appear in the history.
   - [17 Jun 00] In update family forms, added a button close to the "family
