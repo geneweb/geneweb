@@ -30,9 +30,14 @@ GeneWeb version 3.05
   - [30 Apr 00] Fixed little problem with displaying by places for the ones
     containing several (at least two) indications between parentheses.
 
+* Gedcom to GeneWeb (ged2gwb) and GeneWeb to Gedcom (gwb2ged)
+  - [25 May 00] Now save and restore the marriage witnesses.
+
 * Base configuration files (base.gwf)
   - [25 May 00] Added variable "images_path" to specify a path to access
     the images defined in the "image" field (i.e *not* added by "send image").
+    Applies only for images not found in the image/base directory. This
+    variable, when set, could typically start with http://...
   - [08 May 00] (detail) The possible trailing spaces or control-m are
     now stripped (allowing to move a base.gwf file from Windows to
     Unix without needing to remove them).

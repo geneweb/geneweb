@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.24 2000-05-24 09:12:07 ddr Exp $ *)
+(* $Id: perso.ml,v 3.25 2000-05-25 11:46:32 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -646,7 +646,8 @@ value print_relations conf base p =
   [ ([], [], False) -> ()
   | (rl, cl, _) ->
       do Wserver.wprint "<h3>%s</h3>\n"
-           (std_color conf (capitale (transl_nth conf "relation/relations" 1)));
+           (std_color conf
+              (capitale (transl_nth conf "relation/relations" 1)));
          tag "ul" begin
            List.iter (print_relation conf base) rl;
            List.iter (print_related conf base p) cl;
