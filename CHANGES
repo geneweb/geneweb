@@ -83,6 +83,8 @@ GeneWeb version 3.08
     Web site administrators.
 
 * Base configuration files (base.gwf)
+  - [29 Sep 00] The change, (version 3.06, 17 Jun 00) about can_send_image
+    supposed to be yes by default, did not work: fixed.
   - [20 Sep 00] Deleted the change version 3.07 (on date: 28 Jul 00) about
     the variable body_prop. Return to the previous behavior: defined as
     empty or not defined => the default GeneWeb background is used. This
