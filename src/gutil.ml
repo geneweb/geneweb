@@ -1,8 +1,8 @@
-(* $Id: gutil.ml,v 1.9 1998-12-16 17:36:29 ddr Exp $ *)
+(* $Id: gutil.ml,v 1.10 1999-01-11 11:46:52 ddr Exp $ *)
 
 open Def;
 
-value version = "1.10";
+value version = "1.11";
 
 value poi base i = base.data.persons.get (Adef.int_of_iper i);
 value aoi base i = base.data.ascends.get (Adef.int_of_iper i);
