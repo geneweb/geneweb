@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.22 2005-02-04 17:13:28 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 4.23 2005-02-12 18:34:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -626,7 +626,7 @@ value all_checks_person conf base p a u =
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
   do {
-    Gutil.check_person base error warning p;
+    let _ : bool = Gutil.check_person base error warning p in
     relation_sex_is_coherent base warning p;
     match parents a with
     [ Some ifam ->

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 4.30 2005-02-11 21:32:19 ddr Exp $ *)
+(* $Id: gutil.ml,v 4.31 2005-02-12 18:34:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -790,6 +790,7 @@ value try_to_fix_relation_sex base warning p_ref =
           p.rparents)
       p_ref.related;
     warning (IncoherentSex p_ref fixed.val not_fixed.val);
+    fixed.val > 0
   }
 ;
 
@@ -818,7 +819,7 @@ value related_sex_is_coherent base warning p_ref =
       (Some p_ref.sex) p_ref.related
   in
   match new_sex with
-  [ Some g -> if p_ref.sex != g then p_ref.sex := g else ()
+  [ Some g -> if p_ref.sex != g then do { p_ref.sex := g; False } else True
   | None -> try_to_fix_relation_sex base warning p_ref ]
 ;
 
@@ -937,7 +938,8 @@ value check_person base error warning p =
   do {
     birth_before_death base warning p;
     List.iter (titles_after_birth base warning p) p.titles;
-    related_sex_is_coherent base warning p;
+    let c = related_sex_is_coherent base warning p in
+    not c
   }
 ;
 

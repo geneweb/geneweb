@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.29 2005-02-12 02:34:32 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.30 2005-02-12 18:34:29 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -37,6 +37,7 @@ type gen =
     g_fcnt : mutable int;
     g_scnt : mutable int;
     g_base : cbase;
+    g_patch_p : mutable list (int * person);
     g_def : mutable array bool;
     g_separate : mutable bool;
     g_shift : mutable int;
@@ -689,8 +690,8 @@ value cache_of tab =
 
 value no_istr_iper_index = {find = fun []; cursor = fun []; next = fun []};
 
-value persons_cache per_index_ic per_ic persons =
-  let get_fun i =
+value persons_cache gen per_index_ic per_ic persons =
+  let read_person_in_temp_file i =
     let mp = persons.(i) in
     do {
       seek_in per_index_ic (Iovalue.sizeof_long * i);
@@ -727,6 +728,10 @@ value persons_cache per_index_ic per_ic persons =
       p.cle_index := Adef.iper_of_int i;
       p
     }
+  in
+  let get_fun i =
+    try List.assoc i gen.g_patch_p with
+    [ Not_found -> read_person_in_temp_file i ]
   in
   {array = fun _ -> failwith "bug: accessing persons array";
    get = get_fun; len = Array.length persons;
@@ -819,7 +824,7 @@ value linked_base gen per_index_ic per_ic fam_index_ic fam_ic : Def.base =
   let particles = input_particles part_file.val in
   let bnotes = gen.g_base.c_bnotes in
   let base_data =
-    {persons = persons_cache per_index_ic per_ic persons;
+    {persons = persons_cache gen per_index_ic per_ic persons;
      ascends = cache_of ascends;
      unions = cache_of unions;
      families = families_cache fam_index_ic fam_ic gen.g_fcnt;
@@ -843,8 +848,8 @@ value link gwo_list =
   let gen =
     {g_strings = Hashtbl.create 20011; g_names = Hashtbl.create 20011;
      g_local_names = Hashtbl.create 20011; g_pcnt = 0; g_fcnt = 0;
-     g_scnt = 0; g_base = empty_base; g_def = [| |]; g_separate = False;
-     g_shift = 0; g_errored = False;
+     g_scnt = 0; g_base = empty_base; g_patch_p = []; g_def = [| |];
+     g_separate = False; g_shift = 0; g_errored = False;
      g_per_index = open_out_bin "gwc_per_index";
      g_per = open_out_bin "gwc_per";
      g_fam_index = open_out_bin "gwc_fam_index";
@@ -870,9 +875,14 @@ value link gwo_list =
     close_out gen.g_fam_index;
     close_out gen.g_fam;
     let base = linked_base gen per_index_ic per_ic fam_index_ic fam_ic in
+    let changed_p p =
+      let i = Adef.int_of_iper p.cle_index in
+      let list = List.remove_assoc i gen.g_patch_p in
+      gen.g_patch_p := [(i, p) :: list]
+    in
     if do_check.val && gen.g_pcnt > 0 then do {
       Check.check_base base (set_error base gen) (set_warning base)
-        (fun i -> gen.g_def.(i)) pr_stats.val;
+        (fun i -> gen.g_def.(i)) changed_p pr_stats.val;
       flush stdout;
     }
     else ();

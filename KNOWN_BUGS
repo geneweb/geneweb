@@ -1,20 +1,23 @@
+NOT FIXED
+
 [11 Feb 2005] Bug in version 5.00-exp
   Surnames and first names by alphabetic order do not work for deleted or
   renamed persons (the index is not updated). This bug probably still existed
   in previous versions. Urgency 4/5.
 
-[08 Feb 2005] Bug since version 4.10
-  gwc and ged2gwb do not set the sex of isolated "relation" (godparents,
-  etc.) (and probable warnings for fixes like reordering children are not
-  done). Due to memory optimization in code version 4.10 (which is important
-  for large databases). Urgency 3/5.
-
 [08 Feb 2005] Since version 5.00-exp
-  Variables in perso.txt do not work in all cases. Due to rewritting of
-  code to make it cleaner. Urgency 3/5.
+  Some variables in perso.txt do not work in all cases. Due to rewritting of
+  code to make it cleaner. Cases to be checked. Urgency 3/5.
 
 [08 Feb 2005] Probable bug in version 5.00-exp
   Running "consang" on old databases (i.e. created before utf-8) may create
   bad utf-8 strings (names, texts, etc.), because there is no conversion.
   Np idea for the moment how to fix it. Anyway, this error has not been
   experimented, it is just supposed. Urgency 1/5.
+
+FIXED
+
+[12 Feb 2005] Bug appeared in version 4.10
+  gwc do not set the sex of isolated "relation" (godparents, etc.) Due
+  to memory optimization in code version 4.10 (which were important
+  in large databases).
