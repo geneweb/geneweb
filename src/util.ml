@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.94 2001-03-13 12:45:16 ddr Exp $ *)
+(* $Id: util.ml,v 3.95 2001-03-13 12:47:37 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -611,7 +611,7 @@ value gen_decline2 conf wt s1 s2 =
                 match string_of wt.[j + 2] with
                 [ Some s ->
                     let s =
-                      if start_with_vowel s then "'" ^ s
+                      if start_with_vowel s then String.make 1 wt.[j - 1] ^ s
                       else String.sub wt (i + 1) (j - i - 2) ^ " " ^ s
                     in
                     (s, j + 2)
