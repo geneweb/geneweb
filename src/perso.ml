@@ -1,4 +1,4 @@
-(* $Id: perso.ml,v 1.9 1998-11-28 13:28:48 ddr Exp $ *)
+(* $Id: perso.ml,v 1.10 1998-11-28 19:28:48 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -513,7 +513,7 @@ value print conf base p =
   let title h =
     match (sou base p.public_name, p.nick_names) with
     [ (n, [nn :: _]) when n <> "" ->
-        if h then Wserver.wprint "%s %s" n (coa conf (sou base nn))
+        if h then Wserver.wprint "%s %s" (coa conf n) (coa conf (sou base nn))
         else
           Wserver.wprint "%s <em>%s</em>" (coa conf n) (coa conf (sou base nn))
     | (n, []) when n <> "" ->
