@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.123 2005-03-02 12:34:39 ddr Exp $ *)
+(* $Id: util.ml,v 4.124 2005-03-13 10:49:10 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -1175,6 +1175,9 @@ value header_without_page_title conf title =
     Wserver.wprint "  <meta http-equiv=\"Content-Type\" \
                       content=\"text/html; charset=%s\"%s>\n"
       conf.charset conf.xhs;
+    Wserver.wprint
+      "  <meta http-equiv=\"Content-Style-Type\" content=\"text/css\"%s>\n"
+      conf.xhs;
     Wserver.wprint "  \
   <style type=\"text/css\"><!--
     .highlight { color: %s; font-weight: bold }
