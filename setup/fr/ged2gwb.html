@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>Importation d'un fichier GEDCOM</title></head>
+
+<body>
+
+<h1>Importation d'un fichier GEDCOM</h1>
+
+<form mode=GET action="ged2gwb">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Entrez:
+
+<ul><li>Le nom complet de votre fichier GEDCOM; vous pouvez utiliser le
+bouton de navigation pour le rechercher sur votre ordinateur.
+
+<p>
+
+<input name=anon type=file size=55>
+
+</ul>
+
+<p>
+
+<ul><li>Le <a href="name.html">nom</a> que vous voulez donner &agrave;
+votre base de donn&eacute;es <em>GeneWeb</em>.
+
+<p>
+
+<input name=o size=30>
+
+</ul>
+
+<p>
+
+S&eacute;lectionnez les options si vous le d&eacute;sirez:
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td><input type=checkbox name=lf value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Forcer les pr&eacute;noms &agrave; &ecirc;tre en minuscules. Ne
+conserver que leurs initiales en majuscules.</td> </tr>
+
+</table></dl></dd>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td><input type=checkbox name=ls value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Forcer les noms de famille &agrave; &ecirc;tre en minuscules. Ne
+conserver que leurs initiales en majuscules. Essaye de garder les
+particules en minuscules.</td> </tr>
+
+</table></dl></dd>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td>&nbsp;</td><td>Par d&eacute;faut, au moment de la
+cr&eacute;ation d'une personne, si la partie pr&eacute;nom dans le
+GEDCOM est form&eacute;e de plusieurs noms, le premier de ces noms va
+dans la partie "pr&eacute;nom" et le pr&eacute;nom complet devient un
+"pr&eacute;nom alias".</td>
+
+<tr>
+<td><input type=checkbox name=no_efn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Annuler cette option.</td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td>&nbsp;</td><td>Par d&eacute;faut, au moment de la
+cr&eacute;ation d'une personne, si la partie pr&eacute;nom dans le
+GEDCOM ressemble &agrave; un nom public, c'est-&agrave;-dire contient:
+<ul>
+<li>Un nombre normal ou en chiffres romains, cens&eacute; &ecirc;tre
+un num&eacute;ro d'un titre de noblesse (exemple: Louis XIV),
+<li>Un des mots: "der", "die", "el", "le", "la", "the", cens&eacute;
+&ecirc;tre le d&eacute;but d'un qualificatif (exemple: Guillaume le
+Conqu&eacute;rant),
+</ul>
+alors le pr&eacute;nom dans le GEDCOM devient un "nom public" et le premier
+mot de la partie pr&eacute;nom va dans la partie "pr&eacute;nom".
+<tr>
+<td><input type=checkbox name=no_epn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Annuler cette option.</td>
+</tr>
+
+</table></dl>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr>
+<td><input type=checkbox name=tnd value=on>&nbsp;&nbsp;&nbsp;</td>
+
+<td>Essayer de mettre des dates n&eacute;gatives s'il y a
+incoh&eacute;rence (exemple: naissance apr&egrave;s la mort).</td>
+
+</tr>
+
+</table></dl></dd>
+
+<p>
+
+<dl><dd><table border=1>
+<tr>
+<td><input type=checkbox name=no_nd value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Pas de dates n&eacute;gatives: ne pas interpr&eacute;ter une
+ann&eacute;e pr&eacute;c&eacute;d&eacute;e du signe moins "-" comme
+une date n&eacute;gative.</td>
+</tr>
+</table></dl></dd>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td>&nbsp;</td><td>Certains fichiers GEDCOM &eacute;crivent
+parfois les dates en mettant les mois avec des nombres (de 1 &agrave;
+12). Le standard GEDCOM 5.5 exige que les mois soient
+repr&eacute;sent&eacute;s par des identificateurs (ex: "MAY 1912" et
+non pas "05/1912"). La notation "02/05/1912" est ambigu&euml; (peut
+signifier "2 mai 1912" ou "5 f&eacute;vrier 1912" suivant les
+pays).</td></tr>
+
+<tr>
+<td><input type=radio name=dates value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>Pour ces dates, n'extraire que la partie "ann&eacute;e".</td>
+</tr>
+
+<tr>
+<td><input type=radio name=dates value="_dm">&nbsp;&nbsp;&nbsp;</td>
+<td>Interpr&eacute;ter ces dates comme "jour/mois/ann&eacute;e".</td>
+</tr>
+
+<tr>
+<td><input type=radio name=dates value="_md">&nbsp;&nbsp;&nbsp;</td>
+<td>Interpr&eacute;ter ces dates comme "mois/jour/ann&eacute;e".</td>
+</tr>
+
+</table></dl></dd>
+
+<p>
+
+<dl><dd><table border=1>
+
+<tr><td>&nbsp;</td><td>La norme GEDCOM 5.5 pr&eacute;conise
+l'utilisation du codage ANSEL pour les caract&egrave;res
+accentu&eacute;s, qui sont alors repr&eacute;sent&eacute;s par deux
+lettres. Le fichier GEDCOM indique en principe dans son en-t&ecirc;te
+si ce codage est utilis&eacute; ou non.</td></tr>
+
+<tr><td><input type=radio name=ansel value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>Suivre les indications de l'en-t&ecirc;te du GEDCOM.</td>
+</tr>
+
+<tr><td><input type=radio name=ansel value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Force le d&eacute;codage ANSEL, m&ecirc;me si l'en-t&ecirc;te indique
+le contraire.</td>
+</tr>
+
+<tr><td><input type=radio name=ansel value="no_">&nbsp;&nbsp;&nbsp;</td>
+<td>Ne pas faire de d&eacute;codage ANSEL, m&ecirc;me si
+l'en-t&ecirc;te le demande.</td> </tr>
+
+</table></dl></dd>
+
+<p>
+
+<dl><dd><table border=1>
+<tr>
+<td><input type=checkbox name=ta value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Option sp&eacute;cifique pour un copain (-ta). Eh oui, y a des
+pistonn&eacute;s... Normalement, ne pas l'utiliser: &ccedil;a risque
+de mettre des titres de noblesse bizarres...</td>
+</tr>
+</table></dl></dd>
+
+<p>
+
+Puis cliquez sur "Ok".
+
+<p>
+
+<input type=submit value="Ok">
+</form>
+
+<p>
+
+Pour revenir &agrave; l'&eacute;cran pr&eacute;c&eacute;dent, utilisez
+la touche "retour en arri&egrave;re" de votre navigateur.
