@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.17 2002-10-26 01:22:42 ddr Exp $ *)
+(* $Id: forum.ml,v 4.18 2002-11-14 02:43:12 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -255,7 +255,7 @@ value get_message conf pos =
   | None -> None ]
 ;
 
-value backward conf pos =
+value backward_pos conf pos =
   let fname = forum_file conf in
   match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -280,11 +280,6 @@ value backward conf pos =
 ;
 
 value print_forum_message conf base pos =
-  let pos =
-    match p_getenv conf.env "t" with
-    [ Some "back" -> backward conf pos
-    | _ -> pos ]
-  in
   match get_message conf pos with
   [ Some (time, ident, email, subject, mess, next_pos, forum_length) ->
       let title _ =
@@ -304,8 +299,9 @@ value print_forum_message conf base pos =
           Wserver.wprint "<li>";
           if pos = forum_length then Wserver.wprint "&nbsp;"
           else
-            Wserver.wprint "<a href=\"%sm=FORUM;p=%d;t=back\">%s</a>\n"
-              (commd conf) pos (capitale (message_txt conf 3));
+            let back_pos = backward_pos conf pos in
+            Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n"
+              (commd conf) back_pos (capitale (message_txt conf 3));
           Wserver.wprint "<li>";
           if next_pos > 0 then
             Wserver.wprint "<a href=\"%sm=FORUM;p=%d\">%s</a>\n" (commd conf)
