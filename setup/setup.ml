@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.15 1999-05-06 06:20:30 ddr Exp $ *)
+(* $Id: setup.ml,v 1.16 1999-05-06 19:26:42 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -621,7 +621,7 @@ value recover_1 conf =
   in
   let out_file = if out_file = "" then in_file else out_file in
   let conf = conf_with_env conf "o" out_file in
-  if in_file = "" then print_file conf "err_not_appl.html"
+  if in_file = "" then print_file conf "err_missing.html"
   else if not (good_name out_file) then print_file conf "err_name.html"
   else
     let (old_to_src, o_opt, tmp, src_to_new) =
