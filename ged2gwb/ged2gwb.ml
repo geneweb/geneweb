@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.30 2002-02-26 08:54:52 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.31 2002-03-08 10:32:15 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1698,7 +1698,7 @@ value add_indi gen r =
   in
   let ext_notes =
     let concat_text s1 s2 s_sep =
-      let s = if s1 = "" && notes = "" then "" else s_sep in
+      let s = if s1 = "" && notes = "" || s2 = "" then "" else s_sep in
       s1 ^ s ^ s2
     in
     let text = concat_text "" (notes_from_source_record birth_nt) "<br>\n" in
