@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.14 2000-07-28 13:07:48 ddr Exp $ *)
+(* $Id: setup.ml,v 3.15 2000-09-21 09:30:44 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -753,7 +753,7 @@ value recover_2 conf =
          Sys.chdir dir;
       return
       let c =
-        Filename.concat "." src_to_new ^ " " ^ tmp ^ " -o " ^ out_file ^
+        Filename.concat "." src_to_new ^ " " ^ tmp ^ " -f -o " ^ out_file ^
         " > " ^ "comm.log"
       in
       do Printf.eprintf "$ %s\n" c;
