@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 2.5 1999-07-21 17:36:29 ddr Exp $ *)
+(* $Id: gutil.mli,v 2.6 1999-07-22 14:34:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -11,6 +11,9 @@ value sou : base -> istr -> string;
 
 value decline : char -> string -> string;
 value nominative : string -> string;
+
+value p_first_name : base -> person -> string;
+value p_surname : base -> person -> string;
 
 value is_deleted_family : family -> bool;
 

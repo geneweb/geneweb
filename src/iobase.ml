@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.10 1999-07-21 12:35:27 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.11 1999-07-22 14:34:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -704,8 +704,8 @@ value make_name_index base =
   in
   do for i = 0 to Array.length a - 1 do
        let p = base.data.persons.get i in
-       let first_name = sou base p.first_name in
-       let surname = sou base p.surname in
+       let first_name = p_first_name base p in
+       let surname = p_surname base p in
        if first_name <> "?" && surname <> "?" then
          let names =
            [Name.lower (first_name ^ " " ^ surname) ::
@@ -733,8 +733,8 @@ value make_strings_of_fsname base =
   let a = base.data.persons.array () in
   do for i = 0 to Array.length a - 1 do
        let p = base.data.persons.get i in
-       let first_name = sou base p.first_name in
-       let surname = sou base p.surname in
+       let first_name = p_first_name base p in
+       let surname = p_surname base p in
        do if first_name <> "?" then add_name t first_name p.first_name
           else ();
           if surname <> "?" then

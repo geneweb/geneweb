@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.29 1999-07-21 17:36:30 ddr Exp $ *)
+(* $Id: util.ml,v 2.30 1999-07-22 14:34:21 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -160,12 +160,12 @@ value start_with_vowel s =
 ;
 
 value connais base p =
-  sou base p.first_name <> "?" || sou base p.surname <> "?"
+  p_first_name base p <> "?" || p_surname base p <> "?"
 ;
 
 value acces_pur conf base x =
-  let first_name = sou base x.first_name in
-  let surname = sou base x.surname in
+  let first_name = p_first_name base x in
+  let surname = p_surname base x in
   if conf.wizard && conf.friend && not (first_name = "?" || surname = "?")
   || conf.access_by_key then
     "n=" ^ (code_varenv (Name.lower surname)) ^ ";p=" ^
@@ -189,23 +189,23 @@ value person_text conf base p =
   let beg =
     match (sou base p.public_name, p.nick_names) with
     [ ("", [nn :: _]) ->
-        sou base p.first_name ^ " <em>" ^ sou base nn ^ "</em>"
-    | ("", []) -> sou base p.first_name
+        p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
+    | ("", []) -> p_first_name base p
     | (n, [nn :: _]) -> n ^ " <em>" ^ sou base nn ^ "</em>"
     | (n, []) -> n ]
   in
-  beg ^ " " ^ sou base p.surname
+  beg ^ " " ^ p_surname base p
 ;
 
 value person_text_no_html conf base p =
   let beg =
     match (sou base p.public_name, p.nick_names) with
-    [ ("", [nn :: _]) -> sou base p.first_name ^ " " ^ sou base nn
-    | ("", []) -> sou base p.first_name
+    [ ("", [nn :: _]) -> p_first_name base p ^ " " ^ sou base nn
+    | ("", []) -> p_first_name base p
     | (n, [nn :: _]) -> n ^ " " ^ sou base nn
     | (n, []) -> n ]
   in
-  beg ^ " " ^ sou base p.surname
+  beg ^ " " ^ p_surname base p
 ;
 
 value person_text_without_surname conf base p =
@@ -213,8 +213,8 @@ value person_text_without_surname conf base p =
   [ (n, [nn :: _]) when n <> "" -> n ^ " <em>" ^ sou base nn ^ "</em>"
   | (n, []) when n <> "" -> n
   | (_, [nn :: _]) ->
-      sou base p.first_name ^ " <em>" ^ sou base nn ^ "</em>"
-  | (_, []) -> sou base p.first_name ]
+      p_first_name base p ^ " <em>" ^ sou base nn ^ "</em>"
+  | (_, []) -> p_first_name base p ]
 ;
 
 value afficher_nom_titre_reference conf base p s =
@@ -245,7 +245,7 @@ value main_title base p =
 
 value titled_person_text conf base p t =
   if Name.strip_lower (sou base t.t_place) =
-     Name.strip_lower (sou base p.surname)
+     Name.strip_lower (p_surname base p)
   then
     match (t.t_name, p.nick_names) with
     [ (Tname n, []) -> sou base n
@@ -641,8 +641,8 @@ value print_parent conf base p a =
   | _ ->
       Wserver.wprint "%s %s%s" (transl_nth conf "son/daughter/child" is)
         (transl_decline conf "of (same or greater generation level)"
-         (sou base a.first_name))
-        (if p.surname <> a.surname then " " ^ sou base a.surname
+         (p_first_name base a))
+        (if p.surname <> a.surname then " " ^ p_surname base a
          else "") ]
 ;
 
@@ -659,17 +659,17 @@ value preciser_homonyme conf base p =
       Wserver.wprint "%s <em>%s</em>" (sou base n)
         (sou base nn)
   | (_, [nn :: _]) ->
-      Wserver.wprint "%s <em>%s</em>" (sou base p.first_name) (sou base nn)
+      Wserver.wprint "%s <em>%s</em>" (p_first_name base p) (sou base nn)
   | (n, []) when sou base n <> "" ->
       Wserver.wprint "%s" (sou base n)
   | (_, []) ->
       let a = aoi base p.cle_index in
       match a.parents with
       [ Some fam
-        when sou base (poi base (coi base fam).father).first_name <> "?" ->
+        when p_first_name base (poi base (coi base fam).father) <> "?" ->
           print_parent conf base p (poi base (coi base fam).father)
       | Some fam
-        when sou base (poi base (coi base fam).mother).first_name <> "?" ->
+        when p_first_name base (poi base (coi base fam).mother) <> "?" ->
           print_parent conf base p (poi base (coi base fam).mother)
       | _ ->
           let rec loop i =
@@ -680,19 +680,19 @@ value preciser_homonyme conf base p =
               if Array.length ct > 0 then
                 let enfant = poi base ct.(0) in
                 Wserver.wprint "%s %s%s" (transl_nth conf "father/mother" is)
-                  (transl_decline conf "of" (sou base enfant.first_name))
+                  (transl_decline conf "of" (p_first_name base enfant))
                   (if p.surname <> enfant.surname then
-                     " " ^ (sou base enfant.surname)
+                     " " ^ (p_surname base enfant)
                    else "")
               else
                 let conjoint = poi base conjoint in
-                if sou base conjoint.first_name <> "?" ||
-                   sou base conjoint.surname <> "?" then
+                if p_first_name base conjoint <> "?" ||
+                   p_surname base conjoint <> "?" then
                   Wserver.wprint "%s %s %s"
                     (transl_nth conf "husband/wife" is)
                     (transl_decline conf "of"
-                       (sou base conjoint.first_name))
-                    (sou base conjoint.surname)
+                       (p_first_name base conjoint))
+                    (p_surname base conjoint)
                 else loop (i + 1)
             else Wserver.wprint "..."
           in
@@ -837,7 +837,7 @@ value find_person_in_env conf base suff =
           list_find
             (fun x ->
                Name.strip_lower
-                 (sou base x.first_name ^ " " ^ sou base x.surname)
+                 (p_first_name base x ^ " " ^ p_surname base x)
                  = k &&
                x.occ == occ)
             xl
@@ -992,7 +992,7 @@ value default_image_name_of_key fnam surn occ =
 ;
 
 value default_image_name base p =
-  default_image_name_of_key (sou base p.first_name) (sou base p.surname) p.occ
+  default_image_name_of_key (p_first_name base p) (p_surname base p) p.occ
 ;
 
 value auto_image_file conf base p =

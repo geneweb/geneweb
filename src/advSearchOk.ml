@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./def.syn.cmo *)
-(* $Id: advSearchOk.ml,v 2.4 1999-07-15 08:52:38 ddr Exp $ *)
+(* $Id: advSearchOk.ml,v 2.5 1999-07-22 14:33:59 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -121,8 +121,8 @@ value advanced_search conf base max_answers =
   let list = ref [] in
   let len = ref 0 in
   let test_person p =
-    if test "first_name" (fun x -> name_eq x (sou base p.first_name))
-    && test "surname" (fun x -> name_eq x (sou base p.surname))
+    if test "first_name" (fun x -> name_eq x (p_first_name base p))
+    && test "surname" (fun x -> name_eq x (p_surname base p))
     && test "sex"
          (fun              
           [ "M" -> p.sex = Male

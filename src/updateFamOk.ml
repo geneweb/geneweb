@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.16 1999-07-22 13:56:54 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.17 1999-07-22 14:34:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -151,7 +151,7 @@ value print_err_unknown conf base (f, s, o) =
 value print_create_conflict conf base p =
   let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
   let n =
-    Update.find_free_occ base (sou base p.first_name) (sou base p.surname) 0
+    Update.find_free_occ base (p_first_name base p) (p_surname base p) 0
   in
   do header conf title;
      Update.print_error conf base (AlreadyDefined p);
@@ -180,7 +180,7 @@ value insert_person conf base src (f, s, o, create) =
           else
             let ip = Adef.iper_of_int o in
             let p = poi base ip in
-            if sou base p.first_name = f && sou base p.surname = s then ip
+            if p_first_name base p = f && p_surname base p = s then ip
             else raise Not_found
         else
           let ip = person_ht_find_unique base f s o in
@@ -231,7 +231,7 @@ value insert_person conf base src (f, s, o, create) =
         else
           let ip = Adef.iper_of_int o in
           let p = poi base ip in
-          if sou base p.first_name = f && sou base p.surname = s then ip
+          if p_first_name base p = f && p_surname base p = s then ip
           else print_err_unknown conf base (f, s, o)
       else
         try person_ht_find_unique base f s o with
@@ -265,8 +265,8 @@ value print_err_parents conf base p =
        html_li conf;
        Wserver.wprint "%s: %d"
          (capitale (transl conf "first free number"))
-         (Update.find_free_occ base (sou base p.first_name)
-            (sou base p.surname) 0);
+         (Update.find_free_occ base (p_first_name base p)
+            (p_surname base p) 0);
      end;
      Update.print_return conf;
      trailer conf;

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 2.18 1999-07-21 17:47:57 ddr Exp $ *)
+(* $Id: gutil.ml,v 2.19 1999-07-22 14:34:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -78,6 +78,9 @@ value nominative s =
   [ Some _ -> decline 'n' s
   | _ -> s ]
 ;
+
+value p_first_name base p = sou base p.first_name;
+value p_surname base p = sou base p.surname;
 
 value leap_year a =
   if a mod 100 == 0 then a / 100 mod 4 == 0 else a mod 4 == 0
@@ -175,8 +178,8 @@ value strictement_apres d1 d2 =
 ;
 
 value denomination base p =
-  let prenom = sou base p.first_name in
-  let nom = sou base p.surname in
+  let prenom = p_first_name base p in
+  let nom = p_surname base p in
   prenom ^
    (if p.occ == 0 || prenom = "?" || nom = "?" then ""
     else "." ^ string_of_int p.occ) ^
@@ -205,7 +208,7 @@ value surnames_pieces surname =
 ;
 
 value person_misc_names base p =
-  if sou base p.first_name = "?" || sou base p.surname = "?" then [] else
+  if p_first_name base p = "?" || p_surname base p = "?" then [] else
   let public_names =
     let titles_names =
       let tnl = ref [] in
@@ -222,7 +225,7 @@ value person_misc_names base p =
   in
   let first_names = [p.first_name :: p.first_names_aliases @ public_names] in
   let surnames =
-    let surname = sou base p.surname in
+    let surname = p_surname base p in
     [surname ::
        surnames_pieces surname @
        List.map (sou base) (p.surnames_aliases @ p.nick_names)]
@@ -233,11 +236,11 @@ value person_misc_names base p =
         (fun list ifam ->
            let cpl = coi base ifam in
            let husband = poi base cpl.father in
-           let husband_surname = sou base husband.surname in
+           let husband_surname = p_surname base husband in
            let husband_surnames_aliases =
              List.map (sou base) husband.surnames_aliases
            in
-           if sou base husband.surname = "?" then
+           if p_surname base husband = "?" then
              husband_surnames_aliases @ list
            else
              [husband_surname ::
@@ -259,7 +262,7 @@ value person_misc_names base p =
   in
   let list =
     let first_names =
-      List.map (sou base) [p.first_name :: p.first_names_aliases]
+      [p_first_name base p :: List.map (sou base) p.first_names_aliases]
     in
     List.fold_left
       (fun list t ->
@@ -284,7 +287,7 @@ value person_misc_names base p =
         let cpl = coi base ifam in
         let fath = poi base cpl.father in
         let first_names =
-          List.map (sou base) [p.first_name :: p.first_names_aliases]
+          [p_first_name base p :: List.map (sou base) p.first_names_aliases]
         in
         List.fold_left
           (fun list t ->
@@ -299,7 +302,7 @@ value person_misc_names base p =
   let list =
     List.fold_left (fun list s -> [sou base s :: list]) list p.aliases
   in
-  let fn = Name.lower (sou base p.first_name ^ " " ^ sou base p.surname) in
+  let fn = Name.lower (p_first_name base p ^ " " ^ p_surname base p) in
   List.fold_left
     (fun list s ->
        let s = Name.lower s in
@@ -311,7 +314,7 @@ value person_ht_add base s ip = base.func.patch_name s ip;
 
 value person_is_key base p k =
   let k = Name.crush_lower k in
-  if k = Name.crush_lower (sou base p.first_name ^ " " ^ sou base p.surname)
+  if k = Name.crush_lower (p_first_name base p ^ " " ^ p_surname base p)
   then True
   else if
     List.exists (fun x -> k = Name.crush_lower x) (person_misc_names base p)
@@ -330,8 +333,8 @@ value person_ht_find_unique base first_name surname occ =
       [ [ip :: ipl] ->
           let p = poi base ip in
           if occ == p.occ
-          && first_name = Name.strip_lower (sou base p.first_name)
-          && surname = Name.strip_lower (sou base p.surname)
+          && first_name = Name.strip_lower (p_first_name base p)
+          && surname = Name.strip_lower (p_surname base p)
           then p.cle_index
           else find ipl
       | _ -> raise Not_found ]

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 2.6 1999-07-15 08:52:40 ddr Exp $ *)
+(* $Id: alln.ml,v 2.7 1999-07-22 14:34:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -273,8 +273,8 @@ value select_names conf base is_surnames ini =
   do for i = 0 to base.data.persons.len - 1 do
        let p = base.data.persons.get i in
        let s =
-         if is_surnames then sou base p.surname
-         else sou base p.first_name
+         if is_surnames then p_surname base p
+         else p_first_name base p
        in
        let k = Iobase.name_key s in
        if s <> "?" && string_start_with ini k then

@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 2.3 1999-04-05 23:42:27 ddr Exp $ *)
+(* $Id: check.ml,v 2.4 1999-07-22 14:34:03 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -135,7 +135,7 @@ value update_stats base current_year s p =
      [ Male -> s.men := s.men + 1
      | Female -> s.women := s.women + 1
      | Neuter -> s.neutre := s.neutre + 1 ];
-     if sou base p.first_name = "?" && sou base p.surname = "?" then
+     if p_first_name base p = "?" && p_surname base p = "?" then
        s.noname := s.noname + 1
      else ();
      match (birth_year p, death_year current_year p) with

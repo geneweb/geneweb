@@ -5,6 +5,9 @@ GeneWeb Version 2.05
 --------------------
 
 * General
+  - [Jul 22, 99] Added functions p_first_name and p_surname to prepare
+    installation of declined forms for names. Hope it works one day (not
+    sure...)
   - [Jul 15, 99] Changed internal reprentation of strings in data bases:
     no more use of ansel encoding, returning back to version 1.06. Should
     not change anything to normal users. This was done because of too

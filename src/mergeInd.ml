@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeInd.ml,v 2.5 1999-07-15 08:52:51 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 2.6 1999-07-22 14:34:11 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -46,9 +46,9 @@ value print_differences conf base branches p1 p2 =
       | _ -> () ];
     html_p conf;
     string_field True (transl_nth conf "first name/first names" 0) "first_name"
-      (fun p -> sou base p.first_name);
+      (fun p -> p_first_name base p);
     string_field True (transl_nth conf "surname/surnames" 0) "surname"
-      (fun p -> sou base p.surname);
+      (fun p -> p_surname base p);
     gen_string_field
       (if p1.occ < p2.occ then " checked" else "")
       (if p1.occ < p2.occ then "" else " checked")

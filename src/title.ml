@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: title.ml,v 2.5 1999-07-20 12:13:03 ddr Exp $ *)
+(* $Id: title.ml,v 2.6 1999-07-22 14:34:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -272,15 +272,15 @@ value give_access_someone conf base (x, t) list =
      [ (Tmain, pn, [nn :: _]) when sou base pn <> "" ->
          Wserver.wprint "%s <em>%s</em> %s" (sou base pn)
            (sou base nn)
-           (sou base x.surname)
+           (p_surname base x)
      | (Tmain, pn, []) when sou base pn <> "" ->
-         Wserver.wprint "%s %s" (sou base pn) (sou base x.surname)
+         Wserver.wprint "%s %s" (sou base pn) (p_surname base x)
      | (Tname n, _, [nn :: _]) ->
          Wserver.wprint "%s <em>%s</em> %s" (sou base n)
-           (sou base nn) (sou base x.surname)
+           (sou base nn) (p_surname base x)
      | (Tname n, _, []) ->
           Wserver.wprint "%s %s" (sou base n)
-            (sou base x.surname)
+            (p_surname base x)
      | _ -> Wserver.wprint "%s" (person_text conf base x) ];
      Wserver.wprint "\n";
      Date.afficher_dates_courtes conf base x;

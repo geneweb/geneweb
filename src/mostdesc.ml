@@ -1,4 +1,4 @@
-(* $Id: mostdesc.ml,v 2.2 1999-07-15 08:52:52 ddr Exp $ *)
+(* $Id: mostdesc.ml,v 2.3 1999-07-22 14:34:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Gutil;
@@ -23,13 +23,13 @@ value print_result base tab =
            let f i1 i2 =
              let p1 = base.data.persons.get i1 in
              let p2 = base.data.persons.get i2 in
-             let s1 = Name.abbrev (Name.lower (sou base p1.surname)) in
-             let s2 = Name.abbrev (Name.lower (sou base p2.surname)) in
+             let s1 = Name.abbrev (Name.lower (p_surname base p1)) in
+             let s2 = Name.abbrev (Name.lower (p_surname base p2)) in
              if s1 < s2 then True
              else if s1 > s2 then False
              else 
-               let f1 = Name.abbrev (Name.lower (sou base p1.first_name)) in
-               let f2 = Name.abbrev (Name.lower (sou base p2.first_name)) in
+               let f1 = Name.abbrev (Name.lower (p_first_name base p1)) in
+               let f2 = Name.abbrev (Name.lower (p_first_name base p2)) in
                f1 <= f2
            in
            Sort.list f m_list.val;
@@ -39,8 +39,8 @@ value print_result base tab =
            (fun i ->
               let p = base.data.persons.get i in
               do Printf.printf "- %s.%d %s\n"
-                   (sou base p.first_name) p.occ
-                   (sou base p.surname);
+                   (p_first_name base p) p.occ
+                   (p_surname base p);
                  flush stdout;
               return ())
            m_list.val;

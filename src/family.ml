@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 2.18 1999-07-17 20:30:51 ddr Exp $ *)
+(* $Id: family.ml,v 2.19 1999-07-22 14:34:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -9,7 +9,7 @@ open Util;
 
 value person_is_std_key base p k =
   let k = Name.strip_lower k in
-  if k = Name.strip_lower (sou base p.first_name ^ " " ^ sou base p.surname)
+  if k = Name.strip_lower (p_first_name base p ^ " " ^ p_surname base p)
   then True
   else if
     List.exists (fun n -> Name.strip n = k) (person_misc_names base p)
@@ -79,11 +79,11 @@ value compact_list conf base xl =
          | (_, Death _ _, _, _) -> True
          | _ ->
              let c =
-               alphabetique (sou base p1.surname) (sou base p2.surname)
+               alphabetique (p_surname base p1) (p_surname base p2)
              in
              if c == 0 then
                let c =
-                 alphabetique (sou base p1.first_name) (sou base p2.first_name)
+                 alphabetique (p_first_name base p1) (p_first_name base p2)
                in
                if c == 0 then p1.occ > p2.occ else c > 0
              else c > 0 ])
@@ -181,7 +181,7 @@ value precisez conf base n pl =
                      (fun ifam husbands ->
                         let cpl = coi base ifam in
                         let husband = poi base cpl.father in
-                        if sou base husband.surname <> "?" then
+                        if p_surname base husband <> "?" then
                           [husband :: husbands]
                         else husbands)
                      (Array.to_list p.family) []

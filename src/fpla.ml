@@ -1,4 +1,4 @@
-(* $Id: fpla.ml,v 2.2 1999-07-15 08:52:44 ddr Exp $ *)
+(* $Id: fpla.ml,v 2.3 1999-07-22 14:34:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 (* First Parentless Ancestor *)
 
@@ -67,7 +67,7 @@ value first_parentless_ancestor base =
        (fun (i, s) ->
           let p = poi base (Adef.iper_of_int i) in
           do Printf.printf "Sosa %d  \t%s.%d %s\n" s
-               (sou base p.first_name) p.occ (sou base p.surname);
+               (p_first_name base p) p.occ (p_surname base p);
              flush stdout;
           return ())
        tab;

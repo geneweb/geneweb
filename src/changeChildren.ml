@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 2.5 1999-07-15 08:52:42 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 2.6 1999-07-22 14:34:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -8,8 +8,8 @@ open Config;
 open Util;
 
 value print_child_person conf base p =
-  let first_name = sou base p.first_name in
-  let surname = sou base p.surname in
+  let first_name = p_first_name base p in
+  let surname = p_surname base p in
   let occ = p.occ in
   let var = "c" ^ string_of_int (Adef.int_of_iper p.cle_index) in
   tag "table" "border=1" begin
@@ -179,7 +179,7 @@ value print_conflict conf base p =
      html_li conf;
      Wserver.wprint "%s: %d\n"
        (capitale (transl conf "first free number"))
-       (Update.find_free_occ base (sou base p.first_name) (sou base p.surname)
+       (Update.find_free_occ base (p_first_name base p) (p_surname base p)
           0);
      Wserver.wprint "</ul>\n";
      Update.print_same_name conf base p;
@@ -193,7 +193,7 @@ value check_conflict conf base p key new_occ ipl =
     (fun ip ->
        let p1 = poi base ip in
        if p1.cle_index <> p.cle_index
-       && Name.strip_lower (sou base p1.first_name ^ " " ^ sou base p1.surname)
+       && Name.strip_lower (p_first_name base p1 ^ " " ^ p_surname base p1)
           = name
        && p1.occ = new_occ then
          do print_conflict conf base p1; return raise Update.ModErr
@@ -230,14 +230,14 @@ value change_child conf base parent_surname ip =
   let new_first_name =
     match p_getenv conf.env (var ^ "_first_name") with
     [ Some x -> only_printable x
-    | _ -> sou base p.first_name ]
+    | _ -> p_first_name base p ]
   in
   let new_surname =
     match p_getenv conf.env (var ^ "_surname") with
     [ Some x ->
         let x = only_printable x in
         if x = "" then parent_surname else x
-    | _ -> sou base p.surname ]
+    | _ -> p_surname base p ]
   in
   let new_occ =
     match p_getint conf.env (var ^ "_occ") with
@@ -246,8 +246,8 @@ value change_child conf base parent_surname ip =
   in
   if new_first_name = "" then
     error_person conf base p (transl conf "first name missing")
-  else if new_first_name <> sou base p.first_name
-  || new_surname <> sou base p.surname
+  else if new_first_name <> p_first_name base p
+  || new_surname <> p_surname base p
   || new_occ <> p.occ then
     let key = new_first_name ^ " " ^ new_surname in
     let ipl = person_ht_find_all base key in
@@ -271,7 +271,7 @@ value print_change_ok conf base p =
   [ Accept ->
       try
         let ipl = select_children_of base p in
-        let parent_surname = sou base p.surname in
+        let parent_surname = p_surname base p in
         do check_digest conf base (digest_children base ipl);
            List.iter (change_child conf base parent_surname) ipl;
            base.func.commit_patches ();

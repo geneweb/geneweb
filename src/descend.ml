@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: descend.ml,v 2.15 1999-07-19 09:56:17 ddr Exp $ *)
+(* $Id: descend.ml,v 2.16 1999-07-22 14:34:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -72,12 +72,12 @@ value print_choice conf base p niveau_effectif =
          Wserver.wprint "\n<input type=hidden name=%s value=%s>" k v)
       conf.henv;
     Wserver.wprint "<input type=hidden name=m value=D>\n";
-    if conf.wizard && conf.friend && sou base p.surname <> "?"
-    && sou base p.first_name <> "?" then
+    if conf.wizard && conf.friend && p_surname base p <> "?"
+    && p_first_name base p <> "?" then
       do Wserver.wprint "<input type=hidden name=n value=\"%s\">\n"
-           (sou base p.surname);
+           (p_surname base p);
          Wserver.wprint "<input type=hidden name=p value=\"%s\">\n"
-           (sou base p.first_name);
+           (p_first_name base p);
          if p.occ > 0 then
            Wserver.wprint "<input type=hidden name=oc value=\"%d\">\n" p.occ
          else ();
@@ -314,7 +314,7 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
            (fun list x ->
               let x = poi base x in
               if niveau == niveau_max then
-                if sou base x.first_name = "x" ||
+                if p_first_name base x = "x" ||
                    levt.(Adef.int_of_iper x.cle_index) != niveau then
                   list
                 else [x :: list]
@@ -338,10 +338,10 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
   let liste =
     Sort.list
       (fun p1 p2 ->
-         let c = alphabetique (sou base p1.surname) (sou base p2.surname) in
+         let c = alphabetique (p_surname base p1) (p_surname base p2) in
          if c == 0 then
            let c =
-             alphabetique (sou base p1.first_name) (sou base p2.first_name)
+             alphabetique (p_first_name base p1) (p_first_name base p2)
            in
            if c == 0 then p1.occ > p2.occ else c > 0
          else c > 0)
@@ -365,7 +365,7 @@ value afficher_descendants_niveau conf base niveau_max ancetre =
      html_p conf;
      print_alphab_list conf
        (fun (p, _) ->
-          String.sub (sou base p.surname) (initiale (sou base p.surname)) 1)
+          String.sub (p_surname base p) (initiale (p_surname base p)) 1)
        (fun (p, c) ->
           do afficher_personne_titre_referencee conf base p;
              Date.afficher_dates_courtes conf base p;
@@ -733,8 +733,8 @@ value print_ref conf base paths p =
          if paths.(Adef.int_of_iper c) <> [] then
            let c = poi base c in
            Wserver.wprint " => %s %s <tt><b>%s</b></tt>"
-             (sou base c.first_name)
-             (sou base c.surname)
+             (p_first_name base c)
+             (p_surname base c)
              (label_of_path paths c)
          else ())
       p.family
@@ -747,7 +747,7 @@ value print_elem conf base paths precision (n, pll) =
          do Wserver.wprint "<strong>%s " (surname_end n);
             wprint_geneweb_link conf
               ("i=" ^ string_of_int (Adef.int_of_iper p.cle_index))
-              (sou base p.first_name);
+              (p_first_name base p);
             Wserver.wprint "%s</strong>" (surname_begin n);
             Date.afficher_dates_courtes conf base p;
             print_ref conf base paths p;
@@ -771,7 +771,7 @@ value print_elem conf base paths precision (n, pll) =
                              wprint_geneweb_link conf
                                ("i=" ^
                                 string_of_int (Adef.int_of_iper p.cle_index))
-                               (sou base p.first_name);
+                               (p_first_name base p);
                            end;
                            if several && precision then
                              do Wserver.wprint " <em>";
@@ -795,10 +795,10 @@ value trier_et_afficher conf base paths precision liste =
   let liste =
     Sort.list
       (fun p1 p2 ->
-         let c = alphabetique (sou base p1.surname) (sou base p2.surname) in
+         let c = alphabetique (p_surname base p1) (p_surname base p2) in
          if c == 0 then
            let c =
-             alphabetique (sou base p1.first_name) (sou base p2.first_name)
+             alphabetique (p_first_name base p1) (p_first_name base p2)
            in
            c < 0
          else c > 0)
@@ -808,9 +808,9 @@ value trier_et_afficher conf base paths precision liste =
     List.fold_left
       (fun npll p ->
          match npll with
-         [ [(n, pl) :: npll] when n == sou base p.surname ->
+         [ [(n, pl) :: npll] when n == p_surname base p ->
              [(n, [p :: pl]) :: npll]
-         | _ -> [(sou base p.surname, [p]) :: npll] ])
+         | _ -> [(p_surname base p, [p]) :: npll] ])
       [] liste
   in
   let liste =
@@ -857,8 +857,8 @@ value afficher_index_descendants conf base niveau_max ancetre =
   do for i = 0 to base.data.persons.len - 1 do
        if paths.(i) <> [] then
          let p = base.data.persons.get i in
-         if sou base p.first_name <> "?" && sou base p.surname <> "?" &&
-            sou base p.first_name <> "x" then
+         if p_first_name base p <> "?" && p_surname base p <> "?" &&
+            p_first_name base p <> "x" then
            liste.val := [p.cle_index :: liste.val]
          else ()
        else ();
@@ -884,16 +884,16 @@ value afficher_index_spouses conf base niveau_max ancetre =
   do for i = 0 to base.data.persons.len - 1 do
        if paths.(i) <> [] then
          let p = base.data.persons.get i in
-         if sou base p.first_name <> "?" && sou base p.surname <> "?" &&
-            sou base p.first_name <> "x" then
+         if p_first_name base p <> "?" && p_surname base p <> "?" &&
+            p_first_name base p <> "x" then
            Array.iter
              (fun ifam ->
                 let c = spouse p (coi base ifam) in
                 if paths.(Adef.int_of_iper c) = [] then
                   let c = poi base c in
-                  if sou base c.first_name <> "?" &&
-                     sou base c.surname <> "?" &&
-                     sou base p.first_name <> "x" &&
+                  if p_first_name base c <> "?" &&
+                     p_surname base c <> "?" &&
+                     p_first_name base p <> "x" &&
                      not (List.memq c.cle_index liste.val) then
                     liste.val := [c.cle_index :: liste.val]
                   else ()

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.31 1999-07-15 08:52:41 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.32 1999-07-22 14:34:01 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -59,9 +59,9 @@ value print_choice conf base p niveau_effectif =
     Wserver.wprint "<input type=hidden name=m value=A>\n";
     if conf.wizard && conf.friend then
       do Wserver.wprint "<input type=hidden name=n value=\"%s\">\n"
-           (quote_escaped (sou base p.surname));
+           (quote_escaped (p_surname base p));
          Wserver.wprint "<input type=hidden name=p value=\"%s\">\n"
-           (quote_escaped (sou base p.first_name));
+           (quote_escaped (p_first_name base p));
          if p.occ > 0 then
            Wserver.wprint "<input type=hidden name=oc value=\"%d\">\n" p.occ
          else ();
@@ -945,7 +945,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
   [ GP_person n ip _ ->
       let p = poi base ip in
       if sp_incl &&
-      sou base p.first_name = "?" && sou base p.surname = "?" then
+      p_first_name base p = "?" && p_surname base p = "?" then
         do print_title ();
            html_li conf;
            Num.print wpr (transl conf "(thousand separator)") n;
@@ -973,7 +973,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
       else ()
   | GP_missing n ip ->
       let p = poi base ip in
-      if sou base p.first_name = "?" && sou base p.surname = "?" then ()
+      if p_first_name base p = "?" && p_surname base p = "?" then ()
       else
         let n1 = Num.twice n in
         let n2 = Num.inc n1 1 in
@@ -1106,8 +1106,8 @@ value add_missing conf base spouses_included list =
   fun
   [ GP_person n ip _ ->
       let p = poi base ip in
-      if spouses_included && sou base p.first_name = "?"
-      && sou base p.surname = "?" then
+      if spouses_included && p_first_name base p = "?"
+      && p_surname base p = "?" then
         if Array.length p.family > 0 then
           let cpl = coi base p.family.(0) in
           let (a, p) =
@@ -1121,8 +1121,8 @@ value add_missing conf base spouses_included list =
   | GP_missing n ip ->
       let p = poi base ip in
       if spouses_included
-      && (sou base p.surname = "?" || sou base p.surname = "N..." )then
-        if sou base p.first_name = "?" then list
+      && (p_surname base p = "?" || p_surname base p = "N..." )then
+        if p_first_name base p = "?" then list
         else
           if Array.length p.family > 0 then
             let n = person_text_without_surname conf base p in
@@ -1132,9 +1132,9 @@ value add_missing conf base spouses_included list =
               [ Male -> (A_surname_of_husband_of n, poi base cpl.mother)
               | _ -> (A_surname_of_wife_of n, poi base cpl.father) ]
             in
-            if sou base p.surname = "?" then list else [(a, p) :: list]
+            if p_surname base p = "?" then list else [(a, p) :: list]
           else [(A_parents_of, p) :: list]
-      else if sou base p.surname = "?" || sou base p.surname = "?" then
+      else if p_surname base p = "?" || p_surname base p = "?" then
         list
       else [(A_parents_of, p) :: list]
   | _ -> list ]
@@ -1151,10 +1151,10 @@ value val_of_mt =
 ;
 
 value compare base (mt1, p1) (mt2, p2) =
-  let c = alphabetique (sou base p1.surname) (sou base p2.surname) in
+  let c = alphabetique (p_surname base p1) (p_surname base p2) in
   if c == 0 then
     let c =
-      alphabetique (sou base p1.first_name) (sou base p2.first_name)
+      alphabetique (p_first_name base p1) (p_first_name base p2)
     in
     if c == 0 then
       if p1 == p2 then val_of_mt mt1 < val_of_mt mt2
@@ -1191,7 +1191,7 @@ value print_spouses conf base p =
        let fam = foi base ifam in
        let cpl = coi base ifam in
        let sp = poi base (spouse p cpl) in
-       if sou base sp.first_name = "?" && sou base sp.surname = "?" then ()
+       if p_first_name base sp = "?" && p_surname base sp = "?" then ()
        else
          do Wserver.wprint "\n&amp;";
             match Adef.od_of_codate fam.marriage with
@@ -1296,9 +1296,9 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
        List.fold_left
          (fun nell ((_, p) as elm) ->
             match nell with
-            [ [(n, el) :: nell] when n == sou base p.surname ->
+            [ [(n, el) :: nell] when n = p_surname base p ->
                 [(n, [elm :: el]) :: nell]
-            | _ -> [(sou base p.surname, [elm]) :: nell] ])
+            | _ -> [(p_surname base p, [elm]) :: nell] ])
          [] list
      in
      let list =
