@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.32 2002-06-18 07:13:08 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.33 2002-10-22 03:31:33 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -521,7 +521,7 @@ et: järgi
 <input type=submit value="Ok">
 </form>
 
-<li>
+%Ispropose_place_surnames;<li>
 
 <form method=GET action="%s">
 %h<input type=hidden name=m value=PS>
@@ -553,7 +553,7 @@ sv: efter
 - <input type=submit value="Ok">
 </form>
 
-%INshide_advanced_request;<li>
+%E%INshide_advanced_request;<li>
 
 [
 af: <font color=%i><b>deur 'n</b></font>
