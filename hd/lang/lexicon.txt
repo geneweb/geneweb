@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.157 2003-08-04 06:56:13 ddr Exp $
+# $Id: lexicon.txt,v 4.158 2003-08-22 06:27:42 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -2786,7 +2786,7 @@ af: veras
 bg: кремиран/кремирана
 ca: incinerat/incinerada/incinerat(ada)
 cs: zpopelnмn/zpopelnмna
-da: kremeret
+da: bisat
 de: einge&auml;schert
 en: cremated
 eo: cindrigita
