@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.40 1999-12-17 00:43:07 ddr Exp $
+# $Id: lexicon.txt,v 3.41 1999-12-18 13:44:56 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -420,6 +420,7 @@ fi: henkil&ouml;n %t <em>Sosa-numero</em>
 fr: <em>num&eacute;ro Sosa</em> par rapport &agrave; %t
 he: <em> îñôø Sosa </em> áéçñ ì- %t
 is: <em>Sosa númer</em> tengt %t
+no: <em>Sosa nummer</em> i forhold til %t
 se: <em>Sosa nummer</em> relativ till %t
 
     M/F
@@ -1002,7 +1003,7 @@ he:   àá ÷ãîåï
 is: forfağir
 it: un antenato/un'antenata
 nl: een voorouder
-no: stamfar
+no: ane
 pt: um antepassado/uma antepassada
 se: en ana
 
@@ -1420,7 +1421,7 @@ he:  áèì ÷ùøé GeneWeb
 is: án GeneWeb tengla
 it: annullare i links
 nl: geen GeneWeb links
-no: undertrykk GeneWeb koblinger
+no: uten GeneWeb koblinger
 pt: cancelar os links Geneweb
 se: utan GeneWeb l&auml;nkar
 
@@ -1595,6 +1596,7 @@ fr: commentaire ajout&eacute;
 he:   äòøä äåëğñä  
 nl: commentaar toegevoegd
 is: athugasemd bætt viğ
+no: kommentar er tilføyd
 pt: coment&aacute;rio acrescentado
 se: kommentar tillagd
 
@@ -2552,7 +2554,7 @@ he:  ëìì áğé æåâ äçñøéí
 is: meğtaldir makar sem vantar
 it: includere i coniugi mancanti
 nl: ontbrekende echtgenoten tonen
-no: inkluder manglende (ekte)feller
+no: inkluder ukjente maker
 pt: incluir os c&ocirc;njugues que faltam
 se: inkludera makar som saknas
 
@@ -2567,7 +2569,7 @@ he:  áìì
 is: meğtaldar makar
 it: includere i coniugi
 nl: echtgenoten tonen
-no: inkluder (ekte)feller
+no: inkluder maker
 pt: incluir os c&ocirc;njugues
 se: inkludera makar
 
@@ -4206,6 +4208,7 @@ dk: korteste vej
 en: shortest path
 fi: lyhin polku
 fr: chemin le plus court
+no: korteste gren
 se: kortaste grenen
 
     should be female
