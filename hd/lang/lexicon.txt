@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.87 2000-04-26 08:53:16 ddr Exp $
+# $Id: lexicon.txt,v 3.88 2000-04-26 15:35:10 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -1015,7 +1015,7 @@ af: ouderdom by afsterwe:
 cn: ÏíÄê
 cs: vìk v dobì úmrtí
 de: Alter:
-dk: alder:
+dk: alder ved d&oslash;d:
 en: death age:
 eo: agxo de morto:
 es: a la edad de
