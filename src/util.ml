@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.63 2002-11-18 10:02:51 ddr Exp $ *)
+(* $Id: util.ml,v 4.64 2002-11-18 12:36:29 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -158,7 +158,7 @@ value gen_decline conf wt s =
 
 value transl_decline conf w s = gen_decline conf (transl conf w) s;
 
-value gen_decline2 conf wt s1 s2 =
+value gen_decline2 wt s1 s2 =
   let string_of =
     fun
     [ '1' -> Some s1
@@ -203,7 +203,10 @@ value gen_decline2 conf wt s1 s2 =
   loop 0
 ;
 
-value transl_decline2 conf w s1 s2 = gen_decline2 conf (transl conf w) s1 s2;
+value transl_a_of_b conf = gen_decline2 (transl_nth conf "%1 of %2" 0);
+value transl_a_of_gr_eq_gen_lev conf =
+  gen_decline2 (transl_nth conf "%1 of %2" 1)
+;
 
 ifdef OCAML_307 then
 value failed_format s : format 'a 'b 'c 'd = Obj.magic ("[" ^ s ^ "]")
@@ -1460,7 +1463,7 @@ value print_parent conf base p fath moth =
   in
   let is = index_of_sex p.sex in
   Wserver.wprint "%s"
-    (transl_decline2 conf "%1 of (same or greater generation level) %2"
+    (transl_a_of_gr_eq_gen_lev conf
        (transl_nth conf "son/daughter/child" is) s)
 ;
 
@@ -1509,7 +1512,7 @@ value specify_homonymous conf base p =
                      else "")
                 in
                 Wserver.wprint "%s"
-                  (transl_decline2 conf "%1 of %2"
+                  (transl_a_of_b conf
                      (transl_nth conf "father/mother" is)
                      (child_fn ^ child_sn))
               else
@@ -1517,7 +1520,7 @@ value specify_homonymous conf base p =
                 if p_first_name base conjoint <> "?" ||
                    p_surname base conjoint <> "?" then
                   Wserver.wprint "%s"
-                    (transl_decline2 conf "%1 of %2"
+                    (transl_a_of_b conf
                        (transl_nth conf "husband/wife" is)
                        (p_first_name base conjoint ^ " " ^
                           p_surname base conjoint))

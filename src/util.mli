@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.22 2002-11-03 20:16:09 ddr Exp $ *)
+(* $Id: util.mli,v 4.23 2002-11-18 12:36:30 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -124,7 +124,8 @@ value transl : config -> string -> string;
 value transl_nth : config -> string -> int -> string;
 value transl_nth_def : config -> string -> int -> int -> string;
 value transl_decline : config -> string -> string -> string;
-value transl_decline2 : config -> string -> string -> string -> string;
+value transl_a_of_b : config -> string -> string -> string;
+value transl_a_of_gr_eq_gen_lev : config -> string -> string -> string;
 ifdef OCAML_307 then
 declare
 value ftransl : config -> format 'a 'b 'c 'd -> format 'a 'b 'c 'd;

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.26 2002-10-06 15:42:52 ddr Exp $ *)
+(* $Id: family.ml,v 4.27 2002-11-18 12:36:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -312,8 +312,7 @@ value specify conf base n pl =
                    (person_title_text conf base h) hl
                in
                Wserver.wprint ", <em>%s</em>\n"
-                 (transl_decline2 conf
-                    "%1 of (same or greater generation level) %2"
+                 (transl_a_of_gr_eq_gen_lev conf
                     (transl_nth conf "spouse" (index_of_sex p.sex)) s) ];
          })
       ptll;

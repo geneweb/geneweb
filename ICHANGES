@@ -37,6 +37,9 @@ GeneWeb Version 4.08
     not however displayed the surname when several marriages.
 
 * Lexicon (lang/lexicon.txt)
+  - [18 Nov 02] Merged "%1 of %2" and "%1 of (same or...) %1" into one
+    only entry "%1 of %2"; the second case being separated with the first
+    one by a slash.
   - [26 Sep 02] Added 2 phrases (months) in Russian (Eric Kvaalen).
   - [25 Jul 02] Fixed and completed some phrases in Russian (Yuri Gavaga).
 

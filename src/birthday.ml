@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.8 2002-03-11 19:02:55 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.9 2002-11-18 12:36:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -201,8 +201,7 @@ value print_birth_day conf base day_name verb wd dt list =
                   "</b>"))
             verb;
           Wserver.wprint "%s\n"
-            (transl_decline2 conf "%1 of %2" (transl conf "the birthday")
-               "...");
+            (transl_a_of_b conf (transl conf "the birthday") "...");
           print_anniversary_list conf base False dt list;
         } ]
   }
@@ -365,7 +364,7 @@ value print_marriage_day conf base day_name verb wd dt list =
                   "</b>"))
             verb;
           Wserver.wprint "%s\n"
-            (transl_decline2 conf "%1 of %2"
+            (transl_a_of_b conf
                (transl conf "the anniversary of marriage") "...");
           print_anniversaries_of_marriage conf base dt.year list;
         } ]

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: merge.ml,v 4.4 2002-03-06 12:21:20 ddr Exp $ *)
+(* $Id: merge.ml,v 4.5 2002-11-18 12:36:28 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -66,7 +66,7 @@ value print conf base p =
              [ Some ifam ->
                  let cpl = coi base ifam in
                  Wserver.wprint ",\n%s"
-                   (transl_decline2 conf "%1 of %2"
+                   (transl_a_of_b conf
                       (transl_nth conf "son/daughter/child"
                          (index_of_sex p.sex))
                       (person_title_text conf base (poi base cpl.father) ^
