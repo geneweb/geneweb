@@ -2,6 +2,9 @@ GeneWeb version 4.10
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [14 Jan 03] In form to add message in the database forum, added
+    buttons "private/public": only "wizards" and "friend" can see
+    "private" messages.
   - [06 Jan 03] In welcome page, added wizard's name (when named).
 
 * GeneWeb databases Transfer Program (gwtp)

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.23 2003-01-14 14:18:59 ddr Exp $ *)
+(* $Id: forum.ml,v 4.24 2003-01-14 14:38:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -50,7 +50,7 @@ value ndisp_items = 2;
 value change_item pd d = d.month <> pd.month;
 
 value print_one_header conf prec_date ndisp pos h =
-  let (date, hour, ident, subject, beg_mess) = h in
+  let (date, hour, ident, access, subject, beg_mess) = h in
   let ndisp =
     if date <> prec_date then do {
       let ndisp =
@@ -85,7 +85,10 @@ value print_one_header conf prec_date ndisp pos h =
   in
   do {
     tag "tr" "align=left" begin
-      tag "td" begin Wserver.wprint "<tt>&nbsp;&nbsp;&nbsp;</tt>"; end;
+      tag "td" begin
+        Wserver.wprint "<tt>&nbsp;%s&nbsp;</tt>"
+          (if access = "priv" then "*" else "&nbsp;");
+      end;
       tag "td" begin Wserver.wprint "<tt>%s</tt>" hour; end;
       tag "td" begin
         Wserver.wprint "<a href=\"%sm=FORUM;p=%d\"><b>%s</b></a>" (commd conf)
@@ -199,7 +202,9 @@ value print_headers conf =
                   else
                     let ndisp =
                       if ident <> "" then
-                        let h = (date, hour, ident, subject, beg_mess) in
+                        let h =
+                          (date, hour, ident, access, subject, beg_mess)
+                        in
                         print_one_header conf prec_date ndisp pos h
                       else ndisp
                     in
@@ -365,6 +370,10 @@ value print_one_forum_message conf m pos next_pos forum_length =
     if m.m_subject <> "" then
       Wserver.wprint "<b>%s: %s</b>\n<br>\n"
         (capitale (header_txt conf 2)) (secure m.m_subject)
+    else ();
+    if m.m_access = "priv" then
+      Wserver.wprint "<b>%s: %s</b>\n<br>\n"
+        (capitale (transl conf "access")) (transl conf "private")
     else ();
     Wserver.wprint "<em>%s</em>\n" m.m_time;
     Wserver.wprint "<dl><dt><dd>\n";
