@@ -46,10 +46,9 @@ GeneWeb version 2.05
     two words) into "Lepine" (one word).
   - [Jul 16, 99] Added a "back" button in case of update error (useful
     for browsers which loose the contents of the forms when navigating).
-  - [Jul 15..17, 99] In relationship computing, added ability to cancel
-    GeneWeb links. Added a long display. Added the ability to see the spouses
-    in branches displayings. Added ability to cancel GeneWeb links in branches
-    displaying.
+  - [Jul 15..29, 99] In relationship computing, added a long display,
+    the ability to see the spouses in branches displaying, and the ability
+    to cancel GeneWeb links.
   - [Jul 15, 99] Added system of grammar declinations (required by German,
     Esperanto, Czech). Changed the lexicon to use this new system.
   - [Jul 9, 99] Added link (upper arrow) to welcome page in displayings by
