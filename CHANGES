@@ -2,18 +2,20 @@ GeneWeb version 3.07
 --------------------
 
 * GeneWeb Service/CGI (gwd)
-  - [28 Jul 00] Fixed problem in images displaying in personal
-    pages and in trees. Sometimes the image was "broken" and the
-    URL was incorrect. Details: this happened in case of local
-    image (field "image" filled in "person" form), and when the type
-    was not one of the recognized types (i.e. presently "gif", "jpeg",
-    "png"): in these conditions, the URL for the image was incorrect.
-    The fix did not allow to display the image correctly: now the
-    image is *not* displayed at all, since "gwd" need to know its
-    type to answer the browser request. A solution for local images
-    with other types than the ones that "gwd" recognized, it to use
-    the variable "images_path" in the data base configuration file
-    (base.gwf).
+  - [28 Jul 00] Fixed problem in images displaying in personal pages
+    and in trees. Sometimes the image was "broken", its URL being
+    incorrect. Details:
+    * This happened in case of local image (field "image" filled in "person"
+      form), and when the type was not among the recognized types
+      (i.e. presently "gif", "jpeg", "png"): in these conditions, the URL
+      for the image was incorrect.
+    * The fix is not completely satisfactory: this kind of image is now no
+      more displayed at all. Indeed, "gwd" need to know its type to answer
+      the browser request (the HTTP answer must contain the image type).
+    * A solution if there are images with other types than the ones that
+      "gwd" recognizes, is to use the variable "images_path" in the data
+      base configuration file (base.gwf). See the changes version 3.05 or
+      the distributed example file "gw/etc/a.gwf".
   - [26 Jul 00] Added small icon in personal page to indicate sex
     (Louis Granboulan's idea)
   - [19 Jul 00] Fixed bug in places/surnames displaying: some identical
