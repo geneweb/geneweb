@@ -1,8 +1,8 @@
-GeneWeb 3.07
+GeneWeb 3.08
 
 Pour demarrer avec GeneWeb, suivez les instructions suivantes:
 
-Si vous etes sous Windows NT/95/98:
+Si vous etes sous Windows:
    Double-cliquez sur le fichier "index.htm" du repertoire "doc",
    et suivez les instructions.
 

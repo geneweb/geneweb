@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.11 2000-08-19 07:23:05 ddr Exp $
+# $Id: geneweb.spec,v 3.12 2000-10-02 12:10:56 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -205,6 +205,8 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/de/diruse.htm
 /home/geneweb/gw/gw/doc/de/divide.htm
 /home/geneweb/gw/gw/doc/de/faq.htm
+/home/geneweb/gw/gw/doc/de/gwsetup.htm
+/home/geneweb/gw/gw/doc/de/initial.htm
 /home/geneweb/gw/gw/doc/de/links.htm
 /home/geneweb/gw/gw/doc/de/maint.htm
 /home/geneweb/gw/gw/doc/de/merge.htm
@@ -220,6 +222,9 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/en/diruse.htm
 /home/geneweb/gw/gw/doc/en/divide.htm
 /home/geneweb/gw/gw/doc/en/faq.htm
+/home/geneweb/gw/gw/doc/en/gwformat.htm
+/home/geneweb/gw/gw/doc/en/gwsetup.htm
+/home/geneweb/gw/gw/doc/en/initial.htm
 /home/geneweb/gw/gw/doc/en/links.htm
 /home/geneweb/gw/gw/doc/en/maint.htm
 /home/geneweb/gw/gw/doc/en/merge.htm
@@ -235,6 +240,8 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/doc/fr/diruse.htm
 /home/geneweb/gw/gw/doc/fr/divide.htm
 /home/geneweb/gw/gw/doc/fr/faq.htm
+/home/geneweb/gw/gw/doc/fr/gwsetup.htm
+/home/geneweb/gw/gw/doc/fr/initial.htm
 /home/geneweb/gw/gw/doc/fr/links.htm
 /home/geneweb/gw/gw/doc/fr/maint.htm
 /home/geneweb/gw/gw/doc/fr/merge.htm
@@ -286,6 +293,11 @@ chown -R geneweb.geneweb /home/geneweb/gw
 /home/geneweb/gw/gw/etc/redirect.txt
 /home/geneweb/gw/gw/etc/renamed.txt
 /home/geneweb/gw/gw/etc/robot.txt
+/home/geneweb/gw/gw/gwtp_tmp/README
+/home/geneweb/gw/gw/gwtp_tmp/conf.txt
+/home/geneweb/gw/gw/gwtp_tmp/gwtp
+/home/geneweb/gw/gw/gwtp_tmp/recv.txt
+/home/geneweb/gw/gw/gwtp_tmp/send.txt
 /home/geneweb/gw/gw/images/female.gif
 /home/geneweb/gw/gw/images/gwback.jpg
 /home/geneweb/gw/gw/images/gwlogo.gif

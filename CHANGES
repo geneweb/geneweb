@@ -18,7 +18,7 @@ GeneWeb version 3.08
   - [18 Sep 00] In family updating, when creating an unknown person
     (i.e. having "?" as firstname or surname), does not set the "source"
     field any more for this person.
-  - [18 Sep 00] Fixed bugs: 1/ while mergin persons, automatic merging
+  - [18 Sep 00] Fixed bugs: 1/ while merging persons, automatic merging
     sometimes used to loose the death date 2/ while merging families
     the comment of the 2nd family used to be ignored.
   - [15 Sep 00] In ascendants long display, added notes for siblings if
