@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.163 2000-10-23 17:47:01 ddr Exp $
+# $Id: lexicon.txt,v 3.164 2000-10-24 15:35:02 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -77,25 +77,25 @@ pt:  para ver o primeiro link
 ru:  ÷òîáû óâèäåòü ïåğâóş ñâÿçü îòíîøåíèÿ
 se:  f&ouml;r att se den f&ouml;rsta
 
-     to try again with this number, or do "back" and change it yourself
-af:  om weer te probeer met die nommer, of druk "terug" en verander dit self
-cs:  zkusit znovu s tímto èíslem, nebo jít zpìt (back) a zmìnit èíslo
-de: , um es mit dieser Nummer nochmals zu versuchen, oder dr&uuml;cken Sie "back" und &auml;ndern Sie es selbst
-dk:  for at fors&oslash;ge igen med dette nummer, eller g&aring; tilbage og v&aelig;lg et andet
-en:  to try again with this number, or do "back" and change it yourself
-eo:  por reprovi kun cxi tiu numero, aù faru "malantauxe" kaj sxangxu ion mem
-es:  para ensayar de nuevo con este n&uacute;mero, o haga "back" y escoja otro
-fi:  yritt&auml;&auml;ksesi uudelleen t&auml;ll&auml numerolla,  tai peruuta ja muuta se itse
-fr:  pour r&eacute;essayer avec ce num&eacute;ro, ou bien sur "retour" et choisissez-en un autre
-he:  ìğñåú ùåá òí äîñôø äæä, àå "çæøä" åìùğåú áòöîê
-is:  til ağ reyna şetta aftur meğ şessu númeri, eğa veldu "Til baka" og breyttu şví sjálf(ur)
-it:  per provare di nuovo con questo numero, oppure fate "back" e scieglietene un'altro
-lv:  mçìiniet vçlreiz ar ğo nummuru, vai ejiet atpakaï un nomainiet to
-nl: , om dit nummer weer te proberen, of druk "terug" en verander het zelf
-no:  for å pr&oslash;ve igjen med dette nummeret, eller g&aring; tilbake og endre det selv
-pt: para tentar novamente com este n&uacute;mero ou fa&ccedil; "back" e escolha outro
-ru: äëÿ òîãî, ÷òîáû ïûòàòüñÿ ñíîâà ñ ıòèì ÷èñëîì, èëè íàæìèòå "íàçàä" èëè èçìåíèòå åãî ñàìè
-se:  f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer eller g&aring; tillbaka och &auml;ndra det sj&auml;lv
+     to try again with this number
+af:  om weer te probeer met die nommer
+cs:  zkusit znovu s tímto èíslem
+de: , um es mit dieser Nummer nochmals zu versuchen
+dk:  for at fors&oslash;ge igen med dette nummer
+en: to try again with this number
+eo:  por reprovi kun cxi tiu numero
+es:  para ensayar de nuevo con este n&uacute;mero
+fi:  yritt&auml;&auml;ksesi uudelleen t&auml;ll&auml numerolla
+fr:  pour r&eacute;essayer avec ce num&eacute;ro
+he:  ìğñåú ùåá òí äîñôø äæä
+is:  til ağ reyna şetta aftur meğ şessu númeri
+it:  per provare di nuovo con questo numero
+lv:  mçìiniet vçlreiz ar ğo nummuru
+nl: , om dit nummer weer te proberen
+no:  for å pr&oslash;ve igjen med dette nummeret
+pt: para tentar novamente com este n&uacute;mero
+ru: äëÿ òîãî, ÷òîáû ïûòàòüñÿ ñíîâà ñ ıòèì ÷èñëîì
+se:  f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer
 
     %1 of %2
 af: %1 van %2
@@ -1865,6 +1865,26 @@ pt: alterar os nomes dos filhos
 ru: èçìåíåíèå èìåíè ğåáåíêà
 se: &auml;ndra barnens namn
 
+    change it (the number) yourself
+af: verander dit self
+cs: zmìnit èíslo
+de: &auml;ndern Sie es selbst
+dk: v&aelig;lg et andet
+en: change it yourself
+eo: kaj sxangxu ion mem
+es: escoja otro
+fi: muuta se itse
+fr: choisissez-en un autre
+he:  åìùğåú áòöîê
+is: og breyttu şví sjálf(ur)
+it: scieglietene un'altro
+lv: nomainiet to
+nl: verander het zelf
+no: endre det selv
+pt: escolha outro
+ru: èçìåíèòå åãî ñàìè
+se: &auml;ndra det sj&auml;lv
+
     changed order of children
 af: verander die volgorde van kinders
 cs: zmìnit poøadí dìtí
@@ -1945,6 +1965,26 @@ no: klikk
 pt: clicar
 ru: íàæìèòå
 se: klicka
+
+    click on "%s"
+af: druk "%s"
+cs: kliknìte "%s"
+de: klicken Sie "%s"
+dk: klik "%s"
+en: click on "%s"
+eo: kliku "%s"
+es: cliquear "%s"
+fi: klikkaa "%s"
+fr: cliquez sur "%s"
+he:   ìçõ "%s"
+is: İtiğ "%s"
+it: seleziona "%s"
+lv: spiest "%s"
+nl: druk "%s"
+no: klikk "%s"
+pt: clicar "%s"
+ru: íàæìèòå "%s"
+se: klicka "%s"
 
     comment
 af: kommentaar
@@ -3869,24 +3909,24 @@ pt: apelido
 ru: íàçâàíèå
 se: namn
 
-    name "%s.%d %s" already used by %tthis person%t
-af: "%s.%d %s" is reeds gebruik deur %t
-de: Name "%s.%d %s" wird schon bei %tdieser Person%t benutzt
-dk: navn "%s.%d %s" er allerede anvendt af %tdenne person%t
-en: name "%s.%d %s" already used by %tthis person%t
-eo: nomo "%s.%d %s" jam uzita de %ttiu persono%t
-es: nombre "%s.%d %s" ya utilizado por %testa persona%t
-fi: nimi "%s.%d %s" on jo k&auml;yt&ouml;ss&auml %tt&auml;ll&auml; henkil&ouml;ll&auml;%t
-fr: nom "%s.%d %s" d&eacute;j&agrave; utilis&eacute; par %tcette personne%t
-he:  äùí "%s.%d %s" áùéîåù ëáø ò"é %tàãí æä%t
-is: nafniğ "%s %d %s" er şegar í notkun af%t
-it: nome "%s.%d %s" gi&agrave; utilizzato da %tquesta persona%t
-lv: vârds - "%s.%d %s" jau ir %tğai personai%t
-nl: naam "%s.%d %s" is al gebruikt door %tdit persoon%t
-no: navnet "%s.%d %s" er alt i bruk av %tdenne personen%t
-pt: apelido "%s.%d %s" j&aacute; utilizado por %testa pessoa%t
-ru: èìÿ "%s.%d %s" óæå èñïîëüçîâàíî %tıòèì ÷åëîâåêîì%t
-se: namn "%s.%d %s" anv&auml;nds redan av %tdenna person%t
+    name %s already used by %tthis person%t
+af: %s is reeds gebruik deur %t
+de: Name %s wird schon bei %tdieser Person%t benutzt
+dk: navn %s er allerede anvendt af %tdenne person%t
+en: name %s already used by %tthis person%t
+eo: nomo %s jam uzita de %ttiu persono%t
+es: nombre %s ya utilizado por %testa persona%t
+fi: nimi %s on jo k&auml;yt&ouml;ss&auml %tt&auml;ll&auml; henkil&ouml;ll&auml;%t
+fr: nom %s d&eacute;j&agrave; utilis&eacute; par %tcette personne%t
+he:  äùí %s áùéîåù ëáø ò"é %tàãí æä%t
+is: nafniğ %s er şegar í notkun af%t
+it: nome %s gi&agrave; utilizzato da %tquesta persona%t
+lv: vârds - %s jau ir %tğai personai%t
+nl: naam %s is al gebruikt door %tdit persoon%t
+no: navnet %s er alt i bruk av %tdenne personen%t
+pt: apelido %s j&aacute; utilizado por %testa pessoa%t
+ru: èìÿ %s óæå èñïîëüçîâàíî %tıòèì ÷åëîâåêîì%t
+se: namn %s anv&auml;nds redan av %tdenna person%t
 
     navigation with %t as Sosa reference
 af: stap met %t as Sosa verwysing
@@ -4537,26 +4577,6 @@ no: eller
 pt: ou
 ru: èëè
 se: eller
-
-    or use "link" instead of "create"
-af: of gebruik "koppel" eerder as "skep"
-cs: nebo pou¾ij "svázat" namísto "vytvoøit"
-de: oder benutzen Sie "verbinden" an Stelle von "erzeugen"
-dk: eller anvend "forbind" i stedet for "opret"
-en: or use "link" instead of "create"
-eo: aù uzu "bindi" anstataù ol "krei"
-es: o utilise "reunir" en lugar de "crear"
-he:  àå ìäùúîù á-"÷ùø" áî÷åí "òùä"
-is: eğa notağu "tengja" í stağ "búa til"
-it: oppure usare "link" invece di "create"
-fi: tai käytä "luo" toiminnon "liit&auml" sijaan
-fr: ou bien utilisez "relier" au lieu de "cr&eacute;er"
-lv: vai "izveidot" vietâ lietojiet "saite"
-nl: of gebruik "konnektie" inplaats van "maken"
-no: eller bruk "koble" istedet for "opprett"
-pt: ou use "reunir" em lugar de "criar"
-ru: èëè èñïîëüçóéòå "ñâÿçàòü" âìåñòî "ñîçäàòü"
-se: eller anv&auml;nd "l&auml;nk" ist&auml;llet f&ouml;r "skapa"
 
     parents
 af: ouers
@@ -6396,6 +6416,26 @@ no: oppdatere
 pt: actualizar
 ru: èçìåíèòü
 se: uppdatera
+
+    use "link" instead of "create"
+af: gebruik "koppel" eerder as "skep"
+cs: pou¾ij "svázat" namísto "vytvoøit"
+de: benutzen Sie "verbinden" an Stelle von "erzeugen"
+dk: anvend "forbind" i stedet for "opret"
+en: use "link" instead of "create"
+eo: uzu "bindi" anstataù ol "krei"
+es: utilise "reunir" en lugar de "crear"
+he:  ìäùúîù á-"÷ùø" áî÷åí "òùä"
+is: notağu "tengja" í stağ "búa til"
+it: usare "link" invece di "create"
+fi: käytä "luo" toiminnon "liit&auml" sijaan
+fr: utilisez "relier" au lieu de "cr&eacute;er"
+lv: "izveidot" vietâ lietojiet "saite"
+nl: gebruik "konnektie" inplaats van "maken"
+no: bruk "koble" istedet for "opprett"
+pt: use "reunir" em lugar de "criar"
+ru: èñïîëüçóéòå "ñâÿçàòü" âìåñòî "ñîçäàòü"
+se: anv&auml;nd "l&auml;nk" ist&auml;llet f&ouml;r "skapa"
 
     warnings
 af: waarskuwings
