@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 4.3 2001-03-18 14:44:23 ddr Exp $ *)
+(* $Id: perso.ml,v 4.4 2001-03-31 04:46:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -328,6 +328,24 @@ value rec eval_variable conf base env sl =
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
         | None -> None ]
+    | ["related" :: sl] ->
+        match get_env "c" env with
+        [ Vind p a u ->
+            let ep = (p, a, u, age_autorise conf base p) in
+            loop ep efam sl
+        | _ -> None ]
+    | ["relation_her" :: sl] ->
+        match get_env "rel" env with
+        [ Vrel {r_moth = Some ip} ->
+            let ep = make_ep ip in
+            loop ep efam sl
+        | _ -> None ]
+    | ["relation_him" :: sl] ->
+        match get_env "rel" env with
+        [ Vrel {r_fath = Some ip} ->
+            let ep = make_ep ip in
+            loop ep efam sl
+        | _ -> None ]
     | ["self" :: sl] -> loop (p, a, u, p_auth) efam sl
     | ["spouse" :: sl] ->
         match efam with
@@ -647,40 +665,11 @@ value print_referer conf base env =
   Wserver.wprint "%s" (Wserver.extract_param "referer: " '\n' conf.request)
 ;
 
-value print_related conf base env =
-  match get_env "c" env with
-  [ Vind c _ _ ->
-      do Wserver.wprint "%s" (referenced_person_title_text conf base c);
-         Date.afficher_dates_courtes conf base c;
-      return ()
-  | _ -> () ]
-;
-
 value print_related_type conf base env =
   match (get_env "c" env, get_env "rel" env) with
   [ (Vind c _ _, Vrel r) ->
       Wserver.wprint "%s"
         (capitale (rchild_type_text conf r.r_type (index_of_sex c.sex)))
-  | _ -> () ]
-;
-
-value print_relation_her conf base env =
-  match get_env "rel" env with
-  [ Vrel {r_moth = Some ip} ->
-      let p = poi base ip in
-      do Wserver.wprint "%s" (referenced_person_title_text conf base p);
-         Date.afficher_dates_courtes conf base p;
-      return ()
-  | _ -> () ]
-;
-
-value print_relation_him conf base env =
-  match get_env "rel" env with
-  [ Vrel {r_fath = Some ip} ->
-      let p = poi base ip in
-      do Wserver.wprint "%s" (referenced_person_title_text conf base p);
-         Date.afficher_dates_courtes conf base p;
-      return ()
   | _ -> () ]
 ;
 
@@ -851,9 +840,6 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "public_name" -> print_public_name conf base env p p_auth
   | "qualifier" -> print_qualifier conf base env p p_auth
   | "referer" -> print_referer conf base env
-  | "related" -> print_related conf base env
-  | "relation_her" -> print_relation_her conf base env
-  | "relation_him" -> print_relation_him conf base env
   | "relation_type" -> print_relation_type conf base env
   | "related_type" -> print_related_type conf base env
   | "sosa" -> print_sosa conf base env p p_auth
