@@ -1,4 +1,4 @@
-(* $Id: i18n_check.ml,v 2.1 1999-03-08 11:18:46 ddr Exp $ *)
+(* $Id: i18n_check.ml,v 3.0 1999-10-29 10:31:19 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value usage () =

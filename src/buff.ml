@@ -1,4 +1,4 @@
-(* $Id: buff.ml,v 2.1 1999-08-14 09:26:38 ddr Exp $ *)
+(* $Id: buff.ml,v 3.0 1999-10-29 10:31:00 ddr Exp $ *)
 
 value buff = ref (String.create 80);
 

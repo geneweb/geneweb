@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_lock.ml,v 2.1 1999-03-08 11:19:01 ddr Exp $ *)
+(* $Id: pa_lock.ml,v 3.0 1999-10-29 10:31:27 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 EXTEND

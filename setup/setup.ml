@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.59 1999-10-28 16:11:46 ddr Exp $ *)
+(* $Id: setup.ml,v 3.0 1999-10-29 10:29:42 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 2.12 1999-10-04 08:51:33 ddr Exp $ *)
+(* $Id: history.ml,v 3.0 1999-10-29 10:31:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;

@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 2.6 1999-09-20 17:16:46 ddr Exp $ *)
+(* $Id: check.ml,v 3.0 1999-10-29 10:31:02 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;

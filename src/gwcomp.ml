@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 2.18 1999-09-29 13:58:32 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.0 1999-10-29 10:31:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;

@@ -1,4 +1,4 @@
-(* $Id: base64.ml,v 2.1 1999-03-08 11:18:23 ddr Exp $ *)
+(* $Id: base64.ml,v 3.0 1999-10-29 10:30:58 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 (* For basic credentials only *)
