@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.27 1999-09-18 03:43:54 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.28 1999-09-28 16:30:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -637,28 +637,35 @@ value output_command_line bname =
 
 value shift = ref 0;
 
+value speclist =
+  [("-c", Arg.Set just_comp, "Only compiling");
+   ("-o", Arg.String (fun s -> out_file.val := s),
+    "<file> Output data base (default: a.gwb)");
+   ("-stats", Arg.Set pr_stats, "Print statistics");
+   ("-nc", Arg.Clear do_check, "No consistency check");
+   ("-cg", Arg.Set do_consang, "Compute consanguinity");
+   ("-sh", Arg.Int (fun x -> shift.val := x),
+    "<int> Shift all persons numbers");
+   ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
+;
+
+value errmsg =
+  "Usage: gwc [options] [files]
+where [files] are a list of files:
+  source files end with .gw
+  object files end with .gwo
+and [options] are:"
+;
+
 value main () =
   let files = ref [] in
-  do Argl.parse
-       [("-c", Arg.Set just_comp, "Only compiling");
-        ("-o", Arg.String (fun s -> out_file.val := s),
-         "<file> Output data base (default: a.gwb)");
-        ("-stats", Arg.Set pr_stats, "Print statistics");
-        ("-nc", Arg.Clear do_check, "No consistency check");
-        ("-cg", Arg.Set do_consang, "Compute consanguinity");
-        ("-sh", Arg.Int (fun x -> shift.val := x),
-         "<int> Shift all persons numbers");
-        ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
+  do Argl.parse speclist
        (fun x ->
           do if Filename.check_suffix x ".gw" then ()
              else if Filename.check_suffix x ".gwo" then ()
              else raise (Arg.Bad ("Don't know what to do with \"" ^ x ^ "\""));
           return files.val := [(x, shift.val) :: files.val])
-       "Usage: gwc [options] [files]
-where [files] are a list of files:
-  source files end with .gw
-  object files end with .gwo
-and [options] are:";
+       errmsg;
   return
   let gwo = ref [] in
   do List.iter
