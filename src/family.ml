@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 1.9 1998-11-29 13:40:44 ddr Exp $ *)
+(* $Id: family.ml,v 1.10 1998-11-30 00:51:23 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -285,7 +285,7 @@ value family_m conf base =
   | Some "N" ->
       match p_getenv conf.env "v" with
       [ Some v -> Some.surname_print conf base v
-      | _ -> Alln.family_names_print conf base ]
+      | _ -> Alln.print_surnames conf base ]
   | Some "NG" ->
       match p_getenv conf.env "n" with
       [ Some n ->
@@ -308,7 +308,7 @@ value family_m conf base =
   | Some "P" ->
       match p_getenv conf.env "v" with
       [ Some v -> Some.first_name_print conf base v
-      | None -> Alln.first_names_print conf base ]
+      | None -> Alln.print_first_names conf base ]
   | Some "R" ->
       match find_person_in_env conf base "" with
       [ Some p -> Relation.print conf base p
