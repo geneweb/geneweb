@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: perso.txt,v 4.35 2004-12-30 21:20:05 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 4.36 2005-01-01 23:04:23 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>%nn;
     %if;has_public_name;
@@ -100,7 +100,7 @@
       <a href="%referer;"><img
        src="%image_prefix;/left.jpg"%wid_hei;left.jpg; alt="&lt;&lt;"%/></a>
     %end;
-    <a href="%prefix;"><img
+    <a href="%prefix;"><img%sp;
     src="%image_prefix;/up.jpg"%wid_hei;up.jpg; alt="^^"%/></a>
   </td></tr></table>
 %end;
