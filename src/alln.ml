@@ -1,11 +1,13 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.20 2005-03-02 13:05:19 ddr Exp $ *)
+(* $Id: alln.ml,v 4.21 2005-03-04 20:49:36 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Config;
 open Util;
 open Gutil;
+
+value default_max_cnt = 2000;
 
 (* tools *)
 
@@ -288,26 +290,30 @@ value print_alphabetic_small conf base is_surnames ini list len =
 value print_frequency_any conf base is_surnames list len =
   let title _ = print_title conf base is_surnames "" len in
   let mode = if is_surnames then "N" else "P" in
+  let n = ref 0 in
   do {
     header conf title;
     tag "ul" begin
       List.iter
         (fun (cnt, l) ->
-           tag "li" begin
-             Wserver.wprint "%d\n" cnt;
-             tag "ul" begin
-               List.iter
-                 (fun s ->
-                    stagn "li" begin
-                      stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
-                          (code_varenv (Name.lower s)) begin
-                        Wserver.wprint "%s"
-                          (alphab_string conf base is_surnames s);
-                      end;
-                    end)
-                 l;
-             end;
-           end)
+           if n.val > default_max_cnt then ()
+           else
+             tag "li" begin
+               Wserver.wprint "%d\n" cnt;
+               tag "ul" begin
+                 List.iter
+                   (fun s ->
+                      stagn "li" begin
+                        stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
+                            (code_varenv (Name.lower s)) begin
+                          Wserver.wprint "%s"
+                            (alphab_string conf base is_surnames s);
+                        end;
+                        incr n;
+                      end)
+                   l;
+               end;
+             end)
         list;
     end;
     trailer conf;
