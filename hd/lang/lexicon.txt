@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.68 2000-03-08 16:01:59 ddr Exp $
+# $Id: lexicon.txt,v 3.69 2000-03-08 17:43:53 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5122,6 +5122,7 @@ se: de senaste %d d&ouml;dsfallen
 
     the latest %d marriages
 de: die letzen %d Heiraten
+dk: de seneste %d gifterm&aring;l
 en: the latest %d marriages
 eo: la lastaj %d edzigxoj
 es: los %d casamientos m&aacute;s recientes
