@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.21 2001-03-07 21:33:04 ddr Exp $
+# $Id: Makefile,v 3.22 2001-03-10 15:38:14 ddr Exp $
 
 DESTDIR=distribution
 
@@ -62,9 +62,7 @@ new_distrib: classical_distrib
 	done
 	cp setup/gwsetup $(DESTDIR)/gw/gwsetup$(EXE)
 	for i in README LISEZMOI; do \
-	  echo "<pre>" > $(DESTDIR)/$$i.htm; \
-	  cat etc/$$i.distrib.txt >> $(DESTDIR)/$$i.htm; \
-	  echo "</pre>" >> $(DESTDIR)/$$i.htm; \
+	  cat etc/$$i.distrib.txt >> $(DESTDIR)/$$i.txt; \
 	done
 	cp LICENSE $(DESTDIR)/LICENSE.txt
 	cp etc/START.htm $(DESTDIR)/.
