@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.36 2000-03-08 14:35:35 ddr Exp $ *)
+(* $Id: util.ml,v 3.37 2000-03-22 12:47:29 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -481,7 +481,7 @@ value plus_decl s =
 value gen_decline conf wt s =
   let s1 = if s = "" then "" else " " ^ s in
   let len = String.length wt in
-  if wt.[len - 1] = ''' then
+  if len >= 1 && wt.[len - 1] = ''' then
     if String.length s > 0 && start_with_vowel s then
       nth_field wt 1 ^ decline 'n' s
     else nth_field wt 0 ^ decline 'n' s1

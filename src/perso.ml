@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.15 2000-03-11 18:55:49 ddr Exp $ *)
+(* $Id: perso.ml,v 3.16 2000-03-22 12:47:27 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -925,7 +925,7 @@ value print_occupation_dates conf base in_table p =
      | s ->
          if age_autorise conf base p then
            do open_area ();
-              Wserver.wprint "%s" (capitale s);
+              Wserver.wprint "%s\n" (capitale s);
            return ()
          else () ];
      if age_autorise conf base p then print_dates conf base open_area p
