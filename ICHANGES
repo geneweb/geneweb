@@ -15,7 +15,7 @@ GeneWeb Version 3.03
     other images (images accessed in directory "bd/images" or "hd/images").
     Other consequence: background images must *not* be put in bd/images/base
     directory.
-  - [5 Mar 00] In m=RL, added ability to add ";tab=on" or ";tab=off" to
+  - [05 Mar 00] In m=RL, added ability to add ";tab=on" or ";tab=off" to
     force printing with or without tables.
   - [23 Feb 00] Fixed bug: in notes, when "<a" and "href" were separated
     by a newline instead of space, it was not considered to be in the
