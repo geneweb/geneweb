@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.7 1999-03-25 11:18:08 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.8 1999-03-25 20:25:28 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -518,6 +518,7 @@ value unknown_fam gen i =
     {marriage = Adef.codate_None;
      marriage_place = empty;
      marriage_src = empty;
+     not_married = False;
      divorce = NotDivorced;
      children = [| |];
      comment = empty;
@@ -1106,21 +1107,25 @@ value add_fam gen r =
     let rl = find_all_fields "CHIL" r.rsons in
     List.map (fun r -> per_index gen r.rval) rl
   in
-  let (marr, marr_place, marr_src) =
+  let (not_married, marr, marr_place, marr_src) =
     match find_field "MARR" r.rsons with
     [ Some r ->
-        let d =
-          match find_field "DATE" r.rsons with
-          [ Some r -> date_of_field r.rpos r.rval
-          | _ -> None ]
-        in
-        let p =
+        let (u, p) =
           match find_field "PLAC" r.rsons with
-          [ Some r -> r.rval
-          | _ -> "" ]
+          [ Some r ->
+              if String.uncapitalize r.rval = "unmarried" then (True, "")
+              else (False, r.rval)
+          | _ -> (False, "") ]
         in
-        (d, p, source gen r)
-    | None -> (None, "", "") ]
+        let d =
+          if u then None
+          else
+            match find_field "DATE" r.rsons with
+            [ Some r -> date_of_field r.rpos r.rval
+            | _ -> None ]
+        in
+        (u, d, p, source gen r)
+    | None -> (False, None, "", "") ]
   in
   let div =
     match find_field "DIV" r.rsons with
@@ -1146,6 +1151,7 @@ value add_fam gen r =
     {marriage = Adef.codate_of_od marr;
      marriage_place = add_string gen marr_place;
      marriage_src = add_string gen marr_src;
+     not_married = not_married;
      divorce = div;
      children = Array.of_list children;
      comment = add_string gen comment; origin_file = empty;

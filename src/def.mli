@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 2.1 1999-03-08 11:18:33 ddr Exp $ *)
+(* $Id: def.mli,v 2.2 1999-03-25 20:25:33 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = Adef.iper;
@@ -87,6 +87,7 @@ type family 'person 'string =
   { marriage : mutable codate;
     marriage_place : mutable 'string;
     marriage_src : mutable 'string;
+    not_married : mutable bool;
     divorce : mutable divorce;
     children : mutable array 'person;
     comment : mutable 'string;

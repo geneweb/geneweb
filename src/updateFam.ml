@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.1 1999-03-08 11:19:19 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.2 1999-03-25 20:25:42 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -188,6 +188,12 @@ value print_marriage conf base fam =
          (capitale (transl_nth conf "marriage/marriages" 0));
      end;
      Wserver.wprint "\n";
+     Wserver.wprint "<input type=radio name=not_married value=false%s>"
+       (match fam.not_married with [ False -> " checked" | _ -> "" ]);
+     Wserver.wprint "%s\n" (capitale (transl conf "married"));
+     Wserver.wprint "<input type=radio name=not_married value=true%s>"
+       (match fam.not_married with [ True -> " checked" | _ -> "" ]);
+     Wserver.wprint "%s\n" (capitale (transl conf "not married"));
      tag "table" "border=1" begin
        tag "tr" begin
          tag "td" begin
@@ -214,18 +220,14 @@ value print_divorce conf base fam =
        Wserver.wprint "%s" (capitale (transl_nth conf "divorce" 0));
      end;
      Wserver.wprint "\n";
+     Wserver.wprint
+       "<input type=radio name=divorce value=not_divorced%s>"
+       (match fam.divorce with [ NotDivorced -> " checked" | _ -> "" ]);
+     Wserver.wprint "%s\n" (capitale (transl conf "not divorced"));
+     Wserver.wprint "<input type=radio name=divorce value=divorced%s>"
+       (match fam.divorce with [ Divorced _ -> " checked" | _ -> "" ]);
+     Wserver.wprint "%s\n" (capitale (transl conf "divorced"));
      tag "table" "border=1" begin
-       tag "tr" begin
-         tag "tr" "colspan=3" begin
-           Wserver.wprint
-             "<input type=radio name=divorce value=not_divorced%s>"
-             (match fam.divorce with [ NotDivorced -> " checked" | _ -> "" ]);
-           Wserver.wprint "%s\n" (capitale (transl conf "not divorced"));
-           Wserver.wprint "<input type=radio name=divorce value=divorced%s>"
-             (match fam.divorce with [ Divorced _ -> " checked" | _ -> "" ]);
-           Wserver.wprint "%s\n" (capitale (transl conf "divorced"));
-         end;
-       end;
        Update.print_date conf base (capitale (transl conf "date")) "divorce"
          (match fam.divorce with
           [ Divorced d -> Adef.od_of_codate d
@@ -487,7 +489,7 @@ value print_add conf base =
   in
   let fam =
     {marriage = Adef.codate_None; marriage_place = "";
-     marriage_src = "";
+     marriage_src = ""; not_married = False;
      divorce = NotDivorced; children = [| |];
      comment = ""; origin_file = ""; fsources = "";
      fam_index = bogus_family_index}
@@ -503,7 +505,7 @@ value print_add_parents conf base =
       let p = base.data.persons.get i in
       let fam =
         {marriage = Adef.codate_None; marriage_place = "";
-         marriage_src = "";
+         marriage_src = ""; not_married = False;
          divorce = NotDivorced;
          children =
            [| (sou base p.first_name, sou base p.surname, p.occ, Link) |];
