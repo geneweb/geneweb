@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.52 1999-09-21 16:55:47 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.53 1999-10-05 17:04:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -288,7 +288,7 @@ value next_generation base mark gpl =
 
 value wpr s = Wserver.wprint "%s" s;
 
-value print_generation_person conf base gp =
+value print_generation_person conf base cnt gp =
   match gp with
   [ GP_person n ip _ ->
       let p = poi base ip in
@@ -298,6 +298,7 @@ value print_generation_person conf base gp =
          afficher_personne_titre_referencee conf base p;
          Date.afficher_dates_courtes conf base p;
          Wserver.wprint "\n";
+         incr cnt;
       return ()
   | GP_same n1 n2 ip ->
       let p = poi base ip in
@@ -346,12 +347,13 @@ value will_print =
 
 value afficher_ascendants_numerotation conf base niveau_max p =
   let mark = Array.create (base.data.persons.len) Num.zero in
+  let cnt = ref 0 in
   let rec generation niveau gpl =
     if niveau <= niveau_max then
       do html_li conf;
          Wserver.wprint "%s %d\n" (capitale (transl conf "generation")) niveau;
          tag "ul" begin
-           List.iter (print_generation_person conf base) gpl;
+           List.iter (print_generation_person conf base cnt) gpl;
          end;
       return
       let gpl = next_generation base mark gpl in
@@ -369,6 +371,9 @@ value afficher_ascendants_numerotation conf base niveau_max p =
        mark.(Adef.int_of_iper p.cle_index) := Num.one;
        generation 1 [GP_person Num.one p.cle_index None];
      end;
+     html_p conf;
+     Wserver.wprint "%s: %d %s" (capitale (transl conf "total")) cnt.val
+       (transl_nth conf "person/persons" 1);
      trailer conf;
   return ()
 ;
@@ -823,6 +828,7 @@ value print_ancestors_same_time_descendants conf base p a =
     | _ -> False ]
   in
   let mark = Array.create (base.data.persons.len) Num.zero in
+  let cnt = ref 0 in
   let rec generation niveau gpl =
     if List.exists will_print gpl then
       do html_li conf;
@@ -830,7 +836,7 @@ value print_ancestors_same_time_descendants conf base p a =
          tag "ul" begin
            List.iter
               (fun gp ->
-                 if will_print gp then print_generation_person conf base gp
+                 if will_print gp then print_generation_person conf base cnt gp
                  else ())
                gpl;
          end;
@@ -861,6 +867,7 @@ value print_ancestors_same_time_descendants conf base p a =
 
 value afficher_ascendants_niveau conf base niveau_max p =
   let mark = Array.create (base.data.persons.len) Num.zero in
+  let cnt = ref 0 in
   let rec generation niveau gpl =
     do for i = 0 to base.data.persons.len - 1 do
          mark.(i) := Num.zero;
@@ -903,7 +910,7 @@ value afficher_ascendants_niveau conf base niveau_max p =
       do html_li conf;
          Wserver.wprint "%s\n" (capitale (text_level conf niveau_max));
          tag "ul" begin
-           List.iter (print_generation_person conf base) gpl;
+           List.iter (print_generation_person conf base cnt) gpl;
          end;
       return ()
   in
