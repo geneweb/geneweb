@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.2 1999-03-16 18:37:18 ddr Exp $ *)
+(* $Id: util.ml,v 2.3 1999-03-19 15:02:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -781,23 +781,63 @@ value image_file_name bname str =
   else fname3
 ;
 
+value gif_image_size ic =
+  let magic =
+    let s = String.create 4 in
+    do really_input ic s 0 4; return s
+  in
+  if magic = "GIF8" then
+    do seek_in ic 6; return
+    let wid = let x = input_byte ic in input_byte ic * 256 + x in
+    let hei = let x = input_byte ic in input_byte ic * 256 + x in
+    Some (wid, hei)
+  else None
+;
+
+value jpeg_image_size ic =
+  let magic =
+    let str = String.create 10 in
+    do really_input ic str 0 10; return str
+  in
+  if Char.code magic.[0] = 0xff && Char.code magic.[1] = 0xd8
+  && String.sub magic 6 4 = "JFIF" then
+    loop () where rec loop () =
+      do while Char.code (input_char ic) <> 0xFF do done; return
+      let ch =
+        loop (input_char ic) where rec loop ch =
+          if Char.code ch = 0xFF then loop (input_char ic)
+          else ch
+      in
+      if Char.code ch >= 0xC0 && Char.code ch <= 0xC3 then
+        do for i = 1 to 3 do let _ = input_char ic in (); done; return
+        let a = input_char ic in
+        let b = input_char ic in
+        let c = input_char ic in
+        let d = input_char ic in
+        let wid = (Char.code c lsl 8) lor (Char.code d) in
+        let hei = (Char.code a lsl 8) lor (Char.code b) in
+        Some (wid, hei)
+      else
+        let a = input_char ic in
+        let b = input_char ic in
+        let len = (Char.code a lsl 8) lor (Char.code b) in
+        if len < 2 then None
+        else
+          do for i = 1 to len - 2 do let _ = input_char ic in (); done;
+          return if Char.code ch <> 0xDA then loop () else None
+  else None
+;
+
 value image_size fname =
   match try Some (open_in_bin fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let r =
         try
-          let magic =
-            let s = String.create 4 in
-            do really_input ic s 0 4; return s
-          in
-          if magic = "GIF8" then
-            do seek_in ic 6; return
-            let wid = let x = input_byte ic in input_byte ic * 256 + x in
-            let hei = let x = input_byte ic in input_byte ic * 256 + x in
-            Some (wid, hei)
-          else None
+          let sz = gif_image_size ic in
+          if sz = None then do seek_in ic 0; return jpeg_image_size ic
+          else sz
         with
-        [ Sys_error _ | End_of_file -> None ]
+        [ End_of_file -> None ]
       in
       do close_in ic; return r
   | None -> None ]
