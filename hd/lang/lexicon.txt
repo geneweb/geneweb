@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.87 2002-04-11 07:48:58 ddr Exp $
+# $Id: lexicon.txt,v 4.88 2002-04-11 08:27:48 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -1314,8 +1314,8 @@ no: avansert s&oslash;k
 pl: wyszukiwanie zaawansowane
 pt: pesquisa complexa
 ru: расширенный запрос
-sv: avancerad s&ouml;kning
 sl: napredno iskanje
+sv: avancerad s&ouml;kning
 zh: ЄяЉґЈ√ќ «л«у
 
     after
