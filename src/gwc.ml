@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.30 1999-09-29 13:58:31 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.31 1999-10-06 08:47:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -403,8 +403,7 @@ value insert_notes fname gen key str =
   let occ = key.pk_occ + gen.g_shift in
   match
     try
-      Some
-        (find_person_by_name gen key.pk_first_name key.pk_surname occ)
+      Some (find_person_by_name gen key.pk_first_name key.pk_surname occ)
     with [ Not_found -> None ]
   with
   [ Some ip ->
@@ -518,7 +517,8 @@ value pr_stats = ref False;
 
 value cache_of tab =
   let c =
-    {array = fun _ -> tab; get = fun []; len = Array.length tab}
+    {array = fun _ -> tab; get = fun []; len = Array.length tab;
+     clear_array = fun _ -> ()}
   in
   do c.get := fun i -> (c.array ()).(i); return c
 ;
@@ -650,6 +650,7 @@ value speclist =
    ("-cg", Arg.Set do_consang, "Compute consanguinity");
    ("-sh", Arg.Int (fun x -> shift.val := x),
     "<int> Shift all persons numbers");
+   ("-mem", Arg.Set Iobase.save_mem, " Save memory, but slower");
    ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
 ;
 

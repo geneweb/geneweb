@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 2.21 1999-10-05 11:59:59 ddr Exp $ *)
+(* $Id: iobase.ml,v 2.22 1999-10-06 08:47:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -390,12 +390,16 @@ value check_magic =
 
 value make_cache ic ic_acc shift array_pos patches len name =
   let tab = ref None in
-  let r = {array = fun []; get = fun []; len = patch_len len patches.val} in
+  let cleared = ref False in
+  let r =
+    {array = fun []; get = fun []; len = patch_len len patches.val;
+     clear_array = fun _ -> do cleared.val := True; return tab.val := None}
+  in
   let array () =
     match tab.val with
     [ Some x -> x
     | None ->
-do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush stderr; return () else (); return
+do ifdef UNIX then do Printf.eprintf "*** read %s%s\n" name (if cleared.val then " (again)" else ""); flush stderr; return () else (); return
         do seek_in ic array_pos; return
         let t = apply_patches (input_value ic) patches.val r.len in
         do tab.val := Some t; return t ]
@@ -418,7 +422,10 @@ do ifdef UNIX then do Printf.eprintf "*** read %s\n" name; flush stderr; return 
 
 value make_cached ic ic_acc shift array_pos patches len cache_htab name =
   let tab = ref None in
-  let r = {array = fun []; get = fun []; len = patch_len len patches.val} in
+  let r =
+    {array = fun []; get = fun []; len = patch_len len patches.val;
+     clear_array = fun _ -> tab.val := None}
+  in
   let array () =
     match tab.val with
     [ Some x -> x
@@ -845,6 +852,8 @@ do Printf.eprintf "old_pos %d new_pos %d shift %d\n" beg_pos (pos_out oc) shift;
   return ()
 ;
 
+value save_mem = ref False;
+
 value gen_output no_patches bname base =
   let bname =
     if Filename.check_suffix bname ".gwb" then bname
@@ -914,6 +923,7 @@ value gen_output no_patches bname base =
        output_binary_int oc families_array_pos;
        output_binary_int oc couples_array_pos;
        output_binary_int oc strings_array_pos;
+       base.data.families.clear_array ();
        close_out oc;
        close_out oc_acc;
        if not no_patches then
@@ -923,6 +933,12 @@ value gen_output no_patches bname base =
 do Printf.eprintf "*** create name index\n"; flush stderr; return
            do output_binary_int oc_inx 0;
 	      create_name_index oc_inx base;
+              base.data.ascends.clear_array ();
+              base.data.couples.clear_array ();
+              if save_mem.val then
+do Printf.eprintf "*** compacting\n"; flush stderr; return
+                Gc.compact ()
+              else ();
 	      let surname_or_first_name_pos = pos_out oc_inx in
 do Printf.eprintf "*** create strings of fsname\n"; flush stderr; return
 	      do create_strings_of_fsname oc_inx base;
@@ -930,11 +946,24 @@ do Printf.eprintf "*** create strings of fsname\n"; flush stderr; return
 		 output_binary_int oc_inx surname_or_first_name_pos;
 		 close_out oc_inx;
               return ();
+              if save_mem.val then
+do Printf.eprintf "*** compacting\n"; flush stderr; return
+                Gc.compact ()
+              else ();
 do Printf.eprintf "*** create string index\n"; flush stderr; return
               output_strings_hash oc2 base;
+              if save_mem.val then
+do Printf.eprintf "*** compacting\n"; flush stderr; return
+                Gc.compact ()
+              else ();
               let surname_pos = pos_out oc2 in
 do Printf.eprintf "*** create surname index\n"; flush stderr; return
-              do output_surname_index oc2 base; return
+              do output_surname_index oc2 base;
+                 if save_mem.val then
+do Printf.eprintf "*** compacting\n"; flush stderr; return
+                   Gc.compact ()
+                 else ();
+              return
               let first_name_pos = pos_out oc2 in
 do Printf.eprintf "*** create first name index\n"; flush stderr; return
               do output_first_name_index oc2 base;

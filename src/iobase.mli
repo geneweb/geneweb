@@ -1,4 +1,4 @@
-(* $Id: iobase.mli,v 2.4 1999-10-04 18:39:16 ddr Exp $ *)
+(* $Id: iobase.mli,v 2.5 1999-10-06 08:47:55 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -12,3 +12,5 @@ value gen_output : bool -> string -> base -> unit;
 value lock_file : string -> string;
 
 value name_key : string -> string;
+
+value save_mem : ref bool;

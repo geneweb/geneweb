@@ -1,4 +1,4 @@
-(* $Id: consangAll.ml,v 2.1 1999-05-23 09:51:59 ddr Exp $ *)
+(* $Id: consangAll.ml,v 2.2 1999-10-06 08:47:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -37,22 +37,33 @@ value trace quiet cnt max_cnt =
 value compute base from_scratch quiet =
   let _ = base.data.ascends.array () in
   let _ = base.data.couples.array () in
-  let _ = base.data.families.array () in
   let tab =
     Consang.make_relationship_table base (Consang.topological_sort base)
   in
+  let consang_tab = Array.create base.data.families.len no_consang in
   let cnt = ref 0 in
   do if not from_scratch then
        let mark = Array.create base.data.ascends.len False in
-       List.iter
-         (fun ip ->
-            let p = poi base ip in
-            Array.iter (clear_descend_consang base mark) p.family)
-         (base.func.patched_ascends ())
+       match base.func.patched_ascends () with
+       [ [] -> ()
+       | list ->
+           let _ = base.data.families.array () in
+           do List.iter
+                (fun ip ->
+                   let p = poi base ip in
+                   Array.iter (clear_descend_consang base mark) p.family)
+                list;
+              base.data.families.clear_array ();
+           return () ]
      else ();
      for i = 0 to base.data.ascends.len - 1 do
        let a = base.data.ascends.get i in
-       do if from_scratch then a.consang := no_consang else (); return
+       do if from_scratch then a.consang := no_consang
+          else
+            match a.parents with
+            [ Some ifam -> consang_tab.(Adef.int_of_ifam ifam) := a.consang
+            | None -> () ];
+       return
        if a.consang == no_consang then incr cnt else ();
      done;
   return
@@ -74,42 +85,45 @@ value compute base from_scratch quiet =
          if a.consang == no_consang then
            match a.parents with
            [ Some ifam ->
-               let cpl = coi base ifam in
-               let fath = aoi base cpl.father in
-               let moth = aoi base cpl.mother in
-               if fath.consang != no_consang && moth.consang != no_consang then
-                 let consang = relationship base tab cpl.father cpl.mother in
-                 let fix_consang = Adef.fix_of_float consang in
-                 let fam = foi base ifam in
-                 for i = 0 to Array.length fam.children - 1 do
-                   let ip = Array.unsafe_get fam.children i in
-                   let a = aoi base ip in
-                   if a.consang == no_consang then
-                     do trace quiet cnt.val max_cnt;
-                        decr cnt;
-                        a.consang := fix_consang;
-                        if not quiet then
-                          let better =
-                            match most.val with
-                            [ Some m -> a.consang > m.consang
-                            | None -> True ]
-                          in
-                          if better then
-                            do Printf.eprintf
-                                 "\nMax consanguinity %g for %s... "
-                                 consang (denomination base (poi base ip));
-                               flush stderr;
-                            return most.val := Some a
-                          else ()
-                        else ();
-                     return ()
-                   else ();
-                 done
-               else running.val := True
+               let pconsang = consang_tab.(Adef.int_of_ifam ifam) in
+               if pconsang == no_consang then
+                 let cpl = coi base ifam in
+                 let fath = aoi base cpl.father in
+                 let moth = aoi base cpl.mother in
+                 if fath.consang != no_consang && moth.consang != no_consang
+                 then
+                   let consang = relationship base tab cpl.father cpl.mother in
+                   do trace quiet cnt.val max_cnt;
+                      decr cnt;
+                      a.consang := Adef.fix_of_float consang;
+                      consang_tab.(Adef.int_of_ifam ifam) := a.consang;
+                      if not quiet then
+                        let better =
+                          match most.val with
+                          [ Some m -> a.consang > m.consang
+                          | None -> True ]
+                        in
+                        if better then
+                          do Printf.eprintf
+                               "\nMax consanguinity %g for %s... "
+                               consang
+                               (denomination base (base.data.persons.get i));
+                             flush stderr;
+                          return most.val := Some a
+                        else ()
+                      else ();
+                   return ()
+                 else running.val := True
+               else
+                 do trace quiet cnt.val max_cnt;
+                    decr cnt;
+                    a.consang := pconsang;
+                 return ()
            | None ->
                do trace quiet cnt.val max_cnt;
                   decr cnt;
-               return a.consang := Adef.fix_of_float 0.0 ]
+                  a.consang := Adef.fix_of_float 0.0;
+               return () ]
          else ();
        done;
      done;

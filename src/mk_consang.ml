@@ -1,15 +1,17 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 2.8 1999-09-17 06:29:56 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 2.9 1999-10-06 08:47:56 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 value fname = ref "";
 value scratch = ref False;
 value quiet = ref False;
 
-value usage = "usage: " ^ Sys.argv.(0) ^ " [-scratch] <file_name>";
+value usage = "usage: " ^ Sys.argv.(0) ^ " [options] <file_name>";
 value speclist =
   [("-q", Arg.Set quiet, ": quiet mode");
    ("-scratch", Arg.Set scratch, ": from scratch");
+   ("-mem", Arg.Set Iobase.save_mem,
+    ": Save memory, but slower when rewritting data base");
    ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
 ;
 

@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 2.13 1999-09-28 20:11:20 ddr Exp $ *)
+(* $Id: def.mli,v 2.14 1999-10-06 08:47:53 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 type iper = Adef.iper;
@@ -136,7 +136,8 @@ type notes =
 type cache 'a =
   { array : mutable unit -> array 'a;
     get : mutable int -> 'a;
-    len : mutable int }
+    len : mutable int;
+    clear_array : unit -> unit }
 ;
 
 type istr_iper_index =
