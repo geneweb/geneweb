@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 3.5 2000-05-02 17:15:45 doligez Exp $ *)
+(* $Id: robot.ml,v 3.6 2000-05-02 17:28:05 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -14,13 +14,11 @@ type excl =
     max_conn : mutable (int * string) }
 ;
 
-value nl () = Wserver.wprint "\013\010";
-
 value robot_error cgi from cnt sec =
   do if cgi then ()
-     else do Wserver.wprint "HTTP/1.0 403 Forbidden"; nl (); return ();
-     Wserver.wprint "Content-type: text/html; charset=iso-8859-1"; nl ();
-     nl ();
+     else do Wserver.wprint "HTTP/1.0 403 Forbidden"; Util.nl (); return ();
+     Wserver.wprint "Content-type: text/html; charset=iso-8859-1"; Util.nl ();
+     Util.nl ();
      let env = [('c', string_of_int cnt); ('s', string_of_int sec)] in
      match open_etc_file "robot" with
      [ Some ic -> copy_from_etc env "geneweb" ic

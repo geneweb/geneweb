@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.27 2000-05-02 17:15:45 doligez Exp $ *)
+(* $Id: gwd.ml,v 3.28 2000-05-02 17:28:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -92,10 +92,6 @@ value log_passwd_failed passwd uauth oc tm from request base_file =
   return ()
 ;
 
-value nl () =
-  Wserver.wprint "\013\010"
-;
-
 value copy_file fname =
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -117,9 +113,9 @@ value refuse_log from cgi =
      Printf.fprintf oc " excluded: %s\n" from;
      close_out oc;
      if not cgi then
-       do Wserver.wprint "HTTP/1.0 403 Forbidden"; nl (); return ()
+       do Wserver.wprint "HTTP/1.0 403 Forbidden"; Util.nl (); return ()
      else ();
-     Wserver.wprint "Content-type: text/html"; nl (); nl ();
+     Wserver.wprint "Content-type: text/html"; Util.nl (); Util.nl ();
      Wserver.wprint "Your access has been disconnected by administrator.\n";
      copy_file "refuse.txt";
   return ()
@@ -134,7 +130,7 @@ value only_log from cgi =
      flush_log oc;
      if cgi then
        do Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
-          nl (); nl ();
+          Util.nl (); Util.nl ();
        return ()
      else Wserver.html "";
      Wserver.wprint "<head><title>Invalid access</title></head>\n";
@@ -387,9 +383,9 @@ value general_welcome conf =
 ;
 
 value unauth bname typ =
-  do Wserver.wprint "HTTP/1.0 401 Unauthorized"; nl ();
+  do Wserver.wprint "HTTP/1.0 401 Unauthorized"; Util.nl ();
      Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ bname;
-     nl (); nl ();
+     Util.nl (); Util.nl ();
      Wserver.wprint "<head><title>%s %s access failed</title></head>\n"
        typ bname;
      Wserver.wprint "<body><h1>%s %s access failed</h1></body>\n" typ bname;
