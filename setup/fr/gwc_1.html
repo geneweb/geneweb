@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 1999 - GeneWeb -->
+<head><title>Cr&eacute;ation d'une base de donn&eacute;es</title></head>
+
+<body>
+
+<h1>Cr&eacute;ation d'une base de donn&eacute;es</h1>
+
+$v{Attention: il existe d&eacute;j&agrave; une base de nom "$o" dans
+votre <a
+href="setup?lang=$l;v=list.html">r&eacute;pertoire</a>. Si vous
+appuyez sur le bouton "Ok" ci-dessous, cela va l'effacer.<p>
+
+Si vous venez d&eacute;j&agrave; de faire cette manipulation, il
+s'agit probablement de son r&eacute;sultat, ce n'est donc pas
+grave. Sinon, revenez en arri&egrave;re et choisissez un autre nom
+pour votre base.<p>}
+
+Nous allons cr&eacute;er une base de nom "$o". Remarque: cette
+op&eacute;ration peut s'effectuer en un clin d'oeil ou prendre
+quelques dizaines de secondes ou quelques minutes, suivant les
+cas. Soyez patient.
+
+<p>
+
+Appuyez sur le bouton ci-dessous pour cr&eacute;er votre base de
+donn&eacute;es$v{ et &eacute;craser la base "$o" du r&eacute;pertoire
+d'arriv&eacute;e}:
+
+<p>
+
+<form mode=GET action="gwc_1">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+Pour information, cette op&eacute;ration correspond &agrave; la suite
+des commandes suivantes:
+
+<pre>
+     $$ cd $w
+     $$ $c$p &gt; comm.log
+</pre>
+
+Cela fabriquera un r&eacute;pertoire de nom "$o.gwb".

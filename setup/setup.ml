@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.25 1999-05-13 08:23:11 ddr Exp $ *)
+(* $Id: setup.ml,v 1.26 1999-05-15 11:08:16 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = "en";
@@ -396,6 +396,16 @@ value error str =
   return ()
 ;
 
+value exec_f comm =
+  let s = comm ^ " > " ^ "comm.log" in
+  do Printf.eprintf "$ cd %s\n" (Sys.getcwd ());
+     flush stderr;
+     Printf.eprintf "$ %s\n" s;
+     flush stderr;
+  return
+  Sys.command s
+;
+
 value good_name s =
   loop 0 where rec loop i =
     if i = String.length s then True
@@ -454,7 +464,7 @@ value simple conf =
   else print_file conf "base_out.html"
 ;
 
-value gwc_or_ged2gwb_check out_name_of_in_name conf =
+value gwc_or_ged2gwb out_name_of_in_name apply conf =
   let in_file =
     match p_getenv conf.env "anon" with
     [ Some f -> strip_spaces f
@@ -473,11 +483,26 @@ value gwc_or_ged2gwb_check out_name_of_in_name conf =
   else if not (Sys.file_exists in_file) then
     print_file conf "err_unknown.html"
   else if not (good_name out_file) then print_file conf "err_name.html"
-  else print_file conf "base_out.html"
+  else print_file conf apply
 ;
 
-value gwc_check = gwc_or_ged2gwb_check out_name_of_gw;
-value ged2gwb_check = gwc_or_ged2gwb_check out_name_of_ged;
+value gwc = gwc_or_ged2gwb out_name_of_gw "gwc_1.html";
+value ged2gwb_check = gwc_or_ged2gwb out_name_of_ged "base_out.html";
+
+value gwc_1 conf =
+  let rc =
+    exec_f (Filename.concat "." "gwc" ^ parameters conf.env)
+  in
+  let rc = ifdef WIN95 then infer_rc conf rc else rc in
+  do let gwo = strip_spaces (s_getenv conf.env "anon") ^ "o" in
+     try Sys.remove gwo with [ Sys_error _ -> () ];
+     Printf.eprintf "\n";
+     flush stderr;
+  return
+  if rc = 1 then print_file conf "warnings.html"
+  else if rc > 1 then print_file conf "base_out_err.html"
+  else print_file conf "base_out_ok.html"
+;
 
 value gwu_or_gwb2ged_check suffix conf =
   let in_file =
@@ -505,16 +530,6 @@ value gwu_or_gwb2ged_check suffix conf =
 
 value gwu = gwu_or_gwb2ged_check ".gw";
 value gwb2ged = gwu_or_gwb2ged_check ".ged";
-
-value exec_f comm =
-  let s = comm ^ " > " ^ "comm.log" in
-  do Printf.eprintf "$ cd %s\n" (Sys.getcwd ());
-     flush stderr;
-     Printf.eprintf "$ %s\n" s;
-     flush stderr;
-  return
-  Sys.command s
-;
 
 value gwb2ged_or_gwu_1 ok_file conf =
   let rc =
@@ -587,9 +602,15 @@ value recover conf =
   let (init_dir, dir_has_gwu) =
     if has_gwu init_dir then (init_dir, True)
     else
-      let dir = Filename.dirname init_dir in
+      let dir = Filename.concat init_dir "gw" in
       if has_gwu dir then (dir, True)
-      else (init_dir, False)
+      else
+        let dir = Filename.dirname init_dir in
+        if has_gwu dir then (dir, True)
+        else
+          let dir = Filename.concat dir "gw" in
+          if has_gwu dir then (dir, True)
+          else (init_dir, False)
   in
   let conf = conf_with_env conf "anon" init_dir in
   let dest_dir = Sys.getcwd () in
@@ -1073,10 +1094,8 @@ value setup_comm conf =
   | "rename" -> rename conf
   | "delete" -> delete conf
   | "delete_1" -> delete_1 conf
-  | "gwc" ->
-      match p_getenv conf.env "opt" with
-      [ Some "check" -> gwc_check conf
-      | _ -> exec_command_out conf ]
+  | "gwc" -> gwc conf
+  | "gwc_1" -> gwc_1 conf
   | "gwu" ->
       match p_getenv conf.env "opt" with
       [ Some "check" -> gwu conf
