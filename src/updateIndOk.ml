@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.25 1999-08-30 23:55:49 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.26 1999-09-23 22:19:13 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -622,21 +622,23 @@ value print_add conf base =
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       try
-        let (p, ext) = reconstitute_person conf in
+        let (sp, ext) = reconstitute_person conf in
         let redisp =
           match p_getenv conf.env "return" with
           [ Some "on" -> True
           | _ -> False ]
         in
-        if ext || redisp then UpdateInd.print_add1 conf base p
+        if ext || redisp then UpdateInd.print_add1 conf base sp
         else
-          do strip_person p; return
-          match check_person conf base p with
-          [ Some err -> error_person conf base p err
+          do strip_person sp; return
+          match check_person conf base sp with
+          [ Some err -> error_person conf base sp err
           | None ->
-              let (p, a) = effective_add conf base p in
+              let (p, a) = effective_add conf base sp in
               let wl = all_checks_person conf base p a in
+              let k = (sp.first_name, sp.surname, sp.occ) in
               do base.func.commit_patches ();
+                 History.record conf base k "ap";
                  print_add_ok conf base wl p;
               return () ]
       with
@@ -651,9 +653,11 @@ value print_del conf base =
       match p_getint conf.env "i" with
       [ Some i ->
           let p = base.data.persons.get i in
+          let k = (sou base p.first_name, sou base p.surname, p.occ) in
           do effective_del conf base p;
              base.func.patch_person p.cle_index p;
              base.func.commit_patches ();
+             History.record conf base k "dp";
              print_del_ok conf base [];
           return ()
       | _ -> incorrect_request conf ]
@@ -686,15 +690,17 @@ value print_mod_aux conf base callback =
 ;
 
 value print_mod conf base =
-  let callback p =
-    let p = effective_mod conf base p in
+  let callback sp =
+    let p = effective_mod conf base sp in
     do base.func.patch_person p.cle_index p;
        Update.update_misc_names_of_family base p;
     return
     let wl =
       all_checks_person conf base p (aoi base p.cle_index)
     in
+    let k = (sp.first_name, sp.surname, sp.occ) in
     do base.func.commit_patches ();
+       History.record conf base k "mp";
        print_mod_ok conf base wl p;
     return ()
   in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.25 1999-09-17 18:15:23 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.26 1999-09-23 22:19:12 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -571,7 +571,9 @@ value print_add conf base =
           do strip_family sfam; return
           let (fam, cpl) = effective_add conf base sfam scpl in
           let wl = all_checks_family conf base fam cpl in
+          let (fn, sn, occ, _) = scpl.father in
           do base.func.commit_patches ();
+             History.record conf base (fn, sn, occ) "af";
              delete_topological_sort conf base;
              print_add_ok conf base wl fam cpl;
           return ()
@@ -587,9 +589,15 @@ value print_del conf base =
       match p_getint conf.env "i" with
       [ Some i ->
           let fam = foi base (Adef.ifam_of_int i) in
+          let k =
+            let cpl = coi base (Adef.ifam_of_int i) in
+            let p = poi base cpl.father in
+            (sou base p.first_name, sou base p.surname, p.occ)
+          in
           do if not (is_deleted_family fam) then
                do effective_del conf base fam;
                   base.func.commit_patches ();
+                  History.record conf base k "df";
                   delete_topological_sort conf base;
                return ()
              else ();
@@ -626,7 +634,9 @@ value print_mod conf base =
   let callback sfam scpl =
     let (fam, cpl) = effective_mod conf base sfam scpl in
     let wl = all_checks_family conf base fam cpl in
+    let (fn, sn, occ, _) = scpl.father in
     do base.func.commit_patches ();
+       History.record conf base (fn, sn, occ) "mf";
        delete_topological_sort conf base;
        print_mod_ok conf base wl fam cpl;
     return ()
@@ -641,9 +651,11 @@ value print_swi conf base =
       match (p_getint conf.env "i", p_getint conf.env "f") with
       [ (Some ip, Some ifam)  ->
           let p = base.data.persons.get ip in
+          let k = (sou base p.first_name, sou base p.surname, p.occ) in
           try
             do effective_swi conf base p (Adef.ifam_of_int ifam);
                base.func.commit_patches ();
+               History.record conf base k "sf";
                print_swi_ok conf base p;
             return ()
           with [ Update.ModErr -> () ]
