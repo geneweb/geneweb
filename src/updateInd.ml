@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.21 2000-12-19 16:44:54 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.22 2000-12-25 11:59:58 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -604,7 +604,8 @@ value if_propose conf base var f p proj =
     try List.assoc ("propose_" ^ var) conf.base_env <> "no" with
     [ Not_found -> True ]
   in
-  if propose_var then do f conf base p; Wserver.wprint "\n"; return ()
+  if propose_var || proj <> [] then
+    do f conf base p; Wserver.wprint "\n"; return ()
   else
     let _ = List.fold_left
       (fun i_cnt a ->
