@@ -1,4 +1,4 @@
-(* $Id: util.ml,v 1.12 1998-11-21 10:54:13 ddr Exp $ *)
+(* $Id: util.ml,v 1.13 1998-11-25 09:32:58 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -38,7 +38,13 @@ value charset_of_ansel conf s =
   else ansel_to_ascii s
 ;
 
+value ansel_of_charset conf s =
+  if conf.charset = "iso-8859-1" then Ansel.of_iso_8859_1 s
+  else s
+;
+
 value coa = charset_of_ansel;
+value aoc = ansel_of_charset;
 
 value nl () = Wserver.wprint "\r\n";
 
