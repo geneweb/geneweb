@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.54 2000-08-12 19:18:41 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.55 2000-08-25 04:04:15 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -850,53 +850,55 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
   let (conf, sleep, passwd_err) =
     make_conf cgi from (addr, request) script_name contents env
   in
-  let (auth_err, auth) =
-    if conf.auth_file = "" then (False, "")
-    else if cgi then (True, "")
-    else auth_err request conf.auth_file
-  in
-  match (cgi, auth_err, passwd_err) with
-  [ (True, True, _) ->
-      if is_robot from then Robot.robot_error cgi from 0 0 else no_access conf
-  | (_, True, _) ->
-      if is_robot from then Robot.robot_error cgi from 0 0
-      else
-        let auth_type =
-          let x =
-            try List.assoc "auth_file" conf.base_env with
-            [ Not_found -> "" ]
-          in
-          if x = "" then "GeneWeb service" else "data base " ^ conf.bname
-        in
-        refuse_auth conf from auth auth_type
-  | (_, _, Some (passwd, uauth, base_file)) ->
-      if is_robot from then
-        Robot.robot_error cgi from 0 0
-      else
-        let tm = Unix.time () in
-        do lock_wait Srcfile.adm_file "gwd.lck" with
-           [ Accept ->
-               let oc = log_oc () in
-               do log_passwd_failed passwd uauth oc tm from request base_file;
-                  flush_log oc;
-               return ()
-           | Refuse ->
-               () ];
-           unauth base_file (if passwd = "w" then "Wizard" else "Friend");
-        return ()
-  | _ ->
-      let mode = Util.p_getenv conf.env "m" in
-      do if mode <> Some "IM" then
-           log_and_robot_check conf auth from request script_name contents
-         else ();
-         match mode with
-         [ Some "DOC" -> Doc.print conf
-         | _ ->
-             if conf.bname = "" then general_welcome conf
-             else
-               match redirected_addr.val with
-               [ Some addr -> print_redirected conf addr
-               | None ->
+  match redirected_addr.val with
+  [ Some addr -> print_redirected conf addr
+  | None ->
+      let (auth_err, auth) =
+        if conf.auth_file = "" then (False, "")
+        else if cgi then (True, "")
+        else auth_err request conf.auth_file
+      in
+      match (cgi, auth_err, passwd_err) with
+      [ (True, True, _) ->
+          if is_robot from then Robot.robot_error cgi from 0 0
+          else no_access conf
+      | (_, True, _) ->
+          if is_robot from then Robot.robot_error cgi from 0 0
+          else
+            let auth_type =
+              let x =
+                try List.assoc "auth_file" conf.base_env with
+                [ Not_found -> "" ]
+              in
+              if x = "" then "GeneWeb service" else "data base " ^ conf.bname
+            in
+            refuse_auth conf from auth auth_type
+      | (_, _, Some (passwd, uauth, base_file)) ->
+          if is_robot from then
+            Robot.robot_error cgi from 0 0
+          else
+            let tm = Unix.time () in
+            do lock_wait Srcfile.adm_file "gwd.lck" with
+               [ Accept ->
+                   let oc = log_oc () in
+                   do log_passwd_failed passwd uauth oc tm from request
+                        base_file;
+                      flush_log oc;
+                   return ()
+               | Refuse ->
+                   () ];
+               unauth base_file (if passwd = "w" then "Wizard" else "Friend");
+            return ()
+      | _ ->
+          let mode = Util.p_getenv conf.env "m" in
+          do if mode <> Some "IM" then
+               log_and_robot_check conf auth from request script_name contents
+             else ();
+             match mode with
+             [ Some "DOC" -> Doc.print conf
+             | _ ->
+                 if conf.bname = "" then general_welcome conf
+                 else
                    match
                      try Some (List.assoc "renamed" conf.base_env) with
                      [ Not_found -> None ]
@@ -905,8 +907,8 @@ value conf_and_connection cgi from (addr, request) script_name contents env =
                    | _ ->
                        do start_with_base conf conf.bname;
                           if sleep > 0 then Unix.sleep sleep else ();
-                       return () ] ] ];
-      return () ]
+                       return () ] ];
+          return () ] ]
 ;
 
 value chop_extension name =
