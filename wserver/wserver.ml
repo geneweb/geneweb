@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 2.3 1999-03-24 16:31:13 ddr Exp $ *)
+(* $Id: wserver.ml,v 2.4 1999-04-07 13:08:10 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value wserver_oc =
@@ -181,7 +181,6 @@ value print_exc exc =
 
 value print_err_exc exc =
   do print_exc exc;
-     Printf.eprintf "Please report.\n";
      flush stderr;
   return ()
 ;
