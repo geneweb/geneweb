@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 1.14 1999-02-12 12:36:58 ddr Exp $ *)
+(* $Id: ascend.ml,v 1.15 1999-03-06 18:44:51 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -136,7 +136,7 @@ value afficher_menu_ascendants conf base p =
      Wserver.wprint
        (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
        (fun _ ->
-          do conf.henv := List.remove "iz" conf.henv;
+          do conf.henv := List.remove_assoc "iz" conf.henv;
              stag "a" "href=\"%siz=%d;i=%d\"" (commd conf)
                (Adef.int_of_iper p.cle_index)
                (Adef.int_of_iper p.cle_index)

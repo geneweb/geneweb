@@ -1,12 +1,35 @@
 #!/bin/sh
-# $Id: camlp4_depend.sh,v 1.2 1998-12-13 11:56:44 ddr Exp $
+# $Id: camlp4_depend.sh,v 1.3 1999-03-06 18:44:51 ddr Exp $
 
-FILES=$*
+FILES=
+DEPARGS=
+for i in $*; do
+    case $i in
+    *.ml*) FILES="$FILES $i";;
+    *) DEPARGS="$DEPARGS $i";;
+    esac
+done
 
 for FILE in $FILES; do
     head -1 $FILE >/dev/null || exit 1
     set - `head -1 $FILE`
     if test "$2" = "camlp4r" -o "$2" = "camlp4o" -o "$2" = "camlp4"; then
+        COMM=$2
+	shift; shift
+        ARGS=`echo $* | sed -e "s/[()*]//g"`
+    else
+        COMM=camlp4r
+	ARGS=
+    fi
+    echo $COMM pr_depend.cmo pa_ifdef.cmo $ARGS -- $DEPARGS $FILE >&2
+    $COMM pr_depend.cmo pa_ifdef.cmo $ARGS -- $DEPARGS $FILE
+done
+
+for FILE in $FILES; do
+    head -1 $FILE >/dev/null || exit 1
+    set - `head -1 $FILE`
+    if test "$2" = "camlp4r" -o "$2" = "camlp4o" -o "$2" = "camlp4"; then
+        COMM=$2
 	shift; shift
         ARGS=`echo $* | sed -e "s/[()*]//g"`
 	DEPS=
@@ -16,7 +39,7 @@ for FILE in $FILES; do
 		DEPS="$DEPS $DEP"
 	    fi
 	done
-       if test "$DEPS" != ""; then
+        if test "$DEPS" != ""; then
 	    BASE=`basename $FILE .ml`
 	    echo $BASE.cmo $BASE.cmx: $DEPS
         fi
