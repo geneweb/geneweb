@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.28 2002-11-27 20:13:02 ddr Exp $ *)
+(* $Id: family.ml,v 4.29 2002-12-08 21:15:51 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -174,9 +174,9 @@ value find_all conf base an =
   [ (Some p, Some n) ->
       if n <> Num.zero then
         match Util.branch_of_sosa conf base p.cle_index n with
-        [ Some [(ip, _) :: _] -> [pget conf base ip]
-        | _ -> [] ]
-      else []
+        [ Some [(ip, _) :: _] -> ([pget conf base ip], True)
+        | _ -> ([], False) ]
+      else ([], False)
   | _ ->
       let ipl = person_ht_find_all base an in
       let (an, ipl) =
@@ -209,7 +209,7 @@ value find_all conf base an =
             pl []
         else pl
       in
-      compact_list conf base pl ]
+      (compact_list conf base pl, False) ]
 ;
 
 value specify conf base n pl =
@@ -469,7 +469,7 @@ value family_m conf base =
           | _ ->
               if n = "" then unknown conf n
               else
-                let pl = find_all conf base n in
+                let (pl, soza_acc) = find_all conf base n in
                 match pl with
                 [ [] ->
                     do {
@@ -477,9 +477,9 @@ value family_m conf base =
                       Some.surname_print conf base unknown n
                     }
                 | [p] ->
-                    if
-                      Gutil.person_of_key base n <> None ||
-                      person_is_std_key base p n
+                    if soza_acc ||
+                       Gutil.person_of_key base n <> None ||
+                       person_is_std_key base p n
                     then
                       person_selected conf base p
                     else specify conf base n pl
