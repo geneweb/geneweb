@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 2.20 1999-07-28 07:55:33 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 2.21 1999-07-28 09:48:32 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -31,8 +31,8 @@ value reconstitute_parent conf var =
   let occ = try int_of_string (getn conf var "occ") with [ Failure _ -> 0 ] in
   let create =
     match getn conf var "p" with
-    [ "create" -> UpdateFam.Create Neuter None
-    | _ -> UpdateFam.Link ]
+    [ "create" -> Update.Create Neuter None
+    | _ -> Update.Link ]
   in
   (first_name, surname, occ, create)
 ;
@@ -53,8 +53,8 @@ value reconstitute_child conf var default_surname =
   in
   let create =
     match getn conf var "p" with
-    [ "create" -> UpdateFam.Create sex birth
-    | _ -> UpdateFam.Link ]
+    [ "create" -> Update.Create sex birth
+    | _ -> Update.Link ]
   in
   (first_name, surname, occ, create)
 ;
@@ -91,7 +91,7 @@ value reconstitute_family conf =
           let (children, ext) = loop (i + 1) ext in
           match p_getenv conf.env ("ins_child" ^ string_of_int i) with
           [ Some "on" ->
-              let new_child = ("", "", 0, UpdateFam.Create Neuter None) in
+              let new_child = ("", "", 0, Update.Create Neuter None) in
               ([c; new_child :: children], True)
           | _ -> ([c :: children ], ext) ]
       | None -> ([], ext) ]
@@ -99,7 +99,7 @@ value reconstitute_family conf =
   let (children, ext) =
     match p_getenv conf.env "ins_child0" with
     [ Some "on" ->
-        let new_child = ("", "", 0, UpdateFam.Create Neuter None) in
+        let new_child = ("", "", 0, Update.Create Neuter None) in
         ([new_child :: children], True)
     | _ -> (children, ext) ]
   in
@@ -161,7 +161,7 @@ value insert_person conf base src (f, s, o, create) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in
   match create with
-  [ UpdateFam.Create sex birth ->
+  [ Update.Create sex birth ->
       try
         if f = "?" || s = "?" then
           if o <= 0 || o >= base.data.persons.len then raise Not_found
@@ -213,7 +213,7 @@ value insert_person conf base src (f, s, o, create) =
                return ()
              else ();
           return ip ]
-  | UpdateFam.Link ->
+  | Update.Link ->
       Update.link_person conf base (f, s, o) ]
 ;
 

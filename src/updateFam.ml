@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 2.11 1999-07-28 07:55:32 ddr Exp $ *)
+(* $Id: updateFam.ml,v 2.12 1999-07-28 09:48:30 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -9,8 +9,7 @@ open Config;
 
 value bogus_family_index = Adef.ifam_of_int (-1);
 
-type create = [ Create of sex and option date | Link ];
-type str_indi = (string * string * int * create);
+type str_indi = (string * string * int * Update.create);
 
 value person_key base ip =
   let p = poi base ip in
@@ -19,59 +18,13 @@ value person_key base ip =
   let occ =
     if first_name = "?" || surname = "?" then Adef.int_of_iper ip else p.occ
   in
-  (first_name, surname, occ, Link)
+  (first_name, surname, occ, Update.Link)
 ;
 
 value string_family_of base fam cpl =
   let sfam = Gutil.map_family_ps (person_key base) (sou base) fam in
   let scpl = Gutil.map_couple_p (person_key base) cpl in
   (sfam, scpl)
-;
-
-value print_parent_person conf base var (first_name, surname, occ, create) =
-  tag "table" "border=1" begin
-    tag "tr" begin
-      tag "td" begin
-        Wserver.wprint "%s"
-          (capitale (transl_nth conf "first name/first names" 0));
-      end;
-      tag "td" begin
-        Wserver.wprint "<input name=%s_fn size=23 maxlength=200" var;
-        Wserver.wprint " value=\"%s\">"
-          (quote_escaped first_name);
-      end;
-      tag "td" "align=right" begin
-        let s = capitale (transl conf "number") in
-        Wserver.wprint "%s" s;
-      end;
-      tag "td" begin
-        Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
-          (if occ == 0 then "" else " value=" ^ string_of_int occ);
-      end;
-      tag "td" begin
-        tag "select" "name=%s_p" var begin
-          Wserver.wprint "<option value=link%s>%s\n"
-            (if create = Link then " selected" else "")
-            (capitale (transl conf "link"));
-          Wserver.wprint "<option value=create%s>%s\n"
-            (match create with [ Create Neuter _ -> " selected" | _ -> "" ])
-            (capitale (transl conf "create"));
-        end;
-      end;
-    end;
-    Wserver.wprint "\n";
-    tag "tr" begin
-      tag "td" begin
-        Wserver.wprint "%s"
-          (capitale (transl_nth conf "surname/surnames" 0));
-      end;
-      tag "td" "colspan=4" begin
-        Wserver.wprint
-          "<input name=%s_sn size=40 maxlength=200 value=\"%s\">"
-          var surname;
-      end;
-    end;
-  end
 ;
 
 value print_child_person conf base var (first_name, surname, occ, create) =
@@ -112,10 +65,10 @@ value print_child_person conf base var (first_name, surname, occ, create) =
       tag "td" begin
         tag "select" "name=%s_p" var begin
           Wserver.wprint "<option value=link%s>%s\n"
-            (if create = Link then " selected" else "")
+            (if create = Update.Link then " selected" else "")
             (capitale (transl conf "link"));
           Wserver.wprint "<option value=create%s>%s\n"
-            (if create <> Link then " selected" else "")
+            (if create <> Update.Link then " selected" else "")
             (capitale (transl conf "create"));
         end;
       end;
@@ -124,12 +77,14 @@ value print_child_person conf base var (first_name, surname, occ, create) =
       end;
       tag "td" begin
         Wserver.wprint "<input type=radio name=%s_sex value=N%s>?\n" var
-          (match create with [ Create Neuter _ -> " checked" | _ -> "" ]);
+          (match create with
+           [ Update.Create Neuter _ -> " checked" | _ -> "" ]);
         Wserver.wprint "<input type=radio name=%s_sex value=M%s>%s\n" var
-          (match create with [ Create Male _ -> " checked" | _ -> "" ])
+          (match create with [ Update.Create Male _ -> " checked" | _ -> "" ])
           (transl_nth conf "M/F" 0);
         Wserver.wprint "<input type=radio name=%s_sex value=F%s>%s\n" var
-          (match create with [ Create Female _ -> " checked" | _ -> "" ])
+          (match create with
+           [ Update.Create Female _ -> " checked" | _ -> "" ])
           (transl_nth conf "M/F" 1);
       end;
       tag "td" begin
@@ -138,17 +93,17 @@ value print_child_person conf base var (first_name, surname, occ, create) =
       tag "td" "colspan=2" begin
         Wserver.wprint "<input name=%s_dd size=2 maxlength=2%s>\n" var
           (match create with
-           [ Create _ (Some {day = d}) when d <> 0 ->
+           [ Update.Create _ (Some {day = d}) when d <> 0 ->
                " value=" ^ string_of_int d
            | _ -> "" ]);
         Wserver.wprint "<input name=%s_mm size=2 maxlength=2%s>\n" var
           (match create with
-           [ Create _ (Some {month = m}) when m <> 0 ->
+           [ Update.Create _ (Some {month = m}) when m <> 0 ->
                " value=" ^ string_of_int m
            | _ -> "" ]);
         Wserver.wprint "<input name=%s_yyyy size=5 maxlength=5%s>\n" var
           (match create with
-           [ Create _ (Some {year = y}) -> " value=" ^ string_of_int y
+           [ Update.Create _ (Some {year = y}) -> " value=" ^ string_of_int y
            | _ -> "" ]);
       end;
     end;
@@ -160,7 +115,7 @@ value print_father conf base cpl =
        Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 0));
      end;
      Wserver.wprint "\n";
-     print_parent_person conf base "his" cpl.father;
+     Update.print_parent_person conf base "his" cpl.father;
      Wserver.wprint "\n";
   return ()
 ;
@@ -170,7 +125,7 @@ value print_mother conf base cpl =
        Wserver.wprint "%s" (capitale (transl_nth conf "him/her" 1));
      end;
      Wserver.wprint "\n";
-     print_parent_person conf base "her" cpl.mother;
+     Update.print_parent_person conf base "her" cpl.mother;
      Wserver.wprint "\n";
   return ()
 ;
@@ -255,7 +210,7 @@ value print_child conf base cnt n =
 value print_children conf base fam cpl force_children_surnames =
   let children =
     match Array.to_list fam.children with
-    [ [] -> [("", "", 0, Create Neuter None)]
+    [ [] -> [("", "", 0, Update.Create Neuter None)]
     | ipl ->
         let (_, father_surname, _, _) = cpl.father in
         List.map
@@ -477,17 +432,17 @@ value print_add conf base =
         let fath =
           match p.sex with
           [ Male | Neuter -> person_key base p.cle_index
-          | Female -> ("", "", 0, Create Neuter None) ]
+          | Female -> ("", "", 0, Update.Create Neuter None) ]
         in
         let moth =
           match p.sex with
           [ Female -> person_key base p.cle_index
-          | Male | Neuter -> ("", "", 0, Create Neuter None) ]
+          | Male | Neuter -> ("", "", 0, Update.Create Neuter None) ]
         in
         (fath, moth)
     | None ->
-        (("", "", 0, Create Neuter None),
-         ("", "", 0, Create Neuter None)) ]
+        (("", "", 0, Update.Create Neuter None),
+         ("", "", 0, Update.Create Neuter None)) ]
   in
   let fam =
     {marriage = Adef.codate_None; marriage_place = "";
@@ -510,12 +465,13 @@ value print_add_parents conf base =
          marriage_src = ""; not_married = False;
          divorce = NotDivorced;
          children =
-           [| (sou base p.first_name, sou base p.surname, p.occ, Link) |];
+           [| (sou base p.first_name, sou base p.surname, p.occ,
+               Update.Link) |];
          comment = ""; origin_file = ""; fsources = "";
          fam_index = bogus_family_index}
       and cpl =
-        {father = ("", sou base p.surname, 0, Create Neuter None);
-         mother = ("", "", 0, Create Neuter None)}
+        {father = ("", sou base p.surname, 0, Update.Create Neuter None);
+         mother = ("", "", 0, Update.Create Neuter None)}
       in
       print_add1 conf base fam cpl True
   | _ -> incorrect_request conf ]

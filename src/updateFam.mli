@@ -1,11 +1,10 @@
-(* $Id: updateFam.mli,v 2.2 1999-04-05 23:42:29 ddr Exp $ *)
+(* $Id: updateFam.mli,v 2.3 1999-07-28 09:48:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Config;
 
-type create = [ Create of sex and option date | Link ];
-type str_indi = (string * string * int * create);
+type str_indi = (string * string * int * Update.create);
 
 value print_add1 :
   config -> base -> gen_family str_indi string -> gen_couple str_indi ->
