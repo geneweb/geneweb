@@ -3,6 +3,7 @@
 
 	Languages
 		Chinese		Gang Chen
+                Danish          Hans Albeck
 		Dutch		Joris Esch
 				Wijnand J. Nijs
 		German		Markus Mottl

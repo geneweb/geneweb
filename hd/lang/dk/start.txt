@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>Genealogi - %t</title></head>
+<body%b>
+<h1>Genealogi</h1>
+
+%rversion
+
+<p>
+
+Databasen indeholder for øjeblikket %n personer.
+
+<ul>
+
+<li>
+
+<form method=GET action="%f">
+%h<input type=hidden name=m value=NG>
+Søg: <input name=n size=40 maxlength=200>
+<input type=submit value="Ok">
+<br>
+Sådan:
+<ul>
+<li> <input type=radio name=t value=PN checked>
+Enten <em>fornavn</em> og <em>efternavn</em>,
+eller <em>officielt navn</em>, eller <em>alias</em>.
+<li> <input type=radio name=t value=P> Et <em>fornavn</em>.
+<li> <input type=radio name=t value=N> Et <em>efternavn</em>.
+</ul>
+</form>
+
+<li>
+
+<FORM method=GET action="%f">
+%h<input type=hidden name=m value=TT>
+Efter titel <INPUT NAME=t size=14 maxlength=200>
+sted <INPUT NAME=p size=25 maxlength=200> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li>
+
+<FORM method=GET action="%f">
+%hAlle
+<SELECT NAME=m>
+   <OPTION VALUE="N" SELECTED> Efternavn
+   <OPTION VALUE="P"> Fornavn
+</SELECT>
+efter
+<SELECT NAME=tri>
+   <OPTION VALUE="A" SELECTED> Alfabetisk orden
+   <OPTION VALUE="F"> Frekvens
+</SELECT> =&gt;
+<INPUT TYPE=submit VALUE="Ok">
+</FORM>
+
+<li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
+
+%w<li> <a href="%sm=ADD_FAM">Tilføj en familie</a>.
+%w
+
+</ul>
+
+<a href="%sm=AN">Fødselsdage</a>.<br>
+<a href="%sm=AD">Døde personers årsdage</a>.<br>
+<a href="%sm=AM">Bryllupsdage</a>.<br>%x
+De <a href="%sm=LB;k=10">seneste f&oslash;dsler</a>.<br>
+De <a href="%sm=LD;k=10">seneste d&oslash;dsfald</a>.<br>%x
+<p>
+Der har været %q opslag, %c af dem på denne side, siden %d.
+
+%y<p>
+
+<ul>
+<li> <a href="%sw=w"><em>Opdaterings</em></a> adgang (password).
+%y%z<li> <a href="%sw=f"><em>Venner</em></a> adgang (password).
+%z%y</ul>
+
+%y%i<p>
+<form method=get action="%f">
+%h<font size=-1>Password, for <em>venner</em> eller
+<em>opdaterings</em> adgang:</font>
+<input name=w size=20 maxlength=200> =&gt;
+<input type=submit value="Ok">
+</form>
+%i<p>
+
+<font size=-1><a href="%sm=LEX">Lexicon</a></font>
