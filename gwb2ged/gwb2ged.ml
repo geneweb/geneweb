@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 4.1 2001-04-22 18:55:21 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 4.2 2001-04-23 03:02:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -727,14 +727,6 @@ value anonfun s =
 
 value main () =
   do {
-    ifdef MAC then do {
-      Printf.eprintf "args? ";
-      flush stderr;
-      let line = input_line stdin in
-      let list = Gutil.arg_list_of_string line in
-      Argl.parse_list speclist anonfun errmsg list;
-    }
-    else ();
     Argl.parse speclist anonfun errmsg;
     let anc =
       if anc_1st.val <> "" then

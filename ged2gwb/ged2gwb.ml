@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 4.3 2001-04-22 18:55:21 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 4.4 2001-04-23 03:02:37 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -2421,14 +2421,6 @@ value errmsg = "Usage: ged2gwb [<ged>] [options] where options are:";
 
 value main () =
   do {
-    ifdef MAC then do {
-      Printf.eprintf "args? ";
-      flush stderr;
-      let line = input_line stdin in
-      let list = Gutil.arg_list_of_string line in
-      Argl.parse_list speclist anonfun errmsg list;
-    }
-    else ();
     Argl.parse speclist anonfun errmsg;
     let bdir =
       if Filename.check_suffix out_file.val ".gwb" then out_file.val

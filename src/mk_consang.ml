@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 4.1 2001-04-19 12:34:57 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 4.2 2001-04-23 03:02:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 value fname = ref "";
@@ -33,14 +33,6 @@ value simple_output bname base =
 
 value main () =
   do {
-    ifdef MAC then do {
-      Printf.eprintf "args? ";
-      flush stderr;
-      let line = input_line stdin in
-      let list = Gutil.arg_list_of_string line in
-      Argl.parse_list speclist anonfun errmsg list;
-    }
-    else ();
     Argl.parse speclist anonfun errmsg;
     if fname.val = "" then do {
       Printf.eprintf "Missing file name\n";
