@@ -70,9 +70,30 @@ process number, with the command "ps" and kill it with the command
 
 <p>
 
-<ul><li> If you are under Windows NT, you must install "gwd" in "service".
-Ask your system administrator.
-
+<ul><li> If you are under Windows NT, you must install "gwd" as "service" by use of
+the utility "srvany.exe", logged in as Administrator. From Windows NT Ressource Kit 
+you need: srvany.exe, instsrv.exe, may be srvinstw.exe and delsrv.exe, too. 
+First, copy srvany.exe to a folder on your computer (e. g. C:\GeneWeb) and install
+ it as a service (nicer tool for that is the graphical utility srvinstw.exe):
+<PRE>      instsrv GeneWebServer c:\GeneWeb\srvany.exe
+</PRE>
+In Services in Control Panel, click GeneWebServer, and then click Startup to choose 
+Automatic or Manual. In the Log On As box, choose the account to start the service in,
+and fill in the right password (this must be used to have access to the network).
+<font color=#2f6400><b>GeneWeb</b></font> will be started by specifying the following
+registry keys with regedt32:
+<PRE>
+1. under HKLM\System\CurrentControlSet\Services\GeneWebServer create
+   a new key "Parameters"
+   
+2. create there two new Values (type REG_SZ) Application and AppDirectory, e. g.
+   Application: REG_SZ: C:\GeneWeb\gw\gwd.exe
+   AppDirectory: REG_SZ: C:\GeneWeb\gw
+</PRE>
+Now you can control the GeneWeb service in Control Panel -> Services -> GeneWebServer
+"Startup"/"Stop" or by typing "net start GeneWebServer" or "net stop GeneWebServer"
+at the command prompt. To remove GeneWebServer, stop it and type "delsrv GeneWebServer"
+or "instsrv GeneWebServer remove".
 </ul>
 
 <hr>

@@ -1,4 +1,4 @@
-(* $Id: wserver.mli,v 3.3 2000-05-02 02:38:22 ddr Exp $ *)
+(* $Id: wserver.mli,v 3.4 2000-05-31 09:15:24 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 (* module [Wserver]: elementary web service *)
@@ -58,7 +58,7 @@ value sock_out : ref string;
 
    - Source program "foo.ml":
         Wserver.f None 2368 60 None (None, None)
-           (fun _ s -> Wserver.html (); Printf.printf "You said: %s...\n" s);;
+           (fun _ s -> Wserver.html (); Wserver.wprint "You said: %s...\n" s);;
    - Compilation:
         ocamlc -custom unix.cma -cclib -lunix wserver.cmo foo.ml
    - Run:

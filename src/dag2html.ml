@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.30 2000-01-09 07:35:45 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.31 2000-05-31 09:15:22 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -287,7 +287,7 @@ let next_l = min next_l next_j in
                         print " align=right>";
                         print
                           (ph
-                             "<hr noshade size=1 width=\"50%%\" align=right>");
+                             "<hr noshade size=1 width=\"50%\" align=right>");
                         print "</td>\n";
                         print "<td>";
                         print (ph "<hr noshade size=1>");
@@ -301,7 +301,7 @@ let next_l = min next_l next_j in
                         print (string_of_int colspan);
                         print " align=left>";
                         print
-                          (ph "<hr noshade size=1 width=\"50%%\" align=left>");
+                          (ph "<hr noshade size=1 width=\"50%\" align=left>");
                         print "</td>\n";
                         print "<td>&nbsp;</td>\n";
                      return ()

@@ -61,10 +61,36 @@ an und stoppe es mit dem Befehl "kill".</UL>
 
 <UL>
 <li>
-Unter Windows NT mu&szlig;t du "gwd" als "Dienst" installieren. Frage deinen
-Systemadministrator.</LI>
-</UL>
+Unter Windows NT mu&szlig;t du "gwd" mit dem Hilfsprogramm "srvany.exe" als Dienst 
+installieren, wenn Du als Administrator angemeldet bist. Dazu ben&ouml;tigst Du 
+aus dem Windows-NT-Ressource-Kit: srvany.exe, instsrv.exe, eventuell auch srvinstw.exe
+und delsrv.exe. Zuerst kopierst Du "srvany.exe" in ein Verzeichnis auf deinem Computer
+(z. B. c:\GeneWeb) und installierst es mit folgendem Befehl als Service (sch&ouml;n 
+grafisch geht das auch mit "srvinstw.exe"):
+</LI>
+<PRE>     instsrv GeneWebServer c:\GeneWeb\srvany.exe
+</PRE>
+Unter Systemsteuerung -> Dienste suche nach "GeneWebServer", klicke "Startart" und
+w&auml;hle "Automatisch" oder "Manuell" nach Bedarf. In der "Anmelden als"-Box w&auml;hle
+einen Anmeldenamen, unter dem der Dienst laufen soll, und trage das richtige Passwort
+daf&uuml;r ein (nur so funktioniert auch der Zugriff per Netzwerk).
 
+<font color=#2f6400><b>GeneWeb</b></font> wird als zu startender Dienst eingetragen, indem mit regedt32 
+in die Registry eingetragen wird:
+<PRE>
+1. unter HKLM\System\CurrentControlSet\Services\GeneWebServer
+   ein neuer Schl&uuml;ssel "Parameters"
+   
+2. darunter zwei neue Werte (Typ REG_SZ) Application und AppDirectory, z. B.
+   Application: REG_SZ: C:\GeneWeb\gw\gwd.exe
+   AppDirectory: REG_SZ: C:\GeneWeb\gw
+</PRE>   
+Nun kann GeneWeb unter Systemsteuerung->Dienste->GeneWebServer "Starten"/"Beenden"
+oder in der Eingabeaufforderung durch Eingabe von "net start GeneWebServer" bzw.
+"net stop GeneWebServer" gesteuert werden. Willst Du den Dienst GeneWebServer wieder
+entfernen, so erfolgt das (nach dem Stoppen)  durch "delsrv GeneWebServer" oder 
+"instsrv GeneWebServer remove". 
+</UL>
 
 <p>
 <hr>
