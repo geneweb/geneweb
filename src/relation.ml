@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.25 1999-07-29 16:02:56 ddr Exp $ *)
+(* $Id: relation.ml,v 2.26 1999-07-31 18:37:39 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -233,31 +233,26 @@ value print_link conf base n p1 p2 x1 x2 =
      Wserver.wprint " %s" (transl conf "is");
      if n > 1 then Wserver.wprint " %s" (transl conf "also") else ();
      Wserver.wprint "\n";
-     stag "strong" begin
-       if x1 == 0 then Wserver.wprint "%s" (ancestor_label conf x2 p1.sex)
-       else if x2 == 0 then Wserver.wprint "%s" (descendant_label conf x1 p1)
+     let s =
+       if x1 == 0 then ancestor_label conf x2 p1.sex
+       else if x2 == 0 then descendant_label conf x1 p1
        else if x1 == x2 then
          if x1 == 1 && not (same_parents base p1 p2) then
-           Wserver.wprint "%s" (half_brother_label conf p1.sex)
-         else
-           Wserver.wprint "%s" (nominative (brother_label conf x2 p1.sex))
+           half_brother_label conf p1.sex
+         else nominative (brother_label conf x2 p1.sex)
        else if x1 == 1 || x2 == 1 then
-         if x1 == 1 then Wserver.wprint "%s" (uncle_label conf (x2 - x1) p1)
-         else Wserver.wprint "%s" (nephew_label conf (x1 - x2) p1)
+         if x1 == 1 then uncle_label conf (x2 - x1) p1
+         else nephew_label conf (x1 - x2) p1
        else if x1 < x2 then
-         do Wserver.wprint "%s" (nominative (brother_label conf x1 p1.sex));
-            Wserver.wprint " %s"
-              (transl_decline conf
-               "of (same or greater generation level)"
-               (ancestor_label conf (x2 - x1) Neuter));
-         return ()
+         nominative (brother_label conf x1 p1.sex) ^ " " ^
+         transl_decline conf "of (same or greater generation level)"
+           (ancestor_label conf (x2 - x1) Neuter)
        else
-         do Wserver.wprint "%s" (descendant_label conf (x1 - x2) p1);
-            Wserver.wprint " %s"
-              (transl_decline conf "of (same or greater generation level)"
-               (brother_label conf x2 Male));
-         return ();
-     end;
+         descendant_label conf (x1 - x2) p1 ^ " " ^
+         transl_decline conf "of (same or greater generation level)"
+           (brother_label conf x2 Male)
+     in
+     stag "strong" begin Wserver.wprint "%s" s; end;
      Wserver.wprint "\n";
      let s = gen_person_text_without_title raw_access conf base p2 in
      Wserver.wprint "%s"
