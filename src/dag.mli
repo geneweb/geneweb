@@ -1,4 +1,4 @@
-(* $Id: dag.mli,v 3.1 2001-01-06 09:14:16 ddr Exp $ *)
+(* $Id: dag.mli,v 3.2 2001-01-11 02:13:30 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -17,6 +17,8 @@ type sum 'a 'b = [ Left of 'a | Right of 'b ];
 value make_dag : config -> base -> list iper -> Dag2html.dag (sum iper 'b);
 
 value image_txt : config -> base -> person -> string;
+
+value print_html_table : config -> Dag2html.html_table -> unit;
 
 value print_only_dag :
   config -> base ->
