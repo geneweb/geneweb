@@ -39,8 +39,10 @@ GeneWeb Version 1.11
   - [Jan 16, 99] Fixed typos in German version (Markus Mottl).
 
 * Documentation
-  - [Jan 24, 99] Added doc for default photo name (new feature) in directions
-    for use, page "modifications", section 5.4 ("modify a person"),
+  - [Jan 25, 99] Added doc explaining consanguinity: new link in "directions
+    for use".
+  - [Jan 24, 99] Added doc for default photo name (new feature) in "directions
+    for use", page "modifications", section 5.4 ("modify a person"),
     paragraph "Photo".
   - [Jan 24, 99] Fixed typo; was indicated "image" instead of "images" as
     directory name in this paragraph.
