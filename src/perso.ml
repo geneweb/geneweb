@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.88 2001-02-18 09:30:14 ddr Exp $ *)
+(* $Id: perso.ml,v 3.89 2001-02-19 21:43:41 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -801,7 +801,6 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "on_cremation_date" -> print_on_cremation_date conf base env p p_auth
   | "on_death_date" -> print_on_death_date conf base env p p_auth
   | "origin_file" -> print_origin_file conf base env
-  | "prefix" -> Wserver.wprint "%s" (commd conf)
   | "prefix_no_templ" -> print_prefix_no_templ conf base env
   | "public_name" -> print_public_name conf base env p p_auth
   | "qualifier" -> print_qualifier conf base env p p_auth
