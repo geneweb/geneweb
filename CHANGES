@@ -14,7 +14,10 @@ GeneWeb version 4.03
   - [13 Jul 01] Fixed bug: in update person form, when clicking on
     "insert surname alias", the display became "insert first name alias".
 
-* Gedcom to GeneWeb (ged2gwb)
+* Gedcom to GeneWeb (ged2gwb) and GeneWeb uncompiler (gwu)
+  - [17 Jul 01] Now, selecting surnames and ancestors/descendants is
+    no more exclusive. It is therefore possible to select e.g. a surname
+    *and* the ancestors of somebody.
   - [06 Jul 01] Fixed bug: sometimes failed when converting ansel text
     to ascii.
 
