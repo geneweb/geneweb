@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.8 1998-12-11 15:11:46 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.9 1998-12-14 12:43:20 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -486,8 +486,7 @@ value all_checks_family conf base fam cpl =
   let wl = ref [] in
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
-  do Gutil.check_noloop_for_person_list base error
-       [poi base cpl.father; poi base cpl.mother];
+  do Gutil.check_noloop_for_person_list base error [cpl.father; cpl.mother];
      Gutil.check_family base error warning fam;
   return List.rev wl.val
 ;

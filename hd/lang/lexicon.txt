@@ -866,6 +866,7 @@ se: sl&auml;ktskap
 de: Zusammenf&uuml;hrung fortsetzen
 en: continue merging
 fr: continuer &agrave; fusionner
+nl: verdergaan met samenvoegen
 pt: continuar fus&atilde;o
 se: forts&auml;tt sl&aring;samman
 
@@ -1345,6 +1346,7 @@ se: i
 de: unvertr&aml;gliche Geschlechter
 en: incompatible sexes
 fr: sexes incompatibles
+nl: geslacht komt niet overeen
 pt: sexos incompativeis
 se: inkompatibla k&ouml;n
 

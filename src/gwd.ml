@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo *)
-(* $Id: gwd.ml,v 1.19 1998-12-09 10:51:23 ddr Exp $ *)
+(* $Id: gwd.ml,v 1.20 1998-12-14 12:43:19 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -577,7 +577,8 @@ Type control C to stop the service
           flush Pervasives.stderr;
        return ()
      else ();
-     try Unix.mkdir "cnt" 0o755 with _ -> ();
+     try Unix.mkdir (Filename.concat Util.base_dir.val "cnt") 0o755 with
+     [ Unix.Unix_error _ _ _ -> () ];
   return
   Wserver.f port_selected.val tmout
     (ifdef UNIX then max_clients.val else None) robot_xcl.val
@@ -585,6 +586,9 @@ Type control C to stop the service
 ;
 
 value geneweb_cgi str addr =
+  do try Unix.mkdir (Filename.concat Util.base_dir.val "cnt") 0o755 with
+     [ Unix.Unix_error _ _ _ -> () ];
+  return
   let add v x request =
     try [v ^ ": " ^ Sys.getenv x :: request] with [ Not_found -> request ]
   in

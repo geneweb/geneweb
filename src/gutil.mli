@@ -1,4 +1,4 @@
-(* $Id: gutil.mli,v 1.5 1998-12-05 13:29:45 ddr Exp $ *)
+(* $Id: gutil.mli,v 1.6 1998-12-14 12:43:18 ddr Exp $ *)
 
 open Def;
 
@@ -67,7 +67,7 @@ value check_family :
 ;
 
 value check_noloop_for_person_list :
-  base -> (base_error -> unit) -> list (base_person) -> unit
+  base -> (base_error -> unit) -> list iper -> unit
 ;
 
 value check_base :

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 1.6 1998-12-11 09:47:51 ddr Exp $ *)
+(* $Id: gutil.ml,v 1.7 1998-12-14 12:43:18 ddr Exp $ *)
 
 open Def;
 
@@ -331,26 +331,26 @@ value check_noloop base error =
   done
 ;
 
-value check_noloop_for_person_list base error pl =
+value check_noloop_for_person_list base error ipl =
   let tab = Array.create (base.persons.len) NotVisited in
-  let rec noloop p =
-    let i = Adef.int_of_iper p.cle_index in
+  let rec noloop ip =
+    let i = Adef.int_of_iper ip in
     match tab.(i) with
     [ NotVisited ->
-        do match (aoi base p.cle_index).parents with
+        do match (aoi base ip).parents with
            [ Some ifam ->
                let cpl = coi base ifam in
                do tab.(i) := BeingVisited;
-                  noloop (poi base cpl.father);
-                  noloop (poi base cpl.mother);
+                  noloop cpl.father;
+                  noloop cpl.mother;
                return ()
            | None -> () ];
            tab.(i) := Visited;
         return ()
-    | BeingVisited -> error (OwnAncestor p)
+    | BeingVisited -> error (OwnAncestor (poi base ip))
     | Visited -> () ]
   in
-  List.iter noloop pl
+  List.iter noloop ipl
 ;
 
 value child_born_after_his_parent base error warning x iparent =

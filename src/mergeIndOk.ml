@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 1.3 1998-09-30 14:04:45 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 1.4 1998-12-14 12:43:20 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -179,7 +179,8 @@ value effective_mod_merge conf base p =
          base.patch_ascend p.cle_index a1;
          Update.update_misc_names_of_family base p;
          base.patch_person p.cle_index p;
-         Gutil.check_noloop_for_person_list base (Update.error conf base) [p];
+         Gutil.check_noloop_for_person_list base (Update.error conf base)
+           [p.cle_index];
       return
       let wl =
         UpdateIndOk.all_checks_person conf base p (aoi base p.cle_index)
