@@ -1,30 +1,41 @@
-# $Id: Makefile,v 1.7 1999-05-09 09:16:34 ddr Exp $
+# $Id: Makefile,v 1.8 1999-08-16 00:45:57 ddr Exp $
 
 include ../tools/Makefile.inc
 
 OCAMLI=-I ../wserver -I ../src
 OBJS=../wserver/wserver.cmo ../src/version.cmo setup.cmo
 
-all:: setup.out gwd.out
-	$(RM) setup gwd
+all:: setup.out
+	$(RM) setup
 	cp setup.out setup
-	cp gwd.out gwd
 
-opt:: setup.opt gwd.opt
-	$(RM) setup gwd
+opt:: setup.opt
+	$(RM) setup
 	cp setup.opt setup
-	cp gwd.opt gwd
 
 clean::
-	$(RM) setup gwd
+	$(RM) setup
 	$(RM) -rf test
 
-test:
+test: test_dir wrappers
+
+wrappers:
+	if test "$(CAMLP4F)" = "-DWIN95"; then \
+	  echo 'cd gw; gwd' > test/gwd.bat; \
+	  echo 'cd gw; setup' > test/setup.bat; \
+	else \
+	  echo '#!/bin/sh' > test/gwd; \
+	  echo 'cd gw; exec ./gwd' >> test/gwd; \
+	  echo '#!/bin/sh' > test/setup; \
+	  echo 'cd gw; exec ./gwsetup' >> test/setup; \
+	  chmod +x test/gwd test/setup; \
+	fi
+
+test_dir:
 	mkdir test
 	mkdir test/gw
 	mkdir test/gw/old
-	cd test; ln -s ../setup .
-	cd test; ln -s ../gwd .
+	cd test/gw; ln -s ../../setup gwsetup
 	cd test/gw; ln -s ../.. setup
 	cd test/gw; ln -s ../../../doc .
 	cd test/gw; ln -s ../../../src/gwc .
@@ -41,14 +52,8 @@ test:
 setup.out: $(OBJS)
 	$(OCAMLC) -custom unix.cma $(LIBUNIX) $(OBJS) -o setup.out
 
-gwd.out: gwd.cmo
-	$(OCAMLC) -custom unix.cma $(LIBUNIX) gwd.cmo -o gwd.out
-
 setup.opt: $(OBJS:.cmo=.cmx)
 	$(OCAMLOPT) unix.cmxa $(LIBUNIX) $(OBJS:.cmo=.cmx) -o setup.opt
-
-gwd.opt: gwd.cmx
-	$(OCAMLOPT) unix.cmxa $(LIBUNIX) gwd.cmx -o gwd.opt
 
 depend:
 	../tools/camlp4_depend.sh $(OCAMLI) *.ml* > .depend

@@ -1,4 +1,4 @@
-# $Id: Makefile,v 2.20 1999-08-16 00:43:15 ddr Exp $
+# $Id: Makefile,v 2.21 1999-08-16 00:45:57 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -20,12 +20,24 @@ opt::
 	cd doc; $(MAKE) opt
 	cd setup; $(MAKE) opt
 
-distrib: classical_distrib
+distrib: new_distrib wrappers
+
+wrappers:
+	if test "$(CAMLP4F)" = "-DWIN95"; then \
+	  echo 'cd gw; gwd' > distribution/gwd.bat; \
+	  echo 'cd gw; setup' > distribution/setup.bat; \
+	else \
+	  echo '#!/bin/sh' > distribution/gwd; \
+	  echo 'cd gw; exec ./gwd' >> distribution/gwd; \
+	  echo '#!/bin/sh' > distribution/setup; \
+	  echo 'cd gw; exec ./gwsetup' >> distribution/setup; \
+	  chmod +x distribution/gwd distribution/setup; \
+	fi
+
+new_distrib: classical_distrib
 	mkdir t
 	mv distribution t/gw
 	mv t distribution
-	cp setup/setup distribution/setup$(EXE)
-	cp setup/gwd distribution/gwd$(EXE)
 	mkdir distribution/gw/old
 	mkdir distribution/gw/setup
 	cp setup/intro.txt distribution/gw/setup/.
@@ -34,6 +46,7 @@ distrib: classical_distrib
 	  cp setup/$$i/*.htm distribution/gw/setup/$$i; \
 	  cp setup/$$i/*.txt distribution/gw/setup/$$i; \
 	done
+	cp setup/setup distribution/gw/gwsetup$(EXE)
 	cp etc/README.distrib.txt distribution/README.txt
 	cp etc/LISEZMOI.distrib.txt distribution/LISEZMOI.txt
 	echo "127.0.0.1" > distribution/gw/only.txt

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 1.38 1999-08-16 00:43:16 ddr Exp $ *)
+(* $Id: setup.ml,v 1.39 1999-08-16 00:45:57 ddr Exp $ *)
 
 value port = 2316;
 value default_lang = ref "en";
@@ -612,13 +612,19 @@ value recover conf =
   let (init_dir, dir_has_gwu) =
     if has_gwu init_dir then (init_dir, True)
     else
+(*
       let dir = Filename.concat init_dir "gw" in
+*)
+      let dir = init_dir in
+(**)
       if has_gwu dir then (dir, True)
       else
         let dir = Filename.dirname init_dir in
         if has_gwu dir then (dir, True)
         else
+(*
           let dir = Filename.concat dir "gw" in
+*)
           if has_gwu dir then (dir, True)
           else (init_dir, False)
   in
@@ -1255,7 +1261,7 @@ value set_gwd_default_language_if_absent lang =
 ;
 
 value intro () =
-  do Sys.chdir "gw";
+  do (* Sys.chdir "gw"; *)
      copy_text "" "intro.txt";
      let lang =
        let x = input_line stdin in
