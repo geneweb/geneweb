@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.62 2001-03-08 14:13:23 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.63 2001-03-15 07:10:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -184,12 +184,13 @@ value afficher_menu_ascendants conf base p =
          (fcapitale (ftransl conf "navigation with %t as Sosa reference"))
          (fun _ ->
             do conf.henv := List.remove_assoc "iz" conf.henv;
-               stag "a" "href=\"%siz=%d\"" (commd conf)
-                 (Adef.int_of_iper p.cle_index)
-               begin
-                 afficher_personne_sans_titre conf base p;
-               end;
-               afficher_titre conf base p;
+               let reference _ _ _ s =
+                 "<a href=\"" ^ commd conf ^ "iz=" ^
+                 string_of_int (Adef.int_of_iper p.cle_index) ^ "\">" ^ s ^
+                 "</a>"
+               in
+               Wserver.wprint "%s"
+                 (gen_person_title_text reference std_access conf base p);
             return ());
        Wserver.wprint ".\n";
      end;
@@ -1375,8 +1376,7 @@ value print_spouses conf base p u =
 value print_someone_missing conf base begin_surname spouses_incl (mt, mtl, p) =
   do let href= "i=" ^ string_of_int (Adef.int_of_iper p.cle_index) in
      wprint_geneweb_link conf href (person_text_without_surname conf base p);
-     Wserver.wprint "%s" begin_surname;
-     afficher_titre conf base p;
+     Wserver.wprint "%s %s" begin_surname (person_title_text conf base p);
      Date.afficher_dates_courtes conf base p;
      if spouses_incl then
        do Wserver.wprint "\n=&gt; ";

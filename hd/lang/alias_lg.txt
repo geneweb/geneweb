@@ -1,4 +1,5 @@
 ca=ct
+da=dk
+pt-br=br
 sv=se
 zh=cn
-pt-br=br

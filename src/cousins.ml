@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.15 2001-03-14 16:34:20 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.16 2001-03-15 07:10:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -133,15 +133,15 @@ value print_choice conf base p niveau_effectif =
 value cnt = ref 0;
 
 value give_access conf base ia_asex p1 b1 p2 b2 =
-  do stag "a" "href=\"%sm=RL;%s;b1=%s;%s;b2=%s;spouse=on\"" (commd conf)
-       (acces_n conf base "1" p1)
-       (Num.to_string (Util.sosa_of_branch [ia_asex :: b1]))
-       (acces_n conf base "2" p2)
-       (Num.to_string (Util.sosa_of_branch [ia_asex :: b2]))
-     begin
-       afficher_personne_sans_titre conf base p2;
-     end;
-     afficher_titre conf base p2;
+  let reference _ _ _ s =
+    "<a href=\"" ^ commd conf ^ "m=RL;" ^ acces_n conf base "1" p1 ^
+    ";b1=" ^ Num.to_string (Util.sosa_of_branch [ia_asex :: b1]) ^
+    ";" ^ acces_n conf base "2" p2 ^
+    ";b2=" ^ Num.to_string (Util.sosa_of_branch [ia_asex :: b2]) ^
+    ";spouse=on\">" ^ s ^ "</a>"
+  in
+  do Wserver.wprint "%s"
+       (gen_person_title_text reference std_access conf base p2);
      Date.afficher_dates_courtes conf base p2;
   return ()
 ;
@@ -204,7 +204,8 @@ value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
             Wserver.wprint "%s:\n"
               (capitale
                  (cftransl conf "on %s's side"
-                    [gen_person_title_text raw_access conf base a]));
+                    [gen_person_title_text
+                       no_reference raw_access conf base a]));
          return ()
        else ();
        let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.95 2001-03-13 12:47:37 ddr Exp $ *)
+(* $Id: util.ml,v 3.96 2001-03-15 07:10:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -342,14 +342,27 @@ value main_title base p =
 ;
 
 value titled_person_text conf base p t =
-  if Name.strip_lower (sou base t.t_place) =
-     Name.strip_lower (p_surname base p)
-  then
+  let estate = sou base t.t_place in
+  let surname = p_surname base p in
+  let elen = String.length estate in
+  let slen = String.length surname in
+  if Name.strip_lower estate = Name.strip_lower surname then
     match (t.t_name, p.qualifiers) with
     [ (Tname n, []) -> sou base n
     | (Tname n, [nn :: _]) ->
         sou base n ^ " <em>" ^ sou base nn ^ "</em>"
     | _ -> person_text_without_surname conf base p ]
+  else if elen < slen && String.sub surname (slen - elen) elen = estate then
+    match (t.t_name, p.qualifiers) with
+    [ (Tname n, []) -> sou base n
+    | (Tname n, [nn :: _]) ->
+        sou base n ^ " <em>" ^ sou base nn ^ "</em>"
+    | _ ->
+        let trunc_surname _ _ =
+          strip_spaces (String.sub surname 0 (slen - elen))
+        in
+        let trunc_access = (p_first_name, trunc_surname) in
+        gen_person_text trunc_access conf base p ]
   else
     match t.t_name with
     [ Tname s ->
@@ -381,7 +394,9 @@ value reference conf base p s =
   else "<a href=\"" ^ commd conf ^ acces conf base p ^ "\">" ^ s ^ "</a>"
 ;
 
-value gen_referenced_person_title_text p_access conf base p =
+value no_reference conf base p s = s;
+
+value gen_person_title_text reference p_access conf base p =
   if age_autorise conf base p then
     match main_title base p with
     [ Some t ->
@@ -391,19 +406,11 @@ value gen_referenced_person_title_text p_access conf base p =
   else reference conf base p (gen_person_text p_access conf base p)
 ;
 
-value gen_person_title_text p_access conf base p =
-  if age_autorise conf base p then
-    match main_title base p with
-    [ Some t -> titled_person_text conf base p t ^ one_title_text conf base p t
-    | None -> gen_person_text p_access conf base p ]
-  else gen_person_text p_access conf base p
-;
-
 value referenced_person_title_text =
-  gen_referenced_person_title_text std_access
+  gen_person_title_text reference std_access
 ;
 
-value person_title_text = gen_person_title_text std_access;
+value person_title_text = gen_person_title_text no_reference std_access;
 
 value gen_person_text_without_title p_access conf base p =
   match main_title base p with
@@ -1838,12 +1845,4 @@ value afficher_personne_titre conf base p =
 
 value afficher_personne_titre_referencee conf base p =
   Wserver.wprint "\n%s" (referenced_person_title_text conf base p)
-;
-
-value afficher_personne_sans_titre conf base p =
-  Wserver.wprint "%s" (person_text_without_title conf base p)
-;
-
-value afficher_titre conf base p =
-  Wserver.wprint "%s" (person_title conf base p)
 ;
