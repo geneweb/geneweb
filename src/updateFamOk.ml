@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: updateFamOk.ml,v 1.6 1998-12-05 13:29:51 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 1.7 1998-12-11 14:24:11 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -134,7 +134,7 @@ value print_err_unknown conf base (f, s, o) =
   in
   do header conf title;
      Wserver.wprint "%s: <strong>%s.%d %s</strong>\n"
-       (capitale (transl conf "unknown person")) f o s;
+       (capitale (transl conf "unknown person")) (coa conf f) o (coa conf s);
      trailer conf;
   return ()
 ;

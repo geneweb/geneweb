@@ -636,6 +636,7 @@ se: samtidigt
 de: Taufe
 en: baptism
 fr: bapt&ecirc;me
+nl: doop
 se: dop
 
     baptized
@@ -742,6 +743,7 @@ se: gren/grenar
 de: Beisetzung
 en: burial
 fr: enterrement
+nl: begrafenis
 pt: enterro
 se: begravning
 
@@ -1361,6 +1363,7 @@ se: f&ouml;rteckning &ouml;ver gem&aring;lerna (icke &auml;ttlingar)
 de: einf&uuml;gen
 en: insert
 fr: ins&eacute;rer
+nl: invoegen
 pt: inserir
 se: infoga
 
@@ -1546,6 +1549,7 @@ se: kanske
 de: zusammenf&uuml;hren
 en: merge
 fr: fusionner
+nl: samenvoegen
 pt: fus&atilde;o
 se: sl&aring;samman
 
@@ -1553,6 +1557,7 @@ se: sl&aring;samman
 de: Zusammenf&uuml;hrung abgeschlossen
 en: merge done
 fr: fusion termin&eacute;e
+nl: samenvoeging is gedaan
 pt: fus&atilde;o terminada
 se: sammanslagning klar
 
@@ -1591,6 +1596,7 @@ se: m&aring;nader gammal
 de: mehr als %d Antworten
 en: more than %d answers
 fr: plus de %d r&eacute;ponses
+nl: meer dan %d antwoorden
 pt: m&aacute;s de %d respostas
 se: fler &auml;n %d svar
 
@@ -1677,6 +1683,7 @@ se: ingen k&auml;nd sl&auml;ktskap emellan %t och %t
 de: keine passenden Eintr&auml;ge
 en: no match
 fr: aucune r&eacute;ponse
+nl: niets gevonden
 pt: nenhuma resposta
 se: inga tr&auml;ffar
 
@@ -2030,6 +2037,7 @@ se: plats
 de: privat
 en: private
 fr: priv&eacute;
+nl: priv&eacute;
 pt: privado
 se: privat
 
@@ -2039,6 +2047,7 @@ en: probable loop in database: someone being his/her own ancestor
 es: bucle probable en base de datos: alguien es su propio antepasado
 fr: boucle probable dans la base de donn&eacute;es: quelqu'un est son propre anc&ecirc;tre
 it: ciclo probabile nella base di dati: qualcuno &egrave; il suo proprio antenato
+nl: waarschijnlijk een lus in de databank
 pt: la&ccedil;o prov&aacute;vel na base de dados: algu&eacute;m &eacute; his/her pr&oacute;prio antepassado
 se: trolig rundg&aring;ng i databasen: n&aring;gon &auml;r hans/hennes egen sl&auml;kting
 
@@ -2134,6 +2143,7 @@ se: se vidare
 de: mehrere Antworten
 en: several answers
 fr: plusieurs r&eacute;ponses
+nl: meerdere antwoorden
 pt: varias respostas
 se: flera svar
 
@@ -2726,11 +2736,13 @@ se: &aring;r gammal
 de: Sie m&uuml;ssen erst zusammenf&uuml;hren
 en: you must first merge
 fr: vous devez d'abord fusionner
+nl: je moet eerst samenvoegen
 se: du m&aring;ste f&ouml;rst sl&aring;samman
 
     you must first merge the 2 families
 de: Sie m&uuml;ssen erst beide Familien zusammenf&uuml;hren
 en: you must first merge the 2 families
 fr: vous devez d'abord fusionner les 2 familles
+nl: je moet de twee families eerst samenvoegen
 pt: Você tem que fusionar primeiro as 2 familias
 se: du m&aring;ste f&ouml;rst sl&aring;samman de 2 familjerna
