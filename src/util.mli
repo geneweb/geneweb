@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.8 1999-12-14 05:16:09 ddr Exp $ *)
+(* $Id: util.mli,v 3.9 1999-12-15 19:58:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -90,6 +90,7 @@ value preciser_homonyme : config -> base -> person -> unit;
 value transl : config -> string -> string;
 value transl_nth : config -> string -> int -> string;
 value transl_decline : config -> string -> string -> string;
+value transl_decline2 : config -> string -> string -> string -> string;
 value ftransl : config -> format 'a 'b 'c -> format 'a 'b 'c;
 value ftransl_nth : config -> format 'a 'b 'c -> int -> format 'a 'b 'c;
 value fdecline : config -> format 'a 'b 'c -> string -> format 'a 'b 'c;

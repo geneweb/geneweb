@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.19 1999-12-14 05:16:08 ddr Exp $ *)
+(* $Id: util.ml,v 3.20 1999-12-15 19:58:08 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -482,6 +482,44 @@ value gen_decline conf wt s =
 ;
 
 value transl_decline conf w s = gen_decline conf (transl conf w) s;
+
+value gen_decline2 conf wt s1 s2 =
+  let string_of =
+    fun
+    [ '1' -> Some s1
+    | '2' -> Some s2
+    | _ -> None ]
+  in
+  let len = String.length wt in
+  loop 0 where rec loop i =
+    if i = len then ""
+    else
+      let (s, i) =
+        match wt.[i] with
+        [ '%' when i + 1 < len ->
+            match string_of wt.[i + 1] with
+            [ Some s -> (s, i + 1)
+            | None -> ("%", i) ]
+        | ':' when i + 4 < len && wt.[i + 2] = ':' && wt.[i + 3] = '%' ->
+            let c = wt.[i + 1] in
+            match string_of wt.[i + 4] with
+            [ Some s -> (decline c s, i + 4)
+            | None -> (":", i) ]
+        | '[' when i + 5 < len && wt.[i + 3] = ']' && wt.[i + 4] = '%' ->
+            match string_of wt.[i + 5] with
+            [ Some s ->
+                let s =
+                  if start_with_vowel s then String.make 1 wt.[i + 2] ^ s
+                  else String.make 1 wt.[i + 1] ^ " " ^ s
+                in
+                (s, i + 5)
+            | _ -> ("[", i) ]
+        | c -> (String.make 1 c, i) ]
+      in
+      s ^ loop (i + 1)
+;
+
+value transl_decline2 conf w s1 s2 = gen_decline2 conf (transl conf w) s1 s2;
 
 value failed_format s = (Obj.magic ("[" ^ s ^ "]") : format 'a 'b 'c);
 

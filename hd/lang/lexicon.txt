@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.33 1999-12-14 14:42:44 ddr Exp $
+# $Id: lexicon.txt,v 3.34 1999-12-15 19:58:00 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -69,6 +69,40 @@ nl: , om dit nummer weer te proberen, of druk "terug" en verander het zelf
 no:  for å pr&oslash;ve igjen med dette nummeret, eller g&aring; tilbake og endre det selv
 pt: para tentar novamente com este n&uacute;mero ou fazer "back" e escolher outro
 se:  f&ouml;r att f&ouml;rs&ouml;ka igen med detta nummer eller g&aring; tillbaka och &auml;ndra det sj&auml;lv
+
+    %1 of %2
+cs: %1 :g:%2
+de: %1 von :d:%2
+dk: %1 til %2
+en: %1 of %2
+eo: %1 de %2
+es: %1 de %2
+fi: :g:%2 %1
+fr: %1 d[e']%2
+he: %1 ùì %2
+is: %1 %2
+it: %1 d[i']%2
+nl: %1 van %2
+no: %1 til %2
+pt: %1 de %2
+se: %1 till %2
+
+    %1 of (same or greater generation level) %2
+cs: %1 :g:%2
+de: %1 von :d:%2
+dk: %1 til %2
+en: %1 of %2
+eo: %1 de %2
+es: %1 de %2
+fi: :g:%2 %1
+fr: %1 d[e']%2
+he: %1 ùì %2
+is: %1 %2
+it: %1 d[i']%2
+nl: %1 van %2
+no: %1 av %2
+pt: %1 de %2
+se: %1 till %2
 
     %d years ago
 cs: pøed %d rokem;lety
@@ -4626,7 +4660,7 @@ dk: faderen/moderen/en for&aelig;lder
 en: the father/the mother/a parent
 eo: la patro/la patrino/gepatro
 es: el padre/la madre/un padre
-fi: is&auml;/&auml;iti/vanhempi
+fi: is&auml;/&auml;iti/vanhempi:g:--man
 fr: le p&egrave;re/la m&egrave;re/un parent
 he:   äàá/ äàí/ äåøä
 is: fağir/móğir/foreldri
