@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 4.20 2004-12-14 09:30:21 ddr Exp $ *)
+(* $Id: wserver.ml,v 4.21 2004-12-14 13:47:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -545,7 +545,11 @@ value accept_connection tmout max_clients callback s =
             Array.append (Unix.environment ())
               [| "WSERVER=" ^ string_of_sockaddr addr |]
           in
+(*
           let args = Array.map (fun x -> "\"" ^ x ^ "\"") Sys.argv in
+*)
+let args = Sys.argv in
+(**)
           Unix.create_process_env Sys.argv.(0) args env Unix.stdin
             Unix.stdout Unix.stderr
         in
