@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.27 2001-02-23 18:26:52 ddr Exp $ *)
+(* $Id: setup.ml,v 3.28 2001-02-23 18:49:50 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1300,7 +1300,12 @@ value setup (addr, req) comm env_str =
 
 value wrap_setup a b c =
   do ifdef WIN95 then
-       try default_lang.val := Sys.getenv "GWLANG" with [ Not_found -> () ]
+       (* another process have been launched, therefore we lost variables;
+          and we cannot parse the arg list again, because of possible spaces
+          in arguments which may appear as separators *)
+       do try default_lang.val := Sys.getenv "GWLANG" with [ Not_found -> () ];
+          try setup_dir.val := Sys.getenv "GWGD" with [ Not_found -> () ];
+       return ()
      else ();
   return
   try setup a b c with
@@ -1432,19 +1437,16 @@ value intro () =
      in
      do set_gwd_default_language_if_absent gwd_lang;
         default_lang.val := setup_lang;
-        ifdef WIN95 then Unix.putenv "GWLANG" setup_lang else ();
+        ifdef WIN95 then
+          do Unix.putenv "GWLANG" setup_lang;
+             Unix.putenv "GWGD" setup_dir.val;
+          return ()
+        else ();
      return ();
      Printf.printf "\n";
      flush stdout;
   return ()
 ;
-
-(* hack done under vi under Windows... wrap_setup should me moved here *)
-value wrap_setup x =
-  do ifdef WIN95 then Argl.parse speclist anonfun usage else (); return
-  wrap_setup x
-;
-(* end hack *)
 
 value main () =
   do ifdef UNIX then intro ()
