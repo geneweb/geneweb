@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.56 2005-03-13 10:49:10 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.57 2005-03-13 13:31:31 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -1863,10 +1863,10 @@ value print_tree_with_table conf base gv p =
           match po with
           [ Empty -> "&nbsp;"
           | Cell _ Left _ _ ->
-              sprintf "<hr style=\"width:50%%;margin-%s:50%%\"%s>" conf.left
+              sprintf "<div style=\"margin-%s:50%%\"><hr%s></div>" conf.left
                 conf.xhs
           | Cell _ Right _ _ ->
-              sprintf "<hr style=\"width:50%%;margin-%s:50%%\"%s>" conf.right
+              sprintf "<div style=\"margin-%s:50%%\"><hr%s></div>" conf.right
                 conf.xhs
           | Cell _ Alone _ _ -> "|"
           | Cell _ Center _ _ ->
