@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: some.ml,v 4.4 2002-01-10 04:13:31 ddr Exp $ *)
+(* $Id: some.ml,v 4.5 2002-01-23 11:39:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -215,7 +215,7 @@ value rec print_branch conf base first_lev psn lev name p =
     Wserver.wprint "</strong>";
     Date.afficher_dates_courtes conf base p;
     Wserver.wprint "\n";
-    let u = uoi base p.cle_index in
+    let u = uget conf base p.cle_index in
     if Array.length u.family == 0 then ()
     else
       let _ =
@@ -349,14 +349,18 @@ value print_by_branch x conf base not_found_fun (pl, homonymes) =
              }
              else ();
              if br = None || br = Some n then
-               match (aoi base p.cle_index).parents with
+               match (aget conf base p.cle_index).parents with
                [ Some ifam ->
                    let cpl = coi base ifam in
                    do {
-                     let href = Util.acces conf base (pget conf base cpl.father) in
+                     let href =
+                       Util.acces conf base (pget conf base cpl.father)
+                     in
                      wprint_geneweb_link conf href "&lt;&lt";
                      Wserver.wprint "\n&amp;\n";
-                     let href = Util.acces conf base (pget conf base cpl.mother) in
+                     let href =
+                       Util.acces conf base (pget conf base cpl.mother)
+                     in
                      wprint_geneweb_link conf href "&lt;&lt";
                      Wserver.wprint "\n";
                      tag "ul" begin
@@ -444,7 +448,7 @@ value select_ancestors conf base name_inj ipl =
   List.fold_left
     (fun ipl ip ->
        let p = pget conf base ip in
-       let a = aoi base ip in
+       let a = aget conf base ip in
        match a.parents with
        [ Some ifam ->
            let cpl = coi base ifam in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.21 2002-01-10 04:13:31 ddr Exp $ *)
+(* $Id: relation.ml,v 4.22 2002-01-23 11:39:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -70,7 +70,7 @@ value print_menu conf base p =
     }
   in
   let is = index_of_sex p.sex in
-  let u = uoi base p.cle_index in
+  let u = uget conf base p.cle_index in
   do {
     header conf title;
     tag "form" "method=get action=\"%s\"" conf.command begin
@@ -244,7 +244,7 @@ value dag_ind_list_of_path path =
   indl
 ;
 
-value add_missing_parents_of_siblings base indl =
+value add_missing_parents_of_siblings conf base indl =
   List.fold_right
     (fun ind indl ->
        let indl =
@@ -254,7 +254,7 @@ value add_missing_parents_of_siblings base indl =
              let ip =
                match ind.di_val with
                [ Some ip ->
-                   match (aoi base ip).parents with
+                   match (aget conf base ip).parents with
                    [ Some ifam -> (coi base ifam).father
                    | None -> assert False ]
                | _ -> assert False ]
@@ -318,7 +318,7 @@ value dag_of_ind_dag_list indl =
 
 value html_table_of_relation_path_dag conf base elem_txt vbar_txt path =
   let indl = dag_ind_list_of_path path in
-  let indl = add_missing_parents_of_siblings base indl in
+  let indl = add_missing_parents_of_siblings conf base indl in
   let faml = dag_fam_list_of_ind_list indl in
   let (indl, faml) = add_phony_children indl faml in
   let nl = dag_of_ind_dag_list indl in
@@ -369,7 +369,7 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
         Date.short_dates_text conf base p
     in
     let vbar_txt ip =
-      let u = uoi base ip in
+      let u = uget conf base ip in
       let excl_faml = Array.to_list u.family @ excl_faml in
       next_relation_link_txt conf ip1 ip2 excl_faml
     in
@@ -389,7 +389,7 @@ type node =
   | Visited of (bool * iper * famlink) ]
 ;
 
-value get_shortest_path_relation base ip1 ip2 excl_faml =
+value get_shortest_path_relation conf base ip1 ip2 excl_faml =
   let mark_per = Array.create base.data.persons.len NotVisited in
   let mark_fam = Array.create base.data.families.len False in
   do {
@@ -423,7 +423,7 @@ value get_shortest_path_relation base ip1 ip2 excl_faml =
                      (fun child children ->
                         [(child, HalfSibling, fam) :: children])
                      (Array.to_list (doi base fam).children) children)
-              (Array.to_list (uoi base cpl.father).family) []
+              (Array.to_list (uget conf base cpl.father).family) []
         in
         let result =
           result @
@@ -436,7 +436,7 @@ value get_shortest_path_relation base ip1 ip2 excl_faml =
                      (fun child children ->
                         [(child, HalfSibling, fam) :: children])
                      (Array.to_list (doi base fam).children) children)
-              (Array.to_list (uoi base cpl.mother).family) []
+              (Array.to_list (uget conf base cpl.mother).family) []
         in
         result
       }
@@ -455,11 +455,11 @@ value get_shortest_path_relation base ip1 ip2 excl_faml =
                  [(cpl.father, Mate, ifam); (cpl.mother, Mate, ifam)] @
                  nb
              })
-          (Array.to_list (uoi base iper).family) []
+          (Array.to_list (uget conf base iper).family) []
       in
       let result =
         result @
-          (match (aoi base iper).parents with
+          (match (aget conf base iper).parents with
            [ Some ifam -> parse_fam ifam
            | _ -> [] ])
       in
@@ -558,7 +558,7 @@ value print_shortest_path conf base p1 p2 =
                   [ Some n -> n
                   | None -> 0 ]
                 in
-                let u = uoi base p.cle_index in
+                let u = uget conf base p.cle_index in
                 let list =
                   if n < Array.length u.family then [u.family.(n) :: list]
                   else list
@@ -571,7 +571,7 @@ value print_shortest_path conf base p1 p2 =
     in
     let ip1 = p1.cle_index in
     let ip2 = p2.cle_index in
-    match get_shortest_path_relation base ip1 ip2 excl_faml with
+    match get_shortest_path_relation conf base ip1 ip2 excl_faml with
     [ Some (path, ifam) ->
         if p_getenv conf.env "slices" = Some "on" then
           Dag.print_slices_menu conf base None
@@ -642,7 +642,7 @@ value get_piece_of_branch conf base (((reltab, list), x), proj) (len1, len2) =
             loop2 (Array.to_list (doi base ifam).children)
         | [] -> [] ]
       in
-      loop1 (Array.to_list (uoi base ip).family)
+      loop1 (Array.to_list (uget conf base ip).family)
   in
   loop anc.cle_index x
 ;
@@ -820,8 +820,8 @@ value nephew_label conf x p =
           (transl_nth conf "nth (generation)" n) ]
 ;
 
-value same_parents base p1 p2 =
-  (aoi base p1.cle_index).parents = (aoi base p2.cle_index).parents
+value same_parents conf base p1 p2 =
+  (aget conf base p1.cle_index).parents = (aget conf base p2.cle_index).parents
 ;
 
 value print_link_name conf base n p1 p2 sol =
@@ -860,7 +860,7 @@ value print_link_name conf base n p1 p2 sol =
           (child_in_law_label conf ini_p2.sex, sp1, False)
         else (descendant_label conf base (info, x2) x2 p2, sp1, sp2)
       else if x2 == x1 then
-        if x2 == 1 && not (same_parents base p2 p1) then
+        if x2 == 1 && not (same_parents conf base p2 p1) then
           (half_brother_label conf p2.sex, sp1, sp2)
         else if x2 == 1 && (sp2 || sp1) && p2.sex <> Neuter then
           (brother_in_law_label conf ini_p2.sex, False, False)
@@ -1280,7 +1280,7 @@ value compute_simple_relationship conf base tstab p1 p2 =
 ;
 
 value known_spouses_list conf base p excl_p =
-  let u = uoi base p.cle_index in
+  let u = uget conf base p.cle_index in
   List.fold_left
     (fun spl ifam ->
        let sp = pget conf base (spouse p.cle_index (coi base ifam)) in
@@ -1400,8 +1400,8 @@ value print_one_path conf base found a p1 p2 pp1 pp2 l1 l2 =
   let ip1 = p1.cle_index in
   let ip2 = p2.cle_index in
   let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
-  let b1 = find_first_branch base dist ip l1 ip1 Neuter in
-  let b2 = find_first_branch base dist ip l2 ip2 Neuter in
+  let b1 = find_first_branch conf base dist ip l1 ip1 Neuter in
+  let b2 = find_first_branch conf base dist ip l2 ip2 Neuter in
   match (b1, b2) with
   [ (Some b1, Some b2) ->
       let info =
@@ -1459,8 +1459,8 @@ value print_main_relationship conf base long p1 p2 rel =
                   [gen_person_title_text reference raw_access conf base p1;
                    gen_person_title_text reference raw_access conf base p2]))
     | Some (rl, total, relationship) ->
-        let a1 = aoi base p1.cle_index in
-        let a2 = aoi base p2.cle_index in
+        let a1 = aget conf base p1.cle_index in
+        let a2 = aget conf base p2.cle_index in
         let all_by_marr =
           List.for_all
             (fun
@@ -1575,7 +1575,7 @@ value print_multi_relation conf base pl lim assoc_txt =
       [ [p1 :: ([p2 :: _] as pl)] ->
           let ip1 = p1.cle_index in
           let ip2 = p2.cle_index in
-          match get_shortest_path_relation base ip1 ip2 [] with
+          match get_shortest_path_relation conf base ip1 ip2 [] with
           [ Some (path1, _) ->
               let path =
                 match path with

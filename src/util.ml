@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.26 2002-01-21 05:01:01 ddr Exp $ *)
+(* $Id: util.ml,v 4.27 2002-01-23 11:39:56 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -201,6 +201,14 @@ value empty_string = Adef.istr_of_int 0;
 
 value pget (conf : config) base ip =
   base.data.persons.get (Adef.int_of_iper ip)
+;
+
+value aget (conf : config) base ip =
+  base.data.ascends.get (Adef.int_of_iper ip)
+;
+
+value uget (conf : config) base ip =
+  base.data.unions.get (Adef.int_of_iper ip)
 ;
 
 value is_old_person conf p =
@@ -850,7 +858,7 @@ value url_no_index conf base =
             if f = "" || s = "" then None
             else
               let oc = string_of_int p.occ in
-              let u = uoi base cpl.father in
+              let u = uget conf base cpl.father in
               let n =
                 loop 0 where rec loop k =
                   if u.family.(k) == Adef.ifam_of_int i then string_of_int k
@@ -1318,7 +1326,7 @@ value preciser_homonyme conf base p =
       Wserver.wprint "%s <em>%s</em>" (p_first_name base p) (sou base nn)
   | (n, []) when sou base n <> "" -> Wserver.wprint "%s" (sou base n)
   | (_, []) ->
-      let a = aoi base p.cle_index in
+      let a = aget conf base p.cle_index in
       let ifam =
         match a.parents with
         [ Some ifam ->
@@ -1336,7 +1344,7 @@ value preciser_homonyme conf base p =
       in
       match ifam with
       [ Some (None, None) | None ->
-          let u = uoi base p.cle_index in
+          let u = uget conf base p.cle_index in
           let rec loop i =
             if i < Array.length u.family then
               let des = doi base u.family.(i) in
@@ -1642,7 +1650,7 @@ value branch_of_sosa conf base ip n =
       fun
       [ [] -> Some [(ip, sp) :: ipl]
       | [goto_fath :: nl] ->
-          match (aoi base ip).parents with
+          match (aget conf base ip).parents with
           [ Some ifam ->
               let cpl = coi base ifam in
               if goto_fath then loop [(ip, sp) :: ipl] cpl.father Male nl
@@ -1795,9 +1803,9 @@ value wprint_hidden_person conf base pref p =
 
 exception Ok;
 
-value has_nephews_or_nieces base p =
+value has_nephews_or_nieces conf base p =
   try
-    let a = aoi base p.cle_index in
+    let a = aget conf base p.cle_index in
     match a.parents with
     [ Some ifam ->
         let des = doi base ifam in
@@ -1811,7 +1819,7 @@ value has_nephews_or_nieces base p =
                       if Array.length (doi base ifam).children > 0 then
                         raise Ok
                       else ())
-                   (uoi base ip).family)
+                   (uget conf base ip).family)
             des.children;
           False
         }

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 4.6 2002-01-20 06:19:23 ddr Exp $ *)
+(* $Id: cousins.ml,v 4.7 2002-01-23 11:39:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -12,7 +12,7 @@ value max_cnt = 2000;
 
 (* Utilities *)
 
-value niveau_max_ascendance base ip =
+value niveau_max_ascendance conf base ip =
   let x = ref 0 in
   let mark = Array.create base.data.persons.len False in
   let rec loop niveau ip =
@@ -22,7 +22,7 @@ value niveau_max_ascendance base ip =
       x.val := max x.val niveau;
       if x.val = max_lev then ()
       else
-        match (aoi base ip).parents with
+        match (aget conf base ip).parents with
         [ Some ifam ->
             let cpl = coi base ifam in
             do {
@@ -59,8 +59,8 @@ value children_of base u =
     (Array.to_list u.family) []
 ;
 
-value siblings_by base iparent ip =
-  let list = children_of base (uoi base iparent) in
+value siblings_by conf base iparent ip =
+  let list = children_of base (uget conf base iparent) in
   except ip list
 ;
 
@@ -75,30 +75,31 @@ value merge_siblings l1 l2 =
   List.rev l
 ;
 
-value siblings base p =
+value siblings conf base p =
   let ip = p.cle_index in
-  match (aoi base ip).parents with
+  match (aget conf base ip).parents with
   [ Some ifam ->
       let cpl = coi base ifam in
       let fath_sib =
         List.map (fun ip -> (ip, (cpl.father, Male)))
-          (siblings_by base cpl.father ip)
+          (siblings_by conf base cpl.father ip)
       in
       let moth_sib =
         List.map (fun ip -> (ip, (cpl.mother, Female)))
-          (siblings_by base cpl.mother ip)
+          (siblings_by conf base cpl.mother ip)
       in
       merge_siblings fath_sib moth_sib
   | None -> [] ]
 ;
 
-value rec has_desc_lev base lev u =
+value rec has_desc_lev conf base lev u =
   if lev <= 1 then True
   else
     List.exists
       (fun ifam ->
          let des = doi base ifam in
-         List.exists (fun ip -> has_desc_lev base (lev - 1) (uoi base ip))
+         List.exists
+           (fun ip -> has_desc_lev conf base (lev - 1) (uget conf base ip))
            (Array.to_list des.children))
       (Array.to_list u.family)
 ;
@@ -172,7 +173,7 @@ value give_access conf base ia_asex p1 b1 p2 b2 =
   then
     print_nospouse ()
   else
-    let u = Array.to_list (uoi base p2.cle_index).family in
+    let u = Array.to_list (uget conf base p2.cle_index).family in
     match u with
     [ [] -> print_nospouse ()
     | _ ->
@@ -197,10 +198,10 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
     List.iter
       (fun (ip, ia_asex, rev_br) ->
          let p = pget conf base ip in
-         let u = uoi base ip in
+         let u = uget conf base ip in
          let br = List.rev [(ip, p.sex) :: rev_br] in
          let is_valid_rel = br_inter_is_empty ini_br br in
-         if is_valid_rel && cnt.val < max_cnt && has_desc_lev base lev u
+         if is_valid_rel && cnt.val < max_cnt && has_desc_lev conf base lev u
          then do {
            if lev <= 2 then do {
              html_li conf;
@@ -235,13 +236,13 @@ value rec print_descend_upto conf base max_cnt ini_p ini_br lev children =
   else ()
 ;
 
-value sibling_has_desc_lev base lev (ip, _) =
-  has_desc_lev base lev (uoi base ip)
+value sibling_has_desc_lev conf base lev (ip, _) =
+  has_desc_lev conf base lev (uget conf base ip)
 ;
 
 value print_cousins_side_of conf base max_cnt a ini_p ini_br lev1 lev2 =
-  let sib = siblings base a in
-  if List.exists (sibling_has_desc_lev base lev2) sib then do {
+  let sib = siblings conf base a in
+  if List.exists (sibling_has_desc_lev conf base lev2) sib then do {
     if lev1 > 1 then do {
       html_li conf;
       Wserver.wprint "%s:\n"
@@ -349,7 +350,7 @@ value print_menu conf base p effective_level =
       html_li conf;
       Wserver.wprint "<a href=\"%s%s;m=C;v1=2;v2=1\">%s</a>\n" (commd conf)
         (acces conf base p) (capitale (transl conf "uncles and aunts"));
-      if has_nephews_or_nieces base p then do {
+      if has_nephews_or_nieces conf base p then do {
         html_li conf;
         Wserver.wprint "<a href=\"%s%s;m=C;v1=1;v2=2\">%s</a>\n" (commd conf)
           (acces conf base p) (capitale (transl conf "nephews and nieces"))
@@ -397,7 +398,7 @@ value print_anniv conf base p level =
       let set = S.add ip (up_sosa, down_br) set in
       if n = 0 then set
       else
-        let u = (uoi base ip).family in
+        let u = (uget conf base ip).family in
         let down_br = [ip :: down_br] in
         let rec loop set i =
           if i = Array.length u then set
@@ -433,7 +434,7 @@ value print_anniv conf base p level =
         if n >= level then set
         else
           let a =
-            match (aoi base ip).parents with
+            match (aget conf base ip).parents with
             [ Some ifam ->
                 let cpl = coi base ifam in
                 let n = n + 1 in
@@ -449,7 +450,7 @@ value print_anniv conf base p level =
   let set =
     S.fold
       (fun ip (up_sosa, down_br) set ->
-         let u = (uoi base ip).family in
+         let u = (uget conf base ip).family in
          let set = S.add ip (up_sosa, down_br, None) set in
          if Array.length u = 0 then set
          else
@@ -509,7 +510,7 @@ value print conf base p =
   | (_, Some "AN") when conf.wizard || conf.friend ->
       print_anniv conf base p max_lev
   | _ ->
-      let effective_level = niveau_max_ascendance base p.cle_index + 1 in
+      let effective_level = niveau_max_ascendance conf base p.cle_index + 1 in
       if effective_level == 2 then print_cousins conf base p 2 2
       else print_menu conf base p effective_level ]
 ;

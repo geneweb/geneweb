@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.27 2002-01-20 13:37:15 ddr Exp $ *)
+(* $Id: perso.ml,v 4.28 2002-01-23 11:39:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -194,7 +194,7 @@ value find_sosa_aux conf base a p =
                tstab.(Adef.int_of_iper ip) then
             gene_find zil
           else
-            let asc = aoi base ip in
+            let asc = aget conf base ip in
             match asc.parents with
             [ Some ifam ->
                 let cpl = coi base ifam in
@@ -222,7 +222,7 @@ value find_sosa_aux conf base a p =
     else if mark.(Adef.int_of_iper ip) then None
     else do {
       mark.(Adef.int_of_iper ip) := True;
-      let asc = aoi base ip in
+      let asc = aget conf base ip in
       match asc.parents with
       [ Some ifam ->
           let cpl = coi base ifam in
@@ -242,7 +242,7 @@ value find_sosa conf base a =
   [ Some p ->
       if a.cle_index = p.cle_index then Some (Num.one, p)
       else
-        let u = uoi base a.cle_index in
+        let u = uget conf base a.cle_index in
         if has_children base u then find_sosa_aux conf base a p else None
   | None -> None ]
 ;
@@ -290,8 +290,8 @@ value rec eval_variable conf base env sl =
   let efam = get_env "fam" env in
   let make_ep ip =
     let p = pget conf base ip in
-    let a = aoi base ip in
-    let u = uoi base ip in
+    let a = aget conf base ip in
+    let u = uget conf base ip in
     let p_auth = age_autorise conf base p in (p, a, u, p_auth)
   in
   let rec loop (p, a, u, p_auth) efam =
@@ -990,7 +990,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
   | "has_families" -> Array.length u.family > 0
   | "has_first_names_aliases" -> p.first_names_aliases <> []
   | "has_image" -> Util.has_image conf base p
-  | "has_nephews_or_nieces" -> has_nephews_or_nieces base p
+  | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
   | "has_nobility_titles" -> p_auth && p.titles <> []
   | "has_notes" -> p_auth && sou base p.notes <> ""
   | "has_occupation" -> p_auth && sou base p.occupation <> ""
@@ -1243,8 +1243,8 @@ and eval_foreach_child conf base env al =
       Array.iteri
         (fun i ip ->
            let p = pget conf base ip in
-           let a = aoi base ip in
-           let u = uoi base ip in
+           let a = aget conf base ip in
+           let u = uget conf base ip in
            let env = [("#loop", Vint 0) :: env] in
            let env = [("child", Vind p a u) :: env] in
            let env = [("child_cnt", Vint (i + 1)) :: env] in
@@ -1341,8 +1341,8 @@ and eval_foreach_related conf base env al (p, _, _, p_auth) =
     in
     List.iter
       (fun (c, r) ->
-         let a = aoi base c.cle_index in
-         let u = uoi base c.cle_index in
+         let a = aget conf base c.cle_index in
+         let u = uget conf base c.cle_index in
          let env = [("c", Vind c a u); ("rel", Vrel r) :: env] in
          List.iter (eval_ast conf base env) al)
       list
@@ -1407,8 +1407,8 @@ and eval_foreach_witness conf base env al =
       list_iter_first
         (fun first ip ->
            let p = pget conf base ip in
-           let a = aoi base ip in
-           let u = uoi base ip in
+           let a = aget conf base ip in
+           let u = uget conf base ip in
            let env = [("witness", Vind p a u) :: env] in
            let env = [("first", Vbool first) :: env] in
            List.iter (eval_ast conf base env) al)
@@ -1429,14 +1429,14 @@ and eval_foreach_witness_relation conf base env al (p, _, _, _) =
                 let env = [("fam", Vfam fam cpl des) :: env] in
                 List.iter (eval_ast conf base env) al
               else ())
-           (uoi base ic).family
+           (uget conf base ic).family
        else ())
     p.related
 ;
 
 value interp_templ conf base p astl =
-  let a = aoi base p.cle_index in
-  let u = uoi base p.cle_index in
+  let a = aget conf base p.cle_index in
+  let u = uget conf base p.cle_index in
   let env =
     let env = [] in
     let env =
@@ -1469,7 +1469,7 @@ value print conf base p =
     if conf.wizard || conf.friend then None
     else
       let src =
-        match (aoi base p.cle_index).parents with
+        match (aget conf base p.cle_index).parents with
         [ Some ifam -> sou base (foi base ifam).origin_file
         | None -> "" ]
       in

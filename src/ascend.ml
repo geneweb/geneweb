@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.11 2002-01-10 04:13:30 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.12 2002-01-23 11:39:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -19,7 +19,7 @@ value limit_by_tree conf =
   | None -> 7 ]
 ;
 
-value niveau_max_ascendance base ip =
+value niveau_max_ascendance conf base ip =
   let _ = base.data.ascends.array () in
   let _ = base.data.couples.array () in
   let x = ref 0 in
@@ -29,7 +29,7 @@ value niveau_max_ascendance base ip =
     else do {
       mark.(Adef.int_of_iper ip) := True;
       x.val := max x.val niveau;
-      match (aoi base ip).parents with
+      match (aget conf base ip).parents with
       [ Some ifam ->
           let cpl = coi base ifam in
           do { loop (succ niveau) cpl.father; loop (succ niveau) cpl.mother }
@@ -169,7 +169,7 @@ value print_choice conf base p niveau_effectif =
 ;
 
 value afficher_menu_ascendants conf base p =
-  let niveau_effectif = niveau_max_ascendance base p.cle_index in
+  let niveau_effectif = niveau_max_ascendance conf base p.cle_index in
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
     Wserver.wprint "%s"
@@ -213,7 +213,7 @@ value afficher_ascendants_jusqu_a conf base niveau_max p =
   let niveau_max = min (limit_by_list conf) niveau_max in
   let rec boucle niveau ip =
     if niveau < niveau_max then
-      let x = aoi base ip in
+      let x = aget conf base ip in
       match x.parents with
       [ Some ifam ->
           let cpl = coi base ifam in
@@ -275,7 +275,7 @@ type generation_person =
   | GP_missing of Num.t and iper ]
 ;
 
-value next_generation base mark gpl =
+value next_generation conf base mark gpl =
   let gpl =
     List.fold_right
       (fun gp gpl ->
@@ -283,7 +283,7 @@ value next_generation base mark gpl =
          [ GP_person n ip _ ->
              let n_fath = Num.twice n in
              let n_moth = Num.inc n_fath 1 in
-             let a = aoi base ip in
+             let a = aget conf base ip in
              match a.parents with
              [ Some ifam ->
                  let cpl = coi base ifam in
@@ -390,7 +390,7 @@ value afficher_ascendants_numerotation conf base niveau_max p =
       tag "ul" begin
         List.iter (print_generation_person conf base cnt) gpl;
       end;
-      let gpl = next_generation base mark gpl in
+      let gpl = next_generation conf base mark gpl in
       if List.exists will_print gpl then generation (niveau + 1) gpl else ()
     }
     else ()
@@ -494,7 +494,7 @@ value get_link all_gp ip =
 ;
 
 value print_persons_parents conf base all_gp p =
-  let a = aoi base p.cle_index in
+  let a = aget conf base p.cle_index in
   match a.parents with
   [ Some ifam ->
       let cpl = coi base ifam in
@@ -554,7 +554,7 @@ value print_marriage_long conf base all_gp auth marr_nb p ifam =
   }
 ;
 
-value person_has_notes base p =
+value person_has_notes conf base p =
   sou base p.notes <> "" || sou base p.psources <> "" ||
   sou base p.birth_src <> "" || sou base p.baptism_src <> "" ||
   sou base p.death_src <> "" || sou base p.burial_src <> "" ||
@@ -562,7 +562,7 @@ value person_has_notes base p =
     (fun ifam ->
        let fam = foi base ifam in
        sou base fam.marriage_src <> "" || sou base fam.marriage_src <> "")
-    (Array.to_list (uoi base p.cle_index).family)
+    (Array.to_list (uget conf base p.cle_index).family)
 ;
  
 value has_notes conf base =
@@ -570,7 +570,7 @@ value has_notes conf base =
     (fun
      [ GP_person _ ip _ ->
          let p = pget conf base ip in
-         age_autorise conf base p && person_has_notes base p
+         age_autorise conf base p && person_has_notes conf base p
      | _ -> False ])
 ;
 
@@ -586,7 +586,7 @@ value print_other_marriages conf base ws all_gp auth ifamo p u =
 ;
 
 value print_notes_ref conf base p wn n child_n =
-  if wn && age_autorise conf base p && person_has_notes base p then do {
+  if wn && age_autorise conf base p && person_has_notes conf base p then do {
     Wserver.wprint "[%s " (capitale (transl_nth conf "note/notes" 0));
     stag "strong" begin
       stag "a" "href=\"#notes-%s%s\"" (Num.to_string n) child_n begin
@@ -627,7 +627,7 @@ value print_family_long conf base ws wn all_gp ifam nth moth_nb =
         let ipc = des.children.(i) in
         if ws || get_link all_gp ipc <> None then do {
           let pc = pget conf base ipc in
-          let uc = uoi base ipc in
+          let uc = uget conf base ipc in
           let n = get_link all_gp ipc in
           Wserver.wprint "<li>\n";
           stag "strong" begin
@@ -665,7 +665,7 @@ value print_family_long conf base ws wn all_gp ifam nth moth_nb =
 
 value print_other_families conf base wn all_gp excl_ifam moth_nb =
   let print ip n =
-    let u = uoi base ip in
+    let u = uget conf base ip in
     for i = 0 to Array.length u.family - 1 do {
       let ifam = u.family.(i) in
       if ifam <> excl_ifam && Array.length (doi base ifam).children <> 0 then
@@ -682,7 +682,7 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
   match gp with
   [ GP_person n ip ifamo ->
       let p = pget conf base ip in
-      let u = uoi base ip in
+      let u = uget conf base ip in
       do {
         Wserver.wprint "<p>\n";
         match ifamo with
@@ -712,7 +712,7 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
         stag "strong" begin afficher_personne_referencee conf base p; end;
         print_person_long_info conf base (age_autorise conf base p) None p;
         Wserver.wprint ".\n";
-        match (aoi base ip).parents with
+        match (aget conf base ip).parents with
         [ Some ifam ->
             let cpl = coi base ifam in
             let prec =
@@ -783,7 +783,7 @@ value print_not_empty_src conf base new_parag first txt isrc =
 ;
 
 value print_sources conf base new_parag p =
-  let u = uoi base p.cle_index in
+  let u = uget conf base p.cle_index in
   let first = ref True in
   let auth = age_autorise conf base p in
   do {
@@ -821,7 +821,7 @@ value print_sources conf base new_parag p =
 ;
 
 value print_notes_for_someone conf base p n child_n =
-  if age_autorise conf base p && person_has_notes base p then do {
+  if age_autorise conf base p && person_has_notes conf base p then do {
     let notes = sou base p.notes in
     Wserver.wprint "<dt>\n";
     stag "strong" begin
@@ -861,7 +861,7 @@ value print_notes_for_family conf base all_gp ifam nth moth_nb =
 
 value print_notes_for_other_families conf base all_gp excl_ifam moth_nb =
   let print ip n =
-    let u = uoi base ip in
+    let u = uget conf base ip in
     for i = 0 to Array.length u.family - 1 do {
       let ifam = u.family.(i) in
       if ifam <> excl_ifam && Array.length (doi base ifam).children <> 0 then
@@ -896,7 +896,7 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
   let rec get_generations niveau gpll gpl =
     let gpll = [gpl :: gpll] in
     if niveau < niveau_max then
-      let next_gpl = next_generation base mark gpl in
+      let next_gpl = next_generation conf base mark gpl in
       if List.exists will_print next_gpl then
         get_generations (niveau + 1) gpll next_gpl
       else gpll
@@ -966,7 +966,7 @@ value print_ancestors_same_time_descendants conf base p a =
       else if tab.(i) then ()
       else do {
         tab.(i) := True;
-        let u = uoi base p.cle_index in
+        let u = uget conf base p.cle_index in
         for i = 0 to Array.length u.family - 1 do {
           let des = doi base u.family.(i) in
           for i = 0 to Array.length des.children - 1 do {
@@ -997,7 +997,7 @@ value print_ancestors_same_time_descendants conf base p a =
              else ())
           gpl;
       end;
-      let gpl = next_generation base mark gpl in
+      let gpl = next_generation conf base mark gpl in
       generation (niveau + 1) gpl
     }
     else ()
@@ -1042,7 +1042,7 @@ value afficher_ascendants_niveau conf base niveau_max p =
                | _ -> gp ])
             gpl
         in
-        let gpl = next_generation base mark gpl in
+        let gpl = next_generation conf base mark gpl in
         let gpl =
           List.fold_right
             (fun gp gpl ->
@@ -1116,7 +1116,7 @@ value print_generation_missing_persons conf base title sp_incl gp =
   match gp with
   [ GP_person n ip _ ->
       let p = pget conf base ip in
-      let u = uoi base ip in
+      let u = uget conf base ip in
       if sp_incl && p_first_name base p = "?" && p_surname base p = "?" then
          do {
         print_title ();
@@ -1230,7 +1230,7 @@ value print_missing_ancestors conf base v spouses_included p =
         (print_generation_missing_persons conf base title spouses_included)
         gpl_to_print;
       if title.val = None then Wserver.wprint "</ul>\n" else ();
-      let gpl = next_generation base mark gpl in
+      let gpl = next_generation conf base mark gpl in
       generation (niveau + 1) gpl
     }
     else ()
@@ -1280,7 +1280,7 @@ value add_missing conf base spouses_included list =
   fun
   [ GP_person n ip _ ->
       let p = pget conf base ip in
-      let u = uoi base ip in
+      let u = uget conf base ip in
       if spouses_included && p_first_name base p = "?" &&
          p_surname base p = "?" then
         if Array.length u.family > 0 then
@@ -1295,7 +1295,7 @@ value add_missing conf base spouses_included list =
       else list
   | GP_missing n ip ->
       let p = pget conf base ip in
-      let u = uoi base ip in
+      let u = uget conf base ip in
       if spouses_included &&
          (p_surname base p = "?" || p_surname base p = "N...") then
         if p_first_name base p = "?" then list
@@ -1388,7 +1388,7 @@ value
         (fun mt -> do { Wserver.wprint ", "; print_missing_type conf mt; () })
         mtl
     }
-    else print_spouses conf base p (uoi base p.cle_index)
+    else print_spouses conf base p (uget conf base p.cle_index)
   }
 ;
 
@@ -1424,7 +1424,7 @@ value print_missing_ancestors_alphabetically conf base v spouses_included p =
       let list =
         List.fold_left (add_missing conf base spouses_included) list gpl
       in
-      let gpl = next_generation base mark gpl in
+      let gpl = next_generation conf base mark gpl in
       generation list (niveau + 1) gpl
     else list
   in
@@ -1640,7 +1640,7 @@ value print_tree_with_table conf base gv p =
          match po with
          [ Empty -> [Empty :: list]
          | Cell p _ _ _ ->
-             match (aoi base p.cle_index).parents with
+             match (aget conf base p.cle_index).parents with
              [ Some ifam ->
                  let cpl = coi base ifam in
                  let fath =
@@ -1817,7 +1817,7 @@ value print_tree conf base v p =
         let set = Dag.Pset.add ip set in
         if lev <= 1 then set
         else
-          match (aoi base ip).parents with
+          match (aget conf base ip).parents with
           [ Some ifam ->
               let cpl = coi base ifam in
               let set = loop set (lev - 1) cpl.mother in
@@ -1863,7 +1863,7 @@ value print_horizontally conf base max_level p =
   let rec loop level s1 s2 s3 ip =
     if level >= max_level then ()
     else do {
-      match (aoi base ip).parents with
+      match (aget conf base ip).parents with
       [ Some ifam ->
           loop (level + 1) (s1 ^ suff1) (s1 ^ suff2) (s1 ^ suff3)
             (coi base ifam).father
@@ -1874,7 +1874,7 @@ value print_horizontally conf base max_level p =
       Wserver.wprint "%s%s<br>\n"
         (ref conf base p (no_spaces (person_text conf base p)))
         (no_spaces (Date.short_dates_text conf base p));
-      match (aoi base ip).parents with
+      match (aget conf base ip).parents with
       [ Some ifam ->
           loop (level + 1) (s3 ^ suff3) (s3 ^ suff2) (s3 ^ suff1)
             (coi base ifam).mother
@@ -1905,7 +1905,7 @@ value print_male_female_line male conf base v p =
       let list = [ip :: list] in
       if lev <= 1 then list
       else
-        match (aoi base ip).parents with
+        match (aget conf base ip).parents with
         [ Some ifam ->
             let cpl = coi base ifam in
             loop list (lev - 1) (if male then cpl.father else cpl.mother)
@@ -1955,7 +1955,7 @@ value get_date_place conf base auth_for_all_anc p =
           (fun d ifam ->
              if d <> None then d
              else Adef.od_of_codate (foi base ifam).marriage)
-          d1 (Array.to_list (uoi base p.cle_index).family)
+          d1 (Array.to_list (uget conf base p.cle_index).family)
     in
     let d2 =
       match p.death with
@@ -1988,7 +1988,7 @@ value get_date_place conf base auth_for_all_anc p =
             (fun pl ifam ->
                if pl <> "" then pl
                else sou base (foi base ifam).marriage_place)
-            pl (Array.to_list (uoi base p.cle_index).family)
+            pl (Array.to_list (uget conf base p.cle_index).family)
       in
       pl
     in
@@ -2038,7 +2038,7 @@ value build_surnames_list conf base v p =
     else do {
       mark.(Adef.int_of_iper p.cle_index) :=
         mark.(Adef.int_of_iper p.cle_index) - 1;
-      match (aoi base p.cle_index).parents with
+      match (aget conf base p.cle_index).parents with
       [ Some ifam ->
           let cpl = coi base ifam in
           let fath = pget conf base cpl.father in

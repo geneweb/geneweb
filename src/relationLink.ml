@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 4.4 2002-01-10 04:13:31 ddr Exp $ *)
+(* $Id: relationLink.ml,v 4.5 2002-01-23 11:39:55 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -54,7 +54,7 @@ value make_dist_tab conf base ia maxlev =
     let dist = Array.create base.data.persons.len default in
     let q = ref Pq.empty in
     let add_children ip =
-      let u = uoi base ip in
+      let u = uget conf base ip in
       for i = 0 to Array.length u.family - 1 do {
         let des = doi base u.family.(i) in
         for j = 0 to Array.length des.children - 1 do {
@@ -74,7 +74,7 @@ value make_dist_tab conf base ia maxlev =
       while not (Pq.is_empty q.val) do {
         let (k, nq) = Pq.take q.val in
         q.val := nq;
-        match (base.data.ascends.get k).parents with
+        match (aget conf base (Adef.iper_of_int k)).parents with
         [ Some ifam ->
             let cpl = coi base ifam in
             let dfath = dist.(Adef.int_of_iper cpl.father) in
@@ -92,13 +92,13 @@ value make_dist_tab conf base ia maxlev =
     }
 ;
 
-value find_first_branch base (dmin, dmax) ia =
+value find_first_branch conf base (dmin, dmax) ia =
   find [] where rec find br len ip sp =
     if ip == ia then if len == 0 then Some br else None
     else if len == 0 then None
     else if len < dmin ip || len > dmax ip then None
     else
-      match (aoi base ip).parents with
+      match (aget conf base ip).parents with
       [ Some ifam ->
           let cpl = coi base ifam in
           match find [(ip, sp) :: br] (len - 1) cpl.father Male with
@@ -107,71 +107,72 @@ value find_first_branch base (dmin, dmax) ia =
       | None -> None ]
 ;
 
-value rec next_branch_same_len base dist backward missing ia sa ipl =
+value rec next_branch_same_len conf base dist backward missing ia sa ipl =
   if backward then
     match ipl with
     [ [] -> None
     | [(ip, sp) :: ipl1] ->
         match sa with
         [ Female ->
-            next_branch_same_len base dist True (missing + 1) ip sp ipl1
+            next_branch_same_len conf base dist True (missing + 1) ip sp ipl1
         | Male ->
-            match (aoi base ip).parents with
+            match (aget conf base ip).parents with
             [ Some ifam ->
                 let cpl = coi base ifam in
-                next_branch_same_len base dist False missing cpl.mother Female
-                  ipl
+                next_branch_same_len conf base dist False missing cpl.mother
+                  Female ipl
             | _ -> failwith "next_branch_same_len" ]
         | Neuter -> assert False ] ]
   else if missing == 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
-    next_branch_same_len base dist True missing ia sa ipl
+    next_branch_same_len conf base dist True missing ia sa ipl
   else
-    match (aoi base ia).parents with
+    match (aget conf base ia).parents with
     [ Some ifam ->
         let cpl = coi base ifam in
-        next_branch_same_len base dist False (missing - 1) cpl.father Male
+        next_branch_same_len conf base dist False (missing - 1) cpl.father Male
           [(ia, sa) :: ipl]
-    | None -> next_branch_same_len base dist True missing ia sa ipl ]
+    | None -> next_branch_same_len conf base dist True missing ia sa ipl ]
 ;
 
-value find_next_branch base dist ia sa ipl =
+value find_next_branch conf base dist ia sa ipl =
   loop ia sa ipl where rec loop ia1 sa1 ipl =
-    match next_branch_same_len base dist True 0 ia1 sa1 ipl with
+    match next_branch_same_len conf base dist True 0 ia1 sa1 ipl with
     [ Some (ia1, sa1, ipl) -> if ia == ia1 then Some ipl else loop ia1 sa1 ipl
     | _ -> None ]
 ;
 
-value rec prev_branch_same_len base dist backward missing ia sa ipl =
+value rec prev_branch_same_len conf base dist backward missing ia sa ipl =
   if backward then
     match ipl with
     [ [] -> None
     | [(ip, sp) :: ipl1] ->
         match sa with
-        [ Male -> prev_branch_same_len base dist True (missing + 1) ip sp ipl1
+        [ Male ->
+            prev_branch_same_len conf base dist True (missing + 1) ip sp ipl1
         | Female ->
-            match (aoi base ip).parents with
+            match (aget conf base ip).parents with
             [ Some ifam ->
                 let cpl = coi base ifam in
-                prev_branch_same_len base dist False missing cpl.father Male
-                  ipl
+                prev_branch_same_len conf base dist False missing cpl.father
+                  Male ipl
             | _ -> failwith "prev_branch_same_len" ]
         | Neuter -> assert False ] ]
   else if missing == 0 then Some (ia, sa, ipl)
   else if missing < fst dist ia || missing > snd dist ia then
-    prev_branch_same_len base dist True missing ia sa ipl
+    prev_branch_same_len conf base dist True missing ia sa ipl
   else
-    match (aoi base ia).parents with
+    match (aget conf base ia).parents with
     [ Some ifam ->
         let cpl = coi base ifam in
-        prev_branch_same_len base dist False (missing - 1) cpl.mother Female
-          [(ia, sa) :: ipl]
-    | None -> prev_branch_same_len base dist True missing ia sa ipl ]
+        prev_branch_same_len conf base dist False (missing - 1) cpl.mother
+          Female [(ia, sa) :: ipl]
+    | None -> prev_branch_same_len conf base dist True missing ia sa ipl ]
 ;
 
-value find_prev_branch base dist ia sa ipl =
+value find_prev_branch conf base dist ia sa ipl =
   loop ia sa ipl where rec loop ia1 sa1 ipl =
-    match prev_branch_same_len base dist True 0 ia1 sa1 ipl with
+    match prev_branch_same_len conf base dist True 0 ia1 sa1 ipl with
     [ Some (ia1, sa1, ipl) -> if ia == ia1 then Some ipl else loop ia1 sa1 ipl
     | _ -> None ]
 ;
@@ -186,15 +187,15 @@ value someone_text conf base ip =
 value spouse_text conf base end_sp ip ipl =
   match (ipl, (p_getenv conf.env "spouse", p_getenv conf.env "opt")) with
   [ ([(ips, _) :: _], (Some "on", _) | (_, Some "spouse")) ->
-      let a = aoi base ips in
+      let a = aget conf base ips in
       match a.parents with
       [ Some ifam ->
           let c = coi base ifam in
           let fam = foi base ifam in
           let sp = if ip = c.father then c.mother else c.father in
           let d =
-            Date.short_marriage_date_text conf base fam (pget conf base c.father)
-              (pget conf base c.mother)
+            Date.short_marriage_date_text conf base fam
+              (pget conf base c.father) (pget conf base c.mother)
           in
           (someone_text conf base sp, d, Some sp)
       | _ -> ("", "", None) ]
@@ -418,7 +419,7 @@ value print_prev_next_2 conf base info pb nb =
 value other_parent_text_if_same conf base info =
   match (info.b1, info.b2) with
   [ ([(sib1, _) :: _], [(sib2, _) :: _]) ->
-      match ((aoi base sib1).parents, (aoi base sib2).parents) with
+      match ((aget conf base sib1).parents, (aget conf base sib2).parents) with
       [ (Some ifam1, Some ifam2) ->
           let cpl1 = coi base ifam1 in
           let cpl2 = coi base ifam2 in
@@ -586,8 +587,8 @@ value print_relation_no_dag conf base po ip1 ip2 =
     [ (Some p, Some l1, Some l2) ->
         let ip = p.cle_index in
         let dist = make_dist_tab conf base ip (max l1 l2 + 1) in
-        let b1 = find_first_branch base dist ip l1 ip1 Neuter in
-        let b2 = find_first_branch base dist ip l2 ip2 Neuter in
+        let b1 = find_first_branch conf base dist ip l1 ip1 Neuter in
+        let b2 = find_first_branch conf base dist ip l2 ip2 Neuter in
         Some (ip, (pget conf base ip).sex, dist, b1, b2, 1, 1)
     | _ ->
         match (p_getenv conf.env "b1", p_getenv conf.env "b2") with
@@ -626,16 +627,16 @@ value print_relation_no_dag conf base po ip1 ip2 =
   match params with
   [ Some (ip, sp, dist, Some b1, Some b2, c1, c2) ->
       let pb1 =
-        if c1 <= 1 then None else find_prev_branch base dist ip sp b1
+        if c1 <= 1 then None else find_prev_branch conf base dist ip sp b1
       in
       let nb1 =
-        if c1 == 0 then None else find_next_branch base dist ip sp b1
+        if c1 == 0 then None else find_next_branch conf base dist ip sp b1
       in
       let pb2 =
-        if c2 <= 1 then None else find_prev_branch base dist ip sp b2
+        if c2 <= 1 then None else find_prev_branch conf base dist ip sp b2
       in
       let nb2 =
-        if c2 == 0 then None else find_next_branch base dist ip sp b2
+        if c2 == 0 then None else find_next_branch conf base dist ip sp b2
       in
       let sp1 = find_person_in_env conf base "3" in
       let sp2 = find_person_in_env conf base "4" in
@@ -651,7 +652,7 @@ value print_relation_no_dag conf base po ip1 ip2 =
 value print_relation_dag conf base a p1 p2 l1 l2 =
   let ia = a.cle_index in
   let add_branches dist set n ip l =
-    let b = find_first_branch base dist ia l ip Neuter in
+    let b = find_first_branch conf base dist ia l ip Neuter in
     let rec loop set n b =
       if n > 100 then raise Exit
       else
@@ -660,7 +661,7 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
             let set =
               List.fold_left (fun set (ip, _) -> Dag.Pset.add ip set) set b
             in
-            loop set (n + 1) (find_next_branch base dist ia a.sex b)
+            loop set (n + 1) (find_next_branch conf base dist ia a.sex b)
         | None -> (set, n) ]
     in
     loop set n b
