@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.8 2002-01-13 04:19:51 ddr Exp $
+# $Id: Makefile,v 4.9 2002-01-14 18:17:24 ddr Exp $
 
 DESTDIR=distribution
 
@@ -54,15 +54,15 @@ new_distrib: classical_distrib
 	mkdir $(DESTDIR)/gw/setup
 	cp setup/intro.txt $(DESTDIR)/gw/setup/.
 	mkdir $(DESTDIR)/gw/setup/lang
+	if test "$(CAMLP4F)" = "-DWIN95"; then \
+	  cp setup/lang/intro.txt.dos $(DESTDIR)/gw/setup/lang/intro.txt; \
+	else \
+	  cp setup/lang/intro.txt $(DESTDIR)/gw/setup/lang/intro.txt; \
+	fi
 	cp setup/lang/*.htm $(DESTDIR)/gw/setup/lang/.
 	for i in de en es fr lv sv; do \
 	  mkdir $(DESTDIR)/gw/setup/$$i; \
 	  cp setup/$$i/*.htm $(DESTDIR)/gw/setup/$$i; \
-	  if test "$(CAMLP4F)" = "-DWIN95"; then \
-	    cp setup/$$i/intro.txt.dos $(DESTDIR)/gw/setup/$$i/intro.txt; \
-	  else \
-	    cp setup/$$i/intro.txt $(DESTDIR)/gw/setup/$$i/intro.txt; \
-	  fi; \
 	done
 	cp setup/gwsetup $(DESTDIR)/gw/gwsetup$(EXE)
 	for i in README LISEZMOI; do \
