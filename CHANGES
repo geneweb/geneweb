@@ -2,6 +2,9 @@ GeneWeb version 4.02
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [07 Jun 01] (technical point) fixed problem: in case when the data
+    base is not writable, an error message is now displayed, instead of
+    just an empty answer.
   - [02 Jun 01] Fixed bug: in family form, if surnames contained
     double quotes, they were incorrectly displayed.
   - [29 May 01] Fixed problem with option -log (traces in a log file):
