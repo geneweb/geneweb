@@ -1,5 +1,5 @@
 
-<p><hr><font size=-1><em>[
+<p><hr><div style="font-size: 80%%"><em>[
 de: Seite angezeigt von
     <a href="http://www.geneweb.org/">GeneWeb %v</a>
 en: Page displayed by
@@ -13,4 +13,4 @@ it: Pagina visualizzata da
 sl: Strani ustvarjene z:
     <a href="http://www.geneweb.org/">GeneWeb %v</a>
 ]
-Copyright (c) 1998-2005 INRIA %d</em></font><br>
+Copyright (c) 1998-2005 INRIA %d</em></div>

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.95 2004-12-14 09:53:21 ddr Exp $ *)
+(* $Id: util.ml,v 4.96 2004-12-25 23:03:17 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -941,7 +941,7 @@ value image_prefix conf =
 ;
 
 value default_body_prop conf =
-  " background=\"" ^ image_prefix conf ^ "/gwback.jpg\""
+  " style=\"background: url('" ^ image_prefix conf ^ "/gwback.jpg')\""
 ;
 
 value body_prop conf =

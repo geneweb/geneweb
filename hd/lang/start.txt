@@ -1,8 +1,7 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.60 2004-12-25 19:02:28 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.61 2004-12-25 23:03:17 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -31,26 +30,30 @@ ru: Genealogy
 sl: Genealogija - Dru¾insko drevo
 sv: Genealogi
 ] - %t</title>
-  <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
+  <meta http-equiv="Content-Type" content="text/html; charset=%e">
+  <meta http-equiv="Content-Style-Type" content="text/css">
   <meta name="ROBOTS" content="NONE">
+  <style type="text/css"><!--
+    span.highlight { color: %i; font-weight: bold }
+  --></style>
 %j</head>
 <body%b>
 
-<center>
-<table border=0 width="100%">
+<div style="text-align: center">
+<table border=0 width="100%%">
 <tr align=left>
-<td rowspan=2 width="20%">
+<td rowspan=2 style="width: 20%%">
 <a href="http://www.geneweb.org/"><img width=96
-height=108 src="%o/gwlogo.png" align=%L border=0 alt=GeneWeb></a>
+height=108 src="%o/gwlogo.png" style="align: %L; border: 0" alt=GeneWeb></a>
 </td>
 %I&wNf<td align=%R
 valign=top><em>([wizard/wizards/friend/friends]0%U)</em></td>
 %E%I&fNw<td align=%R
 valign=top><em>([wizard/wizards/friend/friends]2)</em></td>
-%E<td align=%R valign=top width=16>%w</td>
+%E<td align=%R valign=top style="width: 16px">%w</td>
 </tr><tr>
 <td align=center colspan=%I|&wNf&fNw2%E%I&|Nwf|Nfw1%E>
-<table border=0><tr align=center><td align=center><h1><font color="%i">[
+<table border=0><tr align=center><td align=center><h1><span style="color: %i">[
 af: Genealogiese databasis
 bg: Ğîäîñëîâíà áàçà îò äàííè
 br: Bon roadoù genealogiezh
@@ -77,14 +80,14 @@ ru: Ãåíåaëîãè÷åñêàÿ áàçà äàííûõ
 sl: Genealo¹ka baza podatkov
 sv: Genealogisk databas
 zh: ÍøÂç¼ÒÆ×
-]</font></h1></table>
+]</span></h1></table>
 </td>
 </tr>
 </table>
 
 <br>
 
-<font size=-1><em>[
+<span style="font-size: 80%%"><em>[
 af: Taalvoorkeur/Language preference:
 bg: Ìîæåòå äà èçáåğåòå äğóã åçèê çà ñúîáùåíèÿ èçìåæäó ñëåäíèòå:
 br: Dibab a c'hellit ur yezh all etre ar re-mañ:
@@ -110,7 +113,7 @@ pl: Mo¿esz wybraæ inny jêzyk spo¶ród nastêpuj±cych:
 ro: poti sa alegi una din urmatoarele limbi pentru afisaj
 sl: Lahko izberete drug jezik:
 sv: Du kan välja ett annat språk bland de följande:
-]</em></font>
+]</em></span>
 
 <br>
 
@@ -119,47 +122,49 @@ sv: Du kan välja ett annat språk bland de följande:
 %Vmotd;<p>
 
 [
-af: Die databasis <font color="%i"><b>"%t"</b></font> bevat tans %n persone.
-bg: Áàçàòà îò äàííè <font color="%i"><b>"%t"</b></font> â ìîìåíòà ñúäúğæà
+af: Die databasis <span class="highlight">"%t"</span> bevat tans %n persone.
+bg: Áàçàòà îò äàííè <span class="highlight">"%t"</span> â ìîìåíòà ñúäúğæà
     ñâåäåíèÿ çà %n äóøè.
-br: Niver an dud a zo er bon roadoù <font color="%i"><b>"%t"</b></font>
+br: Niver an dud a zo er bon roadoù <span class="highlight">"%t"</span>
     bremañ a zo : %n.
-ca: La base de dades <font color="%i"><b>"%t"</b></font> cont&eacute;
+ca: La base de dades <span class="highlight">"%t"</span> cont&eacute;
     actualment %n persones.
-cs: Databáze <font color="%i"><b>"%t"</b></font> obsahuje %n osob.
-da: Databasen <font color="%i"><b>"%t"</b></font> indeholder for
+cs: Databáze <span class="highlight">"%t"</span> obsahuje %n osob.
+da: Databasen <span class="highlight">"%t"</span> indeholder for
     &oslash;jeblikket %n personer.
-de: Die Datenbank <font color="%i"><b>"%t"</b></font> enth&auml;lt z. Zt.
+de: Die Datenbank <span class="highlight">"%t"</span> enth&auml;lt z. Zt.
     %n Personen.
-en: The database <font color="%i"><b>"%t"</b></font> now holds %n persons.
-eo: La datenbazo <font color="%i"><b>"%t"</b></font> enhavas nun %n
+en: The database <span class="highlight">"%t"</span> now holds %n persons.
+eo: La datenbazo <span class="highlight">"%t"</span> enhavas nun %n
     personojn.
-es: La base <font color="%i"><b>"%t"</b></font> contiene actualmente %n
+es: La base <span class="highlight">"%t"</span> contiene actualmente %n
     personas.
-et: Andmebaas <font color="%i"><b>"%t"</b></font> sisaldab andmeid %n
+et: Andmebaas <span class="highlight">"%t"</span> sisaldab andmeid %n
     isiku kohta.
-fi: Tietokannassa <font color="%i"><b>"%t"</b></font> on nyt %n
+fi: Tietokannassa <span class="highlight">"%t"</span> on nyt %n
     henkil&ouml;&auml;.
-fr: La base de donn&eacute;es <font color="%i"><b>"%t"</b></font> contient
+fi: Tietokannassa <span class="highlight">"%t"</span> on nyt %n
+    henkil&ouml;&auml;.
+fr: La base de donn&eacute;es <span class="highlight">"%t"</span> contient
     actuellement %n personnes.
-he: áîàâø äîéãò <font color="%i"><b>"%t"</b></font> éù %n àğùéí.
-is: Gagnagrunnurinn <font color="%i"><b>"%t"</b></font> er nú meğ %n
+he: áîàâø äîéãò <span class="highlight">"%t"</span> éù %n àğùéí.
+is: Gagnagrunnurinn <span class="highlight">"%t"</span> er nú meğ %n
     einstaklinga skráğa.
-it: La base di dati <font color="%i"><b>"%t"</b></font> contiene
+it: La base di dati <span class="highlight">"%t"</span> contiene
     attualmente %n persone.
-lv: Datu bâze <font color="%i"><b>"%t"</b></font> patreiz satur %n personas.
-nl: Deze databank <font color="%i"><b>"%t"</b></font> bevat nu %n personen.
-no: Databasen <font color="%i"><b>"%t"</b></font> inneholder n&aring; %n
+lv: Datu bâze <span class="highlight">"%t"</span> patreiz satur %n personas.
+nl: Deze databank <span class="highlight">"%t"</span> bevat nu %n personen.
+no: Databasen <span class="highlight">"%t"</span> inneholder n&aring; %n
     personer.
-pl: Baza danych <font color="%i"><b>"%t"</b></font> zawiera obecnie osób: %n.
-pt: A base de dados <font color="%i"><b>"%t"</b></font> cont&eacute;m
+pl: Baza danych <span class="highlight">"%t"</span> zawiera obecnie osób: %n.
+pt: A base de dados <span class="highlight">"%t"</span> cont&eacute;m
     actualmente %n pessoas.
-pt-br: A base de dados <font color="%i"><b>"%t"</b></font> cont&eacute;m
+pt-br: A base de dados <span class="highlight">"%t"</span> cont&eacute;m
     atualmente %n pessoas.
-ro: basa de date <font color="%i"><b>"%t"</b></font> contine %n persoane.
-ru: Áàçà äàííûõ <font color="%i"><b>"%t"</b></font> ñåé÷àñ ñîäåğæèò %n ÷åëîâåê.
-sl: Baza podatkov <font color="%i"><b>"%t"</b></font> vsebuje %n oseb.
-sv: Databasen <font color="%i"><b>"%t"</b></font> inneh&aring;ller nu
+ro: basa de date <span class="highlight">"%t"</span> contine %n persoane.
+ru: Áàçà äàííûõ <span class="highlight">"%t"</span> ñåé÷àñ ñîäåğæèò %n ÷åëîâåê.
+sl: Baza podatkov <span class="highlight">"%t"</span> vsebuje %n oseb.
+sv: Databasen <span class="highlight">"%t"</span> inneh&aring;ller nu
     %n personer.
 zh: ÏÖÓĞ %n ÈËÔÚÊı¾İ¿âÖĞ¡£
 ]%In<br>
@@ -277,8 +282,7 @@ he: ñéñîä ìëğéñä <em> îéåçñú  </em> àå <em>ëâàåï</em>
 is: Ağgangsorğ, fyrir <em>vina</em> eğa <em>uppfærslu</em> ağgang:
 it: Parola d'accesso, per accesso dell' <em>amico</em> o del <em>wizard</em>:
 lv: Password, for <em>friend</em> or <em>wizard</em> access:
-nl: <font size=-1>Wachtwoord, voor toegang als <em>vriend</em> of
-    <em>tovenaar</em>:
+nl: Wachtwoord, voor toegang als <em>vriend</em> of <em>tovenaar</em>:
 no: Passord, for <em>venner</em> eller <em>oppdaterings</em> adgang:
 pl: Has³o dla dostêpu <em>"friend"</em> lub <em>"wizard"</em> :
 pt: Palavra chave para entrada <em>amigo</em> ou <em>feiticeiro</em>:
@@ -294,10 +298,11 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
 
 %E%E<br><p>
 
-<table border=0 cellspacing=0 cellpadding=0>
+<table border=0 cellspacing=0 cellpadding=0 style="width: 100%%">
 
 <tr align=left><td>
-<center><table border=0 cellspacing=0 cellpadding=0><tr align=left><td>
+<table style="margin-left: auto; margin-right: auto" border=0
+ cellspacing=0 cellpadding=0><tr><td>
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
 bg: Ìîæåòå äà èçïîëçâàòå òàçè áàçà îò äàííè çà òúğñåíå:
@@ -312,7 +317,7 @@ es: Para navegar en esta base de datos, puede hacer su búsqueda:
 et: Navigeeri andmebaasis:
 fi: Liikkuaksesi t&auml;ss&auml; tietokannassa voit etsi&auml;:
 fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez effectuer
-       votre recherche:
+    votre recherche:
 he: ğååè áîàâø îéãä òì-éãé çéôåñ:
 is: Í şessum gagnagrunni getur şú leitağ:
 it: Per spostarsi in questa base di dati, si pu&ograve; fare una ricerca:
@@ -332,9 +337,9 @@ zh:
 
 <li>
 
-<form method=GET action="%f">
+<form method=GET action="%f"><p>
 %h<input type=hidden name=m value=NG>
-<font color="%i"><b>[
+<span class="highlight">[
 af: per persoon
 bg: ïî èìå íà ÷îâåê
 br: dre anv-den
@@ -361,7 +366,7 @@ ru: ïî ÷åëîâåêó
 sl: osebo:
 sv: efter person
 zh: ËÑË÷£º
-]</b></font>
+]</span>
 <input name=n size=40 maxlength=200>
 <input type=submit value="Ok">
 <br>
@@ -378,10 +383,10 @@ zh: ËÑË÷£º
 
 %Ispropose_titles;<li>
 
-<form method=GET action="%f">
+<form method=GET action="%f"><p>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
 %h<input type=hidden name=m value=TT>
-<table border=0 cellpadding=0 cellspacing=0><tr align=left><td>
-<font color="%i"><b>[
+<span class="highlight">[
 af: by title
 bg: ïî òèòëà
 br: dre ditl
@@ -408,14 +413,14 @@ ru: ïî òèòóëó
 sl: naziv:
 sv: efter titel
 zh: ¸ù¾İÃûÏÎ
-]</b></font>%INl<br>%E
+]</span>%INl<br>%E
 <input name=t size=14 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;t=">[all the titles]</a>)<br>
 </td><td>...</td><td>
-<font color="%i"><b>[estate]0[
+<span class="highlight">[estate]0[
 da:  (dom&aelig;ne, sl&aelig;gt)
 en:
-]</b></font>%INl<br>%E
+]</span>%INl<br>%E
 <input name=p size=25 maxlength=200>%INl<br>%E
 (<a href="%sm=TT;p=*">[all the estates]</a>)
 </td><td>
@@ -425,34 +430,34 @@ en:
 
 %E<li>
 
-<form method=GET action="%f">
+<form method=GET action="%f"><p>
 %h
 [
-af: <font color="%i"><b>in die lys </b></font>van alle
-bg: <font color="%i"><b>â ñïèñúêà</b></font> íà âñè÷êè
-br: <font color="%i"><b>dre roll</b></font> an holl
-ca: <font color="%i"><b>pel llistat</b></font> de tots els
-cs: <font color="%i"><b>ze seznamu</b></font> v¹ech
-da: <font color="%i"><b>i liste</b></font> over alle
-de: <font color="%i"><b>in der Liste</b></font> aller
-en: <font color="%i"><b>by the list</b></font> of all
-eo: <font color="%i"><b>per la listo</b></font> de cxiuj
-es: <font color="%i"><b>por la lista</b></font> de todos los
-et: <font color="%i"><b>loendis</b></font> kõik
-fi: <font color="%i"><b>listasta</b></font> kaikki
-fr: <font color="%i"><b>par la liste</b></font> de tous les
-he: <font color="%i"><b>øùéîä</b></font> ùì ëì ùîåú
-is: <font color="%i"><b>eftir lista</b></font> yfir öll
-it: <font color="%i"><b>per la lista</b></font> di tutti i
-lv: <font color="%i"><b>visus</b></font>
-nl: <font color="%i"><b>via de lijst</b></font> van alle
-no: <font color="%i"><b>med liste</b></font> over alle
-pl: <font color="%i"><b>przejrzeæ listê</b></font> wszystkich
-pt: <font color="%i"><b>pela lista</b></font> de todos os
-ro: <font color="%i"><b>pe lista</b></font> tuturor
-ru: <font color="%i"><b>ïî ñïèñêó</b></font>  âñåõ
-sl: <font color="%i"><b>seznam</b></font> vseh
-sv: <font color="%i"><b>efter listan</b></font> av alla
+af: <span class="highlight">in die lys </span>van alle
+bg: <span class="highlight">â ñïèñúêà</span> íà âñè÷êè
+br: <span class="highlight">dre roll</span> an holl
+ca: <span class="highlight">pel llistat</span> de tots els
+cs: <span class="highlight">ze seznamu</span> v¹ech
+da: <span class="highlight">i liste</span> over alle
+de: <span class="highlight">in der Liste</span> aller
+en: <span class="highlight">by the list</span> of all
+eo: <span class="highlight">per la listo</span> de cxiuj
+es: <span class="highlight">por la lista</span> de todos los
+et: <span class="highlight">loendis</span> kõik
+fi: <span class="highlight">listasta</span> kaikki
+fr: <span class="highlight">par la liste</span> de tous les
+he: <span class="highlight">øùéîä</span> ùì ëì ùîåú
+is: <span class="highlight">eftir lista</span> yfir öll
+it: <span class="highlight">per la lista</span> di tutti i
+lv: <span class="highlight">visus</span>
+nl: <span class="highlight">via de lijst</span> van alle
+no: <span class="highlight">med liste</span> over alle
+pl: <span class="highlight">przejrzeæ listê</span> wszystkich
+pt: <span class="highlight">pela lista</span> de todos os
+ro: <span class="highlight">pe lista</span> tuturor
+ru: <span class="highlight">ïî ñïèñêó</span>  âñåõ
+sl: <span class="highlight">seznam</span> vseh
+sv: <span class="highlight">efter listan</span> av alla
 zh: ÏÔÊ¾ËùµÄ
 ]
 <select name=m>
@@ -646,86 +651,88 @@ sv: efter
 %E%INshide_advanced_request;<li>
 
 [
-af: <font color="%i"><b>deur 'n</b></font>
+af: <span class="highlight">deur 'n</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>detail
        navraag</b></font></a>.
-bg: <font color="%i"><b>÷ğåç</b></font>
+bg: <span class="highlight">÷ğåç</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>ğàçøèğåíî
        òúğñåíå</b></font></a>.
-br: <font color="%i"><b> dre ar</b></font>
+br: <span class="highlight"> dre ar</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>klask
        a-raokaet</b></font></a>.
-ca: <font color="%i"><b>per la</b></font>
+ca: <span class="highlight">per la</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>consulta
        avançada</b></font></a>.
-cs: <font color="%i"><b>lze také zadat</b></font>
+cs: <span class="highlight">lze také zadat</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>roz¹íøenı
        dotaz</b></font></a>.
-da: <font color="%i"><b>ved</b></font>
+da: <span class="highlight">ved</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>avanceret
        søgning</b></font></a>.
-de: <font color="%i"><b>mit der</b></font>
+de: <span class="highlight">mit der</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>erweiterten
        Suche</b></font></a>.
-en: <font color="%i"><b>by the</b></font>
+en: <span class="highlight">by the</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>advanced
        request</b></font></a>.
-eo: <font color="%i"><b>per la</b></font>
+eo: <span class="highlight">per la</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>sercxado
        progresata</b></font></a>.
-es: <font color="%i"><b>mediante una</b></font>
+es: <span class="highlight">mediante una</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>consulta
        avanzada</b></font></a>.
-et: <font color="%i"><b></b></font>
+et: <span class="highlight"></span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>täpsem 
        päring</b></font></a>.
-fi: <a href="%sm=H;v=advanced"><font color="%i"><b>erityishaulla</b></font></a>.
-fr: <font color="%i"><b> par la</b></font>
+fi: <a href="%sm=H;v=advanced"><span class="highlight">erityishaulla</span></a>.
+fr: <span class="highlight"> par la</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>requ&ecirc;te
         &eacute;volu&eacute;e</b></font></a>.
-he: <font color="%i"><b>ò"é </b></font>
+he: <span class="highlight">ò"é </span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>
        á÷ùä îú÷ãîú</b></font></a>.
-is: <font color="%i"><b>eftir </b></font>
+is: <span class="highlight">eftir </span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>frekari
        óskum</b></font></a>.
-it: <font color="%i"><b>per la</b></font>
+it: <span class="highlight">per la</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>richiesta
        avanzata</b></font></a>.
-lv: <font color="%i"><b>meklçt pçc</b></font>
+lv: <span class="highlight">meklçt pçc</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>citiem
        parametriem</b></font></a>.
-nl: <font color="%i"><b>via een</b></font>
+nl: <span class="highlight">via een</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>gedetailleerde
        opzoeking</b></font></a>.
-no: <font color="%i"><b>gjennom</b></font>
+no: <span class="highlight">gjennom</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>avansert
        s&oslash;king</b></font></a>.
-pl: <font color="%i"><b>skorzystaæ z</b></font>
+pl: <span class="highlight">skorzystaæ z</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>wyszukiwania
        zaawansowanego</b></font></a>.
-pt: <font color="%i"><b>por</b></font>
+pt: <span class="highlight">por</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>pesquisa
        complexa</b></font></a>.
-ro: <font color="%i"><b>prin</b></font>
+ro: <span class="highlight">prin</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>specificare
        complexa</b></font></a>.
-ru: <font color="%i"><b>÷åğåç</b></font>
+ru: <span class="highlight">÷åğåç</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>ğàñøèğåííûé
        çàïğîñ</b></font></a>.
-sl: <font color="%i"><b>s pomoèjo</b></font>
+sl: <span class="highlight">s pomoèjo</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>naprednega iskanja
        </b></font></a>.
-sv: <font color="%i"><b>genom</b></font>
+sv: <span class="highlight">genom</span>
        <a href="%sm=H;v=advanced"><font color="%i"><b>avancerad
        s&ouml;kning</b></font></a>.
 ]%E
 
 </ul>
-</td></tr></table></center>
+</td></tr></table>
 
 %Iw<p>
-<center>[
+<table border=0 cellspacing=0 cellpadding=0
+ style="margin-left: auto; margin-right: auto; text-align: center">
+<tr><td>[
 af: Jy kan
 bg: Ìîæåòå îùå
 br: Gellout a rit
@@ -752,11 +759,10 @@ ru: Âû ìîæåòå
 sl: Lahko:
 sv: Du kan
 zh:
-]<br><p>
+]
 
-<table border=0>
-<tr align=left>
-<td align=right>
+<table border=0 cellspacing=0 cellpadding=0>
+<tr><td><p>
 <ul>
 %Ispropose_add_family;<li><a href="%sm=ADD_FAM">[
 af: 'n familie byvoeg
@@ -821,11 +827,14 @@ sv: &auml;ndra noteringar
 </td>
 </tr>
 </table>
-</center>
+</td></tr></table>
 
-%E<br><p>
+%E<p>
 
-<center>[
+<table border=0
+ style="margin-left: auto; margin-right: auto; text-align: center">
+<tr><td>
+[
 af: Jy kan ook kyk na
 bg: Ìîæåòå ñúùî äà ñå íàñî÷èòå êúì
 br: Gellout a rit ivez gweladenniñ
@@ -852,11 +861,11 @@ ru: Âû ìîæåòå òàêæå îáğàòèòüñÿ ê
 sl: Lahko pregledate:
 sv: Du kan ocks&aring; konsultera
 zh:
-]<br><p>
+]
 
 <table border=0>
 <tr align=left>
-<td valign=top>
+<td valign=top><p>
 <ul>
 <li><a href="%sm=AN">[birthdays]</a>
 <li><a href="%sm=AD">[anniversaries of dead people]</a>
@@ -864,7 +873,7 @@ zh:
 <li><a href="%sm=STAT">[statistics]</a>
 </ul>
 </td>
-<td valign=top>
+<td valign=top><p>
 <ul>%Ih
 <li><a href="%sm=HIST;k=10">[history of updates]</a>%E
 <li><a href="%sm=CAL">[calendar/calendars]1</a>
@@ -873,9 +882,11 @@ zh:
 </td>
 </tr>
 </table>
+</td></tr></table>
 
 <p>
 
+<table border=0 style="margin-left: auto; margin-right: auto"><tr><td>
 [
 af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
 bg: Îò %d íàñàì å èìàëî %q ïîñåùåíèÿ, îò êîèòî %c ñà íà íàñòîÿùàòà ñòğàíèöà.
@@ -913,10 +924,11 @@ zh: ÒÑ¾­ÓĞ %q ´Î·ÃÎÊÊı¾İ¿â£¬ÆäÖĞ %c ´Î·ÃÎÊ±¾Ö÷Ò³£¬ ×Ô´Ó %d¡£
 ]
 %Il<p>%E
 
-</center>
+</td></tr></table>
 
 <p>
 
+<table border=0 style="margin-left: auto; margin-right: auto"><tr><td>
 [
 af: Indien u browser nie die bladsye outomaties byvoeg nie (wat u dwing
     om die dokument te herlaai), probeer die volgende <a
@@ -994,13 +1006,15 @@ sv: Om din webbläsare inte automatiskt uppdaterar de modifierade sidorna
     (vilket tvingar dig att uppdatera sidan hela tiden), försök då att
     navigera <a href="%sescache=0">härifrån</a>.
 ]
+</td></tr></table>
 
 </td></tr>
 </table>
 
 <br>
 
-<p align=right><font size=-1><em><a href="%sm=LEX">[
+<p style="text-align: right">
+<span style="font-size: 80%%"><em><a href="%sm=LEX">[
 bg: ëåêñèêîí
 br: geriaoueg
 ca: L&egrave;xic
@@ -1022,8 +1036,8 @@ ro: lexicon
 sl: leksikon
 sv: lexikon
 zh: ±¾Õ¾Ê¹ÓÃµÄÊõÓï
-]</a></em></font></p>
+]</a></em></span></p>
 
 <br>
 
-</center>
+</div>
