@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.15 2002-01-12 14:20:54 ddr Exp $ *)
+(* $Id: forum.ml,v 4.16 2002-06-05 09:42:35 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -83,8 +83,8 @@ value print_one_header conf prec_date ndisp pos h =
       end;
       tag "td" begin
         if subject = "" || subject = "-" then
-          Wserver.wprint "<em>... %s</em>" (secure (sp2nbsp 30 beg_mess))
-        else Wserver.wprint "%s" (secure (sp2nbsp 30 subject));
+          Wserver.wprint "<em>... %s</em>" (secure (sp2nbsp 50 beg_mess))
+        else Wserver.wprint "%s" (secure (sp2nbsp 50 subject));
       end;
     end;
     ndisp
