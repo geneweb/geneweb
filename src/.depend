@@ -171,32 +171,32 @@ util.cmo: adef.cmi ansel.cmo config.cmi consang.cmi def.cmi gutil.cmi \
 util.cmx: adef.cmx ansel.cmx config.cmi consang.cmx def.cmi gutil.cmx \
     iobase.cmx name.cmx ../wserver/wserver.cmx util.cmi 
 util.cmi: config.cmi def.cmi 
-advSearchOk.cmo advSearchOk.cmx: ./pa_html.cmo ./def.syn.cmo
-alln.cmo alln.cmx: ./pa_html.cmo
-ascend.cmo ascend.cmx: ./def.syn.cmo ./pa_html.cmo
-birth.cmo birth.cmx: ./def.syn.cmo ./pa_html.cmo
-birthday.cmo birthday.cmx: ./pa_html.cmo
-cousins.cmo cousins.cmx: ./pa_html.cmo
-descend.cmo descend.cmx: ./pa_html.cmo
-family.cmo family.cmx: ./def.syn.cmo ./pa_html.cmo
-gwc.cmo gwc.cmx: ./pa_lock.cmo
-gwd.cmo gwd.cmx: ./pa_html.cmo
-iovalue.cmo iovalue.cmx: ./q_codes.cmo
-merge.cmo merge.cmx: ./pa_html.cmo
-mergeFam.cmo mergeFam.cmx: ./pa_html.cmo
-mergeFamOk.cmo mergeFamOk.cmx: ./pa_html.cmo
-mergeInd.cmo mergeInd.cmx: ./pa_html.cmo
-mergeIndOk.cmo mergeIndOk.cmx: ./pa_lock.cmo ./pa_html.cmo
-mk_consang.cmo mk_consang.cmx: ./pa_lock.cmo
-perso.cmo perso.cmx: ./pa_html.cmo
-relation.cmo relation.cmx: ./pa_lock.cmo
-relationLink.cmo relationLink.cmx: ./pa_html.cmo
-some.cmo some.cmx: ./def.syn.cmo
-srcfile.cmo srcfile.cmx: ./pa_lock.cmo
-title.cmo title.cmx: ./def.syn.cmo ./pa_html.cmo
-update.cmo update.cmx: ./pa_html.cmo
-updateFam.cmo updateFam.cmx: ./pa_html.cmo
-updateFamOk.cmo updateFamOk.cmx: ./pa_lock.cmo
-updateInd.cmo updateInd.cmx: ./pa_html.cmo
-updateIndOk.cmo updateIndOk.cmx: ./pa_lock.cmo ./pa_html.cmo
-util.cmo util.cmx: ./pa_lock.cmo
+advSearchOk.cmo advSearchOk.cmx: pa_html.cmo def.syn.cmo
+alln.cmo alln.cmx: pa_html.cmo
+ascend.cmo ascend.cmx: def.syn.cmo pa_html.cmo
+birth.cmo birth.cmx: def.syn.cmo pa_html.cmo
+birthday.cmo birthday.cmx: pa_html.cmo
+cousins.cmo cousins.cmx: pa_html.cmo
+descend.cmo descend.cmx: pa_html.cmo
+family.cmo family.cmx: def.syn.cmo pa_html.cmo
+gwc.cmo gwc.cmx: pa_lock.cmo
+gwd.cmo gwd.cmx: pa_html.cmo
+iovalue.cmo iovalue.cmx: q_codes.cmo
+merge.cmo merge.cmx: pa_html.cmo
+mergeFam.cmo mergeFam.cmx: pa_html.cmo
+mergeFamOk.cmo mergeFamOk.cmx: pa_html.cmo
+mergeInd.cmo mergeInd.cmx: pa_html.cmo
+mergeIndOk.cmo mergeIndOk.cmx: pa_lock.cmo pa_html.cmo
+mk_consang.cmo mk_consang.cmx: pa_lock.cmo
+perso.cmo perso.cmx: pa_html.cmo
+relation.cmo relation.cmx: pa_lock.cmo
+relationLink.cmo relationLink.cmx: pa_html.cmo
+some.cmo some.cmx: def.syn.cmo
+srcfile.cmo srcfile.cmx: pa_lock.cmo
+title.cmo title.cmx: def.syn.cmo pa_html.cmo
+update.cmo update.cmx: pa_html.cmo
+updateFam.cmo updateFam.cmx: pa_html.cmo
+updateFamOk.cmo updateFamOk.cmx: pa_lock.cmo
+updateInd.cmo updateInd.cmx: pa_html.cmo
+updateIndOk.cmo updateIndOk.cmx: pa_lock.cmo pa_html.cmo
+util.cmo util.cmx: pa_lock.cmo

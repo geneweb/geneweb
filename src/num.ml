@@ -1,4 +1,4 @@
-(* $Id: num.ml,v 1.2 1998-11-15 22:55:05 ddr Exp $ *)
+(* $Id: num.ml,v 1.3 1998-12-13 11:56:44 ddr Exp $ *)
 
 type t = array int;
 
@@ -132,19 +132,21 @@ value of_int i =
   else [| i mod base; i / base |]
 ;
 value print f sep x =
-  let digits = loop [] x
-    where rec loop d x =
-      if eq x zero then d
-      else loop [modl x 10 :: d] (div x 10)
-  in
-  let _ =
-    List.fold_left
-      (fun n d ->
-         do f (string_of_int d);
-            if n > 0 && n mod 3 = 0 then f sep else ();
-         return n - 1)
-      (List.length digits - 1) digits
-  in ()
+  if eq x zero then f "0"
+  else
+    let digits = loop [] x
+      where rec loop d x =
+        if eq x zero then d
+        else loop [modl x 10 :: d] (div x 10)
+    in
+    let _ =
+      List.fold_left
+        (fun n d ->
+           do f (string_of_int d);
+              if n > 0 && n mod 3 = 0 then f sep else ();
+           return n - 1)
+        (List.length digits - 1) digits
+    in ()
 ;
 value to_string x =
   let digits = loop [] x
