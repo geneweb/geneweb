@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 4.12 2003-12-10 12:19:10 ddr Exp $ *)
+(* $Id: sendImage.ml,v 4.13 2004-10-04 11:18:04 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -192,7 +192,8 @@ value move_file_to_old conf typ fname bfname =
 
 value normal_image_type s =
   if String.length s > 10 && Char.code s.[0] = 0xff &&
-     Char.code s.[1] = 0xd8 && String.sub s 6 4 = "JFIF"
+     Char.code s.[1] = 0xd8 &&
+     (let m = String.sub s 6 4 in m = "JFIF" || m = "Exif")
   then
     ".jpg"
   else if String.length s > 4 && String.sub s 0 4 = "\137PNG" then ".png"
