@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.29 2000-08-18 10:43:52 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.30 2000-08-18 10:54:57 ddr Exp $ *)
 
 open Printf;
 
@@ -48,7 +48,10 @@ value cgi_content () =
 ;
 
 value cgi_from () =
-  try Sys.getenv "REMOTE_HOST" with [ Not_found -> Sys.getenv "REMOTE_ADDR" ]
+  try Sys.getenv "REMOTE_HOST" with
+  [ Not_found ->
+      try Sys.getenv "REMOTE_ADDR" with
+      [ Not_found -> "" ] ]
 ;
 
 (* Utilitaires *)
@@ -524,9 +527,12 @@ value gwtp () =
 
 value usage_msg = "Usage: gwtp";
 value speclist =
-  [("-tmp", Arg.String (fun x -> gwtp_tmp.val := x), "<dir>");
-   ("-dst", Arg.String (fun x -> gwtp_dst.val := x), "<dir>");
-   ("-site", Arg.String (fun x -> gw_site.val := x), "<url>")]
+  [("-tmp", Arg.String (fun x -> gwtp_tmp.val := x),
+    "<dir>: directory for gwtp stuff; default: " ^ gwtp_tmp.val);
+   ("-dst", Arg.String (fun x -> gwtp_dst.val := x),
+    "<dir>: directory for data bases; default: " ^ gwtp_dst.val);
+   ("-site", Arg.String (fun x -> gw_site.val := x),
+    "<url>: site (if any) where data bases are accomodated")]
 ;
 value anonfun _ = do Arg.usage speclist usage_msg; return exit 2;
 
