@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 2.48 1999-09-17 18:15:05 ddr Exp $ *)
+(* $Id: perso.ml,v 2.49 1999-09-18 03:43:57 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -616,24 +616,21 @@ value print_rchildren conf base p ic =
 value print_fwitnesses conf base p nfam n ifam =
   let fam = foi base ifam in
   if Array.length fam.witnesses <> 0 then
-    do html_li conf;
-       Wserver.wprint "%s" (capitale (transl_nth conf "marriage/marriages" 0));
-       if nfam > 1 then Wserver.wprint " %d" (n + 1) else ();
-       Wserver.wprint "\n";
-       tag "ul" begin
-         Array.iter
-           (fun ip ->
-              let p = poi base ip in
-              do html_li conf;
-                 Wserver.wprint "%s:\n%s"
-                   (capitale (transl_nth conf "witness/witnesses" 0))
-                   (referenced_person_title_text conf base p);
-                 Date.afficher_dates_courtes conf base p;
-                 Wserver.wprint "\n";
-              return ())
-         fam.witnesses;
-       end;
-    return ()
+    Array.iter
+      (fun ip ->
+         let p = poi base ip in
+         do html_li conf;
+            Wserver.wprint "%s"
+              (capitale (transl_nth conf "witness/witnesses" 0));
+            if nfam > 1 then
+              Wserver.wprint " (%s %d)"
+                (transl_nth conf "marriage/marriages" 0) (n + 1)
+            else ();
+            Wserver.wprint ":\n%s" (referenced_person_title_text conf base p);
+            Date.afficher_dates_courtes conf base p;
+            Wserver.wprint "\n";
+         return ())
+      fam.witnesses
   else ()
 ;
 

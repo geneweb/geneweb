@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.26 1999-09-15 00:34:31 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.27 1999-09-18 03:43:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -345,9 +345,16 @@ value notice_sex gen p s =
     return Check.error gen
 ;
 
-value insert_family gen co fo =
+value insert_family gen co witl fo =
   let pere = insert_parent gen co.father in
   let mere = insert_parent gen co.mother in
+  let witl =
+    List.map
+      (fun (wit, sex) ->
+         let p = insert_parent gen wit in
+         do notice_sex gen p sex; return p.cle_index)
+      witl
+  in
   let children =
     Array.map
       (fun cle ->
@@ -362,7 +369,7 @@ value insert_family gen co fo =
     {marriage = fo.marriage;
      marriage_place = unique_string gen fo.marriage_place;
      marriage_src = unique_string gen fo.marriage_src;
-     witnesses = [| |];
+     witnesses = Array.of_list witl;
      not_married = fo.not_married;
      children = children; divorce = fo.divorce;
      comment = comment; origin_file = unique_string gen fo.origin_file;
@@ -479,7 +486,7 @@ value insert_relations fname gen key rl =
 
 value insert_syntax fname gen =
   fun
-  [ Family cpl fam -> insert_family gen cpl fam
+  [ Family cpl witl fam -> insert_family gen cpl witl fam
   | Notes key str -> insert_notes fname gen key str
   | Relations key rl -> insert_relations fname gen key rl
   | Bnotes str -> insert_bnotes fname gen str ]

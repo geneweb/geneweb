@@ -1,10 +1,10 @@
-(* $Id: gwcomp.ml,v 2.15 1999-09-16 15:01:12 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 2.16 1999-09-18 03:43:54 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;
 
-value magic_gwo = "GnWo000h";
+value magic_gwo = "GnWo000g";
 
 type key =
   { pk_first_name : string;
@@ -18,7 +18,7 @@ type somebody =
 ;
 
 type syntax_o =
-  [ Family of gen_couple somebody and
+  [ Family of gen_couple somebody and list (somebody * sex) and
       gen_family (gen_person iper string) string
   | Notes of key and string
   | Relations of key and list (gen_relation somebody string)
@@ -727,6 +727,22 @@ value read_family ic fname =
         | Some (str, ["src" :: _]) -> failwith str
         | _ -> ("", line) ]
       in
+      let (witn, line) =
+        loop line where rec loop =
+          fun
+          [ Some (str, [("wit" | "wit:") :: l]) ->
+              let (sex, l) =
+                match l with
+                [ ["m:" :: l] -> (Male, l)
+                | ["f:" :: l] -> (Female, l)
+                | l -> (Neuter, l) ]
+              in
+              let (wk, _, l) = parse_parent str l in
+              do if l <> [] then failwith str else (); return
+              let (witn, line) = loop (read_line ic) in
+              ([(wk, sex) :: witn], line)
+          | line -> ([], line) ]
+      in
       let (csrc, line) =
         match line with
         [ Some (str, ["csrc"; x]) -> (cut_space x, read_line ic)
@@ -767,7 +783,7 @@ value read_family ic fname =
              fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}
           in
-          Some (Family co fo, read_line ic)
+          Some (Family co witn fo, read_line ic)
       | line ->
           let fo =
             {marriage = marriage; marriage_place = marr_place;
@@ -777,7 +793,7 @@ value read_family ic fname =
              origin_file = fname; fsources = fsrc;
              fam_index = Adef.ifam_of_int (-1)}
           in
-          Some (Family co fo, line) ]
+          Some (Family co witn fo, line) ]
   | Some (str, ["notes"]) ->
       let notes = read_notes ic in
       Some (Bnotes notes, read_line ic)
