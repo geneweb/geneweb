@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.207 2001-01-07 19:48:01 ddr Exp $
+# $Id: lexicon.txt,v 3.208 2001-01-21 16:17:48 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -6497,7 +6497,7 @@ se: ospecificerad
 
     up to
 af: tot by
-cs: a¾ k
+cs: a¾ po :a:
 de: bis
 dk: op til
 en: up to

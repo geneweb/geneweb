@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.66 2001-01-10 15:24:50 ddr Exp $ *)
+(* $Id: relation.ml,v 3.67 2001-01-21 16:17:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1093,8 +1093,8 @@ value print_propose_upto conf base p1 p2 rl =
            (capitale
               (transl_decline2 conf "%1 of %2" (transl conf "ancestors")
                  (person_title_text conf base p)));
-         Wserver.wprint " <em>%s</em>\n" (transl conf "up to");
-         afficher_personne_titre conf base a;
+         Wserver.wprint " %s"
+           (transl_decline conf "up to" (person_title_text conf base a));
          Wserver.wprint ":\n<em>%s\n" (transl conf "click");
          Wserver.wprint "<a href=\"%sm=A;t=D;%s;%s;l=%d\">" (commd conf)
            (acces conf base p) (acces_n conf base "1" a) maxlen;
