@@ -11,7 +11,7 @@ GeneWeb version 3.01
     not appear...
 
 * GeneWeb Service/CGI (gwd)
-  - [Dec 2..3, 99] In relationship computing, can print the complete graph
+  - [Dec 2..6, 99] In relationship computing, can print the complete graph
     (all branches in one page). Proposed (when there are no too many links)
     in the list of relationships for each branch type ("click here") and
     globally in a link at end of page if it is a direct relation

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.4 1999-12-03 16:56:43 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.5 1999-12-06 07:31:36 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -618,30 +618,36 @@ value print_relation_no_dag conf base po ip1 ip2 l1 l2 =
 ;
 
 value print_relation_dag conf base a p1 p2 l1 l2 =
+  let module O = struct type t = iper; value compare = compare; end in
+  let module S = Set.Make O in
+  let ia = a.cle_index in
+  let add_branches dist set n ip l =
+    let b = find_first_branch base dist ia l ip Neuter in
+    loop set n b where rec loop set n b =
+      if n > 100 then raise Exit
+      else
+        match b with
+        [ Some b ->
+            let set =
+              List.fold_left (fun set (ip, _) -> S.add ip set) set b
+            in
+            loop set (n + 1) (find_next_branch base dist ia a.sex b)
+        | None -> (set, n) ]
+  in
   try
-    let list =
-      let module O = struct type t = iper; value compare = compare; end in
-      let module S = Set.Make O in
-      let ia = a.cle_index in
-      let dist = make_dist_tab conf base ia (max l1 l2 + 1) in
-      let add_branches set n ip l =
-        let b = find_first_branch base dist ia l ip Neuter in
-        loop set n b where rec loop set n b =
-          if n > 100 then raise Exit
-          else
-            match b with
-            [ Some b ->
-                let set =
-                  List.fold_left (fun set (ip, _) -> S.add ip set) set b
-                in
-                loop set (n + 1) (find_next_branch base dist ia a.sex b)
-            | None -> (set, n) ]
-      in
-      let set = S.add ia S.empty in
-      let (set, n) = add_branches set 0 p1.cle_index l1 in
-      let (set, n) = add_branches set n p2.cle_index l2 in
-      S.elements set
+    let set =
+      List.fold_left
+        (fun set l1 ->
+           List.fold_left
+             (fun set l2 ->
+                let dist = make_dist_tab conf base ia (max l1 l2 + 1) in
+                let (set, n) = add_branches dist set 0 p1.cle_index l1 in
+                let (set, n) = add_branches dist set n p2.cle_index l2 in
+                set)
+             set l2)
+        (S.add ia S.empty) l1
     in
+    let list = S.elements set in
     let d = Dag.make_dag base list in
     Dag.print_dag conf base d
   with
@@ -654,7 +660,7 @@ value print_relation conf base p1 p2 =
   let po = find_person_in_env conf base "" in
   match (p_getenv conf.env "dag", po, l1, l2) with
   [ (Some "on", Some p, Some l1, Some l2) ->
-      print_relation_dag conf base p p1 p2 l1 l2
+      print_relation_dag conf base p p1 p2 [l1] [l2]
   | _ -> print_relation_no_dag conf base po p1.cle_index p2.cle_index l1 l2 ]
 ;
 
@@ -665,3 +671,24 @@ value print conf base =
   [ (Some p1, Some p2) -> print_relation conf base p1 p2
   | _ -> incorrect_request conf ]
 ;
+
+value int_list s =
+  loop 0 0 where rec loop i n =
+    if i = String.length s then [n]
+    else
+      match s.[i] with
+      [ '0'..'9' as d -> loop (i + 1) (n * 10 + Char.code d - Char.code '0')
+      | _ -> [n :: loop (i + 1) 0] ]
+;
+
+value print_rld conf base =
+  match
+    (find_person_in_env conf base "",
+     find_person_in_env conf base "1", find_person_in_env conf base "2",
+     p_getenv conf.env "x1", p_getenv conf.env "x2")
+  with
+  [ (Some p, Some p1, Some p2, Some x1, Some x2) ->
+      print_relation_dag conf base p p1 p2 (int_list x1) (int_list x2)
+  | _ -> incorrect_request conf ]
+;
+
