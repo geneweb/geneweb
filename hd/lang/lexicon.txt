@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.139 2000-07-18 07:50:31 ddr Exp $
+# $Id: lexicon.txt,v 3.140 2000-07-18 08:04:27 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5526,6 +5526,7 @@ eo: la %d plej maljunoj eble ankoraux vivantaj
 es: los %s m&aacute;s viejos quiz&aacute;s todov&iacute;a vivo
 fi: %d vanhinta ehk&auml viel&auml el&auml;v&auml;&auml
 fr: les %d les plus &acirc;g&eacute;s peut-&ecirc;tre encore vivants
+lv: %d visvecâkie iespçjams vçl ir dzîvi
 nl: de %d oudsten, mogelijk nog in leven
 se: de %d &auml;ldsta som kanske lever
 
@@ -5555,6 +5556,7 @@ en: the %d who lived the longest
 eo: la %d kiu vivis plejlonge
 es: los %d que han vivido m&aacute;s mucho tiempo
 fr: les %d ayant v&eacute;cu le plus longtemps
+lv: %d, kuri dzîvojuði visilgâk
 nl: de %d langst levende personen
 se: de %d som har levt l&auml;ngst
 
