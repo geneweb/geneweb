@@ -5,6 +5,8 @@ GeneWeb Version 2.01
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Mar 22, 99] Ability to put "*" (to match any characters) in lines in
+    exclude file.
   - [Mar 20, 99] When merging families, does not print any more the
     intermediate page when there is no differences to select.
   - [Mar 16, 99] Deleted display of trailing space in some links like in
