@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 2.2 1999-10-08 10:19:52 ddr Exp $ *)
+(* $Id: forum.ml,v 2.3 1999-10-08 17:58:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -21,7 +21,7 @@ value get_var ic lab s =
   else ("", s)
 ;
 
-value print_forum conf base label text =
+value print_forum conf base label =
   let fname = forum_file conf label in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -33,7 +33,7 @@ value print_forum conf base label text =
           let (_, s) = get_var ic "Text:" s in
           let (mess, s) =
             get_mess [] s where rec get_mess sl s =
-              if String.length s > 2 && s.[0] = ' ' && s.[1] = ' ' then
+              if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
                 let s = String.sub s 2 (String.length s - 2) in
                 get_mess [s :: sl] (input_line ic)
               else (List.rev sl, s)
@@ -49,7 +49,8 @@ value print_forum conf base label text =
                   Wserver.wprint "<em>%s</em><br>\n" time;
                   List.iter
                     (fun s ->
-                       do copy_string_with_macros conf s;
+                       do if s = "" then Wserver.wprint "<p>"
+                          else copy_string_with_macros conf s;
                           Wserver.wprint "\n";
                        return ())
                     mess;
@@ -61,11 +62,8 @@ value print_forum conf base label text =
   | None -> () ]
 ;
 
-value print conf base label text =
-  let title h =
-    Wserver.wprint "%s - %s%s%s" (capitale (transl conf "forum"))
-      (if h then "" else "<em>") text (if h then "" else "</em>")
-  in
+value print conf base label forum_text =
+  let title _ = Wserver.wprint "%s" (capitale forum_text)  in
   do header conf title;
      print_link_to_welcome conf True;
 (**)
@@ -83,13 +81,17 @@ value print conf base label text =
      end;
 *)
      Wserver.wprint "\n";
-     print_forum conf base label text;
+     print_forum conf base label;
      trailer conf;
   return ()
 ;
 
-value print_wizard conf base = print conf base "w" (transl conf "wizard");
-value print_friend conf base = print conf base "f" (transl conf "friend");
+value print_wizard conf base =
+  print conf base "w" (transl conf "wizards forum")
+;
+value print_friend conf base =
+  print conf base "f" (transl conf "friends forum")
+;
 
 value print_var conf name opt def_value =
   tag "tr" begin
@@ -106,7 +108,7 @@ value print_var conf name opt def_value =
   end
 ;
 
-value print_add conf base label text =
+value print_add conf base label =
   let title _ =
     Wserver.wprint "%s"
       (capitale (transl_decline conf "add" (transl conf "comment")))
@@ -131,12 +133,8 @@ value print_add conf base label text =
   return ()
 ;
 
-value print_add_wizard conf base =
-  print_add conf base "w" (transl conf "wizard")
-;
-value print_add_friend conf base =
-  print_add conf base "f" (transl conf "friend")
-;
+value print_add_wizard conf base = print_add conf base "w";
+value print_add_friend conf base = print_add conf base "f";
 
 value get conf key =
   match p_getenv conf.env key with
@@ -188,10 +186,10 @@ value forum_add conf base label ident text =
   else ()
 ;
 
-value print_add_ok conf base label text =
+value print_add_ok conf base label forum_text =
   let ident = Gutil.strip_spaces (get conf "Ident") in
   let comm = Gutil.strip_spaces (get conf "Text") in
-  if ident = "" || comm = "" then print conf base label text
+  if ident = "" || comm = "" then print conf base label forum_text
   else
     let title _ =
       Wserver.wprint "%s" (capitale (transl conf "comment added"))
@@ -199,15 +197,15 @@ value print_add_ok conf base label text =
     do header conf title;
        forum_add conf base label ident comm;
        print_link_to_welcome conf True;
-       Wserver.wprint "<a href=\"%sm=FORUM;t=%s\">%s - %s</a>\n"
-         (commd conf) label (capitale (transl conf "forum")) text;
+       Wserver.wprint "<a href=\"%sm=FORUM;t=%s\">%s</a>\n"
+         (commd conf) label (capitale forum_text);
        trailer conf;
     return ()
 ;
 
 value print_add_ok_wizard conf base =
-  print_add_ok conf base "w" (transl conf "wizard")
+  print_add_ok conf base "w" (transl conf "wizards forum")
 ;
 value print_add_ok_friend conf base =
-  print_add_ok conf base "f" (transl conf "friend")
+  print_add_ok conf base "f" (transl conf "friends forum")
 ;
