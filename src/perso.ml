@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.43 2002-10-26 12:07:32 ddr Exp $ *)
+(* $Id: perso.ml,v 4.44 2002-12-09 05:09:54 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1123,60 +1123,35 @@ value eval_bool_variable conf base env sl =
   | VVnone -> False ]
 ;
 
-value split_at_coloncolon s =
-  loop 0 where rec loop i =
-    if i >= String.length s - 1 then None
-    else
-      match (s.[i], s.[i + 1]) with
-      [ (':', ':') ->
-          let s1 = String.sub s 0 i in
-          let s2 = String.sub s (i + 2) (String.length s - i - 2) in
-          Some (s1, s2)
-      | _ -> loop (i + 1) ]
-;
-
 value print_transl conf base env upp s c =
   let r =
     match c with
-    [ "n" ->
+    [ "n" | "s" | "w" ->
         let n =
-          match get_env "p" env with
-          [ Vind p _ _ -> 1 - index_of_sex p.sex
-          | _ -> 2 ]
-        in
-        Util.transl_nth conf s n
-    | "s" ->
-        let n =
-          match get_env "child" env with
-          [ Vind p _ _ -> index_of_sex p.sex
-          | _ ->
+          match c with
+          [ "n" ->
               match get_env "p" env with
+              [ Vind p _ _ -> 1 - index_of_sex p.sex
+              | _ -> 2 ]
+          | "s" ->
+              match get_env "child" env with
               [ Vind p _ _ -> index_of_sex p.sex
-              | _ -> 2 ] ]
+              | _ ->
+                  match get_env "p" env with
+                  [ Vind p _ _ -> index_of_sex p.sex
+                  | _ -> 2 ] ]
+          | "w" ->
+              match get_env "fam" env with
+              [ Vfam fam _ _ -> if Array.length fam.witnesses = 1 then 0 else 1
+              | _ -> 0 ]
+          | _ -> assert False ]
         in
-        Util.transl_nth conf s n
-    | "w" ->
-        let n =
-          match get_env "fam" env with
-          [ Vfam fam _ _ -> if Array.length fam.witnesses = 1 then 0 else 1
-          | _ -> 0 ]
-        in
-        Util.transl_nth conf s n
+        let r = Util.transl_nth conf s n in
+        if upp then capitale r else r
     | _ ->
-        match try Some (int_of_string c) with [ Failure _ -> None ] with
-        [ Some n ->
-            match split_at_coloncolon s with
-            [ None -> nominative (Util.transl_nth conf s n)
-            | Some (s1, s2) ->
-                if String.length s2 > 0 && s2.[0] = ':' then
-                  let s2 = String.sub s2 1 (String.length s2 - 1) in
-                  Printf.sprintf
-                    (Util.ftransl_nth conf (Util.valid_format "%t" s1) n)
-                       (fun _ -> s2)
-                else Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
-        | None -> nominative (Util.transl conf s) ^ c ] ]
+        Templ.eval_transl conf upp s c ]
   in
-  Wserver.wprint "%s" (if upp then capitale r else r)
+  Wserver.wprint "%s" r
 ;
 
 value print_wid_hei conf base env fname =

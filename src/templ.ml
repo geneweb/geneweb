@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.14 2002-11-22 09:16:33 ddr Exp $ *)
+(* $Id: templ.ml,v 4.15 2002-12-09 05:09:54 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -450,20 +450,24 @@ value eval_transl_lexicon conf upp s c =
         match split_at_coloncolon s with
         [ None -> Gutil.nominative (Util.transl_nth conf s n)
         | Some (s1, s2) ->
-            let s2 =
-              try
-                if String.length s2 > 0 && s2.[0] = '|' then
-                  let i = 1 in
-                  let j = String.rindex s2 '|' in
-                  let k = skip_spaces_and_newlines s2 (j + 1) in
-                  let s3 = String.sub s2 i (j - i) in
-                  let s4 = String.sub s2 k (String.length s2 - k) in
-                  s3 ^ Util.transl_nth conf s4 n
-                else raise Not_found
-              with
-              [ Not_found -> Util.transl_nth conf s2 n ]
-            in
-            Util.transl_decline conf s1 s2 ]
+            try
+              if String.length s2 > 0 && s2.[0] = '|' then
+                let i = 1 in
+                let j = String.rindex s2 '|' in
+                let k = skip_spaces_and_newlines s2 (j + 1) in
+                let s3 = String.sub s2 i (j - i) in
+                let s4 = String.sub s2 k (String.length s2 - k) in
+                let s2 = s3 ^ Util.transl_nth conf s4 n in
+                Util.transl_decline conf s1 s2
+              else if String.length s2 > 0 && s2.[0] = ':' then
+                let s2 = String.sub s2 1 (String.length s2 - 1) in
+                Printf.sprintf
+                  (Util.ftransl_nth conf (Util.valid_format "%t" s1) n)
+                     (fun _ -> s2)
+              else raise Not_found
+            with
+            [ Not_found ->
+                Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ] ]
     | None -> Gutil.nominative (Util.transl conf s) ^ c ]
   in
   if upp then capitale r else r
