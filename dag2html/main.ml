@@ -1,4 +1,4 @@
-(* $Id: main.ml,v 1.3 2001-08-21 13:56:16 ddr Exp $ *)
+(* $Id: main.ml,v 1.4 2001-08-24 04:54:09 ddr Exp $ *)
 
 open Dag2html;
 open Printf;
@@ -146,7 +146,7 @@ value tag_dag d =
 
 value phony _ = False;
 value indi_txt n = n.valu;
-value vbar_txt n = "|";
+value vbar_txt n = "";
 
 value print_char_table d t =
   let print_elem =
@@ -196,6 +196,7 @@ if colspan = 1 && (td = TDstring "&nbsp;" || td = TDhr CenterA) then
         printf ">";
         match td with
         [ TDstring s -> printf "%s" s
+        | TDbar _ -> printf "|"
         | TDhr align ->
             do {
               printf "<hr noshade size=1";
