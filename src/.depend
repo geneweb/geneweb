@@ -258,7 +258,7 @@ merge.cmo merge.cmx: pa_html.cmo
 mergeFam.cmo mergeFam.cmx: pa_html.cmo
 mergeFamOk.cmo mergeFamOk.cmx: pa_html.cmo
 mergeInd.cmo mergeInd.cmx: pa_html.cmo pa_lock.cmo
-mergeIndOk.cmo mergeIndOk.cmx: pa_lock.cmo pa_html.cmo
+mergeIndOk.cmo mergeIndOk.cmx: pa_html.cmo
 mk_consang.cmo mk_consang.cmx: pa_lock.cmo
 notes.cmo notes.cmx: pa_html.cmo
 place.cmo place.cmx: pa_html.cmo

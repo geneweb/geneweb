@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: camlp4_depend.sh,v 4.1 2001-04-19 15:56:27 ddr Exp $
+# $Id: camlp4_depend.sh,v 4.2 2001-04-21 02:57:51 ddr Exp $
 
 FILES=
 DEPARGS=
@@ -11,7 +11,18 @@ for i in $*; do
 done
 
 for FILE in $FILES; do
-    ../tools/camlp4_comm.sh pr_depend.cmo pa_ifdef.cmo -- $DEPARGS $FILE
+    head -1 $FILE >/dev/null || exit 1
+    set - `head -1 $FILE`
+    if test "$2" = "camlp4r" -o "$2" = "camlp4o" -o "$2" = "camlp4"; then
+        COMM=$2
+        shift; shift
+        ARGS=`echo $* | sed -e "s/[()*]//g"`
+    else
+        COMM=camlp4r
+        ARGS=
+    fi
+    echo $COMM pr_depend.cmo pa_ifdef.cmo $ARGS -- $DEPARGS $FILE >&2
+    $COMM pr_depend.cmo pa_ifdef.cmo $ARGS -- $DEPARGS $FILE
 done
 
 for FILE in $FILES; do
