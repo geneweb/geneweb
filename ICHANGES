@@ -4,6 +4,10 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 2.08
 --------------------
 
+* GeneWeb daemon/CGI (gwd)
+  - [Oct 6, 99] When displaying ascend tree in Lynx, changed disposition
+    so that it is displayed in decreasing order of Sosa number.
+
 * Consanguinity computing (consang)
   - [Oct 6, 99] Improved it to save memory.
 
