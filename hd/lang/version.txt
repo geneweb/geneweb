@@ -22,17 +22,17 @@ function WorkOnBrowser() {
  onmouseout="ibg.src='%o/l-bg.jpg'">
 <img src="%o/l-bg.jpg" width=36 height=22 alt=%ubg; name=ibg border=0></a>
 <a href="%glang=ca"
- onmouseover="if (WorkOnBrowser()) ict.src='%o/t-ca.gif'"
- onmouseout="ict.src='%o/l-ct.jpg'">
-<img src="%o/l-ct.jpg" width=36 height=22 alt=%uca; name=ict border=0></a>
+ onmouseover="if (WorkOnBrowser()) ica.src='%o/t-ca.gif'"
+ onmouseout="ica.src='%o/l-ca.jpg'">
+<img src="%o/l-ca.jpg" width=36 height=22 alt=%uca; name=ica border=0></a>
 <a href="%glang=cs"
  onmouseover="if (WorkOnBrowser()) ics.src='%o/t-cs.gif'"
  onmouseout="ics.src='%o/l-cs.jpg'">
 <img src="%o/l-cs.jpg" width=36 height=22 alt=%ucs; name=ics border=0></a>
 <a href="%glang=da"
- onmouseover="if (WorkOnBrowser()) idk.src='%o/t-da.gif'"
- onmouseout="idk.src='%o/l-dk.jpg'">
-<img src="%o/l-dk.jpg" width=36 height=22 alt=%uda; name=idk border=0></a>
+ onmouseover="if (WorkOnBrowser()) ida.src='%o/t-da.gif'"
+ onmouseout="ida.src='%o/l-da.jpg'">
+<img src="%o/l-da.jpg" width=36 height=22 alt=%uda; name=ida border=0></a>
 <a href="%glang=de"
  onmouseover="if (WorkOnBrowser()) ide.src='%o/t-de.gif'"
  onmouseout="ide.src='%o/l-de.jpg'">
@@ -106,13 +106,13 @@ function WorkOnBrowser() {
  onmouseout="isl.src='%o/l-sl.jpg'">
 <img src="%o/l-sl.jpg" width=36 height=22 alt=%usl; name=isl border=0></a>
 <a href="%glang=sv"
- onmouseover="if (WorkOnBrowser()) ise.src='%o/t-sv.gif'"
- onmouseout="ise.src='%o/l-se.jpg'">
-<img src="%o/l-se.jpg" width=36 height=22 alt=%usv; name=ise border=0></a>
+ onmouseover="if (WorkOnBrowser()) isv.src='%o/t-sv.gif'"
+ onmouseout="isv.src='%o/l-sv.jpg'">
+<img src="%o/l-sv.jpg" width=36 height=22 alt=%usv; name=isv border=0></a>
 <a href="%glang=zh"
- onmouseover="if (WorkOnBrowser()) icn.src='%o/t-zh.gif'"
- onmouseout="icn.src='%o/l-cn.jpg'">
-<img src="%o/l-cn.jpg" width=36 height=22 alt=%uzh; name=icn border=0></a>
+ onmouseover="if (WorkOnBrowser()) izh.src='%o/t-zh.gif'"
+ onmouseout="izh.src='%o/l-zh.jpg'">
+<img src="%o/l-zh.jpg" width=36 height=22 alt=%uzh; name=izh border=0></a>
 </td>
 </tr>
 </table>%Ij

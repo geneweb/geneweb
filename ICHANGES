@@ -5,6 +5,7 @@ GeneWeb Version 4.08
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [13 Nov 02] Renamed some flags names (had old shortcut names).
   - [08 Nov 02] Changed in Util.string_with_macros the filtering of
     tags: now positive list (good_tags_list) instead of negative
     list (dangerous_tags_list): this is better protection against present
