@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.18 2000-04-03 04:45:36 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.19 2000-04-03 14:00:04 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -122,6 +122,14 @@ value print_choice conf base p niveau_effectif =
         tag "td valign=top" begin
           Wserver.wprint "<input type=radio name=t value=L> %s\n"
             (capitale (transl conf "list"));
+          if niveau_effectif <= limit_by_list conf then ()
+          else
+            Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
+              (limit_by_list conf)
+              (transl_nth conf "generation/generations" 1);
+          Wserver.wprint "<br>\n";
+          Wserver.wprint "<input type=radio name=t value=H> %s\n"
+            (capitale (transl conf "horizontally"));
           if niveau_effectif <= limit_by_list conf then ()
           else
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
@@ -1630,28 +1638,43 @@ value no_spaces s =
       loop len (i + 1)
 ;
 
+value htree_reference gv conf base p s =
+  if conf.cancel_links then s
+  else
+    "<a href=\"" ^ commd conf ^ "m=A;t=H;v=" ^ string_of_int gv ^ ";" ^
+    acces conf base p ^ "\">" ^ s ^ "</a>"
+;
+
 value print_horizontally conf base max_level p =
   let title h =
     let txt_fun = if h then gen_person_text_no_html else gen_person_text in
     Wserver.wprint "%s %s" (capitale (transl conf "ancestors"))
       (transl_decline conf "of" (txt_fun raw_access conf base p))
   in
-  let rec loop level ip =
+  let max_level = min (limit_by_list conf) max_level in
+  let space = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" in
+  let bar_space = "|&nbsp;&nbsp;&nbsp;&nbsp;" in
+  let ending = "&nbsp;--&nbsp;" in
+  let rec loop level s1 s2 s3 ip =
     if level >= max_level then ()
     else
       do match (aoi base ip).parents with
-         [ Some ifam -> loop (level + 1) (coi base ifam).father
+         [ Some ifam ->
+             loop (level + 1) (s1 ^ space) (s1 ^ ending) (s1 ^ bar_space)
+               (coi base ifam).father
          | None -> () ];
-         stag "tt" begin
-           for i = 1 to level * 5 do Wserver.wprint "."; done;
-           Wserver.wprint "--.";
-         end;
+         Wserver.wprint "<tt>%s</tt>" s2;
          let p = poi base ip in
+         let ref =
+           if level = 0 then reference else htree_reference max_level
+         in
          Wserver.wprint "%s%s<br>\n"
-           (reference conf base p (no_spaces (person_text conf base p)))
+           (ref conf base p (no_spaces (person_text conf base p)))
            (no_spaces (Date.short_dates_text conf base p));
          match (aoi base ip).parents with
-         [ Some ifam -> loop (level + 1) (coi base ifam).mother
+         [ Some ifam ->
+             loop (level + 1) (s3 ^ bar_space) (s3 ^ ending) (s3 ^ space)
+               (coi base ifam).mother
          | None -> () ];
       return ()
   in
@@ -1659,7 +1682,9 @@ value print_horizontally conf base max_level p =
      print_link_to_welcome conf True;
      Wserver.wprint "%s.\n" (capitale (text_to conf max_level));
      Wserver.wprint "<p>\n";
-     loop 0 p.cle_index;
+     let space1 = "&nbsp;&nbsp;&nbsp;&nbsp;" in
+     let ending1 = "--&nbsp;" in
+     loop 0 space1 ending1 space1 p.cle_index;
      trailer conf;
   return ()
 ;
