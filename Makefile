@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.9 1999-01-27 17:28:57 ddr Exp $
+# $Id: Makefile,v 1.10 1999-01-29 20:55:11 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -30,6 +30,7 @@ distrib:
 	cp gwb2ged/gwb2ged distribution/gwb2ged$(EXE)
 	cp etc/ALIRE.txt distribution/.
 	cp etc/README.txt distribution/.
+	cp etc/INSTALL.htm distribution/.
 	mkdir distribution/doc
 	cp doc/index.htm distribution/doc/.
 	cp doc/LICENCE.htm distribution/doc/.
