@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 3.3 2000-02-25 12:01:15 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 3.4 2000-02-25 15:26:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -49,11 +49,8 @@ value select conf base get_date =
       [ Some (Dgreg d cal) ->
           let e = (p, d, cal) in
           if len < n then loop (Q.add e q) (len + 1) (i + 1)
-          else
-            let (e1, q1) = Q.take q in
-            if before_date e1 e then loop q len (i + 1)
-            else loop (Q.add e q1) len (i + 1)
-        | _ -> loop q len (i + 1) ]
+          else loop (snd (Q.take (Q.add e q))) len (i + 1)
+      | _ -> loop q len (i + 1) ]
 ;
 
 value print_birth conf base =
