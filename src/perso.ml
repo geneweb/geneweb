@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.18 1998-12-16 17:36:38 ddr Exp $ *)
+(* $Id: perso.ml,v 1.19 1998-12-18 10:29:46 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -676,7 +676,7 @@ value print conf base p =
   do header conf title;
      print_sosa_if_any conf base p;
      Wserver.wprint "<a href=\"%s\">" (commd_no_params conf);
-     Wserver.wprint "<img src=\"%sm=IM;v=up.gif\" alt=welcome align=right>"
+     Wserver.wprint "<img src=\"%sm=IM;v=up.gif\" alt=\"^^\" align=right>"
        (commd conf);
      Wserver.wprint "</a>\n";
      if age_autorise conf base p then
@@ -684,9 +684,10 @@ value print conf base p =
        [ "" -> ()
        | s ->
            let http = "http://" in
+           let photo_txt = capitale (transl conf "photo") in
            if String.length s > String.length http &&
               String.sub s 0 (String.length http) = http then
-             Wserver.wprint "<img src=\"%s\" alt=\"%s\"><p>\n" s s
+             Wserver.wprint "<img src=\"%s\" alt=\"%s\"><p>\n" s photo_txt
            else if Filename.is_implicit s then
              let fname1 =
                List.fold_right Filename.concat
@@ -697,7 +698,7 @@ value print conf base p =
              in
              if Sys.file_exists fname1 || Sys.file_exists fname2 then
                Wserver.wprint "<img src=\"%sm=IM;v=%s\" alt=\"%s\"><p>\n"
-                 (commd conf) s s
+                 (commd conf) s photo_txt
              else ()
            else () ]
      else ();
