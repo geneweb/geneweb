@@ -1,5 +1,5 @@
-(* $Id: updateFam.mli,v 4.3 2001-11-16 13:38:54 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: updateFam.mli,v 4.4 2004-12-14 09:30:18 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Config;

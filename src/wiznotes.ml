@@ -1,6 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.16 2004-06-16 11:25:48 ddr Exp $ *)
-(* Copyright (c) 2002 INRIA *)
+(* $Id: wiznotes.ml,v 4.17 2004-12-14 09:30:18 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
 open Util;

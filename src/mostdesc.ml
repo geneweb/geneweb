@@ -1,5 +1,5 @@
-(* $Id: mostdesc.ml,v 4.5 2004-10-21 16:04:26 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: mostdesc.ml,v 4.6 2004-12-14 09:30:14 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Gutil;
 open Def;

@@ -1,5 +1,5 @@
-(* $Id: gwu.ml,v 4.25 2004-08-05 19:41:05 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: gwu.ml,v 4.26 2004-12-14 09:30:12 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Gutil;

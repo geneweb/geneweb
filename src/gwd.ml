@@ -1,6 +1,6 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.67 2004-08-27 11:57:44 ddr Exp $ *)
-(* Copyright (c) 2002 INRIA *)
+(* $Id: gwd.ml,v 4.68 2004-12-14 09:30:12 ddr Exp $ *)
+(* Copyright (c) 1998-2004 INRIA *)
 
 open Config;
 open Def;
@@ -1330,7 +1330,7 @@ value geneweb_server () =
         | None -> try Unix.gethostname () with _ -> "computer" ]
       in
       eprintf "GeneWeb %s - " Version.txt;
-      eprintf "Copyright (c) 2003 INRIA\n";
+      eprintf "Copyright (c) 1998-2005 INRIA\n";
       if not daemon.val then do {
         eprintf "Possible addresses:";
         eprintf "

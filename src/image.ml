@@ -1,6 +1,6 @@
 (* camlp4r *)
-(* $Id: image.ml,v 4.10 2003-08-07 11:43:42 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: image.ml,v 4.11 2004-12-14 09:30:12 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Util;
 open Config;

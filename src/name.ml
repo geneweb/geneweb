@@ -1,5 +1,5 @@
-(* $Id: name.ml,v 4.7 2002-09-30 11:11:00 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: name.ml,v 4.8 2004-12-14 09:30:14 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 module Buff =
   struct

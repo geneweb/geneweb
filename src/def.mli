@@ -1,5 +1,5 @@
-(* $Id: def.mli,v 4.10 2004-07-18 08:53:55 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: def.mli,v 4.11 2004-12-14 09:30:11 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 type choice 'a 'b = [ Left of 'a | Right of 'b ];
 

@@ -1,5 +1,5 @@
-(* $Id: adef.ml,v 4.3 2004-07-18 14:26:38 ddr Exp $ *)
-(* Copyright (c) 2001 INRIA *)
+(* $Id: adef.ml,v 4.4 2004-12-14 09:30:10 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 type iper = int;
 type ifam = int;

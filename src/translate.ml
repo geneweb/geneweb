@@ -1,6 +1,6 @@
 (* camlp4r *)
-(* $Id: translate.ml,v 4.3 2004-02-02 11:47:54 ddr Exp $ *)
-(* Copyright (c) 2002 INRIA *)
+(* $Id: translate.ml,v 4.4 2004-12-14 09:30:17 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 module Buff =
   struct

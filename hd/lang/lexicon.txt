@@ -1,5 +1,5 @@
-# $Id: lexicon.txt,v 4.210 2004-12-14 09:21:06 ddr Exp $
-# Copyright (c) 2002 INRIA
+# $Id: lexicon.txt,v 4.211 2004-12-14 09:30:09 ddr Exp $
+# Copyright (c) 1998-2005 INRIA
 
      !charset
 af: iso-8859-1

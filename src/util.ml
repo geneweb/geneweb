@@ -1,6 +1,6 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.93 2004-11-09 12:33:50 ddr Exp $ *)
-(* Copyright (c) 2002 INRIA *)
+(* $Id: util.ml,v 4.94 2004-12-14 09:30:18 ddr Exp $ *)
+(* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
 open Config;
