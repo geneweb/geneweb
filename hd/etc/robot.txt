@@ -6,9 +6,8 @@
 <body>
 <h1>Access refused</h1>
 
-This address made more than %c requests in less than %s seconds.
-Considering that you probably sent a robot, your access has been
-automatically disconnected.
+This address has been considered to be a robot and its access has
+been automatically disconnected.
 <p>
 Contact the site administrator to restore it.
 
