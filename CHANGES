@@ -52,8 +52,12 @@ GeneWeb Intermediate version 2.02-1
   - [May 23, 99] Does not restart from scratch when changes: compute
     only what's necessary.
 
+* Lexicon (lang/lexicon.txt) and welcome pages (*/start.txt)
+  - [May 31, 99] Corrected and completed Spanish sentences in lexicon
+    and Spanish welcome page (Luis Castro Guzman).
+
 * Documentation
-  - [May 13, 99] Updated Swedish documentation (Lars Gustavsson).
+  - [May 13..31, 99] Updated Swedish documentation (Lars Gustavsson).
 
 GeneWeb Version 2.02
 --------------------
