@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.96 2002-04-25 08:28:08 ddr Exp $
+# $Id: lexicon.txt,v 4.97 2002-05-28 07:49:37 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -43,6 +43,7 @@ nl: ddmmyy
 no: ddmmyy
 pl: ddmmyy
 pt: ddmmyy
+ru: ddmmyy
 sl: ddmmyy
 sv: ddmmyy
 
@@ -3760,6 +3761,7 @@ nl: horizontaal
 no: horisontal
 pl: w poziomie
 pt: horizontalmente
+ru: горизонтально
 sl: vodoravno
 sv: horisontellt
 
@@ -3807,6 +3809,7 @@ nl: ident/e-mail/onderwerp
 no: ident/email/emne
 pl: ident/email/temat
 pt: ident/email/assunto
+ru: идентификатор/email/тема
 sl: ime/e-po╧ta/vsebina
 sv: ident/email/Дmne
 
@@ -4578,6 +4581,7 @@ nl: mannelijke lijn/vrouwelijke lijn
 no: mannlig linje/kvinnelig linje
 pl: linia mЙska/linia ©eЯska
 pt: linha masculina (agnat&iacute;cia)/linha feminina (cogn&aacute;tica)
+ru: мужская линия/женская линия
 sl: mo╧ka linija/╬enska linija
 sv: manliga linjen/kvinnliga linjen
 
@@ -6778,6 +6782,7 @@ no: liste over etternavn
 pl: lista nazwisk
 pt: lista de apelidos
 pt-br: lista de sobrenomes
+ru: список фамилий
 sl: seznam priimkov
 sv: efternamns lista
 
@@ -7330,6 +7335,7 @@ nl: de %d jongste huwelijken
 no: de %d sist gifte
 pl: %d ostatnich ╤lubСw
 pt: os %d casamentos mais recentes
+ru: последние %d браков
 sl: zadnjih %d porok
 sv: de senaste %d Дktenskapen
 
@@ -7758,6 +7764,7 @@ nl: onbepaald geslacht voor %t
 no: udefinert kjЬnn for %t
 pl: %t ma nieokre╤lon╠ pЁeФ
 pt: sexo indefinido para %t
+ru: неизвестный пол у %t
 sl: %t nima doloХenega spola
 sv: odefinierat kЖn fЖr %t
 
