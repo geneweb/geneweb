@@ -25,7 +25,7 @@ With <em>GeneWeb</em>, you can:
 
 <p>
 
-If your data base is accomodated in a site, you are concerned only by
+If your data base is accommodated in a site, you are concerned only by
 the first three points.
 
 <p>
@@ -37,7 +37,7 @@ depend on.
 <p>
 
 Since the topic is about access restrictions, the next section
-concerns the issue of of <a href="#Rob">robots</a> and the ways to
+concerns the issue of <a href="#Rob">robots</a> and the ways to
 prevent them from harming. The last section indicates a even rougher
 way of access interdiction: the <a href="#Bla">black list</a>.
 
@@ -73,7 +73,7 @@ Put your password as value of the variable "wizard_password". Example:
      wizard_passwd=xyzzy
 </pre>
 
-<li>If your data base is accomodated in a site, ask the site
+<li>If your data base is accommodated in a site, ask the site
 administrator to put a "wizard" password. Always pass by him,
 afterwards, if you want to change this password.
 
@@ -89,7 +89,7 @@ the flags) gives you an area for the passwords.
 <ul>
 
 <li>In server mode, the page displays "wizard access" on which you can
-click: your browser then pops a windows where you can type the password
+click: your browser then pops a window where you can type the password
 in the appropriate area (the "user" area is ignored; you can type what
 you want inside).
 
@@ -139,7 +139,7 @@ The other genealogical informations (parents, children) stay displayed.
 
 <p>
 
-If there is a friend password, only the persons having provided this
+If there is a "friend" password, only the persons having provided this
 password (or the "wizard" password) can see the private informations.
 
 <p>
@@ -151,7 +151,7 @@ is "friend_passwd".
 <h4><a name="DBA">Global access restriction to a data base</a></h4>
 
 If you want that your data base be visible only by some persons, you
-can put a global acces restriction.
+can put a global access restriction.
 
 <p>
 
@@ -192,25 +192,25 @@ file "foo.auth"):
      auth_file=foo.auth
 </pre>
 
-<li>If your data base is accomodated in a site, ask the site
-administrator by sending him you authorizations file.
+<li>If your data base is accommodated in a site, ask the site
+administrator by sending him your authorizations file.
 
 </ul>
 
 <p>
 
-When accessing this data base, your browser pops a windows where you
+When accessing this data base, your browser pops a window where you
 have to give a valid user name and its corresponding password.
 
 <p>
 
 In the above example, you have to write "smith" in the "user" area and
-"ex23zuu" in the "password' area, or "martin" in the "user" area and and
+"ex23zuu" in the "password" area, or "martin" in the "user" area and
 "2wxuz4" in the "password" area.
 
 <p>
 
-If you entry is not validated, you have no access at all to the data
+If your entry is not validated, you have no access at all to the data
 base.
 
 <h4><a name="GWA">Global access restriction to the gwd service</a></h4>
@@ -233,7 +233,7 @@ not cgi mode.
 <p>
 
 You have to constituate an authorization file, as well. It can be only
-done by the the site administrator: if your data base is accomodated
+done by the site administrator: if your data base is accommodated
 elsewhere, you are not concerned.
 
 <p>
@@ -244,7 +244,7 @@ of the authorizations file.
 
 <h4><a name="Rob">Robots</a></h4>
 
-Some persons happend to send "robot" in your site. These robots are
+Some persons happen to send "robot" in your site. These robots are
 programs which explore your site methodically, for example by starting
 from some specific page and "clicking" on everything clickable in
 the page and continuing in the resulting pages.
@@ -283,29 +283,28 @@ so many requests so quickly, sometimes more than 10 per second. Because:
 <li>That slows down his computer,
 
 <li>That slows down the other users who consult the site normally,
-normalement,
 
 <li>That distorts the statistics of the site accesses,
 
-<li>That gives the disagreeable feeling to be spied.
+<li>That gives the disagreeable feeling to be spyed on.
 
 </ul>
 
 <p>
 
-However, the pages that <em>GeneWeb</em> generated clairly indicate
-to the robot (in the protocole) not to go on exploring from its pages.
+However, the pages that <em>GeneWeb</em> generated clearly indicate
+to the robot (in the protocol) not to go on exploring from its pages.
 
 <p>
 
 "Good" robots, those which index the Web pages or the whole world,
-respect this protocol and don't insist. But when one launchs a robot,
+respect this protocol and don't insist. But when one launches a robot,
 it is perfectly possible to tell it to ignore it.
 
 <p>
 
 Against these impolite robots, the option "-robot_xcl" of gwd exists.
-It is based on the observation of the quickness of the requests comming
+It is based on the observation of the quickness of the requests coming
 from the same place.
 
 <p>
