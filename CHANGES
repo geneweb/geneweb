@@ -2,7 +2,7 @@ GeneWeb Version 2.01
 --------------------
 
 * General
-  - [Apr 2, 99] Added Norvegian language.
+  - [Apr 2, 99] Added Norwegian language.
   - [Mar 30, 99] Changed term "photo" into "image".
 
 * GeneWeb Daemon/CGI (gwd)
@@ -12,8 +12,8 @@ GeneWeb Version 2.01
     cousins (from the "cousin" link in personal pages).
   - [Mar 25, 99] Added the "unmarried" case for couples.
   - [Mar 23, 99] Added display of number of accesses in traces.
-  - [Mar 17, 99] Added an optional automatic choice for the "death state" in
-    "modify person" forms. Makes the updating simpler to use.
+  - [Mar 17, 99] In person modification form, determines whether a person
+    is died or not (if not specified), according to his age.
   - [Mar 16-19, 99] The presence of images in pages does not block any
     more the display of the text. For example, in welcome pages, the text
     does not wait for the displaying of the flags to be displayed, which
@@ -22,6 +22,9 @@ GeneWeb Version 2.01
     month is now the current month, not always January.
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [Apr 2, 99] Added the automatic computation that a person is died or
+    not (if not indicated in the gedcom), according to the person's age,
+    and deleted the option "-nd".
   - [Mar 31, 99] Added option "-log" to redirect output.
   - [Mar 20, 99] Added options for dates where months are represented by
     numbers: -dates_dm when day before month and -dates_md when month

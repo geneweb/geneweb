@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.4 1999-03-31 02:16:51 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.5 1999-04-02 09:14:22 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -117,7 +117,7 @@ value reconstitute_death conf birth death_place burial burial_place =
   [ "Auto" when d = None ->
       if death_place <> "" || burial <> UnknownBurial || burial_place <> ""
       || dr <> Unspecified then DeadDontKnowWhen
-      else Update.death_supposition conf birth
+      else Update.infer_death conf birth
   | "DeadYoung" when d = None -> DeadYoung
   | "DontKnowIfDead" when d = None -> DontKnowIfDead
   | "NotDead" -> NotDead
