@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.11 1999-11-25 11:21:15 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.12 1999-11-25 23:34:01 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogi - %t</title>
   <meta name="ROBOTS" content="NONE">
@@ -178,7 +178,7 @@ Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan, sedan %d.
 
 <tr>
 <td align=right><br><font size=-1><em><a
-href="%sm=LEX">lexicon</a></em></font></td>
+href="%sm=LEX">lexikon</a></em></font></td>
 </tr>
 
 </table>
