@@ -54,6 +54,10 @@ cousins.cmo: adef.cmi config.cmi date.cmi def.cmi gutil.cmi num.cmi \
     srcfile.cmi util.cmi ../wserver/wserver.cmi 
 cousins.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx num.cmx \
     srcfile.cmx util.cmx ../wserver/wserver.cmx 
+dag2html.cmo: config.cmi date.cmi def.cmi gutil.cmi num.cmi util.cmi \
+    ../wserver/wserver.cmi 
+dag2html.cmx: config.cmi date.cmx def.cmi gutil.cmx num.cmx util.cmx \
+    ../wserver/wserver.cmx 
 date.cmo: adef.cmi calendar.cmo config.cmi def.cmi gutil.cmi util.cmi \
     ../wserver/wserver.cmi date.cmi 
 date.cmx: adef.cmx calendar.cmx config.cmi def.cmi gutil.cmx util.cmx \
@@ -65,23 +69,21 @@ descend.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx perso.cmx \
 doc.cmo: buff.cmo config.cmi util.cmi ../wserver/wserver.cmi 
 doc.cmx: buff.cmx config.cmi util.cmx ../wserver/wserver.cmx 
 family.cmo: adef.cmi advSearchOk.cmo alln.cmo ascend.cmo birthDeath.cmo \
-    birthday.cmo changeChildren.cmo config.cmi cousins.cmo date.cmi def.cmi \
-    descend.cmo doc.cmo forum.cmo gutil.cmi history.cmi merge.cmi \
-    mergeFam.cmo mergeFamOk.cmo mergeInd.cmo mergeIndOk.cmo name.cmi \
-    notes.cmo num.cmi perso.cmi relation.cmo relationLink.cmo sendImage.cmo \
-    some.cmo srcfile.cmi title.cmo tree.cmo update.cmi updateFam.cmi \
-    updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi \
+    birthday.cmo changeChildren.cmo config.cmi cousins.cmo dag2html.cmo \
+    date.cmi def.cmi descend.cmo doc.cmo forum.cmo gutil.cmi history.cmi \
+    merge.cmi mergeFam.cmo mergeFamOk.cmo mergeInd.cmo mergeIndOk.cmo \
+    name.cmi notes.cmo num.cmi perso.cmi relation.cmo relationLink.cmo \
+    sendImage.cmo some.cmo srcfile.cmi title.cmo tree.cmo update.cmi \
+    updateFam.cmi updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi \
     ../wserver/wserver.cmi family.cmi 
 family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birthDeath.cmx \
-    birthday.cmx changeChildren.cmx config.cmi cousins.cmx date.cmx def.cmi \
-    descend.cmx doc.cmx forum.cmx gutil.cmx history.cmx merge.cmx \
-    mergeFam.cmx mergeFamOk.cmx mergeInd.cmx mergeIndOk.cmx name.cmx \
-    notes.cmx num.cmx perso.cmx relation.cmx relationLink.cmx sendImage.cmx \
-    some.cmx srcfile.cmx title.cmx tree.cmx update.cmx updateFam.cmx \
-    updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
+    birthday.cmx changeChildren.cmx config.cmi cousins.cmx dag2html.cmx \
+    date.cmx def.cmi descend.cmx doc.cmx forum.cmx gutil.cmx history.cmx \
+    merge.cmx mergeFam.cmx mergeFamOk.cmx mergeInd.cmx mergeIndOk.cmx \
+    name.cmx notes.cmx num.cmx perso.cmx relation.cmx relationLink.cmx \
+    sendImage.cmx some.cmx srcfile.cmx title.cmx tree.cmx update.cmx \
+    updateFam.cmx updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx family.cmi 
-fhashtbl.cmo: iovalue.cmi 
-fhashtbl.cmx: iovalue.cmx 
 forum.cmo: config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo srcfile.cmi \
     update.cmi util.cmi ../wserver/wserver.cmi 
 forum.cmx: config.cmi def.cmi gutil.cmx iobase.cmx lock.cmx srcfile.cmx \
