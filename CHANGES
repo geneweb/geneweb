@@ -2,6 +2,8 @@ GeneWeb version 2.08
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [Oct 4, 99] Fixed displaying bug in update history (spot displayed due
+    to incorrect HTML).
   - [Oct 3, 99] Added week day in "calendars" page.
 
 * Lexicon (lang/lexicon.txt)
