@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 3.7 2001-01-29 15:33:24 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 3.8 2001-03-04 14:13:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -214,7 +214,7 @@ value rename_image_file conf base p (nfn, nsn, noc) =
   match auto_image_file conf base p with
   [ Some old_f ->
       let s = default_image_name_of_key nfn nsn noc in
-      let f = Filename.concat (base_path ["images"] conf.bname) s in
+      let f = Filename.concat (base_path ["images"] (conf.bname ^ ".gwb")) s in
       let new_f =
         if Filename.check_suffix old_f ".gif" then f ^ ".gif"
         else f ^ ".jpg"

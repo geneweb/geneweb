@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.90 2001-03-02 06:54:46 ddr Exp $ *)
+(* $Id: perso.ml,v 3.91 2001-03-04 14:13:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -858,6 +858,25 @@ value print_variable conf base env sl =
       return () ]
 ;
 
+value is_restricted conf base p =
+  let fname =
+    Filename.concat (Util.base_path [] (conf.bname ^ ".gwb")) "restrict"
+  in
+  match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  [ Some ic ->
+      let hidden = input_value ic in
+      let i = Adef.int_of_iper p.cle_index in
+      let r =
+        if i >= Array.length hidden then
+          match Adef.od_of_codate p.birth with
+          [ Some (Dgreg d _) -> (temps_ecoule d conf.today).year <= 100
+          | _ -> True ]
+        else hidden.(i)
+      in
+      do close_in ic; return r
+  | _ -> False ]
+;
+
 value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
   fun
   [ "are_divorced" ->
@@ -1378,8 +1397,18 @@ value interp_templ conf base p astl =
 (* Main *)
 
 value print_ok conf base p =
-  let astl = Templ.input conf base "perso" in
-  do html conf; interp_templ conf base p astl; return ()
+(**)
+  if conf.wizard || conf.friend || not (is_restricted conf base p) then
+(**)
+    let astl = Templ.input conf base "perso" in
+    do html conf; interp_templ conf base p astl; return ()
+(**)
+  else
+    do Util.header conf (fun _ -> Wserver.wprint "Restricted");
+       Util.print_link_to_welcome conf True;
+       Util.trailer conf;
+    return ()
+(**)
 ;
 
 value print conf base p =

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.91 2001-03-01 19:42:47 ddr Exp $ *)
+(* $Id: util.ml,v 3.92 2001-03-04 14:13:09 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -688,14 +688,12 @@ value input_to_semi ic =
 ;
 
 value base_path pref bname =
-  let bfile = List.fold_right Filename.concat [base_dir.val :: pref] bname in
+  let pref = [base_dir.val :: pref] in
+  let bfile = List.fold_right Filename.concat pref bname in
   ifdef WIN95 then bfile
   else if Sys.file_exists bfile then bfile
-  else if String.length bname >= 2 then
-    let dirs =
-      [base_dir.val ::
-       pref @ [String.make 1 bname.[0]; String.make 1 bname.[1]]]
-    in
+  else if String.length bname >= 6 then
+    let dirs = pref @ [String.make 1 bname.[0]; String.make 1 bname.[1]] in
     List.fold_right Filename.concat dirs bname
   else bfile
 ;
