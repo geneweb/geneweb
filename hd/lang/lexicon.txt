@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.13 1999-11-22 09:28:16 ddr Exp $
+# $Id: lexicon.txt,v 3.14 1999-11-23 12:42:03 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -367,6 +367,7 @@ cs: <em>Sosa number</em> vzta¾ené k %t
 dk: <em>Sosa-nummer</em>, refererende til %t
 en: <em>Sosa number</em> relative to %t
 es: <em>n&uacute;mero Sosa</em> respecto a %t
+fi: henkil&ouml;n %t <em>Sosa-numero</em>
 fr: <em>num&eacute;ro Sosa</em> par rapport &agrave; %t
 is: <em>Sosa númer</em> tengt %t
 se: <em>Sosa nummer</em> relativ till %t
@@ -459,6 +460,7 @@ de: ein Schwager/eine Schw&agrave;gerin
 dk: en svoger/en svigerinde
 en: a brother-in-law/a sister-in-law
 es: un cu&ntilde;ado/una cu&ntilde;ada
+fi: lanko/k&auml;ly
 fr: un beau-fr&egrave;re/une belle-soeur
 is: mágur/mágkona
 it: un cognato/una cognata
@@ -642,6 +644,7 @@ de: ein Neffe (des Ehegatten)/eine Nichte (des Ehegatten)
 dk: en nev&oslash; (&aelig;gtef&aelig;lles nev&oslash;)/en niece (&aelig;gtef&aelig;lles niece)
 en: a nephew (spouse's nephew)/a niece (spouse's niece)
 es: un sobrino pol&iacute;tico/a sobrina pol&iacute;tica
+fi: veljen tai sisaren poika (puolison veljen tai sisaren poika)/veljen tai sisaren tyt&auml;r (puolison veljen tai sisaren tyt&auml;r)
 fr: un neveu (du conjoint)/une ni&egrave;ce (du conjoint)
 is: frændi/frændi
 it: un nipote (dello sposo)/una nipote (dello sposo)
@@ -672,6 +675,7 @@ de: ein Schwiegersohn/eine Schwiegertochter
 dk: en svigers&oslash;n/en svigerdatter
 en: a son-in-law/a daughter-in-law
 es: un yerno/una nuera
+fi: v&auml;vy/mini&auml;
 fr: un beau-fils/une belle-fille
 is: tengdasonur/tengdadóttir
 it: un genero/una nuora
@@ -752,6 +756,7 @@ de: Pflegevater/Pflegemutter/Adoptiveltern
 dk: adoptivfader/adoptivmoder/adoptivfor&aelig;ldre
 en: adoptive father/adoptive mother/adoptive parents
 es: padre adoptivo/madre adoptiva/padres adoptivos
+fi: ottois&auml;/ottoauml;iti/ottovanhemmat
 fr: p&egrave;re adoptif/m&egrave;re adoptive/parents adoptifs
 is: kjörfaðir/kjörmóðir/kjörforeldrar
 it: padre adottivo/madre adottiva/genitori adottivi
@@ -765,6 +770,7 @@ de: Adoptivsohn/Adoptivtochter/Adoptivkind
 dk: adoptivs&oslash;n/adoptivdatter/adoptivbarn
 en: adoptive son/adoptive daughter/adoptive child
 es: hijo adoptivo/hija adoptiva/hijo(a) adoptivo(a)
+fi: ottopoika/ottotyt&auml;r/ottolapsi
 fr: fils adoptif/fille adoptive/enfant adoptif
 is: kjörsonur/kjördóttir/kjörbarn
 it: figlio adottivo/figlia adottiva/figlio addotivo
@@ -950,6 +956,7 @@ de: ein Onkel (Ehemann der Tante)/eine Tante (Ehefrau des Onkels)
 dk: en onkel (tantes mand)/en tante (onkels hustru)
 en: an uncle (aunt's husband)/an aunt (uncle's wife)
 es: un t&iacute;o pol&iacute;tico/una t&iacute;a pol&iacute;tica
+fi: set&auml;/t&auml;ti
 fr: un oncle (&eacute;poux d'une tante)/une tante (&eacute;pouse d'un oncle)
 is: frændi/frænka
 it: uno zio (marito della zia)/una zia (moglie dello zio)
@@ -1118,6 +1125,7 @@ de: zur&uuml;ck
 dk: tilbage
 en: back
 es: regreso
+fi: takaisin
 fr: retour
 is: til baka
 it: torna indietro
@@ -1332,6 +1340,7 @@ dk: kalender/kalendere
 en: calendar/calendars
 eo: kalendaro/kalendaroj
 es: calendario/calendarios
+fi: kalenteri/kalenterit
 fr: calendrier/calendriers
 is: dagatal/dagatöl
 it: calendario/calendarii
@@ -1360,6 +1369,7 @@ de: m&ouml;glicher Vater/m&ouml;gliche Mutter/m&ouml;gliche Eltern
 dk: mulig fader/mulig moder/mulige for&aelig;ldre
 en: candidate father/candidate mother/candidate parents
 es: padre posible/madre posible/padres posibles
+fi: mahdollinen is&auml;/mahdollinen &auml;iti/mahdolliset vanhemmat
 fr: p&egrave;re possible/m&egrave;re possible/parents possibles
 is: sennilegur faðir/sennileg móðir/sennilegir foreldrar
 it: padre presunto/madre presunta/genitori presunti
@@ -1373,6 +1383,7 @@ de: m&ouml;glicher Sohn/m&ouml;gliche Tochter/m&ouml;gliches Kind
 dk: mulig s&oslash;n/mulig datter/muligt barn
 en: candidate son/candidate daughter/candidate child
 es: hijo posible/hija posible/hijo(a) posible
+fi: mahdollinen poika/mahdollinen tyt&auml;r/mahdollinen lapsi
 fr: fils possible/fille possible/enfant possible
 is: sennilega sonur/sennilega dóttir/sennilega barn
 it: figlio presunto/figlia presunta/figlio presunto
@@ -1514,6 +1525,7 @@ se: kommentar
 
     comment added
 en: comment added
+fi: huomautus lis&auml;tty
 fr: commentaire ajout&eacute;
 nl: commentaar toegevoegd
 is: athugasemd bætt við
@@ -2119,6 +2131,7 @@ dk: forum
 en: forum
 eo: forumo
 es: forum
+fi: foorumi
 fr: forum
 is: umræður
 it: tribuna
@@ -2130,6 +2143,7 @@ se: forum
     foster father/foster mother/foster parents
 dk: plejefader/plejemoder/plejefor&aelig;ldre
 en: foster father/foster mother/foster parents
+fi: kasvatusis&auml;/kasvatus&auml;iti/kasvatusvanhemmat
 fr: p&egrave;re nourricier/m&egrave;re nourrici&egrave;re/parents nourriciers
 no: fosterfar/fostermor/fosterforeldre
 se: fosterfar/fostermor/fosterf&ouml;r&auml;lder
@@ -2137,6 +2151,7 @@ se: fosterfar/fostermor/fosterf&ouml;r&auml;lder
     foster son/foster daughter/foster child
 dk: plejes&oslash;n/plejedatter/plejebarn
 en: foster son/foster daughter/foster child
+fi: kasvattipoika/kasvattityt&auml;r/kasvattilapsi
 fr: fils &eacute;lev&eacute;/fille &eacute;lev&eacute;e/enfant &eacute;lev&eacute;
 no: fosters&oslash;nn/fosterdatter/fosterbarn
 se: fosterson/fosterdotter/fosterbarn
@@ -2163,6 +2178,7 @@ de: Taufzeuge/Taufzeugin/Taufzeuge und Taufzeugin
 dk: gudfader/gudmoder/gudfader og gudmoder
 en: godfather/godmother/godparents
 es: padrino/madrina/padrino y padrina
+fi: kummiset&auml;/kummit&auml;ti/kummit
 fr: parrain/marraine/parrain et marraine
 is: guðfaðir/guðmóðir/guðforeldrar
 it: padrino/madrina/padrini
@@ -2176,6 +2192,7 @@ de: Taufkind
 dk: guds&oslash;n/guddatter/gudbarn
 en: godson/goddaughter/godchild
 es: fahijado/fahijada/fahihado(a)
+fi: kummipoika/kummitytt&ouml;/kummilapsi
 fr: filleul/filleule/filleul(e)
 is: guðsonur/guðdóttir/guðbarn
 it: figlioccio/figlioccia/figlioccio
@@ -2223,6 +2240,7 @@ de: Gregorianisch/Julianisch/Franz&ouml;sisch/Hebr&auml;isch
 dk: gregoriansk/juliansk/fransk rep./j&oslash;disk
 en: Gregorian/Julian/French/Hebrew
 es: gregoriano/julian/franc&eacute;s/hebreo
+fi: gregoriaaninen/juliaaninen/ranskalainen/heprealainen
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
 is: gregorísk/julian/franskt/hebreskt
 it: gregorian/julian/francese/ebraico
@@ -2321,6 +2339,7 @@ dk: opdateringers historie
 en: history of updates
 eo: historio de la gxisdatigoj
 es: historia de las actualizaciones
+fi: p&auml;ivityshistoria
 fr: historique des mises-&agrave;-jour
 is: uppfærslusaga
 it: storia degli aggiornamenti
@@ -2466,6 +2485,7 @@ de: Ehegatten einbeziehen
 dk: medtag &aelig;gtef&aelig;ller
 en: include spouses
 es: incluir los c&oacute;nyuges
+fi: mukaanlue puolisot
 fr: inclure les conjoints
 is: meðtaldar makar
 it: includere i coniugi
@@ -3075,6 +3095,7 @@ dk: nev&oslash;er og niecer
 en: nephews and nieces
 eo: nevoj kay nevinoj
 es: sobrinos y sobrinas
+fi: sisarusten lapset
 fr: neveux et ni&egrave;ces
 is: bræðra og systrabörn
 it: nipoti
@@ -3587,6 +3608,7 @@ se: endast den valda generationen
     optional
 dk: efter behag
 en: optional
+fi: valinnainen
 fr: facultatif
 is: má velja
 nl: optioneel
@@ -3751,6 +3773,7 @@ se: plats
 de: Genauigkeit
 dk: pr&aelig;cisering
 en: precision
+fi: tarkennus
 fr: pr&eacute;cision
 is: nákvæmni
 nl: precisie
@@ -3861,6 +3884,7 @@ se: smeknamn
 de: anerkannter Sohn/anerkannte Tochter/anerkanntes Kind
 dk: anerkendt s&oslash;n/anerkendt datter/anerkendt barn
 en: recognized son/recognized daughter/recognized child
+fi: tunnustettu poika/tunnustettu tyt&auml;r/tunnustettu lapsi
 fr: fils reconnu/fille reconnue/enfant reconnu
 is: viðurkendur sonur/viðurkend dóttir/viðurkent barn
 it: figlio riconosciuto/figlia riconosciuta/figlio riconosciuto
@@ -3873,6 +3897,7 @@ se: erk&auml;nd son/erk&auml;nd dotter/erk&auml;nt barn
 de: anerkennender Vater/anerkennende Mutter/anerkennende Eltern
 dk: sig vedkendende fader/sig vedkendende moder/sig vedkendende for&aelig;ldre
 en: recognizing father/recognizing mother/recognizing parents
+fi: tunnustanut is&auml;/tunnustanut &auml;iti/tunnustaneet vanhemmat
 fr: p&egrave;re l'ayant reconnu/m&egrave;re l'ayant reconnu/parents l'ayant reconnu
 is: viðurkenndur faðir/viðurkennd móðir/viðurkennd foreldri
 no: bekreftet far/bekreftet mor/bekreftede foreldre
@@ -3885,6 +3910,7 @@ de: Beziehung/Beziehungen
 dk: forbindelse/forbindelser
 en: relation/relations
 es: relaci&oacute;n/relaciones
+fi: sukulaisuus/sukulaisuussuhteet
 fr: relation/relations
 is: skyldleiki/skyldleikar
 it: parentela
@@ -3965,6 +3991,7 @@ de: Heiratsbeziehungen
 dk: sl&aelig;gtskaber ved gifterm&aring;l
 en: relationships by marriage
 es: parentesco pol&iacute;tico
+fi: sukulaisuussuhteet avioliiton kautta
 fr: liens de parent&eacute; par alliance
 is: tengjast með giftingu
 it: parentele per matrimonio
@@ -4079,6 +4106,7 @@ de: kurze Ansicht
 dk: standardrapport
 en: short display
 es: presentaci&oacute;n corta
+fi: lyhyt esitys
 fr: affichage court
 is: stutt sýn
 it: display corto
@@ -4090,6 +4118,7 @@ se: kort rapport
     shortest path
 dk: korteste vej
 en: shortest path
+fi: lyhin polku
 fr: chemin le plus court
 se: kortaste grenen
 
@@ -4134,6 +4163,7 @@ dk: s&oslash;skende
 en: siblings
 eo: gefratoj
 es: hermanos y hermanas
+fi: sisarukset
 fr: fr&egrave;res et soeurs
 is: systkyni
 it: fratelli
@@ -4364,6 +4394,7 @@ se: &auml;ndra ordningen p&aring; de f&ouml;ljande familjerna
 de: Text
 dk: tekst
 en: text
+fi: teksti
 fr: texte
 is: texti
 nl: tekst
@@ -4528,6 +4559,7 @@ de: der Schwiegervater/die Schwiegermutter
 dk: svigerfaderen/svigermoderen
 en: the father-in-law/the mother-in-law
 es: el suegro/la suegra
+fi: appi/anoppi
 fr: le beau-p&egrave;re/la belle-m&egrave;re
 is: tengdafaðir/tengdamóðir
 it: il suocero/la suocera
@@ -4712,6 +4744,7 @@ dk: &aelig;gtef&aelig;llen
 en: the spouse
 eo: la edzo/la edzino
 es: el esposo/l'esposa
+fi: puoliso
 fr: l'&eacute;poux/l'&eacute;pouse
 is: maki
 it: lo sposo/la sposa
@@ -4759,6 +4792,7 @@ de: um ein Kind zu einer Familie zu hinzuzuf&uuml;gen, benutzen Sie "%s"
 dk: brug "%s" for at f&oslash;je et barn til en familie
 en: to add a child to a family, use "%s"
 es: para agregar un hijo a una familia, utiliza "%s"
+fi: lis&auml;t&auml;ksesi perheeseen lapsen k&auml;yt&auml; "%s"
 fr: pour ajouter un enfant &agrave; une famille, utiliser "%s"
 is: til að bæta barni við fjölskyldu, notaðu "%s"
 it: per aggiungere un figlio ad una famiglia, scegliere "%s"
@@ -4941,6 +4975,7 @@ se: totalt
 de: Baum
 dk: tr&aelig;
 en: tree
+fi: puu
 fr: arbre
 is: tré
 nl: boom
@@ -4954,6 +4989,7 @@ dk: onkler og tanter
 en: uncles and aunts
 eo: onkloj kaj onklinoj
 es: t&iacute;os y t&iacute;as
+fi: sed&auml;t ja t&auml;dit
 fr: oncles et tantes
 is: föður(móður)systur og föður(móður)bræður
 it: zii e zie
@@ -5066,6 +5102,7 @@ se: med
 
     witness at marriage of %s and %s
 en: witness at marriage of %s and %s
+fi: avioliiton %s ja %s todistaja
 fr: t&eacute;moin au mariage de %s et de %s
 is: vitni að giftingu %s og %s
 nl: getuige bij het huwelijk van %s en %s
@@ -5076,6 +5113,7 @@ se: vittne vid &auml;ktenskap mellan %s och %s
     witness/witnesses
 dk: vidne/vidner
 en: witness/witnesses
+fi: todistaja/todistajat
 fr: t&eacute;moin/t&eacute;moins
 is: vitni/vitni
 nl: getuige/getuigen
@@ -5105,6 +5143,7 @@ de: Jahr/Monat/Tag
 dk: &aring;r/m&aring;ned/dag
 en: year/month/day
 es: a&ntilde;o/mes/dia
+fi: vuosi/kuukausi/p&auml;iv&auml
 fr: ann&eacute;e/mois/jour
 is: ár/mánuður/dagur
 it: anno/mese/giorno
