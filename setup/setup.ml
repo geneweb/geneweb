@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.53 2004-12-14 15:03:05 ddr Exp $ *)
+(* $Id: setup.ml,v 4.54 2005-02-13 13:35:46 ddr Exp $ *)
 
 open Printf;
 
@@ -805,7 +805,7 @@ value gwc_or_ged2gwb out_name_of_in_name conf =
 ;
 
 value gwc_check conf =
-  let conf = {(conf) with env = [("f", "on") :: conf.env]} in
+  let conf = {(conf) with env = [("nofail", "on"); ("f", "on") :: conf.env]} in
   gwc_or_ged2gwb out_name_of_gw conf
 ;
 

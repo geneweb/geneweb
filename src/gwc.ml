@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.31 2005-02-13 10:45:51 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.32 2005-02-13 13:35:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -940,7 +940,8 @@ value speclist =
    ("-part", Arg.String (fun s -> part_file.val := s), "\
      <file> Particles file (default = predefined particles)");
    ("-mem", Arg.Set Iobase.save_mem, " Save memory, but slower");
-   ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.")]
+   ("-nolock", Arg.Set Lock.no_lock_flag, " do not lock database.");
+   ("-nofail", Arg.Set Gwcomp.no_fail, " no failure in case of error.")]
 ;
 
 value anonfun x =

@@ -1,5 +1,5 @@
 (* camlp4r ../src/pa_lock.cmo *)
-(* $Id: gwtp.ml,v 4.28 2005-02-03 16:19:32 ddr Exp $ *)
+(* $Id: gwtp.ml,v 4.29 2005-02-13 13:35:46 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Printf;
@@ -647,6 +647,7 @@ value make_temp env b =
     insert_file env bdir "base";
     insert_file env bdir "notes";
     insert_file env bdir "patches";
+    insert_file env bdir "particles.txt";
     flush stdout;
     let base = Iolight.input bdir in
     printf "\n";
