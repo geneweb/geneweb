@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.23 2001-01-06 09:55:54 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.24 2001-02-10 11:04:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -738,10 +738,14 @@ value check_family base error warning fam cpl des =
   let moth = poi base cpl.mother in
   do match fath.sex with
      [ Male -> birth_before_death base warning fath
-     | _ -> error (BadSexOfMarriedPerson fath) ];
+     | _ ->
+         if fam.relation <> Gay then error (BadSexOfMarriedPerson fath)
+         else () ];
      match moth.sex with
      [ Female -> birth_before_death base warning moth
-     | _ -> error (BadSexOfMarriedPerson moth) ];
+     | _ ->
+         if fam.relation <> Gay then error (BadSexOfMarriedPerson moth)
+         else () ];
      check_normal_marriage_date base error warning fam;
      sort_children base warning ifam des;
      let _ =

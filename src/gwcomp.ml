@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 3.14 2001-01-06 09:55:54 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 3.15 2001-02-10 11:04:58 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -481,9 +481,17 @@ value get_mar_date str =
       in
       let (relation, l) =
         match l with
-        [ ["#nm" :: l] -> (NotMarried, l)
-        | ["#eng" :: l] -> (Engaged, l)
-        | _ -> (Married, l) ]
+        [ ["#nm" :: l] -> ((NotMarried, Male, Female), l)
+        | ["#eng" :: l] -> ((Engaged, Male, Female), l)
+        | ["#gay"; c :: l] when String.length c = 2 ->
+            let decode_sex i =
+              match c.[i] with
+              [ 'm' -> Male
+              | 'f' -> Female
+              | _ -> Neuter ]
+            in
+            ((Gay, decode_sex 0, decode_sex 1), l)
+        | _ -> ((Married, Male, Female), l) ]
       in
       let (place, l) = get_field "#mp" l in
       let (src, l) = get_field "#ms" l in
@@ -687,9 +695,10 @@ value read_family ic fname =
   fun
   [ Some (str, ["fam" :: l]) ->
       let (cle_pere, surname, l) = parse_parent str l in
-      let (relation, marriage, marr_place, marr_src, divorce, l) =
+      let (relation_ss, marriage, marr_place, marr_src, divorce, l) =
         get_mar_date str l
       in
+      let (relation, fath_sex, moth_sex) = relation_ss in
       let (cle_mere, _, l) = parse_parent str l in
       do if l <> [] then failwith str else (); return
       let line = read_line ic in

@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.221 2001-02-08 19:28:03 ddr Exp $
+# $Id: lexicon.txt,v 3.222 2001-02-10 11:04:55 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -3012,6 +3012,10 @@ pt: filho adoptivo/filha adoptiva/filho(a) adoptivo(a)
 ru: ןנטולםûי סûם/ןנטולםאÿ המקü/ןנטולםûי נובוםמך
 se: fosterson/fosterdotter/fosterbarn
 
+    gay (marriage)
+en: gay
+fr: homosexuel
+
     generation/generations
 af: geslag/geslagte
 cs: generace
@@ -5576,7 +5580,7 @@ eo: devus esti ina
 es: deber&iacute;a ser de sexo feminino
 et: peaks olema naissoost
 fi: pit&auml;isi olla naispuolinen
-fr: devrait &ecirc;tre de sexe f&eacute;mining
+fr: devrait &ecirc;tre de sexe f&eacute;minin
 he:  צריכה להיות נקבה
 is: זtti aנ vera kvenkyns
 it: dovrebbe essere di sesso femminile

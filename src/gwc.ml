@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 3.14 2001-01-07 23:22:52 ddr Exp $ *)
+(* $Id: gwc.ml,v 3.15 2001-02-10 11:04:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -464,8 +464,11 @@ value insert_family gen co witl fo deo =
      gen.g_fcnt := gen.g_fcnt + 1;
      fath_uni.family := Array.append fath_uni.family [| fam.fam_index |];
      moth_uni.family := Array.append moth_uni.family [| fam.fam_index |];
-     notice_sex gen pere Male;
-     notice_sex gen mere Female;
+     if fo.relation <> Gay then
+       do notice_sex gen pere Male;
+          notice_sex gen mere Female;
+       return ()
+     else ();
      Array.iter
        (fun ix ->
           let x = poi gen.g_base ix in

@@ -1,4 +1,4 @@
-(* $Id: def.mli,v 3.9 2001-01-06 09:55:53 ddr Exp $ *)
+(* $Id: def.mli,v 3.10 2001-02-10 11:04:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 type iper = Adef.iper;
@@ -25,7 +25,7 @@ and precision = Adef.precision ==
   [ Sure | About | Maybe | Before | After | OrYear of int | YearInt of int ]
 ;
 
-type relation_kind = [ Married | NotMarried | Engaged ];
+type relation_kind = [ Married | NotMarried | Engaged | Gay ];
 
 type divorce = [ NotDivorced | Divorced of codate | Separated ];
 
