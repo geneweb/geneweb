@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 4.2 2001-04-19 12:34:56 ddr Exp $ *)
+(* $Id: gwc.ml,v 4.3 2001-04-23 03:02:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -748,14 +748,6 @@ and [options] are:"
 
 value main () =
   do {
-    ifdef MAC then do {
-      Printf.eprintf "args? ";
-      flush stderr;
-      let line = input_line stdin in
-      let list = Gutil.arg_list_of_string line in
-      Argl.parse_list speclist anonfun errmsg list;
-    }
-    else ();
     Argl.parse speclist anonfun errmsg;
     let gwo = ref [] in
     List.iter

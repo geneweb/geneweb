@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 4.1 2001-04-22 08:56:16 ddr Exp $ *)
+(* $Id: gwu.ml,v 4.2 2001-04-23 03:02:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1167,14 +1167,6 @@ Options are:"
 
 value main () =
   do {
-    ifdef MAC then do {
-      Printf.eprintf "args? ";
-      flush stderr;
-      let line = input_line stdin in
-      let list = Gutil.arg_list_of_string line in
-      Argl.parse_list speclist anonfun errmsg list;
-    }
-    else ();
     Argl.parse speclist anonfun errmsg;
     if in_file.val = "" then do {
       Printf.printf "Missing base\n";
