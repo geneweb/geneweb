@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 2.28 1999-09-29 13:58:38 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 2.29 1999-09-30 09:49:06 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -241,7 +241,10 @@ value reconstitute_person conf =
     [ (NotDead | DontKnowIfDead, Buried _ | Cremated _) -> DeadDontKnowWhen
     | _ -> death ]
   in
-  let notes = strip_spaces (strip_controls_m (get conf "notes")) in
+  let notes =
+    if first_name = "?" || surname = "?" then ""
+    else strip_spaces (strip_controls_m (get conf "notes"))
+  in
   let psources = only_printable (get conf "src") in
   let p =
     {first_name = first_name; surname = surname; occ = occ;
