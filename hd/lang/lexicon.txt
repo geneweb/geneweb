@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.142 1999-10-08 10:19:41 ddr Exp $
+# $Id: lexicon.txt,v 2.143 1999-10-08 17:58:04 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1853,10 +1853,6 @@ no: alfabetisk p&aring; fornavn
 pt: por os nomes por ordem alfab&eacute;tico
 se: f&ouml;r f&ouml;rnamnen i bokstavsordning
 
-    forum
-en: forum
-fr: forum
-
     friend
 dk: betroet
 en: friend
@@ -1867,6 +1863,17 @@ nl: vriend
 no: venner
 pt: amigo
 se: v&auml;nner
+
+    friends forum
+dk: betroet forum
+en: friends forum
+eo: forum amikoj
+es: forum amigos
+fr: forum amis
+nl: vriend forum
+no: venner forum
+pt: forum amigos
+se: v&auml;nner forum
 
     generation
 cs: generace
@@ -4449,6 +4456,17 @@ nl: wijzigen
 no: oppdaterings
 pt: bruxo
 se: uppdaterings
+
+    wizards forum
+dk: opdaterings forum
+en: wizards forum
+eo: forum sorcxistoj
+es: forum brujos
+fr: forum sorciers
+nl: wijzigen forum
+no: oppdaterings forum
+pt: forum bruxos
+se: uppdaterings forum
 
     would be his/her own ancestor
 cs: byl by svùj vlastní pøedek
