@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 4.6 2004-12-14 09:30:10 ddr Exp $ *)
+(* $Id: alln.ml,v 4.7 2005-01-03 18:35:30 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -99,35 +99,35 @@ value print_alphabetic_big conf base is_surnames ini list len =
   let mode = if is_surnames then "N" else "P" in
   do {
     header conf title;
-    List.iter
-      (fun (ini_k, _) ->
-         do {
-           stag "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode ini_k begin
+    tag "p" begin
+      List.iter
+        (fun (ini_k, _) ->
+           stagn "a" "href=\"%sm=%s;tri=A;k=%s\"" (commd conf) mode ini_k begin
              Wserver.wprint "%s" (String.capitalize ini_k);
-           end;
-           Wserver.wprint "\n";
-         })
-      list;
-    html_p conf;
-    Wserver.wprint "%s:\n" (capitale (transl conf "the whole list"));
+           end)
+        list;
+    end;
+    stagn "p" begin
+      Wserver.wprint "%s:" (capitale (transl conf "the whole list"));
+    end;
     tag "ul" begin
-      html_li conf;
-      stag "a" "href=\"%sm=%s;tri=A;o=A;k=%s\"" (commd conf) mode ini begin
-        Wserver.wprint "%s" (transl conf "long display");
+      stagn "li" begin
+        stag "a" "href=\"%sm=%s;tri=A;o=A;k=%s\"" (commd conf) mode ini begin
+          Wserver.wprint "%s" (transl conf "long display");
+        end;
       end;
-      Wserver.wprint "\n";
-      html_li conf;
-      stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s\"" (commd conf) mode ini begin
-        Wserver.wprint "%s" (transl conf "short display");
+      stagn "li" begin
+        stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s\"" (commd conf) mode ini begin
+          Wserver.wprint "%s" (transl conf "short display");
+        end;
       end;
-      Wserver.wprint "\n";
-      html_li conf;
-      stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s;cgl=on\"" (commd conf) mode ini
-          begin
-        Wserver.wprint "%s + %s" (transl conf "short display")
-          (transl conf "cancel GeneWeb links");
+      stagn "li" begin
+        stag "a" "href=\"%sm=%s;tri=S;o=A;k=%s;cgl=on\"" (commd conf) mode ini
+            begin
+          Wserver.wprint "%s + %s" (transl conf "short display")
+            (transl conf "cancel GeneWeb links");
+        end;
       end;
-      Wserver.wprint "\n";
     end;
     trailer conf;
   }
@@ -138,39 +138,35 @@ value print_alphabetic_all conf base is_surnames ini list len =
   let mode = if is_surnames then "N" else "P" in
   do {
     header conf title;
-    List.iter
-      (fun (ini_k, _) ->
-         do {
-           stag "a" "href=\"#%s\"" ini_k begin
+    tag "p" begin
+      List.iter
+        (fun (ini_k, _) ->
+           stagn "a" "href=\"#%s\"" ini_k begin
              Wserver.wprint "%s" (String.capitalize ini_k);
-           end;
-           Wserver.wprint "\n";
-         })
+           end)
       list;
+    end;
     tag "ul" begin
       List.iter
         (fun (ini_k, l) ->
-           do {
-             html_li conf;
-             stag "a" "name=\"%s\"" ini_k begin
+           tag "li" begin
+             stagn "a" "id=\"%s\"" ini_k begin
                Wserver.wprint "%s" (String.capitalize ini_k);
              end;
-             Wserver.wprint "\n";
              tag "ul" begin
                List.iter
                  (fun (s, cnt) ->
-                    do {
-                      html_li conf;
+                    stagn "li" begin
                       let href =
                         "m=" ^ mode ^ ";v=" ^ code_varenv (Name.lower s)
                       in
                       wprint_geneweb_link conf href
                         (alphab_string conf is_surnames s);
-                      Wserver.wprint " (%d)\n" cnt;
-                    })
+                      Wserver.wprint " (%d)" cnt;
+                    end)
                  l;
              end;
-           })
+           end)
         list;
     end;
     trailer conf;
@@ -182,19 +178,21 @@ value print_alphabetic_small conf base is_surnames ini list len =
   let mode = if is_surnames then "N" else "P" in
   do {
     header conf title;
-    tag "ul" begin
-      List.iter
-        (fun (_, s, cnt) ->
-           do {
-             html_li conf;
-             stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
-                 (code_varenv (Name.lower s)) begin
-               Wserver.wprint "%s" (alphab_string conf is_surnames s);
-             end;
-             Wserver.wprint " (%d)\n" cnt;
-           })
-        list;
-    end;
+    if list = [] then ()
+    else
+      tag "ul" begin
+        List.iter
+          (fun (_, s, cnt) ->
+             stagn "li" begin
+               stag "a" "href=\"%sm=%s;v=%s\"" (commd conf) mode
+                   (code_varenv (Name.lower s))
+               begin
+                 Wserver.wprint "%s" (alphab_string conf is_surnames s);
+               end;
+               Wserver.wprint " (%d)" cnt;
+             end)
+          list;
+      end;
     trailer conf;
   }
 ;
@@ -367,20 +365,18 @@ value print_alphabetic_short conf base is_surnames ini list len =
   do {
     header conf title;
     if need_ref then
-      List.iter
-        (fun (ini_k, _) ->
-           do {
-             stag "a" "href=\"#%s\"" ini_k begin
+      tag "p" begin
+        List.iter
+          (fun (ini_k, _) ->
+             stagn "a" "href=\"#%s\"" ini_k begin
                Wserver.wprint "%s" (String.capitalize ini_k);
-             end;
-             Wserver.wprint "\n";
-           })
-        list
+             end)
+        list;
+      end
     else ();
     List.iter
       (fun (ini_k, l) ->
-         do {
-           html_p conf;
+         tag "p" begin
            list_iter_first
              (fun first (s, cnt) ->
                 let href =
@@ -404,7 +400,7 @@ value print_alphabetic_short conf base is_surnames ini list len =
                 })
              l;
            Wserver.wprint "\n";
-         })
+         end)
       list;
     trailer conf;
   }
