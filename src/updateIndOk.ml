@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.20 2001-01-06 09:55:59 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.21 2001-01-23 12:39:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -459,9 +459,7 @@ value effective_mod conf base sp =
   let key = sp.first_name ^ " " ^ sp.surname in
   let ofn = p_first_name base op in
   let osn = p_surname base op in
-  do if Name.lower ofn = Name.lower sp.first_name
-     && Name.lower osn = Name.lower sp.surname
-     && op.occ == sp.occ then ()
+  do if ofn = sp.first_name && osn = sp.surname && op.occ == sp.occ then ()
      else
        let ipl = person_ht_find_all base key in
        do check_conflict conf base sp ipl;

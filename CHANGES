@@ -2,6 +2,9 @@ GeneWeb version 3.11
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [23 Jan 01] Fixed bug: when changing somebody's name, in some cases
+    there were no check that the key already existed, resulting of a
+    double defined persons when cleaning the data base.
   - [14 Jan 01] Complicated trees (ancestors, descendants, relationships) now
     work with browsers without tables (like Lynx).
   - [13 Jan 01] Fixed bug: when merging families, the marriage witnesses
