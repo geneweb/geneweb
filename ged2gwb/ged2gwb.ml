@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.36 1999-02-06 14:45:58 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.37 1999-02-14 17:19:19 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -1011,7 +1011,7 @@ value add_fam gen r =
     | None -> phony_per gen ]
   in
   do match gen.g_per.arr.(Adef.int_of_iper fath) with
-     [ Left _ -> ()
+     [ Left lab -> ()
      | Right p ->
          do if not (List.memq i (Array.to_list p.family)) then
               p.family := Array.append p.family [| i |]
@@ -1019,7 +1019,7 @@ value add_fam gen r =
             if p.sex = Neuter then p.sex := Masculine else ();
          return () ];
      match gen.g_per.arr.(Adef.int_of_iper moth) with
-     [ Left _ -> ()
+     [ Left lab -> ()
      | Right p ->
          do if not (List.memq i (Array.to_list p.family)) then
               p.family := Array.append p.family [| i |]
@@ -1097,7 +1097,16 @@ value treat_header r =
       | None -> () ] ]
 ;
 
-value make_gen gen r =
+value make_gen2 gen r =
+(*
+do Printf.printf "%s %s\n" r.rlab r.rval; flush stdout; return
+*)
+  match r.rlab with
+  [ "INDI" -> add_indi gen r
+  | _ -> () ]
+;
+
+value make_gen3 gen r =
 (*
 do Printf.printf "%s %s\n" r.rlab r.rval; flush stdout; return
 *)
@@ -1108,7 +1117,7 @@ do Printf.printf "%s %s\n" r.rlab r.rval; flush stdout; return
          treat_header r;
       return ()
   | "SUBM" -> ()
-  | "INDI" -> add_indi gen r
+  | "INDI" -> ()
   | "FAM" -> add_fam gen r
   | "NOTE" -> ()
   | "SOUR" -> ()
@@ -1245,12 +1254,40 @@ value pass2 gen fname =
          with
          [ End_of_file -> None ])
   in
-  do string_empty.val := add_string gen "";
-     string_x.val := add_string gen "x";
-     loop () where rec loop () =
+  do loop () where rec loop () =
        match try Some (get_lev0 strm) with [ Stream.Failure -> None ] with
        [ Some r ->
-           do make_gen gen r; return loop ()
+           do make_gen2 gen r; return loop ()
+       | None ->
+           match strm with parser
+           [ [: `'1'..'9' :] ->
+               do let _ : string = get_to_eoln 0 strm in (); return
+               loop ()
+           | [: `_ :] ->
+               do let _ : string = get_to_eoln 0 strm in ();
+               return loop ()
+           | [: :] -> () ] ];
+     close_in ic;
+  return ()
+;
+
+value pass3 gen fname =
+  let ic = open_in_bin fname in
+  do line_cnt.val := 0; return
+  let strm =
+    Stream.from
+      (fun i ->
+         try
+           let c = input_char ic in
+           do if c == '\n' then incr line_cnt else (); return
+           Some c
+         with
+         [ End_of_file -> None ])
+  in
+  do loop () where rec loop () =
+       match try Some (get_lev0 strm) with [ Stream.Failure -> None ] with
+       [ Some r ->
+           do make_gen3 gen r; return loop ()
        | None ->
            match strm with parser
            [ [: `'1'..'9' :] ->
@@ -1264,17 +1301,20 @@ value pass2 gen fname =
                return loop ()
            | [: :] -> () ] ];
      close_in ic;
-     for i = 0 to gen.g_per.tlen - 1 do
-       match gen.g_per.arr.(i) with
-       [ Right _ -> ()
-       | Left lab ->
-           let (p, a) = unknown_per gen i in
-           do Printf.printf "Warning: undefined person %s\n" lab;
-              gen.g_per.arr.(i) := Right p;
-              gen.g_asc.arr.(i) := Right a;
-           return () ];
-     done;
   return ()
+;
+
+value check_undefined gen =
+  for i = 0 to gen.g_per.tlen - 1 do
+    match gen.g_per.arr.(i) with
+    [ Right _ -> ()
+    | Left lab ->
+        let (p, a) = unknown_per gen i in
+        do Printf.printf "Warning: undefined person %s\n" lab;
+           gen.g_per.arr.(i) := Right p;
+           gen.g_asc.arr.(i) := Right a;
+        return () ];
+  done
 ;
 
 value make_arrays in_file =
@@ -1296,10 +1336,15 @@ value make_arrays in_file =
      g_hstr = Hashtbl.create 3001;
      g_hnam = Hashtbl.create 3001}
   in
-  do Printf.eprintf "*** pass 1\n"; flush stderr;
+  do string_empty.val := add_string gen "";
+     string_x.val := add_string gen "x";
+     Printf.eprintf "*** pass 1 (note)\n"; flush stderr;
      pass1 gen fname;
-     Printf.eprintf "*** pass 2\n"; flush stderr;
+     Printf.eprintf "*** pass 2 (indi)\n"; flush stderr;
      pass2 gen fname;
+     Printf.eprintf "*** pass 3 (fam)\n"; flush stderr;
+     pass3 gen fname;
+     check_undefined gen;
      close_in gen.g_ic;
   return
   (gen.g_per, gen.g_asc, gen.g_fam, gen.g_cpl, gen.g_str)
