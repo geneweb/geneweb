@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateInd.ml,v 3.12 2000-03-31 15:13:36 ddr Exp $ *)
+(* $Id: updateInd.ml,v 3.13 2000-04-01 02:45:21 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -262,7 +262,7 @@ value print_death_place conf base p =
      tag "td" begin
        Wserver.wprint "<input name=death_place size=40 maxlength=200%s>\n"
          (if p.death_place = "" then ""
-          else " value=\"" ^ p.death_place ^ "\"");
+          else " value=\"" ^ quote_escaped p.death_place ^ "\"");
      end;
   return ()
 ;
