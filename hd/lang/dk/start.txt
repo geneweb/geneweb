@@ -24,7 +24,7 @@ V&aelig;lg imellem at s&oslash;ge p&aring;
 <li> <input type=radio name=t value=PN checked>
 enten <em>fornavn</em> og <em>efternavn</em>,
 eller <em>officielt navn</em>, eller <em>alias</em>%u,
-eller %[<em>Sosa number</em> relative to %a%]%u.
+eller <em>Sosa-nummer</em>, refererende til %a%u.
 <li> <input type=radio name=t value=P> et <em>fornavn</em>.
 <li> <input type=radio name=t value=N> et <em>efternavn</em>.
 </ul>
