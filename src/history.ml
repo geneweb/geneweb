@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: history.ml,v 3.14 2001-01-06 09:55:54 ddr Exp $ *)
+(* $Id: history.ml,v 3.15 2001-01-29 15:33:25 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -12,7 +12,7 @@ value file_name conf =
     if Filename.check_suffix conf.bname ".gwb" then conf.bname
     else conf.bname ^ ".gwb"
   in
-  List.fold_right Filename.concat [Util.base_dir.val; bname] "history"
+  Filename.concat (Util.base_path [] bname) "history"
 ;
 
 (* Record history when committing updates *)

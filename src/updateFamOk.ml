@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.24 2001-01-06 09:55:59 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.25 2001-01-29 15:33:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -666,14 +666,14 @@ value print_swi_ok conf base p =
 *)
 
 value delete_topological_sort conf base =
-  let bfile = Filename.concat base_dir.val conf.bname in
-  let tstab_file = Filename.concat (bfile ^ ".gwb") "tstab" in
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
+  let tstab_file = Filename.concat bfile "tstab" in
   try Sys.remove tstab_file with [ Sys_error _ -> () ]
 ;
 
 value print_add o_conf base =
   let conf = Update.update_conf o_conf in
-  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       try
@@ -717,7 +717,7 @@ value print_add o_conf base =
 ;
 
 value print_del conf base =
-  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       match p_getint conf.env "i" with
@@ -747,7 +747,7 @@ value print_del conf base =
 ;
 
 value print_mod_aux conf base callback =
-  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       try
@@ -793,7 +793,7 @@ value print_mod o_conf base =
 ;
 
 value print_swi conf base =
-  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       match (p_getint conf.env "i", p_getint conf.env "f") with

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.21 2001-01-23 12:39:27 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.22 2001-01-29 15:33:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -388,9 +388,7 @@ value rename_image_file conf base op sp =
   match auto_image_file conf base op with
   [ Some old_f ->
       let s = default_image_name_of_key sp.first_name sp.surname sp.occ in
-      let f =
-        List.fold_right Filename.concat [base_dir.val; "images"; conf.bname] s
-      in
+      let f = Filename.concat (Util.base_path ["images"] conf.bname) s in
       let new_f =
         if Filename.check_suffix old_f ".gif" then f ^ ".gif"
         else f ^ ".jpg"
@@ -659,7 +657,7 @@ value print_del_ok conf base wl =
 
 value print_add o_conf base =
   let conf = Update.update_conf o_conf in
-  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       try
@@ -689,7 +687,7 @@ value print_add o_conf base =
 ;
 
 value print_del conf base =
-  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       match p_getint conf.env "i" with
@@ -707,7 +705,7 @@ value print_del conf base =
 ;
 
 value print_mod_aux conf base callback =
-  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       try

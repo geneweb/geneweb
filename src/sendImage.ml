@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: sendImage.ml,v 3.4 2000-06-26 09:17:10 ddr Exp $ *)
+(* $Id: sendImage.ml,v 3.5 2001-01-29 15:33:26 ddr Exp $ *)
 
 open Gutil;
 open Util;
@@ -140,8 +140,7 @@ value write_file fname content =
 
 value move_file_to_old conf typ fname bfname =
   let old_dir =
-    List.fold_right Filename.concat
-      [Util.base_dir.val; "images"; conf.bname] "old"
+    Filename.concat (Util.base_path ["images"] conf.bname) "old"
   in
   if Sys.file_exists (Filename.concat old_dir bfname ^ ".gif")
   || Sys.file_exists (Filename.concat old_dir bfname ^ ".jpg")
@@ -178,22 +177,24 @@ value effective_send_ok conf base p file =
     | _ -> incorrect conf ]
   in
   let bfname = default_image_name base p in
-  let fname =
-    List.fold_right Filename.concat [Util.base_dir.val; "images"; conf.bname]
-      bfname
+  let bfdir =
+    let bfdir = Util.base_path ["images"] conf.bname in
+    if Sys.file_exists bfdir then bfdir
+    else
+      let d = Filename.concat Util.base_dir.val "images" in
+      let d1 = Filename.concat d conf.bname in
+      do try Unix.mkdir d 0o777 with [ Unix.Unix_error _ _ _ -> () ];
+         try Unix.mkdir d1 0o777 with [ Unix.Unix_error _ _ _ -> () ];
+      return d1
   in
+  let fname = Filename.concat bfdir bfname in
   do if Sys.file_exists (fname ^ ".gif") then
        move_file_to_old conf ".gif" fname bfname
      else if Sys.file_exists (fname ^ ".jpg") then
        move_file_to_old conf ".jpg" fname bfname
      else if Sys.file_exists (fname ^ ".png") then
        move_file_to_old conf ".png" fname bfname
-     else
-       let d = Filename.concat Util.base_dir.val "images" in
-       do try Unix.mkdir d 0o777 with [ Unix.Unix_error _ _ _ -> () ];
-          try Unix.mkdir (Filename.concat d conf.bname) 0o777
-          with [ Unix.Unix_error _ _ _ -> () ];
-       return ();
+     else ();
      write_file (fname ^ typ) content;
      let key = (sou base p.first_name, sou base p.surname, p.occ) in
      History.record conf base key "si";
@@ -202,7 +203,7 @@ value effective_send_ok conf base p file =
 ;
 
 value print_send_ok conf base =
-  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       try
@@ -240,10 +241,7 @@ value print_deleted conf base p =
 
 value effective_delete_ok conf base p =
   let bfname = default_image_name base p in
-  let fname =
-    List.fold_right Filename.concat [Util.base_dir.val; "images"; conf.bname]
-      bfname
-  in
+  let fname = Filename.concat (Util.base_path ["images"] conf.bname) bfname in
   do if Sys.file_exists (fname ^ ".gif") then
        move_file_to_old conf ".gif" fname bfname
      else if Sys.file_exists (fname ^ ".jpg") then
@@ -258,7 +256,7 @@ value effective_delete_ok conf base p =
 ;
 
 value print_del_ok conf base =
-  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       try

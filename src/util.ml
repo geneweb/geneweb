@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.85 2001-01-26 16:24:28 ddr Exp $ *)
+(* $Id: util.ml,v 3.86 2001-01-29 15:33:27 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -672,8 +672,21 @@ value input_to_semi ic =
     else loop (Buff.store len c)
 ;
 
+value base_path pref bname =
+  let bfile = List.fold_right Filename.concat [base_dir.val :: pref] bname in
+  ifdef WIN95 then bfile
+  else if Sys.file_exists bfile then bfile
+  else if String.length bname >= 2 then
+    let dirs =
+      [base_dir.val ::
+       pref @ [String.make 1 bname.[0]; String.make 1 bname.[1]]]
+    in
+    List.fold_right Filename.concat dirs bname
+  else bfile
+;
+
 value base_len n =
-  let n = Filename.concat base_dir.val n in
+  let n = base_path [] (n ^ ".gwb") in
   match try Some (Iobase.input n) with [ Sys_error _ -> None ] with
   [ Some base ->
       let len = base.data.persons.len in
@@ -683,10 +696,7 @@ value base_len n =
 ;
 
 value open_etc_file fname =
-  let fname1 =
-    List.fold_right Filename.concat [base_dir.val; "etc"]
-      (Filename.basename fname ^ ".txt")
-  in
+  let fname1 = base_path ["etc"] (Filename.basename fname ^ ".txt") in
   let fname2 =
     List.fold_right Filename.concat [lang_dir.val; "etc"]
       (Filename.basename fname ^ ".txt")
@@ -878,14 +888,9 @@ value url_no_index conf base =
 
 value include_hed_trl conf base_opt suff =
   let hed_fname =
-    let fname =
-      List.fold_right Filename.concat [base_dir.val; "lang"; conf.lang]
-        (conf.bname ^ suff)
-    in
+    let fname = base_path ["lang"; conf.lang] (conf.bname ^ suff) in
     if Sys.file_exists fname then fname
-    else
-      List.fold_right Filename.concat [base_dir.val; "lang"]
-        (conf.bname ^ suff)
+    else base_path ["lang"] (conf.bname ^ suff)
   in
   match try Some (open_in hed_fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
@@ -1279,12 +1284,12 @@ value print_decimal_num conf f =
 ;
 
 value personal_image_file_name bname str =
-  List.fold_right Filename.concat [base_dir.val; "images"; bname] str
+  Filename.concat (base_path ["images"] bname) str
 ;
 
 value source_image_file_name bname str =
   let fname1 =
-    List.fold_right Filename.concat [base_dir.val; "src"; bname; "images"]
+    List.fold_right Filename.concat [base_path ["src"] bname; "images"]
       str
   in
   let fname2 =
@@ -1510,7 +1515,7 @@ value create_topological_sort conf base =
       Consang.topological_sort base
   | Some "no_tstab" -> Array.create base.data.persons.len 0
   | _ ->
-      let bfile = Filename.concat base_dir.val conf.bname in
+      let bfile = base_path [] (conf.bname ^ ".gwb") in
       lock (Iobase.lock_file bfile) with
       [ Accept ->
           let tstab_file = Filename.concat (bfile ^ ".gwb") "tstab" in
@@ -1597,9 +1602,7 @@ value default_image_name base p =
 
 value auto_image_file conf base p =
   let s = default_image_name base p in
-  let f =
-    List.fold_right Filename.concat [base_dir.val; "images"; conf.bname] s
-  in
+  let f = Filename.concat (base_path ["images"] conf.bname) s in
   if Sys.file_exists (f ^ ".gif") then Some (f ^ ".gif")
   else if Sys.file_exists (f ^ ".jpg") then Some (f ^ ".jpg")
   else if Sys.file_exists (f ^ ".png") then Some (f ^ ".png")
