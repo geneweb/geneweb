@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.27 2000-06-18 12:00:54 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.28 2000-06-18 12:35:44 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <!-- meta http-equiv="Content-Type" content="text/html; charset=%e" -->
@@ -195,11 +195,10 @@ must each time do "reload current document"), try navigating from <a
 href="%sescache=-%c">this link</a>}.
 
 </td></tr>
-
-<tr>
-<td align=right><br><font size=-1><em><a
-href="%sm=LEX">lexicon</a></em></font></td>
-</tr>
-
 </table>
+
+<br><p align=right>
+
+<font size=-1><em><a href="%sm=LEX">lexicon</a></em></font>
+
 </center>
