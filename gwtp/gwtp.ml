@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.42 2000-09-08 01:58:15 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.43 2000-09-08 03:03:32 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -272,6 +272,7 @@ value get_base_conf b =
   let fname = Filename.concat gwtp_dst.val (b ^ ".gwf" ) in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
+      let variables = variables () in
       let env = ref [] in
       let rec record line =
         fun
@@ -292,13 +293,13 @@ value get_base_conf b =
                  String.sub line 0 (String.length line - 1)
                else line
              in
-             record line (variables ());
+             record line variables;
            done
          with
          [ End_of_file -> close_in ic ];
       return env.val
   | None ->
-      [("friend_passwd", mk_passwd 8); ("wizard_passwd", mk_passwd 8)] ]
+      [("friend_passwd", mk_passwd 9); ("wizard_passwd", mk_passwd 9)] ]
 ;
 
 value set_base_conf b varenv =
@@ -316,7 +317,13 @@ value set_base_conf b varenv =
     | [] -> line ]
   in
   let oc = open_out fname_out in
-  do match try Some (open_in fname) with [ Sys_error _ -> None ] with
+  let ic_opt =
+    try Some (open_in fname) with
+    [ Sys_error _ ->
+        let fname = Filename.concat gwtp_tmp.val "default.gwf" in
+        try Some (open_in fname) with [ Sys_error _ -> None ] ]
+  in
+  do match ic_opt with
      [ Some ic ->
          try
            while True do
@@ -655,13 +662,15 @@ value gwtp_config str env b tok =
 
 value gwtp_main str env b tok =
   let gwtp_comm = cgi_script_name () in
-  let bcnf = Filename.concat gwtp_dst.val (b ^ ".gwf") in
+  let config_exists =
+    Sys.file_exists (Filename.concat gwtp_dst.val (b ^ ".gwf"))
+  in
   do printf "content-type: text/html"; crlf (); crlf ();
      printf "\
 <head><title>Gwtp - %s</title></head>\n<body>
 <h1 align=center>Gwtp - %s</h1>
 <ul>\n" b b;
-     if (Sys.file_exists bcnf) then
+     if config_exists then
        do printf "<li><a href=\"%s?m=UPL;b=%s;t=%s\">Upload</a>\n"
             gwtp_comm b tok;
           printf "<li><a href=\"%s?m=DNL;b=%s;t=%s\">Download</a>\n"
@@ -671,7 +680,7 @@ value gwtp_main str env b tok =
      printf "<li><a href=\"%s?m=CNF;b=%s;t=%s\">Configuration</a>\n" gwtp_comm
        b tok;
      printf "</ul>\n";
-     if gw_site.val <> "" then
+     if gw_site.val <> "" && config_exists then
        do printf "<p>\n<ul>\n";
           printf "<li><a href=\"%s%s\">Browse</a>\n" gw_site.val b;
           printf "</ul>\n";
