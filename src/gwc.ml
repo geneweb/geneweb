@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: gwc.ml,v 2.17 1999-07-18 22:56:45 ddr Exp $ *)
+(* $Id: gwc.ml,v 2.18 1999-07-20 03:21:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -342,7 +342,7 @@ value noter_sexe gen p s =
     return Check.error gen
 ;
 
-value insere_famille gen co fo =
+value insert_family gen co fo =
   let pere = insert_parent gen co.father in
   let mere = insert_parent gen co.mother in
   let children =
@@ -384,7 +384,7 @@ value insere_famille gen co fo =
   return ()
 ;
 
-value insere_notes fname gen key str =
+value insert_notes fname gen key str =
   let occ = key.pk_occ + gen.g_shift in
   match
     try
@@ -414,13 +414,13 @@ value insere_notes fname gen key str =
       return () ]
 ;
 
-value insere_syntax fname gen =
+value insert_syntax fname gen =
   fun
-  [ Family cpl fam -> insere_famille gen cpl fam
-  | Notes key str -> insere_notes fname gen key str ]
+  [ Family cpl fam -> insert_family gen cpl fam
+  | Notes key str -> insert_notes fname gen key str ]
 ;
 
-value insere_comp_familles gen (x, shift) =
+value insert_comp_families gen (x, shift) =
   let ic = open_in_bin x in
   do check_magic x ic;
      gen.g_shift := shift;
@@ -429,7 +429,7 @@ value insere_comp_familles gen (x, shift) =
   try
     while True do
       let fam : syntax_o = input_value ic in
-      insere_syntax src gen fam;
+      insert_syntax src gen fam;
     done
   with [ End_of_file -> close_in ic ]
 ;
@@ -531,7 +531,7 @@ value link gwo_list =
      g_base = empty_base;
      g_def = [| |]; g_shift = 0; g_errored = False}
   in
-  do List.iter (insere_comp_familles gen) gwo_list; return
+  do List.iter (insert_comp_families gen) gwo_list; return
   let base = linked_base gen in
   do if do_check.val && gen.g_pcnt > 0 then
        do Check.check_base base gen pr_stats.val; flush stdout; return ()
@@ -586,7 +586,7 @@ and [options] are:";
   do List.iter
        (fun (x, shift) ->
           if Filename.check_suffix x ".gw" then
-            do try Gwcomp.comp_familles x with e ->
+            do try Gwcomp.comp_families x with e ->
                  do Printf.printf "File \"%s\", line %d:\n" x line_cnt.val;
                  return raise e;
                gwo.val := [(x ^ "o", shift) :: gwo.val];
