@@ -3,7 +3,7 @@
 <BODY>
 
 <H1>GeneWeb - Modifiering av sidor</H1>
-<P>Denna del visar hur man modifierar v&auml;lkomstsidan och g&ouml;ra associerade sidor. Det &auml;r skrivet f&ouml;r personer som redan har anv&auml;nt <EM>GeneWeb</EM> och som vill g&aring; in p&aring; detaljer. </P>
+<P>Denna sida beskriver hur man modifierar v&auml;lkomstsidan och g&ouml;ra associerade sidor. Det &auml;r skrivet f&ouml;r personer som redan har anv&auml;nt <EM>GeneWeb</EM> och som vill g&aring; in p&aring; detaljer. </P>
 
 <UL>
 <LI><A HREF="#Wel">V&auml;lkomstsidan</A> </LI>
@@ -48,7 +48,7 @@
 <P>H&auml;r &auml;r betydelsen f&ouml;r makrona "%": </P>
 
 <UL>
-<STRONG><LI>Databas. </LI>
+<LI><STRONG>Databas. </LI>
 
 <UL>
 </STRONG><LI>"<TT>%t</TT>": namnet p&aring; databasen. </LI>
@@ -56,30 +56,79 @@
 <LI>"<TT>%g</TT>": i server mod, som "%f"; i CGI mode, namnet p&aring; CGI kommandot f&ouml;ljt av "?b=", namnet p&aring; databasen och ett semikolon (t.ex.: "gwd.exe?b=foo;"). </LI>
 <LI>"<TT>%s</TT>": v&auml;rdet av "%f" f&ouml;ljt av ett fr&aring;getecken och variabler beroende p&aring; sammanhanget (se nedan) f&ouml;ljt av ett semikolon. T.ex.: "foo?lang=it;iz=8233;". </LI></UL>
 
-<STRONG><LI>Uppr&auml;kning. </LI>
+<LI><STRONG>Uppr&auml;kning. </LI>
 
 <UL>
-</STRONG><LI>"<TT>%c</TT>": antal &aring;tkomster till v&auml;lkomstsidan. </LI>
+</STRONG>
+<LI>"<TT>%c</TT>": antal &aring;tkomster till v&auml;lkomstsidan. </LI>
 <LI>"<TT>%q</TT>": antal f&ouml;rfr&aring;gningar. </LI>
 <LI>"<TT>%d</TT>": datum f&ouml;r den f&ouml;rsta konsultationen. </LI></UL>
 
-<STRONG><LI>Villkor. </LI>
+<li><strong>Villkor.</strong><br>
+
+Villkor startar med "<font size=+1><tt>%I</tt></font>" följt av
+ett boolskt uttryck (sant eller falskt) och slutar med "<font
+size=+1><tt>%E</tt></font>". Texten mellan dessa två makron visas
+endast om det boolska uttrycket är sant. Det boolska uttrycket
+är antingen:
+
+<ul>
+
+<li>"<font size=+1><tt>f</tt></font>" : vi är "friend"
+
+<li>"<font size=+1><tt>w</tt></font>" : vi är "wizard"
+
+<li>"<font size=+1><tt>j</tt></font>" : vi är "wizard" men bara "friend"
+(se vidare <a href="start.htm#Cnf">filen a.gwf</a>, "wizard_just_friend")
+
+<li>"<font size=+1><tt>c</tt></font>" : vi är i CGI mod
+
+<li>"<font size=+1><tt>h</tt></font>" : det finns en historie fil
+
+<li>"<font size=+1><tt>l</tt></font>" : webbläsaren klarar inte tabeller
+
+<li>"<font size=+1><tt>n</tt></font>" : det finns noteringar för databasen
+
+<li>"<font size=+1><tt>t</tt></font>" : det är en sökning efter titlar
+
+<li>"<font size=+1><tt>z</tt></font>" : det är en person vald som
+Sosa referens (se makro "<font size=+1><tt>%u</tt></font>")
+
+<li>"<font size=+1><tt>a</tt></font>" : det finns en <a
+href="access.htm#DBA">global åtkomst restriktion</a> för databasen
+
+<li>"<font size=+1><tt>N</tt></font>" : negering av det följande uttrycket
+
+<li>"<font size=+1><tt>|</tt></font>" : logiskt "eller" mellan de två
+följande uttrycken
+
+<li>"<font size=+1><tt>&amp;</tt></font>" : logiskt "och" mellan de två
+följande uttrycken
+
+</ul>
+
+Exempel:
+
+<ul>
+
+<li> visa texten om det är en sökning efter titel: <font
+size=+1><tt>%It...%E</tt></font>
+
+<li> visa texten om vi varken är "wizard" eller "friend": <font
+size=+1><tt>%I&amp;NwNf...%E</tt></font>
+
+</ul>
+
+<LI><STRONG>Andra. </LI>
 
 <UL>
-</STRONG><LI>"<TT>%w... %w</TT>": visning om "wizard". </LI>
-<LI>"<TT>%x... %x</TT>": visning om "wizard" eller "friend". </LI>
-<LI>"<TT>%y... %y</TT>": visning om "server" mod (ej CGI) och inte "wizard". </LI>
-<LI>"<TT>%z... %z</TT>": visning om "server" mod (ej CGI) och varken "wizard" eller "friend". </LI>
-<LI>"<TT>%i... %i</TT>": visning om i CGI mod. </LI></UL>
-
-<STRONG><LI>Andra. </LI>
-
-<UL>
-</STRONG><LI>"<TT>%r</TT>" f&ouml;ljt av ett namn och ny rad: till&auml;gg till filen "name.txt". </LI>
+</STRONG>
+<LI>"<TT>%r</TT>" f&ouml;ljt av ett namn och en ny rad: till&auml;gg till filen "name.txt". </LI>
 <LI>"<TT>%b</TT>": v&auml;rdet p&aring; variabeln "body_prop" till filen "foo.gwf" f&ouml;r databasen "foo". </LI>
-<LI>"<TT>%h</TT>": variabler beroende p&aring; sammanhanget (se nedan) p&aring; formen "&lt; input type=hidden name=var value=val&amp;gt". </LI>
+<LI>"<TT>%h</TT>": variabler beroende p&aring; sammanhanget (se nedan) p&aring; formen "&lt;input type=hidden name=var value=val&gt;". </LI>
 <LI>"<TT>%l</TT>": spr&aring;k. </LI>
 <LI>"<TT>%n</TT>": antal personer i databasen. </LI>
+<LI>"<TT>%u</TT>": person vald som Sosa referens. </LI>
 <LI>"<TT>%%</TT>": endast ett "%". </LI>
 <LI>"<TT>%[</TT>": "[". </LI>
 <LI>"<TT>%]</TT>": "]". </LI></UL>
@@ -90,7 +139,7 @@
 <UL>
 <LI>b: i CGI mod, databasens namn. </LI>
 <LI>lang: spr&aring;k. </LI>
-<LI>iz: antal personer med generationsnummer (&auml;ven kallat Sosa referens) om n&aring;gra. </LI></UL>
+<LI>iz: antal personer med Sosa referens, om n&aring;gra. </LI></UL>
 
 <P>Det <STRONG>konditionella</STRONG> kan inte &ouml;verlappa: man kan inte s&auml;tta en "<TT>%w... %w</TT>" inuti en "<TT>%i... %i</TT>". </P>
 <H4><A NAME="Ass">Associerade sidor</A></H4>
