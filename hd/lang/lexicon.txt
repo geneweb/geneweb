@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.147 1999-10-11 19:54:23 ddr Exp $
+# $Id: lexicon.txt,v 2.148 1999-10-12 09:22:43 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -1172,6 +1172,7 @@ dk: kalender/kalendere
 en: calendar/calendars
 fr: calendrier/calendriers
 nl: kalender/kalenders
+no: kalender/kalendere
 se: kalender
 
     cancel GeneWeb links
@@ -1195,7 +1196,7 @@ es: padre posible/madre posible/padres posibles
 fr: p&egrave;re possible/m&egrave;re possible/parents possibles
 it: padre presunto/madre presunta/genitori presunti
 nl: kandidaat vader/kandidaat moeder/kandidaat ouders
-no: kandidatfar/kandidatmor/kandidatforeldre
+no: mulig far/mulig mor/mulige foreldre
 pt: suposto pai/suposta m&atilde;e/supostos pais
 se: m&ouml;jlig far/m&ouml;jlig mor/m&ouml;jliga f&ouml;r&auml;ldrar
 
@@ -1207,7 +1208,7 @@ es: hijo posible/hija posible/hijo(a) posible
 fr: fils possible/fille possible/enfant possible
 it: figlio presunto/figlia presunta/figlio presunto
 nl: kandidaat zoon/kandidaat dochter/kandidaat kind
-no: kandidats&oslash;nn/kandidatdatter/kandidatbarn
+no: mulig s&oslash;nn/mulig datter/mulig barn
 pt: suposto filho/suposta filha/supostos filhos
 se: m&ouml;jlig son/m&ouml;jlig dotter/m&ouml;jliga barn
 
@@ -1859,6 +1860,7 @@ dk: forum
 en: forum
 fr: forum
 nl: forum
+no: forum
 se: forum
 
     generation
@@ -1884,7 +1886,7 @@ es: padrino/madrina/padrino y padrina
 fr: parrain/marraine/parrain et marraine
 it: padrino/madrina/padrini
 nl: peter/meter/peetouders
-no: gudfar/gudmor/gudforeldre
+no: gudfar/gudmor/gudfedre
 pt: padrinho/madrinha/padrinhos
 se: gudfar/gudmor/gudf&ouml;r&auml;ldrar
 
@@ -1936,6 +1938,7 @@ dk: gregoriansk/juliansk/fransk rep./j&oslash;disk
 en: Gregorian/Julian/French/Hebrew
 fr: gr&eacute;gorien/julien/r&eacute;publicain/h&eacute;breu
 nl: gregoriaans/juliaans/frans/hebreeuws
+no: gregoriansk/juliansk/fransk rep./j&oslash;disk
 se: gregoriansk/juliansk/fransk/hebreisk
 
     happy birthday to you!
@@ -2017,6 +2020,7 @@ dk: opdateringers historie
 en: history of updates
 fr: historique des mises-&agrave;-jour
 nl: lijst van wijzigingen
+no: oppdateringshistorie
 se: uppdateringarnas historia
 
     husband/wife
@@ -2666,7 +2670,7 @@ fr: navigation avec %t comme r&eacute;f&eacute;rence Sosa
 he:  ניוות עם %t כאזכור Sosa
 it: percorso con %t come riferimento Sosa
 nl: navigatie met %t als proband
-no: navigering med %t som generasjonsnummerreferanse
+no: navigering med %t som Sosa referanse
 pt: navega&ccedil;a&atilde;o com o %t como a refer&ecirc;ncia Sosa
 se: navigering med %t som Sosa referens
 
@@ -3129,6 +3133,7 @@ dk: efter behag
 en: optional
 fr: facultatif
 nl: optioneel
+no: valgfritt
 se: valfritt
 
     or
@@ -3272,6 +3277,7 @@ dk: pr&aelig;cisering
 en: precision
 fr: pr&eacute;cision
 nl: precisie
+no: n&oslash;yaktighet
 se: precision
 
     previous sibling
@@ -3808,6 +3814,7 @@ dk: tekst
 en: text
 fr: texte
 nl: tekst
+no: tekst
 se: text
 
     the %d first names
@@ -4427,12 +4434,14 @@ se: med
 en: witness at marriage of %s and %s
 fr: t&eacute;moin au mariage de %s et de %s
 nl: getuige bij het huwelijk van %s en %s
+no: forlover ved ekteskap mellom %s og %s
 
     witness/witnesses
 dk: vidne/vidner
 en: witness/witnesses
 fr: t&eacute;moin/t&eacute;moins
 nl: getuige/getuigen
+no: forlover/forlovere
 se: vittne/vittnen
 
     would be his/her own ancestor
@@ -4456,6 +4465,7 @@ dk: &aring;r/m&aring;ned/dag
 en: year/month/day
 fr: ann&eacute;e/mois/jour
 nl: jaar/maand/dag
+no: &aring;r/m&aring;ned/dag
 se: &aring;r/m&aring;nad/dag
 
     years old
