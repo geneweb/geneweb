@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.24 2001-01-06 09:14:16 ddr Exp $ *)
+(* $Id: dag.ml,v 3.25 2001-01-06 15:25:57 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -217,20 +217,48 @@ value print_table_pre conf hts =
         loop (ncol + colspan) (j + 1)
   in
   let colsz = Array.make ncol 0 in
-  do for i = 0 to Array.length hts - 1 do
-       loop 0 0 where rec loop col j =
-         if j = Array.length hts.(i) then ()
-         else
-           let (colspan, _, td) = hts.(i).(j) in
-           do match td with
-              [ TDstring s ->
-                  if colspan = 1 then
-                    colsz.(col) := max colsz.(col) (displayed_length s)
-                  else ()
-              | TDhr _ -> () ];
-           return loop (col + colspan) (j + 1);
-     done;
-     Wserver.wprint "<pre>\n";
+  do loop 1 where rec loop curr_colspan =
+       let next_colspan = ref (ncol + 1) in
+       do for i = 0 to Array.length hts - 1 do
+            if i = Array.length hts then ()
+            else
+              loop 0 0 where rec loop col j =
+                if j = Array.length hts.(i) then ()
+                else
+                  let (colspan, _, td) = hts.(i).(j) in
+                  do match td with
+                     [ TDstring s ->
+                         if colspan = curr_colspan then
+                           let len = displayed_length s in
+                           let currsz =
+                             loop 0 col colspan
+                             where rec loop currsz col cnt =
+                               if cnt = 0 then currsz
+                               else
+                                 let currsz = currsz + colsz.(col) in
+                                 loop currsz (col + 1) (cnt - 1)
+                           in
+                           if currsz >= len then ()
+                           else
+                             loop 1 col colspan where rec loop n col cnt =
+                               if cnt = 0 then ()
+                               else
+                                 let inc_sz =
+                                   n * (len - currsz) / colspan -
+                                   (n - 1) * (len - currsz) / colspan
+                                 in
+                                 do colsz.(col) := colsz.(col) + inc_sz;
+                                 return loop (n + 1) (col + 1) (cnt - 1)
+                         else if colspan > curr_colspan then
+                           next_colspan.val := min colspan next_colspan.val
+                         else ()
+                     | TDhr _ -> () ];
+                  return loop (col + colspan) (j + 1);
+          done;
+       return
+       if next_colspan.val > ncol then () else loop next_colspan.val;
+  return
+  do Wserver.wprint "<pre>\n";
      for i = 0 to Array.length hts - 1 do
        loop 0 0 where rec loop col j =
          if j = Array.length hts.(i) then Wserver.wprint "\n"
@@ -357,9 +385,9 @@ value print_only_dag conf base elem_txt spouse_on invert set spl d =
   | _ ->
       let hts = html_table_struct indi_txt phony d t in
 (*
-      print_table_pre conf hts
+      print_table conf hts
 *)
-      print_table conf hts ]
+      print_table_pre conf hts ]
 ;
 
 value gen_print_dag conf base spouse_on invert set spl d =
