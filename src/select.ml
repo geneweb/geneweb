@@ -1,4 +1,4 @@
-(* $Id: select.ml,v 4.3 2001-07-17 07:27:46 ddr Exp $ *)
+(* $Id: select.ml,v 4.4 2001-07-17 08:50:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -296,12 +296,12 @@ value select_surname base per_tab fam_tab no_spouses_parents surname =
   }
 ;
 
-value functions
-  base anc desc surnames ancdesc no_spouses_parents censor with_siblings =
+value select_ancestors_descendants base anc desc ancdesc no_spouses_parents
+    censor with_siblings =
   let tm = Unix.localtime (Unix.time ()) in
   let threshold = 1900 + tm.Unix.tm_year - censor in
-  match (anc, desc, surnames, ancdesc) with
-  [ (None, None, [], None) ->
+  match (anc, desc, ancdesc) with
+  [ (None, None, None) ->
       if censor <> 0 then
         let per_tab = Array.create base.data.persons.len 0 in
         let fam_tab = Array.create base.data.families.len 0 in
@@ -309,16 +309,7 @@ value functions
         (fun i -> per_tab.(Adef.int_of_iper i) == 0,
          fun i -> fam_tab.(Adef.int_of_ifam i) == 0)
       else (fun _ -> True, fun _ -> True)
-  | (None, None, surnames, None) ->
-      let per_tab = Array.create base.data.persons.len False in
-      let fam_tab = Array.create base.data.families.len False in
-      do {
-        List.iter (select_surname base per_tab fam_tab no_spouses_parents)
-          surnames;
-        (fun i -> per_tab.(Adef.int_of_iper i),
-         fun i -> fam_tab.(Adef.int_of_ifam i))
-      }
-  | (None, None, _, Some iadper) ->
+  | (None, None, Some iadper) ->
       let per_tab = Array.create base.data.persons.len 0 in
       let fam_tab = Array.create base.data.families.len 0 in
       let _ =
@@ -365,4 +356,28 @@ value functions
              fun i -> fam_tab.(Adef.int_of_ifam i) == 3)
           }
       | _ -> assert False ] ]
+;
+
+value select_surnames base surnames no_spouses_parents =
+  let per_tab = Array.create base.data.persons.len False in
+  let fam_tab = Array.create base.data.families.len False in
+  do {
+    List.iter (select_surname base per_tab fam_tab no_spouses_parents)
+      surnames;
+    (fun i -> per_tab.(Adef.int_of_iper i),
+     fun i -> fam_tab.(Adef.int_of_ifam i))
+  }
+;
+
+value functions
+    base anc desc surnames ancdesc no_spouses_parents censor with_siblings =
+  let (per_sel1, fam_sel1) =
+    select_ancestors_descendants base anc desc ancdesc no_spouses_parents
+      censor with_siblings
+  in
+  let (per_sel2, fam_sel2) =
+    select_surnames base surnames no_spouses_parents
+  in
+  (fun i -> per_sel1 i || per_sel2 i,
+   fun i -> fam_sel1 i || fam_sel2 i)
 ;
