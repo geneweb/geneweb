@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: mk_consang.ml,v 3.4 2000-05-03 09:50:44 ddr Exp $ *)
+(* $Id: mk_consang.ml,v 3.5 2000-06-26 09:25:38 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 value fname = ref "";
@@ -16,7 +16,10 @@ value speclist =
     ": Save memory, but slower when rewritting data base");
    ("-nolock", Arg.Set Lock.no_lock_flag, ": do not lock data base.")]
 ;
-value anonfun s = fname.val := s;
+value anonfun s =
+  if fname.val = "" then fname.val := s
+  else raise (Arg.Bad "Cannot treat several data bases")
+;
 
 value simple_output bname base =
   let no_patches =

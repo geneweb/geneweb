@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.10 2000-06-04 12:32:05 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.11 2000-06-26 09:25:37 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -652,7 +652,9 @@ value speclist =
 
 value anonfun s =
   match arg_state.val with
-  [ ASnone -> ifile.val := s
+  [ ASnone ->
+      if ifile.val = "" then ifile.val := s
+      else raise (Arg.Bad "Cannot treat several data bases")
   | ASwaitAncOcc ->
       try
         do anc_occ.val := int_of_string s; return
