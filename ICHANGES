@@ -4,6 +4,9 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 4.02
 --------------------
 
+* General
+  - [12 May 01] Added a directory "contrib".
+
 * Compilation
   - [17 Apr 01] Added tools/pa_newseq.ml because the Camlp4 revised syntax
     has changed for sequences. Allow to compile with both old and new versions
