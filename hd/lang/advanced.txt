@@ -44,17 +44,19 @@
 
 <table border=1>
 <tr>
+<td>[*after]</td>
 <td>
-[*after]
-<input name=birth1_dd size=2 maxlength=2>
-<input name=birth1_mm size=2 maxlength=2>
-<input name=birth1_yyyy size=5 maxlength=5>
+[year/month/day]0<input name=birth1_yyyy size=5 maxlength=5>
+[year/month/day]1<input name=birth1_mm size=2 maxlength=2>
+[year/month/day]2<input name=birth1_dd size=2 maxlength=2>
 </td>
+</tr>
+<tr>
+<td>[*before]</td>
 <td>
-[*before]
-<input name=birth2_dd size=2 maxlength=2>
-<input name=birth2_mm size=2 maxlength=2>
-<input name=birth2_yyyy size=5 maxlength=5>
+[year/month/day]0<input name=birth2_yyyy size=5 maxlength=5>
+[year/month/day]1<input name=birth2_mm size=2 maxlength=2>
+[year/month/day]2<input name=birth2_dd size=2 maxlength=2>
 </td>
 </tr>
 </table>
@@ -71,17 +73,19 @@
 
 <table border=1>
 <tr>
+<td>[*after]</td>
 <td>
-[*after]
-<input name=bapt1_dd size=2 maxlength=2>
-<input name=bapt1_mm size=2 maxlength=2>
-<input name=bapt1_yyyy size=5 maxlength=5>
+[year/month/day]0<input name=bapt1_yyyy size=5 maxlength=5>
+[year/month/day]1<input name=bapt1_mm size=2 maxlength=2>
+[year/month/day]2<input name=bapt1_dd size=2 maxlength=2>
 </td>
+</tr>
+<tr>
+<td>[*before]</td>
 <td>
-[*before]
-<input name=bapt2_dd size=2 maxlength=2>
-<input name=bapt2_mm size=2 maxlength=2>
-<input name=bapt2_yyyy size=5 maxlength=5>
+[year/month/day]0<input name=bapt2_yyyy size=5 maxlength=5>
+[year/month/day]1<input name=bapt2_mm size=2 maxlength=2>
+[year/month/day]2<input name=bapt2_dd size=2 maxlength=2>
 </td>
 </tr>
 </table>
@@ -111,17 +115,19 @@
 
 <table border=1>
 <tr>
+<td>[*after]</td>
 <td>
-[*after]
-<input name=death1_dd size=2 maxlength=2>
-<input name=death1_mm size=2 maxlength=2>
-<input name=death1_yyyy size=5 maxlength=5>
+[year/month/day]0<input name=death1_yyyy size=5 maxlength=5>
+[year/month/day]1<input name=death1_mm size=2 maxlength=2>
+[year/month/day]2<input name=death1_dd size=2 maxlength=2>
 </td>
+</tr>
+<tr>
+<td>[*before]</td>
 <td>
-[*before]
-<input name=death2_dd size=2 maxlength=2>
-<input name=death2_mm size=2 maxlength=2>
-<input name=death2_yyyy size=5 maxlength=5>
+[year/month/day]0<input name=death2_yyyy size=5 maxlength=5>
+[year/month/day]1<input name=death2_mm size=2 maxlength=2>
+[year/month/day]2<input name=death2_dd size=2 maxlength=2>
 </td>
 </tr>
 </table>
@@ -141,17 +147,19 @@
 
 <table border=1>
 <tr>
+<td>[*after]</td>
 <td>
-[*after]
-<input name=burial1_dd size=2 maxlength=2>
-<input name=burial1_mm size=2 maxlength=2>
-<input name=burial1_yyyy size=5 maxlength=5>
+[year/month/day]0<input name=burial1_yyyy size=5 maxlength=5>
+[year/month/day]1<input name=burial1_mm size=2 maxlength=2>
+[year/month/day]2<input name=burial1_dd size=2 maxlength=2>
 </td>
+</tr>
+<tr>
+<td>[*before]</td>
 <td>
-[*before]
-<input name=burial2_dd size=2 maxlength=2>
-<input name=burial2_mm size=2 maxlength=2>
-<input name=burial2_yyyy size=5 maxlength=5>
+[year/month/day]0<input name=burial2_yyyy size=5 maxlength=5>
+[year/month/day]1<input name=burial2_mm size=2 maxlength=2>
+[year/month/day]2<input name=burial2_dd size=2 maxlength=2>
 </td>
 </tr>
 </table>
