@@ -6,8 +6,10 @@ GeneWeb version 3.02
     another browser (see version 3.01).
 
 * GeneWeb Service/CGI (gwd)
-  - [Jan 9, 00] Added birthday anniversaries for close parents accessible
-    in "cousin" page.
+  - [Jan 10, 00] Forbid "send image" when the person's first name or
+    surname is "?" ("dead end" person).
+  - [Jan 9, 00] Added birthday anniversaries for close parents (accessible
+    in "cousin" page when wizard or friend).
   - [Jan 8, 00] In adding or modifying family, suppressed the automatic
     copy of family "sources" for created persons (was not a good idea).
   - [Jan 3, 00] Speeded up the displaying of anniversaries (noticeable on
