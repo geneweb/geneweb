@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 1.2 2001-06-07 11:51:36 ddr Exp $ *)
+(* $Id: dag2html.ml,v 1.3 2001-08-21 13:56:15 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -37,7 +37,7 @@ type align = [ LeftA | CenterA | RightA ];
 type table_data = [ TDstring of string | TDhr of align ];
 type html_table = array (array (int * align * table_data));
 
-value html_table_struct indi_txt phony d t =
+value html_table_struct indi_txt vbar_txt phony d t =
   let phony =
     fun
     [ Elem e -> phony d.dag.(int_of_idag e)
@@ -51,9 +51,10 @@ value html_table_struct indi_txt phony d t =
     | Ghost _ -> "|"
     | Nothing -> "&nbsp;" ]
   in
-  let bar_txt =
+  let bar_txt first_vbar =
     fun
-    [ Elem _ | Ghost _ -> "|"
+    [ Elem e -> if first_vbar then vbar_txt d.dag.(int_of_idag e) else "|"
+    | Ghost _ -> "|"
     | Nothing -> "&nbsp;" ]
   in
   let all_empty i =
@@ -111,7 +112,7 @@ value html_table_struct indi_txt phony d t =
               then
                 "&nbsp;"
               else if phony t.table.(i).(j).elem then "&nbsp;"
-              else bar_txt t.table.(i).(j).elem
+              else bar_txt (k <> i) t.table.(i).(j).elem
             in
             [(colspan - 2, CenterA, TDstring s) :: les]
           in

@@ -1,4 +1,4 @@
-(* $Id: main.ml,v 1.2 2001-06-07 11:51:36 ddr Exp $ *)
+(* $Id: main.ml,v 1.3 2001-08-21 13:56:16 ddr Exp $ *)
 
 open Dag2html;
 open Printf;
@@ -146,6 +146,7 @@ value tag_dag d =
 
 value phony _ = False;
 value indi_txt n = n.valu;
+value vbar_txt n = "|";
 
 value print_char_table d t =
   let print_elem =
@@ -247,7 +248,7 @@ value main () =
     else
       let print_indi n = print_string n.valu in
       let t = table_of_dag phony no_optim.val invert.val no_group.val d in
-      let hts = html_table_struct indi_txt phony d t in
+      let hts = html_table_struct indi_txt vbar_txt phony d t in
       print_table border.val hts
   }
 ;

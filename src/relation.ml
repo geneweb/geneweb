@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.16 2001-06-28 17:05:26 ddr Exp $ *)
+(* $Id: relation.ml,v 4.17 2001-08-21 13:56:17 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -115,8 +115,8 @@ value print_menu conf base p =
              let cpl = coi base ifam in
              let c = spouse p.cle_index cpl in
              let c = poi base c in
-             if p_first_name base c <> "?" || p_surname base c <> "?" then
-                do {
+             if p_first_name base c <> "?" || p_surname base c <> "?"
+             then do {
                html_li conf;
                Wserver.wprint "<input type=radio name=select value=%d>\n"
                  (Adef.int_of_iper c.cle_index);
@@ -129,8 +129,7 @@ value print_menu conf base p =
              do {
                print_with_relation relation_type_text conf base p r 0
                  r.r_fath;
-               print_with_relation relation_type_text conf base p r 1
-                 r.r_moth
+               print_with_relation relation_type_text conf base p r 1 r.r_moth
              })
           p.rparents;
         List.iter (print_with_related conf base p) p.related;
@@ -186,7 +185,14 @@ value print_menu conf base p =
 (* find shortest path :
  * parents, siblings, mates and children are at distance 1.
  *)
-type famlink = [ Self | Parent | Sibling | HalfSibling | Mate | Child ];
+type famlink =
+  [ Self
+  | Parent
+  | Sibling
+  | HalfSibling
+  | Mate
+  | Child ]
+;
 
 open Dag2html;
 
@@ -310,7 +316,7 @@ value dag_of_ind_dag_list indl =
     indl
 ;
 
-value html_table_of_relation_path_dag conf base elem_txt path =
+value html_table_of_relation_path_dag conf base elem_txt vbar_txt path =
   let indl = dag_ind_list_of_path path in
   let indl = add_missing_parents_of_siblings base indl in
   let faml = dag_fam_list_of_ind_list indl in
@@ -336,34 +342,52 @@ value html_table_of_relation_path_dag conf base elem_txt path =
     | _ -> False ]
   in
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
-  Dag.make_tree_hts conf base elem_txt spouse_on invert no_group set [] d
+  Dag.make_tree_hts conf base elem_txt vbar_txt spouse_on invert no_group set
+    [] d
 ;
 
-value print_relation_path conf base ip1 ip2 path excl_faml =
+value next_relation_link_txt conf ip1 ip2 excl_faml txt =
+  "<a href=\"" ^ commd conf ^ "em=R;ei=" ^
+    string_of_int (Adef.int_of_iper ip1) ^ ";i=" ^
+    string_of_int (Adef.int_of_iper ip2) ^
+    (if conf.cancel_links then ";cgl=on" else "") ^ ";et=S" ^
+    fst
+      (List.fold_left
+         (fun (txt, i) ifam ->
+            (txt ^ ";ef" ^ string_of_int i ^ "=" ^
+               string_of_int (Adef.int_of_ifam ifam),
+             i + 1))
+         ("", 0) (List.rev excl_faml)) ^
+    "\">" ^ txt ^ "</a>"
+;
+
+value print_relation_path conf base ip1 ip2 path ifam excl_faml =
   if path == [] then ()
   else do {
-    let elem_txt conf base p =
+    let elem_txt p =
       Util.referenced_person_title_text conf base p ^
         Date.short_dates_text conf base p
     in
+    let vbar_txt ip =
+      let u = uoi base ip in
+      let excl_faml = Array.to_list u.family @ excl_faml in
+      next_relation_link_txt conf ip1 ip2 excl_faml "|"
+    in
     Wserver.wprint "<p>\n";
-    let hts = html_table_of_relation_path_dag conf base elem_txt path in
+    let hts =
+      html_table_of_relation_path_dag conf base elem_txt vbar_txt path
+    in
     Dag.print_html_table conf hts;
     Wserver.wprint "<p>\n";
-    Wserver.wprint "<a href=\"%s" (commd conf);
-    Wserver.wprint "em=R;ei=%d;i=%d%s;et=S" (Adef.int_of_iper ip1)
-      (Adef.int_of_iper ip2) (if conf.cancel_links then ";cgl=on" else "");
-    let _ =
-      List.fold_left
-        (fun i ifam ->
-           do { Wserver.wprint ";ef%d=%d" i (Adef.int_of_ifam ifam); i + 1 })
-        0 (List.rev excl_faml)
-    in
-    Wserver.wprint "\">&gt;&gt;</a>\n"
+    Wserver.wprint "%s\n"
+      (next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml] "&gt;&gt;")
   }
 ;
 
-type node = [ NotVisited | Visited of (bool * iper * famlink) ];
+type node =
+  [ NotVisited
+  | Visited of (bool * iper * famlink) ]
+;
 
 value get_shortest_path_relation base ip1 ip2 excl_faml =
   let mark_per = Array.create base.data.persons.len NotVisited in
@@ -553,8 +577,7 @@ value print_shortest_path conf base p1 p2 =
           Dag.print_slices_menu conf base None
         else do {
           header_no_page_title conf title;
-          let excl_faml = [ifam :: excl_faml] in
-          print_relation_path conf base ip1 ip2 path excl_faml;
+          print_relation_path conf base ip1 ip2 path ifam excl_faml;
           trailer conf
         }
     | None ->
@@ -572,11 +595,12 @@ value print_shortest_path conf base p1 p2 =
                  (cftransl conf "no known relationship link between %s and %s"
                     [s1; s2]))
           }
-          else
-            tag "ul" begin
-              Wserver.wprint "<li>%s\n" s1;
-              Wserver.wprint "<li>%s\n" s2;
-            end;
+          else do {
+            Wserver.wprint "<ul>\n";
+            Wserver.wprint "<li>%s\n" s1;
+            Wserver.wprint "<li>%s\n" s2;
+            Wserver.wprint "</ul>\n"
+          };
           trailer conf
         } ]
 ;
@@ -1261,7 +1285,8 @@ value known_spouses_list base p excl_p =
     (fun spl ifam ->
        let sp = poi base (spouse p.cle_index (coi base ifam)) in
        if sou base sp.first_name <> "?" && sou base sp.surname <> "?" &&
-          sp.cle_index <> excl_p.cle_index then
+          sp.cle_index <> excl_p.cle_index
+       then
          [sp :: spl]
        else spl)
     [] (Array.to_list u.family)
@@ -1465,8 +1490,8 @@ value print_main_relationship conf base long p1 p2 rel =
           if long then () else print_dag_links conf base p1 p2 rl;
           if not all_by_marr && age_autorise conf base p1 &&
              age_autorise conf base p2 && a1.consang != Adef.fix (-1) &&
-             a2.consang != Adef.fix (-1) then
-             do {
+             a2.consang != Adef.fix (-1)
+          then do {
             html_p conf;
             Wserver.wprint "<em>%s: " (capitale (transl conf "relationship"));
             print_decimal_num conf
@@ -1564,7 +1589,7 @@ value print_multi_relation conf base pl lim assoc_txt =
           | None -> loop path pl ]
       | [_] | [] -> path ]
   in
-  let elem_txt conf base p =
+  let elem_txt p =
     let txt =
       Util.referenced_person_title_text conf base p ^
         Date.short_dates_text conf base p
@@ -1575,9 +1600,12 @@ value print_multi_relation conf base pl lim assoc_txt =
     with
     [ Not_found -> txt ]
   in
+  let vbar_txt ip = "|" in
   if path = [] then print_no_relationship conf base pl
   else
-    let hts = html_table_of_relation_path_dag conf base elem_txt path in
+    let hts =
+      html_table_of_relation_path_dag conf base elem_txt vbar_txt path
+    in
     if p_getenv conf.env "slices" = Some "on" then
       Dag.print_slices_menu conf base (Some hts)
     else print_multi_relation_html_table conf hts pl2 lim assoc_txt

@@ -9,7 +9,11 @@ GeneWeb version 4.03
     versions using hyperlinks.
 
 * GeneWeb server or CGI (gwd)
-  _ [16 Aug 01] Fixed bug in update family form: when updating a
+  - [21 Aug 01] In relationlink displaying by "shortest path", now the
+    vertical bar under each person is clickable: this link triggers the
+    research of the next path without that connection. In the bottom of
+    the page, the ">>" actually corresponds to one of these links.
+  - [16 Aug 01] Fixed bug in update family form: when updating a
     family with one witness, the form for a second (possible) witness
     displayed weird things.
   - [24 Jul 01] Fixed bug in update family form: when updating a family
