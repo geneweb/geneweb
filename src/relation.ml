@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.60 2000-11-13 20:48:25 ddr Exp $ *)
+(* $Id: relation.ml,v 3.61 2000-11-22 03:01:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1096,7 +1096,7 @@ value print_propose_upto conf base p1 p2 rl =
 ;
 
 value compute_simple_relationship conf base tstab p1 p2 =
-  let tab = Consang.make_relationship_table base tstab in
+  let tab = Consang.make_relationship_info base tstab in
   let (relationship, ancestors) =
     Consang.relationship_and_links base tab True p1.cle_index p2.cle_index
   in
@@ -1105,7 +1105,7 @@ value compute_simple_relationship conf base tstab p1 p2 =
     let total =
       List.fold_left
         (fun n i ->
-           let u = tab.Consang.info.(i) in
+           let u = tab.Consang.reltab.(i) in
            List.fold_left
              (fun n (_, n1) ->
                 let n1 = Num.of_int n1 in
@@ -1118,7 +1118,7 @@ value compute_simple_relationship conf base tstab p1 p2 =
     let rl =
       List.fold_left
         (fun rl i ->
-           let u = tab.Consang.info.(i) in
+           let u = tab.Consang.reltab.(i) in
            let p = base.data.persons.get i in
            List.fold_left
              (fun rl (len1, n1) ->

@@ -1,4 +1,4 @@
-(* $Id: consang.ml,v 3.5 2000-11-21 15:18:13 ddr Exp $ *)
+(* $Id: consang.ml,v 3.6 2000-11-22 03:01:03 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
@@ -22,16 +22,13 @@ type relationship =
     relationship : mutable float;
     lens1 : mutable list (int * int);
     lens2 : mutable list (int * int);
+    inserted : mutable int;
     elim_ancestors : mutable bool;
     anc_stat1 : mutable anc_stat;
-    anc_stat2 : mutable anc_stat;
-    mark : mutable int }
+    anc_stat2 : mutable anc_stat }
 ;
 
-type relationship_table =
-  { id : array int;
-    info : array relationship }
-;
+type relationship_info = { tstab : array int; reltab : array relationship };
 
 value no_consang = Adef.fix (-1);
 
@@ -110,14 +107,14 @@ value topological_sort base =
   return tab
 ;
 
-value make_relationship_table base tstab =
+value make_relationship_info base tstab =
   let phony =
     {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = []; lens2 = [];
-     mark = 0; elim_ancestors = False; anc_stat1 = MaybeAnc;
+     inserted = 0; elim_ancestors = False; anc_stat1 = MaybeAnc;
      anc_stat2 = MaybeAnc}
   in
   let tab = Array.create base.data.persons.len phony in
-  {id = tstab; info = tab}
+  {tstab = tstab; reltab = tab}
 ;
 
 value rec insert_branch_len_rec (len, n) =
@@ -136,24 +133,26 @@ value consang_of p =
   if p.consang == no_consang then 0.0 else Adef.float_of_fix p.consang
 ;
 
-value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
+value relationship_and_links base ri b ip1 ip2 =
   let i1 = Adef.int_of_iper ip1 in
   let i2 = Adef.int_of_iper ip2 in
   if i1 == i2 then (1.0, [])
   else
-    let reset u mark =
-      tab.(u) :=
+    let reltab = ri.reltab in
+    let tstab = ri.tstab in
+    let yes_inserted = new_mark () in
+    let reset u =
+      reltab.(u) :=
         {weight1 = 0.0; weight2 = 0.0; relationship = 0.0; lens1 = [];
-         lens2 = []; mark = mark; elim_ancestors = False;
+         lens2 = []; inserted = yes_inserted; elim_ancestors = False;
          anc_stat1 = MaybeAnc; anc_stat2 = MaybeAnc}
     in
     let q = ref [| |] in
     let qi = ref 0 in
-    let qs = min id.(i1) id.(i2) in
-    let inserted = new_mark () in
-    let add u =
-      let v = id.(u) - qs in
-      do reset u inserted;
+    let qs = min tstab.(i1) tstab.(i2) in
+    let insert u =
+      let v = tstab.(u) - qs in
+      do reset u;
          if v >= Array.length q.val then
            let len = Array.length q.val in
            q.val := Array.append q.val (Array.create (v + 1 - len) [])
@@ -166,8 +165,8 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
     let nb_anc2 = ref 1 in
     let tops = ref [] in
     let treat_parent u y =
-      do if tab.(y).mark <> inserted then add y else (); return
-      let ty = tab.(y) in
+      do if reltab.(y).inserted <> yes_inserted then insert y else (); return
+      let ty = reltab.(y) in
       let p1 = half u.weight1 in
       let p2 = half u.weight2 in
       do if u.anc_stat1 = IsAnc && ty.anc_stat1 <> IsAnc then
@@ -188,7 +187,7 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
       return ()
     in
     let treat_ancestor u =
-      let tu = tab.(u) in
+      let tu = reltab.(u) in
       let a = base.data.ascends.get u in
       let contribution =
         tu.weight1 *. tu.weight2 -.
@@ -211,14 +210,14 @@ value relationship_and_links base {id = id; info = tab} b ip1 ip2 =
          | _ -> () ];
       return ()
     in
-    do add i1;
-       add i2;
-       tab.(i1).weight1 := 1.0;
-       tab.(i2).weight2 := 1.0;
-       tab.(i1).lens1 := [(0, 1)];
-       tab.(i2).lens2 := [(0, 1)];
-       tab.(i1).anc_stat1 := IsAnc;
-       tab.(i2).anc_stat2 := IsAnc;
+    do insert i1;
+       insert i2;
+       reltab.(i1).weight1 := 1.0;
+       reltab.(i2).weight2 := 1.0;
+       reltab.(i1).lens1 := [(0, 1)];
+       reltab.(i2).lens2 := [(0, 1)];
+       reltab.(i1).anc_stat1 := IsAnc;
+       reltab.(i2).anc_stat2 := IsAnc;
        while
          qi.val < Array.length q.val && nb_anc1.val > 0 && nb_anc2.val > 0
        do
