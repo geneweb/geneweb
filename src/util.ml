@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.10 2001-08-04 09:28:05 ddr Exp $ *)
+(* $Id: util.ml,v 4.11 2001-10-15 13:22:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1326,6 +1326,7 @@ value source_image_file_name bname str =
   let fname1 =
     List.fold_right Filename.concat [base_path ["src"] bname; "images"] str
   in
+let _ = do { Printf.eprintf "fname1 %s\n" fname1; flush stderr; } in
   let fname2 =
     List.fold_right Filename.concat [base_dir.val; "src"; "images"] str
   in
