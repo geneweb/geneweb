@@ -81,6 +81,9 @@ GeneWeb version 3.08
     make gwtp work correctly.
 
 * Documentation:
+  - [24 Sep 00] Added a chapter (gwformat.htm) about the GeneWeb source
+    file format (files ending with .gw). Written by Yann Corno. English
+    version only.
   - [20 Sep 00] Added another page (gwsetup.htm) to explain how to use
     gwsetup (French and English versions). Added two paragraphs in a
     FAQ, in the beginning of the section "it does not work at all under
