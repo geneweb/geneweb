@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 3.28 2000-10-28 21:52:32 ddr Exp $ *)
+(* $Id: util.mli,v 3.29 2000-10-29 15:02:21 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -19,8 +19,6 @@ value html_br : config -> unit;
 value html_p : config -> unit;
 value html_li : config -> unit;
 value unauthorized : config -> string -> unit;
-
-value list_iter_first : (bool -> 'a -> unit) -> list 'a -> unit;
 
 value commd : config -> string;
 value code_varenv : string -> string;
@@ -73,8 +71,6 @@ value p_getenv : list (string * string) -> string -> option string;
 value p_getint : list (string * string) -> string -> option int;
 value create_env : string -> list (string * string);
 value capitale : string -> string;
-value list_find : ('a -> bool) -> list 'a -> 'a;
-value list_filter : ('a -> bool) -> list 'a -> list 'a;
 
 value header_no_page_title : config -> (bool -> unit) -> unit;
 value header : config -> (bool -> unit) -> unit;

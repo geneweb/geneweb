@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 3.7 2000-07-31 16:44:47 ddr Exp $ *)
+(* $Id: iobase.ml,v 3.8 2000-10-29 15:02:18 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -549,49 +549,49 @@ value input bname =
     let i = Adef.int_of_iper i in
     do persons.len := max persons.len (i + 1);
        patches.p_person.val :=
-         [(i, p) :: list_remove_assoc i patches.p_person.val];
+         [(i, p) :: List.remove_assoc i patches.p_person.val];
     return ()
   in
   let patch_ascend i a =
     let i = Adef.int_of_iper i in
     do ascends.len := max ascends.len (i + 1);
        patches.p_ascend.val :=
-         [(i, a) :: list_remove_assoc i patches.p_ascend.val];
+         [(i, a) :: List.remove_assoc i patches.p_ascend.val];
     return ()
   in
   let patch_union i a =
     let i = Adef.int_of_iper i in
     do unions.len := max unions.len (i + 1);
        patches.p_union.val :=
-         [(i, a) :: list_remove_assoc i patches.p_union.val];
+         [(i, a) :: List.remove_assoc i patches.p_union.val];
     return ()
   in
   let patch_family i f =
     let i = Adef.int_of_ifam i in
     do families.len := max families.len (i + 1);
        patches.p_family.val :=
-         [(i, f) :: list_remove_assoc i patches.p_family.val];
+         [(i, f) :: List.remove_assoc i patches.p_family.val];
     return ()
   in
   let patch_couple i c =
     let i = Adef.int_of_ifam i in
     do couples.len := max couples.len (i + 1);
        patches.p_couple.val :=
-         [(i, c) :: list_remove_assoc i patches.p_couple.val];
+         [(i, c) :: List.remove_assoc i patches.p_couple.val];
     return ()
   in
   let patch_descend i c =
     let i = Adef.int_of_ifam i in
     do descends.len := max descends.len (i + 1);
        patches.p_descend.val :=
-         [(i, c) :: list_remove_assoc i patches.p_descend.val];
+         [(i, c) :: List.remove_assoc i patches.p_descend.val];
     return ()
   in
   let patch_string i s =
     let i = Adef.int_of_istr i in
     do strings.len := max strings.len (i + 1);
        patches.p_string.val :=
-         [(i, s) :: list_remove_assoc i patches.p_string.val];
+         [(i, s) :: List.remove_assoc i patches.p_string.val];
        Hashtbl.add strings_cache i s;
     return ()
   in

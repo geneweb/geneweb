@@ -5,6 +5,9 @@ GeneWeb Version 3.09
 --------------------
 
 * General
+  - [29 Oct 00] Added useful function list_iter_first. Deleted functions
+    applied to list to accept old versions of OCaml: now, it is necessary
+    to compile with at least version 3.00.
   - [12 Oct 00] Changed all "nick_name" into "qualifier" in all source files.
 
 * Consanguinity computing (consang)

@@ -1,4 +1,4 @@
-(* $Id: gutil.ml,v 3.14 2000-10-20 18:00:33 ddr Exp $ *)
+(* $Id: gutil.ml,v 3.15 2000-10-29 15:02:17 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -24,11 +24,11 @@ value lindex s c =
     else if s.[i] == c then Some i else pos (i + 1)
 ;
 
-value rec list_remove_assoc x =
-  fun
-  [ [] -> []
-  | [((a, b) as pair) :: l] ->
-      if a = x then l else [pair :: list_remove_assoc x l] ]
+value list_iter_first f al =
+  let _ = List.fold_left
+    (fun first a -> let () = f first a in False)
+    True al
+  in ()
 ;
 
 value array_memq x a =
