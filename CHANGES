@@ -4,6 +4,9 @@ GeneWeb version 3.06
 * Languages
   - [20 Jun 00] Added Latvian (Janeks Kamerovskis).
 
+* Setup program (gwsetup)
+  - [20 Jun 00] Added Latvian version (Janeks Kamerovskis).
+
 * GeneWeb Service/CGI (gwd)
   - [20 Jun 00] Together with the link to the welcome page (up arrow), added
     a link to the referer page (left arrow).

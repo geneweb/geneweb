@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 2000 - GeneWeb -->
+<head><title>"gwd" parametri</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<h1>"gwd" parametri</h1>
+
+<form mode=GET action="gwd_1">
+<input type=hidden name=lang value=$l>
+
+<p>
+
+Ðeit ir sekojoði komandas "gwd" parametri. Mainiet tos, ja uzskatiet par nepiecieðamu:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-lang</strong></td>
+<td>Noklusçtâ valoda.
+<p>
+Pçc noklusçjuma, visas datu bâzes lappuses tiek parâdîtas ðinî valodâ.
+Izvçlieties savu valodu.
+<p>
+Ðai datu bâzei to joprojâm varçsiet mainît arî vçlâk. Un arî datubâzes sâkumlapâ Jûs varçsiet, uzklikðíinot uz cita karodziòa, izvçlçties citu valodu. Ðo parametru varçtu nosaukt par noklusçtâs noklusçto valodu.
+<p>
+<p>
+Ja ir atstâts "-" , tad tâ bûs franèu valoda.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<select name=default_lang>
+<option value=$L{}>-
+<option value=$L{cn}>Íînieðu
+<option value=$L{cs}>Èehu
+<option value=$L{dk}>Dâòu
+<option value=$L{nl}>Holandieðu
+<option value=$L{en}>Angïu
+<option value=$L{eo}>Esperanto
+<option value=$L{fr}>Franèu
+<option value=$L{de}>Vâcu
+<option value=$L{he}>Senebreju
+<option value=$L{it}>Itâïu
+<option value=$L{no}>Norvçìu
+<option value=$L{pt}>Portugâïu
+<option value=$L{es}>Spâòu
+<option value=$L{se}>Zviedru
+</select>
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-tikai</strong></td>
+<td>
+Tikai autorizçta adrese.
+<p>
+Tikai no piepasîjumi no autorizçtas Interneta adrese tiek akceptçti.
+<p>
+Lai uzzinâtu sava datora adresi, skatiet programmas "gwd" darbîbas pçdas, kas redzamas katru reizi, kad Jûs darbojoties ar savâm datu bâzçm. Ðeit Jums jâieraksta, tas ko Jûs redziet pçc "From:".
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=only value="$O" size=40>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>-log</strong></td>
+<td>
+Pieprasîjumu reìistrâcijas datne.
+<p>
+Pçc noklusçjuma pieprasîjumu pçdas parâdâs "gwd" logâ. Katru reizi, kad Jðu vai kâds cits darbojas ar kâdu no datu bâzçm, tiek parâdîtas 4 vai 5 paziòojumu rindiòas.
+<p>
+Ja Jûs labâk vçlaties pçdas tiek ierakstîtas datnç, tad ierakstiet ðeit datnes nosaukumu. Ja ðâda datne tiks izviedota (ja neeksistçs) galvenajâ <font color=#2f6400><b>GeneWeb</b></font> katalogâ, kurâ atrodas arî komandas "gwsetup" un "gwd". Pçc katra pieprasîjuma ðî datne tiks papildinâta.
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td><input name=log value="$T" size=40>
+</tr>
+</table></dl>
+
+<dl><dt><dd>Citi "gwd" komandas parametri ðeit nav izmainâmi, jo tie var ietekmçt paðas "gwsetup" programmas darbîbu.</dl>
+
+<dl><dt><dd>Patieðâm "gwsetup" programmâ ir galvenokârt veidota, lai padarîtu <font color=#2f6400><b>GeneWeb</b></font> lietoðanu vienkârðâku, bet tâ neïauj izmantot visas tâs iespçjas. Lai atrastu citus parametrus un to pielietojumu, Jums jâkïûst nedaudz par "hakeri": daþa informâcija ir atrodama dokumntâcijâ.</dl>
+
+<p>
+
+Tad nospiediet ðo podziòu:
+
+<p>
+
+<input type=submit value="Configurate">
+
+</form>

@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 2000 - GeneWeb -->
+<head>
+  <!-- $Id: ged2gwb.htm,v 1.1 2000-06-20 07:57:09 ddr Exp $ -->
+  <title>GEDCOM datnes imports</title>
+</head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<h1>GEDCOM datnes imports</h1>
+
+<form mode=GET action="ged2gwb">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Ievadiet:
+
+<p>
+
+<ul><li>Pilnu GEDCOM datnes nosaukumu.
+
+<p>
+
+<input name=anon $n{type=file} size=55>
+
+</ul>
+
+<p>
+
+<ul><li>Nosaukumu kurâ Jûs vçlties nosaukt savu <font color=#2f6400><b>GeneWeb</b></font> datu bâzi.
+Ja neierakstîsiet, tad datu bâzes nosaukums tiks veidos no GEDCOM datnes nosaukuma.
+
+<p>
+
+<input name=o size=30>
+
+</ul>
+
+<p>
+
+Iezîmçjiet nepiecieðmâs papildus iespçjas:
+
+<p>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=lf value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Pârveidot personvârdus uz mazajiem burtiem ar pirmajiem lielajiem.</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=ls value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Pârveidot uzvârdus  uz mazajiem burtiem ar pirmajiem lielajiem. Mçginât saglabât partikulus ar mazajiem burtiem.</td> </tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Ja personas vârds GEDCOM datnç satur vairâkus vârdus variet norâdît, lai pirmais no ðiem vârdiem kïûst par personas "pirmo vârdu" un GEDCOMa datnes pilnais vârds kïust par pirmâ vârda " "pieòemto vârdu".</td>
+
+<tr>
+<td><input type=checkbox name=efn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Ieslçgt ðo iespçju</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Noklusçtajâ variantâ GEDCOM standartâ pirmais vârds ir kâ oficiâlais vârds, t.i.tas var saturçt:
+<ul>
+<li>Romieði skaitli, kas apzîmç aristokrâta titlu (piemçram, George V)
+<li>Vienu no sekojoðiem vârdiem: "der", "den", "die", "el", "le", "la", "the", kâ kvalifikators (e.g. William the Conqueror)
+</ul>
+tâdâ gadîjumâ GEDCOMa pirmais vârds kïûst par personas "oficiâlo vârdu" un tâ pirmais vârds par personas vârdu.
+<tr>
+<td><input type=checkbox name=no_epn value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Izslçgt ðo iespçju</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><input type=checkbox name=tnd value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Pretrunu gadîjumâ viedot negatîvus datumus (piemçram, dzimðana pçc nâves).</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><input type=checkbox name=no_nd value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Neveidot negatîvus datumus no esoðajiem negatîvajiem datumiem.</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Daþâs GEDCOM datnçs mçneði datumos tiek apzîmçti ar nummuriem (1-12). GEDCOM standarts 5.5 nosaka, ka mçðiem jâbût apzîmçtiem ar to nosaukumu saîsinâjumiem(piemçram "MAY 1912" un nevis "05/1912"). Datums "02/05/1912" ir daþâdi tulkojams (atkarîbâ no valsts tas ir 1912.gada 2.maijs vai 1912.gada 5.februâris).</td></tr>
+
+<tr>
+<td><input type=radio name=dates value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>Ðâdiem datumiem atstât tikai gadu</td>
+</tr>
+
+<tr>
+<td><input type=radio name=dates value="_dm">&nbsp;&nbsp;&nbsp;</td>
+<td>Pieòemt ðo datumus kâ "diena/mçnesis/gads"</td>
+</tr>
+
+<tr>
+<td><input type=radio name=dates value="_md">&nbsp;&nbsp;&nbsp;</td>
+<td>Pieòemt ðo datumus kâ "mçnesis/diena/gads"</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td>Uzsvçrtie burti parsti ir norâdîti GEDCOM datnes galvgaïa aprakstâ.</td></tr>
+
+<tr><td>
+<input type=radio name=charset value=none checked>&nbsp;&nbsp;&nbsp;</td>
+<td>Sekot GEDCOM datnes galvgaïa apraksta norâdîjumam</td>
+</tr>
+
+<tr><td><input type=radio name=charset value=ANSEL>&nbsp;&nbsp;&nbsp;</td>
+<td>Uzsvçrtie burti ir ANSEL kodçjumâ</td></tr>
+
+<tr><td><input type=radio name=charset value=ASCII>&nbsp;&nbsp;&nbsp;</td>
+<td>Uzsvçrtie burti ir ASCII kodçjumâ</td></tr>
+
+<tr><td><input type=radio name=charset value=MSDOS>&nbsp;&nbsp;&nbsp;</td>
+<td>Uzsvçrtie burti ir MSDOS kodçjumâ</td></tr>
+</table></dl>
+
+<p>
+
+Tad nospiediet "Ok".
+
+<p>
+
+<dl><dt><dd><input type=submit value="Ok"></dl>
+
+</form>

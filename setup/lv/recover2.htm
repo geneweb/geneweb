@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 2000 - GeneWeb -->
+<head><title>Datu bâzes atjauninâðana - 3. fâze</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<h1>Datu bâzes atjauninâðana - 2. fâze</h1>
+
+$v{Brîdinâjums: datu bâze ar nosaukumu "$o" jau eksistç <a href="gwsetup?lang=$l;v=list.htm">dotajâ katalogâ</a>. Ja Jûs nospiedîsiet zemâk esoðo podziòu ðî datu bâze tiks izdzçsta. Iespçjams, ka Jûs jau to esiet izveidojuði. Esiet uzmanîgi. Ja nepiecieðams, atgriezieties iepriekðçjâs lapâs un izvçlieties citu datu bâzes nosaukumu.<p>}
+
+Vecâs datu bâzes katalogs un datu bâze:
+
+<pre>
+  $a
+  $i
+</pre>
+
+Jaunais datu bâzes katalogs un datu bâze:
+
+<pre>
+  $w
+  $o
+</pre>
+
+<p>
+
+Brîdinâjums: Atkarîbâ no apstakïiem atjauninâðana var ilgt no daþâm sekundçm lîdz minûtçm. Esiet pacietîgs.
+
+<p>
+
+Nospiediet zemâk esoðo podziòu, lai uzsâktu datu bâzes atjauninâðanu$v{, un pârrakstîtu datu bâzi
+"$o" mçría katalogâ}.
+
+<p>
+
+<form mode=GET action="recover_2">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+Informâcijai: ðî darbîba atbilst sekojoðâm komandâm:
+
+<pre>
+     $$ cd $a
+     $$ .$/$U $i $O $w$/$T
+     $$ cd $w
+     $$ .$/$C $T -o $o > comm.log
+</pre>

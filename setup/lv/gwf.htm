@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 2000 - GeneWeb -->
+<head><title>Parametri</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<h1>Parametri</h1>
+
+<form mode=GET action="gwf">
+<input type=hidden name=lang value=$l>
+
+Ieklikðíinot atbilstoðjâ podziòâ, izvçlieties savu datu bâzi:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+$b{
+<tr>
+<td><input type=radio name=anon value="$a">&nbsp;&nbsp;&nbsp;</td>
+<td><a href="http://localhost:2317/$a">$a</a></td>
+</tr>|
+<tr><td>- patreiz nav nevienas datu bazes</tr></td>}
+</table></dl>
+
+<p>
+
+Tad nospiediet ðo podziòu:
+
+<p>
+
+<input type=submit value="Darîts">
+
+</form>

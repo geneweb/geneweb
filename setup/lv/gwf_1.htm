@@ -1,0 +1,375 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 2000 - GeneWeb -->
+<head><title>"$a" parametri</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<h1>"$a" parametri</h1>
+
+<form mode=GET action="gwf_1">
+<input type=hidden name=lang value=$l>
+<input type=hidden name=anon value=$a>
+
+<p>
+
+Sekojoðie ir datu bâzes <a
+href="http://localhost:2317/$a">$a</a> parametri. Mainiet, ja kas Jums ðíiet nepiecieðams:
+
+<p>
+
+<dl><dt>
+<dd><table border=1>
+<tr>
+<td><strong>- body_prop -</strong></td>
+</tr>
+
+<tr>
+<td>Ar ðo Jûs variet mainît fonu, fona krâsu un arî norâþu krâsu. Ðî parametra sintakse atbilst HTML sintaksei pie "&lt;body&gt;" pirms "&gt;". Skatiet HTML dokumentâciju. Piemçram:
+<p>
+<pre>
+     text=#CC0000 vlink=yellow
+</pre>
+<p>
+Daþas nozîmîgâkâs vçrtîbas...
+<ul>
+<li>background: fona attçls (skatiet <a
+href="gwsetup?lang=$l;o=$a;v=backg.htm">piezîmi</a>)
+<li>bgcolor: fona krâsa
+<li>text: teksta krâsa
+<li>link: norâþu krâsa
+<li>vlink: izmantoto norâþu krâsa
+</ul>
+<p>
+Jûs variet arî izvçlçties arî kâdu no sekojoðâm gatavajâm krâsu kombinâcijâm.<p>
+Ðâdi tiks attçlota ne tikai sveicinâjuma lappause, bet arî uz visâm pârçjâm datu bâzes lappusçm.
+</td>
+</tr>
+
+<tr><td align=center>
+<table border=0>
+<tr>
+<td colspan=3>
+<input type=radio name=proposed_body_prop value="" checked>
+<input name=body_prop value="$B" size=55><br>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#FFFFFF">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFFFF text=#333333 link=#006699 vlink=#999900">
+<font color="#333333">text</font>
+<font color="#006699">link</font>
+<font color="#999900">vlink</font>
+</td>
+<td bgcolor="#FFFFEE">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFFEE text=#000000 link=#006699 vlink=#990000">
+<font color="#000000">text</font>
+<font color="#006699">link</font>
+<font color="#990000">vlink</font>
+</td>
+<td bgcolor="#CCCCCC">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCCCCC text=#000000 link=#0000CC vlink=#660066">
+<font color="#000000">text</font>
+<font color="#0000CC">link</font>
+<font color="#660066">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#FFFF00">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFF00 text=#FF6600 link=#FF0033 vlink=#336633">
+<font color="#FF6600">text</font>
+<font color="#FF0033">link</font>
+<font color="#336633">vlink</font>
+</td>
+<td bgcolor="#CCCC66">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCCC66 text=#330000 link=#CC0000 vlink=#003300">
+<font color="#330000">text</font>
+<font color="#CC0000">link</font>
+<font color="#003300">vlink</font>
+</td>
+<td bgcolor="#FFFF99">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFFF99 text=#330000 link=#CC0000 vlink=#333333">
+<font color="#330000">text</font>
+<font color="#CC0000">link</font>
+<font color="#333333">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#99CCCC">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#99CCCC text=#000066 link=#0000CC vlink=#003366">
+<font color="#000066">text</font>
+<font color="#0000CC">link</font>
+<font color="#003366">vlink</font>
+</td>
+<td bgcolor="#CC99FF">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CC99FF text=#000000 link=#FF0033 vlink=#660066">
+<font color="#000000">text</font>
+<font color="#FF0033">link</font>
+<font color="#660066">vlink</font>
+</td>
+<td bgcolor="#CCFF99">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CCFF99 text=#666600 link=#006699 vlink=#003300">
+<font color="#666600">text</font>
+<font color="#006699">link</font>
+<font color="#003300">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#FFCC00">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#FFCC00 text=#330000 link=#CC0000 vlink=#660066">
+<font color="#330000">text</font>
+<font color="#CC0000">link</font>
+<font color="#660066">vlink</font>
+</td>
+<td bgcolor="#00FF33">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#00FF33 text=#0000CC link=#FF0099 vlink=#660066">
+<font color="#0000CC">text</font>
+<font color="#FF0099">link</font>
+<font color="#660066">vlink</font>
+</td>
+<td bgcolor="#006699">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#006699 text=#CCFFCC link=#FFFF00 vlink=#00FFFF">
+<font color="#CCFFCC">text</font>
+<font color="#FFFF00">link</font>
+<font color="#00FFFF">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#330000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#330000 text=#FF6666 link=#FFCC00 vlink=#CCFF99">
+<font color="#FF6666">text</font>
+<font color="#FFCC00">link</font>
+<font color="#CCFF99">vlink</font>
+</td>
+<td bgcolor="#003300">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#003300 text=#CCCC66 link=#FFFFFF vlink=#FFFF00">
+<font color="#CCCC66">text</font>
+<font color="#FFFFFF">link</font>
+<font color="#FFFF00">vlink</font>
+</td>
+<td bgcolor="#333333">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#333333 text=#CCCCCC link=#FF6666 vlink=#CCCC66">
+<font color="#CCCCCC">text</font>
+<font color="#FF6666">link</font>
+<font color="#CCCC66">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#666600">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#666600 text=#FFFFFF link=#FFFF00 vlink=#99CCFF">
+<font color="#FFFFFF">text</font>
+<font color="#FFFF00">link</font>
+<font color="#99CCFF">vlink</font>
+</td>
+<td bgcolor="#000000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#000000 text=#99CCFF link=#FFFF00 vlink=#CCCC66">
+<font color="#99CCFF">text</font>
+<font color="#FFFF00">link</font>
+<font color="#CCCC66">vlink</font>
+</td>
+<td bgcolor="#333333">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#333333 text=#FFFFFF link=#99CCFF vlink=#CC99FF">
+<font color="#FFFFFF">text</font>
+<font color="#99CCFF">link</font>
+<font color="#CC99FF">vlink</font>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="#CC0000">
+<input type=radio name=proposed_body_prop
+value="bgcolor=#CC0000 text=#FFFFFF link=#FFFF00 vlink=#00FFFF">
+<font color="#FFFFFF">text</font>
+<font color="#FFFF00">link</font>
+<font color="#00FFFF">vlink</font>
+</td>
+</tr>
+</table>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><strong>- default_lang -</strong></td>
+</tr
+
+<tr>
+<td>Noklusçtâ valoda.
+<p>
+Ja atstâsiet vçrtîbu "-", noklusçtâ valoda bûs tâ pati, kas "gwd" komandai.
+</td>
+</tr>
+
+<tr>
+<td align=center>
+<select name=default_lang>
+<option value=$L{}>-
+<option value=$L{cn}>Íînieðu
+<option value=$L{cs}>Èehu
+<option value=$L{dk}>Dâòu
+<option value=$L{nl}>Holandieðu
+<option value=$L{en}>Angïu
+<option value=$L{eo}>Esperanto
+<option value=$L{fi}>Somu
+<option value=$L{fr}>Franèu
+<option value=$L{de}>Vâcu
+<option value=$L{he}>Ebreju
+<option value=$L{is}>Islandieðû
+<option value=$L{it}>Itâïu
+<option value=$L{lv}>Latvieðu
+<option value=$L{no}>Norvçìu
+<option value=$L{pt}>Portugâïu
+<option value=$L{es}>Spâòu
+<option value=$L{ru}>Krievu
+<option value=$L{se}>Zviedru
+</select>
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><strong>- friend_passwd -</strong></td>
+</tr>
+
+<tr>
+<td>"Draugu" parole.
+<p>
+"Draugi" var apsatît visus datumus, piezîmes un fotogrâfijas par personâm, kuras dzimuðas pçdçjos simts gados. Citiem, kuri nebûs ievadîjuði ðo paroli, ðî informâcija nebûs pieejama.
+<p>
+Ja ðis lodziòð tiks atstâts tukðs, tad ikviens tiks uzskatîts par "draugu".
+</td>
+</tr>
+
+<tr>
+<td align=center><input name=friend_passwd value="$F" size=30></td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><strong>- wizard_passwd -</strong></td>
+</tr>
+
+<tr>
+<td>"Burvja" parole.
+<p>
+"Burvji" var veikt arî izmaiòas datu bâzç.
+<p>
+Ja ðis lodziòð tiks atsâts tukðs, tad ikviens tiks uzskatîts par "burvi".
+</td>
+</tr>
+
+<tr>
+<td align=center><input name=wizard_passwd value="$W" size=30></td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><strong>- can_send_image -</strong></td>
+</tr>
+
+<tr>
+<td>Atïaut sûtît attçlus.
+<p>
+Ja jâ, tad "burvjiem" tiek atïauts iesûtît attçlus.
+<p>
+Tas var bût noderîgi, ja nepiecieðams kâdai personai pievienot attçlu, jo programma to automâtiski pievienos atbilstoðjâ vietâ ar atbilstoðo datnes nosaukumu.
+</td>
+</tr>
+
+<tr>
+<td align=center>
+<input type=radio name=can_send_image value=$I[yes]>Jâ
+<input type=radio name=can_send_image value=$I[no]>Nç
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td valign=top><strong>- wizard_just_friend -</strong></td>
+</tr>
+
+<tr>
+<td>"Burvji" kïûst par parastiem "draugiem".
+<p>
+Ja "jâ", tad "burvji" zaudç savas iespçjas veikt izmaiòas datu bâzç.
+<p>
+Tas var bût noderîgi islaîcîgi, ja Jûs veicat datu bâzes sakopðanu. Ja tâ ir pieejama no Interneta, tad tas novçrð iespçju, ka "burvji" varçtu veikt izmaiòas, kas tiktu pazaudçtas sakopðanas laikâ (atcerieties pçc datu bâzes sakopðanas atcelt ðo aizliegumu).
+</td>
+</tr>
+
+<tr>
+<td align=center>
+<input type=radio name=wizard_just_friend value=$J[yes]>Yes
+<input type=radio name=wizard_just_friend value=$J[no]>No
+</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td><strong>- renamed -</strong></td>
+</tr>
+
+<tr>
+<td>Datu bâzei ir mainîts nosaukums.
+<p>
+Ja Jûs iesiet nomainîjuði datu bâzes nosaukumu, kura jau ir eksistçjusi krietni ilgu laiku, un daudz ïauþu ir izveidojuði norâdes uz to, tad ierakstiet ðet vecâs datu bâzes nosaukumu. Uz pieprasîjumiem, kas tiks veikti ar veco datu bâzes nosaukumu, tiks atbildçts no jaunâs datu bâzes.
+<p>
+Ja datu bâzei nosaukums nav mainîts, tad ðis lodziòð atstâjams tukðs.
+</td>
+</tr>
+
+<tr>
+<td align=center><input name=renamed value="$R" size=30></td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr>
+<td>
+Ðeit Jûs variet ierakstît tekstu, kurð tikts parâdîts katras lappuses beigâs. Jûs variet izmantot HTML sintaksi.
+</td>
+</tr>
+<tr>
+<td>
+<textarea name=trailer rows=3 cols=60 wrap=virtual>$T</textarea>
+</td>
+</tr>
+</table></dl>
+
+<p>
+
+Beigâs nospiediet ðo podziòu:
+
+<p>
+
+<input type=submit value="Darîts">
+
+</form>

@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<!-- (c) Copyright INRIA 2000 - GeneWeb -->
+<head><title>Izveidot GEDCOM datni</title></head>
+
+<body background="file://$w/images/gwback.jpg">
+
+<h1>Izveidot GEDCOM datni</h1>
+
+<form mode=GET action="gwb2ged">
+<input type=hidden name=opt value=check>
+<input type=hidden name=lang value=$l>
+
+Izvçlieties datu bâzi:
+
+<p>
+
+<dl><dt><dd><table border=1 cellspacing=0 cellpadding=1>
+
+$b{<tr><td><input type=radio name=anon
+value="$a">&nbsp;&nbsp;&nbsp;</td><td>$a</td></tr>|
+<tr><td>- nav nevienas datu bâzes</tr></td>}
+
+</table></dl>
+
+<p>
+
+Ierakstiet Jûsu izvçlçto GEDCOM datnes nosaukumu. Ja Jûs to neierakstîsiet datne tiks nosaukta tâdâ paðâ vârdâ, kâ datu bâze ar paplaðinâjumu "<tt>.ged</tt>".
+
+<p>
+
+<dl><dt><dd><input name=o size=30></dl>
+
+<p>
+
+Ivçlçties nepiecieðamos izveides parametrus:
+
+<p>
+
+<dl><dt><dd><table border=1>
+
+<tr><td>
+<input type=radio name=charset value=ASCII checked>&nbsp;&nbsp;&nbsp;</td>
+<td>Burti ASCII kodçjumâ.</td> </tr>
+
+<tr><td>
+<input type=radio name=charset value=ANSEL>&nbsp;&nbsp;&nbsp;</td>
+<td>Burti ANSEL kodçjumâ.</td> </tr>
+
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td><input type=checkbox name=mem value=on>&nbsp;&nbsp;&nbsp;</td>
+<td>Darbîbas laikâ taupît operatîvo atmiòu (darbîba notiks lçnâk).</td>
+</tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td colspan=3>Izmantot tikai...</td></tr>
+
+<tr><td>Vârds</td><td><input name="a1" size=30
+maxlength=200></td><td>Nr</td> <td><input name="a2" size=5
+maxlength=8></td></tr>
+
+<tr><td>Uzvârds</td> <td colspan=3><input name="a3" size=40
+maxlength=200></td></tr>
+
+<tr><td>&nbsp;</td><td colspan=3>...vecâkus</td></tr>
+</table></dl>
+
+<dl><dt><dd><table border=1>
+<tr><td>&nbsp;</td><td colspan=3>Izmantot tikai...</td></tr>
+
+<tr><td>Vârds</td><td><input name="d1" size=30
+maxlength=200></td><td>Nr</td><td><input name="d2" size=5
+maxlength=8></td></tr>
+
+<tr><td>Uzvârds</td> <td colspan=3><input name="d3" size=40
+maxlength=200></td></tr>
+<tr><td>&nbsp;</td><td colspan=3>...pçcteèus</td></tr>
+
+</table></dl>
+
+<dl><dt><dd>Ja Jûs lietosiet abus iepriekðçjos parametrus, tiek izmantota pârklâðanâs: t.i. personas, kas <em>vienlaicîgi </em> ir vienam senèi un otram pçcteèi .
+</dl>
+
+<p>
+
+Tad nospiediet ðo podziòu:
+
+<p>
+
+<input type=submit value="Extract">
+
+</form>

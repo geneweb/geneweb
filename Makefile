@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.7 2000-06-19 22:23:13 ddr Exp $
+# $Id: Makefile,v 3.8 2000-06-20 07:56:55 ddr Exp $
 
 include tools/Makefile.inc
 
@@ -44,7 +44,7 @@ new_distrib: classical_distrib
 	mkdir distribution/gw/old
 	mkdir distribution/gw/setup
 	cp setup/intro.txt distribution/gw/setup/.
-	for i in de en es fr se; do \
+	for i in de en es fr lv se; do \
 	  mkdir distribution/gw/setup/$$i; \
 	  cp setup/$$i/*.htm distribution/gw/setup/$$i; \
 	  if test "$(CAMLP4F)" = "-DWIN95"; then \
