@@ -8,7 +8,8 @@ GeneWeb version 3.06
   - [20 Jun 00] Added Latvian version (Janeks Kamerovskis).
 
 * GeneWeb Service/CGI (gwd)
-  - [23 Jun 00] Added descendants displaying with d'Aboville encoding.
+  - [26 Jun 00] Fixed bug: the images in ".png" format were not accepted.
+  - [23 Jun 00] Added descendants displaying with d'Aboville's encoding.
   - [21 Jun 00] Added displaying of oldest perhaps still alive (from welcome
     page).
   - [20 Jun 00] Changed displaying of marriage witnesses in personal pages.
@@ -49,6 +50,10 @@ GeneWeb version 3.06
   - [14 Jun 00] Completed and fixed Portuguese version (Jose Paulo Moitinho
     de Almeida).
   - [14 Jun 00] Completed Dutch lexicon (Bernard Ceurstemont).
+
+* Documentation
+  - [26 Jun 00] In update.htm, added that images in png format are accepted,
+    like "gif" and "jpeg" ones.
 
 GeneWeb version 3.05
 --------------------
