@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.90 2004-07-17 09:14:29 ddr Exp $ *)
+(* $Id: util.ml,v 4.91 2004-10-04 11:18:04 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1635,36 +1635,40 @@ value jpeg_image_size ic =
     let str = String.create 10 in do { really_input ic str 0 10; str }
   in
   if Char.code magic.[0] = 0xff && Char.code magic.[1] = 0xd8 &&
-     String.sub magic 6 4 = "JFIF" then
-    let rec loop () =
+     (let m = String.sub magic 6 4 in m = "JFIF" || m = "Exif") then
+    let exif_type = String.sub magic 6 4 = "Exif" in
+    let rec loop found =
       do {
         while Char.code (input_char ic) <> 0xFF do { () };
         let ch =
           loop (input_char ic) where rec loop ch =
             if Char.code ch = 0xFF then loop (input_char ic) else ch
         in
-        if Char.code ch >= 0xC0 && Char.code ch <= 0xC3 then do {
-          for i = 1 to 3 do { let _ = input_char ic in () };
-          let a = input_char ic in
-          let b = input_char ic in
-          let c = input_char ic in
-          let d = input_char ic in
-          let wid = Char.code c lsl 8 lor Char.code d in
-          let hei = Char.code a lsl 8 lor Char.code b in
-          Some (wid, hei)
-        }
+        if Char.code ch = 0xC0 || Char.code ch = 0xC3 then
+          if exif_type && not found then
+            loop True
+          else do {
+            for i = 1 to 3 do { let _ = input_char ic in () };
+            let a = input_char ic in
+            let b = input_char ic in
+            let c = input_char ic in
+            let d = input_char ic in
+            let wid = Char.code c lsl 8 lor Char.code d in
+            let hei = Char.code a lsl 8 lor Char.code b in
+            Some (wid, hei)
+          }
         else
           let a = input_char ic in
           let b = input_char ic in
           let len = Char.code a lsl 8 lor Char.code b in
-          if len < 2 then None
-          else do {
+          let len = if len >= 32768 then 0 else len in
+          do {
             for i = 1 to len - 2 do { let _ = input_char ic in () };
-            if Char.code ch <> 0xDA then loop () else None
+            if Char.code ch <> 0xDA then loop found else None
           }
       }
     in
-    loop ()
+    loop False
   else None
 ;
 

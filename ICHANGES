@@ -9,6 +9,7 @@ GeneWeb Version 4.10
     ocaml, version 3.08.
 
 * GeneWeb server or CGI (gwd)
+  - [04 Oct 04] Accept now JPEG files with header "Exif".
   - [30 Sep 04] Changed decline system and updfam.txt and updind.txt to
     allow sentences like "insert child/children", particularly in languages
     with accusative form, like Esperanto (the translation correct being
