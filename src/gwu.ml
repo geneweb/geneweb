@@ -1,4 +1,4 @@
-(* $Id: gwu.ml,v 2.8 1999-05-03 07:10:48 ddr Exp $ *)
+(* $Id: gwu.ml,v 2.9 1999-05-28 16:19:24 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -513,6 +513,7 @@ value gwu base out_dir out_oc src_oc_list anc desc =
   in
   let ((per_sel, fam_sel) as sel) = Select.functions base anc desc in
   let fam_done = Array.create (base.data.families.len) False in
+  let out_oc_first = ref True in
   for i = 0 to base.data.families.len - 1 do
     let fam = base.data.families.get i in
     let cpl = base.data.couples.get i in
@@ -521,18 +522,17 @@ value gwu base out_dir out_oc src_oc_list anc desc =
       do if fam_done.(i) then ()
          else if fam_sel fam.fam_index then
            let (oc, first) =
-             try List.assoc fam.origin_file src_oc_list.val with
-             [ Not_found ->
-                 let fname = sou base fam.origin_file in
-                 let oc =
-                   if out_dir = "" then out_oc
-                   else if fname = "" then out_oc
-                   else open_out (Filename.concat out_dir fname)
-                 in
-                 let x = (oc, ref True) in
-                 do src_oc_list.val :=
-                      [(fam.origin_file, x) :: src_oc_list.val];
-                 return x ]
+             let fname = sou base fam.origin_file in
+             if out_dir = "" then (out_oc, out_oc_first)
+             else if fname = "" then (out_oc, out_oc_first)
+             else
+               try List.assoc fam.origin_file src_oc_list.val with
+               [ Not_found ->
+                   let oc = open_out (Filename.concat out_dir fname) in
+                   let x = (oc, ref True) in
+                   do src_oc_list.val :=
+                        [(fam.origin_file, x) :: src_oc_list.val];
+                   return x ]
            in
            let ifaml = connected_families base fam_sel fam cpl in
            let ml =

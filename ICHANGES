@@ -17,6 +17,10 @@ GeneWeb Intermediate Version 2.02-1
   - [May 18, 99] Added thousand separator for displaying of number of persons
     in the welcome page.
 
+* GeneWeb uncompiler (gwu)
+  - [May 28, 99] Fixed missing newlines when the initial sources came from
+    several files and the option -odir was not used.
+
 * Compilation
   - [May 23, 99] Separed consang computation in another file "consangAll.ml".
   - [May 12,99] Fixed YAAP (yet another accent problem...)
