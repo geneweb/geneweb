@@ -13,6 +13,8 @@ GeneWeb version 2.04
   - [Jun 19, 99] Changed presentation of ancestors displaying main menu.
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [Jun 21, 99] Fixed bug: couples could sometimes be recorded as divorced,
+    even if not.
   - [Jun 19, 99] Can now read MSDOS accentuated characters encoding. Added
     option "-charset" which can be followed by "ANSEL", "ASCII" or "MSDOS".
     Removed options "-ansel" and "-no_ansel".
