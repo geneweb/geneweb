@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.32 2004-07-18 14:26:40 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.33 2004-07-18 18:51:36 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -322,7 +322,9 @@ value infer_origin_file_from_other_marriages conf base ifam ip =
 ;
 
 value infer_origin_file conf base ifam ncpl ndes =
-  let r = infer_origin_file_from_other_marriages conf base ifam (father ncpl) in
+  let r =
+    infer_origin_file_from_other_marriages conf base ifam (father ncpl)
+  in
   let r =
     if r = None then
       infer_origin_file_from_other_marriages conf base ifam (mother ncpl)
@@ -426,8 +428,8 @@ value effective_mod conf base sfam scpl sdes =
       [ Male -> print_err_mother_sex conf base nmoth
       | _ -> nmoth.sex := Female ]
     }
-    else if (father ncpl) == (mother ncpl) then print_err conf base
     else ();
+    if (father ncpl) == (mother ncpl) then print_err conf base else ();
     if sfam.origin_file = "" then 
       nfam.origin_file :=
         if sou base ofam.origin_file <> "" then ofam.origin_file
@@ -437,22 +439,24 @@ value effective_mod conf base sfam scpl sdes =
     base.func.patch_family fi nfam;
     base.func.patch_couple fi ncpl;
     base.func.patch_descend fi ndes;
-    if (father ncpl) != (father ocpl) && (father ncpl) != (mother ocpl) then do {
-      let ofath_u = uoi base (father ocpl) in
-      ofath_u.family := family_exclude ofath_u.family ofam.fam_index;
-      nfath_u.family := Array.append nfath_u.family [| fi |];
-      base.func.patch_union (father ocpl) ofath_u;
-      base.func.patch_union (father ncpl) nfath_u
-    }
-    else ();
-    if (mother ncpl) != (mother ocpl) && (mother ncpl) != (father ocpl) then do {
-      let omoth_u = uoi base (mother ocpl) in
-      omoth_u.family := family_exclude omoth_u.family ofam.fam_index;
-      nmoth_u.family := Array.append nmoth_u.family [| fi |];
-      base.func.patch_union (mother ocpl) omoth_u;
-      base.func.patch_union (mother ncpl) nmoth_u
-    }
-    else ();
+    let oarr = parent_array ocpl in
+    let narr = parent_array ncpl in
+    for i = 0 to Array.length oarr - 1 do {
+      if not (array_memq oarr.(i) narr) then do {
+        let ou = uoi base oarr.(i) in
+        ou.family := family_exclude ou.family ofam.fam_index;
+        base.func.patch_union oarr.(i) ou
+      }
+      else ()
+    };
+    for i = 0 to Array.length narr - 1 do {
+      if not (array_memq narr.(i) oarr) then do {
+        let nu = uoi base narr.(i) in
+        nu.family := Array.append nu.family [| fi |];
+        base.func.patch_union narr.(i) nu;
+      }
+      else ()
+    };
     let find_asc =
       let cache = Hashtbl.create 101 in
       fun ip ->
