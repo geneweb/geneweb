@@ -39,8 +39,8 @@ GeneWeb Version 1.10
   - [11/12/98] Fixed and completed Dutch version (thanks to Joris Esch).
 
 * Welcome files (xx/start.txt)
---- [06/01/99, 08/01/99] Wizard and Friend accesses by navigator password
-    (except in CGI mode).
+--- [06/01/99, 08/01/99] <font color=red>Wizard and Friend passwords
+    are to be provided in a popped window</font> (except in CGI mode).
   - [04/01/99, 09/01/99] (de) Fixed some typo (thanks to Markus Mottl).
   - [11/12/98, 04/01/99] (nl) Fixed and completed (thanks to Joris Esch).
 
