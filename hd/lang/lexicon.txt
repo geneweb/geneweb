@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.182 2004-01-13 12:27:59 ddr Exp $
+# $Id: lexicon.txt,v 4.183 2004-01-13 12:35:54 ddr Exp $
 # Copyright (c) 2002 INRIA
 
      !charset
@@ -3008,7 +3008,7 @@ it: deceduto/deceduta/deceduto(a)
 lv: mirðanas
 nl: gestorven
 no: d&oslash;d
-pl: zgon
+pl: zmar³/zmar³a/zgon
 pt: falecido/falecida/falecido(a)
 ro: a decedat
 ru: óìåð/óìåðëà
