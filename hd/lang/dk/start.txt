@@ -90,11 +90,11 @@ eller <em>Sosa-nummer</em>, refererende til %a%u
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
 <font color=#2f6400><b>titel (nob.)</b></font>$INl<br>$E
 <input name=t size=14 maxlength=200>$INl<br>$E
-(Eks.: adelsmand, konge...)<br>
+(eks.: adelsmand, konge...)<br>
 </td><td>...</td><td>
 <font color=#2f6400><b>navn (nob.)</b></font>$INl<br>$E
 <input name=p size=25 maxlength=200>$INl<br>$E
-(Eks.: von Klingenberg, af Danmark...)
+(eks.: von ---, af Danmark...)
 </td><td>
 <input type=submit value="Ok">
 </td></tr></table>
