@@ -36,15 +36,14 @@ Launch a window of interactive commands and type:
 </pre>
 
 
-It may happen that gwc displays errors, because persons are defined twice in "bar.gw" "smith.gw"
-and "foo.gw". To fix that, gwc has an option "-sh" to shift the numbers of the persons to avoid
-conflicts. Try:
+It may happen that gwc displays errors, because persons are defined
+twice in "bar.gw" "smith.gw" and "foo.gw". To fix that, gwc has an
+option "-sep" to automatically shift the numbers of the persons to
+avoid conflicts. Do:
 
 <pre>
-     gwc bar.gw -sh 10 smith.gw -sh 10 foo.gw -o mergedbase
+     gwc bar.gw -sep smith.gw -sep foo.gw -o mergedbase
 </pre>
-
-If the value 10 does not solve the problem, try 20, 30 or 100...
 
 <br>
 

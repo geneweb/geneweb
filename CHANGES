@@ -89,9 +89,10 @@ GeneWeb version 3.08
     make gwtp work correctly.
 
 * Documentation:
-  - [25 Sep 00] Changed in the chapter "merge.htm" the explanation about the
-    separation of the merged data base, using now the new option "-sep"
-    of "gwc" instead of "-shift" (see change in gwc above, same day).
+  - [25..27 Sep 00] Changed in the chapters "merge.htm" and "divide.htm" the
+    explanations about the separation of input files to avoid conflicts, using
+    now the new option "-sep" of "gwc" instead of "-shift" (see change in gwc
+    above, 25 Sep 00).
   - [09..25 Sep 00] Updated German version (Falko Trojahn).
   - [24 Sep 00] Added a chapter (gwformat.htm) about the GeneWeb source
     file format (files ending with .gw). Written by Yann Corno. English
