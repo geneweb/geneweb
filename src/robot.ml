@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: robot.ml,v 4.6 2001-05-05 21:43:35 ddr Exp $ *)
+(* $Id: robot.ml,v 4.7 2001-11-22 19:06:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -17,7 +17,10 @@ type excl =
 value robot_error cgi from cnt sec =
   do {
     if cgi then ()
-    else do { Wserver.wprint "HTTP/1.0 403 Forbidden"; Util.nl (); };
+    else do {
+      Wserver.wprint "HTTP/1.0 403 Forbidden"; Util.nl ();
+      Wserver.wprint "Connection: close"; Util.nl ();
+    };
     Wserver.wprint "Content-type: text/html; charset=iso-8859-1";
     Util.nl ();
     Util.nl ();

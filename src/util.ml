@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.12 2001-11-14 10:02:30 ddr Exp $ *)
+(* $Id: util.ml,v 4.13 2001-11-22 19:06:19 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -52,6 +52,8 @@ value html conf =
       nl ();
       Wserver.wprint "Server: GeneWeb/%s" Version.txt;
       nl ();
+      Wserver.wprint "Connection: close";
+      nl ();
     }
     else ();
     Wserver.wprint "Content-type: text/html; charset=%s" charset;
@@ -62,14 +64,16 @@ value html conf =
 
 value unauthorized conf auth_type =
   do {
-    if conf.cgi then
-      Wserver.wprint "Content-type: text/html; charset=%s" conf.charset
+    if conf.cgi then ()
     else do {
       Wserver.wprint "HTTP/1.0 401 Unauthorized";
       nl ();
+      Wserver.wprint "Connection: close";
+      nl ();
       Wserver.wprint "WWW-Authenticate: Basic realm=\"%s\"" auth_type;
-      ()
+      nl ()
     };
+    Wserver.wprint "Content-type: text/html; charset=%s" conf.charset;
     nl ();
     nl ();
     Wserver.wprint "<head><title>Access failed</title></head>\n";

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.13 2001-09-19 10:52:50 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.14 2001-11-22 19:06:18 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -142,6 +142,7 @@ value refuse_log from cgi =
     close_out oc;
     if not cgi then do {
       Wserver.wprint "HTTP/1.0 403 Forbidden"; Util.nl ();
+      Wserver.wprint "Connection: close"; Util.nl ();
     }
     else ();
     Wserver.wprint "Content-type: text/html";
@@ -460,6 +461,8 @@ value unauth conf typ =
   do {
     Wserver.wprint "HTTP/1.0 401 Unauthorized";
     Util.nl ();
+    Wserver.wprint "Connection: close";
+    Util.nl ();
     Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ conf.bname;
     Util.nl ();
     Util.nl ();
@@ -638,7 +641,10 @@ value index_not_name s =
 
 value print_request_failure cgi msg =
   do {
-    if not cgi then do { Wserver.wprint "HTTP/1.0 200 Ok"; Util.nl (); }
+    if not cgi then do {
+      Wserver.wprint "HTTP/1.0 200 Ok"; Util.nl ();
+      Wserver.wprint "Connection: close"; Util.nl ();
+    }
     else ();
     Wserver.wprint "Content-type: text/html";
     Util.nl (); Util.nl ();
@@ -667,7 +673,10 @@ value refresh_url cgi request s i =
     serv ^ req
   in
   do {
-    if not cgi then do { Wserver.wprint "HTTP/1.0 200 Ok"; Util.nl (); }
+    if not cgi then do {
+      Wserver.wprint "HTTP/1.0 200 Ok"; Util.nl ();
+      Wserver.wprint "Connection: close"; Util.nl ();
+    }
     else ();
     Wserver.wprint "Content-type: text/html";
     Util.nl ();
