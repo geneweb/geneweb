@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.53 2000-07-30 18:59:57 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.54 2000-08-12 19:18:41 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -1268,7 +1268,7 @@ value main () =
        Exclude connections when more than <cnt> requests in <sec> seconds.");
      ("-login_tmout", Arg.Int (fun x -> login_timeout.val := x),
       "<sec>
-       Login timeout for passwords in CGI mode (default " ^
+       Login timeout for entries with passwords in CGI mode (default " ^
        string_of_int login_timeout.val ^ "s)");
      ("-redirect", Arg.String (fun x -> redirected_addr.val := Some x),
       "<addr>
@@ -1283,7 +1283,8 @@ value main () =
        (not cgi).");
        ("-conn_tmout", Arg.Int (fun x -> conn_timeout.val := x),
       "<sec>
-       Connection timeout (default " ^ string_of_int conn_timeout.val ^ "s)");
+       Connection timeout (default " ^ string_of_int conn_timeout.val ^
+       "s; 0 means no limit)");
         ("-daemon", Arg.Set daemon,
          "
        Unix daemon mode.")]
