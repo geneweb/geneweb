@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.1 2000-10-11 14:40:57 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.2 2000-10-11 16:16:19 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -17,9 +17,11 @@
 <body%body_prop;>
 
 %if;is_male;
-<img src="%image_prefix;/male.gif width=13 height=13 alt="[M/F]0" align=left>
+<img src="%image_prefix;/male.gif" width=13 height=13
+ alt="[M/F]0" align=left>
 %elseif;is_female;
-<img src="%image_prefix;/female.gif width=13 height=13 alt="[M/F]1" align=left>
+<img src="%image_prefix;/female.gif" width=13 height=13
+ alt="[M/F]1" align=left>
 %end;
 
 <h1 align=center><font color=%highlight;>
