@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.10 1999-12-29 18:12:01 ddr Exp $ *)
+(* $Id: dag.ml,v 3.11 1999-12-30 21:45:26 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -121,9 +121,13 @@ value print_only_dag conf base spouse_on invert set spl d =
                         match (aoi base cip).parents with
                         [ Some ifam ->
                             let cpl = coi base ifam in
-                            let ips = Util.spouse ip cpl in
-                            if List.mem_assoc ips list then list
-                            else [(ips, Some ifam) :: list]
+                            if ip == cpl.father then
+                              if List.mem_assoc cpl.mother list then list
+                              else [(cpl.mother, Some ifam) :: list]
+                            else if ip == cpl.mother then
+                              if List.mem_assoc cpl.father list then list
+                              else [(cpl.father, Some ifam) :: list]
+                            else list
                         | None -> list ]
                     | Right _ -> list ])
                  [] n.chil

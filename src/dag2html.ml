@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.21 1999-12-24 03:15:23 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.22 1999-12-30 21:45:26 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -823,16 +823,18 @@ value fill_gap d t i j1 j2 =
     let line = t1.(i - 1) in
     let x = line.(j1).span in
     let y = line.(j2).span in
-    do let rec loop j =
+    do let rec loop y j =
          if j >= Array.length line then ()
-         else if line.(j).span = y then
+         else if
+           line.(j).span = y || t1.(i).(j).elem = t1.(i).(j - 1).elem then
+           let y = line.(j).span in
            do line.(j).span := x;
               if i > 0 then t1.(i - 1).(j).span := t1.(i - 1).(j - 1).span
               else ();
-           return loop (j + 1)
+           return loop y (j + 1)
          else ()
        in
-       loop j2;
+       loop y j2;
     return Some ({table = t1}, True)
   else None
 ;
