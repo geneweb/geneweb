@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.30 2000-02-03 01:37:25 ddr Exp $ *)
+(* $Id: util.ml,v 3.31 2000-02-03 15:07:49 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -740,7 +740,7 @@ value rheader conf title =
 ;
 
 value start_with s i p =
-  i + String.length p < String.length s
+  i + String.length p <= String.length s
   && String.lowercase (String.sub s i (String.length p)) = p
 ;
 
@@ -812,13 +812,15 @@ value dangerous_tag s i =
   List.mem tag_id dangerous_tags_list
 ;
 
-type tag_type = [ In_a_href | In_dang | In_norm | Out ];
+type tag_type = [ In_a_href | In_norm | Out ];
 
 value copy_string_with_macros conf s =
   loop Out 0 where rec loop tt i =
     if i < String.length s then
       if i + 1 < String.length s && s.[i] = '%' && s.[i+1] = 's' then
         do Wserver.wprint "%s" (commd conf); return loop tt (i + 2)
+      else if s.[i] = '<' && dangerous_tag s (i + 1) then
+        do Wserver.wprint "..."; return loop tt (i + 1)
       else
         match tt with
         [ In_a_href ->
@@ -827,11 +829,6 @@ value copy_string_with_macros conf s =
         | In_norm ->
             let tt = if s.[i] = '>' then Out else In_norm in
             do Wserver.wprint "%c" s.[i]; return loop tt (i + 1)
-        | In_dang ->
-            let tt = if s.[i] = '>' then Out else In_dang in
-            do if tt = Out then Wserver.wprint "&gt;"
-               else Wserver.wprint "%c" s.[i];
-            return loop tt (i + 1)
         | Out ->
             match http_string s i with
             [ Some j ->
@@ -846,15 +843,9 @@ value copy_string_with_macros conf s =
                     return loop Out j
                 | None ->
                     let tt =
-                      if start_with s i "<a href=" then In_a_href
-                      else if s.[i ] = '<' then
-                        if dangerous_tag s (i + 1) then In_dang
-                        else In_norm
-                      else Out
+                      if start_with s i "<a href=" then In_a_href else Out
                     in
-                    do if tt = In_dang then Wserver.wprint "&lt;"
-                       else Wserver.wprint "%c" s.[i];
-                    return loop tt (i + 1) ] ] ]
+                    do Wserver.wprint "%c" s.[i]; return loop tt (i + 1) ] ] ]
     else ()
 ;
 

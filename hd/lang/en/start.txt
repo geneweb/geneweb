@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 3.15 2000-01-08 12:15:51 ddr Exp $ -->
+  <!-- $Id: start.txt,v 3.16 2000-02-03 15:07:47 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>Genealogy - %t</title>
   <meta http-equiv="Content-Type" content="text/html; charset=%e">
@@ -22,6 +22,11 @@ data base</font></h1></table>
 </td>
 </tr>
 </table>
+
+<br>
+
+<font size=-1><em>You can select another displaying language among the
+following ones:</em></font>
 
 <br>
 
