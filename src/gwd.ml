@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.6 1999-11-10 08:44:24 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.7 1999-11-19 00:25:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -371,6 +371,11 @@ value propose_base conf =
   return ()
 ;
 
+value general_welcome conf =
+  try Util.copy_etc_file [] "index" with
+  [ Sys_error _ -> propose_base conf ]
+;
+
 value unauth bname typ =
   do Wserver.wprint "HTTP/1.0 401 Unauthorized"; nl ();
      Wserver.wprint "WWW-Authenticate: Basic realm=\"%s %s\"" typ bname;
@@ -684,7 +689,7 @@ value conf_and_connection cgi from (addr, request) str env =
          match Util.p_getenv conf.env "m" with
          [ Some "DOC" -> Doc.print conf
          | _ ->
-             if conf.bname = "" then propose_base conf
+             if conf.bname = "" then general_welcome conf
              else
                match redirected_addr.val with
                [ Some addr -> print_redirected conf addr

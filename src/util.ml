@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.11 1999-11-13 11:00:07 ddr Exp $ *)
+(* $Id: util.ml,v 3.12 1999-11-19 00:25:00 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -578,7 +578,7 @@ value rheader conf title =
   return ()
 ;
 
-value copy_from_channel env ic =
+value rec copy_from_channel env ic =
   try
     while True do
       match input_char ic with
@@ -586,6 +586,12 @@ value copy_from_channel env ic =
           let c = input_char ic in
           match c with
           [ '%' -> Wserver.wprint "%%"
+          | 'r' ->
+              let name = input_line ic in
+              try copy_etc_file env name with
+              [ Sys_error _ ->
+                   Wserver.wprint "<em>... file not found: \"%s.txt\"</em><br>"
+                     name ]
           | 'v' -> Wserver.wprint "%s" Version.txt
           | c ->
               try Wserver.wprint "%s" (List.assoc c env) with
@@ -594,12 +600,16 @@ value copy_from_channel env ic =
     done
   with
   [ End_of_file -> close_in ic ]
-;
-
-value copy_etc_file env fname =
+and copy_etc_file env fname =
+  let fname1 =
+    List.fold_right Filename.concat [base_dir.val; "etc"]
+      (Filename.basename fname ^ ".txt")
+  in
   let fname =
-    List.fold_right Filename.concat [lang_dir.val; "etc"]
-       (Filename.basename fname ^ ".txt")
+    if Sys.file_exists fname1 then fname1
+    else
+      List.fold_right Filename.concat [lang_dir.val; "etc"]
+        (Filename.basename fname ^ ".txt")
   in
   let ic = open_in fname in
   copy_from_channel env ic

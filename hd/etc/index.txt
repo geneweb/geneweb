@@ -1,0 +1,21 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <meta name="ROBOTS" content="NONE">
+  <title>Base</title>
+</head>
+<body background="?m=IM;v=/gwback.jpg">
+<center><h1><font color=#2f6400>Base</font></h1></center>
+<ul>
+<li>
+<form method=get action="">
+<input name=b size=40> =&gt;
+<input type=submit value="Ok">
+</ul>
+<p>
+<img src="?m=IM;v=/gwlogo.gif"
+alt=GeneWeb width=64 height=72 align=right>
+<br>
+
+<p><hr><font size=-1><em>(c) Copyright INRIA 1999 -
+<a href="http://cristal.inria.fr/~ddr/GeneWeb/">
+GeneWeb %v</a></em></font><br>
