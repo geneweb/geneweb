@@ -1,4 +1,4 @@
-# $Id: Makefile,v 4.7 2002-01-10 20:01:08 ddr Exp $
+# $Id: Makefile,v 4.8 2002-01-13 04:19:51 ddr Exp $
 
 DESTDIR=distribution
 
@@ -53,6 +53,8 @@ new_distrib: classical_distrib
 	mkdir $(DESTDIR)/gw/old
 	mkdir $(DESTDIR)/gw/setup
 	cp setup/intro.txt $(DESTDIR)/gw/setup/.
+	mkdir $(DESTDIR)/gw/setup/lang
+	cp setup/lang/*.htm $(DESTDIR)/gw/setup/lang/.
 	for i in de en es fr lv sv; do \
 	  mkdir $(DESTDIR)/gw/setup/$$i; \
 	  cp setup/$$i/*.htm $(DESTDIR)/gw/setup/$$i; \
