@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.4 1999-04-20 12:52:41 ddr Exp $ *)
+(* $Id: date.ml,v 2.5 1999-04-25 16:32:18 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -193,6 +193,12 @@ value display_year d =
   Wserver.wprint "%s" (year_text d)
 ;
 
+value of_course_died conf p =
+  match Adef.od_of_codate p.birth with
+  [ Some d -> conf.Config.today.year - d.year > 120
+  | None -> False ]
+;
+
 value short_dates_text conf base p =
   if age_autorise conf base p then
     let birth_date =
@@ -213,7 +219,9 @@ value short_dates_text conf base p =
     let s =
       match (birth_date, p.death) with
       [ (Some _, Death _ _ | NotDead) -> s ^ "-"
-      | (_, Death _ _ | DeadDontKnowWhen | DeadYoung) -> s ^ "+"
+      | (_, Death _ _) -> s
+      | (_, DeadDontKnowWhen | DeadYoung) ->
+          if of_course_died conf p then s else s ^ "+"
       | _ -> s ]
     in
     let s =
