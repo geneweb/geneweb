@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.39 2001-09-11 08:03:17 ddr Exp $
+# $Id: lexicon.txt,v 4.40 2001-09-24 09:25:43 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -4512,6 +4512,7 @@ nl: bericht toegevoegd
 no: melding tilf&oslash;yet
 pl: wiadomoœæ zosta³a dodana
 pt: mensagem adicionada
+ru: äğ÷âşíåïğ õğğ÷üåïêå
 sv: meddelande inlagt
 
     message/previous message/next message
@@ -4531,6 +4532,7 @@ nl: bericht/vorig bericht/volgend bericht
 no: melding/forrige melding/neste melding
 pl: wiadomoœæ/poprzednia wiadomoœæ/nastêpna wiadomoœæ
 pt: mensagem/mensagem anterior/mensagem seguinte
+ru: õğğ÷üåïêå/òôåäıäèüåå õğğ÷üåïêå/õíåäèáüåå õğğ÷üåïêå
 sv: meddelande/f&ouml;reg&aring;ende meddelande/n&auml;sta meddelande
 
     missing ancestors
@@ -6262,6 +6264,7 @@ nl: statistieken
 no: statistikk
 pl: zestawienia
 pt: estat&iacute;sticas
+ru: õæâæêõæêìâ
 sv: statistik
 
     surname alias
