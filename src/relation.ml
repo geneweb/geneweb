@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.22 1999-07-23 10:33:42 ddr Exp $ *)
+(* $Id: relation.ml,v 2.23 1999-07-23 12:38:05 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -471,14 +471,11 @@ value print_main_relationship conf base long p1 p2 rel =
            Wserver.wprint "%s\n"
              (capitale (transl conf "it is the same person!"))
          else
-           do Wserver.wprint
-                (fcapitale
-                   (ftransl conf
-                      "no known relationship link between %s and %s"))
-                (referenced_person_title_text conf base p1)
-                (referenced_person_title_text conf base p2);
-              Wserver.wprint "\n";
-           return ()
+           Wserver.wprint "%s\n"
+             (capitale
+                (cftransl conf "no known relationship link between %s and %s"
+                   [gen_referenced_person_title_text raw_access conf base p1;
+                    gen_referenced_person_title_text raw_access conf base p2]))
      | Some (rl, total, relationship) ->
          let a1 = aoi base p1.cle_index in
          let a2 = aoi base p2.cle_index in

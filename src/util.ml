@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.34 1999-07-23 10:27:32 ddr Exp $ *)
+(* $Id: util.ml,v 2.35 1999-07-23 12:38:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -305,10 +305,21 @@ value gen_referenced_person_title_text p_access conf base p =
   else reference conf base p (gen_person_text p_access conf base p)
 ;
 
+value gen_person_title_text p_access conf base p =
+  if p.access <> Private || conf.friend || conf.wizard then
+    match main_title base p with
+    [ Some t -> titled_person_text conf base p t ^ one_title_text conf base p t
+    | None -> gen_person_text p_access conf base p ]
+  else gen_person_text p_access conf base p
+;
+
 value referenced_person_title_text =
   gen_referenced_person_title_text std_access
 ;
 
+value person_title_text = gen_person_title_text std_access;
+
+(*
 value afficher_personne_un_titre conf base p t =
   do if t.t_place = p.surname then
        match t.t_name with
@@ -322,14 +333,7 @@ value afficher_personne_un_titre conf base p t =
        (sou base t.t_place);
   return ()
 ;
-
-value afficher_personne_titre conf base p =
-  if p.access <> Private || conf.friend || conf.wizard then
-    match main_title base p with
-    [ Some t -> afficher_personne_un_titre conf base p t
-    | None -> Wserver.wprint "%s" (person_text conf base p) ]
-  else Wserver.wprint "%s" (person_text conf base p)
-;
+*)
 
 value gen_person_text_without_title p_access conf base p =
   match main_title base p with
@@ -503,6 +507,23 @@ value valid_format (ini_fmt : format 'a 'b 'c) (r : string) =
     else if j < String.length r - 1 then
       if r.[j] == '%' then failed_format s else loop i (j+1)
     else (Obj.magic r : format 'a 'b 'c)
+;
+
+value cftransl conf fmt =
+  let fmt = transl conf fmt in
+  loop 0 where rec loop i =
+    fun
+    [ [] -> String.sub fmt i (String.length fmt - i)
+    | ([a :: al] as gal) ->
+        if i+4 < String.length fmt && fmt.[i] == ':' && fmt.[i+2] == ':'
+        && fmt.[i+3] == '%' && fmt.[i+4] == 's' then
+          decline fmt.[i+1] a ^ loop (i+5) al
+        else if i+1 < String.length fmt && fmt.[i] == '%' && fmt.[i+1] == 's'
+        then
+          nominative a ^ loop (i+2) al
+        else if i < String.length fmt then
+          String.make 1 fmt.[i] ^ loop (i+1) gal
+        else "" ]
 ;
 
 value ftransl conf s =
@@ -1076,6 +1097,10 @@ value afficher_prenom_de_personne_referencee conf base p =
 
 value afficher_personne_referencee conf base p =
   Wserver.wprint "\n%s" (reference conf base p (person_text conf base p))
+;
+
+value afficher_personne_titre conf base p =
+  Wserver.wprint "%s" (person_title_text conf base p)
 ;
 
 value afficher_personne_titre_referencee conf base p =
