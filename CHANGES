@@ -29,13 +29,16 @@ GeneWeb version 3.02
   - [Dec 10, 99] In tree displays with several branches, the option
     "add spouses" did not work. Fixed.
 
-* Base configuration files (base.gwf)
-  - [Dec 17, 99] Added variable "highlight_color", by default #2f6400, for
-    the color often used in pages.
-
 * GeneWeb uncompiler (gwu) and GeneWeb to gedcom (gwb2ged)
   - [Dec 13, 99] Fixed bug: the option '-s' (extraction of a surname)
     also selected children with different surnames.
+
+* Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
+  - [Dec 17, 99] Fixed and completed some German phrases (Marcus Zelezny)
+
+* Base configuration files (base.gwf)
+  - [Dec 17, 99] Added variable "highlight_color", by default #2f6400
+    (green), for the color often used in pages.
 
 GeneWeb version 3.01
 --------------------
