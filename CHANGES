@@ -21,6 +21,13 @@ GeneWeb version 2.06
   - [Aug 8, 99] Added option "-redirect" to say to the users that the
     GeneWeb service has been redirected to some other address.
 
+* Base configuration files (base.gwf)
+  - [Aug 18, 99] Added a new variable "auth_file" in data bases configuration
+    files (files ending with ".gwf") overriding the possible authorization
+    file set by option "-auth" of gwd. Therefore now, each data base can have
+    its specific global restricted access. See the template file "a.gwf".
+    Works only in server (not cgi) mode.
+
 GeneWeb version 2.05
 --------------------
 

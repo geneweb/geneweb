@@ -1,4 +1,4 @@
-# $Id: a.gwf,v 1.3 1999-07-17 20:30:50 ddr Exp $
+# $Id: a.gwf,v 1.4 1999-08-18 05:10:32 ddr Exp $
 # Parameters in "<body>" (background, color, etc)
 # Here is a palette of possibilities... test and choose one of them
 # if you want by removing the initial "#"
@@ -56,6 +56,16 @@ default_lang=fr
 
 # Authorization for wizards to send images (no: cannot; yes: can)
 can_send_image=no
+
+# Global authorization file for this data base (overriding the value
+# of the option "-auth" of "gwd"). This file must hold lines of the
+# form "user:password". Works only in server (not cgi) mode.
+auth_file=
+
+# Access by key, when set to "yes", generates HTML requests with
+# "n=first+name;p=surname;oc=number" instead of (the shorter) "i=integer"
+# in URLs.
+access_by_key=no
 
 # Uncomment the following definition to specify that the present database has
 # been renamed:
