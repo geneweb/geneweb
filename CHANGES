@@ -9,6 +9,9 @@ Added doc for databases maintenance.
 * gwc, gwu:
   - added backslash as escape character for underscores
 
+* gwc:
+  - display "+" for dead people even if not known date
+
 GeneWeb Version 1.07
 --------------------
 

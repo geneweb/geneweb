@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 1.2 1998-09-24 16:51:57 ddr Exp $ *)
+(* $Id: date.ml,v 1.3 1998-10-14 17:03:49 ddr Exp $ *)
 
 open Def;
 open Util;
@@ -158,21 +158,20 @@ value afficher_dates_courtes conf base p =
   if age_autorise conf base p then
     let something =
       match (Adef.od_of_codate p.birth, p.death) with
-      [ (Some _, _) | (_, Death _ _) -> True
+      [ (Some _, _) | (_, Death _ _ | DeadDontKnowWhen) -> True
       | _ -> False ]
     in
     if something then
       do Wserver.wprint " <em>";
          match (Adef.od_of_codate p.birth, p.death) with
-         [ (Some _, DeadDontKnowWhen | DontKnowIfDead) ->
-             Wserver.wprint "*"
+         [ (Some _, DontKnowIfDead) -> Wserver.wprint "*"
          | _ -> () ];
          match Adef.od_of_codate p.birth with
          [ Some d -> display_year d
          | _ -> () ];
          match (Adef.od_of_codate p.birth, p.death) with
          [ (Some _, Death _ _ | NotDead) -> Wserver.wprint "-"
-         | (_, Death _ _) -> Wserver.wprint "+"
+         | (_, Death _ _ | DeadDontKnowWhen) -> Wserver.wprint "+"
          | _ -> () ];
          match p.death with
          [ Death _ d ->
