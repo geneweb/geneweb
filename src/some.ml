@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo *)
-(* $Id: some.ml,v 2.3 1999-04-07 11:49:45 ddr Exp $ *)
+(* $Id: some.ml,v 2.4 1999-04-30 08:53:07 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -69,13 +69,14 @@ value persons_of_fsname base find proj x =
 ;
 
 value print_elem conf base is_surname (p, xl) =
+  let p = coa conf p in
   match xl with
   [ [x] ->
       do Wserver.wprint "<a href=\"%s%s\">" (commd conf) (acces conf base x);
          if is_surname then
            Wserver.wprint "%s%s" (coa conf (surname_end p))
-             (coa conf (surname_begin p))
-         else Wserver.wprint "%s" (coa conf p);
+             (surname_begin p)
+         else Wserver.wprint "%s" p;
          Wserver.wprint "</a>\n";
          Date.afficher_dates_courtes conf base x;
       return ()
@@ -87,9 +88,9 @@ value print_elem conf base is_surname (p, xl) =
                 Wserver.wprint "<a href=\"%s%s\">" (commd conf)
                   (acces conf base x);
                 if is_surname then
-                  Wserver.wprint "%s%s" (coa conf (surname_end p))
-                    (coa conf (surname_begin p))
-                else Wserver.wprint "%s" (coa conf p);
+                  Wserver.wprint "%s%s" (surname_end p)
+                    (surname_begin p)
+                else Wserver.wprint "%s" p;
                 Wserver.wprint "</a>";
                 Date.afficher_dates_courtes conf base x;
                 Wserver.wprint " <em>";
