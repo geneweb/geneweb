@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.35 2004-07-19 15:50:26 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.36 2004-07-21 07:22:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -692,7 +692,6 @@ value all_checks_family conf base fam cpl des scdo =
   let error = Update.error conf base in
   let warning w = wl.val := [w :: wl.val] in
   do {
-let _ = do { Printf.eprintf "need_check_noloop %b\n" (need_check_noloop scdo); flush stderr; } in
     if need_check_noloop scdo then
       Gutil.check_noloop_for_person_list base error
         (Array.to_list (parent_array cpl))

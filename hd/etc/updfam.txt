@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.32 2004-07-19 15:18:08 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.33 2004-07-21 07:22:21 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -217,7 +217,7 @@ function checkCreate(create, redirect)
 %end;
 
 %foreach;parent;
-<h4>%parent.himher;</h4>
+%if;(cvar_multi_parents != "yes");<h4>%parent.himher;</h4>%end;
 %apply;parent(cnt, "parent")
 %if;(cvar_multi_parents = "yes");%apply;insert_parent(cnt)%end;
 %end;
