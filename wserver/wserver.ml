@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 2.11 1999-08-06 02:22:34 ddr Exp $ *)
+(* $Id: wserver.ml,v 2.12 1999-10-20 12:20:11 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value wserver_oc =
@@ -473,7 +473,7 @@ value accept_connection tmout max_clients callback s =
    return ()
 ;
 
-value f port tmout max_clients (uid, gid) g =
+value f addr_opt port tmout max_clients (uid, gid) g =
   match try Some (Sys.getenv "WSERVER") with [ Not_found -> None ] with
   [ Some s ->
       let addr = sockaddr_of_string s in
@@ -483,9 +483,16 @@ value f port tmout max_clients (uid, gid) g =
          treat_connection tmout g addr ic;
       return exit 0
   | None ->
+      let addr =
+        match addr_opt with
+        [ Some addr ->
+            try Unix.inet_addr_of_string addr with
+            [ Failure _ -> (Unix.gethostbyname addr).Unix.h_addr_list.(0) ]
+        | None -> Unix.inet_addr_any ]
+      in
       let s = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0 in
       do Unix.setsockopt s Unix.SO_REUSEADDR True;
-         Unix.bind s (Unix.ADDR_INET Unix.inet_addr_any port);
+         Unix.bind s (Unix.ADDR_INET addr port);
          Unix.listen s 4;
          ifdef UNIX then
            do match gid with
