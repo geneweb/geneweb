@@ -35,7 +35,7 @@ actualmente %n pessoas%o<br>
 <tr>
 
 <td align=center>Entrada <a href="%sw=w"><em>bruxo</em></a><br>
-(palavra de paso)</td>
+(palavra de paso)<br></td>
 
 %y%z<td align=center>Entrada <a href="%sw=f"><em>amigo</em></a><br>
 (palavra de paso)</td>

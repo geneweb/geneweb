@@ -36,14 +36,14 @@ personer.%o<br>
 <tr>
 
 <td align=center><a href="%sw=w"><em>Oppdaterings</em></a> adgang<br>
-(passord)</td>
+(passord)<br></td>
 
 %y%z<td align=center><a href="%sw=f"><em>Venners</em></a> adgang<br>
 (passord)</td>
 
 %z%y</tr></table>
 
-%y%i<br><br>
+%y%i<br><p>
 
 <table border=0>
 <tr><td align=center>
@@ -60,13 +60,11 @@ personer.%o<br>
 <table border=0 cellspacing=0 cellpadding=0>
 
 <tr><td>
-For &aring; navigere i databasen, kan du s&oslash;ke:<br><br>
+For &aring; navigere i databasen, kan du s&oslash;ke:<br><p>
 
 <ul>
 
 <li>
-
-
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=NG>
@@ -91,12 +89,12 @@ For &aring; navigere i databasen, kan du s&oslash;ke:<br><br>
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>etter titel</b></font><br>
-<input name=t size=14 maxlength=200><br>
-(ex: roi, duke...)
+<font color=#2f6400><b>etter titel</b></font>$INl<br>$E
+<input name=t size=14 maxlength=200>$INl<br>$E
+(ex: roi, duke...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>sted</b></font><br>
-<input name=p size=25 maxlength=200><br>
+<font color=#2f6400><b>sted</b></font>$INl<br>$E
+<input name=p size=25 maxlength=200>$INl<br>$E
 (ex: de France, of Sax...)
 </td><td>
 <input type=submit value="Ok">
@@ -130,27 +128,26 @@ s&oslash;king</b></font></a>.
 
 %w<p>
 
-<center>Du kan<br><br>
+<center>Du kan<br><p>
 
 <table border=0>
 <tr>
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">legge til en familie</a>
-</ul>
+$INl</ul>
 </td>
 <td align=left>
-<ul>
+<ul>$E
 <li><a href="%sm=MOD_NOTES">endre notater</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-<br>
 %w
 
-<center>Du kan ogs&aring; sl&aring; opp<br><br>
+<center>Du kan ogs&aring; sl&aring; opp<br><p>
 
 <table border=0>
 <tr>

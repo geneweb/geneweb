@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.2 1999-10-30 13:25:27 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.3 1999-10-30 14:17:46 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -202,7 +202,7 @@ value rec copy_from_channel conf base ic =
           let (atag, c) =
             loop 0 c where rec loop len =
               fun
-              [ '>' | ' ' as c -> (Buff.get len, c)
+              [ '>' | ' ' | '\n' as c -> (Buff.get len, c)
               | c -> loop (Buff.store len c) (input_char ic) ]
           in
           match atag with
