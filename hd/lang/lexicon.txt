@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.55 1999-06-08 14:11:54 ddr Exp $
+# $Id: lexicon.txt,v 2.56 1999-06-11 14:19:16 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2534,7 +2534,7 @@ se: nte/1a/2a/3e/4e/5e/6e/7e/8e/9e/10e/11e/12e/13e/14e/15e/16e/17e/18e/19e/20e/2
 
     number
 de: Nummer
-dk: nummer
+dk: l&oslash;benummer
 en: number
 eo: nombro
 es: n&uacute;mero
