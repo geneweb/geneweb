@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 4.13 2003-12-04 20:30:56 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: updateIndOk.ml,v 4.14 2003-12-10 12:19:11 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -678,92 +678,68 @@ value print_del_ok conf base wl =
 
 value print_add o_conf base =
   let conf = Update.update_conf o_conf in
-(*
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock (Iobase.lock_file bfile) with
-  [ Accept ->
-*)
-      try
-        let (sp, ext) = reconstitute_person conf in
-        let redisp =
-          match p_getenv conf.env "return" with
-          [ Some _ -> True
-          | _ -> False ]
-        in
-        if ext || redisp then UpdateInd.print_update_ind conf base sp ""
-        else do {
-          strip_person sp;
-          match check_person conf base sp with
-          [ Some err -> error_person conf base sp err
-          | None ->
-              let (p, a) = effective_add conf base sp in
-              let u = uoi base p.cle_index in
-              let wl = all_checks_person conf base p a u in
-              let k = (sp.first_name, sp.surname, sp.occ) in
-              do {
-                Util.commit_patches conf base;
-                History.record conf base k "ap";
-                print_add_ok conf base wl p;
-              } ]
-        }
-      with
-      [ Update.ModErr -> () ]
-(*
-  | Refuse -> Update.error_locked conf base ]
-*)
+  try
+    let (sp, ext) = reconstitute_person conf in
+    let redisp =
+      match p_getenv conf.env "return" with
+      [ Some _ -> True
+      | _ -> False ]
+    in
+    if ext || redisp then UpdateInd.print_update_ind conf base sp ""
+    else do {
+      strip_person sp;
+      match check_person conf base sp with
+      [ Some err -> error_person conf base sp err
+      | None ->
+          let (p, a) = effective_add conf base sp in
+          let u = uoi base p.cle_index in
+          let wl = all_checks_person conf base p a u in
+          let k = (sp.first_name, sp.surname, sp.occ) in
+          do {
+            Util.commit_patches conf base;
+            History.record conf base k "ap";
+            print_add_ok conf base wl p;
+          } ]
+    }
+  with
+  [ Update.ModErr -> () ]
 ;
 
 value print_del conf base =
-(*
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock (Iobase.lock_file bfile) with
-  [ Accept ->
-*)
-      match p_getint conf.env "i" with
-      [ Some i ->
-          let p = base.data.persons.get i in
-          let k = (sou base p.first_name, sou base p.surname, p.occ) in
-          do {
-            effective_del conf base p;
-            base.func.patch_person p.cle_index p;
-            Util.commit_patches conf base;
-            History.record conf base k "dp";
-            print_del_ok conf base [];
-          }
-      | _ -> incorrect_request conf ]
-(*
-  | Refuse -> Update.error_locked conf base ]
-*)
+  match p_getint conf.env "i" with
+  [ Some i ->
+      let p = base.data.persons.get i in
+      let k = (sou base p.first_name, sou base p.surname, p.occ) in
+      do {
+        effective_del conf base p;
+        base.func.patch_person p.cle_index p;
+        Util.commit_patches conf base;
+        History.record conf base k "dp";
+        print_del_ok conf base [];
+      }
+  | _ -> incorrect_request conf ]
 ;
 
 value print_mod_aux conf base callback =
-(*
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock (Iobase.lock_file bfile) with
-  [ Accept ->
-*)
-      try
-        let (p, ext) = reconstitute_person conf in
-        let redisp =
-          match p_getenv conf.env "return" with
-          [ Some _ -> True
-          | _ -> False ]
-        in
-        let digest = Update.digest_person (poi base p.cle_index) in
-        if digest = raw_get conf "digest" then
-          if ext || redisp then UpdateInd.print_update_ind conf base p digest
-          else do {
-            strip_person p;
-            match check_person conf base p with
-            [ Some err -> error_person conf base p err
-            | None -> callback p ]
-          }
-        else Update.error_digest conf base
-      with
-      [ Update.ModErr -> () ]
-(*
-  | Refuse -> Update.error_locked conf base ]
-*)
+  try
+    let (p, ext) = reconstitute_person conf in
+    let redisp =
+      match p_getenv conf.env "return" with
+      [ Some _ -> True
+      | _ -> False ]
+    in
+    let digest = Update.digest_person (poi base p.cle_index) in
+    if digest = raw_get conf "digest" then
+      if ext || redisp then UpdateInd.print_update_ind conf base p digest
+      else do {
+        strip_person p;
+        match check_person conf base p with
+        [ Some err -> error_person conf base p err
+        | None -> callback p ]
+      }
+    else Update.error_digest conf base
+  with
+  [ Update.ModErr -> () ]
 ;
 
 value print_mod o_conf base =

@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 4.31 2003-12-05 05:48:59 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: forum.ml,v 4.32 2003-12-10 12:19:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -537,65 +537,57 @@ value forum_add conf base ident comm =
     | None -> "publ" ]
   in
   if ident <> "" && comm <> "" then
-(*
-  let bfile = base_path [] (conf.bname ^ ".gwb") in
-    lock (Iobase.lock_file bfile) with
-    [ Accept ->
-*)
-        let fname = forum_file conf in
-        let tmp_fname = fname ^ "~" in
-        let oc = Secure.open_out tmp_fname in
-        try
-          let (hh, mm, ss) = conf.time in
-          do {
-            fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
-              conf.today.year conf.today.month conf.today.day hh mm ss;
-            fprintf oc "From: %s\n" conf.from;
-            fprintf oc "Ident: %s\n" ident;
-            if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
-            then
-              fprintf oc "Wizard: %s\n" conf.user
-            else ();
-            if email <> "" then fprintf oc "Email: %s\n" email else ();
-            fprintf oc "Access: %s\n" access;
-            let subject = if subject = "" then "-" else subject in
-            fprintf oc "Subject: %s\n" subject;
-            fprintf oc "Text:\n";
-            let rec loop i bol =
-              if i == String.length comm then ()
-              else do {
-                if bol then fprintf oc "  " else ();
-                if comm.[i] <> '\r' then output_char oc comm.[i] else ();
-                loop (i + 1) (comm.[i] = '\n')
-              }
-            in
-            loop 0 True;
-            fprintf oc "\n\n";
-            match
-              try
-                Some (Secure.open_in_bin fname) with
-                [ Sys_error _ -> None ]
-            with
-            [ Some ic ->
-                do {
-                  try while True do { output_char oc (input_char ic) } with
-                  [ End_of_file -> () ];
-                  close_in ic;
-                }
-            | _ -> () ];
-            close_out oc;
-            try Sys.remove fname with [ Sys_error _ -> () ];
-            Sys.rename tmp_fname fname;
+    let fname = forum_file conf in
+    let tmp_fname = fname ^ "~" in
+    let oc = Secure.open_out tmp_fname in
+    try
+      let (hh, mm, ss) = conf.time in
+      do {
+        fprintf oc "Time: %04d-%02d-%02d %02d:%02d:%02d\n"
+          conf.today.year conf.today.month conf.today.day hh mm ss;
+        fprintf oc "From: %s\n" conf.from;
+        fprintf oc "Ident: %s\n" ident;
+        if (conf.wizard || conf.just_friend_wizard) && conf.user <> ""
+        then
+          fprintf oc "Wizard: %s\n" conf.user
+        else ();
+        if email <> "" then fprintf oc "Email: %s\n" email else ();
+        fprintf oc "Access: %s\n" access;
+        let subject = if subject = "" then "-" else subject in
+        fprintf oc "Subject: %s\n" subject;
+        fprintf oc "Text:\n";
+        let rec loop i bol =
+          if i == String.length comm then ()
+          else do {
+            if bol then fprintf oc "  " else ();
+            if comm.[i] <> '\r' then output_char oc comm.[i] else ();
+            loop (i + 1) (comm.[i] = '\n')
           }
-        with e ->
-          do {
-            try close_out oc with _ -> ();
-            try Sys.remove tmp_fname with [ Sys_error _ -> () ];
-            raise e
-          }
-(*
-    | Refuse -> do { Update.error_locked conf base; raise Update.ModErr } ]
-*)
+        in
+        loop 0 True;
+        fprintf oc "\n\n";
+        match
+          try
+            Some (Secure.open_in_bin fname) with
+            [ Sys_error _ -> None ]
+        with
+        [ Some ic ->
+            do {
+              try while True do { output_char oc (input_char ic) } with
+              [ End_of_file -> () ];
+              close_in ic;
+            }
+        | _ -> () ];
+        close_out oc;
+        try Sys.remove fname with [ Sys_error _ -> () ];
+        Sys.rename tmp_fname fname;
+      }
+    with e ->
+      do {
+        try close_out oc with _ -> ();
+        try Sys.remove tmp_fname with [ Sys_error _ -> () ];
+        raise e
+      }
   else ()
 ;
 
@@ -676,28 +668,20 @@ value print_del_ok conf base =
 ;
 
 value delete_forum_message conf base pos =
-(*
-  let bfile = base_path [] (conf.bname ^ ".gwb") in
-  lock (Iobase.lock_file bfile) with
-  [ Accept ->
-*)
-      match get_message conf pos with
-      [ Some (m, next_pos, forum_length) ->
-          if conf.wizard && conf.user <> "" && m.m_wizard = conf.user &&
-            passwd_in_file conf
-          then
-            try
-              do {
-                forum_del conf base pos next_pos;
-                print_del_ok conf base;
-              }
-            with
-            [ Update.ModErr -> () ]
-          else print_forum_headers conf base
-      | None -> print_forum_headers conf base ]
-(*
-  | Refuse -> Update.error_locked conf base ]
-*)
+  match get_message conf pos with
+  [ Some (m, next_pos, forum_length) ->
+      if conf.wizard && conf.user <> "" && m.m_wizard = conf.user &&
+        passwd_in_file conf
+      then
+        try
+          do {
+            forum_del conf base pos next_pos;
+            print_del_ok conf base;
+          }
+        with
+        [ Update.ModErr -> () ]
+      else print_forum_headers conf base
+  | None -> print_forum_headers conf base ]
 ;
 
 value print_del conf base =

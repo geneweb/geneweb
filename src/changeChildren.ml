@@ -1,5 +1,5 @@
-(* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 4.6 2003-12-04 20:30:55 ddr Exp $ *)
+(* camlp4r ./pa_html.cmo *)
+(* $Id: changeChildren.ml,v 4.7 2003-12-10 12:19:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -267,27 +267,19 @@ value change_child conf base parent_surname ip =
 ;
 
 value print_change_ok conf base p u =
-(*
-  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
-  lock (Iobase.lock_file bfile) with
-  [ Accept ->
-*)
-      try
-        let ipl = select_children_of base u in
-        let parent_surname = p_surname base p in
-        do {
-          check_digest conf base (digest_children base ipl);
-          List.iter (change_child conf base parent_surname) ipl;
-          Util.commit_patches conf base;
-          let key = (sou base p.first_name, sou base p.surname, p.occ) in
-          History.record conf base key "cn";
-          print_change_done conf base p u;
-        }
-      with
-      [ Update.ModErr -> () ]
-(*
-  | Refuse -> Update.error_locked conf base ]
-*)
+  try
+    let ipl = select_children_of base u in
+    let parent_surname = p_surname base p in
+    do {
+      check_digest conf base (digest_children base ipl);
+      List.iter (change_child conf base parent_surname) ipl;
+      Util.commit_patches conf base;
+      let key = (sou base p.first_name, sou base p.surname, p.occ) in
+      History.record conf base key "cn";
+      print_change_done conf base p u;
+    }
+  with
+  [ Update.ModErr -> () ]
 ;
 
 value print_ok conf base =
