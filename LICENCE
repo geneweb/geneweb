@@ -1,6 +1,6 @@
 LEGAL NOTICE
 
-Software: GeneWeb, version 1.06 of August 1998,
+Software: GeneWeb, version 1.06 of September 1998,
 hereinafter referred to as "the software".
 
 The software has been designed and produced by Daniel de Rauglaudre,
@@ -19,24 +19,27 @@ distributed on the Internet.
 
 a- Extent of the rights granted by the INRIA to the user of the software:
 
-INRIA freely grants the right to use and integrate the software in
-another software, provided that all derivative works are distributed
-under the conditions described in point b- below.
+INRIA freely grants the right to use, modify and integrate the
+software in another software, provided that all derivative works are
+distributed under the conditions described in point b- below.
 
 b- Reproduction of the software:
 
 INRIA grants any user of the software the right to reproduce it so as
 to circulate it in accordance with the same purposes and conditions as
-those defined at point a- above. Any copy of the software and/or
-relevant documentation must comprise reference to the ownership of
-INRIA and the present file.
+those defined at point a- above.  Any copy of the software and/or relevant
+documentation must comprise reference to the ownership of INRIA and
+the present file.
 
-The user undertakes to distribute the software identical to those
-originally made public by INRIA.
+The user undertakes to distribute the software either as unmodified
+source files, identical to those originally made public by INRIA, or as
+executable binaries obtained by compiling the original source files.
 
-Distribution of derivative works obtained by integrating it in another
-software is allowed only if the distribution consists of the
-unmodified, original files for the software.
+Distribution of derivative works obtained by modifying the software or
+integrating it in another software is allowed only if the distribution
+consists of the unmodified, original source files for the software,
+along with difference files (patches) to be applied by the user of the
+derivative work.
 
 As regards any other type of distribution, the user undertakes to
 apply to obtain the express approval of INRIA.
