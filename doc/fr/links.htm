@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head><title>GeneWeb - Liens vers une base</title></head>
+<body bgcolor="#d6bfaf">
+<h1>GeneWeb - Liens vers une base</h1>
+
+Cette page indique comment mettre des liens vers des pages
+<em>GeneWeb</em>. Elle s'adresse aussi bien aux utilisateurs de
+<em>GeneWeb</em> qu'&agrave; ceux qui, sans conna&icirc;tre
+<em>GeneWeb</em>, d&eacute;sirent mettre des liens directs vers des
+pages <em>GeneWeb</em> trouv&eacute;es sur la toile.
+
+<p>
+
+Lisez la bien, parce qu'il y a un petit pi&egrave;ge &agrave;
+&eacute;viter et une solution pr&eacute;vue.
+
+<h4>Liens avec num&eacute;ros</h4>
+
+Il est tout &agrave; fait possible de mettre des liens vers des pages
+<em>GeneWeb</em> dans vos signets ou dans des pages HTML.
+
+<p>
+
+Par exemple, vous avez affich&eacute; la page personnelle de "Jean
+Dupont" de la base que vous consultez. Vous constatez que cela
+correspond &agrave; l'adresse:
+
+<pre>
+   http://machine:2317/toto?i=357
+</pre>
+
+<p>
+
+Le "357" que vous voyez dans la requ&ecirc;te correspond &agrave; un
+num&eacute;ro qui a &eacute;t&eacute; attribu&eacute; &agrave; "Jean
+Dupont" par les utilitaires de <em>GeneWeb</em> (ged2gwb, gwc ou gwd).
+
+<p>
+
+Si la personne responsable de cette base (vous-m&ecirc;me ou quelqu'un
+d'autre) d&eacute;cide d'en faire une mise &agrave; jour, il se peut
+que les num&eacute;ros changent, et le lien que vous aurez
+enregistr&eacute; ne fonctionnera plus.
+
+<p>
+
+Pour les responsables de bases <em>GeneWeb</em>, sachez que cela peut
+se produire:
+
+<ul>
+
+<li>Par la commande "ged2gwb" si vous partez d'un nouveau fichier GEDCOM.
+
+<li>Par la commande "gwc" si vous faites un nettoyage de la base.
+
+</ul>
+
+<h4>Rem&egrave;de</h4>
+
+Pour &eacute;vitez cela, ajoutez &agrave; l'adresse la s&eacute;quence
+suivante: "<tt>;opt=no_index</tt>", c'est-&agrave;-dire, pour l'exemple
+ci-dessus:
+
+<pre>
+   http://machine:2317/toto?i=357;opt=no_index
+</pre>
+
+<p>
+
+Entrez cette adresse. <em>GeneWeb</em> vous r&eacute;pondra la page
+suivante:
+
+<pre>
+Link to use
+
+  * http://machine:2317/toto?....
+</pre>
+
+<p>
+
+Ce lien est cliquable (cliquez dessus), vous devez obtenir la
+m&ecirc;me page (ici la page personnelle de Jean Dupont), mais avec
+une adresse ne contenant plus de num&eacute;ro mais des
+r&eacute;f&eacute;rences explicites &agrave; son pr&eacute;nom et son
+nom.
+
+<p>
+
+Utilisez cette adresse-l&agrave; dans vos liens.
+
+<p>
+
+Ceci s'applique &agrave; toutes les requ&ecirc;tes de
+<em>GeneWeb</em>, particuli&egrave;rement &agrave; celles affichant
+les liens de parent&eacute; o&ugrave; il est fr&eacute;quent de
+trouver 2 ou 3 personnes de la base cod&eacute;s par leur
+num&eacute;ro.
+
+<p>
+
+Pour les propri&eacute;taires de bases <em>GeneWeb</em>, utilisez
+cette proc&eacute;dure &eacute;galement dans les fichiers
+associ&eacute;s: voir la <a href="pcustom.htm">personnalisation</a>
+des pages.
+
+<p>
+
+Retour vers <a href="diruse.htm">Mode d'Emploi</a>.
+
+<p><hr><font size=-1><em>&copy; Copyright INRIA 1999 -
+GeneWeb</em></font><br>
+
+</body>
