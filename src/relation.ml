@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.43 2000-06-19 22:23:24 ddr Exp $ *)
+(* $Id: relation.ml,v 3.44 2000-06-20 07:06:40 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -54,7 +54,8 @@ value print_with_witness conf base p fam ip =
   do html_li conf;
      Wserver.wprint "<input type=radio name=select value=%d>\n"
        (Adef.int_of_iper ip);
-     Wserver.wprint "(%s)\n" (transl_nth conf "witness/witnesses" 0);
+     Wserver.wprint "(%s)\n"
+       (nominative (transl_nth conf "witness/witnesses" 0));
 (*
      Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n" (commd conf)
        (Adef.int_of_iper p.cle_index) (Adef.int_of_iper ip);
@@ -131,13 +132,13 @@ value print_menu conf base p =
                 do html_li conf;
                    Wserver.wprint "<input type=radio name=select value=%d>\n"
                      (Adef.int_of_iper c.cle_index);
+(*
                    if fam.relation = NotMarried && auth
                    && age_autorise conf base c then
                      ()
                    else
                      Wserver.wprint "(%s)\n"
                        (transl_nth conf "husband/wife" (1 - is));
-(*
                    Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n"
                      (commd conf) (Adef.int_of_iper p.cle_index)
                      (Adef.int_of_iper c.cle_index);

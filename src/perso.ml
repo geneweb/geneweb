@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.27 2000-06-19 23:50:13 ddr Exp $ *)
+(* $Id: perso.ml,v 3.28 2000-06-20 07:06:39 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -622,7 +622,7 @@ value print_fwitnesses conf base p nfam n ifam =
          let p = poi base ip in
          do html_li conf;
             Wserver.wprint "%s"
-              (capitale (transl_nth conf "witness/witnesses" 0));
+              (capitale (nominative (transl_nth conf "witness/witnesses" 0)));
             if nfam > 1 then
               Wserver.wprint " (%s %d)"
                 (transl_nth conf "marriage/marriages" 0) (n + 1)
