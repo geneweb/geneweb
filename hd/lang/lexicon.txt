@@ -2543,8 +2543,7 @@ en: spouse
 eo: edzo/edzino
 es: esposo/esposa
 fr: &eacute;poux/&eacute;pouse
-he:   בן-זוג/ בת-זוג‎
-it: coniuge
+he:   בן-זוג/ בת-זוג
 nl: echtgenoot/echtgenote
 pt: marido/esposa
 se: make/maka
