@@ -1,5 +1,5 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 4.2 2001-04-25 21:32:23 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 4.3 2001-06-23 10:26:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open MLast;
@@ -21,10 +21,10 @@ value trace =
 value rec expr e =
   match e with
   [ <:expr< $lid:f$ $_$ $str:s$ >> when List.mem f trace ->
-      Printf.printf "%s\n" s
+      Printf.printf "%s\n" (Plexer.string_of_string_token s)
   | <:expr< $lid:f$ $_$ ($lid:g$ $_$ $str:s$ $_$) >>
     when List.mem f trace && List.mem g trace ->
-      Printf.printf "%s\n" s
+      Printf.printf "%s\n" (Plexer.string_of_string_token s)
   | <:expr< $lid:x$ >> when List.mem x trace ->
       Stdpp.raise_with_loc (MLast.loc_of_expr e) (Failure "Bad source")
   | <:expr< let $rec:_$ $list:pel$ in $e$ >> ->

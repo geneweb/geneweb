@@ -1,10 +1,10 @@
-GeneWeb 4.01
+GeneWeb 4.02
 
 If you are under Windows:
    Double-click on the file "index.htm" of the directory "doc",
    and follow the instructions.
 
-If you are under Unix:
+If you are under Unix or Mac
    Launch your Web navigator.
    If you installed GeneWeb, for example in
         /home/smith/geneweb
@@ -26,4 +26,4 @@ Remarks, suggestions, questions, bug reports to:
 	http://cristal.inria.fr/~ddr/
 
 Please specify the version number above and the system you use (Unix,
-Windows NT, Windows 95/98/2000).
+Windows, Mac)
