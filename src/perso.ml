@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.82 2001-02-15 14:24:50 ddr Exp $ *)
+(* $Id: perso.ml,v 3.83 2001-02-16 11:53:38 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -270,6 +270,13 @@ and title_item =
 ;
 
 value get_env v env = try List.assoc v env with [ Not_found -> Enone ];
+
+value extract_var sini s =
+  let len = String.length sini in
+  if String.length s > len && String.sub s 0 (String.length sini) = sini then
+    String.sub s len (String.length s - len)
+  else ""
+;
 
 value eval_variable conf base env sl =
   let ep =
@@ -592,11 +599,8 @@ value print_on_death_date conf base env p p_auth =
 
 value print_origin_file conf base env =
   if conf.wizard then
-    match (p_getenv conf.henv "opt", get_env "fam" env) with
-    [ (Some "from", Efam fam _ _) ->
-        let n = sou base fam.origin_file in
-        if n = "" then ()
-        else do Wserver.wprint "<em>(%s)</em>" n; html_br conf; return ()
+    match get_env "fam" env with
+    [ Efam fam _ _ -> Wserver.wprint "%s" (sou base fam.origin_file)
     | _ -> () ]
   else ()
 ;
@@ -747,6 +751,17 @@ value print_witness_relation conf base env =
   | _ -> () ]
 ;
 
+value eval_gen_variable conf base env =
+  fun
+  [ s ->
+      let v = extract_var "evar_" s in
+      if v <> "" then
+        match p_getenv (conf.env @ conf.henv) v with
+        [ Some vv -> quote_escaped vv
+        | _ -> "" ]
+      else raise Not_found ]
+;
+
 value print_simple_variable conf base env (p, a, u, p_auth) efam =
   fun
   [ "access" -> Wserver.wprint "%s" (acces conf base p)
@@ -823,7 +838,7 @@ value print_simple_variable conf base env (p, a, u, p_auth) efam =
   | "surname_key" -> print_surname_key conf base env p p_auth
   | "title" -> Wserver.wprint "%s" (person_title conf base p)
   | "witness_relation" -> print_witness_relation conf base env efam
-  | v -> Templ.print_variable conf base v ]
+  | s -> Wserver.wprint "%s" (eval_gen_variable conf base env s) ]
 ;
 
 value simple_person_text conf base p p_auth =
@@ -841,7 +856,9 @@ value print_simple_person_text conf base (p, _, _, p_auth) =
 value print_variable conf base env sl =
   match eval_variable conf base env sl with
   [ Some (ep, efam, "") -> print_simple_person_text conf base ep
-  | Some (ep, efam, s) -> print_simple_variable conf base env ep efam s
+  | Some (ep, efam, s) ->
+      try print_simple_variable conf base env ep efam s with
+      [ Not_found -> Templ.print_variable conf base s ]
   | None ->
       do list_iter_first
            (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
@@ -1007,9 +1024,11 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
   | "is_male" -> p.sex = Male
   | "is_sibling_after" -> get_env "pos" env = Estring "next"
   | "is_sibling_before" -> get_env "pos" env = Estring "prev"
+  | "is_private" -> p.access = Private
+  | "is_public" -> p.access = Public
   | "is_self" -> get_env "pos" env = Estring "self"
   | "wizard" -> conf.wizard
-  | v -> do Wserver.wprint "%%%s;" v; return True ]
+  | v -> do Wserver.wprint ">%%%s???" v; return False ]
 ;
 
 value eval_bool_variable conf base env sl =
@@ -1086,10 +1105,21 @@ value eval_bool_value conf base env =
     fun
     [ Eor e1 e2 -> bool_eval e1 || bool_eval e2
     | Eand e1 e2 -> bool_eval e1 && bool_eval e2
-    | Eop s e1 e2 -> do Wserver.wprint "op %s???" s; return False
+    | Eop op e1 e2 ->
+        match op with
+        [ "=" -> string_eval e1 = string_eval e2
+        | "!=" -> string_eval e1 <> string_eval e2
+        | _ -> do Wserver.wprint "op %s???" op; return False ]
     | Enot e -> not (bool_eval e)
     | Estr s -> do Wserver.wprint "\"%s\"???" s; return False
     | Evar s sl -> eval_bool_variable conf base env [s :: sl] ]
+  and string_eval =
+    fun
+    [ Estr s -> s
+    | Evar s sl ->
+        try eval_gen_variable conf base env s with
+        [ Not_found -> do Wserver.wprint ">%%%s???" s; return "" ]
+    | x -> do Wserver.wprint "val???"; return "" ]
   in
   bool_eval
 ;

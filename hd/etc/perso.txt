@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.18 2001-02-05 10:52:10 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.19 2001-02-16 11:53:38 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -203,7 +203,7 @@
         %end;
       </ul>
     %end;
-    %origin_file;
+    %if;(evar_opt = "from" and wizard);<em>(%origin_file;)</em><br>%nl;%end;
   %end;
   </ul>
 %end;

@@ -5,6 +5,9 @@ GeneWeb version 3.12
   - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
 
 * GeneWeb server or CGI (gwd)
+  - [16 Feb 01] Fixed problem: when displaying a surname, if there were
+    several answers, the link for displaying the first names by alphabetical
+    order showed only the first surname.
   - [16 Feb 01] Fixed bug: when displaying the tree of all persons
     having the same nobility title, if there is no relationship links
     between them, the request failed.
