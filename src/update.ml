@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.21 2000-11-13 20:48:25 ddr Exp $ *)
+(* $Id: update.ml,v 3.22 2000-11-18 09:52:00 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -10,7 +10,7 @@ open Util;
 exception ModErr;
 type create_info = (option date * string * option date * string);
 type create = [ Create of sex and option create_info | Link ];
-type key = (string * string * int * create);
+type key = (string * string * int * create * string);
 
 value rec find_free_occ base f s i =
   match
@@ -624,7 +624,7 @@ value print_date conf base lab var d =
   return ()
 ;
 
-value print_simple_person conf base var (first_name, surname, occ, create) =
+value print_simple_person conf base var (first_name, surname, occ, create, _) =
   tag "table" "border=1" begin
     tag "tr" begin
       tag "td" begin
@@ -670,44 +670,37 @@ value print_simple_person conf base var (first_name, surname, occ, create) =
   end
 ;
 
-type person_type =
-  [ R_father of int
-  | R_mother of int
-  | Father
-  | Mother
-  | Witness of int
-  | Child of int ]
+value rec parse_int n =
+  parser
+  [ [: `('0'..'9' as i); strm :] ->
+      parse_int (10 * n + Char.code i - Char.code '0') strm
+  | [: :] -> n ]
 ;
 
-value field_of_ptyp ptyp =
-  match ptyp with
-  [ R_father pos -> "r" ^ string_of_int pos ^ "_fath_"
-  | R_mother pos -> "r" ^ string_of_int pos ^ "_moth_"
-  | Father -> "him_"
-  | Mother -> "her_"
-  | Witness pos -> "witn" ^ string_of_int pos ^ "_"
-  | Child pos -> "ch" ^ string_of_int pos ^ "_" ]
+value parse_r_parent =
+  parser
+  [ [: `'f' :] -> 0
+  | [: `'m' :] -> 1 ]
 ;
 
-value text_of_ptyp conf ptyp =
-  match ptyp with
-  [ R_father pos ->
-      (transl_nth conf "relation/relations" 0) ^ " " ^ string_of_int pos
-       ^ " - " ^ (transl_nth conf "father/mother" 0)
-  | R_mother pos ->
-      (transl_nth conf "relation/relations" 0) ^ " " ^ string_of_int pos
-       ^ " - " ^ (transl_nth conf "father/mother" 1)
-  | Father -> transl_nth conf "him/her" 0
-  | Mother -> transl_nth conf "him/her" 1
-  | Witness pos ->
-      (transl_nth conf "witness/witnesses" 0) ^ " " ^ string_of_int pos
-  | Child pos ->
-      (transl_nth conf "child/children" 0) ^ " " ^ string_of_int pos ]
+value text_of_var conf =
+  fun
+  [ "him" -> transl_nth conf "him/her" 0
+  | "her" -> transl_nth conf "him/her" 1
+  | var ->
+      match Stream.of_string var with parser
+      [ [: `'r'; pos = parse_int 0; `'_'; pn = parse_r_parent :] -> 
+           transl_nth conf "relation/relations" 0 ^ " " ^ string_of_int pos ^
+           " - " ^ transl_nth conf "father/mother" pn
+      | [: `'w'; `'i'; `'t'; `'n'; pos = parse_int 0 :] ->
+          transl_nth conf "witness/witnesses" 0 ^ " " ^ string_of_int pos
+      | [: `'c'; `'h'; pos = parse_int 0 :] ->
+          transl_nth conf "child/children" 0 ^ " " ^ string_of_int pos
+      | [: :] -> var ] ]
 ;
 
-value print_create_conflict conf base p ptyp =
-  let var = field_of_ptyp ptyp in
-  let text = text_of_ptyp conf ptyp in
+value print_create_conflict conf base p var =
+  let text = text_of_var conf var in
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "error"))
   in
@@ -772,7 +765,7 @@ value add_misc_names_for_new_persons base new_persons =
     new_persons
 ;
 
-value insert_person conf base src new_persons (field, (f, s, o, create)) =
+value insert_person conf base src new_persons (f, s, o, create, var) =
   let f = if f = "" then "?" else f in
   let s = if s = "" then "?" else s in
   match create with
@@ -787,7 +780,7 @@ value insert_person conf base src new_persons (field, (f, s, o, create)) =
             else raise Not_found
         else
           let ip = person_ht_find_unique base f s o in
-          print_create_conflict conf base (poi base ip) field
+          print_create_conflict conf base (poi base ip) var
       with
       [ Not_found ->
           let o = if f = "?" || s = "?" then 0 else o in
@@ -1062,7 +1055,7 @@ value rec update_conf_env field p occ o_env n_env =
 value update_conf_create conf =
   let field =
     match p_getenv conf.env "field" with
-    [ Some f -> f
+    [ Some f -> f ^ "_"
     | _ -> "" ]
   in
   let occ =
@@ -1076,7 +1069,7 @@ value update_conf_create conf =
 value update_conf_link conf =
   let field =
     match p_getenv conf.env "field" with
-    [ Some f -> f
+    [ Some f -> f ^ "_"
     | _ -> "" ]
   in
   let occ =

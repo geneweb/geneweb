@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 3.7 2000-11-10 12:02:23 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 3.8 2000-11-18 09:52:00 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -34,7 +34,7 @@ value sorp base ip =
     if first_name = "?" || surname = "?" then Adef.int_of_iper p.cle_index
     else p.occ
   in
-  (sou base p.first_name, sou base p.surname, p.occ, Update.Link)
+  (sou base p.first_name, sou base p.surname, p.occ, Update.Link, "")
 ;
 
 value reconstitute conf base p1 p2 =

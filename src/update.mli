@@ -1,4 +1,4 @@
-(* $Id: update.mli,v 3.7 2000-10-24 15:47:18 ddr Exp $ *)
+(* $Id: update.mli,v 3.8 2000-11-18 09:52:00 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -7,24 +7,14 @@ open Config;
 exception ModErr;
 type create_info = (option date * string * option date * string);
 type create = [ Create of sex and option create_info | Link ];
-type key = (string * string * int * create);
+type key = (string * string * int * create * string);
 
 value find_free_occ : base -> string -> string -> int -> int;
 value infer_death : config -> option date -> death;
 value print_same_name : config -> base -> person -> unit;
 
-type person_type =
-  [ R_father of int
-  | R_mother of int
-  | Father
-  | Mother
-  | Witness of int
-  | Child of int ]
-;
-
 value insert_person :
-  config -> base -> string -> ref (list person) ->
-  (person_type * key) -> Adef.iper
+  config -> base -> string -> ref (list person) -> key -> Adef.iper
 ;
 value insert_string : config -> base -> string -> Adef.istr;
 value add_misc_names_for_new_persons : base -> list person -> unit;
@@ -44,9 +34,7 @@ value digest_family : family -> couple -> descend -> Digest.t;
 value reconstitute_date : config -> string -> option date;
 value print_date : config -> base -> string -> string -> option date -> unit;
 
-value print_simple_person :
-  config -> base -> string -> (string * string * int * create) -> unit
-;
+value print_simple_person : config -> base -> string -> key -> unit;
 
 value print_src : config -> string -> string -> unit;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 3.15 2000-09-14 14:04:03 ddr Exp $ *)
+(* $Id: updateFam.ml,v 3.16 2000-11-18 09:52:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -22,7 +22,7 @@ value person_key base ip =
   let occ =
     if first_name = "?" || surname = "?" then Adef.int_of_iper ip else p.occ
   in
-  (first_name, surname, occ, Update.Link)
+  (first_name, surname, occ, Update.Link, "")
 ;
 
 value string_family_of base fam cpl des =
@@ -104,7 +104,7 @@ value print_death conf var create verbose =
   return ()
 ;
 
-value print_parent_person conf base var (first_name, surname, occ, create) =
+value print_parent_person conf base var (first_name, surname, occ, create, _) =
   do tag "table" "border=1" begin
        tag "tr" begin
          tag "td" begin
@@ -160,7 +160,7 @@ value print_parent_person conf base var (first_name, surname, occ, create) =
   return ()
 ;
 
-value print_child_person conf base var (first_name, surname, occ, create) =
+value print_child_person conf base var (first_name, surname, occ, create, _) =
   tag "table" "border=1" begin
     tag "tr" begin
       tag "td" begin
@@ -267,7 +267,7 @@ value print_witness conf base var key =
 value print_witnesses conf base fam =
   let witnesses =
     match Array.to_list fam.witnesses with
-    [ [] -> let t = ("", "", 0, Update.Create Neuter None) in [t; t]
+    [ [] -> let t = ("", "", 0, Update.Create Neuter None, "") in [t; t]
     | ipl -> ipl ]
   in
   do tag "h4" begin
@@ -369,17 +369,17 @@ value print_child conf base cnt n =
 value print_children conf base des cpl force_children_surnames =
   let children =
     match Array.to_list des.children with
-    [ [] -> [("", "", 0, Update.Create Neuter None)]
+    [ [] -> [("", "", 0, Update.Create Neuter None, "")]
     | ipl ->
-        let (_, father_surname, _, _) = cpl.father in
+        let (_, father_surname, _, _, _) = cpl.father in
         List.map
-          (fun (first_name, surname, occ, create) ->
+          (fun (first_name, surname, occ, create, var) ->
              let surname =
                if not force_children_surnames && surname = father_surname then
                  ""
                else surname
              in
-             (first_name, surname, occ, create))
+             (first_name, surname, occ, create, var))
           ipl ]
   in
   do stag "h4" begin
@@ -615,18 +615,18 @@ value print_add conf base =
           if p.sex = Male
           || p.sex = Neuter && p_getenv conf.env "sex" = Some "M" then
             person_key base p.cle_index
-          else ("", "", 0, Update.Create Male None)
+          else ("", "", 0, Update.Create Male None, "")
         in
         let moth =
           if p.sex = Female
           || p.sex = Neuter && p_getenv conf.env "sex" = Some "F" then
             person_key base p.cle_index
-          else ("", "", 0, Update.Create Female None)
+          else ("", "", 0, Update.Create Female None, "")
         in
         (fath, moth)
     | None ->
-        (("", "", 0, Update.Create Male None),
-         ("", "", 0, Update.Create Female None)) ]
+        (("", "", 0, Update.Create Male None, ""),
+         ("", "", 0, Update.Create Female None, "")) ]
   in
   let fam =
     {marriage = Adef.codate_None; marriage_place = "";
@@ -653,12 +653,12 @@ value print_add_parents conf base =
          comment = ""; origin_file = ""; fsources = default_source conf;
          fam_index = bogus_family_index}
       and cpl =
-        {father = ("", sou base p.surname, 0, Update.Create Neuter None);
-         mother = ("", "", 0, Update.Create Neuter None)}
+        {father = ("", sou base p.surname, 0, Update.Create Neuter None, "");
+         mother = ("", "", 0, Update.Create Neuter None, "")}
       and des =
         {children =
            [| (sou base p.first_name, sou base p.surname, p.occ,
-               Update.Link) |]}
+               Update.Link, "") |]}
       in
       print_add1 conf base fam cpl des True
   | _ -> incorrect_request conf ]

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateIndOk.ml,v 3.17 2000-11-11 20:29:50 ddr Exp $ *)
+(* $Id: updateIndOk.ml,v 3.18 2000-11-18 09:52:02 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -124,7 +124,7 @@ value reconstitute_relation_parent conf var key sex =
         [ "create" -> Update.Create sex None
         | _ -> Update.Link ]
       in
-      Some (fn, sn, occ, create) ]
+      Some (fn, sn, occ, create, var ^ "_" ^ key) ]
 ;
 
 value reconstitute_relation conf var =
@@ -456,60 +456,6 @@ value update_relation_parents base op np =
   List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
 ;
 
-value rec enrich_relation pos lrel =
-  let enrich_rel pos rel =
-    let prefix = "r" ^ string_of_int pos in
-    let r_fath_typ = Update.R_father pos in
-    let r_moth_typ = Update.R_mother pos in
-    { r_type = rel.r_type;
-      r_fath = match rel.r_fath with
-               [ Some key -> Some (r_fath_typ, key)
-               | None -> None ];
-      r_moth = match rel.r_moth with
-               [ Some key -> Some (r_moth_typ, key)
-               | None -> None ];
-      r_sources = rel.r_sources }
-  in
-  match lrel with
-  [ [] -> []
-  | [ head :: lrest ] ->
-      [ enrich_rel pos head :: enrich_relation (pos + 1) lrest ]
-  ]
-;
-
-value enrich_person sp =
-  { first_name = sp.first_name;
-    surname = sp.surname;
-    occ = sp.occ;
-    image = sp.image;
-    aliases = sp.aliases;
-    first_names_aliases = sp.first_names_aliases;
-    surnames_aliases = sp.surnames_aliases;
-    public_name = sp.public_name;
-    qualifiers = sp.qualifiers;
-    titles = sp.titles;
-    rparents = enrich_relation 1 sp.rparents;
-    related = sp.related;
-    occupation = sp.occupation;
-    sex = sp.sex;
-    access = sp.access;
-    birth = sp.birth;
-    birth_place = sp.birth_place;
-    birth_src = sp.birth_src;
-    baptism = sp.baptism;
-    baptism_place = sp.baptism_place;
-    baptism_src = sp.baptism_src;
-    death = sp.death;
-    death_place = sp.death_place;
-    death_src = sp.death_src;
-    burial = sp.burial;
-    burial_place = sp.burial_place;
-    burial_src = sp.burial_src;
-    notes = sp.notes;
-    psources = sp.psources;
-    cle_index = sp.cle_index }
-;
-
 value effective_mod conf base sp =
   let pi = sp.cle_index in
   let op = poi base pi in
@@ -534,7 +480,7 @@ value effective_mod conf base sp =
   let created_p = ref [] in
   let np =
     map_person_ps (Update.insert_person conf base sp.psources created_p)
-      (Update.insert_string conf base) (enrich_person sp)
+      (Update.insert_string conf base) sp
   in
   do np.related := op.related; return
   let op_misc_names = person_misc_names base op in
@@ -558,7 +504,7 @@ value effective_add conf base sp =
   let created_p = ref [] in
   let np =
     map_person_ps (Update.insert_person conf base sp.psources created_p)
-      (Update.insert_string conf base) (enrich_person sp)
+      (Update.insert_string conf base) sp
   in
   let na = {parents = None; consang = Adef.fix (-1)} in
   let nu = {family = [| |]} in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 3.20 2000-10-29 15:02:19 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 3.21 2000-11-18 09:52:01 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -34,7 +34,7 @@ value reconstitute_somebody conf var =
     [ "create" -> Update.Create Neuter None
     | _ -> Update.Link ]
   in
-  (first_name, surname, occ, create)
+  (first_name, surname, occ, create, var)
 ;
 
 value reconstitute_parent_or_child conf var default_surname =
@@ -62,7 +62,7 @@ value reconstitute_parent_or_child conf var default_surname =
     [ "create" -> Update.Create sex (Some create_info)
     | _ -> Update.Link ]
   in
-  (first_name, surname, occ, create)
+  (first_name, surname, occ, create, var)
 ;
 
 value insert_child conf (children, ext) i =
@@ -72,13 +72,13 @@ value insert_child conf (children, ext) i =
       let children =
         loop children n where rec loop children n =
           if n > 0 then 
-            let new_child = ("", "", 0, Update.Create Neuter None) in
+            let new_child = ("", "", 0, Update.Create Neuter None, "") in
             loop [new_child :: children] (n - 1)
           else children
       in
       (children, True)
   | (Some "on", _) ->
-      let new_child = ("", "", 0, Update.Create Neuter None) in
+      let new_child = ("", "", 0, Update.Create Neuter None, "") in
       ([new_child :: children], True)
   | _ -> (children, ext) ]
 ;
@@ -105,7 +105,7 @@ value reconstitute_family conf =
           let (witnesses, ext) = loop (i + 1) ext in
           match p_getenv conf.env ("ins_witn" ^ string_of_int i) with
           [ Some "on" ->
-              let new_witn = ("", "", 0, Update.Create Neuter None) in
+              let new_witn = ("", "", 0, Update.Create Neuter None, "") in
               ([c; new_witn :: witnesses], True)
           | _ -> ([c :: witnesses], ext) ]
       | None -> ([], ext) ]
@@ -113,7 +113,7 @@ value reconstitute_family conf =
   let (witnesses, ext) =
     match p_getenv conf.env "ins_witn0" with
     [ Some "on" ->
-        let new_witn = ("", "", 0, Update.Create Neuter None) in
+        let new_witn = ("", "", 0, Update.Create Neuter None, "") in
         ([new_witn :: witnesses], True)
     | _ -> (witnesses, ext) ]
   in
@@ -170,7 +170,7 @@ value reconstitute_family conf =
 value strip_array_persons pl =
   let pl =
     List.fold_right
-      (fun ((f, s, o, c) as p) pl -> if f = "" then pl else [p :: pl])
+      (fun ((f, s, o, c, _) as p) pl -> if f = "" then pl else [p :: pl])
       (Array.to_list pl) []
   in
   Array.of_list pl
@@ -311,36 +311,6 @@ value update_related_witnesses base ofam_witn nfam_witn ncpl =
   List.iter (fun (ip, p) -> base.func.patch_person ip p) mod_ippl
 ;
 
-value enrich_witness i key =
-  (Update.Witness (i + 1), key) 
-;
-
-value enrich_family sfam =
-  { marriage = sfam.marriage;
-    marriage_place = sfam.marriage_place;
-    marriage_src = sfam.marriage_src;
-    witnesses = Array.mapi enrich_witness sfam.witnesses;
-    relation = sfam.relation;
-    divorce = sfam.divorce;
-    comment = sfam.comment;
-    origin_file = sfam.origin_file;
-    fsources = sfam.fsources;
-    fam_index = sfam.fam_index }
-;
-
-value enrich_couple scpl =
-  { father = (Update.Father, scpl.father);
-    mother = (Update.Mother, scpl.mother) }
-;
-
-value enrich_child i key =
-  (Update.Child (i + 1), key) 
-;
-
-value enrich_descend sdes =
-  { children = Array.mapi enrich_child sdes.children }
-;
-
 value effective_mod conf base sfam scpl sdes =
   let fi = sfam.fam_index in
   let ofam = foi base fi in
@@ -353,16 +323,14 @@ value effective_mod conf base sfam scpl sdes =
     | None -> "" ]
   in
   let ncpl =
-    map_couple_p (Update.insert_person conf base psrc created_p)
-      (enrich_couple scpl)
+    map_couple_p (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)
-      (Update.insert_string conf base) (enrich_family sfam)
+      (Update.insert_string conf base) sfam
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base psrc created_p)
-      (enrich_descend sdes)
+    map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
   let nfath = poi base ncpl.father in
   let nmoth = poi base ncpl.mother in
@@ -455,16 +423,14 @@ value effective_add conf base sfam scpl sdes =
     | None -> "" ]
   in
   let ncpl =
-    map_couple_p (Update.insert_person conf base psrc created_p)
-      (enrich_couple scpl)
+    map_couple_p (Update.insert_person conf base psrc created_p) scpl
   in
   let nfam =
     map_family_ps (Update.insert_person conf base psrc created_p)
-      (Update.insert_string conf base) (enrich_family sfam)
+      (Update.insert_string conf base) sfam
   in
   let ndes =
-    map_descend_p (Update.insert_person conf base psrc created_p)
-      (enrich_descend sdes)
+    map_descend_p (Update.insert_person conf base psrc created_p) sdes
   in
   let origin_file = infer_origin_file conf base fi ncpl ndes in
   let nfath_p = poi base ncpl.father in
@@ -719,7 +685,7 @@ value print_add o_conf base =
           do strip_family sfam sdes; return
           let (fam, cpl, des) = effective_add conf base sfam scpl sdes in
           let wl = all_checks_family conf base fam cpl des in
-          let ((fn, sn, occ, _), act) =
+          let ((fn, sn, occ, _, _), act) =
             match p_getint conf.env "i" with
             [ Some i ->
                 if Adef.int_of_iper cpl.mother = i then (scpl.mother, "af")
@@ -730,7 +696,7 @@ value print_add o_conf base =
                       let p = base.data.persons.get i in
                       let key =
                         (sou base p.first_name, sou base p.surname, p.occ,
-                         Update.Link)
+                         Update.Link, "")
                       in
                       (key, "aa")
                   | _ -> (scpl.father, "af") ]
@@ -808,7 +774,7 @@ value print_mod o_conf base =
   let callback sfam scpl sdes =
     let (fam, cpl, des) = effective_mod conf base sfam scpl sdes in
     let wl = all_checks_family conf base fam cpl des in
-    let (fn, sn, occ, _) =
+    let (fn, sn, occ, _, _) =
       match p_getint conf.env "ip" with
       [ Some i when Adef.int_of_iper cpl.mother = i -> scpl.mother
       | _ -> scpl.father ]
