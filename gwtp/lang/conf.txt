@@ -1,6 +1,7 @@
+<html>
 <head>
   <!-- Copyright (c) 1998-2005 INRIA - GeneWeb -->
-  <!-- $Id: conf.txt,v 1.13 2004-12-14 09:53:16 ddr Exp $ -->
+  <!-- $Id: conf.txt,v 1.14 2005-01-09 01:41:29 ddr Exp $ -->
   <title>Gwtp - [
 de: Konfiguration
 en: configuration
@@ -310,3 +311,8 @@ fr: Modifier
 it: Modificare
 ]">
 </form>
+
+<p><hr><div align=right>
+<a href="%s?m=MAIN;b=%b;t=%t;lang=%l">[main page]</a></div>
+</body>
+</html>
