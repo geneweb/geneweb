@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.27 2000-08-26 10:01:49 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.28 2000-08-31 17:57:58 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -939,6 +939,24 @@ value decode_title s =
   (title, place, nth)
 ;
 
+value list_of_string s =
+  loop 0 0 [] where rec loop i len list =
+    if i == String.length s then List.rev [Buff.get len :: list]
+    else
+      match s.[i] with
+      [ ',' -> loop (i + 1) 0 [Buff.get len :: list]
+      | c -> loop (i + 1) (Buff.store len c) list ]
+;
+
+value purge_list list =
+  List.fold_right
+    (fun s list ->
+       match strip_spaces s with
+       [ "" -> list
+       | s -> [s :: list] ])
+    list []
+;
+
 value decode_date_interval pos s =
   let strm = Stream.of_string s in
   try
@@ -1145,17 +1163,21 @@ value add_indi gen r =
         | None -> "" ]
     | None -> "" ]
   in
-  let surname_alias =
+  let surname_aliases =
     match name_sons with
     [ Some n ->
         match find_field "SURN" n.rsons with
         [ Some r ->
-            let x =
-              if lowercase_surnames.val then lowercase_name r.rval else r.rval
-            in
-            if x <> surname then x else ""
-        | _ -> "" ]
-    | None -> "" ]
+            let list = purge_list (list_of_string r.rval) in
+            List.fold_right
+              (fun x list ->
+                 let x =
+                   if lowercase_surnames.val then lowercase_name x else x
+                 in
+                 if x <> surname then [x :: list] else list)
+              list []
+        | _ -> [] ]
+    | None -> [] ]
   in
   let aliases =
     match find_all_fields "NAME" r.rsons with
@@ -1362,8 +1384,7 @@ value add_indi gen r =
      nick_names = if nick_name <> "" then [add_string gen nick_name] else [];
      aliases = List.map (add_string gen) aliases;
      first_names_aliases = List.map (add_string gen) first_names_aliases;
-     surnames_aliases =
-       if surname_alias <> "" then [add_string gen surname_alias] else [];
+     surnames_aliases = List.map (add_string gen) surname_aliases;
      titles = titles; rparents = rparents; related = [];
      occupation = add_string gen occupation;
      sex = sex;

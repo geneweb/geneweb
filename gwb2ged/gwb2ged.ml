@@ -1,4 +1,4 @@
-(* $Id: gwb2ged.ml,v 3.12 2000-08-29 15:34:02 ddr Exp $ *)
+(* $Id: gwb2ged.ml,v 3.13 2000-08-31 17:58:01 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -137,6 +137,13 @@ value ged_1st_name base p =
   | [] -> fn ]
 ;
 
+value string_of_list =
+  loop "" where rec loop r =
+    fun
+    [ [s :: l] -> if r = "" then loop s l else loop (r ^ "," ^ s) l
+    | [] -> r ]
+;
+
 value ged_name base oc per =
   do Printf.fprintf oc "1 NAME %s /%s/\n" (encode (ged_1st_name base per))
        (encode (sou base per.surname));
@@ -146,8 +153,10 @@ value ged_name base oc per =
      [ [nn :: _] -> Printf.fprintf oc "2 NICK %s\n" (encode (sou base nn))
      | [] -> () ];
      match per.surnames_aliases with
-     [ [n :: _] -> Printf.fprintf oc "2 SURN %s\n" (encode (sou base n))
-     | [] -> () ];
+     [ [] -> ()
+     | list ->
+         let list = List.map (fun n -> encode (sou base n)) list in
+         Printf.fprintf oc "2 SURN %s\n" (string_of_list list) ];
      List.iter
        (fun s ->
           Printf.fprintf oc "1 NAME %s\n" (encode (sou base s)))
