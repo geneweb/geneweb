@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.3 2001-05-09 07:59:36 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.4 2001-05-15 13:24:46 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -28,14 +28,13 @@ value person_key base ip =
 value string_family_of base fam cpl des =
   let sfam = Gutil.map_family_ps (person_key base) (sou base) fam in
   let scpl = Gutil.map_couple_p (person_key base) cpl in
-  let sdes = Gutil.map_descend_p (person_key base) des in (sfam, scpl, sdes)
+  let sdes = Gutil.map_descend_p (person_key base) des in
+  (sfam, scpl, sdes)
 ;
 
 value print_birth conf var create verbose =
   do {
-    tag "td" begin
-      Wserver.wprint "%s" (capitale (transl conf "birth"));
-    end;
+    tag "td" begin Wserver.wprint "%s" (capitale (transl conf "birth")); end;
     tag "td" begin
       Wserver.wprint "<input name=%sb_yyyy size=5 maxlength=5%s>-\n" var
         (match create with
@@ -56,9 +55,7 @@ value print_birth conf var create verbose =
          | _ -> "" ]);
     end;
     if verbose then
-      tag "td" begin
-        Wserver.wprint "%s" (capitale (transl conf "place"));
-      end
+      tag "td" begin Wserver.wprint "%s" (capitale (transl conf "place")); end
     else ();
     tag "td" "colspan=2" begin
       Wserver.wprint "<input name=%sb_pl size=20 maxlength=200%s>\n" var
@@ -66,15 +63,13 @@ value print_birth conf var create verbose =
          [ Update.Create _ (Some (_, pl, _, _)) when pl <> "" ->
              " value=\"" ^ quote_escaped pl ^ "\""
          | _ -> "" ]);
-    end;
+    end
   }
 ;
 
 value print_death conf var create verbose =
   do {
-    tag "td" begin
-      Wserver.wprint "%s" (capitale (transl conf "death"));
-    end;
+    tag "td" begin Wserver.wprint "%s" (capitale (transl conf "death")); end;
     tag "td" begin
       Wserver.wprint "<input name=%sd_yyyy size=5 maxlength=5%s>-\n" var
         (match create with
@@ -95,9 +90,7 @@ value print_death conf var create verbose =
          | _ -> "" ]);
     end;
     if verbose then
-      tag "td" begin
-        Wserver.wprint "%s" (capitale (transl conf "place"));
-      end
+      tag "td" begin Wserver.wprint "%s" (capitale (transl conf "place")); end
     else ();
     tag "td" "colspan=2" begin
       Wserver.wprint "<input name=%sd_pl size=20 maxlength=200%s>\n" var
@@ -105,7 +98,7 @@ value print_death conf var create verbose =
          [ Update.Create _ (Some (_, _, _, pl)) when pl <> "" ->
              " value=\"" ^ quote_escaped pl ^ "\""
          | _ -> "" ]);
-    end;
+    end
   }
 ;
 
@@ -123,7 +116,8 @@ value
           Wserver.wprint " value=\"%s\">" (quote_escaped first_name);
         end;
         tag "td" "align=right" begin
-          let s = capitale (transl conf "number") in Wserver.wprint "%s" s;
+          let s = capitale (transl conf "number") in
+          Wserver.wprint "%s" s;
         end;
         tag "td" begin
           Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
@@ -158,7 +152,7 @@ value
     tag "table" "border=1" begin
       tag "tr" begin print_birth conf var create True; end;
       tag "tr" begin print_death conf var create True; end;
-    end;
+    end
   }
 ;
 
@@ -174,7 +168,8 @@ value print_child_person conf base var (first_name, surname, occ, create, _) =
         Wserver.wprint " value=\"%s\">" (quote_escaped first_name);
       end;
       tag "td" "align=right" begin
-        let s = capitale (transl conf "number") in Wserver.wprint "%s" s;
+        let s = capitale (transl conf "number") in
+        Wserver.wprint "%s" s;
       end;
       tag "td" begin
         Wserver.wprint "<input name=%s_occ size=5 maxlength=8%s>" var
@@ -235,7 +230,7 @@ value print_father conf base cpl =
     end;
     Wserver.wprint "\n";
     print_parent_person conf base "him" cpl.father;
-    Wserver.wprint "\n";
+    Wserver.wprint "\n"
   }
 ;
 
@@ -246,7 +241,7 @@ value print_mother conf base cpl =
     end;
     Wserver.wprint "\n";
     print_parent_person conf base "her" cpl.mother;
-    Wserver.wprint "\n";
+    Wserver.wprint "\n"
   }
 ;
 
@@ -270,7 +265,9 @@ value print_witness conf base var key =
 value print_witnesses conf base fam =
   let witnesses =
     match Array.to_list fam.witnesses with
-    [ [] -> let t = ("", "", 0, Update.Create Neuter None, "") in [t; t]
+    [ [] ->
+        let t = ("", "", 0, Update.Create Neuter None, "") in
+        [t; t]
     | ipl -> ipl ]
   in
   do {
@@ -289,7 +286,7 @@ value print_witnesses conf base fam =
            })
         1 witnesses
     in
-    ();
+    ()
   }
 ;
 
@@ -335,7 +332,7 @@ value print_marriage conf base fam =
     end;
     Update.print_date conf base (capitale (transl conf "date")) "marriage"
       (Adef.od_of_codate fam.marriage);
-    Update.print_src conf "marr_src" fam.marriage_src;
+    Update.print_src conf "marr_src" fam.marriage_src
   }
 ;
 
@@ -363,7 +360,7 @@ value print_divorce conf base fam =
     Update.print_date conf base (capitale (transl conf "date")) "divorce"
       (match fam.divorce with
        [ Divorced d -> Adef.od_of_codate d
-       | _ -> None ]);
+       | _ -> None ])
   }
 ;
 
@@ -387,7 +384,7 @@ value print_child conf base cnt n =
     html_li conf;
     print_child_person conf base ("ch" ^ string_of_int cnt) n;
     html_li conf;
-    print_insert_child conf base cnt;
+    print_insert_child conf base cnt
   }
 ;
 
@@ -421,7 +418,7 @@ value print_children conf base des cpl force_children_surnames =
           children
       in
       ();
-    end;
+    end
   }
 ;
 
@@ -440,7 +437,7 @@ value print_comment conf base fam =
              | _ -> "" ]);
         end;
       end;
-    end;
+    end
   }
 ;
 
@@ -482,7 +479,7 @@ value print_source conf base field =
              | _ -> "" ]);
         end;
       end;
-    end;
+    end
   }
 ;
 
@@ -502,7 +499,7 @@ value print_family conf base fam cpl des force_children_surnames =
     Wserver.wprint "\n";
     print_children conf base des cpl force_children_surnames;
     Wserver.wprint "\n";
-    print_source conf base fam.fsources;
+    print_source conf base fam.fsources
   }
 ;
 
@@ -519,7 +516,7 @@ value merge_call conf =
     | _ -> () ];
     match p_getint conf.env "i2" with
     [ Some i2 -> Wserver.wprint "<input type=hidden name=i2 value=%d>\n" i2
-    | _ -> () ];
+    | _ -> () ]
   }
 ;
 
@@ -555,7 +552,7 @@ value print_mod1 conf base fam cpl des digest =
       Wserver.wprint "<input type=submit value=Ok>\n";
     end;
     Wserver.wprint "\n";
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -581,7 +578,7 @@ value print_del1 conf base fam =
       Wserver.wprint "<input type=submit value=Ok>\n";
     end;
     Wserver.wprint "\n";
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -618,7 +615,7 @@ value print_swi1 conf base p fam1 fam2 =
       Wserver.wprint "<input type=submit value=Ok>\n";
     end;
     Wserver.wprint "\n";
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -642,7 +639,7 @@ value print_add1 conf base fam cpl des force_children_surnames =
       Wserver.wprint "<input type=submit value=Ok>\n";
     end;
     Wserver.wprint "\n";
-    trailer conf;
+    trailer conf
   }
 ;
 
@@ -713,7 +710,8 @@ value print_mod conf base =
 value print_del conf base =
   match p_getint conf.env "i" with
   [ Some i ->
-      let fam = foi base (Adef.ifam_of_int i) in print_del1 conf base fam
+      let fam = foi base (Adef.ifam_of_int i) in
+      print_del1 conf base fam
   | _ -> incorrect_request conf ]
 ;
 
