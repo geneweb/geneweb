@@ -1,12 +1,12 @@
 
 [
-de: Willkommen zu GeneWeb $q
-en: Welcome to GeneWeb $q
-es: Bienvenido a GeneWeb $q
-fr: Bienvenue dans GeneWeb $q
-it: Benvenuti su GeneWeb $q
-lv: Sveicinaati GeneWeb $q Ghenealoghijas datu baazee
-sv: V„lkommen till GeneWeb $q
+de: Willkommen zu GeneWeb %q
+en: Welcome to GeneWeb %q
+es: Bienvenido a GeneWeb %q
+fr: Bienvenue dans GeneWeb %q
+it: Benvenuti su GeneWeb %q
+lv: Sveicinaati GeneWeb %q Ghenealoghijas datu baazee
+sv: V„lkommen till GeneWeb %q
 ]
 
 [
@@ -15,8 +15,8 @@ en: Go to your Web browser and open one of the following addresses:
 fr: Allez dans votre navigateur Web et ouvrez une des adresses suivantes:
 it: Lanciate il vostro navigatore Web e aprite uno dei seguenti indirizzi:
 ]
-       http://127.0.0.1:$z/
-       http://localhost:$z/
+       http://127.0.0.1:%z/
+       http://localhost:%z/
 
 [
 de: Warnung: Damit dieses Programm funktioniert, darfst Du dieses 
@@ -24,7 +24,7 @@ de: Warnung: Damit dieses Programm funktioniert, darfst Du dieses
 en: Warning: for this program to work, you must not close this window!
 fr: Attention: pour que cela fonctionne, vous ne devez pas fermer cette
     fenetre!
-it: Attenzione! Per poter navigare nella base, non dovete chiudere questa
+it: Attenzione! Per poter navigare nella base, non dovete mai chiudere questa
     finestra!
 lv: Uzmaniibu: lai shii programma darbotos Juus nedriigstat aizveert sho logu!
 sv: Varning: f”r att det h„r programmet ska fungera, f†r du inte st„nga
@@ -48,7 +48,7 @@ fr: Si aucune de ces adresses ne fonctionne, il se peut que vous ayez …
     configurer dans votre navigateur des options du genre "travailler hors
     connexion" ou "ne pas utiliser de proxy pour les adresses locales" ou
     "ne pas se connecter sur internet pour l'adresse 'localhost'".
-it: Se nessuno dei due indirizzi funziona, forse egrave; a causa del fatto
+it: Se nessuno dei due indirizzi funziona, forse Š a causa del fatto
     che avete configurato nel vostro navigatore un'opzione del genere
     "lavorare off-line" oppure "non utilizzare il proxy per gli indirizzi
     locali" o "non collegarsi ad internet per l'indirizzo "localhost".

@@ -1,6 +1,6 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: conf.txt,v 1.3 2002-06-18 07:13:05 ddr Exp $ -->
+  <!-- $Id: conf.txt,v 1.4 2002-06-27 09:46:46 ddr Exp $ -->
   <title>Gwtp - [
 en: configuration
 fr: configuration
@@ -35,14 +35,14 @@ it: Password amico:
 <tr><td>[
 en: Wizard password:
 fr: Mot de passe magicien:
-it: Password mago
+it: Password Wizard:
 ]
 <td><input name=wizard_passwd value="%vwizard_passwd;"><br>
 </table>
 [
 en: Default language:
 fr: Langue par défaut:
-it: Lingua per difetto:
+it: Lingua standard:
 ]
 <select name="default_lang">
 <option value=""%edefault_lang=;><tt>-</tt>
@@ -89,7 +89,7 @@ it: Esperanto
 <option value="et"%edefault_lang=et;>[
 en: Estonian
 fr: Estonien
-it: Estoniano
+it: Estone
 ]
 <option value="fi"%edefault_lang=fi;>[
 en: Finnish
@@ -119,7 +119,7 @@ it: Italiano
 <option value="lv"%edefault_lang=lv;>[
 en: Latvian
 fr: Letton
-it: Léttone
+it: Lettone
 ]
 <option value="no"%edefault_lang=no;>[
 fr: Norwegian
@@ -139,7 +139,7 @@ it: Portoghese
 <option value="pt-br"%edefault_lang=pt-br;>[
 en: Brazilian
 fr: Brésilien
-it: Brasiliano
+it: Portoghese-Brasiliano
 ]
 <option value="es"%edefault_lang=es;>[
 en: Spanish
@@ -154,6 +154,7 @@ it: Russo
 <option value="sl"%edefault_lang=sl;>[
 en: Slovenian
 fr: Slovène
+it: Sloveno
 ]
 <option value="sv"%edefault_lang=sv;>[
 en: Swedish
@@ -173,6 +174,7 @@ it: Cinese
 [
 en: Body tag property:
 fr: Propriété "body tag":
+it: Proprietà "body tag":
 ]
 <input name=body_prop value="%vbody_prop;" size=50><br>
 
@@ -248,7 +250,7 @@ it: no
 [
 en: Wizard just friend (for temporary update)
 fr: Magiciens seulement amis (pour mises à jour temporaires):
-it: Maghi solo amici (per aggiornamenti temporanei):
+it: Wizard solo amico (per aggiornamenti temporanei):
 ]
 <input type=radio name=wizard_just_friend
  value=yes%cwizard_just_friend=yes;>[
@@ -292,7 +294,7 @@ it: Se volete che tutti siano "amico", cancellate la password amico.
 <li>[
 en: Keep an non-empty and not too simple wizard password.
 fr: Choisissez un mot de passe "magicien" non vide et pas trop simple.
-it: Scegliete una password "mago" non vuota e non troppo facile.
+it: Scegliete una password "Wizard" non vuota e non troppo facile.
 ]
 
 <li>[
@@ -304,7 +306,7 @@ it: Non verificato: vi assumete tutte le responsabilità.
 <li>[
 en: If you don't know, keep the proposed passwords.
 fr: Si vous ne savez pas, gardez les mots de passe proposés.
-it: Se non ne sapete, tenete le password proposte.
+it: Se non ne sapete, usate le password proposte.
 ]
 
 </ul>

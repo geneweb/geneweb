@@ -1,6 +1,6 @@
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: send.txt,v 1.2 2002-06-18 07:13:05 ddr Exp $ -->
+  <!-- $Id: send.txt,v 1.3 2002-06-27 09:46:46 ddr Exp $ -->
   <title>Gwtp - upload %b</title>
 </head>
 <body>
@@ -21,7 +21,7 @@ en: From your local GeneWeb database directory (<em>%b.gwb</em> for the
     base named <em>%b</em>):
 fr: À partir du répertoire de votre base de données GeneWeb locale
     (<em>%b.gwb</em> pour la base nommée <em>%b</em>):
-it: A partire dalla directory della vostra base di dati  GeneWeb locale
+it: A partire dalla directory della vostra base di dati GeneWeb locale
     (<em>%b.gwb</em> per la base chiamata <em>%b</em>):
 ]<br><p>
 
