@@ -5,6 +5,7 @@ GeneWeb Version 4.04
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [28 Sep 01] Macros in places displaying.
   - [27 Sep 01] Added "%image_txt;" as variable in perso.txt. Return the
     person key used as default image name.
   - [19 Sep 01] Shorter names for variables in update family form, in order
