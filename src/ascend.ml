@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.48 2004-12-31 03:59:53 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.49 2005-01-15 20:00:20 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Config;
@@ -93,7 +93,7 @@ value print_choice conf base p effective_level =
     end;
     tag "table" "border=\"%d\" width=\"100%%\"" conf.border begin
       tag "tr" begin
-        tag "td" begin
+        tag "td" "align=\"left\"" begin
           xtag "input"
             "type=\"radio\" name=\"t\" value=\"N\" checked=\"checked\"";
           Wserver.wprint " %s (*)" (capitale (transl conf "short display"));
@@ -133,12 +133,14 @@ type=\"checkbox\" name=\"notes\" value=\"on\" checked=\"checked\"";
           Wserver.wprint "- %s\n" (capitale (transl conf "border"));
           xtag "input" "name=\"bd\" size=\"1\" maxlength=\"2\" value=\"0\"";
           xtag "br";
-          tag "table" begin
+          tag "table" "cellspacing=\"0\" cellpadding=\"0\" border=\"%d\""
+            conf.border
+          begin
             tag "tr" begin
-              stagn "td" begin
+              stagn "td" "align=\"left\"" begin
                 Wserver.wprint "-&nbsp;%s" (capitale (transl conf "color"));
               end;
-              stagn "td" begin
+              stagn "td" "align=\"left\"" begin
                 xtag "input" "\
 type=\"radio\" name=\"color\" value=\"\" checked=\"checked\"";
               end;
@@ -152,7 +154,7 @@ type=\"radio\" name=\"color\" value=\"\" checked=\"checked\"";
             end;
           end;
         end;
-        tag "td" "valign=\"top\"" begin
+        tag "td" "align=\"left\" valign=\"top\"" begin
           xtag "input" "type=\"radio\" name=\"t\" value=\"L\"";
           Wserver.wprint "%s"
             (capitale (transl_nth conf "list/list (ancestors)" 1));
