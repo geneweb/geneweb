@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 2.16 1999-05-10 15:45:57 ddr Exp $ *)
+(* $Id: ascend.ml,v 2.17 1999-05-16 03:55:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -700,10 +700,11 @@ value print_notes conf base =
 value afficher_ascendants_numerotation_long conf base niveau_max p =
   let mark = Array.create (base.data.persons.len) Num.zero in
   let rec get_generations niveau gpll gpl =
-    if niveau <= niveau_max then
+    let gpll = [gpl :: gpll] in
+    if niveau < niveau_max then
       let next_gpl = next_generation base mark gpl in
       if List.exists will_print next_gpl then
-        get_generations (niveau + 1) [gpl :: gpll] next_gpl
+        get_generations (niveau + 1) gpll next_gpl
       else gpll
     else gpll
   in
@@ -719,9 +720,7 @@ value afficher_ascendants_numerotation_long conf base niveau_max p =
            Wserver.wprint "<p>";
            html_br conf;
         return
-        if List.exists will_print gpl then
-          generation (niveau + 1) all_gp gpll
-        else ()
+        generation (niveau + 1) all_gp gpll
     | [] -> () ]
   in
   let title h =
