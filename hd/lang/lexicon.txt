@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.76 2000-03-14 09:22:02 ddr Exp $
+# $Id: lexicon.txt,v 3.77 2000-03-15 09:49:05 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -5411,6 +5411,7 @@ se: totalt
 de: Baum
 dk: tr&aelig;
 en: tree
+es: ·rbol
 fi: puu
 fr: arbre
 he:  ‡ı
