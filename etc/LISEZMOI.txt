@@ -1,4 +1,4 @@
-GeneWeb 2.07
+GeneWeb 3.00
 
 Pour demarrer avec GeneWeb, suivez les instructions suivantes:
 
