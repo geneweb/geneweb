@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.15 2000-11-10 12:02:22 ddr Exp $ *)
+(* $Id: forum.ml,v 3.16 2000-11-14 14:57:34 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Util;
@@ -168,11 +168,12 @@ value get_message conf pos =
           let (subject, s) = get_var ic "Subject:" s in
           let (_, s) = get_var ic "Text:" s in
           let (mess, s) =
-            get_mess [] s where rec get_mess sl s =
+            get_mess 0 s where rec get_mess len s =
               if String.length s >= 2 && s.[0] = ' ' && s.[1] = ' ' then
                 let s = String.sub s 2 (String.length s - 2) in
-                get_mess [s :: sl] (input_line ic)
-              else (List.rev sl, s)
+                let len = if len = 0 then len else Buff.store len '\n' in
+                get_mess (Buff.mstore len s) (input_line ic)
+              else (Buff.get len, s)
           in
           if ident <> "" then
             Some (time, ident, email, subject, mess, ic_len - pos_in ic)
@@ -223,13 +224,16 @@ value print_forum_message conf base pos =
          else
            Wserver.wprint
              "<table cellspacing=0 cellpadding=0><tr><td>\n";
-         List.iter
-           (fun s ->
-              do if s = "" then Wserver.wprint "<p>"
-                 else copy_string_with_macros conf s;
-                 Wserver.wprint "\n";
-              return ())
-           mess;
+         let mess =
+           loop True 0 0 where rec loop last_was_eoln len i =
+             if i = String.length mess then Buff.get len
+             else if mess.[i] = '\n' && last_was_eoln then
+               loop False (Buff.mstore len "<p>\n") (i + 1)
+            else
+              loop (mess.[i] = '\n') (Buff.store len mess.[i]) (i + 1)
+         in
+         copy_string_with_macros conf mess;
+         Wserver.wprint "\n";
          if browser_doesnt_have_tables conf then ()
          else Wserver.wprint "</table>";
          Wserver.wprint "</dl>\n";
