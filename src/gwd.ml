@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.21 2002-01-12 14:20:55 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.22 2002-01-21 05:01:01 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -17,6 +17,7 @@ value wizard_just_friend = ref False;
 value only_address = ref "";
 value cgi = ref False;
 value default_lang = ref "fr";
+value setup_link = ref False;
 value choose_browser_lang = ref False;
 value images_dir = ref "";
 value log_file = ref "";
@@ -908,6 +909,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
          try List.assoc "public_if_titles" base_env = "yes" with
          [ Not_found -> False ];
        cancel_links = cancel_links;
+       setup_link = setup_link.val;
        access_by_key =
          try List.assoc "access_by_key" base_env = "yes" with
          [ Not_found -> False ];
@@ -1338,6 +1340,7 @@ value read_input len =
 ;
 
 value arg_parse_in_file fname speclist anonfun errmsg =
+let _ = do { Printf.eprintf "arg file = %s\n" fname; flush stderr; } in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let list =
@@ -1448,6 +1451,8 @@ value main () =
        ("-p", Arg.Int (fun x -> selected_port.val := x),
         "<number>\n       Select a port number (default = " ^
           string_of_int selected_port.val ^ "); > 1024 for normal users.");
+       ("-setup_link", Arg.Set setup_link,
+        "\n       Display a link to local gwsetup in bottom of pages.");
        ("-wizard", Arg.String (fun x -> wizard_passwd.val := x), "\
 <passwd>
        Set a wizard password: access to all dates and updating.");

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.10 2002-01-16 12:07:21 ddr Exp $ *)
+(* $Id: templ.ml,v 4.11 2002-01-21 05:01:01 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -539,8 +539,12 @@ value print_copyright conf base =
     [('s', fun _ -> commd conf);
      ('d',
       fun _ ->
-        if conf.cancel_links then ""
-        else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>")]
+        let s =
+          if conf.cancel_links then ""
+          else " - <a href=\"" ^ conf.indep_command ^ "m=DOC\">DOC</a>"
+        in
+        if not conf.setup_link then s
+        else s ^ " - " ^ Util.setup_link conf)]
   in
   match open_etc_file "copyr" with
   [ Some ic -> copy_from_etc env conf.indep_command ic

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.27 2002-01-17 06:15:53 ddr Exp $ *)
+(* $Id: setup.ml,v 4.28 2002-01-21 05:01:00 ddr Exp $ *)
 
 open Printf;
 
@@ -1385,10 +1385,13 @@ value gwd_1 conf =
   let oc = open_out (Filename.concat setup_dir.val "gwd.arg") in
   let print_param k =
     match p_getenv conf.env k with
-    [ Some v when v <> "" -> fprintf oc "-%s\n%s\n" k v
+    [ Some v when v <> "" -> fprintf oc "-%s\n%s" k v
     | _ -> () ]
   in
   do {
+    match p_getenv conf.env "setup_link" with
+    [ Some v -> fprintf oc "-setup_link\n"
+    | _ -> () ];
     print_param "hd";
     print_param "bd";
     print_param "p";
@@ -1587,8 +1590,7 @@ value set_gwd_default_language_if_absent lang =
              do {
                fprintf oc "-%s\n" k;
                if k = "lang" then lang_found.val := True else ();
-               fprintf oc "%s\n" v;
-               ()
+               if v <> "" then fprintf oc "%s\n" v else ();
              })
           env;
         if not lang_found.val then fprintf oc "-lang\n%s\n" lang

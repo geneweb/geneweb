@@ -51,38 +51,3 @@ sv: Om det inte fungerar, kanske du måste ställa in din webbläsare
     för lokala adresser" eller "anslut inte till Internet för adressen
     'localhost'".
 ]
-
-[
-de: Wenn du trotz all dieser Anstrengungen keinen Zugriff bekommst,
-    versuche es mit der klassischen Methode, die Dokumentation 
-    anzuschauen. Dazu beende dieses Programm, indem du Control-C 
-    (bzw. Strg-C) in diesem Fenster drückst, dann in das Verzeichnis
-    "gw" wechselst und die folgende Datei öffnest:
-en: If despite your efforts, it still does not answer, try the classical
-    procedure by looking at the documentation. For that, stop this program
-    by typing "control-c" in this window, go to the directory "gw" and
-    open the file:
-es: Si a pesar de todos sus esfuerzos, el problema no se resuelve, trate 
-    con  el método clásico indicado en la documentación. Para ello salga 
-    del programa escribiendo en el teclado "control-c" (en la ventana que 
-    se había abierto al lanzar el programa), vaya luego a la carpeta "gw" 
-    y habra el fichero:
-fr: Si malgré vos efforts, cela ne répond toujours pas, essayez la procédure
-    classique en regardant la documentation. Pour cela arrêtez ce programme
-    en tapant "control-c" dans cette fenêtre, allez dans le répertoire "gw"
-    et ouvrez le fichier:
-lv: Ja tomeer tas viss neliidz, meeghiniet kaa parasts skatiit programmas
-    aprakstu: izejiet no shiis programas nospiezhot "ctr-c" pie aktiiva
-    shii loga, aizejiet uz katalogu "gw" un atveriet datni:
-sv: Om det ändå inte fungerar fast du försökt på olika sätt, försök med det
-    klassiska att titta i dokumentationen. För att göra det, stoppa först
-    det här programmet genom att trycka "control-c" i detta fönster, gå
-    sedan till katalogen "gw" och öppna filen:
-]
-     INSTALL.htm
-
-[
-en: But you risk to meet the same problem a little bit further...
-fr: Mais... vous risquez de vous retrouver confronté au meme problême un
-    peu plus loin...
-]
