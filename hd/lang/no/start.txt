@@ -174,6 +174,7 @@ $INl</ul>
 <p>
 
 Det har v&aelig;rt %q aksesser, %c av dem til denne siden, siden %d.
+$Il<p>$E
 
 </td></tr>
 

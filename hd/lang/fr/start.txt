@@ -176,6 +176,7 @@ d&eacute;c&eacute;d&eacute;es</a>
 <p>
 
 Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
+$Il<p>$E
 
 </td></tr>
 

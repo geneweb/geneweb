@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo q_MLast.cmo *)
-(* $Id: pa_html.ml,v 3.0 1999-10-29 10:31:26 ddr Exp $ *)
+(* $Id: pa_html.ml,v 3.1 1999-10-30 19:50:25 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Pcaml;
@@ -12,10 +12,6 @@ value rec unfold_apply list =
 
 value tag_encloser loc tag newl a el =
   let s = if newl then "\n" else "" in
-  let fn =
-    if tag = "td" then <:expr< Util.wprint_with_enclosing_tags conf >>
-    else <:expr< Wserver.wprint >>
-  in
   let e =
     let (frm, al) =
       match a with
@@ -32,9 +28,9 @@ value tag_encloser loc tag newl a el =
       | None -> ("", []) ]
     in
     List.fold_left (fun f e -> <:expr< $f$ $e$ >>)
-      <:expr< $fn$ $str:"<" ^ tag ^ frm ^ ">" ^ s$ >> al
+      <:expr< Wserver.wprint $str:"<" ^ tag ^ frm ^ ">" ^ s$ >> al
   in
-  [e :: el @ [<:expr< $fn$ $str:"</" ^ tag ^ ">" ^ s$ >>]]
+  [e :: el @ [<:expr< Wserver.wprint $str:"</" ^ tag ^ ">" ^ s$ >>]]
 ;
 
 EXTEND

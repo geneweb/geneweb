@@ -175,6 +175,7 @@ $INl</ul>
 
 Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
 deze verwelkomingspagina.
+$Il<p>$E
 
 </td></tr>
 
