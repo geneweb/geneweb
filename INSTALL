@@ -22,11 +22,12 @@ INSTALLATIONS INSTRUCTIONS IN UNIX MACHINES
    and follow the instructions.
 
 
-INSTALLATIONS INSTRUCTIONS IN WINDOWS NT
+INSTALLATIONS INSTRUCTIONS IN WINDOWS NT/95/98
 
 You need:
 
-- The Cygnus interface.
+- The Cygnus GNU-Win32 development tool, free, available at:
+	http://www.cygnus.com/misc/gnu-win32/
 
 - The Microsoft Visual C++ compiler.
 
