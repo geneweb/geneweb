@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 4.26 2002-02-14 10:19:40 ddr Exp $ *)
+(* $Id: gwd.ml,v 4.27 2002-02-17 09:48:52 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -346,6 +346,7 @@ value print_renamed conf new_n =
   [ Some ic ->
       do {
         Util.html conf;
+        Util.nl ();
         Util.copy_from_etc env conf.lang conf.indep_command ic;
       }
   | None ->
@@ -387,6 +388,7 @@ value print_redirected conf from request new_addr =
     [ Some ic ->
         do {
           Util.html conf;
+          Util.nl ();
           Util.copy_from_etc env conf.lang conf.indep_command ic;
         }
     | None ->
@@ -410,10 +412,7 @@ value start_with_base conf bname =
   [ Left base ->
       do {
         try
-          do {
-            Family.family conf base (log_file.val, log_oc, flush_log);
-            Wserver.wflush ();
-          }
+          Family.family conf base (log_file.val, log_oc, flush_log)
         with exc ->
           do { base.func.cleanup (); raise exc };
         base.func.cleanup ();
@@ -462,6 +461,7 @@ value general_welcome conf =
       let env = [('w', fun _ -> Util.link_to_referer conf)] in
       do {
         Util.html conf;
+        Util.nl ();
         Util.copy_from_etc env conf.lang conf.indep_command ic;
       }
   | None -> propose_base conf ]

@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.29 2002-01-30 11:49:50 ddr Exp $ *)
+(* $Id: perso.ml,v 4.30 2002-02-17 09:48:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1471,6 +1471,7 @@ value print_ok conf base p =
   let astl = Templ.input conf "perso" in
   do {
     html conf;
+    nl ();
     interp_templ conf base p astl
   }
 ;

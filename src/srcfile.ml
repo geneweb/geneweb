@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 4.9 2002-02-14 10:19:40 ddr Exp $ *)
+(* $Id: srcfile.ml,v 4.10 2002-02-17 09:48:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -531,6 +531,7 @@ value gen_print with_logo mode conf base fname =
   [ Some ic ->
       do {
         Util.html conf;
+        Util.nl ();
         copy_from_channel conf base ic mode;
         Util.gen_trailer with_logo conf;
       }

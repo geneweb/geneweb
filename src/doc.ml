@@ -1,4 +1,4 @@
-(* $Id: doc.ml,v 4.1 2001-04-22 14:37:59 ddr Exp $ *)
+(* $Id: doc.ml,v 4.2 2002-02-17 09:48:52 ddr Exp $ *)
 
 open Config;
 
@@ -116,6 +116,7 @@ value print conf =
     [ Some ic ->
         do {
           Util.html conf;
+          Util.nl ();
           let s =
             let len = ref 0 in
             do {
