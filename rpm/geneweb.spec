@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 1.16 1999-09-22 09:27:00 ddr Exp $
+# $Id: geneweb.spec,v 1.17 1999-09-25 21:23:02 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -107,7 +107,6 @@ rm -rf /home/geneweb/gw /usr/doc/geneweb-%{version} /etc/rc.d/*/*gwd
 # then it automatically unpacks all the files and symlinks from the archive.
 # Finally it runs the %post script, in which I start the service.
 %pre
-/usr/sbin/groupadd geneweb
 /usr/sbin/useradd -d /home/geneweb -c "GeneWeb database" geneweb
 chmod a+rx /home/geneweb
 
@@ -158,7 +157,6 @@ chown -R geneweb.geneweb /home/geneweb/gw
 (rmdir /home/geneweb/gw/gw/setup/* >/dev/null 2>&1; exit 0)
 (rmdir /home/geneweb/gw/gw/setup >/dev/null 2>&1; exit 0)
 /usr/sbin/userdel geneweb
-/usr/sbin/groupdel geneweb
 
 # *********** THE FILES OWNED BY THIS .RPM *************
 # These are the files belonging to this package.  We have to list
