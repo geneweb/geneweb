@@ -42,6 +42,8 @@ GeneWeb version 4.05
     (sometimes just one of them work and not the other).
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [16 Feb 02] Added code to get all the sources from the gedcom to
+    the person's notes (code written by Ludovic Ledieu).
   - [23 Jan 02] Accept now some forms of incorrect dates which do not
     respect the gedcom standard (e.g. @#DJULIAN@ BEF 1580, which should
     be BEF @#DJULIAN@ 1580).
