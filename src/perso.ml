@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.9 2001-04-22 03:31:16 ddr Exp $ *)
+(* $Id: perso.ml,v 4.10 2001-04-28 18:37:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -281,6 +281,12 @@ and title_item =
    list (option date * option date))
 ;
 
+type variable_value =
+  [ VVsome of
+      (list (string * env) * (person * ascend * union * bool) * env * string)
+  | VVnone ]
+;
+
 value get_env v env = try List.assoc v env with [ Not_found -> Vnone ];
 
 value extract_var sini s =
@@ -314,7 +320,7 @@ value rec eval_variable conf base env sl =
               | _ -> False ]
             in
             let ep = (p, a, u, auth) in loop ep efam sl
-        | _ -> None ]
+        | _ -> VVnone ]
     | ["father" :: sl] ->
         match a.parents with
         [ Some ifam ->
@@ -323,7 +329,7 @@ value rec eval_variable conf base env sl =
             let cpl = (cpl.father, cpl.mother) in
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
-        | None -> None ]
+        | None -> VVnone ]
     | ["mother" :: sl] ->
         match a.parents with
         [ Some ifam ->
@@ -332,41 +338,41 @@ value rec eval_variable conf base env sl =
             let cpl = (cpl.mother, cpl.father) in
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
-        | None -> None ]
+        | None -> VVnone ]
     | ["related" :: sl] ->
         match get_env "c" env with
         [ Vind p a u ->
             let ep = (p, a, u, age_autorise conf base p) in loop ep efam sl
-        | _ -> None ]
+        | _ -> VVnone ]
     | ["relation_her" :: sl] ->
         match get_env "rel" env with
         [ Vrel {r_moth = Some ip} -> let ep = make_ep ip in loop ep efam sl
-        | _ -> None ]
+        | _ -> VVnone ]
     | ["relation_him" :: sl] ->
         match get_env "rel" env with
         [ Vrel {r_fath = Some ip} -> let ep = make_ep ip in loop ep efam sl
-        | _ -> None ]
+        | _ -> VVnone ]
     | ["self" :: sl] -> loop (p, a, u, p_auth) efam sl
     | ["spouse" :: sl] ->
         match efam with
         [ Vfam fam (_, ip) _ -> let ep = make_ep ip in loop ep efam sl
-        | _ -> None ]
+        | _ -> VVnone ]
     | ["witness" :: sl] ->
         match get_env "witness" env with
         [ Vind p a u ->
             let ep = (p, a, u, age_autorise conf base p) in loop ep efam sl
-        | _ -> None ]
+        | _ -> VVnone ]
     | ["enclosing" :: sl] ->
         let rec loop =
           fun
           [ [("#loop", _) :: env] -> eval_variable conf base env sl
           | [_ :: env] -> loop env
-          | [] -> None ]
+          | [] -> VVnone ]
         in
         loop env
-    | [] -> Some (env, (p, a, u, p_auth), efam, "")
-    | [s] -> Some (env, (p, a, u, p_auth), efam, s)
-    | _ -> None ]
+    | [] -> VVsome (env, (p, a, u, p_auth), efam, "")
+    | [s] -> VVsome (env, (p, a, u, p_auth), efam, s)
+    | _ -> VVnone ]
   in
   loop ep efam sl
 ;
@@ -871,11 +877,11 @@ value print_simple_person_text conf base (p, _, _, p_auth) =
 
 value print_variable conf base env sl =
   match eval_variable conf base env sl with
-  [ Some (env, ep, efam, "") -> print_simple_person_text conf base ep
-  | Some (env, ep, efam, s) ->
+  [ VVsome (env, ep, efam, "") -> print_simple_person_text conf base ep
+  | VVsome (env, ep, efam, s) ->
       try print_simple_variable conf base env ep efam s with
       [ Not_found -> Templ.print_variable conf base s ]
-  | None ->
+  | VVnone ->
       do {
         list_iter_first
           (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
@@ -1058,7 +1064,7 @@ value eval_simple_bool_variable conf base env (p, a, u, p_auth) efam =
 
 value eval_bool_variable conf base env sl =
   match eval_variable conf base env sl with
-  [ Some (env, ep, efam, "") ->
+  [ VVsome (env, ep, efam, "") ->
       do {
         list_iter_first
           (fun first s -> Wserver.wprint "%s%s" (if first then "" else ".") s)
@@ -1066,9 +1072,9 @@ value eval_bool_variable conf base env sl =
         Wserver.wprint "???";
         False
       }
-  | Some (env, ep, efam, s) ->
+  | VVsome (env, ep, efam, s) ->
       eval_simple_bool_variable conf base env ep efam s
-  | None -> False ]
+  | VVnone -> False ]
 ;
 
 value split_at_coloncolon s =
@@ -1149,7 +1155,7 @@ value eval_bool_value conf base env =
     | Evar s sl ->
         try
           match eval_variable conf base env [s :: sl] with
-          [ Some (env, ep, efam, s) when s <> "" ->
+          [ VVsome (env, ep, efam, s) when s <> "" ->
               try_eval_gen_variable conf base env s
           | _ -> raise Not_found ]
         with
@@ -1182,14 +1188,15 @@ and eval_foreach conf base env s sl al =
     let sl = List.rev [s :: sl] in (List.rev (List.tl sl), List.hd sl)
   in
   match eval_variable conf base env sl with
-  [ Some (env, ep, efam, "") -> eval_simple_foreach conf base env al ep efam s
-  | Some (env, ep, efam, _) ->
+  [ VVsome (env, ep, efam, "") ->
+      eval_simple_foreach conf base env al ep efam s
+  | VVsome (env, ep, efam, _) ->
       do {
         Wserver.wprint "foreach ";
         List.iter (fun s -> Wserver.wprint "%s." s) sl;
         Wserver.wprint "%s???" s
       }
-  | None -> () ]
+  | VVnone -> () ]
 and eval_simple_foreach conf base env al ep efam =
   fun
   [ "alias" -> eval_foreach_alias conf base env al ep
