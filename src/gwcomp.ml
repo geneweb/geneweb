@@ -1,4 +1,4 @@
-(* $Id: gwcomp.ml,v 4.6 2003-02-12 10:12:51 ddr Exp $ *)
+(* $Id: gwcomp.ml,v 4.7 2004-01-28 10:04:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -490,6 +490,7 @@ value get_mar_date str =
               | _ -> Neuter ]
             in
             ((NoSexesCheck, decode_sex 0, decode_sex 1), l)
+        | ["#noment" :: l] -> ((NoMention, Male, Female), l)
         | _ -> ((Married, Male, Female), l) ]
       in
       let (place, l) = get_field "#mp" l in
