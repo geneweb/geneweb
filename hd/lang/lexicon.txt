@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.12 1999-04-07 10:49:35 ddr Exp $
+# $Id: lexicon.txt,v 2.13 1999-04-07 11:31:52 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -2401,7 +2401,7 @@ no: av mordet
 pt: do assesinado
 se: av mordet
 
-    of+
+    of (person of lower generation level)
 de: von +decl
 en: of
 eo: de
