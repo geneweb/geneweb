@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.6 1999-12-19 09:14:15 ddr Exp $
+# $Id: Makefile,v 3.7 1999-12-20 09:03:14 ddr Exp $
 
 include ../tools/Makefile.inc
 
@@ -9,7 +9,6 @@ GWD_OBJS1=../wserver/wserver.cmo argl.cmo lock.cmo adef.cmo iovalue.cmo name.cmo
 GWD_OBJS2=merge.cmo mergeFamOk.cmo mergeFam.cmo mergeInd.cmo mergeIndOk.cmo changeChildren.cmo sendImage.cmo dag2html.cmo dag.cmo relationLink.cmo relation.cmo ascend.cmo descend.cmo cousins.cmo alln.cmo some.cmo advSearchOk.cmo birthday.cmo birthDeath.cmo title.cmo notes.cmo doc.cmo forum.cmo family.cmo base64.cmo robot.cmo
 GWD_OBJS=$(GWD_OBJS1) $(GWD_OBJS2) gwd.cmo
 GWU_OBJS=argl.cmo adef.cmo iovalue.cmo name.cmo gutil.cmo btree.cmo buff.cmo iobase.cmo select.cmo calendar.cmo gwu.cmo
-all:: out
 PHONYGWD_OBJS=../wserver/wserver.cmo argl.cmo phonygwd.cmo
 MOSTDESC_OBJS=adef.cmo name.cmo gutil.cmo iovalue.cmo btree.cmo buff.cmo iobase.cmo pqueue.cmo consang.cmo argl.cmo num.cmo mostdesc.cmo
 FPLA_OBJS=argl.cmo adef.cmo name.cmo gutil.cmo btree.cmo buff.cmo iovalue.cmo iobase.cmo fpla.cmo

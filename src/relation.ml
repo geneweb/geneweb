@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.24 1999-12-18 13:44:59 ddr Exp $ *)
+(* $Id: relation.ml,v 3.25 1999-12-20 09:03:14 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -368,11 +368,94 @@ value print_relation_path_table conf base path =
   return ()
 ;
 
+open Dag2html;
+
+type sum 'a 'b = [ Left of 'a | Right of 'b ];
+
+value print_only_dag conf base d =
+  let t = table_of_dag False d in
+  let print_indi n =
+    match n.valu with
+    [ Left ip ->
+        let p = poi base ip in
+        do Wserver.wprint "%s" (Util.referenced_person_title_text conf base p);
+           Wserver.wprint "%s" (Date.short_dates_text conf base p);
+        return ()
+    | Right _ -> Wserver.wprint "&nbsp;" ]
+  in
+  print_html_table (fun x -> Wserver.wprint "%s" x) print_indi
+    conf.border d t
+;
+
+value print_relation_path_dag conf base path =
+  let (nl, _) =
+    List.fold_left
+      (fun (nl, cnt) (ip, fl) ->
+         match nl with
+         [ [] ->
+             let n = {pare = []; valu = Left ip; chil = []} in
+             ([n], cnt)
+         | [n :: nl] ->
+             let n1 = {pare = []; valu = Left ip; chil = []} in
+             match fl with
+             [ Parent ->
+                 do n.pare := [idag_of_int (cnt + 1) :: n.pare];
+                    n1.chil := [idag_of_int cnt :: n1.chil];
+                 return ([n1; n :: nl], cnt + 1)
+             | Child ->
+                 do n.chil := [idag_of_int (cnt + 1) :: n.chil];
+                    n1.pare := [idag_of_int cnt :: n1.pare];
+                 return ([n1; n :: nl], cnt + 1)
+             | Sibling | HalfSibling ->
+                 match (aoi base ip).parents with
+                 [ Some ifam ->
+                     let cpl = coi base ifam in
+                     let cpar = cpl.father in
+                     let nf = {pare = []; valu = Left cpar; chil = []} in
+                     do nf.chil := [idag_of_int cnt; idag_of_int (cnt + 2)];
+                        n1.pare := [idag_of_int (cnt + 1)];
+                        n.pare := n1.pare @ n.pare;
+                     return ([n1; nf; n :: nl], cnt + 2)
+                 | None -> ([n1; n :: nl], cnt + 1) ]
+             | Mate ->
+                 let np = {pare = []; valu = Right cnt; chil = []} in
+                 do n.chil := [idag_of_int (cnt + 1) :: n.chil];
+                    n1.chil := [idag_of_int (cnt + 1)];
+                    np.pare := [idag_of_int cnt; idag_of_int (cnt + 2)];
+                 return ([n1; np; n :: nl], cnt + 2)
+             | _ -> ([n1; n :: nl], cnt + 1) ] ])
+      ([], 0) (List.rev path)
+  in
+  let d = {dag = Array.of_list (List.rev nl)} in
+(*
+  let set =
+    List.fold_left
+      (fun set (ip, fl) ->
+         let set = Dag.Pset.add ip set in
+         match fl with
+         [ Sibling | HalfSibling ->
+             match (aoi base ip).parents with
+             [ Some ifam ->
+                 let cpl = coi base ifam in
+                 let set = Dag.Pset.add cpl.mother set in
+                 Dag.Pset.add cpl.father set
+             | None -> set ]
+         | _ -> set ])
+      Dag.Pset.empty path
+  in
+  let d = Dag.make_dag base (Dag.Pset.elements set) in
+*)
+  do Wserver.wprint "<p>\n";
+     print_only_dag conf base d;
+  return ()
+;
+
 value print_relation_path conf base path =
   if path == [] then ()
   else
     do print_relation_path_list conf base path;
        print_relation_path_table conf base path;
+       print_relation_path_dag conf base path;
     return ()
 ;
 
