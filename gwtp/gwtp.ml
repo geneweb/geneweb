@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.46 2000-09-14 02:45:25 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.47 2000-09-14 18:16:08 ddr Exp $ *)
 (* (c) Copyright INRIA 2000 *)
 
 open Printf;
@@ -336,8 +336,8 @@ value set_base_conf b varenv =
          [ End_of_file -> close_in ic ]
      | None -> () ];
      List.iter
-       (fun (v, k, is_set) ->
-          if not is_set.val && k <> "" then fprintf oc "%s=%s\n" v k else ())
+       (fun (k, v, is_set) ->
+          if not is_set.val && v <> "" then fprintf oc "%s=%s\n" k v else ())
        varenv;
      close_out oc;
      try Sys.remove fname_saved with [ Sys_error _ -> () ];
