@@ -5,12 +5,12 @@ Starta din webbl„sare och ”ppna adressen:
        http://localhost:$z/
 
 Om det inte fungerar, kanske du m†ste st„lla in din webbl„sare
-med optioner som "work off-line" eller "do not use the proxy for local
-addresses" eller "do not connect to Internet for the address
+med optioner som "arbeta off-line" eller "anv„nd inte en proxyserver
+f”r lokala adresser" eller "anslut inte till Internet f”r adressen
 'localhost'".
 
 Om det „nd† inte fungerar fast du f”rs”kt p† olika s„tt, f”rs”k med det
-klassiska att titta p† dokumentationen. F”r att g”ra det, stoppa detta
-program genom att trycka "control-c" i detta f”nster, g† till katalogen
-"gw" och ”ppna filen:
+klassiska att titta i dokumentationen. F”r att g”ra det, stoppa f”rst
+det h„r programmet genom att trycka "control-c" i detta f”nster, g†
+sedan till katalogen "gw" och ”ppna filen:
    INSTALL.htm
