@@ -1,0 +1,31 @@
+<head><title>Gwtp - %b</title></head>
+<body>
+<h1>Gwtp - %b</h1>
+<form method=POST action=gwtp enctype="multipart/form-data">
+<input type=hidden name=m value=SEND>
+<input type=hidden name=b value=%b>
+<input type=hidden name=t value=%t>
+
+In your GeneWeb data base directory (foo.gwb for the base <em>foo</em>):<br><p>
+
+<ul>
+<li>
+select the file named <b>base</b>:
+</ul>
+<input type=file name=base size=60><br><p>
+
+<ul>
+<li>
+select the file named <b>notes</b>, if it exists:
+</ul>
+<input type=file name=notes size=60><br><p>
+
+<ul>
+<li>
+select the file named <b>patches</b>, if it exists:
+</ul>
+<input type=file name=patches size=60><br><p>
+
+<input type=submit value=Send>
+</form>
+</body>
