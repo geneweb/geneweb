@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.12 1998-12-02 20:48:56 ddr Exp $ *)
+(* $Id: perso.ml,v 1.13 1998-12-03 09:09:23 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -552,7 +552,7 @@ value find_sosa conf base a p =
 *)
 
 value find_sosa_optim conf base a p =
-  if a == p then Some Num.one
+  if a.cle_index = p.cle_index then Some Num.one
   else
     let has_children =
       List.exists

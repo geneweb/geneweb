@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: alln.ml,v 1.7 1998-11-30 20:26:29 ddr Exp $ *)
+(* $Id: alln.ml,v 1.8 1998-12-03 09:09:20 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -212,8 +212,8 @@ value print_frequency_any conf base is_surnames list len =
 
 (* selection *)
 
-value select_names conf base is_surnames ini =
 (* version using the index *)
+value select_names conf base is_surnames ini =
   let iii =
     if is_surnames then base.persons_of_surname else base.persons_of_first_name
   in
@@ -240,7 +240,10 @@ value select_names conf base is_surnames ini =
       else list
   in
   (List.rev list, True)
+;
+
 (* version without index
+value select_names conf base is_surnames ini =
   let table = Mhashtbl.create 801 in
   let list = ref [] in
   do for i = 0 to base.persons.len - 1 do
@@ -264,8 +267,8 @@ value select_names conf base is_surnames ini =
        (fun k (cnt, s) -> list.val := [(k, s, cnt.val) :: list.val])
        table;
   return (list.val, False)
-*)
 ;
+*)
 
 value print_frequency conf base is_surnames =
   let list =
