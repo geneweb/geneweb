@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 2.21 1999-05-18 22:35:02 ddr Exp $ *)
+(* $Id: util.ml,v 2.22 1999-06-03 12:11:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -495,7 +495,8 @@ value transl_decline conf w s =
     else nth_field wt 0 ^ s1
   else
     match plus_decl wt with
-    [ Some (start, decl) ->
+    [ Some (start, " +before") -> s ^ " " ^ start
+    | Some (start, decl) ->
         start ^ (if s = "" then "" else " " ^ decline conf decl s)
     | None -> wt ^ s1 ]
 ;
