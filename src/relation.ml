@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.2 2001-03-23 20:17:11 ddr Exp $ *)
+(* $Id: relation.ml,v 4.3 2001-03-24 05:18:49 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -651,19 +651,16 @@ value descendant_label conf base x anc p =
             let n =
               match (aoi base p.cle_index).parents with
               [ Some ifam ->
-                  let glop list =
-                    List.fold_left
-                      (fun list ->
-                         fun
-                         [ Some ifam ->
-                             let cpl = coi base ifam in
-                             [cpl.father; cpl.mother :: list]
-                         | None -> list ])
-                      [] list
+                  let glop =
+                    fun
+                    [ Some ifam ->
+                        let cpl = coi base ifam in
+                        [cpl.father; cpl.mother]
+                    | None -> [] ]
                   in
                   let cpl = coi base ifam in
-                  let fath_side = glop (ancestors_n base 0 cpl.father) in
-                  let moth_side = glop (ancestors_n base 0 cpl.mother) in
+                  let fath_side = glop (aoi base cpl.father).parents in
+                  let moth_side = glop (aoi base cpl.mother).parents in
                   if List.mem anc.cle_index fath_side then 0
                   else if List.mem anc.cle_index moth_side then 3
                   else 0
@@ -671,8 +668,10 @@ value descendant_label conf base x anc p =
             in
             nth_field txt (is + n)
         | None ->
-            nth_field txt is ^ " " ^ transl conf "or" ^ " " ^
-            nth_field txt (is + 3) ]
+            let sm = nth_field txt is in
+            let sf = nth_field txt (is + 3) in
+            if sm = sf then sm
+            else sm ^ " " ^ transl conf "or" ^ " " ^ sf ]
       else nth_field txt is
   | 3 ->
       transl_nth conf
