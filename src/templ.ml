@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: templ.ml,v 4.19 2004-09-30 12:15:06 ddr Exp $ *)
+(* $Id: templ.ml,v 4.20 2004-11-06 16:58:44 ddr Exp $ *)
 
 open Config;
 open Util;
@@ -538,7 +538,12 @@ value eval_date_variable od =
       | None -> "" ]
   | "month" ->
       match eval_date_field od with
-      [ Some d -> if d.month = 0 then "" else string_of_int d.month
+      [ Some d ->
+          if d.month = 0 then ""
+          else
+            match od with
+            [ Some (Dgreg _ Dfrench) -> short_f_month d.month
+            | _ -> string_of_int d.month ]
       | None -> "" ]
   | "text" -> eval_date_text od
   | "year" ->

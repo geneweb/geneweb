@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.30 2003-11-04 13:29:38 ddr Exp $ *)
+(* $Id: util.mli,v 4.31 2004-11-06 16:58:44 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -144,6 +144,7 @@ value incorrect_request : config -> unit;
 value string_of_decimal_num : config -> float -> string;
 
 value find_person_in_env : config -> base -> string -> option person;
+value find_sosa_ref : config -> base -> option person;
 
 value quote_escaped : string -> string;
 
@@ -200,3 +201,5 @@ value print_pre_right : int -> string -> unit;
 
 value print_selection_bullet : config -> option (string * bool) -> unit;
 value unselected_bullets : config -> list int;
+
+value short_f_month : int -> string;
