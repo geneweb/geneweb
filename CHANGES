@@ -1,6 +1,9 @@
 GeneWeb Version 1.08
 --------------------
 
+Added doc for merging databases, persons and families.
+Added doc for databases maintenance.
+
 * gwd: fixed several displaying bugs due to ANSEL
 
 * gwc, gwu:
