@@ -2,6 +2,8 @@ GeneWeb version 3.06
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [18 Jun 00] Fixed little problem: the (new) fast merges of persons did not
+    appear in the history.
   - [17 Jun 00] In update family forms, added a button close to the "family
     source": when selected, the "family source" text is automatically put 
     (as default value) in "family source" fields in future other family
