@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.1 1999-12-16 22:12:08 ddr Exp $ *)
+(* $Id: forum.ml,v 3.2 1999-12-16 23:11:48 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Util;
@@ -51,7 +51,7 @@ value print_forum conf base =
                   List.iter
                     (fun s ->
                        do if s = "" then Wserver.wprint "<p>"
-                          else copy_string_with_macros conf (secure s);
+                          else copy_string_with_macros conf s;
                           Wserver.wprint "\n";
                        return ())
                     mess;
