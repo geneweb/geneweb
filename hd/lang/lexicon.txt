@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.133 1999-09-26 17:22:45 ddr Exp $
+# $Id: lexicon.txt,v 2.134 1999-09-27 02:51:09 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -175,7 +175,7 @@ dk: 1. %m %y/%d. %m %y/%m %y/%y
 en: %m 1, %y/%m %d, %y/%m %y/%y
 eo: 1a de %m %y/%da de %m %y/%m %y/%y
 es: 1ro %m %y/%d %m %y/%m %y/%y
-fr: 1<sup>er</sup> %m %y/%d %m %y/%m %y/%y
+fr: 1er %m %y/%d %m %y/%m %y/%y
 he: 1 %m %y/%d %m %y/%m %y/%y 
 it: 1o %m %y/%d %m %y/%m %y/%y
 nl: 1 %m %y/%d %m %y/%m %y/%y
