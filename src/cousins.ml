@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 1.1 1998-12-12 17:26:26 ddr Exp $ *)
+(* $Id: cousins.ml,v 1.2 1998-12-13 10:16:54 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -34,6 +34,7 @@ value niveau_max_ascendance base ip =
   return x.val
 ;
 
+(*
 value rec ancestor_of_sosa base ip sosa =
   if Num.eq sosa Num.one then Some ip
   else
@@ -46,6 +47,7 @@ value rec ancestor_of_sosa base ip sosa =
         | None -> None ]
     | None -> None ]
 ;
+*)
 
 value brother_label conf x =
   match x with
@@ -64,16 +66,6 @@ value rec except x =
   | [y :: l] -> if x = y then l else [y :: except x l] ]
 ;
 
-value merge_lists l1 l2 =
-  let l =
-    rev_merge (List.rev l1) l2 where rec rev_merge r =
-      fun
-      [ [x :: l] -> rev_merge (if List.mem x r then r else [x :: r]) l
-      | [] -> r ]
-  in
-  List.rev l
-;
-
 value children_of base p =
   List.fold_right
     (fun ifam list ->
@@ -87,12 +79,31 @@ value siblings_by base iparent ip =
   except ip list
 ;
 
-value siblings base ip =
+value merge_siblings l1 l2 =
+  let l =
+    rev_merge (List.rev l1) l2 where rec rev_merge r =
+      fun
+      [ [((v, _) as x) :: l] ->
+          rev_merge (if List.mem_assoc v r then r else [x :: r]) l
+      | [] -> r ]
+  in
+  List.rev l
+;
+
+value siblings base p =
+  let ip = p.cle_index in
   match (aoi base ip).parents with
   [ Some ifam ->
       let cpl = coi base ifam in
-      merge_lists (siblings_by base cpl.father ip)
-        (siblings_by base cpl.mother ip)
+      let fath_sib =
+        List.map (fun ip -> (ip, (cpl.father, Masculin)))
+          (siblings_by base cpl.father ip)
+      in
+      let moth_sib =
+        List.map (fun ip -> (ip, (cpl.mother, Feminin)))
+          (siblings_by base cpl.mother ip)
+      in
+      merge_siblings fath_sib moth_sib
   | None -> [] ]
 ;
 
@@ -105,6 +116,10 @@ value rec has_desc_lev base lev p =
          List.exists (fun ip -> has_desc_lev base (lev - 1) (poi base ip))
            (Array.to_list fam.children))
       (Array.to_list p.family)
+;
+
+value br_inter_is_empty b1 b2 =
+  List.for_all (fun (ip, _) -> not (List.mem_assoc ip b2)) b1
 ;
 
 (*
@@ -142,18 +157,34 @@ value print_choice conf base p niveau_effectif =
 
 value cnt = ref 0;
 
-value rec print_descend_upto conf base lev children =
+value give_access conf base ia_asex p1 b1 p2 b2 =
+  do stag "a" "href=\"%sm=RL;i1=%d;b1=%s;i2=%d;b2=%s\"" (commd conf)
+       (Adef.int_of_iper p1.cle_index)
+       (Num.to_string (RelationLink.sosa_of_branch [ia_asex :: b1]))
+       (Adef.int_of_iper p2.cle_index)
+       (Num.to_string (RelationLink.sosa_of_branch [ia_asex :: b2]))
+     begin
+       afficher_personne_sans_titre conf base p2;
+     end;
+     afficher_titre conf base p2;
+     Date.afficher_dates_courtes conf base p2;
+  return ()
+;
+
+value rec print_descend_upto conf base ini_p ini_br lev children =
   if lev > 0 && cnt.val < max_cnt then
     do if lev <= 2 then Wserver.wprint "<ul>\n" else ();
        List.iter
-         (fun ip ->
+         (fun (ip, ia_asex, rev_br) ->
             let p = poi base ip in
-            if cnt.val < max_cnt && has_desc_lev base lev p then
+            let br = List.rev [(ip, p.sexe) :: rev_br] in
+            let is_valid_rel = br_inter_is_empty ini_br br in
+            if is_valid_rel && cnt.val < max_cnt && has_desc_lev base lev p
+            then
               do if lev <= 2 then
                    do Wserver.wprint "<li>\n";
                       if lev = 1 then
-                        do afficher_personne_titre_referencee conf base p;
-                           Date.afficher_dates_courtes conf base p;
+                        do give_access conf base ia_asex ini_p ini_br p br;
                            incr cnt;
                         return ()
                       else
@@ -166,7 +197,13 @@ value rec print_descend_upto conf base lev children =
                       Wserver.wprint "\n";
                    return ()
                  else ();
-                 print_descend_upto conf base (lev - 1) (children_of base p);
+                 let children =
+                   List.map
+                     (fun ip ->
+                        (ip, ia_asex, [(p.cle_index, p.sexe) :: rev_br]))
+                   (children_of base p)
+                 in
+                 print_descend_upto conf base ini_p ini_br (lev - 1) children;
               return ()
             else ())
         children;
@@ -175,14 +212,19 @@ value rec print_descend_upto conf base lev children =
   else ()
 ;
 
-value print_cousins_side_of conf base p lev =
-  let sib = siblings base p.cle_index in
-  if List.exists (fun ip -> has_desc_lev base lev (poi base ip)) sib then
+value sibling_has_desc_lev base lev (ip, _) =
+  has_desc_lev base lev (poi base ip)
+;
+
+value print_cousins_side_of conf base a ini_p ini_br lev =
+  let sib = siblings base a in
+  if List.exists (sibling_has_desc_lev base lev) sib then
     do Wserver.wprint "<li>\n";
        Wserver.wprint "%s " (capitale (transl conf "of the side of"));
-       afficher_personne_titre conf base p;
+       afficher_personne_titre conf base a;
        Wserver.wprint ":\n";
-       print_descend_upto conf base lev sib;
+       let sib = List.map (fun (ip, ia_asex) -> (ip, ia_asex, [])) sib in
+       print_descend_upto conf base ini_p ini_br lev sib;
     return True
   else False
 ;
@@ -199,9 +241,10 @@ value print_cousins_lev conf base p lev =
       loop first_sosa False where rec loop sosa some =
         if cnt.val < max_cnt && Num.gt last_sosa sosa then
           let some =
-            match ancestor_of_sosa base p.cle_index sosa with
-            [ Some ia ->
-                print_cousins_side_of conf base (poi base ia) lev || some
+            match RelationLink.branch_of_sosa base p.cle_index sosa with
+            [ Some ([(ia, _) :: _] as br) ->
+                print_cousins_side_of conf base (poi base ia) p br lev ||
+                some
             | _ -> some ]
           in
           loop (Num.inc sosa 1) some
