@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeIndOk.ml,v 4.2 2001-12-04 12:23:09 ddr Exp $ *)
+(* $Id: mergeIndOk.ml,v 4.3 2001-12-05 17:16:23 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -196,23 +196,20 @@ value effective_mod_merge conf base sp =
         for i = 0 to Array.length p2_family - 1 do {
           let ifam = p2_family.(i) in
           let cpl = coi base ifam in
-          match p2_sexe with
-          [ Male ->
-              do {
-                cpl.father := p.cle_index;
-                Array.iter
-                  (fun ip ->
-                     let w = poi base ip in
-                     if not (List.memq p.cle_index w.related) then do {
-                       w.related := [p.cle_index :: w.related];
-                       base.func.patch_person ip w;
-                       ()
-                     }
-                     else ())
-                  (foi base ifam).witnesses;
-              }
-          | Female -> cpl.mother := p.cle_index
-          | Neuter -> assert False ];
+          if p2.cle_index = cpl.father then do {
+            cpl.father := p.cle_index;
+            Array.iter
+              (fun ip ->
+                 let w = poi base ip in
+                 if not (List.memq p.cle_index w.related) then do {
+                   w.related := [p.cle_index :: w.related];
+                   base.func.patch_person ip w;
+                 }
+                 else ())
+              (foi base ifam).witnesses;
+          }
+          else if p2.cle_index = cpl.mother then cpl.mother := p.cle_index
+          else assert False;
           base.func.patch_couple ifam cpl;
         };
         Update.update_misc_names_of_family base p u;
