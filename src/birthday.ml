@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.5 2000-01-08 14:58:12 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.6 2000-01-09 17:58:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -36,7 +36,7 @@ value afficher_anniversaires_jour conf base dead_people liste =
   return ()
 ;
 
-value gen_print conf base mois dead_people =
+value gen_print conf base mois f_scan dead_people =
   let tab = Array.create 31 [] in
   let title _ =
     let lab =
@@ -47,50 +47,53 @@ value gen_print conf base mois dead_people =
       (transl conf "in (month year)")
       (transl_nth conf "(month)" (mois - 1))
   in
-  do for i = 0 to base.data.persons.len - 1 do
-       let p = base.data.persons.get i in
-       if not dead_people then
-         match (Adef.od_of_codate p.birth, p.death) with
-         [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
-             if d.prec = Sure && d.day <> 0 && d.month <> 0
-             && d.month = mois then
-               if age_autorise conf base p then
-                 let j = d.day in
-                 tab.(pred j) := [(p, d.year, DeBirth) :: tab.(pred j)]
+  do try
+       while True do
+         let p = f_scan () in
+         if not dead_people then
+           match (Adef.od_of_codate p.birth, p.death) with
+           [ (Some (Dgreg d _), NotDead | DontKnowIfDead) ->
+               if d.prec = Sure && d.day <> 0 && d.month <> 0
+               && d.month = mois then
+                 if age_autorise conf base p then
+                   let j = d.day in
+                   tab.(pred j) := [(p, d.year, DeBirth) :: tab.(pred j)]
+                 else ()
                else ()
-             else ()
-         | _ -> () ]
-       else
-         match p.death with
-         [ NotDead | DontKnowIfDead -> ()
-         | _ ->
-             do match Adef.od_of_codate p.birth with
-                [ Some (Dgreg dt _) ->
-                    if dt.prec = Sure && dt.day <> 0 && dt.month <> 0
-                    && dt.month = mois then
-                      if age_autorise conf base p then
-                        let j = dt.day in
-                        tab.(pred j) := [(p, dt.year, DeBirth) :: tab.(pred j)]
-                      else ()
-                    else ()
-                | _ -> () ];
-                match p.death with
-                [ Death dr d ->
-                    match Adef.date_of_cdate d with
-                    [ Dgreg dt _ ->
-                        if dt.prec = Sure && dt.day <> 0 && dt.month <> 0
-                        && dt.month = mois then
-                          if age_autorise conf base p then
-                            let j = dt.day in
-                            let a = dt.year in
-                            tab.(pred j) :=
-                              [(p, a, DeDeath dr) :: tab.(pred j)]
-                          else ()
+           | _ -> () ]
+         else
+           match p.death with
+           [ NotDead | DontKnowIfDead -> ()
+           | _ ->
+               do match Adef.od_of_codate p.birth with
+                  [ Some (Dgreg dt _) ->
+                      if dt.prec = Sure && dt.day <> 0 && dt.month <> 0
+                      && dt.month = mois then
+                        if age_autorise conf base p then
+                          let j = dt.day in
+                          tab.(pred j) :=
+                            [(p, dt.year, DeBirth) :: tab.(pred j)]
                         else ()
-                    | _ -> () ]
-                | _ -> () ];
-             return () ];
-     done;
+                      else ()
+                  | _ -> () ];
+                  match p.death with
+                  [ Death dr d ->
+                      match Adef.date_of_cdate d with
+                      [ Dgreg dt _ ->
+                          if dt.prec = Sure && dt.day <> 0 && dt.month <> 0
+                          && dt.month = mois then
+                            if age_autorise conf base p then
+                              let j = dt.day in
+                              let a = dt.year in
+                              tab.(pred j) :=
+                                [(p, a, DeDeath dr) :: tab.(pred j)]
+                            else ()
+                          else ()
+                      | _ -> () ]
+                  | _ -> () ];
+               return () ];
+       done
+     with [ Not_found -> () ];
      header conf title;
      Wserver.wprint "<ul>\n";
      for j = 1 to 31 do
@@ -161,8 +164,17 @@ value afficher_liste_anniversaires conf base dead_people dt liste =
   return ()
 ;
 
-value print_birth conf base mois = gen_print conf base mois False;
-value print_dead conf base mois = gen_print conf base mois True;
+value f_scan base =
+  let i = ref (-1) in
+  fun () ->
+    do incr i; return
+    if i.val < base.data.persons.len then base.data.persons.get i.val
+    else raise Not_found
+;
+value print_birth conf base mois =
+  gen_print conf base mois (f_scan base) False;
+value print_dead conf base mois =
+  gen_print conf base mois (f_scan base) True;
 
 value print_birth_day conf base day_name verb wd dt list =
   do Wserver.wprint "\n"; html_p conf; return
@@ -186,7 +198,7 @@ value propose_months conf mode =
   tag "center" begin
     tag "form" "method=get action=\"%s\"" conf.command begin
       Srcfile.hidden_env conf;
-      Wserver.wprint "<input type=hidden name=m value=%s>\n" mode;
+      mode ();
       tag "select" "name=v" begin
         for i = 1 to 12 do
           Wserver.wprint "<option value=%d%s>%s\n" i
@@ -328,7 +340,7 @@ value match_dates conf base p d1 d2 =
   else False
 ;
 
-value gen_print_menu_birth f_scan conf base =
+value gen_print_menu_birth conf base f_scan mode =
   let title _ =
     Wserver.wprint "%s" (capitale (transl conf "birthdays"))
   in
@@ -370,7 +382,7 @@ value gen_print_menu_birth f_scan conf base =
        aft list_aft.val;
      Wserver.wprint "\n";
      html_p conf;
-     propose_months conf "AN";
+     propose_months conf mode;
      Wserver.wprint "\n";
      trailer conf;
   return ()
@@ -386,7 +398,10 @@ value print_menu_birth conf base =
     if i.val < base.data.persons.len then base.data.persons.get i.val
     else raise Not_found
   in
-  gen_print_menu_birth f_scan conf base
+  let mode () =
+    Wserver.wprint "<input type=hidden name=m value=AN>\n"
+  in
+  gen_print_menu_birth conf base f_scan mode
 ;
 
 value print_menu_dead conf base =
@@ -453,7 +468,8 @@ value print_menu_dead conf base =
        aft list_aft.val;
      Wserver.wprint "\n";
      html_p conf;
-     propose_months conf "AD";
+     let mode () = Wserver.wprint "<input type=hidden name=m value=AD>\n" in
+     propose_months conf mode;
      Wserver.wprint "\n";
      trailer conf;
   return ()
@@ -514,7 +530,8 @@ value print_menu_marriage conf base =
        aft list_aft.val;
      Wserver.wprint "\n";
      html_p conf;
-     propose_months conf "AM";
+     let mode () = Wserver.wprint "<input type=hidden name=m value=AM>\n" in
+     propose_months conf mode;
      Wserver.wprint "\n";
      trailer conf;
   return ()

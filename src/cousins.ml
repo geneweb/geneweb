@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.1 1999-11-10 08:44:16 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.2 2000-01-09 17:58:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -296,13 +296,92 @@ value print_menu conf base p effective_level =
          return ()
        else ();
      end;
+     match p.death with
+     [ NotDead | DontKnowIfDead when conf.wizard || conf.friend ->
+         do html_p conf;
+            tag "ul" begin
+              html_li conf;
+              Wserver.wprint "<a href=\"%s%s;m=C;t=AN\">%s</a>\n"
+                (commd conf) (acces conf base p)
+                (capitale (transl conf "birthdays"));
+            end;
+         return ()
+     | _ -> () ];
      trailer conf;
   return ()
 ;
 
+value print_anniv conf base p level =
+  let module S =
+    Set.Make (struct type t = iper; value compare = compare; end)
+  in
+  let rec insert_desc set n ip =
+    if S.mem ip set then set
+    else
+      let set = S.add ip set in
+      if n = 0 then set
+      else
+        let u = (uoi base ip).family in
+        loop set 0 where rec loop set i =
+          if i = Array.length u then set
+          else
+            let chil = (doi base u.(i)).children in
+            let set =
+              loop set 0 where rec loop set i =
+                if i = Array.length chil then set
+                else
+                  let set = insert_desc set (n - 1) chil.(i) in
+                  loop set (i + 1)
+            in
+            loop set (i + 1)
+  in
+  let set =
+    loop S.empty 0 p.cle_index where rec loop set n ip =
+      if n >= level then insert_desc set (n + 3) ip
+      else
+        match (aoi base ip).parents with
+        [ Some ifam ->
+            let cpl = coi base ifam in
+            let n = n + 1 in
+            loop (loop set n cpl.mother) n cpl.father
+        | None -> insert_desc set (n + 3) ip ]
+  in
+  let set =
+    S.fold
+      (fun ip set ->
+         let u = (uoi base ip).family in
+         if Array.length u = 0 then S.add ip set
+         else
+           loop set 0 where rec loop set i =
+             if i = Array.length u then set
+             else
+               let cpl = coi base u.(i) in
+               let set = S.add cpl.father (S.add cpl.mother set) in
+               loop set (i + 1))
+      set S.empty
+  in
+  let f_scan =
+    let list = ref (S.elements set) in
+    fun () ->
+      match list.val with
+      [ [x :: l] -> do list.val := l; return (poi base x)
+      | [] -> raise Not_found ]
+  in
+  let mode () =
+    do Wserver.wprint "<input type=hidden name=m value=C>\n";
+       Wserver.wprint "<input type=hidden name=i value=%d>\n"
+         (Adef.int_of_iper p.cle_index);
+       Wserver.wprint "<input type=hidden name=t value=AN>\n";
+    return ()
+  in
+  match p_getint conf.env "v" with
+  [ Some i -> Birthday.gen_print conf base i f_scan False
+  | _ -> Birthday.gen_print_menu_birth conf base f_scan mode ]
+;
+
 value print conf base p =
-  match p_getint conf.env "v1" with
-  [ Some lev1 ->
+  match (p_getint conf.env "v1", p_getenv conf.env "t") with
+  [ (Some lev1, _) ->
       let lev1 = min (max 1 lev1) 10 in
       let lev2 =
         match p_getint conf.env "v2" with
@@ -310,6 +389,8 @@ value print conf base p =
         | None -> lev1 ]
       in
       print_cousins conf base p lev1 lev2
+  | (_, Some "AN") when conf.wizard || conf.friend ->
+      print_anniv conf base p max_lev
   | _ ->
       let effective_level = niveau_max_ascendance base p.cle_index + 1 in
       if effective_level == 2 then print_cousins conf base p 2 2

@@ -5,6 +5,7 @@ GeneWeb Version 3.02
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Jan 9, 00] Centered title "genealogical data base".
   - [Jan 9, 00] Added the ability to add ";td=bgcolor=xxx" in URL when
     printing a dag. Color the square of the person.
   - [Jan 5, 00] Added the ability to add ";bd=n" (n >= 1) in URL when
