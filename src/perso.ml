@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.7 2000-01-21 12:01:19 ddr Exp $ *)
+(* $Id: perso.ml,v 3.8 2000-02-02 16:07:17 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1093,8 +1093,8 @@ value print_ok conf base p =
      print_parents conf base a;
      print_families conf base p a u;
      if age_autorise conf base p then
-       do print_notes conf base p;
-          print_relations conf base p;
+       do print_relations conf base p;
+          print_notes conf base p;
           print_sources conf base True p;
        return ()
      else ();
