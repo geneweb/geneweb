@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 3.66 2000-11-05 10:17:27 ddr Exp $ *)
+(* $Id: perso.ml,v 3.67 2000-12-19 15:42:10 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -1185,7 +1185,7 @@ value print_transl conf base env upp s c =
     [ '0'..'9' ->
         let n = Char.code c - Char.code '0' in
         match split_at_coloncolon s with
-        [ None -> Util.transl_nth conf s n
+        [ None -> nominative (Util.transl_nth conf s n)
         | Some (s1, s2) ->
             Util.transl_decline conf s1 (Util.transl_nth conf s2 n) ]
     | 'n' ->
@@ -1212,7 +1212,7 @@ value print_transl conf base env upp s c =
           | _ -> 0 ]
         in
         Util.transl_nth conf s n
-    | _ -> Util.transl conf s ^ String.make 1 c ]
+    | _ -> nominative (Util.transl conf s) ^ String.make 1 c ]
   in
   Wserver.wprint "%s" (if upp then capitale r else r)
 ;
@@ -1402,7 +1402,9 @@ and eval_foreach_source conf base env al (p, _, u, p_auth) =
          else " " ^ string_of_int (i + 1)
        in
        do if p_auth then
-            let src_typ = transl_nth conf "marriage/marriages" 0 in
+            let src_typ =
+              nominative (transl_nth conf "marriage/marriages" 0)
+            in
             print_src (src_typ ^ lab) fam.marriage_src
           else ();
           let src_typ = nominative (transl_nth conf "family/families" 0) in

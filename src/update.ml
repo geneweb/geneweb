@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 3.23 2000-11-25 18:53:33 ddr Exp $ *)
+(* $Id: update.ml,v 3.24 2000-12-19 15:42:11 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -908,7 +908,8 @@ value print_family_stuff conf base p a u =
   	   return Some fi)
        None (Array.to_list u.family)
      in ();
-     let s = transl_nth conf "family/families" 0 in
+     Wserver.wprint "<br>\n";
+     let s = transl_nth conf "marriage/marriages" 0 in
      if (p_first_name base p = "?" || p_surname base p = "?")
      && (Array.length u.family <> 0 || a.parents <> None) then ()
      else if p.sex = Neuter then
