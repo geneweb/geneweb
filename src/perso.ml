@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.72 2005-02-07 10:43:28 ddr Exp $ *)
+(* $Id: perso.ml,v 4.73 2005-02-07 14:13:32 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 open Def;
@@ -262,7 +262,7 @@ value extract_var sini s =
   else ""
 ;
 
-value warning_use_has_parents_before_parent (bp, ep) var =
+value warning_use_has_parents_before_parent (bp, ep) var r =
   ifdef UNIX then do {
     Printf.eprintf "*** <W> perso.txt";
     Printf.eprintf ", chars %d-%d" bp ep;
@@ -270,8 +270,20 @@ value warning_use_has_parents_before_parent (bp, ep) var =
 : since v5.00, must test \"has_parents\" before using \"%s\"\n"
       var;
     flush stderr;
+    r
   }
-  else ()
+  else r
+;
+
+value warning_not_impl (bp, ep) =
+  ifdef UNIX then do {
+    Printf.eprintf "*** <W> perso.txt";
+    Printf.eprintf ", chars %d-%d" bp ep;
+    Printf.eprintf " not implemented\n";
+    flush stderr;
+    raise Not_found
+  }
+  else raise Not_found
 ;
 
 value obsolete_list = ref [];
@@ -521,87 +533,124 @@ and eval_person_var conf base env ((_, a, _, _) as ep) loc =
             | _ -> False ]
           in
           let ep = (p, a, u, auth) in
-          eval_person_var conf base env ep loc sl
+          eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["enclosing" :: sl] ->
       let rec loop =
         fun
-        [ [("#loop", _) :: env] -> eval_person_var conf base env ep loc sl
+        [ [("#loop", _) :: env] ->
+            eval_person_field_var conf base env ep loc sl
         | [_ :: env] -> loop env
         | [] -> raise Not_found ]
       in
       loop env
   | ["father" :: sl] ->
-      match parents a with
+      let famo =
+        match get_env "fam" env with
+        [ Vfam fam _ _ -> Some fam.fam_index
+        | _ -> parents a ]
+      in
+      match famo with
       [ Some ifam ->
           let cpl = coi base ifam in
           let ep = make_ep conf base (father cpl) in
-          let cpl = (father cpl, mother cpl) in
-          let efam = Vfam (foi base ifam) cpl (doi base ifam) in
-          eval_person_var conf base [("fam", efam) :: env] ep loc sl
+          eval_person_field_var conf base env ep loc sl
       | None ->
-          do {
-            warning_use_has_parents_before_parent loc "father";
-            str_val ""
-          } ]
+          warning_use_has_parents_before_parent loc "father" (str_val "") ]
   | ["mother" :: sl] ->
-      match parents a with
+      let famo =
+        match get_env "fam" env with
+        [ Vfam fam _ _ -> Some fam.fam_index
+        | _ -> parents a ]
+      in
+      match famo with
       [ Some ifam ->
           let cpl = coi base ifam in
           let ep = make_ep conf base (mother cpl) in
-          let cpl = (father cpl, mother cpl) in
-          let efam = Vfam (foi base ifam) cpl (doi base ifam) in
-          eval_person_var conf base [("fam", efam) :: env] ep loc sl
+          eval_person_field_var conf base env ep loc sl
       | None ->
-          do {
-            warning_use_has_parents_before_parent loc "mother";
-            str_val ""
-          } ]
+          warning_use_has_parents_before_parent loc "mother" (str_val "") ]
   | ["parent" :: sl] ->
       match get_env "parent" env with
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
-          eval_person_var conf base env ep loc sl
+          eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["related" :: sl] ->
       match get_env "c" env with
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
-          eval_person_var conf base env ep loc sl
+          eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["relation_her" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_moth = Some ip} ->
          let ep = make_ep conf base ip in
-         eval_person_var conf base env ep loc sl
+         eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["relation_him" :: sl] ->
       match get_env "rel" env with
       [ Vrel {r_fath = Some ip} ->
          let ep = make_ep conf base ip in
-         eval_person_var conf base env ep loc sl
+         eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
-  | ["self" :: sl] -> eval_person_var conf base env ep loc sl
+  | ["self" :: sl] -> eval_person_field_var conf base env ep loc sl
   | ["spouse" :: sl] ->
       match get_env "fam" env with
       [ Vfam _ (_, ip) _ ->
           let ep = make_ep conf base ip in
-          eval_person_var conf base env ep loc sl
+          eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
   | ["witness" :: sl] ->
       match get_env "witness" env with
       [ Vind p a u ->
           let ep = (p, a, u, authorized_age conf base p) in
-          eval_person_var conf base env ep loc sl
+          eval_person_field_var conf base env ep loc sl
       | _ -> raise Not_found ]
-  | sl ->
-      try bool_val (eval_bool_person_field conf base env ep sl) with
+  | [s] ->
+      try bool_val (eval_bool_person_field conf base env ep s) with
       [ Not_found ->
-          try str_val (eval_str_person_field conf base env ep sl) with
-          [ Not_found -> obsolete_eval conf base env ep loc sl ] ] ]
+          try str_val (eval_str_person_field conf base env ep s) with
+          [ Not_found -> obsolete_eval conf base env ep loc s ] ]
+  | _ -> raise Not_found ]
+and eval_person_field_var conf base env ((p, a, _, p_auth) as ep) loc =
+  fun
+  [ ["father" :: sl] ->
+      match parents a with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          let ep = make_ep conf base (father cpl) in
+          eval_person_field_var conf base env ep loc sl
+      | None ->
+          warning_use_has_parents_before_parent loc "father" (str_val "") ]
+  | ["mother" :: sl] ->
+      match parents a with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          let ep = make_ep conf base (mother cpl) in
+          eval_person_field_var conf base env ep loc sl
+      | None ->
+          warning_use_has_parents_before_parent loc "mother" (str_val "") ]
+  | ["spouse" :: sl] ->
+      match get_env "fam" env with
+      [ Vfam fam _ _ ->
+          let cpl = coi base fam.fam_index in
+          let ip = Gutil.spouse p.cle_index cpl in
+          let ep = make_ep conf base ip in
+          eval_person_field_var conf base env ep loc sl
+      | _ -> raise Not_found ]
+  | [s] ->
+      try bool_val (eval_bool_person_field conf base env ep s) with
+      [ Not_found ->
+          try str_val (eval_str_person_field conf base env ep s) with
+          [ Not_found ->
+              try obsolete_eval conf base env ep loc s with
+              [ Not_found -> warning_not_impl loc ] ] ]
+  | [] -> str_val (simple_person_text conf base p p_auth)
+  | _ -> warning_not_impl loc ]
 and eval_bool_person_field conf base env ((p, a, u, p_auth) as ep) =
   fun
-  [ ["birthday"] ->
+  [ "birthday" ->
       match (p_auth, Adef.od_of_codate p.birth) with
       [ (True, Some (Dgreg d _)) ->
           if d.prec = Sure && p.death = NotDead then
@@ -611,14 +660,14 @@ and eval_bool_person_field conf base env ((p, a, u, p_auth) as ep) =
             conf.today.day = 1 && conf.today.month = 3
           else False
       | _ -> False ]
-  | ["computable_age"] ->
+  | "computable_age" ->
       if p_auth then
         match (Adef.od_of_codate p.birth, p.death) with
         [ (Some (Dgreg d _), NotDead) ->
             not (d.day == 0 && d.month == 0 && d.prec <> Sure)
         | _ -> False ]
       else False
-  | ["computable_death_age"] ->
+  | "computable_death_age" ->
       if p_auth then
         match Date.get_birth_death_date p with
         [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
@@ -629,19 +678,19 @@ and eval_bool_person_field conf base env ((p, a, u, p_auth) as ep) =
             a.year = 0 && (a.month > 0 || a.month = 0 && a.day > 0)
         | _ -> False ]
       else False
-  | ["has_aliases"] -> p.aliases <> []
-  | ["has_baptism_date"] -> p_auth && p.baptism <> Adef.codate_None
-  | ["has_baptism_place"] -> p_auth && sou base p.baptism_place <> ""
-  | ["has_birth_date"] -> p_auth && p.birth <> Adef.codate_None
-  | ["has_birth_place"] -> p_auth && sou base p.birth_place <> ""
-  | ["has_burial_date"] ->
+  | "has_aliases" -> p.aliases <> []
+  | "has_baptism_date" -> p_auth && p.baptism <> Adef.codate_None
+  | "has_baptism_place" -> p_auth && sou base p.baptism_place <> ""
+  | "has_birth_date" -> p_auth && p.birth <> Adef.codate_None
+  | "has_birth_place" -> p_auth && sou base p.birth_place <> ""
+  | "has_burial_date" ->
       if p_auth then
         match p.burial with
         [ Buried cod -> Adef.od_of_codate cod <> None
         | _ -> False ]
       else False
-  | ["has_burial_place"] -> p_auth && sou base p.burial_place <> ""
-  | ["has_children"] ->
+  | "has_burial_place" -> p_auth && sou base p.burial_place <> ""
+  | "has_children" ->
       match get_env "fam" env with
       [ Vfam _ _ des -> Array.length des.children > 0
       | _ ->
@@ -649,31 +698,31 @@ and eval_bool_person_field conf base env ((p, a, u, p_auth) as ep) =
             (fun ifam ->
              let des = doi base ifam in Array.length des.children > 0)
           (Array.to_list u.family) ]
-  | ["has_consanguinity"] ->
+  | "has_consanguinity" ->
       p_auth && consang a != Adef.fix (-1) && consang a != Adef.fix 0
-  | ["has_cremation_date"] ->
+  | "has_cremation_date" ->
       if p_auth then
         match p.burial with
         [ Cremated cod -> Adef.od_of_codate cod <> None
         | _ -> False ]
       else False
-  | ["has_cremation_place"] -> p_auth && sou base p.burial_place <> ""
-  | ["has_death_date"] ->
+  | "has_cremation_place" -> p_auth && sou base p.burial_place <> ""
+  | "has_death_date" ->
       match p.death with
       [ Death _ _ -> p_auth
       | _ -> False ]
-  | ["has_death_place"] -> p_auth && sou base p.death_place <> ""
-  | ["has_families"] -> Array.length u.family > 0
-  | ["has_first_names_aliases"] -> p.first_names_aliases <> []
-  | ["has_image"] -> Util.has_image conf base p
-  | ["has_nephews_or_nieces"] -> has_nephews_or_nieces conf base p
-  | ["has_nobility_titles"] -> p_auth && p.titles <> []
-  | ["has_notes"] -> p_auth && sou base p.notes <> ""
-  | ["has_occupation"] -> p_auth && sou base p.occupation <> ""
-  | ["has_parents"] -> parents a <> None
-  | ["has_public_name"] -> sou base p.public_name <> ""
-  | ["has_qualifiers"] -> p.qualifiers <> []
-  | ["has_relations"] ->
+  | "has_death_place" -> p_auth && sou base p.death_place <> ""
+  | "has_families" -> Array.length u.family > 0
+  | "has_first_names_aliases" -> p.first_names_aliases <> []
+  | "has_image" -> Util.has_image conf base p
+  | "has_nephews_or_nieces" -> has_nephews_or_nieces conf base p
+  | "has_nobility_titles" -> p_auth && p.titles <> []
+  | "has_notes" -> p_auth && sou base p.notes <> ""
+  | "has_occupation" -> p_auth && sou base p.occupation <> ""
+  | "has_parents" -> parents a <> None
+  | "has_public_name" -> sou base p.public_name <> ""
+  | "has_qualifiers" -> p.qualifiers <> []
+  | "has_relations" ->
       if p_auth && conf.use_restrict then
         let related =
           List.fold_left
@@ -684,11 +733,11 @@ and eval_bool_person_field conf base env ((p, a, u, p_auth) as ep) =
         in
         p.rparents <> [] || related <> []
       else p_auth && (p.rparents <> [] || p.related <> [])
-  | ["has_siblings"] ->
+  | "has_siblings" ->
       match parents a with
       [ Some ifam -> Array.length (doi base ifam).children > 1
       | None -> False ]
-  | ["has_sources"] ->
+  | "has_sources" ->
       if conf.hide_names && not p_auth then False
       else if sou base p.psources <> "" then True
       else if
@@ -703,41 +752,41 @@ and eval_bool_person_field conf base env ((p, a, u, p_auth) as ep) =
              p_auth && sou base fam.marriage_src <> "" ||
              sou base fam.fsources <> "")
           (Array.to_list u.family)
-  | ["has_surnames_aliases"] -> p.surnames_aliases <> []
-  | ["is_buried"] ->
+  | "has_surnames_aliases" -> p.surnames_aliases <> []
+  | "is_buried" ->
       match p.burial with
       [ Buried _ -> p_auth
       | _ -> False ]
-  | ["is_cremated"] ->
+  | "is_cremated" ->
       match p.burial with
       [ Cremated _ -> p_auth
       | _ -> False ]
-  | ["is_dead"] ->
+  | "is_dead" ->
       match p.death with
       [ Death _ _ | DeadYoung | DeadDontKnowWhen -> p_auth
       | _ -> False ]
-  | ["is_female"] -> p.sex = Female
-  | ["is_male"] -> p.sex = Male
-  | ["is_private"] -> p.access = Private
-  | ["is_public"] -> p.access = Public
-  | ["is_restricted"] -> is_hidden p
+  | "is_female" -> p.sex = Female
+  | "is_male" -> p.sex = Male
+  | "is_private" -> p.access = Private
+  | "is_public" -> p.access = Public
+  | "is_restricted" -> is_hidden p
   | _ -> raise Not_found ]
 and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
   fun
-  [ ["access"] -> acces conf base p
-  | ["age"] ->
+  [ "access" -> acces conf base p
+  | "age" ->
       match (p_auth, Adef.od_of_codate p.birth, p.death) with
       [ (True, Some (Dgreg d _), NotDead) ->
           let a = time_gone_by d conf.today in
           Date.string_of_age conf a
       | _ -> "" ]
-  | ["birth_place"] ->
+  | "birth_place" ->
       if p_auth then string_of_place conf base p.birth_place else ""
-  | ["baptism_place"] ->
+  | "baptism_place" ->
       if p_auth then string_of_place conf base p.baptism_place else ""
-  | ["burial_place"] ->
+  | "burial_place" ->
       if p_auth then string_of_place conf base p.burial_place else ""
-  | ["child_name"] ->
+  | "child_name" ->
       let force_surname =
         match parents a with
         [ None -> False
@@ -748,16 +797,16 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
       if not p_auth && conf.hide_names then "x x"
       else if force_surname then person_text conf base p
       else person_text_without_surname conf base p
-  | ["consanguinity"] ->
+  | "consanguinity" ->
       if p_auth then
         string_of_decimal_num conf
           (round_2_dec (Adef.float_of_fix (consang a) *. 100.0)) ^ "%"
       else ""
-  | ["cremation_place"] ->
+  | "cremation_place" ->
       if p_auth then string_of_place conf base p.burial_place else ""
-  | ["dates"] ->
+  | "dates" ->
       if p_auth then Date.short_dates_text conf base p else ""
-  | ["death_age"] ->
+  | "death_age" ->
       if p_auth then
         match Date.get_birth_death_date p with
         [ (Some (Dgreg ({prec = Sure | About | Maybe} as d1) _),
@@ -771,27 +820,27 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
             s ^ Date.string_of_age conf a
         | _ -> "" ]
       else ""
-  | ["death_place"] ->
+  | "death_place" ->
       if p_auth then string_of_place conf base p.death_place else ""
-  | ["died"] -> string_of_died conf base env p p_auth
-  | ["fam_access"] ->
+  | "died" -> string_of_died conf base env p p_auth
+  | "fam_access" ->
       match get_env "fam" env with
       [ Vfam fam _ _ ->
           Printf.sprintf "i=%d;ip=%d" (Adef.int_of_ifam fam.fam_index)
             (Adef.int_of_iper p.cle_index)
       | _ -> raise Not_found ]
-  | ["father_age_at_birth"] -> string_of_parent_age conf base ep father
-  | ["first_name"] ->
+  | "father_age_at_birth" -> string_of_parent_age conf base ep father
+  | "first_name" ->
       if not p_auth && conf.hide_names then "x" else p_first_name base p
-  | ["first_name_key"] ->
+  | "first_name_key" ->
       if conf.hide_names && not p_auth then ""
       else code_varenv (Name.lower (p_first_name base p))
-  | ["image_html_url"] -> string_of_image_url conf base env ep True
-  | ["image_size"] -> string_of_image_size conf base env ep
-  | ["image_url"] -> string_of_image_url conf base env ep False
-  | ["ind_access"] -> "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
-  | ["mother_age_at_birth"] -> string_of_parent_age conf base ep mother
-  | ["misc_names"] ->
+  | "image_html_url" -> string_of_image_url conf base env ep True
+  | "image_size" -> string_of_image_size conf base env ep
+  | "image_url" -> string_of_image_url conf base env ep False
+  | "ind_access" -> "i=" ^ string_of_int (Adef.int_of_iper p.cle_index)
+  | "mother_age_at_birth" -> string_of_parent_age conf base ep mother
+  | "misc_names" ->
       if p_auth then
         let list = Gutil.person_misc_names base p in
         let list =
@@ -807,7 +856,7 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
           "</ul>\n"
         else ""
       else ""
-  | ["nb_children"] ->
+  | "nb_children" ->
       match get_env "fam" env with
       [ Vfam _ _ des -> string_of_int (Array.length des.children)
       | _ ->
@@ -817,58 +866,58 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
               (Array.to_list u.family)
           in
           string_of_int n ]
-  | ["nb_families"] -> string_of_int (Array.length u.family)
-  | ["nobility_title"] ->
+  | "nb_families" -> string_of_int (Array.length u.family)
+  | "nobility_title" ->
       match get_env "nobility_title" env with
       [ Vtitle t ->
           if p_auth then
             string_of_title conf base (transl_nth conf "and" 0) p t
           else ""
       | _ -> raise Not_found ]
-  | ["notes"] ->
+  | "notes" ->
       if p_auth then
         let env = [('i', fun () -> Util.default_image_name base p)] in
         string_with_macros conf False env (sou base p.notes)
       else ""
-  | ["occupation"] ->
+  | "occupation" ->
       if p_auth then
         string_with_macros conf False [] (capitale (sou base p.occupation))
       else ""
-  | ["on_baptism_date"] ->
+  | "on_baptism_date" ->
       match (p_auth, Adef.od_of_codate p.baptism) with
       [ (True, Some d) -> Date.string_of_ondate conf d
       | _ -> "" ]
-  | ["on_birth_date"] ->
+  | "on_birth_date" ->
       match (p_auth, Adef.od_of_codate p.birth) with
       [ (True, Some d) -> Date.string_of_ondate conf d
       | _ -> "" ]
-  | ["on_burial_date"] ->
+  | "on_burial_date" ->
       match p.burial with
       [ Buried cod ->
           match (p_auth, Adef.od_of_codate cod) with
           [ (True, Some d) -> Date.string_of_ondate conf d
           | _ -> "" ]
       | _ -> raise Not_found ]
-  | ["on_cremation_date"] ->
+  | "on_cremation_date" ->
       match p.burial with
       [ Cremated cod ->
           match (p_auth, Adef.od_of_codate cod) with
           [ (True, Some d) -> Date.string_of_ondate conf d
           | _ -> "" ]
       | _ -> raise Not_found ]
-  | ["on_death_date"] ->
+  | "on_death_date" ->
       match (p_auth, p.death) with
       [ (True, Death _ d) ->
           let d = Adef.date_of_cdate d in
           Date.string_of_ondate conf d
       | _ -> "" ]
-  | ["public_name"] -> sou base p.public_name
-  | ["qualifier"] ->
+  | "public_name" -> sou base p.public_name
+  | "qualifier" ->
       match (get_env "qualifier" env, p.qualifiers) with
       [ (Vstring nn, _) -> nn
       | (_, [nn :: _]) -> sou base nn
       | _ -> raise Not_found ]
-  | ["sosa_link"] ->
+  | "sosa_link" ->
       match get_env "sosa" env with
       [ Vsosa x ->
           match x with
@@ -878,19 +927,18 @@ and eval_str_person_field conf base env ((p, a, u, p_auth) as ep) =
                 (Num.to_string n)
           | None -> "" ]
       | _ -> raise Not_found ] 
-  | ["source"] ->
+  | "source" ->
       match get_env "src" env with
       [ Vstring s ->
           let env = [('i', fun () -> Util.default_image_name base p)] in
           string_with_macros conf False env s
       | _ -> raise Not_found ]
-  | ["surname"] ->
+  | "surname" ->
       if not p_auth && conf.hide_names then "x" else p_surname base p
-  | ["surname_key"] ->
+  | "surname_key" ->
       if conf.hide_names && not p_auth then ""
       else code_varenv (Name.lower (p_surname base p))
-  | ["title"] -> person_title conf base p
-  | [] -> simple_person_text conf base p p_auth
+  | "title" -> person_title conf base p
   | _ -> raise Not_found ]
 and simple_person_text conf base p p_auth =
   if p_auth then
@@ -966,7 +1014,7 @@ and string_of_int_env var env =
   | _ -> raise Not_found ]
 and obsolete_eval conf base env (p, a, u, p_auth) loc =
   fun
-  [ ["married_to"] ->
+  [ "married_to" ->
       let s =
         match get_env "fam" env with
         [ Vfam fam (_, ispouse) des ->
@@ -1064,7 +1112,7 @@ and print_foreach conf base env ep loc s sl al =
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
         | None ->
-            warning_use_has_parents_before_parent loc "father" ]
+            warning_use_has_parents_before_parent loc "father" () ]
     | ["mother" :: sl] ->
         match parents a with
         [ Some ifam ->
@@ -1074,7 +1122,7 @@ and print_foreach conf base env ep loc s sl al =
             let efam = Vfam (foi base ifam) cpl (doi base ifam) in
             loop ep efam sl
         | None ->
-            warning_use_has_parents_before_parent loc "mother" ]
+            warning_use_has_parents_before_parent loc "mother" () ]
     | _ -> raise Not_found ]
   in
   let efam = get_env "fam" env in
