@@ -1,4 +1,4 @@
-# $Id: geneweb.spec,v 3.6 2000-04-28 23:46:50 ddr Exp $
+# $Id: geneweb.spec,v 3.7 2000-05-07 06:09:45 ddr Exp $
 #
 # geneweb .spec file -- 15 August 1999 -- Dan Kegel
 #
@@ -190,9 +190,9 @@ chown -R geneweb.geneweb /home/geneweb/gw
 %attr(755, root, root) /etc/rc.d/rc6.d/K01gwd
 /home/geneweb/gw/LISEZMOI.txt
 /home/geneweb/gw/README.txt
-/home/geneweb/gw/gw/CHANGES
+/home/geneweb/gw/gw/CHANGES.txt
 /home/geneweb/gw/gw/INSTALL.htm
-/home/geneweb/gw/gw/LICENSE
+/home/geneweb/gw/gw/LICENSE.txt
 /home/geneweb/gw/gw/LISEZMOI.txt
 /home/geneweb/gw/gw/README.txt
 /home/geneweb/gw/gw/a.gwf
