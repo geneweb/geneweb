@@ -189,22 +189,60 @@ consultation.
 
 <li><strong>Conditionnels.</strong><br>
 
+Les conditionnels commencent par "<font size=+1><tt>%I</tt></font>"
+suivi d'une expression bool&eacute;enne (vrai ou faux) et se terminent
+par "<font size=+1><tt>%E</tt></font>". Le texte entre ces deux macros
+est affich&eacute; si et seulement si l'expression bool&eacute;enne
+est vraie. Une expression bool&eacute;enne est soit:
+
 <ul>
 
-<li>"<font size=+1><tt>%w...%w</tt></font>" : affichage si on est
-"sorcier".
+<li>"<font size=+1><tt>f</tt></font>" : on est "ami"
 
-<li>"<font size=+1><tt>%x...%x</tt></font>" : affichage si on est
-"sorcier" ou "ami".
+<li>"<font size=+1><tt>w</tt></font>" : on est "sorcier"
 
-<li>"<font size=+1><tt>%y...%y</tt></font>" : affichage si on est en
-mode "serveur" (pas CGI) et qu'on n'est pas "sorcier".
+<li>"<font size=+1><tt>j</tt></font>" : on est "sorcier" juste "ami"
+(cf <a href="start.htm#Cnf">fichier a.gwf</a>, "wizard_just_friend")
 
-<li>"<font size=+1><tt>%z...%z</tt></font>" : affichage si on est en
-mode "serveur" (pas CGI) et qu'on n'est ni "sorcier" ni "ami".
+<li>"<font size=+1><tt>c</tt></font>" : on est en mode cgi
 
-<li>"<font size=+1><tt>%i...%i</tt></font>" : affichage si on est en
-mode CGI.
+<li>"<font size=+1><tt>h</tt></font>" : il y a un fichier historique
+
+<li>"<font size=+1><tt>l</tt></font>" : le navigateur ne traite pas les tables
+
+<li>"<font size=+1><tt>n</tt></font>" : il y a des notes pour la base
+de donn&eacute;es
+
+<li>"<font size=+1><tt>t</tt></font>" : il y a une recherche par titres de
+noblesse
+
+<li>"<font size=+1><tt>z</tt></font>" : il y a une personne prise
+comme r&eacute;f&eacute;rence Sosa (voir macro "<font
+size=+1><tt>%u</tt></font>")
+
+<li>"<font size=+1><tt>a</tt></font>" : il y a une <a
+href="access.htm#DBA">restriction globale d'acc&egrave;s</a> &agrave;
+la base de donn&eacute;es
+
+<li>"<font size=+1><tt>N</tt></font>" : contraire de l'expression qui suit
+
+<li>"<font size=+1><tt>|</tt></font>" : "ou" logique entre les deux
+expressions qui suivent
+
+<li>"<font size=+1><tt>&amp;</tt></font>" : "et" logique entre les deux
+expressions qui suivent
+
+</ul>
+
+Exemples:
+
+<ul>
+
+<li> afficher le texte s'il y a une recherche par titre: <font
+size=+1><tt>%It...%E</tt></font>
+
+<li> afficher le texte si on est ni "sorcier" ni "ami": <font
+size=+1><tt>%I&amp;NwNf...%E</tt></font>
 
 </ul>
 
@@ -226,6 +264,9 @@ value=val&gt".
 
 <li>"<font size=+1><tt>%n</tt></font>" : nombre de personnes de la
 base.
+
+<li>"<font size=+1><tt>%u</tt></font>" : personne prise comme
+r&eacute;f&eacute;rence Sosa.
 
 <li>"<font size=+1><tt>%%</tt></font>" : un seul "%".
 
@@ -255,10 +296,6 @@ r&eacute;f&eacute;rence Sosa.
 
 <p>
 
-Les <strong>conditionnels</strong> ne peuvent pas &ecirc;tre
-imbriqu&eacute;s: on ne peut pas mettre un "<font
-size=+1><tt>%w...%w</tt></font>" &agrave; l'int&eacute;rieur d'un
-"<font size=+1><tt>%i...%i</tt></font>".
 <hr>
 <h3><a name="Ass">
 </a> <font color=#2f6400> Pages associ&eacute;es </font></a></h3>

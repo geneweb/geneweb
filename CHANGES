@@ -80,12 +80,18 @@ Thanks to Emmanuelle Visseaux.
     welcome page.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
+  - [Oct 31, 99] [technical point] Changed the conditional macros in
+    the welcome pages, now between %I and %E.
   - [Oct 26, 99] Changed several Portuguese translations (Oscar Filipe de
     Oliveira Barroso).
   - [Oct 12, 99] Fixed and completed some Norwegian phrases (Brynjulf
     Langballe).
   - [Oct 4..10, 99] Fixed and completed some Dutch phrases (Joris Esch).
   - [Oct 4, 99] Fixed some German phrases (Falko Trojahn).
+
+* Documentation
+  - [Oct 31, 99] [technical point] Updated the documentation of the macros
+    of the welcome page. Chapter "customization of pages", section "macros".
 
 GeneWeb version 2.07
 --------------------

@@ -26,24 +26,21 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <p>
 
 Deze databank <font color=#2f6400><b>"%t"</b></font> bevat nu %n
-personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
+personen.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
 
-%y<br><p>
+%I&NwNj<br><p>
 
-<table border=0 width="70%">
+%I&NcNa<table border=0 width="70%">
 <tr>
 
 <td align=center>Toegang als <a href="%sw=w"><em>tovenaar</em></a><br>
 (wachtwoord)<br></td>
 
-%y%z<td align=center>Toegang als <a href="%sw=f"><em>vriend</em></a><br>
+%INf<td align=center>Toegang als <a href="%sw=f"><em>vriend</em></a><br>
 (wachtwoord)</td>
 
-%z%y</tr></table>
-
-%y%i<br><br>
-
-<table border=0>
+%E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=get action="%f">
 %h<font size=-1>Wachtwoord, voor toegang als <em>vriend</em> of
@@ -52,9 +49,8 @@ personen.%o<br>(<a href="%sm=NOTES">[note/notes]1</a>)%o
 </form>
 </td></tr>
 </table>
-%i
 
-<br><p>
+%E%E<br><p>
 
 <table border=0 cellspacing=0 cellpadding=0>
 
@@ -76,32 +72,31 @@ Om deze databank te consulteren, kan u een opzoeking doen:<br><p>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
-[or] <em>[surname/surnames]</em>%u
-[or] <em>Sosa nummer</em> ten opzichte van %a%u
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em>Sosa nummer</em> ten opzichte van %a%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
-
-%T<li>
+%It<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>op titel</b></font>$INl<br>$E
-<input name=t size=14 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>op titel</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
 (vb: koning, hertog...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>plaats</b></font>$INl<br>$E
-<input name=p size=25 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>plaats</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
 (vb: van Frankrijk, van Brabant...)
 </td><td>
 <input type=submit value="Ok">
 </td></tr></table>
 </form>
 
-%T<li>
+%E<li>
 
 <form method=GET action="%f">
 %h
@@ -126,7 +121,7 @@ opzoeking</b></font></a>.
 
 </ul>
 
-%w<p>
+%Iw<p>
 
 <center>U kan:<br><p>
 
@@ -135,17 +130,17 @@ opzoeking</b></font></a>.
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">een familie toevoegen</a>
-$INl</ul>
+%INl</ul>
 </td>
 <td align=left>
-<ul>$E
+<ul>%E
 <li><a href="%sm=MOD_NOTES">de nota's wijzigen</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-%w
+%E
 
 <center>U kan de volgende zaken bekijken:<br><p>
 
@@ -155,14 +150,14 @@ $INl</ul>
 <ul>
 <li>de <a href="%sm=AN">verjaardagen</a>
 <li>de <a href="%sm=AD">verjaardagen van overleden mensen</a>
-<li>de <a href="%sm=AM">verjaardagen van huwelijken</a>%x
-<li>de <a href="%sm=LB;k=10">laatste geboorten</a>%x
+<li>de <a href="%sm=AM">verjaardagen van huwelijken</a>%I|wf
+<li>de <a href="%sm=LB;k=10">laatste geboorten</a>%E
 </ul>
 </td>
 <td valign=up>
-<ul>%x
-<li>de <a href="%sm=LD;k=10">laatste overlijdens</a>%x%j
-<li>de <a href="%sm=HIST;k=10">lijst van wijzigingen</a>%j
+<ul>%I|wf
+<li>de <a href="%sm=LD;k=10">laatste overlijdens</a>%E%Ih
+<li>de <a href="%sm=HIST;k=10">lijst van wijzigingen</a>%E
 <li>de <a href="%sm=CAL">kalenders</a>
 <li>de <a href="%sm=FORUM">databank forum</a>
 </ul>
@@ -175,7 +170,7 @@ $INl</ul>
 
 Deze paginas zijn sinds %d reeds %q maal bezocht, waaronder %c maal
 deze verwelkomingspagina.
-$Il<p>$E
+%Il<p>%E
 
 </td></tr>
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.5 1999-10-30 23:05:51 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.6 1999-10-31 09:43:44 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -174,8 +174,8 @@ value rec copy_from_channel conf base ic =
     | 'j' -> conf.just_friend_wizard
     | 'l' -> no_tables
     | 'n' -> base.data.bnotes.nread 1 <> ""
-    | 'w' -> conf.wizard
     | 't' -> p_getenv conf.base_env "propose_titles" <> Some "no"
+    | 'w' -> conf.wizard
     | 'z' -> Util.find_person_in_env conf base "z" <> None
     | '|' ->
         let a = if_expr (input_char ic) in
@@ -188,7 +188,6 @@ value rec copy_from_channel conf base ic =
     | c -> do Wserver.wprint "!!!!!%c!!!!!" c; return True ]
   in
   try
-    let compatibility = ref True in
     while True do
       match input_char ic with
       [ '[' ->
@@ -212,96 +211,57 @@ value rec copy_from_channel conf base ic =
                 [ '>' -> ()
                 | _ -> loop (input_char ic) ]
           | _ -> Wserver.wprint "<%s%s%c" slash atag c ]
-      | '$' ->
-          match input_char ic with
-          [ 'E' -> pop_echo ()
-          | 'I' -> push_echo (echo.val && if_expr (input_char ic))
-          | 'D' -> compatibility.val := False
-          | c -> Wserver.wprint "$%c" c ]
       | '%' ->
           let c = input_char ic in
-          if not echo.val then
-            match c with
-            [ 'w' | 'x' | 'y' | 'z' | 'i' | 'j' | 'u' | 'o' | 'T'
-              when compatibility.val ->
-                echo.val := True
-            | _ -> () ]
-          else
-            match c with
-            [ '%' -> Wserver.wprint "%%"
-            | '[' | ']' -> Wserver.wprint "%c" c
-            | 'a' ->
-                match Util.find_person_in_env conf base "z" with
-                [ Some ip ->
-                    Wserver.wprint "%s"
-                      (referenced_person_title_text conf base ip)
-                | None -> () ]
-            | 'b' ->
-                let s =
-                  try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
-                  [ Not_found -> "" ]
-                in
-                let s = s ^ " " ^ body_prop conf in
-                Wserver.wprint "%s" s
-            | 'c' ->
-                let (wc, rc, d) = count conf in
-                Num.print (fun x -> Wserver.wprint "%s" x)
-                  (transl conf "(thousand separator)")
-                  (Num.of_int wc)
-            | 'd' -> print_date conf
-            | 'f' -> Wserver.wprint "%s" conf.command
-            | 'g' ->
-                do Wserver.wprint "%s?" conf.command;
-                   if conf.cgi then Wserver.wprint "b=%s;" conf.bname else ();
-                return ()
-            | 'h' -> hidden_env conf
-            | 'i' when compatibility.val ->
-                if conf.cgi || conf.auth_file <> "" then ()
-                else echo.val := False
-            | 'j' when compatibility.val ->
-                if Sys.file_exists (History.file_name conf) then ()
-                else echo.val := False
-            | 'k' ->
-                Wserver.wprint "%s?"
-                  (if conf.cgi then conf.command else "geneweb")
-            | 'l' -> Wserver.wprint "%s" conf.lang
-            | 'n' ->
-                Num.print (fun x -> Wserver.wprint "%s" x)
-                  (transl conf "(thousand separator)")
-                  (Num.of_int base.data.persons.len)
-            | 'o' when compatibility.val ->
-                if base.data.bnotes.nread 1 = "" then echo.val := False
-                else ()
-            | 'q' ->
-                let (wc, rc, d) = count conf in
-                Num.print (fun x -> Wserver.wprint "%s" x)
-                  (transl conf "(thousand separator)")
-                  (Num.of_int (wc + rc))
-            | 'r' -> copy_from_file conf base (input_line ic)
-            | 's' -> Wserver.wprint "%s" (commd conf)
-            | 't' -> Wserver.wprint "%s" conf.bname
-            | 'T' when compatibility.val ->
-                 match p_getenv conf.base_env "propose_titles" with
-                 [ Some "no" -> echo.val := False
-                 | _ -> () ]
-            | 'u' when compatibility.val ->
-                match Util.find_person_in_env conf base "z" with
-                [ Some _ -> ()
-                | None -> echo.val := False ]
-            | 'v' -> Wserver.wprint "%s" Version.txt
-            | 'w' when compatibility.val ->
-                if conf.wizard then () else echo.val := False
-            | 'x' when compatibility.val ->
-                if conf.wizard || conf.friend then () else echo.val := False
-            | 'y' when compatibility.val ->
-                if not conf.wizard && not conf.just_friend_wizard
-                && not conf.cgi && conf.auth_file = "" then ()
-                else echo.val := False
-            | 'z' when compatibility.val ->
-                if not conf.wizard && not conf.friend && not conf.cgi
-                && conf.auth_file = "" then ()
-                else echo.val := False
-            | c -> Wserver.wprint "%%%c" c ]
+          match c with
+          [ 'I' -> push_echo (echo.val && if_expr (input_char ic))
+          | 'E' -> pop_echo ()
+          | _ when not echo.val -> ()
+          | '%' -> Wserver.wprint "%%"
+          | '[' | ']' -> Wserver.wprint "%c" c
+          | 'a' ->
+              match Util.find_person_in_env conf base "z" with
+              [ Some ip ->
+                  Wserver.wprint "%s"
+                    (referenced_person_title_text conf base ip)
+              | None -> () ]
+          | 'b' ->
+              let s =
+                try " dir=" ^ Hashtbl.find conf.lexicon " !dir" with
+                [ Not_found -> "" ]
+              in
+              let s = s ^ " " ^ body_prop conf in
+              Wserver.wprint "%s" s
+          | 'c' ->
+              let (wc, rc, d) = count conf in
+              Num.print (fun x -> Wserver.wprint "%s" x)
+                (transl conf "(thousand separator)")
+                (Num.of_int wc)
+          | 'd' -> print_date conf
+          | 'f' -> Wserver.wprint "%s" conf.command
+          | 'g' ->
+              do Wserver.wprint "%s?" conf.command;
+                 if conf.cgi then Wserver.wprint "b=%s;" conf.bname else ();
+              return ()
+          | 'h' -> hidden_env conf
+          | 'k' ->
+              Wserver.wprint "%s?"
+                (if conf.cgi then conf.command else "geneweb")
+          | 'l' -> Wserver.wprint "%s" conf.lang
+          | 'n' ->
+              Num.print (fun x -> Wserver.wprint "%s" x)
+                (transl conf "(thousand separator)")
+                (Num.of_int base.data.persons.len)
+          | 'q' ->
+              let (wc, rc, d) = count conf in
+              Num.print (fun x -> Wserver.wprint "%s" x)
+                (transl conf "(thousand separator)")
+                (Num.of_int (wc + rc))
+          | 'r' -> copy_from_file conf base (input_line ic)
+          | 's' -> Wserver.wprint "%s" (commd conf)
+          | 't' -> Wserver.wprint "%s" conf.bname
+          | 'v' -> Wserver.wprint "%s" Version.txt
+          | c -> Wserver.wprint "%%%c" c ]
       | c -> if echo.val then Wserver.wprint "%c" c else () ];
     done
   with

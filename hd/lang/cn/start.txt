@@ -27,8 +27,8 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-现有 %n 人在数据库中%o
-(<a href="%sm=NOTES">[note/notes]1</a>)%o。
+现有 %n 人在数据库中%In
+(<a href="%sm=NOTES">[note/notes]1</a>)%E。
 
 <ul>
 <li>
@@ -42,14 +42,14 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
-[or] <em>[surname/surnames]</em>%u
-or <em>Sosa number</em> relative to %a%u
+[or] <em>[surname/surnames]</em>%Iz
+or <em>Sosa number</em> relative to %a%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
-%T<li>
+%It<li>
 
 <FORM method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -58,7 +58,7 @@ or <em>Sosa number</em> relative to %a%u
 <INPUT TYPE=submit VALUE="Ok">
 </FORM>
 
-%T<li>
+%E<li>
 
 <FORM method=GET action="%f">
 %h<table border=0>
@@ -82,14 +82,14 @@ or <em>Sosa number</em> relative to %a%u
 
 <li> <a href="%sm=H;v=advanced">[*advanced request]</a>.
 
-%w<li> <a href="%sm=ADD_FAM">增加家庭记录</a>.
+%Iw<li> <a href="%sm=ADD_FAM">增加家庭记录</a>.
 <li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w
+%E
 
 </ul>
 
-<a href="%sm=AN">出生于今日的记录</a>%x
-和<a href="%sm=B;k=10">最近出生的记录</a>%x。
+<a href="%sm=AN">出生于今日的记录</a>%I|wf
+和<a href="%sm=B;k=10">最近出生的记录</a>%E。
 <br>
 <a href="%sm=AD">死亡于今日的记录</a>。
 <br>
@@ -97,19 +97,19 @@ or <em>Sosa number</em> relative to %a%u
 <p>
 已经有 %q 次访问数据库，其中 %c 次访问本主页， 自从 %d。
 
-%y<p>
+%I&NwNj<p>%I&NcNa
 
 <ul>
 <li> <a href="%sw=w"><em>Wizard</em></a> access (password).
-%y%z<li> <a href="%sw=f"><em>Friend</em></a> access (password).
-%z%y</ul>
+%INf<li> <a href="%sw=f"><em>Friend</em></a> access (password).
+%E</ul>
 
-%y%i<p>
-<form method=get action="%f">
+%E%I|ca<form method=get action="%f">
 %h<font size=-1>授权用户(friend or wizard), 请输入密码：</font>
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
 </form>
-%i<p>
+
+%E%E<p>
 
 <font size=-1><a href="%sm=LEX">本站使用的术语</a></font>

@@ -27,24 +27,21 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <p>
 
 La base <font color=#2f6400><b>"%t"</b></font> contiene actualmente %n
-personas.%o<br> (<a href="%sm=NOTES">[note/notes]1</a>)%o
+personas.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
 
-%y<br><p>
+%I&NwNj<br><p>
 
-<table border=0 width="70%">
+%I&NcNa<table border=0 width="70%">
 <tr>
 
 <td align=center><a href="%sw=w">Entrada <em>brujo</em></a><br>
 (contrase&ntilde;a)<br></td>
 
-%y%z<td align=center><a href="%sw=f">Entrada <em>amigo</em></a><br>
+%INf<td align=center><a href="%sw=f">Entrada <em>amigo</em></a><br>
 (contrase&ntilde;a)</td>
 
-%z%y</tr></table>
-
-%y%i<br><p>
-
-<table border=0>
+%E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=get action="%f">
 %hContrase&ntilde;a, para entrada <em>amigo</em> o <em>brujo</em>:
@@ -52,9 +49,8 @@ personas.%o<br> (<a href="%sm=NOTES">[note/notes]1</a>)%o
 </form>
 </td></tr>
 </table>
-%i
 
-<br><p>
+%E%E<br><p>
 
 <table border=0 cellspacing=0 cellpadding=0>
 
@@ -76,31 +72,31 @@ personas.%o<br> (<a href="%sm=NOTES">[note/notes]1</a>)%o
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
-[or] <em>[surname/surnames]</em>%u
-[or] <em>n&uacute;mero Sosa</em> respecto a %a%u
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em>n&uacute;mero Sosa</em> respecto a %a%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
-$It<li>
+%It<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>por t&iacute;tulo</b></font>$INl<br>$E
-<input name=t size=14 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>por t&iacute;tulo</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
 (ej: roi, duke...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>lugar</b></font>$INl<br>$E
-<input name=p size=25 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>lugar</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
 (ej: de France, of Sax...)
 </td><td>
 <input type=submit value="Ok">
 </td></tr></table>
 </form>
 
-$E<li>
+%E<li>
 
 <form method=GET action="%f">
 %h
@@ -125,7 +121,7 @@ avanzada</b></font></a>.
 
 </ul>
 
-%w<p>
+%Iw<p>
 
 <center>Puede<br><p>
 
@@ -134,19 +130,18 @@ avanzada</b></font></a>.
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">agregar una familia</a>
-$INl</ul>$E
+%INl</ul>%E
 </td>
 <td align=left>
-$INl<ul>$E
+%INl<ul>%E
 <li><a href="%sm=MOD_NOTES">modificar las notas</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-%w
 
-<center>Puede consultar<br><p>
+%E<center>Puede consultar<br><p>
 
 <table border=0>
 <tr>
@@ -154,14 +149,14 @@ $INl<ul>$E
 <ul>
 <li>los <a href="%sm=AN">cumplea&ntilde;os</a>
 <li>los <a href="%sm=AD">aniversarios de las personas fallecidas</a>
-<li>los <a href="%sm=AM">aniversarios de casamiento</a>%x
-<li>los <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>%x
+<li>los <a href="%sm=AM">aniversarios de casamiento</a>%I|wf
+<li>los <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>%E
 </ul>
 </td>
 <td valign=up>
-<ul>%x
-<li>las <a href="%sm=LD;k=10">muertes recientes</a>%x%j
-<li>los <a href="%sm=HIST;k=10">{history of updates}</a>%j
+<ul>%I|wf
+<li>las <a href="%sm=LD;k=10">muertes recientes</a>%E%Ih
+<li>los <a href="%sm=HIST;k=10">{history of updates}</a>%E
 <li>los <a href="%sm=CAL">{calendars}</a>
 <li>el <a href="%sm=FORUM">forum de la base de datos</a>
 </ul>
@@ -174,7 +169,7 @@ $INl<ul>$E
 
 Han habido %q consultas, de las cuales %c corresponden a esta
 p&aacute;gina, desde el %d.
-$Il<p>$E
+%Il<p>%E
 
 </td></tr>
 

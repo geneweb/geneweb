@@ -26,25 +26,22 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-The data base <font color=#2f6400><b>"%t"</b></font> now holds %n persons.%o<br>
-(<a href="%sm=NOTES">[note/notes]1</a>)%o
+The data base <font color=#2f6400><b>"%t"</b></font> now holds %n
+persons.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
 
-%y<br><p>
+%I&NwNj<br><p>
 
-<table border=0 width="70%">
+%I&NcNa<table border=0 width="70%">
 <tr>
 
 <td align=center><a href="%sw=w"><em>Wizard</em></a> access<br>
 (password)<br></td>
 
-%y%z<td align=center><a href="%sw=f"><em>Friend</em></a> access<br>
+%INf<td align=center><a href="%sw=f"><em>Friend</em></a> access<br>
 (password)</td>
 
-%z%y</tr></table>
-
-%y%i<br><p>
-
-<table border=0>
+%E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=get action="%f">
 %hPassword, for <em>friend</em> or <em>wizard</em> access:
@@ -52,9 +49,8 @@ The data base <font color=#2f6400><b>"%t"</b></font> now holds %n persons.%o<br>
 </form>
 </td></tr>
 </table>
-%i
 
-<br><p>
+%E%E<br><p>
 
 <table border=0 cellspacing=0 cellpadding=0>
 
@@ -76,31 +72,31 @@ To navigate in this data base, you can do your search:<br><p>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
-[or] <em>[surname/surnames]</em>%u
-[or] <em>num&eacute;ro Sosa</em> par rapport &agrave; %a%u
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em>num&eacute;ro Sosa</em> par rapport &agrave; %a%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
-%T<li>
+%It<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>by title</b></font>$INl<br>$E
-<input name=t size=14 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>by title</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
 (ex: roi, duke...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>place</b></font>$INl<br>$E
-<input name=p size=25 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>place</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
 (ex: de France, of Sax...)
 </td><td>
 <input type=submit value="Ok">
 </td></tr></table>
 </form>
 
-%T<li>
+%E<li>
 
 <form method=GET action="%f">
 %h
@@ -125,7 +121,7 @@ request</b></font></a>.
 
 </ul>
 
-%w<p>
+%Iw<p>
 
 <center>You can<br><p>
 
@@ -134,19 +130,18 @@ request</b></font></a>.
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">add a family</a>
-$INl</ul>
+%INl</ul>
 </td>
 <td align=left>
-<ul>$E
+<ul>%E
 <li><a href="%sm=MOD_NOTES">modify the notes</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-%w
 
-<center>You can also consult<br><p>
+%E<center>You can also consult<br><p>
 
 <table border=0>
 <tr>
@@ -154,14 +149,14 @@ $INl</ul>
 <ul>
 <li>the <a href="%sm=AN">birthday anniversaries</a>
 <li>the <a href="%sm=AD">death anniversaries</a>
-<li>the <a href="%sm=AM">marriage anniversaries</a>%x
-<li>the <a href="%sm=LB;k=10">latest births</a>%x
+<li>the <a href="%sm=AM">marriage anniversaries</a>%I|wf
+<li>the <a href="%sm=LB;k=10">latest births</a>%E
 </ul>
 </td>
 <td valign=up>
-<ul>%x
-<li>the <a href="%sm=LD;k=10">latest deaths</a>%x%j
-<li>the <a href="%sm=HIST;k=10">history of updates</a>%j
+<ul>%I|wf
+<li>the <a href="%sm=LD;k=10">latest deaths</a>%E%Ih
+<li>the <a href="%sm=HIST;k=10">history of updates</a>%E
 <li>the <a href="%sm=CAL">calendars</a>
 <li>the <a href="%sm=FORUM">data base forum</a>
 </ul>
@@ -173,7 +168,7 @@ $INl</ul>
 <p>
 
 There has been %q accesses, %c of them to this page, since %d.
-$Il<p>$E
+%Il<p>%E
 
 </td></tr>
 

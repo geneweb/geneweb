@@ -26,25 +26,22 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <p>
 
-Gagnagrunnurinn <font color=#2f6400><b>"%t"</b></font> er nú með %n einstaklinga.%o<br>
-(<a href="%sm=NOTES">[note/notes]1</a>)%o
+Gagnagrunnurinn <font color=#2f6400><b>"%t"</b></font> er nú með %n
+einstaklinga.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
 
-%y<br><p>
+%I&NwNj<br><p>
 
-<table border=0 width="70%">
+%I&NcNa<table border=0 width="70%">
 <tr>
 
 <td align=center><a href="%sw=w"><em>Wizard</em></a> aðgangur<br>
 (aðgangsorð)<br></td>
 
-%y%z<td align=center><a href="%sw=f"><em>Vina</em></a> aðgangur<br>
+%INf<td align=center><a href="%sw=f"><em>Vina</em></a> aðgangur<br>
 (aðgangsorð)</td>
 
-%z%y</tr></table>
-
-%y%i<br><p>
-
-<table border=0>
+%E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=get action="%f">
 %hAðgangsorð, fyrir <em>vin</em> eða <em>wizard</em> aðgang:
@@ -52,9 +49,8 @@ Gagnagrunnurinn <font color=#2f6400><b>"%t"</b></font> er nú með %n einstaklinga
 </form>
 </td></tr>
 </table>
-%i
 
-<br><p>
+%E%E<br><p>
 
 <table border=0 cellspacing=0 cellpadding=0>
 
@@ -76,31 +72,31 @@ Til að lóðsa þig í gegnum gagnagrunninn getur þú leitað:<br><p>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
-[or] <em>[surname/surnames]</em>%u
-[or] <em>Sosa</em> skýrsla; %a%u
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em>Sosa</em> skýrsla; %a%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
-%T<li>
+%It<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>eftir titli</b></font>$INl<br>$E
-<input name=t size=14 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>eftir titli</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
 (td: hertoginn...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>stað</b></font>$INl<br>$E
-<input name=p size=25 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>stað</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
 (td: af Frakklandi, af Sax...)
 </td><td>
 <input type=submit value="Ok">
 </td></tr></table>
 </form>
 
-%T<li>
+%E<li>
 
 <form method=GET action="%f">
 %h
@@ -125,7 +121,7 @@ eftir
 
 </ul>
 
-%w<p>
+%Iw<p>
 
 <center>Þú getur<br><p>
 
@@ -134,17 +130,17 @@ eftir
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">bætt við fjölskyldu</a>
-$INl</ul>
+%INl</ul>
 </td>
 <td align=left>
-<ul>$E
+<ul>%E
 <li><a href="%sm=MOD_NOTES">breytt athugasemdum</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-%w
+%E
 
 <center>Þú getur líka athugað<br><p>
 
@@ -154,14 +150,14 @@ $INl</ul>
 <ul>
 <li><a href="%sm=AN">afmælisdaga</a>
 <li><a href="%sm=AD">dánarafmæli</a>
-<li><a href="%sm=AM">brúðkaupsafmæli</a>%x
-<li><a href="%sm=LB;k=10">síðustu fæðingar</a>%x
+<li><a href="%sm=AM">brúðkaupsafmæli</a>%I|wf
+<li><a href="%sm=LB;k=10">síðustu fæðingar</a>%E
 </ul>
 </td>
 <td valign=up>
-<ul>%x
-<li><a href="%sm=LD;k=10">síðustu andlát</a>%x%j
-<li><a href="%sm=HIST;k=10">uppfærslusögu</a>%j
+<ul>%I|wf
+<li><a href="%sm=LD;k=10">síðustu andlát</a>%E%Ih
+<li><a href="%sm=HIST;k=10">uppfærslusögu</a>%E
 <li><a href="%sm=CAL">dagatöl</a>
 <li><a href="%sm=FORUM">gagnagrunnurinn umræður</a>
 </ul>
@@ -173,7 +169,7 @@ $INl</ul>
 <p>
 
 Það hafa verið %q heimsóknir, %c af þeim á þessa síðu, síðan %d.
-$Il<p>$E
+%Il<p>%E
 
 </td></tr>
 

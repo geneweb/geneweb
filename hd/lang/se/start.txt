@@ -26,25 +26,21 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <p>
 
 Databasen <font color=#2f6400><b>"%t"</b></font> inneh&aring;ller nu
-%n personer.%o<br>
-(<a href="%sm=NOTES">[note/notes]1</a>)%o
+%n personer.%In<br>
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
 
-%y<br><p>
+%I&NwNj<br><p>
 
-<table border=0 width="70%">
+%I&NcNa<table border=0 width="70%">
 <tr>
 
 <td align=center><a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br>
 (passord)<br></td>
 
-%y%z<td align=center><a href="%sw=f"><em>V&auml;nners</em></a>
+%INf<td align=center><a href="%sw=f"><em>V&auml;nners</em></a>
 tilltr&auml;de<br> (passord)</td>
 
-%z%y</tr></table>
-
-%y%i<br><p>
-
-<table border=0>
+%E</tr></table>%E%I|ca<table border=0>
 <tr><td align=center>
 <form method=get action="%f">
 %hPassord, f&ouml;r <em>v&auml;nner</em> eller
@@ -53,9 +49,8 @@ tilltr&auml;de<br> (passord)</td>
 </form>
 </td></tr>
 </table>
-%i
 
-<br><p>
+%E%E<br><p>
 
 <table border=0 cellspacing=0 cellpadding=0>
 
@@ -77,31 +72,31 @@ F&ouml;r att navigera i denna databas, kan du s&ouml;ka:<br><p>
 <em>[first name/first names]</em> <em>[surname/surnames]</em>
 [or] <em>[public name]</em>
 [or] <em>[alias]</em>
-[or] <em>[surname/surnames]</em>%u
-[or] <em>Sosa nummer</em> relativ till %a%u
+[or] <em>[surname/surnames]</em>%Iz
+[or] <em>Sosa nummer</em> relativ till %a%E
 <li> <input type=radio name=t value=P> <em>[first name/first names]</em>
 <li> <input type=radio name=t value=N> <em>[surname/surnames]</em>
 </ul>
 </form>
 
-$It<li>
+%It<li>
 
 <form method=GET action="%f">
 %h<input type=hidden name=m value=TT>
 <table border=0 cellpadding=0 cellspacing=0><tr><td>
-<font color=#2f6400><b>efter titel</b></font>$INl<br>$E
-<input name=t size=14 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>efter titel</b></font>%INl<br>%E
+<input name=t size=14 maxlength=200>%INl<br>%E
 (ex: roi, duke...)<br>
 </td><td>...</td><td>
-<font color=#2f6400><b>plats</b></font>$INl<br>$E
-<input name=p size=25 maxlength=200>$INl<br>$E
+<font color=#2f6400><b>plats</b></font>%INl<br>%E
+<input name=p size=25 maxlength=200>%INl<br>%E
 (ex: de France, of Sax...)
 </td><td>
 <input type=submit value="Ok">
 </td></tr></table>
 </form>
 
-$E<li>
+%E<li>
 
 <form method=GET action="%f">
 %h
@@ -126,7 +121,7 @@ s&ouml;kning</b></font></a>.
 
 </ul>
 
-%w<p>
+%Iw<p>
 
 <center>Du kan<br><p>
 
@@ -135,19 +130,18 @@ s&ouml;kning</b></font></a>.
 <td align=right>
 <ul>
 <li><a href="%sm=ADD_FAM">l&auml;gga till en familj</a>
-$INl</ul>
+%INl</ul>
 </td>
 <td align=left>
-<ul>$E
+<ul>%E
 <li><a href="%sm=MOD_NOTES">&auml;ndra noteringar</a>
 </ul>
 </td>
 </tr>
 </table>
 </center>
-%w
 
-<center>Du kan ocks&aring; konsultera<br><p>
+%E<center>Du kan ocks&aring; konsultera<br><p>
 
 <table border=0>
 <tr>
@@ -155,14 +149,14 @@ $INl</ul>
 <ul>
 <li><a href="%sm=AN">f&ouml;delsedagar</a>
 <li><a href="%sm=AD">&aring;rsdagar f&ouml;r d&ouml;da personer</a>
-<li><a href="%sm=AM">br&ouml;llopsdagar</a>%x
-<li>de <a href="%sm=LB;k=10">senaste f&ouml;dslarna</a>%x
+<li><a href="%sm=AM">br&ouml;llopsdagar</a>%I|wf
+<li>de <a href="%sm=LB;k=10">senaste f&ouml;dslarna</a>%E
 </ul>
 </td>
 <td valign=up>
-<ul>%x
-<li>de <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>%x%j
-<li><a href="%sm=HIST;k=10">uppdateringarnas historia</a>%j
+<ul>%I|wf
+<li>de <a href="%sm=LD;k=10">senaste d&ouml;dsfallen</a>%E%Ih
+<li><a href="%sm=HIST;k=10">uppdateringarnas historia</a>%E
 <li><a href="%sm=CAL">kalender</a>
 <li><a href="%sm=FORUM">databas forum</a>
 </ul>
@@ -174,7 +168,7 @@ $INl</ul>
 <p>
 
 Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan, sedan %d.
-$Il<p>$E
+%Il<p>%E
 
 </td></tr>
 

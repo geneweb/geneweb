@@ -26,8 +26,8 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </center>
 
 <p>
-יש במאגר המידע %n אנשים %o
-(<a href="%sm=NOTES">[note/notes]1</a>)%o
+יש במאגר המידע %n אנשים %In
+(<a href="%sm=NOTES">[note/notes]1</a>)%E
 
 <ul>
 
@@ -48,7 +48,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 </ul>
 </form>
 
-%T<li>
+%It<li>
 
 <FORM method=GET action="%f">
 %h<input type=hidden name=m value=TT>
@@ -57,7 +57,7 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <INPUT TYPE=submit value="חפס">
 </FORM>
 
-%T<li>
+%E<li>
 
 <FORM method=GET action="%f">
 %h כל
@@ -75,14 +75,14 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 
 <li> <a href="%sm=H;v=advanced">בקשה מתקדמת</a>.
 
-%w<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
+%Iw<li> <a href="%sm=ADD_FAM">[*add][family/families]0</a>.
 <li> <a href="%sm=MOD_NOTES">[*modify][note/notes]1</a>.
-%w
+%E
 
 </ul>
 
-<a href="%sm=AN">ימי הולדת</a>%x
-ו- <a href="%sm=B;k=10">לידות לאחרונה</a>%x...
+<a href="%sm=AN">ימי הולדת</a>%I|wf
+ו- <a href="%sm=B;k=10">לידות לאחרונה</a>%E...
 <br><!-- -->
 <a href="%sm=AD">ימי השנה למתים</a>.
 <br><!-- -->
@@ -90,19 +90,19 @@ height=108 src="%km=IM;v=/gwlogo.gif" align=left border=0 alt=GeneWeb></a>
 <p>
 היו %q פנייות, מתוכם %c לעמוד זה, מתאריך %d.
 
-%y<p>
+%I&NwNj<p>
 
-<ul>
+%I&NcNa<ul>
 <li> <a href="%sw=w">סיסמה לכניסה <em>כגאון</em>.
-%y%z<li> <a href="%sw=f">סיסמה לכניסה <em>מיוחסת</em>
-%z%y</ul>
+%INf<li> <a href="%sw=f">סיסמה לכניסה <em>מיוחסת</em>
+%E</ul>
 
-%y%i<p>
-<form method=get action="%f">
+%E%I|ca<form method=get action="%f">
 %h<font size=-1>סיסמה לכניסה <em>מיוחסת</em> או <em>כגאון</em></font>
 <input name=w size=20 maxlength=200> =&gt;
 <input type=submit value="Ok">
 </form>
-%i<p>
+
+%E%E<p>
 
 <font size=-1><a href="%glang=en;m=LEX">מילון</a></font>

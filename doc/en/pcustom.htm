@@ -172,22 +172,58 @@ consultation.
 
 </ul>
 
-<li><strong>Conditional.</strong><br>
+<li><strong>Conditionals.</strong><br>
+
+Conditionals start with "<font size=+1><tt>%I</tt></font>" followed by
+a boolean expression (true or false) and end with "<font
+size=+1><tt>%E</tt></font>". The text between these two macros is
+displayed if and only if the boolean expression is true. A boolean
+expression is either:
 
 <ul>
 
-<li>"<font size=+1><tt>%w... %w</tt></font>": display if "wizard".
+<li>"<font size=+1><tt>f</tt></font>" : we are "friend"
 
-<li>"<font size=+1><tt>%x... %x</tt></font>": display if "wizard" or
-"friend".
+<li>"<font size=+1><tt>w</tt></font>" : we are "wizard"
 
-<li>"<font size=+1><tt>%y... %y</tt></font>": display if "server" mode
-(not CGI) and not "wizard".
+<li>"<font size=+1><tt>j</tt></font>" : we are "wizard" just "friend"
+(cf <a href="start.htm#Cnf">file a.gwf</a>, "wizard_just_friend")
 
-<li>"<font size=+1><tt>%z... %z</tt></font>": display if "server" mode
-(not CGI) and neither "wizard" nor "friend".
+<li>"<font size=+1><tt>c</tt></font>" : we are in cgi mode
 
-<li>"<font size=+1><tt>%i... %i</tt></font>": display if CGI mode.
+<li>"<font size=+1><tt>h</tt></font>" : there is a history file
+
+<li>"<font size=+1><tt>l</tt></font>" : the browser does not treat tables
+
+<li>"<font size=+1><tt>n</tt></font>" : there are notes for the database
+
+<li>"<font size=+1><tt>t</tt></font>" : there is a search by nobility titles
+
+<li>"<font size=+1><tt>z</tt></font>" : there is a person selected as
+Sosa referecence (see macro "<font size=+1><tt>%u</tt></font>")
+
+<li>"<font size=+1><tt>a</tt></font>" : there is a <a
+href="access.htm#DBA">global access restriction</a> for the data base
+
+<li>"<font size=+1><tt>N</tt></font>" : contrary of the following expression
+
+<li>"<font size=+1><tt>|</tt></font>" : logical "or" between the two
+following expressions
+
+<li>"<font size=+1><tt>&amp;</tt></font>" : logical "and" between the
+two following expressions
+
+</ul>
+
+Examples:
+
+<ul>
+
+<li> display the text if there is a search by title: <font
+size=+1><tt>%It...%E</tt></font>
+
+<li> display the text if we are neither "wizard" nor "friend": <font
+size=+1><tt>%I&amp;NwNf...%E</tt></font>
 
 </ul>
 
@@ -207,6 +243,8 @@ below) in the form "&lt; input type=hidden name=var value=val&gt;".
 <li>"<font size=+1><tt>%l</tt></font>": language.
 
 <li>"<font size=+1><tt>%n</tt></font>": number of persons in the database.
+
+<li>"<font size=+1><tt>%u</tt></font>" : person selected as Sosa reference.
 
 <li>"<font size=+1><tt>%%</tt></font>": only one "%".
 
@@ -233,10 +271,6 @@ Some macros refer to <strong>contextual variables</strong>. They are:
 </ul>
 
 <p>
-
-The <strong>conditional</strong> cannot overlap: one cannot put one
-"<font size=+1><tt>%w... %w</tt></font>" inside one "<font
-size=+1><tt>%i... %i</tt></font>".
 
 <h4><a name="Ass">Associated pages</a></h4>
 
