@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.46 2000-06-21 21:13:07 ddr Exp $ *)
+(* $Id: relation.ml,v 3.47 2000-06-22 00:07:23 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -648,11 +648,23 @@ value print_relation_with_alliance conf base ip1 ip2 excl_faml =
      if try width_search [ip1] 0 [ip2] 0 with [ FoundLink -> False ] then
        let p1 = poi base ip1 in
        let p2 = poi base ip2 in
-       Wserver.wprint "%s\n"
-         (capitale
-            (cftransl conf "no known relationship link between %s and %s"
-               [gen_referenced_person_title_text raw_access conf base p1;
-                gen_referenced_person_title_text raw_access conf base p2]))
+       let s1 = gen_referenced_person_title_text raw_access conf base p1 in
+       let s2 = gen_referenced_person_title_text raw_access conf base p2 in
+       if excl_faml = [] then
+         do Wserver.wprint "<center><h1><font color=%s>" conf.highlight;
+            title False;
+            Wserver.wprint "</font></h1></center>\n";
+            Util.print_link_to_welcome conf True;
+            Wserver.wprint "%s\n"
+              (capitale
+                 (cftransl conf "no known relationship link between %s and %s"
+                    [s1; s2]));
+         return ()
+       else
+         tag "ul" begin
+           Wserver.wprint "<li>%s\n" s1;
+           Wserver.wprint "<li>%s\n" s2;
+         end
      else ();
      trailer conf;
   return ()
