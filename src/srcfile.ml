@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 2.17 1999-09-16 09:31:49 ddr Exp $ *)
+(* $Id: srcfile.ml,v 2.18 1999-09-24 11:55:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -165,7 +165,7 @@ value rec copy_from_channel conf base ic =
           let c = input_char ic in
           if not echo.val then
             match c with
-            [ 'w' | 'x' | 'y' | 'z' | 'i' | 'u' | 'o' -> echo.val := True
+            [ 'w' | 'x' | 'y' | 'z' | 'i' | 'j' | 'u' | 'o' -> echo.val := True
             | _ -> () ]
           else
             match c with
@@ -204,6 +204,9 @@ value rec copy_from_channel conf base ic =
             | 'h' -> hidden_env conf
             | 'i' ->
                 if conf.cgi || conf.auth_file <> "" then ()
+                else echo.val := False
+            | 'j' ->
+                if Sys.file_exists (History.file_name conf) then ()
                 else echo.val := False
             | 'l' -> Wserver.wprint "%s" conf.lang
             | 'n' ->

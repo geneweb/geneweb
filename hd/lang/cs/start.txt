@@ -72,7 +72,8 @@ seøazená podle
 <a href="%sm=AD">vıroèí úmrtí</a>.<br>
 <a href="%sm=AM">vıroèí sòatkù</a>.<br>%x
 <a href="%sm=LB;k=10">nedávná narození</a>.<br>
-<a href="%sm=LD;k=10">nedávná úmrtí</a>.%x<br>
+<a href="%sm=LD;k=10">nedávná úmrtí</a>.%x%j<br>
+<a href="%sm=HIST;k=10">[*updates history]</a>.%j<br>
 <a href="%sm=CAL">[*calendar/calendars]1</a>.
 <p>
 %q pøístupù, z toho %c na tuto stránku, od %d.

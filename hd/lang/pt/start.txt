@@ -69,7 +69,8 @@ Os <a href="%sm=AN">anivers&aacute;rios</a>.<br>
 Os <a href="%sm=AD">anivers&aacute;rios das pessoas falecidas</a>.<br>
 Os <a href="%sm=AM">anivers&aacute;rios de casamento</a>.<br>%x
 Os <a href="%sm=LB;k=10">reci&eacute;n nacidos</a>.<br>
-Os <a href="%sm=LD;k=10">reci&eacute;n mortes</a>.%x<br>
+Os <a href="%sm=LD;k=10">reci&eacute;n mortes</a>.%x%j<br>
+<a href="%sm=HIST;k=10">[*updates history]</a>.%j<br>
 <a href="%sm=CAL">[*calendar/calendars]1</a>.
 
 <p>
