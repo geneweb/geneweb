@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.16 1999-12-07 13:06:27 ddr Exp $ *)
+(* $Id: relation.ml,v 3.17 1999-12-07 14:18:10 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -237,10 +237,10 @@ value print_relation_path_table_seprow conf base path i width =
       let (next_is_sibling, ip, iq) =
         try
           let (ip, fl, _, _) =
-            List.find (fun (_, _, nx, ny) -> nx == succ j && ny == i) path
+            list_find (fun (_, _, nx, ny) -> nx == succ j && ny == i) path
           in
           let (iq, _, _, _) =
-            List.find (fun (_, _, nx, ny) -> nx == j && ny == i) path
+            list_find (fun (_, _, nx, ny) -> nx == j && ny == i) path
           in
           (fl == Sibling || fl == HalfSibling, Some ip, Some iq)
         with
@@ -279,7 +279,7 @@ value print_relation_path_table_seprow conf base path i width =
              let child =
                try
                  let (_, fl, _, _) =
-                   List.find (fun (_, _, nx, ny) -> nx == j && ny == i) path
+                   list_find (fun (_, _, nx, ny) -> nx == j && ny == i) path
                  in
                  fl == Child
                with
@@ -288,7 +288,7 @@ value print_relation_path_table_seprow conf base path i width =
              let parent =
                try
                  let (_, fl, _, _) =
-                   List.find (fun (_, _, nx, ny) -> nx == j && ny == pred i)
+                   list_find (fun (_, _, nx, ny) -> nx == j && ny == pred i)
                      path
                  in
                  fl == Parent
@@ -312,7 +312,7 @@ value print_relation_path_table_mainrow conf base path i width =
     for j = 0 to width do
       try
         let (ip, fl, _, _) =
-          List.find (fun (_, _, nx, ny) -> nx == j && ny == i) path
+          list_find (fun (_, _, nx, ny) -> nx == j && ny == i) path
         in
         let p = poi base ip in
         do if j == 0 then ()
