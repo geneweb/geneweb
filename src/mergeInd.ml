@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 3.15 2000-11-26 14:45:01 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.16 2000-11-28 20:54:26 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -470,6 +470,34 @@ value print_merged conf base p =
   return ()
 ;
 
+value is_ancestor base ip1 ip2 =
+  let visited = Array.create base.data.persons.len False in
+  loop ip2 where rec loop ip =
+    if visited.(Adef.int_of_iper ip) then False
+    else if ip = ip1 then True
+    else
+      do visited.(Adef.int_of_iper ip) := True; return
+      match (aoi base ip).parents with
+      [ Some ifam ->
+          let cpl = coi base ifam in
+          loop cpl.father || loop cpl.mother
+      | None -> False ]
+;
+
+value error_loop conf base p =
+  let title _ = Wserver.wprint "%s" (capitale (transl conf "error")) in
+  do rheader conf title;
+     print_link_to_welcome conf True;
+     Wserver.wprint "<strong>%s%s %s</strong>" (p_first_name base p)
+       (if p.occ = 0 then "" else "." ^ string_of_int p.occ)
+       (p_surname base p);
+     Wserver.wprint "\n%s\n"
+       (transl conf "would be his/her own ancestor");
+     Wserver.wprint "\n";
+     trailer conf;
+  return ()
+;
+
 value print conf base =
   let p1 =
     match p_getint conf.env "i" with
@@ -491,6 +519,10 @@ value print conf base =
       if p1.cle_index = p2.cle_index then same_person conf
       else if p1.sex <> p2.sex && p1.sex <> Neuter && p2.sex <> Neuter
       then different_sexes conf
+      else if is_ancestor base p1.cle_index p2.cle_index then
+        error_loop conf base p2
+      else if is_ancestor base p2.cle_index p1.cle_index then
+        error_loop conf base p1
       else
         let bfile = Filename.concat Util.base_dir.val conf.bname in
         lock (Iobase.lock_file bfile) with
