@@ -9,6 +9,10 @@ GeneWeb Intermediate Version 2.02-1
   - [May 11, 99] Give up the second command of base recovery when the first
     one returns an error code.
 
+* GeneWeb daemon/CGI (gwd)
+  - [May 18, 99] Added thousand separator for displaying of number of persons
+    in the welcome page.
+
 * Compilation
   - [May 12,99] Fixed YAAP (yet another accent problem...)
   - [May 8, 99] Added "make opt" case in "setup" to build optimized versions.
