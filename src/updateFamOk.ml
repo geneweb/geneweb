@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: updateFamOk.ml,v 4.7 2001-06-15 04:34:25 ddr Exp $ *)
+(* $Id: updateFamOk.ml,v 4.8 2001-06-20 16:34:48 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -726,7 +726,7 @@ value print_add o_conf base =
           | _ -> False ]
         in
         if ext || redisp then
-          UpdateFam.print_add1 conf base sfam scpl sdes False
+          UpdateFam.print_update_fam conf base (sfam, scpl, sdes) ""
         else if forbidden_disconnected conf sfam scpl sdes then
           print_error_disconnected conf
         else do {
@@ -808,7 +808,7 @@ value print_mod_aux conf base callback =
         in
         if digest = raw_get conf "digest" then
           if ext || redisp then
-            UpdateFam.print_mod1 conf base sfam scpl sdes digest
+            UpdateFam.print_update_fam conf base (sfam, scpl, sdes) digest
           else do { strip_family sfam sdes; callback sfam scpl sdes }
         else Update.error_digest conf base
       with

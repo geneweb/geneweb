@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.16 2001-06-19 08:00:04 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.17 2001-06-20 16:34:47 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -32,6 +32,7 @@ value string_family_of base fam cpl des =
   (sfam, scpl, sdes)
 ;
 
+(*
 module Old = struct
 
 value
@@ -674,6 +675,7 @@ value print_merge1 conf base fam des fam2 digest =
 ;
 
 end;
+*)
 
 (* Interpretation of template file 'updfam.txt' *)
 
@@ -1059,22 +1061,16 @@ value print_update_fam conf base fcd digest =
 ;
 
 value print_add1 conf base fam cpl des force_children_surnames =
-  if p_getenv conf.base_env "updfam" = Some "on" then
-    print_update_fam conf base (fam, cpl, des) ""
-  else Old.print_add1 conf base fam cpl des force_children_surnames
+  print_update_fam conf base (fam, cpl, des) ""
 ;
 
 value print_mod1 conf base fam cpl des digest =
-  if p_getenv conf.base_env "updfam" = Some "on" then
-    print_update_fam conf base (fam, cpl, des) digest
-  else Old.print_mod1 conf base fam cpl des digest
+  print_update_fam conf base (fam, cpl, des) digest
 ;
 
 value print_merge1 conf base fam des fam2 digest =
-  if p_getenv conf.base_env "updfam" = Some "on" then
-    let cpl = Gutil.map_couple_p (person_key base) (coi base fam.fam_index) in
-    print_update_fam conf base (fam, cpl, des) digest
-  else Old.print_merge1 conf base fam des fam2 digest
+  let cpl = Gutil.map_couple_p (person_key base) (coi base fam.fam_index) in
+  print_update_fam conf base (fam, cpl, des) digest
 ;
 
 value print_del1 conf base fam =

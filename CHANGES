@@ -2,6 +2,8 @@ GeneWeb version 4.02
 --------------------
 
 * GeneWeb server or CGI (gwd)
+  - [20 Jun 01] Added template file for update family forms
+    (updfam.txt), which can then be customized.
   - [15 Jun 01] Fixed bug in merging families: if there were a key
     conflict in one person, the button "Create" proposing to select a
     fresh key number did not work.
