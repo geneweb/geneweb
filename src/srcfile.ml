@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.34 2001-01-19 16:54:22 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.35 2001-01-29 15:33:26 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -163,8 +163,7 @@ value incr_request_counter conf =
 
 value lang_file_name conf fname =
   let fname1 =
-    List.fold_right Filename.concat [Util.base_dir.val; "lang"; conf.lang]
-      (Filename.basename fname ^ ".txt")
+    Util.base_path ["lang"; conf.lang] (Filename.basename fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
   else
@@ -173,10 +172,7 @@ value lang_file_name conf fname =
 ;
 
 value any_lang_file_name fname =
-  let fname1 =
-    List.fold_right Filename.concat [Util.base_dir.val; "lang"]
-      (Filename.basename fname ^ ".txt")
-  in
+  let fname1 = Util.base_path ["lang"] (Filename.basename fname ^ ".txt") in
   if Sys.file_exists fname1 then fname1
   else
     List.fold_right Filename.concat [Util.lang_dir.val; "lang"]
@@ -187,12 +183,12 @@ value source_file_name conf fname =
   let bname = conf.bname in
   let lang = conf.lang in
   let fname1 =
-    List.fold_right Filename.concat [Util.base_dir.val; "src"; bname; lang]
+    List.fold_right Filename.concat [Util.base_path ["src"] bname; lang]
       (Filename.basename fname ^ ".txt")
   in
   if Sys.file_exists fname1 then fname1
   else
-    List.fold_right Filename.concat [Util.base_dir.val; "src"; bname]
+    Filename.concat (Util.base_path ["src"] bname)
       (Filename.basename fname ^ ".txt")
 ;
 

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: forum.ml,v 3.17 2001-01-06 09:55:54 ddr Exp $ *)
+(* $Id: forum.ml,v 3.18 2001-01-29 15:33:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Util;
@@ -7,8 +7,7 @@ open Config;
 open Def;
 
 value forum_file conf =
-  List.fold_right Filename.concat [Util.base_dir.val; conf.bname ^ ".gwb"]
-    "forum"
+  Filename.concat (base_path [] (conf.bname ^ ".gwb")) "forum"
 ;
 
 (* Print headers *)
@@ -305,7 +304,7 @@ value get conf key =
 value forum_add conf base ident comm =
   let email = String.lowercase (Gutil.strip_spaces (get conf "Email")) in
   let subject = Gutil.strip_spaces (get conf "Subject") in
-  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  let bfile = base_path [] (conf.bname ^ ".gwb") in
   if ident <> "" && comm <> "" then
     lock (Iobase.lock_file bfile) with
     [ Accept ->

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: mergeInd.ml,v 3.18 2001-01-20 09:16:16 ddr Exp $ *)
+(* $Id: mergeInd.ml,v 3.19 2001-01-29 15:33:25 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -524,7 +524,7 @@ value print conf base =
       else if is_ancestor base p2.cle_index p1.cle_index then
         error_loop conf base p1
       else
-        let bfile = Filename.concat Util.base_dir.val conf.bname in
+        let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
         lock (Iobase.lock_file bfile) with
         [ Accept ->
             let (ok, changes_done) =
@@ -582,7 +582,7 @@ value print_kill_ancestors conf base =
       match find_person_in_env conf base "" with
       [ Some p ->
           let key = (sou base p.first_name, sou base p.surname, p.occ) in
-          let bfile = Filename.concat Util.base_dir.val conf.bname in
+          let bfile = Util.base_path [] (conf.bname ^ ".lck") in
           lock (Iobase.lock_file bfile) with
           [ Accept ->
               let nb_ind = ref 0 in

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: changeChildren.ml,v 3.6 2001-01-06 09:55:53 ddr Exp $ *)
+(* $Id: changeChildren.ml,v 3.7 2001-01-29 15:33:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -214,9 +214,7 @@ value rename_image_file conf base p (nfn, nsn, noc) =
   match auto_image_file conf base p with
   [ Some old_f ->
       let s = default_image_name_of_key nfn nsn noc in
-      let f =
-        List.fold_right Filename.concat [base_dir.val; "images"; conf.bname] s
-      in
+      let f = Filename.concat (base_path ["images"] conf.bname) s in
       let new_f =
         if Filename.check_suffix old_f ".gif" then f ^ ".gif"
         else f ^ ".jpg"
@@ -267,7 +265,7 @@ value change_child conf base parent_surname ip =
 ;
 
 value print_change_ok conf base p u =
-  let bfile = Filename.concat Util.base_dir.val conf.bname in
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
   lock (Iobase.lock_file bfile) with
   [ Accept ->
       try

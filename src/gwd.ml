@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.74 2001-01-26 19:39:07 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.75 2001-01-29 15:33:24 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -218,6 +218,29 @@ value input_lexicon lang =
   [ Sys_error _ -> t ]
 ;
 
+value alias_lang lang =
+  if String.length lang <> 2 then lang
+  else
+    let fname =
+       List.fold_right Filename.concat [Util.lang_dir.val; "lang"]
+         "alias_lg.txt"
+    in
+    match try Some (open_in fname) with [ Sys_error _ -> None ] with
+    [ Some ic ->
+        let lang =
+          try
+            loop (input_line ic) where rec loop line =
+              if String.length line >= 5 && line.[2] = '='
+              && line.[0] = lang.[0] && line.[1] = lang.[1] then
+                String.sub line 3 2
+              else loop (input_line ic)
+          with
+          [ End_of_file -> lang ]
+        in
+        do close_in ic; return lang
+    | None -> lang ]
+;
+
 value rec cut_at_equal i s =
   if i = String.length s then (s, "")
   else if s.[i] == '=' then
@@ -238,7 +261,7 @@ value strip_trailing_spaces s =
 ;
 
 value read_base_env cgi bname =
-  let fname = Filename.concat Util.base_dir.val bname ^ ".gwf" in
+  let fname = Util.base_path [] (bname ^ ".gwf") in
   match try Some (open_in fname) with [ Sys_error _ -> None ] with
   [ Some ic ->
       let env =
@@ -341,7 +364,7 @@ value log_count =
 ;
 
 value start_with_base conf bname =
-  let bfile = Filename.concat Util.base_dir.val bname in
+  let bfile = Util.base_path [] (bname ^ ".gwb") in
   match try Left (Iobase.input bfile) with e -> Right e with
   [ Left base ->
       do try
@@ -438,7 +461,7 @@ value unauth conf typ =
 value match_auth_file auth_file uauth =
   if auth_file = "" then False
   else
-    let auth_file = Filename.concat Util.base_dir.val auth_file in
+    let auth_file = Util.base_path [] auth_file in
     match try Some (open_in auth_file) with [ Sys_error _ -> None ] with
     [ Some ic ->
         try
@@ -640,6 +663,7 @@ value make_conf cgi from_addr (addr, request) script_name contents env =
     (command, base_file, passwd, env, access_type)
   in
   let (lang, env) = extract_assoc "lang" env in
+  let lang = alias_lang lang in
   let (from, env) =
     match extract_assoc "opt" env with
     [ ("from", env) -> ("from", env)
@@ -810,8 +834,7 @@ do if threshold_test <> "" then RelationLink.threshold.val := int_of_string thre
      auth_file =
        try
          let x = List.assoc "auth_file" base_env in
-         if x = "" then auth_file.val
-         else Filename.concat Util.base_dir.val x
+         if x = "" then auth_file.val else Util.base_path [] x
        with 
        [ Not_found -> auth_file.val ];
      border =
