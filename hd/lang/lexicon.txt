@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 2.1 1999-03-08 11:18:03 ddr Exp $
+# $Id: lexicon.txt,v 2.2 1999-03-11 12:56:52 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -157,7 +157,7 @@ eo: .
 es: ,
 fr: ,
 he: .
-it: .
+it: ,
 nl: ,
 pt: ,
 se: ,
@@ -183,7 +183,7 @@ eo: ,
 es: .
 fr: .
 he: ,
-it: ,
+it: .
 nl: .
 pt: .
 se: .

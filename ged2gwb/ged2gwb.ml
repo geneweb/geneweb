@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.1 1999-03-08 11:17:48 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.2 1999-03-11 12:56:50 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -16,7 +16,7 @@ type record =
 value titles_aurejac = ref False;
 value lowercase_first_names = ref False;
 value lowercase_surnames = ref False;
-value extract_first_names = ref True;
+value extract_first_names = ref False;
 value extract_public_names = ref True;
 value ansel_option = ref None;
 value ansel_characters = ref True;
@@ -1102,7 +1102,12 @@ value make_gen2 gen r =
 do Printf.printf "%s %s\n" r.rlab r.rval; flush stdout; return
 *)
   match r.rlab with
-  [ "INDI" -> add_indi gen r
+  [ "HEAD" ->
+      do Printf.eprintf "*** Header ok\n";
+         flush stderr;
+         treat_header r;
+      return ()
+  | "INDI" -> add_indi gen r
   | _ -> () ]
 ;
 
@@ -1111,11 +1116,7 @@ value make_gen3 gen r =
 do Printf.printf "%s %s\n" r.rlab r.rval; flush stdout; return
 *)
   match r.rlab with
-  [ "HEAD" ->
-      do Printf.eprintf "*** Header ok\n";
-         flush stderr;
-         treat_header r;
-      return ()
+  [ "HEAD" -> ()
   | "SUBM" -> ()
   | "INDI" -> ()
   | "FAM" -> add_fam gen r
@@ -1676,11 +1677,11 @@ value speclist =
    ("-ls", Arg.Set lowercase_surnames, "   - Lowercase surnames -
        Force lowercase surnames keeping only their initials as uppercase
        characters. Try to keep lowercase particles.");
-   ("-efn", Arg.Set extract_first_names, "  - Extract first names - [default] -
+   ("-efn", Arg.Set extract_first_names, "  - Extract first names
        When creating a person, if the GEDCOM first name part holds several
        names, the first of this names becomes the person \"first name\" and
        the complete GEDCOM first name part a \"first name alias\".");
-   ("-no_efn", Arg.Clear extract_first_names, "
+   ("-no_efn", Arg.Clear extract_first_names, " - [default] -
        Cancels the previous option.");
    ("-epn", Arg.Set extract_public_names, "  - Extract public names - [default]
        When creating a person, if the GEDCOM first name part looks like a
