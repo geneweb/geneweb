@@ -1,40 +1,23 @@
 <a href="%gsuicide=x"> </a>
-</table>
-<table border=0>
-<tr>
-<td align=center>
-<a href="%glang=cn">
-<img src="%km=IM;v=/l-cn.jpg" width=36 height=22 alt=cn></a>
-<a href="%glang=cs">
-<img src="%km=IM;v=/l-cs.jpg" width=36 height=22 alt=cs></a>
-<a href="%glang=de">
-<img src="%km=IM;v=/l-de.jpg" width=36 height=22 alt=de></a>
-<a href="%glang=dk">
-<img src="%km=IM;v=/l-dk.jpg" width=36 height=22 alt=dk></a>
-<a href="%glang=en">
-<img src="%km=IM;v=/l-en.jpg" width=36 height=22 alt=en></a>
-<a href="%glang=eo">
-<img src="%km=IM;v=/l-eo.jpg" width=36 height=22 alt=eo></a>
-<a href="%glang=es">
-<img src="%km=IM;v=/l-es.jpg" width=36 height=22 alt=es></a>
-<a href="%glang=fi">
-<img src="%km=IM;v=/l-fi.jpg" width=36 height=22 alt=fi></a>
-<a href="%glang=fr">
-<img src="%km=IM;v=/l-fr.jpg" width=36 height=22 alt=fr></a>
-<a href="%glang=he">
-<img src="%km=IM;v=/l-he.jpg" width=36 height=22 alt=he></a>
-<a href="%glang=is">
-<img src="%km=IM;v=/l-is.jpg" width=36 height=22 alt=is></a>
-<a href="%glang=it">
-<img src="%km=IM;v=/l-it.jpg" width=36 height=22 alt=it></a>
-<a href="%glang=nl">
-<img src="%km=IM;v=/l-nl.jpg" width=36 height=22 alt=nl></a>
-<a href="%glang=no">
-<img src="%km=IM;v=/l-no.jpg" width=36 height=22 alt=no></a>
-<a href="%glang=pt">
-<img src="%km=IM;v=/l-pt.jpg" width=36 height=22 alt=pt></a>
-<a href="%glang=se">
-<img src="%km=IM;v=/l-se.jpg" width=36 height=22 alt=se></a>
-</td>
-</tr>
-</table>
+
+<map name="lang">
+  <area shape="rect" coords="1,1,39,24" href="%glang=cn" alt=cn>
+  <area shape="rect" coords="44,1,82,24" href="%glang=cs" alt=cs>
+  <area shape="rect" coords="87,1,125,24" href="%glang=de" alt=de>
+  <area shape="rect" coords="130,1,168,24" href="%glang=dk" alt=dk>
+  <area shape="rect" coords="173,1,211,24" href="%glang=en" alt=en>
+  <area shape="rect" coords="216,1,254,24" href="%glang=eo" alt=eo>
+  <area shape="rect" coords="259,1,297,24" href="%glang=es" alt=es>
+  <area shape="rect" coords="302,1,340,24" href="%glang=fi" alt=fi>
+  <area shape="rect" coords="1,29,39,52" href="%glang=fr" alt=fr>
+  <area shape="rect" coords="44,29,82,52" href="%glang=he" alt=he>
+  <area shape="rect" coords="87,29,125,52" href="%glang=is" alt=is>
+  <area shape="rect" coords="130,29,168,52" href="%glang=it" alt=it>
+  <area shape="rect" coords="173,29,211,52" href="%glang=nl" alt=nl>
+  <area shape="rect" coords="216,29,255,52" href="%glang=no" alt=no>
+  <area shape="rect" coords="259,29,297,52" href="%glang=pt" alt=pt>
+  <area shape="rect" coords="302,29,340,52" href="%glang=se" alt=se>
+</map>
+
+<img usemap="#lang" src="%km=IM;v=/flags.jpg" width=341 height=55
+border=0 alt=lang>
