@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.3 2000-02-15 14:13:57 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.4 2000-04-12 15:22:10 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -269,7 +269,8 @@ value string_of_sockaddr =
 value sockaddr_of_string s = Unix.ADDR_UNIX s;
 
 value treat_connection tmout callback addr ic =
-  do ifdef UNIX then
+  do ifdef NO_PROCESS then ()
+     else ifdef UNIX then
        if tmout > 0 then
          let spid = Unix.fork () in
          if spid > 0 then
@@ -308,7 +309,6 @@ value treat_connection tmout callback addr ic =
        flush stderr;
     return ()
   else
-    let _ = ifdef UNIX then Unix.nice 1 else () in
     do try callback (addr, request) str with
        [ Unix.Unix_error Unix.EPIPE "write" _ -> ()
        | exc -> print_err_exc exc ];
@@ -346,8 +346,11 @@ value rec list_remove x =
   | [y :: l] -> if x = y then l else [y :: list_remove x l] ]
 ;
 
+ifndef NO_PROCESS then
 value pids = ref [];
+ifndef NO_PROCESS then
 value cleanup_verbose = ref True;
+ifndef NO_PROCESS then
 value cleanup_sons () =
   List.iter
     (fun p ->
@@ -372,6 +375,7 @@ value cleanup_sons () =
      pids.val
 ;
 
+ifndef NO_PROCESS then
 value wait_available max_clients s =
   match max_clients with
   [ Some m ->
@@ -401,11 +405,35 @@ do Printf.eprintf "*** %02d/%02d/%4d %02d:%02d:%02d %d process(es) remaining aft
   | None -> () ]
 ;
 
+ifdef NO_PROCESS then
+value wait_and_compact s =
+  if Unix.select [s] [] [] 15.0 = ([], [], []) then
+    do Printf.eprintf "Compacting... "; flush stderr;
+       Gc.compact ();
+       Printf.eprintf "Ok\n"; flush stderr;
+    return ()
+  else ()
+;
+
 value accept_connection tmout max_clients callback s =
-  do wait_available max_clients s; return
+  do ifdef NO_PROCESS then wait_and_compact s
+     else wait_available max_clients s;
+  return
   let (t, addr) = Unix.accept s in
   do Unix.setsockopt t Unix.SO_KEEPALIVE True; return
-  ifdef UNIX then
+  ifdef NO_PROCESS then
+    let cleanup () =
+      do try Unix.shutdown t Unix.SHUTDOWN_SEND with _ -> ();
+         try Unix.shutdown t Unix.SHUTDOWN_RECEIVE with _ -> ();
+	 try Unix.close t with _ -> ();
+      return ()
+    in
+    let ic = Unix.in_channel_of_descr t in
+    do wserver_oc.val := Unix.out_channel_of_descr t;
+       treat_connection tmout callback addr ic;
+       cleanup ();
+    return ()
+  else ifdef UNIX then
     match try Some (Unix.fork ()) with _ -> None with
     [ Some 0 ->
         do try
@@ -478,12 +506,14 @@ value accept_connection tmout max_clients callback s =
 
 value f addr_opt port tmout max_clients (uid, gid) g =
   match
-    ifdef WIN95 then
+    ifdef NO_PROCESS then None
+    else ifdef WIN95 then
       try Some (Sys.getenv "WSERVER") with [ Not_found -> None ]
     else None
   with
   [ Some s ->
-      ifdef WIN95 then
+      ifdef NO_PROCESS then ()
+      else ifdef WIN95 then
         let addr = sockaddr_of_string s in
         let ic = open_in_bin sock_in.val in
         let oc = open_out_bin sock_out.val in
@@ -504,6 +534,7 @@ value f addr_opt port tmout max_clients (uid, gid) g =
          Unix.bind s (Unix.ADDR_INET addr port);
          Unix.listen s 4;
          ifdef UNIX then
+           let _ = ifdef UNIX then Unix.nice 1 else () in
            do match gid with
               [ Some gid -> Unix.setgid gid
               | None -> () ];
@@ -511,6 +542,8 @@ value f addr_opt port tmout max_clients (uid, gid) g =
               [ Some uid -> Unix.setuid uid
               | None -> () ];
            return ()
+         else ();
+         ifdef NO_PROCESS then Sys.set_signal Sys.sigpipe Sys.Signal_ignore
          else ();
       return
       let tm = Unix.localtime (Unix.time ()) in
@@ -524,8 +557,8 @@ value f addr_opt port tmout max_clients (uid, gid) g =
            try accept_connection tmout max_clients g s with
            [ Unix.Unix_error _ "accept" _ -> ()
            | exc -> print_err_exc exc ];
-           wflush ();
-           flush stdout;
+           try wflush () with [ Sys_error _ -> () ];
+           try flush stdout with [ Sys_error _ -> () ];
            flush stderr;
          done;
       return () ]

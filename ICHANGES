@@ -4,6 +4,11 @@ Internal, very small, undocumented, or not visible changes
 GeneWeb Version 3.04
 --------------------
 
+* General
+  - [12 Apr 00] Cleaned up the code to provide a version without process
+    nor threads (ifdef NO_PROCESS). Can prepare a possible Macintosh
+    version.
+
 * GeneWeb compiler (gwc) and uncompiler (gwu)
   - [02 Apr 00] Fixed problem in gwu: families could be written several
     times if phony spouses with several marriages.

@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.24 2000-03-19 19:21:37 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.25 2000-04-12 15:22:08 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Config;
@@ -241,7 +241,7 @@ rename it as \"%s.gwf\".\n" bname bname;
           | None ->
               env ]
       in
-      env
+      do close_in ic; return env
   | None -> [] ]
 ;
 
@@ -321,9 +321,13 @@ value start_with_base conf bname =
   let bfile = Filename.concat Util.base_dir.val bname in
   match try Left (Iobase.input bfile) with e -> Right e with
   [ Left base ->
-      let r = Family.family conf base in
-      do Wserver.wflush ();
-         if conf.cgi && log_file.val = "" then () else log_count r;
+      do try
+           let r = Family.family conf base in
+           do Wserver.wflush ();
+              if conf.cgi && log_file.val = "" then () else log_count r;
+           return ()
+         with exc -> do base.func.cleanup (); return raise exc;
+         base.func.cleanup ();
       return ()
   | Right e ->
       let transl conf w =
