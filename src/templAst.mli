@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: templAst.mli,v 4.2 2004-12-14 09:30:17 ddr Exp $ *)
+(* $Id: templAst.mli,v 4.3 2005-01-23 09:41:05 ddr Exp $ *)
 (* Copyright (c) 1998-2005 INRIA *)
 
 type ast =
@@ -21,3 +21,5 @@ and ast_expr =
   | Evar of string and list string
   | Etransl of bool and string and string ]
 ;
+
+type expr_val = [ VVbool of bool | VVstring of string ];
