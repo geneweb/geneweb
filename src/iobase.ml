@@ -1,4 +1,4 @@
-(* $Id: iobase.ml,v 4.26 2004-07-18 08:53:55 ddr Exp $ *)
+(* $Id: iobase.ml,v 4.27 2004-08-04 09:43:57 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1113,7 +1113,10 @@ value rec prime_after n = if is_prime n then n else prime_after (n + 1);
 value output_strings_hash oc2 base =
   let strings_array = base.data.strings.array () in
   let taba =
-    Array.create (prime_after (max 2 (10 * Array.length strings_array))) (-1)
+    Array.create
+      (min Sys.max_array_length
+	 (prime_after (max 2 (10 * Array.length strings_array))))
+      (-1)
   in
   let tabl = Array.create (Array.length strings_array) (-1) in
   do {
