@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+            "http://www.w3.org/TR/REC-html40/loose.dtd">
+<head>
+  <!-- (c) Copyright 2002 INRIA - GeneWeb -->
+  <!-- $Id: bsi.htm,v 1.1 2002-01-14 05:03:16 ddr Exp $ -->
+  <title>[
+de: Funktion "$d" ausf&uuml;hren
+en: Application of "$d"
+es: Aplicaci&oacute;n de "$d"
+fr: Application de "$d"
+lv: "$d" lietoðana
+sv: Applicering av "$d"
+]</title>
+</head>
+
+<body background="file://$f/images/gwback.jpg">
+
+<center><h1><font color=#2f6400>[
+de: Funktion "$d" ausf&uuml;hren
+en: Application of "$d"
+es: Aplicaci&oacute;n de "$d"
+fr: Application de "$d"
+lv: "$d" lietoðana
+sv: Applicering av "$d"
+]</font></h1></center>
+
+[
+de: Die Funktion "$d" wird nun auf deiner Datenbank "$a" ausgef&uuml;hrt.
+    Warnung: Das kann, abh&auml;ngig vom Einzelfall, zwischen einigen Sekunden 
+    und mehreren Minuten dauern. Bitte habe Geduld.
+en: The operation "$d" will be applied on your database "$a". Warning: it
+    can take some seconds or some minutes, depending on the case. Be
+    patient.
+es: La operaci&oacute;n "$d" va a aplicarse a su base "$a". 
+    Atenci&oacute;n: la operaci&oacute;n puede durar algunos segundos o 
+    algunos minutos, de acuerdo al caso. Sea paciente.
+fr: L'op&eacute;ration "$d" va &ecirc;tre appliqu&eacute;e sur votre base
+    "$a". Attention: l'op&eacute;ration peut prendre quelques secondes ou
+    quelques minutes, suivant les cas. Soyez patient.
+lv: Darbîba "$d" tiks lietota datu bâzei "$a". Brîdinâjums: tas var aizòemt
+    daðas sekundes, vai minûtes, atkarîbâ no nosacîjumiem. Esiet pacietîgs.
+sv: Operationen "$d" kommer att appliceras på din databas "$a". Varning: det
+    kan ta några sekunder eller några minuter, beroende på fallet. Ha tålamod.
+]
+
+<p>
+
+[
+de: Dr&uuml;cke diesen Knopf um zu starten:
+en: Push the button below to start:
+es: Apoyar sobre el bot&oacute;n inferior para comenzar:
+fr: Appuyez sur le bouton ci-dessous pour d&eacute;marrer:
+lv: Nospiediet podziòu zemâk, lai sâktu:
+sv: Tryck på knappen nedan för att starta:
+]
+
+<p>
+
+<form method=POST action="$d">
+$h
+<dl><dt><dd><input type=submit value="Ok"></dl>
+</form>
+
+<p>
+
+[
+de: Zu deiner Information: Diese Funktion entspricht der Ausf&uuml;hrung
+    der folgenden Kommandos:
+en: For information, this operation corresponds to the following commands:
+es: Por informaci&oacute;n, esta operaci&oacute;n corresponde a los 
+    comandos siguientes:
+fr: Pour information, cette op&eacute;ration correspond &agrave; la suite
+    des commandes suivantes:
+lv: Informâcijai: ðî darbîba atbilst sekojoðâm komandâm:
+sv: Denna operation motsvarar de följande kommandona:
+]
+
+<pre>
+     $$ cd $w
+     $$ $c$p &gt; comm.log
+</pre>
