@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.40 2001-02-10 22:05:35 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.41 2001-02-13 16:15:50 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -734,7 +734,8 @@ value particle s i =
   string_ini_eq s i "des " || string_ini_eq s i "DES " ||
   string_ini_eq s i "de " || string_ini_eq s i "DE " ||
   string_ini_eq s i "du " || string_ini_eq s i "DU " ||
-  string_ini_eq s i "d'" || string_ini_eq s i "D'"
+  string_ini_eq s i "d'" || string_ini_eq s i "D'" ||
+  string_ini_eq s i "y " || string_ini_eq s i "Y "
 ;
 
 value lowercase_name s =
