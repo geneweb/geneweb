@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: dag.ml,v 4.4 2001-08-21 13:56:16 ddr Exp $ *)
+(* $Id: dag.ml,v 4.5 2001-08-24 04:54:10 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -159,6 +159,9 @@ value print_table conf hts =
         Wserver.wprint ">";
         match td with
         [ TDstring s -> Wserver.wprint "%s" s
+        | TDbar s ->
+            if s = "" then Wserver.wprint "|"
+            else Wserver.wprint "<a %s>|</a>" s
         | TDhr align ->
             do {
               Wserver.wprint "<hr noshade size=1";
@@ -367,6 +370,7 @@ value gen_compute_columns_sizes size_fun hts ncol =
                   else if colspan > curr_colspan then
                     next_colspan.val := min colspan next_colspan.val
                   else ()
+              | TDbar _ -> ()
               | TDhr _ -> () ];
               loop (col + colspan) (j + 1)
             }
@@ -397,7 +401,7 @@ value try_add_vbar stra_row stra_row_max hts i col =
           let (colspan, _, td) = hts.(i - 1).(pj) in
           if pcol = col then
             match td with
-            [ TDstring "|" -> "|"
+            [ TDbar _ -> "|"
             | _ -> "" ]
           else loop (pcol + colspan) (pj + 1)
       in
@@ -411,7 +415,7 @@ value try_add_vbar stra_row stra_row_max hts i col =
           let (colspan, _, td) = hts.(i + 1).(nj) in
           if ncol = col then
             match td with
-            [ TDstring "|" -> "|"
+            [ TDbar _ -> "|"
             | _ -> "" ]
           else loop (ncol + colspan) (nj + 1)
       in
@@ -609,11 +613,16 @@ value print_table_pre conf hts =
                       let dk = (max_row - Array.length stra.(j)) / 2 in
                       row - dk
                     in
-                    if k >= 0 && k < Array.length stra.(j) then stra.(j).(k)
-                    else if s = "|" then s
+                    if k >= 0 && k < Array.length stra.(j) then
+                      let s = stra.(j).(k) in
+                      if s = "&nbsp;" then " " else s
                     else try_add_vbar k (Array.length stra.(j)) hts i col
                   in
-                  let s = if s = "&nbsp;" then " " else s in
+                  let len = displayed_length s in
+                  String.make ((sz - len) / 2) ' ' ^ s ^
+                    String.make (sz - (sz + len) / 2) ' '
+              | TDbar s ->
+                  let s = if s = "" then "|" else "<a " ^ s ^ ">|</a>" in
                   let len = displayed_length s in
                   String.make ((sz - len) / 2) ' ' ^ s ^
                     String.make (sz - (sz + len) / 2) ' '
@@ -757,7 +766,7 @@ value make_tree_hts
   let vbar_txt n =
     match n.valu with
     [ Left ip -> vbar_txt ip
-    | _ -> "|" ]
+    | _ -> "" ]
   in
   let phony n =
     match n.valu with
@@ -835,7 +844,7 @@ value gen_print_dag conf base spouse_on invert set spl d =
     Util.referenced_person_title_text conf base p ^
       Date.short_dates_text conf base p
   in
-  let vbar_txt ip = "|" in
+  let vbar_txt ip = "" in
   let no_group = p_getenv conf.env "nogroup" = Some "on" in
   let hts =
     make_tree_hts conf base dag_elem_txt vbar_txt spouse_on invert no_group

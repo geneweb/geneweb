@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relation.ml,v 4.17 2001-08-21 13:56:17 ddr Exp $ *)
+(* $Id: relation.ml,v 4.18 2001-08-24 04:54:10 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -346,8 +346,8 @@ value html_table_of_relation_path_dag conf base elem_txt vbar_txt path =
     [] d
 ;
 
-value next_relation_link_txt conf ip1 ip2 excl_faml txt =
-  "<a href=\"" ^ commd conf ^ "em=R;ei=" ^
+value next_relation_link_txt conf ip1 ip2 excl_faml =
+  "href=\"" ^ commd conf ^ "em=R;ei=" ^
     string_of_int (Adef.int_of_iper ip1) ^ ";i=" ^
     string_of_int (Adef.int_of_iper ip2) ^
     (if conf.cancel_links then ";cgl=on" else "") ^ ";et=S" ^
@@ -358,7 +358,7 @@ value next_relation_link_txt conf ip1 ip2 excl_faml txt =
                string_of_int (Adef.int_of_ifam ifam),
              i + 1))
          ("", 0) (List.rev excl_faml)) ^
-    "\">" ^ txt ^ "</a>"
+    "\""
 ;
 
 value print_relation_path conf base ip1 ip2 path ifam excl_faml =
@@ -371,7 +371,7 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
     let vbar_txt ip =
       let u = uoi base ip in
       let excl_faml = Array.to_list u.family @ excl_faml in
-      next_relation_link_txt conf ip1 ip2 excl_faml "|"
+      next_relation_link_txt conf ip1 ip2 excl_faml
     in
     Wserver.wprint "<p>\n";
     let hts =
@@ -379,8 +379,8 @@ value print_relation_path conf base ip1 ip2 path ifam excl_faml =
     in
     Dag.print_html_table conf hts;
     Wserver.wprint "<p>\n";
-    Wserver.wprint "%s\n"
-      (next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml] "&gt;&gt;")
+    Wserver.wprint "<a %s>&gt;&gt;</a>\n"
+      (next_relation_link_txt conf ip1 ip2 [ifam :: excl_faml])
   }
 ;
 
@@ -1600,7 +1600,7 @@ value print_multi_relation conf base pl lim assoc_txt =
     with
     [ Not_found -> txt ]
   in
-  let vbar_txt ip = "|" in
+  let vbar_txt ip = "" in
   if path = [] then print_no_relationship conf base pl
   else
     let hts =

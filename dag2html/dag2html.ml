@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 1.3 2001-08-21 13:56:15 ddr Exp $ *)
+(* $Id: dag2html.ml,v 1.4 2001-08-24 04:54:09 ddr Exp $ *)
 
 type dag 'a = { dag : mutable array (node 'a) }
 and node 'a =
@@ -34,7 +34,7 @@ value new_ghost_id =
 (* creating the html table structure *)
 
 type align = [ LeftA | CenterA | RightA ];
-type table_data = [ TDstring of string | TDhr of align ];
+type table_data = [ TDstring of string | TDhr of align | TDbar of string ];
 type html_table = array (array (int * align * table_data));
 
 value html_table_struct indi_txt vbar_txt phony d t =
@@ -47,15 +47,16 @@ value html_table_struct indi_txt vbar_txt phony d t =
   let jlast = Array.length t.table.(0) - 1 in
   let elem_txt =
     fun
-    [ Elem e -> indi_txt d.dag.(int_of_idag e)
-    | Ghost _ -> "|"
-    | Nothing -> "&nbsp;" ]
+    [ Elem e -> TDstring (indi_txt d.dag.(int_of_idag e))
+    | Ghost _ -> TDbar ""
+    | Nothing -> TDstring "&nbsp;" ]
   in
   let bar_txt first_vbar =
     fun
-    [ Elem e -> if first_vbar then vbar_txt d.dag.(int_of_idag e) else "|"
-    | Ghost _ -> "|"
-    | Nothing -> "&nbsp;" ]
+    [ Elem e ->
+        TDbar (if first_vbar then vbar_txt d.dag.(int_of_idag e) else "")
+    | Ghost _ -> TDbar ""
+    | Nothing -> TDstring "&nbsp;" ]
   in
   let all_empty i =
     loop 0 where rec loop j =
@@ -80,11 +81,11 @@ value html_table_struct indi_txt vbar_txt phony d t =
           let colspan = 3 * (next_j - j) in
           let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
           let les =
-            let s =
-              if t.table.(i).(j).elem = Nothing then "&nbsp;"
+            let td =
+              if t.table.(i).(j).elem = Nothing then TDstring "&nbsp;"
               else elem_txt t.table.(i).(j).elem
             in
-            [(colspan - 2, CenterA, TDstring s) :: les]
+            [(colspan - 2, CenterA, td) :: les]
           in
           let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
           loop les next_j
@@ -106,15 +107,15 @@ value html_table_struct indi_txt vbar_txt phony d t =
           let colspan = 3 * (next_j - j) in
           let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
           let les =
-            let s =
+            let td =
               if k > 0 && t.table.(k - 1).(j).elem = Nothing ||
                  t.table.(k).(j).elem = Nothing
               then
-                "&nbsp;"
-              else if phony t.table.(i).(j).elem then "&nbsp;"
+                TDstring "&nbsp;"
+              else if phony t.table.(i).(j).elem then TDstring "&nbsp;"
               else bar_txt (k <> i) t.table.(i).(j).elem
             in
-            [(colspan - 2, CenterA, TDstring s) :: les]
+            [(colspan - 2, CenterA, td) :: les]
           in
           let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
           loop les next_j
@@ -143,16 +144,16 @@ value html_table_struct indi_txt vbar_txt phony d t =
             then
               [(colspan, LeftA, TDstring "&nbsp;") :: les]
             else
-              let s =
+              let td =
                 let all_ph =
                   loop j where rec loop j =
                     if j = next_j then True
                     else if phony t.table.(i + 1).(j).elem then loop (j + 1)
                     else False
                 in
-                if all_ph then "&nbsp;" else "|"
+                if all_ph then TDstring "&nbsp;" else TDbar ""
               in
-              [(colspan, CenterA, TDstring s) :: les]
+              [(colspan, CenterA, td) :: les]
           in
           let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
           loop les next_j
@@ -226,7 +227,7 @@ value html_table_struct indi_txt vbar_txt phony d t =
                     in
                     if l = j && next_l = next_j then
                       let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
-                      let s = ph (TDstring "|") in
+                      let s = ph (TDbar "") in
                       let les = [(colspan, CenterA, s) :: les] in
                       let les = [(1, LeftA, TDstring "&nbsp;") :: les] in
                       les
