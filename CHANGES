@@ -3,6 +3,7 @@ GeneWeb Version 1.09
 
 * gwd:
   - Added error message in relationship computing when loop in database.
+  - Fixed still several displaying bugs due to ANSEL
 
 * ged2gwb, gwb2ged:
   - Added save and restore of the GeneWeb fields
@@ -14,6 +15,10 @@ GeneWeb Version 1.09
        2 SURN ...
        1 OBJE
          2 FILE ...
+
+* ged2gwb
+  - Now the option "-no_efn" is the default. Use "-efn" to set it.
+    The option "-epn" remains the default. Use "-no_epn" to reset it.
 
 GeneWeb Version 1.08
 --------------------

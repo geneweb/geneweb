@@ -1,4 +1,4 @@
-(* $Id: util.ml,v 1.9 1998-11-03 13:30:56 ddr Exp $ *)
+(* $Id: util.ml,v 1.10 1998-11-07 11:12:08 ddr Exp $ *)
 
 open Def;
 open Config;
@@ -185,7 +185,7 @@ value person_text_no_html conf base p =
     | (n, [nn :: _]) -> n ^ " " ^ sou base nn
     | (n, []) -> n ]
   in
-  beg ^ " " ^ sou base p.surname
+  coa conf (beg ^ " " ^ sou base p.surname)
 ;
 
 value person_text_without_surname conf base p =
