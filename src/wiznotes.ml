@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.8 2002-12-31 08:38:07 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.9 2003-07-07 06:30:56 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -121,7 +121,7 @@ value print_wizard conf base wz =
           let digest = Iovalue.digest s in
           Wserver.wprint "<input type=hidden name=digest value=\"%s\">\n"
             digest;
-          stag "textarea" "name=notes rows=30 cols=70 wrap=virtual" begin
+          stag "textarea" "name=notes rows=30 cols=70 wrap=soft" begin
             if s <> "" then Wserver.wprint "%s" (quote_escaped s) else ();
           end;
           Wserver.wprint "\n";
