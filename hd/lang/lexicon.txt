@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.8 2001-03-26 11:51:51 ddr Exp $
+# $Id: lexicon.txt,v 4.9 2001-03-26 11:58:52 ddr Exp $
 # Copyright (c) 2001 INRIA
 
 br=pt
@@ -898,7 +898,7 @@ af: 'n kleinseun/'n kleindogter/'n kleinkind
 cs: vnuk/vnuèka/vnouèe
 ct: un net/una neta/un(a) net(a)
 de: ein Enkel/eine Enkelin/ein Enkelkind
-dk: en s&oslash;nne(datter)-s&oslash;n/en s&oslash;nne(datter)-datter/et barnebarn
+dk: en s&oslash;nne-s&oslash;n/en s&oslash;nne-datter/et barnebarn/en datter-s&oslash;n/en datter-datter/et barnebarn
 en: a grandson/a granddaughter/a grandchild
 eo: nepo/nepino/nep(in)o
 es: un nieto/una nieta/un(a) nieto(a)
