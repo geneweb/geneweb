@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.15 1998-12-06 10:28:33 ddr Exp $ *)
+(* $Id: perso.ml,v 1.16 1998-12-12 17:26:28 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -592,6 +592,44 @@ value print_sosa_if_any conf base a =
   | None -> () ]
 ;
 
+value print_ancestors_descends_cousins conf base p a =
+  let head things =
+    if not things then Wserver.wprint "\n<h4>" else Wserver.wprint " / "
+  in
+  let things = False in
+  let has_grand_parents = grand_parent_connu base a in
+  let things =
+    if has_grand_parents then
+      do head things;
+         Wserver.wprint "<a href=\"%s%s;m=A\">%s</a>"
+           (commd conf) (acces conf base p)
+           (capitale (transl conf "ancestors"));
+      return True
+     else things
+  in
+  let things =
+    if a_des_petits_enfants base p then
+      do head things;
+         Wserver.wprint "<a href=\"%s%s;m=D\">%s</a>"
+           (commd conf) (acces conf base p)
+           (capitale (transl conf "descendants"));
+      return True
+    else things
+  in
+  let things =
+    if has_grand_parents then
+      do head things;
+         Wserver.wprint "<a href=\"%s%s;m=C\">%s</a>"
+           (commd conf) (acces conf base p)
+           (capitale (transl conf "cousins"));
+      return True
+    else things
+  in
+  do if things then Wserver.wprint "</h4>" else ();
+     Wserver.wprint "\n";
+  return ()
+;
+
 value commd_no_params conf =
   conf.command ^
   List.fold_left
@@ -744,15 +782,7 @@ value print conf base p =
      Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=R\">\n%s</a>\n</h4>\n"
        (commd conf) (acces conf base p)
        (capitale (transl conf "relationship computing"));
-     if grand_parent_connu base a then
-       Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=A\">\n%s</a>\n</h4>\n"
-         (commd conf) (acces conf base p) (capitale (transl conf "ancestors"))
-     else ();
-     if a_des_petits_enfants base p then
-       Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=D\">\n%s</a>\n</h4>\n"
-         (commd conf) (acces conf base p)
-         (capitale (transl conf "descendants"))
-     else ();
+     print_ancestors_descends_cousins conf base p a;
      if conf.wizard then
        Wserver.wprint "\n<h4>\n<a href=\"%s%s;m=U\">\n%s</a>\n</h4>\n"
          (commd conf) (acces conf base p) (capitale (transl conf "update"))

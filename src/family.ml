@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 1.11 1998-12-02 15:46:34 ddr Exp $ *)
+(* $Id: family.ml,v 1.12 1998-12-12 17:26:27 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -241,6 +241,10 @@ value family_m conf base =
   | Some "AS_OK" ->
       AdvSearchOk.print conf base
   | Some "B" when conf.wizard || conf.friend -> Birth.print conf base
+  | Some "C" ->
+      match find_person_in_env conf base "" with
+      [ Some p -> Cousins.print conf base p
+      | _ -> inconnu_au_bataillon conf ]
   | Some "D" ->
       match find_person_in_env conf base "" with
       [ Some p -> Descend.print conf base p
