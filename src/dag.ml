@@ -1,4 +1,4 @@
-(* $Id: dag.ml,v 3.40 2001-01-13 04:12:15 ddr Exp $ *)
+(* $Id: dag.ml,v 3.41 2001-01-13 22:13:52 ddr Exp $ *)
 
 open Dag2html;
 open Def;
@@ -605,7 +605,7 @@ return
 (* main *)
 
 value print_html_table conf hts =
-  if Util.p_getenv conf.env "version" = Some "notab"
+  if Util.p_getenv conf.env "notab" = Some "on"
   || browser_doesnt_have_tables conf then
     print_table_pre conf hts
   else
