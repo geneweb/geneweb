@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 4.1 2001-04-22 14:37:59 ddr Exp $ *)
+(* $Id: birthday.ml,v 4.2 2001-04-25 01:38:00 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -130,15 +130,8 @@ value afficher_liste_anniversaires conf base dead_people dt liste =
            if dead_people then do {
              Wserver.wprint "<em>";
              match date_event with
-             [ DeBirth -> Wserver.wprint "%s" (transl conf "of the birth")
-             | DeDeath (Unspecified | Killed) ->
-                 Wserver.wprint "%s" (transl conf "of the death")
-             | DeDeath Murdered ->
-                 Wserver.wprint "%s" (transl conf "of the murder")
-             | DeDeath Executed ->
-                 Wserver.wprint "%s" (transl conf "of the execution")
-             | DeDeath Disappeared ->
-                 Wserver.wprint "%s" (transl conf "of the disappearance") ];
+             [ DeBirth -> Wserver.wprint "%s" (transl conf "birth")
+             | DeDeath _ -> Wserver.wprint "%s" (transl conf "death") ];
              Wserver.wprint "</em>\n";
              Wserver.wprint "-&gt; ";
              Wserver.wprint "%s" (txt_of conf base p);
