@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.19 2002-01-20 06:19:23 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.20 2002-10-10 14:56:12 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -385,8 +385,8 @@
 </form>
 
 <p>
-<img src="%image_prefix;/gwlogo.gif"
- alt=... width=64 height=72 align=right>
+<a href="%prefix;"><img src="%image_prefix;/gwlogo.gif"
+ alt=... width=64 height=72 align=right border=0></a>
 <br>
 %copyright;
 %base_trailer;
