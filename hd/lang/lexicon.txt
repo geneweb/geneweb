@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.217 2001-02-02 16:29:26 ddr Exp $
+# $Id: lexicon.txt,v 3.218 2001-02-04 07:21:39 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -395,7 +395,7 @@ dk: januar/februar/marts/april/maj/juni/juli/august/september/oktober/november/d
 en: January/February/March/April/May/June/July/August/September/October/November/December
 eo: januaro/februaro/marto/aprilo/majo/junio/julio/auxgusto/septembro/oktobro/novembro/decembro
 es: enero/febrero/marzo/abril/mayo/junio/julio/agosto/septiembre/octubre/noviembre/diciembre
-et: jaanuar/veebruar/mהrts/aprill/mai/juuni/juuli/august/september:i:--ril/oktoober/november/detsember
+et: jaanuar:i:+il/veebruar:i:+il/mהrts:i:+il/aprill:i:+il/mai:i:+l/juuni:i:+l/juuli:i:+l/august:i:+il/september:i:--ril/oktoober:i:--ril/november:i:--ril/detsember:i:--ril
 fi: tammikuu/helmikuu/maaliskuu/huhtikuu/toukokuu/kes&auml;kuu/hein&auml;kuu/elokuu/syyskuu/lokakuu/marraskuu/joulukuu
 fr: janvier/f&eacute;vrier/mars/avril/mai/juin/juillet/ao&ucirc;t/septembre/octobre/novembre/d&eacute;cembre
 he:  ינואר/ פברואר/ מרץ/ אפריל/ מאי/ יוני/ יולי/ אוגוסט/ ספטמבר/ אוקטובר/ נובמבר/ דצמבר
@@ -1026,7 +1026,7 @@ dk: omkring
 en: about
 eo: cxirkaש
 es: alrededor de
-et: umbes
+et: umbes :i:
 fi: noin
 fr: vers
 he:   בערך
@@ -1174,7 +1174,7 @@ dk: efter
 en: after
 eo: post
 es: despu&eacute;s de
-et: pהrast
+et: pהrast :p:
 fi: j&auml;lkeen
 fr: apr&egrave;s
 he:   אחרי
@@ -1682,7 +1682,7 @@ dk: f&oslash;r
 en: before
 eo: antaש
 es: antes de
-et: enne
+et: enne :p:
 fi: ennen
 fr: avant
 he:   לפני
@@ -4772,7 +4772,7 @@ dk: den
 en: on
 eo: la
 es: el
-et: 
+et: :i:
 fi:  
 fr: le
 he:   ב-
@@ -5067,7 +5067,7 @@ dk: m&aring;ske
 en: possibly
 eo: eble
 es: posiblemente
-et: vץib-olla
+et: vץib-olla :i:
 fi: ehk&auml;
 fr: peut-&ecirc;tre
 he:  אולי

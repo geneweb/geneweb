@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: birthday.ml,v 3.15 2001-01-06 09:55:53 ddr Exp $ *)
+(* $Id: birthday.ml,v 3.16 2001-02-04 07:21:40 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -43,9 +43,9 @@ value gen_print conf base mois f_scan dead_people =
       if dead_people then transl conf "anniversaries"
       else transl conf "birthdays"
     in
-    Wserver.wprint "%s %s %s" (capitale lab)
-      (transl conf "in (month year)")
-      (transl_nth conf "(month)" (mois - 1))
+    Wserver.wprint "%s %s" (capitale lab)
+      (transl_decline conf "in (month year)"
+         (transl_nth conf "(month)" (mois - 1)))
   in
   do try
        while True do
@@ -209,7 +209,7 @@ value propose_months conf mode =
         for i = 1 to 12 do
           Wserver.wprint "<option value=%d%s>%s\n" i
             (if i = conf.today.month then " selected" else "")
-            (capitale (transl_nth conf "(month)" (i - 1)));
+            (capitale (nominative (transl_nth conf "(month)" (i - 1))));
         done;
       end;
       Wserver.wprint "<input type=submit value=\"Ok\">\n";
@@ -247,9 +247,9 @@ value print_anniv conf base day_name verb wd dt list =
 value print_marriage conf base month =
   let title _ =
     let lab = transl conf "anniversaries of marriage" in
-    Wserver.wprint "%s %s %s" (capitale lab)
-      (transl conf "in (month year)")
-      (transl_nth conf "(month)" (month - 1))
+    Wserver.wprint "%s %s" (capitale lab)
+      (transl_decline conf "in (month year)"
+         (transl_nth conf "(month)" (month - 1)))
   in
   let tab = Array.create 31 [] in
   do header conf title;
