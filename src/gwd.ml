@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ./pa_html.cmo ./pa_lock.cmo *)
-(* $Id: gwd.ml,v 3.0 1999-10-29 10:31:17 ddr Exp $ *)
+(* $Id: gwd.ml,v 3.1 1999-10-30 23:53:16 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -676,23 +676,23 @@ value conf_and_connection cgi from (addr, request) str env =
       return ()
   | _ ->
       do log_and_robot_check conf auth from request str;
-         if conf.bname = "" then
-           match Util.p_getenv conf.env "m" with
-           [ Some "DOC" -> Doc.print conf
-           | _ -> propose_base conf ]
-         else
-           match redirected_addr.val with
-           [ Some addr -> print_redirected conf addr
-           | None ->
-               match
-                 try Some (List.assoc "renamed" conf.base_env) with
-                 [ Not_found -> None ]
-               with
-               [ Some n when n <> "" -> print_renamed conf n
-               | _ ->
-                   do start_with_base conf conf.bname;
-                      if sleep > 0 then Unix.sleep sleep else ();
-                   return () ] ];
+         match Util.p_getenv conf.env "m" with
+         [ Some "DOC" -> Doc.print conf
+         | _ ->
+             if conf.bname = "" then propose_base conf
+             else
+               match redirected_addr.val with
+               [ Some addr -> print_redirected conf addr
+               | None ->
+                   match
+                     try Some (List.assoc "renamed" conf.base_env) with
+                     [ Not_found -> None ]
+                   with
+                   [ Some n when n <> "" -> print_renamed conf n
+                   | _ ->
+                       do start_with_base conf conf.bname;
+                          if sleep > 0 then Unix.sleep sleep else ();
+                       return () ] ] ];
       return () ]
 ;
 
