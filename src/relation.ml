@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 2.10 1999-04-17 14:18:05 ddr Exp $ *)
+(* $Id: relation.ml,v 2.11 1999-07-09 16:22:04 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -33,7 +33,7 @@ value print_menu conf base p =
          (Adef.int_of_iper p.cle_index);
        Wserver.wprint "<input type=hidden name=m value=NG>\n";
        Wserver.wprint "<input name=n size=40 maxlength=200> =&gt;\n";
-       Wserver.wprint "<input type=submit VALUE=\"Ok\">\n";
+       Wserver.wprint "<input type=submit value=\"Ok\">\n";
        tag "ul" begin
          html_li conf;
          Wserver.wprint "<input type=radio name=t value=PN checked>\n";
