@@ -50,18 +50,13 @@ Sammanslagning av databaser g&ouml;rs i tv&aring; steg: </P>
 <LI>Skapa en gemensam databas kallad "dbas". Skriv:
 
 <PRE>
-     gwc foo.gw bar.gw -o dbas</PRE>
-Det kan h&auml;nda (troligen kommer det att g&ouml;ra det) att gwc visar fel meddelanden
-d&auml;rf&ouml;r att personer &auml;r definierade b&aring;de i
-"foo.gw" och "bar.gw". F&ouml;r 
-att r&auml;tta till det, har gwc en option "-sh" f&ouml;r att flytta
-numren f&ouml;r personerna f&ouml;r att
-undvika konflikter. F&ouml;rs&ouml;k med:
-<PRE>
-     gwc foo.gw -sh 10 bar.gw -o dbas</PRE>
+     gwc foo.gw -sep bar.gw -o dbas
+</PRE>
 
-<P>
-Om v&auml;rdet 10 inte l&ouml;ser problemet, f&ouml;rs&ouml;k med 20, 30 eller 100... </P>
+Optionen "-sep" gör det möjligt att behandla "bar.gw" separat: om en person
+i "bar.gw" redan finns definierad med samma nyckel (förnamn/efternamn/nummer)
+i "foo.gw", numret i nyckeln skiftas automatiskt för att undvika konflikter.
+
 </UL>
 
 <HR>
