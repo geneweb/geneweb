@@ -49,6 +49,7 @@ GeneWeb Version 4.10
     replaced with empty strings.
 
 * Setup program (gwsetup)
+  - [08 Dec 03] Fixed problem of output files containing spaces.
   - [17 Sep 03] Added interface for option -uin (code from Olivier
     Pasteur).
   - [07 Mar 03] Fixed bug: the -lang parameter of gwsetup did not work

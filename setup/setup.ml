@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.46 2003-11-12 17:25:19 ddr Exp $ *)
+(* $Id: setup.ml,v 4.47 2003-12-08 09:56:49 ddr Exp $ *)
 
 open Printf;
 
@@ -248,10 +248,10 @@ value parameters =
           | None ->
               if s = "none" then loop comm env
               else if s = "on" then loop (comm ^ " -" ^ k) env
-              else if s.[0] = '_' then loop (comm ^ " -" ^ k ^ s) env
+              else if s.[0] = '_' then loop (comm ^ " -" ^ k ^ stringify s) env
               else if s.[String.length s - 1] = '_' then
                 loop (comm ^ " -" ^ s ^ k) env
-              else loop (comm ^ " -" ^ k ^ " " ^ s) env ]
+              else loop (comm ^ " -" ^ k ^ " " ^ stringify s) env ]
     | [] -> comm ]
 ;
 
