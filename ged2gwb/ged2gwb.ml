@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 2.35 1999-09-16 15:01:03 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 2.36 1999-09-16 15:09:59 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -423,7 +423,7 @@ EXTEND
       | "@"; "#"; ID "DFRENCH"; ID "R"; "@"; d = date_fren ->
           (Calendar.gregorian_of_french d, Dfrench)
       | "@"; "#"; ID "DHEBREW"; "@"; d = date_hebr ->
-          (Calendar.gregorian_of_hebrew d, Dfrench)
+          (Calendar.gregorian_of_hebrew d, Dhebrew)
       | d = date_greg -> (d, Dgregorian) ] ]
   ;
   date_greg:
