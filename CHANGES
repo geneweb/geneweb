@@ -1,6 +1,9 @@
 GeneWeb version 3.04
 --------------------
 
+* GeneWeb Service/CGI (gwd)
+  - [27 Mar 00] Added displaying of places/surnames from welcome page.
+
 GeneWeb version 3.03
 --------------------
 

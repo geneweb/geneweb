@@ -70,21 +70,23 @@ descend.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx perso.cmx \
     util.cmx ../wserver/wserver.cmx 
 doc.cmo: buff.cmo config.cmi util.cmi ../wserver/wserver.cmi 
 doc.cmx: buff.cmx config.cmi util.cmx ../wserver/wserver.cmx 
+eval.cmo: parse.cmo util.cmi ../wserver/wserver.cmi 
+eval.cmx: parse.cmx util.cmx ../wserver/wserver.cmx 
 family.cmo: adef.cmi advSearchOk.cmo alln.cmo ascend.cmo birthDeath.cmo \
     birthday.cmo changeChildren.cmo config.cmi cousins.cmo dag.cmo date.cmi \
     def.cmi descend.cmo doc.cmo forum.cmo gutil.cmi history.cmi image.cmo \
     merge.cmi mergeFam.cmo mergeFamOk.cmo mergeInd.cmo mergeIndOk.cmo \
-    name.cmi notes.cmo num.cmi perso.cmi relation.cmo relationLink.cmo \
-    sendImage.cmo some.cmo srcfile.cmi title.cmo update.cmi updateFam.cmi \
-    updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi \
+    name.cmi notes.cmo num.cmi perso.cmi place.cmo relation.cmo \
+    relationLink.cmo sendImage.cmo some.cmo srcfile.cmi title.cmo update.cmi \
+    updateFam.cmi updateFamOk.cmo updateInd.cmi updateIndOk.cmi util.cmi \
     ../wserver/wserver.cmi family.cmi 
 family.cmx: adef.cmx advSearchOk.cmx alln.cmx ascend.cmx birthDeath.cmx \
     birthday.cmx changeChildren.cmx config.cmi cousins.cmx dag.cmx date.cmx \
     def.cmi descend.cmx doc.cmx forum.cmx gutil.cmx history.cmx image.cmx \
     merge.cmx mergeFam.cmx mergeFamOk.cmx mergeInd.cmx mergeIndOk.cmx \
-    name.cmx notes.cmx num.cmx perso.cmx relation.cmx relationLink.cmx \
-    sendImage.cmx some.cmx srcfile.cmx title.cmx update.cmx updateFam.cmx \
-    updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
+    name.cmx notes.cmx num.cmx perso.cmx place.cmx relation.cmx \
+    relationLink.cmx sendImage.cmx some.cmx srcfile.cmx title.cmx update.cmx \
+    updateFam.cmx updateFamOk.cmx updateInd.cmx updateIndOk.cmx util.cmx \
     ../wserver/wserver.cmx family.cmi 
 forum.cmo: config.cmi def.cmi gutil.cmi iobase.cmi lock.cmo srcfile.cmi \
     update.cmi util.cmi ../wserver/wserver.cmi 
@@ -166,6 +168,8 @@ perso.cmx: adef.cmx config.cmi date.cmx def.cmi gutil.cmx name.cmx num.cmx \
     util.cmx ../wserver/wserver.cmx perso.cmi 
 phonygwd.cmo: argl.cmo ../wserver/wserver.cmi 
 phonygwd.cmx: argl.cmx ../wserver/wserver.cmx 
+place.cmo: def.cmi gutil.cmi name.cmi util.cmi ../wserver/wserver.cmi 
+place.cmx: def.cmi gutil.cmx name.cmx util.cmx ../wserver/wserver.cmx 
 pqueue.cmo: pqueue.cmi 
 pqueue.cmx: pqueue.cmi 
 relation.cmo: adef.cmi config.cmi consang.cmi dag.cmo dag2html.cmi def.cmi \
@@ -251,6 +255,7 @@ mergeIndOk.cmo mergeIndOk.cmx: pa_lock.cmo pa_html.cmo
 mk_consang.cmo mk_consang.cmx: pa_lock.cmo
 notes.cmo notes.cmx: pa_html.cmo
 perso.cmo perso.cmx: pa_html.cmo
+place.cmo place.cmx: pa_html.cmo
 relation.cmo relation.cmx: pa_lock.cmo pa_html.cmo
 relationLink.cmo relationLink.cmx: pa_html.cmo
 sendImage.cmo sendImage.cmx: pa_lock.cmo pa_html.cmo
