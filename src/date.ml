@@ -1,4 +1,4 @@
-(* $Id: date.ml,v 2.3 1999-04-17 14:18:04 ddr Exp $ *)
+(* $Id: date.ml,v 2.4 1999-04-20 12:52:41 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -195,18 +195,23 @@ value display_year d =
 
 value short_dates_text conf base p =
   if age_autorise conf base p then
+    let birth_date =
+      match Adef.od_of_codate p.birth with
+      [ None -> Adef.od_of_codate p.baptism
+      | x -> x ]
+    in
     let s =
-      match (Adef.od_of_codate p.birth, p.death) with
+      match (birth_date, p.death) with
       [ (Some _, DontKnowIfDead) -> "*"
       | _ -> "" ]
     in
     let s =
-      match Adef.od_of_codate p.birth with
+      match birth_date with
       [ Some d -> s ^ year_text d
       | _ -> s ]
     in
     let s =
-      match (Adef.od_of_codate p.birth, p.death) with
+      match (birth_date, p.death) with
       [ (Some _, Death _ _ | NotDead) -> s ^ "-"
       | (_, Death _ _ | DeadDontKnowWhen | DeadYoung) -> s ^ "+"
       | _ -> s ]

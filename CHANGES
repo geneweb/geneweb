@@ -2,10 +2,12 @@ GeneWeb Version 2.01
 --------------------
 
 * General
-  - [Apr 2, 99] Added Norwegian language.
+  - [Apr 2, 99] Added Norwegian language (Brynjulf Langballe).
   - [Mar 30, 99] Changed term "photo" into "image".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Apr 20, 99] In short dates (just year), if no birth date, baptism date
+    is displayed.
   - [Apr 19, 99] In latest births and latest deaths displaying, the
     dates with just the year or just the month and the year are also taken
     into account.
