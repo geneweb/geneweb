@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.13 2001-06-15 18:07:06 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.14 2001-06-16 03:04:52 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -820,6 +820,7 @@ value try_eval_gen_variable conf base env ((fam, cpl, des) as fcd) =
   | "marriage_place" -> quote_escaped fam.marriage_place
   | "marriage_src" -> quote_escaped fam.marriage_src
   | "fsources" -> quote_escaped fam.fsources
+  | "origin_file" -> quote_escaped fam.origin_file
   | s ->
       let v = extract_var "evar_" s in
       if v <> "" then

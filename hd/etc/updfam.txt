@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updfam.txt,v 4.6 2001-06-15 18:07:05 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.7 2001-06-16 03:04:51 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -360,6 +360,10 @@
     </td>
   </tr>
 </table>
+
+%if;(evar_origin_file = "on")
+  <input name=origin_file size=50 maxlength=200 value="%origin_file;">
+%end;
 
 <p>
 <input type=submit value=Ok>
