@@ -1,4 +1,4 @@
-(* $Id: dag2html.ml,v 3.14 1999-12-20 14:33:29 ddr Exp $ *)
+(* $Id: dag2html.ml,v 3.15 1999-12-20 16:59:03 ddr Exp $ *)
 
 (* Warning: this data structure for dags is not satisfactory, its
    consistency must always be checked, resulting on a complicated
@@ -893,28 +893,29 @@ value fall d t =
               else if i1 = 0 then i1
               else if t.table.(i1).(j).elem = Nothing then i1
               else i
-            in
-            do for k = i downto i1 + 1 do
-                 for j = j to j2 do
-                   t.table.(k).(j).elem := t.table.(k - 1).(j).elem;
-                   if k < i then
-                     t.table.(k).(j).span := t.table.(k - 1).(j).span
-                   else ();
-                 done;
-               done;
-               if i1 < i then
-                 for l = j to j2 do
-                   if i1 = 0 || t.table.(i1 - 1).(l).elem = Nothing then
-                     t.table.(i1).(l).elem := Nothing
-                   else
-                     t.table.(i1).(l) :=
-                       if l = j ||
-                          t.table.(i1 - 1).(l - 1).span <>
-                            t.table.(i1 - 1).(l).span then
-                         {elem = Ghost (new_ghost_id ());
-                          span = new_span_id ()}
-                       else copy_data t.table.(i1).(l - 1);
-                 done
+            in 
+            do if i1 < i then
+                 do for k = i downto i1 + 1 do
+                      for j = j to j2 do
+                        t.table.(k).(j).elem := t.table.(k - 1).(j).elem;
+                        if k < i then
+                          t.table.(k).(j).span := t.table.(k - 1).(j).span
+                        else ();
+                      done;
+                    done;
+                    for l = j to j2 do
+                      if i1 = 0 || t.table.(i1 - 1).(l).elem = Nothing then
+                        t.table.(i1).(l).elem := Nothing
+                      else
+                        t.table.(i1).(l) :=
+                          if l = j ||
+                             t.table.(i1 - 1).(l - 1).span <>
+                               t.table.(i1 - 1).(l).span then
+                            {elem = Ghost (new_ghost_id ());
+                             span = new_span_id ()}
+                          else copy_data t.table.(i1).(l - 1);
+                    done;
+                 return ()
                else ();
             return loop (j2 + 1)
         | _ -> loop (j + 1) ]
