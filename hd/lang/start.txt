@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.21 2001-12-26 20:41:55 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.22 2002-01-10 09:17:19 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -736,7 +736,6 @@ zh:
 </td>
 </tr>
 </table>
-</center>
 
 <p>
 
@@ -772,6 +771,8 @@ sv: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
 zh: 已经有 %q 次访问数据库，其中 %c 次访问本主页， 自从 %d。
 ]
 %Il<p>%E
+
+</center>
 
 <p>
 
