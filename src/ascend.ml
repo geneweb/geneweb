@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.3 2001-03-30 20:02:28 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.4 2001-03-30 21:11:08 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -448,9 +448,11 @@ value print_person_long_info conf base auth link p =
      else ();
      match link with
      [ Some n ->
-         do Wserver.wprint ".\n %s " (capitale (transl conf "see"));
-            print_link_long conf n;
-         return ()
+         if p_getenv conf.env "only" = Some "on" then ()
+         else
+           do Wserver.wprint ".\n %s " (capitale (transl conf "see"));
+              print_link_long conf n;
+           return ()
      | None -> () ];
   return ()
 ;
@@ -919,7 +921,9 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
                     (capitale (transl_nth conf "generation/generations" 0))
                     niveau;
                 end;
+(*
                 let all_gp = if only then [] else all_gp in
+*)
                 List.iter
                   (print_generation_person_long conf base ws wn all_gp
                      (gpll = []))
@@ -943,10 +947,11 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
      if only then ()
      else Wserver.wprint "%s.\n" (capitale (text_to conf niveau_max));
      mark.(Adef.int_of_iper p.cle_index) := Num.one;
-     let gpll = get_generations 1 [] [GP_person Num.one p.cle_index None] in
-     let gpll = if only then [List.hd gpll] else List.rev gpll in
+     let gpll1 = get_generations 1 [] [GP_person Num.one p.cle_index None] in
+     let gpll = List.rev gpll1 in
      let all_gp = List.flatten gpll in
-     do generation (if only then niveau_max else 1) all_gp gpll;
+     do generation 1 all_gp gpll;
+        let all_gp = if only then List.hd gpll1 else all_gp in
         if wn && has_notes conf base all_gp then
           do Wserver.wprint "<p><hr><p>\n";
              Wserver.wprint "<h3>%s</h3>\n"
