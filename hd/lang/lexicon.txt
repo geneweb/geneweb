@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.2 1999-10-31 15:56:17 ddr Exp $
+# $Id: lexicon.txt,v 3.3 1999-11-02 10:13:24 ddr Exp $
 # Copyright (c) 1999 INRIA
 
      !charset
@@ -3585,7 +3585,7 @@ it: pubblico
 nl: publieke
 no: offentlig
 pt: p&uacute;blico
-se: publikt
+se: offentligt
 
     public name
 cs: veøejné jméno
@@ -3601,7 +3601,7 @@ it: appellativo pubblico
 nl: publieke naam
 no: offisielt navn
 pt: nome p&uacute;blico
-se: publikt namn
+se: officiellt namn
 
     qualifier
 de: Beiname
