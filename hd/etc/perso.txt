@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: perso.txt,v 3.12 2000-12-27 10:50:40 ddr Exp $ -->
+  <!-- $Id: perso.txt,v 3.13 2001-01-02 16:02:43 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>
@@ -108,13 +108,13 @@
     %if;has_birth_date;
       <li>[*born]s %on_birth_date;
       %if;birthday; ([happy birthday to you!])%end;
-      %if;has_birth_place;, %birth_place;%end;
+      %if;has_birth_place;- %birth_place;%end;
     %else;
       %if;has_birth_place;<li>[*born]s -&nbsp;%birth_place;%end;
     %end;
     %if;has_baptism_date;
       <li>[*baptized]s %on_baptism_date;
-      %if;has_baptism_place;, %baptism_place;%end;
+      %if;has_baptism_place;- %baptism_place;%end;
     %else;
       %if;has_baptism_place;<li>[*baptized]s -&nbsp;%baptism_place;%end;
     %end;
