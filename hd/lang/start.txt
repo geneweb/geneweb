@@ -1,10 +1,10 @@
 %T
 <html>
 <head>
-  <!-- $Id: start.txt,v 4.72 2005-02-05 11:36:30 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.73 2005-03-20 08:17:45 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <!-- This file is kept by compatibility to allow displaying databases
-       created before version 5.00. It does not change any more. -->
+       created before version 5.00. -->
   <title>[
 af: Genealogie/Familiekunde
 bg: Genealogy
@@ -43,7 +43,7 @@ sv: Genealogi
 
 <div style="text-align: center">
 <table border="0" width="100%%">
-<tr align="left">
+<tr align="%L">
 <td rowspan="2" style="width: 20%%">
 <a href="http://www.geneweb.org/"><img width="96" height="108"
  src="%o/gwlogo.png" style="align: %L; border: 0" alt="GeneWeb"%/></a>
@@ -125,7 +125,7 @@ sv: Du kan vдlja ett annat sprеk bland de fцljande:
 %Vmotd;
 
 <table border="0" cellspacing="0" cellpadding="0" style="width: 100%%">
-<tr align="left"><td align="center">
+<tr align="%L"><td align="center">
 
 <p>[
 af: Die databasis <span class="highlight">"%t"</span> bevat tans %n persone.
@@ -182,7 +182,7 @@ zh: ПЦУР %n ИЛФЪКэѕЭївЦРЎЈ
 %I&NwNj
 
 %I&NcNa<table border="0" width="70%">
-<tr align="left">
+<tr align="%L">
 
 <td align="center">[
 af: <a href="%sw=w"><em>[wizard/wizards/friend/friends]0</em></a> toegang<br%/>
@@ -267,7 +267,7 @@ sv: <a href="%sw=f"><em>V&auml;n</em></a> tilltr&auml;de<br%/> (passord)
 ]</td>
 
 %E</tr></table>%E%I|ca<table border="0">
-<tr align="left"><td align="center">
+<tr align="%L"><td align="center">
 <form method="post" action="%f">
 %h[
 af: Toegangkodewoord, vir <em>vriend</em> of <em>medewerker</em> toegang:
@@ -306,7 +306,7 @@ sv: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>administrat&ouml;r</em>
 <br%/>
 %E
 
-<table border="0" cellspacing="0" cellpadding="0"><tr><td align="left">
+<table border="0" cellspacing="0" cellpadding="0"><tr><td align="%L">
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
 bg: Можете да използвате тази база от данни за търсене:
@@ -338,14 +338,14 @@ sv: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
 zh:
 ]<br%/>
 
-<ul>
+<ul style="list-style:none">
 
 <li>
 
 <form method="get" action="%f">
 <p>
 %h<input type="hidden" name="m" value="NG"%/>
-<label><span class="highlight">[
+<label><span class="highlight">- [
 af: per persoon
 bg: по име на човек
 br: dre anv-den
@@ -394,7 +394,8 @@ zh: ЛСЛчЈє
 %Ispropose_titles;<li>
 
 <form method="get" action="%f">
-<table border="0" cellpadding="0" cellspacing="0"><tr><td>
+<table border="0" cellpadding="0" cellspacing="0"><tr>
+<td valign="top"><span class="highlight">-&nbsp;</span></td><td>
 %h<input type="hidden" name="m" value="TT"%/>
 <label><span class="highlight">[
 af: by title
@@ -442,7 +443,7 @@ en:
 
 <form method="get" action="%f"><p>
 %h
-[
+<span class="highlight">- </span>[
 af: <span class="highlight">in die lys </span>van alle
 bg: <span class="highlight">в списъка</span> на всички
 br: <span class="highlight">dre roll</span> an holl
@@ -746,7 +747,7 @@ sv: <span class="highlight">genom</span>
 
 %Iw
 <table border="0" cellspacing="0" cellpadding="0" style="text-align: center">
-<tr><td>[
+<tr><td><div>[
 af: Jy kan
 bg: Можете още
 br: Gellout a rit
@@ -773,11 +774,11 @@ ru: Вы можете
 sl: Lahko:
 sv: Du kan
 zh:
-]
+]</div>
 
 <table border="0" cellspacing="0" cellpadding="0">
 <tr><td>
-<ul>
+<ul style="list-style:inside">
 %Ispropose_add_family;<li><a href="%sm=ADD_FAM">[
 af: 'n familie byvoeg
 bg: да добавите семейство
@@ -808,8 +809,8 @@ zh: ФцјУјТНҐјЗВј
 ]</a></li>
 %INl</ul>
 </td>
-<td align="left">
-<ul>%E
+<td align="%L">
+<ul style="list-style:inside">%E
 %E<li><a href="%sm=MOD_NOTES">[
 af: die notas wysig
 bg: да промените бележките
@@ -846,7 +847,7 @@ sv: &auml;ndra noteringar
 %E
 
 <table border="0" style="text-align:center">
-<tr><td>
+<tr><td><div>
 [
 af: Jy kan ook kyk na
 bg: Можете също да се насочите към
@@ -874,12 +875,12 @@ ru: Вы можете также обратиться к
 sl: Lahko pregledate:
 sv: Du kan ocks&aring; konsultera
 zh:
-]
+]</div>
 
 <table border="0">
-<tr align="left">
+<tr align="%L">
 <td valign="top">
-<ul>
+<ul style="list-style:inside">
 <li><a href="%sm=AN">[birthdays]</a></li>
 <li><a href="%sm=AD">[anniversaries of dead people]</a></li>
 <li><a href="%sm=AM">[anniversaries of marriage]</a></li>
@@ -887,7 +888,7 @@ zh:
 </ul>
 </td>
 <td valign="top">
-<ul>%Ih
+<ul style="list-style:inside">%Ih
 <li><a href="%sm=HIST;k=10">[history of updates]</a></li>%E
 <li><a href="%sm=CAL">[calendar/calendars]1</a></li>
 <li><a href="%sm=FORUM">[database forum]</a></li>
@@ -897,7 +898,7 @@ zh:
 </table>
 </td></tr></table>
 
-<table border="0"><tr><td>
+<table border="0"><tr><td><div>
 [
 af: Daar was %q besoeke, %c van hulle aan hierdie blad, sedert %d.
 bg: От %d насам е имало %q посещения, от които %c са на настоящата страница.
@@ -932,7 +933,7 @@ sl: %q dostopov, %c od teh na to stran, od %d.
 sv: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
     sedan %d.
 zh: ТСѕ­УР %q ґО·ГОККэѕЭївЈ¬ЖдЦР %c ґО·ГОК±ѕЦчТіЈ¬ ЧФґУ %dЎЈ
-]
+]</div>
 %Il<p>%E
 
 </td></tr></table>
@@ -963,8 +964,8 @@ de: Wenn die ge&auml;nderten Seiten nicht automatisch aktualisiert werden
 en: If your browser does not automatically update the modified pages (forcing
     you to do "reload current document"), try navigating from <a
     href="%sescache=0">this link</a>.
-eo: Se via navigisto ne auxtomate gxisdatigas la modifigitajn pagxojn (se vi
-    devas fari "resxargxi kurantan dokumenton"), provu ekde <a
+eo: Se via navigisto ne auxtomate gxisdatigas la modifigitajn pagxojn
+    (se vi devas fari "resxargxi kurantan dokumenton"), provu ekde <a
     href="%sescache=0">cxi tiu legilo</a>.
 es: Si las p&aacute;ginas modificadas no ser&aacute;n actualizadas
     automaticamente, favor de usar esta conexi&oacute;n:
@@ -1022,7 +1023,7 @@ sv: Om din webblдsare inte automatiskt uppdaterar de modifierade sidorna
 
 <br%/>
 
-<p style="text-align: right">
+<p style="text-align: %R">
 <span style="font-size: 80%%"><em><a href="%sm=LEX">[
 bg: лексикон
 br: geriaoueg
