@@ -13,6 +13,7 @@ GeneWeb version 4.04
     faster).
   - [03 Oct 01] Fixed bug in displaying by places/surnames: the cutting
     of the places by "levels" worked bad.
+  - [28 Sep 01] Macros now also apply in places displaying.
   - [16 Sep 01] Added variable "max_images_size" in base configuration
     files (base.gwf) to limit the size of the images which can be sent
     by the "send image" link.
