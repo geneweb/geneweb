@@ -2,7 +2,7 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2001 INRIA - GeneWeb -->
-  <!-- $Id: cleanup1.htm,v 1.3 2002-06-20 08:32:53 ddr Exp $ -->
+  <!-- $Id: cleanup1.htm,v 1.4 2002-06-27 08:31:21 ddr Exp $ -->
   <title>[
 de: Aufr&auml;umen - Phase 2
 en: Clean up - Phase 2
@@ -93,26 +93,26 @@ sv: Denna operation motsvarar de följande kommandona:
 ]
 
 <pre>
-     %% cd %w
-     %% %x%/gwu %a -o tmp.gw
-     %% mkdir old
+     $ cd %w
+     $ %x%/gwu %a -o tmp.gw
+     $ mkdir old
      [
 de: Unter Unix:
 en: Under Unix:
 fr: Sous Unix:
 it: Sotto Unix:
 ]
-        %% rm -rf old/%a.gwb
-        %% mv %a.gwb old/.
+        $ rm -rf old/%a.gwb
+        $ mv %a.gwb old/.
      [
 de: Unter MSdos:
 en: Under MSdos:
 fr: Sous MSdos:
 it: Sotto MSdos
 ]
-        %% del old\%a.gwb\*.*
-        %% rmdir old\%a.gwb
-        %% move %a.gwb old\.
-     %% %x%/gwc tmp.gw -o %a > comm.log
+        $ del old\%a.gwb\*.*
+        $ rmdir old\%a.gwb
+        $ move %a.gwb old\.
+     $ %x%/gwc tmp.gw -o %a > comm.log
 </pre>
 
