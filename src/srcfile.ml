@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo pa_extend.cmo *)
-(* $Id: srcfile.ml,v 3.33 2001-01-06 09:55:58 ddr Exp $ *)
+(* $Id: srcfile.ml,v 3.34 2001-01-19 16:54:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -366,18 +366,12 @@ value rec copy_from_channel conf base ic mode =
     [ 'N' -> not (if_expr (input_char ic))
     | 'a' -> conf.auth_file <> ""
     | 'c' -> conf.cgi || browser_cannot_handle_passwords conf
-(*
-    | 'd' -> p_getenv conf.base_env "propose_add_family" <> Some "no"
-*)
     | 'f' -> conf.friend
     | 'h' -> Sys.file_exists (History.file_name conf)
     | 'j' -> conf.just_friend_wizard
     | 'l' -> no_tables
     | 'n' -> base.data.bnotes.nread 1 <> ""
     | 's' -> p_getenv conf.base_env (get_variable ic) <> Some "no"
-(*
-    | 't' -> p_getenv conf.base_env "propose_titles" <> Some "no"
-*)
     | 'w' -> conf.wizard
     | 'z' -> Util.find_person_in_env conf base "z" <> None
     | '|' ->
