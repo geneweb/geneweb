@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 3.191 2000-11-23 18:42:54 ddr Exp $
+# $Id: lexicon.txt,v 3.192 2000-11-27 10:56:15 ddr Exp $
 # Copyright (c) 2000 INRIA
 
      !charset
@@ -61,7 +61,7 @@ se:  f&ouml;r att se den f&ouml;rsta
 
      to see the first relationship link
 af:  om die eerste te sien
-cs:  vidìt první
+cs:  zobrazit první
 de: , um die erste zu sehen
 dk:  for at se det f&oslash;rste
 en:  to see the first one
@@ -474,7 +474,7 @@ se: , &auml;r det
 
     2nd cousins
 af: kleinneef/kleinniggie
-cs: bratranec/sestøenice z druhého kolena
+cs: bratraneci/sestøenice z druhého kolena
 de: Cousins 2ten Grades
 dk: f&aelig;tre og kusiner af 2. grad
 en: 2nd cousins
@@ -494,7 +494,7 @@ se: sysslingar
 
     3rd cousins
 af: agterkleinneef/agterkleinniggie
-cs: bratranec/sestøenice z tøetího kolena
+cs: bratraneci/sestøenice z tøetího kolena
 de: Cousins 3ten Grades
 dk: f&aelig;tre og kusiner af 3. grad
 en: 3rd cousins
@@ -514,7 +514,7 @@ se: bryllingar
 
     <em>Sosa number</em> relative to %t
 af: <em>Sosa nommer</em> relatief tot %t
-cs: <em>Sosa number</em> vzta¾ené k %t
+cs: <em>"Sosa" èíslo</em> vzta¾ené k %t
 de: <em>Sosa-Nummer</em> relativ zu %t
 dk: <em>Sosa-nummer</em>, refererende til %t
 en: <em>Sosa number</em> relative to %t
@@ -553,7 +553,7 @@ se: M/K
 
     Sosa
 af: Sosa
-cs: Sosa
+cs: "Sosa"
 de: Sosa
 dk: Sosa
 en: Sosa
@@ -592,7 +592,7 @@ se: J/N
 
     a %s cousin
 af: 'n neef in die %s -de geslag/'n niggie in die %s -de geslag
-cs: bratranec z %s kolena/sestøenice z %s. kolena
+cs: bratranec z %s kolena/sestøenice z %s kolena
 de: ein:d:+em Cousin %s Grades/eine Kusine %s Grades
 dk: en f&aelig;tter af %s grad/en kusine af %s grad
 en: a %s cousin
@@ -652,6 +652,7 @@ se: en brylling
 
     a brother-in-law/a sister-in-law
 af: 'n swaer/'n skoonsuster
+cs: ¹vagr/¹vagrová
 de: ein Schwager/eine Schw&agrave;gerin
 dk: en svoger/en svigerinde
 en: a brother-in-law/a sister-in-law
@@ -751,7 +752,7 @@ se: en farf&ouml;r&auml;lder/en morf&ouml;r&auml;lder/en far(mor)f&ouml;r&auml;l
 
     a grandson/a granddaughter/a grandchild
 af: 'n kleinseun/'n kleindogter/'n kleinkind
-cs: vnuk/vnuèka/vnuk
+cs: vnuk/vnuèka/vnouèe
 de: ein Enkel/eine Enkelin/ein Enkelkind
 dk: en s&oslash;nne(datter)-s&oslash;n/en s&oslash;nne(datter)-datter/et barnebarn
 en: a grandson/a granddaughter/a grandchild
@@ -910,6 +911,7 @@ se: en nev&ouml;/en niece
 
     a son-in-law/a daughter-in-law
 af: 'n skoonseun/'n skoondogter
+cs: ze»/snacha
 de: ein Schwiegersohn/eine Schwiegertochter
 dk: en svigers&oslash;n/en svigerdatter
 en: a son-in-law/a daughter-in-law
@@ -1009,6 +1011,7 @@ se: l&auml;gg till
 
     adoptive father/adoptive mother/adoptive parents
 af: aangenome vader/angenome moeder/aangenome ouers
+cs: adoptivní otec/adoptivní matka/adoptivní rodièe
 de: Adoptivvater/Adoptivmutter/Adoptiveltern
 dk: adoptivfader/adoptivmoder/adoptivfor&aelig;ldre
 en: adoptive father/adoptive mother/adoptive parents
@@ -1028,6 +1031,7 @@ se: adoptivfar/adoptivmor/adoptivf&ouml;r&auml;ldrar
 
     adoptive son/adoptive daughter/adoptive child
 af: aangenome seun/aangenome dogter/aangenome kind
+cs: adoptivní syn/adoptivní dcera/adoptivní dítì
 de: Adoptivsohn/Adoptivtochter/Adoptivkind
 dk: adoptivs&oslash;n/adoptivdatter/adoptivbarn
 en: adoptive son/adoptive daughter/adoptive child
@@ -1048,7 +1052,7 @@ se: adoptivson/adoptivdotter/adoptivbarn
     advanced request
 af: gevorderde versoek
 cn: ¸ß¼¶·ÃÎÊÇëÇó
-cs: pokroèilı dotaz
+cs: roz¹íøenı dotaz
 de: Erweiterte Suche
 dk: avanceret s&oslash;gning
 en: advanced request
@@ -1170,6 +1174,7 @@ se: alias
 
     alive
 af: in die lewe
+cs: ¾ijící
 de: nicht verstorben
 dk: levende
 en: alive
@@ -1289,6 +1294,7 @@ se: en ana
 
     an uncle (aunt's husband)/an aunt (uncle's wife)
 af: 'n oom (tante se man)/'n tante (oom se vrou)
+cs: strıc (man¾el tety)/teta (man¾elka strıce)
 de: ein Onkel (Ehemann der Tante)/eine Tante (Ehefrau des Onkels)
 dk: en onkel (tantes mand)/en tante (onkels hustru)
 en: an uncle (aunt's husband)/an aunt (uncle's wife)
@@ -1410,7 +1416,7 @@ se: &aring;rsdagar
 
     anniversaries of dead people
 af: herdenkings van afsterwe
-cs: vıroèí úmrtí
+cs: vıroèí zemøelıch osob
 de: Jahrestage der verstorbenen Personen
 dk: &aring;rsdage for d&oslash;de personer
 en: anniversaries of dead people
@@ -1490,6 +1496,7 @@ se: samtidigt
 
     back
 af: terug
+cs: zpìt
 de: zur&uuml;ck
 dk: tilbage
 en: back
@@ -1750,6 +1757,7 @@ se: begravd
 
     calendar/calendars
 af: kalender/kalenders
+cs: kalendáø/kalendáøe
 de: Kalender
 dk: kalender/kalendere
 en: calendar/calendars
@@ -1769,7 +1777,7 @@ se: kalender
 
     cancel GeneWeb links
 af: stop GeneWeb-skakels
-cs: zru¹it svazky GeneWebu
+cs: zru¹it spoje GeneWebu
 de: GeneWeb-Links entfernen
 dk: uden GeneWeb-links
 en: cancel GeneWeb links
@@ -2086,7 +2094,7 @@ se: kusiner
 
     cousins (general term)
 af: neefs en niggies
-cs: bratranci/sestøenice
+cs: pokrevní pøíbuzní
 de: Cousins
 dk: f&aelig;tre og kusiner
 en: cousins
@@ -2126,7 +2134,7 @@ se: skapa
 
     cremated
 af: veras
-cs: spálen/spálena
+cs: zpopelnìn/zpopelnìna
 de: einge&auml;schert
 dk: kremeret
 en: cremated
@@ -2146,6 +2154,7 @@ se: kremerad
 
     data base forum
 af: databasis forum
+cs: databázové fórum
 de: Datenbankforum
 dk: database-forum
 en: data base forum
@@ -2347,7 +2356,7 @@ se: skilsm&auml;ssa
 
     divorced
 af: geskei
-cs: rozveden/rozvedena
+cs: rozvedeni
 de: geschieden
 dk: skilt
 en: divorced
@@ -2406,6 +2415,7 @@ ru: êîí÷àÿ
 se: slutar
 
     engaged
+cs: snoubenci
 de: verlobt
 dk: forlovet
 en: engaged
@@ -2422,6 +2432,7 @@ pt: Noivos
 se: f&ouml;rlovad
 
     engaged%t to
+cs: zasnoubenı s/zasnoubená s
 de: verlobt%t mit
 dk: forlovet%t med
 en: engaged%t to
@@ -2519,6 +2530,7 @@ se: avr&auml;ttad
 
     families with encoding
 af: gekodeerde families
+cs: rodiny s kódy
 de: Familien mit Kodierung
 dk: familier med kodning
 en: families with encoding
@@ -2779,6 +2791,7 @@ se: f&ouml;r f&ouml;rnamnen i bokstavsordning
 
     foster father/foster mother/foster parents
 af: pleegvader/pleegmoeder/pleegouers
+cs: pìstoun/pìstounka/pìstouni
 de: Pflegevater/Pflegemutter/Pflegeeltern
 dk: plejefader/plejemoder/plejefor&aelig;ldre
 en: foster father/foster mother/foster parents
@@ -2796,6 +2809,7 @@ se: fosterfar/fostermor/fosterf&ouml;r&auml;ldrar
 
     foster son/foster daughter/foster child
 af: pleegseun/pleegdogter/pleegkind
+cs: schovanec/schovanka/schovanec
 de: Pflegesohn/Pflegetochter/Pflegekind
 dk: plejes&oslash;n/plejedatter/plejebarn
 en: foster son/foster daughter/foster child
@@ -2833,6 +2847,7 @@ se: generation/generationer
 
     godfather/godmother/godparents
 af: peetpa/peetma/peetouers
+cs: kmotr/kmotra/kmotr a kmotra
 de: Taufzeuge/Taufzeugin/Taufzeuge und Taufzeugin
 dk: gudfader/gudmoder/gudfader og gudmoder
 en: godfather/godmother/godparents
@@ -2852,6 +2867,7 @@ se: gudfar/gudmor/gudf&ouml;r&auml;ldrar
 
     godson/goddaughter/godchild
 af: peetseun/peetdogter/peetkind
+cs: kmotøenec/kmotøenka/kmotøenec
 de: Taufkind
 dk: guds&oslash;n/guddatter/gudbarn
 en: godson/goddaughter/godchild
@@ -2911,6 +2927,7 @@ se: gammel-far(mor)f&ouml;r&auml;ldrar
 
     gregorian/julian/french/hebrew
 af: gregoriaans/juliaans/frans/hebreeus 
+cs: gregoriánskı/juliánskı/francouzskı/¾idovskı
 de: Gregorianisch/Julianisch/Franz&ouml;sisch/Hebr&auml;isch
 dk: gregoriansk/juliansk/fransk rep./j&oslash;disk
 en: Gregorian/Julian/French/Hebrew
@@ -2930,6 +2947,7 @@ se: gregoriansk/juliansk/franska rep./hebreisk
 
     happy birthday to you!
 af: Geluk met jou verjaarsdag!
+cs: v¹echno nejlep¹í k narozeninám!
 de: Herzlichen Gl&uuml;ckwunsch zum Geburstag!
 dk: til lykke med f&oslash;dselsdagen!
 en: happy birthday to you!
@@ -2950,7 +2968,7 @@ se: gratulerar p&aring; f&ouml;delsedagen!
     having as children
 af: met as kinders:-
 cn: ÉúÓĞ×ÓÅ®
-cs: dìti
+cs: mìli spolu dìti
 de: mit
 dk: b&oslash;rn
 en: with
@@ -3010,6 +3028,7 @@ se: honom/henne
 
     history of updates
 af: bywerkingsgeskiedenis
+cs: historie zmìn
 de: Chronik der Aktualisierungen
 dk: opdateringers historie
 en: history of updates
@@ -3028,6 +3047,7 @@ ru: èñòîğèÿ îáíîâëåíèé
 se: uppdateringarnas historia
 
     horizontally
+cs: horizontálnì
 de: horizontal
 dk: vandret
 en: horizontally
@@ -3065,6 +3085,7 @@ se: make/maka
 
     if titles
 af: as titels
+cs: jsou-li tituly
 de: eingeschr&auml;nkt
 dk: hvis titler
 en: if titles
@@ -3103,7 +3124,7 @@ se: bilden borttagen
 
     image received
 af: prent ontvang
-cs: obrázek obdr¾en
+cs: obrázek pøijat
 de: Bild erhalten
 dk: billede indsat
 en: image received
@@ -3123,7 +3144,7 @@ se: bilden mottagen
 
     image/images
 af: prent/prente
-cs: obrázek
+cs: obrázek/obrázky
 de: Bild
 dk: billede/billeder
 en: image/images
@@ -3144,7 +3165,7 @@ se: bild/bilder
     in (month year)
 af: in
 cn: ÓÚ
-cs: v období
+cs: v
 de: im
 dk: i
 en: in
@@ -3165,7 +3186,7 @@ se: i
     in (year)
 af: in
 cn: ÓÚ
-cs: v roce
+cs: v
 de: im Jahre
 dk: i
 en: in
@@ -3205,6 +3226,7 @@ se: inkludera makar som saknas
 
     include spouses
 af: eggenote ingesluit
+cs: vèetnì man¾elù/man¾elek
 de: Ehegatten einbeziehen
 dk: medtag &aelig;gtef&aelig;ller
 en: include spouses
@@ -3224,7 +3246,7 @@ se: inkludera makar
 
     incompatible sexes
 af: botsende geslagte
-cs: nekompatibilní pohlaví
+cs: nesprávné pohlaví
 de: unvertr&auml;gliche Geschlechter
 dk: k&oslash;n inkompatible
 en: incompatible sexes
@@ -3284,7 +3306,7 @@ se: fel f&ouml;rfr&aring;gan
 
     indeed,
 af: inderdaad,
-cs: Ve skuteènosti
+cs: ve skuteènosti
 de: tats&auml;chlich,
 dk: faktisk,
 en: indeed,
@@ -3444,6 +3466,7 @@ se: det &auml;r samma person!
 
     julian day
 af: juliaanse dag
+cs: juliánskı den
 de: Julianisch
 dk: juliansk dag
 en: Julian day
@@ -3502,6 +3525,7 @@ se: mindre &auml;n en m&aring;nad
 
     link
 af: koppel
+cs: link
 de: verbinden
 dk: forbind
 en: link
@@ -3580,6 +3604,7 @@ ru: ïîäğîáíî
 se: ut&ouml;kad rapport
 
     loop in data base: %s is his/her own ancestor
+cs: smyèka v databázi: %s je svùj pøedek
 de: Schleife in der Datenbank: %s ist sein/ihr eigener Vorfahr
 dk: loop i databasen: %s er sin egen ane
 en: loop in data base: %s is his/her own ancestor
@@ -3612,6 +3637,7 @@ se: huvudtitel
 
     male line/female line
 af: manlike lyn/vroulike lyn
+cs: mu¾ská linie/¾enská linie
 de: v&auml;terlicherseits/m&uuml;tterlicherseits
 dk: mandlige linie/kvindelige linie
 en: male line/female line
@@ -3690,7 +3716,7 @@ se: &auml;ktenskap/&auml;ktenskap
 
     married
 af: getroud
-cs: vdaná
+cs: man¾elé
 de: verheiratet
 dk: gift
 en: married
@@ -3751,6 +3777,7 @@ se: gift%t med
 
     maximum
 af: maksimum
+cs: maximum
 de: Maximal
 dk: maksimalt
 en: maximum
@@ -3790,6 +3817,7 @@ se: sl&aring; samman
 
     merge done
 af: saamgevoeg
+cs: spojení dokonèeno
 de: Zusammenf&uuml;hrung abgeschlossen
 dk: sammenl&aelig;gning udf&oslash;rt
 en: merge done
@@ -3808,6 +3836,7 @@ ru: îáúåäèíåíèå çàâåğøåíî
 se: sammanslagning klar
 
     message added
+cs: zpráva pøidána
 de: Nachricht hinzugefügt
 dk: meddelelse tilf&oslash;jet
 en: message added
@@ -3833,6 +3862,7 @@ se: meddelande/n&auml;sta meddelande
 
     missing ancestors
 af: ontbrekende voorsate
+cs: chybìjící pøedkové
 de: fehlende Vorfahren
 dk: manglende forf&aelig;dre
 en: missing ancestors
@@ -3872,6 +3902,7 @@ se: &auml;ndra
 
     months old
 af: maande oud
+cs: mìsícù starı/mìsícù stará
 de: Monate alt
 dk: m&aring;neder gammel
 en: months old
@@ -3891,6 +3922,7 @@ se: m&aring;nader
 
     more than %d answers
 af: meer as %d antwoorde
+cs: více ne¾ %d odpovìdí
 de: mehr als %d Antworten
 dk: mere end %d svar
 en: more than %d answers
@@ -3934,6 +3966,7 @@ nl: n/1/2/3/4/5/6/7/8/9/10/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/28
 
     name
 af: naam
+cs: jméno
 de: Name
 dk: navn
 en: name
@@ -3953,6 +3986,7 @@ se: namn
 
     name %s already used by %tthis person%t
 af: %s is reeds gebruik deur %t
+cs: jméno %s u¾ má tato %t osoba
 de: Name %s wird schon bei %tdieser Person%t benutzt
 dk: navn %s er allerede anvendt af %tdenne person%t
 en: name %s already used by %tthis person%t
@@ -3972,6 +4006,7 @@ se: namn %s anv&auml;nds redan av %tdenna person%t
 
     navigation with %t as Sosa reference
 af: stap met %t as Sosa verwysing
+cs: prohlí¾ení s %t jako "sosa" referencí
 de: Navigation mit %t als Sosareferenz
 dk: navigering med %t som reference for fortl&oslash;bende anenummerering (Sosa o.a.)
 en: navigation with %t as Sosa reference
@@ -3991,6 +4026,7 @@ se: navigering med %t som proband (Kekules system)
 
     nephews and nieces
 af: broers- en susterskinders
+cs: synovci a neteøe
 de: Neffen und Nichten
 dk: nev&oslash;er og niecer
 en: nephews and nieces
@@ -4030,6 +4066,7 @@ se: n&auml;sta bror/n&auml;sta syster/n&auml;sta syskon
 
     no anniversary
 af: geen herdenking
+cs: ¾ádné vıroèí
 de: kein Jahrestag
 dk: ingen &aring;rsdag
 en: no anniversary
@@ -4089,6 +4126,7 @@ se: ingen k&auml;nd sl&auml;ktskap emellan %s och %s
 
     no match
 af: geen passing
+cs: nenalezena shoda
 de: keine passenden Eintr&auml;ge
 dk: intet resultat af s&oslash;gningen
 en: no match
@@ -4108,7 +4146,7 @@ se: inga tr&auml;ffar
 
     not divorced
 af: nie geskei nie
-cs: nerozveden/nerozvedená
+cs: nerozvedeni
 de: nicht geschieden
 dk: ikke skilt
 en: not divorced
@@ -4148,7 +4186,7 @@ se: hittar inte
 
     not married
 af: Ongetroud
-cs: svobodnı/svobodná
+cs: svobodní
 de: nicht verheiratet
 dk: ikke gift
 en: not married
@@ -4208,6 +4246,7 @@ ru: ıííûé/1-é/2-é/3-é/4-é/5-é/6-é/-7é/8-é/9-é/10-é/11-é/11-é/12-é/13-é/14-é/15-é
 se: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/17:e/18:e/19:e/20:e/21:a/22:a/23:e/24:e/25:e/26:e/27:e/28:e/29:e/30:e/31:a/32:a/33:e/34:e/35:e/36e/37:e/38:e/39:e/40:e/41:a/42:a/43:e/44:e/45:e/46:e/47:e/48:e/49:e/50:e/51:a/52:a/53:e/54:e/55:e/56:e/57:e/58:e/59:e/60:e/61:a/62:a/63:e/64:e/65:e/66:e/67:e/68:e/69:e/70:e/71:a/72:a/73:e/74:e/75:e/76:e/77:e/78:e/79:e/80:e/81:a/82:a/83:e/84:e/85:e/86:e/87:e/88:e/89:e/90:e/91:a/92:a/93:e/94:e/95:e/96:e/97:e/98:e/99:e/100:e/101:a/102:a/103:e/104:e/105:e/106:e/107:e/108:e/109:e/110:e/111:e/112:e/113:e/114:e/115:e/116:e/117:e/118:e/119:e/120:e/121:a/122:a/123:e/124:e/125:e/126:e/127:e/128:e/129:e/130:e
 
     nth (degree)
+cs: n-tı/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 de: n-ten/1sten/2ten/3ten/4ten/5ten/6ten/7ten/8ten/9ten/10ten/11ten/12ten/13ten/14ten/15ten/16ten/17ten/18ten/19ten/20ten/21ten/22ten/23ten/24ten/25ten/26ten/27ten/28ten/29ten/30ten/31ten/32ten/33ten/34ten/35ten/36ten/37ten/38ten/39ten/40ten/41ten/42ten/43ten/44ten/45ten/46ten/47ten/48ten/49ten/50ten/51ten/52ten/53ten/54ten/55ten/56ten/57ten/58ten/59ten/60ten/61ten/62ten/63ten/64ten/65ten/66ten/67ten/68ten/69ten/70ten/71ten/72ten/73ten/74ten/75ten/76ten/77ten/78ten/79ten/80ten/81ten/82ten/83ten/84ten/85ten/86ten/87ten/88ten/89ten/90ten/91ten/92ten/93ten/94ten/95ten/96ten/97ten/98ten/99ten
 dk: nte/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 fi: n./1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
@@ -4220,11 +4259,13 @@ ru: ıííûé/1-é/2-é/3-é/4-é/5-é/6-é/-7é/8-é/9-é/10-é/11-é/11-é/12-é/13-é/14-é/15-é
 se: n/tv&aring;/tre/fyra/fem/sex/sju/&aring;tta/nio/tio/elva/tolv/tretton/fjorton/femton/sexton/sjutton/arton/nitton/tjugo/21/22/23/24/25/26/27/28/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99/100/101/102/103/104/105/106/107/108/109/110/111/112/113/114/115/116/117/118/119/120/121/122/123/124/125/126/127/128/129/130
 
     nth (feminine)
+cs: n-tı/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 es: n-&eacute;sima/1ra/2nda/3ra/4ta/5ta/6ta/7ma/8va/9na/10ma/11ra/12nda/13ra/14ta/15ta/16ta/17ma/18va/19na/20ma/21ra/22nda/23ra/24ta/25ta/26ta/27ma/28va/29na/30ma/31ra/32nda/33ra/34ta/35ta/36ta/37ma/38va/39na/40ma/41ra/42nda/43ra/44ta/45ta/46ta/47ma/48va/49na/50ma/51ra/52nda/53ra/54ta/55ta/56ta/57ma/58va/59na/60ma/61ra/62nda/63ra/64ta/65ta/66ta/67ma/68va/69na/70ma/71ra/72nda/73ra/74ta/75ta/76ta/77ma/78va/79na/80ma/81ra/82nda/83ra/84ta/85ta/86ta/87ma/88va/89na/90ma/91ra/92nda/93ra/94ta/95ta/96ta/97ma/98va/99na
 he:  än/øàùåğä/ ùğéú/ ùìéùéú/ øáéòéú/ çîùéú/ ùéùéú/ ùáéòéú/ ùîéğéú/ úùéòéú/ òùéøéú/11/12/13/14/15/16/17/18/19/20/21/22/23/24/25/26/27/8/29/30/31/32/33/34/35/36/37/38/39/40/41/42/43/44/45/46/47/48/49/50/51/52/53/54/55/56/57/58/59/60/61/62/63/64/65/66/67/68/69/70/71/72/73/74/75/76/77/78/79/80/81/82/83/84/85/86/87/88/89/90/91/92/93/94/95/96/97/98/99
 
     nth (generation)
 af: n-te/1ste/2de/3de/4de/5de/6de/7de/8ste/9de/10de/11de/12de/13de/14de/15de/16de/17de/18de/19de/20ste/21ste/22ste/23ste/24ste/25ste/26ste/27ste/28ste/29ste/30de/31ste/32ste/33ste/34ste/35ste/36ste/37ste/38ste/39ste/40ste/41ste/42ste/43ste/44ste/45ste/46ste/47ste/48ste/49ste/50ste/51ste/52ste/53ste/54ste/55ste/56ste/57ste/58ste/59ste/60ste/61ste/62ste/63ste/64ste/65ste/66ste/67ste/68ste/69ste/70ste/71ste/72ste/73ste/74ste/75ste/76ste/77ste/78ste/79ste/80ste/81ste/82ste/83ste/84ste/85ste/86ste/87ste/88ste/89ste/90ste/91ste/92ste/93ste/94ste/95ste/96ste/97ste/98ste/99ste
+cs: n-tı/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 de: n-ten/1sten/2ten/3ten/4ten/5ten/6ten/7ten/8ten/9ten/10ten/11ten/12ten/13ten/14ten/15ten/16ten/17ten/18ten/19ten/20ten/21ten/22ten/23ten/24ten/25ten/26ten/27ten/28ten/29ten/30ten/31ten/32ten/33ten/34ten/35ten/36ten/37ten/38ten/39ten/40ten/41ten/42ten/43ten/44ten/45ten/46ten/47ten/48ten/49ten/50ten/51ten/52ten/53ten/54ten/55ten/56ten/57ten/58ten/59ten/60ten/61ten/62ten/63ten/64ten/65ten/66ten/67ten/68ten/69ten/70ten/71ten/72ten/73ten/74ten/75ten/76ten/77ten/78ten/79ten/80ten/81ten/82ten/83ten/84ten/85ten/86ten/87ten/88ten/89ten/90ten/91ten/92ten/93ten/94ten/95ten/96ten/97ten/98ten/99ten
 dk: nte/1./2./3./4./5./6./7./8./9./10./11./12./13./14./15./16./17./18./19./20./21./22./23./24./25./26./27./28./29./30./31./32./33./34./35./36./37./38./39./40./41./42./43./44./45./46./47./48./49./50./51./52./53./54./55./56./57./58./59./60./61./62./63./64./65./66./67./68./69./70./71./72./73./74./75./76./77./78./79./80./81./82./83./84./85./86./87./88./89./90./91./92./93./94./95./96./97./98./99.
 en: nth/1st/2nd/3rd/4th/5th/6th/7th/8th/9th/10th/11th/12th/13th/14th/15th/16th/17th/18th/19th/20th/21st/22nd/23rd/24th/25th/26th/27th/28th/29th/30th/31st/32nd/33rd/34th/35th/36th/37th/38th/39th/40th/41st/42nd/43rd/44th/45th/46th/47th/48th/49th/50th/51st/52nd/53rd/54th/55th/56th/57th/58th/59th/60th/61st/62nd/63rd/64th/65th/66th/67th/68th/69th/70th/71st/72nd/73rd/74th/75th/76th/77th/78th/79th/80th/81st/82nd/83rd/84th/85th/86th/87th/88th/89th/90th/91st/92nd/93rd/94th/95th/96th/97th/98th/99th
@@ -4244,6 +4285,7 @@ se: n:te/1:a/2:a/3:e/4:e/5:e/6:e/7:e/8:e/9:e/10:e/11:e/12:e/13:e/14:e/15:e/16:e/
 
     number
 af: nommer
+cs: èíslo
 de: Nummer
 dk: l&oslash;benummer
 en: number
@@ -4544,6 +4586,7 @@ se: endast den valda generationen
 
     optional
 af: opsioneel
+cs: volitelnì
 de: optional
 dk: efter behag
 en: optional
@@ -4664,7 +4707,7 @@ se: person &auml;ndrad
 
     person/persons
 af: persoon/persone
-cs: osobu/osoby
+cs: osoba/osob
 de: Person/Personen
 dk: person/personer
 en: person/persons
@@ -4724,6 +4767,7 @@ se: plats
 
     possibly (date)
 af: miskien
+cs: snad
 de: vielleicht
 dk: m&aring;ske
 en: possibly
@@ -4743,6 +4787,7 @@ se: kanske
 
     precision
 af: akkuraatheid
+cs: pøesnì
 de: Genauigkeit
 dk: pr&aelig;cisering
 en: precision
@@ -4842,6 +4887,7 @@ se: officiellt namn
 
     qualifier
 af: bynaam
+cs: pøívlastek
 de: Beiname
 dk: tilnavn
 en: qualifier
@@ -4861,6 +4907,7 @@ se: smeknamn
 
     recognized son/recognized daughter/recognized child
 af: aanvaarde seun/aanvaarde dogter/aanvaarde kind 
+cs: uznanı syn/uznaná dcera/uznané dítì
 de: anerkannter Sohn/anerkannte Tochter/anerkanntes Kind
 dk: anerkendt s&oslash;n/anerkendt datter/anerkendt barn
 en: recognized son/recognized daughter/recognized child
@@ -4880,6 +4927,7 @@ se: erk&auml;nd son/erk&auml;nd dotter/erk&auml;nt barn
 
     recognizing father/recognizing mother/recognizing parents
 af: erkennende vader/erkennende moeder/erkennende ouders
+cs: uznanı otec/uznaná matka/uznaní rodièe
 de: anerkennender Vater/anerkennende Mutter/anerkennende Eltern
 dk: sig vedkendende fader/sig vedkendende moder/sig vedkendende for&aelig;ldre
 en: recognizing father/recognizing mother/recognizing parents
@@ -4899,6 +4947,7 @@ se: erk&auml;nnande far/erk&auml;nnande mor/erk&auml;nnande f&ouml;r&auml;ldrar
 
     relation/relations
 af: verwant/verwante
+cs: vztah/vztahy
 de: Beziehung/Beziehungen
 dk: forbindelse/forbindelser
 en: relation/relations
@@ -4999,6 +5048,7 @@ se: f&ouml;rh&aring;llande%t med
 
     relationships by marriage
 af: aangetroude verwantskappe
+cs: pøíbuzenské vztahy pøes svatby
 de: Heiratsbeziehungen
 dk: sl&aelig;gtskaber ved gifterm&aring;l
 en: relationships by marriage
@@ -5097,6 +5147,7 @@ ru: ïîñëàòü
 se: skicka
 
     separated
+cs: odlouèeni
 de: getrennt lebend
 dk: separeret
 en: separated
@@ -5174,6 +5225,7 @@ se: kort rapport
 
     shortest path
 af: kortste pad
+cs: nejkrat¹í cesta
 de: k&uuml;rzester Pfad
 dk: korteste vej
 en: shortest path
@@ -5252,6 +5304,7 @@ se: syskon
 
     son/daughter/child
 af: seun/dogter/kind
+cs: je synem/je dcerou/je dítìtem
 de: Sohn/Tochter/Kind
 dk: s&oslash;n/datter/barn
 en: son/daughter/child
@@ -5312,7 +5365,7 @@ se: v&auml;lj
 
     spouse
 af: eggenoot/eggenote
-cs: cho»
+cs: man¾el/cho»
 de: Ehemann/Ehefrau
 dk: &aelig;gtef&aelig;lle
 en: spouse
@@ -5371,6 +5424,7 @@ ru: íà÷èíàşòñÿ ñ
 se: som b&ouml;rjar med
 
     statistics
+cs: statistika
 de: Statistiken    
 dk: statistikker
 en: statistics
@@ -5387,6 +5441,7 @@ pt: estat&iacute;sticas
 se: statistik
 
     subject
+cs: pøedmìt (osoba?)
 de: Betreff
 dk: emne
 en: subject
@@ -5480,6 +5535,7 @@ ru: ôàìèëèÿ/ôàìèëèè
 se: efternamn/efternamn
 
     surnames list
+cs: seznam pøíjmení
 de: Nachnamen-Liste
 dk: efternavnsoversigt
 en: surnames list
@@ -5556,6 +5612,7 @@ se: &auml;ndra ordningen p&aring; de f&ouml;ljande familjerna
 
     text
 af: teks
+cs: text
 de: Text
 dk: tekst
 en: text
@@ -5594,6 +5651,7 @@ ru: %d èì¸í
 se: de %d f&ouml;rnamnen
 
     the %d oldest perhaps still alive
+cs: %d nejstar¹ích snad je¹tì ¾ijících osob
 de: die %d &auml;ltesten vermutlich noch lebenden    
 dk: de %d &aelig;ldste af de muligt levende
 en: the %d oldest perhaps still alive
@@ -5630,6 +5688,7 @@ ru: %d ôàìèëèé
 se: de %d efternamnen
 
     the %d who lived the longest
+cs: %d osob které ¾ili nejdéle
 de: die %d die am l&auml;ngsten lebten   
 dk: de %d som har levet l&aelig;ngst
 en: the %d who lived the longest
@@ -5707,7 +5766,7 @@ se: br&ouml;llopsdagen
 
     the base has changed; do "back", "reload", and refill the form
 af: die databasis het verander; gaan "terug", "herlaai" en vul die vorm weer in
-cs: databáze se zmìnila; bì¾te zpìt (back), znovu naètìte stránku (reload) a vyplòte formuláø
+cs: databáze se zmìnila; vra»te se zpìt (back), znovu naètìte stránku (reload) a vyplòte formuláø
 de: die Datei wurde ver&auml;ndert; dr&uuml;cken Sie bitte "back", "reload" und f&uuml;llen Sie das Formular neu aus
 dk: databasen er &aelig;ndret; g&aring; tilbage, klik for opdatering og udfyld formularen igen
 en: the base has changed; do "back", "reload", and refill the form
@@ -5787,6 +5846,7 @@ se: i &ouml;vermorgon
 
     the father-in-law/the mother-in-law
 af: die skoonpa/die skoonma
+cs: tchán/tchınì
 de: der Schwiegervater/die Schwiegermutter
 dk: svigerfaderen/svigermoderen
 en: the father-in-law/the mother-in-law
@@ -5827,7 +5887,7 @@ se: fadern/modern/en f&ouml;r&auml;lder
 
     the file is temporarily locked: please try again
 af: die lêer is tydelik gesluit: probeer asseblief later weer
-cs: soubor je doèasnì uzamèen: zkuste to znova. Pokud to stále nefunguje, chvíli poèkejte a pak to znovu zkuste.
+cs: soubor je doèasnì uzamèen: zkuste to znova. Pokud to stále nefunguje, chvíli poèkejte a pak to zkuste znovu.
 de: die Datei ist z.Z. gesch&uuml;tzt: versuchen Sie es bitte nochmals
 dk: filen er midlertidigt l&aring;st: pr&oslash;v igen. Hvis dette gentagne gange ikke fungerer, da vent lidt inden n&aelig;ste fors&oslash;g
 en: the file is temporarily locked: please try again. If it still does not work, wait a while before trying again
@@ -5947,7 +6007,7 @@ se: den 4:e generationen
 
     the latest %d births
 af: die laaste %d geboortes
-cs: poslední %d narození
+cs: posledních %d narození
 de: die letzten %d Geburten
 dk: de seneste %d f&oslash;dsler
 en: the latest %d births
@@ -5967,7 +6027,7 @@ se: de senaste %d f&ouml;dslarna
 
     the latest %d deaths
 af: die laaste %d afsterwes
-cs: poslední %d úmrtí
+cs: posledních %d úmrtí
 de: die letzten %d Ableben
 dk: de seneste %d d&oslash;dsfald
 en: the latest %d deaths
@@ -5987,6 +6047,7 @@ se: de senaste %d d&ouml;dsfallen
 
     the latest %d marriages
 af: die laaste %d huwelike
+cs: posledních %d svateb
 de: die letzten %d Heiraten
 dk: de seneste %d bryllupper
 en: the latest %d marriages
@@ -6024,6 +6085,7 @@ se: f&ouml;r&auml;ldrarna
 
     the spouse
 af: die eggenoot/die eggenote
+cs: man¾el/man¾elka
 de: der:d:dem Ehemann/die:d:der Ehefrau
 dk: &aelig;gtef&aelig;llen
 en: the spouse
@@ -6083,6 +6145,7 @@ se: titel/titlar
 
     to add a child to a family, use "%s"
 af: om 'n kind by te voeg by 'n familie, gebruik "%s"
+cs: pro pøidání dítìte do rodiny pou¾ij "%s"
 de: um ein Kind zu einer Familie zu hinzuzuf&uuml;gen, benutzen Sie "%s"
 dk: brug "%s" for at f&oslash;je et barn til en familie
 en: to add a child to a family, use "%s"
@@ -6102,7 +6165,7 @@ se: f&ouml;r att l&auml;gga till ett barn i en familj, anv&auml;nd "%s"
 
     to the %s generation
 af: tot die %s geslag
-cs: a¾ do %s. generace
+cs: a¾ do %s generace
 de: bis zur %s Generation
 dk: til den %s generation
 en: to the %s generation
@@ -6282,7 +6345,7 @@ se: i morgon
 
     total
 af: totaal
-cs: souèet
+cs: celkem
 de: Summe
 dk: totalt
 en: total
@@ -6302,6 +6365,7 @@ se: totalt
 
     tree
 af: boom
+cs: strom
 de: Baum
 dk: tr&aelig;
 en: tree
@@ -6321,6 +6385,7 @@ se: träd
 
     uncles and aunts
 af: ooms en tantes
+cs: strıcové a tety
 de: Onkel und Tanten
 dk: onkler og tanter
 en: uncles and aunts
@@ -6481,6 +6546,7 @@ se: med
 
     witness at marriage of %s and %s
 af: getuie by die troue van %s met %s
+cs: svìdek na svatbì: %s a %s
 de: Trauzeugen bei der Hochzeit von %s und %s
 dk: vidne ved brylluppet mellem %s og %s
 en: witness at marriage of %s and %s
@@ -6499,6 +6565,7 @@ se: vittne vid &auml;ktenskap mellan %s och %s
 
     witness/witnesses
 af: getuie/getuies
+cs: svìdek/svìdkové
 de: Trauzeuge/Trauzeugen
 dk: vidne/vidner
 en: witness/witnesses
@@ -6538,6 +6605,7 @@ se: skulle vara sin egen ana
 
     year/month/day
 af: jaar/maand/dag
+cs: rok/mìsíc/den
 de: Jahr/Monat/Tag
 dk: &aring;r/m&aring;ned/dag
 en: year/month/day
