@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.24 2002-10-23 02:39:23 ddr Exp $ *)
+(* $Id: update.ml,v 4.25 2002-10-26 01:22:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -349,9 +349,7 @@ value print_warning conf base =
       do {
         print_someone_strong conf base p;
         Wserver.wprint "\n%s\n" (transl conf "is a very young parent");
-        Wserver.wprint "(";
-        Date.print_age conf a;
-        Wserver.wprint ")"
+        Wserver.wprint "(%s)" (Date.string_of_age conf a);
       }
   | TitleDatesError p t ->
       Wserver.wprint
@@ -378,7 +376,7 @@ value print_warning conf base =
         print_someone_strong conf base p;
         Wserver.wprint "\n";
         Wserver.wprint (ftransl conf "married at age %t")
-          (fun _ -> Date.print_age conf a)
+          (fun _ -> Wserver.wprint "%s" (Date.string_of_age conf a))
       } ]
 ;
 

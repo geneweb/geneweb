@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: notes.ml,v 4.1 2001-04-22 03:31:15 ddr Exp $ *)
+(* $Id: notes.ml,v 4.2 2002-10-26 01:22:42 ddr Exp $ *)
 
 open Config;
 open Def;
@@ -16,8 +16,7 @@ value print conf base =
     header_no_page_title conf title;
     print_link_to_welcome conf False;
     html_p conf;
-    copy_string_with_macros conf [] s;
-    Wserver.wprint "\n";
+    Wserver.wprint "%s\n" (string_with_macros conf [] s);
     trailer conf;
   }
 ;

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 4.13 2002-10-18 16:18:21 ddr Exp $ *)
+(* $Id: date.ml,v 4.14 2002-10-26 01:22:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -236,26 +236,26 @@ value string_of_date conf =
   | Dtext t -> "(" ^ t ^ ")" ]
 ;
 
-value print_age conf a =
+value string_of_age conf a =
   match a with
   [ {day = 0; month = 0; year = y} ->
-      if y > 1 then Wserver.wprint "%d %s" y (transl conf "years old")
-      else if y = 1 then Wserver.wprint "%s" (transl conf "one year old")
-      else Wserver.wprint "%s" (transl conf "birth")
+      if y > 1 then string_of_int y ^ " " ^ transl conf "years old"
+      else if y = 1 then transl conf "one year old"
+      else transl conf "birth"
   | {day = 0; month = m; year = y} ->
-      if y >= 2 then Wserver.wprint "%d %s" y (transl conf "years old")
+      if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
       else if y > 0 || m > 1 then
-        Wserver.wprint "%d %s" (y * 12 + m) (transl conf "months old")
-      else if m = 1 then Wserver.wprint "%s" (transl conf "one month old")
-      else Wserver.wprint "%s" (transl conf "less than one month old")
+        string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
+      else if m = 1 then transl conf "one month old"
+      else transl conf "less than one month old"
   | {day = d; month = m; year = y} ->
-      if y >= 2 then Wserver.wprint "%d %s" y (transl conf "years old")
+      if y >= 2 then string_of_int y ^ " " ^ transl conf "years old"
       else if y > 0 || m > 1 then
-        Wserver.wprint "%d %s" (y * 12 + m) (transl conf "months old")
-      else if m = 1 then Wserver.wprint "%s" (transl conf "one month old")
-      else if d >= 2 then Wserver.wprint "%d %s" d (transl conf "days old")
-      else if d == 1 then Wserver.wprint "%s" (transl conf "one day old")
-      else Wserver.wprint "0" ]
+        string_of_int (y * 12 + m) ^ " " ^ transl conf "months old"
+      else if m = 1 then transl conf "one month old"
+      else if d >= 2 then string_of_int d ^ " " ^ transl conf "days old"
+      else if d == 1 then transl conf "one day old"
+      else "0" ]
 ;
 
 value year_text d =
@@ -333,9 +333,7 @@ value short_marriage_date_text conf base fam p1 p2 =
   else ""
 ;
 
-value print_place conf pl =
-  Util.copy_string_with_macros conf [] pl
-;
+value string_of_place conf pl = Util.string_with_macros conf [] pl;
 
 value print_dates conf base p =
   let cap s = ", " ^ s in
@@ -353,7 +351,9 @@ value print_dates conf base p =
         if birth_place <> "" then
           Wserver.wprint "%s\n-&nbsp;" (cap (transl_nth conf "born" is))
         else () ];
-    if birth_place <> "" then print_place conf birth_place else ();
+    if birth_place <> "" then
+      Wserver.wprint "%s" (string_of_place conf birth_place)
+    else ();
     let baptism = Adef.od_of_codate p.baptism in
     let baptism_place = sou base p.baptism_place in
     match baptism with
@@ -368,7 +368,9 @@ value print_dates conf base p =
           Wserver.wprint "%s\n-&nbsp;"
             (cap (transl_nth conf "baptized" is))
         else () ];
-    if baptism_place <> "" then print_place conf baptism_place else ();
+    if baptism_place <> "" then
+      Wserver.wprint "%s" (string_of_place conf baptism_place)
+    else ();
     let death_place = sou base p.death_place in
     match p.death with
     [ Death dr d ->
@@ -401,7 +403,9 @@ value print_dates conf base p =
             }
             else () ]
     | DontKnowIfDead | NotDead -> () ];
-    if death_place <> "" then print_place conf death_place else ();
+    if death_place <> "" then
+      Wserver.wprint "%s" (string_of_place conf death_place)
+    else ();
     let burial_date_place cod =
       let place = sou base p.burial_place in
       do {
@@ -412,7 +416,9 @@ value print_dates conf base p =
                if place <> "" then Wserver.wprint ",\n" else ();
              }
          | None -> if place <> "" then Wserver.wprint " -&nbsp;" else () ];
-         if place <> "" then print_place conf place else ();
+         if place <> "" then
+           Wserver.wprint "%s" (string_of_place conf place)
+         else ();
       }
     in
     match p.burial with
@@ -440,8 +446,7 @@ value print_dates conf base p =
           if not approx && d1.prec = Sure && d2.prec = Sure then ()
           else
             Wserver.wprint "%s " (transl_decline conf "possibly (date)" "");
-          print_age conf a;
-          Wserver.wprint ")";
+          Wserver.wprint "%s)" (string_of_age conf a);
         }
     | _ -> () ];
   }

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.24 2002-09-19 15:13:48 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.25 2002-10-26 01:22:42 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -523,7 +523,9 @@ value print_marriage_long conf base all_gp auth marr_nb p ifam =
            match marr_nb with
            [ Some n -> Wserver.wprint " (%d)" n
            | None -> () ];
-           if auth then Perso.print_marriage_text conf base fam else ()
+           if auth then
+             Wserver.wprint "%s" (Perso.string_of_marriage_text conf base fam)
+           else ()
          });
     Wserver.wprint "\n";
     stag "strong" begin
@@ -692,7 +694,9 @@ value print_generation_person_long conf base ws wn all_gp last_gen gp =
               Wserver.wprint "... ";
               Wserver.wprint (relation_txt conf Male fam)
                 (fun _ ->
-                   if auth then Perso.print_marriage_text conf base fam
+                   if auth then
+                     Wserver.wprint "%s"
+                       (Perso.string_of_marriage_text conf base fam)
                    else ());
               Wserver.wprint "...\n<p>\n"
             }
@@ -773,9 +777,8 @@ value print_not_empty_src conf base new_parag first txt isrc =
     html_br conf;
     Wserver.wprint "-\n";
     first.val := False;
-    Wserver.wprint "<font size=-1><em>%s: " (txt ());
-    copy_string_with_macros conf [] src;
-    Wserver.wprint "</em></font>\n"
+    Wserver.wprint "<font size=-1><em>%s: %s</em></font>\n" (txt ())
+      (string_with_macros conf [] src);
   }
 ;
 
@@ -830,7 +833,7 @@ value print_notes_for_someone conf base p n child_n =
       end;
     end;
     Wserver.wprint ": \n<dd>\n";
-    copy_string_with_macros conf [] notes;
+    Wserver.wprint "%s" (string_with_macros conf [] notes);
     print_sources conf base (notes <> "") p;
     Wserver.wprint "<p>\n"
   }

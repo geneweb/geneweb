@@ -1,4 +1,4 @@
-(* $Id: util.mli,v 4.17 2002-10-14 04:23:12 ddr Exp $ *)
+(* $Id: util.mli,v 4.18 2002-10-26 01:22:43 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -95,8 +95,8 @@ value gen_trailer : bool -> config -> unit;
 value open_etc_file : string -> option in_channel;
 value copy_from_etc :
   list (char * unit -> string) -> string -> string -> in_channel -> unit;
-value copy_string_with_macros :
-  config -> list (char * unit -> string) -> string -> unit;
+value string_with_macros :
+  config -> list (char * unit -> string) -> string -> string;
 value body_prop : config -> string;
 value include_hed_trl : config -> option base -> string -> unit;
 value url_no_index : config -> base -> string;

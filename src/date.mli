@@ -1,4 +1,4 @@
-(* $Id: date.mli,v 4.1 2002-03-11 17:56:57 ddr Exp $ *)
+(* $Id: date.mli,v 4.2 2002-10-26 01:22:42 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -7,7 +7,7 @@ open Config;
 value code_dmy : config -> dmy -> string;
 value string_of_ondate : config -> date -> string;
 value string_of_date : config -> date -> string;
-value print_age : config -> dmy -> unit;
+value string_of_age : config -> dmy -> string;
 value year_text : dmy -> string;
 value short_dates_text : config -> base -> person -> string;
 value short_marriage_date_text :
