@@ -1,7 +1,14 @@
-(* $Id: gwu.ml,v 1.7 1998-11-30 10:26:50 ddr Exp $ *)
+(* $Id: gwu.ml,v 1.8 1998-12-11 09:45:59 ddr Exp $ *)
 
 open Def;
 open Gutil;
+
+type mfam =
+  { m_fam : base_family;
+    m_fath : base_person;
+    m_moth : base_person;
+    m_chil : array base_person }
+;
 
 value soy y = if y == 0 then "-0" else string_of_int y;
 
@@ -216,9 +223,8 @@ value print_infos oc base is_child print_sources p =
   return ()
 ;
 
-value print_parent oc base ifaml fam_sel fam ip =
-  let p = poi base ip in
-  let a = aoi base ip in
+value print_parent oc base ml fam_sel fam p =
+  let a = aoi base p.cle_index in
   do Printf.fprintf oc "%s %s%s" (correct_string base p.surname)
        (correct_string base p.first_name)
        (if p.occ == 0 || sou base p.first_name = "?"
@@ -231,12 +237,14 @@ value print_parent oc base ifaml fam_sel fam ip =
     | None -> False ]
   in
   let first_parent_definition =
-    loop ifaml where rec loop =
+    loop ml where rec loop =
       fun
-      [ [ifam1 :: ifaml1] ->
-          let cpl = coi base ifam1 in
-          if cpl.father == ip || cpl.mother == ip then fam.fam_index == ifam1
-          else loop ifaml1
+      [ [m1 :: ml1] ->
+          if m1.m_fath.cle_index == p.cle_index
+          || m1.m_moth.cle_index == p.cle_index
+          then
+            fam.fam_index == m1.m_fam.fam_index
+          else loop ml1
       | [] -> assert False ]
   in
   let pr = not has_printed_parents && first_parent_definition in
@@ -248,8 +256,7 @@ value print_parent oc base ifaml fam_sel fam ip =
   else ()
 ;
 
-value print_child oc base fam_surname print_sources ip =
-  let p = poi base ip in
+value print_child oc base fam_surname print_sources p =
   do Printf.fprintf oc "-";
      match p.sexe with
      [ Masculin -> Printf.fprintf oc " h"
@@ -267,20 +274,19 @@ value print_child oc base fam_surname print_sources ip =
   return ()
 ;
 
-value bogus_person base ip =
-  let p = poi base ip in
+value bogus_person base p =
   sou base p.first_name = "?" && sou base p.surname = "?"
 ;
 
 value common_children_sources base children =
   if Array.length children <= 1 then None
   else
-    loop 1 (poi base children.(0)).psources where rec loop i src =
+    loop 1 children.(0).psources where rec loop i src =
       if i == Array.length children then
         let s = sou base src  in
         if s = "" then None else Some src
       else
-        let p = poi base children.(i) in
+        let p = children.(i) in
         if p.psources == src then loop (i + 1) src else None
 ;
 
@@ -291,17 +297,15 @@ value array_forall f a =
     else False
 ;
 
-value empty_family base fam =
-  let cpl = coi base fam.fam_index in
-  bogus_person base cpl.father && bogus_person base cpl.mother &&
-  array_forall (bogus_person base) fam.children
+value empty_family base m =
+  bogus_person base m.m_fath && bogus_person base m.m_moth &&
+  array_forall (bogus_person base) m.m_chil
 ;
 
-value print_family oc base ifaml (per_sel, fam_sel) fam_done ifam =
-  let fam = foi base ifam in
-  let cpl = coi base ifam in
+value print_family oc base ml (per_sel, fam_sel) fam_done m =
+  let fam = m.m_fam in
   do Printf.fprintf oc "fam ";
-     print_parent oc base ifaml fam_sel fam cpl.father;
+     print_parent oc base ml fam_sel fam m.m_fath;
      Printf.fprintf oc " +";
      print_date_option oc (Adef.od_of_codate fam.marriage);
      print_if_no_empty oc base "#mp" fam.marriage_place;
@@ -312,13 +316,13 @@ value print_family oc base ifaml (per_sel, fam_sel) fam_done ifam =
          let d = Adef.od_of_codate d in
          do Printf.fprintf oc " -"; print_date_option oc d; return () ];
      Printf.fprintf oc " ";
-     print_parent oc base ifaml fam_sel fam cpl.mother;
+     print_parent oc base ml fam_sel fam m.m_moth;
      Printf.fprintf oc "\n";
      match sou base fam.fsources with
      [ "" -> ()
      | s -> Printf.fprintf oc "src %s\n" (correct_string base fam.fsources) ];
      let print_sources =
-       match common_children_sources base fam.children with
+       match common_children_sources base m.m_chil with
        [ Some s ->
           do Printf.fprintf oc "csrc %s\n" (correct_string base s); return
           False
@@ -329,49 +333,45 @@ value print_family oc base ifaml (per_sel, fam_sel) fam_done ifam =
             Printf.fprintf oc "comm %s\n" (Ansel.to_iso_8859_1 (sou base txt))
         | _ -> () ];
      return
-     match Array.length fam.children with
+     match Array.length m.m_chil with
      [ 0 -> ()
      | _ ->
-         let fam_surname = (poi base cpl.father).surname in
+         let fam_surname = m.m_fath.surname in
          do Printf.fprintf oc "beg\n";
             Array.iter
-              (fun ip ->
-                 if per_sel ip then
-                   print_child oc base fam_surname print_sources ip
+              (fun p ->
+                 if per_sel p.cle_index then
+                   print_child oc base fam_surname print_sources p
                  else ())
-              fam.children;
+              m.m_chil;
             Printf.fprintf oc "end\n";
          return () ];
      fam_done.(Adef.int_of_ifam fam.fam_index) := True;
   return ()
 ;
 
-value get_persons_with_notes base ifam list =
-  let fam = foi base ifam in
-  let cpl = coi base ifam in
-  let father = poi base cpl.father in
-  let mother = poi base cpl.mother in
+value get_persons_with_notes base m list =
+  let fath = m.m_fath in
+  let moth = m.m_moth in
   let list =
-    match (sou base father.notes, (aoi base cpl.father).parents) with
+    match (sou base fath.notes, (aoi base fath.cle_index).parents) with
     [ ("", _) | (_, Some _) -> list
-    | _ -> [cpl.father :: list] ]
+    | _ -> [fath :: list] ]
   in
   let list =
-    match (sou base mother.notes, (aoi base cpl.mother).parents) with
+    match (sou base moth.notes, (aoi base moth.cle_index).parents) with
     [ ("", _) | (_, Some _) -> list
-    | _ -> [cpl.mother :: list] ]
+    | _ -> [moth :: list] ]
   in
   List.fold_right
-    (fun ip list ->
-       let p = poi base ip in
+    (fun p list ->
        match sou base p.notes with
        [ "" -> list
-       | _ -> [ip :: list] ])
-    (Array.to_list fam.children) list
+       | _ -> [p :: list] ])
+    (Array.to_list m.m_chil) list
 ;
 
-value print_notes_for_person oc base ip =
-  let p = poi base ip in
+value print_notes_for_person oc base p =
   do Printf.fprintf oc "\n";
      Printf.fprintf oc "notes %s %s%s\n"
        (correct_string base p.surname)
@@ -383,16 +383,25 @@ value print_notes_for_person oc base ip =
   return ()
 ;
 
-value print_notes oc base ifaml per_sel =
-  let ipl = List.fold_right (get_persons_with_notes base) ifaml [] in
-  let ipl =
+value rec list_memf f x =
+  fun
+  [ [] -> False
+  | [a :: l] -> f x a || list_memf f x l ]
+;
+
+value eq_key p1 p2 = p1.cle_index == p2.cle_index;
+
+value print_notes oc base ml per_sel =
+  let pl = List.fold_right (get_persons_with_notes base) ml [] in
+  let pl =
     List.fold_right
-      (fun ip ipl -> if List.memq ip ipl then ipl else [ip :: ipl])
-      ipl []
+      (fun p pl -> if list_memf eq_key p pl then pl else [p :: pl])
+      pl []
   in
   List.iter
-    (fun ip -> if per_sel ip then print_notes_for_person oc base ip else ())
-    ipl
+    (fun p ->
+       if per_sel p.cle_index then print_notes_for_person oc base p else ())
+    pl
 ;
 
 value rec merge_families ifaml1f ifaml2f =
@@ -417,8 +426,8 @@ value rec filter f =
   | [] -> [] ]
 ;
 
-value connected_families base fam_sel fam =
-  loop [fam.fam_index] [] [(coi base fam.fam_index).father]
+value connected_families base fam_sel fam cpl =
+  loop [fam.fam_index] [] [cpl.father]
   where rec loop ifaml ipl_scanned =
     fun
     [ [ip :: ipl] ->
@@ -463,11 +472,11 @@ value gwu base out_dir src_oc_list anc desc =
   let fam_done = Array.create (base.families.len) False in
   for i = 0 to base.families.len - 1 do
     let fam = base.families.get i in
+    let cpl = base.couples.get i in
     if is_deleted_family fam then ()
     else
       do if fam_done.(i) then ()
          else if fam_sel fam.fam_index then
-           let ifaml = connected_families base fam_sel fam in
            let (oc, first) =
              try List.assoc fam.origin_file src_oc_list.val with
              [ Not_found ->
@@ -482,18 +491,26 @@ value gwu base out_dir src_oc_list anc desc =
                       [(fam.origin_file, x) :: src_oc_list.val];
                  return x ]
            in
-           let ifaml =
+           let ifaml = connected_families base fam_sel fam cpl in
+           let ml =
              List.fold_right
-               (fun ifam ifaml ->
-                  if empty_family base (foi base ifam) then ifaml
-                  else [ifam :: ifaml])
+               (fun ifam ml ->
+                  let fam = foi base ifam in
+                  let cpl = coi base ifam in
+                  let m =
+                    {m_fam = fam;
+                     m_fath = poi base cpl.father;
+                     m_moth = poi base cpl.mother;
+                     m_chil = Array.map (fun ip -> poi base ip) fam.children}
+                  in
+                  if empty_family base m then ml else [m :: ml])
                ifaml []
            in
-           if ifaml <> [] then
+           if ml <> [] then
              do if not first.val then Printf.fprintf oc "\n" else ();
                 first.val := False;
-                List.iter (print_family oc base ifaml sel fam_done) ifaml;
-                print_notes oc base ifaml per_sel;
+                List.iter (print_family oc base ml sel fam_done) ml;
+                print_notes oc base ml per_sel;
              return ()
            else ()
          else ();
@@ -587,10 +604,14 @@ value main () =
   in
   let base = Iobase.input in_file.val in
   let src_oc_list = ref [] in
+(*
   let _ = base.persons.array () in
+*)
   let _ = base.ascends.array () in
+(*
   let _ = base.families.array () in
   let _ = base.couples.array () in
+*)
   let _ = base.strings.array () in
   let oc_list = ref [] in
   do gwu base out_dir.val src_oc_list anc desc;
