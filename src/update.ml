@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: update.ml,v 4.17 2002-01-15 16:48:26 ddr Exp $ *)
+(* $Id: update.ml,v 4.18 2002-01-23 11:52:40 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -116,6 +116,12 @@ value update_misc_names_of_family base p u =
              [cpl.mother :: Array.to_list des.children])
         (Array.to_list u.family)
   | _ -> () ]
+;
+
+value delete_topological_sort conf base =
+  let bfile = Util.base_path [] (conf.bname ^ ".gwb") in
+  let tstab_file = Filename.concat bfile "tstab" in
+  try Sys.remove tstab_file with [ Sys_error _ -> () ]
 ;
 
 value gen_someone_txt (p_first_name, p_surname) conf base p =
