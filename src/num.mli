@@ -1,4 +1,4 @@
-(* $Id: num.mli,v 3.1 2000-01-10 02:14:40 ddr Exp $ *)
+(* $Id: num.mli,v 3.2 2000-09-03 22:48:39 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 type t = 'a;
@@ -13,6 +13,7 @@ value twice : t -> t;
 value half : t -> t;
 value even : t -> bool;
 value inc : t -> int -> t;
+value mul : t -> int -> t;
 value div : t -> int -> t;
 value modl : t -> int -> int;
 value print : (string -> unit) -> string -> t -> unit;
