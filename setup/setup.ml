@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.11 2000-06-20 07:56:56 ddr Exp $ *)
+(* $Id: setup.ml,v 3.12 2000-06-28 20:03:14 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1333,8 +1333,10 @@ value intro () =
          do copy_text "" "intro.txt"; return
          let (gwd_lang, setup_lang) =
            let x = String.lowercase (input_line stdin) in
-           if x = "" then (default_gwd_lang, default_setup_lang)
-           else (x, x)
+           if String.length x < 2 then (default_gwd_lang, default_setup_lang)
+           else
+             let x = String.sub x 0 2 in
+             (x, x)
          in
          do copy_text setup_lang (Filename.concat setup_lang "intro.txt");
          return
