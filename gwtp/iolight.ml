@@ -1,4 +1,4 @@
-(* $Id: iolight.ml,v 4.0 2001-03-16 19:32:24 ddr Exp $ *)
+(* $Id: iolight.ml,v 4.1 2001-04-22 18:55:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -8,13 +8,15 @@ value magic_gwb = "GnWb001y";
 value check_magic =
   let b = String.create (String.length magic_gwb) in
   fun ic ->
-    do really_input ic b 0 (String.length b); return
-    if b <> magic_gwb then
-      if String.sub magic_gwb 0 4 = String.sub b 0 4 then
-        failwith "this is a GeneWeb base, but not compatible"
-      else
-        failwith "this is not a GeneWeb base, or it is a very old version"
-    else ()
+    do {
+      really_input ic b 0 (String.length b);
+      if b <> magic_gwb then
+        if String.sub magic_gwb 0 4 = String.sub b 0 4 then
+          failwith "this is a GeneWeb base, but not compatible"
+        else
+          failwith "this is not a GeneWeb base, or it is a very old version"
+      else ()
+    }
 ;
 
 type patches =
@@ -36,15 +38,18 @@ value rec patch_len len =
 
 value apply_patches tab plist plen =
   if plist = [] then tab
-  else
+  else do {
     let new_tab =
-      if plen > Array.length tab then
+      if plen > Array.length tab then do {
         let new_tab = Array.create plen (Obj.magic 0) in
-        do Array.blit tab 0 new_tab 0 (Array.length tab); return
+        Array.blit tab 0 new_tab 0 (Array.length tab);
         new_tab
+      }
       else tab
     in
-    do List.iter (fun (i, v) -> new_tab.(i) := v) plist; return new_tab
+    List.iter (fun (i, v) -> new_tab.(i) := v) plist;
+    new_tab
+  }
 ;
 
 value make_cache ic shift array_pos patches len name =
@@ -57,27 +62,30 @@ value make_cache ic shift array_pos patches len name =
     match tab.val with
     [ Some x -> x
     | None ->
-do Printf.eprintf "*** read %s\n" name; flush stderr; return
-        do seek_in ic array_pos; return
-        let t = apply_patches (input_value ic) patches.val r.len in
-        do tab.val := Some t; return t ]
+        do {
+          Printf.eprintf "*** read %s\n" name;
+          flush stderr;
+          do {
+            seek_in ic array_pos;
+            let t = apply_patches (input_value ic) patches.val r.len in
+            tab.val := Some t;
+            t
+          }
+        } ]
   in
   let gen_get i = (r.array ()).(i) in
-  do r.array := array; r.get := gen_get; return r
+  do { r.array := array; r.get := gen_get; r }
 ;
 
 value input bname =
   let bname =
-    if Filename.check_suffix bname ".gwb" then bname
-    else bname ^ ".gwb"
+    if Filename.check_suffix bname ".gwb" then bname else bname ^ ".gwb"
   in
   let patches =
     match
       try Some (open_in_bin (Filename.concat bname "patches")) with _ -> None
     with
-    [ Some ic ->
-        let p = input_value ic in
-        do close_in ic; return p
+    [ Some ic -> let p = input_value ic in do { close_in ic; p }
     | None ->
         {p_person = ref []; p_ascend = ref []; p_union = ref [];
          p_family = ref []; p_couple = ref []; p_descend = ref [];
@@ -85,7 +93,7 @@ value input bname =
   in
   let ic =
     let ic = open_in_bin (Filename.concat bname "base") in
-    do check_magic ic; return ic
+    do { check_magic ic; ic }
   in
   let persons_len = input_binary_int ic in
   let families_len = input_binary_int ic in
@@ -110,13 +118,12 @@ value input bname =
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let unions =
-    make_cache ic shift unions_array_pos patches.p_union persons_len
-      "unions"
+    make_cache ic shift unions_array_pos patches.p_union persons_len "unions"
   in
   let shift = shift + persons_len * Iovalue.sizeof_long in
   let families =
-    make_cache ic shift families_array_pos patches.p_family
-      families_len "families"
+    make_cache ic shift families_array_pos patches.p_family families_len
+      "families"
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let couples =
@@ -125,8 +132,8 @@ value input bname =
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let descends =
-    make_cache ic shift descends_array_pos patches.p_descend
-      families_len "descends"
+    make_cache ic shift descends_array_pos patches.p_descend families_len
+      "descends"
   in
   let shift = shift + families_len * Iovalue.sizeof_long in
   let strings =
@@ -141,58 +148,45 @@ value input bname =
     with
     [ Some ic ->
         let len = ref 0 in
-        do try
-             while mlen = 0 || len.val < mlen do
-               len.val := Buff.store len.val (input_char ic);
-             done
-           with
-           [ End_of_file -> () ];
-           close_in ic;
-        return Buff.get len.val
+        do {
+          try
+            while mlen = 0 || len.val < mlen do {
+              len.val := Buff.store len.val (input_char ic)
+            }
+          with
+          [ End_of_file -> () ];
+          close_in ic;
+          Buff.get len.val
+        }
     | None -> "" ]
   in
   let commit_notes s =
     let fname = Filename.concat bname "notes" in
-    do try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
-       try Sys.rename fname (fname ^ "~") with _ -> ();
-    return
-    if s = "" then ()
-    else
-      let oc = open_out fname in
-      do output_string oc s;
-         close_out oc;
-      return ()
+    do {
+      try Sys.remove (fname ^ "~") with [ Sys_error _ -> () ];
+      try Sys.rename fname (fname ^ "~") with _ -> ();
+      if s = "" then ()
+      else do {
+        let oc = open_out fname in output_string oc s; close_out oc;
+      }
+    }
   in
   let bnotes = {nread = read_notes; norigin_file = norigin_file} in
   let base_data =
-    {persons = persons;
-     ascends = ascends;
-     unions = unions;
-     families = families;
-     couples = couples;
-     descends = descends;
-     strings = strings;
-     bnotes = bnotes}
+    {persons = persons; ascends = ascends; unions = unions;
+     families = families; couples = couples; descends = descends;
+     strings = strings; bnotes = bnotes}
   in
   let base_func =
-    {persons_of_name = fun [];
-     strings_of_fsname = fun [];
+    {persons_of_name = fun []; strings_of_fsname = fun [];
      index_of_string = fun [];
      persons_of_surname = {find = fun []; cursor = fun []; next = fun []};
      persons_of_first_name = {find = fun []; cursor = fun []; next = fun []};
-     is_restricted = fun [];
-     patch_person = fun [];
-     patch_ascend = fun [];
-     patch_union = fun [];
-     patch_family = fun [];
-     patch_couple = fun [];
-     patch_descend = fun [];
-     patch_string = fun [];
-     patch_name = fun [];
-     patched_ascends = fun [];
-     commit_patches = fun [];
-     commit_notes = commit_notes;
-     cleanup = cleanup}
+     is_restricted = fun []; patch_person = fun []; patch_ascend = fun [];
+     patch_union = fun []; patch_family = fun []; patch_couple = fun [];
+     patch_descend = fun []; patch_string = fun []; patch_name = fun [];
+     patched_ascends = fun []; commit_patches = fun [];
+     commit_notes = commit_notes; cleanup = cleanup}
   in
   {data = base_data; func = base_func}
 ;
