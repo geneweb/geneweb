@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: relationLink.ml,v 3.3 1999-12-03 03:25:20 ddr Exp $ *)
+(* $Id: relationLink.ml,v 3.4 1999-12-03 16:56:43 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Config;
@@ -642,8 +642,8 @@ value print_relation_dag conf base a p1 p2 l1 l2 =
       let (set, n) = add_branches set n p2.cle_index l2 in
       S.elements set
     in
-    let d = Dag2html.make_dag base list in
-    Dag2html.print_dag conf base d
+    let d = Dag.make_dag base list in
+    Dag.print_dag conf base d
   with
   [ Exit -> Util.incorrect_request conf ]
 ;
