@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: date.ml,v 2.16 1999-09-27 14:51:01 ddr Exp $ *)
+(* $Id: date.ml,v 2.17 1999-09-27 14:56:31 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -35,7 +35,7 @@ value french_month =
     [| "vendemiaire"; "brumaire"; "frimaire"; "niv&ocirc;se";
        "pluvi&ocirc;se"; "vent&ocirc;se"; "germinal"; "floreal";
        "prairial"; "messidor"; "thermidor"; "fructidor";
-       "jours compl&eacute;mentaires" |]
+       "compl&eacute;mentaire" |]
   in
   fun m -> tab.(m)
 ;
