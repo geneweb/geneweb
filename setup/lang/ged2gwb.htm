@@ -2,12 +2,13 @@
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
   <!-- (c) Copyright 2002 INRIA - GeneWeb -->
-  <!-- $Id: ged2gwb.htm,v 1.2 2002-01-14 05:03:16 ddr Exp $ -->
+  <!-- $Id: ged2gwb.htm,v 1.3 2002-06-18 08:20:48 ddr Exp $ -->
   <title>[
 de: GEDCOM-Datei importieren
 en: Import a GEDCOM file
 es: Importaci&oacute;n de un fichero GEDCOM
 fr: Importation d'un fichier GEDCOM
+it: Importazione di un file GEDCOM
 lv: GEDCOM datnes imports
 sv: Importera en GEDCOM-fil
 ]</title>
@@ -20,7 +21,8 @@ sv: Importera en GEDCOM-fil
 de: GEDCOM-Datei importieren
 en: Import a GEDCOM file
 es: Importaci&oacute;n de un fichero GEDCOM
-fr: Importation d'un fichier gedcom
+fr: Importation d'un fichier GEDCOM
+it: Importazione di un file GEDCOM
 lv: GEDCOM datnes imports
 sv: Importera en GEDCOM-fil
 ]</font></h1></center>
@@ -37,6 +39,7 @@ de: Bitte eingeben vollst&auml;ndiger Name deiner GEDCOM-Datei.
 en: Select your GEDCOM file:
 es: Agregue Ud el nombre completo de su fichero GEDCOM.
 fr: S&eacute;lectionnez votre fichier GEDCOM.
+it: Selezionate il vostro file GEDCOM.
 lv: Ievadiet pilnu GEDCOM datnes nosaukumu.
 sv: Skriv det kompletta namnet på din GEDCOM-fil.
 ]
@@ -62,6 +65,9 @@ es: El nombre que Ud. desea dar a su base de datos <font
 fr: Entrez le nom que vous voulez donner &agrave; votre base de
     donn&eacute;es <b><font color=#2f6400>GeneWeb</font></b>. Si vous ne
     mettez rien, il sera d&eacute;duit du nom du fichier GEDCOM.
+it: Digitate il nome che volete dare alla vostra base di dati
+    <b><font color=#2f6400>GeneWeb</font></b>. Se non mettete niente il
+    nome sar&agrave; dedotto da quello del file GEDCOM.
 lv: Nosaukumu kurâ Jûs vçlties nosaukt savu <font
     color=#2f6400><b>GeneWeb</b></font> datu bâzi. Ja neierakstîsiet, tad
     datu bâzes nosaukums tiks veidos no GEDCOM datnes nosaukuma.
@@ -83,6 +89,7 @@ de: Sofern gew&uuml;nscht, w&auml;hle bitte aus den folgenden Optionen:
 en: Select the options you want:
 es: Seleccione las opciones que Ud. desee :
 fr: S&eacute;lectionnez les options que vous d&eacute;sirez:
+it: Selezionate le opzioni desiderate
 lv: Iezîmçjiet nepiecieðmâs papildus iespçjas:
 sv: Välj de optioner du vill ha:
 ]
@@ -100,6 +107,7 @@ es: Forzar los nombres a estar en min&uacute;sculas. Meter sus iniciales en
     may&uacute;sculas.
 fr: Convertit les pr&eacute;noms en minuscules, avec leurs initiales en
     majuscules.
+it: Converte i nomi in minuscolo, con le loro iniziali in maiuscolo.
 lv: Pârveidot personvârdus uz mazajiem burtiem ar pirmajiem lielajiem.
 sv: Forcera gemena förnamn, bara initialer behålls som versaler. 
 ]</td>
@@ -120,6 +128,8 @@ es: Forzar los apellidos a estar en min&uacute;sculas. Meter sus iniciales
     min&uacute;sculas.
 fr: Convertit les noms de famille en minuscules, avec leurs initiales en
     majuscules. Essaye de garder les particules en minuscules.
+it: Converte i cognomi in minuscolo, con le loro iniziali in
+    maiuscolo. Cercate di mantenere le particelle in minuscolo.
 lv: Pârveidot uzvârdus  uz mazajiem burtiem ar pirmajiem lielajiem. Mçginât
     saglabât partikulus ar mazajiem burtiem.
 sv: Forcera gemena efternamn, bara initialer behålls som versaler.
@@ -146,6 +156,10 @@ fr: Au moment de la cr&eacute;ation d'une personne, si la partie
     s&eacute;par&eacute;s par des espaces, on peut vouloir que le premier de
     ces noms aille dans la partie "pr&eacute;nom" et que le pr&eacute;nom
     complet devient un "pr&eacute;nom alias".
+it: Al momento della creazione di una persona, se la parte
+    nome nel GEDCOM &egrave; formata da più nomi con degli spazi,
+    potete chiedere che il primo di questi nomi vada nella parte "nome"
+    e che il nome completo diventi un "alias di nome"
 lv: Ja personas vârds GEDCOM datnç satur vairâkus vârdus variet norâdît, lai
     pirmais no ðiem vârdiem kïûst par personas "pirmo vârdu" un GEDCOMa
     datnes pilnais vârds kïust par pirmâ vârda " "pieòemto vârdu".
@@ -162,6 +176,7 @@ de: Diese Option aktivieren.
 en: Set this option.
 es: Poner esta opci&oacute;n.
 fr: Mettre cette option.
+it: Mettere questa opzione.
 lv: Ieslçgt ðo iespçju
 sv: Sätt denna option.
 ]</td>
@@ -206,6 +221,14 @@ fr: Par d&eacute;faut, au moment de la cr&eacute;ation d'une personne, si la
     (exemple: Guillaume le Conqu&eacute;rant), </ul> alors le pr&eacute;nom
     dans le GEDCOM devient un "nom public" et le premier mot de la partie
     pr&eacute;nom va dans la partie "pr&eacute;nom".
+it: Per difetto, al momento della creazione di una persona, se la
+    parte nome nel GEDCOM somiglia a un nome pubblico, cio&egrave; contiene:
+    <ul> <li>un numero in cifre arabe o romane che potrebbe essere il numero
+    di un titolo nobiliare (Esempio: Luigi XIV),<li> Una delle parole: "der",
+    "den", "die", "el", "le", "il", "la", "the", considerati come l'inizio
+    di un qualificativo (Esempio: Guglielmo il Conquistatore), </ul>
+    allora il nome nel GEDCOM diventa un "nome pubblico" e la prima parola
+    della parte nome va nella parte nome.
 lv: Noklusçtajâ variantâ GEDCOM standartâ pirmais vârds ir kâ oficiâlais
     vârds, t.i.tas var saturçt: <ul> <li>Romieði skaitli, kas apzîmç
     aristokrâta titlu (piemçram, George V) <li>Vienu no sekojoðiem vârdiem:
@@ -228,6 +251,7 @@ de: Diese Option abschalten.
 en: Cancel this option.
 es: Anular esta opci&oacute;n.
 fr: Annuler cette option.
+it: Annullare questa opzione.
 lv: Izslçgt ðo iespçju
 sv: Välj bort denna option.
 ]</td>
@@ -245,6 +269,8 @@ es: En caso de incoherencia existente, tratar de incluir las fechas
     negativas (por ejemplo: nacimiento despues de su muerte).
 fr: Essayer de mettre des dates n&eacute;gatives s'il y a incoh&eacute;rence
     (exemple: naissance apr&egrave;s la mort).
+it: In caso di incoerenza, provate a mettere delle date negative
+    (Esempio: data di nascita posteriore a data di morte).
 lv: Pretrunu gadîjumâ viedot negatîvus datumus (piemçram, dzimðana pçc
     nâves).
 sv: Sätt negativt datum när datumen är motsägande varandra (tex födelse
@@ -266,6 +292,8 @@ es: No aceptar las fechas negativas: no interpretar un a&ntilde;o precedido
 fr: Pas de dates n&eacute;gatives: ne pas interpr&eacute;ter une
     ann&eacute;e pr&eacute;c&eacute;d&eacute;e du signe moins "-" comme une
     date n&eacute;gative.
+it: Non accettare le date negative: non interpretare un anno preceduto dal
+    segno "-" come una data negativa.
 lv: Neveidot negatîvus datumus no esoðajiem negatîvajiem datumiem.
 sv: Inga negativa datum: tolka inte ett år med minus tecken framför som ett
     negativt år.
@@ -298,6 +326,11 @@ fr: Certains fichiers GEDCOM &eacute;crivent parfois les dates en mettant
     identificateurs (ex: "MAY 1912" et non pas "05/1912"). La notation
     "02/05/1912" est ambigu&euml; (peut signifier "2 mai 1912" ou "5
     f&eacute;vrier 1912" suivant les pays).
+it: Certi files GEDCOM scrivono talvolta le date indicando il mese
+    con un numero (da 1 a 12); lo standard GEDCOM 5.5 esige
+    che i mesi siano rappresentati da identificatori (esempio: "MAY 1912" e non
+    "05/1912"). La notazione "02/05/1912" &egrave; ambigua; (pu&ograve;
+    voler dire "2 maggio 1912" oppure "5 febbraio 1912" secondo i paesi).
 lv: Daþâs GEDCOM datnçs mçneði datumos tiek apzîmçti ar nummuriem (1-12).
     GEDCOM standarts 5.5 nosaka, ka mçðiem jâbût apzîmçtiem ar to nosaukumu
     saîsinâjumiem(piemçram "MAY 1912" un nevis "05/1912"). Datums
@@ -317,6 +350,7 @@ de: Aus solchen Daten soll nur die Jahreszahl verwendet werden.
 en: For these dates, extract only the "year" part.
 es: Por este tipo de fechas, extraer solamente la parte "a&ntilde;o".
 fr: Pour ces dates, n'extraire que la partie "ann&eacute;e".
+it: Per queste date, estrarre solamente la parte "anno".
 lv: Ðâdiem datumiem atstât tikai gadu
 sv: För dessa datum, extrahera endast "år" delen.
 ]</td>
@@ -329,6 +363,7 @@ de: Interpretiere solche Daten als "Tag/Monat/Jahr".
 en: Interpret these dates as "day/month/year".
 es: Interpretar estas fechas como "d&iacute;a/mes/a&ntilde;o".
 fr: Interpr&eacute;ter ces dates comme "jour/mois/ann&eacute;e".
+it: Interpretare queste date come "giorno/mese/anno".
 lv: Pieòemt ðo datumus kâ "diena/mçnesis/gads"
 sv: Tolka dessa datum som "dag/månad/år".
 ]</td>
@@ -341,6 +376,7 @@ de: Interpretiere solche Daten als "Monat/Tag/Jahr".
 en: Interpret these dates as "month/day/year".
 es: Interpretar estas fechas como "mes/d&iacute;a/a&ntilde;o".
 fr: Interpr&eacute;ter ces dates comme "mois/jour/ann&eacute;e".
+it: Interpretare queste date come "mese/giorno/anno".
 lv: Pieòemt ðo datumus kâ "mçnesis/diena/gads"
 sv: Tolka dessa datum som "månad/dag/år".
 ]</td>
@@ -358,6 +394,8 @@ es: El codage de los car&aacute;cteres acentuados esta indicado en principio
     en el encabezamiento del fichero GEDCOM.
 fr: Le codage des lettres accentu&eacute;es est en principe indiqu&eacute;
     dans l'en-t&ecirc;te du fichier GEDCOM.
+it: La codifica dei caratteri accentuati &egrave; normalmente indicata
+    nell'intestazione del file GEDCOM.
 lv: Uzsvçrtie burti parsti ir norâdîti GEDCOM datnes galvgaïa aprakstâ.
 sv: Hur de accentuerade tecknen är kodade är normalt specifierat i
     GEDCOM-huvudet.
@@ -370,6 +408,7 @@ de: Beachte die Hinweise aus der GEDCOM-Datei.
 en: Follow the indications of the GEDCOM header.
 es: Seguir las indicaciones del encabezamiento del fichero GEDCOM.
 fr: Suivre les indications de l'en-t&ecirc;te du GEDCOM.
+it: Seguire le indicazioni dell'intestazione del file GEDCOM.
 lv: Sekot GEDCOM datnes galvgaïa apraksta norâdîjumam
 sv: Följ GEDCOM-huvudets information.
 ]</td>
@@ -382,6 +421,7 @@ de: Die Sonderzeichen folgen der ANSEL-Kodierung.
 en: The accentuated characters are in ANSEL encoding.
 es: Los car&aacute;cteres acentuados est&aacute;n en codage ANSEL.
 fr: Les lettres accentu&eacute;es sont en codage ANSEL.
+it: I caratteri accentuati sono codificati in ANSEL.
 lv: Uzsvçrtie burti ir ANSEL kodçjumâ.
 sv: De accentuerade tecknen är ANSEL kodade.
 ]</td></tr>
@@ -393,6 +433,7 @@ de: Die Sonderzeichen folgen der ASCII-Kodierung .
 en: The accentuated characters are in ASCII encoding.
 es: Los car&aacute;cteres acentuados est&aacute;n en codage ASCII.
 fr: Les lettres accentu&eacute;es sont en codage ASCII.
+it: I caratteri accentuati sono codificati in ASCII.
 lv: Uzsvçrtie burti ir ASCII kodçjumâ.
 sv: De accentuerade tecknen är ASCII kodade.
 ]</td></tr>
@@ -404,6 +445,7 @@ de: Die Sonderzeichen folgen der MSDOS-Kodierung.
 en: The accentuated characters are in MSDOS encoding.
 es: Los car&aacute;cteres acentuados est&aacute;n en codage MSDOS.
 fr: Les lettres accentu&eacute;es sont en codage MSDOS.
+it: I caratteri accentuati sono codificati in MSDOS.
 lv: Uzsvçrtie burti ir MSDOS kodçjumâ.
 sv: De accentuerade tecknen är MS-DOS kodade.
 ]</td></tr>
@@ -416,6 +458,7 @@ de: Dann dr&uuml;cke auf "Ok".
 en: Then click on "Ok".
 es: Finalmente cliquerar en "Ok".
 fr: Puis cliquez sur "Ok".
+it: Poi cliccate su "Ok".
 lv: Tad nospiediet "Ok".
 sv: Klicka sedan på "OK".
 lv: Tad nospiediet "Ok".
