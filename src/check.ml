@@ -1,4 +1,4 @@
-(* $Id: check.ml,v 1.6 1998-12-16 17:36:24 ddr Exp $ *)
+(* $Id: check.ml,v 1.7 1999-01-02 17:30:05 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -22,14 +22,6 @@ value feminin =
   [ Masculine -> ""
   | Feminine -> "e"
   | Neuter -> "(e)" ]
-;
-
-value glop x =
-  let y = String.create (String.length x) in
-  do for i = 0 to String.length x - 1 do
-       y.[i] := if x.[i] == ' ' then '_' else x.[i];
-     done;
-  return y
 ;
 
 value print_base_error base =
@@ -202,10 +194,7 @@ value check_base base gen pr_stats =
      for i = 0 to base.data.persons.len - 1 do
        let p = base.data.persons.get i in
        do if not gen.g_def.(i) then
-            Printf.printf "Undefined: %s%s %s\n"
-              (sou base p.first_name)
-              (if p.occ == 0 then "" else "." ^ string_of_int p.occ)
-              (glop (sou base p.surname))
+            Printf.printf "Undefined: %s\n" (denomination base p)
           else ();
           if pr_stats then update_stats base current_year s p else ();
        return ();
