@@ -10,7 +10,7 @@ GeneWeb version 3.03
     telling not to delete the window! (English, French, Swedish versions)
 
 * GeneWeb Service/CGI (gwd)
-  - [24 Feb 00] In latest births and death, display by month.
+  - [24 Feb 00] In latest births and deaths, display by month.
   - [02 Feb 00] In personal pages, relations are now displayed before notes.
   - [20 Jan 00] When sorting the children, use now the baptism date
     when there is no birth date.
