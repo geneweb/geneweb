@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: mergeFamOk.ml,v 4.4 2001-06-20 16:34:47 ddr Exp $ *)
+(* $Id: mergeFamOk.ml,v 4.5 2002-03-05 16:29:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -130,7 +130,7 @@ value effective_mod_merge conf base sfam scpl sdes =
           [ Some i when Adef.int_of_iper cpl.mother = i -> scpl.mother
           | _ -> scpl.father ]
         in
-        base.func.commit_patches ();
+        Util.commit_patches conf base;
         History.record conf base (fn, sn, occ) "ff";
         print_mod_merge_ok conf base wl cpl des;
       }

@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.39 2002-03-05 16:16:25 ddr Exp $ *)
+(* $Id: util.ml,v 4.40 2002-03-05 16:29:58 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -2025,6 +2025,30 @@ value relation_txt conf sex fam =
   [ NotMarried -> ftransl_nth conf "relationship%t to" is
   | Married | NoSexesCheck -> ftransl_nth conf "married%t to" is
   | Engaged -> ftransl_nth conf "engaged%t to" is ]
+;
+
+value escache_value conf =
+  let bdir = base_path [] (conf.bname ^ ".gwb") in
+  let s =
+    try Unix.stat (Filename.concat bdir "patches") with
+    [ Unix.Unix_error _ _ _ -> Unix.stat (Filename.concat bdir "base") ]
+  in
+  let v =
+    int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))
+  in
+  string_of_int v
+;
+
+value commit_patches conf base =
+  do {
+    base.func.commit_patches ();
+    conf.henv :=
+      List.map
+        (fun (k, v) ->
+           if k = "escache" then (k, escache_value conf) else (k, v))
+        conf.henv
+    ;
+  }
 ;
 
 (* Deprecated *)

@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 4.17 2002-03-05 16:16:24 ddr Exp $ *)
+(* $Id: family.ml,v 4.18 2002-03-05 16:29:56 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -569,15 +569,8 @@ value extract_henv conf base =
     | Some s -> conf.henv := conf.henv @ [("templ", code_varenv s)] ];
     match p_getenv conf.env "escache" with
     [ Some _ ->
-        let bdir = Util.base_path [] (conf.bname ^ ".gwb") in
-        let s =
-          try Unix.stat (Filename.concat bdir "patches") with
-          [ Unix.Unix_error _ _ _ -> Unix.stat (Filename.concat bdir "base") ]
-        in
-        let v =
-          int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))
-        in
-        conf.henv := conf.henv @ [("escache", string_of_int v)]
+        let v = escache_value conf in
+        conf.henv := conf.henv @ [("escache", v)]
     | None -> () ];
   }
 ;
