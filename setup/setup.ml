@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 4.11 2001-11-09 10:55:47 ddr Exp $ *)
+(* $Id: setup.ml,v 4.12 2001-11-21 14:36:04 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -400,6 +400,13 @@ and print_selector conf print =
         [ Not_found -> Sys.getcwd () ] ]
   in
   let list =
+    let sel =
+      ifdef WIN95 then
+	if String.length sel = 3 && sel.[1] == ':' && sel.[2] == '\\' then
+	  sel ^ "."
+	else sel
+      else sel
+    in
     try
       let dh = Unix.opendir sel in
       loop [] where rec loop list =
@@ -439,8 +446,7 @@ and print_selector conf print =
            print "sel=";
            let d =
              if x = ".." then Filename.dirname sel
-             else ifdef UNIX then Filename.concat sel x
-             else sel ^ "\\" ^ x
+             else Filename.concat sel x
            in
            print (code_varenv d);
            print "\">";
