@@ -122,8 +122,6 @@ iobase.cmx: adef.cmx btree.cmx buff.cmx def.cmi gutil.cmx iovalue.cmx \
     name.cmx iobase.cmi 
 iovalue.cmo: iovalue.cmi 
 iovalue.cmx: iovalue.cmi 
-lextitle.cmo: config.cmi 
-lextitle.cmx: config.cmi 
 lock.cmo: lock.cmi 
 lock.cmx: lock.cmi 
 merge.cmo: adef.cmi config.cmi def.cmi gutil.cmi util.cmi \

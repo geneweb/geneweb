@@ -2,8 +2,8 @@ GeneWeb version 3.07
 --------------------
 
 * New feature
-  - [18 Aug 00] Added a program "gwtp" to upload and download GeneWeb data
-    bases in a site which accomodate some (undocumented program for the
+  - [18 Aug 00] Added a program "gwtp" (CGI) to upload and download GeneWeb
+    data bases in a site which accomodate some (undocumented program for the
     moment).
 
 * GeneWeb Service/CGI (gwd)
