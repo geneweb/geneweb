@@ -5,6 +5,8 @@ GeneWeb Version 3.02
 --------------------
 
 * GeneWeb daemon/CGI (gwd)
+  - [Jan 14, 00] No more hypertext link for spouses and all relations in
+    relationlink computing page.
   - [Jan 11, 00] Put a separation (<td>&nbsp;</td>) between the two branches
     in simple relationship displaying.
   - [Jan 9, 00] Centered title "genealogical data base".
@@ -16,6 +18,10 @@ GeneWeb Version 3.02
   - [Dec 14, 99] Changed things so that adding ";em=R;ep=fn;en=sn" in
     the URL generates relationship computing with "fn sn" in welcome page
     and in notes (already worked for many other page kinds).
+
+* Lexicon
+  - [Jan 14, 00] Deleted entry "his wife/her husband": use now "husband/wife"
+    in all cases.
 
 GeneWeb Version 3.01
 --------------------

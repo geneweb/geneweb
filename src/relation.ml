@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.34 2000-01-10 02:14:41 ddr Exp $ *)
+(* $Id: relation.ml,v 3.35 2000-01-14 23:14:30 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -17,10 +17,14 @@ value print_with_relation text conf base p r is =
          Wserver.wprint "<input type=radio name=select value=%d>\n"
            (Adef.int_of_iper ic);
          Wserver.wprint "%s:\n" (text conf r.r_type is);
+(*
          Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n" (commd conf)
            (Adef.int_of_iper p.cle_index) (Adef.int_of_iper ic);
+*)
          afficher_personne_sans_titre conf base c;
+(*
          Wserver.wprint "</a>";
+*)
          afficher_titre conf base c;
          Wserver.wprint "\n";
       return ()
@@ -51,10 +55,14 @@ value print_with_witness conf base p fam ip =
      Wserver.wprint "<input type=radio name=select value=%d>\n"
        (Adef.int_of_iper ip);
      Wserver.wprint "%s:\n" (transl_nth conf "witness/witnesses" 0);
+(*
      Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n" (commd conf)
        (Adef.int_of_iper p.cle_index) (Adef.int_of_iper ip);
+*)
      afficher_personne_sans_titre conf base w;
+(*
      Wserver.wprint "</a>";
+*)
      afficher_titre conf base w;
      Wserver.wprint "\n";
   return ()
@@ -126,13 +134,17 @@ value print_menu conf base p =
                    if fam.not_married && auth && age_autorise conf base c then
                      ()
                    else
-                     Wserver.wprint "%s\n"
-                       (transl_nth conf "his wife/her husband" is);
+                     Wserver.wprint "%s:\n"
+                       (transl_nth conf "husband/wife" (1 - is));
+(*
                    Wserver.wprint "<a href=\"%sem=R;ei=%d;i=%d\">\n"
                      (commd conf) (Adef.int_of_iper p.cle_index)
                      (Adef.int_of_iper c.cle_index);
+*)
                    afficher_personne_sans_titre conf base c;
+(*
                    Wserver.wprint "</a>";
+*)
                    afficher_titre conf base c;
                    Wserver.wprint "\n";
                 return ()
