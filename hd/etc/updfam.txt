@@ -1,7 +1,7 @@
 %doctype;
 <html>
 <head>
-  <!-- $Id: updfam.txt,v 4.44 2005-02-05 15:27:55 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.45 2005-02-05 18:47:12 ddr Exp $ -->
   <!-- Copyright (c) 1998-2005 INRIA -->
   <meta name="ROBOTS" content="NONE"%/>
   <meta http-equiv="Content-Type" content="text/html; charset=%charset;"%/>
@@ -440,19 +440,13 @@ function checkCreate(create, redirect)
   </table>
 %end;
 
-<ul style="list-style:inside">
-<li>
+<dl><dd>
 %apply;insert_child("0")
-</li>
 %foreach;child;
-  <li>
   %apply;child(cnt)
-  </li>
-  <li>
   %apply;insert_child(cnt)
-  </li>
 %end;
-</ul>
+</dd></dl>
 
 <h4>[*source/sources]0</h4>
 
