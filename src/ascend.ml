@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 3.58 2001-01-31 12:34:15 ddr Exp $ *)
+(* $Id: ascend.ml,v 3.59 2001-02-11 15:58:29 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -106,7 +106,7 @@ value print_choice conf base p niveau_effectif =
             (* if browser_doesnt_have_tables conf then 3 else *)
             limit_by_tree conf
           in
-          if niveau_effectif <= limit then ()
+          if niveau_effectif < limit then ()
           else
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum") limit
               (transl_nth conf "generation/generations" 1);
@@ -123,7 +123,7 @@ value print_choice conf base p niveau_effectif =
         tag "td valign=top" begin
           Wserver.wprint "<input type=radio name=t value=L> %s\n"
             (capitale (transl_nth conf "list/list (ancestors)" 1));
-          if niveau_effectif <= limit_by_list conf then ()
+          if niveau_effectif < limit_by_list conf then ()
           else
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
               (limit_by_list conf)
@@ -131,7 +131,7 @@ value print_choice conf base p niveau_effectif =
           Wserver.wprint "<br>\n";
           Wserver.wprint "<input type=radio name=t value=H> %s\n"
             (capitale (transl conf "horizontally"));
-          if niveau_effectif <= limit_by_list conf then ()
+          if niveau_effectif < limit_by_list conf then ()
           else
             Wserver.wprint "(%s %d %s)\n" (transl conf "maximum")
               (limit_by_list conf)
