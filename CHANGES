@@ -34,6 +34,8 @@ GeneWeb version 3.02
     also selected children with different surnames.
 
 * Lexicon (lang/lexicon.txt) and welcome pages (lang/*/start.txt)
+  - [Dec 18, 99] Fixed and completed some Norwegian phrases (Brynjulf
+    Langballe)
   - [Dec 17, 99] Fixed and completed some German phrases (Marcus Zelezny)
 
 * Base configuration files (base.gwf)
