@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.29 2000-06-27 08:01:12 ddr Exp $ *)
+(* $Id: family.ml,v 3.30 2000-06-27 12:05:39 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -549,14 +549,16 @@ value print_no_index conf base =
             let p = poi base cpl.father in
             let f = scratch p.first_name in
             let s = scratch p.surname in
-            let oc = string_of_int p.occ in
-            let u = uoi base cpl.father in
-            let n =
-              loop 0 where rec loop k =
-                if u.family.(k) == Adef.ifam_of_int i then string_of_int k
-                else loop (k + 1)
-            in
-            Some (f, s, oc, n)
+            if f = "" || s = "" then None
+            else
+              let oc = string_of_int p.occ in
+              let u = uoi base cpl.father in
+              let n =
+                loop 0 where rec loop k =
+                  if u.family.(k) == Adef.ifam_of_int i then string_of_int k
+                  else loop (k + 1)
+              in
+              Some (f, s, oc, n)
         else None
     | None -> None ]
   in
