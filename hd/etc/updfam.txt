@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: updfam.txt,v 4.10 2001-06-23 10:26:56 ddr Exp $ -->
+  <!-- $Id: updfam.txt,v 4.11 2001-06-24 13:20:34 ddr Exp $ -->
   <!-- copyright 2001 (c) INRIA -->
   <meta name="ROBOTS" content="NONE">
   <title>%nn;
@@ -300,7 +300,8 @@
         <input name=chxcnt_sn size=40 maxlength=200%sp;
          value="%nn;
            %if;
-             ((evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK" or
+             ((evar_m = "ADD_FAM_OK" or
+               evar_m = "MOD_FAM" or evar_m = "MOD_FAM_OK" or
                evar_m = "MRG_FAM_OK" or evar_m = "MRG_MOD_FAM_OK") and
               child.surname = father.surname)
            %else;%child.surname;%end;">
