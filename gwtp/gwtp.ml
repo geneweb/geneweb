@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.27 2000-08-16 08:19:34 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.28 2000-08-16 16:45:51 ddr Exp $ *)
 
 open Printf;
 
@@ -372,7 +372,6 @@ value gwtp_receive str env b tok =
             with [ End_of_file -> () ];
             close_in ic;
          return ();
-         printf_link_to_main b tok;
       return ()
   | _ -> gwtp_invalid_request str env ]
 ;
