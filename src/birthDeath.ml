@@ -1,5 +1,6 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: birthDeath.ml,v 1.2 1999-01-30 16:41:30 ddr Exp $ *)
+(* $Id: birthDeath.ml,v 1.3 1999-02-02 10:23:59 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;

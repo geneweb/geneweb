@@ -1,4 +1,5 @@
-(* $Id: wserver.ml,v 1.14 1999-01-06 12:15:00 ddr Exp $ *)
+(* $Id: wserver.ml,v 1.15 1999-02-02 10:24:42 ddr Exp $ *)
+(* Copyright (c) INRIA *)
 
 open Unix;
 

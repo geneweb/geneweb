@@ -1,5 +1,6 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: relation.ml,v 1.16 1999-01-11 15:05:29 ddr Exp $ *)
+(* $Id: relation.ml,v 1.17 1999-02-02 10:24:28 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;

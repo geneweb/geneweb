@@ -1,5 +1,6 @@
 (* camlp4r pa_extend.cmo *)
-(* $Id: ged2gwb.ml,v 1.32 1999-02-01 15:06:32 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 1.33 1999-02-02 10:23:46 ddr Exp $ *)
+(* Copyright (c) INRIA *)
 
 open Def;
 open Gutil;

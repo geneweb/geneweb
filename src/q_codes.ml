@@ -1,4 +1,5 @@
-(* $Id: q_codes.ml,v 1.1.1.1 1998-09-01 14:32:03 ddr Exp $ *)
+(* $Id: q_codes.ml,v 1.2 1999-02-02 10:24:28 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 value f _ =
   fun  

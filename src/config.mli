@@ -1,4 +1,5 @@
-(* $Id: config.mli,v 1.6 1999-01-08 10:22:54 roglo Exp $ *)
+(* $Id: config.mli,v 1.7 1999-02-02 10:24:01 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 open Def;
 

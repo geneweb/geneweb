@@ -1,4 +1,5 @@
-(* $Id: num.mli,v 1.2 1998-11-15 22:55:05 ddr Exp $ *)
+(* $Id: num.mli,v 1.3 1999-02-02 10:24:23 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 type t = 'a;
 

@@ -1,5 +1,6 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 1.9 1999-01-11 15:05:25 ddr Exp $ *)
+(* $Id: cousins.ml,v 1.10 1999-02-02 10:24:03 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;

@@ -1,4 +1,5 @@
-(* $Id: iobase.ml,v 1.13 1998-12-17 10:59:19 ddr Exp $ *)
+(* $Id: iobase.ml,v 1.14 1999-02-02 10:24:15 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 open Def;
 open Gutil;

@@ -1,5 +1,6 @@
 (* camlp4r q_MLast.cmo *)
-(* $Id: pr_transl.ml,v 1.2 1999-01-11 15:05:28 ddr Exp $ *)
+(* $Id: pr_transl.ml,v 1.3 1999-02-02 10:24:28 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 open MLast;
 

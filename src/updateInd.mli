@@ -1,4 +1,5 @@
-(* $Id: updateInd.mli,v 1.1.1.1 1998-09-01 14:32:09 ddr Exp $ *)
+(* $Id: updateInd.mli,v 1.2 1999-02-02 10:24:38 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 open Config;
 open Def;

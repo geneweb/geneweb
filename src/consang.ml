@@ -1,4 +1,5 @@
-(* $Id: consang.ml,v 1.7 1998-12-16 17:36:25 ddr Exp $ *)
+(* $Id: consang.ml,v 1.8 1999-02-02 10:24:02 ddr Exp $ *)
+(* Copyright (c) 1999 INRIA *)
 
 (* Algorithm relationship and links from Didier Remy *)
 
