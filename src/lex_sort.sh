@@ -2,7 +2,7 @@
 #cd (*
 exec ocaml $0
 *) ".";;
-(* $Id: lex_sort.sh,v 4.1 2001-04-05 13:59:42 ddr Exp $ *)
+(* $Id: lex_sort.sh,v 4.2 2001-05-08 02:23:30 ddr Exp $ *)
 
 open Printf
 
@@ -32,7 +32,27 @@ let rec get_all_versions ic =
     with Not_found ->
       []
 
-let compare_assoc (l1, _) (l2, _) = l1 <= l2
+let print_languages (lang, str) =
+  let str = String.sub str 1 (String.length str - 1) in
+  let list =
+    let rec loop ibeg i =
+      if i = String.length str then [String.sub str ibeg (i - ibeg)]
+      else if str.[i] = '/' then
+        String.sub str ibeg (i - ibeg) :: loop (i + 1) (i + 1)
+      else loop ibeg (i + 1)
+    in
+    let compare x y =
+      let i = String.index x '=' in
+      let j = String.index y '=' in
+      compare (String.sub x 0 i) (String.sub y 0 j)
+    in
+    List.sort compare (loop 0 0)
+  in
+  printf "%s: " lang;
+  let _ = List.fold_left
+    (fun sep s -> printf "%s%s" sep s; "/") "" list
+  in ();
+  printf "\n"
 
 let lex_sort () =
   linenum := 0;
@@ -42,7 +62,10 @@ let lex_sort () =
     skip_to_same_line ic_lex ("    " ^ line);
     let list = get_all_versions ic_lex in
     let list = List.sort (fun (l1, _) (l2, _) -> compare l1 l2) list in
-    List.iter (fun (lang, str) -> printf "%s:%s\n" lang str) list;
+    if line = " !languages" then
+      List.iter print_languages list
+    else
+      List.iter (fun (lang, str) -> printf "%s:%s\n" lang str) list;
     match try Some (input_line ic_i18n) with End_of_file -> None with
       Some line -> printf "\n"; loop line
     | None -> ()
