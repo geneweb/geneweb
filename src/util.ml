@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: util.ml,v 3.92 2001-03-04 14:13:09 ddr Exp $ *)
+(* $Id: util.ml,v 3.93 2001-03-08 14:13:25 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -1057,23 +1057,29 @@ value get_variable s i =
 
 type tag_type = [ In_a_href | In_norm | Out ];
 
-value copy_string_with_macros conf s =
+value copy_string_with_macros conf env s =
   loop Out 0 where rec loop tt i =
     if i < String.length s then
       if i + 1 < String.length s && s.[i] = '%' then
-        match s.[i+1] with
-        [ 's' ->
-            do Wserver.wprint "%s" (commd conf); return loop tt (i + 2)
-        | 'v' ->
-            let (k, j) = get_variable s (i + 2) in
-            let (v, i) =
-              try (List.assoc ("var_" ^ k) conf.base_env, j) with
-              [ Not_found -> ("%", i + 1) ]
-            in
-            do Wserver.wprint "%s" v; return loop tt i
-        | '%' ->
-            do Wserver.wprint "%%"; return loop tt (i + 2)
-        | _ -> do Wserver.wprint "%%"; return loop tt (i + 1) ]
+        let i =
+          try
+            do Wserver.wprint "%s" (List.assoc s.[i + 1] env ()); return i + 2
+          with
+          [ Not_found ->
+              match s.[i+1] with
+              [ 's' ->
+                  do Wserver.wprint "%s" (commd conf); return i + 2
+              | 'v' ->
+                  let (k, j) = get_variable s (i + 2) in
+                  let (v, i) =
+                    try (List.assoc ("var_" ^ k) conf.base_env, j) with
+                    [ Not_found -> ("%", i + 1) ]
+                  in
+                  do Wserver.wprint "%s" v; return i
+              | '%' -> do Wserver.wprint "%%"; return i + 2
+              | _ -> do Wserver.wprint "%%"; return i + 1 ] ]
+        in
+        loop tt i
       else if s.[i] = '<' && dangerous_tag s (i + 1) then
         do Wserver.wprint "..."; return loop tt (i + 1)
       else

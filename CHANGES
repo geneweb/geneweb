@@ -22,6 +22,9 @@ The new version number (4.00) is in honour of:
   - [11 Feb 01] Added Catalan (Jaume Ramisa Elias)
 
 * GeneWeb server or CGI (gwd)
+  - [08 Mar 01] Added macro %i usable in person notes: it is replaced by
+    firstname.num.surname (from the person key, which is used for his
+    default image).
   - [28 Feb 01] In surname displaying, if several surnames match,
     everybody is displayed with his/her surname. Previously, the surname
     of the people having the first surname of the list was not displayed.
