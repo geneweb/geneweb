@@ -17,17 +17,16 @@ GeneWeb version 2.05
     and 3 characters for the extension, to be unzippable by "pkunzip".
 
 * GeneWeb Daemon/CGI (gwd)
+  - [Jul 17, 99] In welcome page, now search by surname when search by
+    full name fails (no need to select "surname"). Idem in relationship
+    computing.
   - [Jul 17, 99] Fixed bug: could not access person after having changed his
     name, in some circumstances, e.g. changing the surname "L'epine" (in
     two words) into "Lepine" (one word).
-  - [Jul 17, 99] Added automatic search by surname in welcome page when
-    search by full name fails (no need to select "it is a surname"). Same
-    automatic search in relationship computing.
   - [Jul 16, 99] Added a "back" button in case of update error (useful
     for browsers which loose the contents of the forms when navigating).
-  - [Jul 15, 99] Added ability to cancel GeneWeb links in relationship
-    computing. Added a long display too, to print in the same page the
-    detail of each relationship link.
+  - [Jul 15, 99] In relationship computing, added ability to cancel
+    GeneWeb links and a long display.
   - [Jul 15, 99] Added system of grammar declinations (required by German,
     Esperanto, (future) Czech). Changed the lexicon to use this new system.
   - [Jul 9, 99] Added link (upper arrow) to welcome page in displayings by
@@ -50,11 +49,10 @@ GeneWeb version 2.05
   - [Jul 2, 99] Generate now dates of the form "FROM..TO.." for titles.
 
 * Lexicon (lang/lexicon.txt) and Welcome pages (lang/*/start.txt)
-  - [Jul 17, 99] In welcome pages, simplified the text "it is a first name and
-    surname and so on". Added case "surname" (see above "added automatic
-    search by surname" in section "GeneWeb daemon/CGI"). Changed also French
-    term for "surname" ("nom" changed into "patronyme" more common among French
-    genealogists)
+  - [Jul 17, 99] In welcome pages, simplified the text "it is a first
+    name and surname or public name blah blah blah...".
+  - [Jul 17, 99] Changed French term for "surname" ("nom" changed into
+    "patronyme" more common among French genealogists).
   - [Jul 8, 99] Updated Swedish phrases (Stig Petersson)
   - [Jul 3, 99] Updated Danish phrases (Hans Albeck)
 
