@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
             "http://www.w3.org/TR/REC-html40/loose.dtd">
 <head>
-  <!-- $Id: start.txt,v 4.2 2001-03-26 13:02:54 ddr Exp $ -->
+  <!-- $Id: start.txt,v 4.3 2001-03-26 14:14:37 ddr Exp $ -->
   <!-- copyright (c) INRIA -->
   <title>[
 af: Genealogie/Familiekunde
@@ -10,6 +10,10 @@ ct: Genealogia
 de: Genealogie
 dk: Genealogi
 en: Genealogy
+eo: Genealogio
+es: Genealogía
+et: Genealoogia
+fi: Genealogia
 fr: G&eacute;n&eacute;alogie
 se: Genealogi
 ] - %t</title>
@@ -34,6 +38,10 @@ ct: Base de dades<br>geneal&ograve;gica
 de: Genealogische<br>Datenbank
 dk: Genealogisk<br>database
 en: Genealogical<br>data base
+eo: Datenbazo<br>genealogia
+es: Base de datos<br>geneal&oacute;gica
+et: Genealoogiline<br>andmebaas
+fi: Sukutietokanta
 fr: Base de donn&eacute;es<br>g&eacute;n&eacute;alogique
 se: Genealogisk<br>databas
 ]</font></h1></table>
@@ -52,6 +60,8 @@ de: Du kannst eine der folgenden Sprachen f&uuml;r die Anzeige ausw&auml;hlen:
 dk: Du kan v&aelig;lge fremstilling p&aring; et andet sprog blandt de
     f&oslash;lgende:
 en: You can select another displaying language among the following ones:
+eo: Vi povas elekti alian lingvon inter la sekvantajn:
+et: Võid valida ka mõne muu keele järgnevatest:
 fr: Vous pouvez sélectionner une autre langue d'affichage
     parmi les suivantes:
 se: Du kan välja ett annat språk bland de följande:
@@ -74,6 +84,14 @@ de: Die Datenbank <font color=%i><b>"%t"</b></font> enth&auml;lt z. Zt.
 dk: Databasen <font color=%i><b>"%t"</b></font> indeholder for
     &oslash;jeblikket %n personer.
 en: The data base <font color=%i><b>"%t"</b></font> now holds %n persons.
+eo: La datenbazo <font color=%i><b>"%t"</b></font> enhavas nun %n
+    personojn.
+es: La base <font color=%i><b>"%t"</b></font> contiene actualmente %n
+    personas.
+et: Andmebaas <font color=%i><b>"%t"</b></font> sisaldab andmeid %n
+    isiku kohta.
+fi: Tietokannassa <font color=%i><b>"%t"</b></font> on nyt %n
+    henkil&ouml;&auml.
 fr: La base de donn&eacute;es <font color=%i><b>"%t"</b></font> contient
     actuellement %n personnes.
 se: Databasen <font color=%i><b>"%t"</b></font> inneh&aring;ller nu
@@ -93,6 +111,10 @@ ct: acc&eacute;s <a href="%sw=w"><em>administrador</em></a><br> (clau)
 de: <a href="%sw=w"><em>Wizard</em></a>-Zugang<br> (Passwort)
 dk: <a href="%sw=w"><em>Opdateringsadgang</em></a><br> (adgangskode)
 en: <a href="%sw=w"><em>Wizard</em></a> access<br> (password)
+eo: <a href="%sw=w">Aliro <em>sorcxisto</em></a><br> (pasvorto)
+es: <a href="%sw=w">Entrada <em>brujo</em></a><br> (contrase&ntilde;a)
+et: Ligipääs <a href="%sw=w"><em>teadmamehena</em></a><br> (parool)
+fi: <a href="%sw=w"><em>Velho</em></a> kirjautuminen<br> (salasana)
 fr: acc&egrave;s <a href="%sw=w"><em>sorcier</em></a><br> (mot de passe).
 se: <a href="%sw=w"><em>Uppdaterings</em></a> tilltr&auml;de<br> (passord)
 ]<br></td>
@@ -104,6 +126,10 @@ ct: acc&eacute;s <a href="%sw=f"><em>amic</em></a><br> (clau)
 de: <a href="%sw=f"><em>Freund</em></a>-Zugang<br> (Passwort)
 dk: <a href="%sw=f"><em>Betroet adgang</em></a><br> (adgangskode)
 en: <a href="%sw=f"><em>Friend</em></a> access<br> (password)
+eo: <a href="%sw=f">Aliro <em>amiko</em></a><br> (pasvorto)
+es: <a href="%sw=f">Entrada <em>amigo</em></a><br> (contrase&ntilde;a)
+et: Ligipääs <a href="%sw=f"><em>sõbrana</em></a><br> (parool)
+fi: <a href="%sw=f"><em>Valittu</em></a> kirjautuminen<br> (salasana)
 fr: acc&egrave;s <a href="%sw=f"><em>ami</em></a><br> (mot de passe).
 se: <a href="%sw=f"><em>V&auml;nners</em></a> tilltr&auml;de<br> (passord)
 ]</td>
@@ -118,6 +144,10 @@ ct: Clau, per acc&eacute;s <em>amic</em> o <em>administrador</em>:
 de: Passwort für <em>Freund</em>- oder <em>Wizard</em>-Zugang</em>:
 dk: Adgangskode, for <em>betroet</em> adgang eller <em>opdateringsadgang</em>:
 en: Password, for <em>friend</em> or <em>wizard</em> access:
+eo: Pasvorto, por aliro <em>amiko</em> a&ugrave; <em>sorcxisto</em>:
+es: Contrase&ntilde;a, para entrada <em>amigo</em> o <em>brujo</em>:
+et: Parool, <em>sõbrana</em> või <em>teadmamehena</em> ligipääsuks:
+fi: Salasana <em>Valittu</em> tai <em>Velho</em> kirjautumiseen:
 fr: Mot de passe, pour acc&egrave;s <em>ami</em> ou <em>sorcier</em>:
 se: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
     tilltr&auml;de:
@@ -136,12 +166,16 @@ se: Passord, f&ouml;r <em>v&auml;nner</em> eller <em>uppdaterings</em>
 <center><table border=0 cellspacing=0 cellpadding=0><tr><td>
 [
 af: Om in die databasis rond te blaai, kan jy die volgende soektogte loods:
-cn: 
+cn:
 cs: Databázi lze prohledávat:
 ct: Per navegar en aquesta base, podeu fer la vostra recerca:
 de: Zum Benutzen dieser Datenbank kannst du hier suchen:
 dk: For at navigere i denne database kan du søge:
 en: To navigate in this data base, you can do your search:
+eo: Por navigi en cxi tiu datenbazo, vi povas fari vian sercxon:
+es: Para navegar en esta base de datos, puede hacer su búsqueda:
+et: Navigeeri andmebaasis:
+fi: Liikkuaksesi t&auml;ss&auml; tietokannassa voit etsi&auml;:
 fr: Pour naviguer dans cette base de donn&eacute;es, vous pouvez effectuer
        votre recherche:
 se: F&ouml;r att navigera i denna databas, kan du s&ouml;ka:
@@ -161,6 +195,10 @@ ct: per persona
 de: nach einer Person
 dk: personnavn
 en: by person
+eo: laù la persono
+es: por persona
+et: isik
+fi: henkil&ouml;n mukaan
 fr: par personne
 se: efter person
 ]</b></font>
@@ -191,6 +229,10 @@ ct: per títol
 de: nach einem Titel
 dk: titel (nob.)
 en: by title
+eo: laù la mosxto
+es: por t&iacute;tulo
+et: tiitel
+fi: arvonimen mukaan
 fr: par titre
 se: efter titel
 ]</b></font>%INl<br>%E
@@ -217,6 +259,10 @@ ct: <font color=%i><b>pel llistat</b></font> de tots els
 de: <font color=%i><b>in der Liste</b></font> aller
 dk: <font color=%i><b>i liste</b></font> over alle
 en: <font color=%i><b>by the list</b></font> of all
+eo: <font color=%i><b>per la listo</b></font> de cxiuj
+es: <font color=%i><b>por la lista</b></font> de todos los
+et: <font color=%i><b>loendis</b></font> kõik
+fi: <font color=%i><b>listasta</b></font> kaikki
 fr: <font color=%i><b>par la liste</b></font> de tous les
 se: <font color=%i><b>efter listan</b></font> av alla
 ]
@@ -229,17 +275,25 @@ ct: cognoms
 de: Nachnamen
 dk: efternavne
 en: surnames
+eo: familiaj nomoj
+es: apellidos
+et: perekonnanimed
+fi: sukunimet
 fr: patronymes
 se: efternamn
 ]
 <option value="P">[
 af: voorname
-cn: Ãû 
+cn: Ãû
 cs: køestní jméno
 ct: noms
 de: Vornamen
 dk: fornavne
 en: first names
+eo: propraj nomoj
+es: nombres
+et: eesnimed
+fi: etunimet
 fr: pr&eacute;noms
 se: f&ouml;rnamn
 ]
@@ -249,9 +303,13 @@ af: volgens
 cn: ¸ù¾Ý
 cs: seøazená podle
 ct: per
-de: 
+de:
 dk: sorteret efter
 en: by
+eo: laù
+es: por
+et: järjestatud
+fi: lajiteltuina
 fr: par
 se: sorterade i
 ]
@@ -264,6 +322,10 @@ ct: ordre alfab&egrave;tic
 de: alphabetisch sortiert
 dk: alfabetisk orden
 en: alphabetic order
+eo: alfabeta ordo
+es: orden alfab&eacute;tico
+et: tähestiku
+fi: aakkosj&auml;rjestykseen
 fr: ordre alphab&eacute;tique
 se: bokstavsordning
 ]
@@ -275,10 +337,18 @@ ct: freq&uuml&egrave;ncia
 de: nach H&auml;ufigkeit
 dk: hyppighed
 en: frequency
+eo: ofteco
+es: frecuencia
+et: sageduse
+fi: m&auml;&auml;r&auml;j&auml;rjestykseen
 fr: fr&eacute;quence
 se: frekvensordning
 ]
 </select>
+[
+en:
+et: järgi
+]
 <input type=submit value="Ok">
 </form>
 
@@ -293,6 +363,10 @@ ct: per
 de: mit
 dk: ved
 en: by
+eo: per
+es: por
+et:
+fi:
 fr: par
 se: efter
 ] [place] / [surname/surnames]0</b></font>
@@ -323,6 +397,16 @@ dk: <font color=%i><b>ved</b></font>
 en: <font color=%i><b>by the</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>advanced
        request</b></font></a>.
+eo: <font color=%i><b>per la</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>sercxado
+       progresata</b></font></a>.
+es: <font color=%i><b>mediante una</b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>consulta
+       avanzada</b></font></a>.
+et: <font color=%i><b></b></font>
+       <a href="%sm=H;v=advanced"><font color=%i><b>täpsem 
+       päring</b></font></a>.
+fi: <a href="%sm=H;v=advanced"><font color=%i><b>erityishaulla</b></font></a>.
 fr: <font color=%i><b> par la</b></font>
        <a href="%sm=H;v=advanced"><font color=%i><b>requ&ecirc;te
         &eacute;volu&eacute;e</b></font></a>.
@@ -337,12 +421,16 @@ se: <font color=%i><b>genom</b></font>
 %Iw<p>
 <center>[
 af: Jy kan
-cn: 
+cn:
 cs: Zde mù¾ete
 ct: Podeu
 de: Du kannst
 dk: Du kan:
 en: You can
+eo: Vi povas
+es: Puede
+et: Täiendamine:
+fi: Taikka
 fr: Vous pouvez
 se: Du kan
 ]<br><p>
@@ -359,6 +447,10 @@ ct: afegir una fam&iacute;lia
 de: eine Familie hinzuf&uuml;gen
 dk: tilføje en familie
 en: add a family
+eo: aldoni familion
+es: agregar una familia
+et: lisa pere
+fi: lis&auml;&auml; perhe
 fr: ajouter une famille
 se: l&auml;gga till en familj
 ]</a>
@@ -373,6 +465,10 @@ ct: modificar les notes
 de: die Notizen &auml;ndern
 dk: ændre noterne
 en: modify the notes
+eo: modifi la notojn
+es: modificar las notas
+et: muuda märkusi andmebaasi kohta
+fi: muokkaa lis&auml;tietoja
 fr: modifier les notes
 se: &auml;ndra noteringar
 ]</a>
@@ -386,12 +482,16 @@ se: &auml;ndra noteringar
 
 <center>[
 af: Jy kan ook kyk na
-cn: 
+cn:
 cs: Lze také zobrazit
 ct: Tamb&eacute; podeu consultar
 de: Du kannst zugreifen auf
 dk: Du kan også fremkalde:
 en: You can also consult
+eo: Vi povas anka&ugrave; konsulti
+es: Puede consultar
+et: Vaata lisaks:
+fi: Voit my&ouml;s katsoa
 fr: Vous pouvez également consulter
 se: Du kan ocks&aring; konsultera
 ]<br><p>
@@ -428,6 +528,13 @@ ct: Hi ha hagut %q consultes, de les quals %c en aquesta p&agrave;gina, des
 de: Seit dem %d gab es %q Zugriffe, davon %c auf diese Seite.
 dk: Der har v&aelig;ret %q opslag, %c af dem p&aring; denne side, siden %d.
 en: There have been %q accesses, %c of them to this page, since %d.
+eo: Estis %q alirejoj, el kiuj %c al cxi tiu pagxo, ekde la %d.
+es: Ha habido %q consultas, de las cuales %c corresponden a esta
+    p&aacute;gina, desde el %d.
+et: Alates andmebaasi loomise päevast (%d) on selle poole pöördutud %q korda, 
+    neist %c korda sellele lehele.
+fi: T&auml;h&auml;n menness&auml %q tapahtumaa, joista %c t&auml;lle
+    sivulle %d j&auml;lkeen.
 fr: Il y a eu %q consultations, dont %c &agrave; cette page, depuis le %d.
 se: Det har varit %q &aring;tkomster, %c av dem till den h&auml;r sidan,
     sedan %d.
@@ -445,7 +552,7 @@ ct: Si el vostre navegador no actualitza autom&agrave;ticament les
     la p&agrave;gina), proveu de navegar des d'<a href="%sescache=0">aquest
     altre lloc</a>.
 de: Wenn die ge&auml;nderten Seiten nicht automatisch aktualisiert werden
-    (man mu&szlig; st&auml;ndig im Browser auf "Neu laden" klicken), 
+    (man mu&szlig; st&auml;ndig im Browser auf "Neu laden" klicken),
     bitte <a href="%sescache=0">hier</a> klicken.
 dk: Hvis din browser ikke automatisk opdaterer &aelig;ndrede sider
     (n&oslash;dvendigg&oslash;r genindl&aelig;sning af det aktuelle
@@ -453,6 +560,15 @@ dk: Hvis din browser ikke automatisk opdaterer &aelig;ndrede sider
 en: If your browser does not automatically update the modified pages (forcing
     you to do "reload current document"), try navigating from <a
     href="%sescache=0">this link</a>.
+eo: Se via navigisto ne auxtomate gxisdatigas la modifigitajn pagxojn (se vi
+    devas fari "resxargxi kurantan dokumenton"), provu ekde <a
+    href="%sescache=0">cxi tiu legilo</a>.
+et: Kui Su veebibrauser ei uuenda modifitseeritud lehekülgi automaatselt 
+    (pead andma käsu "lae käesolev dokument uuesti"), siis  proovi alustada
+    navigeerimist <a href="%sescache=0">sellest viitest</a>.
+fi: Mik&auml;li selaimesi ei automaattisesti p&auml;ivit&auml muutettuja sivuja
+    (jolloin sinun t&auml;ytyy "ladata uudelleen nykyinen dokumentti") kokeile
+    <a href="%sescache=0">t&auml;t&auml linkki&auml;</a>.
 fr: Si votre navigateur ne met pas &agrave; jour automatiquement les pages
     modifi&eacute;es (vous obligeant &agrave; faire "actualiser la page"),
     essayez la navigation &agrave; partir de <a href="%sescache=0">ce
@@ -475,6 +591,10 @@ ct: L&egrave;xic
 de: Lexikon
 dk: leksikon
 en: lexicon
+eo: leksikono
+es: lexicon
+et: lexicon
+fi: Sanasto
 fr: lexique
 se: lexikon
 ]</a></em></font></p>
