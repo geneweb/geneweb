@@ -1,6 +1,10 @@
 GeneWeb version 3.02
 --------------------
 
+* Setup program (gwsetup)
+  - [Dec 13, 99] Fixed another problem of images displaying with still
+    another browser (see version 3.01).
+
 * GeneWeb Service/CGI (gwd)
   - [Dec 10, 99] In tree displays with several branches, the option
     "add spouses" did not work. Fixed.
