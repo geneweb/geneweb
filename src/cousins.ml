@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: cousins.ml,v 3.4 2000-01-10 11:55:22 ddr Exp $ *)
+(* $Id: cousins.ml,v 3.5 2000-01-10 12:15:13 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -263,7 +263,7 @@ value print_cousins conf base p lev1 lev2 =
         (capitale (transl conf "descendants")) lev2
   in
   let max_cnt =
-    try int_of_string (List.assoc "max_cousin" conf.base_env) with
+    try int_of_string (List.assoc "max_cousins" conf.base_env) with
     [ Not_found | Failure _ -> max_cnt ]
   in
   do header conf title;
