@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: perso.ml,v 1.19 1998-12-18 10:29:46 ddr Exp $ *)
+(* $Id: perso.ml,v 1.20 1998-12-28 15:40:25 ddr Exp $ *)
 
 open Def;
 open Gutil;
@@ -664,11 +664,11 @@ value print conf base p =
             (coa conf (sou base p.surname))
         else
           do Wserver.wprint "<a href=\"%sm=P;v=%s\">%s</a>" (commd conf)
-               (code_varenv (sou base p.first_name))
+               (code_varenv (Name.lower (sou base p.first_name)))
                (coa conf (sou base p.first_name));
              Wserver.wprint " ";
              Wserver.wprint "<a href=\"%sm=N;v=%s\">%s</a>" (commd conf)
-               (code_varenv (sou base p.surname))
+               (code_varenv (Name.lower (sou base p.surname)))
                (coa conf (sou base p.surname));
           return () ]
   in
