@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: updateFam.ml,v 4.15 2001-06-18 07:06:01 ddr Exp $ *)
+(* $Id: updateFam.ml,v 4.16 2001-06-19 08:00:04 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -836,6 +836,12 @@ value eval_key_variable (fn, sn, oc, create, var) =
   | "occ" -> if oc = 0 then "" else string_of_int oc
   | "surname" -> quote_escaped sn
   | "create" -> if create <> Update.Link then "create" else "link"
+  | "sex" ->
+      match create with
+      [ Update.Create Male _ -> "male"
+      | Update.Create Female _ -> "female"
+      | Update.Create Neuter _ -> "neuter"
+      | _ -> "" ]
   | s -> ">%" ^ s ^ "???" ]
 ;
 
