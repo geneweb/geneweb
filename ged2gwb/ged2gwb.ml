@@ -1,5 +1,5 @@
 (* camlp4r pa_extend.cmo ../src/pa_lock.cmo *)
-(* $Id: ged2gwb.ml,v 3.29 2000-09-23 12:01:08 ddr Exp $ *)
+(* $Id: ged2gwb.ml,v 3.30 2000-09-27 22:15:19 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 open Def;
@@ -56,6 +56,7 @@ value rec skip_eol =
 value rec get_to_eoln len =
   parser
   [ [: `'\010' | '\013'; _ = skip_eol :] -> Buff.get len
+  | [: `'\t'; s :] -> get_to_eoln (Buff.store len ' ') s
   | [: `c; s :] -> get_to_eoln (Buff.store len c) s
   | [: :] -> Buff.get len ]
 ;
@@ -69,13 +70,13 @@ value rec skip_to_eoln =
 
 value rec get_ident len =
   parser
-  [ [: `' ' :] -> Buff.get len
+  [ [: `' ' | '\t' :] -> Buff.get len
   | [: `c when not (List.mem c ['\010'; '\013']); s :] ->
       get_ident (Buff.store len c) s
   | [: :] -> Buff.get len ]
 ;
 
-value skip_space = parser [ [: `' ' :] -> () | [: :] -> () ];
+value skip_space = parser [ [: `' ' | '\t' :] -> () | [: :] -> () ];
 
 value rec line_start num =
   parser [ [: `' '; s :] -> line_start num s | [: `x when x = num :] -> () ]
@@ -206,6 +207,7 @@ value rec skip_spaces =
 value rec ident_slash len =
   parser
   [ [: `'/' :] -> Buff.get len
+  | [: `'\t'; a = ident_slash (Buff.store len ' ') :] -> a
   | [: `c; a = ident_slash (Buff.store len c) :] -> a
   | [: :] -> Buff.get len ]
 ;
@@ -296,7 +298,7 @@ value rec lexing =
   [ [: `('0'..'9' as c); n = number (Buff.store 0 c) :] -> ("INT", n)
   | [: `('A'..'Z' as c); i = ident (Buff.store 0 c) :] -> ("ID", i)
   | [: `'.' :] -> ("", ".")
-  | [: `' ' | '\013'; s :] -> lexing s
+  | [: `' ' | '\t' | '\013'; s :] -> lexing s
   | [: _ = Stream.empty :] -> ("EOI", "")
   | [: `x :] -> ("", String.make 1 x) ]
 and number len =

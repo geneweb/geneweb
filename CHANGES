@@ -51,6 +51,7 @@ GeneWeb version 3.08
     <img src=<a href=http://...>>
 
 * Gedcom to GeneWeb (ged2gwb)
+  - [28 Sep 00] Strip now possible tabulations found in the GEDCOM.
   - [26 Aug 00] If -epn (which is default) and -lf, tries now to lowercase
     the public names.
 
