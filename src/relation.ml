@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo ./pa_html.cmo *)
-(* $Id: relation.ml,v 3.9 1999-12-01 19:16:01 ddr Exp $ *)
+(* $Id: relation.ml,v 3.10 1999-12-02 05:30:45 ddr Exp $ *)
 (* Copyright (c) 1999 INRIA *)
 
 open Def;
@@ -939,15 +939,14 @@ value print_propose_upto conf base total p1 p2 rl =
          Wserver.wprint "<a href=\"%sm=A;t=D;%s;%s;l=%d\">" (commd conf)
            (acces conf base p) (acces_n conf base "1" a) maxlen;
          Wserver.wprint "%s</a>" (transl conf "here");
+         Wserver.wprint ".</em></font>\n";
          if Num.gt total Num.one && Num.gt (Num.of_int 33) total then
-           do Wserver.wprint " %s\n" (transl conf "or");
+           do Wserver.wprint "<p>\n";
               Wserver.wprint "<a href=\"%sm=DAG" (commd conf);
               print_list_for_dag conf base maxlen a p rl;
-              Wserver.wprint "\">%s</a> (%s)" (transl conf "here")
-                (transl conf "tree");
+              Wserver.wprint "\">%s</a>\n" (capitale (transl conf "tree"));
            return ()
          else ();
-         Wserver.wprint ".</em></font>\n";
       return ()
   | _ -> () ]
 ;
