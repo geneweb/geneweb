@@ -1,4 +1,4 @@
-(* $Id: gwtp.ml,v 1.26 2000-08-16 08:15:58 ddr Exp $ *)
+(* $Id: gwtp.ml,v 1.27 2000-08-16 08:19:34 ddr Exp $ *)
 
 open Printf;
 
@@ -395,10 +395,13 @@ value gwtp_download str env b tok =
           try
             while True do
               match Unix.readdir dh with
-              [ "." | ".." -> ()
+              [ "." | ".." | "" -> ()
               | f ->
-                  printf "<li><a href=\"gwtp?m=RECV;b=%s;t=%s;f=/%s\">%s</a>\n"
-                    b tok f f ];
+                  if f.[String.length f - 1] = '~' then ()
+                  else
+                    printf
+                      "<li><a href=\"gwtp?m=RECV;b=%s;t=%s;f=/%s\">%s</a>\n"
+                      b tok f f ];
             done
           with
           [ End_of_file -> Unix.closedir dh ];
