@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.24 2000-06-17 14:51:29 ddr Exp $ *)
+(* $Id: family.ml,v 3.25 2000-06-18 12:00:55 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -546,7 +546,7 @@ value print_no_index conf base =
 ;
 
 value senv_vars =
-  ["dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "long"; "marr"; "spouse";
+  ["dsrc"; "em"; "ei"; "ep"; "en"; "eoc"; "escache"; "long"; "marr"; "spouse";
    "shortest"; "cgl"; "iz"; "nz"; "pz"; "ocz"]
 ;
 
@@ -571,6 +571,18 @@ value extract_henv conf base =
      match p_getenv conf.env "dsrc" with
      [ Some "" | None -> ()
      | Some s -> conf.henv := conf.henv @ [("dsrc", code_varenv s)] ];
+     match p_getenv conf.env "escache" with
+     [ Some _ ->
+         let bdir = Filename.concat Util.base_dir.val (conf.bname ^ ".gwb") in
+         let s =
+           try Unix.stat (Filename.concat bdir "patches") with
+           [ Unix.Unix_error _ _ _ -> Unix.stat (Filename.concat bdir "base") ]
+         in
+         let v =
+           int_of_float (mod_float s.Unix.st_mtime (float_of_int max_int))
+         in
+         conf.henv := conf.henv @ [("escache", string_of_int v)]
+     | None -> () ];
   return ()
 ;
 
