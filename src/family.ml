@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: family.ml,v 3.22 2000-04-11 12:32:06 ddr Exp $ *)
+(* $Id: family.ml,v 3.23 2000-05-02 02:38:21 ddr Exp $ *)
 (* Copyright (c) 2000 INRIA *)
 
 open Def;
@@ -569,6 +569,18 @@ value extract_sosa_henv conf base =
   | None -> () ]
 ;
 
+value set_owner conf =
+  ifdef UNIX then
+    let s = Unix.stat (Filename.concat base_dir.val (conf.bname ^ ".gwb")) in
+    try
+      do Unix.setgid s.Unix.st_gid;
+         Unix.setuid s.Unix.st_uid;
+      return ()
+    with
+    [ Unix.Unix_error _ _ _ -> () ]
+  else ()
+;
+
 value family conf base =
   let r =
     match (p_getenv conf.env "opt", p_getenv conf.env "m") with
@@ -577,7 +589,8 @@ value family conf base =
     | (_, Some "IM") ->
         do Image.print conf base; return None
     | _ ->
-        do extract_sosa_henv conf base;
+        do set_owner conf;
+           extract_sosa_henv conf base;
            make_senv conf base;
         return
         if only_special_env conf.env then

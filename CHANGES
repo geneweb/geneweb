@@ -2,6 +2,12 @@ GeneWeb version 3.05
 --------------------
 
 * GeneWeb Service/CGI (gwd)
+  - [02 May 00] [technical] Deleted (Unix) options -setuid and -setgid: now
+    each request automatically gets the user id and the group id of the owner
+    of the data base directory (base.gwb). All possibly created files then
+    belong to the owner of the data base directory. No error if cannot change
+    to these ids: the database may then just not be accessible or not be
+    writable.
   - [30 Apr 00] Fixed little problem with displaying by places for the ones
     containing several (at least two) indications between parentheses.
 

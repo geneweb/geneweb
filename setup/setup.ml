@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: setup.ml,v 3.7 2000-04-09 01:17:35 ddr Exp $ *)
+(* $Id: setup.ml,v 3.8 2000-05-02 02:38:21 ddr Exp $ *)
 
 value port = ref 2316;
 value default_lang = ref "en";
@@ -1351,7 +1351,7 @@ value main () =
   do ifdef UNIX then intro ()
      else
        try let _ = Sys.getenv "WSERVER" in () with [ Not_found -> intro () ];
-     Wserver.f None port.val 0 None (None, None) wrap_setup;
+     Wserver.f None port.val 0 None wrap_setup;
   return ()
 ;
 

@@ -1,4 +1,4 @@
-(* $Id: wserver.ml,v 3.6 2000-04-28 22:48:42 ddr Exp $ *)
+(* $Id: wserver.ml,v 3.7 2000-05-02 02:38:22 ddr Exp $ *)
 (* Copyright (c) INRIA *)
 
 value sock_in = ref "wserver.sin";
@@ -504,7 +504,7 @@ value accept_connection tmout max_clients callback s =
    return ()
 ;
 
-value f addr_opt port tmout max_clients (uid, gid) g =
+value f addr_opt port tmout max_clients g =
   match
     ifdef MAC then None
     else ifdef WIN95 then
@@ -533,16 +533,7 @@ value f addr_opt port tmout max_clients (uid, gid) g =
       do Unix.setsockopt s Unix.SO_REUSEADDR True;
          Unix.bind s (Unix.ADDR_INET addr port);
          Unix.listen s 4;
-         ifdef UNIX then
-           let _ = ifdef UNIX then Unix.nice 1 else () in
-           do match gid with
-              [ Some gid -> Unix.setgid gid
-              | None -> () ];
-              match uid with
-              [ Some uid -> Unix.setuid uid
-              | None -> () ];
-           return ()
-         else ();
+         ifdef UNIX then let _ = Unix.nice 1 in () else ();
          ifdef MAC then Sys.set_signal Sys.sigpipe Sys.Signal_ignore
          else ();
       return
