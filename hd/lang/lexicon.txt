@@ -1,4 +1,4 @@
-# $Id: lexicon.txt,v 4.18 2001-04-13 19:12:52 ddr Exp $
+# $Id: lexicon.txt,v 4.19 2001-04-14 10:36:06 ddr Exp $
 # Copyright (c) 2001 INRIA
 
      !charset
@@ -2689,6 +2689,7 @@ es: editar por sector/ancho/superpuesto/ancho total
 et: kuva osadena/osa laius/ülekate/kogulaius
 fr: affichage par tranches/largeur de la tranche/chevauchement/largeur totale
 he:  äöâ øöåòåú  / øåçá øöåòåú  / çôéôä / ñ"ä øåçá
+lv: râdît pa loksnçm/loksnes platums/pârklâjums/kopçjais platums
 nl: weergave per snede/sneebreedte/doorsnede/totale breedte
 no: vis med delte sider/valgt sidebredde/valgt overlapping/global bredde
 pt: resultados por fracções/largura da fracção/sobreposição/largura total
@@ -3601,7 +3602,7 @@ fr: nom/courriel/sujet
 he: ident/email/ ğåùà
 is: ident/email/um
 it: ident/email/oggetto
-lv: ident/e-pasts/subjekts
+lv: vârds/e-pasts/subjekts
 nl: ident/email/onderwerp
 no: ident/email/emne
 pl: ident/email/temat
@@ -4860,7 +4861,7 @@ es: sin comprobacion de sexo
 et: ära kontrolli sugude sobivust
 fr: pas de v&eacute;rification des sexes
 he:  áìé ìååãà îéï
-lv: nav pâbaudîts dzimums
+lv: nepâbaudît dzimumus
 nl: geslachten niet verifi&euml;ren
 no: ikke kontroll av kj&oslash;nn
 pt: não verificar os sexos
