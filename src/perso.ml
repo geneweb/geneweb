@@ -1,5 +1,5 @@
 (* camlp4r *)
-(* $Id: perso.ml,v 4.44 2002-12-09 05:09:54 ddr Exp $ *)
+(* $Id: perso.ml,v 4.45 2002-12-26 14:26:22 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Def;
@@ -28,7 +28,7 @@ value string_of_marriage_text conf base fam =
   in
   match marriage_place with
   [ "" -> s
-  | _ -> s ^ ", " ^ string_with_macros conf [] marriage_place ^ "," ]
+  | _ -> s ^ ", " ^ string_with_macros conf False [] marriage_place ^ "," ]
 ;
 
 value string_of_title conf base and_txt p (nth, name, title, places, dates) =
@@ -382,7 +382,7 @@ value string_of_alias conf base env =
 ;
 
 value string_of_place conf base istr =
-  string_with_macros conf [] (sou base istr)
+  string_with_macros conf False [] (sou base istr)
 ;
 
 value string_of_baptism_place conf base env p p_auth =
@@ -400,7 +400,7 @@ value string_of_burial_place conf base env p p_auth =
 value string_of_comment conf base env p p_auth =
   fun
   [ Vfam fam _ _ ->
-      if p_auth then string_with_macros conf [] (sou base fam.comment)
+      if p_auth then string_with_macros conf False [] (sou base fam.comment)
       else ""
   | _ -> "" ]
 ;
@@ -572,7 +572,7 @@ value string_of_nobility_titles conf base env p p_auth =
 value string_of_notes conf base env p p_auth =
   if p_auth then
     let env = [('i', fun () -> Util.default_image_name base p)] in
-    string_with_macros conf env (sou base p.notes)
+    string_with_macros conf False env (sou base p.notes)
   else ""
 ;
 
@@ -727,7 +727,7 @@ value string_of_source conf base env p =
   match get_env "src" env with
   [ Vstring s ->
       let env = [('i', fun () -> Util.default_image_name base p)] in
-      string_with_macros conf env s
+      string_with_macros conf False env s
   | _ -> "" ]
 ;
 

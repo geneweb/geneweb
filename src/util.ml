@@ -1,5 +1,5 @@
 (* camlp4r ./pa_lock.cmo *)
-(* $Id: util.ml,v 4.68 2002-12-23 13:37:52 ddr Exp $ *)
+(* $Id: util.ml,v 4.69 2002-12-26 14:26:24 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Def;
@@ -1202,24 +1202,26 @@ value email_addr s i =
   | None -> None ]
 ;
 
+value tag_id s i =
+  loop i 0 where rec loop i len =
+    if i = String.length s then Buff.get len
+    else
+      match s.[i] with
+      [ 'a'..'z' | 'A'..'Z' | '0'..'9' as c ->
+          loop (i + 1) (Buff.store len (Char.lowercase s.[i]))
+      | _ -> if len = 0 then loop (i + 1) 0 else Buff.get len ]
+;
+
 value good_tags_list =
   ["a"; "b"; "br"; "dd"; "div"; "dl"; "dt"; "em"; "font"; "hr"; "h1"; "h2";
    "h3"; "h4"; "i"; "img"; "li"; "ol"; "p"; "pre"; "strong"; "sup"; "table";
    "td"; "tr"; "u"; "ul"]
 ;
-
-value good_tag s i =
-  let tag_id =
-    loop i 0 where rec loop i len =
-      if i = String.length s then Buff.get len
-      else
-        match s.[i] with
-        [ 'a'..'z' | 'A'..'Z' | '0'..'9' as c ->
-            loop (i + 1) (Buff.store len (Char.lowercase s.[i]))
-        | _ -> if len = 0 then loop (i + 1) 0 else Buff.get len ]
-  in
-  List.mem tag_id good_tags_list
+value bad_tags_list =
+  ["applet"; "embed"; "form"; "input"; "object"; "script"]
 ;
+value good_tag s i = List.mem (tag_id s i) good_tags_list;
+value bad_tag s i = List.mem (tag_id s i) bad_tags_list;
 
 value get_variable s i =
   loop 0 i where rec loop len i =
@@ -1254,7 +1256,7 @@ value expand_env =
    | _ -> s ]
 ;
 
-value string_with_macros conf env s =
+value string_with_macros conf positive_filtering env s =
   let buff = Buffer.create 1000 in
   loop Out 0 where rec loop tt i =
     if i < String.length s then
@@ -1288,7 +1290,10 @@ value string_with_macros conf env s =
       else if s.[i] = '<' && i + 1 < String.length s && s.[i+1] = '%' then do {
         Buffer.add_string buff "<"; loop tt (i + 1)
       }
-      else if s.[i] = '<' && not (good_tag s (i + 1)) then do {
+      else if s.[i] = '<' &&
+        (positive_filtering && not (good_tag s (i + 1)) ||
+         not positive_filtering && bad_tag s (i + 1))
+      then do {
         Buffer.add_string buff "&lt;"; loop tt (i + 1)
       }
       else

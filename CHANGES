@@ -1,6 +1,13 @@
 GeneWeb version 4.09
 --------------------
 
+* GeneWeb server or CGI (gwd)
+  - [26 Dec 02] Changed the filtering of HTML tags: in version 4.08, the
+    principle was changed so that some tags were accepted and all other
+    ones refused. Return to previous behaviour (some tags are refused,
+    all other ones are accepted), except for the forum of the data base
+    where the new behaviour is maintained.
+
 GeneWeb version 4.08
 --------------------
 

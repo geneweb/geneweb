@@ -1,5 +1,5 @@
 (* camlp4r ./pa_html.cmo *)
-(* $Id: wiznotes.ml,v 4.5 2002-12-11 15:55:04 ddr Exp $ *)
+(* $Id: wiznotes.ml,v 4.6 2002-12-26 14:26:26 ddr Exp $ *)
 (* Copyright (c) 2002 INRIA *)
 
 open Config;
@@ -107,7 +107,7 @@ value print_wizard conf base wz =
     tag "table" "border=0" begin
       tag "tr" begin
         tag "td" begin
-          Wserver.wprint "%s\n" (string_with_macros conf [] s);
+          Wserver.wprint "%s\n" (string_with_macros conf False [] s);
         end;
       end;
     end;
