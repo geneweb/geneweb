@@ -81,6 +81,10 @@ GeneWeb Version 4.10
     correctly and the button "OK" resulted in bad request.
   - [30 Jan 03] Added option -min_disp_req
 
+* GeneWeb uncompiler (gwu)
+  - [04 May 04] Fixed small bug displaying in reverse order isolated
+    persons with relations, resulting no fixpoint when doing gwc/gwu.
+
 * Gedcom to GeneWeb (ged2gwb)
   - [12 Feb 03] Fixed problem with places containing only spaces: now
     replaced with empty strings.
