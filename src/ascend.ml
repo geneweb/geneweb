@@ -1,5 +1,5 @@
 (* camlp4r ./def.syn.cmo ./pa_html.cmo *)
-(* $Id: ascend.ml,v 4.0 2001-03-16 19:34:24 ddr Exp $ *)
+(* $Id: ascend.ml,v 4.1 2001-03-30 12:54:21 ddr Exp $ *)
 (* Copyright (c) 2001 INRIA *)
 
 open Config;
@@ -90,9 +90,11 @@ value print_choice conf base p niveau_effectif =
     tag "table" "border=%d width=\"90%%\"" conf.border begin
       tag "tr" begin
         tag "td" "valign=top" begin
-          Wserver.wprint "<input type=radio name=t value=N checked> %s<br>\n"
+          Wserver.wprint
+            "<input type=radio name=t value=N checked> %s (*)<br>\n"
             (capitale (transl conf "short display"));
-          Wserver.wprint "<input type=radio name=t value=G> %s<br>\n"
+          Wserver.wprint
+            "<input type=radio name=t value=G> %s (*)<br>\n"
             (capitale (transl conf "long display"));
           Wserver.wprint
             "- %s <input type=checkbox name=siblings value=on checked><br>\n"
@@ -137,8 +139,6 @@ value print_choice conf base p niveau_effectif =
               (limit_by_list conf)
               (transl_nth conf "generation/generations" 1);
           Wserver.wprint "<br>\n";
-          Wserver.wprint "<input type=radio name=t value=S> %s<br>\n"
-            (capitale (transl conf "only the generation selected"));
           Wserver.wprint "<input type=radio name=t value=F> %s\n"
             (capitale (transl conf "surnames list"));
           Wserver.wprint "<br>\n";
@@ -161,6 +161,13 @@ value print_choice conf base p niveau_effectif =
           Wserver.wprint "%s\n"
             (capitale (transl conf "cancel GeneWeb links"));
           Wserver.wprint "<input type=checkbox name=cgl value=on>\n";
+        end;
+      end;
+      tag "tr" begin
+        tag "td" "colspan=2 align=center" begin
+          Wserver.wprint "(*) %s\n"
+            (capitale (transl conf "only the generation selected"));
+          Wserver.wprint "<input type=checkbox name=only value=on>\n";
         end;
       end;
     end;
@@ -575,7 +582,8 @@ value print_other_marriages conf base ws all_gp auth ifamo p u =
 ;
 
 value print_notes_ref conf base p wn n child_n =
-  if wn && age_autorise conf base p && person_has_notes base p then
+  let only = p_getenv conf.env "only" = Some "on" in
+  if not only && wn && age_autorise conf base p && person_has_notes base p then
     do Wserver.wprint "[%s "
          (capitale (transl_nth conf "note/notes" 0));
        stag "strong" begin
@@ -892,6 +900,7 @@ value print_notes conf base all_gp ws =
 ;
 
 value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
+  let only = p_getenv conf.env "only" = Some "on" in
   let mark = Array.create (base.data.persons.len) Num.zero in
   let rec get_generations niveau gpll gpl =
     let gpll = [gpl :: gpll] in
@@ -905,15 +914,21 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
   let rec generation niveau all_gp =
     fun
     [ [gpl :: gpll] ->
-        do tag "h3" begin
-             Wserver.wprint "<em>%s %d</em>\n"
-               (capitale (transl_nth conf "generation/generations" 0)) niveau;
-           end;
-           List.iter
-             (print_generation_person_long conf base ws wn all_gp (gpll = []))
-             gpl;
-           Wserver.wprint "<p>";
-           html_br conf;
+        do if not only || niveau = niveau_max then
+             do tag "h3" begin
+                  Wserver.wprint "<em>%s %d</em>\n"
+                    (capitale (transl_nth conf "generation/generations" 0))
+                    niveau;
+                end;
+                let all_gp = if only then [] else all_gp in
+                List.iter
+                  (print_generation_person_long conf base ws wn all_gp
+                     (gpll = []))
+                  gpl;
+                Wserver.wprint "<p>";
+                html_br conf;
+             return ()
+           else ();
         return
         generation (niveau + 1) all_gp gpll
     | [] -> () ]
@@ -926,13 +941,14 @@ value afficher_ascendants_numerotation_long conf base niveau_max ws wn p =
             (txt_fun raw_access conf base p)))
   in
   do header conf title;
-     Wserver.wprint "%s.\n" (capitale (text_to conf niveau_max));
+     if only then ()
+     else Wserver.wprint "%s.\n" (capitale (text_to conf niveau_max));
      mark.(Adef.int_of_iper p.cle_index) := Num.one;
      let gpll = get_generations 1 [] [GP_person Num.one p.cle_index None] in
      let gpll = List.rev gpll in
      let all_gp = List.flatten gpll in
      do generation 1 all_gp gpll;
-        if wn && has_notes conf base all_gp then
+        if not only && wn && has_notes conf base all_gp then
           do Wserver.wprint "<p><hr><p>\n";
              Wserver.wprint "<h3>%s</h3>\n"
                (capitale (nominative (transl_nth conf "note/notes" 1)));
@@ -2218,7 +2234,11 @@ value print_surnames_list conf base v p =
 value print conf base p =
   match (p_getenv conf.env "t", p_getint conf.env "v") with
   [ (Some "L", Some v) -> afficher_ascendants_jusqu_a conf base v p
-  | (Some "N", Some v) -> afficher_ascendants_numerotation conf base v p
+  | (Some "N", Some v) ->
+      if p_getenv conf.env "only" = Some "on" then
+        afficher_ascendants_niveau conf base v p
+      else
+        afficher_ascendants_numerotation conf base v p
   | (Some "G", Some v) ->
       let ws =
         match p_getenv conf.env "siblings" with
@@ -2231,7 +2251,6 @@ value print conf base p =
         | _ -> False ]
       in
       afficher_ascendants_numerotation_long conf base v ws wn p
-  | (Some "S", Some v) -> afficher_ascendants_niveau conf base v p
   | (Some "M", Some v) ->
       let al =
         match p_getenv conf.env "al" with

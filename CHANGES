@@ -9,6 +9,8 @@ GeneWeb version 4.01
   - [14 Mar 01] Added Brazilian Portuguese (Paulo Francisco Sedrez).
 
 * GeneWeb server or CGI (gwd)
+  - [30 Mar 01] In ancestors page, in long display mode, added the ability
+    to have only the selected generation.
   - [25 Mar 01] Improved the displaying of phrases like "xxx is a
     grandchild of a nth cousin of yyy" in some languages (Swedish,
     Danish, French). Indeed in Swedish and Danish, the word "grandchild"
